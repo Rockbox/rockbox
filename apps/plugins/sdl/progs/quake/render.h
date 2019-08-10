@@ -110,6 +110,15 @@ extern	int		reinit_surfcache;
 extern	refdef_t	r_refdef;
 extern vec3_t	r_origin, vpn, vright, vup;
 
+#ifdef USE_PQ_OPT1
+extern int	vpn_fxp[3], vright_fxp[3], vup_fxp[3];
+extern int	xscale_fxp, yscale_fxp, xcenter_fxp, ycenter_fxp;
+extern int		r_refdef_fvrectx_adj_fxp;
+extern int		r_refdef_fvrectright_adj_fxp;
+extern int		r_refdef_fvrecty_adj_fxp;
+extern int		r_refdef_fvrectbottom_adj_fxp;
+#endif
+
 extern	struct texture_s	*r_notexture_mip;
 
 

@@ -44,6 +44,10 @@ clipplane_t	*entity_clipplanes;
 clipplane_t	view_clipplanes[4];
 clipplane_t	world_clipplanes[16];
 
+#ifdef USE_PQ_OPT2
+clipplane_fxp_t		view_clipplanes_fxp[4];
+#endif
+
 medge_t			*r_pedge;
 
 qboolean		r_leftclipped, r_rightclipped;
@@ -66,6 +70,11 @@ int				r_emitted;
 float			r_nearzi;
 float			r_u1, r_v1, r_lzi1;
 int				r_ceilv1;
+
+#ifdef USE_PQ_OPT1
+int				r_u1_fxp, r_v1_fxp, r_lzi1_fxp;
+extern int		modelorg_fxp[3];
+#endif
 
 qboolean	r_lastvertvalid;
 
@@ -250,6 +259,306 @@ void R_EmitEdge (mvertex_t *pv0, mvertex_t *pv1)
 	removeedges[v2] = edge;
 }
 
+#ifdef USE_PQ_OPT1
+void R_EmitEdge_fxp (mvertex_t *pv0, mvertex_t *pv1)
+{
+	edge_t	*edge, *pcheck;
+	int		u_check;
+	//float	u, u_step;
+	int		u_fxp, u_step_fxp;
+	//vec3_t	local, transformed;
+	int		local_fxp[3], transformed_fxp[3];
+	float	*world;
+	int		v, v2, ceilv0;
+	//float	scale, lzi0, u0, v0;
+	int		scale_fxp, scale2_fxp, lzi0_fxp, u0_fxp, v0_fxp;
+	int		side;
+
+	if (r_lastvertvalid)
+	{
+		u0_fxp = r_u1_fxp;
+		v0_fxp = r_v1_fxp;
+		lzi0_fxp = r_lzi1_fxp;
+		//lzi0 = r_lzi1;
+		ceilv0 = r_ceilv1;
+	}
+	else
+	{
+		//world_fxp=(int)(pv0->position[0]*(float)(2^16));
+		world = &pv0->position[0];
+		
+	// transform and project
+		//VectorSubtract (world, modelorg, local);
+		//Vector Subtract (and convert)
+		local_fxp[0]=((int)(world[0]*(524288.0)))-modelorg_fxp[0];
+		local_fxp[1]=((int)(world[1]*(524288.0)))-modelorg_fxp[1];
+		local_fxp[2]=((int)(world[2]*(524288.0)))-modelorg_fxp[2];
+
+		//TransformVector (local, transformed);
+		//transformed_fxp[0] = (int)(local_fxp[0]*vright[0])+(int)(local_fxp[1]*vright[1])+(int)(local_fxp[2]*vright[2]);
+		//transformed_fxp[1] = (int)(local_fxp[0]*vup[0])+(int)(local_fxp[1]*vup[1])+(int)(local_fxp[2]*vup[2]);
+		//transformed_fxp[2] = (int)(local_fxp[0]*vpn[0])+(int)(local_fxp[1]*vpn[1])+(int)(local_fxp[2]*vpn[2]);
+
+		transformed_fxp[0] = local_fxp[0]/vright_fxp[0]+local_fxp[1]/vright_fxp[1]+local_fxp[2]/vright_fxp[2];
+		//transformed_fxp[0]*=256;
+		transformed_fxp[1] = local_fxp[0]/vup_fxp[0]+local_fxp[1]/vup_fxp[1]+local_fxp[2]/vup_fxp[2];
+		//transformed_fxp[1]*=256;
+		transformed_fxp[2] = local_fxp[0]/vpn_fxp[0]+local_fxp[1]/vpn_fxp[1]+local_fxp[2]/vpn_fxp[2];
+		transformed_fxp[2]*=256;
+		
+		if (transformed_fxp[2] < (int)(NEAR_CLIP*1048576.0))
+			transformed_fxp[2] = (int)(NEAR_CLIP*1048576.0);
+
+		transformed_fxp[0]/=16;
+		transformed_fxp[1]/=16;
+		transformed_fxp[2]/=2048;
+
+		lzi0_fxp=transformed_fxp[2];
+		//lzi0 = (float)(1.0 / transformed[2]);
+
+	// FIXME: build x/yscale into transform?
+		//scale = xscale * lzi0;
+		//u0 = (xcenter + scale*transformed[0]);
+
+		scale_fxp=xscale_fxp/transformed_fxp[2];	//9.23 / 24.8 = 17.15
+		scale2_fxp=transformed_fxp[0]*(scale_fxp);	// 25.7 * 17.15 = 10.22
+
+		if (transformed_fxp[0]<0) {
+			if (scale2_fxp>0) scale2_fxp=-511*4194304;
+		} else {
+			if (scale2_fxp<0) scale2_fxp=511*4194304;
+		}
+
+		u0_fxp=scale2_fxp+xcenter_fxp;
+
+		if (u0_fxp < r_refdef_fvrectx_adj_fxp)
+			u0_fxp = r_refdef_fvrectx_adj_fxp;
+		if (u0_fxp > r_refdef_fvrectright_adj_fxp)
+			u0_fxp = r_refdef_fvrectright_adj_fxp;
+
+		//scale = yscale * lzi0;
+		//v0 = (ycenter - scale*transformed[1]);
+		scale_fxp=yscale_fxp/transformed_fxp[2];	//9.23 / 24.8 = 17.15
+		scale2_fxp=transformed_fxp[1]*(scale_fxp);	// 25.7 * 17.15 = 10.22
+
+		if (transformed_fxp[1]<0) {
+			if (scale2_fxp>0) scale2_fxp=-511*4194304;
+		} else {
+			if (scale2_fxp<0) scale2_fxp=511*4194304;	//255*8388608;
+		}
+
+		v0_fxp = ycenter_fxp-scale2_fxp;
+
+		if (v0_fxp < r_refdef_fvrecty_adj_fxp)
+			v0_fxp = r_refdef_fvrecty_adj_fxp;
+		if (v0_fxp > r_refdef_fvrectbottom_adj_fxp)
+			v0_fxp = r_refdef_fvrectbottom_adj_fxp;
+	
+		ceilv0 = v0_fxp/4194304;
+		if (v0_fxp&0x3FFFFF) ceilv0++;
+	}
+
+	//world(pv1->position[0]*(float)(2^16));
+	world = &pv1->position[0];
+
+// transform and project
+	//VectorSubtract (world, modelorg, local);
+	//Vector Subtract (and convert)
+	local_fxp[0]=((int)(world[0]*(524288.0)))-modelorg_fxp[0];
+	local_fxp[1]=((int)(world[1]*(524288.0)))-modelorg_fxp[1];
+	local_fxp[2]=((int)(world[2]*(524288.0)))-modelorg_fxp[2];
+
+	//TransformVector (local, transformed);
+	//transformed_fxp[0] = ((int)(local_fxp[0]*vright[0]))+((int)(local_fxp[1]*vright[1]))+((int)(local_fxp[2]*vright[2]));
+	//transformed_fxp[1] = ((int)(local_fxp[0]*vup[0]))+((int)(local_fxp[1]*vup[1]))+((int)(local_fxp[2]*vup[2]));
+	//transformed_fxp[2] = ((int)(local_fxp[0]*vpn[0]))+((int)(local_fxp[1]*vpn[1]))+((int)(local_fxp[2]*vpn[2]));
+
+	transformed_fxp[0] = local_fxp[0]/vright_fxp[0]+local_fxp[1]/vright_fxp[1]+local_fxp[2]/vright_fxp[2];
+	//transformed_fxp[0]*=256;
+	transformed_fxp[1] = local_fxp[0]/vup_fxp[0]+local_fxp[1]/vup_fxp[1]+local_fxp[2]/vup_fxp[2];
+	//transformed_fxp[1]*=256;
+	transformed_fxp[2] = local_fxp[0]/vpn_fxp[0]+local_fxp[1]/vpn_fxp[1]+local_fxp[2]/vpn_fxp[2];
+	transformed_fxp[2]*=256;
+
+	//transformed_fxp[2]=-transformed_fxp[2];
+	//if (transformed[2] < NEAR_CLIP)
+	//	transformed[2] = (float)NEAR_CLIP;
+	if (transformed_fxp[2] < (int)(NEAR_CLIP*524288.0))
+		transformed_fxp[2] = (int)(NEAR_CLIP*524288.0);
+
+	transformed_fxp[0]/=16;
+	transformed_fxp[1]/=16;
+	transformed_fxp[2]/=2048;
+
+	r_lzi1_fxp=transformed_fxp[2];
+	//r_lzi1 = (float)(1.0 / transformed[2]);
+	//scale = xscale * r_lzi1;
+
+	scale_fxp=xscale_fxp/transformed_fxp[2];	//9.23 / 24.8 = 17.15
+	scale2_fxp=transformed_fxp[0]*(scale_fxp);	// 24.8 * 17.15 = 9.23 //21.11
+
+	if (transformed_fxp[0]<0) {
+		if (scale2_fxp>0) scale2_fxp=-511*4194304;
+	} else {
+		if (scale2_fxp<0) scale2_fxp=511*4194304;
+	}
+
+	//r_u1 = (xcenter + scale*transformed[0]);
+	r_u1_fxp = xcenter_fxp + scale2_fxp;
+	if (r_u1_fxp < r_refdef_fvrectx_adj_fxp)
+		r_u1_fxp = r_refdef_fvrectx_adj_fxp;
+	if (r_u1_fxp > r_refdef_fvrectright_adj_fxp)
+		r_u1_fxp = r_refdef_fvrectright_adj_fxp;
+
+	//scale = yscale * r_lzi1;
+	//r_v1 = (ycenter - scale*transformed[1]);
+
+	scale_fxp=yscale_fxp/transformed_fxp[2];	//9.23 / 24.8 = 17.15
+	scale2_fxp=transformed_fxp[1]*(scale_fxp);	// 23.9 * 17.15 = 9.23 //21.11
+
+	if (transformed_fxp[1]<0) {
+		if (scale2_fxp>0) scale2_fxp=-511*4194304;
+	} else {
+		if (scale2_fxp<0) scale2_fxp=511*4194304;
+	}
+
+	r_v1_fxp = ycenter_fxp - scale2_fxp;
+	if (r_v1_fxp < r_refdef_fvrecty_adj_fxp)
+		r_v1_fxp = r_refdef_fvrecty_adj_fxp;
+	if (r_v1_fxp > r_refdef_fvrectbottom_adj_fxp)
+		r_v1_fxp = r_refdef_fvrectbottom_adj_fxp;
+
+	//if (r_lzi1 > lzi0)
+	//	lzi0 = r_lzi1;
+	if (r_lzi1_fxp < lzi0_fxp)
+		lzi0_fxp = r_lzi1_fxp;
+
+	//if (lzi0 > r_nearzi)	// for mipmap finding
+	//	r_nearzi = lzi0;
+	if (128.0/lzi0_fxp > r_nearzi) {	// for mipmap finding
+		//if (!lzi0_fxp) r_nearzi=0;
+		//else
+			r_nearzi = (float)(128.0/lzi0_fxp);
+	}
+
+// for right edges, all we want is the effect on 1/z
+	if (r_nearzionly)
+		return;
+
+	r_emitted = 1;
+
+	//r_ceilv1 = (int) ceil(r_v1);
+	r_ceilv1 = r_v1_fxp/4194304;
+	if (r_v1_fxp&0x3FFFFF) r_ceilv1++;
+
+
+// create the edge
+	if (ceilv0 == r_ceilv1)
+	{
+	// we cache unclipped horizontal edges as fully clipped
+		if (cacheoffset != 0x7FFFFFFF)
+		{
+			cacheoffset = FULLY_CLIPPED_CACHED |
+					(r_framecount & FRAMECOUNT_MASK);
+		}
+
+		return;		// horizontal edge
+	}
+
+	side = ceilv0 > r_ceilv1;
+	
+	edge = edge_p++;
+
+	edge->owner = NULL;
+	
+	edge->owner = r_pedge;
+
+	edge->nearzi = (float)(128.0/lzi0_fxp);
+
+	{
+	//float tmp;
+	if (side == 0)
+	{
+		//int tmp;
+	// trailing edge (go from p1 to p2)
+		v = ceilv0;
+		v2 = r_ceilv1 - 1;
+
+		edge->surfs[0] = surface_p - surfaces;
+		edge->surfs[1] = 0;
+
+		//u_step = ((r_u1 - u0) / (r_v1 - v0));
+		//u = u0 + ((float)v - v0) * u_step;
+
+		u_step_fxp=(r_u1_fxp - u0_fxp) / ((r_v1_fxp - v0_fxp)>>10);	//10.22 / 15.12 = 22.10
+		u_fxp = u0_fxp + ((v*4194304 - v0_fxp)>>12 * u_step_fxp>>12);
+
+		//tmp=(((r_u1_fxp - u0_fxp)/8388608.0) / ((r_v1_fxp - v0_fxp)/8388608.0));
+		//u_step_fxp=(int)(tmp*8388608.0);
+		//u_fxp = u0_fxp + (((float)v - v0_fxp/8388608.0) * tmp)*8388608.0;
+	}
+	else
+	{
+		//int tmp;
+	// leading edge (go from p2 to p1)
+		v2 = ceilv0 - 1;
+		v = r_ceilv1;
+
+		edge->surfs[0] = 0;
+		edge->surfs[1] = surface_p - surfaces;
+
+		//u_step = ((u0 - r_u1) / (v0 - r_v1));
+		//u = r_u1 + ((float)v - r_v1) * u_step;
+
+		u_step_fxp = (u0_fxp - r_u1_fxp) / ((v0_fxp - r_v1_fxp)>>10);
+		u_fxp = r_u1_fxp + ((v*4194304 - r_v1_fxp)>>12 * u_step_fxp>>12);
+
+		//tmp=(((u0_fxp - r_u1_fxp)/8388608.0) / ((v0_fxp - r_v1_fxp)/8388608.0));
+		//u_step_fxp = (int)(tmp*8388608.0);
+		//u_fxp = r_u1_fxp + (((float)v - r_v1_fxp/8388608.0) * tmp)*8388608.0;
+	}
+	//edge->u_step = tmp*0x100000;
+	//edge->u = (int)(/*(u_fxp/65536)*0x100000*/u_fxp/4 + 0xFFFFF);
+
+	edge->u_step = u_step_fxp*1024;///16; //tmp*0x100000;
+	edge->u = (int)(/*(u_fxp/65536)*0x100000*/u_fxp/4 + 0xFFFFF);
+}
+
+// we need to do this to avoid stepping off the edges if a very nearly
+// horizontal edge is less than epsilon above a scan, and numeric error causes
+// it to incorrectly extend to the scan, and the extension of the line goes off
+// the edge of the screen
+// FIXME: is this actually needed?
+	if (edge->u < r_refdef.vrect_x_adj_shift20)
+		edge->u = r_refdef.vrect_x_adj_shift20;
+	if (edge->u > r_refdef.vrectright_adj_shift20)
+		edge->u = r_refdef.vrectright_adj_shift20;
+
+//
+// sort the edge in normally
+//
+	u_check = edge->u;
+	if (edge->surfs[0])
+		u_check++;	// sort trailers after leaders
+
+	if (!newedges[v] || newedges[v]->u >= u_check)
+	{
+		edge->next = newedges[v];
+		newedges[v] = edge;
+	}
+	else
+	{
+		pcheck = newedges[v];
+		while (pcheck->next && pcheck->next->u < u_check)
+			pcheck = pcheck->next;
+		edge->next = pcheck->next;
+		pcheck->next = edge;
+	}
+
+	edge->nextremove = removeedges[v2];
+	removeedges[v2] = edge;
+}
+#endif
 
 /*
 ================
@@ -349,7 +658,11 @@ static inline void R_ClipEdge (mvertex_t *pv0, mvertex_t *pv1, clipplane_t *clip
 	}
 
 // add the edge
+#ifndef USE_PQ_OPT1
 	R_EmitEdge (pv0, pv1);
+#else
+	R_EmitEdge_fxp (pv0, pv1);
+#endif
 }
 
 #endif	// !id386

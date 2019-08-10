@@ -62,6 +62,18 @@ vec3_t	vup, base_vup;
 vec3_t	vpn, base_vpn;
 vec3_t	vright, base_vright;
 vec3_t	r_origin;
+#ifdef USE_PQ_OPT1
+int		vup_fxp[3];
+int		vpn_fxp[3];
+int		vright_fxp[3];
+int		xscale_fxp, yscale_fxp;
+int		xcenter_fxp, ycenter_fxp;
+int		r_refdef_fvrectx_adj_fxp;
+int		r_refdef_fvrectright_adj_fxp;
+int		r_refdef_fvrecty_adj_fxp;
+int		r_refdef_fvrectbottom_adj_fxp;
+extern int		modelorg_fxp[3];
+#endif
 
 //
 // screen size info
@@ -421,6 +433,17 @@ void R_ViewChanged (vrect_t *pvrect, int lineadj, float aspect)
 	yscaleinv = 1.0 / yscale;
 	xscaleshrink = (r_refdef.vrect.width-6)/r_refdef.horizontalFieldOfView;
 	yscaleshrink = xscaleshrink*pixelAspect;
+        
+#ifdef USE_PQ_OPT1
+	xscale_fxp=(int)(xscale*8388608.0);	//9.23
+	yscale_fxp=(int)(yscale*8388608.0);	//9.23
+	xcenter_fxp=(int)(xcenter*4194304.0);	//10.22
+	ycenter_fxp=(int)(ycenter*4194304.0);	//10.22
+	r_refdef_fvrectx_adj_fxp=(int)(r_refdef.fvrectx_adj*4194304.0);
+	r_refdef_fvrectright_adj_fxp=(int)(r_refdef.fvrectright_adj*4194304.0);
+	r_refdef_fvrecty_adj_fxp=(int)(r_refdef.fvrecty_adj*4194304.0);
+	r_refdef_fvrectbottom_adj_fxp=(int)(r_refdef.fvrectbottom_adj*4194304.0);
+#endif
 
 // left side clip
 	screenedge[0].normal[0] = -1.0 / (xOrigin*r_refdef.horizontalFieldOfView);
@@ -789,6 +812,33 @@ void R_DrawBEntitiesOnList (void)
 			// FIXME: stop transforming twice
 				R_RotateBmodel ();
 
+#ifdef USE_PQ_OPT1
+				modelorg_fxp[0]=(int)(modelorg[0]*524288.0);
+				modelorg_fxp[1]=(int)(modelorg[1]*524288.0);
+				modelorg_fxp[2]=(int)(modelorg[2]*524288.0);
+
+				vright_fxp[0]=(int)(256.0/vright[0]);
+				if (!vright_fxp[0]) vright_fxp[0]=0x7fffffff;
+				vright_fxp[1]=(int)(256.0/vright[1]);
+				if (!vright_fxp[1]) vright_fxp[1]=0x7fffffff;
+				vright_fxp[2]=(int)(256.0/vright[2]);
+				if (!vright_fxp[2]) vright_fxp[2]=0x7fffffff;
+
+				vpn_fxp[0]=(int)(256.0/vpn[0]);
+				if (!vpn_fxp[0]) vpn_fxp[0]=0x7fffffff;
+				vpn_fxp[1]=(int)(256.0/vpn[1]);
+				if (!vpn_fxp[1]) vpn_fxp[1]=0x7fffffff;
+				vpn_fxp[2]=(int)(256.0/vpn[2]);
+				if (!vpn_fxp[2]) vpn_fxp[2]=0x7fffffff;
+
+				vup_fxp[0]=(int)(256.0/vup[0]);
+				if (!vup_fxp[0]) vup_fxp[0]=0x7fffffff;
+				vup_fxp[1]=(int)(256.0/vup[1]);
+				if (!vup_fxp[1]) vup_fxp[1]=0x7fffffff;
+				vup_fxp[2]=(int)(256.0/vup[2]);
+				if (!vup_fxp[2]) vup_fxp[2]=0x7fffffff;
+#endif
+                                
 			// calculate dynamic lighting for bmodel if it's not an
 			// instanced model
 				if (clmodel->firstmodelsurface != 0)

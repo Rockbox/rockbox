@@ -49,6 +49,16 @@ typedef struct
 	vec3_t		position;
 } mvertex_t;
 
+typedef struct
+{
+	int		position[3];
+} mvertex_fxp_t;
+
+typedef struct
+{
+	vec3_FPM_t		position;
+} mvertex_FPM_t;
+
 #define	SIDE_FRONT	0
 #define	SIDE_BACK	1
 #define	SIDE_ON		2
@@ -331,6 +341,10 @@ typedef struct model_s
 
 	int			numvertexes;
 	mvertex_t	*vertexes;
+    
+#ifdef USE_PQ_OPT2
+	mvertex_fxp_t	*vertexes_fxp;
+#endif
 
 	int			numedges;
 	medge_t		*edges;

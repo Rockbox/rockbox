@@ -19,6 +19,19 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // mathlib.h
 
+//Dan East:
+#include "FixedPointMath.h"
+
+#ifdef USE_PQ_OPT
+typedef int fpvec3[3];
+#endif
+
+typedef fixedpoint_t vec3_FPM_t[3];
+typedef fixedpoint8_24_t vec3_8_24FPM_t[3];
+typedef fixedpoint_t vec5_FPM_t[5];
+
+//End Dan
+
 typedef float vec_t;
 typedef vec_t vec3_t[3];
 typedef vec_t vec5_t[5];
