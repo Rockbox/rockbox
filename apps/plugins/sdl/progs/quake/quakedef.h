@@ -29,6 +29,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 /* Fixed-point optimizations, thanks to Pocket Quake and Dan East. */
 #ifdef FIXEDPOINT_OPT
+#define USEFPM
+
 #define USE_PQ_OPT
 #define USE_PQ_OPT1
 #define USE_PQ_OPT2
@@ -206,6 +208,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Use for multiplayer testing only - VERY dangerous!!!
 // #define IDGODS
 
+//Dan East:
+#include "FixedPointMath.h"
+
 #include "common.h"
 #include "bspfile.h"
 #include "vid.h"
@@ -223,6 +228,17 @@ typedef struct
 	int		skin;
 	int		effects;
 } entity_state_t;
+
+typedef struct
+{
+	vec3_FPM_t	origin;
+	vec3_FPM_t	angles;
+	int		modelindex;
+	int		frame;
+	int		colormap;
+	int		skin;
+	int		effects;
+} entity_state_FPM_t;
 
 
 #include "wad.h"
@@ -301,8 +317,10 @@ extern	double		realtime;			// not bounded in any way, changed at
 										// start of every frame, never reset
 
 void Host_ClearMemory (void);
+void Host_ClearMemoryFPM (void);
 void Host_ServerFrame (void);
 void Host_InitCommands (void);
+void Host_InitCommandsFPM (void);
 void Host_Init (quakeparms_t *parms);
 void Host_Shutdown(void);
 void Host_Error (char *error, ...);
@@ -310,7 +328,9 @@ void Host_EndGame (char *message, ...);
 void Host_Frame (float time);
 void Host_Quit_f (void);
 void Host_ClientCommands (char *fmt, ...);
+void Host_ClientCommandsFPM (char *fmt, ...);
 void Host_ShutdownServer (qboolean crash);
+void Host_ShutdownServerFPM (qboolean crash);
 
 extern qboolean		msg_suppress_1;		// suppresses resolution and cache size console output
 										//  an fullscreen DIB focus gain/loss
@@ -330,3 +350,4 @@ extern	cvar_t	chase_active;
 void Chase_Init (void);
 void Chase_Reset (void);
 void Chase_Update (void);
+void Chase_UpdateFPM (void);

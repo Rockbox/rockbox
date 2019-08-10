@@ -49,6 +49,7 @@ extern pixel_t	*cacheblock;
 extern int		screenwidth;
 
 extern	float	pixelAspect;
+extern	fixedpoint_t	pixelAspectFPM;
 
 extern int		r_drawnpolycount;
 
@@ -58,16 +59,26 @@ extern int	sintable[SIN_BUFFER_SIZE];
 extern int	intsintable[SIN_BUFFER_SIZE];
 
 extern	vec3_t	vup, base_vup;
+extern	vec3_FPM_t	vupFPM, base_vupFPM;
 extern	vec3_t	vpn, base_vpn;
+extern	vec3_FPM_t	vpnFPM, base_vpnFPM;
 extern	vec3_t	vright, base_vright;
+extern	vec3_FPM_t	vrightFPM, base_vrightFPM;
 extern	entity_t		*currententity;
+extern	entity_FPM_t		*currententityFPM;
 
+#define NUMSTACKEDGES		2400
+#define	MINEDGES			300
+#define NUMSTACKSURFACES	800
+#define MINSURFACES			100
+#define	MAXSPANS			3000
+/*
 #define NUMSTACKEDGES		2400
 #define	MINEDGES			NUMSTACKEDGES
 #define NUMSTACKSURFACES	800
 #define MINSURFACES			NUMSTACKSURFACES
 #define	MAXSPANS			3000
-
+*/
 // !!! if this is changed, it must be changed in asm_draw.h too !!!
 typedef struct espan_s
 {
@@ -93,12 +104,38 @@ typedef struct surf_s
 	entity_t	*entity;
 	float		nearzi;				// nearest 1/z on surface, for mipmapping
 	qboolean	insubmodel;
+#ifndef USE_PQ_OPT3
 	float		d_ziorigin, d_zistepu, d_zistepv;
+#else
+	int			d_ziorigin_fxp, d_zistepu_fxp, d_zistepv_fxp;
+#endif
 
 	int			pad[2];				// to 64 bytes
 } surf_t;
 
+typedef struct surf_FPM_s
+{
+	struct surf_FPM_s	*next;			// active surface stack in r_edge.c
+	struct surf_FPM_s	*prev;			// used in r_edge.c for active surf stack
+	struct espan_s	*spans;			// pointer to linked list of spans to draw
+	int			key;				// sorting key (BSP order)
+	int			last_u;				// set during tracing
+	int			spanstate;			// 0 = not in span
+									// 1 = in span
+									// -1 = in inverted span (end before
+									//  start)
+	int			flags;				// currentface flags
+	void		*data;				// associated data like msurface_t
+	entity_FPM_t	*entity;
+	fixedpoint_t	nearzi;				// nearest 1/z on surface, for mipmapping
+	qboolean	insubmodel;
+	fixedpoint_t	d_ziorigin, d_zistepu, d_zistepv;
+
+	int			pad[2];				// to 64 bytes
+} surf_FPM_t;
+
 extern	surf_t	*surfaces, *surface_p, *surf_max;
+extern	surf_FPM_t	*surfacesFPM, *surface_FPM_p, *surf_maxFPM;
 
 // surfaces are generated in back to front order by the bsp, so if a surf
 // pointer is greater than another one, it should be drawn in front
@@ -111,16 +148,26 @@ extern	surf_t	*surfaces, *surface_p, *surf_max;
 extern vec3_t	sxformaxis[4];	// s axis transformed into viewspace
 extern vec3_t	txformaxis[4];	// t axis transformed into viewspac
 
-extern vec3_t	modelorg, base_modelorg;
+extern vec3_t		modelorg, base_modelorg;
+extern vec3_FPM_t	modelorgFPM, base_modelorgFPM;
 
-extern	float	xcenter, ycenter;
-extern	float	xscale, yscale;
-extern	float	xscaleinv, yscaleinv;
-extern	float	xscaleshrink, yscaleshrink;
+extern	float			xcenter, ycenter;
+extern	fixedpoint_t	xcenterFPM, ycenterFPM;
+extern	float			xscale, yscale;
+extern	fixedpoint_t	xscaleFPM, yscaleFPM;
+extern	float			xscaleinv, yscaleinv;
+extern	fixedpoint_t	xscaleinvFPM, yscaleinvFPM;
+extern	float			xscaleshrink, yscaleshrink;
+extern	fixedpoint_t	xscaleshrinkFPM, yscaleshrinkFPM;
 
 extern	int d_lightstylevalue[256]; // 8.8 frac of base light value
 
 extern void TransformVector (vec3_t in, vec3_t out);
+#ifdef USE_PQ_OPT
+//JB: Optimization
+extern void FPTransformVector (fpvec3 in, fpvec3 out);
+#endif
+extern void TransformVectorFPM (vec3_FPM_t in, vec3_FPM_t out);
 extern void SetUpForLineScan(fixed8_t startvertu, fixed8_t startvertv,
 	fixed8_t endvertu, fixed8_t endvertv);
 
@@ -151,6 +198,17 @@ typedef struct edge_s
 	float			nearzi;
 	medge_t			*owner;
 } edge_t;
+
+typedef struct edge_FPM_s
+{
+	fixed16_t		u;
+	fixed16_t		u_step;
+	struct edge_FPM_s	*prev, *next;
+	unsigned short	surfs[2];
+	struct edge_FPM_s	*nextremove;
+	fixedpoint_t	nearzi;
+	medge_t			*owner;
+} edge_FPM_t;
 
 #endif	// _R_SHARED_H_
 
