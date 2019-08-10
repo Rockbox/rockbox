@@ -34,7 +34,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define USE_PQ_OPT2
 //#define USE_PQ_OPT3 // don't use
 #define USE_PQ_OPT4
-//#define USE_PQ_OPT5
+#define USE_PQ_OPT5
 #endif
 
 #define	QUAKE_GAME			// as opposed to utilities
