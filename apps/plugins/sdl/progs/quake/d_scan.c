@@ -254,6 +254,7 @@ void Turbulent8 (espan_t *pspan)
 D_DrawSpans8
 =============
 */
+#ifndef USE_PQ_OPT5
 void D_DrawSpans8 (espan_t *pspan)
 {
 	int				count, spancount;
@@ -381,8 +382,197 @@ void D_DrawSpans8 (espan_t *pspan)
 
 	} while ((pspan = pspan->pnext) != NULL);
 }
+#else
 
+static int sdivzorig, sdivzstepv, sdivzstepu, sdivz8stepu;
+static int tdivzorig, tdivzstepv, tdivzstepu, tdivz8stepu;
+static int zi8stepu;
+static float last = 0;
+
+/*==============================================
+// UpdateFixedPointVars
+//============================================*/
+void UpdateFixedPointVars( int all )
+{
+	// JB: Store texture transformation matrix in fixed point vars
+	if (all)
+	{
+/*
+		sdivzorig = (int)(524288.0f * d_sdivzorigin); // 13.19 fixed point
+		tdivzorig = (int)(524288.0f * d_tdivzorigin);
+		sdivzstepv = (int)(524288.0f * d_sdivzstepv);
+		tdivzstepv = (int)(524288.0f * d_tdivzstepv);
+		sdivzstepu = (int)(524288.0f * d_sdivzstepu);
+		sdivz8stepu = sdivzstepu*8;
+		tdivzstepu = (int)(524288.0f * d_tdivzstepu);
+		tdivz8stepu = tdivzstepu*8;
+*/
+
+		sdivzorig = (int)(4194304.0f * d_sdivzorigin); // 10.22 fixed point
+		tdivzorig = (int)(4194304.0f * d_tdivzorigin);
+		sdivzstepv = (int)(4194304.0f * d_sdivzstepv);
+		tdivzstepv = (int)(4194304.0f * d_tdivzstepv);
+		sdivzstepu = (int)(4194304.0f * d_sdivzstepu);
+		sdivz8stepu = sdivzstepu*8;
+		tdivzstepu = (int)(4194304.0f * d_tdivzstepu);
+		tdivz8stepu = tdivzstepu*8;
+
+	}
+/*
+	ziorig = (int)(524288.0f * d_ziorigin);  // 13.19 fixed point
+	zistepv = (int)(524288.0f * d_zistepv ); 
+	zistepu = (int)(524288.0f * d_zistepu ); 
+*/
+#ifndef USE_PQ_OPT3
+	d_ziorigin_fxp = (int)(4194304.0f * d_ziorigin);  // 10.22 fixed point
+	d_zistepv_fxp = (int)(4194304.0f * d_zistepv ); 
+	d_zistepu_fxp = (int)(4194304.0f * d_zistepu ); 
 #endif
+
+	zi8stepu = d_zistepu_fxp * 8;
+	last = d_zistepv;
+}
+
+void D_DrawSpans8 (espan_t *pspan)
+{
+	int count, spancount, spancountminus1;
+	unsigned char *pbase, *pdest;
+	fixed16_t s1, t1;
+	int zi, sdivz, tdivz, sstep, tstep;
+	int snext, tnext;
+	pbase = (unsigned char *)cacheblock;
+	//Jacco Biker's fixed point conversion
+
+	// Recalc fixed point values
+	UpdateFixedPointVars( 1 );
+	do
+	{
+		pdest = (unsigned char *)((byte *)d_viewbuffer + (screenwidth * pspan->v) + pspan->u);
+		count = pspan->count;
+		// calculate the initial s/z, t/z, 1/z, s, and t and clamp
+		sdivz = sdivzorig + pspan->v * sdivzstepv + pspan->u * sdivzstepu;
+		tdivz = tdivzorig + pspan->v * tdivzstepv + pspan->u * tdivzstepu;
+		zi = d_ziorigin_fxp + pspan->v * d_zistepv_fxp + pspan->u * d_zistepu_fxp;
+		if (zi == 0) zi = 1;
+		s1 = (((sdivz << 8) / zi) << 8) + sadjust;	// 5.27 / 13.19 = 24.8 >> 8 = 16.16
+		if (s1 > bbextents) s1 = bbextents; else if (s1 < 0) s1 = 0;
+		t1 = (((tdivz << 8) / zi) << 8) + tadjust;
+		if (t1 > bbextentt) t1 = bbextentt; else if (t1 < 0) t1 = 0;
+		// calculate final s/z, t/z, 1/z, s, and t and clamp
+		//sdivz += sdivzstepu * (count - 1);
+		//tdivz += tdivzstepu * (count - 1);
+		//zi += d_zistepu_fxp * (count - 1);
+		//if (zi == 0) zi = 1;
+#if 0
+		s2 = (((sdivz << 8) / zi) << 8) + sadjust;
+		if (s2 > bbextents) s2 = bbextents; else if (s2 < 8) s2 = 8;
+		t2 = (((tdivz << 8) / zi) << 8) + tadjust;
+		if (t2 > bbextentt) t2 = bbextentt; else if (t2 < 8) t2 = 8;
+		if (count > 1)
+		{
+			sstep = (s2 - s1) / (count - 1);
+			tstep = (t2 - t1) / (count - 1);
+		}
+#else
+		//End Jacco Biker mod
+		//Dan East: Fixed point conversion for perspective correction
+		do
+		{
+		// calculate s and t at the far end of the span
+			if (count >= 8)
+				spancount = 8;
+			else
+				spancount = count;
+
+			count -= spancount;
+
+			if (count)
+			{
+			// calculate s/z, t/z, zi->fixed s and t at far end of span,
+			// calculate s and t steps across span by shifting
+				sdivz += sdivz8stepu;
+				tdivz += tdivz8stepu;
+				zi += zi8stepu;
+				if (!zi) zi = 1;
+				//z = zi;
+				//z = (float)0x10000 / zi;	// prescale to 16.16 fixed-point
+				snext = (((sdivz<<8)/zi)<<8)+sadjust;
+				//snext = (int)(sdivz * z) + sadjust;
+				if (snext > bbextents)
+					snext = bbextents;
+				else if (snext < 8)
+					snext = 8;	// prevent round-off error on <0 steps from
+								//  from causing overstepping & running off the
+								//  edge of the texture
+
+				tnext = (((tdivz<<8)/zi)<<8) + tadjust;
+				if (tnext > bbextentt)
+					tnext = bbextentt;
+				else if (tnext < 8)
+					tnext = 8;	// guard against round-off error on <0 steps
+
+				sstep = (snext - s1) >> 3;
+				tstep = (tnext - t1) >> 3;
+			}
+			else
+			{
+			// calculate s/z, t/z, zi->fixed s and t at last pixel in span (so
+			// can't step off polygon), clamp, calculate s and t steps across
+			// span by division, biasing steps low so we don't run off the
+			// texture
+				spancountminus1 = spancount - 1;
+				sdivz += sdivzstepu * spancountminus1;
+				tdivz += tdivzstepu * spancountminus1;
+				zi += d_zistepu_fxp * spancountminus1;
+				if (!zi) zi = 1;
+				//z = zi;//(float)0x10000 / zi;	// prescale to 16.16 fixed-point
+				snext = (((sdivz<<8) / zi)<<8) + sadjust;
+				if (snext > bbextents)
+					snext = bbextents;
+				else if (snext < 8)
+					snext = 8;	// prevent round-off error on <0 steps from
+								//  from causing overstepping & running off the
+								//  edge of the texture
+
+				tnext = (((tdivz<<8) / zi)<<8) + tadjust;
+				if (tnext > bbextentt)
+					tnext = bbextentt;
+				else if (tnext < 8)
+					tnext = 8;	// guard against round-off error on <0 steps
+
+				if (spancount > 1)
+				{
+					sstep = ((snext - s1)) / ((spancount - 1));
+					tstep = ((tnext - t1)) / ((spancount - 1));
+				}
+			}
+			do
+			{
+				*pdest++ = *(pbase + (s1 >> 16) + (t1 >> 16) * cachewidth);
+				s1 += sstep;
+				t1 += tstep;
+			} while (--spancount > 0);
+
+			s1 = snext;
+			t1 = tnext;
+
+		} while (count > 0);
+#endif
+#if 0
+		// Draw span
+		for ( i = 0; i < count; i++ )
+		{
+			*pdest++ = *(pbase + (s1 >> 16) + (t1 >> 16) * cachewidth);
+			s1 += sstep;
+			t1 += tstep;
+		}
+#endif
+	} while ((pspan = pspan->pnext) != NULL);
+}
+
+#endif //USE_PQ_OPT5
+
+#endif // !id386
 
 
 #if	!id386

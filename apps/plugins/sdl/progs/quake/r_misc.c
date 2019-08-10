@@ -286,8 +286,18 @@ void R_TransformFrustum (void)
 		v2[2] = v[1]*vright[2] + v[2]*vup[2] + v[0]*vpn[2];
 
 		VectorCopy (v2, view_clipplanes[i].normal);
-
 		view_clipplanes[i].dist = DotProduct (modelorg, v2);
+
+#ifdef USE_PQ_OPT2
+		if (!v2[0]) view_clipplanes_fxp[i].normal[0]=2<29;
+		else view_clipplanes_fxp[i].normal[0]=(int)(4096.0f/v2[0]);
+		if (!v2[1]) view_clipplanes_fxp[i].normal[1]=2<29;
+		else view_clipplanes_fxp[i].normal[1]=(int)(4096.0f/v2[1]);
+		if (!v2[2]) view_clipplanes_fxp[i].normal[2]=2<29;
+		else view_clipplanes_fxp[i].normal[2]=(int)(4096.0f/v2[2]);
+
+		view_clipplanes_fxp[i].dist=(int)(view_clipplanes[i].dist*128.0);
+#endif
 	}
 }
 
@@ -305,6 +315,38 @@ void TransformVector (vec3_t in, vec3_t out)
 	out[1] = DotProduct(in,vup);
 	out[2] = DotProduct(in,vpn);		
 }
+
+#ifdef USE_PQ_OPT
+//JB: Optimization
+static float last;
+static fpvec3 fpvright, fpvup, fpvpn;
+void FPTransformVector( fpvec3 in, fpvec3 out )
+{
+	if (last != vright[0])
+	{
+		last = vright[0];
+		fpvright[0] = (int)(16384.0f * vright[0]); 
+		fpvright[1] = (int)(16384.0f * vright[1]); 
+		fpvright[2] = (int)(16384.0f * vright[2]); 
+		fpvup[0] = (int)(16384.0f * vup[0]); 
+		fpvup[1] = (int)(16384.0f * vup[1]); 
+		fpvup[2] = (int)(16384.0f * vup[2]); 
+		fpvpn[0] = (int)(16384.0f * vpn[0]); 
+		fpvpn[1] = (int)(16384.0f * vpn[1]); 
+		fpvpn[2] = (int)(16384.0f * vpn[2]); 
+	}
+	out[0] = (in[0] * fpvright[0] +
+			 in[1] * fpvright[1] +
+			 in[2] * fpvright[2]) >> 4;
+	out[1] = (in[0] * fpvup[0] +
+			 in[1] * fpvup[1] +
+			 in[2] * fpvup[2]) >> 4;
+	out[2] = (in[0] * fpvpn[0] +
+			 in[1] * fpvpn[1] +
+			 in[2] * fpvpn[2]) >> 4;
+}
+
+#endif
 
 #endif
 

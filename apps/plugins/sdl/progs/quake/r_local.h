@@ -94,7 +94,28 @@ typedef struct clipplane_s
 	byte		reserved[2];
 } clipplane_t;
 
+typedef struct clipplane_fxp_s
+{
+	int			normal[3];
+	int			dist;
+	struct		clipplane_fxp_s	*next;
+	byte		leftedge;
+	byte		rightedge;
+	byte		reserved[2];
+} clipplane_fxp_t;
+
+typedef struct clipplane_FPM_s
+{
+	vec3_FPM_t	normal;
+	fixedpoint_t	dist;
+	struct		clipplane_FPM_s	*next;
+	byte		leftedge;
+	byte		rightedge;
+	byte		reserved[2];
+} clipplane_FPM_t;
+
 extern	clipplane_t	view_clipplanes[4];
+extern	clipplane_FPM_t	view_clipplanesFPM[4];
 
 #ifdef USE_PQ_OPT2
 extern	clipplane_fxp_t	view_clipplanes_fxp[4];
