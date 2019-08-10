@@ -31,7 +31,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifdef FIXEDPOINT_OPT
 #define USE_PQ_OPT
 #define USE_PQ_OPT1
-//#define USE_PQ_OPT2
+#define USE_PQ_OPT2
 //#define USE_PQ_OPT3 // don't use
 #define USE_PQ_OPT4
 //#define USE_PQ_OPT5

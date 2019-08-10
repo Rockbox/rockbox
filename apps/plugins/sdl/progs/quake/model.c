@@ -588,12 +588,20 @@ void Mod_LoadVertexes (lump_t *l)
 	dvertex_t	*in;
 	mvertex_t	*out;
 	int			i, count;
+#ifdef USE_PQ_OPT2
+	mvertex_fxp_t	*out2;
+#endif
 
 	in = (void *)(mod_base + l->fileofs);
 	if (l->filelen % sizeof(*in))
 		Sys_Error ("MOD_LoadBmodel: funny lump size in %s",loadmodel->name);
 	count = l->filelen / sizeof(*in);
 	out = Hunk_AllocName ( count*sizeof(*out), loadname);	
+
+#ifdef USE_PQ_OPT2
+	out2 = Hunk_AllocName ( count*sizeof(*out2), loadname);	
+	loadmodel->vertexes_fxp = out2;
+#endif
 
 	loadmodel->vertexes = out;
 	loadmodel->numvertexes = count;
@@ -603,6 +611,14 @@ void Mod_LoadVertexes (lump_t *l)
 		out->position[0] = LittleFloatUnaligned (in->point[0]);
 		out->position[1] = LittleFloatUnaligned (in->point[1]);
 		out->position[2] = LittleFloatUnaligned (in->point[2]);
+
+#ifdef USE_PQ_OPT2
+		out2->position[0] = (int)(out->position[0]*524288.0f);	//13.19
+		out2->position[1] = (int)(out->position[1]*524288.0f);	//13.19
+		out2->position[2] = (int)(out->position[2]*524288.0f);	//13.19
+		out2++;
+#endif
+
 	}
 }
 

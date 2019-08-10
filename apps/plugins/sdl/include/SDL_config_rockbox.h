@@ -47,8 +47,8 @@
 #ifdef SIMULATOR
 #define RB_SAMPR SAMPR_44
 #else
-#if HW_SAMPR_CAPS & SAMPR_CAP_44
-#define RB_SAMPR SAMPR_44
+#if HW_SAMPR_CAPS & SAMPR_CAP_22
+#define RB_SAMPR SAMPR_22
 #else
 #define RB_SAMPR HW_SAMPR_MIN
 #endif

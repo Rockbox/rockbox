@@ -43,6 +43,9 @@ qboolean	r_dowarp, r_dowarpold, r_viewchanged;
 int			numbtofpolys;
 btofpoly_t	*pbtofpolys;
 mvertex_t	*r_pcurrentvertbase;
+#ifdef USE_PQ_OPT2
+mvertex_fxp_t	*r_pcurrentvertbase_fxp;
+#endif
 
 int			c_surf;
 int			r_maxsurfsseen, r_maxedgesseen, r_cnumsurfs;
@@ -808,6 +811,10 @@ void R_DrawBEntitiesOnList (void)
 				VectorCopy (modelorg, r_worldmodelorg);
 		
 				r_pcurrentvertbase = clmodel->vertexes;
+                                
+#ifdef USE_PQ_OPT2
+				r_pcurrentvertbase_fxp = clmodel->vertexes_fxp;
+#endif
 		
 			// FIXME: stop transforming twice
 				R_RotateBmodel ();
