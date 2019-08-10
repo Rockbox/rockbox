@@ -383,194 +383,187 @@ void D_DrawSpans8 (espan_t *pspan)
 	} while ((pspan = pspan->pnext) != NULL);
 }
 #else
-
-static int sdivzorig, sdivzstepv, sdivzstepu, sdivz8stepu;
-static int tdivzorig, tdivzstepv, tdivzstepu, tdivz8stepu;
-static int zi8stepu;
-static float last = 0;
-
 /*==============================================
-// UpdateFixedPointVars
+// Fixed-point D_DrawSpans
+//PocketQuake- Dan East
+//fixed-point conversion- Jacco Biker
+//unrolled- mh, MK, qbism
 //============================================*/
-void UpdateFixedPointVars( int all )
+int sdivzorig, sdivzstepv, sdivzstepu, sdivzstepu_fix;
+int tdivzorig, tdivzstepv, tdivzstepu, tdivzstepu_fix;
+int d_zistepu_fxp, d_zistepv_fxp, d_ziorigin_fxp;
+int zistepu_fix;
+
+#define  FIXPOINTDIV 4194304.0f //qbism
+
+//524288.0f is 13.19 fixed point
+// 2097152.0f is 11.21
+//4194304.0f is 10.22 (this is what PocketQuake used)
+//8388608.0f is 9.23
+
+void UpdateFixedPointVars16( int all )
 {
-	// JB: Store texture transformation matrix in fixed point vars
-	if (all)
-	{
-/*
-		sdivzorig = (int)(524288.0f * d_sdivzorigin); // 13.19 fixed point
-		tdivzorig = (int)(524288.0f * d_tdivzorigin);
-		sdivzstepv = (int)(524288.0f * d_sdivzstepv);
-		tdivzstepv = (int)(524288.0f * d_tdivzstepv);
-		sdivzstepu = (int)(524288.0f * d_sdivzstepu);
-		sdivz8stepu = sdivzstepu*8;
-		tdivzstepu = (int)(524288.0f * d_tdivzstepu);
-		tdivz8stepu = tdivzstepu*8;
-*/
+   // JB: Store texture transformation matrix in fixed point vars
+   if (all)
+   {
+      sdivzorig = (int)(FIXPOINTDIV * d_sdivzorigin);
+      tdivzorig = (int)(FIXPOINTDIV * d_tdivzorigin);
+      sdivzstepv = (int)(FIXPOINTDIV * d_sdivzstepv);
+      tdivzstepv = (int)(FIXPOINTDIV * d_tdivzstepv);
+      sdivzstepu = (int)(FIXPOINTDIV * d_sdivzstepu);
+      sdivzstepu_fix = sdivzstepu*16;
+      tdivzstepu = (int)(FIXPOINTDIV * d_tdivzstepu);
+      tdivzstepu_fix = tdivzstepu*16;
 
-		sdivzorig = (int)(4194304.0f * d_sdivzorigin); // 10.22 fixed point
-		tdivzorig = (int)(4194304.0f * d_tdivzorigin);
-		sdivzstepv = (int)(4194304.0f * d_sdivzstepv);
-		tdivzstepv = (int)(4194304.0f * d_tdivzstepv);
-		sdivzstepu = (int)(4194304.0f * d_sdivzstepu);
-		sdivz8stepu = sdivzstepu*8;
-		tdivzstepu = (int)(4194304.0f * d_tdivzstepu);
-		tdivz8stepu = tdivzstepu*8;
 
-	}
-/*
-	ziorig = (int)(524288.0f * d_ziorigin);  // 13.19 fixed point
-	zistepv = (int)(524288.0f * d_zistepv ); 
-	zistepu = (int)(524288.0f * d_zistepu ); 
-*/
-#ifndef USE_PQ_OPT3
-	d_ziorigin_fxp = (int)(4194304.0f * d_ziorigin);  // 10.22 fixed point
-	d_zistepv_fxp = (int)(4194304.0f * d_zistepv ); 
-	d_zistepu_fxp = (int)(4194304.0f * d_zistepu ); 
-#endif
+   }
+   d_ziorigin_fxp = (int)(FIXPOINTDIV * d_ziorigin);
+   d_zistepv_fxp = (int)(FIXPOINTDIV * d_zistepv );
+   d_zistepu_fxp = (int)(FIXPOINTDIV * d_zistepu );
 
-	zi8stepu = d_zistepu_fxp * 8;
-	last = d_zistepv;
+   zistepu_fix = d_zistepu_fxp * 16;
 }
 
-void D_DrawSpans8 (espan_t *pspan)
+void D_DrawSpans8 (espan_t *pspan)  //qbism from PocketQuake
 {
-	int count, spancount, spancountminus1;
-	unsigned char *pbase, *pdest;
-	fixed16_t s1, t1;
-	int zi, sdivz, tdivz, sstep, tstep;
-	int snext, tnext;
-	pbase = (unsigned char *)cacheblock;
-	//Jacco Biker's fixed point conversion
+   int count, spancount, spancountminus1;
+   unsigned char *pbase, *pdest;
+   fixed16_t s, t;
+   int zi, sdivz, tdivz, sstep, tstep;
+   int snext, tnext;
+   pbase = (unsigned char *)cacheblock;
+   //Jacco Biker's fixed point conversion
 
-	// Recalc fixed point values
-	UpdateFixedPointVars( 1 );
-	do
-	{
-		pdest = (unsigned char *)((byte *)d_viewbuffer + (screenwidth * pspan->v) + pspan->u);
-		count = pspan->count;
-		// calculate the initial s/z, t/z, 1/z, s, and t and clamp
-		sdivz = sdivzorig + pspan->v * sdivzstepv + pspan->u * sdivzstepu;
-		tdivz = tdivzorig + pspan->v * tdivzstepv + pspan->u * tdivzstepu;
-		zi = d_ziorigin_fxp + pspan->v * d_zistepv_fxp + pspan->u * d_zistepu_fxp;
-		if (zi == 0) zi = 1;
-		s1 = (((sdivz << 8) / zi) << 8) + sadjust;	// 5.27 / 13.19 = 24.8 >> 8 = 16.16
-		if (s1 > bbextents) s1 = bbextents; else if (s1 < 0) s1 = 0;
-		t1 = (((tdivz << 8) / zi) << 8) + tadjust;
-		if (t1 > bbextentt) t1 = bbextentt; else if (t1 < 0) t1 = 0;
-		// calculate final s/z, t/z, 1/z, s, and t and clamp
-		//sdivz += sdivzstepu * (count - 1);
-		//tdivz += tdivzstepu * (count - 1);
-		//zi += d_zistepu_fxp * (count - 1);
-		//if (zi == 0) zi = 1;
-#if 0
-		s2 = (((sdivz << 8) / zi) << 8) + sadjust;
-		if (s2 > bbextents) s2 = bbextents; else if (s2 < 8) s2 = 8;
-		t2 = (((tdivz << 8) / zi) << 8) + tadjust;
-		if (t2 > bbextentt) t2 = bbextentt; else if (t2 < 8) t2 = 8;
-		if (count > 1)
-		{
-			sstep = (s2 - s1) / (count - 1);
-			tstep = (t2 - t1) / (count - 1);
-		}
-#else
-		//End Jacco Biker mod
-		//Dan East: Fixed point conversion for perspective correction
-		do
-		{
-		// calculate s and t at the far end of the span
-			if (count >= 8)
-				spancount = 8;
-			else
-				spancount = count;
+   // Recalc fixed point values
+   UpdateFixedPointVars16( 1 );
+   do
+   {
+      pdest = (unsigned char *)((byte *)d_viewbuffer + (screenwidth * pspan->v) + pspan->u);
 
-			count -= spancount;
+      // calculate the initial s/z, t/z, 1/z, s, and t and clamp
+      sdivz = sdivzorig + pspan->v * sdivzstepv + pspan->u * sdivzstepu;
+      tdivz = tdivzorig + pspan->v * tdivzstepv + pspan->u * tdivzstepu;
+      zi = d_ziorigin_fxp + pspan->v * d_zistepv_fxp + pspan->u * d_zistepu_fxp;
+      if (zi == 0) zi = 1;
+      s = (((sdivz << 8) / zi) << 8) + sadjust;   // 5.27 / 13.19 = 24.8 >> 8 = 16.16
+      if (s > bbextents) s = bbextents; else if (s < 0) s = 0;
+      t = (((tdivz << 8) / zi) << 8) + tadjust;
+      if (t > bbextentt) t = bbextentt; else if (t < 0) t = 0;
 
-			if (count)
-			{
-			// calculate s/z, t/z, zi->fixed s and t at far end of span,
-			// calculate s and t steps across span by shifting
-				sdivz += sdivz8stepu;
-				tdivz += tdivz8stepu;
-				zi += zi8stepu;
-				if (!zi) zi = 1;
-				//z = zi;
-				//z = (float)0x10000 / zi;	// prescale to 16.16 fixed-point
-				snext = (((sdivz<<8)/zi)<<8)+sadjust;
-				//snext = (int)(sdivz * z) + sadjust;
-				if (snext > bbextents)
-					snext = bbextents;
-				else if (snext < 8)
-					snext = 8;	// prevent round-off error on <0 steps from
-								//  from causing overstepping & running off the
-								//  edge of the texture
+      //End Jacco Biker mod
 
-				tnext = (((tdivz<<8)/zi)<<8) + tadjust;
-				if (tnext > bbextentt)
-					tnext = bbextentt;
-				else if (tnext < 8)
-					tnext = 8;	// guard against round-off error on <0 steps
+      // Manoel Kasimier - begin
+      count = pspan->count >> 4;
+      spancount = pspan->count % 16;
+      // Manoel Kasimier - end
 
-				sstep = (snext - s1) >> 3;
-				tstep = (tnext - t1) >> 3;
-			}
-			else
-			{
-			// calculate s/z, t/z, zi->fixed s and t at last pixel in span (so
-			// can't step off polygon), clamp, calculate s and t steps across
-			// span by division, biasing steps low so we don't run off the
-			// texture
-				spancountminus1 = spancount - 1;
-				sdivz += sdivzstepu * spancountminus1;
-				tdivz += tdivzstepu * spancountminus1;
-				zi += d_zistepu_fxp * spancountminus1;
-				if (!zi) zi = 1;
-				//z = zi;//(float)0x10000 / zi;	// prescale to 16.16 fixed-point
-				snext = (((sdivz<<8) / zi)<<8) + sadjust;
-				if (snext > bbextents)
-					snext = bbextents;
-				else if (snext < 8)
-					snext = 8;	// prevent round-off error on <0 steps from
-								//  from causing overstepping & running off the
-								//  edge of the texture
+      while (count-- >0) // Manoel Kasimier
+      {
+         // calculate s/z, t/z, zi->fixed s and t at far end of span,
+         // calculate s and t steps across span by shifting
+            sdivz += sdivzstepu_fix;
+            tdivz += tdivzstepu_fix;
+            zi += zistepu_fix;
+            if (!zi) zi = 1;
 
-				tnext = (((tdivz<<8) / zi)<<8) + tadjust;
-				if (tnext > bbextentt)
-					tnext = bbextentt;
-				else if (tnext < 8)
-					tnext = 8;	// guard against round-off error on <0 steps
+            snext = (((sdivz<<8)/zi)<<8)+sadjust;
+            if (snext > bbextents)
+               snext = bbextents;
+            else if (snext < 16)
+               snext = 16;   // prevent round-off error on <0 steps from causing overstepping & running off the edge of the texture
 
-				if (spancount > 1)
-				{
-					sstep = ((snext - s1)) / ((spancount - 1));
-					tstep = ((tnext - t1)) / ((spancount - 1));
-				}
-			}
-			do
-			{
-				*pdest++ = *(pbase + (s1 >> 16) + (t1 >> 16) * cachewidth);
-				s1 += sstep;
-				t1 += tstep;
-			} while (--spancount > 0);
+            tnext = (((tdivz<<8)/zi)<<8) + tadjust;
+            if (tnext > bbextentt)
+               tnext = bbextentt;
+            else if (tnext < 16)
+               tnext = 16;   // guard against round-off error on <0 steps
 
-			s1 = snext;
-			t1 = tnext;
+            sstep = (snext - s) >> 4;
+            tstep = (tnext - t) >> 4;
 
-		} while (count > 0);
-#endif
-#if 0
-		// Draw span
-		for ( i = 0; i < count; i++ )
-		{
-			*pdest++ = *(pbase + (s1 >> 16) + (t1 >> 16) * cachewidth);
-			s1 += sstep;
-			t1 += tstep;
-		}
-#endif
-	} while ((pspan = pspan->pnext) != NULL);
+         pdest += 16;
+         pdest[-16] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[-15] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[-14] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[-13] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[-12] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[-11] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[-10] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -9] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -8] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -7] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -6] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -5] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -4] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -3] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -2] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         pdest[ -1] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+         // Manoel Kasimier - end
+
+         s = snext;
+         t = tnext;
+         // Manoel Kasimier - begin
+      }
+      if (spancount > 0)
+      {
+         // Manoel Kasimier - end
+         // calculate s/z, t/z, zi->fixed s and t at last pixel in span (so
+         // can't step off polygon), clamp, calculate s and t steps across
+         // span by division, biasing steps low so we don't run off the
+         // texture
+
+            spancountminus1 = spancount - 1;
+            sdivz += sdivzstepu * spancountminus1;
+            tdivz += tdivzstepu * spancountminus1;
+            zi += d_zistepu_fxp * spancountminus1;
+            //if (!zi) zi = 1;
+            //z = zi;//(float)0x10000 / zi;   // prescale to 16.16 fixed-point
+            snext = (((sdivz<<8) / zi)<<8) + sadjust;
+            if (snext > bbextents)
+               snext = bbextents;
+            else if (snext < 16)
+               snext = 16;   // prevent round-off error on <0 steps from causing overstepping & running off the edge of the texture
+
+            tnext = (((tdivz<<8) / zi)<<8) + tadjust;
+            if (tnext > bbextentt)
+               tnext = bbextentt;
+            else if (tnext < 16)
+               tnext = 16;   // guard against round-off error on <0 steps
+
+            if (spancount > 1)
+            {
+               sstep = ((snext - s)) / ((spancount - 1));
+               tstep = ((tnext - t)) / ((spancount - 1));
+            }
+
+
+         pdest += spancount;
+         switch (spancount)
+         {
+            case 16: pdest[-16] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case 15: pdest[-15] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case 14: pdest[-14] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case 13: pdest[-13] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case 12: pdest[-12] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case 11: pdest[-11] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case 10: pdest[-10] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  9: pdest[ -9] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  8: pdest[ -8] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  7: pdest[ -7] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  6: pdest[ -6] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  5: pdest[ -5] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  4: pdest[ -4] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  3: pdest[ -3] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  2: pdest[ -2] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            case  1: pdest[ -1] = pbase[(s >> 16) + (t >> 16) * cachewidth]; s += sstep; t += tstep;
+            break;
+         }
+
+      }
+   } while ((pspan = pspan->pnext) != NULL);
 }
 
-#endif //USE_PQ_OPT5
+#endif
 
 #endif // !id386
 
