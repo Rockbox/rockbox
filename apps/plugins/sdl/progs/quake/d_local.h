@@ -66,11 +66,41 @@ extern float	d_sdivzstepu, d_tdivzstepu, d_zistepu;
 extern float	d_sdivzstepv, d_tdivzstepv, d_zistepv;
 extern float	d_sdivzorigin, d_tdivzorigin, d_ziorigin;
 
-fixed16_t	sadjust, tadjust;
-fixed16_t	bbextents, bbextentt;
+extern int		d_zistepu_fxp, d_zistepv_fxp, d_ziorigin_fxp;
+
+#ifdef USE_PQ_OPT3
+extern int		d_sdivzstepu_fxp, d_tdivzstepu_fxp, d_zistepu_fxp;
+extern int		d_sdivzstepv_fxp, d_tdivzstepv_fxp, d_zistepv_fxp;
+extern int		d_sdivzorigin_fxp, d_tdivzorigin_fxp, d_ziorigin_fxp;
+#endif
+
+
+#ifdef USE_PQ_OPT
+//JB:Optimization
+//FW: disable
+//extern int sdivzstepu, tdivzstepu, zistepu;
+//extern int sdivzstepv, tdivzstepv, zistepv;
+//extern int sdivzorigin, tdivzorigin, ziorigin;
+#endif
+
+extern fixedpoint_t	d_sdivzstepuFPM, d_tdivzstepuFPM, d_zistepuFPM;
+extern fixedpoint_t	d_sdivzstepvFPM, d_tdivzstepvFPM, d_zistepvFPM;
+extern fixedpoint_t	d_sdivzoriginFPM, d_tdivzoriginFPM, d_zioriginFPM;
+
+//Dan: ID Software was already using a minute amount of fixed point.  I duplicated
+//these just for consistancy in the conversion, and so the types would match.
+fixed16_t		sadjust, tadjust;
+fixed16_t		bbextents, bbextentt;
+fixedpoint_t	sadjustFPM, tadjustFPM;
+fixedpoint_t	bbextentsFPM, bbextenttFPM;
 
 
 void D_DrawSpans8 (espan_t *pspans);
+#ifdef USE_PQ_OPT
+//JB:Optimization
+void D_DrawSpans8WithZ (espan_t *pspans);
+#endif
+void D_DrawSpans8FPM (espan_t *pspans);
 void D_DrawSpans16 (espan_t *pspans);
 void D_DrawZSpans (espan_t *pspans);
 void Turbulent8 (espan_t *pspan);
