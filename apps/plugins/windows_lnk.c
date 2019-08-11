@@ -119,7 +119,7 @@ static bool extract_link_destination(const int fd,
     r = read_lword(fd, &size);
     if (!r) return false;
     if (size!=0x4c) {       /* header size MUST be 76 bytes */
-        DEBUGF("unexpected header size 0x%08lx (must be 0x0000004c)\n", size);
+        DEBUGF("unexpected header size 0x%08x (must be 0x0000004c)\n", size);
         return false;
     }
 
