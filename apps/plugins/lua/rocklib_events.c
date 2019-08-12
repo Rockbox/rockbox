@@ -72,6 +72,7 @@
 #define EVENT_METATABLE "event metatable"
 
 #define EVENT_THREAD LUA_ROCKEVENTSNAME ".thread"
+#define EV_STACKSZ DEFAULT_STACK_SIZE
 
 #define LUA_SUCCESS 0
 #define EV_TIMER_FREQ (TIMER_FREQ / HZ)
@@ -323,7 +324,7 @@ event_error:
 
     /* thread is exiting -- clean up */
     rb->timer_unregister();
-    rb->yield();
+    //rb->yield();
     rb->thread_exit();
 
     return;
@@ -360,7 +361,7 @@ static void create_event_thread_ref(struct event_data *ev_data)
 
     lua_createtable(L, 2, 0);
 
-    ev_data->event_stack = (long *) lua_newuserdata (L, DEFAULT_STACK_SIZE);
+    ev_data->event_stack = (long *) lua_newuserdata (L, EV_STACKSZ);
 
     /* attach EVENT_METATABLE to ud so we get notified on garbage collection */
     luaL_getmetatable (L, EVENT_METATABLE);
@@ -412,7 +413,7 @@ static void init_event_thread(bool init, struct event_data *ev_data)
 
     ev_data->thread_id = rb->create_thread(&event_thread,
                                            ev_data->event_stack,
-                                           DEFAULT_STACK_SIZE,
+                                           EV_STACKSZ,
                                            0,
                                            EVENT_THREAD
                                            IF_PRIO(, PRIORITY_SYSTEM)
