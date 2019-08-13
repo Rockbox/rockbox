@@ -413,6 +413,9 @@ enum codec_status codec_run(void)
                 LOGF("Opus seek page:%lld,%lld,%ld\n",
                     seek_target, page_granule, (long)param);
                 opus_seek_page_granule(seek_target, page_granule, &oy, &os);
+                /* reset the state to help ensure that subsequent packets won't
+                   use state set by unrelated packets processed before seek */
+                opus_decoder_ctl(st, OPUS_RESET_STATE);
             }
 
             ci->set_elapsed(param);
