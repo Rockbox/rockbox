@@ -13000,13 +13000,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Powolny"
+    *: none
+    filter_roll_off: "Powolny"
   </dest>
   <voice>
-    *: "Powolny"
+    *: none
+    filter_roll_off: "Powolny"
   </voice>
 </phrase>
 <phrase>
@@ -13079,13 +13082,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Gwałtowny"
+    *: none
+    filter_roll_off: "Gwałtowny"
   </dest>
   <voice>
-    *: "Gwałtowny"
+    *: none
+    filter_roll_off: "Gwałtowny"
   </voice>
 </phrase>
 <phrase>
@@ -13121,13 +13127,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Filtr roll-off DAC"
+    *: none
+    filter_roll_off: "Filtr roll-off DAC"
   </dest>
   <voice>
-    *: "Filtr roll off DAC"
+    *: none
+    filter_roll_off: "Filtr roll off DAC"
   </voice>
 </phrase>
 <phrase>

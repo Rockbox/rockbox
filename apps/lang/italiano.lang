@@ -12992,13 +12992,16 @@ desc: deprecated
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Filtro Roll-off del DAC"
+    *: none
+    filter_roll_off: "Filtro Roll-off del DAC"
   </dest>
   <voice>
-    *: "Filtro Roll-off del DAC"
+    *: none
+    filter_roll_off: "Filtro Roll-off del DAC"
   </voice>
 </phrase>
 <phrase>
@@ -13006,13 +13009,16 @@ desc: deprecated
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Aspro"
+    *: none
+    filter_roll_off: "Aspro"
   </dest>
   <voice>
-    *: "Aspro"
+    *: none
+    filter_roll_off: "Aspro"
   </voice>
 </phrase>
 <phrase>
@@ -13020,13 +13026,16 @@ desc: deprecated
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Morbido"
+    *: none
+    filter_roll_off: "Morbido"
   </dest>
   <voice>
-    *: "Morbido"
+    *: none
+    filter_roll_off: "Morbido"
   </voice>
 </phrase>
 <phrase>

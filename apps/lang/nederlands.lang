@@ -13123,13 +13123,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Steil"
+    *: none
+    filter_roll_off: "Steil"
   </dest>
   <voice>
-    *: "Steil"
+    *: none
+    filter_roll_off: "Steil"
   </voice>
 </phrase>
 <phrase>
@@ -13151,13 +13154,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Vlak"
+    *: none
+    filter_roll_off: "Vlak"
   </dest>
   <voice>
-    *: "Vlak"
+    *: none
+    filter_roll_off: "Vlak"
   </voice>
 </phrase>
 <phrase>
@@ -13182,13 +13188,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC-filtersteilheid"
+    *: none
+    filter_roll_off: "DAC-filtersteilheid"
   </dest>
   <voice>
-    *: "DAC-filtersteilheid"
+    *: none
+    filter_roll_off: "DAC-filtersteilheid"
   </voice>
 </phrase>
 <phrase>

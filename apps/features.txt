@@ -211,6 +211,10 @@ touchpad_deadzone
 depth_3d
 #endif
 
+#if  defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398)
+filter_roll_off
+#endif
+
 
 /* These features are only used by the manual so they won't break binary
  * compatibility

@@ -13140,13 +13140,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </dest>
   <voice>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </voice>
 </phrase>
 <phrase>
@@ -13154,13 +13157,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </dest>
   <voice>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </voice>
 </phrase>
 <phrase>
@@ -13168,13 +13174,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </dest>
   <voice>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </voice>
 </phrase>
 <phrase>
@@ -13182,13 +13191,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Short"
+    *: none
+    es9018: "Short"
   </source>
   <dest>
-    *: "Short"
+    *: none
+    es9018: "Short"
   </dest>
   <voice>
-    *: "Short"
+    *: none
+    es9018: "Short"
   </voice>
 </phrase>
 <phrase>
@@ -13196,13 +13208,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Bypass"
+    *: none
+    es9018: "Bypass"
   </source>
   <dest>
-    *: "Bypass"
+    *: none
+    es9018: "Bypass"
   </dest>
   <voice>
-    *: "Bypass"
+    *: none
+    es9018: "Bypass"
   </voice>
 </phrase>
 <phrase>

@@ -13019,13 +13019,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Lent"
+    *: none
+    filter_roll_off: "Lent"
   </dest>
   <voice>
-    *: "Lent"
+    *: none
+    filter_roll_off: "Lent"
   </voice>
 </phrase>
 <phrase>
@@ -13172,13 +13175,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Filtre d'atténuation du convertisseur N/A"
+    *: none
+    filter_roll_off: "Filtre d'atténuation du convertisseur N/A"
   </dest>
   <voice>
-    *: "Filtre d'atténuation du convertisseur N A"
+    *: none
+    filter_roll_off: "Filtre d'atténuation du convertisseur N A"
   </voice>
 </phrase>
 <phrase>
@@ -13308,13 +13314,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Rapide"
+    *: none
+    filter_roll_off: "Rapide"
   </dest>
   <voice>
-    *: "Rapide"
+    *: none
+    filter_roll_off: "Rapide"
   </voice>
 </phrase>
 <phrase>

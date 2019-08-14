@@ -13013,13 +13013,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Ascuţime"
+    *: none
+    filter_roll_off: "Ascuţime"
   </dest>
   <voice>
-    *: "Ascuţime"
+    *: none
+    filter_roll_off: "Ascuţime"
   </voice>
 </phrase>
 <phrase>
@@ -13027,13 +13030,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Încet"
+    *: none
+    filter_roll_off: "Încet"
   </dest>
   <voice>
-    *: "Încet"
+    *: none
+    filter_roll_off: "Încet"
   </voice>
 </phrase>
 <phrase>
@@ -13103,13 +13109,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Pantă filtru DAC"
+    *: none
+    filter_roll_off: "Pantă filtru DAC"
   </dest>
   <voice>
-    *: "Pantă filtru DAC"
+    *: none
+    filter_roll_off: "Pantă filtru DAC"
   </voice>
 </phrase>
 <phrase>

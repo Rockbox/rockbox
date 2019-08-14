@@ -13127,13 +13127,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Flankensteilheit"
+    *: none
+    filter_roll_off: "Flankensteilheit"
   </dest>
   <voice>
-    *: "Flankensteilheit"
+    *: none
+    filter_roll_off: "Flankensteilheit"
   </voice>
 </phrase>
 <phrase>
@@ -13158,13 +13161,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Langsam"
+    *: none
+    filter_roll_off: "Langsam"
   </dest>
   <voice>
-    *: "Langsam"
+    *: none
+    filter_roll_off: "Langsam"
   </voice>
 </phrase>
 <phrase>
@@ -13234,13 +13240,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Scharf"
+    *: none
+    filter_roll_off: "Scharf"
   </dest>
   <voice>
-    *: "Scharf"
+    *: none
+    filter_roll_off: "Scharf"
   </voice>
 </phrase>
 <phrase>

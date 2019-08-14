@@ -12923,13 +12923,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC滤波器滚降"
+    *: none
+    filter_roll_off: "DAC滤波器滚降"
   </dest>
   <voice>
-    *: "DAC滤波器滚降"
+    *: none
+    filter_roll_off: "DAC滤波器滚降"
   </voice>
 </phrase>
 <phrase>
@@ -12937,13 +12940,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "快速"
+    *: none
+    filter_roll_off: "快速"
   </dest>
   <voice>
-    *: "快速滚降"
+    *: none
+    filter_roll_off: "快速滚降"
   </voice>
 </phrase>
 <phrase>
@@ -12951,13 +12957,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "平缓"
+    *: none
+    filter_roll_off: "平缓"
   </dest>
   <voice>
-    *: "平缓滚降"
+    *: none
+    filter_roll_off: "平缓滚降"
   </voice>
 </phrase>
 <phrase>
