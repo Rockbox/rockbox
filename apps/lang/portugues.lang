@@ -12989,13 +12989,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Lento"
+    *: none
+    filter_roll_off: "Lento"
   </dest>
   <voice>
-    *: "Lento"
+    *: none
+    filter_roll_off: "Lento"
   </voice>
 </phrase>
 <phrase>
@@ -13003,13 +13006,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Agudo"
+    *: none
+    filter_roll_off: "Agudo"
   </dest>
   <voice>
-    *: "Agudo"
+    *: none
+    filter_roll_off: "Agudo"
   </voice>
 </phrase>
 <phrase>
@@ -13017,13 +13023,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Filtro Roll-off do CAD"
+    *: none
+    filter_roll_off: "Filtro Roll-off do CAD"
   </dest>
   <voice>
-    *: "Filtro Roll-off do CAD"
+    *: none
+    filter_roll_off: "Filtro Roll-off do CAD"
   </voice>
 </phrase>
 <phrase>

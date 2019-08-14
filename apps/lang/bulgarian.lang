@@ -13028,13 +13028,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Бавно"
+    *: none
+    filter_roll_off: "Бавно"
   </dest>
   <voice>
-    *: "Бавно"
+    *: none
+    filter_roll_off: "Бавно"
   </voice>
 </phrase>
 <phrase>
@@ -13056,13 +13059,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Остро"
+    *: none
+    filter_roll_off: "Остро"
   </dest>
   <voice>
-    *: "Остро"
+    *: none
+    filter_roll_off: "Остро"
   </voice>
 </phrase>
 <phrase>
@@ -13084,13 +13090,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Разтоварване на филтъра на ЦАП"
+    *: none
+    filter_roll_off: "Разтоварване на филтъра на ЦАП"
   </dest>
   <voice>
-    *: "Разтоварване на филтъра на ЦАП"
+    *: none
+    filter_roll_off: "Разтоварване на филтъра на ЦАП"
   </voice>
 </phrase>
 <phrase>

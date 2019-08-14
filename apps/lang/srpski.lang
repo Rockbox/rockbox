@@ -12990,13 +12990,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Оштра"
+    *: none
+    filter_roll_off: "Оштра"
   </dest>
   <voice>
-    *: "Оштра"
+    *: none
+    filter_roll_off: "Оштра"
   </voice>
 </phrase>
 <phrase>
@@ -13004,13 +13007,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Блага"
+    *: none
+    filter_roll_off: "Блага"
   </dest>
   <voice>
-    *: "Блага"
+    *: none
+    filter_roll_off: "Блага"
   </voice>
 </phrase>
 <phrase>
@@ -13069,13 +13075,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Стрмина DAC филтра"
+    *: none
+    filter_roll_off: "Стрмина DAC филтра"
   </dest>
   <voice>
-    *: "Стрмина DAC филтра"
+    *: none
+    filter_roll_off: "Стрмина DAC филтра"
   </voice>
 </phrase>
 <phrase>

@@ -11190,13 +11190,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Filter-avrunding for DAC"
+    *: none
+    filter_roll_off: "Filter-avrunding for DAC"
   </dest>
   <voice>
-    *: "Filter-avrunding for DAC"
+    *: none
+    filter_roll_off: "Filter-avrunding for DAC"
   </voice>
 </phrase>
 <phrase>
@@ -12065,13 +12068,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Skarp"
+    *: none
+    filter_roll_off: "Skarp"
   </dest>
   <voice>
-    *: "Skarp"
+    *: none
+    filter_roll_off: "Skarp"
   </voice>
 </phrase>
 <phrase>
@@ -12630,13 +12636,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Treg"
+    *: none
+    filter_roll_off: "Treg"
   </dest>
   <voice>
-    *: "Treg"
+    *: none
+    filter_roll_off: "Treg"
   </voice>
 </phrase>
 <phrase>

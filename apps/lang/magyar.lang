@@ -12910,13 +12910,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC Szűrő Roll-Off"
+    *: none
+    filter_roll_off: "DAC Szűrő Roll-Off"
   </dest>
   <voice>
-    *: "DAC Szűrő Roll-Off"
+    *: none
+    filter_roll_off: "DAC Szűrő Roll-Off"
   </voice>
 </phrase>
 <phrase>
@@ -12924,13 +12927,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Erős"
+    *: none
+    filter_roll_off: "Erős"
   </dest>
   <voice>
-    *: "Erős"
+    *: none
+    filter_roll_off: "Erős"
   </voice>
 </phrase>
 <phrase>
@@ -13288,13 +13294,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Lassú"
+    *: none
+    filter_roll_off: "Lassú"
   </dest>
   <voice>
-    *: "Lassú"
+    *: none
+    filter_roll_off: "Lassú"
   </voice>
 </phrase>
 <phrase>

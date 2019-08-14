@@ -13049,13 +13049,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "roll-off DAC filtra "
+    *: none
+    filter_roll_off: "roll-off DAC filtra "
   </dest>
   <voice>
-    *: "roll-off DAC filtra "
+    *: none
+    filter_roll_off: "roll-off DAC filtra "
   </voice>
 </phrase>
 <phrase>
@@ -13080,13 +13083,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Výrazný"
+    *: none
+    filter_roll_off: "Výrazný"
   </dest>
   <voice>
-    *: "Výrazný"
+    *: none
+    filter_roll_off: "Výrazný"
   </voice>
 </phrase>
 <phrase>
@@ -13094,13 +13100,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Pomalý"
+    *: none
+    filter_roll_off: "Pomalý"
   </dest>
   <voice>
-    *: "Pomalý"
+    *: none
+    filter_roll_off: "Pomalý"
   </voice>
 </phrase>
 <phrase>

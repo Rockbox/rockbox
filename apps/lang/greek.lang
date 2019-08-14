@@ -12246,13 +12246,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </dest>
   <voice>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </voice>
 </phrase>
 <phrase>
@@ -13338,13 +13341,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </dest>
   <voice>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </voice>
 </phrase>
 <phrase>
@@ -13414,13 +13420,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Σιγανό"
+    *: none
+    filter_roll_off: "Σιγανό"
   </dest>
   <voice>
-    *: "Σιγανό"
+    *: none
+    filter_roll_off: "Σιγανό"
   </voice>
 </phrase>
 <phrase>

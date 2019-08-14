@@ -12981,13 +12981,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "DAC's filter roll-off"
+    *: none
+    filter_roll_off: "DAC's filter roll-off"
   </source>
   <dest>
-    *: "Sortida del filtre DAC"
+    *: none
+    filter_roll_off: "Sortida del filtre DAC"
   </dest>
   <voice>
-    *: "Sortida del filtre DAC"
+    *: none
+    filter_roll_off: "Sortida del filtre DAC"
   </voice>
 </phrase>
 <phrase>
@@ -13043,13 +13046,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Sharp"
+    *: none
+    filter_roll_off: "Sharp"
   </source>
   <dest>
-    *: "Agut"
+    *: none
+    filter_roll_off: "Agut"
   </dest>
   <voice>
-    *: "Agut"
+    *: none
+    filter_roll_off: "Agut"
   </voice>
 </phrase>
 <phrase>
@@ -13057,13 +13063,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Slow"
+    *: none
+    filter_roll_off: "Slow"
   </source>
   <dest>
-    *: "Lent"
+    *: none
+    filter_roll_off: "Lent"
   </dest>
   <voice>
-    *: "Lent"
+    *: none
+    filter_roll_off: "Lent"
   </voice>
 </phrase>
 <phrase>
