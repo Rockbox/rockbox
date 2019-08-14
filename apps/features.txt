@@ -211,7 +211,8 @@ touchpad_deadzone
 depth_3d
 #endif
 
-#if  defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398)
+// This should be AUDIOHW_HAVE_FILTER_ROLL_OFF but that is only defined later
+#if defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740)
 filter_roll_off
 #endif
 
