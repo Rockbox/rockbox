@@ -211,11 +211,14 @@ touchpad_deadzone
 depth_3d
 #endif
 
-// This should be AUDIOHW_HAVE_FILTER_ROLL_OFF but that is only defined later
-#if defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740)
+/* This should be AUDIOHW_HAVE_FILTER_ROLL_OFF but that is only defined later */
+#if defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740) || defined(HAVE_ES9018)
 filter_roll_off
 #endif
 
+#if defined(HAVE_ES9018)
+es9018
+#endif
 
 /* These features are only used by the manual so they won't break binary
  * compatibility
