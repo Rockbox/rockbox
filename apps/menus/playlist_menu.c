@@ -50,7 +50,7 @@ int save_playlist_screen(struct playlist_info* playlist)
     if (!dot)
     {
         /* folder of some type */
-        if (temp[1] != '\0')
+        if (len > 1)
             strcpy(&temp[len-1], ".m3u8");
         else
             snprintf(temp, sizeof(temp), "%s%s",
