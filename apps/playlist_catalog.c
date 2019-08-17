@@ -85,6 +85,10 @@ static int initialize_catalog(void)
             if (!dir_exists(playlist_dir))
                 mkdir(playlist_dir);
         }
+        
+        /* remove duplicate '/' */
+        if (playlist_dir[0] == '/' && playlist_dir[1] == '/')
+            strcpy(playlist_dir, &playlist_dir[1]);
 
         playlist_dir_length = strlen(playlist_dir);
 
