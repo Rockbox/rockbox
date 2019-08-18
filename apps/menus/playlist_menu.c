@@ -47,20 +47,24 @@ int save_playlist_screen(struct playlist_info* playlist)
     len = strlen(temp);
 
     dot = strrchr(temp, '.');
-    if (!dot)
+    if (!dot && len <= 1)
     {
-        /* folder of some type */
-        if (len > 1)
-            strcpy(&temp[len-1], ".m3u8");
-        else
-            snprintf(temp, sizeof(temp), "%s%s",
-                    catalog_get_directory(), DEFAULT_DYNAMIC_PLAYLIST_NAME);
+        snprintf(temp, sizeof(temp), "%s%s",
+                 catalog_get_directory(), DEFAULT_DYNAMIC_PLAYLIST_NAME);
     }
-    else if (len > 4 && !strcasecmp(dot, ".m3u"))
-        strcat(temp, "8");
 
+    dot = strrchr(temp, '.');
+    if (dot) /* remove extension */
+       *dot = '\0';
+ 
     if (!kbd_input(temp, sizeof(temp)))
     {
+        len = strlen(temp);
+        if(len > 4 && !strcasecmp(&temp[len-4], ".m3u"))
+            strlcat(temp, "8", sizeof(temp));
+        else if(len <= 5 || strcasecmp(&temp[len-5], ".m3u8"))
+            strlcat(temp, ".m3u8", sizeof(temp));
+
         playlist_save(playlist, temp, NULL, 0);
 
         /* reload in case playlist was saved to cwd */

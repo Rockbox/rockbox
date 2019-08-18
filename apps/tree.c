@@ -941,9 +941,10 @@ static int dirbrowse(void)
 
 int create_playlist(void)
 {
+#if 0
     char filename[MAX_PATH + 16]; /* add enough space for extension */
     const char *playlist_dir = catalog_get_directory();
-    if (strcmp(tc.currdir, playlist_dir) != 0)
+    if (tc.currdir[1] && strcmp(tc.currdir, playlist_dir) != 0)
         snprintf(filename, sizeof filename, "%s.m3u8", tc.currdir);
     else
         snprintf(filename, sizeof filename, "%s/all.m3u8", playlist_dir);
@@ -951,9 +952,9 @@ int create_playlist(void)
     if (kbd_input(filename, MAX_PATH))
         return 0;
     splashf(0, "%s %s", str(LANG_CREATING), filename);
-
+#endif
     trigger_cpu_boost();
-    catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, filename);
+    catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, NULL);
     cancel_cpu_boost();
 
     return 1;
