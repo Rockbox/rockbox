@@ -326,7 +326,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                                bool new_playlist, char *m3u8name)
 {
     int result;
-    char playlist[MAX_PATH + 6];
+    char playlist[MAX_PATH + 7]; /* room for /.m3u8\0*/
     if (in_add_to_playlist)
         return false;
 
@@ -338,24 +338,32 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         size_t len;
         if (m3u8name == NULL)
         {
-            /*If sel is a folder, we prefill the text field with its name*/
-            const char *name = strrchr(sel, '/');
-            snprintf(playlist, sizeof(playlist), "%s/%s.m3u8",
+            const char *name;
+            /* If sel is empty, root, or playlist directory  we use 'all' */
+            if (!sel || !strcmp(sel, "/") || !strcmp(sel, playlist_dir))
+            {
+                if (!sel || !strcmp(sel, PLAYLIST_CATALOG_DEFAULT_DIR))
+                    sel = "/";
+                name = "/all";
+            }
+            else /*If sel is a folder, we prefill the text field with its name*/
+                name = strrchr(sel, '/');
+
+            snprintf(playlist, MAX_PATH + 1, "%s/%s",
                      playlist_dir,
                      (name!=NULL && (sel_attr & ATTR_DIRECTORY))?name+1:"");
         }
         else
-            strcpy(playlist, m3u8name);
+            strlcpy(playlist, m3u8name, MAX_PATH);
+
+        if (kbd_input(playlist, MAX_PATH))
+            return false;
 
         len = strlen(playlist);
-
         if(len > 4 && !strcasecmp(&playlist[len-4], ".m3u"))
-            strcat(playlist, "8");
+            strlcat(playlist, "8", sizeof(playlist));
         else if(len <= 5 || strcasecmp(&playlist[len-5], ".m3u8"))
-            strcat(playlist, ".m3u8");
-        
-        if (kbd_input(playlist, sizeof(playlist)))
-            return false;
+            strlcat(playlist, ".m3u8", sizeof(playlist));
     }
     else
     {
