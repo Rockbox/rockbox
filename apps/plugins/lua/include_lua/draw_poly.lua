@@ -35,8 +35,10 @@ local _poly = {} do
     local _NIL = nil -- nil placeholder
 
     local _abs     = math.abs
+    local _clear   = rocklib_image.clear
     local _copy    = rocklib_image.copy
     local _line    = rocklib_image.line
+    local _newimg  = rb.new_image
     local flood_fill = require("draw_floodfill")
 
     -- draws a non-filled figure based on points in t-points
