@@ -325,6 +325,9 @@ MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
 #endif
 #endif
 
+MENUITEM_SETTING(btn_long_press_duration,
+        &global_settings.btn_long_press_duration, NULL);
+
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
@@ -447,6 +450,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if CONFIG_CODEC == SWCODEC
             &keyclick_menu,
 #endif
+            &btn_long_press_duration,
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
 #endif
