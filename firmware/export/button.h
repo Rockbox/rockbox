@@ -84,6 +84,12 @@ void wheel_send_events(bool send);
 int button_apply_acceleration(const unsigned int data);
 #endif
 
+void set_button_long_press_duration(int ticks);
+
+/* Default button long press duration */
+#define BUTTON_LONGPRESS_TICKS  30
+
+
 #define BUTTON_NONE         0x00000000
 
 /* Button modifiers */
