@@ -16433,3 +16433,17 @@ id: VOICE_BAT_BENCH_KEYS
     *: "File error"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BTN_LONG_PRESS_DURATION
+  desc: Long button press duration in ticks
+  user: core
+  <source>
+    *: "Long Button Press Duration"
+  </source>
+  <dest>
+    *: "Long Button Press Duration"
+  </dest>
+  <voice>
+    *: "Long Button Press Duration"
+  </voice>
+</phrase>
