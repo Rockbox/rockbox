@@ -333,6 +333,8 @@ MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
 MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
            &keyclick, &keyclick_repeats);
 #endif
+MENUITEM_SETTING(btn_long_press_duration,
+        &global_settings.btn_long_press_duration, NULL);
 
 #if CONFIG_CHARGING
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
@@ -432,6 +434,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &buttonlight_brightness,
 #endif
             &keyclick_menu,
+            &btn_long_press_duration,
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
 #endif

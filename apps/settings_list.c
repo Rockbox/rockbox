@@ -2000,6 +2000,9 @@ const struct settings_list settings[] = {
                 MAX_BRIGHTNESS_SETTING, 1, NULL, NULL,
                 buttonlight_set_brightness),
 #endif
+    INT_SETTING(0, btn_long_press_duration, LANG_BTN_LONG_PRESS_DURATION, DEFAULT_BUTTON_LONGPRESS_TICKS,
+                  "button long press duration", UNIT_INT, 20, 50, 1, NULL, NULL,
+                  set_button_long_press_duration),
 #ifndef HAVE_WHEEL_ACCELERATION
     INT_SETTING(F_TIME_SETTING, list_accel_start_delay, LANG_LISTACCEL_START_DELAY,
                 2, "list_accel_start_delay", UNIT_SEC, 0, 10, 1,
