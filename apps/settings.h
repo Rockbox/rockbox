@@ -507,6 +507,7 @@ struct user_settings
 #endif
     int ff_rewind_min_step; /* FF/Rewind minimum step size */
     int ff_rewind_accel; /* FF/Rewind acceleration (in seconds per doubling) */
+    int btn_long_press_duration; /* Long press duration in ticks (=1/100s) */
 
     int peak_meter_release;   /* units per read out */
     int peak_meter_hold;      /* hold time for peak meter in 1/100 s */
