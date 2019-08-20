@@ -67,7 +67,7 @@ static bool lineout_present = false;
 #endif
 
 /* how long until repeat kicks in, in centiseconds */
-#define REPEAT_START      (30*HZ/100)
+static int repeat_start = 30*HZ/100;
 
 #ifndef HAVE_TOUCHSCREEN
 /* the next two make repeat "accelerate", which is nice for lists
@@ -154,6 +154,14 @@ static bool button_try_post(int button, int data)
 
     /* on touchscreen we posted unconditionally */
     return ret;
+}
+
+/* Sets the time interval, in ticks (=1/100s) after which a pressed
+   button will generate the repeat event.
+ */
+void set_button_long_press_duration(int ticks)
+{
+    repeat_start = ticks*HZ/100;
 }
 
 static void button_tick(void)
@@ -306,7 +314,7 @@ static void button_tick(void)
                 }
                 else
                 {
-                    if (count++ > REPEAT_START)
+                    if (count++ > repeat_start)
                     {
                         post = true;
                         repeat = true;

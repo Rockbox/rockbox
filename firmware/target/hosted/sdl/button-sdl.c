@@ -42,8 +42,9 @@
 #include "touchscreen.h"
 static int mouse_coords = 0;
 #endif
-/* how long until repeat kicks in */
-#define REPEAT_START      6
+
+/* how long until repeat kicks in, in ticks */
+static int repeat_start = 30;
 
 /* the speed repeat starts at */
 #define REPEAT_INTERVAL_START   4
@@ -92,6 +93,15 @@ bool remote_button_hold(void) {
 static void button_event(int key, bool pressed);
 extern bool debug_wps;
 extern bool mapping;
+
+
+/* Sets the time interval, in ticks (=1/100s) after which a pressed
+   button will generate the repeat event.
+ */
+void set_button_long_press_duration(int ticks)
+{
+    repeat_start = ticks;
+}
 
 #ifdef HAVE_TOUCHSCREEN
 static void touchscreen_event(int x, int y)
