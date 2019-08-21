@@ -34,6 +34,8 @@ puzzles
 rockboy
 #endif
 
+2600box
+
 #if defined(HAVE_TAGCACHE)
 pictureflow
 #endif
