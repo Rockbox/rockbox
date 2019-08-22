@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2017 Franklin Wei
  *
- * Duke3D stub loader.
+ * Wolf3D stub loader.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
