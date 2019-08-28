@@ -2,7 +2,7 @@
 
 extern unsigned long int strtoul(const char *ptr, char **endptr, int base);
 
-#define ABS_LONG_MIN 2147483648UL
+#define ABS_LONG_MIN LONG_MAX
 long int strtol(const char *nptr, char **endptr, int base)
 {
   int neg=0;

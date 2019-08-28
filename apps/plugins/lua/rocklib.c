@@ -642,8 +642,8 @@ RB_WRAP(strncasecmp)
 
 static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize)
 {
-    intptr_t offset = (intptr_t) luaL_optint(L, 1, 0);
-    size_t   size   = (size_t)   luaL_optint(L, 2, maxsize);
+    intptr_t offset = (intptr_t) luaL_optnumber(L, 1, 0);
+    size_t   size   = (size_t)   luaL_optnumber(L, 2, maxsize);
     size_t   written;
     int      type   = lua_type(L, 3);
 
@@ -651,6 +651,7 @@ static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize)
     {
         /* allows pointer within structure to be calculated offset */
         offset = -(address + offset);
+        luaL_argcheck(L, ((size_t) offset) <= maxsize,  1, ERR_IDX_RANGE);
         size   = (size_t) maxsize - offset;
     }
 
