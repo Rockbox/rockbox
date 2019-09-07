@@ -293,7 +293,7 @@ sub Print_Variable {
             $type = sprintf('%s[%d]', $1, $arr);
         }
 
-        printf "\t%s = {0x%x, %d, \"%s\"},\n", $member, $offset, $size, $type;
+        printf "\t%s = \"0x%x, %d, %s\",\n", $member, $offset, $size, $type;
         return 1;
     }
     return 0;
@@ -303,7 +303,7 @@ if($header) #output sections to lua file [PASS 2]
 {
     print "-- Don't change this file!\n";
     printf "-- It is automatically generated %s\n", $svnrev;
-    print "-- member = {offset, size, \"type\"}\n\n";
+    print "-- member = \"offset, size, type\"\n\n";
 
     print "--";
     foreach my $key (sort(keys %replace_type_prefix)) {
@@ -337,6 +337,7 @@ if($header) #output sections to lua file [PASS 2]
             }
         }
     }
+    print "\nreturn false\n";
     #my ($user,$system,$cuser,$csystem) = times;
     #warn "Pass2 ".$user." ".$system." ".$cuser." ".$csystem."\n";
     exit;

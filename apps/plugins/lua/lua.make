@@ -19,7 +19,7 @@ LUA_INCLUDEDIR := $(LUA_SRCDIR)/include_lua
 LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua draw.lua draw_floodfill.lua draw_poly.lua \
 						draw_num.lua draw_text.lua image.lua image_save.lua lcd.lua math_ex.lua \
 						print.lua timer.lua playlist.lua pcm.lua sound.lua \
-						rbcompat.lua poly_points.lua printtable.lua)
+						rbcompat.lua rbsettings.lua poly_points.lua printtable.lua)
 
 
 ifndef APP_TYPE
