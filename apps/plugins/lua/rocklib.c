@@ -640,8 +640,12 @@ RB_WRAP(strncasecmp)
     return 1;
 }
 
-static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize)
+static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize, bool isstr_p)
 {
+    if(isstr_p) /*pointer to string (**char)*/
+    {
+        lua_settop(L, 2); /* no writes allowed */
+    }
     intptr_t offset = (intptr_t) luaL_optnumber(L, 1, 0);
     size_t   size   = (size_t)   luaL_optnumber(L, 2, maxsize);
     size_t   written;
@@ -716,6 +720,11 @@ static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize)
         case  LUA_TNIL:
         case LUA_TNONE: /* reader */
         {
+            if(isstr_p && mem)
+            {
+                lua_pushstring (L, *(char**) mem);
+                return 1;
+            }
             luaL_Buffer b;
             luaL_buffinit(L, &b);
             while(size > 0)
@@ -746,31 +755,50 @@ RB_WRAP(global_status)
 {
     const uintptr_t address = (uintptr_t) rb->global_status;
     const size_t    maxsize = sizeof(struct system_status);
-    return mem_read_write(L, address, maxsize);
+    /*const bool      isstr_p = lua_toboolean(L, 4);*/
+    return mem_read_write(L, address, maxsize, false);
 }
 
 RB_WRAP(global_settings)
 {
     const uintptr_t address = (uintptr_t) rb->global_settings;
     const size_t    maxsize = sizeof(struct user_settings);
-    return mem_read_write(L, address, maxsize);
+    /*const bool      isstr_p = lua_toboolean(L, 4);*/
+    return mem_read_write(L, address, maxsize, false);
 }
 
 RB_WRAP(audio_next_track)
 {
-    lua_settop(L, 2); /* no writes allowed */
+
     const uintptr_t address = (uintptr_t) rb->audio_next_track();
     const size_t    maxsize = sizeof(struct mp3entry);
-    return mem_read_write(L, address, maxsize);
+    const bool      isstr_p = lua_toboolean(L, 4);
+    lua_settop(L, 2); /* no writes allowed */
+    return mem_read_write(L, address, maxsize, isstr_p);
 }
 
 RB_WRAP(audio_current_track)
 {
-    lua_settop(L, 2); /* no writes allowed */
+
     const uintptr_t address = (uintptr_t) rb->audio_current_track();
     const size_t    maxsize = sizeof(struct mp3entry);
-    return mem_read_write(L, address, maxsize);
+    const bool      isstr_p = lua_toboolean(L, 4);
+    lua_settop(L, 2); /* no writes allowed */
+    return mem_read_write(L, address, maxsize, isstr_p);
 }
+
+#if 0
+RB_WRAP(read_mem)
+{
+    lua_settop(L, 2); /* no writes allowed */
+    const uintptr_t address = lua_tonumber(L, 1);
+    const size_t    maxsize = luaL_optnumber(L, 2, strlen((char *)address));
+    luaL_argcheck(L, address > 0,  1, ERR_IDX_RANGE);
+    lua_pushnil(L);
+    lua_replace(L, -3);/* stk pos 1 is no longer offset it is starting address */
+    return mem_read_write(L, address, maxsize, false);
+}
+#endif
 
 RB_WRAP(restart_lua)
 {
