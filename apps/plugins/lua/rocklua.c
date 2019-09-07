@@ -103,7 +103,7 @@ static int db_errorfb (lua_State *L) {
     }
     lua_pushliteral(L, "\n\t");
     lua_getinfo(L1, "Snl", &ar);
-    char* filename = strrchr(ar.short_src, '/');
+    char* filename = rb->strrchr(ar.short_src, '/'); /* remove path */
     lua_pushfstring(L, "%s:", filename ? filename : ar.short_src);
     if (ar.currentline > 0)
       lua_pushfstring(L, "%d:", ar.currentline);
