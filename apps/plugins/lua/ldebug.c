@@ -708,7 +708,7 @@ static void addinfo (lua_State *L, const char *msg) {
     char buff[LUA_IDSIZE];  /* add file:line information */
     int line = currentline(L, ci);
     luaO_chunkid(buff, getstr(getluaproto(ci)->source), LUA_IDSIZE);
-    luaO_pushfstring(L, "%s:%d: %s", buff, line, msg);
+    luaO_pushfstring(L, "%s: %d: %s", buff, line, msg);
   }
 }
 

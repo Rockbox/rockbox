@@ -87,7 +87,7 @@ static int db_errorfb (lua_State *L) {
     lua_pushliteral(L, "");
   else if (!lua_isstring(L, arg+1)) return 1;  /* message is not a string */
   else lua_pushliteral(L, "\n");
-  lua_pushliteral(L, "stack traceback:");
+  lua_pushliteral(L, "stack traceback: ");
   while (lua_getstack(L1, level++, &ar)) {
     if (level > LEVELS1 && firstpart) {
       /* no more than `LEVELS2' more levels? */
@@ -103,7 +103,8 @@ static int db_errorfb (lua_State *L) {
     }
     lua_pushliteral(L, "\n\t");
     lua_getinfo(L1, "Snl", &ar);
-    lua_pushfstring(L, "%s:", ar.short_src);
+    char* filename = strrchr(ar.short_src, '/');
+    lua_pushfstring(L, "%s:", filename ? filename : ar.short_src);
     if (ar.currentline > 0)
       lua_pushfstring(L, "%d:", ar.currentline);
     if (*ar.namewhat != '\0')  /* is there a name? */
@@ -210,7 +211,7 @@ enum plugin_status plugin_start(const void* parameter)
 
         if (lu_status) {
             DEBUGF("%s\n", lua_tostring(Ls, -1));
-            rb->splash(5 * HZ, lua_tostring(Ls, -1));
+            rb->splash(10 * HZ, lua_tostring(Ls, -1));
             /*lua_pop(Ls, 1);*/
         }
         lua_close(Ls);
