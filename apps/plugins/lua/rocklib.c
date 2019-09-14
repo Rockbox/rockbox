@@ -202,17 +202,59 @@ RB_WRAP(gui_syncyesno_run)
     return 1;
 }
 
+static lua_State* store_luastate(lua_State *L, bool bStore)
+{
+    /* it is dangerous to store the lua state byond its guaranteed lifetime
+       be sure to clear state asap (as in before you exit the calling function) */
+    static lua_State *LStored = NULL;
+    if(bStore)
+        LStored = L;
+    return LStored;
+}
+
+static int menu_callback(int action, const struct menu_item_ex *this_item)
+{
+    (void) this_item;
+    static int lua_ref = LUA_NOREF;
+    lua_State *L = store_luastate(NULL, false);
+    if(!L)
+    {
+        lua_ref = action;
+        action = ACTION_STD_CANCEL;
+    }
+    else if (lua_ref != LUA_NOREF)
+    {
+        lua_rawgeti(L, LUA_REGISTRYINDEX, lua_ref);
+        lua_pushnumber(L, action);
+        lua_pcall (L, 1, 1, 0);
+        action = luaL_optnumber (L, -1, ACTION_STD_CANCEL);
+        lua_pop(L, 1);
+    }
+
+    return action;
+}
+
 RB_WRAP(do_menu)
 {
     struct menu_callback_with_desc menu_desc = {NULL, NULL, Icon_NOICON};
     struct menu_item_ex menu = {MT_RETURN_ID | MENU_HAS_DESC, {.strings = NULL},
                                 {.callback_and_desc = &menu_desc}};
     int n, start_selected;
+    int ref_lua = LUA_NOREF;
     const char **items, *title;
 
     title = luaL_checkstring(L, 1);
 
     start_selected = lua_tointeger(L, 3);
+
+    if (lua_isfunction (L, -1))
+    {
+        /*lua callback function cb(action) return action end */
+        ref_lua = luaL_ref(L, LUA_REGISTRYINDEX);
+        menu_callback(ref_lua, NULL);
+        store_luastate(L, true);
+        menu_desc.menu_callback = &menu_callback;
+    }
 
     /* newuserdata will be pushed onto stack after args*/
     items = get_table_items(L, 2, &n);
@@ -222,6 +264,13 @@ RB_WRAP(do_menu)
     menu_desc.desc = (unsigned char*) title;
 
     int result = rb->do_menu(&menu, &start_selected, NULL, false);
+
+    if (ref_lua != LUA_NOREF)
+    {
+            store_luastate(NULL, true);
+            luaL_unref (L, LUA_REGISTRYINDEX, ref_lua);
+            menu_callback(LUA_NOREF, NULL);
+    }
 
     lua_pushinteger(L, result);
     return 1;
