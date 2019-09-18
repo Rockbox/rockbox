@@ -106,7 +106,7 @@
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
 #include "panic.h"
 #include "logdiskf.h"
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE) 
 #include "dircache.h"
 #endif
 
@@ -195,7 +195,7 @@ static int update_control(struct playlist_info* playlist,
 static void sync_control(struct playlist_info* playlist, bool force);
 static int rotate_index(const struct playlist_info* playlist, int index);
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
 #define PLAYLIST_LOAD_POINTERS 1
 
 static struct event_queue playlist_queue SHAREDBSS_ATTR;
@@ -206,7 +206,7 @@ static const char playlist_thread_name[] = "playlist cachectrl";
 static struct mutex current_playlist_mutex SHAREDBSS_ATTR;
 static struct mutex created_playlist_mutex SHAREDBSS_ATTR;
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
 static void copy_filerefs(struct dircache_fileref *dcfto,
                           const struct dircache_fileref *dcffrom,
                           int count)
@@ -595,7 +595,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
                     /* Store a new entry */
                     playlist->indices[ playlist->amount ] = i+count;
-                #ifdef HAVE_DIRCACHE
+                #if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
                     copy_filerefs(&playlist->dcfrefs[playlist->amount], NULL, 1);
                 #endif
                     playlist->amount++;
@@ -607,7 +607,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
     }
 
 exit:
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
@@ -801,7 +801,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
     for (i=playlist->amount; i>insert_position; i--)
     {
         playlist->indices[i] = playlist->indices[i-1];
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
         if (playlist->dcfrefs)
             playlist->dcfrefs[i] = playlist->dcfrefs[i-1];
 #endif
@@ -836,7 +836,7 @@ static int add_track_to_playlist(struct playlist_info* playlist,
 
     playlist->indices[insert_position] = flags | seek_pos;
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     copy_filerefs(&playlist->dcfrefs[insert_position], NULL, 1);
 #endif
 
@@ -907,7 +907,7 @@ static int remove_track_from_playlist(struct playlist_info* playlist,
     for (i=position; i<playlist->amount; i++)
     {
         playlist->indices[i] = playlist->indices[i+1];
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
         if (playlist->dcfrefs)
             playlist->dcfrefs[i] = playlist->dcfrefs[i+1];
 #endif
@@ -975,7 +975,7 @@ static int randomise_playlist(struct playlist_info* playlist,
         int indextmp = playlist->indices[candidate];
         playlist->indices[candidate] = playlist->indices[count];
         playlist->indices[count] = indextmp;
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
         if (playlist->dcfrefs)
         {
             struct dircache_fileref dcftmp = playlist->dcfrefs[candidate];
@@ -1018,7 +1018,7 @@ static int sort_playlist(struct playlist_info* playlist, bool start_current,
         qsort((void*)playlist->indices, playlist->amount,
             sizeof(playlist->indices[0]), compare);
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     /** We need to re-check the song names from disk because qsort can't
      * sort two arrays at once :/
      * FIXME: Please implement a better way to do this. */
@@ -1244,7 +1244,7 @@ static int compare(const void* p1, const void* p2)
         return *e1 - *e2;
 }
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
 /**
  * Thread to update filename pointers to dircache on background
  * without affecting playlist load up performance.  This thread also flushes
@@ -1378,7 +1378,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     if (buf_length > MAX_PATH+1)
         buf_length = MAX_PATH+1;
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     if (playlist->dcfrefs)
     {
         max = dircache_get_fileref_path(&playlist->dcfrefs[index],
@@ -1929,7 +1929,7 @@ static int update_control(struct playlist_info* playlist,
         case PLAYLIST_COMMAND_PLAYLIST:
         case PLAYLIST_COMMAND_ADD:
         case PLAYLIST_COMMAND_QUEUE:
-#ifndef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
         case PLAYLIST_COMMAND_DELETE:
         case PLAYLIST_COMMAND_RESET:
 #endif
@@ -1955,7 +1955,7 @@ static int update_control(struct playlist_info* playlist,
  */
 static void sync_control(struct playlist_info* playlist, bool force)
 {
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     if (playlist->started && force)
 #else
     (void) force;
@@ -1997,7 +1997,7 @@ static int move_callback(int handle, void* current, void* new)
         playlist->indices = new;
     else if (current == playlist->buffer)
         playlist->buffer = new;
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     else if (current == playlist->dcfrefs)
         playlist->dcfrefs = new;
 #endif /* HAVE_DIRCACHE */
@@ -2039,7 +2039,7 @@ void playlist_init(void)
 
     empty_playlist(playlist, true);
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     handle = core_alloc_ex("playlist dc",
         playlist->max_playlist_size * sizeof(*playlist->dcfrefs), &ops);
     playlist->dcfrefs = core_get_data(handle);
@@ -2509,7 +2509,7 @@ int playlist_resume(void)
         }
     }
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
@@ -2534,7 +2534,7 @@ int playlist_add(const char *filename)
     }
 
     playlist->indices[playlist->amount] = playlist->buffer_end_pos;
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     copy_filerefs(&playlist->dcfrefs[playlist->amount], NULL, 1);
 #endif
 
@@ -2888,7 +2888,7 @@ int playlist_create_ex(struct playlist_info* playlist,
         if (index_buffer)
         {
             size_t unit_size = sizeof (*playlist->indices);
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
             unit_size += sizeof (*playlist->dcfrefs);
 #endif
             int num_indices = index_buffer_size / unit_size;
@@ -2898,7 +2898,7 @@ int playlist_create_ex(struct playlist_info* playlist,
 
             playlist->max_playlist_size = num_indices;
             playlist->indices = index_buffer;
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
             playlist->dcfrefs = (void *)&playlist->indices[num_indices];
 #endif
         }
@@ -2906,7 +2906,7 @@ int playlist_create_ex(struct playlist_info* playlist,
         {
             playlist->max_playlist_size = current_playlist.max_playlist_size;
             playlist->indices = current_playlist.indices;
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
             playlist->dcfrefs = current_playlist.dcfrefs;
 #endif
         }
@@ -2934,6 +2934,7 @@ int playlist_create_ex(struct playlist_info* playlist,
  */
 int playlist_set_current(struct playlist_info* playlist)
 {
+    
     if (!playlist || (check_control(playlist) < 0))
         return -1;
 
@@ -2966,7 +2967,7 @@ int playlist_set_current(struct playlist_info* playlist)
     {
         memcpy((void*)current_playlist.indices, (void*)playlist->indices,
                playlist->max_playlist_size*sizeof(int));
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
         copy_filerefs(current_playlist.dcfrefs, playlist->dcfrefs,
                       playlist->max_playlist_size);
 #endif
@@ -3024,7 +3025,7 @@ void playlist_sync(struct playlist_info* playlist)
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 }
@@ -3112,7 +3113,7 @@ int playlist_insert_directory(struct playlist_info* playlist,
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
@@ -3240,7 +3241,7 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     if ((audio_status() & AUDIO_STATUS_PLAY) && playlist->started)
         audio_flush_and_reload_tracks();
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 
@@ -3401,7 +3402,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index)
         }
     }
 
-#ifdef HAVE_DIRCACHE
+#if defined(HAVE_DIRCACHE) && !defined(PLAYLIST_EXCLUDE_DIRCACHE)
     queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
 #endif
 

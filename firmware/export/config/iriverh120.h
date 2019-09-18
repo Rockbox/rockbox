@@ -35,6 +35,9 @@
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
 
+/* define to disable DIRCACHE in playlist */
+#define PLAYLIST_EXCLUDE_DIRCACHE
+
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
