@@ -47,19 +47,34 @@ static int remove_dir (lua_State *L) {
     return 1;
 }
 
+
 /*
 ** Directory iterator
 */
 static int dir_iter (lua_State *L) {
     struct dirent *entry;
     dir_data *d = (dir_data *)luaL_checkudata (L, 1, DIR_METATABLE);
+
     luaL_argcheck (L, !d->closed, 1, "closed directory");
 
     if ((entry = rb->readdir (d->dir)) != NULL) {
         struct dirinfo info = rb->dir_get_info(d->dir, entry);
         lua_pushstring (L, entry->d_name);
         lua_pushboolean (L, info.attribute & ATTR_DIRECTORY);
-        return 2;
+        if (lua_toboolean (L, lua_upvalueindex(1))) {
+            lua_createtable(L, 0, 3);
+            lua_pushnumber (L, info.attribute);
+            lua_setfield (L, -2, "attribute");
+            lua_pushnumber (L, info.size);
+            lua_setfield (L, -2, "size");
+            lua_pushnumber (L, info.mtime);
+            lua_setfield (L, -2, "time");
+        }
+        else
+        {
+            lua_pushnil(L);
+        }
+        return 3;
     } else {
         /* no more entries => close directory */
         rb->closedir (d->dir);
@@ -79,7 +94,6 @@ static int dir_close (lua_State *L) {
         rb->closedir (d->dir);
         d->closed = 1;
     }
-
     return 0;
 }
 
@@ -90,7 +104,8 @@ static int dir_close (lua_State *L) {
 static int dir_iter_factory (lua_State *L) {
     const char *path = luaL_checkstring (L, 1);
     dir_data *d;
-    lua_pushcfunction (L, dir_iter);
+    lua_settop(L, 2); /* index 2 (bool) return attribute table */
+    lua_pushcclosure(L, &dir_iter, 1);
     d = (dir_data *) lua_newuserdata (L, sizeof(dir_data));
     d->closed = 0;
 
@@ -98,8 +113,9 @@ static int dir_iter_factory (lua_State *L) {
     lua_setmetatable (L, -2);
     d->dir = rb->opendir (path);
     if (d->dir == NULL)
+    {
         luaL_error (L, "cannot open %s: %d", path, errno);
-
+    }
     return 2;
 }
 
@@ -109,19 +125,16 @@ static int dir_iter_factory (lua_State *L) {
 */
 static int dir_create_meta (lua_State *L) {
     luaL_newmetatable (L, DIR_METATABLE);
-    /* set its __gc field */
-    lua_pushstring (L, "__index");
-    lua_newtable(L);
-    lua_pushstring (L, "next");
+    lua_createtable(L, 0, 2);
     lua_pushcfunction (L, dir_iter);
-    lua_settable(L, -3);
-    lua_pushstring (L, "close");
+    lua_setfield (L, -2, "next");
     lua_pushcfunction (L, dir_close);
-    lua_settable(L, -3);
-    lua_settable (L, -3);
-    lua_pushstring (L, "__gc");
+    lua_setfield (L, -2, "close");
+    /* set its __index field */
+    lua_setfield (L, -2, "__index");
+    /* set its __gc field */
     lua_pushcfunction (L, dir_close);
-    lua_settable (L, -3);
+    lua_setfield (L, -2, "__gc");
     return 1;
 }
 
