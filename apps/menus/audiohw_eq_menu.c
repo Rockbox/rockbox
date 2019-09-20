@@ -67,7 +67,7 @@ static int hw_eq_do_band_setting(void *param)
     struct menu_callback_with_desc cbwdesc =
     {
         .menu_callback = NULL,
-        .desc = hw_eq_get_name(0, param, desc),
+        .desc = hw_eq_get_name(0, param, desc, sizeof(desc)),
         .icon_id = Icon_NOICON
     };
     struct menu_item_ex item =
