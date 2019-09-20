@@ -91,7 +91,8 @@ struct menu_item_ex {
         const struct menu_get_name_and_icon {
             int (*menu_callback)(int action, 
                                  const struct menu_item_ex *this_item);
-            char *(*list_get_name)(int selected_item, void * data, char *buffer);
+            char *(*list_get_name)(int selected_item, void * data,
+                                   char *buffer, size_t buffer_len);
             int (*list_speak_item)(int selected_item, void * data);
             void *list_get_name_data;
             int icon_id;

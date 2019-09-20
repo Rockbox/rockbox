@@ -454,9 +454,10 @@ MENUITEM_RETURNVALUE(rocks_browser, ID2P(LANG_PLUGINS), GO_TO_BROWSEPLUGINS,
 MENUITEM_RETURNVALUE(playlist_browser, ID2P(LANG_CATALOG), GO_TO_PLAYLIST_VIEWER,
                         NULL, Icon_Playlist);
 
-static char *get_wps_item_name(int selected_item, void * data, char *buffer)
+static char *get_wps_item_name(int selected_item, void * data,
+                               char *buffer, size_t buffer_len)
 {
-    (void)selected_item; (void)data; (void)buffer;
+    (void)selected_item; (void)data; (void)buffer; (void)buffer_len;
     if (audio_status())
         return ID2P(LANG_NOW_PLAYING);
     return ID2P(LANG_RESUME_PLAYBACK);

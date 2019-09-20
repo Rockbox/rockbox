@@ -41,9 +41,10 @@ static unsigned short hw_eq_setting_lang_ids[AUDIOHW_EQ_SETTING_NUM] =
 #endif
 };
 
-static char * hw_eq_get_name(int selected_item, void * data, char *buffer)
+static char * hw_eq_get_name(int selected_item, void * data,
+                             char *buffer, size_t buffer_len)
 {
-    snprintf(buffer, MAX_PATH,
+    snprintf(buffer, buffer_len,
              str(hw_eq_setting_lang_ids[HW_EQ_IDX_SETTING(data)]),
              HW_EQ_IDX_BAND(data) + 1);
     return buffer;

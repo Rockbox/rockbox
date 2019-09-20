@@ -500,14 +500,15 @@ static int seconds_to_min(int secs)
 
 /* A string representation of either whether a sleep timer will be started or
    canceled, and how long it will be or how long is remaining in brackets */
-static char* sleep_timer_getname(int selected_item, void * data, char *buffer)
+static char* sleep_timer_getname(int selected_item, void * data,
+                                 char *buffer, size_t buffer_len)
 {
     (void)selected_item;
     (void)data;
     int sec = get_sleep_timer();
     char timer_buf[10];
-    /* we have no sprintf, so MAX_PATH is a guess */
-    snprintf(buffer, MAX_PATH, "%s (%s)",
+
+    snprintf(buffer, buffer_len, "%s (%s)",
              str(sec ? LANG_SLEEP_TIMER_CANCEL_CURRENT
                  : LANG_SLEEP_TIMER_START_CURRENT),
              sleep_timer_formatter(timer_buf, sizeof(timer_buf),

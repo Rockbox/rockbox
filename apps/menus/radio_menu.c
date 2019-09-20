@@ -100,11 +100,12 @@ MENUITEM_SETTING(force_mono, &global_settings.fm_force_mono, NULL);
 
 #ifndef FM_MODE
 extern int radio_mode;
-static char* get_mode_text(int selected_item, void * data, char *buffer)
+static char* get_mode_text(int selected_item, void * data,
+                           char *buffer, size_t buffer_len)
 {
     (void)selected_item;
     (void)data;
-    snprintf(buffer, MAX_PATH, "%s %s", str(LANG_MODE),
+    snprintf(buffer, buffer_len, "%s %s", str(LANG_MODE),
              radio_mode ? str(LANG_PRESET) :
                           str(LANG_RADIO_SCAN_MODE));
     return buffer;

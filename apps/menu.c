@@ -104,13 +104,12 @@ static const char* get_menu_item_name(int selected_item,
     int type = (menu->flags&MENU_TYPE_MASK);
     selected_item = get_menu_selection(selected_item, menu);
 
-    (void)buffer_len;
     /* only MT_MENU or MT_RETURN_ID is allowed in here */
     if (type == MT_RETURN_ID)
     {
         if (menu->flags&MENU_DYNAMIC_DESC)
             return menu->menu_get_name_and_icon->list_get_name(selected_item,
-                    menu->menu_get_name_and_icon->list_get_name_data, buffer);
+            menu->menu_get_name_and_icon->list_get_name_data, buffer, buffer_len);
         return menu->strings[selected_item];
     }
 
@@ -118,7 +117,7 @@ static const char* get_menu_item_name(int selected_item,
 
     if ((menu->flags&MENU_DYNAMIC_DESC) && (type != MT_SETTING_W_TEXT))
         return menu->menu_get_name_and_icon->list_get_name(selected_item,
-                    menu->menu_get_name_and_icon->list_get_name_data, buffer);
+            menu->menu_get_name_and_icon->list_get_name_data, buffer, buffer_len);
 
     type = (menu->flags&MENU_TYPE_MASK);
     if ((type == MT_SETTING) || (type == MT_SETTING_W_TEXT))
@@ -177,6 +176,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     int type = (menu->flags&MENU_TYPE_MASK);
     menu_callback_type menu_callback = NULL;
     int icon;
+    char * title;
     current_subitems_count = 0;
 
     if (type == MT_RETURN_ID)
@@ -206,14 +206,33 @@ static void init_menu_lists(const struct menu_item_ex *menu,
 
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1, parent);
 #ifdef HAVE_LCD_BITMAP
-    if (menu->callback_and_desc->icon_id == Icon_NOICON)
-        icon = Icon_Submenu_Entered;
-    else
+
+    if (menu->flags&MENU_HAS_DESC)
+    {
         icon = menu->callback_and_desc->icon_id;
-    gui_synclist_set_title(lists, P2STR(menu->callback_and_desc->desc), icon);
+        title = P2STR(menu->callback_and_desc->desc);
+    }
+    else if (menu->flags&MENU_DYNAMIC_DESC)
+    {
+        char buffer[80];
+        icon = menu->menu_get_name_and_icon->icon_id;
+        title = menu->menu_get_name_and_icon->
+                      list_get_name(-1, menu->menu_get_name_and_icon->
+                                    list_get_name_data, buffer, sizeof(buffer));
+    }
+    else
+    {
+        icon = Icon_NOICON;
+        title = "";
+    }
+
+    if (icon == Icon_NOICON)
+            icon = Icon_Submenu_Entered;
+    gui_synclist_set_title(lists, title, icon);
     gui_synclist_set_icon_callback(lists, global_settings.show_icons?menu_get_icon:NULL);
 #else
     (void)icon;
+    (void)title;
     gui_synclist_set_icon_callback(lists, NULL);
 #endif
     if(global_settings.talk_menu)
@@ -256,8 +275,8 @@ static int talk_menu_item(int selected_item, void *data)
                         char buffer[80];
                         str = menu->submenus[sel]->menu_get_name_and_icon->
                             list_get_name(sel, menu->submenus[sel]->
-                                          menu_get_name_and_icon->
-                                          list_get_name_data, buffer);
+                                    menu_get_name_and_icon->
+                                    list_get_name_data, buffer, sizeof(buffer));
                         id = P2ID(str);
                     }
                 }
