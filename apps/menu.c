@@ -112,8 +112,8 @@ static const char* get_menu_item_name(int selected_item,
             menu->menu_get_name_and_icon->list_get_name_data, buffer, buffer_len);
         return menu->strings[selected_item];
     }
-
-    menu = menu->submenus[selected_item];
+    if (type == MT_MENU)
+        menu = menu->submenus[selected_item];
 
     if ((menu->flags&MENU_DYNAMIC_DESC) && (type != MT_SETTING_W_TEXT))
         return menu->menu_get_name_and_icon->list_get_name(selected_item,
@@ -135,13 +135,16 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int menu_icon = Icon_NOICON;
+    int type = (menu->flags&MENU_TYPE_MASK);
     selected_item = get_menu_selection(selected_item, menu);
 
-    if ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID)
+    if (type == MT_RETURN_ID)
     {
         return Icon_Menu_functioncall;
     }
-    menu = menu->submenus[selected_item];
+    if (type == MT_MENU)
+        menu = menu->submenus[selected_item];
+
     if (menu->flags&MENU_HAS_DESC)
         menu_icon = menu->callback_and_desc->icon_id;
     else if (menu->flags&MENU_DYNAMIC_DESC)
@@ -353,7 +356,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int selected = start_selected? *start_selected : 0;
     int action;
     struct gui_synclist lists;
-    const struct menu_item_ex *temp, *menu = start_menu;
+    const struct menu_item_ex *temp = NULL;
+    const struct menu_item_ex *menu = start_menu;
     int ret = 0;
     bool redraw_lists;
     int old_audio_status = audio_status();
@@ -474,10 +478,16 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             }
             else if (!in_stringlist)
             {
-                int type;
+                int type = (menu->flags&MENU_TYPE_MASK);
                 selected = get_menu_selection(gui_synclist_get_sel_pos(&lists),menu);
-                temp = menu->submenus[selected];
-                type = (temp->flags&MENU_TYPE_MASK);
+                if (type == MT_MENU)
+                {
+                    temp = menu->submenus[selected];
+                    type = (temp->flags&MENU_TYPE_MASK);
+                }
+                else
+                    type = -1;
+
                 if (type == MT_SETTING_W_TEXT || type == MT_SETTING)
                 {
 #ifdef HAVE_QUICKSCREEN
@@ -577,7 +587,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         }
         else if (action == ACTION_STD_OK)
         {
-            int type;
+            int type = (menu->flags&MENU_TYPE_MASK);
             /* entering an item that may not be a list, so stop scrolling */
             gui_synclist_scroll_stop(&lists);
 #ifdef HAVE_BUTTONBAR
@@ -588,11 +598,15 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             }
 #endif
             selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
-            temp = menu->submenus[selected];
+            if (type == MT_MENU)
+                temp = menu->submenus[selected];
+            else
+                type = -1;
+
             redraw_lists = true;
             if (in_stringlist)
                 type = (menu->flags&MENU_TYPE_MASK);
-            else
+            else if (temp)
             {
                 type = (temp->flags&MENU_TYPE_MASK);
                 get_menu_callback(temp, &menu_callback);
@@ -663,6 +677,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     break;
                 case MT_RETURN_VALUE:
                     ret = temp->value;
+                    done = true;
+                    break;
+
+                default:
+                    ret = GO_TO_PREVIOUS;
                     done = true;
                     break;
             }
