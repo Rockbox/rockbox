@@ -238,6 +238,8 @@ struct simplelist_info {
     int selection_size; /* list selection size, usually 1 */
     bool hide_selection;
     bool scroll_all;
+    bool hide_theme;
+    bool speak_onshow; /* list speaks first item or 'empty list' */
     int  timeout;
     int  selection; /* the item to select when the list is first displayed */
                     /* when the list is exited, this will be set to the
@@ -281,6 +283,8 @@ void simplelist_addline(const char *fmt, ...);
     info.selection_size = 1;
     info.hide_selection = false;
     info.scroll_all = false;
+    info.hide_theme = false;
+    info.speak_onshow = true;
     info.action_callback = NULL;
     info.title_icon = Icon_NOICON;
     info.get_icon = NULL;

@@ -951,7 +951,7 @@ bool simplelist_show_list(struct simplelist_info *info)
         getname = simplelist_static_getname;
 
     FOR_NB_SCREENS(i)
-        viewportmanager_theme_enable(i, true, NULL);
+        viewportmanager_theme_enable(i, !info->hide_theme, NULL);
 
     gui_synclist_init(&lists, getname,  info->callback_data,
                       info->scroll_all, info->selection_size, NULL);
@@ -985,7 +985,9 @@ bool simplelist_show_list(struct simplelist_info *info)
     gui_synclist_select_item(&lists, info->selection);
 
     gui_synclist_draw(&lists);
-    gui_synclist_speak_item(&lists);
+
+    if (info->speak_onshow)
+        gui_synclist_speak_item(&lists);
 
     while(1)
     {
@@ -1014,6 +1016,11 @@ bool simplelist_show_list(struct simplelist_info *info)
         if (action == ACTION_STD_CANCEL)
         {
             info->selection = -1;
+            break;
+        }
+        else if (action == ACTION_STD_OK)
+        {
+            info->selection = gui_synclist_get_sel_pos(&lists);
             break;
         }
         else if ((action == ACTION_REDRAW) ||
@@ -1045,6 +1052,8 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->selection_size = 1;
     info->hide_selection = false;
     info->scroll_all = false;
+    info->hide_theme = false;
+    info->speak_onshow = true;
     info->timeout = HZ/10;
     info->selection = 0;
     info->action_callback = NULL;

@@ -155,7 +155,7 @@ RB_WRAP(kbd_input)
     return 1;
 }
 
-static const char ** get_table_items(lua_State *L, int pos, int *count)
+static inline const char ** get_table_items(lua_State *L, int pos, int *count)
 {
     int i;
     luaL_checktype(L, pos, LUA_TTABLE);
@@ -165,7 +165,7 @@ static const char ** get_table_items(lua_State *L, int pos, int *count)
     /* newuserdata will be pushed onto stack after args*/
     const char **items = (const char**) lua_newuserdata(L, n * sizeof(const char*));
 
-    for(i=1; i<= n; i++)
+    for(i=1; i <= n; i++)
     {
         lua_rawgeti(L, pos, i); /* Push item on the stack */
         items[i-1] = lua_tostring(L, -1);
@@ -175,7 +175,7 @@ static const char ** get_table_items(lua_State *L, int pos, int *count)
     return items;
 }
 
-static inline void fill_text_message(lua_State *L, struct text_message * message,
+static void fill_text_message(lua_State *L, struct text_message * message,
                               int pos)
 {
     int n;
@@ -202,33 +202,88 @@ RB_WRAP(gui_syncyesno_run)
     return 1;
 }
 
-static lua_State* store_luastate(lua_State *L, bool bStore)
+struct menu_cb
 {
-    /* it is dangerous to store the lua state byond its guaranteed lifetime
-       be sure to clear state asap (as in before you exit the calling function) */
-    static lua_State *LStored = NULL;
-    if(bStore)
-        LStored = L;
-    return LStored;
+    lua_State *L;
+    int icon_id;
+    int talk_item;
+    int name_argtype;
+    int idx_action_cb;
+};
+
+static const char *menu_item_get_name_cb(int selected_item, void *data,
+                                         char *buffer, size_t buffer_len)
+{
+    (void)buffer;(void)buffer_len;
+    const char *item  = "?";
+    struct menu_cb *menu_cb = data;
+    lua_State *L = menu_cb->L;
+
+    if (L && menu_cb->name_argtype == LUA_TTABLE)
+    {
+        lua_pushinteger(L, selected_item + 1);
+        lua_gettable (L, 2);
+        lua_pushnil(L); /*Icon_NOICON*/
+    }
+    else if (L && menu_cb->name_argtype == LUA_TFUNCTION)
+    {
+        lua_pushvalue(L, 2);  /* push the function to top */
+        lua_pushinteger(L, selected_item + 1);
+        if (lua_pcall (L, 1, 2, 0)) /* call func 1 arg 2 return */
+            lua_pushnil(L); /*Icon_NOICON on error*/
+    }
+    else
+        goto unknown_item;
+
+    menu_cb->icon_id = luaL_optinteger(L, -1, Icon_NOICON);
+    item = luaL_optstring(L, -2, item);
+    lua_pop(L, 2);
+
+    /* Handle the menu talking here while we have the item text */
+    if(selected_item == menu_cb->talk_item)
+    {
+        rb->talk_spell(item, false);
+        menu_cb->talk_item = -1;
+    }
+unknown_item:
+    return item;
 }
 
-static int menu_callback(int action, const struct menu_item_ex *this_item)
+static enum themable_icons menu_item_get_icon_cb(int selected_item, void *data)
 {
-    (void) this_item;
-    static int lua_ref = LUA_NOREF;
-    lua_State *L = store_luastate(NULL, false);
-    if(!L)
+    (void) selected_item;
+    struct menu_cb *menu_cb = data;
+    return menu_cb->icon_id;
+}
+
+static int menu_item_talk_cb(int selected_item, void * data)
+{
+    struct menu_cb *menu_cb = data;
+    menu_cb->talk_item = selected_item;
+    return 0;
+}
+
+static int menu_action_cb(int action, struct gui_synclist *lists)
+{
+    if (action != ACTION_NONE)
     {
-        lua_ref = action;
-        action = ACTION_STD_CANCEL;
+        struct menu_cb *menu_cb = lists->data;
+        lua_State *L = menu_cb->L;
+        int idx = menu_cb->idx_action_cb;
+        if(L && idx)
+        {
+            lua_pushvalue(L, idx); /* push the function to top */
+            lua_pushnumber(L, action);
+            lua_pcall (L, 1, 1, 0); /* call func 1 arg 1 return */
+            action = luaL_optnumber (L, -1, ACTION_STD_CANCEL);
+            lua_pop(L, 1);
+        }
     }
-    else if (lua_ref != LUA_NOREF)
+    
+    if (action == ACTION_STD_MENU) /* emulate behavior of rb->do_menu */
     {
-        lua_rawgeti(L, LUA_REGISTRYINDEX, lua_ref);
-        lua_pushnumber(L, action);
-        lua_pcall (L, 1, 1, 0);
-        action = luaL_optnumber (L, -1, ACTION_STD_CANCEL);
-        lua_pop(L, 1);
+        lists->selected_item = -2;
+        action = ACTION_STD_OK;
     }
 
     return action;
@@ -236,43 +291,54 @@ static int menu_callback(int action, const struct menu_item_ex *this_item)
 
 RB_WRAP(do_menu)
 {
-    struct menu_callback_with_desc menu_desc = {NULL, NULL, Icon_NOICON};
-    struct menu_item_ex menu = {MT_RETURN_ID | MENU_HAS_DESC, {.strings = NULL},
-                                {.callback_and_desc = &menu_desc}};
-    int n, start_selected;
-    int ref_lua = LUA_NOREF;
-    const char **items, *title;
+    /* do_menu(title, items(table/func)[, start, hide_theme, action_cb_func, count, icon]) */
+    struct simplelist_info info;
+    struct menu_cb menu_cb;
+    const char* title;
+    int start_selected, name_argtype, count;
+    int icon = Icon_NOICON - 1; /* invalid icon */
+    bool hide_theme;
 
-    title = luaL_checkstring(L, 1);
-
+    title = lua_tostring(L, 1);
+    name_argtype = lua_type(L, 2);
     start_selected = lua_tointeger(L, 3);
+    hide_theme = lua_toboolean(L, 4);
+    menu_cb.L = L;
+    menu_cb.icon_id   = icon;
+    menu_cb.talk_item = -1;
+    menu_cb.name_argtype  = name_argtype;
+    menu_cb.idx_action_cb = (lua_type(L, 5) ==  LUA_TFUNCTION) ? 5 : 0;
 
-    if (lua_isfunction (L, -1))
+    if (name_argtype == LUA_TTABLE)
+        count = luaL_optinteger(L, 6, lua_objlen(L, 2));
+    else
+        count = luaL_checkint(L, 6);
+
+    rb->simplelist_info_init(&info, (char*) title, count, &menu_cb);
+
+#ifdef HAVE_LCD_BITMAP
+    icon = luaL_optinteger(L, 7, icon);
+    if (icon >= Icon_NOICON)
     {
-        /*lua callback function cb(action) return action end */
-        ref_lua = luaL_ref(L, LUA_REGISTRYINDEX);
-        menu_callback(ref_lua, NULL);
-        store_luastate(L, true);
-        menu_desc.menu_callback = &menu_callback;
+        info.title_icon = icon;
+        info.get_icon = &menu_item_get_icon_cb;
     }
-
-    /* newuserdata will be pushed onto stack after args*/
-    items = get_table_items(L, 2, &n);
-
-    menu.strings = items;
-    menu.flags |= MENU_ITEM_COUNT(n);
-    menu_desc.desc = (unsigned char*) title;
-
-    int result = rb->do_menu(&menu, &start_selected, NULL, false);
-
-    if (ref_lua != LUA_NOREF)
+#endif
+    if(rb->global_settings->talk_menu)
     {
-            store_luastate(NULL, true);
-            luaL_unref (L, LUA_REGISTRYINDEX, ref_lua);
-            menu_callback(LUA_NOREF, NULL);
+        info.speak_onshow = false;  /* simple list cuts off first item */
+        info.get_talk = &menu_item_talk_cb;
+        menu_cb.talk_item = start_selected;
     }
+    info.selection = start_selected;
+    info.action_callback = &menu_action_cb;
+    info.get_name = &menu_item_get_name_cb;
+    info.hide_theme = hide_theme;
 
-    lua_pushinteger(L, result);
+    if(rb->simplelist_show_list(&info))
+        info.selection = -3; /* SYS_USB_CONNECTED */
+
+    lua_pushinteger(L, info.selection);
     return 1;
 }
 
