@@ -228,8 +228,6 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         int line_indent = 0;
         int style = STYLE_DEFAULT;
         bool is_selected = false;
-        icon = list->callback_get_item_icon ?
-                    list->callback_get_item_icon(i, list->data) : Icon_NOICON;
         s = list->callback_get_item_name(i, list->data, entry_buffer,
                                          sizeof(entry_buffer));
         entry_name = P2STR(s);
@@ -313,7 +311,8 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         linedes.style = style;
         linedes.scroll = is_selected ? true : list->scroll_all;
         linedes.line = i % list->selected_size;
-
+        icon = list->callback_get_item_icon ?
+                    list->callback_get_item_icon(i, list->data) : Icon_NOICON;
         /* the list can have both, one of or neither of cursor and item icons,
          * if both don't apply icon padding twice between the icons */
         if (show_cursor && have_icons)
