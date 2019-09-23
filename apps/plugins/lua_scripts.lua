@@ -8,7 +8,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2017 William Wilgus
+ * Copyright (C) 2019 William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,138 +24,156 @@
 local scrpath = rb.current_path() .. "/lua_scripts/"
 
 package.path = scrpath .. "/?.lua;" .. package.path --add lua_scripts directory to path
-require("printtable")
 
-rb.actions = nil
-package.loaded["actions"] = nil
+require("actions")
+rb.contexts = nil
 
+local act = rb.actions
+local last_action = act.ACTION_NONE
+local dir_iter, dir_data
+
+local plugin_icon = 9
 local excludedsrc = ";filebrowse.lua;fileviewers.lua;printmenu.lua;dbgettags.lua;"
 --------------------------------------------------------------------------------
 
-local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
-
-    local quit = false
-
-    local files = f_t or {}
-    local dirs = d_t or {}
-
-    local function f_filedir(name)
-        --default find function
-        -- example: return name:find(".mp3", 1, true) ~= nil
-        if name:len() <= 2 and (name == "." or name == "..") then
-            return false
-        end
-        if string.find(excludedsrc, ";" .. name .. ";") then
-            return false
-        end
-        if string.sub(name, -4) == ".lua" then
-            return true
-        end
-        return false
-    end
-    local function d_filedir(name)
-        --default discard function
-        return false
-    end
-
-    if finddir == nil then
-        finddir = f_filedir
-    elseif type(finddir) ~= "function" then
-        finddir = d_filedir
-    end
-
-    if findfile == nil then
-        findfile = f_filedir
-    elseif type(findfile) ~= "function" then
-        findfile = d_filedir
-    end
-
-    local function _get_files(path, cancelbtn)
-        local sep = ""
-        if string.sub(path, - 1) ~= "/" then sep = "/" end
-        for fname, isdir in luadir.dir(path) do
-
-            if isdir and finddir(fname) then
-                table.insert(dirs, path .. sep ..fname)
-            elseif not isdir and findfile(fname) then
-                table.insert(files, path .. sep ..fname)
-            end
-
-            if  rb.get_plugin_action(0) == cancelbtn then
-                return true
-            end
-        end
-    end
-
-    local function cmp_alphanum (op1, op2)
-        local type1= type(op1)
-        local type2 = type(op2)
-
-        if type1 ~= type2 then
-            return type1 < type2
+--------------------------------------------------------------------------------
+--[[File Properties]]
+local function file_prop(sPath, sFileName)
+    local t_attrib
+    local function to_datetime_str(nTm, bMDY)
+        local t = os.date("*t", nTm)
+        local t_date
+        if bMDY then
+            t_date= {t.month, t.day, t.year}
         else
-            if type1 == "string" then
-                op1 = op1:upper()
-                op2 = op2:upper()
+            t_date= {t.day, t.month, t.year}
+        end
+
+        local t_time = {t.hour, ":", t.min, ".", t.sec}
+        local sDate = table.concat(t_date, "/")
+        local sTime = table.concat(t_time, "")
+        return sDate, sTime
+    end
+    local function to_log_size(nSizeBytes)
+        local tsuf = {" B", " KiB", " MiB", " GiB"}
+        local n, nf = nSizeBytes, nSizeBytes
+        local sSz = string.format("%d %s", n, tsuf[1])
+        for i = 2, #tsuf do
+            n = n/1024
+            if n > 0 then
+                sSz = string.format("%d.%d %s", n, (nf - n * 1024) / 100, tsuf[i])
+            else
+                break
             end
-            return op1 < op2
+            nf = n
         end
-     end
-
-    table.insert(dirs, path) -- root
-
-    for key,value in pairs(dirs) do
-        --luadir.dir may error out so we need to do the call protected
-        _, quit = pcall(_get_files, value, CANCEL_BUTTON)
-
-        if quit == true or norecurse then
-            break;
-        end
+        return sSz
     end
 
-    table.sort(files, cmp_alphanum)
-    table.sort(dirs, cmp_alphanum)
-
-    return dirs, files
-end -- get_files
---------------------------------------------------------------------------------
-
--- uses print_table and get_files to display simple file browser
-function script_choose(dir, title)
-    local dstr
-    local hstr = title
-
-    local norecurse  = true
-    local f_finddir  = false -- function to match directories; nil all, false none
-    local f_findfile = nil -- function to match files; nil all, false none
-
-    local p_settings = {wrap = true, hasheader = true}
-    local files = {}
-    local dirs = {}
-    local item = 1
-    rb.lcd_clear_display()
-
-    while item > 0 do
-        dirs, files = get_files(dir, norecurse, f_finddir, f_findfile, dirs, files)
-        for i=1, #dirs do dirs[i] = nil end -- empty table for reuse
-        table.insert(dirs, 1, hstr)
-        for i = 1, #files do
-            table.insert(dirs, "\t" .. string.gsub(files[i], ".*/",""))
-        end
-
-        item = print_table(dirs, #dirs, p_settings)
-
-        -- If item was selected follow directory or return filename
-        if item > 0 then
-            dir = files[item - 1]
-            if not rb.dir_exists("/" .. dir) then
-                return dir
+    if sPath and sFileName then
+        for fname, isdir, attrib in luadir.dir(sPath, true) do
+            if fname and rb.strncasecmp(fname, sFileName) == 0 then
+                t_attrib = attrib
+                break
             end
         end
-
     end
-end -- file_choose
+    if t_attrib then
+        local sDate, sTime = to_datetime_str(t_attrib.time)
+        local sSize = to_log_size(t_attrib.size)
+        local sPath = string.gsub(sPath, "//", "/")
+        local tprop = {"Date", sDate, "Time", sTime, "Size", sSize, "Path", sPath}
+        sel = rb.do_menu(sFileName, tprop)
+    end
+end
 --------------------------------------------------------------------------------
 
-local script_path = script_choose(scrpath, "lua scripts")
-if script_path then rb.restart_lua(script_path) end
+--------------------------------------------------------------------------------
+--[[Menu display]]
+local function menu_action_cb(action)
+    if action == act.ACTION_STD_CONTEXT then
+        last_action = action
+        action = act.ACTION_STD_OK -- select the item so we get the item#
+    else
+        --rb.splash(0, "Action: " .. action)
+    end
+    return action
+end
+
+function context_menu(filename)
+    local title = filename or "Unknown"
+    local ctxmenu = {"Run" , "Properties", "Delete " .. title}
+    local t_yn, t_y, t_n
+    local sel = rb.do_menu(title, ctxmenu, nil, nil, 3)
+
+    if sel == 1 then
+        file_prop(scrpath, filename)
+    elseif sel == 2 then
+        t_yn = {"Delete " .. filename, "Yes", "No"}
+        t_y, t_n = {"Deleting ", filename}, {"Canceled"}
+        if rb.gui_syncyesno_run(t_yn, t_y, t_n) == 0 then
+            os.remove(scrpath .. "/" .. title)
+        end
+    end
+    return sel -- go back
+end
+
+function scripts(item, bCount)
+    local retry, status, script, isdir
+    local count, retry_ct = 0, 100
+    if bCount then dir_iter, dir_data = luadir.dir(scrpath) end
+    repeat
+        retry = false
+        status, script, isdir = pcall(dir_iter, dir_data)
+        if not status then
+            dir_iter, dir_data = luadir.dir(scrpath)
+            if bCount then return count end
+            retry = true
+            retry_ct = retry_ct - 1
+        else
+            if not script or isdir or
+               string.sub(script, -4) ~= ".lua" or
+               string.find(excludedsrc, ";" .. script .. ";") then 
+                retry = true -- not a file we want to display
+            else
+                count = count + 1
+                retry = bCount
+            end
+        end
+        if bCount then retry = (item ~= count) end
+    until not retry or retry_ct <= 0
+
+    return script, plugin_icon
+end
+
+function script_choose(dir, title, start)
+    local sel, filename
+
+    while true do
+        sel = rb.do_menu(title, scripts , start,
+                         menu_action_cb, scripts(nil, true), plugin_icon)
+
+        start = sel >= 0 and sel or start
+        filename = scripts(sel + 1, true)
+
+        if last_action == act.ACTION_STD_CONTEXT then
+            last_action = act.ACTION_NONE
+
+            if context_menu(filename) == 0 then
+                return filename
+            end
+        elseif sel >= 0 then
+            return filename
+        else
+            return nil, s -- exit
+        end
+    end
+end
+
+--------------------------------------------------------------------------------
+--[[Main]]
+
+local script_name = script_choose(scrpath, "lua Scripts")
+
+if script_name then rb.restart_lua(scrpath .. "/" .. script_name) end
+

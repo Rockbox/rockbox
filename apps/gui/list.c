@@ -1016,6 +1016,11 @@ bool simplelist_show_list(struct simplelist_info *info)
             info->selection = -1;
             break;
         }
+        else if (action == ACTION_STD_OK)
+        {
+            info->selection = gui_synclist_get_sel_pos(&lists);
+            break;
+        }
         else if ((action == ACTION_REDRAW) ||
                  (list_is_dirty(&lists)) ||
                  (old_line_count != simplelist_line_count))
