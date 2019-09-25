@@ -84,7 +84,7 @@ static const unsigned short icons[Icon_Last_Themeable] = {
 extern void screen_put_iconxy(struct screen * screen,
                             int x, int y, enum themable_icons icon)
 {
-    if (icon == Icon_NOICON)
+    if (icon <= Icon_NOICON)
         screen->putchar(x, y, ' ');
     else if (icon >= Icon_Last_Themeable)
         screen->putchar(x, y, old_Icon_Unknown);

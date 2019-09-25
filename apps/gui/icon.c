@@ -107,7 +107,7 @@ void screen_put_iconxy(struct screen * display,
     const int is_rtl = lang_is_rtl();
     const struct bitmap *iconset;
     
-    if (icon == Icon_NOICON)
+    if (icon <= Icon_NOICON)
     {
         if (is_rtl)
             xpos = display->getwidth() - xpos - width;
