@@ -21,7 +21,7 @@
 
 # The purpose of this script is to automatically generate Lua wrappers for
 # (easily) portable C functions used in the Rockbox plugin API.
-# It doesn't contain support for structs or pointers (apart from char*).
+# It doesn't contain support for enums, structs or pointers (apart from char*).
 #
 # The output will be written to <build_dir>/apps/plugins/lua/rocklib_aux.c
 
@@ -193,7 +193,6 @@ EOF
 ;
 
 my %in_types = ('void' => \&in_void,
-                'enum' => \&in_int,
                 'int' => \&in_int,
                 'unsigned' => \&in_int,
                 'unsignedint' => \&in_int,
@@ -244,12 +243,6 @@ my %in_types = ('void' => \&in_void,
 sub in_void
 {
     return "\t(void)L;\n";
-}
-
-sub in_null
-{
-    my ($name, $type, $pos) = @_;
-    return sprintf("\t%s %s = NULL;\n", $type, $name, $type, $pos)
 }
 
 sub in_int
