@@ -21,7 +21,7 @@
 
 # The purpose of this script is to automatically generate Lua wrappers for
 # (easily) portable C functions used in the Rockbox plugin API.
-# It doesn't contain support for enums, structs or pointers (apart from char*).
+# It doesn't contain support for structs or pointers (apart from char*).
 #
 # The output will be written to <build_dir>/apps/plugins/lua/rocklib_aux.c
 
@@ -96,6 +96,7 @@ my @forbidden_functions = ('^atoi$',
                            '^.+_(un)?cached$',
                            '^audio_(status|get_file_pos|flush_and_reload_tracks)$',
                            '^audio_(ff_rewind|next|prev|play|pause|resume|stop)$',
+                           '^mixer_channel.*$',
                            '^playlist_(amount|add|create|start|resume|shuffle)$',
                            '^playlist_(sync|resume_track|remove_all_tracks)$',
                            '^playlist_(insert_track|insert_directory)$',
@@ -112,12 +113,15 @@ my @forbidden_functions = ('^atoi$',
                            '^set_dirfilter$',
                            '^sleep$',
                            '^system_memory_guard$',
+                           '^system_sound_play$',
                            '^talk_number$',
                            '^talk_force_shutup$',
                            '^talk_spell$',
                            '^talk_shutup$',
                            '^(trigger|cancel)_cpu_boost$',
                            '^thread_',
+                           '^touchscreen_(get|set)_mode$',
+                           '^viewportmanager_theme_undo$',
                            '^round_value_to_list32$');
 
 my $rocklib = sprintf("%s/rocklib.c", $ARGV[0]);
@@ -193,6 +197,7 @@ EOF
 ;
 
 my %in_types = ('void' => \&in_void,
+                'enum' => \&in_enum,
                 'int' => \&in_int,
                 'unsigned' => \&in_int,
                 'unsignedint' => \&in_int,
@@ -216,6 +221,7 @@ my %in_types = ('void' => \&in_void,
                 'bool' => \&in_bool,
                 '_Bool' => \&in_bool
 ), %out_types = ('void' => \&out_void,
+                 'enum' => \&out_enum,
                  'int' => \&out_int,
                  'unsigned' => \&out_int,
                  'unsignedint' => \&out_int,
@@ -245,6 +251,12 @@ sub in_void
     return "\t(void)L;\n";
 }
 
+sub in_enum
+{
+    my ($name, $type, $pos) = @_;
+    return sprintf("\t%s %s = luaL_checkint(L, %d); /*(enum)*/\n", "int", $name, $pos);
+}
+
 sub in_int
 {
     my ($name, $type, $pos) = @_;
@@ -267,6 +279,12 @@ sub out_void
 {
     my $name = $_[0];
     return sprintf("\t%s;\n\treturn 0;\n", $name);
+}
+
+sub out_enum
+{
+    my ($name, $type) = @_;
+    return sprintf("\t%s result = %s;\n\tlua_pushinteger(L, result);\n\treturn 1; /*(enum)*/\n", "int", $name);
 }
 
 sub out_int
@@ -310,6 +328,7 @@ foreach my $function (@sorted_functions)
             else
             {
                 $literal_type = trim($1), $name = trim($2), $type = trim($1);
+                $type =~ s/enum\s+.*/enum/g;
                 $type =~ s/(\s|const)//g;
 
                 if($name eq "")
@@ -339,6 +358,7 @@ foreach my $function (@sorted_functions)
 
     # Check for supported return value
     my $return = @$function{'return'};
+    $return =~ s/enum\s+.*/enum/g;
     $return =~ s/(\s|const)//g;
     #printf "/* %s: %s [%d] */\n", @$function{'name'}, $return, $valid;
     if(!defined $out_types{$return})
