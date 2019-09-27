@@ -57,6 +57,7 @@
 #define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
 #define SIMPLE_VOID_WRAPPER(func) RB_WRAP(func) { (void)L; func(); return 0; }
 
+/* KERNEL */
 RB_WRAP(current_tick)
 {
     lua_pushinteger(L, *rb->current_tick);
@@ -76,6 +77,13 @@ RB_WRAP(schedule_cpu_boost)
     return 0;
 }
 #endif
+
+RB_WRAP(sleep)
+{
+    unsigned ticks = (unsigned) lua_tonumber(L, 1);
+    rb->sleep(ticks);
+    return 0;
+}
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 RB_WRAP(thread_set_priority)
@@ -847,8 +855,47 @@ RB_WRAP(read_mem)
     lua_replace(L, -3);/* stk pos 1 is no longer offset it is starting address */
     return mem_read_write(L, address, maxsize, false);
 }
+
+/* will add this back if anyone finds a target that needs it */
+RB_WRAP(system_memory_guard)
+{
+    int newmode = (int) luaL_checkint(L, 1);
+    int result = rb->system_memory_guard(newmode);
+    lua_pushinteger(L, result);
+    return 1;
+}
 #endif
 
+/* SPEAKING */
+static int rock_talk(lua_State *L)
+{
+    int result;
+    bool enqueue = lua_toboolean(L, 2);
+    if (lua_isnumber(L, 1))
+    {
+        long n = (long) lua_tonumber(L, 1);
+        result = rb->talk_number(n, enqueue);
+    }
+    else
+    {
+        const char* spell = luaL_checkstring(L, 1);
+        result = rb->talk_spell(spell, enqueue);
+    }
+
+    lua_pushinteger(L, result);
+    return 1;
+}
+
+RB_WRAP(talk_shutup)
+{
+    if (lua_toboolean(L, 1))
+        rb->talk_force_shutup();
+    else
+        rb->talk_shutup();
+    return 0;
+}
+
+/* MISC */
 RB_WRAP(restart_lua)
 {
     /*close lua state, open a new lua state, load script @ filename */
@@ -859,17 +906,16 @@ RB_WRAP(restart_lua)
     return -1;
 }
 
-
 #define RB_FUNC(func) {#func, rock_##func}
 #define RB_ALIAS(name, func) {name, rock_##func}
 static const luaL_Reg rocklib[] =
 {
-    /* Kernel */
+    /* KERNEL */
     RB_FUNC(current_tick),
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     RB_FUNC(schedule_cpu_boost),
 #endif
-
+    RB_FUNC(sleep),
 #ifdef HAVE_PRIORITY_SCHEDULING
     RB_FUNC(thread_set_priority),
 #endif
@@ -932,6 +978,12 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(audio_next_track),
     RB_FUNC(audio_current_track),
 
+    /* SPEAKING */
+    {"talk_number", rock_talk},
+    {"talk_spell", rock_talk},
+    RB_FUNC(talk_shutup),
+
+    /* MISC */
     RB_FUNC(restart_lua),
 
     {NULL, NULL}
