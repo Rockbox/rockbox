@@ -637,6 +637,7 @@ RB_WRAP(buttonlight_brightness_set)
 
 /* DEVICE STRING / FILENAME MANIPULATION */
 
+#if 0 /*See files.lua */
 RB_WRAP(strip_extension)
 {
     const char* filename = luaL_checkstring(L, -1);
@@ -672,6 +673,7 @@ RB_WRAP(create_numbered_filename)
 
     return 1;
 }
+#endif
 
 RB_WRAP(utf8encode)
 {
@@ -697,6 +699,7 @@ RB_WRAP(strncasecmp)
     return 1;
 }
 
+    /* ROCKBOX SETTINGS / INFO */
 static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize, bool isstr_p)
 {
     if(isstr_p) /*pointer to string (**char)*/
@@ -844,6 +847,12 @@ RB_WRAP(audio_current_track)
     return mem_read_write(L, address, maxsize, isstr_p);
 }
 
+RB_WRAP(settings_save)
+{
+    rb->settings_save();
+    return 0;
+}
+
 #if 0
 RB_WRAP(read_mem)
 {
@@ -904,6 +913,12 @@ RB_WRAP(restart_lua)
     lua_pushlightuserdata(L, L); /* signal exit handler */
     exit(1); /* atexit in rocklua.c */
     return -1;
+}
+
+RB_WRAP(show_logo)
+{
+    rb->show_logo();
+    return 0;
 }
 
 #define RB_FUNC(func) {#func, rock_##func}
@@ -967,8 +982,10 @@ static const luaL_Reg rocklib[] =
 #endif
 
     /* DEVICE STRING / FILENAME MANIPULATION */
+#if 0 /*See files.lua */
     RB_FUNC(strip_extension),
     RB_FUNC(create_numbered_filename),
+#endif
     RB_FUNC(utf8encode),
     RB_FUNC(strncasecmp),
 
@@ -977,6 +994,7 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(global_settings),
     RB_FUNC(audio_next_track),
     RB_FUNC(audio_current_track),
+    RB_FUNC(settings_save),
 
     /* SPEAKING */
     {"talk_number", rock_talk},
@@ -985,6 +1003,7 @@ static const luaL_Reg rocklib[] =
 
     /* MISC */
     RB_FUNC(restart_lua),
+    RB_FUNC(show_logo),
 
     {NULL, NULL}
 };
