@@ -66,7 +66,7 @@
 #define _ROCKCONF_H_ /* We don't need strcmp() etc. wrappers */
 #include "lua.h"
 #include "lauxlib.h"
-#include "plugin.h"
+#include "rocklib.h"
 #include "rocklib_events.h"
 
 #define EVENT_METATABLE "event metatable"

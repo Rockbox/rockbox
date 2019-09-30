@@ -22,6 +22,8 @@
 #ifndef _ROCKLIB_H_
 #define _ROCKLIB_H_
 
+#include "plugin.h"
+
 #define LUA_ROCKLIBNAME	"rb"
 
 #ifndef ERR_IDX_RANGE
@@ -44,6 +46,18 @@ struct lua_str_reg {
   char const* name;
   char const* value;
 };
+
+/* Convoluted way to eliminate extra register load per rb-> plugin call
+ * ARM assembly requires a extra register load of the rb-> struct for every
+ * function call instead we memcpy the rb struct to rbp and use that instead
+ * Caveat: rbp must be initialized before use or Bad Things WILL happen
+ */
+#if defined(__arm__)
+ extern struct plugin_api rbp;
+ #define rbp() (&rbp)
+#else
+  #define rbp() rb
+#endif
 
 LUALIB_API int (luaopen_rock) (lua_State *L) __attribute__((aligned(0x8)));
 /* in rockaux.c */
