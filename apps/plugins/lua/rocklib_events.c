@@ -186,12 +186,12 @@ static void init_event_data(lua_State *L, struct event_data *ev_data)
 
 static inline void rev_lock_mtx(void)
 {
-    rb->mutex_lock(&rev_mtx);
+    rb()->mutex_lock(&rev_mtx);
 }
 
 static inline void rev_unlock_mtx(void)
 {
-    rb->mutex_unlock(&rev_mtx);
+    rb()->mutex_unlock(&rev_mtx);
 }
 
 static void lua_interrupt_callback( lua_State *L, lua_Debug *ar)
@@ -202,13 +202,13 @@ static void lua_interrupt_callback( lua_State *L, lua_Debug *ar)
     dbg_hook_calls++;
 #endif
 
-    rb->yield();
+    rb()->yield();
 
     rev_lock_mtx();
     rev_unlock_mtx(); /* must wait till event thread is done to continue */
 
 #ifdef DEBUG_EV
-    rb->splashf(0, "spin %d, hooked %d", dbg_hook_calls, (lua_gethookmask(L) != 0));
+    rb()->splashf(0, "spin %d, hooked %d", dbg_hook_calls, (lua_gethookmask(L) != 0));
     unsigned char delay = -1;
     /* we can't sleep or yield without affecting count so lets spin in a loop */
     while(delay > 0) {delay--;}
@@ -279,13 +279,13 @@ static void event_thread(void)
                     {
                         /* only send ACTION_NONE once */
                         if (ev_data.cb[ACTEVENT]->id == ACTION_NONE ||
-                            rb->button_status() != 0)
+                            rb()->button_status() != 0)
                             continue; /* check next event */
                     }
                     ev_data.cb[ACTEVENT]->id = action;
                     break;
                 case BUTEVENT:
-                    ev_data.cb[BUTEVENT]->id = rb->button_get(false);
+                    ev_data.cb[BUTEVENT]->id = rb()->button_get(false);
                     if (ev_data.cb[BUTEVENT]->id == 0)
                         continue; /* check next event */
                     break;
@@ -295,7 +295,7 @@ static void event_thread(void)
                 case PLAYBKEVENT:
                     break;
                 case TIMEREVENT:
-                    ev_data.cb[TIMEREVENT]->id = *rb->current_tick + ev_data.timer_ticks;
+                    ev_data.cb[TIMEREVENT]->id = *rb()->current_tick + ev_data.timer_ticks;
                     break;
 
             }
@@ -315,7 +315,7 @@ static void event_thread(void)
 #endif
             lua_interrupt_set(ev_data.L, false);
             ev_data.next_event = EV_TICKS;
-            rb->yield();
+            rb()->yield();
         } while(ev_data.thread_state == THREAD_YIELD || is_suspend(THREAD_SUSPENDMASK));
 
     }
@@ -323,9 +323,9 @@ static void event_thread(void)
 event_error:
 
     /* thread is exiting -- clean up */
-    rb->timer_unregister();
-    //rb->yield();
-    rb->thread_exit();
+    rb()->timer_unregister();
+    //rb()->yield();
+    rb()->thread_exit();
 
     return;
 }
@@ -344,7 +344,7 @@ static void rev_timer_isr(void)
 
     if (ev_data.cb[TIMEREVENT] != NULL && !is_suspend(TIMEREVENT))
     {
-        if (TIME_AFTER(*rb->current_tick, ev_data.cb[TIMEREVENT]->id))
+        if (TIME_AFTER(*rb()->current_tick, ev_data.cb[TIMEREVENT]->id))
         {
             ev_data.thread_state |= thread_ev_states[TIMEREVENT];
             ev_data.next_event = 0;
@@ -386,7 +386,7 @@ static void destroy_event_thread_ref(struct event_data *ev_data)
 static void exit_event_thread(struct event_data *ev_data)
 {
     ev_data->thread_state = THREAD_QUIT;
-    rb->thread_wait(ev_data->thread_id); /* wait for thread to exit */
+    rb()->thread_wait(ev_data->thread_id); /* wait for thread to exit */
 
     ev_data->thread_state = THREAD_YIELD;
     ev_data->thread_id = UINT_MAX;
@@ -411,7 +411,7 @@ static void init_event_thread(bool init, struct event_data *ev_data)
     if (ev_data->NEWL == NULL || ev_data->event_stack == NULL)
         return;
 
-    ev_data->thread_id = rb->create_thread(&event_thread,
+    ev_data->thread_id = rb()->create_thread(&event_thread,
                                            ev_data->event_stack,
                                            EV_STACKSZ,
                                            0,
@@ -420,7 +420,7 @@ static void init_event_thread(bool init, struct event_data *ev_data)
                                            IF_COP(, COP));
 
     /* Timer is used to poll waiting events */
-    rb->timer_register(0, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU));
+    rb()->timer_register(0, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU));
 }
 
 static void playback_event_callback(unsigned short id, void *data)
@@ -450,10 +450,10 @@ static void register_playbk_events(int flag_events,
     for(; i < ARRAYLEN(playback_events); i++, flag_events >>= 1)
     {
         if (flag_events == 0) /* remove events */
-            rb->remove_event(playback_events[i], handler);
+            rb()->remove_event(playback_events[i], handler);
         else /* add events */
             if ((flag_events & 0x1) == 0x1)
-                rb->add_event(playback_events[i], handler);
+                rb()->add_event(playback_events[i], handler);
     }
 }
 
@@ -551,7 +551,7 @@ static int rockev_register(lua_State *L)
             break;
         case TIMEREVENT:
             ev_data.timer_ticks = luaL_checkinteger(L, 3);
-            ev_data.cb[TIMEREVENT]->id = *rb->current_tick + ev_data.timer_ticks;
+            ev_data.cb[TIMEREVENT]->id = *rb()->current_tick + ev_data.timer_ticks;
             break;
     }
 
@@ -629,7 +629,7 @@ static const struct luaL_reg evlib[] = {
 };
 
 int luaopen_rockevents (lua_State *L) {
-    rb->mutex_init(&rev_mtx);
+    rb()->mutex_init(&rev_mtx);
     init_event_data(L, &ev_data);
     event_create_meta (L);
     luaL_register (L, LUA_ROCKEVENTSNAME, evlib);

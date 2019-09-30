@@ -1092,7 +1092,7 @@ RLI_LUA rli_copy(lua_State *L)
     /* copy whole image if possible */
     if(src->elems == dst->elems && src->width == dst->width && lua_gettop(L) < 3)
     {
-        rb->memcpy(dst->data, src->data, dst->elems * sizeof(fb_data));
+        rb()->memcpy(dst->data, src->data, dst->elems * sizeof(fb_data));
         return 0;
     }
 
@@ -1226,9 +1226,9 @@ static const struct luaL_reg rli_lib [] =
 
 #if defined NB_SCREENS && (NB_SCREENS > 1)
 #define RB_SCREEN_STRUCT(luastate, narg) \
-        rb->screens[get_screen(luastate, narg)]
+        rb()->screens[get_screen(luastate, narg)]
 #define RB_SCREENS(luastate, narg, func, ...) \
-        rb->screens[get_screen(luastate, narg)]->func(__VA_ARGS__)
+        rb()->screens[get_screen(luastate, narg)]->func(__VA_ARGS__)
 
 static int get_screen(lua_State *L, int narg)
 {
@@ -1243,9 +1243,9 @@ static int get_screen(lua_State *L, int narg)
 }
 #else /* only SCREEN_MAIN exists */
 #define RB_SCREEN_STRUCT(luastate, narg) \
-        rb->screens[SCREEN_MAIN]
+        rb()->screens[SCREEN_MAIN]
 #define RB_SCREENS(luastate, narg, func, ...) \
-        rb->screens[SCREEN_MAIN]->func(__VA_ARGS__)
+        rb()->screens[SCREEN_MAIN]->func(__VA_ARGS__)
 #endif
 
 RB_WRAP(lcd_update)
@@ -1363,14 +1363,14 @@ RB_WRAP(font_getstringsize)
     int w, h, result;
 
     if (fontnumber == FONT_UI)
-        fontnumber = rb->global_status->font_id[SCREEN_MAIN];
+        fontnumber = rb()->global_status->font_id[SCREEN_MAIN];
     else
         fontnumber = FONT_SYSFIXED;
 
     if lua_isnil(L, 2)
         result = RB_SCREENS(L, 3, getstringsize, str, &w, &h);
     else
-        result = rb->font_getstringsize(str, &w, &h, fontnumber);
+        result = rb()->font_getstringsize(str, &w, &h, fontnumber);
 
     lua_pushinteger(L, result);
     lua_pushinteger(L, w);
@@ -1382,7 +1382,7 @@ RB_WRAP(font_getstringsize)
 #ifdef HAVE_LCD_BITMAP
 RB_WRAP(lcd_framebuffer)
 {
-    rli_wrap(L, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
+    rli_wrap(L, rb()->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
     return 1;
 }
 
@@ -1407,7 +1407,7 @@ RB_WRAP(gui_scrollbar_draw)
     int v[eCNT];
     checkint_arr(L, v, 1, eCNT);
 
-    rb->gui_scrollbar_draw(RB_SCREEN_STRUCT(L, 9), v[x], v[y], v[w], v[h],
+    rb()->gui_scrollbar_draw(RB_SCREEN_STRUCT(L, 9), v[x], v[y], v[w], v[h],
                     v[items], v[min_shown], v[max_shown], (unsigned) v[flags]);
 return 0;
 }
@@ -1462,7 +1462,7 @@ RB_WRAP(lcd_bitmap)
 
 RB_WRAP(lcd_get_backdrop)
 {
-    fb_data* backdrop = rb->lcd_get_backdrop();
+    fb_data* backdrop = rb()->lcd_get_backdrop();
     if(backdrop == NULL)
         lua_pushnil(L);
     else
@@ -1510,7 +1510,7 @@ RB_WRAP(lcd_blit_grey_phase)
     int v[eCNT];
     checkint_arr(L, v, 3, eCNT);
 
-    rb->lcd_blit_grey_phase(values, phases, v[bx], v[by], v[bw], v[bh], v[stride]);
+    rb()->lcd_blit_grey_phase(values, phases, v[bx], v[by], v[bw], v[bh], v[stride]);
     return 0;
 }
 
@@ -1522,7 +1522,7 @@ RB_WRAP(lcd_blit_mono)
     int v[eCNT];
     checkint_arr(L, v, 3, eCNT);
 
-    rb->lcd_blit_mono(data, v[x], v[by], v[w], v[bh], v[stride]);
+    rb()->lcd_blit_mono(data, v[x], v[by], v[w], v[bh], v[stride]);
     return 0;
 }
 #endif /* LCD_DEPTH < 4 && CONFIG_PLATFORM & PLATFORM_NATIVE */
@@ -1658,12 +1658,12 @@ RB_WRAP(read_bmp_file)
     if(transparent)
         format |= FORMAT_TRANSPARENT;
 
-    int result = rb->read_bmp_file(filename, &bm, 0, format | FORMAT_RETURN_SIZE, NULL);
+    int result = rb()->read_bmp_file(filename, &bm, 0, format | FORMAT_RETURN_SIZE, NULL);
 
     if(result > 0)
     {
         bm.data = (unsigned char*) rli_alloc(L, bm.width, bm.height);
-        if(rb->read_bmp_file(filename, &bm, result, format, NULL) < 0)
+        if(rb()->read_bmp_file(filename, &bm, result, format, NULL) < 0)
         {
             /* Error occured, drop newly allocated image from stack */
             lua_pop(L, 1);

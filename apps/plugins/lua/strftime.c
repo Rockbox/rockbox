@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include "plugin.h"
+#include "lua.h"
 
 static const char   sweekdays [7] [4] = {
     "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
@@ -82,7 +83,7 @@ again:
         case 'W': no  = (tm->tm_yday - (tm->tm_wday - 1 + 7) % 7 + 7) / 7; goto _no;
         case 's': {
 #if CONFIG_RTC
-            time_t t = rb->mktime((struct tm*)tm);
+            time_t t = rb()->mktime((struct tm*)tm);
             char sbuf[101];
             char* c;
             sbuf[100]=0;
