@@ -60,7 +60,7 @@
 /* KERNEL */
 RB_WRAP(current_tick)
 {
-    lua_pushinteger(L, *rb->current_tick);
+    lua_pushinteger(L, *rbp()->current_tick);
     return 1;
 }
 
@@ -70,9 +70,9 @@ RB_WRAP(schedule_cpu_boost)
     bool boost = luaL_checkboolean(L, 1);
 
     if(boost)
-        rb->trigger_cpu_boost();
+        rbp()->trigger_cpu_boost();
     else
-        rb->cancel_cpu_boost();
+        rbp()->cancel_cpu_boost();
 
     return 0;
 }
@@ -81,16 +81,16 @@ RB_WRAP(schedule_cpu_boost)
 RB_WRAP(sleep)
 {
     unsigned ticks = (unsigned) lua_tonumber(L, 1);
-    rb->sleep(ticks);
+    rbp()->sleep(ticks);
     return 0;
 }
 
 #ifdef HAVE_PRIORITY_SCHEDULING
 RB_WRAP(thread_set_priority)
 {
-    unsigned int thread_id = rb->thread_self();
+    unsigned int thread_id = rbp()->thread_self();
     int priority = (int) luaL_checkint(L, 1);
-    int result = rb->thread_set_priority(thread_id, priority);
+    int result = rbp()->thread_set_priority(thread_id, priority);
     lua_pushinteger(L, result);
     return 1;
 }
@@ -117,7 +117,7 @@ RB_WRAP(get_plugin_action)
 RB_WRAP(action_get_touchscreen_press)
 {
     short x, y;
-    int result = rb->action_get_touchscreen_press(&x, &y);
+    int result = rbp()->action_get_touchscreen_press(&x, &y);
 
     lua_pushinteger(L, result);
     lua_pushinteger(L, x);
@@ -127,11 +127,11 @@ RB_WRAP(action_get_touchscreen_press)
 
 RB_WRAP(touchscreen_mode)
 {
-    int origmode = rb->touchscreen_get_mode();
+    int origmode = rbp()->touchscreen_get_mode();
     if(!lua_isnoneornil(L, 1))
     {
         enum touchscreen_mode mode = luaL_checkint(L, 1);
-        rb->touchscreen_set_mode(mode);
+        rbp()->touchscreen_set_mode(mode);
     }
     lua_pushinteger(L, origmode);
     return 1;
@@ -148,11 +148,11 @@ RB_WRAP(kbd_input)
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
-        rb->strlcpy(buffer, input, LUAL_BUFFERSIZE);
+        rbp()->strlcpy(buffer, input, LUAL_BUFFERSIZE);
     else
         buffer[0] = '\0';
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
+    if(!rbp()->kbd_input(buffer, LUAL_BUFFERSIZE))
     {
         luaL_addstring(&b, buffer);
         luaL_pushresult(&b);
@@ -204,7 +204,7 @@ RB_WRAP(gui_syncyesno_run)
     if(!lua_isnoneornil(L, 3))
         fill_text_message(L, (no = &no_message), 3);
 
-    enum yesno_res result = rb->gui_syncyesno_run(&main_message, yes, no);
+    enum yesno_res result = rbp()->gui_syncyesno_run(&main_message, yes, no);
 
     lua_pushinteger(L, result);
     return 1;
@@ -271,7 +271,7 @@ RB_WRAP(do_menu)
     menu.flags |= MENU_ITEM_COUNT(n);
     menu_desc.desc = (unsigned char*) title;
 
-    int result = rb->do_menu(&menu, &start_selected, NULL, false);
+    int result = rbp()->do_menu(&menu, &start_selected, NULL, false);
 
     if (ref_lua != LUA_NOREF)
     {
@@ -309,57 +309,57 @@ RB_WRAP(playlist)
     switch(option)
     {
         case PLAYL_AMOUNT:
-            result = rb->playlist_amount();
+            result = rbp()->playlist_amount();
             break;
         case PLAYL_ADD:
             filename = luaL_checkstring(L, 2);
-            result = rb->playlist_add(filename);
+            result = rbp()->playlist_add(filename);
             break;
         case PLAYL_CREATE:
             dir = luaL_checkstring(L, 2);
             filename = luaL_checkstring(L, 3);
-            result = rb->playlist_create(dir, filename);
+            result = rbp()->playlist_create(dir, filename);
             break;
         case PLAYL_START:
             index = luaL_checkint(L, 2);
             elapsed = luaL_checkint(L, 3);
             offset =  luaL_checkint(L, 4);
-            rb->playlist_start(index, elapsed, offset);
+            rbp()->playlist_start(index, elapsed, offset);
             break;
         case PLAYL_RESUMETRACK:
             index = luaL_checkint(L, 2);
             crc = luaL_checkint(L, 3);
             elapsed = luaL_checkint(L, 4);
             offset = luaL_checkint(L, 5);
-            rb->playlist_resume_track(index, (unsigned) crc, elapsed, offset);
+            rbp()->playlist_resume_track(index, (unsigned) crc, elapsed, offset);
             break;
         case PLAYL_RESUME:
-            result = rb->playlist_resume();
+            result = rbp()->playlist_resume();
             break;
         case PLAYL_SHUFFLE:
             random_seed = luaL_checkint(L, 2);
             index = luaL_checkint(L, 3);
-            result = rb->playlist_shuffle(random_seed, index);
+            result = rbp()->playlist_shuffle(random_seed, index);
             break;
         case PLAYL_SYNC:
-            rb->playlist_sync(NULL);
+            rbp()->playlist_sync(NULL);
             break;
         case PLAYL_REMOVEALLTRACKS:
-            result = rb->playlist_remove_all_tracks(NULL);
+            result = rbp()->playlist_remove_all_tracks(NULL);
             break;
         case PLAYL_INSERTTRACK:
             filename = luaL_checkstring(L, 2); /* only required parameter */
             pos = luaL_optint(L, 3, PLAYLIST_INSERT);
             queue = lua_toboolean(L, 4); /* default to false */
             sync = lua_toboolean(L, 5); /* default to false */
-            result = rb->playlist_insert_track(NULL, filename, pos, queue, sync);
+            result = rbp()->playlist_insert_track(NULL, filename, pos, queue, sync);
             break;
         case PLAYL_INSERTDIRECTORY:
             dir = luaL_checkstring(L, 2); /* only required parameter */
             pos = luaL_optint(L, 3, PLAYLIST_INSERT);
             queue = lua_toboolean(L, 4); /* default to false */
             recurse = lua_toboolean(L, 5); /* default to false */
-            result = rb->playlist_insert_directory(NULL, dir, pos, queue, recurse);
+            result = rbp()->playlist_insert_directory(NULL, dir, pos, queue, recurse);
             break;
     }
 
@@ -381,7 +381,7 @@ RB_WRAP(audio)
                                   "get_file_pos", "length",
                                   "elapsed", NULL};
     long elapsed, offset, newtime;
-    int status = rb->audio_status();
+    int status = rbp()->audio_status();
 
     int option = luaL_checkoption (L, 1, NULL, audio_option);
     switch(option)
@@ -395,47 +395,47 @@ RB_WRAP(audio)
             if (status == (AUDIO_STATUS_PLAY | AUDIO_STATUS_PAUSE))
             {
                 /* not perfect but provides a decent compromise */
-                rb->audio_ff_rewind(elapsed + offset);
-                rb->audio_resume();
+                rbp()->audio_ff_rewind(elapsed + offset);
+                rbp()->audio_resume();
             }
             else if (status != AUDIO_STATUS_PLAY)
-                rb->audio_play((unsigned long) elapsed, (unsigned long) offset);
+                rbp()->audio_play((unsigned long) elapsed, (unsigned long) offset);
 
             break;
         case AUDIO_STOP:
-            rb->audio_stop();
+            rbp()->audio_stop();
             break;
         case AUDIO_PAUSE:
-            rb->audio_pause();
+            rbp()->audio_pause();
             break;
         case AUDIO_RESUME:
-            rb->audio_resume();
+            rbp()->audio_resume();
             break;
         case AUDIO_NEXT:
-            rb->audio_next();
+            rbp()->audio_next();
             break;
         case AUDIO_PREV:
-            rb->audio_prev();
+            rbp()->audio_prev();
             break;
         case AUDIO_FFREWIND:
             newtime = (long) luaL_checkint(L, 2);
-            rb->audio_ff_rewind(newtime);
+            rbp()->audio_ff_rewind(newtime);
             break;
         case AUDIO_FLUSHANDRELOADTRACKS:
-            rb->audio_flush_and_reload_tracks();
+            rbp()->audio_flush_and_reload_tracks();
             break;
         case AUDIO_GETPOS:
-            lua_pushinteger(L, rb->audio_get_file_pos());
+            lua_pushinteger(L, rbp()->audio_get_file_pos());
             return 1;
         case AUDIO_LENGTH:
             if ((status & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
-                lua_pushinteger(L, rb->audio_current_track()->length);
+                lua_pushinteger(L, rbp()->audio_current_track()->length);
             else
                 lua_pushnil(L);
             return 1;
         case AUDIO_ELAPSED:
             if ((status & AUDIO_STATUS_PLAY) == AUDIO_STATUS_PLAY)
-                lua_pushinteger(L, rb->audio_current_track()->elapsed);
+                lua_pushinteger(L, rbp()->audio_current_track()->elapsed);
             else
                 lua_pushnil(L);
             return 1;
@@ -465,35 +465,35 @@ RB_WRAP(sound)
     {
         case SOUND_SET:
             value = luaL_checkint(L, 3);
-            rb->sound_set(setting, value);
+            rbp()->sound_set(setting, value);
             return 1; /*nil*/
             break;
         case SOUND_CURRENT:
-            result = rb->sound_current(setting);
+            result = rbp()->sound_current(setting);
             break;
         case SOUND_DEFAULT:
-            result = rb->sound_default(setting);
+            result = rbp()->sound_default(setting);
             break;
         case SOUND_MIN:
-            result = rb->sound_min(setting);
+            result = rbp()->sound_min(setting);
             break;
         case SOUND_MAX:
-            result = rb->sound_max(setting);
+            result = rbp()->sound_max(setting);
             break;
         case SOUND_UNIT:
-            lua_pushstring (L, rb->sound_unit(setting));
+            lua_pushstring (L, rbp()->sound_unit(setting));
             return 1;
             break;
 #if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
         case SOUND_SET_PITCH:
-            rb->sound_set_pitch(setting);
+            rbp()->sound_set_pitch(setting);
             return 1;/*nil*/
             break;
 #endif
         case SOUND_VAL2PHYS:
             value = luaL_checkint(L, 3);
-            result = rb->sound_val2phys(setting, value);      
+            result = rbp()->sound_val2phys(setting, value);      
             break;
 
         default:
@@ -525,38 +525,38 @@ RB_WRAP(pcm)
     switch(option)
     {
         case PCM_APPLYSETTINGS:
-            rb->pcm_apply_settings();
+            rbp()->pcm_apply_settings();
             break;
         case PCM_ISPLAYING:
-            b_result = rb->pcm_is_playing();
+            b_result = rbp()->pcm_is_playing();
             lua_pushboolean(L, b_result);
             break;
         case PCM_ISPAUSED:
-            b_result = rb->pcm_is_paused();
+            b_result = rbp()->pcm_is_paused();
             lua_pushboolean(L, b_result);
             break;
         case PCM_PLAYPAUSE:
-            rb->pcm_play_pause(luaL_checkboolean(L, 2));
+            rbp()->pcm_play_pause(luaL_checkboolean(L, 2));
             break;
         case PCM_PLAYSTOP:
-            rb->pcm_play_stop();
+            rbp()->pcm_play_stop();
             break;
         case PCM_PLAYLOCK:
-            rb->pcm_play_lock();
+            rbp()->pcm_play_lock();
             break;
         case PCM_PLAYUNLOCK:
-            rb->pcm_play_unlock();
+            rbp()->pcm_play_unlock();
             break;
         case PCM_CALCULATEPEAKS:
-            rb->pcm_calculate_peaks(&left, &right);
+            rbp()->pcm_calculate_peaks(&left, &right);
             lua_pushinteger(L, left);
             lua_pushinteger(L, right);
             return 2;
         case PCM_SETFREQUENCY:
-            rb->pcm_set_frequency((unsigned int) luaL_checkint(L, 2));
+            rbp()->pcm_set_frequency((unsigned int) luaL_checkint(L, 2));
             break;
         case PCM_GETBYTESWAITING:
-            byteswait = rb->pcm_get_bytes_waiting();
+            byteswait = rbp()->pcm_get_bytes_waiting();
             lua_pushinteger(L, byteswait);
             break;
     }
@@ -567,12 +567,12 @@ RB_WRAP(pcm)
 
 RB_WRAP(mixer_frequency)
 {
-    unsigned int result = rb->mixer_get_frequency();
+    unsigned int result = rbp()->mixer_get_frequency();
 
     if(!lua_isnoneornil(L, 1))
     {
         unsigned int samplerate = (unsigned int) luaL_checkint(L, 1);
-        rb->mixer_set_frequency(samplerate);
+        rbp()->mixer_set_frequency(samplerate);
     }
     lua_pushinteger(L, result);
     return 1;
@@ -584,9 +584,9 @@ RB_WRAP(backlight_onoff)
 {
     bool on = luaL_checkboolean(L, 1);
     if(on)
-        rb->backlight_on();
+        rbp()->backlight_on();
     else
-        rb->backlight_off();
+        rbp()->backlight_off();
 
     return 0;
 }
@@ -641,7 +641,7 @@ RB_WRAP(buttonlight_brightness_set)
 RB_WRAP(strip_extension)
 {
     const char* filename = luaL_checkstring(L, -1);
-    const char* pos = rb->strrchr(filename, '.');
+    const char* pos = rbp()->strrchr(filename, '.');
     if(pos != NULL)
         lua_pushlstring (L, filename, pos - filename);
 
@@ -662,7 +662,7 @@ RB_WRAP(create_numbered_filename)
     int num = luaL_optint(L, 5, -1);
     (void) num;
 
-    if(rb->create_numbered_filename(buffer, path, prefix, suffix, numberlen
+    if(rbp()->create_numbered_filename(buffer, path, prefix, suffix, numberlen
                                     IF_CNFN_NUM_(, &num)))
     {
         luaL_addstring(&b, buffer);
@@ -679,7 +679,7 @@ RB_WRAP(utf8encode)
 {
     unsigned long ucs = (unsigned long) luaL_checkint(L, 1);
     unsigned char tmp[9];
-    unsigned char *end = rb->utf8encode(ucs, tmp);
+    unsigned char *end = rbp()->utf8encode(ucs, tmp);
     *end = '\0';
     lua_pushstring(L, tmp);
     return 1;
@@ -691,9 +691,9 @@ RB_WRAP(strncasecmp)
     const char * s1 = luaL_checkstring(L, 1);
     const char * s2 = luaL_checkstring(L, 2);
     if(lua_isnoneornil(L, 3))
-        result = rb->strcasecmp(s1, s2);
+        result = rbp()->strcasecmp(s1, s2);
     else
-        result = rb->strncasecmp(s1, s2, (size_t) luaL_checkint(L, 3));
+        result = rbp()->strncasecmp(s1, s2, (size_t) luaL_checkint(L, 3));
 
     lua_pushinteger(L, result);
     return 1;
@@ -805,7 +805,7 @@ static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize, bool 
 
     /* writer */
     luaL_argcheck(L, value != NULL,  3, "Unknown Type");
-    rb->memcpy(mem, value, size);
+    rbp()->memcpy(mem, value, size);
     lua_pushinteger(L, 1);
 
     return 1;
@@ -813,7 +813,7 @@ static int mem_read_write(lua_State *L, uintptr_t address, size_t maxsize, bool 
 
 RB_WRAP(global_status)
 {
-    const uintptr_t address = (uintptr_t) rb->global_status;
+    const uintptr_t address = (uintptr_t) rbp()->global_status;
     const size_t    maxsize = sizeof(struct system_status);
     /*const bool      isstr_p = lua_toboolean(L, 4);*/
     return mem_read_write(L, address, maxsize, false);
@@ -821,7 +821,7 @@ RB_WRAP(global_status)
 
 RB_WRAP(global_settings)
 {
-    const uintptr_t address = (uintptr_t) rb->global_settings;
+    const uintptr_t address = (uintptr_t) rbp()->global_settings;
     const size_t    maxsize = sizeof(struct user_settings);
     /*const bool      isstr_p = lua_toboolean(L, 4);*/
     return mem_read_write(L, address, maxsize, false);
@@ -830,7 +830,7 @@ RB_WRAP(global_settings)
 RB_WRAP(audio_next_track)
 {
 
-    const uintptr_t address = (uintptr_t) rb->audio_next_track();
+    const uintptr_t address = (uintptr_t) rbp()->audio_next_track();
     const size_t    maxsize = sizeof(struct mp3entry);
     const bool      isstr_p = lua_toboolean(L, 4);
     lua_settop(L, 2); /* no writes allowed */
@@ -840,7 +840,7 @@ RB_WRAP(audio_next_track)
 RB_WRAP(audio_current_track)
 {
 
-    const uintptr_t address = (uintptr_t) rb->audio_current_track();
+    const uintptr_t address = (uintptr_t) rbp()->audio_current_track();
     const size_t    maxsize = sizeof(struct mp3entry);
     const bool      isstr_p = lua_toboolean(L, 4);
     lua_settop(L, 2); /* no writes allowed */
@@ -849,7 +849,7 @@ RB_WRAP(audio_current_track)
 
 RB_WRAP(settings_save)
 {
-    rb->settings_save();
+    rbp()->settings_save();
     return 0;
 }
 
@@ -869,7 +869,7 @@ RB_WRAP(read_mem)
 RB_WRAP(system_memory_guard)
 {
     int newmode = (int) luaL_checkint(L, 1);
-    int result = rb->system_memory_guard(newmode);
+    int result = rbp()->system_memory_guard(newmode);
     lua_pushinteger(L, result);
     return 1;
 }
@@ -883,12 +883,12 @@ static int rock_talk(lua_State *L)
     if (lua_isnumber(L, 1))
     {
         long n = (long) lua_tonumber(L, 1);
-        result = rb->talk_number(n, enqueue);
+        result = rbp()->talk_number(n, enqueue);
     }
     else
     {
         const char* spell = luaL_checkstring(L, 1);
-        result = rb->talk_spell(spell, enqueue);
+        result = rbp()->talk_spell(spell, enqueue);
     }
 
     lua_pushinteger(L, result);
@@ -898,9 +898,9 @@ static int rock_talk(lua_State *L)
 RB_WRAP(talk_shutup)
 {
     if (lua_toboolean(L, 1))
-        rb->talk_force_shutup();
+        rbp()->talk_force_shutup();
     else
-        rb->talk_shutup();
+        rbp()->talk_shutup();
     return 0;
 }
 
@@ -917,7 +917,7 @@ RB_WRAP(restart_lua)
 
 RB_WRAP(show_logo)
 {
-    rb->show_logo();
+    rbp()->show_logo();
     return 0;
 }
 

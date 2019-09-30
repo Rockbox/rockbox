@@ -193,7 +193,7 @@ print <<EOF
 #define _ROCKCONF_H_ /* We don't need strcmp() etc. wrappers */
 #include "lua.h"
 #include "lauxlib.h"
-#include "plugin.h"
+#include "rocklib.h"
 
 EOF
 ;
@@ -390,7 +390,7 @@ foreach my $function (@sorted_functions)
         }
         
         # Print the function call
-        my $func = sprintf("rb->%s(%s)", @$function{'name'}, $func_args);
+        my $func = sprintf("rbp()->%s(%s)", @$function{'name'}, $func_args);
 
         # Print the footer
         print $out_types{$return}->($func, @$function{'return'});
