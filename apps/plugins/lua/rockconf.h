@@ -56,14 +56,14 @@ long lpow(long x, long y);
 #define malloc   tlsf_malloc
 #define realloc  tlsf_realloc
 #define free     tlsf_free
-#define memchr   rb->memchr
-#define snprintf rb->snprintf
-#define strcat   rb->strcat
-#define strchr   rb->strchr
-#define strcmp   rb->strcmp
-#define strcpy   rb->strcpy
-#define strlen   rb->strlen
-#define yield()  rb->yield()
+#define memchr   rb()->memchr
+#define snprintf rb()->snprintf
+#define strcat   rb()->strcat
+#define strchr   rb()->strchr
+#define strcmp   rb()->strcmp
+#define strcpy   rb()->strcpy
+#define strlen   rb()->strlen
+#define yield()  rb()->yield()
 
 #endif /* _ROCKCONF_H_ */
 

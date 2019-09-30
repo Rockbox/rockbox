@@ -694,7 +694,7 @@ static const char *getF (lua_State *L, void *ud, size_t *size) {
     *size = 1;
     return "\n";
   }
-  *size = rb->read(lf->f, lf->buff, LUAL_BUFFERSIZE);
+  *size = rb()->read(lf->f, lf->buff, LUAL_BUFFERSIZE);
   return (*size > 0) ? lf->buff : NULL;
 }
 
@@ -712,11 +712,11 @@ LUALIB_API int luaL_loadfile (lua_State *L, const char *filename) {
   int status;
   int fnameindex = lua_gettop(L) + 1;  /* index of filename on the stack */
   lf.extraline = 0;
-  lf.f = rb->open(filename, O_RDONLY);
+  lf.f = rb()->open(filename, O_RDONLY);
   lua_pushfstring(L, "@%s", filename);
   if (lf.f < 0) return errfile(L, "open", fnameindex);
   status = lua_load(L, getF, &lf, lua_tostring(L, -1));
-  rb->close(lf.f);
+  rb()->close(lf.f);
   lua_remove(L, fnameindex);
   return status;
 }
@@ -787,7 +787,7 @@ static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
 static int panic (lua_State *L) {
     DEBUGF("PANIC: unprotected error in call to Lua API (%s)\n",
         lua_tostring(L, -1));
-    rb->splashf(5 * HZ, "PANIC: unprotected error in call to Lua API (%s)",
+    rb()->splashf(5 * HZ, "PANIC: unprotected error in call to Lua API (%s)",
         lua_tostring(L, -1));
 
     return 0;

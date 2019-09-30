@@ -34,9 +34,9 @@
 
 
 static int readable (const char *filename) {
-  int f = rb->open(filename, O_RDONLY);  /* try to open file */
+  int f = rb()->open(filename, O_RDONLY);  /* try to open file */
   if (f < 0) return 0;  /* open failed */
-  rb->close(f);
+  rb()->close(f);
   return 1;
 }
 

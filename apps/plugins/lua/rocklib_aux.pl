@@ -390,7 +390,7 @@ foreach my $function (@sorted_functions)
         }
         
         # Print the function call
-        my $func = sprintf("rb->%s(%s)", @$function{'name'}, $func_args);
+        my $func = sprintf("rb()->%s(%s)", @$function{'name'}, $func_args);
 
         # Print the footer
         print $out_types{$return}->($func, @$function{'return'});

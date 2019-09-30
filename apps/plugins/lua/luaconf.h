@@ -809,6 +809,28 @@ extern long rb_pow(long, long);
 
 /*Rocklua functions*/
 #include "rockconf.h"
+#include "plugin.h"
+
+/* Convoluted way to eliminate extra register load per rb-> plugin call
+ * ARM assembly requires a extra register load of the rb-> struct for every
+ * function call instead we memcpy the rb struct to rbp and use that instead
+ * Caveat: rbp must be initialized before use or Bad Things WILL happen
+ */
+#if defined(__arm__)
+ extern struct plugin_api rbplugin;
+ #define rb() (&rbplugin)
+ #define LUA_RB_PLUGIN_LIBRARY_INIT \
+        { static bool initialized = false; \
+          if (!initialized) { initialized = true; \
+          rb->memcpy(rb(), rb, sizeof(rbplugin)); } }
+ #define LUA_RB_PLUGIN_LIBRARY() struct plugin_api rbplugin
+#else
+ #define rb() rb
+ #define LUA_RB_PLUGIN_LIBRARY_INIT {}
+ #define LUA_RB_PLUGIN_LIBRARY()
+#endif
+static inline void init_rb_plugin_lib(void) LUA_RB_PLUGIN_LIBRARY_INIT
+#undef LUA_RB_PLUGIN_LIBRARY_INIT
 
 /* heap */
 #undef LUAI_GCPAUSE /*200*/
