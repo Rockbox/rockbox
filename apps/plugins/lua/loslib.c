@@ -36,14 +36,14 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 
 static int os_remove (lua_State *L) {
   const char *filename = luaL_checkstring(L, 1);
-  return os_pushresult(L, rb->remove(filename) == 0, filename);
+  return os_pushresult(L, rb()->remove(filename) == 0, filename);
 }
 
 
 static int os_rename (lua_State *L) {
   const char *fromname = luaL_checkstring(L, 1);
   const char *toname = luaL_checkstring(L, 2);
-  return os_pushresult(L, rb->rename(fromname, toname) == 0, fromname);
+  return os_pushresult(L, rb()->rename(fromname, toname) == 0, fromname);
 }
 
 
@@ -97,7 +97,7 @@ static int os_date (lua_State *L) {
   const char *s = luaL_optstring(L, 1, "%c");
   time_t t = luaL_opt(L, (time_t)luaL_checknumber, 2,
 #if CONFIG_RTC
-  rb->mktime(rb->get_time())
+  rb()->mktime(rb()->get_time())
 #else
   0
 #endif
@@ -145,7 +145,7 @@ static int os_time (lua_State *L) {
   time_t t = -1;
 #if CONFIG_RTC
   if (lua_isnoneornil(L, 1))  /* called without args? */
-    t = rb->mktime(rb->get_time());  /* get current time */
+    t = rb()->mktime(rb()->get_time());  /* get current time */
   else {
     struct tm ts;
     luaL_checktype(L, 1, LUA_TTABLE);
@@ -157,7 +157,7 @@ static int os_time (lua_State *L) {
     ts.tm_mon = getfield(L, "month", -1) - 1;
     ts.tm_year = getfield(L, "year", -1) - 1900;
     ts.tm_isdst = getboolfield(L, "isdst");
-    t = rb->mktime(&ts);
+    t = rb()->mktime(&ts);
   }
 #endif
   if (t == (time_t)(-1))

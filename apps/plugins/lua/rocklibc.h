@@ -25,6 +25,7 @@
 
 #include <ctype.h>
 #include "plugin.h"
+#include "lua.h"
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <errno.h>
@@ -40,9 +41,9 @@ extern int errno;
 #define __unlikely UNLIKELY
 
 /* Simple substitutions */
-#define memcmp rb->memcmp
-#define strlen rb->strlen
-#define strrchr rb->strrchr
+#define memcmp rb()->memcmp
+#define strlen rb()->strlen
+#define strrchr rb()->strrchr
 
 #endif /* _ROCKLIBC_H_ */
 

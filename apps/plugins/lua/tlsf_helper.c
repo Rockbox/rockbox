@@ -29,7 +29,7 @@ void *get_new_area(size_t *size)
 
     if (pluginbuf_ptr == NULL)
     {
-        pluginbuf_ptr = rb->plugin_get_buffer(size);
+        pluginbuf_ptr = rb()->plugin_get_buffer(size);
 
         /* kill tlsf signature if any */
         memset(pluginbuf_ptr, 0, 4);
@@ -41,7 +41,7 @@ void *get_new_area(size_t *size)
     if (audiobuf_ptr == NULL && (get_lua_OOM())->count > 0)
     {
         /* grab audiobuffer */
-        audiobuf_ptr = rb->plugin_get_audio_buffer(size);
+        audiobuf_ptr = rb()->plugin_get_audio_buffer(size);
 
         return audiobuf_ptr;
     }

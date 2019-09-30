@@ -56,14 +56,26 @@ long lpow(long x, long y);
 #define malloc   tlsf_malloc
 #define realloc  tlsf_realloc
 #define free     tlsf_free
-#define memchr   rb->memchr
-#define snprintf rb->snprintf
-#define strcat   rb->strcat
-#define strchr   rb->strchr
-#define strcmp   rb->strcmp
-#define strcpy   rb->strcpy
-#define strlen   rb->strlen
-#define yield()  rb->yield()
+#define memchr   rb()->memchr
+#define snprintf rb()->snprintf
+#define strcat   rb()->strcat
+#define strchr   rb()->strchr
+#define strcmp   rb()->strcmp
+#define strcpy   rb()->strcpy
+#define strlen   rb()->strlen
+#define yield()  rb()->yield()
 
 #endif /* _ROCKCONF_H_ */
 
+/* Convoluted way to eliminate extra register load per rb-> plugin call
+ * ARM assembly requires a extra register load of the rb-> struct for every
+ * function call instead we memcpy the rb struct to rbp and use that instead
+ * Caveat: rbp must be initialized before use or Bad Things WILL happen
+ */
+#if defined(__arm__) && !defined(rb)
+ extern struct plugin_api rbp;
+ #define rb() (&rbp)
+#elif !defined(rb)
+  #define rb() rb
+  static inline void initialize_rb_plugin(void) {}
+#endif

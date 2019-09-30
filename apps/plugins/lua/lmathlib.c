@@ -188,7 +188,7 @@ static int math_max (lua_State *L) {
 
 static int math_random (lua_State *L) {
   /* We're not SunOS */
-  lua_Number r = (lua_Number)(rb->rand());
+  lua_Number r = (lua_Number)(rb()->rand());
   switch (lua_gettop(L)) {  /* check number of arguments */
     case 0: {  /* no arguments */
       lua_pushnumber(L, r);  /* Number between 0 and RAND_MAX */
@@ -214,7 +214,7 @@ static int math_random (lua_State *L) {
 
 
 static int math_randomseed (lua_State *L) {
-  rb->srand(luaL_checkint(L, 1));
+  rb()->srand(luaL_checkint(L, 1));
   return 0;
 }
 
