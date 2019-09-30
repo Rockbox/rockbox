@@ -74,13 +74,13 @@ long rb_pow(long x, long n)
 
 int strcoll(const char * str1, const char * str2)
 {
-    return rb->strcmp(str1, str2);
+    return rb()->strcmp(str1, str2);
 }
 
 struct tm * gmtime(const time_t *timep)
 {
     static struct tm time;
-    return rb->gmtime_r(timep, &time);
+    return rb()->gmtime_r(timep, &time);
 }
 
 int get_current_path(lua_State *L, int level)
@@ -94,7 +94,7 @@ int get_current_path(lua_State *L, int level)
         lua_getinfo(L, "S", &ar);
 
         const char* curfile = &ar.source[1];
-        const char* pos = rb->strrchr(curfile, '/');
+        const char* pos = rb()->strrchr(curfile, '/');
         if(pos != NULL)
         {
             lua_pushlstring (L, curfile, pos - curfile + 1);
@@ -124,7 +124,7 @@ int filetol(int fd, long *num)
     bool   neg   = false;
     long   val;
 
-    while (rb->read(fd, &chbuf, 1) == 1)
+    while (rb()->read(fd, &chbuf, 1) == 1)
     {
         if(!isspace(chbuf) || retn == 1)
         {
@@ -137,17 +137,17 @@ int filetol(int fd, long *num)
                 neg = true;
             else
             {
-                rb->lseek(fd, -1, SEEK_CUR);
+                rb()->lseek(fd, -1, SEEK_CUR);
                 break;
             }
         }
     }
 
-    while (rb->read(fd, &chbuf, 1) == 1)
+    while (rb()->read(fd, &chbuf, 1) == 1)
     {
         if(!isdigit(chbuf))
         {
-            rb->lseek(fd, -1, SEEK_CUR);
+            rb()->lseek(fd, -1, SEEK_CUR);
             break;
         }
         else if (count < LUAI_MAXNUMBER2STR - 2)

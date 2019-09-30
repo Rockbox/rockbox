@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 
-#include "plugin.h"
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
@@ -28,6 +27,7 @@
 #include "luadir.h"
 #include "rocklib_events.h"
 
+LUA_RB_PLUGIN_LIBRARY();
 static lua_State *Ls = NULL;
 static int lu_status = 0;
 
@@ -103,7 +103,7 @@ static int db_errorfb (lua_State *L) {
     }
     lua_pushliteral(L, "\n\t");
     lua_getinfo(L1, "Snl", &ar);
-    char* filename = rb->strrchr(ar.short_src, '/'); /* remove path */
+    char* filename = rb()->strrchr(ar.short_src, '/'); /* remove path */
     lua_pushfstring(L, "%s:", filename ? filename : ar.short_src);
     if (ar.currentline > 0)
       lua_pushfstring(L, "%d:", ar.currentline);
@@ -165,7 +165,7 @@ static void lua_atexit(void)
       filename = (char *) malloc(MAX_PATH);
 
       if (filename) /* out of memory? */
-        rb->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH);
+        rb()->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH);
       lua_close(Ls); /* close old state */
 
       lu_status = loadfile_newstate(&Ls, filename);
@@ -189,11 +189,12 @@ static void lua_atexit(void)
 enum plugin_status plugin_start(const void* parameter)
 {
     const char* filename;
+    init_rb_plugin_lib(); /* init prior to using rb()->func on ARM (luaconf.h)*/
 
     if (parameter == NULL)
     {
       if (!Ls)
-        rb->splash(HZ, "Play a .lua file!");
+        rb()->splash(HZ, "Play a .lua file!");
     }
     else
     {
@@ -204,14 +205,14 @@ enum plugin_status plugin_start(const void* parameter)
     if (Ls)
     {
         if (!lu_status) {
-            rb->lcd_scroll_stop(); /* rb doesn't like bg change while scroll */
-            rb->lcd_clear_display();
+            rb()->lcd_scroll_stop(); /* rb doesn't like bg change while scroll */
+            rb()->lcd_clear_display();
             lu_status= docall(Ls);
         }
 
         if (lu_status) {
             DEBUGF("%s\n", lua_tostring(Ls, -1));
-            rb->splash(10 * HZ, lua_tostring(Ls, -1));
+            rb()->splash(10 * HZ, lua_tostring(Ls, -1));
             /*lua_pop(Ls, 1);*/
         }
         lua_close(Ls);
