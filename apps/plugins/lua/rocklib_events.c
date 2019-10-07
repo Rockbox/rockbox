@@ -170,7 +170,7 @@ static void init_event_data(lua_State *L, struct event_data *ev_data)
     //ev_data->NEWL = NULL;
     /* rockbox */
     ev_data->thread_id = UINT_MAX;
-    ev_data->thread_state = THREAD_YIELD;
+    ev_data->thread_state = THREAD_YIELD | THREAD_SUSPENDMASK;
     //ev_data->event_stack = NULL;
     //ev_data->timer_ticks = 0;
     ev_data->freq_input  = EV_INPUT;
@@ -316,7 +316,7 @@ static void event_thread(void)
             lua_interrupt_set(ev_data.L, false);
             ev_data.next_event = EV_TICKS;
             rb->yield();
-        } while(ev_data.thread_state == THREAD_YIELD || is_suspend(THREAD_SUSPENDMASK));
+        } while(ev_data.thread_state == THREAD_YIELD || is_suspend(THREAD_SUSPENDMASK >> 8));
 
     }
 
@@ -333,26 +333,29 @@ event_error:
 /* timer interrupt callback */
 static void rev_timer_isr(void)
 {
-    ev_data.next_event--;
-    ev_data.next_input--;
-
-    if (ev_data.next_input <=0)
+    if (ev_data.thread_state != THREAD_QUIT || is_suspend(THREAD_SUSPENDMASK >> 8))
     {
-        ev_data.thread_state |= ((ev_data.thread_state & THREAD_INPUTMASK) >> 16);
-        ev_data.next_input = ev_data.freq_input;
-    }
+        ev_data.next_event--;
+        ev_data.next_input--;
 
-    if (ev_data.cb[TIMEREVENT] != NULL && !is_suspend(TIMEREVENT))
-    {
-        if (TIME_AFTER(*rb->current_tick, ev_data.cb[TIMEREVENT]->id))
+        if (ev_data.next_input <=0)
         {
-            ev_data.thread_state |= thread_ev_states[TIMEREVENT];
-            ev_data.next_event = 0;
+            ev_data.thread_state |= ((ev_data.thread_state & THREAD_INPUTMASK) >> 16);
+            ev_data.next_input = ev_data.freq_input;
         }
-    }
 
-    if (ev_data.next_event <= 0)
-        lua_interrupt_set(ev_data.L, true);
+        if (ev_data.cb[TIMEREVENT] != NULL && !is_suspend(TIMEREVENT))
+        {
+            if (TIME_AFTER(*rb->current_tick, ev_data.cb[TIMEREVENT]->id))
+            {
+                ev_data.thread_state |= thread_ev_states[TIMEREVENT];
+                ev_data.next_event = 0;
+            }
+        }
+
+        if (ev_data.next_event <= 0)
+            lua_interrupt_set(ev_data.L, true);
+    }
 }
 
 static void create_event_thread_ref(struct event_data *ev_data)
@@ -387,9 +390,6 @@ static void exit_event_thread(struct event_data *ev_data)
 {
     ev_data->thread_state = THREAD_QUIT;
     rb->thread_wait(ev_data->thread_id); /* wait for thread to exit */
-
-    ev_data->thread_state = THREAD_YIELD;
-    ev_data->thread_id = UINT_MAX;
 }
 
 static void init_event_thread(bool init, struct event_data *ev_data)
@@ -398,9 +398,13 @@ static void init_event_thread(bool init, struct event_data *ev_data)
     {
         if (!init && ev_data->thread_id != UINT_MAX)
         {
+            ev_data->thread_state |= THREAD_SUSPENDMASK; /* suspend all events */
+            rb->yield();
             exit_event_thread(ev_data);
             destroy_event_thread_ref(ev_data);
             lua_interrupt_set(ev_data->L, false);
+            ev_data->thread_state = THREAD_YIELD | THREAD_SUSPENDMASK;
+            ev_data->thread_id = UINT_MAX;
         }
         return;
     }
@@ -421,15 +425,19 @@ static void init_event_thread(bool init, struct event_data *ev_data)
 
     /* Timer is used to poll waiting events */
     rb->timer_register(0, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU));
+    ev_data->thread_state &= ~THREAD_SUSPENDMASK;
 }
 
 static void playback_event_callback(unsigned short id, void *data)
 {
     /* playback events are synchronous we need to return ASAP so set a flag */
-    ev_data.thread_state |= thread_ev_states[PLAYBKEVENT];
-    ev_data.cb[PLAYBKEVENT]->id = id;
-    ev_data.cb[PLAYBKEVENT]->data = data;
-    lua_interrupt_set(ev_data.L, true);
+    if (ev_data.thread_state != THREAD_QUIT && !is_suspend(THREAD_SUSPENDMASK >> 8))
+    {
+        ev_data.thread_state |= thread_ev_states[PLAYBKEVENT];
+        ev_data.cb[PLAYBKEVENT]->id = id;
+        ev_data.cb[PLAYBKEVENT]->data = data;
+        lua_interrupt_set(ev_data.L, true);
+    }
 }
 
 static void register_playbk_events(int flag_events,
@@ -499,11 +507,17 @@ static int rockev_gc(lua_State *L) {
     void *d = (void *) lua_touserdata (L, 1);
 
     if (d == NULL)
+    {
         return 0;
+    }
     else if (d == ev_data.event_stack) /* thread stack is gc'd kill thread */
+    {
         init_event_thread(false, &ev_data);
+    }
     else if (d == ev_data.cb[PLAYBKEVENT])
+    {
         register_playbk_events(0, &playback_event_callback);
+    }
 
     for( int i= 0; i < EVENT_CT; i++)
     {
@@ -526,6 +540,9 @@ static int rockev_gc(lua_State *L) {
 
 static int rockev_register(lua_State *L)
 {
+    if (ev_data.thread_state == THREAD_QUIT)
+        return 0;
+
     int event = luaL_checkoption(L, 1, NULL, ev_map);
     int ev_flag = thread_ev_states[event];
     int playbk_events;
@@ -562,6 +579,9 @@ static int rockev_register(lua_State *L)
 
 static int rockev_suspend(lua_State *L)
 {
+    if (ev_data.thread_state == THREAD_QUIT)
+        return 0;
+
     int event; /*Arg 1 is event pass nil to suspend all */
     bool suspend = luaL_optboolean(L, 2, true);
     int ev_flag = THREAD_SUSPENDMASK;
@@ -588,7 +608,7 @@ static int rockev_trigger(lua_State *L)
     int ev_flag;
 
     /* protect from invalid events */
-    if (ev_data.cb[event] != NULL)
+    if (ev_data.cb[event] != NULL && ev_data.thread_state != THREAD_QUIT)
     {
         ev_flag = thread_ev_states[event];
         /* allow user to pass an id to some of the callback functions */
