@@ -47,10 +47,10 @@
  * NOTE!, CUSTOM_EVENT must be unset manually
  * id is only passed to callback by custom and playback events
  *
- * rockev.suspend(["event"/nil][true/false]) passing nil affects all events
- * stops event from executing, any but the last event before
- * re-enabling will be lost. Passing false, unregistering or re-registering
- * an event will clear the suspend
+ * rockev.suspend(["event"/nil][true/false]) passing nil suspends all events
+ * stops event from executing, any event before re-enabling will be lost.
+ * Passing false will clear the suspend as will
+ * unregistering or re-registering an event (except suspend all)
  *
  * rockev.unregister(evX)
  * Use unregister(evX) to remove an event
@@ -286,7 +286,7 @@ static void event_thread(void)
                     break;
                 case BUTEVENT:
                     ev_data.cb[BUTEVENT]->id = rb->button_get(false);
-                    if (ev_data.cb[BUTEVENT]->id == 0)
+                    if (ev_data.cb[BUTEVENT]->id == BUTTON_NONE)
                         continue; /* check next event */
                     break;
                 case CUSTOMEVENT:
@@ -333,7 +333,7 @@ event_error:
 /* timer interrupt callback */
 static void rev_timer_isr(void)
 {
-    if (ev_data.thread_state != THREAD_QUIT || is_suspend(THREAD_SUSPENDMASK >> 8))
+    if (!is_suspend(THREAD_SUSPENDMASK >> 8)) /* all events suspended? */
     {
         ev_data.next_event--;
         ev_data.next_input--;
@@ -408,7 +408,7 @@ static void init_event_thread(bool init, struct event_data *ev_data)
         }
         return;
     }
-    else if (!init)
+    else if (!init || ev_data->thread_state == THREAD_QUIT)
         return;
 
     create_event_thread_ref(ev_data);
@@ -431,7 +431,7 @@ static void init_event_thread(bool init, struct event_data *ev_data)
 static void playback_event_callback(unsigned short id, void *data)
 {
     /* playback events are synchronous we need to return ASAP so set a flag */
-    if (ev_data.thread_state != THREAD_QUIT && !is_suspend(THREAD_SUSPENDMASK >> 8))
+    if (!is_suspend(THREAD_PLAYBKEVENT)) /* playback events suspended? */
     {
         ev_data.thread_state |= thread_ev_states[PLAYBKEVENT];
         ev_data.cb[PLAYBKEVENT]->id = id;
@@ -470,8 +470,10 @@ static void destroy_event_userdata(lua_State *L, int event)
     if (ev_data.cb[event] != NULL)
     {
         int ev_flag = thread_ev_states[event];
-        ev_data.thread_state &=  ~(ev_flag | (ev_flag << 8) | (ev_flag << 16));
-
+        int ev_clear = (ev_flag | (ev_flag << 16));
+        if (!is_suspend(THREAD_SUSPENDMASK >> 8)) /* all events suspended? */
+            ev_clear |= (ev_flag << 8);
+        ev_data.thread_state &= ~(ev_clear);
         luaL_unref (L, LUA_REGISTRYINDEX, ev_data.cb[event]->cb_ref);
         ev_data.cb[event] = NULL;
     }
@@ -540,9 +542,6 @@ static int rockev_gc(lua_State *L) {
 
 static int rockev_register(lua_State *L)
 {
-    if (ev_data.thread_state == THREAD_QUIT)
-        return 0;
-
     int event = luaL_checkoption(L, 1, NULL, ev_map);
     int ev_flag = thread_ev_states[event];
     int playbk_events;
@@ -608,7 +607,7 @@ static int rockev_trigger(lua_State *L)
     int ev_flag;
 
     /* protect from invalid events */
-    if (ev_data.cb[event] != NULL && ev_data.thread_state != THREAD_QUIT)
+    if (ev_data.cb[event] != NULL)
     {
         ev_flag = thread_ev_states[event];
         /* allow user to pass an id to some of the callback functions */
