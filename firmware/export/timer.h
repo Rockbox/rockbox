@@ -30,6 +30,7 @@
 #define TIMER_FREQ 1000000
 #endif
 
+/* NOTE: if unreg cb is defined you are in charge of calling timer_unregister() */
 bool timer_register(int reg_prio, void (*unregister_callback)(void),
                     long cycles, void (*timer_callback)(void)
                     IF_COP(,int core));
@@ -37,6 +38,10 @@ bool timer_set_period(long cycles);
 #ifdef CPU_COLDFIRE
 void timers_adjust_prescale(int multiplier, bool enable_irq);
 #endif
+
+/* NOTE: unregister callbacks are not called by timer_unregister()
+* the unregister_callback only gets called when your timer gets 
+* overwritten by a lower priority timer using timer_register() */
 void timer_unregister(void);
 
 /* target-specific interface */
