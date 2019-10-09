@@ -113,8 +113,8 @@ void (*global_timer_callback)(void);
 
 static void timer_cb(union sigval arg)
 {
-    (void)arg;
-    if (global_timer_callback)
+    /* check for spurious callbacks [arg.sival_ptr] */
+    if (global_timer_callback && global_timer_callback == arg.sival_ptr)
         global_timer_callback();
 }
 
@@ -129,12 +129,18 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (reg_prio <= timer_prio || in_us <= 0)
         return false;
 
-    if (timer_prio >= 0 && global_unreg_callback)
-        global_unreg_callback();
+    if(timer_prio >= 0)
+    {
+        if (global_unreg_callback) /* timer has callback user needs to unreg */
+            global_unreg_callback();
+        else /* no callback -- delete timer */
+            timer_delete(timer_tid);
+    }
 
     memset(&sigev, 0, sizeof(sigevent_t));
     sigev.sigev_notify = SIGEV_THREAD,
     sigev.sigev_notify_function = timer_cb;
+    sigev.sigev_value.sival_ptr = timer_callback; /* store cb to check later */
 
     div_t q = div(in_us, 1000000);
     ts.it_value.tv_sec = ts.it_interval.tv_sec = q.quot;
@@ -166,4 +172,6 @@ void timer_unregister(void)
 {
     timer_delete(timer_tid);
     timer_prio = -1;
+    global_unreg_callback = NULL;
+    global_timer_callback = NULL;
 }

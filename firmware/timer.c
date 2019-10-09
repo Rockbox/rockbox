@@ -42,6 +42,7 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
         return false;
 
     pfn_timer = timer_callback;
+    /* NOTE: if unreg cb is defined you are in charge of calling timer_unregister() */
     pfn_unregister = unregister_callback;
     timer_prio = reg_prio;
 
@@ -53,6 +54,9 @@ bool timer_set_period(long cycles)
     return timer_set(cycles, false);
 }
 
+/* NOTE: unregister callbacks are not called by timer_unregister()
+* the unregister_callback only gets called when your timer gets 
+* overwritten by a lower priority timer using timer_register() */
 void timer_unregister(void)
 {
     timer_stop();

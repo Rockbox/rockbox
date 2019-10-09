@@ -75,25 +75,29 @@
 #define EV_STACKSZ DEFAULT_STACK_SIZE
 
 #define LUA_SUCCESS 0
-#define EV_TIMER_FREQ (TIMER_FREQ / HZ)
+#define EV_TIMER_TICKS 5 /* timer resolution */
+#define EV_TIMER_FREQ (TIMER_FREQ / HZ) * EV_TIMER_TICKS
 #define EV_TICKS (HZ / 5)
 #define EV_INPUT (HZ / 4)
 //#define DEBUG_EV
 
 enum e_thread_state_flags{
-    THREAD_QUIT        = 0x0,
-    THREAD_YIELD       = 0x1,
-    THREAD_TIMEREVENT  = 0x2,
-    THREAD_PLAYBKEVENT = 0x4,
-    THREAD_ACTEVENT    = 0x8,
-    THREAD_BUTEVENT    = 0x10,
-    THREAD_CUSTOMEVENT = 0x20,
+    THREAD_ERROR       = 0x0,
+/* event states */
+    THREAD_TIMEREVENT  = 0x1,
+    THREAD_PLAYBKEVENT = 0x2,
+    THREAD_ACTEVENT    = 0x4,
+    THREAD_BUTEVENT    = 0x8,
+    THREAD_CUSTOMEVENT = 0x10,
+  //THREAD_AVAILEVENT  = 0x20,
   //THREAD_AVAILEVENT  = 0x40,
   //THREAD_AVAILEVENT  = 0x80,
 /* thread state holds 3 status items using masks and bitshifts */
-    THREAD_STATEMASK   = 0x00FF,
-    THREAD_SUSPENDMASK = 0xFF00,
-    THREAD_INPUTMASK   = 0xFF0000,
+    THREAD_EVENTMASK   = 0x000000FF,
+    THREAD_SUSPENDMASK = 0x0000FF00,
+/* thread state */
+    THREAD_QUIT        = 0x80000000,
+    THREAD_STATEMASK   = 0xFF000000,
 };
 
 enum {
@@ -135,7 +139,7 @@ struct event_data {
     lua_State      *NEWL;
     /* rockbox */
     unsigned int    thread_id;
-    int             thread_state;
+    unsigned int    thread_state;
     long           *event_stack;
     long            timer_ticks;
     short           freq_input;
@@ -152,33 +156,40 @@ static struct mutex rev_mtx SHAREDBSS_ATTR;
 static int dbg_hook_calls = 0;
 #endif
 
-static inline bool has_event(int ev_flag)
+static inline bool has_state(unsigned int ev_flag)
 {
-    return ((THREAD_STATEMASK & (ev_data.thread_state & ev_flag)) == ev_flag);
+    return (ev_data.thread_state & ev_flag) == ev_flag;
 }
 
-static inline bool is_suspend(int ev_flag)
+static inline bool has_evt(unsigned int ev_flag)
+{
+    return (ev_data.thread_state & ev_flag) == ev_flag;
+}
+
+static inline void set_evt(unsigned int ev_flag)
+{
+    ev_data.thread_state |= ev_flag;
+}
+
+static inline void remove_evt(unsigned int ev_flag)
+{
+    ev_data.thread_state &= ~(ev_flag);
+}
+
+static inline bool is_suspend(unsigned int ev_flag)
 {
     ev_flag <<= 8;
-    return ((THREAD_SUSPENDMASK & (ev_data.thread_state & ev_flag)) == ev_flag);
+    return (ev_data.thread_state & ev_flag) == ev_flag;
 }
 
-static void init_event_data(lua_State *L, struct event_data *ev_data)
+static inline void set_suspend(unsigned int ev_flag)
 {
-    /* lua */
-    ev_data->L = L;
-    //ev_data->NEWL = NULL;
-    /* rockbox */
-    ev_data->thread_id = UINT_MAX;
-    ev_data->thread_state = THREAD_YIELD | THREAD_SUSPENDMASK;
-    //ev_data->event_stack = NULL;
-    //ev_data->timer_ticks = 0;
-    ev_data->freq_input  = EV_INPUT;
-    ev_data->next_input  = EV_INPUT;
-    ev_data->next_event  = EV_TICKS;
-    /* callbacks */
-    for (int i= 0; i < EVENT_CT; i++)
-        ev_data->cb[i] = NULL;
+    ev_data.thread_state |= (THREAD_SUSPENDMASK & (ev_flag << 8));
+}
+
+static inline void remove_suspend(unsigned int ev_flag)
+{
+    ev_data.thread_state &= ~(THREAD_SUSPENDMASK & (ev_flag << 8));
 }
 
 /* lock and unlock routines allow us to execute the event thread without
@@ -192,6 +203,24 @@ static inline void rev_lock_mtx(void)
 static inline void rev_unlock_mtx(void)
 {
     rb->mutex_unlock(&rev_mtx);
+}
+
+static void init_event_data(lua_State *L, struct event_data *ev_data)
+{
+    /* lua */
+    ev_data->L = L;
+    //ev_data->NEWL = NULL;
+    /* rockbox */
+    ev_data->thread_id = UINT_MAX;
+    ev_data->thread_state = THREAD_SUSPENDMASK;
+    //ev_data->event_stack = NULL;
+    //ev_data->timer_ticks = 0;
+    ev_data->freq_input  = EV_INPUT;
+    ev_data->next_input  = EV_INPUT;
+    ev_data->next_event  = EV_TICKS;
+    /* callbacks */
+    for (int i= 0; i < EVENT_CT; i++)
+        ev_data->cb[i] = NULL;
 }
 
 static void lua_interrupt_callback( lua_State *L, lua_Debug *ar)
@@ -256,7 +285,7 @@ static void event_thread(void)
     int event;
     int ev_flag;
 
-    while(ev_data.thread_state != THREAD_QUIT && lua_status(ev_data.L) == LUA_SUCCESS)
+    while(!has_state(THREAD_QUIT) && lua_status(ev_data.L) == LUA_SUCCESS)
     {
         rev_lock_mtx();
         lua_interrupt_set(ev_data.L, true);
@@ -264,10 +293,10 @@ static void event_thread(void)
         for (event = 0; event < EVENT_CT; event++)
         {
             ev_flag = thread_ev_states[event];
-            if (!has_event(ev_flag) || is_suspend(ev_flag))
+            if (is_suspend(ev_flag) || !has_evt(ev_flag))
                 continue; /* check next event */
 
-            ev_data.thread_state &= ~(ev_flag); /* event handled */
+            remove_evt(ev_flag);
 
             switch (event)
             {
@@ -290,7 +319,7 @@ static void event_thread(void)
                         continue; /* check next event */
                     break;
                 case CUSTOMEVENT:
-                    ev_data.thread_state |= thread_ev_states[CUSTOMEVENT]; // don't reset */
+                    set_evt(thread_ev_states[CUSTOMEVENT]); // don't reset */
                     break;
                 case PLAYBKEVENT:
                     break;
@@ -316,7 +345,7 @@ static void event_thread(void)
             lua_interrupt_set(ev_data.L, false);
             ev_data.next_event = EV_TICKS;
             rb->yield();
-        } while(ev_data.thread_state == THREAD_YIELD || is_suspend(THREAD_SUSPENDMASK >> 8));
+        } while(!has_state(THREAD_QUIT) && is_suspend(THREAD_SUSPENDMASK >> 8));
 
     }
 
@@ -335,12 +364,12 @@ static void rev_timer_isr(void)
 {
     if (!is_suspend(THREAD_SUSPENDMASK >> 8)) /* all events suspended? */
     {
-        ev_data.next_event--;
-        ev_data.next_input--;
+        ev_data.next_event -= EV_TIMER_TICKS;
+        ev_data.next_input -= EV_TIMER_TICKS;
 
         if (ev_data.next_input <=0)
         {
-            ev_data.thread_state |= ((ev_data.thread_state & THREAD_INPUTMASK) >> 16);
+            set_evt(THREAD_ACTEVENT | THREAD_BUTEVENT);
             ev_data.next_input = ev_data.freq_input;
         }
 
@@ -348,8 +377,7 @@ static void rev_timer_isr(void)
         {
             if (TIME_AFTER(*rb->current_tick, ev_data.cb[TIMEREVENT]->id))
             {
-                ev_data.thread_state |= thread_ev_states[TIMEREVENT];
-                ev_data.next_event = 0;
+                set_evt(thread_ev_states[TIMEREVENT]);
             }
         }
 
@@ -388,8 +416,10 @@ static void destroy_event_thread_ref(struct event_data *ev_data)
 
 static void exit_event_thread(struct event_data *ev_data)
 {
-    ev_data->thread_state = THREAD_QUIT;
+    ev_data->thread_state |= (THREAD_QUIT | THREAD_SUSPENDMASK);
     rb->thread_wait(ev_data->thread_id); /* wait for thread to exit */
+    ev_data->thread_state = (THREAD_SUSPENDMASK);
+    ev_data->thread_id = UINT_MAX;
 }
 
 static void init_event_thread(bool init, struct event_data *ev_data)
@@ -398,17 +428,13 @@ static void init_event_thread(bool init, struct event_data *ev_data)
     {
         if (!init && ev_data->thread_id != UINT_MAX)
         {
-            ev_data->thread_state |= THREAD_SUSPENDMASK; /* suspend all events */
-            rb->yield();
             exit_event_thread(ev_data);
             destroy_event_thread_ref(ev_data);
             lua_interrupt_set(ev_data->L, false);
-            ev_data->thread_state = THREAD_YIELD | THREAD_SUSPENDMASK;
-            ev_data->thread_id = UINT_MAX;
         }
         return;
     }
-    else if (!init || ev_data->thread_state == THREAD_QUIT)
+    else if (!init || has_state(THREAD_QUIT))
         return;
 
     create_event_thread_ref(ev_data);
@@ -425,7 +451,6 @@ static void init_event_thread(bool init, struct event_data *ev_data)
 
     /* Timer is used to poll waiting events */
     rb->timer_register(0, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU));
-    ev_data->thread_state &= ~THREAD_SUSPENDMASK;
 }
 
 static void playback_event_callback(unsigned short id, void *data)
@@ -433,7 +458,7 @@ static void playback_event_callback(unsigned short id, void *data)
     /* playback events are synchronous we need to return ASAP so set a flag */
     if (!is_suspend(THREAD_PLAYBKEVENT)) /* playback events suspended? */
     {
-        ev_data.thread_state |= thread_ev_states[PLAYBKEVENT];
+        set_evt(thread_ev_states[PLAYBKEVENT]);
         ev_data.cb[PLAYBKEVENT]->id = id;
         ev_data.cb[PLAYBKEVENT]->data = data;
         lua_interrupt_set(ev_data.L, true);
@@ -470,10 +495,8 @@ static void destroy_event_userdata(lua_State *L, int event)
     if (ev_data.cb[event] != NULL)
     {
         int ev_flag = thread_ev_states[event];
-        int ev_clear = (ev_flag | (ev_flag << 16));
-        if (!is_suspend(THREAD_SUSPENDMASK >> 8)) /* all events suspended? */
-            ev_clear |= (ev_flag << 8);
-        ev_data.thread_state &= ~(ev_clear);
+        remove_evt(ev_flag);
+        set_suspend(ev_flag);
         luaL_unref (L, LUA_REGISTRYINDEX, ev_data.cb[event]->cb_ref);
         ev_data.cb[event] = NULL;
     }
@@ -512,8 +535,9 @@ static int rockev_gc(lua_State *L) {
     {
         return 0;
     }
-    else if (d == ev_data.event_stack) /* thread stack is gc'd kill thread */
+    else if (d == ev_data.event_stack || d == ev_data.NEWL)
     {
+        /* thread is gc'd kill it */
         init_event_thread(false, &ev_data);
     }
     else if (d == ev_data.cb[PLAYBKEVENT])
@@ -548,15 +572,15 @@ static int rockev_register(lua_State *L)
 
     lua_settop (L, 3); /* we need to lock our optional args before...*/
     create_event_userdata(L, event, 2);/* cb_data is on top of stack */
-
+    init_event_thread(true, &ev_data);
     switch (event)
     {
         case ACTEVENT:
             /* fall through */
         case BUTEVENT:
             ev_data.freq_input = luaL_optinteger(L, 3, EV_INPUT);
-            if (ev_data.freq_input < HZ / 20) ev_data.freq_input = HZ / 20;
-            ev_data.thread_state |= (ev_flag | (ev_flag << 16));
+            if (ev_data.freq_input < EV_TIMER_TICKS)
+                ev_data.freq_input = EV_TIMER_TICKS;
             break;
         case CUSTOMEVENT:
             break;
@@ -567,34 +591,36 @@ static int rockev_register(lua_State *L)
             break;
         case TIMEREVENT:
             ev_data.timer_ticks = luaL_checkinteger(L, 3);
+            if (ev_data.timer_ticks < EV_TIMER_TICKS)
+                ev_data.timer_ticks = EV_TIMER_TICKS;
             ev_data.cb[TIMEREVENT]->id = *rb->current_tick + ev_data.timer_ticks;
             break;
     }
-
-    init_event_thread(true, &ev_data);
+    remove_suspend(ev_flag);
 
     return 1; /* returns cb_data */
 }
 
 static int rockev_suspend(lua_State *L)
 {
-    if (ev_data.thread_state == THREAD_QUIT)
+    if (has_state(THREAD_QUIT))
         return 0;
 
     int event; /*Arg 1 is event pass nil to suspend all */
     bool suspend = luaL_optboolean(L, 2, true);
-    int ev_flag = THREAD_SUSPENDMASK;
+    int ev_flag = THREAD_SUSPENDMASK >> 8;
 
     if (!lua_isnoneornil(L, 1))
     {
         event = luaL_checkoption(L, 1, NULL, ev_map);
-        ev_flag = thread_ev_states[event] << 8;
+        if (ev_data.cb[event] == NULL)
+            suspend = true;
     }
 
     if (suspend)
-        ev_data.thread_state |= ev_flag;
+        set_suspend(ev_flag);
     else
-        ev_data.thread_state &= ~(ev_flag);
+        remove_suspend(ev_flag);
 
     return 0;
 }
@@ -614,9 +640,9 @@ static int rockev_trigger(lua_State *L)
         ev_data.cb[event]->id = luaL_optinteger(L, 3, ev_data.cb[event]->id);
 
         if (enable)
-            ev_data.thread_state |= ev_flag;
+            set_evt(ev_flag);
         else
-            ev_data.thread_state &= ~(ev_flag);
+            remove_evt(ev_flag);
     }
     return 0;
 }
