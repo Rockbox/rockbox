@@ -105,9 +105,9 @@ void tick_start(unsigned int interval_in_ms)
 #define cycles_to_microseconds(cycles) \
     ((int)((1000000*cycles)/TIMER_FREQ))
 
-
 static timer_t timer_tid;
 static int timer_prio = -1;
+void timer_unregister(void);
 void (*global_unreg_callback)(void);
 void (*global_timer_callback)(void);
 
@@ -129,8 +129,11 @@ bool timer_register(int reg_prio, void (*unregister_callback)(void),
     if (reg_prio <= timer_prio || in_us <= 0)
         return false;
 
-    if (timer_prio >= 0 && global_unreg_callback)
-        global_unreg_callback();
+    if(timer_prio >= 0)
+    {
+        splash(100, "timer already active");
+        timer_unregister();
+    }
 
     memset(&sigev, 0, sizeof(sigevent_t));
     sigev.sigev_notify = SIGEV_THREAD,
@@ -165,5 +168,11 @@ bool timer_set_period(long cycles)
 void timer_unregister(void)
 {
     timer_delete(timer_tid);
+    if (timer_prio >= 0 && global_unreg_callback)
+        global_unreg_callback();
+
+    global_unreg_callback = NULL;
+    global_timer_callback = NULL;
+
     timer_prio = -1;
 }
