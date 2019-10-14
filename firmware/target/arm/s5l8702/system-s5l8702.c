@@ -199,8 +199,14 @@ enum {
 
 void system_init(void)
 {
+    /*
+     * Bootloader seems to give a blank screen when IRAM1 is disabled
+     * - FW 10/13/19
+     */
+#ifndef BOOTLOADER
     /* disable IRAM1 (not used because it is slower than DRAM) */
     clockgate_enable(CLOCKGATE_SM1, false);
+#endif
 
     clocking_init(clk_modes, 0);
 #ifndef BOOTLOADER
