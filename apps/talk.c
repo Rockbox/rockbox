@@ -613,7 +613,9 @@ static bool load_voicefile_index(int fd)
     if (voicefile.table == sizeof(struct voicefile_header))
     {
         if (voicefile.version == VOICE_VERSION &&
-            voicefile.target_id == TARGET_ID)
+            voicefile.target_id == TARGET_ID && 
+            voicefile.id1_max == TALK_FINAL_ID &&
+            voicefile.id2_max == TALK_FINAL_ID_VOICEONLY - VOICEONLY_DELIMITER)
         {
             if (load_index_table(fd, &voicefile))
                 return true;
