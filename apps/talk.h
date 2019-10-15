@@ -134,7 +134,7 @@ int talk_time_intervals(long time, int unit_idx, bool enqueue);
 
 /* This (otherwise invalid) ID signals the end of the array. */
 #define TALK_FINAL_ID LANG_LAST_INDEX_IN_ARRAY
-
+#define TALK_FINAL_ID_VOICEONLY LANG_LAST_VOICEONLY_INDEX_IN_ARRAY
 /* Enqueue next utterance even if enqueue parameter is false: don't
    interrupt the current utterance. */
 void talk_force_enqueue_next(void);

@@ -613,7 +613,9 @@ static bool load_voicefile_index(int fd)
     if (voicefile.table == sizeof(struct voicefile_header))
     {
         if (voicefile.version == VOICE_VERSION &&
-            voicefile.target_id == TARGET_ID)
+            voicefile.target_id == TARGET_ID &&
+            voicefile.id1_max == TALK_FINAL_ID &&
+            voicefile.id2_max == TALK_FINAL_ID_VOICEONLY - VOICEONLY_DELIMITER)
         {
             if (load_index_table(fd, &voicefile))
                 return true;
@@ -621,6 +623,11 @@ static bool load_voicefile_index(int fd)
     }
 
     logf("Incompatible voice file");
+    logf("version %d expected %d", voicefile.version, VOICE_VERSION);
+    logf("target_id %d expected %d", voicefile.target_id, TARGET_ID);
+    logf("id1_max %d expected %d", voicefile.id1_max, TALK_FINAL_ID);
+    logf("id2_max %d expected %d",
+               voicefile.id2_max, TALK_FINAL_ID_VOICEONLY - VOICEONLY_DELIMITER);
     return false;
 }
 

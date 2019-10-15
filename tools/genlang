@@ -718,6 +718,7 @@ MOO
 
     # Output end of lang_enum.h
     print HFILE_CORE <<MOO
+    LANG_LAST_VOICEONLY_INDEX_IN_ARRAY /* this is not a string, this is a marker */
 };
 /* end of generated enum list */
 #endif /* _LANG_ENUM_H_ */
