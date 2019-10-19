@@ -344,6 +344,8 @@ build() {
     configure_params="$5"
     needs_libs="$6"
 
+	logfile="$builddir/build-$toolname.log"
+
     patch_url="http://www.rockbox.org/gcc"
 
     # create build directory
@@ -402,7 +404,8 @@ build() {
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/downloads"
+            getfile "mpc-0.8.1.tar.gz" "https://gcc.gnu.org/pub/gcc/infrastructure/"
+
             tar xzf $dlwhere/mpc-0.8.1.tar.gz
             ln -s mpc-0.8.1 mpc
         fi
@@ -415,6 +418,9 @@ build() {
     echo "ROCKBOXDEV: cd build-$toolname"
     cd build-$toolname
 
+    echo "ROCKBOXDEV: logging to $logfile"
+    rm -f "$logfile"
+
     echo "ROCKBOXDEV: $toolname/configure"
     case $toolname in
         crosstool-ng) # ct-ng doesnt support out-of-tree build and the src folder is named differently
@@ -423,15 +429,16 @@ build() {
             ./configure --prefix=$prefix $configure_params
         ;;
         *)
-            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
+            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline'
+            run_cmd "$logfile" ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
         ;;
     esac
 
     echo "ROCKBOXDEV: $toolname/make"
-    $make
+    run_cmd "$logfile" $make -i
 
     echo "ROCKBOXDEV: $toolname/make install"
-    $make install
+    run_cmd "$logfile" $make install -i
 
     echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
     cd ..
