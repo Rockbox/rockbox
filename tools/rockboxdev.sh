@@ -39,7 +39,7 @@ fi
 
 # These are the tools this script requires and depends upon.
 reqtools="gcc bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
-
+#apt-get install gcc gperf bison flex texinfo help2man make libncurses5-dev python-dev libtool-bin
 ##############################################################################
 # Functions:
 
@@ -55,6 +55,21 @@ findtool(){
       return
     fi
   done
+}
+
+checktool(){
+# Verify required tool or library
+for t in "$@"; do
+    tool=`findtool $t`
+    if test -z "$tool"; then
+        echo "ROCKBOXDEV: \"$t\" is required for this script to work."
+        missingtools="yes"
+    fi
+done
+if [ -n "$missingtools" ]; then
+    echo "ROCKBOXDEV: Please install the missing tools and re-run the script."
+    exit 1
+fi
 }
 
 findlib (){
@@ -236,17 +251,18 @@ extract() {
     fi
 }
 
-# run a command, and a log command and output to a file (append)
+# run a command, and a log command and std out+err to a file (append)
 # exit on error
 # run_cmd logfile cmd...
 run_cmd() {
     logfile="$1"
     shift
-    echo "Running '$@'" >>$logfile
+    echo "$(date) Running '$@'" >>$logfile
     if ! $@ >> "$logfile" 2>&1; then
         echo "ROCKBOXDEV: an error occured, please see $logfile"
         exit
     fi
+    echo "$(date) Finished '$@'" >>$logfile
 }
 
 # check if the following should be executed or not, depending on RESTART variable:
@@ -343,6 +359,7 @@ build() {
     patch="$4"
     configure_params="$5"
     needs_libs="$6"
+    logfile="$builddir/build-$toolname.log"
 
     patch_url="http://www.rockbox.org/gcc"
 
@@ -388,23 +405,23 @@ build() {
         cd "gcc-$version"
         if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
             echo "ROCKBOXDEV: Getting GMP"
-            getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gmp"
-            tar xjf $dlwhere/gmp-4.3.2.tar.bz2
-            ln -s gmp-4.3.2 gmp
+            getfile "gmp-6.1.2.tar.bz2" "$GNU_MIRROR/gmp"
+            tar xjf $dlwhere/gmp-6.1.2.tar.bz2
+            ln -s gmp-6.1.2 gmp
         fi
 
         if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
             echo "ROCKBOXDEV: Getting MPFR"
-            getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
-            tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
-            ln -s mpfr-2.4.2 mpfr
+            getfile "mpfr-4.0.1.tar.bz2" "$GNU_MIRROR/mpfr"
+            tar xjf $dlwhere/mpfr-4.0.1.tar.bz2
+            ln -s mpfr-4.0.1 mpfr
         fi
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/downloads"
-            tar xzf $dlwhere/mpc-0.8.1.tar.gz
-            ln -s mpc-0.8.1 mpc
+            getfile "mpc-1.1.0.tar.gz" "$GNU_MIRROR/mpc"
+            tar xzf $dlwhere/mpc-1.1.0.tar.gz
+            ln -s mpc-1.1.0 mpc
         fi
         cd $builddir
     fi
@@ -414,6 +431,9 @@ build() {
 
     echo "ROCKBOXDEV: cd build-$toolname"
     cd build-$toolname
+    
+    echo "ROCKBOXDEV: logging to $logfile"
+    rm -f "$logfile"
 
     echo "ROCKBOXDEV: $toolname/configure"
     case $toolname in
@@ -423,15 +443,16 @@ build() {
             ./configure --prefix=$prefix $configure_params
         ;;
         *)
-            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
+            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline'
+            run_cmd "$logfile" ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
         ;;
     esac
 
     echo "ROCKBOXDEV: $toolname/make"
-    $make
+    run_cmd "$logfile" $make -r
 
     echo "ROCKBOXDEV: $toolname/make install"
-    $make install
+    run_cmd "$logfile" $make install
 
     echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
     cd ..
@@ -648,17 +669,7 @@ esac
 done
 
 # Verify required tools and libraries
-for t in $reqtools; do
-    tool=`findtool $t`
-    if test -z "$tool"; then
-        echo "ROCKBOXDEV: \"$t\" is required for this script to work."
-        missingtools="yes"
-    fi
-done
-if [ -n "$missingtools" ]; then
-    echo "ROCKBOXDEV: Please install the missing tools and re-run the script."
-    exit 1
-fi
+checktool $reqtools
 
 echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD or use --download= to change)"
 echo "Install prefix     : $prefix  (set RBDEV_PREFIX or use --prefix= to change)"
@@ -719,24 +730,37 @@ PATH="$prefix/bin:${PATH}"
 for arch in $selarch
 do
     echo ""
+    if [ -n "$COMPLETE" ]; then
+        echo "ROCKBOXDEV: Completed Targets: ${COMPLETE:2}"
+    fi
+    
     case $arch in
         [Ss])
             # For binutils 2.16.1 builtin rules conflict on some systems with a
             # default rule for Objective C. Disable the builtin make rules. See
             # http://sourceware.org/ml/binutils/2005-12/msg00259.html
+            echo "ROCKBOXDEV: Building SuperH."
             export MAKEFLAGS="-r $MAKEFLAGS"
             build "binutils" "sh-elf" "2.16.1" "binutils-2.16.1-texinfo-fix.diff" "--disable-werror"
             build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
+            echo "ROCKBOXDEV: Completed SuperH"
+            COMPLETE="${COMPLETE}, s"
             ;;
 
         [Ii])
+            echo "ROCKBOXDEV: Building MIPS."
             build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror"
             build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc"
+            echo "ROCKBOXDEV: Completed MIPS"
+            COMPLETE="${COMPLETE}, i"
             ;;
 
         [Mm])
+            echo "ROCKBOXDEV: Building Motorola68k."
             build "binutils" "m68k-elf" "2.20.1" "binutils-2.20.1-texinfo-fix.diff" "--disable-werror"
             build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc"
+            echo "ROCKBOXDEV: Completed Motorola68k"
+            COMPLETE="${COMPLETE}, m"
             ;;
 
         [Aa])
@@ -748,11 +772,18 @@ do
                     gccopts="--disable-nls"
                     ;;
             esac
+            echo "ROCKBOXDEV: Building ARM."
             build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
             build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
+            echo "ROCKBOXDEV: Completed ARM"
+            COMPLETE="${COMPLETE}, a"
             ;;
         [Rr])
+            echo "ROCKBOXDEV: Building ARM-APP."
+            echo "NOTE! Requires: subversion, libncurses-dev"
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+            echo "ROCKBOXDEV: Completed ARM-APP"
+            COMPLETE="${COMPLETE}, r"
             ;;
         [Xx])
             # IMPORTANT NOTE
@@ -782,6 +813,7 @@ do
             # kernel but compile glibc to support kernel 2.6.23 and glibc 2.4.
             # We use a recent 2.26.1 binutils to avoid any build problems and
             # avoid patches/bugs.
+            echo "ROCKBOXDEV: Building ARM-Linux."
             glibcopts="--enable-kernel=2.6.23 --enable-oldest-abi=2.4"
             build_linux_toolchain "arm-rockbox-linux-gnueabi" "2.26.1" "" "4.9.4" \
                 "$gccopts" "2.6.32.68" "2.19" "$glibcopts"
@@ -793,6 +825,8 @@ do
             extract "alsa-lib-$alsalib_ver"
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
+            echo "ROCKBOXDEV: Completed ARM-Linux"
+            COMPLETE="${COMPLETE}, x"
             ;;
         [yy])
             # IMPORTANT NOTE
@@ -811,6 +845,7 @@ do
             # require support for up to glibc 2.4
             # We use a recent 2.26.1 binutils to avoid any build problems and
             # avoid patches/bugs.
+            echo "ROCKBOXDEV: Building MIPS-Linux."
             glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.4"
             # FIXME: maybe add -mhard-float
             build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
@@ -823,6 +858,8 @@ do
             extract "alsa-lib-$alsalib_ver"
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
+            echo "ROCKBOXDEV: Completed MIPS-Linux"
+            COMPLETE="${COMPLETE}, y"
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
@@ -833,6 +870,7 @@ done
 
 echo ""
 echo "ROCKBOXDEV: Done!"
+echo "Completed Targets: ${COMPLETE:2}"
 echo ""
 echo "ROCKBOXDEV: Make sure your PATH includes $prefix/bin"
 echo ""
