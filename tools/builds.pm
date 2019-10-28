@@ -33,6 +33,7 @@ $releasenotes="/wiki/ReleaseNotes314";
         name => 'Archos Recorder v1',
         status => 3,
         ram => 2,
+        release => '3.13',
     },
     'archosrecorderv2' => {
         name => 'Archos Recorder v2', 
