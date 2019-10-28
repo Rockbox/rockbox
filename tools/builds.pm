@@ -154,7 +154,7 @@ $releasenotes="/wiki/ReleaseNotes314";
     },
     'ipod6g' => {
         name => 'iPod 6th gen (Classic)',
-        status => 2,
+        status => 3,
     },
     'iriverh10' => {
         name => 'iriver H10 20GB',
