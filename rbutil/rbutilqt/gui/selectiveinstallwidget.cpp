@@ -483,22 +483,51 @@ void SelectiveInstallWidget::installThemes(void)
     }
 }
 
+static const struct {
+    const char *name;
+    const char *pluginpath;
+    SystemInfo::SystemInfos zipurl; // add new games to SystemInfo
+} GamesList[] = {
+    { "Doom",          "/.rockbox/rocks/games/doom.rock",         SystemInfo::DoomUrl      },
+    { "Duke3D",        "/.rockbox/rocks/games/duke3d.rock",       SystemInfo::Duke3DUrl    },
+    { "Quake",         "/.rockbox/rocks/games/quake.rock",        SystemInfo::QuakeUrl     },
+    { "Puzzles fonts", "/.rockbox/rocks/games/sgt-blackbox.rock", SystemInfo::PuzzFontsUrl },
+    { "Wolf3D",        "/.rockbox/rocks/games/wolf3d.rock",       SystemInfo::Wolf3DUrl    },
+    { "XWorld",        "/.rockbox/rocks/games/xworld.rock",       SystemInfo::XWorldUrl    },
+};
 
 void SelectiveInstallWidget::installGamefiles(void)
 {
     if(ui.gamefileCheckbox->isChecked()) {
-    // check if installed Rockbox has doom plugin. If not disable doom.
-        if(!QFileInfo(m_mountpoint + "/.rockbox/rocks/games/doom.rock").exists()) {
-            m_logger->addItem(tr("Your installation doesn't require game files, skipping."), LOGINFO);
-            emit installSkipped(false);
+        // build a list of zip urls that we need, then install
+        QStringList gameUrls;
+        QStringList gameNames;
+
+        for(unsigned int i = 0; i < sizeof(GamesList) / sizeof(GamesList[0]); i++)
+        {
+            // check if installed Rockbox has this plugin.
+            if(QFileInfo(m_mountpoint + GamesList[i].pluginpath).exists()) {
+                gameNames.append(GamesList[i].name);
+                gameUrls.append(SystemInfo::value(GamesList[i].zipurl).toString());
+                LOG_INFO() << gameUrls.at(gameUrls.size() - 1);
+            }
         }
+
+        if(gameUrls.size() == 0)
+        {
+            m_logger->addItem(tr("Your installation doesn't require any game files, skipping."), LOGINFO);
+            emit installSkipped(false);
+            return;
+        }
+
         LOG_INFO() << "installing gamefiles";
+
         // create new zip installer
         if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
 
-        m_zipinstaller->setUrl(SystemInfo::value(SystemInfo::DoomUrl).toString());
-        m_zipinstaller->setLogSection("Game Addons");
+        m_zipinstaller->setUrl(gameUrls);
+        m_zipinstaller->setLogSection(gameNames);
         m_zipinstaller->setLogVersion();
         m_zipinstaller->setMountPoint(m_mountpoint);
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
@@ -523,4 +552,3 @@ void SelectiveInstallWidget::changeEvent(QEvent *e)
         QWidget::changeEvent(e);
     }
 }
-
