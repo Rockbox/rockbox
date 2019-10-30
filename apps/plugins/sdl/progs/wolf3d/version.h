@@ -11,7 +11,7 @@
 
 //#define SPEAR
 //#define SPEARDEMO
-//#define UPLOAD
+#define UPLOAD
 #define GOODTIMES
 #define CARMACIZED
 //#define APOGEE_1_0
