@@ -34,7 +34,8 @@ for key, val in pairs(rb.actions) do
 end
 rb.actions, rb.contexts = nil, nil
 --------------------------------------
-
+local action_ev = pla.ACTION_NONE
+local screen_redraw = "custom"
 local _LCD = rb.lcd_framebuffer()
 local rocklib_image = getmetatable(_LCD)
 local _ellipse = rocklib_image.ellipse
@@ -106,6 +107,14 @@ local function random_color()
     color = (rb.LCD_DEPTH == 2) and (3 - color) or color -- invert for 2-bit screens
 
     return color
+end
+
+function action_event(action)
+    if action == pla.PLA_EXIT or action == pla.PLA_CANCEL then
+        action_ev = pla.PLA_EXIT
+    else
+        action_ev = action
+    end
 end
 
 local Ball = {
@@ -283,7 +292,7 @@ function Cursor:do_action(action)
 
     self.x = clamp_roll(self.x + xi, 1, LCD_W - self.sz)
     self.y = clamp_roll(self.y + yi, 1, LCD_H - self.sz)
-
+    action_ev = pla.ACTION_NONE
     return false
 end
 
@@ -316,15 +325,16 @@ end
 
 local function start_round(level, goal, nrBalls, total)
     local player_added, score = false, 0
+    local is_exit = false;
     local last_expend, nrBalls_expend = 0, 0
     local balls_exploded = 1 -- keep looping when player_added == false
-    local action = 0
+
     local Balls = {}
     local str_level = string.format(FMT_LEVEL, level) -- static
     local str_totpts = string.format(FMT_TOTPTS, total) -- static
     local str_expend, str_lvlpts
     local tick, cursor
-    local test_spd = false
+   test_spd = false
 
     local function update_stats()
         -- we only create a new string when a hit is detected
@@ -347,7 +357,7 @@ local function start_round(level, goal, nrBalls, total)
                             color = cursor.color,
                             step_delay = 3,
                             explosion_sz = (3 * DEFAULT_BALL_SZ),
-                            life_ticks = (test_time == true) and (100) or 
+                            life_ticks = (test_spd) and (100) or
                                         irand(rb.HZ * 2, rb.HZ * DEFAULT_BALL_SZ),
                             sz = 10,
                             state = B_EXPLODE
@@ -376,8 +386,9 @@ local function start_round(level, goal, nrBalls, total)
                             step = function() test_spd = test_spd + 1 end
                         })
                     )
-        add_player()
         test_spd = 0
+        add_player()
+
     else
         set_foreground(DEFAULT_FG_CLR) -- color for text
         cursor = Cursor:new()
@@ -391,22 +402,25 @@ local function start_round(level, goal, nrBalls, total)
     -- Make sure there are no unwanted touchscreen presses
     rb.button_clear_queue()
 
+    action_ev = pla.ACTION_NONE
+
     update_stats() -- load status strings
+
+    rockev.trigger(screen_redraw)
 
      -- Check if the round is over
     while balls_exploded > 0 do
         tick = rb.current_tick()
 
-        if action ~= pla.ACTION_NONE and (action == pla.PLA_EXIT or
-                                          action == pla.PLA_CANCEL) then
-            action = pla.PLA_EXIT
+        if action_ev == pla.PLA_EXIT then
+            is_exit = true
             break
         end
 
         rb.lcd_clear_display()
 
         if not player_added then
-            if action ~= pla.ACTION_NONE and cursor:do_action(action) then
+            if action ~= pla.ACTION_NONE and cursor:do_action(action_ev) then
                 add_player()
             elseif not HAS_TOUCHSCREEN then
                 cursor:draw()
@@ -443,7 +457,7 @@ local function start_round(level, goal, nrBalls, total)
         end
 
         draw_stats() -- stats redrawn every frame
-        rb.lcd_update() -- Push framebuffer to the LCD
+        --rb.lcd_update() -- Push framebuffer to the LCD
 
         if nrBalls_expend ~= last_expend then -- hit detected?
             last_expend = nrBalls_expend
@@ -453,8 +467,6 @@ local function start_round(level, goal, nrBalls, total)
         end
 
         rb.yield() -- yield to other tasks
-
-        action = rb.get_plugin_action(0) -- Check for actions
     end
 
     if test_spd and test_spd > 0 then return test_spd end
@@ -480,8 +492,9 @@ local function start_round(level, goal, nrBalls, total)
     draw_stats()
     rb.lcd_update()
     wait_anykey(2)
+    rockev.trigger(screen_redraw, false)
 
-    return action == pla.PLA_EXIT, score, nrBalls_expend
+    return is_exit, score, nrBalls_expend
 end
 
 -- Helper function to display a message
@@ -530,7 +543,7 @@ do  -- attempt to get stats to fit on screen
     if (w0 + w1) > LCD_W then
         FMT_EXPEND, FMT_LEVEL = "%d balls", "Lv %d"
     end
-    w0, w1 = getwidth(FMT_TOTPTS), getwidth(FMT_LVPTS) 
+    w0, w1 = getwidth(FMT_TOTPTS), getwidth(FMT_LVPTS)
     if (w0 + w1 + getwidth("0000000")) > LCD_W then
         FMT_TOTPTS, FMT_LVPTS = "%d total", "%d lv"
     end
@@ -542,13 +555,16 @@ end
 
 rb.backlight_force_on()
 
-math.randomseed(os.time())
+local eva  = rockev.register("action", action_event)
+local evt = rockev.register(screen_redraw, rb.lcd_update, 1)
+
+math.randomseed(os.time() or 1)
 
 local idx, highscore = 1, 0
 
 local test_spd = start_round(0, 0, 0, 0) -- test speed of target
-
-if test_spd < 100 then 
+--rb.splash(rb.HZ, test_spd)
+if test_spd < 100 then
     rb.splash(100, "Slow Target..")
 
     if test_spd < 25 then
@@ -567,9 +583,9 @@ while levels[idx] ~= nil do
 
     disp_msg(rb.HZ * 2, "Level %d: get %d out of %d balls", idx, goal, nrBalls)
 
-    local exit, score, nrBalls_expend = start_round(idx, goal, nrBalls, highscore)
+    local is_exit, score, nrBalls_expend = start_round(idx, goal, nrBalls, highscore)
 
-    if exit then
+    if is_exit then
         break -- Exiting..
     else
         highscore = calc_score(highscore, idx, goal, nrBalls_expend)
@@ -594,3 +610,4 @@ end
 
 -- Restore user backlight settings
 rb.backlight_use_settings()
+os.exit()
