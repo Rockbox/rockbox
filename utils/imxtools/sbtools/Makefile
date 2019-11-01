@@ -1,11 +1,13 @@
 DEFINES=
-CC=gcc
-CXX=g++
-LD=g++
-CFLAGS=-O3 -g -std=c99 -Wall `pkg-config --cflags libusb-1.0` $(DEFINES)
-CXXFLAGS=-O3 -g -Wall `pkg-config --cflags libcrypto++` $(DEFINES)
-LDFLAGS=`pkg-config --libs libusb-1.0` `pkg-config --libs libcrypto++`
-BINS=elftosb sbtoelf sbloader rsrctool elftosb1
+CC := gcc
+CXX := g++
+LD := g++
+
+LIBUSB := $(shell pkg-config --cflags libusb-1.0)
+CFLAGS := -O3 -g -std=c99 -Wall $(shell pkg-config --cflags libusb-1.0) $(DEFINES)
+CXXFLAGS := -O3 -g -Wall $(pkg-config --cflags libcrypto++) $(DEFINES)
+LDFLAGS := $(shell pkg-config --libs libusb-1.0) $(shell pkg-config --libs libcrypto++)
+BINS := elftosb sbtoelf sbloader rsrctool elftosb1
 
 all: $(BINS)
 
