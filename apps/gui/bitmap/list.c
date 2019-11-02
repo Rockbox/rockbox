@@ -228,8 +228,6 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         int line_indent = 0;
         int style = STYLE_DEFAULT;
         bool is_selected = false;
-        icon = list->callback_get_item_icon ?
-                    list->callback_get_item_icon(i, list->data) : Icon_NOICON;
         s = list->callback_get_item_name(i, list->data, entry_buffer,
                                          sizeof(entry_buffer));
         entry_name = P2STR(s);
@@ -265,6 +263,17 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                 && i <  list->selected_item + list->selected_size
                 && list->show_selection_marker)
         {/* The selected item must be displayed scrolling */
+#ifdef HAVE_LCD_COLOR
+            if (list->selection_color)
+            {
+                /* Display gradient line selector */
+                style = STYLE_GRADIENT;
+                linedes.text_color = list->selection_color->text_color;
+                linedes.line_color = list->selection_color->line_color;
+                linedes.line_end_color = list->selection_color->line_end_color;
+            }
+            else
+#endif
             if (global_settings.cursor_style == 1
 #ifdef HAVE_REMOTE_LCD
                     /* the global_settings.cursor_style check is here to make
@@ -313,7 +322,8 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         linedes.style = style;
         linedes.scroll = is_selected ? true : list->scroll_all;
         linedes.line = i % list->selected_size;
-
+        icon = list->callback_get_item_icon ?
+                    list->callback_get_item_icon(i, list->data) : Icon_NOICON;
         /* the list can have both, one of or neither of cursor and item icons,
          * if both don't apply icon padding twice between the icons */
         if (show_cursor && have_icons)

@@ -26,6 +26,7 @@
 #include "icon.h"
 #include "screen_access.h"
 #include "skin_engine/skin_engine.h"
+#include "line.h"
 
 #define SCROLLBAR_WIDTH global_settings.scrollbar_width
 
@@ -85,6 +86,26 @@ typedef int list_speak_item(int selected_item, void * data);
  *          selected item, negative value for default coloring.
  */
 typedef int list_get_color(int selected_item, void * data);
+
+struct list_selection_color
+{
+    /* text color, in native lcd format
+     * (convert with LCD_RGBPACK() if necessary) */
+    unsigned text_color;
+    /* only STYLE_GRADIENT supported set line_color & line_end_color the same
+     * for solid color, in native
+     * lcd format (convert with LCD_RGBPACK() if necessary) */
+    unsigned line_color;
+    unsigned line_end_color;
+    /* viewport foreground and background, in native
+     * lcd format (convert with LCD_RGBPACK() if necessary) */
+    unsigned fg_color;
+    unsigned bg_color;
+    /* To enable:
+     * call gui_synclist_set_sel_color(gui_synclist*, list_selection_color*)
+     * If using the default viewport you should call 
+     * gui_synclist_set_sel_color(gui_synclist*, NULL) when finished */
+};
 #endif
 
 struct gui_synclist
@@ -120,6 +141,7 @@ struct gui_synclist
 #ifdef HAVE_LCD_COLOR
     int title_color;
     list_get_color *callback_get_item_color;
+    struct list_selection_color *selection_color;
 #endif
     struct viewport *parent[NB_SCREENS];
 };
@@ -146,6 +168,7 @@ extern void gui_synclist_set_voice_callback(struct gui_synclist * lists, list_sp
 extern void gui_synclist_set_viewport_defaults(struct viewport *vp, enum screen_type screen);
 #ifdef HAVE_LCD_COLOR
 extern void gui_synclist_set_color_callback(struct gui_synclist * lists, list_get_color color_callback);
+extern void gui_synclist_set_sel_color(struct gui_synclist * lists, struct list_selection_color *list_sel_color);
 #endif
 extern void gui_synclist_speak_item(struct gui_synclist * lists);
 extern int gui_synclist_get_nb_items(struct gui_synclist * lists);
@@ -232,6 +255,8 @@ struct simplelist_info {
     int selection_size; /* list selection size, usually 1 */
     bool hide_selection;
     bool scroll_all;
+    bool hide_theme;
+    bool speak_onshow; /* list speaks first item or 'empty list' */
     int  timeout;
     int  selection; /* the item to select when the list is first displayed */
                     /* when the list is exited, this will be set to the
@@ -248,6 +273,7 @@ struct simplelist_info {
     list_speak_item *get_talk; /* can be NULL to not speak */
 #ifdef HAVE_LCD_COLOR
     list_get_color *get_color;
+    struct list_selection_color *selection_color;
 #endif
     void *callback_data; /* data for callbacks */
 };
@@ -275,12 +301,15 @@ void simplelist_addline(const char *fmt, ...);
     info.selection_size = 1;
     info.hide_selection = false;
     info.scroll_all = false;
+    info.hide_theme = false;
+    info.speak_onshow = true;
     info.action_callback = NULL;
     info.title_icon = Icon_NOICON;
     info.get_icon = NULL;
     info.get_name = NULL;
     info.get_voice = NULL;
     info.get_color = NULL;
+    info.list_selection_color = NULL;
     info.timeout = HZ/10;
     info.selection = 0;
 */
