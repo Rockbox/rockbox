@@ -206,6 +206,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
 #ifdef HAVE_LCD_COLOR
     gui_list->title_color = -1;
     gui_list->callback_get_item_color = NULL;
+    gui_list->selection_color = NULL;
 #endif
 }
 
@@ -564,6 +565,22 @@ void gui_synclist_set_color_callback(struct gui_synclist * lists,
                                      list_get_color color_callback)
 {
     lists->callback_get_item_color = color_callback;
+}
+
+void gui_synclist_set_sel_color(struct gui_synclist * lists,
+                                struct list_selection_color *list_sel_color)
+{
+    lists->selection_color = list_sel_color;
+    if(list_sel_color)
+    {
+        FOR_NB_SCREENS(i) /* might need to be only SCREEN_MAIN */
+        {
+            lists->parent[i]->fg_pattern = list_sel_color->fg_color;
+            lists->parent[i]->bg_pattern = list_sel_color->bg_color;
+        }
+    }
+    else
+        list_init_viewports(lists);
 }
 #endif
 
@@ -951,7 +968,7 @@ bool simplelist_show_list(struct simplelist_info *info)
         getname = simplelist_static_getname;
 
     FOR_NB_SCREENS(i)
-        viewportmanager_theme_enable(i, true, NULL);
+        viewportmanager_theme_enable(i, !info->hide_theme, NULL);
 
     gui_synclist_init(&lists, getname,  info->callback_data,
                       info->scroll_all, info->selection_size, NULL);
@@ -965,6 +982,8 @@ bool simplelist_show_list(struct simplelist_info *info)
 #ifdef HAVE_LCD_COLOR
     if (info->get_color)
         gui_synclist_set_color_callback(&lists, info->get_color);
+    if (info->selection_color)
+        gui_synclist_set_sel_color(&lists, info->selection_color);
 #endif
 
     if (info->hide_selection)
@@ -985,7 +1004,9 @@ bool simplelist_show_list(struct simplelist_info *info)
     gui_synclist_select_item(&lists, info->selection);
 
     gui_synclist_draw(&lists);
-    gui_synclist_speak_item(&lists);
+
+    if (info->speak_onshow)
+        gui_synclist_speak_item(&lists);
 
     while(1)
     {
@@ -1016,6 +1037,11 @@ bool simplelist_show_list(struct simplelist_info *info)
             info->selection = -1;
             break;
         }
+        else if (action == ACTION_STD_OK)
+        {
+            info->selection = gui_synclist_get_sel_pos(&lists);
+            break;
+        }
         else if ((action == ACTION_REDRAW) ||
                  (list_is_dirty(&lists)) ||
                  (old_line_count != simplelist_line_count))
@@ -1032,6 +1058,12 @@ bool simplelist_show_list(struct simplelist_info *info)
             return true;
     }
     talk_shutup();
+
+#ifdef HAVE_LCD_COLOR
+    if (info->selection_color)
+        gui_synclist_set_sel_color(&lists, NULL);
+#endif
+
     FOR_NB_SCREENS(i)
         viewportmanager_theme_undo(i, false);
     return false;
@@ -1045,6 +1077,8 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->selection_size = 1;
     info->hide_selection = false;
     info->scroll_all = false;
+    info->hide_theme = false;
+    info->speak_onshow = true;
     info->timeout = HZ/10;
     info->selection = 0;
     info->action_callback = NULL;
@@ -1054,6 +1088,7 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->get_talk = NULL;
 #ifdef HAVE_LCD_COLOR
     info->get_color = NULL;
+    info->selection_color = NULL;
 #endif
     info->callback_data = data;
     simplelist_line_count = 0;
