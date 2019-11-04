@@ -1059,7 +1059,7 @@ static int solitaire_menu(bool in_game)
                         "Resume Game", "Start New Game",
                         "Draw Cards Option",
                         "Help", "Playback Control",
-                        "Save and Quit", "Quit");
+                        "Quit without Saving", "Quit");
     _ingame = in_game;
 
     while (result < 0)
@@ -1099,11 +1099,11 @@ static int solitaire_menu(bool in_game)
                  break;
 
             case 5:
-                result = MENU_SAVE_AND_QUIT;
+                result = MENU_QUIT;
                 break;
 
             case 6:
-                result = MENU_QUIT;
+                result = MENU_SAVE_AND_QUIT;
                 break;
         }
     }
