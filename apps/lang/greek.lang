@@ -1158,19 +1158,22 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Θορυβοποίηση (Dithering)"
+    lcd_bitmap: "Χρωματική αντιπαράθεση"
   </dest>
   <voice>
     *: none
     swcodec: "Θορυβοποίηση, ντίδερινκγ"
+    lcd_bitmap: "Χρωματική αντιπαράθεση"
   </voice>
 </phrase>
 <phrase>
@@ -13536,13 +13539,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Bypass"
+    *: none
+    es9018: "Bypass"
   </source>
   <dest>
-    *: "Παράβλεψη"
+    *: none
+    es9018: "Παράκαμψη"
   </dest>
   <voice>
-    *: "Παράβλεψη"
+    *: none
+    es9018: "Παράκαμψη"
   </voice>
 </phrase>
 <phrase>
@@ -13634,13 +13640,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Short"
+    *: none
+    es9018: "Short"
   </source>
   <dest>
-    *: "Σύντομο"
+    *: none
+    es9018: "Σύντομο"
   </dest>
   <voice>
-    *: "Σύντομο"
+    *: none
+    es9018: "Σύντομο"
   </voice>
 </phrase>
 <phrase>
@@ -13697,5 +13706,2646 @@
   </dest>
   <voice>
     *: "Ποτέ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Αλλαγή Έντασης"
+  </dest>
+  <voice>
+    *: "Αλλαγή Έντασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Rebuild cache"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ανάκτηση προσορινής μνήμης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ανάκτηση προσορινής μνήμης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Υποφάκελοι]"
+  </dest>
+  <voice>
+    *: "Υποφάκελοι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Εμφάνιση Επιλογών"
+  </dest>
+  <voice>
+    *: "Εμφάνιση Επιλογών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 6: 40 κινήσεις / 120 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 6: 40 κινήσεις ανά 120 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Φόρτωση της προεπιλεγμένης διαμόρφωσης"
+  </dest>
+  <voice>
+    *: "Φόρτωση της προεπιλεγμένης διαμόρφωσης"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Ο μετρητής μπαταρίας εκτελείται είδη"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Ιδιότητες φακέλου"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Arghs ανά φαγητό"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Arghs ανά φαγητό"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "Έλεγχος με 2 πλήκτρα"
+  </dest>
+  <voice>
+    *: "Έλεγχος με 2 πλήκτρα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Χρήση ρύθμισης ήχου"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Χρήση ρύθμισης ήχου"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Επαναφορά στις Προεπιλεγμένες Ρυθμίσεις"
+  </dest>
+  <voice>
+    *: "Επαναφορά στις Προεπιλεγμένες Ρυθμίσεις"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Παύση / Αναπαραγωγή"
+  </dest>
+  <voice>
+    *: "Παύση / Αναπαραγωγή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 5: 40 κινήσεις / 60 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 5: 40 κινήσεις ανά 60 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Προβολή στο τέλος"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Προβολή στο τέλος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Direct"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Άμεσο"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Άμεσο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Σφάλμα κατά τη συλλογή των πληροφοριών"
+  </dest>
+  <voice>
+    *: "Σφάλμα κατά τη συλλογή των πληροφοριών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ανάπτυξη Σκουλικιού ανά Φαγητό"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ανάπτυξη Σκουλικιού ανά Φαγητό"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Ordered"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ταξινομήθηκαν"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ταξινομήθηκαν"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ταχύτητα Σκουλικιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ταχύτητα Σκουλικιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Διάχυση"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Διάχυση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Εκκαθάριση όλων των συνεχίσεων"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Εκκαθάριση όλων των συνεχίσεων"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Έλεγχος Αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Έλεγχος Αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Μετακίνηση Στοιχείου Κάτω"
+  </dest>
+  <voice>
+    *: "Μετακίνηση Στοιχείου Κάτω"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Παιχνίδια"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Παίξτε σκουλίκι!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Παίξτε σκουλίκι!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Αλλαγή Τρόπου Επανάληψης"
+  </dest>
+  <voice>
+    *: "Αλλαγή Τρόπου Επανάληψης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Εναλλαγή λειτουργίας παρουσίασης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Εναλλαγή λειτουργίας παρουσίασης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Μετακίνηση Στοιχείου Πάνω"
+  </dest>
+  <voice>
+    *: "Μετακίνηση Στοιχείου Πάνω"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Πατήστε αναπαραγωγή για να εκτελέσετε το μετρητή μπαταρίας ή διακοπή για ακύρωση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "New Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Νέο Παιχνίδι"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Νέο Παιχνίδι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Display FPS"
+    lcd_bitmap: "Display FPS"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Εμφάνιση FPS"
+    lcd_bitmap: "Εμφάνιση FPS"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Εμφάνιση FPS"
+    lcd_bitmap: "Εμφάνιση FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Φωτεινότητα οθόνης"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Φωτεινότητα οθόνης"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Λίστα αναπαραγωγής χρόνος που πέρασε: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Λίστα αναπαραγωγής χρόνος που πέρασε"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Ολοκληρώθηκε"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Έλεγχος!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No album art found"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Δεν βρέθηκε album art"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Δεν βρέθηκε album art"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "πλευρά του βασιλιά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Περιβάλλον"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Περιβάλλον"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Προβολή στην κορυφή"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Προβολή στην κορυφή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining: %s"
+  </source>
+  <dest>
+    *: "Κομμάτι απομαίνει: %s"
+  </dest>
+  <voice>
+    *: "Κομμάτι απομαίνει"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Επιλογές Συνέχισης"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Επιλογές Συνέχισης"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Always On"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Πάντα Ενεργοποιημένο"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Πάντα Ενεργοποιημένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 7: 40 κινήσεις / 240 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 7: 40 κινήσεις ανά 240 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 9: 1 κίνηση / 60 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 9: 1 κίνηση ανά 60 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cache will be rebuilt on next restart"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Η προσορινή μνήμη θ'ανακτιθεί στην επόμενη επανεκίνηση"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Η προσορινή μνήμη θ'ανακτιθεί στην επόμενη επανεκίνηση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Διακοπή Αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Διακοπή Αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of slides"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Αριθμός διαφανιών"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αριθμός διαφανιών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Συνέχιση αυτόματα"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Συνέχιση αυτόματα"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Αναπαραγωγή απ'την αρχή"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Αναπαραγωγή απ'την αρχή"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Food Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Μέγεθως Φαγητού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Μέγεθως Φαγητού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 1: 60 κινήσεις / 5 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 1: 60 κινήσεις ανά 5 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Σφάλμα στην ανάλυση του παιχνιδιού !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Σφάλμα στην ανάλυση του παιχνιδιού !"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No games found !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Δεν βρέθηκαν παιχνίδια !"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Δεν βρέθηκαν παιχνίδια!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Αποθήκευση και Έξωδος"
+  </dest>
+  <voice>
+    *: "Αποθήκευση και Έξωδος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Δεν είναι αρχείο VBR"
+  </dest>
+  <voice>
+    *: "Δεν είναι αρχείο VBR"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 3: 60 κινήσεις / 30 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 3: 60 κινήσεις ανά 30 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Saving position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Αποθήκευση θέσης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αποθήκευση θέσης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Προβολή τίτλου άλμπουμ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Προβολή τίτλου άλμπουμ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 2: 60 κινήσεις / 15 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 2: 60 κινήσεις ανά 15 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ενύσχιση CPU"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ενύσχιση CPU"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Παράβλεψη πλαισίων"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Παράβλεψη πλαισίων"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "Έλεγχος με 4 Πλήκτρα"
+  </dest>
+  <voice>
+    *: "Έλεγχος με 4 Πλήκτρα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 8: 1 κίνηση / 15 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 8: 1 κίνηση ανά 15 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track %d / %d %d%%"
+  </source>
+  <dest>
+    *: "Κομμάτι %d / %d %d%%"
+  </dest>
+  <voice>
+    *: "Κομμάτι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Διάταξη κύριου μενού του Rockbox"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Αποτυχία στη συλλογή των πληροφοριών"
+  </dest>
+  <voice>
+    *: "Αποτυχία στη συλλογή των πληροφοριών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADDED_TO_PLAYLIST
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Added to playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Προστέθηκε στη λίστα αναπαραγωγής"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Προστέθηκε στη λίστα αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Χρήση κινής ρύθμισης"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Λειτουργία ημιτόνου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ρύθμιση χρόνου συνέχισης (λεπτά)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ρύθμιση χρόνου συνέχισης"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Χρόνος αναπαραγωγής"
+  </dest>
+  <voice>
+    *: "Χρόνος αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "Σφάλμα αρχείου: %d"
+  </dest>
+  <voice>
+    *: "Σφάλμα αρχείου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Μέγεθος Argh"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Μέγεθος Argh"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ύπος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Save Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Αποθήκευση Παιχνιδιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αποθήκευση Παιχνιδιού"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Βασιλιάς"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Έλεγχος Στυλ"
+  </dest>
+  <voice>
+    *: "Έλεγχος Στυλ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Άλμπουμ]"
+  </dest>
+  <voice>
+    *: "Άλμπουμ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate: %ld kbps"
+  </source>
+  <dest>
+    *: "Ρυθμός μετάδωσης κατά μέσο όρο: %ld kbps"
+  </dest>
+  <voice>
+    *: "Ρυθμός μετάδωσης κατά μέσο όρο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resize Covers"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Αλλαγή Μεγέθους Εξωφύλων"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αλλαγή Μεγέθους Εξωφύλων"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "GNU Σκάκι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Ημερομηνία]"
+  </dest>
+  <voice>
+    *: "Ημερομηνία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Zoom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ζουμ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ζουμ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Επιστροφή"
+  </dest>
+  <voice>
+    *: "Επιστροφή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Χρόνος]"
+  </dest>
+  <voice>
+    *: "Χρόνος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CLEARED
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Playlist Cleared"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Η λίστα αναπαραγωγής Άδειασε"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Η λίστα αναπαραγωγής Άδειασε"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Spacing"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Διαχωρισμός"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Διαχωρισμός"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Μη επιλεγμένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Έξωδος"
+  </dest>
+  <voice>
+    *: "Έξωδος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επαναφορά Παιχνιδιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επαναφορά Παιχνιδιού"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αξιωματικός"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "Χωρίς τηλεχειριστήριο"
+  </dest>
+  <voice>
+    *: "Χωρίς τηλεχειριστήριο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Στάση του γκρι"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Στάση του γκρι"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Βασίλισσα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Φάκελος Ηχογράφησης"
+  </dest>
+  <voice>
+    *: none
+    recording: "Φάκελος Ηχογράφησης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Τρόπος Αναπαραγωγής"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Τρόπος Αναπαραγωγής"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επανεκίνηση Παιχνιδιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επανεκίνηση Παιχνιδιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Εναλλαγή στοιχείου"
+  </dest>
+  <voice>
+    *: "Εναλλαγή στοιχείου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Loading position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Φόρτωση θέσης"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Φόρτωση θέσης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Τηλεχειριστήριο"
+  </dest>
+  <voice>
+    *: "Τηλεχειριστήριο"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Player"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Έκταση χρόνου"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Πιόνι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Απόκρυψη τίτλου άλμπουμ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Απόκρυψη τίτλου άλμπουμ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Έλεγχος τόνου"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Έλεγχος τόνου"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Centre margin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Κεντρικό περιθώριο"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Κεντρικό περιθώριο"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επιλεγμένο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 10: 1 κίνηση / 600 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 10: 1 κίνηση ανά 600 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Στην αρχή του παιχνιδιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Στην αρχή του παιχνιδιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Όνομα αρχείου]"
+  </dest>
+  <voice>
+    *: "Όνομα αρχείου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ματ!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ματ!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Go to WPS"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Μετάβαση στην οθόνη κατά την αναπαραγωγή"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Μετάβαση στην οθόνη κατά την αναπαραγωγή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Συνέχιση Παιχνιδιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Συνέχιση Παιχνιδιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Via Track list"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Μέσω Λίστας κομματιών"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Μέσω Λίστας κομματιών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Μονό"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Μονό"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Παρεμβολή"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Παρεμβολή"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Αριθμός Σκουλικιών"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αριθμός Σκουλικιών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Slideshow Time"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Χρόνος προβολής διαφάνιας"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Χρόνος προβολής διαφάνιας"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Προβολή παιχνιδιών που έχουν παιχτεί"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Προβολή παιχνιδιών που έχουν παιχτεί"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Αρχεία]"
+  </dest>
+  <voice>
+    *: "Αρχεία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Μενού έναρξης"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Μενού έναρξης"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Εναλλαγή Καναλιών"
+  </dest>
+  <voice>
+    *: "Εναλλαγή Καναλιών"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Άσπρο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "WPS Integration"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ενσωμάτωση οθόνης κατά την αναπαραγωγή"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ενσωμάτωση οθόνης κατά την αναπαραγωγή"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Απόλυτη λειτουργία"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Αδύνατη η επανεκίνηση της αναπαραγωγής"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Αδύνατη η επανεκίνηση της αναπαραγωγής"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "πλευρά της βασίλισσας"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Πύργος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Καθιστέρηση Πριν την συνέχιση"
+  </dest>
+  <voice>
+    *: none
+    charging: "Καθιστέρηση Πριν την συνέχιση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Κομμάτι πέρασε: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Κομμάτι πέρασε"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist remaining: %s"
+  </source>
+  <dest>
+    *: "Λίστα αναπαραγωγής απομαίνει: %s"
+  </dest>
+  <voice>
+    *: "Λίστα αναπαραγωγής απομαίνει"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "Ιδιότητες αρχείου"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Λάθως κίνηση!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Λάθως κίνηση!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Thinking..."
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Σκέφτεται..."
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size: %s"
+  </source>
+  <dest>
+    *: "Μέσος όρος μεγέθους κομματιού: %s"
+  </dest>
+  <voice>
+    *: "Μέσος όρος μεγέθους κομματιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Επιλογές Ήχου"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Επιλογές Ήχου"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Όριο FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Όριο FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TITLE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Τίτλος]"
+  </dest>
+  <voice>
+    *: "Τίτλος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error writing config"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Σφάλμα κατά τη δημιουργία παραμέτρων"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Σφάλμα κατά τη δημιουργία παραμέτρων"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Αριθμός Παικτών"
+  </dest>
+  <voice>
+    *: "Αριθμός Παικτών"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage: %s (done %s, remaining %s)"
+  </source>
+  <dest>
+    *: "Αποθήκευση: %s (ολοκληρώθηκε %s, απομαίνει %s)"
+  </dest>
+  <voice>
+    *: "Αποθήκευση"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DURATION
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Duration]"
+  </source>
+  <dest>
+    *: "[Διάρκεια]"
+  </dest>
+  <voice>
+    *: "Διάρκεια"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Στο τέλος του παιχνιδιού"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Στο τέλος του παιχνιδιού"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Εκτώς ελέγχου"
+  </dest>
+  <voice>
+    *: "Εκτώς ελέγχου"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Μέγεθος]"
+  </dest>
+  <voice>
+    *: "Μέγεθος"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Διαχωρισμός διαγράμμισης"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Διαχωρισμός διαγράμμισης"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "κάστρο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Μη διαθέσιμο"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Μη διαθέσιμο"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Προηγούμενο κομμάτι"
+  </dest>
+  <voice>
+    *: "Προηγούμενο κομμάτι"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Ανακατεμένα"
+  </dest>
+  <voice>
+    *: "Ανακατεμένα"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Καλλιτέχνης]"
+  </dest>
+  <voice>
+    *: "Καλλιτέχνης"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επίπεδο 4: 40 κινήσεις / 30 λ"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επίπεδο 4: 40 κινήσεις ανά 30 λεπτά"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Αντήχηση"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Αντήχηση"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Μενού έναρξης αν δεν ολοκληρώθηκε"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Μενού έναρξης αν δεν ολοκληρώθηκε"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Επιλέξτε Άλλο Παιχνίδι"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Επιλέξτε Άλλο Παιχνίδι"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "συλαμβάνει"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Διαδρομή]"
+  </dest>
+  <voice>
+    *: "Διαδρομή"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Επόμενο Κομμάτι"
+  </dest>
+  <voice>
+    *: "Επόμενο Κομμάτι"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Μαύρο"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_PLAYLIST
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Clear playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Καθαρισμός λίστας αναπαραγωγής"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Καθαρισμός λίστας αναπαραγωγής"
   </voice>
 </phrase>
