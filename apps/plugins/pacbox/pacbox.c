@@ -505,7 +505,6 @@ void ai_turn( unsigned char level, unsigned char turn)
 unsigned char ai( unsigned char turn )
 {
     unsigned char position;                       /* pac-mans current position */
-    unsigned char score = ram_[0x4E81];          /* current score */
     unsigned char level;   /* current game level */
     unsigned char map[20] = {0,1,2,3,4,5,4,4,6,7,4,8,8,9,10,10,11,10,12,12};
 
@@ -558,11 +557,9 @@ unsigned char ai( unsigned char turn )
 
 
         /*move joystick if necessary */
-        if(ai_location[level][turn] < 70)
-        {
-            if(ai_location[level][turn] < 30) /* handle turns using pinky's location as basis for turn timing */
+            if(ai_location[level][turn] < 30)
             {
-                if((ai_location[level][turn] < 10) && (ai_location[level][turn] > 0))
+                if((ai_location[level][turn] < 10) && (ai_location[level][turn] > 0)) /* handle turns using ghosts eaten as basis for turn timing */
                 {
                     if( ram_[0x4DD0] == ai_location[level][turn])
                     {
@@ -571,7 +568,7 @@ unsigned char ai( unsigned char turn )
                     }
                 }
 
-                if( ram_[0x4D31] == (ai_location[level][turn] + 30))
+                if( ram_[0x4D31] == (ai_location[level][turn] + 30)) /* handle turns using pinky's location as basis for turn timing */
                 {
                     ai_turn(level,turn);
                     turn++;
@@ -581,14 +578,6 @@ unsigned char ai( unsigned char turn )
                 ai_turn(level,turn);
                 turn++;
             } 
-        }else /* handle turns on eating ghost after center of tile using score as basis for turn timing */
-        {
-            if( score == (ai_location[level][turn]-70))
-            {
-                ai_turn(level,turn);
-                turn++;
-            }
-        }
     }
 
     /* reset turn counter and joystick direction on level start */
