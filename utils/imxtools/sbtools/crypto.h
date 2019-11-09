@@ -26,13 +26,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef uint8_t byte;
 
-/* crypto.c */
+/* crypto.cpp */
 enum crypto_method_t
 {
     CRYPTO_NONE, /* disable */
@@ -74,6 +70,10 @@ int crypto_apply(
     byte iv[16], /* IV */
     byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
     bool encrypt);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* crc.c */
 uint32_t crc(byte *data, int size);

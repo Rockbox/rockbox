@@ -30,7 +30,7 @@
 #if QT_VERSION < 0x050000
 Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #else
-Q_IMPORT_PLUGIN(AccessibleFactory)
+//Q_IMPORT_PLUGIN(AccessibleFactory)
 #endif
 #endif
 

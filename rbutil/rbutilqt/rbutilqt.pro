@@ -251,8 +251,8 @@ macx {
 }
 
 static {
-    QTPLUGIN += qtaccessiblewidgets
-    LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
+#    QTPLUGIN += qtaccessiblewidgets
+ #   LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible # -lqtaccessiblewidgets
     LIBS += -L.
     DEFINES += STATIC
     message("using static plugin")
