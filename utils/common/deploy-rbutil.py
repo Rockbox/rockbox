@@ -26,6 +26,7 @@ deploy.svnpaths = \
              "tools/ucl",
              "tools/rbspeex",
              "utils/imxtools",
+             "utils/nwztools",
              "lib/rbcodec/codecs/libspeex",
              "docs/COPYING",
              "docs/gpl-2.0.html",
