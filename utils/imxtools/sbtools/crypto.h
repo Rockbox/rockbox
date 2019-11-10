@@ -32,7 +32,7 @@ extern "C" {
 
 typedef uint8_t byte;
 
-/* crypto.c */
+/* crypto.cpp */
 enum crypto_method_t
 {
     CRYPTO_NONE, /* disable */
