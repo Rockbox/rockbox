@@ -32,6 +32,7 @@ unix:!mac:!noccache {
 }
 MACHINEFLAGS = $$find(QMAKE_CFLAGS, -m[63][42])
 EXTRALIBS_OPTS += EXTRALIBS_CC=\"$$QMAKE_CC\"
+EXTRALIBS_OPTS += EXTRALIBS_CXX=\"$$QMAKE_CXX\"
 EXTRALIBS_OPTS += EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\" \
 
 MYBUILDDIR = $$OUT_PWD/build/
@@ -251,8 +252,10 @@ macx {
 }
 
 static {
-    QTPLUGIN += qtaccessiblewidgets
-    LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
+    if(equals(QT_MAJOR_VERSION, 5) : lessThan(QT_MINOR_VERSION, 4)) | lessThan(QT_MAJOR_VERSION, 5) {
+            QTPLUGIN += qtaccessiblewidgets
+            LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
+    }
     LIBS += -L.
     DEFINES += STATIC
     message("using static plugin")

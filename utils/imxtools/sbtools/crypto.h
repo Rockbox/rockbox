@@ -26,13 +26,9 @@
 #include <string.h>
 #include <stdbool.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef uint8_t byte;
 
-/* crypto.c */
+/* crypto.cpp */
 enum crypto_method_t
 {
     CRYPTO_NONE, /* disable */
@@ -60,6 +56,10 @@ struct crypto_key_t
 #define CRYPTO_ERROR_SUCCESS    0
 #define CRYPTO_ERROR_BADSETUP   -1
 #define CRYPTO_ERROR_INVALID_OP -2
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /* parameter can be:
  * - CRYPTO_KEY: array of 16-bytes (the key)
