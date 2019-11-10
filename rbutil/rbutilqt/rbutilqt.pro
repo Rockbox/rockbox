@@ -107,7 +107,8 @@ QMAKE_EXTRA_TARGETS += tags
 
 # add a custom rule for making the translations
 LRELEASE = $$[QT_INSTALL_BINS]/lrelease
-win32:!cross {
+
+win32:!cross:!exists($$LRELEASE) {
     LRELEASE = $$[QT_INSTALL_BINS]/lrelease.exe
 }
 lrelease.commands = $$LRELEASE -silent $$_PRO_FILE_
@@ -163,6 +164,8 @@ contains(QT_MAJOR_VERSION, 5) {
         QT += multimedia
     }
 }
+
+CONFIG += c++11
 
 dbg {
     CONFIG += debug thread qt warn_on
