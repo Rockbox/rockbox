@@ -30,7 +30,7 @@
 #include "dircache_redirect.h"
 #include "disk.h"
 
-#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #include "bootdata.h"
 #include "crc32.h"
 #endif
@@ -263,7 +263,7 @@ int disk_mount_all(void)
     for (int i = 0; i < NUM_VOLUMES; i++)
         vol_drive[i] = -1; /* mark all as unassigned */
 
-#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR) && !defined(BOOTLOADER)
     unsigned int crc = 0;
     int boot_volume = 0;
     crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
