@@ -347,7 +347,7 @@ def zipball(programfiles, versionstring, buildfolder, platform=sys.platform):
     for f in programfiles:
         if re.match(r'^(/|[a-zA-Z]:)', f) != None:
             shutil.copy(f, outfolder)
-        else:
+        elif len(f) > 0:
             shutil.copy(buildfolder + "/" + f, outfolder)
     # create zipball from output folder
     zf = zipfile.ZipFile(archivename, mode='w', compression=zipfile.ZIP_DEFLATED)
