@@ -57,11 +57,21 @@ except ImportError:
 
 # == Global stuff ==
 # DLL files to ignore when searching for required DLL files.
-systemdlls = ['advapi32.dll',
+systemdlls = [
+        'advapi32.dll',
         'comdlg32.dll',
+        'crypt32.dll',
+        'd3d9.dll',
+        'dwmapi.dll',
+        'dxva2.dll',
+        'evr.dll',
         'gdi32.dll',
         'imm32.dll',
+        'imm32.dll',
+        'iphlpapi.dll',
         'kernel32.dll',
+        'mf.dll',
+        'mfplat.dll',
         'msvcrt.dll',
         'msvcrt.dll',
         'netapi32.dll',
@@ -70,9 +80,14 @@ systemdlls = ['advapi32.dll',
         'setupapi.dll',
         'shell32.dll',
         'user32.dll',
+        'userenv.dll',
+        'uxtheme.dll',
+        'version.dll',
         'winmm.dll',
         'winspool.drv',
-        'ws2_32.dll']
+        'ws2_32.dll',
+        'wtsapi32.dll'
+        ]
 
 gitrepo = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 
@@ -347,7 +362,7 @@ def zipball(programfiles, versionstring, buildfolder, platform=sys.platform):
     for f in programfiles:
         if re.match(r'^(/|[a-zA-Z]:)', f) != None:
             shutil.copy(f, outfolder)
-        elif len(f) > 0:
+        else:
             shutil.copy(buildfolder + "/" + f, outfolder)
     # create zipball from output folder
     zf = zipfile.ZipFile(archivename, mode='w', compression=zipfile.ZIP_DEFLATED)
