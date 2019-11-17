@@ -33,7 +33,8 @@ deploy.bundlecopy = {
 deploy.progexe = {
     "win32"    : "release/rbthemeeditor.exe",
     "darwin"   : "rbthemeeditor.app",
-    "linux2"   : "rbthemeeditor"
+    "linux2"   : "rbthemeeditor",
+    "linux"    : "rbthemeeditor"
 }
 deploy.regreplace = {}
 # OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
@@ -41,12 +42,14 @@ deploy.regreplace = {}
 deploy.qmakespec = {
     "win32"    : "",
     "darwin"   : "macx-g++40",
-    "linux2"   : ""
+    "linux2"   : "",
+    "linux"    : ""
 }
 deploy.make = {
     "win32"    : "mingw32-make",
     "darwin"   : "make",
-    "linux2"   : "make"
+    "linux2"   : "make",
+    "linux"    : "make"
 }
 
 # all files of the program. Will get put into an archive after building

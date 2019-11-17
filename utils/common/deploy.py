@@ -162,7 +162,7 @@ def findqt(cross=""):
                 if not result == "":
                     return result
         except:
-            print(sys.exc_value)
+            print(sys.exc_info()[1])
 
     return ""
 
@@ -180,11 +180,11 @@ def checkqt(qmakebin):
     cmdout = output.communicate()
     # don't check the qmake return code here, Qt3 doesn't return 0 on -version.
     for ou in cmdout:
-        r = re.compile("Qt[^0-9]+([0-9\.]+[a-z]*)")
+        r = re.compile(b'Qt[^0-9]+([0-9\.]+[a-z]*)')
         m = re.search(r, ou)
-        if not m == None:
-            print("Qt found: %s" % m.group(1))
-            s = re.compile("[45]\..*")
+        if m is not None:
+            print("Qt found: %s" % m.group(1).decode())
+            s = re.compile(b'[45]\..*')
             n = re.search(s, m.group(1))
             if n is not None:
                 result = qmakebin
@@ -302,7 +302,7 @@ def nsisfileinject(nsis, outscript, filelist):
         output.write(line)
         # inject files after the progexe binary.
         # Match the basename only to avoid path mismatches.
-        if re.match(r'^\s*File\s*.*' + os.path.basename(progexe["win32"]), \
+        if re.match(r'^\s*File\s*.*' + os.path.basename(progexe["win32"]),
                     line, re.IGNORECASE):
             for f in filelist:
                 injection = "    File /oname=$INSTDIR\\" + os.path.basename(f) \
@@ -322,7 +322,7 @@ def finddlls(program, extrapaths=[], cross=""):
 
     # create list of used DLLs. Store as lower case as W32 is case-insensitive.
     dlls = []
-    for line in cmdout[0].split('\n'):
+    for line in cmdout[0].decode().split('\n'):
         if re.match(r'\s*DLL Name', line) != None:
             dll = re.sub(r'^\s*DLL Name:\s+([a-zA-Z_\-0-9\.\+]+).*$', r'\1', line)
             dlls.append(dll.lower())
@@ -429,7 +429,7 @@ def filehashes(filename):
     f = open(filename, 'rb')
     while True:
         d = f.read(65536)
-        if d == "":
+        if d == b"":
             break
         m.update(d)
         s.update(d)
@@ -440,12 +440,12 @@ def filestats(filename):
     if not os.path.exists(filename):
         return
     st = os.stat(filename)
-    print(filename, "\n", "-" * len(filename))
+    print("%s\n%s" % (filename, "-" * len(filename)))
     print("Size:    %i bytes" % st.st_size)
     h = filehashes(filename)
     print("md5sum:  %s" % h[0])
     print("sha1sum: %s" % h[1])
-    print("-" * len(filename), "\n")
+    print("%s\n" % ("-" * len(filename)))
 
 
 def tempclean(workfolder, nopro):
@@ -539,12 +539,12 @@ def deploy():
         revision = gitscraper.describe_treehash(gitrepo, treehash)
         # try to find a version number from describe output.
         # WARNING: this is broken and just a temporary workaround!
-        v = re.findall('([\d\.a-f]+)', revision)
+        v = re.findall(b'([\d\.a-f]+)', revision)
         if v:
-            if v[-1].find('.') >= 0:
-                revision = "v" + v[-1]
+            if v[-1].decode().find('.') >= 0:
+                revision = "v" + v[-1].decode()
             else:
-                revision = v[-1]
+                revision = v[-1].decode()
         if buildid == None:
             versionextra = ""
         else:
@@ -647,7 +647,7 @@ def deploy():
     elif platform == "darwin":
         archive = macdeploy(ver, sourcefolder, platform)
     else:
-        if platform == "linux2":
+        if platform in ['linux', 'linux2']:
             for p in progfiles:
                 prog = sourcefolder + "/" + p
                 output = subprocess.Popen(
@@ -664,8 +664,8 @@ def deploy():
 
     # display summary
     headline = "Build Summary for %s" % program
-    print("\n", headline, "\n", "=" * len(headline))
-    if not archivename == "":
+    print("\n%s\n%s" % (headline, "=" * len(headline)))
+    if archivename != "":
         filestats(archivename)
     filestats(archive)
     duration = time.time() - startup

@@ -54,7 +54,8 @@ deploy.bundlecopy = {
 deploy.progexe = {
     "win32"    : "release/RockboxUtility.exe",
     "darwin"   : "RockboxUtility.app",
-    "linux2"   : "RockboxUtility"
+    "linux2"   : "RockboxUtility",
+    "linux"    : "RockboxUtility"
 }
 deploy.regreplace = {
     "rbutil/rbutilqt/version.h"  : [["\$Rev\$", "%REVISION%"],
@@ -66,12 +67,14 @@ deploy.regreplace = {
 deploy.qmakespec = {
     "win32"    : "",
     "darwin"   : "macx-g++40",
-    "linux2"   : ""
+    "linux2"   : "",
+    "linux"    : ""
 }
 deploy.make = {
     "win32"    : "mingw32-make",
     "darwin"   : "make",
-    "linux2"   : "make"
+    "linux2"   : "make",
+    "linux"    : "make"
 }
 
 # all files of the program. Will get put into an archive after building
