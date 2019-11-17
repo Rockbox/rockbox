@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-import gitscraper
 import os
 import sys
+import gitscraper
 
 if len(sys.argv) < 2:
     print("Usage: %s <version|hash>" % sys.argv[0])

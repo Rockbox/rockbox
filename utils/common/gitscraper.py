@@ -42,10 +42,11 @@ def get_refs(repo):
     @return Dict matching hashes to each ref.
     '''
     print("Getting list of refs")
-    output = subprocess.Popen(["git", "show-ref", "--abbrev"],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+    output = subprocess.Popen(
+        ["git", "show-ref", "--abbrev"],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
-    refs = {}
+    refs = dict()
 
     if len(cmdout[1]) > 0:
         print("An error occured!\n")
@@ -53,7 +54,7 @@ def get_refs(repo):
         return refs
 
     for line in cmdout:
-        regex = re.findall(b'([a-f0-9]+)\s+(\S+)', line)
+        regex = re.findall(b'([a-f0-9]+)\\s+(\\S+)', line)
         for r in regex:
             # ref is the key, hash its value.
             refs[r[1].decode()] = r[0].decode()
@@ -61,7 +62,7 @@ def get_refs(repo):
     return refs
 
 
-def get_lstree(repo, start, filterlist=[]):
+def get_lstree(repo, start, filterlist=None):
     '''Get recursive list of tree objects for a given tree.
     @param repo Path to repository root.
     @param start Hash identifying the tree.
@@ -69,10 +70,13 @@ def get_lstree(repo, start, filterlist=[]):
                       An empty list will retrieve all paths.
     @return Dict mapping filename to blob hash
     '''
-    output = subprocess.Popen(["git", "ls-tree", "-r", start],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+    if filterlist is None:
+        filterlist = list()
+    output = subprocess.Popen(
+        ["git", "ls-tree", "-r", start],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
-    objects = {}
+    objects = dict()
 
     if len(cmdout[1]) > 0:
         print("An error occured!\n")
@@ -80,8 +84,8 @@ def get_lstree(repo, start, filterlist=[]):
         return objects
 
     for line in cmdout[0].decode().split('\n'):
-        regex = re.findall(b'([0-9]+)\s+([a-z]+)\s+([0-9a-f]+)\s+(.*)',
-                line.encode())
+        regex = re.findall(b'([0-9]+)\\s+([a-z]+)\\s+([0-9a-f]+)\\s+(.*)',
+                           line.encode())
         for rf in regex:
             # filter
             add = False
@@ -107,8 +111,8 @@ def get_file_timestamp(repo, tree, filename):
     @return Timestamp as string.
     '''
     output = subprocess.Popen(
-            ["git", "log", "--format=%ai", "-n", "1", tree, filename],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+        ["git", "log", "--format=%ai", "-n", "1", tree, filename],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
 
     return cmdout[0].decode().rstrip()
@@ -121,8 +125,9 @@ def get_object(repo, blob, destfile):
     @param destfile filename for blob output.
     @return True if file was successfully written, False on error.
     '''
-    output = subprocess.Popen(["git", "cat-file", "-p", blob],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+    output = subprocess.Popen(
+        ["git", "cat-file", "-p", blob],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
     # make sure output path exists
     if len(cmdout[1]) > 0:
@@ -143,8 +148,9 @@ def describe_treehash(repo, treehash):
     @param treehash Hash identifying the tree / commit to describe.
     @return Description string.
     '''
-    output = subprocess.Popen(["git", "describe", treehash],
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+    output = subprocess.Popen(
+        ["git", "describe", treehash],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
     if len(cmdout[1]) > 0:
         print("An error occured!\n")
@@ -153,7 +159,7 @@ def describe_treehash(repo, treehash):
     return cmdout[0].rstrip()
 
 
-def scrape_files(repo, treehash, filelist, dest="", timestamp_files=[]):
+def scrape_files(repo, treehash, filelist, dest=None, timestamp_files=None):
     '''Scrape list of files from repository.
     @param repo Path to repository root.
     @param treehash Hash identifying the tree.
@@ -167,7 +173,9 @@ def scrape_files(repo, treehash, filelist, dest="", timestamp_files=[]):
     '''
     print("Scraping files from repository")
 
-    if dest == "":
+    if timestamp_files is None:
+        timestamp_files = list()
+    if dest is None:
         dest = tempfile.mkdtemp()
     treeobjects = get_lstree(repo, treehash, filelist)
     timestamps = {}
@@ -180,8 +188,8 @@ def scrape_files(repo, treehash, filelist, dest="", timestamp_files=[]):
     return [dest, timestamps]
 
 
-def archive_files(repo, treehash, filelist, basename, tmpfolder="",
-        archive="tbz"):
+def archive_files(repo, treehash, filelist, basename, tmpfolder=None,
+                  archive="tbz"):
     '''Archive list of files into tarball.
     @param repo Path to repository root.
     @param treehash Hash identifying the tree.
@@ -197,20 +205,20 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder="",
     @return Output filename.
     '''
 
-    if tmpfolder == "":
+    if tmpfolder is None:
         temp_remove = True
         tmpfolder = tempfile.mkdtemp()
     else:
         temp_remove = False
-    workfolder = scrape_files(repo, treehash, filelist,
-            os.path.join(tmpfolder, basename))[0]
+    workfolder = scrape_files(
+        repo, treehash, filelist, os.path.join(tmpfolder, basename))[0]
     if basename is "":
         return ""
     print("Archiving files from repository")
     if archive == "7z":
         outfile = basename + ".7z"
-        output = subprocess.Popen(["7z", "a",
-            os.path.join(os.getcwd(), basename + ".7z"), basename],
+        output = subprocess.Popen(
+            ["7z", "a", os.path.join(os.getcwd(), basename + ".7z"), basename],
             cwd=tmpfolder, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output.communicate()
     elif archive == "tbz":

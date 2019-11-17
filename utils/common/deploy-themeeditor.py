@@ -22,13 +22,13 @@ deploy.program = "rbthemeeditor"
 deploy.project = "utils/themeeditor/themeeditor.pro"
 deploy.svnserver = "svn://svn.rockbox.org/rockbox/"
 deploy.svnpaths = \
-           [ "utils/themeeditor/",
-             "lib/skin_parser/",
-             "docs/COPYING" ]
+           ["utils/themeeditor/",
+            "lib/skin_parser/",
+            "docs/COPYING"]
 deploy.useupx = False
 deploy.bundlecopy = {
     "resources/windowicon.icns" : "Contents/Resources/",
-    "Info.plist"          : "Contents/"
+    "Info.plist"                : "Contents/"
 }
 deploy.progexe = {
     "win32"    : "release/rbthemeeditor.exe",
@@ -52,7 +52,7 @@ deploy.make = {
 # all files of the program. Will get put into an archive after building
 # (zip on w32, tar.bz2 on Linux). Does not apply on Mac which uses dmg.
 # progexe will get added automatically.
-deploy.programfiles = [ ]
+deploy.programfiles = list()
 deploy.nsisscript = "utils/themeeditor/themeeditor.nsi"
 
 deploy.deploy()

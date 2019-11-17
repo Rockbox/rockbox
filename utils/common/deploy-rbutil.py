@@ -22,30 +22,30 @@ deploy.program = "RockboxUtility"
 deploy.project = "rbutil/rbutilqt/rbutilqt.pro"
 deploy.svnserver = "svn://svn.rockbox.org/rockbox/"
 deploy.svnpaths = \
-           [ "rbutil/",
-             "tools/ucl",
-             "tools/rbspeex",
-             "utils/imxtools",
-             "utils/nwztools",
-             "lib/rbcodec/codecs/libspeex",
-             "docs/COPYING",
-             "docs/gpl-2.0.html",
-             "docs/logo/rockbox-clef.svg",
-             "docs/CREDITS",
-             "tools/iriver.c",
-             "tools/Makefile",
-             "tools/mkboot.h",
-             "tools/voicefont.c",
-             "tools/VOICE_PAUSE.wav",
-             "tools/voice-corrections.txt",
-             "tools/wavtrim.h",
-             "tools/iriver.h",
-             "tools/mkboot.c",
-             "tools/telechips.c",
-             "tools/telechips.h",
-             "tools/voicefont.h",
-             "tools/wavtrim.c",
-             "tools/sapi_voice.vbs" ]
+           ["rbutil/",
+            "tools/ucl",
+            "tools/rbspeex",
+            "utils/imxtools",
+            "utils/nwztools",
+            "lib/rbcodec/codecs/libspeex",
+            "docs/COPYING",
+            "docs/gpl-2.0.html",
+            "docs/logo/rockbox-clef.svg",
+            "docs/CREDITS",
+            "tools/iriver.c",
+            "tools/Makefile",
+            "tools/mkboot.h",
+            "tools/voicefont.c",
+            "tools/VOICE_PAUSE.wav",
+            "tools/voice-corrections.txt",
+            "tools/wavtrim.h",
+            "tools/iriver.h",
+            "tools/mkboot.c",
+            "tools/telechips.c",
+            "tools/telechips.h",
+            "tools/voicefont.h",
+            "tools/wavtrim.c",
+            "tools/sapi_voice.vbs"]
 deploy.useupx = False
 deploy.bundlecopy = {
     "icons/rbutilqt.icns" : "Contents/Resources/",
@@ -77,7 +77,7 @@ deploy.make = {
 # all files of the program. Will get put into an archive after building
 # (zip on w32, tar.bz2 on Linux). Does not apply on Mac which uses dmg.
 # progexe will get added automatically.
-deploy.programfiles = [ ]
+deploy.programfiles = list()
 deploy.nsisscript = ""
 
 deploy.deploy()
