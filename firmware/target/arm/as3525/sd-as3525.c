@@ -143,6 +143,15 @@ static unsigned char *uncached_buffer = AS3525_UNCACHED_ADDR(&aligned_buffer[0])
 
 static inline void mci_delay(void) { udelay(1000) ; }
 
+static inline bool card_detect_target(void)
+{
+#if defined(HAVE_MULTIDRIVE)
+    return !(GPIOA_PIN(2));
+#else
+    return false;
+#endif
+}
+
 static void enable_controller(bool on)
 {
 
@@ -196,15 +205,6 @@ static void enable_controller(bool on)
            buttonlight_hw_on();
 #endif
     }
-}
-
-static inline bool card_detect_target(void)
-{
-#if defined(HAVE_MULTIDRIVE)
-    return !(GPIOA_PIN(2));
-#else
-    return false;
-#endif
 }
 
 
