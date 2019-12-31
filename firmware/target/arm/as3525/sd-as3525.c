@@ -229,7 +229,9 @@ static void enable_controller(bool on, const int drive)
             CGU_IDE &= ~(IDE_INTERFACE_CLK);  /* interface disable */
             bitclr32(&CGU_PERI, CGU_NAF_CLOCK_ENABLE);
         }
-#endif
+#else
+    (void) on;
+#endif /* ndef BOOTLOADER */
     }
 #if defined(HAVE_MULTIDRIVE) || defined(HAVE_HOTSWAP)
     else
@@ -1002,4 +1004,3 @@ int sd_event(long id, intptr_t data)
 
     return rc;
 }
-
