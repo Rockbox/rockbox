@@ -215,7 +215,9 @@ static void enable_controller_mci(bool on)
 /* AMS v1 have two different drive interfaces MCI_SD(XPD) and GGU_IDE */
 static void enable_controller(bool on, const int drive)
 {
-
+#ifdef BOOTLOADER
+    (void) on;
+#endif
     if (drive == INTERNAL_AS3525)
     {
 #ifndef BOOTLOADER
