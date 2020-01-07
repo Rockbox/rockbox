@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="cs_CZ">
+<TS version="2.1" language="cs_CZ">
 <context>
     <name>BackupDialog</name>
     <message>
@@ -825,6 +825,172 @@ Viz http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
 </context>
 <context>
+    <name>BootloaderInstallS5l</name>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="61"/>
+        <source>Could not find mounted iPod.</source>
+        <translation>Nepodařilo se nalézt připojený iPod.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="68"/>
+        <source>Downloading bootloader file...</source>
+        <translation>Stahuji soubor zavaděče...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="110"/>
+        <source>Could not make DFU image.</source>
+        <translation>Nepodařilo se vytvořit obraz DFU.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="116"/>
+        <source>Ejecting iPod...</source>
+        <translation>Odpojuji iPod...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="138"/>
+        <source>Action required:
+  Please make sure no programs are accessing
+  files on the device. If ejecting still fails
+  please use your computers eject funtionality.</source>
+        <translation>Je nutný zásah:
+  Přesvědčte se prosím, že žádné programy nepracují
+  se soubory na zařízení. Jestliže odpojení přesto selže
+  využijte prosím funkci odpojení vašeho počítače.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="148"/>
+        <source>Device successfully ejected.</source>
+        <translation>Zařízení úspěšně odpojeno.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="168"/>
+        <source>Action required:
+  Quit iTunes application.</source>
+        <translation>Je nutný zásah:
+  Ukončete aplikaci iTunes.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="176"/>
+        <source>iTunes closed.</source>
+        <translation>iTunes ukončeny.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="189"/>
+        <source>Could not suspend iTunesHelper. Stop it
+using the Task Manager, and try again.</source>
+        <translation>Nepodařilo se zavřít iTunesHelper. Ukončete ho
+prostřednictvím Správce úloh a zkuste to znovu.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="198"/>
+        <source>Waiting for HDD spin-down...</source>
+        <translation>Čekám na zastavení HDD...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="214"/>
+        <source>Waiting for DFU mode...</source>
+        <translation>Čekám na DFU režim...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="215"/>
+        <source>Action required:
+  Press and hold SELECT+MENU buttons, after
+  about 12 seconds a new action will require
+  you to release the buttons, DO IT QUICKLY,
+  otherwise the process could fail.</source>
+        <translation>Je nutný zásah:
+  Zmáčkněte a držte tlačítka SELECT+MENU, po
+  zhruba 12 sekundách bude nutné tlačítka pustit
+  UDĚLEJTE TO RYCHLE, jinak může proces selhat.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="238"/>
+        <source>DFU mode detected.</source>
+        <translation>Zjištěn DFU režim.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="240"/>
+        <source>Action required:
+  Release SELECT+MENU buttons and wait...</source>
+        <translation>Je nutný zásah:
+  Pusťte tlačítka SELECT+MENU a čekejte...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="265"/>
+        <source>Device is not in DFU mode. It seems that
+the previous required action failed, please
+try again.</source>
+        <translation>Zařízení není v DFU režimu. Zdá se,
+že předchozí potřebný zásah selhal. Prosím,
+zkuste to znovu.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="272"/>
+        <source>Transfering DFU image...</source>
+        <translation>Přenáším DFU obraz...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="282"/>
+        <source>No valid DFU USB driver found.
+Install iTunes (or the Apple Device Driver)
+and try again.</source>
+        <translation>Nebyl nalezen platný DFU USB ovladač.
+Instalujte iTunes (nebo Apple Device Driver)
+a zkuste to znovu.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="291"/>
+        <source>Could not transfer DFU image.</source>
+        <translation>Nebylo možné přenést DFU obraz.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="296"/>
+        <source>DFU transfer completed.</source>
+        <translation>Přenos DFU kompletní.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="299"/>
+        <source>Restarting iPod, waiting for remount...</source>
+        <translation>Restartuji iPod, čekám na znovupřipojení...</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="318"/>
+        <source>Action required:
+  Could not remount the device, try to do it
+  manually. If the iPod didn&apos;t restart, force
+  a reset by pressing SELECT+MENU buttons
+  for about 5 seconds. If the problem could
+  not be solved then click &apos;Abort&apos; to cancel.</source>
+        <translation>Je nutný zásah:
+  Zařízení se nepodařilo znovu připojit,
+  zkuste to prosím ručně. Jestliže se iPod
+  nerestartoval, vynuťte restart stisknutím
+  tlačítek SELECT+MENU na 5 sekund.
+  Jestliže se problém nepodařilo vyřešit, klikněte 
+  na &apos;Zrušit&apos; pro přerušení.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="330"/>
+        <source>Device remounted.</source>
+        <translation>Zařízení znovupřipojeno.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="332"/>
+        <source>Bootloader successfully %1.</source>
+        <translation>Zavaděč úspěšně %1.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="345"/>
+        <source>Could not resume iTunesHelper.</source>
+        <translation>Nelze obnovit iTunesHelper.</translation>
+    </message>
+    <message>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="361"/>
+        <source>%1 aborted by user.</source>
+        <translation>%1 zrušeno uživatelem.</translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallSansa</name>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="50"/>
@@ -869,7 +1035,8 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation>Nalezena stará instalace Rockboxu, přerušuji.
 Než poprvé spustíte sansapatcher,
 musíte přeinstalovat původní Sansa firmware.
-Viz http://www.rockbox.org/wiki/SansaE200Install</translation>
+Viz http://www.rockbox.org/wiki/SansaE200Install
+</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallsansa.cpp" line="102"/>
@@ -1172,7 +1339,7 @@ Musíte přepnout váš přehrávač do MSC módu, aby instalace proběhla. </tr
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
         <translation>Nalezen %1 &quot;MacPod&quot;!
-Rockbox potřebuje k běhu Ipod naformátovaný jako FAT (tzv. &quot;WinPod&quot;).</translation>
+Rockbox potřebuje k běhu Ipod naformátovaný jako FAT (tzv. &quot;WinPod&quot;). </translation>
     </message>
     <message>
         <source>Fatal error</source>
@@ -1907,23 +2074,23 @@ Prosím nastavte engine syntézy řeči.</translation>
 <context>
     <name>ProgressLoggerFrm</name>
     <message>
-        <location filename="../progressloggerfrm.ui" line="13"/>
-        <location filename="../progressloggerfrm.ui" line="19"/>
+        <location filename="../progressloggerfrm.ui" line="18"/>
+        <location filename="../progressloggerfrm.ui" line="24"/>
         <source>Progress</source>
         <translation>Průběh</translation>
     </message>
     <message>
-        <location filename="../progressloggerfrm.ui" line="32"/>
+        <location filename="../progressloggerfrm.ui" line="37"/>
         <source>progresswindow</source>
         <translation>oknopostupu</translation>
     </message>
     <message>
-        <location filename="../progressloggerfrm.ui" line="58"/>
+        <location filename="../progressloggerfrm.ui" line="63"/>
         <source>Save Log</source>
         <translation>Uložit záznam</translation>
     </message>
     <message>
-        <location filename="../progressloggerfrm.ui" line="82"/>
+        <location filename="../progressloggerfrm.ui" line="87"/>
         <source>&amp;Abort</source>
         <translation>&amp;Přerušit</translation>
     </message>
@@ -1950,15 +2117,15 @@ Prosím nastavte engine syntézy řeči.</translation>
     <name>QObject</name>
     <message>
         <location filename="../configure.cpp" line="625"/>
-        <location filename="../main.cpp" line="87"/>
+        <location filename="../main.cpp" line="91"/>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
-        <translation>RTL</translation>
+        <translation>LTR</translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="385"/>
         <source>(unknown vendor name) </source>
-        <translation>(neznámý výrobce)</translation>
+        <translation>(neznámý výrobce) </translation>
     </message>
     <message>
         <location filename="../base/system.cpp" line="403"/>
@@ -1966,42 +2133,42 @@ Prosím nastavte engine syntézy řeči.</translation>
         <translation>(neznámé zařízení)</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="80"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="84"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation>Instalace zavaděče je téměř hotova. Instalace od vás &lt;b&gt;vyžaduje&lt;/b&gt; provést následující kroky ručně:</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="86"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="90"/>
         <source>&lt;li&gt;Safely remove your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Bezpečně odeberte váš přehrávač.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="91"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="95"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Restartujte váš přehrávač do původního firmware.&lt;/li&gt;&lt;li&gt;Aktualizujte firmware pomocí aktualizačního procesu původního firmware. Podobnosti se dočtete v návodu k vašemu přehrávači.&lt;br/&gt;&lt;b&gt;Důležité:&lt;/b&gt; aktualizace firmware je kritický proces, který nesmí být přerušen. &lt;b&gt;Ujistěte se, že je přehrávač nabitý před zahájením aktualizace.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;Po aktualizaci firmware restartujte přehrávač.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="102"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="106"/>
         <source>&lt;li&gt;Remove any previously inserted microSD card&lt;/li&gt;</source>
         <translation>&lt;li&gt;Vyjměte jakoukoli dříve vloženou microSD kartu&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="103"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="107"/>
         <source>&lt;li&gt;Disconnect your player. The player will reboot and perform an update of the original firmware. Please refer to your players manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before disconnecting the player.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation>&lt;li&gt;Odpojte váš přehrávač. Přehrávač bude restartován a provede aktualizaci původního firmware. Podobnosti se dočtete v návodu k vašemu přehrávači.&lt;br/&gt;&lt;b&gt;Důležité:&lt;/b&gt; aktualizace firmware je kritický proces, který nesmí být přerušen. &lt;b&gt;Ujistěte se, že je přehrávač nabitý před odpojením.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;Po aktualizaci firmware restartujte přehrávač.&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="114"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="118"/>
         <source>&lt;li&gt;Turn the player off&lt;/li&gt;&lt;li&gt;Insert the charger&lt;/li&gt;</source>
         <translation>&lt;li&gt;Vypněte přehrávač&lt;/li&gt;&lt;li&gt;Připojte nabíječku&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="119"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="123"/>
         <source>&lt;li&gt;Unplug USB and power adaptors&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to turn the player off&lt;/li&gt;&lt;li&gt;Toggle the battery switch on the player&lt;/li&gt;&lt;li&gt;Hold &lt;i&gt;Power&lt;/i&gt; to boot into Rockbox&lt;/li&gt;</source>
         <translation>&lt;li&gt;Odpojte USB a nabíjecí zařízení&lt;/li&gt;&lt;li&gt;Držte tlačítko&lt;i&gt;Napájení&lt;/i&gt; pro vypnutí přehrávače&lt;/li&gt;&lt;li&gt;Přepněte přepínač baterie na přehrávači&lt;/li&gt;&lt;li&gt;Držte tlačítko&lt;i&gt;Napájení&lt;/i&gt; pro spuštění Rockboxu&lt;/li&gt;</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="125"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="129"/>
         <source>&lt;p&gt;&lt;b&gt;Note:&lt;/b&gt; You can safely install other parts first, but the above steps are &lt;b&gt;required&lt;/b&gt; to finish the installation!&lt;/p&gt;</source>
         <translation>&lt;p&gt;&lt;b&gt;Poznámka:&lt;/b&gt; Můžete nejprve bezpečně instalovat zbývající části, ale výše uvedené kroky jsou &lt;b&gt;nezbytné&lt;/b&gt; pro dokončení instalace!&lt;/p&gt;</translation>
     </message>
@@ -2216,11 +2383,11 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     </message>
     <message>
         <source>RockboxUtility Update available</source>
-        <translation>Je k dispozici aktualizace Rockbox Utility</translation>
+        <translation type="vanished">Je k dispozici aktualizace Rockbox Utility</translation>
     </message>
     <message>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation>&lt;b&gt;Je k dispozici nová verze Rockbox Utility.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Stáhněte si ji zde: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+        <translation type="vanished">&lt;b&gt;Je k dispozici nová verze Rockbox Utility.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Stáhněte si ji zde: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="774"/>
@@ -2771,6 +2938,11 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
         <translation>Nutné ruční kroky</translation>
     </message>
     <message>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="518"/>
+        <source>Your installation doesn&apos;t require any game files, skipping.</source>
+        <translation>Vaše instalace nepotřebuje žádné herní soubory, přeskakuji.</translation>
+    </message>
+    <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="171"/>
         <source>Continue with installation?</source>
         <translation>Pokračovat s instalací?</translation>
@@ -2785,9 +2957,8 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
         <translation type="obsolete">Přerušeno!</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="492"/>
         <source>Your installation doesn&apos;t require game files, skipping.</source>
-        <translation>Vaše instalace nepotřebuje herní soubory, přeskakuji.</translation>
+        <translation type="vanished">Vaše instalace nepotřebuje herní soubory, přeskakuji.</translation>
     </message>
 </context>
 <context>
