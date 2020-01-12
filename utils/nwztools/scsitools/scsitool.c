@@ -710,8 +710,7 @@ int get_dev_info(int argc, char **argv)
     (void) argc;
     (void )argv;
     uint8_t cdb[12] = {0xfc, 0, 0x20, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
-
-    char *buffer = malloc(0x80);
+    char buffer[80];
     int buffer_size = 0x80;
     uint8_t sense[32];
     int sense_size = 32;
@@ -736,7 +735,7 @@ int get_dev_info(int argc, char **argv)
 int get_dhp(int argc, char **argv)
 {
     (void) argc;
-    (void )argv;
+    (void) argv;
     uint8_t cdb[12] = {0xfc, 0, 'D', 'd', 'h', 'p', 0, 0, 0, 0, 0, 0};
 
     char *buffer = malloc(0x80);
