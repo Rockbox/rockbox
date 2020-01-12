@@ -710,8 +710,8 @@ int get_dev_info(int argc, char **argv)
     (void) argc;
     (void )argv;
     uint8_t cdb[12] = {0xfc, 0, 0x20, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
-    char buffer[80];
-    int buffer_size = 0x80;
+    char buffer[0x80];
+    int buffer_size = sizeof(buffer);
     uint8_t sense[32];
     int sense_size = 32;
 
@@ -724,7 +724,6 @@ int get_dev_info(int argc, char **argv)
         cprintf(GREY, "An error occured during request\n");
         return ret;
     }
-    buffer[buffer_size] = 0;
     cprintf_field("Raw device info:", "\n");
     print_hex(buffer, buffer_size);
     // the 16 first bytes are 'DEVINFO', 0x80, followed by zeroes
