@@ -157,52 +157,10 @@ void rb_scsi_close(rb_scsi_device_t dev)
     free(dev);
 }
 
-static int is_hctl(const char *name)
-{
-    char *end;
-    strtoul(name, &end, 0); /* h */
-    if(*end != ':')
-        return 0;
-    strtoul(end + 1, &end, 0); /* c */
-    if(*end != ':')
-        return 0;
-    strtoul(end + 1, &end, 0); /* t */
-    if(*end != ':')
-        return 0;
-    strtoul(end + 1, &end, 0); /* l */
-    return *end == 0;
-}
-
-static int _resolve_link_dev_path(char *path, size_t pathsz)
-{
-    /* make sure it is a directory */
-    struct stat st;
-    if(stat(path, &st) < 0)
-        return 0;
-    if(!S_ISDIR(st.st_mode))
-        return 0;
-    if(chdir(path) < 0)
-        return 0;
-    if(getcwd(path, pathsz) == NULL)
-        return 0;
-    return 1;
-}
-
-static int resolve_link_dev_path(char *path, size_t pathsz)
-{
-    /* change directory, ask the current path and resolve current directory */
-    char curdir[PATH_MAX];
-    if(getcwd(curdir, sizeof(curdir)) == NULL)
-        return 0;
-    int ret = _resolve_link_dev_path(path, pathsz);
-    chdir(curdir);
-    return ret;
-}
-
+/* find the first entry of a directory (which is expended to contain only one) and turn
+ * it into a /dev/ path */
 static int scan_resolve_first_dev_path(char *path, size_t pathsz)
 {
-    size_t pathlen = strlen(path);
-    char *pathend = path + pathlen;
     DIR *dir = opendir(path);
     if(dir == NULL)
         return 0;
@@ -212,44 +170,12 @@ static int scan_resolve_first_dev_path(char *path, size_t pathsz)
     {
         if(!strcmp(d->d_name, ".") || !strcmp(d->d_name, ".."))
             continue;
-        /* we found the entry, if it is a symlink, resolve it, otherwise it must be a directory */
-        if(d->d_type == DT_LNK)
-        {
-            snprintf(pathend, pathsz - pathlen, "/%s", d->d_name);
-            ret = resolve_link_dev_path(path, pathsz);
-        }
-        else if(d->d_type == DT_DIR)
+        /* we expect a directory, but it could be a symlink, only the name matters */
+        if(d->d_type == DT_LNK || d->d_type == DT_DIR)
         {
             snprintf(path, pathsz, "/dev/%s", d->d_name);
             ret = 1;
         }
-        break;
-    }
-    closedir(dir);
-    return ret;
-}
-
-static int scan_resolve_dev_path(char *path, size_t pathsz, const char *match)
-{
-    size_t pathlen = strlen(path);
-    char *pathend = path + pathlen;
-    DIR *dir = opendir(path);
-    if(dir == NULL)
-        return 0;
-    struct dirent *d;
-    int ret = 0;
-    while((d = readdir(dir)))
-    {
-        if(strcmp(d->d_name, match))
-            continue;
-        /* we found the entry, there are two case:
-         * - directory: we need to scan it and find the first entry
-         * - symlink: we need to see where it goes and extract the basename */
-        snprintf(pathend, pathsz - pathlen, "/%s", d->d_name);
-        if(d->d_type == DT_DIR)
-            ret = scan_resolve_first_dev_path(path, pathsz);
-        else if(d->d_type == DT_LNK)
-            ret = resolve_link_dev_path(path, pathsz);
         break;
     }
     closedir(dir);
@@ -277,9 +203,9 @@ static char *read_file_or_null(const char *path)
 
 struct rb_scsi_devent_t *rb_scsi_list(void)
 {
-    /* list devices in /sys/bus/scsi/devices
-     * we only keep entries of the form h:c:t:l */
-#define SYS_SCSI_DEV_PATH   "/sys/bus/scsi/devices"
+    /* list devices in /sys/class/scsi_generic
+     * we only keep entries of the form sgX */
+#define SYS_SCSI_DEV_PATH   "/sys/class/scsi_generic"
     DIR *dir = opendir(SYS_SCSI_DEV_PATH);
     if(dir == NULL)
         return NULL;
@@ -292,31 +218,29 @@ struct rb_scsi_devent_t *rb_scsi_list(void)
     {
         if(!strcmp(d->d_name, ".") || !strcmp(d->d_name, ".."))
             continue;
-        /* make sure the name is of the form h:c:t:l, we do not want targets or hosts */
-        if(!is_hctl(d->d_name))
+        /* make sure the name is of the form sgX, and extract X */
+        int sg_idx;
+        if(sscanf(d->d_name, "sg%d", &sg_idx) != 1)
             continue;
-        /* we now need to scan the directory to find the block and scsi generic device path:
-         * block: there should be a 'block' entry
-         * scsi: there should be a 'scsi_generic' entry
-         * Both entries can either be a symlink to the devide, or a directory with a single entry */
-        char scsi_path[PATH_MAX];
-        snprintf(scsi_path, sizeof(scsi_path), SYS_SCSI_DEV_PATH "/%s", d->d_name);
-        if(!scan_resolve_dev_path(scsi_path, sizeof(scsi_path), "scsi_generic"))
-            continue;
-        char block_path[PATH_MAX];
-        snprintf(block_path, sizeof(block_path), SYS_SCSI_DEV_PATH "/%s", d->d_name);
-        if(!scan_resolve_dev_path(block_path, sizeof(block_path), "block"))
-            block_path[0] = 0;
         dev = realloc(dev, (2 + nr_dev) * sizeof(struct rb_scsi_devent_t));
-        dev[nr_dev].scsi_path = strdup(scsi_path);
-        dev[nr_dev].block_path = block_path[0] == 0 ? NULL : strdup(block_path);
+
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "/dev/sg%d", sg_idx);
+        dev[nr_dev].scsi_path = strdup(path);
+        /* /sys/class/scsi_generic/sgX is a folder containing a subfolder 'device' that contains
+         * - a 'block' folder with a single entry: the block device
+         * - the vendor/model/rev files */
+        snprintf(path, sizeof(path), SYS_SCSI_DEV_PATH "/sg%d/device/block", sg_idx);
+        if(!scan_resolve_first_dev_path(path, sizeof(path)))
+            path[0] = 0;
+        dev[nr_dev].block_path = path[0] == 0 ? NULL : strdup(path);
         /* fill vendor/model/rev */
-        snprintf(scsi_path, sizeof(scsi_path), SYS_SCSI_DEV_PATH "/%s/vendor", d->d_name);
-        dev[nr_dev].vendor = read_file_or_null(scsi_path);
-        snprintf(scsi_path, sizeof(scsi_path), SYS_SCSI_DEV_PATH "/%s/model", d->d_name);
-        dev[nr_dev].model = read_file_or_null(scsi_path);
-        snprintf(scsi_path, sizeof(scsi_path), SYS_SCSI_DEV_PATH "/%s/rev", d->d_name);
-        dev[nr_dev].rev = read_file_or_null(scsi_path);
+        snprintf(path, sizeof(path), SYS_SCSI_DEV_PATH "/sg%d/device/vendor", sg_idx);
+        dev[nr_dev].vendor = read_file_or_null(path);
+        snprintf(path, sizeof(path), SYS_SCSI_DEV_PATH "/sg%d/device/model", sg_idx);
+        dev[nr_dev].model = read_file_or_null(path);
+        snprintf(path, sizeof(path), SYS_SCSI_DEV_PATH "/sg%d/device/rev", sg_idx);
+        dev[nr_dev].rev = read_file_or_null(path);
 
         /* sentinel */
         dev[++nr_dev].scsi_path = NULL;
