@@ -94,13 +94,13 @@ struct rb_scsi_devent_t
 {
     /* device path to the raw SCSI device, typically:
      * - Linux: /dev/sgX
-     * - Windows: TODO
+     * - Windows: C:
      * This path can be used directly with scsi_rb_open(), and is guaranteed to
      * be valid. */
     char *scsi_path;
     /* device path to the corresponding block device, if it exists, typically:
      * - Linux: /dev/sdX
-     * - Windows: TODO
+     * - Windows: C:
      * If this path is not-NULL, then it can used directly with scsi_rb_open() */
     char *block_path;
     /* various information about the device, can be NULL on error */

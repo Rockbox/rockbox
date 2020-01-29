@@ -379,6 +379,62 @@ struct rb_scsi_devent_t *rb_scsi_list(void)
     struct rb_scsi_devent_t *dev = malloc(sizeof(struct rb_scsi_devent_t));
     dev[0].scsi_path = NULL;
     dev[0].block_path = NULL;
+    int nr_dev = 0;
+    /* list logical drives */
+    DWORD cbStrSize = GetLogicalDriveStringsA(0, NULL);
+    LPSTR pszDrives = malloc(cbStrSize);
+    cbStrSize = GetLogicalDriveStringsA(cbStrSize, pszDrives);
+    /* drives are separated by a NULL character, the last drive is just a NULL one */
+    for(LPSTR pszDriveRoot = pszDrives; *pszDriveRoot != '\0';
+            pszDriveRoot += lstrlen(pszDriveRoot) + 1)
+    {
+        // each drive is of the form "X:\"
+        char path[3];
+        path[0] = pszDriveRoot[0]; // letter
+        path[1] = ':';
+        path[2] = 0;
+        /* open drive */
+        rb_scsi_device_t rdev = rb_scsi_open(path, 0, NULL, NULL);
+        if(rdev == NULL)
+            continue; // ignore device
+        // send an INQUIRY device to check it's actually an SCSI device and get information
+        uint8_t inquiry_data[36];
+        uint8_t cdb[6] = {0x12, 0, 0, 0, sizeof(inquiry_data), 0}; // INQUIRY
+
+        struct rb_scsi_raw_cmd_t raw;
+        raw.dir = RB_SCSI_READ;
+        raw.cdb_len = sizeof(cdb);
+        raw.cdb = cdb;
+        raw.buf = inquiry_data;
+        raw.buf_len = sizeof(inquiry_data);
+        raw.sense_len = 0; // don't bother with SENSE, this command cannot possibly fail for good reasons
+        raw.sense = NULL;
+        raw.tmo = 5;
+        int ret = rb_scsi_raw_xfer(rdev, &raw);
+        rb_scsi_close(rdev);
+        if(ret != RB_SCSI_OK)
+            continue; // ignore device
+        if(raw.buf_len != (int)sizeof(inquiry_data))
+            continue; // ignore device (what kind of device would not return all the INQUIRY data?)
+
+        /* fill device details */
+        dev = realloc(dev, (2 + nr_dev) * sizeof(struct rb_scsi_devent_t));
+        dev[nr_dev].scsi_path = strdup(path);
+        dev[nr_dev].block_path = strdup(path);
+        /* fill vendor/model/rev */
+        char info[17];
+        snprintf(info, sizeof(info), "%.8s", inquiry_data + 8);
+        dev[nr_dev].vendor = strdup(info);
+        snprintf(info, sizeof(info), "%.16s", inquiry_data + 16);
+        dev[nr_dev].model = strdup(info);
+        snprintf(info, sizeof(info), "%.4s", inquiry_data + 32);
+        dev[nr_dev].rev = strdup(info);
+
+        /* sentinel */
+        dev[++nr_dev].scsi_path = NULL;
+        dev[nr_dev].block_path = NULL;
+    }
+
     return dev;
 }
 /* other targets */
