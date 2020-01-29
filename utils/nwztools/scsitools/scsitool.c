@@ -584,7 +584,7 @@ typedef void (*dpcc_print_func_t)(void *buffer, int buf_size);
 struct dpcc_prop_t
 {
     char *user_name;
-    char name[7];
+    char name[8];
     uint8_t cdb1; // flags: bit 0 means size flag (means size in paragraph)
     int size;
     dpcc_print_func_t print_func;
