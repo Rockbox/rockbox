@@ -29,13 +29,16 @@
 
 bool backlight_hw_init()
 {
+    /* GPIO B1 controls backlight */
+    GPIOB_DIR |= (1 << 1);
+    ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x90);
+    GPIOB_PIN(1) = (1 << 1);
+
     return true;
 }
 
 void backlight_hw_on(void)
 {
-    /* GPIO B1 controls backlight */
-    GPIOB_DIR |= (1 << 1);
     ascodec_write_pmu(AS3543_BACKLIGHT, 1, 0x90);
     GPIOB_PIN(1) = (1 << 1);
 #ifdef HAVE_LCD_ENABLE
@@ -56,4 +59,3 @@ void backlight_hw_brightness(int brightness)
 {
     oled_brightness(brightness);
 }
-
