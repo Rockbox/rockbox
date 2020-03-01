@@ -57,6 +57,7 @@ static const struct button_mapping button_context_wps[]  = {
 
     { ACTION_WPS_QUICKSCREEN,           BUTTON_POWER|BUTTON_REL,           BUTTON_POWER },
     { ACTION_WPS_CONTEXT,               BUTTON_POWER|BUTTON_REPEAT,        BUTTON_NONE },
+    { ACTION_STD_KEYLOCK,               BUTTON_POWER|BUTTON_BACK,          BUTTON_NONE },
 
     { ACTION_WPS_SKIPNEXT,              BUTTON_RIGHT|BUTTON_REL,           BUTTON_RIGHT },
     { ACTION_WPS_SEEKFWD,               BUTTON_RIGHT|BUTTON_REPEAT,        BUTTON_NONE },
@@ -153,7 +154,10 @@ static const struct button_mapping button_context_radio[]  = {
     { ACTION_FM_PLAY,                  BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
     { ACTION_FM_STOP,                  BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_NONE },
 
-    { ACTION_FM_EXIT,                  BUTTON_BACK,                      BUTTON_NONE },
+    { ACTION_STD_KEYLOCK,              BUTTON_POWER|BUTTON_BACK,          BUTTON_NONE },
+
+    { ACTION_FM_EXIT,                  BUTTON_BACK|BUTTON_REL,            BUTTON_BACK },
+    { ACTION_FM_EXIT,                  BUTTON_BACK|BUTTON_REPEAT,         BUTTON_NONE },
 
 /* only compiled if there is a Volume UP button defined */
 #ifdef BUTTON_VOL_UP
