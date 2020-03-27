@@ -8,7 +8,7 @@
 #
 
 # global CC options for all platforms
-CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99"
+CCOPTS="-W -Wall -Wundef -O -nostdlib -ffreestanding -Wstrict-prototypes -pipe -std=gnu99 -funit-at-a-time"
 
 # LD options for the core
 LDOPTS=""
@@ -135,7 +135,7 @@ app_set_lcd_size () {
 
 findarmgcc() {
   prefixtools arm-elf-eabi-
-  gccchoice="4.4.4"
+  gccchoice="4.9.4"
 }
 
 # scan the $PATH for the given command
@@ -504,19 +504,12 @@ shcc () {
  gccchoice="4.0.3"
 }
 
-calmrisccc () {
- prefixtools calmrisc16-unknown-elf-
- GCCOPTS="-Wl\,--no-check-sections $CCOPTS"
- GCCOPTIMIZE="-fomit-frame-pointer"
- endian="big"
-}
-
 coldfirecc () {
  prefixtools m68k-elf-
  GCCOPTS="$CCOPTS -mcpu=5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
- gccchoice="4.5.2"
+ gccchoice="4.9.4"
 }
 
 arm7tdmicc () {
