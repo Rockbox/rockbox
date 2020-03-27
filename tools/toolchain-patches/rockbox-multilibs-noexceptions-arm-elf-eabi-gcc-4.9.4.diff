@@ -1,0 +1,56 @@
+diff -Naur gcc-4.9.4/gcc/config/arm/t-arm-elf gcc-4.9.4-fixed/gcc/config/arm/t-arm-elf
+--- gcc-4.9.4/gcc/config/arm/t-arm-elf	2014-01-02 17:23:26.000000000 -0500
++++ gcc-4.9.4-fixed/gcc/config/arm/t-arm-elf	2020-07-01 22:11:01.198403110 -0400
+@@ -44,6 +44,11 @@
+ #MULTILIB_EXCEPTIONS    += *mcpu=fa526/*mfloat-abi=hard*
+ #MULTILIB_EXCEPTIONS    += *mcpu=fa626/*mfloat-abi=hard*
+ 
++# We build a lib for each specific CPU Rockbox targets.  If anyone knows a better
++# way to do this, please let us know.
++MULTILIB_OPTIONS    += mcpu=arm7tdmi/mcpu=arm9tdmi/mcpu=arm9e/mcpu=arm926ej-s/mcpu=arm1136jf-s
++MULTILIB_DIRNAMES   += arm7tdmi arm9tdmi arm9e arm926ej-s arm1136jf-s
++
+ # MULTILIB_OPTIONS    += mcpu=ep9312
+ # MULTILIB_DIRNAMES   += ep9312
+ # MULTILIB_EXCEPTIONS += *mthumb/*mcpu=ep9312*
+@@ -56,8 +61,8 @@
+ # MULTILIB_DIRNAMES   += fpu soft
+ # MULTILIB_EXCEPTIONS += *mthumb/*mfloat-abi=hard*
+ # 
+-# MULTILIB_OPTIONS    += mno-thumb-interwork/mthumb-interwork
+-# MULTILIB_DIRNAMES   += normal interwork
++MULTILIB_OPTIONS    += mno-thumb-interwork/mthumb-interwork
++MULTILIB_DIRNAMES   += normal interwork
+ # 
+ # MULTILIB_OPTIONS    += fno-leading-underscore/fleading-underscore
+ # MULTILIB_DIRNAMES   += elf under
+diff -Naur gcc-4.9.4/libgcc/config/arm/t-bpabi gcc-4.9.4-fixed/libgcc/config/arm/t-bpabi
+--- gcc-4.9.4/libgcc/config/arm/t-bpabi	2012-08-17 11:06:06.000000000 -0400
++++ gcc-4.9.4-fixed/libgcc/config/arm/t-bpabi	2020-07-01 22:13:39.103762818 -0400
+@@ -17,4 +17,4 @@
+ # On ARM, specifying -fnon-call-exceptions will needlessly pull in
+ # the unwinder in simple programs which use 64-bit division.  Omitting
+ # the option is safe.
+-LIB2_DIVMOD_EXCEPTION_FLAGS := -fexceptions
++LIB2_DIVMOD_EXCEPTION_FLAGS := -fno-exceptions -fno-non-call-exceptions
+diff -Naur gcc-4.9.4/libgcc/Makefile.in gcc-4.9.4-fixed/libgcc/Makefile.in
+--- gcc-4.9.4/libgcc/Makefile.in	2014-01-08 11:37:08.000000000 -0500
++++ gcc-4.9.4-fixed/libgcc/Makefile.in	2020-07-01 22:11:01.199403087 -0400
+@@ -495,7 +495,7 @@
+ ifeq ($(LIB2_DIVMOD_EXCEPTION_FLAGS),)
+ # Provide default flags for compiling divmod functions, if they haven't been
+ # set already by a target-specific Makefile fragment.
+-LIB2_DIVMOD_EXCEPTION_FLAGS := -fexceptions -fnon-call-exceptions
++LIB2_DIVMOD_EXCEPTION_FLAGS := -fno-exceptions -fno-non-call-exceptions
+ endif
+ 
+ # Build LIB2_DIVMOD_FUNCS.
+@@ -816,7 +816,7 @@
+ # libgcc_eh.a, only LIB2ADDEH matters.  If we do, only LIB2ADDEHSTATIC and
+ # LIB2ADDEHSHARED matter.  (Usually all three are identical.)
+ 
+-c_flags := -fexceptions
++c_flags := -fno-exceptions
+ 
+ ifeq ($(enable_shared),yes)
+ 
