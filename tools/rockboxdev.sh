@@ -383,9 +383,9 @@ build() {
         fi
     done
 
-    # kludge to avoid having to install GMP, MPFR and MPC, for new gcc
+    # kludge to avoid having to install GMP, MPFR, MPC and ISL
     if test -n "$needs_libs"; then
-        cd "gcc-$version"
+        cd "$toolname-$version"
         if (echo $needs_libs | grep -q gmp && test ! -d gmp); then
             echo "ROCKBOXDEV: Getting GMP"
             getfile "gmp-4.3.2.tar.bz2" "$GNU_MIRROR/gmp"
@@ -395,16 +395,23 @@ build() {
 
         if (echo $needs_libs | grep -q mpfr && test ! -d mpfr); then
             echo "ROCKBOXDEV: Getting MPFR"
-            getfile "mpfr-2.4.2.tar.bz2" "$GNU_MIRROR/mpfr"
-            tar xjf $dlwhere/mpfr-2.4.2.tar.bz2
-            ln -s mpfr-2.4.2 mpfr
+            getfile "mpfr-3.1.0.tar.bz2" "$GNU_MIRROR/mpfr"
+            tar xjf $dlwhere/mpfr-3.1.0.tar.bz2
+            ln -s mpfr-3.1.0 mpfr
         fi
 
         if (echo $needs_libs | grep -q mpc && test ! -d mpc); then
             echo "ROCKBOXDEV: Getting MPC"
-            getfile "mpc-0.8.1.tar.gz" "http://www.multiprecision.org/downloads"
-            tar xzf $dlwhere/mpc-0.8.1.tar.gz
-            ln -s mpc-0.8.1 mpc
+            getfile "mpc-1.0.1.tar.gz" "http://www.multiprecision.org/downloads"
+            tar xzf $dlwhere/mpc-1.0.1.tar.gz
+            ln -s mpc-1.0.1 mpc
+        fi
+
+        if (echo $needs_libs | grep -q isl && test ! -d isl); then
+            echo "ROCKBOXDEV: Getting ISL"
+            getfile "isl-0.15.tar.bz2" "https://gcc.gnu.org/pub/gcc/infrastructure"
+            tar xjf $dlwhere/isl-0.15.tar.bz2
+            ln -s isl-0.15 isl
         fi
         cd $builddir
     fi
@@ -463,11 +470,11 @@ build_ctng() {
 
     dlurl="http://www.rockbox.org/gcc/$ctng_target"
 
-    # download 
+    # download
     getfile "ct-ng-config" "$dlurl"
 
     test -n "$extra" && getfile "$extra" "$dlurl"
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -494,7 +501,7 @@ build_ctng() {
             tar xf "$dlwhere/$extra" -C "$prefix/$tc_arch-$ctng_target-$tc_host/$sysroot"
         fi
     fi
-    
+
     # cleanup
     cd $builddir
     rm -rf $builddir/build-$ctng_target
@@ -730,13 +737,13 @@ do
             ;;
 
         [Ii])
-            build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror"
-            build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc"
+            build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror" "isl"
+            build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc isl"
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.20.1" "binutils-2.20.1-texinfo-fix.diff" "--disable-werror"
-            build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc"
+            build "binutils" "m68k-elf" "2.26.1" "" "--disable-werror" "isl"
+            build "gcc" "m68k-elf" "4.9.4" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc isl"
             ;;
 
         [Aa])
@@ -748,8 +755,8 @@ do
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
-            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
+            build "binutils" "arm-elf-eabi" "2.26.1" "" "$binopts --disable-werror" "isl"
+            build "gcc" "arm-elf-eabi" "4.9.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.9.4.diff" "$gccopts MAKEINFO=missing" "gmp mpfr mpc isl"
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
@@ -794,7 +801,7 @@ do
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
             ;;
-        [yy])
+        [Yy])
             # IMPORTANT NOTE
             # This toolchain must support several targets and thus must support
             # the oldest possible configuration.
