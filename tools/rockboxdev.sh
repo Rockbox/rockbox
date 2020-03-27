@@ -735,8 +735,8 @@ do
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.20.1" "binutils-2.20.1-texinfo-fix.diff" "--disable-werror"
-            build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc"
+            build "binutils" "m68k-elf" "2.26.1" "" "--disable-werror"
+            build "gcc" "m68k-elf" "4.9.4" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc"
             ;;
 
         [Aa])
@@ -748,8 +748,8 @@ do
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
-            build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
+            build "binutils" "arm-elf-eabi" "2.26.1" "" "$binopts --disable-werror"
+            build "gcc" "arm-elf-eabi" "4.9.4" "" "$gccopts MAKEINFO=missing" "gmp mpfr mpc"
             ;;
         [Rr])
             build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
@@ -794,7 +794,7 @@ do
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
             ;;
-        [yy])
+        [Yy])
             # IMPORTANT NOTE
             # This toolchain must support several targets and thus must support
             # the oldest possible configuration.
