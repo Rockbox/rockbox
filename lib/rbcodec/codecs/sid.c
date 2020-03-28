@@ -554,7 +554,6 @@ void synth_render (int32_t *buffer_r, int32_t *buffer_l, unsigned long len)
          * This filter sounds a lot like the 8580, as the low-quality, dirty
          * sound of the 6581 is uuh too hard to achieve :) */
 
-        outf[0]+=outf[2]; /* mix voice 1 and 3 to right channel */
         for (v=0;v<2;v++) { /* do step 3 for both channels */
             filter.h = quickfloat_ConvertFromInt(outf[v]) - (filter.b>>8)*filter.rez - filter.l;
             filter.b += quickfloat_Multiply(filter.freq, filter.h);
