@@ -110,7 +110,7 @@ usage()
 {
     printf("Usage: ipod_fw [-h]\n"
 	   "       ipod_fw [-v] -o outfile -e img_no fw_file\n"
-	   "       ipod_fw [-v] -g gen [-r rev] -o outfile [-i img_from_-e]* [-l raw_img]* ldr_img\n\n"
+	   "       ipod_fw [-v] -g gen [-r rev] [-s size] -o outfile [-i img_from_-e]* [-l raw_img]* ldr_img\n\n"
 	   "  -g:    set target ipod generation, valid options are: 1g, 2g, 3g\n"
 	   "         4g, 5g, scroll, touch, dock, mini, photo, color, nano and video\n"
 	   "  -e:    extract the image at img_no in boot table to outfile\n"
@@ -124,7 +124,9 @@ usage()
 	   "             may be needed if newest -e img is not the same as the flash rev\n"
 	   "         ldr_img is the iPodLinux loader binary.\n"
 	   "         first image is loaded by default, 2., 3., 4. or 5. loaded if\n"
-	   "         rew, menu, play or ff is hold while booting\n\n"
+	   "         rew, menu, play or ff is hold while booting\n"
+	   "  -n:    do not add a boot loader (ldr_img)\n"
+	   "  -s:    set sector size in bytes (default is 512)\n\n"
 	   "  -v: verbose\n\n"
 	   " This program is used to create a bootable ipod image.\n\n");
 }
@@ -339,12 +341,13 @@ main(int argc, char **argv)
     int images_done = 0;
     unsigned version = 0, offset = 0, len = 0;
     int needs_rcsc = 0;
+    int no_boot = 0;
     
     test_endian();
     
     /* parse options */
     opterr = 0;
-    while ((c = getopt(argc, argv, "3hve:o:i:l:r:g:")) != -1)
+    while ((c = getopt(argc, argv, "3hve:o:i:l:nr:g:s:")) != -1)
 	switch (c) {
 	    case 'h':
 		if (verbose || in || out || images_done || ext) {
@@ -471,12 +474,18 @@ main(int argc, char **argv)
 		images_done++;
 		fclose(in);
 		break;
+	    case 'n':
+	        no_boot = 1;
+		break;
 	    case 'r':
 		if (ext) {
 		    usage();
 		    return 1;
 		}
 		version = strtol(optarg, NULL, 16);
+		break;
+	    case 's':
+	        sectorsize = atoi(optarg);
 		break;
 	    case '?':
 		fprintf(stderr, "invalid option -%c specified\n", optopt);
@@ -488,7 +497,7 @@ main(int argc, char **argv)
 		return 1;
 	}
 
-    if (argc - optind != 1) {
+    if ((argc - optind != 1) && !no_boot) {
 	usage();
 	return 1;
     }
@@ -528,19 +537,22 @@ main(int argc, char **argv)
 	fprintf(stderr, "no images specified!\n");
 	return 1;
     }
-    if ((in = fopen(argv[optind], "rb")) == NULL) {
-	fprintf(stderr, "Cannot open loader image file %s\n", argv[optind]);
-	return 1;
+    if (!no_boot)
+    {
+        if ((in = fopen(argv[optind], "rb")) == NULL) {
+	    fprintf(stderr, "Cannot open loader image file %s\n", argv[optind]);
+	    return 1;
+        }
+	offset = (offset + 0x1ff) & ~0x1ff;
+	if ((len = lengthof(in)) == -1)
+	    return 1;
+	if (fseek(out, offset, SEEK_SET) == -1) {
+	    fprintf(stderr, "fseek failed: %s\n", strerror(errno));
+	    return 1;
+	}
+	if (copysum(in, out, len, 0) == -1)
+	    return 1;
     }
-    offset = (offset + 0x1ff) & ~0x1ff;
-    if ((len = lengthof(in)) == -1)
-	return 1;
-    if (fseek(out, offset, SEEK_SET) == -1) {
-	fprintf(stderr, "fseek failed: %s\n", strerror(errno));
-	return 1;
-    }
-    if (copysum(in, out, len, 0) == -1)
-	return 1;
     for (i=0; i < images_done; i++) {
 	if (images[i].vers > image.vers) image.vers = images[i].vers;
 	if (write_entry(images+i, out, offset+0x0100, i) == -1)
@@ -548,7 +560,10 @@ main(int argc, char **argv)
     }
     if (version) image.vers = version;
     image.len = offset + len - FIRST_OFFSET;
-    image.entryOffset = offset - FIRST_OFFSET;
+    if (!no_boot)
+    {
+	image.entryOffset = offset - FIRST_OFFSET;
+    }
     image.devOffset = (sectorsize==512 ? 0x4400 : 0x4800);
     if ((image.chksum = copysum(out, NULL, image.len, FIRST_OFFSET)) == -1)
 	return 1;
