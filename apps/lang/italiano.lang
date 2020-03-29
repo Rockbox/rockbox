@@ -1173,19 +1173,22 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </dest>
   <voice>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -2615,19 +2618,19 @@ desc: deprecated
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
-    lcd_sleep: "Mai"
+    lcd_sleep: ""
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Mai"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -4610,16 +4613,16 @@ desc: deprecated
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Solo uno"
+    *: ""
   </dest>
   <voice>
-    *: "Solo Uno"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8315,44 +8318,44 @@ desc: deprecated
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "KB"
+    *: ""
   </dest>
   <voice>
-    *: "chilobait"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "MB"
+    *: ""
   </dest>
   <voice>
-    *: "megabait"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "GB"
+    *: ""
   </dest>
   <voice>
-    *: "gigabait"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13516,5 +13519,2834 @@ desc: deprecated
   <voice>
     *: none
     swcodec: "Dry / Wet Mix"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Uno per traccia"
+  </dest>
+  <voice>
+    *: "Uno per traccia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Uno per playlist"
+  </dest>
+  <voice>
+    *: "Uno per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Slideshow Time"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Tempo della Presentazione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Tempo della Presentazione"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "lato re"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "Controllo a 2 tasti"
+  </dest>
+  <voice>
+    *: "Controllo a 2 tasti"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Regina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Dimensione Argh"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Dimensione Argh"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scegli Altra Partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scegli Altra Partita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Direct"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Diretto"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Diretto"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Valutazione batteria già in esecuzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate: %ld kbps"
+  </source>
+  <dest>
+    *: "Bitrate medio: %ld kbps"
+  </dest>
+  <voice>
+    *: "Bitrate medio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Commuta Modalità Presentazione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Commuta Modalità Presentazione"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "In coda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Diffusione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Diffusione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scacco matto!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scacco matto!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nascondi titolo album"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nascondi titolo album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No album art found"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nessuna copertina trovata"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nessuna copertina trovata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "Error file: %d"
+  </dest>
+  <voice>
+    *: "File error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Avvio menu se non completato"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Avvio menu se non completato"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Traccia Precedente"
+  </dest>
+  <voice>
+    *: "Traccia Precedente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Scala di grigi"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scala di grigi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Zoom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zoom"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zoom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pausa / Play"
+  </dest>
+  <voice>
+    *: "Pausa / Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Files]"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Salta frames"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Salta frames"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Modalità assoluta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Modalità Lettura"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Modalità Lettura"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 9: 1 mossa / 60 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 9: 1 mossa ogni 60 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 8: 1 mossa / 15 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 8: 1 mossa ogni 15 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Indisponibile"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Indisponibile"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Save Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Salva Partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Salva Partita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Limitare FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Limitare FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Nessun visualizzatore trovato"
+  </dest>
+  <voice>
+    *: "Nessun visualizzatore trovato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "Nessun telecomando"
+  </dest>
+  <voice>
+    *: "Nessun telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Usa impostazione comune"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Usa impostazione comune"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADDED_TO_PLAYLIST
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Added to playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Aggiunto alla playlist"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Added to playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Scambiare Canali"
+  </dest>
+  <voice>
+    *: "Scambiare Canali"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Bypass"
+  </source>
+  <dest>
+    *: none
+    es9018: "Bypass"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Bypass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Impostazioni Playback"
+  </dest>
+  <voice>
+    *: "Impostazioni Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resize Covers"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ridimensiona Copertine"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ridimensiona Copertine"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Caricare Configurazione Predefinita"
+  </dest>
+  <voice>
+    *: "Caricare Configurazione Predefinita"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Alfiere"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Separazzione Panning"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Separazzione Panning"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Ordered"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ordinato"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ordinato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Esci"
+  </dest>
+  <voice>
+    *: "Esci"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Arghs Per Cibo"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Arghs Per Cibo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: "Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Tempo]"
+  </dest>
+  <voice>
+    *: "Tempo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Alla fine della partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Alla fine della partita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Errore parsing gioco!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Errore parsing gioco!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Mai"
+  </dest>
+  <voice>
+    *: "Mai"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "catture"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Tempo di riproduzione"
+  </dest>
+  <voice>
+    *: "Tempo di riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Interpolazione"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Interpolazione"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of slides"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Numero di diapositive"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Numero di diapositive"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Artista]"
+  </dest>
+  <voice>
+    *: "Artista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Riverbero"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Riverbero"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track %d / %d %d%%"
+  </source>
+  <dest>
+    *: "Traccia %d / %d %d%%"
+  </dest>
+  <voice>
+    *: "Traccia"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Traccia in movimento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TITLE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Titiolo]"
+  </dest>
+  <voice>
+    *: "Titiolo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Telecomando"
+  </dest>
+  <voice>
+    *: "Telecomando"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Bianco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Ordine Menu Principale Rockbox"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Torre"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scacco!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Lettore"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Cancella tutti i ripristini"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Cancella tutti i ripristini"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cache will be rebuilt on next restart"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "La cache sarà ricostruita al prossimo riavvio"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "La cache sarà ricostruita al prossimo riavvio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 2: 60 mosse / 15 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 2: 60 mosse ogni 15 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Imposta momento di ripresa (min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Imposta momento di ripresa (minuti)"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Surround"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Surround"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Rebuild cache"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ricostruire il cache"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ricostruire il cache"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Fatto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Visualizza in alto"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Visualizza in alto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "WPS Integration"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Integrazione WPS"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Integrazione WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 5: 40 mosse / 60 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 5: 40 mosse ogni 60 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "KibiByte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Saving position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Salva posizione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Salva posizione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DURATION
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Duration]"
+  </source>
+  <dest>
+    *: "[Durata]"
+  </dest>
+  <voice>
+    *: "Durata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Luminosità schermo"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Luminosità schermo"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "New Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nuova Partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nuova Partita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Cambiare la modalità di ripetizione"
+  </dest>
+  <voice>
+    *: "Cambiare la modalità di ripetizione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Parametri Tonalità"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Parametri Tonalità"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Cartella Registrazioni"
+  </dest>
+  <voice>
+    *: none
+    recording: "Cartella Registrazioni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Crescita Verme per Cibo"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Crescita Verme per Cibo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Arresta Riproduzione"
+  </dest>
+  <voice>
+    *: "Arresta Riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Modifica Volume"
+  </dest>
+  <voice>
+    *: "Modifica Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Visualizza Partite Giocate"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Visualizza Partite Giocate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 10: 1 mossa / 600 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 10: 1 mossa ogni 600 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Giochi"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Centre margin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Margine centrale"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Margine centrale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Boost CPU"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Boost CPU"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Traccia Seguente"
+  </dest>
+  <voice>
+    *: "Traccia Seguente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Numero di vermi"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Numero di vermi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "Controllo a 4 tasti"
+  </dest>
+  <voice>
+    *: "Controllo a 4 tasti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Riprendi automaticamente"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Riprendi automaticamente"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Spacing"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Spaziatura"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Spaziatura"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostra in basso"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostra in basso"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Arrocco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "Mebibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Velocità del verme"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Velocità del verme"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostra titolo album"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostra titolo album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Via Track list"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Via Elenco delle tracce"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Via Elenco delle tracce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size: %s"
+  </source>
+  <dest>
+    *: "Dimensione media delle traccie: %s"
+  </dest>
+  <voice>
+    *: "Dimensione media delle traccie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Data]"
+  </dest>
+  <voice>
+    *: "Data"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Number of Players"
+  </dest>
+  <voice>
+    *: "Number of Players"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Display FPS"
+    lcd_bitmap: "Display FPS"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Mostra FPS"
+    lcd_bitmap: "Mostra FPS"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Mostra FPS"
+    lcd_bitmap: "Mostra FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No games found !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Nessuna partita trovata!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nessuna partita trovata!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Parametri Tema"
+  </dest>
+  <voice>
+    *: "Parametri Tema"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 7: 40 mosse / 240 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 7: 40 mosse ogni 240 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist remaining: %s"
+  </source>
+  <dest>
+    *: "Playlist restante: %s"
+  </dest>
+  <voice>
+    *: "Playlist restante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Percorso]"
+  </dest>
+  <voice>
+    *: "Percorso"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Traccia da spostare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Opzioni del display"
+  </dest>
+  <voice>
+    *: "Opzioni del display"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Errore durante la raccolta delle informazioni"
+  </dest>
+  <voice>
+    *: "Errore durante la raccolta delle informazioni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ripristina Partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ripristina Partita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Ripristino delle impostazioni predefinite"
+  </dest>
+  <voice>
+    *: "Ripristino delle impostazioni predefinite"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Food Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Dimensione Cibo"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Dimensione Cibo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining: %s"
+  </source>
+  <dest>
+    *: "Traccia restante: %s"
+  </dest>
+  <voice>
+    *: "Traccia restante"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ripristina Impostazioni"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ripristina Impostazioni"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Cavaliere"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Riavvia Partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Riavvia Partita"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Traccia difettosa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Nome file]"
+  </dest>
+  <voice>
+    *: "Nome file"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Modalità semitono"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Always On"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Sempre Acceso"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Sempre Acceso"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Allungamento del tempo"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pedone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "Proprietà file"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Scacchi GNU"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 3: 60 mosse / 30 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 3: 60 mosse ogni 30 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Utilizzare l'impostazione del suono"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Utilizzare l'impostazione del suono"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Commuta l'elemento"
+  </dest>
+  <voice>
+    *: "Commuta l'elemento"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CLEARED
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Playlist Cleared"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Playlist Svuotata"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Playlist Svuotata"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Short"
+  </source>
+  <dest>
+    *: none
+    es9018: "Corto"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Corto"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "All'inizio della partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "All'inizio della partita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Opzioni Audio"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Opzioni Audio"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Riproduci dall'inizio"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Riproduci dall'inizio"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "GibiByte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error writing config"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Errore durante scrittura configurazione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Errore durante scrittura configurazione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Fuori controllo"
+  </dest>
+  <voice>
+    *: "Fuori controllo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 6: 40 mosse / 120 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 6: 40 mosse ogni 120 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Dimensione]"
+  </dest>
+  <voice>
+    *: "Dimensione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Loading position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Caricamento posizione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Caricamento posizione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Sposta Voce in Su"
+  </dest>
+  <voice>
+    *: "Sposta Voce in Su"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Tempo prima della ripresa"
+  </dest>
+  <voice>
+    *: none
+    charging: "Tempo prima della ripresa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Menu di avvio"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Menu di avvio"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Unico"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Unico"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 1: 60 mosse / 5 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 1: 60 mosse ogni 5 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Proprietà cartelle"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Traccia trascorsa: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Traccia trascorsa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage: %s (done %s, remaining %s)"
+  </source>
+  <dest>
+    *: "Memoria: %s (fatto %s, restante %s)"
+  </dest>
+  <voice>
+    *: "Memoria"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Contrassegnato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Salva e Esci"
+  </dest>
+  <voice>
+    *: "Salva e Esci"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Premere play per valutare lo stato della batteria o stop per annullare"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Riprendi Partita"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Riprendi Partita"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Nero"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Livello 4: 40 mosse / 30 min"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Livello 4: 40 mosse ogni 30 minuti"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Playlist trascorsa: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Playlist trascorsa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Go to WPS"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Vai al WPS"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Vai al WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Thinking..."
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Rifletto..."
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Ritorna"
+  </dest>
+  <voice>
+    *: "Ritorna"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Impossibile riavviare la riproduzione"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Impossibile riavviare la riproduzione"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Sposta Voce in Giù"
+  </dest>
+  <voice>
+    *: "Sposta Voce in Giù"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Re"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Non contrassegnato"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "lato regina"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mossa non autorizzata!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mossa non autorizzata!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Gioca a Wormlet!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Gioca a Wormlet!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Raccolta informazioni fallita"
+  </dest>
+  <voice>
+    *: "Raccolta informazioni fallita"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Sotto cartelle]"
+  </dest>
+  <voice>
+    *: "Sotto cartelle"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_PLAYLIST
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Clear playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Svuota playlist"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Svuota playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Non è un VBR file"
+  </dest>
+  <voice>
+    *: "Non è un VBR file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Modalità Shuffle"
+  </dest>
+  <voice>
+    *: "Modalità Shuffle"
   </voice>
 </phrase>
