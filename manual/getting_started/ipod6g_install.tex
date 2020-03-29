@@ -1,0 +1,66 @@
+
+\subsubsection{Bootloader installation from Windows}
+
+Manual installation under Windows is not supported. Please use \caps{Rockbox
+Utility} for bootloader and Rockbox installation.
+
+\subsubsection{Bootloader installation from Mac OS X}
+
+\warn{Please make sure that your iPod is formatted using FAT32
+      (a.k.a. WinPod) before attempting to install the bootloader!
+      Installation will not work on HFS/HFS+ iPods (a.k.a. MacPods).}
+
+\begin{enumerate}
+
+\item Download the bootloader in .ipod format from
+\url{https://files.freemyipod.org/~user890104/bootloader-ipodclassic-v1_0/bootloader-ipod6g.ipod}
+
+\item Download mks5lboot for your operating system from
+\url{https://files.freemyipod.org/~user890104/bootloader-ipodclassic.html\#download_stable}
+
+\item You need to have package libusb installed using Homebrew (brew install
+libusb) or MacPorts (port install libusb) in order to run mks5lboot.
+
+\item Start mks5lboot from a terminal with the following command-line:
+mks5lboot --dfuscan -l It should scan for DFU devices every second.
+
+\item It is important to stop iTunes (dock icon -> Quit) and iTunesHelper
+(using Activity monitor, find the process and select Quit or Force
+quit if it keeps restarting) BEFORE continuing to the next
+step. Otherwise iTunes will put your iPod in wrong mode, and you will
+not be able to proceed with the installation.
+
+\item Put your iPod in DFU mode.
+
+\item When the device is detected, press CTRL+C to terminate the scan
+process, and proceed to the next step.
+
+\item Start mks5lboot from a terminal with the following command-line:
+mks5lboot --bl-inst path/to/bootloader-ipod6g.ipod, providing the
+correct path to bootloader-ipod6g.ipod that you downloaded earlier.
+
+\item When the installation is complete, you should have Rockbox up and
+running!
+
+\end{enumerate}
+
+\subsubsection{Bootloader installation from Linux}
+
+\begin{enumerate}
+
+\item Connect your iPod in normal mode (iTunes/file transfer).
+\item Download \wikilink{RockboxUtility} for your operating system.
+\item When \caps{Rockbox Utility} opens, select the checkbox named Show disabled targets, and point the installer to your iPod's mount point.
+\item On the installation screen make sure that Rockbox is selected and Bootloader is not selected. You can install themes or the game files if you want.
+\item Start the Rockbox installation.
+\item Download the \href{https://files.freemyipod.org/~user890104/bootloader-ipodclassic-v1_0/bootloader-ipod6g.ipod}{bootloader in .ipod format}.
+\item Download \href{https://files.freemyipod.org/~user890104/bootloader-ipodclassic.html#download_stable}{mks5lboot} for your operating system. Alternatively, you can \href{https://files.freemyipod.org/~user890104/bootloader-ipodclassic.html#build_mks5lboot}{build it} from the source code.
+\item You need to have package libusb-1.0.0 installed in order to run mks5lboot.
+\item To make sure the installer is marked as executable, start the following command in the terminal: chmod +x mks5lboot.
+\item Start mks5lboot from a terminal with the following command-line: ./mks5lboot --dfuscan -l. It should scan for DFU devices every second.
+\item Put your iPod in \href{https://files.freemyipod.org/~user890104/bootloader-ipodclassic.html#dfu}{DFU mode}.
+\item When the device is detected, press CTRL+C to terminate the scan process, and proceed to the next step.
+\item Start mks5lboot from a terminal with the following command-line: ./mks5lboot --bl-inst path/to/bootloader-ipod6g.ipod, providing the correct path to bootloader-ipod6g.ipod that you downloaded earlier.
+\item When the installation is complete, you should have Rockbox up and running!
+
+\end{enumerate}

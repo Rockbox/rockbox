@@ -512,7 +512,11 @@ structure that Rockbox needs.\\}
     \subsubsection{Installing the bootloader}
         \opt{iriverh100,iriverh300}{\input{getting_started/iriver_install.tex}}
         \opt{mpiohd200,mpiohd300}{\input{getting_started/mpio_install.tex}}
-        \opt{ipod}{\input{getting_started/ipod_install.tex}}
+        \opt{ipod}{
+          \nopt{ipod6g} {
+            \input{getting_started/ipod_install.tex}}
+          \opt{ipod6g} {
+            \input{getting_started/ipod6g_install.tex}} }
         \opt{iaudio}{\input{getting_started/iaudio_install.tex}}
         \opt{iriverh10,iriverh10_5gb}{\input{getting_started/h10_install.tex}}
         \opt{gigabeatf}{\input{getting_started/gigabeat_install.tex}}
