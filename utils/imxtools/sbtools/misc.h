@@ -40,8 +40,8 @@ extern bool g_debug;
 extern bool g_force;
 
 typedef struct crypto_key_t *key_array_t;
-int g_nr_keys;
-key_array_t g_key_array;
+extern int g_nr_keys;
+extern key_array_t g_key_array;
 
 typedef void (*misc_printf_t)(void *user, const char *fmt, ...);
 
