@@ -855,7 +855,7 @@ void iap_periodic(void)
     }
 
     if (!device.do_notify) return;
-    if (device.notifications == 0) return;
+    if ((device.notifications == 0) && (interface_state != IST_EXTENDED)) return;
 
     /* Volume change notifications are sent every 100ms */
     if (device.notifications & (BIT_N(4) | BIT_N(16))) {
