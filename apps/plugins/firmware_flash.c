@@ -198,7 +198,7 @@ bool EraseSector(volatile UINT8* pAddr)
 
 
 /* address must be in an erased location */
-inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
+static inline bool ProgramByte(volatile UINT8* pAddr, UINT8 data)
 {
 #ifdef DUMMY
     (void)pAddr; /* prevents warnings */
