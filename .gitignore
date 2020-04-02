@@ -8,6 +8,17 @@
 *.o
 *.a
 
+# Intermediate language files
+/apps/lang/*.update
+/apps/lang/*.new
+
+# checkwps
+/tools/checkwps/output
+/tools/checkwps/Makefile
+/tools/checkwps/autoconf.h
+/tools/checkwps/make.dep
+/tools/checkwps/rockbox-info.txt
+
 # android: java build system
 /android/bin
 /android/data
