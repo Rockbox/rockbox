@@ -29,6 +29,11 @@ else
     make="make"
 fi
 
+parallel=`nproc`
+if [ $parallel -gt 1 ] ; then
+  make_parallel=-j$parallel
+fi
+
 if [ -z $GNU_MIRROR ] ; then
     GNU_MIRROR=http://mirrors.kernel.org/gnu
 fi
@@ -322,7 +327,7 @@ buildtool() {
 
     if [ "$make_opts" != "NO_MAKE" ]; then
         echo "ROCKBOXDEV: $toolname/make"
-        run_cmd "$logfile" $make $make_opts
+        run_cmd "$logfile" $make $make_parallel $make_opts
     fi
 
     if [ "$install_opts" = "" ]; then
@@ -428,7 +433,7 @@ build() {
     esac
 
     echo "ROCKBOXDEV: $toolname/make"
-    $make
+    $make $make_parallel
 
     echo "ROCKBOXDEV: $toolname/make install"
     $make install
