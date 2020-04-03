@@ -391,7 +391,12 @@ static int bpb_is_sane(struct bpb *fat_bpb)
         return -1;
     }
 
-    if (fat_bpb->bpb_secperclus * fat_bpb->bpb_bytspersec > 128*1024ul)
+    /* The fat_bpb struct does not hold the raw value of bpb_bytspersec, the
+     * value is multiplied in cases where bpb_bytspersec != SECTOR_SIZE. We need
+     * to undo that multiplication before we do the sanity check. */
+    unsigned long secmult = fat_bpb->bpb_bytspersec / SECTOR_SIZE;
+
+    if (fat_bpb->bpb_secperclus * fat_bpb->bpb_bytspersec / secmult > 128*1024ul)
     {
         DEBUGF("%s() - Error: cluster size is larger than 128K "
                "(%lu * %lu = %lu)\n", __func__,
