@@ -29,6 +29,9 @@ else
     make="make"
 fi
 
+# This is the absolute path to where the script resides.
+rockboxdevdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 parallel=`nproc`
 if [ $parallel -gt 1 ] ; then
   make_parallel=-j$parallel
@@ -349,8 +352,6 @@ build() {
     configure_params="$5"
     needs_libs="$6"
 
-    patch_url="http://www.rockbox.org/gcc"
-
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -361,14 +362,11 @@ build() {
         mkdir -p $builddir
     fi
 
+    patch_dir="$rockboxdevdir/toolchain-patches"
+
     # download source tarball
     gettool "$toolname" "$version"
     file="$toolname-$version"
-
-    # download patch
-    for p in $patch; do
-        getfile "$p" "$patch_url"
-    done
 
     cd $builddir
 
@@ -379,7 +377,7 @@ build() {
         echo "ROCKBOXDEV: applying patch $p"
 
         # apply the patch
-        (cd $builddir/$toolname-$version && patch -p1 < "$dlwhere/$p")
+        (cd $builddir/$toolname-$version && patch -p1 < "$patch_dir/$p")
 
         # check if the patch applied cleanly
         if [ $? -gt 0 ]; then
