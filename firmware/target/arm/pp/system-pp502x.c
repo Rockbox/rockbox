@@ -277,8 +277,12 @@ static void init_cache(void)
     /* Ensure all cache lines are valid for the next flush. Since this
      * can run from cached RAM, rewriting of cache status words may not
      * be safe and the cache is filled instead by reading. */
+
+    /* Note:  Don't start at 0x0, as the compiler thinks it's a
+       null pointer dereference and will helpfully blow up the code. */
+
     register volatile char *p;
-    for (p = (volatile char *)0; p < (volatile char *)0x2000; p += 0x10)
+    for (p = (volatile char *)0x1000; p < (volatile char *)0x3000; p += 0x10)
         (void)*p;
 }
 #endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
