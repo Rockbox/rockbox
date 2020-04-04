@@ -1,0 +1,13 @@
+--- a/Makefile.in	2014-07-30 14:16:57.989859205 +0200
++++ b/Makefile.in	2014-07-30 14:16:52.133836316 +0200
+@@ -26,7 +26,11 @@
+ # '-Rr' to MAKEFLAGS adds it literaly ( and does not add 'Rr' )
+ ifeq ($(filter Rr,$(MAKEFLAGS)),)
+ ifeq ($(filter -Rr,$(MAKEFLAGS)),)
++ifeq ($(filter -rR,$(MAKEFLAGS)),)
++ifeq ($(filter rR,$(MAKEFLAGS)),)
+ CT_MAKEFLAGS += -Rr
++endif # No rR
++endif # No -rR
+ endif # No -Rr
+ endif # No Rr
