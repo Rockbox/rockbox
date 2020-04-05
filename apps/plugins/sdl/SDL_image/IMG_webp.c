@@ -30,8 +30,8 @@
 
 /*=============================================================================
         File: SDL_webp.c
-     Purpose: A WEBP loader for the SDL library      
-    Revision: 
+     Purpose: A WEBP loader for the SDL library
+    Revision:
   Created by: Michael Bonfils (Murlock) (26 November 2011)
               murlock42@gmail.com
 
@@ -53,14 +53,14 @@ static struct {
 } lib;
 
 #ifdef LOAD_WEBP_DYNAMIC
-int IMG_InitWEBP()
+int IMG_InitWEBP(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.handle = SDL_LoadObject(LOAD_WEBP_DYNAMIC);
 		if ( lib.handle == NULL ) {
 			return -1;
 		}
-		lib.webp_get_features_internal = 
+		lib.webp_get_features_internal =
 			( int (*) (const uint8_t *, uint32_t, WebPBitstreamFeatures* const, int) )
 			SDL_LoadFunction(lib.handle, "WebPGetFeaturesInternal" );
 		if ( lib.webp_get_features_internal == NULL ) {
@@ -68,7 +68,7 @@ int IMG_InitWEBP()
 			return -1;
 		}
 
-		lib.webp_decode_rgb_into = 
+		lib.webp_decode_rgb_into =
 			( uint8_t* (*) (const uint8_t*, uint32_t, uint8_t*, int, int ) )
 			SDL_LoadFunction(lib.handle, "WebPDecodeRGBInto" );
 		if ( lib.webp_decode_rgb_into == NULL ) {
@@ -76,7 +76,7 @@ int IMG_InitWEBP()
 			return -1;
 		}
 
-		lib.webp_decode_rgba_into = 
+		lib.webp_decode_rgba_into =
 			( uint8_t* (*) (const uint8_t*, uint32_t, uint8_t*, int, int ) )
 			SDL_LoadFunction(lib.handle, "WebPDecodeRGBInto" );
 		if ( lib.webp_decode_rgba_into == NULL ) {
@@ -88,7 +88,7 @@ int IMG_InitWEBP()
 
 	return 0;
 }
-void IMG_QuitWEBP()
+void IMG_QuitWEBP(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -99,7 +99,7 @@ void IMG_QuitWEBP()
 	--lib.loaded;
 }
 #else
-int IMG_InitWEBP()
+int IMG_InitWEBP(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.webp_get_features_internal = WebPGetFeaturesInternal;
@@ -110,7 +110,7 @@ int IMG_InitWEBP()
 
 	return 0;
 }
-void IMG_QuitWEBP()
+void IMG_QuitWEBP(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -207,7 +207,7 @@ SDL_Surface *IMG_LoadWEBP_RW(SDL_RWops *src)
 		error = "Failed to read WEBP";
 		goto error;
 	}
-	
+
 #if 0
 	// extract size of picture, not interesting since we don't know about alpha channel
 	int width = -1, height = -1;
@@ -270,13 +270,13 @@ error:
 
 #else
 
-int IMG_InitWEBP()
+int IMG_InitWEBP(void)
 {
 	IMG_SetError("WEBP images are not supported");
 	return(-1);
 }
 
-void IMG_QuitWEBP()
+void IMG_QuitWEBP(void)
 {
 }
 
