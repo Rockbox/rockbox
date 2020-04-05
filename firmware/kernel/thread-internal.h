@@ -127,12 +127,12 @@ struct thread_entry
     unsigned char priority;      /* Scheduled priority (higher of base or
                                     all threads blocked by this one) */
 #endif
-#ifndef HAVE_SDL_THREADS
-    size_t stack_size;           /* Size of stack in bytes */
-#endif
     unsigned char state;         /* Thread slot state (STATE_*) */
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     unsigned char cpu_boost;     /* CPU frequency boost flag */
+#endif
+#ifndef HAVE_SDL_THREADS
+    size_t stack_size;           /* Size of stack in bytes */
 #endif
 };
 
