@@ -3,8 +3,8 @@
 
 #include <inttypes.h>
 
-void CVARDEFS_Init();
-void CVARDEFS_Render();
+void CVARDEFS_Init(void);
+void CVARDEFS_Render(void);
 //
 // Function declarations
 //
