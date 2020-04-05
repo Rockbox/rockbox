@@ -60,7 +60,7 @@ static struct {
 } lib;
 
 #ifdef LOAD_JPG_DYNAMIC
-int IMG_InitJPG()
+int IMG_InitJPG(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.handle = SDL_LoadObject(LOAD_JPG_DYNAMIC);
@@ -74,56 +74,56 @@ int IMG_InitJPG()
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_CreateDecompress = 
+		lib.jpeg_CreateDecompress =
 			(void (*) (j_decompress_ptr, int, size_t))
 			SDL_LoadFunction(lib.handle, "jpeg_CreateDecompress");
 		if ( lib.jpeg_CreateDecompress == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_destroy_decompress = 
+		lib.jpeg_destroy_decompress =
 			(void (*) (j_decompress_ptr))
 			SDL_LoadFunction(lib.handle, "jpeg_destroy_decompress");
 		if ( lib.jpeg_destroy_decompress == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_finish_decompress = 
+		lib.jpeg_finish_decompress =
 			(boolean (*) (j_decompress_ptr))
 			SDL_LoadFunction(lib.handle, "jpeg_finish_decompress");
 		if ( lib.jpeg_finish_decompress == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_read_header = 
+		lib.jpeg_read_header =
 			(int (*) (j_decompress_ptr, boolean))
 			SDL_LoadFunction(lib.handle, "jpeg_read_header");
 		if ( lib.jpeg_read_header == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_read_scanlines = 
+		lib.jpeg_read_scanlines =
 			(JDIMENSION (*) (j_decompress_ptr, JSAMPARRAY, JDIMENSION))
 			SDL_LoadFunction(lib.handle, "jpeg_read_scanlines");
 		if ( lib.jpeg_read_scanlines == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_resync_to_restart = 
+		lib.jpeg_resync_to_restart =
 			(boolean (*) (j_decompress_ptr, int))
 			SDL_LoadFunction(lib.handle, "jpeg_resync_to_restart");
 		if ( lib.jpeg_resync_to_restart == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_start_decompress = 
+		lib.jpeg_start_decompress =
 			(boolean (*) (j_decompress_ptr))
 			SDL_LoadFunction(lib.handle, "jpeg_start_decompress");
 		if ( lib.jpeg_start_decompress == NULL ) {
 			SDL_UnloadObject(lib.handle);
 			return -1;
 		}
-		lib.jpeg_std_error = 
+		lib.jpeg_std_error =
 			(struct jpeg_error_mgr * (*) (struct jpeg_error_mgr *))
 			SDL_LoadFunction(lib.handle, "jpeg_std_error");
 		if ( lib.jpeg_std_error == NULL ) {
@@ -135,7 +135,7 @@ int IMG_InitJPG()
 
 	return 0;
 }
-void IMG_QuitJPG()
+void IMG_QuitJPG(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -146,7 +146,7 @@ void IMG_QuitJPG()
 	--lib.loaded;
 }
 #else
-int IMG_InitJPG()
+int IMG_InitJPG(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.jpeg_calc_output_dimensions = jpeg_calc_output_dimensions;
@@ -163,7 +163,7 @@ int IMG_InitJPG()
 
 	return 0;
 }
-void IMG_QuitJPG()
+void IMG_QuitJPG(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -468,13 +468,13 @@ SDL_Surface *IMG_LoadJPG_RW(SDL_RWops *src)
 
 #else
 
-int IMG_InitJPG()
+int IMG_InitJPG(void)
 {
 	IMG_SetError("JPEG images are not supported");
 	return(-1);
 }
 
-void IMG_QuitJPG()
+void IMG_QuitJPG(void)
 {
 }
 

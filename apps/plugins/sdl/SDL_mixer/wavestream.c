@@ -59,7 +59,7 @@ typedef struct WaveFMT {
 	Uint32	FMTchunk;
 	Uint32	fmtlen;
 */
-	Uint16	encoding;	
+	Uint16	encoding;
 	Uint16	channels;		/* 1 = mono, 2 = stereo */
 	Uint32	frequency;		/* One of 11025, 22050, or 44100 Hz */
 	Uint32	byterate;		/* Average bytes per second */
@@ -213,11 +213,11 @@ int WAVStream_PlaySome(Uint8 *stream, int len)
 			}
 			data = SDL_stack_alloc(Uint8, len);
 			if (data)
-			{		
+			{
 				SDL_RWread(music->rw, data, len, 1);
 				SDL_MixAudio(stream, data, len, wavestream_volume);
 				SDL_stack_free(data);
-			}	
+			}
 		}
 	}
 	return left;
@@ -286,7 +286,7 @@ static SDL_RWops *LoadWAVStream (SDL_RWops *src, SDL_AudioSpec *spec,
 
 	/* WAV magic header */
 	Uint32 RIFFchunk;
-	Uint32 wavelen;
+//	Uint32 wavelen;
 	Uint32 WAVEmagic;
 
 	/* FMT chunk */
@@ -296,7 +296,7 @@ static SDL_RWops *LoadWAVStream (SDL_RWops *src, SDL_AudioSpec *spec,
 
 	/* Check the magic header */
 	RIFFchunk	= SDL_ReadLE32(src);
-	wavelen		= SDL_ReadLE32(src);
+//	wavelen		= SDL_ReadLE32(src);
 	WAVEmagic	= SDL_ReadLE32(src);
 	if ( (RIFFchunk != RIFF) || (WAVEmagic != WAVE) ) {
 		Mix_SetError("Unrecognized file type (not WAVE)");
@@ -416,7 +416,7 @@ static SDL_RWops *LoadAIFFStream (SDL_RWops *src, SDL_AudioSpec *spec,
 	Uint32 AIFFmagic;
 	/* SSND chunk        */
 	Uint32 offset;
-	Uint32 blocksize;
+//	Uint32 blocksize;
 	/* COMM format chunk */
 	Uint16 channels = 0;
 	Uint32 numsamples = 0;
@@ -459,7 +459,7 @@ static SDL_RWops *LoadAIFFStream (SDL_RWops *src, SDL_AudioSpec *spec,
 		case SSND:
 		    found_SSND		= 1;
 		    offset		= SDL_ReadBE32(src);
-		    blocksize		= SDL_ReadBE32(src);
+//		    blocksize		= SDL_ReadBE32(src);
 		    *start		= SDL_RWtell(src) + offset;
 		    break;
 
@@ -485,7 +485,7 @@ static SDL_RWops *LoadAIFFStream (SDL_RWops *src, SDL_AudioSpec *spec,
 	    was_error = 1;
 	    goto done;
 	}
-		    
+
 	if (!found_COMM) {
 	    Mix_SetError("Bad AIFF file (no COMM chunk)");
 	    was_error = 1;
@@ -518,4 +518,3 @@ done:
 	}
 	return(src);
 }
-
