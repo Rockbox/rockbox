@@ -56,8 +56,12 @@
 #define IP_RECVERR  SO_BROADCAST
 */
 
+#ifndef stricmp
 #define stricmp strcasecmp
+#endif
+#ifndef strcmpi
 #define strcmpi strcasecmp
+#endif
 
 #define S_IREAD S_IRUSR
 

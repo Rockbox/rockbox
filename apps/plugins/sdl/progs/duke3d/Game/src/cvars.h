@@ -18,8 +18,8 @@ typedef struct t_cvar_binding
 
 
 void            CVAR_RegisterCvar(const char * varname, const char * varhelp, void* variable, function_t function);
-int             CVAR_GetNumCvarBindings();
+int             CVAR_GetNumCvarBindings(void);
 cvar_binding*   CVAR_GetCvarBinding(unsigned int nBinding);
-void            CVAR_Render();
+void            CVAR_Render(void);
 
 #endif

@@ -11,8 +11,8 @@
 
 #include "platform.h"
 
-void Setup_UnstableNetworking();
-void Setup_StableNetworking();
+void Setup_UnstableNetworking(void);
+void Setup_StableNetworking(void);
 
 void callcommit(void);
 void initcrc(void);

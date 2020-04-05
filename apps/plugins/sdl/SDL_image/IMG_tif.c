@@ -42,7 +42,7 @@ static struct {
 } lib;
 
 #ifdef LOAD_TIF_DYNAMIC
-int IMG_InitTIF()
+int IMG_InitTIF(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.handle = SDL_LoadObject(LOAD_TIF_DYNAMIC);
@@ -89,7 +89,7 @@ int IMG_InitTIF()
 
 	return 0;
 }
-void IMG_QuitTIF()
+void IMG_QuitTIF(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -100,7 +100,7 @@ void IMG_QuitTIF()
 	--lib.loaded;
 }
 #else
-int IMG_InitTIF()
+int IMG_InitTIF(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.TIFFClientOpen = TIFFClientOpen;
@@ -113,7 +113,7 @@ int IMG_InitTIF()
 
 	return 0;
 }
-void IMG_QuitTIF()
+void IMG_QuitTIF(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -222,7 +222,7 @@ SDL_Surface* IMG_LoadTIF_RW(SDL_RWops* src)
 	}
 
 	/* turn off memory mapped access with the m flag */
-	tiff = lib.TIFFClientOpen("SDL_image", "rm", (thandle_t)src, 
+	tiff = lib.TIFFClientOpen("SDL_image", "rm", (thandle_t)src,
 		tiff_read, tiff_write, tiff_seek, tiff_close, tiff_size, tiff_map, tiff_unmap);
 	if(!tiff)
 		goto error;
@@ -239,7 +239,7 @@ SDL_Surface* IMG_LoadTIF_RW(SDL_RWops* src)
 		Rmask, Gmask, Bmask, Amask);
 	if(!surface)
 		goto error;
-	
+
 	if(!lib.TIFFReadRGBAImage(tiff, img_width, img_height, surface->pixels, 0))
 		goto error;
 
@@ -258,7 +258,7 @@ SDL_Surface* IMG_LoadTIF_RW(SDL_RWops* src)
 		}
 	}
 	lib.TIFFClose(tiff);
-	
+
 	return surface;
 
 error:
@@ -271,13 +271,13 @@ error:
 
 #else
 
-int IMG_InitTIF()
+int IMG_InitTIF(void)
 {
 	IMG_SetError("TIFF images are not supported");
 	return(-1);
 }
 
-void IMG_QuitTIF()
+void IMG_QuitTIF(void)
 {
 }
 

@@ -62,5 +62,5 @@ extern flac_loader flac;
 
 #endif /* FLAC_MUSIC */
 
-extern int Mix_InitFLAC();
-extern void Mix_QuitFLAC();
+extern int Mix_InitFLAC(void);
+extern void Mix_QuitFLAC(void);

@@ -32,6 +32,13 @@ SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))		\
 -ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations	\
 -D_GNU_SOURCE=1 -D_REENTRANT -DSDL -DELF -w # disable all warnings
 
+# WIP SDLFLAGS for warning deletions
+#SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))		\
+#-O3 -Wno-unused-parameter -Xpreprocessor -Wno-undef -Wno-sign-compare \
+#-Wno-unused-variable -Wno-unused-function -Wno-unused-but-set-variable -Wno-unknown-pragmas \
+#-ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations	\
+#-D_GNU_SOURCE=1 -D_REENTRANT -DSDL -DELF
+
 # use FPU on ARMv6
 ifeq ($(ARCH_VERSION),6)
     SDLFLAGS += -mfloat-abi=softfp

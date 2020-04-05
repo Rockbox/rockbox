@@ -92,6 +92,9 @@
 #undef strdup
 
 /* clock() wraps current_tick */
+#ifdef CLOCKS_PER_SEC
+#undef CLOCKS_PER_SEC
+#endif
 #define CLOCKS_PER_SEC HZ
 
 /*
@@ -160,9 +163,13 @@
 #define strlcpy rb->strlcpy
 #define strlen rb->strlen
 #define strncasecmp rb->strncasecmp
+#ifndef strncat
 #define strncat rb->strlcat /* hack */
+#endif
 #define strncmp rb->strncmp
+#ifndef strncat
 #define strpbrk strpbrk_wrapper
+#endif
 #define strrchr rb->strrchr
 #define strstr SDL_strstr
 #define strtok strtok_wrapper

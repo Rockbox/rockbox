@@ -17,7 +17,7 @@ static	int FB_SRC_A, FB_SRC_B, IIR_DEST_A0, IIR_DEST_A1, ACC_SRC_A0, ACC_SRC_A1,
 		ACC_SRC_B1, IIR_SRC_A0, IIR_SRC_A1, IIR_DEST_B0, IIR_DEST_B1, ACC_SRC_C0,
 		ACC_SRC_C1, ACC_SRC_D0, ACC_SRC_D1, IIR_SRC_B1, IIR_SRC_B0, MIX_DEST_A0,
 		MIX_DEST_A1, MIX_DEST_B0, MIX_DEST_B1;
-	
+
 //static	long IIR_ALPHA, ACC_COEF_A, ACC_COEF_B, ACC_COEF_C, ACC_COEF_D, IIR_COEF, FB_ALPHA, FB_X,
 //		IN_COEF_L, IN_COEF_R;
 
@@ -51,7 +51,7 @@ static inline int cnv_offset(int src)
 
 // extern __stdcall OutputDebugStringA(char *);
 
-static inline void check_buffer()
+static inline void check_buffer(void)
 {
 	int new_delay = cnv_offset(MV_ReverbDelay);
 
@@ -99,7 +99,7 @@ static inline long g_buffer(int iOff, long *ptr)                          // get
 	}
 
 	iOff=(iOff*4)+CurrAddr;
-	while(iOff>correctDelay-1)	
+	while(iOff>correctDelay-1)
 	{
 		iOff=iOff-correctDelay;
 	}
@@ -141,11 +141,11 @@ static inline void s_buffer1(int iOff,long iVal, long *ptr)                // se
 	}
 
 	iOff=(iOff*4)+CurrAddr+1;
-	while(iOff>correctDelay-1)	
+	while(iOff>correctDelay-1)
 	{
 		iOff=iOff-correctDelay;
 	}
-	while(iOff<0)			
+	while(iOff<0)
 	{
 		iOff=correctDelay-(0-iOff);
 	}
@@ -155,12 +155,12 @@ static inline void s_buffer1(int iOff,long iVal, long *ptr)                // se
 static inline long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long *ptr)
 {
 	long ACC0,ACC1,FB_A0,FB_A1,FB_B0,FB_B1;
-	
+
 	const long IIR_INPUT_A0 = (fp_mul(g_buffer(IIR_SRC_A0, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_L, IN_COEF_L, FRACBITS));
 	const long IIR_INPUT_A1 = (fp_mul(g_buffer(IIR_SRC_A1, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_R, IN_COEF_R, FRACBITS));
 	const long IIR_INPUT_B0 = (fp_mul(g_buffer(IIR_SRC_B0, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_L, IN_COEF_L, FRACBITS));
 	const long IIR_INPUT_B1 = (fp_mul(g_buffer(IIR_SRC_B1, ptr), IIR_COEF, FRACBITS) + fp_mul(INPUT_SAMPLE_R, IN_COEF_R, FRACBITS));
-        
+
         const long one = (1 << FRACBITS);
 	const long IIR_A0 = fp_mul(IIR_INPUT_A0, IIR_ALPHA, FRACBITS) + fp_mul(g_buffer(IIR_DEST_A0, ptr), (one - IIR_ALPHA), FRACBITS);
 	const long IIR_A1 = fp_mul(IIR_INPUT_A1, IIR_ALPHA, FRACBITS) + fp_mul(g_buffer(IIR_DEST_A1, ptr), (one - IIR_ALPHA), FRACBITS);
@@ -171,7 +171,7 @@ static inline long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long 
 	s_buffer1(IIR_DEST_A1, IIR_A1, ptr);
 	s_buffer1(IIR_DEST_B0, IIR_B0, ptr);
 	s_buffer1(IIR_DEST_B1, IIR_B1, ptr);
-	
+
 	ACC0 = (fp_mul(g_buffer(ACC_SRC_A0, ptr), ACC_COEF_A, FRACBITS) +
 		fp_mul(g_buffer(ACC_SRC_B0, ptr), ACC_COEF_B, FRACBITS) +
 		fp_mul(g_buffer(ACC_SRC_C0, ptr), ACC_COEF_C, FRACBITS) +
@@ -180,24 +180,24 @@ static inline long MixREVERBLeft(long INPUT_SAMPLE_L, long INPUT_SAMPLE_R, long 
 		fp_mul(g_buffer(ACC_SRC_B1, ptr), ACC_COEF_B, FRACBITS) +
 		fp_mul(g_buffer(ACC_SRC_C1, ptr), ACC_COEF_C, FRACBITS) +
 		fp_mul(g_buffer(ACC_SRC_D1, ptr), ACC_COEF_D, FRACBITS));
-	
+
 	FB_A0 = g_buffer(MIX_DEST_A0 - FB_SRC_A, ptr);
 	FB_A1 = g_buffer(MIX_DEST_A1 - FB_SRC_A, ptr);
 	FB_B0 = g_buffer(MIX_DEST_B0 - FB_SRC_B, ptr);
 	FB_B1 = g_buffer(MIX_DEST_B1 - FB_SRC_B, ptr);
-	
+
 	s_buffer(MIX_DEST_A0, ACC0 - fp_mul(FB_A0 , FB_ALPHA, FRACBITS), ptr);
 	s_buffer(MIX_DEST_A1, ACC1 - fp_mul(FB_A1 , FB_ALPHA, FRACBITS), ptr);
 
 	s_buffer(MIX_DEST_B0, fp_mul(FB_ALPHA , ACC0, FRACBITS) - fp_mul(FB_A0, (FB_ALPHA - one), FRACBITS) - fp_mul(FB_B0, FB_X, FRACBITS), ptr);
 	s_buffer(MIX_DEST_B1, fp_mul(FB_ALPHA , ACC1, FRACBITS) - fp_mul(FB_A1, (FB_ALPHA - one), FRACBITS) - fp_mul(FB_B1, FB_X, FRACBITS), ptr);
-	
+
 	iRVBLeft  = (g_buffer(MIX_DEST_A0, ptr)+g_buffer(MIX_DEST_B0, ptr)) / 3;
 	iRVBRight = (g_buffer(MIX_DEST_A1, ptr)+g_buffer(MIX_DEST_B1, ptr)) / 3;
-	
+
 	CurrAddr++;
 	if(CurrAddr>delay-1) CurrAddr=0;
-	
+
 	return (long)iRVBLeft;
 }
 
@@ -228,7 +228,7 @@ void MV_FPReverb(int volume)
 //	OutputDebugStringA(err);
 
         long scale = (volume << FRACBITS) / MV_MaxVolume;
-	
+
 	if (MV_Channels == 1)
 	{
 		for (i = 0; i < count; i++)
@@ -308,7 +308,7 @@ void MV_16BitReverbFast( const char *src, char *dest, int count, int shift )
 
 	short *pdest = (short *)dest;
 	const short *psrc = (const short *)src;
-	
+
 	for (i = 0; i < count; i++) {
             pdest[i] = readLE16(psrc + i) >> shift;
 	}
@@ -319,11 +319,11 @@ void MV_8BitReverbFast( const signed char *src, signed char *dest, int count, in
 	int i;
 
 	unsigned char sh = 0x80 - (0x80 >> shift);
-	
+
 	for (i = 0; i < count; i++) {
 		unsigned char a = ((unsigned char) src[i]) >> shift;
 		unsigned char c = (((unsigned char) src[i]) ^ 0x80) >> 7;
-		
+
 		dest[i] = (signed char) (a + sh + c);
 	}
 }

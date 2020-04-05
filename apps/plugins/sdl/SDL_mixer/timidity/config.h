@@ -9,7 +9,9 @@
 /* This is for use with the SDL library */
 #ifndef __TIMIDITY_CONFIG_H__
 #define __TIMIDITY_CONFIG_H__
+#ifndef SDL
 #define SDL
+#endif
 #include "SDL_config.h"
 #include "SDL_endian.h"
 
@@ -24,7 +26,7 @@
 #define DEFAULT_PROGRAM 0
 
 /* 9 here is MIDI channel 10, which is the standard percussion channel.
-   Some files (notably C:\WINDOWS\CANYON.MID) think that 16 is one too. 
+   Some files (notably C:\WINDOWS\CANYON.MID) think that 16 is one too.
    On the other hand, some files know that 16 is not a drum channel and
    try to play music on it. This is now a runtime option, so this isn't
    a critical choice anymore. */
@@ -131,7 +133,7 @@ typedef double FLOAT_T;
 #define MAX_CONTROL_RATIO 255
 
 typedef unsigned int uint32;
-typedef int int32; 
+typedef int int32;
 typedef unsigned short uint16;
 typedef short int16;
 typedef unsigned char uint8;

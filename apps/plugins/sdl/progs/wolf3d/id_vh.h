@@ -64,7 +64,7 @@ void VWB_Vlin (int y1, int y2, int x, int color);
 #define VWB_HlinScaledCoord VW_Hlin
 #define VWB_VlinScaledCoord VW_Vlin
 
-void VH_UpdateScreen();
+void VH_UpdateScreen(void);
 #define VW_UpdateScreen VH_UpdateScreen
 
 //
@@ -91,7 +91,7 @@ void    LatchDrawPic (unsigned x, unsigned y, unsigned picnum);
 void    LatchDrawPicScaledCoord (unsigned scx, unsigned scy, unsigned picnum);
 void    LoadLatchMem (void);
 
-void    VH_Startup();
+void    VH_Startup(void);
 boolean FizzleFade (SDL_Surface *source, int x1, int y1,
     unsigned width, unsigned height, unsigned frames, boolean abortable);
 

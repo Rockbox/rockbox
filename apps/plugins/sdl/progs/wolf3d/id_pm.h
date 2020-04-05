@@ -17,40 +17,40 @@ extern bool PMSoundInfoPagePadded;
 // The last pointer points one byte after the last page.
 extern uint8_t **PMPages;
 
-void PM_Startup();
-void PM_Shutdown();
+void PM_Startup(void);
+void PM_Shutdown(void);
 
-static uint32_t PM_GetPageSize(int page)
+static inline uint32_t PM_GetPageSize(int page)
 {
     if(page < 0 || page >= ChunksInFile)
         Quit("PM_GetPageSize: Tried to access illegal page: %i", page);
     return (uint32_t) (PMPages[page + 1] - PMPages[page]);
 }
 
-static uint8_t *PM_GetPage(int page)
+static inline uint8_t *PM_GetPage(int page)
 {
     if(page < 0 || page >= ChunksInFile)
         Quit("PM_GetPage: Tried to access illegal page: %i", page);
     return PMPages[page];
 }
 
-static uint8_t *PM_GetEnd()
+static inline uint8_t *PM_GetEnd(void)
 {
     return PMPages[ChunksInFile];
 }
 
-static byte *PM_GetTexture(int wallpic)
+static inline byte *PM_GetTexture(int wallpic)
 {
     return PM_GetPage(wallpic);
 }
 
-static uint16_t *PM_GetSprite(int shapenum)
+static inline uint16_t *PM_GetSprite(int shapenum)
 {
     // correct alignment is enforced by PM_Startup()
     return (uint16_t *) (void *) PM_GetPage(PMSpriteStart + shapenum);
 }
 
-static byte *PM_GetSound(int soundpagenum)
+static inline byte *PM_GetSound(int soundpagenum)
 {
     return PM_GetPage(PMSoundStart + soundpagenum);
 }

@@ -244,7 +244,7 @@ static void init_new_res_vars(int32_t davidoption)
 	qsetmode = surface->h;
 	activepage = visualpage = 0;
 
-     
+
     frameoffset = frameplace = (uint8_t*)surface->pixels;
 
   	if (screen != NULL)
@@ -259,7 +259,7 @@ static void init_new_res_vars(int32_t davidoption)
     	{
     		case 1:i = xdim*ydim; break;
     		case 2: xdim = 320; ydim = 200; i = xdim*ydim; break;
-    		
+
     		default: assert(0);
     	}
     	j = ydim*4*sizeof(int32_t);  /* Leave room for horizlookup&horizlookup2 */
@@ -269,13 +269,13 @@ static void init_new_res_vars(int32_t davidoption)
 
 		if(horizlookup2)
 			free(horizlookup2);
-		
+
 		horizlookup = (int32_t*)malloc(j);
 		horizlookup2 = (int32_t*)malloc(j);
 
     j = 0;
-    
-    //Build lookup table (X screespace -> frambuffer offset. 
+
+    //Build lookup table (X screespace -> frambuffer offset.
   	for(i = 0; i <= ydim; i++)
     {
         ylookup[i] = j;
@@ -290,16 +290,16 @@ static void init_new_res_vars(int32_t davidoption)
     //Let the Assembly module how many pixels to skip when drawing a column
 	setBytesPerLine(bytesperline);
 
-    
+
     setview(0L,0L,xdim-1,ydim-1);
-    
+
 	setbrightness(curbrightness, palette);
 
 	if (searchx < 0) {
         searchx = halfxdimen;
         searchy = (ydimen>>1);
     }
-    
+
 }
 
 
@@ -370,17 +370,17 @@ static int sdl_mouse_motion_filter(SDL_Event const *event)
     }
     else
     {
-			if (SDL_WM_GrabInput(SDL_GRAB_QUERY)==SDL_GRAB_ON) 
+			if (SDL_WM_GrabInput(SDL_GRAB_QUERY)==SDL_GRAB_ON)
 			{
 				mouse_relative_x += event->motion.xrel;
 	       	    mouse_relative_y += event->motion.yrel;
 				//printf("sdl_mouse_motion_filter: mrx=%d, mry=%d, mx=%d, my=%d\n",
 				//	mouse_relative_x, mouse_relative_y, event->motion.xrel, event->motion.yrel);
-				
-				// mouse_relative_* is already reset in 
+
+				// mouse_relative_* is already reset in
 				// readmousexy(). It must not be
 				// reset here because calling this function does not mean
-				// we always handle the mouse. 
+				// we always handle the mouse.
 				// FIX_00001: Mouse speed is uneven and slower in windowed mode vs fullscreen mode.
 			}
 			else
@@ -431,12 +431,12 @@ static __inline int handle_keypad_enter_hack(const SDL_Event *event)
 
 void fullscreen_toggle_and_change_driver(void)
 {
-	
-//  FIX_00002: New Toggle Windowed/FullScreen system now simpler and will 
-//  dynamically change for Windib or Directx driver. Windowed/Fullscreen 
+
+//  FIX_00002: New Toggle Windowed/FullScreen system now simpler and will
+//  dynamically change for Windib or Directx driver. Windowed/Fullscreen
 //  toggle also made available from menu.
 //  Replace attempt_fullscreen_toggle(SDL_Surface **surface, Uint32 *flags)
-  	
+
 	int32_t x,y;
 	x = surface->w;
 	y = surface->h;
@@ -462,8 +462,8 @@ static int sdl_key_filter(const SDL_Event *event)
 
 		// FIX_00005: Mouse pointer can be toggled on/off (see mouse menu or use CTRL-M)
 		// This is usefull to move the duke window when playing in window mode.
-  
-        if (SDL_WM_GrabInput(SDL_GRAB_QUERY)==SDL_GRAB_ON) 
+
+        if (SDL_WM_GrabInput(SDL_GRAB_QUERY)==SDL_GRAB_ON)
 		{
             SDL_WM_GrabInput(SDL_GRAB_OFF);
 			SDL_ShowCursor(1);
@@ -491,9 +491,9 @@ static int sdl_key_filter(const SDL_Event *event)
 		lastkey=(scancodes[SDLK_LALT]&0xff)+0x80; // Simulating Key up (not extended)
 		keyhandler();
 		SDL_SetModState(KMOD_NONE); // SDL doesnt see we are releasing the ALT-ENTER keys
-        
-		return(0);					
-    }								
+
+		return(0);
+    }
 
     if (!handle_keypad_enter_hack(event))
         lastkey = scancodes[event->key.keysym.sym];
@@ -546,7 +546,7 @@ static int root_sdl_event_filter(const SDL_Event *event)
 			return(sdl_mouse_button_filter((const SDL_MouseButtonEvent*)event));
         case SDL_QUIT:
             /* !!! rcg TEMP */
-            Error(EXIT_SUCCESS, "Exit through SDL\n"); 
+            Error(EXIT_SUCCESS, "Exit through SDL\n");
 		default:
 			//printf("This event is not handled: %d\n",event->type);
 			break;
@@ -662,7 +662,7 @@ int _joystick_update(void)
 int _joystick_axis(int axis)
 {
     if (joystick == NULL)
-    {   
+    {
         return(0);
     }
 
@@ -672,7 +672,7 @@ int _joystick_axis(int axis)
 int _joystick_hat(int hat)
 {
     if (joystick == NULL)
-    {   
+    {
         return(-1);
     }
 
@@ -753,28 +753,28 @@ void _platform_init(int argc, char  **argv, const char  *title, const char  *ico
 				//TODO:
 //TODO ( "[Todo: handle -netmode <int>]" )
 				Setup_StableNetworking();
-					
+
             }
         }
     }
-    
-    
+
+
     if (SDL_Init(SDL_INIT_VIDEO) == -1){
         Error(EXIT_FAILURE, "BUILDSDL: SDL_Init() failed!\nBUILDSDL: SDL_GetError() says \"%s\".\n", SDL_GetError());
-    } 
-    
+    }
+
 
 	// Set up the correct renderer
 	// Becarfull setenv can't reach dll in VC++
 	// A way to proceed is to integrate the SDL libs
 	// in the exe instead.
-	
+
     // FIX_00004: SDL.dll and SDL_Mixer.dll are now integrated within the exe
-    // (this also makes the Windib/Directx driver switching easier with SDL)		
+    // (this also makes the Windib/Directx driver switching easier with SDL)
 
     // This requires to recompile the whole sdl and sdl mixer with the lib
     // switch instead of the default dll switch.
-	
+
 	putenv("SDL_VIDEO_CENTERED=1");
 
     if (title == NULL)
@@ -895,12 +895,12 @@ void _platform_init(int argc, char  **argv, const char  *title, const char  *ico
     scancodes[SDLK_PAGEDOWN]        = 0xE051;
     scancodes[SDLK_INSERT]          = 0xE052;
     scancodes[SDLK_DELETE]          = 0xE053;
-    
-    
+
+
 
     output_sdl_versions();
     output_driver_info();
-    
+
 
 	printf("Video Driver: '%s'.\n", SDL_VideoDriverName(dummyString, 20));
 
@@ -909,11 +909,11 @@ void _platform_init(int argc, char  **argv, const char  *title, const char  *ico
 // Capture BMP of the current frame
 int screencapture(char  *filename, uint8_t  inverseit)
 {
-//  FIX_00006: better naming system for screenshots + message when pic is taken. 
+//  FIX_00006: better naming system for screenshots + message when pic is taken.
 //  Use ./screenshots folder. Screenshot code rerwritten. Faster and
 //  makes smaller files. Doesn't freeze or lag the game anymore.
-  
-	SDL_SaveBMP(surface, filename);  
+
+	SDL_SaveBMP(surface, filename);
 	return 0;
 } /* screencapture */
 
@@ -928,7 +928,7 @@ void setvmode(int mode)
     } else
         printf("setvmode(0x%x) is unsupported in SDL driver.\n", mode);
 
-} 
+}
 
 int32_t _setgamemode(uint8_t  davidoption, int32_t daxdim, int32_t daydim)
 {
@@ -941,13 +941,13 @@ int32_t _setgamemode(uint8_t  davidoption, int32_t daxdim, int32_t daydim)
 	colorkey = 0; // index in this image to be transparent
     SDL_SetColorKey(image, SDL_SRCCOLORKEY, colorkey);
 	SDL_WM_SetIcon(image,NULL);
-    
+
     if (daxdim > MAXXDIM || daydim > MAXYDIM)
     {
 		printf("Resolution %dx%d is too high. Changed to %dx%d\n", daxdim, daydim, MAXXDIM,MAXYDIM);
 	    daxdim = MAXXDIM;
 	    daydim = MAXYDIM;
-    } 
+    }
 
 	getvalidvesamodes();
 
@@ -1052,8 +1052,8 @@ static __inline void add_user_defined_resolution(void)
     /* rockbox hack */
     add_vesa_mode("rockbox", LCD_WIDTH, LCD_HEIGHT);
     add_vesa_mode("rockbox", LCD_HEIGHT, LCD_WIDTH);
-    
-    
+
+
     if (envr == NULL)
         return;
 
@@ -1111,7 +1111,7 @@ static __inline void cull_large_vesa_modes(void)
     int32_t max_w;
     int32_t max_h;
     int i;
- 
+
     get_max_screen_res(&max_w, &max_h);
     printf("Setting resolution ceiling to (%dx%d).\n", max_w, max_h);
 
@@ -1139,7 +1139,7 @@ static __inline void cull_duplicate_vesa_modes(void)
             }
         }
     }
-} 
+}
 
 
 #define swap_macro(tmp, x, y) { tmp = x; x = y; y = tmp; }
@@ -1196,7 +1196,7 @@ static __inline void output_vesa_modelist(void)
     } /* for */
 
     printf("Final sorted modelist:%s", buffer);
-} 
+}
 
 
 void getvalidvesamodes(void)
@@ -1233,37 +1233,37 @@ void getvalidvesamodes(void)
 
         /* print it out for debugging purposes... */
     output_vesa_modelist();
-} 
+}
 
 uint8_t lastPalette[768];
 void WriteTranslucToFile(void){
-    
+
     uint8_t buffer[65535*4];
     uint8_t tga_header[18];
     uint8_t* transPointer = transluc;
     uint8_t* bufferPointer = buffer;
     int i;
     FILE* file;
-    
+
     for (i=0; i < 65535; i++) {
-        
+
         bufferPointer[0] = (lastPalette[(*transPointer)*3+0]) / 63.0 * 255;
         bufferPointer[1] = (lastPalette[(*transPointer)*3+1]) / 63.0 * 255;
         bufferPointer[2] = (lastPalette[(*transPointer)*3+2]) / 63.0 * 255;
         bufferPointer[3] = 255;
-        
+
         printf("%d,",*transPointer);
         if (i%255 ==0)
             printf("\n");
-        
+
         transPointer +=1;
         bufferPointer+=4;
     }
-    
-    
-    
+
+
+
     file = fopen("/transluc.tga", "w");
-    
+
     memset(tga_header, 0, 18);
     tga_header[2] = 2;
     tga_header[12] = (256 & 0x00FF);
@@ -1271,23 +1271,23 @@ void WriteTranslucToFile(void){
     tga_header[14] = (256  & 0x00FF) ;
     tga_header[15] =(256 & 0xFF00) / 256;
     tga_header[16] = 32 ;
-    
+
     fwrite(&tga_header, 18, sizeof(uint8_t), file);
     fwrite(buffer, 65535, 4, file);
     fclose(file);
 }
 
 void WritePaletteToFile(uint8_t* palette,const char* filename,int width, int height){
-    
+
     uint8_t tga_header[18];
     uint8_t* buffer;
     uint8_t* palettePointer = palette;
     uint8_t* bufferPointer ;
     int i;
-    
+
     FILE* file = fopen(filename, "w");
-    
-    
+
+
     memset(tga_header, 0, 18);
     tga_header[2] = 2;
     tga_header[12] = (width & 0x00FF);
@@ -1295,30 +1295,30 @@ void WritePaletteToFile(uint8_t* palette,const char* filename,int width, int hei
     tga_header[14] = (height  & 0x00FF) ;
     tga_header[15] =(height & 0xFF00) / 256;
     tga_header[16] = 32 ;
-    
+
     fwrite(&tga_header, 18, sizeof(uint8_t), file);
-    
+
     bufferPointer = buffer = malloc(width*height*4);
-    
+
     for (i = 0 ; i < width*height ; i++)
     {
         bufferPointer[0] = palettePointer[0] / 63.0 * 255;
         bufferPointer[1] = palettePointer[1] / 63.0 * 255;
         bufferPointer[2] = palettePointer[2] / 63.0 * 255;
         bufferPointer[3] = 255;
-        
+
         bufferPointer += 4;
         palettePointer+= 3;
     }
-    
+
     fwrite(buffer, width*height, 4, file);
     fclose(file);
-    
+
     free(buffer);
 }
 
 
-void WriteLastPaletteToFile(){
+void WriteLastPaletteToFile(void){
     WritePaletteToFile(lastPalette,"lastPalette.tga",16,16);
 }
 
@@ -1342,18 +1342,18 @@ int VBE_setPalette(uint8_t  *palettebuffer)
     uint8_t  *p = palettebuffer;
     int i;
     //static updated=0;
-    
+
     //if (updated >=1 )
     //    return ;
-    
+
     //WritePaletteToFile(palettebuffer,"lastPalette.tga",16,16);
     //updated++;
-    
-   
+
+
     //CODE EXPLORATION
     //Used only to write the last palette to file.
     memcpy(lastPalette, palettebuffer, 768);
-    
+
     for (i = 0; i < 256; i++){
         /* doesn't map perfectly */
         sdlp->b = (Uint8) (*p << 2) | (*p >> 4);
@@ -1383,10 +1383,10 @@ int VBE_getPalette(int32_t start, int32_t num, uint8_t  *palettebuffer)
         *p++ = (Uint8) ((((float) sdlp->r) / 255.0) * 63.0);
         *p++ = sdlp->unused;   /* This byte is unused in both SDL and BUILD. */
         sdlp++;
-    } 
+    }
 
     return(1);
-} 
+}
 
 
 void _uninitengine(void)
@@ -1464,13 +1464,13 @@ void _nextpage(void)
 
     _handle_events();
 
-    
+
     SDL_UpdateRect(surface, 0, 0, 0, 0);
-    
+
     //sprintf(bmpName,"%d.bmp",counter++);
     //SDL_SaveBMP(surface,bmpName);
-    
-    
+
+
     //if (CLEAR_FRAMEBUFFER)
     //    SDL_FillRect(surface,NULL,0);
 
@@ -1480,15 +1480,15 @@ void _nextpage(void)
         total_rendered_frames = 0;
         total_render_time = 1;
         last_render_ticks = ticks;
-    } 
+    }
     total_rendered_frames++;
-} 
+}
 
 
 uint8_t  readpixel(uint8_t  * offset)
 {
     return *offset;
-} 
+}
 
 void drawpixel(uint8_t  * location, uint8_t  pixel)
 {
@@ -1519,7 +1519,7 @@ void fillscreen16(int32_t offset, int32_t color, int32_t blocksize)
     pixels = get_framebuffer();
 
     /* Make this function pageoffset aware - DDOI */
-    if (!pageoffset) { 
+    if (!pageoffset) {
 	    offset = offset << 3;
 	    offset += 640*336;
     }
@@ -1584,7 +1584,7 @@ void drawline16(int32_t XStart, int32_t YStart, int32_t XEnd, int32_t YEnd, uint
 
 	dx = XEnd-XStart;
     dy = YEnd-YStart;
-    
+
     //Analyse the slope
 	if (dx >= 0)
 	{
@@ -1803,7 +1803,7 @@ void (*installusertimercallback(void (*callback)(void)))(void)
  inittimer() -- initialise timer
  FCS: The tickspersecond parameter is a ratio value that helps replicating
       oldschool DOS tick per seconds.
- 
+
       The way the timer work is:
       float newSystemTickPerSecond = [0,1]
       tickPerSecond on a DOS system = tickspersecond * newSystemTickPerSecond ;
@@ -1812,8 +1812,8 @@ void (*installusertimercallback(void (*callback)(void)))(void)
 int inittimer(int tickspersecond)
 {
 	int64_t t;
-	
-    
+
+
 	if (timerfreq) return 0;	// already installed
 
 	//printf("Initialising timer, with tickPerSecond=%d\n",tickspersecond);
@@ -1831,7 +1831,7 @@ int inittimer(int tickspersecond)
 	timerlastsample = (int32_t)(t*timerticspersec / timerfreq);
 
 	usertimercallback = NULL;
-    
+
 	return 0;
 }
 
@@ -1853,12 +1853,12 @@ void sampletimer(void)
 {
 	int64_t i;
 	int32_t n;
-	
+
 	if (!timerfreq) return;
 
 	TIMER_GetPlatformTicks(&i);
-    
-    
+
+
 	n = (int32_t)(i*timerticspersec / timerfreq) - timerlastsample;
 	if (n>0) {
 		totalclock += n;
@@ -1907,10 +1907,9 @@ int TIMER_GetPlatformTicksInOneSecond(int64_t* t)
     *t = 1000;
     return 1;
 }
-    
+
 void TIMER_GetPlatformTicks(int64_t* t)
 {
     *t = SDL_GetTicks();
 }
 /* end of sdl_driver.c ... */
-

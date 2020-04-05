@@ -49,5 +49,5 @@ extern vorbis_loader vorbis;
 
 #endif /* OGG_MUSIC */
 
-extern int Mix_InitOgg();
-extern void Mix_QuitOgg();
+extern int Mix_InitOgg(void);
+extern void Mix_QuitOgg(void);

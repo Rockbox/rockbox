@@ -58,5 +58,5 @@ extern mikmod_loader mikmod;
 
 #endif /* MOD_MUSIC */
 
-extern int Mix_InitMOD();
-extern void Mix_QuitMOD();
+extern int Mix_InitMOD(void);
+extern void Mix_QuitMOD(void);
