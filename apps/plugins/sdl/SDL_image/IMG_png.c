@@ -102,7 +102,7 @@ static struct {
 } lib;
 
 #ifdef LOAD_PNG_DYNAMIC
-int IMG_InitPNG()
+int IMG_InitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.handle = SDL_LoadObject(LOAD_PNG_DYNAMIC);
@@ -249,7 +249,7 @@ int IMG_InitPNG()
 
 	return 0;
 }
-void IMG_QuitPNG()
+void IMG_QuitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -260,7 +260,7 @@ void IMG_QuitPNG()
 	--lib.loaded;
 }
 #else
-int IMG_InitPNG()
+int IMG_InitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.png_create_info_struct = png_create_info_struct;
@@ -289,7 +289,7 @@ int IMG_InitPNG()
 
 	return 0;
 }
-void IMG_QuitPNG()
+void IMG_QuitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;

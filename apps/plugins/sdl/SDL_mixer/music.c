@@ -173,7 +173,7 @@ static void music_internal_initialize_volume(void);
 static void music_internal_volume(int volume);
 static int  music_internal_play(Mix_Music *music, double position);
 static int  music_internal_position(double position);
-static int  music_internal_playing();
+static int  music_internal_playing(void);
 static void music_internal_halt(void);
 
 
@@ -193,8 +193,8 @@ void Mix_HookMusicFinished(void (*music_finished)(void))
 static int music_halt_or_loop (void)
 {
 	/* Restart music if it has to loop */
-	
-	if (!music_internal_playing()) 
+
+	if (!music_internal_playing())
 	{
 #ifdef USE_NATIVE_MIDI
 		/* Native MIDI handles looping internally */
@@ -211,17 +211,17 @@ static int music_halt_or_loop (void)
 			current_fade = music_playing->fading;
 			music_internal_play(music_playing, 0.0);
 			music_playing->fading = current_fade;
-		} 
-		else 
+		}
+		else
 		{
 			music_internal_halt();
 			if (music_finished_hook)
 				music_finished_hook();
-			
+
 			return 0;
 		}
 	}
-	
+
 	return 1;
 }
 
@@ -258,7 +258,7 @@ void music_mixer(void *udata, Uint8 *stream, int len)
 				music_playing->fading = MIX_NO_FADING;
 			}
 		}
-		
+
 		music_halt_or_loop();
 		if (!music_internal_playing())
 			return;
@@ -309,7 +309,7 @@ void music_mixer(void *udata, Uint8 *stream, int len)
 #endif
 #ifdef OGG_MUSIC
 			case MUS_OGG:
-				
+
 				left = OGG_playAudio(music_playing->data.ogg, stream, len);
 				break;
 #endif
@@ -334,7 +334,7 @@ void music_mixer(void *udata, Uint8 *stream, int len)
 		}
 	}
 
-        
+
 skip:
 	/* Handle seamless music looping */
 	if (left > 0 && left < len) {
