@@ -8013,12 +8013,7 @@ void findGRPToUse(char * groupfilefullpath){
 
     while ((dirEntry = readdir(dir)) != NULL)
     {
-
-#ifdef __linux__
-        if (dukeGRP_Match(dirEntry->d_name, _D_EXACT_NAMLEN(dirEntry)))
-#else
             if (dukeGRP_Match(dirEntry->d_name,strlen(dirEntry->d_name)))
-#endif
             {
                 sprintf(groupfilefullpath,"%s%s",directoryToScan,dirEntry->d_name);
                 return;
