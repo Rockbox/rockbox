@@ -118,10 +118,10 @@ extern CP_iteminfo MainItems;
 
 void US_ControlPanel(ScanCode);
 
-void EnableEndGameMenuItem();
+void EnableEndGameMenuItem(void);
 
 void SetupControlPanel(void);
-void SetupSaveGames();
+void SetupSaveGames(void);
 void CleanupControlPanel(void);
 
 void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items);
