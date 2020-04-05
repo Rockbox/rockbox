@@ -96,7 +96,7 @@ void timerhandler(void);
 /* resolution inits. sdl_driver.c ... */
 int32_t _setgamemode(uint8_t  davidoption, int32_t daxdim, int32_t daydim);
 
-uint32_t getticks();
+uint32_t getticks(void);
 
 void drawline16(int32_t XStart, int32_t YStart, int32_t XEnd, int32_t YEnd, uint8_t  Color);
 void setcolor16(uint8_t color);
@@ -106,5 +106,3 @@ void setcolor16(uint8_t color);
 void initmultiplayers(uint8_t  damultioption, uint8_t  dacomrateoption, uint8_t  dapriority);
 
 #endif
-
-
