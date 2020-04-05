@@ -6,9 +6,10 @@
     it under the terms of the Perl Artistic License, available in COPYING.
  */
 
+#include "config.h"
+
 #include <SDL_rwops.h>
 
-#include "config.h"
 #include "common.h"
 #include "instrum.h"
 #include "playmidi.h"
@@ -69,14 +70,14 @@ int XG_System_variation_type;
 
 
 static void adjust_amplification(void)
-{ 
+{
   master_volume = (FLOAT_T)(amplification) / (FLOAT_T)100.0;
   master_volume /= 2;
 }
 
 
 static void adjust_master_volume(int32 vol)
-{ 
+{
   master_volume = (double)(vol*amplification) / 1638400.0L;
   master_volume /= 2;
 }
@@ -146,7 +147,7 @@ static void select_sample(int v, Instrument *ip)
     }
 
   f=voice[v].orig_frequency;
-  /* 
+  /*
      No suitable sample found! We'll select the sample whose root
      frequency is closest to the one we want. (Actually we should
      probably convert the low, high, and root frequencies to MIDI note
@@ -214,11 +215,11 @@ static void select_stereo_samples(int v, InstrumentLayer *lp)
 
 static void recompute_freq(int v)
 {
-  int 
+  int
     sign=(voice[v].sample_increment < 0), /* for bidirectional loops */
     pb=channel[voice[v].channel].pitchbend;
   double a;
-  
+
   if (!voice[v].sample->sample_rate)
     return;
 
@@ -262,22 +263,22 @@ static void recompute_freq(int v)
 	      (double)(play_mode->rate)),
 	     FRACTION_BITS);
 
-  if (sign) 
+  if (sign)
     a = -a; /* need to preserve the loop direction */
 
   voice[v].sample_increment = (int32)(a);
 }
 
 static int expr_curve[128] = {
-	7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 11, 
-	11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 14, 14, 14, 14, 15, 15, 
-	15, 16, 16, 17, 17, 17, 18, 18, 19, 19, 19, 20, 20, 21, 21, 22, 
-	22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 28, 28, 29, 30, 30, 31, 
-	32, 32, 33, 34, 35, 35, 36, 37, 38, 39, 39, 40, 41, 42, 43, 44, 
-	45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56, 57, 59, 60, 61, 63, 
-	64, 65, 67, 68, 70, 71, 73, 75, 76, 78, 80, 82, 83, 85, 87, 89, 
+	7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 9, 10, 10, 10, 10, 11,
+	11, 11, 11, 12, 12, 12, 12, 13, 13, 13, 14, 14, 14, 14, 15, 15,
+	15, 16, 16, 17, 17, 17, 18, 18, 19, 19, 19, 20, 20, 21, 21, 22,
+	22, 23, 23, 24, 24, 25, 25, 26, 26, 27, 28, 28, 29, 30, 30, 31,
+	32, 32, 33, 34, 35, 35, 36, 37, 38, 39, 39, 40, 41, 42, 43, 44,
+	45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56, 57, 59, 60, 61, 63,
+	64, 65, 67, 68, 70, 71, 73, 75, 76, 78, 80, 82, 83, 85, 87, 89,
 	91, 93, 95, 97, 99, 102, 104, 106, 109, 111, 113, 116, 118, 121,
-	124, 127 
+	124, 127
 };
 
 static int panf(int pan, int speaker, int separation)
@@ -423,7 +424,7 @@ static void recompute_amp(int v)
 /* just a variant of note_on() */
 static int vc_alloc(int j)
 {
-  int i=voices; 
+  int i=voices;
 
   while (i--)
     {
@@ -439,7 +440,7 @@ static void kill_note(int i);
 
 static void kill_others(int i)
 {
-  int j=voices; 
+  int j=voices;
 
   if (!voice[i].sample->exclusiveClass) return;
 
@@ -769,7 +770,7 @@ static void start_note(MidiEvent *e, int i)
       ip = lp->instrument;
       if (ip->type == INST_GUS && ip->samples != 1)
 	{
-	  ctl->cmsg(CMSG_WARNING, VERB_VERBOSE, 
+	  ctl->cmsg(CMSG_WARNING, VERB_VERBOSE,
 	       "Strange: percussion instrument with %d samples!", ip->samples);
 	}
 
@@ -989,14 +990,14 @@ static void kill_note(int i)
 /* Only one instance of a note can be playing on a single channel. */
 static void note_on(MidiEvent *e)
 {
-  int i=voices, lowest=-1; 
+  int i=voices, lowest=-1;
   int32 lv=0x7FFFFFFF, v;
 
   while (i--)
     {
       if (voice[i].status == VOICE_FREE)
 	lowest=i; /* Can't get a lower volume than silence */
-      else if (voice[i].channel==e->channel && 
+      else if (voice[i].channel==e->channel &&
 	       (voice[i].note==e->a || channel[voice[i].channel].mono))
 	kill_note(i);
     }
@@ -1007,7 +1008,7 @@ static void note_on(MidiEvent *e)
       start_note(e,lowest);
       return;
     }
-  
+
 #if 0
   /* Look for the decaying note with the lowest volume */
   i=voices;
@@ -1136,7 +1137,7 @@ static void all_notes_off(int c)
     if (voice[i].status==VOICE_ON &&
 	voice[i].channel==c)
       {
-	if (channel[c].sustain) 
+	if (channel[c].sustain)
 	  {
 	    voice[i].status=VOICE_SUSTAINED;
 	    ctl->note(i);
@@ -1151,7 +1152,7 @@ static void all_sounds_off(int c)
 {
   int i=voices;
   while (i--)
-    if (voice[i].channel==c && 
+    if (voice[i].channel==c &&
 	voice[i].status != VOICE_FREE &&
 	voice[i].status != VOICE_DIE)
       {
@@ -1232,29 +1233,29 @@ static void seek_forward(int32 until_time)
 	    current_event->a;
 	  channel[current_event->channel].pitchfactor=0;
 	  break;
-	  
+
 	case ME_PITCHWHEEL:
 	  channel[current_event->channel].pitchbend=
 	    current_event->a + current_event->b * 128;
 	  channel[current_event->channel].pitchfactor=0;
 	  break;
-	  
+
 	case ME_MAINVOLUME:
 	  channel[current_event->channel].volume=current_event->a;
 	  break;
-	  
+
 	case ME_MASTERVOLUME:
 	  adjust_master_volume(current_event->a + (current_event->b <<7));
 	  break;
-	  
+
 	case ME_PAN:
 	  channel[current_event->channel].panning=current_event->a;
 	  break;
-	      
+
 	case ME_EXPRESSION:
 	  channel[current_event->channel].expression=current_event->a;
 	  break;
-	  
+
 	case ME_PROGRAM:
 	  /* if (ISDRUMCHANNEL(current_event->channel)) */
 	  if (channel[current_event->channel].kit)
@@ -1310,11 +1311,11 @@ static void seek_forward(int32 until_time)
 	case ME_RESET_CONTROLLERS:
 	  reset_controllers(current_event->channel);
 	  break;
-	      
+
 	case ME_TONE_BANK:
 	  channel[current_event->channel].bank=current_event->a;
 	  break;
-	  
+
 	case ME_EOT:
 	  current_sample=current_event->time;
 	  return;
@@ -1336,7 +1337,7 @@ static void skip_to(int32 until_time)
   buffered_count=0;
   buffer_pointer=common_buffer;
   current_event=event_list;
-  
+
   if (until_time)
     seek_forward(until_time);
   ctl->reset();
@@ -1351,15 +1352,15 @@ static int apply_controls(void)
     switch(rc=ctl->read(&val))
       {
       case RC_QUIT: /* [] */
-      case RC_LOAD_FILE:	  
+      case RC_LOAD_FILE:
       case RC_NEXT: /* >>| */
       case RC_REALLY_PREVIOUS: /* |<< */
 	return rc;
-	
+
       case RC_CHANGE_VOLUME:
 	if (val>0 || amplification > -val)
 	  amplification += val;
-	else 
+	else
 	  amplification=0;
 	if (amplification > MAX_AMPLIFICATION)
 	  amplification=MAX_AMPLIFICATION;
@@ -1382,20 +1383,20 @@ static int apply_controls(void)
 	skip_to(0);
 	did_skip=1;
 	break;
-	
+
       case RC_JUMP:
 	if (val >= sample_count)
 	  return RC_NEXT;
 	skip_to(val);
 	return rc;
-	
+
       case RC_FORWARD: /* >> */
 	if (val+current_sample >= sample_count)
 	  return RC_NEXT;
 	skip_to(val+current_sample);
 	did_skip=1;
 	break;
-	
+
       case RC_BACK: /* << */
 	if (current_sample > val)
 	  skip_to(current_sample-val);
@@ -1405,10 +1406,10 @@ static int apply_controls(void)
 	break;
       }
   while (rc!= RC_NONE);
- 
+
   /* Advertise the skip so that we stop computing the audio buffer */
   if (did_skip)
-    return RC_JUMP; 
+    return RC_JUMP;
   else
     return rc;
 }
@@ -1466,7 +1467,7 @@ static int compute_data(void *stream, int32 count)
       s32tobuf(stream, common_buffer, channels*AUDIO_BUFFER_SIZE);
       buffer_pointer=common_buffer;
       buffered_count=0;
-      
+
       ctl->current_time(current_sample);
       if ((rc=apply_controls())!=RC_NONE)
 	return rc;
@@ -1485,7 +1486,7 @@ int Timidity_PlaySome(void *stream, int samples)
     //printf("Timidity_PlaySome()\n");
   int rc = RC_NONE;
   int32 end_sample;
-  
+
   if ( ! midi_playing ) {
     return RC_NONE;
   }
@@ -1504,33 +1505,33 @@ int Timidity_PlaySome(void *stream, int samples)
           else
             note_on(current_event);
           break;
-  
+
         case ME_NOTEOFF:
 	  current_event->a += channel[current_event->channel].transpose;
           note_off(current_event);
           break;
-  
+
         case ME_KEYPRESSURE:
           adjust_pressure(current_event);
           break;
-  
+
           /* Effects affecting a single channel */
-  
+
         case ME_PITCH_SENS:
           channel[current_event->channel].pitchsens=current_event->a;
           channel[current_event->channel].pitchfactor=0;
           break;
-          
+
         case ME_PITCHWHEEL:
           channel[current_event->channel].pitchbend=
             current_event->a + current_event->b * 128;
           channel[current_event->channel].pitchfactor=0;
           /* Adjust pitch for notes already playing */
           adjust_pitchbend(current_event->channel);
-          ctl->pitch_bend(current_event->channel, 
+          ctl->pitch_bend(current_event->channel,
               channel[current_event->channel].pitchbend);
           break;
-          
+
         case ME_MAINVOLUME:
           channel[current_event->channel].volume=current_event->a;
           adjust_volume(current_event->channel);
@@ -1540,7 +1541,7 @@ int Timidity_PlaySome(void *stream, int samples)
 	case ME_MASTERVOLUME:
 	  adjust_master_volume(current_event->a + (current_event->b <<7));
 	  break;
-	      
+
 	case ME_REVERBERATION:
 	  channel[current_event->channel].reverberation=current_event->a;
 	  break;
@@ -1555,13 +1556,13 @@ int Timidity_PlaySome(void *stream, int samples)
             adjust_panning(current_event->channel);
           ctl->panning(current_event->channel, current_event->a);
           break;
-          
+
         case ME_EXPRESSION:
           channel[current_event->channel].expression=current_event->a;
           adjust_volume(current_event->channel);
           ctl->expression(current_event->channel, current_event->a);
           break;
-  
+
         case ME_PROGRAM:
           /* if (ISDRUMCHANNEL(current_event->channel)) { */
 	  if (channel[current_event->channel].kit) {
@@ -1574,23 +1575,23 @@ int Timidity_PlaySome(void *stream, int samples)
           }
           ctl->program(current_event->channel, current_event->a);
           break;
-  
+
         case ME_SUSTAIN:
           channel[current_event->channel].sustain=current_event->a;
           if (!current_event->a)
             drop_sustain(current_event->channel);
           ctl->sustain(current_event->channel, current_event->a);
           break;
-          
+
         case ME_RESET_CONTROLLERS:
           reset_controllers(current_event->channel);
           redraw_controllers(current_event->channel);
           break;
-  
+
         case ME_ALL_NOTES_OFF:
           all_notes_off(current_event->channel);
           break;
-          
+
         case ME_ALL_SOUNDS_OFF:
           all_sounds_off(current_event->channel);
           break;
@@ -1725,7 +1726,7 @@ void Timidity_FreeSong(MidiSong *song)
 {
   if (free_instruments_afterwards)
     free_instruments();
-  
+
   free(song->events);
   free(song);
 }
@@ -1743,4 +1744,3 @@ void Timidity_Close(void)
   free_instruments();
   free_pathlist();
 }
-

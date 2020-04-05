@@ -6,8 +6,8 @@
     it under the terms of the Perl Artistic License, available in COPYING.
  */
 
-#include "SDL.h"
 #include "config.h"
+#include "SDL.h"
 #include "common.h"
 #include "instrum.h"
 #include "playmidi.h"
@@ -88,7 +88,7 @@ static int read_config_file(const char *name)
   {
     if (words != 2)
       {
-        ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+        ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
         "%s: line %d: Must specify exactly one patch name\n",
           name, line);
         return -2;
@@ -101,14 +101,14 @@ static int read_config_file(const char *name)
     if (words < 2)
       {
         ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
-          "%s: line %d: No drum set number given\n", 
+          "%s: line %d: No drum set number given\n",
           name, line);
       return -2;
       }
     i=atoi(w[1]);
     if (i<0 || i>127)
      {
-        ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+        ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
           "%s: line %d: Drum set must be between 0 and 127\n",
         name, line);
         return -2;
@@ -125,14 +125,14 @@ static int read_config_file(const char *name)
     if (words < 2)
      {
         ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
-          "%s: line %d: No bank number given\n", 
+          "%s: line %d: No bank number given\n",
         name, line);
         return -2;
      }
     i=atoi(w[1]);
     if (i<0 || i>127)
       {
-        ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+        ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
           "%s: line %d: Tone bank must be between 0 and 127\n",
         name, line);
         return -2;
@@ -161,7 +161,7 @@ static int read_config_file(const char *name)
     }
   if (!bank)
     {
-      ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+      ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
        "%s: line %d: Must specify tone bank or drum set "
         "before assignment\n",
         name, line);
@@ -188,7 +188,7 @@ static int read_config_file(const char *name)
     k=atoi(cp);
     if ((k<0 || k>MAX_AMPLIFICATION) || (*cp < '0' || *cp > '9'))
       {
-       ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+       ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
           "%s: line %d: amplification must be between "
          "0 and %d\n", name, line, MAX_AMPLIFICATION);
        return -2;
@@ -200,7 +200,7 @@ static int read_config_file(const char *name)
     k=atoi(cp);
     if ((k<0 || k>127) || (*cp < '0' || *cp > '9'))
       {
-       ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+       ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
          "%s: line %d: note must be between 0 and 127\n",
           name, line);
         return -2;
@@ -220,7 +220,7 @@ static int read_config_file(const char *name)
     if ((k<0 || k>127) ||
        (k==0 && *cp!='-' && (*cp < '0' || *cp > '9')))
       {
-       ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+       ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
          "%s: line %d: panning must be left, right, "
          "center, or between -100 and 100\n",
          name, line);
@@ -302,7 +302,7 @@ int Timidity_Init(int rate, int format, int channels, int samples)
   }
   if ( channels == 1 ) {
     play_mode->encoding |= PE_MONO;
-  } 
+  }
   switch (format) {
     case AUDIO_S8:
       s32tobuf = s32tos8;
@@ -356,4 +356,3 @@ const char *Timidity_Error(void)
 {
   return(timidity_error);
 }
-

@@ -182,6 +182,9 @@ extern byte				*r_skysource;
 #define DR_TRANSPARENT	1
 
 // !!! must be kept the same as in quakeasm.h !!!
+#ifdef TRANSPARENT_COLOR
+#undef TRANSPARENT_COLOR
+#endif
 #define TRANSPARENT_COLOR	0xFF
 
 extern void *acolormap;	// FIXME: should go away
