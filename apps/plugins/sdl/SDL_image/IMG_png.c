@@ -32,25 +32,25 @@
 
 /*=============================================================================
         File: SDL_png.c
-     Purpose: A PNG loader and saver for the SDL library      
-    Revision: 
+     Purpose: A PNG loader and saver for the SDL library
+    Revision:
   Created by: Philippe Lavoie          (2 November 1998)
               lavoie@zeus.genie.uottawa.ca
- Modified by: 
+ Modified by:
 
  Copyright notice:
           Copyright (C) 1998 Philippe Lavoie
- 
+
           This library is free software; you can redistribute it and/or
           modify it under the terms of the GNU Library General Public
           License as published by the Free Software Foundation; either
           version 2 of the License, or (at your option) any later version.
- 
+
           This library is distributed in the hope that it will be useful,
           but WITHOUT ANY WARRANTY; without even the implied warranty of
           MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
           Library General Public License for more details.
- 
+
           You should have received a copy of the GNU Library General Public
           License along with this library; if not, write to the Free
           Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -102,7 +102,7 @@ static struct {
 } lib;
 
 #ifdef LOAD_PNG_DYNAMIC
-int IMG_InitPNG()
+int IMG_InitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.handle = SDL_LoadObject(LOAD_PNG_DYNAMIC);
@@ -249,7 +249,7 @@ int IMG_InitPNG()
 
 	return 0;
 }
-void IMG_QuitPNG()
+void IMG_QuitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -260,7 +260,7 @@ void IMG_QuitPNG()
 	--lib.loaded;
 }
 #else
-int IMG_InitPNG()
+int IMG_InitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		lib.png_create_info_struct = png_create_info_struct;
@@ -289,7 +289,7 @@ int IMG_InitPNG()
 
 	return 0;
 }
-void IMG_QuitPNG()
+void IMG_QuitPNG(void)
 {
 	if ( lib.loaded == 0 ) {
 		return;
@@ -526,7 +526,7 @@ SDL_Surface *IMG_LoadPNG_RW(SDL_RWops *src)
 		    palette->colors[i].b = i;
 		}
 	    } else if (png_num_palette > 0 ) {
-		palette->ncolors = png_num_palette; 
+		palette->ncolors = png_num_palette;
 		for( i=0; i<png_num_palette; ++i ) {
 		    palette->colors[i].b = png_palette[i].blue;
 		    palette->colors[i].g = png_palette[i].green;
@@ -552,18 +552,18 @@ done:	/* Clean up and return */
 		}
 		IMG_SetError(error);
 	}
-	return(surface); 
+	return(surface);
 }
 
 #else
 
-int IMG_InitPNG()
+int IMG_InitPNG(void)
 {
 	IMG_SetError("PNG images are not supported");
 	return(-1);
 }
 
-void IMG_QuitPNG()
+void IMG_QuitPNG(void)
 {
 }
 

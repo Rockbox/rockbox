@@ -11,7 +11,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -60,7 +60,7 @@ int16  IntelShort (int16 l);
 int32_t  Motoint32_t (int32_t l);
 int32_t  Intelint32_t (int32_t l);
 
-void HeapSort(uint8_t  * base, int32 nel, int32 width, int32 (*compare)(), void (*switcher)());
+//void HeapSort(uint8_t  * base, int32 nel, int32 width, int32 (*compare)(), void (*switcher)());
 
 #ifdef __cplusplus
 };

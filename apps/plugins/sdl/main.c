@@ -71,8 +71,8 @@ void cleanup(void)
 #endif
 }
 
-/* 256KB */
-static long main_stack[1024 * 1024 / 2];
+static long main_stack[1024 * 1024 / 4]; /* ie 1 MB */
+
 int (*main_fn)(int argc, char *argv[]);
 int prog_idx;
 static void main_thread(void)

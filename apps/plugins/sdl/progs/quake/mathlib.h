@@ -8,7 +8,7 @@ of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 See the GNU General Public License for more details.
 
@@ -69,11 +69,13 @@ void CrossProduct (vec3_t v1, vec3_t v2, vec3_t cross);
 //void VectorNormalizeNoRet (vec3_t v); // uses finvsqrt
 //float VectorNormalize (vec3_t v);		// returns vector length
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 static inline float InvSqrt( float number ) {
     long i;
     float x2, y;
     const float threehalfs = 1.5F;
- 
+
     x2 = number * 0.5F;
     y  = number;
     i  = * ( long * ) &y;			// evil floating point bit level hacking
@@ -84,13 +86,14 @@ static inline float InvSqrt( float number ) {
 
     return y;
 }
+#pragma GCC diagnostic pop
 
 static inline void VectorNormalizeNoRet (vec3_t v)
 {
 	float	length, ilength;
 
 	ilength = InvSqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-        
+
         v[0] *= ilength;
         v[1] *= ilength;
         v[2] *= ilength;
@@ -110,7 +113,7 @@ static inline float VectorNormalize (vec3_t v)
 		v[1] *= ilength;
 		v[2] *= ilength;
 	}
-		
+
 	return length;
 
 }
