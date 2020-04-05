@@ -67,7 +67,9 @@ int remote_type(void)
 }
 #endif
 
+#ifndef SIMULATOR
 struct event_queue button_queue;
+#endif
 
 static int btn = 0;    /* Hopefully keeps track of currently pressed keys... */
 
