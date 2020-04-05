@@ -3,17 +3,17 @@
 
 
 // Public member functions
-void     CONSOLE_Init();
-void     CONSOLE_Reset();
-void     CONSOLE_Term();
-void     CONSOLE_ParseStartupScript();
-void     CONSOLE_HandleInput();
-void     CONSOLE_Render();
+void     CONSOLE_Init(void);
+void     CONSOLE_Reset(void);
+void     CONSOLE_Term(void);
+void     CONSOLE_ParseStartupScript(void);
+void     CONSOLE_HandleInput(void);
+void     CONSOLE_Render(void);
 void     CONSOLE_ParseCommand(char * command);
 void     CONSOLE_Printf(const char  *newmsg, ...);
-int      CONSOLE_GetArgc();
+int      CONSOLE_GetArgc(void);
 char *    CONSOLE_GetArgv(unsigned int var);
-int      CONSOLE_IsActive();
-void     CONSOLE_SetActive(int i); 
+int      CONSOLE_IsActive(void);
+void     CONSOLE_SetActive(int i);
 
 #endif
