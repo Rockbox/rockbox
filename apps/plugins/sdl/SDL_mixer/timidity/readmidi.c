@@ -6,9 +6,10 @@
     it under the terms of the Perl Artistic License, available in COPYING.
  */
 
+#include "config.h"
+
 #include <SDL_rwops.h>
 
-#include "config.h"
 #include "common.h"
 #include "instrum.h"
 #include "playmidi.h"
@@ -282,11 +283,11 @@ static MidiEventList *read_midi_event(void)
       at+=getvl();
       if (SDL_RWread(rw,&me,1,1)!=1)
 	{
-	  ctl->cmsg(CMSG_ERROR, VERB_NORMAL, "%s: read_midi_event: %s", 
+	  ctl->cmsg(CMSG_ERROR, VERB_NORMAL, "%s: read_midi_event: %s",
 	       current_filename, strerror(errno));
 	  return 0;
 	}
-      
+
       if(me==0xF0 || me == 0xF7) /* SysEx event */
 	{
 	  int32 sret;
@@ -340,9 +341,9 @@ static MidiEventList *read_midi_event(void)
 	      case 0x51: /* Tempo */
 		SDL_RWread(rw,&a,1,1); SDL_RWread(rw,&b,1,1); SDL_RWread(rw,&c,1,1);
 		MIDIEVENT(at, ME_TEMPO, c, a, b);
-		
+
 	      default:
-		ctl->cmsg(CMSG_INFO, VERB_DEBUG, 
+		ctl->cmsg(CMSG_INFO, VERB_DEBUG,
 		     "(Meta event type 0x%02x, length %ld)", type, len);
 		SDL_RWseek(rw, len, RW_SEEK_CUR);
 		break;
@@ -414,7 +415,7 @@ static MidiEventList *read_midi_event(void)
 		  case 101: nrpn=0; rpn_lsb[lastchan]=b; break;
 		  case 99: nrpn=1; rpn_msb[lastchan]=b; break;
 		  case 98: nrpn=1; rpn_lsb[lastchan]=b; break;
-		    
+
 		  case 6:
 		    if (nrpn)
 		      {
@@ -455,13 +456,13 @@ static MidiEventList *read_midi_event(void)
 			*/
 			 }
 
-			ctl->cmsg(CMSG_INFO, VERB_DEBUG, 
+			ctl->cmsg(CMSG_INFO, VERB_DEBUG,
 				  "(Data entry (MSB) for NRPN %02x,%02x: %ld)",
 				  rpn_msb[lastchan], rpn_lsb[lastchan],
 				  b);
 			break;
 		      }
-		    
+
 		    switch((rpn_msb[lastchan]<<8) | rpn_lsb[lastchan])
 		      {
 		      case 0x0000: /* Pitch bend sensitivity */
@@ -473,22 +474,22 @@ static MidiEventList *read_midi_event(void)
 			MIDIEVENT(at, ME_PITCH_SENS, lastchan, 2, 0);
 
 		      default:
-			ctl->cmsg(CMSG_INFO, VERB_DEBUG, 
+			ctl->cmsg(CMSG_INFO, VERB_DEBUG,
 				  "(Data entry (MSB) for RPN %02x,%02x: %ld)",
 				  rpn_msb[lastchan], rpn_lsb[lastchan],
 				  b);
 			break;
 		      }
 		    break;
-		    
+
 		  default:
-		    ctl->cmsg(CMSG_INFO, VERB_DEBUG, 
+		    ctl->cmsg(CMSG_INFO, VERB_DEBUG,
 			      "(Control %d: %d)", a, b);
 		    break;
 		  }
 		if (control != 255)
-		  { 
-		    MIDIEVENT(at, control, lastchan, b, 0); 
+		  {
+		    MIDIEVENT(at, control, lastchan, b, 0);
 		  }
 	      }
 	      break;
@@ -505,15 +506,15 @@ static MidiEventList *read_midi_event(void)
 	      b &= 0x7F;
 	      MIDIEVENT(at, ME_PITCHWHEEL, lastchan, a, b);
 
-	    default: 
-	      ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+	    default:
+	      ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
 		   "*** Can't happen: status 0x%02X, channel 0x%02X",
 		   laststatus, lastchan);
 	      break;
 	    }
 	}
     }
-  
+
   return new;
 }
 
@@ -574,7 +575,7 @@ static int read_track(int append)
 	  meep=next;
 	  next=meep->next;
 	}
-	  
+
       new->next=next;
       meep->next=new;
 
@@ -720,7 +721,7 @@ static MidiEvent *groom_list(int32 divisions,int32 *eventsp,int32 *samplesp)
 		}
 	      if (current_set[meep->event.channel] != new_value)
 		current_set[meep->event.channel]=new_value;
-	      else 
+	      else
 		skip_this_event=1;
 	    }
 	  else
@@ -776,7 +777,7 @@ static MidiEvent *groom_list(int32 divisions,int32 *eventsp,int32 *samplesp)
 	      if (mprog==SPECIAL_PROGRAM)
 		break;
 
-	      if (XG_System_On && banknum==SFXBANK && !tonebank[SFXBANK] && tonebank[120]) 
+	      if (XG_System_On && banknum==SFXBANK && !tonebank[SFXBANK] && tonebank[120])
 		      banknum = 120;
 
 	      /*if (current_config_pc42b) pcmap(&banknum, &dnote, &mprog, &drumsflag);*/
@@ -812,7 +813,7 @@ static MidiEvent *groom_list(int32 divisions,int32 *eventsp,int32 *samplesp)
 	      new_value=meep->event.a;
 	      if (current_kit[meep->event.channel] != new_value)
 		current_kit[meep->event.channel]=new_value;
-	      else 
+	      else
 		skip_this_event=1;
 	      break;
 	    }
@@ -846,7 +847,7 @@ static MidiEvent *groom_list(int32 divisions,int32 *eventsp,int32 *samplesp)
 	    }
 	  if (tonebank[SFXBANK] || tonebank[120]) /* Is this a defined tone bank? */
 	    new_value=SFX_BANKTYPE;
-	  else 
+	  else
 	    {
 	      ctl->cmsg(CMSG_WARNING, VERB_VERBOSE,
 		   "XG Sfx bank is undefined");
@@ -873,7 +874,7 @@ static MidiEvent *groom_list(int32 divisions,int32 *eventsp,int32 *samplesp)
 	  }
 	  else if (tonebank[meep->event.a]) /* Is this a defined tone bank? */
 	    new_value=meep->event.a;
-	  else 
+	  else
 	    {
 	      ctl->cmsg(CMSG_WARNING, VERB_VERBOSE,
 		   "Tone bank %d is undefined", meep->event.a);
@@ -924,7 +925,7 @@ static MidiEvent *groom_list(int32 divisions,int32 *eventsp,int32 *samplesp)
   lp->type=ME_EOT;
   our_event_count++;
   free_midi_list();
-  
+
   *eventsp=our_event_count;
   *samplesp=st;
   return groomed_list;
@@ -968,11 +969,11 @@ past_riff:
     {
      /* if (ferror(fp))
 	{
-	  ctl->cmsg(CMSG_ERROR, VERB_NORMAL, "%s: %s", current_filename, 
+	  ctl->cmsg(CMSG_ERROR, VERB_NORMAL, "%s: %s", current_filename,
 	       strerror(errno));
 	}
       else*/
-	ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+	ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
 	     "%s: Not a MIDI file!", current_filename);
       return 0;
     }
@@ -1010,18 +1011,18 @@ past_riff:
 
   if (len > 6)
     {
-      ctl->cmsg(CMSG_WARNING, VERB_NORMAL, 
-	   "%s: MIDI file header size %ld bytes", 
+      ctl->cmsg(CMSG_WARNING, VERB_NORMAL,
+	   "%s: MIDI file header size %ld bytes",
 	   current_filename, len);
       SDL_RWseek(rw, len-6, RW_SEEK_CUR); /* skip the excess */
     }
   if (format<0 || format >2)
     {
-      ctl->cmsg(CMSG_ERROR, VERB_NORMAL, 
+      ctl->cmsg(CMSG_ERROR, VERB_NORMAL,
 	   "%s: Unknown MIDI file format %d", current_filename, format);
       return 0;
     }
-  ctl->cmsg(CMSG_INFO, VERB_VERBOSE, 
+  ctl->cmsg(CMSG_INFO, VERB_VERBOSE,
        "Format: %d  Tracks: %d  Divisions: %d", format, tracks, divisions);
 
   /* Put a do-nothing event first in the list for easier processing */
