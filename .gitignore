@@ -78,9 +78,18 @@
 /rbutil/rbutilqt/*.Debug
 /rbutil/rbutilqt/*.Release
 /rbutil/rbutilqt/tags
+/rbutil/rbutilqt/.qmake.stash
 
 # /rbutil/rbutilqt/lang/
 /rbutil/rbutilqt/lang/*.qm
+
+# More rbutil
+/rbutil/*/buildposix
+/rbutil/*/uninstall_script.[ch]
+/rbutil/*/install_script.[ch]
+/rbutil/mkimxboot/mkimxboot
+/rbutil/mknwzboot/mknwzboot
+/rbutil/mkzenboot/mkzenboot
 
 # /tools/
 /tools/bdf2bmp
