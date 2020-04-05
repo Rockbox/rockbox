@@ -292,6 +292,13 @@ bool headphones_inserted(void)
 }
 #endif
 
+#ifdef HAVE_LINEOUT_DETECTION
+bool lineout_inserted(void)
+{
+    return false;
+}
+#endif
+
 #ifdef HAVE_SPDIF_POWER
 void spdif_power_enable(bool on)
 {
