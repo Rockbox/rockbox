@@ -1541,7 +1541,14 @@ INLINE void fix_huff_tables(struct jpeg *p_jpeg)
 INLINE void fix_quant_tables(struct jpeg *p_jpeg)
 {
     int shift, i, j;
-    for (i = 0; i < 2; i++)
+
+#ifdef HAVE_LCD_COLOR
+    const int k = 2;
+#else
+    const int k = 1;
+#endif
+
+    for (i = 0; i < k; i++)
     {
         shift = idct_tbl[p_jpeg->v_scale[i]].scale;
         if (shift)
