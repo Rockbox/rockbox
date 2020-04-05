@@ -128,7 +128,7 @@ struct thread_entry
                                     all threads blocked by this one) */
 #endif
 #ifndef HAVE_SDL_THREADS
-    unsigned short stack_size;   /* Size of stack in bytes */
+    size_t stack_size;           /* Size of stack in bytes */
 #endif
     unsigned char state;         /* Thread slot state (STATE_*) */
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
