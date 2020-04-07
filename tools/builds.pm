@@ -4,10 +4,19 @@ $voicerelease="3.15";
 $releasedate="15 Nov 2019";
 $releasenotes="/wiki/ReleaseNotes315";
 
+# { 'modelname' => {
+#    name => 'Full Name',
+#    status => 1,                        # 1=unusable, 2=unstable, 3=stable
+#    ram => 2,                           # optional (used?)
+#    manual => 'modelname2',             # optional (uses modelname2's manual)
+#    icon => 'modelname3',               # optional (uses modelname3's icon)
+#    release => '3.14',                  # optional (final release version, if different from above)
+# }
+
 %builds = (
     'archosav300' => {
         name => 'Archos AV300',
-        status => 1, # 3=stable, 2=unstable, 1=unusable
+        status => 1,
     },
     'archosfmrecorder' => {
         name => 'Archos FM Recorder',
@@ -33,10 +42,10 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'Archos Recorder v1',
         status => 3,
         ram => 2,
-        release => '3.13',
+#        release => '3.13',  # We did a 3.15 release of this..?
     },
     'archosrecorderv2' => {
-        name => 'Archos Recorder v2', 
+        name => 'Archos Recorder v2',
         status => 3,
         ram => 2,
         manual => "archosfmrecorder",
@@ -44,7 +53,6 @@ $releasenotes="/wiki/ReleaseNotes315";
     'cowond2' => {
         name => 'Cowon D2',
         status => 2,
-        manual => 'cowond2',
     },
     'gigabeatfx' => {
         name => 'Toshiba Gigabeat F/X',
@@ -423,6 +431,14 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'xDuoo X3',
         status => 2,
     },
+    'xduoox3ii' => {
+        name => 'xDuoo X3ii',
+        status => 2,
+    },
+    'xduoox20' => {
+        name => 'xDuoo X20',
+        status => 2,
+    },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
         status => 2,
@@ -441,7 +457,7 @@ sub manualname {
     my $m = shift @_;
 
     return $builds{$m}{manual} ? "$builds{$m}{manual}" : $m;
-}    
+}
 
 sub voicename {
     my $m = shift @_;
