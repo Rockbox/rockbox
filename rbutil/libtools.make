@@ -109,6 +109,11 @@ $(LIBUCL): $(OBJDIR)$(LIBUCL)
 $(OBJDIR)$(LIBUCL):
 	$(SILENT)$(MAKE) -C $(TOP)/../tools/ucl/src TARGET_DIR=$(OBJDIR) CC=$(CC) $@
 
+LIBBZIP2 = libbzip2.a
+$(LIBBZIP2): $(OBJDIR)$(LIBBZIP2)
+$(OBJDIR)$(LIBBZIP2):
+	$(SILENT)$(MAKE) -C $(TOP)/bzip2 TARGET_DIR=$(OBJDIR) CC=$(CC) $@
+
 # building the standalone executable
 $(BINARY): $(OBJS) $(EXTRADEPS) $(addprefix $(OBJDIR),$(EXTRALIBOBJS)) $(TARGET_DIR)lib$(OUTPUT).a
 	$(info LD $@)

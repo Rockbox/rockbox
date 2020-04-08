@@ -67,6 +67,9 @@
 # /rbutil/chinachippatcher/
 /rbutil/chinachippatcher/chinachip
 
+# /rbutil/bspatch/
+/rbutil/bspatch/bspatch
+
 # /rbutil/rbutilqt/
 /rbutil/rbutilqt/build
 /rbutil/rbutilqt/RockboxUtility
@@ -90,6 +93,7 @@
 /rbutil/mkimxboot/mkimxboot
 /rbutil/mknwzboot/mknwzboot
 /rbutil/mkzenboot/mkzenboot
+/rbutil/tools/bin2c
 
 # /tools/
 /tools/bdf2bmp
