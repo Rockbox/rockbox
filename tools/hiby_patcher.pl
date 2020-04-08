@@ -18,8 +18,6 @@
 # need '7z', 'mkisofs', 'md5sum', 'mkfs.ubifs'
 # and https://github.com/jrspruitt/ubi_reader
 
-# Rocker: PEB size 128KiB, I/O 2048, LEBs size: 124KiB, max LEBs 1024 (?)
-
 use strict;
 
 use File::Basename;
@@ -61,13 +59,20 @@ mkdir($isowork) || die ("Can't create '$isowork'");
 @sysargs = ("7z", "x", "-aoa", "-o$isowork", $inname);
 system(@sysargs);
 
-### figure out the rootfs image filename
+### figure out the rootfs image filenames
 my $updatename;
 if ( -e "$isowork/UPDATE.TXT") {
     $updatename = "$isowork/UPDATE.TXT";
 } elsif ( -e "$isowork/update.txt") {
     $updatename = "$isowork/update.txt";
 }
+my $versionname;
+if ( -e "$isowork/VERSION.TXT") {
+    $versionname = "$isowork/VERSION.TXT";
+} elsif ( -e "$isowork/version.txt") {
+    $versionname = "$isowork/version.txt";
+}
+
 open UPDATE, $updatename || die ("Can't open update.txt!");;
 
 my $rootfs_found = 0;
@@ -137,16 +142,14 @@ system("mv $ubinamenew $ubiname");
 
 ### Generate new ISO9660 update image
 
-# Update version string as needed  XXX
-
-open UPDATE, "<$updatename" || die ("Can't open update.txt!");;
-open UPDATEO, ">$updatename.new" || die ("Can't open update.txt!");;
+# Correct md5sum for new rootfs image
+open UPDATE, "<$updatename" || die ("Can't open update.txt!");
+open UPDATEO, ">$updatename.new" || die ("Can't open update.txt!");
 
 $rootfs_found = 0;
 while (<UPDATE>) {
     if ($rootfs_found) {
 	if (s/md5=.*/md5=$md5/) {
-	    print "#### $_ ####\n";
 	    $rootfs_found=0;
 	}
     } else {
@@ -159,6 +162,21 @@ while (<UPDATE>) {
 close UPDATE;
 close UPDATEO;
 system("mv $updatename.new $updatename");
+
+# Fix up version text, if needed (AGPTek Rocker 1.31 beta)
+
+open UPDATE, "<$versionname" || die ("Can't open version.txt!");;
+open UPDATEO, ">$versionname.new" || die ("Can't open version.txt!");
+
+while (<UPDATE>) {
+    s/ver=1\.0\.0\.0/ver=2018-10-07T00:00:00+08:00/;
+    print UPDATEO;
+}
+
+close UPDATE;
+close UPDATEO;
+system("mv $versionname.new $versionname");
+
 @sysargs = ("mkisofs", "-volid", "CDROM", "-o", $uptnamenew, $isowork);
 system(@sysargs);
 
