@@ -92,7 +92,7 @@ void lcd_enable(bool on)
 {
     const char * const sysfs_fb_blank = "/sys/class/graphics/fb0/blank";
 
-#ifdef HAVE_LCD_SLEEP
+#ifdef HAVE_LCD_ENABLE
     if (lcd_active() != on)
 #endif
     {
@@ -118,8 +118,8 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 
 void lcd_update(void)
 {
-#ifdef HAVE_LCD_SLEEP
-    if (lcd_active() != on)
+#ifdef HAVE_LCD_ENABLE
+    if (lcd_active())
 #endif
     {
         /* Copy the Rockbox framebuffer to the second framebuffer */
@@ -131,8 +131,8 @@ void lcd_update(void)
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-#ifdef HAVE_LCD_SLEEP
-    if (lcd_active() != on)
+#ifdef HAVE_LCD_ENABLE
+    if (lcd_active())
 #endif
     {
         fb_data *dst = LCD_FRAMEBUF_ADDR(x, y);
