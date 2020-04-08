@@ -32,7 +32,7 @@ export CC=$(EXTRALIBS_CC)
 export CXX=$(EXTRALIBS_CXX)
 export AR=$(EXTRALIBS_AR)
 
-libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot libmks5lboot
+libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot libmks5lboot libbzip2 libbspatch
 
 # To support cross compiles, we explicitly pass the CC flag below for
 # all tools which override CC or CXX in their makefiles. CXX is only
@@ -67,3 +67,9 @@ libmkimxboot:
 
 libmks5lboot:
 	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mks5lboot BUILD_DIR=$(BUILD_DIR)/mks5lboot libmks5lboot.a CC=$(CC)
+
+libbzip2:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/bzip2 BUILD_DIR=$(BUILD_DIR)/bzip2 libbzip2.a CC=$(CC)
+
+libbspatch:
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/bspatch BUILD_DIR=$(BUILD_DIR)/bspatch libbspatch.a CC=$(CC)
