@@ -124,12 +124,12 @@ target/hosted/lc-unix.c
 target/hosted/sysfs.c
 target/hosted/backlight-unix.c
 target/hosted/system-hosted.c
+target/hosted/lcd-linuxfb.c
 #endif
 
 #if defined(AGPTEK_ROCKER) && !defined(SIMULATOR)
 target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
-target/hosted/agptek/lcd-agptek.c
 target/hosted/agptek/power-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
 target/hosted/agptek/usb-agptek.c
@@ -138,7 +138,7 @@ target/hosted/agptek/usb-agptek.c
 #if ((defined(XDUOO_X3II)||defined(XDUOO_X20)) && !defined(SIMULATOR))
 target/hosted/xduoo/button-xduoo.c
 target/hosted/xduoo/debug-xduoo.c
-target/hosted/xduoo/lcd-xduoo.c
+
 target/hosted/xduoo/power-xduoo.c
 target/hosted/xduoo/powermgmt-xduoo.c
 target/hosted/xduoo/usb-xduoo.c

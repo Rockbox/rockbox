@@ -92,10 +92,14 @@ void lcd_enable(bool on)
 {
     const char * const sysfs_fb_blank = "/sys/class/graphics/fb0/blank";
 
+#ifdef HAVE_LCD_SLEEP
     if (lcd_active() != on)
+#endif
     {
         sysfs_set_int(sysfs_fb_blank, on ? 0 : 1);
+#ifdef HAVE_LCD_ENABLE
         lcd_set_active(on);
+#endif
 
         if (on)
         {
@@ -114,27 +118,37 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 
 void lcd_update(void)
 {
-    /* Copy the Rockbox framebuffer to the second framebuffer */
-    lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), FBADDR(0,0),
-                         LCD_WIDTH*LCD_HEIGHT, 1);
-    redraw();
+#ifdef HAVE_LCD_SLEEP
+    if (lcd_active() != on)
+#endif
+    {
+        /* Copy the Rockbox framebuffer to the second framebuffer */
+        lcd_copy_buffer_rect(LCD_FRAMEBUF_ADDR(0, 0), FBADDR(0,0),
+                             LCD_WIDTH*LCD_HEIGHT, 1);
+        redraw();
+    }
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    fb_data *dst = LCD_FRAMEBUF_ADDR(x, y);
-    fb_data * src = FBADDR(x,y);
+#ifdef HAVE_LCD_SLEEP
+    if (lcd_active() != on)
+#endif
+    {
+        fb_data *dst = LCD_FRAMEBUF_ADDR(x, y);
+        fb_data * src = FBADDR(x,y);
 
-    /* Copy part of the Rockbox framebuffer to the second framebuffer */
-    if (width < LCD_WIDTH)
-    {
-        /* Not full width - do line-by-line */
-        lcd_copy_buffer_rect(dst, src, width, height);
+        /* Copy part of the Rockbox framebuffer to the second framebuffer */
+        if (width < LCD_WIDTH)
+        {
+            /* Not full width - do line-by-line */
+            lcd_copy_buffer_rect(dst, src, width, height);
+        }
+        else
+        {
+            /* Full width - copy as one line */
+            lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
+        }
+        redraw();
     }
-    else
-    {
-        /* Full width - copy as one line */
-        lcd_copy_buffer_rect(dst, src, LCD_WIDTH*height, 1);
-    }
-    redraw();
 }
