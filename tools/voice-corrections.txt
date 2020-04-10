@@ -27,7 +27,6 @@
 /russian/.*/.*/ПДУ/П Д У/g
 /russian/.*/.*/ЖКД/Ж Ка Д/g
 
-
   General for all engines and languages
 
 /.*/.*/.*/USB/U S B/g
@@ -37,6 +36,8 @@
 /.*/.*/.*/RWPS/R W P S/g
 /.*/.*/.*/WPS/W P S/g
 /.*/.*/.*/ID3/I D 3/g
+/.*/.*/.*/DAC/D A C/g
+/.*/.*/.*/ADC/A C C/g
 /.*/.*/.*/last\.fm/Last F M/ig
 
   English
