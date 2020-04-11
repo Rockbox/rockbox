@@ -8620,12 +8620,12 @@
   <dest>
     *: none
     swcodec: "Dithering"
-    lcd_bitmap: ""
+    lcd_bitmap: "Dithering"
   </dest>
   <voice>
     *: none
     swcodec: "Dithering"
-    lcd_bitmap: ""
+    lcd_bitmap: "Dithering"
   </voice>
 </phrase>
 <phrase>
