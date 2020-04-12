@@ -704,7 +704,7 @@ if [ -z "$RBDEV_TARGET" ]; then
     echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
     echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
     echo "i   - mips     (Jz47xx and ATJ-based players)"
-    echo "r   - arm-app  (Samsung ypr0)"
+#    echo "r   - arm-app  (Samsung ypr0)"
     echo "x   - arm-linux  (Generic Linux ARM: Samsung ypr0, Linux-based Sony NWZ)"
     echo "y   - mips-linux  (Generic Linux MIPS: AGPTek Rocker)"
     echo "separate multiple targets with spaces"
@@ -754,9 +754,9 @@ do
             build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
             build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
             ;;
-        [Rr])
-            build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
-            ;;
+#        [Rr])
+#            build_ctng "ypr0" "alsalib.tar.gz" "arm" "linux-gnueabi"
+#            ;;
         [Xx])
             # IMPORTANT NOTE
             # This toolchain must support several targets and thus must support
