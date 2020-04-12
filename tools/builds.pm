@@ -443,7 +443,7 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'Xuelin iHIFI 770',
         status => 2,
     },
-    'ihifi770C' => {
+    'ihifi770c' => {
         name => 'Xuelin iHIFI 770C',
         status => 2,
     },
