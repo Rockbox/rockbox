@@ -30,15 +30,6 @@
 #define PUZZLE_SHUFFLE BUTTON_F1
 #define PUZZLE_PICTURE BUTTON_F2
 
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define PUZZLE_QUIT BUTTON_OFF
-#define PUZZLE_LEFT BUTTON_LEFT
-#define PUZZLE_RIGHT BUTTON_RIGHT
-#define PUZZLE_UP BUTTON_UP
-#define PUZZLE_DOWN BUTTON_DOWN
-#define PUZZLE_SHUFFLE BUTTON_F1
-#define PUZZLE_PICTURE BUTTON_F2
-
 #elif CONFIG_KEYPAD == ONDIO_PAD
 #define PUZZLE_QUIT BUTTON_OFF
 #define PUZZLE_LEFT BUTTON_LEFT
@@ -862,7 +853,7 @@ enum plugin_status plugin_start(
         /* print instructions */
         rb->lcd_clear_display();
         rb->lcd_setfont(FONT_SYSFIXED);
-#if CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ARCHOS_AV300_PAD
+#if CONFIG_KEYPAD == RECORDER_PAD
         rb->lcd_putsxy(3, 18, "[OFF] to stop");
         rb->lcd_putsxy(3, 28, "[F1] shuffle");
         rb->lcd_putsxy(3, 38, "[F2] change pic");

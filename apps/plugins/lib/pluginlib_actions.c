@@ -102,7 +102,6 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
     || (CONFIG_KEYPAD == RECORDER_PAD)      \
-    || (CONFIG_KEYPAD == ARCHOS_AV300_PAD)  \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
     || (CONFIG_KEYPAD == ONDIO_PAD) \
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
@@ -346,12 +345,6 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
-    {PLA_CANCEL,            BUTTON_OFF|BUTTON_REL,              BUTTON_OFF},
-    {PLA_EXIT,              BUTTON_OFF|BUTTON_REPEAT,           BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
-    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == ONDIO_PAD)
     {PLA_CANCEL,            BUTTON_OFF|BUTTON_REL,              BUTTON_OFF},
     {PLA_EXIT,              BUTTON_OFF|BUTTON_REPEAT,           BUTTON_NONE},
