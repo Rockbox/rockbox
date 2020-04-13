@@ -754,7 +754,10 @@ androidcc () {
         echo "environment variable point to the root directory of the Android NDK."
         exit
     fi
-    buildhost=$(uname | tr "[:upper:]" "[:lower:]")
+    make_toolchain="${ANDROID_NDK_PATH}/build/tools/make-standalone-toolchain.sh"
+
+    # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
+    buildhost=$(uname | tr "[:upper:]" "[:lower:]")-x86_64
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -ldl -llog"
     if [ "$modelname" != "ibassodx50" ] && [ "$modelname" != "ibassodx90" ]; then
@@ -763,52 +766,53 @@ androidcc () {
     SHARED_LDFLAG="-shared"
     SHARED_CFLAGS=''
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
+    thread_support="HAVE_SIGALTSTACK_THREADS"
     ANDROID_ARCH=$1 # for android.make too
-    gccchoice="4.6"
+    gccchoice="4.9"
     # arch dependant stuff
     case $ANDROID_ARCH in
         armeabi)
             endian="little"
             gcctarget="arm-linux-androideabi-"
-            # sigaltstack is not available in pre-android-9, however asm
-            # threads work fine so far
-            thread_support="ASSEMBLER_THREADS"
-            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
+            echo "${make_toolchain} --toolchain=arm-linux-androideabi-${gccchoice} --platform=android-16 --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=arm-linux-androideabi-${gccchoice} --platform=android-16 --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer -fuse-ld=bfd"
             ;;
         mips)
             endian="little"
             gcctarget="mipsel-linux-android-"
-            thread_support="HAVE_SIGALTSTACK_THREADS"
-            GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer \
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips -fPIC"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips"
+            echo "${make_toolchain} --toolchain=mipsel-linux-android-${gccchoice} --platform=android-14 --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=mipsel-linux-android-${gccchoice} --platform=android-14 --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer -fPIC"
             ;;
         x86)
             endian="little"
             gcctarget="i686-linux-android-"
-            gccdir=x86-$gccchoice
-            thread_support="HAVE_SIGALTSTACK_THREADS"
-            GCCOPTS="$GCCOPTS -Wa,--noexecstack -ffunction-sections -fomit-frame-pointer\
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-9/arch-x86"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-9/arch-x86"
+            echo "${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-9 --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-9 --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -Wa,--noexecstack -ffunction-sections -fomit-frame-pointer"
             ;;
         *)
             echo "ERROR: androidcc(): Unknown target architecture"
             exit
             ;;
     esac
-    echo "Application environment deemed $endian endian"
-    if [ -z "$gccdir" ]; then
-        gccdir=$gcctarget$gccchoice
-    fi
-    if [ -d $ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86 ]; then
-        gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86
-    else
-        gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86_64
-    fi
-    PATH=$PATH:$gccprefix/bin
+
+    LDOPTS="$LDOPTS -fuse-ld=bfd --sysroot=${pwd}/android-toolchain/sysroot"
+    GCCOPTS="$GCCOPTS --sysroot=${pwd}/android-toolchain/sysroot"
+    echo "Using endian ${endian}"
+    echo "Using gccchoice ${gccchoice}"
+    echo "Using gcctarget ${gcctarget}"
+    PATH=$PATH:${pwd}/android-toolchain/bin
     prefixtools $gcctarget
 }
 
@@ -827,16 +831,8 @@ androidndkcc()
         exit
     fi
 
-    buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")
-    # the prebuild android NDK only supports intel architecture anyway, so we can take shortcuts
-    case $(getconf LONG_BIT) in
-        32)
-            buildhost="${buildhost}-x86"
-            ;;
-        64)
-            buildhost="${buildhost}-x86_64"
-            ;;
-    esac
+    # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
+    buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")-x86_64
 
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -ldl -llog"
@@ -848,15 +844,15 @@ androidndkcc()
     case $1 in
         armeabi)
             endian="little"
-            gccchoice="4.6"
+            gccchoice="4.9"
             gcctarget="arm-linux-androideabi-"
-            echo "${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain"
-            ${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain
+            echo "${make_toolchain} --toolchain=arm-linux-androideabi-4.9 --platform=android-16 --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=arm-linux-androideabi-4.9 --platform=android-16 --install-dir=${pwd}/android-toolchain
             if [ ${?} != 0 ]; then
                 exit
             fi
-            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer --sysroot=${pwd}/android-toolchain/sysroot"
-            LDOPTS="$LDOPTS --sysroot=${pwd}/android-toolchain/sysroot"
+            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer -fuse-ld=bfd --sysroot=${pwd}/android-toolchain/sysroot"
+            LDOPTS="$LDOPTS -fuse-ld=bfd --sysroot=${pwd}/android-toolchain/sysroot"
             ;;
         *)
             echo "ERROR: androidndkcc(): Unknown target architecture"
