@@ -14,10 +14,6 @@ $releasenotes="/wiki/ReleaseNotes315";
 # }
 
 %builds = (
-    'archosav300' => {
-        name => 'Archos AV300',
-        status => 1,
-    },
     'archosfmrecorder' => {
         name => 'Archos FM Recorder',
         status => 3,

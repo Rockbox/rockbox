@@ -1517,7 +1517,7 @@ cat <<EOF
   3) Recorder v2          13) iFP-790            23) 3G
   4) Ondio SP             14) H10 20Gb           24) 4G Grayscale
   5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
-  6) AV300                                       26) Mini 2G
+                                                 26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
  ==Cowon/iAudio==         40) Gigabeat F/X       28) Nano 2G
  30) X5/X5V/X5L           41) Gigabeat S         29) Classic/6G
@@ -1761,28 +1761,6 @@ fi
     t_cpu="sh"
     t_manufacturer="archos"
     t_model="ondio"
-    ;;
-
-   6|archosav300)
-    target_id=38
-    modelname="archosav300"
-    target="ARCHOS_AV300"
-    memory=16 # always
-    arm7tdmicc
-    tool="$rootdir/tools/scramble -mm=C"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 6"
-    output="cjbm.ajz"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    swcodec=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$toolset scramble descramble bmp2rb"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="archos"
-    t_model="av300"
     ;;
 
   10|iriverh120)
