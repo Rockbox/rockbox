@@ -78,14 +78,6 @@
 #define UP BUTTON_UP
 #define DOWN BUTTON_DOWN
 
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define QUIT BUTTON_OFF
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_SELECT
-#define UP BUTTON_UP
-#define DOWN BUTTON_DOWN
-
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -1494,8 +1486,7 @@ static int brickmania_help(void)
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
       (CONFIG_KEYPAD == ONDIO_PAD) || \
-      (CONFIG_KEYPAD == RECORDER_PAD) || \
-      (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
+      (CONFIG_KEYPAD == RECORDER_PAD)
         "STOP:",
 #else
         "POWER:",

@@ -47,16 +47,6 @@
 #define CUBE_PAUSE         BUTTON_PLAY
 #define CUBE_HIGHSPEED     BUTTON_ON
 
-#elif CONFIG_KEYPAD == ARCHOS_AV300_PAD
-#define CUBE_QUIT          BUTTON_OFF
-#define CUBE_NEXT          BUTTON_RIGHT
-#define CUBE_PREV          BUTTON_LEFT
-#define CUBE_INC           BUTTON_UP
-#define CUBE_DEC           BUTTON_DOWN
-#define CUBE_MODE          BUTTON_F1
-#define CUBE_PAUSE         BUTTON_SELECT
-#define CUBE_HIGHSPEED     BUTTON_ON
-
 #elif CONFIG_KEYPAD == PLAYER_PAD
 #define CUBE_QUIT          BUTTON_STOP
 #define CUBE_INC           BUTTON_RIGHT

@@ -104,8 +104,7 @@
 #define SOKOBAN_MOVE_MIN     SOKOBAN_MOVE_DOWN
 
 /* variable button definitions */
-#if (CONFIG_KEYPAD == RECORDER_PAD) || \
-    (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD)
 #define SOKOBAN_LEFT BUTTON_LEFT
 #define SOKOBAN_RIGHT BUTTON_RIGHT
 #define SOKOBAN_UP BUTTON_UP
@@ -1643,8 +1642,7 @@ static int sokoban_menu(void)
                     rb->screens[i]->clear_display();
                 rb->lcd_setfont(SOKOBAN_FONT);
 
-#if (CONFIG_KEYPAD == RECORDER_PAD) || \
-    (CONFIG_KEYPAD == ARCHOS_AV300_PAD)
+#if (CONFIG_KEYPAD == RECORDER_PAD)
                 rb->lcd_putsxy(3,  6, "[OFF] Menu");
                 rb->lcd_putsxy(3, 16, "[ON] Undo");
                 rb->lcd_putsxy(3, 26, "[PLAY] Redo");
