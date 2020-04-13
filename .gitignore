@@ -18,6 +18,7 @@
 /tools/checkwps/autoconf.h
 /tools/checkwps/make.dep
 /tools/checkwps/rockbox-info.txt
+/tools/checkwps/checkwps.failures
 
 # android: java build system
 /android/bin
