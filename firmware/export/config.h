@@ -118,7 +118,6 @@
 #define SANSA_E200_PAD     13
 #define SANSA_C200_PAD     14
 #define TATUNG_TPJ1022_PAD 15
-#define ARCHOS_AV300_PAD   16
 #define MROBE100_PAD       17
 #define MROBE500_PAD       18
 #define GIGABEAT_S_PAD     19
@@ -240,7 +239,6 @@
 #define LCD_H10_20GB 13 /* as used by iriver H10 20Gb */
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
 #define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
-#define LCD_DSC25    16 /* as used by Archos AV300 */
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 #define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
 #define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
@@ -412,8 +410,6 @@ Lyre prototype 1 */
 #include "config/archosondiosp.h"
 #elif defined(ARCHOS_ONDIOFM)
 #include "config/archosondiofm.h"
-#elif defined(ARCHOS_AV300)
-#include "config/archosav300.h"
 #elif defined(IRIVER_H100)
 #include "config/iriverh100.h"
 #elif defined(IRIVER_H120)
