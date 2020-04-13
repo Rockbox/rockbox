@@ -757,11 +757,14 @@ androidcc () {
         exit
     fi
     if [ -z "$ANDROID_NDK_PATH" ]; then
-        echo "ERROR: You need the Android NDK installed (r16 or higher) and have the ANDROID_NDK_PATH"
+        echo "ERROR: You need the Android NDK installed (r10e or higher) and have the ANDROID_NDK_PATH"
         echo "environment variable point to the root directory of the Android NDK."
         exit
     fi
-    buildhost=$(uname | tr "[:upper:]" "[:lower:]")
+    make_toolchain="${ANDROID_NDK_PATH}/build/tools/make-standalone-toolchain.sh"
+
+    # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
+    buildhost=$(uname | tr "[:upper:]" "[:lower:]")-x86_64
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -ldl -llog"
     if [ "$modelname" != "ibassodx50" ] && [ "$modelname" != "ibassodx90" ]; then
@@ -770,59 +773,61 @@ androidcc () {
     SHARED_LDFLAG="-shared"
     SHARED_CFLAGS=''
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
-    ANDROID_ARCH=$1 # for android.make too
-    gccchoice="4.6"
+    thread_support="HAVE_SIGALTSTACK_THREADS"
+    ANDROID_ARCH=$2 # for android.make too
+    ANDROID_PLATFORM_VERSION=$1
+    gccchoice="4.9"
     # arch dependant stuff
     case $ANDROID_ARCH in
         armeabi)
             endian="little"
             gcctarget="arm-linux-androideabi-"
-            # sigaltstack is not available in pre-android-9, however asm
-            # threads work fine so far
-            thread_support="ASSEMBLER_THREADS"
-            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer \
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-16/arch-arm"
+            echo "${make_toolchain} --toolchain=arm-linux-androideabi-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=arm-linux-androideabi-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer -fuse-ld=bfd"
             ;;
         mips)
             endian="little"
             gcctarget="mipsel-linux-android-"
-            thread_support="HAVE_SIGALTSTACK_THREADS"
-            GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer \
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips -fPIC"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-14/arch-mips"
+            echo "${make_toolchain} --toolchain=mipsel-linux-android-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=mipsel-linux-android-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -fomit-frame-pointer -fPIC"
             ;;
         x86)
             endian="little"
             gcctarget="i686-linux-android-"
-            gccdir=x86-$gccchoice
-            thread_support="HAVE_SIGALTSTACK_THREADS"
-            GCCOPTS="$GCCOPTS -Wa,--noexecstack -ffunction-sections -fomit-frame-pointer\
-                    --sysroot=$ANDROID_NDK_PATH/platforms/android-9/arch-x86"
-            LDOPTS="$LDOPTS --sysroot=$ANDROID_NDK_PATH/platforms/android-9/arch-x86"
+            echo "${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=x86-${gccchoice} --platform=android-android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -Wa,--noexecstack -ffunction-sections -fomit-frame-pointer"
             ;;
         *)
             echo "ERROR: androidcc(): Unknown target architecture"
             exit
             ;;
     esac
-    echo "Application environment deemed $endian endian"
-    if [ -z "$gccdir" ]; then
-        gccdir=$gcctarget$gccchoice
-    fi
-    if [ -d $ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86 ]; then
-        gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86
-    else
-        gccprefix=$ANDROID_NDK_PATH/toolchains/$gccdir/prebuilt/$buildhost-x86_64
-    fi
-    PATH=$PATH:$gccprefix/bin
+
+    LDOPTS="$LDOPTS -fuse-ld=bfd --sysroot=${pwd}/android-toolchain/sysroot"
+    GCCOPTS="$GCCOPTS --sysroot=${pwd}/android-toolchain/sysroot"
+    echo "Using endian ${endian}"
+    echo "Using gccchoice ${gccchoice}"
+    echo "Using gcctarget ${gcctarget}"
+    PATH=$PATH:${pwd}/android-toolchain/bin
     prefixtools $gcctarget
 }
 
 androidndkcc()
 {
     if ! [ -d "$ANDROID_NDK_PATH" ]; then
-        echo "ERROR: You need the Android NDK installed (r16 or higher) and have the ANDROID_NDK_PATH"
+        echo "ERROR: You need the Android NDK installed (r10e or higher) and have the ANDROID_NDK_PATH"
         echo "environment variable point to the root directory of the Android NDK."
         exit
     fi
@@ -834,16 +839,8 @@ androidndkcc()
         exit
     fi
 
-    buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")
-    # the prebuild android NDK only supports intel architecture anyway, so we can take shortcuts
-    case $(getconf LONG_BIT) in
-        32)
-            buildhost="${buildhost}-x86"
-            ;;
-        64)
-            buildhost="${buildhost}-x86_64"
-            ;;
-    esac
+    # the prebuilt android NDK only supports x86_64 architecture anyway, so we can take shortcuts
+    buildhost=$(uname -s | tr "[:upper:]" "[:lower:]")-x86_64
 
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -ldl -llog"
@@ -851,25 +848,31 @@ androidndkcc()
     SHARED_CFLAGS=''
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
 
+    ANDROID_PLATFORM_VERSION=$1
+
     # arch dependant stuff
-    case $1 in
+    case $2 in
         armeabi)
             endian="little"
-            gccchoice="4.6"
+            gccchoice="4.9"
             gcctarget="arm-linux-androideabi-"
-            echo "${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain"
-            ${make_toolchain} --system=${buildhost} --toolchain=arm-linux-androideabi-4.6 --platform=android-16 --install-dir=${pwd}/android-toolchain
+            echo "${make_toolchain} --toolchain=arm-linux-androideabi-4.9 --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=arm-linux-androideabi-4.9 --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
             if [ ${?} != 0 ]; then
                 exit
             fi
-            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer --sysroot=${pwd}/android-toolchain/sysroot"
-            LDOPTS="$LDOPTS --sysroot=${pwd}/android-toolchain/sysroot"
+            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer"
             ;;
         *)
             echo "ERROR: androidndkcc(): Unknown target architecture"
             exit
             ;;
     esac
+
+    # -fuse-ld=bfd is needed because toolchain defaults to 'gold'
+    # which often crashes when linking.
+    LDOPTS="$LDOPTS -fuse-ld=bfd --sysroot=${pwd}/android-toolchain/sysroot"
+    GCCOPTS="$GCCOPTS -fuse-ld=bfd --sysroot=${pwd}/android-toolchain/sysroot"
 
     echo "Using endian ${endian}"
     echo "Using gccchoice ${gccchoice}"
@@ -3589,7 +3592,7 @@ fi
     libdir="/data/data/org.rockbox/app_rockbox"
     memory=8
     uname=`uname`
-    androidcc armeabi
+    androidcc 19 armeabi
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -3721,7 +3724,7 @@ fi
     libdir="/data/data/org.rockbox/app_rockbox"
     memory=8
     uname=`uname`
-    androidcc mips
+    androidcc 19 mips
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -3749,7 +3752,7 @@ fi
     libdir="/data/data/org.rockbox/app_rockbox"
     memory=8
     uname=`uname`
-    androidcc x86
+    androidcc 19 x86
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -4184,7 +4187,7 @@ fi
     # Actually 408260kB
     memory=256
     uname=`uname`
-    androidndkcc armeabi
+    androidndkcc 16 armeabi
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -4209,7 +4212,7 @@ fi
     lcd_orientation="landscape"
     memory=256
     uname=`uname`
-    androidndkcc armeabi
+    androidndkcc 16 armeabi
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -5049,6 +5052,7 @@ export LCDORIENTATION=${lcd_orientation}
 export ANDROID_ARCH=${ANDROID_ARCH}
 export ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
 export ANDROID_SDK_PATH=${ANDROID_SDK_PATH}
+export ANDROID_PLATFORM_VERSION=${ANDROID_PLATFORM_VERSION}
 
 CONFIGURE_OPTIONS=${cmdline}
 
