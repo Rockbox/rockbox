@@ -1900,7 +1900,7 @@ static void computer_allocate(void)
     int men_needed;
     struct threat targets[2];
     int numtargets;
-    struct cursor adj;
+    struct cursor adj = { 0, 0 };
 
     compres.cash += compres.bank;
     compres.bank = 0;
