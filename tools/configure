@@ -776,6 +776,7 @@ androidcc () {
     thread_support="HAVE_SIGALTSTACK_THREADS"
     ANDROID_ARCH=$2 # for android.make too
     ANDROID_PLATFORM_VERSION=$1
+    GCCOPTS="$GCCOPTS $3"
     gccchoice="4.9"
     # arch dependant stuff
     case $ANDROID_ARCH in
@@ -787,7 +788,18 @@ androidcc () {
             if [ ${?} != 0 ]; then
                 exit
             fi
-            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer -fuse-ld=bfd"
+	    # Android 4.4 (API 19) doesn't support anything older than armv7.
+            GCCOPTS="$GCCOPTS -fomit-frame-pointer -fuse-ld=bfd"
+            ;;
+        aarch64)
+            endian="little"
+            gcctarget="arm-linux-androideabi-"
+            echo "${make_toolchain} --toolchain=aarch64-linux-android-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain"
+            ${make_toolchain} --toolchain=aarch64-linux-android-${gccchoice} --platform=android-$ANDROID_PLATFORM_VERSION --install-dir=${pwd}/android-toolchain
+            if [ ${?} != 0 ]; then
+                exit
+            fi
+            GCCOPTS="$GCCOPTS -fomit-frame-pointer -fuse-ld=bfd"  # what default cpu arch/tune to use?
             ;;
         mips)
             endian="little"
@@ -849,6 +861,7 @@ androidndkcc()
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
 
     ANDROID_PLATFORM_VERSION=$1
+    GCCOPTS="$GCCOPTS $3"
 
     # arch dependant stuff
     case $2 in
@@ -861,7 +874,7 @@ androidndkcc()
             if [ ${?} != 0 ]; then
                 exit
             fi
-            GCCOPTS="$GCCOPTS -march=armv5te -mtune=xscale -msoft-float -fomit-frame-pointer"
+            GCCOPTS="$GCCOPTS -fomit-frame-pointer"
             ;;
         *)
             echo "ERROR: androidndkcc(): Unknown target architecture"
@@ -3570,7 +3583,7 @@ fi
     libdir="/data/data/org.rockbox/app_rockbox"
     memory=8
     uname=`uname`
-    androidcc 19 armeabi
+    androidcc 19 armeabi "-march=armv7-a -mtune=cortex-a9 -mfloat-abi=softfp"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -4165,7 +4178,7 @@ fi
     # Actually 408260kB
     memory=256
     uname=`uname`
-    androidndkcc 16 armeabi
+    androidndkcc 16 armeabi "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
@@ -4190,7 +4203,7 @@ fi
     lcd_orientation="landscape"
     memory=256
     uname=`uname`
-    androidndkcc 16 armeabi
+    androidndkcc 16 armeabi "-mcpu=cortex-a9 -mfpu=neon-fp16 -mfloat-abi=softfp"
     tool="cp "
     boottool="cp "
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
