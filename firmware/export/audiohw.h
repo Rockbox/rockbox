@@ -215,7 +215,7 @@ struct sound_settings_info
 #include "cs4398.h"
 #elif defined(HAVE_ES9018)
 #include "es9018.h"
-#elif (CONFIG_PLATFORM & (PLATFORM_ANDROID | PLATFORM_MAEMO\
+#elif (CONFIG_PLATFORM & (PLATFORM_ANDROID | PLATFORM_MAEMO \
        | PLATFORM_PANDORA | PLATFORM_SDL))
 #include "hosted_codec.h"
 #elif defined(DX50)
@@ -644,7 +644,7 @@ void audiohw_set_pitch(int32_t val);
 
 /**
  * Return the set pitch ratio
- */ 
+ */
 int32_t audiohw_get_pitch(void);
 #endif /* HAVE_PITCHCONTROL */
 
