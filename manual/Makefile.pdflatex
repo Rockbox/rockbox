@@ -2,7 +2,7 @@ DOCUMENT := rockbox-build
 LATEX := pdflatex
 include LaTeX.Rules
 GRAPHIC_FILES:=`find . -name \*.jpg \*.jpeg`
-HTLATEX := htlatex
+HTLATEX := max_print_line=10000 htlatex
 HTOPTS1 := rockbox-html,charset=utf-8,early_
 HTOPTS2 := " -utf8 -cmozhtf"
 HTOPTS3 := "-dhtml/ -cvalidate"
