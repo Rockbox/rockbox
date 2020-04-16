@@ -1133,6 +1133,14 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="f"
     fi
+    if [ -n "`findtool mimic`" ]; then
+        MIMIC="(M)imic "
+        MIMIC_OPTS=""
+        DEFAULT_TTS="mimic"
+        DEFAULT_TTS_OPTS=$MIMIC_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="M"
+    fi
     if [ -n "`findtool swift`" ]; then
         SWIFT="S(w)ift "
         SWIFT_OPTS=""
@@ -1159,15 +1167,15 @@ voiceconfig () {
         DEFAULT_CHOICE="s"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$SWIFT" ] && [ "$SWIFT" = "$RBSPEAK" ]; then
-        echo "You need Festival, eSpeak or Flite in your path, or SAPI available to build voice files"
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC"] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$RBSPEAK" ]; then
+        echo "You need Festival, eSpeak, Mimic, Flite, or rbspeak in your path, or SAPI available to build voice files"
         exit 3
     fi
 
     if [ "$ARG_TTS" ]; then
         option=$ARG_TTS
     else
-        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${SAPI}${SWIFT}${RBSPEAK}(${DEFAULT_CHOICE})?"
+        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${MIMIC}${SAPI}${SWIFT}${RBSPEAK}(${DEFAULT_CHOICE})?"
         option=`input`
         if [ -z "$option" ]; then option=${DEFAULT_CHOICE}; fi
         advopts="$advopts --tts=$option"
@@ -1187,6 +1195,11 @@ voiceconfig () {
         TTS_ENGINE="festival"
         NOISEFLOOR="500"
         TTS_OPTS=$FESTIVAL_OPTS
+        ;;
+        [Mm])
+        TTS_ENGINE="mimic"
+        NOISEFLOOR="500"
+        TTS_OPTS=$MIMIC_OPTS
         ;;
         [Ss])
         TTS_ENGINE="sapi"
@@ -1238,6 +1251,33 @@ voiceconfig () {
         advopts="$advopts --voice=$CHOICE"
         echo "Festival voice set to $TTS_FESTIVAL_VOICE"
         echo "(voice_$TTS_FESTIVAL_VOICE)" > festival-prolog.scm
+    elif [ "$TTS_ENGINE" = "mimic" ]; then
+	voicelist=`mimic -lv | cut -d':' -f2`
+        for voice in $voicelist; do
+            TTS_MIMIC_VOICE="$voice" # Default choice
+            break
+        done
+        if [ "$ARG_VOICE" ]; then
+            CHOICE=$ARG_VOICE
+        else
+            i=1
+            for voice in $voicelist; do
+                printf "%3d. %s\n" "$i" "$voice"
+                i=`expr $i + 1`
+            done
+            printf "Please select which Mimic voice to use (default is $TTS_MIMIC_VOICE): "
+            CHOICE=`input`
+        fi
+        i=1
+        for voice in $voicelist; do
+            if [ "$i" = "$CHOICE" -o "$voice" = "$CHOICE" ]; then
+                TTS_MIMIC_VOICE="$voice"
+            fi
+            i=`expr $i + 1`
+        done
+        advopts="$advopts --voice=$CHOICE"
+        echo "Mimic voice set to $TTS_MIMIC_VOICE"
+	TTS_OPTS="$TTS_OPTS -voice $TTS_MIMIC_VOICE"
     fi
 
     # Read custom tts options from command line
