@@ -192,6 +192,13 @@ sub voicestring {
         print RBSPEAK $string . "\n";
         close(RBSPEAK);
     }
+    elsif ($name eq 'mimic') {
+	$cmd = "mimic $tts_engine_opts -o $output";
+	print("> $cmd\n") if $verbose;
+	open (MIMIC, "| $cmd");
+	print MIMIC $string . "\n";
+	close(MIMIC);
+    }
 }
 
 # trim leading / trailing silence from the clip
@@ -305,7 +312,7 @@ sub generateclips {
 
                 # If we have a pool of snippets, see if the string exists there first
                 if (defined($ENV{'POOL'})) {
-                    $pool_file = sprintf("%s/%s-%s.mp3", $ENV{'POOL'}, 
+                    $pool_file = sprintf("%s/%s-%s.mp3", $ENV{'POOL'},
                                          md5_hex("$voice $tts_engine $tts_engine_opts $encoder_opts"),
                                          $language);
                     if (-f $pool_file) {
