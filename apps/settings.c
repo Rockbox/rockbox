@@ -285,6 +285,14 @@ bool settings_load_config(const char* file, bool apply)
     {
         if (!settings_parseline(line, &name, &value))
             continue;
+	if (strcasecmp("cfgversion", name))
+	{
+		uint32_t v = atoi(value);
+		if (v != settings_csum)
+		{
+			// XXX do something...
+		}
+	}
         for(i=0; i<nb_settings; i++)
         {
             if (settings[i].cfg_name == NULL)
@@ -553,6 +561,7 @@ static bool settings_write_config(const char* filename, int options)
         return false;
     fdprintf(fd, "# .cfg file created by rockbox %s - "
                  "http://www.rockbox.org\r\n\r\n", rbversion);
+    fdprintf(fd,"%s: %08x\r\n","cfgversion",settings_csum);
     for(i=0; i<nb_settings; i++)
     {
         if (settings[i].cfg_name == NULL)
@@ -1132,6 +1141,7 @@ void settings_reset(void)
             screens[i].setfont(FONT_SYSFIXED);
         }
     }
+    settings_csum = get_settings_csum();
 #endif
 }
 

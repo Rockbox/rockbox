@@ -2286,3 +2286,10 @@ const struct settings_list* get_settings_list(int*count)
     *count = nb_settings;
     return settings;
 }
+
+uint32_t settings_csum;
+
+uint32_t get_settings_csum(void)
+{
+    return crc_32((void*)settings, sizeof(settings), 0xffffffff);
+}
