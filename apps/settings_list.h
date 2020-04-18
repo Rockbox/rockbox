@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <limits.h>
 #include "inttypes.h"
+#include "crc32.h"
 
 typedef int (*_isfunc_type)(void);
 
@@ -180,6 +181,9 @@ const struct settings_list* get_settings_list(int*count);
    possibly fix proberly later */
 extern const struct settings_list  settings[];
 extern const int nb_settings;
+extern uint32_t settings_csum;
+
+uint32_t get_settings_csum(void);
 
 #endif
 
