@@ -285,6 +285,18 @@ bool settings_load_config(const char* file, bool apply)
     {
         if (!settings_parseline(line, &name, &value))
             continue;
+        if (!strcasecmp("cfgversion", name))
+        {
+            uint32_t v = atoi(value);
+            if (v != settings_csum)
+            {
+                if (!strcmp(file, CONFIGFILE)) {
+                    splashf(HZ, "cfgver changed", v);
+                    // XXX do something...
+                    // return false?
+                }
+             }
+        }
         for(i=0; i<nb_settings; i++)
         {
             if (settings[i].cfg_name == NULL)
@@ -553,6 +565,7 @@ static bool settings_write_config(const char* filename, int options)
         return false;
     fdprintf(fd, "# .cfg file created by rockbox %s - "
                  "http://www.rockbox.org\r\n\r\n", rbversion);
+    fdprintf(fd,"%s: %ld\r\n","cfgversion",(long int)settings_csum);
     for(i=0; i<nb_settings; i++)
     {
         if (settings[i].cfg_name == NULL)
@@ -1133,6 +1146,7 @@ void settings_reset(void)
         }
     }
 #endif
+    settings_csum = get_settings_csum();
 }
 
 /** Changing setting values **/
