@@ -277,6 +277,8 @@ bool settings_load_config(const char* file, bool apply)
     char* value;
     int i;
     bool theme_changed = false;
+    uint32_t file_crc = 0;
+
     fd = open_utf8(file, O_RDONLY);
     if (fd < 0)
         return false;
@@ -285,6 +287,10 @@ bool settings_load_config(const char* file, bool apply)
     {
         if (!settings_parseline(line, &name, &value))
             continue;
+        if (!strcasecmp("cfgversion", name))
+        {
+            file_crc = atoi(value);
+        }
         for(i=0; i<nb_settings; i++)
         {
             if (settings[i].cfg_name == NULL)
@@ -370,6 +376,28 @@ bool settings_load_config(const char* file, bool apply)
     } /* while(...) */
 
     close(fd);
+
+    /* Does our settings table checksum match the file? */
+    if (file_crc && file_crc != settings_csum)
+    {
+        /* Only care if it's the main config file */
+        if (!strcmp(file, CONFIGFILE))
+        {
+	    // XXX do something!
+	    // set flag saying csum doesn't match
+	    //
+	    // at later point, check flag and prompt what to do
+	    // (ie continue or reset to defaults) then clear flag
+	    //
+	    // we only need to perform the check in two places:
+	    //  * initial startup (ie by root_menu() somewhere..)
+	    //  * after settings_load() in filetree.c:
+            //
+            // XXX placeholder action:
+            splash(HZ, "cfgver changed!");
+        }
+    }
+
     if (apply)
     {
         settings_save();
@@ -553,6 +581,7 @@ static bool settings_write_config(const char* filename, int options)
         return false;
     fdprintf(fd, "# .cfg file created by rockbox %s - "
                  "http://www.rockbox.org\r\n\r\n", rbversion);
+    fdprintf(fd,"%s: %ld\r\n","cfgversion",(long int)settings_csum);
     for(i=0; i<nb_settings; i++)
     {
         if (settings[i].cfg_name == NULL)
@@ -1133,6 +1162,7 @@ void settings_reset(void)
         }
     }
 #endif
+    settings_csum = get_settings_csum();
 }
 
 /** Changing setting values **/
