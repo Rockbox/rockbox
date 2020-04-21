@@ -274,7 +274,7 @@ static FORCE_INLINE unsigned int
 should_switch_tasks(struct thread_entry *thread)
 {
 #ifdef HAVE_PRIORITY_SCHEDULING
-    const unsigned int core = CURRENT_CORE;
+    IF_NCOP(const) unsigned int core = CURRENT_CORE;
 #if NUM_CORES > 1
     /* Forget about it if different CPU */
     if (thread->core != core)
@@ -409,7 +409,7 @@ static inline void core_rtr_remove(struct core_entry *corep,
  */
 static NO_INLINE void core_schedule_wakeup(struct thread_entry *thread)
 {
-    const unsigned int core = IF_COP_CORE(thread->core);
+    IF_NCOP(const) unsigned int core = IF_COP_CORE(thread->core);
     struct core_entry *corep = __core_id_entry(core);
     core_rtr_add(corep, thread);
 #if NUM_CORES > 1
@@ -483,7 +483,7 @@ static inline void unlock_blocker_thread(struct blocker *bl)
 static inline void set_rtr_thread_priority(
     struct thread_entry *thread, int priority)
 {
-    const unsigned int core = IF_COP_CORE(thread->core);
+    IF_NCOP(const) unsigned int core = IF_COP_CORE(thread->core);
     struct core_entry *corep = __core_id_entry(core);
     RTR_LOCK(corep);
     rtr_move_entry(corep, thread->priority, priority);
@@ -975,7 +975,7 @@ static FORCE_INLINE void check_tmo_expired(struct core_entry *corep)
 static FORCE_INLINE void prepare_block(struct thread_entry *current,
                                        unsigned int state, int timeout)
 {
-    const unsigned int core = IF_COP_CORE(current->core);
+    IF_NCOP(const) unsigned int core = IF_COP_CORE(current->core);
 
     /* Remove the thread from the list of running threads. */
     struct core_entry *corep = __core_id_entry(core);
@@ -1010,7 +1010,7 @@ static FORCE_INLINE void prepare_block(struct thread_entry *current,
  */
 void switch_thread(void)
 {
-    const unsigned int core = CURRENT_CORE;
+    IF_NCOP(const) unsigned int core = CURRENT_CORE;
     struct core_entry *corep = __core_id_entry(core);
     struct thread_entry *thread = corep->running;
 
@@ -1044,7 +1044,7 @@ void switch_thread(void)
             break;
 
         thread = NULL;
-        
+
         /* Enter sleep mode to reduce power usage */
         RTR_UNLOCK(corep);
         core_sleep(IF_COP(core));
@@ -1466,7 +1466,8 @@ void switch_core_final(unsigned int old_core, struct thread_entry *current)
 
 unsigned int switch_core(unsigned int new_core)
 {
-    const unsigned int old_core = CURRENT_CORE;
+    IF_NCOP(const) unsigned int old_core = CURRENT_CORE;
+
     if (old_core == new_core)
         return old_core; /* No change */
 
@@ -1524,7 +1525,7 @@ void cancel_cpu_boost(void)
  */
 void INIT_ATTR init_threads(void)
 {
-    const unsigned int core = CURRENT_CORE;
+    IF_NCOP(const) unsigned int core = CURRENT_CORE;
 
     if (core == CPU)
     {

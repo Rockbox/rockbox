@@ -29,8 +29,8 @@
 
 void corelock_lock(struct corelock *cl)
 {
-    const unsigned int core = CURRENT_CORE;
-    const unsigned int othercore = 1 - core;
+    IF_NCOP(const) unsigned int core = CURRENT_CORE;
+    IF_NCOP(const) unsigned int othercore = 1 - core;
 
     cl->myl[core] = core;
     cl->turn = othercore;
@@ -44,8 +44,8 @@ void corelock_lock(struct corelock *cl)
 
 int corelock_try_lock(struct corelock *cl)
 {
-    const unsigned int core = CURRENT_CORE;
-    const unsigned int othercore = 1 - core;
+    IF_NCOP(const) unsigned int core = CURRENT_CORE;
+    IF_NCOP(const) unsigned int othercore = 1 - core;
 
     cl->myl[core] = core;
     cl->turn = othercore;

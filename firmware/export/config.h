@@ -1158,6 +1158,7 @@ Lyre prototype 1 */
 #define SHAREDDATA_ATTR    NOCACHEDATA_ATTR
 
 #define IF_COP(...)         __VA_ARGS__
+#define IF_NCOP(...)
 #define IF_COP_VOID(...)    __VA_ARGS__
 #define IF_COP_CORE(core)   core
 
@@ -1183,6 +1184,7 @@ Lyre prototype 1 */
 #endif
 
 #define IF_COP(...)
+#define IF_NCOP(...)	    __VA_ARGS__
 #define IF_COP_VOID(...)    void
 #define IF_COP_CORE(core)   CURRENT_CORE
 
