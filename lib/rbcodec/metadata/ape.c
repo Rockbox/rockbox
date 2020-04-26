@@ -34,13 +34,6 @@
 #define APETAG_ITEM_HEADER_FORMAT   "ll"
 #define APETAG_ITEM_TYPE_MASK       3
 
-#ifdef HAVE_ALBUMART
-/* The AA header consists of the pseudo filename "Album Cover (Front).ext"
- * whereas ".ext" is the file extension. For now ".jpg" and ".png" are
- * supported by this APE metadata parser. Therefore the length is 22. */
-#define APETAG_AA_HEADER_LENGTH     22
-#endif
-
 struct apetag_header 
 {
     char id[8];
@@ -144,36 +137,34 @@ bool read_ape_tags(int fd, struct mp3entry* id3)
 #ifdef HAVE_ALBUMART
                 if (strcasecmp(name, "cover art (front)") == 0)
                 {
-                    /* Allow to read at least APETAG_AA_HEADER_LENGTH bytes. */
-                    r = read_string(fd, name, sizeof(name), 0, APETAG_AA_HEADER_LENGTH);
+                    /* Skip any file name. */
+                    r = read_string(fd, value, sizeof(value), 0, -1);
+                    r += read_string(fd, value, sizeof(value), -1, 4);
+
                     if (r == -1)
                     {
                         return false;
                     }
 
-                    /* Gather the album art format from the pseudo file name's ending. */
-                    /* strcpy(name, name + strlen(name) - 4); */
+                    /* Gather the album art format from the magic number of the embedded binary. */
                     id3->albumart.type = AA_TYPE_UNKNOWN;
-                    char *ext = strrchr(name, '.');
-                    if (ext)
+                    if (memcmp(value, "\xFF\xD8\xFF", 3) == 0)
                     {
-                        if      (strcasecmp(ext, ".jpg") == 0)
-                        {
-                            id3->albumart.type = AA_TYPE_JPG;
-                        }
-                        else if (strcasecmp(ext, ".jpeg") == 0)
-                        {
-                            id3->albumart.type = AA_TYPE_JPG;
-                        }
-                        else if (strcasecmp(ext, ".png") == 0)
-                        {
-                            id3->albumart.type = AA_TYPE_PNG;
-                        }
+                        id3->albumart.type = AA_TYPE_JPG;
                     }
+                    else if (memcmp(value, "\x42\x4D", 2) == 0)
+                    {
+                        id3->albumart.type = AA_TYPE_BMP;
+                    }
+                    else if (memcmp(value, "\x89\x50\x4E\x47", 4) == 0)
+                    {
+                        id3->albumart.type = AA_TYPE_PNG;
+                    }
+
                     /* Set the album art size and position. */
                     if (id3->albumart.type != AA_TYPE_UNKNOWN)
                     {
-                        id3->albumart.pos  = lseek(fd, 0, SEEK_CUR);
+                        id3->albumart.pos  = lseek(fd, - 4, SEEK_CUR);
                         id3->albumart.size = item.length - r;
                         id3->has_embedded_albumart = true;
                     }
