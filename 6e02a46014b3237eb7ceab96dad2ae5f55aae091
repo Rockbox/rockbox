@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "29f7b19a_5106b487",
+        "filename": "lib/rbcodec/metadata/ape.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-04-26T19:36:14Z",
+      "side": 1,
+      "message": "Why read 8 bytes if you\u0027re only checking 4 at most?",
+      "range": {
+        "startLine": 142,
+        "startChar": 67,
+        "endLine": 142,
+        "endChar": 69
+      },
+      "revId": "6e02a46014b3237eb7ceab96dad2ae5f55aae091",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "29f7b19a_7101306e",
+        "filename": "lib/rbcodec/metadata/ape.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-04-26T19:36:14Z",
+      "side": 1,
+      "message": "Why not use memcmp() instead of strncmp()?",
+      "range": {
+        "startLine": 151,
+        "startChar": 27,
+        "endLine": 151,
+        "endChar": 68
+      },
+      "revId": "6e02a46014b3237eb7ceab96dad2ae5f55aae091",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "29f7b19a_b1fa7870",
+        "filename": "lib/rbcodec/metadata/ape.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-04-26T19:36:14Z",
+      "side": 1,
+      "message": "please fix indendation",
+      "range": {
+        "startLine": 153,
+        "startChar": 21,
+        "endLine": 153,
+        "endChar": 53
+      },
+      "revId": "6e02a46014b3237eb7ceab96dad2ae5f55aae091",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
