@@ -322,7 +322,7 @@ void skin_error_format_message(void)
         text[i++] = '.';
         text[i++] = '.';
         text[i++] = '.';
-        for (j=error_col-10; error_line_start[j] && error_line_start[j] != '\n'; j++)
+        for (j=error_col-10; j < len && error_line_start[j] && error_line_start[j] != '\n'; j++)
             text[i++] = error_line_start[j];
         text[i] = '\0';
         error_col = 18;
