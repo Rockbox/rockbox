@@ -20,6 +20,11 @@ OTHER_SRC += $(MIKMOD_SRC)
 
 MIKMODCFLAGS = $(PLUGINFLAGS) -I$(MIKMODSRCDIR) -O2
 
+# Disable stringop-truncation warnings on GCC 8 or greater
+ifeq ($(shell expr $(GCCNUM) \> 800),1)
+    MIKMODCFLAGS += -Wno-stringop-truncation
+endif
+
 $(MIKMODBUILDDIR)/mikmod.rock: $(MIKMOD_OBJ) $(TLSFLIB)
 
 # new rule needed to use extra compile flags
