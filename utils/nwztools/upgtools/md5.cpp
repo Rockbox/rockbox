@@ -28,5 +28,5 @@ using namespace CryptoPP::Weak;
 
 void MD5_CalculateDigest(void *digest, const void *input, size_t length)
 {
-    MD5().CalculateDigest((CryptoPP::byte *)digest, (const CryptoPP::byte *)input, length);
+    MD5().CalculateDigest((byte *)digest, (const byte *)input, length);
 }
