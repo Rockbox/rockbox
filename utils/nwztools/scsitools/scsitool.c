@@ -293,7 +293,7 @@ int get_dnk_prop(int argc, char **argv)
     }
     else
     {
-        printf(YELLOW, "\n");
+        cprintf(YELLOW, "\n");
         print_hex(buffer, buffer_size);
     }
     return 0;
@@ -851,6 +851,7 @@ int do_dest(int argc, char **argv)
     ret = read_nvp_node(shp_index, shp, &size);
     if(ret != 0)
     {
+        printf("Cannot read node 'shp'\n");
         free(shp);
         return ret;
     }
