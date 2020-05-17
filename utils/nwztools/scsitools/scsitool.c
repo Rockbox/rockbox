@@ -757,13 +757,13 @@ int get_dhp(int argc, char **argv)
     return 0;
 }
 
-int do_fw_upgrade(int argc, char **argv)
+int try_fw_upgrade(unsigned flags, int argc, char **argv)
 {
     (void) argc;
-    (void )argv;
+    (void) argv;
     /* older devices may have used subcommand 3 instead of 4, but this is not
      * supported by any device I have seen */
-    uint8_t cdb[12] = {0xfc, 0, 0x04, 'd', 'b', 'm', 'n', 0, 0x80, 0, 0, 0};
+    uint8_t cdb[12] = {0xfc, 0, 0x04, 'd', 'b', 'm', 'n', 0, flags, 0, 0, 0};
 
     char *buffer = malloc(0x81);
     int buffer_size = 0x80;
@@ -787,6 +787,14 @@ int do_fw_upgrade(int argc, char **argv)
         print_hex(buffer, buffer_size);
     }
     return 0;
+}
+
+int do_fw_upgrade(int argc, char **argv)
+{
+    if(!try_fw_upgrade(0x80, argc, argv))
+        return 0;
+    cprintf(GREY, "Trying alternative firmware upgrade command...\n");
+    return try_fw_upgrade(0, argc, argv);
 }
 
 static struct
