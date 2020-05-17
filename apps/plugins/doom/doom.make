@@ -24,6 +24,10 @@ DOOMCFLAGS = $(PLUGINFLAGS) -Wno-strict-prototypes -O2 -fno-strict-aliasing
 ifeq ($(shell expr $(GCCNUM) \> 401),1)
     DOOMCFLAGS += -fgnu89-inline
 endif
+# Disable stringop-truncation warnings on GCC 8 or greater
+ifeq ($(shell expr $(GCCNUM) \> 800),1)
+    DOOMCFLAGS += -Wno-stringop-truncation
+endif
 
 ifndef APP_TYPE
 ifeq ($(TARGET), IRIVER_H100)
