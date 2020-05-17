@@ -100,11 +100,19 @@ printf O ("Binary size: %s\n", filesize($ENV{'BINARY'}));
 printf O ("Voice format: %s\n", definescan("$ENV{APPSDIR}/talk.h", "VOICE_VERSION"));
 
 if ($ENV{'APPSDIR'} =~ /\/apps$/) {
-  printf O ("Actual size: %s\n", filesize("rockbox.bin"));
+    if (-f "rockbox.bin") {
+        printf O ("Actual size: %s\n", filesize("rockbox.bin"));
+    } else {
+        printf O ("Actual size: %s\n", filesize($ENV{'BINARY'}));
+    }
   printf O ("RAM usage: %s\n", mapscan("rockbox.map"));
   printf O ("Features: %s\n", features("apps/features"));
 } elsif ($ENV{'APPSDIR'} =~ /\/bootloader$/) {
-  printf O ("Actual size: %s\n", filesize("bootloader.bin"));
+    if (-f "bootloader.bin") {
+        printf O ("Actual size: %s\n", filesize("bootloader.bin"));
+    } else {
+        printf O ("Actual size: %s\n", filesize($ENV{'BINARY'}));
+    }
   printf O ("RAM usage: %s\n", mapscan("bootloader.map"));
 }
 
