@@ -165,6 +165,8 @@ struct dnk_prop_t dnk_prop_list[] =
     { "product_id", "Product ID", 0x23, 6, 12, DNK_STRING},
     { "destination", "Destination", 0x23, 8, 4, DNK_EXACT_LENGTH | DNK_UINT32},
     { "model_id", "Model ID", 0x23, 9, 4, DNK_EXACT_LENGTH | DNK_UINT32 | DNK_HEX},
+    { "ufn", "Update filename", 0x23, 21, 8, DNK_STRING},
+    { "kas", "Key and Signature", 0x23, 22, 60, DNK_STRING},
     { "model_name", "Model Name", 0x12, 0, 64, DNK_STRING},
     /* there are more obscure commands:
      * - 0x11 returns a 10-byte packet containing a 8-byte "LeftIdl8", scrambled
@@ -175,8 +177,9 @@ struct dnk_prop_t dnk_prop_list[] =
      * - 0x23 has more subproperties:
      *   - 5 is "eDKS"
      *   - 7 is "ProductGroup"
-     *   - 10 is nvp properties (see get_dnk_nvp)
+     *   - 10 is nvp properties (see get_dnk_nvp) (NOTE: nvp number vary by model here)
      *   - 11 seems to read something from nvp and encrypt it with AES, not sure what
+     *   - many other read important/canonical entries of NVP (number does NOT vary model)
      * - 0x24 can write the same properties read by 0x23 */
 };
 
