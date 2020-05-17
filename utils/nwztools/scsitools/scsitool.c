@@ -989,6 +989,7 @@ static void usage(void)
 {
     printf("Usage:\n");
     printf("  scsitool [options] list_devices\n");
+    printf("  scsitool [options] decode_scsi <cdb>\n");
     printf("  scsitool [options] <dev> <command> [arguments]\n");
     printf("Options:\n");
     printf("  -o <prefix>          Set output prefix\n");
@@ -1067,6 +1068,139 @@ static int list_devices(bool list_all)
     return 0;
 }
 
+inline uint8_t xdigit2val(char c)
+{
+    if('0' <= c && c <= '9')
+        return c - '0';
+    else if('a' <= c && c <= 'f')
+        return c - 'a' + 10;
+    else if('A' <= c && c <= 'F')
+        return c - 'A' + 10;
+    else
+        return 255;
+}
+
+static int decode_scsi_a3(uint8_t *cdb, int cdb_len)
+{
+    cprintf_field("Opcode: ", "A3\n");
+    cprintf(RED, "Unimplemented\n");
+    return 0;
+}
+
+static int decode_scsi_a4(uint8_t *cdb, int cdb_len)
+{
+    cprintf_field("Opcode: ", "A3\n");
+    cprintf(RED, "Unimplemented\n");
+    return 0;
+}
+
+static int decode_scsi_empr_dpcc(uint8_t *cdb, int cdb_len)
+{
+    cprintf_field("Opcode: ", "%X (EMPR DPCC)\n", cdb[0]);
+    cprintf(RED, "Unimplemented\n");
+    return 0;
+}
+
+static int decode_scsi_dnk(uint8_t *cdb, int cdb_len)
+{
+    cprintf_field("Opcode: ", "%X (DNK)\n", cdb[0]);
+    cprintf(RED, "Unimplemented\n");
+    return 0;
+}
+
+static int decode_scsi_dpcc(uint8_t *cdb, int cdb_len)
+{
+    cprintf_field("Opcode: ", "%X (DPCC)\n", cdb[0]);
+    cprintf(RED, "Unimplemented\n");
+    return 0;
+}
+
+static int decode_scsi_fc(uint8_t *cdb, int cdb_len)
+{
+    cprintf_field("Opcode: ", "FC\n");
+    if(cdb[3] == 'd' && cdb[4] == 'b' && cdb[5] == 'm' && cdb[6] == 'n')
+    {
+        uint8_t cmd = cdb[2];
+        uint8_t flags = cdb[8];
+        const char *cmd_name = "Unknown";
+        if(cmd == 0x04)
+            cmd_name = "Firmware Upgrade";
+        if(cmd == 0x20)
+            cmd_name = "Get Device Info";
+
+        cprintf(BLUE, "Device request:\n");
+        cprintf_field("  Command: ", "%x (%s)\n", cmd, cmd_name);
+        cprintf_field("  Flags(?): ", "%x (Unknown)\n", flags);
+        
+    }
+    return 0;
+}
+
+static int decode_scsi(int argc, char **argv)
+{
+    /* we need to parse the arguments, we support either as one big hexdump:
+     *   fc002064626d6e0080000000
+     * or as a sequence of hex bytes:
+     *   fc 00 20 64 62 6d 6e 00 80 00 00 00
+     */
+    if(argc == 0)
+    {
+        cprintf(GREY, "You need to specify the CDB to decode\n");
+        return 1;
+    }
+#define MAX_CDB 16
+    uint8_t cdb[MAX_CDB];
+    int cdb_len;
+    if(argc > MAX_CDB)
+    {
+        cprintf(GREY, "This does not look like a CDB (more than %d bytes)\n", MAX_CDB);
+        return 1;
+    }
+    if(argc == 1)
+    {
+        /* allow the string to start with 0x */
+        char *str = argv[0];
+        if(str[0] == '0' && str[1] == 'x')
+            str += 2;
+        cdb_len = strlen(str);
+        if(cdb_len % 2)
+        {
+            cprintf(GREY, "The CDB must contain an even number of hex digits!\n");
+            return 1;
+        }
+        cdb_len /= 2;
+        for(int i = 0; i < cdb_len; i++)
+        {
+            if(!isxdigit(str[2 * i]) || !isxdigit(str[2 * i + 1]))
+            {
+                cprintf(GREY, "The CDB must contain hex digits!\n");
+                return 1;
+            }
+            cdb[i] = xdigit2val(str[2 * i]) << 4 | xdigit2val(str[2 * i + 1]);
+        }
+    }
+    else
+    {
+        cprintf(GREY, "unimplemented\n");
+        return 1;
+    }
+    cprintf(GREEN, "CDB: ");
+    print_hex(cdb, cdb_len);
+    
+    if(cdb[0] == CMD_A3) return decode_scsi_a3(cdb, cdb_len);
+    if(cdb[0] == CMD_A4) return decode_scsi_a4(cdb, cdb_len);
+    if(cdb[0] == CMD_EMPR_DPCC) return decode_scsi_empr_dpcc(cdb, cdb_len);
+    if(cdb[0] == CMD_DNK) return decode_scsi_dnk(cdb, cdb_len);
+    if(cdb[0] == CMD_DPCC) return decode_scsi_dpcc(cdb, cdb_len);
+    if(cdb[0] == 0xfc) return decode_scsi_fc(cdb, cdb_len);
+    else
+    {
+        cprintf(RED, "I cannot decode this SCSI command\n");
+    }
+
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     bool list_all = false;
@@ -1130,9 +1264,11 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    /* special list_devices command */
-    if(argc == optind + 1 && strcmp(argv[optind], "list_devices") == 0)
+    /* special list_devices/decode_scsi command */
+    if(argc >= optind + 1 && strcmp(argv[optind], "list_devices") == 0)
         return list_devices(list_all);
+    if(argc >= optind + 1 && strcmp(argv[optind], "decode_scsi") == 0)
+        return decode_scsi(argc - optind - 1, argv + optind + 1);
 
     if(argc - optind < 2)
     {
