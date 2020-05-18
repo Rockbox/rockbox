@@ -375,8 +375,8 @@ static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
 /* GCC 7 and up complain about the snprintf in create_bookmark() when
    compiled with -D_FORTIFY_SOURCE or -Wformat-truncation
    This is a false positive, so disable it here only */
-#pragma GCC diagnostic push
 #if __GNUC__ >= 7
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-truncation"
 #endif
 /* ----------------------------------------------------------------------- */
@@ -447,7 +447,9 @@ static char* create_bookmark()
     else
         return NULL;
 }
+#if __GNUC__ >= 7
 #pragma GCC diagnostic pop /* -Wformat-truncation */
+#endif
 
 /* ----------------------------------------------------------------------- */
 /* This function will determine if an autoload is necessary.  This is an   */
