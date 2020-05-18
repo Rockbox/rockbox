@@ -54,6 +54,12 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 
+static const struct button_mapping button_context_mainmenu[]  = {
+    { ACTION_TREE_WPS,       BUTTON_POWER,                  BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE),
+}; /* button_context_mainmenu as with sansa clip mapping - "back" button returns you to WPS */
+
 static const struct button_mapping button_context_wps[]  = {
 /*    { ACTION_WPS_BROWSE,        BUTTON_UP|BUTTON_REPEAT,  BUTTON_UP }, */
     { ACTION_WPS_PLAY,        BUTTON_SELECT|BUTTON_REL,     BUTTON_SELECT },
@@ -223,6 +229,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_wps;
 
         case CONTEXT_MAINMENU:
+            return button_context_mainmenu;
         case CONTEXT_TREE:
         case CONTEXT_LIST:
             return button_context_list;
