@@ -4694,17 +4694,20 @@ if [ -z "$gccver" ]; then
   echo "[WARNING] checks we want now."
 else
 
-  # gccver should now be "3.3.5", "3.4.3", "2.95.3-6" and similar, but don't
-  # DEPEND on it
-
- num1=`echo $gccver | cut -d . -f1`
- num2=`echo $gccver | cut -d . -f2`
+  # convert gcc version to a number (major*100 + minor).
+  # Newer compilers may only return the major number, so we neen to fetch the
+  # version using -dumpfullversion. MinGW compilers may return names like
+  # "7.3-win32", so me must strip off the last part.
+ gccver2=`$CC -dumpfullversion -dumpversion | cut -d "-" -f1`;
+ num1=`echo $gccver2 | cut -d . -f1`
+ num2=`echo $gccver2 | cut -d . -f2`
  gccnum=`(expr $num1 "*" 100 + $num2) 2>/dev/null`
 
  # This makes:
  # 3.3.X  => 303
  # 3.4.X  => 304
  # 2.95.3 => 295
+ # 7.3-win32 => 703
 
  echo "Using $CC $gccver ($gccnum)"
 
