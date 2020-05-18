@@ -72,6 +72,10 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 #endif
             case ACTION_STD_CANCEL:
+                if (boost)
+                {
+                    rb->cpu_boost(false);
+                }
                 done = true;
                 break;
         }
