@@ -72,6 +72,12 @@ enum plugin_status plugin_start(const void* parameter)
                 break;
 #endif
             case ACTION_STD_CANCEL:
+#ifdef HAVE_ADJUSTABLE_CPU_FREQ
+                if (boost)
+                {
+                    rb->cpu_boost(false);
+                }
+#endif
                 done = true;
                 break;
         }
