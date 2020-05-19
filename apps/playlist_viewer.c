@@ -362,9 +362,14 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 
         if (is_playing)
         {
-            /* Something is playing, use half the plugin buffer for playlist
-               indices */
-            index_buffer_size = buffer_size / 2;
+            /* Something is playing, try to accommodate
+            *  global_settings.max_files_in_playlist entries */
+            index_buffer_size = playlist_get_required_bufsz(viewer->playlist,
+                                   false, global_settings.max_files_in_playlist);
+
+            if ((unsigned)index_buffer_size >= buffer_size - MAX_PATH)
+                index_buffer_size = buffer_size - (MAX_PATH + 1);
+
             index_buffer = buffer;
         }
 
