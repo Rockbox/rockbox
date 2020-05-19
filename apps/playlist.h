@@ -145,6 +145,7 @@ bool playlist_next_dir(int direction);
 int playlist_get_resume_info(int *resume_index);
 int playlist_update_resume_info(const struct mp3entry* id3);
 int playlist_get_display_index(void);
+size_t playlist_get_required_bufsz(struct playlist_info* playlist, int num_indices);
 int playlist_amount(void);
 void playlist_set_last_shuffled_start(void);
 struct playlist_info *playlist_get_current(void);

@@ -2848,6 +2848,20 @@ int playlist_get_display_index(void)
     return (index+1);
 }
 
+/* return size of buffer needed for playlist to initialize num_indices entries */
+size_t playlist_get_required_bufsz(struct playlist_info* playlist, int num_indices)
+{
+    if (!playlist)
+        playlist = &current_playlist;
+
+    size_t unit_size = sizeof (*playlist->indices);
+    #ifdef HAVE_DIRCACHE
+            unit_size += sizeof (*playlist->dcfrefs);
+    #endif
+
+    return num_indices * unit_size;
+}
+
 /* returns number of tracks in current playlist */
 int playlist_amount(void)
 {
@@ -2887,11 +2901,8 @@ int playlist_create_ex(struct playlist_info* playlist,
 
         if (index_buffer)
         {
-            size_t unit_size = sizeof (*playlist->indices);
-#ifdef HAVE_DIRCACHE
-            unit_size += sizeof (*playlist->dcfrefs);
-#endif
-            int num_indices = index_buffer_size / unit_size;
+            int num_indices = index_buffer_size /
+                              playlist_get_required_bufsz(playlist, 1);
 
             if (num_indices > global_settings.max_files_in_playlist)
                 num_indices = global_settings.max_files_in_playlist;
