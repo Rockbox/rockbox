@@ -1,12 +1,10 @@
 $publicrelease="3.15";
-$manualrelease="3.15";
-$voicerelease="3.15";
 $releasedate="15 Nov 2019";
 $releasenotes="/wiki/ReleaseNotes315";
 
 # { 'modelname' => {
 #    name => 'Full Name',
-#    status => 1,                        # 1=unusable, 2=unstable, 3=stable
+#    status => 1,                        # 0=retired, 1=unusable, 2=unstable, 3=stable
 #    ram => 2,                           # optional (used?)
 #    manual => 'modelname2',             # optional (uses modelname2's manual)
 #    icon => 'modelname3',               # optional (uses modelname3's icon)
@@ -36,7 +34,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'archosrecorder' => {
         name => 'Archos Recorder v1',
-        status => 3,
+        status => 0,  # Has not compiled since 2013
         ram => 2,
         release => '3.13',  # Haven't had a proper release since then.
     },
