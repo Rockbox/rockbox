@@ -2363,8 +2363,14 @@ static const char* dbg_talk_get_name(int selected_item, void *data,
     {
         case 0:
             if (talk_data)
-                snprintf(buffer, buffer_len, "Current voice file: %s",
-                        talk_data->voicefile);
+            {
+                if (talk_data->init_status == TALK_STATUS_OK)
+                    snprintf(buffer, buffer_len, "Current voice file: %s",
+                            talk_data->voicefile);
+                else
+                    snprintf(buffer, buffer_len, "Incompatible voice file: %s",
+                            talk_data->voicefile);
+            }
             else
                 buffer = "No voice information available";
             break;

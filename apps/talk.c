@@ -131,6 +131,7 @@ static bool need_shutup; /* is there possibly any voice playing to be shutup */
 static bool force_enqueue_next; /* enqueue next utterance even if enqueue is false */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
+static enum talk_init_status talk_init_status = TALK_STATUS_OK;
 #if CONFIG_CODEC == SWCODEC
 /* protects queue_read, queue_write and thumbnail_buf_used */
 static struct mutex queue_mutex SHAREDBSS_ATTR; 
@@ -622,6 +623,7 @@ static bool load_voicefile_index(int fd)
         }
     }
 
+    talk_init_status = TALK_STATUS_ERR_INCOMPATIBLE;
     logf("Incompatible voice file");
     logf("version %d expected %d", voicefile.version, VOICE_VERSION);
     logf("target_id %d expected %d", voicefile.target_id, TARGET_ID);
@@ -1629,7 +1631,10 @@ bool talk_get_debug_data(struct talk_debug_data *data)
 
     memset(data, 0, sizeof(*data));
 
-    if (!has_voicefile || index_handle <= 0)
+    data->init_status = talk_init_status;
+
+    if (talk_init_status == TALK_STATUS_OK
+       && (!has_voicefile || index_handle <= 0))
         return false;
 
     if (global_settings.lang_file[0] && global_settings.lang_file[0] != 0xff)
@@ -1640,9 +1645,14 @@ bool talk_get_debug_data(struct talk_debug_data *data)
     int real_clips = 0;
 
     strlcpy(data->voicefile, p_lang, sizeof(data->voicefile));
+
     data->num_clips = voicefile.id1_max + voicefile.id2_max;
     data->avg_clipsize = data->max_clipsize = 0;
     data->min_clipsize = INT_MAX;
+
+    if (talk_init_status != TALK_STATUS_OK)
+        return true;
+
     for(int i = 0; i < data->num_clips; i++)
     {
         int size = clips[i].size & (~LOADED_MASK);
@@ -1654,6 +1664,7 @@ bool talk_get_debug_data(struct talk_debug_data *data)
             data->max_clipsize = size;
         data->avg_clipsize += size;
     }
+
     cc = buflib_get_data(&clip_ctx, metadata_table_handle);
     for (int i = 0; i < (int) max_clips; i++)
     {

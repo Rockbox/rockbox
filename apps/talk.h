@@ -55,6 +55,11 @@ enum {
     UNIT_LAST     /* END MARKER */
 };
 
+enum talk_init_status {
+    TALK_STATUS_OK = 0,
+    TALK_STATUS_ERR_INCOMPATIBLE
+};
+
 #define UNIT_SHIFT (32-5) /* this many bits left from UNIT_xx enum */
 
 #define DECIMAL_SHIFT (32 - 8)
@@ -174,6 +179,7 @@ struct talk_debug_data {
     int  cached_clips;
     int  cache_hits;
     int  cache_misses;
+    enum talk_init_status init_status;
 };
 
 bool talk_get_debug_data(struct talk_debug_data *data);
