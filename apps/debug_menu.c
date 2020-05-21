@@ -2362,33 +2362,42 @@ static const char* dbg_talk_get_name(int selected_item, void *data,
     switch(selected_item)
     {
         case 0:
-            if (talk_data)
+            if (talk_data->status != TALK_STATUS_ERR_NOFILE)
                 snprintf(buffer, buffer_len, "Current voice file: %s",
-                        talk_data->voicefile);
+                            talk_data->voicefile);
             else
                 buffer = "No voice information available";
             break;
         case 1:
+            if (talk_data->status == TALK_STATUS_OK)
+                buffer = "Talk Status: OK";
+            else if (talk_data->status != TALK_STATUS_ERR_INCOMPATIBLE)
+                snprintf(buffer, buffer_len, "Talk Status: ERR (%i)",
+                            talk_data->status);
+            else
+                buffer = "Talk Status: ERR Incompatible voice file";
+            break;
+        case 2:
             snprintf(buffer, buffer_len, "Number of (empty) clips in voice file: (%d) %d",
                     talk_data->num_empty_clips, talk_data->num_clips);
             break;
-        case 2:
+        case 3:
             snprintf(buffer, buffer_len, "Min/Avg/Max size of clips: %d / %d / %d",
                     talk_data->min_clipsize, talk_data->avg_clipsize, talk_data->max_clipsize);
             break;
-        case 3:
+        case 4:
             snprintf(buffer, buffer_len, "Memory allocated: %ld.%02ld KB",
                     talk_data->memory_allocated / 1024, talk_data->memory_allocated % 1024);
             break;
-        case 4:
+        case 5:
             snprintf(buffer, buffer_len, "Memory used: %ld.%02ld KB",
                     talk_data->memory_used / 1024, talk_data->memory_used % 1024);
             break;
-        case 5:
+        case 6:
             snprintf(buffer, buffer_len, "Number of clips in cache: %d",
                     talk_data->cached_clips);
             break;
-        case 6:
+        case 7:
             snprintf(buffer, buffer_len, "Cache hits / misses: %d / %d",
                     talk_data->cache_hits, talk_data->cache_misses);
             break;
@@ -2405,9 +2414,9 @@ static bool dbg_talk(void)
     struct simplelist_info list;
     struct talk_debug_data data;
     if (talk_get_debug_data(&data))
-        simplelist_info_init(&list, "Voice Information:", 7, &data);
+        simplelist_info_init(&list, "Voice Information:", 8, &data);
     else
-        simplelist_info_init(&list, "Voice Information:", 1, NULL);
+        simplelist_info_init(&list, "Voice Information:", 2, &data);
     list.scroll_all = true;
     list.hide_selection = true;
     list.timeout = HZ;

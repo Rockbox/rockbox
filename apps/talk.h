@@ -55,6 +55,15 @@ enum {
     UNIT_LAST     /* END MARKER */
 };
 
+/* Status of loading talk file, shown in debug_menu */
+enum talk_status {
+    TALK_STATUS_OK = 0,
+    TALK_STATUS_ERR_OOM,
+    TALK_STATUS_ERR_ALLOC,
+    TALK_STATUS_ERR_NOFILE,
+    TALK_STATUS_ERR_INCOMPATIBLE
+};
+
 #define UNIT_SHIFT (32-5) /* this many bits left from UNIT_xx enum */
 
 #define DECIMAL_SHIFT (32 - 8)
@@ -174,6 +183,7 @@ struct talk_debug_data {
     int  cached_clips;
     int  cache_hits;
     int  cache_misses;
+    enum talk_status status;
 };
 
 bool talk_get_debug_data(struct talk_debug_data *data);

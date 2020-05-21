@@ -131,6 +131,7 @@ static bool need_shutup; /* is there possibly any voice playing to be shutup */
 static bool force_enqueue_next; /* enqueue next utterance even if enqueue is false */
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
+static enum talk_status talk_status = TALK_STATUS_OK;
 #if CONFIG_CODEC == SWCODEC
 /* protects queue_read, queue_write and thumbnail_buf_used */
 static struct mutex queue_mutex SHAREDBSS_ATTR; 
@@ -595,6 +596,7 @@ static bool create_clip_buffer(size_t max_size)
     return true;
 
 alloc_err:
+    talk_status = TALK_STATUS_ERR_ALLOC;
     index_handle = core_free(index_handle);
     return false;
 }
@@ -603,11 +605,17 @@ alloc_err:
 static bool load_voicefile_index(int fd)
 {
     if (fd < 0) /* failed to open */
+    {
+        talk_status = TALK_STATUS_ERR_NOFILE;
         return false;
+    }
 
     /* load the header first */
     if (!load_header(fd, &voicefile))
+    {
+        talk_status = TALK_STATUS_ERR_INCOMPATIBLE;
         return false;
+    }
 
     /* format check */
     if (voicefile.table == sizeof(struct voicefile_header))
@@ -622,6 +630,7 @@ static bool load_voicefile_index(int fd)
         }
     }
 
+    talk_status = TALK_STATUS_ERR_INCOMPATIBLE;
     logf("Incompatible voice file");
     logf("version %d expected %d", voicefile.version, VOICE_VERSION);
     logf("target_id %d expected %d", voicefile.target_id, TARGET_ID);
@@ -648,6 +657,7 @@ static bool load_voicefile_data(int fd)
     if (UNLIKELY(cap < 0))
     {
         logf("Not enough memory for voice. Disabling...\n");
+        talk_status = TALK_STATUS_ERR_OOM;
         return false;
     }
     else if (voicebuf_size > (size_t)cap)
@@ -1629,17 +1639,25 @@ bool talk_get_debug_data(struct talk_debug_data *data)
 
     memset(data, 0, sizeof(*data));
 
-    if (!has_voicefile || index_handle <= 0)
-        return false;
+    data->status = talk_status;
 
     if (global_settings.lang_file[0] && global_settings.lang_file[0] != 0xff)
         p_lang = (char *)global_settings.lang_file;
+
+    strlcpy(data->voicefile, p_lang, sizeof(data->voicefile));
+
+    if (!has_voicefile || index_handle <= 0)
+    {
+        if (data->status == TALK_STATUS_OK)
+            data->status = TALK_STATUS_ERR_NOFILE;
+
+        return false;
+    }
 
     struct clip_entry *clips = core_get_data(index_handle);
     int cached = 0;
     int real_clips = 0;
 
-    strlcpy(data->voicefile, p_lang, sizeof(data->voicefile));
     data->num_clips = voicefile.id1_max + voicefile.id2_max;
     data->avg_clipsize = data->max_clipsize = 0;
     data->min_clipsize = INT_MAX;
