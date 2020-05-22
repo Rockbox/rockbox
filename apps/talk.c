@@ -31,6 +31,7 @@
 #include "kernel.h"
 #include "settings.h"
 #include "settings_list.h"
+#include "splash.h"
 #if CONFIG_CODEC == SWCODEC
 #include "voice_thread.h"
 #else
@@ -937,8 +938,10 @@ void talk_init(void)
     if (filehandle > 0)
     {
         if (!load_voicefile_index(filehandle))
+        {
+            splashf(HZ * 2, str(LANG_READ_FAILED), ".voice");
             goto out;
-
+        }
         /* Now determine the maximum buffer size needed for the voicefile.
          * The below pretends the entire voicefile would be loaded. The buffer
          * size is eventually capped later on in load_voicefile_data() */

@@ -2369,13 +2369,11 @@ static const char* dbg_talk_get_name(int selected_item, void *data,
                 buffer = "No voice information available";
             break;
         case 1:
-            if (talk_data->status == TALK_STATUS_OK)
-                buffer = "Talk Status: OK";
-            else if (talk_data->status != TALK_STATUS_ERR_INCOMPATIBLE)
+            if (talk_data->status != TALK_STATUS_OK)
                 snprintf(buffer, buffer_len, "Talk Status: ERR (%i)",
                             talk_data->status);
             else
-                buffer = "Talk Status: ERR Incompatible voice file";
+                buffer = "Talk Status: OK";
             break;
         case 2:
             snprintf(buffer, buffer_len, "Number of (empty) clips in voice file: (%d) %d",
