@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "29f7b19a_34fcb609",
+        "filename": "rbutil/rbutilqt/base/serverinfo.cpp",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1000545
+      },
+      "writtenOn": "2020-05-22T14:49:53Z",
+      "side": 1,
+      "message": "I was thinking about this change myself, and started to wonder if displaying \"retired\" is a good choice -- it kinda implies the build won\u0027t be stable, but since it\u0027s an old release it is. Maybe it would be better to show \"Stable, Retired\" or even simply show it at \"Stable\" too.",
+      "range": {
+        "startLine": 122,
+        "startChar": 21,
+        "endLine": 122,
+        "endChar": 22
+      },
+      "revId": "4155c35347a959f99517ce049fdbf3cf3a7e6493",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
