@@ -117,6 +117,9 @@ void ServerInfo::readBuildInfo(QString file)
         QString status = tr("Unknown");
         switch(info.value(platforms.at(i)).toInt())
         {
+            case 0:
+                status = tr("Stable (Retired)");
+                break;
             case 1:
                 status = tr("Unusable");
                 break;
@@ -219,4 +222,3 @@ QVariant ServerInfo::platformValue(QString platform, enum ServerInfos info)
     LOG_INFO() << "GET:" << s << serverInfos.value(s, d).toString();
     return serverInfos.value(s, d);
 }
-
