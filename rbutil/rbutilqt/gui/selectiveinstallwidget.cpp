@@ -92,8 +92,11 @@ void SelectiveInstallWidget::updateVersion(void)
     // re-populate all version items
     m_versions.clear();
     m_versions.insert("release", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
-    m_versions.insert("development", ServerInfo::value(ServerInfo::BleedingRevision).toString());
-    m_versions.insert("rc", ServerInfo::value(ServerInfo::RelCandidateVersion).toString());
+    // Don't populate RC or development selections if target has been retired.
+    if (ServerInfo::value(ServerInfo::CurStatus) != tr("Stable (Retired)")) {
+        m_versions.insert("development", ServerInfo::value(ServerInfo::BleedingRevision).toString());
+        m_versions.insert("rc", ServerInfo::value(ServerInfo::RelCandidateVersion).toString());
+    }
 
     ui.selectedVersion->clear();
     if(!m_versions["release"].isEmpty()) {
