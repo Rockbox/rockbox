@@ -117,6 +117,9 @@ void ServerInfo::readBuildInfo(QString file)
         QString status = tr("Unknown");
         switch(info.value(platforms.at(i)).toInt())
         {
+            case 0:
+                status = tr("Retired");
+                break;
             case 1:
                 status = tr("Unusable");
                 break;
