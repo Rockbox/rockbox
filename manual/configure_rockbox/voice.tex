@@ -16,8 +16,11 @@
     \begin{itemize}
     \item Setting the Sound Option \setting{Channels} to \setting{Karaoke} may 
       disable voice menus.
-    \item Plugins \opt{rtc}{and the wake up alarm} do not support
+    \item Most plugins \opt{rtc}{and the wake up alarm} do not support
       voice features.
+    \item Voice files are checked for compatibility before they are loaded
+      by the \dap. A message is displayed on startup ``Failed Reading .voice''
+      if the \fname{.voice} file is not the correct version for your \dap.
     \end{itemize}
 
   \item[Voice Directories.]
