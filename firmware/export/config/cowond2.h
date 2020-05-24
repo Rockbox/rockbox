@@ -58,10 +58,12 @@
 /* define this if you have a flash memory storage */
 #define HAVE_FLASH_STORAGE
 
-#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
+/* NAND is broken. */
+//#define CONFIG_STORAGE (STORAGE_NAND | STORAGE_SD)
+#define CONFIG_STORAGE STORAGE_SD
 #define HAVE_MULTIDRIVE
 #define HAVE_HOTSWAP
-#define NUM_DRIVES 2
+#define NUM_DRIVES 1
 
 #define CONFIG_NAND NAND_TCC
 
