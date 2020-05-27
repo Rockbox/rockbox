@@ -495,6 +495,7 @@ struct user_settings
     bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
     bool play_selected; /* Plays selected file even in shuffle mode */
     bool party_mode;    /* party mode - unstoppable music */
+    bool skim_mode;    /* skim mode - increases speed on forward */
     bool audioscrobbler; /* Audioscrobbler logging  */
     bool cuesheet;
     bool car_adapter_mode; /* 0=off 1=on */

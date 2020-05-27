@@ -1143,3 +1143,152 @@ int gui_syncpitchscreen_run(void)
     pop_current_activity();
     return 0;
 }
+int set_speed(int mode)
+{
+    int button;
+    int32_t pitch = sound_get_pitch();
+    int32_t semitone;
+
+    int32_t new_pitch;
+    int32_t pitch_delta;
+    bool nudged = false;
+    int i,  decimals = 0;
+    bool exit = false;
+    /* should maybe be passed per parameter later, not needed for now */
+
+    push_current_activity(ACTIVITY_PITCHSCREEN);
+
+#if CONFIG_CODEC == SWCODEC
+    int32_t new_stretch;
+
+    /* the speed variable holds the apparent speed of the playback */
+    int32_t speed;
+    if (dsp_timestretch_available())
+    {
+        speed = GET_SPEED(pitch, dsp_get_timestretch());
+    }
+    else
+    {
+        speed = pitch;
+    }
+
+    /* Figure out whether to be in timestretch mode */
+    if (global_settings.pitch_mode_timestretch && !dsp_timestretch_available())
+    {
+        global_settings.pitch_mode_timestretch = false;
+        settings_save();
+    }
+#endif
+
+    /* Count decimals for speaking */
+    for (i = PITCH_SPEED_PRECISION; i >= 10; i /= 10)
+        decimals++;
+
+    /* set the semitone index based on the current pitch */
+    semitone = get_semitone_from_pitch(pitch);
+
+#if CONFIG_CODEC == SWCODEC
+    pcmbuf_set_low_latency(true);
+#endif
+
+
+#if CONFIG_CODEC == SWCODEC
+            if(mode==1)
+                if (global_settings.pitch_mode_timestretch)
+                {
+                    new_speed = speed + SPEED_BIG_DELTA*2;
+                    /* snap to whole numbers */
+                    if(new_speed % PITCH_SPEED_PRECISION != 0)
+                        new_speed -= new_speed % PITCH_SPEED_PRECISION;
+                    at_limit = false;
+                }
+            else
+            {
+#endif
+                pitch = PITCH_SPEED_100;
+                sound_set_pitch(pitch);
+#if CONFIG_CODEC == SWCODEC
+                speed = PITCH_SPEED_100;
+                if (dsp_timestretch_available())
+                {
+                    dsp_set_timestretch(PITCH_SPEED_100);
+                    at_limit = false;
+                }
+#endif
+                semitone = get_semitone_from_pitch(pitch);
+           }
+
+        if (pitch_delta)
+        {
+            if (global_settings.pitch_mode_semitone)
+            {
+                semitone = pitch_increase_semitone(pitch, semitone, pitch_delta
+#if CONFIG_CODEC == SWCODEC
+                                                , speed
+#endif                            
+                );
+                pitch = get_pitch_from_semitone(semitone);
+            }
+            else
+            {
+                pitch = pitch_increase(pitch, pitch_delta, true
+#if CONFIG_CODEC == SWCODEC
+                                       , speed
+#endif                            
+                );
+                semitone = get_semitone_from_pitch(pitch);
+            }
+#if CONFIG_CODEC == SWCODEC
+            if (global_settings.pitch_mode_timestretch)
+            {
+                /* do this to make sure we properly obey the stretch limits */
+                new_speed = speed;
+            }
+            else
+            {
+                speed = pitch;
+            }
+#endif
+        }
+
+#if CONFIG_CODEC == SWCODEC
+        if(new_speed)
+        {
+            new_stretch = GET_STRETCH(pitch, new_speed);
+
+            /* limit the amount of stretch */
+            if(new_stretch > STRETCH_MAX)
+            {
+                new_stretch = STRETCH_MAX;
+                new_speed = GET_SPEED(pitch, new_stretch);
+            }
+            else if(new_stretch < STRETCH_MIN)
+            {
+                new_stretch = STRETCH_MIN;
+                new_speed = GET_SPEED(pitch, new_stretch);
+            }
+
+            new_stretch = GET_STRETCH(pitch, new_speed);
+            if(new_stretch >= STRETCH_MAX || 
+               new_stretch <= STRETCH_MIN)
+            {
+                at_limit = true;
+            }
+
+            /* set the amount of stretch */
+            dsp_set_timestretch(new_stretch);
+
+            /* update the speed variable with the new speed */
+            speed = new_speed;
+
+            /* Reset new_speed so we only call dsp_set_timestretch */
+            /* when needed                                         */
+            new_speed = 0;
+        }
+#endif
+#if CONFIG_CODEC == SWCODEC
+    pcmbuf_set_low_latency(false);
+#endif
+    pop_current_activity();
+    return 0;
+}

@@ -865,6 +865,11 @@ long gui_wps_show(void)
             case ACTION_WPS_SEEKFWD:
                 if (global_settings.party_mode)
                     break;
+                if (global_settings.skim_mode)
+                {
+                    set_speed(1);
+                    break;
+                }
                 if (current_tick -last_right < HZ)
                 {
                     if (state->id3->cuesheet)
@@ -885,6 +890,11 @@ long gui_wps_show(void)
             case ACTION_WPS_SEEKBACK:
                 if (global_settings.party_mode)
                     break;
+                if (global_settings.skim_mode)
+                {
+                    set_speed(0);
+                    break;
+                }
                 if (current_tick -last_left < HZ)
                 {
                     if (state->id3->cuesheet)

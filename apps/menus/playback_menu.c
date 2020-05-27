@@ -92,6 +92,7 @@ MENUITEM_SETTING(buffer_margin, &global_settings.buffer_margin,
 #endif /*HAVE_DISK_STORAGE */
 MENUITEM_SETTING(fade_on_stop, &global_settings.fade_on_stop, NULL);
 MENUITEM_SETTING(party_mode, &global_settings.party_mode, NULL);
+MENUITEM_SETTING(skim_mode, &global_settings.skim_mode, NULL);
 
 #if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_CROSSFADE

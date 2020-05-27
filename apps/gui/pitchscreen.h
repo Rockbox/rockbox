@@ -23,5 +23,6 @@
 #define _PITCHSCREEN_H_
 
 int gui_syncpitchscreen_run(void);
+int set_speed(int mode);
 
 #endif /* _PITCHSCREEN_H_ */

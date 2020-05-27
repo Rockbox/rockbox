@@ -1235,6 +1235,7 @@ const struct settings_list settings[] = {
     /* more playback */
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
     OFFON_SETTING(0,party_mode,LANG_PARTY_MODE,false,"party mode",NULL),
+    OFFON_SETTING(0,skim_mode,"Skim Forward",false,"party mode",NULL),
     OFFON_SETTING(0,fade_on_stop,LANG_FADE_ON_STOP,true,"volume fade",NULL),
     INT_SETTING(F_TIME_SETTING, ff_rewind_min_step, LANG_FFRW_STEP, 1,
                 "scan min step", UNIT_SEC, 1, 60, 1, NULL, NULL, NULL),
