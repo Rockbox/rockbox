@@ -145,13 +145,47 @@ static int docall (lua_State *L) {
   return status;
 }
 
+/* mutates passed filename returns 'arguments...' */
+static char* lua_arguments(char *filename, char *arguments)
+{
+  arguments = strchr(filename, '?');
+  if(arguments) {
+    *arguments = '\0';
+    arguments++;
+  }
+  /*rb->splashf(1000, " @ %s %s", filename, arguments);*/
+  return arguments;
+}
+
 static void lua_atexit(void);
 static int loadfile_newstate(lua_State **L, const char *filename)
 {
+        int ret;
+        char *file = (char *) malloc(MAX_PATH * 2);
+        if (file) {/* out of memory? */
+          rb->strlcpy(file, filename, MAX_PATH * 2);
+        }
+        else {
+          return LUA_ERRMEM;
+        }
+        char *args = NULL;
         *L = luaL_newstate();
         rb_atexit(lua_atexit);
+
+        args = lua_arguments(file, args);
+        if(args)
+          lua_pushfstring(*L, "%s", args);
+        else
+          lua_pushnil(*L);
+
+        lua_setglobal (*L, "_arguments");
+        lua_pushfstring(*L, "%s", file);
+        lua_setglobal (*L, "_fullpath");
+
         rocklua_openlibs(*L);
-        return luaL_loadfile(*L, filename);
+        ret = luaL_loadfile(*L, file);
+        free(file);
+        return ret;
 }
 
 static void lua_atexit(void)
@@ -162,10 +196,10 @@ static void lua_atexit(void)
   {
     if (Ls == lua_touserdata(Ls, -1)) /* signal from restart_lua */
     {
-      filename = (char *) malloc(MAX_PATH);
+      filename = (char *) malloc(MAX_PATH * 2);
 
       if (filename) /* out of memory? */
-        rb->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH);
+        rb->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH * 2);
       lua_close(Ls); /* close old state */
 
       lu_status = loadfile_newstate(&Ls, filename);
