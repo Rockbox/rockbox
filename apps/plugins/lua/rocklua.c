@@ -146,12 +146,28 @@ static int docall (lua_State *L) {
 }
 
 static void lua_atexit(void);
+static int lua_split_arguments(lua_State *L, const char *filename);
+
 static int loadfile_newstate(lua_State **L, const char *filename)
 {
-        *L = luaL_newstate();
-        rb_atexit(lua_atexit);
-        rocklua_openlibs(*L);
-        return luaL_loadfile(*L, filename);
+  const char *file;
+  int ret;
+
+  *L = luaL_newstate();
+  rb_atexit(lua_atexit);
+
+  lua_gc(*L, LUA_GCSTOP, 0);  /* stop collector during initialization */
+  rocklua_openlibs(*L);
+
+  lua_split_arguments(*L, filename);
+  lua_setglobal (*L, "_arguments");
+  file = lua_tostring (*L, -1);
+  lua_setglobal (*L, "_fullpath");
+  /* lua manual -> no guarantee pointer valid after value is removed from stack */
+  ret = luaL_loadfile(*L, file);
+  lua_gc(*L, LUA_GCRESTART, 0);
+
+  return ret;
 }
 
 static void lua_atexit(void)
@@ -162,10 +178,14 @@ static void lua_atexit(void)
   {
     if (Ls == lua_touserdata(Ls, -1)) /* signal from restart_lua */
     {
-      filename = (char *) malloc(MAX_PATH);
+      filename = (char *) malloc((MAX_PATH * 2) + 1);
 
-      if (filename) /* out of memory? */
-        rb->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH);
+      if (filename) {/* out of memory? */
+        filename[MAX_PATH * 2] = '\0';
+        rb->strlcpy(filename, lua_tostring(Ls, -2), MAX_PATH * 2);
+      } else {
+        goto ERR_RUN;
+      }
       lua_close(Ls); /* close old state */
 
       lu_status = loadfile_newstate(&Ls, filename);
@@ -175,6 +195,7 @@ static void lua_atexit(void)
     }
     else if (lua_tointeger(Ls, -1) != 0) /* os.exit */
     {
+ERR_RUN:
       lu_status = LUA_ERRRUN;
       lua_pop(Ls, 1); /* put exit string on top of stack */
       plugin_start(NULL);
@@ -183,6 +204,25 @@ static void lua_atexit(void)
       lua_close(Ls);
   }
   _exit(0); /* don't call exit handler */
+}
+
+/* split filename at argchar
+ * remainder of filename pushed on stack (-1)
+* argument string pushed on stack or nil if doesn't exist (-2)
+ */
+static int lua_split_arguments(lua_State *L, const char *filename)
+{
+  const char argchar = '?';
+  const char* arguments = strchr(filename, argchar);
+  if(arguments) {
+    lua_pushstring(L, (arguments + 1));
+  } else {
+    arguments = strlen(filename) + filename;
+    lua_pushnil(L);
+  }
+  lua_pushlstring(L, filename, arguments - filename);
+  lua_insert(L, -2); /* swap filename and argument */
+  return 2;
 }
 
 /***************** Plugin Entry Point *****************/
