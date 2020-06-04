@@ -724,11 +724,8 @@ do
     echo ""
     case $arch in
         [Ss])
-            # For binutils 2.16.1 builtin rules conflict on some systems with a
-            # default rule for Objective C. Disable the builtin make rules. See
-            # http://sourceware.org/ml/binutils/2005-12/msg00259.html
             export MAKEFLAGS="-r $MAKEFLAGS"
-            build "binutils" "sh-elf" "2.16.1" "binutils-2.16.1-texinfo-fix.diff" "--disable-werror"
+            build "binutils" "sh-elf" "2.26.1" "" "--disable-werror"
             build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
             ;;
 
@@ -738,7 +735,7 @@ do
             ;;
 
         [Mm])
-            build "binutils" "m68k-elf" "2.20.1" "binutils-2.20.1-texinfo-fix.diff" "--disable-werror"
+            build "binutils" "m68k-elf" "2.26.1" "" "--disable-werror"
             build "gcc" "m68k-elf" "4.5.2" "" "--with-arch=cf MAKEINFO=missing" "gmp mpfr mpc"
             ;;
 
@@ -751,7 +748,7 @@ do
                     gccopts="--disable-nls"
                     ;;
             esac
-            build "binutils" "arm-elf-eabi" "2.20.1" "binutils-2.20.1-ld-thumb-interwork-long-call.diff binutils-2.20.1-texinfo-fix.diff" "$binopts --disable-werror"
+            build "binutils" "arm-elf-eabi" "2.26.1" "" "--disable-werror"
             build "gcc" "arm-elf-eabi" "4.4.4" "rockbox-multilibs-noexceptions-arm-elf-eabi-gcc-4.4.2_1.diff" "$gccopts MAKEINFO=missing" "gmp mpfr"
             ;;
 #        [Rr])
