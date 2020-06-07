@@ -20,7 +20,7 @@
  * A tool to generate the Rockbox "voicefont", a collection of all the UI
  * strings. 
  * 
- * Details at http://www.rockbox.org/twiki/bin/view/Main/VoiceBuilding
+ * Details at http://www.rockbox.org/wiki/VoiceBuilding
  *
  ****************************************************************************/
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
 # Rockbox song database docs:
-# http://www.rockbox.org/twiki/bin/view/Main/DataBase
+# http://www.rockbox.org/wiki/DataBase
 #
 
 use mp3info;

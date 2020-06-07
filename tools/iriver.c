@@ -13,7 +13,7 @@
  * bottom of the COPYING file for details on this license.
  *
  * Original code from http://www.beermex.com/@spc/ihpfirm.src.zip
- * Details at http://www.rockbox.org/twiki/bin/view/Main/IriverToolsGuide
+ * Details at http://www.rockbox.org/wiki/IriverToolsGuide
  *
  ****************************************************************************/
 #include <stdio.h>

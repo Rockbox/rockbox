@@ -64,7 +64,7 @@ void print_macpod_warning(void)
     printf("[INFO] *** WARNING FOR ROCKBOX USERS\n");
     printf("[INFO] *** You must convert this ipod to FAT32 format (aka a \"winpod\")\n");
     printf("[INFO] *** if you want to run Rockbox.  Rockbox WILL NOT work on this ipod.\n");
-    printf("[INFO] *** See http://www.rockbox.org/twiki/bin/view/Main/IpodConversionToFAT32\n");
+    printf("[INFO] *** See http://www.rockbox.org/wiki/IpodConversionToFAT32\n");
     printf("[INFO] ************************************************************************\n");
 }
 
