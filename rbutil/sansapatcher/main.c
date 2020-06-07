@@ -279,7 +279,7 @@ int main(int argc, char* argv[])
         printf("[ERR]  *** OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n");
         printf("[ERR]  *** You must reinstall the original Sansa firmware before running\n");
         printf("[ERR]  *** sansapatcher for the first time.\n");
-        printf("[ERR]  *** See http://www.rockbox.org/twiki/bin/view/Main/SansaE200Install\n");
+        printf("[ERR]  *** See http://www.rockbox.org/wiki/SansaE200Install\n");
         printf("[ERR]  ************************************************************************\n");
         res = 4;
     } else {

@@ -22,15 +22,15 @@
     </div>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/package.png' align='top'> <a class="menulink" href="http://www.rockbox.org/download/">releases</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/bomb.png' align='top'> <a class="menulink" href="http://build.rockbox.org">current build</a><br>
-    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/style.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/bin/view/Main/RockboxExtras">extras</a>
+    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/style.png' align='top'> <a class="menulink" href="http://www.rockbox.org/wiki/RockboxExtras">extras</a>
     <div class="submenu">
     Documentation
 
     </div>
-    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/help.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/bin/view/Main/GeneralFAQ">FAQ</a><br>
+    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/help.png' align='top'> <a class="menulink" href="http://www.rockbox.org/wiki/GeneralFAQ">FAQ</a><br>
     <img width=16 height=16 src='http://www.rockbox.org/silk_icons/page_white_acrobat.png' align='top'> <a class="menulink" href="http://www.rockbox.org/manual.shtml">manual</a><br>
-    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/application_edit.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/">wiki</a><br>
-    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/book_open.png' align='top'> <a class="menulink" href="http://www.rockbox.org/twiki/bin/view/Main/DocsIndex">docs index</a>
+    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/application_edit.png' align='top'> <a class="menulink" href="http://www.rockbox.org/wiki/">wiki</a><br>
+    <img width=16 height=16 src='http://www.rockbox.org/silk_icons/book_open.png' align='top'> <a class="menulink" href="http://www.rockbox.org/wiki/DocsIndex">docs index</a>
     <div class="submenu">
     Support
     </div>
@@ -57,17 +57,6 @@
     <input name=as_q size=10><br>
     <input value="Search" type=submit>
     <input type=hidden name=as_sitesearch value="www.rockbox.org">
-    </form>
-    <p><form action="https://www.paypal.com/cgi-bin/webscr" method="get">
-    <input type="hidden" name="cmd" value="_xclick">
-    <input type="hidden" name="business" value="bjorn@haxx.se">
-    <input type="hidden" name="item_name" value="Donation to the Rockbox project">
-    <input type="hidden" name="no_shipping" value="1">
-    <input type="hidden" name="cn" value="Note to the Rockbox team">
-    <input type="hidden" name="currency_code" value="USD">
-
-    <input type="hidden" name="tax" value="0">
-    <input type="image" src="http://www.rockbox.org/paypal-donate.gif" name="submit">
     </form>
     </div>
     </td>

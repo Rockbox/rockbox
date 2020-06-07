@@ -136,7 +136,7 @@
 
 /* define current usage levels */
 #define CURRENT_NORMAL     80  /* 16h playback on 1300mAh battery */
-#define CURRENT_BACKLIGHT  23  /* from IriverBattery twiki page */
+#define CURRENT_BACKLIGHT  23  /* from IriverBattery wiki page */
 #define CURRENT_SPDIF_OUT  10  /* optical SPDIF output on */
 #define CURRENT_RECORD    105  /* additional current while recording */
 #define CURRENT_REMOTE      8  /* additional current when remote connected */
