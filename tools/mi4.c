@@ -118,7 +118,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
     }
     fseek(file,0,SEEK_END);
     length = ftell(file);
-    
+
     fseek(file,0,SEEK_SET);
 
     /* Add 4 bytes to length (for magic), the 0x200 byte header and
@@ -150,15 +150,15 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
     int2le(length+4,     &outbuf[0x2e8]);   /* length plus 0xaa55aa55 */
 
     int2le(0xaa55aa55,   &outbuf[0x200+length]);  /* More Magic */
-    
+
     strncpy((char *)outbuf+0x1f8, type, 4);  /* type of binary (RBBL, RBOS) */
     strncpy((char *)outbuf+0x1fc, model, 4); /* 4 character model id */
-    
+
     /* Calculate CRC32 checksum */
     chksum_crc32gentab ();
     crc = chksum_crc32 (outbuf+0x200,mi4length-0x200);
 
-    strncpy((char *)outbuf, "PPOS", 4);     /* Magic */
+    memcpy(outbuf, "PPOS", 4);     /* Magic */
     int2le(version,      &outbuf[0x04]);    /* .mi4 version */
     int2le(length+4,     &outbuf[0x08]);    /* Length of firmware plus magic */
     int2le(crc,          &outbuf[0x0c]);    /* CRC32 of mi4 file */
@@ -168,7 +168,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
 
     /* v3 files require a dummy DSA signature */
     if (version == 0x00010301) {
-        outbuf[0x2f]=0x01;                
+        outbuf[0x2f]=0x01;
     }
 
     file = fopen(oname, "wb");
@@ -176,7 +176,7 @@ int mi4_encode(char *iname, char *oname, int version, int magic,
         perror(oname);
         return -3;
     }
-    
+
     len = fwrite(outbuf, 1, mi4length, file);
     if(len < (size_t)length) {
         perror(oname);
