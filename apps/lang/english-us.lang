@@ -15854,15 +15854,49 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Show at the bottom"
+    lcd_bitmap: "Show album at the bottom"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Show at the bottom"
+    lcd_bitmap: "Show album at the bottom"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Show at the bottom"
+    lcd_bitmap: "Show album at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
   </voice>
 </phrase>
 <phrase>
@@ -16019,15 +16053,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Hide album title"
+    lcd_bitmap: "Hide information"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Hide album title"
+    lcd_bitmap: "Hide information"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Hide album title"
+    lcd_bitmap: "Hide information"
   </voice>
 </phrase>
 <phrase>
@@ -16036,15 +16070,15 @@
   user: core
   <source>
     *: none
-    lcd_bitmap: "Show at the top"
+    lcd_bitmap: "Show album at the top"
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Show at the top"
+    lcd_bitmap: "Show album at the top"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Show at the top"
+    lcd_bitmap: "Show album at the top"
   </voice>
 </phrase>
 <phrase>
@@ -16345,5 +16379,19 @@
   </dest>
   <voice>
     *: "Not a VBR file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Update cache"
+  </dest>
+  <voice>
+    *: "Update cache"
   </voice>
 </phrase>
