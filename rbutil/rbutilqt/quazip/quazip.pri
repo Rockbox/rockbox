@@ -9,7 +9,7 @@ SOURCES += \
  $$PWD/zip.c \
 
 HEADERS += \
- $$PWD/crypt.h \
+ $$PWD/minizip_crypt.h \
  $$PWD/ioapi.h \
  $$PWD/quazipfile.h \
  $$PWD/quazipfileinfo.h \

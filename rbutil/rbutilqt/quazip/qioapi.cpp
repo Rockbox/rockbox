@@ -11,16 +11,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <zlib.h>
 
-#include "zlib.h"
 #include "ioapi.h"
 #include "quazip_global.h"
-#include <QIODevice>
+#include <QtCore/QIODevice>
 #if (QT_VERSION >= 0x050100)
 #define QUAZIP_QSAVEFILE_BUG_WORKAROUND
 #endif
 #ifdef QUAZIP_QSAVEFILE_BUG_WORKAROUND
-#include <QSaveFile>
+#include <QtCore/QSaveFile>
 #endif
 
 /* I've found an old Unix (a SunOS 4.1.3_U1) without all SEEK_* defined.... */
@@ -75,6 +75,7 @@ ZPOS64_T call_ztell64 (const zlib_filefunc64_32_def* pfilefunc,voidpf filestream
     }
 }
 
+/// @cond internal
 struct QIODevice_descriptor {
     // Position only used for writing to sequential devices.
     qint64 pos;
@@ -82,6 +83,7 @@ struct QIODevice_descriptor {
         pos(0)
     {}
 };
+/// @endcond
 
 voidpf ZCALLBACK qiodevice_open_file_func (
    voidpf opaque,

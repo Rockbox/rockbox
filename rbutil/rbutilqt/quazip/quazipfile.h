@@ -25,7 +25,7 @@ Original ZIP package is copyrighted by Gilles Vollant, see
 quazip/(un)zip.h files for details, basically it's zlib license.
  **/
 
-#include <QIODevice>
+#include <QtCore/QIODevice>
 
 #include "quazip_global.h"
 #include "quazip.h"
@@ -451,6 +451,58 @@ class QUAZIP_EXPORT QuaZipFile: public QIODevice {
     int getZipError() const;
     /// Returns the number of bytes available for reading.
     virtual qint64 bytesAvailable() const;
+    /// Returns the local extra field
+    /**
+      There are two (optional) local extra fields associated with a file.
+      One is located in the central header and is available along
+      with the rest of the file information in @ref QuaZipFileInfo64::extra.
+      Another is located before the file itself,
+      and is returned by this function. The file must be open first.
+
+      @return the local extra field, or an empty array if there is none
+        (or file is not open)
+      */
+    QByteArray getLocalExtraField();
+    /// Returns the extended modification timestamp
+    /**
+    * The getExt*Time() functions only work if there is an extended timestamp
+    * extra field (ID 0x5455) present. Otherwise, they all return invalid null
+    * timestamps.
+    *
+    * Modification time, but not other times, can also be accessed through
+    * @ref QuaZipFileInfo64 without the need to open the file first.
+    *
+    * @sa dateTime
+    * @sa QuaZipFileInfo64::getExtModTime()
+    * @sa getExtAcTime()
+    * @sa getExtCrTime()
+    * @return The extended modification time, UTC
+    */
+    QDateTime getExtModTime();
+    /// Returns the extended access timestamp
+    /**
+    * The getExt*Time() functions only work if there is an extended timestamp
+    * extra field (ID 0x5455) present. Otherwise, they all return invalid null
+    * timestamps.
+    * @sa dateTime
+    * @sa QuaZipFileInfo64::getExtModTime()
+    * @sa getExtModTime()
+    * @sa getExtCrTime()
+    * @return The extended access time, UTC
+    */
+    QDateTime getExtAcTime();
+    /// Returns the extended creation timestamp
+    /**
+    * The getExt*Time() functions only work if there is an extended timestamp
+    * extra field (ID 0x5455) present. Otherwise, they all return invalid null
+    * timestamps.
+    * @sa dateTime
+    * @sa QuaZipFileInfo64::getExtModTime()
+    * @sa getExtModTime()
+    * @sa getExtAcTime()
+    * @return The extended creation time, UTC
+    */
+    QDateTime getExtCrTime();
 };
 
 #endif

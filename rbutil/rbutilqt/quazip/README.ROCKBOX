@@ -3,7 +3,7 @@ These files are distributed under the LGPL v2.1 or later. Only source files
 actually used in Rockbox Utility are included, further sources have been left
 out. Check the quazip source distribution for those.
 
-The source files have been last synced with the projects release 0.7.1 at
-http://sourceforge.net/projects/quazip/ on March 8, 2015.
+The source files have been last synced with the projects release 0.9.1 at
+https://github.com/stachenov/quazip/ on June 8, 2020.
 
 

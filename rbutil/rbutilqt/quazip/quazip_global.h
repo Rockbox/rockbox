@@ -48,12 +48,16 @@ see quazip/(un)zip.h files for details. Basically it's the zlib license.
 #endif // QUAZIP_STATIC
 
 #ifdef __GNUC__
-#define UNUSED __attribute__((__unused__))
+#define QUAZIP_UNUSED __attribute__((__unused__))
 #else
-#define UNUSED
+#define QUAZIP_UNUSED
 #endif
 
 #define QUAZIP_EXTRA_NTFS_MAGIC 0x000Au
 #define QUAZIP_EXTRA_NTFS_TIME_MAGIC 0x0001u
+#define QUAZIP_EXTRA_EXT_TIME_MAGIC 0x5455u
+#define QUAZIP_EXTRA_EXT_MOD_TIME_FLAG 1
+#define QUAZIP_EXTRA_EXT_AC_TIME_FLAG 2
+#define QUAZIP_EXTRA_EXT_CR_TIME_FLAG 4
 
 #endif // QUAZIP_GLOBAL_H

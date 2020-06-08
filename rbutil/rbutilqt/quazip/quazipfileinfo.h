@@ -25,11 +25,15 @@ Original ZIP package is copyrighted by Gilles Vollant and contributors,
 see quazip/(un)zip.h files for details. Basically it's the zlib license.
 */
 
-#include <QByteArray>
-#include <QDateTime>
-#include <QFile>
+#include <QtCore/QByteArray>
+#include <QtCore/QDateTime>
+#include <QtCore/QFile>
+#include <QtCore/QHash>
 
 #include "quazip_global.h"
+
+/// The typedef to store extra field parse results
+typedef QHash<quint16, QList<QByteArray> > QuaExtraFieldHash;
 
 /// Information about a file inside archive.
 /**
@@ -171,8 +175,52 @@ struct QUAZIP_EXPORT QuaZipFileInfo64 {
    * @return The NTFS creation time, UTC
    */
   QDateTime getNTFScTime(int *fineTicks = NULL) const;
+  /// Returns the extended modification timestamp
+  /**
+   * The getExt*Time() functions only work if there is an extended timestamp
+   * extra field (ID 0x5455) present. Otherwise, they all return invalid null
+   * timestamps.
+   *
+   * QuaZipFileInfo64 only contains the modification time because it's extracted
+   * from @ref extra, which contains the global extra field, and access and
+   * creation time are in the local header which can be accessed through
+   * @ref QuaZipFile.
+   *
+   * @sa dateTime
+   * @sa QuaZipFile::getExtModTime()
+   * @sa QuaZipFile::getExtAcTime()
+   * @sa QuaZipFile::getExtCrTime()
+   * @return The extended modification time, UTC
+   */
+  QDateTime getExtModTime() const;
   /// Checks whether the file is encrypted.
   bool isEncrypted() const {return (flags & 1) != 0;}
+  /// Parses extra field
+  /**
+   * The returned hash table contains a list of data blocks for every header ID
+   * in the provided extra field. The number of data blocks in a hash table value
+   * equals to the number of occurrences of the appropriate header id. In most cases,
+   * a block with a specific header ID only occurs once, and therefore the returned
+   * hash table will contain a list consisting of a single element for that header ID.
+   *
+   * @param extraField extra field to parse
+   * @return header id to list of data block hash
+   */
+  static QuaExtraFieldHash parseExtraField(const QByteArray &extraField);
+  /// Extracts extended time from the extra field
+  /**
+   * Utility function used by various getExt*Time() functions, but can be used directly
+   * if the extra field is obtained elsewhere (from a third party library, for example).
+   *
+   * @param extra the extra field for a file
+   * @param flag 1 - modification time, 2 - access time, 4 - creation time
+   * @return the extracted time or null QDateTime if not present
+   * @sa getExtModTime()
+   * @sa QuaZipFile::getExtModTime()
+   * @sa QuaZipFile::getExtAcTime()
+   * @sa QuaZipFile::getExtCrTime()
+   */
+  static QDateTime getExtTime(const QByteArray &extra, int flag);
 };
 
 #endif
