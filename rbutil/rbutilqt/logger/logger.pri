@@ -1,19 +1,22 @@
 
 SOURCES += \
- $$PWD/AbstractAppender.cpp \
- $$PWD/AbstractStringAppender.cpp \
- $$PWD/ConsoleAppender.cpp \
- $$PWD/FileAppender.cpp \
- $$PWD/Logger.cpp \
+ $$PWD/src/AbstractAppender.cpp \
+ $$PWD/src/AbstractStringAppender.cpp \
+ $$PWD/src/ConsoleAppender.cpp \
+ $$PWD/src/FileAppender.cpp \
+ $$PWD/src/Logger.cpp \
 
-INCLUDES += \
- $$PWD/AbstractAppender.h \
- $$PWD/ConsoleAppender.h \
- $$PWD/FileAppender.h \
- $$PWD/OutputDebugAppender.h \
- $$PWD/AbstractStringAppender.h \
- $$PWD/CuteLogger_global.h \
- $$PWD/Logger.h \
+HEADERS += \
+ $$PWD/include/AbstractAppender.h \
+ $$PWD/include/ConsoleAppender.h \
+ $$PWD/include/FileAppender.h \
+ $$PWD/include/OutputDebugAppender.h \
+ $$PWD/include/AbstractStringAppender.h \
+ $$PWD/include/CuteLogger_global.h \
+ $$PWD/include/Logger.h \
+
+INCLUDEPATH += $$PWD/include
 
 DEFINES += \
  CUTELOGGER_STATIC
+

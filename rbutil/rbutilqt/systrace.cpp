@@ -50,11 +50,11 @@ void SysTrace::refresh(void)
     QString color;
     while(!c.atEnd()) {
         line = c.readLine();
-        if(line.contains("WARNING"))
+        if(line.contains("Warning"))
             color = "orange";
-        else if(line.contains("ERROR"))
+        else if(line.contains("Error"))
             color = "red";
-        else if(line.contains("DEBUG"))
+        else if(line.contains("Debug"))
             color = "blue";
 #if 0
         else if(line.contains("INFO"))

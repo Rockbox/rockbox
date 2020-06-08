@@ -40,14 +40,14 @@ Q_IMPORT_PLUGIN(AccessibleFactory)
 int main( int argc, char ** argv ) {
     QApplication app( argc, argv );
     ConsoleAppender* consoleAppender = new ConsoleAppender();
-    consoleAppender->setFormat("[%f:%i %L] %m\n");
-    Logger::registerAppender(consoleAppender);
+    consoleAppender->setFormat("[%{file}:%{line} %{type}] %{message}\n");
+    cuteLoggerInstance()->registerAppender(consoleAppender);
     SysTrace::rotateTrace();
     QString tracefile = QDir::tempPath() + "/rbutil-trace.log";
     FileAppender* fileAppender = new FileAppender();
-    fileAppender->setFormat("[%f:%i %L] %m\n");
+    fileAppender->setFormat("[%{file}:%{line} %{type}] %{message}\n");
     fileAppender->setFileName(tracefile);
-    Logger::registerAppender(fileAppender);
+    cuteLoggerInstance()->registerAppender(fileAppender);
     LOG_INFO() << "Starting trace at" << QDateTime::currentDateTime().toString(Qt::ISODate);
 
 #if defined(Q_OS_MAC)
