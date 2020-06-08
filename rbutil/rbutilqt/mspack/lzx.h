@@ -1,5 +1,5 @@
 /* This file is part of libmspack.
- * (C) 2003-2004 Stuart Caie.
+ * (C) 2003-2013 Stuart Caie.
  *
  * The LZX method was created by Jonathan Forbes and Tomi Poutanen, adapted
  * by Microsoft Corporation.
@@ -35,7 +35,7 @@ extern "C" {
 /* LZX huffman defines: tweak tablebits as desired */
 #define LZX_PRETREE_MAXSYMBOLS  (LZX_PRETREE_NUM_ELEMENTS)
 #define LZX_PRETREE_TABLEBITS   (6)
-#define LZX_MAINTREE_MAXSYMBOLS (LZX_NUM_CHARS + 50*8)
+#define LZX_MAINTREE_MAXSYMBOLS (LZX_NUM_CHARS + 290*8)
 #define LZX_MAINTREE_TABLEBITS  (12)
 #define LZX_LENGTH_MAXSYMBOLS   (LZX_NUM_SECONDARY_LENGTHS+1)
 #define LZX_LENGTH_TABLEBITS    (12)
@@ -55,6 +55,8 @@ struct lzxd_stream {
 
   unsigned char *window;          /* decoding window                         */
   unsigned int   window_size;     /* window size                             */
+  unsigned int   ref_data_size;   /* LZX DELTA reference data size           */
+  unsigned int   num_offsets;     /* number of match_offset entries in table */
   unsigned int   window_posn;     /* decompression offset within window      */
   unsigned int   frame_posn;      /* current frame offset within in window   */
   unsigned int   frame;           /* the number of 32kb frames processed     */
@@ -70,8 +72,8 @@ struct lzxd_stream {
   unsigned char  intel_started;   /* has intel E8 decoding started?          */
   unsigned char  block_type;      /* type of the current block               */
   unsigned char  header_read;     /* have we started decoding at all yet?    */
-  unsigned char  posn_slots;      /* how many posn slots in stream?          */
   unsigned char  input_end;       /* have we reached the end of input?       */
+  unsigned char  is_delta;        /* does stream follow LZX DELTA spec?      */
 
   int error;
 
@@ -87,13 +89,13 @@ struct lzxd_stream {
 
   /* huffman decoding tables */
   unsigned short PRETREE_table [(1 << LZX_PRETREE_TABLEBITS) +
-				(LZX_PRETREE_MAXSYMBOLS * 2)];
+                                (LZX_PRETREE_MAXSYMBOLS * 2)];
   unsigned short MAINTREE_table[(1 << LZX_MAINTREE_TABLEBITS) +
-				(LZX_MAINTREE_MAXSYMBOLS * 2)];
+                                (LZX_MAINTREE_MAXSYMBOLS * 2)];
   unsigned short LENGTH_table  [(1 << LZX_LENGTH_TABLEBITS) +
-				(LZX_LENGTH_MAXSYMBOLS * 2)];
+                                (LZX_LENGTH_MAXSYMBOLS * 2)];
   unsigned short ALIGNED_table [(1 << LZX_ALIGNED_TABLEBITS) +
-				(LZX_ALIGNED_MAXSYMBOLS * 2)];
+                                (LZX_ALIGNED_MAXSYMBOLS * 2)];
   unsigned char LENGTH_empty;
 
   /* this is used purely for doing the intel E8 transform */
@@ -114,12 +116,14 @@ struct lzxd_stream {
  * @param input              an input stream with the LZX data.
  * @param output             an output stream to write the decoded data to.
  * @param window_bits        the size of the decoding window, which must be
- *                           between 15 and 21 inclusive.
+ *                           between 15 and 21 inclusive for regular LZX
+ *                           data, or between 17 and 25 inclusive for
+ *                           LZX DELTA data.
  * @param reset_interval     the interval at which the LZX bitstream is
  *                           reset, in multiples of LZX frames (32678
  *                           bytes), e.g. a value of 2 indicates the input
  *                           stream resets after every 65536 output bytes.
- *                           A value of 0 indicates that the bistream never
+ *                           A value of 0 indicates that the bitstream never
  *                           resets, such as in CAB LZX streams.
  * @param input_buffer_size  the number of bytes to use as an input
  *                           bitstream buffer.
@@ -135,26 +139,49 @@ struct lzxd_stream {
  *                           lzxd_set_output_length() once it is
  *                           known. If never set, 4 of the final 6 bytes
  *                           of the output stream may be incorrect.
+ * @param is_delta           should be zero for all regular LZX data,
+ *                           non-zero for LZX DELTA encoded data.
  * @return a pointer to an initialised lzxd_stream structure, or NULL if
  * there was not enough memory or parameters to the function were wrong.
  */
 extern struct lzxd_stream *lzxd_init(struct mspack_system *system,
-				     struct mspack_file *input,
-				     struct mspack_file *output,
-				     int window_bits,
-				     int reset_interval,
-				     int input_buffer_size,
-				     off_t output_length);
+                                     struct mspack_file *input,
+                                     struct mspack_file *output,
+                                     int window_bits,
+                                     int reset_interval,
+                                     int input_buffer_size,
+                                     off_t output_length,
+                                     char is_delta);
 
 /* see description of output_length in lzxd_init() */
 extern void lzxd_set_output_length(struct lzxd_stream *lzx,
-				   off_t output_length);
+                                   off_t output_length);
+
+/**
+ * Reads LZX DELTA reference data into the window and allows
+ * lzxd_decompress() to reference it.
+ *
+ * Call this before the first call to lzxd_decompress().
+
+ * @param lzx    the LZX stream to apply this reference data to
+ * @param system an mspack_system implementation to use with the
+ *               input param. Only read() will be called.
+ * @param input  an input file handle to read reference data using
+ *               system->read().
+ * @param length the length of the reference data. Cannot be longer
+ *               than the LZX window size.
+ * @return an error code, or MSPACK_ERR_OK if successful
+ */
+extern int lzxd_set_reference_data(struct lzxd_stream *lzx,
+                                   struct mspack_system *system,
+                                   struct mspack_file *input,
+                                   unsigned int length);
 
 /**
  * Decompresses entire or partial LZX streams.
  *
  * The number of bytes of data that should be decompressed is given as the
- * out_bytes parameter. If more bytes are decoded than are needed, they
+ * out_bytes parameter. If more bytes are decoded than are needed, they
  * will be kept over for a later invocation.
  *
  * The output bytes will be passed to the system->write() function given in

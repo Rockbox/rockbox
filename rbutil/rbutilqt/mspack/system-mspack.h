@@ -16,7 +16,7 @@ extern "C" {
 
 /* ensure config.h is read before mspack.h */
 #ifdef HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 #endif
 
 #include "mspack.h"
@@ -61,7 +61,7 @@ extern "C" {
      (defined(FILESIZEBITS)      && FILESIZEBITS      >= 64) || \
      (defined(SIZEOF_OFF_T)      && SIZEOF_OFF_T      >= 8)  || \
      defined(_LARGEFILE_SOURCE) || defined(_LARGEFILE64_SOURCE))
-# define LARGEFILE_SUPPORT
+# define LARGEFILE_SUPPORT 1
 # define LD "lld"
 # define LU "llu"
 #else

@@ -32,14 +32,14 @@ extern "C" {
 # define MSZIP_LITERAL_TABLESIZE (MSZIP_LITERAL_MAXSYMBOLS * 4)
 #else
 # define MSZIP_LITERAL_TABLESIZE ((1 << MSZIP_LITERAL_TABLEBITS) + \
-				  (MSZIP_LITERAL_MAXSYMBOLS * 2))
+                                  (MSZIP_LITERAL_MAXSYMBOLS * 2))
 #endif
 
 #if (1 << MSZIP_DISTANCE_TABLEBITS) < (MSZIP_DISTANCE_MAXSYMBOLS * 2)
 # define MSZIP_DISTANCE_TABLESIZE (MSZIP_DISTANCE_MAXSYMBOLS * 4)
 #else
 # define MSZIP_DISTANCE_TABLESIZE ((1 << MSZIP_DISTANCE_TABLEBITS) + \
-				  (MSZIP_DISTANCE_MAXSYMBOLS * 2))
+                                  (MSZIP_DISTANCE_MAXSYMBOLS * 2))
 #endif
 
 struct mszipd_stream {
@@ -83,10 +83,10 @@ struct mszipd_stream {
  *   a partial recovery of erroneous data.
  */
 extern struct mszipd_stream *mszipd_init(struct mspack_system *system,
-					struct mspack_file *input,
-					struct mspack_file *output,
-					int input_buffer_size,
-					int repair_mode);
+                                        struct mspack_file *input,
+                                        struct mspack_file *output,
+                                        int input_buffer_size,
+                                        int repair_mode);
 
 /* decompresses, or decompresses more of, an MS-ZIP stream.
  *
@@ -107,6 +107,11 @@ extern struct mszipd_stream *mszipd_init(struct mspack_system *system,
  *   or an error.
  */
 extern int mszipd_decompress(struct mszipd_stream *zip, off_t out_bytes);
+
+/* decompresses an entire MS-ZIP stream in a KWAJ file. Acts very much
+ * like mszipd_decompress(), but doesn't take an out_bytes parameter
+ */
+extern int mszipd_decompress_kwaj(struct mszipd_stream *zip);
 
 /* frees all stream associated with an MS-ZIP data stream
  *
