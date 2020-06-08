@@ -26,3 +26,17 @@ Version 1.4.1
 * Improve update check information dialog.
 * Correct USB IDs for Sandisk Sansa c200v2.
 * Add support for iPod Classic 6G bootloader.
+
+Version 1.5.0
+* Add support for xDuoo X3, X3ii, X20.
+* Add support for AGPTek Rocker.
+* Add support for AIGO Eros Q and various clones (AIGO Eros K, AGPTek H3, HIFI Walker H2, Surfans F20)
+* Add support for showing "retired" target status.
+* Update Iriver H100 / H300 series bootloader.
+* Rename Game Files installation to Plugin Data; now installs files for further games (Duke3D, Wolfenstein3D, etc.) as well as other plugins (MIDI patchset)
+* Support installing daily builds.
+* Move Manual / prerendered voice file installation to main dialog.
+* Support installing voice files in other languages than english (available languages depends on build).
+* Improved HiDPI support.
+* Drop support for Qt4, now requires Qt5.
+* Update various external libraries.
