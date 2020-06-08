@@ -5726,10 +5726,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Grabando TagCache"
+    *: "Grabando Base de Datos"
   </dest>
   <voice>
-    *: "Grabando Tag Cache"
+    *: "Grabando Base de Datos"
   </voice>
 </phrase>
 <phrase>
@@ -6217,10 +6217,10 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "TagCache no ha finalizado"
+    *: "La Base de Datos no esta lista"
   </dest>
   <voice>
-    *: "TagCache no ha finalizado"
+    *: "La Base de Datos no esta lista"
   </voice>
 </phrase>
 <phrase>
@@ -7396,10 +7396,10 @@
     *: "Database"
   </source>
   <dest>
-    *: "Tag Cache"
+    *: "Música (Base de Datos)"
   </dest>
   <voice>
-    *: "Tag Cache"
+    *: "Música (Base de Datos)"
   </voice>
 </phrase>
 <phrase>
@@ -8254,10 +8254,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Álbum Artista"
+    *: "Artista del Album"
   </dest>
   <voice>
-    *: "Álbum Artista"
+    *: "Artista del Album"
   </voice>
 </phrase>
 <phrase>
@@ -12399,7 +12399,7 @@
     *: "PictureFlow"
   </source>
   <dest>
-    *: "Pase de carátulas"
+    *: "PictureFlow"
   </dest>
   <voice>
     *: "Abrir pase de carátulas"
@@ -12978,9 +12978,560 @@
     *: "Select directories to scan"
   </source>
   <dest>
-    *: "Seleccione los directorios que explorar"
+    *: "Seleccione los directorios a escanear"
   </dest>
   <voice>
-    *: "Seleccione los directorios que explorar"
+    *: "Seleccione los directorios a escanear"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide information"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ocutar información"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ocultar información"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostrar album en la parte superior"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostrar album en la parte superior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostrar album y artista en la parte superior"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostrar album y artista en la parte superior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostrar album y artista en la parte inferior"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostrar album y artista en la parte inferior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of slides"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Número de carátulas"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Número de carátulas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Always On"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Siempre encendida"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Siempre encendida"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Zoom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zoom"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zoom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Via Track list"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "A través de la lista de canciones"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "A través de la lista de canciones"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostrar título del album"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostrar título del album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Go to WPS"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ir a Pantalla de Reproducción"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ir a Pantalla de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cache will be rebuilt on next restart"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "El caché se reconstruirá después de reiniciar"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "El caché se reconstruirá después de reiniciar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Rebuild cache"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Reconstruir caché"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Reconstruir caché"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error writing config"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Error guardando la configuración"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Error guardando la configuración"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CLEARED
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Playlist Cleared"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Lista de Reproducción Borrada"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Lista de Reproducción Borrada"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Centre margin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Margen central"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Margen central"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Spacing"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Separación"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Separación"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "WPS Integration"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Integración en WPS"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Integración en WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Direct"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Directa"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Directa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resize Covers"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Reescalar Carátulas"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Resize Carátulas"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No album art found"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "No se encontró carátula para el album"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "No se encontró carátula para el album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Display FPS"
+    lcd_bitmap: "Display FPS"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Display FPS"
+    lcd_bitmap: "Mostrar FPS"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Display FPS"
+    lcd_bitmap: "Mostrar FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Mostrar album en la parte inferior"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Mostrar album en la parte inferior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADDED_TO_PLAYLIST
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Added to playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Añadida a la Lista de Reproducción"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Añadida a la Lista de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_PLAYLIST
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Clear playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Borrar Lista de Reproducción"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Borrar Lista de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Control de Reproducción"
+  </dest>
+  <voice>
+    *: "Control de Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Pista Anterior"
+  </dest>
+  <voice>
+    *: "Pista Anterior"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pausar / Reproducir"
+  </dest>
+  <voice>
+    *: "Pausar / Reproducir"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Detener Reproducción"
+  </dest>
+  <voice>
+    *: "Detener Reproducción"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Siguiente Pista"
+  </dest>
+  <voice>
+    *: "Siguiente Pista"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Cambiar Volumen"
+  </dest>
+  <voice>
+    *: "Cambiar Volumen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Modo Aleatorio"
+  </dest>
+  <voice>
+    *: "Modo Aleatorio"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Salir"
+  </dest>
+  <voice>
+    *: "Salir"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Volver"
+  </dest>
+  <voice>
+    *: "Volver"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Actualizar caché"
+  </dest>
+  <voice>
+    *: "Actualizar caché"
   </voice>
 </phrase>
