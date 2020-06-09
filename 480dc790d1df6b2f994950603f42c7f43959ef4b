@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0982ed18_aaa86fdb",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 1
+      },
+      "lineNbr": 16227,
+      "author": {
+        "id": 1000684
+      },
+      "writtenOn": "2020-06-09T16:13:04Z",
+      "side": 1,
+      "message": "Sure no problem, although these strings are only used by PictureFlow",
+      "parentUuid": "0982ed18_4aa29300",
+      "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0982ed18_6aa7570f",
         "filename": "apps/lang/english.lang",
         "patchSetId": 1
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "0982ed18_cab5a332",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 899,
+      "author": {
+        "id": 1000684
+      },
+      "writtenOn": "2020-06-09T16:13:04Z",
+      "side": 1,
+      "message": "I\u0027ll upload a new patch set with this amend",
+      "parentUuid": "0982ed18_aa678feb",
+      "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0982ed18_ca64c3e9",
         "filename": "apps/plugins/pictureflow/pictureflow.c",
         "patchSetId": 1
@@ -64,6 +100,24 @@
       "writtenOn": "2020-06-09T14:51:38Z",
       "side": 1,
       "message": "You should probably check this with a few monochrome devices\nIIRC ipod \u0026 clip+ acted differently",
+      "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_eab26747",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 1000684
+      },
+      "writtenOn": "2020-06-09T16:13:04Z",
+      "side": 1,
+      "message": "This is legacy code actually. It is a fix because this function is called assuming draw_splashscreen will be called first, therefore omitting the lcd initialization code and causing bugs when showing messages. This piece of code is copied from draw_splashscreen to prevent this from happening.",
+      "parentUuid": "0982ed18_ca64c3e9",
       "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "0982ed18_0a817b50",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1383,
+      "author": {
+        "id": 1000684
+      },
+      "writtenOn": "2020-06-09T16:13:04Z",
+      "side": 1,
+      "message": "Totally haha sorry",
+      "parentUuid": "0982ed18_ea6187d6",
+      "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0982ed18_0a989bc8",
         "filename": "apps/plugins/pictureflow/pictureflow.c",
         "patchSetId": 1
@@ -98,6 +170,24 @@
       "writtenOn": "2020-06-09T14:51:38Z",
       "side": 1,
       "message": "Why the bigger char height?",
+      "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_2a863f69",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 2647,
+      "author": {
+        "id": 1000684
+      },
+      "writtenOn": "2020-06-09T16:13:04Z",
+      "side": 1,
+      "message": "Now we need extra space to show the artist name",
+      "parentUuid": "0982ed18_0a989bc8",
       "revId": "480dc790d1df6b2f994950603f42c7f43959ef4b",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
