@@ -50,13 +50,8 @@ RCC_DIR = $$MYBUILDDIR/rcc
 }
 
 # check version of Qt installation
-!contains(QT_MAJOR_VERSION, 5) {
-    VER = $$find(QT_VERSION, ^4\\.[5-9]+.*)
-    isEmpty(VER) {
-        message("Qt >= 4.5 required!")
-        !isEmpty(QT_VERSION) error("Qt found:" $$[QT_VERSION])
-    }
-message("using Qt version $$VER at $$[QT_INSTALL_PREFIX]")
+contains(QT_MAJOR_VERSION, 4) {
+    error("Qt 4 is not supported anymore.")
 }
 
 RBBASE_DIR = $$_PRO_FILE_PWD_
@@ -161,10 +156,8 @@ TEMPLATE = app
 TARGET = RockboxUtility
 QT += network
 
-contains(QT_MAJOR_VERSION, 5) {
-    message("Qt5 found")
-    QT += widgets multimedia
-}
+message("Qt$$QT_MAJOR_VERSION found")
+QT += widgets multimedia
 
 CONFIG += c++11
 
@@ -180,12 +173,8 @@ dbg {
 }
 
 DEFINES += RBUTIL _LARGEFILE64_SOURCE
+DEFINES += QT_DEPRECATED_WARNINGS
 
-# check version of Qt installation
-!contains(QT_MAJOR_VERSION, 5):!macx:linux-g++* {
-    # suppress warnings in Qt 4.8 shown by gcc 4.8
-    QMAKE_CXXFLAGS += -Wno-unused-local-typedefs
-}
 # platform specific
 win32 {
     # use MinGW's implementation of stdio functions for extended format string
@@ -208,22 +197,9 @@ unix:!macx:static {
     LIBS += -Wl,-Bstatic -lusb-1.0 -Wl,-Bdynamic
 }
 
-# if -config intel is specified use 10.5 SDK and don't build for PPC
-contains(QT_MAJOR_VERSION, 5) {
-    macx {
-        CONFIG += intel
-        message("Qt5 doesn't support PPC anymore, building x86 only")
-    }
-}
-macx:!intel {
-    CONFIG += ppc
-    QMAKE_LFLAGS_PPC=-mmacosx-version-min=10.4 -arch ppc
-    QMAKE_LFLAGS_X86=-mmacosx-version-min=10.4 -arch i386
-    QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.4u.sdk
-}
-macx:intel {
+macx {
+    QMAKE_MAC_SDK=macosx
     contains(QT_MAJOR_VERSION, 5) {
-        QMAKE_MAC_SDK=macosx
         greaterThan(QT_MINOR_VERSION, 5) {
             QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.7
             message("Qt 5.6+ detected: setting deploy target to 10.7")
@@ -233,13 +209,7 @@ macx:intel {
             message("Qt up to 5.5 detected: setting deploy target to 10.6")
         }
     }
-    !contains(QT_MAJOR_VERSION, 5) {
-        QMAKE_MAC_SDK=/Developer/SDKs/MacOSX10.5.sdk
-        QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.5
-        QMAKE_LFLAGS_X86=-mmacosx-version-min=10.5 -arch i386
-    }
-}
-macx {
+
     CONFIG += x86
     LIBS += -L/usr/local/lib \
             -framework IOKit -framework CoreFoundation -framework Carbon \
@@ -252,7 +222,7 @@ macx {
 }
 
 static {
-    if(equals(QT_MAJOR_VERSION, 5) : lessThan(QT_MINOR_VERSION, 4)) | lessThan(QT_MAJOR_VERSION, 5) {
+    if(equals(QT_MAJOR_VERSION, 5) : lessThan(QT_MINOR_VERSION, 4)) {
             QTPLUGIN += qtaccessiblewidgets
             LIBS += -L$$(QT_BUILD_TREE)/plugins/accessible -lqtaccessiblewidgets
     }

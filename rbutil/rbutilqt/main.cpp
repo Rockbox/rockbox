@@ -26,14 +26,12 @@
 #include "FileAppender.h"
 
 #ifdef STATIC
-#include <QtPlugin>
-#if QT_VERSION < 0x050000
-Q_IMPORT_PLUGIN(qtaccessiblewidgets)
-#elif QT_VERSION < 0x050400
+#if QT_VERSION < 0x050400
 /*
  * accessibility is no longer a plugin after 5.4.0:
- * <https://bugreports.qt.io/browse/QTBUG-37957?focusedCommentId=239189&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-239189>
+ * <https://bugreports.qt.io/browse/QTBUG-37957#comment-239189>
  */
+#include <QtPlugin>
 Q_IMPORT_PLUGIN(AccessibleFactory)
 #endif
 #endif
