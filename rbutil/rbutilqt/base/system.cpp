@@ -46,11 +46,7 @@
 
 // Linux includes
 #if defined(Q_OS_LINUX)
-#if defined(LIBUSB1)
 #include <libusb-1.0/libusb.h>
-#else
-#include <usb.h>
-#endif
 #include <mntent.h>
 #endif
 
@@ -245,7 +241,6 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
     // usb pid detection
     LOG_INFO() << "Searching for USB devices";
 #if defined(Q_OS_LINUX)
-#if defined(LIBUSB1)
     libusb_device **devs;
     if(libusb_init(NULL) != 0) {
         LOG_ERROR() << "Initializing libusb-1 failed.";
@@ -285,53 +280,6 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
 
     libusb_free_device_list(devs, 1);
     libusb_exit(NULL);
-#else
-    usb_init();
-    usb_find_busses();
-    usb_find_devices();
-    struct usb_bus *b;
-    b = usb_busses;
-
-    while(b) {
-        if(b->devices) {
-            struct usb_device *u;
-            u = b->devices;
-            while(u) {
-                uint32_t id;
-                id = u->descriptor.idVendor << 16 | u->descriptor.idProduct;
-                // get identification strings
-                usb_dev_handle *dev;
-                QString name;
-                char string[256];
-                int res;
-                dev = usb_open(u);
-                if(dev) {
-                    if(u->descriptor.iManufacturer) {
-                        res = usb_get_string_simple(dev, u->descriptor.iManufacturer,
-                                                    string, sizeof(string));
-                        if(res > 0)
-                            name += QString::fromLatin1(string) + " ";
-                    }
-                    if(u->descriptor.iProduct) {
-                        res = usb_get_string_simple(dev, u->descriptor.iProduct,
-                                                    string, sizeof(string));
-                        if(res > 0)
-                            name += QString::fromLatin1(string);
-                    }
-                    usb_close(dev);
-                }
-                if(name.isEmpty()) name = tr("(no description available)");
-
-                if(id) {
-                    usbids.insertMulti(id, name);
-                    LOG_INFO() << "USB:" << QString("0x%1").arg(id, 8, 16) << name;
-                }
-                u = u->next;
-            }
-        }
-        b = b->next;
-    }
-#endif
 #endif
 
 #if defined(Q_OS_MACX)

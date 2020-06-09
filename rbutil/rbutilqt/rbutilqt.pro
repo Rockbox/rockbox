@@ -198,18 +198,14 @@ win32 {
 win32:static {
     QMAKE_LFLAGS += -static-libgcc -static-libstdc++
 }
-unix:!static:!libusb0:!macx {
-    DEFINES += LIBUSB1
+unix:!static:!macx {
     LIBS += -lusb-1.0
-}
-unix:!static:libusb0:!macx {
-    LIBS += -lusb
 }
 
 unix:!macx:static {
     # force statically linking of libusb. Libraries that are appended
     # later will get linked dynamically again.
-    LIBS += -Wl,-Bstatic -lusb -Wl,-Bdynamic
+    LIBS += -Wl,-Bstatic -lusb-1.0 -Wl,-Bdynamic
 }
 
 # if -config intel is specified use 10.5 SDK and don't build for PPC
