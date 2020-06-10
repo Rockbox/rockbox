@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0982ed18_4af453f1",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 947,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-10T05:48:29Z",
+      "side": 1,
+      "message": "I\u0027d like to see these sizeof(artist_pos) rather than having the type twice but don\u0027t take that as a requirement..",
+      "revId": "50e3e12e0f8a747fcc9d5177841748af78fa7c6a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_6af917e6",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-10T05:48:29Z",
+      "side": 1,
+      "message": "I know you just matched the existing code\nhopefully slide_index is bounded well by the caller",
+      "revId": "50e3e12e0f8a747fcc9d5177841748af78fa7c6a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_cae76342",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2609,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-10T05:48:29Z",
+      "side": 1,
+      "message": "switch (show_album_name)\n    {\n        case ALBUM_NAME_HIDE:\n            track_list_y \u003d (show_fps ? char_height : 0);\n            track_list_h \u003d LCD_HEIGHT - track_list_y;\n            break;\n        case ALBUM_NAME_BOTTOM:\n            track_list_y \u003d (show_fps ? char_height : 0);\n            track_list_h \u003d LCD_HEIGHT - track_list_y - (char_height * 3);\n            break;\n        case ALBUM_AND_ARTIST_TOP:\n            track_list_y \u003d char_height * 3;\n            track_list_h \u003d LCD_HEIGHT - track_list_y -\n                           (show_fps ? char_height : 0);\n            break;\n        case ALBUM_AND_ARTIST_BOTTOM:\n            track_list_y \u003d (show_fps ? char_height : 0);\n            track_list_h \u003d LCD_HEIGHT - track_list_y - (char_height * 3);\n            break;\n        case ALBUM_NAME_TOP:\n        default:\n            track_list_y \u003d char_height * 3;\n            track_list_h \u003d LCD_HEIGHT - track_list_y -\n                           (show_fps ? char_height : 0);\n            break;\n    }",
+      "revId": "50e3e12e0f8a747fcc9d5177841748af78fa7c6a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_aada2f73",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2808,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-10T05:48:29Z",
+      "side": 1,
+      "message": "switch(show_album_name){\n        case ALBUM_AND_ARTIST_TOP:\n            albumtxt_y \u003d 0;\n            break;\n        case ALBUM_NAME_BOTTOM:\n            albumtxt_y \u003d (LCD_HEIGHT - char_height - char_height/2 - 10);\n            break;\n        case ALBUM_AND_ARTIST_BOTTOM:\n            albumtxt_y \u003d (LCD_HEIGHT - char_height - char_height/2 - 20);\n            break;\n        case ALBUM_NAME_TOP:\n        default:\n            albumtxt_y \u003d char_height / 2;\n            break;\n    }",
+      "revId": "50e3e12e0f8a747fcc9d5177841748af78fa7c6a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_8add6b70",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 2827,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-10T05:48:29Z",
+      "side": 1,
+      "message": "needs newline",
+      "revId": "50e3e12e0f8a747fcc9d5177841748af78fa7c6a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
