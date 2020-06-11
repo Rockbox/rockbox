@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0982ed18_6ad2f759",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 941,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-11T11:33:26Z",
+      "side": 1,
+      "message": "fd \u003d rb-\u003ecreat(PLUGIN_DIR \"/demos/album_ndx.tmp\",0666);",
+      "revId": "e8447fc3eff094c81c44de48bdef69f0647a6d2b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0982ed18_8ac64b9c",
+        "filename": "apps/plugins/pictureflow/pictureflow.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-06-11T11:33:26Z",
+      "side": 1,
+      "message": "int fr \u003d rb-\u003eopen(PLUGIN_DIR \"/demos/album_ndx.tmp\", O_RDONLY);",
+      "revId": "e8447fc3eff094c81c44de48bdef69f0647a6d2b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
