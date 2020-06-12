@@ -531,10 +531,10 @@
 
 #elif defined(XDUOO_X3II)
 #define UI_TITLE                    "xDuoo X3ii"
-#define UI_WIDTH                    322 /* width of GUI window */
-#define UI_HEIGHT                   609 /* height of GUI window */
-#define UI_LCD_POSX                 43
-#define UI_LCD_POSY                 62
+#define UI_WIDTH                    299 /* width of GUI window */
+#define UI_HEIGHT                   600 /* height of GUI window */
+#define UI_LCD_POSX                 28
+#define UI_LCD_POSY                 56
 
 #elif defined(XDUOO_X20)
 #define UI_TITLE                    "xDuoo X20"
