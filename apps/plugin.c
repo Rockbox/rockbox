@@ -205,7 +205,7 @@ static const struct plugin_api rockbox_api = {
     lcd_icon,
     lcd_double_height,
 #else /* HAVE_LCD_BITMAP */
-    &lcd_static_framebuffer[0][0],
+    &lcd_framebuffer,
     lcd_set_viewport,
     lcd_set_framebuffer,
     lcd_bmp_part,
@@ -293,7 +293,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_mono_bitmap_part,
     lcd_remote_mono_bitmap,
     lcd_remote_putsxy,
-    &lcd_remote_static_framebuffer[0][0],
+    &lcd_remote_framebuffer;
     lcd_remote_update,
     lcd_remote_update_rect,
 #if (LCD_REMOTE_DEPTH > 1)

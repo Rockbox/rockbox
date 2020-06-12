@@ -295,7 +295,7 @@ void vid_update(int scanline)
     else if (fb.mode==2)
         scanline-=8;
     scanline_remapped = scanline / 16;
-    frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
+    frameb = *rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         balance += LCD_WIDTH;
         if (balance > 0)
@@ -370,7 +370,7 @@ void vid_update(int scanline)
     else if (fb.mode==2)
         scanline-=8;
     scanline_remapped = scanline / 4;
-    frameb = rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
+    frameb = *rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         *(frameb++) = (scan.buf[0][cnt]&0x3) |
                       ((scan.buf[1][cnt]&0x3)<<2) |

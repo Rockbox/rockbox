@@ -161,12 +161,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 237
+#define PLUGIN_API_VERSION 238
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 237
+#define PLUGIN_MIN_API_VERSION 238
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -217,7 +217,7 @@ struct plugin_api {
     void (*lcd_icon)(int icon, bool enable);
     void (*lcd_double_height)(bool on);
 #else /* HAVE_LCD_BITMAP */
-    fb_data* lcd_framebuffer;
+    fb_data** lcd_framebuffer;
     void (*lcd_set_viewport)(struct viewport* vp);
     void (*lcd_set_framebuffer)(fb_data *fb);
     void (*lcd_bmp_part)(const struct bitmap *bm, int src_x, int src_y,
@@ -328,7 +328,7 @@ struct plugin_api {
     void (*lcd_remote_mono_bitmap)(const unsigned char *src, int x, int y,
                                    int width, int height);
     void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
-    fb_remote_data* lcd_remote_framebuffer;
+    fb_remote_data** lcd_remote_framebuffer;
     void (*lcd_remote_update)(void);
     void (*lcd_remote_update_rect)(int x, int y, int width, int height);
 #if (LCD_REMOTE_DEPTH > 1)

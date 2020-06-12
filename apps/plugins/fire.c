@@ -250,7 +250,7 @@ static inline void fire_draw(struct fire* fire)
 #ifndef HAVE_LCD_COLOR
         dest = draw_buffer;
 #else
-        dest = rb->lcd_framebuffer + LCD_WIDTH * y + FIRE_XPOS;
+        dest = *rb->lcd_framebuffer + LCD_WIDTH * y + FIRE_XPOS;
 #endif
         end = dest + FIRE_WIDTH;
 
