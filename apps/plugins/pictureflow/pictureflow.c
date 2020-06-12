@@ -188,7 +188,7 @@ GREY_INFO_STRUCT
 #define BUFFER_HEIGHT _grey_info.height
 typedef unsigned char pix_t;
 #else   /* LCD_DEPTH >= 8 */
-#define LCD_BUF rb->lcd_framebuffer
+#define LCD_BUF *rb->lcd_framebuffer
 #define G_PIX LCD_RGBPACK
 #define N_PIX LCD_RGBPACK
 #define G_BRIGHT(y) LCD_RGBPACK(y,y,y)

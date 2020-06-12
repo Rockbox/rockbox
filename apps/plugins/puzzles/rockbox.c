@@ -837,7 +837,7 @@ static void rb_draw_line(void *handle, int x1, int y1, int x2, int y2,
         }
         else
 #endif
-            draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
+            draw_antialiased_line(*rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
     }
     else
     {
@@ -1115,7 +1115,7 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
                                  x2, y2);
             }
             else
-                draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
+                draw_antialiased_line(*rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
 
 #ifdef DEBUG_MENU
             if(debug_settings.polyanim)
@@ -1140,7 +1140,7 @@ static void rb_draw_poly(void *handle, int *coords, int npoints,
                              x2, y2);
         }
         else
-            draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
+            draw_antialiased_line(*rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, x1, y1, x2, y2);
     }
     else
     {
@@ -1295,7 +1295,7 @@ static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
 
         trim_rect(&x, &y, &w, &h);
 
-        fb_data *fb = zoom_enabled ? zoom_fb : rb->lcd_framebuffer;
+        fb_data *fb = zoom_enabled ? zoom_fb : *rb->lcd_framebuffer;
         LOGF("rb_blitter_save(%d, %d, %d, %d)", x, y, w, h);
         for(int i = 0; i < h; ++i)
         {
@@ -1599,9 +1599,9 @@ static void timer_cb(void)
         static bool what = false;
         what = !what;
         if(what)
-            rb->lcd_framebuffer[0] = LCD_BLACK;
+            *rb->lcd_framebuffer[0] = LCD_BLACK;
         else
-            rb->lcd_framebuffer[0] = LCD_WHITE;
+            *rb->lcd_framebuffer[0] = LCD_WHITE;
         rb->lcd_update();
     }
 #endif
@@ -2724,7 +2724,7 @@ static void bench_aa(void)
     int i = 0;
     while(*rb->current_tick < next)
     {
-        draw_antialiased_line(rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, 0, 0, 20, 31);
+        draw_antialiased_line(*rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT, 0, 0, 20, 31);
         ++i;
     }
     rb->splashf(HZ, "%d AA lines/sec", i);
