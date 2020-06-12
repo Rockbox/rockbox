@@ -159,7 +159,7 @@ enum nwz_nvp_node_t
 /* Number of models */
 #define NWZ_MODEL_COUNT     197
 /* Number of series */
-#define NWZ_SERIES_COUNT    40
+#define NWZ_SERIES_COUNT    41
 
 /* NVP node info */
 struct nwz_nvp_info_t

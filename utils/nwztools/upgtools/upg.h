@@ -25,7 +25,7 @@
 #include "fwp.h"
 #include "mg.h"
 
-/** Firmware format
+/** Firmware format V1/V2
  *
  * The firmware starts with the MD5 hash of the entire file (except the MD5 hash
  * itself of course). This is used to check that the file was not corrupted.
@@ -35,7 +35,10 @@
  * the key and finding the right signature serves to authenticate the firmware.
  * The header is followed by N entries (where N is the number of files) giving
  * the offset, within the file, and size of each file. Note that the files in
- * the firmware have no name. */
+ * the firmware have no name. The only difference between V1 and V2 is that the
+ * size of the signature is 16 bytes instead of 8 and the upg entries are 16 bytes
+ * long so they are padded.
+ */
 
 struct upg_md5_t
 {
@@ -44,7 +47,7 @@ struct upg_md5_t
 
 struct upg_header_t
 {
-    uint8_t sig[NWZ_SIG_SIZE];
+    uint8_t sig[8];
     uint32_t nr_files;
     uint32_t pad; // make sure structure size is a multiple of 8
 } __attribute__((packed));
@@ -53,6 +56,20 @@ struct upg_entry_t
 {
     uint32_t offset;
     uint32_t size;
+} __attribute__((packed));
+
+struct upg_header_v2_t
+{
+    uint8_t sig[16];
+    uint32_t nr_files;
+    uint32_t pad[3]; // make sure structure size is a multiple of 16
+} __attribute__((packed));
+
+struct upg_entry_v2_t
+{
+    uint32_t offset;
+    uint32_t size;
+    uint32_t pad[2]; // make sure structure size is a multiple of 16
 } __attribute__((packed));
 
 /** KAS / Key / Signature
@@ -131,7 +148,7 @@ struct nwz_model_t
      * it is a KAS built from a key and sig brute-forced from an upgrade. In this
      * case, the KAS might be different from the 'official' one although for all
      * intent and purposes it should not make any difference. */
-    char *kas;
+    const char *kas;
 };
 
 /* list of models with keys and status. Sentinel NULL entry at the end */
@@ -150,18 +167,18 @@ struct upg_file_t
     struct upg_file_entry_t *files;
 };
 
-/* decrypt a KAS into a key and signature, return <0 if the KAS contains a non-hex
- * character */
-int decrypt_keysig(const char kas[NWZ_KAS_SIZE], char key[NWZ_KEY_SIZE],
-    char sig[NWZ_SIG_SIZE]);
-/* encrypt a key and signature into a KAS */
-void encrypt_keysig(char kas[NWZ_KEY_SIZE],
-    const char key[NWZ_SIG_SIZE], const char sig[NWZ_KAS_SIZE]);
+/* IMPORTANT: all functions assume that the kas/key/sig are string and are zero terminated */
+
+/* Decrypt a KAS into a key and signature, return <0 if the KAS contains a non-hex
+ * character. The function will allocate key and sig if *key and/or *sig is NULL */
+int decrypt_keysig(const char *kas, char **key, char **sig);
+/* Encrypt a key and signature into a KAS, it will allocate kas if *kas is NULL */
+void encrypt_keysig(char **kas, const char *key, const char *sig);
 
 /* Read a UPG file: return a structure on a success or NULL on error.
  * Note that the memory buffer is modified to perform in-place decryption. */
-struct upg_file_t *upg_read_memory(void *file, size_t size, char key[NWZ_KEY_SIZE],
-    char sig[NWZ_SIG_SIZE], void *u, generic_printf_t printf);
+struct upg_file_t *upg_read_memory(void *file, size_t size, const char *key,
+    const char *sig, void *u, generic_printf_t printf);
 /* Write a UPG file: return a buffer containing the whole image, or NULL on error. */
 void *upg_write_memory(struct upg_file_t *file, char key[NWZ_KEY_SIZE],
     char sig[NWZ_SIG_SIZE], size_t *out_size, void *u, generic_printf_t printf);
