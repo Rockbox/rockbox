@@ -483,7 +483,6 @@ static inline unsigned fb_to_scalar(fb_data p)
 #endif
 /* The actual framebuffer */
 extern fb_data *lcd_framebuffer;
-extern fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define FBADDR(x, y) (lcd_framebuffer + ((x) * LCD_FBHEIGHT) + (y))
 #else
