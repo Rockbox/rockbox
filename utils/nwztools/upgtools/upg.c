@@ -54,6 +54,12 @@ struct nwz_model_t g_model_list[] =
     { 0 }
 };
 
+/* KEY/IV for pre-WM1/A30 models */
+static uint8_t g_des_passkey[9] = "ed295076";
+/* device after WM1/NW-A30 */
+static uint8_t g_aes_passkey[17] = "9cc4419c8bef488c";
+static uint8_t g_aes_iv[17] = "6063ce1efa1d543a";
+
 static int digit_value(char c)
 {
     if(c >= '0' && c <= '9') return c - '0';
@@ -67,42 +73,83 @@ static char hex_digit(unsigned v)
     return (v < 10) ? v + '0' : (v < 16) ? v - 10 + 'a' : 'x';
 }
 
-int decrypt_keysig(const char kas[NWZ_KAS_SIZE], char key[NWZ_KEY_SIZE],
-    char sig[NWZ_SIG_SIZE])
+int decrypt_keysig(const char *kas, char **key, char **sig)
 {
-    uint8_t src[NWZ_KAS_SIZE / 2];
-    for(int index = 0; index < NWZ_KAS_SIZE / 2; index++)
+    int len = strlen(kas);
+    if(len % 2)
+        return -1; /* length must be a multiple of two */
+    uint8_t *src = malloc(len / 2);
+    for(int index = 0; index < len / 2; index++)
     {
         int a = digit_value(kas[index * 2]);
         int b = digit_value(kas[index * 2 + 1]);
         if(a < 0 || b < 0)
-            return -1;
+            return -1; /* bad digit */
         src[index] = a << 4 | b;
     }
-    fwp_setkey("ed295076");
-    fwp_crypt(src, sizeof(src), 1);
-    memcpy(key, src, NWZ_KEY_SIZE);
-    memcpy(sig, src + NWZ_KEY_SIZE, NWZ_SIG_SIZE);
+    if(*key == NULL)
+        *key = malloc(len / 4 + 1);
+    if(*sig == NULL)
+        *sig = malloc(len / 4 + 1);
+
+    if(len == 32)
+    {
+        /* Device before WM1/NW-A30 use DES */
+        des_ecb_dec_set_key(g_des_passkey);
+        des_ecb_dec(src, len / 2, src);
+    }
+    else if(len == 64)
+    {
+        /* device after WM1/NW-A30 */
+        aes_cbc_dec_set_key_iv(g_aes_passkey, g_aes_iv);
+        aes_cbc_dec(src, len / 2, src);
+    }
+    else
+    {
+        free(src);
+        return -1;
+    }
+    memcpy(*key, src, len / 4);
+    (*key)[len / 4] = 0;
+    memcpy(*sig, src + len / 4, len / 4);
+    (*sig)[len / 4] = 0;
+    free(src);
     return 0;
 }
 
-void encrypt_keysig(char kas[NWZ_KEY_SIZE],
-    const char key[NWZ_SIG_SIZE], const char sig[NWZ_KAS_SIZE])
+void encrypt_keysig(char **kas, const char *key, const char *sig)
 {
-    uint8_t src[NWZ_KAS_SIZE / 2];
-    fwp_setkey("ed295076");
-    memcpy(src, key, NWZ_KEY_SIZE);
-    memcpy(src + NWZ_KEY_SIZE, sig, NWZ_SIG_SIZE);
-    fwp_crypt(src, sizeof(src), 0);
-    for(int i = 0; i < NWZ_KAS_SIZE / 2; i++)
+    int len = strlen(key);
+    if(len != strlen(sig))
+        abort();
+    uint8_t *src = malloc(len * 2);
+    memcpy(src, key, len);
+    memcpy(src + len, sig, len);
+    if(len == 8)
     {
-        kas[2 * i] = hex_digit((src[i] >> 4) & 0xf);
-        kas[2 * i + 1] = hex_digit(src[i] & 0xf);
+        des_ecb_enc_set_key(g_des_passkey);
+        des_ecb_enc(src, len * 2, src);
     }
+    else if(len == 16)
+    {
+        aes_cbc_enc_set_key_iv(g_aes_passkey, g_aes_iv);
+        aes_cbc_enc(src, len * 2, src);
+    }
+    else
+        abort();
+    if(*kas == NULL)
+        *kas = malloc(len * 4 + 1);
+    for(int i = 0; i < len * 2; i++)
+    {
+        (*kas)[2 * i] = hex_digit((src[i] >> 4) & 0xf);
+        (*kas)[2 * i + 1] = hex_digit(src[i] & 0xf);
+    }
+    (*kas)[len * 4] = 0;
+    free(src);
 }
 
-struct upg_file_t *upg_read_memory(void *buf, size_t size, char key[NWZ_KEY_SIZE],
-    char *sig, void *u, generic_printf_t printf)
+struct upg_file_t *upg_read_memory(void *buf, size_t size, const char *key,
+    const char *sig, void *u, generic_printf_t printf)
 {
 #define cprintf(col, ...) printf(u, false, col, __VA_ARGS__)
 #define cprintf_field(str1, ...) do{ cprintf(GREEN, str1); cprintf(YELLOW, __VA_ARGS__); }while(0)
@@ -113,6 +160,8 @@ struct upg_file_t *upg_read_memory(void *buf, size_t size, char key[NWZ_KEY_SIZE
     for(int i = 0; i < NWZ_MD5_SIZE; i++)
         cprintf(YELLOW, "%02x", md5->md5[i]);
     cprintf(OFF, " ");
+
+    int key_len = strlen(key);
 
     /* check MD5 */
     uint8_t actual_md5[NWZ_MD5_SIZE];
@@ -125,72 +174,186 @@ struct upg_file_t *upg_read_memory(void *buf, size_t size, char key[NWZ_KEY_SIZE
     }
     cprintf(RED, "Ok\n");
 
-    struct upg_header_t *hdr = (void *)(md5 + 1);
-    /* decrypt the whole file at once */
-    fwp_read(hdr, size - sizeof(*md5), hdr, (void *)key);
-
-    cprintf(BLUE, "Header\n");
-    cprintf_field("  Signature:", " ");
-    for(int i = 0; i < NWZ_SIG_SIZE; i++)
-        cprintf(YELLOW, "%c", isprint(hdr->sig[i]) ? hdr->sig[i] : '.');
-    if(sig)
+    bool is_v2 = false;
+    void *hdr = (void *)(md5 + 1);
+    /* decrypt just the header */
+    if(key_len == 8)
     {
-        if(memcmp(hdr->sig, sig, NWZ_SIG_SIZE) != 0)
-        {
-            cprintf(RED, "Mismatch\n");
-            err_printf(GREY, "Signature Mismatch\n");
-            return NULL;
-        }
-        cprintf(RED, " Ok\n");
+        des_ecb_dec_set_key((uint8_t *)key);
+        des_ecb_dec(hdr, sizeof(struct upg_header_t), hdr);
+    }
+    else if(key_len == 16)
+    {
+        aes_ecb_dec_set_key((uint8_t *)key);
+        aes_ecb_dec(hdr, sizeof(struct upg_header_v2_t), hdr);
+        is_v2 = true;
     }
     else
-        cprintf(RED, " Can't check\n");
-    cprintf_field("  Files: ", "%d\n", hdr->nr_files);
-    cprintf_field("  Pad: ", "0x%x\n", hdr->pad);
-
-
-    /* Do a first pass to decrypt in-place */
-    cprintf(BLUE, "Files\n");
-    struct upg_entry_t *entry = (void *)(hdr + 1);
-    for(unsigned i = 0; i < hdr->nr_files; i++, entry++)
     {
-        cprintf(GREY, "  File");
-        cprintf(RED, " %d\n", i);
-        cprintf_field("    Offset: ", "0x%x\n", entry->offset);
-        cprintf_field("    Size: ", "0x%x\n", entry->size);
+        cprintf(GREY, "I don't know how to decrypt with a key of length %s\n", key_len);
+        return NULL;
     }
-    /* Do a second pass to create the file structure */
+
+    cprintf(BLUE, "Header\n");
+    int nr_files = 0;
+    void *content = NULL;
+    if(!is_v2)
+    {
+        struct upg_header_t *hdr_v1 = hdr;
+        cprintf_field("  Signature: ", "");
+        for(int i = 0; i < 8; i++)
+            cprintf_field("", "%c", isprint(hdr_v1->sig[i]) ? hdr_v1->sig[i] : '.');
+        if(sig)
+        {
+            if(memcmp(hdr_v1->sig, sig, 8) != 0)
+            {
+                cprintf(RED, " Mismatch\n");
+                err_printf(GREY, "Signature Mismatch\n");
+                return NULL;
+            }
+            cprintf(RED, " Ok\n");
+        }
+        else
+            cprintf(RED, " Can't check\n");
+        cprintf_field("  Files: ", "%d\n", hdr_v1->nr_files);
+        if(hdr_v1->pad != 0)
+            cprintf_field("  Pad: ", "0x%x\n", hdr_v1->pad);
+
+        nr_files = hdr_v1->nr_files;
+        content = hdr_v1 + 1;
+    }
+    else
+    {
+        struct upg_header_v2_t *hdr_v2 = hdr;
+        cprintf_field("  Signature: ", "");
+        for(int i = 0; i < 16; i++)
+            cprintf_field("", "%c", isprint(hdr_v2->sig[i]) ? hdr_v2->sig[i] : '.');
+        if(sig)
+        {
+            if(memcmp(hdr_v2->sig, sig, 16) != 0)
+            {
+                cprintf(RED, " Mismatch\n");
+                err_printf(GREY, "Signature Mismatch\n");
+                return NULL;
+            }
+            cprintf(RED, " Ok\n");
+        }
+        else
+            cprintf(RED, " Can't check\n");
+        cprintf_field("  Files: ", "%d\n", hdr_v2->nr_files);
+        if(hdr_v2->pad[0] != 0 || hdr_v2->pad[1] != 0 || hdr_v2->pad[2] != 0)
+            cprintf_field("  Pad: ", "0x%x 0x%x 0x%x\n", hdr_v2->pad[0], hdr_v2->pad[1], hdr_v2->pad[2]);
+
+        nr_files = hdr_v2->nr_files;
+        content = hdr_v2 + 1;
+    }
+
     /* create file */
     struct upg_file_t *file = malloc(sizeof(struct upg_file_t));
     memset(file, 0, sizeof(struct upg_file_t));
-    file->nr_files = hdr->nr_files;
+    file->nr_files = nr_files;
     file->files = malloc(sizeof(struct upg_file_entry_t) * file->nr_files);
 
-    entry = (void *)(hdr + 1);
-    for(unsigned i = 0; i < hdr->nr_files; i++, entry++)
+    /* decrypt the file list */
+    if(key_len == 8)
+        des_ecb_dec(content, sizeof(struct upg_entry_t) * nr_files, content);
+    else if(key_len == 16)
+        aes_ecb_dec(content, sizeof(struct upg_entry_v2_t) * nr_files, content);
+
+    /* Extract files */
+    cprintf(BLUE, "Files\n");
+    struct upg_entry_t *entry_v1 = content;
+    struct upg_entry_v2_t *entry_v2 = content;
+    for(unsigned i = 0; i < nr_files; i++)
     {
+        uint32_t offset, size;
+        cprintf(GREY, "  File");
+        cprintf(RED, " %d\n", i);
+        if(!is_v2)
+        {
+            offset = entry_v1[i].offset;
+            size = entry_v1[i].size;
+        }
+        else
+        {
+            offset = entry_v2[i].offset;
+            size = entry_v2[i].size;
+        }
+        cprintf_field("    Offset: ", "0x%x\n", offset);
+        cprintf_field("    Size: ", "0x%x\n", size);
+        if(is_v2 && (entry_v2[i].pad[0] != 0 || entry_v2[i].pad[1] != 0))
+            cprintf_field("    Pad:", " %x %x\n", entry_v2[i].pad[0], entry_v2[i].pad[1]);
+
+        /* decrypt file content, we round up the size to make sure it's a multiple of 8/16 */
+        if(key_len == 8)
+            des_ecb_dec(buf + offset, ROUND_UP(size, 8), buf + offset);
+        else if(key_len == 16)
+        {
+            aes_cbc_dec_set_key_iv((uint8_t *)key, (uint8_t *)g_aes_iv);
+            aes_cbc_dec(buf + offset, ROUND_UP(size, 16), buf + offset);
+        }
+
+        /* in V2 of the format, some entries can be compressed using zlib but there is no marker for
+         * that; instead the OF has the fwpup program that can extract the nth entry of the archive
+         * and takes an optional -z flag to specify whether to uncompress(). Hence we don't support
+         * that at the moment. */
         memset(&file->files[i], 0, sizeof(struct upg_file_entry_t));
-        file->files[i].size = entry->size;
+        file->files[i].size = size;
         file->files[i].data = malloc(file->files[i].size);
-        memcpy(file->files[i].data, buf + entry->offset, entry->size);
+        memcpy(file->files[i].data, buf + offset, size);
     }
 
     return file;
 }
 
-void *upg_write_memory(struct upg_file_t *file, char key[NWZ_KEY_SIZE],
-    char sig[NWZ_SIG_SIZE], size_t *out_size, void *u, generic_printf_t printf)
+void *upg_write_memory(struct upg_file_t *file, const char *key,
+    const char *sig, size_t *out_size, void *u, generic_printf_t printf)
 {
+    int key_len = strlen(key);
+    if(strlen(sig) != key_len)
+    {
+        err_printf(GREY, "The key must have the same length as the signature\n");
+        return NULL;
+    }
     if(file->nr_files == 0)
     {
         err_printf(GREY, "A UPG file must have at least one file\n");
         return NULL;
     }
+    if(key_len == 16 && file->nr_files == 1)
+    {
+        err_printf(RED, "This will probably not work: the firmware updater for this device expects at least two files in the archive.\n");
+        err_printf(RED, "The first one is a shell script and the second is a MD5 file. You can probably put whatever you want in this file,\n");
+        err_printf(RED, "even make it empty, but it needs to be there.\n");
+        /* let it run just in case */
+    }
+
+    bool is_v2 = false;
+    size_t min_chunk_size, hdr_sz, ent_sz;
+    if(key_len == 8)
+    {
+        min_chunk_size = 8;
+        hdr_sz = sizeof(struct upg_header_t);
+        ent_sz = sizeof(struct upg_entry_t);
+    }
+    else if(key_len == 16)
+    {
+        min_chunk_size = 16;
+        hdr_sz = sizeof(struct upg_header_v2_t);
+        ent_sz = sizeof(struct upg_entry_v2_t);
+        is_v2 = true;
+    }
+    else
+    {
+        cprintf(GREY, "I don't know how to decrypt with a key of length %s\n", key_len);
+        return NULL;
+    }
+
     /* compute total size and create buffer */
-    size_t tot_size = sizeof(struct upg_md5_t) + sizeof(struct upg_header_t)
-        + file->nr_files * sizeof(struct upg_entry_t);
+    size_t tot_hdr_siz = hdr_sz + file->nr_files * ent_sz;
+    size_t tot_size = sizeof(struct upg_md5_t) + tot_hdr_siz;
     for(int i = 0; i < file->nr_files; i++)
-        tot_size += ROUND_UP(file->files[i].size, 8);
+        tot_size += ROUND_UP(file->files[i].size, min_chunk_size);
     /* allocate buffer */
     void *buf = malloc(tot_size);
 
@@ -198,40 +361,75 @@ void *upg_write_memory(struct upg_file_t *file, char key[NWZ_KEY_SIZE],
     struct upg_md5_t *md5 = buf;
     memset(md5, 0, sizeof(*md5));
     /* create the encrypted signature and header */
-    struct upg_header_t *hdr = (void *)(md5 + 1);
-    memcpy(hdr->sig, sig, NWZ_SIG_SIZE);
-    hdr->nr_files = file->nr_files;
-    hdr->pad = 0;
+    if(!is_v2)
+    {
+        struct upg_header_t *hdr = (void *)(md5 + 1);
+        memcpy(hdr->sig, sig, 8);
+        hdr->nr_files = file->nr_files;
+        hdr->pad = 0;
+    }
+    else
+    {
+        struct upg_header_v2_t *hdr = (void *)(md5 + 1);
+        memcpy(hdr->sig, sig, 16);
+        hdr->nr_files = file->nr_files;
+        hdr->pad[0] = hdr->pad[1] = hdr->pad[2] = 0;
+    }
 
     /* create file headers */
-    size_t offset = sizeof(*md5) + sizeof(*hdr) + file->nr_files * sizeof(struct upg_entry_t);
-    struct upg_entry_t *entry = (void *)(hdr + 1);
+    size_t offset = sizeof(struct upg_md5_t) + tot_hdr_siz;
+    struct upg_entry_t *entry_v1 = (void *)((uint8_t *)(md5 + 1) + hdr_sz);
+    struct upg_entry_v2_t *entry_v2 = (void *)entry_v1;
     cprintf(BLUE, "Files\n");
     for(int i = 0; i < file->nr_files; i++)
     {
-        entry[i].offset = offset;
-        entry[i].size = file->files[i].size;
-        offset += ROUND_UP(entry[i].size, 8); /* pad each file to a multiple of 8 for encryption */
-
         cprintf(GREY, "  File");
         cprintf(RED, " %d\n", i);
-        cprintf_field("    Offset: ", "0x%lx\n", entry[i].offset);
-        cprintf_field("    Size: ", "0x%lx\n", entry[i].size);
-    }
-
-    /* add file data */
-    for(int i = 0; i < file->nr_files; i++)
-    {
-        /* copy data to buffer, and then encrypt in-place */
-        size_t r_size = ROUND_UP(file->files[i].size, 8);
-        void *data_ptr = (uint8_t *)buf + entry[i].offset;
+        cprintf_field("    Offset: ", "0x%lx\n", offset);
+        cprintf_field("    Size: ", "0x%lx\n", file->files[i].size);
+        if(!is_v2)
+        {
+            entry_v1[i].offset = offset;
+            entry_v1[i].size = file->files[i].size;
+        }
+        else
+        {
+            entry_v2[i].offset = offset;
+            entry_v2[i].size = file->files[i].size;
+            entry_v2[i].pad[0] = entry_v2[i].pad[1] = 0;
+        }
+        /* copy data to buffer, with padding */
+        size_t r_size = ROUND_UP(file->files[i].size, min_chunk_size);
+        void *data_ptr = (uint8_t *)buf + offset;
         memset(data_ptr, 0, r_size); /* the padding will be zero 0 */
         memcpy(data_ptr, file->files[i].data, file->files[i].size);
+        /* encrypt in-place */
+        if(!is_v2)
+        {
+            des_ecb_enc_set_key((uint8_t *)key);
+            des_ecb_enc(data_ptr, r_size, data_ptr);
+        }
+        else
+        {
+            aes_cbc_enc_set_key_iv((uint8_t *)key, (uint8_t *)g_aes_iv);
+            aes_cbc_enc(data_ptr, r_size, data_ptr);
+        }
+
+        offset += r_size;
     }
-    /* encrypt everything and hash everything */
-    fwp_write(hdr, tot_size - sizeof(*md5), hdr, (void *)key);
-    /* write final MD5 */
-    MD5_CalculateDigest(md5->md5, (void *)hdr, tot_size - sizeof(*md5));
+    /* encrypt headers */
+    if(!is_v2)
+    {
+        des_ecb_enc_set_key((uint8_t *)key);
+        des_ecb_enc(md5 + 1, tot_hdr_siz, md5 + 1);
+    }
+    else
+    {
+        aes_ecb_enc_set_key((uint8_t *)key);
+        aes_ecb_enc(md5 + 1, tot_hdr_siz, md5 + 1);
+    }
+    /* compute MD5 of the whole file */
+    MD5_CalculateDigest(md5->md5, md5 + 1, tot_size - sizeof(*md5));
     *out_size = tot_size;
     return buf;
 }
