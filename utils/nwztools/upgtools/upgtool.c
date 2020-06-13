@@ -18,6 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define _XOPEN_SOURCE 500 /* for strdup */
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -30,7 +31,6 @@
 #include "elf.h"
 #include <sys/stat.h>
 #include "crypt.h"
-#include "fwp.h"
 #include "keysig_search.h"
 #include "upg.h"
 
@@ -71,50 +71,49 @@ static bool upg_notify_keysig(void *user, uint8_t key[NWZ_KEY_SIZE],
     uint8_t sig[NWZ_SIG_SIZE])
 {
     g_key = user;
-    g_sig = user + NWZ_KEY_SIZE;
+    g_sig = user + 9;
     memcpy(g_key, key, NWZ_KEY_SIZE);
+    g_key[8] = 0;
     memcpy(g_sig, sig, NWZ_SIG_SIZE);
+    g_sig[8] = 0;
     return true;
 }
 
 static int get_key_and_sig(bool is_extract, void *buf)
 {
-    static char keysig[NWZ_KEYSIG_SIZE];
-    static char kas[NWZ_KAS_SIZE];
     /* database lookup */
     if(g_model_index != -1)
-        g_kas = g_model_list[g_model_index].kas;
+        g_kas = strdup(g_model_list[g_model_index].kas);
 
     /* always prefer KAS because it contains everything */
     if(g_kas)
     {
-        if(strlen(g_kas) != NWZ_KAS_SIZE)
+        if(strlen(g_kas) != 32 && strlen(g_kas) != 64)
         {
-            cprintf(GREY, "The KAS has wrong length (must be %d hex digits)\n", NWZ_KAS_SIZE);
+            cprintf(GREY, "The KAS has wrong length (must be 32 or 64 hex digits)\n");
             return 4;
         }
-        g_key = keysig;
-        g_sig = keysig + NWZ_KEY_SIZE;
-        decrypt_keysig(g_kas, g_key, g_sig);
+        decrypt_keysig(g_kas, &g_key, &g_sig);
     }
     /* Otherwise require key and signature */
     else if(g_key && g_sig)
     {
         /* check key and signature size */
-        if(strlen(g_key) != 8)
+        if(strlen(g_key) != 8 && strlen(g_key) != 16)
         {
-            cprintf(GREY, "The specified key has wrong length (must be 8 hex digits)\n");
+            cprintf(GREY, "The specified key has wrong length (must be 8 or 16 hex digits)\n");
             return 4;
         }
-        if(strlen(g_sig) != 8)
+        if(strlen(g_sig) != strlen(g_key))
         {
-            cprintf(GREY, "The specified sig has wrong length (must be 8 hex digits)\n");
+            cprintf(GREY, "The specified sig has wrong length (must match key length)\n");
             return 5;
         }
     }
     /* for extraction, we offer a brute force search method from the MD5 */
     else if(is_extract && g_keysig_search != KEYSIG_SEARCH_NONE)
     {
+        static char keysig[18]; /* 8+NUL+8+NULL */
         struct upg_md5_t *md5 = (void *)buf;
         void *encrypted_hdr = (md5 + 1);
         cprintf(BLUE, "keysig Search\n");
@@ -145,14 +144,13 @@ static int get_key_and_sig(bool is_extract, void *buf)
     {
         /* This is useful to print the KAS for the user when brute-forcing since
          * the process will produce a key+sig and the database requires a KAS */
-        g_kas = kas;
-        encrypt_keysig(g_kas, g_key, g_sig);
+        encrypt_keysig(&g_kas, g_key, g_sig);
     }
 
     cprintf(BLUE, "Keys\n");
-    cprintf_field("  KAS: ", "%."STR(NWZ_KAS_SIZE)"s\n", g_kas);
-    cprintf_field("  Key: ", "%."STR(NWZ_KEY_SIZE)"s\n", g_key);
-    cprintf_field("  Sig: ", "%."STR(NWZ_SIG_SIZE)"s\n", g_sig);
+    cprintf_field("  KAS: ", "%s\n", g_kas);
+    cprintf_field("  Key: ", "%s\n", g_key);
+    cprintf_field("  Sig: ", "%s\n", g_sig);
 
     return 0;
 }
@@ -268,7 +266,7 @@ static int create_upg(int argc, char **argv)
         if(f == NULL)
         {
             upg_free(upg);
-            printf(GREY, "Cannot open input file '%s': %m\n", argv[i + 1]);
+            cprintf(GREY, "Cannot open input file '%s': %m\n", argv[i + 1]);
             return 1;
         }
         size_t size = filesize(f);
