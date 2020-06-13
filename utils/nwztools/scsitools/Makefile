@@ -6,7 +6,7 @@ CC=$(PREFIX)gcc
 LD=$(PREFIX)gcc
 NWZ_DB_DIR=../../../firmware/target/hosted/sonynwz
 INCLUDES=-I$(NWZ_DB_DIR) -I$(SCSI_DIR)
-CFLAGS=-std=c99 -Wall -O2 $(DEFINES) $(INCLUDES)
+CFLAGS=-std=c99 -g -Wall -O2 $(DEFINES) $(INCLUDES)
 LDFLAGS=-L$(SCSI_DIR) -lrbscsi
 BINS=scsitool$(EXE_EXT)
 

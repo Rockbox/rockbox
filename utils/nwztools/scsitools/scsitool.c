@@ -233,7 +233,7 @@ void set_little_endian32(void *_buf, uint32_t val)
     buf[3] = (val >> 24) & 0xff;
 }
 
-int get_dnk_prop(int argc, char **argv)
+int get_dnk_prop(int argc, const char* const* argv)
 {
     if(argc != 1 && argc != 4)
     {
@@ -456,7 +456,7 @@ int write_nvp_node(int node_index, void *buffer, int size)
     return 0;
 }
 
-int get_dnk_nvp(int argc, char **argv)
+int get_dnk_nvp(int argc, const char* const* argv)
 {
     if(argc != 1 && argc != 2)
     {
@@ -543,7 +543,30 @@ int get_dnk_nvp(int argc, char **argv)
     return 0;
 }
 
-int get_dnk_nvp_multi(int argc, char **argv)
+int get_dnk_nvp_all()
+{
+    int series_index, model_index;
+    int ret = get_model_and_series(&model_index, &series_index, NULL);
+    if(ret)
+        return ret;
+    for(int i = 0; i < NWZ_NVP_COUNT; i++)
+    {
+        int node_index = NWZ_NVP_INVALID;
+        if(nwz_series[series_index].nvp_index)
+            node_index = (*nwz_series[series_index].nvp_index)[i];
+        if(node_index == NWZ_NVP_INVALID)
+            continue; /* device doesn't have this node */
+        /* this is suboptimal, it will query again the model on each request but there aren't
+         * so many nodes anyway */
+        char buffer[10];
+        sprintf(buffer, "%d", node_index);
+        cprintf(BLUE, "querying '%s'\n", nwz_nvp[i].name);
+        get_dnk_nvp(1, &nwz_nvp[i].name);
+    }
+    return 0;
+}
+
+int get_dnk_nvp_multi(int argc, const char* const* argv)
 {
     if(argc == 0)
     {
@@ -554,12 +577,19 @@ int get_dnk_nvp_multi(int argc, char **argv)
             printf("  %-6s%s\n", nwz_nvp[i].name, nwz_nvp[i].desc);
         return 1;
     }
+    /* special case for 'all' */
+    if(argc == 1 && strcmp(argv[0], "all") == 0)
+        return get_dnk_nvp_all();
+    /* otherwise normal */
     for(int i = 0; i < argc; i++)
+    {
+        cprintf(BLUE, "querying '%s'\n", argv[i]);
         get_dnk_nvp(1, &argv[i]);
+    }
     return 0;
 }
 
-int set_dnk_nvp(int argc, char **argv)
+int set_dnk_nvp(int argc, const char* const* argv)
 {
     if(argc <= 1)
     {
@@ -717,7 +747,7 @@ int do_dpcc_cmd(uint32_t cmd, struct dpcc_prop_t *prop, void *buffer, int *buffe
     return 0;
 }
 
-int get_dpcc_prop(int argc, char **argv)
+int get_dpcc_prop(int argc, const char* const* argv)
 {
     if(argc != 1 && argc != 3)
     {
@@ -778,7 +808,7 @@ struct user_timer_t
     uint8_t res2[17];
 } __attribute__((packed));
 
-int get_user_time(int argc, char **argv)
+int get_user_time(int argc, const char* const* argv)
 {
     (void) argc;
     (void )argv;
@@ -798,7 +828,7 @@ int get_user_time(int argc, char **argv)
     return 0;
 }
 
-int get_dev_info(int argc, char **argv)
+int get_dev_info(int argc, const char* const* argv)
 {
     (void) argc;
     (void )argv;
@@ -824,7 +854,7 @@ int get_dev_info(int argc, char **argv)
     return 0;
 }
 
-int get_dhp(int argc, char **argv)
+int get_dhp(int argc, const char* const* argv)
 {
     (void) argc;
     (void) argv;
@@ -850,7 +880,7 @@ int get_dhp(int argc, char **argv)
     return 0;
 }
 
-int try_fw_upgrade(unsigned flags, int argc, char **argv)
+int try_fw_upgrade(unsigned flags, int argc, const char* const* argv)
 {
     (void) argc;
     (void) argv;
@@ -882,7 +912,7 @@ int try_fw_upgrade(unsigned flags, int argc, char **argv)
     return 0;
 }
 
-int do_fw_upgrade(int argc, char **argv)
+int do_fw_upgrade(int argc, const char* const* argv)
 {
     if(!try_fw_upgrade(0x80, argc, argv))
         return 0;
@@ -916,7 +946,7 @@ static struct
 
 #define DEST_COUNT (sizeof(g_dest_list) / sizeof(g_dest_list[0]))
 
-int do_dest(int argc, char **argv)
+int do_dest(int argc, const char* const* argv)
 {
     /* it is possile to write any NVP node using the SCSI interface but only
      * give the user the possibility to write destination, because that's the
@@ -1032,7 +1062,7 @@ int do_dest(int argc, char **argv)
     return 0;
 }
 
-int do_help_us(int argc, char **argv)
+int do_help_us(int argc, const char* const* argv)
 {
     unsigned long model_id;
     if(get_model_id(&model_id))
@@ -1041,7 +1071,7 @@ int do_help_us(int argc, char **argv)
     return 0;
 }
 
-typedef int (*cmd_fn_t)(int argc, char **argv);
+typedef int (*cmd_fn_t)(int argc, const char* const* argv);
 
 struct cmd_t
 {
@@ -1067,7 +1097,7 @@ struct cmd_t cmd_list[] =
 
 #define NR_CMDS (sizeof(cmd_list) / sizeof(cmd_list[0]))
 
-int process_cmd(const char *cmd, int argc, char **argv)
+int process_cmd(const char *cmd, int argc, const char* const* argv)
 {
     for(unsigned i = 0; i < NR_CMDS; i++)
         if(strcmp(cmd_list[i].name, cmd) == 0)
@@ -1310,7 +1340,7 @@ static int decode_scsi_fc(uint8_t *cdb, int cdb_len)
     return 0;
 }
 
-static int decode_scsi(int argc, char **argv)
+static int decode_scsi(int argc, const char* const* argv)
 {
     /* we need to parse the arguments, we support either as one big hexdump:
      *   fc002064626d6e0080000000
@@ -1333,7 +1363,7 @@ static int decode_scsi(int argc, char **argv)
     if(argc == 1)
     {
         /* allow the string to start with 0x */
-        char *str = argv[0];
+        const char *str = argv[0];
         if(str[0] == '0' && str[1] == 'x')
             str += 2;
         cdb_len = strlen(str);
@@ -1446,7 +1476,7 @@ int main(int argc, char **argv)
     if(argc >= optind + 1 && strcmp(argv[optind], "list_devices") == 0)
         return list_devices(list_all);
     if(argc >= optind + 1 && strcmp(argv[optind], "decode_scsi") == 0)
-        return decode_scsi(argc - optind - 1, argv + optind + 1);
+        return decode_scsi(argc - optind - 1, (const char * const *)(argv + optind + 1));
 
     if(argc - optind < 2)
     {
@@ -1466,7 +1496,7 @@ int main(int argc, char **argv)
         goto Lend;
     }
 
-    ret = process_cmd(argv[optind + 1], argc - optind - 2, argv + optind + 2);
+    ret = process_cmd(argv[optind + 1], argc - optind - 2, (const char * const *)(argv + optind + 2));
 
     rb_scsi_close(g_dev);
 Lend:
