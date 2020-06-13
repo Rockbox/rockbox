@@ -44,16 +44,11 @@ import time
 import hashlib
 import tempfile
 from datetime import datetime
+import multiprocessing
 import gitscraper
 
-# modules that are not part of python itself.
-cpus = 1
-try:
-    import multiprocessing
-    cpus = multiprocessing.cpu_count()
-    print("Info: %s cores found." % cpus)
-except ImportError:
-    print("Warning: multiprocessing module not found. Assuming 1 core.")
+CPUS = multiprocessing.cpu_count()
+print("Info: %s cores found." % CPUS)
 
 # == Global stuff ==
 # DLL files to ignore when searching for required DLL files.
@@ -216,9 +211,9 @@ def build(wd=".", platform=sys.platform, cross=""):
     print("Building ...")
     # use the current platforms make here, cross compiling uses the native make.
     command = [make[sys.platform]]
-    if cpus > 1:
+    if CPUS > 1:
         command.append("-j")
-        command.append(str(cpus))
+        command.append(str(CPUS))
     output = subprocess.Popen(command, stdout=subprocess.PIPE, cwd=wd)
     while True:
         c = output.stdout.readline()
