@@ -30,7 +30,7 @@ all: $(BINS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-upgtool: upgtool.o upg.o misc.o fwp.o mg.o keysig_search.o md5.o
+upgtool: upgtool.o upg.o misc.o mg.o keysig_search.o md5.o
 	$(LD) -o $@ $^ $(LDFLAGS)
 
 clean:

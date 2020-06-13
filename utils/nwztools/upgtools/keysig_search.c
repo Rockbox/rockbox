@@ -218,11 +218,10 @@ typedef bool (*sig_validate_fn_t)(uint8_t *key);
 static bool check_key(uint8_t key[NWZ_KEY_SIZE], sig_validate_fn_t validate)
 {
     struct upg_header_t hdr;
-    mg_decrypt_fw(g_keysig_search.enc_buf, sizeof(hdr.sig), (void *)&hdr, key);
+    mg_decrypt_fw(g_keysig_search.enc_buf, sizeof(hdr), (void *)&hdr, key);
     if(validate(hdr.sig))
     {
-        /* the signature looks correct, so decrypt the header futher to be sure */
-        mg_decrypt_fw(g_keysig_search.enc_buf, sizeof(hdr), (void *)&hdr, key);
+        /* the signature looks correct, so check the header to be sure */
         /* we expect the number of files to be small and the padding to be 0 */
         if(hdr.nr_files == 0 || hdr.nr_files > 10 || hdr.pad != 0)
             return false;

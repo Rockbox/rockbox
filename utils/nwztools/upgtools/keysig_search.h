@@ -24,7 +24,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
-#include "fwp.h"
+
+/* these values are for the V1 format */
+#define NWZ_KEY_SIZE    8
+#define NWZ_SIG_SIZE    8
 
 enum keysig_search_method_t
 {
