@@ -46,8 +46,9 @@ struct nwz_model_t g_model_list[] =
     { "nwz-s610", false, "fe14a16d7c5c52cf56846d04305f994c"},
     /* The following models use a different encryption, but we put the KAS here
      * to not forget them */
-    { "nw-a30", false, "c40d91e7efff3e3aa5c8831dd85526fe4972086283419c8cd8fa3b7dcd39" },
-    { "nw-wm1", false, "e8d171a5d92f35eed9658c03fb9f86a169591659851fd7c49525f587a70b" },
+    { "nw-a30", false, "c40d91e7efff3e3aa5c8831dd85526fe4972086283419c8cd8fa3b7dcd39dee4" },
+    { "nw-wm1a", false, "e8d171a5d92f35eed9658c03fb9f86a169591659851fd7c49525f587a70b526c" },
+    { "nw-wm1z", false, "2b07114f06d0f63b8ef8e31c8bc9332c7bd70281f7f8d2f80dab58cd36f82c82" },
     { "nw-zx300", false, "3ab5bbcb999463c50aaa957496b066c6b76a25f4505bf5b42c0bc4815cbe3db6" },
     { "nw-nwa40", false, "a0d2b1317794074aff77dd2afb9c7aa6b28d6cf24a5e5eb60df87a87eb562de5" },
     { 0 }

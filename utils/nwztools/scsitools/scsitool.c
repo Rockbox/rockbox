@@ -167,7 +167,7 @@ struct dnk_prop_t dnk_prop_list[] =
     { "destination", "Destination", 0x23, 8, 4, DNK_EXACT_LENGTH | DNK_UINT32},
     { "model_id", "Model ID", 0x23, 9, 4, DNK_EXACT_LENGTH | DNK_UINT32 | DNK_HEX},
     { "ufn", "Update filename", 0x23, 21, 8, DNK_STRING},
-    { "kas", "Key and Signature", 0x23, 22, 60, DNK_STRING},
+    { "kas", "Key and Signature", 0x23, 22, 64, DNK_STRING},
     { "devinfo", "Devide Info", 0x12, 0, 64, DNK_HEX},
     /* there are more obscure commands:
      * - 0x11 returns a 10-byte packet containing a 8-byte "LeftIdl8", scrambled
