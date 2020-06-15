@@ -2621,19 +2621,19 @@
 </phrase>
 <phrase>
   id: LANG_NEVER
-  desc: in lcd settings
+  desc: deprecated
   user: core
   <source>
     *: none
-    lcd_sleep: "Never"
+    lcd_sleep: ""
   </source>
   <dest>
     *: none
-    lcd_sleep: "Nigdy"
+    lcd_sleep: ""
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Nigdy"
+    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -4619,16 +4619,16 @@
 </phrase>
 <phrase>
   id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
+  desc: deprecated
   user: core
   <source>
-    *: "Unique only"
+    *: ""
   </source>
   <dest>
-    *: "Tylko pojedyncze"
+    *: ""
   </dest>
   <voice>
-    *: "Tylko pojedyncze"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8323,44 +8323,44 @@
 </phrase>
 <phrase>
   id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "KB"
+    *: ""
   </source>
   <dest>
-    *: "KB"
+    *: ""
   </dest>
   <voice>
-    *: "kilbajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "MB"
+    *: ""
   </source>
   <dest>
-    *: "MB"
+    *: ""
   </dest>
   <voice>
-    *: "megabajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
+  desc: deprecated
   user: core
   <source>
-    *: "GB"
+    *: ""
   </source>
   <dest>
-    *: "GB"
+    *: ""
   </dest>
   <voice>
-    *: "gigabajt"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13510,6 +13510,328 @@
   </dest>
   <voice>
     *: "Wyłącz powiadomienie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_PLAY
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Odtwarzanie"
+  </dest>
+  <voice>
+    *: "Odtwarzanie"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Niewłaściwy utwór"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gigabajt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_TOUCH
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Touch"
+  </source>
+  <dest>
+    *: "Wyłącz dotyk"
+  </dest>
+  <voice>
+    *: "Wyłącz dotyk"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_ON
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock On"
+  </source>
+  <dest>
+    *: "Automatyczne blokowanie włączone"
+  </dest>
+  <voice>
+    *: "Automatyczne blokowanie włączone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "megabajt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_SELECTIVE
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Advanced Key Lock"
+  </source>
+  <dest>
+    *: "Zaawansowana blokada klawiatury"
+  </dest>
+  <voice>
+    *: "Zaawansowana blokada klawiatury"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SKIP
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Skip"
+  </source>
+  <dest>
+    *: "Pomijanie"
+  </dest>
+  <voice>
+    *: "Pomijanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_EXT_POWER
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable on External Power"
+  </source>
+  <dest>
+    *: "Wyłącz przy zasilaniu zewnętrznym"
+  </dest>
+  <voice>
+    *: "Wyłącz przy zasilaniu zewnętrznym"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_UNMAPPED
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Disable Unmapped Keys"
+  </source>
+  <dest>
+    *: "Wyłącz nieprzypisane klawisze"
+  </dest>
+  <voice>
+    *: "Wyłącz nieprzypisane klawisze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "Nie znaleziono przeglądarek"
+  </dest>
+  <voice>
+    *: "Nie znaleziono przeglądarek"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "W kolejce"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_SEEK
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Seek"
+  </source>
+  <dest>
+    *: "Wyszukiwanie"
+  </dest>
+  <voice>
+    *: "Wyszukiwanie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_DISABLE_NOTIFY
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Disable Notify"
+  </source>
+  <dest>
+    *: "Wyłącz powiadomienie"
+  </dest>
+  <voice>
+    *: "Wyłącz powiadomienie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "Jedna na utwór"
+  </dest>
+  <voice>
+    *: "Jedna na utwór"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Przenoszenie utworu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_SELECTIVE
+  desc: Backlight behaviour setting
+  user: core
+  <source>
+    *: "Backlight Exemptions"
+  </source>
+  <dest>
+    *: "Zwolnienia podświetlenia"
+  </dest>
+  <voice>
+    *: "Zwolnienia podświetlenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_AUTOLOCK_OFF
+  desc: Softlock behaviour setting
+  user: core
+  <source>
+    *: "Autolock Off"
+  </source>
+  <dest>
+    *: "Automatyczne blokowanie wyłączone"
+  </dest>
+  <voice>
+    *: "Automatyczne blokowanie wyłączone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kilobajt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG__NEVER
+  desc: in lcd settings
+  user: core
+  <source>
+    *: "Never"
+  </source>
+  <dest>
+    *: "Nigdy"
+  </dest>
+  <voice>
+    *: "Nigdy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ENABLED
+  desc: Selective Actions
+  user: core
+  <source>
+    *: "Enabled"
+  </source>
+  <dest>
+    *: "Włączone"
+  </dest>
+  <voice>
+    *: "Włączone"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "Jedna na listę odtwarzania"
+  </dest>
+  <voice>
+    *: "Jedna na listę odtwarzania"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Utwór do przeniesienia"
   </voice>
 </phrase>
 <phrase>
