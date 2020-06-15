@@ -92,6 +92,30 @@
       "revId": "80324a4b32c203d4e7af97061440e62e3f15279b",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e986792c_297c8d80",
+        "filename": "firmware/export/lcd.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 491,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-06-15T20:50:47Z",
+      "side": 1,
+      "message": "that\u0027s a static expression so there won\u0027t be any performance impact.  :)",
+      "parentUuid": "e986792c_094ee970",
+      "range": {
+        "startLine": 491,
+        "startChar": 0,
+        "endLine": 491,
+        "endChar": 57
+      },
+      "revId": "80324a4b32c203d4e7af97061440e62e3f15279b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
