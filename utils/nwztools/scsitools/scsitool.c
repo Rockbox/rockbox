@@ -449,7 +449,7 @@ int write_nvp_node(int node_index, void *buffer, int size)
     if(xfer_size - 4 != (int)size)
     {
         free(xfer_buf);
-        cprintf(GREY, "Wrong transger size\n");
+        cprintf(GREY, "Wrong transfer size\n");
         return 7;
     }
     free(xfer_buf);
