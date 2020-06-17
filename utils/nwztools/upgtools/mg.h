@@ -22,10 +22,15 @@
 #define __mg_h__
 
 #include <stdint.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Compute the MD5 digest of a buffer */
+void MD5_CalculateDigest(void *digest, const void *input, size_t length);
+
 /* size must be a multiple of 8, this function is thread-safe */
 void mg_decrypt_fw(void *in, int size, void *out, uint8_t key[8]);
 

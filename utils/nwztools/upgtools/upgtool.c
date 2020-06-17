@@ -28,9 +28,7 @@
 #include <stdarg.h>
 #include <ctype.h>
 #include "misc.h"
-#include "elf.h"
 #include <sys/stat.h>
-#include "crypt.h"
 #include "keysig_search.h"
 #include "upg.h"
 
@@ -197,10 +195,10 @@ static int extract_upg(int argc, char **argv)
     }
 
     g_in_file = argv[0];
-    FILE *fin = fopen(g_in_file, "r");
+    FILE *fin = fopen(g_in_file, "rb");
     if(fin == NULL)
     {
-        perror("Cannot open boot file");
+        perror("Cannot open UPG file");
         return 1;
     }
     fseek(fin, 0, SEEK_END);

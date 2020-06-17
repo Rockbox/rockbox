@@ -25,6 +25,18 @@
 #include <stdarg.h>
 #include "misc.h"
 
+#if defined(_WIN32) || defined(__WIN32__)
+
+const char OFF[] = "";
+
+const char GREY[] = "";
+const char RED[] = "";
+const char GREEN[] = "";
+const char YELLOW[] = "";
+const char BLUE[] = "";
+
+#else
+
 const char OFF[] = { 0x1b, 0x5b, 0x31, 0x3b, '0', '0', 0x6d, '\0' };
 
 const char GREY[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '0', 0x6d, '\0' };
@@ -32,6 +44,8 @@ const char RED[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '1', 0x6d, '\0' };
 const char GREEN[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '2', 0x6d, '\0' };
 const char YELLOW[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '3', 0x6d, '\0' };
 const char BLUE[] = { 0x1b, 0x5b, 0x31, 0x3b, '3', '4', 0x6d, '\0' };
+
+#endif
 
 static bool g_color_enable = true;
 

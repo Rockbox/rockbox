@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "md5.h"
 
 struct nwz_model_t g_model_list[] =
 {
@@ -190,7 +189,7 @@ struct upg_file_t *upg_read_memory(void *buf, size_t size, const char *key,
     }
     else
     {
-        cprintf(GREY, "I don't know how to decrypt with a key of length %s\n", key_len);
+        cprintf(GREY, "I don't know how to decrypt with a key of length %d\n", key_len);
         return NULL;
     }
 
