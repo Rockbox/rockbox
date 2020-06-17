@@ -49,7 +49,7 @@ struct keysig_search_desc_t
     const char *comment;
 };
 
-struct keysig_search_desc_t keysig_search_desc[KEYSIG_SEARCH_LAST];
+extern struct keysig_search_desc_t keysig_search_desc[KEYSIG_SEARCH_LAST];
 
 bool keysig_search(int method, uint8_t *enc_buf, size_t buf_sz,
     keysig_notify_fn_t notify, void *user, int nr_threads);
