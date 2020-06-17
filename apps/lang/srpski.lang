@@ -1154,19 +1154,22 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: none
     swcodec: "Dithering"
+    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Дитер"
+    lcd_bitmap: "Дитер"
   </dest>
   <voice>
     *: none
     swcodec: "Дитер"
+    lcd_bitmap: "Дитер"
   </voice>
 </phrase>
 <phrase>
@@ -1744,10 +1747,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album Gain"
+    *: "Појачање албума"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "Појачање албума"
   </voice>
 </phrase>
 <phrase>
@@ -1758,10 +1761,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "Појачање нумере"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Појачање нумере"
   </voice>
 </phrase>
 <phrase>
@@ -1772,10 +1775,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Track Gain ако се меша"
+    *: "Појачање нумере ако се меша"
   </dest>
   <voice>
-    *: "Track Gain ако се меша"
+    *: "Појачање нумере ако се меша"
   </voice>
 </phrase>
 <phrase>
@@ -7275,10 +7278,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track појачање"
+    *: "Појачање нумере"
   </dest>
   <voice>
-    *: "Track појачање"
+    *: "Појачање нумере"
   </voice>
 </phrase>
 <phrase>
@@ -7289,10 +7292,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album појачање"
+    *: "Појачање албума"
   </dest>
   <voice>
-    *: "Album појачање"
+    *: "Појачање албума"
   </voice>
 </phrase>
 <phrase>
@@ -13563,13 +13566,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Short"
+    *: none
+    es9018: "Short"
   </source>
   <dest>
-    *: "Кратко"
+    *: none
+    es9018: "Кратко"
   </dest>
   <voice>
-    *: "Кратко"
+    *: none
+    es9018: "Кратко"
   </voice>
 </phrase>
 <phrase>
@@ -13897,13 +13903,16 @@
   desc: in sound settings
   user: core
   <source>
-    *: "Bypass"
+    *: none
+    es9018: "Bypass"
   </source>
   <dest>
-    *: "Премошћење"
+    *: none
+    es9018: "Премошћење"
   </dest>
   <voice>
-    *: "Премошћење"
+    *: none
+    es9018: "Премошћење"
   </voice>
 </phrase>
 <phrase>
@@ -13920,4 +13929,2422 @@
     *: "Грешка током прикупљања инфо"
   </voice>
 </phrase>
-
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Via Track list"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Преко листе нумера"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Преко листе нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "WPS Integration"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "WPS интеграција"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "WPS интеграција"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Бела"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resume Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Настави игру"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Настави игру"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Црна"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Always On"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Увек укључено"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Увек укључено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Особине директоријума"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Путања]"
+  </dest>
+  <voice>
+    *: "Путања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Постави време настављања (мин)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Постави време настављања"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Diffusion"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Дифузија"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Дифузија"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Наредна нумера"
+  </dest>
+  <voice>
+    *: "Наредна нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Arghs Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Аргхова по храни"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Аргхова по храни"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Настави аутоматски"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Настави аутоматски"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 7: 40 потеза / 240 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 7: 40 потеза за 240 мин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Албум]"
+  </dest>
+  <voice>
+    *: "Албум"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Краљ"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Топ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Прескачи фрејмове"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Прескачи фрејмове"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Играч"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи наслов албума"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи наслов албума"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Преклопи ставку"
+  </dest>
+  <voice>
+    *: "Преклопи ставку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Редослед Rockbox главног менија"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "Особине фајла"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Број играча"
+  </dest>
+  <voice>
+    *: "Број играча"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Argh Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Величина аргха"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Величина аргха"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Шах!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cache will be rebuilt on next restart"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Кеш ће да се изради при наредном поновном покретању"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Кеш ће да се изради при наредном поновном покретању"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CLEARED
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Playlist Cleared"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Плејлиста је очишћена"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Плејлиста је очишћена"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 3: 60 потеза / 30 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 3: 60 потеза за 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "Грешка у фајлу: %d"
+  </dest>
+  <voice>
+    *: "Грешка у фајлу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Тонске контроле"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Тонске контроле"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Ван контроле"
+  </dest>
+  <voice>
+    *: "Ван контроле"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 4: 40 потеза / 30 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 4: 40 потеза за 30 минута"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_PLAYLIST
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Clear playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Очисти плејлисту"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Очисти плејлисту"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 тастерска контрола"
+  </dest>
+  <voice>
+    *: "2 тастерска контрола"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "краљичина страна"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Није VBR фајл"
+  </dest>
+  <voice>
+    *: "Није VBR фајл"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Checkmate!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Шах-мат!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Шах-мат!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TITLE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Наслов]"
+  </dest>
+  <voice>
+    *: "Наслов"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Пауза / Пуштање"
+  </dest>
+  <voice>
+    *: "Пауза / Пуштање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Centre margin"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Централна маргина"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Централна маргина"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Претходна нумера"
+  </dest>
+  <voice>
+    *: "Претходна нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 6: 40 потеза / 120 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 6: 40 потеза за 120 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error parsing game !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Грешка при парсирању игре!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Грешка при парсирању игре!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Тест батерије се већ извршава"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Опције дисплеја"
+  </dest>
+  <voice>
+    *: "Опције дисплеја"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Режим репродукције"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Режим репродукције"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Spacing"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Размак"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Размак"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Игре"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Saving position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Чување позиције"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Чување позиције"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "краљева страна"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Speed"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Брзина црва"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Брзина црва"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Фајлови]"
+  </dest>
+  <voice>
+    *: "Фајлови"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 2: 60 потеза / 15 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 2: 60 потеза за 15 минута"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "ГНУ Шах"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Food Size"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Величина хране"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Величина хране"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Контрола репродукције"
+  </dest>
+  <voice>
+    *: "Контрола репродукције"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Grayscale"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Сиви тонови"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Сиви тонови"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Краљица"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "хвата"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Промена режима понављања"
+  </dest>
+  <voice>
+    *: "Промена режима понављања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Slideshow Time"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Време слајд шоуа"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Време слајд шоуа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Опције настављања"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Опције настављања"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "New Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Нова игра"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Нова игра"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "View Played Games"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Преглед одиграних игара"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Преглед одиграних игара"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Окружујуће"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Окружујуће"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Помери ставку навише"
+  </dest>
+  <voice>
+    *: "Помери ставку навише"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Уметник]"
+  </dest>
+  <voice>
+    *: "Уметник"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Величина]"
+  </dest>
+  <voice>
+    *: "Величина"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Играј од почетка"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Играј од почетка"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restart Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Поново покрени игру"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Поново покрени игру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Cannot restart playback"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Приказивање не може поново да се покрене"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Приказивање не може поново да се покрене"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Даљинска контрола"
+  </dest>
+  <voice>
+    *: "Даљинска контрола"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Користи уобичајено подешавање"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Користи уобичајено подешавање"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DURATION
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Duration]"
+  </source>
+  <dest>
+    *: "[Трајање]"
+  </dest>
+  <voice>
+    *: "Трајање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Помери ставку наниже"
+  </dest>
+  <voice>
+    *: "Помери ставку наниже"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Ordered"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Поређано"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Поређано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи на врху"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи на врху"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ловац"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Пијун"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Resize Covers"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Промени величину омота"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Промени величину омота"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Заустави репродукцију"
+  </dest>
+  <voice>
+    *: "Заустави репродукцију"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Zoom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Зум"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Зум"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Интерполација"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Интерполација"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Назад"
+  </dest>
+  <voice>
+    *: "Назад"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Датум]"
+  </dest>
+  <voice>
+    *: "Датум"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Loading position"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Учитавање позиције"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Учитавање позиције"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Go to WPS"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Иди на WPS"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Иди на WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "CPU убрзање"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "CPU убрзање"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи на дну"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи на дну"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide album title"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Сакриј наслов албума"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Сакриј наслов албума"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Ограничи FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Ограничи FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No album art found"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Није пронађена ниједна слика албума"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Није пронађена ниједна слика албума"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "Без даљ. контроле"
+  </dest>
+  <voice>
+    *: "Без даљинске контроле"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Замени места каналима"
+  </dest>
+  <voice>
+    *: "Замени места каналима"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Rebuild cache"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Поново изгради кеш"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Поново изгради кеш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Врати на подразумевана подешавања"
+  </dest>
+  <voice>
+    *: "Врати на подразумевана подешавања"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Коњ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Illegal move!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Недозвољен потез!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Недозвољен потез!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADDED_TO_PLAYLIST
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Added to playlist"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Додато у плејлисту"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Додато у плејлисту"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Direct"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Директно"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Директно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: none
+    swcodec: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Недоступно"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Недоступно"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Притисните репродукцију за покретање теста батерије или стоп за отказ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Користи подешавање звука"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Користи подешавање звука"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Име фајла]"
+  </dest>
+  <voice>
+    *: "Име фајла"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Реверберација"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Реверберација"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Сепарација панирања"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Сепарација панирања"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Промени јачину"
+  </dest>
+  <voice>
+    *: "Промени јачину"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 8: 1 потез / 15 минута"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 8: 1 потез за 15 минута"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Очисти сва настављања"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Очисти сва настављања"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Restore Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Врати игру"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Врати игру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Старт мени"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Старт мени"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "No games found !"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Није пронађена ниједна игра!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Није пронађена ниједна игра!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 5: 40 потеза / 60 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 5: 40 потеза за 60 минута"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Раст црва по храни"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Раст црва по храни"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Витез"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Време]"
+  </dest>
+  <voice>
+    *: "Време"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the beginning of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "На почетку игре"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "На почетку игре"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Сингл"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Сингл"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Излаз"
+  </dest>
+  <voice>
+    *: "Излаз"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of Worms"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Број црва"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Број црва"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Маркирано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Display FPS"
+    lcd_bitmap: "Display FPS"
+  </source>
+  <dest>
+    *: none
+    swcodec: "Прикажи FPS"
+    lcd_bitmap: "Прикажи FPS"
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Прикажи FPS"
+    lcd_bitmap: "Прикажи FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Сачувај и изађи"
+  </dest>
+  <voice>
+    *: "Сачувај и изађи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Старт мени ако није завршено"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Старт мени ако није завршено"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "At the end of the game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "На крај игре"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "На крај игре"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 тастерска контрола"
+  </dest>
+  <voice>
+    *: "4 тастерска контрола"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Режим мешања"
+  </dest>
+  <voice>
+    *: "Режим мешања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Поддир]"
+  </dest>
+  <voice>
+    *: "Поддир"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Error writing config"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Грешка при упису конфигурације"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Грешка при упису конфигурације"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Thinking..."
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Мислим..."
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Преклапај слајдшоу режим"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Преклапај слајдшоу режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Save Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Сачувај игру"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Сачувај игру"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 10: 1 потез / 600 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 10: 1 потез за 600 минута"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Number of slides"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Број слајдова"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Број слајдова"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: none
+    swcodec: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Аудио опције"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Аудио опције"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: ""
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: ""
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Уклоњен маркер"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 1: 60 потеза / 5 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 1: 60 потеза за 5 минута"
+</voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Стил контроле"
+  </dest>
+  <voice>
+    *: "Стил контроле"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: none
+    swcodec: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: none
+    swcodec: "Јачина позадинског светла"
+    lowmem: none
+  </dest>
+  <voice>
+    *: none
+    swcodec: "Јачина позадинског светла"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ниво 9: 1 потез / 60 мин"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ниво 9: 1 потез за 60 минута"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Play Wormlet!"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Играј Вормлет!"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Играј Вормлет!!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Select Other Game"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Избор друге игре"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Избор друге игре"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Учитај подразумевану конфигурацију"
+  </dest>
+  <voice>
+    *: "Учитај подразумевану конфигурацију"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Прибављање информација није успело"
+  </dest>
+  <voice>
+    *: "Прибављање информација није успело"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Директоријум за снимање"
+  </dest>
+  <voice>
+    *: none
+    recording: "Директоријум за снимање"
+  </voice>
+</phrase>
