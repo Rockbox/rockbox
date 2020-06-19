@@ -269,6 +269,33 @@ unix {
     INSTALLS += target
 }
 
+unix:!macx {
+    LINUXDEPLOYQTURL = https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+    LINUXDEPLOYURL = https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+
+    appimage_dl.commands = \
+        curl -C- -fLO $$LINUXDEPLOYQTURL -fLO $$LINUXDEPLOYURL ; \
+        chmod +x *.AppImage; \
+        touch appimage_dl
+
+    appimage_prepare.commands = \
+        mkdir -p AppImage/usr/bin; \
+        cp ${TARGET} AppImage/usr/bin
+    appimage_prepare.depends = ${TARGET} appimage_dl
+
+    appimage.commands = \
+        ./linuxdeploy-x86_64.AppImage \
+        --appdir AppImage \
+        --verbosity 2 --plugin qt --output appimage \
+        -e AppImage/usr/bin/${TARGET} \
+        -d $$_PRO_FILE_PWD_/RockboxUtility.desktop \
+        -i $$RBBASE_DIR/docs/logo/rockbox-clef.svg
+    appimage.depends = appimage_prepare
+
+    QMAKE_EXTRA_TARGETS += appimage_dl appimage_prepare appimage
+}
+
+
 # source files are separate.
 include(rbutilqt.pri)
 include(quazip/quazip.pri)
