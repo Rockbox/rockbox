@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
@@ -25,6 +25,7 @@ import sys
 import tempfile
 import os
 import shutil
+import argparse
 
 # extend search path for gitscraper
 sys.path.append(os.path.abspath(os.path.join(
@@ -59,28 +60,19 @@ LANGBASE = "rbutil/rbutilqt/"
 GITPATHS = [LANGBASE]
 
 
-def printhelp():
-    print("Usage:", sys.argv[0], "[options]")
-    print("Print translation statistics suitable for pasting in the wiki.")
-    print("Options:")
-    print("    --pretty: display pretty output instead of wiki-style")
-    print("    --help: show this help")
-
-
 def main():
-    if len(sys.argv) > 1:
-        if sys.argv[1] == '--help':
-            printhelp()
-            sys.exit(0)
-    if len(sys.argv) > 1:
-        if sys.argv[1] == '--pretty':
-            pretty = True
-    else:
-        pretty = False
-    langstat(pretty)
+    parser = argparse.ArgumentParser(
+        description='Print translation statistics for pasting in the wiki.')
+    parser.add_argument('-p', '--pretty', action='store_true',
+                        help='Display pretty output instead of wiki-style')
+
+    args = parser.parse_args()
+
+    langstat(args.pretty)
 
 
 def langstat(pretty=True):
+    '''Get translation stats and print to stdout.'''
     # get gitpaths to temporary folder
     workfolder = tempfile.mkdtemp() + "/"
     repo = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
@@ -91,11 +83,11 @@ def langstat(pretty=True):
 
     projectfolder = workfolder + LANGBASE
     # lupdate translations and drop all obsolete translations
-    subprocess.Popen(["lupdate-qt4", "-no-obsolete", "rbutilqt.pro"],
+    subprocess.Popen(["lupdate", "-no-obsolete", "rbutilqt.pro"],
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                      cwd=projectfolder).communicate()
     # lrelease translations to get status
-    output = subprocess.Popen(["lrelease-qt4", "rbutilqt.pro"],
+    output = subprocess.Popen(["lrelease", "rbutilqt.pro"],
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                               cwd=projectfolder).communicate()
     lines = re.split(r"\n", output[0].decode())
@@ -164,10 +156,10 @@ def langstat(pretty=True):
                 name = '(unknown)'
 
             percent = (finished + unfinished) * 100. / (translations + ignored)
-            bar = "#" * int(percent / 10)
+            progress = "#" * int(percent / 10)
             if (percent % 10) > 5:
-                bar += "+"
-            bar += " " * (10 - len(bar))
+                progress += "+"
+            progress += " " * (10 - len(progress))
             if pretty:
                 fancylang = lang[0] + " " * (5 - len(lang[0]))
             else:
@@ -177,7 +169,7 @@ def langstat(pretty=True):
                        "{:3}%% {} |"
                        % titlemax).format(
                            name, fancylang, translations, finished, unfinished,
-                           ignored, tsdate, int(percent), bar))
+                           ignored, tsdate, int(percent), progress))
             else:
                 if percent > 90:
                     color = r'%GREEN%'
@@ -190,7 +182,7 @@ def langstat(pretty=True):
                 print("| %s | %s | %s | %s | %s | %s | %s | %s %i%% "
                       "%%ENDCOLOR%% %s |" %
                       (name, fancylang, translations, finished, unfinished,
-                          ignored, tsdate, color, percent, bar))
+                       ignored, tsdate, color, percent, progress))
 
     if pretty:
         print(delim)
