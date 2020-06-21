@@ -41,6 +41,7 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
     unsigned long numSampleFrames = 0;
     unsigned long numbytes = 0;
     bool is_aifc = false;
+    char *p=id3->id3v2buf;
 
     if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, &buf[0], 12) < 12) ||
         (memcmp(&buf[0], "FORM", 4) != 0) || (memcmp(&buf[8], "AIF", 3) != 0) ||
@@ -68,7 +69,30 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
                     (char*) &buf[0], size, sizeof(buf));
         }
 
-        if (memcmp(&buf[0], "COMM", 4) == 0)
+
+        if (memcmp(&buf[0], "NAME", 4) == 0)
+        {
+            read_string(fd, p, 512, 20, size);
+            id3->title=p;
+            p+=size;
+        }
+
+        else if (memcmp(&buf[0], "AUTH", 4) == 0)
+        {
+            read_string(fd, p, 512, 20, size);
+            id3->artist=p;
+            p+=size;
+        }
+
+        else if (memcmp(&buf[0], "ANNO", 4) == 0)
+        {
+            read_string(fd, p, 512, 20, size);
+            id3->comment=p;
+            p+=size;
+        }
+
+
+        else if (memcmp(&buf[0], "COMM", 4) == 0)
         {
             if (size > sizeof(buf) || read(fd, &buf[0], size) != (ssize_t)size)
                 return false;
