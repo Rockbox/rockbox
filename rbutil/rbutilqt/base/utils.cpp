@@ -224,7 +224,7 @@ qulonglong Utils::filesystemClusterSize(QString path)
 
 qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 {
-    qlonglong size = 0;
+    qulonglong size = 0;
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) 
     // the usage of statfs() is deprecated by the LSB so use statvfs().
     struct statvfs fs;
