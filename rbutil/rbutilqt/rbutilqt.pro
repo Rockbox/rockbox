@@ -251,7 +251,7 @@ macx {
     INCLUDEPATH += /usr/local/include
 
     # rule for creating a dmg file
-    dmg.commands = hdiutil create -ov -srcfolder rbutilqt.app/ rbutil.dmg
+    dmg.commands = hdiutil create -ov -srcfolder RockboxUtility.app/ RockboxUtility.dmg
     QMAKE_EXTRA_TARGETS += dmg
 }
 
