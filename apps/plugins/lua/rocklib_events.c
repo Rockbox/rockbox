@@ -139,7 +139,6 @@ struct event_data {
     long                *event_stack;
     volatile long       *get_tick;
     struct thread_status status;
-    char                 next_event;
     /* callbacks */
     struct cb_data      *cb[EVENT_CT];
 };
@@ -232,7 +231,7 @@ static void lua_interrupt_set(lua_State *L, int hookmask)
         oldmask = lua_gethookmask(L);
         oldcount = lua_gethookcount(L);
         hook = lua_interrupt_callback;
-        count = 1;
+        count = 10;
     }
     else
     {
@@ -278,7 +277,7 @@ static void rev_timer_isr(void)
         }
     }
     set_evt(ev_flag);
-    if (--ev_data.next_event <= 0 && ev_data.status.event)
+    if (ev_data.status.event)
         lua_interrupt_set(ev_data.L, ENABLE_LUA_HOOK);
 }
 
@@ -342,7 +341,6 @@ skip_callback:
         do
         {
             lua_interrupt_set(ev_data.L, DISABLE_LUA_HOOK);
-            ev_data.next_event = EV_TICKS;
             rb->yield();
         } while (!has_thread_status(THREAD_QUIT) && (is_suspend(THREAD_EVENT_ALL)
                                                 || !ev_data.status.event));
@@ -540,7 +538,6 @@ static void init_event_data(lua_State *L, struct event_data *ev_data)
     ev_data->status.thread = 0;
 
     /*ev_data->event_stack = NULL;*/
-    ev_data->next_event  = EV_TICKS;
     /* callbacks */
     for (unsigned int i= 0; i < EVENT_CT; i++)
         ev_data->cb[i] = NULL;
@@ -587,7 +584,7 @@ static int rockev_register(lua_State *L)
             event_ticks = luaL_optinteger(L, 3, EV_INPUT);
             break;
         case CUSTOMEVENT:
-            event_ticks = luaL_optinteger(L, 3, EV_TIMER_TICKS);
+            event_ticks = luaL_optinteger(L, 3, EV_TICKS);
             ev_flag = 0; /* don't remove suspend */
             break;
         case PLAYBKEVENT: /* see register_playbk_events() for flags */
