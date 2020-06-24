@@ -749,8 +749,9 @@ void setid3v2title(int fd, struct mp3entry *entry)
     if(entry->id3v2len < 10)
         return;
 
-    /* Read the ID3 tag version from the header */
-    lseek(fd, 0, SEEK_SET);
+
+    /* Read the ID3 tag version from the header.
+       Assumes fd is already at the begining of the header */
     if(10 != read(fd, header, 10))
         return;
 
@@ -1183,6 +1184,7 @@ int getid3v2len(int fd)
             offset = unsync(buf[0], buf[1], buf[2], buf[3]) + 10;
 
     logf("ID3V2 Length: 0x%x", offset);
+    lseek(fd, 0, SEEK_SET);
     return offset;
 }
 
