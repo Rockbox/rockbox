@@ -34,14 +34,23 @@
 /* compressionType: AIFC QuickTime IMA ADPCM */
 #define AIFC_FORMAT_QT_IMA_ADPCM "ima4"
 
+static void read_id3_tags(int fd, struct mp3entry* id3)
+{
+    id3->tracknum = 0;
+    id3->discnum  = 0;
+    setid3v2title(fd, id3);
+}
+
 bool get_aiff_metadata(int fd, struct mp3entry* id3)
 {
     unsigned char buf[512];
     unsigned long numChannels = 0;
     unsigned long numSampleFrames = 0;
     unsigned long numbytes = 0;
+    unsigned long offset = 0;
     bool is_aifc = false;
     char *p=id3->id3v2buf;
+
 
     if ((lseek(fd, 0, SEEK_SET) < 0) || (read(fd, &buf[0], 12) < 12) ||
         (memcmp(&buf[0], "FORM", 4) != 0) || (memcmp(&buf[8], "AIF", 3) != 0) ||
@@ -50,6 +59,7 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
         return false;
     }
 
+
     while (read(fd, &buf[0], 8) == 8)
     {
         size_t size = get_long_be(&buf[4]); /* chunkSize */
@@ -57,6 +67,18 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
         if (memcmp(&buf[0], "SSND", 4) == 0)
         {
             numbytes = size - 8;
+
+            /* check for ID3 tag */
+            offset=lseek(fd, 0, SEEK_CUR);
+            lseek(fd, size, SEEK_CUR);
+            if ((read(fd, &buf[0], 8) == 8) &&  (memcmp(&buf[0], "ID3", 3) == 0))
+            {
+                id3->id3v2len = get_long_be(&buf[4]);
+                read_id3_tags(fd, id3);
+            }
+            else
+                DEBUGF("ID3 tag not present immediately after sound data");
+            lseek(fd, offset, SEEK_SET);
             break;  /* assume COMM was already read */
         }
 
@@ -72,23 +94,28 @@ bool get_aiff_metadata(int fd, struct mp3entry* id3)
 
         if (memcmp(&buf[0], "NAME", 4) == 0)
         {
-            read_string(fd, p, 512, 20, size);
+            read_string(fd, p, 512, 0, size);
             id3->title=p;
             p+=size;
         }
 
         else if (memcmp(&buf[0], "AUTH", 4) == 0)
         {
-            read_string(fd, p, 512, 20, size);
+            read_string(fd, p, 512, 0, size);
             id3->artist=p;
             p+=size;
         }
 
         else if (memcmp(&buf[0], "ANNO", 4) == 0)
         {
-            read_string(fd, p, 512, 20, size);
+            read_string(fd, p, 512, 0, size);
             id3->comment=p;
             p+=size;
+        }
+
+        else if (memcmp(&buf[0], "ID3", 3) == 0)
+        {
+            read_id3_tags(fd, id3);
         }
 
 

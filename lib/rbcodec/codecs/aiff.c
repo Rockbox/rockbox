@@ -198,6 +198,10 @@ enum codec_status codec_run(void)
         } else if (is_aifc && (memcmp(buf, "FVER", 4)==0)) {
             /* Format Version Chunk (AIFC only chunk) */
             /* skip this chunk */
+        } else if ( (memcmp(buf, "NAME", 4)==0) || (memcmp(buf, "AUTH", 4)==0) 
+                   ||  (memcmp(buf, "ANNO", 4)==0)) {
+            /* Text chunks containing only metadata */
+            /* skip this chunk */
         } else {
             DEBUGF("unsupported AIFF chunk: '%c%c%c%c', size=%lu\n",
                    buf[0], buf[1], buf[2], buf[3], (unsigned long)size);
