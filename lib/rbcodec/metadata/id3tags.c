@@ -717,6 +717,9 @@ bool setid3v1title(int fd, struct mp3entry *entry)
  *            entry - the entry to set the title in
  *
  * Returns: true if a title was found and created, else false
+ *
+ * Assumes that the offset of file is at the start of the ID3 header.
+ * (if the header is at the begining of the file getid3v2len() will ensure this.)
  */
 void setid3v2title(int fd, struct mp3entry *entry)
 {
@@ -749,8 +752,9 @@ void setid3v2title(int fd, struct mp3entry *entry)
     if(entry->id3v2len < 10)
         return;
 
-    /* Read the ID3 tag version from the header */
-    lseek(fd, 0, SEEK_SET);
+
+    /* Read the ID3 tag version from the header.
+       Assumes fd is already at the begining of the header */
     if(10 != read(fd, header, 10))
         return;
 
@@ -1177,12 +1181,15 @@ int getid3v2len(int fd)
 
     /* Now check what the ID3v2 size field says */
     else
+    {
         if(read(fd, buf, 4) != 4)
             offset = 0;
         else
             offset = unsync(buf[0], buf[1], buf[2], buf[3]) + 10;
+    }
 
     logf("ID3V2 Length: 0x%x", offset);
+    lseek(fd, -10, SEEK_CUR);
     return offset;
 }
 
