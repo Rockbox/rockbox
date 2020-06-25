@@ -11,6 +11,7 @@
 #include <stdbool.h>
 
 #define PI 3.141592653589793238462643383279502884197169399
+#define ROOT2 1.414213562373095048801688724209698078569672
 
 #define lenof(array) ( sizeof(array) / sizeof(*(array)) )
 
@@ -530,7 +531,11 @@ document *document_new(int pw, int ph, float userscale);
 void document_free(document *doc);
 void document_add_puzzle(document *doc, const game *game, game_params *par,
 			 game_state *st, game_state *st2);
-void document_print(document *doc, drawing *dr);
+int document_npages(const document *doc);
+void document_begin(const document *doc, drawing *dr);
+void document_end(const document *doc, drawing *dr);
+void document_print_page(const document *doc, drawing *dr, int page_nr);
+void document_print(const document *doc, drawing *dr);
 
 /*
  * ps.c
