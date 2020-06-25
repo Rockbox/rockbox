@@ -1448,14 +1448,16 @@ const drawing_api rb_drawing = {
 void fatal(const char *fmt, ...)
 {
     va_list ap;
+    char buf[256];
 
     rb->splash(HZ, "FATAL");
 
     va_start(ap, fmt);
-    char buf[80];
-    rb->vsnprintf(buf, 80, fmt, ap);
-    rb->splash(HZ * 2, buf);
+    rb->vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
+
+    LOGF("%s", buf);
+    rb->splash(HZ * 2, buf);
 
     if(rb->thread_self() == thread)
         rb->thread_exit();
