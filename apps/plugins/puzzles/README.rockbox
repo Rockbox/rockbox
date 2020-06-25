@@ -62,4 +62,5 @@ December 2018: Resync to 3ece3d6. Happy holidays!
 
 May 2019: Resync to e2135d5.
 
-June 2020: Resync to 9aa7b7c.
+June 2020: Resync to 9aa7b7c. Fixed really embarrassing bug in loading
+saved games.
