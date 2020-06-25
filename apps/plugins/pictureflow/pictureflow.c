@@ -38,7 +38,11 @@
 
 
 /* Capacity 10 000 entries (for example 10k different albums) */
-#define UNIQBUF_SIZE (64*1024)
+#if PLUGIN_BUFFER_SIZE > 0x10000
+    #define UNIQBUF_SIZE (64*1024)
+#else /*Bugfix -- Several players havent enough Ram to allow such a large buffer */
+    #define UNIQBUF_SIZE (16*1024)
+#endif
 static long uniqbuf[UNIQBUF_SIZE / sizeof(long)];
 
 /******************************* Globals ***********************************/
@@ -2829,7 +2833,7 @@ static void draw_album_text(void)
 
     albumtxt_x = get_scroll_line_offset(PF_SCROLL_ALBUM);
     mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);    
-    set_scroll_line(artisttxt, PF_SCROLL_ARTIST);
+
     if ((show_album_name == ALBUM_AND_ARTIST_TOP)
         || (show_album_name == ALBUM_AND_ARTIST_BOTTOM)){
 
