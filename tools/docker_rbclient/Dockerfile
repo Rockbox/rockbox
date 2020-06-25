@@ -63,4 +63,4 @@ COPY runclient_modified.sh /home/rb/rockbox/runclient.sh
 
 RUN cd /home/rb/rockbox && chmod +x runclient.sh
 
-ENTRYPOINT cd /home/rb/rockbox && ./runclient.sh $USER $PASS $NAME
+CMD cd /home/rb/rockbox && ./runclient.sh $USER $PASS $NAME
