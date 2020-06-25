@@ -87,8 +87,8 @@ do
     mv $f.tmp $f
 done
 
-# generate quick help from gamedesc.txt
-cat src/gamedesc.txt | awk -F ":" '{print "const char quick_help_text[] = \""$5"\";" >> "help/"$1".c" }'
+# generate quick help from all the .R files
+cat src/*.R | awk 'print_next { print_next = 0; print; } /!begin/ && />/ && /gamedesc.txt/ { print_next = 1; }' | awk -F ":" '{print "const char quick_help_text[] = \""$5"\";" >> "help/"$1".c" }'
 
 rm puzzles.txt
 rm compress
