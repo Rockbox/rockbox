@@ -550,11 +550,13 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
 {
     (void) fontsize;
 
+    LOGF("rb_draw_text(%d %d \"%s\" size=%d)", x, y, text, fontsize);
+
     rb_color(color);
     rb_setfont(fonttype, fontsize); /* size will be clamped if too large */
 
     int w, h;
-    rb->lcd_getstringsize(text, &w, &h);
+    rb->font_getstringsize(text, &w, &h, cur_font);
 
     if(align & ALIGN_VNORMAL)
         y -= h;
@@ -566,10 +568,10 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
     else if(align & ALIGN_HRIGHT)
         x -= w;
 
+    LOGF("calculated origin: (%d, %d) size: (%d, %d)", x, y, w, h);
+
     if(!zoom_enabled)
     {
-        LOGF("rb_draw_text(%d %d %s)", x, y, text);
-
         offset_coords(&x, &y);
 
         rb->lcd_set_drawmode(DRMODE_FG);
