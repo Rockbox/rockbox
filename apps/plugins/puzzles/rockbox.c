@@ -2973,6 +2973,8 @@ static const char *init_for_game(const game *gm, int load_fd)
             return ret;
     }
 
+    fix_size();
+
     tune_input(gm->name);
 
     mouse_x = LCD_WIDTH / 2;
