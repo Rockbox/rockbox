@@ -1307,7 +1307,8 @@ static void rb_start_draw(void *handle)
 static void rb_end_draw(void *handle)
 {
     (void) handle;
-    /* we ignore the backend's redraw requests and just unconditionally update everything */
+    /* we ignore the backend's redraw requests and just
+     * unconditionally update everything */
 #if 0
     if(!zoom_enabled)
     {
@@ -1543,7 +1544,12 @@ static int choose_key(void)
         if(timer_on)
             timer_cb();
         midend_process_key(me, 0, 0, game_keys[sel].button);
-        midend_redraw(me);
+        midend_force_redraw(me);
+
+        if(zoom_enabled)
+            rb->lcd_bitmap_part(zoom_fb, zoom_x, zoom_y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
+                                0, 0, LCD_WIDTH, LCD_HEIGHT);
+
         rb->lcd_update();
         rb->yield();
 
