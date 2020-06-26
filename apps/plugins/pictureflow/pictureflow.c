@@ -24,7 +24,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include <albumart.h>
+#include "albumart.h"
 #include "lib/read_image.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_exit.h"
@@ -34,16 +34,9 @@
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
 
-
-
-
-/* Capacity 10 000 entries (for example 10k different albums) */
-#if PLUGIN_BUFFER_SIZE > 0x10000
-    #define UNIQBUF_SIZE (64*1024)
-#else /*Bugfix -- Several players havent enough Ram to allow such a large buffer */
-    #define UNIQBUF_SIZE (16*1024)
+#ifndef ALIGN_DOWN
+    #define ALIGN_DOWN(n, a)     ((typeof(n))((uintptr_t)(n)/(a)*(a)))
 #endif
-static long uniqbuf[UNIQBUF_SIZE / sizeof(long)];
 
 /******************************* Globals ***********************************/
 
@@ -248,6 +241,7 @@ typedef fb_data pix_t;
 
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 #define CACHE_PREFIX PLUGIN_DEMOS_DATA_DIR "/pictureflow"
+#define ALBUM_INDEX CACHE_PREFIX "/PF_album_idx.tmp"
 
 #define EV_EXIT 9999
 #define EV_WAKEUP 1337
@@ -457,6 +451,8 @@ void reset_track_list(void);
 
 void * buf;
 size_t buf_size;
+void * uniqbuf;
+size_t uniqbuf_size;
 
 static bool thread_is_running;
 
@@ -904,8 +900,8 @@ static int create_album_index(void)
         artist_seek = artist[j].seek;
         rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
         rb->tagcache_search(&tcs, tag_album);
-            /* Prevent duplicate entries in the search list. */
-        rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
+        /* Prevent duplicate entries in the search list. */
+        rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, uniqbuf_size);
         rb->tagcache_search_add_filter(&tcs, tag_albumartist, artist_seek);
         while (rb->tagcache_get_next(&tcs))
         {
@@ -941,8 +937,7 @@ static int create_album_index(void)
  next time PictureFlow is launched*/
 
 static int save_album_index(void){
-    int fd;
-    fd = rb->creat(PLUGIN_DIR "/demos/album_ndx.tmp",0666);
+    int fd = rb->creat(ALBUM_INDEX,0666);
     if(fd >= 0)
     {
         int unsigned_size = sizeof(unsigned int);
@@ -965,7 +960,7 @@ static int save_album_index(void){
 /*Loads the artists+albums index information stored in the hard drive*/
 
 static int load_album_index(void){
-    int fr = rb->open(PLUGIN_DIR "/demos/album_ndx.tmp", O_RDONLY);
+    int fr = rb->open(ALBUM_INDEX, O_RDONLY);
     if (fr >= 0){
         int unsigned_size = sizeof(unsigned int);
         int int_size = sizeof(int);
@@ -1041,7 +1036,8 @@ static int get_wps_current_index(void)
         for( i=0; i < album_count; i++ )
         {
             if(!rb->strcmp(album_names + album[i].name_idx, id3->album) &&
-                !rb->strcmp(artist_names + artist[album[i].artist_idx].name_idx, id3->albumartist))
+                !rb->strcmp(artist_names + artist[album[i].artist_idx].name_idx,
+                            id3->albumartist))
                 return i;
         }
     }
@@ -1071,7 +1067,9 @@ static void create_track_index(const int slide_index)
         goto fail;
 
     rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
-    rb->tagcache_search_add_filter(&tcs, tag_albumartist, artist[album[slide_index].artist_idx].seek);
+    rb->tagcache_search_add_filter(&tcs, tag_albumartist,
+        artist[album[slide_index].artist_idx].seek);
+
     track_count=0;
     int string_index = 0, track_num;
     int disc_num;
@@ -1187,7 +1185,8 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
     bool result;
     /* find the first track of the album */
     rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
-    rb->tagcache_search_add_filter(&tcs, tag_albumartist, artist[album[slide_index].artist_idx].seek);
+    rb->tagcache_search_add_filter(&tcs, tag_albumartist,
+                                   artist[album[slide_index].artist_idx].seek);
 
     if ( rb->tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
@@ -3175,6 +3174,11 @@ enum plugin_status plugin_start(const void *parameter)
     }
 #endif
 #endif
+    /* create unique entry buffer with 1/4 of the plugin buffer */
+    uniqbuf = buf;
+    uniqbuf_size = ALIGN_DOWN(buf_size / 4, 0x8);
+    buf += uniqbuf_size;
+    buf_size -= uniqbuf_size;
 
 #ifdef USEGSLIB
     long grey_buf_used;
