@@ -24,7 +24,7 @@
 ****************************************************************************/
 
 #include "plugin.h"
-#include <albumart.h>
+#include "albumart.h"
 #include "lib/read_image.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_exit.h"
@@ -34,21 +34,10 @@
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
 
-
-
-/* Capacity 10 000 entries (for example 10k different albums) */
-#if PLUGIN_BUFFER_SIZE > 0x10000
-    #define UNIQBUF_SIZE (64*1024)
-#else
-    #if PLUGIN_BUFFER_SIZE > 0x8000
-        /*Bugfix -- Several players havent enough Ram to allow such a large buffer */
-        #define UNIQBUF_SIZE (16*1024)
-    #else
-        #define UNIQBUF_SIZE 0
-    #endif
+#ifndef ALIGN_DOWN
+    #define ALIGN_DOWN(n, a)     ((typeof(n))((uintptr_t)(n)/(a)*(a)))
 #endif
-static long uniqbuf[UNIQBUF_SIZE / sizeof(long)];
-
+    
 /******************************* Globals ***********************************/
 
 /*
@@ -461,6 +450,8 @@ void reset_track_list(void);
 
 void * buf;
 size_t buf_size;
+void * uniqbuf;
+size_t uniqbuf_size;
 
 static bool thread_is_running;
 
@@ -908,12 +899,10 @@ static int create_album_index(void)
         artist_seek = artist[j].seek;
         rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
         rb->tagcache_search(&tcs, tag_album);
-#if UNIQBUF_SIZE > 0
+
         /* Prevent duplicate entries in the search list. */
-        rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, UNIQBUF_SIZE);
-#else
-    (void) uniqbuf;
-#endif
+        rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, uniqbuf_size);
+
         rb->tagcache_search_add_filter(&tcs, tag_albumartist, artist_seek);
         while (rb->tagcache_get_next(&tcs))
         {
@@ -950,7 +939,8 @@ static int create_album_index(void)
 
 static int save_album_index(void){
     int fd;
-    fd = rb->creat(CACHE_PREFIX PLUGIN_DEMOS_DATA_DIR "/album_ndx.tmp",0666);
+
+    fd = rb->creat(CACHE_PREFIX "/album_ndx.tmp",0666);
     if(fd >= 0)
     {
         int unsigned_size = sizeof(unsigned int);
@@ -973,7 +963,7 @@ static int save_album_index(void){
 /*Loads the artists+albums index information stored in the hard drive*/
 
 static int load_album_index(void){
-    int fr = rb->open(CACHE_PREFIX PLUGIN_DEMOS_DATA_DIR "/album_ndx.tmp", O_RDONLY);
+    int fr = rb->open(CACHE_PREFIX "/album_ndx.tmp", O_RDONLY);
     if (fr >= 0){
         int unsigned_size = sizeof(unsigned int);
         int int_size = sizeof(int);
@@ -3187,6 +3177,11 @@ enum plugin_status plugin_start(const void *parameter)
     }
 #endif
 #endif
+    /* create unique entry buffer with 1/3 of the plugin buffer */
+    uniqbuf = buf;
+    uniqbuf_size = ALIGN_DOWN(buf_size / 3, 0x8);
+    buf += uniqbuf_size;
+    buf_size -= uniqbuf_size;
 
 #ifdef USEGSLIB
     long grey_buf_used;
