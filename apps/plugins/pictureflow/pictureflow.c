@@ -218,7 +218,6 @@ typedef fb_data pix_t;
 #define PFREAL_ONE (1 << PFREAL_SHIFT)
 #define PFREAL_HALF (PFREAL_ONE >> 1)
 
-
 #define IANGLE_MAX 1024
 #define IANGLE_MASK 1023
 
@@ -1134,7 +1133,9 @@ retry:
                 avail += out;
                 borrowed += out;
 
-                struct track_data *new_tracks = (struct track_data *)(out + (uintptr_t)tracks);
+                struct track_data *new_tracks =
+                                 (struct track_data *)(out + (uintptr_t)tracks);
+
                 unsigned int bytes = track_count * sizeof(struct track_data);
                 if (track_count)
                     rb->memmove(new_tracks, tracks, bytes);
@@ -1304,7 +1305,7 @@ static void draw_progressbar(int step)
     rb->yield();
 }
 
-/* Calculate modified FNV hash of string 
+/* Calculate modified FNV hash of string
  * has good avalanche behaviour and uniform distribution
  * see http://home.comcast.net/~bretm/hash/ */
 static unsigned int mfnv(char *str)
@@ -1312,7 +1313,7 @@ static unsigned int mfnv(char *str)
     const unsigned int p = 16777619;
     unsigned int hash = 0x811C9DC5; // 2166136261;
 
-    while(*str) 
+    while(*str)
         hash = (hash ^ *str++) * p;
     hash += hash << 13;
     hash ^= hash >> 7;
@@ -2523,7 +2524,7 @@ static int main_menu(void)
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
-            case PF_MENU_CLEAR_PLAYLIST: 
+            case PF_MENU_CLEAR_PLAYLIST:
                 if(rb->playlist_remove_all_tracks(NULL) == 0) {
                     rb->playlist_create(NULL, NULL);
                     rb->splash(HZ*2, ID2P(LANG_PLAYLIST_CLEARED));
@@ -2831,7 +2832,7 @@ static void draw_album_text(void)
     }
 
     albumtxt_x = get_scroll_line_offset(PF_SCROLL_ALBUM);
-    mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);    
+    mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);
 
     if ((show_album_name == ALBUM_AND_ARTIST_TOP)
         || (show_album_name == ALBUM_AND_ARTIST_BOTTOM)){
@@ -2871,7 +2872,7 @@ static int pictureflow_main(void)
         }
     }
 
-    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION); 
+    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     if(auto_wps == 0)
         draw_splashscreen();
     if(backlight_mode == 0) {
