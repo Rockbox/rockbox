@@ -387,6 +387,10 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAS_BUTTON_HOLD
     button_hold,
 #endif
+#ifdef HAVE_SW_POWEROFF
+    button_set_sw_poweroff_state,
+    button_get_sw_poweroff_state,
+#endif
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode,
     touchscreen_get_mode,

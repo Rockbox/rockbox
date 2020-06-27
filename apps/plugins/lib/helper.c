@@ -66,6 +66,21 @@ void backlight_use_settings(void)
 #endif /* CONFIG_CHARGING */
 }
 
+#ifdef HAVE_SW_POWEROFF
+static bool original_sw_poweroff_state = true;
+
+void sw_poweroff_disable(void)
+{
+    original_sw_poweroff_state = rb->button_get_sw_poweroff_state();
+    rb->button_set_sw_poweroff_state(false);
+}
+
+void sw_poweroff_restore(void)
+{
+    rb->button_set_sw_poweroff_state(original_sw_poweroff_state);
+}
+#endif
+
 #ifdef HAVE_REMOTE_LCD
 /*  Force the backlight on */
 void remote_backlight_force_on(void)
