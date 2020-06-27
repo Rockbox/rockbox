@@ -167,6 +167,9 @@ static struct {
     bool timerflash, clipoff, shortcuts, no_aa, polyanim;
 } debug_settings;
 
+// used in menu titles - make sure to initialize!
+static char menu_desc[32];
+
 /* These are re-implementations of many rockbox drawing functions, adapted to
  * draw into a custom framebuffer (used for the zoom feature). */
 static void zoom_drawpixel(int x, int y)
@@ -2717,9 +2720,7 @@ static void new_game_notify(void)
 
 static int pause_menu(void)
 {
-#define static auto
-#define const
-    MENUITEM_STRINGLIST(menu, NULL, pausemenu_cb,
+    MENUITEM_STRINGLIST(menu, menu_desc, pausemenu_cb,
                         "Resume Game",         // 0
                         "New Game",            // 1
                         "Restart Game",        // 2
@@ -2735,12 +2736,6 @@ static int pause_menu(void)
                         "Configure Game",      // 12
                         "Quit without Saving", // 13
                         "Quit");               // 14
-#undef static
-#undef const
-    /* HACK ALERT */
-    char title[32] = { 0 };
-    rb->snprintf(title, sizeof(title), "%s Menu", midend_which_game(me)->name);
-    menu__.desc = title;
 
 #if defined(FOR_REAL) && defined(DEBUG_MENU)
     help_times = 0;
@@ -3289,6 +3284,9 @@ static void puzzles_main(void)
         init_for_game(&thegame, -1);
     }
 
+    /* must be done before any menu needs to be displayed */
+    rb->snprintf(menu_desc, sizeof(menu_desc), "%s Menu", midend_which_game(me)->name);
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* about to go to menu or button block */
     rb->cpu_boost(false);
@@ -3298,9 +3296,7 @@ static void puzzles_main(void)
     help_times = 0;
 #endif
 
-#define static auto
-#define const
-    MENUITEM_STRINGLIST(menu, NULL, mainmenu_cb,
+    MENUITEM_STRINGLIST(menu, menu_desc, mainmenu_cb,
                         "Resume Game",         // 0
                         "New Game",            // 1
                         "Quick Help",          // 2
@@ -3310,13 +3306,6 @@ static void puzzles_main(void)
                         "Configure Game",      // 6
                         "Quit without Saving", // 7
                         "Quit");               // 8
-#undef static
-#undef const
-
-    /* HACK ALERT */
-    char title[32] = { 0 };
-    rb->snprintf(title, sizeof(title), "%s Menu", midend_which_game(me)->name);
-    menu__.desc = title;
 
     bool quit = false;
     int sel = 0;
