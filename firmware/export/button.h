@@ -130,4 +130,9 @@ int touchscreen_last_touch(void);
 void button_enable_touch(bool en);
 #endif
 
+#ifdef HAVE_SW_POWEROFF
+void button_set_sw_poweroff_state(bool en);
+bool button_get_sw_poweroff_state(void);
+#endif
+
 #endif /* _BUTTON_H_ */

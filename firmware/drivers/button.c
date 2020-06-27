@@ -65,6 +65,9 @@ static bool phones_present = false;
 #ifdef HAVE_LINEOUT_DETECTION
 static bool lineout_present = false;
 #endif
+#ifdef HAVE_SW_POWEROFF
+static bool enable_sw_poweroff = true;
+#endif
 
 /* how long until repeat kicks in, in centiseconds */
 #define REPEAT_START      (30*HZ/100)
@@ -280,7 +283,8 @@ static void button_tick(void)
                            which doesn't shut down easily with the OFF
                            key */
 #ifdef HAVE_SW_POWEROFF
-                        if ((btn & POWEROFF_BUTTON
+                        if (enable_sw_poweroff &&
+                            (btn & POWEROFF_BUTTON
 #ifdef RC_POWEROFF_BUTTON
                                     || btn == RC_POWEROFF_BUTTON
 #endif
@@ -771,5 +775,15 @@ void button_enable_touch(bool en)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_enable(en);
 #endif
+}
+#endif
+
+#ifdef HAVE_SW_POWEROFF
+void button_set_sw_poweroff_state(bool en) {
+    enable_sw_poweroff = en;
+}
+
+bool button_get_sw_poweroff_state() {
+    return enable_sw_poweroff;
 }
 #endif

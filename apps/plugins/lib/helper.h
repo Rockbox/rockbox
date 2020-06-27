@@ -29,6 +29,16 @@
 void backlight_force_on(void);
 void backlight_ignore_timeout(void);
 void backlight_use_settings(void);
+
+#ifdef HAVE_SW_POWEROFF
+/**
+ * Disable and restore software poweroff (i.e. holding PLAY on iPods).
+ * Only call _restore() if _disable() was called earlier!
+ */
+void sw_poweroff_disable(void);
+void sw_poweroff_restore(void);
+#endif
+
 #ifdef HAVE_REMOTE_LCD
 void remote_backlight_force_on(void);
 void remote_backlight_ignore_timeout(void);
