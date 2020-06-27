@@ -2909,12 +2909,15 @@ static void tune_input(const char *name)
 {
     static const char *want_spacebar[] = {
         "Magnets",
+        "Map",
         "Mines",
         "Palisade",
+        "Rectangles",
         NULL
     };
 
-    /* these get a spacebar on long click */
+    /* these get a spacebar on long click - you must also add to the
+     * falling_edge list below! */
     input_settings.want_spacebar = string_in_list(name, want_spacebar);
 
     static const char *falling_edge[] = {
@@ -2923,20 +2926,25 @@ static void tune_input(const char *name)
         "Map",
         "Mines",
         "Palisade",
+        "Rectangles",
         NULL
     };
 
     /* wait until a key is released to send an action */
     input_settings.falling_edge = string_in_list(name, falling_edge);
 
+    /* For want_spacebar to work, events must be sent on the falling
+     * edge */
+    assert(!(input_settings.want_spacebar && !input_settings.falling_edge));
+
     /* ignore repeated keypresses in all games but untangle (mouse
      * mode overrides this no matter what) */
-    static const char *ignore_repeats[] = {
+    static const char *allow_repeats[] = {
         "Untangle",
         NULL
     };
 
-    input_settings.ignore_repeats = !string_in_list(name, ignore_repeats);
+    input_settings.ignore_repeats = !string_in_list(name, allow_repeats);
 
     /* set to false if you want dragging to be possible */
     static const char *rclick_on_hold[] = {
