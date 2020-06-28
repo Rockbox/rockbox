@@ -18,11 +18,11 @@
 % Contributors are listed in the file docs/CREDITS-MANUAL
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\ifpdfoutput{
+\Ifpdfoutput{
 \newcommand{\latexbuild}{pdf\LaTeX}}
 {\newcommand{\latexbuild}{\TeX4ht}}
 
-\ifpdfoutput{\chapter*{\centering{Rockbox\\}}}%
+\Ifpdfoutput{\chapter*{\centering{Rockbox\\}}}%
 {\begin{center}{\Large{Rockbox}}\end{center}}
 
 \vspace{1cm}

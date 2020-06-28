@@ -4,7 +4,7 @@
 % define a local version of endhead, as using the output distinction adds
 % an unwanted newline. endhead breaks with htlatex so we need to remove it
 % for the html output.
-\ifpdfoutput{\newcommand{\localendhead}{\endhead}}%
+\Ifpdfoutput{\newcommand{\localendhead}{\endhead}}%
     {\newcommand{\localendhead}{}}
   \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \begin{longtable}{>{\raggedright}p{.3\textwidth}>{\raggedright}p{.4\textwidth}p{.2\textwidth}}
