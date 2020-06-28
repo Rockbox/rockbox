@@ -58,6 +58,7 @@
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 #define PF_TRACKLIST (LAST_ACTION_PLACEHOLDER + 2)
 
+
 #if defined(HAVE_SCROLLWHEEL) || CONFIG_KEYPAD == IRIVER_H10_PAD || \
     CONFIG_KEYPAD == MPIO_HD300_PAD
 #define USE_CORE_PREVNEXT
@@ -236,7 +237,7 @@ typedef fb_data pix_t;
 
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 #define CACHE_PREFIX PLUGIN_DEMOS_DATA_DIR "/pictureflow"
-#define ALBUM_INDEX CACHE_PREFIX "/PF_album_idx.tmp"
+#define ALBUM_INDEX CACHE_PREFIX "/pictureflow_album.idx"
 
 #define EV_EXIT 9999
 #define EV_WAKEUP 1337
@@ -250,16 +251,40 @@ typedef fb_data pix_t;
 #define CACHE_UPDATE    1
 
 /* Error return values */
+#define SUCCESS              0
 #define ERROR_NO_ALBUMS     -1
 #define ERROR_BUFFER_FULL   -2
 #define ERROR_NO_ARTISTS    -3
+#define ERROR_USER_ABORT    -4
 
 /* current version for cover cache */
 #define CACHE_VERSION 3
 #define CONFIG_VERSION 1
 #define CONFIG_FILE "pictureflow.cfg"
+#define INDEX_HDR "PFID"
 
 /** structs we use */
+struct pf_index_t {
+    uint32_t            header; /*INDEX_HDR*/
+    uint16_t            artist_ct;
+    uint16_t            album_ct;
+
+    char               *artist_names;
+    struct artist_data *artist_index;
+    size_t              artist_len;
+
+    unsigned int        album_untagged_idx;
+    char               *album_names;
+    struct album_data  *album_index;
+    size_t              album_len;
+    long                album_untagged_seek;
+
+    void * buf;
+    size_t buf_sz;
+    void * uniqbuf;
+    size_t uniqbuf_sz;
+
+};
 
 struct slide_data {
     int slide_index;
@@ -279,6 +304,7 @@ struct slide_cache {
 struct album_data {
     int name_idx;
     int artist_idx;
+    long artist_seek;
     long seek;
 };
 
@@ -426,14 +452,7 @@ static struct tagcache_search tcs;
 
 static struct buflib_context buf_ctx;
 
-static struct album_data *album;
-static struct artist_data *artist;
-
-static char *album_names;
-static int album_count;
-
-static char *artist_names;
-static int artist_count;
+static struct pf_index_t pf_idx;
 
 static struct track_data *tracks;
 static char *track_names;
@@ -443,11 +462,6 @@ static int track_index;
 static int selected_track;
 static int selected_track_pulse;
 void reset_track_list(void);
-
-void * buf;
-size_t buf_size;
-void * uniqbuf;
-size_t uniqbuf_size;
 
 static bool thread_is_running;
 
@@ -464,6 +478,8 @@ static int track_list_visible_entries = 0;
 static int track_list_y;
 static int track_list_h;
 
+
+enum ePFS{ePFS_ARTIST = 0, ePFS_ALBUM};
 /*
     Proposals for transitions:
 
@@ -494,6 +510,8 @@ static int pf_state;
 static bool free_slide_prio(int prio);
 bool load_new_slide(void);
 int load_surface(int);
+static void draw_progressbar(int step, int count, char *msg);
+static void draw_splashscreen(unsigned char * buf_tmp, size_t buf_tmp_size);
 
 static inline PFreal fmul(PFreal a, PFreal b)
 {
@@ -849,82 +867,341 @@ static void init_reflect_table(void)
             (5 * REFLECT_HEIGHT);
 }
 
+static void write_album_index(int idx, int name_idx, long album_seek, int artist_idx, long artist_seek)
+{
+    pf_idx.album_index[idx].name_idx = name_idx;
+    pf_idx.album_index[idx].seek = album_seek;
+    pf_idx.album_index[idx].artist_idx = artist_idx;
+    pf_idx.album_index[idx].artist_seek = artist_seek;
+}
+
+static int compare_album_artists (const void *a_v, const void *b_v)
+{
+    uint32_t a = ((struct album_data *)a_v)->artist_idx;
+    uint32_t b = ((struct album_data *)b_v)->artist_idx;
+    return (int)(a - b);
+}
+
+static void write_artist_entry(struct tagcache_search *tcs, int name_idx, unsigned int len)
+{
+    pf_idx.artist_index[-pf_idx.artist_ct].name_idx = name_idx;
+    pf_idx.artist_index[-pf_idx.artist_ct].seek = tcs->result_seek;
+    pf_idx.artist_len += len;
+    pf_idx.artist_ct++;
+}
+
+static void write_album_entry(struct tagcache_search *tcs, int name_idx, unsigned int len)
+{
+    write_album_index(-pf_idx.album_ct, name_idx, tcs->result_seek, 0, -1);
+    pf_idx.album_len += len;
+    pf_idx.album_ct++;
+
+    if (pf_idx.album_untagged_seek == -1 && rb->strcmp(UNTAGGED, tcs->result) == 0)
+    {
+        pf_idx.album_untagged_idx = name_idx;
+        pf_idx.album_untagged_seek = tcs->result_seek;
+    }
+}
+
+/* adds tagcache_search results into artist/album index */
+static int get_tcs_search_res(int type, struct tagcache_search *tcs, void **buf, size_t *bufsz)
+{
+    unsigned int l, name_idx = 0;
+    void (*writefn)(struct tagcache_search *, int, unsigned int);
+    int data_size;
+    if (type == ePFS_ARTIST)
+    {
+        writefn = &write_artist_entry;
+        data_size = sizeof(struct artist_data);
+    }
+    else
+    {
+        writefn = &write_album_entry;
+        data_size = sizeof(struct album_data);
+    }
+
+    while (rb->tagcache_get_next(tcs))
+    {
+        if (rb->button_get(false) > BUTTON_NONE)
+            return ERROR_USER_ABORT;
+
+        *bufsz -= data_size;
+
+        l = tcs->result_len;
+
+        if ( l > *bufsz )
+            /* not enough memory */
+            return ERROR_BUFFER_FULL;
+
+        rb->strcpy(*buf, tcs->result);
+
+        *bufsz -= l;
+        *buf = l + (char *)*buf;
+
+        writefn(tcs, name_idx, l);
+
+        name_idx += l;
+    }
+    rb->tagcache_search_finish(tcs);
+    return SUCCESS;
+}
+
+/*adds <untagged> albums/artist to existing album index */
+static int create_album_untagged(struct tagcache_search *tcs, void **buf, size_t *bufsz)
+{
+    int album_count = pf_idx.album_ct; /* store existing count */
+    int total_count = pf_idx.album_ct + pf_idx.artist_ct;
+    long seek;
+    int last, final, retry;
+    int i, j;
+    draw_splashscreen(*buf, *bufsz);
+    draw_progressbar(0, total_count, "Searching " UNTAGGED);
+
+    /* search tagcache for all <untagged> albums & save the albumartist seek pos */
+    if (rb->tagcache_search(tcs, tag_albumartist))
+    {
+        //rb->tagcache_search_set_uniqbuf(tcs, pf_idx.uniqbuf, pf_idx.uniqbuf_sz);
+        rb->tagcache_search_add_filter(tcs, tag_album, pf_idx.album_untagged_seek);
+
+        while (rb->tagcache_get_next(tcs))
+        {
+            if (rb->button_get(false) > BUTTON_NONE) { return ERROR_USER_ABORT; }
+
+            if (pf_idx.album_index[-(pf_idx.album_ct - 1)].artist_seek == tcs->result_seek)
+                continue;
+
+            if ( sizeof(struct album_data) > *bufsz )
+            /* not enough memory */
+                return ERROR_BUFFER_FULL;
+
+            *bufsz -= sizeof(struct album_data);
+            write_album_index(-pf_idx.album_ct, pf_idx.album_untagged_idx,
+                               pf_idx.album_untagged_seek, -1, tcs->result_seek);
+
+            pf_idx.album_ct++;
+            draw_progressbar(pf_idx.album_ct, total_count, NULL);
+        }
+
+        draw_splashscreen(*buf, *bufsz);
+        draw_progressbar(0, pf_idx.album_ct, "Finalizing " UNTAGGED);
+
+        last = 0;
+        final = pf_idx.album_ct;
+        retry = 0;
+
+        /* map the artist_seek position to the artist name index */
+        for (j = album_count; j < pf_idx.album_ct; j++)
+        {
+            if (rb->button_get(false) > BUTTON_NONE) { return ERROR_USER_ABORT; }
+
+            draw_progressbar(j, pf_idx.album_ct, NULL);
+            seek = pf_idx.album_index[-j].artist_seek;
+
+retry_artist_lookup:
+            retry++;
+            for (i = last; i < final; i++)
+            {
+                if (seek == pf_idx.artist_index[i].seek)
+                {
+                    pf_idx.album_index[-j].artist_idx = i;
+                    last = i; /* last match, start here next loop */
+                    final = pf_idx.album_ct;
+                    retry = 0;
+                    break;
+                }
+            }
+            if (retry > 0 && retry < 2)
+            {
+                /* no match start back at beginning */
+                final = last;
+                last = 0;
+                goto retry_artist_lookup;
+            }
+        }
+
+    }
+
+    return SUCCESS;
+}
+
 /**
   Create an index of all artists and albums from the database.
   Also store the artists and album names so we can access them later.
  */
 static int create_album_index(void)
 {
-    artist = ((struct artist_data *)(buf_size + (char *) buf)) - 1;
-    rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
-    artist_count = 0;
-    rb->tagcache_search(&tcs, tag_albumartist);
-    unsigned int l, name_idx = 0;
-    artist_names = buf;
-    while (rb->tagcache_get_next(&tcs))
-    {
-        buf_size -= sizeof(struct artist_data);
-        l = tcs.result_len;
-        artist[-artist_count].name_idx = name_idx;
-        artist[-artist_count].seek = tcs.result_seek;
-        if ( l > buf_size )
-            /* not enough memory */
-            return ERROR_BUFFER_FULL;
-        rb->strcpy(buf, tcs.result);
-        buf_size -= l;
-        buf = l + (char *)buf;
-        name_idx += l;
-        artist_count++;
-    }
-    rb->tagcache_search_finish(&tcs);
+    void *buf = pf_idx.buf;
+    size_t buf_size = pf_idx.buf_sz;
+
+    int last, final, retry, res;
+    draw_splashscreen(buf, buf_size);
     ALIGN_BUFFER(buf, buf_size, 4);
+/* Artists */
+    /* artist index starts at end of buf it will be rearranged when finalized */
+    pf_idx.artist_index = ((struct artist_data *)(buf_size + (char *) buf)) - 1;
+    pf_idx.artist_ct = 0;
+    pf_idx.artist_len = 0;
+    /* artist names starts at beginning of buf */
+    pf_idx.artist_names = buf;
+
+    rb->tagcache_search(&tcs, tag_albumartist);
+    res = get_tcs_search_res(ePFS_ARTIST, &tcs, &buf, &buf_size);
+    rb->tagcache_search_finish(&tcs);
+    if (res < SUCCESS)
+        return res;
+
+    ALIGN_BUFFER(buf, buf_size, 4);
+
+    /* finalize the artist index */
     int i;
     struct artist_data* tmp_artist = (struct artist_data*)buf;
-    for (i = artist_count - 1; i >= 0; i--)
-        tmp_artist[i] = artist[-i];
-    artist = tmp_artist;
-    buf = artist + artist_count;
+    for (i = pf_idx.artist_ct - 1; i >= 0; i--)
+        tmp_artist[i] = pf_idx.artist_index[-i];
 
-    long artist_seek = 0;
+    pf_idx.artist_index = tmp_artist;
+    /* move buf ptr to end of artist_index */
+    buf = pf_idx.artist_index + pf_idx.artist_ct;
+    ALIGN_BUFFER(buf, buf_size, 4);
+
+/* Albums */
     int j = 0;
-    album_count = 0;
-    name_idx = 0;
-    album = ((struct album_data *)(buf_size + (char *) buf)) - 1;
-    album_names = buf;
-    for (j = 0; j < artist_count; j++){
-        artist_seek = artist[j].seek;
-        rb->memset(&tcs, 0, sizeof(struct tagcache_search) );
-        rb->tagcache_search(&tcs, tag_album);
-        /* Prevent duplicate entries in the search list. */
-        rb->tagcache_search_set_uniqbuf(&tcs, uniqbuf, uniqbuf_size);
-        rb->tagcache_search_add_filter(&tcs, tag_albumartist, artist_seek);
-        while (rb->tagcache_get_next(&tcs))
-        {
-            buf_size -= sizeof(struct album_data);
-            l = tcs.result_len;
-            album[-album_count].name_idx = name_idx;
-            album[-album_count].seek = tcs.result_seek;
-            album[-album_count].artist_idx = j;
-            if ( l > buf_size )
-                /* not enough memory */
-                return ERROR_BUFFER_FULL;
 
-            rb->strcpy(buf, tcs.result);
-            buf_size -= l;
-            buf = l + (char *)buf;
-            name_idx += l;
-            album_count++;
+    pf_idx.album_ct = 0;
+    pf_idx.album_len =0;
+    pf_idx.album_untagged_idx = 0;
+    pf_idx.album_untagged_seek = -1;
+
+    /* album_index starts at end of buf it will be rearranged when finalized */
+    pf_idx.album_index = ((struct album_data *)(buf_size + (char *)buf)) - 1;
+    /* album_names starts at the beginning of buf */
+    pf_idx.album_names = buf;
+
+    rb->tagcache_search(&tcs, tag_album);
+    res = get_tcs_search_res(ePFS_ALBUM, &tcs, &buf, &buf_size);
+    rb->tagcache_search_finish(&tcs);
+    if (res < SUCCESS)
+        return res;
+    ALIGN_BUFFER(buf, buf_size, 4);
+
+    /* Build artist list for untagged albums */
+    res = create_album_untagged(&tcs, &buf, &buf_size);
+
+    if (res < SUCCESS)
+        return res;
+
+    ALIGN_BUFFER(buf, buf_size, 4);
+
+    /* finalize the album index */
+    struct album_data* tmp_album = (struct album_data*)buf;
+    for (i = pf_idx.album_ct - 1; i >= 0; i--)
+        tmp_album[i] = pf_idx.album_index[-i];
+
+    pf_idx.album_index = tmp_album;
+    /* move buf ptr to end of album_index */
+    buf = pf_idx.album_index + pf_idx.album_ct;
+    ALIGN_BUFFER(buf, buf_size, 4);
+
+/* Assign indices */
+    draw_splashscreen(buf, buf_size);
+    draw_progressbar(0, pf_idx.album_ct, "Assigning Albums");
+    for (j = 0; j < pf_idx.album_ct; j++)
+    {
+        if (rb->button_get(false) > BUTTON_NONE)
+        {
+            return ERROR_USER_ABORT;
+        }
+
+        draw_progressbar(j, pf_idx.album_ct, NULL);
+        if (pf_idx.album_index[j].artist_seek >= 0) { continue; }
+
+        rb->tagcache_search(&tcs, tag_albumartist);
+        //rb->tagcache_search_set_uniqbuf(&tcs, pf_idx.uniqbuf, pf_idx.uniqbuf_sz);
+        rb->tagcache_search_add_filter(&tcs, tag_album, pf_idx.album_index[j].seek);
+
+        last = 0;
+        final = pf_idx.artist_ct;
+        retry = 0;
+        if (rb->tagcache_get_next(&tcs))
+        {
+
+retry_artist_lookup:
+            retry++;
+            for (i = last; i < final; i++)
+            {
+                if (tcs.result_seek == pf_idx.artist_index[i].seek)
+                {
+                    pf_idx.album_index[j].artist_seek = tcs.result_seek;
+                    pf_idx.album_index[j].artist_idx = i;
+                    last = i; /* last match, start here next loop */
+                    final = pf_idx.artist_ct;
+                    retry = 0;
+                    break;
+                }
+            }
+            if (retry > 0 && retry < 2)
+            {
+                /* no match start back at beginning */
+                final = last;
+                last = 0;
+                goto retry_artist_lookup;
+            }
         }
         rb->tagcache_search_finish(&tcs);
     }
-    ALIGN_BUFFER(buf, buf_size, 4);
-    struct album_data* tmp_album = (struct album_data*)buf;
-    for (i = album_count - 1; i >= 0; i--)
-        tmp_album[i] = album[-i];
-    album = tmp_album;
-    buf = album + album_count;
+    /* now fix the album list order */
+    rb->qsort(pf_idx.album_index, pf_idx.album_ct, sizeof(struct album_data), compare_album_artists);
 
-    return (album_count > 0) ? 0 : ERROR_NO_ALBUMS;
+    draw_progressbar(0, pf_idx.album_ct, "Removing duplicates");
+    /* mark duplicate albums for deletion */
+    for (i = 0; i < pf_idx.album_ct - 1; i++)
+    {
+        draw_progressbar(i, pf_idx.album_ct, NULL);
+        for (j = i + 1; j < pf_idx.album_ct; j++)
+        {
+            if (pf_idx.album_index[i].artist_idx > 0 &&
+            pf_idx.album_index[i].artist_idx == pf_idx.album_index[j].artist_idx &&
+            pf_idx.album_index[i].seek == pf_idx.album_index[j].seek)
+            {
+                pf_idx.album_index[j].artist_idx = -1;
+            }
+            else
+            {
+                i = j - 1;
+                break;
+            }
+        }
+    }
+
+    /* now fix the album list order */
+    rb->qsort(pf_idx.album_index, pf_idx.album_ct, sizeof(struct album_data), compare_album_artists);
+
+    /* remove any extra untagged albums */
+    for (i = 0; i < pf_idx.album_ct; i++)
+    {
+        if (pf_idx.album_index[i].artist_idx > 0)
+        {
+            if (i > 0) { i--; }
+            pf_idx.album_index += i;
+            pf_idx.album_ct -= i;
+            break;
+        }
+    }
+
+    ALIGN_BUFFER(buf, buf_size, 4);
+    pf_idx.buf = buf;
+    pf_idx.buf_sz = buf_size;
+
+    return (pf_idx.album_ct > 0) ? 0 : ERROR_NO_ALBUMS;
+}
+
+/* reads data from save file to buffer */
+static int read2buf(int fildes, void *buf, size_t nbyte){
+    int read;
+    read = rb->read(fildes, buf, nbyte);
+    if (read < (int)nbyte)
+        return 0;
+
+    return read;
 }
 
 
@@ -933,19 +1210,23 @@ static int create_album_index(void)
 
 static int save_album_index(void){
     int fd = rb->creat(ALBUM_INDEX,0666);
+
+    struct pf_index_t data;
+    memcpy(&data, &pf_idx, sizeof(struct pf_index_t));
+
     if(fd >= 0)
     {
-        int unsigned_size = sizeof(unsigned int);
-        int int_size = sizeof(int);
-        rb->write(fd, artist_names, ((char *)buf - (char *)artist_names));
-        unsigned int artist_pos = (char *)artist - (char *)artist_names;
-        rb->write(fd, &artist_pos, unsigned_size);
-        unsigned int album_names_pos = (char *)album_names - (char *)artist_names;
-        rb->write(fd, &album_names_pos, unsigned_size);
-        unsigned int album_pos = (char *)album - (char *)artist_names;
-        rb->write(fd, &album_pos, unsigned_size);
-        rb->write(fd, &artist_count, int_size);
-        rb->write(fd, &album_count, int_size);
+        rb->memcpy(&data.header, INDEX_HDR, sizeof(pf_idx.header));
+
+        rb->write(fd, &data, sizeof(struct pf_index_t));
+
+        rb->write(fd, data.artist_names, data.artist_len);
+        rb->write(fd, data.album_names, data.album_len);
+
+        rb->write(fd, data.artist_index, data.artist_ct * sizeof(struct artist_data));
+
+        rb->write(fd, data.album_index, data.album_ct * sizeof(struct album_data));
+
         rb->close(fd);
         return 0;
     }
@@ -955,29 +1236,96 @@ static int save_album_index(void){
 /*Loads the artists+albums index information stored in the hard drive*/
 
 static int load_album_index(void){
+
     int fr = rb->open(ALBUM_INDEX, O_RDONLY);
+    struct pf_index_t data;
+
+    void *bufstart = pf_idx.buf;
+    unsigned int bufstart_sz = pf_idx.buf_sz;
+
+    void* buf = pf_idx.buf;
+    size_t buf_size = pf_idx.buf_sz;
+    void* uniqbuf = pf_idx.uniqbuf;
+    size_t uniqbuf_size = pf_idx.uniqbuf_sz;
+
+    unsigned int name_sz;
+    unsigned int artist_idx_sz;
+    unsigned int album_idx_sz;
+
     if (fr >= 0){
-        int unsigned_size = sizeof(unsigned int);
-        int int_size = sizeof(int);
-        unsigned long filesize = rb->filesize(fr);
-        unsigned int pos = 0;
-        unsigned int extra_data_size = (sizeof(unsigned int)*3) + (sizeof(int)*2);
-        rb->read(fr,buf ,filesize-extra_data_size);
-        artist_names = buf;
-        buf = (char *)buf + (filesize-extra_data_size);
-        buf_size = buf_size-(filesize-extra_data_size);
-        rb->read(fr,&pos ,unsigned_size);
-        artist = (void *)artist_names + pos;
-        rb->read(fr,&pos ,unsigned_size);
-        album_names = (void *)artist_names + pos;
-        rb->read(fr,&pos ,unsigned_size);
-        album = (void *)artist_names + pos;
-        rb->read(fr,&artist_count ,int_size);
-        rb->read(fr,&album_count ,int_size);
-        rb->close(fr);
-        return 0;
+        const unsigned long filesize = rb->filesize(fr);
+        if (filesize > sizeof(data))
+        {
+            if (rb->read(fr, &data, sizeof(data)) == sizeof(data) &&
+                rb->memcmp(&(data.header), INDEX_HDR, sizeof(data.header)) == 0)
+            {
+                name_sz = data.artist_len + data.album_len;
+                artist_idx_sz = data.artist_ct * sizeof(struct artist_data);
+                album_idx_sz = data.album_ct * sizeof(struct album_data);
+
+                if (name_sz + artist_idx_sz + album_idx_sz > bufstart_sz)
+                    goto failure;
+
+                //rb->lseek(fr, sizeof(data) + 1, SEEK_SET);
+                /* artist names */
+                ALIGN_BUFFER(buf, buf_size, 4);
+                if (read2buf(fr, buf, data.artist_len) == 0)
+                    goto failure;
+
+                data.artist_names = buf;
+                buf = (char *)buf + data.artist_len;
+                buf_size -= data.artist_len;
+
+                /* album names */
+                ALIGN_BUFFER(buf, buf_size, 4);
+                if (read2buf(fr, buf, data.album_len) == 0)
+                    goto failure;
+
+                data.album_names = buf;
+                buf = (char *)buf + data.album_len;
+                buf_size -= data.album_len;
+
+                /* index of artist names */
+                ALIGN_BUFFER(buf, buf_size, 4);
+                if (read2buf(fr, buf, artist_idx_sz) == 0)
+                    goto failure;
+
+                data.artist_index = buf;
+                buf = (char *)buf + artist_idx_sz;
+                buf_size -= artist_idx_sz;
+
+                /* index of album names */
+                ALIGN_BUFFER(buf, buf_size, 4);
+                if (read2buf(fr, buf, album_idx_sz) == 0)
+                    goto failure;
+
+                data.album_index = buf;
+                buf = (char *)buf + album_idx_sz;
+                buf_size -= album_idx_sz;
+
+                rb->close(fr);
+
+                memcpy(&pf_idx, &data, sizeof(struct pf_index_t));
+                pf_idx.buf = buf;
+                pf_idx.buf_sz = buf_size;
+                pf_idx.uniqbuf = uniqbuf;
+                pf_idx.uniqbuf_sz = uniqbuf_size;
+                return 0;
+            }
+        }
     }
+
+failure:
+    rb->splash(HZ/2, "Failed to load index");
+    if (fr >= 0)
+        rb->close(fr);
+
+    pf_idx.buf = bufstart;
+    pf_idx.buf_sz = bufstart_sz;
+    pf_idx.artist_ct = 0;
+    pf_idx.album_ct = 0;
     return -1;
+
 }
 
 /**
@@ -985,7 +1333,8 @@ static int load_album_index(void){
  */
 static char* get_album_name(const int slide_index)
 {
-    return album_names + album[slide_index].name_idx;
+    char *name = pf_idx.album_names + pf_idx.album_index[slide_index].name_idx;
+    return name;
 }
 
 /**
@@ -993,10 +1342,11 @@ static char* get_album_name(const int slide_index)
  */
 static char* get_album_artist(const int slide_index)
 {
-    if (slide_index < album_count && slide_index >= 0){
-        int artist_pos = album[slide_index].artist_idx;
-        if (artist_pos < artist_count && artist_pos >= 0){
-            return artist_names + artist[artist_pos].name_idx;
+    if (slide_index < pf_idx.album_ct && slide_index >= 0){
+        int artist_pos = pf_idx.album_index[slide_index].artist_idx;
+        if (artist_pos < pf_idx.artist_ct && artist_pos >= 0){
+            char *name = pf_idx.artist_names + pf_idx.artist_index[artist_pos].name_idx;
+            return name;
         }
     }
     return NULL;
@@ -1024,15 +1374,31 @@ static char* get_track_filename(const int track_index)
 
 static int get_wps_current_index(void)
 {
+    char* current_artist = NULL;
+    char* current_album = NULL;
     struct mp3entry *id3 = rb->audio_current_track();
 
-    if(id3 && id3->album) {
+    if(id3)
+    {
+        /* we could be looking for the artist in either field */
+        if(id3->albumartist)
+            current_artist = id3->albumartist;
+        else if(id3->artist)
+            current_artist = id3->artist;
+        else /*<untagged> artist*/
+            current_artist = UNTAGGED;
+
+        if (id3->album)
+            current_album = id3->album;
+        else /* <untagged> album */
+            current_album = UNTAGGED;
+
         int i;
-        for( i=0; i < album_count; i++ )
+        for( i=0; i < pf_idx.album_ct; i++ )
         {
-            if(!rb->strcmp(album_names + album[i].name_idx, id3->album) &&
-                !rb->strcmp(artist_names + artist[album[i].artist_idx].name_idx,
-                            id3->albumartist))
+            if(!rb->strcmp(pf_idx.album_names + pf_idx.album_index[i].name_idx, current_album) &&
+                !rb->strcmp(pf_idx.artist_names + pf_idx.artist_index[pf_idx.album_index[i].artist_idx].name_idx,
+                            current_artist))
                 return i;
         }
     }
@@ -1061,13 +1427,16 @@ static void create_track_index(const int slide_index)
     if (!rb->tagcache_search(&tcs, tag_title))
         goto fail;
 
-    rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
-    rb->tagcache_search_add_filter(&tcs, tag_albumartist,
-        artist[album[slide_index].artist_idx].seek);
-
-    track_count=0;
+    rb->tagcache_search_add_filter(&tcs, tag_album, pf_idx.album_index[slide_index].seek);
+    if (pf_idx.album_index[slide_index].artist_idx >= 0)
+    {
+        rb->tagcache_search_add_filter(&tcs, tag_albumartist,
+            pf_idx.album_index[slide_index].artist_seek);
+    }
+    track_count = 0;
     int string_index = 0, track_num;
     int disc_num;
+    char* result = NULL;
     size_t out = 0;
     track_names = rb->buflib_buffer_out(&buf_ctx, &out);
     borrowed += out;
@@ -1075,11 +1444,31 @@ static void create_track_index(const int slide_index)
     tracks = (struct track_data*)(track_names + borrowed);
     while (rb->tagcache_get_next(&tcs))
     {
+        result = NULL;
+        if (rb->strcmp(UNTAGGED, tcs.result) == 0)
+        {
+            if (!rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
+                                        pf_idx.buf, pf_idx.buf_sz))
+                goto fail;
+
+            result = pf_idx.buf;
+        }
+
         int len = 0, fn_idx = 0;
 
         avail -= sizeof(struct track_data);
         track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
         disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
+
+        if (result)
+        {
+            result = rb->strrchr(result, PATH_SEPCH);
+            if (result)
+                result++;
+        }
+
+        if (!result)
+            result = tcs.result;
 
         if (disc_num < 0)
             disc_num = 0;
@@ -1088,16 +1477,16 @@ retry:
         {
             if (disc_num)
                 fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d.%02d: %s", disc_num, track_num, tcs.result);
+                    "%d.%02d: %s", disc_num, track_num, result);
             else
                 fn_idx = 1 + rb->snprintf(track_names + string_index , avail,
-                    "%d: %s", track_num, tcs.result);
+                    "%d: %s", track_num, result);
         }
         else
         {
             track_num = 0;
             fn_idx = 1 + rb->snprintf(track_names + string_index, avail,
-                "%s", tcs.result);
+                "%s", result);
         }
         if (fn_idx <= 0)
             goto fail;
@@ -1129,9 +1518,7 @@ retry:
                 avail += out;
                 borrowed += out;
 
-                struct track_data *new_tracks =
-                                 (struct track_data *)(out + (uintptr_t)tracks);
-
+                struct track_data *new_tracks = (struct track_data *)(out + (uintptr_t)tracks);
                 unsigned int bytes = track_count * sizeof(struct track_data);
                 if (track_count)
                     rb->memmove(new_tracks, tracks, bytes);
@@ -1181,9 +1568,9 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 
     bool result;
     /* find the first track of the album */
-    rb->tagcache_search_add_filter(&tcs, tag_album, album[slide_index].seek);
+    rb->tagcache_search_add_filter(&tcs, tag_album, pf_idx.album_index[slide_index].seek);
     rb->tagcache_search_add_filter(&tcs, tag_albumartist,
-                                   artist[album[slide_index].artist_idx].seek);
+                                   pf_idx.album_index[slide_index].artist_seek);
 
     if ( rb->tagcache_get_next(&tcs) ) {
         struct mp3entry id3;
@@ -1217,10 +1604,8 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
 /**
   Draw the PictureFlow logo
  */
-static void draw_splashscreen(void)
+static void draw_splashscreen(unsigned char * buf_tmp, size_t buf_tmp_size)
 {
-    unsigned char * buf_tmp = buf;
-    size_t buf_tmp_size = buf_size;
     struct screen* display = rb->screens[SCREEN_MAIN];
 #if FB_DATA_SZ > 1
     ALIGN_BUFFER(buf_tmp, buf_tmp_size, sizeof(fb_data));
@@ -1264,27 +1649,29 @@ static void draw_splashscreen(void)
 /**
   Draw a simple progress bar
  */
-static void draw_progressbar(int step)
+static void draw_progressbar(int step, int count, char *msg)
 {
-    int txt_w, txt_h;
+    //rb->sleep(10);
+    static int txt_w, txt_h;
     const int bar_height = 22;
     const int w = LCD_WIDTH - 20;
     const int x = 10;
-
+    static int y;
+    if (msg != NULL)
+    {
 #if LCD_DEPTH > 1
-    rb->lcd_set_background(N_BRIGHT(0));
-    rb->lcd_set_foreground(N_BRIGHT(255));
+        rb->lcd_set_background(N_BRIGHT(0));
+        rb->lcd_set_foreground(N_BRIGHT(255));
 #else
-    rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
+        rb->lcd_set_drawmode(PICTUREFLOW_DRMODE);
 #endif
-    rb->lcd_clear_display();
-    rb->lcd_getstringsize("Preparing album artwork", &txt_w, &txt_h);
+        rb->lcd_getstringsize(msg, &txt_w, &txt_h);
 
-    int y = (LCD_HEIGHT - txt_h)/2;
+        y = (LCD_HEIGHT - txt_h)/2;
 
-    rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, y, "Preparing album artwork");
-    y += (txt_h + 5);
-
+        rb->lcd_putsxy((LCD_WIDTH - txt_w)/2, y, msg);
+        y += (txt_h + 5);
+    }
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(100));
 #endif
@@ -1293,7 +1680,7 @@ static void draw_progressbar(int step)
     rb->lcd_set_foreground(N_PIX(165, 231, 82));
 #endif
 
-    rb->lcd_fillrect(x+1, y+1, step * w / album_count, bar_height-2);
+    rb->lcd_fillrect(x+1, y+1, step * w / count, bar_height-2);
 #if LCD_DEPTH > 1
     rb->lcd_set_foreground(N_BRIGHT(255));
 #endif
@@ -1358,11 +1745,22 @@ static bool create_albumart_cache(void)
     bool update = (cache_version == CACHE_UPDATE);
     if (resize)
         format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
-    for (i=0; i < album_count; i++)
+
+    draw_splashscreen(pf_idx.buf, pf_idx.buf_sz);
+    draw_progressbar(0, pf_idx.album_ct, "Preparing album artwork");
+    for (i=0; i < pf_idx.album_ct; i++)
     {
-        draw_progressbar(i);
+
+        draw_progressbar(i, pf_idx.album_ct, NULL);
+        if (rb->button_get(false) > BUTTON_NONE)
+            return false;
+
+        if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
+            continue;//rb->strcpy(albumart_file, EMPTY_SLIDE_BMP);
+
         rb->snprintf(pfraw_file, sizeof(pfraw_file), CACHE_PREFIX "/%x%x.pfraw",
                      mfnv(get_album_name(i)),mfnv(get_album_artist(i)));
+
         /* delete existing cache, so it's a true rebuild */
         if(rb->file_exists(pfraw_file)) {
             if(update) {
@@ -1371,18 +1769,16 @@ static bool create_albumart_cache(void)
             }
             rb->remove(pfraw_file);
         }
-        if (!get_albumart_for_index_from_db(i, albumart_file, MAX_PATH))
-            rb->strcpy(albumart_file, EMPTY_SLIDE_BMP);
 
-        input_bmp.data = buf;
+        input_bmp.data = pf_idx.buf;
         input_bmp.width = DISPLAY_WIDTH;
         input_bmp.height = DISPLAY_HEIGHT;
-        ret = read_image_file(albumart_file, &input_bmp, buf_size,
+        ret = read_image_file(albumart_file, &input_bmp, pf_idx.buf_sz,
                                 format, &format_transposed);
         if (ret <= 0) {
             rb->splashf(HZ, "Album art is bad: %s", get_album_name(i));
             rb->strcpy(albumart_file, EMPTY_SLIDE_BMP);
-            ret = read_image_file(albumart_file, &input_bmp, buf_size,
+            ret = read_image_file(albumart_file, &input_bmp, pf_idx.buf_sz,
                                     format, &format_transposed);
             if(ret <= 0)
                 continue;
@@ -1393,9 +1789,8 @@ static bool create_albumart_cache(void)
             continue;
         }
         slides++;
-        if ( rb->button_get(false) == PF_MENU ) return false;
     }
-    draw_progressbar(i);
+    draw_progressbar(i, pf_idx.album_ct, NULL);
     if ( slides == 0 ) {
         /* Warn the user that we couldn't find any albumart */
         rb->splash(2*HZ, ID2P(LANG_NO_ALBUMART_FOUND));
@@ -1417,9 +1812,9 @@ static int create_empty_slide(bool force)
 #if LCD_DEPTH > 1
         input_bmp.format = FORMAT_NATIVE;
 #endif
-        input_bmp.data = (char*)buf;
+        input_bmp.data = (char*)pf_idx.buf;
         scaled_read_bmp_file(EMPTY_SLIDE_BMP, &input_bmp,
-                                buf_size,
+                                pf_idx.buf_sz,
                                 FORMAT_NATIVE|FORMAT_RESIZE|FORMAT_KEEP_ASPECT,
                                 &format_transposed);
         if (!save_pfraw(EMPTY_SLIDE, &input_bmp))
@@ -1666,7 +2061,7 @@ static int read_pfraw(char* filename, int prio)
     struct pfraw_header bmph;
     int fh = rb->open(filename, O_RDONLY);
     if( fh < 0 ) {
-        cache_version = CACHE_UPDATE;
+        //cache_version = CACHE_UPDATE;
         return empty_slide_hid;
     }
     else
@@ -2870,7 +3265,7 @@ static int pictureflow_main(void)
 
     configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     if(auto_wps == 0)
-        draw_splashscreen();
+        draw_splashscreen(pf_idx.buf, pf_idx.buf_sz);
     if(backlight_mode == 0) {
         /* Turn off backlight timeout */
         backlight_ignore_timeout();
@@ -2879,13 +3274,15 @@ static int pictureflow_main(void)
     init_scroll_lines();
     init_reflect_table();
 
-    ALIGN_BUFFER(buf, buf_size, 4);
+    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
 
     /*Scan will trigger when no file is found or the option was activated*/
     if ((cache_version != CACHE_VERSION)||(load_album_index() < 0)){
-        rb->splash(HZ/2,"Creating album index, please wait");
+        rb->splash(HZ/2,"Creating index, please wait");
         ret = create_album_index();
+
         if (ret == 0){
+            cache_version = CACHE_REBUILD;
             save_album_index();
         }
     }
@@ -2899,15 +3296,17 @@ static int pictureflow_main(void)
     } else if (ret == ERROR_NO_ALBUMS) {
         error_wait("No albums found. Please enable database");
         return PLUGIN_ERROR;
+    } else if (ret == ERROR_USER_ABORT) {
+        error_wait("User aborted.");
+        return PLUGIN_ERROR;
     }
 
-    ALIGN_BUFFER(buf, buf_size, 4);
-    number_of_slides  = album_count;
+    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
+    number_of_slides  = pf_idx.album_ct;
     if ((cache_version != CACHE_VERSION) && !create_albumart_cache()) {
         cache_version = CACHE_REBUILD;
         configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
         error_wait("Could not create album art cache");
-        return PLUGIN_ERROR;
     }
 
     if (!create_empty_slide(cache_version != CACHE_VERSION)) {
@@ -2922,7 +3321,7 @@ static int pictureflow_main(void)
         configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     }
 
-    rb->buflib_init(&buf_ctx, (void *)buf, buf_size);
+    rb->buflib_init(&buf_ctx, (void *)pf_idx.uniqbuf, pf_idx.uniqbuf_sz);
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
     {
@@ -3152,8 +3551,15 @@ static int pictureflow_main(void)
 
 enum plugin_status plugin_start(const void *parameter)
 {
+
     int ret;
     (void) parameter;
+
+    void * buf;
+    size_t buf_size;
+    void * uniqbuf;
+    size_t uniqbuf_size;
+
     atexit(cleanup);
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -3171,6 +3577,7 @@ enum plugin_status plugin_start(const void *parameter)
     }
 #endif
 #endif
+
     /* create unique entry buffer with 1/4 of the plugin buffer */
     uniqbuf = buf;
     uniqbuf_size = ALIGN_DOWN(buf_size / 4, 0x8);
@@ -3189,6 +3596,13 @@ enum plugin_status plugin_start(const void *parameter)
     buf_size -= grey_buf_used;
     buf = (void*)(grey_buf_used + (char*)buf);
 #endif
+
+    /* store buffer pointers and sizes */
+    pf_idx.buf = buf;
+    pf_idx.buf_sz = buf_size;
+    pf_idx.uniqbuf = uniqbuf;
+    pf_idx.uniqbuf_sz = uniqbuf_size;
+
 
     ret = pictureflow_main();
     if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
