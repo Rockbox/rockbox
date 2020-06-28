@@ -3201,9 +3201,8 @@ static bool load_game(void)
     char *game;
     const char *ret = identify_game(&game, read_wrapper, (void*)fd);
 
-    if(!*game && ret)
+    if(!game && ret)
     {
-        sfree(game);
         rb->splash(HZ, ret);
         rb->close(fd);
         return false;
