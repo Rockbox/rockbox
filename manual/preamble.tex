@@ -76,7 +76,7 @@
 \usepackage{makeidx}
 \usepackage{fancyvrb}
 \usepackage{color}
-\ifpdfoutput{\usepackage{booktabs}}%
+\Ifpdfoutput{\usepackage{booktabs}}%
   {\newcommand{%
     \toprule}{}\newcommand{\midrule}{\hline}\newcommand{\bottomrule}{}%
   }
@@ -90,7 +90,7 @@
 % pdf output: try pdf first, then png and jpg as file format
 % html output: try png first, then jpg. Ignore pdf files
 % this only applies if no file extension is given!
-\ifpdfoutput{\DeclareGraphicsExtensions{.pdf,.png,.jpg}}%
+\Ifpdfoutput{\DeclareGraphicsExtensions{.pdf,.png,.jpg}}%
     {\DeclareGraphicsExtensions{.png,.jpg}}
 
 % fancy header style adjustments
@@ -107,7 +107,7 @@
 \setlength{\headheight}{18.5pt}
 \newcounter{example}[chapter]
 
-\ifpdfoutput{%
+\Ifpdfoutput{%
   \renewcommand{\toprule}{\specialrule{\heavyrulewidth}{\abovetopsep}{0pt}}
   \renewcommand{\midrule}{\specialrule{\lightrulewidth}{0pt}{\belowrulesep}}
   }{}
@@ -198,7 +198,7 @@
 % command to display a note.
 % Usage: \note{text of your note}
 % Note: do NOT use \textbf or similar to emphasize text, use \emph!
-\ifpdfoutput{
+\Ifpdfoutput{
 \newcommand{\note}[1]{
   \ifinner\else\vspace{1ex}\par\noindent\fi
   \textbf{Note:}\ %
@@ -209,7 +209,7 @@
 % command to display a warning.
 % Usage: \warn{text of your warning}
 % Note: do NOT use \textbf or similar to emphasize text!
-\ifpdfoutput{
+\Ifpdfoutput{
 \newcommand{\warn}[1]{
   \ifinner\else\par\noindent\fi
   \textbf{Warning:\ }%
@@ -219,7 +219,7 @@
 
 % command to mark a text block as intended especially for blind people
 % Usage: \blind{text}
-\ifpdfoutput{
+\Ifpdfoutput{
 \newcommand{\blind}[1]{\mbox{}\marginpar{\raisebox{-1ex}{\Huge{\ForwardToEnd}}}#1}
 }
 {\newcommand{\blind}[1]{\ifinner\else\par\noindent\fi#1}}
@@ -299,7 +299,7 @@
 % When creating HTML, use the soul package.
 % This produces much nicer HTML code (textsc results in each character being
 % put in a separate <span>).
-\ifpdfoutput{\newcommand{\caps}[1]{\textsc{#1}}}{\usepackage{soul}}
+\Ifpdfoutput{\newcommand{\caps}[1]{\textsc{#1}}}{\usepackage{soul}}
 \newcommand{\setting}[1]{\caps{#1}}
 
 \newcommand{\config}[1]{\texttt{#1}}
@@ -314,7 +314,7 @@
 % Usage: \wikilink{WebHome}
 %        with "WebHome" being the wiki page name
 \newcommand{\wikibaseurl}{http://www.rockbox.org/wiki/}
-\ifpdfoutput{\newcommand{\wikiicon}{\Pointinghand}}
+\Ifpdfoutput{\newcommand{\wikiicon}{\Pointinghand}}
     {\newcommand{\wikiicon}{}}
 \newcommand{\wikilink}[1]{\wikiicon{}\href{\wikibaseurl#1}{#1}}
 %\newcommand{\wikilink}[1]{\url{http://www.rockbox.org/wiki/#1}}
@@ -355,15 +355,15 @@
 
 % Use the reference to handle get a flexible reference command
 % usage \reference{ref_section}
-\ifpdfoutput{%
+\Ifpdfoutput{%
   \newcommand{\reference}[1]{%
     section~\ref{#1} (page~\pageref{#1})%
 }}
 {\newcommand{\reference}[1]{section~\ref{#1}}}
 
 % special HTML output adjustments
-\ifpdfoutput{}{\setlength{\parindent}{0mm}}
-\ifpdfoutput{}{\renewcommand{\Forward}[1]{$\triangleright${}#1}}
+\Ifpdfoutput{}{\setlength{\parindent}{0mm}}
+\Ifpdfoutput{}{\renewcommand{\Forward}[1]{$\triangleright${}#1}}
 
 \newcommand{\btnfnt}[1]{\textbf{#1}}
 %\hfuzz=2pt
