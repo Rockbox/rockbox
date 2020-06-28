@@ -123,6 +123,12 @@ buflib_init(struct buflib_context *ctx, void *buf, size_t size)
      */
     ctx->alloc_end = bd_buf;
     ctx->compact = true;
+
+    if (size == 0)
+    {
+        BPANICF("buflib_init error (CTX:%p, %zd bytes):\n", ctx,
+            (ctx->handle_table - ctx->buf_start) * sizeof(union buflib_data));
+    }
 }
 
 bool buflib_context_relocate(struct buflib_context *ctx, void *buf)
