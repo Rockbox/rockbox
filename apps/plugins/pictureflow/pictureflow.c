@@ -34,6 +34,10 @@
 #include "lib/mylcd.h"
 #include "lib/feature_wrappers.h"
 
+#ifndef ALIGN_DOWN
+    #define ALIGN_DOWN(n, a)     ((typeof(n))((uintptr_t)(n)/(a)*(a)))
+#endif
+
 /******************************* Globals ***********************************/
 
 /*
@@ -214,6 +218,7 @@ typedef fb_data pix_t;
 #define PFREAL_ONE (1 << PFREAL_SHIFT)
 #define PFREAL_HALF (PFREAL_ONE >> 1)
 
+
 #define IANGLE_MAX 1024
 #define IANGLE_MASK 1023
 
@@ -236,7 +241,7 @@ typedef fb_data pix_t;
 
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 #define CACHE_PREFIX PLUGIN_DEMOS_DATA_DIR "/pictureflow"
-#define ALBUM_INDEX CACHE_PREFIX "/PF_album_idx.tmp"
+#define ALBUM_INDEX CACHE_PREFIX "/pictureflow_album.idx"
 
 #define EV_EXIT 9999
 #define EV_WAKEUP 1337
@@ -935,8 +940,8 @@ static int save_album_index(void){
     int fd = rb->creat(ALBUM_INDEX,0666);
     if(fd >= 0)
     {
-        int unsigned_size = sizeof(unsigned int);
-        int int_size = sizeof(int);
+        const int unsigned_size = sizeof(unsigned int);
+        const int int_size = sizeof(int);
         rb->write(fd, artist_names, ((char *)buf - (char *)artist_names));
         unsigned int artist_pos = (char *)artist - (char *)artist_names;
         rb->write(fd, &artist_pos, unsigned_size);
@@ -957,23 +962,27 @@ static int save_album_index(void){
 static int load_album_index(void){
     int fr = rb->open(ALBUM_INDEX, O_RDONLY);
     if (fr >= 0){
-        int unsigned_size = sizeof(unsigned int);
-        int int_size = sizeof(int);
-        unsigned long filesize = rb->filesize(fr);
+        const int unsigned_size = sizeof(unsigned int);
+        const int int_size = sizeof(int);
+        const unsigned long filesize = rb->filesize(fr);
+        const unsigned int extra_data_size = (unsigned_size *3 ) + (int_size * 2);
+        const unsigned int data_size = filesize-extra_data_size;
         unsigned int pos = 0;
-        unsigned int extra_data_size = (sizeof(unsigned int)*3) + (sizeof(int)*2);
-        rb->read(fr,buf ,filesize-extra_data_size);
+        if (data_size > buf_size)
+            return -1;
+
+        rb->read(fr, buf, data_size);
         artist_names = buf;
-        buf = (char *)buf + (filesize-extra_data_size);
-        buf_size = buf_size-(filesize-extra_data_size);
-        rb->read(fr,&pos ,unsigned_size);
+        buf = (char *)buf + data_size;
+        buf_size -= data_size;
+        rb->read(fr, &pos, unsigned_size);
         artist = (void *)artist_names + pos;
         rb->read(fr,&pos ,unsigned_size);
         album_names = (void *)artist_names + pos;
-        rb->read(fr,&pos ,unsigned_size);
+        rb->read(fr, &pos, unsigned_size);
         album = (void *)artist_names + pos;
-        rb->read(fr,&artist_count ,int_size);
-        rb->read(fr,&album_count ,int_size);
+        rb->read(fr, &artist_count, int_size);
+        rb->read(fr, &album_count, int_size);
         rb->close(fr);
         return 0;
     }
@@ -1024,15 +1033,22 @@ static char* get_track_filename(const int track_index)
 
 static int get_wps_current_index(void)
 {
+    char* current_artist = NULL;
     struct mp3entry *id3 = rb->audio_current_track();
 
-    if(id3 && id3->album) {
+    /* we could be looking for the artist in either artist field */
+    if(id3->albumartist)
+        current_artist = id3->albumartist;
+    else if(id3->artist)
+        current_artist = id3->artist;
+        
+    if(id3 && id3->album && current_artist) {
         int i;
         for( i=0; i < album_count; i++ )
         {
             if(!rb->strcmp(album_names + album[i].name_idx, id3->album) &&
                 !rb->strcmp(artist_names + artist[album[i].artist_idx].name_idx,
-                            id3->albumartist))
+                            current_artist))
                 return i;
         }
     }
@@ -1129,9 +1145,7 @@ retry:
                 avail += out;
                 borrowed += out;
 
-                struct track_data *new_tracks =
-                                 (struct track_data *)(out + (uintptr_t)tracks);
-
+                struct track_data *new_tracks = (struct track_data *)(out + (uintptr_t)tracks);
                 unsigned int bytes = track_count * sizeof(struct track_data);
                 if (track_count)
                     rb->memmove(new_tracks, tracks, bytes);
@@ -1301,7 +1315,7 @@ static void draw_progressbar(int step)
     rb->yield();
 }
 
-/* Calculate modified FNV hash of string
+/* Calculate modified FNV hash of string 
  * has good avalanche behaviour and uniform distribution
  * see http://home.comcast.net/~bretm/hash/ */
 static unsigned int mfnv(char *str)
@@ -1309,7 +1323,7 @@ static unsigned int mfnv(char *str)
     const unsigned int p = 16777619;
     unsigned int hash = 0x811C9DC5; // 2166136261;
 
-    while(*str)
+    while(*str) 
         hash = (hash ^ *str++) * p;
     hash += hash << 13;
     hash ^= hash >> 7;
@@ -2520,7 +2534,7 @@ static int main_menu(void)
             case PF_GOTO_WPS: /* WPS */
                 return -2;
 #if PF_PLAYBACK_CAPABLE
-            case PF_MENU_CLEAR_PLAYLIST:
+            case PF_MENU_CLEAR_PLAYLIST: 
                 if(rb->playlist_remove_all_tracks(NULL) == 0) {
                     rb->playlist_create(NULL, NULL);
                     rb->splash(HZ*2, ID2P(LANG_PLAYLIST_CLEARED));
@@ -2828,7 +2842,7 @@ static void draw_album_text(void)
     }
 
     albumtxt_x = get_scroll_line_offset(PF_SCROLL_ALBUM);
-    mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);
+    mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);    
 
     if ((show_album_name == ALBUM_AND_ARTIST_TOP)
         || (show_album_name == ALBUM_AND_ARTIST_BOTTOM)){
@@ -2868,7 +2882,7 @@ static int pictureflow_main(void)
         }
     }
 
-    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
+    configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION); 
     if(auto_wps == 0)
         draw_splashscreen();
     if(backlight_mode == 0) {
@@ -2922,7 +2936,7 @@ static int pictureflow_main(void)
         configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
     }
 
-    rb->buflib_init(&buf_ctx, (void *)buf, buf_size);
+    rb->buflib_init(&buf_ctx, (void *)uniqbuf, uniqbuf_size);
 
     if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
     {
