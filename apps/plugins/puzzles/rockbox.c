@@ -49,7 +49,7 @@
 /* how many ticks between timer callbacks */
 #define TIMER_INTERVAL (HZ / 50)
 
-/* no c200v2 */
+/* Disable some features if we're memory constrained (c200v2) */
 #if PLUGIN_BUFFER_SIZE > 0x14000
 #define DEBUG_MENU
 #define FONT_CACHING
@@ -61,12 +61,14 @@
 #define BG_B .9f
 #define BG_COLOR LCD_RGBPACK((int)(255*BG_R), (int)(255*BG_G), (int)(255*BG_B))
 
+/* used for invalid config value message */
 #define ERROR_COLOR LCD_RGBPACK(255, 0, 0)
 
+/* subtract two to allow for the fixed and UI fonts */
 #define MAX_FONTS (MAXUSERFONTS - 2)
 #define FONT_TABLE PLUGIN_GAMES_DATA_DIR "/.sgt-puzzles.fnttab"
 
-/* font bundle size range */
+/* font bundle size range (in pixels) */
 #define BUNDLE_MIN 7
 #define BUNDLE_MAX 36
 #define BUNDLE_COUNT (BUNDLE_MAX - BUNDLE_MIN + 1)
@@ -74,7 +76,7 @@
 /* max length of C_STRING config vals */
 #define MAX_STRLEN 128
 
-/* try to increment a numeric config value up to this much */
+/* attempt to increment a numeric config value up to this much */
 #define CHOOSER_MAX_INCR 2
 
 /* max font table line */
@@ -90,15 +92,19 @@
 #define midend_colors midend_colours
 #endif
 
-/* zoom stuff */
+/* magnification factor */
 #define ZOOM_FACTOR 3
+
+/* distance to pan per click (in pixels) */
 #define PAN_X (MIN(LCD_HEIGHT, LCD_WIDTH) / 4)
 #define PAN_Y (MIN(LCD_HEIGHT, LCD_WIDTH) / 4)
 
 /* utility macros */
 #undef ABS
 #define ABS(a) ((a)<0?-(a):(a))
-#define SWAP(a, b, t) do { t = a; a = b; b = t; } while(0);
+#define SWAP(a, b, t) do { t = a; a = b; b = t; } while(0)
+
+/* fixed-point stuff (for antialiased lines) */
 #define fp_fpart(f, bits) ((f) & ((1 << (bits)) - 1))
 #define fp_rfpart(f, bits) ((1 << (bits)) - fp_fpart(f, bits))
 #define FRACBITS 16
@@ -170,8 +176,11 @@ static struct {
 // used in menu titles - make sure to initialize!
 static char menu_desc[32];
 
-/* These are re-implementations of many rockbox drawing functions, adapted to
- * draw into a custom framebuffer (used for the zoom feature). */
+/*
+ * These are re-implementations of many rockbox drawing functions, adapted to
+ * draw into a custom framebuffer (used for the zoom feature):
+ */
+
 static void zoom_drawpixel(int x, int y)
 {
     if(y < zoom_clipu || y >= zoom_clipd)
@@ -319,9 +328,11 @@ static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int
     }
 }
 
-/* Rockbox's alpha format is actually pretty sane: each byte holds
+/*
+ * Rockbox's alpha format is actually pretty sane: each byte holds
  * alpha values for two horizontally adjacent pixels. Low half is
- * leftmost pixel. See lcd-16bit-common.c for more info. */
+ * leftmost pixel. See lcd-16bit-common.c for more info.
+ */
 static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, int h)
 {
     const unsigned char *ptr = bits;
@@ -351,7 +362,28 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
     }
 }
 
-/* font management routines */
+/*
+ * Font management routines
+ *
+ * Many puzzles need a dynamic font size, especially when zooming
+ * in. Rockbox's default font set does not provide the consistency we
+ * need across different sizes, so instead we ship a custom font pack
+ * for sgt-puzzles, available from [1] or through Rockbox Utility.
+ *
+ * The font pack consists of 3 small-size fonts, and the Deja Vu
+ * Sans/Mono fonts, rasterized in sizes from 10 to BUNDLE_MAX
+ * (currently 36).
+ *
+ * The font loading code below tries to be smart about loading fonts:
+ * when games are saved, the set of fonts that were loaded during
+ * execution is written to a "font table" on disk. On subsequent
+ * loads, the fonts in this table are precached while the game is
+ * loaded (and the disk is spinning, on hard drive devices). We also
+ * have a form of LRU caching implemented to dynamically evict fonts
+ * from Rockbox's in-memory cache, which is of limited size.
+ *
+ * [1]: http://download.rockbox.org/useful/sgt-fonts.zip
+ */
 
 static struct bundled_font {
     int status; /* -3 = never tried loading, or unloaded, -2 = failed to load, >= -1: loaded successfully */
@@ -411,8 +443,10 @@ static void font_path(char *buf, int type, int size)
 
 static void rb_setfont(int type, int size)
 {
-    /* out of range (besides, no puzzle should ever need this large
-       of a font, anyways) */
+    /*
+     * First, clamp to range. No puzzle should ever need this large of
+     * a font, anyways.
+     */
     if(size > BUNDLE_MAX)
         size = BUNDLE_MAX;
 
@@ -420,7 +454,7 @@ static void rb_setfont(int type, int size)
     {
         if(size < 7) /* no teeny-tiny fonts */
             size = 7;
-        /* assume monospace for these */
+        /* assume monospace for 7-9px fonts */
         type = FONT_FIXED;
     }
 
@@ -432,7 +466,7 @@ static void rb_setfont(int type, int size)
         /* never loaded */
         char buf[MAX_PATH];
         font_path(buf, type, size);
-        if(n_fonts >= MAX_FONTS) /* safety margin, FIXME */
+        if(n_fonts >= MAX_FONTS)
         {
             /* unload an old font */
             int oldest_use = -1, oldest_idx = -1;
@@ -1278,12 +1312,16 @@ static void rb_draw_update(void *handle, int x, int y, int w, int h)
 {
     LOGF("rb_draw_update(%d, %d, %d, %d)", x, y, w, h);
 
-    /* It seems that the puzzles use a different definition of
+    /*
+     * It seems that the puzzles use a different definition of
      * "updating" the display than Rockbox does; by calling this
      * function, it tells us that it has either already drawn to the
      * updated area (as rockbox assumes), or that it WILL draw to the
-     * said area. Thus we simply remember a rectangle that contains
-     * all the updated regions and update it at the very end. */
+     * said area in the future (in which case we will draw
+     * nothing). Because we don't know which of these is the case, we
+     * simply remember a rectangle that contains all the updated
+     * regions and update it at the very end.
+     */
 
     /* adapted from gtk.c */
     if (!need_draw_update || ud_l > x  ) ud_l = x;
