@@ -1421,11 +1421,41 @@ static void draw_mouse(void)
     }
 }
 
+/* doesn't work, disabled (can't find a good mechanism to check if a
+ * glyph exists in a font) */
+#if 0
+/* See: https://www.chiark.greenend.org.uk/~sgtatham/puzzles/devel/drawing.html#drawing-text-fallback */
 static char *rb_text_fallback(void *handle, const char *const *strings,
                               int nstrings)
 {
-    return dupstr(strings[0]);
+    struct font *pf = rb->font_get(cur_font);
+
+    for(int i = 0; i < nstrings; i++)
+    {
+        LOGF("checking alternative \"%s\"", strings[i]);
+        const unsigned char *ptr = strings[i];
+        unsigned short code;
+        bool valid = true;
+
+        while(*ptr)
+        {
+            ptr = rb->utf8decode(ptr, &code);
+
+            if(!rb->font_get_bits(pf, code))
+            {
+                valid = false;
+                break;
+            }
+        }
+
+        if(valid)
+            return dupstr(strings[i]);
+    }
+
+    /* shouldn't get here */
+    return dupstr(strings[nstrings - 1]);
 }
+#endif
 
 const drawing_api rb_drawing = {
     rb_draw_text,
@@ -1443,9 +1473,10 @@ const drawing_api rb_drawing = {
     rb_blitter_free,
     rb_blitter_save,
     rb_blitter_load,
+    /* printing functions */
     NULL, NULL, NULL, NULL, NULL, NULL, /* {begin,end}_{doc,page,puzzle} */
-    NULL, NULL,                        /* line_width, line_dotted */
-    rb_text_fallback,
+    NULL, NULL,                         /* line_width, line_dotted */
+    NULL, /* fall back to ASCII */
     NULL,
 };
 
