@@ -16358,3 +16358,102 @@
     lcd_bitmap: "roszada"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pokaż album na dole"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pokaż album na dole"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Zaktualizuj pamięć podręczną"
+  </dest>
+  <voice>
+    *: "Zaktualizuj pamięć podręczną"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide information"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ukryj informacje"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ukryj informacje"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pokaż album i wykonawcę na górze"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pokaż album i wykonawcę na górze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pokaż album na górze"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pokaż album na górze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Pokaż album i wykonawcę na dole"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Pokaż album i wykonawcę na dole"
+  </voice>
+</phrase>
