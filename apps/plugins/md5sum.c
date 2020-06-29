@@ -183,9 +183,12 @@ static void hash_check( int out, const char *path )
 
 enum plugin_status plugin_start(const void* parameter)
 {
-    const char *arg = (const char *)parameter; /* input file name, if any */
+    const char *arg = (const char *)parameter; /* input file path, if any */
+    char temp[MAX_PATH]; /* input file name */
+    char *basename=temp;
     int out = -1; /* output file descriptor */
     char filename[MAX_PATH]; /* output file name */
+    int isdir=0;         /*flag if input file is a directory */
 
     void (*action)( int, const char * ) = NULL;
 
@@ -240,10 +243,25 @@ enum plugin_status plugin_start(const void* parameter)
         action = hash_dir;
         arg = "/";
     }
+    rb->strcpy(temp, arg);
+    if (temp[(rb->strlen(temp) - 1)] == '/')
+    {
+        temp[(rb->strlen(temp) - 1)] = '\0';
+        isdir=1;
+    }
+    if(rb->strrchr(temp, '/')) 
+        basename =(rb->strrchr(temp, '/')+1);
 
-    rb->lcd_puts( 0, 1, "Output file:" );
-    rb->lcd_puts( 0, 2, filename );
+    if(isdir)
+        temp[(rb->strlen(temp))] = '/';
 
+    rb->lcd_putsf( 0, 1, "Hashing %s", basename );
+    rb->lcd_puts( 0, 2, rb->str(LANG_ACTION_STD_CANCEL) );
+
+    rb->lcd_puts( 0, 3, "Output file:" );
+    rb->lcd_puts( 0, 4, filename );
+
+    rb->lcd_update();
     count = 0;
     done = 0;
     action( out, arg );
