@@ -168,6 +168,6 @@ $(BIN2C):
 # OS X specifics
 $(OUTPUT).dmg: $(OUTPUT)
 	$(info DMG $@)
-	$(SILENT)$(call mkdir,$(OUTPUT)-dmg))
-	$(SILENT)cp -p $(OUTPUT) $(OUTPUT)-dmg
-	$(SILENT)hdiutil create -srcfolder $(OUTPUT)-dmg $@
+	$(SILENT)$(call mkdir,"$(OUTPUT)-$(APPVERSION)")
+	$(SILENT)cp -p $(OUTPUT) "$(OUTPUT)-$(APPVERSION)"
+	$(SILENT)hdiutil create -srcfolder "$(OUTPUT)-$(APPVERSION)" $@
