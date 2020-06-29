@@ -16532,3 +16532,57 @@ id: VOICE_BAT_BENCH_KEYS
     lcd_bitmap: "Show album and artist at the bottom"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    cowond2,ibassodx50,mrobe500,ibassodx90,iaudio7,ondavx747,creativezenxfi2: "Press POWER to cancel."
+    ihifi770, ihifi770c, ihifi800: "Press HOME to cancel."
+    android,zenvision,hifietma*: "Press BACK to cancel."
+    archosplayer: "Press STOP to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    ihifi760,ihifi960 : "Double tap RETURN to cancel."
+    iriverh10,samsungyh* : "Double tap LEFT to cancel."
+    mpiohd200 : "Double tap REC to cancel."
+    mpiohd300 : "Double tap MENU to cancel."
+    xduoox20,xduoox3,xduoox3ii : "Double tap HOME to cancel."
+#samsung yp-r1 : double tap power
+    sonynwza860: "Keymaps incomplete."
+  </source>
+  <dest>
+    *: "Press LEFT to cancel."
+    cowond2,ibassodx50,mrobe500,ibassodx90,iaudio7,ondavx747,creativezenxfi2: "Press POWER to cancel."
+    ihifi770, ihifi770c, ihifi800: "Press HOME to cancel."
+    android,zenvision,hifietma*: "Press BACK to cancel."
+    archosplayer: "Press STOP to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    ihifi760,ihifi960 : "Double tap RETURN to cancel."
+    iriverh10,samsungyh* : "Double tap LEFT to cancel."
+    mpiohd200 : "Double tap REC to cancel."
+    mpiohd300 : "Double tap MENU to cancel."
+    xduoox20,xduoox3,xduoox3ii : "Double tap HOME to cancel."
+#samsung yp-r1 : double tap power
+    sonynwza860: "Keymaps incomplete."
+  </dest>
+  <voice>
+    *: "Press LEFT to cancel."
+    cowond2,ibassodx50,mrobe500,ibassodx90,iaudio7,ondavx747,creativezenxfi2: "Press POWER to cancel."
+    ihifi770, ihifi770c, ihifi800: "Press HOME to cancel."
+    android,zenvision,hifietma*: "Press BACK to cancel."
+    archosplayer: "Press STOP to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    ihifi760,ihifi960 : "Double tap RETURN to cancel."
+    iriverh10,samsungyh* : "Double tap LEFT to cancel."
+    mpiohd200 : "Double tap REC to cancel."
+    mpiohd300 : "Double tap MENU to cancel."
+    xduoox20,xduoox3,xduoox3ii : "Double tap HOME to cancel."
+  </voice>
+</phrase>
