@@ -30,11 +30,11 @@ inline static long muls32_asr26(long a, long b)
         "mov     %[r], %[r], lsr #26         \n"
         "orr     %[r], %[r], %[t1], lsl #6   \n"
         : /* outputs */
-        [r] "=&r,&r,&r"(r),
-        [t1]"=&r,&r,&r"(t1)
+        [r]  "=&r" (r),
+        [t1] "=&r" (t1)
         : /* inputs */
-        [a] "%r,%r,%r" (a),
-        [b] "r,0,1" (b)
+        [a] "r" (a),
+        [b] "r" (b)
     );
     return r;
 }
