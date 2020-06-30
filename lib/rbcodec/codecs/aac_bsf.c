@@ -91,7 +91,7 @@ enum codec_status codec_run(void)
     buffer=ci->request_buffer(&n, FAAD_BYTE_BUFFER_SIZE);
     bread = NeAACDecInit(decoder, buffer, n, &s, &c);
     if (bread < 0) {
-        LOGF("FAAD: DecInit: %ld, %d\n", bread, decoder->object_type);
+        LOGF("FAAD: DecInit: %ld, %d\n", (long int)bread, decoder->object_type);
         return CODEC_ERROR;
     }
     ci->advance_buffer(bread);

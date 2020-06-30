@@ -166,7 +166,7 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
                 begin = 0;
                 time++;
             } else {
-                LOGF("Can't seek that early:%lld\n",begin);
+                LOGF("Can't seek that early:%lld\n",(long long int)begin);
                 return -3;  /* too early */
             }
         }
@@ -206,7 +206,8 @@ static int64_t seek_backwards(ogg_sync_state *oy, ogg_page *og,
                 } else if (lastgranule > wantedpos) {  /*too late, seek more*/
                     if (offset != -1) {
                         LOGF("Toolate, returnanyway:%lld,%lld,%lld,%lld\n",
-                             ret,lastgranule,wantedpos,avgpagelen);
+                             (long long int)ret, (long long int)lastgranule,
+                              (long long int)wantedpos, (long long int)avgpagelen);
                         return ret;
                     }
                     break;
@@ -340,7 +341,7 @@ static int opus_seek_page_granule(int64_t pos, int64_t curpos,
 
     ogg_sync_reset(oy);
 
-    LOGF("Seek failed:%lld\n", offset);
+    LOGF("Seek failed:%lld\n",  (long long int)offset);
 
     return -1;
 }
@@ -410,8 +411,8 @@ enum codec_status codec_run(void)
                 skip = MIN(seek_target, SEEK_REWIND);
                 seek_target -= skip;
 
-                LOGF("Opus seek page:%lld,%lld,%ld\n",
-                    seek_target, page_granule, (long)param);
+                LOGF("Opus seek page:%lld,%lld,%ld\n", (long long int)seek_target,
+                     (long long int)page_granule, (long)param);
                 opus_seek_page_granule(seek_target, page_granule, &oy, &os);
                 /* reset the state to help ensure that subsequent packets won't
                    use state set by unrelated packets processed before seek */
