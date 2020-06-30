@@ -185,42 +185,9 @@ int disk_mount(int drive)
     disk_sector_multiplier[IF_MD_DRV(drive)] = 1;
 #endif
 
-    for (int i = CONFIG_DEFAULT_PARTNUM;
-         volume != -1 && i < 4 && mounted < NUM_VOLUMES_PER_DRIVE;
-         i++)
-    {
-        if (pinfo[i].type == 0 || pinfo[i].type == 5)
-            continue;  /* skip free/extended partitions */
 
-    #ifdef MAX_LOG_SECTOR_SIZE
-        for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
-        {
-            if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
-            {
-                pinfo[i].start *= j;
-                pinfo[i].size *= j;
-                mounted++;
-                vol_drive[volume] = drive; /* remember the drive for this volume */
-                disk_sector_multiplier[drive] = j;
-                volume_onmount_internal(IF_MV(volume));
-                volume = get_free_volume(); /* prepare next entry */
-                break;
-            }
-        }
-    #else /* ndef MAX_LOG_SECTOR_SIZE */
-        if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
-        {
-            mounted++;
-            vol_drive[volume] = drive; /* remember the drive for this volume */
-            volume_onmount_internal(IF_MV(volume));
-            volume = get_free_volume(); /* prepare next entry */
-        }
-    #endif /* MAX_LOG_SECTOR_SIZE */
-    }
-
-    if (mounted == 0 && volume != -1) /* none of the 4 entries worked? */
-    {   /* try "superfloppy" mode */
-        DEBUGF("No partition found, trying to mount sector 0.\n");
+       /* try "superfloppy" mode */
+        DEBUGF("Trying to mount sector 0.\n");
 
         if (!fat_mount(IF_MV(volume,) IF_MD(drive,) 0))
         {
@@ -231,6 +198,41 @@ int disk_mount(int drive)
             mounted = 1;
             vol_drive[volume] = drive; /* remember the drive for this volume */
             volume_onmount_internal(IF_MV(volume));
+        }
+
+    if (mounted == 0 && volume != -1) /* not a "superfloppy"? */
+    {
+        for (int i = CONFIG_DEFAULT_PARTNUM;
+             volume != -1 && i < 4 && mounted < NUM_VOLUMES_PER_DRIVE;
+             i++)
+        {
+            if (pinfo[i].type == 0 || pinfo[i].type == 5)
+                continue;  /* skip free/extended partitions */
+
+        #ifdef MAX_LOG_SECTOR_SIZE
+            for (int j = 1; j <= (MAX_LOG_SECTOR_SIZE/SECTOR_SIZE); j <<= 1)
+            {
+                if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start * j))
+                {
+                    pinfo[i].start *= j;
+                    pinfo[i].size *= j;
+                    mounted++;
+                    vol_drive[volume] = drive; /* remember the drive for this volume */
+                    disk_sector_multiplier[drive] = j;
+                    volume_onmount_internal(IF_MV(volume));
+                    volume = get_free_volume(); /* prepare next entry */
+                    break;
+                }
+            }
+        #else /* ndef MAX_LOG_SECTOR_SIZE */
+            if (!fat_mount(IF_MV(volume,) IF_MD(drive,) pinfo[i].start))
+            {
+                mounted++;
+                vol_drive[volume] = drive; /* remember the drive for this volume */
+                volume_onmount_internal(IF_MV(volume));
+                volume = get_free_volume(); /* prepare next entry */
+            }
+        #endif /* MAX_LOG_SECTOR_SIZE */
         }
     }
 
