@@ -173,6 +173,7 @@ static bool extract_link_destination(const int fd,
     if (*link_flags & HAS_RELATIVE_PATH) {
         int ccount;
         r = read_word(fd, &ccount);
+        if (!r) return false;
         if (*link_flags & IS_UNICODE) {
             unsigned char utf16[4], utf8[10];
             link_target[0] = '\0';
