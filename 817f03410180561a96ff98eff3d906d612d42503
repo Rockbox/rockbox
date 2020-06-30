@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a9800114_67b4f2d0",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 1
+      },
+      "lineNbr": 16552,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-06-30T14:12:04Z",
+      "side": 1,
+      "message": "this needs to be \u0027x3ii\u0027 not \u0027x311\u0027",
+      "range": {
+        "startLine": 16552,
+        "startChar": 22,
+        "endLine": 16552,
+        "endChar": 30
+      },
+      "revId": "817f03410180561a96ff98eff3d906d612d42503",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
