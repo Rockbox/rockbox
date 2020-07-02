@@ -115,6 +115,7 @@ static inline void plot(fb_data *fb, int w, int h,
                         unsigned x, unsigned y, unsigned long a,
                         unsigned long r1, unsigned long g1, unsigned long b1,
                         unsigned cl, unsigned cr, unsigned cu, unsigned cd);
+static void zoom_clamp_panning(void);
 
 static midend *me = NULL;
 static unsigned *colors = NULL;
@@ -137,7 +138,7 @@ static int mouse_x, mouse_y;
 extern bool audiobuf_available; /* defined in rbmalloc.c */
 
 static fb_data *zoom_fb; /* dynamically allocated */
-static int zoom_x, zoom_y, zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
+static int zoom_x = -1, zoom_y = -1, zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
 static int cur_font = FONT_UI;
 
 static bool need_draw_update = false;
@@ -1722,30 +1723,34 @@ static int process_input(int tmo, bool do_pausemenu)
      * following code is needed for mouse mode. */
     if(mouse_mode)
     {
-        static int last_mousedir = 0, held_count = 0, v = 1;
+        static int held_count = 0, v = 2;
+
+        int dx = 0, dy = 0;
 
         if(button & BTN_UP)
-            state = CURSOR_UP;
-        else if(button & BTN_DOWN)
-            state = CURSOR_DOWN;
-        else if(button & BTN_LEFT)
-            state = CURSOR_LEFT;
-        else if(button & BTN_RIGHT)
-            state = CURSOR_RIGHT;
+            dy -= 1;
+        if(button & BTN_DOWN)
+            dy += 1;
+        if(button & BTN_LEFT)
+            dx -= 1;
+        if(button & BTN_RIGHT)
+            dx += 1;
 
         unsigned released = ~button & last_keystate,
-            pressed = button & ~last_keystate;
+                  pressed =  button & ~last_keystate;
 
-        last_keystate = button;
-
-        /* move */
-        /* get the direction vector the cursor is moving in. */
-        int new_x = mouse_x, new_y = mouse_y;
-
-        /* in src/misc.c */
-        move_cursor(state, &new_x, &new_y, LCD_WIDTH, LCD_HEIGHT, false);
-
-        int dx = new_x - mouse_x, dy = new_y - mouse_y;
+        /* acceleration */
+        if(button && button == last_keystate)
+        {
+            if(++held_count % 4 == 0 && v < 15)
+                v++;
+        }
+        else
+        {
+            LOGF("no buttons pressed, or state changed");
+            v = 1;
+            held_count = 0;
+        }
 
         mouse_x += dx * v;
         mouse_y += dy * v;
@@ -1753,15 +1758,25 @@ static int process_input(int tmo, bool do_pausemenu)
         /* clamp */
         /* The % operator with negative operands is messy; this is much
          * simpler. */
+        bool clamped_x = false, clamped_y = false;
+
         if(mouse_x < 0)
-            mouse_x = 0;
+            mouse_x = 0, clamped_x = true;
         if(mouse_y < 0)
-            mouse_y = 0;
+            mouse_y = 0, clamped_y = true;
 
         if(mouse_x >= LCD_WIDTH)
-            mouse_x = LCD_WIDTH - 1;
+            mouse_x = LCD_WIDTH - 1, clamped_x = true;
         if(mouse_y >= LCD_HEIGHT)
-            mouse_y = LCD_HEIGHT - 1;
+            mouse_y = LCD_HEIGHT - 1, clamped_y = true;
+
+        if((clamped_x || clamped_y) && zoom_enabled) {
+            if(clamped_x)
+                zoom_x += dx * v;
+            if(clamped_y)
+                zoom_y += dy * v;
+            zoom_clamp_panning();
+        }
 
         /* clicking/dragging */
         /* rclick on hold requires that we fire left-click on a
@@ -1777,31 +1792,23 @@ static int process_input(int tmo, bool do_pausemenu)
         }
         else
         {
-            if(pressed & BTN_FIRE)
+            if(pressed & BTN_FIRE) {
                 send_click(LEFT_BUTTON, false);
+                accept_input = false;
+            }
             else if(released & BTN_FIRE)
                 send_click(LEFT_RELEASE, false);
             else if(button & BTN_FIRE)
                 send_click(LEFT_DRAG, false);
         }
 
-        /* acceleration */
-        if(state && state == last_mousedir)
+        if(!button)
         {
-            if(++held_count % 5 == 0 && v < 15)
-                v++;
+            LOGF("all keys released, accepting further input");
+            accept_input = true;
         }
-        else
-        {
-            if(!button)
-            {
-                LOGF("all keys released, accepting further input");
-                accept_input = true;
-            }
-            last_mousedir = state;
-            v = 1;
-            held_count = 0;
-        }
+
+        last_keystate = button;
 
         /* no buttons are sent to the midend in mouse mode */
         return 0;
@@ -1972,6 +1979,18 @@ static int process_input(int tmo, bool do_pausemenu)
     return state;
 }
 
+static void zoom_clamp_panning(void) {
+    if(zoom_y < 0)
+        zoom_y = 0;
+    if(zoom_x < 0)
+        zoom_x = 0;
+
+    if(zoom_y + LCD_HEIGHT >= zoom_h)
+        zoom_y = zoom_h - LCD_HEIGHT;
+    if(zoom_x + LCD_WIDTH >= zoom_w)
+        zoom_x = zoom_w - LCD_WIDTH;
+}
+
 /* This function handles zoom mode, where the user can either pan
  * around a zoomed-in image or play a zoomed-in version of the game. */
 static void zoom(void)
@@ -2001,12 +2020,20 @@ static void zoom(void)
         return;
     }
 
+    /* set position */
+
+    if(zoom_x < 0) {
+        /* first run */
+        zoom_x = zoom_w / 2 - LCD_WIDTH / 2;
+        zoom_y = zoom_h / 2 - LCD_HEIGHT / 2;
+    }
+
+    zoom_clamp_panning();
+
     zoom_enabled = true;
 
     /* draws go to the zoom framebuffer */
     midend_force_redraw(me);
-
-    zoom_x = zoom_y = 0;
 
     rb->lcd_bitmap_part(zoom_fb, zoom_x, zoom_y, STRIDE(SCREEN_MAIN, zoom_w, zoom_h),
                         0, 0, LCD_WIDTH, LCD_HEIGHT);
@@ -2031,18 +2058,25 @@ static void zoom(void)
         if(view_mode)
         {
             int button = rb->button_get_w_tmo(timer_on ? TIMER_INTERVAL : -1);
+
+            exit_on_usb(button);
+
             switch(button)
             {
             case BTN_UP:
+            case BTN_UP | BUTTON_REPEAT:
                 zoom_y -= PAN_Y; /* clamped later */
                 break;
             case BTN_DOWN:
+            case BTN_DOWN | BUTTON_REPEAT:
                 zoom_y += PAN_Y; /* clamped later */
                 break;
             case BTN_LEFT:
+            case BTN_LEFT | BUTTON_REPEAT:
                 zoom_x -= PAN_X; /* clamped later */
                 break;
             case BTN_RIGHT:
+            case BTN_RIGHT | BUTTON_REPEAT:
                 zoom_x += PAN_X; /* clamped later */
                 break;
             case BTN_PAUSE:
@@ -2050,22 +2084,15 @@ static void zoom(void)
                 sfree(zoom_fb);
                 fix_size();
                 return;
-            case BTN_FIRE:
+            case BTN_FIRE | BUTTON_REL:
+                /* state change to interaction mode */
                 view_mode = false;
-                continue;
+                break;
             default:
                 break;
             }
 
-            if(zoom_y < 0)
-                zoom_y = 0;
-            if(zoom_x < 0)
-                zoom_x = 0;
-
-            if(zoom_y + LCD_HEIGHT >= zoom_h)
-                zoom_y = zoom_h - LCD_HEIGHT;
-            if(zoom_x + LCD_WIDTH >= zoom_w)
-                zoom_x = zoom_w - LCD_WIDTH;
+            zoom_clamp_panning();
 
             if(timer_on)
                 timer_cb();
@@ -2081,8 +2108,22 @@ static void zoom(void)
         }
         else
         {
+            /* The cursor is always in screenspace coordinates; when
+             * zoomed, this means the mouse is always restricted to
+             * the bounds of the physical display, not the virtual
+             * zoom framebuffer. */
+            if(mouse_mode)
+                draw_mouse();
+
+            rb->lcd_update();
+
+            if(mouse_mode)
+                clear_mouse();
+
             /* basically a copy-pasta'd main loop */
             int button = process_input(timer_on ? TIMER_INTERVAL : -1, false);
+
+            exit_on_usb(button);
 
             if(button < 0)
             {
@@ -2103,18 +2144,6 @@ static void zoom(void)
                                 0, 0, LCD_WIDTH, LCD_HEIGHT);
 
             draw_title(false);
-
-            /* The cursor is always in screenspace coordinates; when
-             * zoomed, this means the mouse is always restricted to
-             * the bounds of the physical display, not the virtual
-             * zoom framebuffer. */
-            if(mouse_mode)
-                draw_mouse();
-
-            rb->lcd_update();
-
-            if(mouse_mode)
-                clear_mouse();
 
             rb->yield();
         }
