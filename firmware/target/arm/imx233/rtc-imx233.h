@@ -81,6 +81,7 @@ static inline void imx233_rtc_reset_watchdog(uint32_t ms)
 
 static inline void imx233_rtc_init(void)
 {
+    BF_CLR(RTC_CTRL, SFTRST);
     BF_CLR(RTC_CTRL, CLKGATE);
     imx233_rtc_enable_watchdog(false);
 }
