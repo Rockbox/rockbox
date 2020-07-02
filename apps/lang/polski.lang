@@ -1258,11 +1258,11 @@
   </source>
   <dest>
     *: none
-    masf: "Super Bas"
+    masf: "Super bas"
   </dest>
   <voice>
     *: none
-    masf: "Super Bas"
+    masf: "Super bas"
   </voice>
 </phrase>
 <phrase>
@@ -1913,10 +1913,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Przechodzenie między folderami"
+    *: "Przechodzenie między katalogami"
   </dest>
   <voice>
-    *: "Przechodzenie między folderami"
+    *: "Przechodzenie między katalogami"
   </voice>
 </phrase>
 <phrase>
@@ -1955,10 +1955,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Obsługa plików cue"
+    *: "Obsługa plików CUE"
   </dest>
   <voice>
-    *: "Obsługa plików kue"
+    *: "Obsługa plików ce u e"
   </voice>
 </phrase>
 <phrase>
@@ -2062,10 +2062,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Kolejność folderów"
+    *: "Kolejność katalogów"
   </dest>
   <voice>
-    *: "Kolejność folderów"
+    *: "Kolejność katalogów"
   </voice>
 </phrase>
 <phrase>
@@ -2216,10 +2216,10 @@
     *: "Current Directory Only"
   </source>
   <dest>
-    *: "Tylko aktywny folder"
+    *: "Tylko aktywny katalog"
   </dest>
   <voice>
-    *: "Tylko aktywny folder"
+    *: "Tylko aktywny katalog"
   </voice>
 </phrase>
 <phrase>
@@ -2272,7 +2272,7 @@
   </source>
   <dest>
     *: none
-    tc_ramcache: "Wczytaj do RAMu"
+    tc_ramcache: "Wczytaj do RAM"
   </dest>
   <voice>
     *: none
@@ -2714,11 +2714,11 @@
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Do góry nogami"
+    lcd_bitmap: "Odwrócony"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Do góry nogami"
+    lcd_bitmap: "Odwrócony"
   </voice>
 </phrase>
 <phrase>
@@ -3814,7 +3814,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Niklowo metalowo wodorowa"
+    battery_types: "Niklowo metalowo wodorkowy"
   </voice>
 </phrase>
 <phrase>
@@ -3858,11 +3858,11 @@
   </source>
   <dest>
     *: none
-    dircache: "Cache folderów"
+    dircache: "Pamięć podręczna katalogów"
   </dest>
   <voice>
     *: none
-    dircache: "Kesz folderów"
+    dircache: "Pamięć podręczna katalogów"
   </voice>
 </phrase>
 <phrase>
@@ -4348,10 +4348,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Maks. ilość plików przeglądarki folderów"
+    *: "Maks. liczba elementów przeglądarki plików"
   </dest>
   <voice>
-    *: "Maksymalna ilość plików przeglądarki folderów"
+    *: "Maksymalna liczba elementów przeglądarki plików"
   </voice>
 </phrase>
 <phrase>
@@ -4698,10 +4698,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Mówione foldery"
+    *: "Mówione katalogi"
   </dest>
   <voice>
-    *: "Mówione foldery"
+    *: "Mówione katalogi"
   </voice>
 </phrase>
 <phrase>
@@ -4712,10 +4712,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Użyj folderów .talk"
+    *: "Użyj katalogów .talk"
   </dest>
   <voice>
-    *: "Użyj folderów .talk"
+    *: "Użyj katalogów .talk"
   </voice>
 </phrase>
 <phrase>
@@ -5879,11 +5879,11 @@
   </source>
   <dest>
     *: none
-    recording: "Folder"
+    recording: "Katalog"
   </dest>
   <voice>
     *: none
-    recording: "Folder"
+    recording: "Katalog"
   </voice>
 </phrase>
 <phrase>
@@ -5896,11 +5896,11 @@
   </source>
   <dest>
     *: none
-    recording: "Ustaw jako folder nagrywania"
+    recording: "Ustaw jako katalog nagrywania"
   </dest>
   <voice>
     *: none
-    recording: "Ustaw jako folder nagrywania"
+    recording: "Ustaw jako katalog nagrywania"
   </voice>
 </phrase>
 <phrase>
@@ -5913,11 +5913,11 @@
   </source>
   <dest>
     *: none
-    recording: "Wyczyść folder nagrywania"
+    recording: "Wyczyść katalog nagrywania"
   </dest>
   <voice>
     *: none
-    recording: "Wyczyść folder nagrywania"
+    recording: "Wyczyść katalog nagrywania"
   </voice>
 </phrase>
 <phrase>
@@ -5930,11 +5930,11 @@
   </source>
   <dest>
     *: none
-    recording: "Nie można zapisać do folderu"
+    recording: "Nie można zapisać do katalogu"
   </dest>
   <voice>
     *: none
-    recording: "Nie można zapisać do folderu nagrywania"
+    recording: "Nie można zapisać do katalogu nagrywania"
   </voice>
 </phrase>
 <phrase>
@@ -6083,11 +6083,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop"
+    recording: "Zatrzymaj"
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Zatrzymaj"
   </voice>
 </phrase>
 <phrase>
@@ -6358,10 +6358,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Pokazuj pozycje"
+    *: "Pokaż pozycje"
   </dest>
   <voice>
-    *: "Pokazuj pozycje"
+    *: "Pokaż pozycje"
   </voice>
 </phrase>
 <phrase>
@@ -6442,10 +6442,10 @@
     *: "Playlist Catalogue"
   </source>
   <dest>
-    *: "Katalog List odtwarzania"
+    *: "Katalog list odtwarzania"
   </dest>
   <voice>
-    *: "Katalog List odtwarzania"
+    *: "Katalog list odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -6456,10 +6456,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Rekurencyjnie wstawiaj foldery"
+    *: "Rekurencyjnie wstawiaj katalogi"
   </dest>
   <voice>
-    *: "Rekurencyjnie wstawiaj foldery"
+    *: "Rekurencyjnie wstawiaj katalogi"
   </voice>
 </phrase>
 <phrase>
@@ -6704,7 +6704,7 @@
     *: "Debug (Keep Out!)"
   </source>
   <dest>
-    *: "Debug (nie wchodzić!)"
+    *: "Debugowanie (nie wchodzić!)"
   </dest>
   <voice>
     *: "Diagnostyka, nie wchodzić!"
@@ -6987,7 +6987,7 @@
     *: "%s nie istnieje"
   </dest>
   <voice>
-    *: "Folder przechowujący listy odtwarzania nie istnieje."
+    *: "Katalog przechowujący listy odtwarzania nie istnieje."
   </voice>
 </phrase>
 <phrase>
@@ -7082,10 +7082,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Przeglądaj pliki cue"
+    *: "Przeglądaj pliki CUE"
   </dest>
   <voice>
-    *: "Przeglądaj pliki kue"
+    *: "Przeglądaj pliki ce u e"
   </voice>
 </phrase>
 <phrase>
@@ -7236,10 +7236,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Wykonawca Albumu"
+    *: "Wykonawca albumu"
   </dest>
   <voice>
-    *: "Wykonawca Albumu"
+    *: "Wykonawca albumu"
   </voice>
 </phrase>
 <phrase>
@@ -7418,10 +7418,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "Plik/folder istnieje. Zamienić?"
+    *: "Plik/katalog istnieje. Zamienić?"
   </dest>
   <voice>
-    *: "Plik lub folder istnieje. Zamienić?"
+    *: "Plik lub katalog istnieje. Zamienić?"
   </voice>
 </phrase>
 <phrase>
@@ -7446,10 +7446,10 @@
     *: "Delete Directory"
   </source>
   <dest>
-    *: "Usuń folder"
+    *: "Usuń katalog"
   </dest>
   <voice>
-    *: "Usuń folder"
+    *: "Usuń katalog"
   </voice>
 </phrase>
 <phrase>
@@ -7595,10 +7595,10 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Utwórz folder"
+    *: "Utwórz katalog"
   </dest>
   <voice>
-    *: "Utwórz folder"
+    *: "Utwórz katalog"
   </voice>
 </phrase>
 <phrase>
@@ -7656,7 +7656,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Przyśpiesz"
+    pitchscreen: "Przyspiesz"
   </dest>
   <voice>
     *: none
@@ -7822,10 +7822,10 @@
     *: "Error accessing directory"
   </source>
   <dest>
-    *: "Brak dostępu do folderu"
+    *: "Brak dostępu do katalogu"
   </dest>
   <voice>
-    *: "Brak dostępu do folderu"
+    *: "Brak dostępu do katalogu"
   </voice>
 </phrase>
 <phrase>
@@ -7997,7 +7997,7 @@
   </source>
   <dest>
     *: none
-    soft_shutdown: "Wciśnij OFF aby wyłączyć"
+    soft_shutdown: "Wciśnij OFF, aby wyłączyć"
   </dest>
   <voice>
     *: none
@@ -8197,10 +8197,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Bufor folderów jest pełny!"
+    *: "Bufor katalogów jest pełny!"
   </dest>
   <voice>
-    *: "Bufor folderów jest pełny!"
+    *: "Bufor katalogów jest pełny!"
   </voice>
 </phrase>
 <phrase>
@@ -9483,7 +9483,7 @@
     *: ""
   </dest>
   <voice>
-    *: "folder"
+    *: "katalog"
   </voice>
 </phrase>
 <phrase>
@@ -10027,10 +10027,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Pokazuj rozszerzenia plików"
+    *: "Pokaż rozszerzenia plików"
   </dest>
   <voice>
-    *: "Pokazuj rozszerzenia plików"
+    *: "Pokaż rozszerzenia plików"
   </voice>
 </phrase>
 <phrase>
@@ -10866,11 +10866,11 @@
   </source>
   <dest>
     *: none
-    agc: "AKW max. wzmocnienie"
+    agc: "Maks. wzmocnienie AKW"
   </dest>
   <voice>
     *: none
-    agc: "a ka wu maksymalne wzmocnienie"
+    agc: "Maksymalne wzmocnienie a ka wu"
   </voice>
 </phrase>
 <phrase>
@@ -11024,11 +11024,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw jako lewy element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako lewy element szybkiego dostępu"
   </dest>
   <voice>
     *: none
-    quickscreen: "Ustaw jako lewy element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako lewy element szybkiego dostępu"
   </voice>
 </phrase>
 <phrase>
@@ -11041,11 +11041,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw jako prawy element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako prawy element szybkiego dostępu"
   </dest>
   <voice>
     *: none
-    quickscreen: "Ustaw jako prawy element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako prawy element szybkiego dostępu"
   </voice>
 </phrase>
 <phrase>
@@ -11058,11 +11058,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw jako dolny element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako dolny element szybkiego dostępu"
   </dest>
   <voice>
     *: none
-    quickscreen: "Ustaw jako dolny element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako dolny element szybkiego dostępu"
   </voice>
 </phrase>
 <phrase>
@@ -11213,11 +11213,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Szybciej/Wolniej"
+    swcodec: "Szybciej/wolniej"
   </dest>
   <voice>
     *: none
-    swcodec: "Szybciej/Wolniej"
+    swcodec: "Szybciej/wolniej"
   </voice>
 </phrase>
 <phrase>
@@ -11459,11 +11459,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Ustaw jako górny element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako górny element szybkiego dostępu"
   </dest>
   <voice>
     *: none
-    quickscreen: "Ustaw jako górny element Szybkiego Dostępu"
+    quickscreen: "Ustaw jako górny element szybkiego dostępu"
   </voice>
 </phrase>
 <phrase>
@@ -11691,11 +11691,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Auto"
+    swcodec: "Automatycznie"
   </dest>
   <voice>
     *: none
-    swcodec: "Auto"
+    swcodec: "Automatycznie"
   </voice>
 </phrase>
 <phrase>
@@ -11838,7 +11838,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB HID"
+    usb_hid: "Urządzenie USB HID"
   </dest>
   <voice>
     *: none
@@ -11923,11 +11923,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Szybki przycisk dla menadżera plików"
+    hotkey: "Szybki przycisk menadżera plików"
   </dest>
   <voice>
     *: none
-    hotkey: "Szybki przycisk dla menadżera plików"
+    hotkey: "Szybki przycisk menadżera plików"
   </voice>
 </phrase>
 <phrase>
@@ -12506,10 +12506,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Rozpocznij Przeglądanie Plików w /"
+    *: "Rozpocznij przeglądanie plików w /"
   </dest>
   <voice>
-    *: "Rozpocznij Przeglądanie Plików w katalogu głównym"
+    *: "Rozpocznij przeglądanie plików w katalogu głównym"
   </voice>
 </phrase>
 <phrase>
@@ -12520,10 +12520,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Rozpocznij Przeglądanie Plików Tutaj"
+    *: "Rozpocznij przeglądanie plików tutaj"
   </dest>
   <voice>
-    *: "Rozpocznij Przeglądanie Plików Tutaj"
+    *: "Rozpocznij przeglądanie plików tutaj"
   </voice>
   </phrase>
 <phrase>
@@ -12635,10 +12635,10 @@
     *: "Rewind on Pause"
   </source>
   <dest>
-    *: "Cofaj po Wstrzymaniu"
+    *: "Cofnij po wstrzymaniu"
   </dest>
   <voice>
-    *: "Cofaj po Wstrzymaniu"
+    *: "Cofnij po wstrzymaniu"
   </voice>
 </phrase>
 <phrase>
@@ -12649,10 +12649,10 @@
     *: "Current Playlist"
   </source>
   <dest>
-    *: "Obecna Lista odtwarzania"
+    *: "Obecna lista odtwarzania"
   </dest>
   <voice>
-    *: "Obecna Lista odtwarzania"
+    *: "Obecna lista odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -12677,10 +12677,10 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "Zachować Zmiany?"
+    *: "Zachować zmiany?"
   </dest>
   <voice>
-    *: "Zachować Zmiany?"
+    *: "Zachować zmiany?"
   </voice>
 </phrase>
 <phrase>
@@ -12829,10 +12829,10 @@
     *: "Startup/Shutdown"
   </source>
   <dest>
-    *: "Włączanie/Wyłączanie"
+    *: "Włączanie/wyłączanie"
   </dest>
   <voice>
-    *: "Włączanie/Wyłączanie"
+    *: "Włączanie/wyłączanie"
   </voice>
 </phrase>
 <phrase>
@@ -12949,11 +12949,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Użyj Skrótów zamiast Szybkiego Dostępu"
+    quickscreen: "Użyj skrótów zamiast szybkiego dostępu"
   </dest>
   <voice>
     *: none
-    quickscreen: "Użyj Skrótów zamiast Szybkiego Dostępu"
+    quickscreen: "Użyj skrótów zamiast szybkiego dostępu"
   </voice>
 </phrase>
 <phrase>
@@ -12964,10 +12964,10 @@
     *: "Constrain Auto-Change"
   </source>
   <dest>
-    *: "Ogranicz przechodzenie między folderami"
+    *: "Ogranicz przechodzenie między katalogami"
   </dest>
   <voice>
-    *: "Ogranicz przechodzenie między folderami"
+    *: "Ogranicz przechodzenie między katalogami"
   </voice>
 </phrase>
 <phrase>
@@ -13169,11 +13169,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Mix Suchy / Mokry"
+    swcodec: "Miks suchy / mokry"
   </dest>
   <voice>
     *: none
-    swcodec: "Mix Suchy / Mokry"
+    swcodec: "Miks suchy mokry"
   </voice>
 </phrase>
 <phrase>
@@ -13263,11 +13263,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Haas Surround"
+    swcodec: "Przestrzenny Haas"
   </dest>
   <voice>
     *: none
-    swcodec: "Haas Surround"
+    swcodec: "Przestrzenny Haas"
   </voice>
 </phrase>
 <phrase>
@@ -14500,10 +14500,10 @@
     *: "Pause / Play"
   </source>
   <dest>
-    *: "Wstrzymaj / Odtwarzaj"
+    *: "Wstrzymaj / odtwarzaj"
   </dest>
   <voice>
-    *: "Wstrzymaj / Odtwarzaj"
+    *: "Wstrzymaj / odtwarzaj"
   </voice>
 </phrase>
 <phrase>
