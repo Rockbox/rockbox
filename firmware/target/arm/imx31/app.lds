@@ -122,7 +122,7 @@ SECTIONS
         *(COMMON)
         . = ALIGN(0x4);
     } > DRAM
-    
+
     .ncbss . + NOCACHE_BASE (NOLOAD) :
     {
         . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
@@ -135,7 +135,7 @@ SECTIONS
         _end = .;
     } > DRAM
 
-    .audiobuf (NOLOAD) :
+    .audiobuf _end (NOLOAD) :
     {
         _audiobuffer = .;
         audiobuffer = .;

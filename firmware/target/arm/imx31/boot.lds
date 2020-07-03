@@ -93,7 +93,7 @@ SECTIONS
          *(COMMON)
          . = ALIGN(0x4);
     } > DRAM
-    
+
     .ncbss . + NOCACHE_BASE (NOLOAD) :
     {
         . = ALIGN(CACHEALIGN_SIZE); /* >= Cache line boundary */
@@ -106,7 +106,7 @@ SECTIONS
         _end = .;
     } > DRAM
 
-    .qharray (NOLOAD) :
+    .qharray _end (NOLOAD) :
     {
 	_qharray = .;
 	*(.qharray)
