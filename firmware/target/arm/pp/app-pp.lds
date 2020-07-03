@@ -169,7 +169,7 @@ SECTIONS
         _end = .;
     } > DRAM
 
-    .audiobuf (NOLOAD) :
+    .audiobuf _end (NOLOAD) :
     {
         _audiobuffer = .;
         . = ALIGN(0x4);
