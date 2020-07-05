@@ -1480,6 +1480,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                         }
                         break;
                 }
+		(void)len;  /* Shut up, compiler */
                 put_u32(&data[3], start_index+counter);
                 iap_send_pkt(data, 7 + strlen(data+7) + 1);
                 yield();
