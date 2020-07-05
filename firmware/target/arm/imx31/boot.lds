@@ -106,7 +106,7 @@ SECTIONS
         _end = .;
     } > DRAM
 
-    .qharray _end (NOLOAD) :
+    .qharray (NOLOAD) :
     {
 	_qharray = .;
 	*(.qharray)
