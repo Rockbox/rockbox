@@ -31,7 +31,7 @@ SECTIONS
     {
         _dramcopystart = .;
     } > DRAM
-    
+
     .text :
     {
         *(.text*)
@@ -90,7 +90,7 @@ SECTIONS
         . = ALIGN(CACHEALIGN_SIZE);
     } AT> DRAM
 
-    .bssendadr . (NOLOAD) :
+    .bssendadr (NOLOAD) :
     {
         _end = .;
     } > DRAM
