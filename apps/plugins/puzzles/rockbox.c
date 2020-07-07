@@ -37,6 +37,7 @@
 
 #include "src/puzzles.h"
 
+#include "lib/helper.h"
 #include "lib/keymaps.h"
 #include "lib/playback_control.h"
 #include "lib/simple_viewer.h"
@@ -139,6 +140,7 @@ extern bool audiobuf_available; /* defined in rbmalloc.c */
 
 static fb_data *zoom_fb; /* dynamically allocated */
 static int zoom_x = -1, zoom_y = -1, zoom_w, zoom_h, zoom_clipu, zoom_clipd, zoom_clipl, zoom_clipr;
+static bool zoom_force_center;
 static int cur_font = FONT_UI;
 
 static bool need_draw_update = false;
@@ -171,7 +173,7 @@ static bool load_success;
 /* ...did I mention there's a secret debug menu? */
 static struct {
     int slowmo_factor;
-    bool timerflash, clipoff, shortcuts, no_aa, polyanim;
+    bool timerflash, clipoff, shortcuts, no_aa, polyanim, highlight_cursor;
 } debug_settings;
 
 // used in menu titles - make sure to initialize!
@@ -337,7 +339,7 @@ static void zoom_mono_bitmap(const unsigned char *bits, int x, int y, int w, int
 static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, int h)
 {
     const unsigned char *ptr = bits;
-    unsigned char buf;
+    unsigned char buf = 0;
     int n_read = 0; /* how many 4-bit nibbles we've read (read new when even) */
 
     unsigned int pix = rb->lcd_get_foreground();
@@ -751,7 +753,7 @@ static void draw_antialiased_line(fb_data *fb, int w, int h, int x0, int y0, int
     dx = x1 - x0;
     dy = y1 - y0;
 
-    if(!(dx << FRACBITS))
+    if((dx << FRACBITS) == 0)
         return; /* bail out */
 
     long gradient = fp_div(dy << FRACBITS, dx << FRACBITS, FRACBITS);
@@ -1349,6 +1351,16 @@ static void rb_start_draw(void *handle)
 static void rb_end_draw(void *handle)
 {
     (void) handle;
+
+    if(debug_settings.highlight_cursor)
+    {
+        rb->lcd_set_foreground(LCD_RGBPACK(255,0,255));
+        int x, y, w, h;
+        midend_get_cursor_location(me, &x, &y, &w, &h);
+        if(x >= 0)
+            rb->lcd_drawrect(x, y, w, h);
+    }
+
     /* we ignore the backend's redraw requests and just
      * unconditionally update everything */
 #if 0
@@ -1991,6 +2003,47 @@ static void zoom_clamp_panning(void) {
         zoom_x = zoom_w - LCD_WIDTH;
 }
 
+static bool point_in_rect(int px, int py,
+                          int rx, int ry,
+                          int rw, int rh) {
+    return (rx <= px && px < rx + rw) && (ry <= py && py < ry + rh);
+}
+
+
+static void zoom_center_on_cursor(void) {
+    /* get cursor bounding rectangle */
+    int x, y, w, h;
+
+    midend_get_cursor_location(me, &x, &y, &w, &h);
+
+    /* no cursor */
+    if(x < 0)
+        return;
+
+    /* check if either of the top-left and bottom-right corners are
+     * off-screen */
+    bool off_screen = (!point_in_rect(x, y,         zoom_x, zoom_y, LCD_WIDTH, LCD_HEIGHT) ||
+                       !point_in_rect(x + w, y + h, zoom_x, zoom_y, LCD_WIDTH, LCD_HEIGHT));
+
+    if(off_screen || zoom_force_center)
+    {
+        /* if so, recenter */
+        int cx, cy;
+        cx = x + w / 2;
+        cy = y + h / 2;
+
+        bool x_pan = x < zoom_x || zoom_x + LCD_WIDTH <= x + w;
+        if(x_pan || zoom_force_center)
+            zoom_x = cx - LCD_WIDTH / 2;
+
+        bool y_pan = y < zoom_y || zoom_y + LCD_HEIGHT <= y + h;
+        if(y_pan || zoom_force_center)
+            zoom_y = cy - LCD_HEIGHT / 2;
+
+        zoom_clamp_panning();
+    }
+}
+
 /* This function handles zoom mode, where the user can either pan
  * around a zoomed-in image or play a zoomed-in version of the game. */
 static void zoom(void)
@@ -2136,6 +2189,8 @@ static void zoom(void)
 
             if(timer_on)
                 timer_cb();
+
+            zoom_center_on_cursor();
 
             midend_redraw(me);
 
@@ -2624,6 +2679,7 @@ static void init_default_settings(void)
     debug_settings.shortcuts = false;
     debug_settings.no_aa = false;
     debug_settings.polyanim = false;
+    debug_settings.highlight_cursor = false;
 }
 
 #ifdef DEBUG_MENU
@@ -2672,6 +2728,8 @@ static void debug_menu(void)
                         "Toggle send keys on release",
                         "Toggle ignore repeats",
                         "Toggle right-click on hold vs. dragging",
+                        "Toggle highlight cursor region",
+                        "Toggle force zoom on center",
                         "Back");
     bool quit = false;
     int sel = 0;
@@ -2693,37 +2751,43 @@ static void debug_menu(void)
             break;
         }
         case 2:
-            debug_settings.timerflash = !debug_settings.timerflash;
+            debug_settings.timerflash ^= true;
             break;
         case 3:
-            debug_settings.clipoff = !debug_settings.clipoff;
+            debug_settings.clipoff ^= true;
             break;
         case 4:
-            debug_settings.shortcuts = !debug_settings.shortcuts;
+            debug_settings.shortcuts ^= true;
             break;
         case 5:
-            debug_settings.no_aa = !debug_settings.no_aa;
+            debug_settings.no_aa ^= true;
             break;
         case 6:
             bench_aa();
             break;
         case 7:
-            debug_settings.polyanim = !debug_settings.polyanim;
+            debug_settings.polyanim ^= true;
             break;
         case 8:
-            mouse_mode = !mouse_mode;
+            mouse_mode ^= true;
             break;
         case 9:
-            input_settings.want_spacebar = !input_settings.want_spacebar;
+            input_settings.want_spacebar ^= true;
             break;
         case 10:
-            input_settings.falling_edge = !input_settings.falling_edge;
+            input_settings.falling_edge ^= true;
             break;
         case 11:
-            input_settings.ignore_repeats = !input_settings.ignore_repeats;
+            input_settings.ignore_repeats ^= true;
             break;
         case 12:
-            input_settings.rclick_on_hold = !input_settings.rclick_on_hold;
+            input_settings.rclick_on_hold ^= true;
+            break;
+        case 13:
+            debug_settings.highlight_cursor ^= true;
+            break;
+        case 14:
+            zoom_force_center ^= true;
             break;
         default:
             quit = true;
@@ -2952,10 +3016,10 @@ static void init_tlsf(void)
     init_memory_pool(giant_buffer_len, giant_buffer);
 }
 
-static int read_wrapper(void *ptr, void *buf, int len)
+static bool read_wrapper(void *ptr, void *buf, int len)
 {
     int fd = (int) ptr;
-    return rb->read(fd, buf, len);
+    return rb->read(fd, buf, len) == len;
 }
 
 static void write_wrapper(void *ptr, const void *buf, int len)
@@ -3067,6 +3131,12 @@ static void tune_input(const char *name)
     };
 
     input_settings.numerical_chooser = string_in_list(name, number_chooser_games);
+
+    static const char *force_center_games[] = {
+        "Inertia",
+        NULL
+    };
+    zoom_force_center = string_in_list(name, force_center_games);
 }
 
 static const char *init_for_game(const game *gm, int load_fd)
@@ -3241,7 +3311,7 @@ static void save_fonts(void)
             final |= oldmask;
         uint32_t left = final >> 31;
         uint32_t right = final & 0x7fffffff;
-        rb->fdprintf(outfd, "%s:%lu:%lu\n", midend_which_game(me)->name, left, right);
+        rb->fdprintf(outfd, "%s:%u:%u\n", midend_which_game(me)->name, (unsigned)left, (unsigned)right);
         rb->close(outfd);
         rb->rename(FONT_TABLE ".tmp", FONT_TABLE);
     }
