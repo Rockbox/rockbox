@@ -35,6 +35,8 @@
 #include "panic.h"
 #include "timer.h"
 
+/* Forward-declaration */
+void interrupt(void);
 
 static pthread_cond_t wfi_cond = PTHREAD_COND_INITIALIZER;
 static pthread_mutex_t wfi_mtx = PTHREAD_MUTEX_INITIALIZER;
@@ -62,7 +64,6 @@ void interrupt(void)
 {
     pthread_cond_signal(&wfi_cond);
 }
-
 
 /*
  * setup a hrtimer to send a signal to our process every tick
