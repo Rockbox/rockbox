@@ -374,7 +374,7 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
  * for sgt-puzzles, available from [1] or through Rockbox Utility.
  *
  * The font pack consists of 3 small-size fonts, and the Deja Vu
- * Sans/Mono fonts, rasterized in sizes from 10 to BUNDLE_MAX
+ * Sans/Mono fonts, rasterized in sizes from 10px to BUNDLE_MAX
  * (currently 36).
  *
  * The font loading code below tries to be smart about loading fonts:
@@ -389,7 +389,12 @@ static void zoom_alpha_bitmap(const unsigned char *bits, int x, int y, int w, in
  */
 
 static struct bundled_font {
-    int status; /* -3 = never tried loading, or unloaded, -2 = failed to load, >= -1: loaded successfully */
+     /*
+      * -3 = never tried loading, or unloaded,
+      * -2 = failed to load,
+      * [-1,): loaded successfully (FONT_SYSFIXED = -1)
+      */
+    int status;
     int last_use;
 } *loaded_fonts = NULL; /* monospace are first, then proportional */
 
@@ -446,6 +451,8 @@ static void font_path(char *buf, int type, int size)
 
 static void rb_setfont(int type, int size)
 {
+    LOGF("rb_setfont(type=%d, size=%d)", type, size);
+
     /*
      * First, clamp to range. No puzzle should ever need this large of
      * a font, anyways.
@@ -461,17 +468,29 @@ static void rb_setfont(int type, int size)
         type = FONT_FIXED;
     }
 
+    LOGF("target font type, size: %d, %d", type, size);
+
     int font_idx = (type == FONT_FIXED ? 0 : BUNDLE_COUNT) + size - BUNDLE_MIN;
+
+    LOGF("font index: %d, status=%d", font_idx, loaded_fonts[font_idx].status);
+
     switch(loaded_fonts[font_idx].status)
     {
     case -3:
     {
         /* never loaded */
+        LOGF("font %d is not resident, trying to load", font_idx);
+
         char buf[MAX_PATH];
         font_path(buf, type, size);
+
+        LOGF("font should be at: %s", buf);
+
         if(n_fonts >= MAX_FONTS)
         {
             /* unload an old font */
+            LOGF("too many resident fonts, evicting LRU");
+
             int oldest_use = -1, oldest_idx = -1;
             for(int i = 0; i < 2 * BUNDLE_COUNT; ++i)
             {
@@ -482,6 +501,8 @@ static void rb_setfont(int type, int size)
                 }
             }
             assert(oldest_idx >= 0);
+
+            LOGF("evicting %d", oldest_idx);
             rb->font_unload(loaded_fonts[oldest_idx].status);
             loaded_fonts[oldest_idx].status = -3;
             n_fonts--;
@@ -489,7 +510,10 @@ static void rb_setfont(int type, int size)
 
         loaded_fonts[font_idx].status = rb->font_load(buf);
         if(loaded_fonts[font_idx].status < 0)
+        {
+            LOGF("failed to load font %s", buf);
             goto fallback;
+        }
         loaded_fonts[font_idx].last_use = access_counter++;
         n_fonts++;
         cur_font = loaded_fonts[font_idx].status;
@@ -509,8 +533,12 @@ static void rb_setfont(int type, int size)
     return;
 
 fallback:
-    cur_font = type == FONT_FIXED ? FONT_SYSFIXED : FONT_UI;
+    LOGF("could not load font of desired size; falling back to system font");
+
+    cur_font = (type == FONT_FIXED) ? FONT_SYSFIXED : FONT_UI;
     rb->lcd_setfont(cur_font);
+
+    LOGF("set font to %d", cur_font);
 
     return;
 }
@@ -597,6 +625,8 @@ static void rb_draw_text(void *handle, int x, int y, int fonttype,
 
     int w, h;
     rb->font_getstringsize(text, &w, &h, cur_font);
+
+    LOGF("getting string size of font %d: %dx%d\n", cur_font, w, h);
 
     if(align & ALIGN_VNORMAL)
         y -= h;
@@ -3191,6 +3221,7 @@ static void exit_handler(void)
 /* try loading the fonts indicated in the on-disk font table */
 static void load_fonts(void)
 {
+    LOGF("loading cached fonts from disk");
     int fd = rb->open(FONT_TABLE, O_RDONLY);
     if(fd < 0)
         return;
@@ -3209,6 +3240,7 @@ static void load_fonts(void)
 
         if(!strcmp(tok, midend_which_game(me)->name))
         {
+            LOGF("successfully found game in table");
             uint32_t left, right;
             tok = rb->strtok_r(ptr, ":", &save);
             left = atoi(tok);
@@ -3234,6 +3266,9 @@ static void load_fonts(void)
         {
             int size = (i > BUNDLE_COUNT  ? i - BUNDLE_COUNT : i) + BUNDLE_MIN;
             int type = i > BUNDLE_COUNT ? FONT_VARIABLE : FONT_FIXED;
+
+            LOGF("loading font type %d, size %d", type, size);
+
             rb_setfont(type, size);
         }
     }
