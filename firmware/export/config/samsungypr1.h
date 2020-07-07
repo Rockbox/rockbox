@@ -5,14 +5,14 @@
 
 /* We don't run on hardware directly */
 /* YP-R1 need it too of course */
+#ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#endif
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 101
 
 #define MODEL_NAME   "Samsung YP-R1"
-
-#define USB_NONE
 
 /* define this if you have a bitmap LCD display */
 #define HAVE_LCD_BITMAP
@@ -107,17 +107,6 @@
 /* define the bitmask of recording sample rates */
 #define REC_SAMPR_CAPS HW_SAMPR_CAPS /* Same as playback */
 
-/* We have the Si4709 */
-#define CONFIG_TUNER SI4700
-#define HAVE_TUNER_PWR_CTRL
-#define HAVE_RDS_CAP
-
-/* Define this for FM radio input available */
-#define HAVE_FMRADIO_IN
-#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
-
-/* We have a GPIO pin that detects it */
-#define HAVE_HEADPHONE_DETECTION
 
 /* R1 has a standard linux RTC driver on /dev/rtc1 (->/dev/rtc)
  * The RTC is S35392 A
@@ -129,10 +118,6 @@
 #define BATTERY_CAPACITY_MAX 600 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
-
-/* Define current usage levels. */
-#define CURRENT_NORMAL     24 /* ~25h, on 600mAh that's about 24mA */
-#define CURRENT_BACKLIGHT  62 /* ~6,5h -> 92mA. Minus 24mA normal that gives us 68mA */
 
 /* R1's fuel gauge max17040 can supply both kind of values */
 #define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
@@ -154,3 +139,26 @@
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
+
+/** Non-simulator section **/
+#ifndef SIMULATOR
+
+#define USB_NONE
+
+/* We have the Si4709 */
+#define CONFIG_TUNER SI4700
+#define HAVE_TUNER_PWR_CTRL
+#define HAVE_RDS_CAP
+
+/* Define this for FM radio input available */
+#define HAVE_FMRADIO_IN
+#define INPUT_SRC_CAPS SRC_CAP_FMRADIO
+
+/* We have a GPIO pin that detects it */
+#define HAVE_HEADPHONE_DETECTION
+
+/* Define current usage levels. */
+#define CURRENT_NORMAL     24 /* ~25h, on 600mAh that's about 24mA */
+#define CURRENT_BACKLIGHT  62 /* ~6,5h -> 92mA. Minus 24mA normal that gives us 68mA */
+
+#endif /* SIMULATOR */
