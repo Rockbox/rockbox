@@ -221,6 +221,10 @@ bool logfdisplay(void)
 bool logfdump(void)
 {
     int fd;
+#if CONFIG_RTC
+    struct tm *nowtm;
+    char fname[MAX_PATH];
+#endif
 
     splashf(HZ, "Log File Dumped");
 
@@ -231,7 +235,15 @@ bool logfdump(void)
 
     logfenabled = false;
 
+#if CONFIG_RTC
+    nowtm = get_time();
+    snprintf(fname, MAX_PATH, "%s/logf_%04d%02d%02d%02d%02d%02d.txt", ROCKBOX_DIR,
+             nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday,
+             nowtm->tm_hour, nowtm->tm_min, nowtm->tm_sec);
+    fd = open(fname, O_CREAT|O_WRONLY|O_TRUNC);
+#else
     fd = open(ROCKBOX_DIR "/logf.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
+#endif
     if(-1 != fd) {
         int i;
 
