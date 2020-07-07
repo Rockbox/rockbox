@@ -3362,10 +3362,6 @@ static bool load_game(void)
             rb->close(fd);
             rb->remove(fname);
 
-#ifdef FONT_CACHING
-            load_fonts();
-#endif
-
             /* success */
             return true;
         }
@@ -3450,6 +3446,11 @@ static void puzzles_main(void)
         /* our main menu expects a ready-to-use midend */
         init_for_game(&thegame, -1);
     }
+
+#ifdef FONT_CACHING
+    LOGF("loading fonts");
+    load_fonts();
+#endif
 
     /* must be done before any menu needs to be displayed */
     rb->snprintf(menu_desc, sizeof(menu_desc), "%s Menu", midend_which_game(me)->name);
