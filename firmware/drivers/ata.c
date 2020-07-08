@@ -332,6 +332,11 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
+static inline int ata_disk_isssd(void)
+{
+    return (identify_info[217] = 0x0001);
+}
+
 static int ata_transfer_sectors(unsigned long start,
                                 int incount,
                                 void* inbuf,
@@ -445,7 +450,10 @@ static int ata_transfer_sectors(unsigned long start,
 
             if (ata_state == ATA_SPINUP) {
                 ata_state = ATA_ON;
-                spinup_time = current_tick - spinup_start;
+                if (ata_disk_isssd())
+                    spinup_time = 1;
+                else
+                    spinup_time = current_tick - spinup_start;
             }
         }
         else
@@ -473,7 +481,11 @@ static int ata_transfer_sectors(unsigned long start,
 
                 if (ata_state == ATA_SPINUP) {
                     ata_state = ATA_ON;
+                if (ata_disk_isssd())
+                    spinup_time = 1;
+		else
                     spinup_time = current_tick - spinup_start;
+
                 }
 
                 /* read the status register exactly once per loop */
