@@ -1006,7 +1006,7 @@ static void audio_update_filebuf_watermark(int seconds)
     size_t bytes = 0;
 
 #ifdef HAVE_DISK_STORAGE
-    int spinup = ata_spinup_time();
+    int spinup = storage_spinup_time();
 
     if (seconds == 0)
     {
