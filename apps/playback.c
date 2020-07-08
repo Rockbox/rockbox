@@ -26,7 +26,6 @@
 #include "panic.h"
 #include "core_alloc.h"
 #include "sound.h"
-#include "ata.h"
 #include "codecs.h"
 #include "codec_thread.h"
 #include "voice_thread.h"
@@ -39,6 +38,7 @@
 #include "pcmbuf.h"
 #include "audio_thread.h"
 #include "playback.h"
+#include "storage.h"
 #include "misc.h"
 #include "settings.h"
 
