@@ -1122,6 +1122,11 @@ unsigned short* ata_get_identify(void)
     return identify_info;
 }
 
+static inline int ata_disk_isssd(void)
+{
+  return (identify_info[217] = 0x0001);
+}
+
 static int STORAGE_INIT_ATTR init_and_check(bool hard_reset)
 {
     int rc;
