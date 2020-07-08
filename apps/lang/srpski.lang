@@ -16348,3 +16348,102 @@ id: VOICE_BAT_BENCH_KEYS
     recording: "Директоријум за снимање"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Освежи кеш"
+  </dest>
+  <voice>
+    *: "Освежи кеш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide information"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Сакриј информације"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Сакриј информације"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи албум на дну"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи албум на дну"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи албум и извођача на дну"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи албум и извођача на дну"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи албум и извођача на врху"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи албум и извођача на врху"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Прикажи албум на врху"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Прикажи албум на врху"
+  </voice>
+</phrase>
