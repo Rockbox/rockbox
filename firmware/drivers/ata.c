@@ -332,6 +332,19 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
+static inline int ata_disk_isssd(void)
+{
+    /* offset 217 is "Nominal Rotation rate"
+       0x0000 == Not reported
+       0x0001 == Solid State
+       0x0401 -> 0xffe == RPM
+       All others reserved
+
+       Some CF cards return 0x0100 (ie byteswapped 0x0001) so accept either
+     */
+    return (identify_info[217] == 0x0001 || identify_info[217] == 0x0100);
+}
+
 static int ata_transfer_sectors(unsigned long start,
                                 int incount,
                                 void* inbuf,
