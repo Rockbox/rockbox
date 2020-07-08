@@ -1046,15 +1046,16 @@ static int set_features(void)
     int pio_mode = 2;
 
     /* Find out the highest supported PIO mode */
-    if(identify_info[64] & 2)
+    if (identify_info[53] & (1<<1)) {  /* Is word 64 valid? */
+      if (identify_info[64] & 2)
         pio_mode = 4;
-    else
-        if(identify_info[64] & 1)
-            pio_mode = 3;
+      else if(identify_info[64] & 1)
+        pio_mode = 3;
+    }
 
     /* Update the table: set highest supported pio mode that we also support */
     features[0].parameter = 8 + pio_mode;
-    
+
 #ifdef HAVE_ATA_DMA
     if (identify_info[53] & (1<<2))
         /* Ultra DMA mode info present, find a mode */
