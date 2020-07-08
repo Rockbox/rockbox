@@ -801,6 +801,11 @@ bool ata_disk_is_active(void)
 
 void ata_sleepnow(void)
 {
+    /* Don't enter sleep if the device doesn't support
+       power management. */
+    if (!(identify_info[82] & (1 << 3)))
+       return;
+
     if (ata_state >= ATA_SPINUP) {
         mutex_lock(&ata_mtx);
         if (ata_state == ATA_ON) {
