@@ -1111,23 +1111,7 @@ voiceconfig () {
     fi
     if [ -n "`findtool festival`" ]; then
         FESTIVAL="(F)estival "
-        case "$thislang" in
-            "italiano")
-            FESTIVAL_OPTS="--language italian"
-            ;;
-            "espanol")
-            FESTIVAL_OPTS="--language spanish"
-            ;;
-            "finnish")
-            FESTIVAL_OPTS="--language finnish"
-            ;;
-            "czech")
-            FESTIVAL_OPTS="--language czech"
-            ;;
-            *)
-            FESTIVAL_OPTS=""
-            ;;
-        esac
+        FESTIVAL_OPTS=""
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
         DEFAULT_NOISEFLOOR="500"
@@ -1149,6 +1133,23 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="w"
     fi
+    # Allow SAPI if Windows is in use
+    if [ -n "`findtool winver`" ]; then
+        SAPI="(S)API "
+        SAPI_OPTS=""
+        DEFAULT_TTS="sapi"
+        DEFAULT_TTS_OPTS=$SAPI_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="S"
+    fi
+    if [ -n "`findtool gtts-cli`" ]; then
+        GTTS="(g)tts "
+        GTTS_OPTS=""
+        DEFAULT_TTS="gtts"
+        DEFAULT_TTS_OPTS=$GTTS_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="g"
+    fi
     if [ -n "`findtool rbspeak`" ]; then
         RBSPEAK="(O)ther "
         RBSPEAK_OPTS=""
@@ -1157,17 +1158,8 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="O"
     fi
-    # Allow SAPI if Windows is in use
-    if [ -n "`findtool winver`" ]; then
-        SAPI="(S)API "
-        SAPI_OPTS=""
-        DEFAULT_TTS="sapi"
-        DEFAULT_TTS_OPTS=$SAPI_OPTS
-        DEFAULT_NOISEFLOOR="500"
-        DEFAULT_CHOICE="s"
-    fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC"] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$RBSPEAK" ]; then
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC"] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$RBSPEAK" ] && [ "$RBSPEAK" = "$GTTS" ] ; then
         echo "You need Festival, eSpeak, Mimic, Flite, or rbspeak in your path, or SAPI available to build voice files"
         exit 3
     fi
@@ -1175,7 +1167,7 @@ voiceconfig () {
     if [ "$ARG_TTS" ]; then
         option=$ARG_TTS
     else
-        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${MIMIC}${SAPI}${SWIFT}${RBSPEAK}(${DEFAULT_CHOICE})?"
+        echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${MIMIC}${SAPI}${SWIFT}${GTTS}${RBSPEAK}(${DEFAULT_CHOICE})?"
         option=`input`
         if [ -z "$option" ]; then option=${DEFAULT_CHOICE}; fi
         advopts="$advopts --tts=$option"
@@ -1210,6 +1202,11 @@ voiceconfig () {
         TTS_ENGINE="swift"
         NOISEFLOOR="500"
         TTS_OPTS=$SWIFT_OPTS
+	;;
+	[Gg)
+        TTS_ENGINE="gtts"
+        NOISEFLOOR="500"
+        TTS_OPTS=$GTTS_OPTS
 	;;
 	[Oo])
         TTS_ENGINE="rbspeak"

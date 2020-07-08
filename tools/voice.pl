@@ -5,7 +5,7 @@
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$ 
+# $Id$
 #
 # Copyright (C) 2007 Jonas Häggqvist
 #
@@ -33,39 +33,63 @@ sub printusage {
 Usage: voice.pl [options] [path to dir]
  -V
     Create voice file. You must also specify -t and -l.
- 
+
  -C
     Create .talk clips.
 
  -t=<target>
     Specify which target you want to build voicefile for. Must include
     any features that target supports.
- 
+
  -i=<target_id>
     Numeric target id. Needed for voice building.
- 
+
  -l=<language>
     Specify which language you want to build. Without .lang extension.
- 
+
  -e=<encoder>
     Which encoder to use for voice strings
 
  -E=<encoder options>
     Which encoder options to use when compressing voice strings. Enclose
     in double quotes if the options include spaces.
- 
+
  -s=<TTS engine>
     Which TTS engine to use.
- 
+
  -S=<TTS engine options>
     Options to pass to the TTS engine. Enclose in double quotes if the
     options include spaces.
- 
+
  -v
     Be verbose
 USAGE
 ;
 }
+
+my %festival_lang_map = {
+                           'english' => 'english',
+			   'english-us' => 'english',
+			   'espanol' => 'spanish',
+			  #'finnish' => 'finnish'
+			  #'italiano' => 'italian',
+                          #'czech' => 'czech',
+			  #'welsh' => 'welsh'
+};
+
+my %gtts_lang_map = {
+    'english' => 'en-gb',  # Always first, it's the golden master
+	'deutsch' => 'de',
+	'english-us' => 'en-us',
+	'francais' => 'fr-fr',
+	'greek' => 'gr',
+	'italiano' => 'it',
+	'norsk' => 'no',
+	'polski' => 'pl',
+	'russian' => 'ru',
+	'slovak' => 'sk',
+	'srpski' => 'sr',
+};
 
 # Initialize TTS engine. May return an object or value which will be passed
 # to voicestring and shutdown_tts
@@ -73,6 +97,9 @@ sub init_tts {
     our $verbose;
     my ($tts_engine, $tts_engine_opts, $language) = @_;
     my %ret = ("name" => $tts_engine);
+    $ret{"format"} = 'wav';
+    $ret{"ttsoptions"} = "";
+
     # Don't use given/when here - it's not compatible with old perl versions
     if ($tts_engine eq 'festival') {
         print("> festival $tts_engine_opts --server\n") if $verbose;
@@ -81,8 +108,10 @@ sub init_tts {
         $SIG{INT} = sub { kill TERM => $pid; print("foo"); panic_cleanup(); };
         $SIG{KILL} = sub { kill TERM => $pid; print("boo"); panic_cleanup(); };
         $ret{"pid"} = $pid;
-    }
-    elsif ($tts_engine eq 'sapi') {
+        if (defined($festival_lang_map{$language})) {
+            $ret{"ttsoptions"} = "-l $festival_lang_map{$language} ";
+        }
+    } elsif ($tts_engine eq 'sapi') {
         my $toolsdir = dirname($0);
         my $path = `cygpath $toolsdir -a -w`;
         chomp($path);
@@ -102,6 +131,11 @@ sub init_tts {
                 "stdin" => *CMD_IN,
                 "stdout" => *CMD_OUT,
                 "vendor" => $vendor);
+    } elsif ($tts_engine eq 'gtts') {
+        $ret{"format"} = 'mp3';
+        if (defined($gtts_lang_map{$language})) {
+            $ret{"ttsoptions"} = "-l $gtts_lang_map{$language} ";
+        }
     }
     return \%ret;
 }
@@ -143,6 +177,9 @@ sub voicestring {
     my ($string, $output, $tts_engine_opts, $tts_object) = @_;
     my $cmd;
     my $name = $$tts_object{'name'};
+
+    $tts_engine_opts .= $$tts_object{"ttsoptions"};
+
     printf("Generate \"%s\" with %s in file %s\n", $string, $name, $output) if $verbose;
     if ($name eq 'festival') {
         # festival_client lies to us, so we have to do awful soul-eating
@@ -167,7 +204,7 @@ sub voicestring {
     elsif ($name eq 'flite') {
         $cmd = "flite $tts_engine_opts -t \"$string\" \"$output\"";
         print("> $cmd\n") if $verbose;
-        `$cmd`;
+        system($cmd);
     }
     elsif ($name eq 'espeak') {
         $cmd = "espeak $tts_engine_opts -w \"$output\"";
@@ -193,11 +230,14 @@ sub voicestring {
         close(RBSPEAK);
     }
     elsif ($name eq 'mimic') {
-	$cmd = "mimic $tts_engine_opts -o $output";
-	print("> $cmd\n") if $verbose;
-	open (MIMIC, "| $cmd");
-	print MIMIC $string . "\n";
-	close(MIMIC);
+        $cmd = "mimic $tts_engine_opts -o $output -t \"$string\" ";
+        print("> $cmd\n") if $verbose;
+        system($cmd);
+    }
+    elsif ($name eq 'gtts') {
+        $cmd = "gtts-cli $tts_engine_opts -o $output \"$string\"";
+        print("> $cmd\n") if $verbose;
+        system($cmd);
     }
 }
 
@@ -326,17 +366,22 @@ sub generateclips {
                     if ($id eq "VOICE_PAUSE") {
                         print("Use distributed $wav\n") if $verbose;
                         copy(dirname($0)."/VOICE_PAUSE.wav", $wav);
+                    } else {
+			voicestring($voice, $wav, $tts_engine_opts, $tts_object);
+			if ($tts_object->{'format'} eq "wav") {
+			    wavtrim($wav, 500, $tts_object);
+			    # 500 seems to be a reasonable default for now
+			}
                     }
-                    else {
-                        voicestring($voice, $wav, $tts_engine_opts, $tts_object);
-                        wavtrim($wav, 500, $tts_object);
-                        # 500 seems to be a reasonable default for now
-                    }
+		    if ($tts_object->{'format'} eq "wav" || $id eq "VOICE_PAUSE") {
+			encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
+		    } else {
+			copy($wav, $mp3);
+		    }
 
-                    encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
                     synchronize($tts_object);
                     if (defined($ENV{'POOL'})) {
-                        copy($mp3, $pool_file);
+			copy($mp3, $pool_file);
                     }
                     unlink($wav);
                 }
