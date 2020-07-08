@@ -332,6 +332,11 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 }
 #endif /* !ATA_OPTIMIZED_WRITING */
 
+static inline int ata_disk_isssd(void)
+{
+    return (identify_info[217] == 0x0001 || identity_info[217] == 0x0100);
+}
+
 static int ata_transfer_sectors(unsigned long start,
                                 int incount,
                                 void* inbuf,
