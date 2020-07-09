@@ -67,7 +67,7 @@ USAGE
 ;
 }
 
-my %festival_lang_map = {
+my %festival_lang_map = (
                            'english' => 'english',
 			   'english-us' => 'english',
 			   'espanol' => 'spanish',
@@ -75,9 +75,9 @@ my %festival_lang_map = {
 			  #'italiano' => 'italian',
                           #'czech' => 'czech',
 			  #'welsh' => 'welsh'
-};
+);
 
-my %gtts_lang_map = {
+my %gtts_lang_map = (
     'english' => 'en-gb',  # Always first, it's the golden master
 	'deutsch' => 'de',
 	'english-us' => 'en-us',
@@ -89,7 +89,7 @@ my %gtts_lang_map = {
 	'russian' => 'ru',
 	'slovak' => 'sk',
 	'srpski' => 'sr',
-};
+);
 
 # Initialize TTS engine. May return an object or value which will be passed
 # to voicestring and shutdown_tts
