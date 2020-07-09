@@ -7,6 +7,7 @@
 *.so
 *.o
 *.a
+__pycache__
 
 # Intermediate language files
 /apps/lang/*.update
@@ -126,7 +127,7 @@
 /tools/database/database
 
 # /tools/rbspeex/
-/tools/rbspeex/build
+/tools/rbspeex/build*
 /tools/rbspeex/libspeex.a
 /tools/rbspeex/librbspeex.a
 /tools/rbspeex/dep-speex
