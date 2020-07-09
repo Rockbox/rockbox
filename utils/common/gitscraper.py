@@ -212,7 +212,7 @@ def archive_files(repo, treehash, filelist, basename, tmpfolder=None,
         temp_remove = False
     workfolder = scrape_files(
         repo, treehash, filelist, os.path.join(tmpfolder, basename))[0]
-    if basename is "":
+    if basename == "":
         return ""
     print("Archiving files from repository")
     if archive == "7z":
