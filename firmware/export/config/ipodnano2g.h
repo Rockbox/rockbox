@@ -14,7 +14,7 @@
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
-#define INPUT_SRC_CAPS (SRC_CAP_LINEIN)
+#define INPUT_SRC_CAPS (SRC_CAP_LINEIN|SRC_CAP_FMRADIO)
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11 \
@@ -162,9 +162,9 @@
 //#define HAVE_LCD_CONTRAST
 
 /* Define Apple remote tuner */
-//#define CONFIG_TUNER IPOD_REMOTE_TUNER
-//#define HAVE_RDS_CAP
-//#define CONFIG_RDS RDS_CFG_PUSH
+#define CONFIG_TUNER IPOD_REMOTE_TUNER
+#define HAVE_RDS_CAP
+#define CONFIG_RDS RDS_CFG_PUSH
 
 /* The exact type of CPU */
 #define CONFIG_CPU S5L8701

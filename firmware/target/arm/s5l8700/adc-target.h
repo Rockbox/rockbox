@@ -26,7 +26,7 @@
 #define ADC_UNKNOWN_0   0
 #define ADC_UNKNOWN_1   1
 #define ADC_BATTERY     2
-#define ADC_UNKNOWN_3   3
+#define ADC_ACCESSORY   3 /* Complete Guess */
 
 #define ADC_UNREG_POWER ADC_BATTERY /* For compatibility */
 
