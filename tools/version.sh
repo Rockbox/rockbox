@@ -12,40 +12,18 @@
 
 # Prints the revision of the repository.
 #
-# The format is rNNNNN[M]-YYMMDD
+# The format is rNNNNNNNNNN[M]-YYMMDD
 #
-# The M indicates the revision isn't matched to a pure Subversion ID, usually
-# because it's built from something like GIT.
-
-svnversion_safe() {
-    # LANG=C forces svnversion to not localize "exported".
-    if OUTPUT=`LANG=C svnversion "$@"`; then
-        if [ "$OUTPUT" = "exported" ]; then
-            echo "unknown"
-        else
-            echo "r$OUTPUT"
-        fi
-    else
-        echo "unknown"
-    fi
-}
-
-# This logic is pulled from the Linux's scripts/setlocalversion (also GPL) and tweaked for
-# rockbox. If the commit information for HEAD has a svn-id in it we report that instead of
-# the git id
+# The M indicates the revision has been locally modified
+#
+# This logic is pulled from the Linux's scripts/setlocalversion (also GPL)
+# and tweaked for rockbox.
 gitversion() {
     export GIT_DIR="$1/.git"
 
     # This verifies we are in a git directory
-    if head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
+    if head=`git rev-parse --verify --short=10 HEAD 2>/dev/null`; then
 
-	# Get the svn revision of the most recent git-svn commit
-	version=`git log --pretty=format:'%b' --grep='git-svn-id: svn' -1 | tail -n 1 | perl -ne 'm/@(\d*)/; print "r" . $1;'`
-	mod=""
-	# Is this a git-svn commit?
-	if ! git log -1 --pretty=format:"%b" | grep -q "git-svn-id: svn" ; then
-	    version="$head"
-	fi
 	# Are there uncommitted changes?
 	export GIT_WORK_TREE="$1"
 	if git diff --name-only HEAD | read dummy; then
@@ -54,7 +32,7 @@ gitversion() {
 	    mod="M"
 	fi
 
-	echo "${version}${mod}"
+	echo "${head}${mod}"
 	# All done with git
 	exit
     fi
@@ -69,18 +47,12 @@ if [ -n "$1" ]; then TOP=$1; else TOP=..; fi
 if [ -z $VERSION ]; then
     # If the VERSIONFILE exisits we use that
     VERSIONFILE=docs/VERSION
-    if [ -r $TOP/$VERSIONFILE ]; then VER=`cat $TOP/$VERSIONFILE`; 
+    if [ -r $TOP/$VERSIONFILE ]; then
+        VER=`cat $TOP/$VERSIONFILE`;
     else
         # Ok, we need to derive it from the Version Control system
         if [ -d "$TOP/.git" ]; then
 	    VER=`gitversion $TOP`
-        else
-	    VER=`svnversion_safe $TOP`;
-	    if [ "$VER" = "unknown" ]; then
-            # try getting it from a subdir to test if perhaps they are symlinked
-            # from the root
-                VER=`svnversion_safe $TOP/tools`;
-	    fi
         fi
     fi
 VERSION=$VER-`date -u +%y%m%d`
