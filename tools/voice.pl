@@ -91,6 +91,20 @@ my %gtts_lang_map = (
 	'srpski' => 'sr',
 );
 
+my %espeak_lang_map = (
+    'english' => 'en-gb',  # Always first, it's the golden master
+	'deutsch' => 'de',
+	'english-us' => 'en-us',
+	'francais' => 'fr-fr',
+#	'greek' => 'gr',
+	'italiano' => 'it',
+	'norsk' => 'no',
+	'polski' => 'pl',
+	'russian' => 'ru',
+	'slovak' => 'sk',
+	'srpski' => 'sr',
+);
+
 # Initialize TTS engine. May return an object or value which will be passed
 # to voicestring and shutdown_tts
 sub init_tts {
@@ -108,8 +122,8 @@ sub init_tts {
         $SIG{INT} = sub { kill TERM => $pid; print("foo"); panic_cleanup(); };
         $SIG{KILL} = sub { kill TERM => $pid; print("boo"); panic_cleanup(); };
         $ret{"pid"} = $pid;
-        if (defined($festival_lang_map{$language})) {
-            $ret{"ttsoptions"} = "-l $festival_lang_map{$language} ";
+        if (defined($festival_lang_map{$language}) && $tts_engine_opts !~ /--language/) {
+            $ret{"ttsoptions"} = "--language $festival_lang_map{$language} ";
         }
     } elsif ($tts_engine eq 'sapi') {
         my $toolsdir = dirname($0);
@@ -133,10 +147,15 @@ sub init_tts {
                 "vendor" => $vendor);
     } elsif ($tts_engine eq 'gtts') {
         $ret{"format"} = 'mp3';
-        if (defined($gtts_lang_map{$language})) {
+        if (defined($gtts_lang_map{$language}) && $tts_engine_opts !~ /-l/) {
             $ret{"ttsoptions"} = "-l $gtts_lang_map{$language} ";
         }
+    } elsif ($tts_engine eq 'espeak') {
+        if (defined($espeak_lang_map{$language}) && $tts_engine_opts !~ /-v/) {
+            $ret{"ttsoptions"} = "-v$gtts_lang_map{$language} ";
+        }
     }
+
     return \%ret;
 }
 
@@ -207,11 +226,9 @@ sub voicestring {
         system($cmd);
     }
     elsif ($name eq 'espeak') {
-        $cmd = "espeak $tts_engine_opts -w \"$output\"";
+        $cmd = "espeak $tts_engine_opts -w \"$output\" \"$string\"";
         print("> $cmd\n") if $verbose;
-        open(ESPEAK, "| $cmd");
-        print ESPEAK $string . "\n";
-        close(ESPEAK);
+        system($cmd);
     }
     elsif ($name eq 'sapi') {
         print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
