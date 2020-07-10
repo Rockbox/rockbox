@@ -1109,6 +1109,14 @@ voiceconfig () {
         DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
+    if [ -n "`findtool espeak-ng`" ]; then
+        ESPEAK="(e)Speak-ng "
+        ESPEAK_OPTS=""
+        DEFAULT_TTS="espeak-ng"
+        DEFAULT_TTS_OPTS=$ESPEAK_OPTS
+        DEFAULT_NOISEFLOOR="500"
+        DEFAULT_CHOICE="e"
+    fi
     if [ -n "`findtool festival`" ]; then
         FESTIVAL="(F)estival "
         FESTIVAL_OPTS=""

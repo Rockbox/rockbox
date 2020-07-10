@@ -79,30 +79,43 @@ my %festival_lang_map = (
 
 my %gtts_lang_map = (
     'english' => 'en-gb',  # Always first, it's the golden master
+	'czech' => 'cs',   # not supported
 	'deutsch' => 'de',
-	'english-us' => 'en-us',
+        'english-us' => 'en-us',
+	'espanol' => 'es-es',
 	'francais' => 'fr-fr',
-	'greek' => 'gr',
-	'italiano' => 'it',
+        'greek' => 'gr',
+        'magyar' => 'hu',
+        'italiano' => 'it',
+#        'nederlands' => 'nl',  # not supported
 	'norsk' => 'no',
 	'polski' => 'pl',
 	'russian' => 'ru',
 	'slovak' => 'sk',
-	'srpski' => 'sr',
+        'srpski' => 'sr',
+        'svenska' => 'sv',
+        'turkce' => 'tr',
 );
 
 my %espeak_lang_map = (
     'english' => 'en-gb',  # Always first, it's the golden master
+	'czech' => 'cs',
 	'deutsch' => 'de',
-	'english-us' => 'en-us',
+        'english-us' => 'en-us',
+	'espanol' => 'es',
 	'francais' => 'fr-fr',
-#	'greek' => 'gr',
-	'italiano' => 'it',
+	'greek' => 'el',
+        'nederlands' => 'nl',
+        'magyar' => 'hu',
+        'italiano' => 'it',
+        'japanese' => 'ja',
 	'norsk' => 'no',
 	'polski' => 'pl',
 	'russian' => 'ru',
 	'slovak' => 'sk',
-	'srpski' => 'sr',
+        'srpski' => 'sr',
+        'svenska' => 'sv',
+	'turkce' => 'tr',
 );
 
 # Initialize TTS engine. May return an object or value which will be passed
