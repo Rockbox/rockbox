@@ -26,6 +26,7 @@ use Digest::MD5 qw(md5_hex);
 use DirHandle;
 use open ':encoding(utf8)';
 use open ':std';
+use utf8;
 
 sub printusage {
     print <<USAGE
@@ -383,7 +384,7 @@ sub generateclips {
                 # If we have a pool of snippets, see if the string exists there first
                 if (defined($ENV{'POOL'})) {
                     $pool_file = sprintf("%s/%s-%s.mp3", $ENV{'POOL'},
-                                         md5_hex("$voice $tts_engine $tts_engine_opts $encoder_opts"),
+                                         md5_hex(Encode::encode_utf8("$voice $tts_engine $tts_engine_opts $encoder_opts")),
                                          $language);
                     if (-f $pool_file) {
                         printf("Re-using %s (%s) from pool\n", $id, $voice) if $verbose;

@@ -1283,6 +1283,10 @@ voiceconfig () {
         advopts="$advopts --voice=$CHOICE"
         echo "Mimic voice set to $TTS_MIMIC_VOICE"
 	TTS_OPTS="$TTS_OPTS -voice $TTS_MIMIC_VOICE"
+    elif [ "$TTS_ENGINE" = "espeak" ] ; then
+	if [ -n "`findtool espeak-ng`" ] ; then
+	    TTS_ENGINE="espeak-ng"
+	fi
     fi
 
     # Read custom tts options from command line
