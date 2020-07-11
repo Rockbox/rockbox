@@ -178,8 +178,13 @@ struct fsinfo
                                 clusters, or 0xffffffff for no hint */
 };
 /* fsinfo offsets */
-#define FSINFO_FREECOUNT 488
-#define FSINFO_NEXTFREE  492
+#define FSINFO_SIGNATURE0 0
+#define FSINFO_FREECOUNT  488
+#define FSINFO_NEXTFREE   492
+#define FSINFO_SIGNATURE1 508
+
+#define FSINFO_SIGNATURE0_VAL 0x41615252
+#define FSINFO_SIGNATURE1_VAL 0xAA550000
 
 #ifdef HAVE_FAT16SUPPORT
 #define BPB_FN_SET16(bpb, fn)      (bpb)->fn##__ = fn##16
@@ -1250,6 +1255,17 @@ static int fat_mount_internal(struct bpb *fat_bpb)
                    " (error code %d)\n", __func__, rc);
             FAT_ERROR(rc * 10 - 8);
         }
+
+	/* Sanity check FS info */
+        fat_bpb->fsinfo.freecount = BYTES2INT32(buf, FSINFO_SIGNATURE0);
+        fat_bpb->fsinfo.nextfree = BYTES2INT32(buf, FSINFO_SIGNATURE1);
+	if (fat_bpb->fsinfo.freecount != FSINFO_SIGNATURE0_VAL ||
+	    fat_bpb->fsinfo.nextfree != FSINFO_SIGNATURE1_VAL) {
+		DEBUGF("%S() FSInfo signature mismatch (%x/%x)\n",
+		       __func__, fat_bpb->fsinfo.freecount,
+		       fat_bpb->fsinfo.nextfree);
+		FAT_ERROR(-9);
+	}
 
         fat_bpb->fsinfo.freecount = BYTES2INT32(buf, FSINFO_FREECOUNT);
         fat_bpb->fsinfo.nextfree = BYTES2INT32(buf, FSINFO_NEXTFREE);
