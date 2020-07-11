@@ -526,6 +526,16 @@ sub allbuilds {
 	    'gtts' => '-l en-gb',
 	},
     },
+    'deutsch' => {
+	'lang' => 'deutsch',
+	'name' => 'Deutsch (German)',
+        'short' => 'de',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vde',
+	    'gtts' => '-l de',
+	},
+    },
     # Everything else in alphabetical order
     'english-us' => {
 	'lang' => 'english-us',
@@ -546,6 +556,26 @@ sub allbuilds {
 	'engines' => {
 	    'espeak' => '-vel',
 	    'gtts' => '-l el',
+	},
+    },
+    'italiano' => {
+	'lang' => 'italiano',
+	'name' => 'Italiano (Italian)',
+        'short' => 'it',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vit',
+	    'gtts' => '-l it',
+	},
+    },
+    'norsk' => {
+	'lang' => 'norsk',
+	'name' => 'Norsk (Norwegian)',
+        'short' => 'no',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vno',
+	    'gtts' => '-l no',
 	},
     },
     'polski' => {

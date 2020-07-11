@@ -164,7 +164,7 @@ sub init_tts {
         if (defined($gtts_lang_map{$language}) && $tts_engine_opts !~ /-l/) {
             $ret{"ttsoptions"} = "-l $gtts_lang_map{$language} ";
         }
-    } elsif ($tts_engine eq 'espeak') {
+    } elsif ($tts_engine eq 'espeak' || $tts_engine eq 'espeak-ng') {
         if (defined($espeak_lang_map{$language}) && $tts_engine_opts !~ /-v/) {
             $ret{"ttsoptions"} = "-v$gtts_lang_map{$language} ";
         }
@@ -240,14 +240,18 @@ sub voicestring {
         system($cmd);
     }
     elsif ($name eq 'espeak') {
-        $cmd = "espeak $tts_engine_opts -w \"$output\" \"$string\"";
+        $cmd = "espeak $tts_engine_opts -w \"$output\" --stdin";
         print("> $cmd\n") if $verbose;
-        system($cmd);
+        open(RBSPEAK, "| $cmd");
+        print RBSPEAK $string . "\n";
+        close(RBSPEAK);
     }
     elsif ($name eq 'espeak-ng') {
-        $cmd = "espeak-ng $tts_engine_opts -w \"$output\" \"$string\"";
+        $cmd = "espeak-ng $tts_engine_opts -w \"$output\" --stdin";
         print("> $cmd\n") if $verbose;
-        system($cmd);
+        open(RBSPEAK, "| $cmd");
+        print RBSPEAK $string . "\n";
+        close(RBSPEAK);
     }
     elsif ($name eq 'sapi') {
         print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
@@ -266,14 +270,18 @@ sub voicestring {
         close(RBSPEAK);
     }
     elsif ($name eq 'mimic') {
-        $cmd = "mimic $tts_engine_opts -o $output -t \"$string\" ";
+        $cmd = "mimic $tts_engine_opts -o $output";
         print("> $cmd\n") if $verbose;
-        system($cmd);
+        open(RBSPEAK, "| $cmd");
+        print RBSPEAK $string . "\n";
+        close(RBSPEAK);
     }
     elsif ($name eq 'gtts') {
-        $cmd = "gtts-cli $tts_engine_opts -o $output \"$string\"";
+        $cmd = "gtts-cli $tts_engine_opts -o $output -";
         print("> $cmd\n") if $verbose;
-        system($cmd);
+        open(RBSPEAK, "| $cmd");
+        print RBSPEAK $string . "\n";
+        close(RBSPEAK);
     }
 }
 
