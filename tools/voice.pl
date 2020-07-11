@@ -85,7 +85,7 @@ my %gtts_lang_map = (
         'english-us' => 'en-us',
 	'espanol' => 'es-es',
 	'francais' => 'fr-fr',
-        'greek' => 'gr',
+        'greek' => 'el',
         'magyar' => 'hu',
         'italiano' => 'it',
 #        'nederlands' => 'nl',  # not supported
@@ -166,7 +166,7 @@ sub init_tts {
         }
     } elsif ($tts_engine eq 'espeak' || $tts_engine eq 'espeak-ng') {
         if (defined($espeak_lang_map{$language}) && $tts_engine_opts !~ /-v/) {
-            $ret{"ttsoptions"} = "-v$gtts_lang_map{$language} ";
+            $ret{"ttsoptions"} = "-v$espeak_lang_map{$language} ";
         }
     }
 
