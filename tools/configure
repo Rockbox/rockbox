@@ -1167,8 +1167,8 @@ voiceconfig () {
         DEFAULT_CHOICE="O"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC"] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$RBSPEAK" ] && [ "$RBSPEAK" = "$GTTS" ] ; then
-        echo "You need Festival, eSpeak, Mimic, Flite, or rbspeak in your path, or SAPI available to build voice files"
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC"] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$GTTS" ] && [ "$GTTS" = "$RBSPEAK" ] ; then
+        echo "You need Festival, eSpeak, Mimic, Flite, gtts, or rbspeak in your path, or SAPI available to build voice files"
         exit 3
     fi
 
@@ -1181,42 +1181,42 @@ voiceconfig () {
         advopts="$advopts --tts=$option"
     fi
     case "$option" in
-        [Ll])
+        [Ll]|flite)
         TTS_ENGINE="flite"
         NOISEFLOOR="500" # TODO: check this value
         TTS_OPTS=$FLITE_OPTS
         ;;
-        [Ee])
+        [Ee]|espeak)
         TTS_ENGINE="espeak"
         NOISEFLOOR="500"
         TTS_OPTS=$ESPEAK_OPTS
         ;;
-        [Ff])
+        [Ff]|festival)
         TTS_ENGINE="festival"
         NOISEFLOOR="500"
         TTS_OPTS=$FESTIVAL_OPTS
         ;;
-        [Mm])
+        [Mm]|mimic)
         TTS_ENGINE="mimic"
         NOISEFLOOR="500"
         TTS_OPTS=$MIMIC_OPTS
         ;;
-        [Ss])
+        [Ss]|sapi)
         TTS_ENGINE="sapi"
         NOISEFLOOR="500"
         TTS_OPTS=$SAPI_OPTS
         ;;
-	[Ww])
+	[Ww]|swift)
         TTS_ENGINE="swift"
         NOISEFLOOR="500"
         TTS_OPTS=$SWIFT_OPTS
 	;;
-	[Gg)
+	[Gg]|gtts)
         TTS_ENGINE="gtts"
         NOISEFLOOR="500"
         TTS_OPTS=$GTTS_OPTS
 	;;
-	[Oo])
+	[Oo]|rbspeak)
         TTS_ENGINE="rbspeak"
         NOISEFLOOR="500"
         TTS_OPTS=$RBSPEAK_OPTS

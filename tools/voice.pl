@@ -244,6 +244,11 @@ sub voicestring {
         print("> $cmd\n") if $verbose;
         system($cmd);
     }
+    elsif ($name eq 'espeak-ng') {
+        $cmd = "espeak-ng $tts_engine_opts -w \"$output\" \"$string\"";
+        print("> $cmd\n") if $verbose;
+        system($cmd);
+    }
     elsif ($name eq 'sapi') {
         print({$$tts_object{"stdin"}} "SPEAK\t$output\t$string\r\n");
     }

@@ -2,12 +2,15 @@ $publicrelease="3.15";
 $releasedate="15 Nov 2019";
 $releasenotes="/wiki/ReleaseNotes315";
 
-# { 'modelname' => {
+################################################################
+
+# 'modelname' => {
 #    name => 'Full Name',
 #    status => 1,                        # 0=retired, 1=unusable, 2=unstable, 3=stable
 #    ram => 2,                           # optional (used?)
 #    manual => 'modelname2',             # optional (uses modelname2's manual)
 #    icon => 'modelname3',               # optional (uses modelname3's icon)
+#    voice => 'modelname4'               # optional (uses modelname4's voice)
 #    release => '3.14',                  # optional (final release version, if different from above)
 # }
 
@@ -492,5 +495,125 @@ sub allbuilds {
 
     return @list;
 }
+
+################################################################
+
+# 'voicename' => {
+#    lang => 'langname',                     # source rockbox .lang file
+#    name => 'Native Name ( English Name )', # descriptive text
+#    short => 'sss',                         # short iso-ish text
+#    defengine => 'enginename',              # which engine to prefer
+#    engines => {                            # supported engines
+#      enginea = '-opt1=x -opt2=y',            # options for enginea
+#      engineb = '-lang=xx',                   # options for engineb
+#    },
+# }
+
+# A single source language file can have many voice variants.
+# For example, Mandarin and Cantonese use the same "Chinese" script.
+# Also, different genders or regional accents for the same language
+
+%voices = (
+    # UK English always comes first
+    'english' => {
+	'lang' => 'english',
+	'name' => 'UK English',
+	'short' => 'en-uk',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'festival' => '--language english',
+	    'espeak' => '-ven-gb',
+	    'gtts' => '-l en-gb',
+	},
+    },
+    # Everything else in alphabetical order
+    'english-us' => {
+	'lang' => 'english-us',
+	'name' => 'American English',
+        'short' => 'en-us',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'festival' => '--language english',
+	    'espeak' => '-ven-us',
+	    'gtts' => '-l en-us',
+	},
+    },
+    'greek' => {
+	'lang' => 'greek',
+	'name' => 'Ελληνικά (Greek)',
+        'short' => 'el',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vel',
+	    'gtts' => '-l el',
+	},
+    },
+    'polski' => {
+	'lang' => 'polski',
+	'name' => 'Polski (Polish)',
+        'short' => 'pl',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vpl',
+	    'gtts' => '-l pl',
+	},
+    },
+    'russian' => {
+	'lang' => 'russian',
+	'name' => 'Русский (Russian)',
+        'short' => 'ru',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vru',
+	    'gtts' => '-l ru',
+	},
+    },
+    'slovak' => {
+	'lang' => 'slovak',
+	'name' => 'Slovenský (Slovak)',
+        'short' => 'sk',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vsk',
+	    'gtts' => '-l sk',
+	},
+    },
+    'srpski' => {
+	'lang' => 'srpski',
+	'name' => 'српски (Serbian)',
+        'short' => 'sr',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vsr',
+	    'gtts' => '-l sr',
+	},
+    },
+);
+
+sub bylang {
+    return uc $voices{$a}{lang} cmp uc $voices{$b}{lang};
+}
+
+sub allvoices {
+    my @list;
+
+    for my $b (sort bylang keys %voices) {
+        push @list, $b;
+    }
+
+    return @list;
+}
+
+sub voicesforlang($) {
+    my $l = shift @_;
+    my @list;
+
+    for my $b (sort bylang keys %voices) {
+        push @list, $b if ($voices{$b}{lang} eq $b);
+    }
+
+    return @list;
+}
+
 
 1;
