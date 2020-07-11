@@ -526,6 +526,7 @@ sub allbuilds {
 	    'gtts' => '-l en-gb',
 	},
     },
+    # Everything else in alphabetical order
     'deutsch' => {
 	'lang' => 'deutsch',
 	'name' => 'Deutsch (German)',
@@ -536,7 +537,6 @@ sub allbuilds {
 	    'gtts' => '-l de',
 	},
     },
-    # Everything else in alphabetical order
     'english-us' => {
 	'lang' => 'english-us',
 	'name' => 'American English',
