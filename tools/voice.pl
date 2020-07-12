@@ -334,11 +334,15 @@ sub generateclips {
     my $correctionsfile = dirname($0) . '/voice-corrections.txt';
     my $id = '';
     my $voice = '';
-    my $cmd = "genlang -o -t=$target -e=$english $langfile 2>/dev/null";
+    my $cmd = "genlang -o -t=$target -e=$english $language-update.lang 2>/dev/null";
     my $pool_file;
     open(VOICEFONTIDS, "> voicefontids");
     my $i = 0;
     local $| = 1; # make progress indicator work reliably
+
+    # First run the language through an update pass so any missing strings
+    # are backfilled from English.  Without this, BADNESS.
+    system("genlang -u -e=$english $langfile > $language-update.lang");
 
     my $tts_object = init_tts($tts_engine, $tts_engine_opts, $language);
     # add string corrections to tts_object.
