@@ -479,8 +479,9 @@ while(<LANG>) {
                 my $idstr = $phrase{'id'};
                 my $idnum;
 
-                if($binary && !$english{$idstr}) {
+                if(($binary || $binvoice || $voiceout) && !$english{$idstr}) {
                     # $idstr doesn't exist for english, skip it\n";
+		    # FIXME/TODO:  Any reason this filter shouldn't always be enabled?
                 }
                 elsif($dest =~ /^none\z/i) {
                     # "none" as dest (without quotes) means that this entire
