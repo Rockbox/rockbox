@@ -7517,6 +7517,7 @@
 <phrase>
   id: LANG_AGC_LIVE
   desc: AGC preset
+  user: core
   <source>
     *: "Live (slow)"
   </source>
@@ -7586,6 +7587,7 @@
 <phrase>
   id: LANG_SPLIT_SIZE
   desc: in record timesplit options
+  user: core
   <source>
     *: "Split Filesize"
   </source>
