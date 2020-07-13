@@ -466,11 +466,11 @@ build_ctng() {
 
     dlurl="http://www.rockbox.org/gcc/$ctng_target"
 
-    # download 
+    # download
     getfile "ct-ng-config" "$dlurl"
 
     test -n "$extra" && getfile "$extra" "$dlurl"
-    
+
     # create build directory
     if test -d $builddir; then
         if test ! -w $builddir; then
@@ -497,7 +497,7 @@ build_ctng() {
             tar xf "$dlwhere/$extra" -C "$prefix/$tc_arch-$ctng_target-$tc_host/$sysroot"
         fi
     fi
-    
+
     # cleanup
     cd $builddir
     rm -rf $builddir/build-$ctng_target
@@ -721,6 +721,7 @@ PATH="$prefix/bin:${PATH}"
 
 for arch in $selarch
 do
+    export MAKEFLAGS=`echo $MAKEFLAGS| sed 's/ -r / /'`  # We don't want -r
     echo ""
     case $arch in
         [Ss])
@@ -797,7 +798,7 @@ do
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
             ;;
-        [yy])
+        [Yy])
             # IMPORTANT NOTE
             # This toolchain must support several targets and thus must support
             # the oldest possible configuration.
