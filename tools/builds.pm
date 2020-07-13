@@ -563,6 +563,7 @@ sub allbuilds {
 	    'espeak' => '-vel',
 	    'gtts' => '-l el',
 	},
+        'enabled' => 1,
     },
     'italiano' => {
 	'lang' => 'italiano',
@@ -614,6 +615,7 @@ sub allbuilds {
 	    'espeak' => '-vsk',
 	    'gtts' => '-l sk',
 	},
+        'enabled' => 1,
     },
     'srpski' => {
 	'lang' => 'srpski',
