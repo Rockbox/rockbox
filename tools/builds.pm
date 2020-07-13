@@ -1,3 +1,6 @@
+# Note!  This is used by the www.rockbox.org infrastructure
+# to know what targets/etc should be displayed, built, and so forth.
+#
 $publicrelease="3.15";
 $releasedate="15 Nov 2019";
 $releasenotes="/wiki/ReleaseNotes315";
@@ -501,12 +504,13 @@ sub allbuilds {
 # 'voicename' => {
 #    lang => 'langname',                     # source rockbox .lang file
 #    name => 'Native Name ( English Name )', # descriptive text
-#    short => 'sss',                         # short iso-ish text
+#    short => 'xx',                          # short iso621-ish text
 #    defengine => 'enginename',              # which engine to prefer
 #    engines => {                            # supported engines
-#      enginea = '-opt1=x -opt2=y',            # options for enginea
-#      engineb = '-lang=xx',                   # options for engineb
+#      enginenamea = '-opt1=x -opt2=y',        # options for enginea
+#      enginenameb = '-lang=xx',               # options for engineb
 #    },
+#    enabled => 1,                           # set to 0 or leave out to disable
 # }
 
 # A single source language file can have many voice variants.
@@ -514,17 +518,18 @@ sub allbuilds {
 # Also, different genders or regional accents for the same language
 
 %voices = (
-    # UK English always comes first
+    # UK English always comes first; it's the "master"
     'english' => {
 	'lang' => 'english',
 	'name' => 'UK English',
-	'short' => 'en-uk',
+	'short' => 'en-gb',
         'defengine' => 'espeak',
 	'engines' => {
 	    'festival' => '--language english',
-	    'espeak' => '-ven-gb',
+	    'espeak' => '-ven-gb -k 5',
 	    'gtts' => '-l en-gb',
 	},
+        'enabled' => 1,
     },
     # Everything else in alphabetical order
     'deutsch' => {
@@ -544,9 +549,10 @@ sub allbuilds {
         'defengine' => 'espeak',
 	'engines' => {
 	    'festival' => '--language english',
-	    'espeak' => '-ven-us',
+	    'espeak' => '-ven-us -k 5',
 	    'gtts' => '-l en-us',
 	},
+        'enabled' => 1,
     },
     'greek' => {
 	'lang' => 'greek',
@@ -587,6 +593,7 @@ sub allbuilds {
 	    'espeak' => '-vpl',
 	    'gtts' => '-l pl',
 	},
+        'enabled' => 1,
     },
     'russian' => {
 	'lang' => 'russian',
@@ -628,7 +635,7 @@ sub allvoices {
     my @list;
 
     for my $b (sort bylang keys %voices) {
-        push @list, $b;
+        push @list, $b if (defined($voices{$b}->{enabled}) && $voices{$b}->{enabled});
     }
 
     return @list;
@@ -639,7 +646,7 @@ sub voicesforlang($) {
     my @list;
 
     for my $b (sort bylang keys %voices) {
-        push @list, $b if ($voices{$b}{lang} eq $b);
+        push @list, $b if ($voices{$b}{lang} eq $b && defined($voices{$b}->{enabled}) && $voices{$b}->{enabled});
     }
 
     return @list;
