@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4119b214_fcbb5ebb",
+        "filename": "rbutil/rbutilqt/gui/selectiveinstallwidget.cpp",
+        "patchSetId": 22
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-14T13:03:04Z",
+      "side": 1,
+      "message": "This is probably wrong for internationalization purposes.\n\nIs it enough to wrap it in tr() or is there a better string identifier to use instead?",
+      "range": {
+        "startLine": 96,
+        "startChar": 0,
+        "endLine": 96,
+        "endChar": 73
+      },
+      "revId": "8d837ce9d364fa23b3dfcb7a674eaf6c2717b134",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
