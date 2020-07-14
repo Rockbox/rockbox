@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d77a50c_88217d69",
+        "filename": "apps/onplay.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1802,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-14T17:47:52Z",
+      "side": 1,
+      "message": "If one looks at the comments in the original FS#11541, it makes sense to use more intuitive prefixes (eg P-\u003eplaylist, T-\u003etrack) instead of sequential A/B/C/D/E.",
+      "range": {
+        "startLine": 1802,
+        "startChar": 12,
+        "endLine": 1802,
+        "endChar": 31
+      },
+      "revId": "8dd491f8b89b3dfd79cf3c85e1ac19a376de4262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
