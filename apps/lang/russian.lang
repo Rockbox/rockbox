@@ -14644,23 +14644,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMAINING
-  desc: for constructs such as number of tracks remaining etc
-  user: core
-  <source>
-    *: none
-    hotkey: "Remaining"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Осталось"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Осталось"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAY_WORMLET
   desc: For wormlet menu
   user: core
@@ -14734,23 +14717,6 @@
   </dest>
   <voice>
     *: "В списке проиграно"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ELAPSED
-  desc: prefix for elapsed playtime announcement
-  user: core
-  <source>
-    *: none
-    hotkey: "Elapsed"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Проиграно"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Проиграно"
   </voice>
 </phrase>
 <phrase>
@@ -14856,20 +14822,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_PAUSE_BETWEEN_TRACKS
-  desc: in playback settings menu
-  user: core
-  <source>
-    *: "Pause between tracks"
-  </source>
-  <dest>
-    *: "Пауза между треками"
-  </dest>
-  <voice>
-    *: "Пауза между трэками"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REMOTE_CONTROL
   desc: Item for menus
   user: core
@@ -14881,23 +14833,6 @@
   </dest>
   <voice>
     *: "Управление с пульта"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DATE
-  desc: for constructing time and date announcements
-  user: core
-  <source>
-    *: none
-    hotkey: "Date"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Дата"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Дата"
   </voice>
 </phrase>
 <phrase>
@@ -15701,23 +15636,6 @@ id: VOICE_BAT_BENCH_KEYS
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS_ANNOUNCEMENT_FORMAT
-  desc: format for wps hotkey announcement
-  user: core
-  <source>
-    *: none
-    hotkey: "WPS Announcement"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Сообщения в режиме воспроизведения"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Сообщения в режиме воспроизведения"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_TONE_CONTROLS
   desc: in the mpegplayer settings menu
   user: core
@@ -15792,23 +15710,6 @@ id: VOICE_BAT_BENCH_KEYS
   </voice>
 </phrase>
 <phrase>
-  id: LANG_ALARM_TIMER
-  desc: in alarm menu setting
-  user: core
-  <source>
-    *: none
-    alarm: "Alarm Timer"
-  </source>
-  <dest>
-    *: none
-    alarm: "Таймер будильника"
-  </dest>
-  <voice>
-    *: none
-    alarm: "Таймер будильника"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHESSBOX_MENU_RESTART_GAME
   desc: in the chessbox menu
   user: core
@@ -15863,23 +15764,6 @@ id: VOICE_BAT_BENCH_KEYS
     *: none
     swcodec: "Недоступно"
     lowmem: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_VOICEINFO
-  desc: progressively voice information on the wps hotkey
-  user: core
-  <source>
-    *: none
-    hotkey: "Announce Information"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Информационное сообщение"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Информационное сообщение"
   </voice>
 </phrase>
 <phrase>
@@ -16033,23 +15917,6 @@ id: VOICE_BAT_BENCH_KEYS
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TRACKONLY
-  desc: used in track x of y constructs
-  user: core
-  <source>
-    *: none
-    hotkey: "Track"
-  </source>
-  <dest>
-    *: none
-    hotkey: "Трек"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Трэк"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_GRAYSCALE
   desc: in the imageviewer settings menu
   user: core
@@ -16146,20 +16013,6 @@ id: VOICE_BAT_BENCH_KEYS
   <voice>
     *: none
     recording: "Папка для записи"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BTN_LONG_PRESS_DURATION
-  desc: Long button press duration in ticks
-  user: core
-  <source>
-    *: "Long Button Press Duration"
-  </source>
-  <dest>
-    *: "Длительность долгого нажатия"
-  </dest>
-  <voice>
-    *: "Длительность долгого нажатия"
   </voice>
 </phrase>
 <phrase>
@@ -16506,5 +16359,104 @@ id: VOICE_BAT_BENCH_KEYS
   </dest>
   <voice>
     *: "Не удалось собрать информацию"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Показывать альбом и артиста внизу"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Показывать альбом и артиста внизу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Показывать альбом и артиста вверху"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Показывать альбом и артиста вверху"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Показывать альбом внизу"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Показывать альбом внизу"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide information"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Ничего не показывать"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Ничего не показывать"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Показывать альбом вверху"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Показывать альбом вверху"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Обновить кэш"
+  </dest>
+  <voice>
+    *: "Обновить кэш"
   </voice>
 </phrase>
