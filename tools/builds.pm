@@ -574,6 +574,7 @@ sub allbuilds {
 	    'espeak' => '-vit',
 	    'gtts' => '-l it',
 	},
+        'enabled' => 1,
     },
     'norsk' => {
 	'lang' => 'norsk',
