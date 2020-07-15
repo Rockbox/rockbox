@@ -151,6 +151,11 @@ starfield.c
 vu_meter.c
 wormlet.c
 
+#ifdef HAVE_HOTKEY
+announce_status.c
+#endif
+
+
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
 plasma.c

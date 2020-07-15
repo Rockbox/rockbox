@@ -153,7 +153,7 @@ int voicefont(FILE* voicefontids,int targetnum,char* filedir, FILE* output, unsi
             }
             else /* second run, skip the non voice only ones */
             {
-                if (!voiceonly[i] == 1)
+                if (!(voiceonly[i] == 1))
                     continue;
             }
 
