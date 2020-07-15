@@ -27,7 +27,6 @@
 #include "settings.h"
 #include "misc.h"
 #include "rbunicode.h"
-#include "buttonbar.h"
 #include "logf.h"
 #include "hangul.h"
 #include "action.h"
@@ -343,15 +342,6 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         viewportmanager_theme_enable(l, false, NULL);
     }
 
-#ifdef HAVE_BUTTONBAR
-    struct gui_buttonbar buttonbar;
-    bool buttonbar_config = global_settings.buttonbar;
-
-    global_settings.buttonbar = true;
-    gui_buttonbar_init(&buttonbar);
-    gui_buttonbar_set_display(&buttonbar, &screens[SCREEN_MAIN]);
-#endif
-
     /* initialize state */
     state.text = text;
     state.buflen = buflen;
@@ -481,12 +471,6 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
                 kbd_draw_buttons(pm, sc);
 #endif
         }
-
-#ifdef HAVE_BUTTONBAR
-        /* draw the button bar */
-        gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
-        gui_buttonbar_draw(&buttonbar);
-#endif
 
         FOR_NB_SCREENS(l)
             screens[l].update();
@@ -693,10 +677,6 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         state.changed = 0;
     }
 
-#ifdef HAVE_BUTTONBAR
-    global_settings.buttonbar = buttonbar_config;
-#endif
-
     if (ret < 0)
         splash(HZ/2, ID2P(LANG_CANCEL));
 
@@ -736,7 +716,7 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     pm->font_h = font->height;
 
     /* check if FONT_UI fits the screen */
-    if (2*pm->font_h + 3 + BUTTONBAR_HEIGHT > sc->getheight())
+    if (2*pm->font_h + 3 > sc->getheight())
     {
         pm->curfont = FONT_SYSFIXED;
         font = font_get(FONT_SYSFIXED);
@@ -796,13 +776,12 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
     }
 recalc_param:
 #endif
-    pm->lines = (sc_h - BUTTONBAR_HEIGHT) / pm->font_h - 1;
+    pm->lines = sc_h / pm->font_h - 1;
 
     if (pm->default_lines && pm->lines > pm->default_lines)
         pm->lines = pm->default_lines;
 
-    pm->keyboard_margin = sc_h - BUTTONBAR_HEIGHT
-                            - (pm->lines+1)*pm->font_h;
+    pm->keyboard_margin = sc_h - (pm->lines+1)*pm->font_h;
 
     if (pm->keyboard_margin < 3 && pm->lines > 1)
     {
@@ -840,7 +819,7 @@ recalc_param:
 #endif
 
 #ifdef HAVE_MORSE_INPUT
-    pm->old_main_y = sc_h - pm->font_h - BUTTONBAR_HEIGHT;
+    pm->old_main_y = sc_h - pm->font_h;
     if (state->morse_mode)
     {
         int y = pm->main_y;

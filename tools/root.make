@@ -14,7 +14,7 @@ DEFINES = -DROCKBOX -DMEMORYSIZE=$(MEMORYSIZE) $(TARGET) \
 	$(EXTRA_DEFINES) # <-- -DSIMULATOR or not
 INCLUDES = -I$(BUILDDIR) -I$(BUILDDIR)/lang $(TARGET_INC)
 
-CFLAGS = $(INCLUDES) $(DEFINES) $(GCCOPTS) 
+CFLAGS = $(INCLUDES) $(DEFINES) $(GCCOPTS)
 PPCFLAGS = $(filter-out -g -Dmain=SDL_main,$(CFLAGS)) # cygwin sdl-config fix
 ASMFLAGS = -D__ASSEMBLER__      # work around gcc 3.4.x bug with -std=gnu99, only meant for .S files
 CORE_LDOPTS = $(GLOBAL_LDOPTS)  # linker ops specifically for core build
@@ -24,9 +24,6 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
 	$(TOOLSDIR)/iaudio_bl_flash.h
 
-ifeq ($(MODELNAME),archosplayer)
-  TOOLS += $(TOOLSDIR)/player_unifont
-endif
 
 ifeq (,$(PREFIX))
 ifdef APP_TYPE
@@ -110,8 +107,6 @@ ifneq (,$(findstring bootloader,$(APPSDIR)))
   else
     include $(APPSDIR)/bootloader.make
   endif
-else ifneq (,$(findstring bootbox,$(APPSDIR)))
-  include $(APPSDIR)/bootbox.make
 else ifneq (,$(findstring checkwps,$(APP_TYPE)))
   include $(APPSDIR)/checkwps.make
   include $(ROOTDIR)/lib/skin_parser/skin_parser.make
@@ -182,7 +177,7 @@ OBJ := $(OBJ:.S=.o)
 OBJ += $(BMP:.bmp=.o)
 OBJ := $(call full_path_subst,$(ROOTDIR)/%,$(BUILDDIR)/%,$(OBJ))
 
-build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM) $(RBINFO)
+build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(RBINFO)
 
 $(RBINFO): $(BUILDDIR)/$(BINARY)
 	$(SILENT)echo Creating $(@F)
@@ -215,7 +210,7 @@ clean::
 		rockbox-manual*.zip sysfont.h rockbox-info.txt voicefontids \
 		*.wav *.mp3 *.voice $(CLEANOBJS) \
 		$(LINKRAM) $(LINKROM) rockbox.elf rockbox.map rockbox.bin \
-		make.dep rombox.elf rombox.map rombox.bin rombox.ucl romstart.txt \
+		make.dep rombox.elf rombox.map rombox.bin romstart.txt \
 		$(BINARY) $(FLASHFILE) uisimulator bootloader flash $(BOOTLINK) \
 		rockbox.apk lang_enum.h rbversion.h
 
@@ -273,37 +268,8 @@ $(BUILDDIR)/rockbox.bin : $(BUILDDIR)/rockbox.elf
 $(BUILDDIR)/rombox.bin : $(BUILDDIR)/rombox.elf
 	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
 
-#
-# If there's a flashfile defined for this target (rockbox.ucl for Archos
-# models) Then check if the mkfirmware script fails, as then it is (likely)
-# because the image is too big and we need to create a compressed image
-# instead.
-#
 $(BUILDDIR)/$(BINARY) : $(BUILDDIR)/rockbox.bin $(FLASHFILE)
-	$(call PRINTS,SCRAMBLE $(notdir $@))($(MKFIRMWARE) $< $@; \
-	stat=$$?; \
-	if test -n "$(FLASHFILE)"; then \
-	  if test "$$stat" -ne 0; then \
-	    echo "Image too big, making a compressed version!"; \
-	    $(MAKE) -C $(FIRMDIR)/decompressor OBJDIR=$(BUILDDIR)/firmware/decompressor; \
-	    $(MKFIRMWARE) $(BUILDDIR)/firmware/decompressor/compressed.bin $@; \
-	  fi \
-	fi )
-
-# archos
-$(BUILDDIR)/rockbox.ucl: $(BUILDDIR)/rockbox.bin
-	$(call PRINTS,UCLPACK $(@F))$(TOOLSDIR)/uclpack --best --2e -b1048576 $< $@ >/dev/null
-
-MAXINFILE = $(BUILDDIR)/temp.txt
-MAXOUTFILE = $(BUILDDIR)/romstart.txt
-
-$(BUILDDIR)/rombox.ucl: $(BUILDDIR)/rombox.bin $(MAXOUTFILE)
-	$(call PRINTS,UCLPACK $(@F))$(TOOLSDIR)/uclpack --none $< $@ >/dev/null; \
-		perl $(TOOLSDIR)/romsizetest.pl `cat $(MAXOUTFILE)` $<; \
-		if test $$? -ne 0; then \
-		  echo "removing UCL file again, making it a fake one"; \
-		  echo "fake" > $@; \
-		fi
+	$(call PRINTS,SCRAMBLE $(notdir $@)) $(MKFIRMWARE) $< $@
 
 $(MAXOUTFILE):
 	$(call PRINTS,Creating $(@F))
@@ -343,7 +309,7 @@ endif
 mapzip:
 	$(SILENT)find . -name "*.map" | xargs zip rockbox-maps.zip
 
-elfzip: 
+elfzip:
 	$(SILENT)find . -name "*.elf" | xargs zip rockbox-elfs.zip
 
 fullzip:

@@ -355,10 +355,6 @@ bool ffwd_rew(int button)
                         if (!skin_get_global_state()->paused)
                             audio_pause();
 #endif
-#if CONFIG_KEYPAD == PLAYER_PAD
-                        FOR_NB_SCREENS(i)
-                            skin_get_gwps(WPS, i)->display->scroll_stop();
-#endif
                         if (direction > 0)
                             status_set_ffmode(STATUS_FASTFORWARD);
                         else

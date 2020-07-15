@@ -22,8 +22,9 @@
 #ifndef __TUNER_H__
 #define __TUNER_H__
 
+#include <stdbool.h>
+
 #include "config.h"
-#include "hwcompat.h"
 
 #ifdef HAVE_RDS_CAP
 #include <sys/types.h>
@@ -112,12 +113,6 @@ extern int (*tuner_get)(int setting);
 #if (CONFIG_TUNER & LV24020LP)
 /* Sansa c200, e200 */
 #include "lv24020lp.h"
-#endif
-
-/** Samsung S1A0903X01 **/
-#if (CONFIG_TUNER & S1A0903X01)
-/* Ondio FM, FM Recorder */
-#include "s1a0903x01.h"
 #endif
 
 /** Philips TEA5760 **/

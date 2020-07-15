@@ -535,10 +535,6 @@ struct user_settings
     int remote_statusbar;
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-    bool buttonbar;    /* 0=hide, 1=show */
-#endif
-
 #ifdef HAVE_LCD_BITMAP
     int scrollbar;    /* SCROLLBAR_* enum values */
     int scrollbar_width;
@@ -727,10 +723,6 @@ struct user_settings
                                    1=EMI reduce on with cost more CPU. */
 #endif
 #endif /* HAVE_REMOTE_LCD */
-
-#if CONFIG_CODEC == MAS3507D
-    bool line_in;       /* false=off, true=active */
-#endif
 
 #ifdef HAVE_BUTTON_LIGHT
     int buttonlight_timeout;
