@@ -728,10 +728,6 @@ struct user_settings
 #endif
 #endif /* HAVE_REMOTE_LCD */
 
-#if CONFIG_CODEC == MAS3507D
-    bool line_in;       /* false=off, true=active */
-#endif
-
 #ifdef HAVE_BUTTON_LIGHT
     int buttonlight_timeout;
 #endif

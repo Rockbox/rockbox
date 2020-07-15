@@ -152,18 +152,6 @@ void main(void)
     button_init();
     powermgmt_init();
 
-#if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
-    if (charger_inserted()
-#ifdef ATA_POWER_PLAYERSTYLE
-        && !ide_powered() /* relies on probing result from bootloader */
-#endif
-        )
-    {
-        charging_screen(); /* display a "charging" screen */
-        show_logo();  /* again, to provide better visual feedback */
-    }
-#endif
-
     rc = storage_init();
     if(rc)
     {

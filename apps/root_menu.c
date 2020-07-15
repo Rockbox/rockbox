@@ -482,21 +482,6 @@ MENUITEM_RETURNVALUE(playlists, ID2P(LANG_CATALOG), GO_TO_PLAYLISTS_SCREEN,
 MENUITEM_RETURNVALUE(system_menu_, ID2P(LANG_SYSTEM), GO_TO_SYSTEM_SCREEN,
                      NULL, Icon_System_menu);
 
-#if CONFIG_KEYPAD == PLAYER_PAD
-static int do_shutdown(void)
-{
-#if CONFIG_CHARGING
-    if (charger_inserted())
-        charging_splash();
-    else
-#endif
-        sys_poweroff();
-    return 0;
-}
-MENUITEM_FUNCTION(do_shutdown_item, 0, ID2P(LANG_SHUTDOWN),
-                  do_shutdown, NULL, NULL, Icon_NOICON);
-#endif
-
 struct menu_item_ex root_menu_;
 static struct menu_callback_with_desc root_menu_desc = {
         item_callback, ID2P(LANG_ROCKBOX_TITLE), Icon_Rockbox };

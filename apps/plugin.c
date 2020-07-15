@@ -615,8 +615,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef AUDIOHW_HAVE_EQ
     sound_enum_hw_eq_band_setting,
 #endif
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+#if ((CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
     sound_set_pitch,
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -684,13 +683,6 @@ static const struct plugin_api rockbox_api = {
     keyclick_click,
 #endif /* CONFIG_CODEC == SWCODEC */
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    peak_meter_scale_value,
-    peak_meter_set_use_dbfs,
-    peak_meter_get_use_dbfs,
-#endif
-
-
     /* metadata */
     get_metadata,
     mp3info,
@@ -741,21 +733,6 @@ static const struct plugin_api rockbox_api = {
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     mpeg_get_last_header,
 #endif
-
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    /* MAS communication */
-    mas_readmem,
-    mas_writemem,
-    mas_readreg,
-    mas_writereg,
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    mas_codec_writereg,
-    mas_codec_readreg,
-    i2c_begin,
-    i2c_end,
-    i2c_write,
-#endif
-#endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
     /* menu */
     root_menu_get_options,

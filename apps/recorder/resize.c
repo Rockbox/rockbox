@@ -63,14 +63,8 @@
 #endif
 #include <jpeg_load.h>
 
-#if CONFIG_CPU == SH7034
-/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
-#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
-#define MULQ(a, b) ((int32_t) (((int16_t) (a)) * ((int16_t) (b))))
-#else
 #define MULUQ(a, b) ((a) * (b))
 #define MULQ(a, b) ((a) * (b))
-#endif
 
 #ifdef HAVE_LCD_COLOR
 #define CHANNEL_BYTES (sizeof(struct uint32_argb)/sizeof(uint32_t))

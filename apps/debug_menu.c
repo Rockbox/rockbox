@@ -1903,30 +1903,7 @@ static bool dbg_tagcache_info(void)
 }
 #endif
 
-#if CONFIG_CPU == SH7034
-static bool dbg_save_roms(void)
-{
-    int fd;
-    int oldmode = system_memory_guard(MEMGUARD_NONE);
-
-    fd = creat("/internal_rom_0000-FFFF.bin", 0666);
-    if(fd >= 0)
-    {
-        write(fd, (void *)0, 0x10000);
-        close(fd);
-    }
-
-    fd = creat("/internal_rom_2000000-203FFFF.bin", 0666);
-    if(fd >= 0)
-    {
-        write(fd, (void *)0x2000000, 0x40000);
-        close(fd);
-    }
-
-    system_memory_guard(oldmode);
-    return false;
-}
-#elif defined CPU_COLDFIRE
+#if defined CPU_COLDFIRE
 static bool dbg_save_roms(void)
 {
     int fd;
@@ -2091,11 +2068,6 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     simplelist_addline(
                         "sd_set: %d Hz", lv24020lp_get(LV24020LP_SD_SET) );
 #endif /* LV24020LP */
-#if (CONFIG_TUNER & S1A0903X01)
-    simplelist_addline(
-                        "Samsung regs: %08X", s1a0903x01_get(RADIO_ALL));
-    /* This one doesn't return dynamic data atm */
-#endif /* S1A0903X01 */
 #if (CONFIG_TUNER & TEA5767)
     struct tea5767_dbg_info nfo;
     tea5767_dbg_info(&nfo);
@@ -2218,7 +2190,7 @@ static bool dbg_metadatalog(void)
     return false;
 }
 
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
 static bool dbg_set_memory_guard(void)
 {
     static const struct opt_items names[MAXMEMGUARD] = {
@@ -2233,7 +2205,7 @@ static bool dbg_set_memory_guard(void)
 
     return false;
 }
-#endif /* CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) */
+#endif /* defined(CPU_COLDFIRE) */
 
 #if defined(HAVE_EEPROM) && !defined(HAVE_EEPROM_SETTINGS)
 static bool dbg_write_eeprom(void)
@@ -2589,13 +2561,13 @@ static const struct {
     unsigned char *desc; /* string or ID */
     bool (*function) (void); /* return true if USB was connected */
 } menuitems[] = {
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || \
+#if defined(CPU_COLDFIRE) || \
     (defined(CPU_PP) && !(CONFIG_STORAGE & STORAGE_SD)) || \
     CONFIG_CPU == IMX31L || defined(CPU_TCC780X) || CONFIG_CPU == AS3525v2 || \
     CONFIG_CPU == AS3525 || CONFIG_CPU == RK27XX
         { "Dump ROM contents", dbg_save_roms },
 #endif
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE) || defined(CPU_PP) \
+#if defined(CPU_COLDFIRE) || defined(CPU_PP) \
     || CONFIG_CPU == S3C2440 || CONFIG_CPU == IMX31L || CONFIG_CPU == AS3525 \
     || CONFIG_CPU == DM320 || defined(CPU_S5L870X) || CONFIG_CPU == AS3525v2 \
     || CONFIG_CPU == RK27XX
@@ -2616,7 +2588,7 @@ static const struct {
 #if defined(IRIVER_H100_SERIES) && !defined(SIMULATOR)
         { "S/PDIF analyzer", dbg_spdif },
 #endif
-#if CONFIG_CPU == SH7034 || defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
         { "Catch mem accesses", dbg_set_memory_guard },
 #endif
         { "View OS stacks", dbg_os },
