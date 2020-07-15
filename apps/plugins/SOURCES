@@ -148,6 +148,7 @@ solitaire.c
 sokoban.c
 star.c
 starfield.c
+voiceTSR.c
 vu_meter.c
 wormlet.c
 

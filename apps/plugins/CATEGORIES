@@ -177,6 +177,7 @@ theme_remove,viewers
 vbrfix,viewers
 video,viewers
 viewer,viewers
+voiceTSR,demos
 vu_meter,demos
 wav2wv,viewers
 wavplay,viewers
