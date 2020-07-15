@@ -11,14 +11,14 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
 
 \subsubsection{Default keys}
 \begin{btnmap}
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
         ,GIGABEAT_S_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
         ,SAMSUNG_YH820_PAD}{\ButtonUp{} / \ButtonDown}
     \opt{IPOD_4G_PAD}{Tap \ButtonPlay{} / \ButtonMenu}
     \opt{IRIVER_H10_PAD}{\ButtonScrollUp{} / \ButtonScrollDown}
     \opt{PBELL_VIBE500_PAD}{\ButtonOK{} / \ButtonCancel}
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
         ,GIGABEAT_S_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD%
         ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
@@ -29,7 +29,6 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
        \opt{HAVEREMOTEKEYMAP}{& }
     & Direction keys\\
     %
-    \opt{RECORDER_PAD}{\ButtonFOne}
     \opt{IRIVER_H100_PAD}{\ButtonOn}
     \opt{IRIVER_H300_PAD}{\ButtonRec}
     \opt{IPOD_4G_PAD}{Tap \btnfnt{Top-Right}}
@@ -42,7 +41,6 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
        \opt{HAVEREMOTEKEYMAP}{& }
     & A button\\
     %
-    \opt{RECORDER_PAD}{\ButtonFTwo}
     \opt{IRIVER_H100_PAD}{\ButtonOff}
     \opt{IRIVER_H300_PAD}{\ButtonMode}
     \opt{IPOD_4G_PAD}{Tap \btnfnt{Top-Left}}
@@ -56,7 +54,6 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
        \opt{HAVEREMOTEKEYMAP}{& }
     & B button\\
     %
-    \opt{RECORDER_PAD}{\ButtonFThree}
     \opt{IRIVER_H100_PAD}{\ButtonRec}
     \opt{IRIVER_H300_PAD}{\ButtonOn}
     \opt{IPOD_4G_PAD}{Tap \btnfnt{Bottom-Right} /~Press \ButtonSelect}
@@ -73,7 +70,7 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
     & Start\\
     %
     \nopt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{
-        \opt{RECORDER_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
+        \opt{SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonSelect}
         \opt{IPOD_4G_PAD}{Tap \btnfnt{Bottom-Left}}
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD}{\ButtonScrollFwd}
@@ -86,14 +83,13 @@ the gnuboy emulator. To start a game, open a ROM file saved as \fname{.gb} or
         & Select\\
         %
     }
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,iaudiom5,MPIO_HD300_PAD}{
-        \opt{RECORDER_PAD}{\ButtonOn}
+    \opt{IRIVER_H100_PAD,iaudiom5,MPIO_HD300_PAD}{
         \opt{IRIVER_H100_PAD,IAUDIO_X5_PAD,MPIO_HD300_PAD}{\ButtonHold{} switch}
               \opt{HAVEREMOTEKEYMAP}{& }
         & Cycle display scaling modes\\
     %  defined for the Recorders and targets with 160x128x2 displays (H100, M5)
     }
-    \opt{RECORDER_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IRIVER_H300_PAD}{\ButtonOff}
     \opt{IRIVER_H100_PAD}{\ButtonMode}
     \opt{IPOD_4G_PAD}{\ButtonHold{} switch}
     \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD%

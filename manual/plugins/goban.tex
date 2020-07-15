@@ -28,7 +28,7 @@ permanently.  The \fname {/sgf/gbn\_def.sgf} file is also the file loaded if ano
 is not selected.\\
 
 The information panel which displays the current move number may also contain
-these markers: 
+these markers:
 
 \begin{table}
     \begin{rbtabular}{\textwidth}{lX}%
@@ -37,13 +37,12 @@ these markers:
       \emph{* } & There are sibling variations which can be navigated to using the %
       \emph{Next Variation} menu option of the \emph{Context Menu}%
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,%
-         RECORDER_PAD,MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,%
+         MROBE100_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,%
          IRIVER_H300_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD,SANSA_FUZEPLUS_PAD,%
          SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{ or the %
          \opt{SANSA_FUZEPLUS_PAD}{\ButtonBottomRight}%
          \opt{SANSA_E200_PAD,SANSA_C200_PAD}{\ButtonRec}%
          \opt{SANSA_CLIP_PAD}{\ButtonHome}%
-         \opt{RECORDER_PAD}{\ButtonOn}%
          \opt{MROBE100_PAD}{\ButtonPower}%
          \opt{GIGABEAT_PAD}{\ButtonA}%
          \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
@@ -71,7 +70,7 @@ these markers:
             &}
         Move cursor up
         \\
-        
+
         \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,%
             MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonDown}%
         \opt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}%
@@ -83,7 +82,7 @@ these markers:
             &}
         Move cursor down
         \\
-            
+
         \nopt{MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonLeft}
         \opt{MPIO_HD200_PAD}{\ButtonVolDown}
         \opt{MPIO_HD300_PAD}{\ButtonRew}
@@ -92,10 +91,8 @@ these markers:
         \opt{HAVEREMOTEKEYMAP}{
             &}
         Move cursor left
-        \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or retreat one
-            node in the game tree if in \emph{tree} navigation mode}
         \\
-             
+
         \nopt{MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonRight}
         \opt{MPIO_HD200_PAD}{\ButtonVolUp}
         \opt{MPIO_HD300_PAD}{\ButtonFF}
@@ -104,23 +101,13 @@ these markers:
         \opt{HAVEREMOTEKEYMAP}{
             &}
         Move cursor right
-        \opt{ONDIO_PAD}{if in \emph{board} navigation mode, or advance one
-            node in the game tree if in \emph{tree} navigation mode}
         \\
-            
-        \opt{ONDIO_PAD}{
-            \ButtonOff
-                &
-            Toggle between \emph{board} and \emph{tree} navigation modes
-            \\
-        }
-        
-        \nopt{IRIVER_H10_PAD,ONDIO_PAD,RECORDER_PAD,IAUDIO_M3_PAD,PBELL_VIBE500_PAD%
+
+        \nopt{IRIVER_H10_PAD,IAUDIO_M3_PAD,PBELL_VIBE500_PAD%
             ,MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD%
             ,touchscreen}{\ButtonSelect}%
-        \opt{IRIVER_H10_PAD,RECORDER_PAD,PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD%
+        \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD%
             ,SAMSUNG_YH820_PAD}{\ButtonPlay}%
-        \opt{ONDIO_PAD}{\ButtonMenu}
         \opt{MPIO_HD200_PAD}{\ButtonFunc}
         \opt{MPIO_HD300_PAD}{\ButtonEnter}
         \opt{touchscreen}{\TouchCenter}
@@ -129,8 +116,7 @@ these markers:
             &}
         Play a move (or use a tool if play-mode has been changed).
         \\
-            
-        \nopt{ONDIO_PAD}{
+
             \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_1G2G_PAD,IPOD_3G_PAD%
                 ,IPOD_4G_PAD}{\ButtonScrollBack}%
             \opt{SANSA_CLIP_PAD,SANSA_M200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
@@ -140,7 +126,6 @@ these markers:
             \opt{MROBE100_PAD}{\ButtonMenu}%
             \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}%
             \opt{IAUDIO_X5_PAD}{\ButtonPlay}%
-            \opt{RECORDER_PAD}{\ButtonFOne}
             \opt{touchscreen}{\TouchBottomLeft}
             \opt{PBELL_VIBE500_PAD}{\ButtonOK{} + \ButtonLeft}
             \opt{MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonRec + \ButtonRew}
@@ -151,7 +136,7 @@ these markers:
                 &}
             Retreat one node in the game tree
             \\
-            
+
             \opt{scrollwheel}{\ButtonScrollFwd}%
             \opt{SANSA_CLIP_PAD,SANSA_M200_PAD,SANSA_C200_PAD,GIGABEAT_PAD%
                 ,GIGABEAT_S_PAD}{\ButtonVolUp}%
@@ -159,7 +144,6 @@ these markers:
             \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
             \opt{MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPlay}%
             \opt{IAUDIO_X5_PAD}{\ButtonRec}%
-            \opt{RECORDER_PAD}{\ButtonFThree}
             \opt{touchscreen}{\TouchBottomRight}
             \opt{PBELL_VIBE500_PAD}{\ButtonOK{} + \ButtonRight}
             \opt{MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonRec + \ButtonFF}
@@ -170,8 +154,7 @@ these markers:
                 &}
             Advance one node in the game tree
             \\
-        }
-        
+
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_CLIP_PAD,SANSA_M200_PAD%
             ,SANSA_C200_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,SANSA_FUZEPLUS_PAD%
             }{\ButtonPower}%
@@ -180,8 +163,6 @@ these markers:
         \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,PBELL_VIBE500_PAD,MPIO_HD300_PAD}%
             {\ButtonMenu}%
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}%
-        \opt{RECORDER_PAD}{\ButtonFTwo}%
-        \opt{ONDIO_PAD}{Long \ButtonMenu}
         \opt{MPIO_HD200_PAD}{Long \ButtonPlay}
         \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRew}
         \opt{touchscreen}{\TouchTopLeft}
@@ -191,11 +172,10 @@ these markers:
         Main Menu
         \\
 
-%        \nopt{IPOD_1G2G_PAD,IPOD_3G_PAD,IPOD_4G_PAD,ONDIO_PAD,RECORDER_PAD}{%
         \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
             ,IRIVER_H100_PAD,IRIVER_H300_PAD,MROBE100_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD%
             ,MPIO_HD200_PAD,PBELL_VIBE500_PAD,touchscreen,SANSA_FUZEPLUS_PAD%
-            ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{% 
+            ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%
             \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD,SAMSUNG_YH92X_PAD,%
                 MPIO_HD200_PAD,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH820_PAD}%
                 {Long \ButtonSelect}%
@@ -212,15 +192,14 @@ these markers:
             Context Menu
             \\
         }
-        
-        \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,RECORDER_PAD,MROBE100_PAD%
+
+        \opt{SANSA_E200_PAD,SANSA_C200_PAD,SANSA_FUZE_PAD,MROBE100_PAD%
             ,GIGABEAT_PAD,GIGABEAT_S_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SANSA_CLIP_PAD%
             ,PBELL_VIBE500_PAD,MPIO_HD200_PAD,touchscreen,SANSA_FUZEPLUS_PAD,
             ,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%
             \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD%
                 ,MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonRec}%
             \opt{SANSA_FUZE_PAD,SANSA_CLIP_PAD}{\ButtonHome}%
-            \opt{RECORDER_PAD}{\ButtonOn}%
             \opt{MROBE100_PAD}{\ButtonPower}%
             \opt{GIGABEAT_PAD}{\ButtonA}%
             \opt{GIGABEAT_S_PAD}{\ButtonPlay}%
@@ -297,7 +276,7 @@ these markers:
 \item [Options. ]
     Customize the behavior of the plugin in certain ways.
     \begin{description}
-        \item[Show Child Variations?] Enable this to mark child variations on 
+        \item[Show Child Variations?] Enable this to mark child variations on
             he board if there are more than one.  Note: variations which don't
             start with a move are not visible in this way.
         \item[Disable Idle Poweroff?] Enable this if you do not want the \dap{}
@@ -352,4 +331,3 @@ these markers:
         \item[Done.] Go back to the previous screen.
     \end{description}
 \end{description}
-
