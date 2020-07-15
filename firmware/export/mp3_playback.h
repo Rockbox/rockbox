@@ -39,15 +39,6 @@ void mp3_init(int volume, int bass, int treble, int balance, int loudness,
               int mdb_center, int mdb_shape, bool mdb_enable,
               bool superbass);
 
-/* exported just for mpeg.c, to keep the recording there */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-void demand_irq_enable(bool on);
-#endif
-
-/* new functions, exported to plugin API */
-#if CONFIG_CODEC == MAS3587F
-void mp3_play_init(void);
-#endif
 void mp3_play_data(const void* start, size_t size,
                    mp3_play_callback_t get_more);
 void mp3_play_pause(bool play);

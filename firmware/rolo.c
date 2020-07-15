@@ -123,10 +123,7 @@ static void rolo_error(const char *text)
     lcd_scroll_stop();
 }
 
-#if CONFIG_CPU == SH7034 || CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX
-/* these are in assembler file "descramble.S" for SH7034 */
-extern unsigned short descramble(const unsigned char* source,
-                                 unsigned char* dest, int length);
+#if CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX
 /* this is in firmware/target/arm/imx31/rolo_restart.c for IMX31 */
 /* this is in firmware/target/arm/rk27xx/rolo_restart.c for rk27xx */
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
@@ -299,113 +296,7 @@ int rolo_load(const char* filename)
     /* never reached */
     return 0;
 }
-#else /* defined(CPU_SH) */
-int rolo_load(const char* filename)
-{
-    int fd;
-    long length;
-    long file_length;
-    unsigned short checksum,file_checksum;
-    unsigned char* ramstart = (void*)&loadaddress;
-    unsigned char* filebuf;
-    size_t filebuf_size;
-
-    lcd_clear_display();
-    lcd_puts(0, 0, "ROLO...");
-    lcd_puts(0, 1, "Loading");
-    lcd_update();
-#ifdef HAVE_REMOTE_LCD
-    lcd_remote_clear_display();
-    lcd_remote_puts(0, 0, "ROLO...");
-    lcd_remote_puts(0, 1, "Loading");
-    lcd_remote_update();
-#endif
-
-    audio_stop();
-
-    fd = open(filename, O_RDONLY);
-    if(-1 == fd) {
-        rolo_error("File not found");
-        return -1;
-    }
-
-    length = filesize(fd) - FIRMWARE_OFFSET_FILE_DATA;
-
-    /* get the system buffer. release only in case of error, otherwise
-     * we don't return anyway */
-    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
-    filebuf = core_get_data(rolo_handle);
-
-    /* Read file length from header and compare to real file length */
-    lseek(fd, FIRMWARE_OFFSET_FILE_LENGTH, SEEK_SET);
-    if(read(fd, &file_length, 4) != 4) {
-        rolo_error("Error Reading File Length");
-        return -1;
-    }
-    if (length != file_length) {
-        rolo_error("File length mismatch");
-        return -1;
-    }
-
-    /* Read and save checksum */
-    lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
-    if (read(fd, &file_checksum, 2) != 2) {
-        rolo_error("Error Reading checksum");
-        return -1;
-    }
-    lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-
-    /* verify that file can be read and descrambled */
-    if ((size_t)((2*length)+4) >= filebuf_size) {
-        rolo_error("Not enough room to load file");
-        return -1;
-    }
-
-    if (read(fd, &filebuf[length], length) != (int)length) {
-        rolo_error("Error Reading File");
-        return -1;
-    }
-
-    lcd_puts(0, 1, "Descramble");
-    lcd_update();
-
-    checksum = descramble(filebuf + length, filebuf, length);
-
-    /* Verify checksum against file header */
-    if (checksum != file_checksum) {
-        rolo_error("Checksum Error");
-        return -1;
-    }
-
-#ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing      ");
-    lcd_update();
-    storage_flush();
-#endif
-
-    lcd_puts(0, 1, "Executing     ");
-    lcd_update();
-
-    set_irq_level(HIGHEST_IRQ_LEVEL);
-
-    /* Calling these 2 initialization routines was necessary to get the
-       the origional Archos version of the firmware to load and execute. */
-    system_init();           /* Initialize system for restart */
-    i2c_init();              /* Init i2c bus - it seems like a good idea */
-    ICR = IRQ0_EDGE_TRIGGER; /* Make IRQ0 edge triggered */
-    TSTR = 0xE0;             /* disable all timers */
-    /* model-specific de-init, needed when flashed */
-    /* Especially the Archos software is picky about this */
-#if defined(ARCHOS_RECORDER) || defined(ARCHOS_RECORDERV2) || \
-    defined(ARCHOS_FMRECORDER)
-    PAIOR = 0x0FA0;
-#endif
-    rolo_restart(filebuf, ramstart, length);
-
-    return 0; /* this is never reached */
-    (void)checksum; (void)file_checksum;
-}
-#endif /*  */
+#endif /* CPU_COLDFIRE | CPU_ARM | CPU_MIPS  */
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
 {

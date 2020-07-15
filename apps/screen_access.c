@@ -61,10 +61,6 @@ static int screen_helper_getnblines(void)
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar != STATUSBAR_OFF)
         height -= STATUSBAR_HEIGHT;
-#ifdef HAVE_BUTTONBAR
-    if(global_settings.buttonbar && screens[0].has_buttonbar)
-        height -= BUTTONBAR_HEIGHT;
-#endif
 #endif
     return height / screens[0].getcharheight();
 }
@@ -134,10 +130,6 @@ static int screen_helper_remote_getnblines(void)
 #ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar != STATUSBAR_OFF)
         height -= STATUSBAR_HEIGHT;
-#ifdef HAVE_BUTTONBAR
-    if(global_settings.buttonbar && screens[1].has_buttonbar)
-        height -= BUTTONBAR_HEIGHT;
-#endif
 #endif
     return height / screens[1].getcharheight();
 }
@@ -276,9 +268,6 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&backdrop_load,
         .backdrop_show=&backdrop_show,
 #endif
-#ifdef HAVE_BUTTONBAR
-        .has_buttonbar=false,
-#endif
 #if defined(HAVE_LCD_BITMAP)
         .set_framebuffer = (void*)lcd_set_framebuffer,
 #if defined(HAVE_LCD_COLOR)    
@@ -369,13 +358,10 @@ struct screen screens[NB_SCREENS] =
         .backlight_off=&remote_backlight_off,
         .is_backlight_on=&is_remote_backlight_on,
         .backlight_set_timeout=&remote_backlight_set_timeout,
-        
+
 #if LCD_DEPTH > 1
         .backdrop_load=&remote_backdrop_load,
         .backdrop_show=&remote_backdrop_show,
-#endif
-#ifdef HAVE_BUTTONBAR
-        .has_buttonbar=false,
 #endif
 #if defined(HAVE_LCD_BITMAP)
         .set_framebuffer = (void*)lcd_remote_set_framebuffer,
