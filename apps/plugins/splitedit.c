@@ -24,27 +24,7 @@
 
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define SPLITEDIT_QUIT BUTTON_OFF
-#define SPLITEDIT_PLAY BUTTON_PLAY
-#define SPLITEDIT_SAVE BUTTON_F1
-#define SPLITEDIT_LOOP_MODE BUTTON_F2
-#define SPLITEDIT_SCALE BUTTON_F3
-#define SPLITEDIT_SPEED50 (BUTTON_ON | BUTTON_LEFT)
-#define SPLITEDIT_SPEED100 (BUTTON_ON | BUTTON_PLAY)
-#define SPLITEDIT_SPEED150 (BUTTON_ON | BUTTON_RIGHT)
-#define SPLITEDIT_MENU_RUN BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define SPLITEDIT_QUIT BUTTON_OFF
-#define SPLITEDIT_PLAY_PRE BUTTON_MENU
-#define SPLITEDIT_PLAY (BUTTON_MENU | BUTTON_REL)
-#define SPLITEDIT_SAVE (BUTTON_MENU | BUTTON_LEFT)
-#define SPLITEDIT_LOOP_MODE (BUTTON_MENU | BUTTON_UP)
-#define SPLITEDIT_SCALE (BUTTON_MENU | BUTTON_RIGHT)
-#define SPLITEDIT_MENU_RUN BUTTON_RIGHT
-
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD
+#if CONFIG_KEYPAD == IRIVER_H100_PAD
 #define SPLITEDIT_QUIT BUTTON_OFF
 #define SPLITEDIT_PLAY BUTTON_ON
 #define SPLITEDIT_SAVE BUTTON_SELECT
@@ -279,12 +259,6 @@ static void update_icons(void)
         LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
         BMPWIDTH, BMPHEIGHT);
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    /* The scale icon */
-    rb->lcd_mono_bitmap(SCALE_BMP[rb->peak_meter_get_use_dbfs() ? 1 : 0],
-        2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
-        BMPWIDTH, BMPHEIGHT);
-#else
     {
         static int idx;
         if (idx < 0 || idx > 1) idx = 0;
@@ -293,7 +267,6 @@ static void update_icons(void)
             2 *LCD_WIDTH/3 + LCD_WIDTH/3 / 2 - BMPWIDTH/2, LCD_HEIGHT - BMPHEIGHT,
             BMPWIDTH, BMPHEIGHT);
     }
-#endif
 
     rb->lcd_update_rect(0, LCD_HEIGHT - BMPHEIGHT, LCD_WIDTH, BMPHEIGHT);
 }
@@ -961,14 +934,7 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
             {
                 /* read volume info */
                 unsigned short volume;
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-                volume = rb->mas_codec_readreg(0x0c);
-                volume += rb->mas_codec_readreg(0x0d);
-                volume = volume / 2;
-                volume = rb->peak_meter_scale_value(volume, OSCI_HEIGHT);
-#else
                 volume = OSCI_HEIGHT / 2;
-#endif
 
                 /* update osci_buffer */
                 if (osci_valid || lastx == x)
@@ -1126,25 +1092,6 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 lastx = time_to_xpos(mp3->elapsed);
                 break;
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-#ifdef SPLITEDIT_SPEED100
-            case SPLITEDIT_SPEED150:
-                rb->sound_set_pitch(150L*PITCH_SPEED_PRECISION);
-                splitedit_invalidate_osci();
-                break;
-
-            case SPLITEDIT_SPEED100:
-                rb->sound_set_pitch(PITCH_SPEED_100);
-                splitedit_invalidate_osci();
-                break;
-
-            case SPLITEDIT_SPEED50:
-                rb->sound_set_pitch(50L*PITCH_SPEED_PRECISION);
-                splitedit_invalidate_osci();
-                break;
-#endif
-#endif
-
             case BUTTON_LEFT:
             case BUTTON_LEFT | BUTTON_REPEAT:
                 if (splitedit_get_split_x() > OSCI_X + 2)
@@ -1185,9 +1132,6 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 break;
 
             case SPLITEDIT_SCALE:
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-                rb->peak_meter_set_use_dbfs(!rb->peak_meter_get_use_dbfs());
-#endif
                 splitedit_invalidate_osci();
                 update_icons();
                 break;
@@ -1257,12 +1201,6 @@ static unsigned long splitedit_editor(struct mp3entry * mp3_to_split,
                 }
             }
         }
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-#ifdef SPLITEDIT_SPEED100
-        rb->sound_set_pitch(1000); /* make sure to reset pitch */
-#endif
-#endif
-
     }
     return retval;
 }
