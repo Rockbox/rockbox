@@ -147,8 +147,7 @@ const struct button_mapping pf_context_buttons[] =
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
 #elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
-    CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD 
     {PF_QUIT,         BUTTON_OFF,                 BUTTON_NONE},
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
     {PF_QUIT,         BUTTON_REC,                 BUTTON_NONE},
@@ -691,13 +690,7 @@ static inline PFreal fdiv(PFreal num, PFreal den)
 #define fabs(a) (a < 0 ? -a : a)
 #define fbound(min,val,max) (fmax((min),fmin((max),(val))))
 
-#if CONFIG_CPU == SH7034
-/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
-#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
-#else
 #define MULUQ(a, b) ((a) * (b))
-#endif
-
 
 #if 0
 #define fmul(a,b) ( ((a)*(b)) >> PFREAL_SHIFT )
