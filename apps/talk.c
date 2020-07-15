@@ -939,7 +939,8 @@ void talk_init(void)
     {
         if (!load_voicefile_index(filehandle))
         {
-            splashf(HZ * 2, str(LANG_READ_FAILED), ".voice");
+            if (global_settings.talk_menu)
+                splashf(HZ, str(LANG_READ_FAILED), ".voice");
             goto out;
         }
         /* Now determine the maximum buffer size needed for the voicefile.
