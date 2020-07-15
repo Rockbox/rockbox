@@ -934,9 +934,6 @@ static void get_peaks(int *left, int *right)
 #elif defined (SIMULATOR)
     *left = rand() % 0x8000;
     *right = rand() % 0x8000;
-#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    *left = rb->mas_codec_readreg(0xC);
-    *right = rb->mas_codec_readreg(0xD);
 #else
     *left = 0;
     *right = 0;

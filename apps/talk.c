@@ -210,14 +210,6 @@ static void sync_callback(int handle, bool sync_on)
         mutex_lock(&read_buffer_mutex);
     else
         mutex_unlock(&read_buffer_mutex);
-#if CONFIG_CPU == SH7034
-    /* DMA must not interrupt during buffer move or commit_buffer copies
-     * from inconsistent buflib buffer */
-    if (sync_on)
-        CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
-    else
-        CHCR3 |=  0x0001; /* re-enable the DMA */
-#endif
 }
 
 static ssize_t read_to_handle_ex(int fd, struct buflib_context *ctx, int handle,
@@ -779,9 +771,6 @@ void talk_force_shutup(void)
     if (QUEUE_LEVEL == 0) /* has ended anyway */
         return;
 
-#if CONFIG_CPU == SH7034
-    CHCR3 &= ~0x0001; /* disable the DMA (and therefore the interrupt also) */
-#endif /* CONFIG_CPU == SH7034 */
     /* search next frame boundary and continue up to there */
     pos = search = mp3_get_pos();
     end = buflib_get_data(&clip_ctx, queue[queue_read].handle);
@@ -812,10 +801,6 @@ void talk_force_shutup(void)
             queue_write = (queue_read + 1) & QUEUE_MASK; /* will be empty after next callback */
             queue[queue_read].length = sent; /* current one ends after this */
 
-#if CONFIG_CPU == SH7034
-            DTCR3 = sent; /* let the DMA finish this frame */
-            CHCR3 |= 0x0001; /* re-enable DMA */
-#endif /* CONFIG_CPU == SH7034 */
             thumbnail_buf_used = 0;
             return;
         }
@@ -852,10 +837,6 @@ static void queue_clip(struct queue_entry *clip, bool enqueue)
     
     if (!clip->length)
         return; /* safety check */
-#if CONFIG_CPU == SH7034
-    /* disable the DMA temporarily, to be safe of race condition */
-    CHCR3 &= ~0x0001;
-#endif
     talk_queue_lock();
     queue_level = QUEUE_LEVEL; /* check old level */
     qe = &queue[queue_write];
@@ -877,12 +858,6 @@ static void queue_clip(struct queue_entry *clip, bool enqueue)
         curr_hd[1] = commit_buffer[2];
         curr_hd[2] = commit_buffer[3];
         mp3_play_pause(true); /* kickoff audio */
-    }
-    else
-    {
-#if CONFIG_CPU == SH7034
-        CHCR3 |= 0x0001; /* re-enable DMA */
-#endif
     }
 
     need_shutup = true;

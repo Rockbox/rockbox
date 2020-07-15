@@ -1273,159 +1273,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Loudness"
-  </dest>
-  <voice>
-    *: none
-    masf: "Loudness"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Auto Volume"
-  </dest>
-  <voice>
-    *: none
-    masf: "Auto Volume"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "AV Decay Time"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Super Bass"
-  </dest>
-  <voice>
-    *: none
-    masf: "Super Bass"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Enable"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Enable"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Strength"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Strength"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Harmonics"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Harmonics"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Centre Frequency"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Centre Frequency"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Shape"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Shape"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_GENERAL_SETTINGS
   desc: in the main menu
   user: core
@@ -3353,15 +3200,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "Peak Meter"
-    masd: none
   </dest>
   <voice>
     *: "Peak Meter"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3370,15 +3214,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Clip Hold Time"
-    masd: none
   </dest>
   <voice>
     *: "Clip Hold Time"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3387,15 +3228,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Peak Hold Time"
-    masd: none
   </dest>
   <voice>
     *: "Peak Hold Time"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3404,15 +3242,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "Eternal"
-    masd: none
   </dest>
   <voice>
     *: "Eternal"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3421,15 +3256,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "Peak Release"
-    masd: none
   </dest>
   <voice>
     *: "Peak Release"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3438,15 +3270,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "Scale"
-    masd: none
   </dest>
   <voice>
     *: "Scale"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3455,15 +3284,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "Logarithmic (dB)"
-    masd: none
   </dest>
   <voice>
     *: "Logarithmic decibel"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3472,15 +3298,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "Linear (%)"
-    masd: none
   </dest>
   <voice>
     *: "Linear percent"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3489,15 +3312,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Minimum Of Range"
-    masd: none
   </dest>
   <voice>
     *: "Minimum Of Range"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3506,15 +3326,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Maximum Of Range"
-    masd: none
   </dest>
   <voice>
     *: "Maximum Of Range"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -6577,23 +6394,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Shut down"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Shut down"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ROCKBOX_INFO
   desc: displayed topmost on the info screen and in the info menu
   user: core
@@ -8060,23 +7860,6 @@
   <voice>
     *: none
     recording: "minus infinity"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
   </voice>
 </phrase>
 <phrase>

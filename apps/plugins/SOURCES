@@ -112,36 +112,12 @@ video.c
 
 #endif /* HWCODEC */
 
-
-#if defined(ARCHOS_PLAYER) || defined(ARCHOS_RECORDER) || \
-    defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
-alpine_cdc.c
-#endif
-
-#if defined(ARCHOS_PLAYER) || defined(ARCHOS_RECORDER) || \
-    defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2) || \
-    defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
-firmware_flash.c
-#endif
-
 #if defined(IRIVER_H100_SERIES)
 iriver_flash.c
 #endif
 
-#if (CONFIG_CPU == SH7034)
-rockbox_flash.c
-#endif /* CONFIG_CPU */
-
 #if defined(IPOD_NANO2G)
 crypt_firmware.c
-#endif
-
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-wavplay.c
-#endif
-
-#if (CONFIG_CODEC == MAS3587F)
-wavrecord.c
 #endif
 
 #endif /* PLATFORM_NATIVE */
@@ -216,11 +192,6 @@ rockpaint.c
 rocklife.c
 
 #endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_CHARCELLS          /* Archos Player model only */
-euroconverter.c
-nim.c
-#endif /* HAVE_LCD_CHARCELLS */
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 

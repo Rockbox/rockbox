@@ -123,10 +123,7 @@ static void rolo_error(const char *text)
     lcd_scroll_stop();
 }
 
-#if CONFIG_CPU == SH7034 || CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX
-/* these are in assembler file "descramble.S" for SH7034 */
-extern unsigned short descramble(const unsigned char* source,
-                                 unsigned char* dest, int length);
+#if CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX
 /* this is in firmware/target/arm/imx31/rolo_restart.c for IMX31 */
 /* this is in firmware/target/arm/rk27xx/rolo_restart.c for rk27xx */
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,

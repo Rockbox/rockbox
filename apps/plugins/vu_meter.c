@@ -804,10 +804,7 @@ static void draw_digital_minimeters(void) {
 
 static void analog_meter(void) {
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
@@ -864,10 +861,7 @@ static void analog_meter(void) {
 }
 
 static void digital_meter(void) {
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
