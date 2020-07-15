@@ -310,11 +310,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #ifdef HAVE_RECORDING
 /* these should be in the config.h files */
-#if CONFIG_CODEC == MAS3587F
-# define DEFAULT_REC_MIC_GAIN 8
-# define DEFAULT_REC_LEFT_GAIN 2
-# define DEFAULT_REC_RIGHT_GAIN 2
-#elif CONFIG_CODEC == SWCODEC
+#if CONFIG_CODEC == SWCODEC
 # ifdef HAVE_UDA1380
 #  define DEFAULT_REC_MIC_GAIN 16
 #  define DEFAULT_REC_LEFT_GAIN 0
@@ -595,17 +591,6 @@ static void eq_set_default(void* setting, void* defaultval)
 {
     memcpy(setting, defaultval, sizeof(struct eq_band_setting));
 }
-
-#endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-static void set_mdb_enable(bool value)
-{
-    sound_set_mdb_enable((int)value);
-}
-static void set_superbass(bool value)
-{
-    sound_set_superbass((int)value);
-}
 #endif
 
 #ifdef HAVE_QUICKSCREEN
@@ -849,17 +834,6 @@ const struct settings_list settings[] = {
 #endif /* HAVE_WM8978 */
 #endif /* AUDIOHW_HAVE_EQ */
 /* 3-d enhancement effect */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    SOUND_SETTING(0,loudness, LANG_LOUDNESS, "loudness", SOUND_LOUDNESS),
-    /* requires index, uses table defined by driver */
-    STRINGCHOICE_SETTING(F_SOUNDSETTING,avc,LANG_AUTOVOL,0,"auto volume",
-                         "off,20 ms,2 s,4 s,8 s,", sound_set_avc, 5,
-                         LANG_OFF,TALK_ID(20, UNIT_MS),TALK_ID(2, UNIT_SEC),
-                         TALK_ID(4, UNIT_SEC),TALK_ID(8, UNIT_SEC)),
-    OFFON_SETTING(F_SOUNDSETTING, superbass, LANG_SUPERBASS, false, "superbass",
-                  set_superbass),
-#endif
-
     CHOICE_SETTING(F_SOUNDSETTING, channel_config, LANG_CHANNEL_CONFIGURATION,
                    0,"channels",
                    "stereo,mono,custom,mono left,mono right,karaoke",
@@ -992,9 +966,6 @@ const struct settings_list settings[] = {
     {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.list_separator_color,-1,
         INT(DEFAULT_THEME_SEPARATOR),"list separator color",NULL,UNUSED},
 #endif
-#endif
-#if CONFIG_KEYPAD == RECORDER_PAD
-    OFFON_SETTING(F_THEMESETTING,buttonbar, LANG_BUTTON_BAR ,true,"buttonbar", NULL),
 #endif
     CHOICE_SETTING(F_THEMESETTING, volume_type, LANG_VOLUME_DISPLAY, 0,
                    "volume display", graphic_numeric, NULL, 2,
@@ -1336,21 +1307,6 @@ const struct settings_list settings[] = {
                   "peak meter clipcounter", NULL),
 #endif /* HAVE_RECORDING */
 #endif /* HAVE_LCD_BITMAP */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    SOUND_SETTING(F_SOUNDSETTING, mdb_strength, LANG_MDB_STRENGTH,
-                  "mdb strength", SOUND_MDB_STRENGTH),
-    SOUND_SETTING(F_SOUNDSETTING, mdb_harmonics, LANG_MDB_HARMONICS,
-                  "mdb harmonics", SOUND_MDB_HARMONICS),
-    SOUND_SETTING(F_SOUNDSETTING, mdb_center, LANG_MDB_CENTER,
-                  "mdb center", SOUND_MDB_CENTER),
-    SOUND_SETTING(F_SOUNDSETTING, mdb_shape, LANG_MDB_SHAPE,
-                  "mdb shape", SOUND_MDB_SHAPE),
-    OFFON_SETTING(F_SOUNDSETTING, mdb_enable, LANG_MDB_ENABLE,
-                  false, "mdb enable", set_mdb_enable),
-#endif
-#if CONFIG_CODEC == MAS3507D
-    OFFON_SETTING(F_SOUNDSETTING, line_in,LANG_LINE_IN,false,"line in",NULL),
-#endif
     /* voice */
     OFFON_SETTING(F_TEMPVAR, talk_menu, LANG_VOICE_MENU, true, "talk menu", NULL),
     CHOICE_SETTING(0, talk_dir, LANG_VOICE_DIR, 0,
@@ -1442,15 +1398,6 @@ const struct settings_list settings[] = {
         INT(DEFAULT_REC_RIGHT_GAIN),
         "rec right gain",NULL,UNUSED},
 #endif /* DEFAULT_REC_RIGHT_GAIN */
-#if CONFIG_CODEC == MAS3587F
-    {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
-        LANG_FREQUENCY, INT(0), "rec frequency",
-        "44,48,32,22,24,16", UNUSED},
-    INT_SETTING(F_RECSETTING, rec_quality, LANG_RECORDING_QUALITY, 5,
-                "rec quality", UNIT_INT, 0, 7, 1, NULL, NULL, NULL),
-    OFFON_SETTING(F_RECSETTING, rec_editable, LANG_RECORDING_EDITABLE, false,
-                  "editable recordings", NULL),
-#endif /* CONFIG_CODEC == MAS3587F */
 #if CONFIG_CODEC == SWCODEC
     {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
         LANG_FREQUENCY,INT(REC_FREQ_DEFAULT),

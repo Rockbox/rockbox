@@ -484,8 +484,7 @@ RB_WRAP(sound)
             lua_pushstring (L, rb->sound_unit(setting));
             return 1;
             break;
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-    (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+#if ((CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHCONTROL)
         case SOUND_SET_PITCH:
             rb->sound_set_pitch(setting);
             return 1;/*nil*/
