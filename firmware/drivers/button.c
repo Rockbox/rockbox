@@ -575,9 +575,6 @@ static int button_flip(int button)
 #if defined(BUTTON_SCROLL_BACK) && defined(BUTTON_SCROLL_FWD)
         | BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD
 #endif
-#if CONFIG_KEYPAD == RECORDER_PAD
-        | BUTTON_F1 | BUTTON_F3
-#endif
 #if (CONFIG_KEYPAD == SANSA_C200_PAD) || (CONFIG_KEYPAD == SANSA_CLIP_PAD) ||\
     (CONFIG_KEYPAD == GIGABEAT_PAD) || (CONFIG_KEYPAD == GIGABEAT_S_PAD)
         | BUTTON_VOL_UP | BUTTON_VOL_DOWN
@@ -603,12 +600,6 @@ static int button_flip(int button)
         newbutton |= BUTTON_SCROLL_FWD;
     if (button & BUTTON_SCROLL_FWD)
         newbutton |= BUTTON_SCROLL_BACK;
-#endif
-#if CONFIG_KEYPAD == RECORDER_PAD
-    if (button & BUTTON_F1)
-        newbutton |= BUTTON_F3;
-    if (button & BUTTON_F3)
-        newbutton |= BUTTON_F1;
 #endif
 #if (CONFIG_KEYPAD == SANSA_C200_PAD) || (CONFIG_KEYPAD == SANSA_CLIP_PAD) ||\
     (CONFIG_KEYPAD == GIGABEAT_PAD) || (CONFIG_KEYPAD == GIGABEAT_S_PAD)

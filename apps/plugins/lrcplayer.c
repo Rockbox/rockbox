@@ -2667,12 +2667,6 @@ static int handle_button(void)
     switch (button)
     {
         case ACTION_WPS_BROWSE:
-#if CONFIG_KEYPAD == ONDIO_PAD
-            /* ondio doesn't have ACTION_WPS_MENU,
-               so use ACTION_WPS_BROWSE for menu */
-            ret = LRC_GOTO_MENU;
-            break;
-#endif
         case ACTION_WPS_STOP:
             save_changes();
             ret = PLUGIN_OK;

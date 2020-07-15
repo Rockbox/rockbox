@@ -69,7 +69,7 @@ static void updatepatpix(void) ICODE_ATTR;
 static void updatepatpix(void)
 {
     int i, j;
-#if ((CONFIG_CPU != SH7034) && !defined(CPU_COLDFIRE))
+#if !defined(CPU_COLDFIRE)
     int k, a, c;
 #endif
     byte *vram = lcd.vbank[0];
@@ -83,76 +83,7 @@ static void updatepatpix(void)
         patdirty[i] = 0;
         for (j = 0; j < 8; j++)
         {
-#if CONFIG_CPU == SH7034
-            asm volatile (
-                "mov.w   @%2,r1         \n"
-                "swap.b  r1,r2          \n"
-
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@%0         \n"
-                "mov.b   r0,@(7,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(1,%0)     \n"
-                "mov.b   r0,@(6,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(2,%0)     \n"
-                "mov.b   r0,@(5,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(3,%0)     \n"
-                "mov.b   r0,@(4,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(4,%0)     \n"
-                "mov.b   r0,@(3,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(5,%0)     \n"
-                "mov.b   r0,@(2,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(6,%0)     \n"
-                "mov.b   r0,@(1,%1)     \n"
-                "mov     #0,r0          \n"
-                "shlr    r1             \n"
-                "rotcl   r0             \n"
-                "shlr    r2             \n"
-                "rotcl   r0             \n"
-                "mov.b   r0,@(7,%0)     \n"
-                "mov.b   r0,@%1         \n"
-                : /* outputs */
-                : /* inputs */
-                /* %0 */ "r"(patpix[i+1024][j]),
-                /* %1 */ "r"(patpix[i][j]),
-                /* %2 */ "r"(&vram[(i<<4)|(j<<1)])
-                : /* clobbers */
-                "r0", "r1", "r2"
-            );
-#elif defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
             asm volatile (
                 "move.b  (%2),%%d2      \n"
                 "move.b  (1,%2),%%d1    \n"
@@ -229,85 +160,7 @@ static void updatepatpix(void)
                     patpix[i+1024][j][7-k];
 #endif
         }
-#if CONFIG_CPU == SH7034
-        asm volatile (
-            "mov.l   @%0,r0         \n"
-            "mov.l   @(4,%0),r1     \n"
-            "mov.l   r0,@(56,%1)    \n"
-            "mov.l   r1,@(60,%1)    \n"
-            "mov.l   @(8,%0),r0     \n"
-            "mov.l   @(12,%0),r1    \n"
-            "mov.l   r0,@(48,%1)    \n"
-            "mov.l   r1,@(52,%1)    \n"
-            "mov.l   @(16,%0),r0    \n"
-            "mov.l   @(20,%0),r1    \n"
-            "mov.l   r0,@(40,%1)    \n"
-            "mov.l   r1,@(44,%1)    \n"
-            "mov.l   @(24,%0),r0    \n"
-            "mov.l   @(28,%0),r1    \n"
-            "mov.l   r0,@(32,%1)    \n"
-            "mov.l   r1,@(36,%1)    \n"
-            "mov.l   @(32,%0),r0    \n"
-            "mov.l   @(36,%0),r1    \n"
-            "mov.l   r0,@(24,%1)    \n"
-            "mov.l   r1,@(28,%1)    \n"
-            "mov.l   @(40,%0),r0    \n"
-            "mov.l   @(44,%0),r1    \n"
-            "mov.l   r0,@(16,%1)    \n"
-            "mov.l   r1,@(20,%1)    \n"
-            "mov.l   @(48,%0),r0    \n"
-            "mov.l   @(52,%0),r1    \n"
-            "mov.l   r0,@(8,%1)     \n"
-            "mov.l   r1,@(12,%1)    \n"
-            "mov.l   @(56,%0),r0    \n"
-            "mov.l   @(60,%0),r1    \n"
-            "mov.l   r0,@%1         \n"
-            "mov.l   r1,@(4,%1)     \n"
-
-            "add     %2,%0          \n"
-            "add     %2,%1          \n"
-
-            "mov.l   @%0,r0         \n"
-            "mov.l   @(4,%0),r1     \n"
-            "mov.l   r0,@(56,%1)    \n"
-            "mov.l   r1,@(60,%1)    \n"
-            "mov.l   @(8,%0),r0     \n"
-            "mov.l   @(12,%0),r1    \n"
-            "mov.l   r0,@(48,%1)    \n"
-            "mov.l   r1,@(52,%1)    \n"
-            "mov.l   @(16,%0),r0    \n"
-            "mov.l   @(20,%0),r1    \n"
-            "mov.l   r0,@(40,%1)    \n"
-            "mov.l   r1,@(44,%1)    \n"
-            "mov.l   @(24,%0),r0    \n"
-            "mov.l   @(28,%0),r1    \n"
-            "mov.l   r0,@(32,%1)    \n"
-            "mov.l   r1,@(36,%1)    \n"
-            "mov.l   @(32,%0),r0    \n"
-            "mov.l   @(36,%0),r1    \n"
-            "mov.l   r0,@(24,%1)    \n"
-            "mov.l   r1,@(28,%1)    \n"
-            "mov.l   @(40,%0),r0    \n"
-            "mov.l   @(44,%0),r1    \n"
-            "mov.l   r0,@(16,%1)    \n"
-            "mov.l   r1,@(20,%1)    \n"
-            "mov.l   @(48,%0),r0    \n"
-            "mov.l   @(52,%0),r1    \n"
-            "mov.l   r0,@(8,%1)     \n"
-            "mov.l   r1,@(12,%1)    \n"
-            "mov.l   @(56,%0),r0    \n"
-            "mov.l   @(60,%0),r1    \n"
-            "mov.l   r0,@%1         \n"
-            "mov.l   r1,@(4,%1)     \n"
-            : /* outputs */
-            : /* inputs */
-            /* %0 */ "r"(patpix[i][0]),
-            /* %1 */ "r"(patpix[i+2048][0]),
-            /* %2 */ "r"(1024*64)
-            : /* clobbers */
-            "r0", "r1"
-        );
-#elif defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
         asm volatile (
             "movem.l (%0),%%d0-%%d3     \n"
             "move.l  %%d0,%%d4          \n"
