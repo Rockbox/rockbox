@@ -134,14 +134,8 @@ enum
 };
 
 #ifdef HAVE_USB_POWER
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define USBPOWER_BUTTON BUTTON_F1
-#define USBPOWER_BTN_IGNORE BUTTON_ON
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define USBPOWER_BUTTON BUTTON_MENU
-#define USBPOWER_BTN_IGNORE BUTTON_OFF
 /*allow people to define this in config-target.h if they need it*/
-#elif !defined(USBPOWER_BTN_IGNORE) 
+#if !defined(USBPOWER_BTN_IGNORE)
 #define USBPOWER_BTN_IGNORE 0
 #endif
 #endif

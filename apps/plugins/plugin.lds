@@ -6,8 +6,6 @@
 OUTPUT_FORMAT(elf32-m68k)
 #elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
-#elif defined(CPU_SH)
-OUTPUT_FORMAT(elf32-sh)
 #elif defined(CPU_MIPS)
 OUTPUT_FORMAT(elf32-littlemips)
 #else
