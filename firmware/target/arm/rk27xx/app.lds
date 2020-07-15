@@ -1,6 +1,6 @@
 #include "config.h"
 
-ENTRY(start)
+ENTRY(__start)
 #ifdef ROCKBOX_LITTLE_ENDIAN
 OUTPUT_FORMAT(elf32-littlearm)
 #else

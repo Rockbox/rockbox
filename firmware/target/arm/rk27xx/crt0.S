@@ -23,12 +23,12 @@
 #include "config.h"
 #include "cpu.h"
 
-    .global start
+    .global __start
     .global entry_point
 
     /* Exception vectors */
     .section .intvect,"ax",%progbits
-    ldr     pc, =start
+    ldr     pc, =__start
     ldr     pc, =undef_instr_handler
     ldr     pc, =software_int_handler
     ldr     pc, =prefetch_abort_handler
@@ -39,7 +39,7 @@
     .ltorg
 
     .text
-start:
+__start:
     msr     cpsr_c, #0xd3      /* enter supervisor mode, disable IRQ/FIQ */
 
 #ifdef BOOTLOADER
