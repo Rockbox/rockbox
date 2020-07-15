@@ -39,9 +39,9 @@ profile.c
 #if !defined(RKW_FORMAT) && !defined(MI4_FORMAT) && defined(MODEL_NUMBER)
 common/rb-loader.c
 #endif
-#if !defined(BOOTLOADER) || defined(CPU_SH)
+#if !defined(BOOTLOADER)
 rolo.c
-#endif /* !defined(BOOTLOADER) || defined(CPU_SH) */
+#endif /* !defined(BOOTLOADER) */
 timer.c
 debug.c
 #endif /* PLATFORM_NATIVE */
@@ -361,9 +361,7 @@ eeprom_settings.c
 
 /* RTC */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#if (CONFIG_RTC == RTC_M41ST84W)
-drivers/rtc/rtc_m41st84w.c
-#elif (CONFIG_RTC == RTC_PCF50606)
+#if (CONFIG_RTC == RTC_PCF50606)
 drivers/rtc/rtc_pcf50606.c
 #elif (CONFIG_RTC == RTC_PCF50605)
 drivers/rtc/rtc_pcf50605.c
@@ -406,10 +404,6 @@ tuner.c
 #if (CONFIG_TUNER & LV24020LP)
 drivers/tuner/lv24020lp.c
 #endif /* (CONFIG_TUNER & LV24020LP) */
-#if (CONFIG_TUNER & S1A0903X01)
-drivers/fmradio.c
-drivers/tuner/s1a0903x01.c
-#endif /* (CONFIG_TUNER & S1A0903X01) */
 #if (CONFIG_TUNER & TEA5760)
 drivers/tuner/tea5760uk.c
 #endif
@@ -480,8 +474,6 @@ drivers/audio/wm8731.c
 drivers/audio/as3514.c
 #elif defined(HAVE_TLV320)
 drivers/audio/tlv320.c
-#elif defined(HAVE_MAS35XX)
-drivers/audio/mas35xx.c
 #elif defined(HAVE_AK4537)
 drivers/audio/ak4537.c
 #elif defined(HAVE_UDA1341)
@@ -531,18 +523,7 @@ target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 
 /* CPU Specific - By class then particular chip if applicable */
-#if defined(CPU_SH)
-
-target/sh/adc-sh.c
-target/sh/bitswap.S
-target/sh/crt0.S
-target/sh/kernel-sh.c
-target/sh/system-sh.c
-target/sh/archos/descramble.S
-target/sh/archos/i2c-archos.c
-target/sh/debug-sh.c
-
-#elif defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
 
 target/coldfire/crt0.S
 target/coldfire/kernel-coldfire.c
@@ -786,16 +767,8 @@ drivers/i2c.c
 /* LCD driver */
 #if   CONFIG_LCD == LCD_SSD1303
 target/arm/as3525/lcd-ssd1303.c
-#elif CONFIG_LCD == LCD_SSD1801
-target/sh/archos/player/lcd-as-player.S
-target/sh/archos/player/lcd-player.c
 #elif CONFIG_LCD == LCD_SSD1815
-# if CONFIG_CPU == SH7034
-target/sh/archos/lcd-archos-bitmap.c
-target/sh/archos/lcd-as-archos-bitmap.S
-# else
 target/arm/lcd-ssd1815.c
-# endif
 #elif CONFIG_LCD == LCD_HX8340B
 target/arm/rk27xx/lcd-hifiman.c
 #elif CONFIG_LCD == LCD_C200
@@ -907,19 +880,6 @@ target/arm/tcc77x/adc-tcc77x.c
 
 #endif /* CONFIG_I2C */
 
-#ifdef CPU_SH
-target/sh/archos/mascodec-archos.c
-target/sh/archos/audio-archos.c
-target/sh/archos/timer-archos.c
-# if CONFIG_STORAGE & STORAGE_ATA
-target/sh/archos/ata-archos.c
-target/sh/archos/ata-as-archos.S
-# endif
-# ifdef HAVE_SERIAL
-target/sh/archos/uart-archos.c
-# endif
-#endif
-
 #ifdef CPU_TCC77X
 target/arm/usb-tcc.c
 target/arm/tcc77x/kernel-tcc77x.c
@@ -957,39 +917,6 @@ target/arm/s3c2440/system-s3c2440.c
 target/arm/s3c2440/gigabeat-fx/timer-meg-fx.c
 # endif
 #endif /* CONFIG_CPU == S3C2440 */
-
-#ifdef ARCHOS_PLAYER
-target/sh/archos/player/button-player.c
-target/sh/archos/player/hwcompat-player.c
-target/sh/archos/player/power-player.c
-target/sh/archos/player/powermgmt-player.c
-target/sh/archos/player/usb-player.c
-#endif /* ARCHOS_PLAYER */
-
-#ifdef ARCHOS_RECORDER
-target/sh/archos/recorder/button-recorder.c
-target/sh/archos/recorder/power-recorder.c
-target/sh/archos/recorder/powermgmt-recorder.c
-target/sh/archos/recorder/usb-recorder.c
-#endif /* ARCHOS_RECORDER */
-
-#if defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
-target/sh/archos/fm_v2/button-fm_v2.c
-target/sh/archos/fm_v2/power-fm_v2.c
-target/sh/archos/fm_v2/powermgmt-fm_v2.c
-target/sh/archos/fm_v2/usb-fm_v2.c
-#endif /* ARCHOS_FMRECORDER || ARCHOS_RECORDERV2 */
-
-#if defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
-target/sh/archos/ondio/button-ondio.c
-target/sh/archos/ondio/power-ondio.c
-target/sh/archos/ondio/powermgmt-ondio.c
-target/sh/archos/ondio/usb-ondio.c
-target/sh/archos/ondio/ata_mmc.c
-#if (CONFIG_TUNER & TEA5767)
-target/sh/archos/ondio/fmradio_i2c-ondio.c
-#endif
-#endif /* ARCHOS_ONDIOFM || ARCHOS_ONDIOFM */
 
 #if defined(SANSA_E200) || defined(SANSA_C200)
 target/arm/sandisk/backlight-c200_e200.c

@@ -14,7 +14,7 @@ To accomplish this, load a \fname{.cfg} file (as described in
 words: \config{bookmarks}, \config{files}, \opt{tagcache}{\config{database}, }%
 \config{wps}, \config{settings}, \opt{recording}{\config{recording}, }%
 \opt{radio}{\config{radio}, }\config{playlists}, \config{plugins},
-\config{system\_menu}, \opt{PLAYER_PAD}{\config{shutdown}, }\config{shortcuts}.
+\config{system\_menu}, \config{shortcuts}.
 Each of the words, if it occurs in the list, activates the appropriate item
 in the main menu. The order of the items is given by the order of the words
 in the list. The items whose words do not occur in the list will be hidden,
@@ -490,10 +490,8 @@ displaying images:
   \item Load and always show the image, using the \config{\%x} tag
   \item Preload the image with \config{\%xl} and show it with \config{\%xd}.
     This way you can have your images displayed conditionally.
-    \nopt{archos}{%
-    \item Load an image and show as backdrop using the \config{\%X} tag. The
-      image must be of the same exact dimensions as your display.
-    }%
+  \item Load an image and show as backdrop using the \config{\%X} tag. The
+    image must be of the same exact dimensions as your display.
 \end{enumerate}
 
 \optv{swcodec}{% This doesn't depend on swcodec but we don't have a \noptv
@@ -663,21 +661,10 @@ Example of a configuration file:
 \end{description}
 
 \section{\label{ref:FirmwareLoading}Firmware Loading}
-\opt{player,recorder,recorderv2fm,ondio}{
-  When your \dap{} powers on, it loads the Archos firmware in ROM, which
-  automatically checks your \daps{} root directory for a file named
-  \firmwarefilename. Note that Archos firmware can only read the first
-  ten characters of each filename in this process, so do not rename your old
-  firmware files with names like \firmwarefilename.\fname{old} and so on,
-  because it is possible that the \dap{} will load a file other than the one
-  you intended.
-}
 
 \subsection{\label{ref:using_rolo}Using ROLO (Rockbox Loader)}
 Rockbox is able to load and start another firmware file without rebooting.
 You just ``play'' a file with the extension %
-\opt{recorder,recorderv2fm,ondio}{\fname{.ajz}.} %
-\opt{player}{\fname{.mod}.} %
 \opt{iriverh100,iriverh300}{\fname{.iriver}.} %
 \opt{ipod}{\fname{.ipod}.} %
 \opt{iaudio}{\fname{.iaudio}.} %
@@ -686,8 +673,6 @@ You just ``play'' a file with the extension %
 \opt{gigabeatf,gigabeats}{\fname{.gigabeat}.} %
 This can be used to test new firmware versions without deleting your
 current version.
-
-\opt{archos}{\input{advanced_topics/archos-flashing.tex}}
 
 \opt{multi_boot}{
 \subsection{\label{ref:using_multiboot}Using Multiboot}
@@ -732,14 +717,12 @@ current version.
 } The following provides a short overview of the most relevant settings and
   rules of thumb.
 
-\nopt{ondio}{
 \subsection{Display backlight}
   The active backlight consumes a lot of power. Therefore choose a setting that
   disables the backlight after timeout (for setting \setting{Backlight} see
   \reference{ref:Displayoptions}). Avoid having the backlight enabled all the
   time (Activating \setting{selectivebacklight}
   \reference{ref:selectivebacklight} can further reduce power consumption).
-}
 
 \opt{lcd_sleep}{
 \subsection{Display power-off}
