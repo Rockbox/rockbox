@@ -496,14 +496,6 @@ EOF
 # the gcc version should most likely match what versions we build with
 # rockboxdev.sh
 #
-shcc () {
- prefixtools sh-elf-
- GCCOPTS="$CCOPTS -m1"
- GCCOPTIMIZE="-fomit-frame-pointer -fschedule-insns"
- endian="big"
- gccchoice="4.0.3"
-}
-
 calmrisccc () {
  prefixtools calmrisc16-unknown-elf-
  GCCOPTS="-Wl\,--no-check-sections $CCOPTS"
@@ -927,12 +919,6 @@ whichadvanced () {
     printf "Enter your developer options (press only enter when done)\n\
 (D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile,\n\
 Win(6)4 crosscompile, (T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
-    if [ "$modelname" = "archosplayer" ]; then
-      printf ", Use (A)TA poweroff"
-    fi
-    if [ "$t_model" = "ondio" ]; then
-      printf ", (B)acklight MOD"
-    fi
     if [ "$modelname" = "iaudiom5" ]; then
       printf ", (F)M radio MOD"
     fi
@@ -997,18 +983,6 @@ Win(6)4 crosscompile, (T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
       [Vv])
         echo "Voice build selected"
         voice="yes"
-        ;;
-      [Aa])
-        if [ "$modelname" = "archosplayer" ]; then
-          have_ata_poweroff="#define HAVE_ATA_POWER_OFF"
-          echo "ATA power off enabled"
-        fi
-        ;;
-      [Bb])
-        if [ "$t_model" = "ondio" ]; then
-          have_backlight="#define HAVE_BACKLIGHT"
-          echo "Backlight functions enabled"
-        fi
         ;;
       [Ff])
         if [ "$modelname" = "iaudiom5" ]; then
@@ -1076,7 +1050,6 @@ Win(6)4 crosscompile, (T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
   if [ "yes" = "$simulator" ]; then
     debug="-DDEBUG"
     extradefines="$extradefines -DSIMULATOR -DHAVE_TEST_PLUGINS"
-    archosrom=""
     flash=""
   fi
   if [ "yes" = "$profile" ]; then
@@ -1572,13 +1545,13 @@ if [ "$ARG_TARGET" ]; then
 else
   echo "Enter target platform:"
 cat <<EOF
- ==Archos==               ==iriver==             ==Apple iPod==
-  0) Player/Studio        10) H120/H140          20) Color/Photo
-  1) Recorder             11) H320/H340          21) Nano 1G
-  2) FM Recorder          12) iHP-100/110/115    22) Video
-  3) Recorder v2          13) iFP-790            23) 3G
-  4) Ondio SP             14) H10 20Gb           24) 4G Grayscale
-  5) Ondio FM             15) H10 5/6Gb          25) Mini 1G
+                          ==iriver==             ==Apple iPod==
+                          10) H120/H140          20) Color/Photo
+                          11) H320/H340          21) Nano 1G
+                          12) iHP-100/110/115    22) Video
+                          13) iFP-790            23) 3G
+                          14) H10 20Gb           24) 4G Grayscale
+                          15) H10 5/6Gb          25) Mini 1G
                                                  26) Mini 2G
                           ==Toshiba==            27) 1G, 2G
  ==Cowon/iAudio==         40) Gigabeat F/X       28) Nano 2G
@@ -1641,7 +1614,6 @@ fi
   toolset="rdf2binary convbdf codepages"
 
   # Toolsets for some target families:
-  archosbitmaptools="$toolset scramble descramble sh2d uclpack bmp2rb"
   iriverbitmaptools="$toolset scramble descramble mkboot bmp2rb"
   iaudiobitmaptools="$toolset scramble descramble mkboot bmp2rb"
   ipodbitmaptools="$toolset scramble bmp2rb"
@@ -1673,8 +1645,6 @@ fi
   #            $output)
   # appextra:  passed to the APPEXTRA variable in the Makefiles.
   #            TODO: add proper explanation
-  # archosrom: used only for Archos targets that build a special flashable .ucl
-  #            image.
   # flash:     name of output for flashing, for targets where there's a special
   #            file output for this.
   # plugins:   set to 'yes' to build the plugins. Early development builds can
@@ -1690,140 +1660,6 @@ fi
   #            overridden later in the script.
 
   case $buildfor in
-
-   0|archosplayer)
-    target_id=1
-    modelname="archosplayer"
-    target="ARCHOS_PLAYER"
-    shcc
-    tool="$rootdir/tools/scramble"
-    output="archos.mod"
-    appextra="player:gui"
-    #archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
-    plugins="yes"
-    swcodec=""
-
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$toolset scramble descramble sh2d player_unifont uclpack"
-
-    # Note: the convbdf is present in the toolset just because: 1) the
-    # firmware/Makefile assumes it is present always, and 2) we will need it when we
-    # build the player simulator
-
-    t_cpu="sh"
-    t_manufacturer="archos"
-    t_model="player"
-    ;;
-
-   1|archosrecorder)
-    target_id=2
-    modelname="archosrecorder"
-    target="ARCHOS_RECORDER"
-    shcc
-    tool="$rootdir/tools/scramble"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="ajbrec.ajz"
-    appextra="recorder:gui:radio"
-    #archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
-    plugins="yes"
-    swcodec=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$archosbitmaptools
-    t_cpu="sh"
-    t_manufacturer="archos"
-    t_model="recorder"
-    ;;
-
-   2|archosfmrecorder)
-    target_id=3
-    modelname="archosfmrecorder"
-    target="ARCHOS_FMRECORDER"
-    shcc
-    tool="$rootdir/tools/scramble -fm"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="ajbrec.ajz"
-    appextra="recorder:gui:radio"
-    #archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
-    plugins="yes"
-    swcodec=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$archosbitmaptools
-    t_cpu="sh"
-    t_manufacturer="archos"
-    t_model="fm_v2"
-    ;;
-
-   3|archosrecorderv2)
-    target_id=4
-    modelname="archosrecorderv2"
-    target="ARCHOS_RECORDERV2"
-    shcc
-    tool="$rootdir/tools/scramble -v2"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="ajbrec.ajz"
-    appextra="recorder:gui:radio"
-    #archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
-    plugins="yes"
-    swcodec=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$archosbitmaptools
-    t_cpu="sh"
-    t_manufacturer="archos"
-    t_model="fm_v2"
-    ;;
-
-   4|archosondiosp)
-    target_id=7
-    modelname="archosondiosp"
-    target="ARCHOS_ONDIOSP"
-    shcc
-    tool="$rootdir/tools/scramble -osp"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="ajbrec.ajz"
-    appextra="recorder:gui:radio"
-    #archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
-    plugins="yes"
-    swcodec=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$archosbitmaptools
-    t_cpu="sh"
-    t_manufacturer="archos"
-    t_model="ondio"
-    ;;
-
-   5|archosondiofm)
-    target_id=8
-    modelname="archosondiofm"
-    target="ARCHOS_ONDIOFM"
-    shcc
-    tool="$rootdir/tools/scramble -ofm"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="ajbrec.ajz"
-    appextra="recorder:gui:radio"
-    #archosrom="$pwd/rombox.ucl"
-    flash="$pwd/rockbox.ucl"
-    plugins="yes"
-    swcodec=""
-    toolset=$archosbitmaptools
-    t_cpu="sh"
-    t_manufacturer="archos"
-    t_model="ondio"
-    ;;
 
   10|iriverh120)
     target_id=9
@@ -4529,21 +4365,14 @@ fi
       echo "sansa eraser build selected"
       ;;
     [Bb])
-      if test $t_manufacturer = "archos"; then
-          # Archos SH-based players do this somewhat differently for
-          # some reason
-          appsdir='$(ROOTDIR)/flash/bootbox'
-          apps="bootbox"
-      else
-          appsdir='$(ROOTDIR)/bootloader'
-          apps="bootloader"
-          flash=""
-          if test -n "$boottool"; then
-              tool="$boottool"
-          fi
-          if test -n "$bootoutput"; then
-              output=$bootoutput
-          fi
+      appsdir='$(ROOTDIR)/bootloader'
+      apps="bootloader"
+      flash=""
+      if test -n "$boottool"; then
+          tool="$boottool"
+      fi
+      if test -n "$bootoutput"; then
+          output=$bootoutput
       fi
       extradefines="$extradefines -DBOOTLOADER -ffunction-sections -fdata-sections"
       bootloader="1"
@@ -4557,7 +4386,6 @@ fi
       debug="-DDEBUG"
       simulator="yes"
       extradefines="$extradefines -DSIMULATOR -DHAVE_TEST_PLUGINS"
-      archosrom=""
       flash=""
       echo "Simulator build selected"
       ;;
@@ -4588,7 +4416,6 @@ fi
       extradefines="$extradefines  -DDEBUG"
       appsdir='$(ROOTDIR)/tools/checkwps';
       output='checkwps.'${modelname};
-      archosrom='';
       echo "CheckWPS build selected"
       ;;
     [Dd])
@@ -4596,7 +4423,6 @@ fi
       simcc "database-sdl"
       toolset='';
       appsdir='$(ROOTDIR)/tools/database';
-      archosrom='';
 
       case $uname in
           CYGWIN*|MINGW*)
@@ -4620,7 +4446,6 @@ fi
       GCCOPTS='';
       extradefines="$extradefines  -DDEBUG"
       output='warble.'${modelname};
-      archosrom='';
       echo "Warble build selected"
       ;;
     *)
@@ -4636,9 +4461,6 @@ fi
   esac
   # to be able running "make manual" from non-manual configuration
   case $modelname in
-      archosrecorderv2)
-          manualdev="archosfmrecorder"
-          ;;
       iriverh1??)
           manualdev="iriverh100"
           ;;
@@ -4766,30 +4588,15 @@ echo "Using $LD $ldver"
 makever=`make --version | head -1`
 echo "Detected make $makever"
 
-# check the compiler for SH platforms
-if test "$CC" = "sh-elf-gcc"; then
-  if test "$gccnum" -lt "400"; then
-    echo "WARNING: Consider upgrading your compiler to the 4.0.X series!"
-    echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
-  else
-    # figure out patch status
-    gccpatch=`$CC --version`;
-
-    if { echo $gccpatch | grep "rockbox" >/dev/null 2>&1; } then
-      echo "gcc $gccver is rockbox patched"
-      # then convert -O to -Os to get smaller binaries!
-      GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
-    else
-      echo "WARNING: You use an unpatched gcc compiler: $gccver"
-      echo "WARNING: http://www.rockbox.org/twiki/bin/view/Main/CrossCompiler"
-    fi
-  fi
-fi
-
 if test "$CC" = "m68k-elf-gcc"; then
   # convert -O to -Os to get smaller binaries!
   GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
 fi
+if test "$CC" = "mipsel-elf-gcc"; then
+  # convert -O to -Os to get smaller binaries!
+  GCCOPTS=`echo $GCCOPTS | sed 's/ -O / -Os /'`
+fi
+
 
 if [ "$ARG_CCACHE" = "1" ]; then
   echo "Enable ccache for building"
@@ -5025,7 +4832,6 @@ export DOCSDIR=${rootdir}/docs
 export MANUALDIR=${rootdir}/manual
 export DEBUG=${debug}
 export MODELNAME=${modelname}
-export ARCHOSROM=${archosrom}
 export FLASHFILE=${flash}
 export TARGET_ID=${target_id}
 export TARGET=-D${target}

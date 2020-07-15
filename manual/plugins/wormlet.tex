@@ -1,11 +1,11 @@
 \subsection{Wormlet}
 \screenshot{plugins/images/ss-wormlet}{Wormlet game}{img:wormlet}
-Wormlet is a \opt{RECORDER_PAD}{multi{}-user }multi{}-worm game on a multi{}-threaded
+Wormlet is a \opt{MULTIPLAYER_PAD}{multi{}-user }multi{}-worm game on a multi{}-threaded
 multi{}-functional Rockbox console. You navigate a hungry little worm.
 Help your worm to find food and to avoid poisoned argh{}-tiles. The
 goal is to turn your tiny worm into a big worm for as long as possible.
 
-\opt{RECORDER_PAD}{
+\opt{MULTIPLAYER_PAD}{
 For 2{}-player games a remote control is not necessary but recommended.
 If you try to hold the \dap\ in the four hands of two players
 you'll find out why. Games with three players are only
@@ -20,7 +20,7 @@ possible using a remote control.\\}
 {\bfseries
 Game controls:}
 
-\opt{RECORDER_PAD}{
+\opt{MULTIPLAYER_PAD}{
 \renewcommand{\arraystretch}{1.8}
 \begin{rbtabular}{\textwidth}{c X p{3cm} p{3cm} p{3cm}}%
 {\textbf{Players} & \textbf{Modes} & \textbf{Player 1} & \textbf{Player 2}
@@ -51,7 +51,7 @@ Game controls:}
 \renewcommand{\arraystretch}{1.0}
 }
 
-\nopt{RECORDER_PAD}{
+\nopt{MULTIPLAYER_PAD}{
     \begin{btnmap}
         \nopt{MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonLeft}
         \opt{MPIO_HD200_PAD}{\ButtonVolDown}
@@ -62,7 +62,7 @@ Game controls:}
             &}
         Turn left
         \\
-        
+
         \nopt{MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen}{\ButtonRight}
         \opt{MPIO_HD200_PAD}{\ButtonVolUp}
         \opt{MPIO_HD300_PAD}{\ButtonFF}
@@ -72,7 +72,7 @@ Game controls:}
             &}
         Turn right
         \\
-        
+
         \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,MPIO_HD200_PAD%
             ,MPIO_HD300_PAD,touchscreen}{\ButtonUp}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonMenu}
@@ -85,7 +85,7 @@ Game controls:}
             &}
         Turn Up
         \\
-        
+
         \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,MPIO_HD200_PAD%
             ,MPIO_HD300_PAD,touchscreen}{\ButtonDown}
         \opt{IPOD_3G_PAD,IPOD_4G_PAD}{\ButtonPlay}
@@ -119,25 +119,24 @@ An ``argh'' is a black square poisoned piece {}- slightly bigger than
 food {}- that makes a worm say ``Argh!'' when
 run into.  A worm that eats an ``argh'' is dead. Thus eating an
 ``argh'' must be avoided under any circumstances. ``Arghs'' have the
-annoying tendency to accumulate. 
+annoying tendency to accumulate.
 \item[Worms.]
 Thou shall not eat worms. Neither other worms nor thyself. Eating worms
 is blasphemous cannibalism, not healthy and causes instant
 death. And it doesn't help anyway: the other worm
 isn't hurt by the bite. It will go on creeping happily
-and eat all the food you left on the table. 
+and eat all the food you left on the table.
 \item[Walls.]
 Don't crash into the walls. Walls are not edible.
 Crashing a worm against a wall causes it a headache it
-doesn't survive. 
+doesn't survive.
 \item[Game over.]
 The game is over when all worms are dead. The longest worm wins the
-game. 
+game.
 \item [Pause the game.]
 Press
-\opt{RECORDER_PAD,IAUDIO_X5_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD%
+\opt{IAUDIO_X5_PAD,PBELL_VIBE500_PAD,MPIO_HD200_PAD%
     ,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}%
-\opt{ONDIO_PAD}{\ButtonMenu}%
 \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD%
   ,GIGABEAT_PAD,GIGABEAT_S_PAD}{\ButtonSelect}
 \opt{COWON_D2_PAD}{\TouchCenter}
@@ -148,7 +147,7 @@ There are two ways to stop a running game.
 
 \begin{itemize}
 \item If you want to quit Wormlet entirely simply hit
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}%
@@ -157,10 +156,9 @@ There are two ways to stop a running game.
 \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}%
 \opt{MPIO_HD300_PAD}{Long \ButtonMenu}%
 \opt{GIGABEAT_S_PAD}{\ButtonBack}.
-The game will stop immediately and you will return to the game menu. 
-\item If you want to stop the game and still see the screen hit 
-\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
-\opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}%
+The game will stop immediately and you will return to the game menu.
+\item If you want to stop the game and still see the screen hit
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
@@ -171,8 +169,7 @@ The game will stop immediately and you will return to the game menu.
 \opt{MPIO_HD300_PAD}{Long \ButtonPlay}%
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}.
 This freezes the game. If you hit
-\opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
-\opt{ONDIO_PAD}{\ButtonOff+\ButtonMenu}%
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonSelect+\ButtonPlay}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD}{\ButtonRec}%
 \opt{SANSA_FUZE_PAD}{\ButtonSelect+\ButtonUp}%
@@ -184,7 +181,7 @@ This freezes the game. If you hit
 \opt{GIGABEAT_S_PAD}{\ButtonMenu}
 button again a new game starts with the same configuration. To return to the
 games menu you can hit
-\opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
+\opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}%
 \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu+\ButtonSelect}%
 \opt{IAUDIO_X5_PAD,SANSA_E200_PAD,GIGABEAT_PAD}{\ButtonPower}%
 \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
@@ -192,7 +189,7 @@ games menu you can hit
 \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonRew}%
 \opt{MPIO_HD200_PAD}{\ButtonRec + \ButtonPlay}%
 \opt{MPIO_HD300_PAD}{Long \ButtonMenu}%
-\opt{GIGABEAT_S_PAD}{\ButtonBack}. A stopped game can not be resumed. 
+\opt{GIGABEAT_S_PAD}{\ButtonBack}. A stopped game can not be resumed.
 \end{itemize}
 \end{description}
 
@@ -205,20 +202,20 @@ dies its entry on the score board turns black.
 \begin{description}
 \item[Len:]
 Here the current length of the worm is displayed. When a worm is eating
-food it grows by one pixel for each step it moves. 
+food it grows by one pixel for each step it moves.
 
 \item[Hungry:]
 That's the normal state of a worm. Worms are always
 hungry and want to eat. It is good to have a hungry
 worm since it means that your worm is alive. But it is
-better to get your worm growing. 
+better to get your worm growing.
 
 \item[Growing:]
 When a worm has eaten a piece of food it starts growing. For each step
 it moves over food it can grow by one pixel. One piece of food lasts
 for 7 steps. After your worm has moved 7 steps the food is used up. If
 another piece of food is eaten while growing it will increase the size
-of the worm for another 7 steps. 
+of the worm for another 7 steps.
 
 \item[Crashed:]
 This indicates that a worm has crashed against a wall.
@@ -241,7 +238,7 @@ is a good way to get them out of the game.
 \item Initially you will be busy with controlling your worm. Try to
 avoid other worms and crawl far away from them. Wait until they curl up
 themselves and collect the food afterwards. Don't worry if the other
-worms grow longer than yours {}- you can catch up after they've died. 
+worms grow longer than yours {}- you can catch up after they've died.
 
 \item When you are more experienced watch the tactics of other worms.
 Those worms controlled by artificial stupidity head straight for the
@@ -251,9 +248,9 @@ between the opponent and that food. From now on you can `control' the
 other worm by blocking it. You could trap it by making a 1 pixel wide
 U{}-turn. You also could move from food to food and make sure you keep
 between your opponent and the food. So you can always reach it before
-your opponent. 
+your opponent.
 
-\opt{RECORDER_PAD}{
+\opt{MULTIPLAYER_PAD}{
 \item While playing the game the \dap\ can still play music. For
 single player game use any music you like. For berserk games with 2 players use
 hard rock and for 3 player games use heavy metal or X{}-Phobie

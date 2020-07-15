@@ -86,7 +86,7 @@ wolf3d.c
 
 #if PLUGIN_BUFFER_SIZE <= 0x20000 && defined(HAVE_LCD_BITMAP)
 
-#if CONFIG_KEYPAD != ONDIO_PAD && CONFIG_KEYPAD != SANSA_M200_PAD \
+#if CONFIG_KEYPAD != SANSA_M200_PAD \
     && CONFIG_KEYPAD != HM60X_PAD
 /* not enough buttons for rockboy */
 rockboy.c
@@ -106,42 +106,14 @@ pictureflow.c
 splitedit.c
 #endif
 
-#if CONFIG_LCD == LCD_SSD1815
-video.c
-#endif
-
 #endif /* HWCODEC */
-
-
-#if defined(ARCHOS_PLAYER) || defined(ARCHOS_RECORDER) || \
-    defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
-alpine_cdc.c
-#endif
-
-#if defined(ARCHOS_PLAYER) || defined(ARCHOS_RECORDER) || \
-    defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2) || \
-    defined(ARCHOS_ONDIOFM) || defined(ARCHOS_ONDIOSP)
-firmware_flash.c
-#endif
 
 #if defined(IRIVER_H100_SERIES)
 iriver_flash.c
 #endif
 
-#if (CONFIG_CPU == SH7034)
-rockbox_flash.c
-#endif /* CONFIG_CPU */
-
 #if defined(IPOD_NANO2G)
 crypt_firmware.c
-#endif
-
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-wavplay.c
-#endif
-
-#if (CONFIG_CODEC == MAS3587F)
-wavrecord.c
 #endif
 
 #endif /* PLATFORM_NATIVE */
@@ -216,11 +188,6 @@ rockpaint.c
 rocklife.c
 
 #endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_CHARCELLS          /* Archos Player model only */
-euroconverter.c
-nim.c
-#endif /* HAVE_LCD_CHARCELLS */
 
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 

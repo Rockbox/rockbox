@@ -38,16 +38,6 @@ void rtc_init(void);
 int rtc_read_datetime(struct tm *tm);
 int rtc_write_datetime(const struct tm *tm);
 
-#if CONFIG_RTC == RTC_M41ST84W
-
-/* The RTC in the Archos devices is used for much more than just the clock 
-   data */
-int rtc_read(unsigned char address);
-int rtc_read_multiple(unsigned char address, unsigned char *buf, int numbytes);
-int rtc_write(unsigned char address, unsigned char value);
-
-#endif /* RTC_M41ST84W */
-
 #ifdef HAVE_RTC_ALARM
 void rtc_set_alarm(int h, int m);
 void rtc_get_alarm(int *h, int *m);

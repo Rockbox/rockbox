@@ -43,8 +43,6 @@ void audio_set_buffer_margin(int seconds)
      (void)seconds;
 }
 
-/* firmware/target/sh/archos/audio-archos.c */
-
 /* list of tracks in memory */
 #define MAX_ID3_TAGS (1<<4) /* Must be power of 2 */
 #define MAX_ID3_TAGS_MASK (MAX_ID3_TAGS - 1)
@@ -104,48 +102,6 @@ void mp3_shutdown(void)
 {
 }
 
-/* firmware/drivers/audio/mas35xx.c */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-void audiohw_set_loudness(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_avc(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_mdb_strength(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_mdb_harmonics(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_mdb_center(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_mdb_shape(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_mdb_enable(int value)
-{
-    (void)value;
-}
-
-void audiohw_set_superbass(int value)
-{
-    (void)value;
-}
-#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 #endif /* CODEC != SWCODEC */
 
 int fat_startsector(void)
@@ -308,14 +264,6 @@ void spdif_power_enable(bool on)
 bool spdif_powered(void)
 {
     return false;
-}
-#endif
-
-#ifdef ARCHOS_PLAYER
-bool is_new_player(void)
-{
-    extern char having_new_lcd;
-    return having_new_lcd;
 }
 #endif
 

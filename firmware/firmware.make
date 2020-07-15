@@ -17,9 +17,7 @@ include $(FIRMDIR)/asm/asm.make
 
 FIRMLIB_SRC += $(call preprocess, $(FIRMDIR)/SOURCES)
 FIRMLIB_OBJ := $(call c2obj, $(FIRMLIB_SRC))
-ifeq (,$(findstring -DARCHOS_PLAYER,$(TARGET)))
-    FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
-endif
+FIRMLIB_OBJ += $(BUILDDIR)/sysfont.o
 OTHER_SRC += $(FIRMLIB_SRC)
 
 FIRMLIB = $(BUILDDIR)/firmware/libfirmware.a

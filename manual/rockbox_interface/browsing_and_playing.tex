@@ -24,17 +24,6 @@ that are not available within the \setting{Database Browser}. Read more about
 \setting{Database} in \reference{ref:database}. The remainder of this section
 deals with the \setting{File Browser}.}
 
-\opt{ondio}{
-Unlike the Archos Firmware, Rockbox provides multivolume support for the
-MultiMediaCard, this means the \dap{} can access both data volumes (internal
-memory and the MMC), thus being able to for instance, build playlists with
-files from both volumes.
-In the \setting{File Browser} a new directory will appear as soon as the device
-has read the content after inserting the card. This new directory's name is
-generated as \fname{<MMC1>}, and will behave exactly as any other directory
-on the \dap{}.
-}
-
 \opt{iriverh10,iriverh10_5gb}{\note{
 If your \dap{} is a MTP model, the Music directory where all your music is stored
 may be hidden in the \setting{File Browser}. This may be fixed by either
@@ -49,7 +38,7 @@ the \setting{Show Files} setting to all.
          & Go to previous/next item in list. If you are on the first/last 
            entry, the cursor will wrap to the last/first entry.\\
       %
-      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD}
+      \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}
         {
           \ButtonOn+\ButtonUp{}/ \ButtonDown
           \opt{HAVEREMOTEKEYMAP}{&
@@ -98,10 +87,6 @@ the \setting{Show Files} setting to all.
         & Switch to the \setting{Quick Screen}
         (see \reference{ref:QuickScreen}). \\
       }
-      \opt{RECORDER_PAD}{
-        \ButtonFThree & Switch to the \setting{Quick Screen}.\\ 
-        %
-      }
       %
       \opt{SANSA_E200_PAD}{
         \ActionStdRec & Switch to the \setting{Recording Screen}.\\
@@ -117,11 +102,6 @@ the \setting{Show Files} setting to all.
             \\
       }}
 \end{btnmap}
-
-\opt{RECORDER_PAD}{
-  The functions of the F keys are also summarised on the button bar at the
-  bottom of the screen.
-}
 
 \subsection{\label{ref:Contextmenu}\label{ref:PartIISectionFM}Context Menu}
 \screenshot{rockbox_interface/images/ss-context-menu}{The Context Menu}{}
@@ -206,9 +186,9 @@ each option pertains both to files and directories):
 \screenshot{rockbox_interface/images/ss-virtual-keyboard}{The virtual keyboard}{}
 This is the virtual keyboard that is used when entering text in Rockbox, for 
 example when renaming a file or creating a new directory.
-\nopt{player}{The virtual keyboard can be easily changed by making a text file
- with the required layout. More information on how to achieve this can be found
- on the Rockbox website at \wikilink{LoadableKeyboardLayouts}.}
+The virtual keyboard can be easily changed by making a text file
+with the required layout. More information on how to achieve this can be found
+on the Rockbox website at \wikilink{LoadableKeyboardLayouts}.
 
 \opt{morse_input}{
   Also you can switch to Morse code input mode by changing the
@@ -219,12 +199,12 @@ example when renaming a file or creating a new directory.
     { or by pressing \ActionKbdMorseInput{} in the virtual keyboard}%
   .}
 
-\nopt{player}{% no "Actions" yet in the Player's virtual keyboard
+% no "Actions" yet in the Player's virtual keyboard
 
 \note{When the cursor is on the input line, \ActionKbdSelect{} deletes the preceding character}
 
 \begin{btnmap}
-    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
         ,MROBE100_PAD,SANSA_E200_PAD,SANSA_FUZE_PAD,SANSA_C200_PAD,SANSA_FUZEPLUS_PAD%
         ,SAMSUNG_YH820_PAD}{
         \ActionKbdCursorLeft{} / \ActionKbdCursorRight
@@ -258,7 +238,7 @@ example when renaming a file or creating a new directory.
     If you move out of the picker area you get to the line edit mode.
         \\
     %
-    \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,ONDIO_PAD,PBELL_VIBE500_PAD%
+    \nopt{IPOD_3G_PAD,IPOD_4G_PAD,IRIVER_H10_PAD,PBELL_VIBE500_PAD%
          ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{
         \ActionKbdPageFlip
             &
@@ -302,23 +282,6 @@ example when renaming a file or creating a new directory.
         & Tap to select a character in Morse code input mode. \\
       } 
 \end{btnmap}
-}% end of non-Player section
-
-\opt{player}{
-  The current text line to be entered or edited is always listed on the first
-  line of the display. The second line of the display can contain the character
-  selection bar, as in the screenshot above.
-    \begin{btnmap}
-      \ButtonOn & Toggle picker- and line edit mode. \\
-      \ButtonLeft{} / \ButtonRight
-        & Move back and forth in the selected line (picker of input line). \\
-      \ButtonPlay
-        & Pick character in character bar, or act as backspace in the text line. \\
-      Long \ButtonPlay & Accept \\
-      \ButtonStop & Cancel \\
-      \ButtonMenu & Flip picker lines. \\
-    \end{btnmap}
-}
 
 \input{rockbox_interface/tagcache.tex}
 \input{rockbox_interface/wps.tex}

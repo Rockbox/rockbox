@@ -63,14 +63,8 @@
 #endif
 #include <jpeg_load.h>
 
-#if CONFIG_CPU == SH7034
-/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
-#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
-#define MULQ(a, b) ((int32_t) (((int16_t) (a)) * ((int16_t) (b))))
-#else
 #define MULUQ(a, b) ((a) * (b))
 #define MULQ(a, b) ((a) * (b))
-#endif
 
 #ifdef HAVE_LCD_COLOR
 #define CHANNEL_BYTES (sizeof(struct uint32_argb)/sizeof(uint32_t))
@@ -151,18 +145,6 @@ int recalc_dimension(struct dim *dst, struct dim *src)
         "movclr.l %%acc" #num ", %0" \
         : "=d" (dest) \
     )
-#elif defined(CPU_SH)
-/* calculate the 32-bit product of unsigned 16-bit op1 and op2 */
-static inline int32_t mul_s16_s16(int16_t op1, int16_t op2)
-{
-    return (int32_t)(op1 * op2);
-}
-
-/* calculate the 32-bit product of signed 16-bit op1 and op2 */
-static inline uint32_t mul_u16_u16(uint16_t op1, uint16_t op2)
-{
-    return (uint32_t)(op1 * op2);
-}
 #endif
 
 /* horizontal area average scaler */
@@ -171,13 +153,8 @@ static bool scale_h_area(void *out_line_ptr,
 {
     SDEBUGF("scale_h_area\n");
     unsigned int ix, ox, oxe, mul;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-    const uint32_t h_i_val = ctx->src->width,
-                   h_o_val = ctx->bm->width;
-#else
     const uint32_t h_i_val = ctx->h_i_val,
                    h_o_val = ctx->h_o_val;
-#endif
 #ifdef HAVE_LCD_COLOR
     struct uint32_argb rgbvalacc = { 0, 0, 0, 0 },
                        rgbvaltmp = { 0, 0, 0, 0 },
@@ -298,15 +275,6 @@ static bool scale_h_area(void *out_line_ptr,
             mul = h_o_val - oxe;
             MAC(tmp, mul, 0);
             MAC_OUT(acc, 0);
-#elif defined(CPU_SH)
-/* SH-1 16x16->32 math */
-            /* add saved partial pixel from start of area */
-            acc = mul_u16_u16(acc, h_o_val) + mul_u16_u16(tmp, mul);
-
-            /* get new pixel , then add its partial coverage to this area */
-            tmp = *(part->buf);
-            mul = h_o_val - oxe;
-            acc += mul_u16_u16(tmp, mul);
 #else
 /* generic C math */
             /* add saved partial pixel from start of area */
@@ -317,10 +285,8 @@ static bool scale_h_area(void *out_line_ptr,
             mul = h_o_val - oxe;
             acc += tmp * mul;
 #endif /* CPU */
-#if !(defined(CPU_SH) || defined(TEST_SH_MATH))
             /* round, divide, and either store or accumulate to output row */
             acc = (acc + (1 << 21)) >> 22;
-#endif
             if (accum)
             {
                 acc += out_line[ox];
@@ -346,13 +312,8 @@ static bool scale_h_area(void *out_line_ptr,
 static inline bool scale_v_area(struct rowset *rset, struct scaler_context *ctx)
 {
     uint32_t mul, oy, iy, oye;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-    const uint32_t v_i_val = ctx->src->height,
-                   v_o_val = ctx->bm->height;
-#else
     const uint32_t v_i_val = ctx->v_i_val,
                    v_o_val = ctx->v_o_val;
-#endif
 
     /* Set up rounding and scale factors */
     mul = 0;
@@ -409,13 +370,8 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
                            bool accum)
 {
     unsigned int ix, ox, ixe;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-    const uint32_t h_i_val = ctx->src->width - 1,
-                   h_o_val = ctx->bm->width - 1;
-#else
     const uint32_t h_i_val = ctx->h_i_val,
                    h_o_val = ctx->h_o_val;
-#endif
     /* type x = x is an ugly hack for hiding an unitialized data warning. The
        values are conditionally initialized before use, but other values are
        set such that this will occur before these are used.
@@ -531,9 +487,6 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
 #if defined(CPU_COLDFIRE)
 /* Coldfire EMAC math */
             MAC(val, h_o_val, 0);
-#elif defined(CPU_SH)
-/* SH-1 16x16->32 math */
-            val = mul_u16_u16(val, h_o_val);
 #else
 /* generic C math */
             val = val * h_o_val;
@@ -552,9 +505,6 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
 #if defined(CPU_COLDFIRE)
 /* Coldfire EMAC math */
                 MAC(inc, ixe, 0);
-#elif defined(CPU_SH)
-/* SH-1 16x16->32 math */
-                val += mul_s16_s16(inc, ixe);
 #else
 /* generic C math */
                 val += inc * ixe;
@@ -565,16 +515,10 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
             MAC_OUT(val, 0);
 #endif
             /* Now multiply the color increment to its proper value */
-#if defined(CPU_SH)
-/* SH-1 16x16->32 math */
-            inc = mul_s16_s16(inc, h_i_val);
-#else
 /* generic C math */
             inc *= h_i_val;
-#endif
         } else
             val += inc;
-#if !(defined(CPU_SH) || defined(TEST_SH_MATH))
         /* round and scale values, and accumulate or store to output */
         if (accum)
         {
@@ -582,15 +526,6 @@ static bool scale_h_linear(void *out_line_ptr, struct scaler_context *ctx,
         } else {
             out_line[ox] = (val + (1 << 21)) >> 22;
         }
-#else
-        /* round and scale values, and accumulate or store to output */
-        if (accum)
-        {
-            out_line[ox] += val;
-        } else {
-            out_line[ox] = val;
-        }
-#endif
 #endif
         ixe += h_i_val;
     }
@@ -603,13 +538,8 @@ static inline bool scale_v_linear(struct rowset *rset,
 {
     uint32_t iy, iye;
     int32_t oy;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-    const uint32_t v_i_val = ctx->src->height - 1,
-                   v_o_val = ctx->bm->height - 1;
-#else
     const uint32_t v_i_val = ctx->v_i_val,
                    v_o_val = ctx->v_o_val;
-#endif
     /* Set up our buffers, to store the increment and current value for each
        column, and one temp buffer used to read in new rows.
     */
@@ -892,9 +822,6 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.bm = bm;
     ctx.src = src;
     ctx.dither = dither;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-    uint32_t div;
-#endif
 #if !defined(PLUGIN)
 #if defined(HAVE_LCD_COLOR) && defined(HAVE_JPEG)
     ctx.output_row = format_index ? output_row_32_native_fromyuv
@@ -914,23 +841,15 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     {
 #endif
         ctx.h_scaler = scale_h_area;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-        div = sw;
-#else
         uint32_t h_div = (1U << 24) / sw;
         ctx.h_i_val = sw * h_div;
         ctx.h_o_val = dw * h_div;
-#endif
 #ifdef HAVE_UPSCALER
     } else {
         ctx.h_scaler = scale_h_linear;
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-        div = dw - 1;
-#else
         uint32_t h_div = (1U << 24) / (dw - 1);
         ctx.h_i_val = (sw - 1) * h_div;
         ctx.h_o_val = (dw - 1) * h_div;
-#endif
     }
 #endif
 #ifdef CPU_COLDFIRE
@@ -941,27 +860,17 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     if (sh > dh)
 #endif
     {
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-        div *= sh;
-        ctx.recip = ((uint32_t)(-div)) / div + 1;
-#else
         uint32_t v_div = (1U << 22) / sh;
         ctx.v_i_val = sh * v_div;
         ctx.v_o_val = dh * v_div;
-#endif
         ret = scale_v_area(rset, &ctx);
     }
 #ifdef HAVE_UPSCALER
     else
     {
-#if defined(CPU_SH) || defined (TEST_SH_MATH)
-        div *= dh - 1;
-        ctx.recip = ((uint32_t)(-div)) / div + 1;
-#else
         uint32_t v_div = (1U << 22) / dh;
         ctx.v_i_val = (sh - 1) * v_div;
         ctx.v_o_val = (dh - 1) * v_div;
-#endif
         ret = scale_v_linear(rset, &ctx);
     }
 #endif

@@ -75,9 +75,6 @@ iap/iap-lingo7.c
 #endif
 #endif
 screen_access.c
-#ifdef HAVE_BUTTONBAR
-gui/buttonbar.c
-#endif
 #ifdef HAVE_LCD_BITMAP
 gui/icon.c
 #endif
@@ -208,12 +205,6 @@ keymaps/keymap-h1x0_h3x0.c
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
     || (CONFIG_KEYPAD == IPOD_1G2G_PAD))
 keymaps/keymap-ipod.c
-#elif CONFIG_KEYPAD == RECORDER_PAD
-keymaps/keymap-recorder.c
-#elif CONFIG_KEYPAD == ONDIO_PAD
-keymaps/keymap-ondio.c
-#elif CONFIG_KEYPAD == PLAYER_PAD
-keymaps/keymap-player.c
 #elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
 keymaps/keymap-x5.c
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD

@@ -339,27 +339,6 @@ MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
 #endif
 #endif
 
-
-#if CONFIG_CODEC == MAS3507D
-void dac_line_in(bool enable);
-static int linein_callback(int action,
-                           const struct menu_item_ex *this_item,
-                           struct gui_synclist *this_list)
-{
-    (void)this_item;
-    (void)this_list;
-    switch (action)
-    {
-        case ACTION_EXIT_MENUITEM: /* on exit */
-#ifndef SIMULATOR
-            dac_line_in(global_settings.line_in);
-#endif
-            break;
-    }
-    return action;
-}
-MENUITEM_SETTING(line_in, &global_settings.line_in, linein_callback);
-#endif
 #if CONFIG_CHARGING
 MENUITEM_SETTING(car_adapter_mode, &global_settings.car_adapter_mode, NULL);
 MENUITEM_SETTING(car_adapter_mode_delay, &global_settings.car_adapter_mode_delay, NULL);
@@ -439,9 +418,6 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifdef HAVE_MORSE_INPUT
             &morse_input,
-#endif
-#if CONFIG_CODEC == MAS3507D
-            &line_in,
 #endif
 #if CONFIG_CHARGING
             &car_adapter_mode_menu,

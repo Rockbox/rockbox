@@ -74,9 +74,6 @@
 #include "bootchart.h"
 #include "scroll_engine.h"
 
-#if CONFIG_CODEC == MAS3507D
-void dac_line_in(bool enable);
-#endif
 struct user_settings global_settings;
 struct system_status global_status;
 
@@ -759,16 +756,6 @@ void sound_settings_apply(void)
 #endif
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    sound_set(SOUND_LOUDNESS, global_settings.loudness);
-    sound_set(SOUND_AVC, global_settings.avc);
-    sound_set(SOUND_MDB_STRENGTH, global_settings.mdb_strength);
-    sound_set(SOUND_MDB_HARMONICS, global_settings.mdb_harmonics);
-    sound_set(SOUND_MDB_CENTER, global_settings.mdb_center);
-    sound_set(SOUND_MDB_SHAPE, global_settings.mdb_shape);
-    sound_set(SOUND_MDB_ENABLE, global_settings.mdb_enable);
-    sound_set(SOUND_SUPERBASS, global_settings.superbass);
-#endif
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     sound_set(SOUND_BASS_CUTOFF, global_settings.bass_cutoff);
 #endif
@@ -867,9 +854,6 @@ void settings_apply(bool read_disk)
 #endif
 #ifdef HAVE_DISK_STORAGE
     storage_spindown(global_settings.disk_spindown);
-#endif
-#if (CONFIG_CODEC == MAS3507D) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    dac_line_in(global_settings.line_in);
 #endif
     set_poweroff_timeout(global_settings.poweroff);
     if (global_settings.sleeptimer_on_startup)

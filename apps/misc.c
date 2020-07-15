@@ -436,17 +436,6 @@ bool list_stop_handler(void)
         }
     }
 #if CONFIG_CHARGING
-#if (CONFIG_KEYPAD == RECORDER_PAD) && !defined(HAVE_SW_POWEROFF)
-    else
-    {
-        if (charger_inserted())
-            charging_splash();
-        else
-            shutdown_screen(); /* won't return if shutdown actually happens */
-
-        ret = true;  /* screen is dirty, caller needs to refresh */
-    }
-#endif
 #ifndef HAVE_POWEROFF_WHILE_CHARGING
     {
         static long last_off = 0;
@@ -595,10 +584,6 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
         case SYS_USB_CONNECTED:
             if (callback != NULL)
                 callback(parameter);
-#if (CONFIG_STORAGE & STORAGE_MMC) && (defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM))
-            if (!mmc_touched() ||
-                (mmc_remove_request() == SYS_HOTSWAP_EXTRACTED))
-#endif
             {
                 system_flush();
 #ifdef BOOTFILE

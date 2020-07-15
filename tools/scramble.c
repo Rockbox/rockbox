@@ -36,24 +36,6 @@ static int iaudio_encode(char *iname, char *oname, char *idstring);
 static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc);
 static int ccpmp_encode(char *iname, char *oname);
 
-enum
-{
-    ARCHOS_PLAYER, /* and V1 recorder */
-    ARCHOS_V2RECORDER,
-    ARCHOS_FMRECORDER,
-    ARCHOS_ONDIO_SP,
-    ARCHOS_ONDIO_FM
-};
-
-static unsigned int size_limit[] =
-{
-    0x32000, /* ARCHOS_PLAYER */
-    0x64000, /* ARCHOS_V2RECORDER */
-    0x64000, /* ARCHOS_FMRECORDER */
-    0x64000, /* ARCHOS_ONDIO_SP */
-    0x64000  /* ARCHOS_ONDIO_FM */
-};
-
 void short2le(unsigned short val, unsigned char* addr)
 {
     addr[0] = val & 0xFF;
@@ -91,14 +73,9 @@ void short2be(unsigned short val, unsigned char* addr)
 
 void usage(void)
 {
-    printf("usage: scramble [options] <input file> <output file> [xor string]\n");
+    printf("usage: scramble [options] <input file> <output file>\n");
     printf("options:\n"
-           "\t-fm     Archos FM recorder format\n"
-           "\t-v2     Archos V2 recorder format\n"
-           "\t-ofm    Archos Ondio FM recorder format\n"
-           "\t-osp    Archos Ondio SP format\n"
            "\t-neo    SSI Neo format\n"
-           "\t-mm=X   Archos Multimedia format (X values: A=JBMM, B=AV1xx, C=AV3xx)\n"
            "\t-iriver iRiver format\n"
            "\t-iaudiox5 iAudio X5 format\n"
            "\t-iaudiox5v iAudio X5V format\n"
@@ -131,66 +108,30 @@ void usage(void)
            "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360,\n"
            "\t                   zxfi, zmoz, zen, zenv, ypz5, zxfs, e450, e460,\n"
            "\t                   e470, e580, a10, a20, a860, s750, e350, xdx3)\n");
-    printf("\nNo option results in Archos standard player/recorder format.\n");
+    printf("\nNo option results in nothing being done.\n");
 
     exit(1);
 }
 
 int main (int argc, char** argv)
 {
-    unsigned long length,i,slen=0;
+    unsigned long length,i;
     unsigned char *inbuf,*outbuf;
     unsigned short crc=0;
     unsigned long chksum=0; /* 32 bit checksum */
     unsigned char header[24];
     char *iname = argv[1];
     char *oname = argv[2];
-    char *xorstring=NULL;
     int headerlen = 6;
     FILE* file;
     int version=0;
     unsigned long modelnum;
     char modelname[5];
-    int model_id;
-    enum { none, scramble, xor, tcc_sum, tcc_crc, rkw, add } method = scramble;
+    enum { none, tcc_sum, tcc_crc, rkw, add } method = none;
     bool creative_enable_ciff;
 
-    model_id = ARCHOS_PLAYER;
-    
     if (argc < 3) {
         usage();
-    }
-
-    if(!strcmp(argv[1], "-fm")) {
-        headerlen = 24;
-        iname = argv[2];
-        oname = argv[3];
-        version = 4;
-        model_id = ARCHOS_FMRECORDER;
-    }
-    
-    else if(!strcmp(argv[1], "-v2")) {
-        headerlen = 24;
-        iname = argv[2];
-        oname = argv[3];
-        version = 2;
-        model_id = ARCHOS_V2RECORDER;
-    }
-
-    else if(!strcmp(argv[1], "-ofm")) {
-        headerlen = 24;
-        iname = argv[2];
-        oname = argv[3];
-        version = 8;
-        model_id = ARCHOS_ONDIO_FM;
-    }
-
-    else if(!strcmp(argv[1], "-osp")) {
-        headerlen = 24;
-        iname = argv[2];
-        oname = argv[3];
-        version = 16;
-        model_id = ARCHOS_ONDIO_SP;
     }
 
     else if(!strcmp(argv[1], "-neo")) {
@@ -198,19 +139,6 @@ int main (int argc, char** argv)
         iname = argv[2];
         oname = argv[3];
         method = none;
-    }
-    else if(!strncmp(argv[1], "-mm=", 4)) {
-        headerlen = 16;
-        iname = argv[2];
-        oname = argv[3];
-        method = xor;
-        version = argv[1][4];
-        if (argc > 4)
-            xorstring = argv[4];
-        else {
-            printf("Multimedia needs an xor string\n");
-            return -1;
-        }
     }
     else if(!strncmp(argv[1], "-tcc=", 4)) {
         headerlen = 0;
@@ -554,20 +482,10 @@ int main (int argc, char** argv)
     length = ftell(file);
     length = (length + 3) & ~3; /* Round up to nearest 4 byte boundary */
     
-    if ((method == scramble) &&
-        ((length + headerlen) >= size_limit[model_id])) {
-        printf("error: firmware image is %ld bytes while max size is %u!\n",
-               length + headerlen,
-               size_limit[model_id]);
-        fclose(file);
-        return -1;
-    }
 
     fseek(file,0,SEEK_SET); 
     inbuf = malloc(length);
-    if (method == xor)
-        outbuf = malloc(length*2);
-    else if(method == add)
+    if(method == add)
         outbuf = malloc(length + 8);
     else
         outbuf = malloc(length);
@@ -597,32 +515,13 @@ int main (int argc, char** argv)
                 chksum += inbuf[i];
             }
             break;
-        case scramble:
-            slen = length/4;
-            for (i = 0; i < length; i++) {
-                unsigned long addr = (i >> 2) + ((i % 4) * slen);
-                unsigned char data = inbuf[i];
-                data = ~((data << 1) | ((data >> 7) & 1)); /* poor man's ROL */
-                outbuf[addr] = data;
-            }
-            break;
-
-        case xor:
-            /* "compress" */
-            slen = 0;
-            for (i=0; i<length; i++) {
-                if (!(i&7))
-                    outbuf[slen++] = 0xff; /* all data is uncompressed */
-                outbuf[slen++] = inbuf[i];
-            }
-            break;
         case none:
         default:
             /* dummy case just to silence picky compilers */
             break;
     }
 
-    if((method == none) || (method == scramble) || (method == xor)) {
+    if(method == none) {
         /* calculate checksum */
         for (i=0;i<length;i++)
             crc += inbuf[i];
@@ -649,50 +548,6 @@ int main (int argc, char** argv)
             memcpy(outbuf, inbuf, length); /* the input buffer to output*/
             telechips_encode_crc(outbuf, length);
             break;
-
-        case scramble:
-            if (headerlen == 6) {
-                int2be(length, header);
-                header[4] = (crc >> 8) & 0xff;
-                header[5] = crc & 0xff;
-            }
-            else {
-                header[0] =
-                    header[1] =
-                    header[2] =
-                    header[3] = 0xff; /* ??? */
-                
-                header[6] = (crc >> 8) & 0xff;
-                header[7] = crc & 0xff;
-                
-                header[11] = version;
-                
-                header[15] = headerlen; /* really? */
-                
-                int2be(length, &header[20]);
-            }
-            break;
-
-        case xor:
-        {
-            int xorlen = strlen(xorstring);
-
-            /* xor data */
-            for (i=0; i<slen; i++)
-                outbuf[i] ^= xorstring[i & (xorlen-1)];
-            
-            /* calculate checksum */
-            for (i=0; i<slen; i++)
-                crc += outbuf[i];
-
-            header[0] = header[2] = 'Z';
-            header[1] = header[3] = version;
-            int2le(length, &header[4]);
-            int2le(slen, &header[8]);
-            int2le(crc, &header[12]);
-            length = slen;
-            break;
-        }
 
 #define MY_FIRMWARE_TYPE "Rockbox"
 #define MY_HEADER_VERSION 1

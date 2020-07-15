@@ -23,15 +23,7 @@ LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua dra
 
 
 ifndef APP_TYPE
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
-    ### lowmem targets
-    ROCKS += $(LUA_BUILDDIR)/lua.ovl
-    LUA_OUTLDS = $(LUA_BUILDDIR)/lua.link
-    LUA_OVLFLAGS = -T$(LUA_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
-else
-    ### all other targets
     ROCKS += $(LUA_BUILDDIR)/lua.rock
-endif
 else
     ### simulator
     ROCKS += $(LUA_BUILDDIR)/lua.rock

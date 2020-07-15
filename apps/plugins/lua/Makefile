@@ -28,13 +28,8 @@ OBJS = $(patsubst %.S, $(OBJDIR)/%.o, $(OBJS2))
 DIRS = .
 
 ifndef APP_TYPE
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
-    LDS := archos.lds
-    OUTPUT = $(OUTDIR)/lua.ovl
-else  ## iRiver/iPod/... targets
     LDS := ../plugin.lds
     OUTPUT = $(OUTDIR)/lua.rock
-endif
 else  ## simulators
     OUTPUT = $(OUTDIR)/lua.rock
 endif

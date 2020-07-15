@@ -700,7 +700,6 @@ fi
 
 if [ -z "$RBDEV_TARGET" ]; then
     echo "Select target arch:"
-    echo "s   - sh       (Archos models)"
     echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
     echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
     echo "i   - mips     (Jz47xx and ATJ-based players)"
@@ -724,15 +723,6 @@ do
     export MAKEFLAGS=`echo $MAKEFLAGS| sed 's/ -r / /'`  # We don't want -r
     echo ""
     case $arch in
-        [Ss])
-            # For binutils 2.16.1 builtin rules conflict on some systems with a
-            # default rule for Objective C. Disable the builtin make rules. See
-            # http://sourceware.org/ml/binutils/2005-12/msg00259.html
-            export MAKEFLAGS="-r $MAKEFLAGS"
-            build "binutils" "sh-elf" "2.16.1" "binutils-2.16.1-texinfo-fix.diff" "--disable-werror"
-            build "gcc" "sh-elf" "4.0.3" "gcc-4.0.3-rockbox-1.diff"
-            ;;
-
         [Ii])
             build "binutils" "mipsel-elf" "2.26.1" "" "--disable-werror"
             build "gcc" "mipsel-elf" "4.9.4" "" "" "gmp mpfr mpc"

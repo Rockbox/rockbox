@@ -47,7 +47,7 @@ Example:
     \config{\%iy} & Year\\
     \config{\%ik} & Disc Number\\
   \end{tagmap}
-Remember that this information is not always available, so use the 
+Remember that this information is not always available, so use the
 conditionals to show alternate information in preference to assuming.
 
 These tags, when written with a capital ``I'' (e.g. \config{\%Ia} or \config{\%Ic}),
@@ -112,7 +112,7 @@ show the information for the next song to be played.
 \section{Power Related Information}
   \begin{tagmap}
     \config{\%bl} & Numeric battery level in percents.
-                    Can also be used in a conditional: 
+                    Can also be used in a conditional:
                     \config{\%?bl<-1|0|1|2|\ldots|N>},
                     where the value $-1$ is used when the battery level isn't
                     known (it usually is). The value $N$ is only used when the
@@ -153,7 +153,7 @@ show the information for the next song to be played.
                        (N can be 1, 2, 3, \dots)\\
   \end{tagmap}
 Example for the \config{\%d(N)} commands: If the file is
-``\fname{/Rock/Kent/Isola/11 - 747.mp3}'', \config{\%d(1)} is ``\fname{Isola}'', 
+``\fname{/Rock/Kent/Isola/11 - 747.mp3}'', \config{\%d(1)} is ``\fname{Isola}'',
 \config{\%d(2)} is ``\fname{Kent}'' and \config{\%d(3)} is ``\fname{Rock}''.
 
 These tags, when written with the first letter capitalized (e.g. \config{\%Fn}
@@ -162,28 +162,20 @@ or \config{\%D(2)}), produce the information for the next file to be played.
 \section{Playlist/Song Info}
   \begin{tagmap}
     \config{\%pb} & Progress Bar.
-    \opt{player}{
-            This will display a one character ``cup''
-            that empties as the time progresses.}
     \opt{lcd_bitmap}{
            This will replace the entire line with a progress bar.
            You can set the position, width and height of the progressbar
            (in pixels) and load a custom image for it:
            \config{\%pb(x,y,[width],[height],image.bmp)}} \\
-    \opt{player}{%
-    \config{\%pf} & Full-line progress bar \& time display\\
-    }%
     \config{\%px} & Percentage played in song\\
     \config{\%pc} & Current time in song\\
     \config{\%pe} & Total number of playlist entries\\
-    \nopt{player}{%
     \config{\%pm} & Peak Meter. The entire line is used as %
                     volume peak meter.\\%
     \config{\%pL} & Peak meter for the left channel. Can be used as a value, %
             a conditional tag or a bar tag.\\
     \config{\%pR} & Peak meter for the right channel. Can be used as a value, %
             a conditional tag or a bar tag.\\
-    }%
     \config{\%pn} & Playlist name (without path or extension)\\
     \config{\%pp} & Playlist position\\
     \config{\%pr} & Remaining time in song\\
@@ -206,7 +198,7 @@ or \config{\%D(2)}), produce the information for the next file to be played.
            the rest of the track>}\\
     \config{\%Sp} & Current playback pitch\\
   \end{tagmap}
-  
+
 \section{Playlist Viewer}
   \begin{tagmap}
     \config{\%Vp(start,code to render)} & Display the playlist viewer in
@@ -274,7 +266,7 @@ Example: \config{\%?mm<Off|All|One|Shuffle|A-B>}
 
 \section{Playback Mode}
   \begin{tagmap}
-    \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause, 
+    \config{\%mp} & Play status, 0-4, in the order: Stop, Play, Pause,
            Fast Forward, Rewind, Recording, Recording paused, FM Radio playing,
            FM Radio muted\\
   \end{tagmap}
@@ -303,7 +295,7 @@ Example: \config{\%?mp<Stop|Play|Pause|Ffwd|Rew|Rec|Rec pause|FM|FM pause>}
     13 & Playlist Catalogue Viewer \\
     14 & Plugin \\
     15 & Context menu \\
-    16 & System Info screen \\ 
+    16 & System Info screen \\
     17 & Time and Date Screen \\
     18 & Bookmark browser \\
     19 & Shortcuts menu \\
@@ -374,7 +366,6 @@ Examples:
 \opt{lcd_bitmap}{
 \section{\label{ref:wps_images}Images}
   \begin{tagmap}
-    \nopt{archos}{%
     \config{\%X(filename.bmp)}
         & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
@@ -396,12 +387,12 @@ Examples:
           contained in the bitmap. Default is 1.\\
     \config{\%xd(n[i] [,tag] [,offset])} & Display a preloaded image.
           \config{n}: image ID  as it was specified in \config{\%x} or \config{\%xl}\newline
-          \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52). 
+          \config{i}: (optional) number of the sub-image to display (a-z for 1-26 and A-Z for 27-52).
           (ignored when \config{tag} is used). Only useable if the ID is a single letter.
           By default the first (i.e. top most) sub-image will be used.\newline
           \config{tag}: (optional) Another tag to calculate the subimage from e.g \config{\%xd(A, \%mh)} would
           use the first subimage when \config{\%mh} is on and the second when it is off\newline
-          \config{offset}: (optional) Add this number to the value from the \config{tag} when 
+          \config{offset}: (optional) Add this number to the value from the \config{tag} when
           chosing the subimage (may be negative)\\
     \config{\%x9(n)}
         & Display an image as a 9-patch bitmap covering the entire viewport.\newline
@@ -409,7 +400,7 @@ Examples:
           are unscaled, the four middle sections are scaled along one axis and the middle
           section is scaled on both axis.\newline
           \config{n}: image ID\\
-          
+
   \end{tagmap}
 
 Examples:
@@ -429,11 +420,10 @@ with image ID ``M'', and then reference the individual sub-images in a condition
   \item The images must be in BMP format
   \item The image tag must be on its own line
   \item The ID is case sensitive
-  \item The size of the LCD screen for each \dap{} varies. See table below 
-        for appropriate sizes of each device. The x and y coordinates must 
+  \item The size of the LCD screen for each \dap{} varies. See table below
+        for appropriate sizes of each device. The x and y coordinates must
         respect each of the \daps{} limits.
   \end{itemize}
-}
 }
 
 \opt{albumart}{
@@ -519,8 +509,8 @@ and tuned to a preset (and not recording) in order for them to be shown.
     \config{\%Sr} & Use as a conditional to define options for left to right, or
                     right to left languages. \%?Sr<RTL|LTR>\\
   \end{tagmap}
-  
-All alignment tags may be present in one line, but they need to be in the 
+
+All alignment tags may be present in one line, but they need to be in the
 order left -- centre -- right. If the aligned texts overlap, they are merged.
 
 Example: \config{\%ax\%V(\dots)}
@@ -569,7 +559,7 @@ Examples of the \%if tag:\\
 
 Allows grouping of several items (sublines) onto one line, with the
 display cycling round the defined sublines. See
-\reference{ref:AlternatingSublines} for details. 
+\reference{ref:AlternatingSublines} for details.
 
 \opt{rtc}{
 \section{Time and Date}
@@ -601,7 +591,7 @@ display cycling round the defined sublines. See
     \config{\%Sx(English)}
     & Display the translation of ``English'' in the current language\\
   \end{tagmap}
-  
+
   \begin{itemize}
     \item ``English'' must be a phrase used in the language file.
     \item It should match the \config{Source:} line in the language file.
@@ -685,7 +675,7 @@ display cycling round the defined sublines. See
   Some tags can be used to display a bar which draws according to the value of
   the tag. To use these tags like a bar you need to use the following parameters
   (\%XX should be replaced with the actual tag).
-  
+
 \opt{touchscreen}{
     Volume and progress bars automatically create touch regions the same size
     as the bar (slightly larger actually). This can be disabled with the
@@ -716,13 +706,13 @@ display cycling round the defined sublines. See
     the centre of the image matches the current position. This must be
     followed by the label of the desired image.
   \item[backdrop] -- draw a preloaded image under the bar. The full
-    image will be displayed and must be the same size as the bar. 
+    image will be displayed and must be the same size as the bar.
     This must be followed by the label of the desired image.
   \item[nofill] -- don't draw the bar, only its frame (for use with the
      ``slider'' option).
   \item[noborder] -- don't draw the border for image-less bars, instead maximise
     the filling over the specified area. This doesn't work for bars which
-    specify an image. 
+    specify an image.
   \item[nobar] -- don't draw the bar or its frame (for use with the
     ``slider'' option).
     \opt{touchscreen}{
@@ -755,7 +745,7 @@ a horizontal progressbar which doesn't fill and draws the image
             substring is a number so it can be used with conditionals. (i.e \config{\%cM}).
             0 is the first conditional option
 \end{description}
-    
+
 \begin{tagmap}
   \config{\%(}           & The character `('\\
   \config{\%)}           & The character `)'\\
@@ -766,10 +756,10 @@ a horizontal progressbar which doesn't fill and draws the image
   \config{\%>}           & The character `>'\\
   \config{\%;}           & The character `;'\\
   \config{\%\#}          & The character `\#'\\
-  \config{\%s}           & Indicate that the line should scroll. Can occur 
-                           anywhere in a line (given that the text is 
-                           displayed; see conditionals above). You can specify 
-                           up to ten scrolling lines. Scrolling lines can not 
-                           contain dynamic content such as timers, peak meters 
+  \config{\%s}           & Indicate that the line should scroll. Can occur
+                           anywhere in a line (given that the text is
+                           displayed; see conditionals above). You can specify
+                           up to ten scrolling lines. Scrolling lines can not
+                           contain dynamic content such as timers, peak meters
                            or progress bars.\\
 \end{tagmap}

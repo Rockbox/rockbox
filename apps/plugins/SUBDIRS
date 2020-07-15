@@ -24,8 +24,7 @@ sdl
 puzzles
 #endif
 
-#if    (CONFIG_KEYPAD != ONDIO_PAD) /* not enough buttons */ \
-    && (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
+#if    (CONFIG_KEYPAD != SANSA_M200_PAD) /* not enough buttons */ \
     && (CONFIG_KEYPAD != HM60X_PAD) /* not enough buttons */ \
     && (LCD_PIXELFORMAT != HORIZONTAL_PACKING) /* TODO */ \
     && (LCD_PIXELFORMAT != VERTICAL_INTERLEAVED) /* TODO */ \
@@ -48,11 +47,7 @@ imageviewer
 sudoku
 reversi
 goban
-
-/* setjmp/longjmp are not implemented on sh */
-#if (CONFIG_CPU != SH7034)
 frotz
-#endif
 
 #ifndef OLYMPUS_MROBE_500
 #if PLUGIN_BUFFER_SIZE > 0x40000 || PLUGIN_BUFFER_SIZE <= 0x20000 /* overlay */

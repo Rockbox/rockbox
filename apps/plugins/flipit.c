@@ -23,42 +23,7 @@
 
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define FLIPIT_LEFT         BUTTON_LEFT
-#define FLIPIT_RIGHT        BUTTON_RIGHT
-#define FLIPIT_UP           BUTTON_UP
-#define FLIPIT_DOWN         BUTTON_DOWN
-#define FLIPIT_QUIT         BUTTON_OFF
-#define FLIPIT_SHUFFLE      BUTTON_F1
-#define FLIPIT_SOLVE        BUTTON_F2
-#define FLIPIT_STEP_BY_STEP BUTTON_F3
-#define FLIPIT_TOGGLE       BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == PLAYER_PAD
-#define FLIPIT_LEFT         BUTTON_LEFT
-#define FLIPIT_RIGHT        BUTTON_RIGHT
-#define FLIPIT_UP_PRE       BUTTON_ON
-#define FLIPIT_UP           (BUTTON_ON | BUTTON_REL)
-#define FLIPIT_DOWN         BUTTON_MENU
-#define FLIPIT_QUIT         BUTTON_STOP
-#define FLIPIT_SHUFFLE      (BUTTON_ON | BUTTON_LEFT)
-#define FLIPIT_SOLVE        (BUTTON_ON | BUTTON_RIGHT)
-#define FLIPIT_STEP_BY_STEP (BUTTON_ON | BUTTON_PLAY)
-#define FLIPIT_TOGGLE       BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define FLIPIT_LEFT         BUTTON_LEFT
-#define FLIPIT_RIGHT        BUTTON_RIGHT
-#define FLIPIT_UP           BUTTON_UP
-#define FLIPIT_DOWN         BUTTON_DOWN
-#define FLIPIT_QUIT         BUTTON_OFF
-#define FLIPIT_SHUFFLE      (BUTTON_MENU | BUTTON_LEFT)
-#define FLIPIT_SOLVE        (BUTTON_MENU | BUTTON_UP)
-#define FLIPIT_STEP_BY_STEP (BUTTON_MENU | BUTTON_RIGHT)
-#define FLIPIT_TOGGLE_PRE   BUTTON_MENU
-#define FLIPIT_TOGGLE       (BUTTON_MENU | BUTTON_REL)
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define FLIPIT_LEFT         BUTTON_LEFT
 #define FLIPIT_RIGHT        BUTTON_RIGHT
@@ -937,20 +902,8 @@ enum plugin_status plugin_start(const void* parameter)
     /* print instructions */
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
-#if CONFIG_KEYPAD == RECORDER_PAD
-    rb->lcd_putsxy(2, 8, "[OFF] to stop");
-    rb->lcd_putsxy(2, 18, "[PLAY] toggle");
-    rb->lcd_putsxy(2, 28, "[F1] shuffle");
-    rb->lcd_putsxy(2, 38, "[F2] solution");
-    rb->lcd_putsxy(2, 48, "[F3] step by step");
-#elif CONFIG_KEYPAD == ONDIO_PAD
-    rb->lcd_putsxy(2, 8, "[OFF] to stop");
-    rb->lcd_putsxy(2, 18, "[MODE] toggle");
-    rb->lcd_putsxy(2, 28, "[M-LEFT] shuffle");
-    rb->lcd_putsxy(2, 38, "[M-UP] solution");
-    rb->lcd_putsxy(2, 48, "[M-RIGHT] step by step");
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
     rb->lcd_putsxy(2, 8, "[STOP] to stop");
     rb->lcd_putsxy(2, 18, "[SELECT] toggle");
     rb->lcd_putsxy(2, 28, "[MODE] shuffle");

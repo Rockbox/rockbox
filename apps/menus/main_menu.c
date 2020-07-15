@@ -264,21 +264,10 @@ static const char* info_getname(int selected_item, void *data,
                 return str(LANG_BATTERY_CHARGE);
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
-#ifdef ARCHOS_RECORDER
-            /* Report the particular algorithm state */
-            if (charge_state == CHARGING)
-                return str(LANG_BATTERY_CHARGE);
-            else if (charge_state == TOPOFF)
-                return str(LANG_BATTERY_TOPOFF_CHARGE);
-            else if (charge_state == TRICKLE)
-                return str(LANG_BATTERY_TRICKLE_CHARGE);
-            else
-#else /* !ARCHOS_RECORDER */
             /* Go by what power management reports */
             if (charging_state())
                 return str(LANG_BATTERY_CHARGE);
             else
-#endif /* ARCHOS_RECORDER */
 #endif /* CONFIG_CHARGING = */
             if (battery_level() >= 0)
                 snprintf(buffer, buffer_len, str(LANG_BATTERY_TIME),
@@ -394,24 +383,6 @@ static int info_speak_item(int selected_item, void * data)
             }
             else
 #elif CONFIG_CHARGING >= CHARGING_MONITOR
-#ifdef ARCHOS_RECORDER
-            /* Report the particular algorithm state */
-            if (charge_state == CHARGING)
-            {
-                talk_id(LANG_BATTERY_CHARGE, true);
-                if (battery_level() >= 0)
-                    talk_value(battery_level(), UNIT_PERCENT, true);
-            }
-            else if (charge_state == TOPOFF)
-                talk_id(LANG_BATTERY_TOPOFF_CHARGE, true);
-            else if (charge_state == TRICKLE)
-            {
-                talk_id(LANG_BATTERY_TRICKLE_CHARGE, true);
-                if (battery_level() >= 0)
-                    talk_value(battery_level(), UNIT_PERCENT, true);
-            }
-            else
-#else /* !ARCHOS_RECORDER */
             /* Go by what power management reports */
             if (charging_state())
             {
@@ -420,7 +391,6 @@ static int info_speak_item(int selected_item, void * data)
                     talk_value(battery_level(), UNIT_PERCENT, true);
             }
             else
-#endif /* ARCHOS_RECORDER */
 #endif /* CONFIG_CHARGING = */
             if (battery_level() >= 0)
             {

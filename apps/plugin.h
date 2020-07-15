@@ -88,8 +88,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
-#else
-#include "mas35xx.h"
 #endif /* CONFIG_CODEC == SWCODEC */
 #include "settings.h"
 #include "timer.h"
@@ -355,13 +353,9 @@ struct plugin_api {
                                     const enum screen_type screen);
 #endif
 
+#ifdef HAVE_BACKLIGHT
     /* lcd backlight */
-    /* The backlight_* functions must be present in the API regardless whether
-     * HAVE_BACKLIGHT is defined or not. The reason is that the stock Ondio has
-     * no backlight but can be modded to have backlight (it's prepared on the
-     * PCB). This makes backlight an all-target feature API wise, and keeps API
-     * compatible between stock and modded Ondio.
-     * For OLED targets like the Sansa Clip, the backlight_* functions control
+    /* For OLED targets like the Sansa Clip, the backlight_* functions control
      * the display enable, which has essentially the same effect. */
     bool (*is_backlight_on)(bool ignore_always_off);
     void (*backlight_on)(void);
@@ -383,6 +377,7 @@ struct plugin_api {
     void (*remote_backlight_set_timeout_plugged)(int index);
 #endif
 #endif /* HAVE_REMOTE_LCD */
+#endif /* HAVE_BACKLIGHT */
 
     /* list */
     void (*gui_synclist_init)(struct gui_synclist * lists,
@@ -689,8 +684,7 @@ struct plugin_api {
     int (*sound_enum_hw_eq_band_setting)(unsigned int band,
                                          unsigned int band_setting);
 #endif /* AUDIOHW_HAVE_EQ */
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-     (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+#if ((CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHCONTROL))
     void (*sound_set_pitch)(int32_t pitch);
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -771,13 +765,6 @@ struct plugin_api {
     void (*keyclick_click)(bool rawbutton, int action);
 #endif /* CONFIG_CODEC == SWCODEC */
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    unsigned short (*peak_meter_scale_value)(unsigned short val,
-                                             int meterwidth);
-    void (*peak_meter_set_use_dbfs)(bool use);
-    bool (*peak_meter_get_use_dbfs)(void);
-#endif
-
     /* metadata */
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
     bool (*mp3info)(struct mp3entry *entry, const char *filename);
@@ -844,21 +831,6 @@ struct plugin_api {
 #if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
     unsigned long (*mpeg_get_last_header)(void);
 #endif
-
-    /* MAS communication */
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    int (*mas_readmem)(int bank, int addr, unsigned long* dest, int len);
-    int (*mas_writemem)(int bank, int addr, const unsigned long* src, int len);
-    int (*mas_readreg)(int reg);
-    int (*mas_writereg)(int reg, unsigned int val);
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int (*mas_codec_writereg)(int reg, unsigned int val);
-    int (*mas_codec_readreg)(int reg);
-    void (*i2c_begin)(void);
-    void (*i2c_end)(void);
-    int  (*i2c_write)(int address, const unsigned char* buf, int count );
-#endif
-#endif /* !SIMULATOR && CONFIG_CODEC != SWCODEC */
 
     /* menu */
     struct menu_table *(*root_menu_get_options)(int *nb_options);

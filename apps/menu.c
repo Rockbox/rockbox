@@ -60,7 +60,6 @@
 
 /* gui api */
 #include "list.h"
-#include "buttonbar.h"
 
 #define MAX_MENUS 8
 /* used to allow for dynamic menus */
@@ -376,12 +375,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int stack_top = 0;
     bool in_stringlist, done = false;
     struct viewport *vps = NULL;
-#ifdef HAVE_BUTTONBAR
-    struct gui_buttonbar buttonbar;
-    gui_buttonbar_init(&buttonbar);
-    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
-    gui_buttonbar_set(&buttonbar, "<<<", "", "");
-#endif
     menu_callback_type menu_callback = NULL;
 
     /* if hide_theme is true, assume parent has been fixed before passed into
@@ -394,23 +387,10 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
     gui_synclist_draw(&lists);
     gui_synclist_speak_item(&lists);
-#ifdef HAVE_BUTTONBAR
-    if (!hide_theme)
-    {
-        gui_buttonbar_set(&buttonbar, "<<<", "", "");
-        gui_buttonbar_draw(&buttonbar);
-    }
-#endif
     while (!done)
     {
         int new_audio_status;
         redraw_lists = false;
-        if (!hide_theme)
-        {
-#ifdef HAVE_BUTTONBAR
-            gui_buttonbar_draw(&buttonbar);
-#endif
-        }
 #if CONFIG_CODEC == SWCODEC
         keyclick_set_callback(gui_synclist_keyclick_callback, &lists);
 #endif
@@ -590,13 +570,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             int type = (menu->flags&MENU_TYPE_MASK);
             /* entering an item that may not be a list, so stop scrolling */
             gui_synclist_scroll_stop(&lists);
-#ifdef HAVE_BUTTONBAR
-            if (!hide_theme)
-            {
-                gui_buttonbar_unset(&buttonbar);
-                gui_buttonbar_draw(&buttonbar);
-            }
-#endif
             selected = get_menu_selection(gui_synclist_get_sel_pos(&lists), menu);
             if (type == MT_MENU)
                 temp = menu->submenus[selected];
@@ -700,13 +673,6 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 done = true;
                 break;
             }
-#ifdef HAVE_BUTTONBAR
-            if (!hide_theme)
-            {
-                gui_buttonbar_set(&buttonbar, "<<<", "", "");
-                gui_buttonbar_draw(&buttonbar);
-            }
-#endif
         }
         else
         {

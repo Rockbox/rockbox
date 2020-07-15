@@ -28,19 +28,7 @@
 
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define BTN_QUIT     BUTTON_OFF
-#define BTN_RIGHT    BUTTON_RIGHT
-#define BTN_UP       BUTTON_UP
-#define BTN_DOWN     BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define BTN_QUIT         BUTTON_OFF
-#define BTN_RIGHT        BUTTON_RIGHT
-#define BTN_UP           BUTTON_UP
-#define BTN_DOWN         BUTTON_DOWN
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define BTN_QUIT         BUTTON_OFF
 #define BTN_RIGHT        BUTTON_RIGHT
 #define BTN_UP           BUTTON_UP

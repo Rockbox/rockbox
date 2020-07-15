@@ -691,14 +691,8 @@ sub runone {
 
 if(!$exe) {
     # not specified, guess!
-    if($target =~ /(recorder|ondio)/i) {
-        $exe = "ajbrec.ajz";
-    }
-    elsif($target =~ /iriver/i) {
+   if($target =~ /iriver/i) {
         $exe = "rockbox.iriver";
-    }
-    else {
-        $exe = "archos.mod";
     }
 }
 elsif(($exe =~ /rockboxui/)) {

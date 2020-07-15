@@ -11,9 +11,6 @@ STARTUP(target/arm/pp/crt0-pp.o)
 #elif defined(CPU_ARM)
 OUTPUT_FORMAT(elf32-littlearm)
 STARTUP(target/arm/crt0.o)
-#elif CONFIG_CPU == SH7034
-OUTPUT_FORMAT(elf32-sh)
-STARTUP(target/sh/crt0.o)
 #else
 OUTPUT_FORMAT(elf32-sh)
 STARTUP(crt0.o)

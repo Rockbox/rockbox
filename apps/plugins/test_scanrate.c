@@ -44,11 +44,7 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 #endif /*HAVE_SCROLLWHEEL*/
 
 /* Default refresh rates in 1/10 Hz */
-#if defined ARCHOS_RECORDER   || defined ARCHOS_FMRECORDER  \
- || defined ARCHOS_RECORDERV2 || defined ARCHOS_ONDIOFM     \
- || defined ARCHOS_ONDIOSP
-#define DEFAULT_SCAN_RATE 670
-#elif defined IAUDIO_M3
+#if defined IAUDIO_M3
 #define DEFAULT_SCAN_RATE 1500
 #define HORIZ_SCAN /* LCD controller updates the panel sideways */
 #define NEED_BOOST

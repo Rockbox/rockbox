@@ -80,14 +80,6 @@ lcd_invert
 lcd_sleep
 #endif
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-masf
-#endif
-
-#if (CONFIG_CODEC == MAS3507D)
-masd
-#endif
-
 #if defined(HAVE_MORSE_INPUT)
 morse_input
 #endif
@@ -112,13 +104,6 @@ quickscreen
 radio
 #ifdef HAVE_REMOTE_LCD
 radio_remote
-#endif
-#endif
-
-#if (CONFIG_KEYPAD == RECORDER_PAD)
-recorder_pad
-#if defined(CONFIG_TUNER)
-radio_screen_button_bar
 #endif
 #endif
 
@@ -156,10 +141,6 @@ rtc
 
 #if defined(IPOD_ACCESSORY_PROTOCOL)
 serial_port
-#endif
-
-#if defined(ARCHOS_RECORDER) || defined(ARCHOS_PLAYER)
-soft_shutdown
 #endif
 
 #if defined(HAVE_SPDIF_POWER)

@@ -7,12 +7,6 @@
 #define O_BINARY 0
 #endif
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define BUTTONBAR_HEIGHT 8
-#else
-#define BUTTONBAR_HEIGHT 0
-#endif
-
 #define DEFAULT_MARGIN 6
 #define KBD_BUF_SIZE 500
 #define kbd_loaded false
@@ -21,22 +15,6 @@
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define KBD_SELECT BUTTON_SELECT
-#define KBD_ABORT BUTTON_OFF
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define KBD_SELECT BUTTON_PLAY
-#define KBD_ABORT BUTTON_OFF
-#define KBD_LEFT BUTTON_LEFT
-#define KBD_RIGHT BUTTON_RIGHT
-#define KBD_UP BUTTON_UP
-#define KBD_DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == ONDIO_PAD /* restricted Ondio keypad */
-#define KBD_SELECT BUTTON_MENU
 #define KBD_ABORT BUTTON_OFF
 #define KBD_LEFT BUTTON_LEFT
 #define KBD_RIGHT BUTTON_RIGHT
@@ -412,7 +390,7 @@ int zx_kbd_input(char* text/*, int buflen*/)
         param[l].font_h = param[l].font->height;
 
             /* check if FONT_UI fits the screen */
-        if (2*param[l].font_h+3 + BUTTONBAR_HEIGHT >
+        if (2*param[l].font_h+3 >
             rb->screens[l]->getheight()) {
             param[l].font = rb->font_get(FONT_SYSFIXED);
             param[l].font_h = param[l].font->height;
@@ -492,10 +470,10 @@ int zx_kbd_input(char* text/*, int buflen*/)
             param[l].lines = param[l].DEFAULT_LINES;
             param[l].keyboard_margin = DEFAULT_MARGIN;
         } else {
-            param[l].lines = (rb->screens[l]->lcdheight - BUTTONBAR_HEIGHT -
+            param[l].lines = (rb->screens[l]->lcdheight -
                              statusbar_size) / param[l].font_h - 1;
             param[l].keyboard_margin = rb->screens[l]->lcdheight -
-                                       BUTTONBAR_HEIGHT - statusbar_size -
+                                       statusbar_size -
                                        (param[l].lines+1)*param[l].font_h;
             if (param[l].keyboard_margin < 3) {
                 param[l].lines--;

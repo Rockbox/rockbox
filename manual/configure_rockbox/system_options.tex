@@ -4,14 +4,12 @@
 \nopt{sansa,fuzeplus}%will probably be there on Sansas one day -  exclude it the simple way without specific option
 {\nopt{sansaAMS}{
   \subsection{Battery}
-  Options relating to the \opt{archos}{batteries}\nopt{archos}{battery}
+  Options relating to the battery
   in the \dap.
   \begin{description}
     \item [Battery Capacity.] This setting can be used to tell Rockbox what
       capacity (in mAh) the battery being used has. The default is
-      \opt{player,recorder}{1500~mAh}%
-      \opt{recorderv2fm}{2200~mAh}%
-      \opt{ondiosp,ondiofm,vibe500}{1000~mAh}%
+      \opt{vibe500}{1000~mAh}%
       \opt{iriverh100,iriverh300}{1300~mAh}%
       \opt{mpiohd200}{850~mAh}%
       \opt{ipodmini}{400~mAh (1G) or 630~mAh (2G)}%
@@ -28,8 +26,7 @@
       \opt{mrobe100}{720~mAh}%
       \opt{samsungyh920,samsungyh925}{900~mAh}%
       \opt{samsungyh820}{650~mAh}%
-      , which is the capacity value for the standard
-      \opt{archos}{batteries}\nopt{archos}{battery} shipped with the \dap.
+      , which is the capacity value for the standard battery shipped with the \dap.
         Rockbox uses this value for runtime estimation, not battery percentage
         calculation. Changing this setting has no effect whatsoever on
         actual battery life. This setting only affects the accuracy of the
@@ -118,7 +115,6 @@ This sub menu relates to limits in the Rockbox operating system.
     Entries in File Browser} or \setting{Max Playlist Size} to take effect
     while \setting{Glyphs To Cache} will affect the next font load.}
 % TODO: this needs to be rewritten in another style, it lets you mix sound from another source into the music
-\opt{player}{
   \subsection{Line In} This option activates the line-in port on \dap, which is
     off by default. This is useful for such applications as:
     \begin{itemize}
@@ -126,7 +122,6 @@ This sub menu relates to limits in the Rockbox operating system.
     \item laptop $\rightarrow$ \dap $\rightarrow$ human
     \item LAN party computer $\rightarrow$ \dap $\rightarrow$ human
     \end{itemize}
-}
 \opt{quickscreen}{
   \subsection{Use Shortcuts Menu Instead of Quick Screen} This option
   activates the shortcuts menu instead of opening the quick screen when enabled.

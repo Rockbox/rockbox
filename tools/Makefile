@@ -10,11 +10,11 @@ LDFLAGS := -g
 
 .PHONY: rbspeexenc uclpack
 
-CLEANALL := scramble descramble iriver sh2d bmp2rb rdf2binary convbdf \
+CLEANALL := scramble descramble iriver bmp2rb rdf2binary convbdf \
     generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat lngdump \
     telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot convttf
 
-all: scramble descramble sh2d rdf2binary mkboot mkzenboot convbdf codepages \
+all: scramble descramble rdf2binary mkboot mkzenboot convbdf codepages \
 	uclpack rbspeexenc voicefont mk500boot
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
@@ -35,8 +35,6 @@ rkw.o: rkw.c rkw.h
 iaudio_bl_flash.o: iaudio_bl_flash.c iaudio_bl_flash.h
 iaudio_bl_flash.c iaudio_bl_flash.h: iaudio_bl_flash.bmp bmp2rb
 	$(SILENT)./bmp2rb -f 7 -h . $< >iaudio_bl_flash.c
-
-sh2d: sh2d.c
 
 bmp2rb:	bmp2rb.c
 	$(SILENT)$(CC) -DAPPLICATION_NAME=\"$@\" $(CFLAGS) $+ -o $@
@@ -77,10 +75,6 @@ convbdf: convbdf.c
 
 codepages: codepages.c codepage_tables.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
-
-player_unifont: player_unifont.c ../firmware/drivers/lcd-charset-player.c
-	$(SILENT)$(CC) -DARCHOS_PLAYER -D__PCTOOL__ -I../firmware/export $+ \
-	    -o $@
 
 uclpack:
 	$(SILENT)$(MAKE) -C ucl

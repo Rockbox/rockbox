@@ -24,18 +24,13 @@
 #include "fractal_sets.h"
 
 /* CPU stuff */
-#if CONFIG_CPU == SH7034
-#include "cpu_sh7043.h"
-#elif defined CPU_COLDFIRE
+#if defined CPU_COLDFIRE
 #include "cpu_coldfire.h"
 #elif defined CPU_ARM
 #include "cpu_arm.h"
 #endif
 
-#if CONFIG_CPU == SH7034
-#define MULS16_ASR10(a, b) muls16_asr10(a, b)
-#define MULS32_ASR26(a, b) muls32_asr26(a, b)
-#elif defined CPU_COLDFIRE
+#if defined CPU_COLDFIRE
 /* Needs the EMAC initialised to fractional mode w/o rounding and saturation */
 #define MULS32_INIT() coldfire_set_macsr(EMAC_FRACTIONAL)
 #define MULS16_ASR10(a, b) muls16_asr10(a, b)

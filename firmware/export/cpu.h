@@ -20,9 +20,6 @@
  ****************************************************************************/
 #include "config.h"
 
-#if CONFIG_CPU == SH7034
-#include "sh7034.h"
-#endif
 #if CONFIG_CPU == MCF5249
 #include "mcf5249.h"
 #endif

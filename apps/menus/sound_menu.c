@@ -218,17 +218,6 @@ static int timestretch_callback(int action,
               &compressor_knee, &compressor_attack, &compressor_release);
 #endif
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    MENUITEM_SETTING(loudness, &global_settings.loudness, NULL);
-    MENUITEM_SETTING(avc, &global_settings.avc, NULL);
-    MENUITEM_SETTING(superbass, &global_settings.superbass, NULL);
-    MENUITEM_SETTING(mdb_enable, &global_settings.mdb_enable, NULL);
-    MENUITEM_SETTING(mdb_strength, &global_settings.mdb_strength, NULL);
-    MENUITEM_SETTING(mdb_harmonics, &global_settings.mdb_harmonics, NULL);
-    MENUITEM_SETTING(mdb_center, &global_settings.mdb_center, NULL);
-    MENUITEM_SETTING(mdb_shape, &global_settings.mdb_shape, NULL);
-#endif
-
 #ifdef HAVE_SPEAKER
     MENUITEM_SETTING(speaker_mode, &global_settings.speaker_mode, NULL);
 #endif
@@ -271,10 +260,6 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
           ,&timestretch_enabled
 #endif
           ,&compressor_menu
-#endif
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-         ,&loudness,&avc,&superbass,&mdb_enable,&mdb_strength
-         ,&mdb_harmonics,&mdb_center,&mdb_shape
 #endif
 #ifdef HAVE_SPEAKER
          ,&speaker_mode

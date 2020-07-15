@@ -262,13 +262,6 @@ void viewportmanager_init()
 #ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_changed(const int which)
 {
-#ifdef HAVE_BUTTONBAR
-    if (which & THEME_BUTTONBAR)
-    {   /* don't handle further, the custom ui viewport ignores the buttonbar,
-         * as does viewport_set_defaults(), since only lists use it*/
-        screens[SCREEN_MAIN].has_buttonbar = global_settings.buttonbar;
-    }
-#endif
     if (which & THEME_LANGUAGE)
     {
     }

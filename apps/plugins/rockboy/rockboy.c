@@ -110,16 +110,6 @@ static void setoptions (void)
         options.SELECT  = BUTTON_SELECT;
         options.MENU    = BUTTON_OFF;
 
-#elif CONFIG_KEYPAD == RECORDER_PAD
-        options.UP      = BUTTON_UP;
-        options.DOWN    = BUTTON_DOWN;
-
-        options.A       = BUTTON_F1;
-        options.B       = BUTTON_F2;
-        options.START   = BUTTON_F3;
-        options.SELECT  = BUTTON_PLAY;
-        options.MENU    = BUTTON_OFF;
-
 #elif CONFIG_KEYPAD == IPOD_4G_PAD
         options.UP      = BUTTON_MENU;
         options.DOWN    = BUTTON_PLAY;

@@ -36,8 +36,7 @@
 
 /* for internal functions' scanning use to save quite a bit of stack space -
    access must be serialized by the writer lock */
-#if defined(CPU_SH) || defined(IAUDIO_M5) \
-    || CONFIG_CPU == IMX233
+#if defined(IAUDIO_M5) || CONFIG_CPU == IMX233
 /* otherwise, out of IRAM */
 struct fat_direntry dir_fatent;
 #else

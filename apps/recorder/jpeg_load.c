@@ -137,21 +137,7 @@ static struct jpeg jpeg;
 
 INLINE unsigned range_limit(int value)
 {
-#if CONFIG_CPU == SH7034
-    unsigned tmp;
-    asm (  /* Note: Uses knowledge that only low byte of result is used */
-        "extu.b  %[v],%[t]   \n"
-        "cmp/eq  %[v],%[t]   \n"  /* low byte == whole number ? */
-        "bt      1f          \n"  /* yes: no overflow */
-        "cmp/pz  %[v]        \n"  /* overflow: positive? */
-        "subc    %[v],%[v]   \n"  /* %[r] now either 0 or 0xffffffff */
-    "1:                      \n"
-        : /* outputs */
-        [v]"+r"(value),
-        [t]"=&r"(tmp)
-    );
-    return value;
-#elif defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
     /* Note: Uses knowledge that only the low byte of the result is used */
     asm (
         "cmp.l   #255,%[v]   \n"  /* overflow? */
@@ -232,7 +218,7 @@ INLINE unsigned scale_output(int value)
 */
 #define MULTIPLY(var1, var2) ((var1) * (var2))
 
-#if defined(CPU_SH) || defined(CPU_COLDFIRE) || \
+#if defined(CPU_COLDFIRE) || \
     (defined(CPU_ARM) && ARM_ARCH > 4)
 #define MULTIPLY16(var,const)  (((short) (var)) * ((short) (const)))
 #else
@@ -1687,24 +1673,6 @@ static void search_restart(struct jpeg *p_jpeg)
 }
 
 /* Figure F.12: extend sign bit. */
-#if CONFIG_CPU == SH7034
-/* SH1 lacks a variable-shift instruction */
-#define HUFF_EXTEND(x,s)  ((x) < extend_test[s] ? (x) + extend_offset[s] : (x))
-
-static const int extend_test[16] =   /* entry n is 2**(n-1) */
-{
-    0, 0x0001, 0x0002, 0x0004, 0x0008, 0x0010, 0x0020, 0x0040, 0x0080,
-    0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000
-};
-
-static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
-{
-    0, ((-1)<<1) + 1, ((-1)<<2) + 1, ((-1)<<3) + 1, ((-1)<<4) + 1,
-    ((-1)<<5) + 1, ((-1)<<6) + 1, ((-1)<<7) + 1, ((-1)<<8) + 1,
-    ((-1)<<9) + 1, ((-1)<<10) + 1, ((-1)<<11) + 1, ((-1)<<12) + 1,
-    ((-1)<<13) + 1, ((-1)<<14) + 1, ((-1)<<15) + 1
-};
-#else
 /* This saves some code and data size, benchmarks about the same on RAM */
 #define HUFF_EXTEND(x,s) \
 ({ \
@@ -1712,7 +1680,6 @@ static const int extend_offset[16] = /* entry n is (-1 << n) + 1 */
     int s__ = s; \
     x__ & BIT_N(s__- 1) ? x__ : x__ + (-1 << s__) + 1; \
 })
-#endif
 
 /* Decode a single value */
 #define huff_decode_dc(p_jpeg, tbl, s, r) \

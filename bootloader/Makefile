@@ -78,7 +78,7 @@ $(MAXOUTFILE):
 
 build-bitmapsmono:
 	$(call PRINTS,MAKE in bitmaps/mono)$(MAKE) -C ../apps/bitmaps/mono OBJDIR=$(OBJDIR)/bitmaps/mono
- 
+
 build-bitmapsnative:
 	$(call PRINTS,MAKE in bitmaps/native)$(MAKE) -C ../apps/bitmaps/native OBJDIR=$(OBJDIR)/bitmaps/native
 
@@ -96,16 +96,13 @@ $(OBJDIR)/bootloader.elf : $(OBJS) $(LINKFILE) $(DEPFILE) $(LIBROCKBOX) $(BITMAP
 $(OBJDIR)/bootloader.bin : $(OBJDIR)/bootloader.elf
 	$(call PRINTS,OBJCOPY $(@F))$(OC) $(if $(filter yes, $(USE_ELF)), -S -x, -O binary) $< $@
 
-$(OBJDIR)/bootloader.asm: $(OBJDIR)/bootloader.bin
-	$(TOOLSDIR)/sh2d -sh1 $< > $@
-
 $(BUILDDIR)/$(BINARY) : $(OBJDIR)/bootloader.bin
 	$(call PRINTS,Build bootloader file)$(MKFIRMWARE) $< $@
 
 include $(TOOLSDIR)/make.inc
 
 clean:
-	$(call PRINTS,cleaning bootloader)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) $(OBJDIR)/bootloader.asm \
+	$(call PRINTS,cleaning bootloader)-rm -f $(OBJS) $(BUILDDIR)/$(BINARY) \
 	$(OBJDIR)/bootloader.bin $(OBJDIR)/bootloader.elf $(OBJDIR)/*.map \
 	$(LINKFILE) $(MAXOUTFILE) $(DEPFILE)
 	$(SILENT)$(MAKE) -C bitmaps/mono clean OBJDIR=$(OBJDIR)/bitmaps/mono

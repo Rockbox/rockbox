@@ -51,16 +51,6 @@ const struct button_mapping pla_remote_ctx[] =
     { PLA_DOWN_REPEAT,       BUTTON_RC_REW|BUTTON_REPEAT,      BUTTON_NONE},
     { PLA_LEFT_REPEAT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE},
     { PLA_RIGHT_REPEAT,      BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE},
-#elif (CONFIG_KEYPAD == PLAYER_PAD) || \
-      (CONFIG_KEYPAD == RECORDER_PAD)
-    { PLA_UP,                BUTTON_RC_VOL_UP,                 BUTTON_NONE},
-    { PLA_DOWN,              BUTTON_RC_VOL_DOWN,               BUTTON_NONE},
-    { PLA_LEFT,              BUTTON_RC_LEFT,                   BUTTON_NONE},
-    { PLA_RIGHT,             BUTTON_RC_RIGHT,                  BUTTON_NONE},
-    { PLA_UP_REPEAT,         BUTTON_RC_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE},
-    { PLA_DOWN_REPEAT,       BUTTON_RC_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE},
-    { PLA_LEFT_REPEAT,       BUTTON_RC_LEFT|BUTTON_REPEAT,     BUTTON_NONE},
-    { PLA_RIGHT_REPEAT,      BUTTON_RC_RIGHT|BUTTON_REPEAT,    BUTTON_NONE},
 #elif (CONFIG_REMOTE_KEYPAD == MROBE_REMOTE)
     { PLA_UP,                BUTTON_RC_PLAY,                   BUTTON_NONE},
     { PLA_DOWN,              BUTTON_RC_DOWN,                   BUTTON_NONE},
@@ -101,9 +91,7 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
-    || (CONFIG_KEYPAD == RECORDER_PAD)      \
     || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
-    || (CONFIG_KEYPAD == ONDIO_PAD) \
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
     || (CONFIG_KEYPAD == MROBE100_PAD) \
@@ -143,15 +131,6 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
     { PLA_UP_REPEAT,        BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_DOWN_REPEAT,      BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
-    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
-    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
-#elif (CONFIG_KEYPAD == PLAYER_PAD)
-    { PLA_UP,               BUTTON_PLAY,                        BUTTON_NONE },
-    { PLA_DOWN,             BUTTON_STOP,                        BUTTON_NONE },
-    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
-    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
-    { PLA_UP_REPEAT,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
-    { PLA_DOWN_REPEAT,      BUTTON_STOP|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD)
@@ -339,24 +318,6 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
-#elif (CONFIG_KEYPAD == RECORDER_PAD)
-    {PLA_CANCEL,            BUTTON_ON,                          BUTTON_NONE},
-    {PLA_EXIT,              BUTTON_OFF,                         BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
-    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == ONDIO_PAD)
-    {PLA_CANCEL,            BUTTON_OFF|BUTTON_REL,              BUTTON_OFF},
-    {PLA_EXIT,              BUTTON_OFF|BUTTON_REPEAT,           BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_MENU,                        BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_MENU|BUTTON_REL,             BUTTON_MENU},
-    {PLA_SELECT_REPEAT,     BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == PLAYER_PAD)
-    {PLA_CANCEL,            BUTTON_MENU|BUTTON_REL,             BUTTON_MENU},
-    {PLA_EXIT,              BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_ON,                          BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_ON|BUTTON_REL,               BUTTON_ON},
-    {PLA_SELECT_REPEAT,     BUTTON_ON|BUTTON_REPEAT,            BUTTON_NONE},
 #elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
     {PLA_CANCEL,            BUTTON_HOME|BUTTON_REL,             BUTTON_HOME},
     {PLA_EXIT,              BUTTON_HOME|BUTTON_REPEAT,          BUTTON_NONE},

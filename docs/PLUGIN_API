@@ -810,25 +810,6 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message, const
     \return
     \description
 
-void i2c_begin(void)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \description
-
-void i2c_end(void)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \description
-
-int i2c_write(int address, const unsigned char* buf, int count )
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \param address
-    \param buf
-    \param count
-    \return
-    \description
-
 void invalidate_icache(void)
     \conditions (defined(CACHE_FUNCTIONS_AS_CALL))
     \description
@@ -1433,56 +1414,6 @@ const unsigned long *rec_freq_sampr
     \return
     \description
 
-int mas_codec_readreg(int reg)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \param reg
-    \return
-    \description
-
-int mas_codec_writereg(int reg, unsigned int val)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)) && ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \param reg
-    \param val
-    \return
-    \description
-
-int mas_readmem(int bank, int addr, unsigned long* dest, int len)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
-    \param bank
-    \param addr
-    \param dest
-    \param len
-    \return
-    \description
-
-int mas_readreg(int reg)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
-    \param reg
-    \return
-    \description
-
-int mas_writemem(int bank, int addr, const unsigned long* src, int len)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
-    \param bank
-    \param addr
-    \param src
-    \param len
-    \return
-    \description
-
-int mas_writereg(int reg, unsigned int val)
-    \group MAS communication
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
-    \param reg
-    \param val
-    \return
-    \description
-
 void *memchr(const void *s1, int c, size_t n)
     \group strings and memory
     \param s1
@@ -1708,23 +1639,6 @@ void pcm_stop_recording(void)
     \group sound
     \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
     \description
-
-bool peak_meter_get_use_dbfs(void)
-    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \return 1 if the meter currently is displaying dBfs values, 0 if the meter is displaying percent values
-    \description
-
-unsigned short peak_meter_scale_value(unsigned short val, int meterwidth)
-    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \param val is the volume value (range: 0 <= val < MAX_PEAK)
-    \param meterwidth is the width of the meter in pixel
-    \return a value between 0 and meterwidth
-    \description Scales a peak value as read from the MAS to the range of =meterwidth=. The scaling is performed according to the scaling method (dBfs / linear) and the range (peak_meter_range_min .. peak_meter_range_max).
-
-void peak_meter_set_use_dbfs(bool use)
-    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F))
-    \param use If =use= is 0 use linear percent scale, else use dBfs
-    \description Specifies whether the values displayed are scaled as dBfs or as linear percent values
 
 int playlist_amount(void)
     \group playback control
@@ -2208,7 +2122,7 @@ void sound_set(int setting, int value)
 
 void sound_set_pitch(int pitch)
     \group playback control
-    \conditions ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) ||  (CONFIG_CODEC == SWCODEC))
+    \conditions (CONFIG_CODEC == SWCODEC)
     \param pitch
     \description
 

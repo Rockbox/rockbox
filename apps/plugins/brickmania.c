@@ -61,23 +61,6 @@
 #define DOWN BUTTON_DOWN
 #define RC_QUIT BUTTON_RC_STOP
 
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define CONTINUE_TEXT "MENU To Continue"
-#define QUIT BUTTON_OFF
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_MENU
-#define UP BUTTON_UP
-#define DOWN BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == RECORDER_PAD
-#define QUIT BUTTON_OFF
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define SELECT BUTTON_PLAY
-#define UP BUTTON_UP
-#define DOWN BUTTON_DOWN
-
 #elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
       (CONFIG_KEYPAD == IPOD_3G_PAD) || \
       (CONFIG_KEYPAD == IPOD_1G2G_PAD)
@@ -1461,9 +1444,7 @@ static int brickmania_help(void)
         "< & >:",
 #endif
         "Moves", "the", "paddle", "",
-#if CONFIG_KEYPAD == ONDIO_PAD
-        "MENU:",
-#elif (CONFIG_KEYPAD == RECORDER_PAD) || (CONFIG_KEYPAD == IAUDIO_M3_PAD)
+#if (CONFIG_KEYPAD == IAUDIO_M3_PAD)
         "PLAY:",
 #elif CONFIG_KEYPAD == IRIVER_H300_PAD
         "NAVI:",
@@ -1484,9 +1465,7 @@ static int brickmania_help(void)
       (CONFIG_KEYPAD == SANSA_FUZE_PAD)
         "MENU:",
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD) || \
-      (CONFIG_KEYPAD == ONDIO_PAD) || \
-      (CONFIG_KEYPAD == RECORDER_PAD)
+      (CONFIG_KEYPAD == IRIVER_H300_PAD)
         "STOP:",
 #else
         "POWER:",

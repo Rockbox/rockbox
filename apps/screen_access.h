@@ -23,7 +23,6 @@
 #define _SCREEN_ACCESS_H_
 
 #include "lcd.h"
-#include "buttonbar.h"
 #include "scroll_engine.h"
 #include "backdrop.h"
 #include "line.h"
@@ -63,9 +62,6 @@ struct screen
     bool is_color;
 #if (CONFIG_LED == LED_VIRTUAL) || defined(HAVE_REMOTE_LCD)
     bool has_disk_led;
-#endif
-#ifdef HAVE_BUTTONBAR
-    bool has_buttonbar;
 #endif
     void (*set_drawmode)(int mode);
     void (*set_viewport)(struct viewport* vp);

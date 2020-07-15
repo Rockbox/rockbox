@@ -8,10 +8,6 @@ arm/setjmp.S
 m68k/setjmp.S
 #endif
 
-#ifdef CPU_SH
-sh/setjmp.S
-#endif
-
 #ifdef CPU_MIPS
 mips/setjmp.S
 #endif

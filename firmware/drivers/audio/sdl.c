@@ -134,25 +134,3 @@ unsigned int pcm_sampr_to_hw_sampr(unsigned int samplerate,
                                    unsigned int type)
     { return samplerate; (void)type; }
 #endif /* CONFIG_SAMPR_TYPES */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-int mas_codec_readreg(int reg)
-{
-    (void)reg;
-    return 0;
-}
-
-int mas_codec_writereg(int reg, unsigned int val)
-{
-    (void)reg;
-    (void)val;
-    return 0;
-}
-int mas_writemem(int bank, int addr, const unsigned long* src, int len)
-{
-    (void)bank;
-    (void)addr;
-    (void)src;
-    (void)len;
-    return 0;
-}
-#endif

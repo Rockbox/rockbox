@@ -25,9 +25,8 @@
 #include "screen_access.h"
 #include "settings.h"
 
-#if defined (HAVE_SCROLLWHEEL)      || \
-    (CONFIG_KEYPAD == PLAYER_PAD)
-/* Define this if your target makes sense to have 
+#if defined (HAVE_SCROLLWHEEL)
+/* Define this if your target makes sense to have
    smaller values at the top of the list increasing down the list */
 #define ASCENDING_INT_SETTINGS
 #endif

@@ -16,15 +16,7 @@ PICTUREFLOW_OBJ := $(call c2obj, $(PICTUREFLOW_SRC))
 OTHER_SRC += $(PICTUREFLOW_SRC)
 
 ifndef APP_TYPE
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
-    ### lowmem targets
-    ROCKS += $(PICTUREFLOW_OBJDIR)/pictureflow.ovl
-    PICTUREFLOW_OUTLDS = $(PICTUREFLOW_OBJDIR)/picutreflow.link
-    PICTUREFLOW_OVLFLAGS = -T$(PICTUREFLOW_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
-else
-    ### all other targets
     ROCKS += $(PICTUREFLOW_OBJDIR)/pictureflow.rock
-endif
 else
     ### simulator
     ROCKS += $(PICTUREFLOW_OBJDIR)/pictureflow.rock

@@ -43,59 +43,7 @@
 #define MAX_SC_STACK_ALLOC 0
 #define HAVE_UPSCALER 1
 
-#if defined(CPU_SH)
-/* perform 32x32->40 unsigned multiply, round off and return top 8 bits */
-static inline uint32_t sc_mul_u32_rnd(uint32_t m, uint32_t n)
-{
-    unsigned r, t1, t2, t3;
-    unsigned h = 1 << 15;
-    /* notation:
-       m = ab, n = cd
-       final result is (((a *c) << 32) + ((b * c + a * d) << 16) + b * d +
-            (1 << 31)) >> 32
-    */
-    asm (
-        "swap.w  %[m], %[t1]\n\t" /* t1 = ba */
-        "mulu    %[m], %[n]\n\t" /* b * d */
-        "swap.w  %[n], %[t3]\n\t" /* t3 = dc */
-        "sts     macl, %[r]\n\t" /* r = b * d */
-        "mulu    %[m], %[t3]\n\t" /* b * c */
-        "shlr16  %[r]\n\t"
-        "sts     macl, %[t2]\n\t" /* t2 = b * c */
-        "mulu    %[t1], %[t3]\n\t" /* a * c */
-        "add     %[t2], %[r]\n\t"
-        "sts     macl, %[t3]\n\t" /* t3 = a * c */
-        "mulu    %[t1], %[n]\n\t" /* a * d */
-        "shll16  %[t3]\n\t"
-        "sts     macl, %[t2]\n\t" /* t2 = a * d */
-        "add     %[t2], %[r]\n\t"
-        "add     %[t3], %[r]\n\t" /* r = ((b * d) >> 16) + (b * c + a * d) +
-                                         ((a * c) << 16) */
-        "add     %[h], %[r]\n\t" /* round result */
-        "shlr16  %[r]\n\t" /* truncate result */
-        : /* outputs */
-        [r] "=&r"(r),
-        [t1]"=&r"(t1),
-        [t2]"=&r"(t2),
-        [t3]"=&r"(t3)
-        : /* inputs */
-        [h] "r"  (h),
-        [m] "r"  (m),
-        [n] "r"  (n)
-    );
-    return r;
-}
-#elif defined(TEST_SH_MATH)
-static inline uint32_t sc_mul_u32_rnd(uint32_t op1, uint32_t op2)
-{
-    uint64_t tmp = (uint64_t)op1 * op2;
-    tmp += 1LU << 31;
-    tmp >>= 32;
-    return tmp;
-}   
-#else
 #define SC_OUT(n, c) (((n) + (1 << 23)) >> 24)
-#endif
 #ifndef SC_OUT
 #define SC_OUT(n, c) (sc_mul_u32_rnd(n, (c)->recip))
 #endif
@@ -125,14 +73,10 @@ struct uint32_argb {
    horizontal scaler, and row output
 */
 struct scaler_context {
-#if defined(CPU_SH) || defined(TEST_SH_MATH)
-    uint32_t recip;
-#else
     uint32_t h_i_val;
     uint32_t h_o_val;
     uint32_t v_i_val;
     uint32_t v_o_val;
-#endif
     struct bitmap *bm;
     struct dim *src;
     unsigned char *buf;

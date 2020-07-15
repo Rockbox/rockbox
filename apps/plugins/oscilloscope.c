@@ -30,30 +30,7 @@
 #include "lib/osd.h"
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define OSCILLOSCOPE_QUIT            BUTTON_OFF
-#define OSCILLOSCOPE_DRAWMODE        BUTTON_F1
-#define OSCILLOSCOPE_ADVMODE         BUTTON_F2
-#define OSCILLOSCOPE_ORIENTATION     BUTTON_F3
-#define OSCILLOSCOPE_PAUSE           BUTTON_PLAY
-#define OSCILLOSCOPE_SPEED_UP        BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN      BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP          BUTTON_UP
-#define OSCILLOSCOPE_VOL_DOWN        BUTTON_DOWN
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define OSCILLOSCOPE_QUIT            BUTTON_OFF
-#define OSCILLOSCOPE_DRAWMODE_PRE    BUTTON_MENU
-#define OSCILLOSCOPE_DRAWMODE        (BUTTON_MENU | BUTTON_REL)
-#define OSCILLOSCOPE_ADVMODE         (BUTTON_MENU | BUTTON_RIGHT)
-#define OSCILLOSCOPE_ORIENTATION     (BUTTON_MENU | BUTTON_LEFT)
-#define OSCILLOSCOPE_PAUSE           (BUTTON_MENU | BUTTON_OFF)
-#define OSCILLOSCOPE_SPEED_UP        BUTTON_RIGHT
-#define OSCILLOSCOPE_SPEED_DOWN      BUTTON_LEFT
-#define OSCILLOSCOPE_VOL_UP          BUTTON_UP
-#define OSCILLOSCOPE_VOL_DOWN        BUTTON_DOWN
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define OSCILLOSCOPE_QUIT            BUTTON_OFF
 #define OSCILLOSCOPE_DRAWMODE        BUTTON_SELECT
 #define OSCILLOSCOPE_ADVMODE         BUTTON_MODE
@@ -934,9 +911,6 @@ static void get_peaks(int *left, int *right)
 #elif defined (SIMULATOR)
     *left = rand() % 0x8000;
     *right = rand() % 0x8000;
-#elif (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    *left = rb->mas_codec_readreg(0xC);
-    *right = rb->mas_codec_readreg(0xD);
 #else
     *left = 0;
     *right = 0;

@@ -42,37 +42,7 @@ enum {
     BJ_END,
 };
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define BJACK_SELECT_NAME   "PLAY"
-#define BJACK_STAY_NAME     "F1"
-#define BJACK_QUIT_NAME     "OFF"
-#define BJACK_DOUBLE_NAME   "F2"
-#define BJACK_SELECT        BUTTON_PLAY
-#define BJACK_QUIT          BUTTON_OFF
-#define BJACK_MAX           (BUTTON_ON|BUTTON_UP)
-#define BJACK_MIN           (BUTTON_ON|BUTTON_DOWN)
-#define BJACK_STAY          BUTTON_F1
-#define BJACK_DOUBLEDOWN    BUTTON_F2
-#define BJACK_UP            BUTTON_UP
-#define BJACK_DOWN          BUTTON_DOWN
-#define BJACK_RIGHT         BUTTON_RIGHT
-#define BJACK_LEFT          BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define BJACK_SELECT_NAME    "MENU"
-#define BJACK_STAY_NAME     "RIGHT"
-#define BJACK_QUIT_NAME     "OFF"
-#define BJACK_DOUBLE_NAME   "UP"
-#define BJACK_SELECT        BUTTON_MENU
-#define BJACK_QUIT          BUTTON_OFF
-#define BJACK_STAY          BUTTON_RIGHT
-#define BJACK_DOUBLEDOWN    BUTTON_UP
-#define BJACK_UP            BUTTON_UP
-#define BJACK_DOWN          BUTTON_DOWN
-#define BJACK_RIGHT         BUTTON_RIGHT
-#define BJACK_LEFT          BUTTON_LEFT
-
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#if CONFIG_KEYPAD == IRIVER_H10_PAD
 #define BJACK_SELECT_NAME    "PLAY"
 #define BJACK_STAY_NAME     ">>|"
 #define BJACK_QUIT_NAME     "POWER"

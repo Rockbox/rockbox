@@ -58,41 +58,6 @@ This is a list of Feature Requests we get repeatedly that we simply
 cannot do. View it as the opposite of a TODO!
 
 \begin{itemize}
-\opt{archos}{
-\item Record to WAV (uncompressed) or MP3pro format.\\
-The recording hardware (the MAS) does not allow us to do this
-\item Crossfade between tracks.\\
-  Crossfading would require two mp3 decoders, and we only have one. 
-  This is not possible.
-\item Support MP3pro, WMA or other sound format playback.\\
-  The mp3{}-decoding hardware can only play MP3. We cannot make it play other 
-  sound formats.
-\item  Converting OGG $\rightarrow$ MP3.\\
-  The mp3{}-decoding hardware cannot decode OGG. It can be reprogrammed, but 
-  there is too little memory for OGG and we have no documentation on how to 
-  program the MAS' DSP. Doing the conversion with the CPU is impossible, since 
-  a 12~MHz SH1 is far too slow for this daunting task.
-\item Archos Multimedia support.\\
-  The Archos Multimedia is a completely different beast. It is an entirely 
-  different architecture, different CPU and upgrading the software is done 
-  a completely different way. We do not wish to venture into this.  Others 
-  may do so. We will not.
-\item Multi{}-band (or graphic) equaliser.\\
-  We cannot access information for that kind of visualisation from the MP3 
-  decoding hardware.
-\item CBR recording.\\
-  The MP3 encoding hardware does not allow this.
-\item Change tempo of a song without changing pitch.\\
-  The MP3 decoding hardware does not allow this.
-\item Graphic frequency (spectrum analyser).\\
-  We cannot access the audio waveform from the MP3 decoder so we cannot analyse 
-  it. Even if we had access to it, the CPU would probably be too slow to 
-  perform the analysis anyway.
-\item Cool sound effects.\\
-  Adding new sound effects requires reprogramming the MAS chip, and we cannot 
-  do that. The MAS chip is programmable, but we have no access to the chip 
-  documentation.
-}
 \nopt{iriverh300,iaudiox5}{
 \item Interfacing with other USB devices (like cameras) or 2 player games over USB.\\
   The USB system demands that there is a master that talks to a slave. The
@@ -104,10 +69,9 @@ The recording hardware (the MAS) does not allow us to do this
   to play with it the way we'd need for any good communication to work.
 }
 \item Support other file systems than FAT32 (like NTFS or ext2 etc.).\\
-  No.
-  \opt{archos}{Rockbox needs to support FAT32 since it can only start off a FAT32
-  partition (since that is the only way the ROM can load it), and adding}%
-  support for more file systems will just take away valuable ram for
+  No.  (Except perhaps for ExFAT)
+  Most \dap{}s can only start off FAT32 partitions, so adding support
+  for more file systems will just take away valuable ram for
   unnecessary features. You can partition your \dap{} fine, just make sure
   the first one is FAT32 and then make the other ones whatever file system
   you want. Just do not expect Rockbox to understand them.

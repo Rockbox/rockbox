@@ -264,12 +264,6 @@ int time_screen(void* ignored)
     FOR_NB_SCREENS(i)
     {
         viewport_set_defaults(&clock_vps[i], i);
-#ifdef HAVE_BUTTONBAR
-        if (global_settings.buttonbar)
-        {
-            clock_vps[i].height -= BUTTONBAR_HEIGHT;
-        }
-#endif
         nb_lines = viewport_get_nb_lines(&clock_vps[i]);
 
         gui_synclist_set_viewport_defaults(&menu[i], i);

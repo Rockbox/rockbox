@@ -63,14 +63,12 @@ aware:
         }
 
         \nopt{IAUDIO_M3_PAD}{%
-            \nopt{ONDIO_PAD,IRIVER_H10_PAD,RECORDER_PAD,touchscreen,PBELL_VIBE500_PAD%
+            \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD%
                  ,SANSA_FUZE_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD%
                  ,SAMSUNG_YH820_PAD}
                  {\ButtonSelect}
-            \opt{ONDIO_PAD}{\ButtonUp} 
             \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD}{\ButtonRight}
             \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonFF}
-            \opt{RECORDER_PAD}{\ButtonOn} 
             \opt{touchscreen}{\TouchCenter}
             \opt{SANSA_FUZE_PAD}{\ButtonRight}
             \opt{MPIO_HD200_PAD}{\ButtonFunc}
@@ -82,12 +80,11 @@ aware:
             \opt{GIGABEAT_RC_PAD}{\ButtonRCFF}
             &}
         Enter track list
-            \nopt{ONDIO_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%
+            \nopt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%
             / Play album from selected track}
             \\
         % Ondio & Samsung YH use a different button in album list and track list
-        \opt{ONDIO_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%
-            \opt{ONDIO_PAD}{\ButtonMenu}
+        \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{%
             \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
                 &
             Play album from selected track in track list
@@ -120,7 +117,7 @@ aware:
             \\
 
         \nopt{IAUDIO_M3_PAD}{%
-            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,RECORDER_PAD,ONDIO_PAD}{\ButtonOff}
+            \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
             \opt{IAUDIO_X5_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_E200_PAD,SANSA_CLIP_PAD%
                 ,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
             \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}

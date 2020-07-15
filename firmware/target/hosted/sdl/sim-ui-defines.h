@@ -28,35 +28,7 @@
 
 /* colour definitions are R, G, B */
 
-#if defined(ARCHOS_RECORDER)
-#define UI_TITLE                    "Jukebox Recorder"
-#define UI_WIDTH                    270 /* width of GUI window */
-#define UI_HEIGHT                   406 /* height of GUI window */
-#define UI_LCD_POSX                 80 /* x position of lcd */
-#define UI_LCD_POSY                 104 /* y position of lcd */
-
-#elif defined(ARCHOS_PLAYER)
-#define UI_TITLE                    "Jukebox Player"
-#define UI_WIDTH                    284 /* width of GUI window */
-#define UI_HEIGHT                   420 /* height of GUI window */
-#define UI_LCD_POSX                 75 /* x position of lcd */
-#define UI_LCD_POSY                 116 /* y position of lcd */
-
-#elif defined(ARCHOS_FMRECORDER) || defined(ARCHOS_RECORDERV2)
-#define UI_TITLE                    "Jukebox FM Recorder"
-#define UI_WIDTH                    285 /* width of GUI window */
-#define UI_HEIGHT                   414 /* height of GUI window */
-#define UI_LCD_POSX                 87 /* x position of lcd */
-#define UI_LCD_POSY                 77 /* y position of lcd */
-
-#elif defined(ARCHOS_ONDIOSP) || defined(ARCHOS_ONDIOFM)
-#define UI_TITLE                    "Ondio"
-#define UI_WIDTH                    155 /* width of GUI window */
-#define UI_HEIGHT                   334 /* height of GUI window */
-#define UI_LCD_POSX                 21 /* x position of lcd */
-#define UI_LCD_POSY                 82 /* y position of lcd */
-
-#elif defined(IRIVER_H120) || defined(IRIVER_H100)
+#if defined(IRIVER_H120) || defined(IRIVER_H100)
 #define UI_TITLE                    "iriver H1x0"
 #define UI_WIDTH                    379 /* width of GUI window */
 #define UI_HEIGHT                   508 /* height of GUI window */
@@ -237,14 +209,6 @@
 #define UI_HEIGHT                   183 /* height of GUI window */
 #define UI_LCD_POSX                 115 /* x position of lcd */
 #define UI_LCD_POSY                 54 /* y position of lcd */
-
-#elif defined(ARCHOS_AV300)
-#define UI_TITLE                    "Archos AV300"
-/* We are temporarily using a 2bpp LCD driver and dummy bitmap */
-#define UI_WIDTH                    420 /* width of GUI window */
-#define UI_HEIGHT                   340 /* height of GUI window */
-#define UI_LCD_POSX                 50 /* x position of lcd */
-#define UI_LCD_POSY                 50 /* y position of lcd */
 
 #elif defined(MROBE_100)
 #define UI_TITLE                    "Olympus M:Robe 100"

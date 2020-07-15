@@ -24,37 +24,6 @@
 #include <stdbool.h>
 #include "config.h"
 
-#if (CONFIG_CPU == SH7034) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
-
-#define ROM_VERSION (*(short *)0x020000fe)
-
-/* Bit mask values for HW compatibility */
-#define ATA_ADDRESS_200 0x0100
-#define USB_ACTIVE_HIGH 0x0100
-#define PR_ACTIVE_HIGH  0x0100
-#define LCD_CONTRAST_BIAS 0x0200
-#define MMC_CLOCK_POLARITY 0x0400
-#define TUNER_MODEL 0x0800
-
-#ifdef ARCHOS_PLAYER
-#define HW_MASK 0
-#else /* Recorders, Ondios */
-#define HW_MASK (*(short *)0x020000fc)
-#endif
-
-#ifdef CONFIG_TUNER_MULTI
-static inline int tuner_detect_type(void)
-{
-    return (HW_MASK & TUNER_MODEL) ? TEA5767 : S1A0903X01;
-}
-#endif
-
-#endif /* (CONFIG_CPU == SH7034) && (CONFIG_PLATFORM & PLATFORM_NATIVE) */
-
-#ifdef ARCHOS_PLAYER
-bool is_new_player(void);
-#endif
-
 #ifdef IPOD_ARCH
 #ifdef IPOD_VIDEO
 #ifdef BOOTLOADER

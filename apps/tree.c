@@ -71,7 +71,6 @@
 /* gui api */
 #include "list.h"
 #include "splash.h"
-#include "buttonbar.h"
 #include "quickscreen.h"
 #include "appevents.h"
 
@@ -84,9 +83,6 @@ struct gui_synclist tree_lists;
 
 /* I put it here because other files doesn't use it yet,
  * but should be elsewhere since it will be used mostly everywhere */
-#ifdef HAVE_BUTTONBAR
-static struct gui_buttonbar tree_buttonbar;
-#endif
 static struct tree_context tc;
 
 char lastfile[MAX_PATH];
@@ -307,11 +303,6 @@ void tree_gui_init(void)
     FOR_NB_SCREENS(i)
         screens[i].double_height(false);
 #endif
-#ifdef HAVE_BUTTONBAR
-    gui_buttonbar_init(&tree_buttonbar);
-    /* since archos only have one screen, no need to create more than that */
-    gui_buttonbar_set_display(&tree_buttonbar, &(screens[SCREEN_MAIN]) );
-#endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
     gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
     gui_synclist_set_icon_callback(&tree_lists,
@@ -464,7 +455,7 @@ static int update_dir(void)
         } 
 #endif
     }
-    
+
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
     gui_synclist_set_icon_callback(&tree_lists,
                                    global_settings.show_icons?tree_get_fileicon:NULL);
@@ -472,17 +463,6 @@ static int update_dir(void)
         tc.selected_item=tc.filesindir-1;
 
     gui_synclist_select_item(&tree_lists, tc.selected_item);
-#ifdef HAVE_BUTTONBAR
-    if (global_settings.buttonbar) {
-        if (*tc.dirfilter < NUM_FILTER_MODES)
-            gui_buttonbar_set(&tree_buttonbar, str(LANG_SYSFONT_DIRBROWSE_F1),
-                          str(LANG_SYSFONT_DIRBROWSE_F2),
-                          str(LANG_SYSFONT_DIRBROWSE_F3));
-        else
-            gui_buttonbar_set(&tree_buttonbar, "<<<", "", "");
-        gui_buttonbar_draw(&tree_buttonbar);
-    }
-#endif
     gui_synclist_draw(&tree_lists);
     gui_synclist_speak_item(&tree_lists);
     return tc.filesindir;

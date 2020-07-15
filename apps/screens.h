@@ -26,9 +26,6 @@
 
 struct screen;
 
-#if CONFIG_CHARGING && !defined(HAVE_POWEROFF_WHILE_CHARGING) && defined(CPU_SH)
-int charging_screen(void);
-#endif
 #if CONFIG_CHARGING || defined(SIMULATOR)
 void charging_splash(void);
 #endif

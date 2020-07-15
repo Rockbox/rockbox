@@ -16,15 +16,8 @@ GOBAN_OBJ := $(call c2obj, $(GOBAN_SRC))
 OTHER_SRC += $(GOBAN_SRC)
 
 ifndef APP_TYPE
-ifneq (,$(strip $(foreach tgt,RECORDER ONDIO,$(findstring $(tgt),$(TARGET)))))
-    ### lowmem targets
-    ROCKS += $(GOBAN_BUILDDIR)/goban.ovl
-    GOBAN_OUTLDS = $(GOBAN_BUILDDIR)/goban.link
-    GOBAN_OVLFLAGS = -T$(GOBAN_OUTLDS) -Wl,--gc-sections -Wl,-Map,$(basename $@).map
-else
-    ### all other targets
+    ### all targets
     ROCKS += $(GOBAN_BUILDDIR)/goban.rock
-endif
 else
     ### simulator
     ROCKS += $(GOBAN_BUILDDIR)/goban.rock

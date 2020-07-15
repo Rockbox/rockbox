@@ -117,20 +117,6 @@ static void make_options_from_indexes(const struct opt_items *src_names,
 
 static int recfrequency_func(void)
 {
-#if CONFIG_CODEC == MAS3587F
-    static const struct opt_items names[6] = {
-        { "44.1kHz", TALK_ID(44, UNIT_KHZ) },
-        { "48kHz", TALK_ID(48, UNIT_KHZ) },
-        { "32kHz", TALK_ID(32, UNIT_KHZ) },
-        { "22.05kHz", TALK_ID(22, UNIT_KHZ) },
-        { "24kHz", TALK_ID(24, UNIT_KHZ) },
-        { "16kHz", TALK_ID(16, UNIT_KHZ) }
-    };
-    return set_option(str(LANG_FREQUENCY),
-                      &global_settings.rec_frequency, INT,
-                      names, 6, NULL );
-#endif /* CONFIG_CODEC == MAS3587F */
-
 #if CONFIG_CODEC == SWCODEC
     static const struct opt_items names[REC_NUM_FREQ] = {
         REC_HAVE_96_([REC_FREQ_96] = { "96kHz",     TALK_ID(96, UNIT_KHZ) },)
@@ -221,11 +207,6 @@ static int recchannels_func(void)
         [CHN_MODE_STEREO] = { STR(LANG_CHANNEL_STEREO) },
         [CHN_MODE_MONO]   = { STR(LANG_CHANNEL_MONO)   }
     };
-#if CONFIG_CODEC == MAS3587F
-    return set_option(str(LANG_CHANNELS),
-                      &global_settings.rec_channels, INT,
-                      names, CHN_NUM_MODES, NULL );
-#endif /* CONFIG_CODEC == MAS3587F */
 
 #if CONFIG_CODEC == SWCODEC
     struct opt_items    opts[CHN_NUM_MODES];
@@ -329,10 +310,6 @@ static int recmenu_callback(int action,
     }
     return action;
 }
-#if CONFIG_CODEC == MAS3587F
-MENUITEM_SETTING(rec_quality, &global_settings.rec_quality, NULL);
-MENUITEM_SETTING(rec_editable, &global_settings.rec_editable, NULL);
-#endif
 
 MENUITEM_SETTING(rec_split_type, &global_settings.rec_split_type, NULL);
 MENUITEM_SETTING(rec_split_method, &global_settings.rec_split_method, NULL);
@@ -626,9 +603,6 @@ MENUITEM_FUNCTION(save_recpresets_item, 0, ID2P(LANG_SAVE_SETTINGS),
 
 MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             NULL, Icon_Recording,
-#if CONFIG_CODEC == MAS3587F
-            &rec_quality,
-#endif
 #if CONFIG_CODEC == SWCODEC
             &recformat, &enc_global_config_menu_item,
 #endif
@@ -636,9 +610,6 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             &recchannels,
 #if CONFIG_CODEC == SWCODEC
             &recmonomode,
-#endif
-#if CONFIG_CODEC == MAS3587F
-            &rec_editable,
 #endif
             &filesplitoptionsmenu,
             &rec_prerecord_time,

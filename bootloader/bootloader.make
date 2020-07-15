@@ -32,9 +32,5 @@ $(BUILDDIR)/bootloader.elf: $$(OBJ) $(FIRMLIB) $(CORE_LIBS) $$(BOOTLINK)
 $(BUILDDIR)/bootloader.bin : $(BUILDDIR)/bootloader.elf
 	$(call PRINTS,OC $(@F))$(call objcopy,$<,$@)
 
-$(BUILDDIR)/bootloader.asm: $(BUILDDIR)/bootloader.bin
-	$(TOOLSDIR)/sh2d -sh1 $< > $@
-
 $(BUILDDIR)/$(BINARY) : $(BUILDDIR)/bootloader.bin
 	$(call PRINTS,Build bootloader file)$(MKFIRMWARE) $< $@
-

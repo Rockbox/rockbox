@@ -184,8 +184,6 @@ struct sound_settings_info
 #include "tlv320.h"
 #elif defined(HAVE_AS3514)
 #include "as3514.h"
-#elif defined(HAVE_MAS35XX)
-#include "mas35xx.h"
 #if defined(HAVE_DAC3550A)
 #include "dac3550a.h"
 #endif /* HAVE_DAC3550A */

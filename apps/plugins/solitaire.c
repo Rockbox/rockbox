@@ -32,51 +32,8 @@
  * Key definitions
  */
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#   define SOL_QUIT         BUTTON_OFF
-#   define SOL_UP           BUTTON_UP
-#   define SOL_DOWN         BUTTON_DOWN
-#   define SOL_LEFT         BUTTON_LEFT
-#   define SOL_RIGHT        BUTTON_RIGHT
-#   define SOL_MOVE         BUTTON_ON
-#   define SOL_DRAW         BUTTON_F1
-#   define SOL_REM2CUR      BUTTON_PLAY
-#   define SOL_CUR2STACK    BUTTON_F2
-#   define SOL_REM2STACK    BUTTON_F3
-#   define HK_MOVE         "ON"
-#   define HK_DRAW         "F1"
-#   define HK_REM2CUR      "PLAY"
-#   define HK_CUR2STACK    "F2"
-#   define HK_REM2STACK    "F3"
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#   define SOL_QUIT         BUTTON_OFF
-#   define SOL_UP_PRE       BUTTON_UP
-#   define SOL_UP           (BUTTON_UP | BUTTON_REL)
-#   define SOL_DOWN_PRE     BUTTON_DOWN
-#   define SOL_DOWN         (BUTTON_DOWN | BUTTON_REL)
-#   define SOL_LEFT_PRE     BUTTON_LEFT
-#   define SOL_LEFT         (BUTTON_LEFT | BUTTON_REL)
-#   define SOL_RIGHT_PRE    BUTTON_RIGHT
-#   define SOL_RIGHT        (BUTTON_RIGHT | BUTTON_REL)
-#   define SOL_MOVE_PRE     BUTTON_MENU
-#   define SOL_MOVE         (BUTTON_MENU | BUTTON_REL)
-#   define SOL_DRAW_PRE     BUTTON_MENU
-#   define SOL_DRAW         (BUTTON_MENU | BUTTON_REPEAT)
-#   define SOL_REM2CUR_PRE  BUTTON_DOWN
-#   define SOL_REM2CUR      (BUTTON_DOWN | BUTTON_REPEAT)
-#   define SOL_CUR2STACK_PRE BUTTON_UP
-#   define SOL_CUR2STACK    (BUTTON_UP | BUTTON_REPEAT)
-#   define SOL_REM2STACK_PRE BUTTON_RIGHT
-#   define SOL_REM2STACK    (BUTTON_RIGHT | BUTTON_REPEAT)
-#   define HK_MOVE         "MODE"
-#   define HK_DRAW         "MODE.."
-#   define HK_REM2CUR      "DOWN.."
-#   define HK_CUR2STACK    "UP.."
-#   define HK_REM2STACK    "RIGHT.."
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #   define SOL_QUIT         BUTTON_OFF
 #   define SOL_UP           BUTTON_UP
 #   define SOL_DOWN         BUTTON_DOWN

@@ -36,17 +36,6 @@
 #endif
 #endif
 
-#ifdef  CPU_SH
-#define __SH5__ 0
-#if __SH5__
-#define _JBLEN 50
-#define _JBTYPE long long
-#else
-/* r8 through r15 (callee saved), pr, fp regs if available */
-#define _JBLEN 20
-#endif /* __SH5__ */
-#endif
-
 #ifdef _JBLEN
 #ifdef _JBTYPE
 typedef _JBTYPE jmp_buf[_JBLEN];
