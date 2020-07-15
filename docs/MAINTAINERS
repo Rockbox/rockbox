@@ -25,13 +25,6 @@ NOTE: Port maintainers are simply developers who use a particular
 target on a daily basis and are therefore able to report issues
 specific to that target.
 
-:Archos Player/Studio: Jens Arnold
-:Archos Recorder v1: Jens Arnold
-:Archos Recorder 8MB:
-:Archos FM Recorder: Linus Nielsen Feltzing
-:Archos Recorder v2: Linus Nielsen Feltzing
-:Archos Ondio FM: Jens Arnold, Marianne Arnold
-:Archos Ondio SP:
 :Creative Zen Vision:
 :Creative Zen Vision:M: Maurus Cuelenaere
 :Creative Zen Vision:M 60GB:
@@ -299,7 +292,6 @@ Build Tools
 :rdf2binary:
 :convbdf: Daniel Stenberg
 :codepages:
-:player_unifont:
 :uclpack:
 :wavtrim: Linus Nielsen Feltzing
 :voicefont:

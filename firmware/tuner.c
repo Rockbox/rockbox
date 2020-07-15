@@ -80,11 +80,6 @@ void tuner_init(void)
                         tea5767_get,
                         tea5767_init())
     #endif
-    #if (CONFIG_TUNER & S1A0903X01)
-        TUNER_TYPE_CASE(S1A0903X01,
-                        s1a0903x01_set,
-                        s1a0903x01_get)
-    #endif
     #if (CONFIG_TUNER & SI4700)
         TUNER_TYPE_CASE(SI4700,
                         si4700_set,
