@@ -1,10 +1,5 @@
 % $Id$ %
-\section{\label{ref:FMradio}FM Radio}  
-\opt{RECORDER_PAD}{
-  \note{The early V2 models were in fact FM Recorders in disguise,
-  so they had the FM radio still mounted. Rockbox enables it if present -
-  in case this menu does not show on your unit you can skip this chapter.\\}
-}
+\section{\label{ref:FMradio}FM Radio}
 \opt{sansa}{
   \note{Not all Sansas have a radio receiver. Generally all American models do,
   but European models might not. Rockbox will display the radio menu only if it
@@ -23,7 +18,7 @@
   it from the file browser. Rockbox will ``remember'' and use it in
   \setting{PRESET} mode until another file has been selected. Some preset
   files are available here: \wikilink{FmPresets}.
-  
+
   \opt{recording}{
       \opt{swcodec}{
          It is also possible to record the FM radio while listening.
@@ -61,11 +56,6 @@
               \nopt{IRIVER_RC_H100_PAD}{\ActionRCFMSettingsInc, \ActionRCFMSettingsDec}%
           }
           & Change volume.\\
-          \opt{RECORDER_PAD}{
-            \ButtonPlay
-            & Freeze all screen updates. May enhance radio reception in some
-              cases.\\
-          }
 
           %
           \ActionFMExit
@@ -76,10 +66,9 @@
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMStop}
           & Stop the radio and return to \setting{Main Menu}.\\%
           %
-          \nopt{ONDIO_PAD}{%
-            \nopt{RECORDER_PAD}{\ActionFMPlay
+            \ActionFMPlay
               \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMPlay}
-              & Mute radio playback.\\}%
+              & Mute radio playback.\\%
             %
             \ActionFMMode
             \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMMode}
@@ -87,9 +76,9 @@
             %
             \ActionFMPreset
             \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMPreset}
-            & Open a list of radio presets. You can view all the presets that 
+            & Open a list of radio presets. You can view all the presets that
               you have, and switch to the station.\\
-          }%
+          %
           %
           \ActionFMMenu
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCFMMenu}
@@ -99,7 +88,6 @@
           \nopt{hold_button}{%
             \opt{SANSA_CLIP_PAD}{\ButtonHome+\ButtonSelect}
             \opt{SANSA_FUZEPLUS_PAD}{\ButtonPower}
-            \opt{ONDIO_PAD}{\ButtonMenu+\ButtonDown}
             & Key lock (software hold switch) on/off.\\
           }%
        \end{btnmap}
@@ -108,45 +96,21 @@
 
   \item[Saving a preset:]
     Up to 64 of your favourite stations can be saved as presets.
-    \opt{RECORDER_PAD}{Press \ButtonFTwo{} to go to the presets list, press
-    \ButtonFOne{} to add a preset.}%
-    \nopt{RECORDER_PAD}{%
       \ActionFMMenu{} to go to the menu, then select \setting{Add preset}.%
-    }
     Enter the name (maximum number of characters is 32).
     Press \ActionKbdDone{} to save.
 
   \item[Selecting a preset:]
-        \opt{ONDIO_PAD}{\ActionFMMenu{} to open the menu, select
-          \setting{Preset}}%
-        \nopt{ONDIO_PAD}{\ActionFMPreset} to go to the presets list.
+        \ActionFMPreset to go to the presets list.
         Use \ActionFMSettingsInc{} and \ActionFMSettingsDec{}
         to move the cursor and then press \ActionStdOk{}
         to select. Use \ActionStdCancel{} to leave the preset list without selecting
         anything.
 
   \item[Removing a preset:]
-        \opt{ONDIO_PAD}{\ActionFMMenu{} to open the menu, select
-          \setting{Preset}}%
-        \nopt{ONDIO_PAD}{\ActionFMPreset} to go to the presets list.
+        \ActionFMPreset to go to the presets list.
         Use \ActionFMSettingsInc{} and \ActionFMSettingsDec{}
         to move the cursor and then press \ActionStdContext{}
         on the preset that you wish to remove, then select \setting{Remove Preset}.
-
-      \opt{RECORDER_PAD,ONDIO_PAD}{
-          \item[Recording:]
-            \opt{RECORDER_PAD}{Press \ButtonFThree}%
-            \opt{ONDIO_PAD}{Double press \ButtonMenu}
-            to start recording the currently playing station. Press \ButtonOff{} to
-              stop recording.%
-            \opt{RECORDER_PAD}{ Press \ButtonPlay{} again to seamlessly start recording
-              to a new file.}
-            The settings for the recording can be changed in the
-            \opt{RECORDER_PAD}{\ButtonFOne{} menu}%
-            \opt{ONDIO_PAD}{respective menu reached through the FM radio settings menu
-              (Long \ButtonMenu)}
-            before starting the recording. See \reference{ref:Recordingsettings}
-            for details of recording settings.
-          }
   \end{description}
   \note{The radio will turn off when starting playback of an audio file.}

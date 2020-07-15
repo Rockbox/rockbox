@@ -132,11 +132,8 @@ static int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_r
 static void roll_credits(void)
 {
     /* to do: use target defines iso keypads to set animation timings */
-#if (CONFIG_KEYPAD == RECORDER_PAD)
-    #define PAUSE_TIME 1.2
-    #define ANIM_SPEED 35
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
+#if (CONFIG_KEYPAD == IPOD_4G_PAD) || (CONFIG_KEYPAD == IPOD_3G_PAD) || \
+    (CONFIG_KEYPAD == IPOD_1G2G_PAD)
     #define PAUSE_TIME 0
     #define ANIM_SPEED 100
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
