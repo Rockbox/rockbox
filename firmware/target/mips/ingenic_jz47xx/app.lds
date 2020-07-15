@@ -81,10 +81,10 @@ SECTIONS
     {
          *(.stack);
          stackbegin = .;
-         . += 0x1E00;
+         . += 0x1d00;
          stackend = .;
          irqstackbegin = .;
-         . += 0x300;
+         . += 0x400;
          irqstackend = .;
     } > IRAM
 
