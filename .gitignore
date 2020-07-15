@@ -100,7 +100,6 @@ __pycache__
 
 # /tools/
 /tools/bdf2bmp
-/tools/sh2d
 /tools/scramble
 /tools/generate_rocklatin
 /tools/descramble
@@ -109,7 +108,6 @@ __pycache__
 /tools/codepages
 /tools/rdf2binary
 /tools/mkboot
-/tools/player_unifont
 /tools/uclpack
 /tools/ipod_fw
 /tools/wavtrim

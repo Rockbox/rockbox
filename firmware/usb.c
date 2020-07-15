@@ -43,7 +43,7 @@
 #include "screendump.h"
 
 /* Conditions under which we want the entire driver */
-#if !defined(BOOTLOADER) || (CONFIG_CPU == SH7034) || \
+#if !defined(BOOTLOADER) || \
      (defined(HAVE_USBSTACK) && defined(HAVE_BOOTLOADER_USB_MODE)) || \
      (defined(HAVE_USBSTACK) && defined(IPOD_NANO2G)) || \
      (defined(HAVE_USBSTACK) && (defined(CREATIVE_ZVx))) || \

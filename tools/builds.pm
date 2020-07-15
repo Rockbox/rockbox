@@ -20,23 +20,27 @@ $releasenotes="/wiki/ReleaseNotes315";
 %builds = (
     'archosfmrecorder' => {
         name => 'Archos FM Recorder',
-        status => 3,
+        status => 0,
         ram => 2,
+        release => '3.15', 
     },
     'archosondiofm' => {
         name => 'Archos Ondio FM',
-        status => 3,
+        status => 0,
         ram => 2,
+        release => '3.15', 
     },
     'archosondiosp' => {
         name => 'Archos Ondio SP',
-        status => 3,
+        status => 0,
         ram => 2,
+        release => '3.15', 
     },
     'archosplayer' => {
         name => 'Archos Player/Studio',
-        status => 3,
+        status => 0,
         ram => 2,
+        release => '3.15', 
     },
     'archosrecorder' => {
         name => 'Archos Recorder v1',
@@ -46,9 +50,10 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'archosrecorderv2' => {
         name => 'Archos Recorder v2',
-        status => 3,
+        status => 0,
         ram => 2,
         manual => "archosfmrecorder",
+        release => '3.15', 
     },
     'cowond2' => {
         name => 'Cowon D2',
