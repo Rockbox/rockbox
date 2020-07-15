@@ -55,6 +55,12 @@ sub mapscan {
         elsif($_ =~ / +0x([0-9a-f]+) *_loadaddress = \./) {
             $start = $1;
         }
+        elsif($_ =~ / +0x([0-9a-f]+) *_dramcopystart = \./) {
+            $start = $1;
+        }
+        elsif($_ =~ / +0x([0-9a-f]+) *__start/) {
+            $start = $1;
+        }
     }
     close(M);
 
