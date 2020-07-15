@@ -64,11 +64,7 @@
 #endif
 
 /* size of code+bss */
-#if CONFIG_CPU == SH7034
-#define CODE_SIZE 0x3000 /* 12k */
-#else
 #define CODE_SIZE 0x5000 /* 20k */
-#endif
 
 #define CODE_AND_UNDO_SIZE (CODE_SIZE+0x1000) /* + 4k */
 

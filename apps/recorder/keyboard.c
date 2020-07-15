@@ -342,15 +342,6 @@ int kbd_input(char* text, int buflen)
         viewportmanager_theme_enable(l, false, NULL);
     }
 
-#ifdef HAVE_BUTTONBAR
-    struct gui_buttonbar buttonbar;
-    bool buttonbar_config = global_settings.buttonbar;
-
-    global_settings.buttonbar = true;
-    gui_buttonbar_init(&buttonbar);
-    gui_buttonbar_set_display(&buttonbar, &screens[SCREEN_MAIN]);
-#endif
-
     /* initialize state */
     state.text = text;
     state.buflen = buflen;
@@ -474,12 +465,6 @@ int kbd_input(char* text, int buflen)
                 kbd_draw_buttons(pm, sc);
 #endif
         }
-
-#ifdef HAVE_BUTTONBAR
-        /* draw the button bar */
-        gui_buttonbar_set(&buttonbar, "Shift", "OK", "Del");
-        gui_buttonbar_draw(&buttonbar);
-#endif
 
         FOR_NB_SCREENS(l)
             screens[l].update();
@@ -685,10 +670,6 @@ int kbd_input(char* text, int buflen)
         }
         state.changed = 0;
     }
-
-#ifdef HAVE_BUTTONBAR
-    global_settings.buttonbar = buttonbar_config;
-#endif
 
     if (ret < 0)
         splash(HZ/2, ID2P(LANG_CANCEL));

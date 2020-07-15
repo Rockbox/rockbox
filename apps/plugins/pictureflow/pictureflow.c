@@ -691,13 +691,7 @@ static inline PFreal fdiv(PFreal num, PFreal den)
 #define fabs(a) (a < 0 ? -a : a)
 #define fbound(min,val,max) (fmax((min),fmin((max),(val))))
 
-#if CONFIG_CPU == SH7034
-/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
-#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
-#else
 #define MULUQ(a, b) ((a) * (b))
-#endif
-
 
 #if 0
 #define fmul(a,b) ( ((a)*(b)) >> PFREAL_SHIFT )

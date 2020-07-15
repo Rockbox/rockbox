@@ -758,8 +758,7 @@ void grey_ub_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                 + (~yc & _GREY_BMASK);
 #endif /* LCD_PIXELFORMAT */
 
-#if ((LCD_PIXELFORMAT == VERTICAL_PACKING) && (LCD_DEPTH == 1) && (CONFIG_CPU == SH7034)) \
- || ((LCD_PIXELFORMAT == VERTICAL_PACKING) && (LCD_DEPTH == 2) && defined(CPU_COLDFIRE)) \
+#if ((LCD_PIXELFORMAT == VERTICAL_PACKING) && (LCD_DEPTH == 2) && defined(CPU_COLDFIRE)) \
  || ((LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) && defined(CPU_COLDFIRE))
         _grey_line1(width, dst + idx, src, _grey_info.gvalue);
 #else
