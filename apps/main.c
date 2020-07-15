@@ -418,10 +418,6 @@ static void init(void)
 {
     int rc;
     bool mounted = false;
-#if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
-    /* if nobody initialized ATA before, I consider this a cold start */
-    bool coldstart = (PACR2 & 0x4000) != 0; /* starting from Flash */
-#endif
 
     system_init();
     core_allocator_init();
@@ -527,24 +523,6 @@ static void init(void)
     CHART(">viewportmanager_init");
     viewportmanager_init();
     CHART("<viewportmanager_init");
-
-#if CONFIG_CHARGING && (CONFIG_CPU == SH7034)
-    /* charger_inserted() can't be used here because power_thread()
-       hasn't checked power_input_status() yet */
-    if (coldstart && (power_input_status() & POWER_INPUT_MAIN_CHARGER)
-        && !global_settings.car_adapter_mode
-#ifdef ATA_POWER_PLAYERSTYLE
-        && !ide_powered() /* relies on probing result from bootloader */
-#endif
-        )
-    {
-        rc = charging_screen(); /* display a "charging" screen */
-        if (rc == 1)            /* charger removed */
-            power_off();
-        /* "On" pressed or USB connected: proceed */
-        show_logo();  /* again, to provide better visual feedback */
-    }
-#endif
 
     CHART(">storage_init");
     rc = storage_init();

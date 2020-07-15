@@ -39,23 +39,7 @@
 
 INLINE unsigned range_limit(int value)
 {
-#if CONFIG_CPU == SH7034
-    unsigned tmp;
-    asm (  /* Note: Uses knowledge that only low byte of result is used */
-        "mov     #-128,%[t]  \n"
-        "sub     %[t],%[v]   \n"  /* value -= -128; equals value += 128; */
-        "extu.b  %[v],%[t]   \n"
-        "cmp/eq  %[v],%[t]   \n"  /* low byte == whole number ? */
-        "bt      1f          \n"  /* yes: no overflow */
-        "cmp/pz  %[v]        \n"  /* overflow: positive? */
-        "subc    %[v],%[v]   \n"  /* %[r] now either 0 or 0xffffffff */
-    "1:                      \n"
-        : /* outputs */
-        [v]"+r"(value),
-        [t]"=&r"(tmp)
-    );
-    return value;
-#elif defined(CPU_COLDFIRE)
+#if defined(CPU_COLDFIRE)
     asm (  /* Note: Uses knowledge that only the low byte of the result is used */
         "add.l   #128,%[v]   \n"  /* value += 128; */
         "cmp.l   #255,%[v]   \n"  /* overflow? */

@@ -114,12 +114,6 @@ extern int (*tuner_get)(int setting);
 #include "lv24020lp.h"
 #endif
 
-/** Samsung S1A0903X01 **/
-#if (CONFIG_TUNER & S1A0903X01)
-/* Ondio FM, FM Recorder */
-#include "s1a0903x01.h"
-#endif
-
 /** Philips TEA5760 **/
 #if (CONFIG_TUNER & TEA5760)
 #include "tea5760.h"

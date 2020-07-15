@@ -128,16 +128,6 @@ int sound_current(int setting)
         SOUND_CUR_SET(BALANCE,            global_settings.balance)
         SOUND_CUR_SET(CHANNELS,           global_settings.channel_config)
         SOUND_CUR_SET(STEREO_WIDTH,       global_settings.stereo_width)
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-        SOUND_CUR_SET(LOUDNESS,           global_settings.loudness)
-        SOUND_CUR_SET(AVC,                global_settings.avc)
-        SOUND_CUR_SET(MDB_STRENGTH,       global_settings.mdb_strength)
-        SOUND_CUR_SET(MDB_HARMONICS,      global_settings.mdb_harmonics)
-        SOUND_CUR_SET(MDB_CENTER,         global_settings.mdb_center)
-        SOUND_CUR_SET(MDB_SHAPE,          global_settings.mdb_shape)
-        SOUND_CUR_SET(MDB_ENABLE,         global_settings.mdb_enable)
-        SOUND_CUR_SET(SUPERBASS,          global_settings.superbass)
-#endif /* (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) */
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
         SOUND_CUR_SET(BASS_CUTOFF,        global_settings.bass_cutoff)
 #endif
@@ -625,72 +615,6 @@ void sound_set_hw_eq_band4_width(int value)
 }
 #endif
 #endif /* AUDIOHW_HAVE_EQ */
-
-#if CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F
-void sound_set_loudness(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_loudness(value);
-}
-
-void sound_set_avc(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_avc(value);
-}
-
-void sound_set_mdb_strength(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_mdb_strength(value);
-}
-
-void sound_set_mdb_harmonics(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_mdb_harmonics(value);
-}
-
-void sound_set_mdb_center(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_mdb_center(value);
-}
-
-void sound_set_mdb_shape(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_mdb_shape(value);
-}
-
-void sound_set_mdb_enable(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_mdb_enable(value);
-}
-
-void sound_set_superbass(int value)
-{
-    if (!audio_is_initialized)
-        return;
-
-    audiohw_set_superbass(value);
-}
-#endif /* CONFIG_CODEC == MAS3587F || CONFIG_CODEC == MAS3539F */
 
 #if defined(HAVE_PITCHCONTROL)
 void sound_set_pitch(int32_t pitch)

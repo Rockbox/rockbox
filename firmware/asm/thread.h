@@ -47,8 +47,6 @@ struct regs
   #include "arm/thread.h"
 #elif defined(CPU_COLDFIRE)
   #include "m68k/thread.h"
-#elif CONFIG_CPU == SH7034
-  #include "sh/thread.h"
 #elif defined(CPU_MIPS)
   #include "mips/thread.h"
 #endif
