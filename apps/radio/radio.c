@@ -61,14 +61,7 @@
 
 #if CONFIG_TUNER
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define FM_RECORD
-#define FM_PRESET_ADD
-#define FM_PRESET_ACTION
-#define FM_PRESET
-#define FM_MODE
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define FM_PRESET
 #define FM_MODE
 #define FM_NEXT_PRESET
@@ -85,10 +78,6 @@
    proper tuning quiets the screen almost entirely in that extreme measures
    have to be taken to hear any interference. */
 #define HAVE_NOISY_IDLE_MODE
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define FM_RECORD_DBLPRE
-#define FM_RECORD
 
 #elif (CONFIG_KEYPAD == SANSA_E200_PAD) || (CONFIG_KEYPAD == SANSA_C200_PAD) ||\
       (CONFIG_KEYPAD == SANSA_FUZE_PAD) || (CONFIG_KEYPAD == SANSA_CLIP_PAD) ||\

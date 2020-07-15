@@ -297,27 +297,6 @@
 #define  GBN_BUTTON_CONTEXT            BUTTON_PLAY | BUTTON_REPEAT
 /* no next var */
 
-#elif (CONFIG_KEYPAD == RECORDER_PAD)
-#define  GBN_BUTTON_UP                 BUTTON_UP
-#define  GBN_BUTTON_DOWN               BUTTON_DOWN
-#define  GBN_BUTTON_LEFT               BUTTON_LEFT
-#define  GBN_BUTTON_RIGHT              BUTTON_RIGHT
-#define  GBN_BUTTON_RETREAT            BUTTON_F1
-#define  GBN_BUTTON_ADVANCE            BUTTON_F3
-#define  GBN_BUTTON_MENU               BUTTON_F2
-#define  GBN_BUTTON_PLAY               BUTTON_PLAY | BUTTON_REL
-#define  GBN_BUTTON_CONTEXT            BUTTON_PLAY | BUTTON_REPEAT
-#define  GBN_BUTTON_NEXT_VAR           BUTTON_ON
-
-#elif (CONFIG_KEYPAD == ONDIO_PAD)
-#define  GBN_BUTTON_UP                 BUTTON_UP
-#define  GBN_BUTTON_DOWN               BUTTON_DOWN
-#define  GBN_BUTTON_LEFT               BUTTON_LEFT
-#define  GBN_BUTTON_RIGHT              BUTTON_RIGHT
-#define  GBN_BUTTON_MENU               BUTTON_MENU | BUTTON_REPEAT
-#define  GBN_BUTTON_PLAY               BUTTON_MENU | BUTTON_REL
-#define  GBN_BUTTON_NAV_MODE           BUTTON_OFF
-
 #elif (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
 #define  GBN_BUTTON_UP                 BUTTON_UP
 #define  GBN_BUTTON_DOWN               BUTTON_DOWN

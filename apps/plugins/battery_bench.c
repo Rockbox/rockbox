@@ -30,41 +30,12 @@
 
 #define EV_EXIT 1337
 
-/* seems to work with 1300, but who knows... */ 
+/* seems to work with 1300, but who knows... */
 #define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 
-#if CONFIG_KEYPAD == RECORDER_PAD
-
-#define BATTERY_ON BUTTON_PLAY
-#define BATTERY_OFF BUTTON_OFF
-#define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "OFF"
-
-#if BUTTON_REMOTE != 0
-#define BATTERY_RC_ON BUTTON_RC_PLAY
-#define BATTERY_RC_OFF BUTTON_RC_STOP
-#endif
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-
-#define BATTERY_ON BUTTON_RIGHT
-#define BATTERY_OFF BUTTON_OFF
-#define BATTERY_ON_TXT  "RIGHT - start"
-#define BATTERY_OFF_TXT "OFF"
-
-#elif CONFIG_KEYPAD == PLAYER_PAD
-
-#define BATTERY_ON BUTTON_PLAY
-#define BATTERY_OFF BUTTON_STOP
-#define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "STOP"
-
-#define BATTERY_RC_ON BUTTON_RC_PLAY
-#define BATTERY_RC_OFF BUTTON_RC_STOP
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
-      
+
 #define BATTERY_ON BUTTON_ON
 #define BATTERY_RC_ON BUTTON_RC_ON
 
