@@ -128,6 +128,7 @@ robotfindskitten.c
 xobox.c
 spacerocks.c
 
+announce_status.c
 blackjack.c
 bounce.c
 bubbles.c
