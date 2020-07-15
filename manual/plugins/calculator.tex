@@ -7,12 +7,12 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
  other available math functions.
 
 \begin{btnmap}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD%
       ,IPOD_3G_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
       ,GIGABEAT_S_PAD,MROBE100_PAD,IRIVER_H10_PAD,SANSA_FUZE_PAD,PBELL_VIBE500_PAD%
       ,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
       {\ButtonLeft{} / \ButtonRight{} /}
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD%
       ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
       ,SANSA_FUZE_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}
       {\ButtonUp{} / \ButtonDown}
@@ -25,8 +25,6 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
        \opt{HAVEREMOTEKEYMAP}{& }
     & Move around the keypad\\
     %
-    \opt{RECORDER_PAD}{\ButtonPlay}
-    \opt{ONDIO_PAD}{\ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IAUDIO_X5_PAD%
         ,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,MROBE100_PAD%
         ,SANSA_FUZE_PAD,SANSA_FUZEPLUS_PAD}
@@ -39,8 +37,7 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
        \opt{HAVEREMOTEKEYMAP}{& }
     & Select a button\\
     %
-    \nopt{ONDIO_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{
-        \opt{RECORDER_PAD}{\ButtonFOne}
+    \nopt{IPOD_4G_PAD,IPOD_3G_PAD}{
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD%
             ,SANSA_C200_PAD,MPIO_HD200_PAD}{\ButtonRec}
         \opt{SANSA_CLIP_PAD,SANSA_FUZE_PAD}{\ButtonHome}
@@ -55,16 +52,13 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
         & Delete last entered digit or clear after calculation\\
         %
     }
-    \opt{RECORDER_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD,SAMSUNG_YH820_PAD}{
-        \opt{RECORDER_PAD}{\ButtonFTwo}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,SAMSUNG_YH820_PAD}{
         \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonMode}
         \opt{SAMSUNG_YH820_PAD}{\ButtonRec}
        \opt{HAVEREMOTEKEYMAP}{& }
         & Cycle through the 4 basic operators\\
         %
     }
-    \opt{RECORDER_PAD}{\ButtonFThree}
-    \opt{ONDIO_PAD}{Long \ButtonMenu}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOn}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD,IRIVER_H10_PAD,IAUDIO_X5_PAD,IRIVER_H10_PAD
         ,PBELL_VIBE500_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SANSA_FUZEPLUS_PAD}
@@ -76,7 +70,7 @@ standard calculator. Pressing the ``1st'' and ``2nd'' buttons will toggle betwee
        \opt{HAVEREMOTEKEYMAP}{& }
     & Calculate\\
     %
-    \opt{RECORDER_PAD,ONDIO_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
+    \opt{IRIVER_H100_PAD,IRIVER_H300_PAD}{\ButtonOff}
     \opt{IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonMenu}
     \opt{IAUDIO_X5_PAD,IRIVER_H10_PAD,SANSA_E200_PAD,SANSA_C200_PAD,SANSA_CLIP_PAD,GIGABEAT_PAD%
         ,MROBE100_PAD,COWON_D2_PAD}{\ButtonPower}

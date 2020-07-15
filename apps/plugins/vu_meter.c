@@ -24,32 +24,8 @@
 
 
 /* variable button definitions */
-#if CONFIG_KEYPAD == RECORDER_PAD
-#define VUMETER_QUIT BUTTON_OFF
-#define VUMETER_HELP BUTTON_ON
-#define VUMETER_MENU BUTTON_F1
-#define VUMETER_UP BUTTON_UP
-#define VUMETER_DOWN BUTTON_DOWN
-#define LABEL_HELP "ON"
-#define LABEL_QUIT "OFF"
-#define LABEL_MENU "F1"
-#define LABEL_VOLUME "UP/DOWN"
-
-#elif CONFIG_KEYPAD == ONDIO_PAD
-#define VUMETER_QUIT BUTTON_OFF
-#define VUMETER_HELP_PRE BUTTON_MENU
-#define VUMETER_HELP (BUTTON_MENU | BUTTON_REL)
-#define VUMETER_MENU_PRE BUTTON_MENU
-#define VUMETER_MENU (BUTTON_MENU | BUTTON_REPEAT)
-#define VUMETER_UP BUTTON_UP
-#define VUMETER_DOWN BUTTON_DOWN
-#define LABEL_HELP "MODE"
-#define LABEL_QUIT "OFF"
-#define LABEL_MENU "MODE.."
-#define LABEL_VOLUME "UP/DOWN"
-
-#elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
+#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H300_PAD)
 #define VUMETER_QUIT BUTTON_OFF
 #define VUMETER_HELP BUTTON_ON
 #define VUMETER_MENU BUTTON_SELECT
@@ -804,10 +780,7 @@ static void draw_digital_minimeters(void) {
 
 static void analog_meter(void) {
 
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
@@ -864,10 +837,7 @@ static void analog_meter(void) {
 }
 
 static void digital_meter(void) {
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)
-    int left_peak = rb->mas_codec_readreg(0xC);
-    int right_peak = rb->mas_codec_readreg(0xD);
-#elif (CONFIG_CODEC == SWCODEC)
+#if (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);

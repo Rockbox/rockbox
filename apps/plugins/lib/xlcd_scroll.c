@@ -396,77 +396,7 @@ void xlcd_scroll_up(int count)
     {
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
 
-#if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
-        asm (
-            "mov     #0,r4       \n"  /* x = 0 */
-            "mova    .su_shifttbl,r0 \n"  /* calculate jump destination for */
-            "mov.b   @(r0,%[cnt]),%[cnt] \n"  /* shift amount from table */
-            "bra     .su_cloop   \n"  /* skip table */
-            "add     r0,%[cnt]   \n"
-
-            ".align  2           \n"
-        ".su_shifttbl:           \n"  /* shift jump offset table */
-            ".byte   .su_shift0 - .su_shifttbl \n"
-            ".byte   .su_shift1 - .su_shifttbl \n"
-            ".byte   .su_shift2 - .su_shifttbl \n"
-            ".byte   .su_shift3 - .su_shifttbl \n"
-            ".byte   .su_shift4 - .su_shifttbl \n"
-            ".byte   .su_shift5 - .su_shifttbl \n"
-            ".byte   .su_shift6 - .su_shifttbl \n"
-            ".byte   .su_shift7 - .su_shifttbl \n"
-
-        ".su_cloop:              \n"  /* repeat for every column */
-            "mov     %[addr],r2  \n"  /* get start address */
-            "mov     #0,r3       \n"  /* current_row = 0 */
-            "mov     #0,r1       \n"  /* fill with zero */
-
-        ".su_iloop:              \n"  /* repeat for all rows */
-            "sub     %[wide],r2  \n"  /* address -= width */
-            "mov.b   @r2,r0      \n"  /* get data byte */
-            "shll8   r1          \n"  /* old data to 2nd byte */
-            "extu.b  r0,r0       \n"  /* extend unsigned */
-            "or      r1,r0       \n"  /* combine old data */
-            "jmp     @%[cnt]     \n"  /* jump into shift "path" */
-            "extu.b  r0,r1       \n"  /* store data for next round */
-
-        ".su_shift6:             \n"  /* shift right by 0..7 bits */
-            "shll2   r0          \n"
-            "bra     .su_shift0  \n"
-            "shlr8   r0          \n"
-        ".su_shift4:             \n"
-            "shlr2   r0          \n"
-        ".su_shift2:             \n"
-            "bra     .su_shift0  \n"
-            "shlr2   r0          \n"
-        ".su_shift7:             \n"
-            "shlr2   r0          \n"
-        ".su_shift5:             \n"
-            "shlr2   r0          \n"
-        ".su_shift3:             \n"
-            "shlr2   r0          \n"
-        ".su_shift1:             \n"
-            "shlr    r0          \n"
-        ".su_shift0:             \n"
-
-            "mov.b   r0,@r2      \n"  /* store data */
-            "add     #1,r3       \n"  /* current_row++ */
-            "cmp/hi  r3,%[rows]  \n"  /* current_row < bheight - shift ? */
-            "bt      .su_iloop   \n"
-
-            "add     #1,%[addr]  \n"  /* start_address++ */
-            "add     #1,r4       \n"  /* x++ */
-            "cmp/hi  r4,%[wide]  \n"  /* x < width ? */
-            "bt      .su_cloop   \n"
-            : /* outputs */
-            : /* inputs */
-            [addr]"r"(rb->lcd_framebuffer + blocklen * LCD_FBWIDTH),
-            [wide]"r"(LCD_FBWIDTH),
-            [rows]"r"(blocklen),
-            [cnt] "r"(bitcount)
-            : /* clobbers */
-            "r0", "r1", "r2", "r3", "r4"
-        );
-#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
+#if defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
         asm (
             "move.l  %[wide],%%d3\n"  /* columns = width */
 
@@ -590,76 +520,7 @@ void xlcd_scroll_down(int count)
     {
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
 
-#if (CONFIG_CPU == SH7034) && (LCD_DEPTH == 1)
-        asm (
-            "mov     #0,r4       \n"  /* x = 0 */
-            "mova    .sd_shifttbl,r0 \n"  /* calculate jump destination for */
-            "mov.b   @(r0,%[cnt]),%[cnt] \n"  /* shift amount from table */
-            "bra     .sd_cloop   \n"  /* skip table */
-            "add     r0,%[cnt]   \n"
-
-            ".align  2           \n"
-        ".sd_shifttbl:           \n"  /* shift jump offset table */
-            ".byte   .sd_shift0 - .sd_shifttbl \n"
-            ".byte   .sd_shift1 - .sd_shifttbl \n"
-            ".byte   .sd_shift2 - .sd_shifttbl \n"
-            ".byte   .sd_shift3 - .sd_shifttbl \n"
-            ".byte   .sd_shift4 - .sd_shifttbl \n"
-            ".byte   .sd_shift5 - .sd_shifttbl \n"
-            ".byte   .sd_shift6 - .sd_shifttbl \n"
-            ".byte   .sd_shift7 - .sd_shifttbl \n"
-
-        ".sd_cloop:              \n"  /* repeat for every column */
-            "mov     %[addr],r2  \n"  /* get start address */
-            "mov     #0,r3       \n"  /* current_row = 0 */
-            "mov     #0,r1       \n"  /* fill with zero */
-
-        ".sd_iloop:              \n"  /* repeat for all rows */
-            "shlr8   r1          \n"  /* shift right to get residue */
-            "mov.b   @r2,r0      \n"  /* get data byte */
-            "jmp     @%[cnt]     \n"  /* jump into shift "path" */
-            "extu.b  r0,r0       \n"  /* extend unsigned */
-
-        ".sd_shift6:             \n"  /* shift left by 0..7 bits */
-            "shll8   r0          \n"
-            "bra     .sd_shift0  \n"
-            "shlr2   r0          \n"
-        ".sd_shift4:             \n"
-            "shll2   r0          \n"
-        ".sd_shift2:             \n"
-            "bra     .sd_shift0  \n"
-            "shll2   r0          \n"
-        ".sd_shift7:             \n"
-            "shll2   r0          \n"
-        ".sd_shift5:             \n"
-            "shll2   r0          \n"
-        ".sd_shift3:             \n"
-            "shll2   r0          \n"
-        ".sd_shift1:             \n"
-            "shll    r0          \n"
-        ".sd_shift0:             \n"
-
-            "or      r0,r1       \n"  /* combine with last residue */
-            "mov.b   r1,@r2      \n"  /* store data */
-            "add     %[wide],r2  \n"  /* address += width */
-            "add     #1,r3       \n"  /* current_row++ */
-            "cmp/hi  r3,%[rows]  \n"  /* current_row < bheight - shift ? */
-            "bt      .sd_iloop   \n"
-
-            "add     #1,%[addr]  \n"  /* start_address++ */
-            "add     #1,r4       \n"  /* x++ */
-            "cmp/hi  r4,%[wide]  \n"  /* x < width ? */
-            "bt      .sd_cloop   \n"
-            : /* outputs */
-            : /* inputs */
-            [addr]"r"(rb->lcd_framebuffer + blockcount * LCD_FBWIDTH),
-            [wide]"r"(LCD_WIDTH),
-            [rows]"r"(blocklen),
-            [cnt] "r"(bitcount)
-            : /* clobbers */
-            "r0", "r1", "r2", "r3", "r4"
-        );
-#elif defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
+#if defined(CPU_COLDFIRE) && (LCD_DEPTH == 2)
         asm (
             "move.l  %[wide],%%d3\n"  /* columns = width */
 

@@ -39,7 +39,7 @@
  * from Lua in its stack in direct order (the first argument is pushed first). To return values to Lua,
  * a C function just pushes them onto the stack, in direct order (the first result is pushed first),
  * and returns the number of results. Any other value in the stack below the results will be properly
- * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results. 
+ * discarded by Lua. Like a Lua function, a C function called by Lua can also return many results.
  *
  * When porting new functions, don't forget to check rocklib_aux.pl whether it automatically creates
  * wrappers for the function and if so, add the function names to @forbidden_functions. This is to
@@ -487,8 +487,7 @@ RB_WRAP(sound)
             lua_pushstring (L, rb->sound_unit(setting));
             return 1;
             break;
-#if ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F) || \
-    (CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+#if ((CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHCONTROL))
         case SOUND_SET_PITCH:
             rb->sound_set_pitch(setting);
             return 1;/*nil*/
@@ -496,7 +495,7 @@ RB_WRAP(sound)
 #endif
         case SOUND_VAL2PHYS:
             value = luaL_checkint(L, 3);
-            result = rb->sound_val2phys(setting, value);      
+            result = rb->sound_val2phys(setting, value);
             break;
 
         default:
