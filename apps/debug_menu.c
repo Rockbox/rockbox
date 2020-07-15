@@ -1407,9 +1407,12 @@ static int disk_callback(int btn, struct gui_synclist *lists)
              "Free: %ld MB", free / 1024);
     simplelist_addline(
              "Spinup time: %d ms", storage_spinup_time() * (1000/HZ));
-    i = identify_info[83] & (1<<3);
+    i = identify_info[82] & (1<<3);
     simplelist_addline(
              "Power mgmt: %s", i ? "enabled" : "unsupported");
+    i = identify_info[83] & (1<<3);
+    simplelist_addline(
+             "Adv Power mgmt: %s", i ? "enabled" : "unsupported");
     i = identify_info[83] & (1<<9);
     simplelist_addline(
              "Noise mgmt: %s", i ? "enabled" : "unsupported");
