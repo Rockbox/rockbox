@@ -91,9 +91,6 @@ void ev_poll(void)
     if (rb->button_hold()&~holdbutton)
         fb.mode=(fb.mode+1)%4;
     holdbutton=rb->button_hold();
-#elif CONFIG_KEYPAD == RECORDER_PAD
-    if (pressed & BUTTON_ON)
-        fb.mode=(fb.mode+1)%4;
 #endif
 
 #ifdef HAVE_WHEEL_POSITION
@@ -220,12 +217,10 @@ void ev_poll(void)
 #else
         if(pressed & options.MENU) {
 #endif
-#if (CONFIG_KEYPAD != RECORDER_PAD)
 #ifdef HAVE_WHEEL_POSITION
             rb->wheel_send_events(true);
 #endif
             if (do_user_menu() == USER_MENU_QUIT) 
-#endif
             {
                 die("");
                 cleanshut=1;
@@ -300,54 +295,6 @@ void vid_update(int scanline)
         balance += LCD_WIDTH;
         if (balance > 0)
         {
-#if (CONFIG_CPU == SH7034) && !defined(SIMULATOR)
-             asm volatile (
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-                 "mov.b   @%0,r0         \n"
-                 "add     %1,%0          \n"
-                 "tst     #0x02, r0      \n"  /* ~bit 1 */
-                 "rotcr   r1             \n"
-
-                 "shlr16  r1             \n"
-                 "shlr8   r1             \n"
-                 "not     r1,r1          \n"  /* account for negated bits */
-                 "mov.b   r1,@%2         \n"
-                 : /* outputs */
-                 : /* inputs */
-                 /* %0 */ "r"(scan.buf[0] + cnt),
-                 /* %1 */ "r"(256), /* scan.buf line length */
-                 /* %2 */ "r"(frameb++)
-                 : /* clobbers */
-                 "r0", "r1"
-             );
-#else
              register unsigned scrbyte = 0;
              if (scan.buf[0][cnt] & 0x02)  scrbyte |= 0x01;
              if (scan.buf[1][cnt] & 0x02)  scrbyte |= 0x02;
@@ -358,7 +305,6 @@ void vid_update(int scanline)
              if (scan.buf[6][cnt] & 0x02)  scrbyte |= 0x40;
              if (scan.buf[7][cnt] & 0x02)  scrbyte |= 0x80;
              *(frameb++) = scrbyte;
-#endif
              balance -= 160;
         }
         cnt ++;

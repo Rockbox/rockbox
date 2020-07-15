@@ -44,7 +44,6 @@
 #define STORAGE_HOSTFS      (1 << STORAGE_HOSTFS_NUM)
 
 /* CONFIG_TUNER (note these are combineable bit-flags) */
-#define S1A0903X01 0x01 /* Samsung */
 #define TEA5767    0x02 /* Philips */
 #define LV24020LP  0x04 /* Sanyo */
 #define SI4700     0x08 /* Silicon Labs */
@@ -55,13 +54,9 @@
 #define STFM1000   0x100 /* Sigmatel */
 
 /* CONFIG_CODEC */
-#define MAS3587F 3587
-#define MAS3507D 3507
-#define MAS3539F 3539
 #define SWCODEC  1    /* if codec is done by SW */
 
 /* CONFIG_CPU */
-#define SH7034       7034
 #define MCF5249      5249
 #define MCF5250      5250
 #define PP5002       5002
@@ -103,9 +98,6 @@
 #define PLATFORM_PANDORA (1<<6)
 
 /* CONFIG_KEYPAD */
-#define PLAYER_PAD          1
-#define RECORDER_PAD        2
-#define ONDIO_PAD           3
 #define IRIVER_H100_PAD     4
 #define IRIVER_H300_PAD     5
 #define IAUDIO_X5M5_PAD     6
@@ -222,8 +214,7 @@
                                  if the estimation is better that ours
                                  (which it probably is) */
 /* CONFIG_LCD */
-#define LCD_SSD1815   1 /* as used by Archos Recorders and Ondios */
-#define LCD_SSD1801   2 /* as used by Archos Player/Studio */
+#define LCD_SSD1815   1 /* as used by Sansa M200 and others */
 #define LCD_S1D15E06  3 /* as used by iRiver H100 series */
 #define LCD_H300      4 /* as used by iRiver H300 series, exact model name is
                            unknown at the time of this writing */
@@ -312,8 +303,6 @@
 /* CONFIG_I2C */
 #define I2C_NONE     0 /* For targets that do not use I2C - as the
 Lyre prototype 1 */
-#define I2C_PLAYREC  1 /* Archos Player/Recorder style */
-#define I2C_ONDIO    2 /* Ondio style */
 #define I2C_COLDFIRE 3 /* Coldfire style */
 #define I2C_PP5002   4 /* PP5002 style */
 #define I2C_PP5020   5 /* PP5020 style */
@@ -345,7 +334,6 @@ Lyre prototype 1 */
 #define NAND_IMX233  6
 
 /* CONFIG_RTC */
-#define RTC_M41ST84W 1 /* Archos Recorder */
 #define RTC_PCF50605 2 /* iPod 3G, 4G & Mini */
 #define RTC_PCF50606 3 /* iriver H300 */
 #define RTC_S3C2440  4
@@ -398,19 +386,7 @@ Lyre prototype 1 */
 #define IMX233_CREATIVE     (1 << 1) /* Creative MBLK windowing */
 
 /* now go and pick yours */
-#if defined(ARCHOS_PLAYER)
-#include "config/archosplayer.h"
-#elif defined(ARCHOS_RECORDER)
-#include "config/archosrecorder.h"
-#elif defined(ARCHOS_FMRECORDER)
-#include "config/archosfmrecorder.h"
-#elif defined(ARCHOS_RECORDERV2)
-#include "config/archosrecorderv2.h"
-#elif defined(ARCHOS_ONDIOSP)
-#include "config/archosondiosp.h"
-#elif defined(ARCHOS_ONDIOFM)
-#include "config/archosondiofm.h"
-#elif defined(IRIVER_H100)
+#if defined(IRIVER_H100)
 #include "config/iriverh100.h"
 #elif defined(IRIVER_H120)
 #include "config/iriverh120.h"
@@ -658,11 +634,6 @@ Lyre prototype 1 */
 /* setup CPU-specific defines */
 
 #ifndef __PCTOOL__
-
-/* define for all cpus from SH family */
-#if (ARCH == ARCH_SH) && (CONFIG_CPU == SH7034)
-#define CPU_SH
-#endif
 
 /* define for all cpus from coldfire family */
 #if (ARCH == ARCH_M68K) && ((CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250))
@@ -932,11 +903,6 @@ Lyre prototype 1 */
 #define HAVE_PICTUREFLOW_INTEGRATION
 #endif
 
-/* Add one HAVE_ define for all mas35xx targets */
-#if (CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3507D) || (CONFIG_CODEC == MAS3539F)
-#define HAVE_MAS35XX
-#endif
-
 #if (CONFIG_CODEC == SWCODEC)
 #ifdef BOOTLOADER
 
@@ -1012,7 +978,7 @@ Lyre prototype 1 */
 #endif /*  (CONFIG_CODEC == SWCODEC) */
 
 /* Determine if accesses should be strictly long aligned. */
-#if (CONFIG_CPU == SH7034) || defined(CPU_ARM) || defined(CPU_MIPS)
+#if defined(CPU_ARM) || defined(CPU_MIPS)
 #define ROCKBOX_STRICT_ALIGN 1
 #endif
 
@@ -1061,8 +1027,7 @@ Lyre prototype 1 */
 
 /* IRAM usage */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) &&   /* Not for hosted environments */ \
-    (((CONFIG_CPU == SH7034) && !defined(PLUGIN)) || /* SH1 archos: core only */ \
-    defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
+    (defined(CPU_COLDFIRE) || /* Coldfire: core, plugins, codecs */ \
     defined(CPU_PP) ||  /* PortalPlayer: core, plugins, codecs */ \
     (CONFIG_CPU == AS3525 && MEMORYSIZE > 2 && !defined(BOOTLOADER)) || /* AS3525 +2MB: core, plugins, codecs */ \
     (CONFIG_CPU == AS3525 && MEMORYSIZE <= 2 && !defined(PLUGIN) && !defined(CODEC) && !defined(BOOTLOADER)) || /* AS3525 2MB: core only */ \
@@ -1077,7 +1042,7 @@ Lyre prototype 1 */
 #define IDATA_ATTR      __attribute__ ((section(".idata")))
 #define IBSS_ATTR       __attribute__ ((section(".ibss")))
 #define USE_IRAM
-#if CONFIG_CPU != SH7034 && (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
+#if (CONFIG_CPU != AS3525 || MEMORYSIZE > 2) \
     && CONFIG_CPU != JZ4732 && CONFIG_CPU != JZ4760B && CONFIG_CPU != AS3525v2 && CONFIG_CPU != IMX233
 #define PLUGIN_USE_IRAM
 #endif
@@ -1283,8 +1248,7 @@ Lyre prototype 1 */
 #define HAVE_PCM_FULL_DUPLEX
 #endif
 
-#if (CONFIG_CODEC == SWCODEC) || (CONFIG_CODEC == MAS3587F) || \
-    (CONFIG_CODEC == MAS3539F)
+#if (CONFIG_CODEC == SWCODEC)
 #define HAVE_PITCHCONTROL
 #endif
 

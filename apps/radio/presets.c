@@ -473,21 +473,10 @@ int handle_radio_presets(void)
     struct gui_synclist lists;
     int result = 0;
     int action = ACTION_NONE;
-#ifdef HAVE_BUTTONBAR
-    struct gui_buttonbar buttonbar;
-#endif
 
     if(presets_loaded == false)
         return result;
 
-#ifdef HAVE_BUTTONBAR
-    gui_buttonbar_init(&buttonbar);
-    gui_buttonbar_set_display(&buttonbar, &(screens[SCREEN_MAIN]) );
-    gui_buttonbar_set(&buttonbar, str(LANG_FM_BUTTONBAR_ADD),
-                                 str(LANG_FM_BUTTONBAR_EXIT),
-                                 str(LANG_FM_BUTTONBAR_ACTION));
-    gui_buttonbar_draw(&buttonbar);
-#endif
     gui_synclist_init(&lists, presets_get_name, NULL, false, 1, NULL);
     gui_synclist_set_title(&lists, str(LANG_PRESET), NOICON);
     gui_synclist_set_icon_callback(&lists, NULL);

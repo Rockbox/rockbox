@@ -90,13 +90,6 @@ const struct button_mapping pf_context_album_scroll[] =
     {ACTION_NONE,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT},
     {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT},
 #endif
-#if CONFIG_KEYPAD == ONDIO_PAD
-    {PF_SELECT,       BUTTON_UP|BUTTON_REL,       BUTTON_UP},
-    {PF_CONTEXT,      BUTTON_UP|BUTTON_REPEAT,    BUTTON_UP},
-    {ACTION_NONE,     BUTTON_UP,                  BUTTON_NONE},
-    {ACTION_NONE,     BUTTON_DOWN,                BUTTON_NONE},
-    {ACTION_NONE,     BUTTON_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
-#endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN|1)
 };
 #endif /* !USE_CORE_PREVNEXT */
@@ -147,8 +140,7 @@ const struct button_mapping pf_context_buttons[] =
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
 #elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD || \
-    CONFIG_KEYPAD == RECORDER_PAD || CONFIG_KEYPAD == ONDIO_PAD
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD 
     {PF_QUIT,         BUTTON_OFF,                 BUTTON_NONE},
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
     {PF_QUIT,         BUTTON_REC,                 BUTTON_NONE},
@@ -691,13 +683,7 @@ static inline PFreal fdiv(PFreal num, PFreal den)
 #define fabs(a) (a < 0 ? -a : a)
 #define fbound(min,val,max) (fmax((min),fmin((max),(val))))
 
-#if CONFIG_CPU == SH7034
-/* 16*16->32 bit multiplication is a single instrcution on the SH1 */
-#define MULUQ(a, b) ((uint32_t) (((uint16_t) (a)) * ((uint16_t) (b))))
-#else
 #define MULUQ(a, b) ((a) * (b))
-#endif
-
 
 #if 0
 #define fmul(a,b) ( ((a)*(b)) >> PFREAL_SHIFT )
