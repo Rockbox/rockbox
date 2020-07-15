@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfe32748_c1fd4209",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1000547
+      },
+      "writtenOn": "2020-07-15T20:03:47Z",
+      "side": 1,
+      "message": "whitespaces!",
+      "range": {
+        "startLine": 2,
+        "startChar": 12,
+        "endLine": 7,
+        "endChar": 12
+      },
+      "revId": "a9321ab631ec102c7dddc35262bfa0defb8d3b09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfe32748_a102be08",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000547
+      },
+      "writtenOn": "2020-07-15T20:03:47Z",
+      "side": 1,
+      "message": "comment and naming",
+      "revId": "a9321ab631ec102c7dddc35262bfa0defb8d3b09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfe32748_0108ca26",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1000547
+      },
+      "writtenOn": "2020-07-15T20:03:47Z",
+      "side": 1,
+      "message": "use the same buffer, check if possible",
+      "range": {
+        "startLine": 229,
+        "startChar": 14,
+        "endLine": 246,
+        "endChar": 14
+      },
+      "revId": "a9321ab631ec102c7dddc35262bfa0defb8d3b09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dfe32748_e10cc63c",
+        "filename": "firmware/target/hosted/pcm-alsa.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1000547
+      },
+      "writtenOn": "2020-07-15T20:03:47Z",
+      "side": 1,
+      "message": "same buffer or use pointer to buffer",
+      "range": {
+        "startLine": 250,
+        "startChar": 18,
+        "endLine": 262,
+        "endChar": 9
+      },
+      "revId": "a9321ab631ec102c7dddc35262bfa0defb8d3b09",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
