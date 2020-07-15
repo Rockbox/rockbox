@@ -220,23 +220,17 @@ static int plugin_main(void)
         rb->sleep(1);
         rb->lcd_clear_display();
 
-#if ((CONFIG_CODEC == SWCODEC)  || !defined(SIMULATOR) && \
-    ((CONFIG_CODEC == MAS3587F) || (CONFIG_CODEC == MAS3539F)))
-
+#if (CONFIG_CODEC == SWCODEC)
         /* This will make the stars pulse to the music */
         if(pulse){
 
             /* Get the peaks. ( Borrowed from vu_meter ) */
-#if (CONFIG_CODEC == SWCODEC)
             static struct pcm_peaks peaks;
             rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                               &peaks);
             #define left_peak peaks.left
             #define right_peak peaks.right
-#else
-            int left_peak = rb->mas_codec_readreg(0xC);
-            int right_peak = rb->mas_codec_readreg(0xD);
-#endif
+
             /* Devide peak data by 4098 to bring the max
                value down from ~32k to 8 */
             left_peak  =    left_peak/0x1000;
@@ -261,8 +255,6 @@ static int plugin_main(void)
             starfield.z_move = avg_peak;
 
         } /* if pulse */
-#else
-        (void) avg_peak;
 #endif
         starfield_move_and_draw(&starfield);
 
