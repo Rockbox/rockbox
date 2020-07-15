@@ -1740,6 +1740,9 @@ static int process_input(int tmo, bool do_pausemenu)
 
     if(button == BTN_PAUSE)
     {
+        last_keystate = 0;
+        accept_input = true;
+
         if(do_pausemenu)
         {
             /* quick hack to preserve the clipping state */
@@ -1751,9 +1754,6 @@ static int process_input(int tmo, bool do_pausemenu)
 
             if(orig_clipped)
                 rb_clip(NULL, clip_rect.x, clip_rect.y, clip_rect.width, clip_rect.height);
-
-            last_keystate = 0;
-            accept_input = true;
 
             return rc;
         }
