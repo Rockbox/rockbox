@@ -490,10 +490,8 @@ displaying images:
   \item Load and always show the image, using the \config{\%x} tag
   \item Preload the image with \config{\%xl} and show it with \config{\%xd}.
     This way you can have your images displayed conditionally.
-    \nopt{archos}{%
     \item Load an image and show as backdrop using the \config{\%X} tag. The
       image must be of the same exact dimensions as your display.
-    }%
 \end{enumerate}
 
 \optv{swcodec}{% This doesn't depend on swcodec but we don't have a \noptv
@@ -663,15 +661,6 @@ Example of a configuration file:
 \end{description}
 
 \section{\label{ref:FirmwareLoading}Firmware Loading}
-\opt{player,recorder,recorderv2fm,ondio}{
-  When your \dap{} powers on, it loads the Archos firmware in ROM, which
-  automatically checks your \daps{} root directory for a file named
-  \firmwarefilename. Note that Archos firmware can only read the first
-  ten characters of each filename in this process, so do not rename your old
-  firmware files with names like \firmwarefilename.\fname{old} and so on,
-  because it is possible that the \dap{} will load a file other than the one
-  you intended.
-}
 
 \subsection{\label{ref:using_rolo}Using ROLO (Rockbox Loader)}
 Rockbox is able to load and start another firmware file without rebooting.
@@ -686,8 +675,6 @@ You just ``play'' a file with the extension %
 \opt{gigabeatf,gigabeats}{\fname{.gigabeat}.} %
 This can be used to test new firmware versions without deleting your
 current version.
-
-\opt{archos}{\input{advanced_topics/archos-flashing.tex}}
 
 \opt{multi_boot}{
 \subsection{\label{ref:using_multiboot}Using Multiboot}

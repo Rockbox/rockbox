@@ -24,9 +24,6 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
 	$(TOOLSDIR)/iaudio_bl_flash.h
 
-ifeq ($(MODELNAME),archosplayer)
-  TOOLS += $(TOOLSDIR)/player_unifont
-endif
 
 ifeq (,$(PREFIX))
 ifdef APP_TYPE
@@ -182,7 +179,7 @@ OBJ := $(OBJ:.S=.o)
 OBJ += $(BMP:.bmp=.o)
 OBJ := $(call full_path_subst,$(ROOTDIR)/%,$(BUILDDIR)/%,$(OBJ))
 
-build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(ARCHOSROM) $(RBINFO)
+build: $(TOOLS) $(BUILDDIR)/$(BINARY) $(CODECS) $(ROCKS) $(RBINFO)
 
 $(RBINFO): $(BUILDDIR)/$(BINARY)
 	$(SILENT)echo Creating $(@F)
