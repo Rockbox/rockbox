@@ -42,10 +42,6 @@ struct scroll_screen_info LCDFN(scroll_info) =
 #ifdef HAVE_LCD_BITMAP
     .step         = 6,
 #endif
-#ifdef HAVE_LCD_CHARCELLS
-    .jump_scroll_delay = HZ/4,
-    .jump_scroll       = 0,
-#endif
 };
 
 
@@ -121,17 +117,6 @@ void LCDFN(bidir_scroll)(int percent)
     LCDFN(scroll_info).bidir_limit = percent;
 }
 
-#ifdef HAVE_LCD_CHARCELLS
-void LCDFN(jump_scroll)(int mode) /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
-{
-    LCDFN(scroll_info).jump_scroll = mode;
-}
-
-void LCDFN(jump_scroll_delay)(int ms)
-{
-    LCDFN(scroll_info).jump_scroll_delay = ms / (HZ / 10);
-}
-#endif
 
 /* This renders the scrolling line described by s immediatly.
  * This can be called to update a scrolling line if the text has changed
@@ -201,7 +186,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     return ended;
 }
 
-#if !defined(BOOTLOADER) || defined(HAVE_REMOTE_LCD) || defined(HAVE_LCD_CHARCELLS)
+#if !defined(BOOTLOADER) || defined(HAVE_REMOTE_LCD)
 static void LCDFN(scroll_worker)(void)
 {
     int index;

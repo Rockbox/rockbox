@@ -32,15 +32,10 @@
  * targets. On color, mylcd_ub_update_XXXX refer to the proper update
  * functions, otherwise they are no-ops.
  *
- * lib/playergfx.h or lib/grey.h should be included before including this
+ * lib/grey.h should be included before including this
  * header. For bitmap LCD's, defaults to rb->lcd_XXXX otherwise.
  */
-#if defined (HAVE_LCD_CHARCELLS) && defined(__PGFX_H__)
-#define MYLCD_CFG_PGFX              /* using PGFX */
-#define mylcd_(fn)                  pgfx_##fn
-#define mylcd_ub_(fn)               pgfx_##fn
-
-#elif defined (HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && defined(__GREY_H__)
+#if defined (HAVE_LCD_BITMAP) && (LCD_DEPTH < 4) && defined(__GREY_H__)
 #define MYLCD_CFG_GREYLIB           /* using greylib */
 #define mylcd_(fn)                  grey_##fn
 #define myxlcd_(fn)                 grey_##fn
