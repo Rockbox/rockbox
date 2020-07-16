@@ -231,10 +231,6 @@ disk_storage
 remote_button_hold
 #endif
 
-#if defined(HAVE_LCD_CHARCELLS)
-lcd_charcell
-#endif
-
 #if defined(HAVE_LCD_FLIP)
 lcd_flip
 #endif
