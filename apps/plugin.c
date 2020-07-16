@@ -195,16 +195,6 @@ static const struct plugin_api rockbox_api = {
     lcd_putsf,
     lcd_puts_scroll,
     lcd_scroll_stop,
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_define_pattern,
-    lcd_get_locked_pattern,
-    lcd_unlock_pattern,
-    lcd_putc,
-    lcd_put_cursor,
-    lcd_remove_cursor,
-    lcd_icon,
-    lcd_double_height,
-#else /* HAVE_LCD_BITMAP */
     &lcd_static_framebuffer[0][0],
     lcd_set_viewport,
     lcd_set_framebuffer,
@@ -270,7 +260,6 @@ static const struct plugin_api rockbox_api = {
     font_get_width,
     screen_clear_area,
     gui_scrollbar_draw,
-#endif /* HAVE_LCD_BITMAP */
     get_codepage_name,
 
 #ifdef HAVE_REMOTE_LCD

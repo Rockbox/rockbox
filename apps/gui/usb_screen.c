@@ -269,12 +269,7 @@ void gui_usb_screen_run(bool early_usb)
          * generic cleanup here */
         screen->set_viewport(NULL);
         screen->scroll_stop();
-#ifdef HAVE_LCD_CHARCELLS
-        /* Quick fix. Viewports should really be enabled proper for charcell */
-        viewport_set_defaults(&usb_screen_vps_ar[i].parent, i);
-#else
         usb_screen_fix_viewports(screen, &usb_screen_vps_ar[i]);
-#endif
     }
 
     /* update the UI before disabling fonts, this maximizes the propability
@@ -326,10 +321,6 @@ void gui_usb_screen_run(bool early_usb)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(old_mode);
 #endif
-
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_usb(false);
-#endif /* HAVE_LCD_CHARCELLS */
 
 #ifdef HAVE_LCD_BITMAP
     if(!early_usb)

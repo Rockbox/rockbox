@@ -64,17 +64,12 @@ static const char* get_next_line(const char *text, struct view_info *info)
     total = 0;
     while(*ptr)
     {
-#ifdef HAVE_LCD_CHARCELLS
-        n = rb->utf8seek(ptr, 1);
-        w = 1;
-#else
         unsigned short ch;
         n = ((intptr_t)rb->utf8decode(ptr, &ch) - (intptr_t)ptr);
         if (rb->is_diacritic(ch, NULL))
             w = 0;
         else
             w = rb->font_get_width(info->pf, ch);
-#endif
         if (isbrchr(ptr, n))
             space = ptr+(isspace(*ptr) || total + w <= info->vp.width? n: 0);
         if (*ptr == '\n')
