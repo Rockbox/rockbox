@@ -125,11 +125,7 @@ static int show_credits(void)
     return 0;
 }
 
-#ifdef HAVE_LCD_CHARCELLS
-#define SIZE_FMT "%s%s"
-#else
 #define SIZE_FMT "%s %s"
-#endif
 struct info_data
 
 {
@@ -501,24 +497,7 @@ MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
 /*    MAIN MENU                    */
 
 
-#ifdef HAVE_LCD_CHARCELLS
-static int mainmenu_callback(int action,const struct menu_item_ex *this_item)
-{
-    (void)this_item;
-    switch (action)
-    {
-        case ACTION_ENTER_MENUITEM:
-            status_set_param(true);
-            break;
-        case ACTION_EXIT_MENUITEM:
-            status_set_param(false);
-            break;
-    }
-    return action;
-}
-#else
 #define mainmenu_callback NULL
-#endif
 MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), mainmenu_callback,
         Icon_Submenu_Entered,
         &sound_settings,

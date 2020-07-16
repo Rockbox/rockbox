@@ -237,15 +237,6 @@ struct screen screens[NB_SCREENS] =
         .scroll_step=&lcd_scroll_step,
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_LCD_CHARCELLS
-        .double_height=&lcd_double_height,
-        .putchar=&lcd_putc,
-        .get_locked_pattern=&lcd_get_locked_pattern,
-        .define_pattern=&lcd_define_pattern,
-        .unlock_pattern=&lcd_unlock_pattern,
-        .icon=&lcd_icon,
-#endif /* HAVE_LCD_CHARCELLS */
-
         .putsxy=&lcd_putsxy,
         .puts=&lcd_puts,
         .putsf=&lcd_putsf,
@@ -333,13 +324,6 @@ struct screen screens[NB_SCREENS] =
         .scroll_step=&lcd_remote_scroll_step,
 #endif /* 1 */
 
-#if 0 /* no charcell remote LCDs so far */
-        .double_height=&lcd_remote_double_height,
-        .putc=&lcd_remote_putc,
-        .get_locked_pattern=&lcd_remote_get_locked_pattern,
-        .define_pattern=&lcd_remote_define_pattern,
-        .icon=&lcd_remote_icon,
-#endif /* 0 */
         .putsxy=&lcd_remote_putsxy,
         .puts=&lcd_remote_puts,
         .putsf=&lcd_remote_putsf,
