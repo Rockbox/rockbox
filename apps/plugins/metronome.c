@@ -1022,12 +1022,7 @@ static void play_tock(void)
 static void metronome_draw(struct screen* display, int state)
 {
     struct part *ps;
-#ifndef HAVE_LCD_BITMAP
-    char beat1 = ' ';
-    char beat2 = ' ';
-#else
     int textlen = display->lcdwidth / display->getcharwidth();
-#endif
     ps = part;
     display->clear_display();
 #ifdef HAVE_LCD_BITMAP

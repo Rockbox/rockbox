@@ -19,7 +19,6 @@
  *
  **************************************************************************/
 #include "plugin.h"
-#include "lib/playergfx.h"
 #include "lib/mylcd.h"
 #include "lib/pluginlib_actions.h"
 
@@ -59,14 +58,6 @@ enum plugin_status plugin_start(const void* parameter)
     int sy = 3;
     (void)parameter;
 
-#ifdef HAVE_LCD_CHARCELLS
-    if (!pgfx_init(4, 2))
-    {
-        rb->splash(HZ*2, "Old LCD :(");
-        return PLUGIN_OK;
-    }
-    pgfx_display(3, 0);
-#endif
     mylcd_clear_display();
     mylcd_set_drawmode(DRMODE_COMPLEMENT);
     while (1) {
@@ -117,9 +108,6 @@ enum plugin_status plugin_start(const void* parameter)
             case MOSAIQUE_QUIT:
             case MOSAIQUE_QUIT2:
                 mylcd_set_drawmode(DRMODE_SOLID);
-#ifdef HAVE_LCD_CHARCELLS
-                pgfx_release();
-#endif
                 return PLUGIN_OK;
 
             case MOSAIQUE_SPEED:
@@ -142,9 +130,6 @@ enum plugin_status plugin_start(const void* parameter)
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
                 {
                     mylcd_set_drawmode(DRMODE_SOLID);
-#ifdef HAVE_LCD_CHARCELLS
-                    pgfx_release();
-#endif
                     return PLUGIN_USB_CONNECTED;
                 }
                 break;
