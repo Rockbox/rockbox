@@ -237,15 +237,6 @@ struct screen screens[NB_SCREENS] =
         .scroll_step=&lcd_scroll_step,
 #endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_LCD_CHARCELLS
-        .double_height=&lcd_double_height,
-        .putchar=&lcd_putc,
-        .get_locked_pattern=&lcd_get_locked_pattern,
-        .define_pattern=&lcd_define_pattern,
-        .unlock_pattern=&lcd_unlock_pattern,
-        .icon=&lcd_icon,
-#endif /* HAVE_LCD_CHARCELLS */
-
         .putsxy=&lcd_putsxy,
         .puts=&lcd_puts,
         .putsf=&lcd_putsf,

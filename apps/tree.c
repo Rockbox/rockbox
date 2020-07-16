@@ -299,10 +299,6 @@ void tree_gui_init(void)
 
     strcpy(tc.currdir, "/");
 
-#ifdef HAVE_LCD_CHARCELLS
-    FOR_NB_SCREENS(i)
-        screens[i].double_height(false);
-#endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
     gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
     gui_synclist_set_icon_callback(&tree_lists,
