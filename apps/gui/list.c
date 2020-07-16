@@ -279,13 +279,8 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
     int bottom = MAX(0, gui_list->nb_items - nb_lines);
     int new_start_item = gui_list->start_item[screen];
     int difference = gui_list->selected_item - gui_list->start_item[screen];
-#ifdef HAVE_LCD_CHARCELLS
-    const int scroll_limit_up   = 0;
-    const int scroll_limit_down = 1;
-#else
     const int scroll_limit_up   = (nb_lines < gui_list->selected_size+2 ? 0:1);
     const int scroll_limit_down = (scroll_limit_up+gui_list->selected_size);
-#endif
 
     if (gui_list->show_selection_marker == false)
     {
