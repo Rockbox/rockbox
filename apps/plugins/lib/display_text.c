@@ -22,11 +22,7 @@
 #include "plugin.h"
 #include "display_text.h"
 
-#ifdef HAVE_LCD_CHARCELLS
-#define MARGIN 0
-#else
 #define MARGIN 5
-#endif
 
 static bool wait_key_press(void)
 {
