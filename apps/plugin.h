@@ -205,16 +205,6 @@ struct plugin_api {
     void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
     bool (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_scroll_stop)(void);
-#ifdef HAVE_LCD_CHARCELLS
-    void (*lcd_define_pattern)(unsigned long ucs, const char *pattern);
-    unsigned long (*lcd_get_locked_pattern)(void);
-    void (*lcd_unlock_pattern)(unsigned long ucs);
-    void (*lcd_putc)(int x, int y, unsigned long ucs);
-    void (*lcd_put_cursor)(int x, int y, unsigned long ucs);
-    void (*lcd_remove_cursor)(void);
-    void (*lcd_icon)(int icon, bool enable);
-    void (*lcd_double_height)(bool on);
-#else /* HAVE_LCD_BITMAP */
     fb_data* lcd_framebuffer;
     void (*lcd_set_viewport)(struct viewport* vp);
     void (*lcd_set_framebuffer)(fb_data *fb);
@@ -300,7 +290,6 @@ struct plugin_api {
                                int width, int height, int items,
                                int min_shown, int max_shown,
                                unsigned flags);
-#endif  /* HAVE_LCD_BITMAP */
     const char* (*get_codepage_name)(int cp);
 
 #ifdef HAVE_REMOTE_LCD
