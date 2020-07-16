@@ -229,9 +229,7 @@ static void generate(void)
         rb->splashf(HZ, "Couldnt open %s", RFA_FILE);
         return;
     }
-#ifndef HAVE_LCD_CHARCELLS
     update_screen(true);
-#endif
     lasttick = *rb->current_tick;
 
     if(!custom_dir())
