@@ -185,7 +185,7 @@ unsigned int battery_voltage(void)
     \description
 
 unsigned short *bidi_l2v( const unsigned char *str, int orientation )
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param str
     \param orientation
     \return
@@ -353,7 +353,7 @@ bool button_hold(void)
     \description
 
 struct event_queue *button_queue
-    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (defined(HAVE_LCD_ENABLE
+    \conditions defined(HAVE_LCD_BITMAP) )) && (defined(HAVE_LCD_ENABLE
     \return
     \description
 
@@ -372,7 +372,7 @@ void cancel_cpu_boost(void)
     \description Unboosts the CPU for the current thread
 
 const unsigned char *font_get_bits( struct font *pf, unsigned short char_code )
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param pf
     \param char_code
     \return
@@ -628,14 +628,14 @@ void flush_icache(void)
     \description
 
 struct font* font_get(int font)
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param font
     \return the font structure for =font=
     \description If the requested font isn't loaded/compiled-in, decrement the font number and try again.
     \see [S[firmware/export/font.h]]
 
 int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param str
     \param w
     \param h
@@ -644,14 +644,14 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
     \description
 
 int font_get_width(struct font* pf, unsigned short char_code)
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param pf
     \param char_code
     \return
     \description
 
 struct font* font_load(const char *path)
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param path
     \return
     \description Load font =path= and returns a struct font pointer for it
@@ -707,7 +707,7 @@ struct system_status *global_status
     \see [S[apps/settings.h]]
 
 void gui_scrollbar_draw(struct screen * screen, int x, int y, int width, int height, int items, int min_shown, int max_shown, unsigned flags)
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param screen
     \param x
     \param y
@@ -837,7 +837,7 @@ int kbd_input(char* buffer, int buflen)
 
 void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \param src
     \param x
     \param y
@@ -847,7 +847,7 @@ void lcd_bitmap(const fb_data *src, int x, int y, int width, int height)
 
 void lcd_bitmap_part(const fb_data *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \param src
     \param src_x
     \param src_y
@@ -860,7 +860,7 @@ void lcd_bitmap_part(const fb_data *src, int src_x, int src_y, int stride, int x
 
 void lcd_bitmap_transparent(const fb_data *src, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH == 16)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH == 16)
     \param src
     \param x
     \param y
@@ -870,7 +870,7 @@ void lcd_bitmap_transparent(const fb_data *src, int x, int y, int width, int hei
 
 void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH == 16)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH == 16)
     \param src
     \param src_x
     \param src_y
@@ -883,7 +883,7 @@ void lcd_bitmap_transparent_part(const fb_data *src, int src_x, int src_y, int s
 
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases, int bx, int by, int bwidth, int bheight, int stride)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) )) && ((LCD_DEPTH < 4) && !defined(SIMULATOR
+    \conditions defined(HAVE_LCD_BITMAP) )) && ((LCD_DEPTH < 4) && !defined(SIMULATOR
     \param values
     \param phases
     \param bx
@@ -895,7 +895,7 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases, int bx, i
 
 void lcd_blit_mono(const unsigned char *data, int x, int by, int width, int bheight, int stride)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) )) && ((LCD_DEPTH < 4) && !defined(SIMULATOR
+    \conditions defined(HAVE_LCD_BITMAP) )) && ((LCD_DEPTH < 4) && !defined(SIMULATOR
     \param data
     \param x
     \param by
@@ -906,7 +906,7 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width, int bhei
 
 void lcd_blit_yuv(unsigned char * const src[3], int src_x, int src_y, int stride, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH == 16)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH == 16)
     \param src[3]
     \param src_x
     \param src_y
@@ -921,22 +921,9 @@ void lcd_clear_display(void)
     \group lcd
     \description Clears the LCD and the framebuffer
 
-void lcd_define_pattern(unsigned long ucs, const char *pattern)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \param ucs
-    \param pattern is a 8x8 pixelbitmap
-    \description Define a custom pattern for index =ucs=
-
-void lcd_double_height(bool on)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \param on
-    \description
-
 void lcd_drawline(int x1, int y1, int x2, int y2)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x1 X top coordinate
     \param y1 Y top coordinate
     \param x2 X bottom coordinate
@@ -945,14 +932,14 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 
 void lcd_drawpixel(int x, int y)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x
     \param y
     \description Draws a pixel at (=x=, =y=) within current drawing mode
 
 void lcd_drawrect(int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x
     \param y
     \param width
@@ -961,7 +948,7 @@ void lcd_drawrect(int x, int y, int width, int height)
 
 void lcd_fillrect(int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x
     \param y
     \param width
@@ -970,7 +957,7 @@ void lcd_fillrect(int x, int y, int width, int height)
 
 fb_data* lcd_framebuffer
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \return
     \description Pointer to the framebuffer
     \see [S[firmware/export/lcd.h]]
@@ -985,55 +972,40 @@ int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 
 fb_data* lcd_get_backdrop(void)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \return Pointer to framebuffer data
     \description Gets the current backdrop
     \see lcd_framebuffer
 
 unsigned lcd_get_background(void)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \return
     \description
 
 int lcd_get_drawmode(void)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \return current LCD drawing mode
     \description
 
 unsigned lcd_get_foreground(void)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \return
     \description
 
-unsigned long lcd_get_locked_pattern(void)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \return
-    \description Get a locked pattern index
-    \see [S[firmware/drivers/lcd-player.c]]
-
 void lcd_hline(int x1, int x2, int y)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x1 X start coordinate
     \param x2 X end coordinate
     \param y Y coordinate
     \description Draws a horizontal line at (=x1=, =y=) -> (=x2=, =y=) within current drawing mode
 
-void lcd_icon(int icon, bool enable)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \param icon
-    \param enable
-    \description
-    \see [S[firmware/drivers/lcd-player.c]]
-
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param src
     \param x
     \param y
@@ -1043,7 +1015,7 @@ void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int heig
 
 void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y, int stride, int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param src
     \param src_x
     \param src_y
@@ -1053,14 +1025,6 @@ void lcd_mono_bitmap_part(const unsigned char *src, int src_x, int src_y, int st
     \param width
     \param height
     \description
-
-void lcd_putc(int x, int y, unsigned long ucs)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \param x
-    \param y
-    \param ucs
-    \description Put character =ucs= at coordinates (=x=, =y=)
 
 void lcd_puts(int x, int y, const unsigned char *string)
     \group lcd
@@ -1082,15 +1046,6 @@ void lcd_puts_scroll(int x, int y, const unsigned char* string)
     \param y Column Y
     \param string
     \description Puts scrolling string on the LCD at row =x= and column =y=. The scrolling style is STYLE_DEFAULT.
-
-void lcd_put_cursor(int x, int y, unsigned long ucs)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \param x
-    \param y
-    \param ucs
-    \description Put cursor at coordinates (=x=, =y=)
-    \see [S[firmware/export/lcd.h]]
 
 void lcd_remote_bitmap(const fb_remote_data *src, int x, int y, int width, int height)
     \conditions (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -1302,27 +1257,22 @@ void lcd_remote_vline(int x, int y1, int y2)
     \param y2
     \description
 
-void lcd_remove_cursor(void)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \description Remove the cursor from the screen
-
 void lcd_setfont(int font)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param font
     \description Set default font
 
 void lcd_set_backdrop(fb_data* backdrop)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \param backdrop Pointer to backdrop image
     \description Set the backdrop to =backdrop=
     \see lcd_framebuffer
 
 void lcd_set_background(unsigned foreground)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \param foreground
     \description
 
@@ -1333,19 +1283,19 @@ void lcd_set_contrast(int x)
 
 void lcd_set_drawmode(int mode)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param mode
     \description
 
 void lcd_set_foreground(unsigned foreground)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS)  && (LCD_DEPTH > 1)
+    \conditions defined(HAVE_LCD_BITMAP)  && (LCD_DEPTH > 1)
     \param foreground
     \description
 
 void lcd_set_invert_display(bool yesno)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (defined(HAVE_LCD_INVERT
+    \conditions defined(HAVE_LCD_BITMAP) )) && (defined(HAVE_LCD_INVERT
     \param yesno
     \description
 
@@ -1353,19 +1303,13 @@ void lcd_stop_scroll(void)
     \group lcd
     \description Stop all scrolling lines on the screen
 
-void lcd_unlock_pattern(unsigned long ucs)
-    \group lcd
-    \conditions (defined(HAVE_LCD_CHARCELLS))
-    \param ucs
-    \description Unlock pattern of index =ucs=
-
 void lcd_update(void)
     \group lcd
     \description Pushes LCD framebuffer changes to the LCD
 
 void lcd_update_rect(int x, int y, int width, int height)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x measured in pixels
     \param y measured in pixels
     \param width measured in pixels
@@ -1374,7 +1318,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 void lcd_vline(int x, int y1, int y2)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param x X coordinate
     \param y1 Y start coordinate
     \param y2 Y end coordinate
@@ -1382,7 +1326,7 @@ void lcd_vline(int x, int y1, int y2)
 
 void lcd_yuv_set_options(unsigned options)
     \group lcd
-    \conditions !defined(HAVE_LCD_CHARCELLS) )) && (LCD_DEPTH == 16) && (defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)  || defined(IRIVER_H10) || defined(COWON_D2
+    \conditions defined(HAVE_LCD_BITMAP) )) && (LCD_DEPTH == 16) && (defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)  || defined(IRIVER_H10) || defined(COWON_D2
     \param options
     \description
 
@@ -1932,7 +1876,7 @@ struct screen* screens[NB_SCREENS]
     \description
 
 void screen_clear_area(struct screen * display, int xstart, int ystart, int width, int height)
-    \conditions !defined(HAVE_LCD_CHARCELLS) 
+    \conditions defined(HAVE_LCD_BITMAP) 
     \param display
     \param xstart
     \param ystart

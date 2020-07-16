@@ -19,7 +19,6 @@
  *
  **************************************************************************/
 #include "plugin.h"
-#include "lib/playergfx.h"
 #include "lib/mylcd.h"
 #include "lib/pluginlib_actions.h"
 
@@ -143,11 +142,6 @@ static void snow_init(void)
         particles[i][0]=-1;
         particles[i][1]=-1;
     }        
-#ifdef HAVE_LCD_CHARCELLS
-    pgfx_display(0, 0); /* display three times */
-    pgfx_display(4, 0);
-    pgfx_display(8, 0);
-#endif
     mylcd_clear_display();
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_clear_display();
@@ -159,13 +153,6 @@ enum plugin_status plugin_start(const void* parameter)
     int button;
     (void)(parameter);
 
-#ifdef HAVE_LCD_CHARCELLS
-    if (!pgfx_init(4, 2))
-    {
-        rb->splash(HZ*2, "Old LCD :(");
-        return PLUGIN_OK;
-    }
-#endif
 #ifdef HAVE_LCD_COLOR
     rb->lcd_clear_display();
     rb->lcd_set_foreground(LCD_WHITE);
@@ -186,17 +173,11 @@ enum plugin_status plugin_start(const void* parameter)
 
         if ((button == SNOW_QUIT) || (button == SNOW_QUIT2))
         {
-#ifdef HAVE_LCD_CHARCELLS
-            pgfx_release();
-#endif
             return PLUGIN_OK;
         }
         else
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
             {
-#ifdef HAVE_LCD_CHARCELLS
-                pgfx_release();
-#endif
                 return PLUGIN_USB_CONNECTED;
             }
     }

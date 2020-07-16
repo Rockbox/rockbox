@@ -595,75 +595,6 @@ static void draw_info_panel(void)
                     GRID_TOP + 4*(TK_HEIGHT+TK_SPACE) + 2, s );
 }
 
-#else /* HAVE_LCD_CHARCELLS */
-
-static const unsigned char tk_pat[4][7] = {
-    { 0x0e, 0x11, 0x0e, 0x00, 0x0e, 0x11, 0x0e }, /* white - white */
-    { 0x0e, 0x11, 0x0e, 0x00, 0x0e, 0x1f, 0x0e }, /* white - black */
-    { 0x0e, 0x1f, 0x0e, 0x00, 0x0e, 0x11, 0x0e }, /* black - white */
-    { 0x0e, 0x1f, 0x0e, 0x00, 0x0e, 0x1f, 0x0e }  /* black - black */
-};
-
-static unsigned char cur_pat[7];
-static unsigned long gfx_chars[5];
-
-static void release_gfx(void)
-{
-    int i;
-    
-    for (i = 0; i < 5; i++)
-        if (gfx_chars[i])
-            rb->lcd_unlock_pattern(gfx_chars[i]);
-}
-
-static bool init_gfx(void)
-{
-    int i;
-
-    for (i = 0; i < 5; i++) {
-        if ((gfx_chars[i] = rb->lcd_get_locked_pattern()) == 0) {
-            release_gfx();
-            return false;
-        }
-    }
-    for (i = 0; i < 4; i++)
-        rb->lcd_define_pattern(gfx_chars[i], tk_pat[i]);
-    return true;
-}
-
-/* draw a spot at the coordinates (x,y), range of p is 0-19 */
-static void draw_spot(int p)
-{
-    if ((p/5) & 1)
-        p -= 5;
-
-    rb->lcd_putc (p%5, p/10, gfx_chars[2*spots[p]+spots[p+5]]);
-}
-
-/* draw the cursor at the current cursor position */
-static void draw_cursor(void) 
-{
-    if ((cursor_pos/5) & 1) {
-        rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos-5]+spots[cursor_pos]], 7 );
-        cur_pat[4] ^= 0x15;
-        cur_pat[6] ^= 0x11;
-    }
-    else {
-        rb->memcpy( cur_pat, tk_pat[2*spots[cursor_pos]+spots[cursor_pos+5]], 7 );
-        cur_pat[0] ^= 0x15;
-        cur_pat[2] ^= 0x11;
-    }
-    rb->lcd_define_pattern(gfx_chars[4], cur_pat);
-    rb->lcd_putc( cursor_pos%5, cursor_pos/10, gfx_chars[4] );
-}
-
-/* draw the info panel ... duh */
-static void draw_info_panel(void)
-{
-    rb->lcd_puts( 6, 0, "Flips" );
-    rb->lcd_putsf( 6, 1, "%d", moves );
-}
-
 #endif /* LCD */
 
 /* clear the cursor where it is */
@@ -978,9 +909,6 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     rb->lcd_update();
-#else /* HAVE_LCD_CHARCELLS */
-    if (!init_gfx())
-        return PLUGIN_ERROR;
 #endif
     rb->button_get_w_tmo(HZ*3);
 
@@ -995,8 +923,5 @@ enum plugin_status plugin_start(const void* parameter)
     rb->srand(*rb->current_tick);
 
     rc = flipit_loop();
-#ifdef HAVE_LCD_CHARCELLS
-    release_gfx();
-#endif
     return rc;
 }
