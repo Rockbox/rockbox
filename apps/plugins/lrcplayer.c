@@ -144,11 +144,7 @@ static struct viewport vp_lyrics[NB_SCREENS];
 
 #include "lib/pluginlib_actions.h"
 #define LST_SET_TIME    (LST_SET_MSEC|LST_SET_SEC|LST_SET_MIN|LST_SET_HOUR)
-#ifdef HAVE_LCD_CHARCELLS
-#define LST_OFF_Y 0
-#else /* HAVE_LCD_BITMAP */
 #define LST_OFF_Y 1
-#endif
 static int lrc_set_time(const char *title, const char *unit, long *pval,
                  int step, int min, int max, int flags)
 {
@@ -229,17 +225,11 @@ static int lrc_set_time(const char *title, const char *unit, long *pval,
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             rb->lcd_putsxy(x, y*(1+LST_OFF_Y), &buffer[p_start]);
             rb->lcd_set_drawmode(DRMODE_SOLID);
-#else
-            rb->lcd_put_cursor(x+rb->utf8length(&buffer[p_start])-1, y, 0x7F);
 #endif
         }
         rb->lcd_update();
         int button = pluginlib_getaction(TIMEOUT_BLOCK, lst_contexts, ARRAYLEN(lst_contexts));
         int mult = 1;
-#ifdef HAVE_LCD_CHARCELLS
-        if (pos_min != pos_max)
-            rb->lcd_remove_cursor();
-#endif
         switch (button)
         {
             case PLA_UP_REPEAT:
@@ -452,9 +442,7 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
         int word_count, word_width;
         const unsigned char *str;
     } 
-#ifndef HAVE_LCD_CHARCELLS 
         sp, 
-#endif
         cr;
 
     lrc_buffer_used = (lrc_buffer_used+3)&~3; /* 4 bytes aligned */
@@ -514,19 +502,15 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
     cr.nword = lrc_line->nword;
     lrc_word = lrc_line->words+cr.nword;
     cr.str = (lrc_word-1)->word;
-#ifndef HAVE_LCD_CHARCELLS
     sp.word_count = 0;
     sp.word_width = 0;
     sp.nword = 0;
     sp.count = 0;
     sp.width = 0;
-#endif
     do {
         cr.count = 0;
         cr.width = 0;
-#ifndef HAVE_LCD_CHARCELLS
         sp.str = NULL;
-#endif
 
         while (1)
         {
@@ -541,10 +525,6 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
                 break;
 
             int c, w;
-#ifdef HAVE_LCD_CHARCELLS
-            c = rb->utf8seek(cr.str, 1);
-            w = 1;
-#else
             c = ((intptr_t)rb->utf8decode(cr.str, &ch) - (intptr_t)cr.str);
             if (rb->is_diacritic(ch, NULL))
                 w = 0;
@@ -576,7 +556,6 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
                 }
                 break;
             }
-#endif
             cr.count += c;
             cr.width += w;
             lrc_word->count += c;
@@ -1916,38 +1895,6 @@ static void display_lrcs(void)
         }
         if (!lrc_line && ypos < vp_lyrics[i].height)
             display->putsxy(0, ypos, "[end]");
-#else /* HAVE_LCD_CHARCELLS */
-        struct lrc_line *lrc_line = lrc_center;
-        struct lrc_brpos *lrc_brpos = calc_brpos(lrc_line, i);
-        long elapsed = 0;
-        const char *str = get_lrc_str(lrc_line);
-        int x = vp_lyrics[i].width/2, y = 0;
-
-        if (rin >= 0 && len > 0)
-        {
-            elapsed = rin * lrc_center->width / len;
-            while (elapsed > lrc_brpos->width)
-            {
-                elapsed -= lrc_brpos->width;
-                str = lrc_skip_space(str+lrc_brpos->count);
-                lrc_brpos++;
-            }
-        }
-        rb->strlcpy(temp_buf, str, lrc_brpos->count+1);
-
-        x -= elapsed;
-        if (x < 0)
-            display->puts(0, y, temp_buf + rb->utf8seek(temp_buf, -x));
-        else
-            display->puts(x, y, temp_buf);
-        x += rb->utf8length(temp_buf)+1;
-        lrc_line = lrc_line->next;
-        if (!lrc_line && x < vp_lyrics[i].width)
-        {
-            if (x < vp_lyrics[i].width/2)
-                x = vp_lyrics[i].width/2;
-            display->puts(x, y, "[end]");
-        }
 #endif /* HAVE_LCD_BITMAP */
         display->update_viewport();
         display->set_viewport(NULL);
