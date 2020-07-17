@@ -1007,9 +1007,7 @@ static void show_help(void)
     rb->lcd_set_background(LCD_BLACK);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_UI);
-#endif
 
     static char *help_text[] = { "One-Time Password Manager", "",
                                  "Introduction", "",
