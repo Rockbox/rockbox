@@ -226,9 +226,7 @@ static void scrobbler_finish_event(unsigned short id, void *data)
 
     /* add entry using the currently ending track */
     if (pending && (te->flags & TEF_CURRENT)
-#if CONFIG_CODEC == SWCODEC
         && !(te->flags & TEF_REWIND)
-#endif
     )
     {
         pending = false;

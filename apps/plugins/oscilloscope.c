@@ -902,19 +902,11 @@ static int  last_right;
 
 static void get_peaks(int *left, int *right)
 {
-#if CONFIG_CODEC == SWCODEC
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
     *left = peaks.left;
     *right = peaks.right;
-#elif defined (SIMULATOR)
-    *left = rand() % 0x8000;
-    *right = rand() % 0x8000;
-#else
-    *left = 0;
-    *right = 0;
-#endif
 }
 
 static long get_next_delay(void)
