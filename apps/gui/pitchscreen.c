@@ -38,9 +38,7 @@
 #include "misc.h"
 #include "pitchscreen.h"
 #include "settings.h"
-#if CONFIG_CODEC == SWCODEC
 #include "tdspeed.h"
-#endif
 
 #define ICON_BORDER 12 /* icons are currently 7x8, so add ~2 pixels  */
                        /*   on both sides when drawing */
@@ -167,13 +165,9 @@ static bool at_limit = false;
 
 static void speak_pitch_mode(bool enqueue)
 {
-#if CONFIG_CODEC == SWCODEC
     bool timestretch_mode = global_settings.pitch_mode_timestretch && dsp_timestretch_available();
     if (timestretch_mode)
         talk_id(VOICE_PITCH_TIMESTRETCH_MODE, enqueue);
-#else
-#define timestretch_mode 0
-#endif
     if (global_settings.pitch_mode_semitone)
         talk_id(VOICE_PITCH_SEMITONE_MODE, timestretch_mode ? true : enqueue);
     else
@@ -238,9 +232,7 @@ static void pitchscreen_draw_icons(struct screen *display,
 static void pitchscreen_draw(struct screen *display, int max_lines,
                              struct viewport pitch_viewports[PITCH_ITEM_COUNT],
                              int32_t pitch, int32_t semitone
-#if CONFIG_CODEC == SWCODEC
                              ,int32_t speed
-#endif
                              )
 {
     const char* ptr;
@@ -308,7 +300,6 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     /* Middle section upper line - hide for a small screen */
     if ((show_lang_pitch = (max_lines >= 3)))
     {
-#if CONFIG_CODEC == SWCODEC
         if(global_settings.pitch_mode_timestretch)
         {
             /* Pitch:XXX.X% */
@@ -330,7 +321,6 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             }
         }
         else
-#endif
         {
             /* Rate */
             snprintf(buf, sizeof(buf), "%s:", str(LANG_PLAYBACK_RATE));
@@ -344,7 +334,6 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 
     /* Middle section lower line */
     /* "Speed:XXX%" */
-#if CONFIG_CODEC == SWCODEC
     if(global_settings.pitch_mode_timestretch)
     {
         snprintf(buf, sizeof(buf), "%s: %ld.%ld%%", str(LANG_SPEED), 
@@ -352,7 +341,6 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
                  (speed % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
     }
     else
-#endif
     {
         if(global_settings.pitch_mode_semitone)
         {
@@ -396,13 +384,11 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     /* Middle section left/right labels */
     const char *leftlabel = "-2%";
     const char *rightlabel = "+2%";
-#if CONFIG_CODEC == SWCODEC
     if (global_settings.pitch_mode_timestretch)
     {
         leftlabel = "<<";
         rightlabel = ">>";
     }
-#endif
 
     /* Only display if they fit */
     display->getstringsize(leftlabel, &w, &h);
@@ -423,16 +409,12 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
 }
 
 static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cutoff
-#if CONFIG_CODEC == SWCODEC
                           /* need this to maintain correct pitch/speed caps */
                           , int32_t speed
-#endif
                           )
 {
     int32_t new_pitch;
-#if CONFIG_CODEC == SWCODEC
     int32_t new_stretch;
-#endif
     at_limit = false;
 
     if (pitch_delta < 0)
@@ -480,7 +462,6 @@ static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cut
         /* pitch_delta == 0 -> no real change */
         return pitch;
     }
-#if CONFIG_CODEC == SWCODEC
     if (dsp_timestretch_available())
     {
         /* increase the multiple to increase precision of this calculation */
@@ -504,7 +485,6 @@ static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cut
             at_limit = true;
         }
     }
-#endif
 
     sound_set_pitch(new_pitch);
 
@@ -579,9 +559,7 @@ static int32_t get_pitch_from_semitone(int32_t semitone)
 static int32_t pitch_increase_semitone(int32_t pitch,
                                        int32_t current_semitone, 
                                        int32_t semitone_delta
-#if CONFIG_CODEC == SWCODEC
                                        , int32_t speed
-#endif                            
                                       )
 {
     int32_t new_semitone = current_semitone;
@@ -613,7 +591,6 @@ static int32_t pitch_increase_semitone(int32_t pitch,
 
     int32_t new_pitch = get_pitch_from_semitone(new_semitone);
 
-#if CONFIG_CODEC == SWCODEC
     int32_t new_stretch = GET_STRETCH(new_pitch, speed);
 
     /* clamp the pitch so it doesn't go beyond the stretch limits */
@@ -629,12 +606,9 @@ static int32_t pitch_increase_semitone(int32_t pitch,
         new_semitone = get_semitone_from_pitch(new_pitch);
         at_limit = true;
     }
-#endif
 
     pitch_increase(pitch, new_pitch - pitch, false
-#if CONFIG_CODEC == SWCODEC
                    , speed
-#endif          
                    );
 
     return new_semitone;
@@ -765,7 +739,6 @@ int gui_syncpitchscreen_run(void)
 
     push_current_activity(ACTIVITY_PITCHSCREEN);
 
-#if CONFIG_CODEC == SWCODEC
     int32_t new_speed = 0, new_stretch;
 
     /* the speed variable holds the apparent speed of the playback */
@@ -785,7 +758,6 @@ int gui_syncpitchscreen_run(void)
         global_settings.pitch_mode_timestretch = false;
         settings_save();
     }
-#endif
 
     /* Count decimals for speaking */
     for (i = PITCH_SPEED_PRECISION; i >= 10; i /= 10)
@@ -806,23 +778,17 @@ int gui_syncpitchscreen_run(void)
         /* also, draw the icons now, it's only needed once */
         pitchscreen_draw_icons(&screens[i], &parent[i]);
     }
-#if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(true);
-#endif
 
     while (!exit)
     {
         FOR_NB_SCREENS(i)
             pitchscreen_draw(&screens[i], max_lines[i],
                               pitch_viewports[i], pitch, semitone
-#if CONFIG_CODEC == SWCODEC
                               , speed
-#endif
                               );
         pitch_delta = 0;
-#if CONFIG_CODEC == SWCODEC
         new_speed = 0;
-#endif
 
         if (global_settings.talk_menu && updated)
         {
@@ -835,29 +801,23 @@ int gui_syncpitchscreen_run(void)
                 else
                     talk_value_decimal(pitch, UNIT_PERCENT, decimals, false);
                 break;
-#if CONFIG_CODEC == SWCODEC
             case 2:
                 talk_value_decimal(speed, UNIT_PERCENT, decimals, false);
                 break;
-#endif
             case 3:
                 speak_pitch_mode(false);
                 break;
             case 4:
-#if CONFIG_CODEC == SWCODEC
                 if (global_settings.pitch_mode_timestretch && dsp_timestretch_available())
                     talk_id(LANG_PITCH, false);
                 else
-#endif
                     talk_id(LANG_PLAYBACK_RATE, false);
                 talk_value_decimal(pitch, UNIT_PERCENT, decimals, true);
-#if CONFIG_CODEC == SWCODEC
                 if (global_settings.pitch_mode_timestretch && dsp_timestretch_available())
                 {
                     talk_id(LANG_SPEED, true);
                     talk_value_decimal(speed, UNIT_PERCENT, decimals, true);
                 }
-#endif
                 speak_pitch_mode(true);
                 break;
             default:
@@ -910,24 +870,17 @@ int gui_syncpitchscreen_run(void)
                 break;
 
             case ACTION_PS_NUDGE_RIGHT:
-#if CONFIG_CODEC == SWCODEC
                 if (!global_settings.pitch_mode_timestretch)
                 {
-#endif
                     new_pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false
-#if CONFIG_CODEC == SWCODEC
                                                , speed
-#endif                            
                         );
                     nudged = (new_pitch != pitch);
                     pitch = new_pitch;
                     semitone = get_semitone_from_pitch(pitch);
-#if CONFIG_CODEC == SWCODEC
                     speed = pitch;
-#endif
                     updated = nudged ? 1 : 0;
                     break;
-#if CONFIG_CODEC == SWCODEC
                 }
                 else
                 {
@@ -948,19 +901,14 @@ int gui_syncpitchscreen_run(void)
                     updated = 2;
                 }
                 break;
-#endif
 
             case ACTION_PS_NUDGE_RIGHTOFF:
                 if (nudged)
                 {
                     pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false
-#if CONFIG_CODEC == SWCODEC
                                            , speed
-#endif                            
                         );
-#if CONFIG_CODEC == SWCODEC
                     speed = pitch;
-#endif
                     semitone = get_semitone_from_pitch(pitch);
                     nudged = false;
                     updated = 1;
@@ -968,24 +916,17 @@ int gui_syncpitchscreen_run(void)
                 break;
 
             case ACTION_PS_NUDGE_LEFT:
-#if CONFIG_CODEC == SWCODEC
                 if (!global_settings.pitch_mode_timestretch)
                 {
-#endif
                     new_pitch = pitch_increase(pitch, -PITCH_NUDGE_DELTA, false
-#if CONFIG_CODEC == SWCODEC
                                                , speed
-#endif                            
                         );
                     nudged = (new_pitch != pitch);
                     pitch = new_pitch;
                     semitone = get_semitone_from_pitch(pitch);
-#if CONFIG_CODEC == SWCODEC
                     speed = pitch;
-#endif
                     updated = nudged ? 1 : 0;
                     break;
-#if CONFIG_CODEC == SWCODEC
                 }
                 else
                 {
@@ -1006,19 +947,14 @@ int gui_syncpitchscreen_run(void)
                     updated = 2;
                 }
                 break;
-#endif
 
             case ACTION_PS_NUDGE_LEFTOFF:
                 if (nudged)
                 {
                     pitch = pitch_increase(pitch, PITCH_NUDGE_DELTA, false
-#if CONFIG_CODEC == SWCODEC
                                            , speed
-#endif                            
                         );
-#if CONFIG_CODEC == SWCODEC
                     speed = pitch;
-#endif
                     semitone = get_semitone_from_pitch(pitch);
                     nudged = false;
                     updated = 1;
@@ -1028,21 +964,18 @@ int gui_syncpitchscreen_run(void)
             case ACTION_PS_RESET:
                 pitch = PITCH_SPEED_100;
                 sound_set_pitch(pitch);
-#if CONFIG_CODEC == SWCODEC
                 speed = PITCH_SPEED_100;
                 if (dsp_timestretch_available())
                 {
                     dsp_set_timestretch(PITCH_SPEED_100);
                     at_limit = false;
                 }
-#endif
                 semitone = get_semitone_from_pitch(pitch);
                 updated = 4;
                 break;
 
             case ACTION_PS_TOGGLE_MODE:
                 global_settings.pitch_mode_semitone = !global_settings.pitch_mode_semitone;
-#if CONFIG_CODEC == SWCODEC
 
                 if (dsp_timestretch_available() && !global_settings.pitch_mode_semitone)
                 {
@@ -1055,7 +988,6 @@ int gui_syncpitchscreen_run(void)
                     }
                 }
                 settings_save();
-#endif
                 updated = 3;
                 break;
 
@@ -1073,22 +1005,17 @@ int gui_syncpitchscreen_run(void)
             if (global_settings.pitch_mode_semitone)
             {
                 semitone = pitch_increase_semitone(pitch, semitone, pitch_delta
-#if CONFIG_CODEC == SWCODEC
                                                 , speed
-#endif                            
                 );
                 pitch = get_pitch_from_semitone(semitone);
             }
             else
             {
                 pitch = pitch_increase(pitch, pitch_delta, true
-#if CONFIG_CODEC == SWCODEC
                                        , speed
-#endif                            
                 );
                 semitone = get_semitone_from_pitch(pitch);
             }
-#if CONFIG_CODEC == SWCODEC
             if (global_settings.pitch_mode_timestretch)
             {
                 /* do this to make sure we properly obey the stretch limits */
@@ -1098,10 +1025,8 @@ int gui_syncpitchscreen_run(void)
             {
                 speed = pitch;
             }
-#endif
         }
 
-#if CONFIG_CODEC == SWCODEC
         if(new_speed)
         {
             new_stretch = GET_STRETCH(pitch, new_speed);
@@ -1135,11 +1060,8 @@ int gui_syncpitchscreen_run(void)
             /* when needed                                         */
             new_speed = 0;
         }
-#endif
     }
-#if CONFIG_CODEC == SWCODEC
     pcmbuf_set_low_latency(false);
-#endif
     pop_current_activity();
     return 0;
 }
