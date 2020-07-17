@@ -53,9 +53,6 @@
 #define RDA5802    0x80 /* RDA Microelectronics */
 #define STFM1000   0x100 /* Sigmatel */
 
-/* CONFIG_CODEC */
-#define SWCODEC  1    /* if codec is done by SW */
-
 /* CONFIG_CPU */
 #define MCF5249      5249
 #define MCF5250      5250
@@ -903,7 +900,6 @@ Lyre prototype 1 */
 #define HAVE_PICTUREFLOW_INTEGRATION
 #endif
 
-#if (CONFIG_CODEC == SWCODEC)
 #ifdef BOOTLOADER
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
@@ -974,8 +970,6 @@ Lyre prototype 1 */
 #if MEMORYSIZE > 2
 #define HAVE_CROSSFADE
 #endif
-
-#endif /*  (CONFIG_CODEC == SWCODEC) */
 
 /* Determine if accesses should be strictly long aligned. */
 #if defined(CPU_ARM) || defined(CPU_MIPS)
@@ -1248,19 +1242,16 @@ Lyre prototype 1 */
 #define HAVE_PCM_FULL_DUPLEX
 #endif
 
-#if (CONFIG_CODEC == SWCODEC)
 #define HAVE_PITCHCONTROL
-#endif
 
 /* enable logging messages to disk*/
-#if !defined(BOOTLOADER) && !defined(__PCTOOL__) && (CONFIG_CODEC == SWCODEC)
+#if !defined(BOOTLOADER) && !defined(__PCTOOL__)
 #define ROCKBOX_HAS_LOGDISKF
 #endif
 
 #if defined(HAVE_SDL_AUDIO) \
     && !(CONFIG_PLATFORM & PLATFORM_MAEMO5) \
-    && !defined(HAVE_SW_VOLUME_CONTROL) \
-    && CONFIG_CODEC == SWCODEC
+    && !defined(HAVE_SW_VOLUME_CONTROL)
 /* SW volume is needed for accurate control and no double buffering should be
  * required. If target uses SW volume, then its definitions are used instead
  * so things are as on target. */
