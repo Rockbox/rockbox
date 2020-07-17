@@ -47,10 +47,8 @@
 #include "albumart.h"
 #endif
 #include "playlist.h"
-#if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #include "tdspeed.h"
-#endif
 #include "viewport.h"
 #include "tagcache.h"
 
@@ -558,18 +556,16 @@ static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
         static char filename_buf[MAX_PATH + 1];
         fname = playlist_peek(offset, filename_buf, sizeof(filename_buf));
         *filename = (char*)fname;
-#if CONFIG_CODEC == SWCODEC
         static struct mp3entry tempid3;
         if (
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
             tagcache_fill_tags(&tempid3, fname) ||
-#endif 
+#endif
             audio_peek_track(&tempid3, offset)
         )
         {
             pid3 = &tempid3;
         }
-#endif  
     }
     return pid3;
 }
@@ -1224,7 +1220,6 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 
-#if (CONFIG_CODEC == SWCODEC)
         case SKIN_TOKEN_CROSSFADE:
 #ifdef HAVE_CROSSFADE
             if (intval)
@@ -1277,7 +1272,6 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             return buf;
         }
-#endif  /* (CONFIG_CODEC == SWCODEC) */
 
 #if defined (HAVE_PITCHCONTROL)
         case SKIN_TOKEN_SOUND_PITCH:
@@ -1294,7 +1288,7 @@ const char *get_token_value(struct gui_wps *gwps,
         }
 #endif
 
-#if (CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHCONTROL)
+#if defined (HAVE_PITCHCONTROL)
     case SKIN_TOKEN_SOUND_SPEED:
     {
         int32_t pitch = sound_get_pitch();
@@ -1462,7 +1456,6 @@ const char *get_token_value(struct gui_wps *gwps,
             return NULL;
         case SKIN_TOKEN_REC_FREQ: /* order from REC_FREQ_CFG_VAL_LIST */
         {
-#if CONFIG_CODEC == SWCODEC
             unsigned long samprk;
             int rec_freq = global_settings.rec_frequency;
 
@@ -1528,26 +1521,8 @@ const char *get_token_value(struct gui_wps *gwps,
                 }
             }
             snprintf(buf, buf_size, "%lu.%1lu", samprk/1000,samprk%1000);
-#else /* HWCODEC */
-            
-            static const char * const freq_strings[] =
-                {"--", "44", "48", "32", "22", "24", "16"};
-            int freq = 1 + global_settings.rec_frequency;
-#ifdef HAVE_SPDIF_REC
-            if (global_settings.rec_source == AUDIO_SRC_SPDIF)
-            {
-                /* Can't measure S/PDIF sample rate on Archos/Sim yet */
-                freq = 0;
-            }
-#endif /* HAVE_SPDIF_IN */
-            if (intval)
-                *intval = freq+1; /* so the token gets a value 1<=x<=7 */
-            snprintf(buf, buf_size, "%s\n",
-                        freq_strings[global_settings.rec_frequency]);
-#endif
             return buf;
         }
-#if CONFIG_CODEC == SWCODEC
         case SKIN_TOKEN_REC_ENCODER:
         {
             int rec_format = global_settings.rec_format+1; /* WAV, AIFF, WV, MPEG */
@@ -1568,9 +1543,7 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             break;
         }
-#endif
         case SKIN_TOKEN_REC_BITRATE:
-#if CONFIG_CODEC == SWCODEC
             if (global_settings.rec_format == REC_FORMAT_MPA_L3)
             {
                 if (intval)
@@ -1632,17 +1605,11 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             else
                 return NULL; /* Fixme later */
-#else /* CONFIG_CODEC == HWCODEC */
-            if (intval)
-                *intval = global_settings.rec_quality+1;
-            snprintf(buf, buf_size, "%d", global_settings.rec_quality);
-            return buf;
-#endif
         case SKIN_TOKEN_REC_MONO:
             if (!global_settings.rec_channels)
                 return "m";
             return NULL;
-            
+
         case SKIN_TOKEN_REC_SECONDS:
         {
             int time = (audio_recorded_time() / HZ) % 60;
