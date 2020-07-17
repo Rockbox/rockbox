@@ -1331,10 +1331,8 @@ static inline struct viewport* opt_viewport(lua_State *L,
     vp->y = check_tablevalue(L, "y", narg);
     vp->width = check_tablevalue(L, "width", narg);
     vp->height = check_tablevalue(L, "height", narg);
-#ifdef HAVE_LCD_BITMAP
     vp->font = check_tablevalue(L, "font", narg);
     vp->drawmode = check_tablevalue(L, "drawmode", narg);
-#endif
 #if LCD_DEPTH > 1
     vp->fg_pattern = (unsigned int) check_tablevalue(L, "fg_pattern", narg);
     vp->bg_pattern = (unsigned int) check_tablevalue(L, "bg_pattern", narg);
@@ -1379,7 +1377,6 @@ RB_WRAP(font_getstringsize)
     return 3;
 }
 
-#ifdef HAVE_LCD_BITMAP
 RB_WRAP(lcd_framebuffer)
 {
     rli_wrap(L, rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
@@ -1620,8 +1617,6 @@ RB_WRAP(lcd_drawpixel)
     return 0;
 }
 
-#endif /* defined(LCD_BITMAP) */
-
 #ifdef HAVE_LCD_COLOR
 RB_WRAP(lcd_rgbpack)
 {
@@ -1690,7 +1685,6 @@ static const luaL_Reg rocklib_img[] =
     R(set_viewport),
     R(clear_viewport),
     R(font_getstringsize),
-#ifdef HAVE_LCD_BITMAP
     R(lcd_framebuffer),
     R(lcd_setfont),
     R(gui_scrollbar_draw),
@@ -1721,7 +1715,6 @@ static const luaL_Reg rocklib_img[] =
     R(lcd_vline),
     R(lcd_drawpixel),
 
-#endif /*HAVE_LCD_BITMAP*/
 #ifdef HAVE_LCD_COLOR
     R(lcd_rgbpack),
     R(lcd_rgbunpack),
