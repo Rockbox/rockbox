@@ -534,8 +534,6 @@ static int spots[20];
 static int toggle[20];
 static int cursor_pos, moves;
 
-#ifdef HAVE_LCD_BITMAP
-
 #include "pluginbitmaps/flipit_cursor.h"
 #include "pluginbitmaps/flipit_tokens.h"
 
@@ -594,8 +592,6 @@ static void draw_info_panel(void)
     rb->lcd_putsxy( (LCD_WIDTH - rb->lcd_getstringsize(s, NULL, NULL)) / 2,
                     GRID_TOP + 4*(TK_HEIGHT+TK_SPACE) + 2, s );
 }
-
-#endif /* LCD */
 
 /* clear the cursor where it is */
 static inline void clear_cursor(void)
@@ -829,7 +825,6 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->splash(HZ, "FlipIt!");
 
-#ifdef HAVE_LCD_BITMAP
     /* print instructions */
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
@@ -909,7 +904,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
 
     rb->lcd_update();
-#endif
+
     rb->button_get_w_tmo(HZ*3);
 
     rb->lcd_clear_display();
