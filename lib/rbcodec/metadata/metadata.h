@@ -37,7 +37,6 @@ enum
     AFMT_MPA_L2,       /* MPEG Audio layer 2 */
     AFMT_MPA_L3,       /* MPEG Audio layer 3 */
 
-#if CONFIG_CODEC == SWCODEC
     AFMT_AIFF,         /* Audio Interchange File Format */
     AFMT_PCM_WAV,      /* Uncompressed PCM in a WAV file */
     AFMT_OGG_VORBIS,   /* Ogg Vorbis */
@@ -91,7 +90,6 @@ enum
     AFMT_KSS,          /* KSS (MSX computer KSS Music File) */
     AFMT_OPUS,         /* Opus (see http://www.opus-codec.org ) */
     AFMT_AAC_BSF,
-#endif
 
     /* add new formats at any index above this line to have a sensible order -
        specified array index inits are used */
@@ -99,7 +97,7 @@ enum
 
     AFMT_NUM_CODECS,
 
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+#if defined(HAVE_RECORDING)
     /* masks to decompose parts */
     CODEC_AFMT_MASK    = 0x0fff,
     CODEC_TYPE_MASK    = 0x7000,
@@ -107,10 +105,9 @@ enum
     /* switch for specifying codec type when requesting a filename */
     CODEC_TYPE_DECODER = (0 << 12), /* default */
     CODEC_TYPE_ENCODER = (1 << 12),
-#endif /* CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING) */
+#endif /* defined(HAVE_RECORDING) */
 };
 
-#if CONFIG_CODEC == SWCODEC
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 #define CODEC_EXTENSION "so"
 #define CODEC_PREFIX "lib"
@@ -157,23 +154,15 @@ extern const int rec_format_afmt[REC_NUM_FORMATS];
     { label, root_fname, func, ext_list }
 #endif /* HAVE_RECORDING */
 
-#else /* !SWCODEC */
-
-#define AFMT_ENTRY(label, root_fname, enc_root_fname, func, ext_list) \
-    { label, func, ext_list }
-#endif /* CONFIG_CODEC == SWCODEC */
-
 /** Database of audio formats **/
 /* record describing the audio format */
 struct mp3entry;
 struct afmt_entry
 {
     const char *label;      /* format label */
-#if CONFIG_CODEC == SWCODEC
     const char *codec_root_fn; /* root codec filename (sans _enc and .codec) */
 #ifdef HAVE_RECORDING
     const char *codec_enc_root_fn; /* filename of encoder codec */
-#endif
 #endif
     bool (*parse_func)(int fd, struct mp3entry *id3); /* return true on success */
     const char *ext_list;    /* NULL terminated extension
@@ -305,14 +294,12 @@ struct mp3entry {
 #endif
     
     /* replaygain support */
-#if CONFIG_CODEC == SWCODEC
     long track_level;   /* holds the level in dB * (1<<FP_BITS) */
     long album_level;
     long track_gain;    /* s19.12 signed fixed point. 0 for no gain. */
     long album_gain;
     long track_peak;    /* s19.12 signed fixed point. 0 for no peak. */
     long album_peak;
-#endif
 
 #ifdef HAVE_ALBUMART
     bool has_embedded_albumart;
@@ -335,13 +322,11 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig);
 void copy_mp3entry(struct mp3entry *dest, const struct mp3entry *orig);
 void wipe_mp3entry(struct mp3entry *id3);
 
-#if CONFIG_CODEC == SWCODEC
 void fill_metadata_from_path(struct mp3entry *id3, const char *trackname);
 int get_audio_base_codec_type(int type);
 void strip_tags(int handle_id);
 bool rbcodec_format_is_atomic(int afmt);
 bool format_buffers_with_offset(int afmt);
-#endif
 
 #endif
 
