@@ -220,7 +220,6 @@ static int plugin_main(void)
         rb->sleep(1);
         rb->lcd_clear_display();
 
-#if (CONFIG_CODEC == SWCODEC)
         /* This will make the stars pulse to the music */
         if(pulse){
 
@@ -255,7 +254,7 @@ static int plugin_main(void)
             starfield.z_move = avg_peak;
 
         } /* if pulse */
-#endif
+
         starfield_move_and_draw(&starfield);
 
 #ifdef HAVE_LCD_COLOR

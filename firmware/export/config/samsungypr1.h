@@ -89,8 +89,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* R1 KeyPad configuration for plugins */
 #define CONFIG_KEYPAD SAMSUNG_YPR1_PAD

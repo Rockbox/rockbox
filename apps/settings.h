@@ -30,10 +30,8 @@
 #include "statusbar.h" /* for the statusbar values */
 #include "quickscreen.h"
 #include "button.h"
-#if CONFIG_CODEC == SWCODEC
 #include "audio.h"
 #include "dsp_proc_settings.h"
-#endif
 #include "rbpaths.h"
 
 struct opt_items {
@@ -218,9 +216,7 @@ enum {
 #ifdef HAVE_RECORDING
     SETTINGS_SAVE_RECPRESETS,
 #endif
-#if CONFIG_CODEC == SWCODEC
     SETTINGS_SAVE_EQPRESET,
-#endif
 };
 bool settings_save_config(int options);
 
@@ -307,17 +303,6 @@ struct user_settings
     int channel_config; /* Stereo, Mono, Custom, Mono left, Mono right, Karaoke */
     int stereo_width; /* 0-255% */
 
-#if CONFIG_CODEC != SWCODEC
-    int  loudness;      /* loudness eq:          0-100 0=off   100=max         */
-    int  avc;           /* auto volume correct:  0=off, 1=20ms, 2=2s 3=4s 4=8s */
-    int  mdb_strength;  /* 0-127dB */
-    int  mdb_harmonics; /* 0-100% */
-    int  mdb_center;    /* 20-300Hz */
-    int  mdb_shape;     /* 50-300Hz */
-    bool mdb_enable;    /* true/false */
-    bool superbass;     /* true/false */
-#endif
-
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     int bass_cutoff;
 #endif
@@ -325,7 +310,6 @@ struct user_settings
     int treble_cutoff;
 #endif
 
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_CROSSFADE
     /* Crossfade */
     int crossfade;     /* Enable crossfade (0=off, 1=shuffle, 2=trackskip,
@@ -360,10 +344,8 @@ struct user_settings
 #ifdef HAVE_PITCHCONTROL
     bool timestretch_enabled;
 #endif
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_RECORDING
-#if CONFIG_CODEC == SWCODEC
     int rec_format;    /* record format index */
     int rec_mono_mode; /* how to create mono: L, R, L+R */
 
@@ -377,9 +359,6 @@ struct user_settings
 #endif
     /* Encoder Settings End */
 
-#else
-    int rec_quality;   /* 0-7 */
-#endif  /* CONFIG_CODEC == SWCODEC */
     int rec_source;    /* 0=mic, 1=line, 2=S/PDIF, 2 or 3=FM Radio */
     int rec_frequency; /* 0 = 44.1kHz (depends on target)
                           1 = 48kHz
@@ -754,9 +733,7 @@ struct user_settings
 #ifdef HAVE_PITCHCONTROL
     /* pitch screen settings */
     bool pitch_mode_semitone;
-#if CONFIG_CODEC == SWCODEC
     bool pitch_mode_timestretch;
-#endif
 #endif
     /* If values are just added to the end, no need to bump plugin API
        version. */
@@ -778,9 +755,7 @@ struct user_settings
 #endif
 #endif
 
-#if CONFIG_CODEC == SWCODEC
     struct compressor_settings compressor_settings;
-#endif
 
     int sleeptimer_duration; /* In minutes; 0=off */
     bool sleeptimer_on_startup;
@@ -797,10 +772,8 @@ struct user_settings
     int hotkey_tree;
 #endif
 
-#if CONFIG_CODEC == SWCODEC
     /* When resuming playback (after a stop), rewind this number of seconds */
     int resume_rewind;
-#endif
 
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     int depth_3d;
@@ -830,9 +803,7 @@ struct user_settings
 #endif /* AUDIOHW_HAVE_EQ */
 
 #ifdef HAVE_HARDWARE_CLICK
-#if CONFIG_CODEC == SWCODEC
     bool keyclick_hardware; /* hardware piezo keyclick */
-#endif
 #endif
 
     char start_directory[MAX_PATHNAME+1];

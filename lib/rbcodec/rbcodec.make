@@ -22,6 +22,4 @@ CORE_LIBS := $(RBCODECLIB) $(CORE_LIBS)
 $(RBCODECLIB): $(RBCODECLIB_OBJ)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-ifdef SOFTWARECODECS
-  include $(RBCODECLIB_DIR)/codecs/codecs.make
-endif
+include $(RBCODECLIB_DIR)/codecs/codecs.make

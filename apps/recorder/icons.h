@@ -42,9 +42,6 @@ enum icons_5x8 {
     Icon_Lock_Remote,
     Icon_Stereo,
     Icon_Mono,
-#if CONFIG_CODEC != SWCODEC
-    Icon_q,
-#endif
     Icon5x8Last
 };
 
@@ -70,7 +67,7 @@ enum icons_7x8 {
     Icon7x8Last
 };
 
-#if CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING)
+#if defined (HAVE_RECORDING)
 #define BM_GLYPH_WIDTH 4
 enum Glyphs_4x8 {
     Glyph_4x8_0 = 0,
@@ -100,7 +97,7 @@ enum rec_format_18x8 {
 };
 extern const unsigned char bitmap_formats_18x8[Format_18x8Last][18];
 
-#endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
+#endif /* defined (HAVE_RECORDING) */
 
 extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];

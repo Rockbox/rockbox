@@ -31,17 +31,14 @@
 #include "lcd.h"
 #include "led.h"
 #include "audio.h"
-#if CONFIG_CODEC == SWCODEC
 #include "thread.h"
 #include "enc_config.h"
 #include "playback.h"
 #if defined(HAVE_SPDIF_IN) || defined(HAVE_SPDIF_OUT)
 #include "spdif.h"
 #endif
-#endif /* CONFIG_CODEC == SWCODEC */
 #include "pcm_record.h"
 #include "recording.h"
-#include "mp3_playback.h"
 #include "button.h"
 #include "kernel.h"
 #include "settings.h"
@@ -166,18 +163,8 @@ static bool update_list = false;   /* (GIU) list needs updating */
 static int file_number = -1;
 #endif /* CONFIG_RTC */
 
-#if CONFIG_CODEC == SWCODEC
-
 #define REC_FILE_ENDING(rec_format) \
     (audio_formats[rec_format_afmt[rec_format]].ext_list)
-
-#else  /* CONFIG_CODEC != SWCODEC */
-
-/* default record file extension for HWCODEC */
-#define REC_FILE_ENDING(rec_format) \
-    (audio_formats[AFMT_MPA_L3].ext_list)
-
-#endif /* CONFIG_CODEC == SWCODEC */
 
 /* path for current file */
 static char path_buffer[MAX_PATH];
@@ -607,18 +594,12 @@ void rec_init_recording_options(struct audio_recording_options *options)
     options->rec_frequency         = global_settings.rec_frequency;
     options->rec_channels          = global_settings.rec_channels;
     options->rec_prerecord_time    = global_settings.rec_prerecord_time;
-#if CONFIG_CODEC == SWCODEC
     options->rec_mono_mode         = global_settings.rec_mono_mode;
     options->rec_source_flags      = 0;
     options->enc_config.rec_format = global_settings.rec_format;
     global_to_encoder_config(&options->enc_config);
-#else
-    options->rec_quality           = global_settings.rec_quality;
-    options->rec_editable          = global_settings.rec_editable;
-#endif
 }
 
-#if CONFIG_CODEC == SWCODEC
 void rec_set_source(int source, unsigned flags)
 {
     /* Set audio input source, power up/down devices */
@@ -628,14 +609,11 @@ void rec_set_source(int source, unsigned flags)
     peak_meter_playback((flags & SRCF_RECORDING) == 0);
     peak_meter_enable(true);
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 
 void rec_set_recording_options(struct audio_recording_options *options)
 {
-#if CONFIG_CODEC == SWCODEC
     rec_set_source(options->rec_source,
                    options->rec_source_flags | SRCF_RECORDING);
-#endif
     audio_set_recording_options(options);
 }
 
@@ -646,9 +624,7 @@ void rec_command(enum recording_command cmd)
         case RECORDING_CMD_STOP_SHUTDOWN:
             pm_activate_clipcount(false);
             audio_stop_recording();
-#if CONFIG_CODEC == SWCODEC
             audio_close_recording();
-#endif
             sys_poweroff();
             break;
         case RECORDING_CMD_STOP:
@@ -695,12 +671,6 @@ static void trigger_listener(int trigger_status)
             if(!(audio_status() & AUDIO_STATUS_RECORD))
             {
                 rec_status |= RCSTAT_HAVE_RECORDED;
-                rec_command(RECORDING_CMD_START);
-#if CONFIG_CODEC != SWCODEC
-                /* give control to mpeg thread so that it can start
-                   recording */
-                yield(); yield(); yield();
-#endif
             }
 
             /* if we're already recording this is a retrigger */
@@ -791,14 +761,9 @@ enum rec_list_items_mono {
 #ifdef HAVE_SPDIF_REC
 enum rec_list_items_spdif {
     ITEM_VOLUME_D = 0,
-#if CONFIG_CODEC == SWCODEC
     ITEM_SAMPLERATE_D = 6,
     ITEM_FILENAME_D = 7,
     ITEM_COUNT_D = 3,
-#else
-    ITEM_FILENAME_D = 7,
-    ITEM_COUNT_D = 2,
-#endif
 };
 #endif
 
@@ -892,13 +857,11 @@ static const char* reclist_get_name(int selected_item, void * data,
                                   buf3, sizeof(buf3)));
             break;
 #endif
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_SPDIF_REC
         case ITEM_SAMPLERATE_D:
             snprintf(buffer, buffer_len, "%s: %lu",
                      str(LANG_FREQUENCY), pcm_rec_sample_rate());
             break;
-#endif
 #endif
         case ITEM_FILENAME:
         {
@@ -973,15 +936,11 @@ bool recording_screen(bool no_source)
     const unsigned long split_seconds = (unsigned) global_settings.rec_timesplit * 60;
     const unsigned long split_bytes = rec_sizesplit_bytes();
 
-#if CONFIG_CODEC == SWCODEC
     int warning_counter = 0;
     #define WARNING_PERIOD 7
-#endif
 
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_SPDIF_REC
     unsigned long prev_sample_rate = 0;
-#endif
 #endif
 
 #ifdef HAVE_FMRADIO_REC
@@ -1030,7 +989,6 @@ bool recording_screen(bool no_source)
     ata_set_led_enabled(false);
 #endif
 
-#if CONFIG_CODEC == SWCODEC
     /* hardware samplerate gets messed up so prevent mixer playing */
     int keyclick = global_settings.keyclick;
     global_settings.keyclick = 0;
@@ -1039,11 +997,6 @@ bool recording_screen(bool no_source)
     talk_disable(true);
     /* audio_init_recording stops anything playing when it takes the audio
        buffer */
-#else
-    /* Yes, we use the D/A for monitoring */
-    peak_meter_enable(true);
-    peak_meter_playback(true);
-#endif
 
 #ifdef HAVE_AGC
     peak_meter_get_peakhold(&peak_l, &peak_r);
@@ -1175,7 +1128,7 @@ bool recording_screen(bool no_source)
                 goto rec_abort;
             }
 
-#if CONFIG_CODEC == SWCODEC && CONFIG_RTC == 0
+#if CONFIG_RTC == 0
             /* If format changed, a new number is required */
             rec_init_filename();
 #endif
@@ -1202,12 +1155,8 @@ bool recording_screen(bool no_source)
             if(global_settings.rec_source == AUDIO_SRC_SPDIF)
             {
                 listid_to_enum[0] = ITEM_VOLUME_D;
-#if CONFIG_CODEC == SWCODEC
                 listid_to_enum[1] = ITEM_SAMPLERATE_D;
                 listid_to_enum[2] = ITEM_FILENAME_D;
-#else
-                listid_to_enum[1] = ITEM_FILENAME_D;
-#endif
 
                 gui_synclist_set_nb_items(&lists, ITEM_COUNT_D);   /* spdif */
             }
@@ -1452,10 +1401,6 @@ bool recording_screen(bool no_source)
                 }
                 else
                 {
-#if CONFIG_CODEC != SWCODEC
-                    peak_meter_playback(true);
-                    peak_meter_enable(false);
-#endif
                     done = 1;
                 }
                 update_countdown = 0; /* Update immediately */
@@ -1543,11 +1488,7 @@ bool recording_screen(bool no_source)
                 update_countdown = 0; /* Update immediately */
                 break;
             case ACTION_STD_MENU:
-#if CONFIG_CODEC == SWCODEC
                 if(!(audio_stat & AUDIO_STATUS_RECORD))
-#else
-                    if(audio_stat != AUDIO_STATUS_RECORD)
-#endif
                 {
 #if (CONFIG_LED == LED_REAL)
                     /* led is restored at begin of loop / end of function */
@@ -1622,7 +1563,6 @@ bool recording_screen(bool no_source)
             dsize = split_bytes;
             num_recorded_bytes = audio_num_recorded_bytes();
 
-#if CONFIG_CODEC == SWCODEC
             if ((audio_stat & AUDIO_STATUS_WARNING)
                 && (warning_counter++ % WARNING_PERIOD) < WARNING_PERIOD/2)
             {
@@ -1635,7 +1575,6 @@ bool recording_screen(bool no_source)
                          (unsigned long)pcm_rec_get_warnings());
             }
             else
-#endif /* CONFIG_CODEC == SWCODEC */
             if ((global_settings.rec_sizesplit) &&
                 (global_settings.rec_split_method))
             {
@@ -1657,16 +1596,11 @@ bool recording_screen(bool no_source)
 
             if(audio_stat & AUDIO_STATUS_PRERECORD)
             {
-#if CONFIG_CODEC == SWCODEC
                 /* Tracks amount of prerecorded data in buffer */
                 snprintf(buf, sizeof(buf), "%s (%lu/%ds)...",
                          str(LANG_RECORD_PRERECORD),
                          audio_prerecorded_time() / HZ,
                          global_settings.rec_prerecord_time);
-#else /* !SWCODEC */
-                snprintf(buf, sizeof(buf), "%s...",
-                         str(LANG_RECORD_PRERECORD));
-#endif /* CONFIG_CODEC == SWCODEC */
             }
             else
             {
@@ -1782,7 +1716,6 @@ bool recording_screen(bool no_source)
             }
 #endif /* HAVE_AGC */
 
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_SPDIF_REC
             if((global_settings.rec_source == AUDIO_SRC_SPDIF) &&
                (prev_sample_rate != pcm_rec_sample_rate()))
@@ -1791,7 +1724,6 @@ bool recording_screen(bool no_source)
                 prev_sample_rate = pcm_rec_sample_rate();
                 update_list = true;
             }
-#endif
 #endif
 
             if(update_list)
@@ -1824,11 +1756,9 @@ bool recording_screen(bool no_source)
         FOR_NB_SCREENS(i)
             screens[i].update();
 
-#if CONFIG_CODEC == SWCODEC
         /* stop recording first and try to finish saving whatever it can */
         rec_command(RECORDING_CMD_STOP);
         audio_close_recording();
-#endif
 
         audio_error_clear();
 
@@ -1841,7 +1771,6 @@ bool recording_screen(bool no_source)
 
 rec_abort:
 
-#if CONFIG_CODEC == SWCODEC
     rec_command(RECORDING_CMD_STOP);
     audio_close_recording();
 
@@ -1861,9 +1790,6 @@ rec_abort:
 
     /* restore keyclick */
     global_settings.keyclick = keyclick;
-#else /* !SWCODEC */
-    audio_init_playback();
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_SPEAKER
     /* Re-enable speaker */
@@ -1895,12 +1821,10 @@ rec_abort:
     return (rec_status & RCSTAT_BEEN_IN_USB_MODE) != 0;
 } /* recording_screen */
 
-#if CONFIG_CODEC == SWCODEC
 void audio_beep(int duration)
 {
     /* dummy */
     (void)duration;
 }
-#endif /* #ifdef CONFIG_CODEC == SWCODEC */
 
 #endif /* HAVE_RECORDING */

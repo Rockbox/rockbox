@@ -92,8 +92,8 @@
 #define CONFIG_TUNER TEA5767
 #define CONFIG_TUNER_XTAL 32768
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* Define this if you have the TLV320 audio codec */
 /*#define HAVE_TLV320*/

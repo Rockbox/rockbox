@@ -65,8 +65,6 @@
 extern bool debug_audio;
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-
 /* Declarations for libplayblack */
 pb_playback_t *playback = NULL;
 void playback_state_req_handler(pb_playback_t *pb,
@@ -481,5 +479,3 @@ unsigned long spdif_measure_frequency(void)
 #endif
 
 #endif /* HAVE_RECORDING */
-
-#endif /* CONFIG_CODEC == SWCODEC */

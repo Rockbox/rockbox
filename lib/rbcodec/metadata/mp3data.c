@@ -115,11 +115,6 @@ static bool is_mp3frameheader(unsigned long head)
         return false;
     if (!(head & LAYER_MASK)) /* no layer? */
         return false;
-#if CONFIG_CODEC != SWCODEC
-    /* The MAS can't decode layer 1, so treat layer 1 data as invalid */
-    if ((head & LAYER_MASK) == LAYER_MASK)
-        return false;
-#endif
     if ((head & BITRATE_MASK) == BITRATE_MASK) /* bad bitrate? */
         return false;
     if (!(head & BITRATE_MASK)) /* no bitrate? */
@@ -454,7 +449,6 @@ static void get_xing_info(struct mp3info *info, unsigned char *buf)
         /* We don't care about this, but need to skip it */
         i += 4;
     }
-#if CONFIG_CODEC==SWCODEC
     i += 21;
     info->enc_delay   = ((int)buf[i  ] << 4) | (buf[i+1] >> 4);
     info->enc_padding = ((int)(buf[i+1]&0xF) << 8) |  buf[i+2];
@@ -467,7 +461,6 @@ static void get_xing_info(struct mp3info *info, unsigned char *buf)
        info->enc_delay   = -1;
        info->enc_padding = -1;
     }
-#endif
 }
 
 /* Extract information from a 'VBRI' header. */
@@ -541,18 +534,16 @@ int get_mp3file_info(int fd, struct mp3info *info)
     /* Initialize info and frame */
     memset(info,  0, sizeof(struct mp3info));
     memset(frame, 0, sizeof(frame));
-    
-#if CONFIG_CODEC==SWCODEC
+
     /* These two are needed for proper LAME gapless MP3 playback */
     info->enc_delay   = -1;
     info->enc_padding = -1;
-#endif
 
     /* Get the very first single MPEG frame. */
     result = get_next_header_info(fd, &bytecount, info, true);
     if(result)
         return result;
-    
+
     /* Read the amount of frame data to the buffer that is required for the 
      * vbr tag parsing. Skip the rest. */
     buf_size = MIN(info->frame_size-4, (int)sizeof(frame));

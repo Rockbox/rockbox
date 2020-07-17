@@ -31,7 +31,6 @@
 #include "time.h"
 #include "timefuncs.h"
 
-#if CONFIG_CODEC == SWCODEC
 int round_value_to_list32(unsigned long value,
                           const unsigned long list[],
                           int count,
@@ -87,7 +86,6 @@ int make_list_from_caps32(unsigned long src_mask,
 
     return count;
 } /* make_list_from_caps32 */
-#endif /* CONFIG_CODEC == SWCODEC */
 
 /* Create a filename with a number part in a way that the number is 1
  * higher than the highest numbered file matching the same pattern.

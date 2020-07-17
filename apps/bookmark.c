@@ -183,13 +183,6 @@ bool bookmark_autobookmark(bool prompt_ok)
     audio_pause();    /* first pause playback */
     update = (global_settings.autoupdatebookmark && bookmark_exists());
     bookmark = create_bookmark();
-#if CONFIG_CODEC != SWCODEC
-    /* Workaround for inability to speak when paused: all callers will
-       just do audio_stop() when we return, so we can do it right
-       away. This makes it possible to speak the "Create a Bookmark?"
-       prompt and the "Bookmark Created" splash. */
-    audio_stop();
-#endif
 
     if (update)
         return write_bookmark(true, bookmark);
@@ -415,13 +408,13 @@ static char* create_bookmark()
     snprintf(global_bookmark, sizeof(global_bookmark),
              /* new optional bookmark token descriptors should be inserted
                 just before the "%s;%s" in this line... */
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_PITCHCONTROL)
+#if defined(HAVE_PITCHCONTROL)
              ">%d;%d;%ld;%d;%ld;%d;%d;%ld;%ld;%s;%s",
 #else
              ">%d;%d;%ld;%d;%ld;%d;%d;%s;%s",
 #endif
              /* ... their flags should go here ... */
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_PITCHCONTROL)
+#if defined(HAVE_PITCHCONTROL)
              BM_PITCH | BM_SPEED,
 #else
              0,
@@ -433,7 +426,7 @@ static char* create_bookmark()
              global_settings.repeat_mode,
              global_settings.playlist_shuffle,
              /* ...and their values should go here */
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_PITCHCONTROL)
+#if defined(HAVE_PITCHCONTROL)
              (long)sound_get_pitch(),
              (long)dsp_get_timestretch(),
 #endif
@@ -950,7 +943,6 @@ static void say_bookmark(const char* bookmark,
 
     talk_number(bookmark_id + 1, false);
 
-#if CONFIG_CODEC == SWCODEC
     bool is_dir = (global_temp_buffer[0]
               && global_temp_buffer[strlen(global_temp_buffer)-1] == '/');
 
@@ -965,9 +957,6 @@ static void say_bookmark(const char* bookmark,
         else talk_file_or_spell(NULL, global_temp_buffer,
                                 TALK_IDARRAY(LANG_PLAYLIST), true);
     }
-#else
-    (void)show_playlist_name;
-#endif
 
     if(bm.shuffle)
         talk_id(LANG_SHUFFLE, true);
@@ -977,13 +966,11 @@ static void say_bookmark(const char* bookmark,
     talk_id(LANG_TIME, true);
     talk_value(bm.resume_time / 1000, UNIT_TIME, true);
 
-#if CONFIG_CODEC == SWCODEC
     /* Track filename */
     if(!is_dir)
         global_temp_buffer[0] = 0;
     talk_file_or_spell(global_temp_buffer, global_filename,
                        TALK_IDARRAY(VOICE_FILE), true);
-#endif
 }
 
 /* ----------------------------------------------------------------------- */
@@ -992,17 +979,17 @@ static void say_bookmark(const char* bookmark,
 /* ------------------------------------------------------------------------*/
 static bool play_bookmark(const char* bookmark)
 {
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_PITCHCONTROL)
+#if defined(HAVE_PITCHCONTROL)
     /* preset pitch and speed to 100% in case bookmark doesn't have info */
     bm.pitch = sound_get_pitch();
     bm.speed = dsp_get_timestretch();
 #endif
-    
+
     if (parse_bookmark(bookmark, true, true))
     {
         global_settings.repeat_mode = bm.repeat_mode;
         global_settings.playlist_shuffle = bm.shuffle;
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_PITCHCONTROL)
+#if defined(HAVE_PITCHCONTROL)
         sound_set_pitch(bm.pitch);
         dsp_set_timestretch(bm.speed);
 #endif
@@ -1011,7 +998,7 @@ static bool play_bookmark(const char* bookmark)
         return bookmark_play(global_temp_buffer, bm.resume_index,
             bm.resume_time, bm.resume_offset, bm.resume_seed, global_filename);
     }
-    
+
     return false;
 }
 

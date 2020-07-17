@@ -77,8 +77,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* Define this if you have the TLV320 audio codec */
 #define HAVE_TLV320

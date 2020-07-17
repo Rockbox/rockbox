@@ -67,8 +67,8 @@
 
 #define CONFIG_KEYPAD MPIO_HD300_PAD
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* Define this if you have RTC */
 #define CONFIG_RTC RTC_S35380A

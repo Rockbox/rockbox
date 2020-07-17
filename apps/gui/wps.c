@@ -33,7 +33,6 @@
 #include "filetypes.h"
 #include "settings.h"
 #include "skin_engine/skin_engine.h"
-#include "mp3_playback.h"
 #include "audio.h"
 #include "usb.h"
 #include "status.h"
@@ -124,26 +123,17 @@ static void update_non_static(void)
 
 void pause_action(bool may_fade, bool updatewps)
 {
-#if CONFIG_CODEC == SWCODEC
     /* Do audio first, then update, unless skin were to use its local
        status in which case, reverse it */
     audio_pause();
 
     if (updatewps)
         update_non_static();
-#else
-    if (may_fade && global_settings.fade_on_stop)
-        fade(false, updatewps);
-    else
-        audio_pause();
-#endif
 
     if (global_settings.pause_rewind) {
         long newpos;
 
-#if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
-#endif
         newpos = audio_current_track()->elapsed
             - global_settings.pause_rewind * 1000;
         audio_ff_rewind(newpos > 0 ? newpos : 0);
@@ -154,79 +144,15 @@ void pause_action(bool may_fade, bool updatewps)
 
 void unpause_action(bool may_fade, bool updatewps)
 {
-#if CONFIG_CODEC == SWCODEC
     /* Do audio first, then update, unless skin were to use its local
        status in which case, reverse it */
     audio_resume();
 
     if (updatewps)
         update_non_static();
-#else
-    if (may_fade && global_settings.fade_on_stop)
-        fade(true, updatewps);
-    else
-        audio_resume();
-#endif
 
     (void)may_fade;
 }
-
-#if CONFIG_CODEC != SWCODEC
-void fade(bool fade_in, bool updatewps)
-{
-    int fp_global_vol = global_settings.volume << 8;
-    int fp_min_vol = sound_min(SOUND_VOLUME) << 8;
-    int fp_step = (fp_global_vol - fp_min_vol) / 10;
-
-    skin_get_global_state()->is_fading = !fade_in;
-    if (fade_in) {
-        /* fade in */
-        int fp_volume = fp_min_vol;
-
-        /* zero out the sound */
-        sound_set_volume(fp_min_vol >> 8);
-
-        sleep(HZ/10); /* let audio thread run */
-        audio_resume();
-
-        if (updatewps)
-            update_non_static();
-
-        while (fp_volume < fp_global_vol - fp_step) {
-            fp_volume += fp_step;
-            sound_set_volume(fp_volume >> 8);
-            sleep(1);
-        }
-        sound_set_volume(global_settings.volume);
-    }
-    else {
-        /* fade out */
-        int fp_volume = fp_global_vol;
-
-        if (updatewps)
-            update_non_static();
-
-        while (fp_volume > fp_min_vol + fp_step) {
-            fp_volume -= fp_step;
-            sound_set_volume(fp_volume >> 8);
-            sleep(1);
-        }
-        audio_pause();
-
-        skin_get_global_state()->is_fading = false;
-#if CONFIG_CODEC != SWCODEC
-#ifndef SIMULATOR
-        /* let audio thread run and wait for the mas to run out of data */
-        while (!mp3_pause_done())
-#endif
-            sleep(HZ/10);
-#endif
-
-        /* reset volume to what it was before the fade */
-        sound_set_volume(global_settings.volume);
-    }
-}
-#endif /* SWCODEC */
 
 static bool update_onvol_change(enum screen_type screen)
 {
@@ -264,17 +190,8 @@ static int skintouch_to_wps(struct wps_data *data)
 #endif
         case ACTION_TOUCH_SCROLLBAR:
             skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/100;
-#if (CONFIG_CODEC == SWCODEC)
             audio_pre_ff_rewind();
-#else
-            if (!skin_get_global_state()->paused)
-                audio_pause();
-#endif
             audio_ff_rewind(skin_get_global_state()->id3->elapsed);
-#if (CONFIG_CODEC != SWCODEC)
-            if (!skin_get_global_state()->paused)
-                audio_resume();
-#endif
             return ACTION_TOUCHSCREEN;
         case ACTION_TOUCH_VOLUME:
         {
@@ -344,12 +261,7 @@ bool ffwd_rew(int button)
                     if ( (audio_status() & AUDIO_STATUS_PLAY) &&
                           skin_get_global_state()->id3 && skin_get_global_state()->id3->length )
                     {
-#if (CONFIG_CODEC == SWCODEC)
                         audio_pre_ff_rewind();
-#else
-                        if (!skin_get_global_state()->paused)
-                            audio_pause();
-#endif
                         if (direction > 0)
                             status_set_ffmode(STATUS_FASTFORWARD);
                         else
@@ -393,10 +305,6 @@ bool ffwd_rew(int button)
                 skin_get_global_state()->ff_rewind_count = 0;
                 skin_get_global_state()->ff_rewind = false;
                 status_set_ffmode(0);
-#if (CONFIG_CODEC != SWCODEC)
-                if (!skin_get_global_state()->paused)
-                    audio_resume();
-#endif
                 exit = true;
                 break;
 
@@ -495,19 +403,8 @@ static void prev_track(unsigned long skip_thresh)
             return;
         }
 
-#if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
-#else
-        if (!state->paused)
-            audio_pause();
-#endif
-
         audio_ff_rewind(0);
-
-#if (CONFIG_CODEC != SWCODEC)
-        if (!state->paused)
-            audio_resume();
-#endif
     }
 }
 
@@ -573,9 +470,7 @@ static void play_hop(int direction)
     }
     else if (direction == 1 && step >= remaining)
     {
-#if CONFIG_CODEC == SWCODEC
         system_sound_play(SOUND_TRACK_NO_MORE);
-#endif
         return;
     }
     else if (direction == -1 && elapsed < step)
@@ -588,21 +483,10 @@ static void play_hop(int direction)
     }
     if(audio_status() & AUDIO_STATUS_PLAY)
     {
-#if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
-#else
-        if (!state->paused)
-            audio_pause();
-#endif
     }
 
-#if (CONFIG_CODEC == SWCODEC)
     audio_ff_rewind(elapsed);
-#else
-    audio_ff_rewind(state->id3->elapsed = elapsed);
-    if (!state->paused)
-        audio_resume();
-#endif
 }
 
 
@@ -867,12 +751,7 @@ long gui_wps_show(void)
                 {
                     if (state->id3->cuesheet)
                     {
-#if (CONFIG_CODEC == SWCODEC)
                         audio_pre_ff_rewind();
-#else
-                        if (!state->paused)
-                            audio_pause();
-#endif
                         audio_ff_rewind(0);
                     }
                     else
@@ -1128,13 +1007,8 @@ long gui_wps_show(void)
         }
 
         if (exit) {
-#if CONFIG_CODEC != SWCODEC
-            if (global_settings.fade_on_stop)
-                fade(false, true);
-#else
             audio_pause();
             update_non_static();
-#endif
             if (bookmark)
                 bookmark_autobookmark(true);
             audio_stop();
@@ -1200,11 +1074,9 @@ static void wps_state_init(void)
     /* add the WPS track event callbacks */
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, track_info_callback);
     add_event(PLAYBACK_EVENT_NEXTTRACKID3_AVAILABLE, track_info_callback);
-#if CONFIG_CODEC == SWCODEC
     /* Use the same callback as ..._TRACK_CHANGE for when remaining handles have
        finished */
     add_event(PLAYBACK_EVENT_CUR_TRACK_READY, track_info_callback);
-#endif
 #ifdef AUDIO_FAST_SKIP_PREVIEW
     add_event(PLAYBACK_EVENT_TRACK_SKIP, track_info_callback);
 #endif

@@ -112,13 +112,9 @@ static bool file_properties(const char* selected_file)
 
                 num_properties = 5;
 
-#if (CONFIG_CODEC == SWCODEC)
                 int fd = rb->open(selected_file, O_RDONLY);
                 if (fd >= 0 &&
                     rb->get_metadata(&id3, fd, selected_file))
-#else
-                if (!rb->mp3info(&id3, selected_file))
-#endif
                 {
                     long dur = id3.length / 1000;           /* seconds */
                     rb->snprintf(str_artist, sizeof str_artist,
@@ -145,9 +141,7 @@ static bool file_properties(const char* selected_file)
                         num_properties++;
                     }
                 }
-#if (CONFIG_CODEC == SWCODEC)
                 rb->close(fd);
-#endif
                 found = true;
                 break;
             }

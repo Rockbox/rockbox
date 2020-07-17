@@ -32,11 +32,7 @@
 #include "settings.h"
 #include "settings_list.h"
 #include "splash.h"
-#if CONFIG_CODEC == SWCODEC
 #include "voice_thread.h"
-#else
-#include "mp3_playback.h"
-#endif
 #include "audio.h"
 #include "lang.h"
 #include "talk.h"
@@ -107,7 +103,7 @@ struct voicefile_header /* file format of our voice file */
 
 /***************** Globals *****************/
 
-#if (CONFIG_CODEC == SWCODEC && MEMORYSIZE <= 2)
+#if MEMORYSIZE <= 2
 /* On low memory swcodec targets the entire voice file wouldn't fit in memory
  * together with codecs, so we load clips each time they are accessed. */
 #define TALK_PROGRESSIVE_LOAD
@@ -131,15 +127,10 @@ static bool force_enqueue_next; /* enqueue next utterance even if enqueue is fal
 static int queue_write; /* write index of queue, by application */
 static int queue_read; /* read index of queue, by ISR context */
 static enum talk_status talk_status = TALK_STATUS_OK;
-#if CONFIG_CODEC == SWCODEC
 /* protects queue_read, queue_write and thumbnail_buf_used */
 static struct mutex queue_mutex SHAREDBSS_ATTR; 
 #define talk_queue_lock() ({ mutex_lock(&queue_mutex); })
 #define talk_queue_unlock() ({ mutex_unlock(&queue_mutex); })
-#else
-#define talk_queue_lock() ({ })
-#define talk_queue_unlock() ({ })
-#endif /* CONFIG_CODEC */
 static int sent; /* how many bytes handed over to playback, owned by ISR */
 static unsigned char curr_hd[3]; /* current frame header, for re-sync */
 static unsigned char last_lang[MAX_FILENAME+1]; /* name of last used lang file (in talk_init) */
@@ -186,16 +177,8 @@ static int move_callback(int handle, void *current, void *new)
 
 static struct mutex read_buffer_mutex;
 
-
-/* on HWCODEC only voice xor audio can be active at a time */
-static bool check_audio_status(void)
+static inline bool check_audio_status(void)
 {
-#if CONFIG_CODEC != SWCODEC
-    if (audio_status()) /* busy, buffer in use */
-        return false;
-    /* ensure playback is given up on the buffer */
-    audio_hard_stop();
-#endif
     return true;
 }
 
@@ -670,20 +653,16 @@ static bool load_voicefile_data(int fd)
     return true;
 }
 
-/* Use a static buffer to avoid difficulties with buflib during DMA
- * (hwcodec)/buffer passing to the voice_thread (swcodec). Clips
- * can be played in chunks so the size is not that important */
+/* Use a static buffer to avoid difficulties with buflib during
+ * buffer passing to the voice_thread (swcodec). Clips can be played
+   in chunks so the size is not that important */
 static unsigned char commit_buffer[2<<10];
 
 static void* commit_transfer(struct queue_entry *qe, size_t *size)
 {
     void *buf = NULL; /* shut up gcc */
     static unsigned char *bufpos = commit_buffer;
-#if CONFIG_CODEC != SWCODEC
-    sent = MIN(qe->remaining, 0xFFFF);
-#else
     sent = qe->remaining;
-#endif
     sent = MIN((size_t)sent, sizeof(commit_buffer));
     buf = buflib_get_data(&clip_ctx, qe->handle);
     /* adjust buffer position to what has been played already */
@@ -706,13 +685,11 @@ static inline bool is_silence(struct queue_entry *qe)
 static void mp3_callback(const void** start, size_t* size)
 {
     struct queue_entry *qe = &queue[queue_read];
-#if CONFIG_CODEC == SWCODEC
     /* voice_thread.c hints us how many of the buffer we provided it actually
      * consumed. Because buffers have to be frame-aligned for speex
      * it might be less than what we presented */
     if (*size)
         sent = *size;
-#endif
     qe->remaining -= sent; /* we completed this */
 
     if (qe->remaining > 0) /* current clip not finished? */
@@ -757,55 +734,7 @@ static void mp3_callback(const void** start, size_t* size)
 /* stop the playback and the pending clips */
 void talk_force_shutup(void)
 {
-    /* Most of this is MAS only */
-#if CONFIG_CODEC != SWCODEC
-#ifdef SIMULATOR
-    return;
-#endif
-    unsigned char* pos;
-    unsigned char* search;
-    unsigned char* end;
-    int len;
-    if (QUEUE_LEVEL == 0) /* has ended anyway */
-        return;
-
-    /* search next frame boundary and continue up to there */
-    pos = search = mp3_get_pos();
-    end = buflib_get_data(&clip_ctx, queue[queue_read].handle);
-    len = queue[queue_read].length;
-
-    if (pos >= end && pos <= (end+len)) /* really our clip? */
-    { /* (for strange reasons this isn't nesessarily the case) */
-        /* find the next frame boundary */
-        while (search < (end+len)) /* search the remaining data */
-        {
-            if (*search++ != 0xFF) /* quick search for frame sync byte */
-                continue; /* (this does the majority of the job) */
-            
-            /* look at the (bitswapped) rest of header candidate */
-            if (search[0] == curr_hd[0] /* do the quicker checks first */
-             && search[2] == curr_hd[2]
-             && (search[1] & 0x30) == (curr_hd[1] & 0x30)) /* sample rate */
-            {
-                search--; /* back to the sync byte */
-                break; /* From looking at it, this is our header. */
-            }
-        }
-    
-        if (search-pos)
-        {   /* play old data until the frame end, to keep the MAS in sync */
-            sent = search-pos;
-
-            queue_write = (queue_read + 1) & QUEUE_MASK; /* will be empty after next callback */
-            queue[queue_read].length = sent; /* current one ends after this */
-
-            thumbnail_buf_used = 0;
-            return;
-        }
-    }
-#endif /* CONFIG_CODEC != SWCODEC */
-
-    /* Either SWCODEC, or MAS had nothing to do (was frame boundary or not our clip) */
+    /* Had nothing to do (was frame boundary or not our clip) */
     mp3_play_stop();
     talk_queue_lock();
     queue_write = queue_read = 0; /* reset the queue */
@@ -885,9 +814,7 @@ void talk_init(void)
 
     if(!talk_initialized)
     {
-#if CONFIG_CODEC == SWCODEC
         mutex_init(&queue_mutex);
-#endif /* CONFIG_CODEC == SWCODEC */
         mutex_init(&read_buffer_mutex);
     }
 
@@ -957,11 +884,9 @@ void talk_init(void)
 
     load_voicefile_data(filehandle);
 
-#if CONFIG_CODEC == SWCODEC
     /* Initialize the actual voice clip playback engine as well */
     if (talk_voice_required())
         voice_thread_init();
-#endif
 
 out:
     close(filehandle); /* close again, this was just to detect presence */
@@ -1062,9 +987,6 @@ static int _talk_file(const char* filename,
     int fd;
     int size;
     int handle, oldest = -1;
-#if CONFIG_CODEC != SWCODEC
-    struct mp3entry info;
-#endif
 
     /* reload needed? */
     if (talk_temp_disable_count > 0)
@@ -1080,13 +1002,6 @@ static int _talk_file(const char* filename,
         close(fd);
     }
 
-#if CONFIG_CODEC != SWCODEC
-    if(mp3info(&info, filename)) /* use this to find real start */
-    {   
-        return 0; /* failed to open, or invalid */
-    }
-#endif
-
     if (!enqueue)
         /* shutup now to free the thumbnail buffer */
         talk_shutup();
@@ -1097,10 +1012,6 @@ static int _talk_file(const char* filename,
         return 0;
     }
     size = filesize(fd);
-
-#if CONFIG_CODEC != SWCODEC
-    size -= lseek(fd, info.first_frame_offset, SEEK_SET); /* behind ID data */
-#endif
 
     /* free clips from cache until this one succeeds to allocate */
     while ((handle = buflib_alloc(&clip_ctx, size)) < 0)
@@ -1116,10 +1027,6 @@ static int _talk_file(const char* filename,
         struct queue_entry clip;
         clip.handle = handle;
         clip.length = clip.remaining = size;
-#if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
-        /* bitswap doesnt yield() */
-        bitswap(buflib_get_data(&clip_ctx, handle), size);
-#endif
         if(prefix_ids)
             /* prefix thumbnail by speaking these ids, but only now
                that we know there's actually a thumbnail to be

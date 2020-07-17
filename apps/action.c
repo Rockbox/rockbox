@@ -832,10 +832,8 @@ static inline int update_action_last(action_last_t *last, action_cur_t *cur)
     last->data   = button_get_data();
     last->tick   = current_tick;
 
-#if CONFIG_CODEC == SWCODEC
     /* Produce keyclick */
     keyclick_click(false, action);
-#endif
 
     return action;
 }

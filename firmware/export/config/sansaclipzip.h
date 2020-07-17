@@ -98,8 +98,8 @@
 
 #define HAVE_GUI_BOOST
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 

@@ -67,8 +67,8 @@
 
 #define CONFIG_KEYPAD MPIO_HD200_PAD
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 #define CONFIG_LCD LCD_TL0350A
 #define HAVE_LCD_SHUTDOWN

@@ -30,7 +30,6 @@
 #include "list.h"
 #include "menu.h"
 #include "action.h"
-#include "mp3_playback.h"
 #include "settings.h"
 #include "screens.h"
 #include "icons.h"

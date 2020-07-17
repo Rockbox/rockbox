@@ -94,8 +94,8 @@
 /* Which backlight fading type? */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_SW_VOLUME_CONTROL
 #define HW_SAMPR_CAPS SAMPR_CAP_ALL

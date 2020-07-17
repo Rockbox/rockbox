@@ -2,7 +2,6 @@ metadata/metadata.c
 metadata/id3tags.c
 metadata/mp3.c
 metadata/mp3data.c
-#if CONFIG_CODEC == SWCODEC
 dsp/channel_mode.c
 dsp/compressor.c
 dsp/crossfeed.c
@@ -64,4 +63,3 @@ metadata/vox.c
 metadata/wave.c
 metadata/wavpack.c
 metadata/aac.c
-#endif

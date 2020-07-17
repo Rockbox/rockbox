@@ -41,9 +41,7 @@ void ab_set_B_marker(unsigned int song_position);
  * The actual positions are returned via output parameter */
 bool ab_get_A_marker(unsigned int *song_position);
 bool ab_get_B_marker(unsigned int *song_position);
-#if (CONFIG_CODEC == SWCODEC)
 void ab_end_of_track_report(void);
-#endif
 
 /* These functions really need to be inlined for speed */
 extern unsigned int ab_A_marker;
@@ -59,16 +57,9 @@ static inline bool ab_reached_B_marker(unsigned int song_position)
 /* following is the size of the window in which we'll detect that the B marker
 was hit; it must be larger than the frequency (in milliseconds) at which this 
 function is called otherwise detection of the B marker will be unreliable */
-#if (CONFIG_CODEC == SWCODEC)
 /* On swcodec, the worst case seems to be 9600kHz with 1024 samples between
  * calls, meaning ~9 calls per second, look within 1/5 of a second */
 #define B_MARKER_DETECT_WINDOW 200
-#else
-/* we assume that this function will be called on each system tick and derive
-the window size from this with a generous margin of error (note: the number 
-of ticks per second is given by HZ) */
-#define B_MARKER_DETECT_WINDOW ((1000/HZ)*10)
-#endif
     if (ab_B_marker != AB_MARKER_NONE)
     {
         if ( (song_position >= ab_B_marker) 
@@ -78,7 +69,6 @@ of ticks per second is given by HZ) */
     return false;
 }
 
-#if (CONFIG_CODEC == SWCODEC)
 static inline void ab_position_report(unsigned long position)
 {
     if (ab_repeat_mode_enabled())
@@ -90,7 +80,6 @@ static inline void ab_position_report(unsigned long position)
         }
     }
 }
-#endif
 
 #endif
 

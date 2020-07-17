@@ -39,7 +39,6 @@ static inline bool ab_B_marker_set(void)
 }
 
 
-#if (CONFIG_CODEC == SWCODEC)
 void ab_end_of_track_report(void)
 {
     if ( ab_A_marker_set() && ! ab_B_marker_set() )
@@ -47,38 +46,6 @@ void ab_end_of_track_report(void)
         ab_jump_to_A_marker();
     }
 }
-#else
-static int ab_audio_event_handler(unsigned short event, unsigned long data)
-{
-    int rc = AUDIO_EVENT_RC_IGNORED;
-    if ( ab_repeat_mode_enabled() )
-    {
-        switch(event)
-        {
-            case AUDIO_EVENT_POS_REPORT:
-            {
-                if ( ! (audio_status() & AUDIO_STATUS_PAUSE) &&
-                        ab_reached_B_marker(data) )
-                {
-                    ab_jump_to_A_marker();
-                    rc = AUDIO_EVENT_RC_HANDLED;
-                }
-                break;
-            }
-            case AUDIO_EVENT_END_OF_TRACK:
-            {
-                if ( ab_A_marker_set() && ! ab_B_marker_set() )
-                {
-                    ab_jump_to_A_marker();
-                    rc = AUDIO_EVENT_RC_HANDLED;
-                }
-                break;
-            }
-        }
-    }
-    return rc;
-}
-#endif
 
 void ab_repeat_init(void)
 {
@@ -86,10 +53,6 @@ void ab_repeat_init(void)
     if ( ! ab_initialized )
     {
         ab_initialized = true;
-#if (CONFIG_CODEC != SWCODEC)
-        audio_register_event_handler(ab_audio_event_handler,
-            AUDIO_EVENT_POS_REPORT | AUDIO_EVENT_END_OF_TRACK );
-#endif
     }
 }
 
@@ -116,16 +79,7 @@ reasonable amount of time for the typical user to react */
 
 void ab_jump_to_A_marker(void)
 {
-#if (CONFIG_CODEC != SWCODEC)
-    bool paused = (audio_status() & AUDIO_STATUS_PAUSE) != 0;
-    if ( ! paused )
-        audio_pause();
-#endif
     audio_ff_rewind(ab_A_marker);
-#if (CONFIG_CODEC != SWCODEC)
-    if ( ! paused )
-        audio_resume();
-#endif
 }
 
 void ab_reset_markers(void)

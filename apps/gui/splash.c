@@ -199,7 +199,7 @@ void splashf(int ticks, const char *fmt, ...)
 
 void splash(int ticks, const char *str)
 {
-#if !defined(SIMULATOR) || CONFIG_CODEC == SWCODEC
+#if !defined(SIMULATOR)
     long id;
     /* fmt may be a so called virtual pointer. See settings.h. */
     if((id = P2ID((const unsigned char*)str)) >= 0)

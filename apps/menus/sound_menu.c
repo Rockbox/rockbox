@@ -108,18 +108,10 @@ MENUITEM_SETTING(treble_cutoff, &global_settings.treble_cutoff, NULL);
 
 MENUITEM_SETTING(balance, &global_settings.balance, NULL);
 MENUITEM_SETTING(channel_config, &global_settings.channel_config,
-#if CONFIG_CODEC == SWCODEC
     lowlatency_callback
-#else
-    NULL
-#endif
 );
 MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
-#if CONFIG_CODEC == SWCODEC
     lowlatency_callback
-#else
-    NULL
-#endif
 );
 
 #ifdef AUDIOHW_HAVE_DEPTH_3D
@@ -134,7 +126,6 @@ MENUITEM_SETTING(roll_off, &global_settings.roll_off, NULL);
 MENUITEM_SETTING(func_mode, &global_settings.func_mode, NULL);
 #endif
 
-#if CONFIG_CODEC == SWCODEC
     /* Crossfeed Submenu */
     MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, lowlatency_callback);
     MENUITEM_SETTING(crossfeed_direct_gain,
@@ -216,7 +207,6 @@ static int timestretch_callback(int action,
     MAKE_MENU(compressor_menu,ID2P(LANG_COMPRESSOR), NULL, Icon_NOICON,
               &compressor_threshold, &compressor_gain, &compressor_ratio,
               &compressor_knee, &compressor_attack, &compressor_release);
-#endif
 
 #ifdef HAVE_SPEAKER
     MENUITEM_SETTING(speaker_mode, &global_settings.speaker_mode, NULL);
@@ -253,14 +243,12 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
           ,&func_mode
 #endif
-#if CONFIG_CODEC == SWCODEC
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
           ,&surround_menu, &pbe_menu, &afr_enabled
 #ifdef HAVE_PITCHCONTROL
           ,&timestretch_enabled
 #endif
           ,&compressor_menu
-#endif
 #ifdef HAVE_SPEAKER
          ,&speaker_mode
 #endif

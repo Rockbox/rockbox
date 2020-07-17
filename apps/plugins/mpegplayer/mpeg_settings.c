@@ -1245,7 +1245,6 @@ static void display_options(void)
     }
 }
 
-#if CONFIG_CODEC == SWCODEC
 static void audio_options(void)
 {
     int selected = 0;
@@ -1307,7 +1306,6 @@ static void audio_options(void)
             menu_quit = true;
     }
 }
-#endif
 
 static void resume_options(void)
 {

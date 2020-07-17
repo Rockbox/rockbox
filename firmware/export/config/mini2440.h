@@ -114,8 +114,8 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_S3C2440
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000

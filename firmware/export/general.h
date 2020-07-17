@@ -26,7 +26,6 @@
 #include <stddef.h>
 #include "config.h"
 
-#if CONFIG_CODEC == SWCODEC
 /* round a signed/unsigned 32bit value to the closest of a list of values */
 /* returns the index of the closest value */
 int round_value_to_list32(unsigned long value,
@@ -38,7 +37,6 @@ int make_list_from_caps32(unsigned long src_mask,
                           const unsigned long *src_list,
                           unsigned long caps_mask,
                           unsigned long *caps_list);
-#endif /* CONFIG_CODEC == SWCODEC */
 
 /* Create a filename with a number part in a way that the number is 1
  * higher than the highest numbered file matching the same pattern.

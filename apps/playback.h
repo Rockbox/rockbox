@@ -26,15 +26,12 @@
 #include <stdlib.h>
 #include "config.h"
 
-#if CONFIG_CODEC == SWCODEC
 /* Including the code for fast previews is entirely optional since it
    does add two more mp3entry's - for certain targets it may be less
    beneficial such as flash-only storage */
 #if MEMORYSIZE > 2
 #define AUDIO_FAST_SKIP_PREVIEW
 #endif
-
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_ALBUMART
 

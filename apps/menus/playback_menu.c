@@ -35,16 +35,13 @@
 #include "audio.h"
 #include "cuesheet.h"
 #include "misc.h"
-#if CONFIG_CODEC == SWCODEC
 #include "playback.h"
 #include "pcm_sampr.h"
 #ifdef HAVE_PLAY_FREQ
 #include "talk.h"
 #endif
-#endif
 
-
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
+#if defined(HAVE_CROSSFADE)
 static int setcrossfadeonexit_callback(int action,
                                        const struct menu_item_ex *this_item,
                                        struct gui_synclist *this_list)
@@ -60,7 +57,7 @@ static int setcrossfadeonexit_callback(int action,
     return action;
 }
 
-#endif /* CONFIG_CODEC == SWCODEC */
+#endif /* HAVE_CROSSFADE */
 
 /***********************************/
 /*    PLAYBACK MENU                */
@@ -77,7 +74,6 @@ MENUITEM_SETTING(ff_rewind_min_step, &global_settings.ff_rewind_min_step, NULL);
 MAKE_MENU(ff_rewind_settings_menu, ID2P(LANG_WIND_MENU), 0, Icon_NOICON,
           &ff_rewind_min_step, &ff_rewind_accel);
 #ifdef HAVE_DISK_STORAGE
-#if CONFIG_CODEC == SWCODEC
 static int buffermargin_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list)
@@ -92,16 +88,12 @@ static int buffermargin_callback(int action,
     }
     return action;
 }
-#else
-# define buffermargin_callback NULL
-#endif
 MENUITEM_SETTING(buffer_margin, &global_settings.buffer_margin,
                  buffermargin_callback);
 #endif /*HAVE_DISK_STORAGE */
 MENUITEM_SETTING(fade_on_stop, &global_settings.fade_on_stop, NULL);
 MENUITEM_SETTING(party_mode, &global_settings.party_mode, NULL);
 
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_CROSSFADE
 /* crossfade submenu */
 MENUITEM_SETTING(crossfade, &global_settings.crossfade, setcrossfadeonexit_callback);
@@ -150,7 +142,6 @@ MAKE_MENU(replaygain_settings_menu,ID2P(LANG_REPLAYGAIN),0, Icon_NOICON,
           &replaygain_type, &replaygain_noclip, &replaygain_preamp);
 
 MENUITEM_SETTING(beep, &global_settings.beep ,NULL);
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_SPDIF_POWER
 MENUITEM_SETTING(spdif_enable, &global_settings.spdif_enable, NULL);
@@ -188,13 +179,7 @@ static int cuesheet_callback(int action,
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
-#if CONFIG_CODEC == SWCODEC
             audio_set_cuesheet(global_settings.cuesheet);
-#else
-            if (global_settings.cuesheet)
-                splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
-            break;
-#endif
     }
     return action;
 }
@@ -209,9 +194,7 @@ MAKE_MENU(unplug_menu, ID2P(LANG_HEADPHONE_UNPLUG), 0, Icon_NOICON,
 
 MENUITEM_SETTING(skip_length, &global_settings.skip_length, NULL);
 MENUITEM_SETTING(prevent_skip, &global_settings.prevent_skip, NULL);
-#if CONFIG_CODEC == SWCODEC
 MENUITEM_SETTING(resume_rewind, &global_settings.resume_rewind, NULL);
-#endif
 MENUITEM_SETTING(pause_rewind, &global_settings.pause_rewind, NULL);
 #ifdef HAVE_PLAY_FREQ
 MENUITEM_SETTING(play_frequency, &global_settings.play_frequency,
@@ -227,13 +210,11 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #endif
           &fade_on_stop, &party_mode,
 
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
+#if defined(HAVE_CROSSFADE)
           &crossfade_settings_menu,
 #endif
 
-#if CONFIG_CODEC == SWCODEC
           &replaygain_settings_menu, &beep,
-#endif
 
 #ifdef HAVE_SPDIF_POWER
           &spdif_enable,
@@ -244,9 +225,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #endif
          ,&skip_length, &prevent_skip
 
-#if CONFIG_CODEC == SWCODEC
           ,&resume_rewind
-#endif
           ,&pause_rewind
 #ifdef HAVE_PLAY_FREQ
           ,&play_frequency

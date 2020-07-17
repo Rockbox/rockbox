@@ -10,7 +10,7 @@ lua
 lua_scripts
 #ifdef HAVE_LCD_BITMAP
 
-#if CONFIG_CODEC == SWCODEC && PLUGIN_BUFFER_SIZE > 0x20000
+#if PLUGIN_BUFFER_SIZE > 0x20000
 fft
 #endif
 
@@ -23,11 +23,8 @@ pictureflow
 #endif /* HAVE_LCD_BITMAP */
 
 /* For all the swcodec targets */
-#if CONFIG_CODEC == SWCODEC
-
 #if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */
 mikmod
 #endif
 
-#endif /* CONFIG_CODEC == SWCODEC */
 #endif /* HAVE_TOUCHSCREEN */

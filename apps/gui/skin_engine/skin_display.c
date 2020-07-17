@@ -57,9 +57,7 @@
 #endif
 
 #include "cuesheet.h"
-#if CONFIG_CODEC == SWCODEC
 #include "playback.h"
-#endif
 #include "backdrop.h"
 #include "viewport.h"
 #if CONFIG_TUNER

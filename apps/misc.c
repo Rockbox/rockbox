@@ -91,11 +91,7 @@
 #include "bookmark.h"
 #include "wps.h"
 #include "playback.h"
-#if CONFIG_CODEC == SWCODEC
 #include "voice_thread.h"
-#else
-#include "mp3_playback.h"
-#endif
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) \
@@ -302,7 +298,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #endif
     {
         bool batt_safe = battery_level_safe();
-#if CONFIG_CODEC != SWCODEC || defined(HAVE_RECORDING)
+#if defined(HAVE_RECORDING)
         int audio_stat = audio_status();
 #endif
 
@@ -339,19 +335,12 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             splashf(0, "%s %s", str(LANG_WARNING_BATTERY_EMPTY),
                                 str(LANG_SHUTTINGDOWN));
         }
-#if CONFIG_CODEC != SWCODEC
-        if (global_settings.fade_on_stop
-            && (audio_stat & AUDIO_STATUS_PLAY))
-        {
-            fade(false, false);
-        }
-#endif
 
 #ifdef HAVE_DISK_STORAGE
         if (batt_safe) /* do not save on critical battery */
 #endif
         {
-#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+#if defined(HAVE_RECORDING)
             if (audio_stat & AUDIO_STATUS_RECORD)
             {
                 rec_command(RECORDING_CMD_STOP);
@@ -368,13 +357,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             if (callback != NULL)
                 callback(parameter);
 
-#if CONFIG_CODEC != SWCODEC
-            /* wait for audio_stop or audio_stop_recording to complete */
-            while (audio_status())
-                sleep(1);
-#endif
-
-#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+#if defined(HAVE_RECORDING)
             audio_close_recording();
 #endif
             scrobbler_shutdown(true);
@@ -403,9 +386,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
                 enqueue = true;
             }
             talk_id(LANG_SHUTTINGDOWN, enqueue);
-#if CONFIG_CODEC == SWCODEC
             voice_wait();
-#endif
         }
 
         shutdown_hw();
@@ -426,10 +407,6 @@ bool list_stop_handler(void)
     {
         if (!global_settings.party_mode)
         {
-#if CONFIG_CODEC != SWCODEC
-            if (global_settings.fade_on_stop)
-                fade(false, false);
-#endif
             bookmark_autobookmark(true);
             audio_stop();
             ret = true;  /* bookmarking can make a refresh necessary */
@@ -894,7 +871,6 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     return buffer;
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* Play a standard sound */
 void system_sound_play(enum system_sound sound)
 {
@@ -1046,7 +1022,6 @@ void replaygain_update(void)
     settings.type = replaygain_setting_mode(settings.type);
     dsp_replaygain_set_settings(&settings);
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 
 /* format a sound value like: -1.05 dB */
 int format_sound_value(char *buf, size_t size, int snd, int val)

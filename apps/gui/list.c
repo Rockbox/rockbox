@@ -317,10 +317,6 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
 
 static void edge_beep(struct gui_synclist * gui_list, bool wrap)
 {
-#if CONFIG_CODEC != SWCODEC
-    (void)gui_list;
-    (void)wrap;
-#else
     if (global_settings.keyclick)
     {
         list_speak_item *cb = gui_list->callback_speak_item;
@@ -354,7 +350,6 @@ static void edge_beep(struct gui_synclist * gui_list, bool wrap)
             talk_force_shutup();
         }
     }
-#endif
 }
 
 static void _gui_synclist_speak_item(struct gui_synclist *lists)
@@ -615,7 +610,6 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
 }
 #endif /* HAVE_LCD_BITMAP */
 
-#if CONFIG_CODEC == SWCODEC
 bool gui_synclist_keyclick_callback(int action, void* data)
 {
     struct gui_synclist *lists = (struct gui_synclist *)data;
@@ -633,7 +627,6 @@ bool gui_synclist_keyclick_callback(int action, void* data)
 
     return action != ACTION_NONE;
 }
-#endif
 
 /*
  * Magic to make sure the list gets updated correctly if the skin does
@@ -864,9 +857,7 @@ bool list_do_action(int context, int timeout,
    do_button, and places the action from get_action in *action. */
 {
     timeout = list_do_action_timeout(lists, timeout);
-#if CONFIG_CODEC == SWCODEC
     keyclick_set_callback(gui_synclist_keyclick_callback, lists);
-#endif
     *action = get_action(context, timeout);
     return gui_synclist_do_button(lists, action, wrap);
 }

@@ -19,7 +19,6 @@ menus/plugin_menu.c
 #if CONFIG_TUNER
 menus/radio_menu.c
 #endif
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_WM8978
 menus/audiohw_eq_menu.c
 #endif
@@ -27,9 +26,6 @@ menus/eq_menu.c
 buffering.c
 voice_thread.c
 rbcodec_helpers.c
-#else  /* !SWCODEC */
-mpeg.c
-#endif
 menus/main_menu.c
 menus/playback_menu.c
 menus/playlist_menu.c
@@ -163,7 +159,6 @@ radio/radioart.c
 #endif
 #endif
 
-#if CONFIG_CODEC == SWCODEC
 #if INPUT_SRC_CAPS != 0
 audio_path.c
 #endif /* INPUT_SRC_CAPS != 0 */
@@ -178,7 +173,6 @@ beep.c
 #ifdef HAVE_RECORDING
 enc_config.c
 recorder/pcm_record.c
-#endif
 #endif
 #ifdef USB_ENABLE_HID
 usb_keymaps.c

@@ -310,7 +310,6 @@ static const char graphic_numeric[] = "graphic,numeric";
 
 #ifdef HAVE_RECORDING
 /* these should be in the config.h files */
-#if CONFIG_CODEC == SWCODEC
 # ifdef HAVE_UDA1380
 #  define DEFAULT_REC_MIC_GAIN 16
 #  define DEFAULT_REC_LEFT_GAIN 0
@@ -332,7 +331,6 @@ static const char graphic_numeric[] = "graphic,numeric";
 #  define DEFAULT_REC_LEFT_GAIN 0
 #  define DEFAULT_REC_RIGHT_GAIN 0
 # endif
-#endif
 
 #endif /* HAVE_RECORDING */
 
@@ -472,8 +470,6 @@ static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
 }
 #endif
 
-#if CONFIG_CODEC == SWCODEC
-
 static const char* formatter_unit_0_is_off(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
 {
@@ -591,7 +587,6 @@ static void eq_set_default(void* setting, void* defaultval)
 {
     memcpy(setting, defaultval, sizeof(struct eq_band_setting));
 }
-#endif
 
 #ifdef HAVE_QUICKSCREEN
 static int find_setting_by_name(char*name)
@@ -1213,15 +1208,11 @@ const struct settings_list settings[] = {
                    "seek acceleration", "very fast,fast,normal,slow,very slow", NULL, 5,
                    ID2P(LANG_VERY_FAST), ID2P(LANG_FAST), ID2P(LANG_NORMAL),
                    ID2P(LANG_SLOW) , ID2P(LANG_VERY_SLOW)),
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_DISK_STORAGE)
+#if defined(HAVE_DISK_STORAGE)
     TABLE_SETTING(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, buffer_margin,
                   LANG_MP3BUFFER_MARGIN, 5, "antiskip", NULL, UNIT_SEC,
                   NULL, NULL,
                   NULL,8, 5,15,30,60,120,180,300,600),
-#elif defined(HAVE_DISK_STORAGE)
-    INT_SETTING(F_TIME_SETTING, buffer_margin, LANG_MP3BUFFER_MARGIN, 0,
-                "antiskip", UNIT_SEC, 0, 7, 1, formatter_time_unit_0_is_off,
-                getlang_time_unit_0_is_off, audio_set_buffer_margin),
 #endif
     /* disk */
 #ifdef HAVE_DISK_STORAGE
@@ -1348,10 +1339,8 @@ const struct settings_list settings[] = {
                          TALK_ID(1792, UNIT_MB)),
     {F_T_INT|F_RECSETTING, &global_settings.rec_channels, LANG_CHANNELS, INT(0),
      "rec channels","stereo,mono",UNUSED},
-#if CONFIG_CODEC == SWCODEC
     {F_T_INT|F_RECSETTING, &global_settings.rec_mono_mode,
      LANG_RECORDING_MONO_MODE, INT(0), "rec mono mode","L+R,L,R",UNUSED},
-#endif
     CHOICE_SETTING(F_RECSETTING, rec_split_type, LANG_SPLIT_TYPE, 0,
                    "rec split type", "Split,Stop,Shutdown", NULL, 3,
                    ID2P(LANG_START_NEW_FILE), ID2P(LANG_STOP_RECORDING),ID2P(LANG_STOP_RECORDING_AND_SHUTDOWN)),
@@ -1398,7 +1387,6 @@ const struct settings_list settings[] = {
         INT(DEFAULT_REC_RIGHT_GAIN),
         "rec right gain",NULL,UNUSED},
 #endif /* DEFAULT_REC_RIGHT_GAIN */
-#if CONFIG_CODEC == SWCODEC
     {F_T_INT|F_RECSETTING,&global_settings.rec_frequency,
         LANG_FREQUENCY,INT(REC_FREQ_DEFAULT),
         "rec frequency",REC_FREQ_CFG_VAL_LIST,UNUSED},
@@ -1417,7 +1405,6 @@ const struct settings_list settings[] = {
     /* wavpack_enc */
     /* (no settings yet) */
     /** Encoder settings end **/
-#endif /* CONFIG_CODEC == SWCODEC */
     /* values for the trigger */
     INT_SETTING(F_RECSETTING, rec_start_thres_db, LANG_RECORD_START_THRESHOLD, -35,
         "trigger start threshold dB", UNIT_DB, -89, 0, 1, NULL, NULL, NULL),
@@ -1465,7 +1452,6 @@ const struct settings_list settings[] = {
                  LANG_SET_BOOL_YES, LANG_SET_BOOL_NO, NULL),
 
 #ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC
     BOOL_SETTING(0, autoresume_enable, LANG_AUTORESUME, false,
                  "autoresume enable", off_on,
                  LANG_SET_BOOL_YES, LANG_SET_BOOL_NO, NULL),
@@ -1478,7 +1464,6 @@ const struct settings_list settings[] = {
                    ID2P(LANG_AUTORESUME_CUSTOM)),
     TEXT_SETTING(0, autoresume_paths, "autoresume next track paths",
                  "/podcast:/podcasts", NULL, NULL),
-#endif
 
     OFFON_SETTING(0, runtimedb, LANG_RUNTIMEDB_ACTIVE, false,
                   "gather runtime data", NULL),
@@ -1486,7 +1471,6 @@ const struct settings_list settings[] = {
                  DEFAULT_TAGCACHE_SCAN_PATHS, NULL, NULL),
 #endif
 
-#if CONFIG_CODEC == SWCODEC
     /* replay gain */
     CHOICE_SETTING(F_SOUNDSETTING, replaygain_settings.type,
                    LANG_REPLAYGAIN_MODE, REPLAYGAIN_SHUFFLE, "replaygain type",
@@ -1747,7 +1731,6 @@ const struct settings_list settings[] = {
                        LANG_COMPRESSOR_RELEASE, 500,
                        "compressor release time", UNIT_MS, 100, 1000,
                        100, NULL, NULL, compressor_set),
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     SOUND_SETTING(F_NO_WRAP, bass_cutoff, LANG_BASS_CUTOFF,
@@ -2023,7 +2006,6 @@ const struct settings_list settings[] = {
                 3, "list_accel_wait", UNIT_SEC, 1, 10, 1,
                 scanaccel_formatter, NULL, NULL),
 #endif /* HAVE_WHEEL_ACCELERATION */
-#if CONFIG_CODEC == SWCODEC
     /* keyclick */
 #ifdef HAVE_HARDWARE_CLICK
     CHOICE_SETTING(0, keyclick, LANG_KEYCLICK_SOFTWARE, 0,
@@ -2042,7 +2024,6 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, keyclick_repeats, LANG_KEYCLICK_REPEATS, false,
                   "keyclick repeats", NULL),
 #endif
-#endif /* CONFIG_CODEC == SWCODEC */
     TEXT_SETTING(0, playlist_catalog_dir, "playlist catalog directory",
                      PLAYLIST_CATALOG_DEFAULT_DIR, NULL, NULL),
     INT_SETTING(F_TIME_SETTING, sleeptimer_duration, LANG_SLEEP_TIMER_DURATION,
@@ -2117,10 +2098,8 @@ const struct settings_list settings[] = {
 #ifdef HAVE_PITCHCONTROL
     OFFON_SETTING(0, pitch_mode_semitone, LANG_SEMITONE, false,
                   "Semitone pitch change", NULL),
-#if CONFIG_CODEC == SWCODEC
     OFFON_SETTING(0, pitch_mode_timestretch, LANG_TIMESTRETCH, false,
                   "Timestretch mode", NULL),
-#endif
 #endif
 
 #ifdef USB_ENABLE_HID
@@ -2187,11 +2166,9 @@ const struct settings_list settings[] = {
         HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_INSERT, HOTKEY_INSERT_SHUFFLED),
 #endif
 
-#if CONFIG_CODEC == SWCODEC
     INT_SETTING(F_TIME_SETTING, resume_rewind, LANG_RESUME_REWIND, 0,
                 "resume rewind", UNIT_SEC, 0, 60, 5,
                 formatter_time_unit_0_is_off, getlang_time_unit_0_is_off, NULL),
-#endif
    CUSTOM_SETTING(0, root_menu_customized,
                   LANG_ROCKBOX_TITLE, /* lang string here is never actually used */
                   NULL, "root menu order",

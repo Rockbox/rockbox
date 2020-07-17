@@ -466,7 +466,6 @@ static const struct plugin_api rockbox_api = {
     thread_self,
     thread_exit,
     thread_wait,
-#if (CONFIG_CODEC == SWCODEC)
     thread_thaw,
 #ifdef HAVE_PRIORITY_SCHEDULING
     thread_set_priority,
@@ -474,7 +473,6 @@ static const struct plugin_api rockbox_api = {
     mutex_init,
     mutex_lock,
     mutex_unlock,
-#endif
 #ifdef HAVE_SEMAPHORE_OBJECTS
     semaphore_init,
     semaphore_wait,
@@ -517,13 +515,11 @@ static const struct plugin_api rockbox_api = {
     queue_delete,
     queue_post,
     queue_wait_w_tmo,
-#if CONFIG_CODEC == SWCODEC
     queue_enable_queue_send,
     queue_empty,
     queue_wait,
     queue_send,
     queue_reply,
-#endif
 
 #ifdef RB_PROFILE
     profile_thread,
@@ -601,7 +597,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef AUDIOHW_HAVE_EQ
     sound_enum_hw_eq_band_setting,
 #endif
-#if ((CONFIG_CODEC == SWCODEC)) && defined (HAVE_PITCHCONTROL)
+#if defined (HAVE_PITCHCONTROL)
     sound_set_pitch,
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -609,11 +605,7 @@ static const struct plugin_api rockbox_api = {
     mp3_play_pause,
     mp3_play_stop,
     mp3_is_playing,
-#if CONFIG_CODEC != SWCODEC
-    bitswap,
 #endif
-#endif
-#if CONFIG_CODEC == SWCODEC
     &audio_master_sampr_list[0],
     &hw_freq_sampr[0],
     pcm_apply_settings,
@@ -667,7 +659,6 @@ static const struct plugin_api rockbox_api = {
     pcmbuf_fade,
     system_sound_play,
     keyclick_click,
-#endif /* CONFIG_CODEC == SWCODEC */
 
     /* metadata */
     get_metadata,
@@ -716,9 +707,6 @@ static const struct plugin_api rockbox_api = {
     audio_current_track,
     audio_flush_and_reload_tracks,
     audio_get_file_pos,
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    mpeg_get_last_header,
-#endif
 
     /* menu */
     root_menu_get_options,
@@ -783,7 +771,6 @@ static const struct plugin_api rockbox_api = {
 #ifdef ROCKBOX_HAS_LOGF
     _logf,
 #endif
-#if CONFIG_CODEC == SWCODEC
     codec_thread_do_callback,
     codec_load_file,
     codec_run_proc,
@@ -792,7 +779,6 @@ static const struct plugin_api rockbox_api = {
     find_array_ptr,
     remove_array_ptr,
     round_value_to_list32,
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_LCD_BITMAP
     read_bmp_file,

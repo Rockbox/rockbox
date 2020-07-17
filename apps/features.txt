@@ -109,11 +109,7 @@ radio_remote
 
 #if defined(HAVE_RECORDING)
 recording
-#if CONFIG_CODEC == SWCODEC
 recording_swcodec
-#else
-recording_hwcodec
-#endif
 #if defined(HAVE_LINE_IN)
 recording_linein
 #endif
@@ -151,11 +147,7 @@ spdif_power
 speaker
 #endif
 
-#if CONFIG_CODEC == SWCODEC
 swcodec
-#else
-hwcodec
-#endif
 
 #if defined(HAVE_TAGCACHE)
 tagcache

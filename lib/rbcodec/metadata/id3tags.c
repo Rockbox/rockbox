@@ -43,9 +43,7 @@
 
 #include "metadata.h"
 #include "mp3data.h"
-#if CONFIG_CODEC == SWCODEC
 #include "metadata_common.h"
-#endif
 #include "metadata_parsers.h"
 #include "misc.h"
 
@@ -91,9 +89,6 @@ static const char* const genres[] = {
     "Synthpop"
 };
 
-#if CONFIG_CODEC != SWCODEC
-static
-#endif
 char* id3_get_num_genre(unsigned int genre_num)
 {
     if (genre_num < ARRAYLEN(genres))
@@ -376,23 +371,20 @@ static int parseuser( struct mp3entry* entry, char* tag, int bufferpos )
         /* At least part of the value was read, so we can safely try to
          * parse it */
         value = tag + desc_len + 1;
-        
+
         if (!strcasecmp(tag, "ALBUM ARTIST")) {
             length = strlen(value) + 1;
             strlcpy(tag, value, length);
             entry->albumartist = tag;
-#if CONFIG_CODEC == SWCODEC
         } else {
             /* Call parse_replaygain(). */
             parse_replaygain(tag, value, entry);
-#endif
         }
     }
 
     return tag - entry->id3v2buf + length;
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* parse RVA2 binary data and convert to replaygain information. */
 static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
 {
@@ -452,13 +444,12 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
                 return start_pos;
             }
         }
-            
+
         parse_replaygain_int(album, gain, peak * 2, entry);
     }
 
     return start_pos;
 }
-#endif
 
 static int parsembtid( struct mp3entry* entry, char* tag, int bufferpos )
 {
@@ -514,9 +505,7 @@ static const struct tag_resolver taglist[] = {
     { "PIC",  3, 0, &parsealbumart, true },
 #endif
     { "TXXX", 4, 0, &parseuser, false },
-#if CONFIG_CODEC == SWCODEC
     { "RVA2", 4, 0, &parserva2, true },
-#endif
     { "UFID", 4, 0, &parsembtid, false },
 };
 
@@ -738,9 +727,7 @@ void setid3v2title(int fd, struct mp3entry *entry)
     bool unsynch = false;
     int i, j;
     int rc;
-#if CONFIG_CODEC == SWCODEC
     bool itunes_gapless = false;
-#endif
 
 #ifdef HAVE_ALBUMART
     entry->has_embedded_albumart = false;
@@ -984,14 +971,11 @@ void setid3v2title(int fd, struct mp3entry *entry)
                    (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
                     int offset;
                     if(bytesread >= 8 && !strncmp(tag+4, "iTun", 4)) {
-#if CONFIG_CODEC == SWCODEC
                         /* check for iTunes gapless information */
                         if(bytesread >= 12 && !strncmp(tag+4, "iTunSMPB", 8))
                             itunes_gapless = true;
                         else
-#endif
-                        /* ignore other with iTunes tags */
-                        break;
+                            break; /* ignore other with iTunes tags */
                     }
 
                     offset = 3 + unicode_len(*tag, tag + 4);
@@ -1071,7 +1055,6 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 tag[bytesread] = 0;
                 bufferpos += bytesread + 1;
 
-#if CONFIG_CODEC == SWCODEC
                 /* parse the tag if it contains iTunes gapless info */
                 if (itunes_gapless)
                 {
@@ -1079,7 +1062,6 @@ void setid3v2title(int fd, struct mp3entry *entry)
                     entry->lead_trim = get_itunes_int32(tag, 1);
                     entry->tail_trim = get_itunes_int32(tag, 2);
                 }
-#endif
 
                 /* Note that parser functions sometimes set *ptag to NULL, so
                  * the "!*ptag" check here doesn't always have the desired

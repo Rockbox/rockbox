@@ -1268,19 +1268,8 @@ voiceconfig () {
         echo "$TTS_ENGINE options set to $TTS_OPTS"
     fi
 
-    if [ "$swcodec" = "yes" ]; then
-        ENCODER="rbspeexenc"
-        ENC_OPTS="-q 7 -c 10"
-    else
-        if [ -n "`findtool lame`" ]; then
-            ENCODER="lame"
-            ENC_OPTS="-t -m m -h -V 9 -S -B 64 -b 8"
-         else
-            echo "You need LAME in the system path to build voice files for"
-            echo "HWCODEC targets."
-            exit 4
-         fi
-    fi
+    ENCODER="rbspeexenc"
+    ENC_OPTS="-q 7 -c 10"
 
     echo "Using $ENCODER for encoding voice clips"
 
@@ -1650,7 +1639,6 @@ fi
   # plugins:   set to 'yes' to build the plugins. Early development builds can
   #            set this to no in the early stages to have an easier life for a
   #            while
-  # swcodec:   set 'yes' on swcodec targets
   # toolset:   lists what particular tools in the tools/ directory that this
   #            target needs to have built prior to building Rockbox
   #
@@ -1677,7 +1665,6 @@ fi
     appextra="recorder:gui:radio"
     flash="$pwd/rombox.iriver"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -1700,7 +1687,6 @@ fi
     output="rockbox.iriver"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -1725,7 +1711,6 @@ fi
     appextra="recorder:gui:radio"
     flash="$pwd/rombox.iriver"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$iriverbitmaptools
@@ -1746,7 +1731,6 @@ fi
     output="rockbox.wma"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$genericbitmaptools
@@ -1767,7 +1751,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=h10 -type=RBBL"
     bootoutput="H10_20GC.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1792,7 +1775,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=h105 -type=RBBL"
     bootoutput="H10.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -1817,7 +1799,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1841,7 +1822,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1865,7 +1845,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1889,7 +1868,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1913,7 +1891,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1937,7 +1914,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1961,7 +1937,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -1985,7 +1960,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2009,7 +1983,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2032,7 +2005,6 @@ fi
     output="rockbox.ipod"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="bootloader-$modelname.ipod"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2059,7 +2031,6 @@ fi
     bootoutput="x5_fw.bin"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
@@ -2085,7 +2056,6 @@ fi
     bootoutput="m5_fw.bin"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
@@ -2108,7 +2078,6 @@ fi
     output="rockbox.iaudio"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     bootoutput="I7_FW.BIN"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
@@ -2133,7 +2102,6 @@ fi
     bootoutput="bootloader-cowond2.bin"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset="$tccbitmaptools"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="arm"
@@ -2155,7 +2123,6 @@ fi
     bootoutput="cowon_m3.bin"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$iaudiobitmaptools"
@@ -2177,7 +2144,6 @@ fi
     output="rockbox.gigabeat"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$gigabeatbitmaptools
     boottool="$rootdir/tools/scramble -gigabeat"
     bootoutput="FWIMG01.DAT"
@@ -2199,7 +2165,6 @@ fi
     output="rockbox.gigabeat"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset="$gigabeatbitmaptools"
     boottool="$rootdir/tools/scramble -gigabeats"
     bootoutput="nk.bin"
@@ -2223,7 +2188,6 @@ fi
     output="rockbox.mrobe500"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$gigabeatbitmaptools
     boottool="cp "
     bootoutput="rockbox.mrboot"
@@ -2247,7 +2211,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=m100 -type=RBBL"
     bootoutput="pp5020.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -2274,7 +2237,6 @@ fi
     output="rockbox.logik"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$tccbitmaptools
@@ -2296,7 +2258,6 @@ fi
     bootoutput="bootloader-zenxfistyle.creative"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2317,7 +2278,6 @@ fi
     output="rockbox.zvm"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zvm -no-ciff"
     bootoutput="rockbox.zvmboot"
@@ -2340,7 +2300,6 @@ fi
     output="rockbox.zvm60"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zvm60"
     bootoutput="rockbox.zvm60boot"
@@ -2363,7 +2322,6 @@ fi
     output="rockbox.zv"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     toolset=$ipodbitmaptools
     boottool="$rootdir/tools/scramble -creative=zenvision"
     bootoutput="rockbox.zvboot"
@@ -2385,7 +2343,6 @@ fi
     bootoutput="bootloader-zenxfi2.creative"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2405,7 +2362,6 @@ fi
     bootoutput="bootloader-zenxfi3.creative"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2425,7 +2381,6 @@ fi
     bootoutput="bootloader-zenv.creative"
     appextra="radio:gui:recorder"
     plugins=""
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2445,7 +2400,6 @@ fi
     bootoutput="bootloader-zenxfi.creative"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2465,7 +2419,6 @@ fi
     bootoutput="bootloader-zenmozaic.creative"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2485,7 +2438,6 @@ fi
     bootoutput="bootloader-zen.creative"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2506,7 +2458,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=e200 -type=RBBL"
     bootoutput="PP5022.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -2534,7 +2485,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4r -model=e20r -type=RBBL"
     bootoutput="pp5022.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -2559,7 +2509,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=c200 -type=RBBL"
     bootoutput="firmware.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -2586,7 +2535,6 @@ fi
     output="rockbox.m200"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$tccbitmaptools
@@ -2610,7 +2558,6 @@ fi
     output="rockbox.c100"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$tccbitmaptools
@@ -2632,7 +2579,6 @@ fi
     bootoutput="bootloader-clip.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2655,7 +2601,6 @@ fi
     bootoutput="bootloader-e200v2.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2676,7 +2621,6 @@ fi
     bootoutput="bootloader-m200v4.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2699,7 +2643,6 @@ fi
     bootoutput="bootloader-fuze.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2720,7 +2663,6 @@ fi
     bootoutput="bootloader-c200v2.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset=$scramblebitmaptools
@@ -2745,7 +2687,6 @@ fi
     bootoutput="bootloader-clipv2.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2764,7 +2705,6 @@ fi
     output="rockbox.mi4"
     appextra="gui"
     plugins=""
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=view -type=RBBL"
     bootoutput="firmware.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -2788,7 +2728,6 @@ fi
     bootoutput="bootloader-clipplus.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2808,7 +2747,6 @@ fi
     bootoutput="bootloader-fuzev2.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2828,7 +2766,6 @@ fi
     bootoutput="bootloader-fuzeplus.sansa"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -2848,7 +2785,6 @@ fi
     bootoutput="bootloader-clipzip.sansa"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="as3525"
@@ -2868,7 +2804,6 @@ fi
     bootoutput="bootloader-connect.sansa"
     appextra="recorder:gui"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="tms320dm320"
@@ -2888,7 +2823,6 @@ fi
     output="rockbox.elio"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2"
     bootoutput="pp5020.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -2913,7 +2847,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=9200 -type=RBBL"
     bootoutput="FWImage.ebn"
     # toolset is the tools within the tools directory that we build for
@@ -2938,7 +2871,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=1630 -type=RBBL"
     bootoutput="FWImage.ebn"
     # toolset is the tools within the tools directory that we build for
@@ -2963,7 +2895,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=6330 -type=RBBL"
     bootoutput="FWImage.ebn"
     # toolset is the tools within the tools directory that we build for
@@ -2988,7 +2919,6 @@ fi
     output="rockbox.meizu"
     appextra="recorder:gui:radio"
     plugins="no" #FIXME
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
     bootoutput="rockboot.ebn"
@@ -3010,7 +2940,6 @@ fi
     output="rockbox.meizu"
     appextra="recorder:gui:radio"
     plugins="no" #FIXME
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
     bootoutput="rockboot.ebn"
@@ -3032,7 +2961,6 @@ fi
     output="rockbox.meizu"
     appextra="recorder:gui:radio"
     plugins="no" #FIXME
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
     bootoutput="rockboot.ebn"
@@ -3054,7 +2982,6 @@ fi
     output="rockbox.vx747"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
     bootoutput="ccpmp.bin"
@@ -3076,7 +3003,6 @@ fi
     output="rockbox.vx767"
     appextra="recorder:gui:radio"
     plugins="" #FIXME
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
     bootoutput="ccpmp.bin"
@@ -3098,7 +3024,6 @@ fi
     output="rockbox.vx747p"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
     bootoutput="ccpmp.bin"
@@ -3120,7 +3045,6 @@ fi
     output="rockbox.vx777"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="$rootdir/tools/scramble -ccpmp"
     bootoutput="ccpmp.bin"
@@ -3142,7 +3066,6 @@ fi
     output="rockbox.lyre"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     toolset=$scramblebitmaptools
     boottool="cp"
     bootoutput="bootloader-proto1.lyre"
@@ -3164,7 +3087,6 @@ fi
     output="rockbox.mini2440"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     toolset=$scramblebitmaptools
     boottool="cp"
     bootoutput="bootloader-mini2440.lyre"
@@ -3186,7 +3108,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=y820 -type=RBBL"
     bootoutput="FW_YH820.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -3211,7 +3132,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=y920 -type=RBBL"
     bootoutput="PP5020.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -3236,7 +3156,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v2 -model=y925 -type=RBBL"
     bootoutput="FW_YH925.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -3261,7 +3180,6 @@ fi
     output="rockbox.yps3"
     appextra="recorder:gui:radio"
     plugins="no" #FIXME
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
     bootoutput="rockboot.ebn"
@@ -3283,7 +3201,6 @@ fi
     bootoutput="bootloader-ypz5.samsung"
     appextra="gui:recorder:radio"
     plugins=""
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -3303,7 +3220,6 @@ fi
     output="rockbox.mi4"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     boottool="$rootdir/tools/scramble -mi4v3 -model=v500 -type=RBBL"
     bootoutput="jukebox.mi4"
     # toolset is the tools within the tools directory that we build for
@@ -3329,7 +3245,6 @@ fi
     bootoutput="bootloader.mpio"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3352,7 +3267,6 @@ fi
     bootoutput="bootloader.mpio"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3375,7 +3289,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui:radio"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3398,7 +3311,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3421,7 +3333,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3449,7 +3360,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="sdl"
@@ -3477,7 +3387,6 @@ fi
     bootoutput="librockbox.so"
     appextra="recorder:gui:radio:hosted/android"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="android"
@@ -3504,7 +3413,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="maemo"
@@ -3531,7 +3439,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="maemo"
@@ -3558,7 +3465,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="pandora"
@@ -3581,7 +3487,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="samsungypr"
@@ -3609,7 +3514,6 @@ fi
     bootoutput="librockbox.so"
     appextra="recorder:gui:radio:hosted/android"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="android"
@@ -3637,7 +3541,6 @@ fi
     bootoutput="librockbox.so"
     appextra="recorder:gui:radio:hosted/android"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="android"
@@ -3661,7 +3564,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="samsungypr"
@@ -3681,7 +3583,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3704,7 +3605,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3727,7 +3627,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3750,7 +3649,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -3774,7 +3672,6 @@ fi
     bootoutput="bootloader-nwze350.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3795,7 +3692,6 @@ fi
     bootoutput="bootloader-nwze370.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -3815,7 +3711,6 @@ fi
     bootoutput="bootloader-nwze360.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$scramblebitmaptools
     t_cpu="arm"
     t_manufacturer="imx233"
@@ -3837,7 +3732,6 @@ fi
     bootoutput="bootloader-nwze450.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3860,7 +3754,6 @@ fi
     bootoutput="bootloader-nwze460.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3883,7 +3776,6 @@ fi
     bootoutput="bootloader-nwze470.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3906,7 +3798,6 @@ fi
     bootoutput="bootloader-nwze580.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3929,7 +3820,6 @@ fi
     bootoutput="bootloader-nwza10.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3952,7 +3842,6 @@ fi
     bootoutput="bootloader-nwa20.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3975,7 +3864,6 @@ fi
     bootoutput="bootloader-nwza860.sony"
     appextra="gui:recorder:radio"
     plugins=""
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -3998,7 +3886,6 @@ fi
     bootoutput="bootloader-nwzs750.sony"
     appextra="gui:recorder:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     t_cpu="hosted"
     t_manufacturer="sonynwz"
@@ -4020,7 +3907,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -4043,7 +3929,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins=""
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -4072,7 +3957,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:hosted"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="ibasso"
@@ -4097,7 +3981,6 @@ fi
     bootoutput="rockbox"
     appextra="recorder:gui:hosted"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="ibasso"
@@ -4119,7 +4002,6 @@ fi
     bootoutput="bootloader.rocker"
     appextra="recorder:gui:hosted"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="agptek"
@@ -4139,7 +4021,6 @@ fi
     output="rockbox.x3"
     appextra="recorder:gui:radio"
     plugins="yes"
-    swcodec="yes"
     toolset=$genericbitmaptools
     boottool="cp"
     bootoutput="bootloader-x3.bin"
@@ -4165,7 +4046,6 @@ fi
     bootoutput="bootloader.x3ii"
     appextra="recorder:gui:hosted"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="xduoo"
@@ -4188,7 +4068,6 @@ fi
     bootoutput="bootloader.x20"
     appextra="recorder:gui:hosted"
     plugins="yes"
-    swcodec="yes"
     # architecture, manufacturer and model for the target-tree build
     t_cpu="hosted"
     t_manufacturer="xduoo"
@@ -4208,7 +4087,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -4231,7 +4109,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -4254,7 +4131,6 @@ fi
     bootoutput="bootloader.rkw"
     appextra="recorder:gui"
     plugins="yes"
-    swcodec="yes"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$genericbitmaptools"
@@ -4793,11 +4669,7 @@ if test -n "$t_cpu"; then
   GCCOPTS="$GCCOPTS"
 fi
 
-if test "$swcodec" = "yes"; then
-  voicetoolset="rbspeexenc voicefont wavtrim"
-else
-  voicetoolset="voicefont wavtrim"
-fi
+voicetoolset="rbspeexenc voicefont wavtrim"
 
 if test "$apps" = "apps"; then
   # only when we build "real" apps we build the .lng files
@@ -4853,7 +4725,6 @@ export BMP2RB_REMOTENATIVE=${bmp2rb_remotenative}
 export BINARY=${output}
 export APPEXTRA=${appextra}
 export ENABLEDPLUGINS=${plugins}
-export SOFTWARECODECS=${swcodec}
 export EXTRA_DEFINES=${extradefines}
 export HOSTCC=${HOSTCC}
 export HOSTAR=${HOSTAR}

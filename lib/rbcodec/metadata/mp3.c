@@ -108,11 +108,9 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->frequency = info.frequency;
     entry->layer     = info.layer;
     switch(entry->layer) {
-#if CONFIG_CODEC==SWCODEC
         case 0:
             entry->codectype=AFMT_MPA_L1;
             break;
-#endif
         case 1:
             entry->codectype=AFMT_MPA_L2;
             break;
@@ -143,12 +141,10 @@ static int getsonglength(int fd, struct mp3entry *entry)
     entry->vbr = info.is_vbr;
     entry->has_toc = info.has_toc;
 
-#if CONFIG_CODEC==SWCODEC
     if (!entry->lead_trim)
         entry->lead_trim = info.enc_delay;
     if (!entry->tail_trim)
         entry->tail_trim = info.enc_padding;
-#endif
 
     memcpy(entry->toc, info.toc, sizeof(info.toc));
 

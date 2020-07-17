@@ -41,11 +41,7 @@
 #include "logf.h"
 
 /* max filetypes (plugins & icons stored here) */
-#if CONFIG_CODEC == SWCODEC
 #define MAX_FILETYPES 192
-#else
-#define MAX_FILETYPES 128
-#endif
 /* max viewer plugins */
 #ifdef HAVE_LCD_BITMAP
 #define MAX_VIEWERS 56
@@ -58,8 +54,6 @@ static const struct filetype inbuilt_filetypes[] = {
     { "mp3", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mp2", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mpa", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
-#if CONFIG_CODEC == SWCODEC
-    /* Temporary hack to allow playlist creation */
     { "mp1", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "ogg", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "oga", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
@@ -121,7 +115,6 @@ static const struct filetype inbuilt_filetypes[] = {
     { "vgz", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "kss", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "aac", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
-#endif
     { "m3u", FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "m3u8",FILE_ATTR_M3U, Icon_Playlist, LANG_PLAYLIST },
     { "cfg", FILE_ATTR_CFG, Icon_Config,   VOICE_EXT_CFG },

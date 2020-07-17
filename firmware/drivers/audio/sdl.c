@@ -48,7 +48,7 @@ void audiohw_set_volume(int volume)
 #ifdef HAVE_SW_VOLUME_CONTROL
     volume = sdl_volume_level(volume);
     pcm_set_master_volume(volume, volume);
-#elif CONFIG_CODEC == SWCODEC
+#else
     extern void pcm_set_mixer_volume(int volume);
     pcm_set_mixer_volume(volume);
 #endif
@@ -87,14 +87,6 @@ void audiohw_set_bass(int value)        { (void)value; }
 void audiohw_set_treble(int value)      { (void)value; }
 #endif
 #endif /* HAVE_SW_TONE_CONTROLS */
-#if CONFIG_CODEC != SWCODEC
-void audiohw_set_channel(int value)     { (void)value; }
-void audiohw_set_stereo_width(int value){ (void)value; }
-#ifdef HAVE_PITCHCONTROL
-void audiohw_set_pitch(int32_t value)   { (void)value; }
-int32_t audiohw_get_pitch(void)         { return PITCH_SPEED_100; }
-#endif
-#endif /* CONFIG_CODEC != SWCODEC */
 #if defined(AUDIOHW_HAVE_BASS_CUTOFF)
 void audiohw_set_bass_cutoff(int value) { (void)value; }
 #endif

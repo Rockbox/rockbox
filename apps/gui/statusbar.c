@@ -27,9 +27,7 @@
 #include "sound.h"
 #include "settings.h"
 #include "viewport.h"
-#if CONFIG_CODEC == SWCODEC
 #include "metadata.h"
-#endif
 #include "icons.h"
 #include "powermgmt.h"
 #include "usb.h"
@@ -602,7 +600,6 @@ static void gui_statusbar_time(struct screen * display, struct tm *time)
 #endif
 
 #ifdef HAVE_RECORDING
-#if CONFIG_CODEC == SWCODEC
 /**
  * Write a number to the display using bitmaps and return new position
  */
@@ -650,7 +647,7 @@ static void gui_statusbar_write_format_info(struct screen * display)
                 xpos += BM_GLYPH_WIDTH;
         }
     }
-       
+
 
     /* Show bitmap - clipping right edge if needed */
     display->mono_bitmap_part(bm, 0, 0, STATUSBAR_ENCODER_WIDTH,
@@ -695,58 +692,14 @@ static void gui_statusbar_write_samplerate_info(struct screen * display)
                          STATUSBAR_Y_POS, BM_GLYPH_WIDTH,
                          STATUSBAR_HEIGHT);
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 
 static void gui_statusbar_icon_recording_info(struct screen * display)
 {
-#if CONFIG_CODEC != SWCODEC
-    char buffer[3];
-    const char *p = buffer;
-    int width, height;
-    display->setfont(FONT_SYSFIXED);
-#endif /* CONFIG_CODEC != SWCODEC */
-
     /* Display Codec info in statusbar */
-#if CONFIG_CODEC == SWCODEC
     gui_statusbar_write_format_info(display);
-#else /* !SWCODEC */
-    display->mono_bitmap(bitmap_icons_5x8[Icon_q],
-                             STATUSBAR_ENCODER_X_POS + 8, STATUSBAR_Y_POS,
-                             5, STATUSBAR_HEIGHT);
-
-    snprintf(buffer, sizeof(buffer), "%d", global_settings.rec_quality);
-    display->getstringsize(buffer, &width, &height);
-    if (height <= STATUSBAR_HEIGHT)
-        display->putsxy(STATUSBAR_ENCODER_X_POS + 13, STATUSBAR_Y_POS, buffer);
-#endif /* CONFIG_CODEC == SWCODEC */
 
     /* Display Samplerate info in statusbar */
-#if CONFIG_CODEC == SWCODEC
-    /* SWCODEC targets use bitmaps for glyphs */    
     gui_statusbar_write_samplerate_info(display);
-#else /* !SWCODEC */
-    /* hwcodec targets have sysfont characters */ 
-#ifdef HAVE_SPDIF_REC
-    if (global_settings.rec_source == AUDIO_SRC_SPDIF)
-    {
-        /* Can't measure S/PDIF sample rate on Archos/Sim yet */
-        p = "--";
-    }
-    else
-#endif /* HAVE_SPDIF_IN */
-    {
-        static const char * const freq_strings[] =
-           {"44", "48", "32", "22", "24", "16"};
-        p = freq_strings[global_settings.rec_frequency];
-    }
-
-    display->getstringsize(p, &width, &height);
-
-    if (height <= STATUSBAR_HEIGHT)
-        display->putsxy(STATUSBAR_RECFREQ_X_POS, STATUSBAR_Y_POS, p);
-
-    display->setfont(FONT_UI);
-#endif /* CONFIG_CODEC == SWCODEC */
 
     /* Display Channel status in status bar */
     if(global_settings.rec_channels)

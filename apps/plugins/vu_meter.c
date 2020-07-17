@@ -469,10 +469,6 @@
 #endif
 #endif
 
-#if defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-#define mas_codec_readreg(x) rand()%MAX_PEAK
-#endif
-
 /* Defines x positions on a logarithmic (dBfs) scale. */
 unsigned char analog_db_scale[LCD_WIDTH/2];
 
@@ -780,13 +776,11 @@ static void draw_digital_minimeters(void) {
 
 static void analog_meter(void) {
 
-#if (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
     #define left_peak peaks.left
     #define right_peak peaks.right
-#endif
 
     if(vumeter_settings.analog_use_db_scale) {
         left_needle_top_x = analog_db_scale[left_peak * half_width / MAX_PEAK];
@@ -837,13 +831,11 @@ static void analog_meter(void) {
 }
 
 static void digital_meter(void) {
-#if (CONFIG_CODEC == SWCODEC)
     static struct pcm_peaks peaks;
     rb->mixer_channel_calculate_peaks(PCM_MIXER_CHAN_PLAYBACK,
                                       &peaks);
     #define left_peak peaks.left
     #define right_peak peaks.right
-#endif
 
     if(vumeter_settings.digital_use_db_scale) {
         num_left_leds = digital_db_scale[left_peak * 44 / MAX_PEAK];

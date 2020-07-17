@@ -30,7 +30,6 @@
 #include "icons.h"
 #include "font.h"
 #include "audio.h"
-#include "mp3_playback.h"
 #include "usb.h"
 #include "settings.h"
 #include "status.h"
@@ -380,10 +379,8 @@ static const int id3_headers[]=
     LANG_ID3_PLAYLIST,
     LANG_ID3_BITRATE,
     LANG_ID3_FREQUENCY,
-#if CONFIG_CODEC == SWCODEC
     LANG_ID3_TRACK_GAIN,
     LANG_ID3_ALBUM_GAIN,
-#endif
     LANG_FILESIZE,
     LANG_ID3_PATH,
 };
@@ -423,7 +420,6 @@ static void say_number_and_spell(char *buf, bool year_style)
     }
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* Say a replaygain ID3 value from its text form */
 static void say_gain(char *buf)
 {
@@ -479,7 +475,6 @@ static void say_gain(char *buf)
     }else /* we didn't find a number, just spell everything */
         talk_spell(buf, true);
 }
-#endif
 
 static const char * id3_get_or_speak_info(int selected_item, void* data,
                                           char *buffer, size_t buffer_len,
@@ -619,7 +614,6 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if(say_it)
                     talk_value(id3->frequency, UNIT_HERTZ, true);
                 break;
-#if CONFIG_CODEC == SWCODEC
             case LANG_ID3_TRACK_GAIN:
                 replaygain_itoa(buffer, buffer_len, id3->track_level);
                 val=(id3->track_level) ? buffer : NULL; /* only show level!=0 */
@@ -632,12 +626,11 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if(say_it && val)
                     say_gain(val);
                 break;
-#endif
             case LANG_ID3_PATH:
                 val=id3->path;
                 if(say_it && val)
                     talk_fullpath(val, true);
-                break;    
+                break;
             case LANG_ID3_COMPOSER:
                 val=id3->composer;
                 if(say_it && val)

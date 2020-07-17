@@ -82,8 +82,8 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 /* There is no hardware tone control */
 #define HAVE_SW_TONE_CONTROLS
 /* The PP5024 has a built-in AustriaMicrosystems AS3514 */

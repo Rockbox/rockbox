@@ -92,8 +92,8 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF

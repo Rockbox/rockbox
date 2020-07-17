@@ -59,8 +59,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 #define CONFIG_TUNER SI4700
 

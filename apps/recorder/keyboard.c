@@ -1218,16 +1218,12 @@ static void kbd_move_cursor(struct edit_state *state, int dir)
     else if (state->editpos > state->len_utf8)
     {
         state->editpos = 0;
-        #if CONFIG_CODEC == SWCODEC
         if (global_settings.talk_menu) beep_play(1000, 150, 1500);
-	#endif
     }
     else if (state->editpos < 0)
     {
         state->editpos = state->len_utf8;
-        #if CONFIG_CODEC == SWCODEC
         if (global_settings.talk_menu) beep_play(1000, 150, 1500);
-        #endif
     }
 }
 

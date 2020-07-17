@@ -313,14 +313,8 @@ static bool seek(unsigned long pos)
     }
     else
     {
-#if (CONFIG_CODEC == SWCODEC)
         audio_pre_ff_rewind();
         audio_ff_rewind(pos);
-#else
-        audio_pause();
-        audio_ff_rewind(pos);
-        audio_resume();
-#endif
         return true;
     }
 }

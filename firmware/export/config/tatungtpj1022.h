@@ -45,8 +45,8 @@
 
 #define CONFIG_KEYPAD TATUNG_TPJ1022_PAD
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* define this if you have a real-time clock */
 #ifndef BOOTLOADER

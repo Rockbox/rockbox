@@ -102,9 +102,9 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef USE_GREY
 grey_show(false);
 grey_release();
-#endif 
+#endif
 
-#if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
+#if !defined SIMULATOR
     rb->pcm_play_stop();
 #endif
 

@@ -29,7 +29,6 @@
 #include "lcd.h"
 #include "menu.h"
 #include "button.h"
-#include "mp3_playback.h"
 #include "settings.h"
 #include "screens.h"
 #include "icons.h"
@@ -51,14 +50,12 @@
 #include "peakmeter.h"
 #endif
 #include "splash.h"
-#if CONFIG_CODEC == SWCODEC
 #include "metadata.h"
 #include "menus/eq_menu.h"
 #ifdef HAVE_RECORDING
 #include "enc_config.h"
 #endif
 #include "general.h"
-#endif
 #include "action.h"
 #include "recording.h"
 #include "sound_menu.h"
@@ -101,7 +98,6 @@ static int recsource_func(void)
 MENUITEM_FUNCTION(recsource, 0, ID2P(LANG_RECORDING_SOURCE), 
                     recsource_func, NULL, recmenu_callback, Icon_Menu_setting);
 
-#if CONFIG_CODEC == SWCODEC
 /* Makes an options list from a source list of options and indexes */
 static void make_options_from_indexes(const struct opt_items *src_names,
                                       const long *src_indexes,
@@ -112,12 +108,8 @@ static void make_options_from_indexes(const struct opt_items *src_names,
         dst_names[n_indexes] = src_names[src_indexes[n_indexes]];
 } /* make_options_from_indexes */
 
-
-#endif /* CONFIG_CODEC == SWCODEC */
-
 static int recfrequency_func(void)
 {
-#if CONFIG_CODEC == SWCODEC
     static const struct opt_items names[REC_NUM_FREQ] = {
         REC_HAVE_96_([REC_FREQ_96] = { "96kHz",     TALK_ID(96, UNIT_KHZ) },)
         REC_HAVE_88_([REC_FREQ_88] = { "88.2kHz",   TALK_ID(88, UNIT_KHZ) },)
@@ -195,7 +187,6 @@ static int recfrequency_func(void)
     }
 
     return ret;
-#endif /* CONFIG_CODEC == SWCODEC */
 } /* recfrequency */
 MENUITEM_FUNCTION(recfrequency, 0, ID2P(LANG_FREQUENCY),
                     recfrequency_func, NULL, NULL, Icon_Menu_setting);
@@ -208,7 +199,6 @@ static int recchannels_func(void)
         [CHN_MODE_MONO]   = { STR(LANG_CHANNEL_MONO)   }
     };
 
-#if CONFIG_CODEC == SWCODEC
     struct opt_items    opts[CHN_NUM_MODES];
     long                table[CHN_NUM_MODES];
     struct encoder_caps caps;
@@ -238,12 +228,9 @@ static int recchannels_func(void)
         global_settings.rec_channels = table[rec_channels];
 
     return ret;
-#endif /* CONFIG_CODEC == SWCODEC */
 }
 MENUITEM_FUNCTION(recchannels, 0, ID2P(LANG_CHANNELS),
                     recchannels_func, NULL, NULL, Icon_Menu_setting);
-
-#if CONFIG_CODEC == SWCODEC
 
 static int recmonomode_func(void)
 {
@@ -292,9 +279,6 @@ MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_RECORDING_FORMAT),
 MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),
                      enc_global_config_menu,
                      NULL, NULL, Icon_Submenu);
-
-#endif /* CONFIG_CODEC == SWCODEC */
-
 
 static int recmenu_callback(int action,
                              const struct menu_item_ex *this_item,
@@ -603,14 +587,10 @@ MENUITEM_FUNCTION(save_recpresets_item, 0, ID2P(LANG_SAVE_SETTINGS),
 
 MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
             NULL, Icon_Recording,
-#if CONFIG_CODEC == SWCODEC
             &recformat, &enc_global_config_menu_item,
-#endif
             &recfrequency, &recsource, /* recsource not shown if no_source */
             &recchannels,
-#if CONFIG_CODEC == SWCODEC
             &recmonomode,
-#endif
             &filesplitoptionsmenu,
             &rec_prerecord_time,
             &clear_rec_directory_item,

@@ -75,8 +75,8 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 #define HAVE_ROCKER_CODEC
 
 #define HAVE_HEADPHONE_DETECTION

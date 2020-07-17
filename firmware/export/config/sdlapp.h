@@ -65,8 +65,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 #define HAVE_SCROLLWHEEL
 #define CONFIG_KEYPAD SDL_PAD
