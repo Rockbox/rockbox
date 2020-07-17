@@ -107,8 +107,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* The D2 uses a WM8985 codec */
 #define HAVE_WM8985
