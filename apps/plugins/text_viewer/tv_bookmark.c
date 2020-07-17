@@ -182,11 +182,7 @@ static const char* get_bookmark_name(int selected, void * data,
     (void)data;
     struct tv_bookmark_info *bookmark = &bookmarks[selected];
     rb->snprintf(buffer, buffer_len,
-#ifdef HAVE_LCD_BITMAP
                  "%cPage: %d  Line: %d",
-#else
-                 "%cP:%d  L:%d",
-#endif
                  (bookmark->flag & TV_BOOKMARK_SYSTEM)? '*' : ' ',
                  bookmark->pos.page + 1, bookmark->pos.line + 1);
     return buffer;

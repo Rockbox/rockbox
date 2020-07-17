@@ -39,9 +39,7 @@
 #include "storage.h"
 #include "screens.h"
 #include "playlist.h"
-#ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#endif
 #include "lang.h"
 #include "bookmark.h"
 #include "misc.h"
@@ -87,7 +85,6 @@ static void track_info_callback(unsigned short id, void *param);
 char* wps_default_skin(enum screen_type screen)
 {
     static char *skin_buf[NB_SCREENS] = {
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
             "%X(d)\n"
 #endif
@@ -97,10 +94,6 @@ char* wps_default_skin(enum screen_type screen)
             "%al%pc/%pt%ar[%pp:%pe]\n"
             "%fbkBit %?fv<avg|> %?iv<%(id3v%iv%)|%(no id3%)>\n"
             "%pb\n%pm\n",
-#else
-            "%s%pp/%pe: %?it<%it|%fn> - %?ia<%ia|%d(2)> - %?id<%id|%d(1)>\n"
-            "%pc%?ps<*|/>%pt\n",
-#endif
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH > 1
             "%X(d)\n"

@@ -21,11 +21,7 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 /*
  * Print a checkbox
  */
 void checkbox(int x, int y, int width, int height, bool checked);
-
-#endif

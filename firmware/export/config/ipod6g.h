@@ -38,8 +38,8 @@
                        | SAMPR_CAP_48 | SAMPR_CAP_24 | SAMPR_CAP_12 \
                        | SAMPR_CAP_32 | SAMPR_CAP_16 | SAMPR_CAP_8)
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you can flip your LCD */
 //#define HAVE_LCD_FLIP

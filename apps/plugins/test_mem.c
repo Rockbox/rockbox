@@ -206,10 +206,8 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     int count = 0;
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
-#endif
-    
+
     rb->screens[0]->clear_display();
     TEST_MEM_PRINTF("patience, may take some seconds...");
     rb->screens[0]->update();

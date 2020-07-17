@@ -159,7 +159,6 @@ MAKE_MENU(colors_settings, ID2P(LANG_COLORS_MENU),
 /*                                  */
 
 
-#ifdef HAVE_LCD_BITMAP
 static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item,
                                 enum screen_type screen)
 {
@@ -212,18 +211,15 @@ MAKE_MENU(bars_menu, ID2P(LANG_BARS_MENU), 0, Icon_NOICON,
           , &battery_display
 #endif
           );
-#endif /* HAVE_LCD_BITMAP */
 
 /*                                  */
 /*    BARS MENU                     */
 /************************************/
 
-#ifdef HAVE_LCD_BITMAP
 static struct browse_folder_info fonts = {FONT_DIR, SHOW_FONT};
 static struct browse_folder_info sbs   = {SBS_DIR, SHOW_SBS};
 #if CONFIG_TUNER
 static struct browse_folder_info fms   = {WPS_DIR, SHOW_FMS};
-#endif
 #endif
 static struct browse_folder_info wps = {WPS_DIR, SHOW_WPS};
 #ifdef HAVE_REMOTE_LCD
@@ -262,7 +258,6 @@ int browse_folder(void *param)
             setting = global_settings.wps_file;
             lang_id = LANG_WHILE_PLAYING;
             break;
-#ifdef HAVE_LCD_BITMAP
         case SHOW_FONT:
             ext = "fnt";
             setting = global_settings.font_file;
@@ -280,7 +275,6 @@ int browse_folder(void *param)
             lang_id = LANG_RADIOSCREEN;
             break;
 #endif /* CONFIG_TUNER */
-#endif
 #ifdef HAVE_REMOTE_LCD
         case SHOW_RWPS:
             ext = "rwps";
@@ -318,7 +312,6 @@ int browse_folder(void *param)
     return rockbox_browse(&browse);
 }
 
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION(browse_fonts, MENU_FUNC_USEPARAM, 
         ID2P(LANG_CUSTOM_FONT), 
         browse_folder, (void*)&fonts, NULL, Icon_Font);
@@ -330,7 +323,6 @@ MENUITEM_FUNCTION(browse_sbs, MENU_FUNC_USEPARAM,
 MENUITEM_FUNCTION(browse_fms, MENU_FUNC_USEPARAM, 
         ID2P(LANG_RADIOSCREEN), 
         browse_folder, (void*)&fms, NULL, Icon_Wps);
-#endif
 #endif
 MENUITEM_FUNCTION(browse_wps, MENU_FUNC_USEPARAM, 
         ID2P(LANG_WHILE_PLAYING), 
@@ -371,9 +363,7 @@ MENUITEM_SETTING(show_icons, &global_settings.show_icons, showicons_callback);
 MENUITEM_FUNCTION(browse_themes, MENU_FUNC_USEPARAM, 
         ID2P(LANG_CUSTOM_THEME), 
         browse_folder, (void*)&themes, NULL, Icon_Config);
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING(cursor_style, &global_settings.cursor_style, NULL);
-#endif
 #if LCD_DEPTH > 1
 MENUITEM_SETTING(sep_menu, &global_settings.list_separator_height, NULL);
 #endif
@@ -381,9 +371,7 @@ MENUITEM_SETTING(sep_menu, &global_settings.list_separator_height, NULL);
 MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
             NULL, Icon_Wps,
             &browse_themes,
-#ifdef HAVE_LCD_BITMAP
             &browse_fonts,
-#endif
             &browse_wps,
 #ifdef HAVE_REMOTE_LCD
             &browse_rwps,
@@ -394,9 +382,7 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
             &browse_rfms,
 #endif
 #endif
-#ifdef HAVE_LCD_BITMAP
             &browse_sbs,
-#endif
 #ifdef HAVE_REMOTE_LCD
             &browse_rsbs,
 #endif
@@ -404,7 +390,6 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
 #ifdef HAVE_BACKDROP_IMAGE
             &clear_main_bd,
 #endif
-#ifdef HAVE_LCD_BITMAP
             &bars_menu,
             &cursor_style,
 #if LCD_DEPTH > 1
@@ -413,5 +398,4 @@ MAKE_MENU(theme_menu, ID2P(LANG_THEME_MENU),
 #ifdef HAVE_LCD_COLOR
             &colors_settings,
 #endif
-#endif /* HAVE_LCD_BITMAP */
 );

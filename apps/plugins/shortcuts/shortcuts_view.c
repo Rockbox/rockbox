@@ -223,20 +223,16 @@ enum plugin_status plugin_start(const void* void_parameter)
         return PLUGIN_OK;
     }
 
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
-#endif
 
     do {
         /* Display a menu to choose between the entries */
         leave_loop = list_sc();
     } while (!leave_loop);
 
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
-#endif
 
     return usb_connected ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
 }

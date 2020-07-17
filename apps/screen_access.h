@@ -50,9 +50,7 @@ struct screen
     int lcdwidth, lcdheight;
     int depth;
     int (*getnblines)(void);
-#ifdef HAVE_LCD_BITMAP
     int pixel_format;
-#endif
     int (*getcharwidth)(void);
     int (*getcharheight)(void);
     bool is_color;
@@ -64,7 +62,6 @@ struct screen
     int (*getwidth)(void);
     int (*getheight)(void);
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD) /* always bitmap */
     void (*setfont)(int newfont);
     int (*getuifont)(void);
     void (*setuifont)(int newfont);
@@ -104,7 +101,6 @@ struct screen
     void (*drawline)(int x1, int y1, int x2, int y2);
     void (*vline)(int x, int y1, int y2);
     void (*hline)(int x1, int x2, int y);
-#endif /* HAVE_LCD_BITMAP || HAVE_REMOTE_LCD */
 
     void (*putsxy)(int x, int y, const unsigned char *str);
     void (*puts)(int x, int y, const unsigned char *str);
@@ -130,7 +126,6 @@ struct screen
     bool (*backdrop_load)(const char *filename, char* backdrop_buffer);
     void (*backdrop_show)(char* backdrop_buffer);
 #endif
-#if defined(HAVE_LCD_BITMAP)
     void (*set_framebuffer)(void *framebuffer);
 #if defined(HAVE_LCD_COLOR)    
     void (*gradient_fillrect)(int x, int y, int width, int height,
@@ -138,15 +133,11 @@ struct screen
     void (*gradient_fillrect_part)(int x, int y, int width, int height,
             unsigned start, unsigned end, int src_height, int row_skip);
 #endif
-#endif
-#if defined(HAVE_LCD_BITMAP)
     void (*nine_segment_bmp)(const struct bitmap* bm, int x, int y,
                                 int width, int height);
-#endif
     void (*put_line)(int x, int y, struct line_desc *line, const char *fmt, ...);
 };
 
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
 /*
  * Clear only a given area of the screen
  * - screen : the screen structure
@@ -155,7 +146,6 @@ struct screen
  */
 void screen_clear_area(struct screen * display, int xstart, int ystart,
                        int width, int height);
-#endif
 
 /*
  * exported screens array that should be used
