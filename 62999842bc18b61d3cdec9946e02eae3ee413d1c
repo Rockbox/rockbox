@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59735bc7_0e3ece0f",
+        "filename": "lib/rbcodec/metadata/id3tags.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 979,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-07-17T15:58:17Z",
+      "side": 1,
+      "message": "needs tabbed and probably brackets too",
+      "revId": "62999842bc18b61d3cdec9946e02eae3ee413d1c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
