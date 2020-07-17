@@ -16,6 +16,24 @@
       "revId": "ed13cb33696a8644a505009355d0a18e56216c63",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "3200966d_86fcc8c7",
+        "filename": "apps/screens.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 766,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-17T16:58:57Z",
+      "side": 0,
+      "message": "got it.",
+      "parentUuid": "934bb1f0_176beea2",
+      "revId": "ed13cb33696a8644a505009355d0a18e56216c63",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
