@@ -51,7 +51,6 @@
 extern bool debug_audio;
 #endif
 
-#if CONFIG_CODEC == SWCODEC
 static int cvt_status = -1;
 
 static const void *pcm_data;
@@ -411,5 +410,3 @@ void pcm_play_dma_init(void)
 void pcm_play_dma_postinit(void)
 {
 }
-
-#endif /* CONFIG_CODEC == SWCODEC */

@@ -41,16 +41,13 @@
 char* default_radio_skin(enum screen_type screen)
 {
     (void)screen;
-    static char default_fms[] = 
+    static char default_fms[] =
         "%s%?Ti<%Ti. |>%?Tn<%Tn|%Tf>\n"
         "%Sx(Station:) %tf MHz\n"
         "%?St(force fm mono)<%Sx(Force Mono)|%?ts<%Sx(Stereo)|%Sx(Mono)>>\n"
         "%Sx(Mode:) %?tm<%Sx(Scan)|%Sx(Preset)>\n"
 #ifdef HAVE_RADIO_RSSI
         "%Sx(Signal strength:) %tr dBuV\n"
-#endif
-#if CONFIG_CODEC != SWCODEC && !defined(SIMULATOR)
-        "%?Rr<%Sx(Time:) %Rh:%Rn:%Rs|%?St(prerecording time)<%pm|%Sx(Prerecord Time) %Rs>>\n"
 #endif
         "%pb\n"
 #ifdef HAVE_RDS_CAP

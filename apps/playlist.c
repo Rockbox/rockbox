@@ -647,11 +647,7 @@ static int create_and_play_dir(int direction, bool play_last)
         else
             index = 0;
 
-#if (CONFIG_CODEC == SWCODEC)
         current_playlist.started = true;
-#else
-        playlist_start(index, 0, 0);
-#endif
     }
 
     /* we've overwritten the dircache when getting the next/previous dir,
@@ -1090,7 +1086,6 @@ static int calculate_step_count(const struct playlist_info *playlist, int steps)
     return steps;
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* Marks the index of the track to be skipped that is "steps" away from
  * current playing track.
  */
@@ -1100,7 +1095,7 @@ void playlist_skip_entry(struct playlist_info *playlist, int steps)
 
     if (playlist == NULL)
         playlist = &current_playlist;
-    
+
     /* need to account for already skipped tracks */
     steps = calculate_step_count(playlist, steps);
 
@@ -1112,7 +1107,6 @@ void playlist_skip_entry(struct playlist_info *playlist, int steps)
 
     playlist->indices[index] |= PLAYLIST_SKIPPED;
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 
 /*
  * returns the index of the track that is "steps" away from current playing
@@ -2649,11 +2643,9 @@ const char* playlist_peek(int steps, char* buf, size_t buf_size)
     if (index < 0)
         return NULL;
 
-#if CONFIG_CODEC == SWCODEC
     /* Just testing - don't care about the file name */
     if (!buf || !buf_size)
         return "";
-#endif
 
     control_file = playlist->indices[index] & PLAYLIST_INSERT_TYPE_MASK;
     seek = playlist->indices[index] & PLAYLIST_SEEK_MASK;
@@ -2730,11 +2722,7 @@ int playlist_next(int steps)
             sort_playlist(playlist, false, false);
             randomise_playlist(playlist, current_tick, false, true);
 
-#if CONFIG_CODEC == SWCODEC
             playlist->started = true;
-#else
-            playlist_start(0, 0, 0);
-#endif
             playlist->index = 0;
             index = 0;
         }
@@ -2780,7 +2768,6 @@ int playlist_next(int steps)
     return index;
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* try playing next or previous folder */
 bool playlist_next_dir(int direction)
 {
@@ -2790,7 +2777,6 @@ bool playlist_next_dir(int direction)
 
     return create_and_play_dir(direction, false) >= 0;
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 
 /* Get resume info for current playing song.  If return value is -1 then
    settings shouldn't be saved. */

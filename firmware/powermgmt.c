@@ -31,7 +31,6 @@
 #include "storage.h"
 #include "power.h"
 #include "audio.h"
-#include "mp3_playback.h"
 #include "usb.h"
 #include "powermgmt.h"
 #include "backlight.h"
@@ -770,11 +769,7 @@ void shutdown_hw(void)
             storage_spindown(1);
     }
 
-#if CONFIG_CODEC == SWCODEC
     audiohw_close();
-#else
-    mp3_shutdown();
-#endif
 
     /* If HD is still active we try to wait for spindown, otherwise the
        shutdown_timeout in power_thread_step will force a power off */
