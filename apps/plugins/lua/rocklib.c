@@ -487,7 +487,7 @@ RB_WRAP(sound)
             lua_pushstring (L, rb->sound_unit(setting));
             return 1;
             break;
-#if ((CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHCONTROL))
+#if defined (HAVE_PITCHCONTROL)
         case SOUND_SET_PITCH:
             rb->sound_set_pitch(setting);
             return 1;/*nil*/
@@ -507,7 +507,6 @@ RB_WRAP(sound)
     return 1;
 }
 
-#if CONFIG_CODEC == SWCODEC
 RB_WRAP(pcm)
 {
     enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_ISPLAYING, PCM_ISPAUSED,
@@ -579,7 +578,6 @@ RB_WRAP(mixer_frequency)
     lua_pushinteger(L, result);
     return 1;
 }
-#endif /*CONFIG_CODEC == SWCODEC*/
 
 /* DEVICE LIGHTING CONTROL */
 RB_WRAP(backlight_onoff)
@@ -953,10 +951,8 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(audio),
     RB_FUNC(playlist),
     RB_FUNC(sound),
-#if CONFIG_CODEC == SWCODEC
     RB_FUNC(pcm),
     RB_FUNC(mixer_frequency),
-#endif
 
     /* DEVICE LIGHTING CONTROL */
     RB_FUNC(backlight_onoff),

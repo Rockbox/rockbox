@@ -77,8 +77,8 @@
 //#define AB_REPEAT_ENABLE
 //#define ACTION_WPSAB_SINGLE ACTION_WPS_BROWSE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* define this if you have a real-time clock */
 //#define CONFIG_RTC RTC_S5L8700
