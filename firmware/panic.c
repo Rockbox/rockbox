@@ -86,7 +86,6 @@ void panicf( const char *fmt, ...)
 
     lcd_set_viewport(NULL);
 
-#if defined(HAVE_LCD_BITMAP)
     int y = 1;
 
 #if LCD_DEPTH > 1
@@ -115,9 +114,6 @@ void panicf( const char *fmt, ...)
 #endif
 #ifdef ROCKBOX_HAS_LOGF
     logf_panic_dump(&y);
-#endif
-#else
-    /* no LCD */
 #endif
 
     lcd_update();

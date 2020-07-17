@@ -24,7 +24,7 @@
 #include "plugin.h"
 #include "lib/helper.h" 
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if (LCD_DEPTH < 4)
 #include "lib/grey.h"
 
 
@@ -372,5 +372,5 @@ enum plugin_status plugin_start(const void* parameter)
     return main();
 }
 
-#endif /* #ifdef HAVE_LCD_BITMAP */
+#endif /* #if LCD_DEPTH < 4 */
 

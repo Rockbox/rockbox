@@ -411,10 +411,8 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
 
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
-#endif
 
     rb->gui_synclist_init(&properties_lists, &get_props, &dps, false, 2, NULL);
     rb->gui_synclist_set_title(&properties_lists, rb->str(its_a_dir ? LANG_PROPERTIES_DIRECTORY_PROPERTIES : LANG_PROPERTIES_FILE_PROPERTIES), NOICON);
@@ -448,10 +446,8 @@ enum plugin_status plugin_start(const void* parameter)
         }
     }
 
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
-#endif
 
     return usb? PLUGIN_USB_CONNECTED: PLUGIN_OK;
 }
