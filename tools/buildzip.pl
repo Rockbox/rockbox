@@ -92,7 +92,7 @@ sub find_copyfile {
                 print "cp $path $destination\n" if $verbose;
                 copy($path, $destination);
                 chmod(0755, $destination.'/'.$path);
-            } 
+            }
         }
     }
 }
@@ -266,7 +266,6 @@ LCD Height: LCD_HEIGHT
 Icon Width: CONFIG_DEFAULT_ICON_WIDTH
 Icon Height: CONFIG_DEFAULT_ICON_HEIGHT
 #endif
-Codec: CONFIG_CODEC
 #ifdef HAVE_REMOTE_LCD
 Remote Depth: LCD_REMOTE_DEPTH
 Remote Icon Width: CONFIG_REMOTE_DEFAULT_ICON_WIDTH
@@ -287,7 +286,7 @@ STOP
 
     open(TARGET, "$c|");
 
-    my ($bitmap, $width, $height, $depth, $swcodec, $icon_h, $icon_w);
+    my ($bitmap, $width, $height, $depth, $icon_h, $icon_w);
     my ($remote_depth, $remote_icon_h, $remote_icon_w);
     my ($recording);
     my $icon_count = 1;
@@ -311,10 +310,6 @@ STOP
         elsif($_ =~ /^Icon Height: (\d*)/) {
             $icon_h = $1;
         }
-        elsif($_ =~ /^Codec: (\d*)/) {
-            # SWCODEC is 1, the others are HWCODEC
-            $swcodec = ($1 == 1);
-        }
         elsif($_ =~ /^Remote Depth: (\d*)/) {
             $remote_depth = $1;
         }
@@ -332,7 +327,7 @@ STOP
     unlink("gcctemp");
 
     return ($bitmap, $depth, $width, $height, $icon_w, $icon_h, $recording,
-            $swcodec, $remote_depth, $remote_icon_w, $remote_icon_h);
+            $remote_depth, $remote_icon_w, $remote_icon_h);
 }
 
 sub filesize {
@@ -345,17 +340,17 @@ sub filesize {
 
 
 sub buildzip {
-    my ($image, $fonts)=@_;    
+    my ($image, $fonts)=@_;
     my $libdir = $install;
     my $temp_dir = ".rockbox";
 
     print "buildzip: image=$image fonts=$fonts\n" if $verbose;
-    
+
     my ($bitmap, $depth, $width, $height, $icon_w, $icon_h, $recording,
-        $swcodec, $remote_depth, $remote_icon_w, $remote_icon_h) =
+        $remote_depth, $remote_icon_w, $remote_icon_h) =
       &gettargetinfo();
 
-    # print "Bitmap: $bitmap\nDepth: $depth\nSwcodec: $swcodec\n";
+    # print "Bitmap: $bitmap\nDepth: $depth\n";
 
     # remove old traces
     rmtree($temp_dir);
@@ -406,11 +401,8 @@ sub buildzip {
         glob_mkdir("$temp_dir/recpresets");
     }
 
-    if($swcodec) {
-        glob_mkdir("$temp_dir/eqs");
-
-        glob_copy("$ROOT/lib/rbcodec/dsp/eqs/*.cfg", "$temp_dir/eqs/"); # equalizer presets
-    }
+    glob_mkdir("$temp_dir/eqs");
+    glob_copy("$ROOT/lib/rbcodec/dsp/eqs/*.cfg", "$temp_dir/eqs/"); # equalizer presets
 
     glob_mkdir("$temp_dir/wps");
     glob_mkdir("$temp_dir/icons");
@@ -556,7 +548,7 @@ sub buildzip {
         if( filesize("rombox.ucl") > 1000) {
             copy("rombox.ucl", "$temp_dir/rombox.ucl");  # UCL for flashing
         }
-        
+
         # Check for rombox.target
         if ($image=~/(.*)\.(\w+)$/)
         {
@@ -596,20 +588,16 @@ sub buildzip {
     else {
         print STDERR "No wps module present, can't do the WPS magic!\n";
     }
-    
+
     # until buildwps.pl is fixed, manually copy the classic_statusbar theme across
     mkdir "$temp_dir/wps/classic_statusbar", 0777;
     glob_copy("$ROOT/wps/classic_statusbar/*.bmp", "$temp_dir/wps/classic_statusbar");
-    if ($swcodec) {
-        if ($depth == 16) {
-            copy("$ROOT/wps/classic_statusbar.sbs", "$temp_dir/wps");
-        } elsif ($depth > 1) {
-            copy("$ROOT/wps/classic_statusbar.grey.sbs", "$temp_dir/wps/classic_statusbar.sbs");
-        } else {
-            copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.sbs");
-        }
+    if ($depth == 16) {
+        copy("$ROOT/wps/classic_statusbar.sbs", "$temp_dir/wps");
+    } elsif ($depth > 1) {
+        copy("$ROOT/wps/classic_statusbar.grey.sbs", "$temp_dir/wps/classic_statusbar.sbs");
     } else {
-        copy("$ROOT/wps/classic_statusbar.112x64x1.sbs", "$temp_dir/wps/classic_statusbar.sbs");
+        copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.sbs");
     }
     if ($remote_depth != $depth) {
         copy("$ROOT/wps/classic_statusbar.mono.sbs", "$temp_dir/wps/classic_statusbar.rsbs");

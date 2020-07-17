@@ -181,7 +181,6 @@ enum current_activity {
     ACTIVITY_USBSCREEN
 };
 
-#if CONFIG_CODEC == SWCODEC
 void beep_play(unsigned int frequency, unsigned int duration,
                unsigned int amplitude);
 
@@ -209,9 +208,6 @@ void keyclick_click(bool rawbutton, int action);
 struct mp3entry;
 int id3_get_replaygain_mode(const struct mp3entry *id3);
 void replaygain_update(void);
-#else
-static inline void replaygain_update(void) {}
-#endif /* CONFIG_CODEC == SWCODEC */
 
 void push_current_activity(enum current_activity screen);
 void pop_current_activity(void);
