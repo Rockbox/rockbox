@@ -879,7 +879,6 @@ static void tagtree_buffer_event(unsigned short id, void *ev_data)
         logf("-> %ld/%ld", id3->playcount, id3->playtime);
     }
 
- #if CONFIG_CODEC == SWCODEC
     if (autoresume)
     {
         /* Load current file resume info if not already defined (by
@@ -900,7 +899,6 @@ static void tagtree_buffer_event(unsigned short id, void *ev_data)
                  str_or_empty(id3->title), id3->offset);
         }
     }
- #endif
 
     /* Store our tagcache index pointer. */
     id3->tagcache_idx = tcs.idx_id+1;
@@ -922,25 +920,20 @@ static void tagtree_track_finish_event(unsigned short id, void *ev_data)
     }
     tagcache_idx--;
 
-#if CONFIG_CODEC == SWCODEC /* HWCODEC doesn't have automatic_skip */
     bool auto_skip = te->flags & TEF_AUTO_SKIP;
-#endif
     bool runtimedb = global_settings.runtimedb;
     bool autoresume = global_settings.autoresume_enable;
 
     /* Don't process unplayed tracks, or tracks interrupted within the
        first 15 seconds but always process autoresume point */
     if (runtimedb && (id3->elapsed == 0
-#if CONFIG_CODEC == SWCODEC
         || (id3->elapsed < 15 * 1000 && !auto_skip)
-#endif
         ))
     {
         logf("not db logging unplayed or skipped track");
         runtimedb = false;
     }
 
-#if CONFIG_CODEC == SWCODEC
     /* 3s because that is the threshold the WPS uses to rewind instead
        of skip backwards */
     if (autoresume && (id3->elapsed == 0
@@ -949,7 +942,6 @@ static void tagtree_track_finish_event(unsigned short id, void *ev_data)
         logf("not logging autoresume");
         autoresume = false;
     }
-#endif
 
     /* Do not gather data unless proper setting has been enabled and at least
        one is still slated to be recorded */
@@ -987,7 +979,6 @@ static void tagtree_track_finish_event(unsigned short id, void *ev_data)
         tagcache_update_numeric(tagcache_idx, tag_lastplayed, lastplayed);
     }
 
-#if CONFIG_CODEC == SWCODEC
     if (autoresume)
     {
         unsigned long elapsed = auto_skip ? 0 : id3->elapsed;
@@ -998,7 +989,6 @@ static void tagtree_track_finish_event(unsigned short id, void *ev_data)
         logf("tagtree_track_finish_event: Save resume for %s: %lX %lX",
              str_or_empty(id3->title), elapsed, offset);
     }
-#endif
 }
 
 int tagtree_export(void)
