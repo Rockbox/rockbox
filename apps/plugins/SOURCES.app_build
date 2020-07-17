@@ -23,9 +23,7 @@ test_fps.c
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 test_boost.c
 #endif
-#if CONFIG_CODEC == SWCODEC
 test_codec.c
-#endif
 #ifdef HAVE_JPEG
 test_core_jpeg.c
 #endif
@@ -46,9 +44,7 @@ test_mem_jpeg.c
 #ifdef HAVE_LCD_COLOR
 test_resize.c
 #endif
-#if CONFIG_CODEC == SWCODEC
 test_sampr.c
-#endif
 test_viewports.c
 #endif /* HAVE_TEST_PLUGINS */
 
