@@ -34,14 +34,12 @@
 #include "profile.h"
 #include "thread.h"
 #endif
-#if (CONFIG_CODEC == SWCODEC)
 #ifdef HAVE_RECORDING
 #include "enc_base.h"
 #endif
 #include "dsp_core.h"
 #include "dsp_misc.h"
 #include "dsp-util.h"
-#endif
 
 #include "gcc_extensions.h"
 #include "load_code.h"
@@ -281,18 +279,18 @@ int codec_load_buf(int hid, struct codec_api *api);
 int codec_load_file(const char* codec, struct codec_api *api);
 int codec_run_proc(void);
 int codec_close(void);
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+#if defined(HAVE_RECORDING)
 enc_callback_t codec_get_enc_callback(void);
-#else
-#define codec_get_enc_callback()  NULL
 #endif
 
 /* defined by the codec */
 enum codec_status codec_start(enum codec_entry_call_reason reason);
 enum codec_status codec_main(enum codec_entry_call_reason reason);
 enum codec_status codec_run(void);
-#if CONFIG_CODEC == SWCODEC && defined(HAVE_RECORDING)
+#if defined(HAVE_RECORDING)
 int enc_callback(enum enc_callback_reason reason, void *params);
+#else
+#define codec_get_enc_callback()  NULL
 #endif
 
 #endif /* _CODECS_H_ */

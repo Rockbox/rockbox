@@ -67,8 +67,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 #define HAVE_MULTIMEDIA_KEYS
 #define CONFIG_KEYPAD ANDROID_PAD

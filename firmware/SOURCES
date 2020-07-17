@@ -425,8 +425,6 @@ drivers/rds.c
 /* Sound */
 sound.c
 
-#if CONFIG_CODEC == SWCODEC
-
 #ifndef BOOTLOADER
 pcm_sampr.c
 pcm.c
@@ -440,7 +438,6 @@ enc_base.c
 
 drivers/audio/audiohw-swcodec.c
 #endif /* BOOTLOADER */
-#endif /* SWCODEC */
 
 /* Audio codec */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER)
@@ -505,13 +502,13 @@ drivers/audio/rocker_codec.c
 drivers/audio/xduoolinux_codec.c
 #elif defined(HAVE_SDL_AUDIO)
 drivers/audio/sdl.c
-#if CONFIG_CODEC == SWCODEC
+
 #if (CONFIG_PLATFORM & PLATFORM_MAEMO5)
 target/hosted/maemo/pcm-gstreamer.c
 #else
 target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
-#endif /* CONFIG_CODEC == SWCODEC */
+
 #endif
 #endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
 

@@ -77,14 +77,12 @@
 struct user_settings global_settings;
 struct system_status global_status;
 
-#if CONFIG_CODEC == SWCODEC
 #include "dsp_proc_settings.h"
 #include "playback.h"
 #ifdef HAVE_RECORDING
 #include "enc_config.h"
 #endif
 #include "pcm_sampr.h"
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #define NVRAM_DATA_START 8
 #ifdef HAVE_RTC_RAM
@@ -582,12 +580,10 @@ static bool settings_write_config(const char* filename, int options)
                     continue;
                 break;
 #endif
-#if CONFIG_CODEC == SWCODEC
             case SETTINGS_SAVE_EQPRESET:
                 if ((settings[i].flags&F_EQSETTING) == 0)
                     continue;
                 break;
-#endif
         }
 
         cfg_to_string(i, value, MAX_PATH);
@@ -668,12 +664,10 @@ bool settings_save_config(int options)
             namebase = "recording";
             break;
 #endif
-#if CONFIG_CODEC == SWCODEC
         case SETTINGS_SAVE_EQPRESET:
             folder = EQS_DIR;
             namebase = "eq";
             break;
-#endif
         case SETTINGS_SAVE_SOUND:
             folder = ROCKBOX_DIR;
             namebase = "sound";
@@ -975,7 +969,6 @@ void settings_apply(bool read_disk)
     lcd_scroll_delay(global_settings.scroll_delay);
 
 
-#if CONFIG_CODEC == SWCODEC
 #ifdef HAVE_PLAY_FREQ
     /* before crossfade */
     audio_set_playback_frequency(global_settings.play_frequency);
@@ -1009,7 +1002,6 @@ void settings_apply(bool read_disk)
     dsp_timestretch_enable(global_settings.timestretch_enabled);
 #endif
     dsp_set_compressor(&global_settings.compressor_settings);
-#endif
 
 #ifdef HAVE_SPDIF_POWER
     spdif_power_enable(global_settings.spdif_enable);
@@ -1061,7 +1053,7 @@ void settings_apply(bool read_disk)
 #endif
 
     /* This should stay last */
-#if defined(HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+#if defined(HAVE_RECORDING)
     enc_global_settings_apply();
 #endif
 #ifdef HAVE_LCD_BITMAP
@@ -1107,7 +1099,7 @@ void settings_reset(void)
 {
     for(int i=0; i<nb_settings; i++)
         reset_setting(&settings[i], settings[i].setting);
-#if defined (HAVE_RECORDING) && CONFIG_CODEC == SWCODEC
+#if defined (HAVE_RECORDING)
     enc_global_settings_reset();
 #endif
 #ifdef HAVE_LCD_BITMAP
