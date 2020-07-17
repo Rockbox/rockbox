@@ -102,9 +102,7 @@ struct gui_synclist
     int selected_size;
     /* the number of pixels each line occupies (including optional padding on touchscreen */
     int line_height[NB_SCREENS];
-#ifdef HAVE_LCD_BITMAP
     int offset_position[NB_SCREENS]; /* the list's screen scroll placement in pixels */
-#endif
     long scheduled_talk_tick, last_talked_tick, dirty_tick;
 
     list_get_icon *callback_get_item_icon;
@@ -127,14 +125,12 @@ struct gui_synclist
 };
 
 
-#ifdef HAVE_LCD_BITMAP
 extern void list_init(void);
 /* parse global setting to static int */
 extern void gui_list_screen_scroll_step(int ofs);
 
 /* parse global setting to static bool */
 extern void gui_list_screen_scroll_out_of_view(bool enable);
-#endif /* HAVE_LCD_BITMAP */
 
 extern void gui_synclist_init(
     struct gui_synclist * lists,
@@ -179,7 +175,7 @@ extern bool gui_synclist_keyclick_callback(int action, void* data);
 extern bool gui_synclist_do_button(struct gui_synclist * lists,
                                        int *action,
                                        enum list_wrap);
-#if defined(HAVE_LCD_BITMAP) && !defined(PLUGIN)
+#if !defined(PLUGIN)
 struct listitem_viewport_cfg {
     struct wps_data *data;
     OFFSETTYPE(char *)   label;
@@ -204,7 +200,7 @@ enum themable_icons skinlist_get_item_icon(int offset, bool wrap);
 bool skinlist_needs_scrollbar(enum screen_type screen);
 void skinlist_get_scrollbar(int* nb_item, int* first_shown, int* last_shown);
 int skinlist_get_line_count(enum screen_type screen, struct gui_synclist *list);
-#endif
+#endif /* !PLUGIN) */
 
 #if  defined(HAVE_TOUCHSCREEN)
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */

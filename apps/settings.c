@@ -47,11 +47,9 @@
 #include "system.h"
 #include "general.h"
 #include "misc.h"
-#ifdef HAVE_LCD_BITMAP
 #include "icons.h"
 #include "font.h"
 #include "peakmeter.h"
-#endif
 #include "lang.h"
 #include "language.h"
 #include "powermgmt.h"
@@ -91,11 +89,7 @@ struct system_status global_status;
 #define NVRAM_BLOCK_SIZE (sizeof(struct system_status) + NVRAM_DATA_START)
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #define MAX_LINES 10
-#else
-#define MAX_LINES 2
-#endif
 
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -699,8 +693,6 @@ bool settings_save_config(int options)
 
 /** Apply and Reset settings **/
 
-
-#ifdef HAVE_LCD_BITMAP
 /*
  * Applies the range infos stored in global_settings to
  * the peak meter.
@@ -727,7 +719,6 @@ void settings_apply_pm_range(void)
     /* apply the range */
     peak_meter_init_range(global_settings.peak_meter_dbfs, pm_min, pm_max);
 }
-#endif /* HAVE_LCD_BITMAP */
 
 void sound_settings_apply(void)
 {
@@ -779,9 +770,7 @@ void sound_settings_apply(void)
 
 void settings_apply(bool read_disk)
 {
-#ifdef HAVE_LCD_BITMAP
     int rc;
-#endif
     CHART(">set_codepage");
     set_codepage(global_settings.default_codepage);
     CHART("<set_codepage");
@@ -857,7 +846,6 @@ void settings_apply(bool read_disk)
     set_battery_type(global_settings.battery_type);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_LCD_INVERT
     lcd_set_invert_display(global_settings.invert);
 #endif
@@ -870,7 +858,6 @@ void settings_apply(bool read_disk)
     peak_meter_init_times(
         global_settings.peak_meter_release, global_settings.peak_meter_hold,
         global_settings.peak_meter_clip_hold);
-#endif
 
 #ifdef HAVE_SPEAKER
     audio_enable_speaker(global_settings.speaker_mode);
@@ -879,7 +866,6 @@ void settings_apply(bool read_disk)
     if (read_disk)
     {
         char buf[MAX_PATH];
-#ifdef HAVE_LCD_BITMAP
         /* fonts need to be loaded before the WPS */
         if (global_settings.font_file[0]
             && global_settings.font_file[0] != '-') {
@@ -928,7 +914,6 @@ void settings_apply(bool read_disk)
         }
         else
             load_kbd(NULL);
-#endif /* HAVE_LCD_BITMAP */
         if ( global_settings.lang_file[0]) {
             snprintf(buf, sizeof buf, LANG_DIR "/%s.lng",
                      global_settings.lang_file);
@@ -960,11 +945,9 @@ void settings_apply(bool read_disk)
     screens[SCREEN_MAIN].set_background(global_settings.bg_color);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     lcd_scroll_step(global_settings.scroll_step);
     gui_list_screen_scroll_step(global_settings.screen_scroll_step);
     gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
-#endif
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay);
 
@@ -1056,12 +1039,10 @@ void settings_apply(bool read_disk)
 #if defined(HAVE_RECORDING)
     enc_global_settings_apply();
 #endif
-#ifdef HAVE_LCD_BITMAP
     /* already called with THEME_STATUSBAR in settings_apply_skins() */
     CHART(">viewportmanager_theme_changed");
     viewportmanager_theme_changed(THEME_UI_VIEWPORT|THEME_LANGUAGE|THEME_BUTTONBAR);
     CHART("<viewportmanager_theme_changed");
-#endif
 }
 
 
@@ -1102,7 +1083,6 @@ void settings_reset(void)
 #if defined (HAVE_RECORDING)
     enc_global_settings_reset();
 #endif
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
         if (screens[i].getuifont() > FONT_SYSFIXED)
@@ -1112,7 +1092,6 @@ void settings_reset(void)
             screens[i].setfont(FONT_SYSFIXED);
         }
     }
-#endif
 }
 
 /** Changing setting values **/

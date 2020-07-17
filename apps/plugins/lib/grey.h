@@ -29,7 +29,7 @@
 
 #include "plugin.h"
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if (LCD_DEPTH < 4)
 
 /* The greyscale lib uses 8 bit brightness values natively on input. */
 #define GREY_BRIGHTNESS(y) (y)
@@ -201,5 +201,5 @@ struct _grey_info
 /* Global variable, defined in the plugin */
 extern struct _grey_info _grey_info;
 
-#endif /* HAVE_LCD_BITMAP && (LCD_DEPTH < 4) */
+#endif /* (LCD_DEPTH < 4) */
 #endif /* __GREY_H__ */
