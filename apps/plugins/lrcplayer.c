@@ -71,14 +71,12 @@ struct preferences {
     unsigned active_color;
     unsigned inactive_color;
 #endif
-#ifdef HAVE_LCD_BITMAP
     bool wrap;
     bool wipe;
     bool active_one_line;
     int  align; /* 0: left, 1: center, 2: right */
     bool statusbar_on;
     bool display_title;
-#endif
     bool display_time;
     bool backlight_on;
 
@@ -118,16 +116,12 @@ static struct lrc_info {
     bool loaded_lrc;
     bool changed_lrc;
     bool too_many_lines; /* true if nlrcline >= max_lrclines after calc pos */
-#ifdef HAVE_LCD_BITMAP
     bool wipe; /* false if lyrics is unsynched */
-#endif
 } current;
 static char temp_buf[MAX(MAX_LINE_LEN,MAX_PATH)];
-#ifdef HAVE_LCD_BITMAP
 static int uifont = -1;
 static int font_ui_height = 1;
 static struct viewport vp_info[NB_SCREENS];
-#endif
 static struct viewport vp_lyrics[NB_SCREENS];
 
 #define AUDIO_PAUSE (current.audio_status & AUDIO_STATUS_PAUSE)
@@ -221,11 +215,9 @@ static int lrc_set_time(const char *title, const char *unit, long *pval,
         {
             /* draw cursor */
             buffer[p_end-1] = 0;
-#ifdef HAVE_LCD_BITMAP
             rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
             rb->lcd_putsxy(x, y*(1+LST_OFF_Y), &buffer[p_start]);
             rb->lcd_set_drawmode(DRMODE_SOLID);
-#endif
         }
         rb->lcd_update();
         int button = pluginlib_getaction(TIMEOUT_BLOCK, lst_contexts, ARRAYLEN(lst_contexts));
@@ -394,19 +386,16 @@ static int format_time_tag(char *buf, long t)
 /* find start of next line */
 static const char *lrc_skip_space(const char *str)
 {
-#ifdef HAVE_LCD_BITMAP
     if (prefs.wrap)
     {
         while (*str && *str != '\n' && isspace(*str))
             str++;
     }
-#endif
     if (*str == '\n')
         str++;
     return str;
 }
 
-#ifdef HAVE_LCD_BITMAP
 static bool isbrchr(const unsigned char *str, int len)
 {
     const unsigned char *p = "!,-.:;?　、。！，．：；？―";
@@ -422,7 +411,6 @@ static bool isbrchr(const unsigned char *str, int len)
     }
     return false;
 }
-#endif
 
 /* calculate how many lines is needed to display and store it.
  * create cache if there is enough space in lrc_buffer. */
@@ -431,11 +419,9 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
     struct lrc_brpos *lrc_brpos;
     struct lrc_word *lrc_word;
     int nlrcbrpos = 0, max_lrcbrpos;
-#ifdef HAVE_LCD_BITMAP
     uifont = rb->screens[0]->getuifont();
     struct font* pf = rb->font_get(uifont);
     unsigned short ch;
-#endif
     struct snap {
         int count, width;
         int nword;
@@ -1559,7 +1545,6 @@ static void display_state(void)
             str = "No lyrics";
     }
 
-#ifdef HAVE_LCD_BITMAP
     const char *info = NULL;
 
     if (AUDIO_PLAY && prefs.display_title)
@@ -1605,13 +1590,6 @@ static void display_state(void)
         display->update_viewport();
         display->set_viewport(NULL);
     }
-#else
-    /* there is no place to display title or artist. */
-    rb->lcd_clear_display();
-    if (str)
-        rb->lcd_puts_scroll(0, 0, str);
-    rb->lcd_update();
-#endif /* HAVE_LCD_BITMAP */
 }
 
 static void display_time(void)
@@ -1619,7 +1597,6 @@ static void display_time(void)
     rb->snprintf(temp_buf, MAX_LINE_LEN, "%ld:%02ld/%ld:%02ld",
                             current.elapsed/60000, (current.elapsed/1000)%60,
                             current.length/60000, (current.length)/1000%60);
-#ifdef HAVE_LCD_BITMAP
     int y = (prefs.display_title? font_ui_height:0);
     FOR_NB_SCREENS(i)
     {
@@ -1634,16 +1611,11 @@ static void display_time(void)
         display->setfont(uifont);
         display->set_viewport(NULL);
     }
-#else
-    rb->lcd_puts(0, 0, temp_buf);
-    rb->lcd_update();
-#endif /* HAVE_LCD_BITMAP */
 }
 
 /*******************************
  * Display lyrics
  *******************************/
-#ifdef HAVE_LCD_BITMAP
 static inline void set_to_default(struct screen *display)
 {
 #if (LCD_DEPTH > 1)
@@ -1817,7 +1789,6 @@ static int display_lrc_line(struct lrc_line *lrc_line, int ypos, int i)
     set_to_default(display);
     return ypos;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 static void display_lrcs(void)
 {
@@ -1848,7 +1819,7 @@ static void display_lrcs(void)
         /* display current line at the center of the viewport */
         display->set_viewport(&vp_lyrics[i]);
         display->clear_viewport();
-#ifdef HAVE_LCD_BITMAP
+
         struct lrc_line *lrc_line;
         int y, ypos = 0, nblines = vp_lyrics[i].height/font_ui_height;
         y = (nblines-1)/2;
@@ -1895,7 +1866,7 @@ static void display_lrcs(void)
         }
         if (!lrc_line && ypos < vp_lyrics[i].height)
             display->putsxy(0, ypos, "[end]");
-#endif /* HAVE_LCD_BITMAP */
+
         display->update_viewport();
         display->set_viewport(NULL);
     }
@@ -2191,7 +2162,6 @@ static void load_or_save_settings(bool save)
         { TYPE_INT, 0, 0xffffff, { .int_p = &prefs.inactive_color },
             "inactive color", NULL },
 #endif
-#ifdef HAVE_LCD_BITMAP
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.wrap }, "wrap", NULL },
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.wipe }, "wipe", NULL },
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.active_one_line },
@@ -2201,7 +2171,6 @@ static void load_or_save_settings(bool save)
             "statusbar on", NULL },
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.display_title },
             "display title", NULL },
-#endif
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.display_time },
             "display time", NULL },
         { TYPE_BOOL, 0, 1, { .bool_p = &prefs.backlight_on },
@@ -2223,14 +2192,12 @@ static void load_or_save_settings(bool save)
         prefs.active_color = rb->lcd_get_foreground();
         prefs.inactive_color = LCD_LIGHTGRAY;
 #endif
-#ifdef HAVE_LCD_BITMAP
         prefs.wrap = true;
         prefs.wipe = true;
         prefs.active_one_line = false;
         prefs.align = 1; /* center */
         prefs.statusbar_on = false;
         prefs.display_title = true;
-#endif
         prefs.display_time = true;
         prefs.backlight_on = false;
 #ifdef LRC_SUPPORT_ID3
@@ -2252,10 +2219,8 @@ static void load_or_save_settings(bool save)
 static bool lrc_theme_menu(void)
 {
     enum {
-#ifdef HAVE_LCD_BITMAP
         LRC_MENU_STATUSBAR,
         LRC_MENU_DISP_TITLE,
-#endif
         LRC_MENU_DISP_TIME,
 #ifdef HAVE_LCD_COLOR
         LRC_MENU_INACTIVE_COLOR,
@@ -2267,9 +2232,7 @@ static bool lrc_theme_menu(void)
     bool exit = false, usb = false;
 
     MENUITEM_STRINGLIST(menu, "Theme Settings", NULL,
-#ifdef HAVE_LCD_BITMAP
                         "Show Statusbar", "Display Title",
-#endif
                         "Display Time",
 #ifdef HAVE_LCD_COLOR
                         "Inactive Colour",
@@ -2280,14 +2243,12 @@ static bool lrc_theme_menu(void)
     {
         switch (rb->do_menu(&menu, &selected, NULL, false))
         {
-#ifdef HAVE_LCD_BITMAP
             case LRC_MENU_STATUSBAR:
                 usb = rb->set_bool("Show Statusbar", &prefs.statusbar_on);
                 break;
             case LRC_MENU_DISP_TITLE:
                 usb = rb->set_bool("Display Title", &prefs.display_title);
                 break;
-#endif
             case LRC_MENU_DISP_TIME:
                 usb = rb->set_bool("Display Time", &prefs.display_time);
                 break;
@@ -2312,7 +2273,6 @@ static bool lrc_theme_menu(void)
     return usb;
 }
 
-#ifdef HAVE_LCD_BITMAP
 static bool lrc_display_menu(void)
 {
     enum {
@@ -2362,7 +2322,6 @@ static bool lrc_display_menu(void)
 
     return usb;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 static bool lrc_lyrics_menu(void)
 {
@@ -2489,9 +2448,7 @@ static int lrc_menu(void)
 {
     enum {
         LRC_MENU_THEME,
-#ifdef HAVE_LCD_BITMAP
         LRC_MENU_DISPLAY,
-#endif
         LRC_MENU_LYRICS,
         LRC_MENU_PLAYBACK,
 #ifdef LRC_DEBUG
@@ -2504,9 +2461,7 @@ static int lrc_menu(void)
 
     MENUITEM_STRINGLIST(menu, "Lrcplayer Menu", NULL,
                         "Theme Settings",
-#ifdef HAVE_LCD_BITMAP
                         "Display Settings",
-#endif
                         "Lyrics Settings",
                         "Playback Control",
 #ifdef LRC_DEBUG
@@ -2524,11 +2479,9 @@ static int lrc_menu(void)
             case LRC_MENU_THEME:
                 usb = lrc_theme_menu();
                 break;
-#ifdef HAVE_LCD_BITMAP
             case LRC_MENU_DISPLAY:
                 usb = lrc_display_menu();
                 break;
-#endif
             case LRC_MENU_LYRICS:
                 usb = lrc_lyrics_menu();
                 break;
@@ -2720,40 +2673,27 @@ static int lrc_main(void)
     long id3_timeout = 0;
     bool update_display_state = true;
 
-#ifdef HAVE_LCD_BITMAP
     /* y offset of vp_lyrics */
     int h = (prefs.display_title?font_ui_height:0)+
             (prefs.display_time?SYSFONT_HEIGHT*2:0);
 
-#endif
 
     FOR_NB_SCREENS(i)
     {
-#ifdef HAVE_LCD_BITMAP
         rb->viewportmanager_theme_enable(i, prefs.statusbar_on, &vp_info[i]);
         vp_lyrics[i] = vp_info[i];
         vp_lyrics[i].flags &= ~VP_FLAG_ALIGNMENT_MASK;
         vp_lyrics[i].y += h;
         vp_lyrics[i].height -= h;
-#else
-        rb->viewport_set_defaults(&vp_lyrics[i], i);
-        if (prefs.display_time)
-        {
-            vp_lyrics[i].y += 1; /* time */
-            vp_lyrics[i].height -= 1;
-        }
-#endif
     }
 
     if (prefs.backlight_on)
         backlight_ignore_timeout();
 
-#ifdef HAVE_LCD_BITMAP
-    /* in case settings that may affect break position 
+    /* in case settings that may affect break position
      * are changed (statusbar_on and wrap). */
     if (!current.too_many_lines)
         calc_brpos(NULL, 0);
-#endif
 
     while (ret == LRC_GOTO_MAIN)
     {
@@ -2819,12 +2759,10 @@ static int lrc_main(void)
         }
         if (update_display_state)
         {
-#ifdef HAVE_LCD_BITMAP
             if (current.type == TXT || current.type == ID3_USLT)
                 current.wipe = false;
             else
                 current.wipe = prefs.wipe;
-#endif
             display_state();
             update_display_state = false;
         }
@@ -2839,10 +2777,9 @@ static int lrc_main(void)
         ret = handle_button();
     }
 
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
-#endif
+
     if (prefs.backlight_on)
         backlight_use_settings();
 
@@ -2857,10 +2794,8 @@ enum plugin_status plugin_start(const void* parameter)
     /* initialize settings. */
     load_or_save_settings(false);
 
-#ifdef HAVE_LCD_BITMAP
     uifont = rb->screens[0]->getuifont();
     font_ui_height = rb->font_get(uifont)->height;
-#endif
 
     lrc_buffer = rb->plugin_get_buffer(&lrc_buffer_size);
     lrc_buffer = ALIGN_UP(lrc_buffer, 4); /* 4 bytes aligned */

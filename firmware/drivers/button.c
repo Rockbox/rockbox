@@ -50,9 +50,7 @@ struct event_queue button_queue SHAREDBSS_ATTR;
 static long lastbtn;   /* Last valid button status */
 static long last_read; /* Last button status, for debouncing/filtering */
 static intptr_t button_data; /* data value from last message dequeued */
-#ifdef HAVE_LCD_BITMAP
 static bool flipped;  /* buttons can be flipped to match the LCD flip */
-#endif
 #ifdef HAVE_BACKLIGHT
 static bool filter_first_keypress;
 #ifdef HAVE_REMOTE_LCD
@@ -535,9 +533,7 @@ void button_init(void)
 
     reset_poweroff_timer();
 
-#ifdef HAVE_LCD_BITMAP
     flipped = false;
-#endif
 #ifdef HAVE_BACKLIGHT
     filter_first_keypress = false;
 #ifdef HAVE_REMOTE_LCD

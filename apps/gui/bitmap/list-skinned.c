@@ -236,7 +236,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
                 int cols = (parent->width / listcfg[screen]->width);
                 current_column = (cur_line)%cols;
                 current_row = (cur_line)/cols;
-                
+
                 skin_viewport->vp.x = parent->x + listcfg[screen]->width*current_column + original_x;
                 skin_viewport->vp.y = parent->y + listcfg[screen]->height*current_row + original_y;
             }
@@ -249,7 +249,6 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
                                    (listcfg[screen]->height*cur_line);
             }
             display->set_viewport(&skin_viewport->vp);
-#ifdef HAVE_LCD_BITMAP
             /* Set images to not to be displayed */
             struct skin_token_list *imglist = SKINOFFSETTOPTR(get_skin_buffer(wps.data), wps.data->images);
             while (imglist)
@@ -259,13 +258,10 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
                 img->display = -1;
                 imglist = SKINOFFSETTOPTR(get_skin_buffer(wps.data), imglist->next);
             }
-#endif
             struct skin_element** children = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->children);
             skin_render_viewport(SKINOFFSETTOPTR(get_skin_buffer(wps.data), (intptr_t)children[0]),
                                  &wps, skin_viewport, SKIN_REFRESH_ALL);
-#ifdef HAVE_LCD_BITMAP
             wps_display_images(&wps, &skin_viewport->vp);
-#endif
             /* force disableing scroll because it breaks later */
             if (!is_selected)
             {
