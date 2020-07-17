@@ -21,10 +21,6 @@
 
 #include "plugin.h"
 
-
-
-#ifdef HAVE_LCD_BITMAP
-
 #ifdef HAVE_LCD_COLOR
 #define BGCOLOR_1 LCD_RGBPACK(255,255,0)
 #define BGCOLOR_2 LCD_RGBPACK(0,255,0)
@@ -207,61 +203,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-
-#else
-
-/* Charcell version of plugin */
-
-static struct viewport vp0 =
-{
-    .x        = 0,
-    .y        = 0,
-    .width    = 5,
-    .height   = 1,
-};
-
-static struct viewport vp1 =
-{
-    .x        = 6,
-    .y        = 0,
-    .width    = 5,
-    .height   = 1,
-};
-
-static struct viewport vp2 =
-{
-    .x        = 0,
-    .y        = 1,
-    .width    = LCD_WIDTH,
-    .height   = 1,
-};
-
-
-enum plugin_status plugin_start(const void* parameter)
-{
-    (void)parameter;
-
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Rockbox");
-
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp1);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewports");
-
-    rb->screens[SCREEN_MAIN]->set_viewport(&vp2);
-    rb->screens[SCREEN_MAIN]->clear_viewport();
-    rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Demonstration");
-
-    rb->screens[SCREEN_MAIN]->update();
-
-    rb->button_get(true);
-
-    /* Restore the default viewport */
-    rb->screens[SCREEN_MAIN]->set_viewport(NULL);
-
-    return PLUGIN_OK;
-}
-
-#endif /* !HAVE_LCD_BITMAP */

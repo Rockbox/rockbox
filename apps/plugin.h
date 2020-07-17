@@ -89,12 +89,10 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "settings.h"
 #include "timer.h"
 #include "playlist.h"
-#ifdef HAVE_LCD_BITMAP
 #include "screendump.h"
 #include "scrollbar.h"
 #include "jpeg_load.h"
 #include "../recorder/bmp.h"
-#endif
 #include "statusbar.h"
 #include "menu.h"
 #include "rbunicode.h"
@@ -156,12 +154,12 @@ void* plugin_get_buffer(size_t *buffer_size);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 238
+#define PLUGIN_API_VERSION 239
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 238
+#define PLUGIN_MIN_API_VERSION 239
 
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
@@ -331,13 +329,11 @@ struct plugin_api {
 
     void (*viewport_set_defaults)(struct viewport *vp,
                                   const enum screen_type screen);
-#ifdef HAVE_LCD_BITMAP
     void (*viewportmanager_theme_enable)(enum screen_type screen, bool enable,
                                          struct viewport *viewport);
     void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
     void (*viewport_set_fullscreen)(struct viewport *vp,
                                     const enum screen_type screen);
-#endif
 
 #ifdef HAVE_BACKLIGHT
     /* lcd backlight */
@@ -597,7 +593,7 @@ struct plugin_api {
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     /* special simulator hooks */
-#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
+#if LCD_DEPTH < 8
     void (*sim_lcd_ex_init)(unsigned long (*getpixel)(int, int));
     void (*sim_lcd_ex_update_rect)(int x, int y, int width, int height);
 #endif
@@ -900,7 +896,6 @@ struct plugin_api {
                                  int count,
                                  bool signd);
 
-#ifdef HAVE_LCD_BITMAP
     int (*read_bmp_file)(const char* filename, struct bitmap *bm, int maxsize,
                          int format, const struct custom_format *cformat);
     int (*read_bmp_fd)(int fd, struct bitmap *bm, int maxsize,
@@ -912,7 +907,6 @@ struct plugin_api {
                         int format, const struct custom_format *cformat);
 #endif
     void (*screen_dump_set_hook)(void (*hook)(int fh));
-#endif
     int (*show_logo)(void);
 
 #ifdef HAVE_WHEEL_POSITION

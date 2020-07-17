@@ -31,15 +31,10 @@
 #include "viewport.h"
 #include "strtok_r.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 #define MAXLINES  (LCD_HEIGHT/6)
 #define MAXBUFFER 512
 #define RECT_SPACING 2
 #define SPLASH_MEMORY_INTERVAL (HZ)
-
-#endif
-
 
 static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 {
@@ -54,15 +49,13 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     int y, i;
     int space_w, w, h;
     struct viewport vp;
-#ifdef HAVE_LCD_BITMAP
     int width, height;
     int maxw = 0;
 
     viewport_set_defaults(&vp, screen->screen_type);
     screen->set_viewport(&vp);
-    
+
     screen->getstringsize(" ", &space_w, &h);
-#endif
     y = h;
 
     vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap);
@@ -77,20 +70,14 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     lines[0] = next;
     while (true)
     {
-#ifdef HAVE_LCD_BITMAP
         screen->getstringsize(next, &w, NULL);
-#else
-        w = utf8length(next);
-#endif
         if (lastbreak)
         {
             if (x + (next - lastbreak) * space_w + w
                     > vp.width - RECT_SPACING*2)
             {   /* too wide, wrap */
-#ifdef HAVE_LCD_BITMAP
                 if (x > maxw)
                     maxw = x;
-#endif
                 if ((y + h > vp.height) || (line >= (MAXLINES-1)))
                     break;  /* screen full or out of lines */
                 x = 0;
@@ -109,10 +96,8 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
         next = strtok_r(NULL, " ", &store);
         if (!next)
         {   /* no more words */
-#ifdef HAVE_LCD_BITMAP
             if (x > maxw)
                 maxw = x;
-#endif
             break;
         }
     }
@@ -122,8 +107,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
      * the text*/
 
     screen->scroll_stop();
-
-#ifdef HAVE_LCD_BITMAP
 
     width = maxw + 2*RECT_SPACING;
     height = y + 2*RECT_SPACING;
@@ -166,14 +149,11 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
     /* prepare putting the text */
     y = RECT_SPACING;
-#endif
 
     /* print the message to screen */
     for (i = 0; i <= line; i++, y+=h)
     {
-#ifdef HAVE_LCD_BITMAP
         screen->putsxy(0, y, lines[i]);
-#endif
     }
     screen->update_viewport();
 end:

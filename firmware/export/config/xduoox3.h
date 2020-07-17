@@ -17,8 +17,8 @@
 /* ChinaChip NAND FTL */
 #define CONFIG_NAND NAND_CC
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN

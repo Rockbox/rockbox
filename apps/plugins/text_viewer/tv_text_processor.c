@@ -33,11 +33,7 @@ enum{
 };
 
 /* the max characters of each blocks */
-#ifdef HAVE_LCD_BITMAP
 #define TV_MAX_CHARS_PER_BLOCK (LCD_WIDTH / 2 + 1)
-#else
-#define TV_MAX_CHARS_PER_BLOCK (LCD_WIDTH + 1)
-#endif
 
 #define TV_MAX_BLOCKS 5
 
@@ -90,15 +86,11 @@ static int tv_glyph_width(int ch)
     if (ch == 0)
         ch = ' ';
 
-#ifdef HAVE_LCD_BITMAP
     /* the width of the diacritics charcter is 0 */
     if (rb->is_diacritic(ch, NULL))
         return 0;
 
     return rb->font_get_width(rb->font_get(preferences->font_id), ch);
-#else
-    return 1;
-#endif
 }
 
 static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
@@ -138,7 +130,6 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
     if (preferences->encoding == UTF_8)
         return (unsigned char*)rb->utf8decode(str, ch);
 
-#ifdef HAVE_LCD_BITMAP
     if ((*str >= 0x80) &&
         ((preferences->encoding > SJIS) ||
          (preferences->encoding == SJIS && (*str <= 0xa0 || *str >= 0xe0))))
@@ -151,7 +142,7 @@ static unsigned char *tv_get_ucs(const unsigned char *str, unsigned short *ch)
         }
         count = 2;
     }
-#endif
+
     rb->iso_decode(str, utf8_tmp, preferences->encoding, count);
     rb->utf8decode(utf8_tmp, ch);
     return (unsigned char *)str + count;
