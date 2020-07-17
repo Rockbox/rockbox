@@ -1462,7 +1462,6 @@ static int pegbox_main(struct game_context* pb)
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -1484,7 +1483,6 @@ enum plugin_status plugin_start(const void* parameter)
     pegbox_main(&pb);
     configfile_save(CONFIG_FILE_NAME,config,2,0);
     rb->lcd_setfont(FONT_UI);
-#endif /* HAVE_LCD_BITMAP */
 
     return PLUGIN_OK;
 }

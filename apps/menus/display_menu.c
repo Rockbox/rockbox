@@ -30,9 +30,7 @@
 #include "menu.h"
 #include "tree.h"
 #include "list.h"
-#ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
-#endif
 #include "talk.h"
 #include "lcd.h"
 #ifdef HAVE_REMOTE_LCD
@@ -187,16 +185,12 @@ MENUITEM_SETTING(brightness_item, &global_settings.brightness, NULL);
 #ifdef HAVE_LCD_CONTRAST
 MENUITEM_SETTING(contrast, &global_settings.contrast, NULL);
 #endif
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_LCD_INVERT
 MENUITEM_SETTING(invert, &global_settings.invert, NULL);
 #endif
 #ifdef HAVE_LCD_FLIP
 MENUITEM_SETTING(flip_display, &global_settings.flip_display, flipdisplay_callback);
 #endif
-#endif /* HAVE_LCD_BITMAP */
-
-
 
 /* now the actual menu */
 MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
@@ -226,14 +220,12 @@ MAKE_MENU(lcd_settings,ID2P(LANG_LCD_MENU),
 #ifdef HAVE_LCD_CONTRAST
             ,&contrast
 #endif
-#ifdef HAVE_LCD_BITMAP
 # ifdef HAVE_LCD_INVERT
             ,&invert
 # endif
 # ifdef HAVE_LCD_FLIP
             ,&flip_display
 # endif
-#endif /* HAVE_LCD_BITMAP */
          );
 /*    LCD MENU                    */
 /***********************************/
@@ -318,10 +310,8 @@ MAKE_MENU(lcd_remote_settings, ID2P(LANG_LCD_REMOTE_MENU),
 MENUITEM_SETTING_W_TEXT(scroll_speed, &global_settings.scroll_speed,
                          ID2P(LANG_SCROLL), NULL);
 MENUITEM_SETTING(scroll_delay, &global_settings.scroll_delay, NULL);
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING_W_TEXT(scroll_step, &global_settings.scroll_step,
                         ID2P(LANG_SCROLL_STEP_EXAMPLE), NULL);
-#endif
 MENUITEM_SETTING(bidir_limit, &global_settings.bidir_limit, NULL);
 #ifdef HAVE_REMOTE_LCD
 MENUITEM_SETTING_W_TEXT(remote_scroll_speed, &global_settings.remote_scroll_speed,
@@ -342,7 +332,6 @@ MENUITEM_SETTING(list_accel_start_delay,
                  &global_settings.list_accel_start_delay, NULL);
 MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
 #endif /* HAVE_WHEEL_ACCELERATION */
-#ifdef HAVE_LCD_BITMAP
 static int screenscroll_callback(int action,
                                  const struct menu_item_ex *this_item,
                                  struct gui_synclist *this_list)
@@ -360,21 +349,16 @@ static int screenscroll_callback(int action,
 MENUITEM_SETTING(offset_out_of_view, &global_settings.offset_out_of_view,
                  screenscroll_callback);
 MENUITEM_SETTING(screen_scroll_step, &global_settings.screen_scroll_step, NULL);
-#endif
 MENUITEM_SETTING(scroll_paginated, &global_settings.scroll_paginated, NULL);
 
 MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
           &scroll_speed, &scroll_delay,
-#ifdef HAVE_LCD_BITMAP
           &scroll_step,
-#endif
           &bidir_limit,
 #ifdef HAVE_REMOTE_LCD
           &remote_scroll_sets,
 #endif
-#ifdef HAVE_LCD_BITMAP
           &offset_out_of_view, &screen_scroll_step,
-#endif
           &scroll_paginated,
 #ifndef HAVE_WHEEL_ACCELERATION
           &list_accel_start_delay, &list_accel_wait
@@ -386,7 +370,6 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
 /***********************************/
 /*    PEAK METER MENU              */
 
-#ifdef HAVE_LCD_BITMAP
 static int peakmeter_callback(int action,
                               const struct menu_item_ex *this_item,
                               struct gui_synclist *this_list)
@@ -570,7 +553,6 @@ MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
           &histogram,
 #endif
           &peak_meter_scale_item, &peak_meter_min_item, &peak_meter_max_item);
-#endif /*  HAVE_LCD_BITMAP */
 /*    PEAK METER MENU              */
 /***********************************/
 
@@ -645,9 +627,7 @@ MAKE_MENU(display_menu, ID2P(LANG_DISPLAY),
             &lcd_remote_settings,
 #endif
             &scroll_settings_menu,
-#ifdef HAVE_LCD_BITMAP
             &peak_meter_menu,
-#endif
             &codepage_setting,
 #ifdef HAVE_TOUCHSCREEN
             &touchscreen_menu,

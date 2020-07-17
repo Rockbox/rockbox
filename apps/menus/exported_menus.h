@@ -31,9 +31,7 @@ extern const struct menu_item_ex
 #ifdef HAVE_RECORDING
         recording_settings,         /* recording_menu.c */
         recording_settings_menu,
-#ifdef HAVE_LCD_BITMAP
         peak_meter_menu,            /* also used from within recording_menu */
-#endif
 #endif
         sound_settings,             /* sound_menu.c     */
         settings_menu_item,         /* settings_menu.c  */
