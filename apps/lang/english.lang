@@ -5375,23 +5375,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Quality"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Quality"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -5494,23 +5477,6 @@
   <voice>
     *: none
     recording,archosplayer: "Line In"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Independent Frames"
   </voice>
 </phrase>
 <phrase>
@@ -9509,23 +9475,6 @@
   <voice>
     *: none
     recording: "Mono"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Quality"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
