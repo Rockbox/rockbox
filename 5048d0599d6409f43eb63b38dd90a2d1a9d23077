@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df72952e_f62858d8",
+        "filename": "manual/advanced_topics/main.tex",
+        "patchSetId": 6
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-07-17T16:49:01Z",
+      "side": 1,
+      "message": "tab left",
+      "revId": "5048d0599d6409f43eb63b38dd90a2d1a9d23077",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8b2bfe9c_44c4331e",
+        "filename": "manual/appendix/wps_tags.tex",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-07-17T16:49:01Z",
+      "side": 1,
+      "message": "tab left",
+      "revId": "5048d0599d6409f43eb63b38dd90a2d1a9d23077",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
