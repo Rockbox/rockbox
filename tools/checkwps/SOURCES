@@ -17,6 +17,4 @@
 #endif
 checkwps.c
 
-#ifdef HAVE_LCD_BITMAP
 ../../apps/recorder/bmp.c
-#endif

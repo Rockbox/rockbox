@@ -107,9 +107,7 @@
 /* Messages from usb_tick and thread states */
 enum
 {
-#ifdef HAVE_LCD_BITMAP
     USB_SCREENDUMP = -1,     /* State */
-#endif
     USB_EXTRACTED = 0,       /* Event+State */
     USB_INSERTED,            /* Event+State */
     USB_POWERED,             /* State - transitional indicator if no host */
