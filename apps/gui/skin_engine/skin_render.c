@@ -77,12 +77,10 @@ struct skin_draw_info {
 typedef bool (*skin_render_func)(struct skin_element* alternator, struct skin_draw_info *info);
 bool skin_render_alternator(struct skin_element* alternator, struct skin_draw_info *info);
 
-#ifdef HAVE_LCD_BITMAP
 static void skin_render_playlistviewer(struct playlistviewer* viewer,
                                        struct gui_wps *gwps,
                                        struct skin_viewport* skin_viewport,
                                        unsigned long refresh_type);
-#endif
 
 static char* skin_buffer;
 
@@ -99,11 +97,10 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 {
     struct wps_token *token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, element->data);
 
-#ifdef HAVE_LCD_BITMAP
     struct viewport *vp = &skin_vp->vp;
     struct wps_data *data = gwps->data;
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
-#endif
+
     switch (token->type)
     {   
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
@@ -181,7 +178,6 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             }
         }
         break;
-#ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_LIST_ITEM_CFG:
             skinlist_set_cfg(gwps->display->screen_type,
                                 SKINOFFSETTOPTR(skin_buffer, token->value.data));
@@ -225,11 +221,9 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_PEAKMETER_RIGHTBAR:
             data->peak_meter_enabled = true;
             /* fall through to the progressbar code */
-#endif
         case SKIN_TOKEN_VOLUMEBAR:
         case SKIN_TOKEN_BATTERY_PERCENTBAR:
         case SKIN_TOKEN_SETTINGBAR:
-#ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_PROGRESSBAR:
         case SKIN_TOKEN_TUNER_RSSI_BAR:
         case SKIN_TOKEN_LIST_SCROLLBAR:
@@ -238,9 +232,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             if (do_refresh)
                 draw_progressbar(gwps, info->line_number, bar);
         }
-#endif
         break;
-#ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_IMAGE_DISPLAY:
         {
             struct gui_img *img = SKINOFFSETTOPTR(skin_buffer, token->value.data);
@@ -321,8 +313,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                 skin_render_playlistviewer(SKINOFFSETTOPTR(skin_buffer, token->value.data), gwps,
                                            info->skin_vp, info->refresh_type);
             break;
-        
-#endif /* HAVE_LCD_BITMAP */
+
 #ifdef HAVE_SKIN_VARIABLES
         case SKIN_TOKEN_VAR_SET:
             {
@@ -352,16 +343,12 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
     }
     return true;
 }
-                
-
 
 static void do_tags_in_hidden_conditional(struct skin_element* branch,
                                           struct skin_draw_info *info)
 {
-#ifdef HAVE_LCD_BITMAP
     struct gui_wps *gwps = info->gwps;
     struct wps_data *data = gwps->data;
-#endif
     /* Tags here are ones which need to be "turned off" or cleared 
      * if they are in a conditional branch which isnt being used */
     if (branch->type == LINE_ALTERNATOR)
@@ -375,9 +362,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
     else if (branch->type == LINE && branch->children_count)
     {
         struct skin_element *child = get_child(branch->children, 0);
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_ALBUMART)
         struct wps_token *token;
-#endif
         while (child)
         {
             if (child->type == CONDITIONAL)
@@ -395,10 +380,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                 child = SKINOFFSETTOPTR(skin_buffer, child->next);
                 continue;
             }
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_ALBUMART)
             token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, child->data);
-#endif
-#ifdef HAVE_LCD_BITMAP
             /* clear all pictures in the conditional and nested ones */
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
             {
@@ -420,7 +402,6 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                      viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next))
                 {
                     struct skin_viewport *skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
-                    
                     char *vplabel = SKINOFFSETTOPTR(skin_buffer, skin_viewport->label);
                     if (skin_viewport->label == VP_DEFAULT_LABEL)
                         vplabel = VP_DEFAULT_LABEL_STRING;
@@ -460,7 +441,6 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                     }
                 }
             }
-#endif
 #ifdef HAVE_ALBUMART
             else if (data->albumart && token->type == SKIN_TOKEN_ALBUMART_DISPLAY)
             {
@@ -734,11 +714,10 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         .offset = 0,
         .line_desc = LINE_DESC_DEFINIT,
     };
-    
+
     struct align_pos * align = &info.align;
     bool needs_update, update_all = false;
     skin_buffer = get_skin_buffer(gwps->data);
-#ifdef HAVE_LCD_BITMAP
     /* Set images to not to be displayed */
     struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, gwps->data->images);
     while (imglist)
@@ -752,10 +731,7 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
     /* fix font ID's */
     if (skin_viewport->parsed_fontid == 1)
         skin_viewport->vp.font = display->getuifont();
-#endif
 
-
-    
     while (line)
     {
         linebuf[0] = '\0';
@@ -811,9 +787,7 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
             info.line_number++;
         line = SKINOFFSETTOPTR(skin_buffer, line->next);
     }
-#ifdef HAVE_LCD_BITMAP
     wps_display_images(gwps, &skin_viewport->vp);
-#endif
 }
 
 void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
@@ -903,8 +877,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     display->update();
 }
 
-#ifdef HAVE_LCD_BITMAP
-static __attribute__((noinline)) 
+static __attribute__((noinline))
 void skin_render_playlistviewer(struct playlistviewer* viewer,
                                 struct gui_wps *gwps,
                                 struct skin_viewport* skin_viewport,
@@ -926,7 +899,7 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         .offset = viewer->start_offset,
         .line_desc = LINE_DESC_DEFINIT,
     };
-    
+
     struct align_pos * align = &info.align;
     bool needs_update;
     int cur_pos, start_item, max;
@@ -989,4 +962,3 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         start_item++;
     }
 }
-#endif

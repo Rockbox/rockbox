@@ -181,9 +181,7 @@ struct screen screens[NB_SCREENS] =
 #endif
         .getwidth = getwidth,
         .getheight = getheight,
-#ifdef HAVE_LCD_BITMAP
         .getuifont = getuifont,
-#endif
 #if LCD_DEPTH > 1
         .get_foreground=dummy_func2,
         .get_background=dummy_func2,
@@ -209,7 +207,6 @@ struct screen screens[NB_SCREENS] =
 #endif
 };
 
-#ifdef HAVE_LCD_BITMAP
 void screen_clear_area(struct screen * display, int xstart, int ystart,
                        int width, int height)
 {
@@ -217,7 +214,6 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->fillrect(xstart, ystart, width, height);
     display->set_drawmode(DRMODE_SOLID);
 }
-#endif
 
 #if CONFIG_TUNER
 bool radio_hardware_present(void)
@@ -226,7 +222,6 @@ bool radio_hardware_present(void)
 }
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 static int loaded_fonts = 0;
 static struct font _font;
 int font_load(const char *path)
@@ -235,7 +230,7 @@ int font_load(const char *path)
     loaded_fonts++;
     return id;
 }
-    
+
 void font_unload(int font_id)
 {
     (void)font_id;
@@ -245,7 +240,6 @@ struct font* font_get(int font)
 {
     return &_font;
 }
-#endif
 
 /* This is no longer defined in ROCKBOX builds so just use a huge value */
 #define SKIN_BUFFER_SIZE (200*1024)

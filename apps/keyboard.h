@@ -25,8 +25,6 @@
 
 int kbd_input(char* buffer, int buflen, unsigned short *kbd);
 
-#ifdef HAVE_LCD_BITMAP
 int load_kbd(unsigned char* filename);
-#endif
 
 #endif

@@ -54,9 +54,7 @@
 #include "quickscreen.h"
 #include "shortcuts.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#endif
 
 /* gui api */
 #include "list.h"
@@ -129,7 +127,7 @@ static const char* get_menu_item_name(int selected_item,
     }
     return P2STR(menu->callback_and_desc->desc);
 }
-#ifdef HAVE_LCD_BITMAP
+
 static enum themable_icons  menu_get_icon(int selected_item, void * data)
 {
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
@@ -168,7 +166,6 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
     }
     return menu_icon;
 }
-#endif
 
 static void init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback,
@@ -207,7 +204,6 @@ static void init_menu_lists(const struct menu_item_ex *menu,
     current_submenus_menu = (struct menu_item_ex *)menu;
 
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1, parent);
-#ifdef HAVE_LCD_BITMAP
 
     if (menu->flags&MENU_HAS_DESC)
     {
@@ -232,11 +228,6 @@ static void init_menu_lists(const struct menu_item_ex *menu,
             icon = Icon_Submenu_Entered;
     gui_synclist_set_title(lists, title, icon);
     gui_synclist_set_icon_callback(lists, global_settings.show_icons?menu_get_icon:NULL);
-#else
-    (void)icon;
-    (void)title;
-    gui_synclist_set_icon_callback(lists, NULL);
-#endif
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(lists, talk_menu_item);
     gui_synclist_set_nb_items(lists,current_subitems_count);

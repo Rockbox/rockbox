@@ -37,7 +37,7 @@ int save_bmp_file( char* filename, struct bitmap *bm );
 */
 void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst);
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if (LCD_DEPTH < 4)
 /**
    Same as simple_resize_bitmap except this is for use with greylib.
 */

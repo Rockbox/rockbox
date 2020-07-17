@@ -41,11 +41,9 @@
 #include "lang.h"
 #include "misc.h"
 #include "led.h"
-#ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 /* Image stuff */
 #include "albumart.h"
-#endif
 #include "playlist.h"
 #include "playback.h"
 #include "tdspeed.h"
@@ -813,7 +811,6 @@ const char *get_token_value(struct gui_wps *gwps,
             if (intval)
                 *intval = playlist_amount();
             return buf;
-#ifdef HAVE_LCD_BITMAP
         case SKIN_TOKEN_LIST_TITLE_TEXT:
             return sb_get_title(gwps->display->screen_type);
         case SKIN_TOKEN_LIST_TITLE_ICON:
@@ -854,7 +851,6 @@ const char *get_token_value(struct gui_wps *gwps,
         }
         case SKIN_TOKEN_LIST_NEEDS_SCROLLBAR:
             return skinlist_needs_scrollbar(gwps->display->screen_type) ? "s" : "";
-#endif
         case SKIN_TOKEN_PLAYLIST_NAME:
             return playlist_name(NULL, buf, buf_size);
 
@@ -1202,7 +1198,6 @@ const char *get_token_value(struct gui_wps *gwps,
             return "-";
 #endif
 
-#ifdef HAVE_LCD_BITMAP
         /* peakmeter */
         case SKIN_TOKEN_PEAKMETER_LEFT:
         case SKIN_TOKEN_PEAKMETER_RIGHT:
@@ -1218,7 +1213,6 @@ const char *get_token_value(struct gui_wps *gwps,
             data->peak_meter_enabled = true;
             return buf;
         }
-#endif
 
         case SKIN_TOKEN_CROSSFADE:
 #ifdef HAVE_CROSSFADE

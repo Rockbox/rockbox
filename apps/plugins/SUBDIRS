@@ -8,9 +8,6 @@ text_viewer
 clock
 #endif
 
-/* For all targets with a bitmap display */
-#ifdef HAVE_LCD_BITMAP
-
 /* color horizontal-stride LCDs */
 #if defined(HAVE_LCD_COLOR) && \
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
@@ -54,8 +51,6 @@ frotz
 zxbox
 #endif
 #endif
-
-#endif /* HAVE_LCD_BITMAP */
 
 /* For all big enough colour screens, iriver H1x0 and iAudio M5 */
 #if defined(HAVE_LCD_COLOR) && ( (LCD_HEIGHT >= 90 && LCD_WIDTH >=116) \

@@ -48,18 +48,12 @@ struct remove_setting {
 };
 
 static int remove_wps(struct remove_setting *);
-#ifdef HAVE_LCD_BITMAP
 static int remove_icons(struct remove_setting *setting);
-#endif
 
 enum remove_settings {
-#ifdef HAVE_LCD_BITMAP
     REMOVE_FONT,
-#endif
     REMOVE_WPS,
-#ifdef HAVE_LCD_BITMAP
     REMOVE_SBS,
-#endif
 #ifdef HAVE_REMOTE_LCD
     REMOVE_RWPS,
     REMOVE_RSBS,
@@ -67,10 +61,8 @@ enum remove_settings {
 #if LCD_DEPTH > 1
     REMOVE_BACKDROP,
 #endif
-#ifdef HAVE_LCD_BITMAP
     REMOVE_ICON,
     REMOVE_VICON,
-#endif
 #ifdef HAVE_REMOTE_LCD
     REMOVE_RICON,
     REMOVE_RVICON,
@@ -83,16 +75,12 @@ enum remove_settings {
 
 static bool create_log = true;
 static struct remove_setting remove_list[NUM_REMOVE_ITEMS] = {
-#ifdef HAVE_LCD_BITMAP
     [REMOVE_FONT] = { "font", FONT_DIR "/", ".fnt", "",
         ASK_FOR_REMOVAL, NULL, false },
-#endif
     [REMOVE_WPS] = { "wps", WPS_DIR "/", ".wps", "",
         REMOVE_IF_NOT_USED, remove_wps, false },
-#ifdef HAVE_LCD_BITMAP
     [REMOVE_SBS] = { "sbs", SBS_DIR "/", ".sbs", "",
         REMOVE_IF_NOT_USED, remove_wps, false },
-#endif
 #ifdef HAVE_REMOTE_LCD
     [REMOVE_RWPS] = { "rwps", WPS_DIR "/", ".rwps", "",
         REMOVE_IF_NOT_USED, remove_wps, false },
@@ -103,12 +91,10 @@ static struct remove_setting remove_list[NUM_REMOVE_ITEMS] = {
     [REMOVE_BACKDROP] = { "backdrop", BACKDROP_DIR "/", ".bmp", "",
         REMOVE_IF_NOT_USED, NULL, false },
 #endif
-#ifdef HAVE_LCD_BITMAP
     [REMOVE_ICON] = { "iconset", ICON_DIR "/", ".bmp", "",
         ASK_FOR_REMOVAL, NULL, false },
     [REMOVE_VICON] = { "viewers iconset", ICON_DIR "/", ".bmp", "",
         ASK_FOR_REMOVAL, remove_icons, false },
-#endif
 #ifdef HAVE_REMOTE_LCD
     [REMOVE_RICON] = { "remote iconset", ICON_DIR "/", ".bmp", "",
         ASK_FOR_REMOVAL, NULL, false },
@@ -124,19 +110,15 @@ static char *option_names[NUM_REMOVE_OPTION] = {
     "always", "never", "not used", "ask",
 };
 static struct configdata config[] = {
-#ifdef HAVE_LCD_BITMAP
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_FONT].option },
         "remove font", option_names },
-#endif
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_WPS].option },
         "remove wps", option_names },
-#ifdef HAVE_LCD_BITMAP
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_SBS].option },
         "remove sbs", option_names },
-#endif
 #ifdef HAVE_REMOTE_LCD
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_RWPS].option },
@@ -150,14 +132,12 @@ static struct configdata config[] = {
         { .int_p = &remove_list[REMOVE_BACKDROP].option },
         "remove backdrop", option_names },
 #endif
-#ifdef HAVE_LCD_BITMAP
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_ICON].option },
         "remove iconset", option_names },
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_VICON].option },
         "remove viconset", option_names },
-#endif
 #ifdef HAVE_REMOTE_LCD
     { TYPE_INT, 0, NUM_REMOVE_OPTION,
         { .int_p = &remove_list[REMOVE_RICON].option },
@@ -285,7 +265,6 @@ static int remove_wps(struct remove_setting *setting)
     return remove_dir(bmpdir, MAX_PATH);
 }
 
-#ifdef HAVE_LCD_BITMAP
 static int remove_icons(struct remove_setting *setting)
 {
     char path[MAX_PATH];
@@ -306,19 +285,15 @@ static int remove_icons(struct remove_setting *setting)
     show_mess("Removed", path);
     return 0;
 }
-#endif
 
-#ifdef HAVE_LCD_BITMAP
 static char font_file[MAX_PATH];
-#endif
+
 static bool is_deny_file(const char *file)
 {
     const char *deny_files[] = {
         WPS_DEFAULTCFG,
         RWPS_DEFAULTCFG,
-#ifdef HAVE_LCD_BITMAP
         font_file,
-#endif
         NULL
     };
     const char **p = deny_files;
@@ -334,13 +309,9 @@ static bool is_deny_file(const char *file)
 static void check_whether_used_in_setting(void)
 {
     const char *setting_files[] = {
-#ifdef HAVE_LCD_BITMAP
         rb->global_settings->font_file,
-#endif
         rb->global_settings->wps_file,
-#ifdef HAVE_LCD_BITMAP
         rb->global_settings->sbs_file,
-#endif
 #ifdef HAVE_REMOTE_LCD
         rb->global_settings->rwps_file,
         rb->global_settings->rsbs_file,
@@ -348,10 +319,8 @@ static void check_whether_used_in_setting(void)
 #if LCD_DEPTH > 1
         rb->global_settings->backdrop_file,
 #endif
-#ifdef HAVE_LCD_BITMAP
         rb->global_settings->icon_file,
         rb->global_settings->viewers_icon_file,
-#endif
 #ifdef HAVE_REMOTE_LCD
         rb->global_settings->remote_icon_file,
         rb->global_settings->remote_viewers_icon_file,
@@ -419,12 +388,10 @@ static void check_whether_used(void)
     DIR *dir;
 
     check_whether_used_in_setting();
-#ifdef HAVE_LCD_BITMAP
     /* mark font files come from rockbox-font.zip as used and don't remove
      * them automatically as themes may depend on those fonts. */
     if (remove_list[REMOVE_FONT].option == REMOVE_IF_NOT_USED)
         check_whether_used_in_file(RB_FONTS_CONFIG);
-#endif
 
     dir = rb->opendir(THEME_DIR);
     if (!dir)
@@ -591,13 +558,9 @@ static bool option_menu(void)
 {
     MENUITEM_STRINGLIST(option_menu, "Remove Options", NULL,
                         /* same order as remove_list */
-#ifdef HAVE_LCD_BITMAP
                         "Font",
-#endif
                         "WPS",
-#ifdef HAVE_LCD_BITMAP
                         "Statusbar Skin",
-#endif
 #ifdef HAVE_REMOTE_LCD
                         "Remote WPS",
                         "Remote Statusbar Skin",
@@ -605,9 +568,7 @@ static bool option_menu(void)
 #if LCD_DEPTH > 1
                         "Backdrop",
 #endif
-#ifdef HAVE_LCD_BITMAP
                         "Iconset", "Viewers Iconset",
-#endif
 #ifdef HAVE_REMOTE_LCD
                         "Remote Iconset", "Remote Viewers Iconset",
 #endif
@@ -669,10 +630,8 @@ enum plugin_status plugin_start(const void* parameter)
     if((p = rb->strrchr(title, '.')))
         *p = 0;
 
-#ifdef HAVE_LCD_BITMAP
     rb->snprintf(font_file, MAX_PATH, FONT_DIR "/%s.fnt",
                     rb->global_settings->font_file);
-#endif
     rb->strlcpy(themefile, parameter, MAX_PATH);
     if (!rb->file_exists(themefile))
     {

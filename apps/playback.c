@@ -46,10 +46,8 @@
 #include "tagcache.h"
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
-#endif
 #endif
 
 #ifdef HAVE_PLAY_FREQ

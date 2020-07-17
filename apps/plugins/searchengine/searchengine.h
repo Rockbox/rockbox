@@ -25,20 +25,12 @@
 #include <autoconf.h>
 
 extern int w, h, y;
-#ifdef HAVE_LCD_BITMAP
 #define PUTS(str) do { \
       rb->lcd_putsxy(1, y, str); \
       rb->lcd_getstringsize(str, &w, &h); \
       y += h + 1; \
 } while (0); \
 rb->lcd_update()
-#else
-#define PUTS(str) do { \
-      rb->lcd_puts(0, y, str); \
-      y = (y + 1) % 2; \
-} while (0); \
-rb->lcd_update()
-#endif
 
 void *my_malloc(size_t size);
 void setmallocpos(void *pointer);

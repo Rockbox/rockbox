@@ -34,8 +34,8 @@
 /* ChinaChip NAND FTL */
 #define CONFIG_NAND NAND_CC
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

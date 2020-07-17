@@ -125,11 +125,7 @@ static bool search_init(const char* file){
             fdw = rb->open(resultfile, O_WRONLY|O_CREAT|O_TRUNC, 0666);
 
         if (fdw < 0) {
-#ifdef HAVE_LCD_BITMAP
             rb->splash(HZ, "Failed to create result file!");
-#else
-            rb->splash(HZ, "File creation failed");
-#endif
             rb->close(fd);
             return false;
         }

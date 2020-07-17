@@ -39,9 +39,7 @@ struct scroll_screen_info LCDFN(scroll_info) =
     .ticks        = 12,
     .delay        = HZ/2,
     .bidir_limit  = 50,
-#ifdef HAVE_LCD_BITMAP
     .step         = 6,
-#endif
 };
 
 
@@ -100,12 +98,10 @@ void LCDFN(scroll_speed)(int speed)
     LCDFN(scroll_info).ticks = scroll_tick_table[speed];
 }
 
-#if defined(HAVE_LCD_BITMAP)
 void LCDFN(scroll_step)(int step)
 {
     LCDFN(scroll_info).step = step;
 }
-#endif
 
 void LCDFN(scroll_delay)(int ms)
 {
@@ -162,7 +158,6 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
 
     /* Stash and restore these three, so that the scroll_func
      * can do whatever it likes without destroying the state */
-#ifdef HAVE_LCD_BITMAP
     unsigned drawmode;
 #if LCD_DEPTH > 1
     unsigned fg_pattern, bg_pattern;
@@ -170,18 +165,15 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     bg_pattern = s->vp->bg_pattern;
 #endif
     drawmode   = s->vp->drawmode;
-#endif
     s->scroll_func(s);
 
     LCDFN(update_viewport_rect)(s->x, s->y, s->width, s->height);
 
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
     s->vp->fg_pattern = fg_pattern;
     s->vp->bg_pattern = bg_pattern;
 #endif
     s->vp->drawmode = drawmode;
-#endif
 
     return ended;
 }
@@ -216,12 +208,7 @@ static void LCDFN(scroll_worker)(void)
         LCDFN(set_viewport)(s->vp);
 
         makedelay = false;
-#ifdef HAVE_LCD_BITMAP
         step = si->step;
-#else
-        step = 1;
-#endif
-
 
         if (s->backward)
             s->offset -= step;

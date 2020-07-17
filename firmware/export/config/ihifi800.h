@@ -19,8 +19,8 @@
 #define HAVE_ES9018
 #define CODEC_SLAVE
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you can flip your LCD */
 /* #define HAVE_LCD_FLIP */

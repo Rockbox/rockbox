@@ -329,9 +329,7 @@ static bool exit_tsr(bool reenter)
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, "Batt.Bench is currently running.");
     rb->lcd_puts_scroll(0, 1, "Press " BATTERY_OFF_TXT " to cancel the test");
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_puts_scroll(0, 2, "Anything else will resume");
-#endif
     if(rb->global_settings->talk_menu)
         rb->talk_id(VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING, true);
     rb->lcd_update();
@@ -488,11 +486,7 @@ static void thread(void)
                 exit = true;
                 break;
             case EV_EXIT:
-#ifdef HAVE_LCD_BITMAP
                 rb->splash(HZ, "Exiting battery_bench...");
-#else
-                rb->splash(HZ, "bench exit");
-#endif
                 exit_reason = "plugin exit";
                 exit = true;
                 break;
@@ -516,7 +510,6 @@ static void thread(void)
 }
 
 
-#ifdef HAVE_LCD_BITMAP
 typedef void (*plcdfunc)(int x, int y, const unsigned char *str);
 
 static void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, int line)
@@ -525,7 +518,6 @@ static void put_centered_str(const char* str, plcdfunc putsxy, int lcd_width, in
     rb->lcd_getstringsize(str, &strwdt, &strhgt);
     putsxy((lcd_width - strwdt)/2, line*(strhgt), str);
 }
-#endif
 
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -533,27 +525,20 @@ enum plugin_status plugin_start(const void* parameter)
     int button, fd;
     bool on = false;
     start_tick = *rb->current_tick;
-#ifdef HAVE_LCD_BITMAP
     int i;
     const char *msgs[] = { "Battery Benchmark","Check file", BATTERY_LOG,
                            "for more info", BATTERY_ON_TXT, BATTERY_OFF_TXT " - quit" };
-#endif    
     rb->lcd_clear_display();
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_clear_display();
     rb->lcd_setfont(FONT_SYSFIXED);
 
     for (i = 0; i<(int)(sizeof(msgs)/sizeof(char *)); i++)
         put_centered_str(msgs[i],rb->lcd_putsxy,LCD_WIDTH,i+1);
-#else
-    rb->lcd_puts_scroll(0, 0, "Batt.Bench.");
-    rb->lcd_puts_scroll(0, 1, "PLAY/STOP");
-#endif
     if(rb->global_settings->talk_menu)
         rb->talk_id(VOICE_BAT_BENCH_KEYS, true);
     rb->lcd_update();
-    
+
 #ifdef HAVE_REMOTE_LCD
     rb->lcd_remote_clear_display();
     put_centered_str(msgs[0],rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,0);

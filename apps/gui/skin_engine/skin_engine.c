@@ -56,9 +56,7 @@ static struct gui_skin_helper {
     char* (*default_skin)(enum screen_type screen);
     bool load_on_boot;
 } skin_helpers[SKINNABLE_SCREENS_COUNT] = {
-#ifdef HAVE_LCD_BITMAP
     [CUSTOM_STATUSBAR] = { sb_preproccess, sb_postproccess, sb_create_from_settings, true },
-#endif
     [WPS] = { NULL, NULL, wps_default_skin, true },
 #if CONFIG_TUNER
     [FM_SCREEN] = { NULL, NULL, default_radio_skin, false }
@@ -115,10 +113,8 @@ static void gui_skin_reset(struct gui_skin *skin)
 #ifdef HAVE_SKIN_VARIABLES
     skin->data.skinvars = -1;
 #endif
-#ifdef HAVE_LCD_BITMAP
     skin->data.font_ids = -1;
     skin->data.images = -1;
-#endif
 #ifdef HAVE_ALBUMART
     skin->data.albumart = -1;
     skin->data.playback_aa_slot = -1;
@@ -157,9 +153,7 @@ void settings_apply_skins(void)
     char filename[MAX_PATH];
     static bool first_run = true;
 
-#ifdef HAVE_LCD_BITMAP
     skin_backdrop_init();
-#endif
     skins_initialised = true;
 
     /* Make sure each skin is loaded */
@@ -236,7 +230,6 @@ static char* get_skin_filename(char *buf, size_t buf_size,
     char *setting = NULL, *ext = NULL;
     switch (skin)
     {
-#ifdef HAVE_LCD_BITMAP
         case CUSTOM_STATUSBAR:
 #if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
             if (screen == SCREEN_REMOTE)
@@ -251,7 +244,6 @@ static char* get_skin_filename(char *buf, size_t buf_size,
                 ext = "sbs";
             }
             break;
-#endif
         case WPS:
 #if defined(HAVE_REMOTE_LCD) && NB_SCREENS > 1
             if (screen == SCREEN_REMOTE)
@@ -296,10 +288,8 @@ static char* get_skin_filename(char *buf, size_t buf_size,
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen)
 {
-#ifdef HAVE_LCD_BITMAP
     if (skin == CUSTOM_STATUSBAR && !skins_initialised)
         return &skins[skin][screen].gui_wps;
-#endif
 
     if (skins[skin][screen].data.wps_loaded == false)
     {

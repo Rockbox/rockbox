@@ -167,9 +167,7 @@ int main(void)
         screens[i].clear_display();
         screens[i].update();
     }
-#ifdef HAVE_LCD_BITMAP
     list_init();
-#endif
     tree_gui_init();
     /* Keep the order of this 3
      * Must be done before any code uses the multi-screen API */
@@ -280,7 +278,6 @@ static void init_tagcache(void)
                 talk_number(tagcache_get_max_commit_step(), true);
             }
 #endif
-#ifdef HAVE_LCD_BITMAP
             if (lang_is_rtl())
             {
                 splashf(0, "[%d/%d] %s", ret, tagcache_get_max_commit_step(),
@@ -291,12 +288,6 @@ static void init_tagcache(void)
                 splashf(0, "%s [%d/%d]", str(LANG_TAGCACHE_INIT), ret,
                     tagcache_get_max_commit_step());
             }
-#else
-            lcd_double_height(false);
-            lcd_putsf(0, 1, " DB [%d/%d]", ret,
-                tagcache_get_max_commit_step());
-            lcd_update();
-#endif
             clear = true;
         }
         sleep(HZ/4);
@@ -326,11 +317,9 @@ static void init(void)
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
 #endif
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
-#endif
     show_logo();
 #ifndef USB_NONE
     usb_init();
@@ -428,11 +417,9 @@ static void init(void)
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
 #endif
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
-#endif
 
     settings_reset();
 
@@ -507,14 +494,12 @@ static void init(void)
     CHART("<storage_init");
     if(rc)
     {
-#ifdef HAVE_LCD_BITMAP
         lcd_clear_display();
         lcd_putsf(0, 1, "ATA error: %d", rc);
         lcd_puts(0, 3, "Press ON to debug");
         lcd_update();
         while(!(button_get(true) & BUTTON_REL)); /* DO NOT CHANGE TO ACTION SYSTEM */
         dbg_ports();
-#endif
         panicf("ata: %d", rc);
     }
 
@@ -565,10 +550,8 @@ static void init(void)
             lcd_clear_display();
             lcd_puts(0, 0, "No partition");
             lcd_puts(0, 1, "found.");
-#ifdef HAVE_LCD_BITMAP
             lcd_puts(0, 2, "Insert USB cable");
             lcd_puts(0, 3, "and fix it.");
-#endif
             lcd_update();
 
             while(button_get(true) != SYS_USB_CONNECTED) {};

@@ -49,9 +49,7 @@
 #include "splash.h"
 #include "yesno.h"
 #include "menus/exported_menus.h"
-#ifdef HAVE_LCD_BITMAP
 #include "icons.h"
-#endif
 #include "sound_menu.h"
 #include "playlist_menu.h"
 #include "playlist_catalog.h"
@@ -794,7 +792,6 @@ static int cat_playlist_callback(int action,
     return action;
 }
 
-#ifdef HAVE_LCD_BITMAP
 static void draw_slider(void)
 {
     FOR_NB_SCREENS(i)
@@ -809,9 +806,6 @@ static void draw_slider(void)
         screens[i].set_viewport(NULL);
     }
 }
-#else
-#define draw_slider()
-#endif
 
 static void clear_display(bool update)
 {

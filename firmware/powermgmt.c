@@ -40,9 +40,7 @@
 #include "fmradio.h"
 #endif
 #include "sound.h"
-#ifdef HAVE_LCD_BITMAP
 #include "font.h"
-#endif
 #include "logf.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
@@ -754,9 +752,7 @@ void shutdown_hw(void)
     audio_stop();
 
     if (battery_level_safe()) { /* do not save on critical battery */
-#ifdef HAVE_LCD_BITMAP
         font_unload_all();
-#endif
 
 /* Commit pending writes if needed. Even though we don't do write caching,
    things like flash translation layers may need this to commit scattered

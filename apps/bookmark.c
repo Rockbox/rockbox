@@ -198,14 +198,8 @@ bool bookmark_autobookmark(bool prompt_ok)
         case BOOKMARK_RECENT_ONLY_YES:
             return write_bookmark(false, bookmark);
     }
-#ifdef HAVE_LCD_BITMAP
     const char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY)};
     const struct text_message message={lines, 1};
-#else
-    const char *lines[]={ID2P(LANG_AUTO_BOOKMARK_QUERY),
-                            str(LANG_CONFIRM_WITH_BUTTON)};
-    const struct text_message message={lines, 2};
-#endif
 
     if(prompt_ok && gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
     {

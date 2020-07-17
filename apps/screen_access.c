@@ -39,43 +39,30 @@
 /* some helper functions to calculate metrics on the fly */
 static int screen_helper_getcharwidth(void)
 {
-#ifdef HAVE_LCD_BITMAP
     return font_get(lcd_getfont())->maxwidth;
-#else
-    return 1;
-#endif
 }
 
 static int screen_helper_getcharheight(void)
 {
-#ifdef HAVE_LCD_BITMAP
     return font_get(lcd_getfont())->height;
-#else
-    return 1;
-#endif
 }
 
 static int screen_helper_getnblines(void)
 {
     int height=screens[0].lcdheight;
-#ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar != STATUSBAR_OFF)
         height -= STATUSBAR_HEIGHT;
-#endif
     return height / screens[0].getcharheight();
 }
 
 void screen_helper_setfont(int font)
 {
     (void)font;
-#ifdef HAVE_LCD_BITMAP
     if (font == FONT_UI)
         font = global_status.font_id[SCREEN_MAIN];
     lcd_setfont(font);
-#endif
 }
 
-#ifdef HAVE_LCD_BITMAP
 static int screen_helper_getuifont(void)
 {
     return global_status.font_id[SCREEN_MAIN];
@@ -85,15 +72,10 @@ static void screen_helper_setuifont(int font)
 {
     global_status.font_id[SCREEN_MAIN] = font;
 }
-#endif
 
 static void screen_helper_set_drawmode(int mode)
 {
-#ifdef HAVE_LCD_BITMAP
     lcd_set_drawmode(mode);
-#else
-    (void) mode;
-#endif
 }
 
 static void screen_helper_put_line(int x, int y, struct line_desc *line,
@@ -108,29 +90,19 @@ static void screen_helper_put_line(int x, int y, struct line_desc *line,
 #if NB_SCREENS == 2
 static int screen_helper_remote_getcharwidth(void)
 {
-#ifdef HAVE_LCD_BITMAP
     return font_get(lcd_remote_getfont())->maxwidth;
-#else
-    return 1;
-#endif
 }
 
 static int screen_helper_remote_getcharheight(void)
 {
-#ifdef HAVE_LCD_BITMAP
     return font_get(lcd_remote_getfont())->height;
-#else
-    return 1;
-#endif
 }
 
 static int screen_helper_remote_getnblines(void)
 {
     int height=screens[1].lcdheight;
-#ifdef HAVE_LCD_BITMAP
     if(global_settings.statusbar != STATUSBAR_OFF)
         height -= STATUSBAR_HEIGHT;
-#endif
     return height / screens[1].getcharheight();
 }
 
@@ -143,18 +115,12 @@ void screen_helper_remote_setfont(int font)
 
 static int screen_helper_remote_getuifont(void)
 {
-#ifdef HAVE_LCD_BITMAP
     return global_status.font_id[SCREEN_REMOTE];
-#else
-    return FONT_SYSFIXED;
-#endif
 }
 
 static void screen_helper_remote_setuifont(int font)
 {
-#ifdef HAVE_LCD_BITMAP
     global_status.font_id[SCREEN_REMOTE] = font;
-#endif
 }
 
 static void screen_helper_remote_put_line(int x, int y, struct line_desc *line,
@@ -181,9 +147,7 @@ struct screen screens[NB_SCREENS] =
 #else
         .is_color=false,
 #endif
-#ifdef HAVE_LCD_BITMAP
         .pixel_format=LCD_PIXELFORMAT,
-#endif
         .getcharwidth=screen_helper_getcharwidth,
         .getcharheight=screen_helper_getcharheight,
 #if (CONFIG_LED == LED_VIRTUAL)
@@ -196,7 +160,6 @@ struct screen screens[NB_SCREENS] =
         .getwidth=&lcd_getwidth,
         .getheight=&lcd_getheight,
         .getstringsize=&lcd_getstringsize,
-#ifdef HAVE_LCD_BITMAP
         .setfont=screen_helper_setfont,
         .getuifont=screen_helper_getuifont,
         .setuifont=screen_helper_setuifont,
@@ -235,7 +198,6 @@ struct screen screens[NB_SCREENS] =
         .vline=&lcd_vline,
         .hline=&lcd_hline,
         .scroll_step=&lcd_scroll_step,
-#endif /* HAVE_LCD_BITMAP */
 
         .putsxy=&lcd_putsxy,
         .puts=&lcd_puts,
@@ -259,12 +221,10 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&backdrop_load,
         .backdrop_show=&backdrop_show,
 #endif
-#if defined(HAVE_LCD_BITMAP)
         .set_framebuffer = (void*)lcd_set_framebuffer,
 #if defined(HAVE_LCD_COLOR)    
         .gradient_fillrect = lcd_gradient_fillrect,
         .gradient_fillrect_part = lcd_gradient_fillrect_part,
-#endif
 #endif
         .put_line = screen_helper_put_line,
     },
@@ -347,15 +307,12 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&remote_backdrop_load,
         .backdrop_show=&remote_backdrop_show,
 #endif
-#if defined(HAVE_LCD_BITMAP)
         .set_framebuffer = (void*)lcd_remote_set_framebuffer,
-#endif
         .put_line = screen_helper_remote_put_line,
     }
 #endif /* NB_SCREENS == 2 */
 };
 
-#ifdef HAVE_LCD_BITMAP
 void screen_clear_area(struct screen * display, int xstart, int ystart,
                        int width, int height)
 {
@@ -363,4 +320,3 @@ void screen_clear_area(struct screen * display, int xstart, int ystart,
     display->fillrect(xstart, ystart, width, height);
     display->set_drawmode(DRMODE_SOLID);
 }
-#endif

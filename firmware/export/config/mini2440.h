@@ -50,8 +50,8 @@
 /* #define HAVE_DISK_STORAGE */
 
 /* Display */
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 /* The LCD is assumed to be 3.5" TFT touch screen, others are possible */

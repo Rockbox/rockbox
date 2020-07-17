@@ -41,8 +41,8 @@
 /*define this if the ATA controller and method of USB access support LBA48 */
 #define HAVE_LBA48
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

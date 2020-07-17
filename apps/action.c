@@ -26,7 +26,7 @@
 #include "config.h"
 #include "lang.h"
 
-#if defined(HAVE_LCD_BITMAP) && !defined(BOOTLOADER)
+#if !defined(BOOTLOADER)
 #include "language.h"
 #endif
 
@@ -421,7 +421,7 @@ static inline bool get_action_touchscreen(action_last_t *last, action_cur_t *cur
 static inline void button_flip_horizontally(int context, int *button)
 {
 
-#if !defined(HAVE_LCD_BITMAP) || defined(BOOTLOADER)
+#if defined(BOOTLOADER)
     (void) context;
     (void) *button;
     return;
@@ -473,7 +473,7 @@ static inline void button_flip_horizontally(int context, int *button)
 #endif /* !SIMULATOR */
 
     *button = newbutton;
-#endif /* !HAVE_LCD_BITMAP | BOOTLOADER */
+#endif /* !BOOTLOADER */
 } /* button_flip_horizontally */
 
 /**********************************************************************

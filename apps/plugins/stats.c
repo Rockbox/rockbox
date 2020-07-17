@@ -56,7 +56,6 @@ static void update_screen(void)
     rb->lcd_remote_clear_display();
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     rb->snprintf(buf, sizeof(buf), "Total Files: %d", files);
     prn(buf,0);
     rb->snprintf(buf, sizeof(buf), "Audio: %d", audiofiles);
@@ -71,12 +70,6 @@ static void update_screen(void)
     prn(buf,5);
     rb->snprintf(buf, sizeof(buf), "Max files in Dir: %d", largestdir);
     prn(buf,6);
-#else
-    rb->snprintf(buf, sizeof(buf), "Files:%5d", files);
-    prn(buf,0);
-    rb->snprintf(buf, sizeof(buf), "Dirs: %5d", dirs);
-    prn(buf,1);
-#endif
 
     rb->lcd_update();
 #ifdef HAVE_REMOTE_LCD

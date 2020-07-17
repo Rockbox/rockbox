@@ -40,14 +40,12 @@ struct viewport {
     int y;
     int width;
     int height;
-#ifdef HAVE_LCD_BITMAP
     int flags;
     int font;
     int drawmode;
     /* needed for even for mono displays to support greylib */
     unsigned fg_pattern;
     unsigned bg_pattern;
-#endif
 };
 
 /* Frame buffer stride
@@ -114,7 +112,6 @@ struct scrollinfo;
 #define STRIDE(screen, w, h) (screen==SCREEN_MAIN?STRIDE_MAIN((w), \
                                         (h)):STRIDE_REMOTE((w),(h)))
 
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH <=8
 #if (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED) \
  || (LCD_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
@@ -144,7 +141,6 @@ typedef unsigned long fb_data;
 #endif
 #define FB_DATA_SZ 4
 #endif /* LCD_DEPTH */
-#endif
 
 #if defined(HAVE_LCD_MODES)
 void lcd_set_mode(int mode);
@@ -193,8 +189,6 @@ extern bool lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
                                    void (*scroll_func)(struct scrollinfo *),
                                    void *data, int x_offset);
 
-#ifdef HAVE_LCD_BITMAP
-
 /* performance function */
 #if defined(HAVE_LCD_COLOR)
 #if MEMORYSIZE > 2
@@ -221,7 +215,6 @@ extern void lcd_remote_update(void);
 /* update a fraction of the screen */
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
 #endif /* HAVE_REMOTE_LCD */
-#endif /* HAVE_LCD_BITMAP */
 
 /* Bitmap formats */
 enum
@@ -248,8 +241,6 @@ typedef void lcd_blockfunc_type(fb_data *address, unsigned mask, unsigned bits);
 #if LCD_DEPTH >= 8
 typedef void lcd_fastpixelfunc_type(fb_data *address);
 #endif
-
-#ifdef HAVE_LCD_BITMAP
 
 #if defined(HAVE_LCD_COLOR) && defined(LCD_REMOTE_DEPTH) && \
  LCD_REMOTE_DEPTH > 1
@@ -592,7 +583,5 @@ static inline int lcd_get_dpi(void) { return LCD_DPI; }
 #else
 extern int lcd_get_dpi(void);
 #endif /* LCD_DPI */
-
-#endif /* HAVE_LCD_BITMAP */
 
 #endif /* __LCD_H__ */

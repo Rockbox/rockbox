@@ -50,9 +50,7 @@ panic.c
 #ifdef HAVE_SDL
 target/hosted/sdl/button-sdl.c
 target/hosted/sdl/kernel-sdl.c
-#ifdef HAVE_LCD_BITMAP
 target/hosted/sdl/lcd-bitmap.c
-#endif
 #ifdef HAVE_REMOTE_LCD
 target/hosted/sdl/lcd-remote-bitmap.c
 #endif
@@ -253,7 +251,6 @@ common/vuprintf.c
 /* Display */
 scroll_engine.c
 
-#ifdef HAVE_LCD_BITMAP
 arabjoin.c
 bidi.c
 font_cache.c
@@ -283,7 +280,6 @@ drivers/lcd-16bit.c
 drivers/lcd-24bit.c
 #endif /* LCD_DEPTH */
 common/diacritic.c
-#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH == 1

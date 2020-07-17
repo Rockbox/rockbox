@@ -22,15 +22,9 @@
 #include "lib/mylcd.h"
 #include "lib/pluginlib_actions.h"
 
-#ifdef HAVE_LCD_BITMAP
 #define NUM_PARTICLES (LCD_WIDTH * LCD_HEIGHT / 72)
 #define SNOW_HEIGHT LCD_HEIGHT
 #define SNOW_WIDTH LCD_WIDTH
-#else
-#define NUM_PARTICLES 10
-#define SNOW_HEIGHT 14
-#define SNOW_WIDTH 20
-#endif
 
 static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
@@ -40,14 +34,12 @@ static const struct button_mapping *plugin_contexts[] = { pla_main_ctx };
 
 static short particles[NUM_PARTICLES][2];
 
-#ifdef HAVE_LCD_BITMAP
 #if LCD_WIDTH >= 160
 #define FLAKE_WIDTH 5
 static const unsigned char flake[] = {0x0a,0x04,0x1f,0x04,0x0a};
 #else
 #define FLAKE_WIDTH 3
 static const unsigned char flake[] = {0x02,0x07,0x02};
-#endif
 #endif
 
 static bool particle_exists(int particle)
@@ -83,12 +75,8 @@ static void snow_move(void)
     for (i=0; i<NUM_PARTICLES; i++) {
         if (particle_exists(i)) {
             mylcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
-#ifdef HAVE_LCD_BITMAP
             rb->lcd_fillrect(particles[i][0],particles[i][1],
                              FLAKE_WIDTH,FLAKE_WIDTH);
-#else
-            pgfx_drawpixel(particles[i][0],particles[i][1]);
-#endif
             mylcd_set_drawmode(DRMODE_SOLID);
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
@@ -116,12 +104,8 @@ static void snow_move(void)
                     break;
             }
             if (particle_exists(i))
-#ifdef HAVE_LCD_BITMAP
                 rb->lcd_mono_bitmap(flake,particles[i][0],particles[i][1],
                                     FLAKE_WIDTH,FLAKE_WIDTH);
-#else
-                pgfx_drawpixel(particles[i][0],particles[i][1]);
-#endif
 #ifdef HAVE_REMOTE_LCD
             if (particles[i][0] <= LCD_REMOTE_WIDTH 
                     && particles[i][1] <= LCD_REMOTE_HEIGHT) {

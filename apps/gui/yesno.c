@@ -112,9 +112,7 @@ static void gui_yesno_draw(struct gui_yesno * yn)
         if(line_shift+3 <= vp_lines)
             line_shift++;
         display->puts(0, line_shift, str(LANG_CONFIRM_WITH_BUTTON));
-#ifdef HAVE_LCD_BITMAP
         display->puts(0, line_shift+1, str(LANG_CANCEL_WITH_ANY));
-#endif
     }
 #endif
     display->update_viewport();

@@ -13,7 +13,7 @@ display_text.c
 strncpy.c
 stdio_compat.c
 
-#if defined(HAVE_LCD_BITMAP) && (LCD_DEPTH < 4)
+#if (LCD_DEPTH < 4)
 grey_core.c
 grey_draw.c
 grey_parm.c
@@ -23,7 +23,7 @@ grey_scroll.c
 grey_coldfire.S
 #endif
 
-#endif /* HAVE_LCD_BITMAP && LCD_DEPTH < 4 */
+#endif /* LCD_DEPTH < 4 */
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 overlay.c
@@ -32,8 +32,6 @@ overlay.c
 #ifdef RB_PROFILE
 profile_plugin.c
 #endif
-
-#ifdef HAVE_LCD_BITMAP
 
 #ifdef CPU_ARM
 pluginlib_jpeg_idct_arm.S
@@ -64,8 +62,6 @@ pluginlib_albumart.c
 #endif
 
 kbd_helper.c
-
-#endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_TOUCHSCREEN
 pluginlib_touchscreen.c

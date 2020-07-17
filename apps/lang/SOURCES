@@ -39,7 +39,6 @@ ukrainian.lang
 vlaams.lang
 wallisertitsch.lang
 walon.lang
-#ifdef HAVE_LCD_BITMAP /* Not for the Player */
 arabic.lang
 chinese-simp.lang
 chinese-trad.lang
@@ -47,4 +46,3 @@ hindi.lang
 japanese.lang
 korean.lang
 thai.lang
-#endif /* HAVE_LCD_BITMAP */

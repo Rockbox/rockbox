@@ -8,7 +8,6 @@
  */
 lua
 lua_scripts
-#ifdef HAVE_LCD_BITMAP
 
 #if PLUGIN_BUFFER_SIZE > 0x20000
 fft
@@ -19,8 +18,6 @@ reversi
 #ifdef HAVE_TAGCACHE
 pictureflow
 #endif
-
-#endif /* HAVE_LCD_BITMAP */
 
 /* For all the swcodec targets */
 #if MEMORYSIZE > 2 /* we need a lot of RAM for instruments */

@@ -59,12 +59,10 @@ static bool tv_notify_change_preferences(const struct tv_preferences *oldp)
         (oldp->vertical_scrollbar   != preferences->vertical_scrollbar)   ||
         (oldp->encoding             != preferences->encoding)             ||
         (oldp->indent_spaces        != preferences->indent_spaces)        ||
-#ifdef HAVE_LCD_BITMAP
         (oldp->header_mode          != preferences->header_mode)          ||
         (oldp->footer_mode          != preferences->footer_mode)          ||
         (oldp->statusbar            != preferences->statusbar)            ||
         (rb->strcmp(oldp->font_name, preferences->font_name))             ||
-#endif
         (rb->strcmp(oldp->file_name, preferences->file_name)))
     {
         /* callback functions are called as FILO */
@@ -110,17 +108,11 @@ void tv_set_default_preferences(struct tv_preferences *p)
     p->overlap_page_mode = false;
     p->horizontal_scrollbar = false;
     p->vertical_scrollbar = false;
-#ifdef HAVE_LCD_BITMAP
     p->header_mode = true;
     p->footer_mode = true;
     p->statusbar   = true;
     rb->strlcpy(p->font_name, rb->global_settings->font_file, MAX_PATH);
     p->font_id = rb->global_status->font_id[SCREEN_MAIN];
-#else
-    p->header_mode = false;
-    p->footer_mode = false;
-    p->statusbar   = false;
-#endif
     p->autoscroll_speed = 10;
     p->night_mode  = false;
     p->narrow_mode = NM_PAGE;
@@ -139,7 +131,5 @@ void tv_add_preferences_change_listner(int (*listner)(const struct tv_preference
 void tv_change_fontid(int id)
 {
     (void)id;
-#ifdef HAVE_LCD_BITMAP
     prefs.font_id = id;
-#endif
 }

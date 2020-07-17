@@ -14,8 +14,8 @@
 /*define this if the ATA controller and method of USB access support LBA48 */
 #define HAVE_LBA48
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you want album art for this target */
 #define HAVE_ALBUMART

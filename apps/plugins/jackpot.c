@@ -30,7 +30,6 @@ const struct button_mapping* plugin_contexts[]={pla_main_ctx};
 #define NB_PICTURES 9
 #define NB_SLOTS 3
 
-#ifdef HAVE_LCD_BITMAP
 #define PICTURE_HEIGHT (BMPHEIGHT_jackpot_slots/(NB_PICTURES+1))
 #if NB_SCREENS==1
 #define PICTURE_ROTATION_STEPS PICTURE_HEIGHT
@@ -55,7 +54,6 @@ const struct picture jackpot_pictures[]={
 };
 
 #define SLEEP_TIME (HZ/200)
-#endif /* HAVE_LCD_BITMAP */
 
 struct jackpot
 {

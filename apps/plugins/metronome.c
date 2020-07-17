@@ -840,12 +840,9 @@ static void metronome_draw(struct screen* display, int state)
     int textlen = display->lcdwidth / display->getcharwidth();
     ps = part;
     display->clear_display();
-#ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_SYSFIXED);
-#endif
     switch(state)
     {
-#ifdef HAVE_LCD_BITMAP
         case 0:
             if(sound_paused)
             {
@@ -876,49 +873,17 @@ static void metronome_draw(struct screen* display, int state)
         case 3:
             display->puts((textlen-3)/2,0, "o.O");
         break;
-#else /* Much simpler on 2-line text display, but same thing. */
-        case 1:
-            if((beat+1) % 2 == 0)
-                beat1 = '/';
-            else
-                beat1 = '\\';
-        break;
-        case 2:
-            if((beat+1) % 2 == 0)
-                beat2 = '/';
-            else
-                beat2 = '\\';
-         break;
-        case 3:
-            beat1 = '.';
-        break;
-#endif
     }
 
     if(track_mode)
     {
 
-#ifdef HAVE_LCD_BITMAP
         /* One line in several. */
         rb->snprintf( buffer, sizeof(buffer), "%u/%u@%u V%d"
                     , ps->beats_per_bar, ps->base_beat
                     , bpm, rb->global_settings->volume );
         display->puts(0,4, buffer);
-#else
-        /* Just two short lines with integrated beat indicator. */
-        rb->snprintf( buffer, sizeof(buffer), "%c %u/%u@%u"
-                    , beat1
-                    , ps->beats_per_bar, ps->base_beat
-                    , bpm );
-        display->puts(0,0, buffer);
-        /* Simulator prints format %+02d ... real Rockbox doesn't. */
-        rb->snprintf( buffer, sizeof(buffer), "%c V%d"
-                    , beat2
-                    , rb->global_settings->volume );
-        display->puts(0,1, buffer);
-#endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_LCD_BITMAP
         /* Would it hurt to draw a 3rd line to 2-line display?
            I guess there are 3-line displays out there. */
         if(ps->label && rb->strlen(ps->label))
@@ -935,13 +900,11 @@ static void metronome_draw(struct screen* display, int state)
             rb->snprintf( buffer, sizeof(buffer), "P%u/%u: B%u/_+%u"
                         , part->id+1, parts, bar+1, beat+1 );
         display->puts(0, 5, buffer);
-#endif /* HAVE_LCD_BITMAP */
 
     }
     else /* track mode */
     {
 
-#ifdef HAVE_LCD_BITMAP
         if(display->screen_type==SCREEN_MAIN)
         {
 #ifdef MET_SYNC
@@ -960,32 +923,18 @@ static void metronome_draw(struct screen* display, int state)
 #endif
         }
 #endif
-#endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_LCD_BITMAP
         rb->snprintf( buffer, sizeof(buffer), "BPM: %d Vol: %d"
                     , bpm, rb->global_settings->volume );
         display->puts(0,3, buffer);
-#else
-        rb->snprintf( buffer, sizeof(buffer), "%c BPM: %d "
-                    , beat1, bpm );
-        display->puts(0,0, buffer);
-        rb->snprintf( buffer, sizeof(buffer), "%c Vol: %d"
-                    , beat2, rb->global_settings->volume );
-        display->puts(0,1, buffer);
-#endif /* HAVE_LCD_BITMAP */
 
-#ifdef HAVE_LCD_BITMAP
         display->hline(0, 111, 12);
         if(sound_paused) display->puts(0,2,"start: hold select");
         else             display->puts(0,2,"stop : cancel");
-#endif /* HAVE_LCD_BITMAP */
 
     } /* !track_mode */
 
-#ifdef HAVE_LCD_BITMAP
     display->setfont(FONT_UI);
-#endif /* HAVE_LCD_BITMAP */
     display->update();
 }
 

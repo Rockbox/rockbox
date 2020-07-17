@@ -80,11 +80,9 @@
 #include "radio.h"
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
 #include "peakmeter.h"
 #include "skin_engine/skin_engine.h"
-#endif
 #include "logfdisp.h"
 #include "core_alloc.h"
 #include "pcmbuf.h"
@@ -300,7 +298,6 @@ static bool dbg_cpuinfo(void)
 
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 static unsigned int ticks, freq_sum;
 #ifndef CPU_MULTI_FREQUENCY
 static unsigned int boost_ticks;
@@ -442,7 +439,6 @@ static bool dbg_buffering_thread(void)
 
     return false;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 static const char* bf_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
@@ -688,9 +684,7 @@ static bool dbg_pcf(void)
 {
     int line;
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
-#endif
     lcd_clear_display();
 
     while(1)
@@ -731,9 +725,7 @@ static bool dbg_cpufreq(void)
     int x = 0;
     bool done = false;
 
-#ifdef HAVE_LCD_BITMAP
     lcd_setfont(FONT_SYSFIXED);
-#endif
     lcd_clear_display();
 
     while(!done)
@@ -838,7 +830,7 @@ static bool tsc2100_debug(void)
     return simplelist_show_list(&info);
 }
 #endif
-#if (CONFIG_BATTERY_MEASURE != 0) && defined(HAVE_LCD_BITMAP) && !defined(SIMULATOR)
+#if (CONFIG_BATTERY_MEASURE != 0) && !defined(SIMULATOR)
 /*
  * view_battery() shows a automatically scaled graph of the battery voltage
  * over time. Usable for estimating battery life / charging rate.
@@ -1165,7 +1157,7 @@ static bool view_battery(void)
     return false;
 }
 
-#endif /* (CONFIG_BATTERY_MEASURE != 0) && HAVE_LCD_BITMAP */
+#endif /* (CONFIG_BATTERY_MEASURE != 0)  */
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if (CONFIG_STORAGE & STORAGE_MMC) || (CONFIG_STORAGE & STORAGE_SD)
@@ -2103,7 +2095,7 @@ static bool dbg_fm_radio(void)
 #endif /* CONFIG_TUNER */
 #endif /* !SIMULATOR */
 
-#if defined(HAVE_LCD_BITMAP) && !defined(APPLICATION)
+#if !defined(APPLICATION)
 extern bool do_screendump_instead_of_usb;
 
 static bool dbg_screendump(void)
@@ -2112,7 +2104,7 @@ static bool dbg_screendump(void)
     splashf(HZ, "Screendump %sabled", do_screendump_instead_of_usb?"en":"dis");
     return false;
 }
-#endif /* HAVE_LCD_BITMAP */
+#endif /* !APPLICATION */
 
 extern bool write_metadata_log;
 
@@ -2397,7 +2389,6 @@ static bool dbg_pic(void)
 }
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 static bool dbg_skin_engine(void)
 {
     struct simplelist_info info;
@@ -2451,7 +2442,6 @@ static bool dbg_skin_engine(void)
 #endif
     return simplelist_show_list(&info);
 }
-#endif
 
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 static bool dbg_boot_data(void)
@@ -2528,7 +2518,6 @@ static const struct {
 #ifdef __linux__
         { "View CPU stats", dbg_cpuinfo },
 #endif
-#ifdef HAVE_LCD_BITMAP
 #if (CONFIG_BATTERY_MEASURE != 0) && !defined(SIMULATOR)
         { "View battery", view_battery },
 #endif
@@ -2536,7 +2525,6 @@ static const struct {
         { "Screendump", dbg_screendump },
 #endif
         { "Skin Engine RAM usage", dbg_skin_engine },
-#endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || (defined(SONY_NWZ_LINUX) && !defined(SIMULATOR))
         { "View HW info", dbg_hw_info },
 #endif
@@ -2559,12 +2547,10 @@ static const struct {
 #ifdef HAVE_TAGCACHE
         { "View database info", dbg_tagcache_info },
 #endif
-#ifdef HAVE_LCD_BITMAP
         { "View buffering thread", dbg_buffering_thread },
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */
-#endif /* HAVE_LCD_BITMAP */
         { "View buflib allocs", dbg_buflib_allocs },
 #ifndef SIMULATOR
 #if CONFIG_TUNER

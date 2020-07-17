@@ -80,7 +80,6 @@ struct skin_token_list {
     OFFSETTYPE(struct skin_token_list *) next;
 };
 
-#ifdef HAVE_LCD_BITMAP
 struct gui_img {
     OFFSETTYPE(struct viewport*) vp;    /* The viewport to display this image in */
     short int x;                  /* x-pos */
@@ -137,9 +136,6 @@ struct draw_rectangle {
     unsigned start_colour;
     unsigned end_colour;
 };
-#endif
-
-
 
 struct align_pos {
     char* left;
@@ -147,11 +143,7 @@ struct align_pos {
     char* right;
 };
 
-#ifdef HAVE_LCD_BITMAP
 #define WPS_MAX_TOKENS      1150
-#else
-#define WPS_MAX_TOKENS      64
-#endif
 
 enum wps_parse_error {
     PARSE_OK,
@@ -344,11 +336,9 @@ struct wps_data
     int buflib_handle;
 
     OFFSETTYPE(struct skin_element *) tree;
-#ifdef HAVE_LCD_BITMAP
     OFFSETTYPE(struct skin_token_list *) images;
     OFFSETTYPE(int *) font_ids;
     int font_count;
-#endif
 #ifdef HAVE_BACKDROP_IMAGE
     int backdrop_id;
     bool use_extra_framebuffer;
@@ -370,11 +360,9 @@ struct wps_data
     OFFSETTYPE(struct skin_token_list *) skinvars;
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     bool peak_meter_enabled;
     bool wps_sb_tag;
     bool show_sb_on_wps;
-#endif
     bool wps_loaded;
 };
 
@@ -448,9 +436,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 enum skin_find_what {
     SKIN_FIND_VP = 0,
     SKIN_FIND_UIVP,
-#ifdef HAVE_LCD_BITMAP
     SKIN_FIND_IMAGE,
-#endif
 #ifdef HAVE_TOUCHSCREEN
     SKIN_FIND_TOUCHREGION,
 #endif

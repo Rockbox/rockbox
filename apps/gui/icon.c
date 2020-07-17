@@ -144,11 +144,7 @@ void screen_put_iconxy(struct screen * display,
 
 void screen_put_cursorxy(struct screen * display, int x, int y, bool on)
 {
-#ifdef HAVE_LCD_BITMAP
     screen_put_icon(display, x, y, on?Icon_Cursor:0);
-#else
-    screen_put_icon(display, x, y, on?CURSOR_CHAR:-1);
-#endif
 }
 
 static int buflib_move_callback(int handle, void* current, void* new)

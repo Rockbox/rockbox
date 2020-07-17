@@ -66,9 +66,7 @@
 #include "tuner.h"
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #include "bmp.h"
-#endif
 
 #ifdef HAVE_ALBUMART
 #include "playback.h"
@@ -127,7 +125,6 @@ typedef int (*parse_function)(struct skin_element *element,
                               struct wps_token *token,
                               struct wps_data *wps_data);
 
-#ifdef HAVE_LCD_BITMAP
 /* add a skin_token_list item to the list chain. ALWAYS appended because some of the
  * chains require the order to be kept.
  */
@@ -146,9 +143,6 @@ static void add_to_ll_chain(OFFSETTYPE(struct skin_token_list *) *listoffset,
         list->next = PTRTOSKINOFFSET(skin_buffer, item);
     }
 }
-
-#endif
-
 
 void *skin_find_item(const char *label, enum skin_find_what what,
                      struct wps_data *data)
@@ -170,11 +164,9 @@ void *skin_find_item(const char *label, enum skin_find_what what,
             list.vplist = SKINOFFSETTOPTR(databuf, data->tree);
             isvplist = true;
         break;
-#ifdef HAVE_LCD_BITMAP
         case SKIN_FIND_IMAGE:
             list.linkedlist = SKINOFFSETTOPTR(databuf, data->images);
         break;
-#endif
 #ifdef HAVE_TOUCHSCREEN
         case SKIN_FIND_TOUCHREGION:
             list.linkedlist = SKINOFFSETTOPTR(databuf, data->touchregions);
@@ -190,11 +182,9 @@ void *skin_find_item(const char *label, enum skin_find_what what,
     while (list.linkedlist)
     {
         bool skip = false;
-#ifdef HAVE_LCD_BITMAP
         struct wps_token *token = NULL;
         if (!isvplist)
             token = SKINOFFSETTOPTR(databuf, list.linkedlist->token);
-#endif
         switch (what)
         {
             case SKIN_FIND_UIVP:
@@ -207,12 +197,10 @@ void *skin_find_item(const char *label, enum skin_find_what what,
                 skip = !(((struct skin_viewport *)ret)->is_infovp ==
                     (what==SKIN_FIND_UIVP));
                 break;
-#ifdef HAVE_LCD_BITMAP
             case SKIN_FIND_IMAGE:
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct gui_img *)ret)->label);
                 break;
-#endif
 #ifdef HAVE_TOUCHSCREEN
             case SKIN_FIND_TOUCHREGION:
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
@@ -239,8 +227,6 @@ void *skin_find_item(const char *label, enum skin_find_what what,
     }
     return NULL;
 }
-
-#ifdef HAVE_LCD_BITMAP
 
 /* create and init a new wpsll item.
  * passing NULL to token will alloc a new one.
@@ -493,9 +479,6 @@ static int parse_font_load(struct skin_element *element,
     return 0;
 }
 
-
-#ifdef HAVE_LCD_BITMAP
-
 static int parse_playlistview(struct skin_element *element,
                               struct wps_token *token,
                               struct wps_data *wps_data)
@@ -513,7 +496,7 @@ static int parse_playlistview(struct skin_element *element,
 
     return 0;
 }
-#endif
+
 #ifdef HAVE_LCD_COLOR
 static int parse_viewport_gradient_setup(struct skin_element *element,
                                    struct wps_token *token,
@@ -756,8 +739,6 @@ static int parse_image_special(struct skin_element *element,
 }
 #endif
 
-#endif /* HAVE_LCD_BITMAP */
-
 static int parse_progressbar_tag(struct skin_element* element,
                                  struct wps_token *token,
                                  struct wps_data *wps_data);
@@ -898,7 +879,6 @@ static int parse_progressbar_tag(struct skin_element* element,
                                  struct wps_token *token,
                                  struct wps_data *wps_data)
 {
-#ifdef HAVE_LCD_BITMAP
     struct progressbar *pb;
     struct viewport *vp = &curr_vp->vp;
     struct skin_tag_parameter *param = get_param(element, 0);
@@ -1211,20 +1191,7 @@ static int parse_progressbar_tag(struct skin_element* element,
         add_to_ll_chain(&wps_data->touchregions, item);
     }
 #endif
-
     return 0;
-
-#else
-    (void)element;
-    if (token->type == SKIN_TOKEN_PROGRESSBAR ||
-        token->type == SKIN_TOKEN_PLAYER_PROGRESSBAR)
-    {
-        wps_data->full_line_progressbar =
-                        token->type == SKIN_TOKEN_PLAYER_PROGRESSBAR;
-    }
-    return 0;
-
-#endif
 }
 
 #ifdef HAVE_ALBUMART
@@ -1741,7 +1708,6 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 {
     if (wps_data->wps_loaded)
         skin_buffer = get_skin_buffer(wps_data);
-#ifdef HAVE_LCD_BITMAP
 #ifndef __PCTOOL__
     struct skin_token_list *list = SKINOFFSETTOPTR(skin_buffer, wps_data->images);
     int *font_ids = SKINOFFSETTOPTR(skin_buffer, wps_data->font_ids);
@@ -1776,7 +1742,6 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
         core_free(wps_data->buflib_handle);
     wps_data->buflib_handle = -1;
 #endif
-#endif
 }
 
 /*
@@ -1787,9 +1752,7 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 static void skin_data_reset(struct wps_data *wps_data)
 {
     skin_data_free_buflib_allocs(wps_data);
-#ifdef HAVE_LCD_BITMAP
     wps_data->images = INVALID_OFFSET;
-#endif
     wps_data->tree = INVALID_OFFSET;
 #ifdef HAVE_BACKDROP_IMAGE
     if (wps_data->backdrop_id >= 0)
@@ -1811,15 +1774,12 @@ static void skin_data_reset(struct wps_data *wps_data)
     }
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     wps_data->peak_meter_enabled = false;
     wps_data->wps_sb_tag = false;
     wps_data->show_sb_on_wps = false;
-#endif
     wps_data->wps_loaded = false;
 }
 
-#ifdef HAVE_LCD_BITMAP
 #ifndef __PCTOOL__
 static int currently_loading_handle = -1;
 static int buflib_move_callback(int handle, void* current, void* new)
@@ -2065,7 +2025,6 @@ static bool skin_load_fonts(struct wps_data *data)
     return success;
 }
 
-#endif /* HAVE_LCD_BITMAP */
 static int convert_viewport(struct wps_data *data, struct skin_element* element)
 {
     struct skin_viewport *skin_vp = skin_buffer_alloc(sizeof(*skin_vp));
@@ -2176,11 +2135,9 @@ static int convert_viewport(struct wps_data *data, struct skin_element* element)
         skin_vp->vp.height = display->lcdheight - skin_vp->vp.y;
     }
     param++;
-#ifdef HAVE_LCD_BITMAP
     /* font */
     if (!isdefault(param))
         skin_vp->parsed_fontid = param->data.number;
-#endif
     if ((unsigned) skin_vp->vp.x >= (unsigned) display->lcdwidth ||
         skin_vp->vp.width + skin_vp->vp.x > display->lcdwidth ||
         (unsigned) skin_vp->vp.y >= (unsigned) display->lcdheight ||
@@ -2259,7 +2216,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_TRACK_ENDING:
                     function = parse_timeout_tag;
                     break;
-#ifdef HAVE_LCD_BITMAP
                 case SKIN_TOKEN_LIST_ITEM_TEXT:
                 case SKIN_TOKEN_LIST_ITEM_ICON:
                     function = parse_listitem;
@@ -2274,7 +2230,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     sb_skin_has_title(curr_screen);
 #endif
                     break;
-#endif
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                 case SKIN_TOKEN_DRAWRECTANGLE:
                     function = parse_drawrectangle;
@@ -2309,7 +2264,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_SETTING:
                     function = parse_setting_and_lang;
                     break;
-#ifdef HAVE_LCD_BITMAP
                 case SKIN_TOKEN_VIEWPORT_CUSTOMLIST:
                     function = parse_playlistview;
                     break;
@@ -2331,7 +2285,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
                 case SKIN_TOKEN_LIST_ITEM_CFG:
                     function = parse_listitemviewport;
                     break;
-#endif
 #ifdef HAVE_TOUCHSCREEN
                 case SKIN_TOKEN_TOUCHREGION:
                     function = parse_touchregion;
@@ -2423,14 +2376,12 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     char *wps_buffer = NULL;
     if (!wps_data || !buf)
         return false;
-#ifdef HAVE_LCD_BITMAP
     int i;
     for (i=0;i<MAXUSERFONTS;i++)
     {
         skinfonts[i].id = -1;
         skinfonts[i].name = NULL;
     }
-#endif
 #ifdef DEBUG_SKIN_ENGINE
     if (isfile && debug_wps)
     {
@@ -2504,7 +2455,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         return false;
     }
 
-#ifdef HAVE_LCD_BITMAP
     char bmpdir[MAX_PATH];
     if (isfile)
     {
@@ -2523,7 +2473,6 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         skin_data_reset(wps_data);
         return false;
     }
-#endif
 #if defined(HAVE_ALBUMART) && !defined(__PCTOOL__)
     /* last_albumart_{width,height} is either both 0 or valid AA dimensions */
     struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);

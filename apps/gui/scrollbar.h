@@ -23,8 +23,6 @@
 #define _GUI_SCROLLBAR_H_
 #include "screen_access.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 enum orientation {
     VERTICAL          = 0x0000,   /* Vertical orientation     */
     HORIZONTAL        = 0x0001,   /* Horizontal orientation   */
@@ -64,5 +62,4 @@ extern void gui_bitmap_scrollbar_draw(struct screen * screen, struct bitmap *bm,
                             unsigned flags);
 extern void show_busy_slider(struct screen *s, int x, int y,
                             int width, int height);
-#endif /* HAVE_LCD_BITMAP */
 #endif /* _GUI_SCROLLBAR_H_ */

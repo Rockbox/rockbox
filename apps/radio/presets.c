@@ -608,7 +608,6 @@ void presets_save(void)
 }
 
 #if 0 /* disabled in draw_progressbar() */
-#ifdef HAVE_LCD_BITMAP
 static inline void draw_vertical_line_mark(struct screen * screen,
                                            int x, int y, int h)
 {
@@ -633,5 +632,4 @@ void presets_draw_markers(struct screen *screen,
         draw_vertical_line_mark(screen, xi, y, h);
     }
 }
-#endif
 #endif

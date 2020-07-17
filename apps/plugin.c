@@ -50,12 +50,10 @@
 #include "power.h"
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #include "scrollbar.h"
 #include "peakmeter.h"
 #include "bmp.h"
 #include "bidi.h"
-#endif
 
 #ifdef USB_ENABLE_HID
 #include "usbstack/usb_hid.h"
@@ -301,11 +299,9 @@ static const struct plugin_api rockbox_api = {
 #endif
 
     viewport_set_defaults,
-#ifdef HAVE_LCD_BITMAP
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
-#endif
 
 #ifdef HAVE_BACKLIGHT
     /* lcd backlight */
@@ -533,7 +529,7 @@ static const struct plugin_api rockbox_api = {
 
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     /* special simulator hooks */
-#if defined(HAVE_LCD_BITMAP) && LCD_DEPTH < 8
+#if LCD_DEPTH < 8
     sim_lcd_ex_init,
     sim_lcd_ex_update_rect,
 #endif
@@ -780,7 +776,6 @@ static const struct plugin_api rockbox_api = {
     remove_array_ptr,
     round_value_to_list32,
 
-#ifdef HAVE_LCD_BITMAP
     read_bmp_file,
     read_bmp_fd,
 #ifdef HAVE_JPEG
@@ -788,7 +783,6 @@ static const struct plugin_api rockbox_api = {
     read_jpeg_fd,
 #endif
     screen_dump_set_hook,
-#endif
     show_logo,
 
 #ifdef HAVE_WHEEL_POSITION
@@ -927,7 +921,6 @@ int plugin_load(const char* plugin, const void* parameter)
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     screen_helper_setfont(FONT_UI);
 #if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
@@ -939,8 +932,6 @@ int plugin_load(const char* plugin, const void* parameter)
 #else /* LCD_DEPTH == 1 */
     lcd_set_drawmode(DRMODE_SOLID);
 #endif /* LCD_DEPTH */
-#endif /* HAVE_LCD_BITMAP */
-
 
 #ifdef HAVE_REMOTE_LCD
 #if LCD_REMOTE_DEPTH > 1

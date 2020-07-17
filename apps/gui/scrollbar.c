@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "scrollbar.h"
-#ifdef HAVE_LCD_BITMAP
 #include "config.h"
 #include "limits.h"
 #include "bmp.h"
@@ -264,5 +263,3 @@ void show_busy_slider(struct screen *s, int x, int y, int width, int height)
             dir = 1;
     }
 }
-
-#endif /* HAVE_LCD_BITMAP */

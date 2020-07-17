@@ -88,8 +88,6 @@ struct cp_info
     const char  *name;
 };
 
-#ifdef HAVE_LCD_BITMAP
-
 #define MAX_CP_TABLE_SIZE  32768
 
 #define CPF_ISO "iso.cp"
@@ -117,27 +115,6 @@ static const struct cp_info cp_info[NUM_CODEPAGES+1] =
     [BIG_5]               = { CP_TID_950 , CPF_950, "BIG5"        },
     [UTF_8]               = { CP_TID_NONE, NULL   , "UTF-8"       },
 };
-
-#else /* !HAVE_LCD_BITMAP, reduced support */
-
-#define MAX_CP_TABLE_SIZE  768
-
-#define CPF_ISOMINI "isomini.cp"
-
-static const struct cp_info cp_info[NUM_CODEPAGES+1] =
-{
-    [0 ... NUM_CODEPAGES] = { CP_TID_NONE, NULL       , "unknown"    },
-    [ISO_8859_1]          = { CP_TID_NONE, NULL       , "ISO-8859-1" },
-    [ISO_8859_7]          = { CP_TID_ISO , CPF_ISOMINI, "ISO-8859-7" },
-    [WIN_1251]            = { CP_TID_ISO , CPF_ISOMINI, "CP1251"     },
-    [ISO_8859_9]          = { CP_TID_ISO , CPF_ISOMINI, "ISO-8859-9" },
-    [ISO_8859_2]          = { CP_TID_ISO , CPF_ISOMINI, "ISO-8859-2" },
-    [WIN_1250]            = { CP_TID_ISO , CPF_ISOMINI, "CP1250"     },
-    [WIN_1252]            = { CP_TID_ISO , CPF_ISOMINI, "CP1252"     },
-    [UTF_8]               = { CP_TID_ISO , NULL       , "UTF-8"      },
-};
-
-#endif /* HAVE_LCD_BITMAP */
 
 static int default_cp = INIT_CODEPAGE;
 static int default_cp_tid = CP_TID_NONE;
@@ -368,7 +345,6 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                     ucs = table[tmp];
                     break;
 
-#ifdef HAVE_LCD_BITMAP
                 case CP_TID_932: /* Japanese */
                     if (*iso > 0xA0 && *iso < 0xE0) {
                         tmp = *iso++ | (0xA100 - 0x8000);
@@ -392,7 +368,6 @@ unsigned char* iso_decode(const unsigned char *iso, unsigned char *utf8,
                     ucs = table[tmp];
                     count--;
                     break;
-#endif /* HAVE_LCD_BITMAP */
 
                 default:
                     ucs = *iso++;

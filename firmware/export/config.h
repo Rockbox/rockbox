@@ -896,7 +896,7 @@ Lyre prototype 1 */
 #endif
 #endif
 
-#if defined(HAVE_TAGCACHE) && defined(HAVE_LCD_BITMAP)
+#if defined(HAVE_TAGCACHE)
 #define HAVE_PICTUREFLOW_INTEGRATION
 #endif
 

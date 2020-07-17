@@ -24,8 +24,5 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
-
-#endif /* HAVE_LCD_BITMAP */
 

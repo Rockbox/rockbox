@@ -66,7 +66,7 @@ void charging_splash(void)
 #endif
 
 
-#if defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0)
+#if (CONFIG_RTC != 0)
 
 /* little helper function for voice output */
 static void say_time(int cursorpos, const struct tm *tm)
@@ -360,7 +360,7 @@ bool set_time_screen(const char* title, struct tm *tm)
 #endif
     return usb;
 }
-#endif /* defined(HAVE_LCD_BITMAP) && (CONFIG_RTC != 0) */
+#endif /* (CONFIG_RTC != 0) */
 
 static const int id3_headers[]=
 {

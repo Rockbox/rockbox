@@ -22,9 +22,7 @@
 #ifndef _ROCKLIB_IMG_H_
 #define _ROCKLIB_IMG_H_
 
-#ifdef HAVE_LCD_BITMAP
 #define RLI_EXTENDED
-#endif
 
 LUALIB_API int (luaopen_rock_img) (lua_State *L);
 

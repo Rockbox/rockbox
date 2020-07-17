@@ -1,5 +1,3 @@
-#ifdef HAVE_LCD_BITMAP
-
 /* Rockbox logo */
 #if (LCD_DEPTH == 1)
 #if (LCD_WIDTH == 160)
@@ -81,5 +79,3 @@ usblogo.104x27x1.bmp
 #endif
 
 #endif /* BOOTLOADER */
-
-#endif /* HAVE_LCD_BITMAP */

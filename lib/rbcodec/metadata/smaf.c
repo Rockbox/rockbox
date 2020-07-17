@@ -34,11 +34,7 @@ static const int basebits[4] = { 4, 8, 12, 16 };
 static const int frequency[5] = { 4000, 8000, 11025, 22050, 44100 };
 
 static const int support_codepages[5] = {
-#ifdef HAVE_LCD_BITMAP
     SJIS, ISO_8859_1, -1, GB_2312, BIG_5,
-#else
-    -1, ISO_8859_1, -1, -1, -1,
-#endif
 };
 
 /* extra codepage */
@@ -170,13 +166,11 @@ static int read_audio_track_contets(int fd, int codepage, unsigned char **dst,
                 while ((*p & MASK) != COMP)
                     *q++ = *p++;
             }
-#ifdef HAVE_LCD_BITMAP
             else if (codepage == SJIS)
             {
                 if (*p <= 0xa0 || *p >= 0xe0)
                     *q++ = *p++;
             }
-#endif
         }
 
         *q++ = *p++;

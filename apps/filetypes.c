@@ -43,11 +43,7 @@
 /* max filetypes (plugins & icons stored here) */
 #define MAX_FILETYPES 192
 /* max viewer plugins */
-#ifdef HAVE_LCD_BITMAP
 #define MAX_VIEWERS 56
-#else
-#define MAX_VIEWERS 24
-#endif
 
 /* a table for the known file types */
 static const struct filetype inbuilt_filetypes[] = {
@@ -129,15 +125,11 @@ static const struct filetype inbuilt_filetypes[] = {
     { "lng", FILE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
     { "rock",FILE_ATTR_ROCK,Icon_Plugin,   VOICE_EXT_ROCK },
     { "lua", FILE_ATTR_LUA, Icon_Plugin,   VOICE_EXT_ROCK },
-#ifdef HAVE_LCD_BITMAP
     { "fnt", FILE_ATTR_FONT,Icon_Font,     VOICE_EXT_FONT },
     { "kbd", FILE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
-#endif
     { "bmark",FILE_ATTR_BMARK, Icon_Bookmark,  VOICE_EXT_BMARK },
     { "cue",  FILE_ATTR_CUE,   Icon_Bookmark,  VOICE_EXT_CUESHEET },
-#ifdef HAVE_LCD_BITMAP
     { "sbs",  FILE_ATTR_SBS,  Icon_Wps,   VOICE_EXT_SBS },
-#endif
 #ifdef HAVE_REMOTE_LCD
     { "rsbs", FILE_ATTR_RSBS, Icon_Wps,   VOICE_EXT_RSBS },
 #if CONFIG_TUNER
@@ -289,7 +281,6 @@ void read_color_theme_file(void) {
     close(fd);
 }
 #endif
-#ifdef HAVE_LCD_BITMAP
 void read_viewer_theme_file(void)
 {
     char buffer[MAX_PATH];
@@ -340,7 +331,6 @@ void read_viewer_theme_file(void)
     close(fd);
     custom_icons_loaded = true;
 }
-#endif
 
 void  filetype_init(void)
 {
@@ -368,9 +358,7 @@ void  filetype_init(void)
     read_builtin_types();
     read_config(fd);
     close(fd);
-#ifdef HAVE_LCD_BITMAP
     read_viewer_theme_file();
-#endif
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
 #endif

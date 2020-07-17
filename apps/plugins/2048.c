@@ -41,10 +41,8 @@
 #include "lib/pluginlib_actions.h"
 #include "lib/pluginlib_exit.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "pluginbitmaps/_2048_background.h"
 #include "pluginbitmaps/_2048_tiles.h"
-#endif
 
 /* some constants */
 

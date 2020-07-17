@@ -42,9 +42,7 @@
 #include "playlist.h"
 #include "misc.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "bitmaps/usblogo.h"
-#endif
 
 #ifdef HAVE_REMOTE_LCD
 #include "bitmaps/remote_usblogo.h"
@@ -122,15 +120,12 @@ static int handle_usb_events(void)
 struct usb_screen_vps_t
 {
     struct viewport parent;
-#ifdef HAVE_LCD_BITMAP
     struct viewport logo;
 #ifdef USB_ENABLE_HID
     struct viewport title;
 #endif
-#endif
 };
 
-#ifdef HAVE_LCD_BITMAP
 static void usb_screen_fix_viewports(struct screen *screen,
         struct usb_screen_vps_t *usb_screen_vps)
 {
@@ -181,18 +176,15 @@ static void usb_screen_fix_viewports(struct screen *screen,
     }
 #endif
 }
-#endif
 
 static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
-#ifdef HAVE_LCD_BITMAP
     static const struct bitmap* logos[NB_SCREENS] = {
         &bm_usblogo,
 #ifdef HAVE_REMOTE_LCD
         &bm_remote_usblogo,
 #endif
     };
-#endif
 
     FOR_NB_SCREENS(i)
     {
@@ -200,15 +192,12 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 
         struct usb_screen_vps_t *usb_screen_vps = &usb_screen_vps_ar[i];
         struct viewport *parent = &usb_screen_vps->parent;
-#ifdef HAVE_LCD_BITMAP
         struct viewport *logo = &usb_screen_vps->logo;
-#endif
 
         screen->set_viewport(parent);
         screen->clear_viewport();
         screen->backlight_on();
 
-#ifdef HAVE_LCD_BITMAP
         screen->set_viewport(logo);
         screen->bmp(logos[i], 0, 0);
         if (i == SCREEN_MAIN)
@@ -227,14 +216,6 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 #endif /* USB_ENABLE_HID */
         }
         screen->set_viewport(parent);
-
-#else /* !HAVE_LCD_BITMAP */
-        screen->double_height(false);
-        screen->puts_scroll(0, 0, "[USB Mode]");
-        status_set_param(false);
-        status_set_audio(false);
-        status_set_usb(true);
-#endif /* HAVE_LCD_BITMAP */
 
         screen->set_viewport(NULL);
         screen->update_viewport();
@@ -275,13 +256,11 @@ void gui_usb_screen_run(bool early_usb)
     /* update the UI before disabling fonts, this maximizes the propability
      * that font cache lookups succeed during USB */
     send_event(GUI_EVENT_ACTIONUPDATE, NULL);
-#ifdef HAVE_LCD_BITMAP
     if(!early_usb)
     {
         /* The font system leaves the .fnt fd's open, so we need for force close them all */
         font_disable_all();
     }
-#endif
 
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
@@ -302,10 +281,8 @@ void gui_usb_screen_run(bool early_usb)
     {
         const struct viewport* vp = NULL;
 
-#if defined(HAVE_LCD_BITMAP) && defined(USB_ENABLE_HID)
+#if defined(USB_ENABLE_HID)
         vp = usb_hid ? &usb_screen_vps_ar[i].title : NULL;
-#elif !defined(HAVE_LCD_BITMAP)
-        vp = &usb_screen_vps_ar[i].parent;
 #endif
         if (vp)
             screens[i].scroll_stop_viewport(vp);
@@ -322,7 +299,6 @@ void gui_usb_screen_run(bool early_usb)
     touchscreen_set_mode(old_mode);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     if(!early_usb)
     {
         font_enable_all();
@@ -331,7 +307,6 @@ void gui_usb_screen_run(bool early_usb)
         /* Reload playlist */
         playlist_resume();
     }
-#endif
 
     FOR_NB_SCREENS(i)
     {

@@ -44,9 +44,7 @@
 #include "filetree.h"
 #include "misc.h"
 #include "strnatcmp.h"
-#ifdef HAVE_LCD_BITMAP
 #include "keyboard.h"
-#endif
 
 #if CONFIG_TUNER
 #include "radio.h"
@@ -339,12 +337,10 @@ int ft_load(struct tree_context* c, const char* tempdir)
              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
             (*c->dirfilter == SHOW_WPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_WPS) ||
-#ifdef HAVE_LCD_BITMAP
             (*c->dirfilter == SHOW_FONT && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FONT) ||
             (*c->dirfilter == SHOW_SBS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_SBS) ||
 #if CONFIG_TUNER
             (*c->dirfilter == SHOW_FMS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMS) ||
-#endif
 #endif
 #ifdef HAVE_REMOTE_LCD
             (*c->dirfilter == SHOW_RWPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RWPS) ||
@@ -399,7 +395,6 @@ int ft_load(struct tree_context* c, const char* tempdir)
     tree_unlock_cache(c);
     return 0;
 }
-#ifdef HAVE_LCD_BITMAP
 static void ft_load_font(char *file)
 {
     int current_font_id;
@@ -428,8 +423,7 @@ static void ft_load_font(char *file)
     screens[screen].setuifont(
         font_load_ex(file,0,global_settings.glyphs_to_cache));
     viewportmanager_theme_changed(THEME_UI_VIEWPORT);
-}    
-#endif
+}
 
 int ft_enter(struct tree_context* c)
 {
@@ -550,13 +544,11 @@ int ft_enter(struct tree_context* c)
 #endif
 #endif
 
-#ifdef HAVE_LCD_BITMAP
             case FILE_ATTR_SBS:
                 splash(0, ID2P(LANG_WAIT));
                 set_file(buf, (char *)global_settings.sbs_file, MAX_FILENAME);
                 settings_apply_skins();
                 break;
-#endif
 #ifdef HAVE_REMOTE_LCD
             case FILE_ATTR_RSBS:
                 splash(0, ID2P(LANG_WAIT));
@@ -610,7 +602,6 @@ int ft_enter(struct tree_context* c)
                 splash(HZ, ID2P(LANG_LANGUAGE_LOADED));
                 break;
 
-#ifdef HAVE_LCD_BITMAP
             case FILE_ATTR_FONT:
                 ft_load_font(buf);
                 break;
@@ -621,7 +612,6 @@ int ft_enter(struct tree_context* c)
                     splash(HZ, ID2P(LANG_KEYBOARD_LOADED));
                 set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
                 break;
-#endif
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
                 /* firmware file */

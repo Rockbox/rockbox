@@ -448,11 +448,7 @@
 
 
 /* leave first line blank on bitmap display, for pause icon */
-#ifdef HAVE_LCD_BITMAP
 #define FIRST_LINE 1
-#else
-#define FIRST_LINE 0
-#endif
 
 #define MAX_PLAYERS 10
 
@@ -597,7 +593,6 @@ enum plugin_status plugin_start(const void* parameter)
     return PLUGIN_OK;
 }
 
-#ifdef HAVE_LCD_BITMAP
 static void show_pause_mode(bool enabled)
 {
     static const char pause_icon[] = {0x00,0x7f,0x7f,0x00,0x7f,0x7f,0x00};
@@ -611,9 +606,6 @@ static void show_pause_mode(bool enabled)
         rb->lcd_set_drawmode(DRMODE_SOLID);
     }
 }
-#else
-#define show_pause_mode(enabled)  rb->lcd_icon(ICON_PAUSE, enabled)
-#endif
 
 static int run_timer(int nr)
 {

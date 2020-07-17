@@ -451,9 +451,6 @@
 #endif
 #endif
 
-
-#ifdef HAVE_LCD_BITMAP
-
 #define DIST (10 * MIN(LCD_HEIGHT, LCD_WIDTH) / 16)
 static int x_off = LCD_WIDTH/2;
 static int y_off = LCD_HEIGHT/2;
@@ -485,16 +482,6 @@ static struct my_lcd *mylcd = &greyfuncs;
 #else
 #define ASPECT 256 /* = 1.00 */
 #endif
-
-#else /* !LCD_BITMAP */
-
-#define MYLCD(fn) pgfx_ ## fn
-#define DIST 9
-static int x_off = 10;
-static int y_off = 7;
-#define ASPECT 300 /* = 1.175 */
-
-#endif /* !LCD_BITMAP */
 
 struct point_3D {
     long x, y, z;
@@ -771,7 +758,6 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)(parameter);
 
-#ifdef HAVE_LCD_BITMAP
 #if defined(USEGSLIB)
     gbuf = (unsigned char *)rb->plugin_get_buffer(&gbuf_size);
     if (!grey_init(gbuf, gbuf_size, GREY_BUFFERED,
@@ -794,7 +780,6 @@ enum plugin_status plugin_start(const void* parameter)
     grey_setfont(FONT_SYSFIXED);
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
-#endif
 
     atexit(cleanup);
     while(!quit)
@@ -808,7 +793,6 @@ enum plugin_status plugin_start(const void* parameter)
             redraw = false;
         }
 
-#ifdef HAVE_LCD_BITMAP
         if (t_disp > 0)
         {
             char buffer[30];
@@ -821,24 +805,6 @@ enum plugin_status plugin_start(const void* parameter)
             if (t_disp == 0)
                 redraw = true;
         }
-#else
-        if (t_disp > 0)
-        {
-            if (t_disp == DISP_TIME)
-            {
-                rb->lcd_puts(5, 0, axes[curr].label);
-                rb->lcd_putsf(5, 1, "%d %c",
-                             paused ? axes[curr].angle : axes[curr].speed,
-                             highspeed ? 'H' : ' ');
-            }
-            t_disp--;
-            if (t_disp == 0)
-            {
-                rb->lcd_clear_display();
-                pgfx_display(0, 0);
-            }
-        }
-#endif
 #ifdef USEGSLIB
         if (mode_switch)
         {

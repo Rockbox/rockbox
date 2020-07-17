@@ -187,9 +187,7 @@ MENUITEM_SETTING(interpret_numbers, &global_settings.interpret_numbers, fileview
 MENUITEM_SETTING(dirfilter, &global_settings.dirfilter, NULL);
 MENUITEM_SETTING(show_filename_ext, &global_settings.show_filename_ext, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
-#endif
 static int clear_start_directory(void)
 {
     strcpy(global_settings.start_directory, "/");
@@ -222,9 +220,7 @@ static int fileview_callback(int action,
 MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
                 &sort_case, &sort_dir, &sort_file, &interpret_numbers,
                 &dirfilter, &show_filename_ext, &browse_current,
-#ifdef HAVE_LCD_BITMAP
                 &show_path_in_browser,
-#endif
                 &clear_start_directory_item
                 );
 /*    FILE VIEW MENU               */
@@ -312,14 +308,10 @@ MAKE_MENU(disk_menu, ID2P(LANG_DISK_MENU), 0, Icon_NOICON,
 /* Limits menu */
 MENUITEM_SETTING(max_files_in_dir, &global_settings.max_files_in_dir, NULL);
 MENUITEM_SETTING(max_files_in_playlist, &global_settings.max_files_in_playlist, NULL);
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_SETTING(default_glyphs, &global_settings.glyphs_to_cache, NULL);
-#endif
 MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0, Icon_NOICON,
            &max_files_in_dir, &max_files_in_playlist
-#ifdef HAVE_LCD_BITMAP
            ,&default_glyphs
-#endif
            );
 
 

@@ -60,9 +60,7 @@ hold_button
 hotkey
 #endif
 
-#if defined(HAVE_LCD_BITMAP)
 lcd_bitmap
-#endif
 
 #if LCD_DEPTH > 1
 lcd_non-mono

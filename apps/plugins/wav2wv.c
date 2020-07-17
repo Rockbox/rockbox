@@ -77,9 +77,7 @@ static void wvupdate (int32_t start_tick,
     rb->lcd_putsf(0, 6, "realtime: %d%%  ", realtime);
     rb->lcd_putsf(0, 8, "compression: %d%%  ", compression);
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 }
 
 #define TEMP_SAMPLES 4096
@@ -102,9 +100,7 @@ static int wav2wv(const char *infile)
 
     rb->lcd_clear_display();
     rb->lcd_puts_scroll(0, 0, (unsigned char *)infile);
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_update();
-#endif
 
     last_buttons = rb->button_status ();
     start_tick = *rb->current_tick;

@@ -36,15 +36,14 @@
 #include "action.h"
 #include "splash.h"
 
-#ifdef HAVE_LCD_BITMAP
 int compute_nb_lines(int w, struct font* font)
 {
     int i, nb_lines;
     int cur_x, delta_x;
-    
+
     if(logfindex == 0 && !logfwrap)
         return 0;
-        
+
     if(logfwrap)
         i = logfindex;
     else
@@ -209,7 +208,6 @@ bool logfdisplay(void)
 
     return false;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 bool logfdump(void)
 {

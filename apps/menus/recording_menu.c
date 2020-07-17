@@ -32,10 +32,8 @@
 #include "settings.h"
 #include "screens.h"
 #include "icons.h"
-#ifdef HAVE_LCD_BITMAP
 #include "font.h"
 #include "scrollbar.h"
-#endif
 #include "lang.h"
 #include "talk.h"
 #include "misc.h"
@@ -601,9 +599,7 @@ MAKE_MENU(recording_settings_menu, ID2P(LANG_RECORDING_SETTINGS),
 #ifdef HAVE_AGC
             &agc_preset, &agc_cliptime,
 #endif
-#ifdef HAVE_LCD_BITMAP
             &peak_meter_menu,
-#endif
             &browse_recconfigs, &save_recpresets_item
 );
 

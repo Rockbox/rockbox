@@ -47,13 +47,11 @@
 #include "list.h"
 #include "option_select.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
 /* Image stuff */
 #include "bmp.h"
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
-#endif
 #endif
 
 #include "cuesheet.h"
@@ -92,9 +90,6 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
     skin_render(gwps, skin_do_full_update(skin, screen) ? 
                         SKIN_REFRESH_ALL : update_type);
 }
-
-#ifdef HAVE_LCD_BITMAP
-
 
 #ifdef AB_REPEAT_ENABLE
 
@@ -171,7 +166,7 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
     int x = pb->x, y = pb->y, width = pb->width, height = pb->height;
     unsigned long length, end;
     int flags = HORIZONTAL;
-    
+
     if (height < 0)
         height = font_get(vp->font)->height;
 
@@ -423,8 +418,6 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
     display->set_drawmode(DRMODE_SOLID);
 }
 
-#endif /* HAVE_LCD_BITMAP */
-
 /* Evaluate the conditional that is at *token_index and return whether a skip
    has ocurred. *token_index is updated with the new position.
 */
@@ -587,21 +580,17 @@ void write_line(struct screen *display, struct align_pos *format_align,
     else
     {
         linedes->scroll = false;
-#ifdef HAVE_LCD_BITMAP
         /* clear the line first */
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fillrect(0, line*string_height, viewport_width, string_height);
         display->set_drawmode(DRMODE_SOLID);
-#endif
 
         /* Nasty hack: we output an empty scrolling string,
         which will reset the scroller for that line */
         display->puts_scroll(0, line, (unsigned char *)"");
-#ifdef HAVE_LCD_BITMAP
         line *= string_height;
         center_xpos = (viewport_width-center_width)/2;
         right_xpos = viewport_width-right_width;
-#endif
         /* print aligned strings. print whole line at once so that %Vs works
          * across the full viewport width */
         char *left   = format_align->left   ?: "";
@@ -614,7 +603,6 @@ void write_line(struct screen *display, struct align_pos *format_align,
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
 void draw_peakmeters(struct gui_wps *gwps, int line_number,
                      struct viewport *viewport)
 {
@@ -645,15 +633,12 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
     (void)screen;
     (void)data;
     bool draw = false;
-#ifdef HAVE_LCD_BITMAP
     if (data->wps_sb_tag)
         draw = data->show_sb_on_wps;
     else if (statusbar_position(screen) != STATUSBAR_OFF)
         draw = true;
-#endif
     return draw;
 }
-#endif
 
 /* do the button loop as often as required for the peak meters to update
  * with a good refresh rate. 
@@ -661,7 +646,6 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
 {
     int button = ACTION_NONE;
-#ifdef HAVE_LCD_BITMAP
     /* when the peak meter is enabled we want to have a
         few extra updates to make it look smooth. On the
         other hand we don't want to waste energy if it
@@ -700,7 +684,6 @@ int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
     /* The peak meter is disabled
        -> no additional screen updates needed */
     else
-#endif
     {
         button = get_action(context, timeout);
     }

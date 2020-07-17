@@ -28,8 +28,8 @@
 /* define the bitmask of recording sample rates */
 #define REC_SAMPR_CAPS  (SAMPR_CAP_44)
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

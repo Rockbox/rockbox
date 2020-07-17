@@ -26,8 +26,6 @@
 #include <lcd.h>
 #include "metadata.h"
 
-#ifdef HAVE_LCD_BITMAP
-
 /* External bitmaps */
 
 #include "bitmaps/rockboxlogo.h"
@@ -125,6 +123,5 @@ extern const unsigned char bitmap_icon_disk[];
 #define ICON_DISK_X_POS       STATUSBAR_WIDTH-ICON_DISK_WIDTH
 #define TIME_X_END            STATUSBAR_WIDTH-1
 
-#endif /* End HAVE_LCD_BITMAP */
 #endif /* PLUGIN */
 #endif /*  _ICONS_H_ */

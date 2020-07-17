@@ -258,14 +258,12 @@ sub gettargetinfo {
     # Get the LCD screen depth and graphical status
     print GCC <<STOP
 \#include "config.h"
-#ifdef HAVE_LCD_BITMAP
 Bitmap: yes
 Depth: LCD_DEPTH
 LCD Width: LCD_WIDTH
 LCD Height: LCD_HEIGHT
 Icon Width: CONFIG_DEFAULT_ICON_WIDTH
 Icon Height: CONFIG_DEFAULT_ICON_HEIGHT
-#endif
 #ifdef HAVE_REMOTE_LCD
 Remote Depth: LCD_REMOTE_DEPTH
 Remote Icon Width: CONFIG_REMOTE_DEFAULT_ICON_WIDTH

@@ -84,10 +84,10 @@
 #if defined(HAVE_RECORDING) && !defined(__PCTOOL__)
 #include "recording.h"
 #endif
-#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
+#if !defined(__PCTOOL__)
 #include "bmp.h"
 #include "icons.h"
-#endif /* End HAVE_LCD_BITMAP */
+#endif /* !__PCTOOL__ */
 #include "bookmark.h"
 #include "wps.h"
 #include "playback.h"
@@ -712,7 +712,6 @@ long default_event_handler(long event)
 
 int show_logo( void )
 {
-#ifdef HAVE_LCD_BITMAP
     char version[32];
     int font_h, font_w;
 
@@ -735,14 +734,6 @@ int show_logo( void )
 #endif
     lcd_setfont(FONT_UI);
 
-#else
-    char *rockbox = "  ROCKbox!";
-
-    lcd_clear_display();
-    lcd_double_height(true);
-    lcd_puts(0, 0, rockbox);
-    lcd_puts_scroll(0, 1, rbversion);
-#endif
     lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
@@ -1439,7 +1430,6 @@ int hex_to_rgb(const char* hex, int* color)
 }
 #endif /* HAVE_LCD_COLOR */
 
-#ifdef HAVE_LCD_BITMAP
 /* '0'-'3' are ASCII 0x30 to 0x33 */
 #define is0123(x) (((x) & 0xfc) == 0x30)
 #if !defined(__PCTOOL__) || defined(CHECKWPS)
@@ -1482,7 +1472,6 @@ int clamp_value_wrap(int value, int max, int min)
     return value;
 }
 #endif
-#endif
 
 
 #ifndef __PCTOOL__
@@ -1494,25 +1483,21 @@ static int current_activity_top = 0;
 void push_current_activity(enum current_activity screen)
 {
     current_activity[current_activity_top++] = screen;
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
         skinlist_set_cfg(i, NULL);
         skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
-#endif
 }
 
 void pop_current_activity(void)
 {
     current_activity_top--;
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
         skinlist_set_cfg(i, NULL);
         skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_ALL);
     }
-#endif
 }
 enum current_activity get_current_activity(void)
 {

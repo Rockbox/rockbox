@@ -24,8 +24,7 @@
 
 #include "config.h"
 
-/* Make BMP colour map entries from R, G, B triples, without and with blending.
- * Not within HAVE_LCD_BITMAP because it is also used for the Player sim */
+/* Make BMP colour map entries from R, G, B triples, without and with blending. */
 #define RED_CMP(c)   (((c) >> 16) & 0xff)
 #define GREEN_CMP(c) (((c) >> 8) & 0xff)
 #define BLUE_CMP(c)  ((c) & 0xff)
@@ -63,9 +62,7 @@
 /* Save a .BMP file containing the current screen contents. */
 void screen_dump(void);
 
-#ifdef HAVE_LCD_BITMAP
 void screen_dump_set_hook(void (*hook)(int fd));
-#endif
 
 #ifdef HAVE_REMOTE_LCD
 /* Save a .BMP file containing the current remote screen contents. */

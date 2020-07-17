@@ -294,7 +294,6 @@ next:
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
 static void style_line(struct screen *display,
                        int x, int y, struct line_desc *line)
 {
@@ -380,7 +379,6 @@ static void style_line(struct screen *display,
     }
 #endif
 }
-#endif /* HAVE_LCD_BITMAP */
 
 void vput_line(struct screen *display,
               int x, int y, struct line_desc *line,
