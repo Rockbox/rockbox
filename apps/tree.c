@@ -399,9 +399,8 @@ static int update_dir(void)
         }
     }
 #ifdef HAVE_TAGCACHE
-    if (id3db) 
+    if (id3db)
     {
-#ifdef HAVE_LCD_BITMAP
         if (global_settings.show_path_in_browser == SHOW_PATH_FULL
             || global_settings.show_path_in_browser == SHOW_PATH_CURRENT)
         {
@@ -412,13 +411,11 @@ static int update_dir(void)
         {
             /* Must clear the title as the list is reused */
             gui_synclist_set_title(&tree_lists, NULL, NOICON);
-        } 
-#endif
+        }
     }
     else
 #endif
     {
-#ifdef HAVE_LCD_BITMAP
         if (tc.browse && tc.browse->title)
         {
             int icon = tc.browse->icon;
@@ -448,8 +445,7 @@ static int update_dir(void)
         {
             /* Must clear the title as the list is reused */
             gui_synclist_set_title(&tree_lists, NULL, NOICON);
-        } 
-#endif
+        }
     }
 
     gui_synclist_set_nb_items(&tree_lists, tc.filesindir);
@@ -606,9 +602,7 @@ static int dirbrowse(void)
     char buf[MAX_PATH];
     int len;
     int button;
-#ifdef HAVE_LCD_BITMAP
     int oldbutton;
-#endif
     bool reload_root = false;
     int lastfilter = *tc.dirfilter;
     bool lastsortcase = global_settings.sort_case;
@@ -643,7 +637,7 @@ static int dirbrowse(void)
         splash(HZ*2, ID2P(LANG_NO_FILES));
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
     }
-    
+
     gui_synclist_draw(&tree_lists);
     while(1) {
         bool restore = false;
@@ -653,9 +647,7 @@ static int dirbrowse(void)
         keyclick_set_callback(gui_synclist_keyclick_callback, &tree_lists);
         button = get_action(CONTEXT_TREE,
                             list_do_action_timeout(&tree_lists, HZ/2));
-#ifdef HAVE_LCD_BITMAP
         oldbutton = button;
-#endif
         gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
         tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
         switch ( button ) {

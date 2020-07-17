@@ -261,7 +261,6 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
                           "$1", "LO", "HI", "STATUS", "EPC" };
     int i;
 
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
     lcd_set_drawmode(DRMODE_SOLID);
@@ -270,7 +269,7 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
 #endif
     lcd_setfont(FONT_SYSFIXED);
     lcd_set_viewport(NULL);
-#endif
+
     lcd_clear_display();
     backlight_hw_on();
 

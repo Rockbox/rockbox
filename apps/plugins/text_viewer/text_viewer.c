@@ -61,10 +61,8 @@ enum plugin_status plugin_start(const void* file)
 
     atexit(tv_exit);
     while (!done) {
-#ifdef HAVE_LCD_BITMAP
         if (preferences->statusbar)
             rb->send_event(GUI_EVENT_ACTIONUPDATE, NULL);
-#endif
 
         if (display_update)
             tv_draw();

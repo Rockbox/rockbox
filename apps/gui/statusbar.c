@@ -132,7 +132,6 @@
 struct gui_syncstatusbar statusbars;
 
 /* Prototypes */
-#ifdef HAVE_LCD_BITMAP
 static void gui_statusbar_icon_battery(struct screen * display, int percent,
                                        int batt_charge_step);
 static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume);
@@ -151,7 +150,6 @@ static void gui_statusbar_icon_recording_info(struct screen * display);
 #endif
 #if CONFIG_RTC
 static void gui_statusbar_time(struct screen * display, struct tm *time);
-#endif
 #endif
 
 /* End prototypes */
@@ -242,7 +240,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
     }
 
     bar->info.volume = global_settings.volume;
-#ifdef HAVE_LCD_BITMAP
     bar->info.shuffle = global_settings.playlist_shuffle;
 #ifdef HAS_BUTTON_HOLD
     bar->info.keylock = button_hold();
@@ -349,11 +346,8 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
         display->set_viewport(NULL);
         bar->lastinfo = bar->info;
     }
-#endif /* HAVE_LCD_BITMAP */
-
 }
 
-#ifdef HAVE_LCD_BITMAP
 /* from icon.c */
 /*
  * Print battery icon to status bar
@@ -717,8 +711,6 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
 }
 #endif /* HAVE_RECORDING */
 
-#endif /* HAVE_LCD_BITMAP */
-
 void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 {
     FOR_NB_SCREENS(i) {
@@ -730,7 +722,6 @@ void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
 void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
                             bool force_redraw)
 {
-#ifdef HAVE_LCD_BITMAP
     if(!global_settings.statusbar)
        return;
     struct viewport viewport;
@@ -738,9 +729,6 @@ void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
         GET_RECT(viewport,statusbar_position(i),&screens[i]);
         gui_statusbar_draw( &(bars->statusbars[i]), force_redraw, &viewport );
     }
-#else
-    gui_statusbar_draw( &(bars->statusbars[0]), force_redraw, NULL );
-#endif /* HAVE_LCD_BITMAP */
 }
 
 
