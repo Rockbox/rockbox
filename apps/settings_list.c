@@ -43,9 +43,7 @@
 #endif
 #include "list.h"
 #include "rbunicode.h"
-#ifdef HAVE_LCD_BITMAP
 #include "peakmeter.h"
-#endif
 #include "menus/eq_menu.h"
 #if CONFIG_TUNER
 #include "radio.h"
@@ -219,16 +217,12 @@ static const int time_recording_trigger[] = {0,1,2,5,10,15,20,25,30,60,120,300,6
 static const int backlight_fade[] = {0,100,200,300,500,1000,2000,3000,5000,10000};
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 static const char graphic_numeric[] = "graphic,numeric";
-#endif
 
 /* Default theme settings */
 #define DEFAULT_WPSNAME  "cabbiev2"
 #define DEFAULT_SBSNAME  "-"
 #define DEFAULT_FMS_NAME "cabbiev2"
-
-#ifdef HAVE_LCD_BITMAP
 
 #if LCD_HEIGHT <= 64
   #define DEFAULT_FONT_HEIGHT 8
@@ -254,10 +248,6 @@ static const char graphic_numeric[] = "graphic,numeric";
 #define DEFAULT_GLYPHS 250
 #define MIN_GLYPHS 50
 #define MAX_GLYPHS 65540
-
-#else
-  #define DEFAULT_FONT_HEIGHT 12
-#endif
 
 #ifndef DEFAULT_FONTNAME
 /* ugly expansion needed */
@@ -438,7 +428,6 @@ static int32_t getlang_time_unit_0_is_skip_track(int value, int unit)
         return talk_time_intervals(value, unit, false);
 }
 
-#ifdef HAVE_LCD_BITMAP
 static const char* formatter_time_unit_0_is_eternal(char *buffer,
                                 size_t buffer_size, int val, const char *unit)
 {
@@ -455,7 +444,6 @@ static int32_t getlang_time_unit_0_is_eternal(int value, int unit)
     else
         return talk_time_intervals(value, unit, false);
 }
-#endif /* HAVE_LCD_BITMAP */
 
 #ifndef HAVE_WHEEL_ACCELERATION
 static const char* scanaccel_formatter(char *buffer, size_t buffer_size,
@@ -907,7 +895,6 @@ const struct settings_list settings[] = {
                     23, timeout_sec_common),
 #endif
 #endif /* HAVE_BACKLIGHT */
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_LCD_INVERT
     BOOL_SETTING(0, invert, LANG_INVERT, false ,"invert", off_on,
                  LANG_INVERT_LCD_INVERSE, LANG_NORMAL, lcd_set_invert_display),
@@ -972,7 +959,6 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0, timeformat, LANG_TIMEFORMAT, 0,
         "time format", "24hour,12hour", NULL, 2,
         ID2P(LANG_24_HOUR_CLOCK), ID2P(LANG_12_HOUR_CLOCK)),
-#endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,show_icons, LANG_SHOW_ICONS ,true,"show icons", NULL),
     /* system */
     INT_SETTING(F_TIME_SETTING, poweroff, LANG_POWEROFF_IDLE, 10,
@@ -1170,7 +1156,6 @@ const struct settings_list settings[] = {
                 "remote bidir limit", UNIT_PERCENT, 0, 200, 25, NULL, NULL,
                 lcd_remote_bidir_scroll),
 #endif
-#ifdef HAVE_LCD_BITMAP
     OFFON_SETTING(0, offset_out_of_view, LANG_SCREEN_SCROLL_VIEW,
                   false, "Screen Scrolls Out Of View",
                   gui_list_screen_scroll_out_of_view),
@@ -1179,7 +1164,6 @@ const struct settings_list settings[] = {
     INT_SETTING(F_PADTITLE, screen_scroll_step, LANG_SCREEN_SCROLL_STEP, 16,
                 "screen scroll step", UNIT_PIXEL, 1, LCD_WIDTH, 1, NULL, NULL,
                 gui_list_screen_scroll_step),
-#endif /* HAVE_LCD_BITMAP */
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
                   false,"scroll paginated",NULL),
 #ifdef HAVE_LCD_COLOR
@@ -1274,7 +1258,6 @@ const struct settings_list settings[] = {
                    ID2P(LANG_SET_BOOL_YES),
                    ID2P(LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST),
                    ID2P(LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK)),
-#ifdef HAVE_LCD_BITMAP
     /* peak meter */
     TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS, peak_meter_clip_hold,
                   LANG_PM_CLIP_HOLD, 60, "peak meter clip hold", "eternal",
@@ -1297,7 +1280,6 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, peak_meter_clipcounter, LANG_PM_CLIPCOUNTER, false,
                   "peak meter clipcounter", NULL),
 #endif /* HAVE_RECORDING */
-#endif /* HAVE_LCD_BITMAP */
     /* voice */
     OFFON_SETTING(F_TEMPVAR, talk_menu, LANG_VOICE_MENU, true, "talk menu", NULL),
     CHOICE_SETTING(0, talk_dir, LANG_VOICE_DIR, 0,
@@ -1755,7 +1737,6 @@ const struct settings_list settings[] = {
 #endif
     CHOICE_SETTING(F_TEMPVAR, default_codepage, LANG_DEFAULT_CODEPAGE, 0,
                    "default codepage",
-#ifdef HAVE_LCD_BITMAP
                    /* The order must match with that in unicode.c */
                    "iso8859-1,iso8859-7,iso8859-8,cp1251,iso8859-11,cp1256,"
                    "iso8859-9,iso8859-2,cp1250,cp1252,sjis,gb2312,ksx1001,big5,utf-8",
@@ -1771,17 +1752,6 @@ const struct settings_list settings[] = {
                    ID2P(LANG_CODEPAGE_JAPANESE),
                    ID2P(LANG_CODEPAGE_SIMPLIFIED), ID2P(LANG_CODEPAGE_KOREAN),
                    ID2P(LANG_CODEPAGE_TRADITIONAL), ID2P(LANG_CODEPAGE_UTF8)),
-#else /* !HAVE_LCD_BITMAP */
-                   /* The order must match with that in unicode.c */
-                   "iso8859-1,iso8859-7,cp1251,iso8859-9,iso8859-2,cp1250,cp1252,utf-8",
-                   NULL, 8,
-                   ID2P(LANG_CODEPAGE_LATIN1), ID2P(LANG_CODEPAGE_GREEK),
-                   ID2P(LANG_CODEPAGE_CYRILLIC), ID2P(LANG_CODEPAGE_TURKISH),
-                   ID2P(LANG_CODEPAGE_LATIN_EXTENDED),
-                   ID2P(LANG_CODEPAGE_CENTRAL_EUROPEAN),
-                   ID2P(LANG_CODEPAGE_WESTERN_EUROPEAN),
-                   ID2P(LANG_CODEPAGE_UTF8)),
-#endif
     OFFON_SETTING(0, warnon_erase_dynplaylist, LANG_WARN_ERASEDYNPLAYLIST_MENU,
                   true, "warn when erasing dynamic playlist",NULL),
 
@@ -1805,12 +1775,10 @@ const struct settings_list settings[] = {
 
     OFFON_SETTING(0, hold_lr_for_scroll_in_list, -1, true,
                   "hold_lr_for_scroll_in_list",NULL),
-#ifdef HAVE_LCD_BITMAP
     CHOICE_SETTING(0, show_path_in_browser, LANG_SHOW_PATH, SHOW_PATH_CURRENT,
                    "show path in browser", "off,current directory,full path",
                    NULL, 3, ID2P(LANG_OFF), ID2P(LANG_SHOW_PATH_CURRENT),
                    ID2P(LANG_DISPLAY_FULL_PATH)),
-#endif
 
 #ifdef HAVE_AGC
     {F_T_INT,&global_settings.rec_agc_preset_mic,LANG_RECORDING_AGC_PRESET,
@@ -1866,23 +1834,19 @@ const struct settings_list settings[] = {
                      DEFAULT_FMS_NAME, SBS_DIR "/", ".rfms"),
 #endif
 #endif /* CONFIG_TUNER */
-#ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(F_THEMESETTING, font_file, "font",
                      DEFAULT_FONTNAME, FONT_DIR "/", ".fnt"),
     INT_SETTING(0, glyphs_to_cache, LANG_GLYPHS, DEFAULT_GLYPHS,
                 "glyphs", UNIT_INT, MIN_GLYPHS, MAX_GLYPHS, 10,
                 NULL, NULL, NULL),
-#endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING, remote_font_file, "remote font",
                      DEFAULT_REMOTE_FONTNAME, FONT_DIR "/", ".fnt"),
 #endif
     TEXT_SETTING(F_THEMESETTING,wps_file, "wps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".wps"),
-#ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(F_THEMESETTING,sbs_file, "sbs",
                      DEFAULT_SBSNAME, SBS_DIR "/", ".sbs"),
-#endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING,rwps_file,"rwps",
                      DEFAULT_WPSNAME, WPS_DIR "/", ".rwps"),
@@ -1894,9 +1858,7 @@ const struct settings_list settings[] = {
     TEXT_SETTING(F_THEMESETTING,backdrop_file,"backdrop",
                      DEFAULT_BACKDROP, NULL, NULL),
 #endif
-#ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
-#endif
 #ifdef HAVE_USB_CHARGING_ENABLE
     CHOICE_SETTING(0, usb_charging, LANG_USB_CHARGING, 1, "usb charging",
                    "off,on,force", NULL, 3, ID2P(LANG_SET_BOOL_NO),
@@ -1965,13 +1927,11 @@ const struct settings_list settings[] = {
 #endif /* HAVE_RTC_ALARM */
 
     /* Customizable icons */
-#ifdef HAVE_LCD_BITMAP
     TEXT_SETTING(F_THEMESETTING, icon_file, "iconset", DEFAULT_ICONSET,
                      ICON_DIR "/", ".bmp"),
     TEXT_SETTING(F_THEMESETTING, viewers_icon_file, "viewers iconset",
                      DEFAULT_VIEWERS_ICONSET,
                      ICON_DIR "/", ".bmp"),
-#endif
 #ifdef HAVE_REMOTE_LCD
     TEXT_SETTING(F_THEMESETTING, remote_icon_file, "remote iconset", "-",
                      ICON_DIR "/", ".bmp"),
@@ -2128,11 +2088,9 @@ const struct settings_list settings[] = {
 #endif
 
     /* Customizable list */
-#ifdef HAVE_LCD_BITMAP
     VIEWPORT_SETTING(ui_vp_config, "ui viewport"),
 #ifdef HAVE_REMOTE_LCD
     VIEWPORT_SETTING(remote_ui_vp_config, "remote ui viewport"),
-#endif
 #endif
 
 #ifdef HAVE_MORSE_INPUT

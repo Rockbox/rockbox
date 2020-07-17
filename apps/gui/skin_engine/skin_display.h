@@ -29,7 +29,6 @@
 #define _SKIN_DISPLAY_H_
 
 
-#ifdef HAVE_LCD_BITMAP
 void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb);
 void draw_playlist_viewer_list(struct gui_wps *gwps, struct playlistviewer *viewer);
 /* clears the area where the image was shown */
@@ -40,7 +39,6 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp);
 void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
                         struct skin_viewport* skin_viewport, unsigned long refresh_type);
 
-#endif
 
 /* Evaluate the conditional that is at *token_index and return whether a skip
    has ocurred. *token_index is updated with the new position.

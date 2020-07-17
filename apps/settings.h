@@ -286,9 +286,7 @@ struct system_status
     signed char last_screen;
     int  viewer_icon_count;
     int last_volume_change; /* tick the last volume change happened. skins use this */
-#ifdef HAVE_LCD_BITMAP
     int font_id[NB_SCREENS]; /* font id of the settings font for each screen */
-#endif
 
 };
 
@@ -494,9 +492,7 @@ struct user_settings
     int peak_meter_max; /* range maximum */
 
     unsigned char wps_file[MAX_FILENAME+1];  /* last wps */
-#ifdef HAVE_LCD_BITMAP
     unsigned char sbs_file[MAX_FILENAME+1];  /* last statusbar skin */
-#endif
 #ifdef HAVE_REMOTE_LCD
     unsigned char rwps_file[MAX_FILENAME+1];  /* last remote-wps */
     unsigned char rsbs_file[MAX_FILENAME+1];  /* last remote statusbar skin */
@@ -514,7 +510,6 @@ struct user_settings
     int remote_statusbar;
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     int scrollbar;    /* SCROLLBAR_* enum values */
     int scrollbar_width;
 
@@ -524,7 +519,6 @@ struct user_settings
 #if LCD_DEPTH > 1
     int list_separator_height; /* -1=auto (== 1 currently), 0=disabled, X=height in pixels */
     int list_separator_color;
-#endif
 #endif
     /* goto current song when exiting WPS */
     bool browse_current; /* 1=goto current song,
@@ -621,7 +615,6 @@ struct user_settings
     int contrast;   /* lcd contrast */
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 #ifdef HAVE_LCD_INVERT
     bool invert;    /* invert display */
 #endif
@@ -640,7 +633,6 @@ struct user_settings
     unsigned char remote_font_file[MAX_FILENAME+1]; /* last font */
 #endif
     unsigned char kbd_file[MAX_FILENAME+1];  /* last keyboard */
-#endif /* HAVE_LCD_BITMAP */
     int  backlight_timeout;  /* backlight off timeout:  -1=never,
                                 0=always, or time in seconds */
     bool caption_backlight; /* turn on backlight at end and start of track */
@@ -748,11 +740,9 @@ struct user_settings
     bool usb_skip_first_drive;
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     unsigned char ui_vp_config[64]; /* viewport string for the lists */
 #ifdef HAVE_REMOTE_LCD
     unsigned char remote_ui_vp_config[64]; /* viewport string for the remote lists */
-#endif
 #endif
 
     struct compressor_settings compressor_settings;

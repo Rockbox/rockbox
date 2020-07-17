@@ -58,11 +58,7 @@ extern bool lcd_remote_scroll_now(struct scrollinfo *scroll);
  * larger than the normal linebuffer since it holds the line a second
  * time (+3 spaces) for non-bidir scrolling */
 #define SCROLL_SPACING   3
-#ifdef HAVE_LCD_BITMAP
 #define SCROLL_LINE_SIZE (MAX_PATH + SCROLL_SPACING + 3*LCD_WIDTH/2 + 2)
-#else
-#define SCROLL_LINE_SIZE (MAX_PATH + SCROLL_SPACING + 3*LCD_WIDTH + 2)
-#endif
 
 struct scrollinfo
 {
@@ -95,20 +91,14 @@ struct scroll_screen_info
     long ticks; /* # of ticks between updates*/
     long delay; /* ticks delay before start */
     int bidir_limit;  /* percent */
-#if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
     int step;  /* pixels per scroll step */
-#endif
 #if defined(HAVE_REMOTE_LCD)
     long last_scroll;
 #endif
 };
 
 /** main lcd **/
-#ifdef HAVE_LCD_BITMAP
 #define LCD_SCROLLABLE_LINES ((LCD_HEIGHT+4)/5 < 32 ? (LCD_HEIGHT+4)/5 : 32)
-#else
-#define LCD_SCROLLABLE_LINES LCD_HEIGHT * 2
-#endif
 
 extern struct scroll_screen_info lcd_scroll_info;
 
