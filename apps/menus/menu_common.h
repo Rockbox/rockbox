@@ -24,9 +24,7 @@
 #include "menu.h"
 #include "config.h"
 
-#if CONFIG_CODEC == SWCODEC
 int lowlatency_callback(int action, const struct menu_item_ex *this_item);
-#endif
 
 #endif /* _MENU_COMMON_H */
 

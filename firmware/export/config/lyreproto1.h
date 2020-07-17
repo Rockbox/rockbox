@@ -61,8 +61,8 @@
 
 #define CONFIG_KEYPAD LYRE_PROTO1_PAD
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
