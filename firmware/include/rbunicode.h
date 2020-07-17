@@ -33,8 +33,6 @@
 #define MASK   0xC0 /* 11000000 */
 #define COMP   0x80 /* 10x      */
 
-#ifdef HAVE_LCD_BITMAP
- 
 enum codepages {
     ISO_8859_1 = 0, /* Latin1 */
     ISO_8859_7,     /* Greek */
@@ -54,23 +52,6 @@ enum codepages {
     NUM_CODEPAGES,
     INIT_CODEPAGE = ISO_8859_1,
 };
-
-#else /* !HAVE_LCD_BITMAP, reduced support */
-
-enum codepages {
-    ISO_8859_1 = 0, /* Latin1 */
-    ISO_8859_7,     /* Greek */
-    WIN_1251,       /* Cyrillic */
-    ISO_8859_9,     /* Turkish */
-    ISO_8859_2,     /* Latin Extended */
-    WIN_1250,       /* Central European */
-    WIN_1252,       /* Western European */
-    UTF_8,          /* Unicode */
-    NUM_CODEPAGES,
-    INIT_CODEPAGE = ISO_8859_1,
-};
-
-#endif
 
 /* Encode a UCS value as UTF-8 and return a pointer after this UTF-8 char. */
 unsigned char* utf8encode(unsigned long ucs, unsigned char *utf8);

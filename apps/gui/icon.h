@@ -24,11 +24,7 @@
 #include "screen_access.h"
 /* Defines a type for the icons since it's not the same thing on
  * char-based displays and bitmap displays */
-#ifdef HAVE_LCD_BITMAP
 typedef const unsigned char * ICON;
-#else
-typedef long ICON;
-#endif
 
 /* Don't #ifdef icon values, or we wont be able to use the same 
    bmp for every target. */

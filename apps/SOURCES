@@ -71,15 +71,11 @@ iap/iap-lingo7.c
 #endif
 #endif
 screen_access.c
-#ifdef HAVE_LCD_BITMAP
 gui/icon.c
-#endif
 gui/list.c
 gui/line.c
-#ifdef HAVE_LCD_BITMAP
 gui/bitmap/list.c
 gui/bitmap/list-skinned.c
-#endif
 gui/option_select.c
 #ifdef HAVE_PITCHCONTROL
 gui/pitchscreen.c
@@ -96,9 +92,7 @@ gui/wps.c
 gui/scrollbar.c
 gui/splash.c
 gui/statusbar.c
-#ifdef HAVE_LCD_BITMAP
 gui/statusbar-skinned.c
-#endif
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
 hosted/android/yesno.c
 hosted/android/notification.c
@@ -121,7 +115,6 @@ gui/skin_engine/skin_touchsupport.c
 gui/backdrop.c
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 recorder/bmp.c
 recorder/icons.c
 #if (CONFIG_PLATFORM&PLATFORM_ANDROID)
@@ -145,7 +138,7 @@ recorder/albumart.c
 #ifdef HAVE_LCD_COLOR
 gui/color_picker.c
 #endif
-#endif
+
 #ifdef HAVE_RECORDING
 recorder/recording.c
 #endif
