@@ -29,8 +29,6 @@
 
 #include "metadata_parsers.h"
 
-#if CONFIG_CODEC == SWCODEC
-
 /* For trailing tag stripping and base audio data types */
 #include "buffering.h"
 
@@ -53,7 +51,6 @@ static bool get_other_asap_metadata(int fd, struct mp3entry *id3)
     id3->genre_string = id3_get_num_genre(36);
     return true;
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 bool write_metadata_log = false;
 
 const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
@@ -66,13 +63,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_MPA_L2] =
         AFMT_ENTRY("MP2",   "mpa",  NULL,       get_mp3_metadata,   "mpa\0mp2\0"),
 
-#if CONFIG_CODEC != SWCODEC
-    /* MPEG Audio layer 3 on HWCODEC: .talk clips, no encoder  */
-    [AFMT_MPA_L3] =
-        AFMT_ENTRY("MP3",   "mpa",  NULL,       get_mp3_metadata,   "mp3\0talk\0"),
-
-#else /* CONFIG_CODEC == SWCODEC */
-    /* MPEG Audio layer 3 on SWCODEC */
+    /* MPEG Audio layer 3 */
     [AFMT_MPA_L3] =
         AFMT_ENTRY("MP3",   "mpa",  "mp3_enc",  get_mp3_metadata,   "mp3\0"),
 
@@ -238,10 +229,9 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* AAC bitstream format */
     [AFMT_AAC_BSF] =
         AFMT_ENTRY("AAC", "aac_bsf", NULL, get_aac_metadata,   "aac\0"),
-#endif
 };
 
-#if CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING)
+#if defined (HAVE_RECORDING)
 /* get REC_FORMAT_* corresponding AFMT_* */
 const int rec_format_afmt[REC_NUM_FORMATS] =
 {
@@ -267,9 +257,8 @@ const int afmt_rec_format[AFMT_NUM_CODECS] =
     [AFMT_PCM_WAV] = REC_FORMAT_PCM_WAV,
 };
 #endif
-#endif /* CONFIG_CODEC == SWCODEC && defined (HAVE_RECORDING) */
+#endif /* defined (HAVE_RECORDING) */
 
-#if CONFIG_CODEC == SWCODEC
 /* Get the canonical AFMT type */
 int get_audio_base_codec_type(int type)
 {
@@ -357,8 +346,6 @@ bool format_buffers_with_offset(int afmt)
         return false;
     }
 }
-#endif /* CONFIG_CODEC == SWCODEC */
-
 
 /* Simple file type probing by looking at the filename extension. */
 unsigned int probe_file_format(const char *filename)
@@ -464,7 +451,6 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 }
 
 #ifndef __PCTOOL__
-#if CONFIG_CODEC == SWCODEC
 void strip_tags(int handle_id)
 {
     static const unsigned char tag[] = "TAG";
@@ -500,7 +486,6 @@ void strip_tags(int handle_id)
     logf("Cutting off APE tag (%ldB)", len);
     bufcuttail(handle_id, len);
 }
-#endif /* CONFIG_CODEC == SWCODEC */
 #endif /* ! __PCTOOL__ */
 
 #define MOVE_ENTRY(x) if (x) x += offset;
@@ -544,7 +529,6 @@ void wipe_mp3entry(struct mp3entry *id3)
     memset(id3, 0, sizeof (struct mp3entry));
 }
 
-#if CONFIG_CODEC == SWCODEC
 /* Glean what is possible from the filename alone - does not parse metadata */
 void fill_metadata_from_path(struct mp3entry *id3, const char *trackname)
 {
@@ -574,4 +558,3 @@ void fill_metadata_from_path(struct mp3entry *id3, const char *trackname)
     /* Copy the path info */
     strlcpy(id3->path, trackname, sizeof (id3->path));
 }
-#endif /* CONFIG_CODEC == SWCODEC */

@@ -957,7 +957,7 @@ rockboxlogo.91x32x1.bmp
 /* Pitch detector */
 /* The following preprocessor condition must match the condition */
 /* for pitch detector from plugins/SOURCES                       */
-#if (CONFIG_CODEC == SWCODEC) && defined(HAVE_RECORDING) && \
+#if defined(HAVE_RECORDING) && \
     (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
 #if (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240) && (LCD_DEPTH >= 16)
 pitch_notes.320x240x16.bmp

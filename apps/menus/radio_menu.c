@@ -34,7 +34,7 @@
 #ifdef HAVE_RECORDING
 #include "recording.h"  /* recording_screen() */
 
-#if defined(HAVE_FMRADIO_REC) && CONFIG_CODEC == SWCODEC
+#if defined(HAVE_FMRADIO_REC)
 #define FM_RECORDING_SCREEN
 static int fm_recording_screen(void)
 {
@@ -53,30 +53,20 @@ static int fm_recording_screen(void)
 
 MENUITEM_FUNCTION(recscreen_item, 0, ID2P(LANG_RECORDING),
                     fm_recording_screen, NULL, NULL, Icon_Recording);
-#endif /* defined(HAVE_FMRADIO_REC) && CONFIG_CODEC == SWCODEC */
+#endif /* defined(HAVE_FMRADIO_REC) */
 
-#if defined(HAVE_FMRADIO_REC) || CONFIG_CODEC != SWCODEC
+#if defined(HAVE_FMRADIO_REC)
 #define FM_RECORDING_SETTINGS
 static int fm_recording_settings(void)
 {
     int ret = recording_menu(true);
-
-#if CONFIG_CODEC != SWCODEC
-    if (!ret)
-    {
-        struct audio_recording_options rec_options;
-        rec_init_recording_options(&rec_options);
-        rec_options.rec_source = AUDIO_SRC_LINEIN;
-        rec_set_recording_options(&rec_options);
-    }
-#endif
 
     return ret;
 }
 
 MENUITEM_FUNCTION(recsettings_item, 0, ID2P(LANG_RECORDING_SETTINGS),
                     fm_recording_settings, NULL, NULL, Icon_Recording);
-#endif /* defined(HAVE_FMRADIO_REC) || CONFIG_CODEC != SWCODEC */
+#endif /* defined(HAVE_FMRADIO_REC) */
 #endif /* HAVE_RECORDING */
 
 #ifndef FM_PRESET
