@@ -38,9 +38,7 @@
 #include "yesno.h"
 #include "talk.h"
 #include "powermgmt.h"
-#if CONFIG_CODEC == SWCODEC
 #include "playback.h"
-#endif
 #if CONFIG_RTC
 #include "screens.h"
 #endif
@@ -326,7 +324,6 @@ MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0, Icon_NOICON,
 
 
 /* Keyclick menu */
-#if CONFIG_CODEC == SWCODEC
 MENUITEM_SETTING(keyclick, &global_settings.keyclick, NULL);
 MENUITEM_SETTING(keyclick_repeats, &global_settings.keyclick_repeats, NULL);
 #ifdef HAVE_HARDWARE_CLICK
@@ -336,7 +333,6 @@ MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
 #else
 MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
            &keyclick, &keyclick_repeats);
-#endif
 #endif
 
 #if CONFIG_CHARGING
@@ -437,9 +433,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
             &buttonlight_brightness,
 #endif
-#if CONFIG_CODEC == SWCODEC
             &keyclick_menu,
-#endif
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
             &touchpad_sensitivity,
 #endif
@@ -619,7 +613,6 @@ MAKE_MENU(bookmark_settings_menu, ID2P(LANG_BOOKMARK_SETTINGS), 0,
 /***********************************/
 /*    AUTORESUME MENU              */
 #ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC
 
 static int autoresume_callback(int action,
                                const struct menu_item_ex *this_item,
@@ -674,7 +667,6 @@ MAKE_MENU(autoresume_menu, ID2P(LANG_AUTORESUME),
           0, Icon_NOICON,
           &autoresume_enable, &autoresume_automatic);
 
-#endif /* CONFIG_CODEC == SWCODEC */
 #endif /* HAVE_TAGCACHE */
 /*    AUTORESUME MENU              */
 /***********************************/
@@ -758,9 +750,7 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &startup_shutdown_menu,
           &bookmark_settings_menu,
 #ifdef HAVE_TAGCACHE
-#if CONFIG_CODEC == SWCODEC
           &autoresume_menu,
-#endif
 #endif
           &browse_langs, &voice_settings_menu,
 #ifdef HAVE_HOTKEY

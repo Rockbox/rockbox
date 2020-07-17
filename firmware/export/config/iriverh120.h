@@ -73,8 +73,8 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */

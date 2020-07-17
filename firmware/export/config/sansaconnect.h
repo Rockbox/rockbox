@@ -101,8 +101,8 @@
 
 #define HAVE_MORSE_INPUT
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 //#define HAVE_HARDWARE_BEEP
 

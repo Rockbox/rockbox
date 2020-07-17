@@ -87,8 +87,8 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 #define CONFIG_LCD LCD_HX8340B
 

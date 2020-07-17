@@ -46,17 +46,12 @@ remote_control.c
 lamp.c
 #endif /* HAVE_BACKLIGHT */
 
-
-
-#if CONFIG_CODEC == SWCODEC
 #if defined(HAVE_RECORDING) && (defined(HAVE_LINE_IN) || defined(HAVE_MIC_IN))
 pitch_detector.c
 #endif
 
 mp3_encoder.c
 wav2wv.c
-#endif /* CONFIG_CODEC */
-
 
 #if CONFIG_RTC
 alarmclock.c
@@ -98,15 +93,6 @@ goban.c
 pictureflow.c
 
 #endif /* PLUGIN_BUFFER_SIZE <= 0x20000 && HAVE_LCD_BITMAP */
-
-
-#if CONFIG_CODEC != SWCODEC
-
-#if defined(HAVE_LCD_BITMAP)
-splitedit.c
-#endif
-
-#endif /* HWCODEC */
 
 #if defined(IRIVER_H100_SERIES)
 iriver_flash.c
@@ -207,9 +193,7 @@ superdom.c
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 test_boost.c
 #endif
-#if CONFIG_CODEC == SWCODEC
 test_codec.c
-#endif
 #ifdef HAVE_JPEG
 test_core_jpeg.c
 #endif
@@ -232,9 +216,7 @@ test_mem_jpeg.c
 #ifdef HAVE_LCD_COLOR
 test_resize.c
 #endif
-#if CONFIG_CODEC == SWCODEC
 test_sampr.c
-#endif
 #ifdef HAVE_TOUCHSCREEN
 test_touchscreen.c
 #endif
