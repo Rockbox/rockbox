@@ -1779,7 +1779,6 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
     if (id3->bitrate == 0)
         id3->bitrate = 1;
 
-#if CONFIG_CODEC == SWCODEC 
     if (global_settings.autoresume_enable)
     {
         id3->elapsed = get_tag_numeric(entry, tag_lastelapsed, idx_id);
@@ -1790,8 +1789,7 @@ bool tagcache_fill_tags(struct mp3entry *id3, const char *filename)
         logf("tagcache_fill_tags: Set offset for %s to %lX\n", 
              id3->title, id3->offset);
     }
-#endif
-    
+
     return true;
 }
 #endif /* defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE) */

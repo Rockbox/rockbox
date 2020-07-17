@@ -66,9 +66,8 @@ void* plugin_get_buffer(size_t *buffer_size);
 #include "scroll_engine.h"
 #include "metadata.h"
 #include "sound.h"
-#include "mpeg.h"
 #include "audio.h"
-#include "mp3_playback.h"
+#include "voice_thread.h"
 #include "root_menu.h"
 #include "talk.h"
 #include "lang_enum.h"
@@ -77,7 +76,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 #endif
 #include "misc.h"
 #include "pathfuncs.h"
-#if (CONFIG_CODEC == SWCODEC)
 #include "pcm_mixer.h"
 #include "dsp-util.h"
 #include "dsp_core.h"
@@ -88,7 +86,6 @@ void* plugin_get_buffer(size_t *buffer_size);
 #ifdef HAVE_RECORDING
 #include "recording.h"
 #endif
-#endif /* CONFIG_CODEC == SWCODEC */
 #include "settings.h"
 #include "timer.h"
 #include "playlist.h"
@@ -526,7 +523,6 @@ struct plugin_api {
     unsigned int (*thread_self)(void);
     void (*thread_exit)(void);
     void (*thread_wait)(unsigned int thread_id);
-#if CONFIG_CODEC == SWCODEC
     void (*thread_thaw)(unsigned int thread_id);
 #ifdef HAVE_PRIORITY_SCHEDULING
     int (*thread_set_priority)(unsigned int thread_id, int priority);
@@ -534,7 +530,6 @@ struct plugin_api {
     void (*mutex_init)(struct mutex *m);
     void (*mutex_lock)(struct mutex *m);
     void (*mutex_unlock)(struct mutex *m);
-#endif
 #ifdef HAVE_SEMAPHORE_OBJECTS
     void (*semaphore_init)(struct semaphore *s, int max, int start);
     int  (*semaphore_wait)(struct semaphore *s, int timeout);
@@ -580,7 +575,6 @@ struct plugin_api {
     void (*queue_post)(struct event_queue *q, long id, intptr_t data);
     void (*queue_wait_w_tmo)(struct event_queue *q, struct queue_event *ev,
             int ticks);
-#if CONFIG_CODEC == SWCODEC
     void (*queue_enable_queue_send)(struct event_queue *q,
                                     struct queue_sender_list *send,
                                     unsigned int thread_id);
@@ -589,7 +583,6 @@ struct plugin_api {
     intptr_t (*queue_send)(struct event_queue *q, long id,
                            intptr_t data);
     void (*queue_reply)(struct event_queue *q, intptr_t retval);
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
@@ -673,7 +666,7 @@ struct plugin_api {
     int (*sound_enum_hw_eq_band_setting)(unsigned int band,
                                          unsigned int band_setting);
 #endif /* AUDIOHW_HAVE_EQ */
-#if ((CONFIG_CODEC == SWCODEC) && defined (HAVE_PITCHCONTROL))
+#if defined (HAVE_PITCHCONTROL)
     void (*sound_set_pitch)(int32_t pitch);
 #endif
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
@@ -682,11 +675,7 @@ struct plugin_api {
     void (*mp3_play_pause)(bool play);
     void (*mp3_play_stop)(void);
     bool (*mp3_is_playing)(void);
-#if CONFIG_CODEC != SWCODEC
-    void (*bitswap)(unsigned char *data, int length);
-#endif
 #endif /* PLATFORM_NATIVE */
-#if CONFIG_CODEC == SWCODEC
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
     void (*pcm_apply_settings)(void);
@@ -752,7 +741,6 @@ struct plugin_api {
     void (*pcmbuf_fade)(bool fade, bool in);
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
-#endif /* CONFIG_CODEC == SWCODEC */
 
     /* metadata */
     bool (*get_metadata)(struct mp3entry* id3, int fd, const char* trackname);
@@ -817,9 +805,6 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
-#if !defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC)
-    unsigned long (*mpeg_get_last_header)(void);
-#endif
 
     /* menu */
     struct menu_table *(*root_menu_get_options)(int *nb_options);
@@ -902,7 +887,6 @@ struct plugin_api {
 #ifdef ROCKBOX_HAS_LOGF
     void (*logf)(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2);
 #endif
-#if CONFIG_CODEC == SWCODEC
     void (*codec_thread_do_callback)(void (*fn)(void),
                                      unsigned int *audio_thread_id);
     int (*codec_load_file)(const char* codec, struct codec_api *api);
@@ -915,7 +899,6 @@ struct plugin_api {
                                  const unsigned long list[],
                                  int count,
                                  bool signd);
-#endif /* CONFIG_CODEC == SWCODEC */
 
 #ifdef HAVE_LCD_BITMAP
     int (*read_bmp_file)(const char* filename, struct bitmap *bm, int maxsize,

@@ -111,20 +111,20 @@ void audio_resume(void)
 
 void audio_set_input_source(int source, unsigned flags)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (INPUT_SRC_CAPS != 0)
+    \conditions (INPUT_SRC_CAPS != 0)
     \param source
     \param flags
     \description
 
 void audio_set_output_source(int monitor)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (INPUT_SRC_CAPS != 0)
+    \conditions (INPUT_SRC_CAPS != 0)
     \param monitor
     \description
 
 void audio_set_recording_gain(int left, int right, int type)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions (defined(HAVE_RECORDING))
     \param left
     \param right
     \param type
@@ -191,16 +191,8 @@ unsigned short *bidi_l2v( const unsigned char *str, int orientation )
     \return
     \description
 
-void bitswap(unsigned char *data, int length)
-    \group sound
-    \conditions (!defined(SIMULATOR)) && (CONFIG_CODEC != SWCODEC)
-    \param data
-    \param length
-    \description Swap the bits for each element of array =data= of size =length=
-
 int bufadvance(int handle_id, off_t offset)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param offset
     \return
@@ -208,7 +200,6 @@ int bufadvance(int handle_id, off_t offset)
 
 int bufalloc(const void *src, size_t size, enum data_type type)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param src
     \param size
     \param type
@@ -217,14 +208,12 @@ int bufalloc(const void *src, size_t size, enum data_type type)
 
 bool bufclose(int handle_id)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \return
     \description
 
 ssize_t bufcuttail(int handle_id, size_t size)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param size
     \return
@@ -232,7 +221,6 @@ ssize_t bufcuttail(int handle_id, size_t size)
 
 ssize_t bufgetdata(int handle_id, size_t size, void **data)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param size
     \param data
@@ -241,7 +229,6 @@ ssize_t bufgetdata(int handle_id, size_t size, void **data)
 
 ssize_t bufgettail(int handle_id, size_t size, void **data)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param size
     \param data
@@ -250,7 +237,6 @@ ssize_t bufgettail(int handle_id, size_t size, void **data)
 
 int bufopen(const char *file, size_t offset, enum data_type type)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param file
     \param offset
     \param type
@@ -259,7 +245,6 @@ int bufopen(const char *file, size_t offset, enum data_type type)
 
 ssize_t bufread(int handle_id, size_t size, void *dest)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param size
     \param dest
@@ -268,37 +253,31 @@ ssize_t bufread(int handle_id, size_t size, void *dest)
 
 int bufseek(int handle_id, size_t newpos)
     \group buffering API
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param newpos
     \return
     \description
 
 ssize_t buf_get_offset(int handle_id, void *ptr)
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \param ptr
     \return
     \description
 
 ssize_t buf_handle_offset(int handle_id)
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \return
     \description
 
 void buf_request_buffer_handle(int handle_id)
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \description
 
 void buf_set_base_handle(int handle_id)
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \param handle_id
     \description
 
 size_t buf_used(void)
-    \conditions ((CONFIG_CODEC == SWCODEC))
     \return
     \description
 
@@ -410,7 +389,6 @@ int closedir(DIR* dir)
 
 int codec_load_file(const char* codec, struct codec_api *api)
     \group misc
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param codec
     \param api
     \return
@@ -540,7 +518,6 @@ int do_menu(const struct menu_item_ex *menu, int *start_selected, struct viewpor
 
 intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param dsp
     \param setting
     \param value
@@ -549,13 +526,11 @@ intptr_t dsp_configure(struct dsp_config *dsp, int setting, intptr_t value)
 
 void dsp_dither_enable(bool enable)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param enable
     \description
 
 int dsp_process(struct dsp_config *dsp, char *dest, const char *src[], int count)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param dsp
     \param dest
     \param src[]
@@ -565,13 +540,11 @@ int dsp_process(struct dsp_config *dsp, char *dest, const char *src[], int count
 
 void dsp_set_crossfeed(bool enable)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param enable
     \description
 
 void dsp_set_eq(bool enable)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param enable
     \description
 
@@ -666,7 +639,6 @@ int get_action(int context, int timeout)
 
 const char *get_codec_filename(int cod_spec)
     \group misc
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param cod_spec
     \return
     \description
@@ -681,7 +653,6 @@ int get_custom_action(int context,int timeout, const struct button_mapping* (*ge
 
 bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
     \group misc
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param id3
     \param fd
     \param trackname
@@ -1342,19 +1313,17 @@ void logf(const char *fmt, ...) ATTRIBUTE_PRINTF(1, 2)
 
 const unsigned long *audio_master_sampr_list
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \return
     \description
 
 const unsigned long *hw_freq_sampr
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \return
     \description
 
 const unsigned long *rec_freq_sampr
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \return
     \description
 
@@ -1443,27 +1412,18 @@ void mp3_play_stop(void)
     \conditions (!defined(SIMULATOR))
     \description Stops playback
 
-unsigned long mpeg_get_last_header(void)
-    \group playback control
-    \conditions (!defined(SIMULATOR) && (CONFIG_CODEC != SWCODEC))
-    \return
-    \description
-
 void mutex_init(struct mutex *m)
     \group kernel/ system
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param m
     \description
 
 void mutex_lock(struct mutex *m)
     \group kernel/ system
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param m
     \description
 
 void mutex_unlock(struct mutex *m)
     \group kernel/ system
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param m
     \description
 
@@ -1484,54 +1444,48 @@ bool option_screen(const struct settings_list *setting, struct viewport parent[N
 
 void pcm_apply_settings(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \description
 
 void pcm_calculate_peaks(int *left, int *right)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param left
     \param right
     \description
 
 void pcm_calculate_rec_peaks(int *left, int *right)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \param left
     \param right
     \description
 
 void pcm_close_recording(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \description
 
 size_t pcm_get_bytes_waiting(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \return
     \description
 
 void pcm_init_recording(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \description
 
 bool pcm_is_paused(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \return true if playback is paused, else false
     \description
 
 bool pcm_is_playing(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \return true unless playback is paused
     \description
 
 void pcm_play_data(pcm_more_callback_type get_more, unsigned char* start, size_t size)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param get_more Optional callback
     \param start is the address of raw 16-16, interleaved PCM data
     \param size is the size of the data to play
@@ -1539,28 +1493,24 @@ void pcm_play_data(pcm_more_callback_type get_more, unsigned char* start, size_t
 
 void pcm_play_lock(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \description
 
 void pcm_play_pause(bool play)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param play
     \description Pauses or unpauses the playback depending on the truth value of =play=
 
 void pcm_play_stop(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \description Stops the playback and empties the audio buffer unlike [F[pcm_play_pause]]
 
 void pcm_play_unlock(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \description
 
 void pcm_record_data(pcm_more_callback_type2 more_ready, void *start, size_t size)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \param more_ready
     \param start
     \param size
@@ -1568,20 +1518,19 @@ void pcm_record_data(pcm_more_callback_type2 more_ready, void *start, size_t siz
 
 void pcm_record_more(void *start, size_t size)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \param start
     \param size
     \description
 
 void pcm_set_frequency(unsigned int frequency)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param frequency
     \description
 
 void pcm_stop_recording(void)
     \group sound
-    \conditions (CONFIG_CODEC == SWCODEC) && (defined(HAVE_RECORDING))
+    \conditions defined(HAVE_RECORDING)
     \description
 
 int playlist_amount(void)
@@ -1757,13 +1706,11 @@ void queue_delete(struct event_queue *q)
     \description
 
 bool queue_empty(const struct event_queue *q)
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param q
     \return
     \description
 
 void queue_enable_queue_send(struct event_queue *q, struct queue_sender_list *send, struct thread_entry *owner)
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param q
     \param send
     \param owner
@@ -1781,13 +1728,11 @@ void queue_post(struct event_queue *q, long id, intptr_t data)
     \description
 
 void queue_reply(struct event_queue *q, intptr_t retval)
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param q
     \param retval
     \description
 
 intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param q
     \param id
     \param data
@@ -1795,7 +1740,6 @@ intptr_t queue_send(struct event_queue *q, long id, intptr_t data)
     \description
 
 void queue_wait(struct event_queue *q, struct queue_event *ev)
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param q
     \param ev
     \description
@@ -2066,7 +2010,6 @@ void sound_set(int setting, int value)
 
 void sound_set_pitch(int pitch)
     \group playback control
-    \conditions (CONFIG_CODEC == SWCODEC)
     \param pitch
     \description
 

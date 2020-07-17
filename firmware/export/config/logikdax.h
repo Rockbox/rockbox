@@ -80,8 +80,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* The DAX uses built-in WM8731 codec */
 #define HAVE_WM8731

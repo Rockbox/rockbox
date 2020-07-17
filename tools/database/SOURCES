@@ -20,10 +20,4 @@ database.c
 #else /* !APPLICATION */
 ../../uisimulator/common/filesystem-sim.c
 #endif /* APPLICATION */
-#if CONFIG_CODEC != SWCODEC
-../../lib/rbcodec/metadata/id3tags.c
-../../lib/rbcodec/metadata/metadata.c
-../../lib/rbcodec/metadata/mp3.c
-../../lib/rbcodec/metadata/mp3data.c
-#endif
 /* Caution. metadata files do not add!! */
