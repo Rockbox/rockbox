@@ -66,15 +66,11 @@
 #define IO_PRIORITY_IMMEDIATE    0
 #define IO_PRIORITY_BACKGROUND   32
 
-#if CONFIG_CODEC == SWCODEC
 # ifdef HAVE_HARDWARE_CLICK
 #  define BASETHREADS  17
 # else
 #  define BASETHREADS  16
 # endif
-#else
-# define BASETHREADS   11
-#endif /* CONFIG_CODE == * */
 
 #ifndef TARGET_EXTRA_THREADS
 #define TARGET_EXTRA_THREADS 0

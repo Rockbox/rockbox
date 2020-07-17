@@ -57,8 +57,8 @@
 
 #define AB_REPEAT_ENABLE
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* Work around debug macro expansion of strncmp in scratchbox */
 #define _HAVE_STRING_ARCH_strncmp
