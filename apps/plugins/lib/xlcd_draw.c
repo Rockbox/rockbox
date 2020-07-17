@@ -24,7 +24,6 @@
 
 #include "plugin.h"
 
-#ifdef HAVE_LCD_BITMAP
 #include "xlcd.h"
 
 /* sort the given coordinates by increasing x value */
@@ -486,5 +485,3 @@ void xlcd_color_bitmap(const unsigned char *src, int x, int y, int width,
 #endif /* HAVE_LCD_COLOR */
 
 #endif /* LCD_DEPTH >= 8 */
-
-#endif /* HAVE_LCD_BITMAP */

@@ -34,12 +34,10 @@ static struct tv_preferences new_prefs;
 /* horizontal scroll settings menu */
 /*                                 */
 
-#ifdef HAVE_LCD_BITMAP
 static bool tv_horizontal_scrollbar_setting(void)
 {
    return rb->set_bool("Horizontal Scrollbar", &new_prefs.horizontal_scrollbar);
 }
-#endif
 
 static bool tv_horizontal_scroll_mode_setting(void)
 {
@@ -52,30 +50,24 @@ static bool tv_horizontal_scroll_mode_setting(void)
                           names, 2, NULL);
 }
 
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION(horizontal_scrollbar_item, 0, "Scrollbar",
                   tv_horizontal_scrollbar_setting,
                   NULL, NULL, Icon_NOICON);
-#endif
 MENUITEM_FUNCTION(horizontal_scroll_mode_item, 0, "Scroll Mode",
                   tv_horizontal_scroll_mode_setting, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(horizontal_scroll_menu, "Horizontal", NULL, Icon_NOICON,
-#ifdef HAVE_LCD_BITMAP
           &horizontal_scrollbar_item,
-#endif
           &horizontal_scroll_mode_item);
 
 /*                               */
 /* vertical scroll settings menu */
 /*                               */
 
-#ifdef HAVE_LCD_BITMAP
 static bool tv_vertical_scrollbar_setting(void)
 {
     return rb->set_bool("Vertical Scrollbar", &new_prefs.vertical_scrollbar);
 }
-#endif
 
 static bool tv_vertical_scroll_mode_setting(void)
 {
@@ -110,11 +102,9 @@ static bool tv_narrow_mode_setting(void)
                           names, 2, NULL);
 }
 
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION(vertical_scrollbar_item, 0, "Scrollbar",
                   tv_vertical_scrollbar_setting,
                   NULL, NULL, Icon_NOICON);
-#endif
 MENUITEM_FUNCTION(vertical_scroll_mode_item, 0, "Scroll Mode",
                   tv_vertical_scroll_mode_setting, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(overlap_page_mode_item, 0, "Overlap Pages", tv_overlap_page_mode_setting,
@@ -125,9 +115,7 @@ MENUITEM_FUNCTION(narrow_mode_item, 0, "Left/Right Key (Narrow mode)",
                   tv_narrow_mode_setting, NULL, NULL, Icon_NOICON);
 
 MAKE_MENU(vertical_scroll_menu, "Vertical", NULL, Icon_NOICON,
-#ifdef HAVE_LCD_BITMAP
           &vertical_scrollbar_item,
-#endif
           &vertical_scroll_mode_item, &overlap_page_mode_item, &autoscroll_speed_item,
           &narrow_mode_item);
 
@@ -198,7 +186,6 @@ static bool tv_alignment_setting(void)
                            names , 2, NULL);
 }
 
-#ifdef HAVE_LCD_BITMAP
 static bool tv_header_setting(void)
 {
     return rb->set_bool("Show Header", &new_prefs.header_mode);
@@ -239,7 +226,6 @@ static bool tv_font_setting(void)
 
     return false;
 }
-#endif
 
 static bool tv_indent_spaces_setting(void)
 {
@@ -264,7 +250,6 @@ MENUITEM_FUNCTION(windows_item, 0, "Screens Per Page", tv_windows_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(alignment_item, 0, "Alignment", tv_alignment_setting,
                   NULL, NULL, Icon_NOICON);
-#ifdef HAVE_LCD_BITMAP
 MENUITEM_FUNCTION(header_item, 0, "Show Header", tv_header_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(footer_item, 0, "Show Footer", tv_footer_setting,
@@ -273,7 +258,6 @@ MENUITEM_FUNCTION(statusbar_item, 0, "Show Statusbar", tv_statusbar_setting,
                   NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(font_item, 0, "Font", tv_font_setting,
                   NULL, NULL, Icon_NOICON);
-#endif
 MENUITEM_FUNCTION(indent_spaces_item, 0, "Indent Spaces", tv_indent_spaces_setting,
                   NULL, NULL, Icon_NOICON);
 #ifdef HAVE_LCD_COLOR
@@ -284,9 +268,7 @@ MENUITEM_FUNCTION(night_mode_item, 0, "Night Mode", tv_night_mode_setting,
 MAKE_MENU(option_menu, "Viewer Options", NULL, Icon_NOICON,
             &encoding_item, &word_wrap_item, &line_mode_item, &windows_item,
             &alignment_item,
-#ifdef HAVE_LCD_BITMAP
             &header_item, &footer_item, &font_item, &statusbar_item,
-#endif
             &scroll_menu, &indent_spaces_item
 #ifdef HAVE_LCD_COLOR
             , &night_mode_item

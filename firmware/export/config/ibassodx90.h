@@ -33,8 +33,8 @@
 
 #define USB_NONE
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
