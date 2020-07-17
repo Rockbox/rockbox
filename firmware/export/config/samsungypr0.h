@@ -84,8 +84,8 @@
 #define AB_REPEAT_ENABLE
 #define ACTION_WPSAB_SINGLE ACTION_WPS_HOTKEY
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 
 /* R0 KeyPad configuration for plugins */
 #define CONFIG_KEYPAD SAMSUNG_YPR0_PAD

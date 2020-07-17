@@ -38,10 +38,8 @@ INCLUDES += -I$(ROOTDIR)/apps/gui \
             -I$(ROOTDIR)/lib/rbcodec/dsp \
             -I$(APPSDIR) \
             -I$(BUILDDIR)
-            
-ifdef SOFTWARECODECS
+
 OTHERLIBS := $(FIXEDPOINTLIB)
-endif
 
 .SECONDEXPANSION: # $$(OBJ) is not populated until after this
 

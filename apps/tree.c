@@ -650,9 +650,7 @@ static int dirbrowse(void)
         if (tc.dirlevel < 0)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 
-#if CONFIG_CODEC == SWCODEC
         keyclick_set_callback(gui_synclist_keyclick_callback, &tree_lists);
-#endif
         button = get_action(CONTEXT_TREE,
                             list_do_action_timeout(&tree_lists, HZ/2));
 #ifdef HAVE_LCD_BITMAP
@@ -1175,11 +1173,6 @@ static void say_filetype(int attr)
 
 static int ft_play_dirname(char* name)
 {
-#if CONFIG_CODEC != SWCODEC
-    if (audio_status() & AUDIO_STATUS_PLAY)
-        return 0;
-#endif
-
     return talk_file(tc.currdir, name, dir_thumbnail_name, NULL,
                      global_settings.talk_filetype ?
                      TALK_IDARRAY(VOICE_DIR) : NULL,
@@ -1188,11 +1181,6 @@ static int ft_play_dirname(char* name)
 
 static int ft_play_filename(char *dir, char *file, int attr)
 {
-#if CONFIG_CODEC != SWCODEC
-    if (audio_status() & AUDIO_STATUS_PLAY)
-        return 0;
-#endif
-
     if (strlen(file) >= strlen(file_thumbnail_ext)
         && strcasecmp(&file[strlen(file) - strlen(file_thumbnail_ext)],
                       file_thumbnail_ext))

@@ -37,7 +37,6 @@
 #include "system.h"
 #include "font.h"
 #include "audio.h"
-#include "mp3_playback.h"
 #include "settings.h"
 #include "list.h"
 #include "statusbar.h"
@@ -88,13 +87,11 @@
 #endif
 #include "logfdisp.h"
 #include "core_alloc.h"
-#if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
 #include "buffering.h"
 #include "playback.h"
 #if defined(HAVE_SPDIF_OUT) || defined(HAVE_SPDIF_IN)
 #include "spdif.h"
-#endif
 #endif
 #ifdef IRIVER_H300_SERIES
 #include "pcf50606.h"   /* for pcf50606_read */
@@ -304,48 +301,6 @@ static bool dbg_cpuinfo(void)
 #endif
 
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_CODEC != SWCODEC
-#ifndef SIMULATOR
-static bool dbg_audio_thread(void)
-{
-    struct audio_debug d;
-
-    lcd_setfont(FONT_SYSFIXED);
-
-    while(1)
-    {
-        if (action_userabort(HZ/5))
-            return false;
-
-        audio_get_debugdata(&d);
-
-        lcd_clear_display();
-
-        lcd_putsf(0, 0, "read: %x", d.audiobuf_read);
-        lcd_putsf(0, 1, "write: %x", d.audiobuf_write);
-        lcd_putsf(0, 2, "swap: %x", d.audiobuf_swapwrite);
-        lcd_putsf(0, 3, "playing: %d", d.playing);
-        lcd_putsf(0, 4, "playable: %x", d.playable_space);
-        lcd_putsf(0, 5, "unswapped: %x", d.unswapped_space);
-
-        /* Playable space left */
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, 6*8, 112, 4, d.audiobuflen, 0,
-                  d.playable_space, HORIZONTAL);
-
-        /* Show the watermark limit */
-        gui_scrollbar_draw(&screens[SCREEN_MAIN],0, 6*8+4, 112, 4, d.audiobuflen, 0,
-                  d.low_watermark_level, HORIZONTAL);
-
-        lcd_putsf(0, 7, "wm: %x - %x",
-                    d.low_watermark_level, d.lowest_watermark_level);
-
-        lcd_update();
-    }
-    lcd_setfont(FONT_UI);
-    return false;
-}
-#endif /* !SIMULATOR */
-#else /* CONFIG_CODEC == SWCODEC */
 static unsigned int ticks, freq_sum;
 #ifndef CPU_MULTI_FREQUENCY
 static unsigned int boost_ticks;
@@ -487,7 +442,6 @@ static bool dbg_buffering_thread(void)
 
     return false;
 }
-#endif /* CONFIG_CODEC */
 #endif /* HAVE_LCD_BITMAP */
 
 static const char* bf_getname(int selected_item, void *data,
@@ -2606,11 +2560,7 @@ static const struct {
         { "View database info", dbg_tagcache_info },
 #endif
 #ifdef HAVE_LCD_BITMAP
-#if CONFIG_CODEC == SWCODEC
         { "View buffering thread", dbg_buffering_thread },
-#elif !defined(SIMULATOR)
-        { "View audio thread", dbg_audio_thread },
-#endif
 #ifdef PM_DEBUG
         { "pm histogram", peak_meter_histogram},
 #endif /* PM_DEBUG */

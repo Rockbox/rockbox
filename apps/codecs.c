@@ -40,7 +40,6 @@
 #include "lang.h"
 #include "keyboard.h"
 #include "buffering.h"
-#include "mp3_playback.h"
 #include "backlight.h"
 #include "storage.h"
 #include "talk.h"
