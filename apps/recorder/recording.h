@@ -33,17 +33,14 @@ void settings_apply_trigger(void);
 /* If true, start recording automatically when recording_sreen() is entered */
 extern bool recording_start_automatic;
 
-#if CONFIG_CODEC == SWCODEC
 /* handles device powerup, sets audio source and peakmeter mode */
 void rec_set_source(int source, unsigned flags);
-#endif /* CONFIG_CODEC == SW_CODEC */
 
 /* Initializes a recording_options structure with global settings.
    pass returned data to audio_set_recording_options or 
    rec_set_recording_options */
 void rec_init_recording_options(struct audio_recording_options *options);
 /* steals mp3 buffer, sets source and then options */
-/* SRCF_RECORDING is implied for SWCODEC */
 void rec_set_recording_options(struct audio_recording_options *options);
 
 enum recording_command

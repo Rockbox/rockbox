@@ -71,8 +71,8 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-/* Define this if you do software codec */
-#define CONFIG_CODEC SWCODEC
+
+
 /* There is no hardware tone control */
 /* #define HAVE_SW_TONE_CONTROLS*/
 #define HAVE_WM8731

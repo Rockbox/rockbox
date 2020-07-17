@@ -290,7 +290,7 @@ static void options_menu(void){
                                no_yes, 2, NULL);
                 if (new_setting != settings.sound )
                     settings.sound=new_setting;
-#if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
+#if !defined SIMULATOR
                 rb->pcm_play_stop();
 #endif
                 break;
@@ -318,7 +318,7 @@ static void options_menu(void){
 /* menu */
 static bool zxbox_menu(void)
 {
-#if CONFIG_CODEC == SWCODEC && !defined SIMULATOR
+#if !defined SIMULATOR
     rb->pcm_play_stop();
 #endif
     int selected=0;
