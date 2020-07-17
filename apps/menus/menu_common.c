@@ -25,11 +25,8 @@
 #include "action.h"
 #include "menu.h"
 #include "menu_common.h"
-#if CONFIG_CODEC == SWCODEC
 #include "pcmbuf.h"
-#endif
 
-#if CONFIG_CODEC == SWCODEC
 /* Use this callback if your menu adjusts DSP settings. */
 int lowlatency_callback(int action, const struct menu_item_ex *this_item)
 {
@@ -45,5 +42,3 @@ int lowlatency_callback(int action, const struct menu_item_ex *this_item)
     }
     return action;
 }
-#endif
-
