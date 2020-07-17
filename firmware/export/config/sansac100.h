@@ -10,8 +10,8 @@
 /* define hardware samples rate caps mask */
 #define HW_SAMPR_CAPS   (/*SAMPR_CAP_88 | */SAMPR_CAP_44/* | SAMPR_CAP_22 | SAMPR_CAP_11*/)
 
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
+
+
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

@@ -54,9 +54,7 @@
 #include "statusbar.h"
 #include "appevents.h"
 #include "panic.h"
-#ifdef HAVE_LCD_BITMAP
 #include "language.h"
-#endif
 #include "statusbar-skinned.h"
 #include "skin_engine/skin_engine.h"
 #include "debug.h"
@@ -68,7 +66,6 @@ struct viewport_stack_item
     bool   enabled;
 };
 
-#ifdef HAVE_LCD_BITMAP
 static void viewportmanager_redraw(unsigned short id, void* data);
 
 static int theme_stack_top[NB_SCREENS]; /* the last item added */
@@ -218,16 +215,10 @@ static bool is_theme_enabled(enum screen_type screen)
     int top = theme_stack_top[screen];
     return theme_stack[screen][top].enabled;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 int viewport_get_nb_lines(const struct viewport *vp)
 {
-#ifdef HAVE_LCD_BITMAP
     return vp->height/font_get(vp->font)->height;
-#else
-    (void)vp;
-    return 2;
-#endif
 }
 
 static void viewportmanager_redraw(unsigned short id, void* data)
@@ -235,31 +226,21 @@ static void viewportmanager_redraw(unsigned short id, void* data)
     (void)id;
     FOR_NB_SCREENS(i)
     {
-#ifdef HAVE_LCD_BITMAP
         if (is_theme_enabled(i))
             sb_skin_update(i, NULL != data);
-#else
-        (void)data;
-        gui_statusbar_draw(&statusbars.statusbars[i], NULL, NULL);
-#endif
     }
 }
 
 void viewportmanager_init()
 {
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
         theme_stack_top[i] = -1; /* the next call fixes this to 0 */
         /* We always want the theme enabled by default... */
         viewportmanager_theme_enable(i, true, NULL);
     }
-#else
-    add_event(GUI_EVENT_ACTIONUPDATE, viewportmanager_redraw);
-#endif
 }
 
-#ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_changed(const int which)
 {
     if (which & THEME_LANGUAGE)
@@ -296,7 +277,6 @@ static void set_default_align_flags(struct viewport *vp)
         vp->flags |= VP_FLAG_ALIGN_RIGHT;
 }
 
-#endif /* HAVE_LCD_BITMAP */
 #endif /* __PCTOOL__ */
 
 void viewport_set_fullscreen(struct viewport *vp,
@@ -307,7 +287,6 @@ void viewport_set_fullscreen(struct viewport *vp,
     vp->width = screens[screen].lcdwidth;
     vp->height = screens[screen].lcdheight;
 
-#ifdef HAVE_LCD_BITMAP
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
@@ -331,13 +310,12 @@ void viewport_set_fullscreen(struct viewport *vp,
         vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
     }
 #endif
-#endif
 }
 
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
-#if defined(HAVE_LCD_BITMAP) && !defined(__PCTOOL__)
+#if !defined(__PCTOOL__)
     struct viewport *sbs_area = NULL;
     if (!is_theme_enabled(screen))
     {
@@ -349,12 +327,10 @@ void viewport_set_defaults(struct viewport *vp,
     if (sbs_area)
         *vp = *sbs_area;
     else
-#endif /* HAVE_LCD_BITMAP */
+#endif /* !__PCTOOL__ */
         viewport_set_fullscreen(vp, screen);
 }
 
-
-#ifdef HAVE_LCD_BITMAP
 
 int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
 {
@@ -392,5 +368,3 @@ int get_viewport_default_colour(enum screen_type screen, bool fgcolour)
     return 0;
 #endif /* LCD_DEPTH > 1 || LCD_REMOTE_DEPTH > 1 */
 }
-
-#endif

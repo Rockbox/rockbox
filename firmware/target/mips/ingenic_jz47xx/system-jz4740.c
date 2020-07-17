@@ -261,7 +261,6 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
                           "$1", "LO", "HI", "STATUS", "EPC" };
     int i;
 
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH > 1
     lcd_set_backdrop(NULL);
     lcd_set_drawmode(DRMODE_SOLID);
@@ -284,8 +283,6 @@ void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
     lcd_update();
 
     system_exception_wait();
-#else
-    panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), read_c0_badvaddr(), epc, (unsigned int)stack_ptr);
 #endif
 }
 
