@@ -47,17 +47,14 @@
  */
 #define FRAMEDROP_TRIGGER 6
 
-#ifdef HAVE_LCD_BITMAP
 static int offset_step = 16; /* pixels per screen scroll step */
 /* should lines scroll out of the screen */
 static bool offset_out_of_view = false;
-#endif
 
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset);
 void list_draw(struct screen *display, struct gui_synclist *list);
 
-#ifdef HAVE_LCD_BITMAP
 static long last_dirty_tick;
 static struct viewport parent[NB_SCREENS];
 
@@ -92,23 +89,7 @@ static void list_init_viewports(struct gui_synclist *list)
     }
     list->dirty_tick = current_tick;
 }
-#else
-static struct viewport parent[NB_SCREENS] =
-{
-    [SCREEN_MAIN] =
-    {
-        .x        = 0,
-        .y        = 0,
-        .width    = LCD_WIDTH,
-        .height   = LCD_HEIGHT
-    },
-};
 
-#define list_init_viewports(a)
-#define list_is_dirty(a) false
-#endif
-
-#ifdef HAVE_LCD_BITMAP
 static int list_nb_lines(struct gui_synclist *list, enum screen_type screen)
 {
     struct viewport *vp = list->parent[screen];
@@ -148,13 +129,6 @@ void list_init_item_height(struct gui_synclist *list, enum screen_type screen)
 #endif
 }
 
-#else
-#define list_display_title(l, i) false
-#define list_get_nb_lines(list, screen) \
-            viewport_get_nb_lines((list)->parent[(screen)]);
-#define list_init_item_height(l, i)
-#endif
-
 /*
  * Initializes a scrolling list
  *  - gui_list : the list structure to initialize
@@ -181,9 +155,7 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     FOR_NB_SCREENS(i)
     {
         gui_list->start_item[i] = 0;
-#ifdef HAVE_LCD_BITMAP
         gui_list->offset_position[i] = 0;
-#endif
         if (list_parent)
             gui_list->parent[i] = &list_parent[i];
         else
@@ -216,7 +188,6 @@ void gui_synclist_hide_selection_marker(struct gui_synclist * lists, bool hide)
 }
 
 
-#ifdef HAVE_LCD_BITMAP
 int gui_list_get_item_offset(struct gui_synclist * gui_list,
                             int item_width,
                             int text_pos,
@@ -248,7 +219,6 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
 
     return item_offset;
 }
-#endif
 
 /*
  * Force a full screen update.
@@ -264,9 +234,7 @@ void gui_synclist_draw(struct gui_synclist *gui_list)
     }
     FOR_NB_SCREENS(i)
     {
-#ifdef HAVE_LCD_BITMAP
         if (!skinlist_draw(&screens[i], gui_list))
-#endif
             list_draw(&screens[i], gui_list);
     }
 }
@@ -481,7 +449,6 @@ void gui_synclist_del_item(struct gui_synclist * gui_list)
     }
 }
 
-#ifdef HAVE_LCD_BITMAP
 void gui_list_screen_scroll_step(int ofs)
 {
     offset_step = ofs;
@@ -491,7 +458,6 @@ void gui_list_screen_scroll_out_of_view(bool enable)
 {
     offset_out_of_view = enable;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 /*
  * Set the title and title icon of the list. Setting title to NULL disables
@@ -502,22 +468,18 @@ void gui_synclist_set_title(struct gui_synclist * gui_list,
 {
     gui_list->title = title;
     gui_list->title_icon = icon;
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
         sb_set_title_text(title, icon, i);
-#endif
     send_event(GUI_EVENT_ACTIONUPDATE, (void*)1);
 }
 
 void gui_synclist_set_nb_items(struct gui_synclist * lists, int nb_items)
 {
     lists->nb_items = nb_items;
-#ifdef HAVE_LCD_BITMAP
     FOR_NB_SCREENS(i)
     {
         lists->offset_position[i] = 0;
     }
-#endif
 }
 int gui_synclist_get_nb_items(struct gui_synclist * lists)
 {
@@ -576,7 +538,6 @@ void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
     lists->limit_scroll = scroll;
 }
 
-#ifdef HAVE_LCD_BITMAP
 /*
  * Makes all the item in the list scroll by one step to the right.
  * Should stop increasing the value when reaching the widest item value
@@ -608,7 +569,6 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
             lists->offset_position[i] = 0;
     }
 }
-#endif /* HAVE_LCD_BITMAP */
 
 bool gui_synclist_keyclick_callback(int action, void* data)
 {
@@ -652,9 +612,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
                             int *actionptr, enum list_wrap wrap)
 {
     int action = *actionptr;
-#ifdef HAVE_LCD_BITMAP
     static bool pgleft_allow_cancel = false;
-#endif
 
 #ifdef HAVE_WHEEL_ACCELERATION
     int next_item_modifier = button_apply_acceleration(get_action_data());
@@ -753,7 +711,6 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             *actionptr = ACTION_STD_NEXT;
             return true;
 
-#ifdef HAVE_LCD_BITMAP
         case ACTION_TREE_PGRIGHT:
             gui_synclist_scroll_right(lists);
             gui_synclist_draw(lists);
@@ -784,7 +741,6 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             pgleft_allow_cancel = false; /* stop ACTION_TREE_PAGE_LEFT
                                             skipping to root */
             return true;
-#endif
 /* for pgup / pgdown, we are obliged to have a different behaviour depending
  * on the screen for which the user pressed the key since for example, remote
  * and main screen doesn't have the same number of lines */

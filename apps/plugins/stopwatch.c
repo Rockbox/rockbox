@@ -23,11 +23,7 @@
 
 
 
-#ifdef HAVE_LCD_BITMAP
 #define TIMER_Y 1
-#else
-#define TIMER_Y 0
-#endif
 
 #define LAP_Y TIMER_Y+1
 #define MAX_LAPS 64
@@ -481,14 +477,10 @@ enum plugin_status plugin_start(const void* parameter)
 
     (void)parameter;
 
-#ifdef HAVE_LCD_BITMAP
     int h;
     rb->lcd_setfont(FONT_UI);
     rb->lcd_getstringsize("M", NULL, &h);
     lines = (LCD_HEIGHT / h) - (LAP_Y);
-#else
-    lines = 1;
-#endif
 
     load_stopwatch();
     

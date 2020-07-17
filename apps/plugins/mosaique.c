@@ -23,7 +23,6 @@
 #include "lib/pluginlib_actions.h"
 
 
-#ifdef HAVE_LCD_BITMAP
 #define GFX_X (LCD_WIDTH/2-1)
 #define GFX_Y (LCD_HEIGHT/2-1)
 #if LCD_WIDTH != LCD_HEIGHT
@@ -32,12 +31,6 @@
 #else
 #define GFX_WIDTH  GFX_X
 #define GFX_HEIGHT (4*GFX_Y/5)
-#endif
-#else
-#define GFX_X 9
-#define GFX_Y 6
-#define GFX_WIDTH  9
-#define GFX_HEIGHT 6
 #endif
 
 /* this set the context to use with PLA */
