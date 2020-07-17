@@ -532,8 +532,6 @@
 
 #define BOARD_WIDTH 10
 
-#ifdef HAVE_LCD_BITMAP
-
 #define BOARD_HEIGHT 20
 
 #if (LCD_WIDTH == 640) && (LCD_HEIGHT == 480)
@@ -769,10 +767,6 @@
 
 extern const fb_data rockblox_background[];
 
-#else
-#error "lcd screen size not defined!"
-#endif
-
 #ifndef HIGHSCORE_SPACE
 #define HIGHSCORE_SPACE " "
 #endif
@@ -974,7 +968,6 @@ static void init_board (void)
 /* show the score, level and lines */
 static void show_details (void)
 {
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
     rb->lcd_set_foreground (LCD_BLACK);
     rb->lcd_set_background (LCD_WHITE);
@@ -982,7 +975,6 @@ static void show_details (void)
     rb->lcd_putsxyf (LABEL_X, SCORE_Y, "%d", rockblox_status.score);
     rb->lcd_putsxyf (LEVEL_X, LEVEL_Y, "%d", rockblox_status.level);
     rb->lcd_putsxyf (LINES_X, LINES_Y, "%d", rockblox_status.lines);
-#endif
 }
 
 #ifdef HIGH_SCORE_Y
@@ -1050,9 +1042,7 @@ static void init_rockblox (bool resume)
                  tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday,
                  tm->tm_hour, tm->tm_min, tm->tm_sec);
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
-#endif
     if (!resume)
     {
         rockblox_status.level = 1;
@@ -1149,7 +1139,6 @@ static void refresh_board (void)
         for (j = 0; j < BOARD_HEIGHT; j++) {
             block = rockblox_status.board[j][i];
             if (block != EMPTY_BLOCK) {
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
                 /* middle drawing */
                 rb->lcd_set_foreground (figures[block].color[1]);
@@ -1177,7 +1166,6 @@ static void refresh_board (void)
                 rb->lcd_hline (BOARD_X + i * BLOCK_WIDTH + 1,
                                BOARD_X + (i + 1) * BLOCK_WIDTH - 1,
                                BOARD_Y + (j + 1) * BLOCK_HEIGHT - 1);
-#endif
             }
         }
 
@@ -1194,7 +1182,6 @@ static void refresh_board (void)
             + rockblox_status.cx;
         y = getRelativeY (rockblox_status.cf, i, rockblox_status.co)
             + ghost_y;
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
         /* middle drawing */
         rb->lcd_set_foreground (ghost_colors[rockblox_status.cf][0]);
@@ -1221,7 +1208,6 @@ static void refresh_board (void)
         rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
-#endif
     }
 
     /* draw current piece */
@@ -1231,7 +1217,6 @@ static void refresh_board (void)
             + rockblox_status.cx;
         y = getRelativeY (rockblox_status.cf, i, rockblox_status.co)
             + rockblox_status.cy;
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
         /* middle drawing */
         rb->lcd_set_foreground (figures[rockblox_status.cf].color[1]);
@@ -1258,7 +1243,6 @@ static void refresh_board (void)
         rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
-#endif
     }
 
     mylcd_update ();
@@ -1301,7 +1285,6 @@ static void draw_next_block (void)
     for (i = 0; i < 4; i++) {
         rx = getRelativeX (rockblox_status.nf, i, 0) + 2;
         ry = getRelativeY (rockblox_status.nf, i, 0) + 2;
-#ifdef HAVE_LCD_BITMAP
 #if LCD_DEPTH >= 2
         rb->lcd_set_foreground (figures[rockblox_status.nf].color[1]);  /* middle drawing */
 #endif
@@ -1326,7 +1309,6 @@ static void draw_next_block (void)
         rb->lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH + 1,
                        PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
                        PREVIEW_Y + (ry + 1) * BLOCK_HEIGHT - 1);
-#endif
     }
 
 }
@@ -1428,18 +1410,14 @@ static bool rockblox_help(void)
         LAST_STYLE_ITEM
     };
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_UI);
-#endif
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
     if (display_text(ARRAYLEN(help_text), help_text, formation, NULL, true))
         return true;
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont(FONT_SYSFIXED);
-#endif
 
     return false;
 }
@@ -1699,15 +1677,7 @@ enum plugin_status plugin_start (const void *parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
 
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_setfont (FONT_SYSFIXED);
-#else
-    if (!pgfx_init(4, 2))
-    {
-        rb->splash(HZ*2, "Old LCD :(");
-        return PLUGIN_OK;
-    }
-#endif
 
     /* Turn off backlight timeout */
     backlight_ignore_timeout();

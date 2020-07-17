@@ -53,7 +53,6 @@ int get_viewport_default_colour(enum screen_type screen, bool fgcolour);
  */
 void viewportmanager_init(void) INIT_ATTR;
 
-#ifdef HAVE_LCD_BITMAP
 void viewportmanager_theme_enable(enum screen_type screen, bool enable,
                                  struct viewport *viewport);
 /* Force will cause a redraw even if the theme was previously and 
@@ -67,8 +66,6 @@ void viewportmanager_theme_changed(const int);
 #ifdef HAVE_TOUCHSCREEN
 bool viewport_point_within_vp(const struct viewport *vp,
                                const int x, const int y);
-#endif
-
 #endif
 
 #endif /* __PCTOOL__ */
