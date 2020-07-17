@@ -79,7 +79,7 @@ wolf3d.c
 #endif
 #endif
 
-#if PLUGIN_BUFFER_SIZE <= 0x20000 && defined(HAVE_LCD_BITMAP)
+#if PLUGIN_BUFFER_SIZE <= 0x20000
 
 #if CONFIG_KEYPAD != SANSA_M200_PAD \
     && CONFIG_KEYPAD != HM60X_PAD
@@ -92,7 +92,7 @@ chessbox.c
 goban.c
 pictureflow.c
 
-#endif /* PLUGIN_BUFFER_SIZE <= 0x20000 && HAVE_LCD_BITMAP */
+#endif /* PLUGIN_BUFFER_SIZE <= 0x20000 */
 
 #if defined(IRIVER_H100_SERIES)
 iriver_flash.c
@@ -105,8 +105,6 @@ crypt_firmware.c
 #endif /* PLATFORM_NATIVE */
 
 metronome.c
-
-#ifdef HAVE_LCD_BITMAP             /* Not for the Archos Player */
 
 2048.c
 
@@ -173,8 +171,6 @@ rockpaint.c
 
 rocklife.c
 
-#endif /* HAVE_LCD_BITMAP */
-
 #if LCD_DEPTH > 1                  /* non-mono bitmap targets */
 
 matrix.c
@@ -198,7 +194,6 @@ test_codec.c
 test_core_jpeg.c
 #endif
 test_disk.c
-#ifdef HAVE_LCD_BITMAP
 test_fps.c
 test_gfx.c
 #if LCD_DEPTH < 4 && !defined(SIMULATOR)
@@ -208,11 +203,8 @@ test_scanrate.c
 test_grey.c
 test_greylib_bitmap_scale.c
 #endif
-#endif
 test_mem.c
-#ifdef HAVE_LCD_BITMAP
 test_mem_jpeg.c
-#endif
 #ifdef HAVE_LCD_COLOR
 test_resize.c
 #endif

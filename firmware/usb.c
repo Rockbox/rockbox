@@ -56,9 +56,7 @@
 #define USB_FULL_INIT
 #endif
 
-#ifdef HAVE_LCD_BITMAP
 bool do_screendump_instead_of_usb = false;
-#endif
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
 
@@ -116,7 +114,6 @@ static void try_reboot(void)
 #endif /* USB_FIRWIRE_HANDLING */
 
 /* Screen dump */
-#ifdef HAVE_LCD_BITMAP
 static inline bool usb_do_screendump(void)
 {
     if(do_screendump_instead_of_usb)
@@ -129,7 +126,6 @@ static inline bool usb_do_screendump(void)
     }
     return false;
 }
-#endif /* HAVE_LCD_BITMAP */
 
 /* Power (charging-only) button */
 static inline void usb_detect_charging_only(bool detect)
@@ -458,13 +454,11 @@ static void NORETURN_ATTR usb_thread(void)
             if(usb_state != USB_EXTRACTED)
                 break;
 
-#ifdef HAVE_LCD_BITMAP
             if(usb_do_screendump())
             {
                 usb_state = USB_SCREENDUMP;
                 break;
             }
-#endif
 
             usb_state = USB_POWERED;
             usb_stack_enable(true);

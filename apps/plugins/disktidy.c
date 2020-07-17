@@ -343,10 +343,8 @@ static void tidy_lcd_status(const char *name)
     rb->lcd_clear_display();
     rb->lcd_puts(0, 0, "Working ...");
     rb->lcd_puts(0, 1, name);
-#ifdef HAVE_LCD_BITMAP
     rb->lcd_putsf(0, 2, "Cleaned up %d items",
         run_stats.files_removed + run_stats.dirs_removed);
-#endif
     rb->lcd_update();
 }
 
