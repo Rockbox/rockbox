@@ -865,6 +865,9 @@ static const struct plugin_api rockbox_api = {
     audio_hard_stop,
 #endif
 
+#ifdef HAVE_LCD_BITMAP
+    load_kbd,
+#endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 };
