@@ -429,7 +429,19 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 
         if (menu_callback)
         {
+            int old_start = (start_selected) ? *start_selected : 0;
+            if (start_selected) /* HACK to know selected item in callback */
+            {
+                *start_selected = get_menu_selection(
+                                  gui_synclist_get_sel_pos(&lists), menu);
+            }
+
             int old_action = action;
+            action = menu_callback(action, menu);
+
+            if (start_selected)
+                *start_selected = old_start;
+
             action = menu_callback(action, menu);
             if (action == ACTION_EXIT_AFTER_THIS_MENUITEM)
             {
