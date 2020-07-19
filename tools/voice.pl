@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use File::Basename;
 use File::Copy;
-use vars qw($V $C $t $l $e $E $s $S $i $v);
+use vars qw($V $C $t $l $e $E $s $S $i $v $f);
 use IPC::Open2;
 use IPC::Open3;
 use Digest::MD5 qw(md5_hex);
@@ -33,7 +33,7 @@ sub printusage {
 
 Usage: voice.pl [options] [path to dir]
  -V
-    Create voice file. You must also specify -t and -l.
+    Create voice file. You must also specify -l, -i, and -t or -f
 
  -C
     Create .talk clips.
@@ -41,6 +41,8 @@ Usage: voice.pl [options] [path to dir]
  -t=<target>
     Specify which target you want to build voicefile for. Must include
     any features that target supports.
+
+ -f=<file> Use existing voiceids file
 
  -i=<target_id>
     Numeric target id. Needed for voice building.
@@ -328,21 +330,32 @@ sub synchronize {
 # Run genlang and create voice clips for each string
 sub generateclips {
     our $verbose;
-    my ($language, $target, $encoder, $encoder_opts, $tts_engine, $tts_engine_opts) = @_;
+    my ($language, $target, $encoder, $encoder_opts, $tts_engine, $tts_engine_opts, $existingids) = @_;
     my $english = dirname($0) . '/../apps/lang/english.lang';
     my $langfile = dirname($0) . '/../apps/lang/' . $language . '.lang';
     my $correctionsfile = dirname($0) . '/voice-corrections.txt';
+    my $idfile = "$language.vid";
+    my $updfile = "$language-update.lang";
     my $id = '';
     my $voice = '';
-    my $cmd = "genlang -o -t=$target -e=$english $language-update.lang 2>/dev/null";
+    my $cmd;
     my $pool_file;
-    open(VOICEFONTIDS, "> voicefontids");
     my $i = 0;
     local $| = 1; # make progress indicator work reliably
 
     # First run the language through an update pass so any missing strings
     # are backfilled from English.  Without this, BADNESS.
-    system("genlang -u -e=$english $langfile > $language-update.lang");
+    if ($existingids) {
+        $idfile = $existingids;
+    } else {
+	$cmd = "genlang -u -e=$english $langfile > $updfile";
+	print("> $cmd\n") if $verbose;
+        system($cmd);
+	$cmd = "genlang -o -t=$target -e=$english $updfile 2>/dev/null > $idfile";
+	print("> $cmd\n") if $verbose;
+	system($cmd);
+    }
+    open(VOICEFONTIDS, " < $idfile");
 
     my $tts_object = init_tts($tts_engine, $tts_engine_opts, $language);
     # add string corrections to tts_object.
@@ -378,9 +391,8 @@ sub generateclips {
 
     print("Generating voice clips");
     print("\n") if $verbose;
-    for (`$cmd`) {
+    for (<VOICEFONTIDS>) {
         my $line = $_;
-        print(VOICEFONTIDS $line);
         if ($line =~ /^id: (.*)$/) {
             $id = $1;
         }
@@ -388,7 +400,7 @@ sub generateclips {
             $voice = $1;
             if ($id !~ /^NOT_USED_.*$/ && $voice ne "") {
                 my $wav = $id . '.wav';
-                my $mp3 = $id . '.mp3';
+                my $enc = $id . '.mp3';
 
                 # Print some progress information
                 if (++$i % 10 == 0 and !$verbose) {
@@ -405,12 +417,12 @@ sub generateclips {
                                          $language);
                     if (-f $pool_file) {
                         printf("Re-using %s (%s) from pool\n", $id, $voice) if $verbose;
-                        copy($pool_file, $mp3);
+                        copy($pool_file, $enc);
                     }
                 }
 
-                # Don't generate MP3 if it already exists (probably from the POOL)
-                if (! -f $mp3) {
+                # Don't generate encoded file if it already exists (probably from the POOL)
+                if (! -f $enc) {
                     if ($id eq "VOICE_PAUSE") {
                         print("Use distributed $wav\n") if $verbose;
                         copy(dirname($0)."/VOICE_PAUSE.wav", $wav);
@@ -422,14 +434,14 @@ sub generateclips {
 			}
                     }
 		    if ($tts_object->{'format'} eq "wav" || $id eq "VOICE_PAUSE") {
-			encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
+			encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
 		    } else {
-			copy($wav, $mp3);
+			copy($wav, $enc);
 		    }
 
                     synchronize($tts_object);
                     if (defined($ENV{'POOL'})) {
-			copy($mp3, $pool_file);
+			copy($enc, $pool_file);
                     }
                     unlink($wav);
                 }
@@ -438,25 +450,36 @@ sub generateclips {
             }
         }
     }
-    print("\n");
     close(VOICEFONTIDS);
+
+    print("\n");
+
+    unlink($updfile) if (-f $updfile);
     shutdown_tts($tts_object);
 }
 
 # Assemble the voicefile
 sub createvoice {
     our $verbose;
-    my ($language, $target_id) = @_;
+    my ($language, $target_id, $existingids) = @_;
     my $outfile = "";
+    my $vfile = "$language.vid";
+
+    if ($existingids) {
+        $vfile = $existingids;
+    }
     $outfile = sprintf("%s.voice", $language);
     printf("Saving voice file to %s\n", $outfile) if $verbose;
-    my $cmd = "voicefont 'voicefontids' $target_id ./ $outfile";
+    my $cmd = "voicefont '$vfile' $target_id ./ $outfile";
     print("> $cmd\n") if $verbose;
     my $output = `$cmd`;
     print($output) if $verbose;
+    if (!$existingids) {
+        unlink("$vfile");
+    }
 }
 
-sub deletemp3s() {
+sub deleteencs() {
     for (glob('*.mp3')) {
         unlink($_);
     }
@@ -466,7 +489,7 @@ sub deletemp3s() {
 }
 
 sub panic_cleanup {
-    deletemp3s();
+    deletencs();
     die "moo";
 }
 
@@ -476,7 +499,7 @@ sub gentalkclips {
     my ($dir, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i) = @_;
     my $d = new DirHandle $dir;
     while (my $file = $d->read) {
-        my ($voice, $wav, $mp3);
+        my ($voice, $wav, $enc);
         # Print some progress information
         if (++$i % 10 == 0 and !$verbose) {
             print(".");
@@ -495,20 +518,20 @@ sub gentalkclips {
         # Element is a dir
         if ( -d $path) {
             gentalkclips($path, $tts_object, $encoder, $encoder_opts, $tts_engine_opts, $i);
-            $mp3 = sprintf("%s/_dirname.talk", $path);
+            $enc = sprintf("%s/_dirname.talk", $path);
         }
         # Element is a file
         else {
-            $mp3 = sprintf("%s.talk", $path);
+            $enc = sprintf("%s.talk", $path);
             $voice =~ s/\.[^\.]*$//; # Trim extension
         }
 
-        printf("Talkclip %s: %s", $mp3, $voice) if $verbose;
+        printf("Talkclip %s: %s", $enc, $voice) if $verbose;
 
         voicestring($voice, $wav, $tts_engine_opts, $tts_object);
         wavtrim($wav, 500, $tts_object);
         # 500 seems to be a reasonable default for now
-        encodewav($wav, $mp3, $encoder, $encoder_opts, $tts_object);
+        encodewav($wav, $enc, $encoder, $encoder_opts, $tts_object);
         synchronize($tts_object);
         unlink($wav);
     }
@@ -519,9 +542,12 @@ sub gentalkclips {
 my $printusage = 0;
 unless (defined($V) or defined($C)) { print("Missing either -V or -C\n"); $printusage = 1; }
 if (defined($V)) {
-    unless (defined($t)) { print("Missing -t argument\n"); $printusage = 1; }
     unless (defined($l)) { print("Missing -l argument\n"); $printusage = 1; }
     unless (defined($i)) { print("Missing -i argument\n"); $printusage = 1; }
+    if (defined($t) && defined($f) ||
+        !defined($t) && !defined($f)) {
+	     print("Missing either -t or -f argument\n"); $printusage = 1;
+        }
 }
 elsif (defined($C)) {
     unless (defined($ARGV[0])) { print "Missing path argument\n"; $printusage = 1; }
@@ -539,7 +565,6 @@ if (defined($v) or defined($ENV{'V'})) {
 # add the tools dir to the path temporarily, for calling various tools
 $ENV{'PATH'} = dirname($0) . ':' . $ENV{'PATH'};
 
-
 # Do what we're told
 if ($V == 1) {
     # Only do the panic cleanup for voicefiles
@@ -547,10 +572,11 @@ if ($V == 1) {
     $SIG{KILL} = \&panic_cleanup;
 
     printf("Generating voice\n  Target: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n",
-        $t, $l, $e, $E, $s, $S);
-    generateclips($l, $t, $e, $E, $s, $S);
-    createvoice($l, $i);
-    deletemp3s();
+           defined($t) ? $t : "unknown",
+           $l, $e, $E, $s, $S);
+    generateclips($l, $t, $e, $E, $s, $S, $f);
+    createvoice($l, $i, $f);
+    deleteencs();
 }
 elsif ($C) {
     printf("Generating .talk clips\n  Path: %s\n  Language: %s\n  Encoder (options): %s (%s)\n  TTS Engine (options): %s (%s)\n", $ARGV[0], $l, $e, $E, $s, $S);
