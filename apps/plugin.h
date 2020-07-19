@@ -665,11 +665,7 @@ struct plugin_api {
 #if defined (HAVE_PITCHCONTROL)
     void (*sound_set_pitch)(int32_t pitch);
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    void (*mp3_play_data)(const void* start, size_t size,
-                          mp3_play_callback_t get_more);
-    void (*mp3_play_pause)(bool play);
-    void (*mp3_play_stop)(void);
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_DISK_STORAGE)
     bool (*mp3_is_playing)(void);
 #endif /* PLATFORM_NATIVE */
     const unsigned long *audio_master_sampr_list;
@@ -810,10 +806,6 @@ struct plugin_api {
     char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
     void (*root_menu_load_from_cfg)(void* setting, char *value);
 
-    /* statusbars */
-    struct gui_syncstatusbar *statusbars;
-    void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
-
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);
     const struct settings_list* (*find_setting)(const void* variable, int *id);
@@ -871,7 +863,6 @@ struct plugin_api {
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen, unsigned short *kbd);
     struct tm* (*get_time)(void);
-    int  (*set_time)(const struct tm *tm);
     struct tm * (*gmtime_r)(const time_t *timep, struct tm *tm);
 #if CONFIG_RTC
     time_t (*mktime)(struct tm *t);
