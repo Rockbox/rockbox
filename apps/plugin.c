@@ -711,10 +711,6 @@ static const struct plugin_api rockbox_api = {
     root_menu_write_to_cfg,
     root_menu_load_from_cfg,
 
-    /* statusbars */
-    &statusbars,
-    gui_syncstatusbar_draw,
-
     /* options */
     get_settings_list,
     find_setting,
@@ -755,7 +751,6 @@ static const struct plugin_api rockbox_api = {
     (void *)qsort,
     kbd_input,
     get_time,
-    set_time,
     gmtime_r,
 #if CONFIG_RTC
     mktime,

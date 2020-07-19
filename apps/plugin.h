@@ -810,10 +810,6 @@ struct plugin_api {
     char* (*root_menu_write_to_cfg)(void* setting, char*buf, int buf_len);
     void (*root_menu_load_from_cfg)(void* setting, char *value);
 
-    /* statusbars */
-    struct gui_syncstatusbar *statusbars;
-    void (*gui_syncstatusbar_draw)(struct gui_syncstatusbar * bars, bool force_redraw);
-
     /* options */
     const struct settings_list* (*get_settings_list)(int*count);
     const struct settings_list* (*find_setting)(const void* variable, int *id);
@@ -871,7 +867,6 @@ struct plugin_api {
                   int(*compar)(const void *, const void *));
     int (*kbd_input)(char* buffer, int buflen);
     struct tm* (*get_time)(void);
-    int  (*set_time)(const struct tm *tm);
     struct tm * (*gmtime_r)(const time_t *timep, struct tm *tm);
 #if CONFIG_RTC
     time_t (*mktime)(struct tm *t);
