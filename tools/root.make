@@ -378,7 +378,7 @@ ifdef TTS_ENGINE
 
 voice: voicetools $(BUILDDIR)/apps/features
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done ; \
-	for lang in `echo $(VOICELANGUAGE) |sed "s/,/ /g"`; do $(TOOLSDIR)/voice.pl -V -l=$$lang -t=$(MODELNAME)$$feat -i=$(TARGET_ID) -e="$(ENCODER)" -E="$(ENC_OPTS)" -s=$(TTS_ENGINE) -S="$(TTS_OPTS)"; done \
+	x=1 ; for lang in `echo $(VOICELANGUAGE) |sed "s/,/ /g"`; do ENG=`echo $(TTS_ENGINE) | cut -d , -f $$x` ; echo $(TOOLSDIR)/voice.pl -V -l=$$lang -t=$(MODELNAME)$$feat -i=$(TARGET_ID) -e="$(ENCODER)" -E="$(ENC_OPTS)" -s=$$ENG -S="$(TTS_OPTS)" ; x=`expr $$x + 1` ; done \
 
 endif
 
