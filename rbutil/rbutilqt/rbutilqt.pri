@@ -55,6 +55,7 @@ SOURCES += \
  sysinfo.cpp \
  systrace.cpp \
  base/bootloaderinstallbase.cpp \
+ base/bootloaderinstallbspatch.cpp \
  base/bootloaderinstallhelper.cpp \
  base/bootloaderinstallmi4.cpp \
  base/bootloaderinstallhex.cpp \
@@ -134,6 +135,7 @@ HEADERS += \
  base/system.h \
  systrace.h \
  base/bootloaderinstallbase.h \
+ base/bootloaderinstallbspatch.h \
  base/bootloaderinstallhelper.h \
  base/bootloaderinstallmi4.h \
  base/bootloaderinstallhex.h \
