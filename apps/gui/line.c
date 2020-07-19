@@ -41,11 +41,7 @@
 #endif
 
 
-#ifdef HAVE_LCD_CHARCELLS
-#define style_line(d, x, y, l)
-#else
 static void style_line(struct screen *display, int x, int y, struct line_desc *line);
-#endif
 
 static void put_text(struct screen *display, int x, int y, struct line_desc *line,
                       const char *text, bool prevent_scroll, int text_skip_pixels);

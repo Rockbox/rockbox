@@ -38,12 +38,6 @@
 #define RECT_SPACING 2
 #define SPLASH_MEMORY_INTERVAL (HZ)
 
-#else /* HAVE_LCD_CHARCELLS */
-
-#define MAXLINES  2
-#define MAXBUFFER 64
-#define RECT_SPACING 0
-
 #endif
 
 
@@ -68,12 +62,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     screen->set_viewport(&vp);
     
     screen->getstringsize(" ", &space_w, &h);
-#else /* HAVE_LCD_CHARCELLS */
-    vp.width = screen->lcdwidth;
-    vp.height = screen->lcdheight;
-
-    space_w = h = 1;
-    screen->double_height (false);
 #endif
     y = h;
 
@@ -178,9 +166,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
 
     /* prepare putting the text */
     y = RECT_SPACING;
-#else /* HAVE_LCD_CHARCELLS */
-    y = 0;    /* vertical centering on 2 lines would be silly */
-    screen->clear_display();
 #endif
 
     /* print the message to screen */
@@ -188,8 +173,6 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     {
 #ifdef HAVE_LCD_BITMAP
         screen->putsxy(0, y, lines[i]);
-#else
-        screen->puts(0, y, lines[i]);
 #endif
     }
     screen->update_viewport();

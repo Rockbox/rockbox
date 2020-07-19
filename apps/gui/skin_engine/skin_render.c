@@ -97,10 +97,6 @@ get_child(OFFSETTYPE(struct skin_element**) children, int child)
 static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                              struct skin_element *element, struct skin_viewport* skin_vp)
 {
-#ifndef HAVE_LCD_BITMAP
-    (void)skin_vp; /* silence warnings */
-    (void)info;
-#endif
     struct wps_token *token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, element->data);
 
 #ifdef HAVE_LCD_BITMAP
@@ -832,14 +828,6 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     int old_refresh_mode = refresh_mode;
     skin_buffer = get_skin_buffer(gwps->data);
     
-#ifdef HAVE_LCD_CHARCELLS
-    int i;
-    for (i = 0; i < 8; i++)
-    {
-        if (data->wps_progress_pat[i] == 0)
-            data->wps_progress_pat[i] = display->get_locked_pattern();
-    }
-#endif
 
     viewport = SKINOFFSETTOPTR(skin_buffer, data->tree);
     skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);

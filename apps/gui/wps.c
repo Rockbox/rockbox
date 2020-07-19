@@ -232,11 +232,6 @@ static bool update_onvol_change(enum screen_type screen)
 {
     skin_update(WPS, screen, SKIN_REFRESH_NON_STATIC);
 
-#ifdef HAVE_LCD_CHARCELLS
-    splashf(0, "Vol: %3d dB",
-               sound_val2phys(SOUND_VOLUME, global_settings.volume));
-    return true;
-#endif
     return false;
 }
 
@@ -401,10 +396,6 @@ bool ffwd_rew(int button)
 #if (CONFIG_CODEC != SWCODEC)
                 if (!skin_get_global_state()->paused)
                     audio_resume();
-#endif
-#ifdef HAVE_LCD_CHARCELLS
-                FOR_NB_SCREENS(i)
-                    skin_update(WPS, i, SKIN_REFRESH_ALL);
 #endif
                 exit = true;
                 break;
@@ -741,11 +732,6 @@ long gui_wps_show(void)
     long last_left = 0, last_right = 0;
     struct wps_state *state = skin_get_global_state();
 
-#ifdef HAVE_LCD_CHARCELLS
-    status_set_audio(true);
-    status_set_param(false);
-#endif
-
 #ifdef AB_REPEAT_ENABLE
     ab_repeat_init();
     ab_reset_markers();
@@ -833,10 +819,6 @@ long gui_wps_show(void)
             break;
 
             case ACTION_WPS_BROWSE:
-#ifdef HAVE_LCD_CHARCELLS
-                status_set_record(false);
-                status_set_audio(false);
-#endif
                 gwps_leave_wps();
                 return GO_TO_PREVIOUS_BROWSER;
                 break;
@@ -1146,10 +1128,6 @@ long gui_wps_show(void)
         }
 
         if (exit) {
-#ifdef HAVE_LCD_CHARCELLS
-            status_set_record(false);
-            status_set_audio(false);
-#endif
 #if CONFIG_CODEC != SWCODEC
             if (global_settings.fade_on_stop)
                 fade(false, true);

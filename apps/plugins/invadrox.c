@@ -66,10 +66,6 @@
 /* Original graphics is only 1bpp so it should be portable
  * to most targets. But for now, only support the simple ones.
  */
-#ifndef HAVE_LCD_BITMAP
-    #error INVADROX: Unsupported LCD
-#endif
-
 #if (LCD_DEPTH < 2)
     #error INVADROX: Unsupported LCD
 #endif

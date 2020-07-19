@@ -37,10 +37,6 @@ void screen_helper_setfont(int font);
 
 #define FOR_NB_SCREENS(i) for(int i = 0; i < NB_SCREENS; i++)
 
-#ifdef HAVE_LCD_CHARCELLS
-#define MAX_LINES_ON_SCREEN 2
-#endif
-
 typedef void screen_bitmap_part_func(const void *src, int src_x, int src_y,
                               int stride, int x, int y, int width, int height);
 typedef void screen_bitmap_func(const void *src, int x, int y, int width,
@@ -110,15 +106,6 @@ struct screen
     void (*hline)(int x1, int x2, int y);
 #endif /* HAVE_LCD_BITMAP || HAVE_REMOTE_LCD */
 
-#ifdef HAVE_LCD_CHARCELLS  /* no charcell remote LCDs so far */
-    void (*double_height)(bool on);
-    /* name it putchar, not putc because putc is a c library function */
-    void (*putchar)(int x, int y, unsigned long ucs);
-    void (*icon)(int icon, bool enable);
-    unsigned long (*get_locked_pattern)(void);
-    void (*define_pattern)(unsigned long ucs, const char *pattern);
-    void (*unlock_pattern)(unsigned long ucs);
-#endif
     void (*putsxy)(int x, int y, const unsigned char *str);
     void (*puts)(int x, int y, const unsigned char *str);
     void (*putsf)(int x, int y, const unsigned char *str, ...);

@@ -21,13 +21,6 @@
 #ifndef _STATUS_H
 #define _STATUS_H
 
-#if defined(HAVE_LCD_CHARCELLS)
-extern bool record;
-extern bool audio;
-extern bool param;
-extern bool usb;
-#endif
-
 enum playmode
 {
     STATUS_PLAY,
@@ -48,11 +41,5 @@ int current_playmode(void);
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
-#ifdef HAVE_LCD_CHARCELLS
-void status_set_record(bool b);
-void status_set_audio(bool b);
-void status_set_param(bool b);
-void status_set_usb(bool b);
-#endif /* HAVE_LCD_CHARCELLS */
 
 #endif /* _STATUS_H */

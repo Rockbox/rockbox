@@ -69,11 +69,6 @@
 #define TV_SCROLLBAR_WIDTH  rb->global_settings->scrollbar_width
 #define TV_SCROLLBAR_HEIGHT 4
 
-
-#ifndef HAVE_LCD_BITMAP
-#define TV_BOOKMARK_ICON 0xe101
-#endif
-
 struct tv_rect {
     int x;
     int y;

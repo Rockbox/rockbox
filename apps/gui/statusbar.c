@@ -191,12 +191,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
     if (!display)
         return;
 
-#ifdef HAVE_LCD_CHARCELLS
-    int val;
-    (void)force_redraw; /* The Player always has "redraw" */
-    (void)vp;
-#endif /* HAVE_LCD_CHARCELLS */
-
     bar->info.battlevel = battery_level();
 #ifdef HAVE_USB_POWER
     bar->info.usb_inserted = usb_inserted();
@@ -359,38 +353,6 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
     }
 #endif /* HAVE_LCD_BITMAP */
 
-
-#ifdef HAVE_LCD_CHARCELLS
-    display->icon(ICON_BATTERY, bar->info.battery_state);
-    
-    if (bar->info.batt_charge_step > -1)
-        val = bar->info.batt_charge_step;
-    else
-        val = (bar->info.battlevel * 3 + 50) / 100;
-    display->icon(ICON_BATTERY_1, val >= 1);
-    display->icon(ICON_BATTERY_2, val >= 2);
-    display->icon(ICON_BATTERY_3, val >= 3);
-
-    val = 10 * (bar->info.volume - sound_min(SOUND_VOLUME))
-           / (sound_max(SOUND_VOLUME) - sound_min(SOUND_VOLUME));
-    display->icon(ICON_VOLUME, true);
-    display->icon(ICON_VOLUME_1, val >= 1);
-    display->icon(ICON_VOLUME_2, val >= 3);
-    display->icon(ICON_VOLUME_3, val >= 5);
-    display->icon(ICON_VOLUME_4, val >= 7);
-    display->icon(ICON_VOLUME_5, val >= 9);
-
-    display->icon(ICON_PLAY, current_playmode() == STATUS_PLAY);
-    display->icon(ICON_PAUSE, current_playmode() == STATUS_PAUSE);
-
-    display->icon(ICON_REPEAT, global_settings.repeat_mode != REPEAT_OFF);
-    display->icon(ICON_1, global_settings.repeat_mode == REPEAT_ONE);
-
-    display->icon(ICON_RECORD, record);
-    display->icon(ICON_AUDIO, audio);
-    display->icon(ICON_PARAM, param);
-    display->icon(ICON_USB, usb);
-#endif /* HAVE_LCD_CHARCELLS */
 }
 
 #ifdef HAVE_LCD_BITMAP

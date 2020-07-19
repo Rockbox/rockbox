@@ -605,13 +605,6 @@ int filetype_list_viewers(const char* current_file)
 {
     struct simplelist_info info;
     struct cb_data data = { current_file };
-#ifndef HAVE_LCD_BITMAP
-    if (viewer_count == 0)
-    {
-        splash(HZ*2, ID2P(LANG_NO_VIEWERS));
-        return PLUGIN_OK;
-    }
-#endif
     simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), viewer_count, &data);
     info.action_callback = openwith_action_callback;
     info.get_name = openwith_get_name;

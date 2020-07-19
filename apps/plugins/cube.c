@@ -22,7 +22,6 @@
 ***************************************************************************/
 #include "plugin.h"
 #include "fixedpoint.h"
-#include "lib/playergfx.h"
 #include "lib/pluginlib_exit.h"
 #if LCD_DEPTH > 1
 #include "lib/mylcd.h" /* MYLCD_CFG_RB_XLCD or MYLCD_CFG_PGFX */
@@ -746,8 +745,6 @@ static void cleanup(void)
 {
 #ifdef USEGSLIB
     grey_release();
-#elif defined HAVE_LCD_CHARCELLS
-    pgfx_release();
 #endif
 }
 
@@ -797,13 +794,6 @@ enum plugin_status plugin_start(const void* parameter)
     grey_setfont(FONT_SYSFIXED);
 #endif
     rb->lcd_setfont(FONT_SYSFIXED);
-#else /* LCD_CHARCELLS */
-    if (!pgfx_init(4, 2))
-    {
-        rb->splash(HZ*2, "Old LCD :(");
-        return PLUGIN_OK;
-    }
-    pgfx_display(0, 0);
 #endif
 
     atexit(cleanup);

@@ -763,11 +763,7 @@ int view_runtime(void)
     struct gui_synclist lists;
     int action;
     gui_synclist_init(&lists, runtime_get_data, NULL, false, 2, NULL);
-#if !defined(HAVE_LCD_CHARCELLS)
     gui_synclist_set_title(&lists, str(LANG_RUNNING_TIME), NOICON);
-#else
-    gui_synclist_set_title(&lists, NULL, NOICON);
-#endif
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&lists, runtime_speak_data);
     gui_synclist_set_icon_callback(&lists, NULL);

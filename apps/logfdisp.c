@@ -209,13 +209,6 @@ bool logfdisplay(void)
 
     return false;
 }
-#else /* HAVE_LCD_BITMAP */
-bool logfdisplay(void)
-
-{
-    /* TODO: implement a browser for charcell bitmaps */
-    return false;
-}
 #endif /* HAVE_LCD_BITMAP */
 
 bool logfdump(void)

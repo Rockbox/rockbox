@@ -19,7 +19,6 @@
  *
  **************************************************************************/
 #include "plugin.h"
-#include "lib/playergfx.h"
 #include "lib/pluginlib_actions.h"
 
 /* this set the context to use with PLA */
@@ -81,19 +80,9 @@ enum plugin_status plugin_start(const void* parameter) {
     int y = (DISPLAY_HEIGHT / 2) - (LOGO_HEIGHT / 2);
     int dx;
     int dy;
-#ifdef HAVE_LCD_CHARCELLS
-    int cpos = -1;
-    int old_cpos = -1;
-#endif
 
     (void)parameter;
 
-#ifdef HAVE_LCD_CHARCELLS
-    if (!pgfx_init(4, 2)) {
-        rb->splash(HZ*2, "Old LCD :(");
-        return PLUGIN_OK;
-    }
-#endif
     rb->srand(*rb->current_tick);
     dx = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
     dy = rb->rand()%(2*RAND_SCALE+1) - RAND_SCALE;
@@ -159,9 +148,6 @@ enum plugin_status plugin_start(const void* parameter) {
         switch (button) {
             case LP_QUIT:
             case LP_QUIT2:
-#ifdef HAVE_LCD_CHARCELLS
-                pgfx_release();
-#endif
                 return PLUGIN_OK;
             case LP_DEC_X:
             case LP_DEC_X_REPEAT:
@@ -184,9 +170,6 @@ enum plugin_status plugin_start(const void* parameter) {
                 
             default:
                 if (rb->default_event_handler(button) == SYS_USB_CONNECTED) {
-#ifdef HAVE_LCD_CHARCELLS
-                    pgfx_release();
-#endif
                     return PLUGIN_USB_CONNECTED;
                 }
                 break;

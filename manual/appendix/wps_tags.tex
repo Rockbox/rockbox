@@ -53,61 +53,58 @@ conditionals to show alternate information in preference to assuming.
 These tags, when written with a capital ``I'' (e.g. \config{\%Ia} or \config{\%Ic}),
 show the information for the next song to be played.
 
-\nopt{lcd_charcell}{
-  \section{Viewports}
-    \begin{tagmap}
-      \nopt{lcd_non-mono}{%
-        \config{\%V(x,y,[width],\tabnlindent[height],[font])}
-        & See section \ref{ref:Viewports}\\}
+\section{Viewports}
+  \begin{tagmap}
+    \nopt{lcd_non-mono}{%
+      \config{\%V(x,y,[width],\tabnlindent[height],[font])}
+       & See section \ref{ref:Viewports}\\}
 
-      \nopt{lcd_color}{\opt{lcd_non-mono}{%
-        \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
-        \config{\%Vf([fgshade])}\newline
-        \config{\%Vb([bgshade])}
-        & See section \ref{ref:Viewports}\\}}
+     \nopt{lcd_color}{\opt{lcd_non-mono}{%
+     \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
+      \config{\%Vf([fgshade])}\newline
+      \config{\%Vb([bgshade])}
+      & See section \ref{ref:Viewports}\\}}
 
-      \opt{lcd_color}{%
-        \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
-        \config{\%Vf([fgcolour])}\newline
-        \config{\%Vb([bgcolour])}\newline
-        \config{\%Vg(start,end \tabnlindent[,text])}
-        & See section \ref{ref:Viewports}\\}
+    \opt{lcd_color}{%
+      \config{\%V(x,y,[width],\tabnlindent[height],[font])}\newline
+      \config{\%Vf([fgcolour])}\newline
+      \config{\%Vb([bgcolour])}\newline
+      \config{\%Vg(start,end \tabnlindent[,text])}
+      & See section \ref{ref:Viewports}\\}
 
-      \opt{lcd_non-mono}{%
-        \config{\%Vs(mode[,param])}
-        & See section \ref{ref:Viewports}\\}
-
-      \config{\%Vl('identifier',\newline\dots)} & Preloads a viewport for later
+    \opt{lcd_non-mono}{%
+      \config{\%Vs(mode[,param])}
+      & See section \ref{ref:Viewports}\\}
+     \config{\%Vl('identifier',\newline\dots)} & Preloads a viewport for later
       display. `identifier' is a single lowercase letter (a-z) and the `\dots'
       parameters use the same logic as the \%V tag explained above.\\
 
-      \config{\%Vd('identifier')} & Display the `identifier' viewport. E.g.
-      \config{\%?C<\%Vd(a)|\%Vd(b)>}
-      will show viewport `a' if album art is found, and `b' if it isn't.\\
+    \config{\%Vd('identifier')} & Display the `identifier' viewport. E.g.
+    \config{\%?C<\%Vd(a)|\%Vd(b)>}
+    will show viewport `a' if album art is found, and `b' if it isn't.\\
 
-      \config{\%Vi('label',\dots)} &
-      Declare a Custom UI Viewport. The `\dots' parameters use the same logic as
-      the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\ 
+    \config{\%Vi('label',\dots)} &
+    Declare a Custom UI Viewport. The `\dots' parameters use the same logic as
+    the \config{\%V} tag explained above. See section \ref{ref:Viewports}.\\ 
 
-      \config{\%VI('label')} & Set the Info Viewport to use the viewport called
-      label, as declared with the previous tag.\\
+    \config{\%VI('label')} & Set the Info Viewport to use the viewport called
+    label, as declared with the previous tag.\\
 
-      \config{\%VB} & Draw this viewport on the backdrop layer.\\
-    \end{tagmap}
+    \config{\%VB} & Draw this viewport on the backdrop layer.\\
+  \end{tagmap}
 
-  \section{Additional Fonts}
-    \begin{tagmap}
-      \config{\%Fl('id',filename)} & See section \ref{ref:multifont}.\\
-    \end{tagmap}
+\section{Additional Fonts}
+  \begin{tagmap}
+    \config{\%Fl('id',filename)} & See section \ref{ref:multifont}.\\
+  \end{tagmap}
 
-  \section{Misc Coloring Tags}
-    \begin{tagmap}
-      \config{\%dr(x,y,width,height,[color1,color2])} & Color a rectangle. \\
-    \end{tagmap}
-      width and height can be ``$-$'' to fill the viewport. If no color is
-      specified the viewports foreground color will be used. If two
-      colors are specified it will do a gradient fill.
-}
+\section{Misc Coloring Tags}
+  \begin{tagmap}
+    \config{\%dr(x,y,width,height,[color1,color2])} & Color a rectangle. \\
+  \end{tagmap}
+    width and height can be ``$-$'' to fill the viewport. If no color is
+    specified the viewports foreground color will be used. If two
+    colors are specified it will do a gradient fill.
 
 \section{Power Related Information}
   \begin{tagmap}

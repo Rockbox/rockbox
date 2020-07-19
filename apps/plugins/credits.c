@@ -27,69 +27,6 @@ static const char* const credits[] = {
 #include "credits.raw" /* generated list of names from docs/CREDITS */
 };
 
-#ifdef HAVE_LCD_CHARCELLS
-
-static void roll_credits(void)
-{
-    int numnames = sizeof(credits)/sizeof(char*);
-    int curr_name = 0;
-    int curr_len = rb->utf8length(credits[0]);
-    int curr_index = 0;
-    int curr_line = 0;
-    int name, len, new_len, line, x;
-
-    while (1)
-    {
-        rb->lcd_clear_display();
-
-        name = curr_name;
-        x = -curr_index;
-        len = curr_len;
-        line = curr_line;
-
-        while (x < 11)
-        {
-            int x2;
-
-            if (x < 0)
-                rb->lcd_puts(0, line,
-                             credits[name] + rb->utf8seek(credits[name], -x));
-            else
-                rb->lcd_puts(x, line, credits[name]);
-
-            if (++name >= numnames)
-                break;
-
-            line ^= 1;
-
-            x2 = x + len/2;
-            if ((unsigned)x2 < 11)
-                rb->lcd_putc(x2, line, '*');
-
-            new_len = rb->utf8length(credits[name]);
-            x += MAX(len/2 + 2, len - new_len/2 + 1);
-            len = new_len;
-        }
-        rb->lcd_update();
-
-        /* abort on keypress */
-        if(rb->action_userabort(HZ/8))
-            return;
-
-        if (++curr_index >= curr_len)
-        {
-            if (++curr_name >= numnames)
-                break;
-            new_len = rb->utf8length(credits[curr_name]);
-            curr_index -= MAX(curr_len/2 + 2, curr_len - new_len/2 + 1);
-            curr_len = new_len;
-            curr_line ^= 1;
-        }
-    }
-}
-
-#else
-
 static bool stop_autoscroll(int action)
 {
     switch (action)
@@ -362,8 +299,6 @@ static void roll_credits(void)
     }
 }
 
-#endif
-
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
@@ -372,9 +307,6 @@ enum plugin_status plugin_start(const void* parameter)
     backlight_ignore_timeout();
 
     rb->show_logo();
-#ifdef HAVE_LCD_CHARCELLS
-    rb->lcd_double_height(false);
-#endif
 
     /* Show the logo for about 3 secs allowing the user to stop */
     if(!rb->action_userabort(3*HZ))

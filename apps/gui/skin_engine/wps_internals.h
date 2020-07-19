@@ -374,9 +374,6 @@ struct wps_data
     bool peak_meter_enabled;
     bool wps_sb_tag;
     bool show_sb_on_wps;
-#else /*HAVE_LCD_CHARCELLS */
-    unsigned short wps_progress_pat[8];
-    bool full_line_progressbar;
 #endif
     bool wps_loaded;
 };

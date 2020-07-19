@@ -144,9 +144,6 @@ typedef unsigned long fb_data;
 #endif
 #define FB_DATA_SZ 4
 #endif /* LCD_DEPTH */
-
-#else /* LCD_CHARCELLS */
-typedef unsigned char fb_data;
 #endif
 
 #if defined(HAVE_LCD_MODES)
@@ -225,43 +222,6 @@ extern void lcd_remote_update(void);
 extern void lcd_remote_update_rect(int x, int y, int width, int height);
 #endif /* HAVE_REMOTE_LCD */
 #endif /* HAVE_LCD_BITMAP */
-
-#ifdef HAVE_LCD_CHARCELLS
-
-/* Icon definitions for lcd_icon() */
-enum
-{
-    ICON_BATTERY = 0,
-    ICON_BATTERY_1,
-    ICON_BATTERY_2,
-    ICON_BATTERY_3,
-    ICON_USB,
-    ICON_PLAY,
-    ICON_RECORD,
-    ICON_PAUSE,
-    ICON_AUDIO,
-    ICON_REPEAT,
-    ICON_1,
-    ICON_VOLUME,
-    ICON_VOLUME_1,
-    ICON_VOLUME_2,
-    ICON_VOLUME_3,
-    ICON_VOLUME_4,
-    ICON_VOLUME_5,
-    ICON_PARAM
-};
-
-void lcd_icon(int icon, bool enable);
-void lcd_double_height(bool on);
-void lcd_define_pattern(unsigned long ucs, const char *pattern);
-unsigned long lcd_get_locked_pattern(void);
-void lcd_unlock_pattern(unsigned long ucs);
-void lcd_put_cursor(int x, int y, unsigned long cursor_ucs);
-void lcd_remove_cursor(void);
-#define JUMP_SCROLL_ALWAYS 5
-extern void lcd_jump_scroll(int mode); /* 0=off, 1=once, ..., ALWAYS */
-extern void lcd_jump_scroll_delay(int ms);
-#endif /* HAVE_LCD_CHARCELLS */
 
 /* Bitmap formats */
 enum

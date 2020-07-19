@@ -1815,14 +1815,6 @@ static void skin_data_reset(struct wps_data *wps_data)
     wps_data->peak_meter_enabled = false;
     wps_data->wps_sb_tag = false;
     wps_data->show_sb_on_wps = false;
-#else /* HAVE_LCD_CHARCELLS */
-    /* progress bars */
-    int i;
-    for (i = 0; i < 8; i++)
-    {
-        wps_data->wps_progress_pat[i] = 0;
-    }
-    wps_data->full_line_progressbar = false;
 #endif
     wps_data->wps_loaded = false;
 }

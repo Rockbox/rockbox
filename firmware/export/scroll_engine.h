@@ -95,10 +95,6 @@ struct scroll_screen_info
     long ticks; /* # of ticks between updates*/
     long delay; /* ticks delay before start */
     int bidir_limit;  /* percent */
-#ifdef HAVE_LCD_CHARCELLS
-    long jump_scroll_delay; /* delay between jump scroll jumps */
-    int jump_scroll; /* 0=off, 1=once, ..., JUMP_SCROLL_ALWAYS */
-#endif
 #if defined(HAVE_LCD_BITMAP) || defined(HAVE_REMOTE_LCD)
     int step;  /* pixels per scroll step */
 #endif

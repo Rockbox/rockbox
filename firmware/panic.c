@@ -86,11 +86,7 @@ void panicf( const char *fmt, ...)
 
     lcd_set_viewport(NULL);
 
-#ifdef HAVE_LCD_CHARCELLS
-    lcd_double_height(false);
-    lcd_puts(0, 0, "*PANIC*");
-    lcd_puts(0, 1, panic_buf);
-#elif defined(HAVE_LCD_BITMAP)
+#if defined(HAVE_LCD_BITMAP)
     int y = 1;
 
 #if LCD_DEPTH > 1

@@ -27,7 +27,7 @@
 #include "system.h"
 #include "lcd.h"
 #if defined(HAVE_TRANSFLECTIVE_LCD) && defined(HAVE_LCD_SLEEP)
-/* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
+/* in uisimulator/sdl/lcd-bitmap.c */
 extern void sim_backlight(int value);
 #endif
 

@@ -79,31 +79,3 @@ int current_playmode(void)
     
     return STATUS_STOP;
 }
-
-#if defined(HAVE_LCD_CHARCELLS)
-bool record = false;
-bool audio = false;
-bool param = false;
-bool usb = false;
-
-void status_set_record(bool b)
-{
-    record = b;
-}
-
-void status_set_audio(bool b)
-{
-    audio = b;
-}
-
-void status_set_param(bool b)
-{
-    param = b;
-}
-
-void status_set_usb(bool b)
-{
-    usb = b;
-}
-
-#endif /* HAVE_LCD_CHARCELLS */

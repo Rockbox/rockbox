@@ -180,15 +180,7 @@ static int bookmark_menu_callback(int action,
             else if (!bookmark_is_bookmarkable_state() && !bookmark_exists())
                 return ACTION_EXIT_MENUITEM;
             break;
-#ifdef HAVE_LCD_CHARCELLS
-        case ACTION_ENTER_MENUITEM:
-            status_set_param(true);
-            break;
-#endif
         case ACTION_EXIT_MENUITEM:
-#ifdef HAVE_LCD_CHARCELLS
-            status_set_param(false);
-#endif
             settings_save();
             break;
     }
