@@ -220,9 +220,12 @@ static lua_State* store_luastate(lua_State *L, bool bStore)
     return LStored;
 }
 
-static int menu_callback(int action, const struct menu_item_ex *this_item)
+static int menu_callback(int action,
+                         const struct menu_item_ex *this_item,
+                         struct gui_synclist *this_list)
 {
     (void) this_item;
+    (void) this_list;
     static int lua_ref = LUA_NOREF;
     lua_State *L = store_luastate(NULL, false);
     if(!L)
@@ -259,7 +262,7 @@ RB_WRAP(do_menu)
     {
         /*lua callback function cb(action) return action end */
         ref_lua = luaL_ref(L, LUA_REGISTRYINDEX);
-        menu_callback(ref_lua, NULL);
+        menu_callback(ref_lua, NULL, NULL);
         store_luastate(L, true);
         menu_desc.menu_callback = &menu_callback;
     }
@@ -277,7 +280,7 @@ RB_WRAP(do_menu)
     {
             store_luastate(NULL, true);
             luaL_unref (L, LUA_REGISTRYINDEX, ref_lua);
-            menu_callback(LUA_NOREF, NULL);
+            menu_callback(LUA_NOREF, NULL, NULL);
     }
 
     lua_pushinteger(L, result);

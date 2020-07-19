@@ -433,12 +433,14 @@ MENUITEM_FUNCTION(radio_delete_preset_item, MENU_FUNC_CHECK_RETVAL,
                     ID2P(LANG_FM_DELETE_PRESET), 
                     radio_delete_preset, NULL, NULL, Icon_NOICON);
 static int radio_preset_callback(int action,
-                                 const struct menu_item_ex *this_item)
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
     if (action == ACTION_STD_OK)
         action = ACTION_EXIT_AFTER_THIS_MENUITEM;
     return action;
     (void)this_item;
+    (void)this_list;
 }
 MAKE_MENU(handle_radio_preset_menu, ID2P(LANG_PRESET),
             radio_preset_callback, Icon_NOICON, &radio_edit_preset_item, 

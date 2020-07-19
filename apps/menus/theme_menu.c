@@ -182,20 +182,29 @@ static int statusbar_callback_ex(int action,const struct menu_item_ex *this_item
 }
 
 #ifdef HAVE_REMOTE_LCD
-static int statusbar_callback_remote(int action,const struct menu_item_ex *this_item)
+static int statusbar_callback_remote(int action,
+                                     const struct menu_item_ex *this_item,
+                                     struct gui_synclist *this_list)
 {
+    (void)this_list;
     return statusbar_callback_ex(action, this_item, SCREEN_REMOTE);
 }
 #endif
-static int statusbar_callback(int action,const struct menu_item_ex *this_item)
+static int statusbar_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_list;
     return statusbar_callback_ex(action, this_item, SCREEN_MAIN);
 }
 
 #ifdef HAVE_BUTTONBAR
-static int buttonbar_callback(int action, const struct menu_item_ex *this_item)
+static int buttonbar_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -369,9 +378,12 @@ MENUITEM_FUNCTION(browse_rfms, MENU_FUNC_USEPARAM,
 #endif
 
 
-static int showicons_callback(int action, const struct menu_item_ex *this_item)
+static int showicons_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     static bool old_icons;
     switch (action)
     {

@@ -31,9 +31,12 @@
 
 #if CONFIG_CODEC == SWCODEC
 /* Use this callback if your menu adjusts DSP settings. */
-int lowlatency_callback(int action, const struct menu_item_ex *this_item)
+int lowlatency_callback(int action,
+                        const struct menu_item_ex *this_item,
+                        struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM: /* on entering an item */

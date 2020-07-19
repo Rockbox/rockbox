@@ -45,9 +45,12 @@
 
 
 #if (CONFIG_CODEC == SWCODEC) && defined(HAVE_CROSSFADE)
-static int setcrossfadeonexit_callback(int action,const struct menu_item_ex *this_item)
+static int setcrossfadeonexit_callback(int action,
+                                       const struct menu_item_ex *this_item,
+                                       struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -61,7 +64,9 @@ static int setcrossfadeonexit_callback(int action,const struct menu_item_ex *thi
 
 /***********************************/
 /*    PLAYBACK MENU                */
-static int playback_callback(int action,const struct menu_item_ex *this_item);
+static int playback_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list);
 
 MENUITEM_SETTING(shuffle_item, &global_settings.playlist_shuffle, playback_callback);
 MENUITEM_SETTING(repeat_mode, &global_settings.repeat_mode, playback_callback);
@@ -73,9 +78,12 @@ MAKE_MENU(ff_rewind_settings_menu, ID2P(LANG_WIND_MENU), 0, Icon_NOICON,
           &ff_rewind_min_step, &ff_rewind_accel);
 #ifdef HAVE_DISK_STORAGE
 #if CONFIG_CODEC == SWCODEC
-static int buffermargin_callback(int action,const struct menu_item_ex *this_item)
+static int buffermargin_callback(int action,
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -115,9 +123,12 @@ MAKE_MENU(crossfade_settings_menu,ID2P(LANG_CROSSFADE),0, Icon_NOICON,
 
 /* replay gain submenu */
 
-static int replaygain_callback(int action,const struct menu_item_ex *this_item)
+static int replaygain_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -147,9 +158,12 @@ MENUITEM_SETTING(spdif_enable, &global_settings.spdif_enable, NULL);
 MENUITEM_SETTING(next_folder, &global_settings.next_folder, NULL);
 MENUITEM_SETTING(constrain_next_folder,
                  &global_settings.constrain_next_folder, NULL);
-static int audioscrobbler_callback(int action,const struct menu_item_ex *this_item)
+static int audioscrobbler_callback(int action,
+                                   const struct menu_item_ex *this_item,
+                                   struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -165,9 +179,12 @@ static int audioscrobbler_callback(int action,const struct menu_item_ex *this_it
 MENUITEM_SETTING(audioscrobbler, &global_settings.audioscrobbler, audioscrobbler_callback);
 
 
-static int cuesheet_callback(int action,const struct menu_item_ex *this_item)
+static int cuesheet_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -236,8 +253,11 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #endif
          );
 
-static int playback_callback(int action,const struct menu_item_ex *this_item)
+static int playback_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_list;
     static bool old_shuffle = false;
     static int old_repeat = 0;
     switch (action)

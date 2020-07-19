@@ -311,8 +311,11 @@ static void sys_reset_settings(struct System* sys)
 
 static struct System* mainmenu_sysptr;
 
-static int mainmenu_cb(int action, const struct menu_item_ex *this_item)
+static int mainmenu_cb(int action,
+                       const struct menu_item_ex *this_item,
+                       struct gui_synclist *this_list)
 {
+    (void)this_list;
     int idx = ((intptr_t)this_item);
     if(action == ACTION_REQUEST_MENUITEM && !mainmenu_sysptr->loaded && (idx == 0 || idx == 8 || idx == 10))
         return ACTION_EXIT_MENUITEM;

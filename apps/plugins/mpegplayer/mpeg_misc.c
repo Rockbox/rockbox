@@ -183,8 +183,11 @@ long mpeg_sysevent(void)
     return mpeg_sysevent_id;
 }
 
-int mpeg_sysevent_callback(int btn, const struct menu_item_ex *menu)
+int mpeg_sysevent_callback(int btn,
+                           const struct menu_item_ex *menu,
+                           struct gui_synclist *this_list)
 {
+    (void) this_list;
     switch (btn)
     {
     case SYS_USB_CONNECTED:
@@ -218,6 +221,6 @@ int mpeg_button_get(int timeout)
     /* Produce keyclick */
     rb->keyclick_click(true, button);
 
-    return mpeg_sysevent_callback(button, NULL);
+    return mpeg_sysevent_callback(button, NULL, NULL);
 }
 

@@ -645,8 +645,11 @@ static bool tidy_types_selected(void)
     return false;
 }
 
-static int disktidy_menu_cb(int action, const struct menu_item_ex *this_item)
+static int disktidy_menu_cb(int action,
+                            const struct menu_item_ex *this_item,
+                            struct gui_synclist *this_list)
 {
+    (void)this_list;
     int item = ((intptr_t)this_item);
 
     if (action == ACTION_REQUEST_MENUITEM &&

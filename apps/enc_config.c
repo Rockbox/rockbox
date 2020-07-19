@@ -40,9 +40,11 @@
     if (fn) fn(__VA_ARGS__)
 
 static int enc_menuitem_callback(int action,
-                                  const struct menu_item_ex *this_item);
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list);
 static int enc_menuitem_enteritem(int action,
-                                  const struct menu_item_ex *this_item);
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list);
 static void enc_rec_settings_changed(struct encoder_config *cfg);
 /* this is used by all encoder menu items,
    MUST be initialised before the call to do_menu() */
@@ -262,9 +264,11 @@ static inline bool rec_format_ok(int rec_format)
 /* This is called before entering the menu with the encoder settings
    Its needed to make sure the settings can take effect. */
 static int enc_menuitem_enteritem(int action,
-                                  const struct menu_item_ex *this_item)
+                                  const struct menu_item_ex *this_item,
+                                  struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     /* this struct must be init'ed before calling do_menu() so this is safe */
     struct menucallback_data *data = &menu_callback_data;
     if (action == ACTION_STD_OK) /* entering the item */
@@ -277,8 +281,10 @@ static int enc_menuitem_enteritem(int action,
 /* this is called when a encoder setting is exited
    It is used to update the status bar and save the setting */
 static int enc_menuitem_callback(int action,
-                                  const struct menu_item_ex *this_item)
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
+    (void)this_list;
     struct menucallback_data *data = 
             (struct menucallback_data*)this_item->function->param;
     

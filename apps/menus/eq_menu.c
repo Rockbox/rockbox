@@ -81,16 +81,19 @@ static void eq_apply(void)
     }
 }
 
-static int eq_setting_callback(int action, const struct menu_item_ex *this_item)
+static int eq_setting_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list)
 {
+    (void)this_list;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
-            action = lowlatency_callback(action, this_item);
+            action = lowlatency_callback(action, this_item, NULL);
             break;
         case ACTION_EXIT_MENUITEM:
             eq_apply();
-            action = lowlatency_callback(action, this_item);
+            action = lowlatency_callback(action, this_item, NULL);
             break;
     }
 

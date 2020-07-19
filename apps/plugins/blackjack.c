@@ -1418,8 +1418,11 @@ static bool blackjack_help(void) {
     return false;
 }
 
-static int blackjack_menu_cb(int action, const struct menu_item_ex *this_item)
+static int blackjack_menu_cb(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_list;
     int i = ((intptr_t)this_item);
     if(action == ACTION_REQUEST_MENUITEM
        && !resume && (i==0 || i==5))

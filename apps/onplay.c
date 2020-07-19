@@ -143,7 +143,8 @@ static bool clipboard_clip(struct clipboard *clip, const char *path,
 /* ----------------------------------------------------------------------- */
 
 static int bookmark_menu_callback(int action,
-                                  const struct menu_item_ex *this_item);
+                                  const struct menu_item_ex *this_item,
+                                  struct gui_synclist *this_list);
 MENUITEM_FUNCTION(bookmark_create_menu_item, 0,
                   ID2P(LANG_BOOKMARK_MENU_CREATE),
                   bookmark_create_menu, NULL,
@@ -156,8 +157,10 @@ MAKE_ONPLAYMENU(bookmark_menu, ID2P(LANG_BOOKMARK_MENU),
                 bookmark_menu_callback, Icon_Bookmark,
                 &bookmark_create_menu_item, &bookmark_load_menu_item);
 static int bookmark_menu_callback(int action,
-                                  const struct menu_item_ex *this_item)
+                                  const struct menu_item_ex *this_item,
+                                  struct gui_synclist *this_list)
 {
+    (void) this_list;
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
@@ -574,9 +577,11 @@ static int playlist_queue_func(void *param)
 }
 
 static int treeplaylist_wplayback_callback(int action,
-                                        const struct menu_item_ex* this_item)
+                                        const struct menu_item_ex* this_item,
+                                        struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
@@ -590,7 +595,8 @@ static int treeplaylist_wplayback_callback(int action,
 }
 
 static int treeplaylist_callback(int action,
-                                 const struct menu_item_ex *this_item);
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list);
 
 /* insert items */
 MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
@@ -656,8 +662,10 @@ MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  &replace_pl_item
                );
 static int treeplaylist_callback(int action,
-                                 const struct menu_item_ex *this_item)
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
+    (void)this_list;
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
@@ -727,7 +735,10 @@ static bool cat_add_to_a_new_playlist(void)
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
                                      true, NULL);
 }
-static int clipboard_callback(int action,const struct menu_item_ex *this_item);
+static int clipboard_callback(int action,
+                              const struct menu_item_ex *this_item,
+                              struct gui_synclist *this_list);
+
 static bool set_catalogdir(void)
 {
     catalog_set_directory(selected_file);
@@ -738,7 +749,9 @@ MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_SET_AS_PLAYLISTCAT_DIR),
                   set_catalogdir, NULL, clipboard_callback, Icon_Playlist);
 
 static int cat_playlist_callback(int action,
-                                 const struct menu_item_ex *this_item);
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list);
+
 MENUITEM_FUNCTION(cat_add_to_list, 0, ID2P(LANG_CATALOG_ADD_TO),
                   cat_add_to_a_playlist, 0, NULL, Icon_Playlist);
 MENUITEM_FUNCTION(cat_add_to_new, 0, ID2P(LANG_CATALOG_ADD_TO_NEW),
@@ -755,9 +768,11 @@ void onplay_show_playlist_cat_menu(char* track_name)
 }
 
 static int cat_playlist_callback(int action,
-                                 const struct menu_item_ex *this_item)
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     if (!selected_file ||
         (((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
          ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) &&
@@ -1394,9 +1409,12 @@ static int set_rating_inline(void)
         splash(HZ*2, ID2P(LANG_ID3_NO_INFO));
     return 0;
 }
-static int ratingitem_callback(int action,const struct menu_item_ex *this_item)
+static int ratingitem_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
@@ -1426,9 +1444,11 @@ static bool view_cue(void)
     return false;
 }
 static int view_cue_item_callback(int action,
-                                  const struct menu_item_ex *this_item)
+                                  const struct menu_item_ex *this_item,
+                                  struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     struct mp3entry* id3 = audio_current_track();
     switch (action)
     {
@@ -1460,7 +1480,10 @@ MENUITEM_FUNCTION(pitch_screen_item, 0, ID2P(LANG_PITCH),
 #endif
 
 /* CONTEXT_[TREE|ID3DB] items */
-static int clipboard_callback(int action,const struct menu_item_ex *this_item);
+static int clipboard_callback(int action,
+                              const struct menu_item_ex *this_item,
+                              struct gui_synclist *this_list);
+
 MENUITEM_FUNCTION(rename_file_item, 0, ID2P(LANG_RENAME),
                   rename_file, NULL, clipboard_callback, Icon_NOICON);
 MENUITEM_FUNCTION(clipboard_cut_item, 0, ID2P(LANG_CUT),
@@ -1542,8 +1565,11 @@ static bool set_startdir(void)
 MENUITEM_FUNCTION(set_startdir_item, 0, ID2P(LANG_SET_AS_START_DIR),
                   set_startdir, NULL, clipboard_callback, Icon_file_view_menu);
 
-static int clipboard_callback(int action,const struct menu_item_ex *this_item)
+static int clipboard_callback(int action,
+                              const struct menu_item_ex *this_item,
+                              struct gui_synclist *this_list)
 {
+    (void)this_list;
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
@@ -1625,7 +1651,10 @@ static int clipboard_callback(int action,const struct menu_item_ex *this_item)
     return action;
 }
 
-static int onplaymenu_callback(int action,const struct menu_item_ex *this_item);
+static int onplaymenu_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list);
+
 /* used when onplay() is called in the CONTEXT_WPS context */
 MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            onplaymenu_callback, Icon_Audio,
@@ -1659,8 +1688,11 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #endif
            &set_startdir_item, &add_to_faves_item, &file_menu,
          );
-static int onplaymenu_callback(int action,const struct menu_item_ex *this_item)
+static int onplaymenu_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list)
 {
+    (void)this_list;
     switch (action)
     {
         case ACTION_TREE_STOP:

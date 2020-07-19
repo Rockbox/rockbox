@@ -38,9 +38,12 @@
 #include "option_select.h"
 #include "misc.h"
 
-static int volume_limit_callback(int action,const struct menu_item_ex *this_item)
+static int volume_limit_callback(int action,
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
 
     static struct int_setting volume_limit_int_setting;
     volume_limit_int_setting.option_callback = NULL;
@@ -147,8 +150,11 @@ MENUITEM_SETTING(func_mode, &global_settings.func_mode, NULL);
               &crossfeed_hf_attenuation, &crossfeed_hf_cutoff);
 
 #ifdef HAVE_PITCHCONTROL
-static int timestretch_callback(int action,const struct menu_item_ex *this_item)
+static int timestretch_callback(int action,
+                                const struct menu_item_ex *this_item,
+                                struct gui_synclist *this_list)
 {
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -156,7 +162,7 @@ static int timestretch_callback(int action,const struct menu_item_ex *this_item)
                 splash(HZ*2, ID2P(LANG_PLEASE_REBOOT));
             break;
     }
-    lowlatency_callback(action, this_item);
+    lowlatency_callback(action, this_item, NULL);
     return action;
 }
     MENUITEM_SETTING(timestretch_enabled,

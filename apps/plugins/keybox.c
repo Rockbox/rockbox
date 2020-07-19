@@ -104,9 +104,13 @@ static void do_decrypt(uint32_t* v, uint32_t* k)
     v[0]=v0; v[1]=v1;
 }
 
-static int context_item_cb(int action, const struct menu_item_ex *this_item)
+static int context_item_cb(int action,
+                           const struct menu_item_ex *this_item,
+                           struct gui_synclist *this_list)
 {
     int i = (intptr_t)this_item;
+    (void)this_list;
+
     if (action == ACTION_REQUEST_MENUITEM
         && pw_list.num_entries == 0
         && (i != 0 && i != 5))
