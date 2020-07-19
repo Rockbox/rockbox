@@ -1059,6 +1059,7 @@ Win(6)4 crosscompile, (T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
     for thislang in `echo $voicelanguage | sed 's/,/ /g'`; do
       voiceconfig "$thislang"
     done
+    advopts="$advopts --tts=$TTS_ENGINE --ttsopts=\"$TTS_OPTS\""
   fi
   if [ "yes" = "$use_debug" ]; then
     debug="-DDEBUG"
@@ -1098,7 +1099,6 @@ voiceconfig () {
         FLITE_OPTS=""
         DEFAULT_TTS="flite"
         DEFAULT_TTS_OPTS=$FLITE_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="l"
     fi
     if [ -n "`findtool espeak`" ]; then
@@ -1106,7 +1106,6 @@ voiceconfig () {
         ESPEAK_OPTS=""
         DEFAULT_TTS="espeak"
         DEFAULT_TTS_OPTS=$ESPEAK_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
     if [ -n "`findtool espeak-ng`" ]; then
@@ -1114,7 +1113,6 @@ voiceconfig () {
         ESPEAK_OPTS=""
         DEFAULT_TTS="espeak-ng"
         DEFAULT_TTS_OPTS=$ESPEAK_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
     if [ -n "`findtool festival`" ]; then
@@ -1122,7 +1120,6 @@ voiceconfig () {
         FESTIVAL_OPTS=""
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="f"
     fi
     if [ -n "`findtool mimic`" ]; then
@@ -1130,7 +1127,6 @@ voiceconfig () {
         MIMIC_OPTS=""
         DEFAULT_TTS="mimic"
         DEFAULT_TTS_OPTS=$MIMIC_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="M"
     fi
     if [ -n "`findtool swift`" ]; then
@@ -1138,7 +1134,6 @@ voiceconfig () {
         SWIFT_OPTS=""
         DEFAULT_TTS="swift"
         DEFAULT_TTS_OPTS=$SWIFT_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="w"
     fi
     # Allow SAPI if Windows is in use
@@ -1147,7 +1142,6 @@ voiceconfig () {
         SAPI_OPTS=""
         DEFAULT_TTS="sapi"
         DEFAULT_TTS_OPTS=$SAPI_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="S"
     fi
     if [ -n "`findtool gtts-cli`" ]; then
@@ -1155,7 +1149,6 @@ voiceconfig () {
         GTTS_OPTS=""
         DEFAULT_TTS="gtts"
         DEFAULT_TTS_OPTS=$GTTS_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="g"
     fi
     if [ -n "`findtool rbspeak`" ]; then
@@ -1163,7 +1156,6 @@ voiceconfig () {
         RBSPEAK_OPTS=""
         DEFAULT_TTS="rbspeak"
         DEFAULT_TTS_OPTS=$RBSPEAK_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="O"
     fi
 
@@ -1178,58 +1170,48 @@ voiceconfig () {
         echo "TTS engine to use: ${FLITE}${FESTIVAL}${ESPEAK}${MIMIC}${SAPI}${SWIFT}${GTTS}${RBSPEAK}(${DEFAULT_CHOICE})?"
         option=`input`
         if [ -z "$option" ]; then option=${DEFAULT_CHOICE}; fi
-        advopts="$advopts --tts=$option"
     fi
     case "$option" in
         [Ll]|flite)
-        TTS_ENGINE="flite"
-        NOISEFLOOR="500" # TODO: check this value
-        TTS_OPTS=$FLITE_OPTS
+        TTS_ENGINEX="flite"
+        TTS_OPTSX=$FLITE_OPTS
         ;;
-        [Ee]|espeak)
-        TTS_ENGINE="espeak"
-        NOISEFLOOR="500"
-        TTS_OPTS=$ESPEAK_OPTS
+        [Ee]|espeak|espeak-ng)
+        TTS_ENGINEX="espeak"
+        TTS_OPTSX=$ESPEAK_OPTS
         ;;
         [Ff]|festival)
-        TTS_ENGINE="festival"
-        NOISEFLOOR="500"
-        TTS_OPTS=$FESTIVAL_OPTS
+        TTS_ENGINEX="festival"
+        TTS_OPTSX=$FESTIVAL_OPTS
         ;;
         [Mm]|mimic)
-        TTS_ENGINE="mimic"
-        NOISEFLOOR="500"
-        TTS_OPTS=$MIMIC_OPTS
+        TTS_ENGINEX="mimic"
+        TTS_OPTSX=$MIMIC_OPTS
         ;;
         [Ss]|sapi)
-        TTS_ENGINE="sapi"
-        NOISEFLOOR="500"
-        TTS_OPTS=$SAPI_OPTS
+        TTS_ENGINEX="sapi"
+        TTS_OPTSX=$SAPI_OPTS
         ;;
 	[Ww]|swift)
-        TTS_ENGINE="swift"
-        NOISEFLOOR="500"
-        TTS_OPTS=$SWIFT_OPTS
+        TTS_ENGINEX="swift"
+        TTS_OPTSX=$SWIFT_OPTS
 	;;
 	[Gg]|gtts)
-        TTS_ENGINE="gtts"
-        NOISEFLOOR="500"
-        TTS_OPTS=$GTTS_OPTS
+        TTS_ENGINEX="gtts"
+        TTS_OPTSX=$GTTS_OPTS
 	;;
 	[Oo]|rbspeak)
-        TTS_ENGINE="rbspeak"
-        NOISEFLOOR="500"
-        TTS_OPTS=$RBSPEAK_OPTS
+        TTS_ENGINEX="rbspeak"
+        TTS_OPTSX=$RBSPEAK_OPTS
 	;;
         *)
-        TTS_ENGINE=$DEFAULT_TTS
-        TTS_OPTS=$DEFAULT_TTS_OPTS
-        NOISEFLOOR=$DEFAULT_NOISEFLOOR
+        TTS_ENGINEX=$DEFAULT_TTS
+        TTS_OPTSX=$DEFAULT_TTS_OPTS
     esac
-    echo "Using $TTS_ENGINE for TTS"
+    echo "Using $TTS_ENGINEX for TTS"
 
     # Select which voice to use for Festival
-    if [ "$TTS_ENGINE" = "festival" ]; then
+    if [ "$TTS_ENGINEX" = "festival" ]; then
         voicelist=`echo "(voice.list)"|festival -i 2>/dev/null |tr "\n" " "|sed -e 's/.*festival> (\(.*\)) festival>/\1/'|sort`
         for voice in $voicelist; do
             TTS_FESTIVAL_VOICE="$voice" # Default choice
@@ -1256,7 +1238,7 @@ voiceconfig () {
         advopts="$advopts --voice=$CHOICE"
         echo "Festival voice set to $TTS_FESTIVAL_VOICE"
         echo "(voice_$TTS_FESTIVAL_VOICE)" > festival-prolog.scm
-    elif [ "$TTS_ENGINE" = "mimic" ]; then
+    elif [ "$TTS_ENGINEX" = "mimic" ]; then
 	voicelist=`mimic -lv | cut -d':' -f2`
         for voice in $voicelist; do
             TTS_MIMIC_VOICE="$voice" # Default choice
@@ -1282,17 +1264,17 @@ voiceconfig () {
         done
         advopts="$advopts --voice=$CHOICE"
         echo "Mimic voice set to $TTS_MIMIC_VOICE"
-	TTS_OPTS="$TTS_OPTS -voice $TTS_MIMIC_VOICE"
-    elif [ "$TTS_ENGINE" = "espeak" ] ; then
+	TTS_OPTSX="$TTS_OPTSX -voice $TTS_MIMIC_VOICE"
+    elif [ "$TTS_ENGINEX" = "espeak" ] ; then
 	if [ -n "`findtool espeak-ng`" ] ; then
-	    TTS_ENGINE="espeak-ng"
+	    TTS_ENGINEX="espeak-ng"
 	fi
     fi
 
     # Read custom tts options from command line
     if [ "$ARG_TTSOPTS" ]; then
-        TTS_OPTS="$ARG_TTSOPTS"
-        echo "$TTS_ENGINE options set to $TTS_OPTS"
+        TTS_OPTSX="$ARG_TTSOPTS"
+        echo "$TTS_ENGINEX options set to $TTS_OPTSX"
     fi
 
     if [ "$swcodec" = "yes" ]; then
@@ -1321,6 +1303,17 @@ voiceconfig () {
     if [ -n "`findtool cygpath`" ]; then
         TEMPDIR=`cygpath . -a -w`
     fi
+
+#    if [ -n "$TTS_OPTS" ] ; then
+#	$TTS_OPTS="$TTS_OPTS,"
+#    fi
+#    TTS_OPTS="$TTS_OPTS$TTS_OPTSX"
+    TTS_OPTS="$TTS_OPTSX"
+
+    if [ -n "$TTS_ENGINE" ] ; then
+	TTS_ENGINE="$TTS_ENGINE,"
+    fi
+    TTS_ENGINE="$TTS_ENGINE$TTS_ENGINEX"
 }
 
 picklang() {
@@ -1334,8 +1327,7 @@ picklang() {
         pick=$ARG_LANG
     else
         echo "Select a number for the language to use (default is english)"
-        # FIXME The multiple-language feature is currently broken
-        # echo "You may enter a comma-separated list of languages to build"
+        echo "You may enter a comma-separated list of languages to build"
 
         num=1
         for one in $langs; do
@@ -5012,7 +5004,9 @@ fi
 cmdline=`echo $cmdline | sed -e s,--target=[a-zA-Z_0-9]\*,,g \
                             -e s,--ram=[0-9]\*,,g \
                             -e s,--rbdir=[./a-zA-Z0-9]\*,,g \
-                            -e s,--type=[a-zA-Z]\*,,g`
+                            -e s,--type=[a-zA-Z]\*,,g \
+                            -e s,--tts=[a-z,-]\*,,g \
+                            -e s,--ttsopts=\"[a-zA-Z0-9::space::,-]\*\",,g`
 cmdline="$cmdline --target=\$(MODELNAME) --ram=\$(MEMORYSIZE) --rbdir=\$(RBDIR) --type=$btype$advopts"
 
 ### end of cmdline
