@@ -160,12 +160,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         yn[i].result_message[YESNO_NO]=no_message;
         yn[i].display=&screens[i];
         yn[i].vp = &vp[i];
-#ifdef HAVE_LCD_CHARCELLS 
-        /* Quick fix. Viewports should really be enabled proper for charcell */
-        viewport_set_defaults(yn[i].vp, i);
-#else
         viewportmanager_theme_enable(i, true, yn[i].vp);
-#endif
         screens[i].scroll_stop();
         gui_yesno_draw(&(yn[i]));
     }
