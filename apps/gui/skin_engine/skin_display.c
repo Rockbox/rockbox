@@ -662,7 +662,6 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
  */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
 {
-    (void)skin; /* silence charcell warning */
     int button = ACTION_NONE;
 #ifdef HAVE_LCD_BITMAP
     /* when the peak meter is enabled we want to have a
