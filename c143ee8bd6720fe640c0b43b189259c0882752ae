@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a5552453_fc813c2a",
+        "filename": "apps/plugin.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 669,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-19T19:03:11Z",
+      "side": 1,
+      "message": "This is only used by the imageviewer plugin, and IMO the underlying reason is rather pointless.  I the #ifdef to match the flags the imageviewer uses.",
+      "range": {
+        "startLine": 669,
+        "startChar": 4,
+        "endLine": 669,
+        "endChar": 33
+      },
+      "revId": "c143ee8bd6720fe640c0b43b189259c0882752ae",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
