@@ -25,7 +25,6 @@
 #include "lib/helper.h"
 #include "lib/highscore.h"
 #include "lib/playback_control.h"
-#include "lib/playergfx.h"
 #include "lib/mylcd.h"
 
 
@@ -770,17 +769,8 @@
 
 extern const fb_data rockblox_background[];
 
-#else /* HAVE_LCD_CHARCELLS */
-
-#define BOARD_HEIGHT 14
-
-#define BLOCK_WIDTH  1
-#define BLOCK_HEIGHT 1
-#define BOARD_X      5
-#define BOARD_Y      0
-#define PREVIEW_X    15
-#define PREVIEW_Y    1
-
+#else
+#error "lcd screen size not defined!"
 #endif
 
 #ifndef HIGHSCORE_SPACE
@@ -992,10 +982,6 @@ static void show_details (void)
     rb->lcd_putsxyf (LABEL_X, SCORE_Y, "%d", rockblox_status.score);
     rb->lcd_putsxyf (LEVEL_X, LEVEL_Y, "%d", rockblox_status.level);
     rb->lcd_putsxyf (LINES_X, LINES_Y, "%d", rockblox_status.lines);
-#else  /* HAVE_LCD_CHARCELLS */
-    rb->lcd_putsf (5, 0, "L%d/%d", rockblox_status.level,
-                   rockblox_status.lines);
-    rb->lcd_putsf (5, 1, "S%d", rockblox_status.score);
 #endif
 }
 
@@ -1066,15 +1052,6 @@ static void init_rockblox (bool resume)
 
 #ifdef HAVE_LCD_BITMAP
     rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
-#else  /* HAVE_LCD_CHARCELLS */
-    pgfx_display (0, 0);
-    pgfx_display_block (3, 0, 3, 1);
-    pgfx_display_block (4, 0, 3, 0);
-    rb->lcd_puts(4, 1, " ");
-    pgfx_clear_display();
-    pgfx_fillrect (3, 0, 2, 14);
-    pgfx_fillrect (15, 7, 2, 7);
-    pgfx_update();
 #endif
     if (!resume)
     {
@@ -1200,8 +1177,6 @@ static void refresh_board (void)
                 rb->lcd_hline (BOARD_X + i * BLOCK_WIDTH + 1,
                                BOARD_X + (i + 1) * BLOCK_WIDTH - 1,
                                BOARD_Y + (j + 1) * BLOCK_HEIGHT - 1);
-#else  /* HAVE_LCD_CHARCELLS */
-                pgfx_drawpixel (BOARD_X + i, BOARD_Y + j);
 #endif
             }
         }
@@ -1246,8 +1221,6 @@ static void refresh_board (void)
         rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
-#else /* HAVE_LCD_CHARCELLS */
-        pgfx_drawpixel (BOARD_X + x, BOARD_Y + y);
 #endif
     }
 
@@ -1285,8 +1258,6 @@ static void refresh_board (void)
         rb->lcd_hline (BOARD_X + x * BLOCK_WIDTH + 1,
                        BOARD_X + (x + 1) * BLOCK_WIDTH - 1,
                        BOARD_Y + (y + 1) * BLOCK_HEIGHT - 1);
-#else /* HAVE_LCD_CHARCELLS */
-        pgfx_drawpixel (BOARD_X + x, BOARD_Y + y);
 #endif
     }
 
@@ -1355,8 +1326,6 @@ static void draw_next_block (void)
         rb->lcd_hline (PREVIEW_X + rx * BLOCK_WIDTH + 1,
                        PREVIEW_X + (rx + 1) * BLOCK_WIDTH - 1,
                        PREVIEW_Y + (ry + 1) * BLOCK_HEIGHT - 1);
-#else /* HAVE_LCD_CHARCELLS */
-        pgfx_drawpixel (PREVIEW_X + rx, PREVIEW_Y + ry);
 #endif
     }
 
@@ -1787,9 +1756,6 @@ enum plugin_status plugin_start (const void *parameter)
         }
     }
 
-#ifndef HAVE_LCD_BITMAP
-    pgfx_release();
-#endif
     /* Save user's HighScore */
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
     backlight_use_settings();
