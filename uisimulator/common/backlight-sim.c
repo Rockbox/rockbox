@@ -27,7 +27,7 @@
 #ifdef HAVE_LCD_SLEEP
 extern void lcd_awake(void);
 #endif
-/* in uisimulator/sdl/lcd-bitmap.c and lcd-charcell.c */
+/* in uisimulator/sdl/lcd-bitmap.c */
 extern void sim_backlight(int value);
 
 bool backlight_hw_init(void)

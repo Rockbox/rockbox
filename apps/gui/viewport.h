@@ -69,10 +69,6 @@ bool viewport_point_within_vp(const struct viewport *vp,
                                const int x, const int y);
 #endif
 
-#else /* HAVE_LCD_CHARCELL */
-#define viewportmanager_theme_changed(a)
-#define viewportmanager_theme_enable(...)
-#define viewportmanager_theme_undo(...)
 #endif
 
 #endif /* __PCTOOL__ */

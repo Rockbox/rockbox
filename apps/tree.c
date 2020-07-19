@@ -299,10 +299,6 @@ void tree_gui_init(void)
 
     strcpy(tc.currdir, "/");
 
-#ifdef HAVE_LCD_CHARCELLS
-    FOR_NB_SCREENS(i)
-        screens[i].double_height(false);
-#endif
     gui_synclist_init(&tree_lists, &tree_get_filename, &tc, false, 1, NULL);
     gui_synclist_set_voice_callback(&tree_lists, tree_voice_cb);
     gui_synclist_set_icon_callback(&tree_lists,
@@ -710,14 +706,12 @@ static int dirbrowse(void)
                 if ((*tc.dirfilter == SHOW_ID3DB && tc.dirlevel == 0) ||
                     ((*tc.dirfilter != SHOW_ID3DB && !strcmp(currdir,"/"))))
                 {
-#ifdef HAVE_LCD_BITMAP /* charcell doesnt have ACTION_TREE_PGLEFT so this isnt needed */
                     if (oldbutton == ACTION_TREE_PGLEFT)
                         break;
                     else
-#endif
                         return GO_TO_ROOT;
                 }
-                
+
 #ifdef HAVE_TAGCACHE
                 if (id3db)
                     tagtree_exit(&tc);

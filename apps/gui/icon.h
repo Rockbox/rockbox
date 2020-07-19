@@ -89,10 +89,6 @@ extern void screen_put_cursorxy(struct screen * screen, int x, int y, bool on);
  */
 extern void screen_put_iconxy(struct screen * screen,
                               int x, int y, enum themable_icons icon);
-#ifdef HAVE_LCD_CHARCELLS
-# define screen_put_icon(s, x, y, i) screen_put_iconxy(s, x, y, i)
-# define screen_put_icon_with_offset(s, x, y, w, h, i) screen_put_icon(s, x, y, i)
-#else
 /* For both of these, the icon will be placed in the center of the rectangle */
 /* as above, but x,y are letter position, NOT PIXEL */
 extern void screen_put_icon(struct screen * screen,
@@ -101,23 +97,14 @@ extern void screen_put_icon(struct screen * screen,
 extern void screen_put_icon_with_offset(struct screen * display, 
                        int x, int y, int off_x, int off_y,
                        enum themable_icons icon);
-#endif
-
 void icons_init(void);
 
 
-#ifdef HAVE_LCD_CHARCELLS
-# define CURSOR_CHAR 0xe10c
-# define get_icon_width(a) 1
-# define get_icon_height(a) 1 /* needs to be verified */
-#else
 int get_icon_width(enum screen_type screen_type);
 int get_icon_height(enum screen_type screen_type);
 int get_icon_format(enum screen_type screen_type);
-#endif
 
-#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1) \
-    && !defined(HAVE_LCD_CHARCELLS)
+#if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
 int get_icon_format(enum screen_type screen_type);
 #else
 # define get_icon_format(a) FORMAT_MONO
