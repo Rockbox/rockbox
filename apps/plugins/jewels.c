@@ -1471,8 +1471,11 @@ static bool jewels_help(void)
 }
 
 static bool _ingame;
-static int jewels_menu_cb(int action, const struct menu_item_ex *this_item)
+static int jewels_menu_cb(int action,
+                          const struct menu_item_ex *this_item,
+                          struct gui_synclist *this_list)
 {
+    (void)this_list;
     int i = ((intptr_t)this_item);
     if(action == ACTION_REQUEST_MENUITEM
        && !_ingame && (i==0 || i==6))

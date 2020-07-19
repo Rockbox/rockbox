@@ -93,9 +93,12 @@ MENUITEM_FUNCTION(alarm_screen_call, 0, ID2P(LANG_ALARM_MOD_ALARM_MENU),
 /* This need only be shown if we dont have recording, because if we do
    then always show the setting item, because there will always be at least
    2 items */
-static int alarm_callback(int action,const struct menu_item_ex *this_item)
+static int alarm_callback(int action,
+                          const struct menu_item_ex *this_item,
+                          struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_REQUEST_MENUITEM:
@@ -204,9 +207,11 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
 static struct viewport clock_vps[NB_SCREENS], menu[NB_SCREENS];
 static bool menu_was_pressed;
 static int time_menu_callback(int action,
-                       const struct menu_item_ex *this_item)
+                              const struct menu_item_ex *this_item,
+                              struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     static int last_redraw = 0;
     bool redraw = false;
 

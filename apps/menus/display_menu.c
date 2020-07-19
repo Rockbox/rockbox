@@ -50,10 +50,12 @@
 #include "rbunicode.h"
 
 #ifdef HAVE_BACKLIGHT
-static int selectivebacklight_callback(int action,const struct menu_item_ex *this_item)
+static int selectivebacklight_callback(int action,
+                                       const struct menu_item_ex *this_item,
+                                       struct gui_synclist *this_list)
 {
     (void)this_item;
-
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -69,10 +71,11 @@ static int selectivebacklight_callback(int action,const struct menu_item_ex *thi
     return action;
 }
 
-static int filterfirstkeypress_callback(int action,const struct menu_item_ex *this_item)
+static int filterfirstkeypress_callback(int action,
+                                        const struct menu_item_ex *this_item,
+                                        struct gui_synclist *this_list)
 {
     /*(void)this_item;REMOVED*/
-
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -81,7 +84,7 @@ static int filterfirstkeypress_callback(int action,const struct menu_item_ex *th
             set_remote_backlight_filter_keypress(
                                 global_settings.remote_bl_filter_first_keypress);
 #endif /* HAVE_REMOTE_LCD */
-            selectivebacklight_callback(action,this_item);/*uses Filter First KP*/
+            selectivebacklight_callback(action,this_item, this_list);/*uses Filter First KP*/
             break;
     }
 
@@ -118,9 +121,12 @@ static int selectivebacklight_set_mask(void* param)
 
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_FLIP
-static int flipdisplay_callback(int action,const struct menu_item_ex *this_item)
+static int flipdisplay_callback(int action,
+                                const struct menu_item_ex *this_item
+                                struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -265,9 +271,12 @@ MENUITEM_SETTING(remote_flip_display,
 #endif
 
 #ifdef HAVE_REMOTE_LCD_TICKING
-static int ticking_callback(int action,const struct menu_item_ex *this_item)
+static int ticking_callback(int action,
+                            const struct menu_item_ex *this_item
+                            struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -334,9 +343,12 @@ MENUITEM_SETTING(list_accel_start_delay,
 MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
 #endif /* HAVE_WHEEL_ACCELERATION */
 #ifdef HAVE_LCD_BITMAP
-static int screenscroll_callback(int action,const struct menu_item_ex *this_item)
+static int screenscroll_callback(int action,
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -375,9 +387,12 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
 /*    PEAK METER MENU              */
 
 #ifdef HAVE_LCD_BITMAP
-static int peakmeter_callback(int action,const struct menu_item_ex *this_item)
+static int peakmeter_callback(int action,
+                              const struct menu_item_ex *this_item,
+                              struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
@@ -561,9 +576,12 @@ MAKE_MENU(peak_meter_menu, ID2P(LANG_PM_MENU), NULL, Icon_NOICON,
 
 
 #ifdef HAVE_TOUCHSCREEN
-static int touch_mode_callback(int action,const struct menu_item_ex *this_item)
+static int touch_mode_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -573,10 +591,12 @@ static int touch_mode_callback(int action,const struct menu_item_ex *this_item)
     return action;
 }
 
-static int line_padding_callback(int action,const struct menu_item_ex *this_item)
+static int line_padding_callback(int action,
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list);
 {
     (void)this_item;
-
+    (void)this_list;
     if (action == ACTION_EXIT_MENUITEM)
         viewportmanager_theme_changed(THEME_LISTS);
     return action;
@@ -594,11 +614,14 @@ MAKE_MENU(touchscreen_menu, ID2P(LANG_TOUCHSCREEN_SETTINGS), NULL, Icon_NOICON, 
             &touchscreen_menu_calibrate, &touchscreen_menu_reset_calibration);
 #endif
 
-static int codepage_callback(int action, const struct menu_item_ex *this_item)
+static int codepage_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_item;
+    (void)this_list;
     static int old_codepage;
     int new_codepage = global_settings.default_codepage;
-    (void)this_item;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:

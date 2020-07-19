@@ -59,9 +59,11 @@
 
 #ifndef HAS_BUTTON_HOLD
 static int selectivesoftlock_callback(int action,
-                                      const struct menu_item_ex *this_item)
+                                      const struct menu_item_ex *this_item,
+                                      struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
 
     switch (action)
     {
@@ -176,7 +178,10 @@ MAKE_MENU(tagcache_menu, ID2P(LANG_TAGCACHE), 0, Icon_NOICON,
 
 /***********************************/
 /*    FILE VIEW MENU               */
-static int fileview_callback(int action,const struct menu_item_ex *this_item);
+static int fileview_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list);
+
 MENUITEM_SETTING(sort_case, &global_settings.sort_case, NULL);
 MENUITEM_SETTING(sort_dir, &global_settings.sort_dir, fileview_callback);
 MENUITEM_SETTING(sort_file, &global_settings.sort_file, fileview_callback);
@@ -196,8 +201,11 @@ static int clear_start_directory(void)
 }
 MENUITEM_FUNCTION(clear_start_directory_item, 0, ID2P(LANG_RESET_START_DIR),
                   clear_start_directory, NULL, NULL, Icon_file_view_menu);
-static int fileview_callback(int action,const struct menu_item_ex *this_item)
+static int fileview_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_list;
     static int oldval;
     int *variable = this_item->variable;
     switch (action)
@@ -236,9 +244,12 @@ MENUITEM_SETTING(battery_capacity, &global_settings.battery_capacity, NULL);
 MENUITEM_SETTING(battery_type, &global_settings.battery_type, NULL);
 #endif
 #ifdef HAVE_USB_CHARGING_ENABLE
-static int usbcharging_callback(int action,const struct menu_item_ex *this_item)
+static int usbcharging_callback(int action,
+                                const struct menu_item_ex *this_item,
+                                struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -265,9 +276,12 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
 #endif
 #ifdef HAVE_DIRCACHE
-static int dircache_callback(int action,const struct menu_item_ex *this_item)
+static int dircache_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -328,9 +342,12 @@ MAKE_MENU(keyclick_menu, ID2P(LANG_KEYCLICK), 0, Icon_NOICON,
 
 #if CONFIG_CODEC == MAS3507D
 void dac_line_in(bool enable);
-static int linein_callback(int action,const struct menu_item_ex *this_item)
+static int linein_callback(int action,
+                           const struct menu_item_ex *this_item,
+                           struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -545,9 +562,11 @@ static int toggle_sleeptimer(void)
 /* Handle restarting a current sleep timer to the newly set default
    duration */
 static int sleeptimer_duration_cb(int action,
-    const struct menu_item_ex *this_item)
+                                  const struct menu_item_ex *this_item,
+                                  struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     static int initial_duration;
     switch (action)
     {
@@ -590,9 +609,12 @@ MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
 
 /***********************************/
 /*    BOOKMARK MENU                */
-static int bmark_callback(int action,const struct menu_item_ex *this_item)
+static int bmark_callback(int action,
+                          const struct menu_item_ex *this_item,
+                          struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     switch (action)
     {
         case ACTION_EXIT_MENUITEM: /* on exit */
@@ -623,9 +645,12 @@ MAKE_MENU(bookmark_settings_menu, ID2P(LANG_BOOKMARK_SETTINGS), 0,
 #ifdef HAVE_TAGCACHE
 #if CONFIG_CODEC == SWCODEC
 
-static int autoresume_callback(int action, const struct menu_item_ex *this_item)
+static int autoresume_callback(int action,
+                               const struct menu_item_ex *this_item,
+                               struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
 
     if (action == ACTION_EXIT_MENUITEM  /* on exit */
         && global_settings.autoresume_enable
@@ -642,9 +667,11 @@ static int autoresume_callback(int action, const struct menu_item_ex *this_item)
 }
 
 static int autoresume_nexttrack_callback(int action,
-                                         const struct menu_item_ex *this_item)
+                                         const struct menu_item_ex *this_item,
+                                         struct gui_synclist *this_list)
 {
     (void)this_item;
+    (void)this_list;
     static int oldval = 0;
     switch (action)
     {
@@ -678,14 +705,20 @@ MAKE_MENU(autoresume_menu, ID2P(LANG_AUTORESUME),
 
 /***********************************/
 /*    VOICE MENU                   */
-static int talk_callback(int action,const struct menu_item_ex *this_item);
+static int talk_callback(int action,
+                         const struct menu_item_ex *this_item,
+                         struct gui_synclist *this_list);
+
 MENUITEM_SETTING(talk_menu_item, &global_settings.talk_menu, NULL);
 MENUITEM_SETTING(talk_dir_item, &global_settings.talk_dir, NULL);
 MENUITEM_SETTING(talk_dir_clip_item, &global_settings.talk_dir_clip, talk_callback);
 MENUITEM_SETTING(talk_file_item, &global_settings.talk_file, NULL);
 MENUITEM_SETTING(talk_file_clip_item, &global_settings.talk_file_clip, talk_callback);
-static int talk_callback(int action,const struct menu_item_ex *this_item)
+static int talk_callback(int action,
+                         const struct menu_item_ex *this_item,
+                         struct gui_synclist *this_list)
 {
+    (void)this_list;
     static int oldval = 0;
     switch (action)
     {

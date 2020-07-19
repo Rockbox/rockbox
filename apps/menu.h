@@ -27,6 +27,7 @@
 #include "icons.h"
 #include "root_menu.h" /* needed for MENU_* return codes */
 #include "settings_list.h"
+#include "gui/list.h"
 
 
 enum menu_item_type {
@@ -79,18 +80,21 @@ struct menu_item_ex {
     };
     union {
         /* For settings */
-        int (*menu_callback)(int action, const struct menu_item_ex *this_item);
+        int (*menu_callback)(int action, const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list);
         /* For everything else, except if the text is dynamic */
         const struct menu_callback_with_desc {
-            int (*menu_callback)(int action, 
-                                 const struct menu_item_ex *this_item);
+            int (*menu_callback)(int action,
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list);
             unsigned char *desc; /* string or ID */
             int icon_id; /* from icons_6x8 in icons.h */
         } *callback_and_desc;
         /* For when the item text is dynamic */
         const struct menu_get_name_and_icon {
             int (*menu_callback)(int action, 
-                                 const struct menu_item_ex *this_item);
+                                 const struct menu_item_ex *this_item,
+                                 struct gui_synclist *this_list);
             char *(*list_get_name)(int selected_item, void * data,
                                    char *buffer, size_t buffer_len);
             int (*list_speak_item)(int selected_item, void * data);
@@ -101,7 +105,8 @@ struct menu_item_ex {
 };
 
 typedef int (*menu_callback_type)(int action,
-                                  const struct menu_item_ex *this_item);
+                                  const struct menu_item_ex *this_item,
+                                  struct gui_synclist *this_list);
 void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS]);
 void do_setting_screen(const struct settings_list *setting, const char * title,

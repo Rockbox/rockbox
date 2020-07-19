@@ -192,7 +192,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
         if (menu_callback)
         {
             if (menu_callback(ACTION_REQUEST_MENUITEM,
-                    type==MT_RETURN_ID ? (void*)(intptr_t)i: menu->submenus[i])
+                type==MT_RETURN_ID ? (void*)(intptr_t)i: menu->submenus[i], lists)
                     != ACTION_EXIT_MENUITEM)
             {
                 current_subitems[current_subitems_count] = i;
@@ -246,7 +246,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
 
     get_menu_callback(menu,&menu_callback);
     if (callback && menu_callback)
-        menu_callback(ACTION_ENTER_MENUITEM,menu);
+        menu_callback(ACTION_ENTER_MENUITEM, menu, lists);
 }
 
 static int talk_menu_item(int selected_item, void *data)
@@ -430,7 +430,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         if (menu_callback)
         {
             int old_action = action;
-            action = menu_callback(action, menu);
+            action = menu_callback(action, menu, &lists);
             if (action == ACTION_EXIT_AFTER_THIS_MENUITEM)
             {
                 action = old_action;
@@ -560,7 +560,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             /* might be leaving list, so stop scrolling */
             gui_synclist_scroll_stop(&lists);
             if (menu_callback)
-                menu_callback(ACTION_EXIT_MENUITEM, menu);
+                menu_callback(ACTION_EXIT_MENUITEM, menu, &lists);
 
             if (menu->flags&MENU_EXITAFTERTHISMENU)
                 done = true;
@@ -612,7 +612,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 get_menu_callback(temp, &menu_callback);
                 if (menu_callback)
                 {
-                    action = menu_callback(ACTION_ENTER_MENUITEM,temp);
+                    action = menu_callback(ACTION_ENTER_MENUITEM, temp, &lists);
                     if (action == ACTION_EXIT_MENUITEM)
                         break;
                 }
@@ -688,7 +688,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             if (type != MT_MENU)
             {
                 if (menu_callback)
-                    menu_callback(ACTION_EXIT_MENUITEM,temp);
+                    menu_callback(ACTION_EXIT_MENUITEM, temp, &lists);
             }
             if (current_submenus_menu != menu)
                 init_menu_lists(menu,&lists,selected,true,vps);
@@ -730,9 +730,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         if (redraw_lists && !done)
         {
             if (menu_callback)
-                menu_callback(ACTION_REDRAW, menu);
-            gui_synclist_draw(&lists);
-            gui_synclist_speak_item(&lists);
+                if (menu_callback(ACTION_REDRAW, menu, &lists) == ACTION_REDRAW)
+                {
+                    gui_synclist_draw(&lists);
+                    gui_synclist_speak_item(&lists);
+                }
         }
     }
 

@@ -496,8 +496,11 @@ static void snake_game_init(void) {
     board[11][7]=1;
 }
 
-static int snake_menu_cb(int action, const struct menu_item_ex *this_item)
+static int snake_menu_cb(int action,
+                         const struct menu_item_ex *this_item,
+                         struct gui_synclist *this_list)
 {
+    (void)this_list;
     if(action == ACTION_REQUEST_MENUITEM
        && !ingame && ((intptr_t)this_item)==0)
         return ACTION_EXIT_MENUITEM;

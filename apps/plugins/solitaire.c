@@ -1060,8 +1060,11 @@ void solitaire_init(void);
 enum { MENU_RESUME, MENU_SAVE_AND_QUIT, MENU_QUIT, MENU_USB };
 
 static bool _ingame;
-static int solitaire_menu_cb(int action, const struct menu_item_ex *this_item)
+static int solitaire_menu_cb(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_list;
     int i = (intptr_t)this_item;
     if( action == ACTION_REQUEST_MENUITEM )
     {

@@ -853,8 +853,11 @@ static void resume_save_data (struct resume_data *r, struct resume_data *old)
 * Manages the main menu 
 ******************************************************************************/
 static bool have_continue;
-static int main_menu_cb(int action, const struct menu_item_ex *this_item)
+static int main_menu_cb(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
 {
+    (void)this_list;
     if(action == ACTION_REQUEST_MENUITEM
        && !have_continue && ((intptr_t)this_item)==0)
         return ACTION_EXIT_MENUITEM;

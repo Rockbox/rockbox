@@ -437,7 +437,9 @@ static const struct root_items items[] = {
 };
 static const int nb_items = sizeof(items)/sizeof(*items);
 
-static int item_callback(int action, const struct menu_item_ex *this_item) ;
+static int item_callback(int action,
+                         const struct menu_item_ex *this_item,
+                         struct gui_synclist *this_list);
 
 MENUITEM_RETURNVALUE(shortcut_menu, ID2P(LANG_SHORTCUTS), GO_TO_SHORTCUTMENU,
                         NULL, Icon_Bookmark);
@@ -621,8 +623,11 @@ bool root_menu_is_changed(void* setting, void* defaultval)
     return *(bool*)setting;
 }
 
-static int item_callback(int action, const struct menu_item_ex *this_item)
+static int item_callback(int action,
+                         const struct menu_item_ex *this_item,
+                         struct gui_synclist *this_list)
 {
+    (void)this_list;
     switch (action)
     {
         case ACTION_TREE_STOP:

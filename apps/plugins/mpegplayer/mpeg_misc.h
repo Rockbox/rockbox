@@ -241,7 +241,8 @@ void mpeg_sysevent_set(void);
 long mpeg_sysevent(void);
 
 /* Call with a system event code and used as menu callback */
-int mpeg_sysevent_callback(int btn, const struct menu_item_ex *menu);
+int mpeg_sysevent_callback(int btn, const struct menu_item_ex *menu,
+                           struct gui_synclist *this_list);
 
 /* Handle recorded event */
 void mpeg_sysevent_handle(void);
