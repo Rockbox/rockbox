@@ -32,6 +32,7 @@
 #include "bootloaderinstallmpio.h"
 #include "bootloaderinstallimx.h"
 #include "bootloaderinstalls5l.h"
+#include "bootloaderinstallbspatch.h"
 
 BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObject* parent, QString type)
 {
@@ -68,10 +69,12 @@ BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObjec
     else if(type == "s5l") {
         return new BootloaderInstallS5l(parent);
     }
+    else if(type == "bspatch") {
+        return new BootloaderInstallBSPatch(parent);
+    }
     else {
         return NULL;
     }
-
 }
 
 
@@ -134,4 +137,3 @@ QString BootloaderInstallHelper::postinstallHints(QString model)
     else
         return QString();
 }
-
