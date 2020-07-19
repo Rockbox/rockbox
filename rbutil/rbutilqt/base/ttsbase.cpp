@@ -25,7 +25,9 @@
 #include "ttsmssp.h"
 #include "ttsexes.h"
 #include "ttsespeak.h"
+#include "ttsespeakng.h"
 #include "ttsflite.h"
+#include "ttsmimic.h"
 #include "ttsswift.h"
 #if defined(Q_OS_MACX)
 #include "ttscarbon.h"
@@ -43,6 +45,8 @@ void TTSBase::initTTSList()
 {
 #if !defined(Q_OS_WIN)
     ttsList["espeak"] = tr("Espeak TTS Engine");
+    ttsList["espeakng"] = tr("Espeak-ng TTS Engine");
+    ttsList["mimic"] = tr("Mimic TTS Engine");
 #endif
     ttsList["flite"] = tr("Flite TTS Engine");
     ttsList["swift"] = tr("Swift TTS Engine");
@@ -85,6 +89,10 @@ TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
 #endif
     if(ttsName == "espeak")
         tts = new TTSEspeak(parent);
+    else if(ttsName == "espeakng")
+        tts = new TTSEspeakNG(parent);
+    else if(ttsName == "mimic")
+        tts = new TTSMimic(parent);
     else if(ttsName == "flite")
         tts = new TTSFlite(parent);
     else if(ttsName == "swift")
