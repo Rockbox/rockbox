@@ -122,7 +122,7 @@ static int selectivebacklight_set_mask(void* param)
 #endif /* HAVE_BACKLIGHT */
 #ifdef HAVE_LCD_FLIP
 static int flipdisplay_callback(int action,
-                                const struct menu_item_ex *this_item
+                                const struct menu_item_ex *this_item,
                                 struct gui_synclist *this_list)
 {
     (void)this_item;
