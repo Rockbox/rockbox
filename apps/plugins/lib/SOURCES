@@ -33,10 +33,6 @@ overlay.c
 profile_plugin.c
 #endif
 
-#ifdef HAVE_LCD_CHARCELLS
-playergfx.c
-#endif
-
 #ifdef HAVE_LCD_BITMAP
 
 #ifdef CPU_ARM
