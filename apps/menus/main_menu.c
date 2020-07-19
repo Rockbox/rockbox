@@ -532,9 +532,12 @@ MAKE_MENU(info_menu, ID2P(LANG_SYSTEM), 0, Icon_System_menu,
 
 
 #ifdef HAVE_LCD_CHARCELLS
-static int mainmenu_callback(int action,const struct menu_item_ex *this_item)
+static int mainmenu_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *lists)
 {
     (void)this_item;
+    (void)lists;
     switch (action)
     {
         case ACTION_ENTER_MENUITEM:
