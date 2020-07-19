@@ -272,7 +272,7 @@ MENUITEM_SETTING(remote_flip_display,
 
 #ifdef HAVE_REMOTE_LCD_TICKING
 static int ticking_callback(int action,
-                            const struct menu_item_ex *this_item
+                            const struct menu_item_ex *this_item,
                             struct gui_synclist *this_list)
 {
     (void)this_item;
@@ -593,7 +593,7 @@ static int touch_mode_callback(int action,
 
 static int line_padding_callback(int action,
                                  const struct menu_item_ex *this_item,
-                                 struct gui_synclist *this_list);
+                                 struct gui_synclist *this_list)
 {
     (void)this_item;
     (void)this_list;
