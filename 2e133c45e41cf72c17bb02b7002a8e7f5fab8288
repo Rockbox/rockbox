@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "870922c4_194630e9",
+        "filename": "rbutil/rbutilqt/rbutil.ini",
+        "patchSetId": 5
+      },
+      "lineNbr": 886,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2020-07-20T18:30:12Z",
+      "side": 1,
+      "message": "shouldn\u0027t that be \"*.zip\"?",
+      "revId": "2e133c45e41cf72c17bb02b7002a8e7f5fab8288",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4533e7b1_80e0ef54",
+        "filename": "rbutil/rbutilqt/rbutil.ini",
+        "patchSetId": 5
+      },
+      "lineNbr": 901,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2020-07-20T18:30:12Z",
+      "side": 1,
+      "message": "as above: shouldn\u0027t that be \"*.upt\" and \"*.zip\"?",
+      "revId": "2e133c45e41cf72c17bb02b7002a8e7f5fab8288",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "30fdfc12_ddd2c21f",
+        "filename": "rbutil/rbutilqt/rbutil.ini",
+        "patchSetId": 5
+      },
+      "lineNbr": 916,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2020-07-20T18:30:12Z",
+      "side": 1,
+      "message": "as above",
+      "revId": "2e133c45e41cf72c17bb02b7002a8e7f5fab8288",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "00052dfb_be0f0f24",
+        "filename": "rbutil/rbutilqt/rbutil.ini",
+        "patchSetId": 5
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 1000001
+      },
+      "writtenOn": "2020-07-20T18:30:12Z",
+      "side": 1,
+      "message": "as above",
+      "revId": "2e133c45e41cf72c17bb02b7002a8e7f5fab8288",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
