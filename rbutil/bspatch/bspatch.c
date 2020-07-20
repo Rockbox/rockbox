@@ -28,6 +28,7 @@
 #include <io.h>
 #else
 #include <stdarg.h>
+#include <sys/types.h>
 #endif
 #include "../bzip2/bzlib.h"
 #include <stdlib.h>
