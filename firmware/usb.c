@@ -42,6 +42,10 @@
 #include "logf.h"
 #include "screendump.h"
 
+#include "gui/yesno.h"
+#include "settings.h"
+#include "lang_enum.h"
+
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || \
      (defined(HAVE_USBSTACK) && defined(HAVE_BOOTLOADER_USB_MODE)) || \
@@ -68,7 +72,7 @@ static int usb_mmc_countdown = 0;
 
 /* Make sure there's enough stack space for screendump */
 #ifdef USB_FULL_INIT
-static long usb_stack[(DEFAULT_STACK_SIZE + DUMP_BMP_LINESIZE)/sizeof(long)];
+static long usb_stack[(DEFAULT_STACK_SIZE*2 + DUMP_BMP_LINESIZE)/sizeof(long)];
 static const char usb_thread_name[] = "usb";
 static unsigned int usb_thread_entry = 0;
 static bool usb_monitor_enabled = false;
@@ -198,7 +202,7 @@ static inline bool usb_configure_drivers(int for_state)
         usb_attach(); /* Powered only: attach now. */
         break;
         /* USB_POWERED: */
-    
+
     case USB_INSERTED:
 #ifdef USB_ENABLE_STORAGE
         usb_core_enable_driver(USB_DRIVER_MASS_STORAGE, true);
@@ -461,9 +465,17 @@ static void NORETURN_ATTR usb_thread(void)
             }
 
             usb_state = USB_POWERED;
-            usb_stack_enable(true);
 
+            usb_stack_enable(true);
             usb_detect_charging_only(true);
+
+#ifdef HAVE_USB_POWER
+            const char *mlines[]={ID2P(LANG_ENTER_USB_STORAGE_MODE_QUERY)};
+            const struct text_message message={mlines, 1};
+            if (!usb_charging_only && gui_syncyesno_run(&message, NULL, NULL)==YESNO_NO) {
+                    usb_charging_only = true;
+            }
+#endif
 
 #ifndef USB_DETECT_BY_REQUEST
             usb_set_host_present(true);
@@ -594,7 +606,7 @@ static void usb_tick(void)
 #ifdef USB_FIREWIRE_HANDLING
     static int firewire_countdown = -1;
     static int last_firewire_status = false;
-#endif    
+#endif
 
     if(usb_monitor_enabled)
     {
@@ -811,4 +823,3 @@ void usb_wait_for_disconnect(struct event_queue *q)
    (void)q;
 }
 #endif /* USB_NONE */
-

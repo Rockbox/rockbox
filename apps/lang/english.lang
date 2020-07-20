@@ -16104,3 +16104,20 @@ id: VOICE_BAT_BENCH_KEYS
     lcd_bitmap: "Show album and artist at the bottom"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Enter USB storage mode?"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Enter USB storage mode?"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Enter USB storage mode?"
+  </voice>
+</phrase>
