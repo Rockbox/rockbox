@@ -730,11 +730,11 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         if (redraw_lists && !done)
         {
             if (menu_callback)
-                if (menu_callback(ACTION_REDRAW, menu, &lists) == ACTION_REDRAW)
-                {
-                    gui_synclist_draw(&lists);
-                    gui_synclist_speak_item(&lists);
-                }
+                if (menu_callback(ACTION_REDRAW, menu, &lists) != ACTION_REDRAW)
+                    continue;
+
+            gui_synclist_draw(&lists);
+            gui_synclist_speak_item(&lists);
         }
     }
 
