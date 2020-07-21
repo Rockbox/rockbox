@@ -794,7 +794,7 @@ elsif($binary || $binvoice) {
         # loop over the target phrases
         # This loops over the strings in the translated language file order
         my @ids = ((0 .. ($idcount[$_]-1)));
-        push @ids, (0x8000 .. ($voiceid[$_]-1));
+        push @ids, (0x8001 .. ($voiceid[$_]-1));
         for $n (@ids) {
             my $name=$idnum[$_][$n]; # get the ID
             my $dest = $dest{$name}; # get the destination phrase
@@ -829,66 +829,38 @@ elsif($voiceout) {
 
     my @engl;
 
-    # This loops over the strings in the translated language file order
-    my @ids = ((0 .. ($idcount[$users{"core"}]-1)));
-    push @ids, (0x8000 .. ($voiceid[$users{"core"}]-1));
+    for (keys %users) {
+        # loop over the target phrases
+        # This loops over the strings in the translated language file order
+        my @ids = ((0 .. ($idcount[$_]-1)));
+        push @ids, (0x8001 .. ($voiceid[$_]-1));
+        for $n (@ids) {
+            my $name=$idnum[$_][$n]; # get the ID
+            my $dest = $dest{$name}; # get the destination phrase
+            my $voice = $voice{$name}; # get the destination voice string
 
-    #for my $id (@ids) {
-    #    print "$id\n";
-    #}
-
-    for $i (@ids) {
-        my $name=$idnum[$users{"core"}][$i]; # get the ID
-        my $dest = $voice{$name}; # get the destination voice string
-
-        if($dest) {
-            $dest =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
-
-            # Now, make sure we get the number from the english sort order:
-            $idnum = $idmap[$users{"core"}]{$name};
-
-            if(length($idnum)) {
-                $engl[$idnum] = $i;
-
-                #print "Input index $i output index $idnum\n";
+            if($voice) {
+                $voice =~ s/^\"(.*)\"\s*$/$1/g; # cut off quotes
+                # Now, make sure we get the number from the english sort order:
+                $idnum = $idmap[$_]{$name};
+		$engl[$idnum] = "#$idnum ($n)\nid: $name\nvoice: \"$voice\"\n";
             }
-            else {
-                # not used, mark it so
-                $engl[$i] = -1
-            }
-
         }
     }
-    for my $i (@ids) {
-
-        my $o = $engl[$i];
-
-        if(($o < 0) || !length($o)) {
-            if($i < 0x8000) {
-                print "#$i\nid: NOT_USED_$i\nvoice: \"\"\n";
-            }
-            else {
-                print "#$i\nid: VOICE_NOT_USED_$i\nvoice: \"\"\n";
-            }
-            next;
-        }
-
-        my $name=$idnum[$users{"core"}][$o]; # get the ID
-        my $dest = $voice{$name}; # get the destination voice string
-        
-        print "#$i ($o)\nid: $name\nvoice: $dest\n";
+    # Print the list in the the English sort order
+    for (@engl) {
+        print $_;
     }
-    
 }
 
 
 if($verbose) {
     my $num_str = 0;
-    
+
     for (keys %users) {
         $num_str += $idcount[$_];
     }
-    
+
     printf("%d ID strings scanned\n", $num_str);
 
     print "* head *\n";

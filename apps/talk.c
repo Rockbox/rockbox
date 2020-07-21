@@ -624,7 +624,7 @@ static bool load_voicefile_index(int fd)
         if (voicefile.version == VOICE_VERSION &&
             voicefile.target_id == TARGET_ID &&
             voicefile.id1_max == TALK_FINAL_ID &&
-            voicefile.id2_max == TALK_FINAL_ID_VOICEONLY - VOICEONLY_DELIMITER)
+            voicefile.id2_max == TALK_FINAL_ID_VOICEONLY - VOICEONLY_DELIMITER - 1)
         {
             if (load_index_table(fd, &voicefile))
                 return true;
