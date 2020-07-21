@@ -927,7 +927,7 @@ struct plugin_api {
     int  (*rand)(void);
     void (*qsort)(void *base, size_t nmemb, size_t size,
                   int(*compar)(const void *, const void *));
-    int (*kbd_input)(char* buffer, int buflen);
+    int (*kbd_input)(char* buffer, int buflen, unsigned short *kbd);
     struct tm* (*get_time)(void);
     int  (*set_time)(const struct tm *tm);
     struct tm * (*gmtime_r)(const time_t *timep, struct tm *tm);

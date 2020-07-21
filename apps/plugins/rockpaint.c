@@ -1794,7 +1794,7 @@ static void draw_text( int x, int y )
         {
             case TEXT_MENU_TEXT:
                 rb->lcd_set_foreground(COLOR_BLACK);
-                rb->kbd_input( buffer->text.text, MAX_TEXT );
+                rb->kbd_input( buffer->text.text, MAX_TEXT, NULL );
                 break;
 
             case TEXT_MENU_FONT:
@@ -2790,7 +2790,7 @@ static void goto_menu(void)
                 rb->lcd_set_foreground(COLOR_BLACK);
                 if (!filename[0])
                     rb->strcpy(filename,"/");
-                if( !rb->kbd_input( filename, MAX_PATH ) )
+                if( !rb->kbd_input( filename, MAX_PATH, NULL ) )
                 {
                     if( !check_extention( filename, ".bmp" ) )
                         rb->strcat(filename, ".bmp");

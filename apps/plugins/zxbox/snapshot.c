@@ -628,7 +628,7 @@ void save_snapshot(void)
   name[0]='/';
   name[1]='\0';
   put_msg("Enter name of snapshot file to save:");
-  if (!rb->kbd_input((char*)&name, sizeof name))
+  if (!rb->kbd_input((char*)&name, sizeof(name), NULL))
     save_snapshot_file(&name[0]);
 }
 

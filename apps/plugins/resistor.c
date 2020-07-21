@@ -623,7 +623,7 @@ static void led_resistance_calc(void)
 
         rb->splash(HZ*2, "(First) Input the supply voltage:");
         memset(kbd_buffer,0,sizeof(kbd_buffer));
-        rb->kbd_input(kbd_buffer, sizeof(kbd_buffer));
+        rb->kbd_input(kbd_buffer, sizeof(kbd_buffer), NULL);
         input_voltage = rb->atoi(kbd_buffer);
         if(input_voltage == 0) break;
 
@@ -660,7 +660,7 @@ static void led_resistance_calc(void)
                 rb->lcd_clear_display();
                 rb->splash(HZ*2, "Input the foreward current, in mA");
                 memset(fwd_kbd_buffer,0,sizeof(fwd_kbd_buffer));
-                rb->kbd_input(fwd_kbd_buffer, sizeof(fwd_kbd_buffer));
+                rb->kbd_input(fwd_kbd_buffer, sizeof(fwd_kbd_buffer), NULL);
                 foreward_current = ((rb->atoi(fwd_kbd_buffer))/10);
                 break;
         }
@@ -817,7 +817,7 @@ static void resistance_to_color(void)
                                      NULL, false);
         if(ret<0) break;
         
-        rb->kbd_input(kbd_buffer, sizeof(kbd_buffer));
+        rb->kbd_input(kbd_buffer, sizeof(kbd_buffer), NULL);
         /* As stated above somewhere, we (I) need to make a calculator-like
            keypad, that keyboard isn't all that fun to use. */
         ret = rb->do_menu(&r_to_c_menu_tol, &menu_selection_tol,

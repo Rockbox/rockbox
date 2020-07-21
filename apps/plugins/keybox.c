@@ -196,12 +196,12 @@ static void add_entry(int selected_item)
 
     rb->splash(HZ, "Enter title");
     pw_list.entries[i].title[0] = '\0';
-    if (rb->kbd_input(pw_list.entries[i].title, FIELD_LEN) < 0)
+    if (rb->kbd_input(pw_list.entries[i].title, FIELD_LEN, NULL) < 0)
         return;
 
     rb->splash(HZ, "Enter name");
     pw_list.entries[i].name[0] = '\0';
-    if (rb->kbd_input(pw_list.entries[i].name, FIELD_LEN) < 0)
+    if (rb->kbd_input(pw_list.entries[i].name, FIELD_LEN, NULL) < 0)
     {
         pw_list.entries[i].title[0] = '\0';
         return;
@@ -209,7 +209,7 @@ static void add_entry(int selected_item)
 
     rb->splash(HZ, "Enter password");
     pw_list.entries[i].password[0] = '\0';
-    if (rb->kbd_input(pw_list.entries[i].password, FIELD_LEN) < 0)
+    if (rb->kbd_input(pw_list.entries[i].password, FIELD_LEN, NULL) < 0)
     {
         pw_list.entries[i].title[0] = '\0';
         pw_list.entries[i].name[0] = '\0';
@@ -244,7 +244,7 @@ static void edit_title(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (rb->kbd_input(entry->title, FIELD_LEN) == 0)
+    if (rb->kbd_input(entry->title, FIELD_LEN, NULL) == 0)
         data_changed = true;
 }
 
@@ -257,7 +257,7 @@ static void edit_name(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (rb->kbd_input(entry->name, FIELD_LEN) == 0)
+    if (rb->kbd_input(entry->name, FIELD_LEN, NULL) == 0)
         data_changed = true;
 }
 
@@ -270,7 +270,7 @@ static void edit_pw(int selected_item)
         if (entry->next)
             entry = entry->next;
     }
-    if (rb->kbd_input(entry->password, FIELD_LEN) == 0)
+    if (rb->kbd_input(entry->password, FIELD_LEN, NULL) == 0)
         data_changed = true;
 }
 
@@ -513,11 +513,11 @@ static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)
     if (new_pw)
     {
         rb->splash(HZ, "Enter new master password");
-        if (rb->kbd_input(buf[0], sizeof(buf[0])) < 0)
+        if (rb->kbd_input(buf[0], sizeof(buf[0]), NULL) < 0)
             return -1;
 
         rb->splash(HZ, "Confirm master password");
-        if (rb->kbd_input(buf[1], sizeof(buf[1])) < 0)
+        if (rb->kbd_input(buf[1], sizeof(buf[1]), NULL) < 0)
             return -1;
 
         if (rb->strcmp(buf[0], buf[1]))
@@ -534,7 +534,7 @@ static int enter_pw(char *pw_buf, size_t buflen, bool new_pw)
     }
 
     rb->splash(HZ, "Enter master password");
-    if (rb->kbd_input(pw_buf, buflen) < 0)
+    if (rb->kbd_input(pw_buf, buflen, NULL) < 0)
         return -1;
     hash_pw(&pwhash);
     return 0;
