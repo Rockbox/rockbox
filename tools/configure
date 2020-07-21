@@ -4669,9 +4669,6 @@ fi
 
 echo "Using source code root directory: $rootdir"
 
-# this was once possible to change at build-time, but no more:
-language="english"
-
 uname=`uname`
 
 if [ "yes" = "$simulator" ]; then
@@ -5039,7 +5036,6 @@ export MANUFACTURER=${t_manufacturer}
 export OBJDIR=${pwd}
 export BUILDDIR=${pwd}
 export RBCODEC_BLD=${pwd}/lib/rbcodec
-export LANGUAGE=${language}
 export VOICELANGUAGE=${voicelanguage}
 export MEMORYSIZE=${memory}
 export BUILDDATE:=\$(shell date -u +'-DYEAR=%Y -DMONTH=%m -DDAY=%d')

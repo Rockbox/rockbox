@@ -82,7 +82,9 @@ const char* const file_thumbnail_ext = ".talk";
 
 #define LOADED_MASK 0x80000000 /* MSB */
 
+#ifndef DEFAULT_VOICE_LANG
 #define DEFAULT_VOICE_LANG "english"
+#endif
 
 /***************** Data types *****************/
 
