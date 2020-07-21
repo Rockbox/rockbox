@@ -2411,7 +2411,7 @@ static bool do_configure_item(config_item *cfgs, int idx)
         }
 
         rb->strlcpy(newstr, cfg->u.string.sval, MAX_STRLEN);
-        if(rb->kbd_input(newstr, MAX_STRLEN) < 0)
+        if(rb->kbd_input(newstr, MAX_STRLEN, NULL) < 0)
         {
             sfree(newstr);
             return false;

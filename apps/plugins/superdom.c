@@ -689,7 +689,7 @@ static int save_game(void)
     char savepath[MAX_PATH];
 
     rb->snprintf(savepath, sizeof(savepath), "/Savegame.ssg");
-    if(rb->kbd_input(savepath, MAX_PATH))
+    if(rb->kbd_input(savepath, MAX_PATH, NULL))
     {
         DEBUGF("Keyboard input failed\n");
         return -1;

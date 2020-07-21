@@ -82,8 +82,9 @@ static void kdb_init(void)
         sleep(HZ/10);
 }
 
-int kbd_input(char* text, int buflen)
+int kbd_input(char* text, int buflen, unsigned short *kbd)
 {
+	(void)kbd;
     JNIEnv e            = *env_ptr;
     jstring str         = e->NewStringUTF(env_ptr, text);
     jstring ok_text     = e->NewStringUTF(env_ptr, str(LANG_KBD_OK));
