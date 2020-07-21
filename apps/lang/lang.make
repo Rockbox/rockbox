@@ -11,6 +11,7 @@ LANGS := $(call preprocess, $(APPSDIR)/lang/SOURCES)
 LANGOBJ := $(LANGS:$(ROOTDIR)/%.lang=$(BUILDDIR)/%.lng)
 VOICEOBJ := $(LANGS:$(ROOTDIR)/%.lang=$(BUILDDIR)/%.vstrings)
 LANG_O = $(BUILDDIR)/lang/lang_core.o
+ENGLISH := english
 
 CLEANOBJS += $(BUILDDIR)/lang/max_language_size.h $(BUILDDIR)/lang/lang*
 
@@ -36,7 +37,7 @@ $(BUILDDIR)/lang/lang_core.o: $(BUILDDIR)/lang/lang.h $(BUILDDIR)/lang/lang_core
 # instead we pretend that genlang create lang_core.c and that lang.c depends from lang.h
 # it will work fine as long as one never manually removes lang.c and not lang.h, and it will avoid
 # race conditions such as running genlang twice or worse in parallel with other things!
-$(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(LANGUAGE).lang $(BUILDDIR)/apps/features
+$(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(ENGLISH).lang $(BUILDDIR)/apps/features
 	$(call PRINTS,GEN lang.h)
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
 		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
@@ -49,8 +50,8 @@ $(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h
 $(BUILDDIR)/%.lng $(BUILDDIR)/%.vstrings: $(ROOTDIR)/%.lang $(BUILDDIR)/apps/genlang-features
 	$(call PRINTS,GENLANG $(subst $(ROOTDIR)/,,$<))
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(TOOLSDIR)/genlang -u -e=$(APPSDIR)/lang/english.lang $< > $@.tmp
-	$(SILENT)$(TOOLSDIR)/genlang -e=$(APPSDIR)/lang/english.lang -t=$(MODELNAME):`cat $(BUILDDIR)/apps/genlang-features` -i=$(TARGET_ID) -b=$*.lng -c=$*.vstrings $@.tmp
+	$(SILENT)$(TOOLSDIR)/genlang -u -e=$(APPSDIR)/lang/$(ENGLISH).lang $< > $@.tmp
+	$(SILENT)$(TOOLSDIR)/genlang -e=$(APPSDIR)/lang/$(ENGLISH).lang -t=$(MODELNAME):`cat $(BUILDDIR)/apps/genlang-features` -i=$(TARGET_ID) -b=$*.lng -c=$*.vstrings $@.tmp
 	$(SILENT)rm -f $@.tmp
 
 $(BUILDDIR)/apps/lang/voicestrings.zip: $(VOICEOBJ)
