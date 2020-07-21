@@ -2475,7 +2475,7 @@ static bool lrc_lyrics_menu(void)
 #endif
             case LRC_MENU_LRC_DIR:
                 rb->strcpy(temp_buf, prefs.lrc_directory);
-                if (!rb->kbd_input(temp_buf, sizeof(prefs.lrc_directory)))
+                if (!rb->kbd_input(temp_buf, sizeof(prefs.lrc_directory), NULL))
                     rb->strcpy(prefs.lrc_directory, temp_buf);
                 break;
             case MENU_ATTACHED_USB:

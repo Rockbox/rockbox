@@ -276,7 +276,7 @@ static bool do_slot(int slot_id, bool is_load) {
     if (!is_load)
     {
         slot_info(desc_buf, sizeof(desc_buf), slot_id, false);
-        if ( rb->kbd_input(desc_buf, sizeof(desc_buf)) < 0 )
+        if ( rb->kbd_input(desc_buf, sizeof(desc_buf), NULL) < 0 )
             return false;
         if ( !strlen(desc_buf) )
             strlcpy(desc_buf, "Untitled", sizeof(desc_buf));

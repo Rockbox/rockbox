@@ -111,7 +111,7 @@ static void clear_display(void){
 static bool search_init(const char* file){
     rb->memset(search_string, 0, sizeof(search_string));
 
-    if (!rb->kbd_input(search_string,sizeof search_string)){
+    if (!rb->kbd_input(search_string,sizeof(search_string), NULL)){
         clear_display();
         rb->splash(0, "Searching...");
         fd = rb->open_utf8(file, O_RDONLY);

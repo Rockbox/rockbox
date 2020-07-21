@@ -950,7 +950,7 @@ int create_playlist(void)
     else
         snprintf(filename, sizeof filename, "%s/all.m3u8", playlist_dir);
 
-    if (kbd_input(filename, MAX_PATH))
+    if (kbd_input(filename, MAX_PATH, NULL))
         return 0;
     splashf(0, "%s %s", str(LANG_CREATING), filename);
 #endif

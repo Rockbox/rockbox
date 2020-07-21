@@ -874,7 +874,7 @@ static void save_editor(struct mp3entry *mp3, int splittime)
                 break;
 
             case SE_PART1_NAME:
-                rb->kbd_input(part1_name, MAX_PATH);
+                rb->kbd_input(part1_name, MAX_PATH, NULL);
                 break;
 
             case SE_PART2_SAVE:
@@ -882,7 +882,7 @@ static void save_editor(struct mp3entry *mp3, int splittime)
                 break;
 
             case SE_PART2_NAME:
-                rb->kbd_input(part2_name, MAX_PATH);
+                rb->kbd_input(part2_name, MAX_PATH, NULL);
                 break;
 
             case SE_SAVE:

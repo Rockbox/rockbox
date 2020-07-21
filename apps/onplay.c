@@ -1009,7 +1009,7 @@ static int rename_file(void)
 
     if (strlcpy(newname, selection, sizeof (newname)) >= sizeof (newname)) {
         /* Too long */
-    } else if (kbd_input(newbase, sizeof (newname) - pathlen) < 0) {
+    } else if (kbd_input(newbase, sizeof (newname) - pathlen, NULL) < 0) {
         rc = OPRC_CANCELLED;
     } else if (!strcmp(oldbase, newbase)) {
         rc = OPRC_NOOP; /* No change at all */
@@ -1051,7 +1051,7 @@ static int create_dir(void)
 
     if (pathlen >= sizeof (dirname)) {
         /* Too long */
-    } else if (kbd_input(basename, sizeof (dirname) - pathlen) < 0) {
+    } else if (kbd_input(basename, sizeof (dirname) - pathlen, NULL) < 0) {
         rc = OPRC_CANCELLED;
     } else if (check_new_name(basename)) {
         rc = mkdir(dirname);

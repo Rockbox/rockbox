@@ -411,10 +411,11 @@ static void add_acct_manual(void)
     memset(accounts + next_slot, 0, sizeof(struct account_t));
 
     rb->splash(HZ * 1, "Enter account name.");
-    if(rb->kbd_input(accounts[next_slot].name, sizeof(accounts[next_slot].name)) < 0)
+    char* buf = accounts[next_slot].name;
+    if(rb->kbd_input(buf, sizeof(accounts[next_slot].name), NULL) < 0)
         return;
 
-    if(acct_exists(accounts[next_slot].name))
+    if(acct_exists(buf))
     {
         rb->splash(HZ * 2, "Duplicate account name!");
         return;
@@ -425,7 +426,7 @@ static void add_acct_manual(void)
     char temp_buf[SECRET_MAX * 2];
     memset(temp_buf, 0, sizeof(temp_buf));
 
-    if(rb->kbd_input(temp_buf, sizeof(temp_buf)) < 0)
+    if(rb->kbd_input(temp_buf, sizeof(temp_buf), NULL) < 0)
         return;
 
     if((accounts[next_slot].sec_len = base32_decode(accounts[next_slot].secret, SECRET_MAX, temp_buf)) <= 0)
@@ -457,7 +458,7 @@ static void add_acct_manual(void)
         temp_buf[1] = '0';
     }
 
-    if(rb->kbd_input(temp_buf, sizeof(temp_buf)) < 0)
+    if(rb->kbd_input(temp_buf, sizeof(temp_buf), NULL) < 0)
         return;
 
     if(!accounts[next_slot].is_totp)
@@ -470,7 +471,7 @@ static void add_acct_manual(void)
     memset(temp_buf, 0, sizeof(temp_buf));
     temp_buf[0] = '6';
 
-    if(rb->kbd_input(temp_buf, sizeof(temp_buf)) < 0)
+    if(rb->kbd_input(temp_buf, sizeof(temp_buf), NULL) < 0)
         return;
 
     accounts[next_slot].digits = rb->atoi(temp_buf);
@@ -667,7 +668,7 @@ static void edit_menu(int acct)
         case 0: // rename
             rb->splash(HZ, "Enter new name.");
             rb->strlcpy(data_buf, accounts[acct].name, sizeof(data_buf));
-            if(rb->kbd_input(data_buf, sizeof(data_buf)) < 0)
+            if(rb->kbd_input(data_buf, sizeof(data_buf), NULL) < 0)
                 break;
             if(acct_exists(data_buf))
             {
@@ -695,7 +696,7 @@ static void edit_menu(int acct)
             else
                 rb->snprintf(data_buf, sizeof(data_buf), "%d", accounts[acct].totp_period);
 
-            if(rb->kbd_input(data_buf, sizeof(data_buf)) < 0)
+            if(rb->kbd_input(data_buf, sizeof(data_buf), NULL) < 0)
                 break;
 
             if(accounts[acct].is_totp)
@@ -709,7 +710,7 @@ static void edit_menu(int acct)
             break;
         case 3: // digits
             rb->snprintf(data_buf, sizeof(data_buf), "%d", accounts[acct].digits);
-            if(rb->kbd_input(data_buf, sizeof(data_buf)) < 0)
+            if(rb->kbd_input(data_buf, sizeof(data_buf), NULL) < 0)
                 break;
 
             accounts[acct].digits = rb->atoi(data_buf);
@@ -722,7 +723,7 @@ static void edit_menu(int acct)
             memcpy(temp_sec, accounts[acct].secret, accounts[acct].sec_len);
             base32_encode(accounts[acct].secret, accounts[acct].sec_len, data_buf, sizeof(data_buf));
 
-            if(rb->kbd_input(data_buf, sizeof(data_buf)) < 0)
+            if(rb->kbd_input(data_buf, sizeof(data_buf), NULL) < 0)
                 break;
 
             int ret = base32_decode(accounts[acct].secret, sizeof(accounts[acct].secret), data_buf);

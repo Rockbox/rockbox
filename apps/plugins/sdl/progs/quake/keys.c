@@ -151,7 +151,7 @@ keyname_t keynames[] =
 /* Rockbox hack */
 void rb_console(void)
 {
-    rb->kbd_input(key_lines[edit_line] + 1, MAXCMDLINE-1);
+    rb->kbd_input(key_lines[edit_line] + 1, MAXCMDLINE-1, NULL);
 }
 
 /*

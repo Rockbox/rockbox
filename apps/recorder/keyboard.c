@@ -82,6 +82,7 @@
 struct keyboard_parameters
 {
     unsigned short kbd_buf[KBD_BUF_SIZE];
+    unsigned short *kbd_buf_ptr;
     unsigned short max_line_len;
     int default_lines;
     int last_k;
@@ -295,7 +296,7 @@ static unsigned short get_kbd_ch(struct keyboard_parameters *pm, int x, int y)
         i = pm->last_i;
         k -= pm->last_k;
     }
-    for (pbuf = &pm->kbd_buf[i]; (i = *pbuf) != 0xFEFF; pbuf += i + 1)
+    for (pbuf = &pm->kbd_buf_ptr[i]; (i = *pbuf) != 0xFEFF; pbuf += i + 1)
     {
         n = i ? (i + pm->max_chars - 1) / pm->max_chars : 1;
         if (k < n) break;
@@ -304,7 +305,7 @@ static unsigned short get_kbd_ch(struct keyboard_parameters *pm, int x, int y)
     if (y == 0 && i != 0xFEFF)
     {
         pm->last_k = pm->page*pm->lines - k;
-        pm->last_i = pbuf - pm->kbd_buf;
+        pm->last_i = pbuf - pm->kbd_buf_ptr;
     }
     k = k * pm->max_chars + x;
     return (*pbuf != 0xFEFF && k < *pbuf)? pbuf[k+1]: ' ';
@@ -330,7 +331,7 @@ static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
 static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
                                      struct edit_state *state, int dir);
 
-int kbd_input(char* text, int buflen)
+int kbd_input(char* text, int buflen, unsigned short *kbd)
 {
     bool done = false;
     struct keyboard_parameters * const param = kbd_param;
@@ -438,6 +439,12 @@ int kbd_input(char* text, int buflen)
     FOR_NB_SCREENS(l)
     {
         struct keyboard_parameters *pm = &param[l];
+
+        if(kbd) /* user supplied custom layout */
+            pm->kbd_buf_ptr = kbd;
+        else
+            pm->kbd_buf_ptr = pm->kbd_buf; /* internal layout buffer */
+
         struct screen *sc = &screens[l];
         kbd_calc_params(pm, sc, &state);
     }
@@ -743,7 +750,7 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
      * since we're going to be adding spaces,
      * max width is at least their width */
     pm->font_w = font_get_width(font, ' ');
-    for (pbuf = pm->kbd_buf; *pbuf != 0xFEFF; pbuf += i)
+    for (pbuf = pm->kbd_buf_ptr; *pbuf != 0xFEFF; pbuf += i)
     {
         for (i = 0; ++i <= *pbuf; )
         {
@@ -807,7 +814,7 @@ recalc_param:
         pm->keyboard_margin = DEFAULT_MARGIN;
 
     total_lines = 0;
-    for (pbuf = pm->kbd_buf; (i = *pbuf) != 0xFEFF; pbuf += i + 1)
+    for (pbuf = pm->kbd_buf_ptr; (i = *pbuf) != 0xFEFF; pbuf += i + 1)
         total_lines += (i ? (i + pm->max_chars - 1) / pm->max_chars : 1);
 
     pm->pages = (total_lines + pm->lines - 1) / pm->lines;
