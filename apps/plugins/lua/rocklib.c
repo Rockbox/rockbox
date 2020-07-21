@@ -152,7 +152,7 @@ RB_WRAP(kbd_input)
     else
         buffer[0] = '\0';
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE))
+    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, NULL))
     {
         luaL_addstring(&b, buffer);
         luaL_pushresult(&b);

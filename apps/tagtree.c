@@ -1905,7 +1905,7 @@ int tagtree_enter(struct tree_context* c)
                         }
                         else
                         {
-                            rc = kbd_input(searchstring, SEARCHSTR_SIZE);
+                            rc = kbd_input(searchstring, SEARCHSTR_SIZE, NULL);
                             if (rc < 0 || !searchstring[0])
                             {
                                 tagtree_exit(c);

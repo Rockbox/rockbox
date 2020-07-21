@@ -983,7 +983,7 @@ static int sudoku_edit_menu(struct sudoku_state_t* state)
 
     switch (result) {
         case 0: /* Save new game */
-            rb->kbd_input(state->filename,MAX_PATH);
+            rb->kbd_input(state->filename,MAX_PATH, NULL);
             if (save_sudoku(state)) {
                 state->editmode=0;
             } else {

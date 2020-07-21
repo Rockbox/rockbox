@@ -356,7 +356,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
         else
             strlcpy(playlist, m3u8name, MAX_PATH);
 
-        if (kbd_input(playlist, MAX_PATH))
+        if (kbd_input(playlist, MAX_PATH, NULL))
             return false;
 
         len = strlen(playlist);

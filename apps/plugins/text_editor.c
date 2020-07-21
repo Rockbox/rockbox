@@ -173,7 +173,7 @@ static bool save_changes(int overwrite)
 
     if (newfile || !overwrite)
     {
-        if(rb->kbd_input(filename,MAX_PATH) < 0)
+        if(rb->kbd_input(filename,MAX_PATH, NULL) < 0)
         {
             newfile = true;
             return false;
@@ -247,7 +247,7 @@ static int do_item_menu(int cur_sel)
             ret = MENU_RET_NO_UPDATE;
         break;
         case 2: /* insert above */
-            if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN))
+            if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN, NULL))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel);
                 copy_buffer[0]='\0';
@@ -255,7 +255,7 @@ static int do_item_menu(int cur_sel)
             }
         break;
         case 3: /* insert below */
-            if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN))
+            if (!rb->kbd_input(copy_buffer,MAX_LINE_LEN, NULL))
             {
                 do_action(ACTION_INSERT,copy_buffer,cur_sel+1);
                 copy_buffer[0]='\0';
@@ -425,7 +425,7 @@ enum plugin_status plugin_start(const void* parameter)
                     switch (rb->do_menu(&menu, NULL, NULL, false))
                     {
                         case 0:
-                            temp_changed = !rb->kbd_input(extension, sizeof(extension));
+                            temp_changed = !rb->kbd_input(extension, sizeof(extension), NULL);
                             break;
                         case 1:
                             old_color = color;
@@ -446,7 +446,7 @@ enum plugin_status plugin_start(const void* parameter)
                 }
                 else
 #endif
-                if (!rb->kbd_input(temp_line,MAX_LINE_LEN))
+                if (!rb->kbd_input(temp_line,MAX_LINE_LEN, NULL))
                 {
                     if (line_count)
                         do_action(ACTION_UPDATE,temp_line,cur_sel);

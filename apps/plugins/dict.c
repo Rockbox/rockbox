@@ -92,7 +92,7 @@ enum plugin_status plugin_start(const void* parameter)
     searchword[0] = '\0';
 
     /* get the word to search */
-    if (rb->kbd_input(searchword, sizeof(searchword)) < 0)
+    if (rb->kbd_input(searchword, sizeof(searchword), NULL) < 0)
         return PLUGIN_OK; /* input cancelled */
 
     fIndex = rb->open(DICT_INDEX, O_RDONLY); /* index file */

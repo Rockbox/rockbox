@@ -842,7 +842,7 @@ static void add_memo(struct shown *shown, int type)
 {
     bool saved = false;
     struct memo *memo = &memos[memos_in_memory];
-    if (rb->kbd_input(memo->message, MAX_CHAR_MEMO_LEN) == 0)
+    if (rb->kbd_input(memo->message, MAX_CHAR_MEMO_LEN, NULL) == 0)
     {
         if (memo->message[0])
         {
@@ -920,7 +920,7 @@ static bool edit_memo(int change, struct shown *shown)
 
             case 1: /* edit */
                 if(rb->kbd_input(memos[change].message,
-                                 MAX_CHAR_MEMO_LEN)  == 0)
+                                 MAX_CHAR_MEMO_LEN, NULL)  == 0)
                     save_memo(change, true, shown);
                 return false;
 

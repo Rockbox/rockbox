@@ -69,6 +69,8 @@ bmp_smooth_scale.c
 pluginlib_albumart.c
 #endif
 
+kbd_helper.c
+
 #endif /* HAVE_LCD_BITMAP */
 
 #ifdef HAVE_TOUCHSCREEN

@@ -97,8 +97,9 @@ static void say_edit(void)
         talk_id(VOICE_EDIT, false);
 }
 
-int kbd_input(char* text, int buflen)
+int kbd_input(char* text, int buflen, unsigned short *kbd)
 {
+    (void) kbd;
     bool done = false;
     bool redraw = true;
     bool line_edit = false;

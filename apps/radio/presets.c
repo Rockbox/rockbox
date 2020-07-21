@@ -277,7 +277,7 @@ int handle_radio_add_preset(void)
     {
         buf[0] = '\0';
 
-        if (!kbd_input(buf, MAX_FMPRESET_LEN + 1))
+        if (!kbd_input(buf, MAX_FMPRESET_LEN + 1, NULL))
         {
             struct fmstation * const fms = &presets[num_presets];
             strcpy(fms->name, buf);
@@ -307,7 +307,7 @@ static int radio_edit_preset(void)
 
         strcpy(buf, fms->name);
 
-        if (!kbd_input(buf, MAX_FMPRESET_LEN + 1))
+        if (!kbd_input(buf, MAX_FMPRESET_LEN + 1, NULL))
         {
             strcpy(fms->name, buf);
             presets_changed = true;
@@ -372,7 +372,7 @@ int preset_list_save(void)
 
         while(bad_file_name)
         {
-            if(!kbd_input(filepreset, sizeof(filepreset)))
+            if(!kbd_input(filepreset, sizeof(filepreset), NULL))
             {
                 /* check the name: max MAX_FILENAME (20) chars */
                 char* p2;

@@ -1963,7 +1963,7 @@ static bool sokoban_loop(void)
                                 *loc = '.';
                         }
 
-                        if (!rb->kbd_input(buf, MAX_PATH))
+                        if (!rb->kbd_input(buf, MAX_PATH, NULL))
                             save(buf, true);
                     } else
                         rb->splash(HZ*2, "Solution too long to save");

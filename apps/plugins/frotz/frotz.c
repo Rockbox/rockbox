@@ -195,7 +195,7 @@ zchar os_read_key(int timeout, bool show_cursor)
             return zkey;
 
         inputbuf[0] = '\0';
-        r = rb->kbd_input(inputbuf, 5);
+        r = rb->kbd_input(inputbuf, 5, NULL);
         rb->lcd_setfont(FONT_SYSFIXED);
         dumb_dump_screen();
         if (!r)
@@ -226,7 +226,7 @@ zchar os_read_line(int max, zchar *buf, int timeout, int width, int continued)
         if (max > width)
             max = width;
         strcpy(inputbuf, buf);
-        r = rb->kbd_input(inputbuf, 256);
+        r = rb->kbd_input(inputbuf, 256, NULL);
         rb->lcd_setfont(FONT_SYSFIXED);
         dumb_dump_screen();
         if (!r)
