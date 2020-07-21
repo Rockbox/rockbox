@@ -319,13 +319,6 @@ void *upg_write_memory(struct upg_file_t *file, const char *key,
         err_printf(GREY, "A UPG file must have at least one file\n");
         return NULL;
     }
-    if(key_len == 16 && file->nr_files == 1)
-    {
-        err_printf(RED, "This will probably not work: the firmware updater for this device expects at least two files in the archive.\n");
-        err_printf(RED, "The first one is a shell script and the second is a MD5 file. You can probably put whatever you want in this file,\n");
-        err_printf(RED, "even make it empty, but it needs to be there.\n");
-        /* let it run just in case */
-    }
 
     bool is_v2 = false;
     size_t min_chunk_size, hdr_sz, ent_sz;
@@ -337,7 +330,7 @@ void *upg_write_memory(struct upg_file_t *file, const char *key,
     }
     else if(key_len == 16)
     {
-        min_chunk_size = 16;
+        min_chunk_size = 4096; /* experimentally, V2 UPG files always seem to have 4k sizes */
         hdr_sz = sizeof(struct upg_header_v2_t);
         ent_sz = sizeof(struct upg_entry_v2_t);
         is_v2 = true;
@@ -346,6 +339,15 @@ void *upg_write_memory(struct upg_file_t *file, const char *key,
     {
         cprintf(GREY, "I don't know how to decrypt with a key of length %s\n", key_len);
         return NULL;
+    }
+
+    /* V2 wants at least two files, the second of which is supposed to contain MD5 sums */
+    if(is_v2 && file->nr_files == 1)
+    {
+        err_printf(RED, "This will probably not work: the firmware updater for this device expects at least two files in the archive.\n");
+        err_printf(RED, "The first one is a shell script and the second is a MD5 file. You can probably put whatever you want in this file,\n");
+        err_printf(RED, "even make it empty, but it needs to be there.\n");
+        /* let it run just in case */
     }
 
     /* compute total size and create buffer */
@@ -386,17 +388,6 @@ void *upg_write_memory(struct upg_file_t *file, const char *key,
         cprintf(RED, " %d\n", i);
         cprintf_field("    Offset: ", "0x%lx\n", offset);
         cprintf_field("    Size: ", "0x%lx\n", file->files[i].size);
-        if(!is_v2)
-        {
-            entry_v1[i].offset = offset;
-            entry_v1[i].size = file->files[i].size;
-        }
-        else
-        {
-            entry_v2[i].offset = offset;
-            entry_v2[i].size = file->files[i].size;
-            entry_v2[i].pad[0] = entry_v2[i].pad[1] = 0;
-        }
         /* copy data to buffer, with padding */
         size_t r_size = ROUND_UP(file->files[i].size, min_chunk_size);
         void *data_ptr = (uint8_t *)buf + offset;
@@ -412,6 +403,18 @@ void *upg_write_memory(struct upg_file_t *file, const char *key,
         {
             aes_cbc_enc_set_key_iv((uint8_t *)key, (uint8_t *)g_aes_iv);
             aes_cbc_enc(data_ptr, r_size, data_ptr);
+        }
+        /* write header */
+        if(!is_v2)
+        {
+            entry_v1[i].offset = offset;
+            entry_v1[i].size = file->files[i].size;
+        }
+        else
+        {
+            entry_v2[i].offset = offset;
+            entry_v2[i].size = r_size; /* the V2 seems to write the padded size here */
+            entry_v2[i].pad[0] = entry_v2[i].pad[1] = 0;
         }
 
         offset += r_size;
