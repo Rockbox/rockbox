@@ -29,6 +29,7 @@
 #include <ctype.h>
 #include "misc.h"
 #include <sys/stat.h>
+#include <zlib.h>
 #include "keysig_search.h"
 #include "upg.h"
 
@@ -46,16 +47,10 @@ static char *g_kas = NULL;
 static char *g_key = NULL;
 static char *g_sig = NULL;
 static int g_nr_threads = 1;
+#define MAX_NR_FILES    32
+bool g_compress[MAX_NR_FILES] = {false};
 
 enum keysig_search_method_t g_keysig_search = KEYSIG_SEARCH_NONE;
-
-#define let_the_force_flow(x) do { if(!g_force) return x; } while(0)
-#define continue_the_force(x) if(x) let_the_force_flow(x)
-
-#define check_field(v_exp, v_have, str_ok, str_bad) \
-    if((v_exp) != (v_have)) \
-    { cprintf(RED, str_bad); let_the_force_flow(__LINE__); } \
-    else { cprintf(RED, str_ok); }
 
 #define cprintf(col, ...) do {color(col); printf(__VA_ARGS__); }while(0)
 
@@ -176,7 +171,48 @@ static int do_upg(void *buf, long size)
             continue;
         }
         free(str);
-        fwrite(file->files[i].data, 1, file->files[i].size, f);
+        if(g_compress[i])
+        {
+            void *buf = file->files[i].data;
+            int size = file->files[i].size;
+            int pos = 0;
+            /* the fwpup tool seems to assume that every block decompresses to less than 4096 bytes,
+             * so I guess the encoder splits the input in chunks */
+            int max_chunk_size = 4096;
+            void *chunk = malloc(max_chunk_size);
+            if(g_debug)
+                cprintf(GREY, "decompressing file %d with chunk size %d...\n", i, max_chunk_size);
+            while(pos + 4 <= size)
+            {
+                int compressed_chunk_size = *(int *)(buf + pos);
+                if(g_debug)
+                    cprintf(GREY, "%d ", compressed_chunk_size);
+                if(compressed_chunk_size < 0)
+                {
+                    cprintf(RED, "invalid block size when decompressing, something is wrong\n");
+                    break;
+                }
+                if(compressed_chunk_size == 0)
+                    break;
+                uLongf chunk_size = max_chunk_size;
+                int zres = uncompress(chunk, &chunk_size, buf + pos + 4, compressed_chunk_size);
+                if(zres == Z_BUF_ERROR)
+                    cprintf(RED, "the encoder produced a block greater than %d, I can't handle that\n", max_chunk_size);
+                if(zres == Z_DATA_ERROR)
+                    cprintf(RED, "the compressed data seems corrupted\n");
+                if(zres != Z_OK)
+                    break;
+                pos += 4 + compressed_chunk_size;
+                fwrite(chunk, 1, chunk_size, f);
+            }
+            free(chunk);
+            if(g_debug)
+                cprintf(GREY, "done.");
+        }
+        else
+        {
+            fwrite(file->files[i].data, 1, file->files[i].size, f);
+        }
         fclose(f);
     }
     upg_free(file);
@@ -277,6 +313,8 @@ static int create_upg(int argc, char **argv)
             return 1;
         }
         fclose(f);
+        if(g_compress[i])
+            cprintf(RED, "Support for compressing file is not implemented yet\n");
         upg_append(upg, buf, size);
     }
 
@@ -325,6 +363,7 @@ static void usage(void)
     printf("  -s/--sig <sig>\tForce sig\n");
     printf("  -e/--extract\t\tExtract a UPG archive\n");
     printf("  -c/--create\t\tCreate a UPG archive\n");
+    printf("  -z/--compress <idx>\t\t(De)compress file <idx> (starts at 0)\n");
     printf("keysig search method:\n");
     for(int i = KEYSIG_SEARCH_FIRST; i < KEYSIG_SEARCH_LAST; i++)
         printf("  %-10s\t%s\n", keysig_search_desc[i].name, keysig_search_desc[i].comment);
@@ -355,10 +394,11 @@ int main(int argc, char **argv)
             {"extract", no_argument, 0, 'e'},
             {"create", no_argument, 0 ,'c'},
             {"threads", required_argument, 0, 't'},
+            {"compress", required_argument, 0, 'z'},
             {0, 0, 0, 0}
         };
 
-        int c = getopt_long(argc, argv, "?dnfo:m:l:a:k:s:ect:", long_options, NULL);
+        int c = getopt_long(argc, argv, "?dnfo:m:l:a:k:s:ect:z:", long_options, NULL);
         if(c == -1)
             break;
         switch(c)
@@ -418,6 +458,17 @@ int main(int argc, char **argv)
                     return 1;
                 }
                 break;
+            case 'z':
+            {
+                int idx = strtol(optarg, NULL, 0);
+                if(idx < 0 || idx >= MAX_NR_FILES)
+                {
+                    cprintf(GREY, "Invalid file index\n");
+                    return 1;
+                }
+                g_compress[idx] = true;
+                break;
+            }
             default:
                 abort();
         }
