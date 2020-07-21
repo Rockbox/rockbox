@@ -31,7 +31,7 @@ endif
 
 CXXFLAGS+=-g -Wall $(DEFINES)
 CFLAGS+=-g -Wall -std=c99 $(DEFINES)
-LDLIBS+=-lpthread
+LDLIBS+=-lpthread -lz
 
 BINS=upgtool$(EXE_EXT)
 
