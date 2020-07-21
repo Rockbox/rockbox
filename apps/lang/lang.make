@@ -51,7 +51,7 @@ $(BUILDDIR)/%.lng $(BUILDDIR)/%.vstrings: $(ROOTDIR)/%.lang $(BUILDDIR)/apps/gen
 	$(SILENT)mkdir -p $(dir $@)
 	$(SILENT)$(TOOLSDIR)/genlang -u -e=$(APPSDIR)/lang/english.lang $< > $@.tmp
 	$(SILENT)$(TOOLSDIR)/genlang -e=$(APPSDIR)/lang/english.lang -t=$(MODELNAME):`cat $(BUILDDIR)/apps/genlang-features` -i=$(TARGET_ID) -b=$*.lng -c=$*.vstrings $@.tmp
-	$(SILENT)rm -f $<.tmp
+	$(SILENT)rm -f $@.tmp
 
 $(BUILDDIR)/apps/lang/voicestrings.zip: $(VOICEOBJ)
 	$(call PRINTS,ZIP $(subst $(BUILDDIR)/,,$@))
