@@ -58,7 +58,7 @@ int save_playlist_screen(struct playlist_info* playlist)
     if (dot) /* remove extension */
        *dot = '\0';
 
-    if (!kbd_input(temp, sizeof(temp)))
+    if (!kbd_input(temp, sizeof(temp), NULL))
     {
         len = strlen(temp);
         if(len > 4 && !strcasecmp(&temp[len-4], ".m3u"))

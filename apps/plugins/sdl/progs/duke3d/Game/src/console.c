@@ -224,7 +224,7 @@ void CONSOLE_HandleInput()
             //If console_buffer[0] strlen() != 0
             //1. Push the dirty_buffer unto the console_buffer
             //2. parse the text
-            rb->kbd_input(dirty_buffer, sizeof(dirty_buffer));
+            rb->kbd_input(dirty_buffer, sizeof(dirty_buffer), NULL);
 
             CONSOLE_Printf("%s", dirty_buffer);
             console_cursor_pos = 0;

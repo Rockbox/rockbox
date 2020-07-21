@@ -691,7 +691,7 @@ bool settings_save_config(int options)
 
     /* allow user to modify filename */
     while (true) {
-        if (!kbd_input(filename, sizeof filename)) {
+        if (!kbd_input(filename, sizeof(filename), NULL)) {
             break;
         }
         else {

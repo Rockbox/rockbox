@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 by Björn Stenberg
+ * Copyright (C) 2002 by Daniel Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,13 +18,34 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _KEYBOARD_H
-#define _KEYBOARD_H
+#include "plugin.h"
+#include "kbd_helper.h"
 
-int kbd_input(char* buffer, int buflen, unsigned short *kbd);
+/* create a custom keyboard layout for kbd_input */
+int kbd_create_layout(char *layout, unsigned short *buf, int bufsz)
+{
+    unsigned short *pbuf;
+    const unsigned char *p = layout;
+    int len = 0;
+    pbuf = buf;
+    while (*p && (pbuf - buf + 8) < bufsz)
+    {
+        p = rb->utf8decode(p, &pbuf[len+1]);
+        if (pbuf[len+1] == '\n')
+        {
+            *pbuf = len;
+            pbuf += len+1;
+            len = 0;
+        }
+        else
+            len++;
+    }
 
-#ifdef HAVE_LCD_BITMAP
-int load_kbd(unsigned char* filename);
-#endif
-
-#endif
+    if (len + 1 < bufsz)
+    {
+        *pbuf = len; 
+        pbuf[len+1] = 0xFEFF;   /* mark end of characters */
+        return len + 1;
+    }
+    return 0;
+}
