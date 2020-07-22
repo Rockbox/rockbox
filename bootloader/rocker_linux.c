@@ -9,6 +9,7 @@
  *
  * Copyright (C) 2016 by Amaury Pouly
  *               2018 by Marcin Bukat
+ *               2018 by Roman Stolyarov
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
@@ -45,9 +46,24 @@
 #include <stdarg.h>
 #include "version.h"
 
-/* all images must have the following size */
+/* Basic configuration */
+#if defined(AGPTEK_ROCKER)
 #define ICON_WIDTH  70
 #define ICON_HEIGHT 70
+#define RBFILE "rockbox.rocker"
+#elif defined(XDUOO_X3II)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define RBFILE "rockbox.x3ii"
+#elif defined(XDUOO_X20)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define RBFILE "rockbox.x20"
+#else
+#error "must define ICON_WIDTH/HEIGHT"
+#endif
+
+#define BASE_DIR "/mnt/sd_0"
 
 /* images */
 #include "bitmaps/rockboxicon.h"
@@ -68,14 +84,20 @@
 #error toolsicon has the wrong resolution
 #endif
 
-#ifndef BUTTON_REW
-#define BUTTON_REW  BUTTON_LEFT
+#ifndef BUTTON_LEFT
+#define BUTTON_LEFT   BUTTON_REW
 #endif
-#ifndef BUTTON_FF
-#define BUTTON_FF   BUTTON_RIGHT
+#ifndef BUTTON_RIGHT
+#define BUTTON_RIGHT  BUTTON_FF
 #endif
-#ifndef BUTTON_PLAY
-#define BUTTON_PLAY BUTTON_SELECT
+#ifndef BUTTON_SELECT
+#define BUTTON_SELECT BUTTON_PLAY
+#endif
+#ifndef BUTTON_DOWN
+#define BUTTON_DOWN BUTTON_NEXT
+#endif
+#ifndef BUTTON_UP
+#define BUTTON_UP BUTTON_PREV
 #endif
 
 /* return icon y position (x is always centered) */
@@ -143,7 +165,7 @@ static enum boot_mode inactivity_action(enum boot_mode cur_selection)
  * (since the mostly suspends instead of powering down) */
 static enum boot_mode load_boot_mode(enum boot_mode mode)
 {
-    int fd = open("/data/rb_bl_mode.txt", O_RDONLY);
+    int fd = open(BASE_DIR "/.rockbox/rb_bl_mode.txt", O_RDONLY);
     if(fd >= 0)
     {
         read(fd, &mode, sizeof(mode));
@@ -154,7 +176,7 @@ static enum boot_mode load_boot_mode(enum boot_mode mode)
 
 static void save_boot_mode(enum boot_mode mode)
 {
-    int fd = open("/data/rb_bl_mode.txt", O_RDWR | O_CREAT | O_TRUNC);
+    int fd = open(BASE_DIR "/.rockbox/rb_bl_mode.txt", O_RDWR | O_CREAT | O_TRUNC);
     if(fd >= 0)
     {
         write(fd, &mode, sizeof(mode));
@@ -250,12 +272,12 @@ static enum boot_mode get_boot_mode(void)
         if(btn & BUTTON_REPEAT)
             btn &= ~BUTTON_REPEAT;
         /* play -> stop loop and return mode */
-        if(btn == BUTTON_PLAY)
+        if(btn == BUTTON_SELECT)
             break;
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_LEFT || btn == BUTTON_DOWN || btn == BUTTON_REW)
+        if(btn == BUTTON_LEFT || btn == BUTTON_DOWN)
             mode = (mode + BOOT_COUNT - 1) % BOOT_COUNT;
-        if(btn == BUTTON_RIGHT || btn == BUTTON_UP || btn == BUTTON_FF)
+        if(btn == BUTTON_RIGHT || btn == BUTTON_UP)
             mode = (mode + 1) % BOOT_COUNT;
     }
 
@@ -323,10 +345,10 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
         if(btn & BUTTON_REPEAT)
             btn &= ~BUTTON_REPEAT;
         /* play -> stop loop and return mode */
-        if(btn == BUTTON_PLAY || btn == BUTTON_LEFT)
+        if(btn == BUTTON_SELECT || btn == BUTTON_LEFT)
         {
             free(buf);
-            return btn == BUTTON_PLAY ? choice : -1;
+            return btn == BUTTON_SELECT ? choice : -1;
         }
         /* left/right/up/down: change mode */
         if(btn == BUTTON_UP)
@@ -338,7 +360,7 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
 
 void run_file(const char *name)
 {
-    char *dirname = "/mnt/sd_0/";
+    char *dirname = BASE_DIR;
     char *buf = malloc(strlen(dirname) + strlen(name) + 1);
     sprintf(buf, "%s%s", dirname, name);
 
@@ -380,7 +402,7 @@ void run_script_menu(void)
 {
     const char **entries = NULL;
     int nr_entries = 0;
-    DIR *dir = opendir("/mnt/sd_0");
+    DIR *dir = opendir(BASE_DIR);
     struct dirent *ent;
     while((ent = readdir(dir)))
     {
@@ -443,10 +465,14 @@ static void tools_screen(void)
     {
         run_script_menu();
     }
-//    else if(choice == 2)
-//        nwz_power_restart();
+    else if(choice == 3)
+    {
+        system_reboot();
+    }
     else if(choice == 4)
+    {
         power_off();
+    }
 }
 
 #if 0
@@ -454,7 +480,7 @@ static void tools_screen(void)
 static int open_log(void)
 {
     /* open regular log file */
-    int fd = open("/mnt/sd_0/rockbox.log", O_RDWR | O_CREAT | O_APPEND);
+    int fd = open(BASE_DIR "/rockbox.log", O_RDWR | O_CREAT | O_APPEND);
     /* get its size */
     struct stat stat;
     if(fstat(fd, &stat) != 0)
@@ -464,9 +490,9 @@ static int open_log(void)
         return fd;
     close(fd);
     /* move file */
-    rename("/mnt/sd_0/rockbox.log", "/mnt_sd_0/rockbox.log.1");
+    rename(BASE_DIR "/rockbox.log", BASE_DIR "/rockbox.log.1");
     /* re-open the file, truncate in case the move was unsuccessful */
-    return open("/mnt/sd_0/rockbox.log", O_RDWR | O_CREAT | O_APPEND | O_TRUNC);
+    return open(BASE_DIR "/rockbox.log", O_RDWR | O_CREAT | O_APPEND | O_TRUNC);
 }
 #endif
 
@@ -529,8 +555,8 @@ int main(int argc, char **argv)
         else if(mode == BOOT_ROCKBOX)
         {
             fflush(stdout);
-            system("/bin/cp /mnt/sd_0/.rockbox/rockbox.rocker /tmp");
-            execl("/tmp/rockbox.rocker", "rockbox.rocker", NULL);
+            system("/bin/cp " BASE_DIR "/.rockbox/" RBFILE " /tmp");
+            execl("/tmp/" RBFILE, RBFILE, NULL);
             printf("execvp failed: %s\n", strerror(errno));
             /* fallback to OF in case of failure */
             error_screen("Cannot boot Rockbox");
