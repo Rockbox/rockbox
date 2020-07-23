@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6ed03b3e_937b00bf",
+        "filename": "apps/plugins/fractals/mandelbrot_set.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-23T16:07:40Z",
+      "side": 1,
+      "message": "I don\u0027t understand why it is no longer necessary.\n\n(beyond what the comment says)",
+      "parentUuid": "b1efe79f_46320520",
+      "revId": "99e26dd05112f56901acca7842f9dacd78f39af7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8cb5e6ad_885634a5",
         "filename": "firmware/export/hwcompat.h",
         "patchSetId": 24
@@ -30,6 +48,24 @@
       "writtenOn": "2020-07-23T15:35:37Z",
       "side": 1,
       "message": "I feel there should be a small explanation what the file should include since there is no code for context anymore",
+      "revId": "99e26dd05112f56901acca7842f9dacd78f39af7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d39d8cd_8bb42746",
+        "filename": "firmware/export/hwcompat.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-23T16:07:40Z",
+      "side": 1,
+      "message": "I have no idea what this file is actually for, but since it now only seems to be used by ipods now, we should rename or eliminate it altogether.",
+      "parentUuid": "8cb5e6ad_885634a5",
       "revId": "99e26dd05112f56901acca7842f9dacd78f39af7",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
