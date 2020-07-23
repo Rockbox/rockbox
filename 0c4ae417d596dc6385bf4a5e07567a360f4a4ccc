@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "683211a2_de4525df",
+        "filename": "apps/plugins/stopwatch.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-07-23T15:35:37Z",
+      "side": 0,
+      "message": "Are you sure RECORDER_PAD  isn\u0027t used anywhere else?",
+      "revId": "0c4ae417d596dc6385bf4a5e07567a360f4a4ccc",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
