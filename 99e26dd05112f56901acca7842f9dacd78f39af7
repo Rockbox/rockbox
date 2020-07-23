@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fee3c3ea_d72696d8",
+        "filename": "apps/plugins/fractals/mandelbrot_set.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-07-23T23:40:37Z",
+      "side": 1,
+      "message": "oops sorry, didn\u0027t see the elif above\nwas saying the two ifdef could be combined but you are correct.",
+      "parentUuid": "b1efe79f_46320520",
+      "revId": "99e26dd05112f56901acca7842f9dacd78f39af7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8cb5e6ad_885634a5",
         "filename": "firmware/export/hwcompat.h",
         "patchSetId": 24
