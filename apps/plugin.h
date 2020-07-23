@@ -998,6 +998,9 @@ struct plugin_api {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    struct playlist_info* (*playlist_get_current)(void);
+
 };
 
 /* plugin header */
