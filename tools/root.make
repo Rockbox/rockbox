@@ -21,7 +21,7 @@ CORE_LDOPTS = $(GLOBAL_LDOPTS)  # linker ops specifically for core build
 
 TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
-	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
+	$(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
 	$(TOOLSDIR)/iaudio_bl_flash.h
 
 
@@ -107,8 +107,6 @@ ifneq (,$(findstring bootloader,$(APPSDIR)))
   else
     include $(APPSDIR)/bootloader.make
   endif
-else ifneq (,$(findstring bootbox,$(APPSDIR)))
-  include $(APPSDIR)/bootbox.make
 else ifneq (,$(findstring checkwps,$(APP_TYPE)))
   include $(APPSDIR)/checkwps.make
   include $(ROOTDIR)/lib/skin_parser/skin_parser.make

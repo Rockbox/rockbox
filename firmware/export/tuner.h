@@ -23,7 +23,6 @@
 #define __TUNER_H__
 
 #include "config.h"
-#include "hwcompat.h"
 
 #ifdef HAVE_RDS_CAP
 #include <sys/types.h>

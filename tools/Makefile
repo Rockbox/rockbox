@@ -8,14 +8,14 @@
 CFLAGS := -O -g -W -Wall -Wshadow -pedantic
 LDFLAGS := -g
 
-.PHONY: rbspeexenc uclpack
+.PHONY: rbspeexenc
 
 CLEANALL := scramble descramble iriver bmp2rb rdf2binary convbdf \
-    generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat lngdump \
+    generate_rocklatin mkboot ipod_fw codepages mi4 gigabeat lngdump \
     telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot convttf
 
 all: scramble descramble rdf2binary mkboot mkzenboot convbdf codepages \
-	uclpack rbspeexenc voicefont mk500boot
+	rbspeexenc voicefont mk500boot
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
 	iaudio_bl_flash.o creative.o hmac-sha1.o rkw.o
@@ -75,9 +75,6 @@ convbdf: convbdf.c
 
 codepages: codepages.c codepage_tables.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
-
-uclpack:
-	$(SILENT)$(MAKE) -C ucl
 
 rbspeexenc:
 	$(SILENT)$(MAKE) -C rbspeex
