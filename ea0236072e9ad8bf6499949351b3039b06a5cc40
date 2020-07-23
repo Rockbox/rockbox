@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a8c827c5_c445867a",
+        "filename": "firmware/target/mips/ingenic_jz47xx/system-jz4740.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-23T19:53:16Z",
+      "side": 1,
+      "message": "yep!",
+      "parentUuid": "b4fc1b72_801ea8b9",
+      "revId": "ea0236072e9ad8bf6499949351b3039b06a5cc40",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "90b1b3d6_8101e1a7",
         "filename": "firmware/target/mips/ingenic_jz47xx/system-jz4740.c",
         "patchSetId": 17
@@ -30,6 +48,24 @@
       "writtenOn": "2020-07-23T19:41:53Z",
       "side": 1,
       "message": "think this is for EXTENDED_EXCEPTION_DESC",
+      "revId": "ea0236072e9ad8bf6499949351b3039b06a5cc40",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ce18cb11_f6b5380e",
+        "filename": "firmware/target/mips/ingenic_jz47xx/system-jz4740.c",
+        "patchSetId": 17
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-23T19:53:16Z",
+      "side": 1,
+      "message": "yep, fixed.",
+      "parentUuid": "90b1b3d6_8101e1a7",
       "revId": "ea0236072e9ad8bf6499949351b3039b06a5cc40",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
