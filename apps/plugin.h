@@ -161,6 +161,8 @@ void* plugin_get_buffer(size_t *buffer_size);
    new function which are "waiting" at the end of the function table) */
 #define PLUGIN_MIN_API_VERSION 239
 
+/* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
+
 /* plugin return codes */
 /* internal returns start at 0x100 to make exit(1..255) work */
 #define INTERNAL_PLUGIN_RETVAL_START 0x100
@@ -769,6 +771,7 @@ struct plugin_api {
 #endif
 
     /* playback control */
+    struct playlist_info* (*playlist_get_current)(void);
     int (*playlist_amount)(void);
     int (*playlist_resume)(void);
     void (*playlist_resume_track)(int start_index, unsigned int crc,

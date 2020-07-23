@@ -792,10 +792,11 @@ bool is_backlight_on(bool ignore_always_off)
     \return
     \description
 
-int kbd_input(char* buffer, int buflen)
+int kbd_input(char* buffer, int buflen, unsigned short *kbd)
     \group misc
     \param buffer
     \param buflen
+    \param *kbd
     \return 0 upon success, negative upon failure
     \description Prompt for a string to be stored in =buffer= which is of length =buflen=
 
@@ -1511,6 +1512,11 @@ void pcm_set_frequency(unsigned int frequency)
 void pcm_stop_recording(void)
     \group sound
     \conditions defined(HAVE_RECORDING)
+    \description
+
+struct playlist_info *playlist_get_current(void)
+    \group playback control
+    \return pointer to current playlist
     \description
 
 int playlist_amount(void)
