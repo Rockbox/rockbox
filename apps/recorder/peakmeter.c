@@ -46,7 +46,9 @@
 #include "pcm_record.h"
 #endif
 
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 static bool pm_playback = true; /* selects between playback and recording peaks */
+#endif
 
 static struct meter_scales scales[NB_SCREENS];
 
@@ -1074,9 +1076,12 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
 
 #ifdef HAVE_BACKLIGHT
     /* cliplight */
-    if ((pm_clip_left || pm_clip_right) && 
-        global_settings.cliplight &&
-        !pm_playback)
+    if ((pm_clip_left || pm_clip_right) &&
+        global_settings.cliplight
+#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
+        && !pm_playback
+#endif
+	    )
     {
         /* if clipping, cliplight setting on and in recording screen */
         if (global_settings.cliplight <= 2)
