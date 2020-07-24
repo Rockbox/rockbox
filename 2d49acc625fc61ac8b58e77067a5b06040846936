@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a024f03c_be4a3df9",
+        "filename": "firmware/drivers/ata.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-24T03:47:27Z",
+      "side": 1,
+      "message": "um, oops.  will fix this.\n\nAlso, discovered that the problematic CF-\u003eSD adapters have this 0x0001 value in their table, but in the wrong endianness.  So we\u0027d need to check for 0x0001 and 0x0100.",
+      "range": {
+        "startLine": 337,
+        "startChar": 31,
+        "endLine": 337,
+        "endChar": 33
+      },
+      "revId": "2d49acc625fc61ac8b58e77067a5b06040846936",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f6de75f0_035bbca7",
+        "filename": "firmware/drivers/ata.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-07-24T03:47:27Z",
+      "side": 1,
+      "message": "this is 1 tick.  not realistic.  Will need a different approach -- just as long as the spinup_time is \u003e 0 as \u00270\u0027 triggers default behaviors which are not ideal.",
+      "range": {
+        "startLine": 454,
+        "startChar": 20,
+        "endLine": 454,
+        "endChar": 36
+      },
+      "revId": "2d49acc625fc61ac8b58e77067a5b06040846936",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
