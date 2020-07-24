@@ -46,9 +46,7 @@
 #include "pcm_record.h"
 #endif
 
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 static bool pm_playback = true; /* selects between playback and recording peaks */
-#endif
 
 static struct meter_scales scales[NB_SCREENS];
 
