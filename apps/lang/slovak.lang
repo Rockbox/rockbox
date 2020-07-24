@@ -16348,3 +16348,102 @@
     lcd_bitmap: "Vybrať inú hru"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zobraziť album navrchu"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zobraziť album navrchu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Aktualizovať cache"
+  </dest>
+  <voice>
+    *: "Aktualizovať cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zobraziť album a umelca naspodku"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zobraziť album a umelca naspodku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album at the bottom"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zobraziť album naspodku"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zobraziť album naspodku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Hide information"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Skryť info"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Skryť info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: none
+    lcd_bitmap: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: none
+    lcd_bitmap: "Zobraziť album a umelca navrchu"
+  </dest>
+  <voice>
+    *: none
+    lcd_bitmap: "Zobraziť album a umelca navrchu"
+  </voice>
+</phrase>
