@@ -274,8 +274,9 @@ static int fill_buffer(int new_offset){
     {
         log_text("Read failed.",true);
         DEBUGF("read fail:  got %d bytes, expected %d\n", (int)n, (int)audiobufsize);
+#ifdef HAVE_BACKLIGHT
         rb->backlight_on();
-
+#endif
         if (fd >= 0)
         {
             rb->close(fd);
@@ -723,7 +724,9 @@ static enum plugin_status test_track(const char* filename)
 
     /* Be sure it is done */
     rb->codec_thread_do_callback(NULL, NULL);
+#ifdef HAVE_BACKLIGHT
     rb->backlight_on();
+#endif
     log_text(str,true);
 
     if (codec_action == CODEC_ACTION_HALT)
@@ -771,8 +774,9 @@ static enum plugin_status test_track(const char* filename)
     res = PLUGIN_OK;
 
 exit:
+#ifdef HAVE_BACKLIGHT
     rb->backlight_on();
-
+#endif
     if (fd >= 0)
     {
         rb->close(fd);
