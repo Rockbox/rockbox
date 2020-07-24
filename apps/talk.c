@@ -817,6 +817,9 @@ void talk_init(void)
         mutex_init(&queue_mutex);
         mutex_init(&read_buffer_mutex);
     }
+
+    talk_force_shutup();  /* In case we have something speaking! */
+
     talk_initialized = true;
     strlcpy((char *)last_lang, (char *)global_settings.lang_file,
         MAX_FILENAME);
