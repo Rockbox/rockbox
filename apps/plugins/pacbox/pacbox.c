@@ -768,9 +768,11 @@ enum plugin_status plugin_start(const void* parameter)
        the settings have changed when we quit */
     old_settings = settings;
 
+#ifdef HAVE_BACKLIGHT
     /*Turn off backlight for ai*/
     if(settings.ai)
         backlight_ignore_timeout();
+#endif
 
     /* Initialise the hardware */
     init_PacmanMachine(settings_to_dip(settings));
@@ -803,8 +805,8 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
-
+#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-
+#endif
     return PLUGIN_OK;
 }

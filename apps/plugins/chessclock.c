@@ -21,8 +21,6 @@
 #include "plugin.h"
 #include "lib/playback_control.h"
 
-
-
 /* variable button definitions */
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -636,15 +634,19 @@ static int run_timer(int nr)
                 rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"ROUND UP!");
             else
                 rb->lcd_puts(0, FIRST_LINE+1, (unsigned char *)"TIME OUT!");
+#ifdef HAVE_BACKLIGHT
             rb->backlight_on();
+#endif
             ticks = max_ticks;
         } else {
             now=*rb->current_tick;
             if (!chesspause) {
                 ticks+=now-last_tick;
                 if ((max_ticks-ticks)/HZ == 10) {
-                     /* Backlight on if 10 seconds remain */
+#ifdef HAVE_BACKLIGHT
+                    /* Backlight on if 10 seconds remain */
                     rb->backlight_on();
+#endif
                 }
             }
             last_tick=now;

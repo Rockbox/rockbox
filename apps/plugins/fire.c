@@ -277,8 +277,10 @@ static void cleanup(void *parameter)
 #ifndef HAVE_LCD_COLOR
     grey_release();
 #endif
+#ifdef HAVE_BACKLIGHT
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
+#endif
 }
 
 
@@ -366,15 +368,17 @@ enum plugin_status plugin_start(const void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
+#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
+#endif
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
     ret = main();
-    
+
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif

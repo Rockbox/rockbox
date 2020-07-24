@@ -189,10 +189,12 @@ enum plugin_status plugin_start(const void* parameter)
         return PLUGIN_OK;
     }
     update_screen();
+#ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
     rb->remote_backlight_on();
 #endif
     rb->backlight_on();
+#endif
     rb->splash(HZ, "Done");
     update_screen();
     while (1) {

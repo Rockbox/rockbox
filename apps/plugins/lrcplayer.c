@@ -2687,8 +2687,10 @@ static int lrc_main(void)
         vp_lyrics[i].height -= h;
     }
 
+#ifdef HAVE_BACKLIGHT
     if (prefs.backlight_on)
         backlight_ignore_timeout();
+#endif
 
     /* in case settings that may affect break position
      * are changed (statusbar_on and wrap). */
@@ -2780,8 +2782,10 @@ static int lrc_main(void)
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
 
+#ifdef HAVE_BACKLIGHT
     if (prefs.backlight_on)
         backlight_use_settings();
+#endif
 
     return ret;
 }

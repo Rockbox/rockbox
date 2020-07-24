@@ -121,7 +121,9 @@ void exit_handler(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
+#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
+#endif
 }
 
 static bool sys_do_help(void)
@@ -425,7 +427,9 @@ void sys_menu(struct System* sys)
 void sys_init(struct System* sys, const char* title)
 {
     (void) title;
+#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
+#endif
     rb_atexit(exit_handler);
     save_sys = sys;
     rb->memset(&sys->input, 0, sizeof(sys->input));

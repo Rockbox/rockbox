@@ -1899,8 +1899,9 @@ enum plugin_status plugin_start(UNUSED const void* parameter)
 {
     rb->lcd_setfont(FONT_SYSFIXED);
     /* Turn off backlight timeout */
+#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-
+#endif
     /* now go ahead and have fun! */
     game_loop();
 
@@ -1916,8 +1917,9 @@ enum plugin_status plugin_start(UNUSED const void* parameter)
     /* Restore user's original backlight setting */
     rb->lcd_setfont(FONT_UI);
     /* Turn on backlight timeout (revert to settings) */
+#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-
+#endif
     return PLUGIN_OK;
 }
 
