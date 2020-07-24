@@ -2971,8 +2971,10 @@ static void cleanup(void)
     rb->cpu_boost(false);
 #endif
     end_pf_thread();
+#ifdef HAVE_BACKLIGHT
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
+#endif
 
 #ifdef USEGSLIB
     grey_release();
@@ -3508,7 +3510,9 @@ static int pictureflow_main(void)
         draw_splashscreen(pf_idx.buf, pf_idx.buf_sz);
     if(pf_cfg.backlight_mode == 0) {
         /* Turn off backlight timeout */
+#ifdef HAVE_BACKLIGHT
         backlight_ignore_timeout();
+#endif
     }
 
     init_scroll_lines();

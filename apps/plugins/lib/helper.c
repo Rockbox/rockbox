@@ -22,6 +22,7 @@
 #include "plugin.h"
 #include "helper.h"
 
+#ifdef HAVE_BACKLIGHT
 /* Force the backlight on */
 void backlight_force_on(void)
 {
@@ -51,6 +52,7 @@ void backlight_use_settings(void)
                                       backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 }
+#endif /* HAVE_BACKLIGHT */
 
 #ifdef HAVE_SW_POWEROFF
 static bool original_sw_poweroff_state = true;

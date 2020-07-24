@@ -569,10 +569,12 @@ static enum plugin_status main_menu(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
 #endif
+#ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                 rb->remote_backlight_on();
 #endif
                 rb->backlight_on();
+#endif
                 break;
             case 1:
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -583,10 +585,12 @@ static enum plugin_status main_menu(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
 #endif
+#ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                 rb->remote_backlight_on();
 #endif
                 rb->backlight_on();
+#endif
                 break;
             case 2: /* export to textfile */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -596,10 +600,12 @@ static enum plugin_status main_menu(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
 #endif
+#ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                 rb->remote_backlight_on();
 #endif
                 rb->backlight_on();
+#endif
                 break;
             case 3: /* import from textfile */
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
@@ -609,10 +615,12 @@ static enum plugin_status main_menu(void)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                 rb->cpu_boost(false);
 #endif
+#ifdef HAVE_BACKLIGHT
 #ifdef HAVE_REMOTE_LCD
                 rb->remote_backlight_on();
 #endif
                 rb->backlight_on();
+#endif
                 break;
             case 4:
                 if (!start_shuffled_play())

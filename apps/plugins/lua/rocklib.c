@@ -579,6 +579,7 @@ RB_WRAP(mixer_frequency)
     return 1;
 }
 
+#ifdef HAVE_BACKLIGHT
 /* DEVICE LIGHTING CONTROL */
 RB_WRAP(backlight_onoff)
 {
@@ -599,11 +600,6 @@ SIMPLE_VOID_WRAPPER(remote_backlight_force_on);
 SIMPLE_VOID_WRAPPER(remote_backlight_use_settings);
 #endif
 
-#ifdef HAVE_BUTTON_LIGHT
-SIMPLE_VOID_WRAPPER(buttonlight_force_on);
-SIMPLE_VOID_WRAPPER(buttonlight_use_settings);
-#endif
-
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 RB_WRAP(backlight_brightness_set)
 {
@@ -617,6 +613,12 @@ RB_WRAP(backlight_brightness_set)
 
     return 0;
 }
+#endif
+#endif /* HAVE_BACKLIGHT */
+
+#ifdef HAVE_BUTTON_LIGHT
+SIMPLE_VOID_WRAPPER(buttonlight_force_on);
+SIMPLE_VOID_WRAPPER(buttonlight_use_settings);
 #endif
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
@@ -954,6 +956,7 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(pcm),
     RB_FUNC(mixer_frequency),
 
+#ifdef HAVE_BACKLIGHT
     /* DEVICE LIGHTING CONTROL */
     RB_FUNC(backlight_onoff),
 
@@ -966,13 +969,14 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(remote_backlight_use_settings),
 #endif
 
+#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+    RB_FUNC(backlight_brightness_set),
+#endif
+#endif  /* HAVE_BACKLIGHT */
+
 #ifdef HAVE_BUTTON_LIGHT
     RB_FUNC(buttonlight_force_on),
     RB_FUNC(buttonlight_use_settings),
-#endif
-
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
-    RB_FUNC(backlight_brightness_set),
 #endif
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS

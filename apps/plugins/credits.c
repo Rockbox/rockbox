@@ -303,17 +303,21 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
+#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
+#endif
 
     rb->show_logo();
 
     /* Show the logo for about 3 secs allowing the user to stop */
     if(!rb->action_userabort(3*HZ))
         roll_credits();
-      
+
+#ifdef HAVE_BACKLIGHT
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
+#endif
 
     return PLUGIN_OK;
 }
