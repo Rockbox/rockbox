@@ -559,6 +559,17 @@ sub allbuilds {
 	},
         'enabled' => 1,
     },
+    'francais' => {
+	'lang' => 'francais',
+	'name' => 'Français (French)',
+        'short' => 'fr',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vfr-fr',
+	    'gtts' => '-l fr',
+	},
+        'enabled' => 1,
+    },
     'greek' => {
 	'lang' => 'greek',
 	'name' => 'Ελληνικά (Greek)',
