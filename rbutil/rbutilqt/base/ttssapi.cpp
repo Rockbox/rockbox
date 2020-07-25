@@ -143,7 +143,11 @@ bool TTSSapi::start(QString *errStr)
     }
 
     voicestream = new QTextStream(voicescript);
+#if QT_VERSION < 0x060000
     voicestream->setCodec("UTF16-LE");
+#else
+    voicestream->setEncoding(QStringConverter::Utf16LE);
+#endif
 
     m_started = true;
     return true;

@@ -217,7 +217,11 @@ void VoiceFileCreator::create(void)
     //read in downloaded file
     emit logItem(tr("Reading strings..."),LOGINFO);
     QTextStream in(&genlang);
+#if QT_VERSION < 0x060000
     in.setCodec("UTF-8");
+#else
+    in.setEncoding(QStringConverter::Utf8);
+#endif
     QString id, voice;
     bool idfound = false;
     bool voicefound=false;

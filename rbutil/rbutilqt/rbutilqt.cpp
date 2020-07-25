@@ -292,7 +292,11 @@ void RbUtilQt::about()
     QFile credits(":/docs/CREDITS");
     credits.open(QIODevice::ReadOnly);
     QTextStream r(&credits);
+#if QT_VERSION < 0x060000
     r.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    r.setEncoding(QStringConverter::Utf8);
+#endif
     while(!r.atEnd()) {
         QString line = r.readLine();
         // filter out header.

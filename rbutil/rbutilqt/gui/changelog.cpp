@@ -45,7 +45,11 @@ QString Changelog::parseChangelogFile(QString filename)
     QFile changelog(filename);
     changelog.open(QIODevice::ReadOnly);
     QTextStream c(&changelog);
+#if QT_VERSION < 0x060000
     c.setCodec(QTextCodec::codecForName("UTF-8"));
+#else
+    c.setEncoding(QStringConverter::Utf8);
+#endif
     QString text;
     while(!c.atEnd()) {
         QString line = c.readLine();
