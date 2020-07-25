@@ -630,7 +630,7 @@ void Config::updateLanguage()
     RbUtilQt::translators.append(translator);
     RbUtilQt::translators.append(qttrans);
 
-    QLocale::setDefault(language);
+    QLocale::setDefault(QLocale(language));
 
 }
 

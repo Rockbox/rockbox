@@ -80,7 +80,7 @@ int main( int argc, char ** argv ) {
             QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
             qttrans.load("qt_" + applang, ":/lang");
 
-        QLocale::setDefault(applang);
+        QLocale::setDefault(QLocale(applang));
     }
     delete user;
     app.installTranslator(&translator);
