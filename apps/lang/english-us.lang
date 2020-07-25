@@ -5388,11 +5388,11 @@
   </source>
   <dest>
     *: none
-    recording: ""
+    recording: "Line In"
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "Line In"
   </voice>
 </phrase>
 <phrase>
@@ -6205,7 +6205,7 @@
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
-    iriverifp7xx: ""
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
@@ -7670,7 +7670,7 @@
   </source>
   <dest>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: ""
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
