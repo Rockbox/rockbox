@@ -47,9 +47,11 @@ struct vo_data
 #if NUM_CORES > 1
 /* Cache aligned and padded to avoid clobbering other processors' cacheable
  * data */
-static uint8_t __vo_data[CACHEALIGN_UP(sizeof(struct vo_data))]
-        CACHEALIGN_ATTR;
-#define vo (*((struct vo_data *)__vo_data))
+static union {
+	uint8_t __vo_data[CACHEALIGN_UP(sizeof(struct vo_data))];
+	struct vo_data vo;
+} vo_raw CACHEALIGN_ATTR;
+#define vo vo_raw.vo
 #else
 static struct vo_data vo;
 #endif
