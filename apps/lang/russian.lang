@@ -7033,40 +7033,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-    recording: "Стерео"
-  </dest>
-  <voice>
-    *: none
-    recording: "Стерео"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-    recording: "Моно"
-  </dest>
-  <voice>
-    *: none
-    recording: "Моно"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
   desc: in the equalizer settings menu
   user: core
@@ -7098,159 +7064,6 @@
   <voice>
     *: none
     swcodec: "Частота среза"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Качество"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Качество"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "Частота"
-  </dest>
-  <voice>
-    *: none
-    recording: "Частота"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "Источник"
-  </dest>
-  <voice>
-    *: none
-    recording: "Источник"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "Микрофон"
-  </dest>
-  <voice>
-    *: none
-    recording: "Микрофон"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "Цифровой"
-  </dest>
-  <voice>
-    *: none
-    recording: "Цифровой"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "Триггер"
-  </dest>
-  <voice>
-    *: none
-    recording: "Триггер"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Меню"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Параметр"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "ЖКД"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -7395,23 +7208,6 @@
   <voice>
     *: none
     lcd_color: "Первичный цвет"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_LINE_IN
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Line In"
-  </source>
-  <dest>
-    *: none
-    recording: "Аудиовход"
-  </dest>
-  <voice>
-    *: none
-    recording: "Аудиовход"
   </voice>
 </phrase>
 <phrase>
@@ -8679,23 +8475,6 @@
   </dest>
   <voice>
     *: "Копировать"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: none
-    lcd_bitmap: "Mode:"
-  </source>
-  <dest>
-    *: none
-    lcd_bitmap: "Режим:"
-  </dest>
-  <voice>
-    *: none
-    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -10116,23 +9895,6 @@
   <voice>
     *: none
     ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Подавление высоких частот"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "Каналы"
-  </dest>
-  <voice>
-    *: none
-    recording: "Каналы"
   </voice>
 </phrase>
 <phrase>
