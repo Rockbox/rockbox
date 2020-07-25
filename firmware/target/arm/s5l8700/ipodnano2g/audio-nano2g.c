@@ -33,8 +33,10 @@ void audio_set_output_source(int source)
 void audio_input_mux(int source, unsigned flags)
 {
     (void)flags;
+#ifdef HAVE_RECORDING
     /* Prevent pops from unneeded switching */
     static int last_source = AUDIO_SRC_PLAYBACK;
+#endif
 
     switch (source)
     {
@@ -60,6 +62,8 @@ void audio_input_mux(int source, unsigned flags)
 #endif
     } /* end switch */
 
+#ifdef HAVE_RECORDING
     last_source = source;
+#endif
 } /* audio_input_mux */
 #endif /* INPUT_SRC_CAPS != 0 */

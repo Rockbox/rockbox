@@ -40,6 +40,7 @@ enum plugin_status plugin_start(const void* parameter)
         int j,x;
         for (j=1; j<100000; j++)
             x = j*11;
+	(void)x;
         rb->screens[0]->clear_display();
         rb->screens[0]->putsf(0, 0, "%s: %d",boost?"boost":"normal",count);
         if (TIME_AFTER(*rb->current_tick, last_tick+HZ))
