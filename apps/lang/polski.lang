@@ -258,17 +258,15 @@
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
-    archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
     creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = Tak"
-    cowond2*: "MENU lub lewo-góra = Tak"
+    cowond2*: "MENU lub góra-prawo = Tak"
     iriverh100,iriverh120,iriverh300: "NAVI = Tak"
     ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Tak"
-    mrobe500: "PLAY lub POWER = Tak"
-    archosplayer: "(PLAY/STOP)"
+    mrobe500: "PLAY, POWER lub góra-prawo = Tak"
     vibe500: "OK = Tak"
     creativezen*: "Select = Tak"
   </dest>
@@ -282,15 +280,12 @@
   user: core
   <source>
     *: "Any Other = No"
-    archosplayer: none
   </source>
   <dest>
     *: "Każdy inny = Nie"
-    archosplayer: none
   </dest>
   <voice>
     *: ""
-    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -1198,159 +1193,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Podgłaśnianie"
-  </dest>
-  <voice>
-    *: none
-    masf: "Podgłaśnianie"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Aut. reg. głośności"
-  </dest>
-  <voice>
-    *: none
-    masf: "Automatyczna regulacja poziomu głośności"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "Czas reakcji aut. reg. głośności"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Super bas"
-  </dest>
-  <voice>
-    *: none
-    masf: "Super bas"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "Wzmocnienie basu"
-  </dest>
-  <voice>
-    *: none
-    masf: "Wzmocnienie basu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "Siła wzm. basu"
-  </dest>
-  <voice>
-    *: none
-    masf: "Siła wzmocnienia basu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "Harmoniczność wzm. basu"
-  </dest>
-  <voice>
-    *: none
-    masf: "Harmoniczność wzmocnienia basu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "Środ. częst. wzm. basu"
-  </dest>
-  <voice>
-    *: none
-    masf: "Środkowa częstotliwość wzmocnienia basu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "Model wzm. basu"
-  </dest>
-  <voice>
-    *: none
-    masf: "Model wzmocnienia basu"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_GENERAL_SETTINGS
   desc: in the main menu
   user: core
@@ -2247,16 +2089,14 @@
     iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
-    archosplayer: "Building DB %d found"
   </source>
   <dest>
-    *: "Budowanie biblioteki... %d znalezionych (OFF by wrócić)"
-    iriverh100,iriverh120,iriverh300: "Budowanie biblioteki... %d znalezionych (STOP by wrócić)"
-    ipod*: "Budowanie biblioteki... %d znalezionych (PREV by wrócić)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Budowanie biblioteki... %d znalezionych (LEFT by wrócić)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Budowanie biblioteki... %d znalezionych (PREV by wrócić)"
-    gogearsa9200: "Budowanie biblioteki... %d znalezionych (REW by wrócić)"
-    archosplayer: "Budowanie biblioteki %d znalezionych"
+    *: "Budowanie biblioteki... %d znalezionych (OFF, by wrócić)"
+    iriverh100,iriverh120,iriverh300: "Budowanie biblioteki... %d znalezionych (STOP, by wrócić)"
+    ipod*: "Budowanie biblioteki... %d znalezionych (PREV, by wrócić)"
+    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Budowanie biblioteki... %d znalezionych (LEFT, by wrócić)"
+    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Budowanie biblioteki... %d znalezionych (PREV, by wrócić)"
+    gogearsa9200: "Budowanie biblioteki... %d znalezionych (REW, by wrócić)"
   </dest>
   <voice>
     *: "znaleziono wpisy do biblioteki"
@@ -3188,23 +3028,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Pasek przycisków"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Pasek przycisków"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
   user: core
@@ -3278,15 +3101,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "Wskaźnik szczytowy"
-    masd: none
   </dest>
   <voice>
     *: "Wskaźnik szczytowy"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3295,15 +3115,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Czas trzymania przester."
-    masd: none
   </dest>
   <voice>
     *: "Czas trzymania przesterowania"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3312,15 +3129,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Czas trzymania szczytu"
-    masd: none
   </dest>
   <voice>
     *: "Czas trzymania szczytu"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3329,15 +3143,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "Zawsze"
-    masd: none
   </dest>
   <voice>
     *: "Zawsze"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3346,15 +3157,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "Szybkość opadania"
-    masd: none
   </dest>
   <voice>
     *: "Szybkość opadania"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3363,15 +3171,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "Skala"
-    masd: none
   </dest>
   <voice>
     *: "Skala"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3380,15 +3185,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "Logarytmiczna (dB)"
-    masd: none
   </dest>
   <voice>
     *: "Logarytmiczna w decybelach"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3397,15 +3199,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "Liniowa (%)"
-    masd: none
   </dest>
   <voice>
     *: "Liniowa w procentach"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3414,15 +3213,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Początek skali"
-    masd: none
   </dest>
   <voice>
     *: "Początek skali"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3431,15 +3227,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Koniec skali"
-    masd: none
   </dest>
   <voice>
     *: "Koniec skali"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -5051,57 +4844,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Wyjście"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Akcja"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PRESET
   desc: in button bar and radio screen / menu
   user: core
@@ -5116,40 +4858,6 @@
   <voice>
     *: none
     radio: "Stacje"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ADD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Add"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Dodaj"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_RECORD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Record"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Nagraj"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5595,23 +5303,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Jakość"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Jakość"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -5705,32 +5396,15 @@
   user: core
   <source>
     *: none
-    recording,archosplayer: "Line In"
+    recording: "Line In"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Wejście liniowe"
+    recording: "Wejście liniowe"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Wejście liniowe"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Niezależne ramki"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Niezależne ramki"
+    recording: "Wejście liniowe"
   </voice>
 </phrase>
 <phrase>
@@ -6505,23 +6179,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Wyłącz"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Wyłącz"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ROCKBOX_INFO
   desc: displayed topmost on the info screen and in the info menu
   user: core
@@ -6541,11 +6198,9 @@
   user: core
   <source>
     *: "Buffer:"
-    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Bufor:"
-    archosplayer: "Bufor:"
   </dest>
   <voice>
     *: "Rozmiar bufora"
@@ -6557,12 +6212,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Bateria: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Bateria: %d%% %dh %dm"
   </dest>
   <voice>
@@ -6616,28 +6271,25 @@
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     xduoox3: "mSD2:"
-    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "microSD:"
-    xduoox3: "microSD2:"
-    archosondio*: "MMC:"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
     multivolume: "ha de 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro es di"
-    xduoox3: "mikro es di 2"
-    archosondio*: "em em ce"
+    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro es de"
+    xduoox3: "mikro es de 2"
   </voice>
 </phrase>
 <phrase>
@@ -7734,11 +7386,9 @@
   user: core
   <source>
     *: "End of Song List"
-    archosplayer: "End of List"
   </source>
   <dest>
     *: "Koniec listy piosenek"
-    archosplayer: "Koniec listy"
   </dest>
   <voice>
     *: "Koniec listy piosenek"
@@ -7988,40 +7638,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Wciśnij OFF, aby wyłączyć"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "Proszę wyjąć kartę MMC"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Proszę wyjąć kartę em em ce"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BOOT_CHANGED
   desc: File browser discovered the boot file was changed
   user: core
@@ -8051,11 +7667,11 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on archosrecorder models
+  desc: Used on many models
   user: core
   <source>
     *: "OFF to abort"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
@@ -8065,7 +7681,7 @@
   </source>
   <dest>
     *: "OFF = Anuluj"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP = Anuluj"
+    iriverh100,iriverh120,iriverh300: "STOP = Anuluj"
     ipod*: "PLAY/PAUSE = Anuluj"
     iaudiox5,iaudiom5: "Przytrzymaj PLAY = Anuluj"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV = Anuluj"
@@ -8135,7 +7751,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
@@ -8144,7 +7760,7 @@
     *: "Nieobsługiwany model"
   </dest>
   <voice>
-    *: ""
+    *: "Nieobsługiwany model"
   </voice>
 </phrase>
 <phrase>
@@ -8246,23 +7862,6 @@
   <voice>
     *: none
     charging: "Ładowanie baterii"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "Bateria: doładowywanie"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "Doładowywanie baterii"
   </voice>
 </phrase>
 <phrase>
@@ -9729,57 +9328,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Menu"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Opcje"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "LCD"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSFONT_CHANNEL_STEREO
   desc: in sound_settings
   user: core
@@ -9811,23 +9359,6 @@
   <voice>
     *: none
     recording: "Monofoniczny"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Jakość"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Jakość"
   </voice>
 </phrase>
 <phrase>
