@@ -294,8 +294,8 @@ QString TTSFestival::getVoiceInfo(QString voice)
     }
     else
     {
-        response = response.remove(QRegExp("(description \"*\")",
-                    Qt::CaseInsensitive, QRegExp::Wildcard));
+        response = response.remove(QRegularExpression("(description \".*\")",
+                    QRegularExpression::CaseInsensitiveOption));
         LOG_INFO() << "voiceInfo w/o descr:" << response;
         response = response.remove(')');
 #if QT_VERSION >= 0x050e00

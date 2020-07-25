@@ -557,7 +557,7 @@ QStringList Config::findLanguageFiles()
     QDir resDir(":/lang");
     fileNames += resDir.entryList(QStringList("*.qm"), QDir::Files, QDir::Name);
 
-    QRegExp exp("^rbutil_(.*)\\.qm");
+    QRegularExpression exp("^rbutil_(.*)\\.qm");
     for(int i = 0; i < fileNames.size(); i++) {
         QString a = fileNames.at(i);
         a.replace(exp, "\\1");

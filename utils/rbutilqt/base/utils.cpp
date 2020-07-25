@@ -118,7 +118,8 @@ QString Utils::resolvePathCase(QString path)
             // need to filter using QRegExp as QStringList::filter(QString)
             // matches any substring
             QString expr = QString("^" + elems.at(i) + "$");
-            QRegExp rx = QRegExp(expr, Qt::CaseInsensitive);
+            QRegularExpression rx = QRegularExpression(expr,
+                    QRegularExpression::CaseInsensitiveOption);
             QStringList a = direlems.filter(rx);
 
             if(a.size() != 1)
@@ -403,9 +404,10 @@ QString Utils::checkEnvironment(bool permission)
  */
 QString Utils::trimVersionString(QString s)
 {
-    QRegExp r = QRegExp(".*([\\d\\.]+\\d+[a-z]?).*");
-    if(r.indexIn(s) != -1) {
-        return r.cap(1);
+    QRegularExpression r = QRegularExpression("^\\D*([\\d\\.]+\\d+[a-z]?).*");
+    QRegularExpressionMatch match = r.match(s);
+    if(match.hasMatch()) {
+        return match.captured(1);
     }
     return s;
 }
@@ -428,15 +430,15 @@ int Utils::compareVersionStrings(QString s1, QString s2)
 
     while(!a.isEmpty() || !b.isEmpty()) {
         // trim all leading non-digits and non-dots (dots are removed afterwards)
-        a.remove(QRegExp("^[^\\d\\.]*"));
-        b.remove(QRegExp("^[^\\d\\.]*"));
+        a.remove(QRegularExpression("^[^\\d\\.]*"));
+        b.remove(QRegularExpression("^[^\\d\\.]*"));
 
         // trim all trailing non-digits for conversion (QString::toInt()
         // requires this). Copy strings first as replace() changes the string.
         QString numa = a;
         QString numb = b;
-        numa.remove(QRegExp("\\D+.*$"));
-        numb.remove(QRegExp("\\D+.*$"));
+        numa.remove(QRegularExpression("\\D+.*$"));
+        numb.remove(QRegularExpression("\\D+.*$"));
 
         // convert to number
         bool ok1, ok2;
@@ -455,15 +457,15 @@ int Utils::compareVersionStrings(QString s1, QString s2)
             return (vala > valb) ? -1 : 1;
 
         // trim leading digits.
-        a.remove(QRegExp("^\\d*"));
-        b.remove(QRegExp("^\\d*"));
+        a.remove(QRegularExpression("^\\d*"));
+        b.remove(QRegularExpression("^\\d*"));
 
         // If only one of the following characters is a dot that one is
         // "greater" then anything else. Make sure it's followed by a number,
         // Otherwise it might be the end of the string or suffix.  Do this
         // before version addon characters check to avoid stopping too early.
-        bool adot = a.contains(QRegExp("^[a-zA-Z]*\\.[0-9]"));
-        bool bdot = b.contains(QRegExp("^[a-zA-Z]*\\.[0-9]"));
+        bool adot = a.contains(QRegularExpression("^[a-zA-Z]*\\.[0-9]"));
+        bool bdot = b.contains(QRegularExpression("^[a-zA-Z]*\\.[0-9]"));
         if(adot && !bdot)
             return -1;
         if(!adot && bdot)
@@ -473,17 +475,17 @@ int Utils::compareVersionStrings(QString s1, QString s2)
         // (version numbers like 1.2b.3 aren't handled).
         QChar ltra;
         QChar ltrb;
-        if(a.contains(QRegExp("^[a-zA-Z]")))
+        if(a.contains(QRegularExpression("^[a-zA-Z]")))
             ltra = a.at(0);
-        if(b.contains(QRegExp("^[a-zA-Z]")))
+        if(b.contains(QRegularExpression("^[a-zA-Z]")))
             ltrb = b.at(0);
         if(ltra != ltrb)
             return (ltra < ltrb) ? 1 : -1;
 
         // both are identical or no addon characters, ignore.
         // remove modifiers and following dot.
-        a.remove(QRegExp("^[a-zA-Z]*\\."));
-        b.remove(QRegExp("^[a-zA-Z]*\\."));
+        a.remove(QRegularExpression("^[a-zA-Z]*\\."));
+        b.remove(QRegularExpression("^[a-zA-Z]*\\."));
     }
 
     // no differences found.
@@ -630,7 +632,7 @@ QString Utils::resolveMountPoint(QString device)
 
 #if defined(Q_OS_WIN32)
     QString result;
-    unsigned int driveno = device.replace(QRegExp("^.*([0-9]+)"), "\\1").toInt();
+    unsigned int driveno = device.replace(QRegularExpression("^.*([0-9]+)"), "\\1").toInt();
 
     int letter;
     for(letter = 'A'; letter <= 'Z'; letter++) {
@@ -800,8 +802,8 @@ QMap<QString, QList<int> > Utils::findRunningProcess(QStringList names)
             QStringList k(processlist.keys());
 #if defined(Q_OS_WIN32)
             // the process name might be truncated. Allow the extension to be partial.
-            int index = k.indexOf(QRegExp(names.at(i) + "(\\.(e(x(e?)?)?)?)?",
-                                          Qt::CaseInsensitive));
+            int index = k.indexOf(QRegularExpression(names.at(i) + "(\\.(e(x(e?)?)?)?)?",
+                                  QRegularExpression::CaseInsensitiveOption));
 #else
             int index = k.indexOf(names.at(i));
 #endif

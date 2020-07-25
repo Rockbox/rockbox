@@ -263,9 +263,10 @@ QString TalkGenerator::correctString(QString s)
     int i = 0;
     int max = m_corrections.size();
     while(i < max) {
-        corrected = corrected.replace(QRegExp(m_corrections.at(i).search,
+        corrected = corrected.replace(QRegularExpression(m_corrections.at(i).search,
                 m_corrections.at(i).modifier.contains("i")
-                    ? Qt::CaseInsensitive : Qt::CaseSensitive),
+                    ? QRegularExpression::NoPatternOption
+                    : QRegularExpression::CaseInsensitiveOption),
                 m_corrections.at(i).replace);
         i++;
     }
@@ -329,7 +330,7 @@ void TalkGenerator::setLang(QString name)
         co.search = items.at(3);
         co.replace = items.at(4);
         // Qt uses backslash for back references, Perl uses dollar sign.
-        co.replace.replace(QRegExp("\\$(\\d+)"), "\\\\1");
+        co.replace.replace(QRegularExpression("\\$(\\d+)"), "\\\\1");
         co.modifier = items.at(5);
         m_corrections.append(co);
     }

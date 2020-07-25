@@ -58,7 +58,7 @@ void InstallTalkWindow::saveSettings(void)
     for(int i = 0; i < si.size(); i++) {
         if(si.at(i).column() == 0) {
             QString current = fsm->filePath(si.at(i));
-            foldersToTalk.append(current.remove(QRegExp("^" + mp)));
+            foldersToTalk.append(current.remove(QRegularExpression("^" + mp)));
         }
     }
     RbSettings::setValue(RbSettings::TalkFolders, foldersToTalk);

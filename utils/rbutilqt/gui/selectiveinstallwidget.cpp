@@ -334,7 +334,7 @@ void SelectiveInstallWidget::installBootloader(void)
                         PlayerBuildInfo::DisplayName).toString()
                 + " Firmware Backup";
             // remove invalid character(s)
-            targetFolder.remove(QRegExp("[:/]"));
+            targetFolder.remove(QRegularExpression("[:/]"));
             if(QMessageBox::question(this, tr("Create Bootloader backup"),
                         tr("You can create a backup of the original bootloader "
                             "file. Press \"Yes\" to select an output folder on your "

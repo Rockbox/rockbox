@@ -18,6 +18,7 @@
 
 #include <QDialog>
 #include <QDir>
+#include <QRegularExpression>
 #include "sysinfo.h"
 #include "ui_sysinfofrm.h"
 #include "system.h"
@@ -77,7 +78,7 @@ QString Sysinfo::getInfo(Sysinfo::InfoType type)
     info += "</table>";
     info += "<hr/>";
     if(type == InfoText) {
-        info.replace(QRegExp("(<[^>]+>)+"),"\n");
+        info.replace(QRegularExpression("(<[^>]+>)+"), "\n");
     }
 
     return info;
