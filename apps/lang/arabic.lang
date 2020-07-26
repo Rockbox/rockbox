@@ -21,23 +21,6 @@
   rtl: 1
 </options>
 <phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "العلو"
-  </dest>
-  <voice>
-    *: none
-    masf: "Loudness"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOICE_FILETYPE
   desc: voice settings menu
   user: core
@@ -2722,23 +2705,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "القنوات"
-  </dest>
-  <voice>
-    *: none
-    recording: "Channels"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SYSTEM
   desc: in the main menu and settings menu
   user: core
@@ -2952,23 +2918,6 @@
   </dest>
   <voice>
     *: "Battery Capacity"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "الجودة"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
@@ -3225,23 +3174,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-    recording: "أحادى"
-  </dest>
-  <voice>
-    *: none
-    recording: "Mono"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_PERCENT
   desc: spoken only, a unit postfix
   user: core
@@ -3439,23 +3371,6 @@
   <voice>
     *: none
     recording: "File Split Options"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "الزناد"
-  </dest>
-  <voice>
-    *: none
-    recording: "Trigger"
   </voice>
 </phrase>
 <phrase>
@@ -3764,15 +3679,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "خطي (%)"
-    masd: none
   </dest>
   <voice>
     *: "Linear percent"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3880,23 +3792,6 @@
   <voice>
     *: none
     speaker: "Enable Speaker"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "ميكروفون داخلي"
-  </dest>
-  <voice>
-    *: none
-    recording: "Internal Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -4761,23 +4656,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "المصدر"
-  </dest>
-  <voice>
-    *: none
-    recording: "Source"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_NORMAL
   desc: in settings_menu
   user: core
@@ -4834,40 +4712,6 @@
   </dest>
   <voice>
     *: "Limits"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "من فضلك أخرج كارت الـMMC المدخل"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Please remove multimedia card"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-    recording: "مجسم"
-  </dest>
-  <voice>
-    *: none
-    recording: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -5045,23 +4889,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "إيقاف التشغيل"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "إيقاف التشغيل"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FILTER_MUSIC
   desc: show only music-related files
   user: core
@@ -5166,23 +4993,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "تردد"
-  </dest>
-  <voice>
-    *: none
-    recording: "تردد"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CHANNELS
   desc: in sound_settings
   user: core
@@ -5270,23 +5080,6 @@
   <voice>
     *: none
     battery_types: "نوع البطارية"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "الرقمي"
-  </dest>
-  <voice>
-    *: none
-    recording: "الرقمي"
   </voice>
 </phrase>
 <phrase>
@@ -5625,23 +5418,6 @@
   <voice>
     *: none
     radio: "المنطقة"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: in pause_phones_menu.
-  user: core
-  <source>
-    *: none
-    headphone_detection: "Duration to Rewind"
-  </source>
-  <dest>
-    *: none
-    headphone_detection: "المدة لإرجاع التسجيل"
-  </dest>
-  <voice>
-    *: none
-    headphone_detection: "المدة لإرجاع التسجيل"
   </voice>
 </phrase>
 <phrase>
