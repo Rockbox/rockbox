@@ -11,9 +11,7 @@
     \toprule
     \rowcolor{tblhdrbgcolor}\tblhdrstrut\textbf{Setting} & \textbf{Allowed Values} & \textbf{Unit}\\
     \midrule\localendhead % endhead breaks with htlatex
-    volume      & \opt{masd}{$-78$ to +18}%
-                  \opt{masf}{$-100$ to +12}%
-                  \opt{iriverh100,iriverh300}{$-84$ to 0}%
+    volume      & \opt{iriverh100,iriverh300}{$-84$ to 0}%
                   \opt{ipodnano}{$-72$ to +6}%
                   \opt{ipodvideo,cowond2}{$-89$ to +6}%
                   \opt{iaudiom3,iaudiom5,iaudiox5}{$-73$ to +6}%
@@ -21,16 +19,12 @@
                   \opt{e200,e200v2,ipodcolor,mrobe100,vibe500,ipodnano2g}{$-74$ to +6}%
                   \opt{samsungyh}{$-128$ to 0}%
                                         & dB\\
-    bass        & \opt{masd}{$-15$ to +15}%
-                  \opt{masf}{$-12$ to +12}%
-                  \opt{iriverh100,iriverh300}{0 to +24}%
+    bass        & \opt{iriverh100,iriverh300}{0 to +24}%
                   \opt{ipod,mrobe100}{$-6$ to +9}%
                   \opt{iaudiom3,iaudiom5,iaudiox5,e200,e200v2,vibe500,fuzeplus,%
                        samsungyh}{$-24$ to +24}%
                                         & dB\\
-    treble      & \opt{masd}{$-15$ to +15}%
-                  \opt{masf}{$-12$ to +12}%
-                  \opt{iriverh100,iriverh300}{0 to +6}%
+    treble      & \opt{iriverh100,iriverh300}{0 to +6}%
                   \opt{ipod,mrobe100}{$-6$ to +9}%
                   \opt{iaudiom3,iaudiom5,iaudiox5,e200,e200v2,vibe500,fuzeplus,%
                        samsungyh}{$-24$ to +24}%
@@ -248,18 +242,6 @@
         touchpad sensitivity  & $-25$ to 25 & N/A\\
         touchpad deadzone     & 0 to 100 & N/A\\
       }
-    }%
-
-    \opt{masf}{
-      loudness      & 0 to 17           & N/A\\
-      superbass     & on, off           & N/A\\
-      auto volume   & off, 20ms, 2s, 4s, 8s
-                                        & N/A\\
-      mdb enable    & on,off            & N/A\\
-      mdb strength  & 0 to 127          & dB\\
-      mdb harmonics & 0 to 100          & \%\\
-      mdb center    & 20 to 300         & Hz\\
-      mdb shape     & 50 to 300         & Hz\\
     }%
 
     \opt{lcd_bitmap}{
