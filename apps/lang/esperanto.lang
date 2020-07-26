@@ -2130,15 +2130,15 @@
   user: core
   <source>
     *: none
-    recording,archosplayer: "Line In"
+    recording: "Line In"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Analoga Enigaĵo"
+    recording: "Analoga Enigaĵo"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Analoga Enigaĵo"
+    recording: "Analoga Enigaĵo"
   </voice>
 </phrase>
 <phrase>

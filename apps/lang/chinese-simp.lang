@@ -2134,15 +2134,15 @@
   user: core
   <source>
     *: none
-    recording,archosplayer: "Line In"
+    recording: "Line In"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "线路输入"
+    recording: "线路输入"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "线路输入"
+    recording: "线路输入"
   </voice>
 </phrase>
 <phrase>
@@ -4231,12 +4231,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "剩余电量:%d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "电量:%d%% %dh %dm"
   </dest>
   <voice>
@@ -7152,7 +7152,7 @@
   user: core
   <source>
     *: "OFF to abort"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
@@ -7162,7 +7162,7 @@
   </source>
   <dest>
     *: "按OFF键取消"
-    archosplayer,iriverh100,iriverh120,iriverh300: "按STOP键取消"
+    iriverh100,iriverh120,iriverh300: "按STOP键取消"
     ipod*: "按PLAY/PAUSE键取消"
     iaudiox5,iaudiom5: "长按PLAY键取消"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "按PREV键取消"

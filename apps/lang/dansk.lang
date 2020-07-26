@@ -1773,15 +1773,15 @@
   user: core
   <source>
     *: none
-    recording,archosplayer: "Line In"
+    recording: "Line In"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Linje indgang"
+    recording: "Linje indgang"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Linje indgang"
+    recording: "Linje indgang"
   </voice>
 </phrase>
 <phrase>
@@ -3523,17 +3523,17 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Batteri: %d%% %dt %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dt %dm"
+    iriverifp7xx: "%d%% %dt %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dt %dm"
   </dest>
   <voice>
     *: "Batteri niveau"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: ""
+    iriverifp7xx: ""
     iriverh10,ipodmini1g,ipodmini2g: ""
   </voice>
 </phrase>
@@ -6356,7 +6356,7 @@
   user: core
   <source>
     *: "OFF to abort"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
@@ -6366,7 +6366,7 @@
   </source>
   <dest>
     *: "SLUK for at afbryde"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP for at afbryde"
+    iriverh100,iriverh120,iriverh300: "STOP for at afbryde"
     ipod*: "SPIL/PAUSE for at afbryde"
     iaudiox5,iaudiom5: "Lang SPIL for at afbryde"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "FORRIGE for at afbryde"

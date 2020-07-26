@@ -5677,15 +5677,15 @@
   user: core
   <source>
     *: none
-    recording,archosplayer: "Line In"
+    recording: "Line In"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Линијски улаз"
+    recording: "Линијски улаз"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Линијски улаз"
+    recording: "Линијски улаз"
   </voice>
 </phrase>
 <phrase>
@@ -6529,12 +6529,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Батерија: %d%% %dч %dм"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dч %dм"
+    iriverifp7xx: "%d%% %dч %dм"
     iriverh10,ipodmini1g,ipodmini2g: "Бат: %d%% %dч %dм"
   </dest>
   <voice>
@@ -8028,7 +8028,7 @@
   user: core
   <source>
     *: "OFF to abort"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
@@ -8038,7 +8038,7 @@
   </source>
   <dest>
     *: "OFF за прекид"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP за прекид"
+    iriverh100,iriverh120,iriverh300: "STOP за прекид"
     ipod*: "PLAY/PAUSE за прекид"
     iaudiox5,iaudiom5: "Long PLAY за прекид"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за прекид"

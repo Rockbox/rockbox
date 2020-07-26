@@ -2040,15 +2040,15 @@
   user: core
   <source>
     *: none
-    recording,archosplayer: "Line In"
+    recording: "Line In"
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Линейный вход"
+    recording: "Линейный вход"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Линейный вход"
+    recording: "Линейный вход"
   </voice>
 </phrase>
 <phrase>
@@ -3954,12 +3954,12 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "%d%% %dч %dм"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dч %dм"
+    iriverifp7xx: "%d%% %dч %dм"
     iriverh10,ipodmini1g,ipodmini2g: "%d%% %dч %dм"
   </dest>
   <voice>
@@ -6795,7 +6795,7 @@
   user: core
   <source>
     *: "OFF to abort"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
     ipod*: "PLAY/PAUSE to abort"
     iaudiox5,iaudiom5: "Long PLAY to abort"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
@@ -6805,7 +6805,7 @@
   </source>
   <dest>
     *: "ВЫКЛ. для отмены"
-    archosplayer,iriverh100,iriverh120,iriverh300: "СТОП для отмены"
+    iriverh100,iriverh120,iriverh300: "СТОП для отмены"
     ipod*: "ПАУЗА для отмены"
     iaudiox5,iaudiom5: "ВОСПР. для отмены"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "ПРЕД. для отмены"

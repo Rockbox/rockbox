@@ -5442,11 +5442,11 @@
   </source>
   <dest>
     *: none
-    recording,archosplayer: "Entrée ligne"
+    recording: "Entrée ligne"
   </dest>
   <voice>
     *: none
-    recording,archosplayer: "Entrée ligne"
+    recording: "Entrée ligne"
   </voice>
 </phrase>
 <phrase>
@@ -6260,7 +6260,7 @@
   </source>
   <dest>
     *: "Batterie: %d%% %dh %dm"
-    archosplayer,archosrecorder,archosfmrecorder,archosrecorderv2,archosondio*,iriverifp7xx: "%d%% %dh %dm"
+    iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
@@ -7728,7 +7728,7 @@
   </source>
   <dest>
     *: "OFF pour Annuler"
-    archosplayer,iriverh100,iriverh120,iriverh300: "STOP pour Annuler"
+    iriverh100,iriverh120,iriverh300: "STOP pour Annuler"
     ipod*: "PLAY/PAUSE pour Annuler"
     iaudiox5,iaudiom5: "Long PLAY pour Annuler"
     iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV pour Annuler"
