@@ -157,13 +157,7 @@ QT += network
 
 contains(QT_MAJOR_VERSION, 5) {
     message("Qt5 found")
-    QT += widgets
-    win32 {
-        QT += multimedia
-    }
-    macx {
-        QT += multimedia
-    }
+    QT += widgets multimedia
 }
 
 CONFIG += c++11

@@ -20,9 +20,7 @@
 #include <QProgressDialog>
 #include <QFileDialog>
 #include <QUrl>
-#if !defined(Q_OS_LINUX)
 #include <QSound>
-#endif
 
 #include "version.h"
 #include "configure.h"
@@ -951,16 +949,7 @@ void Config::testTts()
     }
     tts->stop();
     if(!filename.isEmpty()) {
-#if defined(Q_OS_LINUX)
-        QString exe = Utils::findExecutable("aplay");
-        if(exe == "") exe = Utils::findExecutable("play");
-        if(exe != "")
-        {
-            QProcess::execute(exe+" "+filename);
-        }
-#else
         QSound::play(filename);
-#endif
     }
     ui.testTTS->setEnabled(true);
     delete tts; /* Config objects are never deleted (in fact, they are
