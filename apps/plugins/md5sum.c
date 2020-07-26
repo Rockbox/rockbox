@@ -42,11 +42,11 @@ static int hash( char *string, const char *path )
     while( !quit && ( len = rb->read( in, buffer, sizeof(buffer) ) ) > 0 )
     {
         AddMD5( &md5, buffer, len );
-        
+
         if( rb->get_action(CONTEXT_STD, TIMEOUT_NOBLOCK) == ACTION_STD_CANCEL )
             quit = true;
     }
-    
+
     EndMD5( &md5 );
 
     psz_md5_hash( string, &md5 );
@@ -66,10 +66,10 @@ static void hash_file( int out, const char *path )
         done++;
         rb->splashf( 0, "%d / %d : %s", done, count, path );
         status = hash( string, path );
-        
+
         if( quit )
             return;
-        
+
         if( status )
             rb->write( out, "error", 5 );
         else
@@ -77,7 +77,7 @@ static void hash_file( int out, const char *path )
         rb->write( out, "  ", 2 );
         rb->write( out, path, rb->strlen( path ) );
         rb->write( out, "\n", 1 );
-        
+
         rb->yield();
     }
 }
@@ -95,7 +95,7 @@ static void hash_dir( int out, const char *path )
             char childpath[MAX_PATH];
             rb->snprintf( childpath, MAX_PATH, "%s/%s",
                           rb->strcmp( path, "/" ) ? path : "", entry->d_name );
-            
+
             struct dirinfo info = rb->dir_get_info(dir, entry);
             if (info.attribute & ATTR_DIRECTORY)
             {
