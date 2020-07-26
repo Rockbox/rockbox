@@ -1185,159 +1185,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Ozentasuna"
-  </dest>
-  <voice>
-    *: none
-    masf: "Ozentasuna"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Auto Bolumena"
-  </dest>
-  <voice>
-    *: none
-    masf: "Auto Bolumena"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "AV Erortze Denbora"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Super Baxua"
-  </dest>
-  <voice>
-    *: none
-    masf: "Super Baxua"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Gaitu"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Gaitu"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Indarra"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Indarra"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Harmonikoak"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Harmonikoak"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Frekuentzia Zentrua"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Frekuentzia Zentrua"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "MDBren Era"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDBren Era"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_GENERAL_SETTINGS
   desc: in the main menu
   user: core
@@ -3175,23 +3022,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Botoi Barra"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Botoi Barra"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
   user: core
@@ -3265,15 +3095,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "Piko Neurtzailea"
-    masd: none
   </dest>
   <voice>
     *: "Piko Neurtzailea"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3282,15 +3109,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Mozketen Iraupen Denbora"
-    masd: none
   </dest>
   <voice>
     *: "Mozketen Iraupen Denbora"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3299,15 +3123,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Espektro Analizatzaile Denbora"
-    masd: none
   </dest>
   <voice>
     *: "Espektro Analizatzaile Denbora"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3316,15 +3137,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "Betirakoa"
-    masd: none
   </dest>
   <voice>
     *: "Betirakoa"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3333,15 +3151,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "Espektro Analizatzaile Jaitsiera"
-    masd: none
   </dest>
   <voice>
     *: "Espektro Analizatzaile Jaitsiera"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3350,15 +3165,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "Eskala"
-    masd: none
   </dest>
   <voice>
     *: "Eskala"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3367,15 +3179,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "Logaritmikoa (dB)"
-    masd: none
   </dest>
   <voice>
     *: "Dezibelio logaritmiko"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3384,15 +3193,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "Lineala (%)"
-    masd: none
   </dest>
   <voice>
     *: "Ehuneko lineala"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3401,15 +3207,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Tartearen Gutxienezkoa"
-    masd: none
   </dest>
   <voice>
     *: "Tartearen Gutxienezkoa"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3418,15 +3221,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Tartearen Gehienezkoa"
-    masd: none
   </dest>
   <voice>
     *: "Tartearen Gehienezkoa"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -5035,57 +4835,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Menua"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Irten"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Ekintza"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PRESET
   desc: in button bar and radio screen / menu
   user: core
@@ -5579,23 +5328,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Kalitatea"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Kalitatea"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -5698,23 +5430,6 @@
   <voice>
     *: none
     recording: "Sarrera"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Frame Independienteak"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Frame Independienteak"
   </voice>
 </phrase>
 <phrase>
@@ -6489,23 +6204,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Itzali"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Itzali"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ROCKBOX_INFO
   desc: displayed topmost on the info screen and in the info menu
   user: core
@@ -6607,21 +6305,18 @@
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
     xduoox3: "mSD2:"
-    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
     xduoox3: "MSD2:"
-    archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
     sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro S D"
     xduoox3: "micro S D 2"
-    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -7990,23 +7685,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "Mesedez MMC txartela kendu"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Mesedez multimedia txartela kendu"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BOOT_CHANGED
   desc: File browser discovered the boot file was changed
   user: core
@@ -8231,23 +7909,6 @@
   <voice>
     *: none
     charging: "Bateria: Kargatzen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "Bateria: Karga Egina"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "Karga Egina"
   </voice>
 </phrase>
 <phrase>
@@ -9711,227 +9372,6 @@
   <voice>
     *: none
     lcd_bitmap: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Menua"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Aukera"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "LCD"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-    recording: "Stereo"
-  </dest>
-  <voice>
-    *: none
-    recording: "Stereo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-    recording: "Mono"
-  </dest>
-  <voice>
-    *: none
-    recording: "Mono"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Kalitatea"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Kalitatea"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "Frekuentzia"
-  </dest>
-  <voice>
-    *: none
-    recording: "Frekuentzia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "Iturburua"
-  </dest>
-  <voice>
-    *: none
-    recording: "Iturburua"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "Barn. Mik"
-  </dest>
-  <voice>
-    *: none
-    recording: "Barne Mikrofonoa"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_LINE_IN
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Line In"
-  </source>
-  <dest>
-    *: none
-    recording: "Sarrera"
-  </dest>
-  <voice>
-    *: none
-    recording: "Sarrera"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "Digitala"
-  </dest>
-  <voice>
-    *: none
-    recording: "Digitala"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "Kanalak"
-  </dest>
-  <voice>
-    *: none
-    recording: "Kanalak"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "Abiarazlea"
-  </dest>
-  <voice>
-    *: none
-    recording: "Abiarazlea"
   </voice>
 </phrase>
 <phrase>
@@ -12215,15 +11655,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Tone Controls"
+    gigabeats,samsungypr1: "Tone Controls"
   </source>
   <dest>
     *: none
-    gigabeats: "Tonu Kontrolak"
+    gigabeats,samsungypr1: "Tonu Kontrolak"
   </dest>
   <voice>
     *: none
-    gigabeats: "Tonu Kontrolak"
+    gigabeats,samsungypr1: "Tonu Kontrolak"
   </voice>
 </phrase>
 <phrase>
@@ -12232,15 +11672,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Advanced Tone Control Settings"
   </source>
   <dest>
     *: none
-    gigabeats: "Tonu Kontrol Aukera Aurreratuak"
+    gigabeats,samsungypr1: "Tonu Kontrol Aukera Aurreratuak"
   </dest>
   <voice>
     *: none
-    gigabeats: "Tonu Kontrol Aukera Aurreratua"
+    gigabeats,samsungypr1: "Tonu Kontrol Aukera Aurreratua"
   </voice>
 </phrase>
 <phrase>
@@ -12249,15 +11689,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats,samsungypr1: "Band %d Gain"
   </source>
   <dest>
     *: none
-    gigabeats: "Banda Irabazia %d"
+    gigabeats,samsungypr1: "Banda Irabazia %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Banda Irabazia"
+    gigabeats,samsungypr1: "Banda Irabazia"
   </voice>
 </phrase>
 <phrase>
@@ -12266,15 +11706,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Frequency"
+    gigabeats,samsungypr1: "Band %d Frequency"
   </source>
   <dest>
     *: none
-    gigabeats: "Banda Frekuentzia %d"
+    gigabeats,samsungypr1: "Banda Frekuentzia %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Band Frekuentzia"
+    gigabeats,samsungypr1: "Band Frekuentzia"
   </voice>
 </phrase>
 <phrase>
@@ -12283,15 +11723,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Band %d Width"
+    gigabeats,samsungypr1: "Band %d Width"
   </source>
   <dest>
     *: none
-    gigabeats: "Banda Zabalera %d"
+    gigabeats,samsungypr1: "Banda Zabalera %d"
   </dest>
   <voice>
     *: none
-    gigabeats: "Banda Zabalera"
+    gigabeats,samsungypr1: "Banda Zabalera"
   </voice>
 </phrase>
 <phrase>
@@ -12300,15 +11740,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Narrow"
+    gigabeats,samsungypr1: "Narrow"
   </source>
   <dest>
     *: none
-    gigabeats: "Estu"
+    gigabeats,samsungypr1: "Estu"
   </dest>
   <voice>
     *: none
-    gigabeats: "Estu"
+    gigabeats,samsungypr1: "Estu"
   </voice>
 </phrase>
 <phrase>
@@ -12317,15 +11757,15 @@
   user: core
   <source>
     *: none
-    gigabeats: "Wide"
+    gigabeats,samsungypr1: "Wide"
   </source>
   <dest>
     *: none
-    gigabeats: "Zabalera"
+    gigabeats,samsungypr1: "Zabalera"
   </dest>
   <voice>
     *: none
-    gigabeats: "Zabalera"
+    gigabeats,samsungypr1: "Zabalera"
   </voice>
 </phrase>
 <phrase>
@@ -12334,15 +11774,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    depth_3d: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3D nabarmentzea"
+    depth_3d: "3D nabarmentzea"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3D nabarmentzea"
+    depth_3d: "3D nabarmentzea"
   </voice>
 </phrase>
 <phrase>
