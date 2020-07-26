@@ -181,14 +181,46 @@ static void hash_check( int out, const char *path )
     rb->close( list );
 }
 
+/*
+ * Return the last name from a pathname (ignoring a trailing slash if
+ * it exists). The returned pointer points to a statically allocated
+ * buffer.
+ */
+static char *get_basename(const char *path) {
+    static char temp[MAX_PATH];
+    char *p;
+    int len, isdir = 0;
+
+    rb->strcpy(temp, path);
+
+    len = rb->strlen(temp);
+
+    if (temp[len - 1] == '/')
+    {
+        /* strip trailing slash, and update length accordingly */
+        temp[--len] = '\0';
+        isdir = 1;
+    }
+
+    /* find the last slash, if there is one */
+    p = rb->strrchr(temp, '/');
+
+    /*
+     * re-append trailing slash if we previously removed it (the
+     * original NUL is still present)
+     */
+    if(isdir)
+        temp[len++] = '/';
+
+    return p ? (p + 1) : temp;
+}
+
 enum plugin_status plugin_start(const void* parameter)
 {
     const char *arg = (const char *)parameter; /* input file path, if any */
-    char temp[MAX_PATH]; /* input file name */
-    char *basename=temp;
+    char *basename;
     int out = -1; /* output file descriptor */
     char filename[MAX_PATH]; /* output file name */
-    int isdir=0;         /*flag if input file is a directory */
 
     void (*action)( int, const char * ) = NULL;
 
@@ -243,17 +275,8 @@ enum plugin_status plugin_start(const void* parameter)
         action = hash_dir;
         arg = "/";
     }
-    rb->strcpy(temp, arg);
-    if (temp[(rb->strlen(temp) - 1)] == '/')
-    {
-        temp[(rb->strlen(temp) - 1)] = '\0';
-        isdir=1;
-    }
-    if(rb->strrchr(temp, '/')) 
-        basename =(rb->strrchr(temp, '/')+1);
 
-    if(isdir)
-        temp[(rb->strlen(temp))] = '/';
+    basename = get_basename(arg);
 
     rb->lcd_putsf( 0, 1, "Hashing %s", basename );
     rb->lcd_puts( 0, 2, rb->str(LANG_ACTION_STD_CANCEL) );
