@@ -427,18 +427,13 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
-    <widget class="QMenu" name="menu_Troubleshoot">
-     <property name="title">
-      <string>&amp;Troubleshoot</string>
-     </property>
-     <addaction name="action_System_Info"/>
-     <addaction name="action_Trace"/>
-    </widget>
     <addaction name="action_About"/>
     <addaction name="actionAbout_Qt"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Changelog"/>
-    <addaction name="menu_Troubleshoot"/>
+    <addaction name="action_System_Info"/>
+    <addaction name="action_Trace"/>
+    <addaction name="separator"/>
     <addaction name="action_Help"/>
    </widget>
    <widget class="QMenu" name="menuA_ctions">
