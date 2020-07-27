@@ -323,20 +323,20 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
+    creativezen*: "Select = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
-    creativezen*: "Select = Yes"
   </source>
   <dest>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
+    creativezen*: "Select = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
-    creativezen*: "Select = Yes"
   </dest>
   <voice>
     *: ""
@@ -2149,19 +2149,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -3524,17 +3522,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -3805,27 +3803,27 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3834,39 +3832,35 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4352,22 +4346,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </dest>
   <voice>
     *: none
@@ -5370,15 +5364,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -5421,18 +5415,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -6274,13 +6268,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -6338,19 +6332,19 @@
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
     xduoox3: "micro S D 2"
   </voice>
 </phrase>
@@ -7596,8 +7590,6 @@
     *: "Time"
   </voice>
 </phrase>
-/* TODO: cleanup LANG_USB_CHARGING unless HAVE_USB_CHARGING_ENABLE defined,
- * the selector should probably be usb_charging_enable_enable as well. */
 <phrase>
   id: LANG_USB_CHARGING
   desc: in Battery menu
@@ -7666,23 +7658,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*,vibe500,samsungyh*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
@@ -7736,23 +7728,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </dest>
   <voice>
     *: ""
@@ -9287,7 +9277,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -9814,15 +9804,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -9831,15 +9821,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -12727,18 +12717,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </source>
   <dest>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </voice>
 </phrase>
 <phrase>
@@ -12747,18 +12734,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </dest>
   <voice>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </voice>
 </phrase>
 <phrase>
@@ -12767,18 +12751,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </voice>
 </phrase>
 <phrase>
@@ -12787,18 +12768,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </voice>
 </phrase>
 <phrase>
@@ -12807,18 +12785,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -13887,7 +13862,7 @@
   <voice>
     *: none
     lcd_bitmap: "Level 1: 60 moves per 5 minutes"
-</voice>
+  </voice>
 </phrase>
 <phrase>
   id: LANG_CHESSBOX_LEVEL_2
@@ -14482,7 +14457,7 @@
   </voice>
 </phrase>
 <phrase>
-id: VOICE_BAT_BENCH_KEYS
+  id: VOICE_BAT_BENCH_KEYS
   desc: Battery bench start up message
   user: core
   <source>
@@ -14651,18 +14626,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Audio Options"
     lowmem: none
+    swcodec: "Audio Options"
   </source>
   <dest>
     *: none
-    swcodec: "Audio Options"
     lowmem: none
+    swcodec: "Audio Options"
   </dest>
   <voice>
     *: none
-    swcodec: "Audio Options"
     lowmem: none
+    swcodec: "Audio Options"
   </voice>
 </phrase>
 <phrase>
@@ -14671,18 +14646,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Resume Options"
     lowmem: none
+    swcodec: "Resume Options"
   </source>
   <dest>
     *: none
-    swcodec: "Resume Options"
     lowmem: none
+    swcodec: "Resume Options"
   </dest>
   <voice>
     *: none
-    swcodec: "Resume Options"
     lowmem: none
+    swcodec: "Resume Options"
   </voice>
 </phrase>
 <phrase>
@@ -14691,18 +14666,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Play Mode"
     lowmem: none
+    swcodec: "Play Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Play Mode"
     lowmem: none
+    swcodec: "Play Mode"
   </dest>
   <voice>
     *: none
-    swcodec: "Play Mode"
     lowmem: none
+    swcodec: "Play Mode"
   </voice>
 </phrase>
 <phrase>
@@ -14711,18 +14686,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Single"
     lowmem: none
+    swcodec: "Single"
   </source>
   <dest>
     *: none
-    swcodec: "Single"
     lowmem: none
+    swcodec: "Single"
   </dest>
   <voice>
     *: none
-    swcodec: "Single"
     lowmem: none
+    swcodec: "Single"
   </voice>
 </phrase>
 <phrase>
@@ -14731,18 +14706,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Use sound setting"
     lowmem: none
+    swcodec: "Use sound setting"
   </source>
   <dest>
     *: none
-    swcodec: "Use sound setting"
     lowmem: none
+    swcodec: "Use sound setting"
   </dest>
   <voice>
     *: none
-    swcodec: "Use sound setting"
     lowmem: none
+    swcodec: "Use sound setting"
   </voice>
 </phrase>
 <phrase>
@@ -14751,18 +14726,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Play from beginning"
     lowmem: none
+    swcodec: "Play from beginning"
   </source>
   <dest>
     *: none
-    swcodec: "Play from beginning"
     lowmem: none
+    swcodec: "Play from beginning"
   </dest>
   <voice>
     *: none
-    swcodec: "Play from beginning"
     lowmem: none
+    swcodec: "Play from beginning"
   </voice>
 </phrase>
 <phrase>
@@ -14771,18 +14746,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Set resume time (min)"
     lowmem: none
+    swcodec: "Set resume time (min)"
   </source>
   <dest>
     *: none
-    swcodec: "Set resume time (min)"
     lowmem: none
+    swcodec: "Set resume time (min)"
   </dest>
   <voice>
     *: none
-    swcodec: "Set resume time"
     lowmem: none
+    swcodec: "Set resume time"
   </voice>
 </phrase>
 <phrase>
@@ -14791,18 +14766,15 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Display FPS"
-    lcd_bitmap: "Display FPS"
+    lcd_bitmap,swcodec: "Display FPS"
   </source>
   <dest>
     *: none
-    swcodec: "Display FPS"
-    lcd_bitmap: "Display FPS"
+    lcd_bitmap,swcodec: "Display FPS"
   </dest>
   <voice>
     *: none
-    swcodec: "Display FPS"
-    lcd_bitmap: "Display FPS"
+    lcd_bitmap,swcodec: "Display FPS"
   </voice>
 </phrase>
 <phrase>
@@ -14811,18 +14783,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Limit FPS"
     lowmem: none
+    swcodec: "Limit FPS"
   </source>
   <dest>
     *: none
-    swcodec: "Limit FPS"
     lowmem: none
+    swcodec: "Limit FPS"
   </dest>
   <voice>
     *: none
-    swcodec: "Limit FPS"
     lowmem: none
+    swcodec: "Limit FPS"
   </voice>
 </phrase>
 <phrase>
@@ -14831,18 +14803,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Skip frames"
     lowmem: none
+    swcodec: "Skip frames"
   </source>
   <dest>
     *: none
-    swcodec: "Skip frames"
     lowmem: none
+    swcodec: "Skip frames"
   </dest>
   <voice>
     *: none
-    swcodec: "Skip frames"
     lowmem: none
+    swcodec: "Skip frames"
   </voice>
 </phrase>
 <phrase>
@@ -14851,18 +14823,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Backlight brightness"
     lowmem: none
+    swcodec: "Backlight brightness"
   </source>
   <dest>
     *: none
-    swcodec: "Backlight brightness"
     lowmem: none
+    swcodec: "Backlight brightness"
   </dest>
   <voice>
     *: none
-    swcodec: "Backlight brightness"
     lowmem: none
+    swcodec: "Backlight brightness"
   </voice>
 </phrase>
 <phrase>
@@ -14871,18 +14843,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Use common setting"
     lowmem: none
+    swcodec: "Use common setting"
   </source>
   <dest>
     *: none
-    swcodec: "Use common setting"
     lowmem: none
+    swcodec: "Use common setting"
   </dest>
   <voice>
     *: none
-    swcodec: "Use common setting"
     lowmem: none
+    swcodec: "Use common setting"
   </voice>
 </phrase>
 <phrase>
@@ -14891,18 +14863,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Tone controls"
     lowmem: none
+    swcodec: "Tone controls"
   </source>
   <dest>
     *: none
-    swcodec: "Tone controls"
     lowmem: none
+    swcodec: "Tone controls"
   </dest>
   <voice>
     *: none
-    swcodec: "Tone controls"
     lowmem: none
+    swcodec: "Tone controls"
   </voice>
 </phrase>
 <phrase>
@@ -14911,18 +14883,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Start menu"
     lowmem: none
+    swcodec: "Start menu"
   </source>
   <dest>
     *: none
-    swcodec: "Start menu"
     lowmem: none
+    swcodec: "Start menu"
   </dest>
   <voice>
     *: none
-    swcodec: "Start menu"
     lowmem: none
+    swcodec: "Start menu"
   </voice>
 </phrase>
 <phrase>
@@ -14931,18 +14903,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Start menu if not completed"
     lowmem: none
+    swcodec: "Start menu if not completed"
   </source>
   <dest>
     *: none
-    swcodec: "Start menu if not completed"
     lowmem: none
+    swcodec: "Start menu if not completed"
   </dest>
   <voice>
     *: none
-    swcodec: "Start menu if not completed"
     lowmem: none
+    swcodec: "Start menu if not completed"
   </voice>
 </phrase>
 <phrase>
@@ -14951,18 +14923,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Resume automatically"
     lowmem: none
+    swcodec: "Resume automatically"
   </source>
   <dest>
     *: none
-    swcodec: "Resume automatically"
     lowmem: none
+    swcodec: "Resume automatically"
   </dest>
   <voice>
     *: none
-    swcodec: "Resume automatically"
     lowmem: none
+    swcodec: "Resume automatically"
   </voice>
 </phrase>
 <phrase>
@@ -14971,18 +14943,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Clear all resumes"
     lowmem: none
+    swcodec: "Clear all resumes"
   </source>
   <dest>
     *: none
-    swcodec: "Clear all resumes"
     lowmem: none
+    swcodec: "Clear all resumes"
   </dest>
   <voice>
     *: none
-    swcodec: "Clear all resumes"
     lowmem: none
+    swcodec: "Clear all resumes"
   </voice>
 </phrase>
 <phrase>
@@ -14991,18 +14963,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Unavailable"
     lowmem: none
+    swcodec: "Unavailable"
   </source>
   <dest>
     *: none
-    swcodec: "Unavailable"
     lowmem: none
+    swcodec: "Unavailable"
   </dest>
   <voice>
     *: none
-    swcodec: "Unavailable"
     lowmem: none
+    swcodec: "Unavailable"
   </voice>
 </phrase>
 <phrase>
@@ -15305,18 +15277,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Panning Separation"
     lowmem: none
+    swcodec: "Panning Separation"
   </source>
   <dest>
     *: none
-    swcodec: "Panning Separation"
     lowmem: none
+    swcodec: "Panning Separation"
   </dest>
   <voice>
     *: none
-    swcodec: "Panning Separation"
     lowmem: none
+    swcodec: "Panning Separation"
   </voice>
 </phrase>
 <phrase>
@@ -15325,18 +15297,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Reverberation"
     lowmem: none
+    swcodec: "Reverberation"
   </source>
   <dest>
     *: none
-    swcodec: "Reverberation"
     lowmem: none
+    swcodec: "Reverberation"
   </dest>
   <voice>
     *: none
-    swcodec: "Reverberation"
     lowmem: none
+    swcodec: "Reverberation"
   </voice>
 </phrase>
 <phrase>
@@ -15345,18 +15317,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Interpolation"
     lowmem: none
+    swcodec: "Interpolation"
   </source>
   <dest>
     *: none
-    swcodec: "Interpolation"
     lowmem: none
+    swcodec: "Interpolation"
   </dest>
   <voice>
     *: none
-    swcodec: "Interpolation"
     lowmem: none
+    swcodec: "Interpolation"
   </voice>
 </phrase>
 <phrase>
@@ -15365,18 +15337,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Surround"
     lowmem: none
+    swcodec: "Surround"
   </source>
   <dest>
     *: none
-    swcodec: "Surround"
     lowmem: none
+    swcodec: "Surround"
   </dest>
   <voice>
     *: none
-    swcodec: "Surround"
     lowmem: none
+    swcodec: "Surround"
   </voice>
 </phrase>
 <phrase>
@@ -15385,18 +15357,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "CPU Boost"
     lowmem: none
+    swcodec: "CPU Boost"
   </source>
   <dest>
     *: none
-    swcodec: "CPU Boost"
     lowmem: none
+    swcodec: "CPU Boost"
   </dest>
   <voice>
     *: none
-    swcodec: "CPU Boost"
     lowmem: none
+    swcodec: "CPU Boost"
   </voice>
 </phrase>
 <phrase>
@@ -15889,48 +15861,46 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: "Press LEFT to cancel."
-    cowond2,ibassodx50,mrobe500,ibassodx90,iaudio7,ondavx747,creativezenxfi2: "Press POWER to cancel."
-    ihifi770, ihifi770c, ihifi800: "Press HOME to cancel."
-    android,zenvision,hifietma*: "Press BACK to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
     rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
     touchscreen: "Press Middle Left to cancel."
     vibe500: "Press PREV to cancel."
-    ihifi760,ihifi960 : "Double tap RETURN to cancel."
-    iriverh10,samsungyh* : "Double tap LEFT to cancel."
-    mpiohd200 : "Double tap REC to cancel."
-    mpiohd300 : "Double tap MENU to cancel."
-    xduoox20,xduoox3,xduoox3ii : "Double tap HOME to cancel."
-#samsung yp-r1 : double tap power
-    sonynwza860: "Keymaps incomplete."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
   </source>
   <dest>
     *: "Press LEFT to cancel."
-    cowond2,ibassodx50,mrobe500,ibassodx90,iaudio7,ondavx747,creativezenxfi2: "Press POWER to cancel."
-    ihifi770, ihifi770c, ihifi800: "Press HOME to cancel."
-    android,zenvision,hifietma*: "Press BACK to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
     rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
     touchscreen: "Press Middle Left to cancel."
     vibe500: "Press PREV to cancel."
-    ihifi760,ihifi960 : "Double tap RETURN to cancel."
-    iriverh10,samsungyh* : "Double tap LEFT to cancel."
-    mpiohd200 : "Double tap REC to cancel."
-    mpiohd300 : "Double tap MENU to cancel."
-    xduoox20,xduoox3,xduoox3ii : "Double tap HOME to cancel."
-#samsung yp-r1 : double tap power
-    sonynwza860: "Keymaps incomplete."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
   </dest>
   <voice>
     *: "Press LEFT to cancel."
-    cowond2,ibassodx50,mrobe500,ibassodx90,iaudio7,ondavx747,creativezenxfi2: "Press POWER to cancel."
-    ihifi770, ihifi770c, ihifi800: "Press HOME to cancel."
-    android,zenvision,hifietma*: "Press BACK to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
     rx27generic: "Press VOLUME to cancel."
     touchscreen: "Press Middle Left to cancel."
     vibe500: "Press PREV to cancel."
-    ihifi760,ihifi960 : "Double tap RETURN to cancel."
-    iriverh10,samsungyh* : "Double tap LEFT to cancel."
-    mpiohd200 : "Double tap REC to cancel."
-    mpiohd300 : "Double tap MENU to cancel."
-    xduoox20,xduoox3,xduoox3ii : "Double tap HOME to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
   </voice>
 </phrase>
