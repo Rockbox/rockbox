@@ -54,7 +54,7 @@ class PreviewLabel : public QLabel
     Q_OBJECT
 
 public:
-    PreviewLabel(QWidget * parent = 0, Qt::WindowFlags f = 0);
+    PreviewLabel(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
 
     void setPixmap(QPixmap p);
     void setText(QString text);

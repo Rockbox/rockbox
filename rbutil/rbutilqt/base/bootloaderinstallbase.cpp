@@ -40,7 +40,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallBase::installed(void)
 
 BootloaderInstallBase::Capabilities BootloaderInstallBase::capabilities(void)
 {
-    return 0;
+    return Capabilities();
 }
 
 
