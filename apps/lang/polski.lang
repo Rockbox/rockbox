@@ -15818,3 +15818,52 @@
     lcd_bitmap: "Pokaż album i wykonawcę na dole"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Wciśnij LEFT, aby anulować."
+    android,hifietma*,zenvision: "Wciśnij BACK, aby anulować."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Wciśnij POWER, aby anulować."
+    ihifi760,ihifi960: "Podwójnie stuknij RETURN, aby anulować."
+    ihifi770,ihifi770c,ihifi800: "Wciśnij HOME, aby anulować."
+    iriverh10,samsungyh*: "Podwójnie stuknij LEFT, aby anulować."
+    mpiohd200: "Podwójnie stuknij REC, aby anulować."
+    mpiohd300: "Podwójnie stuknij MENU, aby anulować."
+    rx27generic: "Wciśnij VOLUME, aby anulować."
+    sonynwza860: "Niekompletne mapy klawiszy."
+    touchscreen: "Wciśnij środkowy lewy, aby anulować."
+    vibe500: "Wciśnij PREV, aby anulować."
+    xduoox20,xduoox3,xduoox3ii: "Podwójnie stuknij HOME, aby anulować."
+  </dest>
+  <voice>
+    *: "Wciśnij left, aby anulować."
+    android,hifietma*,zenvision: "Wciśnij bak, aby anulować."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Wciśnij pałer, aby anulować."
+    ihifi760,ihifi960: "Podwójnie stuknij ritern, aby anulować."
+    ihifi770,ihifi770c,ihifi800: "Wciśnij hołm, aby anulować."
+    iriverh10,samsungyh*: "Podwójnie stuknij left, aby anulować."
+    mpiohd200: "Podwójnie stuknij rek, aby anulować."
+    mpiohd300: "Podwójnie stuknij menju, aby anulować."
+    rx27generic: "Wciśnij woljum, aby anulować."
+    touchscreen: "Wciśnij środkowy lewy, aby anulować."
+    vibe500: "Wciśnij priw, aby anulować."
+    xduoox20,xduoox3,xduoox3ii: "Podwójnie stuknij hołm, aby anulować."
+  </voice>
+</phrase>
