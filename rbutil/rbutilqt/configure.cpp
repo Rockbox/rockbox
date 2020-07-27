@@ -56,10 +56,6 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     ui.setupUi(this);
     ui.tabConfiguration->setCurrentIndex(index);
     ui.radioManualProxy->setChecked(true);
-    QRegExpValidator *proxyValidator = new QRegExpValidator(this);
-    QRegExp validate("[0-9]*");
-    proxyValidator->setRegExp(validate);
-    ui.proxyPort->setValidator(proxyValidator);
 
     // build language list and sort alphabetically
     QStringList langs = findLanguageFiles();
@@ -134,7 +130,7 @@ void Config::accept()
         proxy.setUserName(ui.proxyUser->text());
         proxy.setPassword(ui.proxyPass->text());
         proxy.setHost(ui.proxyHost->text());
-        proxy.setPort(ui.proxyPort->text().toInt());
+        proxy.setPort(ui.proxyPort->value());
     }
 
     // Encode the password using base64 before storing it to the configuration
@@ -253,9 +249,7 @@ void Config::setUserSettings()
     QByteArray pw = QByteArray::fromBase64(proxy.password().toUtf8());
     proxy.setPassword(pw);
 
-    if(proxy.port() > 0)
-        ui.proxyPort->setText(QString("%1").arg(proxy.port()));
-    else ui.proxyPort->setText("");
+    ui.proxyPort->setValue(proxy.port());
     ui.proxyHost->setText(proxy.host());
     ui.proxyUser->setText(proxy.userName());
     ui.proxyPass->setText(proxy.password());
@@ -512,13 +506,13 @@ void Config::setSystemProxy(bool checked)
         proxy.setUserName(ui.proxyUser->text());
         proxy.setPassword(ui.proxyPass->text());
         proxy.setHost(ui.proxyHost->text());
-        proxy.setPort(ui.proxyPort->text().toInt());
+        proxy.setPort(ui.proxyPort->value());
         // show system values in input box
         QUrl envproxy = System::systemProxy();
         LOG_INFO() << "setting system proxy" << envproxy;
 
         ui.proxyHost->setText(envproxy.host());
-        ui.proxyPort->setText(QString("%1").arg(envproxy.port()));
+        ui.proxyPort->setValue(envproxy.port());
         ui.proxyUser->setText(envproxy.userName());
         ui.proxyPass->setText(envproxy.password());
 
@@ -543,9 +537,7 @@ void Config::setSystemProxy(bool checked)
     }
     else {
         ui.proxyHost->setText(proxy.host());
-        if(proxy.port() > 0)
-            ui.proxyPort->setText(QString("%1").arg(proxy.port()));
-        else ui.proxyPort->setText("");
+        ui.proxyPort->setValue(proxy.port());
         ui.proxyUser->setText(proxy.userName());
         ui.proxyPass->setText(proxy.password());
     }
