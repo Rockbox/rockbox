@@ -51,7 +51,7 @@ void HttpGet::setCache(const QDir& d)
 {
     if(m_cache && m_cachedir == d.absolutePath())
         return;
-    m_cachedir = d.absolutePath();
+    m_cachedir.setPath(d.absolutePath());
     setCache(true);
 }
 
