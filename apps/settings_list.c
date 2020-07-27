@@ -93,7 +93,7 @@
 
 /* Use for int settings which use the set_sound() function to set them */
 #define SOUND_SETTING(flags,var,lang_id,name,setting)                      \
-            {flags|F_T_INT|F_T_SOUND|F_SOUNDSETTING, &global_settings.var, \
+            {flags|F_T_INT|F_T_SOUND|F_SOUNDSETTING|F_ALLOW_ARBITRARY_VALS, &global_settings.var, \
                 lang_id, NODEFAULT,name,NULL,                              \
                 {.sound_setting=(struct sound_setting[]){{setting}}} }
 
@@ -817,14 +817,14 @@ const struct settings_list settings[] = {
 #endif /* HAVE_WM8978 */
 #endif /* AUDIOHW_HAVE_EQ */
 /* 3-d enhancement effect */
-    CHOICE_SETTING(F_SOUNDSETTING, channel_config, LANG_CHANNEL_CONFIGURATION,
+    CHOICE_SETTING(0, channel_config, LANG_CHANNEL_CONFIGURATION,
                    0,"channels",
                    "stereo,mono,custom,mono left,mono right,karaoke",
                    sound_set_channels, 6,
                    ID2P(LANG_CHANNEL_STEREO), ID2P(LANG_CHANNEL_MONO),
                    ID2P(LANG_CHANNEL_CUSTOM), ID2P(LANG_CHANNEL_LEFT),
                    ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),
-    SOUND_SETTING(F_SOUNDSETTING, stereo_width, LANG_STEREO_WIDTH,
+    SOUND_SETTING(0, stereo_width, LANG_STEREO_WIDTH,
                   "stereo_width", SOUND_STEREO_WIDTH),
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     SOUND_SETTING(0,depth_3d, LANG_DEPTH_3D, "3-d enhancement",
