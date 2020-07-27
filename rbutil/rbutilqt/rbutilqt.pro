@@ -157,7 +157,10 @@ TARGET = RockboxUtility
 QT += network
 
 message("Qt$$QT_MAJOR_VERSION found")
-QT += widgets multimedia
+QT += widgets
+if (lessThan(QT_MAJOR_VERSION, 6)) {
+    QT += multimedia
+}
 
 CONFIG += c++11
 

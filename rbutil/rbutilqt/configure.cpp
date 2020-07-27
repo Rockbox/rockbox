@@ -20,7 +20,9 @@
 #include <QProgressDialog>
 #include <QFileDialog>
 #include <QUrl>
+#ifdef QT_MULTIMEDIA_LIB
 #include <QSound>
+#endif
 
 #include "version.h"
 #include "configure.h"
@@ -446,7 +448,11 @@ void Config::updateTtsState(int index)
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.png")));
+#ifdef QT_MULTIMEDIA_LIB
         ui.testTTS->setEnabled(true);
+#else
+        ui.testTTS->setEnabled(false);
+#endif
     }
     else
     {
@@ -895,6 +901,7 @@ void Config::configTts()
 
 void Config::testTts()
 {
+#ifdef QT_MULTIMEDIA_LIB
     QString errstr;
     int index = ui.comboTts->currentIndex();
     TTSBase* tts;
@@ -947,6 +954,7 @@ void Config::testTts()
     delete tts; /* Config objects are never deleted (in fact, they are
                    leaked..), so we can't rely on QObject, since that would
                    delete the TTSBase instance on application exit */
+#endif
 }
 
 void Config::configEnc()
