@@ -97,6 +97,7 @@ static const char* get_menu_item_name(int selected_item,
                                       char *buffer,
                                       size_t buffer_len)
 {
+    const char *name;
     const struct menu_item_ex *menu = (const struct menu_item_ex *)data;
     int type = (menu->flags&MENU_TYPE_MASK);
     selected_item = get_menu_selection(selected_item, menu);
@@ -105,9 +106,17 @@ static const char* get_menu_item_name(int selected_item,
     if (type == MT_RETURN_ID)
     {
         if (menu->flags&MENU_DYNAMIC_DESC)
-            return menu->menu_get_name_and_icon->list_get_name(selected_item,
+        {
+            name = menu->menu_get_name_and_icon->list_get_name(selected_item,
             menu->menu_get_name_and_icon->list_get_name_data, buffer, buffer_len);
-        return menu->strings[selected_item];
+        }
+        else
+            name = menu->strings[selected_item];
+
+        if (P2ID((unsigned char *)name) > VOICEONLY_DELIMITER)
+            name = "";
+
+        return name;
     }
     if (type == MT_MENU)
         menu = menu->submenus[selected_item];
