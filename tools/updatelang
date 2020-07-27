@@ -9,7 +9,6 @@
 # Copyright (C) 2020 Solomon Peachy
 #
 
-use Clone 'clone';
 use utf8;
 use File::Basename;
 
@@ -66,7 +65,8 @@ sub parselangfile {
 	    $line eq '<phrase>') {
 	    $pos = 'phrase';
 	} elsif ($line eq '</phrase>') {
-	    $phrases{$id} = clone(\%thisphrase);
+	    my %copy = %thisphrase;
+	    $phrases{$id} = \%copy;
 	    %thisphrase = %empty;
 	    $pos = 'lang';
 	    $id = '';
