@@ -295,8 +295,10 @@ foreach my $id (@langorder) {
     foreach my $tgt (keys(%ep)) {
 	if (!defined($lp{$tgt})) {
 	    # If it doesn't exist in the language, copy it from English
-	    $lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' is missing! Copying from english!\n";
-#	    print "#!! '$id:$tgt' source missing\n";
+	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
+		$lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' is missing! Copying from english!\n";
+#		print "#!! '$id:$tgt' source missing\n";
+	    }
 	    $lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    # If the source string differs, complain, and copy from English
@@ -332,22 +334,24 @@ foreach my $id (@langorder) {
     foreach my $tgt (keys(%ep)) {
 	if (!defined($lp{$tgt})) {
 	    # If it doesn't exist in the language, copy it from English
-	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is missing! Copying from english\n";
-#	    print "#!! '$id:$tgt' dest missing\n";
+	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is missing! Copying from english\n";
+#		print "#!! '$id:$tgt' dest missing\n";
+	    }
 	    $lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    # If the source string differs, complain, and copy from English
 	    if ($lp{$tgt} eq '' && $ep{$tgt} ne '') {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is blank! Copying from english!\n";
 #		print "#!! '$id:$tgt' dest is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
-		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
 		# It should be kept blank!
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is not blank!\n";
 		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
 		$lang{$id}{'notes'} .= "### $english{$id}{dest}{$tgt}\n";
 #		print "#!! '$id:$tgt' dest not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
-		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 	    }
 	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'}) {
 	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is identical to english!\n";
@@ -379,22 +383,24 @@ foreach my $id (@langorder) {
     foreach my $tgt (keys(%ep)) {
 	if (!defined($lp{$tgt})) {
 	    # If it doesn't exist in the language, copy it from English
-	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is missing! Copying from english\n";
-#	    print "#!! '$id:$tgt' voice missing\n";
+	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
+		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is missing! Copying from english\n";
+#		print "#!! '$id:$tgt' voice missing\n";
+	    }
 	    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    if ($lp{$tgt} eq '' && $ep{$tgt} ne '') {
 		# If the lang voice string is blank, complain, and copy from English
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
 #		print "#!! '$id:$tgt' voice is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
-		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+		$lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
 		# If it's not blank, clear it and complain!
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is not blank!\n";
 		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
 		$lang{$id}{'notes'} .= "### $english{$id}{voice}{$tgt}\n";
 #		print "#!! '$id:$tgt' voice not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
-		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+		$lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 	    }
 	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'}) {
 	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
