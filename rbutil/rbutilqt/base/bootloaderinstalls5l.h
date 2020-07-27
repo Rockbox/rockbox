@@ -55,10 +55,10 @@ class BootloaderInstallS5l : public BootloaderInstallBase
         QList<int> suspendedPids;
         bool aborted;
         bool abortDetected(void);
-        QTime scanTimer;
+        QElapsedTimer scanTimer;
         bool scanSuccess;
         // progress
-        QTime progressTimer;
+        QElapsedTimer progressTimer;
         int progressTimeout;
         int progCurrent;
         int progOrigin;

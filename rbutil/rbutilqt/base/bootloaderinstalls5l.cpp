@@ -115,7 +115,7 @@ void BootloaderInstallS5l::installStageMkdfu(void)
     LOG_INFO() << "preparing installStageWaitForEject";
     emit logItem(tr("Ejecting iPod..."), LOGINFO);
     setProgress(10);
-    scanTimer = QTime();
+    scanTimer.invalidate();
     installStageWaitForEject();
 }
 
@@ -125,7 +125,7 @@ void BootloaderInstallS5l::installStageWaitForEject(void)
     if (!updateProgress())
         return; /* aborted */
 
-    if (scanTimer.isNull() || (scanTimer.elapsed() > 3000)) {
+    if (!scanTimer.isValid() || (scanTimer.elapsed() > 3000)) {
         scanSuccess = Utils::ejectDevice(mntpoint);
         if (!scanSuccess) {
             scanSuccess = !Utils::mountpoints(
@@ -149,7 +149,7 @@ void BootloaderInstallS5l::installStageWaitForEject(void)
 
     LOG_INFO() << "preparing installStageWaitForProcs";
     setProgress(40, 18);
-    scanTimer = QTime();
+    scanTimer.invalidate();
     installStageWaitForProcs();
 }
 
@@ -159,7 +159,7 @@ void BootloaderInstallS5l::installStageWaitForProcs(void)
     if (!updateProgress())
         return; /* aborted */
 
-    if (scanTimer.isNull() || (scanTimer.elapsed() > 1000)) {
+    if (!scanTimer.isValid() || (scanTimer.elapsed() > 1000)) {
         scanSuccess = Utils::findRunningProcess(QStringList("iTunes")).isEmpty();
         scanTimer.start();
     }
@@ -217,7 +217,7 @@ void BootloaderInstallS5l::installStageWaitForSpindown(void)
                     "  about 12 seconds a new action will require\n"
                     "  you to release the buttons, DO IT QUICKLY,\n"
                     "  otherwise the process could fail."), LOGWARNING);
-    scanTimer = QTime();
+    scanTimer.invalidate();
     installStageWaitForDfu();
 }
 
@@ -227,7 +227,7 @@ void BootloaderInstallS5l::installStageWaitForDfu(void)
     if (!updateProgress())
         return; /* aborted */
 
-    if (scanTimer.isNull() || (scanTimer.elapsed() > 2000)) {
+    if (!scanTimer.isValid() || (scanTimer.elapsed() > 2000)) {
         scanSuccess = System::listUsbIds().contains(0x05ac1223);
         scanTimer.start();
     }
@@ -298,7 +298,7 @@ void BootloaderInstallS5l::installStageSendDfu(void)
     LOG_INFO() << "preparing installStageWaitForRemount";
     emit logItem(tr("Restarting iPod, waiting for remount..."), LOGINFO);
     setProgress(99, 45);
-    scanTimer = QTime();
+    scanTimer.invalidate();
     installStageWaitForRemount();
 }
 
@@ -308,7 +308,7 @@ void BootloaderInstallS5l::installStageWaitForRemount(void)
     if (!updateProgress())
         return; /* aborted */
 
-    if (scanTimer.isNull() || (scanTimer.elapsed() > 5000)) {
+    if (!scanTimer.isValid() || (scanTimer.elapsed() > 5000)) {
         scanSuccess = Utils::mountpoints(
                     Utils::MountpointsSupported).contains(mntpoint);
         scanTimer.start();
@@ -381,7 +381,8 @@ bool BootloaderInstallS5l::updateProgress(void)
 {
     if (progressTimeout) {
         progCurrent = qMin(progTarget, progOrigin +
-            progressTimer.elapsed()*(progTarget-progOrigin)/progressTimeout);
+            static_cast<int>(progressTimer.elapsed())
+                           * (progTarget - progOrigin) / progressTimeout);
     }
     else {
         progCurrent = progTarget;
