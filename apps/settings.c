@@ -300,14 +300,7 @@ bool settings_load_config(const char* file, bool apply)
 #endif
                             if (settings[i].cfg_vals == NULL)
                         {
-                            int temp = atoi(value);
-                            if (settings[i].flags&F_ALLOW_ARBITRARY_VALS ||
-                                (temp >= settings[i].int_setting->min &&
-                                 temp <= settings[i].int_setting->max &&
-                                 temp % settings[i].int_setting->step == 0))
-                            {
-                                *(int*)settings[i].setting = temp;
-                            }
+                            *(int*)settings[i].setting = atoi(value);
                         }
                         else
                         {
