@@ -93,7 +93,11 @@ QString Utils::resolvePathCase(QString path)
 {
     int start;
     QString realpath;
+#if QT_VERSION >= 0x050e00
+    QStringList elems = path.split("/", Qt::SkipEmptyParts);
+#else
     QStringList elems = path.split("/", QString::SkipEmptyParts);
+#endif
 
     if(path.isEmpty())
         return QString();
@@ -280,9 +284,17 @@ QString Utils::findExecutable(QString name)
     QString exepath;
     //try autodetect tts   
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+#if QT_VERSION >= 0x050e00
+    QStringList path = QString(getenv("PATH")).split(":", Qt::SkipEmptyParts);
+#else
     QStringList path = QString(getenv("PATH")).split(":", QString::SkipEmptyParts);
+#endif
 #elif defined(Q_OS_WIN)
+#if QT_VERSION >= 0x050e00
+    QStringList path = QString(getenv("PATH")).split(";", Qt::SkipEmptyParts);
+#else
     QStringList path = QString(getenv("PATH")).split(";", QString::SkipEmptyParts);
+#endif
 #endif
     LOG_INFO() << "system path:" << path;
     for(int i = 0; i < path.size(); i++)
@@ -290,7 +302,11 @@ QString Utils::findExecutable(QString name)
         QString executable = QDir::fromNativeSeparators(path.at(i)) + "/" + name;
 #if defined(Q_OS_WIN)
         executable += ".exe";
+#if QT_VERSION >= 0x050e00
+        QStringList ex = executable.split("\"", Qt::SkipEmptyParts);
+#else
         QStringList ex = executable.split("\"", QString::SkipEmptyParts);
+#endif
         executable = ex.join("");
 #endif
         if(QFileInfo(executable).isExecutable())

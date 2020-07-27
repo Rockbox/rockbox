@@ -204,7 +204,11 @@ QStringList TTSSapi::getVoiceList(QString language)
     if(dataRaw.startsWith("Error")) {
         LOG_INFO() << "Error:" << dataRaw;
     }
-    result = dataRaw.split(";",QString::SkipEmptyParts);
+#if QT_VERSION >= 0x050e00
+    result = dataRaw.split(";", Qt::SkipEmptyParts);
+#else
+    result = dataRaw.split(";", QString::SkipEmptyParts);
+#endif
     if(result.size() > 0)
     {
         result.sort();
