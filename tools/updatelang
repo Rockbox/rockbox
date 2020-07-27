@@ -1,0 +1,496 @@
+#!/usr/bin/perl -s -w
+#             __________               __   ___.
+#   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+#   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+#   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+#   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+#                     \/            \/     \/    \/            \/
+#
+# Copyright (C) 2020 Solomon Peachy
+#
+
+use Clone 'clone';
+use utf8;
+use File::Basename;
+
+sub trim {
+    my ($string) = @_;
+    $string =~ s/^\s+//;
+    $string =~ s/\s+$//;
+    return $string;
+}
+
+sub parselangfile {
+    my ($filename) = @_;
+    my %phrases;
+    my @order;
+    my %empty = ( #'phrase' => {},
+		  #'source' => {},
+		  #'dest' => {},
+		  #'voice' => {},
+		  'notes' => "",
+		  'new' => 0
+	);
+    my %thisphrase = %empty;
+
+    open(FH, "<$filename") || die ("Can't open $filename");
+    my @lines = <FH>;
+    close(FH);
+
+    my $pos = 'lang';
+    my $id = '';
+    my @comments;
+
+    foreach my $line (@lines) {
+	$line = trim($line);
+        if($line =~ /^ *#/) {
+	    push(@comments, "$line\n") if ($pos eq 'lang');
+            # comments are ignored!
+            next;
+        } elsif ($pos eq 'phrase' && $line =~ /^([^:]+): ?(.*)$/) {
+	    $thisphrase{$pos}->{$1} = $2;
+	    if ($1 eq 'id') {
+		push(@order, $2);
+		$id = $2;
+	    }
+	} elsif ($pos ne 'phrase' && $line =~ /^([^:]+): ?\"?([^\"]*)\"?$/) {
+	    my @targets = split(',', $1);
+	    foreach (@targets) {
+		my $l = trim($_);
+		$thisphrase{$pos}->{$l} = $2;
+	    }
+	}
+	if ($line eq '</voice>' ||
+	    $line eq '</dest>' ||
+	    $line eq '</source>' ||
+	    $line eq '<phrase>') {
+	    $pos = 'phrase';
+	} elsif ($line eq '</phrase>') {
+	    $phrases{$id} = clone(\%thisphrase);
+	    %thisphrase = %empty;
+	    $pos = 'lang';
+	    $id = '';
+	} elsif ($line eq '<source>') {
+	    $pos = 'source';
+	} elsif ($line eq '<dest>') {
+	    $pos = 'dest';
+	} elsif ($line eq '<voice>') {
+	    $pos = 'voice';
+	}
+    }
+    $phrases{'HEADER'} = \@comments;
+    $phrases{'ORDER'} = \@order;
+    return %phrases;
+}
+
+sub combinetgts {
+    my (%tgtmap) = (@_);
+    my %strmap;
+    my %combined;
+
+    # Reverse-map things
+    foreach my $tgt (sort(keys(%tgtmap))) {
+	next if ($tgt eq '*');  # Do not combine anything with fallback
+	if (defined($strmap{$tgtmap{$tgt}})) {
+	    $strmap{$tgtmap{$tgt}} .= ",$tgt";
+	} else {
+	    $strmap{$tgtmap{$tgt}} = "$tgt";
+	}
+    }
+
+    # Copy over default/fallback as it was skipped
+    $combined{'*'} = $tgtmap{'*'};
+
+    foreach my $str (keys(%strmap)) {
+	$combined{$strmap{$str}} = $str;
+    }
+
+    return %combined;
+}
+
+my @ignorelist = split("\n",
+"LANG_SERIAL_BITRATE_19200
+LANG_SERIAL_BITRATE_9600
+LANG_SERIAL_BITRATE_38400
+LANG_SERIAL_BITRATE_57600
+LANG_COMPRESSOR_RATIO_10
+LANG_COMPRESSOR_RATIO_2
+LANG_COMPRESSOR_RATIO_6
+LANG_COMPRESSOR_RATIO_4
+LANG_ROCKBOX_TITLE
+LANG_EQUALIZER_BAND_Q
+LANG_FM_DEFAULT_PRESET_NAME
+LANG_DISK_NAME_MMC
+LANG_COLOR_RGB_LABELS
+LANG_BYTE
+LANG_KIBIBYTE
+LANG_GIBIBYTE
+LANG_USB_HID
+VOICE_ZERO
+VOICE_ONE
+VOICE_TWO
+VOICE_THREE
+VOICE_FOUR
+VOICE_FIVE
+VOICE_SIX
+VOICE_SEVEN
+VOICE_EIGHT
+VOICE_NINE
+VOICE_TEN
+VOICE_ELEVEN
+VOICE_TWELVE
+VOICE_THIRTEEN
+VOICE_FOURTEEN
+VOICE_FIFTEEN
+VOICE_SIXTEEN
+VOICE_SEVENTEEN
+VOICE_EIGHTEEN
+VOICE_NINETEEN
+VOICE_TWENTY
+VOICE_THIRTY
+VOICE_FORTY
+VOICE_FIFTY
+VOICE_SIXTY
+VOICE_SEVENTY
+VOICE_EIGHTY
+VOICE_NINETY
+VOICE_CHAR_A
+VOICE_CHAR_B
+VOICE_CHAR_C
+VOICE_CHAR_D
+VOICE_CHAR_E
+VOICE_CHAR_F
+VOICE_CHAR_G
+VOICE_CHAR_H
+VOICE_CHAR_I
+VOICE_CHAR_J
+VOICE_CHAR_K
+VOICE_CHAR_L
+VOICE_CHAR_M
+VOICE_CHAR_N
+VOICE_CHAR_O
+VOICE_CHAR_P
+VOICE_CHAR_Q
+VOICE_CHAR_R
+VOICE_CHAR_S
+VOICE_CHAR_T
+VOICE_CHAR_U
+VOICE_CHAR_V
+VOICE_CHAR_W
+VOICE_CHAR_X
+VOICE_CHAR_Y
+VOICE_CHAR_Z
+VOICE_PAUSE");
+
+sub not_ignorelist {
+    my ($key) = @_;
+    foreach (@ignorelist) {
+	if ($_ eq $key) {
+	    return 0;
+	}
+    }
+    return 1;
+}
+##################
+
+if($#ARGV != 2) {
+    print "Usage: updatelang <english.lang> <otherlang> [<outfile>|-]\n";
+    exit;
+}
+
+# Parse master file
+my %english = parselangfile($ARGV[0]);
+my @englishorder = @{$english{'ORDER'}};
+
+# Parse secondary file
+my %lang = parselangfile($ARGV[1]);
+my @langorder = @{$lang{'ORDER'}};
+my @langheader = @{$lang{'HEADER'}};
+
+# Clean up
+delete $english{'ORDER'};
+delete $english{'HEADER'};
+delete $lang{'ORDER'};
+delete $lang{'HEADER'};
+
+# ork out the missing phrases
+my %missing;
+my @missingorder;
+
+foreach (@englishorder) {
+    $missing{$_} = 1;
+}
+foreach (@langorder) {
+    if (!defined($english{$_})) {
+	delete($lang{$_});
+#	print "#!! '$_' no longer needed\n";
+	next;
+    }
+    delete $missing{$_};
+}
+foreach (@englishorder) {
+    push(@missingorder, $_) if defined($missing{$_});
+}
+# And add them to the phrase list.
+foreach (@missingorder) {
+#    print "#!! '$_' missing\n";
+    push(@langorder, $_);
+    $lang{$_} = $english{$_};
+    $lang{$_}{'notes'} .= "### This phrase is missing entirely, copying from english!\n";
+    $lang{$_}{'new'} = 1;
+}
+undef @missingorder;
+undef %missing;
+
+# Sanity-check a few things
+foreach my $id (@langorder) {
+    if (!defined($english{$id})) {
+	next;
+    }
+    my %ep = %{$english{$id}{'phrase'}};
+    my %lp = %{$lang{$id}{'phrase'}};
+
+    if ($lp{'desc'} ne $ep{'desc'}) {
+	if ($ep{'desc'} eq 'deprecated') {
+	    # Nuke all deprecated targets; just copy from English
+#	    print "#!! '$id' deprecated, deleting\n";
+	    $lang{$id} = $english{$id};
+	} else {
+	    $lang{$id}{'notes'} .= "### The 'desc' field for '$id' differs from the english!\n### the previously used desc is commented below:\n### desc: $lp{desc}\n";
+	    $lang{$id}{'phrase'}{'desc'} = 	$english{$id}{'phrase'}{'desc'};
+	    #	print "#!! '$id' changed description\n";
+	}
+    }
+
+    if (!defined($lp{'user'}) || $lp{'user'} ne $ep{'user'}) {
+	if (!defined($lp{'user'})) {
+	    $lp{'user'} = $ep{'user'};
+	}
+	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from the english!\n### the previously used desc is commented below:\n### desc: $lp{user}\n";
+	$lang{$id}{'phrase'}{'user'} = $english{$id}{'phrase'}{'user'};
+#	print "#!! '$id' changed user\n";
+    }
+}
+
+# Check sources
+foreach my $id (@langorder) {
+    if (!defined($english{$id})) {
+	next;
+    }
+    my %ep = %{$english{$id}{'source'}};
+    my %lp;
+
+    if (defined($lang{$id}{'source'})) {
+	%lp = %{$lang{$id}{'source'}};
+    } else {
+	%lp = ();
+    }
+
+    foreach my $tgt (keys(%lp)) {
+	if (!defined($ep{$tgt})) {
+	    # Delete any targets that have been nuked in master
+	    delete($lang{$id}{'source'}{$tgt});
+	}
+    }
+    foreach my $tgt (keys(%ep)) {
+	if (!defined($lp{$tgt})) {
+	    # If it doesn't exist in the language, copy it from English
+	    $lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' is missing! Copying from english!\n";
+#	    print "#!! '$id:$tgt' source missing\n";
+	    $lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+	} elsif ($lp{$tgt} ne $ep{$tgt}) {
+	    # If the source string differs, complain, and copy from English
+	    $lang{$id}{'notes'} .= "### The <source> section for '$id:$tgt' differs from the english!\n";
+	    $lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
+            $lang{$id}{'notes'} .= "### $english{$id}{source}{$tgt}\n";
+#	    print "#!! '$id:$tgt' source changed ('$lp{$tgt}' vs '$ep{$tgt}')\n";
+	    $lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+	}
+    }
+}
+
+# Check dests
+foreach my $id (@langorder) {
+    if (!defined($english{$id})) {
+	next;
+    }
+    my %ep = %{$english{$id}{'dest'}};
+    my %lp;
+
+    if (defined($lang{$id}{'dest'})) {
+	%lp = %{$lang{$id}{'dest'}};
+    } else {
+	%lp = ();
+    }
+
+    foreach my $tgt (keys(%lp)) {
+	if (!defined($ep{$tgt})) {
+	    # Delete any targets that have been nuked in master
+	    delete($lang{$id}{'dest'}{$tgt});
+	}
+    }
+    foreach my $tgt (keys(%ep)) {
+	if (!defined($lp{$tgt})) {
+	    # If it doesn't exist in the language, copy it from English
+	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is missing! Copying from english\n";
+#	    print "#!! '$id:$tgt' dest missing\n";
+	    $lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
+	} elsif ($lp{$tgt} ne $ep{$tgt}) {
+	    # If the source string differs, complain, and copy from English
+	    if ($lp{$tgt} eq '' && $ep{$tgt} ne '') {
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is blank! Copying from english!\n";
+#		print "#!! '$id:$tgt' dest is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
+		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
+		# It should be kept blank!
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is not blank!\n";
+		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "### $english{$id}{dest}{$tgt}\n";
+#		print "#!! '$id:$tgt' dest not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
+		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+	    }
+	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'}) {
+	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is identical to english!\n";
+#	    print "#!! '$id:$tgt' dest identical ('$lp{$tgt}')\n";
+	}
+    }
+}
+
+# Check voices
+foreach my $id (@langorder) {
+    if (!defined($english{$id})) {
+	next;
+    }
+    my %ep = %{$english{$id}{'voice'}};
+    my %lp;
+
+    if (defined($lang{$id}{'voice'})) {
+	%lp = %{$lang{$id}{'voice'}};
+    } else {
+	%lp = ();
+    }
+
+    foreach my $tgt (keys(%lp)) {
+	if (!defined($ep{$tgt})) {
+	    # Delete any targets that have been nuked in master
+	    delete($lang{$id}{'voice'}{$tgt});
+	}
+    }
+    foreach my $tgt (keys(%ep)) {
+	if (!defined($lp{$tgt})) {
+	    # If it doesn't exist in the language, copy it from English
+	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is missing! Copying from english\n";
+#	    print "#!! '$id:$tgt' voice missing\n";
+	    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
+	} elsif ($lp{$tgt} ne $ep{$tgt}) {
+	    if ($lp{$tgt} eq '' && $ep{$tgt} ne '') {
+		# If the lang voice string is blank, complain, and copy from English
+		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
+#		print "#!! '$id:$tgt' voice is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
+		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
+		# If it's not blank, clear it and complain!
+		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is not blank!\n";
+		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
+		$lang{$id}{'notes'} .= "### $english{$id}{voice}{$tgt}\n";
+#		print "#!! '$id:$tgt' voice not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
+		$lang{$id}{'source'}{$tgt} = $english{$id}{'source'}{$tgt};
+	    }
+	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'}) {
+	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
+#	    print "#!! '$id:$tgt' voice identical ('$lp{$tgt}')\n";
+	}
+    }
+}
+
+########## Write new language file
+my $printnotes = 1;
+
+my @tmp = split(/\./, basename($ARGV[0]));
+my $f1 = $tmp[0];
+@tmp = split(/\./, basename($ARGV[1]));
+my $f2 = $tmp[0];
+
+if (index($f2, $f1) > -1) {
+    $printnotes = 0;
+}
+undef $f1;
+undef $f2;
+undef @tmp;
+
+my $fh;
+if ($ARGV[2] ne '-') {
+    open(FH, ">$ARGV[2]") || die ("Can't open $ARGV[2]");
+    $fh = *FH;
+} else {
+    $fh = *STDOUT;
+}
+
+foreach (@langheader) {
+    print $fh $_;
+}
+
+my @finalorder = @langorder;  # TODO make configurable vs @englishorder
+foreach my $id (@finalorder) {
+    if (!defined($english{$id})) {
+	next;
+    }
+    my %lp;
+
+    # phrase
+    %lp = %{$lang{$id}{'phrase'}};
+    if (length($lang{$id}{'notes'}) && $printnotes) {
+	print $fh "$lang{$id}{notes}";
+    }
+    print $fh "<phrase>\n";
+    print $fh "  id: $lp{id}\n";
+    if ($lp{'desc'} ne '') {
+	print $fh "  desc: $lp{desc}\n";
+    } else {
+	print $fh "  desc:\n";
+    }
+    print $fh "  user: $lp{user}\n";
+
+    # source
+    %lp = combinetgts(%{$lang{$id}{'source'}});
+    print $fh "  <source>\n";
+    foreach my $tgt (sort(keys(%lp))) {
+	if ($lp{$tgt} eq 'none') {
+	    print $fh "    $tgt: $lp{$tgt}\n";
+	} else {
+	    print $fh "    $tgt: \"$lp{$tgt}\"\n";
+	}
+    }
+    print $fh "  </source>\n";
+
+    # dest
+    %lp = combinetgts(%{$lang{$id}{'dest'}});
+    print $fh "  <dest>\n";
+    foreach my $tgt (sort(keys(%lp))) {
+	if ($lp{$tgt} eq 'none') {
+	    print $fh "    $tgt: $lp{$tgt}\n";
+	} else {
+	    print $fh "    $tgt: \"$lp{$tgt}\"\n";
+	}
+    }
+    print $fh "  </dest>\n";
+
+    # voice
+    %lp = combinetgts(%{$lang{$id}{'voice'}});
+    print $fh "  <voice>\n";
+    foreach my $tgt (sort(keys(%lp))) {
+	if ($lp{$tgt} eq 'none') {
+	    print $fh "    $tgt: $lp{$tgt}\n";
+	} else {
+	    print $fh "    $tgt: \"$lp{$tgt}\"\n";
+	}
+    }
+    print $fh "  </voice>\n";
+
+    # FiN
+    print $fh "</phrase>\n";
+}
+
+if ($ARGV[2] ne '-') {
+    close(FH);
+}

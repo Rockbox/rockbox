@@ -348,7 +348,7 @@ sub generateclips {
     if ($existingids) {
         $idfile = $existingids;
     } else {
-	$cmd = "genlang -u -e=$english $langfile > $updfile";
+	$cmd = "updatelang $english $langfile $updfile";
 	print("> $cmd\n") if $verbose;
         system($cmd);
 	$cmd = "genlang -o -t=$target -e=$english $updfile 2>/dev/null > $idfile";
