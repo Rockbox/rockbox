@@ -21,7 +21,7 @@ CLEANOBJS += $(BUILDDIR)/lang/max_language_size.h $(BUILDDIR)/lang/lang*
 #DUMMY := $(shell mkdir -p $(BUILDDIR)/apps/lang)
 
 # Calculate the maximum language size. Currently based on the file size
-# of the largest lng file. Subtract 10 due to HEADER_SIZE and 
+# of the largest lng file. Subtract 10 due to HEADER_SIZE and
 # SUBHEADER_SIZE.
 # TODO: In the future generate this file within genlang or another script
 # in order to only calculate the maximum size based on the core strings.
@@ -47,10 +47,10 @@ $(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h
 
 # NOTE: for some weird reasons in GNU make, multi targets rules WITH patterns actually express
 # the fact that the two files are created as the result of one invocation of the rule
-$(BUILDDIR)/%.lng $(BUILDDIR)/%.vstrings: $(ROOTDIR)/%.lang $(BUILDDIR)/apps/genlang-features
+$(BUILDDIR)/%.lng $(BUILDDIR)/%.vstrings: $(ROOTDIR)/%.lang $(BUILDDIR)/apps/genlang-features $(TOOLSDIR)/genlang $(TOOLSDIR)/updatelang
 	$(call PRINTS,GENLANG $(subst $(ROOTDIR)/,,$<))
 	$(SILENT)mkdir -p $(dir $@)
-	$(SILENT)$(TOOLSDIR)/genlang -u -e=$(APPSDIR)/lang/$(ENGLISH).lang $< > $@.tmp
+	$(SILENT)$(TOOLSDIR)/updatelang $(APPSDIR)/lang/$(ENGLISH).lang $< $@.tmp
 	$(SILENT)$(TOOLSDIR)/genlang -e=$(APPSDIR)/lang/$(ENGLISH).lang -t=$(MODELNAME):`cat $(BUILDDIR)/apps/genlang-features` -i=$(TARGET_ID) -b=$*.lng -c=$*.vstrings $@.tmp
 	$(SILENT)rm -f $@.tmp
 
