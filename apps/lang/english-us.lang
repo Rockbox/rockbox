@@ -1170,17 +1170,14 @@
   <source>
     *: none
     swcodec: "Dithering"
-    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Dithering"
-    lcd_bitmap: "Dithering"
   </dest>
   <voice>
     *: none
     swcodec: "Dithering"
-    lcd_bitmap: "Dithering"
   </voice>
 </phrase>
 <phrase>
