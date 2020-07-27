@@ -43,11 +43,6 @@ Usage: genlang [options] <langv2 file>
     Create binary voicestring file named [outfile]. Works like -b and can be
     used the same time.
 
- -u
-    Update language file. Given the translated file and the most recent english
-    file, you\'ll get an updated version sent to stdout. Suitable action to do
-    when you intend to update a translation.
-
  -e=<english lang file>
     Point out the english (original source) file, to use that as master
     language template. Used in combination with -b, -u or -s.
@@ -92,26 +87,25 @@ MOO
 
 my $prefix = $p;
 my $binary = $b;
-my $update = $u;
 my $sortfile = $s;
 my $binvoice = $c;
 
 my $english = $e;
 my $voiceout = $o;
 
-my $check = ($binary?.5:0) + ($prefix?1:0) + ($update?1:0) + ($voiceout?1:0) + ($sortfile?1:0) + ($binvoice?.5:0);
+my $check = ($binary?.5:0) + ($prefix?1:0) + ($voiceout?1:0) + ($sortfile?1:0) + ($binvoice?.5:0);
 
 if($check > 1) {
-    print STDERR "Please use only one of -p, -u, -o, -b, -c and -s\n";
+    print STDERR "Please use only one of -p, -o, -b, -c and -s\n";
     exit;
 }
 if(!$check) {
-    print STDERR "Please use at least one of -p, -u, -o, -c, -e and -s\n";
+    print STDERR "Please use at least one of -p, -o, -c, -e and -s\n";
     exit;
 }
 
 
-if(($binary || $update || $voiceout || $sortfile) && !$english) {
+if(($binary || $voiceout || $sortfile) && !$english) {
     print STDERR "Please use -e too when you use -b, -o, -u or -s\n";
     exit;
 }
@@ -123,7 +117,7 @@ if($binary && !$target_id) {
 }
 
 my $target = $t;
-if(!$target && !$update && !$sortfile) {
+if(!$target && !$sortfile) {
     print STDERR "Please specify a target (with -t)!\n";
     exit;
 }
@@ -310,7 +304,7 @@ sub readenglish {
             elsif($withindest && ($_ =~ /^ *\<\/dest\>/i)) {
                 $withindest=0;
 
-                if($update || ($deststr && ($deststr !~ /^none\z/i))) {
+                if($deststr && ($deststr !~ /^none\z/i)) {
                     # we unconditionally always use all IDs when the "update"
                     # feature is used
                     $id = $maybeid;
@@ -349,83 +343,6 @@ sub readenglish {
     close(ENG);
 }
 
-# a function that compares the english phrase with the translated one.
-# compare source strings and desc
-
-# Then output the updated version!
-sub compare {
-    my ($idstr, $engref, $locref)=@_;
-    my ($edesc, $ldesc);
-    my ($esource, $lsource);
-    my $mode=0;
-    
-    for my $l (@$engref) {
-        if($l =~ /^ *#/) {
-            # comment
-            next;
-        }
-        if($l =~ /^ *desc: (.*)/) {
-            $edesc=$1;
-        }
-        elsif($l =~ / *\<source\>/i) {
-            $mode=1;
-        }
-        elsif($mode) {
-            if($l =~ / *\<\/source\>/i) {
-                last;
-            }
-            $esource .= "$l\n";
-        }
-    }
-
-    my @show;
-    my @source;
-
-    $mode = 0;
-    for my $l (@$locref) {
-        if($l =~ /^ *desc: (.*)/) {
-            $ldesc=$1;
-            if(trim($edesc) ne trim($ldesc)) {
-                $l = "### The 'desc' field differs from the english!\n### the previously used desc is commented below:\n### desc: $ldesc\n  desc: $edesc\n";
-            }
-            push @show, $l;
-        }
-        elsif($l =~ / *\<source\>/i) {
-            $mode=1;
-            push @show, $l;
-        }
-        elsif($mode) {
-            if($l =~ / *\<\/source\>/i) {
-                $mode = 0;
-                print @show;
-                if(trim($esource) ne trim($lsource)) {
-                    print "### The <source> section differs from the english!\n",
-                    "### the previously used one is commented below:\n";
-                    for(split("\n", $lsource)) {
-                        print "### $_\n";
-                    }
-                    print $esource;
-                }
-                else {
-                    print $lsource;
-                }
-                undef @show; # start over
-
-                push @show, $l;
-            }
-            else {
-                $lsource .= "$l";
-            }
-        }
-        else {
-            push @show, $l;
-        }
-    }
-
-
-    print @show;
-}
-
 my @idcount;           # counter for lang ID numbers
 my @voiceid;           # counter for voice-only ID numbers
 
@@ -452,7 +369,7 @@ while(<LANG>) {
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
         # comment or empty line - output it if it's part of the header
-        if ($header and ($update || $sortfile)) {
+        if ($header and $sortfile) {
             print($_);
         }
         next;
@@ -490,10 +407,7 @@ while(<LANG>) {
                 elsif($sortfile) {
                     $allphrases{$idstr}=join('',@phrase);
                 }
-                elsif(!$update) {
-                    # we don't do the fully detailed analysis when we "update"
-                    # since we don't do it for a particular target etc
-
+                else {
                     # allow the keyword 'deprecated' to be used on dest and
                     # voice strings to mark that as deprecated. It will then
                     # be replaced with "".
@@ -569,22 +483,6 @@ while(<LANG>) {
                     undef $user;
                     undef %phrase;
                 }
-
-                if($update) {
-                    my $e = $english{$idstr};
-
-                    if($e) {
-                        # compare original english with this!
-                        my @eng = split("\n", $english{$idstr});
-
-                        compare($idstr, \@eng, \@phrase);
-
-                        $english{$idstr}=""; # clear it
-                    }
-                    else {
-                        print "### $idstr: The phrase is not used. Skipped\n";
-                    }
-                }
                 undef @phrase;
             } # end of </phrase>
             elsif($part eq "/options") {
@@ -612,19 +510,6 @@ while(<LANG>) {
     }
 }
 close(LANG);
-
-if($update) {
-    my $any=0;
-    for(keys %english) {
-        if($english{$_}) {
-            print "###\n",
-            "### This phrase below was not present in the translated file\n",
-            "<phrase>\n";
-            print $english{$_};
-            print "</phrase>\n";
-        }
-    }
-}
 
 if ($sortfile) {
     for(sort { $sortorder{$a} <=> $sortorder{$b} } keys %allphrases) {
