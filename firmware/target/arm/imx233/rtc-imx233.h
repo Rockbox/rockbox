@@ -29,6 +29,16 @@
 
 #define HW_RTC_PERSISTENTn(n)   *(&HW_RTC_PERSISTENT0 + 4 * (n))
 
+#define RTC_PERSISTENT0_VALUE 0x082114
+/*
+*     Bitfield with the following bits set
+*         bit 2 -  enable rtc alarms
+*         bit 4 -  enable rtc while chip powered down
+*         bit 8 -  set rtc resolution t 1 ms
+*         bit 13 - keep device running if clock stops
+*         bit 19 - disable pulldown resistors on headphones
+*/
+
 struct imx233_rtc_info_t
 {
     uint32_t seconds;
@@ -84,7 +94,7 @@ static inline void imx233_rtc_init(void)
     BF_CLR(RTC_CTRL, SFTRST);
     udelay(5);  /* only need 3 GPMI clocks (1us) */
     BF_CLR(RTC_CTRL, CLKGATE);
-    HW_RTC_PERSISTENT0_SET=0x082114;
+    HW_RTC_PERSISTENT0_SET=RTC_PERSISTENT0_VALUE;
     imx233_rtc_enable_watchdog(false);
 }
 
