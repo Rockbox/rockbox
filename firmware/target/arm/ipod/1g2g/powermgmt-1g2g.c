@@ -61,7 +61,7 @@ int _battery_voltage(void)
 {
     unsigned adcval = adc_read(ADC_UNREG_POWER);
 
-    if ((IPOD_HW_REVISION >> 16) == 1)
+    if ((IPOD_HW_REVISION >> 16) != 2)
         return (adcval * BATTERY_SCALE_FACTOR_1G) >> 8;
     else
         return (adcval * BATTERY_SCALE_FACTOR_2G) >> 8;

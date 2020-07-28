@@ -265,7 +265,7 @@ void button_init_device(void)
     GPIOA_INT_CLR = GPIOA_INT_STAT;
 
 #ifdef IPOD_1G2G
-    if ((IPOD_HW_REVISION >> 16) == 1)
+    if ((IPOD_HW_REVISION >> 16) != 2)
     {   /* enable scroll wheel */
         GPIOB_ENABLE |= 0x01;
         GPIOB_OUTPUT_EN |= 0x01;
@@ -289,7 +289,7 @@ int button_read_device(void)
     static unsigned char last_wheel_value = 0;
     unsigned char wheel_value;
 
-    if ((IPOD_HW_REVISION >> 16) == 1)
+    if ((IPOD_HW_REVISION >> 16) != 2)
     {
         if (!hold_button && (wheel_timeout == 0))
         {
