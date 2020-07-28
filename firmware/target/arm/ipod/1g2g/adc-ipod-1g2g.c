@@ -40,7 +40,7 @@ unsigned short adc_scan(int channel)
     (void)channel; /* there is only one */
     mutex_lock(&adc_mtx);
 
-    if ((IPOD_HW_REVISION >> 16) == 1)
+    if ((IPOD_HW_REVISION >> 16) != 2)
     {
         int i;
         unsigned pval = GPIOB_OUTPUT_VAL;
@@ -109,7 +109,7 @@ void adc_init(void)
     
     GPIOB_ENABLE |= 0x1e;  /* enable B1..B4 */
 
-    if ((IPOD_HW_REVISION >> 16) == 1)
+    if ((IPOD_HW_REVISION >> 16) != 2)
     {
         GPIOB_OUTPUT_EN  = (GPIOB_OUTPUT_EN & ~0x08) | 0x16;
                                          /* B1, B2, B4 -> output, B3 -> input */
