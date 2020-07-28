@@ -40,7 +40,7 @@ int kbd_create_layout(char *layout, unsigned short *buf, int bufsz)
     const unsigned char *p = layout;
     int len = 0;
     pbuf = buf;
-    while (*p && (pbuf - buf + sizeof(unsigned short)) < bufsz)
+    while (*p && (pbuf - buf + (ptrdiff_t) sizeof(unsigned short)) < bufsz)
     {
         p = rb->utf8decode(p, &pbuf[len+1]);
         if (pbuf[len+1] == '\n')
