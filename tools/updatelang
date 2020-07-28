@@ -412,17 +412,17 @@ foreach my $id (@langorder) {
 ########## Write new language file
 my $printnotes = 1;
 
-my @tmp = split(/\./, basename($ARGV[0]));
-my $f1 = $tmp[0];
-@tmp = split(/\./, basename($ARGV[1]));
-my $f2 = $tmp[0];
-
-if (index($f2, $f1) > -1) {
-    $printnotes = 0;
-}
-undef $f1;
-undef $f2;
-undef @tmp;
+#my @tmp = split(/\./, basename($ARGV[0]));
+#my $f1 = $tmp[0];
+#@tmp = split(/\./, basename($ARGV[1]));
+#my $f2 = $tmp[0];
+#
+#if (index($f2, $f1) > -1) {
+#    $printnotes = 0;
+#}
+#undef $f1;
+#undef $f2;
+#undef @tmp;
 
 my $fh;
 if ($ARGV[2] ne '-') {
