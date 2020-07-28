@@ -111,93 +111,10 @@ sub combinetgts {
     return %combined;
 }
 
-my @ignorelist = split("\n",
-"LANG_SERIAL_BITRATE_19200
-LANG_SERIAL_BITRATE_9600
-LANG_SERIAL_BITRATE_38400
-LANG_SERIAL_BITRATE_57600
-LANG_COMPRESSOR_RATIO_10
-LANG_COMPRESSOR_RATIO_2
-LANG_COMPRESSOR_RATIO_6
-LANG_COMPRESSOR_RATIO_4
-LANG_ROCKBOX_TITLE
-LANG_EQUALIZER_BAND_Q
-LANG_FM_DEFAULT_PRESET_NAME
-LANG_DISK_NAME_MMC
-LANG_COLOR_RGB_LABELS
-LANG_BYTE
-LANG_KIBIBYTE
-LANG_GIBIBYTE
-LANG_USB_HID
-VOICE_ZERO
-VOICE_ONE
-VOICE_TWO
-VOICE_THREE
-VOICE_FOUR
-VOICE_FIVE
-VOICE_SIX
-VOICE_SEVEN
-VOICE_EIGHT
-VOICE_NINE
-VOICE_TEN
-VOICE_ELEVEN
-VOICE_TWELVE
-VOICE_THIRTEEN
-VOICE_FOURTEEN
-VOICE_FIFTEEN
-VOICE_SIXTEEN
-VOICE_SEVENTEEN
-VOICE_EIGHTEEN
-VOICE_NINETEEN
-VOICE_TWENTY
-VOICE_THIRTY
-VOICE_FORTY
-VOICE_FIFTY
-VOICE_SIXTY
-VOICE_SEVENTY
-VOICE_EIGHTY
-VOICE_NINETY
-VOICE_CHAR_A
-VOICE_CHAR_B
-VOICE_CHAR_C
-VOICE_CHAR_D
-VOICE_CHAR_E
-VOICE_CHAR_F
-VOICE_CHAR_G
-VOICE_CHAR_H
-VOICE_CHAR_I
-VOICE_CHAR_J
-VOICE_CHAR_K
-VOICE_CHAR_L
-VOICE_CHAR_M
-VOICE_CHAR_N
-VOICE_CHAR_O
-VOICE_CHAR_P
-VOICE_CHAR_Q
-VOICE_CHAR_R
-VOICE_CHAR_S
-VOICE_CHAR_T
-VOICE_CHAR_U
-VOICE_CHAR_V
-VOICE_CHAR_W
-VOICE_CHAR_X
-VOICE_CHAR_Y
-VOICE_CHAR_Z
-VOICE_PAUSE");
-
-sub not_ignorelist {
-    my ($key) = @_;
-    foreach (@ignorelist) {
-	if ($_ eq $key) {
-	    return 0;
-	}
-    }
-    return 1;
-}
 ##################
 
 if($#ARGV != 2) {
-    print "Usage: updatelang <english.lang> <otherlang> [<outfile>|-]\n";
+    print "Usage: updatelang <english.lang> <otherlang> <outfile|->\n";
     exit;
 }
 
@@ -222,6 +139,22 @@ my $f1 = $tmp[0];
 @tmp = split(/\./, basename($ARGV[1]));
 my $f2 = $tmp[0];
 undef @tmp;
+
+# Read in ignore list
+my $igname = dirname($0) . "/langignorelist.txt";
+open (FH, "<$igname") || die ("Can't open $igname!");
+my @ignorelist = <FH>;
+close (FH);
+sub not_ignorelist {
+    my ($key) = @_;
+    foreach (@ignorelist) {
+	if ($_ eq $key) {
+	    return 0;
+	}
+    }
+    return 1;
+}
+undef $igname;
 
 # Do we care about notes?
 my $printnotes = 1;
