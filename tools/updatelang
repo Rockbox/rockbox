@@ -148,6 +148,7 @@ close (FH);
 sub not_ignorelist {
     my ($key) = @_;
     foreach (@ignorelist) {
+	chomp;
 	if ($_ eq $key) {
 	    return 0;
 	}
