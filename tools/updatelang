@@ -42,7 +42,10 @@ sub parselangfile {
 
     foreach my $line (@lines) {
 	$line = trim($line);
-        if($line =~ /^ *#/) {
+        if($line =~ /^ *###/) {
+	    # Filter out warnings from prior runs
+	    next;
+        } elsif($line =~ /^ *#/) {
 	    push(@comments, "$line\n") if ($pos eq 'lang');
             # comments are ignored!
             next;
@@ -271,7 +274,7 @@ foreach my $id (@langorder) {
     my %ep = %{$english{$id}{'phrase'}};
     my %lp = %{$lang{$id}{'phrase'}};
 
-    if ($lp{'desc'} ne $ep{'desc'}) {
+    if ($lp{'desc'} ne $ep{'desc'} || $ep{'desc'} eq 'deprecated') {
 	if ($ep{'desc'} eq 'deprecated') {
 	    # Nuke all deprecated targets; just copy from English
 #	    print "#!! '$id' deprecated, deleting\n";
