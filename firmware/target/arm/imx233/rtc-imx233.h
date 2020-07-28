@@ -84,7 +84,10 @@ static inline void imx233_rtc_init(void)
     BF_CLR(RTC_CTRL, SFTRST);
     udelay(5);  /* only need 3 GPMI clocks (1us) */
     BF_CLR(RTC_CTRL, CLKGATE);
-    HW_RTC_PERSISTENT0_SET=0x082114;
+#ifdef BM_RTC_PERSISTENT0_DISABLE_XTALOK
+    BF_SET(RTC_PERSISTENT0, XTAL24MHZ_PWRUP, DISABLE_XTALOK);
+#endif
+    BF_CLR(RTC_PERSISTENT0, CLOCKSOURCE);
     imx233_rtc_enable_watchdog(false);
 }
 
