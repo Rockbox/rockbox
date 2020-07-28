@@ -536,7 +536,7 @@ int plugin_main(const void* parameter)
                 settings = true;
                 break;
             }
-            sleep(HZ / 5);
+            rb->sleep(HZ / 5);
         }
     }
 
