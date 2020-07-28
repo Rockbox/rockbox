@@ -704,7 +704,7 @@ static int load_context_screen(int selection)
 }
 
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
-static int load_plugin_screen(char *plug_path)
+static int load_plugin_screen(char *plug_path, void* plug_param)
 {
     int ret_val;
     int old_previous = last_screen;
@@ -712,7 +712,7 @@ static int load_plugin_screen(char *plug_path)
     global_status.last_screen = (char)next_screen;
     status_save();
 
-    switch (plugin_load(plug_path, NULL))
+    switch (plugin_load(plug_path, plug_param))
     {
     case PLUGIN_GOTO_WPS:
         ret_val = GO_TO_WPS;
@@ -728,20 +728,6 @@ static int load_plugin_screen(char *plug_path)
     if (ret_val == GO_TO_PREVIOUS)
         last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
     return ret_val;
-}
-
-static bool check_database(void)
-{
-    bool needwarn = true;
-    while ( !tagcache_is_usable() )
-    {
-        if (needwarn)
-            splash(0, ID2P(LANG_TAGCACHE_BUSY));
-        if ( action_userabort(HZ/5) )
-            return false;
-        needwarn = false;
-    }
-    return true;
 }
 #endif
 
@@ -823,18 +809,18 @@ void root_menu(void)
                 break;
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
             case GO_TO_PICTUREFLOW:
-                if (check_database())
-                {
-                    char pf_path[MAX_PATH];
-                    snprintf(pf_path, sizeof(pf_path),
-                            "%s/pictureflow.rock",
-                            PLUGIN_DEMOS_DIR);
-                    next_screen = load_plugin_screen(pf_path);
-		    previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PICTUREFLOW;
-                }
-                else
-		    next_screen = GO_TO_PREVIOUS;
+            {
+                char pf_path[MAX_PATH];
+                char activity[6];/* big enough to display int */
+                snprintf(activity, sizeof(activity), "%d", get_current_activity());
+                snprintf(pf_path, sizeof(pf_path),
+                        "%s/pictureflow.rock",
+                        PLUGIN_DEMOS_DIR);
+                
+                next_screen = load_plugin_screen(pf_path, &activity);
+                previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PICTUREFLOW;
                 break;
+            }
 #endif
             default:
 #ifdef HAVE_TAGCACHE
