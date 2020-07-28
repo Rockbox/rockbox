@@ -213,7 +213,28 @@ delete $english{'HEADER'};
 delete $lang{'ORDER'};
 delete $lang{'HEADER'};
 
-# ork out the missing phrases
+# Extract language names
+my @tmp = split(/\./, basename($ARGV[0]));
+my $f1 = $tmp[0];
+@tmp = split(/\./, basename($ARGV[1]));
+my $f2 = $tmp[0];
+undef @tmp;
+
+# Do we care about notes?
+my $printnotes = 1;
+my $ignoredups = 0;
+
+if ($f1 eq $f2) {
+    # Ignore all notes for master language
+    $printnotes = 0;
+}
+
+if (index($f2, $f1) > -1) {
+    # Ignore duplicates for sub-languages
+    $ignoredups = 1;
+}
+
+# work out the missing phrases
 my %missing;
 my @missingorder;
 
@@ -353,7 +374,7 @@ foreach my $id (@langorder) {
 #		print "#!! '$id:$tgt' dest not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 		$lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
 	    }
-	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'}) {
+	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'} && !$ignoredups) {
 	    $lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is identical to english!\n";
 #	    print "#!! '$id:$tgt' dest identical ('$lp{$tgt}')\n";
 	}
@@ -402,7 +423,7 @@ foreach my $id (@langorder) {
 #		print "#!! '$id:$tgt' voice not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 		$lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 	    }
-	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'}) {
+	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'} && !$ignoredups) {
 	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
 #	    print "#!! '$id:$tgt' voice identical ('$lp{$tgt}')\n";
 	}
@@ -410,20 +431,6 @@ foreach my $id (@langorder) {
 }
 
 ########## Write new language file
-my $printnotes = 1;
-
-#my @tmp = split(/\./, basename($ARGV[0]));
-#my $f1 = $tmp[0];
-#@tmp = split(/\./, basename($ARGV[1]));
-#my $f2 = $tmp[0];
-#
-#if (index($f2, $f1) > -1) {
-#    $printnotes = 0;
-#}
-#undef $f1;
-#undef $f2;
-#undef @tmp;
-
 my $fh;
 if ($ARGV[2] ne '-') {
     open(FH, ">$ARGV[2]") || die ("Can't open $ARGV[2]");
