@@ -28,6 +28,7 @@
 #include "regs/rtc.h"
 
 #define HW_RTC_PERSISTENTn(n)   *(&HW_RTC_PERSISTENT0 + 4 * (n))
+#define RTC_PERSISTENT0_VALUE 0x082114
 
 struct imx233_rtc_info_t
 {
@@ -84,7 +85,7 @@ static inline void imx233_rtc_init(void)
     BF_CLR(RTC_CTRL, SFTRST);
     udelay(5);  /* only need 3 GPMI clocks (1us) */
     BF_CLR(RTC_CTRL, CLKGATE);
-    HW_RTC_PERSISTENT0_SET=0x082114;
+    HW_RTC_PERSISTENT0_SET=RTC_PERSISTENT0_VALUE;
     imx233_rtc_enable_watchdog(false);
 }
 
