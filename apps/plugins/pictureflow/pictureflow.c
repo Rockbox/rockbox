@@ -530,6 +530,26 @@ static void draw_progressbar(int step, int count, char *msg);
 static void draw_splashscreen(unsigned char * buf_tmp, size_t buf_tmp_size);
 static void free_all_slide_prio(int prio);
 
+static bool check_database(bool prompt)
+{
+    bool needwarn = true;
+    struct tagcache_stat *stat = rb->tagcache_get_stat();
+    while ( !(stat->initialized && stat->ready) )
+    {
+        if (needwarn)
+            rb->splash(0, ID2P(LANG_TAGCACHE_BUSY));
+        if (!prompt)
+            return false;
+        else if (rb->action_userabort(HZ/5))
+            return false;
+
+        needwarn = false;
+        stat = rb->tagcache_get_stat();
+        rb->yield();
+    }
+    return true;
+}
+
 static bool confirm_quit(void)
 {
     const struct text_message prompt =
@@ -3821,6 +3841,17 @@ enum plugin_status plugin_start(const void *parameter)
 
     void * buf;
     size_t buf_size;
+    bool prompt = (parameter && ((char *) parameter)[0] == ACTIVITY_MAINMENU);
+
+    if (!check_database(prompt))
+    {
+        if (prompt)
+            return PLUGIN_OK;
+        else
+            error_wait("Please enable database");
+
+        return PLUGIN_ERROR;
+    }
 
     atexit(cleanup);
 
