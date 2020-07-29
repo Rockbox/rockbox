@@ -2,16 +2,16 @@
 
 if [ "wiki" = "$1" ]; then
     echo "As of `LC_ALL=C date +'%d %b %Y'`, the current status of the translations is the following:"
-    echo "|   *Language*   |   *Missing strings*   |   *Changed desc*   |   *Changed source*   |"
+    echo "|   *Language*   |   *Missing strings*   |   *Changed desc*   |   *Changed source*   | *Missing translation* | *Missing voice* |"
     FORMAT="|%s|   %d|   %d|   %d|\n"
 else
-    echo ".----------------------.-----------------.---------------.---------------."
-    echo "| Language             | Missing strings | Changed desc | Changed source |"
-    echo "|----------------------|-----------------|--------------|----------------|"
-    FORMAT="| %-20s | %15d | %12d | %14d |\n"
+    echo ".----------------------.-----------------.--------------.----------------.---------------.---------------."
+    echo "| Language             | Missing strings | Changed desc | Changed source | Missing trans | Missing voice |"
+    echo "|----------------------|-----------------|--------------|----------------|---------------|---------------|"
+    FORMAT="| %-20s | %15d | %12d | %14d | %13d | %13d |\n"
 fi
 
-GENLANG=`dirname $0`/genlang
+UPDLANG=`dirname $0`/updatelang
 LANGDIR=`dirname $0`/../apps/lang
 ENGLISH="$LANGDIR"/english.lang
 
@@ -19,31 +19,40 @@ ENGLISH="$LANGDIR"/english.lang
     LANGUAGE=`basename $LANGFILE .lang |sed -e "s/^\(.\)/\U\1/"`
 
 
-    $GENLANG -u -e=$ENGLISH $LANGFILE |grep "^###" |(
+    $UPDLANG $ENGLISH $LANGFILE - |grep "^###" |(
         MISSING=0
         CHANGE_DESC=0
         CHANGE_SRC=0
+	MISS_DEST=0
+	MISS_VOICE=0
 
         while read LINE; do
             case $LINE in
-                "### This phrase below was not present in the translated file")
+                "### This phrase is missing entirely"*)
                     MISSING=`expr $MISSING + 1`
                 ;;
-                "### The 'desc' field differs from the english!")
+                "### The 'desc' field for"*|"### The 'user' field for"*)
                     CHANGE_DESC=`expr $CHANGE_DESC + 1`
                 ;;
-                "### The <source> section differs from the english!")
+                "### The <source> section for"*)
                     CHANGE_SRC=`expr $CHANGE_SRC + 1`
                 ;;
+                "### The <dest> section for"*)
+                    MISS_DEST=`expr $MISS_DEST + 1`
+                ;;
+                "### The <voice> section for"*)
+                    MISS_VOICE=`expr $MISS_VOICE + 1`
+                ;;
+
                 *)
                     #echo $LINE
                 ;;
             esac
         done
-        printf "$FORMAT" "$LANGUAGE" "$MISSING" "$CHANGE_DESC" "$CHANGE_SRC"
+        printf "$FORMAT" "$LANGUAGE" "$MISSING" "$CHANGE_DESC" "$CHANGE_SRC" "$MISS_DEST" "$MISS_VOICE"
     )
 done) 2>/dev/null
 
 if [ "wiki" != "$1" ]; then
-    echo "'----------------------'-----------------'--------------'----------------'"
+    echo "'----------------------'-----------------'--------------'----------------'---------------'----------------'"
 fi
