@@ -113,6 +113,9 @@ MENUITEM_SETTING(channel_config, &global_settings.channel_config,
 MENUITEM_SETTING(stereo_width, &global_settings.stereo_width,
     lowlatency_callback
 );
+MENUITEM_SETTING(swap_channels, &global_settings.swap_channels,
+    lowlatency_callback
+);
 
 #ifdef AUDIOHW_HAVE_DEPTH_3D
 MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
@@ -233,7 +236,7 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #ifdef AUDIOHW_HAVE_EQ
           ,&audiohw_eq_tone_controls
 #endif
-          ,&balance,&channel_config,&stereo_width
+          ,&balance,&channel_config,&stereo_width,&swap_channels
 #ifdef AUDIOHW_HAVE_DEPTH_3D
           ,&depth_3d
 #endif

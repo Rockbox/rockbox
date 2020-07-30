@@ -577,6 +577,11 @@ static void eq_set_default(void* setting, void* defaultval)
     memcpy(setting, defaultval, sizeof(struct eq_band_setting));
 }
 
+static void set_swap_channels(bool value)
+{
+    sound_set_swap_channels((int)value);
+}
+
 #ifdef HAVE_QUICKSCREEN
 static int find_setting_by_name(char*name)
 {
@@ -838,6 +843,7 @@ const struct settings_list settings[] = {
                    ID2P(LANG_CHANNEL_RIGHT), ID2P(LANG_CHANNEL_KARAOKE)),
     SOUND_SETTING(0, stereo_width, LANG_STEREO_WIDTH,
                   "stereo_width", SOUND_STEREO_WIDTH),
+    OFFON_SETTING(F_SOUNDSETTING, swap_channels, LANG_SWAP_CHANNELS, false, "swap channels", set_swap_channels),
 #ifdef AUDIOHW_HAVE_DEPTH_3D
     SOUND_SETTING(0,depth_3d, LANG_DEPTH_3D, "3-d enhancement",
                   SOUND_DEPTH_3D),

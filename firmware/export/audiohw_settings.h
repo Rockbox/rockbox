@@ -84,6 +84,7 @@ AUDIOHW_SETTINGS(
     AUDIOHW_SETTING_ENT(BALANCE,            sound_set_balance)
     AUDIOHW_SETTING_ENT(CHANNELS,           sound_set_channels)
     AUDIOHW_SETTING_ENT(STEREO_WIDTH,       sound_set_stereo_width)
+    AUDIOHW_SETTING_ENT(SWAP_CHANNELS,      sound_set_swap_channels)
 #if defined(AUDIOHW_HAVE_LIN_GAIN)
     AUDIOHW_SETTING_ENT(LEFT_GAIN,          NULL)
     AUDIOHW_SETTING_ENT(RIGHT_GAIN,         NULL)

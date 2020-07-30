@@ -734,6 +734,7 @@ void sound_settings_apply(void)
 #endif
     sound_set(SOUND_CHANNELS, global_settings.channel_config);
     sound_set(SOUND_STEREO_WIDTH, global_settings.stereo_width);
+    sound_set(SOUND_SWAP_CHANNELS, global_settings.swap_channels);
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     sound_set(SOUND_BASS_CUTOFF, global_settings.bass_cutoff);
 #endif

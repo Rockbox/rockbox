@@ -300,6 +300,7 @@ struct user_settings
     int treble;     /* treble boost/cut in decibels                             */
     int channel_config; /* Stereo, Mono, Custom, Mono left, Mono right, Karaoke */
     int stereo_width; /* 0-255% */
+    bool swap_channels; /* true/false */
 
 #ifdef AUDIOHW_HAVE_BASS_CUTOFF
     int bass_cutoff;
