@@ -125,6 +125,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "lng", FILE_ATTR_LNG, Icon_Language, LANG_LANGUAGE },
     { "rock",FILE_ATTR_ROCK,Icon_Plugin,   VOICE_EXT_ROCK },
     { "lua", FILE_ATTR_LUA, Icon_Plugin,   VOICE_EXT_ROCK },
+    { "opx", FILE_ATTR_OPX, Icon_Plugin,   VOICE_EXT_ROCK },
     { "fnt", FILE_ATTR_FONT,Icon_Font,     VOICE_EXT_FONT },
     { "kbd", FILE_ATTR_KBD, Icon_Keyboard, VOICE_EXT_KBD },
     { "bmark",FILE_ATTR_BMARK, Icon_Bookmark,  VOICE_EXT_BMARK },
