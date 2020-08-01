@@ -357,7 +357,8 @@ int ft_load(struct tree_context* c, const char* tempdir)
             (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
             (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||
             (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK &&
-                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA) ||
+                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA &&
+                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_OPX) ||
             (callback_show_item && !callback_show_item(entry->d_name, dptr->attr, c)))
         {
             continue;
@@ -625,12 +626,18 @@ int ft_enter(struct tree_context* c)
                 /* plugin file */
             case FILE_ATTR_ROCK:
             case FILE_ATTR_LUA:
+            case FILE_ATTR_OPX:
             {
                 char *plugin = buf, *argument = NULL, lua_path[MAX_PATH];
                 int ret;
 
                 if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
                     snprintf(lua_path, sizeof(lua_path)-1, "%s/lua.rock", VIEWERS_DIR); /* Use a #define here ? */
+                    plugin = lua_path;
+                    argument = buf;
+                }
+                else if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_OPX) {
+                    snprintf(lua_path, sizeof(lua_path)-1, "%s/open_plugins.rock", VIEWERS_DIR); /* Use a #define here ? */
                     plugin = lua_path;
                     argument = buf;
                 }
@@ -644,6 +651,9 @@ int ft_enter(struct tree_context* c)
                 {
                     case PLUGIN_GOTO_WPS:
                         play = true;
+                        break;
+                    case PLUGIN_GOTO_PLUGIN:
+                        rc = GO_TO_PLUGIN;
                         break;
                     case PLUGIN_USB_CONNECTED:
                         if(*c->dirfilter > NUM_FILTER_MODES)
@@ -689,6 +699,9 @@ int ft_enter(struct tree_context* c)
                     {
                         case PLUGIN_USB_CONNECTED:
                             rc = GO_TO_FILEBROWSER;
+                            break;
+                        case PLUGIN_GOTO_PLUGIN:
+                            rc = GO_TO_PLUGIN;
                             break;
                         case PLUGIN_GOTO_WPS:
                             rc = GO_TO_WPS;

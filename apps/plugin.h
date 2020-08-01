@@ -49,6 +49,7 @@
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
+int plugin_open(char *plugin, char *parameter);
 
 #ifndef __PCTOOL__
 #include "config.h"
@@ -172,6 +173,7 @@ enum plugin_status {
     PLUGIN_USB_CONNECTED = INTERNAL_PLUGIN_RETVAL_START,
     PLUGIN_POWEROFF,
     PLUGIN_GOTO_WPS,
+    PLUGIN_GOTO_PLUGIN,
     PLUGIN_ERROR = -1,
 };
 
@@ -934,6 +936,7 @@ struct plugin_api {
 #ifdef HAVE_TAGCACHE
     struct tagcache_stat* (*tagcache_get_stat)(void);
 #endif
+    int (*plugin_open)(char *path, char *parameter);
 
 };
 

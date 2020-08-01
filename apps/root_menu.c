@@ -32,6 +32,7 @@
 #include "kernel.h"
 #include "debug.h"
 #include "misc.h"
+#include "open_plugin.h"
 #include "rolo.h"
 #include "powermgmt.h"
 #include "power.h"
@@ -347,6 +348,7 @@ static int miscscrn(void * param)
     int result = do_menu(menu, NULL, NULL, false);
     switch (result)
     {
+        case GO_TO_PLUGIN:
         case GO_TO_PLAYLIST_VIEWER:
         case GO_TO_WPS:
             return result;
@@ -703,7 +705,6 @@ static int load_context_screen(int selection)
     return retval;
 }
 
-#ifdef HAVE_PICTUREFLOW_INTEGRATION
 static int load_plugin_screen(char *plug_path, void* plug_param)
 {
     int ret_val;
@@ -717,6 +718,9 @@ static int load_plugin_screen(char *plug_path, void* plug_param)
     case PLUGIN_GOTO_WPS:
         ret_val = GO_TO_WPS;
         break;
+    case PLUGIN_GOTO_PLUGIN:
+        ret_val = GO_TO_PLUGIN;
+        break;
     case PLUGIN_OK:
         ret_val = audio_status() ? GO_TO_PREVIOUS : GO_TO_ROOT;
         break;
@@ -729,7 +733,6 @@ static int load_plugin_screen(char *plug_path, void* plug_param)
         last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
     return ret_val;
 }
-#endif
 
 void root_menu(void)
 {
@@ -807,21 +810,36 @@ void root_menu(void)
             case GO_TO_ROOTITEM_CONTEXT:
                 next_screen = load_context_screen(selected);
                 break;
-#ifdef HAVE_PICTUREFLOW_INTEGRATION
-            case GO_TO_PICTUREFLOW:
+            case GO_TO_PLUGIN:
             {
-                char pf_path[MAX_PATH];
-                char activity[6];/* big enough to display int */
-                snprintf(activity, sizeof(activity), "%d", get_current_activity());
-                snprintf(pf_path, sizeof(pf_path),
-                        "%s/pictureflow.rock",
-                        PLUGIN_DEMOS_DIR);
-                
-                next_screen = load_plugin_screen(pf_path, &activity);
-                previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PICTUREFLOW;
+                char *key;
+                switch (last_screen)
+                {
+                    case GO_TO_ROOT:
+                        key = ID2P(LANG_START_SCREEN);
+                        break;
+                    case GO_TO_WPS:
+                        key = ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN);
+                        break;
+                    case GO_TO_SHORTCUTMENU:
+                        key = ID2P(LANG_SHORTCUTS);
+                        break;
+                    default:
+                        key = ID2P(LANG_OPEN_PLUGIN);
+                        break;
+                }
+
+                open_plugin_get_entry(key, &open_plugin_entry);
+                char *path = open_plugin_entry.path;
+                char *param = open_plugin_entry.param;
+                if (param[0] == '\0')
+                    param = NULL;
+
+                next_screen = load_plugin_screen(path, param);
+
+                previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PLUGIN;
                 break;
             }
-#endif
             default:
 #ifdef HAVE_TAGCACHE
 /* With !HAVE_TAGCACHE previous_browser is always GO_TO_FILEBROWSER */
