@@ -16110,3 +16110,17 @@
     hotkey: "Hold for settings"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ONPLAY_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Open Plugin"
+  </dest>
+  <voice>
+    *: "Open Plugin"
+  </voice>
+</phrase>
