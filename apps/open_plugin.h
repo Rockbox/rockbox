@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2020 by William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,41 +18,28 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _ONPLAY_H_
-#define _ONPLAY_H_
+#ifndef OPEN_PLUGIN_H
+#define OPEN_PLUGIN_H
 
-int onplay(char* file, int attr, int from_screen, bool hotkey);
-
-enum {
-    ONPLAY_MAINMENU = -1,
-    ONPLAY_OK = 0,
-    ONPLAY_RELOAD_DIR,
-    ONPLAY_START_PLAY,
-    ONPLAY_PLAYLIST,
-    ONPLAY_PICTUREFLOW,
-    ONPLAY_PLUGIN,
+#ifndef __PCTOOL__
+#define OPEN_PLUGIN_BUFSZ MAX_PATH
+#define OPEN_PLUGIN_NAMESZ 32
+struct open_plugin_entry_t
+{
+    uint32_t hash;
+    int32_t  lang_id;
+    char name[OPEN_PLUGIN_NAMESZ+1];
+    /*char key[OPEN_PLUGIN_BUFSZ+1];*/
+    char path[OPEN_PLUGIN_BUFSZ+1];
+    char param[OPEN_PLUGIN_BUFSZ+1];
 };
 
-#ifdef HAVE_HOTKEY
-int get_hotkey_lang_id(int action);
-
-enum hotkey_action {
-    HOTKEY_OFF = 0,
-    HOTKEY_VIEW_PLAYLIST,
-    HOTKEY_SHOW_TRACK_INFO,
-    HOTKEY_PITCHSCREEN,
-    HOTKEY_OPEN_WITH,
-    HOTKEY_DELETE,
-    HOTKEY_INSERT,
-    HOTKEY_INSERT_SHUFFLED,
-    HOTKEY_PICTUREFLOW,
-    HOTKEY_BOOKMARK,
-    HOTKEY_PLUGIN,
-};
+extern struct open_plugin_entry_t open_plugin_entry;
+void open_plugin_add_path(const char *key, const char *plugin, const char *parameter);
+int open_plugin_hash_get_entry(uint32_t hash, struct open_plugin_entry_t *entry);
+int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry);
+void open_plugin_browse(const char *key);
+void open_plugin_remove(const char *key);
+int open_plugin_run(const char *key);
 #endif
-
-/* needed for the playlist viewer.. eventually clean this up */
-void onplay_show_playlist_cat_menu(char* track_name);
-void onplay_show_playlist_menu(char* path);
-
-#endif
+#endif /* OPEN_PLUGIN_H */

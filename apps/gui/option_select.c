@@ -467,6 +467,8 @@ bool option_screen(const struct settings_list *setting,
     int oldvalue, nb_items = 0, selected = 0, temp_var;
     int *variable;
     bool allow_wrap = setting->flags & F_NO_WRAP ? false : true;
+    bool cb_on_select_only =
+                ((setting->flags & F_CB_ON_SELECT_ONLY) == F_CB_ON_SELECT_ONLY);
     int var_type = setting->flags&F_T_MASK;
     void (*function)(int) = NULL;
     char *title;
@@ -554,12 +556,15 @@ bool option_screen(const struct settings_list *setting,
             }
             settings_save();
             done = true;
+            if (cb_on_select_only && function)
+                function(*variable);
         }
         else if(default_event_handler(action) == SYS_USB_CONNECTED)
             return true;
         /* callback */
-        if ( function )
+        if (function && !cb_on_select_only)
             function(*variable);
+
         /* if the volume is changing we need to let the skins know */
         if (function == sound_get_fn(SOUND_VOLUME))
             global_status.last_volume_change = current_tick;
