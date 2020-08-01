@@ -43,6 +43,7 @@
 #include "talk.h"
 #include "onplay.h"
 #include "filetypes.h"
+#include "open_plugin.h"
 #include "plugin.h"
 #include "bookmark.h"
 #include "action.h"
@@ -1415,10 +1416,8 @@ MENUITEM_FUNCTION(rating_item, 0, ID2P(LANG_MENU_SET_RATING),
                   set_rating_inline, NULL,
                   ratingitem_callback, Icon_Questionmark);
 #endif
-#ifdef HAVE_PICTUREFLOW_INTEGRATION
-MENUITEM_RETURNVALUE(pictureflow_item, ID2P(LANG_ONPLAY_PICTUREFLOW),
-                  GO_TO_PICTUREFLOW, NULL, Icon_NOICON);
-#endif
+MENUITEM_RETURNVALUE(plugin_item, ID2P(LANG_OPEN_PLUGIN),
+                  GO_TO_PLUGIN, NULL, Icon_Plugin);
 
 static bool view_cue(void)
 {
@@ -1650,9 +1649,7 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &rating_item,
 #endif
            &bookmark_menu,
-#ifdef HAVE_PICTUREFLOW_INTEGRATION
-           &pictureflow_item,
-#endif
+           &plugin_item,
            &browse_id3_item, &list_viewers_item,
            &delete_file_item, &view_cue_item,
 #ifdef HAVE_PITCHCONTROL
@@ -1732,6 +1729,11 @@ static int playlist_insert_shuffled(void)
     return ONPLAY_RELOAD_DIR;
 }
 
+static void hotkey_run_plugin(void)
+{
+    open_plugin_run(ID2P(LANG_HOTKEY_WPS));
+}
+
 struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
@@ -1768,11 +1770,9 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
             ONPLAY_RELOAD_DIR },
-#ifdef HAVE_PICTUREFLOW_INTEGRATION
-    { HOTKEY_PICTUREFLOW, LANG_ONPLAY_PICTUREFLOW,
-            HOTKEY_FUNC(NULL, NULL),
-            ONPLAY_PICTUREFLOW },
-#endif
+    { HOTKEY_PLUGIN, LANG_OPEN_PLUGIN,
+            HOTKEY_FUNC(hotkey_run_plugin, NULL),
+            ONPLAY_OK },
     { HOTKEY_BOOKMARK,   LANG_BOOKMARK_MENU_CREATE,
             HOTKEY_FUNC(bookmark_create_menu, NULL),
             ONPLAY_OK },
@@ -1861,10 +1861,8 @@ int onplay(char* file, int attr, int from, bool hotkey)
             return ONPLAY_MAINMENU;
         case GO_TO_PLAYLIST_VIEWER:
             return ONPLAY_PLAYLIST;
-#ifdef HAVE_PICTUREFLOW_INTEGRATION
-        case GO_TO_PICTUREFLOW:
-            return ONPLAY_PICTUREFLOW;
-#endif
+        case GO_TO_PLUGIN:
+            return ONPLAY_PLUGIN;
         default:
             return onplay_result;
     }
