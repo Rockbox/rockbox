@@ -533,19 +533,28 @@ static void free_all_slide_prio(int prio);
 static bool check_database(bool prompt)
 {
     bool needwarn = true;
+    int spin = 5;
+
     struct tagcache_stat *stat = rb->tagcache_get_stat();
+
     while ( !(stat->initialized && stat->ready) )
     {
-        if (needwarn)
+        if (--spin > 0)
+        {
+            rb->sleep(HZ/5);
+        }
+        else if (needwarn)
+        {
+            needwarn = false;
             rb->splash(0, ID2P(LANG_TAGCACHE_BUSY));
-        if (!prompt)
+        }
+        else if (!prompt)
             return false;
         else if (rb->action_userabort(HZ/5))
             return false;
 
-        needwarn = false;
-        stat = rb->tagcache_get_stat();
         rb->yield();
+        stat = rb->tagcache_get_stat();
     }
     return true;
 }
@@ -3841,7 +3850,7 @@ enum plugin_status plugin_start(const void *parameter)
 
     void * buf;
     size_t buf_size;
-    bool prompt = (parameter && ((char *) parameter)[0] == ACTIVITY_MAINMENU);
+    bool prompt = (parameter && (((char *) parameter)[0] == ACTIVITY_MAINMENU));
 
     if (!check_database(prompt))
     {
