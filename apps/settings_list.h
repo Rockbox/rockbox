@@ -100,6 +100,7 @@ struct table_setting {
 };
 #define F_TABLE_SETTING 0x2000
 #define F_ALLOW_ARBITRARY_VALS 0x4000
+#define F_CB_ON_SELECT_ONLY 0x20000
 /* these use the _isfunc_type type for the function */
 /* typedef int (*_isfunc_type)(void); */
 #define F_MIN_ISFUNC    0x100000 /* min(above) is function pointer to above type */

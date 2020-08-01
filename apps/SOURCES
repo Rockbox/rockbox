@@ -38,6 +38,7 @@ menus/sound_menu.c
 menus/time_menu.c
 #endif
 misc.c
+open_plugin.c
 onplay.c
 playlist.c
 playlist_catalog.c

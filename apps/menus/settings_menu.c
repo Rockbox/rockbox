@@ -28,6 +28,7 @@
 #include "action.h"
 #include "settings.h"
 #include "menu.h"
+#include "open_plugin.h"
 #include "keyboard.h"
 #include "sound_menu.h"
 #include "exported_menus.h"
@@ -711,6 +712,18 @@ MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
 /*    VOICE MENU                   */
 /***********************************/
 
+/*    WPS_CONTEXT_PLUGIN           */
+/***********************************/
+static void wps_plugin_cb(void)
+{
+    open_plugin_browse(ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN));
+}
+MENUITEM_FUNCTION(wps_set_context_plugin, 0,
+                  ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN),
+                  wps_plugin_cb, NULL, NULL, Icon_Plugin);
+
+/*    WPS_CONTEXT_PLUGIN           */
+/***********************************/
 
 /***********************************/
 /*    HOTKEY MENU                  */
@@ -745,6 +758,7 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &autoresume_menu,
 #endif
           &browse_langs, &voice_settings_menu,
+          &wps_set_context_plugin,
 #ifdef HAVE_HOTKEY
           &hotkey_menu,
 #endif

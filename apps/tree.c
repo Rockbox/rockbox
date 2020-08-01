@@ -676,6 +676,8 @@ static int dirbrowse(void)
 #endif
                 {
                     case GO_TO_FILEBROWSER: reload_dir = true; break;
+                    case GO_TO_PLUGIN:
+                        return GO_TO_PLUGIN;
                     case GO_TO_WPS:
                         return GO_TO_WPS;
 #if CONFIG_TUNER

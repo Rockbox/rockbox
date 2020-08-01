@@ -21,6 +21,7 @@
 #define DIRFUNCTIONS_DEFINED
 #define FILEFUNCTIONS_DEFINED
 #include "plugin.h"
+#include "open_plugin.h"
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
@@ -807,6 +808,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef HAVE_TAGCACHE
     tagcache_get_stat,
 #endif
+    plugin_open,
 };
 
 static int plugin_buffer_handle;
@@ -1017,6 +1019,12 @@ static void plugin_release_audio_buffer(void)
 static void plugin_tsr(bool (*exit_callback)(bool))
 {
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
+}
+
+int plugin_open(char *plugin, char *parameter)
+{
+    open_plugin_add_path(ID2P(LANG_OPEN_PLUGIN), plugin, parameter);
+    return PLUGIN_GOTO_PLUGIN;
 }
 
 char *plugin_get_current_filename(void)
