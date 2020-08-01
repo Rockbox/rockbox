@@ -67,6 +67,7 @@ mosaique,demos
 mp3_encoder,apps
 mpegplayer,viewers
 nim,games
+open_plugins,viewers
 oscilloscope,demos
 otp,apps
 pacbox,games
