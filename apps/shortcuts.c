@@ -36,6 +36,7 @@
 #include "lang.h"
 #include "menu.h"
 #include "misc.h"
+#include "open_plugin.h"
 #include "tree.h"
 #include "splash.h"
 #include "pathfuncs.h"
@@ -269,6 +270,7 @@ void shortcuts_add(enum shortcut_type type, const char* value)
     else
         strlcpy(sc->u.path, value, MAX_PATH);
 
+    
     if (first_idx_to_writeback < 0)
         first_idx_to_writeback = shortcut_count - 1;
     overwrite_shortcuts = false;
@@ -608,6 +610,12 @@ int do_shortcut_menu(void *ignored)
                     /* else fall through */
                 case SHORTCUT_BROWSER:
                 {
+
+                    if(open_plugin_add_path(ID2P(LANG_SHORTCUTS), sc->u.path, NULL) != 0)
+                    {
+                        done = GO_TO_PLUGIN;
+                        break;
+                    }
                     struct browse_context browse;
                     browse_context_init(&browse, global_settings.dirfilter, 0,
                             NULL, NOICON, sc->u.path, NULL);
