@@ -38,6 +38,7 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "kernel.h"
+#include "open_plugin.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -680,20 +681,34 @@ static void tsc_set_default(void* setting, void* defaultval)
 }
 #endif
 #ifdef HAVE_HOTKEY
+static void hotkey_callback(int var)
+{
+    if (get_hotkey_lang_id(var) == LANG_ONPLAY_PLUGIN)
+        open_plugin_browse(ID2P(LANG_HOTKEY_WPS));
+}
 static const char* hotkey_formatter(char* buffer, size_t buffer_size, int value,
                               const char* unit)
 {
     (void)buffer;
     (void)buffer_size;
     (void)unit;
+
     return str(get_hotkey_lang_id(value));
+
 }
 static int32_t hotkey_getlang(int value, int unit)
 {
     (void)unit;
+
     return get_hotkey_lang_id(value);
 }
 #endif /* HAVE_HOTKEY */
+
+static void start_in_callback(int var)
+{
+    if (var - 2 == GO_TO_PLUGIN)
+        open_plugin_browse(ID2P(LANG_START_SCREEN));
+}
 
 /* volume limiter */
 static void volume_limit_load_from_cfg(void* var, char*value)
@@ -1872,7 +1887,7 @@ const struct settings_list settings[] = {
                   UNIT_SEC, formatter_time_unit_0_is_skip_track,
                   getlang_time_unit_0_is_skip_track, NULL,
                   25, timeout_sec_common),
-    CHOICE_SETTING(0, start_in_screen, LANG_START_SCREEN, 1,
+    CHOICE_SETTING(F_CB_ON_SELECT_ONLY, start_in_screen, LANG_START_SCREEN, 1,
                    "start in screen", "previous,root,files,"
 #ifdef HAVE_TAGCACHE
 #define START_DB_COUNT 1
@@ -1893,15 +1908,16 @@ const struct settings_list settings[] = {
 #else
 #define START_TUNER_COUNT 0
 #endif
-                   "bookmarks"
+                   "bookmarks,"
+                   "plugin"
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
 #define START_PF_COUNT 1
                    ",pictureflow"
 #else
 #define START_PF_COUNT 0
 #endif
-                   , NULL,
-    (6 + START_DB_COUNT + START_REC_COUNT + START_TUNER_COUNT + START_PF_COUNT),
+                   , start_in_callback,
+    (7 + START_DB_COUNT + START_REC_COUNT + START_TUNER_COUNT + START_PF_COUNT),
                    ID2P(LANG_PREVIOUS_SCREEN), ID2P(LANG_MAIN_MENU),
                    ID2P(LANG_DIR_BROWSER),
 #ifdef HAVE_TAGCACHE
@@ -1914,7 +1930,8 @@ const struct settings_list settings[] = {
 #if CONFIG_TUNER
                    ID2P(LANG_FM_RADIO),
 #endif
-                   ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS)
+                   ID2P(LANG_BOOKMARK_MENU_RECENT_BOOKMARKS),
+                   ID2P(LANG_ONPLAY_PLUGIN)
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
                    ,ID2P(LANG_ONPLAY_PICTUREFLOW)
 #endif
@@ -2098,21 +2115,21 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef HAVE_HOTKEY
-    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS, hotkey_wps,
+    TABLE_SETTING(F_ALLOW_ARBITRARY_VALS | F_CB_ON_SELECT_ONLY, hotkey_wps,
         LANG_HOTKEY_WPS, HOTKEY_VIEW_PLAYLIST, "hotkey wps",
-        "off,view playlist,show track info,pitchscreen,open with,delete,bookmark"
+        "off,view playlist,show track info,pitchscreen,open with,delete,bookmark,plugin"
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
         ",pictureflow"
 #endif
-        ,UNIT_INT, hotkey_formatter, hotkey_getlang, NULL,
+        ,UNIT_INT, hotkey_formatter, hotkey_getlang, hotkey_callback,
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
-        8,
+        9,
 #else
-        7,
+        8,
 #endif
         HOTKEY_OFF,
         HOTKEY_VIEW_PLAYLIST, HOTKEY_SHOW_TRACK_INFO, HOTKEY_PITCHSCREEN,
-        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_BOOKMARK
+        HOTKEY_OPEN_WITH, HOTKEY_DELETE, HOTKEY_BOOKMARK, HOTKEY_PLUGIN
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
         , HOTKEY_PICTUREFLOW
 #endif

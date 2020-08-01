@@ -22,7 +22,7 @@
 
 #include "shortcuts.h"
 
-
+#define LOOP_EXIT 1
 
 enum sc_list_action_type
 {
@@ -35,7 +35,6 @@ enum sc_list_action_type
 
 static char *link_filename;
 static bool user_file;
-static bool usb_connected = false;
 
 enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc);
 
@@ -43,10 +42,10 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc);
 static const char* build_sc_list(int selected_item, void *data,
                                  char *buffer, size_t buffer_len);
 
-/* Returns true iff we should leave the main loop */
-bool list_sc(void);
+/* Returns LOOP_EXIT iff we should leave the main loop */
+int list_sc(void);
 
-bool goto_entry(char *file_or_dir);
+int goto_entry(char *file_or_dir);
 bool ends_with(char *str, char *suffix);
 
 
@@ -104,7 +103,7 @@ static const char* build_sc_list(int selected_item, void *data,
 }
 
 
-bool list_sc(void)
+int list_sc(void)
 {
     int selected_item = 0;
     enum sc_list_action_type action = SCLA_NONE;
@@ -122,8 +121,7 @@ bool list_sc(void)
     /* Draw the prepared widget to the LCD now */
     action = draw_sc_list(&gui_sc);
     if (action == SCLA_USB) {
-        usb_connected = true;
-        return true;
+        return PLUGIN_USB_CONNECTED;
     }
 
     /* which item do we action? */
@@ -132,7 +130,7 @@ bool list_sc(void)
     if (!is_valid_index(&sc_file, selected_item)) {
         /* This should never happen */
         rb->splash(HZ*2, "Bad entry selected!");
-        return true;
+        return PLUGIN_ERROR;
     }
 
     /* perform the following actions if the user "selected"
@@ -145,13 +143,13 @@ bool list_sc(void)
             rb->splashf(HZ, "Deleting %s", sc_file.entries[selected_item].disp);
             remove_entry(&sc_file, selected_item);
             dump_sc_file(&sc_file, link_filename);
-            return (sc_file.entry_cnt == 0);
+            return (sc_file.entry_cnt == 0)? LOOP_EXIT : PLUGIN_OK;
         default:
-            return true;
+            return LOOP_EXIT;
     }
 }
 
-
+#if 0
 bool goto_entry(char *file_or_dir)
 {
     DEBUGF("Trying to go to '%s'...\n", file_or_dir);
@@ -181,7 +179,46 @@ bool goto_entry(char *file_or_dir)
     rb->set_current_file(file_or_dir);
     return true;
 }
+#endif
 
+int goto_entry(char *file_or_dir)
+{
+    DEBUGF("Trying to go to '%s'...\n", file_or_dir);
+
+    bool is_dir = ends_with(file_or_dir, PATH_SEPARATOR);
+    bool exists;
+    char *what;
+    if (is_dir) {
+        what = "Directory";
+        exists = rb->dir_exists(file_or_dir);
+    } else {
+        what = "File";
+        exists = rb->file_exists(file_or_dir);
+    }
+
+    if (!exists) {
+        rb->splashf(HZ*2, "%s %s no longer exists on disk", what, file_or_dir);
+        return PLUGIN_ERROR;
+    }
+
+    int len = rb->strlen(file_or_dir);
+    if(!is_dir && len > 5 && rb->strcasecmp(&(file_or_dir[len-5]), ".rock") == 0)
+    {
+        return rb->plugin_open(file_or_dir, NULL);
+    }
+    else
+    {
+        /* Set the browsers dirfilter to the global setting
+         * This is required in case the plugin was launched
+         * from the plugins browser, in which case the
+         * dirfilter is set to only display .rock files */
+        rb->set_dirfilter(rb->global_settings->dirfilter);
+
+        /* Change directory to the entry selected by the user */
+        rb->set_current_file(file_or_dir);
+    }
+    return PLUGIN_OK;
+}
 
 bool ends_with(char *string, char *suffix)
 {
@@ -195,7 +232,7 @@ bool ends_with(char *string, char *suffix)
 
 enum plugin_status plugin_start(const void* void_parameter)
 {
-    bool leave_loop;
+    int ret;
 
     /* This is a viewer, so a parameter must have been specified */
     if (void_parameter == NULL) {
@@ -219,8 +256,7 @@ enum plugin_status plugin_start(const void* void_parameter)
         /* if there's only one entry in the user .link file,
          * go straight to it without displaying the menu
          * thus allowing 'quick links' */
-        goto_entry(sc_file.entries[0].path);
-        return PLUGIN_OK;
+        return goto_entry(sc_file.entries[0].path);
     }
 
     FOR_NB_SCREENS(i)
@@ -228,11 +264,13 @@ enum plugin_status plugin_start(const void* void_parameter)
 
     do {
         /* Display a menu to choose between the entries */
-        leave_loop = list_sc();
-    } while (!leave_loop);
+        ret = list_sc();
+    } while (ret == PLUGIN_OK);
+    if (ret == LOOP_EXIT)
+        ret = PLUGIN_OK;
 
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
 
-    return usb_connected ? PLUGIN_USB_CONNECTED : PLUGIN_OK;
+    return ret;
 }

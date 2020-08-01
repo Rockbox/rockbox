@@ -43,6 +43,7 @@
 #include "talk.h"
 #include "onplay.h"
 #include "filetypes.h"
+#include "open_plugin.h"
 #include "plugin.h"
 #include "bookmark.h"
 #include "action.h"
@@ -1732,6 +1733,11 @@ static int playlist_insert_shuffled(void)
     return ONPLAY_RELOAD_DIR;
 }
 
+static void hotkey_run_plugin(void)
+{
+    open_plugin_run(ID2P(LANG_HOTKEY_WPS));
+}
+
 struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
@@ -1768,6 +1774,9 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
             ONPLAY_RELOAD_DIR },
+    { HOTKEY_PLUGIN, LANG_ONPLAY_PLUGIN,
+            HOTKEY_FUNC(hotkey_run_plugin, NULL),
+            ONPLAY_OK },
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
     { HOTKEY_PICTUREFLOW, LANG_ONPLAY_PICTUREFLOW,
             HOTKEY_FUNC(NULL, NULL),

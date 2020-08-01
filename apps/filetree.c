@@ -645,6 +645,9 @@ int ft_enter(struct tree_context* c)
                     case PLUGIN_GOTO_WPS:
                         play = true;
                         break;
+                    case PLUGIN_GOTO_PLUGIN:
+                        rc = GO_TO_PLUGIN;
+                        break;
                     case PLUGIN_USB_CONNECTED:
                         if(*c->dirfilter > NUM_FILTER_MODES)
                             /* leave sub-browsers after usb, doing
@@ -689,6 +692,9 @@ int ft_enter(struct tree_context* c)
                     {
                         case PLUGIN_USB_CONNECTED:
                             rc = GO_TO_FILEBROWSER;
+                            break;
+                        case PLUGIN_GOTO_PLUGIN:
+                            rc = GO_TO_PLUGIN;
                             break;
                         case PLUGIN_GOTO_WPS:
                             rc = GO_TO_WPS;

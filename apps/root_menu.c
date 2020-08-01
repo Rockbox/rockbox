@@ -32,6 +32,7 @@
 #include "kernel.h"
 #include "debug.h"
 #include "misc.h"
+#include "open_plugin.h"
 #include "rolo.h"
 #include "powermgmt.h"
 #include "power.h"
@@ -717,6 +718,9 @@ static int load_plugin_screen(char *plug_path, void* plug_param)
     case PLUGIN_GOTO_WPS:
         ret_val = GO_TO_WPS;
         break;
+    case PLUGIN_GOTO_PLUGIN:
+        ret_val = GO_TO_PLUGIN;
+        break;
     case PLUGIN_OK:
         ret_val = audio_status() ? GO_TO_PREVIOUS : GO_TO_ROOT;
         break;
@@ -807,12 +811,31 @@ void root_menu(void)
             case GO_TO_ROOTITEM_CONTEXT:
                 next_screen = load_context_screen(selected);
                 break;
+            case GO_TO_PLUGIN:
+            {
+                char *key;
+                if (last_screen < 0)
+                    key = ID2P(LANG_START_SCREEN);
+                else
+                    key = ID2P(LANG_ONPLAY_PLUGIN);
+
+                open_plugin_get_entry(key, &open_plugin_entry);
+                char *path = open_plugin_entry.path;
+                char *param = open_plugin_entry.param;
+                if (param[0] == '\0')
+                    param = NULL;
+
+                next_screen = load_plugin_screen(path, param);
+
+                previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PLUGIN;
+                break;
+            }
 #ifdef HAVE_PICTUREFLOW_INTEGRATION
             case GO_TO_PICTUREFLOW:
             {
                 char pf_path[MAX_PATH];
                 char activity[6];/* big enough to display int */
-                snprintf(activity, sizeof(activity), "%d", get_current_activity());
+                snprintf(activity, sizeof(activity), "%c", get_current_activity());
                 snprintf(pf_path, sizeof(pf_path),
                         "%s/pictureflow.rock",
                         PLUGIN_DEMOS_DIR);
