@@ -12452,10 +12452,10 @@ desc: deprecated
     *: "Enabled"
   </source>
   <dest>
-    *: "Abilitata"
+    *: "Abilitato"
   </dest>
   <voice>
-    *: "Abilitata"
+    *: "Abilitato"
   </voice>
 </phrase>
 <phrase>
@@ -12466,10 +12466,10 @@ desc: deprecated
     *: "Disable Touch"
   </source>
   <dest>
-    *: "Disabilitare il Touch"
+    *: "Disabilitare il Tocco"
   </dest>
   <voice>
-    *: "Disabilitare il Touch"
+    *: "Disabilitare il Tocco"
   </voice>
 </phrase>
 <phrase>
@@ -12531,7 +12531,7 @@ desc: deprecated
     *: "Blocco Automatico Off"
   </dest>
   <voice>
-    *: "Blocco Automatico spento"
+    *: "Blocco Automatico Disattivo"
   </voice>
 </phrase>
 <phrase>
@@ -12672,7 +12672,7 @@ desc: deprecated
     *: "Blocco Automatico On"
   </dest>
   <voice>
-    *: "Blocco Automatico Acceso"
+    *: "Blocco Automatico Attivo"
   </voice>
 </phrase>
 <phrase>
@@ -13208,10 +13208,10 @@ desc: deprecated
     *: "Pause / Play"
   </source>
   <dest>
-    *: "Pausa / Play"
+    *: "Pausa / Riproduzione"
   </dest>
   <voice>
-    *: "Pausa / Play"
+    *: "Pausa / Riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -13277,12 +13277,12 @@ desc: deprecated
   <dest>
     *: none
     lowmem: none
-    swcodec: "Modalità Lettura"
+    swcodec: "Modalità Riproduzione"
   </dest>
   <voice>
     *: none
     lowmem: none
-    swcodec: "Modalità Lettura"
+    swcodec: "Modalità Riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -13331,12 +13331,12 @@ desc: deprecated
   <dest>
     *: none
     lowmem: none
-    swcodec: "Indisponibile"
+    swcodec: "Non disponibile"
   </dest>
   <voice>
     *: none
     lowmem: none
-    swcodec: "Indisponibile"
+    swcodec: "Non disponibile"
   </voice>
 </phrase>
 <phrase>
@@ -13480,10 +13480,10 @@ desc: deprecated
     *: "Playback Control"
   </source>
   <dest>
-    *: "Impostazioni Playback"
+    *: "Controllo Riproduzione"
   </dest>
   <voice>
-    *: "Impostazioni Playback"
+    *: "Controllo Riproduzione"
   </voice>
 </phrase>
 <phrase>
@@ -13657,11 +13657,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Errore parsing gioco!"
+    lcd_bitmap: "Errore parsing partita!"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Errore parsing gioco!"
+    lcd_bitmap: "Errore parsing partita!"
   </voice>
 </phrase>
 <phrase>
@@ -13692,7 +13692,7 @@ desc: deprecated
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "catture"
+    lcd_bitmap: "cattura"
   </voice>
 </phrase>
 <phrase>
@@ -13816,10 +13816,10 @@ desc: deprecated
     *: "[Title]"
   </source>
   <dest>
-    *: "[Titiolo]"
+    *: "[Titolo]"
   </dest>
   <voice>
-    *: "Titiolo"
+    *: "Titolo"
   </voice>
 </phrase>
 <phrase>
@@ -13984,12 +13984,12 @@ desc: deprecated
   <dest>
     *: none
     lowmem: none
-    swcodec: "Imposta momento di ripresa (min)"
+    swcodec: "Imposta tempo di ripresa (min)"
   </dest>
   <voice>
     *: none
     lowmem: none
-    swcodec: "Imposta momento di ripresa (minuti)"
+    swcodec: "Imposta tempo di ripresa (minuti)"
   </voice>
 </phrase>
 <phrase>
@@ -14022,11 +14022,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Ricostruire il cache"
+    lcd_bitmap: "Ricostruire la cache"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Ricostruire il cache"
+    lcd_bitmap: "Ricostruire la cache"
   </voice>
 </phrase>
 <phrase>
@@ -14053,11 +14053,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Visualizza in alto"
+    lcd_bitmap: "Mostra in alto"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Visualizza in alto"
+    lcd_bitmap: "Mostra in alto"
   </voice>
 </phrase>
 <phrase>
@@ -14368,10 +14368,10 @@ desc: deprecated
     *: "Next Track"
   </source>
   <dest>
-    *: "Traccia Seguente"
+    *: "Traccia Successiva"
   </dest>
   <voice>
-    *: "Traccia Seguente"
+    *: "Traccia Successiva"
   </voice>
 </phrase>
 <phrase>
@@ -14656,10 +14656,10 @@ desc: deprecated
     *: "Playlist remaining: %s"
   </source>
   <dest>
-    *: "Playlist restante: %s"
+    *: "Playlist rimanente: %s"
   </dest>
   <voice>
-    *: "Playlist restante"
+    *: "Playlist rimanente"
   </voice>
 </phrase>
 <phrase>
@@ -14774,10 +14774,10 @@ desc: deprecated
     *: "Track remaining: %s"
   </source>
   <dest>
-    *: "Traccia restante: %s"
+    *: "Traccia rimanente: %s"
   </dest>
   <voice>
-    *: "Traccia restante"
+    *: "Traccia rimanente"
   </voice>
 </phrase>
 <phrase>
@@ -14814,7 +14814,7 @@ desc: deprecated
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Cavaliere"
+    lcd_bitmap: "Cavallo"
   </voice>
 </phrase>
 <phrase>
@@ -15131,7 +15131,7 @@ desc: deprecated
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Errore durante scrittura configurazione"
+    lcd_bitmap: "Errore durante la scrittura della configurazione"
   </voice>
 </phrase>
 <phrase>
@@ -15204,10 +15204,10 @@ desc: deprecated
     *: "Move Item Up"
   </source>
   <dest>
-    *: "Sposta Voce in Su"
+    *: "Sposta Elemento Su"
   </dest>
   <voice>
-    *: "Sposta Voce in Su"
+    *: "Sposta Elemento Su"
   </voice>
 </phrase>
 <phrase>
@@ -15259,12 +15259,12 @@ desc: deprecated
   <dest>
     *: none
     lowmem: none
-    swcodec: "Unico"
+    swcodec: "Singolo"
   </dest>
   <voice>
     *: none
     lowmem: none
-    swcodec: "Unico"
+    swcodec: "Singolo"
   </voice>
 </phrase>
 <phrase>
@@ -15381,11 +15381,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Riprendi Partita"
+    lcd_bitmap: "Riprendere la  Partita"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Riprendi Partita"
+    lcd_bitmap: "Riprendere la Partita"
   </voice>
 </phrase>
 <phrase>
@@ -15478,10 +15478,10 @@ desc: deprecated
     *: "Return"
   </source>
   <dest>
-    *: "Ritorna"
+    *: "Indietro"
   </dest>
   <voice>
-    *: "Ritorna"
+    *: "Indietro"
   </voice>
 </phrase>
 <phrase>
@@ -15509,10 +15509,10 @@ desc: deprecated
     *: "Move Item Down"
   </source>
   <dest>
-    *: "Sposta Voce in Giù"
+    *: "Sposta Elemento Giù"
   </dest>
   <voice>
-    *: "Sposta Voce in Giù"
+    *: "Sposta Elemento Giù"
   </voice>
 </phrase>
 <phrase>
@@ -15622,10 +15622,10 @@ desc: deprecated
     *: "[Subdirs]"
   </source>
   <dest>
-    *: "[Sotto cartelle]"
+    *: "[Sottocartelle]"
   </dest>
   <voice>
-    *: "Sotto cartelle"
+    *: "Sottocartelle"
   </voice>
 </phrase>
 <phrase>
@@ -15653,10 +15653,10 @@ desc: deprecated
     *: "Not a VBR file"
   </source>
   <dest>
-    *: "Non è un VBR file"
+    *: "Non è un file VBR"
   </dest>
   <voice>
-    *: "Non è un VBR file"
+    *: "Non è un file VBR"
   </voice>
 </phrase>
 <phrase>
@@ -15667,10 +15667,10 @@ desc: deprecated
     *: "Shuffle Mode"
   </source>
   <dest>
-    *: "Modalità Shuffle"
+    *: "Modalità Casuale"
   </dest>
   <voice>
-    *: "Modalità Shuffle"
+    *: "Modalità Casuale"
   </voice>
 </phrase>
 <phrase>
@@ -15697,11 +15697,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostra l'album e l'artista all'inizio"
+    lcd_bitmap: "Mostrare l'album e l'artista all'inizio"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostra l'album e l'artista all'inizio"
+    lcd_bitmap: "Mostrare l'album e l'artista all'inizio"
   </voice>
 </phrase>
 <phrase>
@@ -15731,11 +15731,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostra l'album all'inizio"
+    lcd_bitmap: "Mostrare l'album all'inizio"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostra l'album all'inizio"
+    lcd_bitmap: "Mostrare l'album all'inizio"
   </voice>
 </phrase>
 <phrase>
@@ -15748,11 +15748,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostra l'album alla fine"
+    lcd_bitmap: "Mostrare l'album alla fine"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostra l'album alla fine"
+    lcd_bitmap: "Mostrare l'album alla fine"
   </voice>
 </phrase>
 <phrase>
@@ -15765,11 +15765,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    lcd_bitmap: "Mostra l'album e l'artista alla fine"
+    lcd_bitmap: "Mostrare l'album e l'artista alla fine"
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Mostra l'album e l'artista alla fine"
+    lcd_bitmap: "Mostrare l'album e l'artista alla fine"
   </voice>
 </phrase>
 <phrase>
@@ -15795,32 +15795,32 @@ desc: deprecated
     *: "Premere LEFT per annullare."
     android,hifietma*,zenvision: "Premere BACK per annullare."
     cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
-    ihifi760: "Doppio tocco su RETURN per annullare."
+    ihifi760: "Premere due volte RETURN per annullare."
     ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
-    iriverh10,samsungyh*: "premere due volte LEFT per annullare."
-    mpiohd200: "premere due volte REC per annullare."
-    mpiohd300: "premere due volte MENU per annullare."
+    iriverh10,samsungyh*: "Premere due volte LEFT per annullare."
+    mpiohd200: "Premere due volte REC per annullare."
+    mpiohd300: "Premere due volte MENU per annullare."
     rx27generic: "Premere VOLUME per annullare."
     sonynwza860: "Mappa tasti incompleta."
     touchscreen: "Premere Middle Left per annullare."
     vibe500: "Premere PREV per annullare."
-    xduoox20,xduoox3,xduoox3ii: "premere due volte HOME per annullare."
+    xduoox20,xduoox3,xduoox3ii: "Premere due volte HOME per annullare."
   </dest>
   <voice>
     *: "Premere LEFT per annullare."
     android,hifietma*,zenvision: "Premere BACK per annullare."
     cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
-    ihifi760: "Doppio tocco su RETURN per annullare."
+    ihifi760: "Premere due volte RETURN per annullare."
     ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
-    iriverh10,samsungyh*: "premere due volte LEFT per annullare."
-    mpiohd200: "premere due volte REC per annullare."
-    mpiohd300: "premere due volte MENU per annullare."
+    iriverh10,samsungyh*: "Premere due volte LEFT per annullare."
+    mpiohd200: "Premere due volte REC per annullare."
+    mpiohd300: "Premere due volte MENU per annullare."
     rx27generic: "Premere VOLUME per annullare."
     touchscreen: "Premere Middle Left per annullare."
     vibe500: "Premere PREV per annullare."
-    xduoox20,xduoox3,xduoox3ii: "premere due volte HOME per annullare."
+    xduoox20,xduoox3,xduoox3ii: "Premere due volte HOME per annullare."
   </voice>
 </phrase>
 <phrase>
