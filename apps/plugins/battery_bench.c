@@ -31,7 +31,7 @@
 #define EV_EXIT 1337
 
 /* seems to work with 1300, but who knows... */
-#define THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
+#define MIN_THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -317,13 +317,21 @@ static struct batt_info
 
 #define BUF_ELEMENTS    (sizeof(bat)/sizeof(struct batt_info))
 
-static unsigned int thread_id;
+
+static struct
+{
+    unsigned int id; /* worker thread id */
+    long   *stack;
+    ssize_t stacksize;
+} gThread;
+
 static struct event_queue thread_q SHAREDBSS_ATTR;
 static bool in_usb_mode;
 static unsigned int buf_idx;
 
 static bool exit_tsr(bool reenter)
 {
+    bool is_exit;
     long button;
     (void)reenter;
     rb->lcd_clear_display();
@@ -342,13 +350,19 @@ static bool exit_tsr(bool reenter)
         if (button == BATTERY_OFF)
         {
             rb->queue_post(&thread_q, EV_EXIT, 0);
-            rb->thread_wait(thread_id);
+            rb->thread_wait(gThread.id);
             /* remove the thread's queue from the broadcast list */
             rb->queue_delete(&thread_q);
-            return true;
+            is_exit = true;
         }
-        else return false;
+        else is_exit = false;
+
+        break;
     }
+    FOR_NB_SCREENS(idx)
+        rb->screens[idx]->scroll_stop();
+
+    return is_exit;
 }
 
 #define BIT_CHARGER     0x1
@@ -356,9 +370,6 @@ static bool exit_tsr(bool reenter)
 #define BIT_USB_POWER   0x4
 
 #define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60 
-
-/* use long for aligning */
-static unsigned long thread_stack[THREAD_STACK_SIZE/sizeof(long)];
 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
 static unsigned int charge_state(void)
@@ -636,18 +647,39 @@ enum plugin_status plugin_start(const void* parameter)
             HMS((unsigned)start_tick/HZ));
         rb->close(fd);
     }
-    
+
+    rb->memset(&gThread, 0, sizeof(gThread));
+    void   *buf;
+    size_t  buf_size;
+    buf = rb->plugin_get_buffer(&buf_size);
+    ALIGN_BUFFER(buf, buf_size, sizeof(long));
+    rb->memset(buf, 0, buf_size);
+
+    gThread.stacksize = buf_size;
+    gThread.stack = (long *) buf + buf_size; /* stack grows towards *buf */
+
+    ALIGN_BUFFER(gThread.stack, gThread.stacksize, sizeof(long));
+
+    if (gThread.stacksize < MIN_THREAD_STACK_SIZE)
+    {
+        rb->splash(HZ*2, "Out of memory");
+        gThread.id = UINT_MAX;
+        return PLUGIN_ERROR;
+    }
+
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
-    if ((thread_id = rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), 0, "Battery Benchmark" 
-        IF_PRIO(, PRIORITY_BACKGROUND)
-        IF_COP(, CPU))) == 0)
+    gThread.id = rb->create_thread(thread, gThread.stack,
+                                   gThread.stacksize, 0, "Battery Benchmark"
+                                   IF_PRIO(, PRIORITY_BACKGROUND)
+                                   IF_COP(, CPU));
+
+    if (gThread.id == 0 || gThread.id == UINT_MAX)
     {
         rb->splash(HZ, "Cannot create thread!");
         return PLUGIN_ERROR;
     }
-            
+
     rb->plugin_tsr(exit_tsr);
-    
+
     return PLUGIN_OK;
 }
