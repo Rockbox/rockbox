@@ -8166,6 +8166,7 @@ int main(int argc,char  **argv)
                 for(i=0; i<MAX_KNOWN_GRP; i++)
                         printf("%s -> CRC32=%X  Size=%d bytes\n", crc32lookup[i].name, crc32lookup[i].crc32, crc32lookup[i].size);
 
+#if 0
                 printf( "\nYou should try to get one of these GRP only as a base GRP\n"
                                 "Do you want to continue anyway? (Y/N): ");
                 do
@@ -8175,6 +8176,8 @@ int main(int argc,char  **argv)
 
                 if(kbdKey == 'n')
                         Error(EXIT_SUCCESS,"");
+#endif
+                rb->splashf(HZ, "WARNING: Your GRP is not a well-known version. Continue at your own risk!");
         }
 
         // computing exe crc
