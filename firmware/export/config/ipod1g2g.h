@@ -131,8 +131,8 @@
 
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
-/* Hardware controlled charging? FIXME */
-//#define CONFIG_CHARGING CHARGING_SIMPLE
+/* Hardware controlled charging */
+#define CONFIG_CHARGING CHARGING_SIMPLE
 
 /* FIXME: Don't shutdown on low battery until we have proper suspend. */
 #define NO_LOW_BATTERY_SHUTDOWN
