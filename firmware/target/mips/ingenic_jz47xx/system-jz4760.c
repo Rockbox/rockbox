@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "cpu.h"
 #include "mips.h"
@@ -289,7 +289,7 @@ void intr_handler(void)
     register int irq = get_irq_number();
     if(UNLIKELY(irq < 0))
         return;
-    
+
     ack_irq(irq);
     if(LIKELY(irq >= 0))
         irqvector[irq]();
@@ -379,7 +379,7 @@ static inline unsigned int pll_calc_m_n_od(unsigned int speed, unsigned int xtal
 			continue;
 		for (k = pll_n_min; k <= pll_n_max; k++) {
 			n = k;
-			
+
 			/* Limit: 1MHZ <= XIN/N <= 50MHZ */
 			if ((xtal / n) < (1 * MHZ))
 				break;
@@ -396,8 +396,8 @@ static inline unsigned int pll_calc_m_n_od(unsigned int speed, unsigned int xtal
 
 				if (tmp < distance) {
 					distance = tmp;
-					
-					plcr_m_n_od = (j << CPPCR0_PLLM_LSB) 
+
+					plcr_m_n_od = (j << CPPCR0_PLLM_LSB)
 						| (k << CPPCR0_PLLN_LSB)
 						| (i << CPPCR0_PLLOD_LSB);
 
@@ -430,12 +430,21 @@ static void pll0_init(unsigned int freq)
     int div[6] = {1, 4, 4, 4, 4, 4};
     int usbdiv;
 
+    /* @ CPU_FREQ of 492MHZ, this means:
+       492MHz CCLK
+       123MHz HCLK
+       123MHz H2CLK
+       123MHz PCLK
+       123MHz MCLK
+       123MHZ SCLK  ( must equal H2CLK or HCLK/2)
+    */
+
     /* set ahb **/
     REG32(HARB0_BASE) = 0x00300000;
     REG32(0xb3070048) = 0x00000000;
     REG32(HARB2_BASE) = 0x00FFFFFF;
-	
-    cfcr = CPCCR_PCS |
+
+    cfcr = CPCCR_PCS | // no divisor on PLL for peripherals
         (n2FR[div[0]] << CPCCR_CDIV_LSB) |
         (n2FR[div[1]] << CPCCR_HDIV_LSB) |
         (n2FR[div[2]] << CPCCR_H2DIV_LSB) |
@@ -458,13 +467,13 @@ static void pll0_init(unsigned int freq)
     else
         cfcr &= ~CPCCR_ECS;
 
-    cfcr &= ~CPCCR_MEM; /* mddr */
+    cfcr &= ~CPCCR_MEM; /* Use mobile DDR / SDRAM */
     cfcr |= CPCCR_CE;
 
     plcr1 = pll_calc_m_n_od(freq, CFG_EXTAL);
     plcr1 |= (0x20 << CPPCR0_PLLST_LSB)  /* PLL stable time */
              | CPPCR0_PLLEN;             /* enable PLL */
-	
+
     /*
      * Init USB Host clock, pllout2 must be n*48MHz
      * For JZ4760b UHC - River.
@@ -488,7 +497,6 @@ void pll1_init(unsigned int freq)
 {
     register unsigned int plcr2;
 
-    /* set CPM_CPCCR_MEM only for ddr1 or ddr2 */
     plcr2 = pll_calc_m_n_od(freq, CFG_EXTAL)
             | CPPCR1_PLL1EN;            /* enable PLL1 */
 
@@ -501,6 +509,11 @@ void pll1_init(unsigned int freq)
     while (!(REG_CPM_CPPCR1 & CPPCR1_PLL1S));
 
     REG_CPM_CPPCR1 &= ~CPPCR1_LOCK;
+}
+
+void pll1_disable(void)
+{
+    REG_CPM_CPPCR1 &= ~CPPCR1_PLL1EN;
 }
 
 static void serial_setbrg(void)
@@ -548,10 +561,10 @@ int serial_preinit(void)
 
     /* Set databits, stopbits and parity. (8-bit data, 1 stopbit, no parity) */
     *uart_lcr = UARTLCR_WLEN_8 | UARTLCR_STOP1;
-	
+
     /* Set baud rate */
     serial_setbrg();
-	
+
     /* Enable UART unit, enable and clear FIFO */
     *uart_fcr = UARTFCR_UUE | UARTFCR_FE | UARTFCR_TFLS | UARTFCR_RFLS;
 
@@ -626,10 +639,10 @@ void dma_preinit(void)
 void ICODE_ATTR system_main(void)
 {
     int i;
-       
+
     __dcache_writeback_all();
     __icache_invalidate_all();
-    
+
     write_c0_status(1 << 28 | 1 << 10 ); /* Enable CP | Mask interrupt 2 */
 
     /* Disable all interrupts */
@@ -638,8 +651,8 @@ void ICODE_ATTR system_main(void)
 
     mmu_init();
 
-    pll0_init(CPU_FREQ);
-    pll1_init(CPU_FREQ);
+    pll0_init(CPU_FREQ);   // PLL0 drives everything but audio
+    pll1_disable();        // Leave PLL1 disabled until audio needs it
 
     serial_preinit();
     usb_preinit();
@@ -673,7 +686,7 @@ void system_exception_wait(void)
 void power_off(void)
 {
     REG_CPM_RSR = 0x0;
-	
+
     /* Set minimum wakeup_n pin low-level assertion time for wakeup: 100ms */
     rtc_write_reg(RTC_HWFCR, HWFCR_WAIT_TIME(1000));
 

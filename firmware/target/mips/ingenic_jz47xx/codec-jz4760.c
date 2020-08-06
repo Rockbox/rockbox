@@ -192,80 +192,85 @@ void audiohw_set_filter_roll_off(int value)
 }
 
 void pll1_init(unsigned int freq);
+void pll1_disable(void);
+
 void audiohw_set_frequency(int fsel)
 {
     unsigned int  pll1_speed;
     unsigned char mclk_div, bclk_div, func_mode;
 
+    // bclk is 1..8
+    // mclk is 1..512
+
     switch(fsel)
     {
-        case HW_FREQ_8:
+        case HW_FREQ_8: // 0.512 MHz
             pll1_speed = 426000000;
             mclk_div = 52;
             bclk_div = 16;
             func_mode = 0;
             break;
-        case HW_FREQ_11:
+        case HW_FREQ_11: // 0.7056 MHz
             pll1_speed = 508000000;
             mclk_div = 45;
             bclk_div = 16;
             func_mode = 0;
             break;
-        case HW_FREQ_12:
+        case HW_FREQ_12: // 0.768 MHz
             pll1_speed = 516000000;
             mclk_div = 42;
             bclk_div = 16;
             func_mode = 0;
             break;
-        case HW_FREQ_16:
+        case HW_FREQ_16: // 1.024 MHz
             pll1_speed = 426000000;
             mclk_div = 52;
             bclk_div = 8;
             func_mode = 0;
             break;
-        case HW_FREQ_22:
+        case HW_FREQ_22: // 1.4112 MHz
             pll1_speed = 508000000;
             mclk_div = 45;
             bclk_div = 8;
             func_mode = 0;
             break;
-        case HW_FREQ_24:
+        case HW_FREQ_24: // 1.536 MHz
             pll1_speed = 516000000;
             mclk_div = 42;
             bclk_div = 8;
             func_mode = 0;
             break;
-        case HW_FREQ_32:
+        case HW_FREQ_32: // 2.048 MHz
             pll1_speed = 426000000;
             mclk_div = 52;
             bclk_div = 4;
             func_mode = 0;
             break;
-        case HW_FREQ_44:
+        case HW_FREQ_44: // 2.8224 MHz
             pll1_speed = 508000000;
             mclk_div = 45;
             bclk_div = 4;
             func_mode = 0;
             break;
-        case HW_FREQ_48:
+        case HW_FREQ_48: // 3.072 MHz
             pll1_speed = 516000000;
             mclk_div = 42;
             bclk_div = 4;
             func_mode = 0;
             break;
-        case HW_FREQ_64:
+        case HW_FREQ_64: // 4.096 MHz
             pll1_speed = 426000000;
             mclk_div = 52;
             bclk_div = 2;
             func_mode = 1;
             break;
-        case HW_FREQ_88:
+        case HW_FREQ_88: // 5.6448 MHz
             pll1_speed = 508000000;
             mclk_div = 45;
             bclk_div = 2;
             func_mode = 1;
             break;
-        case HW_FREQ_96:
+        case HW_FREQ_96: // 6.144 MHz
             pll1_speed = 516000000;
             mclk_div = 42;
             bclk_div = 2;
@@ -314,6 +319,7 @@ void audiohw_close(void)
     dac_enable(0);
     __i2s_disable();
     __cpm_stop_aic();
+    pll1_disable();
     sleep(HZ);
     pop_ctrl(1);
 }
