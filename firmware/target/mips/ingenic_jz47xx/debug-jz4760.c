@@ -45,24 +45,23 @@ static void display_clocks(void)
     unsigned int od[4] = {1, 2, 2, 4};
 
     lcd_putsf(0, line++, "CPPCR0:0x%08x", cppcr0);
-    lcd_putsf(0, line++, "PLL0  :%s", (cppcr0 & CPPCR0_PLLEN) ? "ON" : "OFF");
-    lcd_putsf(0, line++, "PLL0  :%3d.%02d MHz", TO_MHZ(__cpm_get_pllout()));
-    lcd_putsf(0, line++, "m:n:o :%d:%d:%d",
-            __cpm_get_pllm() + 2,
-            __cpm_get_plln() + 2,
-            od[__cpm_get_pllod()]
-        );
-
+    if (cppcr0 & CPPCR0_PLLEN) {
+        lcd_putsf(0, line++, "PLL0  :%3d.%02d MHz", TO_MHZ(__cpm_get_pllout()));
+        lcd_putsf(0, line++, "m:n:o :%d:%d:%d",
+                __cpm_get_pllm(),
+                __cpm_get_plln(),
+                od[__cpm_get_pllod()]
+            );
+    }
     lcd_putsf(0, line++, "CPPCR1:0x%08x", cppcr1);
-
-    lcd_putsf(0, line++, "PLL1  :%s", (cppcr1 & CPPCR1_PLL1EN) ? "ON" : "OFF");
-    lcd_putsf(0, line++, "PLL1  :%3d.%02d MHz", TO_MHZ(__cpm_get_pll1out()));
-    lcd_putsf(0, line++, "m:n:o :%d:%d:%d",
-            __cpm_get_pll1m() + 2,
-            __cpm_get_pll1n() + 2,
+    if (cppcr1 & CPPCR1_PLL1EN) {
+        lcd_putsf(0, line++, "PLL1  :%3d.%02d MHz", TO_MHZ(__cpm_get_pll1out()));
+        lcd_putsf(0, line++, "m:n:o :%d:%d:%d",
+            __cpm_get_pll1m(),
+            __cpm_get_pll1n(),
             od[__cpm_get_pll1od()]
         );
-
+    }
     lcd_putsf(0, line++, "C:H:M:P:%d:%d:%d:%d",
             div[__cpm_get_cdiv()],
             div[__cpm_get_hdiv()],
