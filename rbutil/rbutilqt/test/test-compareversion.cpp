@@ -110,7 +110,7 @@ void TestVersionCompare::testCompare()
 
 void TestVersionCompare::testTrim()
 {
-    for(int i = 0; i < sizeof(trimdata) / sizeof(struct trimvector); i++) {
+    for(size_t i = 0; i < sizeof(trimdata) / sizeof(struct trimvector); i++) {
         QCOMPARE(Utils::trimVersionString(trimdata[i].input), trimdata[i].expected);
     }
 }
