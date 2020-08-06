@@ -90,7 +90,13 @@ extralibs.commands = $$SILENT \
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
-         mkmpioboot chinachippatcher mkimxboot mks5lboot bspatch bzip2 ucl
+         mkmpioboot chinachippatcher mkimxboot mks5lboot bspatch ucl
+# NOTE: Linking bzip2 causes problems on Windows (Qt seems to export those
+# symbols as well, similar to what we have with zlib.) Only link that on
+# non-Windows for now.
+!win32 {
+    RBLIBS += bzip2
+}
 !win32-msvc* {
     QMAKE_EXTRA_TARGETS += extralibs
     PRE_TARGETDEPS += extralibs
