@@ -49,6 +49,7 @@ static const struct button_mapping button_context_standard[] = {
 
 static const struct button_mapping button_context_wps[] = {
     { ACTION_WPS_PLAY,        BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
+    { ACTION_WPS_STOP,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
     { ACTION_WPS_SKIPPREV,    BUTTON_PREV|BUTTON_REL,           BUTTON_PREV },
     { ACTION_WPS_SEEKBACK,    BUTTON_PREV|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,    BUTTON_PREV|BUTTON_REL,           BUTTON_PREV|BUTTON_REPEAT },
@@ -135,6 +136,7 @@ static const struct button_mapping button_context_quickscreen[] = {
     { ACTION_QS_RIGHT,        BUTTON_NEXT,                      BUTTON_NONE },
     { ACTION_QS_RIGHT,        BUTTON_NEXT|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_STD_CANCEL,      BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
+    { ACTION_STD_CANCEL,      BUTTON_POWER|BUTTON_REL,          BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_quickscreen */
@@ -164,6 +166,7 @@ static const struct button_mapping button_context_settings_vol_is_inc[] = {
 /** Tree **/
 static const struct button_mapping button_context_tree[] = {
     { ACTION_TREE_WPS,        BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_TREE_STOP,       BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
     { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
     { ACTION_STD_MENU,        BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
 
