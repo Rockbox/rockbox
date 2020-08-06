@@ -85,7 +85,7 @@ wps.400x240x(16|24):  cabbiev2.400x240x16.wps
 wps.320x480x(16|24):  cabbiev2.320x480x16.wps
 wps.320x240x(16|24):  cabbiev2.320x240x16.wps
 wps.240x400x(16|24):  cabbiev2.240x400x16.wps
-wps.240x320x(16|24):  cabbiev2.240x320x16.wps
+wps.240x320x(16|24|32):  cabbiev2.240x320x16.wps
 wps.220x176x(16|24):  cabbiev2.220x176x16.wps
 wps.176x220x(16|24):  cabbiev2.176x220x16.wps
 wps.176x132x(16|24):  cabbiev2.176x132x16.wps
@@ -114,7 +114,7 @@ Font.400x240x(16|24): 15-Adobe-Helvetica.fnt
 Font.320x480x(16|24): 27-Adobe-Helvetica.fnt
 Font.320x240x(16|24): 15-Adobe-Helvetica.fnt
 Font.240x400x(16|24): 16-Adobe-Helvetica.fnt
-Font.240x320x(16|24): 15-Adobe-Helvetica.fnt
+Font.240x320x(16|24|32): 15-Adobe-Helvetica.fnt
 Font.220x176x(16|24): 12-Adobe-Helvetica.fnt
 Font.176x220x(16|24): 12-Adobe-Helvetica.fnt
 Font.176x132x(16|24): 12-Adobe-Helvetica.fnt
@@ -156,7 +156,7 @@ backdrop.160x128x2:       backdrops/cabbiev2.160x128x2.bmp
 backdrop.176x132x(16|24): backdrops/cabbiev2.176x132x16.bmp
 backdrop.176x220x(16|24): backdrops/cabbiev2.176x220x16.bmp
 backdrop.220x176x(16|24): backdrops/cabbiev2.220x176x16.bmp
-backdrop.240x320x(16|24): backdrops/cabbiev2.240x320x16.bmp
+backdrop.240x320x(16|24|32): backdrops/cabbiev2.240x320x16.bmp
 backdrop.240x400x(16|24): backdrops/cabbiev2.240x400x16.bmp
 backdrop.96x96x(16|24):   backdrops/cabbiev2.96x96x16.bmp
 backdrop.128x96x(16|24):  backdrops/cabbiev2.128x96x16.bmp
@@ -179,7 +179,7 @@ iconset.160x128x(16|24|32):  icons/tango_icons.12x12.bmp
 iconset.176x132x(16|24):  icons/tango_icons.12x12.bmp
 iconset.176x220x(16|24):  icons/tango_icons.12x12.bmp
 iconset.220x176x(16|24):  icons/tango_icons.12x12.bmp
-iconset.240x320x(16|24):  icons/tango_icons.16x16.bmp
+iconset.240x320x(16|24|32):  icons/tango_icons.16x16.bmp
 iconset.240x400x(16|24):  icons/tango_icons.16x16.bmp
 iconset.128x96x(16|24):   icons/tango_icons.8x8.bmp
 iconset.96x96x(16|24):    icons/tango_icons.8x8.bmp
@@ -198,7 +198,7 @@ viewers iconset.160x128x(16|24|32):  icons/tango_icons_viewers.12x12.bmp
 viewers iconset.176x132x(16|24):  icons/tango_icons_viewers.12x12.bmp
 viewers iconset.176x220x(16|24):  icons/tango_icons_viewers.12x12.bmp
 viewers iconset.220x176x(16|24):  icons/tango_icons_viewers.12x12.bmp
-viewers iconset.240x320x(16|24):  icons/tango_icons_viewers.16x16.bmp
+viewers iconset.240x320x(16|24|32):  icons/tango_icons_viewers.16x16.bmp
 viewers iconset.240x400x(16|24):  icons/tango_icons_viewers.16x16.bmp
 viewers iconset.128x96x(16|24):   icons/tango_icons_viewers.8x8.bmp
 viewers iconset.96x96x(16|24):    icons/tango_icons_viewers.8x8.bmp
