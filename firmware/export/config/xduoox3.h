@@ -106,6 +106,7 @@
 
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
+#define HAVE_PLAY_FREQ
 
 #define AB_REPEAT_ENABLE
 
