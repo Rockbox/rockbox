@@ -123,6 +123,9 @@ size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
     /* stderr, stdout (disabled) */
     else
     {
+        char fmt[32];
+        rb->snprintf(fmt, sizeof fmt, "%d%%s", size * nmemb);
+        rb->splashf(HZ, fmt, (char*)ptr);
         return size * nmemb;
     }
 }

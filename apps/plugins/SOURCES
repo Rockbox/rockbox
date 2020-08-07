@@ -76,6 +76,7 @@ iriverify.c
 duke3d.c
 quake.c
 wolf3d.c
+test_sdl2.c
 #endif
 #endif
 
