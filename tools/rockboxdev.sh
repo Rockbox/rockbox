@@ -32,7 +32,12 @@ fi
 # This is the absolute path to where the script resides.
 rockboxdevdir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-parallel=`nproc`
+if [ `uname -s` = "Darwin" ]; then
+    parallel=`sysctl -n hw.physicalcpu`
+else
+    parallel=`nproc`
+fi
+
 if [ $parallel -gt 1 ] ; then
   make_parallel=-j$parallel
 fi
