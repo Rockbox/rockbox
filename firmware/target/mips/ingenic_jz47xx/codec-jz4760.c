@@ -199,7 +199,7 @@ void audiohw_set_frequency(int fsel)
     unsigned int  pll1_speed;
     unsigned short mclk_div, bclk_div, func_mode;
 
-    // bclk is 1..8
+    // bclk is 1..16
     // mclk is 1..512
 
     switch(fsel)
@@ -217,8 +217,8 @@ void audiohw_set_frequency(int fsel)
             func_mode = 0;
             break;
         case HW_FREQ_12: // 0.768 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
+            pll1_speed = 516000000/2;
+            mclk_div = 42/2;
             bclk_div = 16;
             func_mode = 0;
             break;
@@ -235,8 +235,8 @@ void audiohw_set_frequency(int fsel)
             func_mode = 0;
             break;
         case HW_FREQ_24: // 1.536 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
+            pll1_speed = 516000000/2;
+            mclk_div = 42/2;
             bclk_div = 8;
             func_mode = 0;
             break;
@@ -253,8 +253,8 @@ void audiohw_set_frequency(int fsel)
             func_mode = 0;
             break;
         case HW_FREQ_48: // 3.072 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
+            pll1_speed = 516000000/2;
+            mclk_div = 42/2;
             bclk_div = 4;
             func_mode = 0;
             break;
@@ -271,8 +271,8 @@ void audiohw_set_frequency(int fsel)
             func_mode = 1;
             break;
         case HW_FREQ_96: // 6.144 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
+            pll1_speed = 516000000/2;
+            mclk_div = 42/2;
             bclk_div = 2;
             func_mode = 1;
             break;
