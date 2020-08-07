@@ -123,6 +123,8 @@ size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
     /* stderr, stdout (disabled) */
     else
     {
+        //rb->splash(HZ, (char*)ptr);
+        LOGF("%s", ptr);
         return size * nmemb;
     }
 }
