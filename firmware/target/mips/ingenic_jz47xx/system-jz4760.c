@@ -478,7 +478,7 @@ static void pll0_init(unsigned int freq)
      * Init USB Host clock, pllout2 must be n*48MHz
      * For JZ4760b UHC - River.
      */
-    usbdiv = (cfcr & CPCCR_PCS) ? CPU_FREQ : (CPU_FREQ / 2);
+    usbdiv = (cfcr & CPCCR_PCS) ? freq : (freq / 2);
     REG_CPM_UHCCDR = usbdiv / 48000000 - 1;
 
     /* init PLL */
