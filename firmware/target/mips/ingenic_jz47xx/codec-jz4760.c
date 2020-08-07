@@ -87,10 +87,10 @@ void audiohw_preinit(void)
 
 void audiohw_init(void)
 {
-    __gpio_as_func1(3*32+12); // BCK
-    __gpio_as_func0(3*32+13); // LRCK
-    __gpio_as_func2(4*32+5);  // MCLK
-    __gpio_as_func0(4*32+7);  // DO
+    __gpio_as_func1(3*32+12); // BCK  - BCLK pin AA20 func 1
+    __gpio_as_func0(3*32+13); // LRCK - SYNC pin W19 func 0
+    __gpio_as_func2(4*32+5);  // MCLK - SCLK_RSTN - E20 fund 2
+    __gpio_as_func0(4*32+7);  // DO   - SDATO pin Y19 func 0
 
     pop_ctrl(0);
     ap_mute(true);
@@ -194,85 +194,96 @@ void audiohw_set_filter_roll_off(int value)
 void pll1_init(unsigned int freq);
 void pll1_disable(void);
 
+#if CFG_EXTAL != 12000000
+#error "non-12MHz XTAL needs new audio rates calculated!"
+#endif
+
 void audiohw_set_frequency(int fsel)
 {
     unsigned int  pll1_speed;
     unsigned short mclk_div, bclk_div, func_mode;
+    unsigned char  dem = CS4398_DEM_NONE;
 
-    // bclk is 1..8
+    // bclk is 2,3,4,6,8,12  ONLY
     // mclk is 1..512
 
+    // for cs4398, BCLK must be 4 for single-rate, 2 for double-rate, 1 for quad-rate!
+
+    // 11.025 and 22.050 are a little wonky.
     switch(fsel)
     {
         case HW_FREQ_8: // 0.512 MHz
-            pll1_speed = 426000000;
-            mclk_div = 52;
-            bclk_div = 16;
+            pll1_speed = 426000000/4;
+            mclk_div = 208/4;
+            bclk_div = 4;
             func_mode = 0;
             break;
         case HW_FREQ_11: // 0.7056 MHz
-            pll1_speed = 508000000;
-            mclk_div = 45;
-            bclk_div = 16;
+            pll1_speed = 0;
+            mclk_div = 272;
+            bclk_div = 4;
             func_mode = 0;
             break;
         case HW_FREQ_12: // 0.768 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
-            bclk_div = 16;
+            pll1_speed = 516000000/2/3;
+            mclk_div = 168/2/3;
+            bclk_div = 4;
             func_mode = 0;
             break;
         case HW_FREQ_16: // 1.024 MHz
-            pll1_speed = 426000000;
-            mclk_div = 52;
-            bclk_div = 8;
+            pll1_speed = 426000000/4;
+            mclk_div = 104/4;
+            bclk_div = 4;
             func_mode = 0;
             break;
         case HW_FREQ_22: // 1.4112 MHz
-            pll1_speed = 508000000;
-            mclk_div = 45;
-            bclk_div = 8;
+            pll1_speed = 0;
+            mclk_div = 136;
+            bclk_div = 4;
             func_mode = 0;
             break;
         case HW_FREQ_24: // 1.536 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
-            bclk_div = 8;
+            pll1_speed = 516000000/2/3;
+            mclk_div = 84/2/3;
+            bclk_div = 4;
             func_mode = 0;
             break;
         case HW_FREQ_32: // 2.048 MHz
-            pll1_speed = 426000000;
-            mclk_div = 52;
+            pll1_speed = 426000000/4;
+            mclk_div = 52/4;
             bclk_div = 4;
+            dem = CS4398_DEM_32000;
             func_mode = 0;
             break;
         case HW_FREQ_44: // 2.8224 MHz
-            pll1_speed = 508000000;
-            mclk_div = 45;
+            pll1_speed = 0;
+            mclk_div = 68;
             bclk_div = 4;
+            dem = CS4398_DEM_44100;
             func_mode = 0;
             break;
         case HW_FREQ_48: // 3.072 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
+            pll1_speed = 516000000/2/3;
+            mclk_div = 42/2/3;
             bclk_div = 4;
+            dem = CS4398_DEM_48000;
             func_mode = 0;
             break;
         case HW_FREQ_64: // 4.096 MHz
-            pll1_speed = 426000000;
-            mclk_div = 52;
+            pll1_speed = 426000000/4;
+            mclk_div = 52/4;
             bclk_div = 2;
             func_mode = 1;
             break;
         case HW_FREQ_88: // 5.6448 MHz
-            pll1_speed = 508000000;
-            mclk_div = 45;
+            pll1_speed = 0;
+            mclk_div = 68;
             bclk_div = 2;
             func_mode = 1;
             break;
         case HW_FREQ_96: // 6.144 MHz
-            pll1_speed = 516000000;
-            mclk_div = 42;
+            pll1_speed = 516000000/2/3;
+            mclk_div = 42/2/3;
             bclk_div = 2;
             func_mode = 1;
             break;
@@ -286,13 +297,20 @@ void audiohw_set_frequency(int fsel)
     /* 0 = Single-Speed Mode (<50KHz);
        1 = Double-Speed Mode (50-100KHz);
        2 = Quad-Speed Mode;  (100-200KHz) */
-    cs4398_write_reg(CS4398_REG_MODECTL, (cs4398_read_reg(CS4398_REG_MODECTL) & ~CS4398_FM_MASK) | func_mode);
+    cs4398_write_reg(CS4398_REG_MODECTL, (cs4398_read_reg(CS4398_REG_MODECTL) & ~(CS4398_FM_MASK|CS4398_DEM_MASK)) | func_mode | dem);
     if (func_mode == 2)
         cs4398_write_reg(CS4398_REG_MISC, cs4398_read_reg(CS4398_REG_MISC) | CS4398_MCLKDIV2);
     else
         cs4398_write_reg(CS4398_REG_MISC, cs4398_read_reg(CS4398_REG_MISC) & ~CS4398_MCLKDIV2);
 
-    pll1_init(pll1_speed);
+    if (pll1_speed == 0) {
+	    pll1_disable();
+	    __cpm_select_i2sclk_exclk();
+    } else {
+	    __cpm_select_i2sclk_pll();
+	    __cpm_select_i2sclk_pll1();
+	    pll1_init(pll1_speed);
+    }
     __cpm_enable_pll_change();
     __cpm_set_i2sdiv(mclk_div-1);
     __i2s_set_i2sdiv(bclk_div-1);
