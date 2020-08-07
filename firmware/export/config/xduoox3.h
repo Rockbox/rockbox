@@ -148,7 +148,7 @@
 #define CONFIG_CPU JZ4760B
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ 492000000    /* CPU clock: 492 MHz */
+#define CPU_FREQ 480000000    /* CPU clock: 480 MHz -- Keep a multiple of 48MHz! */
 
 /* Define this if you want to use the JZ47XX i2c interface */
 #define CONFIG_I2C I2C_JZ47XX
