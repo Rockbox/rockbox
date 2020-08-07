@@ -1,0 +1,6 @@
+Font bug:
+load_font()
+ load_sprites_from_file
+  load_from_opendats_alloc
+   load_from_opendats_metadata -- load metadata from open DAT files???
+  shpl->n_images == 0 ???

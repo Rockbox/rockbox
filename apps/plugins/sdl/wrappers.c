@@ -323,6 +323,7 @@ int fscanf_wrapper(FILE *f, const char *fmt, ...)
 
     switch(format)
     {
+    case 'd':
     case 'i':
         *va_arg(ap, int*) = atoi(buf);
         break;
@@ -1473,4 +1474,175 @@ float rb_log(float x)
         else
             return dk*ln2_hi-((s*(f-R)-dk*ln2_lo)-f);
     }
+}
+
+float log2f_wrapper(float x) {
+    return rb_log(x) / rb_log(2.0f);
+}
+
+void perror(const char *s) {
+    printf("ERROR: %s", s);
+}
+
+size_t strnlen_wrapper(const char *s, size_t maxlen)
+{
+    size_t len = 0;
+    while(*s++ && maxlen--) len++;
+    return len;
+}
+
+double ldexp_wrapper(double x, int exp) {
+    /* hacky as hell */
+    return x * pow(2, exp);
+}
+
+/* from uclibc */
+
+#if !defined(__MAVERICK__) && ((__BYTE_ORDER == __BIG_ENDIAN) || \
+    (!defined(__VFP_FP__) && (defined(__arm__) || defined(__thumb__))))
+typedef uint32_t u_int32_t;
+typedef union
+{
+  double value;
+  struct
+  {
+    u_int32_t msw;
+    u_int32_t lsw;
+  } parts;
+} ieee_double_shape_type;
+
+#else
+
+typedef union
+{
+  double value;
+  struct
+  {
+    u_int32_t lsw;
+    u_int32_t msw;
+  } parts;
+} ieee_double_shape_type;
+
+#endif
+
+#define EXTRACT_WORDS(ix0,ix1,d)                                \
+do {                                                            \
+  ieee_double_shape_type ew_u;                                  \
+  ew_u.value = (d);                                             \
+  (ix0) = ew_u.parts.msw;                                       \
+  (ix1) = ew_u.parts.lsw;                                       \
+} while (0)
+
+/* Get the more significant 32 bit int from a double.  */
+
+#define GET_HIGH_WORD(i,d)                                      \
+do {                                                            \
+  ieee_double_shape_type gh_u;                                  \
+  gh_u.value = (d);                                             \
+  (i) = gh_u.parts.msw;                                         \
+} while (0)
+
+/* Get the less significant 32 bit int from a double.  */
+
+#define GET_LOW_WORD(i,d)                                       \
+do {                                                            \
+  ieee_double_shape_type gl_u;                                  \
+  gl_u.value = (d);                                             \
+  (i) = gl_u.parts.lsw;                                         \
+} while (0)
+
+/* Set a double from two 32 bit ints.  */
+
+#define INSERT_WORDS(d,ix0,ix1)                                 \
+do {                                                            \
+  ieee_double_shape_type iw_u;                                  \
+  iw_u.parts.msw = (ix0);                                       \
+  iw_u.parts.lsw = (ix1);                                       \
+  (d) = iw_u.value;                                             \
+} while (0)
+
+/* Set the more significant 32 bits of a double from an int.  */
+
+#define SET_HIGH_WORD(d,v)                                      \
+do {                                                            \
+  ieee_double_shape_type sh_u;                                  \
+  sh_u.value = (d);                                             \
+  sh_u.parts.msw = (v);                                         \
+  (d) = sh_u.value;                                             \
+} while (0)
+
+/* Set the less significant 32 bits of a double from an int.  */
+
+#define SET_LOW_WORD(d,v)                                       \
+do {                                                            \
+  ieee_double_shape_type sl_u;                                  \
+  sl_u.value = (d);                                             \
+  sl_u.parts.lsw = (v);                                         \
+  (d) = sl_u.value;                                             \
+} while (0)
+
+static const double
+two54 =  1.80143985094819840000e+16; /* 0x43500000, 0x00000000 */
+
+double frexp_wrapper(double x, int *eptr)
+{
+        int32_t hx, ix, lx;
+        EXTRACT_WORDS(hx,lx,x);
+        ix = 0x7fffffff&hx;
+        *eptr = 0;
+        if(ix>=0x7ff00000||((ix|lx)==0)) return x;      /* 0,inf,nan */
+        if (ix<0x00100000) {            /* subnormal */
+            x *= two54;
+            GET_HIGH_WORD(hx,x);
+            ix = hx&0x7fffffff;
+            *eptr = -54;
+        }
+        *eptr += (ix>>20)-1022;
+        hx = (hx&0x800fffff)|0x3fe00000;
+        SET_HIGH_WORD(x,hx);
+        return x;
+}
+
+
+double modf_wrapper(double x, double *iptr)
+{
+static const double one = 1.0;
+
+        int32_t i0,i1,_j0;
+        u_int32_t i;
+        EXTRACT_WORDS(i0,i1,x);
+        _j0 = ((i0>>20)&0x7ff)-0x3ff;   /* exponent of x */
+        if(_j0<20) {                    /* integer part in high x */
+            if(_j0<0) {                 /* |x|<1 */
+                INSERT_WORDS(*iptr,i0&0x80000000,0);    /* *iptr = +-0 */
+                return x;
+            } else {
+                i = (0x000fffff)>>_j0;
+                if(((i0&i)|i1)==0) {            /* x is integral */
+                    *iptr = x;
+                    INSERT_WORDS(x,i0&0x80000000,0);    /* return +-0 */
+                    return x;
+                } else {
+                    INSERT_WORDS(*iptr,i0&(~i),0);
+                    return x - *iptr;
+                }
+            }
+        } else if (_j0>51) {            /* no fraction part */
+            *iptr = x*one;
+            /* We must handle NaNs separately.  */
+            if (_j0 == 0x400 && ((i0 & 0xfffff) | i1))
+              return x*one;
+            INSERT_WORDS(x,i0&0x80000000,0);    /* return +-0 */
+            return x;
+        } else {                        /* fraction part in low x */
+            i = ((u_int32_t)(0xffffffff))>>(_j0-20);
+            if((i1&i)==0) {             /* x is integral */
+                *iptr = x;
+                INSERT_WORDS(x,i0&0x80000000,0);        /* return +-0 */
+                return x;
+            } else {
+                INSERT_WORDS(*iptr,i0,i1&(~i));
+                return x - *iptr;
+            }
+        }
 }

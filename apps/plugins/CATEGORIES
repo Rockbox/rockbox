@@ -94,6 +94,7 @@ rockbox_flash,viewers
 rockboy,viewers
 rocklife,demos
 rockpaint,apps
+sdlpop,games
 search,viewers
 searchengine,viewers
 settings_dumper,apps
@@ -169,6 +170,7 @@ test_gfx,apps
 test_resize,apps
 test_sampr,apps
 test_scanrate,apps
+test_sdl2,apps
 test_touchscreen,apps
 test_viewports,apps
 test_greylib_bitmap_scale,viewers

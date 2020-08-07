@@ -123,6 +123,8 @@ size_t _fwrite_(const void *ptr, size_t size, size_t nmemb, _FILE_ *stream)
     /* stderr, stdout (disabled) */
     else
     {
+        //rb->splash(HZ, (char*)ptr);
+        LOGF("%s", (char*)ptr);
         return size * nmemb;
     }
 }
@@ -250,4 +252,28 @@ int _fprintf_(_FILE_ *stream, const char *format, ...)
     va_end(ap);
 
     return _fwrite_(buf, 1, len, stream);
+}
+
+int _fstat_(int fd, struct _stat_ *buf)
+{
+    off_t orig = rb->lseek(fd, 0, SEEK_CUR);
+    off_t len = rb->lseek(fd, 0, SEEK_END);
+    rb->lseek(fd, orig, SEEK_SET);
+
+    if(buf) {
+        //printf("got length %d for fd=%d", len, fd);
+        buf->st_size = len;
+    }
+
+    return 0;
+}
+
+int _fileno_(FILE *stream)
+{
+    return stream->fd;
+}
+
+int _fputs_(const char *s, FILE *stream)
+{
+    return _fwrite_(s, 1, rb->strlen(s), stream);
 }

@@ -18,6 +18,8 @@
  *
  ****************************************************************************/
 
+#pragma once
+
 #include <stddef.h>
 
 #define MAX_STDIO_FILES 11
@@ -37,7 +39,10 @@
 #define fgetc  _fgetc_
 #define ungetc _ungetc_
 #define fputc  _fputc_
+#define putc   _fputc_
 #define fgets  _fgets_
+#define fputs  _fputs_
+#define fileno _fileno_
 #undef clearerr
 #define clearerr _clearerr_
 #undef ferror
@@ -51,12 +56,24 @@
 #define stderr _stderr_
 #undef getc
 #define getc fgetc
+#define rewind(stream) fseek((stream), 0, SEEK_SET)
+
+#if 0
+#undef fstat
+#undef stat
+#define fstat _fstat_
+#define stat  _stat_
+#endif
 
 typedef struct {
     int fd;
     int unget_char;
     int error;
 } _FILE_;
+
+struct _stat_ {
+    off_t st_size;
+};
 
 extern _FILE_ *_stdout_, *_stderr_;
 
@@ -76,3 +93,6 @@ void _clearerr_(_FILE_ *stream);
 int _ferror_(_FILE_ *stream);
 int _feof_(_FILE_ *stream);
 int _fprintf_(_FILE_ *stream, const char *format, ...);
+int _fstat_(int fd, struct _stat_ *buf);
+int _fileno_(FILE *stream);
+int _fputs_(const char *s, FILE *stream);
