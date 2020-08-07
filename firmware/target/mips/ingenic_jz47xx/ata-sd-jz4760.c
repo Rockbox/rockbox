@@ -633,14 +633,23 @@ static inline unsigned int jz_sd_calc_clkrt(const int drive, unsigned int rate)
     return clkrt;
 }
 
-static inline void cpm_select_msc_clk(unsigned int rate)
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+#define cpu_frequency __cpm_get_pllout2()
+#endif
+
+void cpm_select_msc_clk(void)
 {
-    unsigned int div = __cpm_get_pllout2() / rate;
+    unsigned int div = cpu_frequency / SD_CLOCK_FAST;
+
     if (div == 0)
             div = 1;
 
+    if (div == __cpm_get_mscdiv())
+	    return;
+
     REG_CPM_MSCCDR = MSCCDR_MCS | (div - 1);
     DEBUG("MSCCLK == %x\n", REG_CPM_MSCCDR);
+    __cpm_enable_pll_change();
 }
 
 /* Set the MMC clock frequency */
@@ -651,9 +660,8 @@ static void jz_sd_set_clock(const int drive, unsigned int rate)
     jz_sd_stop_clock(drive);
 
     /* select clock source from CPM */
-    cpm_select_msc_clk(rate);
+    cpm_select_msc_clk();
 
-    __cpm_enable_pll_change();
     clkrt = jz_sd_calc_clkrt(drive, rate);
     REG_MSC_CLKRT(MSC_CHN(drive)) = clkrt;
 

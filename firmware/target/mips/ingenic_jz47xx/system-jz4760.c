@@ -417,25 +417,31 @@ static inline unsigned int pll_calc_m_n_od(unsigned int speed, unsigned int xtal
 static void pll0_init(unsigned int freq)
 {
     register unsigned int cfcr, plcr1;
-    int usbdiv;
+    int usbdiv, offset;
 
     /** divisors,
      *  for jz4760b,I:H:H2:P:M:S.
      *  DIV should be one of [1, 2, 3, 4, 6, 8]
      */
-    const int div[6] = {1, 4, 4, 4, 4, 4};
+    const int div[2][6] = { { 1, 2, 2, 2, 2, 2 },
+			    { 1, 6, 6, 6, 6, 6 } };
     const int n2FR[9] = {
         0, 0, 1, 2, 3, 0, 4, 0, 5
     };
 
-    /* @ CPU_FREQ of 492MHZ, this means:
-       492MHz CCLK
-       123MHz HCLK
-       123MHz H2CLK
-       123MHz PCLK
-       123MHz MCLK
-       123MHZ SCLK  ( must equal H2CLK or HCLK/2)
+    /* @ CPU_FREQ of 576/192MHz, this means:
+              CCLK  (= HCLK*n, H2CLK*n, PCLK*o)
+        96MHz HCLK  (= MCLK or 2x MCLK, PCLK*n)
+        96MHz H2CLK (= HCLK or HCLK/2, PCLK*n)
+        96MHz PCLK
+        96MHz MCLK  (= PCLK*n)
+        96MHZ SCLK  (= H2CLK or HCLK/2)
     */
+
+    if (freq > CPUFREQ_NORMAL)
+	    offset = 1;
+    else
+	    offset = 0;
 
     /* set ahb **/
     REG32(HARB0_BASE) = 0x00300000;
@@ -443,12 +449,12 @@ static void pll0_init(unsigned int freq)
     REG32(HARB2_BASE) = 0x00FFFFFF;
 
     cfcr = CPCCR_PCS | // no divisor on PLL for peripherals
-        (n2FR[div[0]] << CPCCR_CDIV_LSB) |
-        (n2FR[div[1]] << CPCCR_HDIV_LSB) |
-        (n2FR[div[2]] << CPCCR_H2DIV_LSB) |
-        (n2FR[div[3]] << CPCCR_PDIV_LSB) |
-        (n2FR[div[4]] << CPCCR_MDIV_LSB) |
-        (n2FR[div[5]] << CPCCR_SDIV_LSB);
+        (n2FR[div[offset][0]] << CPCCR_CDIV_LSB) |
+        (n2FR[div[offset][1]] << CPCCR_HDIV_LSB) |
+        (n2FR[div[offset][2]] << CPCCR_H2DIV_LSB) |
+        (n2FR[div[offset][3]] << CPCCR_PDIV_LSB) |
+        (n2FR[div[offset][4]] << CPCCR_MDIV_LSB) |
+        (n2FR[div[offset][5]] << CPCCR_SDIV_LSB);
 
     // write REG_DDRC_CTRL 8 times to clear ddr fifo
     REG_DDRC_CTRL = 0;
@@ -569,6 +575,10 @@ int serial_preinit(void)
     return 0;
 }
 
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+#define cpu_frequency CPU_FREQ
+#endif
+
 void usb_preinit(void)
 {
     /* Clear ECS bit of CPCCR, 0:clock source is EXCLK, 1:clock source is EXCLK/2 */
@@ -589,7 +599,7 @@ void usb_preinit(void)
     REG_CPM_USBVBFIL = 0x80;
 
     /* rdt */
-    REG_CPM_USBRDT = (600 * (CPU_FREQ / 1000000)) / 1000;
+    REG_CPM_USBRDT = (600 * (CPUFREQ_DEFAULT / 1000000)) / 1000;
 
     /* rdt - filload_en */
     REG_CPM_USBRDT |= (1 << 25);
@@ -649,8 +659,8 @@ void ICODE_ATTR system_main(void)
 
     mmu_init();
 
-    pll0_init(CPU_FREQ);   // PLL0 drives everything but audio
-    pll1_disable();        // Leave PLL1 disabled until audio needs it
+    pll0_init(CPUFREQ_DEFAULT); // PLL0 drives everything but audio
+    pll1_disable();             // Leave PLL1 disabled until audio needs it
 
     serial_preinit();
     usb_preinit();
@@ -713,9 +723,22 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
+void cpm_select_msc_clk(void);
+
 void set_cpu_frequency(long frequency)
 {
-    serial_putsf("set_cpu_frequency: %d\n", frequency);
+   if (frequency == cpu_frequency)
+       return;
+   else if (frequency < CPUFREQ_MIN)
+       frequency = CPUFREQ_MIN;
+   else if (frequency > CPUFREQ_MAX)
+       frequency = CPUFREQ_MAX;
+
+   pll0_init(frequency);
+   // FIX PCLK (ie i2c)?
+   cpu_frequency = __cpm_get_pllout2();
+   cpm_select_msc_clk();
 }
 #endif
