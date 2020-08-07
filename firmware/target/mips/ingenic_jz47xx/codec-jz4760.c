@@ -197,7 +197,7 @@ void pll1_disable(void);
 void audiohw_set_frequency(int fsel)
 {
     unsigned int  pll1_speed;
-    unsigned char mclk_div, bclk_div, func_mode;
+    unsigned short mclk_div, bclk_div, func_mode;
 
     // bclk is 1..8
     // mclk is 1..512

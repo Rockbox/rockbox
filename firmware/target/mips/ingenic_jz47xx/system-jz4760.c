@@ -362,18 +362,18 @@ static inline unsigned int pll_calc_m_n_od(unsigned int speed, unsigned int xtal
 	const int pll_m_max = 0x7f, pll_m_min = 4;
 	const int pll_n_max = 0x0f, pll_n_min = 2;
 
-	int od[] = {1, 2, 4, 8};
+	unsigned char od[] = {1, 2, 4, 8};
 
 	unsigned int plcr_m_n_od = 0;
 	unsigned int distance;
-	unsigned int tmp, raw;
+	unsigned int tmp;
 
 	int i, j, k;
 	int m, n;
 
 	distance = 0xFFFFFFFF;
 
-	for (i = 0; i < (int)sizeof (od) / (int)sizeof(int); i++) {
+	for (i = 0; i < (int)sizeof(od); i++) {
 		/* Limit: 500MHZ <= CLK_OUT * OD <= 1500MHZ */
 		if ((speed * od[i]) < 500 * MHZ || (speed * od[i]) > 1500 * MHZ)
 			continue;
@@ -383,15 +383,13 @@ static inline unsigned int pll_calc_m_n_od(unsigned int speed, unsigned int xtal
 			/* Limit: 1MHZ <= XIN/N <= 50MHZ */
 			if ((xtal / n) < (1 * MHZ))
 				break;
-			if ((xtal / n) > (15 * MHZ))
+			if ((xtal / n) > (50 * MHZ))
 				continue;
 
 			for (j = pll_m_min; j <= pll_m_max; j++) {
 				m = j*2;
 
-				raw = xtal * m / n;
-				tmp = raw / od[i];
-
+				tmp = xtal * m / (n * od[i]);
 				tmp = (tmp > speed) ? (tmp - speed) : (speed - tmp);
 
 				if (tmp < distance) {
@@ -419,16 +417,16 @@ static inline unsigned int pll_calc_m_n_od(unsigned int speed, unsigned int xtal
 static void pll0_init(unsigned int freq)
 {
     register unsigned int cfcr, plcr1;
-    int n2FR[9] = {
-        0, 0, 1, 2, 3, 0, 4, 0, 5
-    };
+    int usbdiv;
 
     /** divisors,
      *  for jz4760b,I:H:H2:P:M:S.
      *  DIV should be one of [1, 2, 3, 4, 6, 8]
      */
-    int div[6] = {1, 4, 4, 4, 4, 4};
-    int usbdiv;
+    const int div[6] = {1, 4, 4, 4, 4, 4};
+    const int n2FR[9] = {
+        0, 0, 1, 2, 3, 0, 4, 0, 5
+    };
 
     /* @ CPU_FREQ of 492MHZ, this means:
        492MHz CCLK

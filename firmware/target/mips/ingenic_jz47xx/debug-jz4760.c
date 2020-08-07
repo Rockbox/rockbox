@@ -42,7 +42,7 @@ static void display_clocks(void)
     unsigned int cppcr0 = REG_CPM_CPPCR0;  /* PLL Control Register */
     unsigned int cppcr1 = REG_CPM_CPPCR1;  /* PLL Control Register */
     unsigned int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
-    unsigned int od[4] = {1, 2, 2, 4};
+    unsigned int od[4] = {1, 2, 4, 8};
 
     lcd_putsf(0, line++, "CPPCR0:0x%08x", cppcr0);
     if (cppcr0 & CPPCR0_PLLEN) {
