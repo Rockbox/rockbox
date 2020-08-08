@@ -132,38 +132,42 @@ static void ROCKBOXAUD_WaitAudio(_THIS)
 }
 
 /* when this is called, SDL wants us to play the samples in mixbuf */
-static void ROCKBOXAUD_PlayAudio(_THIS)
+static void
+ROCKBOXAUD_PlayAudio(_THIS)
 {
     /* There are two cases in which we should be called:
      *  - There is an empty buffer (marked with status = 0)
      *  - There are more than two buffers marked as playing, meaning at least one is stale.
      */
-    int idx = -1;
 
     /* Find the next empty or stale buffer and fill. */
-    for(int i = 1; i < this->hidden->n_buffers; ++i)
+    for(int i = 1; i <= this->hidden->n_buffers; ++i)
     {
-        idx = (this->hidden->current_playing + i) % this->hidden->n_buffers;
+        int idx = (this->hidden->current_playing + i) % this->hidden->n_buffers;
 
         /* Empty or stale. */
         if(this->hidden->status[idx] == 0 ||
-           this->hidden->status[idx] == 2)
-            break;
+           this->hidden->status[idx] == 2) {
+
+            LOGF("found empty buffer: %d (status: %d)", idx, this->hidden->status[idx]);
+
+            /* probably premature optimization here */
+            char *dst = (char*)this->hidden->rb_buf[idx], *src = this->hidden->mixbuf;
+            int size = this->spec.size / 2;
+            memcpy(dst, src, size);
+
+            this->hidden->status[idx] = 1;
+            rb->yield();
+
+            memcpy(dst + size, src + size, this->spec.size - size);
+
+            LOGF("filled buffer %d (status %d %d %d %d)", idx, this->hidden->status[0], this->hidden->status[1], this->hidden->status[2], this->hidden->status[3]);
+
+            return;
+        }
     }
-    if(idx < 0)
-        return;
 
-    /* probably premature optimization here */
-    char *dst = (char*)this->hidden->rb_buf[idx], *src = this->hidden->mixbuf;
-    int size = this->hidden->mixlen / 2;
-    memcpy(dst, src, size);
-
-    this->hidden->status[idx] = 1;
-    rb->yield();
-
-    memcpy(dst + size, src + size, this->hidden->mixlen - size);
-
-    //LOGF("filled buffer %d (status %d %d %d)", idx, this->hidden->status[0], this->hidden->status[1], this->hidden->status[2]);
+    LOGF("WARNING: PlayDevice could not find buffer to fill; DROPPING SAMPLES!");
 }
 
 static SDL_AudioDevice *ROCKBOXAUD_CreateDevice(int devindex)
