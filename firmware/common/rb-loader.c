@@ -36,7 +36,7 @@
  * Returns payload len on success,
  * On error returns EKEY_NOT_FOUND
  */
-static int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
+int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
 {
     struct boot_data_t bl_boot_data;
     struct boot_data_t *fw_boot_data = NULL;

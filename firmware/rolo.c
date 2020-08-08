@@ -48,6 +48,11 @@
 #define LOAD_FIRMWARE(a,b,c) load_rkw(a,b,c)
 #else
 #include "rb-loader.h"
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+#include "bootdata.h"
+#include "crc32.h"
+extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*rb-loader.c*/    
+#endif
 #define LOAD_FIRMWARE(a,b,c) load_firmware(a,b,c)
 #endif
 
@@ -236,6 +241,15 @@ int rolo_load(const char* filename)
     filebuf = core_get_data(rolo_handle);
 
     err = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+    /* write the bootdata as if rolo were the bootloader */
+    unsigned int crc = 0;
+    if (strcmp(filename, BOOTDIR "/" BOOTFILE) == 0)
+        crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
+
+    if(crc > 0 && crc == boot_data.crc)
+        write_bootdata(filebuf, filebuf_size, boot_data.boot_volume); /* rb-loader.c */
+#endif
 
     if (err <= 0)
     {
