@@ -8,24 +8,18 @@
 # We use the SB code available in the Rockbox utils/sbtools directory
 
 IMXTOOLS_DIR=../../utils/imxtools/sbtools/
-CFLAGS += -I$(IMXTOOLS_DIR) -Wall
+
+COMPILEFLAGS := -Wall -g -O3 -I$(IMXTOOLS_DIR)
+
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
-CFLAGS += -std=gnu99 -g -O3
+CFLAGS += -std=gnu99 $(COMPILEFLAGS)
+CXXFLAGS += $(COMPILEFLAGS)
 
-# Location to pkg-config binary.
-PKGCONFIG := pkg-config
+TOMCRYPT_DIR := ../../utils/tomcrypt
 
-# Distros could use different names for the crypto library. We try a list
-# of candidate names, only one of them should be the valid one.
-LIBCRYPTO_NAMES = libcryptopp libcrypto++ cryptopp crypto++
-
-$(foreach l,$(LIBCRYPTO_NAMES),\
-	$(eval LDOPTS += $(shell $(PKGCONFIG) --silence-errors --libs $(l))))
-$(foreach l,$(LIBCRYPTO_NAMES),\
-	$(eval CFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
-$(foreach l,$(LIBCRYPTO_NAMES),\
-	$(eval CXXFLAGS += $(shell $(PKGCONFIG) --silence-errors --cflags $(l))))
-LDOPTS += -lpthread
+CXXFLAGS += -I$(TOMCRYPT_DIR)/src/headers
+CFLAGS += -I$(TOMCRYPT_DIR)/src/headers
+LDOPTS += -lpthread $(TOMCRYPT_DIR)/librbtomcrypt.a
 
 OUTPUT = mkimxboot
 
@@ -33,6 +27,10 @@ OUTPUT = mkimxboot
 IMXTOOLS_SOURCES = misc.c sb.c crypto.cpp crc.c elf.c
 LIBSOURCES := dualboot.c mkimxboot.c md5.c \
 	      $(addprefix $(IMXTOOLS_DIR),$(IMXTOOLS_SOURCES))
+
+# for now build tomcrypt as part of the lib.
+LIBSOURCES += $(addprefix $(TOMCRYPT_DIR),$(TOMCRYPT_SOURCES))
+
 # inputs for binary only
 SOURCES := $(LIBSOURCES) main.c
 # dependencies for binary
@@ -43,3 +41,8 @@ include ../libtools.make
 # explicit dependencies on dualboot.{c,h} and mkimxboot.h
 $(OBJDIR)mkimxboot.o: dualboot.h dualboot.c mkimxboot.c mkimxboot.h
 $(OBJDIR)main.o: dualboot.h dualboot.c main.c mkimxboot.h
+$(BINARY): librbtomcrypt.a
+
+librbtomcrypt.a:
+	$(MAKE) -C ../../utils/tomcrypt
+
