@@ -58,7 +58,7 @@ void *xmalloc(size_t s)
     return r;
 }
 
-int convxdigit(char digit, byte *val)
+int convxdigit(char digit, uint8_t *val)
 {
     if(digit >= '0' && digit <= '9')
     {
@@ -127,7 +127,7 @@ bool parse_key(char **pstr, struct crypto_key_t *key)
     {
         for(int j = 0; j < 128; j++)
         {
-            byte a, b;
+            uint8_t a, b;
             if(convxdigit(str[2 * j], &a) || convxdigit(str[2 * j + 1], &b))
                 return false;
             key->u.xor_key[j / 64].key[j % 64] = (a << 4) | b;
@@ -143,7 +143,7 @@ bool parse_key(char **pstr, struct crypto_key_t *key)
             return false;
         for(int j = 0; j < 16; j++)
         {
-            byte a, b;
+            uint8_t a, b;
             if(convxdigit(str[2 * j], &a) || convxdigit(str[2 * j + 1], &b))
                 return false;
             key->u.key[j] = (a << 4) | b;
@@ -243,7 +243,7 @@ bool add_keys_from_file(const char *key_file)
     return true;
 }
 
-void print_hex(void *user, misc_printf_t printf, byte *data, int len, bool newline)
+void print_hex(void *user, misc_printf_t printf, uint8_t *data, int len, bool newline)
 {
     for(int i = 0; i < len; i++)
         printf(user, "%02X ", data[i]);
