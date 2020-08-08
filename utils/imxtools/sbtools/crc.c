@@ -68,12 +68,12 @@ static uint32_t crc_table[256] = {
     0x0B8757BDA, 0x0B5365D03, 0x0B1F740B4
 };
 
-uint32_t crc(byte *data, int size)
+uint32_t crc(uint8_t *data, int size)
 {
     return crc_continue(0xffffffff, data, size);
 }
 
-uint32_t crc_continue(uint32_t previous_crc, byte *data, int size)
+uint32_t crc_continue(uint32_t previous_crc, uint8_t *data, int size)
 {
     uint32_t c = previous_crc;
     /* normal CRC */
