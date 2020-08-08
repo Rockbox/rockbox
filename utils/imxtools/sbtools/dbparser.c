@@ -207,7 +207,7 @@ static void parse_number(struct context_t *ctx, struct lexem_t *lexem)
     {
         if(base == 10 && !isdigit(cur_char(ctx)))
             break;
-        byte v;
+        uint8_t v;
         if(convxdigit(cur_char(ctx), &v))
             break;
         lexem->num = base * lexem->num + v;

@@ -30,19 +30,19 @@ namespace
 {
 
 enum crypto_method_t g_cur_method = CRYPTO_NONE;
-byte g_key[16];
+uint8_t g_key[16];
 CBC_Mode<AES>::Encryption g_aes_enc;
 CBC_Mode<AES>::Decryption g_aes_dec;
 bool g_aes_enc_key_dirty; /* true of g_aes_enc key needs to be updated */
 bool g_aes_dec_key_dirty; /* same for g_aes_dec */
 
 int cbc_mac2(
-    const byte *in_data, /* Input data */
-    byte *out_data, /* Output data (or NULL) */
+    const uint8_t *in_data, /* Input data */
+    uint8_t *out_data, /* Output data (or NULL) */
     int nr_blocks, /* Number of blocks to encrypt/decrypt (one block=16 bytes) */
-    byte key[16], /* Key */
-    byte iv[16], /* Initialisation Vector */
-    byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
+    uint8_t key[16], /* Key */
+    uint8_t iv[16], /* Initialisation Vector */
+    uint8_t (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
     bool encrypt /* 1 to encrypt, 0 to decrypt */
     )
 {
@@ -58,10 +58,10 @@ int cbc_mac2(
             g_aes_enc_key_dirty = false;
         }
         g_aes_enc.Resynchronize(iv, 16);
-        byte tmp[16];
+        uint8_t tmp[16];
         /* we need some output buffer, either a temporary one if we are CBC-MACing
          * only, or use output buffer if available */
-        byte *out_ptr = (out_data == NULL) ? tmp : out_data;
+        uint8_t *out_ptr = (out_data == NULL) ? tmp : out_data;
         while(nr_blocks-- > 0)
         {
             g_aes_enc.ProcessData(out_ptr, in_data, 16);
@@ -113,11 +113,11 @@ int crypto_setup(struct crypto_key_t *key)
 }
 
 int crypto_apply(
-    byte *in_data, /* Input data */
-    byte *out_data, /* Output data (or NULL) */
+    uint8_t *in_data, /* Input data */
+    uint8_t *out_data, /* Output data (or NULL) */
     int nr_blocks, /* Number of blocks (one block=16 bytes) */
-    byte iv[16], /* Key */
-    byte (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
+    uint8_t iv[16], /* Key */
+    uint8_t (*out_cbc_mac)[16], /* CBC-MAC of the result (or NULL) */
     bool encrypt)
 {
     if(g_cur_method == CRYPTO_KEY)
@@ -131,7 +131,7 @@ void sha_1_init(struct sha_1_params_t *params)
     params->object = new SHA1;
 }
 
-void sha_1_update(struct sha_1_params_t *params, byte *buffer, int size)
+void sha_1_update(struct sha_1_params_t *params, uint8_t *buffer, int size)
 {
     reinterpret_cast<SHA1 *>(params->object)->Update(buffer, size);
 }
@@ -143,7 +143,7 @@ void sha_1_finish(struct sha_1_params_t *params)
     delete obj;
 }
 
-void sha_1_output(struct sha_1_params_t *params, byte *out)
+void sha_1_output(struct sha_1_params_t *params, uint8_t *out)
 {
     memcpy(out, params->hash, 20);
 }

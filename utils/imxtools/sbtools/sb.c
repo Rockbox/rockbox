@@ -223,7 +223,7 @@ static void produce_sb_section_header(struct sb_section_t *sec,
 static uint8_t instruction_checksum(struct sb_instruction_header_t *hdr)
 {
     uint8_t sum = 90;
-    byte *ptr = (byte *)hdr;
+    uint8_t *ptr = (uint8_t *)hdr;
     for(int i = 1; i < 16; i++)
         sum += ptr[i];
     return sum;
@@ -287,8 +287,8 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
     struct crypto_key_t real_key;
     real_key.method = CRYPTO_KEY;
-    byte crypto_iv[16];
-    byte (*cbc_macs)[16] = xmalloc(16 * g_nr_keys);
+    uint8_t crypto_iv[16];
+    uint8_t (*cbc_macs)[16] = xmalloc(16 * g_nr_keys);
     /* init CBC-MACs */
     for(int i = 0; i < g_nr_keys; i++)
         memset(cbc_macs[i], 0, 16);
@@ -319,8 +319,8 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     struct sb_header_t sb_hdr;
     produce_sb_header(sb, &sb_hdr);
     /* allocate image */
-    byte *buf = xmalloc(sb_hdr.image_size * BLOCK_SIZE);
-    byte *buf_p = buf;
+    uint8_t *buf = xmalloc(sb_hdr.image_size * BLOCK_SIZE);
+    uint8_t *buf_p = buf;
     #define write(p, sz) do { memcpy(buf_p, p, sz); buf_p += sz; } while(0)
     #define check_crypto(expr) \
         do { int err = expr; \
@@ -329,7 +329,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
                 cprintf(u, true, GREY, "Crypto error: %d\n", err); \
                 return SB_CRYPTO_ERROR; } } while(0)
 
-    sha_1_update(&file_sha1, (byte *)&sb_hdr, sizeof(sb_hdr));
+    sha_1_update(&file_sha1, (uint8_t *)&sb_hdr, sizeof(sb_hdr));
     write(&sb_hdr, sizeof(sb_hdr));
 
     memcpy(crypto_iv, &sb_hdr, 16);
@@ -338,7 +338,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     for(int i = 0; i < g_nr_keys; i++)
     {
         check_crypto(crypto_setup(&g_key_array[i]));
-        check_crypto(crypto_apply((byte *)&sb_hdr, NULL, sizeof(sb_hdr) / BLOCK_SIZE,
+        check_crypto(crypto_apply((uint8_t *)&sb_hdr, NULL, sizeof(sb_hdr) / BLOCK_SIZE,
             cbc_macs[i], &cbc_macs[i], true));
     }
 
@@ -347,13 +347,13 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     {
         struct sb_section_header_t sb_sec_hdr;
         produce_sb_section_header(&sb->sections[i], &sb_sec_hdr);
-        sha_1_update(&file_sha1, (byte *)&sb_sec_hdr, sizeof(sb_sec_hdr));
+        sha_1_update(&file_sha1, (uint8_t *)&sb_sec_hdr, sizeof(sb_sec_hdr));
         write(&sb_sec_hdr, sizeof(sb_sec_hdr));
         /* update CBC-MACs */
         for(int j = 0; j < g_nr_keys; j++)
         {
             check_crypto(crypto_setup(&g_key_array[j]));
-            check_crypto(crypto_apply((byte *)&sb_sec_hdr, NULL,
+            check_crypto(crypto_apply((uint8_t *)&sb_sec_hdr, NULL,
                 sizeof(sb_sec_hdr) / BLOCK_SIZE, cbc_macs[j], &cbc_macs[j], true));
         }
     }
@@ -365,7 +365,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
         check_crypto(crypto_setup(&g_key_array[i]));
         check_crypto(crypto_apply(real_key.u.key, entry.key, 1, crypto_iv, NULL, true));
         write(&entry, sizeof(entry));
-        sha_1_update(&file_sha1, (byte *)&entry, sizeof(entry));
+        sha_1_update(&file_sha1, (uint8_t *)&entry, sizeof(entry));
     }
 
     /* HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK HACK */
@@ -391,7 +391,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     unsigned init_gap = (sb->sections[0].file_offset - 1) * BLOCK_SIZE - (buf_p - buf);
     if(init_gap > 0)
     {
-        byte *data = xmalloc(init_gap);
+        uint8_t *data = xmalloc(init_gap);
         generate_random_data(data, init_gap);
         sha_1_update(&file_sha1, data, init_gap);
         write(data, init_gap);
@@ -407,13 +407,13 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
         produce_section_tag_cmd(&sb->sections[i], &tag_cmd, (i + 1) == sb_hdr.nr_sections);
         if(g_nr_keys > 0)
         {
-            check_crypto(crypto_apply((byte *)&tag_cmd, (byte *)&tag_cmd,
+            check_crypto(crypto_apply((uint8_t *)&tag_cmd, (uint8_t *)&tag_cmd,
                 sizeof(tag_cmd) / BLOCK_SIZE, crypto_iv, NULL, true));
         }
-        sha_1_update(&file_sha1, (byte *)&tag_cmd, sizeof(tag_cmd));
+        sha_1_update(&file_sha1, (uint8_t *)&tag_cmd, sizeof(tag_cmd));
         write(&tag_cmd, sizeof(tag_cmd));
         /* produce other commands */
-        byte cur_cbc_mac[16];
+        uint8_t cur_cbc_mac[16];
         memcpy(cur_cbc_mac, crypto_iv, 16);
         for(int j = 0; j < sb->sections[i].nr_insts; j++)
         {
@@ -425,17 +425,17 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
                 produce_sb_instruction(inst, &cmd, u, cprintf);
                 if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
                 {
-                    check_crypto(crypto_apply((byte *)&cmd, (byte *)&cmd,
+                    check_crypto(crypto_apply((uint8_t *)&cmd, (uint8_t *)&cmd,
                         sizeof(cmd) / BLOCK_SIZE, cur_cbc_mac, &cur_cbc_mac, true));
                 }
-                sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
+                sha_1_update(&file_sha1, (uint8_t *)&cmd, sizeof(cmd));
                 write(&cmd, sizeof(cmd));
             }
             /* data */
             if(inst->inst == SB_INST_LOAD || inst->inst == SB_INST_DATA)
             {
                 uint32_t sz = inst->size + inst->padding_size;
-                byte *data = xmalloc(sz);
+                uint8_t *data = xmalloc(sz);
                 memcpy(data, inst->data, inst->size);
                 memcpy(data + inst->size, inst->padding, inst->padding_size);
                 if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
@@ -452,7 +452,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
         uint32_t pad_size = sb->sections[i].pad_size;
         if(sb->sections[i].is_data)
         {
-            byte *data = xmalloc(pad_size * BLOCK_SIZE);
+            uint8_t *data = xmalloc(pad_size * BLOCK_SIZE);
             generate_random_data(data, pad_size * BLOCK_SIZE);
             sha_1_update(&file_sha1, data, pad_size * BLOCK_SIZE);
             write(data, pad_size * BLOCK_SIZE);
@@ -468,16 +468,16 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
                 cmd.hdr.checksum = instruction_checksum(&cmd.hdr);
                 if(g_nr_keys > 0 && !sb->sections[i].is_cleartext)
                 {
-                    check_crypto(crypto_apply((byte *)&cmd, (byte *)&cmd,
+                    check_crypto(crypto_apply((uint8_t *)&cmd, (uint8_t *)&cmd,
                         sizeof(cmd) / BLOCK_SIZE, cur_cbc_mac, &cur_cbc_mac, true));
                 }
-                sha_1_update(&file_sha1, (byte *)&cmd, sizeof(cmd));
+                sha_1_update(&file_sha1, (uint8_t *)&cmd, sizeof(cmd));
                 write(&cmd, sizeof(cmd));
             }
         }
     }
     /* write file SHA-1 */
-    byte final_sig[32];
+    uint8_t final_sig[32];
     sha_1_finish(&file_sha1);
     sha_1_output(&file_sha1, final_sig);
     generate_random_data(final_sig + 20, 12);
@@ -513,7 +513,7 @@ enum sb_error_t sb_write_file(struct sb_file_t *sb, const char *filename, void *
     #undef printf
 }
 
-static struct sb_section_t *read_section(bool data_sec, uint32_t id, byte *buf,
+static struct sb_section_t *read_section(bool data_sec, uint32_t id, uint8_t *buf,
     int size, const char *indent, void *u, generic_printf_t cprintf, enum sb_error_t *err)
 {
     #define printf(c, ...) cprintf(u, false, c, __VA_ARGS__)
@@ -758,7 +758,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
                 fatal(SB_CRYPTO_ERROR, "Crypto error: %d\n", err); } while(0)
 
     struct sha_1_params_t sha_1_params;
-    byte (*cbcmacs)[16] = xmalloc(16 * g_nr_keys);
+    uint8_t (*cbcmacs)[16] = xmalloc(16 * g_nr_keys);
     sb_file = xmalloc(sizeof(struct sb_file_t));
     memset(sb_file, 0, sizeof(struct sb_file_t));
     struct sb_header_t *sb_header = (struct sb_header_t *)buf;
@@ -790,10 +790,10 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
     printf(GREEN, "  SB version: ");
     printf(YELLOW, "%d.%d\n", sb_header->major_ver, sb_header->minor_ver);
     printf(GREEN, "  Header SHA-1: ");
-    byte *hdr_sha1 = sb_header->sha1_header;
+    uint8_t *hdr_sha1 = sb_header->sha1_header;
     print_hex(YELLOW, hdr_sha1, 20, false);
     /* Check SHA1 sum */
-    byte computed_sha1[20];
+    uint8_t computed_sha1[20];
     sha_1_init(&sha_1_params);
     sha_1_update(&sha_1_params, &sb_header->signature[0],
         sizeof(struct sb_header_t) - sizeof(sb_header->sha1_header));
@@ -876,7 +876,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
             print_key(&printer, sb_printer, &g_key_array[i], true);
             printf(GREEN, "    CBC-MAC: ");
             /* check it */
-            byte zero[16];
+            uint8_t zero[16];
             memset(zero, 0, 16);
             check_crypto(crypto_setup(&g_key_array[i]));
             check_crypto(crypto_apply(buf, NULL, sb_header->header_size +
@@ -906,8 +906,8 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
             {
                 printf(RED, " Match\n");
                 /* decrypt */
-                byte decrypted_key[16];
-                byte iv[16];
+                uint8_t decrypted_key[16];
+                uint8_t iv[16];
                 memcpy(iv, buf, 16); /* uses the first 16-bytes of SHA-1 sig as IV */
                 check_crypto(crypto_setup(&g_key_array[idx]));
                 check_crypto(crypto_apply(dict_entry->key, decrypted_key, 1, iv, NULL, false));
@@ -1008,7 +1008,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
             }
 
             /* save it */
-            byte *sec = xmalloc(size);
+            uint8_t *sec = xmalloc(size);
             if(encrypted)
                 check_crypto(crypto_apply(buf + pos, sec, size / BLOCK_SIZE, buf, NULL, false));
             else
@@ -1034,13 +1034,13 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
         /* advanced raw mode */
         printf(BLUE, "Commands\n");
         uint32_t offset = sb_header->first_boot_tag_off * BLOCK_SIZE;
-        byte iv[16];
+        uint8_t iv[16];
         const char *indent = "    ";
         while(true)
         {
             /* restart with IV */
             memcpy(iv, buf, 16);
-            byte cmd[BLOCK_SIZE];
+            uint8_t cmd[BLOCK_SIZE];
             if(sb_header->nr_keys > 0)
                 check_crypto(crypto_apply(buf + offset, cmd, 1, iv, &iv, false));
             else
@@ -1106,7 +1106,7 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
                 }
 
                 /* save it */
-                byte *sec = xmalloc(size);
+                uint8_t *sec = xmalloc(size);
                 if(encrypted)
                     check_crypto(crypto_apply(buf + pos, sec, size / BLOCK_SIZE, buf, NULL, false));
                 else
@@ -1147,11 +1147,11 @@ struct sb_file_t *sb_read_memory(void *_buf, size_t filesize, unsigned flags, vo
 
     /* final signature */
     printf(BLUE, "Final signature:\n");
-    byte decrypted_block[32];
+    uint8_t decrypted_block[32];
     if(sb_header->nr_keys > 0)
     {
         printf(GREEN, "  Encrypted SHA-1:\n");
-        byte *encrypted_block = &buf[filesize - 32];
+        uint8_t *encrypted_block = &buf[filesize - 32];
         printf(OFF, "    ");
         print_hex(YELLOW, encrypted_block, 16, true);
         printf(OFF, "    ");

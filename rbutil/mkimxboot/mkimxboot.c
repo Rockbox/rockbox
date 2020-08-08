@@ -655,7 +655,7 @@ static enum imx_error_t find_model_by_md5sum(uint8_t file_md5sum[16], int *md5_i
         }
         for(int j = 0; j < 16; j++)
         {
-            byte a, b;
+            uint8_t a, b;
             if(convxdigit(imx_sums[i].md5sum[2 * j], &a) || convxdigit(imx_sums[i].md5sum[2 * j + 1], &b))
             {
                 printf("[ERR][INTERNAL] Bad checksum format: %s\n", imx_sums[i].md5sum);
