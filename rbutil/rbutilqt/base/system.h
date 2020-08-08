@@ -26,6 +26,7 @@
 
 #include <inttypes.h>
 
+#include <QMultiMap>
 #include <QString>
 #include <QUrl>
 
@@ -43,7 +44,7 @@ public:
     static QString userName(void);
     static QString osVersionString(void);
     static QList<uint32_t> listUsbIds(void);
-    static QMap<uint32_t, QString> listUsbDevices(void);
+    static QMultiMap<uint32_t, QString> listUsbDevices(void);
 
     static QUrl systemProxy(void);
 

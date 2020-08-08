@@ -23,7 +23,7 @@
 #include "systeminfo.h"
 #include "Logger.h"
 
-#ifdef UNICODE
+#if !defined(_UNICODE)
 #define _UNICODE
 #endif
 

@@ -350,12 +350,12 @@ void Config::setDevices()
     else
         platformList = SystemInfo::platforms(SystemInfo::PlatformAll);
 
-    QMap <QString, QString> manuf;
+    QMultiMap <QString, QString> manuf;
     for(int it = 0; it < platformList.size(); it++)
     {
         QString curbrand = SystemInfo::platformValue(platformList.at(it),
                     SystemInfo::CurBrand).toString();
-        manuf.insertMulti(curbrand, platformList.at(it));
+        manuf.insert(curbrand, platformList.at(it));
     }
 
     // set up devices table

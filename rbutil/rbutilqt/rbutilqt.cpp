@@ -55,7 +55,7 @@
 #include <stdio.h>
 #endif
 #if defined(Q_OS_WIN32)
-#if defined(UNICODE)
+#if !defined(_UNICODE)
 #define _UNICODE
 #endif
 #include <stdio.h>

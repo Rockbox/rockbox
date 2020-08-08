@@ -48,7 +48,7 @@ QString Sysinfo::getInfo(Sysinfo::InfoType type)
     info += tr("<b>Permissions</b><br/>%1<hr/>").arg(System::userPermissionsString());
 #endif
     info += tr("<b>Attached USB devices</b><br/>");
-    QMap<uint32_t, QString> usbids = System::listUsbDevices();
+    QMultiMap<uint32_t, QString> usbids = System::listUsbDevices();
     QList<uint32_t> usbkeys = usbids.keys();
     for(int i = 0; i < usbkeys.size(); i++) {
         info += tr("VID: %1 PID: %2, %3")

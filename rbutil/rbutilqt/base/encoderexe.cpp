@@ -78,7 +78,7 @@ bool EncoderExe::encode(QString input,QString output)
     execstring.replace("%output",output);
     LOG_INFO() << "cmd: " << execstring;
     int result = QProcess::execute(execstring);
-    return (result == 0) ? true : false;
+    return result == 0;
 }
 
 

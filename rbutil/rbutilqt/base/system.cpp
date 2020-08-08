@@ -235,9 +235,9 @@ QList<uint32_t> System::listUsbIds(void)
 /** @brief detect devices based on usb pid / vid.
  *  @return list with usb VID / PID values.
  */
-QMap<uint32_t, QString> System::listUsbDevices(void)
+QMultiMap<uint32_t, QString> System::listUsbDevices(void)
 {
-    QMap<uint32_t, QString> usbids;
+    QMultiMap<uint32_t, QString> usbids;
     // usb pid detection
     LOG_INFO() << "Searching for USB devices";
 #if defined(Q_OS_LINUX)
@@ -272,7 +272,7 @@ QMap<uint32_t, QString> System::listUsbDevices(void)
             if(name.isEmpty())
                 name = tr("(no description available)");
             if(id) {
-                usbids.insertMulti(id, name);
+                usbids.insert(id, name);
                 LOG_INFO("USB: 0x%08x, %s", id, name.toLocal8Bit().data());
             }
         }
