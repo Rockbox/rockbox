@@ -77,11 +77,12 @@ int crypto_apply(
 uint32_t crc(uint8_t *data, int size);
 uint32_t crc_continue(uint32_t previous_crc, uint8_t *data, int size);
 
+#include "tomcrypt.h"
 /* sha1.c */
 struct sha_1_params_t
 {
     uint8_t hash[20]; /* final hash */
-    void *object; /* pointer to CryptoPP::SHA1 object */
+    hash_state state; /* libtomcrypt state */
 };
 
 void sha_1_init(struct sha_1_params_t *params);

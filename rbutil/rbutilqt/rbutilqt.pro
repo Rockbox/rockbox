@@ -85,7 +85,8 @@ extralibs.commands = $$SILENT \
 # Note: order is important for RBLIBS! The libs are appended to the linker
 # flags in this order, put libucl at the end.
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
-         mkmpioboot chinachippatcher mkimxboot mks5lboot bspatch ucl
+         mkmpioboot chinachippatcher mkimxboot mks5lboot bspatch ucl \
+         rbtomcrypt
 # NOTE: Linking bzip2 causes problems on Windows (Qt seems to export those
 # symbols as well, similar to what we have with zlib.) Only link that on
 # non-Windows for now.
@@ -138,9 +139,6 @@ LIBS += -L$$OUT_PWD -L$$MYLIBBUILDDIR
 for(rblib, RBLIBS) {
     LIBS += -l$$rblib
 }
-
-# We need libcrypto++
-LIBS += -lcryptopp
 
 # on win32 libz is linked implicitly.
 !win32 {
