@@ -1,0 +1,7 @@
+This folder contains the source from libtomcrypt.
+
+Only the source files that are actually used have been added. If more
+functionality is needed add the missing files.
+
+The source tree has last been synced with libtomcrypt 1.18.2 on 2020-08-08.
+
