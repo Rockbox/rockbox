@@ -72,7 +72,7 @@ iriverify.c
 
 #if defined(HAVE_LCD_COLOR) && \
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
-#if (PLUGIN_BUFFER_SIZE > 0x14000) && defined(CPU_ARM)
+#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_HOSTED)) && (defined(CPU_ARM) || defined(CPU_MIPS))
 duke3d.c
 quake.c
 wolf3d.c
