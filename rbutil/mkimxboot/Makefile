@@ -13,18 +13,16 @@ COMPILEFLAGS := -Wall -g -O3 -I$(IMXTOOLS_DIR)
 
 # std=gnu99 is required by MinGW on Windows (c99 is sufficient for Linux / MXE)
 CFLAGS += -std=gnu99 $(COMPILEFLAGS)
-CXXFLAGS += $(COMPILEFLAGS)
 
 TOMCRYPT_DIR := ../../utils/tomcrypt
 
-CXXFLAGS += -I$(TOMCRYPT_DIR)/src/headers
 CFLAGS += -I$(TOMCRYPT_DIR)/src/headers
 LDOPTS += -lpthread $(TOMCRYPT_DIR)/librbtomcrypt.a
 
 OUTPUT = mkimxboot
 
 # inputs for lib
-IMXTOOLS_SOURCES = misc.c sb.c crypto.cpp crc.c elf.c
+IMXTOOLS_SOURCES = misc.c sb.c crypto.c crc.c elf.c
 LIBSOURCES := dualboot.c mkimxboot.c md5.c \
 	      $(addprefix $(IMXTOOLS_DIR),$(IMXTOOLS_SOURCES))
 
