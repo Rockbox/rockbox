@@ -33,12 +33,14 @@ export CC=$(EXTRALIBS_CC)
 export CXX=$(EXTRALIBS_CXX)
 export AR=$(EXTRALIBS_AR)
 
-libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot libmks5lboot libbzip2 libbspatch
+libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot libmks5lboot libbzip2 libbspatch librbtomcrypt
 
 # To support cross compiles, we explicitly pass the CC flag below for
 # all tools which override CC or CXX in their makefiles. CXX is only
 # used by mkimxboot.
 
+librbtomcrypt:
+	$(SILENT) $(MAKE) -C $(RBBASE_DIR)/utils/tomcrypt BUILD_DIR=$(BUILD_DIR)/tomcrypt librbtomcrypt.a
 librbspeex:
 	$(SILENT) $(MAKE) -C $(RBBASE_DIR)/tools/rbspeex BUILD_DIR=$(BUILD_DIR)/libspeex librbspeex.a
 
