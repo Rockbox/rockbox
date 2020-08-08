@@ -15,9 +15,6 @@ all: $(BINS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
-
 sbtoelf: sbtoelf.o crc.o crypto.o xorcrypt.o dbparser.o elf.o misc.o sb.o sb1.o $(TOMCRYPT_DIR)/librbtomcrypt.a
 	$(LD) -o $@ $^ $(LDFLAGS)
 
