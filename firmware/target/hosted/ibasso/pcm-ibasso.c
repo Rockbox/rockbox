@@ -310,7 +310,7 @@ void pcm_play_dma_init(void)
         pcm_thread_run relies on this size match. See pcm_mixer.h.
     */
     _config.channels          = 2;
-    _config.rate              = 44100;
+    _config.rate              = pcm_sampr;
     _config.period_size       = 256;
     _config.period_count      = 4;
     _config.format            = PCM_FORMAT_S16_LE;
