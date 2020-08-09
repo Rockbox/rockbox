@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_669.c,v 1.3 2005/04/07 19:57:38 realtech Exp $
+  $Id: $
 
   Composer 669 module loader
 
@@ -49,11 +49,11 @@ extern int fprintf(FILE *, const char *, ...);
 /*========== Module structure */
 
 /* header */
-typedef struct S69HEADER {   
+typedef struct S69HEADER {
 	UBYTE	marker[2];
 	CHAR	message[108];
 	UBYTE	nos;
-	UBYTE	rbnop;
+	UBYTE	RBnop;
 	UBYTE	looporder;
 	UBYTE	orders[0x80];
 	UBYTE	tempos[0x80];
@@ -81,7 +81,7 @@ static	S69NOTE* s69pat=NULL;
 static	S69HEADER* mh=NULL;
 
 /* file type identification */
-static	CHAR* S69_Version[]={
+static	const CHAR* S69_Version[]={
 	"Composer 669",
 	"Extended 669"
 };
@@ -134,6 +134,8 @@ static void S69_Cleanup(void)
 {
 	MikMod_free(s69pat);
 	MikMod_free(mh);
+	mh=NULL;
+	s69pat=NULL;
 }
 
 static int S69_LoadPatterns(void)
@@ -142,7 +144,7 @@ static int S69_LoadPatterns(void)
 	UBYTE note,inst,vol,effect,lastfx,lastval;
 	S69NOTE *cur;
 	int tracks=0;
-	
+
 	if(!AllocPatterns()) return 0;
 	if(!AllocTracks()) return 0;
 
@@ -226,7 +228,7 @@ static int S69_LoadPatterns(void)
 						case 5: /* set speed */
 							if (effect)
 								UniPTEffect(0xf,effect);
-							else 
+							else
 							  if(mh->marker[0]!=0x69) {
 #ifdef MIKMOD_DEBUG
 								fprintf(stderr,"\r669: unsupported super fast tempo at pat=%d row=%d chan=%d\n",
@@ -250,13 +252,13 @@ static int S69_Load(int curious)
 	int i;
 	SAMPLE *current;
 	S69SAMPLE sample;
-    (void)curious;
+	(void)curious;
 
 	/* module header */
 	_mm_read_UBYTES(mh->marker,2,modreader);
 	_mm_read_UBYTES(mh->message,108,modreader);
 	mh->nos=_mm_read_UBYTE(modreader);
-	mh->rbnop=_mm_read_UBYTE(modreader);
+	mh->RBnop=_mm_read_UBYTE(modreader);
 	mh->looporder=_mm_read_UBYTE(modreader);
 	_mm_read_UBYTES(mh->orders,0x80,modreader);
 	for(i=0;i<0x80;i++)
@@ -281,9 +283,9 @@ static int S69_Load(int curious)
 	of.initspeed=4;
 	of.inittempo=78;
 	of.songname=DupStr(mh->message,36,1);
-	of.modtype=StrDup(S69_Version[memcmp(mh->marker,"JN",2)==0]);
+	of.modtype=MikMod_strdup(S69_Version[memcmp(mh->marker,"JN",2)==0]);
 	of.numchn=8;
-	of.numpat=mh->rbnop;
+	of.numpat=mh->RBnop;
 	of.numins=of.numsmp=mh->nos;
 	of.numtrk=of.numchn*of.numpat;
 	of.flags=UF_XMPERIODS|UF_LINEAR;
@@ -292,7 +294,7 @@ static int S69_Load(int curious)
 	for(i=36+35;(i>=36+0)&&(mh->message[i]==' ');i--) mh->message[i]=0;
 	for(i=72+35;(i>=72+0)&&(mh->message[i]==' ');i--) mh->message[i]=0;
 	if((mh->message[0])||(mh->message[36])||(mh->message[72]))
-		if((of.comment=(CHAR*)MikMod_malloc(3*(36+1)+1))) {
+		if((of.comment=(CHAR*)MikMod_malloc(3*(36+1)+1)) != NULL) {
 			strncpy(of.comment,mh->message,36);
 			strcat(of.comment,"\r");
 			if (mh->message[36]) strncat(of.comment,mh->message+36,36);
@@ -304,7 +306,7 @@ static int S69_Load(int curious)
 
 	if(!AllocPositions(0x80)) return 0;
 	for(i=0;i<0x80;i++) {
-		if(mh->orders[i]>=mh->rbnop) break;
+		if(mh->orders[i]>=mh->RBnop) break;
 		of.positions[i]=mh->orders[i];
 	}
 	of.numpos=i;

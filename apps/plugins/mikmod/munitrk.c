@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: munitrk.c,v 1.2 2005/03/30 19:11:46 realtech Exp $
+  $Id$
 
   All routines dealing with the manipulation of UNITRK streams
 
@@ -37,7 +37,7 @@
 /* Unibuffer chunk size */
 #define BUFPAGE  128
 
-UWORD unioperands[UNI_LAST]={
+const UWORD unioperands[UNI_LAST] = {
 	0, /* not used */
 	1, /* UNI_NOTE */
 	1, /* UNI_INSTRUMENT */
@@ -214,7 +214,7 @@ static int UniExpand(int wanted)
 			unibuf = newbuf;
 			unimax+=BUFPAGE;
 			return 1;
-		} else 
+		} else
 			return 0;
 	}
 	return 1;
@@ -236,7 +236,7 @@ void UniWriteWord(UWORD data)
 	}
 }
 
-static int MyCmp(UBYTE* a,UBYTE* b,UWORD l)
+static int MyCmp(const UBYTE* a,const UBYTE* b,UWORD l)
 {
 	UWORD t;
 
@@ -275,15 +275,15 @@ void UniNewline(void)
    stream. */
 UBYTE* UniDup(void)
 {
-	UBYTE *d;
+	void *d;
 
-	if (!UniExpand(unitt-unipc)) return NULL;
+	if (!UniExpand(unipc-unitt)) return NULL;
 	unibuf[unitt] = 0;
 
-	if(!(d=(UBYTE *)MikMod_malloc(unipc))) return NULL;
+	if(!(d=MikMod_malloc(unipc))) return NULL;
 	memcpy(d,unibuf,unipc);
 
-	return d;
+	return (UBYTE *)d;
 }
 
 int UniInit(void)
@@ -296,7 +296,7 @@ int UniInit(void)
 
 void UniCleanup(void)
 {
-	if(unibuf) MikMod_free(unibuf);
+	MikMod_free(unibuf);
 	unibuf = NULL;
 }
 
