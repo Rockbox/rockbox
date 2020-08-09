@@ -8,6 +8,9 @@
 
 #undef WIN32
 
+#define NO_DEPACKERS  // We don't support these
+//#define NO_HQMIXER    // We don't have the oomph
+
 #ifndef NO_MMSUPP_DEFINES
 #define snprintf(...)		rb->snprintf(__VA_ARGS__)
 #define fdprintf(...)		rb->fdprintf(__VA_ARGS__)
@@ -87,7 +90,12 @@ extern const struct plugin_api * rb;
 
 #endif /* !SIMULATOR */
 
+// Hardware that supports > 48KHz could use bigger buffers
+#if (HW_SAMPR_CAPS & ( SAMPR_CAP_96 | SAMPR_CAP_88 | SAMPR_CAP_64 ))
+#define BUF_SIZE 8192*8
+#else
 #define BUF_SIZE 4096*8
+#endif
 #define NBUF   2
 
 /* LibMikMod defines */

@@ -25,7 +25,7 @@
 /* Persistent configuration */
 #define MIKMOD_CONFIGFILE             "mikmod.cfg"
 #define MIKMOD_SETTINGS_MINVERSION    1
-#define MIKMOD_SETTINGS_VERSION       1
+#define MIKMOD_SETTINGS_VERSION       2
 
 #ifdef USETHREADS
 #define EV_EXIT 9999
@@ -161,7 +161,6 @@ static bool mod_ext(const char ext[])
        !rb->strcasecmp(ext,".dsm") ||
        !rb->strcasecmp(ext,".far") ||
        !rb->strcasecmp(ext,".gdm") ||
-       !rb->strcasecmp(ext,".gt2") ||
        !rb->strcasecmp(ext,".imf") ||
        !rb->strcasecmp(ext,".it") ||
        !rb->strcasecmp(ext,".m15") ||
@@ -174,6 +173,7 @@ static bool mod_ext(const char ext[])
        !rb->strcasecmp(ext,".stx") ||
        !rb->strcasecmp(ext,".ult") ||
        !rb->strcasecmp(ext,".uni") ||
+       !rb->strcasecmp(ext,".umx") ||
        !rb->strcasecmp(ext,".xm") )
             return true;
     else
@@ -305,7 +305,7 @@ static void showinfo(void)
     rb->lcd_putsxy(1, 1, statustext);
     sprintf(statustext, "Type: %s", module->modtype);
     rb->lcd_putsxy(1, 11, statustext);
-    
+
     sprintf(statustext, "Samples: %d", module->numsmp);
     rb->lcd_putsxy(1, 21, statustext);
 
@@ -315,25 +315,25 @@ static void showinfo(void)
         rb->lcd_putsxy(1, 31, statustext);
     }
 
-    sprintf(statustext, "pat: %03d/%03d  %2.2X", 
+    sprintf(statustext, "pat: %03d/%03d  %2.2X",
         module->sngpos, module->numpos - 1, module->patpos);
     rb->lcd_putsxy(1, 51, statustext);
 
-    sprintf(statustext, "spd: %d/%d", 
+    sprintf(statustext, "spd: %d/%d",
         module->sngspd, module->bpm);
     rb->lcd_putsxy(1, 61, statustext);
 
     sprintf(statustext, "vol: %ddB", rb->global_settings->volume);
     rb->lcd_putsxy(1, 71, statustext);
 
-    sprintf(statustext, "time: %d:%02d", 
+    sprintf(statustext, "time: %d:%02d",
         (playingtime / 60) % 60, playingtime % 60);
     rb->lcd_putsxy(1, 81, statustext);
 
     if (module->flags & UF_NNA)
     {
         sprintf(statustext, "chn: %d/%d+%d->%d",
-            module->realchn, module->numchn, 
+            module->realchn, module->numchn,
             module->totalchn - module->realchn,
             module->totalchn);
     }
@@ -465,25 +465,29 @@ struct mikmod_settings
 {
     int pansep;
     int reverb;
+    int sample_rate;
     bool interp;
     bool reverse;
     bool surround;
     bool boost;
+    bool hqmixer;
 };
 
 static struct mikmod_settings settings =
 {
     128,
     0,
+    SAMPLE_RATE,
     0,
     0,
     1,
-    1
+    1,
+    0,
 };
 
 static struct mikmod_settings old_settings;
 
-static struct configdata config[] =
+static const struct configdata config[] =
 {
     { TYPE_INT, 0, 128, { .int_p = &settings.pansep }, "Panning Separation", NULL},
     { TYPE_INT, 0, 15, { .int_p = &settings.reverb }, "Reverberation", NULL},
@@ -491,6 +495,8 @@ static struct configdata config[] =
     { TYPE_BOOL, 0, 1, { .bool_p = &settings.reverse }, "Reverse Channels", NULL},
     { TYPE_BOOL, 0, 1, { .bool_p = &settings.surround }, "Surround", NULL},
     { TYPE_BOOL, 0, 1, { .bool_p = &settings.boost }, "CPU Boost", NULL},
+    { TYPE_BOOL, 0, 1, { .bool_p = &settings.hqmixer }, "HQ Mixer", NULL},
+    { TYPE_INT, 0, HW_NUM_FREQ-1, { .int_p = &settings.sample_rate }, "Sample Rate", NULL},
 };
 
 static void applysettings(void)
@@ -498,6 +504,7 @@ static void applysettings(void)
     md_pansep = settings.pansep;
     md_reverb = settings.reverb;
     md_mode = DMODE_STEREO | DMODE_16BITS | DMODE_SOFT_MUSIC | DMODE_SOFT_SNDFX;
+
     if ( settings.interp )
     {
         md_mode |= DMODE_INTERP;
@@ -510,6 +517,21 @@ static void applysettings(void)
     {
         md_mode |= DMODE_SURROUND;
     }
+#ifndef NO_HQMIXER
+    if ( settings.hqmixer )
+    {
+        md_mode |= DMODE_HQMIXER;
+    }
+#endif
+
+    if (md_mixfreq != rb->hw_freq_sampr[settings.sample_rate]) {
+        md_mixfreq = rb->hw_freq_sampr[settings.sample_rate];
+//	MikMod_Reset("");  BROKEN!
+	rb->pcm_play_stop();
+	rb->mixer_set_frequency(md_mixfreq);
+	rb->mixer_channel_play_data(PCM_MIXER_CHAN_PLAYBACK, get_more, NULL, 0);
+    }
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     if ( Player_Active() )
     {
@@ -517,6 +539,21 @@ static void applysettings(void)
     }
 #endif
 }
+
+static const struct opt_items sr_names[HW_NUM_FREQ] = {
+        HW_HAVE_96_([HW_FREQ_96] = { "96kHz",     TALK_ID(96, UNIT_KHZ) },)
+        HW_HAVE_88_([HW_FREQ_88] = { "88.2kHz",   TALK_ID(88, UNIT_KHZ) },)
+        HW_HAVE_64_([HW_FREQ_64] = { "64kHz",     TALK_ID(64, UNIT_KHZ) },)
+        HW_HAVE_48_([HW_FREQ_48] = { "48kHz",     TALK_ID(48, UNIT_KHZ) },)
+        HW_HAVE_44_([HW_FREQ_44] = { "44.1kHz",   TALK_ID(44, UNIT_KHZ) },)
+        HW_HAVE_32_([HW_FREQ_32] = { "32kHz",     TALK_ID(32, UNIT_KHZ) },)
+        HW_HAVE_24_([HW_FREQ_24] = { "24kHz",     TALK_ID(24, UNIT_KHZ) },)
+        HW_HAVE_22_([HW_FREQ_22] = { "22.05kHz",  TALK_ID(22, UNIT_KHZ) },)
+        HW_HAVE_16_([HW_FREQ_16] = { "16kHz",     TALK_ID(16, UNIT_KHZ) },)
+        HW_HAVE_12_([HW_FREQ_12] = { "12kHz",     TALK_ID(12, UNIT_KHZ) },)
+        HW_HAVE_11_([HW_FREQ_11] = { "11.025kHz", TALK_ID(11, UNIT_KHZ) },)
+        HW_HAVE_8_( [HW_FREQ_8 ] = { "8kHz",      TALK_ID( 8, UNIT_KHZ) },)
+};
 
 /**
   Shows the settings menu
@@ -531,6 +568,8 @@ static int settings_menu(void)
                         ID2P(LANG_INTERPOLATION),
                         ID2P(LANG_SWAP_CHANNELS),
                         ID2P(LANG_MIKMOD_SURROUND),
+                        ID2P(LANG_MIKMOD_HQMIXER),
+                        ID2P(LANG_MIKMOD_SAMPLERATE),
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
                         ID2P(LANG_CPU_BOOST)
 #endif
@@ -571,6 +610,17 @@ static int settings_menu(void)
             break;
 
         case 5:
+            rb->set_bool(rb->str(LANG_MIKMOD_HQMIXER), &(settings.hqmixer));
+            applysettings();
+            break;
+
+        case 6:
+            rb->set_option(rb->str(LANG_MIKMOD_SAMPLERATE), &(settings.sample_rate), INT, sr_names,
+                           HW_NUM_FREQ, NULL);
+            applysettings();
+            break;
+
+        case 7:
             rb->set_bool(rb->str(LANG_CPU_BOOST), &(settings.boost));
             applysettings();
             break;
@@ -681,7 +731,7 @@ static int playfile(char* filename)
 #ifdef USETHREADS
     rb->queue_init(&thread_q, true);
     if ((thread_id = rb->create_thread(thread, thread_stack,
-        sizeof(thread_stack), 0, "render buffering thread" 
+        sizeof(thread_stack), 0, "render buffering thread"
         IF_PRIO(, PRIORITY_PLAYBACK)
         IF_COP(, CPU))) == 0)
     {
@@ -830,11 +880,11 @@ static int playfile(char* filename)
             rb->lcd_setfont(FONT_SYSFIXED);
             screenupdated = false;
             break;
-            
+
         case ACTION_WPS_STOP:
             quit = true;
             break;
-            
+
         default:
             if (rb->default_event_handler(button) == SYS_USB_CONNECTED)
             {
@@ -856,14 +906,14 @@ static int playfile(char* filename)
 
     Player_Stop();
     Player_Free(module);
-    
+
     memset(gmbuf, '\0', sizeof(gmbuf));
-    
+
     if ( retval == PLUGIN_OK && entries > 1 && !quit )
     {
         retval = change_filename(DIR_NEXT);
     }
-    
+
     return retval;
 }
 
@@ -891,10 +941,9 @@ enum plugin_status plugin_start(const void* parameter)
     rb->audio_set_input_source(AUDIO_SRC_PLAYBACK, SRCF_PLAYBACK);
     rb->audio_set_output_source(AUDIO_SRC_PLAYBACK);
 #endif
-    rb->mixer_set_frequency(SAMPLE_RATE);
 
     audio_buffer = rb->plugin_get_audio_buffer((size_t *)&audio_buffer_free);
-    
+
     rb->strcpy(np_file, parameter);
     get_mod_list();
     if(!entries) {
@@ -903,16 +952,15 @@ enum plugin_status plugin_start(const void* parameter)
 
     //add_pool(audio_buffer, audio_buffer_free);
     init_memory_pool(audio_buffer_free, audio_buffer);
-    
+
     MikMod_RegisterDriver(&drv_nos);
     MikMod_RegisterAllLoaders();
     MikMod_RegisterErrorHandler(mm_errorhandler);
 
-    md_mixfreq = SAMPLE_RATE;
-
     configfile_load(MIKMOD_CONFIGFILE, config,
                     ARRAYLEN(config), MIKMOD_SETTINGS_MINVERSION);
     rb->memcpy(&old_settings, &settings, sizeof (settings));
+
     applysettings();
 
     if (MikMod_Init(""))
@@ -941,7 +989,7 @@ enum plugin_status plugin_start(const void* parameter)
                         ARRAYLEN(config), MIKMOD_SETTINGS_MINVERSION);
         }
     }
-    
+
     destroy_memory_pool(audio_buffer);
 
     return retval;

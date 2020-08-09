@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mplayer.c,v 1.4 2006/08/08 00:06:31 realtech Exp $
+  $Id$
 
   The Protracker Player Driver
 
@@ -40,31 +40,35 @@
 #include <stdlib.h>
 #endif
 
+#include <limits.h>
+
 #include "mikmod_internals.h"
 
 #ifdef SUNOS
-extern int fprintf(FILE *, const char *, ...);
+extern int fprintf(int, const char *, ...);
 extern long int random(void);
 #endif
 
 /* The currently playing module */
 MODULE *pf = NULL;
 
+#define NUMVOICES(mod) (md_sngchn < (mod)->numvoices ? md_sngchn : (mod)->numvoices)
+
 #define	HIGH_OCTAVE		2	/* number of above-range octaves */
 
-static	UWORD oldperiods[OCTAVE*2]={
+static	const UWORD oldperiods[OCTAVE*2]={
 	0x6b00, 0x6800, 0x6500, 0x6220, 0x5f50, 0x5c80,
 	0x5a00, 0x5740, 0x54d0, 0x5260, 0x5010, 0x4dc0,
 	0x4b90, 0x4960, 0x4750, 0x4540, 0x4350, 0x4160,
 	0x3f90, 0x3dc0, 0x3c10, 0x3a40, 0x38b0, 0x3700
 };
 
-static	UBYTE VibratoTable[32]={
+static	const UBYTE VibratoTable[32]={
 	  0, 24, 49, 74, 97,120,141,161,180,197,212,224,235,244,250,253,
 	255,253,250,244,235,224,212,197,180,161,141,120, 97, 74, 49, 24
 };
 
-static	UBYTE avibtab[128]={
+static	const UBYTE avibtab[128]={
 	 0, 1, 3, 4, 6, 7, 9,10,12,14,15,17,18,20,21,23,
 	24,25,27,28,30,31,32,34,35,36,38,39,40,41,42,44,
 	45,46,47,48,49,50,51,52,53,54,54,55,56,57,57,58,
@@ -76,7 +80,7 @@ static	UBYTE avibtab[128]={
 };
 
 /* Triton's linear periods to frequency translation table (for XM modules) */
-static	ULONG lintab[768]={
+static	const ULONG lintab[768]={
 	535232,534749,534266,533784,533303,532822,532341,531861,
 	531381,530902,530423,529944,529466,528988,528511,528034,
 	527558,527082,526607,526131,525657,525183,524709,524236,
@@ -176,7 +180,7 @@ static	ULONG lintab[768]={
 };
 
 #define LOGFAC 2*16
-static	UWORD logtab[104]={
+static	const UWORD logtab[104]={
 	LOGFAC*907,LOGFAC*900,LOGFAC*894,LOGFAC*887,
 	LOGFAC*881,LOGFAC*875,LOGFAC*868,LOGFAC*862,
 	LOGFAC*856,LOGFAC*850,LOGFAC*844,LOGFAC*838,
@@ -205,7 +209,7 @@ static	UWORD logtab[104]={
 	LOGFAC*440,LOGFAC*437,LOGFAC*434,LOGFAC*431
 };
 
-static	SBYTE PanbrelloTable[256]={
+static	const SBYTE PanbrelloTable[256]={
 	  0,  2,  3,  5,  6,  8,  9, 11, 12, 14, 16, 17, 19, 20, 22, 23,
 	 24, 26, 27, 29, 30, 32, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44,
 	 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 56, 57, 58, 59,
@@ -225,12 +229,12 @@ static	SBYTE PanbrelloTable[256]={
 };
 
 /* returns a random value between 0 and ceil-1, ceil must be a power of two */
-static int getrandom(int ceil)
+static int getrandom(int ceilval)
 {
-#ifdef HAVE_SRANDOM
-	return random()&(ceil-1);
+#if defined(HAVE_SRANDOM) && !defined(_MIKMOD_AMIGA)
+	return random()&(ceilval-1);
 #else
-	return (rand()*ceil)/(RAND_MAX+1.0);
+	return (rand()*ceilval)/(RAND_MAX+1.0);
 #endif
 }
 
@@ -246,14 +250,14 @@ static int MP_FindEmptyChannel(MODULE *mod)
 	MP_VOICE *a;
 	ULONG t,k,tvol,pp;
 
-	for (t=0;t<md_sngchn;t++)
+	for (t=0;t<NUMVOICES(mod);t++)
 		if (((mod->voice[t].main.kick==KICK_ABSENT)||
 			 (mod->voice[t].main.kick==KICK_ENV))&&
 		   Voice_Stopped_internal(t))
 			return t;
 
 	tvol=0xffffffUL;t=-1;a=mod->voice;
-	for (k=0;k<md_sngchn;k++,a++) {
+	for (k=0;k<NUMVOICES(mod);k++,a++) {
 		/* allow us to take over a nonexisting sample */
 		if (!a->main.s)
 			return k;
@@ -325,9 +329,9 @@ static UWORD GetPeriod(UWORD flags, UWORD note, ULONG speed)
 {
 	if (flags & UF_XMPERIODS) {
 		if (flags & UF_LINEAR)
-				return getlinearperiod(note, speed);
+			return getlinearperiod(note, speed);
 		else
-				return getlogperiod(note, speed);
+			return getlogperiod(note, speed);
 	} else
 		return getoldperiod(note, speed);
 }
@@ -359,9 +363,15 @@ static SWORD StartEnvelope(ENVPR *t,UBYTE flg,UBYTE pts,UBYTE susbeg,UBYTE susen
 	t->a=0;
 	t->b=((t->flg&EF_SUSTAIN)&&(!(keyoff&KEY_OFF)))?0:1;
 
+	if (!t->pts) { /* FIXME: bad/crafted file. better/more general solution? */
+		t->b=0;
+		return t->env[0].val;
+	}
+
 	/* Imago Orpheus sometimes stores an extra initial point in the envelope */
 	if ((t->pts>=2)&&(t->env[0].pos==t->env[1].pos)) {
-		t->a++;t->b++;
+		t->a++;
+		t->b++;
 	}
 
 	/* Fit in the envelope, still */
@@ -615,10 +625,10 @@ static void DoToneSlide(UWORD tick, MP_CONTROL *a)
 			/* ...make tmpperiod equal tperiod */
 			a->tmpperiod=a->main.period=a->wantedperiod;
 		else if (dist>0) {
-			a->tmpperiod-=a->portspeed;	
+			a->tmpperiod-=a->portspeed;
 			a->main.period-=a->portspeed; /* dist>0, slide up */
 		} else {
-			a->tmpperiod+=a->portspeed;	
+			a->tmpperiod+=a->portspeed;
 			a->main.period+=a->portspeed; /* dist<0, slide down */
 		}
 	} else
@@ -786,8 +796,8 @@ static int DoPTEffect7(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffect8(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-    (void)tick;
-    (void)flags;
+	(void)tick;
+	(void)flags;
 
 	dat = UniGetByte();
 	if (mod->panflag)
@@ -799,16 +809,16 @@ static int DoPTEffect8(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffect9(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-    (void)flags;
-    (void)mod;
-    (void)channel;
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
 	dat=UniGetByte();
 	if (!tick) {
 		if (dat) a->soffset=(UWORD)dat<<8;
 		a->main.start=a->hioffset|a->soffset;
 
-		if ((a->main.s)&&(a->main.start > (SLONG)a->main.s->length))
+		if ((a->main.s)&&(a->main.start>(SLONG)a->main.s->length))
 			a->main.start=a->main.s->flags&(SF_LOOP|SF_BIDI)?
 			    a->main.s->loopstart:a->main.s->length;
 	}
@@ -819,9 +829,9 @@ static int DoPTEffect9(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffectA(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-    (void)flags;
-    (void)mod;
-    (void)channel;
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
 	dat=UniGetByte();
 	if (tick)
@@ -842,13 +852,18 @@ static int DoPTEffect6(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffectB(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-    (void)a;
-    (void)channel;
+	(void)a;
+	(void)channel;
 
 	dat=UniGetByte();
 
 	if (tick || mod->patdly2)
 		return 0;
+
+	if (dat >= mod->numpos) { /* crafted file? */
+	/*	fprintf(stderr,"DoPTEffectB: numpos=%d, dat=%d -> %d\n",mod->numpos,dat,mod->numpos-1);*/
+		dat=mod->numpos-1;
+	}
 
 	/* Vincent Voois uses a nasty trick in "Universal Bolero" */
 	if (dat == mod->sngpos && mod->patbrk == mod->patpos)
@@ -857,8 +872,8 @@ static int DoPTEffectB(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 	if (!mod->loop && !mod->patbrk &&
 	    (dat < mod->sngpos ||
 		 (mod->sngpos == (mod->numpos - 1) && !mod->patbrk) ||
-	     (dat == mod->sngpos && (flags & UF_NOWRAP))
-		)) {
+	     (dat == mod->sngpos && (flags & UF_NOWRAP)) ) )
+	{
 		/* if we don't loop, better not to skip the end of the
 		   pattern, after all... so:
 		mod->patbrk=0; */
@@ -870,6 +885,9 @@ static int DoPTEffectB(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		mod->sngpos=dat;
 		mod->posjmp=2;
 		mod->patpos=0;
+		/* cancel the FT2 pattern loop (E60) bug.
+		 * also see DoEEffects() below for it. */
+		if (flags & UF_FT2QUIRKS) mod->patbrk=0;
 	}
 
 	return 0;
@@ -878,15 +896,15 @@ static int DoPTEffectB(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffectC(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-    (void)flags;
-    (void)mod;
-    (void)channel;
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
-			dat=UniGetByte();
-			if (tick) return 0;
-			if (dat==(UBYTE)-1) a->anote=dat=0; /* note cut */
-			else if (dat>64) dat=64;
-			a->tmpvolume=dat;
+	dat=UniGetByte();
+	if (tick) return 0;
+	if (dat==(UBYTE)-1) a->anote=dat=0; /* note cut */
+	else if (dat>64) dat=64;
+	a->tmpvolume=dat;
 
 	return 0;
 }
@@ -894,29 +912,33 @@ static int DoPTEffectC(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 static int DoPTEffectD(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE dat;
-    (void)a;
-    (void)channel;
+	(void)a;
+	(void)channel;
 
-			dat=UniGetByte();
-			if ((tick)||(mod->patdly2)) return 0;
-			if ((mod->positions[mod->sngpos]!=LAST_PATTERN)&&
-			   (dat>mod->pattrows[mod->positions[mod->sngpos]]))
-				dat=mod->pattrows[mod->positions[mod->sngpos]];
-			mod->patbrk=dat;
-			if (!mod->posjmp) {
-				/* don't ask me to explain this code - it makes
-				   backwards.s3m and children.xm (heretic's version) play
-				   correctly, among others. Take that for granted, or write
-				   the page of comments yourself... you might need some
-				   aspirin - Miod */
-				if ((mod->sngpos==mod->numpos-1)&&(dat)&&((mod->loop)||
-				               (mod->positions[mod->sngpos]==(mod->numpat-1)
-								&& !(flags&UF_NOWRAP)))) {
-					mod->sngpos=0;
-					mod->posjmp=2;
-				} else
-					mod->posjmp=3;
-			}
+	dat=UniGetByte();
+	if ((tick)||(mod->patdly2)) return 0;
+	if (dat && dat >= mod->numrow) { /* crafted file? */
+	/*	fprintf(stderr,"DoPTEffectD: numrow=%d, dat=%d -> 0\n",mod->numrow,dat);*/
+		dat=0;
+	}
+	if ((mod->positions[mod->sngpos]!=LAST_PATTERN)&&
+	    (dat>mod->pattrows[mod->positions[mod->sngpos]])) {
+		dat=mod->pattrows[mod->positions[mod->sngpos]];
+	}
+	mod->patbrk=dat;
+	if (!mod->posjmp) {
+		/* don't ask me to explain this code - it makes
+		   backwards.s3m and children.xm (heretic's version) play
+		   correctly, among others. Take that for granted, or write
+		   the page of comments yourself... you might need some
+		   aspirin - Miod */
+		if ((mod->sngpos==mod->numpos-1)&&(dat)&&
+		    ((mod->loop) || (mod->positions[mod->sngpos]==(mod->numpat-1) && !(flags&UF_NOWRAP)))) {
+			mod->sngpos=0;
+			mod->posjmp=2;
+		} else
+			mod->posjmp=3;
+	}
 
 	return 0;
 }
@@ -982,8 +1004,13 @@ static void DoEEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod,
 				} else
 					mod->patpos=a->pat_reppos;
 			} else a->pat_reppos=POS_NONE;
-		} else
+		} else {
 			a->pat_reppos=mod->patpos-1; /* set reppos - can be (-1) */
+			/* emulate the FT2 pattern loop (E60) bug:
+			 * http://milkytracker.org/docs/MilkyTracker.html#fxE6x
+			 * roadblas.xm plays correctly with this. */
+			if (flags & UF_FT2QUIRKS) mod->patbrk=mod->patpos;
+		}
 		break;
 	case 0x7: /* set tremolo waveform */
 		a->wavecontrol&=0x0f;
@@ -1065,7 +1092,7 @@ static int DoPTEffectF(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 	if (tick||mod->patdly2) return 0;
 	if (mod->extspd&&(dat>=mod->bpmlimit))
 		mod->bpm=dat;
-	else 
+	else
 	  if (dat) {
 		mod->sngspd=(dat>=mod->bpmlimit)?mod->bpmlimit-1:dat;
 		mod->vbtick=0;
@@ -1465,7 +1492,7 @@ static int DoXMEffectA(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		a->s3mvolslide = inf;
 	else
 		inf = a->s3mvolslide;
-	
+
 	if (tick) {
 		lo=inf&0xf;
 		hi=inf>>4;
@@ -1608,7 +1635,7 @@ static int DoXMEffectL(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 		INSTRUMENT *i=a->main.i;
 		MP_VOICE *aout;
 
-		if ((aout=a->slave)) {
+		if ((aout=a->slave) != NULL) {
 			if (aout->venv.env) {
 				points=i->volenv[i->volpts-1].pos;
 				aout->venv.p=aout->venv.env[(dat>points)?points:dat].pos;
@@ -1710,7 +1737,7 @@ static void DoITToneSlide(UWORD tick, MP_CONTROL *a, UBYTE dat)
 	/* if we don't come from another note, ignore the slide and play the note
 	   as is */
 	if (!a->oldnote || !a->main.period)
-			return;
+		return;
 
 	if ((!tick)&&(a->newsamp)){
 		a->main.kick=KICK_NOTE;
@@ -1725,15 +1752,15 @@ static void DoITToneSlide(UWORD tick, MP_CONTROL *a, UBYTE dat)
 		   difference between those two values */
 		dist=a->main.period-a->wantedperiod;
 
-	    /* if they are equal or if portamentospeed is too big... */
+		/* if they are equal or if portamentospeed is too big... */
 		if ((!dist)||((a->portspeed<<2)>abs(dist)))
 			/* ... make tmpperiod equal tperiod */
 			a->tmpperiod=a->main.period=a->wantedperiod;
 		else
-		  if (dist>0) {	
+		  if (dist>0) {
 			a->tmpperiod-=a->portspeed<<2;
 			a->main.period-=a->portspeed<<2; /* dist>0 slide up */
-		} else {				
+		} else {
 			a->tmpperiod+=a->portspeed<<2;
 			a->main.period+=a->portspeed<<2; /* dist<0 slide down */
 		}
@@ -1762,7 +1789,7 @@ static void DoITVibrato(UWORD tick, MP_CONTROL *a, UBYTE dat)
 		if (dat&0xf0) a->vibspd=(dat&0xf0)>>2;
 	}
 	if (!a->main.period)
-			return;
+		return;
 
 	q=(a->vibpos>>2)&0x1f;
 
@@ -1867,7 +1894,7 @@ static int DoITEffectN(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWOR
 	lo=inf&0xf;
 	hi=inf>>4;
 
-	if (!hi) 
+	if (!hi)
 		a->main.chanvol-=lo;
 	else
 	  if (!lo) {
@@ -2105,13 +2132,13 @@ static int DoITEffectS0(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 	switch (c) {
 	case SS_GLISSANDO: /* S1x set glissando voice */
 		DoEEffects(tick, flags, a, mod, channel, 0x30|inf);
-		break;              
+		break;
 	case SS_FINETUNE: /* S2x set finetune */
 		DoEEffects(tick, flags, a, mod, channel, 0x50|inf);
 		break;
 	case SS_VIBWAVE: /* S3x set vibrato waveform */
 		DoEEffects(tick, flags, a, mod, channel, 0x40|inf);
-		break;   
+		break;
 	case SS_TREMWAVE: /* S4x set tremolo waveform */
 		DoEEffects(tick, flags, a, mod, channel, 0x70|inf);
 		break;
@@ -2130,13 +2157,13 @@ static int DoITEffectS0(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 	case SS_SURROUND: /* S9x set surround sound */
 		if (mod->panflag)
 			a->main.panning = mod->panning[channel] = PAN_SURROUND;
-		break;    
+		break;
 	case SS_HIOFFSET: /* SAy set high order sample offset yxx00h */
 		if (!tick) {
 			a->hioffset=inf<<16;
 			a->main.start=a->hioffset|a->soffset;
 
-			if ((a->main.s)&&(a->main.start > (SLONG)a->main.s->length))
+			if ((a->main.s)&&(a->main.start>(SLONG)a->main.s->length))
 				a->main.start=a->main.s->flags&(SF_LOOP|SF_BIDI)?
 				    a->main.s->loopstart:a->main.s->length;
 		}
@@ -2168,10 +2195,10 @@ static int DoITEffectS0(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 static int DoVolEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UBYTE c, inf;
-    (void)channel;
-	
-	c = UniGetByte(); 
-	inf = UniGetByte(); 
+	(void)channel;
+
+	c = UniGetByte();
+	inf = UniGetByte();
 
 	if ((!c)&&(!inf)) {
 		c=a->voleffect;
@@ -2219,16 +2246,16 @@ static int DoVolEffects(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWO
 static int DoULTEffect9(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD channel)
 {
 	UWORD offset=UniGetWord();
-    (void)tick;
-    (void)flags;
-    (void)mod;
-    (void)channel;
+	(void)tick;
+	(void)flags;
+	(void)mod;
+	(void)channel;
 
 	if (offset)
 		a->ultoffset=offset;
 
 	a->main.start=a->ultoffset<<2;
-	if ((a->main.s)&&(a->main.start > (SLONG)a->main.s->length))
+	if ((a->main.s)&&(a->main.start>(SLONG)a->main.s->length))
 		a->main.start=a->main.s->flags&(SF_LOOP|SF_BIDI)?
 		    a->main.s->loopstart:a->main.s->length;
 
@@ -2310,68 +2337,68 @@ static int DoNothing(UWORD tick, UWORD flags, MP_CONTROL *a, MODULE *mod, SWORD 
 typedef int (*effect_func) (UWORD, UWORD, MP_CONTROL *, MODULE *, SWORD);
 
 static effect_func effects[UNI_LAST] = {
-		DoNothing,		/* 0 */
-		DoNothing,		/* UNI_NOTE */
-		DoNothing,		/* UNI_INSTRUMENT */
-		DoPTEffect0,	/* UNI_PTEFFECT0 */
-		DoPTEffect1,	/* UNI_PTEFFECT1 */
-		DoPTEffect2,	/* UNI_PTEFFECT2 */
-		DoPTEffect3,	/* UNI_PTEFFECT3 */
-		DoPTEffect4,	/* UNI_PTEFFECT4 */
-		DoPTEffect5,	/* UNI_PTEFFECT5 */
-		DoPTEffect6,	/* UNI_PTEFFECT6 */
-		DoPTEffect7,	/* UNI_PTEFFECT7 */
-		DoPTEffect8,	/* UNI_PTEFFECT8 */
-		DoPTEffect9,	/* UNI_PTEFFECT9 */
-		DoPTEffectA,	/* UNI_PTEFFECTA */
-		DoPTEffectB,	/* UNI_PTEFFECTB */
-		DoPTEffectC,	/* UNI_PTEFFECTC */
-		DoPTEffectD,	/* UNI_PTEFFECTD */
-		DoPTEffectE,	/* UNI_PTEFFECTE */
-		DoPTEffectF,	/* UNI_PTEFFECTF */
-		DoS3MEffectA,	/* UNI_S3MEFFECTA */
-		DoS3MEffectD,	/* UNI_S3MEFFECTD */
-		DoS3MEffectE,	/* UNI_S3MEFFECTE */
-		DoS3MEffectF,	/* UNI_S3MEFFECTF */
-		DoS3MEffectI,	/* UNI_S3MEFFECTI */
-		DoS3MEffectQ,	/* UNI_S3MEFFECTQ */
-		DoS3MEffectR,	/* UNI_S3MEFFECTR */
-		DoS3MEffectT,	/* UNI_S3MEFFECTT */
-		DoS3MEffectU,	/* UNI_S3MEFFECTU */
-		DoKeyOff,		/* UNI_KEYOFF */
-		DoKeyFade,		/* UNI_KEYFADE */
-		DoVolEffects,	/* UNI_VOLEFFECTS */
-		DoPTEffect4,	/* UNI_XMEFFECT4 */
-		DoXMEffect6,	/* UNI_XMEFFECT6 */
-		DoXMEffectA,	/* UNI_XMEFFECTA */
-		DoXMEffectE1,	/* UNI_XMEFFECTE1 */
-		DoXMEffectE2,	/* UNI_XMEFFECTE2 */
-		DoXMEffectEA,	/* UNI_XMEFFECTEA */
-		DoXMEffectEB,	/* UNI_XMEFFECTEB */
-		DoXMEffectG,	/* UNI_XMEFFECTG */
-		DoXMEffectH,	/* UNI_XMEFFECTH */
-		DoXMEffectL,	/* UNI_XMEFFECTL */
-		DoXMEffectP,	/* UNI_XMEFFECTP */
-		DoXMEffectX1,	/* UNI_XMEFFECTX1 */
-		DoXMEffectX2,	/* UNI_XMEFFECTX2 */
-		DoITEffectG,	/* UNI_ITEFFECTG */
-		DoITEffectH,	/* UNI_ITEFFECTH */
-		DoITEffectI,	/* UNI_ITEFFECTI */
-		DoITEffectM,	/* UNI_ITEFFECTM */
-		DoITEffectN,	/* UNI_ITEFFECTN */
-		DoITEffectP,	/* UNI_ITEFFECTP */
-		DoITEffectT,	/* UNI_ITEFFECTT */
-		DoITEffectU,	/* UNI_ITEFFECTU */
-		DoITEffectW,	/* UNI_ITEFFECTW */
-		DoITEffectY,	/* UNI_ITEFFECTY */
-		DoNothing,		/* UNI_ITEFFECTZ */
-		DoITEffectS0,	/* UNI_ITEFFECTS0 */
-		DoULTEffect9,	/* UNI_ULTEFFECT9 */
-		DoMEDSpeed,		/* UNI_MEDSPEED */
-		DoMEDEffectF1,	/* UNI_MEDEFFECTF1 */
-		DoMEDEffectF2,	/* UNI_MEDEFFECTF2 */
-		DoMEDEffectF3,	/* UNI_MEDEFFECTF3 */
-		DoOktArp,		/* UNI_OKTARP */
+	DoNothing,		/* 0 */
+	DoNothing,		/* UNI_NOTE */
+	DoNothing,		/* UNI_INSTRUMENT */
+	DoPTEffect0,	/* UNI_PTEFFECT0 */
+	DoPTEffect1,	/* UNI_PTEFFECT1 */
+	DoPTEffect2,	/* UNI_PTEFFECT2 */
+	DoPTEffect3,	/* UNI_PTEFFECT3 */
+	DoPTEffect4,	/* UNI_PTEFFECT4 */
+	DoPTEffect5,	/* UNI_PTEFFECT5 */
+	DoPTEffect6,	/* UNI_PTEFFECT6 */
+	DoPTEffect7,	/* UNI_PTEFFECT7 */
+	DoPTEffect8,	/* UNI_PTEFFECT8 */
+	DoPTEffect9,	/* UNI_PTEFFECT9 */
+	DoPTEffectA,	/* UNI_PTEFFECTA */
+	DoPTEffectB,	/* UNI_PTEFFECTB */
+	DoPTEffectC,	/* UNI_PTEFFECTC */
+	DoPTEffectD,	/* UNI_PTEFFECTD */
+	DoPTEffectE,	/* UNI_PTEFFECTE */
+	DoPTEffectF,	/* UNI_PTEFFECTF */
+	DoS3MEffectA,	/* UNI_S3MEFFECTA */
+	DoS3MEffectD,	/* UNI_S3MEFFECTD */
+	DoS3MEffectE,	/* UNI_S3MEFFECTE */
+	DoS3MEffectF,	/* UNI_S3MEFFECTF */
+	DoS3MEffectI,	/* UNI_S3MEFFECTI */
+	DoS3MEffectQ,	/* UNI_S3MEFFECTQ */
+	DoS3MEffectR,	/* UNI_S3MEFFECTR */
+	DoS3MEffectT,	/* UNI_S3MEFFECTT */
+	DoS3MEffectU,	/* UNI_S3MEFFECTU */
+	DoKeyOff,	/* UNI_KEYOFF */
+	DoKeyFade,	/* UNI_KEYFADE */
+	DoVolEffects,	/* UNI_VOLEFFECTS */
+	DoPTEffect4,	/* UNI_XMEFFECT4 */
+	DoXMEffect6,	/* UNI_XMEFFECT6 */
+	DoXMEffectA,	/* UNI_XMEFFECTA */
+	DoXMEffectE1,	/* UNI_XMEFFECTE1 */
+	DoXMEffectE2,	/* UNI_XMEFFECTE2 */
+	DoXMEffectEA,	/* UNI_XMEFFECTEA */
+	DoXMEffectEB,	/* UNI_XMEFFECTEB */
+	DoXMEffectG,	/* UNI_XMEFFECTG */
+	DoXMEffectH,	/* UNI_XMEFFECTH */
+	DoXMEffectL,	/* UNI_XMEFFECTL */
+	DoXMEffectP,	/* UNI_XMEFFECTP */
+	DoXMEffectX1,	/* UNI_XMEFFECTX1 */
+	DoXMEffectX2,	/* UNI_XMEFFECTX2 */
+	DoITEffectG,	/* UNI_ITEFFECTG */
+	DoITEffectH,	/* UNI_ITEFFECTH */
+	DoITEffectI,	/* UNI_ITEFFECTI */
+	DoITEffectM,	/* UNI_ITEFFECTM */
+	DoITEffectN,	/* UNI_ITEFFECTN */
+	DoITEffectP,	/* UNI_ITEFFECTP */
+	DoITEffectT,	/* UNI_ITEFFECTT */
+	DoITEffectU,	/* UNI_ITEFFECTU */
+	DoITEffectW,	/* UNI_ITEFFECTW */
+	DoITEffectY,	/* UNI_ITEFFECTY */
+	DoNothing,	/* UNI_ITEFFECTZ */
+	DoITEffectS0,	/* UNI_ITEFFECTS0 */
+	DoULTEffect9,	/* UNI_ULTEFFECT9 */
+	DoMEDSpeed,	/* UNI_MEDSPEED */
+	DoMEDEffectF1,	/* UNI_MEDEFFECTF1 */
+	DoMEDEffectF2,	/* UNI_MEDEFFECTF2 */
+	DoMEDEffectF3,	/* UNI_MEDEFFECTF3 */
+	DoOktArp,	/* UNI_OKTARP */
 };
 
 static int pt_playeffects(MODULE *mod, SWORD channel, MP_CONTROL *a)
@@ -2382,10 +2409,14 @@ static int pt_playeffects(MODULE *mod, SWORD channel, MP_CONTROL *a)
 	int explicitslides = 0;
 	effect_func f;
 
-	while((c=UniGetByte())) {
+	while((c=UniGetByte()) != 0) {
+#if 0 /* this doesn't normally happen unless things go fubar elsewhere */
+		if (c >= UNI_LAST)
+		    fprintf(stderr,"fubar'ed opcode %u\n",c);
+#endif
 		f = effects[c];
 		if (f != DoNothing)
-				a->sliding = 0;
+		    a->sliding = 0;
 		explicitslides |= f(tick, flags, a, mod, channel);
 	}
 	return explicitslides;
@@ -2396,17 +2427,17 @@ static void DoNNAEffects(MODULE *mod, MP_CONTROL *a, UBYTE dat)
 	int t;
 	MP_VOICE *aout;
 
-	dat&=0xf; 
+	dat&=0xf;
 	aout=(a->slave)?a->slave:NULL;
 
 	switch (dat) {
 	case 0x0: /* past note cut */
-		for (t=0;t<md_sngchn;t++)
+		for (t=0;t<NUMVOICES(mod);t++)
 			if (mod->voice[t].master==a)
 				mod->voice[t].main.fadevol=0;
 		break;
 	case 0x1: /* past note off */
-		for (t=0;t<md_sngchn;t++)
+		for (t=0;t<NUMVOICES(mod);t++)
 			if (mod->voice[t].master==a) {
 				mod->voice[t].main.keyoff|=KEY_OFF;
 				if ((!(mod->voice[t].venv.flg & EF_ON))||
@@ -2415,7 +2446,7 @@ static void DoNNAEffects(MODULE *mod, MP_CONTROL *a, UBYTE dat)
 			}
 		break;
 	case 0x2: /* past note fade */
-		for (t=0;t<md_sngchn;t++)
+		for (t=0;t<NUMVOICES(mod);t++)
 			if (mod->voice[t].master==a)
 				mod->voice[t].main.keyoff|=KEY_FADE;
 		break;
@@ -2427,7 +2458,7 @@ static void DoNNAEffects(MODULE *mod, MP_CONTROL *a, UBYTE dat)
 		break;
 	case 0x5: /* set NNA note off */
 		a->main.nna=(a->main.nna&~NNA_MASK)|NNA_OFF;
-		break;   
+		break;
 	case 0x6: /* set NNA note fade */
 		a->main.nna=(a->main.nna&~NNA_MASK)|NNA_FADE;
 		break;
@@ -2442,7 +2473,7 @@ static void DoNNAEffects(MODULE *mod, MP_CONTROL *a, UBYTE dat)
 	case 0x9: /* disable panning envelope */
 		if (aout)
 			aout->main.panflg&=~EF_ON;
-		break;    
+		break;
 	case 0xa: /* enable panning envelope */
 		if (aout)
 			aout->main.panflg|=EF_ON;
@@ -2470,7 +2501,7 @@ static void pt_UpdateVoices(MODULE *mod, int max_volume)
 	SAMPLE *s;
 
 	mod->totalchn=mod->realchn=0;
-	for (channel=0;channel<md_sngchn;channel++) {
+	for (channel=0;channel<NUMVOICES(mod);channel++) {
 		aout=&mod->voice[channel];
 		i=aout->main.i;
 		s=aout->main.s;
@@ -2484,7 +2515,7 @@ static void pt_UpdateVoices(MODULE *mod, int max_volume)
 
 		if ((aout->main.kick==KICK_NOTE)||(aout->main.kick==KICK_KEYOFF)) {
 			Voice_Play_internal(channel,s,(aout->main.start==-1)?
-			    ((s->flags&SF_UST_LOOP) ? (SLONG)s->loopstart : 0) : aout->main.start);
+					    ((s->flags&SF_UST_LOOP)?(SLONG)s->loopstart:0):aout->main.start);
 			aout->main.fadevol=32768;
 			aout->aswppos=0;
 		}
@@ -2687,7 +2718,7 @@ static void pt_Notes(MODULE *mod)
 		UniSetRow(a->row);
 		funky=0;
 
-		while((c=UniGetByte()))
+		while((c=UniGetByte()) != 0)
 			switch (c) {
 			case UNI_NOTE:
 				funky|=1;
@@ -2720,7 +2751,7 @@ static void pt_Notes(MODULE *mod)
 			INSTRUMENT *i;
 			SAMPLE *s;
 
-			if ((i=a->main.i)) {
+			if ((i=a->main.i) != NULL) {
 				if (i->samplenumber[a->anote] >= mod->numsmp) continue;
 				s=&mod->samples[i->samplenumber[a->anote]];
 				a->main.note=i->samplenote[a->anote];
@@ -2809,7 +2840,7 @@ static void pt_EffectsPass1(MODULE *mod)
 	for (channel=0;channel<mod->numchn;channel++) {
 		a=&mod->control[channel];
 
-		if ((aout=a->slave)) {
+		if ((aout=a->slave) != NULL) {
 			a->main.fadevol=aout->main.fadevol;
 			a->main.period=aout->main.period;
 			if (a->main.kick==KICK_KEYOFF)
@@ -2891,7 +2922,7 @@ static void pt_NNA(MODULE *mod)
 			if (a->dct!=DCT_OFF) {
 				int t;
 
-				for (t=0;t<md_sngchn;t++)
+				for (t=0;t<NUMVOICES(mod);t++)
 					if ((!Voice_Stopped_internal(t))&&
 					   (mod->voice[t].masterchn==channel)&&
 					   (a->main.sample==mod->voice[t].main.sample)) {
@@ -2951,11 +2982,11 @@ static void pt_SetupVoices(MODULE *mod)
 					if ((newchn=MP_FindEmptyChannel(mod))!=-1)
 						a->slave=&mod->voice[a->slavechn=newchn];
 				}
-			} else 
+			} else
 				a->slave=&mod->voice[a->slavechn=channel];
 
 			/* assign parts of MP_VOICE only done for a KICK_NOTE */
-			if ((aout=a->slave)) {
+			if ((aout=a->slave) != NULL) {
 				if (aout->mflag && aout->master) aout->master->slave=NULL;
 				aout->master=a;
 				a->slave=aout;
@@ -2984,7 +3015,7 @@ static void pt_EffectsPass2(MODULE *mod)
 		if (!a->row) continue;
 		UniSetRow(a->row);
 
-		while((c=UniGetByte()))
+		while((c=UniGetByte()) != 0)
 			if (c==UNI_ITEFFECTS0) {
 				c=UniGetByte();
 				if ((c>>4)==SS_S7EFFECTS)
@@ -3016,7 +3047,7 @@ void Player_HandleTick(void)
 	pf->sngremainder%=pf->bpm;
 
 	if (++pf->vbtick>=pf->sngspd) {
-		if (pf->pat_repcrazy) 
+		if (pf->pat_repcrazy)
 			pf->pat_repcrazy=0; /* play 2 times row 0 */
 		else
 			pf->patpos++;
@@ -3046,6 +3077,9 @@ void Player_HandleTick(void)
 				pf->control[channel].pat_reppos=-1;
 
 			pf->patbrk=pf->posjmp=0;
+
+			if (pf->sngpos<0) pf->sngpos=(SWORD)(pf->numpos-1);
+
 			/* handle the "---" (end of song) pattern since it can occur
 			   *inside* the module in some formats */
 			if ((pf->sngpos>=pf->numpos)||
@@ -3060,7 +3094,6 @@ void Player_HandleTick(void)
 					pf->bpm=pf->inittempo<32?32:pf->inittempo;
 				}
 			}
-			if (pf->sngpos<0) pf->sngpos=pf->numpos-1;
 		}
 
 		if (!pf->patdly2)
@@ -3093,7 +3126,7 @@ static void Player_Init_internal(MODULE* mod)
 		mod->control[t].main.chanvol=mod->chanvol[t];
 		mod->control[t].main.panning=mod->panning[t];
 	}
-	
+
 	mod->sngtime=0;
 	mod->sngremainder=0;
 
@@ -3133,6 +3166,11 @@ int Player_Init(MODULE* mod)
 	if (!(mod->voice=(MP_VOICE*)MikMod_calloc(md_sngchn,sizeof(MP_VOICE))))
 		return 1;
 
+	/* mod->numvoices was used during loading to clamp md_sngchn.
+	   After loading it's used to remember how big mod->voice is.
+	*/
+	mod->numvoices = md_sngchn;
+
 	Player_Init_internal(mod);
 	return 0;
 }
@@ -3148,10 +3186,8 @@ void Player_Exit_internal(MODULE* mod)
 		pf=NULL;
 	}
 
-	if (mod->control)
-		MikMod_free(mod->control);
-	if (mod->voice)
-		MikMod_free(mod->voice);
+	MikMod_free(mod->control);
+	MikMod_free(mod->voice);
 	mod->control=NULL;
 	mod->voice=NULL;
 }
@@ -3166,8 +3202,10 @@ void Player_Exit(MODULE* mod)
 MIKMODAPI void Player_SetVolume(SWORD volume)
 {
 	MUTEX_LOCK(vars);
-	if (pf)
+	if (pf) {
 		pf->volume=(volume<0)?0:(volume>128)?128:volume;
+		pf->initvolume=pf->volume;
+	}
 	MUTEX_UNLOCK(vars);
 }
 
@@ -3241,7 +3279,7 @@ MIKMODAPI void Player_NextPosition(void)
 		pf->patbrk=0;
 		pf->vbtick=pf->sngspd;
 
-		for (t=0;t<md_sngchn;t++) {
+		for (t=0;t<NUMVOICES(pf);t++) {
 			Voice_Stop_internal(t);
 			pf->voice[t].main.i=NULL;
 			pf->voice[t].main.s=NULL;
@@ -3266,7 +3304,7 @@ MIKMODAPI void Player_PrevPosition(void)
 		pf->patbrk=0;
 		pf->vbtick=pf->sngspd;
 
-		for (t=0;t<md_sngchn;t++) {
+		for (t=0;t<NUMVOICES(pf);t++) {
 			Voice_Stop_internal(t);
 			pf->voice[t].main.i=NULL;
 			pf->voice[t].main.s=NULL;
@@ -3293,7 +3331,7 @@ MIKMODAPI void Player_SetPosition(UWORD pos)
 		pf->sngpos=pos;
 		pf->vbtick=pf->sngspd;
 
-		for (t=0;t<md_sngchn;t++) {
+		for (t=0;t<NUMVOICES(pf);t++) {
 			Voice_Stop_internal(t);
 			pf->voice[t].main.i=NULL;
 			pf->voice[t].main.s=NULL;
@@ -3303,12 +3341,12 @@ MIKMODAPI void Player_SetPosition(UWORD pos)
 			pf->control[t].main.s=NULL;
 		}
 		pf->forbid=0;
-		
+
 		if (!pos)
 			Player_Init_internal(pf);
 	}
 	MUTEX_UNLOCK(vars);
-}    
+}
 
 static void Player_Unmute_internal(SLONG arg1,va_list ap)
 {
@@ -3418,7 +3456,7 @@ static void Player_ToggleMute_internal(SLONG arg1,va_list ap)
 			}
 			break;
 		default:
-			if (arg1<pf->numchn) 
+			if (arg1<pf->numchn)
 				pf->control[arg1].muted=1-pf->control[arg1].muted;
 			break;
 		}
@@ -3465,7 +3503,7 @@ MIKMODAPI UWORD Player_GetChannelPeriod(UBYTE chan)
 	UWORD result=0;
 
 	MUTEX_LOCK(vars);
-    if (pf)
+	if (pf)
 	    result=(chan<pf->numchn)?pf->control[chan].main.period:0;
 	MUTEX_UNLOCK(vars);
 
@@ -3499,7 +3537,7 @@ MIKMODAPI void Player_TogglePause(void)
 MIKMODAPI void Player_SetSpeed(UWORD speed)
 {
 	MUTEX_LOCK(vars);
-	if (pf) 
+	if (pf)
 		pf->sngspd=speed?(speed<32?speed:32):1;
 	MUTEX_UNLOCK(vars);
 }
@@ -3538,18 +3576,17 @@ MIKMODAPI int Player_QueryVoices(UWORD numvoices, VOICEINFO *vinfo)
 	return numvoices;
 }
 
-
-// Get current module order
+/* Get current module order */
 MIKMODAPI int Player_GetOrder(void)
 {
 	int ret;
 	MUTEX_LOCK(vars);
-	ret = pf ? pf->sngpos :0; // pf->positions[pf->sngpos ? pf->sngpos-1 : 0]: 0;
+	ret = pf ? pf->sngpos :0; /* pf->positions[pf->sngpos ? pf->sngpos-1 : 0]: 0; */
 	MUTEX_UNLOCK(vars);
 	return ret;
 }
 
-// Get current module row
+/* Get current module row */
 MIKMODAPI int Player_GetRow(void)
 {
 	int ret;
@@ -3558,6 +3595,5 @@ MIKMODAPI int Player_GetRow(void)
 	MUTEX_UNLOCK(vars);
 	return ret;
 }
-
 
 /* ex:set ts=4: */
