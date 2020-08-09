@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2010 Thomas Martitz
@@ -77,9 +77,7 @@ static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format *
 typedef short sample_t;
 #endif
 static const int channels = 2;                                /* count of channels */
-static unsigned int rate = 44100;                       /* stream rate */
-
-static snd_pcm_t *handle;
+static snd_pcm_t *handle = NULL;
 static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
 static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
 static sample_t *frames;
@@ -136,12 +134,12 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
     err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0);
     if (err < 0)
     {
-        printf("Rate %iHz not available for playback: %s\n", rate, snd_strerror(err));
+        printf("Rate %iHz not available for playback: %s\n", sample_rate, snd_strerror(err));
         goto error;
     }
     if (rrate != sample_rate)
     {
-        printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, err);
+        printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, rrate);
         err = -EINVAL;
         goto error;
     }
@@ -359,7 +357,7 @@ static int async_rw(snd_pcm_t *handle)
         DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
         return err;
     }
-    
+
     err = snd_async_add_pcm_handler(&ahandler, handle, async_callback, NULL);
     if (err < 0)
     {
@@ -430,7 +428,7 @@ void pcm_play_dma_init(void)
     if ((err = snd_pcm_nonblock(handle, 1)))
         panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
-    if ((err = set_hwparams(handle, rate)) < 0)
+    if ((err = set_hwparams(handle, pcm_sampr)) < 0)
     {
         panicf("Setting of hwparams failed: %s\n", snd_strerror(err));
     }
