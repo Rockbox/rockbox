@@ -37,7 +37,7 @@
 #include "logf.h"
 
 #if (defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)) && !(defined(BOOTLOADER) || defined(CHECKWPS) || defined(SIMULATOR))
-#define PIVOT_ROOT "/mnt/sd_0"
+#define PIVOT_ROOT HOME_DIR
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
