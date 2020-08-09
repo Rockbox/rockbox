@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_uni.c,v 1.3 2005/04/07 19:57:38 realtech Exp $
+  $Id$
 
   UNIMOD (libmikmod's and APlayer's internal module format) loader
 
@@ -94,18 +94,18 @@ static UNISMP05 *wh=NULL,*s=NULL;
 
 /*========== Loader code */
 
-static char* readstring(void)
+static char * readstring(void)
 {
-	char *s=NULL;
+	char *str=NULL;
 	UWORD len;
-	
+
 	len=_mm_read_I_UWORD(modreader);
 	if(len) {
-		s=MikMod_malloc(len+1);
-		_mm_read_UBYTES(s,len,modreader);
-		s[len]=0;
+		str=(char *) MikMod_malloc(len+1);
+		_mm_read_UBYTES(str,len,modreader);
+		str[len]=0;
 	}
-	return s;
+	return str;
 }
 
 static int UNI_Test(void)
@@ -133,7 +133,7 @@ static int UNI_Init(void)
 static void UNI_Cleanup(void)
 {
 	MikMod_free(wh);
-	s=NULL;
+	wh = s = NULL;
 }
 
 static UBYTE* readtrack(void)
@@ -148,7 +148,7 @@ static UBYTE* readtrack(void)
 		len=_mm_read_I_UWORD(modreader);
 
 	if(!len) return NULL;
-	if(!(t=MikMod_malloc(len))) return NULL;
+	if(!(t=(UBYTE*)MikMod_malloc(len))) return NULL;
 	_mm_read_UBYTES(t,len,modreader);
 
 	/* Check if the track is correct */
@@ -221,65 +221,65 @@ static UBYTE* readtrack(void)
 static int loadsmp6(void)
 {
 	int t;
-	SAMPLE *s;
+	SAMPLE *sptr;
 
-	s=of.samples;
-	for(t=0;t<of.numsmp;t++,s++) {
+	sptr=of.samples;
+	for(t=0;t<of.numsmp;t++,sptr++) {
 		int flags;
 
 		flags         = _mm_read_M_UWORD(modreader);
-		s->flags=0;
-		if(flags&0x0004) s->flags|=SF_STEREO;
-		if(flags&0x0002) s->flags|=SF_SIGNED;
-		if(flags&0x0001) s->flags|=SF_16BITS;
+		sptr->flags=0;
+		if(flags&0x0004) sptr->flags|=SF_STEREO;
+		if(flags&0x0002) sptr->flags|=SF_SIGNED;
+		if(flags&0x0001) sptr->flags|=SF_16BITS;
 		/* convert flags */
 		if(universion>=0x104) {
-			if(flags&0x2000) s->flags|=SF_UST_LOOP;
-			if(flags&0x1000) s->flags|=SF_OWNPAN;
-			if(flags&0x0800) s->flags|=SF_SUSTAIN;
-			if(flags&0x0400) s->flags|=SF_REVERSE;
-			if(flags&0x0200) s->flags|=SF_BIDI;
-			if(flags&0x0100) s->flags|=SF_LOOP;
-			if(flags&0x0020) s->flags|=SF_ITPACKED;
-			if(flags&0x0010) s->flags|=SF_DELTA;
-			if(flags&0x0008) s->flags|=SF_BIG_ENDIAN;
+			if(flags&0x2000) sptr->flags|=SF_UST_LOOP;
+			if(flags&0x1000) sptr->flags|=SF_OWNPAN;
+			if(flags&0x0800) sptr->flags|=SF_SUSTAIN;
+			if(flags&0x0400) sptr->flags|=SF_REVERSE;
+			if(flags&0x0200) sptr->flags|=SF_BIDI;
+			if(flags&0x0100) sptr->flags|=SF_LOOP;
+			if(flags&0x0020) sptr->flags|=SF_ITPACKED;
+			if(flags&0x0010) sptr->flags|=SF_DELTA;
+			if(flags&0x0008) sptr->flags|=SF_BIG_ENDIAN;
 		} else if(universion>=0x102) {
-			if(flags&0x0800) s->flags|=SF_UST_LOOP;
-			if(flags&0x0400) s->flags|=SF_OWNPAN;
-			if(flags&0x0200) s->flags|=SF_SUSTAIN;
-			if(flags&0x0100) s->flags|=SF_REVERSE;
-			if(flags&0x0080) s->flags|=SF_BIDI;
-			if(flags&0x0040) s->flags|=SF_LOOP;
-			if(flags&0x0020) s->flags|=SF_ITPACKED;
-			if(flags&0x0010) s->flags|=SF_DELTA;
-			if(flags&0x0008) s->flags|=SF_BIG_ENDIAN;
+			if(flags&0x0800) sptr->flags|=SF_UST_LOOP;
+			if(flags&0x0400) sptr->flags|=SF_OWNPAN;
+			if(flags&0x0200) sptr->flags|=SF_SUSTAIN;
+			if(flags&0x0100) sptr->flags|=SF_REVERSE;
+			if(flags&0x0080) sptr->flags|=SF_BIDI;
+			if(flags&0x0040) sptr->flags|=SF_LOOP;
+			if(flags&0x0020) sptr->flags|=SF_ITPACKED;
+			if(flags&0x0010) sptr->flags|=SF_DELTA;
+			if(flags&0x0008) sptr->flags|=SF_BIG_ENDIAN;
 		} else {
-			if(flags&0x400) s->flags|=SF_UST_LOOP;
-			if(flags&0x200) s->flags|=SF_OWNPAN;
-			if(flags&0x100) s->flags|=SF_REVERSE;
-			if(flags&0x080) s->flags|=SF_SUSTAIN;
-			if(flags&0x040) s->flags|=SF_BIDI;
-			if(flags&0x020) s->flags|=SF_LOOP;
-			if(flags&0x010) s->flags|=SF_BIG_ENDIAN;
-			if(flags&0x008) s->flags|=SF_DELTA;
+			if(flags&0x400) sptr->flags|=SF_UST_LOOP;
+			if(flags&0x200) sptr->flags|=SF_OWNPAN;
+			if(flags&0x100) sptr->flags|=SF_REVERSE;
+			if(flags&0x080) sptr->flags|=SF_SUSTAIN;
+			if(flags&0x040) sptr->flags|=SF_BIDI;
+			if(flags&0x020) sptr->flags|=SF_LOOP;
+			if(flags&0x010) sptr->flags|=SF_BIG_ENDIAN;
+			if(flags&0x008) sptr->flags|=SF_DELTA;
 		}
 
-		s->speed      = _mm_read_M_ULONG(modreader);
-		s->volume     = _mm_read_UBYTE(modreader);
-		s->panning    = _mm_read_M_UWORD(modreader);
-		s->length     = _mm_read_M_ULONG(modreader);
-		s->loopstart  = _mm_read_M_ULONG(modreader);
-		s->loopend    = _mm_read_M_ULONG(modreader);
-		s->susbegin   = _mm_read_M_ULONG(modreader);
-		s->susend     = _mm_read_M_ULONG(modreader);
-		s->globvol    = _mm_read_UBYTE(modreader);
-		s->vibflags   = _mm_read_UBYTE(modreader);
-		s->vibtype    = _mm_read_UBYTE(modreader);
-		s->vibsweep   = _mm_read_UBYTE(modreader);
-		s->vibdepth   = _mm_read_UBYTE(modreader);
-		s->vibrate    = _mm_read_UBYTE(modreader);
+		sptr->speed      = _mm_read_M_ULONG(modreader);
+		sptr->volume     = _mm_read_UBYTE(modreader);
+		sptr->panning    = _mm_read_M_UWORD(modreader);
+		sptr->length     = _mm_read_M_ULONG(modreader);
+		sptr->loopstart  = _mm_read_M_ULONG(modreader);
+		sptr->loopend    = _mm_read_M_ULONG(modreader);
+		sptr->susbegin   = _mm_read_M_ULONG(modreader);
+		sptr->susend     = _mm_read_M_ULONG(modreader);
+		sptr->globvol    = _mm_read_UBYTE(modreader);
+		sptr->vibflags   = _mm_read_UBYTE(modreader);
+		sptr->vibtype    = _mm_read_UBYTE(modreader);
+		sptr->vibsweep   = _mm_read_UBYTE(modreader);
+		sptr->vibdepth   = _mm_read_UBYTE(modreader);
+		sptr->vibrate    = _mm_read_UBYTE(modreader);
 
-		s->samplename=readstring();
+		sptr->samplename=readstring();
 
 		if(_mm_eof(modreader)) {
 			_mm_errno = MMERR_LOADING_SAMPLEINFO;
@@ -308,7 +308,7 @@ static int loadinstr6(void)
 		i->rpanvar      = _mm_read_UBYTE(modreader);
 		i->volfade      = _mm_read_M_UWORD(modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define UNI_LoadEnvelope6(name) 										\
 		i-> name##flg=_mm_read_UBYTE(modreader);						\
 		i-> name##pts=_mm_read_UBYTE(modreader);						\
@@ -373,7 +373,7 @@ static int loadinstr5(void)
 		for(u=0;u<96;u++)
 			i->samplenumber[u]=of.numsmp+_mm_read_UBYTE(modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define UNI_LoadEnvelope5(name) 									\
 		i-> name##flg=_mm_read_UBYTE(modreader);					\
 		i-> name##pts=_mm_read_UBYTE(modreader);					\
@@ -415,7 +415,7 @@ static int loadinstr5(void)
 			/* Allocate more room for sample information if necessary */
 			if(of.numsmp+u==wavcnt) {
 				wavcnt+=UNI_SMPINCR;
-				if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(UNISMP05)))) {
+				if(!(wh=(UNISMP05*)MikMod_realloc(wh,wavcnt*sizeof(UNISMP05)))) {
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
 				}
@@ -447,7 +447,7 @@ static int loadinstr5(void)
 
 	/* sanity check */
 	if(!of.numsmp) {
-		if(wh) { MikMod_free(wh);wh=NULL; }
+		MikMod_free(wh);wh=NULL;
 		_mm_errno=MMERR_LOADING_SAMPLEINFO;
 		return 0;
 	}
@@ -504,8 +504,8 @@ static int UNI_Load(int curious)
 	char *modtype,*oldtype=NULL;
 	INSTRUMENT *d;
 	SAMPLE *q;
-    (void)curious;
-	
+	(void)curious;
+
 	/* read module header */
 	_mm_read_UBYTES(mh.id,4,modreader);
 	if(mh.id[3]!='N')
@@ -514,11 +514,11 @@ static int UNI_Load(int curious)
 		universion=0x100;
 
 	if(universion>=6) {
-		if (universion==6)
-			(void)_mm_read_UBYTE(modreader);
-		else
+		if (universion==6) {
+			_mm_skip_BYTE(modreader);
+		} else {
 			universion=_mm_read_M_UWORD(modreader);
-
+		}
 		mh.flags     =_mm_read_M_UWORD(modreader);
 		mh.numchn    =_mm_read_UBYTE(modreader);
 		mh.numvoices =_mm_read_UBYTE(modreader);
@@ -556,7 +556,7 @@ static int UNI_Load(int curious)
 		mh.flags &= UF_XMPERIODS | UF_LINEAR;
 		mh.flags |= UF_INST | UF_NOWRAP | UF_PANNING;
 	}
-	
+
 	/* set module parameters */
 	of.flags     =mh.flags;
 	of.numchn    =mh.numchn;
@@ -578,21 +578,21 @@ static int UNI_Load(int curious)
 		oldtype=readstring();
 	if(oldtype) {
 		size_t len=strlen(oldtype)+20;
-		if(!(modtype=MikMod_malloc(len))) return 0;
+		if(!(modtype=(char*)MikMod_malloc(len))) return 0;
 #ifdef HAVE_SNPRINTF
 		snprintf(modtype,len,"%s (was %s)",(universion>=0x100)?"APlayer":"MikCvt2",oldtype);
 #else
 		sprintf(modtype,"%s (was %s)",(universion>=0x100)?"APlayer":"MikCvt2",oldtype);
 #endif
 	} else {
-		if(!(modtype=MikMod_malloc(10))) return 0;
+		if(!(modtype=(char*)MikMod_malloc(10))) return 0;
 #ifdef HAVE_SNPRINTF
 		snprintf(modtype,10,"%s",(universion>=0x100)?"APlayer":"MikCvt3");
 #else
 		sprintf(modtype,"%s",(universion>=0x100)?"APlayer":"MikCvt3");
 #endif
 	}
-	of.modtype=StrDup(modtype);
+	of.modtype=MikMod_strdup(modtype);
 	MikMod_free(modtype);MikMod_free(oldtype);
 	of.comment=readstring();
 
@@ -624,9 +624,14 @@ static int UNI_Load(int curious)
 		for(t=0;t<of.numchn;t++) of.panning[t]=mh.panning[t];
 	}
 	/* convert the ``end of song'' pattern code if necessary */
-	if(universion<0x106)
-		for(t=0;t<of.numpos;t++)
-			if(of.positions[t]==255) of.positions[t]=LAST_PATTERN;
+	for(t=0;t<of.numpos;t++) {
+		if(universion<0x106 && of.positions[t]==255) of.positions[t]=LAST_PATTERN;
+		else if (of.positions[t]>of.numpat) { /* SANITIY CHECK */
+		/*	fprintf(stderr,"position[%d]=%d > numpat=%d\n",t,of.positions[t],of.numpat);*/
+			_mm_errno = MMERR_LOADING_HEADER;
+			return 0;
+		}
+	}
 
 	/* instruments and samples */
 	if(universion>=6) {
@@ -642,7 +647,7 @@ static int UNI_Load(int curious)
 		if(!AllocInstruments()) return 0;
 		if(!loadinstr5()) return 0;
 		if(!AllocSamples()) {
-			if(wh) { MikMod_free(wh);wh=NULL; }
+			MikMod_free(wh);wh=NULL;
 			return 0;
 		}
 		if(!loadsmp5()) return 0;

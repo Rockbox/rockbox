@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_s3m.c,v 1.3 2005/04/07 19:57:38 realtech Exp $
+  $Id$
 
   Screamtracker (S3M) module loader
 
@@ -104,7 +104,7 @@ static unsigned int tracker;	/* tracker id */
 
 /* tracker identifiers */
 #define NUMTRACKERS 4
-static CHAR* S3M_Version[] = {
+static const CHAR * S3M_Version[] = {
 	"Screamtracker x.xx",
 	"Imago Orpheus x.xx (S3M format)",
 	"Impulse Tracker x.xx (S3M format)",
@@ -113,7 +113,7 @@ static CHAR* S3M_Version[] = {
 	"Impulse Tracker 2.14p4 (S3M format)"
 };
 /* version number position in above array */
-static int numeric[NUMTRACKERS]={14,14,16,16};
+static const int numeric[NUMTRACKERS]={14,14,16,16};
 
 /*========== Loader code */
 
@@ -144,6 +144,11 @@ static void S3M_Cleanup(void)
 	MikMod_free(poslookup);
 	MikMod_free(mh);
 	MikMod_free(origpositions);
+	s3mbuf=NULL;
+	paraptr=NULL;
+	poslookup=NULL;
+	mh=NULL;
+	origpositions=NULL;
 }
 
 /* Because so many s3m files have 16 channels as the set number used, but really
@@ -154,9 +159,9 @@ static void S3M_Cleanup(void)
    global variable 'remap'
 
    NOTE: You must first seek to the file location of the pattern before calling
-         this procedure.
+   this procedure.
 
-   Returns 1 on fail.                                                         */
+   Returns 0 on fail. */
 static int S3M_GetNumChannels(void)
 {
 	int row=0,flag,ch;
@@ -166,19 +171,19 @@ static int S3M_GetNumChannels(void)
 
 		if(_mm_eof(modreader)) {
 			_mm_errno = MMERR_LOADING_PATTERN;
-			return 1;
+			return 0;
 		}
 
 		if(flag) {
 			ch=flag&31;
 			if(mh->channels[ch]<32) remap[ch] = 0;
-			if(flag&32) {(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);}
-			if(flag&64) (void)_mm_read_UBYTE(modreader);
-			if(flag&128){(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);}
+			if(flag&32) {_mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader);}
+			if(flag&64) _mm_skip_BYTE(modreader);
+			if(flag&128){_mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader);}
 		} else row++;
 	}
-	return 0;
-}    
+	return 1;
+}
 
 static int S3M_ReadPattern(void)
 {
@@ -282,6 +287,10 @@ static int S3M_Load(int curious)
 		_mm_errno = MMERR_LOADING_HEADER;
 		return 0;
 	}
+	if(mh->ordnum > 255 || mh->insnum > 255 || mh->patnum > 255) {
+		_mm_errno = MMERR_NOT_A_MODULE;
+		return 0;
+	}
 
 	/* then we can decide the module type */
 	tracker=mh->tracker>>12;
@@ -294,7 +303,7 @@ static int S3M_Load(int curious)
 			tracker=NUMTRACKERS; /* IT 2.14p3 */
 		else tracker--;
 	}
-	of.modtype = StrDup(S3M_Version[tracker]);
+	of.modtype = MikMod_strdup(S3M_Version[tracker]);
 	if(tracker<NUMTRACKERS) {
 		of.modtype[numeric[tracker]] = ((mh->tracker>>8) &0xf)+'0';
 		of.modtype[numeric[tracker]+2] = ((mh->tracker>>4)&0xf)+'0';
@@ -315,7 +324,7 @@ static int S3M_Load(int curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=(UWORD*)MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);
@@ -374,7 +383,8 @@ static int S3M_Load(int curious)
 		_mm_read_string(s.scrs,4,modreader);
 
 		/* ScreamTracker imposes a 64000 bytes (not 64k !) limit */
-		if (s.length > 64000)
+		/* enforce it, if we'll use S3MIT_SCREAM in S3M_ConvertTrack() */
+		if (s.length > 64000 && tracker == 1)
 			s.length = 64000;
 
 		if(_mm_eof(modreader)) {
@@ -388,7 +398,7 @@ static int S3M_Load(int curious)
 		q->loopstart  = s.loopbeg;
 		q->loopend    = s.loopend;
 		q->volume     = s.volume;
-		q->seekpos    = (((long)s.memsegh)<<16|s.memsegl)<<4;
+		q->seekpos    = (((ULONG)s.memsegh)<<16|s.memsegl)<<4;
 
 		if(s.flags&1) q->flags |= SF_LOOP;
 		if(s.flags&4) q->flags |= SF_16BITS;
@@ -406,16 +416,16 @@ static int S3M_Load(int curious)
 	for(t=0;t<of.numpat;t++) {
 		/* seek to pattern position (+2 skip pattern length) */
 		_mm_fseek(modreader,(long)((paraptr[of.numins+t])<<4)+2,SEEK_SET);
-		if(S3M_GetNumChannels()) return 0;
+		if(!S3M_GetNumChannels()) return 0;
 	}
 
 	/* build the remap array  */
 	for(t=0;t<32;t++)
-		if(!remap[t]) 
+		if(!remap[t])
 			remap[t]=of.numchn++;
 
 	/* set panning positions after building remap chart! */
-	for(t=0;t<32;t++) 
+	for(t=0;t<32;t++)
 		if((mh->channels[t]<32)&&(remap[t]!=-1)) {
 			if(mh->channels[t]<8)
 				of.panning[remap[t]]=0x30;

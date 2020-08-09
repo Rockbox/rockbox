@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: mlutil.c,v 1.3 2007/12/06 17:43:10 denis111 Exp $
+  $Id$
 
   Utility functions for the module loader
 
@@ -43,13 +43,13 @@ extern int fprintf(FILE *, const char *, ...);
 
 /*========== Shared tracker identifiers */
 
-CHAR *STM_Signatures[STM_NTRACKERS] = {
+const CHAR *STM_Signatures[STM_NTRACKERS] = {
 	"!Scream!",
 	"BMOD2STM",
 	"WUZAMOD!"
 };
 
-CHAR *STM_Version[STM_NTRACKERS] = {
+const CHAR *STM_Version[STM_NTRACKERS] = {
 	"Screamtracker 2",
 	"Converted by MOD2STM (STM format)",
 	"Wuzamod (STM format)"
@@ -71,29 +71,27 @@ FILTER filtersettings[UF_MAXFILTER]; /* computed filter settings */
 /*========== Linear periods stuff */
 
 int*   noteindex=NULL;      /* remap value for linear period modules */
-static int noteindexcount=0;
+static unsigned noteindexcount=0;
 
 int *AllocLinear(void)
 {
 	if(of.numsmp>noteindexcount) {
 		noteindexcount=of.numsmp;
-		noteindex=MikMod_realloc(noteindex,noteindexcount*sizeof(int));
+		noteindex=(int*)MikMod_realloc(noteindex,noteindexcount*sizeof(int));
 	}
 	return noteindex;
 }
 
 void FreeLinear(void)
 {
-	if(noteindex) {
-		MikMod_free(noteindex);
-		noteindex=NULL;
-	}
+	MikMod_free(noteindex);
+	noteindex=NULL;
 	noteindexcount=0;
 }
 
 int speed_to_finetune(ULONG speed,int sample)
 {
-    ULONG ctmp=0,tmp,note=1,finetune=0;
+    ULONG ctmp=0,tmp,note=1,ft=0;
 
     speed>>=1;
     while((tmp=getfrequency(of.flags,getlinearperiod(note<<1,0)))<speed) {
@@ -104,16 +102,16 @@ int speed_to_finetune(ULONG speed,int sample)
     if(tmp!=speed) {
         if((tmp-speed)<(speed-ctmp))
             while(tmp>speed)
-                tmp=getfrequency(of.flags,getlinearperiod(note<<1,--finetune));
+                tmp=getfrequency(of.flags,getlinearperiod(note<<1,--ft));
         else {
             note--;
             while(ctmp<speed)
-                ctmp=getfrequency(of.flags,getlinearperiod(note<<1,++finetune));
+                ctmp=getfrequency(of.flags,getlinearperiod(note<<1,++ft));
         }
     }
 
     noteindex[sample]=note-4*OCTAVE;
-    return finetune;
+    return ft;
 }
 
 /*========== Order stuff */
@@ -141,13 +139,9 @@ void S3MIT_CreateOrders(int curious)
 /*========== Effect stuff */
 
 /* handles S3M and IT effects */
-void S3MIT_ProcessCmd(UBYTE cmd,UBYTE inf,unsigned int flags)
+void S3MIT_ProcessCmd(UBYTE cmd, UBYTE inf, unsigned int flags)
 {
-	UBYTE /* hi,*/ lo;
-
-	lo=inf&0xf;
-	/* hi=inf>>4; */
-
+	UBYTE lo = inf&0xF;
 	/* process S3M / IT specific command structure */
 
 	if(cmd!=255) {
@@ -196,7 +190,7 @@ void S3MIT_ProcessCmd(UBYTE cmd,UBYTE inf,unsigned int flags)
 			case 9: /* Ixy tremor, ontime x, offtime y */
 				if (flags & S3MIT_OLDSTYLE)
 					UniEffect(UNI_S3MEFFECTI,inf);
-				else                     
+				else
 					UniEffect(UNI_ITEFFECTI,inf);
 				break;
 			case 0xa: /* Jxy arpeggio */
@@ -204,7 +198,7 @@ void S3MIT_ProcessCmd(UBYTE cmd,UBYTE inf,unsigned int flags)
 				break;
 			case 0xb: /* Kxy Dual command H00 & Dxy */
 				if (flags & S3MIT_OLDSTYLE)
-					UniPTEffect(0x4,0);    
+					UniPTEffect(0x4,0);
 				else
 					UniEffect(UNI_ITEFFECTH,0);
 				UniEffect(UNI_S3MEFFECTD,inf);
@@ -218,7 +212,7 @@ void S3MIT_ProcessCmd(UBYTE cmd,UBYTE inf,unsigned int flags)
 				break;
 			case 0xd: /* Mxx Set Channel Volume */
 				UniEffect(UNI_ITEFFECTM,inf);
-				break;       
+				break;
 			case 0xe: /* Nxy Slide Channel Volume */
 				UniEffect(UNI_ITEFFECTN,inf);
 				break;
@@ -233,7 +227,7 @@ void S3MIT_ProcessCmd(UBYTE cmd,UBYTE inf,unsigned int flags)
 				if(inf && !lo && !(flags & S3MIT_OLDSTYLE))
 					UniWriteByte(1);
 				else
-					UniWriteByte(inf); 
+					UniWriteByte(inf);
 				break;
 			case 0x12: /* Rxy tremolo speed x, depth y */
 				UniEffect(UNI_S3MEFFECTR,inf);

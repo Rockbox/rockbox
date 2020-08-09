@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_okt.c,v 1.3 2005/04/07 19:57:38 realtech Exp $
+  $Id$
 
   Oktalyzer (OKT) module loader
 
@@ -203,7 +203,7 @@ static int OKT_doSAMP(int len)
 		s.len = _mm_read_M_ULONG(modreader);
 		s.loopbeg = _mm_read_M_UWORD(modreader) * 2;
 		s.looplen = _mm_read_M_UWORD(modreader) * 2;
-		(void)_mm_read_UBYTE(modreader);
+		_mm_skip_BYTE(modreader);
 		s.volume = _mm_read_UBYTE(modreader);
 		_mm_read_M_UWORD(modreader);
 
@@ -314,6 +314,7 @@ static int OKT_doPBOD(int patnum)
 	}
 	MikMod_free(patbuf);
 	MikMod_free(okttrk);
+	okttrk = NULL;
 	return 1;
 }
 
@@ -330,28 +331,28 @@ static int OKT_Load(int curious)
 	int seen_cmod = 0, seen_samp = 0, seen_slen = 0, seen_plen = 0, seen_patt
 			= 0, seen_spee = 0;
 	int patnum = 0, insnum = 0;
-    (void)curious;
+	(void)curious;
 
 	/* skip OKTALYZER header */
 	_mm_fseek(modreader, 8, SEEK_SET);
-	of.songname = StrDup("");
+	of.songname = MikMod_strdup("");
 
-	of.modtype = StrDup("Amiga Oktalyzer");
+	of.modtype = MikMod_strdup("Amiga Oktalyzer");
 	of.numpos = of.reppos = 0;
-	
+
 	/* default values */
 	of.initspeed = 6;
 	of.inittempo = 125;
-	
+
 	while (1) {
 		/* read block header */
 		_mm_read_UBYTES(id, 4, modreader);
 		len = _mm_read_M_ULONG(modreader);
-		
+
 		if (_mm_eof(modreader))
 			break;
 		fp = _mm_ftell(modreader);
-		
+
 		if (!memcmp(id, "CMOD", 4)) {
 			if (!seen_cmod) {
 				OKT_doCMOD();
@@ -442,7 +443,7 @@ static int OKT_Load(int curious)
 
 static CHAR *OKT_LoadTitle(void)
 {
-	return StrDup("");
+	return MikMod_strdup("");
 }
 
 /*========== Loader information */

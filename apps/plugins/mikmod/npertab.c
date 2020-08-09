@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: npertab.c,v 1.2 2005/03/30 19:11:47 realtech Exp $
+  $Id$
 
   MOD format period table.  Used by both the MOD and M15 (15-inst mod) Loaders.
 
@@ -32,7 +32,7 @@
 
 #include "mikmod_internals.h"
 
-UWORD npertab[7 * OCTAVE] = {
+const UWORD npertab[7 * OCTAVE] = {
 	/* Octaves 6 -> 0 */
 	/* C    C#     D    D#     E     F    F#     G    G#     A    A#     B */
 	0x6b0,0x650,0x5f4,0x5a0,0x54c,0x500,0x4b8,0x474,0x434,0x3f8,0x3c0,0x38a,

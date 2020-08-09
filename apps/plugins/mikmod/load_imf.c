@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_imf.c,v 1.3 2005/04/07 19:57:38 realtech Exp $
+  $Id$
 
   Imago Orpheus (IMF) module loader
 
@@ -127,12 +127,36 @@ static	IMFHEADER *mh=NULL;
 
 static int IMF_Test(void)
 {
-	UBYTE id[4];
+	UBYTE buf[512], *p;
+	int t, chn;
 
 	_mm_fseek(modreader,0x3c,SEEK_SET);
-	if(!_mm_read_UBYTES(id,4,modreader)) return 0;
-	if(!memcmp(id,"IM10",4)) return 1;
-	return 0;
+	if (!_mm_read_UBYTES(buf,4,modreader)) return 0;
+	if (memcmp(buf,"IM10",4) != 0) return 0;	/* no magic */
+
+	_mm_fseek(modreader,32,SEEK_SET);
+	if (_mm_read_I_UWORD(modreader) > 256) return 0;/* bad ordnum */
+	if (_mm_read_I_UWORD(modreader) > 256) return 0;/* bad patnum */
+	if (_mm_read_I_UWORD(modreader) > 256) return 0;/* bad insnum */
+
+	_mm_fseek(modreader,64,SEEK_SET);
+	if(!_mm_read_UBYTES(buf,512,modreader)) return 0;
+	/* verify channel status */
+	for (t = 0, chn = 0, p = &buf[15]; t < 512; t += 16, p += 16) {
+		switch (*p) {
+		case  0:		/* channel enabled */
+		case  1:		/* channel muted   */
+			chn++;
+			break;
+		case  2:		/* channel disabled */
+			break;
+		default:		/* bad status value */
+			return 0;
+		}
+	}
+	if(!chn) return 0;		/* no channels found */
+
+	return 1;
 }
 
 static int IMF_Init(void)
@@ -149,6 +173,8 @@ static void IMF_Cleanup(void)
 
 	MikMod_free(imfpat);
 	MikMod_free(mh);
+	imfpat=NULL;
+	mh=NULL;
 }
 
 static int IMF_ReadPattern(SLONG size,UWORD rows)
@@ -388,7 +414,7 @@ static int IMF_Load(int curious)
 	ULONG *nextwav=NULL;
 	UWORD wavcnt=0;
 	UBYTE id[4];
-    (void)curious;
+	(void)curious;
 
 	/* try to read the module header */
 	_mm_read_string(mh->songname,32,modreader);
@@ -410,7 +436,7 @@ static int IMF_Load(int curious)
 
 	/* set module variables */
 	of.songname=DupStr(mh->songname,31,1);
-	of.modtype=StrDup(IMF_Version);
+	of.modtype=MikMod_strdup(IMF_Version);
 	of.numpat=mh->patnum;
 	of.numins=mh->insnum;
 	of.reppos=0;
@@ -467,6 +493,13 @@ static int IMF_Load(int curious)
 	if(!AllocPositions(of.numpos)) return 0;
 	for(t=u=0;t<mh->ordnum;t++)
 		if(mh->orders[t]!=0xff) of.positions[u++]=mh->orders[t];
+	for(t=0;t<of.numpos;t++) {
+		if (of.positions[t]>of.numpat) { /* SANITIY CHECK */
+		/*	fprintf(stderr,"position[%d]=%d > numpat=%d\n",t,of.positions[t],of.numpat);*/
+			_mm_errno = MMERR_LOADING_HEADER;
+			return 0;
+		}
+	}
 
 	/* load pattern info */
 	of.numtrk=of.numpat*of.numchn;
@@ -509,16 +542,16 @@ static int IMF_Load(int curious)
 		_mm_read_I_UWORDS(ih.panenv,IMFENVCNT,modreader);
 		_mm_read_I_UWORDS(ih.pitenv,IMFENVCNT,modreader);
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define IMF_FinishLoadingEnvelope(name)					\
 		ih. name##pts=_mm_read_UBYTE(modreader);		\
 		ih. name##sus=_mm_read_UBYTE(modreader);		\
 		ih. name##beg=_mm_read_UBYTE(modreader);		\
 		ih. name##end=_mm_read_UBYTE(modreader);		\
 		ih. name##flg=_mm_read_UBYTE(modreader);		\
-		(void)_mm_read_UBYTE(modreader);						\
-		(void)_mm_read_UBYTE(modreader);						\
-		(void)_mm_read_UBYTE(modreader)
+		_mm_skip_BYTE(modreader);						\
+		_mm_skip_BYTE(modreader);						\
+		_mm_skip_BYTE(modreader)
 #else
 #define IMF_FinishLoadingEnvelope(name)				\
 		ih. name/**/pts=_mm_read_UBYTE(modreader);	\
@@ -526,9 +559,9 @@ static int IMF_Load(int curious)
 		ih. name/**/beg=_mm_read_UBYTE(modreader);	\
 		ih. name/**/end=_mm_read_UBYTE(modreader);	\
 		ih. name/**/flg=_mm_read_UBYTE(modreader);	\
-		(void)_mm_read_UBYTE(modreader);					\
-		(void)_mm_read_UBYTE(modreader);					\
-		(void)_mm_read_UBYTE(modreader)
+		_mm_skip_BYTE(modreader);					\
+		_mm_skip_BYTE(modreader);					\
+		_mm_skip_BYTE(modreader)
 #endif
 
 		IMF_FinishLoadingEnvelope(vol);
@@ -541,7 +574,7 @@ static int IMF_Load(int curious)
 		_mm_read_UBYTES(id,4,modreader);
 		/* Looks like Imago Orpheus forgets the signature for empty
 		   instruments following a multi-sample instrument... */
-		if(memcmp(id,"II10",4) && 
+		if(memcmp(id,"II10",4) &&
 		   (oldnumsmp && memcmp(id,"\x0\x0\x0\x0",4))) {
 			if(nextwav) MikMod_free(nextwav);
 			if(wh) MikMod_free(wh);
@@ -562,7 +595,7 @@ static int IMF_Load(int curious)
 			d->samplenumber[u]=ih.what[u]>ih.numsmp?0xffff:ih.what[u]+of.numsmp;
 		d->volfade=ih.volfade;
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define IMF_ProcessEnvelope(name) 									\
 		for (u = 0; u < (IMFENVCNT >> 1); u++) {					\
 			d-> name##env[u].pos = ih. name##env[u << 1];			\
@@ -613,12 +646,12 @@ static int IMF_Load(int curious)
 			/* allocate more room for sample information if necessary */
 			if(of.numsmp+u==wavcnt) {
 				wavcnt+=IMF_SMPINCR;
-				if(!(nextwav=MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))) {
+				if(!(nextwav=(ULONG*)MikMod_realloc(nextwav,wavcnt*sizeof(ULONG)))) {
 					if(wh) MikMod_free(wh);
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
 				}
-				if(!(wh=MikMod_realloc(wh,wavcnt*sizeof(IMFWAVHEADER)))) {
+				if(!(wh=(IMFWAVHEADER*)MikMod_realloc(wh,wavcnt*sizeof(IMFWAVHEADER)))) {
 					MikMod_free(nextwav);
 					_mm_errno=MMERR_OUT_OF_MEMORY;
 					return 0;
@@ -627,7 +660,7 @@ static int IMF_Load(int curious)
 			}
 
 			_mm_read_string(s->samplename,13,modreader);
-			(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader);
+			_mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader);
 			s->length    =_mm_read_I_ULONG(modreader);
 			s->loopstart =_mm_read_I_ULONG(modreader);
 			s->loopend   =_mm_read_I_ULONG(modreader);

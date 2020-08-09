@@ -1,17 +1,17 @@
 /*	MikMod sound library
-	(c) 1998, 1999, 2000, 2001 Miodrag Vallat and others - see file AUTHORS
-	for complete list.
+	(c) 1998-2014 Miodrag Vallat and others - see file AUTHORS
+	for a complete list.
 
 	This library is free software; you can redistribute it and/or modify
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -19,8 +19,6 @@
 */
 
 /*==============================================================================
-
-  $Id: mdriver.c,v 1.4 2007/12/03 20:59:05 denis111 Exp $
 
   These routines are used to access the available soundcard drivers.
 
@@ -34,54 +32,59 @@
 #include <unistd.h>
 #endif
 
-#if 0
-#if defined unix || (defined __APPLE__ && defined __MACH__)
+#include <string.h>
+
+#include "mikmod_internals.h"
+
+#if (MIKMOD_UNIX)
 #include <pwd.h>
 #include <sys/stat.h>
 #endif
-#endif
-
-#include <string.h>
-#ifdef HAVE_STRINGS_H
-#include <strings.h>
-#endif
-
-#include "mikmod_internals.h"
 
 #ifdef SUNOS
 extern int fprintf(FILE *, const char *, ...);
 #endif
 
-static	MDRIVER *firstdriver=NULL;
-MIKMODAPI	MDRIVER *md_driver=NULL;
 extern	MODULE *pf; /* modfile being played */
 
+/* EXPORTED GLOBALS */
+MIKMODAPI MDRIVER *md_driver	= NULL;
+
 /* Initial global settings */
-MIKMODAPI	UWORD md_device         = 0;	/* autodetect */
-MIKMODAPI	UWORD md_mixfreq        = 44100;
-MIKMODAPI	UWORD md_mode           = DMODE_STEREO | DMODE_16BITS |
-									  DMODE_SURROUND |DMODE_SOFT_MUSIC |
-									  DMODE_SOFT_SNDFX;
-MIKMODAPI	UBYTE md_pansep         = 128;	/* 128 == 100% (full left/right) */
-MIKMODAPI	UBYTE md_reverb         = 0;	/* no reverb */
-MIKMODAPI	UBYTE md_volume         = 128;	/* global sound volume (0-128) */
-MIKMODAPI	UBYTE md_musicvolume    = 128;	/* volume of song */
-MIKMODAPI	UBYTE md_sndfxvolume    = 128;	/* volume of sound effects */
-			UWORD md_bpm            = 125;	/* tempo */
+MIKMODAPI UWORD md_device	= 0;	/* autodetect */
+MIKMODAPI ULONG md_mixfreq	= 44100;
+MIKMODAPI UWORD md_mode		= DMODE_STEREO | DMODE_16BITS |
+				  DMODE_SURROUND |
+				  DMODE_SOFT_MUSIC | DMODE_SOFT_SNDFX;
+MIKMODAPI UBYTE md_pansep	= 128;	/* 128 == 100% (full left/right) */
+MIKMODAPI UBYTE md_reverb	= 0;	/* no reverb */
+MIKMODAPI UBYTE md_volume	= 128;	/* global sound volume (0-128) */
+MIKMODAPI UBYTE md_musicvolume	= 128;	/* volume of song */
+MIKMODAPI UBYTE md_sndfxvolume	= 128;	/* volume of sound effects */
 
-/* Do not modify the numchn variables yourself!  use MD_SetVoices() */
-			UBYTE md_numchn=0,md_sngchn=0,md_sfxchn=0;
-			UBYTE md_hardchn=0,md_softchn=0;
+/* INTERNAL GLOBALS */
+UWORD md_bpm = 125;	/* tempo */
 
-			void (*md_player)(void) = Player_HandleTick;
-static volatile	int  isplaying=0, initialized = 0;
-static		UBYTE *sfxinfo;
-static		int sfxpool;
+/* Do not modify the numchn variables yourself!  use MikMod_SetNumVoices() */
+UBYTE md_numchn  = 0, md_sngchn = 0, md_sfxchn = 0;
+UBYTE md_hardchn = 0, md_softchn= 0;
 
-static		SAMPLE **md_sample = NULL;
+MikMod_player_t md_player  =  Player_HandleTick;
+
+MikMod_callback_t vc_callback = NULL;
+
+/* PRIVATE VARS */
+static MDRIVER *firstdriver = NULL;
+
+static volatile int isplaying = 0, initialized = 0;
+
+static UBYTE *sfxinfo;
+static int sfxpool;
+
+static SAMPLE **md_sample = NULL;
 
 /* Previous driver in use */
-static		SWORD olddevice = -1;
+static SWORD olddevice = -1;
 
 /* Limits the number of hardware voices to the specified amount.
    This function should only be used by the low-level drivers. */
@@ -183,17 +186,18 @@ MIKMODAPI CHAR* MikMod_InfoDriver(void)
 
 	MUTEX_LOCK(lists);
 	/* compute size of buffer */
-	for(l=firstdriver;l;l=l->next)
-		len+=4+(l->next?1:0)+strlen(l->Version);
+	for(l = firstdriver; l; l = l->next)
+		len += 4 + (l->next ? 1 : 0) + strlen(l->Version);
 
 	if(len)
-		if((list=MikMod_malloc(len*sizeof(CHAR)))) {
-			list[0]=0;
-			/* list all registered device drivers : */
-			for(t=1,l=firstdriver;l;l=l->next,t++)
-				sprintf(list,(l->next)?"%s%2d %s\n":"%s%2d %s",
-				    list,t,l->Version);
+	  if((list=(CHAR*)MikMod_malloc(len*sizeof(CHAR))) != NULL) {
+		CHAR *list_end = list;
+		list[0] = 0;
+		/* list all registered device drivers : */
+		for(t = 1, l = firstdriver; l; l = l->next, t++) {
+		    list_end += sprintf(list_end, "%2d %s%s", t, l->Version, (l->next)? "\n" : "");
 		}
+	}
 	MUTEX_UNLOCK(lists);
 	return list;
 }
@@ -214,7 +218,7 @@ void _mm_registerdriver(struct MDRIVER* drv)
 			}
 			cruise->next = drv;
 		} else
-			firstdriver = drv; 
+			firstdriver = drv;
 	}
 }
 
@@ -230,7 +234,7 @@ MIKMODAPI void MikMod_RegisterDriver(struct MDRIVER* drv)
 	MUTEX_UNLOCK(lists);
 }
 
-MIKMODAPI int MikMod_DriverFromAlias(CHAR *alias)
+MIKMODAPI int MikMod_DriverFromAlias(const CHAR *alias)
 {
 	int rank=1;
 	MDRIVER *cruise;
@@ -252,18 +256,17 @@ MIKMODAPI int MikMod_DriverFromAlias(CHAR *alias)
 
 MIKMODAPI MDRIVER *MikMod_DriverByOrdinal(int ordinal)
 {
-        MDRIVER *cruise;
+	MDRIVER *cruise;
 
-        /* Allow only driver ordinals > 0 */
-        if (!ordinal)
-                return 0;
+	/* Allow only driver ordinals > 0 */
+	if (!ordinal) return NULL;
 
-        MUTEX_LOCK(lists);
-        cruise = firstdriver;
-        while (cruise && --ordinal)
-                cruise = cruise->next;
-        MUTEX_UNLOCK(lists);
-        return cruise;
+	MUTEX_LOCK(lists);
+	cruise = firstdriver;
+	while (cruise && --ordinal)
+		cruise = cruise->next;
+	MUTEX_UNLOCK(lists);
+	return cruise;
 }
 
 SWORD MD_SampleLoad(SAMPLOAD* s, int type)
@@ -496,14 +499,12 @@ MIKMODAPI ULONG Voice_RealVolume(SBYTE voice)
 	return result;
 }
 
-extern MikMod_callback_t vc_callback;
-
 MIKMODAPI void VC_SetCallback(MikMod_callback_t callback)
 {
 	vc_callback = callback;
 }
 
-static int _mm_init(CHAR *cmdline)
+static int _mm_init(const CHAR *cmdline)
 {
 	UWORD t;
 
@@ -561,7 +562,7 @@ static int _mm_init(CHAR *cmdline)
 	return 0;
 }
 
-MIKMODAPI int MikMod_Init(CHAR *cmdline)
+MIKMODAPI int MikMod_Init(const CHAR *cmdline)
 {
 	int result;
 
@@ -581,8 +582,8 @@ void MikMod_Exit_internal(void)
 	md_numchn = md_sfxchn = md_sngchn = 0;
 	md_driver = &drv_nos;
 
-	if(sfxinfo) MikMod_free(sfxinfo);
-	if(md_sample) MikMod_free(md_sample);
+	MikMod_free(sfxinfo);
+	MikMod_free(md_sample);
 	md_sample  = NULL;
 	sfxinfo    = NULL;
 
@@ -598,14 +599,14 @@ MIKMODAPI void MikMod_Exit(void)
 	MUTEX_UNLOCK(vars);
 }
 
-/* Reset the driver using the new global variable settings. 
+/* Reset the driver using the new global variable settings.
    If the driver has not been initialized, it will be now. */
-static int _mm_reset(CHAR *cmdline)
+static int _mm_reset(const CHAR *cmdline)
 {
 	int wasplaying = 0;
 
 	if(!initialized) return _mm_init(cmdline);
-	
+
 	if (isplaying) {
 		wasplaying = 1;
 		md_driver->PlayStop();
@@ -629,12 +630,12 @@ static int _mm_reset(CHAR *cmdline)
 			return 1;
 		}
 	}
-	
-	if (wasplaying) md_driver->PlayStart();
+
+	if (wasplaying) return md_driver->PlayStart();
 	return 0;
 }
 
-MIKMODAPI int MikMod_Reset(CHAR *cmdline)
+MIKMODAPI int MikMod_Reset(const CHAR *cmdline)
 {
 	int result;
 
@@ -661,8 +662,8 @@ int MikMod_SetNumVoices_internal(int music, int sfx)
 		resume = 1;
 	}
 
-	if(sfxinfo) MikMod_free(sfxinfo);
-	if(md_sample) MikMod_free(md_sample);
+	MikMod_free(sfxinfo);
+	MikMod_free(md_sample);
 	md_sample  = NULL;
 	sfxinfo    = NULL;
 
@@ -764,7 +765,7 @@ MIKMODAPI int MikMod_Active(void)
    allocated for use as sound effects (loops through voices, skipping all active
    criticals).
 
-   Returns the voice that the sound is being played on.                       */
+   Returns the voice that the sound is being played on. */
 static SBYTE Sample_Play_internal(SAMPLE *s,ULONG start,UBYTE flags)
 {
 	int orig=sfxpool;/* for cases where all channels are critical */
@@ -825,12 +826,15 @@ MIKMODAPI long MikMod_GetVersion(void)
 #ifdef HAVE_PTHREAD
 #define INIT_MUTEX(name) \
 	pthread_mutex_t _mm_mutex_##name=PTHREAD_MUTEX_INITIALIZER
+
 #elif defined(__OS2__)||defined(__EMX__)
 #define INIT_MUTEX(name) \
 	HMTX _mm_mutex_##name
-#elif defined(WIN32)
+
+#elif defined(_WIN32)
 #define INIT_MUTEX(name) \
 	HANDLE _mm_mutex_##name
+
 #else
 #define INIT_MUTEX(name) \
 	void *_mm_mutex_##name = NULL
@@ -842,8 +846,8 @@ INIT_MUTEX(lists);
 MIKMODAPI int MikMod_InitThreads(void)
 {
 	static int firstcall=1;
-	static int result=0;
-	
+	static int result = 0;
+
 	if (firstcall) {
 		firstcall=0;
 #ifdef HAVE_PTHREAD
@@ -855,9 +859,9 @@ MIKMODAPI int MikMod_InitThreads(void)
 			result=0;
 		} else
 			result=1;
-#elif defined(WIN32)
-		if((!(_mm_mutex_lists=CreateMutex(NULL,FALSE,"libmikmod(lists)")))||
-		   (!(_mm_mutex_vars=CreateMutex(NULL,FALSE,"libmikmod(vars)"))))
+#elif defined(_WIN32)
+		if((!(_mm_mutex_lists=CreateMutex(NULL,FALSE,TEXT("libmikmod(lists)"))))||
+		   (!(_mm_mutex_vars=CreateMutex(NULL,FALSE,TEXT("libmikmod(vars)")))))
 			result=0;
 		else
 			result=1;
@@ -880,24 +884,24 @@ MIKMODAPI void MikMod_Lock(void)
 
 /*========== Parameter extraction helper */
 
-CHAR *MD_GetAtom(CHAR *atomname,CHAR *cmdline,int implicit)
+CHAR *MD_GetAtom(const CHAR *atomname, const CHAR *cmdline, int implicit)
 {
 	CHAR *ret=NULL;
 
 	if(cmdline) {
-		CHAR *buf=strstr(cmdline,atomname);
+		const CHAR *buf=strstr(cmdline,atomname);
 
 		if((buf)&&((buf==cmdline)||(*(buf-1)==','))) {
-			CHAR *ptr=buf+strlen(atomname);
+			const CHAR *ptr=buf+strlen(atomname);
 
 			if(*ptr=='=') {
 				for(buf=++ptr;(*ptr)&&((*ptr)!=',');ptr++);
-				ret=MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
+				ret=(CHAR *)MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
 				if(ret)
 					strncpy(ret,buf,ptr-buf);
 			} else if((*ptr==',')||(!*ptr)) {
 				if(implicit) {
-					ret=MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
+					ret=(CHAR *)MikMod_malloc((1+ptr-buf)*sizeof(CHAR));
 					if(ret)
 						strncpy(ret,buf,ptr-buf);
 				}
@@ -907,8 +911,7 @@ CHAR *MD_GetAtom(CHAR *atomname,CHAR *cmdline,int implicit)
 	return ret;
 }
 
-#if 0
-#if defined unix || (defined __APPLE__ && defined __MACH__)
+#if (MIKMOD_UNIX)
 
 /*========== Posix helper functions */
 
@@ -917,7 +920,7 @@ CHAR *MD_GetAtom(CHAR *atomname,CHAR *cmdline,int implicit)
    reasonable. Returns 1 if it is safe to rewrite the file, 0 otherwise.
    The goal is to prevent a setuid root libmikmod application from overriding
    files like /etc/passwd with digital sound... */
-int MD_Access(CHAR *filename)
+int MD_Access(const CHAR * filename)
 {
 	struct stat buf;
 
@@ -934,7 +937,7 @@ int MD_Access(CHAR *filename)
 		} else
 			if(!(buf.st_mode&S_IWOTH)) return 0;
 	}
-	
+
 	return 1;
 }
 
@@ -961,5 +964,5 @@ int MD_DropPrivileges(void)
 }
 
 #endif
-#endif
-/* ex:set ts=4: */
+
+/* ex:set ts=8: */

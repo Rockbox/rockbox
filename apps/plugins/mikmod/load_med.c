@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_med.c,v 1.3 2005/04/07 19:57:38 realtech Exp $
+  $Id$
 
   Amiga MED module loader
 
@@ -189,6 +189,12 @@ static void MED_Cleanup(void)
 	MikMod_free(ba);
 	MikMod_free(mmd0pat);
 	MikMod_free(mmd1pat);
+	me = NULL;
+	mh = NULL;
+	ms = NULL;
+	ba = NULL;
+	mmd0pat = NULL;
+	mmd1pat = NULL;
 }
 
 static void EffectCvt(UBYTE eff, UBYTE dat)
@@ -338,7 +344,13 @@ static int LoadMEDPatterns(void)
 			of.numchn = numtracks;
 		if (numlines > maxlines)
 			maxlines = numlines;
+		/* sanity check */
+		if (numtracks > 64)
+			return 0;
 	}
+	/* sanity check */
+	if (! of.numchn)	/* docs say 4, 8, 12 or 16 */
+		return 0;
 
 	of.numtrk = of.numpat * of.numchn;
 	if (!AllocTracks())
@@ -346,10 +358,8 @@ static int LoadMEDPatterns(void)
 	if (!AllocPatterns())
 		return 0;
 
-	if (!
-		(mmd0pat =
-		 (MMD0NOTE *)MikMod_calloc(of.numchn * (maxlines + 1),
-								sizeof(MMD0NOTE)))) return 0;
+	if (!(mmd0pat = (MMD0NOTE *)MikMod_calloc(of.numchn * (maxlines + 1), sizeof(MMD0NOTE))))
+		return 0;
 
 	/* second read: read and convert patterns */
 	for (t = 0; t < of.numpat; t++) {
@@ -388,7 +398,15 @@ static int LoadMMD1Patterns(void)
 			of.numchn = numtracks;
 		if (numlines > maxlines)
 			maxlines = numlines;
+		/* sanity check */
+		if (numtracks > 64)
+			return 0;
+		if (numlines >= 3200) /* per docs */
+			return 0;
 	}
+	/* sanity check */
+	if (! of.numchn)	/* docs say 4, 8, 12 or 16 */
+		return 0;
 
 	of.numtrk = of.numpat * of.numchn;
 	if (!AllocTracks())
@@ -396,10 +414,8 @@ static int LoadMMD1Patterns(void)
 	if (!AllocPatterns())
 		return 0;
 
-	if (!
-		(mmd1pat =
-		 (MMD1NOTE *)MikMod_calloc(of.numchn * (maxlines + 1),
-								sizeof(MMD1NOTE)))) return 0;
+	if (!(mmd1pat = (MMD1NOTE *)MikMod_calloc(of.numchn * (maxlines + 1), sizeof(MMD1NOTE))))
+		return 0;
 
 	/* second read: really read and convert patterns */
 	for (t = 0; t < of.numpat; t++) {
@@ -471,6 +487,11 @@ static int MED_Load(int curious)
 	ms->numblocks = _mm_read_M_UWORD(modreader);
 	ms->songlen = _mm_read_M_UWORD(modreader);
 	_mm_read_UBYTES(ms->playseq, 256, modreader);
+	/* sanity check */
+	if (ms->numblocks > 255 || ms->songlen > 256) {
+		_mm_errno = MMERR_NOT_A_MODULE;
+		return 0;
+	}
 	ms->deftempo = _mm_read_M_UWORD(modreader);
 	ms->playtransp = _mm_read_SBYTE(modreader);
 	ms->flags = _mm_read_UBYTE(modreader);
@@ -479,6 +500,11 @@ static int MED_Load(int curious)
 	_mm_read_UBYTES(ms->trkvol, 16, modreader);
 	ms->mastervol = _mm_read_UBYTE(modreader);
 	ms->numsamples = _mm_read_UBYTE(modreader);
+	/* sanity check */
+	if (ms->numsamples > 64) {
+		_mm_errno = MMERR_NOT_A_MODULE;
+		return 0;
+	}
 
 	/* check for a bad header */
 	if (_mm_eof(modreader)) {
@@ -505,6 +531,14 @@ static int MED_Load(int curious)
 		me->songname = _mm_read_M_ULONG(modreader);
 		me->songnamelen = _mm_read_M_ULONG(modreader);
 		me->dumps = _mm_read_M_ULONG(modreader);
+		/* sanity check */
+		if (me->annolen > 0xffff) {
+			_mm_errno = MMERR_NOT_A_MODULE;
+			return 0;
+		}
+		/* truncate insane songnamelen (fail instead??) */
+		if (me->songnamelen > 256)
+			me->songnamelen = 256;
 	}
 
 	/* seek to and read the samplepointer array */
@@ -526,8 +560,14 @@ static int MED_Load(int curious)
 	/* copy song positions */
 	if (!AllocPositions(ms->songlen))
 		return 0;
-	for (t = 0; t < ms->songlen; t++)
+	for (t = 0; t < ms->songlen; t++) {
 		of.positions[t] = ms->playseq[t];
+		if (of.positions[t]>ms->numblocks) { /* SANITIY CHECK */
+		/*	fprintf(stderr,"positions[%d]=%d > numpat=%d\n",t,of.positions[t],ms->numblocks);*/
+			_mm_errno = MMERR_LOADING_HEADER;
+			return 0;
+		}
+	}
 
 	decimalvolumes = (ms->flags & 0x10) ? 0 : 1;
 	bpmtempos = (ms->flags2 & 0x20) ? 1 : 0;
@@ -571,7 +611,7 @@ static int MED_Load(int curious)
 		of.flags |= UF_HIGHBPM;
 	}
 	MED_Version[12] = mh->id;
-	of.modtype = StrDup(MED_Version);
+	of.modtype = MikMod_strdup(MED_Version);
 	of.numchn = 0;				/* will be counted later */
 	of.numpat = ms->numblocks;
 	of.numpos = ms->songlen;
@@ -582,7 +622,7 @@ static int MED_Load(int curious)
 		char *name;
 
 		_mm_fseek(modreader, me->songname, SEEK_SET);
-		name = MikMod_malloc(me->songnamelen);
+		name = (char *) MikMod_malloc(me->songnamelen);
 		_mm_read_UBYTES(name, me->songnamelen, modreader);
 		of.songname = DupStr(name, me->songnamelen, 1);
 		MikMod_free(name);
@@ -684,17 +724,17 @@ static CHAR *MED_LoadTitle(void)
 {
 	ULONG posit, namelen;
 	CHAR *name, *retvalue = NULL;
-	
+
 	_mm_fseek(modreader, 0x20, SEEK_SET);
 	posit = _mm_read_M_ULONG(modreader);
-	
+
 	if (posit) {
 		_mm_fseek(modreader, posit + 0x2C, SEEK_SET);
 		posit = _mm_read_M_ULONG(modreader);
 		namelen = _mm_read_M_ULONG(modreader);
 
 		_mm_fseek(modreader, posit, SEEK_SET);
-		name = MikMod_malloc(namelen);
+		name = (CHAR*) MikMod_malloc(namelen);
 		_mm_read_UBYTES(name, namelen, modreader);
 		retvalue = DupStr(name, namelen, 1);
 		MikMod_free(name);
