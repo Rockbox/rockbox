@@ -122,6 +122,10 @@
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS
 
+/* HW codec is flexible */
+#define HW_SAMPR_CAPS SAMPR_CAP_ALL
+#define HAVE_PLAY_FREQ
+
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 2000  /* min. capacity selectable */
