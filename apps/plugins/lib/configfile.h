@@ -45,10 +45,10 @@ struct configdata
 /* configfile_save - Given configdata entries this function will
    create a config file with these entries, destroying any
    previous config file of the same name */
-int configfile_save(const char *filename, struct configdata *cfg,
+int configfile_save(const char *filename, const struct configdata *cfg,
                     int num_items, int version);
 
-int configfile_load(const char *filename, struct configdata *cfg,
+int configfile_load(const char *filename, const struct configdata *cfg,
                     int num_items, int min_version);
 
 /* configfile_get_value - Given a key name, this function will
