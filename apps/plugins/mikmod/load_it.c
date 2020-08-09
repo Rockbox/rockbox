@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_it.c,v 1.4 2010/01/12 03:30:32 realtech Exp $
+  $Id$
 
   Impulse tracker (IT) module loader
 
@@ -45,7 +45,6 @@
 
 #ifdef SUNOS
 extern int fprintf(FILE *, const char *, ...);
-extern int toupper(int);
 #endif
 
 /*========== Module structure */
@@ -67,7 +66,7 @@ typedef struct ITHEADER {
 	UBYTE	initspeed;
 	UBYTE	inittempo;
 	UBYTE	pansep;		/* panning separation between channels */
-	UBYTE	zerobyte;       
+	UBYTE	zerobyte;
 	UWORD	msglength;
 	ULONG	msgoffset;
 	UBYTE	blank02[4];
@@ -107,19 +106,19 @@ typedef struct ITINSTHEADER {
 	CHAR	filename[12];	/* (char) Instrument filename */
 	UBYTE	zerobyte;		/* (byte) Instrument type (always 0) */
 	UBYTE	volflg;
-	UBYTE	volpts;   
+	UBYTE	volpts;
 	UBYTE	volbeg;			/* (byte) Volume loop start (node) */
 	UBYTE	volend;			/* (byte) Volume loop end (node) */
 	UBYTE	volsusbeg;		/* (byte) Volume sustain begin (node) */
 	UBYTE	volsusend;		/* (byte) Volume Sustain end (node) */
 	UBYTE	panflg;
-	UBYTE	panpts;  
+	UBYTE	panpts;
 	UBYTE	panbeg;			/* (byte) channel loop start (node) */
 	UBYTE	panend;			/* (byte) channel loop end (node) */
 	UBYTE	pansusbeg;		/* (byte) channel sustain begin (node) */
 	UBYTE	pansusend;		/* (byte) channel Sustain end (node) */
 	UBYTE	pitflg;
-	UBYTE	pitpts;   
+	UBYTE	pitpts;
 	UBYTE	pitbeg;			/* (byte) pitch loop start (node) */
 	UBYTE	pitend;			/* (byte) pitch loop end (node) */
 	UBYTE	pitsusbeg;		/* (byte) pitch sustain begin (node) */
@@ -149,7 +148,7 @@ typedef struct ITINSTHEADER {
 	UWORD	pantick[ITENVCNT];   /* tick value of panning nodes */
 	SBYTE	pitnode[ITENVCNT];   /* pitchenv - node points */
 	UWORD	pittick[ITENVCNT];   /* tick value of pitch nodes */
-} ITINSTHEADER;                       
+} ITINSTHEADER;
 
 /* unpacked note */
 
@@ -166,8 +165,8 @@ static UBYTE *mask=NULL;	/* arrays allocated to 64 elements and used for */
 static ITNOTE *last=NULL;	/* uncompressing IT's pattern information */
 static int numtrk=0;
 static unsigned int old_effect;		/* if set, use S3M old-effects stuffs */
-   
-static CHAR* IT_Version[]={
+
+static const CHAR* IT_Version[]={
 	"ImpulseTracker  .  ",
 	"Compressed ImpulseTracker  .  ",
 	"ImpulseTracker 2.14p3",
@@ -177,7 +176,7 @@ static CHAR* IT_Version[]={
 };
 
 /* table for porta-to-note command within volume/panning column */
-static UBYTE portatable[10]= {0,1,4,8,16,32,64,96,128,255};
+static const UBYTE portatable[10]= {0,1,4,8,16,32,64,96,128,255};
 
 /*========== Loader code */
 
@@ -212,40 +211,48 @@ static void IT_Cleanup(void)
 	MikMod_free(last);
 	MikMod_free(paraptr);
 	MikMod_free(origpositions);
+	mh=NULL;
+	poslookup=NULL;
+	itpat=NULL;
+	mask=NULL;
+	last=NULL;
+	paraptr=NULL;
+	origpositions=NULL;
 }
 
 /* Because so many IT files have 64 channels as the set number used, but really
    only use far less (usually from 8 to 24 still), I had to make this function,
    which determines the number of channels that are actually USED by a pattern.
- 
-   NOTE: You must first seek to the file location of the pattern before calling
-         this procedure.
 
-   Returns 1 on error
+   NOTE: You must first seek to the file location of the pattern before calling
+   this procedure.
+
+   Returns 0 on error
 */
 static int IT_GetNumChannels(UWORD patrows)
 {
 	int row=0,flag,ch;
 
 	do {
-		if((flag=_mm_read_UBYTE(modreader))==EOF) {
+		if(_mm_eof(modreader)) {
 			_mm_errno=MMERR_LOADING_PATTERN;
-			return 1;
+			return 0;
 		}
+		flag=_mm_read_UBYTE(modreader);
 		if(!flag)
 			row++;
 		else {
 			ch=(flag-1)&63;
 			remap[ch]=0;
 			if(flag & 128) mask[ch]=_mm_read_UBYTE(modreader);
-			if(mask[ch]&1)   (void)_mm_read_UBYTE(modreader);
-			if(mask[ch]&2)   (void)_mm_read_UBYTE(modreader);
-			if(mask[ch]&4)   (void)_mm_read_UBYTE(modreader);
-			if(mask[ch]&8) { (void)_mm_read_UBYTE(modreader);(void)_mm_read_UBYTE(modreader); }
+			if(mask[ch]&1)   _mm_skip_BYTE(modreader);
+			if(mask[ch]&2)   _mm_skip_BYTE(modreader);
+			if(mask[ch]&4)   _mm_skip_BYTE(modreader);
+			if(mask[ch]&8) { _mm_skip_BYTE(modreader);_mm_skip_BYTE(modreader); }
 		}
 	} while(row<patrows);
 
-	return 0;
+	return 1;
 }
 
 static UBYTE* IT_ConvertTrack(ITNOTE* tr,UWORD numrows)
@@ -282,7 +289,7 @@ static UBYTE* IT_ConvertTrack(ITNOTE* tr,UWORD numrows)
 		/* process volume / panning column
 		   volume / panning effects do NOT all share the same memory address
 		   yet. */
-		if(volpan<=64) 
+		if(volpan<=64)
 			UniVolEffect(VOL_VOLUME,volpan);
 		else if(volpan==65) /* fine volume slide up (65-74) - A0 case */
 			UniVolEffect(VOL_VOLSLIDE,0);
@@ -324,16 +331,20 @@ static UBYTE* IT_ConvertTrack(ITNOTE* tr,UWORD numrows)
 
 static int IT_ReadPattern(UWORD patrows)
 {
-	int row=0,flag,ch,blah;
+	int row=0,flag,ch;
+	unsigned int blah;
 	ITNOTE *itt=itpat,dummy,*n,*l;
+	ITNOTE *ite=&itpat[200*64 -1];
+	UBYTE *m;
 
 	memset(itt,255,200*64*sizeof(ITNOTE));
 
 	do {
-		if((flag=_mm_read_UBYTE(modreader))==EOF) {
+		if(_mm_eof(modreader)) {
 			_mm_errno = MMERR_LOADING_PATTERN;
 			return 0;
 		}
+		flag=_mm_read_UBYTE(modreader);
 		if(!flag) {
 			itt=&itt[of.numchn];
 			row++;
@@ -342,29 +353,38 @@ static int IT_ReadPattern(UWORD patrows)
 			if(ch!=-1) {
 				n=&itt[ch];
 				l=&last[ch];
-			} else 
+				m=&mask[ch];
+				if(n > ite) { /* malformed file */
+					_mm_errno = MMERR_NOT_A_MODULE;
+					return 0;
+				}
+			} else
+			{
 				n=l=&dummy;
+				blah = 0;
+				m=(UBYTE*)&blah;
+			}
 
-			if(flag&128) mask[ch]=_mm_read_UBYTE(modreader);
-			if(mask[ch]&1)
+			if(flag&128) *m=_mm_read_UBYTE(modreader);
+			if(*m&1)
 				/* convert IT note off to internal note off */
-				if((l->note=n->note=_mm_read_UBYTE(modreader))==255) 
+				if((l->note=n->note=_mm_read_UBYTE(modreader))==255)
 					l->note=n->note=253;
-			if(mask[ch]&2)
+			if(*m&2)
 				l->ins=n->ins=_mm_read_UBYTE(modreader);
-			if(mask[ch]&4)
+			if(*m&4)
 				l->volpan=n->volpan=_mm_read_UBYTE(modreader);
-			if(mask[ch]&8) {
+			if(*m&8) {
 				l->cmd=n->cmd=_mm_read_UBYTE(modreader);
 				l->inf=n->inf=_mm_read_UBYTE(modreader);
 			}
-			if(mask[ch]&16)
+			if(*m&16)
 				n->note=l->note;
-			if(mask[ch]&32)
+			if(*m&32)
 				n->ins=l->ins;
-			if(mask[ch]&64)
+			if(*m&64)
 				n->volpan=l->volpan;
-			if(mask[ch]&128) {
+			if(*m&128) {
 				n->cmd=l->cmd;
 				n->inf=l->inf;
 			}
@@ -379,38 +399,39 @@ static int IT_ReadPattern(UWORD patrows)
 	return 1;
 }
 
-static void LoadMidiString(MREADER* modreader,CHAR* dest)
+static void LoadMidiString(MREADER* r,CHAR* dest)
 {
-	CHAR *cur,*last;
+	CHAR *curp,*lastp;
 
-	_mm_read_UBYTES(dest,32,modreader);
-	cur=last=dest;
+	memset(dest,0,33*sizeof(CHAR));/* caller sends midiline[33] */
+	_mm_read_UBYTES(dest,32,r);
+	curp=lastp=dest;
 	/* remove blanks and uppercase all */
-	while(*last) {
-		if(isalnum((int)*last)) *(cur++)=toupper((int)*last);
-		last++;
+	while(*lastp) {
+		if(isalnum((int)*lastp)) *(curp++)=toupper((int)*lastp);
+		lastp++;
 	}
-	*cur=0;
+	*curp=0;
 }
 
 /* Load embedded midi information for resonant filters */
-static void IT_LoadMidiConfiguration(MREADER* modreader)
+static void IT_LoadMidiConfiguration(MREADER* r)
 {
 	int i;
 
 	memset(filtermacros,0,sizeof(filtermacros));
 	memset(filtersettings,0,sizeof(filtersettings));
 
-	if (modreader) { /* information is embedded in file */
+	if (r) { /* information is embedded in file */
 		UWORD dat;
 		CHAR midiline[33];
 
-		dat=_mm_read_I_UWORD(modreader);
-		_mm_fseek(modreader,8*dat+0x120,SEEK_CUR);
+		dat=_mm_read_I_UWORD(r);
+		_mm_fseek(r,8*dat+0x120,SEEK_CUR);
 
 		/* read midi macros */
 		for(i=0;i<UF_MAXMACRO;i++) {
-			LoadMidiString(modreader,midiline);
+			LoadMidiString(r,midiline);
 			if((!strncmp(midiline,"F0F00",5))&&
 			   ((midiline[5]=='0')||(midiline[5]=='1')))
 					filtermacros[i]=(midiline[5]-'0')|0x80;
@@ -418,7 +439,7 @@ static void IT_LoadMidiConfiguration(MREADER* modreader)
 
 		/* read standalone filters */
 		for(i=0x80;i<0x100;i++) {
-			LoadMidiString(modreader,midiline);
+			LoadMidiString(r,midiline);
 			if((!strncmp(midiline,"F0F00",5))&&
 			   ((midiline[5]=='0')||(midiline[5]=='1'))) {
 				filtersettings[i].filter=(midiline[5]-'0')|0x80;
@@ -446,7 +467,7 @@ static int IT_Load(int curious)
 	int t,u,lp;
 	INSTRUMENT *d;
 	SAMPLE *q;
-	/* int compressed=0; */
+	/*int compressed=0;*/
 
 	numtrk=0;
 	filters=0;
@@ -479,6 +500,10 @@ static int IT_Load(int curious)
 		_mm_errno=MMERR_LOADING_HEADER;
 		return 0;
 	}
+	if(mh->ordnum > 256 || mh->insnum > 255 || mh->smpnum > 255 || mh->patnum > 255) {
+		_mm_errno=MMERR_NOT_A_MODULE;
+		return 0;
+	}
 
 	/* set module variables */
 	of.songname    = DupStr(mh->songname,26,0); /* make a cstr of songname  */
@@ -506,11 +531,11 @@ static int IT_Load(int curious)
 	/* 2.16 : IT 2.14p3 with resonant filters */
 	/* 2.15 : IT 2.14p3 (improved compression) */
 	if((mh->cwt<=0x219)&&(mh->cwt>=0x217))
-		of.modtype=StrDup(IT_Version[mh->cmwt<0x214?4:5]);
+		of.modtype=MikMod_strdup(IT_Version[mh->cmwt<0x214?4:5]);
 	else if (mh->cwt>=0x215)
-		of.modtype=StrDup(IT_Version[mh->cmwt<0x214?2:3]);
+		of.modtype=MikMod_strdup(IT_Version[mh->cmwt<0x214?2:3]);
 	else {
-		of.modtype     = StrDup(IT_Version[mh->cmwt<0x214?0:1]);
+		of.modtype = MikMod_strdup(IT_Version[mh->cmwt<0x214?0:1]);
 		of.modtype[mh->cmwt<0x214?15:26] = (mh->cwt>>8)+'0';
 		of.modtype[mh->cmwt<0x214?17:28] = ((mh->cwt>>4)&0xf)+'0';
 		of.modtype[mh->cmwt<0x214?18:29] = ((mh->cwt)&0xf)+'0';
@@ -550,7 +575,7 @@ static int IT_Load(int curious)
 
 	/* read the order data */
 	if(!AllocPositions(mh->ordnum)) return 0;
-	if(!(origpositions=MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
+	if(!(origpositions=(UWORD*)MikMod_calloc(mh->ordnum,sizeof(UWORD)))) return 0;
 
 	for(t=0;t<mh->ordnum;t++) {
 		origpositions[t]=_mm_read_UBYTE(modreader);
@@ -672,14 +697,14 @@ static int IT_Load(int curious)
 		if(s.flag&2) q->flags|=SF_16BITS;
 		if((s.flag&8)&&(mh->cwt>=0x214)) {
 			q->flags|=SF_ITPACKED;
-			/* compressed=1; */
+			/*compressed=1;*/
 		}
 		if(s.flag&16) q->flags|=SF_LOOP;
 		if(s.flag&64) q->flags|=SF_BIDI;
 
 		if(mh->cwt>=0x200) {
 			if(s.convert&1) q->flags|=SF_SIGNED;
-			if(s.convert&4) q->flags|=SF_DELTA;   
+			if(s.convert&4) q->flags|=SF_DELTA;
 		}
 		q++;
 	}
@@ -726,7 +751,7 @@ static int IT_Load(int curious)
 
 			ih.trkvers   = _mm_read_I_UWORD(modreader);
 			ih.numsmp    = _mm_read_UBYTE(modreader);
-			(void)_mm_read_UBYTE(modreader);
+			_mm_skip_BYTE(modreader);
 			_mm_read_string(ih.name,26,modreader);
 			_mm_read_UBYTES(ih.blank01,6,modreader);
 			_mm_read_I_UWORDS(ih.samptable,ITNOTECNT,modreader);
@@ -736,13 +761,15 @@ static int IT_Load(int curious)
 				for(lp=0;lp<ITENVCNT;lp++) {
 					ih.oldvoltick[lp] = _mm_read_UBYTE(modreader);
 					ih.volnode[lp]    = _mm_read_UBYTE(modreader);
-				} 
+				}
 			} else {
 				/* load IT 2xx volume, pan and pitch envelopes */
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define IT_LoadEnvelope(name,type) 										\
 				ih. name##flg   =_mm_read_UBYTE(modreader);				\
 				ih. name##pts   =_mm_read_UBYTE(modreader);				\
+				if (ih. name##pts > ITENVCNT)							\
+					ih. name##pts = ITENVCNT;							\
 				ih. name##beg   =_mm_read_UBYTE(modreader);				\
 				ih. name##end   =_mm_read_UBYTE(modreader);				\
 				ih. name##susbeg=_mm_read_UBYTE(modreader);				\
@@ -751,11 +778,13 @@ static int IT_Load(int curious)
 					ih. name##node[lp]=_mm_read_##type (modreader);		\
 					ih. name##tick[lp]=_mm_read_I_UWORD(modreader);		\
 				}														\
-				(void)_mm_read_UBYTE(modreader)
+				_mm_skip_BYTE(modreader)
 #else
 #define IT_LoadEnvelope(name,type) 										\
 				ih. name/**/flg   =_mm_read_UBYTE(modreader);			\
 				ih. name/**/pts   =_mm_read_UBYTE(modreader);			\
+				if (ih. name/**/pts > ITENVCNT)							\
+					ih. name/**/pts = ITENVCNT;							\
 				ih. name/**/beg   =_mm_read_UBYTE(modreader);			\
 				ih. name/**/end   =_mm_read_UBYTE(modreader);			\
 				ih. name/**/susbeg=_mm_read_UBYTE(modreader);			\
@@ -764,7 +793,7 @@ static int IT_Load(int curious)
 					ih. name/**/node[lp]=_mm_read_/**/type (modreader);	\
 					ih. name/**/tick[lp]=_mm_read_I_UWORD(modreader);	\
 				}														\
-				(void)_mm_read_UBYTE(modreader)
+				_mm_skip_BYTE(modreader)
 #endif
 
 				IT_LoadEnvelope(vol,UBYTE);
@@ -772,7 +801,7 @@ static int IT_Load(int curious)
 				IT_LoadEnvelope(pit,SBYTE);
 #undef IT_LoadEnvelope
 			}
- 
+
 			if(_mm_eof(modreader)) {
 				_mm_errno = MMERR_LOADING_SAMPLEINFO;
 				return 0;
@@ -791,10 +820,10 @@ static int IT_Load(int curious)
 
 				if(ih.volflg&1) d->volflg|=EF_ON;
 				if(ih.volflg&2) d->volflg|=EF_LOOP;
-				if(ih.volflg&4) d->volflg|=EF_SUSTAIN;      
+				if(ih.volflg&4) d->volflg|=EF_SUSTAIN;
 
 				/* XM conversion of IT envelope Array */
-				d->volbeg    = ih.volbeg;   
+				d->volbeg    = ih.volbeg;
 				d->volend    = ih.volend;
 				d->volsusbeg = ih.volsusbeg;
 				d->volsusend = ih.volsusend;
@@ -807,7 +836,7 @@ static int IT_Load(int curious)
 							d->volpts++;
 						} else
 							break;
-				}  
+				}
 			} else {
 				d->panning=((ih.chanpan&127)==64)?255:(ih.chanpan&127)<<2;
 				if(!(ih.chanpan&128)) d->flags|=IF_OWNPAN;
@@ -827,7 +856,7 @@ static int IT_Load(int curious)
 					d->rpanvar = ih.rpanvar;
 				}
 
-#if defined __STDC__ || defined _MSC_VER || defined MPW_C
+#if defined __STDC__ || defined _MSC_VER || defined __WATCOMC__ || defined MPW_C
 #define IT_ProcessEnvelope(name) 										\
 				if(ih. name##flg&1) d-> name##flg|=EF_ON;				\
 				if(ih. name##flg&2) d-> name##flg|=EF_LOOP;				\
@@ -862,11 +891,7 @@ static int IT_Load(int curious)
 #endif
 
 				IT_ProcessEnvelope(vol);
-			
-				// Secunia SA37775
-				if (ih.volpts>= ENVPOINTS)
-					ih.volpts = ENVPOINTS-1;
-				
+
 				for(u=0;u<ih.volpts;u++)
 					d->volenv[u].val=(ih.volnode[u]<<2);
 
@@ -887,7 +912,7 @@ static int IT_Load(int curious)
 #ifdef MIKMOD_DEBUG
 					{
 						static int warn=0;
-						
+
 						if(!warn)
 							fprintf(stderr, "\rFilter envelopes not supported yet\n");
 						warn=1;
@@ -908,7 +933,7 @@ static int IT_Load(int curious)
 				}
 			}
 
-			d++;                  
+			d++;
 		}
 	} else if(of.flags & UF_LINEAR) {
 		if(!AllocInstruments()) return 0;
@@ -946,12 +971,12 @@ static int IT_Load(int curious)
 				return 0;
 			}
 			_mm_read_I_ULONG(modreader);
-			if(IT_GetNumChannels(packlen)) return 0;
+			if(!IT_GetNumChannels(packlen)) return 0;
 		}
 	}
 
 	/* give each of them a different number */
-	for(t=0;t<UF_MAXCHAN;t++) 
+	for(t=0;t<UF_MAXCHAN;t++)
 		if(!remap[t])
 			remap[t]=of.numchn++;
 
@@ -963,6 +988,8 @@ static int IT_Load(int curious)
 	if(!AllocTracks()) return 0;
 
 	for(t=0;t<of.numpat;t++) {
+		UWORD packlen;
+
 		/* seek to pattern position */
 		if(!paraptr[mh->insnum+mh->smpnum+t]) { /* 0 -> empty 64 row pattern */
 			of.pattrows[t]=64;
@@ -975,7 +1002,8 @@ static int IT_Load(int curious)
 			}
 		} else {
 			_mm_fseek(modreader,((long)paraptr[mh->insnum+mh->smpnum+t]),SEEK_SET);
-			(void)_mm_read_I_UWORD(modreader);
+			packlen=_mm_read_I_UWORD(modreader);
+			(void)packlen; /* unused */
 			of.pattrows[t]=_mm_read_I_UWORD(modreader);
 			_mm_read_I_ULONG(modreader);
 			if(!IT_ReadPattern(of.pattrows[t])) return 0;
@@ -991,7 +1019,7 @@ static CHAR *IT_LoadTitle(void)
 
 	_mm_fseek(modreader,4,SEEK_SET);
 	if(!_mm_read_UBYTES(s,26,modreader)) return NULL;
-   
+
 	return(DupStr(s,26,0));
 }
 
