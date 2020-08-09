@@ -8,6 +8,9 @@
 
 #undef WIN32
 
+#define NO_DEPACKERS  // We don't support these
+//#define NO_HQMIXER    // We don't have the oomph
+
 #ifndef NO_MMSUPP_DEFINES
 #define snprintf(...)		rb->snprintf(__VA_ARGS__)
 #define fdprintf(...)		rb->fdprintf(__VA_ARGS__)

@@ -15352,6 +15352,26 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "High Quality Mixer"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_CPU_BOOST
   desc: in mikmod settings menu
   user: core
