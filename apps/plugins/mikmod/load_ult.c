@@ -6,12 +6,12 @@
 	it under the terms of the GNU Library General Public License as
 	published by the Free Software Foundation; either version 2 of
 	the License, or (at your option) any later version.
- 
+
 	This program is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Library General Public License for more details.
- 
+
 	You should have received a copy of the GNU Library General Public
 	License along with this library; if not, write to the Free Software
 	Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
@@ -20,7 +20,7 @@
 
 /*==============================================================================
 
-  $Id: load_ult.c,v 1.3 2010/01/12 03:30:32 realtech Exp $
+  $Id$
 
   Ultratracker (ULT) module loader
 
@@ -80,7 +80,7 @@ typedef struct ULTEVENT {
 #define ULTS_REVERSE    16
 
 #define ULT_VERSION_LEN 18
-static	CHAR ULT_Version[ULT_VERSION_LEN]="Ultra Tracker v1.x";
+static	CHAR ULT_Version[ULT_VERSION_LEN+1]="Ultra Tracker v1.x";
 
 static	ULTEVENT ev;
 
@@ -130,8 +130,8 @@ static int ULT_Load(int curious)
 	SAMPLE *q;
 	ULTSAMPLE s;
 	ULTHEADER mh;
-	UBYTE nos,noc,rbnop;
-    (void)curious;
+	UBYTE nos,noc,RBnop;
+	(void)curious;
 
 	/* try to read module header */
 	_mm_read_string(mh.id,15,modreader);
@@ -207,29 +207,37 @@ static int ULT_Load(int curious)
 	if(!AllocPositions(256)) return 0;
 	for(t=0;t<256;t++)
 		of.positions[t]=_mm_read_UBYTE(modreader);
-	for(t=0;t<256;t++)
+
+	noc=_mm_read_UBYTE(modreader);
+	RBnop=_mm_read_UBYTE(modreader);
+
+	of.numchn=++noc;
+	of.numpat=++RBnop;
+	of.numtrk=of.numchn*of.numpat;
+
+	for(t=0;t<256;t++) {
 		if(of.positions[t]==255) {
 			of.positions[t]=LAST_PATTERN;
 			break;
 		}
+		if (of.positions[t]>of.numpat) { /* SANITIY CHECK */
+		/*	fprintf(stderr,"positions[%d]=%d > numpat=%d\n",t,of.positions[t],of.numpat);*/
+			_mm_errno = MMERR_LOADING_HEADER;
+			return 0;
+		}
+	}
 	of.numpos=t;
 
-	noc=_mm_read_UBYTE(modreader);
-	rbnop=_mm_read_UBYTE(modreader);
-
-	of.numchn=++noc;
-	of.numpat=++rbnop;
-	of.numtrk=of.numchn*of.numpat;
 	if(!AllocTracks()) return 0;
 	if(!AllocPatterns()) return 0;
 	for(u=0;u<of.numchn;u++)
 		for(t=0;t<of.numpat;t++)
 			of.patterns[(t*of.numchn)+u]=tracks++;
 
-	// SA37775
+	/* Secunia SA37775 / CVE-2009-3996 */
 	if (of.numchn>=UF_MAXCHAN)
 		of.numchn=UF_MAXCHAN - 1;
-	
+
 	/* read pan position table for v1.5 and higher */
 	if(mh.id[14]>='3') {
 		for(t=0;t<of.numchn;t++) of.panning[t]=_mm_read_UBYTE(modreader)<<4;
@@ -313,7 +321,7 @@ static int ULT_Load(int curious)
 	return 1;
 }
 
-static CHAR *ULT_LoadTitle(void)
+static CHAR * ULT_LoadTitle(void)
 {
 	CHAR s[32];
 
