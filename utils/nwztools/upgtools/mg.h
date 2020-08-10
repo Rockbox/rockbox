@@ -30,6 +30,10 @@ extern "C" {
 
 /* Compute the MD5 digest of a buffer */
 void MD5_CalculateDigest(void *digest, const void *input, size_t length);
+/* Compute MD5 in more than one step */
+void *md5_start(); /* return an opaque pointer */
+void md5_update(void *md5_obj, const void *input, size_t length);
+void md5_final(void *md5_obj, void *digest); /* destroys the MD5 object */
 
 /* size must be a multiple of 8, this function is thread-safe */
 void mg_decrypt_fw(void *in, int size, void *out, uint8_t key[8]);

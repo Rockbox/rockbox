@@ -49,6 +49,7 @@ static char *g_sig = NULL;
 static int g_nr_threads = 1;
 #define MAX_NR_FILES    32
 bool g_compress[MAX_NR_FILES] = {false};
+const char *g_md5name[MAX_NR_FILES] = {NULL};
 
 enum keysig_search_method_t g_keysig_search = KEYSIG_SEARCH_NONE;
 
@@ -148,6 +149,93 @@ static int get_key_and_sig(bool is_extract, void *buf)
     return 0;
 }
 
+static unsigned xdigit2val(char c)
+{
+    if('0' <= c && c <= '9')
+        return c - '0';
+    if('a' <= c && c <= 'f')
+        return c - 'a' + 10;
+    if('A' <= c && c <= 'F')
+        return c - 'A' + 10;
+    return 0;
+}
+
+static bool find_md5_entry(struct upg_file_t *file, const char *name, size_t *out_size, uint8_t *md5)
+{
+    char *content = file->files[1].data;
+    size_t size = file->files[1].size;
+    /* we expect the file to have a terminating zero because it is padded with zeroes, if not, add one */
+    if(content[size - 1] != 0)
+    {
+        content = file->files[1].data = realloc(content, size + 1);
+        content[size] = 0;
+        size++;
+    }
+    /* now we can parse safely by stopping t the first 0 */
+    size_t pos = 0;
+    while(true)
+    {
+        /* format of each line: filesize md5 name */
+        char *end;
+        if(content[pos] == 0)
+            break; /* stop on zero */
+        if(!isdigit(content[pos]))
+            goto Lskipline;
+        /* parse size */
+        *out_size = strtoul(content + pos, &end, 0);
+        pos = end - content;
+        while(content[pos] == ' ')
+            pos++;
+        /* parse md5 */
+        for(int i = 0; i < NWZ_MD5_SIZE; i++)
+        {
+            if(!isxdigit(content[pos]))
+                goto Lskipline;
+            if(!isxdigit(content[pos + 1]))
+                goto Lskipline;
+            md5[i] = xdigit2val(content[pos]) << 4 | xdigit2val(content[pos + 1]);
+            pos += 2;
+        }
+        /* parse name: this is a stupid comparison, no trimming */
+        while(content[pos] == ' ')
+            pos++;
+        size_t name_begin = pos;
+        while(content[pos] != 0 && content[pos] != '\n')
+            pos++;
+        if(strlen(name) == pos - name_begin && !memcmp(content + name_begin, name, pos - name_begin))
+            return true;
+        /* fallthrough: eat end of line */
+        Lskipline:
+        while(content[pos] != 0 && content[pos] != '\n')
+            pos++;
+        if(content[pos] == '\n')
+            pos++;
+    }
+    return false;
+}
+
+static void compare_md5(struct upg_file_t *file, int idx, size_t filesize, uint8_t *md5)
+{
+    if(g_md5name[idx] == NULL)
+        return;
+    size_t expected_size;
+    uint8_t expected_md5[NWZ_MD5_SIZE * 2];
+    bool found = find_md5_entry(file, g_md5name[idx], &expected_size, expected_md5);
+    cprintf(BLUE, "File %d\n", idx);
+    cprintf_field("  Name: ", "%s ", g_md5name[idx]);
+    cprintf(RED, found ? "Found" : " Not found");
+    printf("\n");
+    cprintf_field("  Size: ", "%lu", filesize);
+    cprintf(RED, " %s", !found ? "Cannot check" : filesize == expected_size ? "Ok" : "Mismatch");
+    printf("\n");
+    cprintf_field("  MD5:", " ");
+    for(int i = 0; i < NWZ_MD5_SIZE; i++)
+        printf("%02x", md5[i]);
+    bool ok_md5 = !memcmp(md5, expected_md5, NWZ_MD5_SIZE);
+    cprintf(RED, " %s", !found ? "Cannot check" : ok_md5 ? "Ok" : "Mismatch");
+    printf("\n");
+}
+
 static int do_upg(void *buf, long size)
 {
     int ret = get_key_and_sig(true, buf);
@@ -171,8 +259,11 @@ static int do_upg(void *buf, long size)
             continue;
         }
         free(str);
+        /* we will compute the MD5 during writing/decompress */
         if(g_compress[i])
         {
+            void *md5_obj = md5_start();
+            uint8_t md5[NWZ_MD5_SIZE];
             void *buf = file->files[i].data;
             int size = file->files[i].size;
             int pos = 0;
@@ -182,6 +273,7 @@ static int do_upg(void *buf, long size)
             void *chunk = malloc(max_chunk_size);
             if(g_debug)
                 cprintf(GREY, "decompressing file %d with chunk size %d...\n", i, max_chunk_size);
+            size_t total_size = 0;
             while(pos + 4 <= size)
             {
                 int compressed_chunk_size = *(uint32_t *)(buf + pos);
@@ -206,11 +298,15 @@ static int do_upg(void *buf, long size)
                     break;
                 }
                 pos += 4 + compressed_chunk_size;
+                md5_update(md5_obj, chunk, chunk_size);
                 fwrite(chunk, 1, chunk_size, f);
+                total_size += chunk_size;
             }
             free(chunk);
             if(g_debug)
                 cprintf(GREY, "done.");
+            md5_final(md5_obj, md5);
+            compare_md5(file, i, total_size, md5);
         }
         else
         {
@@ -297,6 +393,9 @@ static int create_upg(int argc, char **argv)
     struct upg_file_t *upg = upg_new();
     int nr_files = argc - 1;
 
+    char *md5_prepend = malloc(1);
+    md5_prepend[0] = 0;
+    size_t md5_prepend_sz = 0;
     for(int i = 0; i < nr_files; i++)
     {
         FILE *f = fopen(argv[1 + i], "rb");
@@ -316,9 +415,24 @@ static int create_upg(int argc, char **argv)
             return 1;
         }
         fclose(f);
+        /* add the MD5 of files *before* any kind of treatment. Does nothing if not resquested,
+        * which is important on v1 where the second file might not be the md5 file */
+        if(g_md5name[i])
+        {
+            uint8_t md5[NWZ_MD5_SIZE];
+            MD5_CalculateDigest(md5, buf, size);
+            size_t inc_sz = 16 + NWZ_MD5_SIZE * 2 + strlen(g_md5name[i]);
+            md5_prepend = realloc(md5_prepend, md5_prepend_sz + inc_sz);
+            md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, "%lu ", size);
+            for(int i = 0; i < NWZ_MD5_SIZE; i++)
+                md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, "%02x", md5[i]);
+            md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, " %s\n", g_md5name[i]);
+        }
         if(g_compress[i])
         {
-            int out_buf_max_sz = size; /* we expect that the output will not take more space */
+            /* in the worst case, maybe the compressor will double the size, also we always need
+             * at least 4 bytes to write the size of a block */
+            int out_buf_max_sz = 4 + 2 * size;
             void *out_buf = malloc(out_buf_max_sz);
             int out_buf_pos = 0, in_buf_pos = 0;
             int max_chunk_size = 4096; /* the OF encoder/decoder expect that */
@@ -329,7 +443,7 @@ static int create_upg(int argc, char **argv)
                 int zres = compress(out_buf + out_buf_pos + 4, &dest_len, buf + in_buf_pos, chunk_size);
                 if(zres == Z_BUF_ERROR)
                 {
-                    cprintf(RED, "the compresser produced a file greater than its input, I can't handle that\n");
+                    cprintf(RED, "the compresser produced a file much greater than its input, I can't handle that\n");
                     return 1;
                 }
                 else if(zres != Z_OK)
@@ -351,6 +465,11 @@ static int create_upg(int argc, char **argv)
         else
             upg_append(upg, buf, size);
     }
+
+    /* modify md5 file (if any) */
+    upg->files[1].data = realloc(upg->files[1].data, upg->files[1].size + md5_prepend_sz);
+    memmove(upg->files[1].data + md5_prepend_sz, upg->files[1].data, upg->files[1].size);
+    memcpy(upg->files[1].data, md5_prepend, md5_prepend_sz);
 
     size_t size = 0;
     void *buf = upg_write_memory(upg, g_key, g_sig, &size, NULL, generic_std_printf);
@@ -398,7 +517,11 @@ static void usage(void)
     printf("  -e/--extract\t\tExtract a UPG archive\n");
     printf("  -c/--create\t\tCreate a UPG archive\n");
     printf("  -z/--compress <idx>\t\t(De)compress file <idx> (starts at 0)\n");
-    printf("keysig search method:\n");
+    printf("  -z/--compress <idx>,<md5name>\t\t(De)compress file <idx> and add it to the MD5 file\n");
+    printf("When using -z <idx>,<md5name>, the file file size and MD5 prior to compression will\n");
+    printf("be prepended to the contect of the second file (index 1). The name can be arbitrary and\n");
+    printf("has meaning only the script, e.g. \"-z 6,system.img\".\n");
+    printf("Keysig search method:\n");
     for(int i = KEYSIG_SEARCH_FIRST; i < KEYSIG_SEARCH_LAST; i++)
         printf("  %-10s\t%s\n", keysig_search_desc[i].name, keysig_search_desc[i].comment);
     exit(1);
@@ -494,13 +617,23 @@ int main(int argc, char **argv)
                 break;
             case 'z':
             {
-                int idx = strtol(optarg, NULL, 0);
+                char *end;
+                int idx = strtol(optarg, &end, 0);
                 if(idx < 0 || idx >= MAX_NR_FILES)
                 {
                     cprintf(GREY, "Invalid file index\n");
                     return 1;
                 }
                 g_compress[idx] = true;
+                /* distinguish betwen -z <idx> and -z <idx>,<md5name> */
+                if(*end == 0)
+                    break;
+                if(*end != ',')
+                {
+                    cprintf(GREY, "Invalid file index\n");
+                    return 1;
+                }
+                g_md5name[idx] = end + 1;
                 break;
             }
             default:

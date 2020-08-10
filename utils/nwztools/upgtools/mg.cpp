@@ -215,6 +215,24 @@ void MD5_CalculateDigest(void *digest, const void *input, size_t length)
     MD5().CalculateDigest((byte *)digest, (const byte *)input, length);
 }
 
+void *md5_start()
+{
+    return new MD5;
+}
+
+void md5_update(void *md5_obj, const void *input, size_t length)
+{
+    MD5 *md5 = reinterpret_cast<MD5 *>(md5_obj);
+    md5->Update(reinterpret_cast<const uint8_t *>(input), length);
+}
+
+void md5_final(void *md5_obj, void *digest)
+{
+    MD5 *md5 = reinterpret_cast<MD5 *>(md5_obj);
+    md5->Final(reinterpret_cast<uint8_t *>(digest));
+    delete md5;
+}
+
 void mg_decrypt_fw(void *in, int size, void *out, uint8_t *key)
 {
     ECB_Mode< DES >::Decryption dec;
