@@ -96,6 +96,7 @@ __pycache__
 /rbutil/mkimxboot/mkimxboot
 /rbutil/mknwzboot/mknwzboot
 /rbutil/mkzenboot/mkzenboot
+/rbutil/sansapatcher/sansapatcher
 /rbutil/tools/bin2c
 
 # /tools/
@@ -159,6 +160,17 @@ __pycache__
 /utils/jz4740_tools/IHFSsplit
 /utils/jz4740_tools/jz_xloader.*
 /utils/jz4740_tools/bin2c
+
+# /utils/jz4760_tools
+/utils/jz4760_tools/packtools
+/utils/jz4760_tools/usbboot
+
+# /utils/nwztools
+/utils/nwztools/scsitools/scsitool
+/utils/nwztools/upgtools/upgtool
+
+#  utils/rk27utils 
+/utils/rk27utils/rkboottool/rkboottool
 
 # /utils/themeeditor/
 /utils/themeeditor/debug
