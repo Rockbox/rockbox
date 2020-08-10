@@ -33,9 +33,9 @@
 bool get_flac_metadata(int fd, struct mp3entry* id3)
 {
     /* A simple parser to read vital metadata from a FLAC file - length,
-     * frequency, bitrate etc. This code should either be moved to a 
+     * frequency, bitrate etc. This code should either be moved to a
      * seperate file, or discarded in favour of the libFLAC code.
-     * The FLAC stream specification can be found at 
+     * The FLAC stream specification can be found at
      * http://flac.sourceforge.net/format.html#stream
      */
 
@@ -48,22 +48,22 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
     {
         return rc;
     }
-    
-    if (memcmp(buf, "fLaC", 4) != 0) 
+
+    if (memcmp(buf, "fLaC", 4) != 0)
     {
         return rc;
     }
 
-    while (!last_metadata) 
+    while (!last_metadata)
     {
         unsigned long i;
         int type;
-        
+
         if (read(fd, buf, 4) != 4)
         {
             return rc;
         }
-        
+
         last_metadata = buf[0] & 0x80;
         type = buf[0] & 0x7f;
         /* The length of the block */
@@ -72,39 +72,39 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
         if (type == 0)       /* 0 is the STREAMINFO block */
         {
             unsigned long totalsamples;
-            
-            if (i >= sizeof(id3->path) || read(fd, buf, i) != i)
+
+            if (i >= sizeof(id3->path) || read(fd, buf, i) != (int)i)
             {
                 return rc;
             }
-          
+
             id3->vbr = true;   /* All FLAC files are VBR */
             id3->filesize = filesize(fd);
-            id3->frequency = (buf[10] << 12) | (buf[11] << 4) 
+            id3->frequency = (buf[10] << 12) | (buf[11] << 4)
                 | ((buf[12] & 0xf0) >> 4);
             rc = true;  /* Got vital metadata */
 
             /* totalsamples is a 36-bit field, but we assume <= 32 bits are used */
             totalsamples = get_long_be(&buf[14]);
-            
+
             if(totalsamples > 0)
             {
-                /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */        
+                /* Calculate track length (in ms) and estimate the bitrate (in kbit/s) */
                 id3->length = ((int64_t) totalsamples * 1000) / id3->frequency;
-                id3->bitrate = (id3->filesize * 8) / id3->length;   
-            } 
+                id3->bitrate = (id3->filesize * 8) / id3->length;
+            }
             else if (totalsamples == 0)
             {
                 id3->length = 0;
                 id3->bitrate = 0;
             }
-            else 
+            else
             {
                 logf("flac length invalid!");
                 return false;
             }
 
-        } 
+        }
         else if (type == 4)  /* 4 is the VORBIS_COMMENT block */
         {
             /* The next i bytes of the file contain the VORBIS COMMENTS. */
@@ -112,7 +112,7 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
             {
                 return rc;
             }
-        } 
+        }
 #ifdef HAVE_ALBUMART
         else if (type == 6) /* 6 is the PICTURE block */
         {
@@ -172,6 +172,6 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
             }
         }
     }
-    
+
     return true;
 }
