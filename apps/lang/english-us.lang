@@ -16033,3 +16033,43 @@
     hotkey: "Hold for settings"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "High Quality Mixer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </voice>
+</phrase>
