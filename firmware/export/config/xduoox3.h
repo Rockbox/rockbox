@@ -152,12 +152,11 @@
 #define CPUFREQ_MAX      576000000  // datasheet sez 600MHz max.  Must be multiple of 48!
 #define CPUFREQ_MIN      192000000
 #define CPUFREQ_DEFAULT  CPUFREQ_MIN
+#define CPUFREQ_NORMAL   CPUFREQ_MIN
 
 #define HAVE_ADJUSTABLE_CPU_FREQ
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
-//#define HAVE_GUI_BOOST
-#define CPUFREQ_NORMAL   CPUFREQ_MIN
-#else
+
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
 #define CPU_FREQ         CPUFREQ_MAX
 #endif
 
