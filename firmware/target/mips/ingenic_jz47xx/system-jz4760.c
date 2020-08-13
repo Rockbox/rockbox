@@ -28,6 +28,8 @@
 #include "kernel.h"
 #include "power.h"
 
+#define USE_HW_UDELAY
+
 static int irq;
 static void UIRQ(void)
 {
@@ -335,6 +337,28 @@ void tlb_refill_handler(void)
     panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
+#ifdef USE_HW_UDELAY
+/* This enables the HW timer, set to EXT_XTAL / 16 (so @ 12MHz, 1 us = 750 ticks) */
+static void init_delaytimer(void)
+{
+    __tcu_disable_ost();
+    REG_OST_OSTCSR = OSTCSR_EXT_EN | OSTCSR_PRESCALE16 |  OSTCSR_CNT_MD;
+    REG_OST_OSTCNT = 0;
+    REG_OST_OSTDR = 0;
+    __tcu_enable_ost();
+}
+
+void udelay(unsigned int usec)
+{
+    if (!__tcu_ost_enabled())
+	init_delaytimer();
+
+    /* Figure out how many ticks we need */
+    usec = (CFG_EXTAL / 16 / 1000) * (usec + 1);
+
+    while (usec < REG_OST_OSTCNT) {  }
+}
+#else
 void udelay(unsigned int usec)
 {
     unsigned int i = usec * (__cpm_get_cclk() / 2000000);
@@ -348,6 +372,7 @@ void udelay(unsigned int usec)
                           : "0" (i)
                           );
 }
+#endif
 
 void mdelay(unsigned int msec)
 {
@@ -656,6 +681,10 @@ void ICODE_ATTR system_main(void)
     /* Disable all interrupts */
     for(i=0; i<IRQ_INTC_MAX; i++)
         dis_irq(i);
+
+#ifdef USE_HW_UDELAY
+    init_delaytimer();
+#endif
 
     mmu_init();
 
