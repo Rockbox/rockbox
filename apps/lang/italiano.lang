@@ -5187,11 +5187,11 @@ desc: deprecated
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "Wave PCM"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "Wave PCM"
   </voice>
 </phrase>
 <phrase>
@@ -15795,8 +15795,7 @@ desc: deprecated
     *: "Premere LEFT per annullare."
     android,hifietma*,zenvision: "Premere BACK per annullare."
     cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
-    ihifi760: "Premere due volte RETURN per annullare."
-    ihifi960: "Premere due volte RETURN per annullare."
+    ihifi760,ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
     iriverh10,samsungyh*: "Premere due volte LEFT per annullare."
     mpiohd200: "Premere due volte REC per annullare."
@@ -15811,8 +15810,7 @@ desc: deprecated
     *: "Premere LEFT per annullare."
     android,hifietma*,zenvision: "Premere BACK per annullare."
     cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
-    ihifi760: "Premere due volte RETURN per annullare."
-    ihifi960: "Premere due volte RETURN per annullare."
+    ihifi760,ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
     iriverh10,samsungyh*: "Premere due volte LEFT per annullare."
     mpiohd200: "Premere due volte REC per annullare."
@@ -16027,5 +16025,45 @@ desc: deprecated
   <voice>
     *: none
     hotkey: "Temere premuto per le impostazioni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "Mixer HQ"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Mixer Alta Qualità"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
   </voice>
 </phrase>
