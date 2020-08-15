@@ -656,9 +656,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->memset(buf, 0, buf_size);
 
     gThread.stacksize = buf_size;
-    gThread.stack = (long *) buf + buf_size; /* stack grows towards *buf */
-
-    ALIGN_BUFFER(gThread.stack, gThread.stacksize, sizeof(long));
+    gThread.stack = (long *) buf;
 
     if (gThread.stacksize < MIN_THREAD_STACK_SIZE)
     {

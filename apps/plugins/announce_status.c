@@ -438,7 +438,7 @@ void plugin_buffer_init(void)
     {
         rb->memset(&gThread, 0, sizeof(gThread));
         gThread.buf = rb->plugin_get_buffer(&gThread.buf_size);
-        ALIGN_BUFFER(gThread.buf, gThread.buf_size, 4);
+        ALIGN_BUFFER(gThread.buf, gThread.buf_size, sizeof(long));
     }
 }
 
@@ -448,9 +448,9 @@ void thread_create(void)
     gThread.stacksize = gThread.buf_size;
     gThread.buf_size -= gThread.stacksize;
 
-    gThread.stack = (long *) gThread.buf + gThread.buf_size;
+    gThread.stack = (long *) gThread.buf;
 
-    ALIGN_BUFFER(gThread.stack, gThread.stacksize, 4);
+    ALIGN_BUFFER(gThread.stack, gThread.stacksize, sizeof(long));
 
     if (gThread.stacksize < DEFAULT_STACK_SIZE)
     {
