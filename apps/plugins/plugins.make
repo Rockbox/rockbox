@@ -88,6 +88,7 @@ $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 
 # special dependencies
 $(BUILDDIR)/apps/plugins/wav2wv.rock: $(RBCODEC_BLD)/codecs/libwavpack.a $(PLUGIN_LIBS)
+$(BUILDDIR)/apps/plugins/battery_bench.rock: $(TLSFLIB)
 
 # Do not use '-ffunction-sections' and '-fdata-sections' when compiling sdl-sim
 ifeq ($(findstring sdl-sim, $(APP_TYPE)), sdl-sim)

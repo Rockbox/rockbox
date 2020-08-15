@@ -23,7 +23,7 @@
 #include "version.h"
 #include "plugin.h"
 #include "lang_enum.h"
-
+#include <tlsf.h> /* see special dependencies in plugins.make */
 
 #define BATTERY_LOG  HOME_DIR"/battery_bench.txt"
 #define BUF_SIZE 16000
@@ -317,7 +317,6 @@ static struct batt_info
 
 #define BUF_ELEMENTS    (sizeof(bat)/sizeof(struct batt_info))
 
-
 static struct
 {
     unsigned int id; /* worker thread id */
@@ -328,6 +327,14 @@ static struct
 static struct event_queue thread_q SHAREDBSS_ATTR;
 static bool in_usb_mode;
 static unsigned int buf_idx;
+
+static void init_tlsf(char *buffer, size_t buffer_len)
+{
+    /* reset tlsf by nuking the signature */
+    /* will make any already-allocated memory point to garbage */
+    memset(buffer, 0, 4);
+    init_memory_pool(buffer_len, buffer);
+}
 
 static bool exit_tsr(bool reenter)
 {
@@ -652,15 +659,16 @@ enum plugin_status plugin_start(const void* parameter)
     void   *buf;
     size_t  buf_size;
     buf = rb->plugin_get_buffer(&buf_size);
-    ALIGN_BUFFER(buf, buf_size, sizeof(long));
-    rb->memset(buf, 0, buf_size);
 
-    gThread.stacksize = buf_size;
-    gThread.stack = (long *) buf + buf_size; /* stack grows towards *buf */
+    init_tlsf(buf, buf_size);
 
-    ALIGN_BUFFER(gThread.stack, gThread.stacksize, sizeof(long));
+    gThread.stacksize = get_max_size(buf);
+    uintptr_t old = (uintptr_t)tlsf_malloc(gThread.stacksize);
 
-    if (gThread.stacksize < MIN_THREAD_STACK_SIZE)
+    gThread.stack = (long*)((char*)(((uintptr_t)old & (uintptr_t)(~0x3)) + 4));
+    gThread.stacksize -= ((char*)gThread.stack - (char*)old);
+
+    if (!gThread.stack || gThread.stacksize < MIN_THREAD_STACK_SIZE)
     {
         rb->splash(HZ*2, "Out of memory");
         gThread.id = UINT_MAX;
