@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f29defeb_498d5625",
+        "filename": "firmware/rolo.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-08-15T16:29:38Z",
+      "side": 1,
+      "message": "Already here..",
+      "revId": "0b5396c80affeb4d1f89f68dfb96368a5a855337",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
