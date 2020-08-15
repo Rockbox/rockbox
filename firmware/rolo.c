@@ -42,6 +42,11 @@
 #if defined(MI4_FORMAT)
 #include "crc32-mi4.h"
 #include "mi4-loader.h"
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+#include "bootdata.h"
+#include "crc32.h"
+extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*mi4-loader.c*/    
+#endif
 #define LOAD_FIRMWARE(a,b,c) load_mi4(a,b,c)
 #elif defined(RKW_FORMAT)
 #include "rkw-loader.h"

@@ -49,3 +49,22 @@ struct tea_key {
 
 int load_mi4(unsigned char* buf, const char* firmware, unsigned int buffer_size);
 const char *mi4_strerror(int8_t errno);
+
+#ifdef HAVE_MULTIBOOT /* defined by config.h */
+/* Check in root of this <volume> for rockbox_main.<playername>
+ * if this file empty or there is a single slash '/'
+ * buf = '<volume#>/<rootdir>/<firmware(name)>\0'
+ * If instead '/<*DIRECTORY*>' is supplied
+ * addpath will be set to this DIRECTORY buf =
+ * '/<volume#>/addpath/<rootdir>/<firmware(name)>\0'
+ * On error returns Negative number or 0
+ * On success returns bytes from snprintf
+ * and generated path will be placed in buf
+ * note: if supplied buffer is too small return will be
+ * the number of bytes that would have been written
+ */
+
+/* TODO needs mapped back to debug_menu if root redirect ever becomes a reality */
+int get_redirect_dir(char* buf, int buffer_size, int volume,
+                     const char* rootdir, const char* firmware);
+#endif

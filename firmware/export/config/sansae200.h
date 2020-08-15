@@ -8,6 +8,12 @@
 
 #define HW_SAMPR_CAPS       (SAMPR_CAP_48 | SAMPR_CAP_44 | SAMPR_CAP_32)
 
+/* Define if boot data from bootloader has been enabled for the target */
+#define HAVE_BOOTDATA
+
+/* define boot redirect file name allows booting from external drives */
+#define BOOT_REDIR "rockbox_main.e200"
+
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
@@ -178,11 +184,10 @@
 #define FIRMWARE_OFFSET_FILE_CRC    0x0
 #define FIRMWARE_OFFSET_FILE_DATA   0x8
 
-#ifndef BOOTLOADER
 #define HAVE_MULTIDRIVE
+//#define HAVE_MULTIVOLUME
 #define NUM_DRIVES 2
-#define HAVE_HOTSWAP
-#endif
+#define HAVE_HOTSWAP /* required to access sd from bootloader */
 
 /* USB On-the-go */
 #define CONFIG_USBOTG USBOTG_ARC
