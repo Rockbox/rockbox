@@ -600,8 +600,13 @@ Logger::~Logger()
 
   // Cleanup appenders
   QMutexLocker appendersLocker(&d->loggerMutex);
+#if QT_VERSION >= 0x050e00
+  QSet<AbstractAppender*> deleteList(QSet<AbstractAppender*>(d->appenders.begin(), d->appenders.end()));
+  deleteList.unite(QSet<AbstractAppender*>(d->categoryAppenders.values().begin(), d->categoryAppenders.values().end()));
+#else
   QSet<AbstractAppender*> deleteList(QSet<AbstractAppender*>::fromList(d->appenders));
   deleteList.unite(QSet<AbstractAppender*>::fromList(d->categoryAppenders.values()));
+#endif
   qDeleteAll(deleteList);
 
   appendersLocker.unlock();
@@ -1032,7 +1037,11 @@ void LoggerTimingHelper::start(const char* msg, ...)
 {
   va_list va;
   va_start(va, msg);
+#if QT_VERSION >= 0x050500
+  m_block = QString().vasprintf(msg, va);
+#else
   m_block = QString().vsprintf(msg, va);
+#endif
   va_end(va);
 
   m_time.start();
@@ -1062,7 +1071,7 @@ LoggerTimingHelper::~LoggerTimingHelper()
   else
     message = QString(QLatin1String("\"%1\" finished in ")).arg(m_block);
 
-  int elapsed = m_time.elapsed();
+  qint64 elapsed = m_time.elapsed();
   if (elapsed >= 10000 && m_timingMode == Logger::TimingAuto)
     message += QString(QLatin1String("%1 s.")).arg(elapsed / 1000);
   else
