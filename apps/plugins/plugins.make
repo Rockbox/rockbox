@@ -86,6 +86,11 @@ $(OVERLAYREF_LDS): $(PLUGIN_LDS)
 $(BUILDDIR)/credits.raw credits.raw: $(DOCSDIR)/CREDITS
 	$(call PRINTS,Create credits.raw)perl $(APPSDIR)/plugins/credits.pl < $< > $(BUILDDIR)/$(@F)
 
+$(BUILDDIR)/apps/plugins/open_plugins.opx:
+	$(call PRINTS,MK open_plugins.opx) touch $< $(BUILDDIR)/apps/plugins/open_plugins.opx
+
+$(BUILDDIR)/apps/plugins/open_plugins.rock: $(BUILDDIR)/apps/plugins/open_plugins.opx
+
 # special dependencies
 $(BUILDDIR)/apps/plugins/wav2wv.rock: $(RBCODEC_BLD)/codecs/libwavpack.a $(PLUGIN_LIBS)
 
