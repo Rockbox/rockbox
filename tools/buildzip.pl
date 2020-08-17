@@ -518,6 +518,12 @@ sub buildzip {
     copy("$ROOT/apps/tagnavi.config", "$temp_dir/");
     copy("$ROOT/apps/plugins/disktidy.config", "$temp_dir/rocks/apps/");
 
+    if(-e "$temp_dir/rocks/viewers/open_plugins.rock") {
+        my $cwd = getcwd();
+        copy("$cwd/apps/plugins/open_plugins.opx", "$temp_dir/rocks/apps/open_plugins.opx") or
+            print STDERR "Copy failed: $cwd/apps/plugins/open_plugins.opx $!\n";
+    }
+
     if($bitmap) {
         copy("$ROOT/apps/plugins/sokoban.levels", "$temp_dir/rocks/games/sokoban.levels"); # sokoban levels
         copy("$ROOT/apps/plugins/snake2.levels", "$temp_dir/rocks/games/snake2.levels"); # snake2 levels
