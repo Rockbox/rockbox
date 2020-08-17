@@ -137,6 +137,7 @@ chopper.c
 demystify.c
 jewels.c
 minesweeper.c
+open_plugins.c
 oscilloscope.c
 pegbox.c
 periodic_table.c
