@@ -58,7 +58,6 @@ extern struct open_plugin_entry_t open_plugin_entry;
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter);
 int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry);
 void open_plugin_browse(const char *key);
-void open_plugin_remove(const char *key);
 int open_plugin_run(const char *key);
 #endif
 

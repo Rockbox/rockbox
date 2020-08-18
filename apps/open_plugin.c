@@ -24,21 +24,12 @@
 #include "plugin.h"
 #include "open_plugin.h"
 #include "pathfuncs.h"
-#include "keyboard.h"
 #include "splash.h"
 #include "lang.h"
 
 struct open_plugin_entry_t open_plugin_entry;
 
 static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
-
-static void get_param(void)
-{
-    char tmp_buf[OPEN_PLUGIN_BUFSZ+1];
-    strlcpy(tmp_buf, open_plugin_entry.param, OPEN_PLUGIN_BUFSZ);
-    if (kbd_input(tmp_buf, OPEN_PLUGIN_BUFSZ, NULL))
-        strlcpy(open_plugin_entry.param, tmp_buf, OPEN_PLUGIN_BUFSZ);
-}
 
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter)
 {
@@ -72,15 +63,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
             strlcpy(open_plugin_entry.path, plugin, OPEN_PLUGIN_BUFSZ);
 
             if(parameter)
-            {
-                if (parameter[0] == '\0' &&
-                    yesno_pop(ID2P(LANG_PARAMETER)))
-                {
-                    get_param();
-                }
-                else
-                    strlcpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
-            }
+                strlcpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
 
             write(fd, &open_plugin_entry, op_entry_sz);
         }
@@ -131,15 +114,7 @@ void open_plugin_browse(const char *key)
     browse.bufsize = OPEN_PLUGIN_BUFSZ;
 
     if (rockbox_browse(&browse) == GO_TO_PREVIOUS)
-    {
         open_plugin_add_path(key, tmp_buf, NULL);
-    }
-}
-
-void open_plugin_remove(const char *key)
-{
-    (void)key;
-    open_plugin_add_path(key, NULL, NULL);
 }
 
 static int open_plugin_hash_get_entry(uint32_t hash, struct open_plugin_entry_t *entry)
