@@ -98,6 +98,30 @@ static bool op_entry_read_name(int fd, int selected_item)
     return op_entry_read(fd, selected_item, op_name_sz);
 }
 
+static int op_entry_read_opx(const char *path)
+{
+    int ret = -1;
+    off_t filesize;
+    int fd_opx;
+    int len;
+
+    len = rb->strlen(path);
+    if(len > 4 && rb->strcasecmp(&((path)[len-4]), "." OP_EXT) == 0)
+    {
+        fd_opx = rb->open(path, O_RDONLY);
+        if (fd_opx)
+        {
+            filesize = rb->filesize(fd_opx);
+            ret = filesize;
+            if (filesize == op_entry_sz && !op_entry_read(fd_opx, 0, op_entry_sz))
+                ret = 0;
+
+            rb->close(fd_opx);
+        }
+    }
+    return ret;
+}
+
 static void op_entry_export(int selection)
 {
     int len;
@@ -312,9 +336,29 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
                 {
                     op_entry_set_param();
                 }
-                else
+                else if (parameter != op_entry.param)
                     rb->strlcpy(op_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
+
+                /* hash on the parameter path if it is a file */
+                if (op_entry.lang_id <0 && key == op_entry.path &&
+                    rb->file_exists(op_entry.param))
+                    open_plugin_get_hash(op_entry.path, &op_entry.hash);
             }
+
+            rb->write(fd_tmp, &op_entry, op_entry_sz); /* add new entry first */
+        }
+        else if(op_entry_read_opx(plugin) == op_entry_sz)
+        {
+            fd_tmp = rb->open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+            if (fd_tmp < 0)
+                return 0;
+
+            if (op_entry.lang_id <0 && rb->file_exists(op_entry.param))
+                open_plugin_get_hash(op_entry.param, &hash);
+            else
+                open_plugin_get_hash(op_entry.path, &hash);
+
+            op_entry.hash = hash;
 
             rb->write(fd_tmp, &op_entry, op_entry_sz); /* add new entry first */
         }
@@ -402,8 +446,8 @@ static void op_entry_remove_empty(void)
         if (fd_tmp < 0)
             return;
 
-        if ((op_entry_transfer(fd_dat, fd_tmp, &op_et_exclude_builtin, NULL)
-            + op_entry_transfer(fd_dat, fd_tmp, &op_et_exclude_user, NULL)) > 0)
+        if ((op_entry_transfer(fd_dat, fd_tmp, &op_et_exclude_user, NULL)
+            + op_entry_transfer(fd_dat, fd_tmp, &op_et_exclude_builtin, NULL)) > 0)
         {
             rb->close(fd_tmp);
             rb->close(fd_dat);
@@ -688,9 +732,7 @@ enum plugin_status plugin_start(const void* parameter)
     int selection = -1;
     int action;
     int items;
-    int len;
-    int fd_opx;
-    off_t filesize;
+    int res;
     char *path;
     bool exit = false;
 
@@ -710,28 +752,13 @@ enum plugin_status plugin_start(const void* parameter)
     if (parameter)
     {
         path = (char*)parameter;
-        len = rb->strlen(path);
-        if(len > 4 && rb->strcasecmp(&((path)[len-4]), "." OP_EXT) == 0)
+        res = op_entry_read_opx(path);
+        if (res >= 0)
         {
-            fd_opx = rb->open(path, O_RDONLY, 0666);
-            if (fd_opx)
+            if (res == op_entry_sz)
             {
-                filesize = rb->filesize(fd_opx);
-                if (filesize == op_entry_sz)
-                {
-
-                    if (op_entry_read(fd_opx, 0, op_entry_sz))
-                    {
-                        exit = true;
-                        ret = op_entry_run();
-                    }
-                    else
-                        rb->splashf(HZ, rb->str(LANG_READ_FAILED), path);
-                }
-                else if (filesize != 0)
-                    rb->splashf(2 * HZ, rb->str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), path);
-
-                rb->close(fd_opx);
+                exit = true;
+                ret = op_entry_run();
             }
         }
         else
@@ -752,22 +779,24 @@ enum plugin_status plugin_start(const void* parameter)
             {
                 if (op_entry_read(fd_dat, selection, op_entry_sz))
                 {
-                    if (op_entry_run() == PLUGIN_GOTO_PLUGIN)
-                        return PLUGIN_GOTO_PLUGIN;
+                    ret = op_entry_run();
+                    if (ret == PLUGIN_GOTO_PLUGIN)
+                        exit = true;
                 }
             }
             else
             {
                 op_entry_read(fd_dat, selection, op_entry_sz);
-                op_entry_add_path(parameter, parameter, "\0");
-                selection = 0;
-                items++;
-                fd_dat = rb->open(OPEN_PLUGIN_DAT, creat_flags, 0666);
-                if (!fd_dat)
-                    exit = true;
+                if (op_entry_add_path(parameter, parameter, "\0") > 0)
+                {
+                    selection = 0;
+                    items++;
+                    fd_dat = rb->open(OPEN_PLUGIN_DAT, creat_flags, 0666);
+                    if (!fd_dat)
+                        exit = true;
+                }
             }
         }/* OP_EXT */
-
     }
 
     if (!exit)

@@ -64,6 +64,8 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 
             if(parameter)
                 strlcpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
+            else
+                open_plugin_entry.param[0] = '\0';
 
             write(fd, &open_plugin_entry, op_entry_sz);
         }
