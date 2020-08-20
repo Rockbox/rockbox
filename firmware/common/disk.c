@@ -27,7 +27,7 @@
 #include "disk_cache.h"
 #include "fileobj_mgr.h"
 #include "dir.h"
-#include "rb_namespace.h"
+#include "dircache_redirect.h"
 #include "disk.h"
 
 
@@ -249,7 +249,23 @@ int disk_mount_all(void)
     for (int i = 0; i < NUM_VOLUMES; i++)
         vol_drive[i] = -1; /* mark all as unassigned */
 
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+    unsigned int crc = 0;
+    int boot_volume = 0;
+    crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
+    if(crc == boot_data.crc)
+    {
+        boot_volume = boot_data.boot_volume; /* boot volume contained in uint8_t payload */
+    }
+    #ifdef HAVE_HOTSWAP
+        if (storage_present(boot_volume))
+    #endif
+            mounted += disk_mount(boot_volume); /* mount boot volume first */
     for (int i = 0; i < NUM_DRIVES; i++)
+    if (i != boot_volume)
+#else
+    for (int i = 0; i < NUM_DRIVES; i++)
+#endif
     {
     #ifdef HAVE_HOTSWAP
         if (storage_present(i))
