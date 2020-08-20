@@ -16067,3 +16067,157 @@ desc: deprecated
     swcodec: "Sample Rate"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Apri Plugin"
+  </dest>
+  <voice>
+    *: "Apri Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "%s: Non è un plugin"
+  </dest>
+  <voice>
+    *: "Non è un plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Imposta un Plugin Contestuale per Wps"
+  </dest>
+  <voice>
+    *: "Imposta un Plugin Contestuale per Wps"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parametro"
+  </dest>
+  <voice>
+    *: "Parametro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Nome"
+  </dest>
+  <voice>
+    *: "Nome"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Aggiungi"
+  </dest>
+  <voice>
+    *: "Aggiungi"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Indietro"
+  </dest>
+  <voice>
+    *: "Indietro"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Modifica"
+  </dest>
+  <voice>
+    *: "Modifica"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Avvia"
+  </dest>
+  <voice>
+    *: "Avvia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Esporta"
+  </dest>
+  <voice>
+    *: "Esporta"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Sfoglia"
+  </dest>
+  <voice>
+    *: "Sfoglia"
+  </voice>
+</phrase>
