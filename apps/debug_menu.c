@@ -2451,21 +2451,10 @@ static bool dbg_boot_data(void)
     info.scroll_all = true;
     simplelist_info_init(&info, "Boot data", 1, NULL);
     simplelist_set_line_count(0);
-    crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
-#if defined(HAVE_MULTIBOOT)
-    int boot_volume = 0;
-    if(crc == boot_data.crc)
-    {
-        boot_volume = boot_data.boot_volume; /* boot volume contained in uint8_t payload */
-    }
-    simplelist_addline("Boot Volume: <%lu>", boot_volume);
-    simplelist_addline("");
-#endif
-    simplelist_addline("Bootdata RAW:");
-    if (crc != boot_data.crc)
-        simplelist_addline("Magic: %.8s", boot_data.magic);
+    simplelist_addline("Magic: %.8s", boot_data.magic);
     simplelist_addline("Length: %lu", boot_data.length);
     simplelist_addline("CRC: %lx", boot_data.crc);
+    crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
     (crc == boot_data.crc) ? simplelist_addline("CRC: OK!") :
                              simplelist_addline("CRC: BAD");
     for (unsigned i = 0; i < boot_data.length; i += 4)
@@ -2477,7 +2466,7 @@ static bool dbg_boot_data(void)
     info.hide_selection = true;
     return simplelist_show_list(&info);
 }
-#endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
+#endif
 
 /****** The menu *********/
 static const struct {
