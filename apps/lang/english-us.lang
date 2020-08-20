@@ -2457,12 +2457,10 @@
     lcd_sleep: ""
   </source>
   <dest>
-    *: none
-    lcd_sleep: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_sleep: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5052,12 +5050,10 @@
     radio: ""
   </source>
   <dest>
-    *: none
-    radio: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    radio: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7179,12 +7175,10 @@
     lcd_non-mono: ""
   </source>
   <dest>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7196,12 +7190,10 @@
     lcd_non-mono: ""
   </source>
   <dest>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16071,5 +16063,159 @@
     *: none
     lowmem: none
     swcodec: "Sample Rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Open Plugin"
+  </dest>
+  <voice>
+    *: "Open Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Not a plugin: %s"
+  </dest>
+  <voice>
+    *: "Not a plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Set Wps Context Plugin"
+  </dest>
+  <voice>
+    *: "Set Wps Context Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parameter"
+  </dest>
+  <voice>
+    *: "Parameter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Name"
+  </dest>
+  <voice>
+    *: "Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Add"
+  </dest>
+  <voice>
+    *: "Add"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Back"
+  </dest>
+  <voice>
+    *: "Back"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Edit"
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Run"
+  </dest>
+  <voice>
+    *: "Run"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Export"
+  </dest>
+  <voice>
+    *: "Export"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Browse"
+  </dest>
+  <voice>
+    *: "Browse"
   </voice>
 </phrase>
