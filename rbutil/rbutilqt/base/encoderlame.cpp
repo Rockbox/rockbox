@@ -25,15 +25,19 @@
 /** Resolve a symbol from loaded library.
  */
 #define SYMBOLRESOLVE(symbol, type) \
-    do { m_##symbol = (type)lib->resolve(#symbol); \
+    do { m_##symbol = (type)lib.resolve(#symbol); \
         if(!m_##symbol) return; \
         LOG_INFO() << "Resolved symbol " #symbol; } \
     while(0)
 
-EncoderLame::EncoderLame(QObject *parent) : EncoderBase(parent)
+EncoderLame::EncoderLame(QObject *parent) : EncoderBase(parent),
+    lib("libmp3lame", this), m_symbolsResolved(false)
 {
-    m_symbolsResolved = false;
-    lib = new QLibrary("libmp3lame", this);
+    lib.load();
+    if (!lib.isLoaded()) {
+        LOG_WARNING() << "Loading mp3lame lib failed:" << lib.errorString();
+        return;
+    }
 
     SYMBOLRESOLVE(get_lame_short_version, const char* (*)());
     SYMBOLRESOLVE(lame_set_out_samplerate, int (*)(lame_global_flags*, int));
@@ -50,8 +54,6 @@ EncoderLame::EncoderLame(QObject *parent) : EncoderBase(parent)
     SYMBOLRESOLVE(lame_encode_buffer, int (*)(lame_global_flags*, short int*, short int*, int, unsigned char*, int));
     SYMBOLRESOLVE(lame_encode_flush, int (*)(lame_global_flags*, unsigned char*, int));
     SYMBOLRESOLVE(lame_close, int (*)(lame_global_flags*));
-
-    LOG_INFO() << "libmp3lame loaded:" << lib->isLoaded();
 
     m_encoderVolume = RbSettings::subValue("lame", RbSettings::EncoderVolume).toDouble();
     m_encoderQuality = RbSettings::subValue("lame", RbSettings::EncoderQuality).toDouble();
@@ -305,6 +307,6 @@ bool EncoderLame::encode(QString input,QString output)
  */
 bool EncoderLame::configOk()
 {
-    return (lib->isLoaded() && m_symbolsResolved);
+    return m_symbolsResolved;
 }
 

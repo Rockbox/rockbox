@@ -34,7 +34,7 @@ class EncoderLame : public EncoderBase
 
     Q_OBJECT
     public:
-        EncoderLame(QObject *parent = NULL);
+        EncoderLame(QObject *parent = nullptr);
         bool encode(QString input,QString output);
         bool start();
         bool stop() {return true;}
@@ -45,7 +45,7 @@ class EncoderLame : public EncoderBase
         void saveSettings();
 
     private:
-        QLibrary *lib;
+        QLibrary lib;
         const char*(*m_get_lame_short_version)(void);
         int (*m_lame_set_out_samplerate)(lame_global_flags*, int);
         int (*m_lame_set_in_samplerate)(lame_global_flags*, int);

@@ -23,6 +23,8 @@
 #include "encoderlame.h"
 #include "encoderexe.h"
 
+#include "Logger.h"
+
 /*********************************************************************
 * Encoder Base
 **********************************************************************/
@@ -58,9 +60,17 @@ EncoderBase* EncoderBase::getEncoder(QObject* parent,QString encoder)
     {
 #if defined(Q_OS_MACX)
         /* currently not on OS X */
-        enc = new EncoderExe(encoder,parent);
+        enc = new EncoderExe(encoder, parent);
 #else
         enc = new EncoderLame(parent);
+        if (!enc->configOk())
+        {
+            LOG_WARNING() << "Could not load lame dll, falling back to command "
+                             "line lame. This is notably slower.";
+            delete enc;
+            enc = new EncoderExe(encoder, parent);
+
+        }
 #endif
         return enc;
     }
