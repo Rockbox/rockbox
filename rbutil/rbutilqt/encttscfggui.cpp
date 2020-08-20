@@ -250,6 +250,7 @@ void EncTtsCfgGui::updateSetting()
         case EncTtsSetting::eBOOL:
         {
             setting->setCurrent(((QCheckBox*)widget)->isChecked(),false);
+            break;
         }
         default:
         {
