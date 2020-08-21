@@ -42,7 +42,7 @@ void TTSSapi::generateSettings()
     // language
     QMap<QString, QStringList> languages = SystemInfo::languages();
     QStringList langs;
-    for(int i = 0; i < languages.values().size(); ++i) {
+    for(int i = 0; i < languages.size(); ++i) {
         langs.append(languages.values().at(i).at(0));
     }
     EncTtsSetting* setting = new EncTtsSetting(this,

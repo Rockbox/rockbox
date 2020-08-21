@@ -121,6 +121,6 @@ QStringList Uninstaller::getAllSections()
 
 bool Uninstaller::uninstallPossible()
 {
-    return QFileInfo(m_mountpoint +"/.rockbox/rbutil.log").exists();
+    return QFileInfo::exists(m_mountpoint +"/.rockbox/rbutil.log");
 }
 

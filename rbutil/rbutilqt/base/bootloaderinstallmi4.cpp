@@ -48,7 +48,7 @@ void BootloaderInstallMi4::installStage2(void)
     QFile oldbl(fwfile);
     QString moved = QFileInfo(Utils::resolvePathCase(m_blfile)).absolutePath()
                         + "/OF.mi4";
-    if(!QFileInfo(moved).exists()) {
+    if(!QFileInfo::exists(moved)) {
         LOG_INFO() << "renaming" << fwfile << "to" << moved;
         oldbl.rename(moved);
     }

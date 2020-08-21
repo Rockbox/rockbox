@@ -69,7 +69,7 @@ bool Utils::recursiveRmdir( const QString &dirName )
     // make list of entries in directory
     QStringList list = dir.entryList(QDir::AllEntries | QDir::NoDotAndDotDot);
     QFileInfo fileInfo;
-    QString curItem, lstAt;
+    QString curItem;
     for(int i = 0; i < list.size(); i++){ // loop through all items of list
         QString name = list.at(i);
         curItem = dirN + "/" + name;
@@ -281,7 +281,6 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 //! \brief searches for a Executable in the Environement Path
 QString Utils::findExecutable(QString name)
 {
-    QString exepath;
     //try autodetect tts   
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
 #if QT_VERSION >= 0x050e00

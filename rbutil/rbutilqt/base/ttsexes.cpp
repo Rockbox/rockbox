@@ -119,7 +119,7 @@ TTSStatus TTSExes::voice(QString text, QString wavfile, QString *errStr)
 bool TTSExes::configOk()
 {
     loadSettings();
-    if (QFileInfo(m_TTSexec).exists())
+    if (QFileInfo::exists(m_TTSexec))
         return true;
     else
         return false;

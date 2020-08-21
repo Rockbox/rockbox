@@ -145,7 +145,7 @@ bool TalkFileCreator::createTalkList(QDir startDir)
             if(!dir.dirName().isEmpty() && m_talkFolders)
             {
                 // check if we should ignore it
-                if(m_generateOnlyNew && QFileInfo(dir.path() + "/_dirname.talk").exists())
+                if(m_generateOnlyNew && QFileInfo::exists(dir.path() + "/_dirname.talk"))
                 {
                     continue;
                 }
@@ -186,7 +186,7 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                     continue;
 
                 // check if we should ignore it
-                if(m_generateOnlyNew && QFileInfo(fileInf.path() + "/" + fileInf.fileName() + ".talk").exists())
+                if(m_generateOnlyNew && QFileInfo::exists(fileInf.path() + "/" + fileInf.fileName() + ".talk"))
                 {
                     continue;
                 }
