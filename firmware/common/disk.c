@@ -30,6 +30,10 @@
 #include "dircache_redirect.h"
 #include "disk.h"
 
+#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR) && !defined(BOOTLOADER)
+#include "bootdata.h"
+#include "crc32.h"
+#endif
 
 #ifndef CONFIG_DEFAULT_PARTNUM
 #define CONFIG_DEFAULT_PARTNUM 0

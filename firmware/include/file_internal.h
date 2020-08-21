@@ -72,18 +72,16 @@ enum fildes_and_obj_flags
     /* used in descriptor and common */
     FDO_BUSY       = 0x0001,     /* descriptor/object is in use */
     /* only used in individual stream descriptor */
-    FD_VALID       = 0x0002,     /* descriptor is valid but not registered */
-    FD_WRITE       = 0x0004,     /* descriptor has write mode */
-    FD_WRONLY      = 0x0008,     /* descriptor is write mode only */
-    FD_APPEND      = 0x0010,     /* descriptor is append mode */
+    FD_WRITE       = 0x0002,     /* descriptor has write mode */
+    FD_WRONLY      = 0x0004,     /* descriptor is write mode only */
+    FD_APPEND      = 0x0008,     /* descriptor is append mode */
     FD_NONEXIST    = 0x8000,     /* closed but not freed (uncombined) */
     /* only used as common flags */
-    FO_DIRECTORY   = 0x0020,     /* fileobj is a directory */
-    FO_TRUNC       = 0x0040,     /* fileobj is opened to be truncated */
-    FO_REMOVED     = 0x0080,     /* fileobj was deleted while open */
-    FO_SINGLE      = 0x0100,     /* fileobj has only one stream open */
-    FO_MOUNTTARGET = 0x0200,     /* fileobj kept open as a mount target */
-    FDO_MASK       = 0x03ff,
+    FO_DIRECTORY   = 0x0010,     /* fileobj is a directory */
+    FO_TRUNC       = 0x0020,     /* fileobj is opened to be truncated */
+    FO_REMOVED     = 0x0040,     /* fileobj was deleted while open */
+    FO_SINGLE      = 0x0080,     /* fileobj has only one stream open */
+    FDO_MASK       = 0x00ff,
     FDO_CHG_MASK   = FO_TRUNC,   /* fileobj permitted external change */
     /* bitflags that instruct various 'open' functions how to behave;
      * saved in stream flags (only) but not used by manager */
@@ -97,9 +95,7 @@ enum fildes_and_obj_flags
     FF_CACHEONLY   = 0x00200000, /* succeed only if in dircache */
     FF_INFO        = 0x00400000, /* return info on self */
     FF_PARENTINFO  = 0x00800000, /* return info on parent */
-    FF_DEVPATH     = 0x01000000, /* path is a device path, not root-based */
-    FF_NOFS        = 0x02000000, /* no filesystem mounted here */
-    FF_MASK        = 0x03ff0000,
+    FF_MASK        = 0x00ff0000,
 };
 
 /** Common data structures used throughout **/

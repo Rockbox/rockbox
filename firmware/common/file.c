@@ -28,7 +28,7 @@
 #include "file.h"
 #include "fileobj_mgr.h"
 #include "disk_cache.h"
-#include "rb_namespace.h"
+#include "dircache_redirect.h"
 #include "string-extra.h"
 
 /**

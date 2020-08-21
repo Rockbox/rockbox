@@ -30,14 +30,9 @@
 /* useful char constants that could be reconfigured if desired */
 #define PATH_SEPCH    '/'
 #define PATH_SEPSTR   "/"
-#define PATH_ROOTCHR  '/'
 #define PATH_ROOTSTR  "/"
 #define PATH_BADSEPCH '\\'
 #define PATH_DRVSEPCH ':'
-
-#ifndef ROOT_VOLUME
-#define ROOT_VOLUME   INT_MAX
-#endif
 
 /* a nicer way to check for "." and ".." than two strcmp() calls */
 static inline bool is_dotdir_name(const char *name)
@@ -80,7 +75,6 @@ static inline bool name_is_dot_dot(const char *name)
 #ifdef HAVE_MULTIVOLUME
 int path_strip_volume(const char *name, const char **nameptr, bool greedy);
 int get_volume_name(int volume, char *name);
-int make_volume_root(int volume, char *dst);
 #endif
 
 int path_strip_drive(const char *name, const char **nameptr, bool greedy);

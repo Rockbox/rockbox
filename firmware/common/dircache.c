@@ -2541,10 +2541,13 @@ static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
         cename = "";
 
     #ifdef HAVE_MULTIVOLUME
-        /* prepend the volume specifier */
         int volume = IF_MV_VOL(-idx - 1);
-        cename = alloca(VOL_MAX_LEN+1);
-        get_volume_name(volume, cename);
+        if (volume > 0)
+        {
+            /* prepend the volume specifier for volumes > 0 */
+            cename = alloca(VOL_MAX_LEN+1);
+            get_volume_name(volume, cename);
+        }
     #endif /* HAVE_MULTIVOLUME */
 
         data->serialhash = dc_hash_serialnum(get_idx_dcvolp(idx)->serialnum,

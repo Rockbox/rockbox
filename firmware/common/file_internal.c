@@ -26,7 +26,9 @@
 #include "pathfuncs.h"
 #include "disk_cache.h"
 #include "fileobj_mgr.h"
-#include "rb_namespace.h"
+#include "dir.h"
+#include "dircache_redirect.h"
+#include "dircache.h"
 #include "string-extra.h"
 #include "rbunicode.h"
 
@@ -85,10 +87,9 @@ void file_cache_free(struct filestr_cache *cachep)
 
 /** Stream base APIs **/
 
-static inline void filestr_clear(struct filestr_base *stream,
-                                 unsigned int flags)
+static inline void filestr_clear(struct filestr_base *stream)
 {
-    stream->flags = flags;
+    stream->flags = 0;
     stream->bindp = NULL;
 #if 0
     stream->mtx   = NULL;
@@ -152,7 +153,7 @@ void filestr_discard_cache(struct filestr_base *stream)
 /* Initialize the base descriptor */
 void filestr_base_init(struct filestr_base *stream)
 {
-    filestr_clear(stream, FD_VALID);
+    filestr_clear(stream);
     file_cache_init(&stream->cache);
     stream->cachep = &stream->cache;
 }
@@ -160,7 +161,7 @@ void filestr_base_init(struct filestr_base *stream)
 /* free base descriptor resources */
 void filestr_base_destroy(struct filestr_base *stream)
 {
-    filestr_clear(stream, 0);
+    filestr_clear(stream);
     filestr_free_cache(stream);
 }
 
@@ -292,7 +293,7 @@ struct pathwalk_component
 
 #define WALK_RC_NOT_FOUND    0   /* successfully not found (aid for file creation) */
 #define WALK_RC_FOUND        1   /* found and opened */
-#define WALK_RC_FOUND_ROOT   2   /* found and opened sys root */
+#define WALK_RC_FOUND_ROOT   2   /* found and opened sys/volume root */
 #define WALK_RC_CONT_AT_ROOT 3   /* continue at root level */
 
 /* return another struct pathwalk_component from the pool, or NULL if the
@@ -396,10 +397,10 @@ static int walk_open_info(struct pathwalk *walkp,
 
     /* make open official if not simply probing for presence - must do it here
        or compp->info on stack will get destroyed before it was copied */
-    if (!(callflags & (FF_PROBE|FF_NOFS)))
+    if (!(callflags & FF_PROBE))
         fileop_onopen_internal(stream, &compp->info, callflags);
 
-    return compp->attr == ATTR_SYSTEM_ROOT ? WALK_RC_FOUND_ROOT : WALK_RC_FOUND;
+    return compp->nextp ? WALK_RC_FOUND : WALK_RC_FOUND_ROOT;
 }
 
 /* check the component against the prefix test info */
@@ -506,10 +507,6 @@ walk_path(struct pathwalk *walkp, struct pathwalk_component *compp,
         if (len > MAX_COMPNAME)
             return -ENAMETOOLONG;
 
-        /* no filesystem is mounted here */
-        if (walkp->callflags & FF_NOFS)
-            return -ENOENT;
-
         /* check for "." and ".." */
         if (name[0] == '.')
         {
@@ -578,7 +575,7 @@ int open_stream_internal(const char *path, unsigned int callflags,
         callflags &= ~(FF_INFO | FF_PARENTINFO | FF_CHECKPREFIX);
 
     /* This lets it be passed quietly to directory scanning */
-    stream->flags |= callflags & FF_MASK;
+    stream->flags = callflags & FF_MASK;
 
     struct pathwalk walk;
     walk.path      = path;
@@ -588,36 +585,80 @@ int open_stream_internal(const char *path, unsigned int callflags,
 
     struct pathwalk_component *rootp = pathwalk_comp_alloc(NULL);
     rootp->nextp = NULL;
+    rootp->attr  = ATTR_SYSTEM_ROOT;
+
+#ifdef HAVE_MULTIVOLUME
+    int volume = 0, rootrc = WALK_RC_FOUND;
+#endif /* HAVE_MULTIVOLUME */
 
     while (1)
     {
-        rc = ns_parse_root(walk.path, &rootp->name, &rootp->length);
+        const char *pathptr = walk.path;
+ 
+    #ifdef HAVE_MULTIVOLUME
+        /* this seamlessly integrates secondary filesystems into the
+           root namespace (e.g. "/<0>/../../<1>/../foo/." :<=> "/foo") */
+        const char *p;
+        volume = path_strip_volume(pathptr, &p, false);
+        if (!CHECK_VOL(volume))
+        {
+            DEBUGF("No such device or address: %d\n", volume);
+            FILE_ERROR(ENXIO, -2);
+        }
+
+        if (p == pathptr)
+        {
+            /* the root of this subpath is the system root */
+            rootp->attr = ATTR_SYSTEM_ROOT;
+            rootrc = WALK_RC_FOUND_ROOT;
+        }
+        else
+        {
+            /* this subpath specifies a mount point */
+            rootp->attr = ATTR_MOUNT_POINT;
+            rootrc = WALK_RC_FOUND;
+        }
+
+        walk.path = p;
+    #endif /* HAVE_MULTIVOLUME */
+
+        /* set name to start at last leading separator; names of volume
+           specifiers will be returned as "/<fooN>" */
+        rootp->name   = GOBBLE_PATH_SEPCH(pathptr) - 1;
+        rootp->length =
+            IF_MV( rootrc == WALK_RC_FOUND ? p - rootp->name : ) 1;
+
+        rc = fat_open_rootdir(IF_MV(volume,) &rootp->info.fatfile);
         if (rc < 0)
+        {
+            /* not mounted */
+            DEBUGF("No such device or address: %d\n", IF_MV_VOL(volume));
+            rc = -ENXIO;
             break;
+        }
 
-        rc = ns_open_root(IF_MV(rc,) &walk.callflags, &rootp->info, &rootp->attr);
-        if (rc < 0)
-            break;
-
-        walk.path = rootp->name + rootp->length;
-
+        get_rootinfo_internal(&rootp->info);
         rc = walk_path(&walk, rootp, stream);
         if (rc != WALK_RC_CONT_AT_ROOT)
             break;
     }
 
-    if (rc >= 0)
+    switch (rc)
     {
+    case WALK_RC_FOUND_ROOT:
+        IF_MV( rc = rootrc; )
+    case WALK_RC_NOT_FOUND:
+    case WALK_RC_FOUND:
         /* FF_PROBE leaves nothing for caller to clean up */
-        if (walk.callflags & FF_PROBE)
+        if (callflags & FF_PROBE)
             filestr_base_destroy(stream);
-    }
-    else
-    {
-        /* utter, abject failure :`( */
+
+        break;
+
+    default: /* utter, abject failure :`( */
         DEBUGF("Open failed: rc=%d, errno=%d\n", rc, errno);
         filestr_base_destroy(stream);
-        FILE_ERROR(-rc, -1);
+        FILE_ERROR(-rc, -3);
     }
 
 file_error:
