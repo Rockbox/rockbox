@@ -115,7 +115,7 @@ void ServerInfo::readBuildInfo(QString file)
 
         info.beginGroup("status");
         QString status = tr("Unknown");
-        switch(info.value(platforms.at(i)).toInt())
+        switch(info.value(platforms.at(i), -1).toInt())
         {
             case 0:
                 status = tr("Stable (Retired)");
