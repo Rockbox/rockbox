@@ -498,7 +498,7 @@ sub allbuilds {
     my @list;
 
     for my $b (sort byname keys %builds) {
-        push @list, $b if ($builds{$b}{status} >= 1);
+        push @list, $b;
     }
 
     return @list;
