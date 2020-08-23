@@ -224,11 +224,20 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
 bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
 {
     bool found = false;
-    ArchiveUtil *util = 0;
+    ArchiveUtil *util = nullptr;
+
+    // check if we're actually looking for a zip file. If so we must avoid
+    // trying to unzip it.
+    bool wantZip = false;
+    for (int i = 0; i < blfile.size(); i++)
+    {
+        if (blfile.at(i).endsWith(".zip"))
+            wantZip = true;
+    }
 
     // try ZIP first
     ZipUtil *zu = new ZipUtil(this);
-    if(zu->open(of))
+    if(zu->open(of) && !wantZip)
     {
         emit logItem(tr("Zip file format detected"), LOGINFO);
         util = zu;
