@@ -2466,12 +2466,10 @@
     lcd_sleep: ""
   </source>
   <dest>
-    *: none
-    lcd_sleep: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_sleep: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5061,12 +5059,10 @@
     radio: ""
   </source>
   <dest>
-    *: none
-    radio: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    radio: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7188,12 +7184,10 @@
     lcd_non-mono: ""
   </source>
   <dest>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7205,12 +7199,10 @@
     lcd_non-mono: ""
   </source>
   <dest>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_non-mono: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16040,5 +16032,199 @@
   <voice>
     *: none
     hotkey: "Przytrzymaj, aby wyświetlić ustawienia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "Mikser HQ"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Mikser wysokiej jakości"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "Częstotliwość próbkowania"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Częstotliwość próbkowania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Wtyczka otwierania"
+  </dest>
+  <voice>
+    *: "Wtyczka otwierania"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "To nie jest wtyczka: %s"
+  </dest>
+  <voice>
+    *: "To nie jest wtyczka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Ustaw wtyczkę kontekstową WPS"
+  </dest>
+  <voice>
+    *: "Ustaw wtyczkę kontekstową WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parametr"
+  </dest>
+  <voice>
+    *: "Parametr"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Nazwa"
+  </dest>
+  <voice>
+    *: "Nazwa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Dodaj"
+  </dest>
+  <voice>
+    *: "Dodaj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Wstecz"
+  </dest>
+  <voice>
+    *: "Wstecz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Edytuj"
+  </dest>
+  <voice>
+    *: "Edytuj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Uruchom"
+  </dest>
+  <voice>
+    *: "Uruchom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Eksportuj"
+  </dest>
+  <voice>
+    *: "Eksportuj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Przeglądaj"
+  </dest>
+  <voice>
+    *: "Przeglądaj"
   </voice>
 </phrase>
