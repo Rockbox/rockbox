@@ -45,7 +45,7 @@ text files%
 
 {\input{plugins/dice.tex}}
 
-\opt{swcodec}{\nopt{lowmem}{\input{plugins/doom.tex}}}
+\nopt{xduoox3}{\nopt{lowmem}{\input{plugins/doom.tex}}}
 
 \opt{lcd_color}{\nopt{lowmem,iaudiox5,iriverh300}{\input{plugins/duke3d.tex}}}
 
@@ -170,6 +170,11 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
     Lua scripting language& \fname{.lua}                     &   \\
     \opt{swcodec}{\nopt{lowmem}{
         Midiplay          & \fname{.mid, .midi}              &   \\
+        Mikmod            & \fname{.669, .amf, .asy, .dsm,}  &   \\
+                          & \fname{.far, .gdm, imf, .it,}    &  \\
+                          & \fname{.m15, .med, .mod, .okt,}   &  \\
+                          & \fname{.s3m, .stm, .stx, .ult,}  &  \\
+                          & \fname{.uni, .umx, .xm}         &   \\
         MPEG Player       & \fname{.mpg, .mpeg, .mpv, .m2v}  &   \\
     }}
     \opt{swcodec}{
@@ -200,6 +205,7 @@ option from the \setting{Context Menu} (see \reference{ref:Contextmenu}).}
 \opt{large_plugin_buffer}{\input{plugins/lua.tex}}
 
 \opt{swcodec}{\nopt{lowmem}{\input{plugins/midiplay.tex}}}
+\opt{swcodec}{\nopt{lowmem}{\input{plugins/mikmod.tex}}}
 
 \opt{lcd_bitmap}{\opt{swcodec}{\nopt{lowmem}{\input{plugins/mpegplayer.tex}}}}
 
