@@ -297,8 +297,11 @@ int ft_load(struct tree_context* c, const char* tempdir)
         int len;
         struct dirinfo info;
         struct entry* dptr = tree_get_entry_at(c, files_in_dir);
-        if (!entry)
+        if (!dptr)
+        {
+            c->dirfull = true;
             break;
+        }
 
         info = dir_get_info(dir, entry);
         len = strlen((char *)entry->d_name);
@@ -364,8 +367,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
             continue;
         }
 
-        if ((len > c->cache.name_buffer_size - name_buffer_used - 1) ||
-            (files_in_dir >= c->cache.max_entries)) {
+        if (len > c->cache.name_buffer_size - name_buffer_used - 1) {
             /* Tell the world that we ran out of buffer space */
             c->dirfull = true;
             break;
