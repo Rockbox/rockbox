@@ -434,7 +434,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'xduoox3' => {
         name => 'xDuoo X3',
-        status => 2,
+        status => 3,
     },
     'xduoox3ii' => {
         name => 'xDuoo X3ii',
