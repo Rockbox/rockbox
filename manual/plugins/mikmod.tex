@@ -2,8 +2,6 @@
 
 Mikmod plays most common tracker music formats.
 
-\note{TODO:  Document configuration settings}
-
 \begin{btnmap}
     \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD%
         ,IAUDIO_X5_PAD,MROBE100_PAD,PBELL_VIBE500_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
@@ -67,3 +65,25 @@ Mikmod plays most common tracker music formats.
        \opt{HAVEREMOTEKEYMAP}{& }
     & Stop playback and quit\\
 \end{btnmap}
+
+Mikmod is highly configurable, and has many setting that affect output quality.  However, 
+less powerful \dap{}s may lack the cpu resources that higher quality settings require, expecially
+on more complex modules.  Settings are saved and re-loaded automatically.
+
+\subsubsection{Configuration}
+\begin {description}
+\item [Panning Separation]
+    Specifies how far to separate Left and Right channels.  128 is full separation, 0 is none, effectively resulting in mono sound.
+\item [Reverberation]
+    Specifies the amount of reberb (echo) to add to the mix.  0 is disabled.
+\item [Interpolation]
+    Enabling this improves the sound of lower-quality instruments.  Recommended.
+\item [Swap Channels]
+    Swaps the left and right channels.
+\item [Surround]
+    Enables a faux-surround effect.
+\item [HQ Mixer]
+    Enables a high quality audio mixer that is very CPU intensive.  Must restart the plugin to take effect.
+\item [Sample Rate]
+    Select the sample/mixing rate for playback.  44.1KHz or higher is recommended, but you can select from any rate the \dap{} natively supports.
+\end {description}
