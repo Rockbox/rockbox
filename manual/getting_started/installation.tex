@@ -5,17 +5,17 @@ before beginning there are a few important things to know.
 
 \section{Before Starting}
 
-\opt{e200}{\fixme{NOTE: These instructions will not work on the 
-``Rhapsody'' version of the E200 series (also known as E200R). Please 
-follow the instructions at 
+\opt{e200}{\fixme{NOTE: These instructions will not work on the
+``Rhapsody'' version of the E200 series (also known as E200R). Please
+follow the instructions at
 \url{http://www.rockbox.org/wiki/SansaE200RInstallation}.}}
 
 \opt{ipodnano,ipodnano2g,ipodvideo,ipod6g,e200,c200,c200v2,e200v2,clipv1,clipv2,cowond2,fuze,fuzev2}{
-\begin{description}  
-\item[Supported hardware versions.] 
+\begin{description}
+\item[Supported hardware versions.]
     \opt{ipodnano,ipodnano2g}{
     The \playertype{} is available in multiple versions, not
-    all of which run Rockbox.  Rockbox presently runs only on 
+    all of which run Rockbox.  Rockbox presently runs only on
     the first and second generation Ipod Nano. Rockbox does
     \emph{not} run on the third, fourth or fifth generation Ipod Nano.
     For information on identifying which Ipod you own, see this page on
@@ -23,7 +23,7 @@ follow the instructions at
   }
   \opt{ipodvideo}{
     The \playertype{} is the 5th/5.5th generation \playerman{} only.
-    For information on identifying which Ipod you own, see this page on Apple's 
+    For information on identifying which Ipod you own, see this page on Apple's
     website: \url{http://www.info.apple.com/kbnum/n61688}.
   }
   \opt{ipod6g}{
@@ -33,7 +33,7 @@ follow the instructions at
   }
   \opt{c200,c200v2,e200,e200v2}{
     The \playertype{} is available in multiple versions, and you need to make
-    sure which you have by checking the Sandisk firmware version number under 
+    sure which you have by checking the Sandisk firmware version number under
     Settings $\rightarrow$ Info. The v1 firmware is named 01.xx.xx, while the
     v2 firmware begins with 03. Make sure that you are following the
     instructions from the correct manual.
@@ -97,14 +97,14 @@ follow the instructions at
 \end{description}
 }
 \opt{iriverh300}{
-\begin{description}  
+\begin{description}
   \item[DRM capability.] If your \dap{} has a US firmware, then by installing Rockbox you will
   \emph{permanently} lose the ability to playback files with DRM.
 \end{description}
 }
 
 \opt{sansaAMS,fuzeplus}{
-\begin{description}  
+\begin{description}
   \item[DRM capability.] It is possible that installation of the bootloader
   may lead to you \emph{permanently} losing the ability to playback files
   with DRM.
@@ -112,7 +112,7 @@ follow the instructions at
 }
 
 \nopt{gigabeats}{
-\begin{description}  
+\begin{description}
 
 \nopt{ipod1g2g}{
   \item[USB connection.]
@@ -121,9 +121,9 @@ follow the instructions at
   \item[Firewire connection.]
 }
   To transfer Rockbox to your \dap{} you need to
-  connect it to your computer. For manual installation/uninstallation, or 
-  should autodetection fail during automatic installation, you need to know 
-  where to access the \dap{}. On Windows this means you need to know 
+  connect it to your computer. For manual installation/uninstallation, or
+  should autodetection fail during automatic installation, you need to know
+  where to access the \dap{}. On Windows this means you need to know
   the drive letter associated with the \dap{}. On Linux you need to know
   the mount point of your \dap{}. On Mac OS X you need to know the volume
   name of your \dap{}.
@@ -189,7 +189,7 @@ follow the instructions at
   }
   \opt{gigabeatf}{The installation requires you to change a setting in the
       original firmware.  Make sure the option under \setting{Setup
-      $\rightarrow$ Connections $\rightarrow$ PC Connections} is set to 
+      $\rightarrow$ Connections $\rightarrow$ PC Connections} is set to
       \setting{gigabeat room}. Also, during installation, do not connect your
       \dap{} using the cradle but plug the USB cable directly to the \dap{}.
   }
@@ -209,7 +209,7 @@ follow the instructions at
 }
 
 \opt{ipod,sansa}{
-\begin{description}  
+\begin{description}
   \item[Administrator/Root rights.] Installing the bootloader portion of Rockbox
   requires you to have administrative (Windows) or root (Linux) rights.
   Consequently when doing either the automatic or manual bootloader install,
@@ -279,7 +279,7 @@ still available to you.\\
   most of the Rockbox code is contained in a
   ``build'' that resides on your \daps{} drive. This makes it easy to
   update Rockbox. The build consists of a directory called
-  \fname{.rockbox} which contains all of the Rockbox files, and is 
+  \fname{.rockbox} which contains all of the Rockbox files, and is
   located in the root of your \daps{} drive.
 \end{description}
 }
@@ -320,7 +320,7 @@ instructions below.\\}}
 
 When first starting \caps{Rockbox Utility} run ``Autodetect'',
 found in the configuration dialog (File $\rightarrow$ Configure). Autodetection
-can detect most player types. If autodetection fails or is unable to detect 
+can detect most player types. If autodetection fails or is unable to detect
 the mountpoint, make sure to enter the correct values. The mountpoint indicates
 the location of the \dap{} in your filesystem. On Windows, this is the drive
 letter the \dap{} gets assigned, on other systems this is a path in the
@@ -333,16 +333,16 @@ filesystem.\\*
   the bootloader directly. Instead, we have to patch the Iriver firmware
   with the Rockbox bootloader.
 
-  Download a supported version of the Iriver firmware for your 
-  \playername{} from the Iriver website, links can be found on 
+  Download a supported version of the Iriver firmware for your
+  \playername{} from the Iriver website, links can be found on
   \wikilink{IriverBoot}.
- 
-  Supported Iriver firmware versions currently include 
-  \opt{iriverh100}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US, 
+
+  Supported Iriver firmware versions currently include
+  \opt{iriverh100}{1.63US, 1.63EU, 1.63K, 1.65US, 1.65EU, 1.65K, 1.66US,
     1.66EU and 1.66K. Note that the H140 uses the same firmware as the H120;
     H120 and H140 owners should use the firmware called \fname{ihp\_120.hex}.
-    Likewise, the iHP110 and iHP115 use the same firmware, called 
-    \fname{ihp\_100.hex}. Be sure to use the correct firmware file for 
+    Likewise, the iHP110 and iHP115 use the same firmware, called
+    \fname{ihp\_100.hex}. Be sure to use the correct firmware file for
     your player.}
     \opt{iriverh300}{1.28K, 1.28EU, 1.28J, 1.29K, 1.29J, 1.30EU and 1.31K.
     \note{The US \playername{} firmware is not supported and cannot be
@@ -353,11 +353,11 @@ filesystem.\\*
     \warn{Installing a non-US firmware on a US \playername{} will
     \emph{permanently} remove DRM support from the player.}}
 
-  If the file that you downloaded is a \fname{.zip} file, use an unzip 
+  If the file that you downloaded is a \fname{.zip} file, use an unzip
   utility like mentioned in the prerequisites section to extract
   the \fname{.hex} from the \fname{.zip} file
-  to your desktop. Likewise, if the file that you downloaded is an 
-  \fname{.exe} file, double-click on the \fname{.exe} file to extract 
+  to your desktop. Likewise, if the file that you downloaded is an
+  \fname{.exe} file, double-click on the \fname{.exe} file to extract
   the \fname{.hex} file to your desktop.
   When running Linux you should be able to extract \fname{.exe}
   files using \fname{unzip}.
@@ -369,8 +369,8 @@ filesystem.\\*
   the bootloader directly. Instead, we have to patch the MPIO firmware
   with the Rockbox bootloader.
 
-  Download a supported version of the MPIO firmware for your 
-  \playername{} from the MPIO website, links can be found on 
+  Download a supported version of the MPIO firmware for your
+  \playername{} from the MPIO website, links can be found on
   \opt{mpiohd200}{\wikilink{MPIOHD200Port}}%
   \opt{mpiohd300}{\wikilink{MPIOHD300Port}}.
 
@@ -420,11 +420,11 @@ to select which version you wish to install.
 \item[Release.] The release version is the latest stable release, free
    of known critical bugs. For a manual install, the current stable release of Rockbox is
    available at \url{http://www.rockbox.org/download/}.
-  
+
 \item[Development Build.] The development build is built at each change to
   the Rockbox source code repository and represents the current state of Rockbox
   development. This means that the build could contain bugs but most of
-  the time is safe to use. For a manual install, you can download the current build from  
+  the time is safe to use. For a manual install, you can download the current build from
   \url{http://build.rockbox.org/}.
 
 \item[Archived Build.] In addition to the release version and the current build,
@@ -434,8 +434,8 @@ to select which version you wish to install.
 
 \end{description}
 
-\note{Because current and archived builds are development versions that 
-      change frequently, they may behave differently than described in this manual, 
+\note{Because current and archived builds are development versions that
+      change frequently, they may behave differently than described in this manual,
       or they may introduce new (and potentially annoying) bugs. Unless you wish to
       try the latest and greatest features at the price of possibly greater instability,
       or you wish to help with development, you should stick with the release.\\*}
@@ -461,18 +461,18 @@ partition (containing at least a file called \fname{nk.bin}) and
 the main data partition. Rockbox \emph{must} be installed onto the main
 data partition.}}
 
-\begin{enumerate} 
+\begin{enumerate}
 \item Download your chosen version of Rockbox from the links in the
   previous section.
 
-\item Connect your \dap{} to the computer via USB 
+\item Connect your \dap{} to the computer via USB
   \opt{sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus,samsungyh}
   { in MSC mode }
   \opt{ipod3g,ipod4g,ipodmini,ipodcolor}{ or Firewire }as described in
   the manual that came with your \dap{}.
 
 \item Take the \fname{.zip} file that you downloaded and use
- the ``Extract all'' command of your unzip program to extract 
+ the ``Extract all'' command of your unzip program to extract
  the files onto
  \opt{gigabeats,fuzeplus}{the main data partition of }
  \opt{cowond2}{either an SD card or the internal memory of }
@@ -482,7 +482,7 @@ data partition.}}
      will not be possible to save settings.}}
 \end{enumerate}
 
-\note{The entire contents of the \fname{.zip} file should be extracted 
+\note{The entire contents of the \fname{.zip} file should be extracted
 directly to the root of your \daps{} drive. Do not try to
 create a separate directory on your \dap{} for the Rockbox
 files! The \fname{.zip} file already contains the internal
@@ -490,11 +490,9 @@ structure that Rockbox needs.\\}
 
 % This has nothing to do with swcodec, just that these players need our own
 % bootloader so we can decide where we want the main binary.
-\opt{swcodec}{
- If the contents of the \fname{.zip} file are extracted correctly, you will
- have a directory called \fname{.rockbox}, which contains all the files needed
- by Rockbox, in the main directory of your \daps{} drive.
-}
+If the contents of the \fname{.zip} file are extracted correctly, you will
+have a directory called \fname{.rockbox}, which contains all the files needed
+by Rockbox, in the main directory of your \daps{} drive.
 
 \opt{swcodec}{%
     \nopt{gigabeats}{%
@@ -517,33 +515,34 @@ structure that Rockbox needs.\\}
         \opt{ondavx777}{\input{getting_started/ondavx777_install.tex}}
         \opt{IMX233}{\input{getting_started/IMX233_install.tex}}
         \opt{samsungyh}{\input{getting_started/samsungyh_install.tex}}
+        \opt{xduoox3}{\input{getting_started/xduoox3_install.tex}}
     }
 }
 
 \subsection{Finishing the install}\label{ref:finish_install}
 
 \opt{gigabeatf}{
-  After installing you \emph{need} to power-cycle the 
+  After installing you \emph{need} to power-cycle the
   \dap{} by doing the following steps. Failure to do so may result in problems.
   \begin{itemize}
   \item Safely eject / unmount your \dap{} and unplug the USB cable.
   \item Unplug any power adapter.
   \item Hold the \ButtonPower{} button to turn off the \dap{}.
-  \item Slide the battery switch located on the bottom of the \dap{} from 
+  \item Slide the battery switch located on the bottom of the \dap{} from
   `on' to `off'.
   \item Slide the battery switch back from `off' to `on'.
   \end{itemize}
 }
 
 \opt{iaudiom3,iaudiom5,iaudiox5}{
-  After installing you \emph{need} to power-cycle the 
+  After installing you \emph{need} to power-cycle the
   \dap{} by doing the following steps.
   \begin{itemize}
   \item Safely eject / unmount your \dap{} and unplug the USB cable.
   \item Hold the
      \opt{IAUDIO_X5_PAD}{\ButtonPower}
      \opt{IAUDIO_M3_PAD}{\ButtonPlay}
-     button to turn off the \dap{}. 
+     button to turn off the \dap{}.
   \item Insert the charger. The Rockbox bootloader will automatically be flashed.
   \end{itemize}
 }
@@ -564,14 +563,14 @@ structure that Rockbox needs.\\}
 \opt{iriverh100,iriverh300}{
   \begin{itemize}
   \item Safely eject / unmount your \dap{}.
-  
+
   \item \warn{Before proceeding further, make sure that your player has a full charge
   or that it is connected to the power adapter. Interrupting the next step
   due to a power failure most likely will brick your \dap{}.}
   Update your \daps{} firmware with the patched bootloader. To do this, turn
   the jukebox on. Press and hold the \ButtonSelect{} button to enter the main menu,
   and navigate to \setting{General $\rightarrow$ Firmware Upgrade}. Select
-  \setting{Yes} when asked to confirm if you want to upgrade the 
+  \setting{Yes} when asked to confirm if you want to upgrade the
   firmware. The \playerman{} will display a message indicating that the
   firmware update is in progress. Do \emph{not} interrupt this process. When the
   firmware update is complete the player will turn itself off. (The update
@@ -618,7 +617,7 @@ structure that Rockbox needs.\\}
 \index{Speech}\index{Installation!Optional Steps}
 If you wish to use speech support you will also need a voice file. Voice files
 allow Rockbox to speak the user interface to you. Rockbox Utility can install
-an English voice file, or you can download it from \url{http://www.rockbox.org/daily.shtml} 
+an English voice file, or you can download it from \url{http://www.rockbox.org/daily.shtml}
 and unzip it to the root of your \dap{}.
 Rockbox Utility can also aid you in the creation of voice files with different voices
 or in other languages if you have a suitable speech engine installed on your computer.
@@ -642,7 +641,7 @@ you turn the unit on, Rockbox should load.}
   \note{
     If you have loaded music onto your \dap{} using the \playerman{}
     firmware, you will not be able to see your music properly in the
-    \setting{File Browser} as MTP mode changes the location and file names. 
+    \setting{File Browser} as MTP mode changes the location and file names.
     Files placed on your \dap{} using the \playerman{} firmware can be
     viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.}
@@ -659,10 +658,10 @@ you turn the unit on, Rockbox should load.}
 
 \opt{ipod}{
   \note{
-    If you have loaded music onto your \dap{} using Itunes, 
-    you will not be able to see your music properly in the \setting{File Browser}. 
-    This is because Itunes changes your files' names and hides them in 
-    directories in the \fname{Ipod\_Control} directory. Files placed on your 
+    If you have loaded music onto your \dap{} using Itunes,
+    you will not be able to see your music properly in the \setting{File Browser}.
+    This is because Itunes changes your files' names and hides them in
+    directories in the \fname{Ipod\_Control} directory. Files placed on your
     \dap{} using Itunes can be viewed by initialising and using Rockbox's database.
     See \reference{ref:database} for more information.
   }
@@ -697,7 +696,7 @@ need to be updated.\\
 \section{Uninstalling Rockbox}\index{Installation!uninstall}
 
 \nopt{gigabeatf,iaudiom3,iaudiom5,iaudiox5,mrobe100,gigabeats,fuzeplus}{
-  \note{The Rockbox bootloader allows you to choose between Rockbox and 
+  \note{The Rockbox bootloader allows you to choose between Rockbox and
   the original firmware. (See \reference{ref:Dualboot} for more information.)}
 }
 
@@ -735,8 +734,8 @@ completely follow the manual uninstallation instructions below.}}
 
 \optv{ipod}{
   To uninstall Rockbox and go back to using just the original Ipod software, connect
-  the \dap{} to your computer and follow the instructions to install 
-  the bootloader but, when prompted by ipodpatcher, enter \texttt{u} for uninstall 
+  the \dap{} to your computer and follow the instructions to install
+  the bootloader but, when prompted by ipodpatcher, enter \texttt{u} for uninstall
   instead of \texttt{i} for install.
 }
 
@@ -766,7 +765,7 @@ completely follow the manual uninstallation instructions below.}}
 }
 
     \opt{sansaAMS,fuzeplus}{
-      Copy an unmodified original firmware to your player, and then reboot into 
+      Copy an unmodified original firmware to your player, and then reboot into
       the Sandisk firmware. See \reference{ref:Dualboot} for more information.
 }
 
@@ -803,12 +802,12 @@ completely follow the manual uninstallation instructions below.}}
   \end{itemize}
 
   \note{From Windows, you can also run \fname{gbs\_update\_1\_2\_us.exe}
-  directly to restore your \dap{}. This will format your \dap{}, 
+  directly to restore your \dap{}. This will format your \dap{},
   removing all files.}
 }
 
 \section{Troubleshooting}
-\begin{description} 
+\begin{description}
 \opt{sansa,ipod}{
   \item[Bootloader install problems]
   If you have trouble installing the bootloader,
@@ -836,9 +835,9 @@ completely follow the manual uninstallation instructions below.}}
 \opt{iriverh100,iriverh300,mpiohd200}{\item[``-1 error'']}
   If you receive a
   \nopt{iriverh100,iriverh300,mpiohd200}{``File Not Found''}
-  \opt{iriverh100,iriverh300,mpiohd200}{``-1 error''} 
-  from the bootloader, then the bootloader cannot find the Rockbox firmware. 
-  This is usually a result of not extracting the contents of the \fname{.zip} 
+  \opt{iriverh100,iriverh300,mpiohd200}{``-1 error''}
+  from the bootloader, then the bootloader cannot find the Rockbox firmware.
+  This is usually a result of not extracting the contents of the \fname{.zip}
   file to the proper location, and should not happen when Rockbox has been
   installed with Rockbox Utility.
 
@@ -859,7 +858,7 @@ before installing will resolve this problem. The appropriate format command is:
     mkdosfs -f 2 -F 32 -S 512 -s 64 -v -n TFAT /path/to/partition/device
 \end{code}
 \warn{This will remove all your files.}
-  
+
 \item Copying a \fname{tar}. If you have a Rockbox build environment
 then you can try generating \fname{rockbox.tar} instead of
 \fname{rockbox.zip} as follows:

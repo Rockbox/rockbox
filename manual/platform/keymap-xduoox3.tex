@@ -1,0 +1,103 @@
+% $Id$
+
+\newcommand{\ButtonPrev}{\btnfnt{Prev}}
+\newcommand{\ButtonNext}{\btnfnt{Next}}
+\newcommand{\ButtonHome}{\btnfnt{Home}}
+\newcommand{\ButtonOption}{\btnfnt{Option}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonHold}{\btnfnt{Hold}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonPrev}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonPrev}
+\newcommand{\ActionStdNext}{\ButtonNext}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonNext}
+\newcommand{\ActionStdContext}{Long \ButtonPlay}
+\newcommand{\ActionStdCancel}{\ButtonHome}
+\newcommand{\ActionStdOk}{\ButtonPlay}
+\newcommand{\ActionStdMenu}{\ButtonOption}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonOption}
+\newcommand{\ActionQuickScreenExit}{\ButtonPlay{} or \ButtonHome}
+\newcommand{\ActionStdUsbCharge}{\ButtonPlay}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay}
+\newcommand{\ActionWpsStop}{\ButtonPower}
+
+\newcommand{\ActionWpsSkipNext}{\ButtonNext}
+\newcommand{\ActionWpsSkipPrev}{\ButtonPrev}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonPrev}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonNext}
+
+\newcommand{\ActionWpsVolDown}{\ButtonVolDown}
+\newcommand{\ActionWpsVolUp}{\ButtonVolUp}
+
+\newcommand{\ActionWpsBrowse}{\ButtonHome}
+\newcommand{\ActionWpsContext}{Long \ButtonPlay}
+\newcommand{\ActionWpsMenu}{\ButtonOption}
+\newcommand{\ActionWpsHotkey}{\ButtonHome}
+
+\newcommand{\ActionWpsAbSetBNextDir}{\ButtonPower{} + \ButtonNext}
+\newcommand{\ActionWpsAbSetAPrevDir}{\ButtonPower{} + \ButtonNext}
+
+\newcommand{\ActionWpsQuickScreen}{}
+\newcommand{\ActionWpsAbReset}{}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\ButtonPower}
+\newcommand{\ActionTreeStop}{Long \ButtonPower}
+\newcommand{\ActionTreeEnter}{\ButtonPlay}
+\newcommand{\ActionTreeParentDirectory}{\ButtonHome}
+\newcommand{\ActionTreeHotkey}{Long \ButtonHome}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonPlay}
+
+%Button actions, Setting context
+\newcommand{\ActionSettingInc}{\ButtonVolUp}
+\newcommand{\ActionSettingDec}{\ButtonVolDown}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\ButtonPrev}
+\newcommand{\ActionKbdRight}{\ButtonNext}
+\newcommand{\ActionKbdDown}{\ButtonOption}
+\newcommand{\ActionKbdUp}{\ButtonHome}
+\newcommand{\ActionKbdCursorLeft}{\ButtonVolUp}
+\newcommand{\ActionKbdCursorRight}{\ButtonVolDown}
+\newcommand{\ActionKbdBackSpace}{\ButtonHome}
+\newcommand{\ActionKbdSelect}{\ButtonPlay}
+\newcommand{\ActionKbdDone}{Long \ButtonPlay}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+
+\newcommand{\ActionKbdPageFlip}{}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsIncSmall}{\ButtonVolUp}
+\newcommand{\ActionPsIncBig}{Long \ButtonVolUp}
+\newcommand{\ActionPsDecSmall}{\ButtonVolDown}
+\newcommand{\ActionPsDecBig}{Long \ButtonVolDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonNext}
+\newcommand{\ActionPsNudgeRight}{\ButtonPrev}
+\newcommand{\ActionPsToggleMode}{\ButtonPlay}
+\newcommand{\ActionPsReset}{\ButtonPower}
+\newcommand{\ActionPsExit}{\ButtonHome}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{Long \ButtonHome}
+
+%Plugin lib actions
+\newcommand{\PluginUp}{\ButtonHome}
+\newcommand{\PluginDown}{\ButtonOption}
+\newcommand{\PluginLeft}{\ButtonPrev}
+\newcommand{\PluginRight}{\ButtonNext}
+\newcommand{\PluginUpRepeat}{Long \ButtonHome}
+\newcommand{\PluginDownRepeat}{Long \ButtonOption}
+\newcommand{\PluginLeftRepeat}{Long \ButtonPrev}
+\newcommand{\PluginRightRepeat}{Long \ButtonNext}
+\newcommand{\PluginCancel}{\ButtonPower}
+\newcommand{\PluginExit}{Long \ButtonPower}
+\newcommand{\PluginSelect}{\ButtonPlay}
+\newcommand{\PluginSelectRepeat}{Long \ButtonPlay}

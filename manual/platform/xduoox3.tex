@@ -1,0 +1,26 @@
+% Id: %
+\def\UseOption{xduoox3}
+\edef\UseOption{\UseOption,XDUOO_X3_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+
+\newcommand{\playerman}{xDuoo}
+\newcommand{\playertype}{X3}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{128}
+\newcommand{\dapdisplayheight}{64}
+\newcommand{\dapdisplaydepth}{1}
+\newcommand{\specimg}{xduoox3}
+%used for specifying screenshot names common to a target "family"
+\newcommand{\seriesimg}{xduoox3}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{update.zip}}
+\newcommand{\firmwareextension}{\fname{zip}}
+\newcommand{\screenshotsize}{3cm}
+\newcommand{\disk}{SD card}
+
+% link external keymap file
+\input{platform/keymap-xduoox3.tex}

@@ -85,7 +85,7 @@ static const struct button_mapping button_context_list[] = {
 
 /** Bookmark Screen **/
 static const struct button_mapping button_context_bmark[] = {
-    { ACTION_BMS_DELETE,      BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
+    { ACTION_BMS_DELETE,      BUTTON_HOME|BUTTON_REPEAT,        BUTTON_PLAY },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_bmark */
