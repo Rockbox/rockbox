@@ -270,8 +270,9 @@ static inline void storage_thread_init(void)
 
 int storage_init(void)
 {
-#ifdef CONFIG_STORAGE_MULTI
     int rc=0;
+
+#ifdef CONFIG_STORAGE_MULTI
     int i;
     num_drives=0;
     
@@ -330,11 +331,11 @@ int storage_init(void)
     }
 #endif
 #else /* ndef CONFIG_STORAGE_MULTI */
-    STORAGE_FUNCTION(init)();
+    rc = STORAGE_FUNCTION(init)();
 #endif /* CONFIG_STORAGE_MULTI */
 
     storage_thread_init();
-    return 0;
+    return rc;
 }
 
 int storage_read_sectors(IF_MD(int drive,) unsigned long start, int count,
