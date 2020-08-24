@@ -365,7 +365,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         }
 
         if ((len > c->cache.name_buffer_size - name_buffer_used - 1) ||
-            (files_in_dir >= c->cache.max_entries)) {
+            (files_in_dir + 1 >= c->cache.max_entries)) {
             /* Tell the world that we ran out of buffer space */
             c->dirfull = true;
             break;
