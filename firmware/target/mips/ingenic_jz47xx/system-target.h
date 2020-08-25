@@ -97,8 +97,12 @@ void dma_disable(void);
 #define DMA_AIC_TX_CHANNEL 0
 #define DMA_NAND_CHANNEL   1
 #define DMA_USB_CHANNEL    2
-#define DMA_SD_RX_CHANNEL  3
-#define DMA_SD_TX_CHANNEL  4
+#define DMA_SD_RX_CHANNEL0 3
+#define DMA_SD_RX_CHANNEL1 4
+#define DMA_SD_TX_CHANNEL0 5
+#define DMA_SD_TX_CHANNEL1 6
+#define DMA_SD_RX_CHANNEL(n)  3+n
+#define DMA_SD_TX_CHANNEL(n)  5+n
 #endif
 
 #define XDMA_CALLBACK(n) DMA ## n
