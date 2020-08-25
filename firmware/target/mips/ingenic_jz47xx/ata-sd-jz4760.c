@@ -29,10 +29,12 @@
 #include "logf.h"
 #include "storage.h"
 #include "string.h"
+#include "panic.h"
 
-#define SD_INTERRUPT 0
+#define SD_INTERRUPT 0   // COMPLETELY BROKEN!
 #define SD_DMA_ENABLE 1
-#define SD_DMA_INTERRUPT 0
+#define SD_DMA_INTERRUPT 1  // HANGS RANDOMLY!
+#define SD_AUTO_CLOCK 1
 
 #if NUM_DRIVES > 2
 #error "JZ4760 SD driver supports NUM_DRIVES <= 2 only"
@@ -267,6 +269,14 @@ static inline int jz_sd_stop_clock(const int drive)
     register int timeout = 1000;
 
     //DEBUG("stop MMC clock");
+#if SD_AUTO_CLOCK
+    REG_MSC_LPM(drive) = 0; /* disable auto clock stop */
+#endif
+
+    /* only stop if necessary */
+    if (!(REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_CLK_EN))
+       return SD_NO_ERROR;
+
     REG_MSC_STRPCL(MSC_CHN(drive)) = MSC_STRPCL_CLOCK_CONTROL_STOP;
 
     while (timeout && (REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_CLK_EN))
@@ -279,6 +289,7 @@ static inline int jz_sd_stop_clock(const int drive)
         }
         udelay(1);
     }
+
     //DEBUG("clock off time is %d microsec", timeout);
     return SD_NO_ERROR;
 }
@@ -286,7 +297,11 @@ static inline int jz_sd_stop_clock(const int drive)
 /* Start the MMC clock and operation */
 static inline int jz_sd_start_clock(const int drive)
 {
-    REG_MSC_STRPCL(MSC_CHN(drive)) = MSC_STRPCL_CLOCK_CONTROL_START | MSC_STRPCL_START_OP;
+    int reg = MSC_STRPCL_START_OP;
+#if !SD_AUTO_CLOCK
+    reg |= (REG_MSC_STAT(MSC_CHN(drive)) & MSC_STAT_CLK_EN) ? 0 : MSC_STRPCL_CLOCK_CONTROL_START;
+#endif
+    REG_MSC_STRPCL(MSC_CHN(drive)) = reg;
     return SD_NO_ERROR;
 }
 
@@ -588,91 +603,88 @@ void DMA_CALLBACK(DMA_SD_RX_CHANNEL0)(void)
 {
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_AR)
     {
-        logf("SD RX DMA address error");
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_AR;
+        panicf("SD RX DMA address error");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_HLT)
     {
-        logf("SD RX DMA halt");
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_HLT;
+        panicf("SD RX DMA halt");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_TT)
     {
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_TT;
         //sd_rx_dma_callback();
+        semaphore_release(&sd_wakeup[SD_SLOT_1]);
     }
-
-    semaphore_release(&sd_wakeup[SD_SLOT_1]);
 }
 
 void DMA_CALLBACK(DMA_SD_RX_CHANNEL1)(void)
 {
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_AR)
     {
-        logf("SD RX DMA address error");
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_AR;
+        panicf("SD RX DMA address error");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_HLT)
     {
-        logf("SD RX DMA halt");
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_HLT;
+        panicf("SD RX DMA halt");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_TT)
     {
         REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_TT;
         //sd_rx_dma_callback();
+        semaphore_release(&sd_wakeup[SD_SLOT_2]);
     }
-
-    semaphore_release(&sd_wakeup[SD_SLOT_2]);
 }
 
 void DMA_CALLBACK(DMA_SD_TX_CHANNEL0)(void)
 {
     if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_AR)
     {
-        logf("SD TX DMA address error: %x, %x, %x", var1, var2, var3);
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_AR;
+        panicf("SD TX DMA address error");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_HLT)
     {
-        logf("SD TX DMA halt");
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_HLT;
+        panicf("SD TX DMA halt");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_TT)
     {
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_TT;
         //sd_tx_dma_callback();
+        semaphore_release(&sd_wakeup[SD_SLOT_1]);
     }
-
-    semaphore_release(&sd_wakeup[SD_SLOT_1]);
 }
+
 void DMA_CALLBACK(DMA_SD_TX_CHANNEL1)(void)
 {
     if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_AR)
     {
-        logf("SD TX DMA address error: %x, %x, %x", var1, var2, var3);
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_AR;
+        panicf("SD TX DMA address error");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_HLT)
     {
-        logf("SD TX DMA halt");
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_HLT;
+        panicf("SD TX DMA halt");
     }
 
     if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_TT)
     {
         REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_TT;
         //sd_tx_dma_callback();
+	semaphore_release(&sd_wakeup[SD_SLOT_2]);
     }
-
-    semaphore_release(&sd_wakeup[SD_SLOT_2]);
 }
 #endif                /* SD_DMA_INTERRUPT */
 #endif                /* SD_DMA_ENABLE */
@@ -715,8 +727,6 @@ static void jz_sd_set_clock(const int drive, unsigned int rate)
 {
     int clkrt;
 
-    jz_sd_stop_clock(drive);
-
     /* select clock source from CPM */
     cpm_select_msc_clk();
 
@@ -747,28 +757,27 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         /* On reset, 1-bit bus width */
         use_4bit[drive] = 0;
 
+        /* On reset, stop SD clock */
+        jz_sd_stop_clock(drive);
+
         /* Reset MMC/SD controller */
         __msc_reset(MSC_CHN(drive));
 
-        /* On reset, drop SD clock down */
+        /* Drop SD clock down to lowest speed */
         jz_sd_set_clock(drive, MMC_CLOCK_SLOW);
 
-        /* On reset, stop SD clock */
-        jz_sd_stop_clock(drive);
+#if SD_AUTO_CLOCK
+	/* Re-enable clocks */
+        REG_MSC_STRPCL(MSC_CHN(drive)) = MSC_STRPCL_CLOCK_CONTROL_START;
+        REG_MSC_LPM(drive) = MSC_SET_LPM;
+#endif
     }
-
-    /* stop clock */
-    jz_sd_stop_clock(drive);
 
     /* mask all interrupts and clear status */
     SD_IRQ_MASK(MSC_CHN(drive));
 
     /* open interrupt */
-#if SD_INTERRUPT
-    REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
-#else
     REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_END_CMD_RES | MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
-#endif
 
     /* Set command type and events */
     switch (request->cmd)
@@ -926,8 +935,8 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
             return SD_ERROR_TIMEOUT;
         yield();
     }
-#endif
     REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_END_CMD_RES;    /* clear flag */
+#endif
 
     /* Check for status */
     retval = jz_sd_check_status(drive, request);
@@ -964,8 +973,8 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         /* Wait for Data Done */
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE))
             yield();
-#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
+#endif
     }
 
     /* Wait for Prog Done event */
@@ -976,11 +985,14 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
 #else
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_PRG_DONE))
             yield();
-#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_PRG_DONE;    /* clear status */
+#endif
     }
 
     /* Command completed */
+#if !SD_AUTO_CLOCK
+    jz_sd_stop_clock(drive); /* stop SD clock */
+#endif
 
     return SD_NO_ERROR;    /* return successfully */
 }
@@ -996,17 +1008,44 @@ static int jz_sd_chkcard(const int drive)
     return (__gpio_get_pin((drive == SD_SLOT_1) ? PIN_SD1_CD : PIN_SD2_CD) == 0 ? 1 : 0);
 }
 
-/* MSC interrupt handler */
-void MSC(void)
-{
+/* MSC interrupt handlers */
 #if SD_INTERRUPT
-    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) & MSC_IREG_DATA_TRAN_DONE)
+void MSC2(void)  /* SD_SLOT_1 */
+{
+    logf("MSC2 interrupt");
+
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) & MSC_IREG_END_CMD_RES) {
+        REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) = MSC_IREG_END_CMD_RES;    /* clear flag */
         semaphore_release(&sd_wakeup[SD_SLOT_1]);
-    else if (REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) & MSC_IREG_DATA_TRAN_DONE)
-        semaphore_release(&sd_wakeup[SD_SLOT_2]);
-#endif
-    logf("MSC interrupt");
+    }
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) & MSC_IREG_PRG_DONE) {
+        REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) = MSC_IREG_PRG_DONE;    /* clear flag */
+        semaphore_release(&sd_wakeup[SD_SLOT_1]);
+    }
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) & MSC_IREG_DATA_TRAN_DONE) {
+        REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) = MSC_IREG_DATA_TRAN_DONE;    /* clear flag */
+        semaphore_release(&sd_wakeup[SD_SLOT_1]);
+    }
 }
+
+/* MSC interrupt handlers */
+void MSC1(void) /* SD_SLOT_2 */
+{
+    logf("MSC1 interrupt");
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) & MSC_IREG_END_CMD_RES) {
+        REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) = MSC_IREG_END_CMD_RES;    /* clear flag */
+        semaphore_release(&sd_wakeup[SD_SLOT_2]);
+    }
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) & MSC_IREG_PRG_DONE) {
+        REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) = MSC_IREG_PRG_DONE;    /* clear flag */
+        semaphore_release(&sd_wakeup[SD_SLOT_2]);
+    }
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) & MSC_IREG_DATA_TRAN_DONE) {
+        REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) = MSC_IREG_DATA_TRAN_DONE;    /* clear flag */
+        semaphore_release(&sd_wakeup[SD_SLOT_2]);
+    }
+}
+#endif
 
 #ifdef HAVE_HOTSWAP
 static void sd_gpio_setup_irq(const int drive, bool inserted)
@@ -1038,7 +1077,12 @@ static void jz_sd_hardware_init(const int drive)
 #endif
     __msc_reset(MSC_CHN(drive));  /* reset mmc/sd controller */
     SD_IRQ_MASK(MSC_CHN(drive));  /* mask all IRQs */
+#if SD_AUTO_CLOCK
+    REG_MSC_STRPCL(MSC_CHN(drive)) = MSC_STRPCL_CLOCK_CONTROL_START; /* Enable clocks */
+    REG_MSC_LPM(drive) = MSC_SET_LPM; /* enable auto clock stop */
+#else
     jz_sd_stop_clock(drive); /* stop SD clock */
+#endif
 }
 
 static void sd_send_cmd(const int drive, struct sd_request *request, int cmd, unsigned int arg,
@@ -1314,6 +1358,11 @@ int sd_init(void)
 #endif
         mutex_init(&sd_mtx[SD_SLOT_1]);
         mutex_init(&sd_mtx[SD_SLOT_2]);
+
+#if SD_INTERRUPT
+        system_enable_irq(IRQ_MSC2);
+        system_enable_irq(IRQ_MSC1);
+#endif
 
 #if SD_DMA_ENABLE && SD_DMA_INTERRUPT
         system_enable_irq(DMA_IRQ(DMA_SD_RX_CHANNEL(SD_SLOT_1)));
