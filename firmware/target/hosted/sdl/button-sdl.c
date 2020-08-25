@@ -295,7 +295,7 @@ void gui_message_loop(void)
     do {
         /* wait for the next event */
         if(SDL_WaitEvent(&event) == 0) {
-            printf("SDL_WaitEvent() error\n");
+            printf("SDL_WaitEvent(): %s\n", SDL_GetError());
             return; /* error, out of here */
         }
 
