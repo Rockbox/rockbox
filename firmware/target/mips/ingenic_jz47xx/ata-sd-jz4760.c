@@ -30,6 +30,7 @@
 #include "storage.h"
 #include "string.h"
 
+#define SD_INTERRUPT 0    // Enable at your own risk
 #define SD_DMA_ENABLE 1
 #define SD_DMA_INTERRUPT 0
 
@@ -47,7 +48,7 @@ static int                sd_drive_nr = 0;
 #endif
 
 static struct mutex       sd_mtx;
-#if SD_DMA_INTERRUPT
+#if SD_DMA_INTERRUPT || SD_INTERRUPT
 static struct semaphore   sd_wakeup;
 #endif
 
@@ -702,8 +703,13 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
 
     /* mask all interrupts and clear status */
     SD_IRQ_MASK(MSC_CHN(drive));
-    /*open interrupt */
+
+    /* open interrupt */
+#if SD_INTERRUPT
+    REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
+#else
     REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_END_CMD_RES | MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
+#endif
 
     /* Set command type and events */
     switch (request->cmd)
@@ -852,15 +858,16 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     jz_sd_start_clock(drive);
 
     /* Wait for command completion */
-    //__intc_unmask_irq(IRQ_MSC);
-    //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+    semaphore_wait(&sd_wakeup, 100); // XXX timeout ?
+#else
     while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_END_CMD_RES))
     {
         if (TIME_AFTER(current_tick, deadline))
             return SD_ERROR_TIMEOUT;
         yield();
     }
-
+#endif
     REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_END_CMD_RES;    /* clear flag */
 
     /* Check for status */
@@ -900,21 +907,25 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         if (retval)
             return retval;
 
-        //__intc_unmask_irq(IRQ_MSC);
-        //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+        semaphore_wait(&sd_wakeup, 100); // XXX timeout?
+#else
         /* Wait for Data Done */
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE))
             yield();
+#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
     }
 
     /* Wait for Prog Done event */
     if (events & SD_EVENT_PROG_DONE)
     {
-        //__intc_unmask_irq(IRQ_MSC);
-        //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+        semaphore_wait(&sd_wakeup, 100); // XXX timeout?
+#else
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_PRG_DONE))
             yield();
+#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_PRG_DONE;    /* clear status */
     }
 
@@ -937,7 +948,10 @@ static int jz_sd_chkcard(const int drive)
 /* MSC interrupt handler */
 void MSC(void)
 {
-    //semaphore_release(&sd_wakeup);
+#if SD_INTERRUPT
+    if (REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE)
+        semaphore_release(&sd_wakeup);
+#endif
     logf("MSC interrupt");
 }
 
@@ -1242,7 +1256,7 @@ int sd_init(void)
     if(!inited)
     {
 
-#if SD_DMA_INTERRUPT
+#if SD_DMA_INTERRUPT || SD_INTERRUPT
         semaphore_init(&sd_wakeup, 1, 0);
 #endif
         mutex_init(&sd_mtx);
