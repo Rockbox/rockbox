@@ -77,7 +77,10 @@
 
 /* Voice thread variables */
 static unsigned int voice_thread_id = 0;
-#ifdef CPU_COLDFIRE
+#if defined(CPU_MIPS)
+/* MIPS is stack-hungry */
+#define VOICE_STACK_EXTRA   0x500
+#elif defined(CPU_COLDFIRE)
 /* ISR uses any available stack - need a bit more room */
 #define VOICE_STACK_EXTRA   0x400
 #else
