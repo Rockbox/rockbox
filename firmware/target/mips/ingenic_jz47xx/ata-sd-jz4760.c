@@ -30,6 +30,7 @@
 #include "storage.h"
 #include "string.h"
 
+#define SD_INTERRUPT 0
 #define SD_DMA_ENABLE 1
 #define SD_DMA_INTERRUPT 0
 
@@ -39,6 +40,7 @@
 
 static long               last_disk_activity = -1;
 static tCardInfo          card[NUM_DRIVES];
+static char               active[NUM_DRIVES];
 
 #if defined(CONFIG_STORAGE_MULTI) || defined(HAVE_HOTSWAP)
 static int                sd_drive_nr = 0;
@@ -46,9 +48,9 @@ static int                sd_drive_nr = 0;
 #define                   sd_drive_nr 0
 #endif
 
-static struct mutex       sd_mtx;
-#if SD_DMA_INTERRUPT
-static struct semaphore   sd_wakeup;
+static struct mutex       sd_mtx[NUM_DRIVES];
+#if SD_DMA_INTERRUPT || SD_INTERRUPT
+static struct semaphore   sd_wakeup[NUM_DRIVES];
 #endif
 
 static int                use_4bit[NUM_DRIVES];
@@ -382,6 +384,11 @@ static void jz_sd_get_response(const int drive, struct sd_request *request)
     }
 }
 
+#if SD_DMA_ENABLE
+static int jz_sd_transmit_data_dma(const int drive, struct sd_request *req);
+static int jz_sd_receive_data_dma(const int drive, struct sd_request *req);
+#endif
+
 static int jz_sd_receive_data(const int drive, struct sd_request *req)
 {
     unsigned int nob = req->nob;
@@ -390,6 +397,12 @@ static int jz_sd_receive_data(const int drive, struct sd_request *req)
     unsigned int *wbuf = (unsigned int *) buf;
     unsigned int waligned = (((unsigned int) buf & 0x3) == 0);    /* word aligned ? */
     unsigned int stat, data, cnt;
+
+#if SD_DMA_ENABLE
+    /* Use DMA if we can */
+    if ((int)req->buffer & 0x3 == 0)
+        return jz_sd_receive_data_dma(drive, req);
+#endif
 
     for (; nob >= 1; nob--)
     {
@@ -448,6 +461,12 @@ static int jz_sd_transmit_data(const int drive, struct sd_request *req)
     unsigned int waligned = (((unsigned int) buf & 0x3) == 0);    /* word aligned ? */
     unsigned int stat, data, cnt;
 
+#if SD_DMA_ENABLE
+    /* Use DMA if we can */
+    if ((int)req->buffer & 0x3 == 0)
+        return jz_sd_transmit_data_dma(drive, req);
+#endif
+
     for (; nob >= 1; nob--)
     {
         long deadline = current_tick + (HZ * 65);
@@ -498,123 +517,162 @@ static int jz_sd_transmit_data(const int drive, struct sd_request *req)
 #if SD_DMA_ENABLE
 static int jz_sd_receive_data_dma(const int drive, struct sd_request *req)
 {
-    if ((unsigned int)req->buffer & 0x3)
-        return jz_sd_receive_data(drive, req);
-
-    /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
-
     /* setup dma channel */
-    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
-    REG_DMAC_DSAR(DMA_SD_RX_CHANNEL) = PHYSADDR(MSC_RXFIFO(MSC_CHN(drive))); /* DMA source addr */
-    REG_DMAC_DTAR(DMA_SD_RX_CHANNEL) = PHYSADDR((unsigned long)req->buffer); /* DMA dest addr */
-    REG_DMAC_DTCR(DMA_SD_RX_CHANNEL) = (req->cnt + 3) >> 2;                  /* DMA transfer count */
-    REG_DMAC_DRSR(DMA_SD_RX_CHANNEL) = (drive == SD_SLOT_1) ? DMAC_DRSR_RS_MSC2IN : DMAC_DRSR_RS_MSC1IN;    /* DMA request type */
+    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(drive)) = 0;
+    REG_DMAC_DSAR(DMA_SD_RX_CHANNEL(drive)) = PHYSADDR(MSC_RXFIFO(MSC_CHN(drive))); /* DMA source addr */
+    REG_DMAC_DTAR(DMA_SD_RX_CHANNEL(drive)) = PHYSADDR((unsigned long)req->buffer); /* DMA dest addr */
+    REG_DMAC_DTCR(DMA_SD_RX_CHANNEL(drive)) = (req->cnt + 3) >> 2;                  /* DMA transfer count */
+    REG_DMAC_DRSR(DMA_SD_RX_CHANNEL(drive)) = (drive == SD_SLOT_1) ? DMAC_DRSR_RS_MSC2IN : DMAC_DRSR_RS_MSC1IN;    /* DMA request type */
 
-    REG_DMAC_DCMD(DMA_SD_RX_CHANNEL) =
+    REG_DMAC_DCMD(DMA_SD_RX_CHANNEL(drive)) =
 #if SD_DMA_INTERRUPT
         DMAC_DCMD_TIE | /* Enable DMA interrupt */
 #endif
         DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT;
-    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
+    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(drive)) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
 
     /* wait for dma completion */
 #if SD_DMA_INTERRUPT
-    semaphore_wait(&sd_wakeup, TIMEOUT_BLOCK);
+    semaphore_wait(&sd_wakeup[drive], TIMEOUT_BLOCK);
 #else
-    while (REG_DMAC_DTCR(DMA_SD_RX_CHANNEL))
+    while (REG_DMAC_DTCR(DMA_SD_RX_CHANNEL(drive)))
            yield();
 #endif
 
     /* clear status and disable channel */
-    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
+    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(drive)) = 0;
+
+    /* flush dcache */
+    dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
 
     return SD_NO_ERROR;
 }
 
 static int jz_sd_transmit_data_dma(const int drive, struct sd_request *req)
 {
-    if ((unsigned int)req->buffer & 0x3)
-        return jz_sd_transmit_data(drive, req);
-
     /* flush dcache */
     dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
 
     /* setup dma channel */
-    REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
-    REG_DMAC_DSAR(DMA_SD_TX_CHANNEL) = PHYSADDR((unsigned long) req->buffer); /* DMA source addr */
-    REG_DMAC_DTAR(DMA_SD_TX_CHANNEL) = PHYSADDR(MSC_TXFIFO(MSC_CHN(drive)));  /* DMA dest addr */
-    REG_DMAC_DTCR(DMA_SD_TX_CHANNEL) = (req->cnt + 3) >> 2;                       /* DMA transfer count */
-    REG_DMAC_DRSR(DMA_SD_TX_CHANNEL) = (drive == SD_SLOT_1) ? DMAC_DRSR_RS_MSC2OUT : DMAC_DRSR_RS_MSC1OUT;    /* DMA request type */
+    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(drive)) = 0;
+    REG_DMAC_DSAR(DMA_SD_TX_CHANNEL(drive)) = PHYSADDR((unsigned long) req->buffer); /* DMA source addr */
+    REG_DMAC_DTAR(DMA_SD_TX_CHANNEL(drive)) = PHYSADDR(MSC_TXFIFO(MSC_CHN(drive)));  /* DMA dest addr */
+    REG_DMAC_DTCR(DMA_SD_TX_CHANNEL(drive)) = (req->cnt + 3) >> 2;                       /* DMA transfer count */
+    REG_DMAC_DRSR(DMA_SD_TX_CHANNEL(drive)) = (drive == SD_SLOT_1) ? DMAC_DRSR_RS_MSC2OUT : DMAC_DRSR_RS_MSC1OUT;    /* DMA request type */
 
-    REG_DMAC_DCMD(DMA_SD_TX_CHANNEL) =
+    REG_DMAC_DCMD(DMA_SD_TX_CHANNEL(drive)) =
 #if SD_DMA_INTERRUPT
         DMAC_DCMD_TIE | /* Enable DMA interrupt */
 #endif
         DMAC_DCMD_SAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 |
         DMAC_DCMD_DS_32BIT;
-    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
+    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(drive)) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
 
     /* wait for dma completion */
 #if SD_DMA_INTERRUPT
-    semaphore_wait(&sd_wakeup, TIMEOUT_BLOCK);
+    semaphore_wait(&sd_wakeup[drive], TIMEOUT_BLOCK);
 #else
-    while (REG_DMAC_DTCR(DMA_SD_TX_CHANNEL))
+    while (REG_DMAC_DTCR(DMA_SD_TX_CHANNEL(drive)))
            yield();
 #endif
 
     /* clear status and disable channel */
-    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) = 0;
+    REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(drive)) = 0;
 
     return SD_NO_ERROR;
 }
 
 #if SD_DMA_INTERRUPT
-void DMA_CALLBACK(DMA_SD_RX_CHANNEL)(void)
+void DMA_CALLBACK(DMA_SD_RX_CHANNEL0)(void)
 {
-    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) & DMAC_DCCSR_AR)
+    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_AR)
     {
         logf("SD RX DMA address error");
-        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) &= ~DMAC_DCCSR_AR;
+        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_AR;
     }
 
-    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) & DMAC_DCCSR_HLT)
+    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_HLT)
     {
         logf("SD RX DMA halt");
-        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) &= ~DMAC_DCCSR_HLT;
+        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_HLT;
     }
 
-    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) & DMAC_DCCSR_TT)
+    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_TT)
     {
-        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) &= ~DMAC_DCCSR_TT;
+        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_TT;
         //sd_rx_dma_callback();
     }
 
-    semaphore_release(&sd_wakeup);
+    semaphore_release(&sd_wakeup[SD_SLOT_1]);
 }
 
-void DMA_CALLBACK(DMA_SD_TX_CHANNEL)(void)
+void DMA_CALLBACK(DMA_SD_RX_CHANNEL1)(void)
 {
-    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) & DMAC_DCCSR_AR)
+    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_AR)
+    {
+        logf("SD RX DMA address error");
+        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_AR;
+    }
+
+    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_HLT)
+    {
+        logf("SD RX DMA halt");
+        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_HLT;
+    }
+
+    if (REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_TT)
+    {
+        REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_TT;
+        //sd_rx_dma_callback();
+    }
+
+    semaphore_release(&sd_wakeup[SD_SLOT_2]);
+}
+
+void DMA_CALLBACK(DMA_SD_TX_CHANNEL0)(void)
+{
+    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_AR)
     {
         logf("SD TX DMA address error: %x, %x, %x", var1, var2, var3);
-        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) &= ~DMAC_DCCSR_AR;
+        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_AR;
     }
 
-    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) & DMAC_DCCSR_HLT)
+    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_HLT)
     {
         logf("SD TX DMA halt");
-        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) &= ~DMAC_DCCSR_HLT;
+        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_HLT;
     }
 
-    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) & DMAC_DCCSR_TT)
+    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) & DMAC_DCCSR_TT)
     {
-        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL) &= ~DMAC_DCCSR_TT;
+        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_1)) &= ~DMAC_DCCSR_TT;
         //sd_tx_dma_callback();
     }
 
-    semaphore_release(&sd_wakeup);
+    semaphore_release(&sd_wakeup[SD_SLOT_1]);
+}
+void DMA_CALLBACK(DMA_SD_TX_CHANNEL1)(void)
+{
+    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_AR)
+    {
+        logf("SD TX DMA address error: %x, %x, %x", var1, var2, var3);
+        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_AR;
+    }
+
+    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_HLT)
+    {
+        logf("SD TX DMA halt");
+        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_HLT;
+    }
+
+    if (REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) & DMAC_DCCSR_TT)
+    {
+        REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(SD_SLOT_2)) &= ~DMAC_DCCSR_TT;
+        //sd_tx_dma_callback();
+    }
+
+    semaphore_release(&sd_wakeup[SD_SLOT_2]);
 }
 #endif                /* SD_DMA_INTERRUPT */
 #endif                /* SD_DMA_ENABLE */
@@ -678,7 +736,9 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
 {
     unsigned int cmdat = 0, events = 0;
     int retval;
+#if !SD_INTERRUPT
     long deadline = current_tick + (HZ * 5);
+#endif
 
     /* Indicate we have no result yet */
     request->result = SD_NO_RESPONSE;
@@ -702,8 +762,13 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
 
     /* mask all interrupts and clear status */
     SD_IRQ_MASK(MSC_CHN(drive));
-    /*open interrupt */
+
+    /* open interrupt */
+#if SD_INTERRUPT
+    REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
+#else
     REG_MSC_IMASK(MSC_CHN(drive)) = ~(MSC_IMASK_END_CMD_RES | MSC_IMASK_DATA_TRAN_DONE | MSC_IMASK_PRG_DONE);
+#endif
 
     /* Set command type and events */
     switch (request->cmd)
@@ -852,15 +917,16 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     jz_sd_start_clock(drive);
 
     /* Wait for command completion */
-    //__intc_unmask_irq(IRQ_MSC);
-    //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+    semaphore_wait(&sd_wakeup[drive], HZ * 5);
+#else
     while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_END_CMD_RES))
     {
         if (TIME_AFTER(current_tick, deadline))
             return SD_ERROR_TIMEOUT;
         yield();
     }
-
+#endif
     REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_END_CMD_RES;    /* clear flag */
 
     /* Check for status */
@@ -880,41 +946,37 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     {
         if (events & SD_EVENT_RX_DATA_DONE)
         {
-#if SD_DMA_ENABLE
-            retval = jz_sd_receive_data_dma(drive, request);
-#else
             retval = jz_sd_receive_data(drive, request);
-#endif
         }
         if (retval)
             return retval;
 
         if (events & SD_EVENT_TX_DATA_DONE)
         {
-#if SD_DMA_ENABLE
-            retval = jz_sd_transmit_data_dma(drive, request);
-#else
             retval = jz_sd_transmit_data(drive, request);
-#endif
         }
         if (retval)
             return retval;
 
-        //__intc_unmask_irq(IRQ_MSC);
-        //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+        semaphore_wait(&sd_wakeup[drive], HZ * 5);
+#else
         /* Wait for Data Done */
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE))
             yield();
+#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
     }
 
     /* Wait for Prog Done event */
     if (events & SD_EVENT_PROG_DONE)
     {
-        //__intc_unmask_irq(IRQ_MSC);
-        //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+        semaphore_wait(&sd_wakeup[drive], HZ * 5);
+#else
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_PRG_DONE))
             yield();
+#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_PRG_DONE;    /* clear status */
     }
 
@@ -937,7 +999,12 @@ static int jz_sd_chkcard(const int drive)
 /* MSC interrupt handler */
 void MSC(void)
 {
-    //semaphore_release(&sd_wakeup);
+#if SD_INTERRUPT
+    if (REG_MSC_IREG(MSC_CHN(SD_SLOT_1)) & MSC_IREG_DATA_TRAN_DONE)
+        semaphore_release(&sd_wakeup[SD_SLOT_1]);
+    else if (REG_MSC_IREG(MSC_CHN(SD_SLOT_2)) & MSC_IREG_DATA_TRAN_DONE)
+        semaphore_release(&sd_wakeup[SD_SLOT_2]);
+#endif
     logf("MSC interrupt");
 }
 
@@ -1188,13 +1255,11 @@ static int sd_select_card(const int drive)
     return 0;
 }
 
-static int sd_init_device(const int drive)
+static int __sd_init_device(const int drive)
 {
     int retval = 0;
     long deadline;
     struct sd_request init_req;
-
-    mutex_lock(&sd_mtx);
 
     /* Initialise card data as blank */
     memset(&card[drive], 0, sizeof(tCardInfo));
@@ -1202,6 +1267,7 @@ static int sd_init_device(const int drive)
     sd2_0[drive] = 0;
     num_6[drive] = 0;
     use_4bit[drive] = 0;
+    active[drive] = 0;
 
     /* reset mmc/sd controller */
     jz_sd_hardware_init(drive);
@@ -1223,8 +1289,6 @@ static int sd_init_device(const int drive)
     else
         __cpm_stop_msc1(); /* disable SD2 clock */
 
-    mutex_unlock(&sd_mtx);
-
     return retval;
 }
 
@@ -1235,28 +1299,37 @@ int sd_init(void)
     sd_init_gpio();     /* init GPIO */
 
 #if SD_DMA_ENABLE
-    __dmac_channel_enable_clk(DMA_SD_RX_CHANNEL);
-    __dmac_channel_enable_clk(DMA_SD_TX_CHANNEL);
+    __dmac_channel_enable_clk(DMA_SD_RX_CHANNEL(SD_SLOT_1));
+    __dmac_channel_enable_clk(DMA_SD_RX_CHANNEL(SD_SLOT_2));
+    __dmac_channel_enable_clk(DMA_SD_TX_CHANNEL(SD_SLOT_1));
+    __dmac_channel_enable_clk(DMA_SD_TX_CHANNEL(SD_SLOT_2));
 #endif
 
     if(!inited)
     {
 
-#if SD_DMA_INTERRUPT
-        semaphore_init(&sd_wakeup, 1, 0);
+#if SD_DMA_INTERRUPT || SD_INTERRUPT
+        semaphore_init(&sd_wakeup[SD_SLOT_1], 1, 0);
+        semaphore_init(&sd_wakeup[SD_SLOT_2], 1, 0);
 #endif
-        mutex_init(&sd_mtx);
+        mutex_init(&sd_mtx[SD_SLOT_1]);
+        mutex_init(&sd_mtx[SD_SLOT_2]);
 
 #if SD_DMA_ENABLE && SD_DMA_INTERRUPT
-        system_enable_irq(DMA_IRQ(DMA_SD_RX_CHANNEL));
-        system_enable_irq(DMA_IRQ(DMA_SD_TX_CHANNEL));
+        system_enable_irq(DMA_IRQ(DMA_SD_RX_CHANNEL(SD_SLOT_1)));
+        system_enable_irq(DMA_IRQ(DMA_SD_RX_CHANNEL(SD_SLOT_2)));
+        system_enable_irq(DMA_IRQ(DMA_SD_TX_CHANNEL(SD_SLOT_1)));
+        system_enable_irq(DMA_IRQ(DMA_SD_TX_CHANNEL(SD_SLOT_2)));
 #endif
 
         inited = true;
     }
 
-    for (int drive = 0; drive < NUM_DRIVES; drive++)
-        sd_init_device(drive);
+    for (int drive = 0; drive < NUM_DRIVES; drive++) {
+        mutex_lock(&sd_mtx[drive]);
+        __sd_init_device(drive);
+        mutex_unlock(&sd_mtx[drive]);
+    }
 
     return 0;
 }
@@ -1273,22 +1346,26 @@ tCardInfo* card_get_info_target(const int drive)
 
 static inline void sd_start_transfer(const int drive)
 {
-    mutex_lock(&sd_mtx);
+    mutex_lock(&sd_mtx[drive]);
     if (drive == SD_SLOT_1)
         __cpm_start_msc2();
     else
         __cpm_start_msc1();
-    led(true);
+
+    active[drive] = 1;
+    led(active[SD_SLOT_1] || active[SD_SLOT_2]);
 }
 
 static inline void sd_stop_transfer(const int drive)
 {
-    led(false);
+    active[drive] = 0;
+    led(active[SD_SLOT_1] || active[SD_SLOT_2]);
+
     if (drive == SD_SLOT_1)
         __cpm_stop_msc2();
     else
         __cpm_stop_msc1();
-    mutex_unlock(&sd_mtx);
+    mutex_unlock(&sd_mtx[drive]);
 }
 
 int sd_transfer_sectors(IF_MD(const int drive,) unsigned long start, int count, void* buf, bool write)
@@ -1305,7 +1382,7 @@ int sd_transfer_sectors(IF_MD(const int drive,) unsigned long start, int count, 
     if (!card_detect_target(drive) || count < 1 || (start + count) > card[drive].numblocks)
         goto err;
 
-    if(card[drive].initialized == 0 && !sd_init_device(drive))
+    if(card[drive].initialized == 0 && !__sd_init_device(drive))
         goto err;
 
     sd_simple_cmd(drive, &request, SD_SEND_STATUS, card[drive].rca, RESPONSE_R1);
@@ -1440,11 +1517,11 @@ int sd_event(long id, intptr_t data)
     case SYS_HOTSWAP_EXTRACTED:
         /* Force card init for new card, re-init for re-inserted one or
          * clear if the last attempt to init failed with an error. */
-        mutex_lock(&sd_mtx); /* lock-out card activity */
+        mutex_lock(&sd_mtx[data]); /* lock-out card activity */
         card[data].initialized = 0;
 	if (id == SYS_HOTSWAP_INSERTED)
-            sd_init_device(data);
-        mutex_unlock(&sd_mtx);
+            __sd_init_device(data);
+        mutex_unlock(&sd_mtx[data]);
         break;
 #endif /* HAVE_HOTSWAP */
     default:
