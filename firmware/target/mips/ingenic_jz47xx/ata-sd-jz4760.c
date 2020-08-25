@@ -30,6 +30,7 @@
 #include "storage.h"
 #include "string.h"
 
+#define SD_INTERRUPT 0    // Enable at your own risk
 #define SD_DMA_ENABLE 1
 #define SD_DMA_INTERRUPT 0
 
@@ -47,7 +48,7 @@ static int                sd_drive_nr = 0;
 #endif
 
 static struct mutex       sd_mtx;
-#if SD_DMA_INTERRUPT
+#if SD_DMA_INTERRUPT || SD_INTERRUPT
 static struct semaphore   sd_wakeup;
 #endif
 
@@ -852,15 +853,16 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
     jz_sd_start_clock(drive);
 
     /* Wait for command completion */
-    //__intc_unmask_irq(IRQ_MSC);
-    //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+    semaphore_wait(&sd_wakeup, 100); // XXX timeout ?
+#else
     while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_END_CMD_RES))
     {
         if (TIME_AFTER(current_tick, deadline))
             return SD_ERROR_TIMEOUT;
         yield();
     }
-
+#endif
     REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_END_CMD_RES;    /* clear flag */
 
     /* Check for status */
@@ -900,21 +902,25 @@ static int jz_sd_exec_cmd(const int drive, struct sd_request *request)
         if (retval)
             return retval;
 
-        //__intc_unmask_irq(IRQ_MSC);
-        //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+        semaphore_wait(&sd_wakeup, 100); // XXX timeout?
+#else
         /* Wait for Data Done */
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_DATA_TRAN_DONE))
             yield();
+#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_DATA_TRAN_DONE;    /* clear status */
     }
 
     /* Wait for Prog Done event */
     if (events & SD_EVENT_PROG_DONE)
     {
-        //__intc_unmask_irq(IRQ_MSC);
-        //semaphore_wait(&sd_wakeup, 100);
+#if SD_INTERRUPT
+        semaphore_wait(&sd_wakeup, 100); // XXX timeout?
+#else
         while (!(REG_MSC_IREG(MSC_CHN(drive)) & MSC_IREG_PRG_DONE))
             yield();
+#endif
         REG_MSC_IREG(MSC_CHN(drive)) = MSC_IREG_PRG_DONE;    /* clear status */
     }
 
@@ -934,12 +940,14 @@ static int jz_sd_chkcard(const int drive)
     return (__gpio_get_pin((drive == SD_SLOT_1) ? PIN_SD1_CD : PIN_SD2_CD) == 0 ? 1 : 0);
 }
 
+#if SD_INTERRUPT
 /* MSC interrupt handler */
 void MSC(void)
 {
-    //semaphore_release(&sd_wakeup);
+    semaphore_release(&sd_wakeup);
     logf("MSC interrupt");
 }
+#endif
 
 #ifdef HAVE_HOTSWAP
 static void sd_gpio_setup_irq(const int drive, bool inserted)
@@ -1242,10 +1250,14 @@ int sd_init(void)
     if(!inited)
     {
 
-#if SD_DMA_INTERRUPT
+#if SD_DMA_INTERRUPT || SD_INTERRUPT
         semaphore_init(&sd_wakeup, 1, 0);
 #endif
         mutex_init(&sd_mtx);
+
+#if SD_INTERRUPT
+	__intc_unmask_irq(IRQ_MSC);  // XXX is this the right thing?
+#endif
 
 #if SD_DMA_ENABLE && SD_DMA_INTERRUPT
         system_enable_irq(DMA_IRQ(DMA_SD_RX_CHANNEL));
