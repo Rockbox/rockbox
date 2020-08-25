@@ -1184,12 +1184,10 @@ static int sd_select_card(void)
     return 0;
 }
 
-static int sd_init_device(void)
+static int __sd_init_device(void)
 {
     int retval;
     struct sd_request init_req;
-
-    mutex_lock(&sd_mtx);
 
     /* Initialise card data as blank */
     memset(&card, 0, sizeof(tCardInfo));
@@ -1210,7 +1208,6 @@ static int sd_init_device(void)
     retval = (retval == SD_INIT_PASSED ? sd_select_card() : -1);
 
     __cpm_stop_msc(); /* disable SD clock */
-    mutex_unlock(&sd_mtx);
 
     return retval;
 }
@@ -1225,7 +1222,11 @@ int sd_init(void)
         inited = true;
     }
 
-    return sd_init_device();
+    mutex_lock(&sd_mtx);
+    int ret = __sd_init_device();
+    mutex_unlock(&sd_mtx);
+
+    return ret;
 }
 
 static inline bool card_detect_target(void)
@@ -1267,7 +1268,7 @@ int sd_read_sectors(IF_MD(int drive,) unsigned long start, int count, void* buf)
     if (!card_detect_target() || count == 0 || start > card.numblocks)
         goto err;
 
-    if(card.initialized == 0 && !sd_init_device())
+    if(card.initialized == 0 && !__sd_init_device())
         goto err;
 
     sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
@@ -1321,7 +1322,7 @@ int sd_write_sectors(IF_MV(int drive,) unsigned long start, int count, const voi
     if (!card_detect_target() || count == 0 || start > card.numblocks)
         goto err;
 
-    if(card.initialized == 0 && !sd_init_device())
+    if(card.initialized == 0 && !__sd_init_device())
         goto err;
 
     sd_simple_cmd(&request, SD_SEND_STATUS, card.rca, RESPONSE_R1);
