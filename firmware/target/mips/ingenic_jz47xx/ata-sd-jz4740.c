@@ -172,7 +172,7 @@ struct sd_response_r1
 };
 
 struct sd_response_r3
-{  
+{
     unsigned int ocr;
 };
 
@@ -335,10 +335,10 @@ static int jz_sd_check_status(struct sd_request *request)
     {
         DEBUG("SD CRC error, MSC_STAT 0x%x", status);
         return SD_ERROR_CRC;
-    
+
     }
-    
-    
+
+
     /* Checking for FIFO empty */
     /*if(status & MSC_STAT_DATA_FIFO_EMPTY && request->rtype != RESPONSE_NONE)
     {
@@ -623,8 +623,6 @@ static void jz_sd_set_clock(unsigned int rate)
 {
     int clkrt;
 
-    jz_sd_stop_clock();
-
     /* select clock source from CPM */
     cpm_select_msc_clk(rate);
 
@@ -675,9 +673,6 @@ static int jz_sd_exec_cmd(struct sd_request *request)
             use_4bit = 0;
         }
     }
-
-    /* stop clock */
-    jz_sd_stop_clock();
 
     /* mask all interrupts */
     //REG_MSC_IMASK = 0xffff;
@@ -851,8 +846,8 @@ static int jz_sd_exec_cmd(struct sd_request *request)
         {
             if (request->cmd == SD_SEND_SCR)
             {
-                /* SD card returns SCR register as data. 
-                   SD core expect it in the response buffer, 
+                /* SD card returns SCR register as data.
+                   SD core expect it in the response buffer,
                    after normal response. */
                 request->buffer =
                     (unsigned char *) ((unsigned int) request->response + 5);
@@ -889,6 +884,7 @@ static int jz_sd_exec_cmd(struct sd_request *request)
     }
 
     /* Command completed */
+    jz_sd_stop_clock();  /* Stop SD clock since we're done */
 
     return SD_NO_ERROR;    /* return successfully */
 }
@@ -1026,7 +1022,7 @@ static int sd_init_card_state(struct sd_request *request)
             retval = sd_unpack_r1(request, &r1);
             if (retval & (limit_41 < 100))
             {
-                DEBUG("sd_init_card_state: unable to SD_APP_CMD error=%d", 
+                DEBUG("sd_init_card_state: unable to SD_APP_CMD error=%d",
                       retval);
                 limit_41++;
                 sd_simple_cmd(request, SD_APP_OP_COND, ocr, RESPONSE_R3);
@@ -1064,7 +1060,7 @@ static int sd_init_card_state(struct sd_request *request)
 
         case SD_ALL_SEND_CID:
             for(i=0; i<4; i++)
-                card.cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
+                card.cid[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) |
                                (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             logf("CID: %08lx%08lx%08lx%08lx", card.cid[0], card.cid[1], card.cid[2], card.cid[3]);
@@ -1072,11 +1068,11 @@ static int sd_init_card_state(struct sd_request *request)
             break;
         case SD_SEND_RELATIVE_ADDR:
             retval = sd_unpack_r6(request, &r1, &card.rca);
-            card.rca = card.rca << 16; 
+            card.rca = card.rca << 16;
             DEBUG("sd_init_card_state: Get RCA from SD: 0x%04lx Status: %x", card.rca, r1.status);
             if (retval)
             {
-                DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d", 
+                DEBUG("sd_init_card_state: unable to SET_RELATIVE_ADDR error=%d",
                       retval);
                 return SD_INIT_FAILED;
             }
@@ -1086,7 +1082,7 @@ static int sd_init_card_state(struct sd_request *request)
 
         case SD_SEND_CSD:
             for(i=0; i<4; i++)
-                card.csd[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) | 
+                card.csd[i] = ((request->response[1+i*4]<<24) | (request->response[2+i*4]<<16) |
                                (request->response[3+i*4]<< 8) | request->response[4+i*4]);
 
             sd_parse_csd(&card);
@@ -1132,7 +1128,7 @@ static int sd_read_switch(struct sd_request *request)
 
     if (((unsigned char *)status)[13] & 0x02)
         return 0;
-    else 
+    else
         return 1;
 }
 
