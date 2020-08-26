@@ -81,8 +81,14 @@
 
 #define LCD_COL_OFFSET 2 /* column offset */
 
-static inline void bitdelay(void)
+/* Setup delay needs to be at least 40ns */
+static inline void setupdelay(void)
 {
+#if 1
+    /* OST is 24MHz, so 1 tick = 42ns */
+    unsigned int now = REG_OST_OSTCNT;
+    while (REG_OST_OSTCNT - now < 2) {  }
+#else
     unsigned int i = 15;
     __asm__ __volatile__ (
                           ".set noreorder    \n"
@@ -93,7 +99,9 @@ static inline void bitdelay(void)
                           : "=r" (i)
                           : "0" (i)
                           );
+#endif
 }
+
 
 void lcd_hw_init(void)
 {
@@ -115,9 +123,9 @@ void lcd_write_command(int byte)
     REG_GPIO_PXDATC(2) = 0x000030FC;
     REG_GPIO_PXDATS(2) = ((byte & 0xC0) << 6) | ((byte & 0x3F) << 2);
     __gpio_clear_pin(PIN_LCD_WR);
-    bitdelay();
+    setupdelay();
     __gpio_set_pin(PIN_LCD_WR);
-    bitdelay();
+    setupdelay();
 }
 
 void lcd_write_data(const fb_data* p_bytes, int count)
@@ -129,9 +137,9 @@ void lcd_write_data(const fb_data* p_bytes, int count)
         REG_GPIO_PXDATS(2) = ((*p_bytes & 0xC0) << 6) | ((*p_bytes & 0x3F) << 2);
         p_bytes++;
         __gpio_clear_pin(PIN_LCD_WR);
-        bitdelay();
+        setupdelay();
         __gpio_set_pin(PIN_LCD_WR);
-        bitdelay();
+        setupdelay();
     }
 }
 
@@ -320,9 +328,9 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count)
         REG_GPIO_PXDATC(2) = 0x000030FC;
         REG_GPIO_PXDATS(2) = ((c & 0xC0) << 6) | ((c & 0x3F) << 2);
         __gpio_clear_pin(PIN_LCD_WR);
-        bitdelay();
+        setupdelay();
         __gpio_set_pin(PIN_LCD_WR);
-        bitdelay();
+        setupdelay();
     }
 }
 
