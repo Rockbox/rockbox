@@ -26,6 +26,7 @@
       \opt{mrobe100}{720~mAh}%
       \opt{samsungyh920,samsungyh925}{900~mAh}%
       \opt{samsungyh820}{650~mAh}%
+      \opt{xduoox3}{2000~mAh}%
       , which is the capacity value for the standard battery shipped with the \dap.
         Rockbox uses this value for runtime estimation, not battery percentage
         calculation. Changing this setting has no effect whatsoever on
@@ -44,8 +45,10 @@
 
       \opt{battery_types}{
       \item [Battery Type.] This setting tells Rockbox which type of battery
-        is currently used in the \dap{}. The two supported battery types are
-        ``Alkaline'' or ``NiMH''.}
+        is currently used in the \dap{}.
+       \nopt{xduoox3}{The two supported battery types are ``Alkaline'' or ``NiMH''.}
+       \opt{xduoox3}{Older \playerman{} \playertype{} units shipped with a 1500mAh battery, while newer units ships with a 2000mAh battery.  If you are not sure which type you have, older units have a button marked ``ESC''.}
+	}
 
       \opt{usb_charging_enable}{
       \item [Charge During USB Connection.] This option lets you control whether

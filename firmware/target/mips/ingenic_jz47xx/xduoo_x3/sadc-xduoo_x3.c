@@ -148,29 +148,39 @@ void KEY_INT_IRQ(void)
 {
 }
 
+/* Notes on batteries
+
+   xDuoo shipped two types of batteries:
+
+   First is the 2000mAh battery shipped in newer units
+   Second is the 1500mAh battery shipped in older units
+
+*/
+
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
     /* 5% */
-    3414
+    3414, 3634
 };
 
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     /* 0% */
-    3307
+    3307, 3307
 };
-
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3307, 3459, 3530, 3575, 3608, 3648, 3723, 3819, 3918, 4022, 4162 }
+    { 3307, 3459, 3530, 3575, 3608, 3648, 3723, 3819, 3918, 4022, 4162 },
+    { 3300, 3652, 3704, 3730, 3753, 3786, 3836, 3906, 3973, 4061, 4160 }
 };
 
 #if CONFIG_CHARGING
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
-    { 3307, 3459, 3530, 3575, 3608, 3648, 3723, 3819, 3918, 4022, 4162 };
+//    { 3300, 3652, 3704, 3730, 3753, 3786, 3836, 3906, 3973, 4061, 4160 };
+    { 3444, 3827, 3893, 3909, 3931, 4001, 4067, 4150, 4206, 4207, 4208 };
 #endif /* CONFIG_CHARGING */
 
 /* VBAT = (BDATA/1024) * 2.5V */

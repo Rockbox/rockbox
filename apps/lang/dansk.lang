@@ -2993,7 +2993,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE_ALKALINE
+  id: LANG_BATTERY_TYPE_1
   desc: in battery settings
   user: core
   <source>
@@ -3010,7 +3010,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE_NIMH
+  id: LANG_BATTERY_TYPE_2
   desc: in battery settings
   user: core
   <source>
