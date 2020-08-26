@@ -81,8 +81,14 @@
 
 #define LCD_COL_OFFSET 2 /* column offset */
 
+/* Setup delay needs to be at least 40ns */
 static inline void bitdelay(void)
 {
+#if 1
+    /* OST is 24MHz, so 1 tick = 42ns */
+    unsigned int now = REG_OST_OSTCNT;
+    while (REG_OST_OSTCNT - now < 2) {  }
+#else
     unsigned int i = 15;
     __asm__ __volatile__ (
                           ".set noreorder    \n"
@@ -93,7 +99,9 @@ static inline void bitdelay(void)
                           : "=r" (i)
                           : "0" (i)
                           );
+#endif
 }
+
 
 void lcd_hw_init(void)
 {
