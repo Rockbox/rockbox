@@ -3640,37 +3640,43 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE_ALKALINE
+  id: LANG_BATTERY_TYPE_1
   desc: in battery settings
   user: core
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer 2000 milliamp hour"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TYPE_NIMH
+  id: LANG_BATTERY_TYPE_2
   desc: in battery settings
   user: core
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Nickel metal hydride"
+    xduoox3: "Older 1500 milliamp hour"
   </voice>
 </phrase>
 <phrase>

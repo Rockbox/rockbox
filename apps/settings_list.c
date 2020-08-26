@@ -1050,8 +1050,12 @@ const struct settings_list settings[] = {
 
 #if BATTERY_TYPES_COUNT > 1
     CHOICE_SETTING(0, battery_type, LANG_BATTERY_TYPE, 0, "battery type",
-                   "alkaline,nimh", NULL, 2, ID2P(LANG_BATTERY_TYPE_ALKALINE),
-                   ID2P(LANG_BATTERY_TYPE_NIMH)),
+#ifdef XDUOO_X3
+                   "new_2000mAh,old_1500mAh",
+#else
+                   "alkaline,nimh",
+#endif
+                   NULL, 2, ID2P(LANG_BATTERY_TYPE_1), ID2P(LANG_BATTERY_TYPE_2)),
 #endif
 #ifdef HAVE_REMOTE_LCD
     /* remote lcd */
