@@ -338,11 +338,11 @@ void tlb_refill_handler(void)
 }
 
 #ifdef USE_HW_UDELAY
-/* This enables the HW timer, set to EXT_XTAL / 16 (so @ 12MHz, 1 us = 750 ticks) */
+/* This enables the HW timer, set to EXT_XTAL / 4 (so @ 12/4 = 3MHz, 1 us = 3 ticks) */
 static void init_delaytimer(void)
 {
     __tcu_disable_ost();
-    REG_OST_OSTCSR = OSTCSR_EXT_EN | OSTCSR_PRESCALE16 |  OSTCSR_CNT_MD;
+    REG_OST_OSTCSR = OSTCSR_EXT_EN | OSTCSR_PRESCALE4 |  OSTCSR_CNT_MD;
     REG_OST_OSTCNT = 0;
     REG_OST_OSTDR = 0;
     __tcu_enable_ost();
@@ -353,10 +353,12 @@ void udelay(unsigned int usec)
     if (!__tcu_ost_enabled())
 	init_delaytimer();
 
-    /* Figure out how many ticks we need */
-    usec = (CFG_EXTAL / 16 / 1000) * (usec + 1);
+    unsigned int now = REG_OST_OSTCNT;
 
-    while (usec < REG_OST_OSTCNT) {  }
+    /* Figure out how many ticks we need */
+    usec = (CFG_EXTAL / (4 * 1000 * 1000)) * (usec + 1);
+
+    while (REG_OST_OSTCNT - now < usec) {  }
 }
 #else
 void udelay(unsigned int usec)
