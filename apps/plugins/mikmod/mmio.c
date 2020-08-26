@@ -159,7 +159,7 @@ static int _mm_FileReader_Seek(MREADER* reader,long offset,int whence)
 	//return fseek(((MFILEREADER*)reader)->file,
 	//                       (whence==SEEK_SET)?offset+reader->iobase:offset,whence);
 	return lseek(((MFILEREADER*)reader)->file,
-				 (whence==SEEK_SET)?offset+reader->iobase:offset,whence);
+                     (whence==SEEK_SET)?offset+reader->iobase:offset,whence) >= 0 ? 0 : -1;
 }
 
 static long _mm_FileReader_Tell(MREADER* reader)
