@@ -116,6 +116,10 @@
 #define BATTERY_CAPACITY_INC 100      /* capacity increment */
 #define BATTERY_TYPES_COUNT  1        /* only one type */
 
+#define CURRENT_NORMAL 167      // 2.78mA * 60s
+#define CURRENT_BACKLIGHT 180   // 15mA * 60s
+#define CURRENT_MAX_CHG 500     // bursts higher if needed
+
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
 /* Hardware controlled charging with monitoring */
