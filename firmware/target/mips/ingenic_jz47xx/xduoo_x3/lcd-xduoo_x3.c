@@ -301,28 +301,29 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
 void lcd_grey_data(unsigned char *values, unsigned char *phases, int count) ICODE_ATTR;
 void lcd_grey_data(unsigned char *values, unsigned char *phases, int count)
 {
-    unsigned char a, b, c, d;
+    unsigned long ltmp;
+    unsigned long *lval = (unsigned long *)values;
+    unsigned long *lpha = (unsigned long *)phases;
+    const unsigned long mask = 0x80808080;
 
-    __gpio_set_pin(PIN_LCD_DC);
     while(count--)
     {
-        c = 0;
-        d = 8;
-        while(d--)
-        {
-            a = *phases;
-            b = *values++;
-            b += a & ~0x80;
-            *phases++ = b;
-            c <<= 1;
-            c |= a >> 7;
-        }
-        REG_GPIO_PXDATC(2) = 0x000030FC;
-        REG_GPIO_PXDATS(2) = ((c & 0xC0) << 6) | ((c & 0x3F) << 2);
-        __gpio_clear_pin(PIN_LCD_WR);
-        bitdelay();
-        __gpio_set_pin(PIN_LCD_WR);
-        bitdelay();
+        /* calculate disp data from phase we only use the last byte (8bits) */
+        ltmp = mask & lpha[0];         // ltmp= 3.......2.......1.......0.......
+        ltmp |= (mask & lpha[1]) >> 4; // ltmp= 7.......6.......5.......4.......
+        /* phase0 | phase1 >> 4 */     // ltmp= 3...7...2...6...1...5...0...4...
+        ltmp |= ltmp >> 9;             // ltmp= 3...7...23..67..12..56..01..45..
+        ltmp |= ltmp >> 9;             // ltmp= 3...7...23..67..123.567.012.456.
+        ltmp |= ltmp >> 9;             // ltmp= 3...7...23..67..123.567.01234567
+
+        /* update the phases */
+        lpha[0] = lval[0] + (lpha[0] & ~mask);
+        lpha[1] = lval[1] + (lpha[1] & ~mask);
+
+        lcd_write_data((const fb_data*) &ltmp, 1);
+
+        lpha+=2;
+        lval+=2;
     }
 }
 
