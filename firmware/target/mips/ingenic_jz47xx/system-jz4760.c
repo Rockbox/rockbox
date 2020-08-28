@@ -470,11 +470,6 @@ static void pll0_init(unsigned int freq)
     else
 	    offset = 0;
 
-    /* set ahb **/
-    REG32(HARB0_BASE) = 0x00300000;
-    REG32(0xb3070048) = 0x00000000;
-    REG32(HARB2_BASE) = 0x00FFFFFF;
-
     cfcr = CPCCR_PCS | // no divisor on PLL for peripherals
         (n2FR[div[offset][0]] << CPCCR_CDIV_LSB) |
         (n2FR[div[offset][1]] << CPCCR_HDIV_LSB) |
@@ -482,16 +477,6 @@ static void pll0_init(unsigned int freq)
         (n2FR[div[offset][3]] << CPCCR_PDIV_LSB) |
         (n2FR[div[offset][4]] << CPCCR_MDIV_LSB) |
         (n2FR[div[offset][5]] << CPCCR_SDIV_LSB);
-
-    // write REG_DDRC_CTRL 8 times to clear ddr fifo
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
-    REG_DDRC_CTRL = 0;
 
     if (CFG_EXTAL > 16000000)
         cfcr |= CPCCR_ECS;
@@ -692,6 +677,21 @@ void ICODE_ATTR system_main(void)
 
     mmu_init();
 
+    /* set ahb arbitrators */
+    REG32(HARB0_BASE) = 0x00300000; /* HARB0_PRIOR [bridge, cim, lcd, ipu] */
+    REG32(0xb3070048) = 0x00000000; /* Not documented! */
+    REG32(HARB2_BASE) = 0x00FFFFFF; /* HARB2_PRIOR [p0b, gps, uhc],[eth, dma, p1br, otg] */
+
+    /* write REG_DDRC_CTRL 8 times to clear ddr fifo */
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+    REG_DDRC_CTRL = 0;
+
     pll0_init(CPUFREQ_DEFAULT); // PLL0 drives everything but audio
     pll1_disable();             // Leave PLL1 disabled until audio needs it
 
@@ -770,7 +770,6 @@ void set_cpu_frequency(long frequency)
        frequency = CPUFREQ_MAX;
 
    pll0_init(frequency);
-   // FIX PCLK (ie i2c)?
    cpu_frequency = __cpm_get_pllout2();
    cpm_select_msc_clk();
 }
