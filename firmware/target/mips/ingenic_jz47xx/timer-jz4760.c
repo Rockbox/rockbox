@@ -78,10 +78,10 @@ bool timer_set(long cycles, bool start)
     if(start)
     {
         system_enable_irq(IRQ_TCU1);
-        __tcu_start_counter(5);
     }
 
     restore_irq(old_irq);
+    __tcu_start_counter(5);
 
     return true;
 }
