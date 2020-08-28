@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "jz4740.h"
 #include "system.h"
@@ -61,7 +61,7 @@ bool timer_set(long cycles, bool start)
     {
         __tcu_disable_pwm_output(1);
 
-        __tcu_mask_half_match_irq(1); 
+        __tcu_mask_half_match_irq(1);
         __tcu_unmask_full_match_irq(1);
 
         /* EXTAL clock = CFG_EXTAL (12Mhz in most targets) */
@@ -78,10 +78,10 @@ bool timer_set(long cycles, bool start)
     if(start)
     {
         system_enable_irq(IRQ_TCU1);
-        __tcu_start_counter(1);
     }
 
     restore_irq(old_irq);
+    __tcu_start_counter(1);
 
     return true;
 }
