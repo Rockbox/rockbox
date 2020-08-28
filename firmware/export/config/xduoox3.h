@@ -45,6 +45,13 @@
 #define LCD_BL_DARKCOLOR     0x000000
 #define LCD_BL_BRIGHTCOLOR   0x0de2e5
 
+/* Define this if your LCD can set contrast */
+#define HAVE_LCD_CONTRAST
+
+#define MIN_CONTRAST_SETTING        -9
+#define MAX_CONTRAST_SETTING        -1
+#define DEFAULT_CONTRAST_SETTING    -6
+
 /* define this if you have LCD enable function */
 #define HAVE_LCD_ENABLE
 
