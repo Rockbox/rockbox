@@ -87,19 +87,20 @@ intr(GPIO187);intr(GPIO188);intr(GPIO189);intr(GPIO190);intr(GPIO191);
 
 static void (* const irqvector[])(void) =
 {
+    // @0
     I2C1,I2C0,UART3,UART2,UART1,UART0,GPU,SSI1,
     SSI0,TSSI,UIRQ,KBC,UIRQ,UIRQ,UIRQ,UIRQ,
     UIRQ,UIRQ,SADC,ETH,UHC,OTG,UIRQ,UIRQ,
     UIRQ,TCU2,TCU1,TCU0,GPS,IPU,CIM,LCD,
-
-    RTC,OWI,AIC,MSC2,MSC1,MSC0,SCC,BCH, // 32
-    PCM,HARB0,HARB2,AOSD,CPM,UIRQ,
-
-    DMA0,DMA1,DMA2,DMA3,DMA4,DMA5,DMA6,DMA7, // 46
-    DMA8,DMA9,DMA10,DMA11,MDMA0,MDMA1,MDMA2,BDMA0,
-    BDMA1,BDMA2,
-
-    GPIO0,GPIO1,GPIO2,GPIO3,GPIO4,GPIO5,GPIO6,GPIO7, // 64
+    // @32
+    RTC,OWI,AIC,MSC2,MSC1,MSC0,SCC,BCH,
+    PCM,HARB0,HARB2,AOSD,CPM,  // end of HW IRQs, everything else is SW
+    // @45
+    UIRQ,DMA0,DMA1,DMA2,DMA3,DMA4,DMA5,
+    DMA6,DMA7,DMA8,DMA9,DMA10,DMA11,MDMA0,MDMA1,
+    MDMA2,BDMA0,BDMA1,BDMA2,
+    // @64
+    GPIO0,GPIO1,GPIO2,GPIO3,GPIO4,GPIO5,GPIO6,GPIO7,
     GPIO8,GPIO9,GPIO10,GPIO11,GPIO12,GPIO13,GPIO14,GPIO15,
     GPIO16,GPIO17,GPIO18,GPIO19,GPIO20,GPIO21,GPIO22,GPIO23,
     GPIO24,GPIO25,GPIO26,GPIO27,GPIO28,GPIO29,GPIO30,GPIO31,
@@ -243,6 +244,23 @@ static int get_irq_number(void)
     if (UNLIKELY(irq0 < 0) && UNLIKELY(irq1 < 0))
         return -1;
 
+#if 1
+    // Prioritze AIC and SADC, then everything on ipl1 (ie MSC mostly)
+    if (ipl1 & 1<<(IRQ_AIC-32)) {
+        irq = IRQ_AIC;
+	ipl1 &= ~(1<<(IRQ_AIC-32));
+    } else if (ipl0 & 1<<IRQ_SADC) {
+        irq = IRQ_SADC;
+	ipl0 &= ~(1<<IRQ_SADC);
+    } else if (ipl1) {
+        irq = irq1 + 32;
+	ipl1 &= ~(1<<irq1);
+    } else {
+        irq = irq0;
+	ipl0 &= ~(1<<irq0);
+    }
+#else
+    // Prioritize I2C0, I2C1, IPL0, and finally IPL1
     if (!(ipl0 & 3)) {
         if (ipl0) {
             irq = irq0;
@@ -251,7 +269,7 @@ static int get_irq_number(void)
             irq = irq1 + 32;
             ipl1 &= ~(1<<irq1);
         }
-    } else  {
+    } else {
         if (ipl0 & 2) {
             irq = 1;
             ipl0 &= ~(1<<irq);
@@ -260,6 +278,7 @@ static int get_irq_number(void)
             ipl0 &= ~(1<<irq);
         }
     }
+#endif
 
     switch (irq)
     {
