@@ -689,12 +689,18 @@ void DMA_CALLBACK(DMA_SD_TX_CHANNEL1)(void)
 #endif                /* SD_DMA_INTERRUPT */
 #endif                /* SD_DMA_ENABLE */
 
+#ifndef HAVE_ADJUSTABLE_CPU_FREQ
+#define cpu_frequency __cpm_get_pllout2()
+#endif
+
 static inline unsigned int jz_sd_calc_clkrt(const int drive, unsigned int rate)
 {
-    unsigned int clkrt;
-    unsigned int clk_src = sd2_0[drive] ? SD_CLOCK_HIGH : SD_CLOCK_FAST;
+    unsigned int clkrt = 0;
+    unsigned int clk_src = cpu_frequency / __cpm_get_mscdiv(); /* MSC_CLK */
 
-    clkrt = 0;
+    if (!sd2_0[drive] && rate > SD_CLOCK_FAST)
+        rate = SD_CLOCK_FAST;
+
     while (rate < clk_src)
     {
         clkrt++;
@@ -703,32 +709,10 @@ static inline unsigned int jz_sd_calc_clkrt(const int drive, unsigned int rate)
     return clkrt;
 }
 
-#ifndef HAVE_ADJUSTABLE_CPU_FREQ
-#define cpu_frequency __cpm_get_pllout2()
-#endif
-
-void cpm_select_msc_clk(void)
-{
-    unsigned int div = cpu_frequency / SD_CLOCK_FAST;
-
-    if (div == 0)
-            div = 1;
-
-    if (div == __cpm_get_mscdiv())
-	    return;
-
-    REG_CPM_MSCCDR = MSCCDR_MCS | (div - 1);
-    DEBUG("MSCCLK == %x\n", REG_CPM_MSCCDR);
-    __cpm_enable_pll_change();
-}
-
 /* Set the MMC clock frequency */
 static void jz_sd_set_clock(const int drive, unsigned int rate)
 {
     int clkrt;
-
-    /* select clock source from CPM */
-    cpm_select_msc_clk();
 
     clkrt = jz_sd_calc_clkrt(drive, rate);
     REG_MSC_CLKRT(MSC_CHN(drive)) = clkrt;

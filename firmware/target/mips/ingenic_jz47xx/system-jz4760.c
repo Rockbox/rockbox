@@ -491,11 +491,13 @@ static void pll0_init(unsigned int freq)
              | CPPCR0_PLLEN;             /* enable PLL */
 
     /*
-     * Init USB Host clock, pllout2 must be n*48MHz
-     * For JZ4760b UHC - River.
+     * Init USB Host clock, PLL0 must be multiple of 48MHz!
      */
     usbdiv = (cfcr & CPCCR_PCS) ? freq : (freq / 2);
     REG_CPM_UHCCDR = usbdiv / 48000000 - 1;
+
+    /* Init MSC clock; shoot for 48MHz base clock. */
+    REG_CPM_MSCCDR = MSCCDR_MCS | ((freq / 48000000) - 1);
 
     /* init PLL */
     REG_CPM_CPCCR = cfcr;
@@ -756,10 +758,7 @@ int system_memory_guard(int newmode)
     return 0;
 }
 
-
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
-void cpm_select_msc_clk(void);
-
 void set_cpu_frequency(long frequency)
 {
    if (frequency == cpu_frequency)
@@ -771,6 +770,5 @@ void set_cpu_frequency(long frequency)
 
    pll0_init(frequency);
    cpu_frequency = __cpm_get_pllout2();
-   cpm_select_msc_clk();
 }
 #endif
