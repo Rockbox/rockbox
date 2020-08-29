@@ -109,8 +109,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     REG_DMAC_DCMD(DMA_LCD_CHANNEL)  = ( DMAC_DCMD_SAI     | DMAC_DCMD_RDIL_IGN | DMAC_DCMD_SWDH_32
                                       | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_16BYTE );
 
-    __dcache_writeback_all(); /* Size of framebuffer is way bigger than cache size.
-                                 We need to find a way to make the framebuffer uncached, so this statement can get removed. */
+    // XXX range
+    commit_discard_dcache(); /* Size of framebuffer is way bigger than cache size.
+                                We need to find a way to make the framebuffer uncached, so this statement can get removed. */
 
     while(REG_SLCD_STATE & SLCD_STATE_BUSY);
     REG_SLCD_CTRL |= SLCD_CTRL_DMA_EN; /* Enable SLCD DMA support */
@@ -174,7 +175,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
     yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
 
-    __dcache_writeback_all();
+    commit_discard_dcache(); // XXX range
 
     __cpm_start_ipu();
 

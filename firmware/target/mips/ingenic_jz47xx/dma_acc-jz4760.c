@@ -29,7 +29,7 @@ void memset_dma(void *target, int c, size_t len, unsigned int bits)
     unsigned char *dp;
 
     if(((unsigned int)target < 0xa0000000) && len)
-         dma_cache_wback_inv((unsigned long)target, len);
+         discard_dcache_range(target, len);
 
     dp = (unsigned char *)((unsigned int)(&d) | 0xa0000000);
     *(dp + 0) = c;
@@ -68,14 +68,14 @@ void memset_dma(void *target, int c, size_t len, unsigned int bits)
 void memcpy_dma(void *target, const void *source, size_t len, unsigned int bits)
 {
     if(((unsigned int)source < 0xa0000000) && len)
-        dma_cache_wback_inv((unsigned long)source, len);
-    
+        commit_dcache_range(source, len);
+
     if(((unsigned int)target < 0xa0000000) && len)
-        dma_cache_wback_inv((unsigned long)target, len);
-    
+        discard_dcache_range(target, len);
+
     REG_MDMAC_DCCSR(MDMA_CHANNEL) = 0;
     REG_MDMAC_DSAR(MDMA_CHANNEL) = PHYSADDR((unsigned long)source);
-    REG_MDMAC_DTAR(MDMA_CHANNEL) = PHYSADDR((unsigned long)target); 
+    REG_MDMAC_DTAR(MDMA_CHANNEL) = PHYSADDR((unsigned long)target);
     REG_MDMAC_DRSR(MDMA_CHANNEL) = DMAC_DRSR_RS_AUTO;
     switch (bits)
     {
