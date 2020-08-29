@@ -160,7 +160,7 @@
 #define CONFIG_CPU JZ4760B
 
 /* If we have adjustable frequency */
-#define CPUFREQ_MAX      576000000  // datasheet sez 600MHz max.  Must be multiple of 48!
+#define CPUFREQ_MAX      528000000  // datasheet sez 600MHz max.  Must be multiple of 48!
 #define CPUFREQ_MIN      192000000
 #define CPUFREQ_NORMAL   CPUFREQ_MIN
 

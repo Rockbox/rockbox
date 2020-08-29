@@ -451,7 +451,7 @@ static void pll0_init(unsigned int freq)
      *  DIV should be one of [1, 2, 3, 4, 6, 8]
      */
     const int div[2][6] = { { 1, 2, 2, 2, 2, 2 },
-			    { 1, 6, 6, 6, 6, 6 } };
+			    { 1, 4, 4, 4, 4, 4 } };
     const int n2FR[9] = {
         0, 0, 1, 2, 3, 0, 4, 0, 5
     };
