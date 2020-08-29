@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2009 by Maurus Cuelenaere
+ * Copyright (C) 2015 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,8 +25,16 @@
 #include "system.h"
 #include "mmu-mips.h"
 
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
+/* XBurst core has 32 JTLB entries */
+#define NR_TLB_ENTRIES  32
+#else
+#error please define NR_TLB_ENTRIES
+#endif
+
 #define BARRIER                            \
     __asm__ __volatile__(                  \
+    "    .set    push               \n"    \
     "    .set    noreorder          \n"    \
     "    nop                        \n"    \
     "    nop                        \n"    \
@@ -34,7 +42,7 @@
     "    nop                        \n"    \
     "    nop                        \n"    \
     "    nop                        \n"    \
-    "    .set    reorder            \n");
+    "    .set    pop                \n");
 
 #define DEFAULT_PAGE_SHIFT       PL_4K
 #define DEFAULT_PAGE_MASK        PM_4K
@@ -43,6 +51,7 @@
 #define VPN2_SHIFT               S_EntryHiVPN2
 #define PFN_SHIFT                S_EntryLoPFN
 #define PFN_MASK                 0xffffff
+
 static void local_flush_tlb_all(void)
 {
     unsigned long old_ctx;
@@ -55,10 +64,11 @@ static void local_flush_tlb_all(void)
     write_c0_entrylo1(0);
     BARRIER;
 
-    /* Blast 'em all away. */
-    for(entry = 0; entry < 32; entry++)
+    /* blast all entries except the wired one */
+    for(entry = read_c0_wired(); entry < NR_TLB_ENTRIES; entry++)
     {
-        /* Make sure all entries differ. */
+        /* Make sure all entries differ and are in unmapped space, making them
+         * impossible to match */
         write_c0_entryhi(UNIQUE_ENTRYHI(entry, DEFAULT_PAGE_SHIFT));
         write_c0_index(entry);
         BARRIER;
@@ -119,84 +129,133 @@ void mmu_init(void)
     write_c0_framemask(0);
 
     local_flush_tlb_all();
-/*
-    map_address(0x80000000, 0x80000000, 0x4000, K_CacheAttrC);
-    map_address(0x80004000, 0x80004000, MEMORYSIZE * 0x100000, K_CacheAttrC);
-*/
 }
 
-#define SYNC_WB() __asm__ __volatile__ ("sync")
+/* Target specific operations:
+ * - invalidate BTB (Branch Table Buffer)
+ * - sync barrier after cache operations */
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
+#define INVALIDATE_BTB()                     \
+do {                                         \
+        unsigned long tmp;                   \
+        __asm__ __volatile__(                \
+        "    .set push            \n"        \
+        "    .set noreorder       \n"        \
+        "    .set mips32          \n"        \
+        "    mfc0 %0, $16, 7      \n"        \
+        "    nop                  \n"        \
+        "    ori  %0, 2           \n"        \
+        "    mtc0 %0, $16, 7      \n"        \
+        "    nop                  \n"        \
+        "    .set pop             \n"        \
+        : "=&r"(tmp));                       \
+    } while (0)
 
-#define cache_op(base,op)	        	\
-	__asm__ __volatile__("	         	\
-		.set noreorder;		        \
-		.set mips3;		        \
-		cache %1, (%0);	                \
-		.set mips0;			\
-		.set reorder"			\
-		:				\
-		: "r" (base),			\
-		  "i" (op));
+#define SYNC_WB() __asm__ __volatile__ ("sync":::"memory")
+#else /* !JZ4732 */
+#define INVALIDATE_BTB() do { } while(0)
+#define SYNC_WB() do { } while(0)
+#endif /* CONFIG_CPU */
 
-void __icache_invalidate_all(void)
+#define __CACHE_OP(op, addr)                 \
+    __asm__ __volatile__(                    \
+    "    .set    push\n\t         \n"        \
+    "    .set    noreorder        \n"        \
+    "    .set    mips32\n\t       \n"        \
+    "    cache   %0, %1           \n"        \
+    "    .set    pop              \n"        \
+    :                                        \
+    : "i" (op), "m"(*(unsigned char *)(addr)))
+
+/* rockbox cache api */
+
+/* Writeback whole D-cache
+ * Alias to commit_discard_dcache() as there is no index type
+ * variant of writeback-only operation
+ */
+void commit_dcache(void) __attribute__((alias("commit_discard_dcache")));
+
+/* Writeback whole D-cache and invalidate D-cache lines */
+void commit_discard_dcache(void)
 {
-    unsigned long start;
-    unsigned long end;
+    unsigned int i;
 
-    start = A_K0BASE;
-    end = start + CACHE_SIZE;
-    while(start < end)
-    {
-        cache_op(start,ICIndexInv);
-        start += CACHE_LINE_SIZE;
-    }
+    /* Use index type operation and iterate whole cache */
+    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHEALIGN_SIZE)
+        __CACHE_OP(DCIndexWBInv, i);
+
     SYNC_WB();
 }
 
-void __dcache_invalidate_all(void)
+/* Writeback lines of D-cache corresponding to address range and
+ * invalidate those D-cache lines
+ */
+void commit_discard_dcache_range(const void *base, unsigned int size)
 {
-    unsigned long start;
-    unsigned long end;
+    char *s;
 
-    start = A_K0BASE;
-    end = start + CACHE_SIZE;
-    while (start < end)
-    {
-        cache_op(start,DCIndexWBInv);
-        start += CACHE_LINE_SIZE;
-    }
+    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
+        __CACHE_OP(DCHitWBInv, s);
+
     SYNC_WB();
 }
 
-void __idcache_invalidate_all(void)
+/* Writeback lines of D-cache corresponding to address range
+ */
+void commit_dcache_range(const void *base, unsigned int size)
 {
-    __dcache_invalidate_all();
-    __icache_invalidate_all();
-}
+    char *s;
 
-void __dcache_writeback_all(void)
-{
-    __dcache_invalidate_all();
-}
+    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
+        __CACHE_OP(DCHitWB, s);
 
-void dma_cache_wback_inv(unsigned long addr, unsigned long size)
-{
-    unsigned long end, a;
-
-    if (size >= CACHE_SIZE*2) {
-        __dcache_writeback_all();
-    }
-    else {
-        unsigned long dc_lsize = CACHE_LINE_SIZE;
-
-        a = addr & ~(dc_lsize - 1);
-        end = (addr + size - 1) & ~(dc_lsize - 1);
-        while (1) {
-            cache_op(a,DCHitWBInv);
-            if (a == end)
-                break;
-            a += dc_lsize;
-        }
-    }
     SYNC_WB();
+}
+
+/* Invalidate D-cache lines corresponding to address range
+ * WITHOUT writeback
+ */
+void discard_dcache_range(const void *base, unsigned int size)
+{
+    char *s;
+
+    if (((int)base & CACHEALIGN_SIZE - 1) ||
+	(((int)base + size) & CACHEALIGN_SIZE - 1)) {
+            /* Overlapping sections, so we need to write back instead */
+            commit_discard_dcache_range(base, size);
+            return;
+    };
+
+    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
+        __CACHE_OP(DCHitInv, s);
+
+    SYNC_WB();
+}
+
+/* Invalidate whole I-cache */
+static void discard_icache(void)
+{
+    unsigned int i;
+
+    asm volatile (".set   push       \n"
+                  ".set   noreorder  \n"
+                  ".set   mips32     \n"
+                  "mtc0   $0, $28    \n" /* TagLo */
+                  "mtc0   $0, $29    \n" /* TagHi */
+                  ".set   pop        \n"
+                  );
+    /* Use index type operation and iterate whole cache */
+    for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHEALIGN_SIZE)
+        __CACHE_OP(ICIndexStTag, i);
+
+    INVALIDATE_BTB();
+}
+
+/* Invalidate the entire I-cache
+ * and writeback + invalidate the entire D-cache
+ */
+void commit_discard_idcache(void)
+{
+    commit_discard_dcache();
+    discard_icache();
 }

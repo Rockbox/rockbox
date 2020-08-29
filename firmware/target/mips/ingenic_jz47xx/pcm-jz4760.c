@@ -28,7 +28,6 @@
 #include "pcm-internal.h"
 #include "cpu.h"
 
-
 /****************************************************************************
  ** Playback DMA transfer
  **/
@@ -60,8 +59,8 @@ static inline void set_dma(const void *addr, size_t size)
     int burst_size;
     logf("%x %d %x", (unsigned int)addr, size, REG_AIC_SR);
 
-    dma_cache_wback_inv((unsigned long)addr, size);
-    
+    commit_discard_dcache_range(addr, size);
+
     if(size % 16)
     {
         if(size % 4)

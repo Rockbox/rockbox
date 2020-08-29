@@ -511,24 +511,23 @@ static void sdram_init(void)
 void ICODE_ATTR system_main(void)
 {
     int i;
-       
-    __dcache_writeback_all();
-    __icache_invalidate_all();
-    
+
+    commit_discard_idcache();
+
     write_c0_status(1 << 28 | 1 << 10 ); /* Enable CP | Mask interrupt 2 */
-    
+
     /* Disable all interrupts */
     for(i=0; i<IRQ_MAX; i++)
         dis_irq(i);
-    
+
     mmu_init();
     pll_init();
     sdram_init();
-    
+
     /* Disable unneeded clocks, clocks are enabled when needed */
     __cpm_stop_all();
     __cpm_suspend_usbhost();
-    
+
     /* Enable interrupts at core level */
     enable_interrupt();
 }

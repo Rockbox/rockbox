@@ -201,7 +201,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
         : : "r"(dest)
     );
 #elif defined(CPU_MIPS)
-    __dcache_writeback_all();
+    commit_discard_idcache();
     asm volatile(
         "jr     %0               \n"
         : : "r"(dest)

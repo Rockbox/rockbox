@@ -32,7 +32,7 @@ void memset(void *target, unsigned char c, size_t len)
     else
     {
         if(((unsigned int)target < 0xa0000000) && len)
-             dma_cache_wback_inv((unsigned long)target, len);
+             discard_dcache_range(target, len);
 
         dp = (unsigned char *)((unsigned int)(&d) | 0xa0000000);
         *(dp + 0) = c;
@@ -52,7 +52,6 @@ void memset(void *target, unsigned char c, size_t len)
             dp = (unsigned char *)((unsigned int)target + (len & (32 - 1)));
             for(d = 0;d < (len % 32); d++)
                 *dp++ = c;
-
         }
     }
 }
@@ -68,7 +67,7 @@ void memset16(void *target, unsigned short c, size_t len)
     else
     {
         if(((unsigned int)target < 0xa0000000) && len)
-             dma_cache_wback_inv((unsigned long)target, len);
+             discard_dcache_range(target, len);
 
         d = c;
         REG_DMAC_DSAR(ch) = PHYSADDR((unsigned long)&d);
@@ -97,10 +96,10 @@ void memcpy(void *target, const void *source, size_t len)
         _memcpy(target, source, len);
 
     if(((unsigned int)source < 0xa0000000) && len)
-        dma_cache_wback_inv((unsigned long)source, len);
+        commit_dcache_range(source, len);
 
     if(((unsigned int)target < 0xa0000000) && len)
-        dma_cache_wback_inv((unsigned long)target, len);
+        discard_dcache_range(target, len);
 
     REG_DMAC_DSAR(ch) = PHYSADDR((unsigned long)source);
     REG_DMAC_DTAR(ch) = PHYSADDR((unsigned long)target);
