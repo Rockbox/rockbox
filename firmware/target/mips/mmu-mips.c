@@ -48,7 +48,7 @@ static void local_flush_tlb_all(void)
     unsigned long old_ctx;
     int entry;
     unsigned int old_irq = disable_irq_save();
-    
+
     /* Save old context and create impossible VPN2 value */
     old_ctx = read_c0_entryhi();
     write_c0_entrylo0(0);
@@ -66,7 +66,7 @@ static void local_flush_tlb_all(void)
     }
     BARRIER;
     write_c0_entryhi(old_ctx);
-    
+
     restore_irq(old_irq);
 }
 
@@ -77,7 +77,7 @@ static void add_wired_entry(unsigned long entrylo0, unsigned long entrylo1,
     unsigned long old_pagemask;
     unsigned long old_ctx;
     unsigned int  old_irq = disable_irq_save();
-    
+
     old_ctx = read_c0_entryhi() & ASID_MASK;
     old_pagemask = read_c0_pagemask();
     wired = read_c0_wired();
@@ -105,10 +105,10 @@ void map_address(unsigned long virtual, unsigned long physical,
     unsigned long entry0  = (physical & PFN_MASK) << PFN_SHIFT;
     unsigned long entry1  = ((physical+length) & PFN_MASK) << PFN_SHIFT;
     unsigned long entryhi = virtual & ~VPN2_SHIFT;
-    
+
     entry0 |= (M_EntryLoG | M_EntryLoV | (cache_flags << S_EntryLoC) );
     entry1 |= (M_EntryLoG | M_EntryLoV | (cache_flags << S_EntryLoC) );
-    
+
     add_wired_entry(entry0, entry1, entryhi, DEFAULT_PAGE_MASK);
 }
 
@@ -117,7 +117,7 @@ void mmu_init(void)
     write_c0_pagemask(DEFAULT_PAGE_MASK);
     write_c0_wired(0);
     write_c0_framemask(0);
-    
+
     local_flush_tlb_all();
 /*
     map_address(0x80000000, 0x80000000, 0x4000, K_CacheAttrC);

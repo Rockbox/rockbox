@@ -148,20 +148,20 @@ static inline void jz_nand_read_buf8(void *buf, int count)
 static void jz_nand_write_dma(void *source, unsigned int len, int bw)
 {
     mutex_lock(&nand_dma_mtx);
-    
+
     if(((unsigned int)source < 0xa0000000) && len)
          dma_cache_wback_inv((unsigned long)source, len);
-    
+
     dma_enable();
 
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = DMAC_DCCSR_NDES;
-    REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)source);       
-    REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);       
-    REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 16;                        
-    REG_DMAC_DRSR(DMA_NAND_CHANNEL) = DMAC_DRSR_RS_AUTO;                
+    REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)source);
+    REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);
+    REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 16;
+    REG_DMAC_DRSR(DMA_NAND_CHANNEL) = DMAC_DRSR_RS_AUTO;
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) = (DMAC_DCMD_SAI| DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DS_16BYTE |
                                        (bw == 8 ? DMAC_DCMD_DWDH_8 : DMAC_DCMD_DWDH_16));
-    
+
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) |= DMAC_DCCSR_EN; /* Enable DMA channel */
 #if 1
     while( REG_DMAC_DTCR(DMA_NAND_CHANNEL) )
@@ -172,26 +172,26 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
 #endif
 
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
-    
+
     dma_disable();
-    
+
     mutex_unlock(&nand_dma_mtx);
 }
 
 static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 {
     mutex_lock(&nand_dma_mtx);
-    
+
     if(((unsigned int)target < 0xa0000000) && len)
         dma_cache_wback_inv((unsigned long)target, len);
 
     dma_enable();
-    
+
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) = DMAC_DCCSR_NDES ;
-    REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);       
-    REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)target);       
-    REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 4;                        
-    REG_DMAC_DRSR(DMA_NAND_CHANNEL) = DMAC_DRSR_RS_AUTO;                
+    REG_DMAC_DSAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)NAND_DATAPORT);
+    REG_DMAC_DTAR(DMA_NAND_CHANNEL) = PHYSADDR((unsigned long)target);
+    REG_DMAC_DTCR(DMA_NAND_CHANNEL) = len / 4;
+    REG_DMAC_DRSR(DMA_NAND_CHANNEL) = DMAC_DRSR_RS_AUTO;
     REG_DMAC_DCMD(DMA_NAND_CHANNEL) = (DMAC_DCMD_SAI| DMAC_DCMD_DAI | DMAC_DCMD_DWDH_32 | DMAC_DCMD_DS_32BIT |
                                        (bw == 8 ? DMAC_DCMD_SWDH_8 : DMAC_DCMD_SWDH_16));
     REG_DMAC_DCCSR(DMA_NAND_CHANNEL) |= DMAC_DCCSR_EN; /* Enable DMA channel */
@@ -204,9 +204,9 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 #endif
 
     //REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
-    
+
     dma_disable();
-    
+
     mutex_unlock(&nand_dma_mtx);
 }
 
@@ -223,7 +223,7 @@ void DMA_CALLBACK(DMA_NAND_CHANNEL)(void)
 
     if (REG_DMAC_DCCSR(DMA_NAND_CHANNEL) & DMAC_DCCSR_TT)
         REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_TT;
-    
+
     semaphore_release(&nand_dma_complete);
 }
 #endif /* USE_DMA */
@@ -245,7 +245,7 @@ static inline void jz_nand_read_buf(void *buf, int count, int bw)
 
 #ifdef USE_ECC
 /*
- * Correct 1~9-bit errors in 512-bytes data 
+ * Correct 1~9-bit errors in 512-bytes data
  */
 static void jz_rs_correct(unsigned char *dat, int idx, int mask)
 {
@@ -348,7 +348,7 @@ static int jz_nand_read_page(unsigned long page_addr, unsigned char *dst)
 #endif
     unsigned char *data_buf;
     unsigned char oob_buf[nandp->oob_size];
-    
+
     page_size = nandp->page_size;
     oob_size = nandp->oob_size;
     row_cycle = nandp->row_cycle;
@@ -472,9 +472,9 @@ static int jz_nand_init(void)
     __gpio_as_nand_16bit(1);
 
     REG_NEMC_SMCR1 = CFG_NAND_SMCR1 | 0x40;
-    
+
     __nand_select();
-       
+
     __nand_cmd(NAND_CMD_READID);
     __nand_addr(NAND_CMD_READ0);
     cData[0] = __nand_data8();
@@ -482,14 +482,14 @@ static int jz_nand_init(void)
     cData[2] = __nand_data8();
     cData[3] = __nand_data8();
     cData[4] = __nand_data8();
-        
+
     __nand_deselect();
-        
+
     logf("NAND chip %d: 0x%x 0x%x 0x%x 0x%x 0x%x", i+1, cData[0], cData[1],
                                                   cData[2], cData[3], cData[4]);
-        
+
     bank = nand_identify(cData);
-        
+
     if(bank == NULL)
     {
         panicf("Unknown NAND flash chip: 0x%x 0x%x 0x%x 0x%x 0x%x", cData[0],
@@ -498,16 +498,16 @@ static int jz_nand_init(void)
     }
 
     chip_info = bank;
-    
+
     internal_param.bus_width = 16;
     internal_param.row_cycle = chip_info->row_cycles;
     internal_param.page_size = chip_info->page_size;
     internal_param.oob_size = chip_info->spare_size;
     internal_param.page_per_block = chip_info->pages_per_block;
     internal_param.bad_block_pos = 0;
-    
+
     nand_size = ((chip_info->page_size * chip_info->blocks_per_bank * chip_info->pages_per_block) - 0x200000) / 512;
-     
+
     return 0;
 }
 
@@ -515,7 +515,7 @@ int nand_init(void)
 {
     int res = 0;
     static bool inited = false;
-    
+
     if(!inited)
     {
         res = jz_nand_init();
@@ -525,7 +525,7 @@ int nand_init(void)
         semaphore_init(&nand_dma_complete, 1, 0);
         system_enable_irq(DMA_IRQ(DMA_NAND_CHANNEL));
 #endif
-        
+
         inited = true;
     }
 
@@ -536,7 +536,7 @@ static inline int read_sector(unsigned long start, unsigned int count,
                                void* buf, unsigned int chip_size)
 {
     register int ret;
-    
+
     if(UNLIKELY(start % chip_size == 0 && count == chip_size))
         ret = jz_nand_read_page(start / chip_size, buf);
     else
@@ -544,7 +544,7 @@ static inline int read_sector(unsigned long start, unsigned int count,
         ret = jz_nand_read_page(start / chip_size, temp_page);
         memcpy(buf, temp_page + (start % chip_size), count);
     }
-    
+
     return ret;
 }
 
@@ -559,7 +559,7 @@ static inline int write_sector(unsigned long start, unsigned int count,
     (void)chip_size;
 
     /* TODO */
-    
+
     return ret;
 }
 
@@ -571,20 +571,20 @@ int nand_read_sectors(IF_MV(int drive,) unsigned long start, int count, void* bu
     int ret = 0;
     unsigned int _count, chip_size = chip_info->page_size;
     unsigned long _start;
-    
+
     logf("start");
     mutex_lock(&nand_mtx);
-      
+
     _start = start << 9;
     _start += 0x200000; /* skip BL */
     _count = count << 9;
-    
+
     __nand_select();
     ret = read_sector(_start, _count, buf, chip_size);
     __nand_deselect();
 
     mutex_unlock(&nand_mtx);
-    
+
     logf("nand_read_sectors(%ld, %d, 0x%x): %d", start, count, (int)buf, ret);
 
     return ret;
@@ -598,20 +598,20 @@ int nand_write_sectors(IF_MV(int drive,) unsigned long start, int count, const v
     int ret = 0;
     unsigned int _count, chip_size = chip_info->page_size;
     unsigned long _start;
-    
+
     logf("start");
     mutex_lock(&nand_mtx);
-      
+
     _start = start << 9;
     _start += chip_info->page_size * chip_info->pages_per_block; /* skip BL */
     _count = count << 9;
-    
+
     __nand_select();
     ret = write_sector(_start, _count, buf, chip_size);
     __nand_deselect();
 
     mutex_unlock(&nand_mtx);
-    
+
     logf("nand_write_sectors(%ld, %d, 0x%x): %d", start, count, (int)buf, ret);
 
     return ret;
@@ -667,7 +667,7 @@ void nand_get_info(IF_MV(int drive,) struct storage_info *info)
 #ifdef HAVE_MULTIVOLUME
     (void)drive;
 #endif
-    
+
     /* firmware version */
     info->revision="0.00";
 
@@ -685,7 +685,7 @@ int nand_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif

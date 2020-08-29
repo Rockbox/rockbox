@@ -26,14 +26,14 @@ void memset(void *target, unsigned char c, size_t len)
     int ch = DMA_CHANNEL;
     unsigned int d;
     unsigned char *dp;
-    
+
     if(len < 32)
         _memset(target,c,len);
     else
     {
         if(((unsigned int)target < 0xa0000000) && len)
              dma_cache_wback_inv((unsigned long)target, len);
-        
+
         dp = (unsigned char *)((unsigned int)(&d) | 0xa0000000);
         *(dp + 0) = c;
         *(dp + 1) = c;
@@ -45,16 +45,16 @@ void memset(void *target, unsigned char c, size_t len)
         REG_DMAC_DRSR(ch) = DMAC_DRSR_RS_AUTO;
         REG_DMAC_DCMD(ch) = DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 | DMAC_DCMD_DS_32BYTE;
         REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
-        
+
         while (REG_DMAC_DTCR(ch));
         if(len % 32)
         {
             dp = (unsigned char *)((unsigned int)target + (len & (32 - 1)));
             for(d = 0;d < (len % 32); d++)
                 *dp++ = c;
-            
+
         }
-    }    
+    }
 }
 
 void memset16(void *target, unsigned short c, size_t len)
@@ -62,14 +62,14 @@ void memset16(void *target, unsigned short c, size_t len)
     int ch = DMA_CHANNEL;
     unsigned short d;
     unsigned short *dp;
-    
+
     if(len < 32)
         _memset16(target,c,len);
     else
     {
         if(((unsigned int)target < 0xa0000000) && len)
              dma_cache_wback_inv((unsigned long)target, len);
-        
+
         d = c;
         REG_DMAC_DSAR(ch) = PHYSADDR((unsigned long)&d);
         REG_DMAC_DTAR(ch) = PHYSADDR((unsigned long)target);
@@ -77,7 +77,7 @@ void memset16(void *target, unsigned short c, size_t len)
         REG_DMAC_DRSR(ch) = DMAC_DRSR_RS_AUTO;
         REG_DMAC_DCMD(ch) = DMAC_DCMD_DAI | DMAC_DCMD_SWDH_16 | DMAC_DCMD_DWDH_16 | DMAC_DCMD_DS_32BYTE;
         REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
-        
+
         while (REG_DMAC_DTCR(ch));
         if(len % 32)
         {
@@ -85,29 +85,29 @@ void memset16(void *target, unsigned short c, size_t len)
             for(d = 0; d < (len % 32); d++)
                 *dp++ = c;
         }
-    }    
+    }
 }
 
 void memcpy(void *target, const void *source, size_t len)
 {
     int ch = DMA_CHANNEL;
     unsigned char *dp;
-    
+
     if(len < 4)
         _memcpy(target, source, len);
-    
+
     if(((unsigned int)source < 0xa0000000) && len)
         dma_cache_wback_inv((unsigned long)source, len);
-    
+
     if(((unsigned int)target < 0xa0000000) && len)
         dma_cache_wback_inv((unsigned long)target, len);
-    
+
     REG_DMAC_DSAR(ch) = PHYSADDR((unsigned long)source);
-    REG_DMAC_DTAR(ch) = PHYSADDR((unsigned long)target); 
+    REG_DMAC_DTAR(ch) = PHYSADDR((unsigned long)target);
     REG_DMAC_DTCR(ch) = len / 4;
     REG_DMAC_DRSR(ch) = DMAC_DRSR_RS_AUTO;
     REG_DMAC_DCMD(ch) = DMAC_DCMD_DAI | DMAC_DCMD_SWDH_32 | DMAC_DCMD_DWDH_32 | DMAC_DCMD_DS_32BIT;
-    
+
     REG_DMAC_DCCSR(ch) = DMAC_DCCSR_EN | DMAC_DCCSR_NDES;
     while (REG_DMAC_DTCR(ch));
     if(len % 4)
