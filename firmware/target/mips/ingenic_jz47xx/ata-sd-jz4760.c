@@ -532,6 +532,9 @@ static int jz_sd_transmit_data(const int drive, struct sd_request *req)
 #if SD_DMA_ENABLE
 static int jz_sd_receive_data_dma(const int drive, struct sd_request *req)
 {
+    /* flush dcache */
+    discard_dcache_range(req->buffer, req->cnt);
+
     /* setup dma channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(drive)) = 0;
     REG_DMAC_DSAR(DMA_SD_RX_CHANNEL(drive)) = PHYSADDR(MSC_RXFIFO(MSC_CHN(drive))); /* DMA source addr */
@@ -558,16 +561,13 @@ static int jz_sd_receive_data_dma(const int drive, struct sd_request *req)
     /* clear status and disable channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(drive)) = 0;
 
-    /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
-
     return SD_NO_ERROR;
 }
 
 static int jz_sd_transmit_data_dma(const int drive, struct sd_request *req)
 {
     /* flush dcache */
-    dma_cache_wback_inv((unsigned long) req->buffer, req->cnt);
+    commit_discard_dcache_range(req->buffer, req->cnt);
 
     /* setup dma channel */
     REG_DMAC_DCCSR(DMA_SD_TX_CHANNEL(drive)) = 0;
