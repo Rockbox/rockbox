@@ -274,7 +274,7 @@ static void EPIN_handler(unsigned int endpoint)
     }
 
     logf("EP%d: %d -> %d", endpoint, ep->sent, ep->length);
-    
+
     if(ep->sent == 0)
         length = MIN(ep->length, ep->fifo_size);
     else
@@ -365,7 +365,7 @@ static void EPDMA_handler(int number)
         /* Disable DMA */
         REG_USB_REG_CNTL2 = 0;
 
-        __dcache_invalidate_all();
+        commit_discard_dcache(); // XXX range?
 
         select_endpoint(endpoint);
         /* Read out last packet manually */
@@ -707,8 +707,7 @@ static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length
     {
         if(ep->use_dma)
         {
-            //dma_cache_wback_inv((unsigned long)ptr, length);
-            __dcache_writeback_all();
+            commit_discard_dcache_range(ptr, length);
             REG_USB_REG_ADDR1 = PHYSADDR((unsigned long)ptr);
             REG_USB_REG_COUNT1 = length;
             REG_USB_REG_CNTL1 = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
@@ -767,8 +766,7 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
         ep->busy = true;
         if(ep->use_dma)
         {
-            //dma_cache_wback_inv((unsigned long)ptr, length);
-            __dcache_writeback_all();
+            discard_dcache_range(ptr, length);
             REG_USB_REG_ADDR2 = PHYSADDR((unsigned long)ptr);
             REG_USB_REG_COUNT2 = length;
             REG_USB_REG_CNTL2 = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
