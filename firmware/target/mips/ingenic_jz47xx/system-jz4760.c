@@ -673,8 +673,7 @@ void ICODE_ATTR system_main(void)
 {
     int i;
 
-    __dcache_writeback_all();
-    __icache_invalidate_all();
+    commit_discard_idcache();
 
     write_c0_status(1 << 28 | 1 << 10 ); /* Enable CP | Mask interrupt 2 */
 
