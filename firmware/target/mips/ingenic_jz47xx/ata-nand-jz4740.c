@@ -151,7 +151,7 @@ static void jz_nand_write_dma(void *source, unsigned int len, int bw)
     mutex_lock(&nand_dma_mtx);
 
     if(((unsigned int)source < 0xa0000000) && len)
-         dma_cache_wback_inv((unsigned long)source, len);
+         commit_discard_dcache_range(source, len);
 
     dma_enable();
 
@@ -184,7 +184,7 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     mutex_lock(&nand_dma_mtx);
 
     if(((unsigned int)target < 0xa0000000) && len)
-        dma_cache_wback_inv((unsigned long)target, len);
+        discard_dcache_range(target, len);
 
     dma_enable();
 

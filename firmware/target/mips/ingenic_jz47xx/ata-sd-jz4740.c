@@ -417,7 +417,7 @@ static void jz_sd_receive_data_dma(struct sd_request *req)
 #endif
 
     /* flush dcache */
-    //dma_cache_wback_inv((unsigned long) req->buffer, size);
+    discard_dcache_range(req->buffer, size);
     /* setup dma channel */
     REG_DMAC_DSAR(DMA_SD_RX_CHANNEL) = PHYSADDR(MSC_RXFIFO);    /* DMA source addr */
     REG_DMAC_DTAR(DMA_SD_RX_CHANNEL) = PHYSADDR((unsigned long) req->buffer);    /* DMA dest addr */
@@ -452,7 +452,7 @@ static void jz_mmc_transmit_data_dma(struct mmc_request *req)
 #endif
 
     /* flush dcache */
-    //dma_cache_wback_inv((unsigned long) req->buffer, size);
+    commit_discard_dcache_range(req->buffer, size);
     /* setup dma channel */
     REG_DMAC_DSAR(DMA_SD_TX_CHANNEL) = PHYSADDR((unsigned long) req->buffer);    /* DMA source addr */
     REG_DMAC_DTAR(DMA_SD_TX_CHANNEL) = PHYSADDR(MSC_TXFIFO);    /* DMA dest addr */
