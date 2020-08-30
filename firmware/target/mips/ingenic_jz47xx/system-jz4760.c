@@ -28,7 +28,7 @@
 #include "kernel.h"
 #include "power.h"
 
-#define USE_HW_UDELAY
+//#define USE_HW_UDELAY  // This is BROKEN.
 
 static int irq;
 static void UIRQ(void)
