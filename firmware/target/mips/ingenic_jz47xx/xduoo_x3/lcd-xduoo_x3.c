@@ -24,6 +24,7 @@
 #include "system.h"
 #include "cpu.h"
 #include "string.h"
+#include "kernel.h"
 
 /* LCD pins */
 #define PIN_BL_EN   (32*4+0)
@@ -435,9 +436,11 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count)
 void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
                          int x, int by, int width, int bheight, int stride)
 {
-    if(!display_on)
+    static long last_tick = 0;
+    if(!display_on || TIME_BEFORE(current_tick, last_tick + 2))
         return;
 
+    last_tick = current_tick;
     const int column_high = get_column_high_byte(x);
     const int column_low = get_column_low_byte(x);
 
