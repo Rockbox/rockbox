@@ -91,6 +91,9 @@ bool button_hold(void)
    return (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
 }
 
+/* NOTE:  Due to how this is wired, button combinations are not allowed
+   unless one of the two buttons is the POWER
+*/
 int button_read_device(void)
 {
 #ifndef BOOTLOADER
@@ -104,8 +107,10 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     bool gpio_btn = (__gpio_get_pin(PIN_BTN_POWER) ? false : true);
 
-    REG_SADC_ADCFG = ADCFG_VBAT_SEL + ADCFG_CMD_AUX(1);
-    REG_SADC_ADENA = ADENA_VBATEN + ADENA_AUXEN;
+    /* Don't initiate a new request if we have one pending */
+    if (!(REG_SADC_ADENA & (ADENA_VBATEN | ADENA_AUXEN))) {
+        REG_SADC_ADENA = ADENA_VBATEN | ADENA_AUXEN;
+    }
 
 #ifndef BOOTLOADER
     if (hold_button != hold_button_old) {
@@ -192,6 +197,11 @@ int _battery_voltage(void)
     return (bat_val*BATTERY_SCALE_FACTOR)>>10;
 }
 
+/* 12MHz XTAL
+    /61    = 196 MHz base clock  (max is 200, err on the side of safety)
+     /(1+1) = 98.4KHz "us_clk (ie ~10us/tick)
+     /(199+1) = 983.6KHz "ms_clk" (ie ~1ms/tick)
+*/
 void adc_init(void)
 {
     bat_val = 0xfff;
@@ -202,8 +212,8 @@ void adc_init(void)
     mdelay(70);
     REG_SADC_ADSTATE = 0;
     REG_SADC_ADCTRL = ADCTRL_MASK_ALL - ADCTRL_ARDYM - ADCTRL_VRDYM;
-    REG_SADC_ADCFG = ADCFG_VBAT_SEL + ADCFG_CMD_AUX(1);
-    REG_SADC_ADCLK = (4 << 16) | (1 << 8) | 59; /* 200KHz */
+    REG_SADC_ADCFG = ADCFG_VBAT_SEL | ADCFG_CMD_AUX(1);  /* VBAT_SEL is undocumented but required! */
+    REG_SADC_ADCLK = (199 << 16) | (1 << 8) | 61;
     system_enable_irq(IRQ_SADC);
 }
 
