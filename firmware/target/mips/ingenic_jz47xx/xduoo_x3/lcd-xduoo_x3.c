@@ -97,10 +97,20 @@ static inline void bitdelay(void)
 
 void lcd_hw_init(void)
 {
-    REG_GPIO_PXFUNC(2) = 0x000C73FC; /* D0-D7 RD DC CS RES WR */
-    REG_GPIO_PXSELC(2) = 0x000C73FC;
-    REG_GPIO_PXDIRS(2) = 0x000C73FC;
-    REG_GPIO_PXDATS(2) = 0x000C73FC;
+    REG_GPIO_PXFUNC(2) = 0x000C73FC; /* D0-D7 RD DC CS RES WR -- GPIO/INTERRUPT */
+    REG_GPIO_PXSELC(2) = 0x000C73FC; /* GPIO */
+
+    REG_GPIO_PXPEC(2) = 0x000C73FC; /* ENABLE PULLUP*/
+
+    REG_GPIO_PXDIRS(2) = 0x000C73FC; /* OUTPUT */
+    REG_GPIO_PXDATS(2) = 0x000C73FC; /* D0-D7 RD DC CS RES WR -- SET BIT */
+
+    REG_GPIO_PXSLC(2)  = 0x000C73FC; /* slew -- slow rate */
+
+    REG_GPIO_PXDS0C(2) = 0x000C73FC; /* Low pin drive strength */
+    REG_GPIO_PXDS1C(2) = 0x000C73FC;
+    REG_GPIO_PXDS2C(2) = 0x000C73FC;
+
     __gpio_clear_pin(PIN_BL_EN);
     __gpio_as_output(PIN_BL_EN);
     __gpio_clear_pin(PIN_LCD_RES);

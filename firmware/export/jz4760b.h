@@ -275,9 +275,9 @@
 #define REG_GPIO_PXDS2(n) 	REG32(GPIO_PXDS2(n))
 #define REG_GPIO_PXDS2S(n) 	REG32(GPIO_PXDS2S(n))
 #define REG_GPIO_PXDS2C(n) 	REG32(GPIO_PXDS2C(n))
-#define REG_GPIO_PXSL(n) 	REG32(GPIO_PXSL(n))
-#define REG_GPIO_PXSLS(n) 	REG32(GPIO_PXSLS(n))
-#define REG_GPIO_PXSLC(n) 	REG32(GPIO_PXSLC(n))
+#define REG_GPIO_PXSL(n) 	REG32(GPIO_PXSL(n))   /* Port Slew */
+#define REG_GPIO_PXSLS(n) 	REG32(GPIO_PXSLS(n))  /* Port Slew -- Fast */
+#define REG_GPIO_PXSLC(n) 	REG32(GPIO_PXSLC(n))  /* Port Slew -- Slow */
 
 /*----------------------------------------------------------------
  * p is the port number (0,1,2,3,4,5)
