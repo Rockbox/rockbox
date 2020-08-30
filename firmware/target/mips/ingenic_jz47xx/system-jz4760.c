@@ -244,41 +244,20 @@ static int get_irq_number(void)
     if (UNLIKELY(irq0 < 0) && UNLIKELY(irq1 < 0))
         return -1;
 
-#if 1
-    // Prioritze AIC and SADC, then everything on ipl1 (ie MSC mostly)
-    if (ipl1 & 1<<(IRQ_AIC-32)) {
-        irq = IRQ_AIC;
-	ipl1 &= ~(1<<(IRQ_AIC-32));
-    } else if (ipl0 & 1<<IRQ_SADC) {
-        irq = IRQ_SADC;
-	ipl0 &= ~(1<<IRQ_SADC);
+    // Prioritze DMA0 (audio) and TCU0 (systick), then everything on ipl1 (ie MSC mostly)
+    if (ipl0 & 1<<IRQ_DMAC0) {
+        irq = IRQ_DMAC0;
+        ipl0 &= ~(1<<IRQ_DMAC0);
+    } else if (ipl0 & 1<<IRQ_TCU0) {
+        irq = IRQ_TCU0;
+        ipl0 &= ~(1<<IRQ_TCU0);
     } else if (ipl1) {
         irq = irq1 + 32;
-	ipl1 &= ~(1<<irq1);
+        ipl1 &= ~(1<<irq1);
     } else {
         irq = irq0;
-	ipl0 &= ~(1<<irq0);
+        ipl0 &= ~(1<<irq0);
     }
-#else
-    // Prioritize I2C0, I2C1, IPL0, and finally IPL1
-    if (!(ipl0 & 3)) {
-        if (ipl0) {
-            irq = irq0;
-            ipl0 &= ~(1<<irq0);
-        } else {
-            irq = irq1 + 32;
-            ipl1 &= ~(1<<irq1);
-        }
-    } else {
-        if (ipl0 & 2) {
-            irq = 1;
-            ipl0 &= ~(1<<irq);
-        } else {
-            irq = 0;
-            ipl0 &= ~(1<<irq);
-        }
-    }
-#endif
 
     switch (irq)
     {
@@ -307,13 +286,16 @@ static int get_irq_number(void)
 
 void intr_handler(void)
 {
-    register int irq = get_irq_number();
+    register int irq;
+top:
+    irq = get_irq_number();
     if(UNLIKELY(irq < 0))
         return;
 
     ack_irq(irq);
     if(LIKELY(irq >= 0))
         irqvector[irq]();
+    goto top;
 }
 
 #define EXC(x,y) case (x): return (y);
