@@ -138,6 +138,8 @@ bool dbg_ports(void)
     return false;
 }
 
+extern uint32_t irqstackend,irqstackbegin;
+
 bool dbg_hw_info(void)
 {
     int btn = 0;
@@ -151,6 +153,12 @@ bool dbg_hw_info(void)
     {
         lcd_clear_display();
         line = 0;
+
+        uint32_t *ptr = &irqstackbegin;
+        for ( ; ptr < &irqstackend && *ptr == 0xDEADBEEF; ptr++) {}
+
+        lcd_putsf(0, line++, "IRQ stack max: %d", (uint32_t)&irqstackend - (uint32_t)ptr);
+
         display_clocks();
         display_enabled_clocks();
 #ifdef HAVE_TOUCHSCREEN
@@ -169,8 +177,7 @@ bool dbg_hw_info(void)
     return true;
 }
 
-#define CFG_UART_BASE           UART1_BASE      /* Base of the UART channel */
-
+#ifdef WITH_SERIAL
 void serial_putc (const char c)
 {
         volatile u8 *uart_lsr = (volatile u8 *)(CFG_UART_BASE + OFF_LSR);
@@ -271,3 +278,4 @@ void serial_dump_data(unsigned char* data, int len)
 
         serial_putc( '\n' );
 }
+#endif

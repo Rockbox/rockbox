@@ -32,6 +32,8 @@
 #define CACHE_LINE_SIZE  32
 #include "mmu-mips.h"
 
+#define CFG_UART_BASE    UART1_BASE      /* Base of the UART channel */
+
 /* no optimized byteswap functions implemented for mips, yet */
 #define NEED_GENERIC_BYTESWAPS
 
