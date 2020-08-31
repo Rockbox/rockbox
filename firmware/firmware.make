@@ -22,7 +22,10 @@ OTHER_SRC += $(FIRMLIB_SRC)
 
 FIRMLIB = $(BUILDDIR)/firmware/libfirmware.a
 
-SYSFONT = $(ROOTDIR)/fonts/08-Schumacher-Clean.bdf
+ifeq ($(SYSFONT),)
+SYSFONT = 08-Schumacher-Clean
+endif
+SYSFONTX = $(ROOTDIR)/fonts/$(SYSFONT).bdf
 
 CLEANOBJS += $(BUILDDIR)/sysfont.* $(BUILDDIR)/version.*
 
@@ -37,10 +40,10 @@ $(FIRMLIB): $(FIRMLIB_OBJ)
 	$(SILENT)$(shell rm -f $@)
 	$(call PRINTS,AR $(@F))$(AR) rcs $@ $^ >/dev/null
 
-$(BUILDDIR)/sysfont.h: $(SYSFONT) $(TOOLS) $(BUILDDIR)/firmware/common/config.o
+$(BUILDDIR)/sysfont.h: $(SYSFONTX) $(TOOLS) $(BUILDDIR)/firmware/common/config.o
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -h -o $@ $<
 
-$(BUILDDIR)/sysfont.o: $(SYSFONT) $(BUILDDIR)/sysfont.h
+$(BUILDDIR)/sysfont.o: $(SYSFONTX) $(BUILDDIR)/sysfont.h
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -c -o $(BUILDDIR)/sysfont.c $<
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$(BUILDDIR)/sysfont.c))$(CC) $(CFLAGS) -c $(BUILDDIR)/sysfont.c -o $@
 
