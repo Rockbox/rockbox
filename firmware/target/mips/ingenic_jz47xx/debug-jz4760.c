@@ -29,6 +29,8 @@
 #include "button.h"
 #include "timefuncs.h"
 
+#ifndef BOOTLOADER
+
 static int line = 0;
 
 /*
@@ -176,6 +178,11 @@ bool dbg_hw_info(void)
     }
     return true;
 }
+#endif
+
+#ifdef BOOTLOADER
+#define WITH_SERIAL
+#endif
 
 #ifdef WITH_SERIAL
 void serial_putc (const char c)
