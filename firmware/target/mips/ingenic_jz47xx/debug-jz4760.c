@@ -233,7 +233,7 @@ bool dbg_hw_info(void)
 #endif
     struct tm *cur_time;
 
-    lcd_setfont(FONT_UI);
+    lcd_setfont(FONT_SYSFIXED);
     while(btn ^ BUTTON_POWER)
     {
         lcd_clear_display();
@@ -259,6 +259,7 @@ bool dbg_hw_info(void)
         lcd_update();
         sleep(HZ/16);
     }
+    lcd_setfont(FONT_UI);
     return true;
 }
 #endif
