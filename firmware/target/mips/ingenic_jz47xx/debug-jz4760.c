@@ -28,6 +28,7 @@
 #include "font.h"
 #include "button.h"
 #include "timefuncs.h"
+#include "action.h"
 
 #ifndef BOOTLOADER
 
@@ -38,6 +39,42 @@ static int line = 0;
  */
 #define TO_MHZ(x) ((x)/1000000), ((x)%1000000)/10000
 #define TO_KHZ(x) ((x)/1000), ((x)%1000)/10
+
+#define DEBUG_CANCEL       ACTION_STD_CANCEL
+#define DEBUG_NEXT         ACTION_STD_NEXT
+#define DEBUG_LEFT_JUSTIFY ACTION_STD_OK
+#define DEBUG_LEFT_SCROLL  ACTION_STD_MENU
+
+/* if the possiblity exists to divide by zero protect with this macro */
+#define DIV_FINITE(dividend, divisor) ((divisor == 0)? divisor : dividend/divisor)
+
+#define ON "Enabled"
+#define OFF "Disabled"
+
+static bool dbg_btn(bool *done, int *x)
+{
+    bool cont = !*done;
+    if (cont)
+    {
+        lcd_update();
+        int button = get_action(CONTEXT_STD,HZ/10);
+        switch(button)
+        {
+            case DEBUG_CANCEL:
+                *done = true;
+            case DEBUG_NEXT:
+                cont = false;
+            case DEBUG_LEFT_JUSTIFY:
+                (*x) = 0;
+                sleep(HZ/5);
+                break;
+            case DEBUG_LEFT_SCROLL:
+                (*x)--;
+        }
+    }
+    lcd_clear_display();
+    return cont;
+}
 
 static void display_clocks(void)
 {
@@ -137,6 +174,52 @@ static void display_enabled_clocks(void)
 
 bool dbg_ports(void)
 {
+#if CONFIG_CPU == JZ4760B
+    int line, i, j, cur;
+    int x = 0;
+    const int last_port = 5;
+    bool done = false;
+
+    long data, dir;
+    long fun, intr;
+    long lvl;
+
+
+    lcd_clear_display();
+    lcd_setfont(FONT_SYSFIXED);
+
+    while(!done)
+    {
+        i = 0;
+        while(dbg_btn(&done, &x))
+        {
+            i %= last_port; /*PORT: A B C D E F */
+            while(dbg_btn(&done, &x))
+            {
+                line = 0;
+                lcd_puts(x, line++, "[GPIO Vals and Dirs]");
+                for (j = i; j < i + 2; j++)
+                {
+                    cur = j % last_port;
+                    dir = REG_GPIO_PXDIR(cur);
+                    data = REG_GPIO_PXDAT(cur);
+                    fun = REG_GPIO_PXFUN(cur);
+                    intr = REG_GPIO_PXIM(cur);
+                    lvl  = REG_GPIO_PXPIN(cur);
+
+                    lcd_putsf(x, line++, "[%s%c]: %8x", "GPIO", 'A' + cur, lvl);
+                    lcd_putsf(x, line++, "DIR: %8x FUN: %8x", dir, fun);
+                    lcd_putsf(x, line++, "DAT: %8x INT: %8x", data, intr);
+                    line++;
+                }
+            }
+            i++;
+        }
+
+    }
+    lcd_setfont(FONT_UI);
+#endif
+
     return false;
 }
 
