@@ -35,6 +35,7 @@
 
 #define PIN_KEY_INT   (32*4+13)
 #define KEY_INT_IRQ   GPIO141
+#define INT_UNK       GPIO0
 
 #define PIN_CHARGE_CON (32*1+7)
 
@@ -70,11 +71,12 @@ void button_init_device(void)
     __gpio_disable_pull(PIN_BTN_POWER);
     __gpio_disable_pull(PIN_BTN_HOLD);
 
-#if 0
+
     /* We poll this, no need to set it up for an interrupt */
-    __gpio_as_irq_fall_edge(PIN_KEY_INT);
+    __gpio_as_irq_low_level(PIN_KEY_INT);
+    //__gpio_enable_pull(PIN_KEY_INT);
     system_enable_irq(GPIO_IRQ(PIN_KEY_INT));
-#endif
+
 
     __gpio_set_pin(PIN_CHARGE_CON); /* 0.7 A */
     __gpio_as_output(PIN_CHARGE_CON);
@@ -107,11 +109,6 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     bool gpio_btn = (__gpio_get_pin(PIN_BTN_POWER) ? false : true);
 
-    /* Don't initiate a new request if we have one pending */
-    if (!(REG_SADC_ADENA & (ADENA_VBATEN | ADENA_AUXEN))) {
-        REG_SADC_ADENA = ADENA_VBATEN | ADENA_AUXEN;
-    }
-
 #ifndef BOOTLOADER
     if (hold_button != hold_button_old) {
         backlight_hold_changed(hold_button);
@@ -123,6 +120,12 @@ int button_read_device(void)
 
     if (gpio_btn)
         btn |= BUTTON_POWER;
+
+    if (__gpio_get_pin(PIN_KEY_INT))
+    {
+        return btn;
+    }
+    __gpio_unmask_irq(PIN_KEY_INT);
 
     if (key_val < 261)
         btn |= BUTTON_VOL_UP;
@@ -148,9 +151,19 @@ int button_read_device(void)
     return btn;
 }
 
+void INT_UNK(void)
+{
+}
+
 /* called on button press interrupt */
 void KEY_INT_IRQ(void)
 {
+    /* Don't initiate a new request if we have one pending */
+    if (!(REG_SADC_ADENA & (ADENA_VBATEN | ADENA_AUXEN)))
+    {
+        REG_SADC_ADENA = ADENA_VBATEN | ADENA_AUXEN;
+    }
+    __gpio_mask_irq(PIN_KEY_INT);
 }
 
 /* Notes on batteries
@@ -243,4 +256,6 @@ void SADC(void)
     {
         bat_val = REG_SADC_ADVDAT;
     }
+    if (!__gpio_get_pin(PIN_KEY_INT))
+        REG_SADC_ADENA = ADENA_AUXEN;
 }
