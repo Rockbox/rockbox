@@ -29,9 +29,6 @@
 #include "power.h"
 
 //#define USE_HW_UDELAY  // This is BROKEN.
-#ifdef BOOTLOADER
-#define WITH_SERIAL
-#endif
 
 static int irq;
 static void UIRQ(void)
@@ -538,7 +535,6 @@ void pll1_disable(void)
     REG_CPM_CPPCR1 &= ~CPPCR1_PLL1EN;
 }
 
-#ifdef WITH_SERIAL
 static void serial_setbrg(void)
 {
     volatile u8 *uart_lcr = (volatile u8 *)(CFG_UART_BASE + OFF_LCR);
@@ -593,7 +589,6 @@ int serial_preinit(void)
 
     return 0;
 }
-#endif
 
 #ifndef HAVE_ADJUSTABLE_CPU_FREQ
 #define cpu_frequency CPU_FREQ
@@ -670,8 +665,7 @@ void ICODE_ATTR system_main(void)
 {
     int i;
 
-    __dcache_writeback_all();
-    __icache_invalidate_all();
+    commit_discard_idcache();
 
     write_c0_status(1 << 28 | 1 << 10 ); /* Enable CP | Mask interrupt 2 */
 
@@ -703,14 +697,7 @@ void ICODE_ATTR system_main(void)
     pll0_init(CPUFREQ_DEFAULT); // PLL0 drives everything but audio
     pll1_disable();             // Leave PLL1 disabled until audio needs it
 
-    /* Make sure UARTs are off */
-    __cpm_stop_uart0();
-    __cpm_stop_uart1();
-    __cpm_stop_uart2();
-#ifdef WITH_SERIAL
     serial_preinit();
-#endif
-
     usb_preinit();
     dma_preinit();
 
