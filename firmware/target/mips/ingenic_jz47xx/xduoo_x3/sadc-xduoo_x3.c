@@ -30,11 +30,14 @@
 #include "logf.h"
 #include "adc.h"
 
+//#define DEBUG_ADC_KEY_VALUES
 #define PIN_BTN_POWER (32*0+30)
 #define PIN_BTN_HOLD  (32*1+15)
 
 #define PIN_KEY_INT   (32*4+13)
 #define KEY_INT_IRQ   GPIO141
+
+#define PIN_KEY_BOP (32*3+17) /* Back Option Play */
 
 #define PIN_CHARGE_CON (32*1+7)
 
@@ -45,6 +48,18 @@
 #define PIN_LO_DECT   (32*1+12)
 #define IRQ_LO_DECT   GPIO_IRQ(PIN_LO_DECT)
 #define GPIO_LO_DECT  GPIO44
+
+#define __gpio_get_dir(n)			\
+({						\
+	unsigned int p, o, v;			\
+	p = (n) / 32;				\
+	o = (n) % 32;				\
+	if (REG_GPIO_PXDIR(p) & (1 << o))	\
+		v = 1;				\
+	else					\
+		v = 0;				\
+	v;					\
+})
 
 static volatile unsigned short bat_val,key_val;
 
@@ -70,11 +85,13 @@ void button_init_device(void)
     __gpio_disable_pull(PIN_BTN_POWER);
     __gpio_disable_pull(PIN_BTN_HOLD);
 
-#if 0
-    /* We poll this, no need to set it up for an interrupt */
+    __gpio_as_output(PIN_KEY_BOP);
+    __gpio_disable_pull(PIN_KEY_BOP);
+    __gpio_clear_pin(PIN_KEY_BOP);
+
     __gpio_as_irq_fall_edge(PIN_KEY_INT);
+    __gpio_enable_pull(PIN_KEY_INT);
     system_enable_irq(GPIO_IRQ(PIN_KEY_INT));
-#endif
 
     __gpio_set_pin(PIN_CHARGE_CON); /* 0.7 A */
     __gpio_as_output(PIN_CHARGE_CON);
@@ -88,7 +105,12 @@ void button_init_device(void)
 
 bool button_hold(void)
 {
-   return (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
+#ifdef DEBUG_ADC_KEY_VALUES
+    if (1)
+        return false;
+    else
+#endif
+        return (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
 }
 
 /* NOTE:  Due to how this is wired, button combinations are not allowed
@@ -102,17 +124,18 @@ int button_read_device(void)
 
     hold_button_old = hold_button;
     hold_button = (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
+#ifdef DEBUG_ADC_KEY_VALUES
+    static int option = 0;
+    static long ltick = 0;
+    int v1 = -1;
+    int v2 = -1;
+#endif
 #endif
 
     int btn = BUTTON_NONE;
     bool gpio_btn = (__gpio_get_pin(PIN_BTN_POWER) ? false : true);
 
-    /* Don't initiate a new request if we have one pending */
-    if (!(REG_SADC_ADENA & (ADENA_VBATEN | ADENA_AUXEN))) {
-        REG_SADC_ADENA = ADENA_VBATEN | ADENA_AUXEN;
-    }
-
-#ifndef BOOTLOADER
+#if !defined(BOOTLOADER) && !defined(DEBUG_ADC_KEY_VALUES)
     if (hold_button != hold_button_old) {
         backlight_hold_changed(hold_button);
     }
@@ -123,6 +146,11 @@ int button_read_device(void)
 
     if (gpio_btn)
         btn |= BUTTON_POWER;
+
+    if (__gpio_get_pin(PIN_KEY_INT) && (!__gpio_get_pin(PIN_KEY_BOP)))
+    {
+        return btn;
+    }
 
     if (key_val < 261)
         btn |= BUTTON_VOL_UP;
@@ -144,6 +172,29 @@ int button_read_device(void)
     else
     if (key_val < 2600)
         btn |= BUTTON_HOME;
+#if !defined(BOOTLOADER) && defined(DEBUG_ADC_KEY_VALUES)
+    if (hold_button) {
+        if (TIME_BEFORE(current_tick, ltick + HZ/ 10))
+            return 0;
+        switch(option)
+        {
+            default:
+                v1 = 0;
+                v2 = 0;
+        }
+        lcd_putsf(0, 0, "                                                     ");
+        lcd_putsf(0, 0, "OP %c: %d %d, %d", 'A' + option, v1, v2, key_val);
+        lcd_update();
+        ltick = current_tick;
+
+        if ((btn & BUTTON_OPTION) == BUTTON_OPTION)
+        {
+            option++;
+            option %= 1;
+        }
+        btn = 0;
+    }
+#endif
 
     return btn;
 }
@@ -151,6 +202,12 @@ int button_read_device(void)
 /* called on button press interrupt */
 void KEY_INT_IRQ(void)
 {
+    /* Don't initiate a new request if we have one pending */
+    if ((!__gpio_get_pin(PIN_KEY_BOP)) && 
+        !(REG_SADC_ADENA & (ADENA_VBATEN | ADENA_AUXEN)))
+    {
+        REG_SADC_ADENA = ADENA_VBATEN | ADENA_AUXEN;
+    }
 }
 
 /* Notes on batteries
@@ -243,4 +300,20 @@ void SADC(void)
     {
         bat_val = REG_SADC_ADVDAT;
     }
+
+    __gpio_mask_irq(PIN_KEY_INT);
+    __gpio_clear_pin(PIN_KEY_BOP);
+    __gpio_unmask_irq(PIN_KEY_INT);
+
+    if (!__gpio_get_pin(PIN_KEY_INT)) /* key(s) are down kick off another read */
+    {
+        __gpio_set_pin(PIN_KEY_BOP);
+        REG_SADC_ADENA = ADENA_AUXEN;
+    }
+    else
+    {
+        __gpio_mask_irq(PIN_KEY_INT);
+        __gpio_clear_pin(PIN_KEY_BOP);
+        __gpio_unmask_irq(PIN_KEY_INT);
+    }   
 }
