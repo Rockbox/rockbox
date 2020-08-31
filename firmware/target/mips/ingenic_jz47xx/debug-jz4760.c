@@ -28,9 +28,9 @@
 #include "font.h"
 #include "button.h"
 #include "timefuncs.h"
-#include "action.h"
 
 #ifndef BOOTLOADER
+#include "action.h"
 
 static int line = 0;
 
