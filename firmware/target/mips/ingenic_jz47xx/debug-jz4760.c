@@ -31,8 +31,12 @@
 
 #ifndef BOOTLOADER
 #include "action.h"
+#include "list.h"
 
+static bool is_done = false;
 static int line = 0;
+static int cur_line = 0;
+static int maxlines = 0;
 
 /*
  * Clock Generation Module
@@ -51,79 +55,127 @@ static int line = 0;
 #define ON "Enabled"
 #define OFF "Disabled"
 
+static int hw_info_debug_menu(void);
+
 static bool dbg_btn(bool *done, int *x)
 {
     bool cont = !*done;
     if (cont)
     {
-        lcd_update();
         int button = get_action(CONTEXT_STD,HZ/10);
         switch(button)
         {
             case DEBUG_CANCEL:
                 *done = true;
+
             case DEBUG_NEXT:
                 cont = false;
             case DEBUG_LEFT_JUSTIFY:
-                (*x) = 0;
+                if (x){(*x) = 0;}
                 sleep(HZ/5);
                 break;
             case DEBUG_LEFT_SCROLL:
-                (*x)--;
+                if(x){(*x)--;}
+                break;
         }
+    }
+    return cont;
+}
+
+static bool dbg_btn_update(bool *done, int *x)
+{
+    bool cont = !*done;
+    if (cont)
+    {
+        lcd_update();
+        cont = dbg_btn(done, x);
     }
     lcd_clear_display();
     return cont;
 }
 
-static void display_clocks(void)
+static inline unsigned int read_cp0_15 (void)
+{
+    /* CPUID Cp0 Register 15 Select 0 */
+    unsigned int cp_val;
+    asm volatile("mfc0 %0, $15\n" : "=r" (cp_val));
+    return (cp_val);
+}
+
+#define DBG_PUTSF(n, x, ln, ...) do {     \
+        if(--lines_left && cur_line < n){\
+            lcd_putsf(x, ln, __VA_ARGS__);\
+        }                                 \
+} while(0)
+
+static bool display_clocks(void)
 {
     unsigned int cppcr0 = REG_CPM_CPPCR0;  /* PLL Control Register */
     unsigned int cppcr1 = REG_CPM_CPPCR1;  /* PLL Control Register */
     unsigned int div[] = {1, 2, 3, 4, 6, 8, 12, 16, 24, 32};
     unsigned int od[4] = {1, 2, 4, 8};
 
-    lcd_putsf(0, line++, "CPPCR0:0x%08x", cppcr0);
-    if (cppcr0 & CPPCR0_PLLEN) {
-        lcd_putsf(0, line++, "PLL0  :%3d.%02d MHz", TO_MHZ(__cpm_get_pllout()));
-        lcd_putsf(0, line++, "m:n:o :%d:%d:%d",
-                __cpm_get_pllm(),
-                __cpm_get_plln(),
-                od[__cpm_get_pllod()]
-            );
+    int lines_left;
+    cur_line = 0;
+    int x = 0;
+
+    while(!is_done)
+    {
+        lcd_clear_display();
+        cur_line += maxlines / 2;
+        while(dbg_btn(&is_done, &x))
+        {
+            lcd_update();
+            lcd_clear_display();
+            line = 0;
+            lines_left = maxlines;
+            DBG_PUTSF(0, x, line++, "CPPCR0:0x%08x", cppcr0);
+            if (cppcr0 & CPPCR0_PLLEN) {
+                DBG_PUTSF(1, x, line++, "PLL0  :%3d.%02d MHz", TO_MHZ(__cpm_get_pllout()));
+                DBG_PUTSF(2, x, line++, "m:n:o :%d:%d:%d",
+                        __cpm_get_pllm(),
+                        __cpm_get_plln(),
+                        od[__cpm_get_pllod()]
+                    );
+            }
+            DBG_PUTSF(3, x, line++, "CPPCR1:0x%08x", cppcr1);
+            if (cppcr1 & CPPCR1_PLL1EN) {
+                DBG_PUTSF(4, x, line++, "PLL1  :%3d.%02d MHz", TO_MHZ(__cpm_get_pll1out()));
+                DBG_PUTSF(5, x, line++, "m:n:o :%d:%d:%d",
+                    __cpm_get_pll1m(),
+                    __cpm_get_pll1n(),
+                    od[__cpm_get_pll1od()]
+                );
+            }
+            DBG_PUTSF(6, x, line++, "C:H:M:P:%d:%d:%d:%d",
+                    div[__cpm_get_cdiv()],
+                    div[__cpm_get_hdiv()],
+                    div[__cpm_get_mdiv()],
+                    div[__cpm_get_pdiv()]
+                );
+            DBG_PUTSF(7, x, line++, "I:P:M : %d:%d:%d",
+                    __cpm_get_i2sdiv()+1,
+                    __cpm_get_pixdiv()+1,
+                    __cpm_get_mscdiv()+1
+                );
+            DBG_PUTSF(8, x, line++, "CCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_cclk()));
+            DBG_PUTSF(9, x, line++, "HCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_hclk()));
+            DBG_PUTSF(10, x, line++, "MCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_mclk()));
+            DBG_PUTSF(11, x, line++, "PCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_pclk()));
+            DBG_PUTSF(12, x, line++, "PIXCLK:%6d.%02d KHz", TO_KHZ(__cpm_get_pixclk()));
+            DBG_PUTSF(13, x, line++, "I2SCLK:%3d.%02d MHz", TO_MHZ(__cpm_get_i2sclk()));
+            DBG_PUTSF(14, x, line++, "MSCCLK:%3d.%02d MHz", TO_MHZ(__cpm_get_mscclk()));
+            DBG_PUTSF(15, x, line++, "EXTALCLK:%3d.%02d MHz", TO_MHZ(__cpm_get_extalclk()));
+            DBG_PUTSF(16, x, line++, "RTCCLK:%3d.%02d KHz", TO_KHZ(__cpm_get_rtcclk()));
+            if (cur_line + maxlines > 17)
+                cur_line = -1;
+            lcd_update();
+        }
     }
-    lcd_putsf(0, line++, "CPPCR1:0x%08x", cppcr1);
-    if (cppcr1 & CPPCR1_PLL1EN) {
-        lcd_putsf(0, line++, "PLL1  :%3d.%02d MHz", TO_MHZ(__cpm_get_pll1out()));
-        lcd_putsf(0, line++, "m:n:o :%d:%d:%d",
-            __cpm_get_pll1m(),
-            __cpm_get_pll1n(),
-            od[__cpm_get_pll1od()]
-        );
-    }
-    lcd_putsf(0, line++, "C:H:M:P:%d:%d:%d:%d",
-            div[__cpm_get_cdiv()],
-            div[__cpm_get_hdiv()],
-            div[__cpm_get_mdiv()],
-            div[__cpm_get_pdiv()]
-        );
-    lcd_putsf(0, line++, "I:P:M : %d:%d:%d",
-            __cpm_get_i2sdiv()+1,
-            __cpm_get_pixdiv()+1,
-            __cpm_get_mscdiv()+1
-        );
-    lcd_putsf(0, line++, "CCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_cclk()));
-    lcd_putsf(0, line++, "HCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_hclk()));
-    lcd_putsf(0, line++, "MCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_mclk()));
-    lcd_putsf(0, line++, "PCLK  :%3d.%02d MHz", TO_MHZ(__cpm_get_pclk()));
-    lcd_putsf(0, line++, "PIXCLK:%6d.%02d KHz", TO_KHZ(__cpm_get_pixclk()));
-    lcd_putsf(0, line++, "I2SCLK:%3d.%02d MHz", TO_MHZ(__cpm_get_i2sclk()));
-    lcd_putsf(0, line++, "MSCCLK:%3d.%02d MHz", TO_MHZ(__cpm_get_mscclk()));
-    lcd_putsf(0, line++, "EXTALCLK:%3d.%02d MHz", TO_MHZ(__cpm_get_extalclk()));
-    lcd_putsf(0, line++, "RTCCLK:%3d.%02d KHz", TO_KHZ(__cpm_get_rtcclk()));
+    return true;
 }
 
-static void display_enabled_clocks(void)
+static bool display_enabled_clocks(void)
 {
     unsigned long lcr = REG_CPM_LCR;
     unsigned long clkgr0 = REG_CPM_CLKGR0;
@@ -170,6 +222,8 @@ static void display_enabled_clocks(void)
             (clkgr0 & CLKGR0_UART1) ? "stopped" : "running");
     lcd_putsf(0, line++, "UART0 : %s",
             (clkgr0 & CLKGR0_UART0) ? "stopped" : "running");
+
+    return true;
 }
 
 bool dbg_ports(void)
@@ -191,10 +245,10 @@ bool dbg_ports(void)
     while(!done)
     {
         i = 0;
-        while(dbg_btn(&done, &x))
+        while(dbg_btn_update(&done, &x))
         {
             i %= last_port; /*PORT: A B C D E F */
-            while(dbg_btn(&done, &x))
+            while(dbg_btn_update(&done, &x))
             {
                 line = 0;
                 lcd_puts(x, line++, "[GPIO Vals and Dirs]");
@@ -227,17 +281,19 @@ extern uint32_t irqstackend,irqstackbegin;
 
 bool dbg_hw_info(void)
 {
+    return hw_info_debug_menu() > 0;
     int btn = 0;
 #ifdef HAVE_TOUCHSCREEN
     int touch;
 #endif
     struct tm *cur_time;
 
-    lcd_setfont(FONT_SYSFIXED);
+    lcd_setfont(FONT_UI);
     while(btn ^ BUTTON_POWER)
     {
         lcd_clear_display();
         line = 0;
+        lcd_putsf(0, line++, "CPUID %X", read_cp0_15);
 
         uint32_t *ptr = &irqstackbegin;
         for ( ; ptr < &irqstackend && *ptr == 0xDEADBEEF; ptr++) {}
@@ -259,7 +315,6 @@ bool dbg_hw_info(void)
         lcd_update();
         sleep(HZ/16);
     }
-    lcd_setfont(FONT_UI);
     return true;
 }
 #endif
@@ -368,5 +423,75 @@ void serial_dump_data(unsigned char* data, int len)
         }
 
         serial_putc( '\n' );
+}
+#endif
+
+#ifndef BOOTLOADER
+static const struct {
+    unsigned char *desc; /* string or ID */
+    bool (*function) (void); /* return true if USB was connected */
+} hwinfo_items[] = {
+        { "", NULL }, /*CPUID*/
+        { "", NULL }, /*IRQSTACKMAX*/
+        { "Clocks", display_clocks},
+        { "Enabled Clocks", display_enabled_clocks},
+};
+
+static int menu_action_callback(int btn, struct gui_synclist *lists)
+{
+    int selection = gui_synclist_get_sel_pos(lists);
+    if (btn == ACTION_STD_OK)
+    {
+        FOR_NB_SCREENS(i)
+           viewportmanager_theme_enable(i, false, NULL);
+        if (hwinfo_items[selection].function)
+        {
+            is_done = false;
+            hwinfo_items[selection].function();
+        }       
+        btn = ACTION_REDRAW;
+        FOR_NB_SCREENS(i)
+            viewportmanager_theme_undo(i, false);
+    }
+    else if (btn == ACTION_STD_CONTEXT)
+    {
+    }
+    return btn;
+}
+
+static const char* menu_get_name(int item, void * data,
+                                    char *buffer, size_t buffer_len)
+{
+    (void)data;
+    uint32_t *stackptr;
+    switch(item)
+    {
+        case 0: /*cpuID*/
+            snprintf(buffer, buffer_len, "CPUID %X:%d", read_cp0_15(), (REG_CPM_CLKGR0 & BIT31) >> 31);
+            return buffer;
+        case 1:
+            stackptr = &irqstackbegin;
+            for ( ; stackptr < &irqstackend && *stackptr == 0xDEADBEEF; stackptr++) {}
+            snprintf(buffer, buffer_len, "IRQ stack max: %lu", (uint32_t)&irqstackend - (uint32_t)stackptr);
+            return buffer;
+        default:
+        return hwinfo_items[item].desc;
+    }
+    return "???";
+}
+
+static int hw_info_debug_menu(void)
+{
+    int h;
+    lcd_setfont(FONT_SYSFIXED);
+    lcd_getstringsize((unsigned char *)"A", NULL, &h);
+    maxlines = LCD_HEIGHT / h - 1;
+    is_done = false;
+    struct simplelist_info info;
+
+    simplelist_info_init(&info, "Hw Info", ARRAYLEN(hwinfo_items), NULL);
+    info.action_callback = menu_action_callback;
+    info.get_name        = menu_get_name;
+    return (simplelist_show_list(&info)) ? 1 : 0;
 }
 #endif
