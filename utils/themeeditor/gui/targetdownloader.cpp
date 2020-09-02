@@ -49,8 +49,9 @@ TargetDownloader::TargetDownloader(QWidget *parent, QString path) :
         ui->label->setText(tr("Downloading targetdb"));
 
         QNetworkRequest request;
-        request.setUrl(QUrl("http://svn.rockbox.org/viewvc.cgi/trunk/utils/"
-                            "themeeditor/resources/targetdb"));
+        request.setUrl(
+                QUrl("https://git.rockbox.org/cgit/rockbox.git/plain/"
+                     "utils/themeeditor/resources/targetdb"));
         request.setRawHeader("User-Agent", "Rockbox Theme Editor");
 
         reply = manager->get(request);
