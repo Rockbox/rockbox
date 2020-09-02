@@ -91,16 +91,23 @@ static inline void set_dma(const void *addr, size_t size)
     playback_address = addr;
 }
 
+uint8_t low_audio_wm = 0xff;
+
 static inline void play_dma_callback(void)
 {
     const void *start;
     size_t size;
+
+    uint8_t val = __aic_get_transmit_resident();
 
     if (pcm_play_dma_complete_callback(PCM_DMAST_OK, &start, &size))
     {
         set_dma(start, size);
         REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
         pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+        if (val < low_audio_wm)
+            low_audio_wm = val;
+
     }
 }
 
