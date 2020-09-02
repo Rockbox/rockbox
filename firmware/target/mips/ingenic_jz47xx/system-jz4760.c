@@ -503,6 +503,9 @@ static void pll0_init(unsigned int freq)
     /* Init MSC clock; shoot for 48MHz base clock. */
     REG_CPM_MSCCDR = MSCCDR_MCS | ((freq / 48000000) - 1);
 
+    /* Clock LCD clock as low as possible here */
+    __cpm_set_pixdiv(2048 -1);
+
     /* init PLL */
     REG_CPM_CPCCR = cfcr;
     REG_CPM_CPPCR0 = plcr1;
