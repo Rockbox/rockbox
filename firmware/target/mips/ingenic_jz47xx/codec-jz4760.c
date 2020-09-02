@@ -115,12 +115,13 @@ void audiohw_init(void)
     __cpm_start_aic();
 
     /* Init AIC */
+    __aic_play_lastsample(); /* on FIFO underflow.  Versus zero */
     __i2s_enable_sclk();
     __i2s_external_codec();
     __i2s_select_msbjustified();
     __i2s_as_master();
     __i2s_enable_transmit_dma();
-    __i2s_set_transmit_trigger(24);
+    __i2s_set_transmit_trigger(24); // XXX 0-31
     __i2s_set_oss_sample_size(16);
     __i2s_enable();
 
