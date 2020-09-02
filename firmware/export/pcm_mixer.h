@@ -36,6 +36,8 @@
 /* iBasso Devices: Match Rockbox PCM buffer size to ALSA PCM buffer size
    to minimize memory transfers. */
 #define MIX_FRAME_SAMPLES 2048
+#elif defined(XDUOO_X3)
+#define MIX_FRAME_SAMPLES 1024  // XXX
 #else
 /* Assume HW DMA engine is available or sufficient latency exists in the
    PCM pathway */
