@@ -1335,6 +1335,7 @@ int sd_init(void)
 
     if(!inited)
     {
+        __cpm_stop_msc0();   /* We don't use MSC0 */
 
 #if SD_DMA_INTERRUPT || SD_INTERRUPT
         semaphore_init(&sd_wakeup[SD_SLOT_1], 1, 0);
