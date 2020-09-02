@@ -482,7 +482,7 @@ static const struct {
         { "Clocks", display_clocks},
         { "Enabled Clocks", display_enabled_clocks},
         { "", NULL}, /*TOUCH/BTN*/
-
+        { "", NULL }, /*AUDIOLOWWMARK*/
 };
 
 static int hw_info_menu_action_cb(int btn, struct gui_synclist *lists)
@@ -513,6 +513,8 @@ static int hw_info_menu_action_cb(int btn, struct gui_synclist *lists)
     }
     return btn;
 }
+
+extern uint8_t low_audio_wm;
 
 static const char* hw_info_menu_get_name(int item, void * data,
                                     char *buffer, size_t buffer_len)
@@ -555,6 +557,10 @@ static const char* hw_info_menu_get_name(int item, void * data,
             snprintf(buffer, buffer_len, "BTN: 0x%X", btn);
 #endif
             return buffer;
+        case 6: /* Audio WMARK */
+            snprintf(buffer, buffer_len, "Audio Low WM: %u",
+                     low_audio_wm);
+	    return buffer;
         default: /* static items -- default */
             return hwinfo_items[item].desc;
     }
