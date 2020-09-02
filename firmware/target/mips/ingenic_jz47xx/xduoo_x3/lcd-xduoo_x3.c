@@ -118,6 +118,8 @@ void lcd_hw_init(void)
     udelay(1);
     __gpio_set_pin(PIN_LCD_RES);
     __gpio_clear_pin(PIN_LCD_CS);
+
+    __cpm_stop_lcd(); /* We don't use the LCD controller */
 }
 
 void lcd_write_command(int byte)
@@ -167,7 +169,7 @@ int lcd_default_contrast(void)
 void lcd_set_contrast(int val)
 {
     static int last_val = 0xFFFFFF;
-    
+
     if (val >= 0) /* brightness menu */
     {
         lcd_write_command(LCD_CNTL_CONTRAST);
@@ -175,7 +177,7 @@ void lcd_set_contrast(int val)
     }
     else if (val != last_val)
     {
-        /* here we change the voltage level and drive times 
+        /* here we change the voltage level and drive times
          * longer precharge = dimmer display
          * higher voltage = shorter precharge required
          */
