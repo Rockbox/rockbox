@@ -32,14 +32,14 @@ static void USED_ATTR _start_thread(void)
     /* t1 = context */
     asm volatile (
       "start_thread:          \n"
+        ".set push            \n"
         ".set noreorder       \n"
         ".set noat            \n"
         "lw     $8,    4($9)  \n" /* Fetch thread function pointer ($8 = t0, $9 = t1) */
         "lw     $29,  36($9)  \n" /* Set initial sp(=$29) */
         "jalr   $8            \n" /* Start the thread */
         "sw     $0,   44($9)  \n" /* Clear start address */
-        ".set at              \n"
-        ".set reorder         \n"
+        ".set pop             \n"
     );
     thread_exit();
 }
@@ -58,6 +58,7 @@ static void USED_ATTR _start_thread(void)
 static inline void store_context(void* addr)
 {
     asm volatile (
+        ".set push             \n"
         ".set noreorder        \n"
         ".set noat             \n"
         "move  $8, %0          \n" /* Store addr in clobbered t0 othrewise
@@ -76,8 +77,7 @@ static inline void store_context(void* addr)
         "sw    $30, 32($8)     \n" /* fp */
         "sw    $29, 36($8)     \n" /* sp */
         "sw    $31, 40($8)     \n" /* ra */
-        ".set at               \n"
-        ".set reorder          \n"
+        ".set pop              \n"
         : : "r" (addr) : "t0"
     );
 }
@@ -89,6 +89,7 @@ static inline void store_context(void* addr)
 static inline void load_context(const void* addr)
 {
     asm volatile (
+        ".set push             \n"
         ".set noat             \n"
         ".set noreorder        \n"
         "lw    $8, 44(%0)      \n" /* Get start address ($8 = t0) */
@@ -113,9 +114,7 @@ static inline void load_context(const void* addr)
         "lw    $30, 32($8)     \n" /* fp */
         "lw    $29, 36($8)     \n" /* sp */
         "lw    $31, 40($8)     \n" /* ra */
-        ".set at               \n"
-        ".set reorder          \n"
+        ".set pop              \n"
         : : "r" (addr) : "t0", "t1"
     );
 }
-
