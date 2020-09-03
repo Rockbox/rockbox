@@ -4,55 +4,37 @@
 # ----------------------------------------------------------- #
 # ----------------------------------------------------------- #
 
-archosfmrecorder
+creativezenmozaic
 {
-    name   : Archos FM Recorder
-    screen : 112 x 64 @ mono
+    name   : Creative Zen Mozaic
+    screen : 128 x 160 @ rgb
     remote : no
     fm     : yes
     record : yes
 }
 
-archosondiofm
+creativezenxfi
 {
-    name   : Archos Ondio FM
-    screen : 112 x 64 @ mono
+    name   : Creative Zen X-Fi
+    screen : 320 x 240 @ rgb
     remote : no
     fm     : yes
     record : yes
 }
 
-archosondiosp
+creativezenxfistyle
 {
-    name   : Archos Ondio SP
-    screen : 112 x 64 @ mono
+    name   : Creative Zen X-Fi Style
+    screen : 320 x 240 @ rgb
     remote : no
-    fm     : no
-    record : no
-}
-
-archosplayer
-{
-    name   : Archos Player/Studio
-    screen : 11 x 2 @ mono
-    remote : no
-    fm     : no
-    record : no
-}
-
-archosrecorder
-{
-    name   : Archos Recorder v1
-    screen : 112 x 64 @ mono
-    remote : no
-    fm     : no
+    fm     : yes
     record : yes
 }
 
-archosrecorderv2
+creativezenxfi3
 {
-    name   : Archos Recorder v2
-    screen : 112 x 64 @ mono
+    name   : Creative Zen X-Fi3
+    screen : 176 x 220 @ rgb
     remote : no
     fm     : yes
     record : yes
@@ -112,6 +94,15 @@ ipod4g
     record : yes
 }
 
+ipod6g
+{
+    name   : iPod 6th gen (Classic)
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : yes
+}
+
 ipodcolor
 {
     name   : iPod color/Photo
@@ -126,7 +117,7 @@ ipodmini1g
     name   : iPod Mini 1st gen
     screen : 138 x 110 @ grey
     remote : no
-    fm     : no
+    fm     : yes
     record : no
 }
 
@@ -135,7 +126,7 @@ ipodmini2g
     name   : iPod Mini 2nd gen
     screen : 138 x 110 @ grey
     remote : no
-    fm     : no
+    fm     : yes
     record : no
 }
 
@@ -148,9 +139,18 @@ ipodnano1g
     record : yes
 }
 
+ipodnano2g
+{
+    name   : iPod Nano 2nd gen
+    screen : 176 x 132 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
 ipodvideo
 {
-    name   : iPod Video 30GB
+    name   : iPod Video
     screen : 320 x 240 @ rgb
     remote : no
     fm     : yes
@@ -202,6 +202,15 @@ iriverh300
     record : yes
 }
 
+mpiohd300
+{
+    name   : MPIO HD300
+    screen : 160 x 128 @ grey
+    remote : no
+    fm     : yes
+    record : yes
+}
+
 mrobe100
 {
     name   : Olympus M-Robe 100
@@ -220,10 +229,109 @@ vibe500
     record : yes
 }
 
+gogearhdd1630
+{
+    name   : Philips GoGear HDD1630
+    screen : 128 x 128 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+gogearhdd6330
+{
+    name   : Philips GoGear HDD6330
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+gogearsa9200
+{
+    name   : Philips GoGear SA9200
+    screen : 128 x 160 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+samsungyh820
+{
+    name   : Samsung YH-820
+    screen : 128 x 96 @ rgb
+    remote : no
+    fm     : no
+    record : yes
+}
+
+samsungyh920
+{
+    name   : Samsung YH-920
+    screen : 160 x 128 @ grey
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+samsungyh925
+{
+    name   : Samsung YH-925
+    screen : 160 x 128 @ rgb
+    remote : no
+    fm     : no
+    record : yes
+}
+
 sansac200
 {
     name   : SanDisk Sansa c200
     screen : 132 x 80 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansac200v2
+{
+    name   : SanDisk Sansa c200 v2
+    screen : 132 x 80 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclip
+{
+    name   : SanDisk Sansa Clip v1
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclipv2
+{
+    name   : SanDisk Sansa Clip v2
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclipzip
+{
+    name   : SanDisk Sansa Clip Zip
+    screen : 96 x 96 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansaclipplus
+{
+    name   : SanDisk Sansa Clip+
+    screen : 128 x 64 @ mono
     remote : no
     fm     : yes
     record : yes
@@ -256,10 +364,64 @@ sansafuze
     record : yes
 }
 
+sansafuzev2
+{
+    name   : SanDisk Sansa Fuze v2
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sansafuzeplus
+{
+    name   : SanDisk Sansa Fuze+
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+sonynwze360
+{
+    name   : Sony NWZ-E360
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwze370
+{
+    name   : Sony NWZ-E370/E380
+    screen : 128 x 160 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
 gigabeatfx
 {
     name   : Toshiba Gigabeat F/X
     screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+xduoox3
+{
+    name   : xDuoo X3
+    screen : 128 x 64 @ mono
+    remote : no
+    fm     : no
+    record : no
+}
+
+agptekrocker
+{
+    name   : Agptek Rocker
+    screen : 128 x 160 @ rgb
     remote : no
     fm     : no
     record : no
@@ -272,6 +434,15 @@ cowond2
     remote : no
     fm     : yes
     record : no
+}
+
+creativezen
+{
+    name   : Creative Zen
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
 }
 
 zenvision
@@ -301,6 +472,69 @@ zenvisionm60gb
     record : no
 }
 
+creativezenxfi2
+{
+    name   : Creative Zen X-Fi2
+    screen : 240 x 400 @ rgb
+    remote : no
+    fm     : yes
+    record : yes
+}
+
+hifietma8
+{
+    name   : HiFi E.T MA8
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+hifietma8c
+{
+    name   : HiFi E.T MA8C
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+hifietma9
+{
+    name   : HiFi E.T MA9
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+hifietma9c
+{
+    name   : HiFi E.T MA9C
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+hifimanhm60x
+{
+    name   : HiFiMAN HM-60x
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+hifimanhm801
+{
+    name   : HiFiMAN HM-801
+    screen : 220 x 176 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
 iaudio7
 {
     name   : iAudio 7
@@ -310,10 +544,19 @@ iaudio7
     record : yes
 }
 
-ipodnano2g
+ibassodx50
 {
-    name   : iPod Nano 2nd gen
-    screen : 176 x 132 @ rgb
+    name   : iBasso DX50
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ibassodx90
+{
+    name   : iBasso DX90
+    screen : 320 x 240 @ rgb
     remote : no
     fm     : no
     record : no
@@ -382,6 +625,15 @@ mini2440
     record : no
 }
 
+mpiohd200
+{
+    name   : MPIO HD200
+    screen : 128 x 128 @ grey
+    remote : no
+    fm     : yes
+    record : yes
+}
+
 mrobe500
 {
     name   : Olympus M-Robe 500
@@ -403,7 +655,7 @@ ondavx747
 ondavx767
 {
     name   : Onda VX767
-    screen : 320 x 240 @ rgb
+    screen : 480 x 272 @ rgb
     remote : no
     fm     : yes
     record : no
@@ -418,48 +670,21 @@ ondavx777
     record : no
 }
 
-gogearhdd1630
+rk27generic
 {
-    name   : Philips GoGear HDD1630
-    screen : 128 x 128 @ rgb
+    name   : Rockchip rk27xx
+    screen : 400 x 240 @ rgb
     remote : no
     fm     : yes
-    record : yes
-}
-
-gogearsa9200
-{
-    name   : Philips GoGear SA9200
-    screen : 128 x 160 @ rgb
-    remote : no
-    fm     : no
     record : no
 }
 
-samsungyh820
+samsungypr0
 {
-    name   : Samsung YH-820
-    screen : 128 x 96 @ rgb
+    name   : Samsung YP-R0
+    screen : 240 x 320 @ rgb
     remote : no
-    fm     : no
-    record : no
-}
-
-samsungyh920
-{
-    name   : Samsung YH-920
-    screen : 160 x 128 @ grey
-    remote : no
-    fm     : no
-    record : no
-}
-
-samsungyh925
-{
-    name   : Samsung YH-925
-    screen : 160 x 128 @ rgb
-    remote : no
-    fm     : no
+    fm     : yes
     record : no
 }
 
@@ -479,51 +704,6 @@ sansac100
     remote : no
     fm     : no
     record : no
-}
-
-sansac200v2
-{
-    name   : SanDisk Sansa c200 v2
-    screen : 132 x 80 @ rgb
-    remote : no
-    fm     : yes
-    record : yes
-}
-
-sansaclip
-{
-    name   : SanDisk Sansa Clip v1
-    screen : 128 x 64 @ mono
-    remote : no
-    fm     : yes
-    record : yes
-}
-
-sansaclipv2
-{
-    name   : SanDisk Sansa Clip v2
-    screen : 128 x 64 @ mono
-    remote : no
-    fm     : yes
-    record : yes
-}
-
-sansaclipplus
-{
-    name   : SanDisk Sansa Clip+
-    screen : 128 x 64 @ mono
-    remote : no
-    fm     : yes
-    record : yes
-}
-
-sansafuzev2
-{
-    name   : SanDisk Sansa Fuze v2
-    screen : 220 x 176 @ rgb
-    remote : no
-    fm     : yes
-    record : yes
 }
 
 sansam200
@@ -553,6 +733,87 @@ sansaview
     record : no
 }
 
+sonynwa20
+{
+    name   : Sony NW-A20
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwza10
+{
+    name   : Sony NWZ-A10
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwza860
+{
+    name   : Sony NWZ-A860
+    screen : 240 x 400 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwze350
+{
+    name   : Sony NWZ-E350
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwze450
+{
+    name   : Sony NWZ-E450
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwze460
+{
+    name   : Sony NWZ-E460
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwze470
+{
+    name   : Sony NWZ-E470
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwze580
+{
+    name   : Sony NWZ-E580
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
+sonynwzs750
+{
+    name   : Sony NWZ-S750
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : yes
+    record : no
+}
+
 tatungtpj1022
 {
     name   : Tatung Elio TPJ-1022
@@ -569,6 +830,51 @@ gigabeats
     remote : no
     fm     : yes
     record : yes
+}
+
+xduoox20
+{
+    name   : xDuoo X20
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+xduoox3ii
+{
+    name   : xDuoo X3ii
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ihifi770
+{
+    name   : Xuelin iHIFI 770
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ihifi770c
+{
+    name   : Xuelin iHIFI 770C
+    screen : 320 x 240 @ rgb
+    remote : no
+    fm     : no
+    record : no
+}
+
+ihifi800
+{
+    name   : Xuelin iHIFI 800
+    screen : 240 x 320 @ rgb
+    remote : no
+    fm     : no
+    record : no
 }
 
  
