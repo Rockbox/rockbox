@@ -197,14 +197,14 @@ void SkinDocument::settingsChanged()
     QSettings settings;
     settings.beginGroup("SkinDocument");
 
-    QColor fg = settings.value("fgColor", Qt::black).value<QColor>();
-    QColor bg = settings.value("bgColor", Qt::white).value<QColor>();
+    QColor fg = settings.value("fgColor", QColor(Qt::black)).value<QColor>();
+    QColor bg = settings.value("bgColor", QColor(Qt::white)).value<QColor>();
     QPalette palette;
     palette.setColor(QPalette::All, QPalette::Base, bg);
     palette.setColor(QPalette::All, QPalette::Text, fg);
     editor->setPalette(palette);
 
-    QColor highlight = settings.value("errorColor", Qt::red).value<QColor>();
+    QColor highlight = settings.value("errorColor", QColor(Qt::red)).value<QColor>();
     editor->setErrorColor(highlight);
 
     /* Setting the font */
@@ -227,7 +227,7 @@ void SkinDocument::cursorChanged()
         QTextCursor line = editor->textCursor();
         line.movePosition(QTextCursor::StartOfLine);
         line.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
-        skin_parse(line.selectedText().toAscii());
+        skin_parse(line.selectedText().toLatin1());
         if(skin_error_line() > 0)
             parseStatus = tr("Error on line ") +
                           QString::number(line.blockNumber() + 1)
@@ -263,7 +263,7 @@ void SkinDocument::codeChanged()
 
     editor->clearErrors();
     parseStatus = model->changeTree(editor->document()->
-                                    toPlainText().toAscii());
+                                    toPlainText().toLatin1());
 
     treeInSync = true;
     emit antiSync(false);
@@ -294,7 +294,7 @@ void SkinDocument::codeChanged()
             rest.removeSelectedText();
             base += skin_error_line();
 
-            skin_parse(doc.toPlainText().toAscii());
+            skin_parse(doc.toPlainText().toLatin1());
 
             if(skin_error_line() > 0)
                 editor->addError(base + skin_error_line());
@@ -338,7 +338,7 @@ void SkinDocument::save()
     }
 
     fout.open(QFile::WriteOnly);
-    fout.write(editor->document()->toPlainText().toAscii());
+    fout.write(editor->document()->toPlainText().toLatin1());
     fout.close();
 
     saved = editor->document()->toPlainText();
@@ -372,7 +372,7 @@ void SkinDocument::saveAs()
 
     QFile fout(fileName);
     fout.open(QFile::WriteOnly);
-    fout.write(editor->document()->toPlainText().toAscii());
+    fout.write(editor->document()->toPlainText().toLatin1());
     fout.close();
 
     saved = editor->document()->toPlainText();

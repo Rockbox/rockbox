@@ -8,7 +8,7 @@ CONFIG(debug) {
 }
 
 # Adding network support
-QT += network
+QT += network widgets
 
 # Enabling profiling
 QMAKE_CXXFLAGS_DEBUG += -pg

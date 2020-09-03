@@ -143,7 +143,7 @@ void ConfigDocument::save()
     }
 
     fout.open(QFile::WriteOnly);
-    fout.write(toPlainText().toAscii());
+    fout.write(toPlainText().toLatin1());
     fout.close();
 
     saved = toPlainText();
@@ -174,7 +174,7 @@ void ConfigDocument::saveAs()
 
     QFile fout(filePath);
     fout.open(QFile::WriteOnly);
-    fout.write(toPlainText().toAscii());
+    fout.write(toPlainText().toLatin1());
     fout.close();
 
     saved = toPlainText();
@@ -415,14 +415,14 @@ void ConfigDocument::settingsChanged()
     QSettings settings;
     settings.beginGroup("SkinDocument");
 
-    QColor fg = settings.value("fgColor", Qt::black).value<QColor>();
-    QColor bg = settings.value("bgColor", Qt::white).value<QColor>();
+    QColor fg = settings.value("fgColor", QColor(Qt::black)).value<QColor>();
+    QColor bg = settings.value("bgColor", QColor(Qt::white)).value<QColor>();
     QPalette palette;
     palette.setColor(QPalette::All, QPalette::Base, bg);
     palette.setColor(QPalette::All, QPalette::Text, fg);
     editor->setPalette(palette);
 
-    QColor highlight = settings.value("errorColor", Qt::red).value<QColor>();
+    QColor highlight = settings.value("errorColor", QColor(Qt::red)).value<QColor>();
     editor->setErrorColor(highlight);
 
     /* Setting the font */

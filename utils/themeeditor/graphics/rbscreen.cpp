@@ -227,7 +227,7 @@ void RBScreen::makeCustomUI(QString id)
 
 void RBScreen::endSbsRender()
 {
-    sbsChildren = children();
+    sbsChildren = childItems();
 
     QList<int> keys = fonts.keys();
     for(QList<int>::iterator i = keys.begin(); i != keys.end(); i++)
@@ -259,7 +259,7 @@ QColor RBScreen::stringToColor(QString str, QColor fallback)
     {
         for(int i = 0; i < 6; i++)
         {
-            char c = str[i].toAscii();
+            char c = str[i].toLatin1();
             if(!((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') ||
                  isdigit(c)))
             {
@@ -274,9 +274,9 @@ QColor RBScreen::stringToColor(QString str, QColor fallback)
     }
     else if(str.length() == 1)
     {
-        if(isdigit(str[0].toAscii()) && str[0].toAscii() <= '3')
+        if(isdigit(str[0].toLatin1()) && str[0].toLatin1() <= '3')
         {
-            int shade = 255 * (str[0].toAscii() - '0') / 3;
+            int shade = 255 * (str[0].toLatin1() - '0') / 3;
             retval = QColor(shade, shade, shade);
         }
         else

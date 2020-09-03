@@ -63,7 +63,7 @@ void SkinHighlighter::highlightBlock(const QString& text)
             if(text.length() - i < 2)
                 return;
 
-            if(find_escape_character(text[i + 1].toAscii()))
+            if(find_escape_character(text[i + 1].toLatin1()))
             {
                 /* Checking for escaped characters */
 
@@ -82,8 +82,8 @@ void SkinHighlighter::highlightBlock(const QString& text)
 
                 if(text.length() - i >= 3)
                 {
-                    lookup[0] = text[i + 1].toAscii();
-                    lookup[1] = text[i + 2].toAscii();
+                    lookup[0] = text[i + 1].toLatin1();
+                    lookup[1] = text[i + 2].toLatin1();
 
                     found = find_tag(lookup);
                 }
@@ -96,7 +96,7 @@ void SkinHighlighter::highlightBlock(const QString& text)
                 else
                 {
                     lookup[1] = '\0';
-                    lookup[0] = text[i + 1].toAscii();
+                    lookup[0] = text[i + 1].toLatin1();
                     found = find_tag(lookup);
 
                     if(found)
@@ -121,8 +121,8 @@ void SkinHighlighter::highlightBlock(const QString& text)
 
                 if(text.length() - i >= 4)
                 {
-                    lookup[0] = text[i + 2].toAscii();
-                    lookup[1] = text[i + 3].toAscii();
+                    lookup[0] = text[i + 2].toLatin1();
+                    lookup[1] = text[i + 3].toLatin1();
 
                     found = find_tag(lookup);
                 }
@@ -135,7 +135,7 @@ void SkinHighlighter::highlightBlock(const QString& text)
                 else
                 {
                     lookup[1] = '\0';
-                    lookup[0] = text[i + 2].toAscii();
+                    lookup[0] = text[i + 2].toLatin1();
 
                     found = find_tag(lookup);
 

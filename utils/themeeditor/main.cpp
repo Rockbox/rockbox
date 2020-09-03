@@ -21,7 +21,7 @@
 
 #include "editorwindow.h"
 
-#include <QtGui/QApplication>
+#include <QApplication>
 
 int main(int argc, char* argv[])
 {

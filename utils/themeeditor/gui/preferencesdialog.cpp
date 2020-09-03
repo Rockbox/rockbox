@@ -85,13 +85,13 @@ void PreferencesDialog::loadColors()
     /* Buttons from the editor group */
     settings.beginGroup("SkinDocument");
 
-    fgColor = settings.value("fgColor", Qt::black).value<QColor>();
+    fgColor = settings.value("fgColor", QColor(Qt::black)).value<QColor>();
     setButtonColor(ui->fgButton, fgColor);
 
-    bgColor = settings.value("bgColor", Qt::white).value<QColor>();
+    bgColor = settings.value("bgColor", QColor(Qt::white)).value<QColor>();
     setButtonColor(ui->bgButton, bgColor);
 
-    errorColor = settings.value("errorColor", Qt::red).value<QColor>();
+    errorColor = settings.value("errorColor", QColor(Qt::red)).value<QColor>();
     setButtonColor(ui->errorButton, errorColor);
 
     settings.endGroup();

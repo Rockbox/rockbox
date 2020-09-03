@@ -874,7 +874,7 @@ void EditorWindow::createFile(QString filename, QString contents)
     QFile fout(filename);
     fout.open(QFile::WriteOnly);
 
-    fout.write(contents.toAscii());
+    fout.write(contents.toLatin1());
 
     fout.close();
 }
