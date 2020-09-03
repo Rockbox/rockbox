@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e67824a6_e15cabf1",
+        "filename": "firmware/target/mips/ingenic_jz47xx/xduoo_x3/sadc-xduoo_x3.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-09-03T15:30:10Z",
+      "side": 1,
+      "message": "this seems superfluous.. what else turns on VBATEN?",
+      "range": {
+        "startLine": 223,
+        "startChar": 7,
+        "endLine": 223,
+        "endChar": 46
+      },
+      "revId": "640b1559b96b6e91de96f3413a7100f79f1cefe6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "623fcaec_44b65805",
+        "filename": "firmware/target/mips/ingenic_jz47xx/xduoo_x3/sadc-xduoo_x3.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-09-03T15:30:10Z",
+      "side": 1,
+      "message": "might it not make more sense to check (REG_SADC_ADSTATE \u0026 ADCTRL_ARDYM) for completion?",
+      "range": {
+        "startLine": 228,
+        "startChar": 19,
+        "endLine": 228,
+        "endChar": 49
+      },
+      "revId": "640b1559b96b6e91de96f3413a7100f79f1cefe6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
