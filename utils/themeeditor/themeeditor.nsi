@@ -88,7 +88,7 @@ SectionEnd
 Section "Download Fonts Package" SecFontsPackage
     SetOutPath "$INSTDIR"
     NSISdl::download http://download.rockbox.org/daily/fonts/rockbox-fonts.zip "$INSTDIR\rockbox-fonts.zip"
-    ZipDLL::extractall "$INSTDIR\rockbox-fonts.zip" "$INSTDIR" <ALL>
+    ZipDLL::extractall "$INSTDIR\rockbox-fonts.zip" "$INSTDIR" "<ALL>"
     ; the fonts package uses the Rockbox folder structure. Move all fonts into a
     ; flat directory instead.
     Rename "$INSTDIR\.rockbox\fonts" "$INSTDIR\fonts"
