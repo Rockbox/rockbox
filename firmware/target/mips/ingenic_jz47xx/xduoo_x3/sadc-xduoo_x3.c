@@ -282,7 +282,10 @@ void SADC(void)
 
         if (!__gpio_get_pin(PIN_KEY_INT)) /* key(s) are down kick off another read */
         {
+#ifdef ENABLE_BUTTON_COMBOS
+            /* setting bit high removes BOP from ADC circuit*/
             __gpio_set_pin(PIN_KEY_BOP);
+#endif
             REG_SADC_ADENA = ADENA_AUXEN;
         }
 #ifdef ENABLE_BUTTON_COMBOS
