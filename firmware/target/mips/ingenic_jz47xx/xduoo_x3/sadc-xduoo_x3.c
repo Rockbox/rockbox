@@ -240,7 +240,7 @@ int _battery_voltage(void)
 */
 void adc_init(void)
 {
-    bat_val = 0xfff;
+    bat_val = 0x6DD; /* 4.222 volts */
 
     __cpm_start_sadc();
     mdelay(10);
@@ -248,13 +248,14 @@ void adc_init(void)
     mdelay(70);
     REG_SADC_ADSTATE = 0;
     REG_SADC_ADCTRL = ADCTRL_MASK_ALL - ADCTRL_ARDYM - ADCTRL_VRDYM;
-    REG_SADC_ADCFG = ADCFG_VBAT_SEL | ADCFG_CMD_AUX(1);  /* VBAT_SEL is undocumented but required! */
+    REG_SADC_ADCFG |= ADCFG_VBAT_SEL | ADCFG_CMD_AUX(1);  /* VBAT_SEL is undocumented but required! */
     REG_SADC_ADCLK = (199 << 16) | (1 << 8) | 61;
     system_enable_irq(IRQ_SADC);
 }
 
 void adc_close(void)
 {
+    REG_SADC_ADENA = 0;
     REG_SADC_ADENA = ADENA_POWER; /* Power Down */
     __intc_mask_irq(IRQ_SADC);
     mdelay(20);
