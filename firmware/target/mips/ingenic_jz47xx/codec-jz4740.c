@@ -267,6 +267,7 @@ void audiohw_postinit(void)
 
 void audiohw_init(void)
 {
+    __aic_play_lastsample(); /* on FIFO underflow */
     i2s_codec_init();
 }
 

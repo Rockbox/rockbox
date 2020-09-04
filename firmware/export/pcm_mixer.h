@@ -30,6 +30,10 @@
 #if CONFIG_CPU == PP5002
 /* There's far less time to do mixing because HW FIFOs are short */
 #define MIX_FRAME_SAMPLES 64
+#elif (CONFIG_CPU == JZ4760B) || (CONFIG_CPU == JZ4732)
+/* These MIPS32r1 targets have a very high interrupt latency, which
+   unfortunately causes a lot of audio underruns under even moderate load */
+#define MIX_FRAME_SAMPLES 2048
 #elif (CONFIG_PLATFORM & PLATFORM_MAEMO5) || defined(DX50) || defined(DX90)
 /* Maemo 5 needs 2048 samples for decent performance.
    Otherwise the locking overhead inside gstreamer costs too much */

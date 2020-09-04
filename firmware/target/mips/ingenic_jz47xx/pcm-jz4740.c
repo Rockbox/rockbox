@@ -137,6 +137,8 @@ void DMA_CALLBACK(DMA_AIC_TX_CHANNEL)(void)
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
+    pcm_play_dma_stop();
+
     dma_enable();
 
     set_dma(addr, size);
