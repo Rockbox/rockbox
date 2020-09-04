@@ -153,7 +153,7 @@
     *: "Учитавам... %d%% завршено (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Учитавам"
   </voice>
 </phrase>
 <phrase>
@@ -247,22 +247,20 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
-    archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Yes"
     creativezen*: "Select = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Да"
     cowond2*: "MENU, или горе-десно = Да"
-    iriverh100,iriverh120,iriverh300: "NAVI = Да"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Да"
-    mrobe500: "PLAY, POWER, или горе-десно = Да"
-    archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Да"
     creativezen*: "Select = Да"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Да"
+    iriverh100,iriverh120,iriverh300: "NAVI = Да"
+    mrobe500: "PLAY, POWER, или горе-десно = Да"
+    vibe500: "OK = Да"
   </dest>
   <voice>
     *: ""
@@ -274,11 +272,9 @@
   user: core
   <source>
     *: "Any Other = No"
-    archosplayer: none
   </source>
   <dest>
     *: "Било које друго = Не"
-    archosplayer: none
   </dest>
   <voice>
     *: ""
@@ -1159,170 +1155,14 @@
   <source>
     *: none
     swcodec: "Dithering"
-    lcd_bitmap: "Dithering"
   </source>
   <dest>
     *: none
     swcodec: "Дитер"
-    lcd_bitmap: "Дитер"
   </dest>
   <voice>
     *: none
     swcodec: "Дитер"
-    lcd_bitmap: "Дитер"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Гласност"
-  </dest>
-  <voice>
-    *: none
-    masf: "Гласност"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Ауто јачина"
-  </dest>
-  <voice>
-    *: none
-    masf: "Ауто јачина"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "Време опадања за AV"
-  </dest>
-  <voice>
-    *: none
-    masf: "Време опадања за AV"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Супер Бас"
-  </dest>
-  <voice>
-    *: none
-    masf: "Супер Бас"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "Укључи MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Укључи MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "Јачина MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Јачина MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "Хармоници MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Хармоници MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "Централна фреквенција MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Централна фреквенција MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "Облик MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Облик MDB"
   </voice>
 </phrase>
 <phrase>
@@ -2217,21 +2057,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
-    archosplayer: "Building DB %d found"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "Креирам базу података... %d пронађено (OFF за повратак)"
-    iriverh100,iriverh120,iriverh300: "Креирам базу података... %d пронађено (STOP за повратак)"
-    ipod*: "Креирам базу података... %d пронађено (PREV за повратак)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Креирам базу података... %d пронађено (LEFT за повратак)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Креирам базу података... %d пронађено (PREV за повратак)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Креирам базу података... %d пронађено (LEFT за повратак)"
     gogearsa9200: "Креирам базу података... %d пронађено (REW за повратак)"
-    archosplayer: "Креирам БП %d пронађено"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Креирам базу података... %d пронађено (PREV за повратак)"
+    iriverh100,iriverh120,iriverh300: "Креирам базу података... %d пронађено (STOP за повратак)"
   </dest>
   <voice>
     *: "пронађене ставке за базу"
@@ -3163,23 +2999,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Линија са дугмићима"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Линија са дугмићима"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOLUME_DISPLAY
   desc: Volume type title
   user: core
@@ -3253,15 +3072,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "Мерач вршног нивоа"
-    masd: none
   </dest>
   <voice>
     *: "Мерач вршног нивоа"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3270,15 +3086,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Време задржавања клип индикатора"
-    masd: none
   </dest>
   <voice>
     *: "Време задржавања клип индикатора"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3287,15 +3100,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Време задржавања вршног нивоа"
-    masd: none
   </dest>
   <voice>
     *: "Време задржавања вршног нивоа"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3304,15 +3114,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "Заувек"
-    masd: none
   </dest>
   <voice>
     *: "Заувек"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3321,15 +3128,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "Враћање врхова"
-    masd: none
   </dest>
   <voice>
     *: "Враћање врхова"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3338,15 +3142,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "Скала"
-    masd: none
   </dest>
   <voice>
     *: "Скала"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3355,15 +3156,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "Логаритамска (dB)"
-    masd: none
   </dest>
   <voice>
     *: "Логаритамска децибели"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3372,15 +3170,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "Линеарна (%)"
-    masd: none
   </dest>
   <voice>
     *: "Линеарна проценти"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3389,15 +3184,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Минимум опсега"
-    masd: none
   </dest>
   <voice>
     *: "Минимум опсега"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3406,15 +3198,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "Максимум опсега"
-    masd: none
   </dest>
   <voice>
     *: "Максимум опсега"
-    masd: none
   </voice>
 </phrase>
 <phrase>
@@ -3641,17 +3430,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Тајмаут светла за дугмиће"
-    sansafuze*,sansae200*: "Тајмаут светла за точак"
+    sansae200*,sansafuze*: "Тајмаут светла за точак"
   </dest>
   <voice>
     *: none
     button_light: "Тајмаут светла за дугмиће"
-    sansafuze*,sansae200*: "Тајмаут светла за точак"
+    sansae200*,sansafuze*: "Тајмаут светла за точак"
   </voice>
 </phrase>
 <phrase>
@@ -3765,14 +3554,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Алкална"
+    xduoox3: "Новија (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Алкална"
+    xduoox3: "Новија (2000 милиампер часова)"
   </voice>
 </phrase>
 <phrase>
@@ -3782,14 +3574,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Старија (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Никл метал хидридна"
+    xduoox3: "Старија (1500 милиампер часова)"
   </voice>
 </phrase>
 <phrase>
@@ -3922,23 +3717,23 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Постави"
-    mrobe500: "HEART = Постави"
-    iriverh100,iriverh120,iriverh300: "NAVI = Постави"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Постави"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Постави"
     gogearsa9200,samsungyh*: "PLAY = Постави"
-    vibe500: "OK = Постави"
+    iriverh100,iriverh120,iriverh300: "NAVI = Постави"
     mpiohd300: "ENTER = Постави"
+    mrobe500: "HEART = Постави"
+    rtc: "ON = Постави"
+    vibe500: "OK = Постави"
   </dest>
   <voice>
     *: none
@@ -3951,35 +3746,31 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = Врати на старо"
-    mrobe500: "POWER = Врати на старо"
-    iriverh100,iriverh120,iriverh300: "STOP = Врати на старо"
-    ipod*,sansac200*,mpiohd300: "MENU = Врати на старо"
-    iaudiox5,iaudiom5: "RECORD = Врати на старо"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Врати на старо"
-    gigabeatfx: "POWER = Врати на старо"
-    sansafuzeplus: "BACK = Врати на старо"
-    mrobe100: "DISPLAY = Врати на старо"
-    gigabeats: "BACK = Врати на старо"
+    gigabeatfx,mrobe500: "POWER = Врати на старо"
+    gigabeats,sansafuzeplus: "BACK = Врати на старо"
     gogearsa9200: "LEFT = Врати на старо"
-    vibe500: "CANCEL = Врати на старо"
+    iaudiom5,iaudiox5: "RECORD = Врати на старо"
+    ipod*,mpiohd300,sansac200*: "MENU = Врати на старо"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Врати на старо"
+    iriverh100,iriverh120,iriverh300: "STOP = Врати на старо"
+    mrobe100: "DISPLAY = Врати на старо"
+    rtc: "OFF = Врати на старо"
     samsungyh*: "REW = Врати на старо"
+    vibe500: "CANCEL = Врати на старо"
   </dest>
   <voice>
     *: none
@@ -4408,7 +4199,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Време аларма"
+    alarm: ""
   </voice>
 </phrase>
 <phrase>
@@ -4469,22 +4260,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Постави OFF=Одустани"
+    gigabeats: "SELECT=Постави POWER=Одустани"
     ipod*: "SELECT=Постави MENU=Одустани"
     iriverh10,iriverh10_5gb: "SELECT=Постави PREV=Одустани"
-    gigabeats: "SELECT=Постави POWER=Одустани"
-    vibe500: "OK=Постави C=Одустани"
     mpiohd300: "ENTER=Постави MENU=Одустани"
     sansafuzeplus: "SELECT=Постави  BACK=Одустани"
+    vibe500: "OK=Постави C=Одустани"
   </dest>
   <voice>
     *: none
@@ -5023,57 +4814,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Мени"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Излаз"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Акција"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PRESET
   desc: in button bar and radio screen / menu
   user: core
@@ -5088,40 +4828,6 @@
   <voice>
     *: none
     radio: "Станица"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ADD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Add"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Додај"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_RECORD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Record"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Снимај"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -5567,37 +5273,20 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Квалитет"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Квалитет"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "Фреквенција"
+    play_frequency,recording: "Фреквенција"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "Фреквенција"
+    play_frequency,recording: "Фреквенција"
   </voice>
 </phrase>
 <phrase>
@@ -5640,18 +5329,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "Микрофон"
     iriverh100,iriverh120,iriverh300: "Уграђени микрофон"
+    recording: "Микрофон"
   </dest>
   <voice>
     *: none
-    recording: "Микрофон"
     iriverh100,iriverh120,iriverh300: "Уграђени микрофон"
+    recording: "Микрофон"
   </voice>
 </phrase>
 <phrase>
@@ -5686,23 +5375,6 @@
   <voice>
     *: none
     recording: "Линијски улаз"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Независни фрејмови"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Независни фрејмови"
   </voice>
 </phrase>
 <phrase>
@@ -6477,23 +6149,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Искључивање"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Искључивање"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ROCKBOX_INFO
   desc: displayed topmost on the info screen and in the info menu
   user: core
@@ -6513,11 +6168,9 @@
   user: core
   <source>
     *: "Buffer:"
-    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Бафер:"
-    archosplayer: "Баф:"
   </dest>
   <voice>
     *: "Величина бафера"
@@ -6529,13 +6182,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Батерија: %d%% %dч %dм"
+    ipodmini1g,ipodmini2g,iriverh10: "Бат: %d%% %dч %dм"
     iriverifp7xx: "%d%% %dч %dм"
-    iriverh10,ipodmini1g,ipodmini2g: "Бат: %d%% %dч %dм"
   </dest>
   <voice>
     *: "Ниво батерије"
@@ -6588,28 +6241,25 @@
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
-    archosondio*: "MMC:"
   </source>
   <dest>
     *: none
     multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
-    archosondio*: "MMC:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "мајкро Ес Де"
+    multivolume: "Ха Де 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "мајкро Ес Де"
     xduoox3: "мајкро Ес Де 2"
-    archosondio*: "M M C"
   </voice>
 </phrase>
 <phrase>
@@ -6889,7 +6539,7 @@
     *: "Тражим... %d пронађено (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "пронађено"
   </voice>
 </phrase>
 <phrase>
@@ -7706,11 +7356,9 @@
   user: core
   <source>
     *: "End of Song List"
-    archosplayer: "End of List"
   </source>
   <dest>
     *: "Крај листе песама"
-    archosplayer: "Крај листе"
   </dest>
   <voice>
     *: "Крај листе песама"
@@ -7898,7 +7546,7 @@
     *: "Тастери откључани"
   </dest>
   <voice>
-    *: "Тастери откључани"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7915,7 +7563,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Време"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -7924,19 +7572,19 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "Диск је пун. Притисните OFF за наставак."
-    iriverh100,iriverh120,iriverh300: "Диск је пун. Притисните STOP за наставак."
     iaudiom5,iaudiox5: "Диск је пун. Притисните POWER за наставак."
-    sansae200*,sansac200*,vibe500: "Диск је пун. Притисните PREV за наставак."
+    iriverh100,iriverh120,iriverh300: "Диск је пун. Притисните STOP за наставак."
+    recording: "Диск је пун. Притисните OFF за наставак."
     samsungyh*: "Диск је пун. Притисните LEFT за наставак."
+    sansac200*,sansae200*,vibe500: "Диск је пун. Притисните PREV за наставак."
   </dest>
   <voice>
     *: none
@@ -7958,40 +7606,6 @@
   <voice>
     *: none
     recording: "минус бесконачно"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Притисните OFF за искључивање"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "Молим уклоните уметнуту MMC"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Молим уклоните мултимедија картицу"
   </voice>
 </phrase>
 <phrase>
@@ -8024,27 +7638,25 @@
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on archosrecorder models
+  desc: Used on many models
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF за прекид"
-    iriverh100,iriverh120,iriverh300: "STOP за прекид"
-    ipod*: "PLAY/PAUSE за прекид"
-    iaudiox5,iaudiom5: "Long PLAY за прекид"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за прекид"
-    gigabeats: "BACK за прекид"
     gigabeatfx: "POWER за прекид"
-    sansafuzeplus: "BACK за прекид"
+    gigabeats,sansafuzeplus: "BACK за прекид"
+    iaudiom5,iaudiox5: "Long PLAY за прекид"
+    ipod*: "PLAY/PAUSE за прекид"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV за прекид"
+    iriverh100,iriverh120,iriverh300: "STOP за прекид"
   </dest>
   <voice>
     *: ""
@@ -8108,7 +7720,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
@@ -8117,7 +7729,7 @@
     *: "Модел није одговарајући"
   </dest>
   <voice>
-    *: ""
+    *: "Неодговарајући модел"
   </voice>
 </phrase>
 <phrase>
@@ -8131,7 +7743,7 @@
     *: "Верзија није одговарајућа"
   </dest>
   <voice>
-    *: ""
+    *: "Неодговарајућа верзија"
   </voice>
 </phrase>
 <phrase>
@@ -8145,7 +7757,7 @@
     *: "Додатак је вратио грешку"
   </dest>
   <voice>
-    *: ""
+    *: "Додатак је вратио грешку"
   </voice>
 </phrase>
 <phrase>
@@ -8219,23 +7831,6 @@
   <voice>
     *: none
     charging: "Батерија: пуни се"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "Батерија: Top-Off Chg"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "Top off пуњење"
   </voice>
 </phrase>
 <phrase>
@@ -10123,15 +9718,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фрекв. за ниске"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Гранична фрекв. за ниске"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фреквенција за ниске"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Гранична фреквенција за ниске"
   </voice>
 </phrase>
 <phrase>
@@ -10140,15 +9735,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фрекв. за високе"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Гранична фрекв. за високе"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Гранична фреквенција за високе"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Гранична фреквенција за високе"
   </voice>
 </phrase>
 <phrase>
@@ -10396,7 +9991,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Време дељења"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10427,7 +10022,7 @@
   </dest>
   <voice>
     *: none
-    recording: "КЛИП"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -10461,7 +10056,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Фајл"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -12900,18 +12495,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </source>
   <dest>
     *: none
-    ibassodx50: "Управљач скалирањем фрекв"
-    ibassodx90: "Управљач скалирањем фрекв"
+    ibassodx50,ibassodx90: "Управљач скалирањем фрекв"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Управљач скалирањем фрекв"
-    ibassodx90: "Управљач скалирањем фрекв"
+    ibassodx50,ibassodx90: "Управљач скалирањем фрекв"
   </voice>
 </phrase>
 <phrase>
@@ -13010,18 +12602,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50: "USB Мод"
-    ibassodx90: "USB Мод"
+    ibassodx50,ibassodx90: "USB Мод"
   </dest>
   <voice>
     *: none
-    ibassodx50: "USB Мод"
-    ibassodx90: "USB Мод"
+    ibassodx50,ibassodx90: "USB Мод"
   </voice>
 </phrase>
 <phrase>
@@ -13044,18 +12633,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -13171,18 +12757,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50: "Масовно Складиште"
-    ibassodx90: "Масовно Складиште"
+    ibassodx50,ibassodx90: "Масовно Складиште"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Масовно Складиште"
-    ibassodx90: "Масовно Складиште"
+    ibassodx50,ibassodx90: "Масовно Складиште"
   </voice>
 </phrase>
 <phrase>
@@ -13267,18 +12850,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50: "Само пуњење"
-    ibassodx90: "Само пуњење"
+    ibassodx50,ibassodx90: "Само пуњење"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Само пуњење"
-    ibassodx90: "Само пуњење"
+    ibassodx50,ibassodx90: "Само пуњење"
   </voice>
 </phrase>
 <phrase>
@@ -13827,18 +13407,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Set resume time (min)"
     lowmem: none
+    swcodec: "Set resume time (min)"
   </source>
   <dest>
     *: none
-    swcodec: "Постави време настављања (мин)"
     lowmem: none
+    swcodec: "Постави време настављања (мин)"
   </dest>
   <voice>
     *: none
-    swcodec: "Постави време настављања"
     lowmem: none
+    swcodec: "Постави време настављања"
   </voice>
 </phrase>
 <phrase>
@@ -13895,18 +13475,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Resume automatically"
     lowmem: none
+    swcodec: "Resume automatically"
   </source>
   <dest>
     *: none
-    swcodec: "Настави аутоматски"
     lowmem: none
+    swcodec: "Настави аутоматски"
   </dest>
   <voice>
     *: none
-    swcodec: "Настави аутоматски"
     lowmem: none
+    swcodec: "Настави аутоматски"
   </voice>
 </phrase>
 <phrase>
@@ -13980,18 +13560,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Skip frames"
     lowmem: none
+    swcodec: "Skip frames"
   </source>
   <dest>
     *: none
-    swcodec: "Прескачи фрејмове"
     lowmem: none
+    swcodec: "Прескачи фрејмове"
   </dest>
   <voice>
     *: none
-    swcodec: "Прескачи фрејмове"
     lowmem: none
+    swcodec: "Прескачи фрејмове"
   </voice>
 </phrase>
 <phrase>
@@ -14189,18 +13769,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Tone controls"
     lowmem: none
+    swcodec: "Tone controls"
   </source>
   <dest>
     *: none
-    swcodec: "Тонске контроле"
     lowmem: none
+    swcodec: "Тонске контроле"
   </dest>
   <voice>
     *: none
-    swcodec: "Тонске контроле"
     lowmem: none
+    swcodec: "Тонске контроле"
   </voice>
 </phrase>
 <phrase>
@@ -14440,18 +14020,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Play Mode"
     lowmem: none
+    swcodec: "Play Mode"
   </source>
   <dest>
     *: none
-    swcodec: "Режим репродукције"
     lowmem: none
+    swcodec: "Режим репродукције"
   </dest>
   <voice>
     *: none
-    swcodec: "Режим репродукције"
     lowmem: none
+    swcodec: "Режим репродукције"
   </voice>
 </phrase>
 <phrase>
@@ -14706,18 +14286,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Resume Options"
     lowmem: none
+    swcodec: "Resume Options"
   </source>
   <dest>
     *: none
-    swcodec: "Опције настављања"
     lowmem: none
+    swcodec: "Опције настављања"
   </dest>
   <voice>
     *: none
-    swcodec: "Опције настављања"
     lowmem: none
+    swcodec: "Опције настављања"
   </voice>
 </phrase>
 <phrase>
@@ -14760,18 +14340,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Surround"
     lowmem: none
+    swcodec: "Surround"
   </source>
   <dest>
     *: none
-    swcodec: "Окружујуће"
     lowmem: none
+    swcodec: "Окружујуће"
   </dest>
   <voice>
     *: none
-    swcodec: "Окружујуће"
     lowmem: none
+    swcodec: "Окружујуће"
   </voice>
 </phrase>
 <phrase>
@@ -14822,18 +14402,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Play from beginning"
     lowmem: none
+    swcodec: "Play from beginning"
   </source>
   <dest>
     *: none
-    swcodec: "Играј од почетка"
     lowmem: none
+    swcodec: "Играј од почетка"
   </dest>
   <voice>
     *: none
-    swcodec: "Играј од почетка"
     lowmem: none
+    swcodec: "Играј од почетка"
   </voice>
 </phrase>
 <phrase>
@@ -14890,18 +14470,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Use common setting"
     lowmem: none
+    swcodec: "Use common setting"
   </source>
   <dest>
     *: none
-    swcodec: "Користи уобичајено подешавање"
     lowmem: none
+    swcodec: "Користи уобичајено подешавање"
   </dest>
   <voice>
     *: none
-    swcodec: "Користи уобичајено подешавање"
     lowmem: none
+    swcodec: "Користи уобичајено подешавање"
   </voice>
 </phrase>
 <phrase>
@@ -15054,18 +14634,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Interpolation"
     lowmem: none
+    swcodec: "Interpolation"
   </source>
   <dest>
     *: none
-    swcodec: "Интерполација"
     lowmem: none
+    swcodec: "Интерполација"
   </dest>
   <voice>
     *: none
-    swcodec: "Интерполација"
     lowmem: none
+    swcodec: "Интерполација"
   </voice>
 </phrase>
 <phrase>
@@ -15136,18 +14716,18 @@
   user: core
   <source>
     *: none
-    swcodec: "CPU Boost"
     lowmem: none
+    swcodec: "CPU Boost"
   </source>
   <dest>
     *: none
-    swcodec: "CPU убрзање"
     lowmem: none
+    swcodec: "CPU убрзање"
   </dest>
   <voice>
     *: none
-    swcodec: "CPU убрзање"
     lowmem: none
+    swcodec: "CPU убрзање"
   </voice>
 </phrase>
 <phrase>
@@ -15190,18 +14770,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Limit FPS"
     lowmem: none
+    swcodec: "Limit FPS"
   </source>
   <dest>
     *: none
-    swcodec: "Ограничи FPS"
     lowmem: none
+    swcodec: "Ограничи FPS"
   </dest>
   <voice>
     *: none
-    swcodec: "Ограничи FPS"
     lowmem: none
+    swcodec: "Ограничи FPS"
   </voice>
 </phrase>
 <phrase>
@@ -15354,18 +14934,18 @@
   user: core
   <source>
     *: none
-    swcodec: "Unavailable"
     lowmem: none
+    swcodec: "Unavailable"
   </source>
   <dest>
     *: none
-    swcodec: "Недоступно"
     lowmem: none
+    swcodec: "Недоступно"
   </dest>
   <voice>
     *: none
-    swcodec: "Недоступно"
     lowmem: none
+    swcodec: "Недоступно"
   </voice>
 </phrase>
 <phrase>
@@ -15379,7 +14959,7 @@ id: VOICE_BAT_BENCH_KEYS
     *: ""
   </dest>
   <voice>
-    *: "Притисните репродукцију за покретање теста батерије или стоп за отказ"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15388,18 +14968,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Use sound setting"
     lowmem: none
+    swcodec: "Use sound setting"
   </source>
   <dest>
     *: none
-    swcodec: "Користи подешавање звука"
     lowmem: none
+    swcodec: "Користи подешавање звука"
   </dest>
   <voice>
     *: none
-    swcodec: "Користи подешавање звука"
     lowmem: none
+    swcodec: "Користи подешавање звука"
   </voice>
 </phrase>
 <phrase>
@@ -15422,18 +15002,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Reverberation"
     lowmem: none
+    swcodec: "Reverberation"
   </source>
   <dest>
     *: none
-    swcodec: "Реверберација"
     lowmem: none
+    swcodec: "Реверберација"
   </dest>
   <voice>
     *: none
-    swcodec: "Реверберација"
     lowmem: none
+    swcodec: "Реверберација"
   </voice>
 </phrase>
 <phrase>
@@ -15442,18 +15022,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Panning Separation"
     lowmem: none
+    swcodec: "Panning Separation"
   </source>
   <dest>
     *: none
-    swcodec: "Сепарација панирања"
     lowmem: none
+    swcodec: "Сепарација панирања"
   </dest>
   <voice>
     *: none
-    swcodec: "Сепарација панирања"
     lowmem: none
+    swcodec: "Сепарација панирања"
   </voice>
 </phrase>
 <phrase>
@@ -15493,18 +15073,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Clear all resumes"
     lowmem: none
+    swcodec: "Clear all resumes"
   </source>
   <dest>
     *: none
-    swcodec: "Очисти сва настављања"
     lowmem: none
+    swcodec: "Очисти сва настављања"
   </dest>
   <voice>
     *: none
-    swcodec: "Очисти сва настављања"
     lowmem: none
+    swcodec: "Очисти сва настављања"
   </voice>
 </phrase>
 <phrase>
@@ -15530,18 +15110,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Start menu"
     lowmem: none
+    swcodec: "Start menu"
   </source>
   <dest>
     *: none
-    swcodec: "Старт мени"
     lowmem: none
+    swcodec: "Старт мени"
   </dest>
   <voice>
     *: none
-    swcodec: "Старт мени"
     lowmem: none
+    swcodec: "Старт мени"
   </voice>
 </phrase>
 <phrase>
@@ -15649,18 +15229,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Single"
     lowmem: none
+    swcodec: "Single"
   </source>
   <dest>
     *: none
-    swcodec: "Сингл"
     lowmem: none
+    swcodec: "Сингл"
   </dest>
   <voice>
     *: none
-    swcodec: "Сингл"
     lowmem: none
+    swcodec: "Сингл"
   </voice>
 </phrase>
 <phrase>
@@ -15708,7 +15288,7 @@ id: VOICE_BAT_BENCH_KEYS
   </dest>
   <voice>
     *: none
-    lcd_bitmap: "Маркирано"
+    lcd_bitmap: ""
   </voice>
 </phrase>
 <phrase>
@@ -15717,18 +15297,15 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Display FPS"
-    lcd_bitmap: "Display FPS"
+    lcd_bitmap,swcodec: "Display FPS"
   </source>
   <dest>
     *: none
-    swcodec: "Прикажи FPS"
-    lcd_bitmap: "Прикажи FPS"
+    lcd_bitmap,swcodec: "Прикажи FPS"
   </dest>
   <voice>
     *: none
-    swcodec: "Прикажи FPS"
-    lcd_bitmap: "Прикажи FPS"
+    lcd_bitmap,swcodec: "Прикажи FPS"
   </voice>
 </phrase>
 <phrase>
@@ -15751,18 +15328,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Start menu if not completed"
     lowmem: none
+    swcodec: "Start menu if not completed"
   </source>
   <dest>
     *: none
-    swcodec: "Старт мени ако није завршено"
     lowmem: none
+    swcodec: "Старт мени ако није завршено"
   </dest>
   <voice>
     *: none
-    swcodec: "Старт мени ако није завршено"
     lowmem: none
+    swcodec: "Старт мени ако није завршено"
   </voice>
 </phrase>
 <phrase>
@@ -15932,18 +15509,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Audio Options"
     lowmem: none
+    swcodec: "Audio Options"
   </source>
   <dest>
     *: none
-    swcodec: "Аудио опције"
     lowmem: none
+    swcodec: "Аудио опције"
   </dest>
   <voice>
     *: none
-    swcodec: "Аудио опције"
     lowmem: none
+    swcodec: "Аудио опције"
   </voice>
 </phrase>
 <phrase>
@@ -16000,18 +15577,18 @@ id: VOICE_BAT_BENCH_KEYS
   user: core
   <source>
     *: none
-    swcodec: "Backlight brightness"
     lowmem: none
+    swcodec: "Backlight brightness"
   </source>
   <dest>
     *: none
-    swcodec: "Јачина позадинског светла"
     lowmem: none
+    swcodec: "Јачина позадинског светла"
   </dest>
   <voice>
     *: none
-    swcodec: "Јачина позадинског светла"
     lowmem: none
+    swcodec: "Јачина позадинског светла"
   </voice>
 </phrase>
 <phrase>
@@ -16207,5 +15784,455 @@ id: VOICE_BAT_BENCH_KEYS
   <voice>
     *: none
     lcd_bitmap: "Прикажи албум на врху"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "HQ Mixer"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "ВК миксер"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Миксер високог квалитета"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Уређивање"
+  </dest>
+  <voice>
+    *: "Уређивање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GROUPING
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Grouping"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Груписање"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Груписање"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Отвори додатак"
+  </dest>
+  <voice>
+    *: "Отвори додатак"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Извоз"
+  </dest>
+  <voice>
+    *: "Извоз"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: none
+    hotkey: "Track"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Нумера"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Нумера"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Име"
+  </dest>
+  <voice>
+    *: "Име"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOLD_FOR_SETTINGS
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Hold for settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Задржи за подешавања"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Задржи за подешавања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Постави Wps контекст додатак"
+  </dest>
+  <voice>
+    *: "Постави Wps контекст додатак"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAIN
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remain"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Преостаје"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Преостаје"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_CHANGE
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Track change"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Промена нумере"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Промена нумере"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Покрени"
+  </dest>
+  <voice>
+    *: "Покрени"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: none
+    lowmem: none
+    swcodec: "Sample Rate"
+  </source>
+  <dest>
+    *: none
+    lowmem: none
+    swcodec: "Учестаност узорковања"
+  </dest>
+  <voice>
+    *: none
+    lowmem: none
+    swcodec: "Учестаност узорковања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEOUT
+  desc:
+  user: core
+  <source>
+    *: "Timeout"
+  </source>
+  <dest>
+    *: "Тајмаут"
+  </dest>
+  <voice>
+    *: "Тајмаут"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: "Date"
+  </source>
+  <dest>
+    *: "Датум"
+  </dest>
+  <voice>
+    *: "Датум"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL
+  desc:
+  user: core
+  <source>
+    *: "Clear all"
+  </source>
+  <dest>
+    *: "Обриши све"
+  </dest>
+  <voice>
+    *: "Обриши све"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Elapsed"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Протекло"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Протекло"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Назад"
+  </dest>
+  <voice>
+    *: "Назад"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Додај"
+  </dest>
+  <voice>
+    *: "Додај"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Притисните LEFT за прекид."
+    android,hifietma*,zenvision: "Притисните BACK за прекид."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Притисните POWER за прекид."
+    ihifi760,ihifi960: "Дупли тап RETURN за прекид."
+    ihifi770,ihifi770c,ihifi800: "Притисните HOME за прекид."
+    iriverh10,samsungyh*: "Дупли тап LEFT за прекид."
+    mpiohd200: "Дупли тап REC за прекид."
+    mpiohd300: "Дупли тап MENU за прекид."
+    rx27generic: "Притисните VOLUME за прекид."
+    sonynwza860: "Мапе тастера нису комплетне."
+    touchscreen: "Притисните Middle Left за прекид."
+    vibe500: "Притисните PREV за прекид."
+    xduoox20,xduoox3,xduoox3ii: "Дупли тап HOME за прекид."
+  </dest>
+  <voice>
+    *: "Притисните LEFT за прекид."
+    android,hifietma*,zenvision: "Притисните BACK за прекид."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Притисните POWER за прекид."
+    ihifi760,ihifi960: "Дупли тап RETURN за прекид."
+    ihifi770,ihifi770c,ihifi800: "Притисните HOME за прекид."
+    iriverh10,samsungyh*: "Дупли тап LEFT за прекид."
+    mpiohd200: "Дупли тап REC за прекид."
+    mpiohd300: "Дупли тап MENU за прекид."
+    rx27generic: "Притисните VOLUME за прекид."
+    sonynwza860: "Мапе тастера нису комплетне."
+    touchscreen: "Притисните Middle Left за прекид."
+    vibe500: "Притисните PREV за прекид."
+    xduoox20,xduoox3,xduoox3ii: "Дупли тап HOME за прекид."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Преглед"
+  </dest>
+  <voice>
+    *: "Преглед"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Параметар"
+  </dest>
+  <voice>
+    *: "Параметар"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE
+  desc:
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Сачувај"
+  </dest>
+  <voice>
+    *: "Сачувај"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCEMENT_FMT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Announcement format"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Формат објаве"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Формат објаве"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_0
+  desc: CANCEL.
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Отказ"
+  </dest>
+  <voice>
+    *: "Отказ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Није додатак: %s"
+  </dest>
+  <voice>
+    *: "Није додатак"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_ON
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce on"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Објављивање укључено"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Објављивање укључено"
   </voice>
 </phrase>
