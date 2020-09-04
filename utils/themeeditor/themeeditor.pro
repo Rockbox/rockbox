@@ -1,8 +1,8 @@
 # Setting the binary name
 TARGET = rbthemeeditor
 VERSION = 0.5
-CONFIG(debug) { 
-    REVISION = $$system(svnversion)
+CONFIG(debug) {
+    REVISION = $$system(git rev-parse --verify --short=10 HEAD)
     VERSION = $$join(VERSION,,,r)
     VERSION = $$join(VERSION,,,$$REVISION)
 }
@@ -34,14 +34,14 @@ INCLUDEPATH += graphics
 INCLUDEPATH += quazip
 INCLUDEPATH += qtfindreplacedialog
 DEFINES += FINDREPLACE_NOLIB
-cross { 
+cross {
     message("Crossbuilding for W32 binary")
-    
+
     # retrieve ar binary for w32 cross compile. This might be specific to
     # Fedora mingw32 packages of Qt. Using member() here is needed because at
     # least the F13 packages add ar options to the variable.
     CROSSOPTIONS += AR=$$member(QMAKE_LIB) TARGETPLATFORM=\"MinGW\"
-    
+
     # make sure we use the correct subsystem to prevent a console window coming up.
     LIBS += -Wl,-subsystem,windows
 }
@@ -202,7 +202,7 @@ FORMS += gui/editorwindow.ui \
     gui/rbconsole.ui
 RESOURCES += resources.qrc
 win32:RC_FILE = themeeditor.rc
-macx { 
+macx {
     QMAKE_MAC_SDK = /Developer/SDKs/MacOSX10.4u.sdk
     QMAKE_LFLAGS_PPC = -mmacosx-version-min=10.4 \
         -arch \
