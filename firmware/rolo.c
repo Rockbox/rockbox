@@ -148,13 +148,31 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
                   long length)
 {
     long i;
+    const unsigned char* localsource = source;
     unsigned char* localdest = dest;
+
+    unsigned long sum;
+    unsigned long cksum = 0xB161;
 
     /* This is the equivalent of a call to memcpy() but this must be done from
        iram to avoid overwriting itself and we don't want to depend on memcpy()
        always being in iram */
     for(i = 0;i < length;i++)
-        *localdest++ = *source++;
+    {
+        cksum += dest[i];
+        *localdest++ = *localsource++;
+    }
+    sum = cksum;
+
+    cksum = 0xB161;
+    for(i = 0;i < length;i++)
+        cksum += source[i];
+
+    if (sum != cksum)
+    {
+        return;
+    }
+
 
 #if defined(CPU_COLDFIRE)
     asm (
@@ -280,10 +298,10 @@ int rolo_load(const char* filename)
     storage_flush();
 #endif
 
-    lcd_puts(0, 1, "Executing");
+    lcd_puts(0, 1, "Preparing");
     lcd_update();
 #ifdef HAVE_REMOTE_LCD
-    lcd_remote_puts(0, 1, "Executing");
+    lcd_remote_puts(0, 1, "Preparing");
     lcd_remote_update();
 #endif
     adc_close();
@@ -310,10 +328,17 @@ int rolo_load(const char* filename)
 #endif
 #endif /* CONFIG_CPU == IMX31L */
 
+    lcd_puts(0, 1, "Executing");
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_puts(0, 1, "Executing");
+    lcd_remote_update();
+#endif
+
     rolo_restart(filebuf, ramstart, length);
 
-    /* never reached */
-    return 0;
+    rolo_error("!BADMEMCPY!");
+    return -1;
 }
 #endif /* CPU_COLDFIRE | CPU_ARM | CPU_MIPS  */
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
