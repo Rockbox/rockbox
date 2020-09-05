@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "jz4740.h"
 #include "r61509.h"
@@ -36,7 +36,7 @@ do {                                    \
     REG_GPIO_PXPES(2)  = 0x001cffff;    \
 } while (0)
 
-#define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) asm volatile("nop\n nop\n"); }
+#define SLEEP(x) { register int __i; for(__i=0; __i<x; __i++) asm volatile("ssnop\n ssnop\n"); }
 #define DELAY    SLEEP(700000);
 
 #if ((defined(ONDA_VX777) || defined(ONDA_VX747P)) && !defined(BOOTLOADER)) \

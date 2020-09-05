@@ -36,12 +36,12 @@
     __asm__ __volatile__(                  \
     "    .set    push               \n"    \
     "    .set    noreorder          \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
-    "    nop                        \n"    \
+    "    ssnop                      \n"    \
+    "    ssnop                      \n"    \
+    "    ssnop                      \n"    \
+    "    ssnop                      \n"    \
+    "    ssnop                      \n"    \
+    "    ssnop                      \n"    \
     "    .set    pop                \n");
 
 #define DEFAULT_PAGE_SHIFT       PL_4K
@@ -137,16 +137,16 @@ void mmu_init(void)
 #if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
 #define INVALIDATE_BTB()                     \
 do {                                         \
-        unsigned long tmp;                   \
+        register unsigned long tmp;          \
         __asm__ __volatile__(                \
         "    .set push            \n"        \
         "    .set noreorder       \n"        \
         "    .set mips32          \n"        \
         "    mfc0 %0, $16, 7      \n"        \
-        "    nop                  \n"        \
+        "    ssnop                \n"        \
         "    ori  %0, 2           \n"        \
         "    mtc0 %0, $16, 7      \n"        \
-        "    nop                  \n"        \
+        "    ssnop                \n"        \
         "    .set pop             \n"        \
         : "=&r"(tmp));                       \
     } while (0)
@@ -178,7 +178,7 @@ void commit_dcache(void) __attribute__((alias("commit_discard_dcache")));
 /* Writeback whole D-cache and invalidate D-cache lines */
 void commit_discard_dcache(void)
 {
-    unsigned int i;
+    register unsigned int i;
 
     /* Use index type operation and iterate whole cache */
     for (i=A_K0BASE; i<A_K0BASE+CACHE_SIZE; i+=CACHEALIGN_SIZE)
@@ -192,7 +192,7 @@ void commit_discard_dcache(void)
  */
 void commit_discard_dcache_range(const void *base, unsigned int size)
 {
-    char *s;
+    register char *s;
 
     for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
         __CACHE_OP(DCHitWBInv, s);
@@ -204,7 +204,7 @@ void commit_discard_dcache_range(const void *base, unsigned int size)
  */
 void commit_dcache_range(const void *base, unsigned int size)
 {
-    char *s;
+    register char *s;
 
     for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
         __CACHE_OP(DCHitWB, s);
@@ -217,7 +217,7 @@ void commit_dcache_range(const void *base, unsigned int size)
  */
 void discard_dcache_range(const void *base, unsigned int size)
 {
-    char *s;
+    register char *s;
 
     if (((int)base & CACHEALIGN_SIZE - 1) ||
 	(((int)base + size) & CACHEALIGN_SIZE - 1)) {
@@ -235,7 +235,7 @@ void discard_dcache_range(const void *base, unsigned int size)
 /* Invalidate whole I-cache */
 static void discard_icache(void)
 {
-    unsigned int i;
+    register unsigned int i;
 
     asm volatile (".set   push       \n"
                   ".set   noreorder  \n"

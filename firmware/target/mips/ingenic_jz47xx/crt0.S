@@ -108,7 +108,7 @@ _cache_loop:
     cache   0x9, 0(t0)       # index store dcache tag
     addiu   t0, t0, 0x20     # 32 bytes per cache line
     bne     t0, t1, _cache_loop
-    nop
+    ssnop
 
     /*
       ----------------------------------------------------
@@ -116,10 +116,10 @@ _cache_loop:
       ----------------------------------------------------
     */
     mfc0    t0, C0_CONFIG
-    nop
+    ssnop
     ori     t0, 2
     mtc0    t0, C0_CONFIG
-    nop
+    ssnop
 
     /*
       ----------------------------------------------------
@@ -183,9 +183,9 @@ _irq_stack_loop:
       ----------------------------------------------------
     */
     jal     system_main  /* Init clocks etc first */
-    nop
+    ssnop
     j       main
-    nop
+    ssnop
 
 
     /*
@@ -197,19 +197,19 @@ _irq_stack_loop:
 
     .section .vectors.1, "ax", %progbits
     j      tlb_refill_handler
-    nop
+    ssnop
 
     .section .vectors.2, "ax", %progbits
     j      real_exception_handler
-    nop
+    ssnop
 
     .section .vectors.3, "ax", %progbits
     j      real_exception_handler
-    nop
+    ssnop
 
     .section .vectors.4, "ax", %progbits
     j      real_exception_handler
-    nop
+    ssnop
 
     .section .vectors, "ax", %progbits
 real_exception_handler:
@@ -253,47 +253,47 @@ real_exception_handler:
     sw      v0, 0x68(sp)
     sw      $1, 0x6C(sp)
     mflo    k0
-    nop
+    ssnop
     sw      k0, 0x70(sp)
     mfhi    k0
-    nop
+    ssnop
     sw      k0, 0x74(sp)
     mfc0    k0, C0_STATUS
-    nop
-    nop
-    nop
+    ssnop
+    ssnop
+    ssnop
     sw      k0, 0x78(sp)
     mfc0    k0, C0_EPC
-    nop
-    nop
-    nop
+    ssnop
+    ssnop
+    ssnop
     sw      k0, 0x7C(sp)
 
     li      k1, M_CauseExcCode
     mfc0    k0, C0_CAUSE
     and     k0, k1
     beq     zero, k0, _int
-    nop
+    ssnop
     j       _exception
-    nop
+    ssnop
 
 _int:
     jal     intr_handler
-    nop
+    ssnop
     j       _exception_return
 
 _exception:
     move    a0, sp
     mfc0    a1, C0_CAUSE
-    nop
-    nop
-    nop
+    ssnop
+    ssnop
+    ssnop
     mfc0    a2, C0_EPC
-    nop
-    nop
-    nop
+    ssnop
+    ssnop
+    ssnop
     jal     exception_handler
-    nop
+    ssnop
 
 _exception_return:
     lw      ra,    0(sp)
@@ -326,23 +326,23 @@ _exception_return:
     lw      $1, 0x6C(sp)
     lw      k0, 0x70(sp)
     mtlo    k0
-    nop
+    ssnop
     lw      k0, 0x74(sp)
     mthi    k0
-    nop
+    ssnop
     lw      k0, 0x78(sp)
     mtc0    k0, C0_STATUS
-    nop
-    nop
-    nop
+    ssnop
+    ssnop
+    ssnop
     lw      k0, 0x7C(sp)
     mtc0    k0, C0_EPC
-    nop
-    nop
-    nop
+    ssnop
+    ssnop
+    ssnop
     /* Restore previous stack pointer */
     lw      sp, 0x80(sp)
     eret
-    nop
+    ssnop
     .set reorder
     .set at
