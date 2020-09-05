@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d9036020_f323b784",
+        "filename": "firmware/rolo.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-09-05T03:25:21Z",
+      "side": 1,
+      "message": "you\u0027re computing the destination checksum before you write to the destination...",
+      "range": {
+        "startLine": 164,
+        "startChar": 0,
+        "endLine": 165,
+        "endChar": 38
+      },
+      "revId": "448c49389766f847c8047bf34275330b2c4e78e0",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
