@@ -78,7 +78,8 @@ static void surround_buffer_free(void)
 
 static void dsp_surround_flush(void)
 {
-    memset(core_get_data(handle), 0, SURROUND_BUFSIZE);
+    if (handle >= 0)
+        memset(core_get_data(handle), 0, SURROUND_BUFSIZE);
 }
 
 static void surround_update_filter(unsigned int fout)
@@ -121,7 +122,7 @@ void dsp_surround_set_cutoff(int frq_l, int frq_h)
 
 static void surround_set_stepsize(int surround_strength)
 {
-    if (handle > 0)
+    if (handle >= 0)
         dsp_surround_flush();
 
     switch(surround_strength)
