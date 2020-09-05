@@ -737,7 +737,7 @@ void system_exception_wait(void)
     {
         if( (~REG_GPIO_PXPIN(0)) & (1 << 30) )
             return;
-        asm volatile("nop");
+        asm volatile("ssnop");
     }
 }
 

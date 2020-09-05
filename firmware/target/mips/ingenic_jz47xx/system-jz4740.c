@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "jz4740.h"
 #include "mips.h"
@@ -165,9 +165,9 @@ static int get_irq_number(void)
 {
     static unsigned long ipl;
     register int irq;
-    
+
     ipl |= REG_INTC_IPR;
-    
+
     if (UNLIKELY(ipl == 0))
         return -1;
 
@@ -180,7 +180,7 @@ static int get_irq_number(void)
                          : "r" (ipl)
                          : "t0"
                         );
-    
+
     if (UNLIKELY(irq < 0))
         return -1;
 
@@ -213,7 +213,7 @@ void intr_handler(void)
     register int irq = get_irq_number();
     if(UNLIKELY(irq < 0))
         return;
-    
+
     ack_irq(irq);
     if(LIKELY(irq > 0))
         irqvector[irq-1]();
@@ -320,14 +320,14 @@ void dma_enable(void)
     if(++dma_count == 1)
     {
         __cpm_start_dmac();
-        
+
         REG_DMAC_DCCSR(0) = 0;
         REG_DMAC_DCCSR(1) = 0;
         REG_DMAC_DCCSR(2) = 0;
         REG_DMAC_DCCSR(3) = 0;
         REG_DMAC_DCCSR(4) = 0;
         REG_DMAC_DCCSR(5) = 0;
-        
+
         REG_DMAC_DMACR = (DMAC_DMACR_PR_RR | DMAC_DMACR_DMAE);
     }
 }
@@ -377,7 +377,7 @@ static void pll_init(void)
         (0 << CPM_CPPCR_PLLN_BIT) |     /* RD=0, NR=2 */
         (0 << CPM_CPPCR_PLLOD_BIT) |    /* OD=0, NO=1 */
         (0x20 << CPM_CPPCR_PLLST_BIT) | /* PLL stable time */
-        CPM_CPPCR_PLLEN;                /* enable PLL */          
+        CPM_CPPCR_PLLEN;                /* enable PLL */
 
     /* init PLL */
     REG_CPM_CPCCR = cfcr;
@@ -539,7 +539,7 @@ void system_reboot(void)
     REG_WDT_TDR = JZ_EXTAL/1000;   /* reset after 4ms */
     REG_TCU_TSCR = TCU_TSSR_WDTSC; /* enable wdt clock */
     REG_WDT_TCER = WDT_TCER_TCEN;  /* wdt start */
-    
+
     while (1);
 }
 
@@ -550,7 +550,7 @@ void system_exception_wait(void)
     {
         if( (~REG_GPIO_PXPIN(3)) & (1 << 29) )
             return;
-        asm volatile("nop");
+        asm volatile("ssnop");
     }
 }
 
@@ -558,7 +558,7 @@ void power_off(void)
 {
     /* Enable RTC clock */
     __cpm_start_rtc();
-    
+
     /* Put system into hibernate mode */
     __rtc_clear_alarm_flag();
     __rtc_clear_hib_stat_all();
@@ -567,7 +567,7 @@ void power_off(void)
     __rtc_set_hrcr_val(0xFE0);
     __rtc_set_hwfcr_val(0xFFFF << 4);
     __rtc_power_down();
-    
+
     while(1);
 }
 

@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "jz4740.h"
 #include "lcd.h"
@@ -37,7 +37,7 @@ do {                                       \
 } while (0)
 
 
-#define SLEEP(x) for(i=0; i<x; i++) asm volatile("nop\n nop\n");
+#define SLEEP(x) for(i=0; i<x; i++) asm volatile("ssnop\n ssnop\n");
 #define DELAY    SLEEP(700000);
 static void _display_pin_init(void)
 {
@@ -48,10 +48,10 @@ static void _display_pin_init(void)
     __gpio_as_output(PIN_CS_N);
     __gpio_as_output(PIN_RESET_N);
     DELAY; /* delay_ms(10); */
-    
+
     __gpio_clear_pin(PIN_CS_N);
     DELAY; /* delay_ms(10); */
-    
+
     __gpio_set_pin(PIN_RESET_N);
     DELAY; /* delay_ms(10); */
     __gpio_clear_pin(PIN_RESET_N);
@@ -80,13 +80,13 @@ static void _display_pin_init(void)
 static void _display_init(void)
 {
     int i;
-    
+
     SLCD_SEND_COMMAND(0xE3, 0x8);
     SLCD_SEND_COMMAND(0xE4, 0x1411);
     SLCD_SEND_COMMAND(0xE5, 0x8000);
     SLCD_SEND_COMMAND(0x0, 0x1);
     DELAY; /* delay_ms(10); */
-    
+
     SLCD_SEND_COMMAND(0x1, 0x100);
     SLCD_SEND_COMMAND(0x2, 0x400);
     SLCD_SEND_COMMAND(0x3, 0x1028);
@@ -139,7 +139,7 @@ static void _display_init(void)
     SLCD_SEND_COMMAND(0x97, 0);
     SLCD_SEND_COMMAND(0x98, 0);
     SLCD_SEND_COMMAND(0x7, 0x173);
-    
+
     __gpio_clear_pin(PIN_UNK_N);
     SLCD_SET_COMMAND(0x22);
     WAIT_ON_SLCD;
@@ -158,7 +158,7 @@ static void _set_lcd_bus(void)
 {
     REG_LCD_CFG &= ~LCD_CFG_LCDPIN_MASK;
     REG_LCD_CFG |= LCD_CFG_LCDPIN_SLCD;
-    
+
     REG_SLCD_CFG = (SLCD_CFG_BURST_4_WORD | SLCD_CFG_DWIDTH_18 | SLCD_CFG_CWIDTH_18BIT
                    | SLCD_CFG_CS_ACTIVE_LOW | SLCD_CFG_RS_CMD_LOW | SLCD_CFG_CLK_ACTIVE_FALLING
                    | SLCD_CFG_TYPE_PARALLEL);
@@ -167,15 +167,15 @@ static void _set_lcd_bus(void)
 static void _set_lcd_clock(void)
 {
     unsigned int val;
-    
+
     __cpm_stop_lcd();
-    
+
     val = __cpm_get_pllout2() / LCD_PCLK;
     val--;
     if ( val > 0x1ff )
         val = 0x1ff; /* CPM_LPCDR is too large, set it to 0x1ff */
     __cpm_set_pixdiv(val);
-    
+
     __cpm_start_lcd();
 }
 
@@ -196,7 +196,7 @@ void lcd_set_target(int x, int y, int width, int height)
     SLCD_SEND_COMMAND(0x52, x);
     SLCD_SEND_COMMAND(0x53, x+width-1);
     /* TODO */
-    
+
     __gpio_clear_pin(PIN_UNK_N);
     SLCD_SET_COMMAND(0x22);
     WAIT_ON_SLCD;
