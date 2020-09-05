@@ -70,6 +70,10 @@ extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume
 
 #define IRQ0_EDGE_TRIGGER 0x80
 
+/* define ROLO_CHECKSUM_SEED to sanity check the firmware copy to ram */
+#define ROLO_CHECKSUM_SEED 0xEE0B160F
+
+
 static int rolo_handle;
 #ifdef CPU_PP
 /* Handle the COP properly - it needs to jump to a function outside SDRAM while
@@ -148,13 +152,32 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
                   long length)
 {
     long i;
+    const unsigned char* localsource = source;
     unsigned char* localdest = dest;
 
+#ifdef ROLO_CHECKSUM_SEED
+    unsigned long cksum_s = ROLO_CHECKSUM_SEED;
+    unsigned long cksum_d = ROLO_CHECKSUM_SEED;
+
+    for(i = 0;i < length;i++)
+    {
+        cksum_d += dest[i];
+        *localdest++ = *localsource++;
+        cksum_s += source[i];
+    }
+
+    if (cksum_d != cksum_s)
+        return;
+#else
     /* This is the equivalent of a call to memcpy() but this must be done from
        iram to avoid overwriting itself and we don't want to depend on memcpy()
        always being in iram */
     for(i = 0;i < length;i++)
-        *localdest++ = *source++;
+    {
+        *localdest++ = *localsource++;
+    }
+
+#endif /* def ROLO_CHECKSUM_SEED */
 
 #if defined(CPU_COLDFIRE)
     asm (
@@ -280,10 +303,10 @@ int rolo_load(const char* filename)
     storage_flush();
 #endif
 
-    lcd_puts(0, 1, "Executing");
+    lcd_puts(0, 1, "Preparing");
     lcd_update();
 #ifdef HAVE_REMOTE_LCD
-    lcd_remote_puts(0, 1, "Executing");
+    lcd_remote_puts(0, 1, "Preparing");
     lcd_remote_update();
 #endif
     adc_close();
@@ -310,10 +333,17 @@ int rolo_load(const char* filename)
 #endif
 #endif /* CONFIG_CPU == IMX31L */
 
+    lcd_puts(0, 1, "Executing");
+    lcd_update();
+#ifdef HAVE_REMOTE_LCD
+    lcd_remote_puts(0, 1, "Executing");
+    lcd_remote_update();
+#endif
+
     rolo_restart(filebuf, ramstart, length);
 
-    /* never reached */
-    return 0;
+    rolo_error("!BADMEMCPY!");
+    return -1;
 }
 #endif /* CPU_COLDFIRE | CPU_ARM | CPU_MIPS  */
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
