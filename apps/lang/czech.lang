@@ -13316,7 +13316,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_TRACKONLY
+  id: LANG_TRACK
   desc: used in track x of y constructs
   user: core
   <source>
@@ -13367,12 +13367,12 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_WPS_ANNOUNCEMENT_FORMAT
+  id: LANG_ANNOUNCEMENT_FMT
   desc: format for wps hotkey announcement
   user: core
   <source>
     *: none
-    hotkey: "WPS Announcement"
+    hotkey: "Announcement format"
   </source>
   <dest>
     *: none
@@ -13384,12 +13384,12 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMAINING
+  id: LANG_REMAIN
   desc: for constructs such as number of tracks remaining etc
   user: core
   <source>
     *: none
-    hotkey: "Remaining"
+    hotkey: "Remain"
   </source>
   <dest>
     *: none
