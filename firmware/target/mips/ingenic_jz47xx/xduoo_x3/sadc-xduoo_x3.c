@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2016 by Roman Stolyarov
+ * Copyright (C) 2020 by William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,7 +39,7 @@
 #define PIN_KEY_INT   (32*4+13)
 #define KEY_INT_IRQ   GPIO141
 
-#define PIN_KEY_BOP (32*3+17) /* Back Option Play */
+#define PIN_COM_BOP (32*3+17) /* common pin for Back Option Play */
 
 #define PIN_CHARGE_CON (32*1+7)
 
@@ -50,9 +51,11 @@
 #define IRQ_LO_DECT   GPIO_IRQ(PIN_LO_DECT)
 #define GPIO_LO_DECT  GPIO44
 
-/*#define ENABLE_BUTTON_COMBOS*/
+#define KEY_IS_DOWN(pin) (__gpio_get_pin(pin) == 0)
 
-static volatile unsigned short bat_val,key_val;
+#define ADC_MASK  0x0FFF
+
+static volatile unsigned short bat_val, key_val;
 
 bool headphones_inserted(void)
 {
@@ -68,7 +71,7 @@ bool lineout_inserted(void)
 
 void button_init_device(void)
 {
-    key_val = 0xfff;
+    key_val = ADC_MASK;
 
     __gpio_as_input(PIN_BTN_POWER);
     __gpio_as_input(PIN_BTN_HOLD);
@@ -76,21 +79,15 @@ void button_init_device(void)
     __gpio_disable_pull(PIN_BTN_POWER);
     __gpio_disable_pull(PIN_BTN_HOLD);
 
-#ifdef ENABLE_BUTTON_COMBOS
-    __gpio_as_output(PIN_KEY_BOP);
-    __gpio_disable_pull(PIN_KEY_BOP);
-    __gpio_clear_pin(PIN_KEY_BOP);
-#endif
-
     __gpio_as_irq_fall_edge(PIN_KEY_INT);
-    __gpio_enable_pull(PIN_KEY_INT);
+    __gpio_disable_pull(PIN_KEY_INT);
     system_enable_irq(GPIO_IRQ(PIN_KEY_INT));
 
     __gpio_set_pin(PIN_CHARGE_CON); /* 0.7 A */
     __gpio_as_output(PIN_CHARGE_CON);
 
     __gpio_as_input(PIN_PH_DECT);
-    __gpio_disable_pull(PIN_PH_DECT);
+    /*__gpio_disable_pull(PIN_PH_DECT); // Spurious Detections */
 
     __gpio_as_input(PIN_LO_DECT);
     __gpio_disable_pull(PIN_LO_DECT);
@@ -98,63 +95,54 @@ void button_init_device(void)
 
 bool button_hold(void)
 {
-    return (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
+    bool hold_button = __gpio_get_pin(PIN_BTN_HOLD) == 1;
+#ifndef BOOTLOADER
+    static bool hold_button_old = false;
+    if (hold_button != hold_button_old)
+    {
+        hold_button_old = hold_button;
+        backlight_hold_changed(hold_button);
+    }
+#endif
+    return hold_button;
 }
 
 /* NOTE:  Due to how this is wired, button combinations are not allowed
    unless one of the two buttons is the POWER
-   ENABLE_BUTTON_COMBOS when defined also  allows 'Back, Option, Play'
 */
 int button_read_device(void)
 {
     int btn = BUTTON_NONE;
-#ifndef BOOTLOADER
-    static bool hold_button = false;
-    bool hold_button_old;
+    unsigned short key = (key_val & ADC_MASK);
 
-    hold_button_old = hold_button;
-    hold_button = (__gpio_get_pin(PIN_BTN_HOLD) ? true : false);
-
-    if (hold_button != hold_button_old) {
-        backlight_hold_changed(hold_button);
-    }
-    if (hold_button) {
+    if (button_hold())
         return BUTTON_NONE;
-    }
-#endif
 
-    bool gpio_btn = (__gpio_get_pin(PIN_BTN_POWER) ? false : true);
-    if (gpio_btn)
+    if (KEY_IS_DOWN(PIN_BTN_POWER))
         btn |= BUTTON_POWER;
 
-#ifdef ENABLE_BUTTON_COMBOS
-    if (__gpio_get_pin(PIN_KEY_INT) && (!__gpio_get_pin(PIN_KEY_BOP)))
-#else
-    if (__gpio_get_pin(PIN_KEY_INT))
-#endif
-    {
+    if (!KEY_IS_DOWN(PIN_KEY_INT))
         return btn;
-    }
 
-    if (key_val < 261)
+    if (key < 261)
         btn |= BUTTON_VOL_UP;
     else
-    if (key_val < 653)
+    if (key < 653)
         btn |= BUTTON_VOL_DOWN;
     else
-    if (key_val < 1101)
+    if (key < 1101)
         btn |= BUTTON_PREV;
     else
-    if (key_val < 1498)
+    if (key < 1498)
         btn |= BUTTON_NEXT;
     else
-    if (key_val < 1839)
+    if (key < 1839)
         btn |= BUTTON_PLAY;
     else
-    if (key_val < 2213)
+    if (key < 2213)
         btn |= BUTTON_OPTION;
     else
-    if (key_val < 2600)
+    if (key < 2600)
         btn |= BUTTON_HOME;
 
     return btn;
@@ -163,15 +151,9 @@ int button_read_device(void)
 /* called on button press interrupt */
 void KEY_INT_IRQ(void)
 {
-
     /* Don't initiate a new request if we have one pending */
-    if(!(REG_SADC_ADENA & (ADENA_AUXEN))
-#ifdef ENABLE_BUTTON_COMBOS
-       && (!__gpio_get_pin(PIN_KEY_BOP))
-#endif
-   ){
+    if(!(REG_SADC_ADENA & (ADENA_AUXEN)))
         REG_SADC_ADENA |= ADENA_AUXEN;
-    }
 }
 
 /* Notes on batteries
@@ -217,17 +199,22 @@ int _battery_voltage(void)
 {
     static long last_tick = 0;
 
-    if (TIME_AFTER(current_tick, last_tick + BATT_WAIT_TIME))
+    if (TIME_AFTER(current_tick, last_tick) && REG_SADC_ADENA == 0)
     {
         last_tick = current_tick;
-        REG_SADC_ADENA |= ADENA_VBATEN;
         __intc_mask_irq(IRQ_SADC);
-        while ((REG_SADC_ADENA & ADENA_VBATEN) &&
+        REG_SADC_ADENA |= ADENA_VBATEN;
+        /* poll for value from our context instead of ISR */
+        while (!(REG_SADC_ADSTATE & ADCTRL_VRDYM) &&
                TIME_BEFORE(current_tick, last_tick + HZ / 20))
             ;;
-        __intc_unmask_irq(IRQ_SADC);
-        if (!(REG_SADC_ADENA & ADENA_VBATEN))
+        if ((REG_SADC_ADSTATE & ADCTRL_VRDYM))
+        {
+            last_tick += BATT_WAIT_TIME;
             bat_val = REG_SADC_ADVDAT;
+            REG_SADC_ADSTATE &= ADCTRL_VRDYM; /* clear ready bit by writing 1*/
+        }
+        __intc_unmask_irq(IRQ_SADC);
     }
 
     return (bat_val*BATTERY_SCALE_FACTOR)>>10;
@@ -240,10 +227,10 @@ int _battery_voltage(void)
 */
 void adc_init(void)
 {
-    bat_val = 0xfff;
+    bat_val = ADC_MASK;
 
     __cpm_start_sadc();
-    mdelay(10);
+    mdelay(20);
     REG_SADC_ADENA = 0; /* Power Up */
     mdelay(70);
     REG_SADC_ADSTATE = 0;
@@ -266,7 +253,6 @@ void SADC(void)
 {
     unsigned char state;
     unsigned char sadcstate;
-
     sadcstate = REG_SADC_ADSTATE;
     state = REG_SADC_ADSTATE & (~REG_SADC_ADCTRL);
     REG_SADC_ADSTATE &= sadcstate;
@@ -274,30 +260,10 @@ void SADC(void)
     if(state & ADCTRL_ARDYM)
     {
         key_val = REG_SADC_ADADAT;
-#ifdef ENABLE_BUTTON_COMBOS
-        __gpio_mask_irq(PIN_KEY_INT);
-        __gpio_clear_pin(PIN_KEY_BOP);
-        __gpio_unmask_irq(PIN_KEY_INT);
-#endif
-
-        if (!__gpio_get_pin(PIN_KEY_INT)) /* key(s) are down kick off another read */
-        {
-#ifdef ENABLE_BUTTON_COMBOS
-            /* setting bit high removes BOP from ADC circuit*/
-            __gpio_set_pin(PIN_KEY_BOP);
-#endif
+        if (KEY_IS_DOWN(PIN_KEY_INT)) /* key(s) are down kick off another read */
             REG_SADC_ADENA = ADENA_AUXEN;
-        }
-#ifdef ENABLE_BUTTON_COMBOS
-        else
-        {
-            __gpio_mask_irq(PIN_KEY_INT);
-            __gpio_clear_pin(PIN_KEY_BOP);
-            __gpio_unmask_irq(PIN_KEY_INT);
-        }
-#endif
     }
-    if(state & ADCTRL_VRDYM)
+    else if(UNLIKELY(state & ADCTRL_VRDYM))
     {
         bat_val = REG_SADC_ADVDAT;
     }
