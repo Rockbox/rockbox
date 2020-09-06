@@ -28,7 +28,7 @@
 #include "kernel.h"
 #include "power.h"
 
-//#define USE_HW_UDELAY  // This is BROKEN.
+#define HW_UDELAY_TIMER 3
 #ifdef BOOTLOADER
 #define WITH_SERIAL
 #endif
@@ -341,28 +341,35 @@ void tlb_refill_handler(void)
     panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
 }
 
-#ifdef USE_HW_UDELAY
+#ifdef HW_UDELAY_TIMER
 /* This enables the HW timer, set to EXT_XTAL / 4 (so @ 12/4 = 3MHz, 1 us = 3 ticks) */
 static void init_delaytimer(void)
 {
-    __tcu_disable_ost();
-    REG_OST_OSTCSR = OSTCSR_EXT_EN | OSTCSR_PRESCALE4 |  OSTCSR_CNT_MD;
-    REG_OST_OSTCNT = 0;
-    REG_OST_OSTDR = 0;
-    __tcu_enable_ost();
+    __tcu_stop_counter(HW_UDELAY_TIMER);
+    __tcu_disable_pwm_output(HW_UDELAY_TIMER);
+    __tcu_select_extalclk(HW_UDELAY_TIMER);
+    __tcu_clear_half_match_flag(HW_UDELAY_TIMER);
+    __tcu_clear_full_match_flag(HW_UDELAY_TIMER);
+    __tcu_mask_half_match_irq(HW_UDELAY_TIMER);
+    __tcu_mask_full_match_irq(HW_UDELAY_TIMER);
+    __tcu_select_clk_div4(HW_UDELAY_TIMER);
+    REG_TCU_TCNT(HW_UDELAY_TIMER) = 0;
+    REG_TCU_TDFR(HW_UDELAY_TIMER) = 0xffff;  /* wraps at 21.845ms */
+    __tcu_start_counter(HW_UDELAY_TIMER);
 }
 
-void udelay(unsigned int usec)
+void udelay(unsigned int usec) /* Must be under 21845 us! */
 {
-    if (!__tcu_ost_enabled())
+    if (!__tcu_counter_enabled(HW_UDELAY_TIMER))
 	init_delaytimer();
 
-    unsigned int now = REG_OST_OSTCNT;
+    unsigned short start = REG_TCU_TCNT(HW_UDELAY_TIMER);
 
     /* Figure out how many ticks we need */
     usec = (CFG_EXTAL / (4 * 1000 * 1000)) * (usec + 1);
 
-    while (REG_OST_OSTCNT - now < usec) {  }
+    while (((REG_TCU_TCNT(HW_UDELAY_TIMER) - start) & 0xffff) < usec) { }
+    // while (start + usec < REG_TCU_TCNT(HW_UDELAY_TIMER)) { };
 }
 #else
 void udelay(unsigned int usec)
@@ -681,7 +688,7 @@ void ICODE_ATTR system_main(void)
     for(i=0; i<IRQ_INTC_MAX; i++)
         dis_irq(i);
 
-#ifdef USE_HW_UDELAY
+#ifdef HW_UDELAY_TIMER
     init_delaytimer();
 #endif
 
