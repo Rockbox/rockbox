@@ -18,16 +18,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "config.h"
 #include "cpu.h"
 #include "system.h"
 #include "timer.h"
 
+#define TIMER_ID 5
+
 /* Interrupt handler */
 void TCU1(void)
 {
-    __tcu_clear_full_match_flag(5);
+    __tcu_clear_full_match_flag(TIMER_ID);
 
     if (pfn_timer != NULL)
         pfn_timer();
@@ -56,24 +58,24 @@ bool timer_set(long cycles, bool start)
 
     old_irq = disable_irq_save();
 
-    __tcu_stop_counter(5);
+    __tcu_stop_counter(TIMER_ID);
     if(start)
     {
-        __tcu_disable_pwm_output(5);
+        __tcu_disable_pwm_output(TIMER_ID);
 
-        __tcu_mask_half_match_irq(5); 
-        __tcu_unmask_full_match_irq(5);
+        __tcu_mask_half_match_irq(TIMER_ID);
+        __tcu_unmask_full_match_irq(TIMER_ID);
 
         /* EXTAL clock = CFG_EXTAL (12Mhz in most targets) */
-        __tcu_select_extalclk(5);
+        __tcu_select_extalclk(TIMER_ID);
     }
 
-    REG_TCU_TCSR(5) = (REG_TCU_TCSR(5) & ~TCSR_PRESCALE_MASK) | (prescaler_bit << TCSR_PRESCALE_LSB);
-    REG_TCU_TCNT(5) = 0;
-    REG_TCU_TDHR(5) = 0;
-    REG_TCU_TDFR(5) = divider;
+    REG_TCU_TCSR(TIMER_ID) = (REG_TCU_TCSR(TIMER_ID) & ~TCSR_PRESCALE_MASK) | (prescaler_bit << TCSR_PRESCALE_LSB);
+    REG_TCU_TCNT(TIMER_ID) = 0;
+    REG_TCU_TDHR(TIMER_ID) = 0;
+    REG_TCU_TDFR(TIMER_ID) = divider;
 
-    __tcu_clear_full_match_flag(5);
+    __tcu_clear_full_match_flag(TIMER_ID);
 
     if(start)
     {
@@ -81,14 +83,14 @@ bool timer_set(long cycles, bool start)
     }
 
     restore_irq(old_irq);
-    __tcu_start_counter(5);
+    __tcu_start_counter(TIMER_ID);
 
     return true;
 }
 
 bool timer_start(void)
 {
-    __tcu_start_counter(5);
+    __tcu_start_counter(TIMER_ID);
 
     return true;
 }
@@ -96,6 +98,6 @@ bool timer_start(void)
 void timer_stop(void)
 {
     unsigned int old_irq = disable_irq_save();
-    __tcu_stop_counter(5);
+    __tcu_stop_counter(TIMER_ID);
     restore_irq(old_irq);
 }
