@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2016 by Roman Stolyarov
+ * Copyright (C) 2020 by William Wilgus
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,6 +44,13 @@
 #define PIN_LCD_CS  (32*2+14)
 #define PIN_LCD_RES (32*2+18)
 #define PIN_LCD_WR  (32*2+19)
+
+ /* LCD_PINS_MASK D0-D7 RD DC CS RES WR */
+#define LCD_PINS_MASK 0x000C73FC
+ /* LCD_DATA_MASK D0-D7 */
+#define LCD_DATA_MASK 0x000030FC
+/* FRAMEBUF_TO_LCD_DATA -- translate data to match LCD data pins */
+#define FRAMEBUF_TO_LCD_DATA(b) (((b & 0xC0) << 6) | ((b & 0x3F) << 2))
 
 /* LCD setup codes */
 #define LCD_SET_LOWER_COLUMN_ADDRESS              ((char)0x00)
@@ -82,35 +90,37 @@
 
 #define LCD_COL_OFFSET 2 /* column offset */
 
-static inline void bitdelay(void)
-{
-    unsigned int i = 15;
-    __asm__ __volatile__ (
-                          ".set noreorder    \n"
-                          "1:                \n"
-                          "bne  %0, $0, 1b   \n"
-                          "addi %0, %0, -1   \n"
-                          ".set reorder      \n"
-                          : "=r" (i)
-                          : "0" (i)
-                          );
-}
+#define BITDELAY()                    \
+    do {                              \
+        volatile unsigned int i = 12; \
+        __asm__ __volatile__ (        \
+          ".set noreorder    \n"      \
+          "1:                \n"      \
+          "bne  %0, $0, 1b   \n"      \
+          "addi %0, %0, -1   \n"      \
+          ".set reorder      \n"      \
+          : "=r" (i)                  \
+          : "0" (i)                   \
+        );                            \
+    } while (0)
 
 void lcd_hw_init(void)
 {
-    REG_GPIO_PXFUNC(2) = 0x000C73FC; /* D0-D7 RD DC CS RES WR -- GPIO/INTERRUPT */
-    REG_GPIO_PXSELC(2) = 0x000C73FC; /* GPIO */
+    REG_GPIO_PXFUNC(2) = LCD_PINS_MASK; /* GPIO/INTERRUPT */
+    REG_GPIO_PXSELC(2) = LCD_PINS_MASK; /* GPIO */
 
-    REG_GPIO_PXPEC(2) = 0x000C73FC; /* ENABLE PULLUP*/
+    REG_GPIO_PXPEC(2) =  LCD_PINS_MASK; /* ENABLE PULLUP*/
+    REG_GPIO_PXDIRS(2) = LCD_PINS_MASK; /* OUTPUT */
 
-    REG_GPIO_PXDIRS(2) = 0x000C73FC; /* OUTPUT */
-    REG_GPIO_PXDATS(2) = 0x000C73FC; /* D0-D7 RD DC CS RES WR -- SET BIT */
+    REG_GPIO_PXDATS(2) = LCD_PINS_MASK; /* SET BIT */
+    REG_GPIO_PXSLS(2)  = LCD_PINS_MASK; /* slew -- fast rate */
 
-    REG_GPIO_PXSLC(2)  = 0x000C73FC; /* slew -- slow rate */
+    REG_GPIO_PXDS0C(2) = LCD_PINS_MASK; /* Low pin drive strength */
+    REG_GPIO_PXDS1C(2) = LCD_PINS_MASK;
+    REG_GPIO_PXDS2C(2) = LCD_PINS_MASK;
 
-    REG_GPIO_PXDS0C(2) = 0x000C73FC; /* Low pin drive strength */
-    REG_GPIO_PXDS1C(2) = 0x000C73FC;
-    REG_GPIO_PXDS2C(2) = 0x000C73FC;
+    __gpio_clear_pin(PIN_LCD_RD);       /* UNUSED */
+    __gpio_as_input(PIN_LCD_RD);        /* UNUSED */
 
     __gpio_clear_pin(PIN_BL_EN);
     __gpio_as_output(PIN_BL_EN);
@@ -125,26 +135,64 @@ void lcd_hw_init(void)
 void lcd_write_command(int byte)
 {
     __gpio_clear_pin(PIN_LCD_DC);
-    REG_GPIO_PXDATC(2) = 0x000030FC;
-    REG_GPIO_PXDATS(2) = ((byte & 0xC0) << 6) | ((byte & 0x3F) << 2);
+    REG_GPIO_PXDATC(2) = LCD_DATA_MASK;
+    REG_GPIO_PXDATS(2) = FRAMEBUF_TO_LCD_DATA(byte);
     __gpio_clear_pin(PIN_LCD_WR);
-    bitdelay();
+    BITDELAY();
     __gpio_set_pin(PIN_LCD_WR);
-    bitdelay();
+    BITDELAY();
+}
+
+static void lcd_write_cmd_triplet(int cmd1, int cmd2, int cmd3)
+{
+#if 0
+    lcd_write_command(cmd1);
+    lcd_write_command(cmd2);
+    lcd_write_command(cmd3);
+#else
+    int command = LCD_DATA_MASK;
+    __gpio_clear_pin(PIN_LCD_DC);
+
+    REG_GPIO_PXDATC(2) = command;
+    command = FRAMEBUF_TO_LCD_DATA(cmd1);
+    REG_GPIO_PXDATS(2) = command;
+    __gpio_clear_pin(PIN_LCD_WR);
+    BITDELAY();
+    __gpio_set_pin(PIN_LCD_WR);
+    BITDELAY();
+
+    REG_GPIO_PXDATC(2) = command;
+    command = FRAMEBUF_TO_LCD_DATA(cmd2);
+    REG_GPIO_PXDATS(2) = command;
+    __gpio_clear_pin(PIN_LCD_WR);
+    BITDELAY();
+    __gpio_set_pin(PIN_LCD_WR);
+    BITDELAY();
+
+    REG_GPIO_PXDATC(2) = command;
+    command = FRAMEBUF_TO_LCD_DATA(cmd3);
+    REG_GPIO_PXDATS(2) = command;
+    __gpio_clear_pin(PIN_LCD_WR);
+    BITDELAY();
+    __gpio_set_pin(PIN_LCD_WR);
+    BITDELAY();
+#endif
 }
 
 void lcd_write_data(const fb_data* p_bytes, int count)
 {
+    int data = LCD_DATA_MASK;
     __gpio_set_pin(PIN_LCD_DC);
     while (count--)
     {
-        REG_GPIO_PXDATC(2) = 0x000030FC;
-        REG_GPIO_PXDATS(2) = ((*p_bytes & 0xC0) << 6) | ((*p_bytes & 0x3F) << 2);
+        REG_GPIO_PXDATC(2) = data;
+        data = FRAMEBUF_TO_LCD_DATA(*p_bytes);
         p_bytes++;
+        REG_GPIO_PXDATS(2) = data;
         __gpio_clear_pin(PIN_LCD_WR);
-        bitdelay();
+        BITDELAY();
         __gpio_set_pin(PIN_LCD_WR);
-        bitdelay();
+        BITDELAY();
     }
 }
 
@@ -275,6 +323,7 @@ void lcd_enable(bool enable)
     {
         lcd_write_command(LCD_SET_DISPLAY_OFF);
         lcd_enable_power(enable);
+        REG_GPIO_PXDATC(2) = LCD_DATA_MASK;
     }
 }
 
@@ -296,7 +345,7 @@ void lcd_init_device(void)
 
     /* Set display clock and oscillator frequency */
     lcd_write_command(LCD_SET_DISPLAY_CLOCK_AND_OSC_FREQ);
-    lcd_write_command(0x80);
+    lcd_write_command(0x00); /* External clock Bits [0-3] for divider */
 
     /* Set multiplex ratio*/
     lcd_write_command(LCD_SET_MULTIPLEX_RATIO);
@@ -386,9 +435,12 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
     /* Copy display bitmap to hardware */
     while (bheight--)
     {
-        lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (column_high);
-        lcd_write_command (column_low);
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (by++ & 0xf)),
+            (column_high),
+            (column_low)
+        );
 
         lcd_write_data(data, width);
         data += stride;
@@ -405,6 +457,7 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count)
     unsigned long *lval = (unsigned long *)values;
     unsigned long *lpha = (unsigned long *)phases;
     const unsigned long mask = 0x80808080;
+    int data = LCD_DATA_MASK;
 
     __gpio_set_pin(PIN_LCD_DC);
     while(count--)
@@ -421,13 +474,13 @@ void lcd_grey_data(unsigned char *values, unsigned char *phases, int count)
         lpha[0] = lval[0] + (lpha[0] & ~mask);
         lpha[1] = lval[1] + (lpha[1] & ~mask);
 
-        REG_GPIO_PXDATC(2) = 0x000030FC;
-        REG_GPIO_PXDATS(2) = ((ltmp & 0xC0) << 6) | ((ltmp & 0x3F) << 2);
+        REG_GPIO_PXDATC(2) = data;
+        data = FRAMEBUF_TO_LCD_DATA(ltmp);
+        REG_GPIO_PXDATS(2) = data;
         __gpio_clear_pin(PIN_LCD_WR);
-        bitdelay();
+        BITDELAY();
         __gpio_set_pin(PIN_LCD_WR);
-        bitdelay();
-
+        /*BITDELAY(); //enough instructions above to satisfy data hold time */
         lpha+=2;
         lval+=2;
     }
@@ -450,9 +503,12 @@ void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,
     /* Copy display bitmap to hardware */
     while (bheight--)
     {
-        lcd_write_command (LCD_CNTL_PAGE | (by++ & 0xf));
-        lcd_write_command (column_high);
-        lcd_write_command (column_low);
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (by++ & 0xf)),
+            (column_high),
+            (column_low)
+        );
 
         lcd_grey_data(values, phases, width);
 
@@ -479,9 +535,12 @@ void lcd_update(void)
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_FBHEIGHT; y++)
     {
-        lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (column_high);
-        lcd_write_command (column_low);
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (y & 0xf)),
+            (column_high),
+            (column_low)
+        );
 
         lcd_write_data (FBADDR(0, y), LCD_WIDTH);
     }
@@ -530,9 +589,12 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
-        lcd_write_command (LCD_CNTL_PAGE | (y & 0xf));
-        lcd_write_command (column_high);
-        lcd_write_command (column_low);
+        lcd_write_cmd_triplet
+        (
+            (LCD_CNTL_PAGE | (y & 0xf)),
+            (column_high),
+            (column_low)
+        );
 
         lcd_write_data (FBADDR(x,y), width);
     }
