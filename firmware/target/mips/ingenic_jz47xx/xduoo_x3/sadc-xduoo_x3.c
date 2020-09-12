@@ -119,7 +119,12 @@ int button_read_device(void)
         return BUTTON_NONE;
 
     if (KEY_IS_DOWN(PIN_BTN_POWER))
-        btn |= BUTTON_POWER;
+    {
+        if (KEY_IS_DOWN(PIN_KEY_INT))
+            btn |= BUTTON_PWRALT;
+        else
+            btn |= BUTTON_POWER;
+    }
 
     if (!KEY_IS_DOWN(PIN_KEY_INT))
         return btn;

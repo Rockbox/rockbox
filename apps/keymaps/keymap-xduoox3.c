@@ -67,9 +67,9 @@ static const struct button_mapping button_context_wps[] = {
     { ACTION_WPS_QUICKSCREEN, BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
     { ACTION_WPS_HOTKEY,      BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
 
-    { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_POWER|BUTTON_NEXT,   BUTTON_POWER },
-    { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_POWER|BUTTON_PREV,   BUTTON_POWER },
-    { ACTION_WPS_ABRESET,           BUTTON_POWER|BUTTON_PLAY,   BUTTON_POWER },
+    { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_PWRALT|BUTTON_NEXT,   BUTTON_POWER },
+    { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_PWRALT|BUTTON_PREV,   BUTTON_POWER },
+    { ACTION_WPS_ABRESET,           BUTTON_PWRALT|BUTTON_PLAY,   BUTTON_POWER },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -173,10 +173,20 @@ static const struct button_mapping button_context_settings_vol_is_inc[] = {
 static const struct button_mapping button_context_tree[] = {
     { ACTION_TREE_WPS,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
     { ACTION_TREE_STOP,       BUTTON_POWER|BUTTON_REPEAT,       BUTTON_POWER },
-    { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
+    { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME},
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
+
+static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
+    { ACTION_NONE,           BUTTON_POWER,                             BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,    BUTTON_PWRALT|BUTTON_VOL_DOWN,               BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,    BUTTON_PWRALT|BUTTON_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,   BUTTON_PWRALT|BUTTON_VOL_UP,                 BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,   BUTTON_PWRALT|BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
+}; /* button_context_listtree_scroll_with_combo */
 
 /** Yes/No Screen **/
 static const struct button_mapping button_context_yesnoscreen[] = {
@@ -256,7 +266,10 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_vol_is_inc;
         case CONTEXT_TREE:
+                return button_context_listtree_scroll_with_combo;
         case CONTEXT_MAINMENU:
+            return button_context_tree;
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
         case CONTEXT_WPS:
             return button_context_wps;
