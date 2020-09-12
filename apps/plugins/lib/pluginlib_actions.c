@@ -447,8 +447,8 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_NONE},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == XDUOO_X3_PAD)
-    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
-    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
+    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,           BUTTON_POWER},
+    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,        BUTTON_NONE},
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
