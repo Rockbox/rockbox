@@ -21,6 +21,29 @@
 
 /* Button Code Definitions for xDuoo X3 target */
 
+
+/* NOTE X3 Button system
+ * The x3 has an interesting button layout. Multiple key presses are
+ * NOT supported unless [BUTTON_POWER] is one of the combined keys
+ * as you can imagine this causes problems as the power button takes
+ * precedence in the button system and initiates a shutdown if the
+ * key is held too long
+ * instead of BUTTON_POWER use BUTTON_PWRALT in combination with other keys
+ * IF using as a prerequsite button then BUTTON_POWER should be used
+ *
+ * Multiple buttons are emulated by button_read_device but there are a few
+ * caveats to be aware of:
+ *
+ * Button Order Matters!
+ *  different keys have different priorities, higher priority keys 'overide' the
+ *  lower priority keys
+ * VOLUP[7] VOLDN[6] PREV[5] NEXT[4] PLAY[3] OPTION[2] HOME[1]
+ *
+ * There will be no true release or repeat events, the user can let off the button
+ *  pressed initially and it will still continue to appear to be pressed as long as
+ *  the second key is held
+ * */
+
 #include "config.h"
 #include "action.h"
 #include "button.h"
@@ -67,9 +90,9 @@ static const struct button_mapping button_context_wps[] = {
     { ACTION_WPS_QUICKSCREEN, BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
     { ACTION_WPS_HOTKEY,      BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
 
-    { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_POWER|BUTTON_NEXT,   BUTTON_POWER },
-    { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_POWER|BUTTON_PREV,   BUTTON_POWER },
-    { ACTION_WPS_ABRESET,           BUTTON_POWER|BUTTON_PLAY,   BUTTON_POWER },
+    { ACTION_WPS_ABSETB_NEXTDIR,    BUTTON_PWRALT|BUTTON_NEXT,   BUTTON_POWER },
+    { ACTION_WPS_ABSETA_PREVDIR,    BUTTON_PWRALT|BUTTON_PREV,   BUTTON_POWER },
+    { ACTION_WPS_ABRESET,           BUTTON_PWRALT|BUTTON_PLAY,   BUTTON_POWER },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -173,10 +196,20 @@ static const struct button_mapping button_context_settings_vol_is_inc[] = {
 static const struct button_mapping button_context_tree[] = {
     { ACTION_TREE_WPS,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
     { ACTION_TREE_STOP,       BUTTON_POWER|BUTTON_REPEAT,       BUTTON_POWER },
-    { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
+    { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME},
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
+
+static const struct button_mapping button_context_listtree_scroll_with_combo[]  = {
+    { ACTION_NONE,           BUTTON_POWER,                             BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,    BUTTON_PLAY|BUTTON_PREV,               BUTTON_NONE },
+    { ACTION_TREE_PGLEFT,    BUTTON_PLAY|BUTTON_PREV|BUTTON_REPEAT, BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,   BUTTON_PLAY|BUTTON_NEXT,                 BUTTON_NONE },
+    { ACTION_TREE_PGRIGHT,   BUTTON_PLAY|BUTTON_NEXT|BUTTON_REPEAT,   BUTTON_NONE },
+
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM|CONTEXT_TREE),
+}; /* button_context_listtree_scroll_with_combo */
 
 /** Yes/No Screen **/
 static const struct button_mapping button_context_yesnoscreen[] = {
@@ -256,7 +289,10 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings_vol_is_inc;
         case CONTEXT_TREE:
+                return button_context_listtree_scroll_with_combo;
         case CONTEXT_MAINMENU:
+            return button_context_tree;
+        case CONTEXT_CUSTOM|CONTEXT_TREE:
             return button_context_tree;
         case CONTEXT_WPS:
             return button_context_wps;

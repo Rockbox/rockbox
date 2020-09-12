@@ -56,6 +56,8 @@
 #define ADC_MASK  0x0FFF
 
 static volatile unsigned short bat_val, key_val;
+static volatile int btn_last = BUTTON_NONE;
+static volatile long btn_last_tick;
 
 bool headphones_inserted(void)
 {
@@ -108,52 +110,82 @@ bool button_hold(void)
 }
 
 /* NOTE:  Due to how this is wired, button combinations are not allowed
-   unless one of the two buttons is the POWER
-*/
+ *  unless one of the two buttons is the POWER
+ *
+ * Note --Update 2020
+ *  by toggling BOP common I was able to remove BACK, OPTION, PLAY from the
+ * loop selectively and test which keys were pressed but this took two adc rounds
+ * and proved to be minimally useful for the added overhead
+ *
+ * NOW multiple button presses are emulated but button priority needs to be taken
+ * into consideration; higher priority keys 'overide' the lower priority keys
+ * VOLUP[7] VOLDN[6] PREV[5] NEXT[4] PLAY[3] OPTION[2] HOME[1]
+ */
 int button_read_device(void)
 {
+    unsigned short key;
     int btn = BUTTON_NONE;
-    unsigned short key = (key_val & ADC_MASK);
+    int btn_pwr = BUTTON_NONE;
 
     if (button_hold())
         return BUTTON_NONE;
 
     if (KEY_IS_DOWN(PIN_BTN_POWER))
-        btn |= BUTTON_POWER;
+        btn_pwr = BUTTON_POWER;
 
     if (!KEY_IS_DOWN(PIN_KEY_INT))
-        return btn;
+    {
+        __intc_mask_irq(IRQ_SADC);
+        REG_SADC_ADENA &= ~ADENA_AUXEN;
+        return btn_pwr;
+    }
+
+    key = (key_val & ADC_MASK);
+
+    /* Don't initiate a new request if we have one pending */
+    if(!(REG_SADC_ADENA & (ADENA_AUXEN)))
+    {
+        REG_SADC_ADENA |= ADENA_AUXEN;
+    }
 
     if (key < 261)
-        btn |= BUTTON_VOL_UP;
+        btn = BUTTON_VOL_UP;
     else
     if (key < 653)
-        btn |= BUTTON_VOL_DOWN;
+        btn = BUTTON_VOL_DOWN;
     else
     if (key < 1101)
-        btn |= BUTTON_PREV;
+        btn = BUTTON_PREV;
     else
     if (key < 1498)
-        btn |= BUTTON_NEXT;
+        btn = BUTTON_NEXT;
     else
     if (key < 1839)
-        btn |= BUTTON_PLAY;
+        btn = BUTTON_PLAY;
     else
     if (key < 2213)
-        btn |= BUTTON_OPTION;
+        btn = BUTTON_OPTION;
     else
     if (key < 2600)
-        btn |= BUTTON_HOME;
+        btn = BUTTON_HOME;
 
-    return btn;
+    if (btn_last == BUTTON_NONE && TIME_AFTER(current_tick, btn_last_tick + HZ/20))
+        btn_last = btn;
+
+    if (btn_pwr != BUTTON_NONE)
+        btn  |= BUTTON_PWRALT;
+
+    return btn | btn_last;
 }
 
 /* called on button press interrupt */
 void KEY_INT_IRQ(void)
 {
-    /* Don't initiate a new request if we have one pending */
-    if(!(REG_SADC_ADENA & (ADENA_AUXEN)))
-        REG_SADC_ADENA |= ADENA_AUXEN;
+    btn_last = BUTTON_NONE;
+    key_val = ADC_MASK;
+    __intc_unmask_irq(IRQ_SADC);
+     REG_SADC_ADENA |= ADENA_AUXEN;
+    btn_last_tick = current_tick;
 }
 
 /* Notes on batteries
@@ -238,6 +270,7 @@ void adc_init(void)
     REG_SADC_ADCFG = ADCFG_VBAT_SEL | ADCFG_CMD_AUX(1);  /* VBAT_SEL is undocumented but required! */
     REG_SADC_ADCLK = (199 << 16) | (1 << 8) | 61;
     system_enable_irq(IRQ_SADC);
+    REG_SADC_ADENA |= ADENA_AUXEN | ADENA_VBATEN;
 }
 
 void adc_close(void)
@@ -260,8 +293,6 @@ void SADC(void)
     if(state & ADCTRL_ARDYM)
     {
         key_val = REG_SADC_ADADAT;
-        if (KEY_IS_DOWN(PIN_KEY_INT)) /* key(s) are down kick off another read */
-            REG_SADC_ADENA = ADENA_AUXEN;
     }
     else if(UNLIKELY(state & ADCTRL_VRDYM))
     {

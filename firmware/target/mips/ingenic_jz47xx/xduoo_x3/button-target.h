@@ -32,7 +32,7 @@
 #define BUTTON_PLAY       0x00000020
 #define BUTTON_VOL_UP     0x00000040
 #define BUTTON_VOL_DOWN   0x00000080
-
+#define BUTTON_PWRALT     0x00000100 /* BUTTON_POWER combo with other buttons */
 #define BUTTON_LEFT  0
 #define BUTTON_RIGHT 0
 
