@@ -11622,7 +11622,7 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Band %d Gain	"
+    gigabeats,samsungypr1: "Band %d Gain"
   </dest>
   <voice>
     *: none
