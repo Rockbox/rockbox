@@ -260,6 +260,12 @@ int _battery_voltage(void)
 void adc_init(void)
 {
     bat_val = ADC_MASK;
+    /* don't re-init*/
+    if (!(REG_CPM_CLKGR0 & CLKGR0_SADC) && !(REG_SADC_ADENA & ADENA_POWER))
+    {
+        system_enable_irq(IRQ_SADC);
+        return;
+    }
 
     __cpm_start_sadc();
     mdelay(20);

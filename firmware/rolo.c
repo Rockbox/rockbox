@@ -286,7 +286,9 @@ int rolo_load(const char* filename)
     lcd_remote_puts(0, 1, "Executing");
     lcd_remote_update();
 #endif
+#if (CONFIG_KEYPAD != XDUOO_X3_PAD) /* X3 adc hangs on ROLO */
     adc_close();
+#endif
 #if CONFIG_CPU == AS3525v2
     /* Set CVDD1 power supply to default*/
     ascodec_write_pmu(0x17, 1, 0);
