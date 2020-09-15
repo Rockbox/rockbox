@@ -6992,6 +6992,8 @@ do {								\
 #define USB_OUTCSRH		(USB_BASE + 0x17) /* EP1-15 OUT CSR MSB 8-bit */
 #define USB_OUTCOUNT		(USB_BASE + 0x18) /* EP1-15 OUT FIFO count 16-bit */
 
+#define USB_CONFIGDATA          (USB_BASE + 0x1f) /* Fixed config */
+
 #define USB_FIFO_EP(n)		(USB_BASE + (n)*4 + 0x20)
 
 #define USB_EPINFO		(USB_BASE + 0x78) /* Endpoint information */
@@ -7034,6 +7036,7 @@ do {								\
 #define USB_INCSRH_DMAREQENAB	0x10
 #define USB_INCSRH_FRCDATATOG	0x08
 #define USB_INCSRH_DMAREQMODE	0x04
+#define USB_INCSR_INCOMPTX      0x80
 #define USB_INCSR_CDT		0x40
 #define USB_INCSR_SENTSTALL	0x20
 #define USB_INCSR_SENDSTALL	0x10
@@ -7104,6 +7107,7 @@ do {								\
 #define REG_USB_OUTCSRH		REG8(USB_OUTCSRH)
 #define REG_USB_OUTCOUNT	REG16(USB_OUTCOUNT)
 
+#define REG_USB_CONFIGDATA      REG8(USB_CONFIGDATA)
 #define REG_USB_FIFO_EP(n)	REG32(USB_FIFO_EP(n))
 
 #define REG_USB_INTR		REG8(USB_INTR)
