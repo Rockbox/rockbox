@@ -6992,7 +6992,11 @@ do {								\
 #define USB_OUTCSRH		(USB_BASE + 0x17) /* EP1-15 OUT CSR MSB 8-bit */
 #define USB_OUTCOUNT		(USB_BASE + 0x18) /* EP1-15 OUT FIFO count 16-bit */
 
+#define USB_CONFIGDATA          (USB_BASE + 0x1f) /* Fixed config */
+
 #define USB_FIFO_EP(n)		(USB_BASE + (n)*4 + 0x20)
+
+#define USB_HWVERS              (USB_BASE + 0x6c)
 
 #define USB_EPINFO		(USB_BASE + 0x78) /* Endpoint information */
 #define USB_RAMINFO		(USB_BASE + 0x79) /* RAM information */
@@ -7034,6 +7038,7 @@ do {								\
 #define USB_INCSRH_DMAREQENAB	0x10
 #define USB_INCSRH_FRCDATATOG	0x08
 #define USB_INCSRH_DMAREQMODE	0x04
+#define USB_INCSR_INCOMPTX      0x80
 #define USB_INCSR_CDT		0x40
 #define USB_INCSR_SENTSTALL	0x20
 #define USB_INCSR_SENDSTALL	0x10
@@ -7077,6 +7082,10 @@ do {								\
 #define USB_CNTL_BURST_8	(2 << 9)
 #define USB_CNTL_BURST_16	(3 << 9)
 
+/* USB HW revision */
+#define USB_HWVERS_MAJOR(x)    ((x >> 10) & 0x1f)
+#define USB_HWVERS_MINOR(x)    (x & 0x3ff)
+
 /* DMA interrupt bits */
 #define USB_INTR_DMA_BULKIN	1
 #define USB_INTR_DMA_BULKOUT	2
@@ -7104,12 +7113,15 @@ do {								\
 #define REG_USB_OUTCSRH		REG8(USB_OUTCSRH)
 #define REG_USB_OUTCOUNT	REG16(USB_OUTCOUNT)
 
+#define REG_USB_CONFIGDATA      REG8(USB_CONFIGDATA)
 #define REG_USB_FIFO_EP(n)	REG32(USB_FIFO_EP(n))
 
 #define REG_USB_INTR		REG8(USB_INTR)
 #define REG_USB_CNTL(n)		REG16(USB_CNTL(n))
 #define REG_USB_ADDR(n)		REG32(USB_ADDR(n))
 #define REG_USB_COUNT(n)	REG32(USB_COUNT(n))
+
+#define REG_USB_HWVERS          REG16(USB_HWVERS)
 
 #define REG_USB_EPINFO		REG8(USB_EPINFO)
 #define REG_USB_RAMINFO		REG8(USB_RAMINFO)

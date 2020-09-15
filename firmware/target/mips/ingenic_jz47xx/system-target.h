@@ -83,6 +83,7 @@ static inline void restore_interrupt(int status)
 #define UNCACHED_ADDRESS(addr)    ((unsigned int)(addr) | 0xA0000000)
 #define UNCACHED_ADDR(x)          UNCACHED_ADDRESS((x))
 #define PHYSADDR(x)               ((x) & 0x1fffffff)
+#define VIRTADDR(x)               ((x) | 0xA0000000)
 
 void system_enable_irq(unsigned int irq);
 void udelay(unsigned int usec);

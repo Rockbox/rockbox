@@ -6966,6 +6966,8 @@ do {								\
 
 #define USB_FIFO_EP(n)		(USB_BASE + (n)*4 + 0x20)
 
+#define USB_HWVERS              (USB_BASE + 0x6c)
+
 #define USB_EPINFO		(USB_BASE + 0x78) /* Endpoint information */
 #define USB_RAMINFO		(USB_BASE + 0x79) /* RAM information */
 
@@ -7006,6 +7008,7 @@ do {								\
 #define USB_INCSRH_DMAREQENAB	0x10
 #define USB_INCSRH_FRCDATATOG	0x08
 #define USB_INCSRH_DMAREQMODE	0x04
+#define USB_INCSR_INCOMPTX	0x80
 #define USB_INCSR_CDT		0x40
 #define USB_INCSR_SENTSTALL	0x20
 #define USB_INCSR_SENDSTALL	0x10
@@ -7082,6 +7085,8 @@ do {								\
 #define REG_USB_CNTL(n)		REG16(USB_CNTL(n))
 #define REG_USB_ADDR(n)		REG32(USB_ADDR(n))
 #define REG_USB_COUNT(n)	REG32(USB_COUNT(n))
+
+#define REG_USB_HWVERS          REG16(USB_HWVERS)
 
 #define REG_USB_EPINFO		REG8(USB_EPINFO)
 #define REG_USB_RAMINFO		REG8(USB_RAMINFO)
