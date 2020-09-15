@@ -7,7 +7,8 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2016 by Roman Stolyarov
+ * Copyright (C) 2016 Roman Stolyarov
+ * Copyright (C) 2020 Solomon Peachy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -43,6 +44,11 @@
 #define TOTAL_EP()       (sizeof(endpoints)/sizeof(struct usb_endpoint))
 #define EP_IS_IN(ep)     (EP_NUMBER((ep))%2)
 
+/* NOTE:  IN/OUT is from the HOST perspective.  We're a peripheral, so:
+     IN = DEV->HOST, (ie we send)
+     OUT = HOST->DEV, (ie we recv)
+*/
+
 enum ep_type
 {
     ep_control,
@@ -53,6 +59,12 @@ enum ep_type
 
 struct usb_endpoint
 {
+    const enum ep_type type;
+    const long fifo_addr;
+    unsigned short fifo_size;
+    bool allocated;
+    int use_dma;  /* -1 = no, 0 = mode_0, 1 = mode_1 */
+
     volatile void *buf;
     volatile size_t length;
     union
@@ -62,22 +74,15 @@ struct usb_endpoint
     };
     volatile bool busy;
 
-    const enum ep_type type;
-    const bool use_dma;
-
-    const long fifo_addr;
-    unsigned short fifo_size;
-
-    volatile bool wait;
     struct semaphore complete;
 
+    volatile bool wait;
     volatile int rc;
-    bool allocated;
 };
 
-#define EP_INIT(_type, _fifo_addr, _fifo_size, _buf, _use_dma) \
+#define EP_INIT(_type, _fifo_addr, _fifo_size, _buf) \
     { .type = (_type), .fifo_addr = (_fifo_addr), .fifo_size = (_fifo_size), \
-      .buf = (_buf), .use_dma = (_use_dma), \
+      .buf = (_buf), .use_dma = -1, \
       .length = 0, .busy = false, .wait = false, .allocated = false }
 
 static union
@@ -91,12 +96,12 @@ static volatile bool ep0_data_requested = false;
 
 static struct usb_endpoint endpoints[] =
 {
-    EP_INIT(ep_control,   USB_FIFO_EP(0),  64, NULL,        false),
-    EP_INIT(ep_control,   USB_FIFO_EP(0),  64, &ep0_rx.buf, false),
-    EP_INIT(ep_bulk,      USB_FIFO_EP(1), 512, NULL,        false),
-    EP_INIT(ep_bulk,      USB_FIFO_EP(1), 512, NULL,        false),
-    EP_INIT(ep_interrupt, USB_FIFO_EP(2), 512, NULL,        false),
-    EP_INIT(ep_interrupt, USB_FIFO_EP(2), 512, NULL,        false),
+    EP_INIT(ep_control,   USB_FIFO_EP(0),  64, NULL),
+    EP_INIT(ep_control,   USB_FIFO_EP(0),  64, &ep0_rx.buf),
+    EP_INIT(ep_bulk,      USB_FIFO_EP(1), 512, NULL),
+    EP_INIT(ep_bulk,      USB_FIFO_EP(1), 512, NULL),
+    EP_INIT(ep_interrupt, USB_FIFO_EP(2), 512, NULL),
+    EP_INIT(ep_interrupt, USB_FIFO_EP(2), 512, NULL),
 };
 
 static inline void select_endpoint(int ep)
@@ -346,12 +351,18 @@ static void EPIN_handler(unsigned int endpoint)
 
     if(csr & USB_INCSR_SENTSTALL)
     {
+        logf("SENDSTALL %d\n", endpoint);
         REG_USB_INCSR = csr & ~USB_INCSR_SENTSTALL;
         return;
     }
 
-    if(ep->use_dma)
+#ifdef USE_USB_DMA
+    if(ep->use_dma >= 0) {
+	logf("DMA status(%x %x %x)", REG_USB_ADDR(USB_INTR_DMA_BULKIN), REG_USB_COUNT(USB_INTR_DMA_BULKIN),REG_USB_CNTL(USB_INTR_DMA_BULKIN));
+
         return;
+    }
+#endif
 
     if(csr & USB_INCSR_FFNOTEMPT)
     {
@@ -403,8 +414,12 @@ static void EPOUT_handler(unsigned int endpoint)
             return;
         }
 
-        if(ep->use_dma)
+#ifdef USE_USB_DMA
+        if(ep->use_dma >= 0) {
+	    logf("DMA status(%x %x %x)", REG_USB_ADDR(USB_INTR_DMA_BULKOUT), REG_USB_COUNT(USB_INTR_DMA_BULKOUT),REG_USB_CNTL(USB_INTR_DMA_BULKOUT));
             return;
+	}
+#endif
 
         if(csr & USB_OUTCSR_OUTPKTRDY) /* There is a packet in the fifo */
         {
@@ -430,59 +445,60 @@ static void EPOUT_handler(unsigned int endpoint)
     }
 }
 
+#ifdef USE_USB_DMA
 static void EPDMA_handler(int number)
 {
     int endpoint = -1;
     unsigned int size = 0;
     struct usb_endpoint* ep = NULL;
 
-    if(number == USB_INTR_DMA_BULKIN)
-    {
-        endpoint = (REG_USB_CNTL(0) >> 4) & 0xF;
+    if (number == USB_INTR_DMA_BULKIN) {
+        endpoint = (REG_USB_CNTL(USB_INTR_DMA_BULKIN) >> 4) & 0xF;
         ep = &endpoints[endpoint*2];
-        size = (unsigned int)ep->buf - REG_USB_ADDR(0);
-    }
-    else if(number == USB_INTR_DMA_BULKOUT)
-    {
-        endpoint = (REG_USB_CNTL(1) >> 4) & 0xF;
+        size = (unsigned int)ep->buf - REG_USB_ADDR(USB_INTR_DMA_BULKIN);
+    } else if (number == USB_INTR_DMA_BULKOUT) {
+        endpoint = (REG_USB_CNTL(USB_INTR_DMA_BULKOUT) >> 4) & 0xF;
         ep = &endpoints[endpoint*2+1];
-        size = (unsigned int)ep->buf - REG_USB_ADDR(1);
+        size = (unsigned int)ep->buf - REG_USB_ADDR(USB_INTR_DMA_BULKOUT);
     }
 
     logf("DMA_BULK%d %d", number, endpoint);
 
-    if(number == USB_INTR_DMA_BULKOUT)
-    {
-        /* Disable DMA */
-        REG_USB_CNTL(1) = 0;
+    if (ep) {
+        /* We're done with the DMA transfer, shut things down.. */
+        if (number == USB_INTR_DMA_BULKIN) {
+            uint16_t incsr = REG_USB_INCSR;
+            if ((ep->use_dma == 0) || (size % ep->fifo_size) && (incsr & USB_INCSR_FFNOTEMPT)) {
+                /* But short packets may need the final chunk manually initiated */
+                select_endpoint(endpoint);
+                if (ep->use_dma == 1) {
+                    incsr &= ~((USB_INCSRH_AUTOSET | USB_INCSRH_DMAREQENAB) << 8);
+                    REG_USB_INCSR = incsr;
+                    incsr &= ~((USB_INCSRH_DMAREQMODE) << 8);
+                    incsr |= ((USB_INCSRH_DMAREQENAB) << 8);
+                }
+                incsr |= USB_INCSR_INPKTRDY;
+                logf("DMA sts %x / %x %x", incsr, REG_USB_COUNT(USB_INTR_DMA_BULKIN), REG_USB_CNTL(USB_INTR_DMA_BULKIN));
+                REG_USB_INCSR = incsr;
+            }
+	    ep->sent += size;
+	    ep->use_dma = -1;
 
-        commit_discard_dcache(); // XXX range?
-
-        select_endpoint(endpoint);
-        /* Read out last packet manually */
-        unsigned int lpack_size = REG_USB_OUTCOUNT;
-        if(lpack_size > 0)
-        {
-            ep->buf += ep->length - lpack_size;
-            readFIFO(ep, lpack_size);
-            REG_USB_OUTCSR &= ~USB_OUTCSR_OUTPKTRDY;
+            /* Clean up, if we're indeed finished! */
+            if(ep->sent >= ep->length) {
+                logf("DMA send complete");
+                if (!ep->wait)
+                    usb_core_transfer_complete(endpoint, USB_DIR_IN, 0, ep->length);
+                ep->rc = 0;
+                ep_transfer_completed(ep);
+            }
+        } else if (number == USB_INTR_DMA_BULKOUT) {
+		// XXX WRITE RX SIDE HERE
         }
-    }
-    else if(number == USB_INTR_DMA_BULKIN && size % ep->fifo_size)
-    {
-        /* If the last packet is less than MAXP, set INPKTRDY manually */
-        REG_USB_INCSR |= USB_INCSR_INPKTRDY;
-    }
-
-    if (ep)
-    {
-        int dir = EP_IS_IN(ep) ? USB_DIR_IN : USB_DIR_OUT;
-        if ((dir ==  USB_DIR_OUT) || !ep->wait)
-            usb_core_transfer_complete(endpoint, dir, 0, ep->length);
-        ep->rc = 0;
-        ep_transfer_completed(ep);
+        ep->use_dma = -1;
     }
 }
+#endif
 
 static void setup_endpoint(struct usb_endpoint *ep)
 {
@@ -515,15 +531,14 @@ static void setup_endpoint(struct usb_endpoint *ep)
         csr = (USB_INCSR_FF | USB_INCSR_CDT);
         csrh = USB_INCSRH_MODE;
 
-        if(ep->use_dma)
-            csrh |= (USB_INCSRH_DMAREQENAB | USB_INCSRH_AUTOSET | USB_INCSRH_DMAREQMODE);
-
         if(ep->type == ep_interrupt)
             csrh |= USB_INCSRH_FRCDATATOG;
 
         REG_USB_INMAXP   = ep->fifo_size;
         REG_USB_INCSR    = csr;
         REG_USB_INCSRH   = csrh;
+
+	logf("IN %d (%x %x %x)", endpoint, ep->fifo_size, csr, csrh);
 
         if (ep->allocated)
             REG_USB_INTRINE |= USB_INTR_EP(EP_NUMBER2(ep));
@@ -536,12 +551,16 @@ static void setup_endpoint(struct usb_endpoint *ep)
         if(ep->type == ep_interrupt)
             csrh |= USB_OUTCSRH_DNYT;
 
-        if(ep->use_dma)
+#ifdef USE_USB_DMA
+        if(ep->use_dma >= 0)
             csrh |= (USB_OUTCSRH_DMAREQENAB | USB_OUTCSRH_AUTOCLR | USB_OUTCSRH_DMAREQMODE);
+#endif
 
         REG_USB_OUTMAXP   = ep->fifo_size;
         REG_USB_OUTCSR    = csr;
         REG_USB_OUTCSRH   = csrh;
+
+	logf("OUT %d (%x %x %x)", endpoint, ep->fifo_size, csr, csrh);
 
         if (ep->allocated)
             REG_USB_INTROUTE |= USB_INTR_EP(EP_NUMBER2(ep));
@@ -574,8 +593,8 @@ static void udc_reset(void)
     REG_USB_INTRUSBE = 0;
 
     /* Disable DMA */
-    REG_USB_CNTL(0) = 0;
-    REG_USB_CNTL(1) = 0;
+    REG_USB_CNTL(USB_INTR_DMA_BULKIN) = 0;
+    REG_USB_CNTL(USB_INTR_DMA_BULKOUT) = 0;
 
     /* High speed, softconnect */
     REG_USB_POWER = (USB_POWER_SOFTCONN | USB_POWER_HSENAB);
@@ -629,7 +648,7 @@ void OTG(void)
     unsigned short   intrOut = REG_USB_INTROUT;
     unsigned char    intrDMA = REG_USB_INTR;
 
-    logf("%x %x %x %x", intrUSB, intrIn, intrOut, intrDMA);
+    logf("IRQ %x %x %x %x", intrUSB, intrIn, intrOut, intrDMA);
 
     /* EPIN & EPOUT are all handled in DMA */
     if(intrIn & USB_INTR_EP(0))
@@ -648,10 +667,12 @@ void OTG(void)
         logf("USB suspend");
     if(intrUSB & USB_INTR_RESUME)
         logf("USB resume");
-    if(intrDMA & USB_INTR_DMA_BULKIN)
+#ifdef USE_USB_DMA
+    if(intrDMA & (1<<USB_INTR_DMA_BULKIN))
         EPDMA_handler(USB_INTR_DMA_BULKIN);
-    if(intrDMA & USB_INTR_DMA_BULKOUT)
+    if(intrDMA & (1<<USB_INTR_DMA_BULKOUT))
         EPDMA_handler(USB_INTR_DMA_BULKOUT);
+#endif
 }
 
 bool usb_drv_stalled(int endpoint, bool in)
@@ -799,8 +820,8 @@ void usb_drv_exit(void)
     REG_USB_INTRUSBE = 0;
 
     /* Disable DMA */
-    REG_USB_CNTL(0) = 0;
-    REG_USB_CNTL(1) = 0;
+    REG_USB_CNTL(USB_INTR_DMA_BULKIN) = 0;
+    REG_USB_CNTL(USB_INTR_DMA_BULKOUT) = 0;
 
     /* Disconnect from USB */
     REG_USB_POWER &= ~USB_POWER_SOFTCONN;
@@ -817,10 +838,8 @@ static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length
 {
     int flags = disable_irq_save();
 
-    if(ep->type == ep_control)
-    {
-        if ((ptr == NULL && length == 0) || !ep0_data_requested)
-        {
+    if (ep->type == ep_control) {
+        if ((ptr == NULL && length == 0) || !ep0_data_requested) {
             restore_irq(flags);
             return;
         }
@@ -831,36 +850,66 @@ static void usb_drv_send_internal(struct usb_endpoint* ep, void* ptr, int length
     ep->sent = 0;
     ep->length = length;
     ep->busy = true;
-    if(blocking)
-    {
+    if(blocking) {
         ep->rc = -1;
         ep->wait = true;
+    } else {
+        ep->rc = 0;
     }
-    else ep->rc = 0;
 
-    if(ep->type == ep_control)
-    {
-        EP0_send();
-    }
-    else
-    {
-        if(ep->use_dma)
-        {
-            commit_discard_dcache_range(ptr, length);
-            REG_USB_ADDR(0) = PHYSADDR((unsigned long)ptr);
-            REG_USB_COUNT(0) = length;
-            REG_USB_CNTL(0) = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
-                                 USB_CNTL_DIR_IN  | USB_CNTL_ENA |
-                                 USB_CNTL_EP(EP_NUMBER2(ep)) | USB_CNTL_BURST_16);
-        }
+#ifdef USE_USB_DMA
+    /* Can we use DMA? */
+    if (length && ((unsigned long)ptr & 4 == 0) && !button_hold()) {
+	if (ep->type == ep_bulk && length < ep->fifo_size)
+            ep->use_dma = 0;
         else
+            ep->use_dma = 1;
+    } else {
+        ep->use_dma = -1;
+    }
+#endif
+
+    if (ep->type == ep_control) {
+        EP0_send();
+    } else {
+#ifdef USE_USB_DMA
+        if (ep->use_dma >= 0) {
+            commit_discard_dcache_range(ptr, length);
+            /* Set up DMA */
+            uint16_t dmacr = USB_CNTL_BURST_16 | USB_CNTL_EP(EP_NUMBER2(ep)) | USB_CNTL_ENA | USB_CNTL_INTR_EN | USB_CNTL_DIR_IN ;
+            if (ep->use_dma > 0)
+                dmacr |= USB_CNTL_MODE_1;
+
+            REG_USB_ADDR(USB_INTR_DMA_BULKIN) = PHYSADDR((unsigned long)ptr);
+            REG_USB_COUNT(USB_INTR_DMA_BULKIN) = length;
+            REG_USB_CNTL(USB_INTR_DMA_BULKIN) = dmacr;
+
+	    select_endpoint(EP_NUMBER2(ep));
+	    uint16_t csr = REG_USB_INCSR;
+	    if (ep->use_dma == 0) {
+		    csr &= ~((USB_INCSRH_AUTOSET | USB_INCSRH_DMAREQENAB) << 8);
+		    REG_USB_INCSR = csr | (USB_INCSR_SENTSTALL | USB_INCSR_UNDERRUN | USB_INCSR_FFNOTEMPT | USB_INCSR_INCOMPTX); /* Don't clear status bits by writing zeros.. */
+		    csr &= ~((USB_INCSRH_DMAREQMODE) << 8);
+		    csr |= ((USB_INCSRH_DMAREQENAB | USB_INCSRH_MODE) << 8);
+	    } else {
+		    csr |= ((USB_INCSRH_DMAREQENAB | USB_INCSRH_MODE | USB_INCSRH_DMAREQMODE) << 8);
+		    csr |= ((USB_INCSRH_AUTOSET) << 8);
+	    }
+	    csr &= ~USB_INCSR_UNDERRUN;
+
+            logf("DMA setup(%d %x %x %x %x)", ep->use_dma, REG_USB_ADDR(USB_INTR_DMA_BULKIN), REG_USB_COUNT(USB_INTR_DMA_BULKIN),REG_USB_CNTL(USB_INTR_DMA_BULKIN), csr);
+
+	    REG_USB_INCSR = csr;
+        } else
+#endif
+	{
             EPIN_handler(EP_NUMBER2(ep));
+        }
     }
 
     restore_irq(flags);
 
-    if(blocking)
-    {
+    if(blocking) {
         semaphore_wait(&ep->complete, HZ);
         ep->wait = false;
     }
@@ -918,23 +967,25 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
     ep->received = 0;
     ep->length = length;
     ep->busy = true;
-    if(ep->use_dma)
-    {
+#ifdef USE_USB_DMA
+    // XXX Figure out if it's okay to use DMA, and which mode!
+    if(ep->use_dma >= 0) {
         discard_dcache_range(ptr, length);
-        REG_USB_ADDR(1) = PHYSADDR((unsigned long)ptr);
-        REG_USB_COUNT(1) = length;
-        REG_USB_CNTL(1) = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
+        REG_USB_ADDR(USB_INTR_DMA_BULKOUT) = PHYSADDR((unsigned long)ptr);
+        REG_USB_COUNT(USB_INTR_DMA_BULKOUT) = length;
+        REG_USB_CNTL(USB_INTR_DMA_BULKOUT) = (USB_CNTL_INTR_EN | USB_CNTL_MODE_1 |
                              USB_CNTL_ENA | USB_CNTL_EP(endpoint) |
                              USB_CNTL_BURST_16);
-    }
-    else
+	logf("DMA setup(%d %x %x %x)", USB_INTR_DMA_BULKOUT, REG_USB_ADDR(USB_INTR_DMA_BULKOUT), REG_USB_COUNT(USB_INTR_DMA_BULKOUT),REG_USB_CNTL(USB_INTR_DMA_BULKOUT));
+    } else
+#endif
     {
-        if (endpoint == EP_CONTROL)
-        {
+        if (endpoint == EP_CONTROL) {
             ep0_data_supplied = false;
             EP0_handler();
+        } else {
+            EPOUT_handler(endpoint);
         }
-        else EPOUT_handler(endpoint);
     }
 
     restore_irq(flags);
