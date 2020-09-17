@@ -56,6 +56,9 @@ static int maxlines = 0;
 
 #define ON "Enabled"
 #define OFF "Disabled"
+#define INSERTED "Inserted"
+#define REMOVED "Removed"
+#define OFF "Disabled"
 #define STOPPED "Stopped"
 #define RUNNING "Running"
 
@@ -323,7 +326,6 @@ bool dbg_ports(void)
     long fun, intr;
     long lvl;
 
-
     lcd_clear_display();
     lcd_setfont(FONT_SYSFIXED);
 
@@ -332,24 +334,39 @@ bool dbg_ports(void)
         i = 0;
         while(dbg_btn_update(&done, &x))
         {
-            i %= last_port; /*PORT: A B C D E F */
+            i %= last_port; /*PORT: A B C D E F HEADPHONE/LINEOUT */
+
             while(dbg_btn_update(&done, &x))
             {
                 line = 0;
+
                 lcd_puts(x, line++, "[GPIO Vals and Dirs]");
                 for (j = i; j < i + 2; j++)
                 {
-                    cur = j % last_port;
-                    dir = REG_GPIO_PXDIR(cur);
-                    data = REG_GPIO_PXDAT(cur);
-                    fun = REG_GPIO_PXFUN(cur);
-                    intr = REG_GPIO_PXIM(cur);
-                    lvl  = REG_GPIO_PXPIN(cur);
+                    if (j < last_port)
+                    {
+                        cur = j % last_port;
+                        dir = REG_GPIO_PXDIR(cur);
+                        data = REG_GPIO_PXDAT(cur);
+                        fun = REG_GPIO_PXFUN(cur);
+                        intr = REG_GPIO_PXIM(cur);
+                        lvl  = REG_GPIO_PXPIN(cur);
 
-                    lcd_putsf(x, line++, "[%s%c]: %8x", "GPIO", 'A' + cur, lvl);
-                    lcd_putsf(x, line++, "DIR: %8x FUN: %8x", dir, fun);
-                    lcd_putsf(x, line++, "DAT: %8x INT: %8x", data, intr);
-                    line++;
+                        lcd_putsf(x, line++, "[%s%c]: %8x", "GPIO", 'A' + cur, lvl);
+                        lcd_putsf(x, line++, "DIR: %8x FUN: %8x", dir, fun);
+                        lcd_putsf(x, line++, "DAT: %8x INT: %8x", data, intr);
+                        line++;
+                    }
+                    else
+                    {
+                        lcd_puts(x, line++, "[Headphone Status]");
+#if defined(HAVE_HEADPHONE_DETECTION)
+                        lcd_putsf(x, line++, "HP: %s", headphones_inserted() ? INSERTED:REMOVED);
+#endif
+#if defined(HAVE_LINEOUT_DETECTION)
+                        lcd_putsf(x, line++, "LO: %s", lineout_inserted() ? INSERTED:REMOVED);
+#endif
+                    }
                 }
             }
             i++;
