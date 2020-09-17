@@ -498,7 +498,7 @@ void car_adapter_mode_init(void)
 #ifdef HAVE_HEADPHONE_DETECTION
 static void hp_unplug_change(bool inserted)
 {
-    static bool headphone_caused_pause = false;
+    static bool headphone_caused_pause = true;
 
     if (global_settings.unplug_mode)
     {
@@ -526,7 +526,7 @@ static void hp_unplug_change(bool inserted)
     audio_enable_speaker(global_settings.speaker_mode);
 #endif
 }
-#endif
+#endif /*HAVE_HEADPHONE_DETECTION*/
 
 #ifdef HAVE_LINEOUT_DETECTION
 static void lo_unplug_change(bool inserted)
@@ -534,11 +534,32 @@ static void lo_unplug_change(bool inserted)
 #ifdef HAVE_LINEOUT_POWEROFF
     lineout_set(inserted);
 #else
-    (void)inserted;
-    audiohw_set_lineout_volume(0,0);
-#endif
+    audiohw_set_lineout_volume(0,0); /*hp vol re-set by this function as well*/
+    static bool lineout_caused_pause = true;
+
+    if (global_settings.unplug_mode)
+    {
+        int audio_stat = audio_status();
+        if (inserted)
+        {
+            backlight_on();
+            if ((audio_stat & AUDIO_STATUS_PLAY) &&
+                    lineout_caused_pause &&
+                    global_settings.unplug_mode > 1 )
+                unpause_action(true, true);
+            lineout_caused_pause = false;
+        } else {
+            if ((audio_stat & AUDIO_STATUS_PLAY) &&
+                    !(audio_stat & AUDIO_STATUS_PAUSE))
+            {
+                lineout_caused_pause = true;
+                pause_action(false, false);
+            }
+        }
+    }
+#endif /*HAVE_LINEOUT_POWEROFF*/
 }
-#endif
+#endif /*HAVE_LINEOUT_DETECTION*/
 
 long default_event_handler_ex(long event, void (*callback)(void *), void *parameter)
 {

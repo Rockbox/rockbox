@@ -169,10 +169,19 @@ int audio_get_spdif_sample_rate(void)
 #ifdef HAVE_SPEAKER
 void audio_enable_speaker(int mode)
 {
-#ifdef HAVE_HEADPHONE_DETECTION
+#if defined(HAVE_HEADPHONE_DETECTION) || defined(HAVE_LINEOUT_DETECTION)
     /* if needed, query jack state */
     if(mode == 2)
-        mode = !headphones_inserted();
+    {
+#ifdef HAVE_HEADPHONE_DETECTION
+        if (headphones_inserted())
+            mode = 0;
+#endif
+#ifdef HAVE_LINEOUT_DETECTION
+        if (lineout_inserted())
+            mode = 0;
+#endif
+    }
 #endif
     /* treat any nonzero value as enable */
     audiohw_enable_speaker(mode);

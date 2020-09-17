@@ -767,11 +767,20 @@ void root_menu(void)
     }
 #endif /* HAVE_RTC_ALARM */
 
+#if defined(HAVE_HEADPHONE_DETECTION) || defined(HAVE_LINEOUT_DETECTION)
+    if (next_screen == GO_TO_WPS && global_settings.unplug_autoresume)
+    {
+       next_screen = GO_TO_ROOT;
 #ifdef HAVE_HEADPHONE_DETECTION
-    if (next_screen == GO_TO_WPS &&
-        (global_settings.unplug_autoresume && !headphones_inserted() ))
-            next_screen = GO_TO_ROOT;
+        if (headphones_inserted())
+            next_screen = GO_TO_WPS;
 #endif
+#ifdef HAVE_LINEOUT_DETECTION
+        if (lineout_inserted())
+            next_screen = GO_TO_WPS;
+#endif
+    }
+#endif /*(HAVE_HEADPHONE_DETECTION) || (HAVE_LINEOUT_DETECTION)*/
 
     while (true)
     {

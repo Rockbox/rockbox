@@ -112,6 +112,7 @@ static int hp_detect_callback(struct timeout *tmo)
     queue_remove_from_head(&button_queue, id);
     queue_post(&button_queue, id, 0);
     return 0;
+    /*misc.c:hp_unplug_change*/
 }
 #endif
 
@@ -125,6 +126,7 @@ static int lo_detect_callback(struct timeout *tmo)
     queue_remove_from_head(&button_queue, id);
     queue_post(&button_queue, id, 0);
     return 0;
+    /*misc.c:lo_unplug_change*/
 }
 #endif
 

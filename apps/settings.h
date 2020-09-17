@@ -448,7 +448,7 @@ struct user_settings
 #endif
 
     int  pause_rewind; /* time in s to rewind when pausing */
-#ifdef HAVE_HEADPHONE_DETECTION
+#if defined(HAVE_HEADPHONE_DETECTION) || defined(HAVE_LINEOUT_DETECTION)
     int  unplug_mode; /* pause on headphone unplug */
     bool unplug_autoresume; /* disable auto-resume if no phones */
 #endif
