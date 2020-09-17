@@ -89,10 +89,12 @@ void button_init_device(void)
     __gpio_as_output(PIN_CHARGE_CON);
 
     __gpio_as_input(PIN_PH_DECT);
+    __gpio_enable_pull(PIN_PH_DECT);
     /*__gpio_disable_pull(PIN_PH_DECT); // Spurious Detections */
 
     __gpio_as_input(PIN_LO_DECT);
-    __gpio_disable_pull(PIN_LO_DECT);
+    __gpio_enable_pull(PIN_LO_DECT);
+    /*__gpio_disable_pull(PIN_LO_DECT); // Spurious Detections */
 }
 
 bool button_hold(void)
