@@ -47,6 +47,7 @@
 #define EP_IS_IN(ep)     (EP_NUMBER((ep))%2)
 
 #define TXCSR_WZC_BITS (USB_INCSR_SENTSTALL | USB_INCSR_UNDERRUN | USB_INCSR_FFNOTEMPT | USB_INCSR_INCOMPTX)
+#define RXCSR_WZC_BITS (USB_OUTCSR_SENTSTALL | USB_OUTCSR_OVERRUN | USB_OUTCSR_OUTPKTRDY)
 
 /* NOTE:  IN/OUT is from the HOST perspective.  We're a peripheral, so:
      IN = DEV->HOST, (ie we send)
@@ -89,6 +90,9 @@ struct usb_endpoint
     { .type = (_type), .fifo_addr = (_fifo_addr), .fifo_size = (_fifo_size), \
       .buf = (_buf), .use_dma = -1, \
       .length = 0, .busy = false, .wait = false, .allocated = false }
+
+#define short_not_ok 1   /* only works for mass storage.. */
+#define ep_doublebuf(__ep) 0
 
 static union
 {
@@ -360,7 +364,7 @@ static void EPIN_send(unsigned int endpoint)
     }
 
     if (csr & USB_INCSR_SENTSTALL) {
-        logf("SENDSTALL %d", endpoint);
+        logf("TX SENTSTALL %d", endpoint);
         REG_USB_INCSR = csr & ~USB_INCSR_SENTSTALL;
         return;
     }
@@ -446,7 +450,7 @@ static void EPIN_complete(unsigned int endpoint)
     logf("%s(%d): 0x%x", __func__, endpoint, csr);
 
     if (csr & USB_INCSR_SENTSTALL) {
-        logf("SENDSTALL %d\n", endpoint);
+        logf("TX SENTSTALL %d", endpoint);
         REG_USB_INCSR = csr & ~USB_INCSR_SENTSTALL; // XXX TXCSR_P_WZC_BITS
         return;
     }
@@ -504,26 +508,77 @@ static void EPOUT_handler(unsigned int endpoint)
     struct usb_endpoint* ep = &endpoints[endpoint*2+1];
     unsigned int size, csr;
 
-    if(!ep->busy)
-    {
+    if(!ep->busy) {
         logf("Entered EPOUT handler without work!");
         return;
     }
 
     select_endpoint(endpoint);
-    while((csr = REG_USB_OUTCSR) & (USB_OUTCSR_SENTSTALL|USB_OUTCSR_OUTPKTRDY))
-    {
+    while((csr = REG_USB_OUTCSR) & (USB_OUTCSR_SENTSTALL|USB_OUTCSR_OUTPKTRDY)) {
         logf("%s(%d): 0x%x", __func__, endpoint, csr);
-        if(csr & USB_OUTCSR_SENTSTALL)
-        {
+        if(csr & USB_OUTCSR_SENTSTALL) {
             logf("stall sent, flushing fifo..");
             flushFIFO(ep);
             REG_USB_OUTCSR = csr & ~USB_OUTCSR_SENTSTALL;
             return;
         }
 
-        if(csr & USB_OUTCSR_OUTPKTRDY) /* There is a packet in the fifo */
-        {
+#ifdef USE_USB_DMA
+        if (ep->use_dma >= 0) {
+            logf("DMA busy(%x %x %x)", REG_USB_ADDR(USB_INTR_DMA_BULKOUT), REG_USB_COUNT(USB_INTR_DMA_BULKOUT),REG_USB_CNTL(USB_INTR_DMA_BULKOUT));
+            return;
+        }
+
+        /* Can we use DMA? */
+        if (ep->type == ep_bulk && ep->length && (!(((unsigned long)ep->buf + ep->received) % 4)) && !button_hold()) {
+            if (ep->length >= ep->fifo_size && short_not_ok)
+                ep->use_dma = 1;
+            else
+                ep->use_dma = 0;
+        } else {
+            ep->use_dma = -1;
+        }
+        logf("RX DMA? %d", ep->use_dma);
+
+        /* Set up RX side for DMA */
+        if (ep->use_dma == 1) {
+            csr |= (USB_OUTCSRH_AUTOCLR) << 8;
+            REG_USB_OUTCSR = csr;
+            csr |= USB_OUTCSRH_DMAREQENAB << 8;
+            REG_USB_OUTCSR = csr;
+
+            csr |= (USB_OUTCSRH_DMAREQMODE << 8); // XXX
+//            /* Work around HW quirk; write and clear DMAMODE */
+//            REG_USB_OUTCSR = csr | (USB_OUTCSRH_DMAREQMODE << 8);
+
+        } else if (ep->use_dma == 0) {
+            if (ep_doublebuf(ep))  // XXX or isoc..
+                csr |= ((USB_OUTCSRH_AUTOCLR) << 8);
+            csr |= USB_OUTCSRH_DMAREQENAB << 8;
+        }
+        /* Set up DMA engine */
+        if (ep->use_dma >= 0) {
+            REG_USB_OUTCSR = csr;
+            logf("DMA RX %d csr %x", ep->use_dma, csr);
+            discard_dcache_range((void*)ep->buf + ep->received, ep->length - ep->received);
+
+            /* Program actual DMA channel */
+            uint16_t dmacr = USB_CNTL_BURST_16 | USB_CNTL_EP(EP_NUMBER2(ep)) | USB_CNTL_ENA | USB_CNTL_INTR_EN;
+            if (ep->use_dma > 0)
+                dmacr |= USB_CNTL_MODE_1;
+
+            REG_USB_ADDR(USB_INTR_DMA_BULKOUT) = PHYSADDR((unsigned long)ep->buf + ep->received);
+            REG_USB_COUNT(USB_INTR_DMA_BULKOUT) = ep->length - ep->received;
+            REG_USB_CNTL(USB_INTR_DMA_BULKOUT) = dmacr;
+            logf("DMA RX start %x %d %x", (unsigned int)ep->buf + ep->received,
+                 (ep->length - ep->received), dmacr);
+
+            return; /* ie wait for DMA to complete */
+        }
+#endif
+
+        /* There is a packet in the fifo, copy it out via PIO */
+        if (csr & USB_OUTCSR_OUTPKTRDY) {
             size = REG_USB_OUTCOUNT;
 
             readFIFO(ep, size);
@@ -536,14 +591,74 @@ static void EPOUT_handler(unsigned int endpoint)
 
             logf("received: %d max length: %d", ep->received, ep->length);
 
-            if(size < ep->fifo_size || ep->received >= ep->length)
-            {
+            if(size < ep->fifo_size || ep->received >= ep->length) {
                 usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
                 ep_transfer_completed(ep);
                 logf("receive transfer_complete");
             }
         }
     }
+}
+
+static void EPOUT_ready(unsigned int endpoint)
+{
+    logf("%s(%d)", __func__, endpoint);
+
+#ifdef USE_USB_DMA
+    struct usb_endpoint* ep = &endpoints[endpoint*2+1];
+    unsigned int csr;
+
+    select_endpoint(endpoint);
+    csr = REG_USB_OUTCSR;
+
+    if(!ep->busy)
+    {
+        logf("Entered EPOUT handler without work!");
+        return;
+    }
+
+    // check for stall
+    // check for overrun
+    // check for incomprx
+
+    /* If DMA engine is enabled, handle and clean up */
+    if (ep->use_dma >= 0 && csr & (USB_OUTCSRH_DMAREQENAB << 8)) {
+        int size = VIRTADDR(REG_USB_ADDR(USB_INTR_DMA_BULKOUT)) - ((unsigned int)ep->buf + ep->received);
+
+        csr &= ~((USB_OUTCSRH_AUTOCLR | USB_OUTCSRH_DMAREQENAB | USB_OUTCSRH_DMAREQMODE) << 8);
+        REG_USB_OUTCSR = csr | RXCSR_WZC_BITS;
+        logf("EPOUT DMA RX %x %d @%d/%d", csr, size, ep->received, ep->length);
+        ep->received += size;
+
+        /* Autoclear doesn't clear OutPktRdy for short packets.. */
+        if ((ep->use_dma == 0 && !ep_doublebuf(ep)) || size % ep->fifo_size) {
+            csr &= ~USB_OUTCSR_OUTPKTRDY;
+            REG_USB_OUTCSR = csr;
+            logf("Cleanup after short RX %x", csr);
+        }
+        // XXX what about 0-length transfers?
+
+        /* If we're incomplete, wait for the next one.. */
+        if (ep->received < ep->length && size == ep->fifo_size) {
+            csr = REG_USB_OUTCSR;
+            if (csr & USB_OUTCSR_OUTPKTRDY && ep_doublebuf(ep))
+               goto exit;
+            return;
+        }
+
+        /* It we're done, clean up */
+        if (size < ep->fifo_size || ep->received >= ep->length) {
+            ep->use_dma = -1;
+            usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
+            ep_transfer_completed(ep);
+            logf("DMA RX transfer_complete");
+            return;
+        }
+    }
+
+exit:
+#endif
+    EPOUT_handler(endpoint);
 }
 
 #ifdef USE_USB_DMA
@@ -586,10 +701,7 @@ static void EPDMA_handler(int number)
     } else if (number == USB_INTR_DMA_BULKOUT) {
         /* RX DMA completed */
         logf("DMA RX%d %d @%d/%d", number, size, ep->received, ep->length);
-        ep->received += size;
-        ep->use_dma = -1;
-
-        EPOUT_handler(endpoint);
+        EPOUT_ready(endpoint);
     } else if (ep) {
         ep->use_dma = -1;
     }
@@ -756,9 +868,9 @@ void OTG(void)
     if(intrIn & USB_INTR_EP(2))
         EPIN_complete(2);
     if(intrOut & USB_INTR_EP(1))
-        EPOUT_handler(1);
+        EPOUT_ready(1);
     if(intrOut & USB_INTR_EP(2))
-        EPOUT_handler(2);
+        EPOUT_ready(2);
     if(intrUSB & USB_INTR_RESET)
         udc_reset();
     if(intrUSB & USB_INTR_SUSPEND)
@@ -909,10 +1021,6 @@ void usb_drv_exit(void)
 {
     logf("%s()", __func__);
 
-    select_endpoint(1);
-
-    logf("DMA X (%x %x %x %x)", REG_USB_ADDR(USB_INTR_DMA_BULKIN), REG_USB_COUNT(USB_INTR_DMA_BULKIN),REG_USB_CNTL(USB_INTR_DMA_BULKIN), REG_USB_INCSR);
-
     REG_USB_FADDR = 0;
     REG_USB_INDEX = 0;
 
@@ -922,6 +1030,11 @@ void usb_drv_exit(void)
     REG_USB_INTRUSBE = 0;
 
 #ifdef USE_USB_DMA
+    select_endpoint(1);
+
+    logf("X DMA RX (%x %x %x %x)", REG_USB_ADDR(USB_INTR_DMA_BULKOUT), REG_USB_COUNT(USB_INTR_DMA_BULKOUT),REG_USB_CNTL(USB_INTR_DMA_BULKOUT), REG_USB_OUTCSR);
+    logf("X DMA TX (%x %x %x %x)", REG_USB_ADDR(USB_INTR_DMA_BULKIN), REG_USB_COUNT(USB_INTR_DMA_BULKIN),REG_USB_CNTL(USB_INTR_DMA_BULKIN), REG_USB_INCSR);
+
     /* Disable DMA */
     REG_USB_CNTL(USB_INTR_DMA_BULKIN) = 0;
     REG_USB_CNTL(USB_INTR_DMA_BULKOUT) = 0;
