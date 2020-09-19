@@ -32,6 +32,12 @@
    before the last samples are sent to the codec and so things are done in
    parallel (as much as possible) with sending-out data. */
 
+#ifdef HW_NEEDS_PCM_DOUBLE_BUFFER
+#define NUM_BUFS 3
+#else
+#define NUM_BUFS 2
+#endif
+
 static unsigned int mixer_sampr = HW_SAMPR_DEFAULT;
 
 /* Define this to nonzero to add a marker pulse at each frame start */
@@ -55,7 +61,7 @@ struct mixer_channel
 /* Because of the double-buffering, playback is always from here, otherwise a
    mechanism for the channel callbacks not to free buffers too early would be
    needed (if we _really_ want it and it's worth it, we _can_ do that ;-) ) */
-static uint32_t downmix_buf[2][MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
+static uint32_t downmix_buf[NUM_BUFS][MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
 static int downmix_index = 0;   /* Which downmix_buf? */
 static size_t next_size = 0;    /* Size of buffer to play next time */
 
@@ -122,7 +128,11 @@ mixer_buffer_callback(enum pcm_dma_status status)
     if (status != PCM_DMAST_STARTED)
         return status;
 
+#if (NUM_BUFS == 2)
     downmix_index ^= 1; /* Next buffer */
+#else
+    downmix_index = (downmix_index + 1) % NUM_BUFS;
+#endif
 
     void *mixptr = downmix_buf[downmix_index];
     size_t mixsize = MIX_FRAME_SIZE;
