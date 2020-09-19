@@ -18,6 +18,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define LOGF_ENABLE
+
 #include "config.h"
 #include "system.h"
 #include "general.h"
@@ -26,11 +28,19 @@
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
 
+#include "logf.h"
+
 /* Channels use standard-style PCM callback interface but a latency of one
    frame by double-buffering is introduced in order to facilitate mixing and
    keep the hardware fed. There must be sufficient time to perform operations
    before the last samples are sent to the codec and so things are done in
    parallel (as much as possible) with sending-out data. */
+
+#ifdef HW_NEEDS_PCM_DOUBLE_BUFFER
+#define NUM_BUFS 3
+#else
+#define NUM_BUFS 2
+#endif
 
 static unsigned int mixer_sampr = HW_SAMPR_DEFAULT;
 
@@ -55,8 +65,9 @@ struct mixer_channel
 /* Because of the double-buffering, playback is always from here, otherwise a
    mechanism for the channel callbacks not to free buffers too early would be
    needed (if we _really_ want it and it's worth it, we _can_ do that ;-) ) */
-static uint32_t downmix_buf[2][MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
-static int downmix_index = 0;   /* Which downmix_buf? */
+static uint32_t downmix_buf[NUM_BUFS][MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
+static int downmix_index_r = 0;   /* Which downmix_buf? */
+static int downmix_index_w = 0;   /* Which downmix_buf? */
 static size_t next_size = 0;    /* Size of buffer to play next time */
 
 /* Descriptors for all available channels */
@@ -104,8 +115,16 @@ static void channel_stopped(struct mixer_channel *chan)
 /* Main PCM callback - sends the current prepared frame to play */
 static void mixer_pcm_callback(const void **addr, size_t *size)
 {
-    *addr = downmix_buf[downmix_index];
+    *addr = downmix_buf[downmix_index_r];
     *size = next_size;
+
+    logf("m cb %d/%d %x %d", downmix_index_r, downmix_index_w, *addr, *size);
+
+#if (NUM_BUFS == 2)
+    downmix_index_r ^= 1; /* Next buffer */
+#else
+    downmix_index_r = (downmix_index_r + 1) % NUM_BUFS;
+#endif
 }
 
 static inline void chan_call_buffer_hook(struct mixer_channel *chan)
@@ -119,12 +138,18 @@ static inline void chan_call_buffer_hook(struct mixer_channel *chan)
 static enum pcm_dma_status MIXER_CALLBACK_ICODE
 mixer_buffer_callback(enum pcm_dma_status status)
 {
+    logf("m %d %d/%d", status, downmix_index_r, downmix_index_w);
+
     if (status != PCM_DMAST_STARTED)
         return status;
 
-    downmix_index ^= 1; /* Next buffer */
+#if (NUM_BUFS == 2)
+    downmix_index_w ^= 1; /* Next buffer */
+#else
+    downmix_index_w = (downmix_index_w + 1) % NUM_BUFS;
+#endif
 
-    void *mixptr = downmix_buf[downmix_index];
+    void *mixptr = downmix_buf[downmix_index_w];
     size_t mixsize = MIX_FRAME_SIZE;
     struct mixer_channel **chan_p;
 
@@ -235,8 +260,11 @@ fill_frame:
     /* else silence period ran out - go to sleep */
 
 #if FRAME_BOUNDARY_MARKERS != 0
+#if NUM_BUFS > 2
+    #error "FRAME_BOUNDARY_MARKERS broken for NUM_BUFS > 2"
+#endif
     if (next_size)
-        *downmix_buf[downmix_index] = downmix_index ? 0x7fff7fff : 0x80008000;
+        *downmix_buf[downmix_index_w] = downmix_index_w ? 0x7fff7fff : 0x80008000;
 #endif
 
     /* Certain SoC's have to do cleanup */
@@ -256,6 +284,8 @@ static void mixer_start_pcm(void)
         return;
 #endif
 
+    logf("mixer start %d/%d", downmix_index_r, downmix_index_w);
+
     /* Requires a shared global sample rate for all channels */
     pcm_set_frequency(mixer_sampr);
 
@@ -263,10 +293,19 @@ static void mixer_start_pcm(void)
     mixer_buffer_callback(PCM_DMAST_STARTED);
 
     /* Save the previous call's output */
-    void *start = downmix_buf[downmix_index];
+    void *start = downmix_buf[downmix_index_w];
 
     mixer_buffer_callback(PCM_DMAST_STARTED);
 
+#if (NUM_BUFS > 2)
+    /* Fill in remaining buffers */
+    int i;
+    for (i = 2 ; i < NUM_BUFS ; i++) {
+	    mixer_buffer_callback(PCM_DMAST_STARTED);
+    }
+#endif
+
+    logf("start %x, %d", start, MIX_FRAME_SIZE);
     pcm_play_data(mixer_pcm_callback, mixer_buffer_callback,
                   start, MIX_FRAME_SIZE);
 }

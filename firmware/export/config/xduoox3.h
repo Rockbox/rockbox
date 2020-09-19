@@ -115,6 +115,9 @@
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL
 #define HAVE_PLAY_FREQ
 
+/* Hardware needs two PCM buffers */
+#define HW_NEEDS_PCM_DOUBLE_BUFFER
+
 #define AB_REPEAT_ENABLE
 
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
