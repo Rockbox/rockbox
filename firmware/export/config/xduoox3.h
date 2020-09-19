@@ -108,6 +108,9 @@
 /* define the bitmask of hardware sample rates */
 #define HW_SAMPR_CAPS  SAMPR_CAP_ALL_192
 
+/* Hardware needs two PCM buffers */
+#define HW_NEEDS_PCM_DOUBLE_BUFFER
+
 #define AB_REPEAT_ENABLE
 
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
