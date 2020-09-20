@@ -668,6 +668,7 @@ static const struct plugin_api rockbox_api = {
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     tagcache_fill_tags,
 #endif
+    tagcache_get_stat,
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -790,6 +791,7 @@ static const struct plugin_api rockbox_api = {
     led,
 
     /*plugin*/
+    plugin_open,
     plugin_get_buffer,
     plugin_get_audio_buffer,     /* defined in plugin.c */
     plugin_release_audio_buffer, /* defined in plugin.c */
@@ -802,10 +804,6 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 
-#ifdef HAVE_TAGCACHE
-    tagcache_get_stat,
-#endif
-    plugin_open,
 };
 
 static int plugin_buffer_handle;
