@@ -1519,6 +1519,61 @@ void talk_time(const struct tm *tm, bool enqueue)
     }
 }
 
+void talk_announce_voice_invalid(void)
+{
+    int voice_fd;
+    int voice_sz;
+    int buf_handle, core_handle;
+    unsigned char *buf;
+    struct queue_entry qe;
+
+    const char talkfile[] =
+               LANG_DIR "/InvalidVoice_" DEFAULT_VOICE_LANG ".talk";
+    static struct buflib_callbacks dummy_ops;
+
+    if (global_settings.talk_menu && talk_status != TALK_STATUS_OK && !button_hold())
+    {
+        talk_temp_disable_count = 0xFF; /* don't let anyone else use voice sys */
+        voice_fd = open(talkfile, O_RDONLY);
+        if (voice_fd < 0)
+            return; /* can't open */
+        voice_sz= lseek(voice_fd, 0, SEEK_END);
+        if (voice_sz == 0 || voice_sz > (64<<10))
+            return; /* nothing here or too big */
+
+        lseek(voice_fd, 0, SEEK_SET);
+        /* add a bit extra for buflib overhead (2K) */
+        core_handle = core_alloc_ex("voice buf",
+                                    ALIGN_UP(voice_sz, sizeof(long)) + (2<<10),
+                                    &dummy_ops);
+        if (core_handle < 0)
+            return;
+
+        buflib_init(&clip_ctx, core_get_data(core_handle),
+                               ALIGN_UP(voice_sz, sizeof(long)) + (2 << 9));
+
+        buf_handle = buflib_alloc(&clip_ctx, ALIGN_UP(voice_sz, sizeof(long)));
+
+        if (buf_handle < 0)
+            return;
+        buf = buflib_get_data(&clip_ctx, buf_handle);
+
+        if (buf && read(voice_fd, buf, voice_sz) > 0)
+        {
+            voice_thread_init();
+            qe.handle = buf_handle;
+            qe.length = qe.remaining = voice_sz;
+            queue_clip(&qe, false);
+        }
+        close(voice_fd);
+
+        voice_wait();
+        voice_thread_kill();
+        buf_handle = buflib_free(&clip_ctx, buf_handle);
+        core_handle = core_free(core_handle);
+    }
+}
+
 bool talk_get_debug_data(struct talk_debug_data *data)
 {
     char* p_lang = DEFAULT_VOICE_LANG; /* default */

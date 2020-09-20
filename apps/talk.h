@@ -186,6 +186,8 @@ struct talk_debug_data {
     enum talk_status status;
 };
 
+void talk_announce_voice_invalid(void);
+
 bool talk_get_debug_data(struct talk_debug_data *data);
 
 #endif /* __TALK_H__ */
