@@ -155,12 +155,12 @@ int plugin_open(char *plugin, char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 240
+#define PLUGIN_API_VERSION 241
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 239
+#define PLUGIN_MIN_API_VERSION 241
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -669,9 +669,6 @@ struct plugin_api {
 #if defined (HAVE_PITCHCONTROL)
     void (*sound_set_pitch)(int32_t pitch);
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_DISK_STORAGE)
-    bool (*mp3_is_playing)(void);
-#endif /* PLATFORM_NATIVE */
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
     void (*pcm_apply_settings)(void);
@@ -765,6 +762,7 @@ struct plugin_api {
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     bool (*tagcache_fill_tags)(struct mp3entry *id3, const char *filename);
 #endif
+    struct tagcache_stat* (*tagcache_get_stat)(void);
 #endif /* HAVE_TAGCACHE */
 
 #ifdef HAVE_ALBUMART
@@ -920,6 +918,7 @@ struct plugin_api {
     void (*led)(bool on);
 
     /*plugin*/
+    int (*plugin_open)(char *path, char *parameter);
     void* (*plugin_get_buffer)(size_t *buffer_size);
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_release_audio_buffer)(void);
@@ -929,14 +928,8 @@ struct plugin_api {
     void (*audio_hard_stop)(void);
 #endif
 
-
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-       
-#ifdef HAVE_TAGCACHE
-    struct tagcache_stat* (*tagcache_get_stat)(void);
-#endif
-    int (*plugin_open)(char *path, char *parameter);
 
 };
 
