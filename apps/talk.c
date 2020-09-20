@@ -1510,7 +1510,7 @@ void talk_announce_voice_invalid(void)
     const char talkfile[] =
                LANG_DIR "/InvalidVoice_" DEFAULT_VOICE_LANG ".talk";
 
-    if (global_settings.talk_menu && talk_status != TALK_STATUS_OK && !button_hold())
+    if (global_settings.talk_menu && talk_status != TALK_STATUS_OK)
     {
         talk_temp_disable_count = 0xFF; /* don't let anyone else use voice sys */
 
