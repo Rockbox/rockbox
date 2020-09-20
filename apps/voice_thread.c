@@ -106,6 +106,7 @@ enum voice_state
     VOICE_STATE_MESSAGE = 0,
     VOICE_STATE_DECODE,
     VOICE_STATE_BUFFER_INSERT,
+    VOICE_STATE_QUIT,
 };
 
 /* A delay to not bring audio back to normal level too soon */
@@ -115,6 +116,7 @@ enum voice_thread_messages
 {
     Q_VOICE_PLAY = 0, /* Play a clip */
     Q_VOICE_STOP,     /* Stop current clip */
+    Q_VOICE_KILL,     /* Kill voice thread till restart*/
 };
 
 /* Structure to store clip data callback info */
@@ -383,7 +385,9 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         speex_decoder_ctl(td->st, SPEEX_GET_LOOKAHEAD, &td->lookahead);
 
         return VOICE_STATE_DECODE;
-
+    case Q_VOICE_KILL:
+        queue_delete(&voice_queue);
+        return VOICE_STATE_QUIT;
     case SYS_TIMEOUT:
         if (voice_unplayed_frames())
         {
@@ -512,7 +516,7 @@ static enum voice_state voice_buffer_insert(struct voice_thread_data *td)
 }
 
 /* Voice thread entrypoint */
-static void NORETURN_ATTR voice_thread(void)
+static void voice_thread(void)
 {
     struct voice_thread_data td;
     enum voice_state state = VOICE_STATE_MESSAGE;
@@ -532,8 +536,20 @@ static void NORETURN_ATTR voice_thread(void)
         case VOICE_STATE_BUFFER_INSERT:
             state = voice_buffer_insert(&td);
             break;
+        case VOICE_STATE_QUIT:
+            logf("Exiting voice thread");
+            core_free(voice_buf_hid);
+            voice_buf_hid = 0;
+            return;
         }
     }
+    return;
+}
+
+/* kill voice thread and dont allow re-init*/
+void voice_thread_kill(void)
+{
+    queue_send(&voice_queue, Q_VOICE_KILL, 0);
 }
 
 /* Initialize buffers, all synchronization objects and create the thread */

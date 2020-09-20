@@ -36,6 +36,8 @@ void voice_wait(void);
 void voice_stop(void);
 
 void voice_thread_init(void);
+void voice_thread_kill(void);
+
 #ifdef HAVE_PRIORITY_SCHEDULING
 void voice_thread_set_priority(int priority);
 #endif

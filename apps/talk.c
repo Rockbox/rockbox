@@ -535,7 +535,6 @@ static bool load_header(int fd, struct voicefile_header *hdr)
 
 static bool create_clip_buffer(size_t max_size)
 {
-    size_t alloc_size;
     /* just allocate, populate on an as-needed basis later */
     talk_handle = core_alloc_ex("voice data", max_size, &talk_ops);
     if (talk_handle < 0)
@@ -543,16 +542,12 @@ static bool create_clip_buffer(size_t max_size)
 
     buflib_init(&clip_ctx, core_get_data(talk_handle), max_size);
 
-    /* the first alloc is the clip metadata table */
-    alloc_size = max_clips * sizeof(struct clip_cache_metadata);
-    metadata_table_handle = buflib_alloc(&clip_ctx, alloc_size);
-    memset(buflib_get_data(&clip_ctx, metadata_table_handle), 0, alloc_size);
-
     return true;
 
 alloc_err:
     talk_status = TALK_STATUS_ERR_ALLOC;
-    index_handle = core_free(index_handle);
+    if (index_handle > 0)
+        index_handle = core_free(index_handle);
     return false;
 }
 
@@ -608,6 +603,7 @@ static bool load_voicefile_data(int fd)
      * other allocs succeed without disabling voice which would require
      * reloading the voice from disk (as we do not shrink our buffer when
      * other code attempts new allocs these would fail) */
+    size_t metadata_alloc_size;
     ssize_t cap = MIN(MAX_CLIP_BUFFER_SIZE, audio_buffer_available() - (64<<10));
     if (UNLIKELY(cap < 0))
     {
@@ -624,6 +620,11 @@ static bool load_voicefile_data(int fd)
         talk_handle = core_free(talk_handle);
     if (!create_clip_buffer(voicebuf_size))
         return false;
+
+    /* the first alloc is the clip metadata table */
+    metadata_alloc_size = max_clips * sizeof(struct clip_cache_metadata);
+    metadata_table_handle = buflib_alloc(&clip_ctx, metadata_alloc_size);
+    memset(buflib_get_data(&clip_ctx, metadata_table_handle), 0, metadata_alloc_size);
 
     load_initial_clips(fd);
     /* make sure to have the silence clip, if available return value can
@@ -1496,6 +1497,56 @@ void talk_time(const struct tm *tm, bool enqueue)
                 talk_id(VOICE_OH, true);
             talk_number(tm->tm_min, true);
         }
+    }
+}
+
+void talk_announce_voice_invalid(void)
+{
+    int voice_fd;
+    int voice_sz;
+    int buf_handle;
+    struct queue_entry qe;
+
+    const char talkfile[] =
+               LANG_DIR "/InvalidVoice_" DEFAULT_VOICE_LANG ".talk";
+
+    if (global_settings.talk_menu && talk_status != TALK_STATUS_OK && !button_hold())
+    {
+        talk_temp_disable_count = 0xFF; /* don't let anyone else use voice sys */
+
+        voice_fd = open(talkfile, O_RDONLY);
+        if (voice_fd < 0)
+            return; /* can't open */
+
+        voice_sz= lseek(voice_fd, 0, SEEK_END);
+        if (voice_sz == 0 || voice_sz > (64<<10))
+            return; /* nothing here or too big */
+
+        lseek(voice_fd, 0, SEEK_SET);
+        /* add a bit extra for buflib overhead (2K) */
+        if (!create_clip_buffer(ALIGN_UP(voice_sz, sizeof(long)) + (2<<10)))
+            return;
+        mutex_lock(&read_buffer_mutex);
+        buf_handle = buflib_alloc(&clip_ctx, ALIGN_UP(voice_sz, sizeof(long)));
+
+        if (buf_handle < 0)
+            return;
+
+        if (read_to_handle_ex(voice_fd, &clip_ctx, buf_handle, 0, voice_sz) > 0)
+        {
+            voice_thread_init();
+            qe.handle = buf_handle;
+            qe.length = qe.remaining = voice_sz;
+            queue_clip(&qe, false);
+            voice_wait();
+            voice_thread_kill();
+        }
+
+        mutex_unlock(&read_buffer_mutex);
+        close(voice_fd);
+
+        buf_handle = buflib_free(&clip_ctx, buf_handle);
+        talk_handle = core_free(talk_handle);
     }
 }
 

@@ -372,7 +372,7 @@ static void init(void)
         scrobbler_init();
 
     audio_init();
-
+    talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
     settings_apply_skins();
 }
 
@@ -631,6 +631,7 @@ static void init(void)
     CHART(">audio_init");
     audio_init();
     CHART("<audio_init");
+    talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);
