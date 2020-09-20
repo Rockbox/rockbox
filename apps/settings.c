@@ -921,9 +921,6 @@ void settings_apply(bool read_disk)
             lang_core_load(buf);
             CHART("<lang_core_load");
         }
-        CHART(">talk_init");
-        talk_init(); /* use voice of same language */
-        CHART("<talk_init");
 
         /* load the icon set */
         CHART(">icons_init");
@@ -1034,6 +1031,10 @@ void settings_apply(bool read_disk)
     ibasso_set_governor(global_settings.governor);
     ibasso_set_usb_mode(global_settings.usb_mode);
 #endif
+
+    CHART(">talk_init");
+    talk_init(); /* use voice of same language */
+    CHART("<talk_init");
 
     /* This should stay last */
 #if defined(HAVE_RECORDING)

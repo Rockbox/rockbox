@@ -372,8 +372,9 @@ static void init(void)
         scrobbler_init();
 
     audio_init();
-
+    talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
     settings_apply_skins();
+
 }
 
 #else /* CONFIG_PLATFORM & PLATFORM_HOSTED */
@@ -631,6 +632,7 @@ static void init(void)
     CHART(">audio_init");
     audio_init();
     CHART("<audio_init");
+    talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);
@@ -655,6 +657,7 @@ static void init(void)
     CHART("<settings_apply_skins");
     settings_apply_skins();
     CHART(">settings_apply_skins");
+
 }
 
 #ifdef CPU_PP
