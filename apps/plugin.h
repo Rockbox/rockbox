@@ -155,12 +155,12 @@ int plugin_open(char *plugin, char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 240
+#define PLUGIN_API_VERSION 241
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 239
+#define PLUGIN_MIN_API_VERSION 241
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -669,9 +669,6 @@ struct plugin_api {
 #if defined (HAVE_PITCHCONTROL)
     void (*sound_set_pitch)(int32_t pitch);
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_DISK_STORAGE)
-    bool (*mp3_is_playing)(void);
-#endif /* PLATFORM_NATIVE */
     const unsigned long *audio_master_sampr_list;
     const unsigned long *hw_freq_sampr;
     void (*pcm_apply_settings)(void);
