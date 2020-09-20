@@ -121,7 +121,7 @@ enum voice_thread_messages
 struct voice_info
 {
     /* Callback to get more clips */
-    mp3_play_callback_t get_more;
+    voice_play_callback_t get_more;
     /* Start of clip */
     const void *start;
     /* Size of clip */
@@ -276,8 +276,8 @@ static void voice_buf_commit(int count)
 }
 
 /* Stop any current clip and start playing a new one */
-void mp3_play_data(const void *start, size_t size,
-                   mp3_play_callback_t get_more)
+void voice_play_data(const void *start, size_t size,
+                     voice_play_callback_t get_more)
 {
     if (voice_thread_id && start && size && get_more)
     {
@@ -294,25 +294,13 @@ void mp3_play_data(const void *start, size_t size,
 }
 
 /* Stop current voice clip from playing */
-void mp3_play_stop(void)
+void voice_play_stop(void)
 {
     if (voice_thread_id != 0)
     {
         LOGFQUEUE("mp3 >| voice Q_VOICE_STOP");
         queue_send(&voice_queue, Q_VOICE_STOP, 0);
     }
-}
-
-void mp3_play_pause(bool play)
-{
-    /* a dummy */
-    (void)play;
-}
-
-/* Tell if voice is still in a playing state */
-bool mp3_is_playing(void)
-{
-    return voice_playing;
 }
 
 /* This function is meant to be used by the buffer request functions to

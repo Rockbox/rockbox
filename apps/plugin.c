@@ -597,9 +597,6 @@ static const struct plugin_api rockbox_api = {
 #if defined (HAVE_PITCHCONTROL)
     sound_set_pitch,
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && defined(HAVE_DISK_STORAGE)
-    mp3_is_playing,
-#endif
     &audio_master_sampr_list[0],
     &hw_freq_sampr[0],
     pcm_apply_settings,

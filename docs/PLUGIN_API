@@ -402,7 +402,7 @@ int count_mp3_frames(int fd, int startpos, int filesize, void (*progressfunc)(in
     \description
 
 void cpu_boost(bool on_off)
-    \conditions (!defined(SIMULATOR)) && (defined(HAVE_ADJUSTABLE_CPU_FREQ)) && !defined(CPU_BOOST_LOGGING) 
+    \conditions (!defined(SIMULATOR)) && (defined(HAVE_ADJUSTABLE_CPU_FREQ)) && !defined(CPU_BOOST_LOGGING)
     \param on_off
     \description Boosts the CPU if =on_off= is true, otherwise it unboosts the CPU
 
@@ -1368,31 +1368,6 @@ bool mp3info(struct mp3entry *entry, const char *filename)
     \return FALSE if successfull
     \description The given =entry= is filled in with whatever id3 info it could find about the given =filename=
 
-bool mp3_is_playing(void)
-    \group sound
-    \conditions (!defined(SIMULATOR))
-    \return true if an mp3 is playing, else return false
-    \description Note: a paused mp3 is considered as a playing mp3
-
-void mp3_play_data(const unsigned char* start, int size, void (*get_more)(unsigned char** start, size_t* size))
-    \group sound
-    \conditions (!defined(SIMULATOR))
-    \param start points to the begining of the file to play
-    \param size is the size to play
-    \param get_more is a callback function
-    \description Plays a chunk of an mp3 file
-
-void mp3_play_pause(bool play)
-    \group sound
-    \conditions (!defined(SIMULATOR))
-    \param play
-    \description If playback was paused and =play= is TRUE, resume playback. If playback isn't paused and =play= is FALSE, pause playback.
-
-void mp3_play_stop(void)
-    \group sound
-    \conditions (!defined(SIMULATOR))
-    \description Stops playback
-
 void mutex_init(struct mutex *m)
     \group kernel/ system
     \param m
@@ -1470,7 +1445,7 @@ void pcm_play_data(pcm_more_callback_type get_more, unsigned char* start, size_t
     \param get_more Optional callback
     \param start is the address of raw 16-16, interleaved PCM data
     \param size is the size of the data to play
-    \description May be used without the callback parameter in order to play a single clip. If you wish to play sound continuously, then use the callback instead and return the buffer address and size to be played from that callback. Every time that a buffer is played out, the callback is asked for the next buffer to play but without stopping and starting playback. The callback is called asynchronously in interrupt context so what you may do in there is limited. 
+    \description May be used without the callback parameter in order to play a single clip. If you wish to play sound continuously, then use the callback instead and return the buffer address and size to be played from that callback. Every time that a buffer is played out, the callback is asked for the next buffer to play but without stopping and starting playback. The callback is called asynchronously in interrupt context so what you may do in there is limited.
 
 void pcm_play_lock(void)
     \group sound
@@ -2031,8 +2006,8 @@ struct gui_syncstatusbar *statusbars
 
 int strcasecmp(const char *, const char *)
     \group strings and memory
-    \param 
-    \param 
+    \param
+    \param
     \return an integer less than, equal to, or greater than zero if s1 is found, respectively, to be less than, to match, or be greater than s2
     \description The  strcasecmp() function compares the two strings s1 and s2, ignoring the case of the characters
 
@@ -2052,8 +2027,8 @@ char *strchr(const char *s, int c)
 
 int strcmp(const char *, const char *)
     \group strings and memory
-    \param 
-    \param 
+    \param
+    \param
     \return
     \description strcmp() compares the string a to string b. If a sorts lexicographically after b, strcmp returns a number greater than zero. If the two strings match, strcmp returns zero. If a sorts lexicographically before b, strcmp returns a number less than zero.
 
@@ -2081,8 +2056,8 @@ int strncasecmp(const char *s1, const char *s2, size_t n)
 
 int strncmp(const char *, const char *, size_t)
     \group strings and memory
-    \param 
-    \param 
+    \param
+    \param
     \param size_t
     \return
     \description

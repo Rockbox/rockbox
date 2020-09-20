@@ -23,16 +23,14 @@
 
 #include "config.h"
 
-#ifndef MP3_PLAY_CALLBACK_DEFINED
-#define MP3_PLAY_CALLBACK_DEFINED
-typedef void (*mp3_play_callback_t)(const void **start, size_t *size);
+#ifndef VOICE_PLAY_CALLBACK_DEFINED
+#define VOICE_PLAY_CALLBACK_DEFINED
+typedef void (*voice_play_callback_t)(const void **start, size_t *size);
 #endif
 
-void mp3_play_data(const void *start, size_t size,
-                   mp3_play_callback_t get_more);
-void mp3_play_stop(void);
-void mp3_play_pause(bool play);
-bool mp3_is_playing(void);
+void voice_play_data(const void *start, size_t size,
+                     voice_play_callback_t get_more);
+void voice_play_stop(void);
 
 void voice_wait(void);
 void voice_stop(void);
