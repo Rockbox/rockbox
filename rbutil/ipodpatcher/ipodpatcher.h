@@ -19,14 +19,30 @@
  *
  ****************************************************************************/
 
-#ifndef _IPODPATCHER_H
-#define _IPODPATCHER_H
+#ifndef IPODPATCHER_H
+#define IPODPATCHER_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #include "ipodio.h"
+
+/* exit codes */
+#define IPOD_OK 0
+#define IPOD_WRONG_ARGUMENTS 1
+#define IPOD_OPEN_INFILE_FAILED 2
+#define IPOD_PARTITION_ERROR 3
+#define IPOD_OPEN_OUTFILE_FAILED 4
+#define IPOD_CANNOT_REOPEN 5
+#define IPOD_ACCESS_DENIED 10
+#define IPOD_NOT_FOUND 11
+#define IPOD_WRONG_DEVICE_COUNT 12
+#define IPOD_IMAGE_ERROR 13
+#define IPOD_DUMP_FAILED 14
+#define IPOD_MULTIPLE_DEVICES 15
+#define IPOD_WRONG_TYPE 16
+#define IPOD_UNKNOWN_FW_VERSION -1
 
 /* Size of buffer for disk I/O - 8MB is large enough for any version
    of the Apple firmware, but not the Nano's RSRC image. */

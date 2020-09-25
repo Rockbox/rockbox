@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
 
     if ((argc > 1) && ((strcmp(argv[1],"-h")==0) || (strcmp(argv[1],"--help")==0))) {
         print_usage();
-        return 1;
+        return IPOD_OK;
     }
 
     if (ipod_alloc_buffer(&ipod,BUFFER_SIZE) < 0) {
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
     if ((argc > 1) && (strcmp(argv[1],"--scan")==0)) {
         if (ipod_scan(&ipod) == 0)
             fprintf(stderr,"[ERR]  No ipods found.\n");
-        return 0;
+        return IPOD_NOT_FOUND;
     }
 
     /* If the first parameter doesn't start with -, then we interpret it as a device */
@@ -200,6 +200,9 @@ int main(int argc, char* argv[])
         } else if (n > 1) {
             fprintf(stderr,"[ERR]  %d ipods found, aborting\n",n);
             fprintf(stderr,"[ERR]  Please connect only one ipod and re-run ipodpatcher.\n");
+            return IPOD_MULTIPLE_DEVICES;
+        } else if (n == 1 && ipod.macpod) {
+            return IPOD_WRONG_TYPE;
         }
 
         if (n != 1) {
@@ -209,7 +212,7 @@ int main(int argc, char* argv[])
                 fgets(yesno,4,stdin);
             }
 #endif
-            return 0;
+            return IPOD_NOT_FOUND;
         }
 
         i = 1;
@@ -239,7 +242,7 @@ int main(int argc, char* argv[])
             action = ADD_BOOTLOADER;
             type = FILETYPE_DOT_IPOD;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-ab")==0) || 
@@ -247,7 +250,7 @@ int main(int argc, char* argv[])
             action = ADD_BOOTLOADER;
             type = FILETYPE_DOT_BIN;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-rf")==0) || 
@@ -255,7 +258,7 @@ int main(int argc, char* argv[])
             action = READ_FIRMWARE;
             type = FILETYPE_DOT_IPOD;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-rfb")==0) || 
@@ -263,7 +266,7 @@ int main(int argc, char* argv[])
             action = READ_FIRMWARE;
             type = FILETYPE_DOT_BIN;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
 #ifdef WITH_BOOTOBJS
@@ -279,7 +282,7 @@ int main(int argc, char* argv[])
             action = WRITE_FIRMWARE;
             type = FILETYPE_DOT_IPOD;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-wfb")==0) || 
@@ -287,21 +290,21 @@ int main(int argc, char* argv[])
             action = WRITE_FIRMWARE;
             type = FILETYPE_DOT_BIN;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-r")==0) || 
                    (strcmp(argv[i],"--read-partition")==0)) {
             action = READ_PARTITION;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-w")==0) || 
                    (strcmp(argv[i],"--write-partition")==0)) {
             action = WRITE_PARTITION;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-v")==0) || 
@@ -315,20 +318,20 @@ int main(int argc, char* argv[])
         } else if (strcmp(argv[i],"--read-aupd")==0) {
             action = READ_AUPD;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if (strcmp(argv[i],"--write-aupd")==0) {
             action = WRITE_AUPD;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-x")==0) ||
                    (strcmp(argv[i],"--dump-xml")==0)) {
             action = DUMP_XML;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return IPOD_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-c")==0) || 
@@ -336,7 +339,7 @@ int main(int argc, char* argv[])
             action = CONVERT_TO_FAT32;
             i++;
         } else {
-            print_usage(); return 1;
+            print_usage(); return IPOD_WRONG_ARGUMENTS;
         }
     }
 
@@ -346,14 +349,14 @@ int main(int argc, char* argv[])
     }
 
     if (ipod_open(&ipod, 0) < 0) {
-        return 1;
+        return IPOD_ACCESS_DENIED;
     }
 
     fprintf(stderr,"[INFO] Reading partition table from %s\n",ipod.diskname);
     fprintf(stderr,"[INFO] Sector size is %d bytes\n",ipod.sector_size);
 
     if (read_partinfo(&ipod,0) < 0) {
-        return 2;
+        return IPOD_PARTITION_ERROR;
     }
 
     display_partinfo(&ipod);
@@ -361,26 +364,26 @@ int main(int argc, char* argv[])
     if (ipod.pinfo[0].start==0) {
         fprintf(stderr,"[ERR]  No partition 0 on disk:\n");
         display_partinfo(&ipod);
-        return 3;
+        return IPOD_PARTITION_ERROR;
     }
 
     read_directory(&ipod);
 
     if (ipod.nimages <= 0) {
         fprintf(stderr,"[ERR]  Failed to read firmware directory - nimages=%d\n",ipod.nimages);
-        return 1;
+        return IPOD_IMAGE_ERROR;
     }
 
     if (getmodel(&ipod,(ipod.ipod_directory[ipod.ososimage].vers>>8)) < 0) {
         fprintf(stderr,"[ERR] Unknown version number in firmware (%08x)\n",
                        ipod.ipod_directory[ipod.ososimage].vers);
-        return -1;
+        return IPOD_UNKNOWN_FW_VERSION;
     }
 
 #ifdef __WIN32__
     /* Windows requires the ipod in R/W mode for SCSI Inquiry */
     if (ipod_reopen_rw(&ipod) < 0) {
-        return 5;
+        return IPOD_CANNOT_REOPEN;
     }
 #endif
 
@@ -412,7 +415,7 @@ int main(int argc, char* argv[])
         if (fgets(yesno,4,stdin)) {
             if (yesno[0]=='i') {
                 if (ipod_reopen_rw(&ipod) < 0) {
-                    return 5;
+                    return IPOD_CANNOT_REOPEN;
                 }
 
                 if (add_bootloader(&ipod, NULL, FILETYPE_INTERNAL)==0) {
@@ -422,7 +425,7 @@ int main(int argc, char* argv[])
                 }
             } else if (yesno[0]=='u') {
                 if (ipod_reopen_rw(&ipod) < 0) {
-                    return 5;
+                    return IPOD_CANNOT_REOPEN;
                 }
 
                 if (delete_bootloader(&ipod)==0) {
@@ -435,7 +438,7 @@ int main(int argc, char* argv[])
 #endif
     } else if (action==DELETE_BOOTLOADER) {
         if (ipod_reopen_rw(&ipod) < 0) {
-            return 5;
+            return IPOD_CANNOT_REOPEN;
         }
 
         if (ipod.ipod_directory[0].entryOffset==0) {
@@ -449,7 +452,7 @@ int main(int argc, char* argv[])
         }
     } else if (action==ADD_BOOTLOADER) {
         if (ipod_reopen_rw(&ipod) < 0) {
-            return 5;
+            return IPOD_CANNOT_REOPEN;
         }
 
         if (add_bootloader(&ipod, filename, type)==0) {
@@ -460,7 +463,7 @@ int main(int argc, char* argv[])
 #ifdef WITH_BOOTOBJS
     } else if (action==INSTALL) {
         if (ipod_reopen_rw(&ipod) < 0) {
-            return 5;
+            return IPOD_CANNOT_REOPEN;
         }
 
         if (add_bootloader(&ipod, NULL, FILETYPE_INTERNAL)==0) {
@@ -471,7 +474,7 @@ int main(int argc, char* argv[])
 #endif
     } else if (action==WRITE_FIRMWARE) {
         if (ipod_reopen_rw(&ipod) < 0) {
-            return 5;
+            return IPOD_CANNOT_REOPEN;
         }
 
         if (write_firmware(&ipod, filename,type)==0) {
@@ -493,7 +496,7 @@ int main(int argc, char* argv[])
         }
     } else if (action==WRITE_AUPD) {
         if (ipod_reopen_rw(&ipod) < 0) {
-            return 5;
+            return IPOD_CANNOT_REOPEN;
         }
 
         if (write_aupd(&ipod, filename)==0) {
@@ -504,13 +507,13 @@ int main(int argc, char* argv[])
     } else if (action==DUMP_XML) {
         if (ipod.xmlinfo == NULL) {
             fprintf(stderr,"[ERR]  No XML to write\n");
-            return 1;
+            return IPOD_DUMP_FAILED;
         }
 
         outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);
         if (outfile < 0) {
            perror(filename);
-           return 4;
+           return IPOD_OPEN_OUTFILE_FAILED;
         }
 
         if (write(outfile, ipod.xmlinfo, ipod.xmlinfo_len) < 0) {
@@ -523,7 +526,7 @@ int main(int argc, char* argv[])
         outfile = open(filename,O_CREAT|O_TRUNC|O_WRONLY|O_BINARY,S_IREAD|S_IWRITE);
         if (outfile < 0) {
            perror(filename);
-           return 4;
+           return IPOD_OPEN_OUTFILE_FAILED;
         }
 
         if (read_partition(&ipod, outfile) < 0) {
@@ -534,13 +537,13 @@ int main(int argc, char* argv[])
         close(outfile);
     } else if (action==WRITE_PARTITION) {
         if (ipod_reopen_rw(&ipod) < 0) {
-            return 5;
+            return IPOD_CANNOT_REOPEN;
         }
 
         infile = open(filename,O_RDONLY|O_BINARY);
         if (infile < 0) {
             perror(filename);
-            return 2;
+            return IPOD_OPEN_INFILE_FAILED;
         }
 
         /* Check filesize is <= partition size */
@@ -567,7 +570,7 @@ int main(int argc, char* argv[])
         if (fgets(yesno,4,stdin)) {
             if (yesno[0]=='y') {
                 if (ipod_reopen_rw(&ipod) < 0) {
-                    return 5;
+                    return IPOD_CANNOT_REOPEN;
                 }
 
                 if (format_partition(&ipod,1) < 0) {
@@ -588,7 +591,7 @@ int main(int argc, char* argv[])
             if (fgets(yesno,4,stdin)) {
                 if (yesno[0]=='y') {
                     if (ipod_reopen_rw(&ipod) < 0) {
-                        return 5;
+                        return IPOD_CANNOT_REOPEN;
                     }
 
                     if (write_dos_partition_table(&ipod) < 0) {
@@ -615,5 +618,5 @@ int main(int argc, char* argv[])
 #endif
 
     ipod_dealloc_buffer(&ipod);
-    return 0;
+    return IPOD_OK;
 }
