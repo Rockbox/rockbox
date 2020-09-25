@@ -75,7 +75,7 @@ static const char *apple_stop_sign = "{{~~  /-----\\   "\
    and initialise it with ipod_alloc_buf() 
 */
 
-char* get_parttype(int pt)
+char* get_parttype(unsigned int pt)
 {
     int i;
     static char unknown[]="Unknown";
@@ -1478,7 +1478,7 @@ int read_firmware(struct ipod_t* ipod, char* filename, int type)
 
 int read_directory(struct ipod_t* ipod)
 {
-    int n;
+    ssize_t n;
     int x;
     unsigned char* p;
     unsigned short version;

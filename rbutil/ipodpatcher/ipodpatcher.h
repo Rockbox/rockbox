@@ -40,7 +40,7 @@ extern int ipod_verbose;
   #define FILETYPE_INTERNAL 2
 #endif
 
-char* get_parttype(int pt);
+char* get_parttype(unsigned int pt);
 int read_partinfo(struct ipod_t* ipod, int silent);
 int read_partition(struct ipod_t* ipod, int outfile);
 int write_partition(struct ipod_t* ipod, int infile);
