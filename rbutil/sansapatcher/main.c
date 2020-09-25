@@ -152,17 +152,18 @@ int main(int argc, char* argv[])
 
     if ((argc > 1) && ((strcmp(argv[1],"-h")==0) || (strcmp(argv[1],"--help")==0))) {
         print_usage();
-        return 1;
+        return SANSA_OK;
     }
 
     if (sansa_alloc_buffer(&sansa, BUFFER_SIZE) < 0) {
         fprintf(stderr,"Failed to allocate memory buffer\n");
+        return SANSA_INTERNAL_ERROR;
     }
 
     if ((argc > 1) && (strcmp(argv[1],"--scan")==0)) {
         if (sansa_scan(&sansa) == 0)
             fprintf(stderr,"[ERR]  No E200s or C200s found.\n");
-        return 0;
+        return SANSA_NOT_FOUND;
     }
 
     /* If the first parameter doesn't start with -, then we interpret it as a device */
@@ -194,11 +195,13 @@ int main(int argc, char* argv[])
         }
 
         if (n != 1) {
+#ifdef WITH_BOOTOBJS
             if (argc==1) {
                 printf("\nPress ENTER to exit sansapatcher :");
                 fgets(yesno,4,stdin);
             }
-            return 0;
+#endif
+            return n > 1 ? SANSA_MULTIPLE_DEVICES : SANSA_NOT_FOUND;
         }
 
         i = 1;
@@ -223,28 +226,28 @@ int main(int argc, char* argv[])
                    (strcmp(argv[i],"--add-bootloader")==0)) {
             action = ADD_BOOTLOADER;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-of")==0) || 
                    (strcmp(argv[i],"--update-original-firmware")==0)) {
             action = UPDATE_OF;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-bl")==0) || 
                    (strcmp(argv[i],"--update-ppbl")==0)) {
             action = UPDATE_PPBL;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         } else if ((strcmp(argv[i],"-rf")==0) || 
                    (strcmp(argv[i],"--read-firmware")==0)) {
             action = READ_FIRMWARE;
             i++;
-            if (i == argc) { print_usage(); return 1; }
+            if (i == argc) { print_usage(); return SANSA_WRONG_ARGUMENTS; }
             filename=argv[i];
             i++;
         }
@@ -252,18 +255,18 @@ int main(int argc, char* argv[])
 
     if (sansa.diskname[0]==0) {
         print_usage();
-        return 1;
+        return SANSA_WRONG_ARGUMENTS;
     }
 
     if (sansa_open(&sansa, 0) < 0) {
-        return 1;
+        return SANSA_ACCESS_DENIED;
     }
 
     fprintf(stderr,"[INFO] Reading partition table from %s\n",sansa.diskname);
     fprintf(stderr,"[INFO] Sector size is %d bytes\n",sansa.sector_size);
 
     if (sansa_read_partinfo(&sansa,0) < 0) {
-        return 2;
+        return SANSA_PARTITION_ERROR;
     }
 
     display_partinfo(&sansa);
@@ -271,7 +274,7 @@ int main(int argc, char* argv[])
     i = is_sansa(&sansa);
     if (i < 0) {
         fprintf(stderr,"[ERR]  Disk is not an E200 or C200 (%d), aborting.\n",i);
-        return 3;
+        return SANSA_WRONG_TYPE;
     }
 
     if (sansa.hasoldbootloader) {
@@ -281,7 +284,7 @@ int main(int argc, char* argv[])
         printf("[ERR]  *** sansapatcher for the first time.\n");
         printf("[ERR]  *** See http://www.rockbox.org/wiki/SansaE200Install\n");
         printf("[ERR]  ************************************************************************\n");
-        res = 4;
+        res = SANSA_OLD_INSTALL;
     } else {
         if (action==LIST_IMAGES) {
             sansa_list_images(&sansa);
@@ -293,7 +296,7 @@ int main(int argc, char* argv[])
             if (fgets(yesno,4,stdin)) {
                 if (yesno[0]=='i') {
                     if (sansa_reopen_rw(&sansa) < 0) {
-                        res = 5;
+                        res = SANSA_CANNOT_REOPEN;
                     }
                     if (strcmp(sansa.targetname,"c200") == 0) {
                         len = LEN_bootimg_c200;
@@ -306,18 +309,18 @@ int main(int argc, char* argv[])
                         fprintf(stderr,"[INFO] Bootloader installed successfully.\n");
                     } else {
                         fprintf(stderr,"[ERR]  --install failed.\n");
-                        res = 6;
+                        res = SANSA_INSTALL_FAILED;
                     }
                 } else if (yesno[0]=='u') {
                     if (sansa_reopen_rw(&sansa) < 0) {
-                        res = 5;
+                        res = SANSA_CANNOT_REOPEN;
                     }
 
                     if (sansa_delete_bootloader(&sansa)==0) {
                         fprintf(stderr,"[INFO] Bootloader removed.\n");
                     } else {
                         fprintf(stderr,"[ERR]  Bootloader removal failed.\n");
-                        res = 7;
+                        res = SANSA_UNINSTALL_FAILED;
                     }
                 }
             }
@@ -331,7 +334,7 @@ int main(int argc, char* argv[])
 #ifdef WITH_BOOTOBJS
         } else if (action==INSTALL) {
             if (sansa_reopen_rw(&sansa) < 0) {
-                return 5;
+                return SANSA_CANNOT_REOPEN;
             }
 
             if (strcmp(sansa.targetname,"c200") == 0) {
@@ -350,7 +353,7 @@ int main(int argc, char* argv[])
 #endif
         } else if (action==ADD_BOOTLOADER) {
             if (sansa_reopen_rw(&sansa) < 0) {
-                return 5;
+                return SANSA_CANNOT_REOPEN;
             }
 
             len = sansa_read_bootloader(&sansa, filename, &buf);
@@ -363,7 +366,7 @@ int main(int argc, char* argv[])
             }
         } else if (action==DELETE_BOOTLOADER) {
             if (sansa_reopen_rw(&sansa) < 0) {
-                return 5;
+                return SANSA_CANNOT_REOPEN;
             }
 
             if (sansa_delete_bootloader(&sansa)==0) {
@@ -373,7 +376,7 @@ int main(int argc, char* argv[])
             }
         } else if (action==UPDATE_OF) {
             if (sansa_reopen_rw(&sansa) < 0) {
-                return 5;
+                return SANSA_CANNOT_REOPEN;
             }
 
             if (sansa_update_of(&sansa, filename)==0) {
@@ -390,9 +393,9 @@ int main(int argc, char* argv[])
             if (fgets(yesno,4,stdin)) {
                 if (yesno[0]=='y') {
                     if (sansa_reopen_rw(&sansa) < 0) {
-                        return 5;
+                        return SANSA_CANNOT_REOPEN;
                     }
-        
+
                     if (sansa_update_ppbl(&sansa, filename)==0) {
                         fprintf(stderr,"[INFO] PPBL updated successfully.\n");
                     } else {
@@ -406,10 +409,12 @@ int main(int argc, char* argv[])
     sansa_close(&sansa);
     sansa_dealloc_buffer(&sansa);
 
+#ifdef WITH_BOOTOBJS
     if (action==INTERACTIVE) {
         printf("Press ENTER to exit sansapatcher :");
         fgets(yesno,4,stdin);
     }
+#endif
 
     return res;
 }

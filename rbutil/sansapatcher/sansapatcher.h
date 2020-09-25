@@ -28,6 +28,22 @@ extern "C" {
 
 #include "sansaio.h"
 
+/* exit codes */
+#define SANSA_OK 0
+#define SANSA_WRONG_ARGUMENTS 1
+#define SANSA_OPEN_INFILE_FAILED 2
+#define SANSA_PARTITION_ERROR 3
+#define SANSA_CANNOT_REOPEN 5
+#define SANSA_INSTALL_FAILED 6
+#define SANSA_UNINSTALL_FAILED 7
+#define SANSA_ACCESS_DENIED 10
+#define SANSA_NOT_FOUND 11
+#define SANSA_WRONG_DEVICE_COUNT 12
+#define SANSA_MULTIPLE_DEVICES 15
+#define SANSA_WRONG_TYPE 16
+#define SANSA_OLD_INSTALL 17
+#define SANSA_INTERNAL_ERROR 20
+
 extern int sansa_verbose;
 /* Size of buffer for disk I/O - 8MB is large enough for any version
    of the Apple firmware, but not the Nano's RSRC image. */
