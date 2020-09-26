@@ -12,8 +12,7 @@
 
 #define USB_NONE
 
-
-
+#define HAVE_FPU
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
