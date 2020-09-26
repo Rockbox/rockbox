@@ -83,6 +83,9 @@ enum
     AFMT_MPC_SV8,      /* Musepack SV8 */
     AFMT_MP4_AAC_HE,   /* Advanced Audio Coding (AAC-HE) in M4A container */
     AFMT_AY,             /* AY (ZX Spectrum, Amstrad CPC Sound Format) */
+#ifdef HAVE_FPU
+    AFMT_VTX,            /* VTX (ZX Spectrum Sound Format) */
+#endif
     AFMT_GBS,          /* GBS (Game Boy Sound Format) */
     AFMT_HES,          /* HES (Hudson Entertainment System Sound Format) */
     AFMT_SGC,          /* SGC (Sega Master System, Game Gear, Coleco Vision Sound Format) */
@@ -140,7 +143,7 @@ enum rec_format_indexes
     REC_FORMAT_CFG_NUM_BITS = 2
 };
 
-#define REC_FORMAT_CFG_VAL_LIST "wave,aiff,wvpk,mpa3" 
+#define REC_FORMAT_CFG_VAL_LIST "wave,aiff,wvpk,mpa3"
 
 /* get REC_FORMAT_* corresponding AFMT_* */
 extern const int rec_format_afmt[REC_NUM_FORMATS];
@@ -232,7 +235,7 @@ struct mp3entry {
     char* comment;
     char* albumartist;
     char* grouping;
-    int discnum;    
+    int discnum;
     int tracknum;
     int layer;
     int year;
@@ -283,7 +286,7 @@ struct mp3entry {
 
 #ifdef HAVE_TAGCACHE
     unsigned char autoresumable; /* caches result of autoresumable() */
-    
+
     /* runtime database fields */
     long tagcache_idx;     /* 0=invalid, otherwise idx+1 */
     int rating;
@@ -292,7 +295,7 @@ struct mp3entry {
     long lastplayed;
     long playtime;
 #endif
-    
+
     /* replaygain support */
     long track_level;   /* holds the level in dB * (1<<FP_BITS) */
     long album_level;
@@ -329,5 +332,3 @@ bool rbcodec_format_is_atomic(int afmt);
 bool format_buffers_with_offset(int afmt);
 
 #endif
-
-
