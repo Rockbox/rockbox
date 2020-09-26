@@ -33,10 +33,10 @@ local _timer = require("timer")
 -- or you can provide your own function see below..
 -- f_t and d_t allow you to pass your own tables for re-use but isn't necessary
 ]]
-local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
-
+local function get_files(path, norecurse, finddir, findfile, sort_by, f_t, d_t)
     local quit = false
-
+    local sort_by_function -- forward declaration
+    local filepath_function -- forward declaration
     local files = f_t or {}
     local dirs = d_t or {}
 
@@ -67,13 +67,15 @@ local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
 
     local function _get_files(path, cancelbtn)
         local sep = ""
+        local filepath
+        local finfo_t
         if string.sub(path, - 1) ~= "/" then sep = "/" end
-        for fname, isdir in luadir.dir(path) do
-
+        for fname, isdir, finfo_t in luadir.dir(path, true) do
             if isdir and finddir(fname) then
                 table.insert(dirs, path .. sep ..fname)
             elseif not isdir and findfile(fname) then
-                table.insert(files, path .. sep ..fname)
+                filepath = filepath_function(path, sep, fname, finfo_t.attribute, finfo_t.size, finfo_t.time)
+                table.insert(files, filepath)
             end
 
             if  rb.get_plugin_action(0) == cancelbtn then
@@ -81,6 +83,8 @@ local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
             end
         end
     end
+
+
 
     local function cmp_alphanum (op1, op2)
         local type1= type(op1)
@@ -92,6 +96,7 @@ local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
             if type1 == "string" then
                 op1 = op1:upper()
                 op2 = op2:upper()
+                return sort_by_function(op1, op2)
             end
             return op1 < op2
         end
@@ -99,10 +104,44 @@ local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
 
     _lcd:splashf(1, "Searching for Files")
 
+    if sort_by == "name" then
+        sort_by_function = function(s1, s2) return s1 < s2 end
+        filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
+                return string.format("%s%s%s;", path, sep, fname)
+        end
+    elseif sort_by == "size" then
+        filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
+                return string.format("%s%s%s; At:%d, Sz:%d, Tm:%d", path, sep, fname, fattrib, fsize, ftime)
+        end
+        sort_by_function = function(s1, s2)
+            local v1, v2
+            v1 = string.match(s1, "SZ:(%d+)")
+            v2 = string.match(s2, "SZ:(%d+)")
+            if v1 or v2 then
+                return tonumber(v1 or 0) < tonumber(v2 or 0)
+            end
+            return s1 < s2
+        end
+    elseif sort_by == "date" then
+        filepath_function = function(path, sep, fname, fattrib, fsize, ftime)
+                return string.format("%s%s%s; At:%d, Sz:%d, Tm:%d", path, sep, fname, fattrib, fsize, ftime)
+        end
+        sort_by_function = function(s1, s2)
+            local v1, v2
+            v1 = string.match(s1, "TM:(%d+)")
+            v2 = string.match(s2, "TM:(%d+)")
+            if v1 or v2 then
+                return tonumber(v1 or 0) < tonumber(v2 or 0)
+            end
+            return s1 < s2
+        end
+    end
+
     table.insert(dirs, path) -- root
 
     for key,value in pairs(dirs) do
         --luadir.dir may error out so we need to do the call protected
+        -- _get_files(value, CANCEL_BUTTON)
         _, quit = pcall(_get_files, value, CANCEL_BUTTON)
 
         if quit == true or norecurse then
@@ -118,13 +157,18 @@ end -- get_files
 --------------------------------------------------------------------------------
 
 -- uses print_table and get_files to display simple file browser
-function file_choose(dir, title)
+-- sort_by "date" "name" "size"
+-- descending true/false
+function file_choose(dir, title, sort_by, descending)
     local dstr, hstr = ""
     if not title then
         dstr = "%d items found in %0d.%02d seconds"
     else
         hstr = title
     end
+
+    if not sort_by then sort_by = "name" end
+    sort_by = sort_by:lower()
 
     -- returns whole seconds and remainder
     local function tick2seconds(ticks)
@@ -150,17 +194,24 @@ function file_choose(dir, title)
             timer = _timer()
         end
 
-        dirs, files = get_files(dir, norecurse, f_finddir, f_findfile, dirs, files)
+        dirs, files = get_files(dir, norecurse, f_finddir, f_findfile, sort_by, dirs, files)
 
         local parentdir = dirs[1]
         for i = 1, #dirs do
             dirs[i] = "\t" .. dirs[i]
         end
 
-        for i = 1, #files do
-            table.insert(dirs, "\t" .. files[i])
+        if not descending then
+            for i = 1, #files do
+                -- only store file name .. strip attributes from end
+                table.insert(dirs, "\t" .. string.match(files[i], "[^;]+") or "?")
+            end
+        else
+            for i = #files, 1, -1 do
+                -- only store file name .. strip attributes from end
+                table.insert(dirs, "\t" .. string.match(files[i], "[^;]+") or "?")
+            end
         end
-
         for i=1, #files do files[i] = nil end -- empty table for reuse
 
         if not title then
