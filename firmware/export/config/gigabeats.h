@@ -153,6 +153,8 @@
 
 #define CONFIG_CPU IMX31L
 
+#define HAVE_FPU
+
 /* Define this if you want to use imx31l's i2c interface */
 #define CONFIG_I2C I2C_IMX31L
 
