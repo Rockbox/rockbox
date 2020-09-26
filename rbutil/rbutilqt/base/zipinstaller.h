@@ -28,11 +28,15 @@
 #include "httpget.h"
 #include "Logger.h"
 
+/** Install a file or zip.
+ *  Downloads file(s) from a given URL, and installs by either extracting or
+ *  copying it to the target path set by setMountpoint().
+ */
 class ZipInstaller : public QObject
 {
     Q_OBJECT
 public:
-    ZipInstaller(QObject* parent) ;
+    ZipInstaller(QObject* parent);
     ~ZipInstaller(){}
     void install(void);
     void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
@@ -44,11 +48,12 @@ public:
     { m_verlist = QStringList(v); LOG_INFO() << m_verlist;}
     void setLogVersion(QStringList v)
     { m_verlist = v; LOG_INFO() << m_verlist;}
+    /** Change between copy and unzip mode. */
     void setUnzip(bool i) { m_unzip = i; }
+    /** Set target filename for copy mode.
+     *  If not set the filename part of the download URL is used. */
     void setTarget(QString t) { m_target = t; }
-    void setCache(QDir c) { m_cache = c; m_usecache = true; };
-    void setCache(bool c) { m_usecache = c; };
-    void setCache(QString c) { m_cache = QDir(c); m_usecache = true; }
+    void setCache(bool c) { m_usecache = c; }
 
 public slots:
     void abort(void);
@@ -70,8 +75,7 @@ private:
     QStringList m_urllist, m_loglist, m_verlist;
     bool m_unzip;
     QString m_target;
-    int runner;
-    QDir m_cache;
+    int m_runner;
     bool m_usecache;
 
     HttpGet *m_getter;

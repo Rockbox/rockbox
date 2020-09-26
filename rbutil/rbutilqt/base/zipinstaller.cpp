@@ -22,11 +22,10 @@
 #include "ziputil.h"
 #include "Logger.h"
 
-ZipInstaller::ZipInstaller(QObject* parent): QObject(parent)
+ZipInstaller::ZipInstaller(QObject* parent) :
+    QObject(parent),
+    m_unzip(true), m_usecache(false), m_getter(0)
 {
-    m_unzip = true;
-    m_usecache = false;
-    m_getter = 0;
 }
 
 
@@ -34,11 +33,11 @@ void ZipInstaller::install()
 {
     LOG_INFO() << "initializing installation";
 
-    runner = 0;
+    m_runner = 0;
     connect(this, SIGNAL(cont()), this, SLOT(installContinue()));
-    m_url = m_urllist.at(runner);
-    m_logsection = m_loglist.at(runner);
-    m_logver = m_verlist.at(runner);
+    m_url = m_urllist.at(m_runner);
+    m_logsection = m_loglist.at(m_runner);
+    m_logver = m_verlist.at(m_runner);
     installStart();
 }
 
@@ -54,13 +53,13 @@ void ZipInstaller::installContinue()
 {
     LOG_INFO() << "continuing installation";
 
-    runner++; // this gets called when a install finished, so increase first.
-    LOG_INFO() << "runner done:" << runner << "/" << m_urllist.size();
-    if(runner < m_urllist.size()) {
+    m_runner++; // this gets called when a install finished, so increase first.
+    LOG_INFO() << "runner done:" << m_runner << "/" << m_urllist.size();
+    if(m_runner < m_urllist.size()) {
         emit logItem(tr("done."), LOGOK);
-        m_url = m_urllist.at(runner);
-        m_logsection = m_loglist.at(runner);
-        if(runner < m_verlist.size()) m_logver = m_verlist.at(runner);
+        m_url = m_urllist.at(m_runner);
+        m_logsection = m_loglist.at(m_runner);
+        if(m_runner < m_verlist.size()) m_logver = m_verlist.at(m_runner);
         else m_logver = "";
         installStart();
     }
@@ -69,7 +68,6 @@ void ZipInstaller::installContinue()
         emit done(false);
         return;
     }
-
 }
 
 
@@ -158,18 +156,22 @@ void ZipInstaller::downloadDone(bool error)
         zip.close();
     }
     else {
+        if (m_target.isEmpty())
+            m_target = QUrl(m_url).fileName();
+        QString destfile = m_mountpoint + "/" + m_target;
         // only copy the downloaded file to the output location / name
         emit logItem(tr("Installing file."), LOGINFO);
-        LOG_INFO() << "saving downloaded file (no extraction)";
+        LOG_INFO() << "saving downloaded file (no extraction) to" << destfile;
 
         m_downloadFile->open(); // copy fails if file is not opened (filename issue?)
         // make sure the required path is existing
-        QString path = QFileInfo(m_mountpoint + m_target).absolutePath();
+        QString path = QFileInfo(destfile).absolutePath();
         QDir p;
         p.mkpath(path);
         // QFile::copy() doesn't overwrite files, so remove old one first
-        QFile(m_mountpoint + m_target).remove();
-        if(!m_downloadFile->copy(m_mountpoint + m_target)) {
+        // TODO: compare old and new file and fail if those are different.
+        QFile(destfile).remove();
+        if(!m_downloadFile->copy(destfile)) {
             emit logItem(tr("Installing file failed."), LOGERROR);
             emit done(true);
             return;
