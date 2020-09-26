@@ -40,6 +40,9 @@ metadata/asap.c
 metadata/asf.c
 metadata/au.c
 metadata/ay.c
+#ifdef HAVE_FPU
+metadata/vtx.c
+#endif
 metadata/flac.c
 metadata/gbs.c
 metadata/hes.c
