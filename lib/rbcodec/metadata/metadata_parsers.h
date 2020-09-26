@@ -49,6 +49,9 @@ bool get_vox_metadata(int fd, struct mp3entry* id3);
 bool get_wave64_metadata(int fd, struct mp3entry* id3);
 bool get_tta_metadata(int fd, struct mp3entry* id3);
 bool get_ay_metadata(int fd, struct mp3entry* id3);
+#ifdef HAVE_FPU
+bool get_vtx_metadata(int fd, struct mp3entry* id3);
+#endif
 bool get_gbs_metadata(int fd, struct mp3entry* id3);
 bool get_hes_metadata(int fd, struct mp3entry* id3);
 bool get_sgc_metadata(int fd, struct mp3entry* id3);

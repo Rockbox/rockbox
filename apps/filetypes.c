@@ -104,6 +104,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "w64", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "tta", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "ay", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "vtx", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "gbs", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "hes", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "sgc", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },

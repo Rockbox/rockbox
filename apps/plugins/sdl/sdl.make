@@ -39,11 +39,6 @@ SDLFLAGS = -I$(SDL_SRCDIR)/include $(filter-out -O%,$(PLUGINFLAGS))		\
 #-ffast-math -funroll-loops -fomit-frame-pointer -fexpensive-optimizations	\
 #-D_GNU_SOURCE=1 -D_REENTRANT -DSDL -DELF
 
-# use FPU on ARMv6
-ifeq ($(ARCH_VERSION),6)
-    SDLFLAGS += -mfloat-abi=softfp
-endif
-
 ifndef APP_TYPE
     ### no target has a big enough plugin buffer
     ROCKS += $(SDL_OBJDIR)/duke3d.ovl

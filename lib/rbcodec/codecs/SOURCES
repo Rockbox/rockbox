@@ -34,6 +34,9 @@ wav64.c
 tta.c
 wmapro.c
 ay.c
+#ifdef HAVE_FPU
+vtx.c
+#endif
 gbs.c
 hes.c
 nsf.c

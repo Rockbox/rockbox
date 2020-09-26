@@ -17,6 +17,8 @@
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
 #endif
 
+#define HAVE_FPU
+
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 

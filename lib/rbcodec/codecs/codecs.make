@@ -39,6 +39,7 @@ include $(RBCODECLIB_DIR)/codecs/liba52/liba52.make
 include $(RBCODECLIB_DIR)/codecs/libalac/libalac.make
 include $(RBCODECLIB_DIR)/codecs/libasap/libasap.make
 include $(RBCODECLIB_DIR)/codecs/libasf/libasf.make
+include $(RBCODECLIB_DIR)/codecs/libayumi/libayumi.make
 include $(RBCODECLIB_DIR)/codecs/libfaad/libfaad.make
 include $(RBCODECLIB_DIR)/codecs/libffmpegFLAC/libffmpegFLAC.make
 include $(RBCODECLIB_DIR)/codecs/libm4a/libm4a.make
@@ -74,6 +75,7 @@ $(ASAPLIB) : CODECFLAGS += -O1
 $(ASFLIB) : CODECFLAGS += -O2
 $(ATRACLIB) : CODECFLAGS += -O1
 $(AYLIB) : CODECFLAGS += -O2
+$(AYUMILIB) : CODECFLAGS += -O3
 $(COOKLIB): CODECFLAGS += -O1
 $(DEMACLIB) : CODECFLAGS += -O3
 $(FAADLIB) : CODECFLAGS += -O2
@@ -181,6 +183,7 @@ $(CODECDIR)/vox.codec : $(CODECDIR)/libpcm.a
 $(CODECDIR)/wav64.codec : $(CODECDIR)/libpcm.a
 $(CODECDIR)/tta.codec : $(CODECDIR)/libtta.a
 $(CODECDIR)/ay.codec : $(CODECDIR)/libay.a
+$(CODECDIR)/vtx.codec : $(CODECDIR)/libayumi.a
 $(CODECDIR)/gbs.codec : $(CODECDIR)/libgbs.a
 $(CODECDIR)/hes.codec : $(CODECDIR)/libhes.a
 $(CODECDIR)/nsf.codec : $(CODECDIR)/libnsf.a $(CODECDIR)/libemu2413.a

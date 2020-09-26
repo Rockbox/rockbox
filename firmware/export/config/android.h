@@ -4,6 +4,7 @@
 
 /* We don't run on hardware directly */
 #define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_ANDROID)
+#define HAVE_FPU
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 100
@@ -11,9 +12,6 @@
 #define MODEL_NAME   "Rockbox"
 
 #define USB_NONE
-
-
-
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
