@@ -4,6 +4,7 @@
 
 /* We don't run on hardware directly */
 #define CONFIG_PLATFORM (PLATFORM_HOSTED|PLATFORM_SDL)
+#define HAVE_FPU
 
 /* For Rolo and boot loader */
 #define MODEL_NUMBER 100
