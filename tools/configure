@@ -890,7 +890,7 @@ androidndkcc()
 
 mipsellinuxcc () {
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib//`
- GCCOPTS="$GCCOPTS -march=mips32r2  -mno-mips16 -mno-long-calls -Umips -fPIC"
+ GCCOPTS="$GCCOPTS -march=mips32r2 -mhard-float -mno-mips16 -mno-long-calls -Umips -fPIC"
  GCCOPTIMIZE=''
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"

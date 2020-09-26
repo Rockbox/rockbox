@@ -43,7 +43,7 @@ static bool get_shn_metadata(int fd, struct mp3entry *id3)
 }
 
 static bool get_other_asap_metadata(int fd, struct mp3entry *id3)
-{    
+{
     id3->bitrate = 706;
     id3->frequency = 44100;
     id3->vbr = false;
@@ -85,7 +85,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* Musepack SV7 */
     [AFMT_MPC_SV7] =
         AFMT_ENTRY("MPCv7", "mpc",  NULL,       get_musepack_metadata,"mpc\0"),
-    /* A/52 (aka AC3) audio */                  
+    /* A/52 (aka AC3) audio */
     [AFMT_A52] =
         AFMT_ENTRY("AC3",   "a52",  NULL,       get_a52_metadata,   "a52\0ac3\0"),
     /* WavPack */
@@ -109,7 +109,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     /* NESM (NES Sound Format) */
     [AFMT_NSF] =
         AFMT_ENTRY("NSF",   "nsf",  NULL,       get_nsf_metadata,   "nsf\0nsfe\0"),
-    /* Speex File Format */                     
+    /* Speex File Format */
     [AFMT_SPEEX] =
         AFMT_ENTRY("Speex", "speex",NULL,       get_ogg_metadata,   "spx\0"),
     /* SPC700 Save State */
@@ -162,12 +162,12 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
         AFMT_ENTRY("DLT",   "asap", NULL,       get_other_asap_metadata,"dlt\0"),
     /* Atari MPT File */
     [AFMT_MPT] =
-        AFMT_ENTRY("MPT",   "asap", NULL,       get_other_asap_metadata,"mpt\0"), 
+        AFMT_ENTRY("MPT",   "asap", NULL,       get_other_asap_metadata,"mpt\0"),
     /* Atari MPD File */
     [AFMT_MPD] =
         AFMT_ENTRY("MPD",   "asap", NULL,       get_other_asap_metadata,"mpd\0"),
     /* Atari RMT File */
-    [AFMT_RMT] =                   
+    [AFMT_RMT] =
         AFMT_ENTRY("RMT",   "asap", NULL,       get_other_asap_metadata,"rmt\0"),
     /* Atari TMC File */
     [AFMT_TMC] =
@@ -177,10 +177,10 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
         AFMT_ENTRY("TM8",   "asap", NULL,       get_other_asap_metadata,"tm8\0"),
     /* Atari TM2 File */
     [AFMT_TM2] =
-        AFMT_ENTRY("TM2",   "asap", NULL,       get_other_asap_metadata,"tm2\0"),        
+        AFMT_ENTRY("TM2",   "asap", NULL,       get_other_asap_metadata,"tm2\0"),
     /* Atrac3 in Sony OMA Container */
     [AFMT_OMA_ATRAC3] =
-        AFMT_ENTRY("ATRAC3","atrac3_oma",NULL,  get_oma_metadata,   "oma\0aa3\0"), 
+        AFMT_ENTRY("ATRAC3","atrac3_oma",NULL,  get_oma_metadata,   "oma\0aa3\0"),
     /* SMAF (Synthetic music Mobile Application Format) */
     [AFMT_SMAF] =
         AFMT_ENTRY("SMAF",  "smaf", NULL,       get_smaf_metadata,  "mmf\0"),
@@ -194,7 +194,7 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_WAVE64] =
         AFMT_ENTRY("WAVE64","wav64",NULL,       get_wave64_metadata,"w64\0"),
     /* True Audio */
-    [AFMT_TTA] =                                
+    [AFMT_TTA] =
         AFMT_ENTRY("TTA",   "tta",  NULL,       get_tta_metadata,   "tta\0"),
     /* WMA Voice in ASF */
     [AFMT_WMAVOICE] =
@@ -206,8 +206,13 @@ const struct afmt_entry audio_formats[AFMT_NUM_CODECS] =
     [AFMT_MP4_AAC_HE] =
         AFMT_ENTRY("AAC-HE","aac",  NULL,       get_mp4_metadata,   "mp4\0"),
     /* AY (ZX Spectrum, Amstrad CPC Sound Format) */
-    [AFMT_AY] = 
+    [AFMT_AY] =
         AFMT_ENTRY("AY",    "ay",  NULL, get_ay_metadata,           "ay\0"),
+    /* AY (ZX Spectrum Sound Format) */
+#ifdef HAVE_FPU
+    [AFMT_VTX] =
+        AFMT_ENTRY("VTX",   "vtx", NULL, get_vtx_metadata,          "vtx\0"),
+#endif
     /* GBS (Game Boy Sound Format) */
     [AFMT_GBS] =
         AFMT_ENTRY("GBS",   "gbs",  NULL,       get_gbs_metadata,   "gbs\0"),
@@ -313,6 +318,9 @@ bool rbcodec_format_is_atomic(int afmt)
     case AFMT_MOD:
     case AFMT_SAP:
     case AFMT_AY:
+#ifdef HAVE_FPU
+    case AFMT_VTX:
+#endif
     case AFMT_GBS:
     case AFMT_HES:
     case AFMT_SGC:
@@ -352,17 +360,17 @@ unsigned int probe_file_format(const char *filename)
 {
     char *suffix;
     unsigned int i;
-    
+
     suffix = strrchr(filename, '.');
 
     if (suffix == NULL)
     {
         return AFMT_UNKNOWN;
     }
-    
+
     /* skip '.' */
     suffix++;
-    
+
     for (i = 1; i < AFMT_NUM_CODECS; i++)
     {
         /* search extension list for type */
@@ -379,7 +387,7 @@ unsigned int probe_file_format(const char *filename)
         }
         while (*ext != '\0');
     }
-    
+
     return AFMT_UNKNOWN;
 }
 
@@ -418,7 +426,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
             close(logfd);
         }
     }
-    
+
     /* Clear the mp3entry to avoid having bogus pointers appear */
     wipe_mp3entry(id3);
 
@@ -454,7 +462,7 @@ bool get_metadata(struct mp3entry* id3, int fd, const char* trackname)
 void strip_tags(int handle_id)
 {
     static const unsigned char tag[] = "TAG";
-    static const unsigned char apetag[] = "APETAGEX";    
+    static const unsigned char apetag[] = "APETAGEX";
     size_t len, version;
     void *tail;
 
@@ -502,7 +510,7 @@ void adjust_mp3entry(struct mp3entry *entry, void *dest, const void *orig)
     MOVE_ENTRY(entry->artist)
     MOVE_ENTRY(entry->album)
 
-    if (entry->genre_string > (char*)orig && 
+    if (entry->genre_string > (char*)orig &&
         entry->genre_string < (char*)orig + sizeof(struct mp3entry))
         /* Don't adjust that if it points to an entry of the "genres" array */
         entry->genre_string += offset;
