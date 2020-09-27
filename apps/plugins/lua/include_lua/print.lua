@@ -227,6 +227,7 @@ local _print = {} do
         local o = get_settings(true)
         _LCD:clear(o.bg_pattern, o.x, o.y, o.x + o.width, o.y + o.height)
         if o.autoupdate == true then rb.lcd_update() end
+        rb.lcd_scroll_stop()
         set_line(1)
         for i=1, #col_buf do col_buf[i] = _NIL end
         s_lines = {}
