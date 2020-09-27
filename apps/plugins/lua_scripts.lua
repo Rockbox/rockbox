@@ -29,7 +29,7 @@ require("printtable")
 rb.actions = nil
 package.loaded["actions"] = nil
 
-local excludedsrc = ";filebrowse.lua;fileviewers.lua;printmenu.lua;dbgettags.lua;"
+local excludedsrc = ";filebrowse.lua;fileviewers.lua;printmenu.lua;dbgettags.lua;filesearch.lua"
 --------------------------------------------------------------------------------
 
 local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
