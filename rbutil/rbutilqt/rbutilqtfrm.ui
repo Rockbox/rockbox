@@ -15,7 +15,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="rbutilqt.qrc">
-    <normaloff>:/icons/rockbox-32.png</normaloff>:/icons/rockbox-32.png</iconset>
+    <normaloff>:/icons/rockbox-clef.svg</normaloff>:/icons/rockbox-clef.svg</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
@@ -93,7 +93,7 @@
          </property>
          <property name="icon">
           <iconset resource="rbutilqt.qrc">
-           <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+           <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
          </property>
         </widget>
        </item>
@@ -104,7 +104,7 @@
          </property>
          <property name="icon">
           <iconset resource="rbutilqt.qrc">
-           <normaloff>:/icons/media-eject.png</normaloff>:/icons/media-eject.png</iconset>
+           <normaloff>:/icons/media-eject.svg</normaloff>:/icons/media-eject.svg</iconset>
          </property>
         </widget>
        </item>
@@ -178,7 +178,7 @@
           </property>
           <property name="icon">
            <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
+            <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -205,7 +205,7 @@
           </property>
           <property name="icon">
            <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
+            <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -255,7 +255,7 @@
           </property>
           <property name="icon">
            <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
+            <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -293,7 +293,7 @@
           </property>
           <property name="icon">
            <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/rembootloader_btn.png</normaloff>:/icons/rembootloader_btn.png</iconset>
+            <normaloff>:/icons/edit-clear.svg</normaloff>:/icons/edit-clear.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -320,7 +320,7 @@
           </property>
           <property name="icon">
            <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/remrb_btn.png</normaloff>:/icons/remrb_btn.png</iconset>
+            <normaloff>:/icons/edit-clear.svg</normaloff>:/icons/edit-clear.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -350,7 +350,7 @@
           </property>
           <property name="icon">
            <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
+            <normaloff>:/icons/package-x-generic.svg</normaloff>:/icons/package-x-generic.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -555,7 +555,7 @@
   <action name="actionInstall_Themes">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/themes_btn.png</normaloff>:/icons/themes_btn.png</iconset>
+     <normaloff>:/icons/preferences-desktop-theme.svg</normaloff>:/icons/preferences-desktop-theme.svg</iconset>
    </property>
    <property name="text">
     <string>Install &amp;Themes</string>
@@ -564,7 +564,7 @@
   <action name="actionInstall_Game_Files">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/doom_btn.png</normaloff>:/icons/doom_btn.png</iconset>
+     <normaloff>:/icons/input-gaming.svg</normaloff>:/icons/input-gaming.svg</iconset>
    </property>
    <property name="text">
     <string>Install &amp;Game Files</string>
@@ -573,7 +573,7 @@
   <action name="actionInstall_Voice_File">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
+     <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
    </property>
    <property name="text">
     <string>&amp;Install Voice File</string>
@@ -582,7 +582,7 @@
   <action name="actionCreate_Talk_Files">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
+     <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
    </property>
    <property name="text">
     <string>Create &amp;Talk Files</string>
@@ -591,7 +591,7 @@
   <action name="actionRemove_bootloader">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/rembootloader_btn.png</normaloff>:/icons/rembootloader_btn.png</iconset>
+     <normaloff>:/icons/edit-clear.svg</normaloff>:/icons/edit-clear.svg</iconset>
    </property>
    <property name="text">
     <string>Remove &amp;bootloader</string>
@@ -600,7 +600,7 @@
   <action name="actionUninstall_Rockbox">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/remrb_btn.png</normaloff>:/icons/remrb_btn.png</iconset>
+     <normaloff>:/icons/edit-clear.svg</normaloff>:/icons/edit-clear.svg</iconset>
    </property>
    <property name="text">
     <string>Uninstall &amp;Rockbox</string>
@@ -629,7 +629,7 @@
   <action name="actionCreate_Voice_File">
    <property name="icon">
     <iconset resource="rbutilqt.qrc">
-     <normaloff>:/icons/talkfile_btn.png</normaloff>:/icons/talkfile_btn.png</iconset>
+     <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
    </property>
    <property name="text">
     <string>Create &amp;Voice File</string>

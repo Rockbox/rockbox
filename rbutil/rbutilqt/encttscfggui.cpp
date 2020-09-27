@@ -94,9 +94,9 @@ void EncTtsCfgGui::setUpWindow()
     // ok - cancel buttons
     QPushButton* okBtn = new QPushButton(tr("Ok"),this);
     okBtn->setDefault(true);
-    okBtn->setIcon(QIcon(":icons/go-next.png"));
+    okBtn->setIcon(QIcon(":icons/go-next.svg"));
     QPushButton* cancelBtn = new QPushButton(tr("Cancel"),this);
-    cancelBtn->setIcon(QIcon(":icons/process-stop.png"));
+    cancelBtn->setIcon(QIcon(":icons/process-stop.svg"));
     connect(okBtn,SIGNAL(clicked()),this,SLOT(accept()));
     connect(cancelBtn,SIGNAL(clicked()),this,SLOT(reject()));
 
@@ -195,7 +195,7 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
     if(setting->button() == EncTtsSetting::eBROWSEBTN)
     {
         QPushButton* browsebtn = new QPushButton(tr("Browse"),this);
-        browsebtn->setIcon(QIcon(":/icons/system-search.png"));
+        browsebtn->setIcon(QIcon(":/icons/system-search.svg"));
         m_browseBtnMap.setMapping(browsebtn,setting);
         connect(browsebtn,SIGNAL(clicked()),&m_browseBtnMap,SLOT(map()));
         return browsebtn;
@@ -203,7 +203,7 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
     else if(setting->button() == EncTtsSetting::eREFRESHBTN)
     {
         QPushButton* refreshbtn = new QPushButton(tr("Refresh"),this);
-        refreshbtn->setIcon(QIcon(":/icons/view-refresh.png"));
+        refreshbtn->setIcon(QIcon(":/icons/view-refresh.svg"));
         connect(refreshbtn,SIGNAL(clicked()),setting,SIGNAL(refresh()));
         return refreshbtn;
     }

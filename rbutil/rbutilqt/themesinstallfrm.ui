@@ -115,7 +115,8 @@
         <string>&amp;Install</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
+        <iconset resource="rbutilqt.qrc" >
+         <normaloff>:/icons/go-next.svg</normaloff>:/icons/go-next.svg</iconset>
        </property>
       </widget>
      </item>
@@ -125,7 +126,8 @@
         <string>&amp;Cancel</string>
        </property>
        <property name="icon" >
-        <iconset resource="rbutilqt.qrc" >:/icons/process-stop.png</iconset>
+        <iconset resource="rbutilqt.qrc" >
+         <normaloff>:/icons/process-stop.svg</normaloff>:/icons/process-stop.svg</iconset>
        </property>
       </widget>
      </item>

@@ -29,7 +29,7 @@
      <widget class="QWidget" name="tabDevice">
       <attribute name="icon">
        <iconset resource="rbutilqt.qrc">
-        <normaloff>:/icons/rbutil.png</normaloff>:/icons/rbutil.png</iconset>
+        <normaloff>:/icons/multimedia-player.svg</normaloff>:/icons/multimedia-player.svg</iconset>
       </attribute>
       <attribute name="title">
        <string>&amp;Device</string>
@@ -59,7 +59,7 @@
          </property>
          <property name="icon">
           <iconset resource="rbutilqt.qrc">
-           <normaloff>:/icons/view-refresh.png</normaloff>:/icons/view-refresh.png</iconset>
+           <normaloff>:/icons/view-refresh.svg</normaloff>:/icons/view-refresh.svg</iconset>
          </property>
          <property name="autoDefault">
           <bool>false</bool>
@@ -115,7 +115,7 @@
          </property>
          <property name="icon">
           <iconset resource="rbutilqt.qrc">
-           <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+           <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
          </property>
          <property name="default">
           <bool>true</bool>
@@ -130,7 +130,7 @@
      <widget class="QWidget" name="tabProxy">
       <attribute name="icon">
        <iconset resource="rbutilqt.qrc">
-        <normaloff>:/icons/network-idle.png</normaloff>:/icons/network-idle.png</iconset>
+        <normaloff>:/icons/network-idle.svg</normaloff>:/icons/network-idle.svg</iconset>
       </attribute>
       <attribute name="title">
        <string>&amp;Proxy</string>
@@ -261,7 +261,7 @@
      <widget class="QWidget" name="tabLanguage">
       <attribute name="icon">
        <iconset resource="rbutilqt.qrc">
-        <normaloff>:/icons/preferences-desktop-locale.png</normaloff>:/icons/preferences-desktop-locale.png</iconset>
+        <normaloff>:/icons/preferences-desktop-locale.svg</normaloff>:/icons/preferences-desktop-locale.svg</iconset>
       </attribute>
       <attribute name="title">
        <string>&amp;Language</string>
@@ -275,7 +275,7 @@
      <widget class="QWidget" name="tabCache">
       <attribute name="icon">
        <iconset resource="rbutilqt.qrc">
-        <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
+        <normaloff>:/icons/package-x-generic.svg</normaloff>:/icons/package-x-generic.svg</iconset>
       </attribute>
       <attribute name="title">
        <string>Cac&amp;he</string>
@@ -327,7 +327,7 @@
            </property>
            <property name="icon">
             <iconset resource="rbutilqt.qrc">
-             <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+             <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
            </property>
           </widget>
          </item>
@@ -377,7 +377,7 @@
          </property>
          <property name="icon">
           <iconset resource="rbutilqt.qrc">
-           <normaloff>:/icons/user-trash-full.png</normaloff>:/icons/user-trash-full.png</iconset>
+           <normaloff>:/icons/user-trash-full.svg</normaloff>:/icons/user-trash-full.svg</iconset>
          </property>
         </widget>
        </item>
@@ -386,7 +386,7 @@
      <widget class="QWidget" name="tabTts">
       <attribute name="icon">
        <iconset resource="rbutilqt.qrc">
-        <normaloff>:/icons/audio-input-microphone.png</normaloff>:/icons/audio-input-microphone.png</iconset>
+        <normaloff>:/icons/audio-input-microphone.svg</normaloff>:/icons/audio-input-microphone.svg</iconset>
       </attribute>
       <attribute name="title">
        <string>&amp;TTS &amp;&amp; Encoder</string>
@@ -431,7 +431,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="rbutilqt.qrc">:/icons/dialog-error.png</pixmap>
+             <pixmap resource="rbutilqt.qrc">:/icons/dialog-error.svg</pixmap>
             </property>
            </widget>
           </item>
@@ -442,7 +442,7 @@
             </property>
             <property name="icon">
              <iconset resource="rbutilqt.qrc">
-              <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+              <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
             </property>
            </widget>
           </item>
@@ -450,6 +450,10 @@
            <widget class="QPushButton" name="testTTS">
             <property name="text">
              <string>Test TTS</string>
+            </property>
+            <property name="icon">
+             <iconset resource="rbutilqt.qrc">
+              <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
             </property>
            </widget>
           </item>
@@ -482,7 +486,7 @@
              <string/>
             </property>
             <property name="pixmap">
-             <pixmap resource="rbutilqt.qrc">:/icons/dialog-error.png</pixmap>
+             <pixmap resource="rbutilqt.qrc">:/icons/process-stop.svg</pixmap>
             </property>
            </widget>
           </item>
@@ -493,7 +497,7 @@
             </property>
             <property name="icon">
              <iconset resource="rbutilqt.qrc">
-              <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+              <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
             </property>
            </widget>
           </item>
@@ -544,7 +548,7 @@
      </property>
      <property name="icon">
       <iconset resource="rbutilqt.qrc">
-       <normaloff>:/icons/go-next.png</normaloff>:/icons/go-next.png</iconset>
+       <normaloff>:/icons/go-next.svg</normaloff>:/icons/go-next.svg</iconset>
      </property>
     </widget>
    </item>
@@ -555,7 +559,7 @@
      </property>
      <property name="icon">
       <iconset resource="rbutilqt.qrc">
-       <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
+       <normaloff>:/icons/process-stop.svg</normaloff>:/icons/process-stop.svg</iconset>
      </property>
     </widget>
    </item>

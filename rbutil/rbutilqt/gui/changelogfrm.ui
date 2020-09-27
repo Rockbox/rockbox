@@ -47,7 +47,7 @@
      </property>
      <property name="icon">
       <iconset resource="../rbutilqt.qrc">
-       <normaloff>:/icons/go-next.png</normaloff>:/icons/go-next.png</iconset>
+       <normaloff>:/icons/go-next.svg</normaloff>:/icons/go-next.svg</iconset>
      </property>
     </widget>
    </item>

@@ -64,7 +64,7 @@
      </property>
      <property name="icon" >
       <iconset resource="rbutilqt.qrc" >
-       <normaloff>:/icons/document-save.png</normaloff>:/icons/document-save.png</iconset>
+       <normaloff>:/icons/document-save.svg</normaloff>:/icons/document-save.svg</iconset>
      </property>
     </widget>
    </item>
@@ -88,7 +88,7 @@
      </property>
      <property name="icon" >
       <iconset resource="rbutilqt.qrc" >
-       <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
+       <normaloff>:/icons/process-stop.svg</normaloff>:/icons/process-stop.svg</iconset>
      </property>
     </widget>
    </item>

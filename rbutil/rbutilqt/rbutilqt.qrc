@@ -10,38 +10,35 @@
         <file alias="builtin/voice-corrections.txt">../../tools/voice-corrections.txt</file>
     </qresource>
     <qresource prefix="/">
-        <file>icons/audio-input-microphone.png</file>
-        <file>icons/bootloader_btn.png</file>
-        <file>icons/dialog-error.png</file>
-        <file>icons/dialog-information.png</file>
-        <file>icons/dialog-warning.png</file>
-        <file>icons/document-save.png</file>
-        <file>icons/doom_btn.png</file>
-        <file>icons/edit-find.png</file>
-        <file>icons/font_btn.png</file>
-        <file>icons/go-next.png</file>
-        <file>icons/media-eject.png</file>
-        <file>icons/network-idle.png</file>
-        <file>icons/package-x-generic.png</file>
-        <file>icons/preferences-desktop-locale.png</file>
-        <file>icons/preferences-system.png</file>
-        <file>icons/process-stop.png</file>
-        <file>icons/rbinstall_btn.png</file>
+        <file>icons/audio-volume-high.svg</file>
+        <file>icons/edit-clear.svg</file>
+        <file>icons/preferences-desktop-font.svg</file>
+        <file>icons/preferences-desktop-theme.svg</file>
+        <file>icons/multimedia-player.svg</file>
+        <file>icons/input-gaming.svg</file>
+        <file>icons/audio-input-microphone.svg</file>
+        <file>icons/dialog-error.svg</file>
+        <file>icons/dialog-information.svg</file>
+        <file>icons/dialog-warning.svg</file>
+        <file>icons/document-save.svg</file>
+        <file>icons/edit-find.svg</file>
+        <file>icons/go-next.svg</file>
+        <file>icons/media-eject.svg</file>
+        <file>icons/network-idle.svg</file>
+        <file>icons/package-x-generic.svg</file>
+        <file>icons/preferences-desktop-locale.svg</file>
+        <file>icons/preferences-system.svg</file>
+        <file>icons/process-stop.svg</file>
         <file>icons/rblogo.png</file>
-        <file>icons/rbutil.png</file>
-        <file>icons/rembootloader_btn.png</file>
-        <file>icons/remrb_btn.png</file>
         <file>icons/rockbox-16.png</file>
         <file>icons/rockbox-32.png</file>
         <file>icons/rockbox-48.png</file>
         <file>icons/rockbox-64.png</file>
         <file>icons/rockbox-128.png</file>
         <file>icons/rockbox-256.png</file>
-        <file>icons/system-search.png</file>
-        <file>icons/talkfile_btn.png</file>
-        <file>icons/themes_btn.png</file>
-        <file>icons/user-trash-full.png</file>
-        <file>icons/view-refresh.png</file>
+        <file>icons/system-search.svg</file>
+        <file>icons/user-trash-full.svg</file>
+        <file>icons/view-refresh.svg</file>
         <file>icons/wizard.jpg</file>
         <file alias="icons/rockbox-clef.svg">../../docs/logo/rockbox-clef.svg</file>
     </qresource>

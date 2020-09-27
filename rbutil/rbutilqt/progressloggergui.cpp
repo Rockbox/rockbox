@@ -47,16 +47,16 @@ void ProgressLoggerGui::addItem(const QString &text, int flag)
         case LOGNOICON:
             break;
         case LOGOK:
-            item->setIcon(QIcon(":/icons/go-next.png"));
+            item->setIcon(QIcon(":/icons/go-next.svg"));
             break;
         case LOGINFO:
-            item->setIcon(QIcon(":/icons/dialog-information.png"));
+            item->setIcon(QIcon(":/icons/dialog-information.svg"));
             break;
         case LOGWARNING:
-            item->setIcon(QIcon(":/icons/dialog-warning.png"));
+            item->setIcon(QIcon(":/icons/dialog-warning.svg"));
             break;
         case LOGERROR:
-            item->setIcon(QIcon(":/icons/dialog-error.png"));
+            item->setIcon(QIcon(":/icons/dialog-error.svg"));
             dp.saveLog->show();
             break;
     }
@@ -102,7 +102,7 @@ void ProgressLoggerGui::setProgressVisible(bool b)
 void ProgressLoggerGui::setRunning()
 {
     dp.buttonAbort->setText(tr("&Abort"));
-    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/process-stop.png")));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/process-stop.svg")));
 
     // make sure to not close the window on button press.
     disconnect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
@@ -120,7 +120,7 @@ void ProgressLoggerGui::setRunning()
 void ProgressLoggerGui::setFinished()
 {
     dp.buttonAbort->setText(tr("&Ok"));
-    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/go-next.png")));
+    dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/go-next.svg")));
 
     // close the window on button press.
     connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));

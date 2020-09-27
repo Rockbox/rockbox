@@ -77,7 +77,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/edit-find.png</normaloff>:/icons/edit-find.png</iconset>
+          <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
         </property>
        </widget>
       </item>
@@ -117,7 +117,7 @@
      </property>
      <property name="icon">
       <iconset resource="../rbutilqt.qrc">
-       <normaloff>:/icons/go-next.png</normaloff>:/icons/go-next.png</iconset>
+       <normaloff>:/icons/go-next.svg</normaloff>:/icons/go-next.svg</iconset>
      </property>
     </widget>
    </item>
@@ -128,7 +128,7 @@
      </property>
      <property name="icon">
       <iconset resource="../rbutilqt.qrc">
-       <normaloff>:/icons/process-stop.png</normaloff>:/icons/process-stop.png</iconset>
+       <normaloff>:/icons/process-stop.svg</normaloff>:/icons/process-stop.svg</iconset>
      </property>
     </widget>
    </item>

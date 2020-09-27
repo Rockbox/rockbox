@@ -447,7 +447,7 @@ void Config::updateTtsState(int index)
     if(tts->configOk())
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
-        ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.png")));
+        ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.svg")));
 #ifdef QT_MULTIMEDIA_LIB
         ui.testTTS->setEnabled(true);
 #else
@@ -457,7 +457,7 @@ void Config::updateTtsState(int index)
     else
     {
         ui.configTTSstatus->setText(tr("Configuration INVALID"));
-        ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
+        ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.svg")));
         ui.testTTS->setEnabled(false);
     }
 
@@ -481,12 +481,12 @@ void Config::updateEncState()
     if(enc->configOk())
     {
         ui.configEncstatus->setText(tr("Configuration OK"));
-        ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.png")));
+        ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.svg")));
     }
     else
     {
         ui.configEncstatus->setText(tr("Configuration INVALID"));
-        ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.png")));
+        ui.configEncstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/dialog-error.svg")));
     }
 }
 

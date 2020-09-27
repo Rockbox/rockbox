@@ -61,7 +61,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
+          <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -91,7 +91,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/font_btn.png</normaloff>:/icons/font_btn.png</iconset>
+          <normaloff>:/icons/preferences-desktop-font.svg</normaloff>:/icons/preferences-desktop-font.svg</iconset>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -105,7 +105,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
+          <normaloff>:/icons/multimedia-player.svg</normaloff>:/icons/multimedia-player.svg</iconset>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -167,7 +167,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/doom_btn.png</normaloff>:/icons/doom_btn.png</iconset>
+          <normaloff>:/icons/input-gaming.svg</normaloff>:/icons/input-gaming.svg</iconset>
         </property>
        </widget>
       </item>
@@ -178,7 +178,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/preferences-system.png</normaloff>:/icons/preferences-system.png</iconset>
+          <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
         </property>
        </widget>
       </item>
@@ -189,7 +189,7 @@
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/themes_btn.png</normaloff>:/icons/themes_btn.png</iconset>
+          <normaloff>:/icons/preferences-desktop-theme.svg</normaloff>:/icons/preferences-desktop-theme.svg</iconset>
         </property>
        </widget>
       </item>
@@ -251,7 +251,7 @@
      </property>
      <property name="icon">
       <iconset resource="../rbutilqt.qrc">
-       <normaloff>:/icons/package-x-generic.png</normaloff>:/icons/package-x-generic.png</iconset>
+       <normaloff>:/icons/package-x-generic.svg</normaloff>:/icons/package-x-generic.svg</iconset>
      </property>
     </widget>
    </item>

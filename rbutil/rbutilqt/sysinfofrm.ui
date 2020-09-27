@@ -22,7 +22,8 @@
       <string>&amp;Refresh</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/view-refresh.png</iconset>
+      <iconset resource="rbutilqt.qrc" >
+       <normaloff>:/icons/view-refresh.svg</normaloff>:/icons/view-refresh.svg</iconset>
      </property>
     </widget>
    </item>
@@ -45,7 +46,8 @@
       <string>&amp;OK</string>
      </property>
      <property name="icon" >
-      <iconset resource="rbutilqt.qrc" >:/icons/go-next.png</iconset>
+      <iconset resource="rbutilqt.qrc" >
+       <normaloff>:/icons/go-next.svg</normaloff>:/icons/go-next.svg</iconset>
      </property>
      <property name="default" >
       <bool>true</bool>
