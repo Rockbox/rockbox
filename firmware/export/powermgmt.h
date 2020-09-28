@@ -80,7 +80,7 @@ void powermgmt_init(void) INIT_ATTR;
 
 /* Generic current values that are intentionally meaningless - config header
  * should define proper numbers.*/
- 
+
 
 #ifndef CURRENT_BACKLIGHT
 #define CURRENT_BACKLIGHT  5  /* additional current when backlight always on */

@@ -86,11 +86,16 @@ static int poweroff_timeout = 0;
 static long last_event_tick = 0;
 
 #if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) == PERCENTAGE_MEASURE
+int _battery_level(void) { return -1; }
+#ifdef SIMULATOR
+int _battery_voltage(void);
+extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
+extern const unsigned short percent_to_volt_charge[11];
+#else
 int _battery_voltage(void) { return -1; }
-
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 const unsigned short percent_to_volt_charge[11];
-
+#endif
 #elif (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE) == VOLTAGE_MEASURE
 int _battery_level(void) { return -1; }
 /*
@@ -363,7 +368,7 @@ static int runcurrent(void)
 #endif
 
 #endif /* BOOTLOADER */
-    
+
     return current;
 }
 
@@ -659,7 +664,7 @@ static inline void power_thread_step(void)
         average_step_low();
         /* update battery status every time an update is available */
         battery_status_update();
-        
+
         /*
          * If battery is low, observe voltage during disk activity.
          * Shut down if voltage drops below shutoff level and we are not
