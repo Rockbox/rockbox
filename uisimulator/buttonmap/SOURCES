@@ -81,6 +81,8 @@ agptek-rocker.c
 xduoo-x3.c
 #elif CONFIG_KEYPAD == XDUOO_X3II_PAD
 xduoo-x3ii.c
+#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+xduoo-x20.c
 #elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
 ihifi2.c
 #endif
