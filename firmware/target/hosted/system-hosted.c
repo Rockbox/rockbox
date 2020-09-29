@@ -84,7 +84,9 @@ static void sig_handler(int sig, siginfo_t *siginfo, void *context)
 
 void power_off(void)
 {
+    backlight_hw_off();
     system("/sbin/poweroff");
+    while (1);       /* halt */
 }
 
 void system_init(void)
@@ -109,7 +111,9 @@ void system_init(void)
 
 void system_reboot(void)
 {
+    backlight_hw_off();
     system("/sbin/reboot");
+    while (1);       /* halt */
 }
 
 void system_exception_wait(void)
