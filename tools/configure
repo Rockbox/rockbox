@@ -1535,65 +1535,60 @@ if [ "$ARG_TARGET" ]; then
 else
   echo "Enter target platform:"
 cat <<EOF
-                          ==iriver==             ==Apple iPod==
-                          10) H120/H140          20) Color/Photo
-                          11) H320/H340          21) Nano 1G
-                          12) iHP-100/110/115    22) Video
-                          13) iFP-790            23) 3G
-                          14) H10 20Gb           24) 4G Grayscale
+ ==Cowon/iAudio==         ==iriver==             ==Apple iPod==
+ 30) X5/X5V/X5L           10) H120/H140          20) Color/Photo
+ 31) M5/M5L               11) H320/H340          21) Nano 1G
+ 32) 7                    12) iHP-100/110/115    22) Video
+ 33) D2                   13) iFP-790            23) 3G
+ 34) M3/M3L               14) H10 20Gb           24) 4G Grayscale
                           15) H10 5/6Gb          25) Mini 1G
-                                                 26) Mini 2G
-                          ==Toshiba==            27) 1G, 2G
- ==Cowon/iAudio==         40) Gigabeat F/X       28) Nano 2G
- 30) X5/X5V/X5L           41) Gigabeat S         29) Classic/6G
- 31) M5/M5L
- 32) 7                    ==Olympus=             ==SanDisk==
- 33) D2                   70) M:Robe 500         50) Sansa e200
- 34) M3/M3L               71) M:Robe 100         51) Sansa e200R
-                                                 52) Sansa c200
- ==Creative==             ==Philips==            53) Sansa m200
- 89) Zen X-Fi Style       100) GoGear SA9200     54) Sansa c100
- 90) Zen Vision:M 30GB    101) GoGear HDD1630/   55) Sansa Clip
- 91) Zen Vision:M 60GB         HDD1830           56) Sansa e200v2
- 92) Zen Vision           102) GoGear HDD6330    57) Sansa m200v4
- 93) Zen X-Fi2                                   58) Sansa Fuze
- 94) Zen X-Fi3            ==Meizu==              59) Sansa c200v2
- 96) Zen X-Fi             110) M6SL              60) Sansa Clipv2
- 97) Zen Mozaic           111) M6SP              61) Sansa View
- 98) Zen                  112) M3                62) Sansa Clip+
-                                                 63) Sansa Fuze v2
- ==Onda==                 ==Tatung==             64) Sansa Fuze+
- 120) VX747               150) Elio TPJ-1022     65) Sansa Clip Zip
- 121) VX767                                      66) Sansa Connect
- 122) VX747+              ==Packard Bell==
- 123) VX777               160) Vibe 500          ==Logik==
-                                                 80) DAX 1GB MP3/DAB
- ==Samsung==              ==MPIO==
- 140) YH-820              170) HD200             ==Lyre project==
- 141) YH-920              171) HD300             130) Lyre proto 1
- 142) YH-925                                     131) Mini2440
- 143) YP-S3
- 144) YP-Z5               ==ROCKCHIP==
-                          180) rk27xx generic    ==HiFiMAN==
- ==Application==                                 190) HM-60x
- 200) SDL                 ==HiFi E.T.==          191) HM-801
- 201) Android             210) MA9
- 202) Nokia N8xx          211) MA9C              ==Sony==
- 203) Nokia N900          212) MA8               219) NWZ-E350 series
- 204) Pandora             213) MA8C              220) NWZ-E370/E380 series
- 205) Samsung YP-R0                              221) NWZ-E360 series
- 206) Android MIPS        ==IHIFI==              222) NWZ-E450 series
- 207) Android x86         230) 760               223) NWZ-E460 series
- 208) Samsung YP-R1       231) 960               224) NWZ-E470 series
-                          250) 770C              225) NWZ-E580 series
- ==iBasso==               251) 770               226) NWZ-A10 series
- 232) DX50                252) 800               227) NW-A20 series
- 233) DX90                                       228) NWZ-A860 series
+ ==Creative==                                    26) Mini 2G
+ 89) Zen X-Fi Style       ==Toshiba==            27) 1G, 2G
+ 90) Zen Vision:M 30GB    40) Gigabeat F/X       28) Nano 2G
+ 91) Zen Vision:M 60GB    41) Gigabeat S         29) Classic/6G
+ 92) Zen Vision
+ 93) Zen X-Fi2            ==Olympus=             ==SanDisk==
+ 94) Zen X-Fi3            70) M:Robe 500         50) Sansa e200
+ 96) Zen X-Fi             71) M:Robe 100         51) Sansa e200R
+ 97) Zen Mozaic                                  52) Sansa c200
+ 98) Zen                  ==Philips==            53) Sansa m200
+                          100) GoGear SA9200     54) Sansa c100
+ ==Onda==                 101) GoGear HDD1630/   55) Sansa Clip
+ 120) VX747                    HDD1830           56) Sansa e200v2
+ 121) VX767               102) GoGear HDD6330    57) Sansa m200v4
+ 122) VX747+                                     58) Sansa Fuze
+ 123) VX777               ==Meizu==              59) Sansa c200v2
+                          110) M6SL              60) Sansa Clipv2
+ ==Samsung==              111) M6SP              61) Sansa View
+ 140) YH-820              112) M3                62) Sansa Clip+
+ 141) YH-920                                     63) Sansa Fuze v2
+ 142) YH-925              ==Tatung==             64) Sansa Fuze+
+ 143) YP-S3               150) Elio TPJ-1022     65) Sansa Clip Zip
+ 144) YP-Z5                                      66) Sansa Connect
+                          ==Packard Bell==
+ ==Application==          160) Vibe 500          ==Logik==
+ 200) SDL                                        80) DAX 1GB MP3/DAB
+ 201) Android             ==MPIO==
+ 202) Nokia N8xx          170) HD200             ==Lyre project==
+ 203) Nokia N900          171) HD300             130) Lyre proto 1
+ 204) Pandora                                    131) Mini2440
+ 205) Samsung YP-R0       ==ROCKCHIP==
+ 206) Android MIPS        180) rk27xx generic    ==HiFiMAN==
+ 207) Android x86                                190) HM-60x
+ 208) Samsung YP-R1       ==HiFi E.T.==          191) HM-801
+                          210) MA9
+ ==iBasso==               211) MA9C              ==Sony==
+ 232) DX50                212) MA8               219) NWZ-E350 series
+ 233) DX90                213) MA8C              220) NWZ-E370/E380 series
+                                                 221) NWZ-E360 series
+ ==xDuoo==                ==IHIFI==              222) NWZ-E450 series
+ 241) X3                  230) 760               223) NWZ-E460 series
+ 242) X3II                231) 960               224) NWZ-E470 series
+ 243) X20                 250) 770C              225) NWZ-E580 series
+                          251) 770               226) NWZ-A10 series
+ ==AgpTek==               252) 800               227) NW-A20 series
+ 240) Rocker                                     228) NWZ-A860 series
                                                  229) NWZ-S750 series
- ==xDuoo==                ==AgpTek==
- 241) X3                  240) Rocker
- 242) X3II
- 243) X20
 
 EOF
 
