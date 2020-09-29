@@ -105,7 +105,7 @@
 #define HAVE_SW_POWEROFF
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ            532000000
+#define CPU_FREQ            1008000000
 
 /* No special storage */
 #define CONFIG_STORAGE (STORAGE_HOSTFS)//|STORAGE_SD)
