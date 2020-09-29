@@ -7,6 +7,7 @@
  *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2017 Marcin Bukat
+ * Copyright (C) 2019 by Roman Stolyarov
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -28,6 +29,7 @@
 #include "backlight-target.h"
 #include "sysfs.h"
 #include "panic.h"
+#include "lcd.h"
 
 static const char * const sysfs_bl_brightness =
     "/sys/class/backlight/pwm-backlight.0/brightness";
@@ -44,12 +46,18 @@ bool backlight_hw_init(void)
 
 void backlight_hw_on(void)
 {
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(true);
+#endif
     sysfs_set_int(sysfs_bl_power, 0);
 }
 
 void backlight_hw_off(void)
 {
     sysfs_set_int(sysfs_bl_power, 1);
+#ifdef HAVE_LCD_ENABLE
+    lcd_enable(false);
+#endif
 }
 
 void backlight_hw_brightness(int brightness)
