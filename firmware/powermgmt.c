@@ -86,8 +86,8 @@ static int poweroff_timeout = 0;
 static long last_event_tick = 0;
 
 #if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) == PERCENTAGE_MEASURE
-int _battery_level(void) { return -1; }
 #ifdef SIMULATOR
+int _battery_level(void) { return -1; }
 int _battery_voltage(void);
 extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 extern const unsigned short percent_to_volt_charge[11];
