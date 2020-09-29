@@ -183,7 +183,7 @@ depth_3d
 #endif
 
 /* This should be AUDIOHW_HAVE_FILTER_ROLL_OFF but that is only defined later */
-#if defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740) || defined(HAVE_ES9018)
+#if defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740) || defined(HAVE_ES9018) || defined(HAVE_XDUOO_LINUX_CODEC)
 filter_roll_off
 #endif
 
