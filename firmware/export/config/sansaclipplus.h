@@ -19,7 +19,7 @@
 #define HAVE_HOTSWAP
 #endif
 
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
