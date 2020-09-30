@@ -227,7 +227,7 @@ do
     local quit = false
     local last_action = 0
     local magnitude = 1
-    local skip_ms = 1000
+    local skip_ms = 100
     local playback
 
     function action_event(action)
@@ -237,11 +237,15 @@ do
         elseif action == act.PLA_RIGHT_REPEAT then
             event = pb.TRACK_FF
             audio_ff_rew(skip_ms * magnitude)
-            magnitude = magnitude + 1
+            if magnitude < 300 then
+                magnitude = magnitude + 1
+            end
         elseif action == act.PLA_LEFT_REPEAT then
             event = pb.TRACK_REW
             audio_ff_rew(-skip_ms * magnitude)
-            magnitude = magnitude + 1
+            if magnitude < 300 then
+                magnitude = magnitude + 1
+            end
         elseif action == act.PLA_SELECT then
             playback = rb.audio("status")
             if playback == 1 then
