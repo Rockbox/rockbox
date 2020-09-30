@@ -879,8 +879,18 @@ const struct settings_list settings[] = {
                   ), /* CHOICE_SETTING( repeat_mode ) */
 #ifdef HAVE_PLAY_FREQ
     STRINGCHOICE_SETTING(0, play_frequency, LANG_FREQUENCY, 0,
+#if HAVE_PLAY_FREQ >= 192
+        "playback frequency", "auto,44.1 kHz,48 kHz,88.2 kHz,96 kHz,176.4 kHz,192 kHz", NULL, 7,
+        LANG_AUTOMATIC, TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ), TALK_ID_DECIMAL(882, 1, UNIT_KHZ), TALK_ID(96, UNIT_KHZ), TALK_ID_DECIMAL(1764, 1, UNIT_KHZ), TALK_ID(192, UNIT_KHZ)),
+#elif HAVE_PLAY_FREQ >= 96
+        "playback frequency", "auto,44.1 kHz,48 kHz,88.2 kHz,96 kHz", NULL, 5,
+        LANG_AUTOMATIC, TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ), TALK_ID_DECIMAL(882, 1, UNIT_KHZ), TALK_ID(96, UNIT_KHZ)),
+#elif HAVE_PLAY_FREQ >= 48
         "playback frequency", "auto,44.1 kHz,48 kHz", NULL, 3,
         LANG_AUTOMATIC, TALK_ID_DECIMAL(441, 1, UNIT_KHZ), TALK_ID(48, UNIT_KHZ)),
+#else
+      #error "HAVE_PLAY_FREQ < 48???"
+#endif
 #endif /* HAVE_PLAY_FREQ */
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST

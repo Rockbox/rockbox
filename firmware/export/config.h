@@ -600,7 +600,7 @@ Lyre prototype 1 */
 #elif defined(XDUOO_X20)
 #include "config/xduoox20.h"
 #else
-/* no known platform */
+//#error "unknown hwardware platform!"
 #endif
 
 #ifdef __PCTOOL__

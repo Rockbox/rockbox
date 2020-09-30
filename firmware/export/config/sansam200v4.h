@@ -10,7 +10,7 @@
 /* Enable FAT16 support */
 #define HAVE_FAT16SUPPORT
 
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
