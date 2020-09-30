@@ -79,8 +79,8 @@
 
 #define HOME_DIR_LEN (sizeof(HOME_DIR)-1)
 
-#define REC_BASE_DIR        HOME_DIR
-#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
+#define REC_BASE_DIR        "/Recordings"
+#define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
 
 #define LANG_DIR            ROCKBOX_DIR "/langs"
 
