@@ -78,7 +78,6 @@
 #define EV_TIMER_TICKS 5 /* timer resolution */
 #define EV_TIMER_FREQ ((TIMER_FREQ / HZ) * EV_TIMER_TICKS)
 #define EV_TICKS (HZ / 5)
-#define EV_INPUT (HZ / 5)
 
 #define ENABLE_LUA_HOOK  (LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT)
 #define DISABLE_LUA_HOOK (0)
@@ -87,7 +86,7 @@ enum {
     THREAD_ERROR       = 0x0,
 /* event & suspend states */
     THREAD_ACTEVENT    = 0x1,
-    THREAD_BUTEVENT    = 0x2,
+    THREAD_BTNEVENT    = 0x2,
     THREAD_CUSTOMEVENT = 0x4,
     THREAD_PLAYBKEVENT = 0x8,
     THREAD_TIMEREVENT  = 0x10,
@@ -108,7 +107,7 @@ enum {
 
 enum {
     ACTEVENT = 0,
-    BUTEVENT,
+    BTNEVENT,
     CUSTOMEVENT,
     PLAYBKEVENT,
     TIMEREVENT,
@@ -272,12 +271,16 @@ static void rev_timer_isr(void)
         if (!is_suspend(event_flag(i)))
         {
             evt = ev_data.cb[i];
-            if(evt->ticks > 0 && TIME_AFTER(curr_tick, evt->next_tick))
+
+            if ((i == ACTEVENT || i == BTNEVENT) && rb->button_queue_count())
+                    ev_flag |= event_flag(i); /* any buttons ready? */
+            else if(evt->ticks > 0 && TIME_AFTER(curr_tick, evt->next_tick))
                 ev_flag |= event_flag(i);
+
         }
     }
     set_evt(ev_flag);
-    if (ev_data.status.event)
+    if (ev_data.status.event) /* any events ready? */
         lua_interrupt_set(ev_data.L, ENABLE_LUA_HOOK);
 }
 
@@ -312,14 +315,23 @@ static void event_thread(void)
                     {
                         /* only send ACTION_NONE once */
                         if (evt->id == ACTION_NONE || rb->button_status() != 0)
-                            goto skip_callback; /* check next event */
+                        {
+                            evt->ticks = 0;
+                            continue; /* check next event */
+                        }
                     }
+                    evt->ticks = EV_TICKS; /* poll release event */
                     evt->id = action;
                     break;
-                case BUTEVENT:
+                case BTNEVENT:
                     evt->id = rb->button_get(false);
+                    /* only send BUTTON_NONE once */
                     if (evt->id == BUTTON_NONE)
-                        goto skip_callback; /* check next event */
+                    {
+                        evt->ticks = 0;
+                        continue; /* check next event */
+                    }
+                    evt->ticks = EV_TICKS; /* poll release event */
                     break;
                 case CUSTOMEVENT:
                 case PLAYBKEVENT:
@@ -333,7 +345,6 @@ static void event_thread(void)
                 rev_unlock_mtx();
                 goto event_error;
             }
-skip_callback:
             evt->next_tick = *(ev_data.get_tick) + evt->ticks;
         }
         rev_unlock_mtx(); /* we are safe to release back to main lua state */
@@ -552,7 +563,7 @@ static unsigned int get_event_by_name(lua_State *L)
     static const char *const ev_map[EVENT_CT] =
     {
         [ACTEVENT] = "action",
-        [BUTEVENT] = "button",
+        [BTNEVENT] = "button",
         [CUSTOMEVENT] = "custom",
         [PLAYBKEVENT] = "playback",
         [TIMEREVENT] = "timer",
@@ -580,8 +591,8 @@ static int rockev_register(lua_State *L)
     {
         case ACTEVENT:
             /* fall through */
-        case BUTEVENT:
-            event_ticks = luaL_optinteger(L, 3, EV_INPUT);
+        case BTNEVENT:
+            event_ticks = 0; /* button events not triggered by timeout but release is*/
             break;
         case CUSTOMEVENT:
             event_ticks = luaL_optinteger(L, 3, EV_TICKS);
@@ -607,7 +618,7 @@ static int rockev_register(lua_State *L)
 
 static int rockev_suspend(lua_State *L)
 {
-    unsigned int event; /*Arg 1 is event pass nil to suspend all */
+    unsigned int event; /*Arg 1 is event, pass nil to suspend all */
     bool suspend = luaL_optboolean(L, 2, true);
     uint8_t ev_flag = THREAD_EVENT_ALL;
 
