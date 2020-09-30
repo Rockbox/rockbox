@@ -190,7 +190,7 @@ static const struct button_mapping button_context_settings_vol_is_inc[] = {
     { ACTION_SETTINGS_DECREPEAT,BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
-}; /* button_context_settings_right_is_inc */
+}; /* button_context_settings_vol_is_inc */
 
 /** Tree **/
 static const struct button_mapping button_context_tree[] = {
