@@ -17,9 +17,6 @@
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
 #endif
 
-
-
-
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
@@ -72,9 +69,6 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-
-
-
 #define HAVE_HEADPHONE_DETECTION
 
 /* KeyPad configuration for plugins */
@@ -123,8 +117,7 @@
 #define HAVE_SW_TONE_CONTROLS
 
 /* HW codec is flexible */
-#define HW_SAMPR_CAPS SAMPR_CAP_ALL
-#define HAVE_PLAY_FREQ
+#define HW_SAMPR_CAPS SAMPR_CAP_ALL_192
 
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */

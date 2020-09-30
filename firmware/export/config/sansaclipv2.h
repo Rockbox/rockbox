@@ -10,7 +10,7 @@
 /* Define if boot data from bootloader has been enabled for the target */
 #define HAVE_BOOTDATA
 
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING

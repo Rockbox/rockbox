@@ -11,7 +11,7 @@
 /* define boot redirect file name allows booting from external drives */
 #define BOOT_REDIR "rockbox_main.fuze"
 
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING

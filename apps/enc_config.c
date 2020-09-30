@@ -375,7 +375,7 @@ bool enc_get_caps(const struct encoder_config *cfg,
     else
     {
         /* If no function provided...defaults to all */
-        caps->samplerate_caps = SAMPR_CAP_ALL;
+        caps->samplerate_caps = SAMPR_CAP_ALL_192;
         caps->channel_caps    = CHN_CAP_ALL;
     }
 
