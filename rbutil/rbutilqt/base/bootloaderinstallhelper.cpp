@@ -92,8 +92,9 @@ QString BootloaderInstallHelper::postinstallHints(QString model)
     if(model != "sansafuzeplus") {
         msg += QObject::tr("<li>Safely remove your player.</li>");
     }
-    if(model == "iriverh100" || model == "iriverh120" || model == "iriverh300" ||
-       model == "ondavx747") {
+    if(model == "iriverh100" || model == "iriverh120" || model == "iriverh300"
+       || model == "ondavx747" || model == "agptekrocker"
+       || model == "xduoox3" || model == "xduoox3ii" || model == "xduoox20") {
         hint = true;
         msg += QObject::tr("<li>Reboot your player into the original firmware.</li>"
                 "<li>Perform a firmware upgrade using the update functionality "
