@@ -401,8 +401,8 @@ int Utils::compareVersionStrings(QString s1, QString s2)
 
         // convert to number
         bool ok1, ok2;
-        int vala = numa.toUInt(&ok1);
-        int valb = numb.toUInt(&ok2);
+        unsigned int vala = numa.toUInt(&ok1);
+        unsigned int valb = numb.toUInt(&ok2);
         // if none of the numbers converted successfully we're at trailing garbage.
         if(!ok1 && !ok2)
             break;
