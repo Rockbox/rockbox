@@ -29,8 +29,13 @@
 #include "panic.h"
 #include "sysfs.h"
 #include "alsa-controls.h"
+#include "pcm-alsa.h"
 
 static int fd_hw;
+
+static long int vol_l_hw = 255;
+static long int vol_r_hw = 255;
+static long int last_ps = 0;
 
 static void hw_open(void)
 {
@@ -44,25 +49,39 @@ static void hw_close(void)
     close(fd_hw);
 }
 
-void audiohw_preinit(void)
+void audiohw_mute(int mute)
 {
-    alsa_controls_init();
-    hw_open();
+    if(mute)
+    {
+#if defined(XDUOO_X3II)
+        alsa_controls_set_bool("AK4490 Soft Mute", true);
+#endif
+#if defined(XDUOO_X20)
+        long int ps0 = (last_ps > 1) ? 1 : 2;
+        alsa_controls_set_ints("Output Port Switch", 1, &ps0);
+#endif
+    }
+    else
+    {
+#if defined(XDUOO_X3II)
+        alsa_controls_set_bool("AK4490 Soft Mute", false);
+#endif
+#if defined(XDUOO_X20)
+        alsa_controls_set_ints("Output Port Switch", 1, &last_ps);
+#endif
+    }
 }
 
-void audiohw_postinit(void)
+void audiohw_set_output(void)
 {
     long int ps = 2; // headset
+
     int status = 0;
 
     const char * const sysfs_lo_switch = "/sys/class/switch/lineout/state";
     const char * const sysfs_hs_switch = "/sys/class/switch/headset/state";
-#ifdef XDUOO_X20
+#if defined(XDUOO_X20)
     const char * const sysfs_bal_switch = "/sys/class/switch/balance/state";
-#endif
-
-#if defined(XDUOO_X3II)
-    alsa_controls_set_bool("AK4490 Soft Mute", true);
 #endif
 
     sysfs_get_int(sysfs_lo_switch, &status);
@@ -71,17 +90,28 @@ void audiohw_postinit(void)
     sysfs_get_int(sysfs_hs_switch, &status);
     if (status) ps = 2; // headset
 
-#ifdef XDUOO_X20
+#if defined(XDUOO_X20)
     sysfs_get_int(sysfs_bal_switch, &status);
     if (status) ps = 3; // balance
 #endif
 
-    /* Output port switch */
-    alsa_controls_set_ints("Output Port Switch", 1, &ps);
+    if (last_ps != ps)
+    {
+        /* Output port switch */
+        last_ps = ps;
+        alsa_controls_set_ints("Output Port Switch", 1, &last_ps);
+    }
+}
 
-#if defined(XDUOO_X3II)
-    alsa_controls_set_bool("AK4490 Soft Mute", false);
-#endif
+void audiohw_preinit(void)
+{
+    alsa_controls_init();
+    hw_open();
+}
+
+void audiohw_postinit(void)
+{
+    audiohw_set_output();
 }
 
 void audiohw_close(void)
@@ -97,24 +127,24 @@ void audiohw_set_frequency(int fsel)
 
 void audiohw_set_volume(int vol_l, int vol_r)
 {
-    long int vol_l_hw = -vol_l/5;
-    long int vol_r_hw = -vol_r/5;
-
+    vol_l_hw = -vol_l/5;
+    vol_r_hw = -vol_r/5;
+ 
     alsa_controls_set_ints("Left Playback Volume", 1, &vol_l_hw);
     alsa_controls_set_ints("Right Playback Volume", 1, &vol_r_hw);
 }
 
 void audiohw_set_filter_roll_off(int value)
 {
-    /* 0 = fast (sharp);
-       1 = slow;
-       2 = fast2
-       3 = slow2
-       4 = NOS ? */
-    long int value_hw = value;
+    /* 0 = Sharp; 
+       1 = Slow;
+       2 = Short Sharp
+       3 = Short Slow */
 #if defined(XDUOO_X3II)
+    long int value_hw = value;
     alsa_controls_set_ints("AK4490 Digital Filter", 1, &value_hw);
 #elif defined(XDUOO_X20)
+    long int value_hw = value;
     alsa_controls_set_ints("ES9018_K2M Digital Filter", 1, &value_hw);
 #else
     (void)value;
