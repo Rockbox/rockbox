@@ -547,6 +547,8 @@ static void applysettings(void)
 }
 
 static const struct opt_items sr_names[HW_NUM_FREQ] = {
+        HW_HAVE_192_([HW_FREQ_192] = { "192kHz",     TALK_ID(192, UNIT_KHZ) },)
+        HW_HAVE_176_([HW_FREQ_176] = { "176.4kHz",   TALK_ID(176, UNIT_KHZ) },)
         HW_HAVE_96_([HW_FREQ_96] = { "96kHz",     TALK_ID(96, UNIT_KHZ) },)
         HW_HAVE_88_([HW_FREQ_88] = { "88.2kHz",   TALK_ID(88, UNIT_KHZ) },)
         HW_HAVE_64_([HW_FREQ_64] = { "64kHz",     TALK_ID(64, UNIT_KHZ) },)
