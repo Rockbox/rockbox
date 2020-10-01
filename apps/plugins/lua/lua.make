@@ -43,7 +43,7 @@ $(LUA_BUILDDIR)/settings.lua: $(LUA_OBJ) $(LUA_SRCDIR)/settings_helper.pl
 
 HOST_INCLUDES := $(filter-out %/libc/include,$(INCLUDES))
 $(LUA_BUILDDIR)/buttons.lua: $(LUA_OBJ) $(LUA_SRCDIR)/button_helper.pl
-	$(SILENT)$(CC) $(INCLUDES) -dM -E -P -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -
+	$(SILENT)$(CC) $(INCLUDES) $(TARGET) -dM -E -P -include button-target.h - < /dev/null | $(LUA_SRCDIR)/button_helper.pl | $(HOSTCC) -fno-builtin $(HOST_INCLUDES) -x c -o $(LUA_BUILDDIR)/button_helper -
 	$(call PRINTS,GEN $(@F))$(LUA_BUILDDIR)/button_helper > $(LUA_BUILDDIR)/buttons.lua
 
 $(LUA_BUILDDIR)/rb_defines.lua: $(LUA_OBJ) $(LUA_SRCDIR)/rbdefines_helper.pl
@@ -80,4 +80,3 @@ $(LUA_BUILDDIR)/lua.ovl: $(LUA_OBJ) $(TLSFLIB) $(LUA_OUTLDS)
 
 $(LUA_BUILDDIR):
 	$(call PRINTS,MKDIR $@)mkdir -p $(LUA_BUILDDIR)/
-
