@@ -25,6 +25,7 @@
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "pcm_mixer.h"
+#include "pcm_sampr.h"
 
 /* Channels use standard-style PCM callback interface but a latency of one
    frame by double-buffering is introduced in order to facilitate mixing and
@@ -33,6 +34,7 @@
    parallel (as much as possible) with sending-out data. */
 
 static unsigned int mixer_sampr = HW_SAMPR_DEFAULT;
+static unsigned int mix_frame_size = MIX_FRAME_SAMPLES*4;
 
 /* Define this to nonzero to add a marker pulse at each frame start */
 #define FRAME_BOUNDARY_MARKERS 0
@@ -49,13 +51,20 @@ struct mixer_channel
     chan_buffer_hook_fn_type buffer_hook; /* Callback for new buffer */
 };
 
-/* Forget about boost here for the moment */
-#define MIX_FRAME_SIZE      (MIX_FRAME_SAMPLES*4)
+#if (defined(HW_HAVE_192) || defined(HW_HAVE_176))
+#define FRAME_SIZE_MULT  4
+#elif (defined(HW_HAVE_96) || defined(HW_HAVE_88))
+#define FRAME_SIZE_MULT  2
+#else
+#define FRAME_SIZE_MULT  1
+#endif
+
+#define MAX_MIX_FRAME_SAMPLES  (MIX_FRAME_SAMPLES * FRAME_SIZE_MULT)
 
 /* Because of the double-buffering, playback is always from here, otherwise a
    mechanism for the channel callbacks not to free buffers too early would be
    needed (if we _really_ want it and it's worth it, we _can_ do that ;-) ) */
-static uint32_t downmix_buf[2][MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
+static uint32_t downmix_buf[2][MAX_MIX_FRAME_SAMPLES] DOWNMIX_BUF_IBSS MEM_ALIGN_ATTR;
 static int downmix_index = 0;   /* Which downmix_buf? */
 static size_t next_size = 0;    /* Size of buffer to play next time */
 
@@ -66,7 +75,7 @@ static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
 
 /* Number of silence frames to play after all data has played */
-#define MAX_IDLE_FRAMES     (mixer_sampr*3 / MIX_FRAME_SAMPLES)
+#define MAX_IDLE_FRAMES     (mixer_sampr*3 / mix_frame_size / 4)
 static unsigned int idle_counter = 0;
 
 /** Mixing routines, CPU optmized **/
@@ -125,7 +134,7 @@ mixer_buffer_callback(enum pcm_dma_status status)
     downmix_index ^= 1; /* Next buffer */
 
     void *mixptr = downmix_buf[downmix_index];
-    size_t mixsize = MIX_FRAME_SIZE;
+    size_t mixsize = mix_frame_size;
     struct mixer_channel **chan_p;
 
     next_size = 0;
@@ -216,11 +225,11 @@ fill_frame:
         chan->last_size = mixsize;
         next_size += mixsize;
 
-        if (next_size < MIX_FRAME_SIZE)
+        if (next_size < mix_frame_size)
         {
             /* There is still space remaining in this frame */
             mixptr += mixsize;
-            mixsize = MIX_FRAME_SIZE - next_size;
+            mixsize = mix_frame_size - next_size;
             goto fill_frame;
         }
     }
@@ -228,9 +237,9 @@ fill_frame:
     {
         /* Pad incomplete frames with silence */
         if (idle_counter <= 3)
-            memset(mixptr, 0, MIX_FRAME_SIZE - next_size);
+            memset(mixptr, 0, mix_frame_size - next_size);
 
-        next_size = MIX_FRAME_SIZE;
+        next_size = mix_frame_size;
     }
     /* else silence period ran out - go to sleep */
 
@@ -268,7 +277,7 @@ static void mixer_start_pcm(void)
     mixer_buffer_callback(PCM_DMAST_STARTED);
 
     pcm_play_data(mixer_pcm_callback, mixer_buffer_callback,
-                  start, MIX_FRAME_SIZE);
+                  start, mix_frame_size);
 }
 
 /** Public interfaces **/
@@ -452,6 +461,16 @@ void mixer_set_frequency(unsigned int samplerate)
     /* All data is now invalid */
     mixer_reset();
     mixer_sampr = samplerate;
+
+    /* Work out how much space we really need */
+    if (samplerate > SAMPR_96)
+        mix_frame_size = 4;
+    else if (samplerate > SAMPR_48)
+        mix_frame_size = 2;
+    else
+        mix_frame_size = 1;
+
+    mix_frame_size *= MIX_FRAME_SAMPLES * 4;
 }
 
 /* Get output samplerate */
