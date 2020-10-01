@@ -8,6 +8,7 @@
  *
  * Copyright (C) 2017 Marcin Bukat
  * Copyright (C) 2016 Amaury Pouly
+ * Copyright (C) 2019 Roman Stolyarov
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +23,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <string.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
@@ -34,19 +36,24 @@
 
 static int fd = -1;
 static struct fb_var_screeninfo vinfo;
+static struct fb_fix_screeninfo finfo;
 fb_data *framebuffer = 0; /* global variable, see lcd-target.h */
+
+static void redraw(void)
+{
+    ioctl(fd, FBIOPAN_DISPLAY, &vinfo);
+}
 
 void lcd_init_device(void)
 {
     const char * const fb_dev = "/dev/fb0";
-    fd = open(fb_dev, O_RDWR);
+    fd = open(fb_dev, O_RDWR | O_SYNC);
     if(fd < 0)
     {
         panicf("Cannot open framebuffer: %s\n", fb_dev);
     }
 
     /* get fixed and variable information */
-    struct fb_fix_screeninfo finfo;
     if(ioctl(fd, FBIOGET_FSCREENINFO, &finfo) < 0)
     {
         panicf("Cannot read framebuffer fixed information");
@@ -75,6 +82,8 @@ void lcd_init_device(void)
         panicf("Cannot map framebuffer");
     }
 
+    memset(framebuffer, 0, finfo.smem_len);
+
 #ifdef HAVE_LCD_ENABLE
     lcd_set_active(true);
 #endif
@@ -88,30 +97,23 @@ void lcd_shutdown(void)
 }
 #endif
 
+#ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool on)
 {
-    const char * const sysfs_fb_blank = "/sys/class/graphics/fb0/blank";
-
-#ifdef HAVE_LCD_ENABLE
-    if (lcd_active() != on)
-#endif
+    lcd_set_active(on);
+    if (on)
     {
-        sysfs_set_int(sysfs_fb_blank, on ? 0 : 1);
-#ifdef HAVE_LCD_ENABLE
-        lcd_set_active(on);
-#endif
-
-        if (on)
-        {
-            send_event(LCD_EVENT_ACTIVATION, NULL);
-        }
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+        ioctl(fd, FB_BLANK_UNBLANK);
+    }
+    else
+    {
+        memset(framebuffer, 0, finfo.smem_len);
+        redraw();
+        ioctl(fd, FB_BLANK_POWERDOWN);
     }
 }
-
-static void redraw(void)
-{
-    ioctl(fd, FBIOPAN_DISPLAY, &vinfo);
-}
+#endif
 
 extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
                                  int width, int height);
