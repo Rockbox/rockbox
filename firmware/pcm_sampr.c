@@ -25,6 +25,8 @@
 const unsigned long audio_master_sampr_list[SAMPR_NUM_FREQ] =
 {
     [0 ... SAMPR_NUM_FREQ-1] = -1, /* any gaps set to -1 */
+    [FREQ_192] = SAMPR_192,
+    [FREQ_176] = SAMPR_176,
     [FREQ_96] = SAMPR_96,
     [FREQ_88] = SAMPR_88,
     [FREQ_64] = SAMPR_64,
@@ -43,6 +45,8 @@ const unsigned long audio_master_sampr_list[SAMPR_NUM_FREQ] =
 const unsigned long hw_freq_sampr[HW_NUM_FREQ] =
 {
     [0 ... HW_NUM_FREQ-1] = -1,
+    HW_HAVE_192_([HW_FREQ_192] = SAMPR_192,)
+    HW_HAVE_176_([HW_FREQ_176] = SAMPR_176,)
     HW_HAVE_96_([HW_FREQ_96] = SAMPR_96,)
     HW_HAVE_88_([HW_FREQ_88] = SAMPR_88,)
     HW_HAVE_64_([HW_FREQ_64] = SAMPR_64,)
