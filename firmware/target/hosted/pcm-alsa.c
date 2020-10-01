@@ -68,7 +68,7 @@
  * with multple applications running */
 static char device[] = "plughw:0,0";                    /* playback device */
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
-#ifdef SONY_NWZ_LINUX
+#if defined(SONY_NWZ_LINUX) || defined(HAVE_FIIO_LINUX_CODEC)
 /* Sony NWZ must use 32-bit per sample */
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
 typedef long sample_t;
@@ -77,6 +77,9 @@ static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format *
 typedef short sample_t;
 #endif
 static const int channels = 2;                                /* count of channels */
+static unsigned int sample_rate = 0;
+static unsigned int real_sample_rate = 0;
+
 static snd_pcm_t *handle = NULL;
 static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
 static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
@@ -93,13 +96,12 @@ static char signal_stack[SIGSTKSZ];
 static int recursion;
 #endif
 
-static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
+static int set_hwparams(snd_pcm_t *handle)
 {
-    unsigned int rrate;
     int err;
+    unsigned int srate;
     snd_pcm_hw_params_t *params;
     snd_pcm_hw_params_malloc(&params);
-
 
     /* choose all parameters */
     err = snd_pcm_hw_params_any(handle, params);
@@ -130,16 +132,17 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
         goto error;
     }
     /* set the stream rate */
-    rrate = sample_rate;
-    err = snd_pcm_hw_params_set_rate_near(handle, params, &rrate, 0);
+    sample_rate = srate = pcm_sampr;
+    err = snd_pcm_hw_params_set_rate_near(handle, params, &srate, 0);
     if (err < 0)
     {
         printf("Rate %iHz not available for playback: %s\n", sample_rate, snd_strerror(err));
         goto error;
     }
-    if (rrate != sample_rate)
+    real_sample_rate = srate;
+    if (real_sample_rate != sample_rate)
     {
-        printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, rrate);
+        printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, real_sample_rate);
         err = -EINVAL;
         goto error;
     }
@@ -159,8 +162,9 @@ static int set_hwparams(snd_pcm_t *handle, unsigned sample_rate)
         printf("Unable to set period size %ld for playback: %s\n", period_size, snd_strerror(err));
         goto error;
     }
-    if (!frames)
-        frames = malloc(period_size * channels * sizeof(sample_t));
+
+    free(frames);
+    frames = calloc(1, period_size * channels * sizeof(sample_t));
 
     /* write the parameters to device */
     err = snd_pcm_hw_params(handle, params);
@@ -229,26 +233,37 @@ error:
  * and add 48dB to the input volume. We cannot go lower -43dB because several
  * values between -48dB and -43dB would require a fractional multiplier, which is
  * stupid to implement for such very low volume. */
-static int dig_vol_mult = 2 ^ 16; /* multiplicative factor to apply to each sample */
+static int dig_vol_mult_l = 2 ^ 16; /* multiplicative factor to apply to each sample */
+static int dig_vol_mult_r = 2 ^ 16; /* multiplicative factor to apply to each sample */
 
-void pcm_alsa_set_digital_volume(int vol_db)
+void pcm_alsa_set_digital_volume(int vol_db_l, int vol_db_r)
 {
-    if(vol_db > 0 || vol_db < -43)
+    if(vol_db_l > 0 || vol_db_r > 0 || vol_db_l < -43 || vol_db_r < -43)
         panicf("invalid pcm alsa volume");
     if(format != SND_PCM_FORMAT_S32_LE)
         panicf("this function assumes 32-bit sample size");
-    vol_db += 48; /* -42dB .. 0dB => 5dB .. 48dB */
+    vol_db_l += 48; /* -42dB .. 0dB => 5dB .. 48dB */
+    vol_db_r += 48; /* -42dB .. 0dB => 5dB .. 48dB */
     /* NOTE if vol_dB = 5 then vol_shift = 1 but r = 1 so we do vol_shift - 1 >= 0
      * otherwise vol_dB >= 0 implies vol_shift >= 2 so vol_shift - 2 >= 0 */
-    int vol_shift = vol_db / 3;
-    int r = vol_db % 3;
-    if(r == 0)
-        dig_vol_mult = 1 << vol_shift;
-    else if(r == 1)
-        dig_vol_mult = 1 << vol_shift | 1 << (vol_shift - 2);
+    int vol_shift_l = vol_db_l / 3;
+    int vol_shift_r = vol_db_r / 3;
+    int r_l = vol_db_l % 3;
+    int r_r = vol_db_r % 3;
+    if(r_l == 0)
+        dig_vol_mult_l = 1 << vol_shift_l;
+    else if(r_l == 1)
+        dig_vol_mult_l = 1 << vol_shift_l | 1 << (vol_shift_l - 2);
     else
-        dig_vol_mult = 1 << vol_shift | 1 << (vol_shift - 1);
-    printf("%d dB -> factor = %d\n", vol_db - 48, dig_vol_mult);
+        dig_vol_mult_l = 1 << vol_shift_l | 1 << (vol_shift_l - 1);
+    printf("l: %d dB -> factor = %d\n", vol_db_l - 48, dig_vol_mult_l);
+    if(r_r == 0)
+        dig_vol_mult_r = 1 << vol_shift_r;
+    else if(r_r == 1)
+        dig_vol_mult_r = 1 << vol_shift_r | 1 << (vol_shift_r - 2);
+    else
+        dig_vol_mult_r = 1 << vol_shift_r | 1 << (vol_shift_r - 1);
+    printf("r: %d dB -> factor = %d\n", vol_db_r - 48, dig_vol_mult_r);
 }
 
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
@@ -279,8 +294,11 @@ static bool fill_frames(void)
              * sample by some value so the sound is not too low */
             const short *pcm_ptr = pcm_data;
             sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
-            for (int i = 0; i < copy_n*2; i++)
-                *sample_ptr++ = *pcm_ptr++ * dig_vol_mult;
+            for (int i = 0; i < copy_n; i++)
+            {
+                *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_l;
+                *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_r;
+            }
         }
         else
         {
@@ -378,7 +396,7 @@ static int async_rw(snd_pcm_t *handle)
 
     /* fill buffer with silence to initiate playback without noisy click */
     sample_size = buffer_size;
-    samples = malloc(sample_size * channels * sizeof(sample_t));
+    samples = calloc(1, sample_size * channels * sizeof(sample_t));
 
     snd_pcm_format_set_silence(format, samples, sample_size);
     err = snd_pcm_writei(handle, samples, sample_size);
@@ -428,7 +446,7 @@ void pcm_play_dma_init(void)
     if ((err = snd_pcm_nonblock(handle, 1)))
         panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
-    if ((err = set_hwparams(handle, pcm_sampr)) < 0)
+    if ((err = set_hwparams(handle)) < 0)
     {
         panicf("Setting of hwparams failed: %s\n", snd_strerror(err));
     }
@@ -473,15 +491,28 @@ void pcm_play_unlock(void)
 #endif
 }
 
+#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
+static void pcm_dma_apply_settings_nolock(void)
+{
+    if (sample_rate != pcm_sampr)
+    {
+	audiohw_mute(true);
+        snd_pcm_drop(handle);
+        set_hwparams(handle);
+	audiohw_mute(false);
+    }
+}
+#else
 static void pcm_dma_apply_settings_nolock(void)
 {
     snd_pcm_drop(handle);
-    set_hwparams(handle, pcm_sampr);
+    set_hwparams(handle);
 #if defined(HAVE_NWZ_LINUX_CODEC)
     /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
     audiohw_set_frequency(pcm_sampr);
 #endif
 }
+#endif
 
 void pcm_dma_apply_settings(void)
 {
@@ -571,11 +602,16 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-
 void pcm_set_mixer_volume(int volume)
 {
     (void)volume;
 }
+
+int pcm_alsa_get_rate(void)
+{
+    return real_sample_rate;
+}
+
 #ifdef HAVE_RECORDING
 void pcm_rec_lock(void)
 {

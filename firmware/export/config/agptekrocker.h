@@ -75,10 +75,6 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-
-
-#define HAVE_ROCKER_CODEC
-
 #define HAVE_HEADPHONE_DETECTION
 
 /* KeyPad configuration for plugins */
@@ -108,10 +104,7 @@
 #define CPU_FREQ            1008000000
 
 /* No special storage */
-#define CONFIG_STORAGE (STORAGE_HOSTFS)//|STORAGE_SD)
-//#define MULTIDRIVE_DIR "/mnt/sd_0"
-//#define NUM_DRIVES 1
-//#define HAVE_HOTSWAP
+#define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
 
 /* Battery */

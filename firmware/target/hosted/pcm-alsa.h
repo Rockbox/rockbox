@@ -22,10 +22,12 @@
 
 #include <config.h>
 
-#ifdef SONY_NWZ_LINUX
+#if defined(SONY_NWZ_LINUX) || defined(HAVE_FIIO_LINUX_CODEC)
 /* Set the PCM volume in dB: each sample with have this volume applied digitally
  * before being sent to ALSA. Volume must satisfy -43 <= dB <= 0 */
-void pcm_alsa_set_digital_volume(int vol_db);
+void pcm_alsa_set_digital_volume(int vol_db_l, int vol_db_r);
 #endif
+
+int pcm_alsa_get_rate(void);
 
 #endif /* __PCM_ALSA_RB_H__ */

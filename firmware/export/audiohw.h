@@ -223,7 +223,7 @@ struct sound_settings_info
 #elif defined(HAVE_ROCKER_CODEC)
 #include "rocker_codec.h"
 #elif defined(HAVE_XDUOO_LINUX_CODEC)
-#include "rocker_codec.h"
+#include "xduoolinux_codec.h"
 #endif
 
 /* convert caps into defines */
@@ -450,6 +450,10 @@ void audiohw_set_volume(int vol_l, int vol_r);
  * @param vol_r sets right channel volume
  */
 void audiohw_set_lineout_volume(int vol_l, int vol_r);
+#endif
+
+#ifdef AUDIOHW_HAVE_SET_OUTPUT
+void audiohw_set_output(void);
 #endif
 
 #ifndef AUDIOHW_HAVE_CLIPPING
