@@ -17,9 +17,6 @@
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
 #endif
 
-
-
-
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
@@ -84,6 +81,7 @@
 /* We have usb power and can detect usb but it is handled by Linux */
 #define HAVE_USB_POWER
 
+#define AUDIOHW_HAVE_SET_OUTPUT
 #endif
 
 #define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
@@ -118,8 +116,6 @@
 
 /* HW codec is flexible */
 #define HW_SAMPR_CAPS SAMPR_CAP_ALL_192
-
-#define AUDIOHW_HAVE_SET_OUTPUT
 
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 2400 /* default battery capacity */

@@ -416,7 +416,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     printf(" set driver volume %d (%d dB)\n", drv_vol, curve->level[drv_vol] / 10);
     nwz_set_driver_vol(drv_vol);
     printf(" set digital volume %d dB\n", vol / 10);
-    pcm_alsa_set_digital_volume(vol / 10);
+    pcm_alsa_set_digital_volume(vol / 10, vol / 10);
 }
 
 void audiohw_close(void)
