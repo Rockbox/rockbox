@@ -534,7 +534,9 @@ static void lo_unplug_change(bool inserted)
 #ifdef HAVE_LINEOUT_POWEROFF
     lineout_set(inserted);
 #else
+#ifdef AUDIOHW_HAVE_LINEOUT
     audiohw_set_lineout_volume(0,0); /*hp vol re-set by this function as well*/
+#endif
     static bool lineout_caused_pause = true;
 
     if (global_settings.unplug_mode)

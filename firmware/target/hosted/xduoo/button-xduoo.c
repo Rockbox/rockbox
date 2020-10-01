@@ -36,6 +36,7 @@
 #include "kernel.h"
 #include "backlight.h"
 #include "backlight-target.h"
+#include "xduoolinux_codec.h"
 
 static bool soft_hold = false;
 #ifndef BOOTLOADER
