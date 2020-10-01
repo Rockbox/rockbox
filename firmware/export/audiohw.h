@@ -452,10 +452,6 @@ void audiohw_set_volume(int vol_l, int vol_r);
 void audiohw_set_lineout_volume(int vol_l, int vol_r);
 #endif
 
-#ifdef AUDIOHW_HAVE_SET_OUTPUT
-void audiohw_set_output(void);
-#endif
-
 #ifndef AUDIOHW_HAVE_CLIPPING
 #if defined(AUDIOHW_HAVE_BASS) || defined(AUDIOHW_HAVE_TREBLE) \
     || defined(AUDIOHW_HAVE_EQ)

@@ -67,6 +67,7 @@
 #define PLUGIN_BUFFER_SIZE 0x100000
 
 #define HAVE_HEADPHONE_DETECTION
+#define HAVE_LINEOUT_DETECTION
 
 /* KeyPad configuration for plugins */
 #define CONFIG_KEYPAD XDUOO_X20_PAD
@@ -81,7 +82,6 @@
 /* We have usb power and can detect usb but it is handled by Linux */
 #define HAVE_USB_POWER
 
-#define AUDIOHW_HAVE_SET_OUTPUT
 #endif
 
 #define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
