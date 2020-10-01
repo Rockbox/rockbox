@@ -24,6 +24,7 @@
 #include "config.h"
 #include "audio.h"
 #include "audiohw.h"
+#include "button.h"
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
@@ -32,6 +33,7 @@
 #include "pcm-alsa.h"
 
 static int fd_hw;
+static int inited = 0;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
@@ -72,11 +74,12 @@ void audiohw_mute(int mute)
     }
 }
 
-void audiohw_set_output(void)
-{
+int xduoo_get_outputs(void){
     long int ps = 2; // headset
 
     int status = 0;
+
+    if (!inited) return ps;
 
     const char * const sysfs_lo_switch = "/sys/class/switch/lineout/state";
     const char * const sysfs_hs_switch = "/sys/class/switch/headset/state";
@@ -84,22 +87,32 @@ void audiohw_set_output(void)
     const char * const sysfs_bal_switch = "/sys/class/switch/balance/state";
 #endif
 
-    sysfs_get_int(sysfs_lo_switch, &status);
-    if (status) ps = 1; // lineout
-
     sysfs_get_int(sysfs_hs_switch, &status);
     if (status) ps = 2; // headset
+
+    sysfs_get_int(sysfs_lo_switch, &status);
+    if (status) ps = 1; // lineout
 
 #if defined(XDUOO_X20)
     sysfs_get_int(sysfs_bal_switch, &status);
     if (status) ps = 3; // balance
 #endif
 
+    xduoo_set_output(ps);
+
+    return ps;
+}
+
+void xduoo_set_output(int ps)
+{
+    if (!inited) return;
+
     if (last_ps != ps)
     {
         /* Output port switch */
         last_ps = ps;
         alsa_controls_set_ints("Output Port Switch", 1, &last_ps);
+	audiohw_set_volume(vol_l_hw, vol_r_hw);
     }
 }
 
@@ -107,15 +120,17 @@ void audiohw_preinit(void)
 {
     alsa_controls_init();
     hw_open();
+    inited = 1;
 }
 
 void audiohw_postinit(void)
 {
-    audiohw_set_output();
+    xduoo_set_output(xduoo_get_outputs());
 }
 
 void audiohw_close(void)
 {
+    inited = 0;
     hw_close();
     alsa_controls_close();
 }
@@ -127,16 +142,45 @@ void audiohw_set_frequency(int fsel)
 
 void audiohw_set_volume(int vol_l, int vol_r)
 {
-    vol_l_hw = -vol_l/5;
-    vol_r_hw = -vol_r/5;
- 
-    alsa_controls_set_ints("Left Playback Volume", 1, &vol_l_hw);
-    alsa_controls_set_ints("Right Playback Volume", 1, &vol_r_hw);
+    long l,r;
+
+    vol_l_hw = vol_l;
+    vol_r_hw = vol_r;
+
+    if (lineout_inserted()) {
+        l = 0;
+        r = 0;
+    } else {
+        l = -vol_l/5;
+        r = -vol_r/5;
+    }
+
+    alsa_controls_set_ints("Left Playback Volume", 1, &l);
+    alsa_controls_set_ints("Right Playback Volume", 1, &r);
+}
+
+void audiohw_set_lineout_volume(int vol_l, int vol_r)
+{
+    long l,r;
+
+    (void)vol_l;
+    (void)vol_r;
+
+    if (lineout_inserted()) {
+        l = 0;
+        r = 0;
+    } else {
+        l = -vol_l_hw/5;
+        r = -vol_r_hw/5;
+    }
+
+    alsa_controls_set_ints("Left Playback Volume", 1, &l);
+    alsa_controls_set_ints("Right Playback Volume", 1, &r);
 }
 
 void audiohw_set_filter_roll_off(int value)
 {
-    /* 0 = Sharp; 
+    /* 0 = Sharp;
        1 = Slow;
        2 = Short Sharp
        3 = Short Slow */

@@ -85,9 +85,6 @@
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
 
-
-
-
 #ifndef BOOTLOADER
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_JZ4760

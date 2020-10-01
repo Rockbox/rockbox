@@ -3851,10 +3851,6 @@ static void audio_change_frequency_callback(unsigned short id, void *data)
     static bool starting_playback = false;
     struct mp3entry *id3;
 
-#ifdef AUDIOHW_HAVE_SET_OUTPUT
-    audiohw_set_output();
-#endif
-
     switch (id)
     {
     case PLAYBACK_EVENT_START_PLAYBACK:

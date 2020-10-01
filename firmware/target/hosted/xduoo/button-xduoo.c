@@ -166,25 +166,16 @@ int button_read_device(void)
 
 bool headphones_inserted(void)
 {
-    int status = 0;
-    const char * const sysfs_lo_switch = "/sys/class/switch/lineout/state";
-    const char * const sysfs_hs_switch = "/sys/class/switch/headset/state";
-#ifdef XDUOO_X20
-    const char * const sysfs_bal_switch = "/sys/class/switch/balance/state";
-#endif
+    int ps = xduoo_get_outputs();
 
-    sysfs_get_int(sysfs_lo_switch, &status);
-    if (status) return true;
+    return (ps == 2 || ps == 3);
+}
 
-    sysfs_get_int(sysfs_hs_switch, &status);
-    if (status) return true;
+bool lineout_inserted(void)
+{
+    int ps = xduoo_get_outputs();
 
-#ifdef XDUOO_X20
-    sysfs_get_int(sysfs_bal_switch, &status);
-    if (status) return true;
-#endif
-
-    return false;
+    return (ps == 1);
 }
 
 void button_close_device(void)

@@ -41,6 +41,13 @@ bool dbg_hw_info(void)
         line = 0;
 
         lcd_putsf(0, line++, "pcm srate: %d", pcm_alsa_get_rate());
+#ifdef HAVE_HEADPHONE_DETECTION
+        lcd_putsf(0, line++, "hp: %d", headphones_inserted());
+#endif
+#ifdef HAVE_LINEOUT_DETECTION
+        lcd_putsf(0, line++, "lo: %d", lineout_inserted());
+#endif
+
         btn = button_read_device();
 
         lcd_update();
