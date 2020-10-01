@@ -37,7 +37,7 @@
 static int fd = -1;
 static struct fb_var_screeninfo vinfo;
 static struct fb_fix_screeninfo finfo;
-fb_data *framebuffer = 0; /* global variable, see lcd-target.h */
+fb_data *framebuffer = NULL; /* global variable, see lcd-target.h */
 
 static void redraw(void)
 {
@@ -93,13 +93,17 @@ void lcd_init_device(void)
 void lcd_shutdown(void)
 {
     munmap(framebuffer, FRAMEBUFFER_SIZE);
+    framebuffer = NULL;
     close(fd);
+    fd = -1;
 }
 #endif
 
 #ifdef HAVE_LCD_ENABLE
 void lcd_enable(bool on)
 {
+    if (fd < 0) return;
+
     lcd_set_active(on);
     if (on)
     {
@@ -120,6 +124,8 @@ extern void lcd_copy_buffer_rect(fb_data *dst, const fb_data *src,
 
 void lcd_update(void)
 {
+    if (fd < 0) return;
+
 #ifdef HAVE_LCD_ENABLE
     if (lcd_active())
 #endif
@@ -133,6 +139,8 @@ void lcd_update(void)
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    if (fd < 0) return;
+
 #ifdef HAVE_LCD_ENABLE
     if (lcd_active())
 #endif
