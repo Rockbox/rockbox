@@ -208,9 +208,6 @@ void audiohw_set_frequency(int fsel)
     // bclk is 2,3,4,6,8,12  ONLY
     // mclk is 1..512
 
-    // for cs4398, BCLK must be 4 for single-rate, 2 for double-rate, 1 for quad-rate!
-
-    // 11.025 and 22.050 are a little wonky.
     switch(fsel)
     {
         case HW_FREQ_8: // 0.512 MHz
@@ -222,8 +219,6 @@ void audiohw_set_frequency(int fsel)
         case HW_FREQ_11: // 0.7056 MHz
             pll1_speed = 508000000 / 3;
             mclk_div = 180 / 3;
-//	    pll1_speed = 0;
-//            mclk_div = 272;
             bclk_div = 4;
             func_mode = 0;
             break;
@@ -242,8 +237,6 @@ void audiohw_set_frequency(int fsel)
         case HW_FREQ_22: // 1.4112 MHz
             pll1_speed = 508000000 / 3;
             mclk_div = 90 / 3;
-//            pll1_speed = 0;
-//            mclk_div = 136;
             bclk_div = 4;
             func_mode = 0;
             break;
@@ -263,8 +256,6 @@ void audiohw_set_frequency(int fsel)
         case HW_FREQ_44: // 2.8224 MHz
             pll1_speed = 508000000 / 3;
             mclk_div = 45 / 3;
-//            pll1_speed = 0;
-//            mclk_div = 68;
             bclk_div = 4;
             dem = CS4398_DEM_44100;
             func_mode = 0;
@@ -285,8 +276,6 @@ void audiohw_set_frequency(int fsel)
         case HW_FREQ_88: // 5.6448 MHz
             pll1_speed = 508000000 / 3;
             mclk_div = 45 / 3;
-//            pll1_speed = 0;
-//            mclk_div = 68;
             bclk_div = 2;
             func_mode = 1;
             break;
@@ -295,6 +284,18 @@ void audiohw_set_frequency(int fsel)
             mclk_div = 42/2/3;
             bclk_div = 2;
             func_mode = 1;
+            break;
+        case HW_FREQ_176: // 11.2896 MHz
+            pll1_speed = 508000000*2;
+            mclk_div = 45;
+            bclk_div = 2;
+            func_mode = 2;
+            break;
+        case HW_FREQ_192: // 12.288 MHz
+            pll1_speed = 516000000;
+            mclk_div = 42/2;
+            bclk_div = 2;
+            func_mode = 2;
             break;
         default:
             return;

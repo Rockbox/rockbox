@@ -106,7 +106,7 @@
 #define HAVE_SW_TONE_CONTROLS
 
 /* define the bitmask of hardware sample rates */
-#define HW_SAMPR_CAPS  SAMPR_CAP_ALL_96
+#define HW_SAMPR_CAPS  SAMPR_CAP_ALL_192
 
 #define AB_REPEAT_ENABLE
 
