@@ -66,13 +66,6 @@ void audiohw_set_volume(int vol_l, int vol_r)
 }
 #endif /* AUDIOHW_HAVE_MONO_VOLUME */
 
-#ifdef AUDIOHW_HAVE_LINEOUT
-void audiohw_set_lineout_volume(int vol_l, int vol_r)
-{
-    (void)vol_l; (void)vol_r;
-}
-#endif
-
 #if defined(AUDIOHW_HAVE_PRESCALER)
 void audiohw_set_prescaler(int value)
 {
