@@ -28,4 +28,6 @@
 void pcm_alsa_set_digital_volume(int vol_db);
 #endif
 
+int pcm_alsa_get_rate(void);
+
 #endif /* __PCM_ALSA_RB_H__ */

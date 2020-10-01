@@ -60,9 +60,6 @@
 /* define this if you have a real-time clock */
 #define CONFIG_RTC APPLICATION
 
-/* Define if the device can wake from an RTC alarm */
-//#define HAVE_RTC_ALARM
-
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x80000
 
@@ -118,6 +115,8 @@
 
 /* HW codec is flexible */
 #define HW_SAMPR_CAPS SAMPR_CAP_ALL_192
+
+#define AUDIOHW_HAVE_SET_OUTPUT
 
 /* Battery */
 #define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
