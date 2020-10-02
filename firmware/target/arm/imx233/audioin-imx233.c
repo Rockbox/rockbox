@@ -181,7 +181,7 @@ void imx233_audioin_enable_mic(bool enable)
 
 void imx233_audioin_set_freq(int fsel)
 {
-    static struct
+    static const struct
     {
         int base_mult;
         int src_hold;
@@ -201,6 +201,9 @@ void imx233_audioin_set_freq(int fsel)
         HW_HAVE_64_([HW_FREQ_64] = { 0x2, 0x0, 0x17, 0xe00},)
         HW_HAVE_88_([HW_FREQ_88] = { 0x2, 0x0, 0x11, 0x37 },)
         HW_HAVE_96_([HW_FREQ_96] = { 0x2, 0x0, 0xf, 0x13ff },)
+//        HW_HAVE_128_([HW_FREQ_128] = { 0x4, 0x0, 0x17, 0xe00 },)
+        HW_HAVE_176_([HW_FREQ_176] = { 0x4, 0x0, 0x11, 0x37 },)
+        HW_HAVE_192_([HW_FREQ_192] = { 0x4, 0x0, 0xf, 0x13ff },)
     };
 
     BF_WR_ALL(AUDIOIN_ADCSRR,
