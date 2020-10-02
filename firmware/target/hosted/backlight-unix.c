@@ -44,20 +44,28 @@ bool backlight_hw_init(void)
     return true;
 }
 
+static int last_bl = -1;
+
 void backlight_hw_on(void)
 {
+    if (last_bl != 1) {
 #ifdef HAVE_LCD_ENABLE
-    lcd_enable(true);
+        lcd_enable(true);
 #endif
-    sysfs_set_int(sysfs_bl_power, 0);
+        sysfs_set_int(sysfs_bl_power, 0);
+	last_bl = 1;
+    }
 }
 
 void backlight_hw_off(void)
 {
-    sysfs_set_int(sysfs_bl_power, 1);
+    if (last_bl != 0) {
+        sysfs_set_int(sysfs_bl_power, 1);
 #ifdef HAVE_LCD_ENABLE
-    lcd_enable(false);
+        lcd_enable(false);
 #endif
+	last_bl = 0;
+    }
 }
 
 void backlight_hw_brightness(int brightness)
