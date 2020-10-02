@@ -53,15 +53,15 @@ void lcd_init_device(void)
         panicf("Cannot open framebuffer: %s\n", fb_dev);
     }
 
+    if (fcntl( fd, F_SETFD, FD_CLOEXEC ) < 0)
+    {
+        panicf("Can't set CLOEXEC");
+    }
+
     /* get fixed and variable information */
     if(ioctl(fd, FBIOGET_FSCREENINFO, &finfo) < 0)
     {
         panicf("Cannot read framebuffer fixed information");
-    }
-
-    if(ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0)
-    {
-        panicf("Cannot read framebuffer variable information");
     }
 
 #if 0
@@ -76,10 +76,15 @@ void lcd_init_device(void)
      * values returned by the driver for line_length */
 
     /* map framebuffer */
-    framebuffer = mmap(0, FRAMEBUFFER_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    framebuffer = mmap(NULL, FRAMEBUFFER_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if((void *)framebuffer == MAP_FAILED)
     {
         panicf("Cannot map framebuffer");
+    }
+
+    if(ioctl(fd, FBIOGET_VSCREENINFO, &vinfo) < 0)
+    {
+        panicf("Cannot read framebuffer variable information");
     }
 
     memset(framebuffer, 0, finfo.smem_len);
@@ -104,7 +109,11 @@ void lcd_enable(bool on)
 {
     if (fd < 0) return;
 
+    if (lcd_active() == on)
+        return;
+
     lcd_set_active(on);
+
     if (on)
     {
         send_event(LCD_EVENT_ACTIVATION, NULL);
