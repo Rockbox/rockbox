@@ -81,9 +81,9 @@ static unsigned int sample_rate = 0;
 static unsigned int real_sample_rate = 0;
 
 static snd_pcm_t *handle = NULL;
-static snd_pcm_sframes_t buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
-static snd_pcm_sframes_t period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
-static sample_t *frames;
+static snd_pcm_sframes_t buffer_size;
+static snd_pcm_sframes_t period_size;
+static sample_t *frames = NULL;
 
 static const void  *pcm_data = 0;
 static size_t       pcm_size = 0;
@@ -102,6 +102,18 @@ static int set_hwparams(snd_pcm_t *handle)
     unsigned int srate;
     snd_pcm_hw_params_t *params;
     snd_pcm_hw_params_malloc(&params);
+
+    /* Size playback buffers based on sample rate */
+    if (pcm_sampr > SAMPR_96) {
+        buffer_size = MIX_FRAME_SAMPLES * 32 * 4; /* ~64k */
+        period_size = MIX_FRAME_SAMPLES * 4 * 4;  /* ~16k */
+    } else if (pcm_sampr > SAMPR_48) {
+        buffer_size = MIX_FRAME_SAMPLES * 32 * 2; /* ~32k */
+        period_size = MIX_FRAME_SAMPLES * 4 * 2;  /*  ~8k */
+    } else {
+        buffer_size = MIX_FRAME_SAMPLES * 32; /* ~16k */
+        period_size = MIX_FRAME_SAMPLES * 4;  /*  ~4k */
+    }
 
     /* choose all parameters */
     err = snd_pcm_hw_params_any(handle, params);
@@ -195,7 +207,7 @@ static int set_swparams(snd_pcm_t *handle)
         printf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
         goto error;
     }
-    /* start the transfer when the buffer is haalmost full */
+    /* start the transfer when the buffer is half full */
     err = snd_pcm_sw_params_set_start_threshold(handle, swparams, buffer_size / 2);
     if (err < 0)
     {
