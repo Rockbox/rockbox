@@ -225,6 +225,124 @@ static int lua_split_arguments(lua_State *L, const char *filename)
   return 2;
 }
 
+static void display_traceback(const char *errstr)
+{
+#if 1
+  int i, w, h;
+  rb->lcd_getstringsize("W", &w, &h);
+  const int max_ch = (LCD_WIDTH / w - 1) * 2;
+  const int max_w = LCD_WIDTH - w;
+  const int max_lines = LCD_HEIGHT / h - 1;
+  const int timeout = HZ * 5;
+  const int minute_count = (HZ * 60) / timeout;
+
+  bool done = false;
+  int curline;
+  char line[max_ch + 1];
+  int line_len = 0;
+
+  const char *ch = errstr;
+  int scrollpos = 0;
+  int strerr_len = strlen(errstr);
+  int runcount = 0;
+  do
+  {
+    rb->lcd_clear_display();
+    curline = 0;
+
+    while (ch && curline < max_lines)
+    {
+      for (i = 0; i < max_ch; i++)
+      {
+        line[i] = ch[i];
+        line[i+1] = '\0'; /* need to terminate before checking text extent */
+        rb->lcd_getstringsize(line, &w, NULL);
+
+        if (line[i] == '\t')
+          line[i] = ' ';
+
+        if (w >= max_w || iscntrl(line[i]))
+        {
+          break;
+        }
+        /* try to not split in middle of words */
+        else if ((line[i] >= '#' && line[i] <= '&') ||
+                 line[i] == '/' || line[i] == '\\'  ||
+                (line[i] >= '*' && line[i] <= '-'))
+        {
+          if (w + (max_w / 5) >= max_w)
+          {
+            line[i] = '\0';
+            break;
+          }
+        }
+        else if (ispunct(line[i]) || isspace(line[i]))
+        {
+          if (w + (max_w / 5) >= max_w)
+          {
+            break;
+          }
+        }
+      }
+
+      line_len = strlen(line);
+      ch+=line_len;
+      if (line_len == 0)
+      {
+        line_len = max_ch / 2;
+        break;
+      }
+
+      /* Remove control characters*/
+      for (i = 0; i < line_len; i++)
+      {
+        if (iscntrl(line[i]))
+        {
+            if (line_len == 1)
+              line[i] = '\0';
+            else
+              line[i] = ' ';
+        }
+      }
+
+      if(strlen(line) > 0)
+        rb->lcd_putsxy(0, curline++ * h, line);
+    }
+
+    rb->lcd_update();
+
+    switch(rb->get_action(CONTEXT_STD,HZ*5))
+    {
+      case ACTION_NONE:
+        if (runcount <= 0)
+        {
+          runcount++;
+          break;
+        }
+      case ACTION_STD_CANCEL:
+      case ACTION_STD_OK:
+        done = true;
+        break;
+      case ACTION_STD_PREV:
+        scrollpos -= line_len;
+        runcount = -minute_count; /* increase timeout */
+        if (scrollpos < 0)
+          scrollpos = 0;
+        break;
+      case ACTION_STD_NEXT:
+        scrollpos += line_len;
+        runcount = -minute_count; /* increase timeout */
+        if (scrollpos >= strerr_len - line_len)
+          scrollpos = strerr_len - line_len;
+        break;
+    }
+     ch = &errstr[scrollpos];
+
+  } while (!done);
+#else
+    rb->splash(10 * HZ, errstr);
+#endif
+}
 /***************** Plugin Entry Point *****************/
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -251,7 +369,8 @@ enum plugin_status plugin_start(const void* parameter)
 
         if (lu_status) {
             DEBUGF("%s\n", lua_tostring(Ls, -1));
-            rb->splash(10 * HZ, lua_tostring(Ls, -1));
+            display_traceback(lua_tostring(Ls, -1));
+            //rb->splash(10 * HZ, lua_tostring(Ls, -1));
             /*lua_pop(Ls, 1);*/
         }
         lua_close(Ls);
