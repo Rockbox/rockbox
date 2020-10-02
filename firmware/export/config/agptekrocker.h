@@ -51,10 +51,11 @@
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
 /* Main LCD backlight brightness range and defaults: the backlight driver
- * has levels from 0 to 2555. But 0 is off so start at 1.
+ * has levels from 0 to 255. But 0 is off so start at 1.
  */
 #define MIN_BRIGHTNESS_SETTING      1
 #define MAX_BRIGHTNESS_SETTING      255
+#define BRIGHTNESS_STEP             5
 #define DEFAULT_BRIGHTNESS_SETTING  70
 
 /* Which backlight fading type? */
