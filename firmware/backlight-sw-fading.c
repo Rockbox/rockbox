@@ -27,6 +27,10 @@
 #include "backlight.h"
 #include "backlight-sw-fading.h"
 
+#ifndef BRIGHTNESS_STEP
+#define BRIGHTNESS_STEP 1
+#endif
+
 /* To adapt a target do:
  * - make sure backlight_hw_on doesn't set the brightness to something other than
  *  the previous value (lowest brightness in most cases)
@@ -46,7 +50,14 @@ static bool _backlight_fade_up(void)
 {
     if (LIKELY(current_brightness < backlight_brightness))
     {
+#if BRIGHTNESS_STEP == 1
         backlight_hw_brightness(++current_brightness);
+#else
+        current_brightness += BRIGHTNESS_STEP;
+        if (current_brightness > MAX_BRIGHTNESS_SETTING)
+            current_brightness = MAX_BRIGHTNESS_SETTING;
+	backlight_hw_brightness(current_brightness);
+#endif
     }
     return(current_brightness >= backlight_brightness);
 }
@@ -56,13 +67,24 @@ static bool _backlight_fade_down(void)
 {
     if (LIKELY(current_brightness > MIN_BRIGHTNESS_SETTING))
     {
+#if BRIGHTNESS_STEP == 1
         backlight_hw_brightness(--current_brightness);
+#else
+        current_brightness -= BRIGHTNESS_STEP;
+        if (current_brightness < MIN_BRIGHTNESS_SETTING)
+            current_brightness = MIN_BRIGHTNESS_SETTING;
+	backlight_hw_brightness(current_brightness);
+#endif
         return false;
     }
     else
     {
         /* decrement once more, since backlight is off */
+#if BRIGHTNESS_STEP == 1
         current_brightness--;
+#else
+        current_brightness=MIN_BRIGHTNESS_SETTING -1;
+#endif
         backlight_hw_off();
         return true;
     }
