@@ -48,6 +48,7 @@ unsigned long strtoul(const char *str, char **endptr, int base);
 size_t strftime(char* dst, size_t max, const char* format, const struct tm* tm);
 long lfloor(long x);
 long lpow(long x, long y);
+int splash_scroller(int timeout, const char* str);
 
 #define floor   lfloor
 #define pow     lpow

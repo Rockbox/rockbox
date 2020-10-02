@@ -86,7 +86,7 @@ static int db_errorfb (lua_State *L) {
   if (lua_gettop(L) == arg)
     lua_pushliteral(L, "");
   else if (!lua_isstring(L, arg+1)) return 1;  /* message is not a string */
-  else lua_pushliteral(L, "\n");
+  else lua_pushliteral(L, "\n\n");
   lua_pushliteral(L, "stack traceback: ");
   while (lua_getstack(L1, level++, &ar)) {
     if (level > LEVELS1 && firstpart) {
@@ -101,7 +101,7 @@ static int db_errorfb (lua_State *L) {
       firstpart = 0;
       continue;
     }
-    lua_pushliteral(L, "\n\t");
+    lua_pushliteral(L, "\n\n\t");
     lua_getinfo(L1, "Snl", &ar);
     char* filename = rb->strrchr(ar.short_src, '/'); /* remove path */
     lua_pushfstring(L, "%s:", filename ? filename : ar.short_src);
@@ -118,8 +118,10 @@ static int db_errorfb (lua_State *L) {
         lua_pushfstring(L, " in function <%s:%d>",
                            ar.short_src, ar.linedefined);
     }
+
     lua_concat(L, lua_gettop(L) - arg);
   }
+  lua_pushfstring(L, "\n\nRam Used: %d Kb", lua_gc (L, LUA_GCCOUNT, 0));
   lua_concat(L, lua_gettop(L) - arg);
   return 1;
 }
@@ -225,6 +227,14 @@ static int lua_split_arguments(lua_State *L, const char *filename)
   return 2;
 }
 
+static void display_traceback(const char *errstr)
+{
+#if 1
+  splash_scroller(HZ * 5, errstr); /*rockaux.c*/
+#else
+  rb->splash(10 * HZ, errstr);
+#endif
+}
 /***************** Plugin Entry Point *****************/
 enum plugin_status plugin_start(const void* parameter)
 {
@@ -251,7 +261,8 @@ enum plugin_status plugin_start(const void* parameter)
 
         if (lu_status) {
             DEBUGF("%s\n", lua_tostring(Ls, -1));
-            rb->splash(10 * HZ, lua_tostring(Ls, -1));
+            display_traceback(lua_tostring(Ls, -1));
+            //rb->splash(10 * HZ, lua_tostring(Ls, -1));
             /*lua_pop(Ls, 1);*/
         }
         lua_close(Ls);

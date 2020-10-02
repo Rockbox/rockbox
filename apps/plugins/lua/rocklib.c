@@ -287,6 +287,14 @@ RB_WRAP(do_menu)
     return 1;
 }
 
+RB_WRAP(splash_scroller)
+{
+    int timeout = luaL_checkint(L, 1);
+    const char *str = luaL_checkstring(L, 2);
+    int action = splash_scroller(timeout, str); /*rockaux.c*/
+    lua_pushinteger(L, action);
+    return 1;
+}
 
 /* DEVICE AUDIO / PLAYLIST CONTROL */
 
@@ -948,6 +956,7 @@ static const luaL_Reg rocklib[] =
     RB_FUNC(kbd_input),
     RB_FUNC(gui_syncyesno_run),
     RB_FUNC(do_menu),
+    RB_FUNC(splash_scroller),
 
     /* DEVICE AUDIO / SOUND / PLAYLIST CONTROL */
     RB_FUNC(audio),
