@@ -47,7 +47,7 @@ static void redraw(void)
 void lcd_init_device(void)
 {
     const char * const fb_dev = "/dev/fb0";
-    fd = open(fb_dev, O_RDWR | O_SYNC);
+    fd = open(fb_dev, O_RDWR /* | O_SYNC */);
     if(fd < 0)
     {
         panicf("Cannot open framebuffer: %s\n", fb_dev);
