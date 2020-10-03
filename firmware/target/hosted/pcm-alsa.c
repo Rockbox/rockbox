@@ -443,6 +443,7 @@ static int async_rw(snd_pcm_t *handle)
     } else {
         return state;
     }
+
     return 0;
 }
 
@@ -469,6 +470,10 @@ void pcm_play_dma_init(void)
 
     if ((err = snd_pcm_nonblock(handle, 1)))
         panicf("Could not set non-block mode: %s\n", snd_strerror(err));
+
+#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
+    audiohw_mute(true);
+#endif
 
     if ((err = set_hwparams(handle)) < 0)
     {
@@ -523,12 +528,14 @@ static void pcm_dma_apply_settings_nolock(void)
         audiohw_mute(true);
         snd_pcm_drop(handle);
         set_hwparams(handle);
-        audiohw_mute(false);
+//        audiohw_mute(false);  /// Play DMA will unmute us.
     }
 }
 #else
 static void pcm_dma_apply_settings_nolock(void)
 {
+    logf("PCM DMA Settings %d %d", sample_rate, pcm_sampr);
+
     snd_pcm_drop(handle);
     set_hwparams(handle);
 #if defined(HAVE_NWZ_LINUX_CODEC)
@@ -557,6 +564,9 @@ void pcm_play_dma_stop(void)
     snd_pcm_drain(handle);
     snd_pcm_nonblock(handle, 1);
     sample_rate = 0;
+#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
+    audiohw_mute(true);
+#endif
     logf("PCM DMA stopped");
 }
 
@@ -600,6 +610,9 @@ void pcm_play_dma_start(const void *addr, size_t size)
                     logf("Start error: %s\n", snd_strerror(err));
 		    return;
 		}
+#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
+    audiohw_mute(false);
+#endif
 		if (err == 0)
 			return;
 		break;
