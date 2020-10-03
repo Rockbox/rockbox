@@ -515,33 +515,26 @@ void pcm_play_unlock(void)
 #endif
 }
 
-#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
-static void pcm_dma_apply_settings_nolock(void)
-{
-    logf("PCM DMA Settings %d %d", sample_rate, pcm_sampr);
-    if (sample_rate != pcm_sampr)
-    {
-#ifdef AUDIOHW_MUTE_ON_PAUSE
-        audiohw_mute(true);
-#endif
-        snd_pcm_drop(handle);
-        set_hwparams(handle);
-	/* Will be unmuted by pcm resuming */
-    }
-}
-#else
 static void pcm_dma_apply_settings_nolock(void)
 {
     logf("PCM DMA Settings %d %d", sample_rate, pcm_sampr);
 
-    snd_pcm_drop(handle);
-    set_hwparams(handle);
+    if (sample_rate != pcm_sampr)
+    {
+#ifdef AUDIOHW_MUTE_ON_PAUSE
+        // XXX AK4450 (xDuoo X3ii) needs to be muted when switching rates.
+        audiohw_mute(true);
+#endif
+        snd_pcm_drop(handle);
+        set_hwparams(handle);
 #if defined(HAVE_NWZ_LINUX_CODEC)
-    /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
-    audiohw_set_frequency(pcm_sampr);
+        /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
+        audiohw_set_frequency(pcm_sampr);
 #endif
+
+	/* (Will be unmuted by pcm resuming) */
+    }
 }
-#endif
 
 void pcm_dma_apply_settings(void)
 {
