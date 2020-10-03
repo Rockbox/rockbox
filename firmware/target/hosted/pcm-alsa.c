@@ -471,10 +471,6 @@ void pcm_play_dma_init(void)
     if ((err = snd_pcm_nonblock(handle, 1)))
         panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
-#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
-    audiohw_mute(true);
-#endif
-
     if ((err = set_hwparams(handle)) < 0)
     {
         panicf("Setting of hwparams failed: %s\n", snd_strerror(err));
@@ -525,10 +521,12 @@ static void pcm_dma_apply_settings_nolock(void)
     logf("PCM DMA Settings %d %d", sample_rate, pcm_sampr);
     if (sample_rate != pcm_sampr)
     {
+#ifdef AUDIOHW_MUTE_ON_PAUSE
         audiohw_mute(true);
+#endif
         snd_pcm_drop(handle);
         set_hwparams(handle);
-//        audiohw_mute(false);  /// Play DMA will unmute us.
+	/* Will be unmuted by pcm resuming */
     }
 }
 #else
@@ -555,7 +553,13 @@ void pcm_dma_apply_settings(void)
 void pcm_play_dma_pause(bool pause)
 {
     logf("PCM DMA pause %d", pause);
+#ifdef AUDIOHW_MUTE_ON_PAUSE
+    if (pause) audiohw_mute(true);
+#endif
     snd_pcm_pause(handle, pause);
+#ifdef AUDIOHW_MUTE_ON_PAUSE
+    if (!pause) audiohw_mute(false);
+#endif
 }
 
 void pcm_play_dma_stop(void)
@@ -564,7 +568,7 @@ void pcm_play_dma_stop(void)
     snd_pcm_drain(handle);
     snd_pcm_nonblock(handle, 1);
     sample_rate = 0;
-#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
+#ifdef AUDIOHW_MUTE_ON_PAUSE
     audiohw_mute(true);
 #endif
     logf("PCM DMA stopped");
@@ -610,7 +614,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
                     logf("Start error: %s\n", snd_strerror(err));
 		    return;
 		}
-#if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
+#ifdef AUDIOHW_MUTE_ON_PAUSE
     audiohw_mute(false);
 #endif
 		if (err == 0)
