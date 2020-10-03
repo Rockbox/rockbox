@@ -14,9 +14,6 @@
 /*define this if the ATA controller and method of USB access support LBA48 */
 #define HAVE_LBA48
 
-
-
-
 /* define this if you want album art for this target */
 #define HAVE_ALBUMART
 
@@ -73,9 +70,6 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-
-
-
 /* Define this if you have an remote lcd */
 #define HAVE_REMOTE_LCD
 
@@ -114,7 +108,7 @@
 #define HAVE_RECORDING
 
 /* define hardware samples rate caps mask */
-#define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+#define HW_SAMPR_CAPS   (/*SAMPR_CAP_88 |*/ SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
 /* define the bitmask of recording sample rates */
 #define REC_SAMPR_CAPS  (SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)

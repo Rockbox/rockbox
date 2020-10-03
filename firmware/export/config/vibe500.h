@@ -20,13 +20,10 @@
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_LINEIN)
 
 /* define the bitmask of hardware sample rates */
-#define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+#define HW_SAMPR_CAPS   (/*SAMPR_CAP_88 |*/ SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
 /* define the bitmask of recording sample rates */
-#define REC_SAMPR_CAPS  (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
-
-
-
+#define REC_SAMPR_CAPS  (/*SAMPR_CAP_88 |*/ SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP

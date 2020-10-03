@@ -14,9 +14,6 @@
 /*define this if the ATA controller and method of USB access support LBA48 */
 #define HAVE_LBA48
 
-
-
-
 /* define this if you want album art for this target */
 #define HAVE_ALBUMART
 
@@ -73,9 +70,6 @@
 /* Define this to enable morse code input */
 #define HAVE_MORSE_INPUT
 
-
-
-
 /* define this if you have a disk storage, i.e. something
    that needs spinups and can cause skips when shaked */
 #define HAVE_DISK_STORAGE
@@ -121,7 +115,7 @@
                         SRC_CAP_FMRADIO | SRC_CAP_SPDIF)
 
 /* define hardware samples rate caps mask */
-#define HW_SAMPR_CAPS   (SAMPR_CAP_88 | SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
+#define HW_SAMPR_CAPS   (/*SAMPR_CAP_88 |*/ SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
 
 /* define the bitmask of recording sample rates */
 #define REC_SAMPR_CAPS  (SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11)
