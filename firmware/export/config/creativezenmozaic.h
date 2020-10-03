@@ -9,12 +9,12 @@
 #define MODEL_NUMBER 87
 #define MODEL_NAME   "Creative ZEN Mozaic"
 
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_48
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_192
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      SAMPR_CAP_ALL_48
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL_96
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23
