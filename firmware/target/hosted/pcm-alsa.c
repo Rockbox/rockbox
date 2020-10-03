@@ -5,9 +5,9 @@
  *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
- * $Id$
  *
  * Copyright (C) 2010 Thomas Martitz
+ * Copyright (c) 2020 Solomon Peachy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,12 +41,14 @@
  * device works which doesnt break with other apps running.
  */
 
-
 #include "autoconf.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
 #include <alsa/asoundlib.h>
+
+//#define LOGF_ENABLE
+
 #include "system.h"
 #include "debug.h"
 #include "kernel.h"
@@ -58,6 +60,8 @@
 #include "pcm_sampr.h"
 #include "audiohw.h"
 #include "pcm-alsa.h"
+
+#include "logf.h"
 
 #include <pthread.h>
 #include <signal.h>
@@ -119,28 +123,28 @@ static int set_hwparams(snd_pcm_t *handle)
     err = snd_pcm_hw_params_any(handle, params);
     if (err < 0)
     {
-        printf("Broken configuration for playback: no configurations available: %s\n", snd_strerror(err));
+        panicf("Broken configuration for playback: no configurations available: %s\n", snd_strerror(err));
         goto error;
     }
     /* set the interleaved read/write format */
     err = snd_pcm_hw_params_set_access(handle, params, access_);
     if (err < 0)
     {
-        printf("Access type not available for playback: %s\n", snd_strerror(err));
+        panicf("Access type not available for playback: %s\n", snd_strerror(err));
         goto error;
     }
     /* set the sample format */
     err = snd_pcm_hw_params_set_format(handle, params, format);
     if (err < 0)
     {
-        printf("Sample format not available for playback: %s\n", snd_strerror(err));
+        logf("Sample format not available for playback: %s\n", snd_strerror(err));
         goto error;
     }
     /* set the count of channels */
     err = snd_pcm_hw_params_set_channels(handle, params, channels);
     if (err < 0)
     {
-        printf("Channels count (%i) not available for playbacks: %s\n", channels, snd_strerror(err));
+        logf("Channels count (%i) not available for playbacks: %s\n", channels, snd_strerror(err));
         goto error;
     }
     /* set the stream rate */
@@ -148,13 +152,13 @@ static int set_hwparams(snd_pcm_t *handle)
     err = snd_pcm_hw_params_set_rate_near(handle, params, &srate, 0);
     if (err < 0)
     {
-        printf("Rate %iHz not available for playback: %s\n", sample_rate, snd_strerror(err));
+        logf("Rate %iHz not available for playback: %s\n", sample_rate, snd_strerror(err));
         goto error;
     }
     real_sample_rate = srate;
     if (real_sample_rate != sample_rate)
     {
-        printf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, real_sample_rate);
+        logf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, real_sample_rate);
         err = -EINVAL;
         goto error;
     }
@@ -163,7 +167,7 @@ static int set_hwparams(snd_pcm_t *handle)
     err = snd_pcm_hw_params_set_buffer_size_near(handle, params, &buffer_size);
     if (err < 0)
     {
-        printf("Unable to set buffer size %ld for playback: %s\n", buffer_size, snd_strerror(err));
+        logf("Unable to set buffer size %ld for playback: %s\n", buffer_size, snd_strerror(err));
         goto error;
     }
 
@@ -171,18 +175,18 @@ static int set_hwparams(snd_pcm_t *handle)
     err = snd_pcm_hw_params_set_period_size_near (handle, params, &period_size, NULL);
     if (err < 0)
     {
-        printf("Unable to set period size %ld for playback: %s\n", period_size, snd_strerror(err));
+        logf("Unable to set period size %ld for playback: %s\n", period_size, snd_strerror(err));
         goto error;
     }
 
-    free(frames);
+    if (frames) free(frames);
     frames = calloc(1, period_size * channels * sizeof(sample_t));
 
     /* write the parameters to device */
     err = snd_pcm_hw_params(handle, params);
     if (err < 0)
     {
-        printf("Unable to set hw params for playback: %s\n", snd_strerror(err));
+        logf("Unable to set hw params for playback: %s\n", snd_strerror(err));
         goto error;
     }
 
@@ -204,28 +208,28 @@ static int set_swparams(snd_pcm_t *handle)
     err = snd_pcm_sw_params_current(handle, swparams);
     if (err < 0)
     {
-        printf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
+        logf("Unable to determine current swparams for playback: %s\n", snd_strerror(err));
         goto error;
     }
     /* start the transfer when the buffer is half full */
     err = snd_pcm_sw_params_set_start_threshold(handle, swparams, buffer_size / 2);
     if (err < 0)
     {
-        printf("Unable to set start threshold mode for playback: %s\n", snd_strerror(err));
+        logf("Unable to set start threshold mode for playback: %s\n", snd_strerror(err));
         goto error;
     }
     /* allow the transfer when at least period_size samples can be processed */
     err = snd_pcm_sw_params_set_avail_min(handle, swparams, period_size);
     if (err < 0)
     {
-        printf("Unable to set avail min for playback: %s\n", snd_strerror(err));
+        logf("Unable to set avail min for playback: %s\n", snd_strerror(err));
         goto error;
     }
     /* write the parameters to the playback device */
     err = snd_pcm_sw_params(handle, swparams);
     if (err < 0)
     {
-        printf("Unable to set sw params for playback: %s\n", snd_strerror(err));
+        logf("Unable to set sw params for playback: %s\n", snd_strerror(err));
         goto error;
     }
 
@@ -268,14 +272,14 @@ void pcm_alsa_set_digital_volume(int vol_db_l, int vol_db_r)
         dig_vol_mult_l = 1 << vol_shift_l | 1 << (vol_shift_l - 2);
     else
         dig_vol_mult_l = 1 << vol_shift_l | 1 << (vol_shift_l - 1);
-    printf("l: %d dB -> factor = %d\n", vol_db_l - 48, dig_vol_mult_l);
+    logf("l: %d dB -> factor = %d\n", vol_db_l - 48, dig_vol_mult_l);
     if(r_r == 0)
         dig_vol_mult_r = 1 << vol_shift_r;
     else if(r_r == 1)
         dig_vol_mult_r = 1 << vol_shift_r | 1 << (vol_shift_r - 2);
     else
         dig_vol_mult_r = 1 << vol_shift_r | 1 << (vol_shift_r - 1);
-    printf("r: %d dB -> factor = %d\n", vol_db_r - 48, dig_vol_mult_r);
+    logf("r: %d dB -> factor = %d\n", vol_db_r - 48, dig_vol_mult_r);
 }
 
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
@@ -327,6 +331,7 @@ static bool fill_frames(void)
             pcm_play_dma_status_callback(PCM_DMAST_STARTED);
         }
     }
+
     return true;
 }
 
@@ -351,13 +356,13 @@ static void pcm_tick(void)
             int err = snd_pcm_writei(handle, frames, period_size);
             if (err < 0 && err != period_size && err != -EAGAIN)
             {
-                printf("Write error: written %i expected %li\n", err, period_size);
+                logf("Write error: written %i expected %li\n", err, period_size);
                 break;
             }
         }
         else
         {
-            DEBUGF("%s: No Data.\n", __func__);
+            logf("%s: No Data.\n", __func__);
             break;
         }
     }
@@ -384,14 +389,14 @@ static int async_rw(snd_pcm_t *handle)
     err = sigaltstack(&ss, NULL);
     if (err < 0)
     {
-        DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
+        logf("Unable to install alternative signal stack: %s", strerror(err));
         return err;
     }
 
     err = snd_async_add_pcm_handler(&ahandler, handle, async_callback, NULL);
     if (err < 0)
     {
-        DEBUGF("Unable to register async handler: %s\n", snd_strerror(err));
+        logf("Unable to register async handler: %s\n", snd_strerror(err));
         return err;
     }
 
@@ -401,7 +406,7 @@ static int async_rw(snd_pcm_t *handle)
     err = sigaction(SIGIO, &sa, NULL);
     if (err < 0)
     {
-        DEBUGF("Unable to install alternative signal stack: %s", strerror(err));
+        logf("Unable to install alternative signal stack: %s", strerror(err));
         return err;
     }
 #endif
@@ -416,26 +421,30 @@ static int async_rw(snd_pcm_t *handle)
 
     if (err < 0)
     {
-            DEBUGF("Initial write error: %s\n", snd_strerror(err));
-            return err;
+        logf("Initial write error: %s\n", snd_strerror(err));
+        return err;
     }
     if (err != (ssize_t)sample_size)
     {
-            DEBUGF("Initial write error: written %i expected %li\n", err, sample_size);
-            return err;
+        logf("Initial write error: written %i expected %li\n", err, sample_size);
+        return err;
     }
-    if (snd_pcm_state(handle) == SND_PCM_STATE_PREPARED)
+
+    snd_pcm_state_t state = snd_pcm_state(handle);
+    logf("PCM RW State %d", state);
+    if (state == SND_PCM_STATE_PREPARED)
     {
-            err = snd_pcm_start(handle);
-            if (err < 0)
-            {
-                DEBUGF("Start error: %s\n", snd_strerror(err));
-                return err;
-            }
+        err = snd_pcm_start(handle);
+        if (err < 0)
+        {
+            logf("Start error: %s\n", snd_strerror(err));
+            return err;
+        }
+    } else {
+        return state;
     }
     return 0;
 }
-
 
 void cleanup(void)
 {
@@ -448,6 +457,9 @@ void cleanup(void)
 void pcm_play_dma_init(void)
 {
     int err;
+
+    logf("PCM DMA Init");
+
     audiohw_preinit();
 
     if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
@@ -482,7 +494,6 @@ void pcm_play_dma_init(void)
     return;
 }
 
-
 void pcm_play_lock(void)
 {
 #ifdef USE_ASYNC_CALLBACK
@@ -506,12 +517,13 @@ void pcm_play_unlock(void)
 #if defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_ROCKER_CODEC)
 static void pcm_dma_apply_settings_nolock(void)
 {
+    logf("PCM DMA Settings %d %d", sample_rate, pcm_sampr);
     if (sample_rate != pcm_sampr)
     {
-	audiohw_mute(true);
+        audiohw_mute(true);
         snd_pcm_drop(handle);
         set_hwparams(handle);
-	audiohw_mute(false);
+        audiohw_mute(false);
     }
 }
 #else
@@ -533,20 +545,24 @@ void pcm_dma_apply_settings(void)
     pcm_play_unlock();
 }
 
-
 void pcm_play_dma_pause(bool pause)
 {
+    logf("PCM DMA pause %d", pause);
     snd_pcm_pause(handle, pause);
 }
 
-
 void pcm_play_dma_stop(void)
 {
+    snd_pcm_nonblock(handle, 0);
     snd_pcm_drain(handle);
+    snd_pcm_nonblock(handle, 1);
+    sample_rate = 0;
+    logf("PCM DMA stopped");
 }
 
 void pcm_play_dma_start(const void *addr, size_t size)
 {
+    logf("PCM DMA start (%p %d)", addr, size);
     pcm_dma_apply_settings_nolock();
 
     pcm_data = addr;
@@ -555,32 +571,38 @@ void pcm_play_dma_start(const void *addr, size_t size)
     while (1)
     {
         snd_pcm_state_t state = snd_pcm_state(handle);
+	logf("PCM State %d", state);
+
         switch (state)
         {
             case SND_PCM_STATE_RUNNING:
                 return;
             case SND_PCM_STATE_XRUN:
             {
-                DEBUGF("Trying to recover from error\n");
+                logf("Trying to recover from error\n");
                 int err = snd_pcm_recover(handle, -EPIPE, 0);
                 if (err < 0)
-                    DEBUGF("Recovery failed: %s\n", snd_strerror(err));
+                    logf("Recovery failed: %s\n", snd_strerror(err));
                 continue;
             }
             case SND_PCM_STATE_SETUP:
             {
                 int err = snd_pcm_prepare(handle);
                 if (err < 0)
-                    printf("Prepare error: %s\n", snd_strerror(err));
+                    logf("Prepare error: %s\n", snd_strerror(err));
                 /* fall through */
             }
             case SND_PCM_STATE_PREPARED:
             {   /* prepared state, we need to fill the buffer with silence before
                  * starting */
                 int err = async_rw(handle);
-                if (err < 0)
-                    printf("Start error: %s\n", snd_strerror(err));
-                return;
+                if (err < 0) {
+                    logf("Start error: %s\n", snd_strerror(err));
+		    return;
+		}
+		if (err == 0)
+			return;
+		break;
             }
             case SND_PCM_STATE_PAUSED:
             {   /* paused, simply resume */
@@ -591,7 +613,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
                 /* run until drained */
                 continue;
             default:
-                DEBUGF("Unhandled state: %s\n", snd_pcm_state_name(state));
+                logf("Unhandled state: %s\n", snd_pcm_state_name(state));
                 return;
         }
     }
