@@ -14,7 +14,9 @@ mosaique.c
 main_menu_config.c
 properties.c
 random_folder_advance_config.c
+#if (!defined(FIIO_M3PRO))
 rockblox.c
+#endif
 search.c
 settings_dumper.c
 snow.c
@@ -130,12 +132,16 @@ spacerocks.c
 
 blackjack.c
 bounce.c
+#if (!defined(FIIO_M3PRO))
 bubbles.c
+#endif
 calculator.c
 chip8.c
 chopper.c
 demystify.c
+#if (!defined(FIIO_M3PRO))
 jewels.c
+#endif
 minesweeper.c
 open_plugins.c
 oscilloscope.c
@@ -150,7 +156,9 @@ sokoban.c
 star.c
 starfield.c
 vu_meter.c
+#if (!defined(FIIO_M3PRO))
 wormlet.c
+#endif
 
 #ifdef HAVE_HOTKEY
 announce_status.c
@@ -183,8 +191,10 @@ matrix.c
 speedread.c
 
 #if (LCD_WIDTH > 138)
+#if (!defined(FIIO_M3PRO))
 invadrox.c
 superdom.c
+#endif
 #endif
 
 #endif /* LCD_DEPTH > 1 */
