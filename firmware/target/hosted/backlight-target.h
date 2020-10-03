@@ -21,9 +21,7 @@
 #ifndef _BACKLIGHT_TARGET_H_
 #define _BACKLIGHT_TARGET_H_
 
-
 #include <stdbool.h>
-
 
 /* See backlight.c */
 bool backlight_hw_init(void);
@@ -31,6 +29,12 @@ void backlight_hw_on(void);
 void backlight_hw_off(void);
 void backlight_hw_brightness(int brightness);
 
-
+#ifdef HAVE_BUTTON_LIGHT
+void buttonlight_hw_on(void);
+void buttonlight_hw_off(void);
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+void buttonlight_hw_brightness(int brightness);
+#endif
 #endif
 
+#endif
