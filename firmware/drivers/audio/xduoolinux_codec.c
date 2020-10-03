@@ -66,15 +66,13 @@ void audiohw_mute(int mute)
     }
     else
     {
-        long int ps0 = last_ps;
         last_ps = 0;
         xduoo_get_outputs();
-//      xduoo_set_output(ps);
     }
 }
 
 int xduoo_get_outputs(void){
-    long int ps = 2; // headset
+    long int ps = 0; // Muted, if nothing is plugged in!
 
     int status = 0;
 
@@ -121,15 +119,16 @@ void audiohw_preinit(void)
     logf("hw preinit");
     alsa_controls_init();
     hw_open();
-    audiohw_mute(true);  /* Start muted */
+    audiohw_mute(true);  /* Start muted to avoid the POP */
     inited = 1;
 }
 
 void audiohw_postinit(void)
 {
+//    const char * const codec_pmdown = "/sys/devices/platform/ingenic-x3ii.0/x3ii-ak4490-i2s/pmdown_time";  // in ms, defaults 5000
+
     logf("hw postinit");
-    audiohw_mute(true);  /* Stay muted */
-    xduoo_set_output(xduoo_get_outputs());
+    xduoo_set_output(xduoo_get_outputs());  /* Unmute */
 }
 
 void audiohw_close(void)
