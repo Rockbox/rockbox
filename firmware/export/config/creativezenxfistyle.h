@@ -9,12 +9,14 @@
 #define MODEL_NUMBER 94
 #define MODEL_NAME   "Creative Zen X-Fi Style"
 
-#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_48
+// HW can do it but we don't have the IRAM for mix buffers
+//#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_192
+#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      SAMPR_CAP_ALL_48
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL_96
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23

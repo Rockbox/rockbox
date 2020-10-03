@@ -11,13 +11,13 @@
 /* Define if boot data from bootloader has been enabled for the target */
 #define HAVE_BOOTDATA
 
+// HW can do it but we don't have the IRAM for mix buffers
+//#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_192
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL_96
 
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO
-
-
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

@@ -11,12 +11,14 @@
 /* Define if boot data from bootloader has been enabled for the target */
 #define HAVE_BOOTDATA
 
+// HW supports it but our buffers don't fit.
+//#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_192
 #define HW_SAMPR_CAPS       SAMPR_CAP_ALL_48
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING
 
-#define REC_SAMPR_CAPS      SAMPR_CAP_ALL_48
+#define REC_SAMPR_CAPS      SAMPR_CAP_ALL_96
 
 /* Default recording levels */
 #define DEFAULT_REC_MIC_GAIN    23
@@ -26,8 +28,6 @@
 /* Define bitmask of input sources - recordable bitmask can be defined
    explicitly if different */
 #define INPUT_SRC_CAPS (SRC_CAP_MIC | SRC_CAP_FMRADIO)
-
-
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
