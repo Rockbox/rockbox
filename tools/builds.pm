@@ -444,6 +444,10 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'xDuoo X20',
         status => 2,
     },
+    'fiiom3k' => {
+        name => 'FiiO M3K',
+        status => 1,
+    },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
         status => 2,
@@ -670,6 +674,5 @@ sub voicesforlang($) {
 
     return @list;
 }
-
 
 1;

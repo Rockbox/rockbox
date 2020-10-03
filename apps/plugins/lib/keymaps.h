@@ -239,6 +239,14 @@
 #define BTN_FIRE         BUTTON_PLAY
 #define BTN_PAUSE        BUTTON_POWER
 
+#elif (CONFIG_KEYPAD == FIIO_M3K_PAD)
+#define BTN_UP           BUTTON_VOL_UP
+#define BTN_DOWN         BUTTON_VOL_DOWN
+#define BTN_LEFT         BUTTON_PREV
+#define BTN_RIGHT        BUTTON_NEXT
+#define BTN_FIRE         BUTTON_PLAY
+#define BTN_PAUSE        BUTTON_POWER
+
 #elif (CONFIG_KEYPAD == IHIFI_770_PAD)
 #define BTN_UP           BUTTON_PREV
 #define BTN_DOWN         BUTTON_NEXT
