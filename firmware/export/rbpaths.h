@@ -42,7 +42,7 @@
 
 #if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
     defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || \
-    defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)
+    defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(FIIO_M3K)
 
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #define HOME_DIR "/mnt/media0"
@@ -53,6 +53,8 @@
 #define HOME_DIR "/mnt/sdcard"
 #elif defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)
 #define HOME_DIR "/mnt/sd_0"
+#elif defined(FIIO_M3K)
+#define HOME_DIR "/mnt"
 #else
 #define HOME_DIR "/"
 #endif
