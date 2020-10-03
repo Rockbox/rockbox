@@ -21,6 +21,8 @@
  *
  ****************************************************************************/
 
+//#define LOGF_ENABLE
+
 #include "config.h"
 #include "audio.h"
 #include "audiohw.h"
@@ -31,6 +33,8 @@
 #include "sysfs.h"
 #include "alsa-controls.h"
 #include "pcm-alsa.h"
+
+#include "logf.h"
 
 static int fd_hw;
 static int inited = 0;
@@ -53,24 +57,19 @@ static void hw_close(void)
 
 void audiohw_mute(int mute)
 {
+    logf("mute %d", mute);
+
     if(mute)
     {
-#if defined(XDUOO_X3II)
-        alsa_controls_set_bool("AK4490 Soft Mute", true);
-#endif
-#if defined(XDUOO_X20)
-        long int ps0 = (last_ps > 1) ? 1 : 2;
+        long int ps0 = 0;
         alsa_controls_set_ints("Output Port Switch", 1, &ps0);
-#endif
     }
     else
     {
-#if defined(XDUOO_X3II)
-        alsa_controls_set_bool("AK4490 Soft Mute", false);
-#endif
-#if defined(XDUOO_X20)
-        alsa_controls_set_ints("Output Port Switch", 1, &last_ps);
-#endif
+        long int ps0 = last_ps;
+        last_ps = 0;
+        xduoo_get_outputs();
+//      xduoo_set_output(ps);
     }
 }
 
@@ -109,6 +108,7 @@ void xduoo_set_output(int ps)
 
     if (last_ps != ps)
     {
+        logf("set out %d/%d", ps, last_ps);
         /* Output port switch */
         last_ps = ps;
         alsa_controls_set_ints("Output Port Switch", 1, &last_ps);
@@ -118,18 +118,23 @@ void xduoo_set_output(int ps)
 
 void audiohw_preinit(void)
 {
+    logf("hw preinit");
     alsa_controls_init();
     hw_open();
+    audiohw_mute(true);  /* Start muted */
     inited = 1;
 }
 
 void audiohw_postinit(void)
 {
+    logf("hw postinit");
+    audiohw_mute(true);  /* Stay muted */
     xduoo_set_output(xduoo_get_outputs());
 }
 
 void audiohw_close(void)
 {
+    logf("hw close");
     inited = 0;
     hw_close();
     alsa_controls_close();
@@ -142,6 +147,8 @@ void audiohw_set_frequency(int fsel)
 
 void audiohw_set_volume(int vol_l, int vol_r)
 {
+    logf("hw vol %d %d", vol_l, vol_r);
+
     long l,r;
 
     vol_l_hw = vol_l;
@@ -163,6 +170,8 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 {
     long l,r;
 
+    logf("lo vol %d %d", vol_l, vol_r);
+
     (void)vol_l;
     (void)vol_r;
 
@@ -180,6 +189,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 
 void audiohw_set_filter_roll_off(int value)
 {
+    logf("rolloff %d", value);
     /* 0 = Sharp;
        1 = Slow;
        2 = Short Sharp
