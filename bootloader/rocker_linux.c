@@ -51,23 +51,42 @@
 #define ICON_WIDTH  70
 #define ICON_HEIGHT 70
 #define RBFILE "rockbox.rocker"
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#include "bitmaps/hibyicon.h"
 #elif defined(XDUOO_X3II)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
 #define RBFILE "rockbox.x3ii"
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#include "bitmaps/hibyicon.h"
 #elif defined(XDUOO_X20)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
 #define RBFILE "rockbox.x20"
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#include "bitmaps/hibyicon.h"
+#elif defined(FIIO_M3K)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define RBFILE "rockbox.fiiom3k"
+#define ICON_NAME bm_fiioicon
+#define OF_NAME "FIIO PLAYER"
+#include "bitmaps/fiioicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"
 #endif
 
+#ifdef FIIO_M3K
+#define BASE_DIR "/mnt"
+#else
 #define BASE_DIR "/mnt/sd_0"
+#endif
 
 /* images */
 #include "bitmaps/rockboxicon.h"
-#include "bitmaps/hibyicon.h"
 #include "bitmaps/toolsicon.h"
 
 /* don't issue an error when parsing the file for dependencies */
@@ -78,6 +97,10 @@
 #if defined(BMPWIDTH_hibyicon) && (BMPWIDTH_hibyicon != ICON_WIDTH || \
     BMPHEIGHT_hibyicon != ICON_HEIGHT)
 #error hibyicon has the wrong resolution
+#endif
+#if defined(BMPWIDTH_fiioicon) && (BMPWIDTH_fiioicon != ICON_WIDTH || \
+    BMPHEIGHT_fiioicon != ICON_HEIGHT)
+#error fiioicon has the wrong resolution
 #endif
 #if defined(BMPWIDTH_toolsicon) && (BMPWIDTH_toolsicon != ICON_WIDTH || \
     BMPHEIGHT_toolsicon != ICON_HEIGHT)
@@ -148,6 +171,8 @@ static int get_inactivity_tmo(void)
     else
 #endif
         return 10 * HZ; /* Inactivity timeout when not on hold */
+
+    // XXX if booting the last selection, use a short timeout?
 }
 
 /* return action on idle timeout */
@@ -229,11 +254,11 @@ static enum boot_mode get_boot_mode(void)
         }
         lcd_set_foreground(LCD_RGBPACK(255, 201, 0));
         /* display icon */
-        const struct bitmap *icon = (mode == BOOT_OF) ? &bm_hibyicon :
+        const struct bitmap *icon = (mode == BOOT_OF) ? &ICON_NAME :
             (mode == BOOT_ROCKBOX) ? &bm_rockboxicon : &bm_toolsicon;
         lcd_bmp(icon, (LCD_WIDTH - ICON_WIDTH) / 2, get_icon_y());
         /* display bottom description */
-        const char *desc = (mode == BOOT_OF) ? "HIBY PLAYER" :
+        const char *desc = (mode == BOOT_OF) ? OF_NAME :
             (mode == BOOT_ROCKBOX) ? "ROCKBOX" : "TOOLS";
 
         int desc_height;
