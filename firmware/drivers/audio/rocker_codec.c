@@ -62,6 +62,7 @@ void audiohw_preinit(void)
 {
     alsa_controls_init();
     hw_open();
+    audiohw_mute(true);  /* Start muted to avoid the POP */
 }
 
 void audiohw_postinit(void)
@@ -69,7 +70,7 @@ void audiohw_postinit(void)
     long int hp = 2;
 
     /* Output port switch set to Headphones */
-    alsa_controls_set_ints("Output Port Switch", 1, &hp);
+    alsa_controls_set_ints("Output Port Switch", 1, &hp); /* Unmutes */
 }
 
 void audiohw_close(void)
