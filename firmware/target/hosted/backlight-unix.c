@@ -41,6 +41,12 @@ bool backlight_hw_init(void)
 {
     backlight_hw_on();
     backlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
+#ifdef HAVE_BUTTON_LIGHT
+    buttonlight_hw_on();
+#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+    buttonlight_hw_brightness(DEFAULT_BRIGHTNESS_SETTING);
+#endif
+#endif
     return true;
 }
 
