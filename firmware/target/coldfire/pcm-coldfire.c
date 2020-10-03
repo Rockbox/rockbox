@@ -91,7 +91,7 @@ HW_HAVE_88_([HW_FREQ_88] = { 0x0c, 0x01 },)
  */
 static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_88] = { 0x00, 0x01 },
+HW_HAVE_88_([HW_FREQ_88] = { 0x00, 0x01 },)
     [HW_FREQ_44] = { 0x00, 0x01 },
     [HW_FREQ_22] = { 0x00, 0x01 },
     [HW_FREQ_11] = { 0x00, 0x01 },
@@ -102,7 +102,7 @@ static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 #if (CONFIG_CPU == MCF5250 || CONFIG_CPU == MCF5249) && defined(HAVE_TLV320)
 static const unsigned char pcm_freq_parms[HW_NUM_FREQ][2] =
 {
-    [HW_FREQ_88] = { 0x0c, 0x01 },
+HW_HAVE_88_([HW_FREQ_88] = { 0x0c, 0x01 },)
     [HW_FREQ_44] = { 0x06, 0x01 },
     [HW_FREQ_22] = { 0x04, 0x01 },
     [HW_FREQ_11] = { 0x02, 0x02 },
