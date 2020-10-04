@@ -65,14 +65,14 @@ QString Sysinfo::getInfo(Sysinfo::InfoType type)
     info += "<table>";
     info += "<tr><td>" + tr("Mountpoint") + "</td><td>" + tr("Label")
             + "</td><td>" + tr("Free") + "</td><td>" + tr("Total") + "</td><td>"
-            + tr("Cluster Size") + "</td></tr>";
+            + tr("Type") + "</td><td></tr>";
     for(int i = 0; i < drives.size(); i++) {
         info += tr("<tr><td>%1</td><td>%4</td><td>%2 GiB</td><td>%3 GiB</td><td>%5</td></tr>")
             .arg(QDir::toNativeSeparators(drives.at(i)))
             .arg((double)Utils::filesystemFree(drives.at(i)) / (1<<30), 0, 'f', 2)
             .arg((double)Utils::filesystemTotal(drives.at(i)) / (1<<30), 0, 'f', 2)
             .arg(Utils::filesystemName(drives.at(i)))
-            .arg(Utils::filesystemClusterSize(drives.at(i)));
+            .arg(Utils::filesystemType(drives.at(i)));
     }
     info += "</table>";
     info += "<hr/>";

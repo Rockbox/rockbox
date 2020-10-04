@@ -135,6 +135,51 @@ QString Utils::resolvePathCase(QString path)
 }
 
 
+QString Utils::filesystemType(QString path)
+{
+#if defined(Q_OS_LINUX)
+    FILE *mn = setmntent("/etc/mtab", "r");
+    if(!mn)
+        return QString("");
+
+    struct mntent *ent;
+    while((ent = getmntent(mn))) {
+        if(QString(ent->mnt_dir) == path) {
+            endmntent(mn);
+            LOG_INFO() << "device type is" << ent->mnt_type;
+            return QString(ent->mnt_type);
+        }
+    }
+    endmntent(mn);
+#endif
+
+#if defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
+    int num;
+    struct statfs *mntinf;
+
+    num = getmntinfo(&mntinf, MNT_WAIT);
+    while(num--) {
+        if(QString(mntinf->f_mntonname) == path) {
+            LOG_INFO() << "device type is" << mntinf->f_fstypename;
+            return QString(mntinf->f_fstypename);
+        }
+        mntinf++;
+    }
+#endif
+
+#if defined(Q_OS_WIN32)
+    wchar_t t[64];
+    memset(t, 0, 32);
+    if(GetVolumeInformationW((LPCWSTR)path.utf16(),
+                             NULL, 0, NULL, NULL, NULL, t, 64)) {
+        LOG_INFO() << "device type is" << t;
+        return QString::fromWCharArray(t);
+    }
+#endif
+    return QString("-");
+}
+
+
 QString Utils::filesystemName(QString path)
 {
     QString name;
@@ -218,18 +263,10 @@ qulonglong Utils::filesystemTotal(QString path)
 }
 
 
-qulonglong Utils::filesystemClusterSize(QString path)
-{
-    qulonglong size = filesystemSize(path, FilesystemClusterSize);
-    LOG_INFO() << "cluster size for" << path << size;
-    return size;
-}
-
-
 qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 {
     qulonglong size = 0;
-#if defined(Q_OS_LINUX) || defined(Q_OS_MACX) 
+#if defined(Q_OS_LINUX) || defined(Q_OS_MACX)
     // the usage of statfs() is deprecated by the LSB so use statvfs().
     struct statvfs fs;
     int ret;
@@ -281,7 +318,7 @@ qulonglong Utils::filesystemSize(QString path, enum Utils::Size type)
 //! \brief searches for a Executable in the Environement Path
 QString Utils::findExecutable(QString name)
 {
-    //try autodetect tts   
+    //try autodetect tts
 #if defined(Q_OS_LINUX) || defined(Q_OS_MACX) || defined(Q_OS_OPENBSD)
 #if QT_VERSION >= 0x050e00
     QStringList path = QString(getenv("PATH")).split(":", Qt::SkipEmptyParts);
