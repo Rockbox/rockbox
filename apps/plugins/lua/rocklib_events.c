@@ -272,7 +272,8 @@ static void rev_timer_isr(void)
         {
             evt = ev_data.cb[i];
 
-            if ((i == ACTEVENT || i == BTNEVENT) && rb->button_queue_count())
+            if ((i == ACTEVENT || i == BTNEVENT) &&
+                (rb->button_queue_count() || rb->button_status() || evt->id))
                     ev_flag |= event_flag(i); /* any buttons ready? */
             else if(evt->ticks > 0 && TIME_AFTER(curr_tick, evt->next_tick))
                 ev_flag |= event_flag(i);
@@ -315,23 +316,15 @@ static void event_thread(void)
                     {
                         /* only send ACTION_NONE once */
                         if (evt->id == ACTION_NONE || rb->button_status() != 0)
-                        {
-                            evt->ticks = 0;
                             continue; /* check next event */
-                        }
                     }
-                    evt->ticks = EV_TICKS; /* poll release event */
                     evt->id = action;
                     break;
                 case BTNEVENT:
                     evt->id = rb->button_get(false);
                     /* only send BUTTON_NONE once */
                     if (evt->id == BUTTON_NONE)
-                    {
-                        evt->ticks = 0;
                         continue; /* check next event */
-                    }
-                    evt->ticks = EV_TICKS; /* poll release event */
                     break;
                 case CUSTOMEVENT:
                 case PLAYBKEVENT:
@@ -592,7 +585,7 @@ static int rockev_register(lua_State *L)
         case ACTEVENT:
             /* fall through */
         case BTNEVENT:
-            event_ticks = 0; /* button events not triggered by timeout but release is*/
+            event_ticks = 0; /* button events not triggered by timeout */
             break;
         case CUSTOMEVENT:
             event_ticks = luaL_optinteger(L, 3, EV_TICKS);

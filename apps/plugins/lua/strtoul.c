@@ -7,7 +7,7 @@ unsigned long int strtoul(const char *ptr, char **endptr, int base)
   const char* orig;
   const char* nptr=ptr;
 
-  while(isspace(*nptr)) ++nptr;
+  while(__unlikely(isspace(*nptr))) ++nptr;
 
   if (*nptr == '-') { neg=1; nptr++; }
   else if (*nptr == '+') ++nptr;
