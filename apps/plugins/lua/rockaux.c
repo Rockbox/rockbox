@@ -27,6 +27,7 @@
 #include "lib/pluginlib_actions.h"
 
 extern long strtol(const char *nptr, char **endptr, int base);
+extern const char *strpbrk_n(const char *s, int smax, const char *accept);
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 int errno = 0;
@@ -58,7 +59,7 @@ int splash_scroller(int timeout, const char* str)
     const int max_lines = LCD_HEIGHT / ch_h - 1;
     const int wrap_thresh = (LCD_WIDTH / 3);
     const char *ch;
-    char *brk;
+    const char *brk;
 
     const int max_ch = (LCD_WIDTH / ch_w - 1) * 2;
     char line[max_ch + 2]; /* display buffer */
@@ -98,9 +99,10 @@ int splash_scroller(int timeout, const char* str)
             rb->lcd_getstringsize(line, &w, NULL);
 
             /* try to not split in middle of words */
-            if (w + wrap_thresh >= max_w && strpbrk (&line[linepos], break_chars))
+            if (w + wrap_thresh >= max_w &&
+                strpbrk_n(ch, 1, break_chars))
             {
-                brk = strpbrk(ch+1, break_chars);
+                brk = strpbrk_n(ch+1, max_ch, break_chars);
                 chars_next_break = (brk - ch);
                 if (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w)
                 {

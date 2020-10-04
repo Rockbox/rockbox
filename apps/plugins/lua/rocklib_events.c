@@ -272,7 +272,8 @@ static void rev_timer_isr(void)
         {
             evt = ev_data.cb[i];
 
-            if ((i == ACTEVENT || i == BTNEVENT) && rb->button_queue_count())
+            if ((i == ACTEVENT || i == BTNEVENT) &&
+                (rb->button_queue_count() || rb->button_status() != 0))
                     ev_flag |= event_flag(i); /* any buttons ready? */
             else if(evt->ticks > 0 && TIME_AFTER(curr_tick, evt->next_tick))
                 ev_flag |= event_flag(i);
