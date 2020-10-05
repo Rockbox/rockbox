@@ -25,11 +25,11 @@
 
 /* {Action Code,    Button code,    Prereq button code } */
 
-/* 
+/*
  * The format of the list is as follows
- * { Action Code,   Button code,    Prereq button code } 
+ * { Action Code,   Button code,    Prereq button code }
  * if there's no need to check the previous button's value, use BUTTON_NONE
- * Insert LAST_ITEM_IN_LIST at the end of each mapping 
+ * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_PREV,       BUTTON_UP,                   BUTTON_NONE },
@@ -61,7 +61,6 @@ static const struct button_mapping button_context_mainmenu[]  = {
 }; /* button_context_mainmenu as with sansa clip mapping - "back" button returns you to WPS */
 
 static const struct button_mapping button_context_wps[]  = {
-/*    { ACTION_WPS_BROWSE,        BUTTON_UP|BUTTON_REPEAT,  BUTTON_UP }, */
     { ACTION_WPS_PLAY,        BUTTON_SELECT|BUTTON_REL,     BUTTON_SELECT },
     { ACTION_WPS_SEEKBACK,    BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_WPS_SEEKFWD,     BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_NONE },
@@ -74,7 +73,7 @@ static const struct button_mapping button_context_wps[]  = {
     { ACTION_WPS_VOLDOWN,     BUTTON_VOLDOWN|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_WPS_VOLUP,       BUTTON_VOLUP,                 BUTTON_NONE },
     { ACTION_WPS_VOLUP,       BUTTON_VOLUP|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_WPS_PITCHSCREEN, BUTTON_UP|BUTTON_REPEAT,      BUTTON_UP },
+    { ACTION_WPS_BROWSE,      BUTTON_UP|BUTTON_REPEAT,      BUTTON_UP },
 /*    ACTION_WPS_ID3SCREEN    optional */
     { ACTION_WPS_CONTEXT,     BUTTON_DOWN|BUTTON_REL,       BUTTON_DOWN },
     { ACTION_WPS_QUICKSCREEN, BUTTON_DOWN|BUTTON_REPEAT,    BUTTON_DOWN },
@@ -182,7 +181,7 @@ static const struct button_mapping button_context_pitchscreen[]  = {
     { ACTION_PS_EXIT,           BUTTON_POWER,                 BUTTON_NONE },
     { ACTION_PS_SLOWER,         BUTTON_LEFT|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_PS_FASTER,         BUTTON_RIGHT|BUTTON_REPEAT,   BUTTON_NONE },
-    
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_pitchscreen */
 
@@ -224,7 +223,7 @@ const struct button_mapping* get_context_mapping(int context)
     {
         case CONTEXT_STD:
             return button_context_standard;
-            
+
         case CONTEXT_WPS:
             return button_context_wps;
 
@@ -259,6 +258,6 @@ const struct button_mapping* get_context_mapping(int context)
 
         default:
             return button_context_standard;
-    } 
+    }
     return button_context_standard;
 }
