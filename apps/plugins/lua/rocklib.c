@@ -53,6 +53,8 @@
  *
  * -----------------------------
  */
+extern size_t rock_get_allocated_bytes(void); /* tlsf_helper.c */
+extern size_t rock_get_unused_bytes(void);
 
 #define RB_WRAP(func) static int rock_##func(lua_State UNUSED_ATTR *L)
 #define SIMPLE_VOID_WRAPPER(func) RB_WRAP(func) { (void)L; func(); return 0; }
@@ -931,6 +933,19 @@ RB_WRAP(show_logo)
     return 0;
 }
 
+RB_WRAP(mem_stats)
+{
+    /* used, allocd, free = rb.mem_stats() */
+    /* note free is the high watermark */
+    size_t allocd = rock_get_allocated_bytes();
+    size_t free = rock_get_unused_bytes();
+
+    lua_pushinteger(L, allocd - free);
+    lua_pushinteger(L, allocd);
+    lua_pushinteger(L, free);
+    return 3;
+}
+
 #define RB_FUNC(func) {#func, rock_##func}
 #define RB_ALIAS(name, func) {name, rock_##func}
 static const luaL_Reg rocklib[] =
@@ -1015,6 +1030,7 @@ static const luaL_Reg rocklib[] =
     /* MISC */
     RB_FUNC(restart_lua),
     RB_FUNC(show_logo),
+    RB_FUNC(mem_stats),
 
     {NULL, NULL}
 };
