@@ -49,7 +49,7 @@ static const struct button_mapping button_context_standard[] = {
 
 static const struct button_mapping button_context_wps[] = {
     { ACTION_WPS_PLAY,        BUTTON_PLAY|BUTTON_REL,           BUTTON_PLAY },
-    { ACTION_WPS_STOP,        BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
+    { ACTION_WPS_STOP,        BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
     { ACTION_WPS_SKIPPREV,    BUTTON_PREV|BUTTON_REL,           BUTTON_PREV },
     { ACTION_WPS_SEEKBACK,    BUTTON_PREV|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_WPS_STOPSEEK,    BUTTON_PREV|BUTTON_REL,           BUTTON_PREV|BUTTON_REPEAT },
@@ -61,10 +61,11 @@ static const struct button_mapping button_context_wps[] = {
     { ACTION_WPS_VOLDOWN,     BUTTON_VOL_DOWN,                  BUTTON_NONE },
     { ACTION_WPS_VOLDOWN,     BUTTON_VOL_DOWN|BUTTON_REPEAT,    BUTTON_NONE },
     { ACTION_WPS_BROWSE,      BUTTON_HOME|BUTTON_REL,           BUTTON_HOME },
-    { ACTION_WPS_CONTEXT,     BUTTON_PLAY|BUTTON_REPEAT,        BUTTON_PLAY },
+    { ACTION_WPS_CONTEXT,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
     { ACTION_WPS_MENU,        BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
     { ACTION_WPS_QUICKSCREEN, BUTTON_OPTION|BUTTON_REPEAT,      BUTTON_OPTION },
-    { ACTION_WPS_HOTKEY,      BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
+
+    { ACTION_STD_KEYLOCK,     BUTTON_POWER,                 BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */

@@ -73,9 +73,6 @@
 /* KeyPad configuration for plugins */
 #define CONFIG_KEYPAD XDUOO_X3II_PAD
 
-/* Define this if a programmable hotkey is mapped */
-#define HAVE_HOTKEY
-
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
