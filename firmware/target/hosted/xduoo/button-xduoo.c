@@ -38,14 +38,6 @@
 #include "backlight-target.h"
 #include "xduoolinux_codec.h"
 
-static bool soft_hold = false;
-#ifndef BOOTLOADER
-static unsigned soft_hold_counter = 0;
-#define SOFT_HOLD_BUTTON   BUTTON_POWER
-#define SOFT_HOLD_CNTMAX_1 (HZ)
-#define SOFT_HOLD_CNTMAX_2 (HZ*2)
-#endif
-
 #define NR_POLL_DESC    3
 static struct pollfd poll_fds[NR_POLL_DESC];
 
@@ -141,27 +133,6 @@ int button_read_device(void)
         }
     }
 
-#ifndef BOOTLOADER
-    if (button_bitmap == SOFT_HOLD_BUTTON) {
-        soft_hold_counter++;
-        if (soft_hold_counter == SOFT_HOLD_CNTMAX_1) {
-            soft_hold = !soft_hold;
-            backlight_hold_changed(soft_hold);
-        }
-        else
-        if (soft_hold_counter == SOFT_HOLD_CNTMAX_2) {
-            soft_hold = false;
-            backlight_hold_changed(soft_hold);
-        }
-    } else {
-        soft_hold_counter = 0;
-    }
-
-    if((soft_hold) && (button_bitmap != SOFT_HOLD_BUTTON)) {
-        return BUTTON_NONE;
-    }
-#endif
-
     return button_bitmap;
 }
 
@@ -186,9 +157,4 @@ void button_close_device(void)
     {
         close(poll_fds[i].fd);
     }
-}
-
-bool button_hold(void)
-{
-    return soft_hold;
 }

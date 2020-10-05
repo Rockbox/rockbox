@@ -20,8 +20,6 @@
 #ifndef _BUTTON_TARGET_H_
 #define _BUTTON_TARGET_H_
 
-#define HAS_BUTTON_HOLD
-
 /* Main unit's buttons */
 #define BUTTON_POWER      0x00000001
 #define BUTTON_HOME       0x00000002
