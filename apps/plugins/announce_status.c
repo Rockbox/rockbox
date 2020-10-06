@@ -557,11 +557,7 @@ int plugin_main(const void* parameter)
         rb->add_event(PLAYBACK_EVENT_TRACK_CHANGE, playback_event_callback);
 
     thread_create();
-#ifdef DEBUG
-    return rb->default_event_handler(button);
-#else
     return 0;
-#endif
 }
 
 
