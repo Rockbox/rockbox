@@ -821,7 +821,7 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
     src_y  &= 7;
     src_end = src + width;
 
-    dst = rb->lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
+    dst = *rb->lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
     do
     {
         const unsigned char *src_col = src++;
@@ -953,7 +953,7 @@ static void draw_oriented_alpha_bitmap_part(const unsigned char *src,
     fg_pattern =    rb->lcd_get_foreground();
     /*bg_pattern=*/ rb->lcd_get_background();
 
-    dst_start = rb->lcd_framebuffer + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
+    dst_start = *rb->lcd_framebuffer + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
     int col, row = height;
     unsigned data, pixels;
     unsigned skip_end = (stride - width);

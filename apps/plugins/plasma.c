@@ -201,9 +201,9 @@ int main(void)
 #ifdef HAVE_LCD_COLOR
         shades_generate(time++); /* dynamically */
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        ptr = (unsigned char*)rb->lcd_framebuffer;
+        ptr = (unsigned char*)*rb->lcd_framebuffer;
 #else
-        ptr = rb->lcd_framebuffer;
+        ptr = *rb->lcd_framebuffer;
 #endif
 
 #else
@@ -237,7 +237,7 @@ int main(void)
         p4-=sp4;
 #ifdef HAVE_LCD_COLOR
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        rb->lcd_blit_pal256(    (unsigned char*)rb->lcd_framebuffer,
+        rb->lcd_blit_pal256(    (unsigned char*)*rb->lcd_framebuffer,
                                 0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
 #else
         rb->lcd_update();
