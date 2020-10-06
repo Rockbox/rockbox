@@ -1059,7 +1059,7 @@ void I_FinishUpdate (void)
 
         for (y = 1; y <= SCREENHEIGHT; y++)
         {
-            fb_data *dst = rb->lcd_framebuffer + LCD_WIDTH - y;
+            fb_data *dst = *rb->lcd_framebuffer + LCD_WIDTH - y;
             count = SCREENWIDTH;
 
             do
@@ -1073,7 +1073,7 @@ void I_FinishUpdate (void)
     else
 #endif
     {
-        fb_data *dst = rb->lcd_framebuffer;
+        fb_data *dst = *rb->lcd_framebuffer;
         count = SCREENWIDTH*SCREENHEIGHT;
 
         do

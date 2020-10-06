@@ -239,12 +239,12 @@ static fb_data (* const pixel_funcs[COLOUR_NUM_MODES][DITHER_NUM_MODES])(void) =
 
 /* These defines are used fornormal horizontal strides and vertical strides. */
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define LCDADDR(x, y)   (rb->lcd_framebuffer + LCD_HEIGHT*(x) + (y))
+#define LCDADDR(x, y)   (*rb->lcd_framebuffer + LCD_HEIGHT*(x) + (y))
 #define ROWENDOFFSET    (width*LCD_HEIGHT)
 #define ROWOFFSET       (1)
 #define COLOFFSET       (LCD_HEIGHT)
 #else
-#define LCDADDR(x, y) (rb->lcd_framebuffer + LCD_WIDTH*(y) + (x))
+#define LCDADDR(x, y) (*rb->lcd_framebuffer + LCD_WIDTH*(y) + (x))
 #define ROWENDOFFSET    (width)
 #define ROWOFFSET       (LCD_WIDTH)
 #define COLOFFSET       (1)
