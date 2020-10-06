@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 BjÃ¶rn Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -194,7 +194,7 @@ static const struct plugin_api rockbox_api = {
     lcd_putsf,
     lcd_puts_scroll,
     lcd_scroll_stop,
-    &lcd_static_framebuffer[0][0],
+    &lcd_framebuffer,
     lcd_set_viewport,
     lcd_set_framebuffer,
     lcd_bmp_part,
@@ -281,7 +281,7 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_mono_bitmap_part,
     lcd_remote_mono_bitmap,
     lcd_remote_putsxy,
-    &lcd_remote_static_framebuffer[0][0],
+    &lcd_remote_framebuffer;
     lcd_remote_update,
     lcd_remote_update_rect,
 #if (LCD_REMOTE_DEPTH > 1)

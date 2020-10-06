@@ -227,7 +227,7 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
     osd->back_bitmap_stride = w;
 #endif /* end stride type selection */
 
-    osd->lcd_bitmap_data = (void *)rb->lcd_framebuffer;
+    osd->lcd_bitmap_data = (void *)*rb->lcd_framebuffer;
     osd->back_bitmap_data = buf;
 
     osd->maxwidth = w;
