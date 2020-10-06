@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 BjÃ¶rn Stenberg
+ * Copyright (C) 2002 Björn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -155,12 +155,12 @@ int plugin_open(char *plugin, char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 241
+#define PLUGIN_API_VERSION 242
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 241
+#define PLUGIN_MIN_API_VERSION 242
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -204,7 +204,7 @@ struct plugin_api {
     void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
     bool (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_scroll_stop)(void);
-    fb_data* lcd_framebuffer;
+    fb_data** lcd_framebuffer;
     void (*lcd_set_viewport)(struct viewport* vp);
     void (*lcd_set_framebuffer)(fb_data *fb);
     void (*lcd_bmp_part)(const struct bitmap *bm, int src_x, int src_y,
@@ -314,7 +314,7 @@ struct plugin_api {
     void (*lcd_remote_mono_bitmap)(const unsigned char *src, int x, int y,
                                    int width, int height);
     void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
-    fb_remote_data* lcd_remote_framebuffer;
+    fb_remote_data** lcd_remote_framebuffer;
     void (*lcd_remote_update)(void);
     void (*lcd_remote_update_rect)(int x, int y, int width, int height);
 #if (LCD_REMOTE_DEPTH > 1)

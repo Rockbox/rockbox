@@ -526,7 +526,7 @@ static void pan_view_down(struct image_info *info)
              */
             move++, info->y--;
             rb->memcpy(rgb_linebuf,
-                    rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+                    *rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
                     LCD_WIDTH*sizeof (fb_data));
         }
 #endif
@@ -539,7 +539,7 @@ static void pan_view_down(struct image_info *info)
          && settings.jpeg_dither_mode == DITHER_DIFFUSION)
         {
             /* Cover the first row drawn with previous image data. */
-            rb->memcpy(rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
+            rb->memcpy(*rb->lcd_framebuffer + (LCD_HEIGHT - move)*LCD_WIDTH,
                         rgb_linebuf, LCD_WIDTH*sizeof (fb_data));
             info->y++;
         }

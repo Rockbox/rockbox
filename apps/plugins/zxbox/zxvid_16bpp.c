@@ -58,7 +58,7 @@ void update_screen(void)
     byte *scrptr;
     scrptr = (byte *) SPNM(image);
     */
-    frameb = rb->lcd_framebuffer;
+    frameb = *rb->lcd_framebuffer;
     for ( y = 0 ; y < HEIGHT*WIDTH; y++ ){
         frameb[y] = FB_SCALARPACK(_16bpp_colors[(unsigned)sp_image[y]]);
     }
@@ -68,7 +68,7 @@ void update_screen(void)
     int srcx, srcy=0;     /* x / y coordinates in source image */
     unsigned char* image;
     image = sp_image + ( (Y_OFF)*(WIDTH) ) + X_OFF;
-    frameb = rb->lcd_framebuffer;
+    frameb = *rb->lcd_framebuffer;
     for(y = 0; y < LCD_HEIGHT; y++)
     {
         srcx = 0;           /* reset our x counter before each row... */

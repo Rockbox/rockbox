@@ -704,7 +704,7 @@ static int gameProc( void )
             rb->lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS, 
                                     ScreenWidth, ScreenHeight);
 #else
-            blit_display(rb->lcd_framebuffer,video_buffer);
+            blit_display(*rb->lcd_framebuffer,video_buffer);
 #endif
 
             if (settings.showfps) {
