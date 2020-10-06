@@ -584,7 +584,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
         struct bitmap out_bmp;
         out_bmp.width = LCD_WIDTH;
         out_bmp.height = LCD_HEIGHT;
-        out_bmp.data = (unsigned char*) rb->lcd_framebuffer;
+        out_bmp.data = (unsigned char*) *rb->lcd_framebuffer;
 
 #ifdef HAVE_LCD_COLOR
         if(sys->settings.scaling_quality == 1)
@@ -631,25 +631,25 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
             {
 #ifdef HAVE_LCD_COLOR
                 int r, g, b;
-                fb_data pix = rb->lcd_framebuffer[y * LCD_WIDTH + x];
+                fb_data pix = *rb->lcd_framebuffer[y * LCD_WIDTH + x];
 #if (LCD_DEPTH > 24)
                 r = 0xff - pix.r;
                 g = 0xff - pix.g;
                 b = 0xff - pix.b;
-                rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r, 255 };
+                *rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r, 255 };
 #elif (LCD_DEPTH == 24)
                 r = 0xff - pix.r;
                 g = 0xff - pix.g;
                 b = 0xff - pix.b;
-                rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r };
+                *rb->lcd_framebuffer[y * LCD_WIDTH + x] = (fb_data) { b, g, r };
 #else
                 r = RGB_UNPACK_RED  (pix);
                 g = RGB_UNPACK_GREEN(pix);
                 b = RGB_UNPACK_BLUE (pix);
-                rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_RGBPACK(0xff - r, 0xff - g, 0xff - b);
+                *rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_RGBPACK(0xff - r, 0xff - g, 0xff - b);
 #endif
 #else
-                rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_BRIGHTNESS(0xff - rb->lcd_framebuffer[y * LCD_WIDTH + x]);
+                *rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_BRIGHTNESS(0xff - *rb->lcd_framebuffer[y * LCD_WIDTH + x]);
 #endif
             }
         }
@@ -671,14 +671,14 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
         if(prev_frames && orig_fb)
         {
 
-            rb->memcpy(orig_fb, rb->lcd_framebuffer, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+            rb->memcpy(orig_fb, *rb->lcd_framebuffer, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
             /* fancy useless slow motion blur */
             for(int y = 0; y < LCD_HEIGHT; ++y)
             {
                 for(int x = 0; x < LCD_WIDTH; ++x)
                 {
                     int r, g, b;
-                    fb_data pix = rb->lcd_framebuffer[y * LCD_WIDTH + x];
+                    fb_data pix = *rb->lcd_framebuffer[y * LCD_WIDTH + x];
                     r = RGB_UNPACK_RED  (pix);
                     g = RGB_UNPACK_GREEN(pix);
                     b = RGB_UNPACK_BLUE (pix);
@@ -695,7 +695,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
                     r /= (BLUR_FRAMES + 1) / 2 * (1 + BLUR_FRAMES + 1);
                     g /= (BLUR_FRAMES + 1) / 2 * (1 + BLUR_FRAMES + 1);
                     b /= (BLUR_FRAMES + 1) / 2 * (1 + BLUR_FRAMES + 1);
-                    rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_RGBPACK(r, g, b);
+                    *rb->lcd_framebuffer[y * LCD_WIDTH + x] = LCD_RGBPACK(r, g, b);
                 }
             }
             prev_baseidx -= LCD_WIDTH * LCD_HEIGHT;

@@ -434,13 +434,12 @@ static inline unsigned fb_to_scalar(fb_data p)
 #endif
 /* The actual framebuffer */
 extern fb_data *lcd_framebuffer;
-extern fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH];
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define FBADDR(x, y) (lcd_framebuffer + ((x) * LCD_FBHEIGHT) + (y))
 #else
 #define FBADDR(x, y) (lcd_framebuffer + ((y) * LCD_FBWIDTH) + (x))
 #endif
-#define FRAMEBUFFER_SIZE (sizeof(lcd_static_framebuffer))
+#define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
 
 /** Port-specific functions. Enable in port config file. **/
 #ifdef HAVE_REMOTE_LCD_AS_MAIN
