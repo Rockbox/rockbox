@@ -239,6 +239,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     char buf[32];
     int w, h;
     bool show_lang_pitch;
+    struct viewport *last_vp = NULL;
 
      /* "Pitch up/Pitch down" - hide for a small screen,
       * the text is drawn centered automatically
@@ -249,7 +250,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     {
         int w, h;
         struct viewport *vp = &pitch_viewports[PITCH_TOP];
-        display->set_viewport(vp);
+        last_vp = display->set_viewport(vp);
         display->clear_viewport();
 #ifdef HAVE_TOUCHSCREEN
         /* two arrows in the top row, left and right column */
@@ -405,7 +406,7 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
                         rightlabel);
     }
     display->update_viewport();
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 }
 
 static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cutoff

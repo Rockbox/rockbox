@@ -23,30 +23,10 @@
 #define __LCD_H__
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "cpu.h"
 #include "config.h"
 #include "events.h"
-
-#define VP_FLAG_ALIGN_RIGHT  0x01
-#define VP_FLAG_ALIGN_CENTER 0x02
-
-#define VP_FLAG_ALIGNMENT_MASK \
-        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
-
-#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
-
-struct viewport {
-    int x;
-    int y;
-    int width;
-    int height;
-    int flags;
-    int font;
-    int drawmode;
-    /* needed for even for mono displays to support greylib */
-    unsigned fg_pattern;
-    unsigned bg_pattern;
-};
 
 /* Frame buffer stride
  *
@@ -155,6 +135,34 @@ void lcd_set_mode(int mode);
 #endif
 #endif
 
+struct frame_buffer_t {
+    void   *data;
+    void *(*get_address_fn)(int x, int y);
+    int     stride;
+    size_t  elems;
+};
+
+#define VP_FLAG_ALIGN_RIGHT  0x01
+#define VP_FLAG_ALIGN_CENTER 0x02
+
+#define VP_FLAG_ALIGNMENT_MASK \
+        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
+
+#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
+
+struct viewport {
+    int x;
+    int y;
+    int width;
+    int height;
+    int flags;
+    int font;
+    int drawmode;
+    struct frame_buffer_t *buffer;
+    /* needed for even for mono displays to support greylib */
+    unsigned fg_pattern;
+    unsigned bg_pattern;
+};
 
 /* common functions */
 extern void lcd_write_command(int byte);
@@ -163,6 +171,8 @@ extern void lcd_write_command_ex(int cmd, int data1, int data2);
 extern void lcd_write_data(const fb_data* p_bytes, int count);
 extern void lcd_init(void) INIT_ATTR;
 extern void lcd_init_device(void) INIT_ATTR;
+extern struct viewport * lcd_get_default_viewport(void);
+extern struct frame_buffer_t lcd_framebuffer_default;
 
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);
@@ -171,7 +181,8 @@ extern int  lcd_getwidth(void);
 extern int  lcd_getheight(void);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
-extern void lcd_set_viewport(struct viewport* vp);
+extern struct viewport* lcd_init_viewport(struct viewport* vp);
+extern struct viewport* lcd_set_viewport(struct viewport* vp);
 extern void lcd_update(void);
 extern void lcd_update_viewport(void);
 extern void lcd_update_viewport_rect(int x, int y, int width, int height);
@@ -432,13 +443,15 @@ static inline unsigned fb_to_scalar(fb_data p)
 #ifndef LCD_FBHEIGHT
 #define LCD_FBHEIGHT LCD_HEIGHT
 #endif
-/* The actual framebuffer */
-extern fb_data *lcd_framebuffer;
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define FBADDR(x, y) (lcd_framebuffer + ((x) * LCD_FBHEIGHT) + (y))
-#else
-#define FBADDR(x, y) (lcd_framebuffer + ((y) * LCD_FBWIDTH) + (x))
-#endif
+
+extern void *_viewport_get_framebuffer(struct viewport *vp, size_t *size,
+                                           const enum screen_type screen);
+
+extern struct frame_buffer_t *lcd_framebuf;
+
+extern struct viewport* lcd_current_viewport;
+#define FBADDR(x,y) (fb_data*) (lcd_current_viewport->buffer->get_address_fn(x, y))
+
 #define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
 
 /** Port-specific functions. Enable in port config file. **/
@@ -535,7 +548,6 @@ extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_bitmap(const fb_data *src, int x, int y, int width,
                        int height);
-extern void lcd_set_framebuffer(fb_data *fb);
 
 extern void lcd_scroll_step(int pixels);
 

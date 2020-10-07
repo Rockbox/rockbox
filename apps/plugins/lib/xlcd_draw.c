@@ -26,6 +26,11 @@
 
 #include "xlcd.h"
 
+
+#ifdef HAVE_LCD_COLOR
+static fb_data *lcd_fb = NULL;
+#endif
+
 /* sort the given coordinates by increasing x value */
 static void sort_points_by_increasing_x(int* x1, int* y1,
                                         int* x2, int* y2,
@@ -349,6 +354,9 @@ static const fb_data graylut[256] = {
 void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     const unsigned char *src_end;
     fb_data *dst;
 
@@ -377,7 +385,7 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src    += stride * src_y + src_x; /* move starting point */
     src_end = src + stride * height;
-    dst     = *rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst     = lcd_fb + LCD_WIDTH * y + x;
 
     do
     {
@@ -416,6 +424,9 @@ void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
 void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     const unsigned char *src_end;
     fb_data *dst;
 
@@ -444,7 +455,7 @@ void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src    += 3 * (stride * src_y + src_x); /* move starting point */
     src_end = src + 3 * stride * height;
-    dst     = *rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst     = lcd_fb + LCD_WIDTH * y + x;
 
     do
     {

@@ -126,7 +126,14 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     char buf[80];
     int i,y;
-
+    fb_data vp_buffer[rb->screens[SCREEN_MAIN]->lcdwidth * rb->screens[SCREEN_MAIN]->lcdheight];
+    struct frame_buffer_t fb;
+    fb.stride = 0;
+    fb.data = &vp_buffer;
+    fb.elems = rb->screens[SCREEN_MAIN]->lcdwidth * rb->screens[SCREEN_MAIN]->lcdheight;
+    fb.get_address_fn = NULL;
+    
+    rb->viewport_set_buffer(&vp0, &fb, SCREEN_MAIN);
     rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
     rb->screens[SCREEN_MAIN]->clear_viewport();
     rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewport testing plugin - this is a scrolling title");
