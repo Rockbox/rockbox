@@ -92,11 +92,9 @@ extern unsigned lcd_remote_color_to_native(unsigned color);
 #define LCD_REMOTE_FBHEIGHT LCD_REMOTE_HEIGHT
 #endif
 
-/* The actual framebuffer */
-extern fb_remote_data *lcd_remote_framebuffer;
-extern fb_remote_data lcd_remote_static_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH];
-#define FBREMOTEADDR(x, y) (lcd_remote_framebuffer + ((y) * LCD_REMOTE_FBWIDTH) + (x))
-#define FRAMEBUFFER_REMOTE_SIZE (sizeof(lcd_remote_static_framebuffer))
+extern struct viewport* lcd_remote_current_viewport;
+#define FBREMOTEADDR(x,y) (lcd_remote_current_viewport->buffer->get_address_fn(x, y))
+#define FRAMEBUFFER_REMOTE_SIZE (sizeof(fb_remote_data)*LCD_REMOTE_FBWIDTH*LCD_REMOTE_FBHEIGHT)
 
 #if LCD_REMOTE_DEPTH > 1
 extern void     lcd_remote_set_foreground(unsigned foreground);
@@ -170,6 +168,7 @@ extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);
 extern void lcd_remote_set_contrast(int val);
 
+extern struct viewport* lcd_remote_init_viewport(struct viewport* vp);
 extern void lcd_remote_set_viewport(struct viewport* vp);
 extern void lcd_remote_clear_display(void);
 extern void lcd_remote_clear_viewport(void);

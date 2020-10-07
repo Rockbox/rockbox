@@ -1379,7 +1379,9 @@ RB_WRAP(font_getstringsize)
 
 RB_WRAP(lcd_framebuffer)
 {
-    rli_wrap(L, *rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
+    rli_wrap(L, rb->_viewport_get_framebuffer(NULL, NULL, luaL_optint(L, 1, SCREEN_MAIN)),
+    	                                                  RB_SCREEN_STRUCT(L, 1)->lcdwidth,
+    	                                                  RB_SCREEN_STRUCT(L, 1)->lcdheight);
     return 1;
 }
 
