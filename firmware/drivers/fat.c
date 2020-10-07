@@ -1257,7 +1257,7 @@ static int fat_mount_internal(struct bpb *fat_bpb)
 	/* Sanity check FS info */
 	long info = BYTES2INT32(buf, FSINFO_SIGNATURE);
 	if (info != FSINFO_SIGNATURE_VAL) {
-		DEBUGF("%S() FSInfo signature mismatch (%x)\n",
+		DEBUGF("%s() FSInfo signature mismatch (%lx)\n",
 		       __func__, info);
 		FAT_ERROR(-9);
 	}
