@@ -12,6 +12,7 @@
 #include "asm.h"
 #endif
 
+static fb_data *lcd_fb;
 struct lcd lcd;
 
 struct scan scan IBSS_ATTR;
@@ -741,10 +742,12 @@ static void spr_scan(void)
 
 void lcd_begin(void)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    vdest=(unsigned char*)*rb->lcd_framebuffer;
+    vdest=(unsigned char*)lcd_fb;
 #else
-    vdest=*rb->lcd_framebuffer;
+    vdest=lcd_fb;
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -959,6 +962,8 @@ void lcd_refreshline(void)
 
     if(L==143)
     {
+        if (!lcd_fb)
+            lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
         if(options.showstats)
         {
             if(options.showstats==1) {
@@ -975,9 +980,9 @@ void lcd_refreshline(void)
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
         if(options.scaling==3) {
-            rb->lcd_blit_pal256((unsigned char*)*rb->lcd_framebuffer,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
+            rb->lcd_blit_pal256((unsigned char*)lcd_fb,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
         } else {
-            rb->lcd_blit_pal256((unsigned char*)*rb->lcd_framebuffer,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+            rb->lcd_blit_pal256((unsigned char*)lcd_fb,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
         }
 #else
         if(options.scaling==3) {
