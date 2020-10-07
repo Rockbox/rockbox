@@ -349,6 +349,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 {
     struct gui_wps *gwps = info->gwps;
     struct wps_data *data = gwps->data;
+    struct viewport *last_vp;
     /* Tags here are ones which need to be "turned off" or cleared 
      * if they are in a conditional branch which isnt being used */
     if (branch->type == LINE_ALTERNATOR)
@@ -420,20 +421,19 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
-                                void *backdrop = skin_backdrop_get_buffer(data->backdrop_id);
-                                gwps->display->set_framebuffer(backdrop);
+                                skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
                                 skin_backdrop_show(-1);
                             }
 #endif
                             gwps->display->set_viewport(&skin_viewport->vp);
                             gwps->display->clear_viewport();
-                            gwps->display->set_viewport(&info->skin_vp->vp);
+                            last_vp = gwps->display->set_viewport(&info->skin_vp->vp);
                             skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
-                                gwps->display->set_framebuffer(NULL);
+                                gwps->display->set_viewport(last_vp);
                                 skin_backdrop_show(data->backdrop_id);
                             }
 #endif
@@ -822,12 +822,12 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         if (skin_viewport->output_to_backdrop_buffer)
         {
-            display->set_framebuffer(skin_backdrop_get_buffer(data->backdrop_id));
+            skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
             skin_backdrop_show(-1);
         }
         else
         {
-            display->set_framebuffer(NULL);
+            skin_backdrop_set_buffer(-1, skin_viewport);
             skin_backdrop_show(data->backdrop_id);
         }
 #endif
@@ -862,7 +862,6 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
         refresh_mode = old_refresh_mode;
     }
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    display->set_framebuffer(NULL);
     skin_backdrop_show(data->backdrop_id);
 #endif
 
