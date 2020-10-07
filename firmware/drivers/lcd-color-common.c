@@ -36,12 +36,22 @@ enum fill_opt {
 };
 
 /*** globals ***/
-fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
+static fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
-fb_data *lcd_framebuffer = &lcd_static_framebuffer[0][0];
+
+static void *lcd_frameaddress_default(int x, int y);
 
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
+
+/* shouldn't be changed unless you want system-wide framebuffer changes! */
+struct frame_buffer_t lcd_framebuffer_default =
+{
+    .fb_ptr         = &lcd_static_framebuffer[0][0],
+    .get_address_fn = &lcd_frameaddress_default,
+    .stride         = STRIDE_MAIN(LCD_WIDTH, LCD_HEIGHT),
+    .elems          = (LCD_FBWIDTH*LCD_FBHEIGHT),
+};
 
 static struct viewport default_vp =
 {
@@ -51,15 +61,32 @@ static struct viewport default_vp =
     .height   = LCD_HEIGHT,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .fg_pattern = LCD_DEFAULT_FG,
-    .bg_pattern = LCD_DEFAULT_BG,
+    .buffer   = NULL,
+    .fg_pattern   = LCD_DEFAULT_FG,
+    .bg_pattern   = LCD_DEFAULT_BG,
 };
 
-static struct viewport* current_vp IDATA_ATTR = &default_vp;
+struct viewport* lcd_current_viewport IDATA_ATTR;
+
+static void *lcd_frameaddress_default(int x, int y)
+{
+    /* the default expects a buffer the same size as the screen */
+    struct frame_buffer_t *fb = lcd_current_viewport->buffer;
+
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    size_t element = (x * LCD_NATIVE_STRIDE(fb->stride)) + y;
+#else
+    size_t element = (y * LCD_NATIVE_STRIDE(fb->stride)) + x;
+#endif
+    return fb->fb_ptr + element;/*(element % fb->elems);*/
+}
 
 /* LCD init */
 void lcd_init(void)
 {
+    /* Initialize the viewport */
+    lcd_set_viewport(NULL);
+
     lcd_clear_display();
 
     /* Call device specific init */
@@ -70,77 +97,77 @@ void lcd_init(void)
 /* Clear the whole display */
 void lcd_clear_display(void)
 {
-    struct viewport* old_vp = current_vp;
+    struct viewport* old_vp = lcd_current_viewport;
 
-    current_vp = &default_vp;
+    lcd_current_viewport = &default_vp;
 
     lcd_clear_viewport();
 
-    current_vp = old_vp;
+    lcd_current_viewport = old_vp;
 }
 
 /*** parameter handling ***/
 
 void lcd_set_drawmode(int mode)
 {
-    current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_current_viewport->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
 
 int lcd_get_drawmode(void)
 {
-    return current_vp->drawmode;
+    return lcd_current_viewport->drawmode;
 }
 
 void lcd_set_foreground(unsigned color)
 {
-    current_vp->fg_pattern = color;
+    lcd_current_viewport->fg_pattern = color;
 }
 
 unsigned lcd_get_foreground(void)
 {
-    return current_vp->fg_pattern;
+    return lcd_current_viewport->fg_pattern;
 }
 
 void lcd_set_background(unsigned color)
 {
-    current_vp->bg_pattern = color;
+    lcd_current_viewport->bg_pattern = color;
 }
 
 unsigned lcd_get_background(void)
 {
-    return current_vp->bg_pattern;
+    return lcd_current_viewport->bg_pattern;
 }
 
 void lcd_set_drawinfo(int mode, unsigned fg_color, unsigned bg_color)
 {
     lcd_set_drawmode(mode);
-    current_vp->fg_pattern = fg_color;
-    current_vp->bg_pattern = bg_color;
+    lcd_current_viewport->fg_pattern = fg_color;
+    lcd_current_viewport->bg_pattern = bg_color;
 }
 
 int lcd_getwidth(void)
 {
-    return current_vp->width;
+    return lcd_current_viewport->width;
 }
 
 int lcd_getheight(void)
 {
-    return current_vp->height;
+    return lcd_current_viewport->height;
 }
 
 void lcd_setfont(int newfont)
 {
-    current_vp->font = newfont;
+    lcd_current_viewport->font = newfont;
 }
 
 int lcd_getfont(void)
 {
-    return current_vp->font;
+    return lcd_current_viewport->font;
 }
 
 int lcd_getstringsize(const unsigned char *str, int *w, int *h)
 {
-    return font_getstringsize(str, w, h, current_vp->font);
+    return font_getstringsize(str, w, h, lcd_current_viewport->font);
 }
 
 void lcd_set_backdrop(fb_data* backdrop)
@@ -148,7 +175,7 @@ void lcd_set_backdrop(fb_data* backdrop)
     lcd_backdrop = backdrop;
     if (backdrop)
     {
-        lcd_backdrop_offset = (intptr_t)backdrop - (intptr_t)lcd_framebuffer;
+        lcd_backdrop_offset = (intptr_t)backdrop - (intptr_t)FBADDR(0,0);
         lcd_fastpixelfuncs = lcd_fastpixelfuncs_backdrop;
     }
     else
@@ -166,14 +193,14 @@ fb_data* lcd_get_backdrop(void)
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)current_vp->width)
-        && ((unsigned)y < (unsigned)current_vp->height)
+    if (   ((unsigned)x < (unsigned)lcd_current_viewport->width)
+        && ((unsigned)y < (unsigned)lcd_current_viewport->height)
 #if defined(HAVE_VIEWPORT_CLIP)
         && ((unsigned)x < (unsigned)LCD_WIDTH)
         && ((unsigned)y < (unsigned)LCD_HEIGHT)
 #endif
         )
-        lcd_fastpixelfuncs[current_vp->drawmode](FBADDR(current_vp->x+x, current_vp->y+y));
+        lcd_fastpixelfuncs[lcd_current_viewport->drawmode](FBADDR(lcd_current_viewport->x+x, lcd_current_viewport->y+y));
 }
 
 /* Draw a line */
@@ -185,7 +212,7 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[current_vp->drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[lcd_current_viewport->drawmode];
 
     deltay = abs(y2 - y1);
     if (deltay == 0)
@@ -241,14 +268,14 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (   ((unsigned)x < (unsigned)current_vp->width)
-            && ((unsigned)y < (unsigned)current_vp->height)
+        if (   ((unsigned)x < (unsigned)lcd_current_viewport->width)
+            && ((unsigned)y < (unsigned)lcd_current_viewport->height)
 #if defined(HAVE_VIEWPORT_CLIP)
             && ((unsigned)x < (unsigned)LCD_WIDTH)
             && ((unsigned)y < (unsigned)LCD_HEIGHT)
 #endif
             )
-            pfunc(FBADDR(x + current_vp->x, y + current_vp->y));
+            pfunc(FBADDR(x + lcd_current_viewport->x, y + lcd_current_viewport->y));
 
         if (d < 0)
         {
@@ -307,9 +334,9 @@ void ICODE_ATTR lcd_alpha_bitmap_part(const unsigned char *src, int src_x,
 void ICODE_ATTR lcd_bmp_part(const struct bitmap* bm, int src_x, int src_y,
                                 int x, int y, int width, int height)
 {
-    int bitmap_stride = STRIDE_MAIN(bm->width, bm->height);
+    int bitmap_stride = LCD_FBSTRIDE(bm->width, bm->height);
     if (bm->format == FORMAT_MONO)
-        lcd_mono_bitmap_part(bm->data, src_x, src_y, bitmap_stride, x, y, width, height);
+        lcd_mono_bitmap_part(bm->data, src_x, src_y, bm->width, x, y, width, height);
     else if (bm->alpha_offset > 0)
         lcd_alpha_bitmap_part_mix((fb_data*)bm->data, bm->data+bm->alpha_offset,
             src_x, src_y, x, y, width, height,
@@ -554,7 +581,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 void lcd_gradient_fillrect_part(int x, int y, int width, int height,
         unsigned start_rgb, unsigned end_rgb, int src_height, int row_skip)
 {
-    int old_pattern = current_vp->fg_pattern;
+    int old_pattern = lcd_current_viewport->fg_pattern;
     int step_mul, i;
     int x1, x2;
     x1 = x;
@@ -581,14 +608,14 @@ void lcd_gradient_fillrect_part(int x, int y, int width, int height,
     }
 
     for(i = y; i < y + height; i++) {
-        current_vp->fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
+        lcd_current_viewport->fg_pattern = LCD_RGBPACK(h_r >> 16, h_g >> 16, h_b >> 16);
         lcd_hline(x1, x2, i);
         h_r -= rstep;
         h_g -= gstep;
         h_b -= bstep;
     }
 
-    current_vp->fg_pattern = old_pattern;
+    lcd_current_viewport->fg_pattern = old_pattern;
 }
 
 /* Fill a rectangle with a gradient. The gradient's color will fade from

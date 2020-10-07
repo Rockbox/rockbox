@@ -251,7 +251,7 @@ void lcd_set_direct_fb(bool yes)
     unsigned int addr;
     direct_fb_access = yes;
     if(yes)
-        addr = ((unsigned int)&lcd_framebuffer-CONFIG_SDRAM_START) / 32;
+        addr = ((unsigned int)FBADDR(0,0)-CONFIG_SDRAM_START) / 32;
     else
         addr = ((unsigned int)FRAME-CONFIG_SDRAM_START) / 32;
     IO_OSD_OSDWINADH = addr >> 16;

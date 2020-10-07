@@ -1242,6 +1242,7 @@ static int get_screen(lua_State *L, int narg)
     return screen;
 }
 #else /* only SCREEN_MAIN exists */
+#define get_screen(a,b) (SCREEN_MAIN)
 #define RB_SCREEN_STRUCT(luastate, narg) \
         rb->screens[SCREEN_MAIN]
 #define RB_SCREENS(luastate, narg, func, ...) \
@@ -1379,7 +1380,12 @@ RB_WRAP(font_getstringsize)
 
 RB_WRAP(lcd_framebuffer)
 {
-    rli_wrap(L, *rb->lcd_framebuffer, LCD_WIDTH, LCD_HEIGHT);
+    int screen = get_screen(L, 1);
+    static struct viewport vp;
+    rb->viewport_set_fullscreen(&vp, screen);
+    rli_wrap(L, vp.buffer->data,
+                RB_SCREEN_STRUCT(L, 1)->lcdwidth,
+                RB_SCREEN_STRUCT(L, 1)->lcdheight);
     return 1;
 }
 

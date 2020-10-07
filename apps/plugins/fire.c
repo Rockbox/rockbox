@@ -30,6 +30,7 @@
 #ifndef HAVE_LCD_COLOR
 #include "lib/grey.h"
 #endif
+static fb_data *lcd_fb = NULL;
 
 #if (LCD_WIDTH == 112) && (LCD_HEIGHT == 64)
 /* Archos has not enough plugin RAM for full-width fire :( */
@@ -251,7 +252,7 @@ static inline void fire_draw(struct fire* fire)
 #ifndef HAVE_LCD_COLOR
         dest = draw_buffer;
 #else
-        dest = *rb->lcd_framebuffer + LCD_WIDTH * y + FIRE_XPOS;
+        dest = lcd_fb + LCD_WIDTH * y + FIRE_XPOS;
 #endif
         end = dest + FIRE_WIDTH;
 
@@ -379,6 +380,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
+    struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+    lcd_fb = vp_main->buffer->fb_ptr;
     ret = main();
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)

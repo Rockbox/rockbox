@@ -765,6 +765,11 @@ static const unsigned char colorindex[4] = {128, 85, 43, 0};
    content (b&w and greyscale overlay) to an 8-bit BMP file. */
 static void grey_screendump_hook(int fd)
 {
+	fb_data *lcd_fb;
+    struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+    rb->viewport_set_fullscreen(vp_main, SCREEN_MAIN);
+    lcd_fb = vp_main->buffer->fb_ptr;
+
     int i;
     int y, gx, gy;
 #if LCD_PIXELFORMAT == VERTICAL_PACKING
@@ -845,7 +850,7 @@ static void grey_screendump_hook(int fd)
         gsrc = _grey_info.values + _GREY_MULUQ(_grey_info.width, gy);
 
 #if LCD_DEPTH == 2
-        src = *rb->lcd_framebuffer + _GREY_MULUQ(LCD_FBWIDTH, y);
+        src = lcd_fb + _GREY_MULUQ(LCD_FBWIDTH, y);
         
         do
         {
@@ -876,7 +881,7 @@ static void grey_screendump_hook(int fd)
 
 #if LCD_DEPTH == 1
         mask = BIT_N(y & 7);
-        src = *rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+        src = lcd_fb + _GREY_MULUQ(LCD_WIDTH, y >> 3);
 
         do
         {
@@ -908,7 +913,7 @@ static void grey_screendump_hook(int fd)
 
 #elif LCD_DEPTH == 2
         shift = 2 * (y & 3);
-        src = *rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 2);
+        src = lcd_fb + _GREY_MULUQ(LCD_WIDTH, y >> 2);
         
         do
         {
@@ -933,7 +938,7 @@ static void grey_screendump_hook(int fd)
 
 #if LCD_DEPTH == 2
         shift = y & 7;
-        src = *rb->lcd_framebuffer + _GREY_MULUQ(LCD_WIDTH, y >> 3);
+        src = lcd_fb + _GREY_MULUQ(LCD_WIDTH, y >> 3);
         
         do
         {

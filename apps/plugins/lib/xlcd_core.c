@@ -26,3 +26,12 @@
 
 #include "xlcd.h"
 
+fb_data* get_framebuffer(struct viewport *vp, size_t *stride)
+{
+    struct viewport *vp_main = *(rb->screens[SCREEN_MAIN]->current_viewport);
+    if (vp)
+        *vp = *vp_main;
+    if (stride)
+        *stride = vp_main->buffer->stride;
+    return vp_main->buffer->fb_ptr;
+}

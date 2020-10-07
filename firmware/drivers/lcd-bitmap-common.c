@@ -40,43 +40,70 @@
 #define MAIN_LCD
 #endif
 
-void LCDFN(set_framebuffer)(FBFN(data) *fb)
-{
-    if (fb)
-        LCDFN(framebuffer) = fb;
-    else
-        LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
-}
+#ifdef MAIN_LCD
+#define THIS_STRIDE STRIDE_MAIN
+#else
+#define THIS_STRIDE STRIDE_REMOTE
+#endif
 
+extern void viewport_set_buffer(struct viewport *vp,
+                                struct frame_buffer_t *buffer,
+                                const enum screen_type screen); /* viewport.c */
 /*
  * draws the borders of the current viewport
  **/
 void LCDFN(draw_border_viewport)(void)
 {
-    LCDFN(drawrect)(0, 0, current_vp->width, current_vp->height);
+    LCDFN(drawrect)(0, 0, LCDFN(current_viewport)->width, LCDFN(current_viewport)->height);
 }
 
 /*
- * fills the rectangle formed by current_vp
+ * fills the rectangle formed by LCDFN(current_viewport)
  **/
 void LCDFN(fill_viewport)(void)
 {
-    LCDFN(fillrect)(0, 0, current_vp->width, current_vp->height);
+    LCDFN(fillrect)(0, 0, LCDFN(current_viewport)->width, LCDFN(current_viewport)->height);
 }
 
 
 /*** Viewports ***/
-
-void LCDFN(set_viewport)(struct viewport* vp)
+/* init_viewport Notes: When a viewport is initialized
+ * if vp->buffer is NULL the default frame_buffer is assigned
+ * likewise the actual buffer, stride, get_address_fn
+ * are all filled with values from the default buffer if they are not set
+ * RETURNS either the viewport you passed or the default viewport if vp == NULL
+ */
+struct viewport* LCDFN(init_viewport)(struct viewport* vp)
 {
-    if (vp == NULL)
-        current_vp = &default_vp;
+    struct frame_buffer_t *fb_default = &LCDFN(framebuffer_default);
+    if (!vp) /* NULL vp grabs default viewport */
+        vp = &default_vp;
+
+    /* use defaults if no buffer is provided */
+    if (vp->buffer == NULL || vp->buffer->elems == 0)
+        vp->buffer = fb_default;
     else
-        current_vp = vp;
+    {
+        if (vp->buffer->stride == 0)
+            vp->buffer->stride = fb_default->stride;
+
+        if (vp->buffer->data == NULL)
+            vp->buffer->data = fb_default->data;
+
+        if (vp->buffer->get_address_fn == NULL)
+            vp->buffer->get_address_fn = fb_default->get_address_fn;
+    }
+    return vp;
+}
+struct viewport* LCDFN(set_viewport_ex)(struct viewport* vp, int flags)
+{
+    vp = LCDFN(init_viewport)(vp);
+    struct viewport* last_vp = LCDFN(current_viewport);
+    LCDFN(current_viewport) = vp;
 
 #if LCDM(DEPTH) > 1
-    LCDFN(set_foreground)(current_vp->fg_pattern);
-    LCDFN(set_background)(current_vp->bg_pattern);
+    LCDFN(set_foreground)(vp->fg_pattern);
+    LCDFN(set_background)(vp->bg_pattern);
 #endif
 
 #if defined(SIMULATOR)
@@ -84,10 +111,11 @@ void LCDFN(set_viewport)(struct viewport* vp)
      *  be considered an error - the viewport will not draw as it might be
      *  expected.
      */
-    if((unsigned) current_vp->x > (unsigned) LCDM(WIDTH)
-        || (unsigned) current_vp->y > (unsigned) LCDM(HEIGHT)
-        || current_vp->x + current_vp->width > LCDM(WIDTH)
-        || current_vp->y + current_vp->height > LCDM(HEIGHT))
+
+    if((unsigned) vp->x > (unsigned) LCDM(WIDTH)
+        || (unsigned) vp->y > (unsigned) LCDM(HEIGHT)
+        || vp->x + vp->width > LCDM(WIDTH)
+        || vp->y + vp->height > LCDM(HEIGHT))
     {
 #if !defined(HAVE_VIEWPORT_CLIP)
         DEBUGF("ERROR: "
@@ -95,27 +123,68 @@ void LCDFN(set_viewport)(struct viewport* vp)
         DEBUGF("NOTE: "
 #endif
             "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n",
-            current_vp->x, current_vp->y,
-            current_vp->width, current_vp->height);
+            vp->x, vp->y, vp->width, vp->height);
     }
 #endif
+    if(last_vp)
+    {
+        if ((flags & VP_FLAG_CLEAR_FLAG) == VP_FLAG_CLEAR_FLAG)
+            last_vp->flags &= ~flags;
+        else
+            last_vp->flags |= flags;
+    }
+
+    return last_vp;
+}
+
+struct viewport* LCDFN(set_viewport)(struct viewport* vp)
+{
+    return LCDFN(set_viewport_ex)(vp, VP_FLAG_VP_DIRTY);
 }
 
 struct viewport *LCDFN(get_viewport)(bool *is_default)
 {
-    *is_default = (current_vp == &default_vp);
-    return current_vp;
+#if 0
+    *is_default = memcmp(LCDFN(current_viewport),
+                         &default_vp, sizeof(struct viewport)) == 0;
+#else
+    *is_default = LCDFN(current_viewport) == &default_vp;
+#endif
+
+    return LCDFN(current_viewport);
 }
 
 void LCDFN(update_viewport)(void)
 {
-    LCDFN(update_rect)(current_vp->x, current_vp->y,
-                    current_vp->width, current_vp->height);
+    struct viewport* vp = LCDFN(current_viewport);
+    if (vp->buffer->stride != LCDFN(framebuffer_default.stride))
+    {
+        LCDFN(update_viewport_rect)(0,0, vp->width, vp->height);
+        return;
+    }
+    LCDFN(update_rect)(vp->x, vp->y, vp->width, vp->height);
 }
 
 void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
 {
-    LCDFN(update_rect)(current_vp->x + x, current_vp->y + y, width, height);
+    struct viewport* vp = LCDFN(current_viewport);
+
+    /* handle the case of viewport with differing stride from main screen */
+    if (vp->buffer->stride != LCDFN(framebuffer_default.stride))
+    {
+        struct frame_buffer_t *fb = vp->buffer;
+        viewport_set_buffer(vp, NULL, 0);
+
+        LCDFN(bitmap_part)
+             (fb->FBFN(ptr), vp->x, vp->y, fb->stride,
+              vp->x + x, vp->y + y, width, height);
+
+        LCDFN(update_rect)(vp->x + x, vp->y + y, width, height);
+        viewport_set_buffer(vp, fb, 0);
+        return;
+    }
+
+    LCDFN(update_rect)(vp->x + x, vp->y + y, width, height);
 }
 
 #ifndef BOOTLOADER
@@ -123,9 +192,9 @@ void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short *ucs;
-    font_lock(current_vp->font, true);
-    struct font* pf = font_get(current_vp->font);
-    int vp_flags = current_vp->flags;
+    font_lock(LCDFN(current_viewport)->font, true);
+    struct font* pf = font_get(LCDFN(current_viewport)->font);
+    int vp_flags = LCDFN(current_viewport)->flags;
     int rtl_next_non_diac_width, last_non_diacritic_width;
 
     if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
@@ -136,13 +205,13 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         /* center takes precedence */
         if (vp_flags & VP_FLAG_ALIGN_CENTER)
         {
-            x = ((current_vp->width - w)/ 2) + x;
+            x = ((LCDFN(current_viewport)->width - w)/ 2) + x;
             if (x < 0)
                 x = 0;
         }
         else
         {
-            x = current_vp->width - w - x;
+            x = LCDFN(current_viewport)->width - w - x;
             x += ofs;
             ofs = 0;
         }
@@ -158,7 +227,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         int width, base_width, drawmode = 0, base_ofs = 0;
         const unsigned short next_ch = ucs[1];
 
-        if (x >= current_vp->width)
+        if (x >= LCDFN(current_viewport)->width)
             break;
 
         is_diac = is_diacritic(*ucs, &is_rtl);
@@ -219,8 +288,8 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
              * buffer using OR, and then draw the final bitmap instead of the
              * chars, without touching the drawmode
              **/
-            drawmode = current_vp->drawmode;
-            current_vp->drawmode = DRMODE_FG;
+            drawmode = LCDFN(current_viewport)->drawmode;
+            LCDFN(current_viewport)->drawmode = DRMODE_FG;
 
             base_ofs = (base_width - width) / 2;
         }
@@ -237,7 +306,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
                                     y, width - ofs, pf->height);
         if (is_diac)
         {
-            current_vp->drawmode = drawmode;
+            LCDFN(current_viewport)->drawmode = drawmode;
         }
 
         if (next_ch)
@@ -256,7 +325,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
             }
         }
     }
-    font_lock(current_vp->font, false);
+    font_lock(LCDFN(current_viewport)->font, false);
 }
 #else /* BOOTLOADER */
 /* put a string at a given pixel position, skipping first ofs pixel columns */
@@ -375,7 +444,7 @@ static struct scrollinfo* find_scrolling_line(int x, int y)
     for(i=0; i<LCDFN(scroll_info).lines; i++)
     {
         s = &LCDFN(scroll_info).scroll[i];
-        if (s->x == x && s->y == y && s->vp == current_vp)
+        if (s->x == x && s->y == y && s->vp == LCDFN(current_viewport))
             return s;
     }
     return NULL;
@@ -411,13 +480,13 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
 
     /* prepare rectangle for scrolling. x and y must be calculated early
      * for find_scrolling_line() to work */
-    cwidth = font_get(current_vp->font)->maxwidth;
-    height = font_get(current_vp->font)->height;
+    cwidth = font_get(LCDFN(current_viewport)->font)->maxwidth;
+    height = font_get(LCDFN(current_viewport)->font)->height;
     y = y * (linebased ? height : 1);
     x = x * (linebased ? cwidth : 1);
-    width = current_vp->width - x;
+    width = LCDFN(current_viewport)->width - x;
 
-    if (y >= current_vp->height)
+    if (y >= LCDFN(current_viewport)->height)
         return false;
 
     s = find_scrolling_line(x, y);
@@ -430,7 +499,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
      * the string width is too small to scroll the scrolling line is
      * cleared as well */
     if (w < width || restart) {
-        LCDFN(scroll_stop_viewport_rect)(current_vp, x, y, width, height);
+        LCDFN(scroll_stop_viewport_rect)(LCDFN(current_viewport), x, y, width, height);
         LCDFN(putsxyofs)(x, y, x_offset, string);
         /* nothing to scroll, or out of scrolling lines. Either way, get out */
         if (w < width || LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES))
@@ -443,7 +512,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     strlcpy(s->linebuffer, string, sizeof(s->linebuffer));
     /* scroll bidirectional or forward only depending on the string width */
     if ( LCDFN(scroll_info).bidir_limit ) {
-        s->bidir = w < (current_vp->width) *
+        s->bidir = w < (LCDFN(current_viewport)->width) *
             (100 + LCDFN(scroll_info).bidir_limit) / 100;
     }
     else
@@ -457,7 +526,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
         s->y = y;
         s->width = width;
         s->height = height;
-        s->vp = current_vp;
+        s->vp = LCDFN(current_viewport);
         s->start_tick = current_tick + LCDFN(scroll_info).delay;
         LCDFN(scroll_info).lines++;
     } else {
@@ -497,11 +566,6 @@ bool LCDFN(puts_scroll)(int x, int y, const unsigned char *string)
 
 #if !defined(HAVE_LCD_COLOR) || !defined(MAIN_LCD)
 /* see lcd-16bit-common.c for others */
-#ifdef MAIN_LCD
-#define THIS_STRIDE STRIDE_MAIN
-#else
-#define THIS_STRIDE STRIDE_REMOTE
-#endif
 
 void LCDFN(bmp_part)(const struct bitmap* bm, int src_x, int src_y,
                                 int x, int y, int width, int height)

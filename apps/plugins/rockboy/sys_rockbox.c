@@ -282,6 +282,12 @@ fb_data *frameb;
 void vid_update(int scanline) 
 { 
    register int cnt=0;
+    static fb_data *lcd_fb = NULL;
+    if (!lcd_fb)
+    {
+        struct viewport *vp_main = *(rb->screens[SCREEN_MAIN]->current_viewport);
+        lcd_fb = vp_main->buffer->fb_ptr;
+    }
     int scanline_remapped;
 #if (LCD_HEIGHT == 64) && (LCD_DEPTH == 1) /* Archos, Clip, m200v4 */
     int balance = 0;
@@ -290,7 +296,7 @@ void vid_update(int scanline)
     else if (fb.mode==2)
         scanline-=8;
     scanline_remapped = scanline / 16;
-    frameb = *rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
+    frameb = lcd_fb + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         balance += LCD_WIDTH;
         if (balance > 0)
@@ -316,7 +322,7 @@ void vid_update(int scanline)
     else if (fb.mode==2)
         scanline-=8;
     scanline_remapped = scanline / 4;
-    frameb = *rb->lcd_framebuffer + scanline_remapped * LCD_WIDTH;
+    frameb = lcd_fb + scanline_remapped * LCD_WIDTH;
     while (cnt < 160) {
         *(frameb++) = (scan.buf[0][cnt]&0x3) |
                       ((scan.buf[1][cnt]&0x3)<<2) |

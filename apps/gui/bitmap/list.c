@@ -146,7 +146,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     struct viewport *list_text_vp = &list_text[screen];
     int indent = 0;
 
-    display->set_viewport(parent);
+    struct viewport * last_vp = display->set_viewport(parent);
     display->clear_viewport();
     display->scroll_stop_viewport(list_text_vp);
     *list_text_vp = *parent;
@@ -332,7 +332,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     }
     display->set_viewport(parent);
     display->update_viewport();
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 }
 
 #if defined(HAVE_TOUCHSCREEN)

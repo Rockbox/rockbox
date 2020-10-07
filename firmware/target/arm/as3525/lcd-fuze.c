@@ -291,7 +291,7 @@ void lcd_update(void)
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    dbop_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+    dbop_write_data(FBADDR(0,0), LCD_WIDTH*LCD_HEIGHT);
 }
 
 /* Update a fraction of the display. */

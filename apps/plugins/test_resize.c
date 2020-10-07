@@ -64,8 +64,8 @@ static fb_data output_bmp_data[MAX_OUTPUT_WIDTH*MAX_OUTPUT_HEIGHT];
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
-
-    b = *rb->lcd_framebuffer;
+    struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+    b = vp_main->buffer->fb_ptr;
 
     rb->lcd_set_background(LCD_RGBPACK(0,0,0));
     rb->lcd_clear_display(); // TODO: Optimizes this by e.g. invalidating rects

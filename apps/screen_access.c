@@ -35,6 +35,7 @@
 #include "backlight.h"
 #include "screen_access.h"
 #include "backdrop.h"
+#include "viewport.h"
 
 /* some helper functions to calculate metrics on the fly */
 static int screen_helper_getcharwidth(void)
@@ -87,7 +88,17 @@ static void screen_helper_put_line(int x, int y, struct line_desc *line,
     va_end(ap);
 }
 
+void screen_helper_lcd_viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer)
+{
+    viewport_set_buffer(vp, buffer, SCREEN_MAIN);
+}
+
 #if NB_SCREENS == 2
+void screen_helper_lcd_remote_viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer)
+{
+    viewport_set_buffer(vp, buffer, SCREEN_REMOTE);
+}
+
 static int screen_helper_remote_getcharwidth(void)
 {
     return font_get(lcd_remote_getfont())->maxwidth;
@@ -156,7 +167,11 @@ struct screen screens[NB_SCREENS] =
         .has_disk_led=true,
 #endif
         .set_drawmode=&screen_helper_set_drawmode,
+        .init_viewport=&lcd_init_viewport,
         .set_viewport=&lcd_set_viewport,
+        .set_viewport_ex=&lcd_set_viewport_ex,
+        .viewport_set_buffer = &screen_helper_lcd_viewport_set_buffer,
+        .current_viewport = &lcd_current_viewport,
         .getwidth=&lcd_getwidth,
         .getheight=&lcd_getheight,
         .getstringsize=&lcd_getstringsize,
@@ -221,7 +236,6 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&backdrop_load,
         .backdrop_show=&backdrop_show,
 #endif
-        .set_framebuffer = (void*)lcd_set_framebuffer,
 #if defined(HAVE_LCD_COLOR)    
         .gradient_fillrect = lcd_gradient_fillrect,
         .gradient_fillrect_part = lcd_gradient_fillrect_part,
@@ -241,7 +255,11 @@ struct screen screens[NB_SCREENS] =
         .getcharheight=screen_helper_remote_getcharheight,
         .has_disk_led=false,
         .set_drawmode=&lcd_remote_set_drawmode,
+        .init_viewport=&lcd_remote_init_viewport,
         .set_viewport=&lcd_remote_set_viewport,
+        .set_viewport_ex=&lcd_remote_set_viewport_ex,
+        .viewport_set_buffer = &screen_helper_lcd_remote_viewport_set_buffer,
+        .current_viewport = &lcd_remote_current_viewport,
         .getwidth=&lcd_remote_getwidth,
         .getheight=&lcd_remote_getheight,
         .getstringsize=&lcd_remote_getstringsize,
@@ -307,7 +325,6 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&remote_backdrop_load,
         .backdrop_show=&remote_backdrop_show,
 #endif
-        .set_framebuffer = (void*)lcd_remote_set_framebuffer,
         .put_line = screen_helper_remote_put_line,
     }
 #endif /* NB_SCREENS == 2 */

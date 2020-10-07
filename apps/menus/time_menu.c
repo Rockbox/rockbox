@@ -169,7 +169,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
     const char *t = time, *d = date;
     if (vp->height == 0)
         return;
-    display->set_viewport(vp);
+    struct viewport *last_vp = display->set_viewport(vp);
     display->clear_viewport();
     if (viewport_get_nb_lines(vp) >= 4)
         line = 1;
@@ -200,7 +200,7 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
     display->puts(0, line, d);
 
     display->update_viewport();
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 }
 
 

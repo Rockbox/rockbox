@@ -207,12 +207,13 @@ bool set_time_screen(const char* title, struct tm *tm)
             /* 6 possible cursor possitions, 2 values stored for each: x, y */
             unsigned int cursor[6][2];
             struct viewport *vp = &viewports[s];
+            struct viewport *last_vp;
             struct screen *screen = &screens[s];
             static unsigned char rtl_idx[] =
                 { IDX_SECONDS, IDX_MINUTES, IDX_HOURS, IDX_DAY, IDX_MONTH, IDX_YEAR };
 
             viewport_set_defaults(vp, s);
-            screen->set_viewport(vp);
+            last_vp = screen->set_viewport(vp);
             nb_lines = viewport_get_nb_lines(vp);
 
             /* minimum lines needed is 2 + title line */
@@ -283,7 +284,7 @@ bool set_time_screen(const char* title, struct tm *tm)
             if (nb_lines > 5)
                 screen->puts(0, 5, str(LANG_TIME_REVERT));
             screen->update_viewport();
-            screen->set_viewport(NULL);
+            screen->set_viewport(last_vp);
         }
 
         /* set the most common numbers */

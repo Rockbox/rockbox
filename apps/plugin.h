@@ -204,9 +204,7 @@ struct plugin_api {
     void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
     bool (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_scroll_stop)(void);
-    fb_data** lcd_framebuffer;
-    void (*lcd_set_viewport)(struct viewport* vp);
-    void (*lcd_set_framebuffer)(fb_data *fb);
+    struct viewport* (*lcd_set_viewport)(struct viewport* vp);
     void (*lcd_bmp_part)(const struct bitmap *bm, int src_x, int src_y,
                          int x, int y, int width, int height);
     void (*lcd_update_rect)(int x, int y, int width, int height);
@@ -314,7 +312,6 @@ struct plugin_api {
     void (*lcd_remote_mono_bitmap)(const unsigned char *src, int x, int y,
                                    int width, int height);
     void (*lcd_remote_putsxy)(int x, int y, const unsigned char *string);
-    fb_remote_data** lcd_remote_framebuffer;
     void (*lcd_remote_update)(void);
     void (*lcd_remote_update_rect)(int x, int y, int width, int height);
 #if (LCD_REMOTE_DEPTH > 1)
@@ -338,6 +335,8 @@ struct plugin_api {
     void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
     void (*viewport_set_fullscreen)(struct viewport *vp,
                                     const enum screen_type screen);
+    void (*viewport_set_buffer)(struct viewport *vp, struct frame_buffer_t *buffer,
+                                                     const enum screen_type screen);
 
 #ifdef HAVE_BACKLIGHT
     /* lcd backlight */

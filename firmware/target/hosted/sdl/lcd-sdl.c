@@ -39,7 +39,7 @@ void sdl_update_rect(SDL_Surface *surface, int x_start, int y_start, int width,
     (void)max_y;
     (void)getpixel;
     /* Update complete screen via one blit operation (fast) */
-    SDL_Surface *lcd = SDL_CreateRGBSurfaceFrom(lcd_framebuffer, LCD_FBWIDTH,
+    SDL_Surface *lcd = SDL_CreateRGBSurfaceFrom(FBADDR(0, 0), LCD_FBWIDTH,
                                                 LCD_FBHEIGHT, LCD_DEPTH,
                                                 LCD_FBWIDTH * LCD_DEPTH/8,
                                                 0, 0, 0, 0);

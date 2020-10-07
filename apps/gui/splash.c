@@ -53,7 +53,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     int maxw = 0;
 
     viewport_set_defaults(&vp, screen->screen_type);
-    screen->set_viewport(&vp);
+    struct viewport *last_vp = screen->set_viewport(&vp);
 
     screen->getstringsize(" ", &space_w, &h);
     y = h;
@@ -157,7 +157,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     }
     screen->update_viewport();
 end:
-    screen->set_viewport(NULL);
+    screen->set_viewport(last_vp);
 }
 
 void splashf(int ticks, const char *fmt, ...)

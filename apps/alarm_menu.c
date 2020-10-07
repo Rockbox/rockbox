@@ -60,6 +60,7 @@ int alarm_screen(void)
     bool update = true;
     bool hour_wrapped = false;
     struct viewport vp[NB_SCREENS];
+    struct viewport * last_vp;
 
     rtc_get_alarm(&h, &m);
 
@@ -91,11 +92,11 @@ int alarm_screen(void)
 
         FOR_NB_SCREENS(i)
         {
-            screens[i].set_viewport(&vp[i]);
+            last_vp = screens[i].set_viewport(&vp[i]);
             screens[i].putsf(0, 1, str(LANG_ALARM_MOD_TIME));
             screens[i].putsf(0, 2, "%02d:%02d", h, m);
             screens[i].update_viewport();
-            screens[i].set_viewport(NULL);
+            screens[i].set_viewport(last_vp);
         }
         button = get_action(CONTEXT_SETTINGS,HZ);
 

@@ -164,7 +164,7 @@ static void draw_screen(struct screen *display, char *title,
     struct viewport vp;
 
     viewport_set_defaults(&vp, display->screen_type);
-    display->set_viewport(&vp);
+    struct viewport * last_vp = display->set_viewport(&vp);
 
     display->clear_viewport();
 
@@ -323,7 +323,7 @@ static void draw_screen(struct screen *display, char *title,
     }
 
     display->update_viewport();
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 }
 
 #ifdef HAVE_TOUCHSCREEN
@@ -341,7 +341,7 @@ static int touchscreen_slider(struct screen *display,
     struct viewport vp;
 
     viewport_set_defaults(&vp, display->screen_type);
-    display->set_viewport(&vp);
+    struct viewport *last_vp = display->set_viewport(&vp);
 
     button = action_get_touchscreen_press_in_vp(&x, &y, &vp);
     if (button == ACTION_UNKNOWN || button == BUTTON_NONE)
@@ -373,7 +373,7 @@ static int touchscreen_slider(struct screen *display,
             char_height*2             + /*  + margins for bottom */
             MARGIN_BOTTOM;              /* colored rectangle     */
 
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 
     if (y < text_top)
     {

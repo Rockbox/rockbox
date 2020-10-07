@@ -58,7 +58,11 @@ struct screen
     bool has_disk_led;
 #endif
     void (*set_drawmode)(int mode);
-    void (*set_viewport)(struct viewport* vp);
+    struct viewport* (*init_viewport)(struct viewport* vp);
+    struct viewport* (*set_viewport)(struct viewport* vp);
+    struct viewport* (*set_viewport_ex)(struct viewport* vp, int flags);
+    void (*viewport_set_buffer)(struct viewport *vp, struct frame_buffer_t *buffer);
+    struct viewport** current_viewport;
     int (*getwidth)(void);
     int (*getheight)(void);
     int (*getstringsize)(const unsigned char *str, int *w, int *h);
@@ -126,7 +130,6 @@ struct screen
     bool (*backdrop_load)(const char *filename, char* backdrop_buffer);
     void (*backdrop_show)(char* backdrop_buffer);
 #endif
-    void (*set_framebuffer)(void *framebuffer);
 #if defined(HAVE_LCD_COLOR)    
     void (*gradient_fillrect)(int x, int y, int width, int height,
             unsigned start, unsigned end);

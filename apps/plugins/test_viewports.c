@@ -35,7 +35,7 @@ static struct viewport vp0 =
 {
     .x        = 0,
     .y        = 0,
-    .width    = LCD_WIDTH,
+    .width    = LCD_WIDTH/ 2 + LCD_WIDTH / 3,
     .height   = 20,
     .font     = FONT_UI,
     .drawmode = DRMODE_SOLID,
@@ -120,15 +120,37 @@ static struct viewport rvp1 =
 
 #endif
 
+static void *test_address_fn(int x, int y)
+{
+    struct frame_buffer_t *fb = vp0.buffer;
+
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    size_t element = (x * LCD_NATIVE_STRIDE(fb->stride)) + y;
+#else
+    size_t element = (y * LCD_NATIVE_STRIDE(fb->stride)) + x;
+#endif
+    return fb->fb_ptr + (element % fb->elems);
+}
 
 enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
     char buf[80];
     int i,y;
+    fb_data vp_buffer[LCD_NBELEMS(vp0.width, vp0.height)];
 
+    struct frame_buffer_t fb;
+
+    fb.stride = STRIDE_MAIN(vp0.width, vp0.height);
+
+    fb.fb_ptr = vp_buffer;
+    fb.elems = LCD_NBELEMS(vp0.width, vp0.height);
+    fb.get_address_fn = &test_address_fn;
+
+    rb->viewport_set_buffer(&vp0, &fb, SCREEN_MAIN);
     rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
     rb->screens[SCREEN_MAIN]->clear_viewport();
+
     rb->screens[SCREEN_MAIN]->puts_scroll(0,0,"Viewport testing plugin - this is a scrolling title");
 
     rb->screens[SCREEN_MAIN]->set_viewport(&vp1);
@@ -192,6 +214,9 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->screens[SCREEN_REMOTE]->update();
 #endif
+    rb->button_clear_queue();
+    while(rb->button_get(true) <= BUTTON_NONE)
+     ;;
 
     rb->button_get(true);
 

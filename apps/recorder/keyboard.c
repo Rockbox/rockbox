@@ -1009,7 +1009,7 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
     int sc_w = sc->getwidth(), sc_h = sc->getheight();
     viewport_set_defaults(&vp, sc->screen_type);
     vp.flags |= VP_FLAG_ALIGN_CENTER;
-    sc->set_viewport(&vp);
+    struct viewport *last_vp = sc->set_viewport(&vp);
     text_h = sc->getcharheight();
     button_h = GRID_SIZE(sc->screen_type, text_h);
     text_y = (button_h - text_h) / 2 + 1;
@@ -1039,7 +1039,7 @@ static void kbd_draw_buttons(struct keyboard_parameters *pm, struct screen *sc)
     vp.x += vp.width;
     sc->vline(0, 0, button_h);
     sc->putsxy(0, text_y, str(LANG_KBD_CANCEL));
-    sc->set_viewport(NULL);
+    sc->set_viewport(last_vp);
 }
 
 static int keyboard_touchscreen(struct keyboard_parameters *pm,

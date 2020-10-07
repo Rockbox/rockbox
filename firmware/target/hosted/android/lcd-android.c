@@ -83,7 +83,7 @@ void lcd_update(void)
     if (display_on)
     {
         JNIEnv e = *env_ptr;
-        jobject buffer = e->NewDirectByteBuffer(env_ptr, lcd_framebuffer,
+        jobject buffer = e->NewDirectByteBuffer(env_ptr, FBADDR(0,0),
                                                (jlong) FRAMEBUFFER_SIZE);
 
         e->CallVoidMethod(env_ptr, RockboxFramebuffer_instance,
@@ -97,7 +97,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if (display_on)
     {
         JNIEnv e = *env_ptr;
-        jobject buffer = e->NewDirectByteBuffer(env_ptr, lcd_framebuffer,
+        jobject buffer = e->NewDirectByteBuffer(env_ptr, FBADDR(0,0),
                                                    (jlong) FRAMEBUFFER_SIZE);
         jobject rect = e->NewObject(env_ptr, AndroidRect_class, AndroidRect_constructor,
                                         x, y, x + width, y + height);
