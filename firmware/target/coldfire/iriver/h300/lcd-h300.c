@@ -408,7 +408,7 @@ void lcd_update(void)
         lcd_begin_write_gram();
 
         dma_count = 1;
-        SAR3 = (unsigned long)lcd_framebuffer;
+        SAR3 = (unsigned long)FBADDR(0,0);
         BCR3 = LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data);
         DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
              | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE) 

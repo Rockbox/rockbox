@@ -259,7 +259,7 @@ static int parse_statusbar_tags(struct skin_element* element,
     }
     else
     {
-        struct skin_viewport *default_vp = SKINOFFSETTOPTR(skin_buffer, first_viewport->data);
+        struct skin_viewport *skin_default = SKINOFFSETTOPTR(skin_buffer, first_viewport->data);
         if (first_viewport->params_count == 0)
         {
             wps_data->wps_sb_tag = true;
@@ -267,11 +267,11 @@ static int parse_statusbar_tags(struct skin_element* element,
         }
         if (wps_data->show_sb_on_wps)
         {
-            viewport_set_defaults(&default_vp->vp, curr_screen);
+            viewport_set_defaults(&skin_default->vp, curr_screen);
         }
         else
         {
-            viewport_set_fullscreen(&default_vp->vp, curr_screen);
+            viewport_set_fullscreen(&skin_default->vp, curr_screen);
         }
 #ifdef HAVE_REMOTE_LCD
         /* This parser requires viewports which will use the settings font to
@@ -279,7 +279,7 @@ static int parse_statusbar_tags(struct skin_element* element,
          * the current real font id. So force 1 here it will be set correctly
          * at the end
          */
-        default_vp->vp.font = 1;
+        skin_default->vp.font = 1;
 #endif
     }
     return 0;

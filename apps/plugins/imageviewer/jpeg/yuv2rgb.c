@@ -236,15 +236,15 @@ static fb_data (* const pixel_funcs[COLOUR_NUM_MODES][DITHER_NUM_MODES])(void) =
         [DITHER_DIFFUSION] = pixel_fsdither_to_lcd,
     },
 };
-
+static fb_data *lcd_fb = NULL;
 /* These defines are used fornormal horizontal strides and vertical strides. */
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define LCDADDR(x, y)   (*rb->lcd_framebuffer + LCD_HEIGHT*(x) + (y))
+#define LCDADDR(x, y)   (lcd_fb + LCD_HEIGHT*(x) + (y))
 #define ROWENDOFFSET    (width*LCD_HEIGHT)
 #define ROWOFFSET       (1)
 #define COLOFFSET       (LCD_HEIGHT)
 #else
-#define LCDADDR(x, y) (*rb->lcd_framebuffer + LCD_WIDTH*(y) + (x))
+#define LCDADDR(x, y) (lcd_fb + LCD_WIDTH*(y) + (x))
 #define ROWENDOFFSET    (width)
 #define ROWOFFSET       (LCD_WIDTH)
 #define COLOFFSET       (1)
@@ -261,6 +261,12 @@ void yuv_bitmap_part(unsigned char *src[3], int csub_x, int csub_y,
                      int x, int y, int width, int height,
                      int colour_mode, int dither_mode)
 {
+    if (!lcd_fb)
+    {
+        struct viewport *vp_main = *(rb->screens[SCREEN_MAIN]->current_viewport);
+        lcd_fb = vp_main->buffer->fb_ptr;
+    }
+
     fb_data *dst, *dst_end;
     fb_data (*pixel_func)(void);
     struct rgb_pixel px;
