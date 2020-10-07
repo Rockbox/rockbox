@@ -152,6 +152,8 @@
 /* Define this if you have a Ingenic JZ4760B */
 #define CONFIG_CPU JZ4760B
 
+#define HAVE_FPU
+
 /* If we have adjustable frequency */
 #define CPUFREQ_MAX      480000000  // datasheet sez 600MHz max.  Must be multiple of 48!
 #define CPUFREQ_MIN      192000000
