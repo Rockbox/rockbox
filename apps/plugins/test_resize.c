@@ -65,7 +65,7 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-    b = *rb->lcd_framebuffer;
+    b = rb->_viewport_get_framebuffer(NULL, NULL);
 
     rb->lcd_set_background(LCD_RGBPACK(0,0,0));
     rb->lcd_clear_display(); // TODO: Optimizes this by e.g. invalidating rects

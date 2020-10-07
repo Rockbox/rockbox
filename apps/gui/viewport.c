@@ -31,6 +31,9 @@
 #include "settings.h"
 #include "misc.h"
 #include "list.h"
+
+extern struct viewport* lcd_current_viewport;
+extern struct viewport default_vp;
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
 #define FG_FALLBACK global_settings.fg_color
@@ -43,7 +46,6 @@
 #define REMOTE_FG_FALLBACK LCD_REMOTE_DEFAULT_FG
 #define REMOTE_BG_FALLBACK LCD_REMOTE_DEFAULT_BG
 #endif
-
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
@@ -282,11 +284,8 @@ static void set_default_align_flags(struct viewport *vp)
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
-    vp->x = 0;
-    vp->y = 0;
-    vp->width = screens[screen].lcdwidth;
-    vp->height = screens[screen].lcdheight;
-
+    if (vp != &default_vp)
+        memcpy(vp, &default_vp, sizeof(struct viewport));
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
@@ -310,6 +309,34 @@ void viewport_set_fullscreen(struct viewport *vp,
         vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
     }
 #endif
+}
+
+fb_data *_viewport_get_framebuffer(struct viewport *vp, size_t *size)
+{
+    /* this function is here for compatibility with old plugins
+     * the viewports + lcd functions are flexible enough to do this..
+    */
+    if (!vp)
+        vp = lcd_current_viewport;
+    struct frame_buffer_t *buffer;
+    /* NULL denotes default buffer */
+    buffer = vp->buffer;
+    if (!buffer)
+        buffer = &lcd_framebuffer_default;
+    if (size)
+        *size = vp->buffer->elems * sizeof(fb_data);
+
+    return buffer->data;
+}
+
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer)
+{
+    /* NULL sets default buffer */
+
+    if (!buffer || buffer->elems == 0)
+        vp->buffer = &lcd_framebuffer_default;
+    else
+        vp->buffer = buffer;
 }
 
 void viewport_set_defaults(struct viewport *vp,

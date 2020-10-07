@@ -48,17 +48,37 @@
 FBFN(data) LCDFN(static_framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
 FBFN(data) *LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
 
+static fb_data *lcd_frameaddress_default(int x, int y);
+
+static struct frame_buffer_t lcd_framebuffer_default =
+{
+    .buffer         = &lcd_static_framebuffer[0][0],
+    .get_address_fn = &lcd_frameaddress_default,
+    .elems          = (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT),
+};
+
 static struct viewport default_vp =
 {
     .x        = 0,
     .y        = 0,
     .width    = LCDM(WIDTH),
     .height   = LCDM(HEIGHT),
+    .stride   = STRIDE_MAIN(LCD_FBWIDTH, LCD_FBHEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
+    .buffer   = &lcd_framebuffer_default,
 };
 
-static struct viewport* current_vp = &default_vp;
+static struct viewport* lcd_current_viewport = &default_vp;
+
+static fb_data *lcd_frameaddress_default(int x, int y)
+{
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    return lcd_current_viewport->data + ((x) * lcd_current_viewport->stride) + (y);
+#else
+    return lcd_current_viewport->data + ((y) * lcd_current_viewport->stride) + (x);
+#endif
+}
 
 /* LCD init */
 void LCDFN(init)(void)
@@ -74,37 +94,37 @@ void LCDFN(init)(void)
 
 void LCDFN(set_drawmode)(int mode)
 {
-    current_vp->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
+    lcd_current_viewport->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
 }
 
 int LCDFN(get_drawmode)(void)
 {
-    return current_vp->drawmode;
+    return lcd_current_viewport->drawmode;
 }
 
 int LCDFN(getwidth)(void)
 {
-    return current_vp->width;
+    return lcd_current_viewport->width;
 }
 
 int LCDFN(getheight)(void)
 {
-    return current_vp->height;
+    return lcd_current_viewport->height;
 }
 
 void LCDFN(setfont)(int newfont)
 {
-    current_vp->font = newfont;
+    lcd_current_viewport->font = newfont;
 }
 
 int LCDFN(getfont)(void)
 {
-    return current_vp->font;
+    return lcd_current_viewport->font;
 }
 
 int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
 {
-    return font_getstringsize(str, w, h, current_vp->font);
+    return font_getstringsize(str, w, h, lcd_current_viewport->font);
 }
 
 /*** low-level drawing functions ***/
@@ -199,7 +219,7 @@ LCDFN(blockfunc_type)* const LCDFN(blockfuncs)[8] = {
 /* Clear the whole display */
 void LCDFN(clear_display)(void)
 {
-    unsigned bits = (current_vp->drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
+    unsigned bits = (lcd_current_viewport->drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
 
     memset(LCDFN(framebuffer), bits, FBSIZE);
     LCDFN(scroll_info).lines = 0;
@@ -210,37 +230,37 @@ void LCDFN(clear_viewport)(void)
 {
     int oldmode;
 
-    if (current_vp == &default_vp)
+    if (lcd_current_viewport == &default_vp)
     {
         LCDFN(clear_display)();
     }
     else
     {
-        oldmode = current_vp->drawmode;
+        oldmode = lcd_current_viewport->drawmode;
 
         /* Invert the INVERSEVID bit and set basic mode to SOLID */
-        current_vp->drawmode = (~current_vp->drawmode & DRMODE_INVERSEVID) | 
+        lcd_current_viewport->drawmode = (~lcd_current_viewport->drawmode & DRMODE_INVERSEVID) | 
                                DRMODE_SOLID;
 
-        LCDFN(fillrect)(0, 0, current_vp->width, current_vp->height);
+        LCDFN(fillrect)(0, 0, lcd_current_viewport->width, lcd_current_viewport->height);
 
-        current_vp->drawmode = oldmode;
+        lcd_current_viewport->drawmode = oldmode;
 
-        LCDFN(scroll_stop_viewport)(current_vp);
+        LCDFN(scroll_stop_viewport)(lcd_current_viewport);
     }
 }
 
 /* Set a single pixel */
 void LCDFN(drawpixel)(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)current_vp->width) 
-        && ((unsigned)y < (unsigned)current_vp->height)
+    if (   ((unsigned)x < (unsigned)lcd_current_viewport->width) 
+        && ((unsigned)y < (unsigned)lcd_current_viewport->height)
 #if defined(HAVE_VIEWPORT_CLIP)
         && ((unsigned)x < (unsigned)LCDM(WIDTH))
         && ((unsigned)y < (unsigned)LCDM(HEIGHT))
 #endif
         )
-        LCDFN(pixelfuncs)[current_vp->drawmode](current_vp->x + x, current_vp->y + y);
+        LCDFN(pixelfuncs)[lcd_current_viewport->drawmode](lcd_current_viewport->x + x, lcd_current_viewport->y + y);
 }
 
 /* Draw a line */
@@ -252,7 +272,7 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
-    LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[current_vp->drawmode];
+    LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[lcd_current_viewport->drawmode];
 
     deltax = abs(x2 - x1);
     if (deltax == 0)
@@ -308,14 +328,14 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if (   ((unsigned)x < (unsigned)current_vp->width)
-            && ((unsigned)y < (unsigned)current_vp->height)
+        if (   ((unsigned)x < (unsigned)lcd_current_viewport->width)
+            && ((unsigned)y < (unsigned)lcd_current_viewport->height)
 #if defined(HAVE_VIEWPORT_CLIP)
             && ((unsigned)x < (unsigned)LCDM(WIDTH))
             && ((unsigned)y < (unsigned)LCDM(HEIGHT))
 #endif
             )
-            pfunc(current_vp->x + x, current_vp->y + y);
+            pfunc(lcd_current_viewport->x + x, lcd_current_viewport->y + y);
 
         if (d < 0)
         {
@@ -350,19 +370,19 @@ void LCDFN(hline)(int x1, int x2, int y)
     
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
-    if (((unsigned)y >= (unsigned)current_vp->height) || (x1 >= current_vp->width)
+    if (((unsigned)y >= (unsigned)lcd_current_viewport->height) || (x1 >= lcd_current_viewport->width)
         || (x2 < 0))
         return;  
     
     if (x1 < 0)
         x1 = 0;
-    if (x2 >= current_vp->width)
-        x2 = current_vp->width-1;
+    if (x2 >= lcd_current_viewport->width)
+        x2 = lcd_current_viewport->width-1;
         
     /* adjust to viewport */
-    x1 += current_vp->x;
-    x2 += current_vp->x;
-    y += current_vp->y;
+    x1 += lcd_current_viewport->x;
+    x2 += lcd_current_viewport->x;
+    y += lcd_current_viewport->y;
     
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -380,7 +400,7 @@ void LCDFN(hline)(int x1, int x2, int y)
 
     width = x2 - x1 + 1;
 
-    bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
+    bfunc = LCDFN(blockfuncs)[lcd_current_viewport->drawmode];
     dst   = LCDFB(x1,y>>3);
     mask  = BIT_N(y & 7);
 
@@ -408,19 +428,19 @@ void LCDFN(vline)(int x, int y1, int y2)
 
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
-    if (((unsigned)x >= (unsigned)current_vp->width) || (y1 >= current_vp->height)
+    if (((unsigned)x >= (unsigned)lcd_current_viewport->width) || (y1 >= lcd_current_viewport->height)
         || (y2 < 0))
         return;  
     
     if (y1 < 0)
         y1 = 0;
-    if (y2 >= current_vp->height)
-        y2 = current_vp->height-1;
+    if (y2 >= lcd_current_viewport->height)
+        y2 = lcd_current_viewport->height-1;
         
     /* adjust for viewport */
-    y1 += current_vp->y;
-    y2 += current_vp->y;
-    x += current_vp->x;
+    y1 += lcd_current_viewport->y;
+    y2 += lcd_current_viewport->y;
+    x += lcd_current_viewport->x;
     
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -436,7 +456,7 @@ void LCDFN(vline)(int x, int y1, int y2)
         y2 = LCDM(HEIGHT)-1;
 #endif
 
-    bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
+    bfunc = LCDFN(blockfuncs)[lcd_current_viewport->drawmode];
     dst   = LCDFB(x,y1>>3);
     ny    = y2 - (y1 & ~7);
     mask  = 0xFFu << (y1 & 7);
@@ -479,8 +499,8 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
 
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
-        || (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width)
+        || (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     if (x < 0)
@@ -493,14 +513,14 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
         height += y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+    if (x + width > lcd_current_viewport->width)
+        width = lcd_current_viewport->width - x;
+    if (y + height > lcd_current_viewport->height)
+        height = lcd_current_viewport->height - y;
         
     /* adjust for viewport */
-    x += current_vp->x;
-    y += current_vp->y;
+    x += lcd_current_viewport->x;
+    y += lcd_current_viewport->y;
     
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -526,22 +546,22 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
         height = LCDM(HEIGHT) - y;
 #endif
 
-    if (current_vp->drawmode & DRMODE_INVERSEVID)
+    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
     {
-        if (current_vp->drawmode & DRMODE_BG)
+        if (lcd_current_viewport->drawmode & DRMODE_BG)
         {
             fillopt = true;
         }
     }
     else
     {
-        if (current_vp->drawmode & DRMODE_FG)
+        if (lcd_current_viewport->drawmode & DRMODE_FG)
         {
             fillopt = true;
             bits = 0xFFu;
         }
     }
-    bfunc = LCDFN(blockfuncs)[current_vp->drawmode];
+    bfunc = LCDFN(blockfuncs)[lcd_current_viewport->drawmode];
     dst   = LCDFB(x,y>>3);
     ny    = height - 1 + (y & 7);
     mask  = 0xFFu << (y & 7);
@@ -600,8 +620,8 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
 
     /******************** Image in viewport clipping **********************/
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width)
-        || (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width)
+        || (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
         return;
         
     /* clip image in viewport */
@@ -617,14 +637,14 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
         src_y -= y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+    if (x + width > lcd_current_viewport->width)
+        width = lcd_current_viewport->width - x;
+    if (y + height > lcd_current_viewport->height)
+        height = lcd_current_viewport->height - y;
 
     /* adjust for viewport */
-    x += current_vp->x;
-    y += current_vp->y;
+    x += lcd_current_viewport->x;
+    y += lcd_current_viewport->y;
     
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -659,13 +679,13 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 
-    bfunc  = LCDFN(blockfuncs)[current_vp->drawmode];
+    bfunc  = LCDFN(blockfuncs)[lcd_current_viewport->drawmode];
     mask   = 0xFFu << (shift + src_y);
     mask_bottom = 0xFFu >> (~ny & 7);
     
     if (shift == 0)
     {
-        bool copyopt = (current_vp->drawmode == DRMODE_SOLID);
+        bool copyopt = (lcd_current_viewport->drawmode == DRMODE_SOLID);
 
         for (; ny >= 8; ny -= 8)
         {
