@@ -578,8 +578,8 @@ arm7ejscc () {
 mipselcc () {
  prefixtools mipsel-elf-
  # mips is predefined, but we want it for paths. use __mips instead
- GCCOPTS="$CCOPTS -march=mips32 -mtune=r4600 -mno-mips16 -mno-long-calls -Umips"
- GCCOPTS="$GCCOPTS -ffunction-sections -msoft-float -G 0 -Wno-parentheses"
+ GCCOPTS="$CCOPTS -march=mips32 -mno-mips16 -mno-long-calls -Umips"
+ GCCOPTS="$GCCOPTS -ffunction-sections -G 0 -Wno-parentheses"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
  gccchoice="4.9.4"
@@ -2980,6 +2980,7 @@ fi
     target="ONDA_VX747"
     memory=16
     mipselcc
+    GCCOPTS="$GCCOPTS -msoft-float"
     tool="$rootdir/tools/scramble -add=x747"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -3001,6 +3002,7 @@ fi
     target="ONDA_VX767"
     memory=16 #FIXME
     mipselcc
+    GCCOPTS="$GCCOPTS -msoft-float"
     tool="cp"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -3022,6 +3024,7 @@ fi
     target="ONDA_VX747P"
     memory=16
     mipselcc
+    GCCOPTS="$GCCOPTS -msoft-float"
     tool="$rootdir/tools/scramble -add=747p"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -3043,6 +3046,7 @@ fi
     target="ONDA_VX777"
     memory=16
     mipselcc
+    GCCOPTS="$GCCOPTS -msoft-float"
     tool="$rootdir/tools/scramble -add=x777"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
@@ -4019,6 +4023,7 @@ fi
     target="XDUOO_X3"
     memory=64
     mipselcc
+    GCCOPTS="$GCCOPTS -mhard-float"
     tool="$rootdir/tools/scramble -add=xdx3"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$bmp2rb_mono"

@@ -27,5 +27,16 @@ struct regs
     uint32_t start; /*   44 - Thread start address, or NULL when started */
 };
 
-#define DEFAULT_STACK_SIZE 0x400 /* Bytes */
+#ifdef HAVE_FPU
+struct fpregs
+{
+    uint32_t fp[32]; /* 0-124 - Floating point registers f0-f31 */
+    uint32_t fcr31;  // 128
+    uint32_t msacsr; // 132
+};
+#define __FPU_HAZARD "ssnop; ssnop; ssnop; ehb;"
+#define __SYSTEM_FPU_ENABLE()  set_c0_status(ST0_CU1);
+#define __SYSTEM_FPU_DISABLE() clear_c0_status(ST0_CU1); // __FPU_HAZARD();
+#endif
 
+#define DEFAULT_STACK_SIZE 0x400 /* Bytes */

@@ -262,10 +262,34 @@ static FORCE_INLINE void thread_store_context(struct thread_entry *thread)
 #endif
 }
 
+#ifdef HAVE_FPU
+static struct thread_entry *cur_fp_thread = NULL;
+
+void thread_enable_fpu(unsigned int thread_id)
+{
+    struct thread_entry *thread = __thread_id_entry(thread_id);
+    thread->use_fpu = 1;
+    __SYSTEM_FPU_ENABLE();
+}
+#endif
+
 static FORCE_INLINE void thread_load_context(struct thread_entry *thread)
 {
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
     errno = thread->__errno;
+#endif
+#ifdef HAVE_FPU
+    /* Lazy FPU store/restore:  IFF new thread needs FPU */
+    if (thread->use_fpu) {
+	    if (cur_fp_thread && cur_fp_thread != thread) {
+		    // __FPU_HAZARD;
+		    thread_store_fp(cur_fp_thread);
+		    // __FPU_HAZARD;
+		    thread_load_fp(thread);
+		    // __FPU_HAZARD;
+	    }
+	    cur_fp_thread = thread;
+    }
 #endif
     load_context(&thread->context);
 }
@@ -369,6 +393,9 @@ static void new_thread_base_init(struct thread_entry *thread,
 #endif
 #ifdef HAVE_SCHEDULER_BOOSTCTRL
     thread->cpu_boost = 0;
+#endif
+#ifdef HAVE_FPU
+    thread->use_fpu = 0;
 #endif
 }
 
@@ -1044,7 +1071,7 @@ void switch_thread(void)
             break;
 
         thread = NULL;
-        
+
         /* Enter sleep mode to reduce power usage */
         RTR_UNLOCK(corep);
         core_sleep(IF_COP(core));
@@ -1274,6 +1301,12 @@ void thread_exit_final(struct thread_entry *current)
 
     UNLOCK_THREAD(current);
     corelock_unlock(&current->waiter_cl);
+
+#ifdef HAVE_FPU
+    /* This thread can't use the FPU any more */
+    if (current == cur_fp_thread)
+        cur_fp_thread = NULL;
+#endif
 
     thread_free(current);
 

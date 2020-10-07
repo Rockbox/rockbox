@@ -118,3 +118,19 @@ static inline void load_context(const void* addr)
         : : "r" (addr) : "t0", "t1"
     );
 }
+
+static inline void thread_store_fp(struct thread_entry *thread)
+{
+	// thread->fpregs.
+	//   fp[32]
+	//   fcr31
+	//   msacsr
+}
+
+static inline void thread_load_fp(struct thread_entry *thread)
+{
+	// thread->fpregs.
+	//   fp[32]
+	//   fcr31
+	//   msacsr
+}

@@ -652,6 +652,10 @@ void INIT_ATTR codec_thread_init(void)
             codec_thread, codec_stack, sizeof(codec_stack), 0,
             codec_thread_name IF_PRIO(, PRIORITY_PLAYBACK)
             IF_COP(, CPU));
+#ifdef HAVE_FPU
+    thread_enable_fpu(codec_thread_id);
+#endif
+
     queue_enable_queue_send(&codec_queue, &codec_queue_sender_list,
                             codec_thread_id);
 }

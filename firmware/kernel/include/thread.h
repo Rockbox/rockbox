@@ -209,4 +209,8 @@ struct thread_debug_info
 int thread_get_debug_info(unsigned int thread_id,
                           struct thread_debug_info *infop);
 
+#ifdef HAVE_FPU
+void thread_enable_fpu(unsigned int thread_id);
+#endif
+
 #endif /* THREAD_H */

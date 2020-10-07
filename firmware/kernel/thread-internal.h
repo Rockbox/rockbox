@@ -134,6 +134,10 @@ struct thread_entry
 #ifndef HAVE_SDL_THREADS
     size_t stack_size;           /* Size of stack in bytes */
 #endif
+#ifdef HAVE_FPU
+    int use_fpu;                 /* Thread uses FPU */
+    struct fpregs fpregs;        /* FP register state */
+#endif
 };
 
 /* Thread ID, 32 bits = |VVVVVVVV|VVVVVVVV|VVVVVVVV|SSSSSSSS| */
