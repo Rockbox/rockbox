@@ -78,8 +78,9 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     struct screen * display=yn->display;
     struct viewport *vp = yn->vp;
     int nb_lines, vp_lines, line_shift=0;
+    struct viewport *last_vp;
 
-    display->set_viewport(vp);
+    last_vp = display->set_viewport(vp);
     display->clear_viewport();
     nb_lines = yn->main_message->nb_lines;
     vp_lines = viewport_get_nb_lines(vp);
@@ -116,7 +117,7 @@ static void gui_yesno_draw(struct gui_yesno * yn)
     }
 #endif
     display->update_viewport();
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 }
 
 /*

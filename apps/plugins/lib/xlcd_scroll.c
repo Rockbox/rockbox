@@ -25,6 +25,7 @@
 #include "plugin.h"
 
 #include "xlcd.h"
+static fb_data *lcd_fb;
 
 #if (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
 static const unsigned short patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
@@ -33,6 +34,9 @@ static const unsigned short patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 void xlcd_scroll_left(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int length, oldmode;
 
     if ((unsigned)count >= LCD_WIDTH)
@@ -43,8 +47,7 @@ void xlcd_scroll_left(int count)
 
     length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
 
-    rb->memmove(*rb->lcd_framebuffer, *rb->lcd_framebuffer + LCD_HEIGHT*count, 
-                length * sizeof(fb_data));
+    rb->memmove(lcd_fb, lcd_fb + LCD_HEIGHT*count, length * sizeof(fb_data));
 
     oldmode = rb->lcd_get_drawmode();
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -55,6 +58,9 @@ void xlcd_scroll_left(int count)
 /* Scroll right */
 void xlcd_scroll_right(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int length, oldmode;
 
     if ((unsigned)count >= LCD_WIDTH)
@@ -65,8 +71,8 @@ void xlcd_scroll_right(int count)
 
     length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
 
-    rb->memmove(*rb->lcd_framebuffer + LCD_HEIGHT*count, 
-                *rb->lcd_framebuffer, length * sizeof(fb_data));
+    rb->memmove(lcd_fb + LCD_HEIGHT*count, 
+                lcd_fb, length * sizeof(fb_data));
 
     oldmode = rb->lcd_get_drawmode();
     rb->lcd_set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
@@ -77,6 +83,9 @@ void xlcd_scroll_right(int count)
 /* Scroll up */
 void xlcd_scroll_up(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int width, length, oldmode;
     
     fb_data *data;
@@ -90,7 +99,7 @@ void xlcd_scroll_up(int count)
     length = LCD_HEIGHT - count;
     
     width = LCD_WIDTH-1;
-    data = *rb->lcd_framebuffer;
+    data = lcd_fb;
     
     do {
         rb->memmove(data,data + count,length * sizeof(fb_data));
@@ -106,6 +115,9 @@ void xlcd_scroll_up(int count)
 /* Scroll down */
 void xlcd_scroll_down(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int width, length, oldmode;
     
     fb_data *data;
@@ -119,7 +131,7 @@ void xlcd_scroll_down(int count)
     length = LCD_HEIGHT - count;
 
     width = LCD_WIDTH-1;
-    data = *rb->lcd_framebuffer;
+    data = lcd_fb;
     
     do {
         rb->memmove(data + count, data, length * sizeof(fb_data));
@@ -138,6 +150,9 @@ void xlcd_scroll_down(int count)
 /* Scroll left */
 void xlcd_scroll_left(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int bitcount=0, oldmode;
     int blockcount=0, blocklen;
 
@@ -155,7 +170,7 @@ void xlcd_scroll_left(int count)
 
     if (blockcount)
     {
-        unsigned char *data = *rb->lcd_framebuffer;
+        unsigned char *data = lcd_fb;
         unsigned char *data_end = data + LCD_FBWIDTH*LCD_HEIGHT;
 
         do
@@ -168,7 +183,7 @@ void xlcd_scroll_left(int count)
     if (bitcount)
     {
         int bx, y;
-        unsigned char *addr = *rb->lcd_framebuffer + blocklen;
+        unsigned char *addr = lcd_fb + blocklen;
 #if LCD_DEPTH == 2
         unsigned fill = (0x55 * (~rb->lcd_get_background() & 3)) << bitcount;
 #endif
@@ -196,6 +211,9 @@ void xlcd_scroll_left(int count)
 /* Scroll right */
 void xlcd_scroll_right(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int bitcount=0, oldmode;
     int blockcount=0, blocklen;
 
@@ -213,7 +231,7 @@ void xlcd_scroll_right(int count)
 
     if (blockcount)
     {
-        unsigned char *data = *rb->lcd_framebuffer;
+        unsigned char *data = lcd_fb;
         unsigned char *data_end = data + LCD_FBWIDTH*LCD_HEIGHT;
 
         do
@@ -226,7 +244,7 @@ void xlcd_scroll_right(int count)
     if (bitcount)
     {
         int bx, y;
-        unsigned char *addr = *rb->lcd_framebuffer + blockcount;
+        unsigned char *addr = lcd_fb + blockcount;
 #if LCD_DEPTH == 2
         unsigned fill = 0x55 * (~rb->lcd_get_background() & 3);
 #endif
@@ -256,6 +274,9 @@ void xlcd_scroll_right(int count)
 /* Scroll left */
 void xlcd_scroll_left(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     fb_data *data, *data_end;
     int length, oldmode;
 
@@ -265,7 +286,7 @@ void xlcd_scroll_left(int count)
         return;
     }
 
-    data = *rb->lcd_framebuffer;
+    data = lcd_fb;
     data_end = data + LCD_WIDTH*LCD_FBHEIGHT;
     length = LCD_WIDTH - count;
 
@@ -285,6 +306,9 @@ void xlcd_scroll_left(int count)
 /* Scroll right */
 void xlcd_scroll_right(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     fb_data *data, *data_end;
     int length, oldmode;
 
@@ -294,7 +318,7 @@ void xlcd_scroll_right(int count)
         return;
     }
 
-    data = *rb->lcd_framebuffer;
+    data = lcd_fb;
     data_end = data + LCD_WIDTH*LCD_FBHEIGHT;
     length = LCD_WIDTH - count;
 
@@ -318,6 +342,9 @@ void xlcd_scroll_right(int count)
 /* Scroll up */
 void xlcd_scroll_up(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int length, oldmode;
 
     if ((unsigned)count >= LCD_HEIGHT)
@@ -328,8 +355,8 @@ void xlcd_scroll_up(int count)
 
     length = LCD_HEIGHT - count;
 
-    rb->memmove(*rb->lcd_framebuffer,
-                      *rb->lcd_framebuffer + count * LCD_FBWIDTH,
+    rb->memmove(lcd_fb,
+                      lcd_fb + count * LCD_FBWIDTH,
                       length * LCD_FBWIDTH * sizeof(fb_data));
 
     oldmode = rb->lcd_get_drawmode();
@@ -341,6 +368,9 @@ void xlcd_scroll_up(int count)
 /* Scroll down */
 void xlcd_scroll_down(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int length, oldmode;
 
     if ((unsigned)count >= LCD_HEIGHT)
@@ -351,8 +381,8 @@ void xlcd_scroll_down(int count)
 
     length = LCD_HEIGHT - count;
 
-    rb->memmove(*rb->lcd_framebuffer + count * LCD_FBWIDTH,
-                      *rb->lcd_framebuffer,
+    rb->memmove(lcd_fb + count * LCD_FBWIDTH,
+                      lcd_fb,
                       length * LCD_FBWIDTH * sizeof(fb_data));
 
     oldmode = rb->lcd_get_drawmode();
@@ -367,6 +397,9 @@ void xlcd_scroll_down(int count)
 /* Scroll up */
 void xlcd_scroll_up(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int bitcount=0, oldmode;
     int blockcount=0, blocklen;
 
@@ -388,8 +421,8 @@ void xlcd_scroll_up(int count)
 
     if (blockcount)
     {
-        rb->memmove(*rb->lcd_framebuffer,
-                          *rb->lcd_framebuffer + blockcount * LCD_FBWIDTH,
+        rb->memmove(lcd_fb,
+                          lcd_fb + blockcount * LCD_FBWIDTH,
                           blocklen * LCD_FBWIDTH * sizeof(fb_data));
     }
     if (bitcount)
@@ -424,7 +457,7 @@ void xlcd_scroll_up(int count)
             : /* inputs */
             [wide]"r"(LCD_FBWIDTH),
             [rows]"r"(blocklen),
-            [addr]"a"(*rb->lcd_framebuffer + blocklen * LCD_FBWIDTH),
+            [addr]"a"(lcd_fb + blocklen * LCD_FBWIDTH),
             [cnt] "d"(bitcount),
             [bkg] "d"(0x55 * (~rb->lcd_get_background() & 3))
             : /* clobbers */
@@ -432,7 +465,7 @@ void xlcd_scroll_up(int count)
         );
 #else /* C version */
         int x, by;
-        unsigned char *addr = *rb->lcd_framebuffer + blocklen * LCD_FBWIDTH;
+        unsigned char *addr = lcd_fb + blocklen * LCD_FBWIDTH;
 #if LCD_DEPTH == 2
         unsigned fill = 0x55 * (~rb->lcd_get_background() & 3);
 #else
@@ -457,7 +490,7 @@ void xlcd_scroll_up(int count)
 
 #if LCD_DEPTH == 2
         int x, by;
-        fb_data *addr = *rb->lcd_framebuffer + blocklen * LCD_FBWIDTH;
+        fb_data *addr = lcd_fb + blocklen * LCD_FBWIDTH;
         unsigned fill, mask;
 
         fill = patterns[rb->lcd_get_background() & 3] << 8;
@@ -491,6 +524,9 @@ void xlcd_scroll_up(int count)
 /* Scroll up */
 void xlcd_scroll_down(int count)
 {
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     int bitcount=0, oldmode;
     int blockcount=0, blocklen;
 
@@ -512,8 +548,8 @@ void xlcd_scroll_down(int count)
 
     if (blockcount)
     {
-        rb->memmove(*rb->lcd_framebuffer + blockcount * LCD_FBWIDTH,
-                          *rb->lcd_framebuffer,
+        rb->memmove(lcd_fb + blockcount * LCD_FBWIDTH,
+                          lcd_fb,
                           blocklen * LCD_FBWIDTH * sizeof(fb_data));
     }
     if (bitcount)
@@ -548,7 +584,7 @@ void xlcd_scroll_down(int count)
             : /* inputs */
             [wide]"r"(LCD_WIDTH),
             [rows]"r"(blocklen),
-            [addr]"a"(*rb->lcd_framebuffer + blockcount * LCD_FBWIDTH),
+            [addr]"a"(lcd_fb + blockcount * LCD_FBWIDTH),
             [cnt] "d"(bitcount),
             [bkg] "d"((0x55 * (~rb->lcd_get_background() & 3)) << bitcount)
             : /* clobbers */
@@ -556,7 +592,7 @@ void xlcd_scroll_down(int count)
         );
 #else /* C version */
         int x, by;
-        unsigned char *addr = *rb->lcd_framebuffer + blockcount * LCD_FBWIDTH;
+        unsigned char *addr = lcd_fb + blockcount * LCD_FBWIDTH;
 #if LCD_DEPTH == 2
         unsigned fill = (0x55 * (~rb->lcd_get_background() & 3)) << bitcount;
 #else
@@ -581,7 +617,7 @@ void xlcd_scroll_down(int count)
 
 #if LCD_DEPTH == 2
         int x, by;
-        fb_data *addr = *rb->lcd_framebuffer + blockcount * LCD_FBWIDTH;
+        fb_data *addr = lcd_fb + blockcount * LCD_FBWIDTH;
         unsigned fill, mask;
         
         fill = patterns[rb->lcd_get_background() & 3] >> (8 - bitcount);
