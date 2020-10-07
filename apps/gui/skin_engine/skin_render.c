@@ -349,6 +349,8 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 {
     struct gui_wps *gwps = info->gwps;
     struct wps_data *data = gwps->data;
+    struct viewport *last_vp;
+
     /* Tags here are ones which need to be "turned off" or cleared 
      * if they are in a conditional branch which isnt being used */
     if (branch->type == LINE_ALTERNATOR)
@@ -420,22 +422,23 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
-                                void *backdrop = skin_backdrop_get_buffer(data->backdrop_id);
-                                gwps->display->set_framebuffer(backdrop);
+                                skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
                                 skin_backdrop_show(-1);
                             }
 #endif
-                            gwps->display->set_viewport(&skin_viewport->vp);
+                            last_vp = gwps->display->set_viewport(&skin_viewport->vp);
                             gwps->display->clear_viewport();
-                            gwps->display->set_viewport(&info->skin_vp->vp);
+                            gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
                             skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
 
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
-                                gwps->display->set_framebuffer(NULL);
+                                gwps->display->set_viewport_ex(last_vp, VP_FLAG_VP_SET_CLEAN);
                                 skin_backdrop_show(data->backdrop_id);
                             }
+#else
+    (void)last_vp;
 #endif
                         }
                     }
@@ -801,7 +804,16 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     
     int old_refresh_mode = refresh_mode;
     skin_buffer = get_skin_buffer(gwps->data);
-    
+
+    struct viewport*last_vp;
+    /* should already be the default buffer */
+    last_vp = display->set_viewport(NULL);
+
+    if (refresh_mode == SKIN_REFRESH_ALL)
+    {
+        if ((last_vp->flags & VP_FLAG_VP_SET_CLEAN) == VP_FLAG_VP_DIRTY)
+            display->clear_viewport();
+    }
 
     viewport = SKINOFFSETTOPTR(skin_buffer, data->tree);
     skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
@@ -822,12 +834,12 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         if (skin_viewport->output_to_backdrop_buffer)
         {
-            display->set_framebuffer(skin_backdrop_get_buffer(data->backdrop_id));
+            skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
             skin_backdrop_show(-1);
         }
         else
         {
-            display->set_framebuffer(NULL);
+            skin_backdrop_set_buffer(-1, skin_viewport);
             skin_backdrop_show(data->backdrop_id);
         }
 #endif
@@ -850,7 +862,8 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             skin_viewport->hidden_flags = VP_DRAW_HIDEABLE;
         }
         
-        display->set_viewport(&skin_viewport->vp);
+        display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
+
         if ((vp_refresh_mode&SKIN_REFRESH_ALL) == SKIN_REFRESH_ALL)
         {
             display->clear_viewport();
@@ -862,7 +875,6 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
         refresh_mode = old_refresh_mode;
     }
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    display->set_framebuffer(NULL);
     skin_backdrop_show(data->backdrop_id);
 #endif
 
@@ -873,7 +885,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
         send_event(GUI_EVENT_NEED_UI_UPDATE, NULL);
     }
     /* Restore the default viewport */
-    display->set_viewport(NULL);
+    display->set_viewport_ex(last_vp, VP_FLAG_VP_SET_CLEAN);
     display->update();
 }
 

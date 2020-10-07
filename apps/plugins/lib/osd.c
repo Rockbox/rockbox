@@ -52,6 +52,7 @@ struct osd
         OSD_ERASED,             /* Erased in preparation for regular drawing */
     } status;                   /* View status */
     struct viewport vp;         /* Clipping viewport */
+    struct frame_buffer_t framebuf; /* Holds framebuffer reference */
     int lcd_bitmap_stride;      /* Stride of LCD bitmap */
     void *lcd_bitmap_data;      /* Backbuffer framebuffer data */
     int back_bitmap_stride;     /* Stride of backbuffer bitmap */
@@ -68,7 +69,7 @@ struct osd
                              int height);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
-    void (*lcd_set_viewport)(struct viewport *vp);
+    struct viewport *(*lcd_set_viewport)(struct viewport *vp);
     void (*lcd_set_framebuffer)(void *buf);
     void (*lcd_framebuffer_set_pos)(int x, int y, int width, int height);
     void (*lcd_bitmap_part)(const void *src, int src_x, int src_y,
@@ -227,7 +228,8 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
     osd->back_bitmap_stride = w;
 #endif /* end stride type selection */
 
-    osd->lcd_bitmap_data = (void *)*rb->lcd_framebuffer;
+    /* vp is currently initialized to the default framebuffer */
+    osd->lcd_bitmap_data = osd->vp.buffer->data;
     osd->back_bitmap_data = buf;
 
     osd->maxwidth = w;
@@ -686,6 +688,25 @@ static void _osd_lcd_update_rect(struct osd *osd,
     osd->lcd_update_rect(x, y, width, height);
 }
 
+static void _osd_lcd_viewport_set_buffer(void *buffer)
+{
+    if (buffer)
+    {
+        native_osd.framebuf.data = buffer;
+        native_osd.framebuf.elems = native_osd.maxheight * native_osd.maxwidth;
+        native_osd.framebuf.get_address_fn = NULL; /*Default iterator*/
+
+        if (buffer == native_osd.back_bitmap_data)
+            native_osd.framebuf.stride = (native_osd.back_bitmap_stride);
+        else
+            native_osd.framebuf.stride = (native_osd.lcd_bitmap_stride);
+
+        rb->viewport_set_buffer(NULL, &native_osd.framebuf, SCREEN_MAIN);
+    }
+    else
+        rb->viewport_set_buffer(NULL, NULL, SCREEN_MAIN);
+}
+
 /* Native LCD, public */
 bool osd_init(unsigned flags, void *backbuf, size_t backbuf_size,
               osd_draw_cb_fn_t draw_cb, int *width, int *height,
@@ -696,7 +717,7 @@ bool osd_init(unsigned flags, void *backbuf, size_t backbuf_size,
     native_osd.lcd_update = rb->lcd_update;
     native_osd.lcd_update_rect = rb->lcd_update_rect;
     native_osd.lcd_set_viewport = rb->lcd_set_viewport;
-    native_osd.lcd_set_framebuffer = (void *)rb->lcd_set_framebuffer;
+    native_osd.lcd_set_framebuffer = (void *)_osd_lcd_viewport_set_buffer;
 #if LCD_DEPTH < 4
     native_osd.lcd_framebuffer_set_pos = NULL;
 #endif /* LCD_DEPTH < 4 */

@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "misc.h"
 #include "list.h"
+
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
 #define FG_FALLBACK global_settings.fg_color
@@ -43,7 +44,6 @@
 #define REMOTE_FG_FALLBACK LCD_REMOTE_DEFAULT_FG
 #define REMOTE_BG_FALLBACK LCD_REMOTE_DEFAULT_BG
 #endif
-
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
@@ -101,6 +101,7 @@ static void toggle_theme(enum screen_type screen, bool force)
     bool enable_event = false;
     static bool was_enabled[NB_SCREENS] = {false};
     static bool after_boot[NB_SCREENS] = {false};
+    struct viewport *last_vp;
 
     FOR_NB_SCREENS(i)
     {
@@ -111,6 +112,7 @@ static void toggle_theme(enum screen_type screen, bool force)
 
     if (is_theme_enabled(screen))
     {
+        last_vp = screens[screen].set_viewport(NULL);
         bool first_boot = theme_stack_top[screen] == 0;
         /* remove the left overs from the previous screen.
          * could cause a tiny flicker. Redo your screen code if that happens */
@@ -162,7 +164,7 @@ static void toggle_theme(enum screen_type screen, bool force)
                 screens[screen].clear_viewport();
                 screens[screen].update_viewport();
             }
-            screens[screen].set_viewport(NULL);
+            screens[screen].set_viewport(last_vp);
         }
         intptr_t force = first_boot?0:1;
 
@@ -282,11 +284,11 @@ static void set_default_align_flags(struct viewport *vp)
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
+    screens[screen].init_viewport(vp);
     vp->x = 0;
     vp->y = 0;
     vp->width = screens[screen].lcdwidth;
     vp->height = screens[screen].lcdheight;
-
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
@@ -312,9 +314,25 @@ void viewport_set_fullscreen(struct viewport *vp,
 #endif
 }
 
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer,
+                                                const enum screen_type screen)
+{
+    if (!vp) /* NULL vp grabs current framebuffer */
+        vp = *(screens[screen].current_viewport);
+
+    /* NULL sets default buffer */
+    if (buffer && buffer->elems == 0)
+        vp->buffer = NULL;
+    else
+        vp->buffer = buffer;
+    screens[screen].init_viewport(vp);
+}
+
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
+    vp->buffer = NULL; /* use default frame_buffer */
+
 #if !defined(__PCTOOL__)
     struct viewport *sbs_area = NULL;
     if (!is_theme_enabled(screen))
@@ -323,7 +341,7 @@ void viewport_set_defaults(struct viewport *vp,
         return;
     }
     sbs_area = sb_skin_get_info_vp(screen);
-    
+
     if (sbs_area)
         *vp = *sbs_area;
     else

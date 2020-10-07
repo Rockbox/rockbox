@@ -620,6 +620,14 @@ struct fps
 static struct osd osd;
 static struct fps fps NOCACHEBSS_ATTR; /* Accessed on other processor */
 
+#ifdef LCD_PORTRAIT
+static fb_data* get_framebuffer(void)
+{
+    struct viewport *vp_main = *(rb->screens[SCREEN_MAIN]->current_viewport);
+    return vp_main->buffer->fb_ptr;
+}
+#endif
+
 static void osd_show(unsigned show);
 
 #ifdef LCD_LANDSCAPE
@@ -821,7 +829,7 @@ static void draw_oriented_mono_bitmap_part(const unsigned char *src,
     src_y  &= 7;
     src_end = src + width;
 
-    dst = *rb->lcd_framebuffer + (LCD_WIDTH - y) + x*LCD_WIDTH;
+    dst = get_framebuffer() + (LCD_WIDTH - y) + x*LCD_WIDTH;
     do
     {
         const unsigned char *src_col = src++;
@@ -953,7 +961,7 @@ static void draw_oriented_alpha_bitmap_part(const unsigned char *src,
     fg_pattern =    rb->lcd_get_foreground();
     /*bg_pattern=*/ rb->lcd_get_background();
 
-    dst_start = *rb->lcd_framebuffer + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
+    dst_start = get_framebuffer() + (LCD_WIDTH - y - 1) + x*LCD_WIDTH;
     int col, row = height;
     unsigned data, pixels;
     unsigned skip_end = (stride - width);

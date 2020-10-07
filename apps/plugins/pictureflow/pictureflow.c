@@ -35,6 +35,7 @@
 #include "lib/feature_wrappers.h"
 
 /******************************* Globals ***********************************/
+static fb_data *lcd_fb;
 
 /*
  *  Targets which use plugin_get_audio_buffer() can't have playback from
@@ -190,7 +191,7 @@ GREY_INFO_STRUCT
 #define BUFFER_HEIGHT _grey_info.height
 typedef unsigned char pix_t;
 #else   /* LCD_DEPTH >= 8 */
-#define LCD_BUF *rb->lcd_framebuffer
+#define LCD_BUF lcd_fb
 #define G_PIX LCD_RGBPACK
 #define N_PIX LCD_RGBPACK
 #define G_BRIGHT(y) LCD_RGBPACK(y,y,y)
@@ -3847,6 +3848,9 @@ static int pictureflow_main(void)
 
 enum plugin_status plugin_start(const void *parameter)
 {
+    struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+    lcd_fb = vp_main->buffer->fb_ptr;
+
     int ret;
     (void) parameter;
 

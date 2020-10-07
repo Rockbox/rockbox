@@ -37,23 +37,6 @@
 int remote_type(void);
 #endif
 
-#if LCD_REMOTE_DEPTH <= 8
-#if (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED) \
- || (LCD_REMOTE_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
-typedef unsigned short fb_remote_data;
-#define FB_RDATA_SZ 2
-#else
-typedef unsigned char fb_remote_data;
-#define FB_RDATA_SZ 1
-#endif
-#elif LCD_DEPTH <= 16
-typedef unsigned short fb_remote_data;
-#define FB_RDATA_SZ 2
-#else
-typedef unsigned long fb_remote_data;
-#define FB_RDATA_SZ 4
-#endif
-
 #if LCD_REMOTE_DEPTH > 1 /* greyscale - 8 bit max */
 #ifdef HAVE_LCD_COLOR
 extern unsigned lcd_remote_color_to_native(unsigned color);
@@ -77,12 +60,18 @@ extern unsigned lcd_remote_color_to_native(unsigned color);
 
 /* Frame buffer dimensions (format checks only cover existing targets!) */
 #if LCD_REMOTE_DEPTH == 1
-#define LCD_REMOTE_FBHEIGHT ((LCD_REMOTE_HEIGHT+7)/8)
+#define LCD_REMOTE_FBSTRIDE(w, h) ((h+7)/8)
+#define LCD_REMOTE_FBHEIGHT LCD_REMOTE_FBSTRIDE(LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT)
+#define LCD_REMOTE_NBELEMS(w, h) (((w*LCD_REMOTE_FBSTRIDE(w, h)) + h)  / sizeof(fb_remote_data))
+
 #elif LCD_REMOTE_DEPTH == 2
 #if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
-#define LCD_REMOTE_FBHEIGHT ((LCD_REMOTE_HEIGHT+7)/8)
+#define LCD_REMOTE_FBSTRIDE(w, h) ((h+7)/8)
+#define LCD_REMOTE_FBHEIGHT LCD_REMOTE_FBSTRIDE(LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT)
+#define LCD_REMOTE_NBELEMS(w, h) (((w*LCD_REMOTE_FBSTRIDE(w, h)) + h)  / sizeof(fb_remote_data))
 #endif
 #endif /* LCD_REMOTE_DEPTH */
+
 /* Set defaults if not defined different yet. The defaults apply to both
  * dimensions for LCD_REMOTE_DEPTH >= 8 */
 #ifndef LCD_REMOTE_FBWIDTH
@@ -92,11 +81,15 @@ extern unsigned lcd_remote_color_to_native(unsigned color);
 #define LCD_REMOTE_FBHEIGHT LCD_REMOTE_HEIGHT
 #endif
 
-/* The actual framebuffer */
-extern fb_remote_data *lcd_remote_framebuffer;
-extern fb_remote_data lcd_remote_static_framebuffer[LCD_REMOTE_FBHEIGHT][LCD_REMOTE_FBWIDTH];
-#define FBREMOTEADDR(x, y) (lcd_remote_framebuffer + ((y) * LCD_REMOTE_FBWIDTH) + (x))
-#define FRAMEBUFFER_REMOTE_SIZE (sizeof(lcd_remote_static_framebuffer))
+#ifndef LCD_REMOTE_NBELEMS
+/* At this time (2020) known remote screens only have vertical stride */
+#define LCD_REMOTE_NBELEMS(w, h) ((w*STRIDE_REMOTE(w, h)) + h) / sizeof(fb_remote_data))
+#define LCD_REMOTE_FBSTRIDE(w, h) STRIDE_REMOTE(w, h)
+#endif
+
+extern struct viewport* lcd_remote_current_viewport;
+#define FBREMOTEADDR(x,y) (fb_remote_data *)(lcd_remote_current_viewport->buffer->get_address_fn(x, y))
+#define FRAMEBUFFER_REMOTE_SIZE (sizeof(fb_remote_data)*LCD_REMOTE_FBWIDTH*LCD_REMOTE_FBHEIGHT)
 
 #if LCD_REMOTE_DEPTH > 1
 extern void     lcd_remote_set_foreground(unsigned foreground);
@@ -170,7 +163,10 @@ extern void lcd_remote_init(void);
 extern int  lcd_remote_default_contrast(void);
 extern void lcd_remote_set_contrast(int val);
 
-extern void lcd_remote_set_viewport(struct viewport* vp);
+extern struct viewport* lcd_remote_init_viewport(struct viewport* vp);
+extern struct viewport* lcd_remote_set_viewport(struct viewport* vp);
+extern struct viewport* lcd_remote_set_viewport_ex(struct viewport* vp, int flags);
+
 extern void lcd_remote_clear_display(void);
 extern void lcd_remote_clear_viewport(void);
 extern void lcd_remote_puts(int x, int y, const unsigned char *str);
