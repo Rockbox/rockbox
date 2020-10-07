@@ -1052,6 +1052,9 @@ void I_FinishUpdate (void)
 	rb->lcd_blit_pal256(src, 0, 0, 0, 0, LCD_WIDTH, LCD_HEIGHT);
 #endif
 #elif defined(HAVE_LCD_COLOR)
+    static fb_data *lcd_fb = NULL;
+    if (!lcd_fb)
+        lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
 #if(LCD_HEIGHT>LCD_WIDTH)
     if(rotate_screen)
     {
@@ -1059,7 +1062,7 @@ void I_FinishUpdate (void)
 
         for (y = 1; y <= SCREENHEIGHT; y++)
         {
-            fb_data *dst = *rb->lcd_framebuffer + LCD_WIDTH - y;
+            fb_data *dst = lcd_fb + LCD_WIDTH - y;
             count = SCREENWIDTH;
 
             do
@@ -1073,7 +1076,7 @@ void I_FinishUpdate (void)
     else
 #endif
     {
-        fb_data *dst = *rb->lcd_framebuffer;
+        fb_data *dst = lcd_fb;
         count = SCREENWIDTH*SCREENHEIGHT;
 
         do
