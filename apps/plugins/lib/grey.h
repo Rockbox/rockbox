@@ -62,7 +62,7 @@ void grey_deferred_lcd_update(void);
 
 /* Viewports and framebuffers */
 void grey_clear_viewport(void);
-void grey_set_viewport(struct viewport *vp);
+struct viewport *grey_set_viewport(struct viewport *vp);
 void grey_viewport_set_fullscreen(struct viewport *vp,
                                   const enum screen_type screen);
 void grey_viewport_set_pos(struct viewport *vp,
