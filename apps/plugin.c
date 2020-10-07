@@ -194,9 +194,9 @@ static const struct plugin_api rockbox_api = {
     lcd_putsf,
     lcd_puts_scroll,
     lcd_scroll_stop,
-    &lcd_framebuffer,
+    //&lcd_framebuffer,
     lcd_set_viewport,
-    lcd_set_framebuffer,
+    //lcd_set_framebuffer,
     lcd_bmp_part,
     lcd_update_rect,
     lcd_set_drawmode,
@@ -303,6 +303,8 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
+    viewport_set_buffer,
+    _viewport_get_framebuffer, /* compatibility function for old plugins */
 
 #ifdef HAVE_BACKLIGHT
     /* lcd backlight */
@@ -914,7 +916,7 @@ int plugin_load(const char* plugin, const void* parameter)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
-
+    lcd_set_viewport(NULL);
     screen_helper_setfont(FONT_UI);
 #if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR

@@ -45,6 +45,8 @@ void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen);
 int get_viewport_default_colour(enum screen_type screen, bool fgcolour);
 
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer);
+
 #ifndef __PCTOOL__
 
 /*
@@ -62,6 +64,11 @@ void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw);
 
 /* call this when a theme changed */
 void viewportmanager_theme_changed(const int);
+
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer);
+
+/* viewport_get_framebuffer is for compatibility with old plugins */
+fb_data *_viewport_get_framebuffer(struct viewport *vp, size_t *size);
 
 #ifdef HAVE_TOUCHSCREEN
 bool viewport_point_within_vp(const struct viewport *vp,

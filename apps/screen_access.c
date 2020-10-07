@@ -35,6 +35,7 @@
 #include "backlight.h"
 #include "screen_access.h"
 #include "backdrop.h"
+#include "viewport.h"
 
 /* some helper functions to calculate metrics on the fly */
 static int screen_helper_getcharwidth(void)
@@ -157,6 +158,7 @@ struct screen screens[NB_SCREENS] =
 #endif
         .set_drawmode=&screen_helper_set_drawmode,
         .set_viewport=&lcd_set_viewport,
+        .viewport_set_buffer = &viewport_set_buffer,
         .getwidth=&lcd_getwidth,
         .getheight=&lcd_getheight,
         .getstringsize=&lcd_getstringsize,
@@ -221,7 +223,6 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&backdrop_load,
         .backdrop_show=&backdrop_show,
 #endif
-        .set_framebuffer = (void*)lcd_set_framebuffer,
 #if defined(HAVE_LCD_COLOR)    
         .gradient_fillrect = lcd_gradient_fillrect,
         .gradient_fillrect_part = lcd_gradient_fillrect_part,
@@ -307,7 +308,7 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&remote_backdrop_load,
         .backdrop_show=&remote_backdrop_show,
 #endif
-        .set_framebuffer = (void*)lcd_remote_set_framebuffer,
+        //.set_framebuffer = (void*)lcd_remote_set_framebuffer,
         .put_line = screen_helper_remote_put_line,
     }
 #endif /* NB_SCREENS == 2 */
