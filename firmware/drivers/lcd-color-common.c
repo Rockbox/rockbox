@@ -40,22 +40,38 @@ fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
 fb_data *lcd_framebuffer = &lcd_static_framebuffer[0][0];
 
+static fb_data *lcd_frameaddress_default(int x, int y);
+fb_data *(*lcd_frameaddress)(int x, int y) = &lcd_frameaddress_default;
+
+
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
 
-static struct viewport default_vp =
+struct viewport default_vp =
 {
     .x        = 0,
     .y        = 0,
     .width    = LCD_WIDTH,
     .height   = LCD_HEIGHT,
+    .stride   = STRIDE_MAIN(LCD_FBWIDTH, LCD_FBHEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .fg_pattern = LCD_DEFAULT_FG,
-    .bg_pattern = LCD_DEFAULT_BG,
+    .data     = &lcd_static_framebuffer[0][0],
+    .frameaddress = &lcd_frameaddress_default,
+    .fg_pattern   = LCD_DEFAULT_FG,
+    .bg_pattern   = LCD_DEFAULT_BG,
 };
 
 static struct viewport* current_vp IDATA_ATTR = &default_vp;
+
+static fb_data *lcd_frameaddress_default(int x, int y)
+{
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    return current_vp->data + ((x) * current_vp->stride) + (y);
+#else
+    return current_vp->data + ((y) * current_vp->stride) + (x);
+#endif
+}
 
 /* LCD init */
 void lcd_init(void)

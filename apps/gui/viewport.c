@@ -44,6 +44,7 @@
 #define REMOTE_BG_FALLBACK LCD_REMOTE_DEFAULT_BG
 #endif
 
+extern struct viewport default_vp;
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
@@ -282,11 +283,7 @@ static void set_default_align_flags(struct viewport *vp)
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
-    vp->x = 0;
-    vp->y = 0;
-    vp->width = screens[screen].lcdwidth;
-    vp->height = screens[screen].lcdheight;
-
+    memcpy(vp, &default_vp, sizeof(struct viewport));
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif

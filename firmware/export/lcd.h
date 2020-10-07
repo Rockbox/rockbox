@@ -27,27 +27,6 @@
 #include "config.h"
 #include "events.h"
 
-#define VP_FLAG_ALIGN_RIGHT  0x01
-#define VP_FLAG_ALIGN_CENTER 0x02
-
-#define VP_FLAG_ALIGNMENT_MASK \
-        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
-
-#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
-
-struct viewport {
-    int x;
-    int y;
-    int width;
-    int height;
-    int flags;
-    int font;
-    int drawmode;
-    /* needed for even for mono displays to support greylib */
-    unsigned fg_pattern;
-    unsigned bg_pattern;
-};
-
 /* Frame buffer stride
  *
  * Stride describes the amount that you need to increment to get to the next
@@ -155,6 +134,29 @@ void lcd_set_mode(int mode);
 #endif
 #endif
 
+#define VP_FLAG_ALIGN_RIGHT  0x01
+#define VP_FLAG_ALIGN_CENTER 0x02
+
+#define VP_FLAG_ALIGNMENT_MASK \
+        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
+
+#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
+
+struct viewport {
+    int x;
+    int y;
+    int width;
+    int height;
+    int stride;
+    int flags;
+    int font;
+    int drawmode;
+    fb_data *data;
+    fb_data *(*frameaddress)(int x, int y);
+    /* needed for even for mono displays to support greylib */
+    unsigned fg_pattern;
+    unsigned bg_pattern;
+};
 
 /* common functions */
 extern void lcd_write_command(int byte);
@@ -434,13 +436,21 @@ static inline unsigned fb_to_scalar(fb_data p)
 #endif
 /* The actual framebuffer */
 extern fb_data *lcd_framebuffer;
+
+extern fb_data *(*lcd_frameaddress)(int x, int y);
+
+#define FBADDR(x,y) (lcd_frameaddress(x, y))
+
+#define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
+
+#if 0
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define FBADDR(x, y) (lcd_framebuffer + ((x) * LCD_FBHEIGHT) + (y))
 #else
 #define FBADDR(x, y) (lcd_framebuffer + ((y) * LCD_FBWIDTH) + (x))
 #endif
 #define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
-
+#endif
 /** Port-specific functions. Enable in port config file. **/
 #ifdef HAVE_REMOTE_LCD_AS_MAIN
 void lcd_on(void);
