@@ -183,6 +183,7 @@ static void gui_statusbar_init(struct gui_statusbar * bar)
 void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct viewport *vp)
 {
     struct screen * display = bar->display;
+    struct viewport *last_vp = NULL;
 
     if (!display)
         return;
@@ -267,7 +268,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
 #endif
         memcmp(&(bar->info), &(bar->lastinfo), sizeof(struct status_info)))
     {
-        display->set_viewport(vp);
+        last_vp = display->set_viewport(vp);
         display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
         display->fill_viewport();
         display->set_drawmode(DRMODE_SOLID);
@@ -343,7 +344,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
             gui_statusbar_led(display);
 #endif
         display->update_viewport();
-        display->set_viewport(NULL);
+        display->set_viewport(last_vp);
         bar->lastinfo = bar->info;
     }
 }

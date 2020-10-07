@@ -156,8 +156,9 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
         }
     }
 
-    /* Stash and restore these three, so that the scroll_func
+    /* Stash and restore these four, so that the scroll_func
      * can do whatever it likes without destroying the state */
+    struct frame_buffer_t *framebuf = s->vp->buffer;
     unsigned drawmode;
 #if LCD_DEPTH > 1
     unsigned fg_pattern, bg_pattern;
@@ -174,6 +175,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     s->vp->bg_pattern = bg_pattern;
 #endif
     s->vp->drawmode = drawmode;
+    s->vp->buffer = framebuf;
 
     return ended;
 }

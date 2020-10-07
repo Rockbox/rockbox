@@ -287,7 +287,7 @@ static char* get_skin_filename(char *buf, size_t buf_size,
 }
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen)
-{
+{ 
     if (skin == CUSTOM_STATUSBAR && !skins_initialised)
         return &skins[skin][screen].gui_wps;
 
@@ -312,7 +312,35 @@ struct wps_state *skin_get_global_state(void)
 bool skin_do_full_update(enum skinnable_screens skin,
                             enum screen_type screen)
 {
-    bool ret = skins[skin][screen].needs_full_update;
+    bool vp_is_dirty = false;
+    char* skin_buffer;
+    struct gui_wps *gwps;
+    struct skin_element* viewport;
+    struct skin_viewport* skin_viewport;
+
+    for (int i=0; i<SKINNABLE_SCREENS_COUNT; i++)
+    {
+        gwps = skin_get_gwps(i, screen);
+        skin_buffer = get_skin_buffer(gwps->data);
+        viewport = SKINOFFSETTOPTR(skin_buffer, gwps->data->tree);
+        skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
+        struct viewport *vp = &(skin_viewport->vp);
+        vp_is_dirty = (vp->flags & VP_FLAG_VP_DIRTY) == VP_FLAG_VP_DIRTY;
+    }
+
+                
+
+
+
+
+
+
+
+
+
+
+
+    bool ret = (skins[skin][screen].needs_full_update || vp_is_dirty);
     skins[skin][screen].needs_full_update = false;
     return ret;
 }
