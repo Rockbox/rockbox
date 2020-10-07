@@ -36,6 +36,8 @@
 
 
 /******************************* Globals ***********************************/
+static fb_data *lcd_fb;
+
 
 static unsigned char wave_array[256];  /* Pre calculated wave array */
 #ifdef HAVE_LCD_COLOR
@@ -201,9 +203,9 @@ int main(void)
 #ifdef HAVE_LCD_COLOR
         shades_generate(time++); /* dynamically */
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        ptr = (unsigned char*)*rb->lcd_framebuffer;
+        ptr = (unsigned char*)lcd_fb;
 #else
-        ptr = *rb->lcd_framebuffer;
+        ptr = lcd_fb;
 #endif
 
 #else
@@ -237,7 +239,7 @@ int main(void)
         p4-=sp4;
 #ifdef HAVE_LCD_COLOR
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-        rb->lcd_blit_pal256(    (unsigned char*)*rb->lcd_framebuffer,
+        rb->lcd_blit_pal256(    (unsigned char*)lcd_fb,
                                 0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
 #else
         rb->lcd_update();
@@ -326,5 +328,7 @@ enum plugin_status plugin_start(const void* parameter)
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
+    lcd_fb = rb->_viewport_get_framebuffer(NULL, NULL, SCREEN_MAIN);
+
     return main();
 }
