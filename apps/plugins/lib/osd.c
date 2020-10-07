@@ -227,7 +227,7 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
     osd->back_bitmap_stride = w;
 #endif /* end stride type selection */
 
-    osd->lcd_bitmap_data = (void *)*rb->lcd_framebuffer;
+    osd->lcd_bitmap_data = (void *)rb->_viewport_get_framebuffer(NULL, NULL);
     osd->back_bitmap_data = buf;
 
     osd->maxwidth = w;
@@ -696,7 +696,6 @@ bool osd_init(unsigned flags, void *backbuf, size_t backbuf_size,
     native_osd.lcd_update = rb->lcd_update;
     native_osd.lcd_update_rect = rb->lcd_update_rect;
     native_osd.lcd_set_viewport = rb->lcd_set_viewport;
-    native_osd.lcd_set_framebuffer = (void *)rb->lcd_set_framebuffer;
 #if LCD_DEPTH < 4
     native_osd.lcd_framebuffer_set_pos = NULL;
 #endif /* LCD_DEPTH < 4 */

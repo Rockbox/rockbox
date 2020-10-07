@@ -44,6 +44,7 @@
 #define REMOTE_BG_FALLBACK LCD_REMOTE_DEFAULT_BG
 #endif
 
+extern struct viewport default_vp;
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
@@ -282,11 +283,7 @@ static void set_default_align_flags(struct viewport *vp)
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
-    vp->x = 0;
-    vp->y = 0;
-    vp->width = screens[screen].lcdwidth;
-    vp->height = screens[screen].lcdheight;
-
+    memcpy(vp, &default_vp, sizeof(struct viewport));
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
@@ -310,6 +307,35 @@ void viewport_set_fullscreen(struct viewport *vp,
         vp->bg_pattern = LCD_REMOTE_DEFAULT_BG;
     }
 #endif
+}
+
+fb_data *_viewport_get_framebuffer(struct viewport *vp, size_t *size)
+{
+    /* this function is here for compatibility with old plugins
+     * the viewports + lcd functions are flexible enough to do this..
+    */
+    struct frame_buffer_t *buffer;
+    /* NULL denotes default buffer */
+    buffer = vp->buffer;
+    if (!buffer)
+        buffer = &lcd_framebuffer_default;
+    if (size)
+        *size = vp->buffer->elems * sizeof(fb_data);
+
+    return buffer->data;
+}
+
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer)
+{
+    /* NULL sets default buffer */
+
+    if (!buffer)
+        vp->buffer = &lcd_framebuffer_default;
+    else
+        vp->buffer = buffer;
+
+    if (!vp->buffer->get_address_fn) /* default iterator */
+        vp->buffer->get_address_fn = lcd_framebuffer_default.get_address_fn;
 }
 
 void viewport_set_defaults(struct viewport *vp,

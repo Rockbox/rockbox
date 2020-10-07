@@ -211,6 +211,20 @@ void* skin_backdrop_get_buffer(int backdrop_id)
     return backdrops[backdrop_id].buffer;
 }
 
+void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp)
+{
+    if (!svp)
+        return;
+    if (backdrop_id < 0)
+    {
+        svp->vp.buffer = NULL; /*Default*/
+        return;
+    }
+
+    svp->vp.buffer->elems = LCD_BACKDROP_BYTES / sizeof(fb_data);
+    svp->vp.buffer->data = (fb_data *) backdrops[backdrop_id].buffer;
+}
+
 void skin_backdrop_show(int backdrop_id)
 {
     if (backdrop_id < 0)

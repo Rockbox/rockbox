@@ -23,30 +23,10 @@
 #define __LCD_H__
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "cpu.h"
 #include "config.h"
 #include "events.h"
-
-#define VP_FLAG_ALIGN_RIGHT  0x01
-#define VP_FLAG_ALIGN_CENTER 0x02
-
-#define VP_FLAG_ALIGNMENT_MASK \
-        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
-
-#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
-
-struct viewport {
-    int x;
-    int y;
-    int width;
-    int height;
-    int flags;
-    int font;
-    int drawmode;
-    /* needed for even for mono displays to support greylib */
-    unsigned fg_pattern;
-    unsigned bg_pattern;
-};
 
 /* Frame buffer stride
  *
@@ -155,6 +135,34 @@ void lcd_set_mode(int mode);
 #endif
 #endif
 
+struct frame_buffer_t {
+    fb_data *data;
+    fb_data *(*get_address_fn)(int x, int y);
+    size_t   elems;
+};
+
+#define VP_FLAG_ALIGN_RIGHT  0x01
+#define VP_FLAG_ALIGN_CENTER 0x02
+
+#define VP_FLAG_ALIGNMENT_MASK \
+        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
+
+#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
+
+struct viewport {
+    int x;
+    int y;
+    int width;
+    int height;
+    int stride;
+    int flags;
+    int font;
+    int drawmode;
+    struct frame_buffer_t *buffer;
+    /* needed for even for mono displays to support greylib */
+    unsigned fg_pattern;
+    unsigned bg_pattern;
+};
 
 /* common functions */
 extern void lcd_write_command(int byte);
@@ -163,6 +171,8 @@ extern void lcd_write_command_ex(int cmd, int data1, int data2);
 extern void lcd_write_data(const fb_data* p_bytes, int count);
 extern void lcd_init(void) INIT_ATTR;
 extern void lcd_init_device(void) INIT_ATTR;
+extern struct viewport * lcd_get_default_viewport(void);
+extern struct frame_buffer_t lcd_framebuffer_default;
 
 extern void lcd_backlight(bool on);
 extern int  lcd_default_contrast(void);
@@ -434,13 +444,23 @@ static inline unsigned fb_to_scalar(fb_data p)
 #endif
 /* The actual framebuffer */
 extern fb_data *lcd_framebuffer;
+
+extern fb_data *(*lcd_frameaddress)(int x, int y);
+
+extern struct frame_buffer_t *lcd_framebuf;
+
+#define FBADDR(x,y) (lcd_frameaddress(x, y))
+
+#define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
+
+#if 0
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define FBADDR(x, y) (lcd_framebuffer + ((x) * LCD_FBHEIGHT) + (y))
 #else
 #define FBADDR(x, y) (lcd_framebuffer + ((y) * LCD_FBWIDTH) + (x))
 #endif
 #define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
-
+#endif
 /** Port-specific functions. Enable in port config file. **/
 #ifdef HAVE_REMOTE_LCD_AS_MAIN
 void lcd_on(void);

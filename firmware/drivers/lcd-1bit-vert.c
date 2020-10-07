@@ -48,17 +48,37 @@
 FBFN(data) LCDFN(static_framebuffer)[LCDM(FBHEIGHT)][LCDM(FBWIDTH)] IRAM_LCDFRAMEBUFFER;
 FBFN(data) *LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
 
+static fb_data *lcd_frameaddress_default(int x, int y);
+
+static struct frame_buffer_t lcd_framebuffer_default =
+{
+    .buffer         = &lcd_static_framebuffer[0][0],
+    .get_address_fn = &lcd_frameaddress_default,
+    .elems          = (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT),
+};
+
 static struct viewport default_vp =
 {
     .x        = 0,
     .y        = 0,
     .width    = LCDM(WIDTH),
     .height   = LCDM(HEIGHT),
+    .stride   = STRIDE_MAIN(LCD_FBWIDTH, LCD_FBHEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
+    .buffer   = &lcd_framebuffer_default,
 };
 
 static struct viewport* current_vp = &default_vp;
+
+static fb_data *lcd_frameaddress_default(int x, int y)
+{
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+    return current_vp->data + ((x) * current_vp->stride) + (y);
+#else
+    return current_vp->data + ((y) * current_vp->stride) + (x);
+#endif
+}
 
 /* LCD init */
 void LCDFN(init)(void)

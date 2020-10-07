@@ -40,6 +40,7 @@
 #define MAIN_LCD
 #endif
 
+#if 1
 void LCDFN(set_framebuffer)(FBFN(data) *fb)
 {
     if (fb)
@@ -47,7 +48,7 @@ void LCDFN(set_framebuffer)(FBFN(data) *fb)
     else
         LCDFN(framebuffer) = &LCDFN(static_framebuffer)[0][0];
 }
-
+#endif
 /*
  * draws the borders of the current viewport
  **/
@@ -72,7 +73,19 @@ void LCDFN(set_viewport)(struct viewport* vp)
     if (vp == NULL)
         current_vp = &default_vp;
     else
+    {
+        /* use defaults if no buffer is provided */
+        if (vp->buffer == NULL || vp->buffer->elems == 0)
+            vp->buffer = default_vp.buffer;
+        else if (vp->buffer->data == NULL)
+            vp->buffer->data = default_vp.buffer->data;
+        else if (vp->buffer->get_address_fn == NULL)
+            vp->buffer->get_address_fn = default_vp.buffer->get_address_fn;
+
+
         current_vp = vp;
+    }
+
 
 #if LCDM(DEPTH) > 1
     LCDFN(set_foreground)(current_vp->fg_pattern);

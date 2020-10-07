@@ -204,7 +204,7 @@ struct plugin_api {
     void (*lcd_putsf)(int x, int y, const unsigned char *fmt, ...);
     bool (*lcd_puts_scroll)(int x, int y, const unsigned char* string);
     void (*lcd_scroll_stop)(void);
-    fb_data** lcd_framebuffer;
+    //fb_data** lcd_framebuffer;
     void (*lcd_set_viewport)(struct viewport* vp);
     void (*lcd_set_framebuffer)(fb_data *fb);
     void (*lcd_bmp_part)(const struct bitmap *bm, int src_x, int src_y,
@@ -338,6 +338,8 @@ struct plugin_api {
     void (*viewportmanager_theme_undo)(enum screen_type screen, bool force_redraw);
     void (*viewport_set_fullscreen)(struct viewport *vp,
                                     const enum screen_type screen);
+    /* compatibility function for old plugins */
+    fb_data *(*_viewport_get_framebuffer)(struct viewport *vp, size_t *size);
 
 #ifdef HAVE_BACKLIGHT
     /* lcd backlight */
