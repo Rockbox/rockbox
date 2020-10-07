@@ -795,33 +795,34 @@ static int cat_playlist_callback(int action,
 
 static void draw_slider(void)
 {
+    struct viewport *last_vp;
     FOR_NB_SCREENS(i)
     {
         struct viewport vp;
         int slider_height = 2*screens[i].getcharheight();
         viewport_set_defaults(&vp, i);
-        screens[i].set_viewport(&vp);
+        last_vp = screens[i].set_viewport(&vp);
         show_busy_slider(&screens[i], 1, vp.height - slider_height,
                          vp.width-2, slider_height-1);
         screens[i].update_viewport();
-        screens[i].set_viewport(NULL);
+        screens[i].set_viewport(last_vp);
     }
 }
 
 static void clear_display(bool update)
 {
     struct viewport vp;
-
+    struct viewport *last_vp;
     FOR_NB_SCREENS(i)
     {
         struct screen * screen = &screens[i];
         viewport_set_defaults(&vp, screen->screen_type);
-        screen->set_viewport(&vp);
+        last_vp = screen->set_viewport(&vp);
         screen->clear_viewport();
         if (update) {
             screen->update_viewport();
         }
-        screen->set_viewport(NULL);
+        screen->set_viewport(last_vp);
     }
 }
 
