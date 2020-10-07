@@ -31,6 +31,7 @@
 #include "settings.h"
 #include "misc.h"
 #include "list.h"
+
 /*some short cuts for fg/bg/line selector handling */
 #ifdef HAVE_LCD_COLOR
 #define FG_FALLBACK global_settings.fg_color
@@ -43,7 +44,6 @@
 #define REMOTE_FG_FALLBACK LCD_REMOTE_DEFAULT_FG
 #define REMOTE_BG_FALLBACK LCD_REMOTE_DEFAULT_BG
 #endif
-
 
 /* all below isn't needed for pc tools (i.e. checkwps/wps editor)
  * only viewport_parse_viewport() is */
@@ -282,11 +282,7 @@ static void set_default_align_flags(struct viewport *vp)
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen)
 {
-    vp->x = 0;
-    vp->y = 0;
-    vp->width = screens[screen].lcdwidth;
-    vp->height = screens[screen].lcdheight;
-
+    screens[screen].init_viewport(vp);
 #ifndef __PCTOOL__
     set_default_align_flags(vp);
 #endif
@@ -312,9 +308,52 @@ void viewport_set_fullscreen(struct viewport *vp,
 #endif
 }
 
+void *_viewport_get_framebuffer(struct viewport *vp, size_t *size,
+                                        const enum screen_type screen)
+{
+    /* this function is here for compatibility with old plugins
+     * the viewports + lcd functions are flexible enough to do this..
+    */
+
+    void *fb = NULL;
+    size_t sz = 0;
+    size_t elem_sz = sizeof(fb_data);
+#if defined(HAVE_REMOTE_LCD)
+    if (screen == SCREEN_REMOTE)
+        elem_sz = sizeof(fb_remote_data);
+#endif
+
+    if (!vp || !vp->buffer) /* NULL denotes default buffer before init */
+        vp = *(screens[screen].current_viewport); 
+
+    if (vp->buffer)
+    {
+        sz = vp->buffer->elems * elem_sz;
+        fb = (void*) vp->buffer->data;
+    }
+
+    if (size)
+            *size = sz;
+    return fb;
+}
+
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer)
+{
+    /* NULL sets default buffer */
+    if (!buffer || buffer->elems == 0)
+        vp->buffer = NULL;
+    else
+        vp->buffer = buffer;
+}
+
 void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
+    vp->buffer = NULL; /* use default frame_buffer */
+    vp->x = 0;
+    vp->y = 0;
+    vp->width = screens[screen].lcdwidth;
+    vp->height = screens[screen].lcdheight;
 #if !defined(__PCTOOL__)
     struct viewport *sbs_area = NULL;
     if (!is_theme_enabled(screen))
