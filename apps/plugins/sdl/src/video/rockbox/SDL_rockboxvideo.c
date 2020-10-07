@@ -67,6 +67,7 @@
 #define RBSDL_EXTRA0 SDLK_0
 
 /* Initialization/Query functions */
+static fb_data *lcd_fb;
 static int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat);
 static SDL_Rect **ROCKBOX_ListModes(_THIS, SDL_PixelFormat *format, Uint32 flags);
 static SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current, int width, int height, int bpp, Uint32 flags);
@@ -447,6 +448,8 @@ static void rb_pixelformat(SDL_PixelFormat *vformat)
 
 int ROCKBOX_VideoInit(_THIS, SDL_PixelFormat *vformat)
 {
+    struct viewport *vp_main = *(rb->screens[SCREEN_MAIN]->current_viewport);
+    lcd_fb = vp_main->buffer->fb_ptr;
     /* we change this during the SDL_SetVideoMode implementation... */
     rb_pixelformat(vformat);
 
@@ -639,7 +642,7 @@ SDL_Surface *ROCKBOX_SetVideoMode(_THIS, SDL_Surface *current,
     this->hidden->w = current->w = width;
     this->hidden->h = current->h = height;
     current->pitch = current->w * (bpp / 8);
-    current->pixels = this->hidden->direct ? *rb->lcd_framebuffer : this->hidden->buffer;
+    current->pixels = this->hidden->direct ? lcd_fb : this->hidden->buffer;
 
     /* We're done */
     return(current);
@@ -674,7 +677,7 @@ static void flip_pixels(int x, int y, int w, int h)
         for(int x_0 = x; x_0 < x + w; ++x_0)
         {
             /* swap pixels directly in the framebuffer */
-            *rb->lcd_framebuffer[y_0 * LCD_WIDTH + x_0] = swap16(*rb->lcd_framebuffer[y_0 * LCD_WIDTH + x_0]);
+            lcd_fb[y_0 * LCD_WIDTH + x_0] = swap16(lcd_fb[y_0 * LCD_WIDTH + x_0]);
         }
     }
 }
@@ -684,7 +687,7 @@ static void blit_rotated(fb_data *src, int x, int y, int w, int h)
 {
     for(int y_0 = y; y_0 < y + h; ++y_0)
         for(int x_0 = x; x_0 < x + w; ++x_0)
-            *rb->lcd_framebuffer[x_0 * LCD_WIDTH + y_0] = src[(LCD_WIDTH - y_0) * LCD_HEIGHT + x_0];
+            lcd_fb[x_0 * LCD_WIDTH + y_0] = src[(LCD_WIDTH - y_0) * LCD_HEIGHT + x_0];
 }
 
 static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
@@ -720,7 +723,7 @@ static void ROCKBOX_UpdateRects(_THIS, int numrects, SDL_Rect *rects)
 
                     out_bmp.width = LCD_WIDTH;
                     out_bmp.height = LCD_HEIGHT;
-                    out_bmp.data = (char*)*rb->lcd_framebuffer;
+                    out_bmp.data = (char*)lcd_fb;
                     simple_resize_bitmap(&in_bmp, &out_bmp);
                 }
                 else

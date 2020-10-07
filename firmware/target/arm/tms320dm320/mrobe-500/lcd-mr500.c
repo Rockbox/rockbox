@@ -489,7 +489,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 
 #if defined(LCD_USE_DMA)
-    dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_WIDTH, 
+    dma_start_transfer16( (char *)FBADDR(0,0), x, y, LCD_WIDTH, 
         x, y, width, height, 2);
 #else
     register fb_data *dst;
@@ -514,7 +514,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 
 #if defined(LCD_USE_DMA)
-    dma_start_transfer16( (char *)lcd_framebuffer, x, y, LCD_HEIGHT, 
+    dma_start_transfer16( (char *)FBADDR(0,0), x, y, LCD_HEIGHT, 
         x, y, width, height, 2);
 #else
     fb_data *src;

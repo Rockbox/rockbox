@@ -23,30 +23,11 @@
 #define __LCD_H__
 
 #include <stdbool.h>
+#include <stddef.h>
 #include "cpu.h"
 #include "config.h"
 #include "events.h"
 
-#define VP_FLAG_ALIGN_RIGHT  0x01
-#define VP_FLAG_ALIGN_CENTER 0x02
-
-#define VP_FLAG_ALIGNMENT_MASK \
-        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
-
-#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
-
-struct viewport {
-    int x;
-    int y;
-    int width;
-    int height;
-    int flags;
-    int font;
-    int drawmode;
-    /* needed for even for mono displays to support greylib */
-    unsigned fg_pattern;
-    unsigned bg_pattern;
-};
 
 /* Frame buffer stride
  *
@@ -101,7 +82,7 @@ enum screen_type {
 
 struct scrollinfo;
 
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define STRIDE_MAIN(w, h)   (h)
 #else
 #define STRIDE_MAIN(w, h)   (w)
@@ -142,6 +123,25 @@ typedef unsigned long fb_data;
 #define FB_DATA_SZ 4
 #endif /* LCD_DEPTH */
 
+#ifdef HAVE_REMOTE_LCD
+#if LCD_REMOTE_DEPTH <= 8
+#if (LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED) \
+ || (LCD_REMOTE_PIXELFORMAT == HORIZONTAL_INTERLEAVED)
+typedef unsigned short fb_remote_data;
+#define FB_RDATA_SZ 2
+#else
+typedef unsigned char fb_remote_data;
+#define FB_RDATA_SZ 1
+#endif
+#elif LCD_DEPTH <= 16
+typedef unsigned short fb_remote_data;
+#define FB_RDATA_SZ 2
+#else
+typedef unsigned long fb_remote_data;
+#define FB_RDATA_SZ 4
+#endif
+#endif
+
 #if defined(HAVE_LCD_MODES)
 void lcd_set_mode(int mode);
 #define LCD_MODE_RGB565 0x00000001
@@ -155,6 +155,46 @@ void lcd_set_mode(int mode);
 #endif
 #endif
 
+struct frame_buffer_t {
+    union
+    {
+        void           *data;
+        char           *ch_ptr;
+        fb_data        *fb_ptr;
+#ifdef HAVE_REMOTE_LCD
+        fb_remote_data *fb_remote_ptr;
+#endif
+    };
+    void   *(*get_address_fn)(int x, int y);
+    ptrdiff_t stride;
+    size_t    elems;
+};
+
+#define VP_FLAG_ALIGN_RIGHT  0x01
+#define VP_FLAG_ALIGN_CENTER 0x02
+
+#define VP_FLAG_ALIGNMENT_MASK \
+        (VP_FLAG_ALIGN_RIGHT|VP_FLAG_ALIGN_CENTER)
+
+#define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
+
+#define VP_FLAG_VP_DIRTY 0x4000
+#define VP_FLAG_CLEAR_FLAG 0x8000
+#define VP_FLAG_VP_SET_CLEAN (VP_FLAG_CLEAR_FLAG | VP_FLAG_VP_DIRTY)
+
+struct viewport {
+    int x;
+    int y;
+    int width;
+    int height;
+    int flags;
+    int font;
+    int drawmode;
+    struct frame_buffer_t *buffer;
+    /* needed for even for mono displays to support greylib */
+    unsigned fg_pattern;
+    unsigned bg_pattern;
+};
 
 /* common functions */
 extern void lcd_write_command(int byte);
@@ -171,7 +211,10 @@ extern int  lcd_getwidth(void);
 extern int  lcd_getheight(void);
 extern int  lcd_getstringsize(const unsigned char *str, int *w, int *h);
 
-extern void lcd_set_viewport(struct viewport* vp);
+extern struct viewport* lcd_init_viewport(struct viewport* vp);
+extern struct viewport* lcd_set_viewport(struct viewport* vp);
+extern struct viewport* lcd_set_viewport_ex(struct viewport* vp, int flags);
+
 extern void lcd_update(void);
 extern void lcd_update_viewport(void);
 extern void lcd_update_viewport_rect(int x, int y, int width, int height);
@@ -411,17 +454,27 @@ static inline unsigned fb_to_scalar(fb_data p)
 /* Frame buffer dimensions */
 #if LCD_DEPTH == 1
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define LCD_FBWIDTH ((LCD_WIDTH+7)/8)
+#define LCD_FBSTRIDE(w, h) ((w+7)/8)
+#define LCD_FBWIDTH LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
+#define LCD_NBELEMS(w, h) (((h*LCD_FBSTRIDE(w, h)) + w) / sizeof(fb_data))
 #else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
-#define LCD_FBHEIGHT ((LCD_HEIGHT+7)/8)
+#define LCD_FBSTRIDE(w, h) ((h+7)/8)
+#define LCD_FBHEIGHT LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
+#define LCD_NBELEMS(w, h) (((w*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
-#define LCD_FBWIDTH ((LCD_WIDTH+3)/4)
+#define LCD_FBSTRIDE(w, h) ((w+3)/4)
+#define LCD_FBWIDTH LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
+#define LCD_NBELEMS(w, h) (((h*LCD_FBSTRIDE(w, h)) + w) / sizeof(fb_data))
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
-#define LCD_FBHEIGHT ((LCD_HEIGHT+3)/4)
+#define LCD_FBSTRIDE(w, h) ((h+3)/4)
+#define LCD_FBHEIGHT LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
+#define LCD_NBELEMS(w, h) (((w*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
-#define LCD_FBHEIGHT ((LCD_HEIGHT+7)/8)
+#define LCD_FBSTRIDE(w, h) ((h+7)/8)
+#define LCD_FBHEIGHT LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
+#define LCD_NBELEMS(w, h) (((w*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
 #endif /* LCD_PIXELFORMAT */
 #endif /* LCD_DEPTH */
 /* Set defaults if not defined different yet. The defaults apply to both
@@ -432,13 +485,20 @@ static inline unsigned fb_to_scalar(fb_data p)
 #ifndef LCD_FBHEIGHT
 #define LCD_FBHEIGHT LCD_HEIGHT
 #endif
-/* The actual framebuffer */
-extern fb_data *lcd_framebuffer;
+
+#ifndef LCD_NBELEMS
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define FBADDR(x, y) (lcd_framebuffer + ((x) * LCD_FBHEIGHT) + (y))
+#define LCD_NBELEMS(w, h) ((w*STRIDE_MAIN(w, h)) + h)
 #else
-#define FBADDR(x, y) (lcd_framebuffer + ((y) * LCD_FBWIDTH) + (x))
+#define LCD_NBELEMS(w, h) ((h*STRIDE_MAIN(w, h)) + w)
 #endif
+#define LCD_FBSTRIDE(w, h) STRIDE_MAIN(w, h) 
+#endif
+
+extern struct viewport* lcd_current_viewport;
+
+#define FBADDR(x,y) ((fb_data*) lcd_current_viewport->buffer->get_address_fn(x, y))
+
 #define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
 
 /** Port-specific functions. Enable in port config file. **/
@@ -535,7 +595,6 @@ extern void lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
 extern void lcd_bitmap(const fb_data *src, int x, int y, int width,
                        int height);
-extern void lcd_set_framebuffer(fb_data *fb);
 
 extern void lcd_scroll_step(int pixels);
 

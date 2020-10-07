@@ -287,7 +287,7 @@ static char* get_skin_filename(char *buf, size_t buf_size,
 }
 
 struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type screen)
-{
+{ 
     if (skin == CUSTOM_STATUSBAR && !skins_initialised)
         return &skins[skin][screen].gui_wps;
 
@@ -312,7 +312,13 @@ struct wps_state *skin_get_global_state(void)
 bool skin_do_full_update(enum skinnable_screens skin,
                             enum screen_type screen)
 {
-    bool ret = skins[skin][screen].needs_full_update;
+    struct viewport *vp = *(screens[screen].current_viewport);
+    bool vp_is_dirty = ((vp->flags & VP_FLAG_VP_SET_CLEAN) == VP_FLAG_VP_DIRTY);
+
+    if (vp_is_dirty)
+        screens[screen].clear_display();
+
+    bool ret = (skins[skin][screen].needs_full_update || vp_is_dirty);
     skins[skin][screen].needs_full_update = false;
     return ret;
 }
