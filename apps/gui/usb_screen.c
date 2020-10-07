@@ -179,6 +179,7 @@ static void usb_screen_fix_viewports(struct screen *screen,
 
 static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
 {
+    struct viewport *last_vp;
     static const struct bitmap* logos[NB_SCREENS] = {
         &bm_usblogo,
 #ifdef HAVE_REMOTE_LCD
@@ -194,7 +195,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         struct viewport *parent = &usb_screen_vps->parent;
         struct viewport *logo = &usb_screen_vps->logo;
 
-        screen->set_viewport(parent);
+        last_vp = screen->set_viewport(parent);
         screen->clear_viewport();
         screen->backlight_on();
 
@@ -217,7 +218,7 @@ static void usb_screens_draw(struct usb_screen_vps_t *usb_screen_vps_ar)
         }
         screen->set_viewport(parent);
 
-        screen->set_viewport(NULL);
+        screen->set_viewport(last_vp);
         screen->update_viewport();
     }
 }

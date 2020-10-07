@@ -64,6 +64,12 @@ unsigned char *vdest;
 fb_data *vdest;
 #endif
 
+static fb_data* get_framebuffer(void)
+{
+    struct viewport *vp_main = *(rb->screens[SCREEN_MAIN]->current_viewport);
+    return vp_main->buffer->fb_ptr;
+}
+
 #ifndef ASM_UPDATEPATPIX
 static void updatepatpix(void) ICODE_ATTR;
 static void updatepatpix(void)
@@ -741,10 +747,11 @@ static void spr_scan(void)
 
 void lcd_begin(void)
 {
+    fb_data *lcd_fb = get_framebuffer();
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
-    vdest=(unsigned char*)*rb->lcd_framebuffer;
+    vdest=(unsigned char*)lcd_fb;
 #else
-    vdest=*rb->lcd_framebuffer;
+    vdest=lcd_fb;
 #endif
 
 #ifdef HAVE_LCD_COLOR
@@ -975,9 +982,9 @@ void lcd_refreshline(void)
 
 #if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
         if(options.scaling==3) {
-            rb->lcd_blit_pal256((unsigned char*)*rb->lcd_framebuffer,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
+            rb->lcd_blit_pal256((unsigned char*)lcd_fb,(LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, (LCD_WIDTH-160)/2, (LCD_HEIGHT-144)/2, 160, 144);
         } else {
-            rb->lcd_blit_pal256((unsigned char*)*rb->lcd_framebuffer,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
+            rb->lcd_blit_pal256((unsigned char*)lcd_fb,0,0,0,0,LCD_WIDTH,LCD_HEIGHT);
         }
 #else
         if(options.scaling==3) {
