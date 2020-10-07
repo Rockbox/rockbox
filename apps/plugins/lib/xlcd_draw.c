@@ -349,6 +349,9 @@ static const fb_data graylut[256] = {
 void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
                            int stride, int x, int y, int width, int height)
 {
+    size_t dst_stride;
+    fb_data *lcd_fb = get_framebuffer(NULL, &dst_stride);
+
     const unsigned char *src_end;
     fb_data *dst;
 
@@ -377,7 +380,7 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src    += stride * src_y + src_x; /* move starting point */
     src_end = src + stride * height;
-    dst     = *rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst     = lcd_fb + dst_stride * y + x;
 
     do
     {
@@ -398,7 +401,7 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
 #endif
 
         src +=  stride;
-        dst += LCD_WIDTH;
+        dst += dst_stride;
     }
     while (src < src_end);
 }
@@ -416,6 +419,9 @@ void xlcd_gray_bitmap(const unsigned char *src, int x, int y, int width,
 void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height)
 {
+    size_t dst_stride;
+    fb_data *lcd_fb = get_framebuffer(NULL, &dst_stride);
+
     const unsigned char *src_end;
     fb_data *dst;
 
@@ -444,7 +450,7 @@ void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
 
     src    += 3 * (stride * src_y + src_x); /* move starting point */
     src_end = src + 3 * stride * height;
-    dst     = *rb->lcd_framebuffer + LCD_WIDTH * y + x;
+    dst     = lcd_fb + dst_stride * y + x;
 
     do
     {
@@ -471,7 +477,7 @@ void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
         while (src_row < row_end);
 
         src +=  3 * stride;
-        dst += LCD_WIDTH;
+        dst += dst_stride;
     }
     while (src < src_end);
 }

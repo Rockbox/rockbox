@@ -156,8 +156,9 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
         }
     }
 
-    /* Stash and restore these three, so that the scroll_func
+    /* Stash and restore these four, so that the scroll_func
      * can do whatever it likes without destroying the state */
+    struct frame_buffer_t *framebuf = s->vp->buffer;
     unsigned drawmode;
 #if LCD_DEPTH > 1
     unsigned fg_pattern, bg_pattern;
@@ -174,6 +175,7 @@ bool LCDFN(scroll_now)(struct scrollinfo *s)
     s->vp->bg_pattern = bg_pattern;
 #endif
     s->vp->drawmode = drawmode;
+    s->vp->buffer = framebuf;
 
     return ended;
 }
@@ -205,7 +207,7 @@ static void LCDFN(scroll_worker)(void)
          * be switched early so that lcd_getstringsize() picks the
          * correct font */
         vp = LCDFN(get_viewport)(&is_default);
-        LCDFN(set_viewport)(s->vp);
+        LCDFN(set_viewport_ex)(s->vp, 0); /* don't mark the last vp as dirty */
 
         makedelay = false;
         step = si->step;
@@ -218,7 +220,7 @@ static void LCDFN(scroll_worker)(void)
         /* put the line onto the display now */
         makedelay = LCDFN(scroll_now(s));
 
-        LCDFN(set_viewport)(vp);
+        LCDFN(set_viewport_ex)(vp, 0); /* don't mark the last vp as dirty */
 
         if (makedelay)
             s->start_tick += si->delay + si->ticks;

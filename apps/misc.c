@@ -769,7 +769,9 @@ int show_logo( void )
     lcd_remote_setfont(FONT_UI);
     lcd_remote_update();
 #endif
-
+#ifdef SIMULATOR
+    sleep(HZ); /* sim is too fast to see logo */
+#endif
     return 0;
 }
 

@@ -35,10 +35,10 @@ void lcd_clear_viewport(void)
     int x, y, width, height;
     int len, step;
 
-    x = current_vp->x;
-    y = current_vp->y;
-    width = current_vp->width;
-    height = current_vp->height;
+    x = lcd_current_viewport->x;
+    y = lcd_current_viewport->y;
+    width = lcd_current_viewport->width;
+    height = lcd_current_viewport->height;
 
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -70,11 +70,11 @@ void lcd_clear_viewport(void)
     dst = FBADDR(x, y);
     dst_end = FBADDR(x + width - 1 , y + height - 1);
 
-    if (current_vp->drawmode & DRMODE_INVERSEVID)
+    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
     {
         do
         {
-            memset16(dst, current_vp->fg_pattern, len);
+            memset16(dst, lcd_current_viewport->fg_pattern, len);
             dst += step;
         }
         while (dst <= dst_end);
@@ -85,7 +85,7 @@ void lcd_clear_viewport(void)
         {
             do
             {
-                memset16(dst, current_vp->bg_pattern, len);
+                memset16(dst, lcd_current_viewport->bg_pattern, len);
                 dst += step;
             }
             while (dst <= dst_end);
@@ -102,22 +102,24 @@ void lcd_clear_viewport(void)
         }
     }
 
-    if (current_vp == &default_vp)
+    if (lcd_current_viewport == &default_vp)
         lcd_scroll_stop();
     else
-        lcd_scroll_stop_viewport(current_vp);
+        lcd_scroll_stop_viewport(lcd_current_viewport);
+
+    lcd_current_viewport->flags &= ~(VP_FLAG_VP_SET_CLEAN);
 }
 
 /*** low-level drawing functions ***/
 
 static void ICODE_ATTR setpixel(fb_data *address)
 {
-    *address = current_vp->fg_pattern;
+    *address = lcd_current_viewport->fg_pattern;
 }
 
 static void ICODE_ATTR clearpixel(fb_data *address)
 {
-    *address = current_vp->bg_pattern;
+    *address = lcd_current_viewport->bg_pattern;
 }
 
 static void ICODE_ATTR clearimgpixel(fb_data *address)
@@ -157,8 +159,8 @@ void lcd_fillrect(int x, int y, int width, int height)
 
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
-        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width) ||
+        (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     if (x < 0)
@@ -171,14 +173,14 @@ void lcd_fillrect(int x, int y, int width, int height)
         height += y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+    if (x + width > lcd_current_viewport->width)
+        width = lcd_current_viewport->width - x;
+    if (y + height > lcd_current_viewport->height)
+        height = lcd_current_viewport->height - y;
 
     /* adjust for viewport */
-    x += current_vp->x;
-    y += current_vp->y;
+    x += lcd_current_viewport->x;
+    y += lcd_current_viewport->y;
 
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -205,14 +207,14 @@ void lcd_fillrect(int x, int y, int width, int height)
 #endif
 
     /* drawmode and optimisation */
-    if (current_vp->drawmode & DRMODE_INVERSEVID)
+    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
     {
-        if (current_vp->drawmode & DRMODE_BG)
+        if (lcd_current_viewport->drawmode & DRMODE_BG)
         {
             if (!lcd_backdrop)
             {
                 fillopt = OPT_SET;
-                bits = current_vp->bg_pattern;
+                bits = lcd_current_viewport->bg_pattern;
             }
             else
                 fillopt = OPT_COPY;
@@ -220,13 +222,13 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     else
     {
-        if (current_vp->drawmode & DRMODE_FG)
+        if (lcd_current_viewport->drawmode & DRMODE_FG)
         {
             fillopt = OPT_SET;
-            bits = current_vp->fg_pattern;
+            bits = lcd_current_viewport->fg_pattern;
         }
     }
-    if (fillopt == OPT_NONE && current_vp->drawmode != DRMODE_COMPLEMENT)
+    if (fillopt == OPT_NONE && lcd_current_viewport->drawmode != DRMODE_COMPLEMENT)
         return;
 
     dst = FBADDR(x, y);
@@ -284,13 +286,13 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     const unsigned char *src_end;
     fb_data *dst, *dst_col;
     unsigned dmask = 0x100; /* bit 8 == sentinel */
-    int drmode = current_vp->drawmode;
+    int drmode = lcd_current_viewport->drawmode;
     int row;
 
     /******************** Image in viewport clipping **********************/
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
-        (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width) ||
+        (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
         return;
 
     if (x < 0)
@@ -305,14 +307,14 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         src_y -= y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+    if (x + width > lcd_current_viewport->width)
+        width = lcd_current_viewport->width - x;
+    if (y + height > lcd_current_viewport->height)
+        height = lcd_current_viewport->height - y;
 
     /* adjust for viewport */
-    x += current_vp->x;
-    y += current_vp->y;
+    x += lcd_current_viewport->x;
+    y += lcd_current_viewport->y;
 
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -404,7 +406,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
         case DRMODE_BG:
-            bg = current_vp->bg_pattern;
+            bg = lcd_current_viewport->bg_pattern;
             do
             {
                 if (!(data & 0x01))
@@ -417,7 +419,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
           case DRMODE_FG:
-            fg = current_vp->fg_pattern;
+            fg = lcd_current_viewport->fg_pattern;
             do
             {
                 if (data & 0x01)
@@ -430,7 +432,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
           case DRMODE_SOLID|DRMODE_INT_BD:
-            fg = current_vp->fg_pattern;
+            fg = lcd_current_viewport->fg_pattern;
             bo = lcd_backdrop_offset;
             do
             {
@@ -443,8 +445,8 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
           case DRMODE_SOLID:
-            fg = current_vp->fg_pattern;
-            bg = current_vp->bg_pattern;
+            fg = lcd_current_viewport->fg_pattern;
+            bg = lcd_current_viewport->bg_pattern;
             do
             {
                 *dst = (data & 0x01) ? fg : bg;
@@ -549,10 +551,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
 {
     fb_data *dst, *dst_row;
     unsigned dmask = 0x00000000;
-    int drmode = current_vp->drawmode;
+    int drmode = lcd_current_viewport->drawmode;
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= current_vp->width) ||
-         (y >= current_vp->height) || (x + width <= 0) || (y + height <= 0))
+    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width) ||
+         (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
         return;
     /* initialize blending */
     BLEND_INIT;
@@ -570,14 +572,14 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
         src_y -= y;
         y = 0;
     }
-    if (x + width > current_vp->width)
-        width = current_vp->width - x;
-    if (y + height > current_vp->height)
-        height = current_vp->height - y;
+    if (x + width > lcd_current_viewport->width)
+        width = lcd_current_viewport->width - x;
+    if (y + height > lcd_current_viewport->height)
+        height = lcd_current_viewport->height - y;
 
     /* adjust for viewport */
-    x += current_vp->x;
-    y += current_vp->y;
+    x += lcd_current_viewport->x;
+    y += lcd_current_viewport->y;
 
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -668,7 +670,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     /* go through the rows and update each pixel */
     do
     {
-        /* saving current_vp->fg/bg_pattern and lcd_backdrop_offset into these
+        /* saving lcd_current_viewport->fg/bg_pattern and lcd_backdrop_offset into these
          * temp vars just before the loop helps gcc to opimize the loop better
          * (testing showed ~15% speedup) */
         unsigned fg, bg;
@@ -727,7 +729,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_BG:
-                bg = current_vp->bg_pattern;
+                bg = lcd_current_viewport->bg_pattern;
                 do
                 {
                     *dst = blend_two_colors(bg, *dst, data & ALPHA_COLOR_LOOKUP_SIZE );
@@ -747,7 +749,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_FG:
-                fg = current_vp->fg_pattern;
+                fg = lcd_current_viewport->fg_pattern;
                 do
                 {
                     *dst = blend_two_colors(*dst, fg, data & ALPHA_COLOR_LOOKUP_SIZE );
@@ -758,7 +760,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 break;
             case DRMODE_SOLID|DRMODE_INT_BD:
                 bo = lcd_backdrop_offset;
-                fg = current_vp->fg_pattern;
+                fg = lcd_current_viewport->fg_pattern;
                 do
                 {
                     fb_data *c = (fb_data *)((uintptr_t)dst +  bo);
@@ -769,7 +771,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_SOLID|DRMODE_INT_IMG:
-                bg = current_vp->bg_pattern;
+                bg = lcd_current_viewport->bg_pattern;
                 img_offset = image - dst;
                 do
                 {
@@ -792,8 +794,8 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_SOLID:
-                bg = current_vp->bg_pattern;
-                fg = current_vp->fg_pattern;
+                bg = lcd_current_viewport->bg_pattern;
+                fg = lcd_current_viewport->fg_pattern;
                 do
                 {
                     *dst = blend_two_colors(bg, fg, data & ALPHA_COLOR_LOOKUP_SIZE );

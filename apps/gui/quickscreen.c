@@ -172,7 +172,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     char buf[MAX_PATH];
     unsigned const char *title, *value;
     int temp;
-    display->set_viewport(parent);
+    struct viewport *last_vp = display->set_viewport(parent);
     display->clear_viewport();
 
     for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
@@ -225,7 +225,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
 
     display->set_viewport(parent);
     display->update_viewport();
-    display->set_viewport(NULL);
+    display->set_viewport(last_vp);
 }
 
 static void talk_qs_option(const struct settings_list *opt, bool enqueue)
