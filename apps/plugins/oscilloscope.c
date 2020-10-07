@@ -838,10 +838,10 @@ static void osc_osd_show_message(int id, int val)
     int width, height;
     int maxwidth, maxheight;
 
-    rb->lcd_set_viewport(osd_get_viewport());
+    struct viewport *last_vp = rb->lcd_set_viewport(osd_get_viewport());
     osd_get_max_dims(&maxwidth, &maxheight);
     rb->lcd_getstringsize(osc_osd_message, &width, &height);
-    rb->lcd_set_viewport(NULL); /* to regular viewport */
+    rb->lcd_set_viewport(last_vp); /* to regular viewport */
 
     width += 2 + 2*OSC_OSD_MARGIN_SIZE;
     if (width > maxwidth)

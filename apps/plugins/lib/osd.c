@@ -52,6 +52,7 @@ struct osd
         OSD_ERASED,             /* Erased in preparation for regular drawing */
     } status;                   /* View status */
     struct viewport vp;         /* Clipping viewport */
+    struct frame_buffer_t framebuf; /* Holds framebuffer reference */
     int lcd_bitmap_stride;      /* Stride of LCD bitmap */
     void *lcd_bitmap_data;      /* Backbuffer framebuffer data */
     int back_bitmap_stride;     /* Stride of backbuffer bitmap */
@@ -66,10 +67,11 @@ struct osd
                            size_t *bufsize);
     void (*set_viewport_pos)(struct viewport *vp, int x, int y, int width,
                              int height);
+    struct viewport* (*lcd_set_viewport)(struct viewport *vp);
     void (*lcd_update)(void);
     void (*lcd_update_rect)(int x, int y, int width, int height);
-    void (*lcd_set_viewport)(struct viewport *vp);
-    void (*lcd_set_framebuffer)(void *buf);
+
+    void (*lcd_viewport_set_buffer)(struct viewport *vp, void *buffer);
     void (*lcd_framebuffer_set_pos)(int x, int y, int width, int height);
     void (*lcd_bitmap_part)(const void *src, int src_x, int src_y,
                             int stride, int x, int y, int width, int height);
@@ -227,7 +229,8 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
     osd->back_bitmap_stride = w;
 #endif /* end stride type selection */
 
-    osd->lcd_bitmap_data = (void *)*rb->lcd_framebuffer;
+    /* vp is currently initialized to the default framebuffer */
+    osd->lcd_bitmap_data = (void *)&osd->vp.buffer->data;
     osd->back_bitmap_data = buf;
 
     osd->maxwidth = w;
@@ -240,6 +243,36 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
 
     return buf;
 }
+
+static void _osd_lcd_viewport_set_buffer(struct viewport *vp, void *buffer)
+{
+    if (!vp)
+        vp = *(rb->screens[SCREEN_MAIN]->current_viewport);
+
+    if (buffer)
+    {
+        native_osd.framebuf.data = buffer;
+        native_osd.framebuf.elems = native_osd.maxheight * native_osd.maxwidth;
+        native_osd.framebuf.get_address_fn = NULL; /*Default iterator*/
+
+        if (buffer == native_osd.back_bitmap_data)
+            native_osd.framebuf.stride = native_osd.back_bitmap_stride;
+        else
+            native_osd.framebuf.stride = native_osd.lcd_bitmap_stride;
+
+        rb->viewport_set_buffer(vp, &native_osd.framebuf, SCREEN_MAIN);
+    }
+    else
+         rb->viewport_set_buffer(vp, NULL, SCREEN_MAIN);
+}
+
+#if LCD_DEPTH < 4
+static void _osd_lcd_viewport_set_grey_buffer(struct viewport *vp, void *buffer)
+{
+    (void)vp;
+    grey_set_framebuffer(buffer));
+}
+#endif
 
 /* Set viewport coordinates */
 static void _osd_lcd_viewport_set_pos(
@@ -333,24 +366,22 @@ static void _osd_draw_osd(struct osd *osd)
 
 static void _osd_update_viewport(struct osd *osd)
 {
-    osd->lcd_update_rect(osd->vp.x, osd->vp.y, osd->vp.width,
-                         osd->vp.height);
+    osd->lcd_update_rect(osd->vp.x, osd->vp.y, osd->vp.width, osd->vp.height);
 }
 
 /* Sync the backbuffer to the framebuffer image */
 static void _osd_update_back_buffer(struct osd *osd)
 {
-    /* Assume it's starting with default viewport for now */
-    osd->lcd_set_framebuffer(osd->back_bitmap_data);
+    osd->lcd_viewport_set_buffer(NULL, osd->back_bitmap_data);
+
 #if LCD_DEPTH < 4
     if (osd->lcd_framebuffer_set_pos)
         osd->lcd_framebuffer_set_pos(0, 0, osd->maxwidth, osd->maxheight);
 #endif /* LCD_DEPTH < 4 */
     osd->lcd_bitmap_part(osd->lcd_bitmap_data, osd->vp.x, osd->vp.y,
-                         osd->lcd_bitmap_stride, 0, 0, osd->vp.width,
-                         osd->vp.height);
-    /* Assume it was on default framebuffer for now */
-    osd->lcd_set_framebuffer(NULL);
+                             osd->lcd_bitmap_stride, 0, 0, osd->vp.width,
+                             osd->vp.height);
+    osd->lcd_viewport_set_buffer(NULL, NULL);
 }
 
 /* Erase the OSD to restore the framebuffer image */
@@ -358,6 +389,7 @@ static void _osd_erase_osd(struct osd *osd)
 {
     osd->lcd_bitmap_part(osd->back_bitmap_data, 0, 0, osd->back_bitmap_stride,
                          osd->vp.x, osd->vp.y, osd->vp.width, osd->vp.height);
+
 }
 
 /* Initialized the OSD and set its backbuffer */
@@ -696,7 +728,7 @@ bool osd_init(unsigned flags, void *backbuf, size_t backbuf_size,
     native_osd.lcd_update = rb->lcd_update;
     native_osd.lcd_update_rect = rb->lcd_update_rect;
     native_osd.lcd_set_viewport = rb->lcd_set_viewport;
-    native_osd.lcd_set_framebuffer = (void *)rb->lcd_set_framebuffer;
+    native_osd.lcd_viewport_set_buffer = _osd_lcd_viewport_set_buffer;
 #if LCD_DEPTH < 4
     native_osd.lcd_framebuffer_set_pos = NULL;
 #endif /* LCD_DEPTH < 4 */
@@ -783,7 +815,7 @@ bool osd_grey_init(unsigned flags, void *backbuf, size_t backbuf_size,
     grey_osd.lcd_update = grey_update;
     grey_osd.lcd_update_rect = grey_update_rect;
     grey_osd.lcd_set_viewport = grey_set_viewport;
-    grey_osd.lcd_set_framebuffer = (void *)grey_set_framebuffer;
+    grey_osd.lcd_viewport_set_buffer = _osd_lcd_viewport_set_grey_buffer;
     grey_osd.lcd_framebuffer_set_pos = grey_framebuffer_set_pos;
     grey_osd.lcd_bitmap_part = (void *)grey_gray_bitmap_part;
 
