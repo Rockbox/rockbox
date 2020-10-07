@@ -194,9 +194,7 @@ static const struct plugin_api rockbox_api = {
     lcd_putsf,
     lcd_puts_scroll,
     lcd_scroll_stop,
-    &lcd_framebuffer,
     lcd_set_viewport,
-    lcd_set_framebuffer,
     lcd_bmp_part,
     lcd_update_rect,
     lcd_set_drawmode,
@@ -281,7 +279,6 @@ static const struct plugin_api rockbox_api = {
     lcd_remote_mono_bitmap_part,
     lcd_remote_mono_bitmap,
     lcd_remote_putsxy,
-    &lcd_remote_framebuffer;
     lcd_remote_update,
     lcd_remote_update_rect,
 #if (LCD_REMOTE_DEPTH > 1)
@@ -303,6 +300,7 @@ static const struct plugin_api rockbox_api = {
     viewportmanager_theme_enable,
     viewportmanager_theme_undo,
     viewport_set_fullscreen,
+    viewport_set_buffer,
 
 #ifdef HAVE_BACKLIGHT
     /* lcd backlight */
@@ -869,11 +867,12 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif
 
     *(p_hdr->api) = &rockbox_api;
-
+    lcd_set_viewport(NULL);
     lcd_clear_display();
     lcd_update();
 
 #ifdef HAVE_REMOTE_LCD
+    lcd_remote_set_viewport(NULL);
     lcd_remote_clear_display();
     lcd_remote_update();
 #endif
@@ -914,7 +913,8 @@ int plugin_load(const char* plugin, const void* parameter)
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
-
+    /* restore default vp */
+    lcd_set_viewport(NULL);
     screen_helper_setfont(FONT_UI);
 #if LCD_DEPTH > 1
 #ifdef HAVE_LCD_COLOR
@@ -928,6 +928,8 @@ int plugin_load(const char* plugin, const void* parameter)
 #endif /* LCD_DEPTH */
 
 #ifdef HAVE_REMOTE_LCD
+    lcd_remote_set_viewport(NULL);
+
 #if LCD_REMOTE_DEPTH > 1
     lcd_remote_set_drawinfo(DRMODE_SOLID, LCD_REMOTE_DEFAULT_FG,
                             LCD_REMOTE_DEFAULT_BG);

@@ -768,7 +768,7 @@ int curr_alien, aliens_paralyzed, gamespeed;
 int ufo_state, ufo_x;
 bool level_finished;
 bool aliens_down, aliens_right, hit_left_border, hit_right_border;
-
+static fb_data *lcd_fb;
 
 /* No standard get_pixel function yet, use this hack instead */
 #if (LCD_DEPTH >= 8)
@@ -776,12 +776,12 @@ bool aliens_down, aliens_right, hit_left_border, hit_right_border;
 #if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
 static inline fb_data get_pixel(int x, int y)
 {
-    return *rb->lcd_framebuffer[x*LCD_HEIGHT+y];
+    return lcd_fb[x*LCD_HEIGHT+y];
 }
 #else
 static inline fb_data get_pixel(int x, int y)
 {
-    return *rb->lcd_framebuffer[ytab[y] + x];
+    return lcd_fb[ytab[y] + x];
 }
 #endif
 
@@ -794,7 +794,7 @@ static const unsigned char shifts[4] = {
 /* Horizontal packing */
 static inline fb_data get_pixel(int x, int y)
 {
-    return (*rb->lcd_framebuffer[ytab[y] + (x >> 2)] >> shifts[x & 3]) & 3;
+    return (lcd_fb[ytab[y] + (x >> 2)] >> shifts[x & 3]) & 3;
 }
 #else
 /* Vertical packing */
@@ -803,7 +803,7 @@ static const unsigned char shifts[4] = {
 };
 static inline fb_data get_pixel(int x, int y)
 {
-    return (*rb->lcd_framebuffer[ytab[y] + x] >> shifts[y & 3]) & 3;
+    return (lcd_fb[ytab[y] + x] >> shifts[y & 3]) & 3;
 }
 #endif /* Horizontal/Vertical packing */
 
@@ -1902,6 +1902,8 @@ enum plugin_status plugin_start(UNUSED const void* parameter)
 #ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
 #endif
+    struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+    lcd_fb = vp_main->buffer->fb_ptr;
     /* now go ahead and have fun! */
     game_loop();
 

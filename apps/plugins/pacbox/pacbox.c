@@ -35,6 +35,7 @@
 #include "lib/configfile.h"
 #include "lib/playback_control.h"
 #include "lib/helper.h"
+static fb_data *lcd_fb;
 
 /*Allows split screen jump and makes pacman invincible if you start at 18 credits (for testing purposes)*/
 //#define CHEATS 1
@@ -704,7 +705,7 @@ static int gameProc( void )
             rb->lcd_blit_pal256(    video_buffer, 0, 0, XOFS, YOFS, 
                                     ScreenWidth, ScreenHeight);
 #else
-            blit_display(*rb->lcd_framebuffer,video_buffer);
+            blit_display(lcd_fb ,video_buffer);
 #endif
 
             if (settings.showfps) {
@@ -742,6 +743,9 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_background(LCD_BLACK);
     rb->lcd_clear_display();
     rb->lcd_update();
+
+    struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+    lcd_fb = vp_main->buffer->fb_ptr;
 
     /* Set the default settings */
     settings.difficulty = 0; /* Normal */
