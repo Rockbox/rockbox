@@ -63,6 +63,13 @@ void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw);
 /* call this when a theme changed */
 void viewportmanager_theme_changed(const int);
 
+void viewport_set_buffer(struct viewport *vp, struct frame_buffer_t *buffer,
+                                                const enum screen_type screen);
+
+/* viewport_get_framebuffer is for compatibility with old plugins */
+void *_viewport_get_framebuffer(struct viewport *vp, size_t *size,
+                                const enum screen_type screen);
+
 #ifdef HAVE_TOUCHSCREEN
 bool viewport_point_within_vp(const struct viewport *vp,
                                const int x, const int y);
