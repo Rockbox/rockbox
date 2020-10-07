@@ -420,8 +420,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
-                                void *backdrop = skin_backdrop_get_buffer(data->backdrop_id);
-                                gwps->display->set_framebuffer(backdrop);
+                                skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
                                 skin_backdrop_show(-1);
                             }
 #endif
@@ -433,7 +432,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
                             if (skin_viewport->output_to_backdrop_buffer)
                             {
-                                gwps->display->set_framebuffer(NULL);
+                                gwps->display->set_viewport(NULL);
                                 skin_backdrop_show(data->backdrop_id);
                             }
 #endif
@@ -822,12 +821,12 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         if (skin_viewport->output_to_backdrop_buffer)
         {
-            display->set_framebuffer(skin_backdrop_get_buffer(data->backdrop_id));
+            skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
             skin_backdrop_show(-1);
         }
         else
         {
-            display->set_framebuffer(NULL);
+            skin_backdrop_set_buffer(-1, skin_viewport);
             skin_backdrop_show(data->backdrop_id);
         }
 #endif
@@ -862,7 +861,6 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
         refresh_mode = old_refresh_mode;
     }
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
-    display->set_framebuffer(NULL);
     skin_backdrop_show(data->backdrop_id);
 #endif
 

@@ -218,7 +218,7 @@ void lcd_update(void)
     dma_len = LCD_WIDTH*2;
 
     /* Initialize DMA transfer */
-    SAR3 = (unsigned long)lcd_framebuffer;
+    SAR3 = (unsigned long)FBADDR(0,0);
     BCR3 = LCD_WIDTH*2;
     DCR3 = DMA_INT | DMA_AA | DMA_BWC(1)
          | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
