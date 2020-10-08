@@ -38,6 +38,10 @@ if ($model eq 'rocker') {
     @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
 } elsif ($model eq 'x20') {
     @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
+} elsif ($model eq 'eros_q') {
+    @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
+} elsif ($model eq 'm3k') {
+    @ubiopts = ("-e", "124KiB", "-c", "2048", "-m", "2048", "-j", "8192KiB", "-U");
 } else {
     die ("Unknown hiby model: $model\n");
 }
@@ -81,7 +85,6 @@ while (<UPDATE>) {
     if ($rootfs_found) {
 	if (/file_path=(.*)/) {
 	    $ubiname = basename($1);
-	    $ubiname =~ tr/[a-z]/[A-Z]/;
 	    last;
 	}
     } else {
@@ -92,7 +95,11 @@ while (<UPDATE>) {
 }
 close UPDATE;
 
-die("can't locate rootfs image") if (! -e "$isowork/$ubiname");
+if (! -e "$isowork/$ubiname") {
+    $ubiname =~ tr/[a-z]/[A-Z]/;
+    die("can't locate rootfs image ($ubiname)") if (! -e "$isowork/$ubiname");
+}
+
 $ubiname = "$isowork/$ubiname";
 
 ### Extract RootFS
@@ -102,6 +109,7 @@ mkdir($rootfsdir) || die ("Can't create '$rootfsdir'");
 @sysargs = ("ubireader_extract_files", "-k", "-o", $rootfsdir, $ubiname);
 system(@sysargs);
 
+# exit(0);
 ### Mangle RootFS
 
 # Generate rb_bootloader.sh
@@ -109,19 +117,74 @@ my $rbbasename = basename($rbbname);
 my $bootloader_sh =
     "#!/bin/sh
 
-mount /dev/mmcblk0 /mnt/sd_0 &>/dev/null || \
-mount /dev/mmcblk0p1 /mnt/sd_0 &>/dev/null
+#mkdir -p /mnt/sd_0
+#
+#mount /dev/mmcblk0 /mnt/sd_0 &>/dev/null || \
+#mount /dev/mmcblk0p1 /mnt/sd_0 &>/dev/null
 
-killall $rbbasename
-killall -9 $rbbasename
+killall    hiby_player    &>/dev/null
+killall -9 hiby_player    &>/dev/null
 
+killall $rbbasename       &>/dev/null
+killall -9 $rbbasename    &>/dev/null
+
+# /etc/init.d/K90adb start
+
+# Rockbox launcher!
 /usr/bin/$rbbasename
 sleep 1
 reboot
-    ";
+";
 open FILE, ">$rootfsdir/usr/bin/hiby_player.sh" || die ("can't write bootloader script!");
 print FILE $bootloader_sh;
 close FILE;
+chmod 0755, "$rootfsdir/usr/bin/hiby_player.sh";
+
+# Auto mount/unmount external USB drives
+open  FILE, ">>$rootfsdir/etc/mdev.conf" || die ("can't access mdev conf!");
+print FILE "sd[a-z][0-9]+ 0:0 664 @ /etc/rb_inserting.sh\n";
+print FILE "mmcblk[0-9]p[0-9] 0:0 664 @ /etc/rb_inserting.sh\n";
+print FILE "mmcblk[0-9] 0:0 664 @ /etc/rb_inserting.sh\n";
+print FILE "sd[a-z] 0:0 664 \$ /etc/rb_removing.sh";
+print FILE "mmcblk[0-9] 0:0 664 \$ /etc/rb_removing.sh\n";
+close FILE;
+
+my $insert_sh = '
+#!/bin/sh
+# $MDEV is the device
+
+case $MDEV in
+ mmc*) 
+   MNT_POINT=/mnt/sd_0
+   ;;
+ sd*) 
+   MNT_POINT=/mnt/sd_0/USB
+   ;;
+esac
+
+if [ ! -d $MNT_POINT ];then
+   mkdir $MNT_POINT 
+fi
+
+mount $MDEV $MNT_POINT
+';
+
+open FILE, ">$rootfsdir/etc/rb_inserting.sh" || die("can't write hotplug helpers!");
+print FILE $insert_sh;
+close FILE;
+chmod 0755, "$rootfsdir/etc/rb_inserting.sh";
+
+my $remove_sh = '
+#!/bin/sh
+# $MDEV is the device
+sync;
+unmount -f $MDEV;
+';
+
+open FILE, ">$rootfsdir/etc/rb_removing.sh" || die("can't write hotplug helpers!");
+print FILE $remove_sh;
+close FILE;
+chmod 0755, "$rootfsdir/etc/rb_removing.sh";
 
 # Copy bootloader over
 @sysargs=("cp", "$rbbname", "$rootfsdir/usr/bin/$rbbasename");

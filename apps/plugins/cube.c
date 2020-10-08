@@ -370,27 +370,7 @@
 #define CUBE_HIGHSPEED     (BUTTON_SELECT | BUTTON_REPEAT)
 #define CUBE_PAUSE         (BUTTON_LEFT | BUTTON_REPEAT)
 
-#elif (CONFIG_KEYPAD == XDUOO_X3_PAD)
-#define CUBE_QUIT          BUTTON_POWER
-#define CUBE_NEXT          BUTTON_NEXT
-#define CUBE_PREV          BUTTON_PREV
-#define CUBE_INC           BUTTON_VOL_UP
-#define CUBE_DEC           BUTTON_VOL_DOWN
-#define CUBE_MODE          BUTTON_OPTION
-#define CUBE_PAUSE         BUTTON_HOME
-#define CUBE_HIGHSPEED     BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == XDUOO_X3II_PAD)
-#define CUBE_QUIT          BUTTON_POWER
-#define CUBE_NEXT          BUTTON_NEXT
-#define CUBE_PREV          BUTTON_PREV
-#define CUBE_INC           BUTTON_VOL_UP
-#define CUBE_DEC           BUTTON_VOL_DOWN
-#define CUBE_MODE          BUTTON_OPTION
-#define CUBE_PAUSE         BUTTON_HOME
-#define CUBE_HIGHSPEED     BUTTON_PLAY
-
-#elif (CONFIG_KEYPAD == XDUOO_X20_PAD)
+#elif (CONFIG_KEYPAD == XDUOO_X3_PAD) || (CONFIG_KEYPAD == XDUOO_X3II_PAD) || (CONFIG_KEYPAD == XDUOO_X20_PAD)
 #define CUBE_QUIT          BUTTON_POWER
 #define CUBE_NEXT          BUTTON_NEXT
 #define CUBE_PREV          BUTTON_PREV
@@ -410,7 +390,7 @@
 #define CUBE_PAUSE         BUTTON_HOME
 #define CUBE_HIGHSPEED     BUTTON_PLAY
 
-#elif (CONFIG_KEYPAD == IHIFI_770_PAD)
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
 #define CUBE_QUIT          BUTTON_POWER
 #define CUBE_NEXT          BUTTON_NEXT
 #define CUBE_PREV          BUTTON_PREV
@@ -420,14 +400,14 @@
 #define CUBE_PAUSE         BUTTON_HOME
 #define CUBE_HIGHSPEED     BUTTON_PLAY
 
-#elif (CONFIG_KEYPAD == IHIFI_800_PAD)
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define CUBE_QUIT          BUTTON_POWER
 #define CUBE_NEXT          BUTTON_NEXT
 #define CUBE_PREV          BUTTON_PREV
-#define CUBE_INC           BUTTON_VOL_UP
-#define CUBE_DEC           BUTTON_VOL_DOWN
-#define CUBE_MODE          (BUTTON_HOME | BUTTON_POWER)
-#define CUBE_PAUSE         BUTTON_HOME
+#define CUBE_INC           BUTTON_SCROLL_FWD
+#define CUBE_DEC           BUTTON_SCROLL_BACK
+#define CUBE_MODE          BUTTON_MENU
+#define CUBE_PAUSE         BUTTON_BACK
 #define CUBE_HIGHSPEED     BUTTON_PLAY
 
 #else
@@ -666,7 +646,7 @@ static void cube_draw(void)
     {
 #if LCD_DEPTH > 1 || defined(USEGSLIB)
       case SOLID:
-      
+
         old_foreground = mylcd_get_foreground();
         for (i = 0; i < 6; i++)
         {
@@ -882,7 +862,7 @@ enum plugin_status plugin_start(const void* parameter)
                 t_disp = DISP_TIME;
                 redraw = true;
                 break;
-                
+
             case CUBE_NEXT:
                 if (++curr > 2)
                     curr = 0;
@@ -947,5 +927,3 @@ enum plugin_status plugin_start(const void* parameter)
 
     return PLUGIN_OK;
 }
-
-

@@ -17,6 +17,8 @@
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
 #endif
 
+#define HIBY_LINUX
+
 #define HAVE_FPU
 
 /* define this if you have a colour LCD */

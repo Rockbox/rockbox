@@ -315,25 +315,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN     BUTTON_DOWN
 #define PAUSE    BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-
-#define QUIT     BUTTON_POWER
-#define LEFT     BUTTON_PREV
-#define RIGHT    BUTTON_NEXT
-#define UP       BUTTON_HOME
-#define DOWN     BUTTON_OPTION
-#define PAUSE    BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-
-#define QUIT     BUTTON_POWER
-#define LEFT     BUTTON_PREV
-#define RIGHT    BUTTON_NEXT
-#define UP       BUTTON_HOME
-#define DOWN     BUTTON_OPTION
-#define PAUSE    BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 
 #define QUIT     BUTTON_POWER
 #define LEFT     BUTTON_PREV
@@ -351,7 +333,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN     BUTTON_OPTION
 #define PAUSE    BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 
 #define QUIT     BUTTON_POWER
 #define LEFT     BUTTON_HOME
@@ -360,20 +342,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN     BUTTON_NEXT
 #define PAUSE    BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 
 #define QUIT     BUTTON_POWER
-#define LEFT     BUTTON_HOME
-#define RIGHT    BUTTON_VOL_DOWN
+#define LEFT     BUTTON_SCROLL_BACK
+#define RIGHT    BUTTON_SCROLL_FWD
 #define UP       BUTTON_PREV
 #define DOWN     BUTTON_NEXT
 #define PAUSE    BUTTON_PLAY
 
-#else
-#error No keymap defined!
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
+#elif defined(HAVE_TOUCHSCREEN)
 #ifndef QUIT
 #define QUIT  BUTTON_TOPLEFT
 #endif
@@ -392,6 +370,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef PAUSE
 #define PAUSE BUTTON_CENTER
 #endif
+#else
+#error No keymap defined!
 #endif
 
 #define MOVE_NO 0               /* player movement */
@@ -734,7 +714,7 @@ static void refresh_board (void)
 #else
     x = BOARD_X + CUBE_SIZE * BOARD_W - 40;
 #endif
-    rb->lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8, 
+    rb->lcd_putsxyf (x, BOARD_Y + CUBE_SIZE * BOARD_H - 8,
                  (player.lives != 1) ? "%d Lives" : "%d Life", player.lives);
 
 #if LCD_DEPTH>=2
@@ -1160,7 +1140,7 @@ static int xobox_menu_cb(int action,
 static int xobox_menu(bool ingame)
 {
     rb->button_clear_queue();
-    
+
     int selection = 0;
     MENUITEM_STRINGLIST(main_menu, "Xobox Menu", xobox_menu_cb,
                         "Resume Game", "Start New Game",

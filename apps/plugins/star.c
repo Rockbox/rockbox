@@ -588,23 +588,7 @@
 #define STAR_LEVEL_DOWN_NAME "PLAY + PREV"
 #define STAR_LEVEL_REPEAT_NAME "PLAY + OPTION"
 
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define STAR_QUIT           BUTTON_POWER
-#define STAR_LEFT           BUTTON_PREV
-#define STAR_RIGHT          BUTTON_NEXT
-#define STAR_UP             BUTTON_HOME
-#define STAR_DOWN           BUTTON_OPTION
-#define STAR_TOGGLE_CONTROL BUTTON_PLAY
-#define STAR_LEVEL_UP      (BUTTON_PLAY | BUTTON_NEXT)
-#define STAR_LEVEL_DOWN    (BUTTON_PLAY | BUTTON_PREV)
-#define STAR_LEVEL_REPEAT  (BUTTON_PLAY | BUTTON_OPTION)
-#define STAR_TOGGLE_CONTROL_NAME "PLAY"
-#define STAR_QUIT_NAME      "POWER"
-#define STAR_LEVEL_UP_NAME  "PLAY + NEXT"
-#define STAR_LEVEL_DOWN_NAME "PLAY + PREV"
-#define STAR_LEVEL_REPEAT_NAME "PLAY + OPTION"
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_LEFT           BUTTON_PREV
 #define STAR_RIGHT          BUTTON_NEXT
@@ -636,7 +620,7 @@
 #define STAR_LEVEL_DOWN_NAME "PLAY + PREV"
 #define STAR_LEVEL_REPEAT_NAME "PLAY + OPTION"
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define STAR_QUIT           BUTTON_POWER
 #define STAR_LEFT           BUTTON_HOME
 #define STAR_RIGHT          BUTTON_VOL_DOWN
@@ -652,21 +636,21 @@
 #define STAR_LEVEL_DOWN_NAME "POWER + VOL-"
 #define STAR_LEVEL_REPEAT_NAME "POWER + HOME"
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define STAR_QUIT           BUTTON_POWER
-#define STAR_LEFT           BUTTON_HOME
-#define STAR_RIGHT          BUTTON_VOL_DOWN
+#define STAR_LEFT           BUTTON_SCROLL_BACK
+#define STAR_RIGHT          BUTTON_SCROLL_FWD
 #define STAR_UP             BUTTON_PREV
 #define STAR_DOWN           BUTTON_NEXT
 #define STAR_TOGGLE_CONTROL BUTTON_PLAY
-#define STAR_LEVEL_UP      (BUTTON_POWER | BUTTON_VOL_UP)
-#define STAR_LEVEL_DOWN    (BUTTON_POWER | BUTTON_VOL_DOWN)
-#define STAR_LEVEL_REPEAT  (BUTTON_POWER | BUTTON_HOME)
+#define STAR_LEVEL_UP       BUTTON_VOL_UP
+#define STAR_LEVEL_DOWN     BUTTON_VOL_DOWN
+#define STAR_LEVEL_REPEAT   BUTTON_BACK
 #define STAR_TOGGLE_CONTROL_NAME "PLAY"
 #define STAR_QUIT_NAME      "POWER"
-#define STAR_LEVEL_UP_NAME  "POWER + VOL+"
-#define STAR_LEVEL_DOWN_NAME "POWER + VOL-"
-#define STAR_LEVEL_REPEAT_NAME "POWER + HOME"
+#define STAR_LEVEL_UP_NAME  "VOL UP"
+#define STAR_LEVEL_DOWN_NAME "VOL DN"
+#define STAR_LEVEL_REPEAT_NAME "BACK"
 
 #else
 #error No keymap defined!
@@ -1035,8 +1019,8 @@ static void star_display_board_info(int current_level)
                    label_pos_y, "C:");
 
     rb->lcd_bitmap_part(star_tiles, 0, control == STAR_CONTROL_BALL ?
-                        BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+                        BALL*TILE_HEIGHT : BLOCK*TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         STAR_OFFSET_X + (STAR_WIDTH-1) * TILE_WIDTH,
                         tile_pos_y, TILE_WIDTH, TILE_HEIGHT);
@@ -1082,7 +1066,7 @@ static int star_load_level(int current_level)
                          STAR_OFFSET_X + x * TILE_WIDTH,    \
                          STAR_OFFSET_Y + y * TILE_HEIGHT,   \
                          TILE_WIDTH, TILE_HEIGHT);
-                         
+
                 case STAR_VOID:
                     DRAW_TILE( SPACE );
                     break;
@@ -1128,12 +1112,12 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         for (i = 1 ; i <= TILE_WIDTH ; i++)
         {
             STAR_SLEEP
-            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
-                        STRIDE( SCREEN_MAIN, 
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x + delta_x * i, start_y, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_update_rect(start_x + delta_x * i - (delta_x>0?1:0),
@@ -1145,12 +1129,12 @@ static void star_animate_tile(int tile_no, int start_x, int start_y,
         for (i = 1 ; i <= TILE_HEIGHT ; i++)
         {
             STAR_SLEEP
-            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+            rb->lcd_bitmap_part(star_tiles, 0, SPACE * TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y, TILE_WIDTH, TILE_HEIGHT);
-            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT, 
-                        STRIDE( SCREEN_MAIN, 
+            rb->lcd_bitmap_part(star_tiles, 0, tile_no * TILE_HEIGHT,
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_star_tiles, BMPHEIGHT_star_tiles),
                         start_x, start_y + delta_y * i, TILE_WIDTH, TILE_HEIGHT);
             rb->lcd_update_rect(start_x, start_y + delta_y * i - (delta_y>0?1:0),
@@ -1169,7 +1153,7 @@ static int star_run_game(int current_level)
     int key;
 #if defined(STAR_LEVEL_DOWN_PRE) || \
     defined(STAR_LEVEL_UP_PRE) || \
-    defined(STAR_TOGGLE_CONTROL_PRE) 
+    defined(STAR_TOGGLE_CONTROL_PRE)
     int lastkey = BUTTON_NONE;
 #endif
 
@@ -1261,7 +1245,7 @@ static int star_run_game(int current_level)
             }
 #if defined(STAR_LEVEL_DOWN_PRE) || \
     defined(STAR_LEVEL_UP_PRE) || \
-    defined(STAR_TOGGLE_CONTROL_PRE) 
+    defined(STAR_TOGGLE_CONTROL_PRE)
             if (key != BUTTON_NONE)
                 lastkey = key;
 #endif

@@ -152,7 +152,7 @@ static const uint8_t ht_count[2][2][16] =
   { {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 },     /* table1 */
     { 4,  5,  5,  6,  5,  6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8 } } }; /* hleng1 */
 
-static const uint8_t  t1HB[4]  = {1,1,1,0}; 
+static const uint8_t  t1HB[4]  = {1,1,1,0};
 static const uint8_t  t2HB[9]  = {1,2,1,3,1,1,3,2,0};
 static const uint8_t  t3HB[9]  = {3,2,1,1,1,1,3,2,0};
 static const uint8_t  t5HB[16] = {1,2,6,5,3,1,4,4,7,5,7,1,6,1,1,0};
@@ -802,7 +802,7 @@ static const int16_t win[18][4] = {
   {   529, -831,-3747,-2387 },
   {   362, -471,-3579,-2747 },
   {   134, -146,-3352,-3072 } };
-  
+
 static char* mp3_enc_err[] = {
   /* 0 */ "",
   /* 1 */ "Cannot open file.",
@@ -880,21 +880,21 @@ static int wave_open(void)
 
   if((wavfile = rb->open(wav_filename, O_RDONLY)) < 0)
     return -1;
-  
+
   if(!checkString(wavfile,"RIFF")) return -2;
   Read32BitsLowHigh(wavfile); /* complete wave chunk size */
   if(!checkString(wavfile,"WAVE")) return -3;
   if(!checkString(wavfile,"fmt ")) return -4;
-  
+
   header_size = Read32BitsLowHigh(wavfile); /* chunk size */
   wFormatTag  = Read16BitsLowHigh(wavfile);
-  
+
   cfg.channels    = Read16BitsLowHigh(wavfile);
   cfg.samplerate  = Read32BitsLowHigh(wavfile);
   /*dAvgBytesPerSec*/ Read32BitsLowHigh(wavfile);
   /*wBlockAlign    */ Read16BitsLowHigh(wavfile);
   bits_per_samp   = Read16BitsLowHigh(wavfile);
-  
+
   if(wFormatTag != 0x0001)         return -5; /* linear PCM required */
   if(bits_per_samp != 16)          return -6; /* 16 bps required */
   if(cfg.channels > 2)             return -7; /* <=2 channels required */
@@ -904,11 +904,11 @@ static int wave_open(void)
   if((cfg.samplerate != 16000) && (cfg.samplerate != 22050) &&
      (cfg.samplerate != 24000) && (cfg.samplerate != 32000) &&
      (cfg.samplerate != 44100) && (cfg.samplerate != 48000))    return -9;
-  
+
   header_size = 0x28;
   wav_size = rb->filesize(wavfile);
   rb->lseek(wavfile, header_size, SEEK_SET);
-  
+
   return 0;
 }
 
@@ -946,7 +946,7 @@ static void encodeSideInfo( side_info_t si[2][2] )
 {
   int gr, ch, header;
   uint32_t  cc=0, sz=0;
-  
+
   /*
    * MPEG header layout:
    * AAAAAAAA AAABBCCD EEEEFFGH IIJJKLMM
@@ -1053,7 +1053,7 @@ static void Huffmancodebits( short *ix, char *xr_sign, side_info_t *gi )
 
   if(bigvals > region2)
     bits += HuffmanCode(ix, xr_sign, region2, bigvals, gi->table_select[2]);
- 
+
   if(count1 > bigvals)
     bits += HuffmanCod1(ix, xr_sign, bigvals,  count1, gi->table_select[3]);
 
@@ -1251,7 +1251,7 @@ static int choose_table( short *ix, uint32_t begin, uint32_t end, int *bits )
 {
   uint32_t i;
   int    max, table0, table1;
-  
+
   for(i=begin,max=0; i<end; i++)
     if(ix[i] > max)
       max = ix[i];
@@ -1408,7 +1408,7 @@ static int calc_runlen( short *ix, side_info_t *si )
     int w = ix[i-2];
     int x = ix[i-3];
     int y = ix[i-4];
-    
+
     if((v | w | x | y) <= 1)
     {
       p = (y<<3) + (x<<2) + (w<<1) + (v);
@@ -1473,7 +1473,7 @@ static int quantize_int(int *xr, short *ix, side_info_t *si)
 static void subdivide(side_info_t *si)
 {
   int scfb, count0, count1;
-  
+
   if( !si->address3 )
   { /* no bigvalue region */
     si->region_0_1 = 0;
@@ -1535,7 +1535,7 @@ static int quantize_and_count_bits(int *xr, short *ix, side_info_t *si)
 
 /************************************************************************/
 /* The code selects the best quantStep for a particular set of scalefacs*/
-/************************************************************************/ 
+/************************************************************************/
 static int inner_loop(int *xr, int max_bits, side_info_t *si)
 {
   int bits;
@@ -1877,7 +1877,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   a[ 7] -= a[ 6];
   a[22] -= a[ 7];
   a[23] -= a[22];
-    
+
   xr = a[ 6];  a[ 6] = a[31] - xr;  a[31] = a[31] + xr;
   xr = a[ 7];  a[ 7] = a[30] - xr;  a[30] = a[30] + xr;
   xr = a[22];  a[22] = a[15] - xr;  a[15] = a[15] + xr;
@@ -1897,23 +1897,23 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[ 1] - a[13];  a[ 1] += a[13];  a[13] = shft9(xr) * wp[ -4*27+25];
   xr = a[16] - a[28];  a[16] += a[28];  a[28] = shft9(xr) * wp[ -4*27+25];
   xr =-a[17] + a[29];  a[17] += a[29];  a[29] = shft9(xr) * wp[ -4*27+25];
-  
+
   xr = SQRT * shft9(a[ 2] - a[10]);  a[ 2] += a[10];  a[10] = xr;
   xr = SQRT * shft9(a[ 3] - a[11]);  a[ 3] += a[11];  a[11] = xr;
   xr = SQRT * shft9(a[26] - a[18]);  a[18] += a[26];  a[26] = xr - a[18];
   xr = SQRT * shft9(a[27] - a[19]);  a[19] += a[27];  a[27] = xr - a[19];
-  
+
   xr = a[ 2];  a[19] -= a[ 3];  a[ 3] -= xr;  a[ 2] = a[31] - xr;  a[31] += xr;
   xr = a[ 3];  a[11] -= a[19];  a[18] -= xr;  a[ 3] = a[30] - xr;  a[30] += xr;
   xr = a[18];  a[27] -= a[11];  a[19] -= xr;  a[18] = a[15] - xr;  a[15] += xr;
-  
+
   xr = a[19];  a[10] -= xr;  a[19] = a[14] - xr;  a[14] += xr;
   xr = a[10];  a[11] -= xr;  a[10] = a[23] - xr;  a[23] += xr;
   xr = a[11];  a[26] -= xr;  a[11] = a[22] - xr;  a[22] += xr;
   xr = a[26];  a[27] -= xr;  a[26] = a[ 7] - xr;  a[ 7] += xr;
-  
+
   xr = a[27];  a[27] = a[6] - xr;  a[6] += xr;
-  
+
   xr = SQRT * shft9(a[ 0] - a[ 4]);  a[ 0] += a[ 4];  a[ 4] = xr;
   xr = SQRT * shft9(a[ 1] - a[ 5]);  a[ 1] += a[ 5];  a[ 5] = xr;
   xr = SQRT * shft9(a[16] - a[20]);  a[16] += a[20];  a[20] = xr;
@@ -1922,15 +1922,15 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr =-SQRT * shft9(a[ 9] - a[13]);  a[ 9] += a[13];  a[13] = xr - a[ 9];
   xr =-SQRT * shft9(a[25] - a[29]);  a[25] += a[29];  a[29] = xr - a[25];
   xr =-SQRT * shft9(a[24] + a[28]);  a[24] -= a[28];  a[28] = xr - a[24];
-  
+
   xr = a[24] - a[16]; a[24] = xr;
   xr = a[20] - xr;    a[20] = xr;
   xr = a[28] - xr;    a[28] = xr;
-  
+
   xr = a[25] - a[17]; a[25] = xr;
   xr = a[21] - xr;    a[21] = xr;
   xr = a[29] - xr;    a[29] = xr;
-  
+
   xr = a[17] - a[1];  a[17] = xr;
   xr = a[ 9] - xr;    a[ 9] = xr;
   xr = a[25] - xr;    a[25] = xr;
@@ -1938,7 +1938,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[21] - xr;    a[21] = xr;
   xr = a[13] - xr;    a[13] = xr;
   xr = a[29] - xr;    a[29] = xr;
-  
+
   xr = a[ 1] - a[0];  a[ 1] = xr;
   xr = a[16] - xr;    a[16] = xr;
   xr = a[17] - xr;    a[17] = xr;
@@ -1954,7 +1954,7 @@ void window_subband2(short *x1, int a[SBLIMIT])
   xr = a[13] - xr;    a[13] = xr;
   xr = a[28] - xr;    a[28] = xr;
   xr = a[29] - xr;    a[29] = xr;
-  
+
   xr = a[ 0];  a[ 0] += a[31];  a[31] -= xr;
   xr = a[ 1];  a[ 1] += a[30];  a[30] -= xr;
   xr = a[16];  a[16] += a[15];  a[15] -= xr;
@@ -1994,7 +1994,7 @@ void mdct_long(int *out, int *in)
   ct      = (tc1 - tc3 - tc4) * cx[6];
   out[5]  = ct + st;
   out[6]  = ct - st;
-    
+
   tc2     = (in[16] - in[10]) * cx[6];
   ts6     =  ts6 * cx[7] + in[4] * cx[8];
 
@@ -2002,12 +2002,12 @@ void mdct_long(int *out, int *in)
   st      = -ts5 * cx[4] + ts6 - ts7 * cx[5] + ts8 * cx[3];
   out[1]  = ct + st;
   out[2]  = ct - st;
-    
+
   ct      =  tc1 * cx[1] - tc2 - tc3 * cx[2] + tc4 * cx[0];
   st      = -ts5 * cx[5] + ts6 - ts7 * cx[3] + ts8 * cx[4];
   out[ 9] = ct + st;
   out[10] = ct - st;
-    
+
   ct      = tc1 * cx[2] - tc2 + tc3 * cx[0] - tc4 * cx[1];
   st      = ts5 * cx[3] - ts6 + ts7 * cx[4] - ts8 * cx[5];
   out[13] = ct + st;
@@ -2089,7 +2089,7 @@ static void init_mp3_encoder_engine(bool stereo, int bitrate, uint16_t sample_ra
   cfg.mpg.smpl_id   = find_samplerate_index(cfg.samplerate, &cfg.mpg.type);
   cfg.mpg.bitr_id   = find_bitrate_index(cfg.mpg.type, cfg.mpg.bitrate);
   cfg.mpg.num_bands = num_bands[stereo ? cfg.mpg.type : 2][cfg.mpg.bitr_id];
-  
+
   if(0 == cfg.mpg.type)
   { /* use MPEG2 format */
     cfg.smpl_per_frm = MAX_SAMP_PER_FRAME/2;
@@ -2172,13 +2172,13 @@ static void compress(void)
   {
     if((frames & 7) == 0)
     { rb->lcd_clear_display();
-      rb->lcd_putsxyf(4, 20, "Frame %d / %d", frames, 
+      rb->lcd_putsxyf(4, 20, "Frame %d / %d", frames,
           wav_size/cfg.smpl_per_frm/cfg.channels/2);
       rb->lcd_update();
     }
     /* encode one mp3 frame in this loop */
     memset(CodedData.bbuf, 0, sizeof(CodedData.bbuf));
-      
+
     if((cfg.slot_lag += cfg.frac_per_frame) >= 64)
     { /* Padding for this frame */
       cfg.slot_lag   -= 64;
@@ -2556,19 +2556,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define MP3ENC_DONE    BUTTON_POWER
 #define MP3ENC_SELECT  BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define MP3ENC_PREV    BUTTON_HOME
-#define MP3ENC_NEXT    BUTTON_OPTION
-#define MP3ENC_DONE    BUTTON_POWER
-#define MP3ENC_SELECT  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define MP3ENC_PREV    BUTTON_HOME
-#define MP3ENC_NEXT    BUTTON_OPTION
-#define MP3ENC_DONE    BUTTON_POWER
-#define MP3ENC_SELECT  BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define MP3ENC_PREV    BUTTON_HOME
 #define MP3ENC_NEXT    BUTTON_OPTION
 #define MP3ENC_DONE    BUTTON_POWER
@@ -2580,13 +2568,13 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define MP3ENC_DONE    BUTTON_POWER
 #define MP3ENC_SELECT  BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define MP3ENC_PREV    BUTTON_PREV
 #define MP3ENC_NEXT    BUTTON_NEXT
 #define MP3ENC_DONE    BUTTON_POWER
 #define MP3ENC_SELECT  BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define MP3ENC_PREV    BUTTON_PREV
 #define MP3ENC_NEXT    BUTTON_NEXT
 #define MP3ENC_DONE    BUTTON_POWER

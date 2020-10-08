@@ -626,24 +626,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define PEGBOX_SELECT   BUTTON_PLAY
-#define PEGBOX_QUIT     BUTTON_POWER
-#define PEGBOX_RESTART  (BUTTON_POWER | BUTTON_HOME)
-#define PEGBOX_LVL_UP   BUTTON_VOL_UP
-#define PEGBOX_LVL_DOWN BUTTON_VOL_DOWN
-#define PEGBOX_UP       BUTTON_HOME
-#define PEGBOX_DOWN     BUTTON_OPTION
-#define PEGBOX_RIGHT    BUTTON_NEXT
-#define PEGBOX_LEFT     BUTTON_PREV
-
-#define SELECT_TEXT "PLAY"
-#define QUIT_TEXT "POWER"
-#define RESTART_TEXT "HOME"
-#define LVL_UP_TEXT "VOL+"
-#define LVL_DOWN_TEXT "VOL-"
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define PEGBOX_SELECT   BUTTON_PLAY
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  (BUTTON_POWER | BUTTON_HOME)
@@ -677,7 +660,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define PEGBOX_SELECT   BUTTON_PLAY
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  (BUTTON_POWER | BUTTON_HOME)
@@ -694,16 +677,16 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
 #define PEGBOX_SELECT   BUTTON_PLAY
 #define PEGBOX_QUIT     BUTTON_POWER
 #define PEGBOX_RESTART  (BUTTON_POWER | BUTTON_HOME)
-#define PEGBOX_LVL_UP   (BUTTON_POWER | BUTTON_VOL_UP)
-#define PEGBOX_LVL_DOWN (BUTTON_POWER | BUTTON_VOL_DOWN)
-#define PEGBOX_UP       BUTTON_PREV
-#define PEGBOX_DOWN     BUTTON_NEXT
-#define PEGBOX_RIGHT    BUTTON_HOME
-#define PEGBOX_LEFT     BUTTON_VOL_DOWN
+#define PEGBOX_LVL_UP   BUTTON_VOL_UP
+#define PEGBOX_LVL_DOWN BUTTON_VOL_DOWN
+#define PEGBOX_UP       BUTTON_HOME
+#define PEGBOX_DOWN     BUTTON_OPTION
+#define PEGBOX_RIGHT    BUTTON_NEXT
+#define PEGBOX_LEFT     BUTTON_PREV
 
 #define SELECT_TEXT "PLAY"
 #define QUIT_TEXT "POWER"
@@ -711,11 +694,24 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
-#else
-#error Unsupported keymap!
-#endif
+#elif CONFIG_KEYPAD == EROSQ_PAD
+#define PEGBOX_SELECT   BUTTON_PLAY
+#define PEGBOX_QUIT     BUTTON_POWER
+#define PEGBOX_RESTART  BUTTON_BACK
+#define PEGBOX_LVL_UP   BUTTON_VOL_UP
+#define PEGBOX_LVL_DOWN BUTTON_VOL_DOWN
+#define PEGBOX_UP       BUTTON_PREV
+#define PEGBOX_DOWN     BUTTON_NEXT
+#define PEGBOX_RIGHT    BUTTON_SCROLL_FWD
+#define PEGBOX_LEFT     BUTTON_SCROLL_BACK
 
-#ifdef HAVE_TOUCHSCREEN
+#define SELECT_TEXT "PLAY"
+#define QUIT_TEXT "POWER"
+#define RESTART_TEXT "BACK"
+#define LVL_UP_TEXT "VOL+"
+#define LVL_DOWN_TEXT "VOL-"
+
+#elif defined(HAVE_TOUCHSCREEN)
 #ifndef PEGBOX_QUIT
 #define PEGBOX_QUIT     BUTTON_TOPLEFT
 #endif
@@ -758,8 +754,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef LVL_DOWN_TEXT
 #define LVL_DOWN_TEXT "BOTTOMRIGHT"
 #endif
+#else
+#error Unsupported keymap!
 #endif
-
 
 /* get several sizes from the bitmaps */
 #ifdef BMPWIDTH_pegbox_pieces
@@ -1083,7 +1080,7 @@ static void pegbox_draw_board(struct game_context* pb)
 
             if(type != SPACE) {
                 rb->lcd_bitmap_part(pegbox_pieces, 0, (type-1)*PIECE_HEIGHT,
-                        STRIDE( SCREEN_MAIN, 
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_pegbox_pieces,BMPHEIGHT_pegbox_pieces),
                         c * PIECE_WIDTH + BOARD_X,
                         r * PIECE_HEIGHT + BOARD_Y, PIECE_WIDTH,

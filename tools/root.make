@@ -104,6 +104,8 @@ ifneq (,$(findstring bootloader,$(APPSDIR)))
     include $(ROOTDIR)/firmware/target/hosted/agptek/rocker.make
   else ifneq (,$(findstring xduoo,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/xduoo/xduoo.make
+  else ifneq (,$(findstring erosq,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/aigo/erosq.make
   else ifneq (,$(findstring fiio,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/fiio/fiio.make
   else
@@ -154,6 +156,10 @@ else # core
 
   ifneq (,$(findstring fiio,$(APP_TYPE)))
     include $(ROOTDIR)/firmware/target/hosted/fiio/fiio.make
+  endif
+
+  ifneq (,$(findstring erosq,$(APP_TYPE)))
+    include $(ROOTDIR)/firmware/target/hosted/aigo/erosq.make
   endif
 
   ifneq (,$(findstring android_ndk, $(APP_TYPE)))

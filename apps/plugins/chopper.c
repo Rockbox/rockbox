@@ -198,32 +198,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define ACTION     BUTTON_SELECT
 #define ACTIONTEXT "Select"
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define QUIT       BUTTON_POWER
-#define ACTION     BUTTON_PLAY
-#define ACTIONTEXT "PLAY"
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define QUIT       BUTTON_POWER
-#define ACTION     BUTTON_PLAY
-#define ACTIONTEXT "PLAY"
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
-#define QUIT       BUTTON_POWER
-#define ACTION     BUTTON_PLAY
-#define ACTIONTEXT "PLAY"
-
-#elif CONFIG_KEYPAD == FIIO_M3K_PAD
-#define QUIT       BUTTON_POWER
-#define ACTION     BUTTON_PLAY
-#define ACTIONTEXT "PLAY"
-
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
-#define QUIT       BUTTON_POWER
-#define ACTION     BUTTON_PLAY
-#define ACTIONTEXT "PLAY"
-
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD || CONFIG_KEYPAD == FIIO_M3K_PAD || CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD || CONFIG_KEYPAD == EROSQ_PAD
 #define QUIT       BUTTON_POWER
 #define ACTION     BUTTON_PLAY
 #define ACTIONTEXT "PLAY"
@@ -735,7 +710,7 @@ static void chopDrawScene(void)
 #elif LCD_DEPTH == 2
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
-    
+
 #if LCD_WIDTH <= 128
     rb->snprintf(s, sizeof(s), "Dist: %d", score);
 #else
@@ -781,7 +756,7 @@ static int chopMenu(int menunum)
         { "Normal", -1 },
         { "Steep", -1 },
     };
-    
+
     MENUITEM_STRINGLIST(menu,"Chopper Menu",chopMenuCb,
                         "Resume Game","Start New Game",
                         "Level","Playback Control","Quit");

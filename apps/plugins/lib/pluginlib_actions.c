@@ -68,7 +68,7 @@ const struct button_mapping pla_remote_ctx[] =
 #endif /* HAVE_REMOTE_LCD */
 
 /* these were taken from the bubbles plugin, so may need tweaking */
-const struct button_mapping pla_main_ctx[] = 
+const struct button_mapping pla_main_ctx[] =
 {
     /* Touchscreens */
 #ifdef HAVE_TOUCHSCREEN
@@ -242,6 +242,15 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_DOWN_REPEAT,      BUTTON_OPTION|BUTTON_REPEAT,        BUTTON_NONE },
     { PLA_LEFT_REPEAT,      BUTTON_PREV|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_RIGHT_REPEAT,     BUTTON_NEXT|BUTTON_REPEAT,          BUTTON_NONE },
+#elif (CONFIG_KEYPAD == EROSQ_PAD)
+    { PLA_UP,               BUTTON_NEXT,                        BUTTON_NONE },
+    { PLA_DOWN,             BUTTON_PREV,                        BUTTON_NONE },
+    { PLA_LEFT,             BUTTON_SCROLL_BACK,                 BUTTON_NONE },
+    { PLA_RIGHT,            BUTTON_SCROLL_FWD,                  BUTTON_NONE },
+    { PLA_UP_REPEAT,        BUTTON_NEXT|BUTTON_REPEAT,          BUTTON_NONE },
+    { PLA_DOWN_REPEAT,      BUTTON_PREV|BUTTON_REPEAT,          BUTTON_NONE },
+//    { PLA_LEFT_REPEAT,      BUTTON_SCROLL_BACK|BUTTON_REPEAT,          BUTTON_NONE },
+//    { PLA_RIGHT_REPEAT,     BUTTON_SCROLL_FWD|BUTTON_REPEAT,          BUTTON_NONE },
 #elif (CONFIG_KEYPAD == IHIFI_770_PAD)
     { PLA_UP,               BUTTON_PREV,                        BUTTON_NONE },
     { PLA_DOWN,             BUTTON_NEXT,                        BUTTON_NONE },
@@ -407,19 +416,19 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_OK,                          BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_OK|BUTTON_REL,               BUTTON_OK  },
     {PLA_SELECT_REPEAT,     BUTTON_OK|BUTTON_REPEAT,            BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)                                      
+#elif (CONFIG_KEYPAD == MPIO_HD200_PAD)
     {PLA_CANCEL,            BUTTON_REC,                         BUTTON_NONE},
     {PLA_EXIT,              (BUTTON_REC|BUTTON_PLAY),           BUTTON_NONE},
     {PLA_SELECT,            BUTTON_FUNC,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_FUNC|BUTTON_REL,             BUTTON_FUNC},
     {PLA_SELECT_REPEAT,     BUTTON_FUNC|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == MPIO_HD300_PAD)                                      
+#elif (CONFIG_KEYPAD == MPIO_HD300_PAD)
     {PLA_CANCEL,            BUTTON_MENU,                        BUTTON_NONE},
     {PLA_EXIT,              BUTTON_MENU|BUTTON_REPEAT,          BUTTON_NONE},
     {PLA_SELECT,            BUTTON_ENTER,                       BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_ENTER|BUTTON_REL,            BUTTON_ENTER},
     {PLA_SELECT_REPEAT,     BUTTON_ENTER|BUTTON_REPEAT,         BUTTON_NONE},
-#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)                                      
+#elif (CONFIG_KEYPAD == RK27XX_GENERIC_PAD)
     {PLA_CANCEL,            BUTTON_M,                           BUTTON_NONE},
     {PLA_EXIT,              BUTTON_M|BUTTON_REPEAT,             BUTTON_NONE},
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
@@ -431,7 +440,7 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
-#elif (CONFIG_KEYPAD == AGPTEK_ROCKER_PAD)                                      
+#elif (CONFIG_KEYPAD == AGPTEK_ROCKER_PAD)
     {PLA_CANCEL,            BUTTON_VOLUP,                       BUTTON_NONE},
     {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
@@ -479,6 +488,12 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
+#elif (CONFIG_KEYPAD == EROSQ_PAD)
+    {PLA_CANCEL,            BUTTON_BACK|BUTTON_REL,             BUTTON_BACK},
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
+    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
+    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IHIFI_770_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
@@ -501,7 +516,7 @@ const struct button_mapping pla_main_ctx[] =
 
 static struct button_mapping **plugin_context_order;
 static int plugin_context_count = 0;
-static int last_context = 0; /* index into plugin_context_order 
+static int last_context = 0; /* index into plugin_context_order
                                 of the last context returned */
 
 static const struct button_mapping* get_context_map(int context)

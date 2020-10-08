@@ -277,23 +277,7 @@
 #define STOPWATCH_SCROLL_UP      BUTTON_UP
 #define STOPWATCH_SCROLL_DOWN    BUTTON_DOWN
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define STOPWATCH_QUIT           BUTTON_POWER
-#define STOPWATCH_START_STOP     BUTTON_NEXT
-#define STOPWATCH_RESET_TIMER    BUTTON_PREV
-#define STOPWATCH_LAP_TIMER      BUTTON_PLAY
-#define STOPWATCH_SCROLL_UP      BUTTON_HOME
-#define STOPWATCH_SCROLL_DOWN    BUTTON_OPTION
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define STOPWATCH_QUIT           BUTTON_POWER
-#define STOPWATCH_START_STOP     BUTTON_NEXT
-#define STOPWATCH_RESET_TIMER    BUTTON_PREV
-#define STOPWATCH_LAP_TIMER      BUTTON_PLAY
-#define STOPWATCH_SCROLL_UP      BUTTON_HOME
-#define STOPWATCH_SCROLL_DOWN    BUTTON_OPTION
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define STOPWATCH_QUIT           BUTTON_POWER
 #define STOPWATCH_START_STOP     BUTTON_NEXT
 #define STOPWATCH_RESET_TIMER    BUTTON_PREV
@@ -309,7 +293,7 @@
 #define STOPWATCH_SCROLL_UP      BUTTON_HOME
 #define STOPWATCH_SCROLL_DOWN    BUTTON_OPTION
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define STOPWATCH_QUIT           BUTTON_POWER
 #define STOPWATCH_START_STOP     BUTTON_NEXT
 #define STOPWATCH_RESET_TIMER    BUTTON_PREV
@@ -317,13 +301,13 @@
 #define STOPWATCH_SCROLL_UP      BUTTON_VOL_UP
 #define STOPWATCH_SCROLL_DOWN    BUTTON_VOL_DOWN
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define STOPWATCH_QUIT           BUTTON_POWER
-#define STOPWATCH_START_STOP     BUTTON_NEXT
-#define STOPWATCH_RESET_TIMER    BUTTON_PREV
-#define STOPWATCH_LAP_TIMER      BUTTON_PLAY
-#define STOPWATCH_SCROLL_UP      BUTTON_VOL_UP
-#define STOPWATCH_SCROLL_DOWN    BUTTON_VOL_DOWN
+#define STOPWATCH_START_STOP     BUTTON_PLAY
+#define STOPWATCH_RESET_TIMER    BUTTON_BACK
+#define STOPWATCH_LAP_TIMER      BUTTON_MENU
+#define STOPWATCH_SCROLL_UP      BUTTON_SCROLL_FWD
+#define STOPWATCH_SCROLL_DOWN    BUTTON_SCROLL_BACK
 
 #else
 #error No keymap defined!
@@ -405,24 +389,24 @@ static void ticks_to_string(int ticks,int lap,int buflen, char * buf)
     }
 }
 
-/* 
+/*
  * Load saved stopwatch state, if exists.
  */
 static void load_stopwatch(void)
 {
     int fd;
-    
+
     fd = rb->open(STOPWATCH_FILE, O_RDONLY);
-    
+
     if (fd < 0)
     {
         return;
     }
-    
+
     /* variable stopwatch isn't saved/loaded, because it is only used
      * temporarily in main loop
      */
-    
+
     rb->read(fd, &start_at, sizeof(start_at));
     rb->read(fd, &prev_total, sizeof(prev_total));
     rb->read(fd, &counting, sizeof(counting));
@@ -430,7 +414,7 @@ static void load_stopwatch(void)
     rb->read(fd, &lap_scroll, sizeof(lap_scroll));
     rb->read(fd, &lap_start, sizeof(lap_start));
     rb->read(fd, lap_times, sizeof(lap_times));
-    
+
     if (counting && start_at > *rb->current_tick)
     {
         /* Stopwatch started in the future? Unlikely; probably started on a
@@ -441,28 +425,28 @@ static void load_stopwatch(void)
         start_at = 0;
         counting = false;
     }
-    
+
     rb->close(fd);
 }
 
-/* 
+/*
  * Save stopwatch state.
  */
 static void save_stopwatch(void)
 {
     int fd;
-    
+
     fd = rb->open(STOPWATCH_FILE, O_CREAT|O_WRONLY|O_TRUNC, 0666);
-    
+
     if (fd < 0)
     {
         return;
     }
-    
+
     /* variable stopwatch isn't saved/loaded, because it is only used
      * temporarily in main loop
      */
-    
+
     rb->write(fd, &start_at, sizeof(start_at));
     rb->write(fd, &prev_total, sizeof(prev_total));
     rb->write(fd, &counting, sizeof(counting));
@@ -470,7 +454,7 @@ static void save_stopwatch(void)
     rb->write(fd, &lap_scroll, sizeof(lap_scroll));
     rb->write(fd, &lap_start, sizeof(lap_start));
     rb->write(fd, lap_times, sizeof(lap_times));
-    
+
     rb->close(fd);
 }
 
@@ -491,9 +475,9 @@ enum plugin_status plugin_start(const void* parameter)
     lines = (LCD_HEIGHT / h) - (LAP_Y);
 
     load_stopwatch();
-    
+
     rb->lcd_clear_display();
-    
+
     while (!done)
     {
         if (counting)

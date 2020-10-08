@@ -631,23 +631,7 @@
 #define BUTTON_SAVE BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
 
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define SOKOBAN_LEFT BUTTON_PREV
-#define SOKOBAN_RIGHT BUTTON_NEXT
-#define SOKOBAN_UP BUTTON_HOME
-#define SOKOBAN_DOWN BUTTON_OPTION
-#define SOKOBAN_MENU BUTTON_POWER
-#define SOKOBAN_UNDO_PRE BUTTON_PLAY
-#define SOKOBAN_UNDO (BUTTON_PLAY | BUTTON_REL)
-#define SOKOBAN_REDO (BUTTON_POWER | BUTTON_PLAY)
-#define SOKOBAN_LEVEL_DOWN BUTTON_VOL_DOWN
-#define SOKOBAN_LEVEL_REPEAT (BUTTON_PLAY | BUTTON_NEXT)
-#define SOKOBAN_LEVEL_UP BUTTON_VOL_UP
-#define SOKOBAN_PAUSE BUTTON_PLAY
-#define BUTTON_SAVE BUTTON_PLAY
-#define BUTTON_SAVE_NAME "PLAY"
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define SOKOBAN_LEFT BUTTON_PREV
 #define SOKOBAN_RIGHT BUTTON_NEXT
 #define SOKOBAN_UP BUTTON_HOME
@@ -679,7 +663,7 @@
 #define BUTTON_SAVE BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define SOKOBAN_LEFT BUTTON_HOME
 #define SOKOBAN_RIGHT BUTTON_VOL_DOWN
 #define SOKOBAN_UP BUTTON_PREV
@@ -695,18 +679,18 @@
 #define BUTTON_SAVE BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
-#define SOKOBAN_LEFT BUTTON_HOME
-#define SOKOBAN_RIGHT BUTTON_VOL_DOWN
+#elif CONFIG_KEYPAD == EROSQ_PAD
+#define SOKOBAN_LEFT BUTTON_SCROLL_BACK
+#define SOKOBAN_RIGHT BUTTON_SCROLL_FWD
 #define SOKOBAN_UP BUTTON_PREV
 #define SOKOBAN_DOWN BUTTON_NEXT
-#define SOKOBAN_MENU BUTTON_POWER
+#define SOKOBAN_MENU BUTTON_MENU
 #define SOKOBAN_UNDO_PRE BUTTON_PLAY
 #define SOKOBAN_UNDO (BUTTON_PLAY | BUTTON_REL)
 #define SOKOBAN_REDO (BUTTON_POWER | BUTTON_PLAY)
-#define SOKOBAN_LEVEL_DOWN (BUTTON_POWER | BUTTON_VOL_DOWN)
-#define SOKOBAN_LEVEL_REPEAT (BUTTON_POWER | BUTTON_HOME)
-#define SOKOBAN_LEVEL_UP (BUTTON_POWER | BUTTON_VOL_UP)
+#define SOKOBAN_LEVEL_DOWN BUTTON_VOL_DOWN
+#define SOKOBAN_LEVEL_REPEAT BUTTON_BACK
+#define SOKOBAN_LEVEL_UP BUTTON_VOL_UP
 #define SOKOBAN_PAUSE BUTTON_PLAY
 #define BUTTON_SAVE BUTTON_PLAY
 #define BUTTON_SAVE_NAME "PLAY"
@@ -1286,56 +1270,56 @@ static void update_screen(void)
 
                 case ' ': /* floor */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 0*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
+                        STRIDE( SCREEN_MAIN,
                                 BMPWIDTH_sokoban_tiles,
-                                BMPHEIGHT_sokoban_tiles), 
+                                BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '#': /* wall */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 1*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
-                                BMPWIDTH_sokoban_tiles, 
+                        STRIDE( SCREEN_MAIN,
+                                BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '$': /* box */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 2*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
-                                BMPWIDTH_sokoban_tiles, 
+                        STRIDE( SCREEN_MAIN,
+                                BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE,SOKOBAN_TILESIZE);
                     break;
 
                 case '*': /* box on goal */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 3*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
-                                BMPWIDTH_sokoban_tiles, 
+                        STRIDE( SCREEN_MAIN,
+                                BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '.': /* goal */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 4*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
-                                BMPWIDTH_sokoban_tiles, 
+                        STRIDE( SCREEN_MAIN,
+                                BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '@': /* player */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 5*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
-                                BMPWIDTH_sokoban_tiles, 
+                        STRIDE( SCREEN_MAIN,
+                                BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;
 
                 case '+': /* player on goal */
                     rb->lcd_bitmap_part(sokoban_tiles, 0, 6*SOKOBAN_TILESIZE,
-                        STRIDE( SCREEN_MAIN, 
-                                BMPWIDTH_sokoban_tiles, 
+                        STRIDE( SCREEN_MAIN,
+                                BMPWIDTH_sokoban_tiles,
                                 BMPHEIGHT_sokoban_tiles),
                         c, r, SOKOBAN_TILESIZE, SOKOBAN_TILESIZE);
                     break;

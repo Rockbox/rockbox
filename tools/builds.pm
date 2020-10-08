@@ -448,6 +448,10 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'FiiO M3K',
         status => 1,
     },
+    'erosq' => {
+        name => 'AIGO EROS Q / K',
+        status => 1,
+    },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
         status => 2,

@@ -17,6 +17,8 @@
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
 #endif
 
+#define HAVE_FPU
+
 #define HW_SAMPR_CAPS (SAMPR_CAP_44 | SAMPR_CAP_48 | SAMPR_CAP_88 | SAMPR_CAP_96 | SAMPR_CAP_176 | SAMPR_CAP_192)
 
 /* define this if you have a bitmap LCD display */

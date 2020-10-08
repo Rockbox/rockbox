@@ -15,8 +15,8 @@ mempcpy.c
     defined(CREATIVE_ZVx) || defined(SANSA_CONNECT) || defined(SANSA_FUZEPLUS) || \
     defined(COWON_D2) || defined(MINI2440) || defined(SAMSUNG_YPR0) || \
     defined(SAMSUNG_YPR1) || defined(DX50) || defined(DX90) || (defined(MROBE_500) && !defined(LCD_USE_DMA)) || \
-    defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(SONY_NWZ_LINUX) || defined(AGPTEK_ROCKER) || \
-    defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(FIIO_M3K)) && \
+    defined(CREATIVE_ZEN) || defined(CREATIVE_ZENXFI) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX) || \
+    defined(FIIO_M3K)) && \
     !defined(SIMULATOR)
 #if LCD_DEPTH >= 24
 lcd-as-memframe-24bit.c

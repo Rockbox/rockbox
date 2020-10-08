@@ -436,31 +436,7 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_LEFT|BUTTON_VOLUP)
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-
-#define FLIPIT_LEFT         BUTTON_PREV
-#define FLIPIT_RIGHT        BUTTON_NEXT
-#define FLIPIT_UP           BUTTON_HOME
-#define FLIPIT_DOWN         BUTTON_OPTION
-#define FLIPIT_QUIT         BUTTON_POWER
-#define FLIPIT_SHUFFLE      (BUTTON_HOME | BUTTON_PREV)
-#define FLIPIT_SOLVE        (BUTTON_HOME | BUTTON_NEXT)
-#define FLIPIT_STEP_BY_STEP (BUTTON_HOME | BUTTON_PLAY)
-#define FLIPIT_TOGGLE       BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-
-#define FLIPIT_LEFT         BUTTON_PREV
-#define FLIPIT_RIGHT        BUTTON_NEXT
-#define FLIPIT_UP           BUTTON_HOME
-#define FLIPIT_DOWN         BUTTON_OPTION
-#define FLIPIT_QUIT         BUTTON_POWER
-#define FLIPIT_SHUFFLE      (BUTTON_HOME | BUTTON_PREV)
-#define FLIPIT_SOLVE        (BUTTON_HOME | BUTTON_NEXT)
-#define FLIPIT_STEP_BY_STEP (BUTTON_HOME | BUTTON_PLAY)
-#define FLIPIT_TOGGLE       BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD ||  CONFIG_KEYPAD == XDUOO_X20_PAD
 
 #define FLIPIT_LEFT         BUTTON_PREV
 #define FLIPIT_RIGHT        BUTTON_NEXT
@@ -484,7 +460,7 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_HOME | BUTTON_PLAY)
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 
 #define FLIPIT_LEFT         BUTTON_HOME
 #define FLIPIT_RIGHT        BUTTON_VOL_DOWN
@@ -496,16 +472,16 @@
 #define FLIPIT_STEP_BY_STEP (BUTTON_POWER | BUTTON_PLAY)
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 
-#define FLIPIT_LEFT         BUTTON_HOME
-#define FLIPIT_RIGHT        BUTTON_VOL_DOWN
+#define FLIPIT_LEFT         BUTTON_SCROLL_BACK
+#define FLIPIT_RIGHT        BUTTON_SCROLL_FWD
 #define FLIPIT_UP           BUTTON_PREV
 #define FLIPIT_DOWN         BUTTON_NEXT
 #define FLIPIT_QUIT         BUTTON_POWER
-#define FLIPIT_SHUFFLE      (BUTTON_POWER | BUTTON_PREV)
-#define FLIPIT_SOLVE        (BUTTON_POWER | BUTTON_NEXT)
-#define FLIPIT_STEP_BY_STEP (BUTTON_POWER | BUTTON_PLAY)
+#define FLIPIT_SHUFFLE      BUTTON_MENU
+#define FLIPIT_SOLVE        BUTTON_VOL_DOWN
+#define FLIPIT_STEP_BY_STEP BUTTON_VOL_UP
 #define FLIPIT_TOGGLE       BUTTON_PLAY
 
 #else
@@ -562,8 +538,8 @@ static int cursor_pos, moves;
 /* draw a spot at the coordinates (x,y), range of p is 0-19 */
 static void draw_spot(int p)
 {
-    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT, 
-                         STRIDE(SCREEN_MAIN, BMPWIDTH_flipit_tokens, 
+    rb->lcd_bitmap_part( flipit_tokens, 0, spots[p] * TK_HEIGHT,
+                         STRIDE(SCREEN_MAIN, BMPWIDTH_flipit_tokens,
                             BMPHEIGHT_flipit_tokens),
                          GRID_LEFT + (p%5) * (TK_WIDTH+TK_SPACE),
                          GRID_TOP + (p/5) * (TK_HEIGHT+TK_SPACE),
@@ -571,7 +547,7 @@ static void draw_spot(int p)
 }
 
 /* draw the cursor at the current cursor position */
-static void draw_cursor(void) 
+static void draw_cursor(void)
 {
 #ifdef HAVE_LCD_COLOR
     rb->lcd_bitmap_transparent( flipit_cursor,
@@ -612,7 +588,7 @@ static inline void clear_cursor(void)
 }
 
 /* check if the puzzle is finished */
-static bool flipit_finished(void) 
+static bool flipit_finished(void)
 {
     int i;
     for (i=0; i<20; i++)
@@ -653,7 +629,7 @@ static void flipit_toggle(void)
 }
 
 /* move the cursor in any direction */
-static void move_cursor(int x, int y) 
+static void move_cursor(int x, int y)
 {
     if (!(flipit_finished())) {
         clear_cursor();
@@ -665,7 +641,7 @@ static void move_cursor(int x, int y)
 }
 
 /* initialize the board */
-static void flipit_init(void) 
+static void flipit_init(void)
 {
     int i;
 
@@ -690,7 +666,7 @@ static void flipit_init(void)
 }
 
 /* the main game loop */
-static bool flipit_loop(void) 
+static bool flipit_loop(void)
 {
     int i;
     int button;
@@ -775,7 +751,7 @@ static bool flipit_loop(void)
             /*move cursor though the entire field*/
 #ifdef FLIPIT_SCROLLWHEEL
             case FLIPIT_PREV:
-            case FLIPIT_PREV|BUTTON_REPEAT:    
+            case FLIPIT_PREV|BUTTON_REPEAT:
                 if ((cursor_pos)%5 == 0) {
                     move_cursor(-1, -1);
                 }

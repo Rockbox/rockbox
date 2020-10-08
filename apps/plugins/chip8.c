@@ -57,7 +57,7 @@
 #ifndef EXTERN
 #define EXTERN extern
 #endif
- 
+
 typedef unsigned char byte;                     /* sizeof(byte)==1          */
 typedef unsigned short word;                    /* sizeof(word)>=2          */
 
@@ -390,11 +390,11 @@ static void op_system (word opcode)
         break;
     case 0xfc:
         scroll_left();
-        break;  
+        break;
     case 0xfd:
         DBG_(printf("SUPER: quit the emulator\n"));
         chip8_reset();
-        break;  
+        break;
     case 0xfe:
         DBG_(printf("SUPER: set CHIP-8 graphic mode\n"));
         memset (chip8_display,0,sizeof(chip8_display));
@@ -404,7 +404,7 @@ static void op_system (word opcode)
         DBG_(printf("SUPER: set SCHIP graphic mode\n"));
         memset (chip8_display,0,sizeof(chip8_display));
         chip8_super = 1;
-        break;  
+        break;
 #endif
         case 0xe0:
             memset (chip8_display,0,sizeof(chip8_display));
@@ -553,7 +553,7 @@ static void op_sprite (word opcode)
         x &= 64-1;
         y &= 32-1;
         q=chip8_display+y*CHIP8_WIDTH*2;
-        if(n == 0) 
+        if(n == 0)
             n = 16;
         if (n+y>32)
             n=32-y;
@@ -838,7 +838,7 @@ STATIC void chip8_execute(void)
         --chip8_regs.delay;
     if (chip8_regs.sound)
         if (--chip8_regs.sound == 0)
-            chip8_sound_off();       
+            chip8_sound_off();
 
     /* Update the machine status */
     chip8_interrupt ();
@@ -1092,7 +1092,7 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define CHIP8_KEY8 BUTTON_DOWN
 #define CHIP8_KEY9 BUTTON_VIEW
 #define CHIP8_KEY0 BUTTON_VOL_DOWN
- 
+
 #elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
 #define CHIP8_OFF  BUTTON_POWER
 #define CHIP8_KEY1 BUTTON_LEFT
@@ -1251,23 +1251,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define CHIP8_KEY6    BUTTON_RIGHT
 #define CHIP8_KEY8    BUTTON_LEFT
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define CHIP8_OFF  BUTTON_POWER
-#define CHIP8_KEY2 BUTTON_HOME
-#define CHIP8_KEY4 BUTTON_PREV
-#define CHIP8_KEY5 BUTTON_PLAY
-#define CHIP8_KEY6 BUTTON_NEXT
-#define CHIP8_KEY8 BUTTON_OPTION
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define CHIP8_OFF  BUTTON_POWER
-#define CHIP8_KEY2 BUTTON_HOME
-#define CHIP8_KEY4 BUTTON_PREV
-#define CHIP8_KEY5 BUTTON_PLAY
-#define CHIP8_KEY6 BUTTON_NEXT
-#define CHIP8_KEY8 BUTTON_OPTION
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define CHIP8_OFF  BUTTON_POWER
 #define CHIP8_KEY2 BUTTON_HOME
 #define CHIP8_KEY4 BUTTON_PREV
@@ -1283,7 +1267,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define CHIP8_KEY6 BUTTON_NEXT
 #define CHIP8_KEY8 BUTTON_OPTION
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define CHIP8_OFF  BUTTON_POWER
 #define CHIP8_KEY2 BUTTON_NEXT
 #define CHIP8_KEY4 BUTTON_HOME
@@ -1291,12 +1275,12 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define CHIP8_KEY6 BUTTON_VOL_DOWN
 #define CHIP8_KEY8 BUTTON_PREV
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define CHIP8_OFF  BUTTON_POWER
 #define CHIP8_KEY2 BUTTON_NEXT
-#define CHIP8_KEY4 BUTTON_HOME
-#define CHIP8_KEY5 BUTTON_VOL_UP
-#define CHIP8_KEY6 BUTTON_VOL_DOWN
+#define CHIP8_KEY4 BUTTON_MENU
+#define CHIP8_KEY5 BUTTON_PLAY
+#define CHIP8_KEY6 BUTTON_BACK
 #define CHIP8_KEY8 BUTTON_PREV
 
 #else
@@ -1342,15 +1326,15 @@ static unsigned long cycles; /* Number of update cycles (50Hz) */
 /****************************************************************************/
 /* Turn sound on                                                            */
 /****************************************************************************/
-static void chip8_sound_on (void) 
+static void chip8_sound_on (void)
 {
 }
 
 /****************************************************************************/
 /* Turn sound off                                                           */
 /****************************************************************************/
-static void chip8_sound_off (void) 
-{ 
+static void chip8_sound_off (void)
+{
 }
 
 /****************************************************************************/
@@ -1587,7 +1571,7 @@ enum plugin_status plugin_start(const void* parameter)
     }
     else
     {
-        filename = (char*) parameter; 
+        filename = (char*) parameter;
     }
 
     /* now go ahead and have fun! */
