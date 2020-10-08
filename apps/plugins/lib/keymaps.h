@@ -215,23 +215,7 @@
 #define BTN_FIRE       BUTTON_MENU
 #define BTN_PAUSE      BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == XDUOO_X3_PAD)
-#define BTN_UP           BUTTON_VOL_UP
-#define BTN_DOWN         BUTTON_VOL_DOWN
-#define BTN_LEFT         BUTTON_PREV
-#define BTN_RIGHT        BUTTON_NEXT
-#define BTN_FIRE         BUTTON_PLAY
-#define BTN_PAUSE        BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == XDUOO_X3II_PAD)
-#define BTN_UP           BUTTON_VOL_UP
-#define BTN_DOWN         BUTTON_VOL_DOWN
-#define BTN_LEFT         BUTTON_PREV
-#define BTN_RIGHT        BUTTON_NEXT
-#define BTN_FIRE         BUTTON_PLAY
-#define BTN_PAUSE        BUTTON_POWER
-
-#elif (CONFIG_KEYPAD == XDUOO_X20_PAD)
+#elif (CONFIG_KEYPAD == XDUOO_X3_PAD) || (CONFIG_KEYPAD == XDUOO_X3II_PAD) || (CONFIG_KEYPAD == XDUOO_X20_PAD)
 #define BTN_UP           BUTTON_VOL_UP
 #define BTN_DOWN         BUTTON_VOL_DOWN
 #define BTN_LEFT         BUTTON_PREV
@@ -247,15 +231,15 @@
 #define BTN_FIRE         BUTTON_PLAY
 #define BTN_PAUSE        BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == IHIFI_770_PAD)
+#elif (CONFIG_KEYPAD == EROSQ_PAD)
 #define BTN_UP           BUTTON_PREV
 #define BTN_DOWN         BUTTON_NEXT
-#define BTN_LEFT         BUTTON_HOME
-#define BTN_RIGHT        BUTTON_VOL_DOWN
+#define BTN_LEFT         BUTTON_SCROLL_BACK
+#define BTN_RIGHT        BUTTON_SCROLL_FWD
 #define BTN_FIRE         BUTTON_PLAY
 #define BTN_PAUSE        BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == IHIFI_800_PAD)
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
 #define BTN_UP           BUTTON_PREV
 #define BTN_DOWN         BUTTON_NEXT
 #define BTN_LEFT         BUTTON_HOME

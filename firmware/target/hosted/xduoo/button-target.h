@@ -41,4 +41,3 @@
 #define POWEROFF_COUNT  25
 
 #endif /* _BUTTON_TARGET_H_ */
-

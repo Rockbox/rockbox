@@ -24,7 +24,6 @@
 #include "plugin.h"
 #include "lang_enum.h"
 
-
 #define BATTERY_LOG  HOME_DIR"/battery_bench.txt"
 #define BUF_SIZE 16000
 
@@ -83,7 +82,17 @@
 #define BATTERY_ON_TXT  "SELECT - start"
 #define BATTERY_OFF_TXT "HOME"
 
-#elif CONFIG_KEYPAD == IRIVER_H10_PAD
+#elif (CONFIG_KEYPAD == IRIVER_H10_PAD ||	\
+       CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD || \
+       CONFIG_KEYPAD == SONY_NWZ_PAD || \
+       CONFIG_KEYPAD == AGPTEK_ROCKER_PAD || \
+       CONFIG_KEYPAD == XDUOO_X3_PAD || \
+       CONFIG_KEYPAD == IHIFI_770_PAD || \
+       CONFIG_KEYPAD == IHIFI_800_PAD || \
+       CONFIG_KEYPAD == XDUOO_X3II_PAD || \
+       CONFIG_KEYPAD == XDUOO_X20_PAD || \
+       CONFIG_KEYPAD == FIIO_M3K_PAD || \
+       CONFIG_KEYPAD == EROSQ_PAD)
 
 #define BATTERY_ON  BUTTON_PLAY
 #define BATTERY_OFF BUTTON_POWER
@@ -177,7 +186,7 @@
 
 #elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
       (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
-      
+
 #define BATTERY_ON      BUTTON_LEFT
 #define BATTERY_OFF     BUTTON_RIGHT
 #define BATTERY_ON_TXT  "LEFT"
@@ -214,24 +223,12 @@
 #define BATTERY_ON_TXT  "SELECT - start"
 #define BATTERY_OFF_TXT "POWER"
 
-#elif CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD
-#define BATTERY_ON BUTTON_PLAY
-#define BATTERY_OFF BUTTON_POWER
-#define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "POWER"
-
 #elif (CONFIG_KEYPAD == HM60X_PAD) || (CONFIG_KEYPAD == HM801_PAD)
 #define BATTERY_ON BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
 #define BATTERY_ON_TXT  "SELECT - start"
 
 #define BATTERY_OFF_TXT "POWER"
-
-#elif CONFIG_KEYPAD == SONY_NWZ_PAD
-#define BATTERY_ON BUTTON_PLAY
-#define BATTERY_OFF BUTTON_POWER
-#define BATTERY_ON_TXT "PLAY - start"
-#define BATTERY_OFF_TXT "Power"
 
 #elif CONFIG_KEYPAD == DX50_PAD
 #define BATTERY_ON      BUTTON_PLAY
@@ -245,53 +242,8 @@
 #define BATTERY_OFF_TXT "Power"
 #define BATTERY_ON_TXT  "Menu - start"
 
-#elif CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
-#define BATTERY_ON      BUTTON_LEFT
-#define BATTERY_OFF     BUTTON_RIGHT
-#define BATTERY_OFF_TXT "Right"
-#define BATTERY_ON_TXT  "Left - start"
+#elif defined(HAVE_TOUCHSCREEN)
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define BATTERY_ON      BUTTON_PLAY
-#define BATTERY_OFF     BUTTON_POWER
-#define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "POWER"
-
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
-#define BATTERY_ON      BUTTON_PLAY
-#define BATTERY_OFF     BUTTON_POWER
-#define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "POWER"
-
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
-#define BATTERY_ON      BUTTON_PLAY
-#define BATTERY_OFF     BUTTON_POWER
-#define BATTERY_ON_TXT  "PLAY - start"
-#define BATTERY_OFF_TXT "POWER"
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define BATTERY_ON      BUTTON_PLAY
-#define BATTERY_OFF     BUTTON_POWER
-#define BATTERY_ON_TXT  "Play - start"
-#define BATTERY_OFF_TXT "POWER"
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
-#define BATTERY_ON      BUTTON_PLAY
-#define BATTERY_OFF     BUTTON_POWER
-#define BATTERY_ON_TXT  "Play - start"
-#define BATTERY_OFF_TXT "POWER"
-
-#elif CONFIG_KEYPAD == FIIO_M3K_PAD
-#define BATTERY_ON      BUTTON_PLAY
-#define BATTERY_OFF     BUTTON_POWER
-#define BATTERY_ON_TXT  "Play - start"
-#define BATTERY_OFF_TXT "POWER"
-
-#else
-#error No keymap defined!
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
 #ifndef BATTERY_ON
 #define BATTERY_ON       BUTTON_CENTER
 #endif
@@ -304,6 +256,9 @@
 #ifndef BATTERY_OFF_TXT
 #define BATTERY_OFF_TXT "TOPLEFT"
 #endif
+
+#else
+#error No keymap defined!
 #endif
 
 /****************************** Plugin Entry Point ****************************/
@@ -375,7 +330,7 @@ static bool exit_tsr(bool reenter)
 #define BIT_CHARGING    0x2
 #define BIT_USB_POWER   0x4
 
-#define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60 
+#define HMS(x) (x)/3600,((x)%3600)/60,((x)%3600)%60
 
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
 static unsigned int charge_state(void)
@@ -476,7 +431,7 @@ static void thread(void)
             rb->register_storage_idle_func(flush_buffer);
 #endif
         }
-        
+
         /* What to do when the measurement buffer is full:
            1) save our measurements to disk but waste some power doing so?
            2) throw away measurements to save some power?
@@ -486,12 +441,12 @@ static void thread(void)
         if (buf_idx == BUF_ELEMENTS) {
             flush_buffer();
         }
-        
+
         /* sleep some time until next measurement */
         rb->queue_wait_w_tmo(&thread_q, &ev, sleep_time);
         switch (ev.id)
         {
-            case SYS_USB_CONNECTED: 
+            case SYS_USB_CONNECTED:
                 in_usb_mode = true;
                 rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
                 break;
@@ -516,7 +471,7 @@ static void thread(void)
 #else
     flush_buffer();
 #endif
-    
+
     /* log end of bench and exit reason */
     fd = rb->open(BATTERY_LOG, O_RDWR | O_CREAT | O_APPEND, 0666);
     if (fd >= 0)
@@ -565,7 +520,7 @@ enum plugin_status plugin_start(const void* parameter)
                     rb->lcd_remote_putsxy,LCD_REMOTE_WIDTH,2);
     rb->lcd_remote_update();
 #endif
-    
+
     do
     {
         button = rb->button_get(true);
@@ -574,10 +529,10 @@ enum plugin_status plugin_start(const void* parameter)
             case BATTERY_ON:
 #ifdef BATTERY_RC_ON
             case BATTERY_RC_ON:
-#endif                         
+#endif
                 on = true;
-                break;        
-            case BATTERY_OFF: 
+                break;
+            case BATTERY_OFF:
 #ifdef BATTERY_RC_OFF
             case BATTERY_RC_OFF:
 #endif
@@ -588,7 +543,7 @@ enum plugin_status plugin_start(const void* parameter)
                     return PLUGIN_USB_CONNECTED;
         }
     }while(!on);
-    
+
     fd = rb->open(BATTERY_LOG, O_RDONLY);
     if (fd < 0)
     {
