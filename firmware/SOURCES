@@ -436,7 +436,9 @@ drivers/audio/audiohw-swcodec.c
 #endif /* BOOTLOADER */
 
 /* Audio codec */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER)
+#if !defined(BOOTLOADER)
+
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #if defined(HAVE_UDA1380)
 drivers/audio/uda1380.c
 #elif defined(HAVE_WM8740)
@@ -506,7 +508,9 @@ target/hosted/sdl/pcm-sdl.c
 #endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 
 #endif
-#endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(BOOTLOADER) */
+#endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
+
+#endif /* !defined(BOOTLOADER) */
 
 /* CPU Specific - By class then particular chip if applicable */
 #if defined(CPU_COLDFIRE)
