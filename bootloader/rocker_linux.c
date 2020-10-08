@@ -10,6 +10,7 @@
  * Copyright (C) 2016 by Amaury Pouly
  *               2018 by Marcin Bukat
  *               2018 by Roman Stolyarov
+ *               2020 by Solomon Peachy
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
@@ -60,6 +61,11 @@
 #define RBFILE "rockbox.x3ii"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
+#define BUTTON_LEFT   BUTTON_OPTION
+#define BUTTON_RIGHT  BUTTON_HOME
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
 #elif defined(XDUOO_X20)
 #define ICON_WIDTH  130
@@ -67,14 +73,32 @@
 #define RBFILE "rockbox.x20"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
+#define BUTTON_LEFT   BUTTON_OPTION
+#define BUTTON_RIGHT  BUTTON_HOME
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
 #elif defined(FIIO_M3K)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
 #define RBFILE "rockbox.fiiom3k"
 #define ICON_NAME bm_fiioicon
+#define BUTTON_LEFT    BUTTON_PREV
+#define BUTTON_RIGHT   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #define OF_NAME "FIIO PLAYER"
 #include "bitmaps/fiioicon.h"
+#elif defined(EROS_Q)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define RBFILE "rockbox.erosq"
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_WHEEL_CCW
+#define BUTTON_DOWN   BUTTON_WHEEL_CW
+#define BUTTON_SELECT BUTTON_PLAY
+#include "bitmaps/hibyicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"
 #endif
@@ -107,21 +131,6 @@
 #error toolsicon has the wrong resolution
 #endif
 
-#ifndef BUTTON_LEFT
-#define BUTTON_LEFT   BUTTON_REW
-#endif
-#ifndef BUTTON_RIGHT
-#define BUTTON_RIGHT  BUTTON_FF
-#endif
-#ifndef BUTTON_SELECT
-#define BUTTON_SELECT BUTTON_PLAY
-#endif
-#ifndef BUTTON_DOWN
-#define BUTTON_DOWN BUTTON_NEXT
-#endif
-#ifndef BUTTON_UP
-#define BUTTON_UP BUTTON_PREV
-#endif
 
 /* return icon y position (x is always centered) */
 static int get_icon_y(void)
@@ -370,15 +379,15 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
         if(btn & BUTTON_REPEAT)
             btn &= ~BUTTON_REPEAT;
         /* play -> stop loop and return mode */
-        if(btn == BUTTON_SELECT || btn == BUTTON_LEFT)
+        if (btn == BUTTON_SELECT)
         {
             free(buf);
             return btn == BUTTON_SELECT ? choice : -1;
         }
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_UP)
+        if (btn == BUTTON_UP || btn == BUTTON_LEFT)
             choice = (choice + nr_choices - 1) % nr_choices;
-        if(btn == BUTTON_DOWN)
+        if(btn == BUTTON_DOWN || btn == BUTTON_RIGHT)
             choice = (choice + 1) % nr_choices;
     }
 }
@@ -580,7 +589,12 @@ int main(int argc, char **argv)
         else if(mode == BOOT_ROCKBOX)
         {
             fflush(stdout);
+            system("/bin/mkdir -p " BASE_DIR);
+            if (system("/bin/mount /dev/mmcblk0 " BASE_DIR))
+                system("/bin/mount /dev/mmcblk0p1 " BASE_DIR);
+	    // XXX possibly invoke sys_serv -> "MOUNT:MOUNT:%s %s", blkdev, mntpoint
             system("/bin/cp " BASE_DIR "/.rockbox/" RBFILE " /tmp");
+            system("/bin/chmod +x /tmp/" RBFILE);
             execl("/tmp/" RBFILE, RBFILE, NULL);
             printf("execvp failed: %s\n", strerror(errno));
             /* fallback to OF in case of failure */
