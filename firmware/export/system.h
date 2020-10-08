@@ -347,7 +347,7 @@ static inline void cpu_boost_unlock(void)
 #ifndef SIMULATOR
 bool dbg_ports(void);
 #endif
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX) || defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX) || defined(FIIO_M3K)
 bool dbg_hw_info(void);
 #endif
 
