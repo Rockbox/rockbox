@@ -558,15 +558,20 @@ void button_close(void)
 
 #ifdef HAVE_LCD_FLIP
 /*
- * helper function to swap LEFT/RIGHT, UP/DOWN (if present), and F1/F3 (Recorder)
+ * helper function to swap LEFT/RIGHT, UP/DOWN (if present)
  */
 static int button_flip(int button)
 {
     int newbutton = button;
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-    newbutton &=
-        ~(BUTTON_LEFT | BUTTON_RIGHT
+    newbutton &= ~(
+#if defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
+        BUTTON_LEFT | BUTTON_RIGHT
+#else
+#warning "LEFT/RIGHT not defined!"
+	 0
+#endif
 #if defined(BUTTON_UP) && defined(BUTTON_DOWN)
         | BUTTON_UP | BUTTON_DOWN
 #endif
@@ -583,10 +588,15 @@ static int button_flip(int button)
 #endif
         );
 
+#if defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
     if (button & BUTTON_LEFT)
         newbutton |= BUTTON_RIGHT;
     if (button & BUTTON_RIGHT)
         newbutton |= BUTTON_LEFT;
+#else
+#warning "LEFT/RIGHT not defined!"
+#endif
+
 #if defined(BUTTON_UP) && defined(BUTTON_DOWN)
     if (button & BUTTON_UP)
         newbutton |= BUTTON_DOWN;

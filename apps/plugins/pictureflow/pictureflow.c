@@ -80,7 +80,7 @@ const struct button_mapping pf_context_album_scroll[] =
     {PF_PREV_REPEAT,  BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE},
     {PF_NEXT,         BUTTON_RC_FF,               BUTTON_NONE},
     {PF_NEXT_REPEAT,  BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE},
-#else
+#elif defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
     {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
     {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
     {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
@@ -89,6 +89,8 @@ const struct button_mapping pf_context_album_scroll[] =
     {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT},
     {ACTION_NONE,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT},
     {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT},
+#else
+#warning "LEFT/RIGHT not defined!"
 #endif
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_PLUGIN|1)
 };

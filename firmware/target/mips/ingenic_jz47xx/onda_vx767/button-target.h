@@ -32,11 +32,8 @@
 #define BUTTON_REWIND     0x00000020
 #define BUTTON_FAST_FWD   0x00000040
 
-/* Compatibility hacks for flipping. Needs a somewhat better fix. */
-#define BUTTON_LEFT  0
-#define BUTTON_RIGHT 0
-#define BUTTON_UP    0
-#define BUTTON_DOWN  0
+#define BUTTON_LEFT BUTTON_REWIND
+#define BUTTON_RIGHT BUTTON_FAST_FWD
 
 #define BUTTON_MAIN  (BUTTON_SELECT | BUTTON_VOL_UP | BUTTON_VOL_DOWN | BUTTON_MENU \
                       BUTTON_MENU | BUTTON_BACK | BUTTON_REWIND | BUTTON_FAST_FWD)
