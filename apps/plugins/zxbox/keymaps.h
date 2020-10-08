@@ -266,15 +266,7 @@
 #define ZX_UP           BUTTON_HOME
 #define ZX_DOWN         BUTTON_OPTION
 
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define ZX_SELECT       BUTTON_PLAY
-#define ZX_MENU         BUTTON_POWER
-#define ZX_LEFT         BUTTON_PREV
-#define ZX_RIGHT        BUTTON_NEXT
-#define ZX_UP           BUTTON_HOME
-#define ZX_DOWN         BUTTON_OPTION
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define ZX_SELECT       BUTTON_PLAY
 #define ZX_MENU         BUTTON_POWER
 #define ZX_LEFT         BUTTON_PREV
@@ -290,7 +282,7 @@
 #define ZX_UP           BUTTON_HOME
 #define ZX_DOWN         BUTTON_OPTION
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define ZX_SELECT       BUTTON_PLAY
 #define ZX_MENU         BUTTON_POWER
 #define ZX_LEFT         BUTTON_HOME
@@ -298,11 +290,11 @@
 #define ZX_UP           BUTTON_PREV
 #define ZX_DOWN         BUTTON_NEXT
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define ZX_SELECT       BUTTON_PLAY
-#define ZX_MENU         BUTTON_POWER
-#define ZX_LEFT         BUTTON_HOME
-#define ZX_RIGHT        BUTTON_VOL_DOWN
+#define ZX_MENU         BUTTON_MENU
+#define ZX_LEFT         BUTTON_SCROLL_BACK
+#define ZX_RIGHT        BUTTON_SCROLL_FWD
 #define ZX_UP           BUTTON_PREV
 #define ZX_DOWN         BUTTON_NEXT
 
