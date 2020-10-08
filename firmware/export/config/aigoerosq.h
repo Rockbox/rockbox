@@ -1,17 +1,17 @@
 /*
- * This config file is for the FiiO M3K
+ * This config file is for the AIGO EROS Q / EROS K (and its clones)
  */
 
 /* For Rolo and boot loader */
-#define MODEL_NUMBER 112
+#define MODEL_NUMBER 113
 
-#define MODEL_NAME   "FiiO M3K"
+#define MODEL_NAME   "AIGO Eros Q"
 
 /* LCD dimensions */
-#define LCD_WIDTH  240
-#define LCD_HEIGHT 320
-/* sqrt(240^2 + 320^2) / 2.0 = 200 */
-#define LCD_DPI 200
+#define LCD_WIDTH  320
+#define LCD_HEIGHT 240
+/* sqrt(240^2 + 320^2) / 2.4 = 166 */
+#define LCD_DPI 166
 
 #ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
@@ -19,15 +19,13 @@
 
 #define HAVE_FPU
 
-#define HW_SAMPR_CAPS (SAMPR_CAP_44 | SAMPR_CAP_48 | SAMPR_CAP_88 | SAMPR_CAP_96 | SAMPR_CAP_176 | SAMPR_CAP_192)
-
-/* define this if you have a bitmap LCD display */
-#define HAVE_LCD_BITMAP
-
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
 
 #define HAVE_LCD_ENABLE
+
+/* Define this if the LCD can shut down */
+#define HAVE_LCD_SHUTDOWN
 
 /* define this if you want album art for this target */
 #define HAVE_ALBUMART
@@ -44,19 +42,15 @@
 /* define this if you would like tagcache to build on this target */
 #define HAVE_TAGCACHE
 
-#define LCD_DEPTH  16
+#define LCD_DEPTH  32
 /* Check that but should not matter */
-#define LCD_PIXELFORMAT RGB565
+#define LCD_PIXELFORMAT XRGB8888
 
 #define HAVE_BACKLIGHT
 #define HAVE_BACKLIGHT_BRIGHTNESS
 
-/* define this if you have a light associated with the buttons */
-#define HAVE_BUTTON_LIGHT
-#define HAVE_BUTTONLIGHT_BRIGHTNESS
-
 /* Main LCD backlight brightness range and defaults: the backlight driver
- * has levels from 0 to 32. But 0 is off so start at 1.
+ * has levels from 0 to 255. But 0 is off so start at 1.
  */
 #define MIN_BRIGHTNESS_SETTING      1
 #define MAX_BRIGHTNESS_SETTING      255
@@ -76,12 +70,10 @@
 #define PLUGIN_BUFFER_SIZE 0x100000
 
 #define HAVE_HEADPHONE_DETECTION
+#define HAVE_LINEOUT_DETECTION
 
 /* KeyPad configuration for plugins */
-#define CONFIG_KEYPAD FIIO_M3K_PAD
-
-/* Define this if a programmable hotkey is mapped */
-#define HAVE_HOTKEY
+#define CONFIG_KEYPAD EROSQ_PAD
 
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
@@ -107,7 +99,7 @@
 #define HAVE_SW_POWEROFF
 
 /* Define this to the CPU frequency */
-#define CPU_FREQ            1008000000
+#define CPU_FREQ           108000000
 
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
@@ -117,13 +109,18 @@
 #define BATTERY_TYPES_COUNT  1
 
 /* Audio codec */
-#define HAVE_FIIO_LINUX_CODEC
+#define HAVE_EROSQ_LINUX_CODEC
+/* Rockbox has to handle the volume level */
+#define HAVE_SW_VOLUME_CONTROL
 
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS
 
+/* HW codec is flexible */
+#define HW_SAMPR_CAPS SAMPR_CAP_ALL_192
+
 /* Battery */
-#define BATTERY_CAPACITY_DEFAULT 1100 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 1100  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 1100 /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 2000  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 2000 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */

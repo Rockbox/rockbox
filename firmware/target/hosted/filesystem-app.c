@@ -37,7 +37,7 @@
 #include "logf.h"
 
 #if !(defined(BOOTLOADER) || defined(CHECKWPS) || defined(SIMULATOR))
-#if (defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20))
+#if (defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(EROS_Q))
 #define PIVOT_ROOT "/mnt/sd_0"
 #elif defined(FIIO_M3K)
 #define PIVOT_ROOT "/mnt"  // XXX check this!
@@ -57,7 +57,7 @@ static const char rbhome[] = HOME_DIR;
 
 #if !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || \
      defined(SONY_NWZ_LINUX) || defined(DX90) || defined(AGPTEK_ROCKER) || \
-     defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(FIIO_M3K) || defined(FIIO_M3K_PRO)) &&	\
+     defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(FIIO_M3K) || defined(EROS_Q)) &&	\
     !defined(__PCTOOL__)
 /* Special dirs are user-accessible (and user-writable) dirs which take priority
  * over the ones where Rockbox is installed to. Classic example would be

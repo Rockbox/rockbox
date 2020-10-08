@@ -38,6 +38,8 @@ if ($model eq 'rocker') {
     @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
 } elsif ($model eq 'x20') {
     @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
+} elsif ($model eq 'eros_q') {
+    @ubiopts = ("-e", "124KiB", "-c", "1024", "-m", "2048", "-j", "8192KiB", "-U");
 } else {
     die ("Unknown hiby model: $model\n");
 }
@@ -81,7 +83,6 @@ while (<UPDATE>) {
     if ($rootfs_found) {
 	if (/file_path=(.*)/) {
 	    $ubiname = basename($1);
-	    $ubiname =~ tr/[a-z]/[A-Z]/;
 	    last;
 	}
     } else {
@@ -92,7 +93,11 @@ while (<UPDATE>) {
 }
 close UPDATE;
 
-die("can't locate rootfs image") if (! -e "$isowork/$ubiname");
+if (! -e "$isowork/$ubiname") {
+    $ubiname =~ tr/[a-z]/[A-Z]/;
+    die("can't locate rootfs image ($ubiname)") if (! -e "$isowork/$ubiname");
+}
+
 $ubiname = "$isowork/$ubiname";
 
 ### Extract RootFS
@@ -102,6 +107,7 @@ mkdir($rootfsdir) || die ("Can't create '$rootfsdir'");
 @sysargs = ("ubireader_extract_files", "-k", "-o", $rootfsdir, $ubiname);
 system(@sysargs);
 
+# exit(0);
 ### Mangle RootFS
 
 # Generate rb_bootloader.sh
@@ -112,13 +118,25 @@ my $bootloader_sh =
 mount /dev/mmcblk0 /mnt/sd_0 &>/dev/null || \
 mount /dev/mmcblk0p1 /mnt/sd_0 &>/dev/null
 
-killall $rbbasename
-killall -9 $rbbasename
+killall    hiby_player    &>/dev/null
+killall -9 hiby_player    &>/dev/null
 
+killall $rbbasename       &>/dev/null
+killall -9 $rbbasename    &>/dev/null
+
+if [ -f '/usr/bin/batd' ]; then
+  killall    batd    &>/dev/null
+  killall -9 batd    &>/dev/null
+  /usr/bin/batd -v -s -t5 -o /mnt/sd_0/batlog.txt &
+fi
+
+# /etc/init.d/K90adb start
+
+# Rockbox launcher!
 /usr/bin/$rbbasename
 sleep 1
 reboot
-    ";
+";
 open FILE, ">$rootfsdir/usr/bin/hiby_player.sh" || die ("can't write bootloader script!");
 print FILE $bootloader_sh;
 close FILE;
