@@ -162,6 +162,7 @@
 #define XDUOO_X3II_PAD     69
 #define XDUOO_X20_PAD      70
 #define FIIO_M3K_PAD       71
+#define EROSQ_PAD          72
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -602,6 +603,8 @@ Lyre prototype 1 */
 #include "config/xduoox20.h"
 #elif defined(FIIO_M3K)
 #include "config/fiiom3k.h"
+#elif defined(EROS_Q)
+#include "config/aigoerosq.h"
 #else
 //#error "unknown hwardware platform!"
 #endif

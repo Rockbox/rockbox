@@ -6,7 +6,7 @@
  *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
  *                     \/            \/     \/    \/            \/
  *
- * Copyright (C) 2018 by Roman Stolyarov
+ * Copyright (C) 2017 by Marcin Bukat
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,27 +17,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _BUTTON_TARGET_H_
-#define _BUTTON_TARGET_H_
+#ifndef _POWER_XDUOO_H_
+#define _POWER_XDUOO_H_
 
-/* Main unit's buttons */
-#define BUTTON_POWER      0x00000001
-#define BUTTON_HOME       0x00000002
-#define BUTTON_OPTION     0x00000004
-#define BUTTON_PREV       0x00000008
-#define BUTTON_NEXT       0x00000010
-#define BUTTON_PLAY       0x00000020
-#define BUTTON_VOL_UP     0x00000040
-#define BUTTON_VOL_DOWN   0x00000080
+#include <stdbool.h>
+#include "config.h"
 
-#define BUTTON_LEFT       BUTTON_PREV
-#define BUTTON_RIGHT      BUTTON_NEXT
+unsigned int erosq_power_input_status(void);
+bool erosq_power_charging_status(void);
+unsigned int erosq_power_get_battery_voltage(void);
+unsigned int erosq_power_get_battery_capacity(void);
+#endif /* _POWER_XDUOO_H_ */
 
-#define BUTTON_MAIN  (BUTTON_POWER | BUTTON_HOME | BUTTON_OPTION | BUTTON_PREV | \
-                      BUTTON_NEXT | BUTTON_PLAY | BUTTON_VOL_UP | BUTTON_VOL_DOWN)
-
-/* Software power-off */
-#define POWEROFF_BUTTON BUTTON_POWER
-#define POWEROFF_COUNT  25
-
-#endif /* _BUTTON_TARGET_H_ */
