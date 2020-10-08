@@ -60,6 +60,11 @@
 #define RBFILE "rockbox.x3ii"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
+#define BUTTON_LEFT   BUTTON_OPTION
+#define BUTTON_RIGHT  BUTTON_HOME
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
 #elif defined(XDUOO_X20)
 #define ICON_WIDTH  130
@@ -67,14 +72,32 @@
 #define RBFILE "rockbox.x20"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
+#define BUTTON_LEFT   BUTTON_OPTION
+#define BUTTON_RIGHT  BUTTON_HOME
+#define BUTTON_UP     BUTTON_PREV
+#define BUTTON_DOWN   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
 #elif defined(FIIO_M3K)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
 #define RBFILE "rockbox.fiiom3k"
 #define ICON_NAME bm_fiioicon
+#define BUTTON_LEFT    BUTTON_PREV
+#define BUTTON_RIGHT   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #define OF_NAME "FIIO PLAYER"
 #include "bitmaps/fiioicon.h"
+#elif defined(EROS_Q)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define RBFILE "rockbox.erosq"
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_WHEEL_CCW
+#define BUTTON_DOWN   BUTTON_WHEEL_CW
+#define BUTTON_SELECT BUTTON_PLAY
+#include "bitmaps/hibyicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"
 #endif
@@ -107,21 +130,6 @@
 #error toolsicon has the wrong resolution
 #endif
 
-#ifndef BUTTON_LEFT
-#define BUTTON_LEFT   BUTTON_REW
-#endif
-#ifndef BUTTON_RIGHT
-#define BUTTON_RIGHT  BUTTON_FF
-#endif
-#ifndef BUTTON_SELECT
-#define BUTTON_SELECT BUTTON_PLAY
-#endif
-#ifndef BUTTON_DOWN
-#define BUTTON_DOWN BUTTON_NEXT
-#endif
-#ifndef BUTTON_UP
-#define BUTTON_UP BUTTON_PREV
-#endif
 
 /* return icon y position (x is always centered) */
 static int get_icon_y(void)
