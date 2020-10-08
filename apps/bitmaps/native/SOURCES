@@ -46,7 +46,7 @@ toolsicon.130x130x16.bmp
 hibyicon.70x70x16.bmp
 rockboxicon.70x70x16.bmp
 toolsicon.70x70x16.bmp
-#elif (defined(XDUOO_X3II) || defined(XDUOO_X20))
+#elif (defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(EROS_Q))
 hibyicon.130x130x16.bmp
 rockboxicon.130x130x16.bmp
 toolsicon.130x130x16.bmp

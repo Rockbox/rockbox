@@ -425,17 +425,7 @@ static void setoptions (void)
         options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-        options.UP      = BUTTON_PREV;
-        options.DOWN    = BUTTON_NEXT;
-
-        options.A       = BUTTON_HOME;
-        options.B       = BUTTON_OPTION;
-        options.START   = BUTTON_VOL_DOWN;
-        options.SELECT  = BUTTON_VOL_UP;
-        options.MENU    = BUTTON_POWER;
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
         options.UP      = BUTTON_PREV;
         options.DOWN    = BUTTON_NEXT;
 
@@ -455,7 +445,7 @@ static void setoptions (void)
         options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
         options.UP      = BUTTON_PREV;
         options.DOWN    = BUTTON_NEXT;
 
@@ -465,14 +455,16 @@ static void setoptions (void)
         options.SELECT  = BUTTON_HOME;
         options.MENU    = BUTTON_POWER;
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
-        options.UP      = BUTTON_PREV;
-        options.DOWN    = BUTTON_NEXT;
+#elif CONFIG_KEYPAD == EROSQ_PAD
+        options.UP     = BUTTON_PREV;
+        options.DOWN   = BUTTON_NEXT;
+        options.LEFT   = BUTTON_SCROLL_BACK;
+        options.RIGHT  = BUTTON_SCROLL_FWD;
 
-        options.A       = BUTTON_VOL_UP;
-        options.B       = BUTTON_VOL_DOWN;
-        options.START   = BUTTON_PLAY;
-        options.SELECT  = BUTTON_HOME;
+        options.A       = BUTTON_MENU;
+        options.B       = BUTTON_BACK;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
 #else
