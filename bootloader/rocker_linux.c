@@ -10,6 +10,7 @@
  * Copyright (C) 2016 by Amaury Pouly
  *               2018 by Marcin Bukat
  *               2018 by Roman Stolyarov
+ *               2020 by Solomon Peachy
  *
  * Based on Rockbox iriver bootloader by Linus Nielsen Feltzing
  * and the ipodlinux bootloader by Daniel Palffy and Bernard Leach
@@ -60,6 +61,9 @@
 #define RBFILE "rockbox.x3ii"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_OPTION
+#define BUTTON_DOWN   BUTTON_HOME
+#define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
 #elif defined(XDUOO_X20)
 #define ICON_WIDTH  130
@@ -67,14 +71,30 @@
 #define RBFILE "rockbox.x20"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_OPTION
+#define BUTTON_DOWN   BUTTON_HOME
+#define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
 #elif defined(FIIO_M3K)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
 #define RBFILE "rockbox.fiiom3k"
 #define ICON_NAME bm_fiioicon
+#define BUTTON_LEFT    BUTTON_PREV
+#define BUTTON_RIGHT   BUTTON_NEXT
+#define BUTTON_SELECT BUTTON_PLAY
 #define OF_NAME "FIIO PLAYER"
 #include "bitmaps/fiioicon.h"
+#elif defined(EROS_Q)
+#define ICON_WIDTH  130
+#define ICON_HEIGHT 130
+#define RBFILE "rockbox.erosq"
+#define ICON_NAME bm_hibyicon
+#define OF_NAME "HIBY PLAYER"
+#define BUTTON_UP     BUTTON_SCROLL_BACK
+#define BUTTON_DOWN   BUTTON_SCROLL_FWD
+#define BUTTON_SELECT BUTTON_PLAY
+#include "bitmaps/hibyicon.h"
 #else
 #error "must define ICON_WIDTH/HEIGHT"
 #endif
@@ -107,21 +127,8 @@
 #error toolsicon has the wrong resolution
 #endif
 
-#ifndef BUTTON_LEFT
-#define BUTTON_LEFT   BUTTON_REW
-#endif
-#ifndef BUTTON_RIGHT
-#define BUTTON_RIGHT  BUTTON_FF
-#endif
-#ifndef BUTTON_SELECT
-#define BUTTON_SELECT BUTTON_PLAY
-#endif
-#ifndef BUTTON_DOWN
-#define BUTTON_DOWN BUTTON_NEXT
-#endif
-#ifndef BUTTON_UP
-#define BUTTON_UP BUTTON_PREV
-#endif
+/* If we started ADB, don't immediately boot into USB mode if we plug in. */
+static int adb_running = 0;
 
 /* return icon y position (x is always centered) */
 static int get_icon_y(void)
@@ -141,7 +148,6 @@ enum boot_mode
     BOOT_TOOLS,
     BOOT_OF,
     BOOT_COUNT,
-    BOOT_USB, /* special */
     BOOT_STOP, /* power down/suspend */
 };
 
@@ -199,6 +205,19 @@ static enum boot_mode load_boot_mode(enum boot_mode mode)
     return mode;
 }
 
+static void mount_storage(int enable)
+{
+    if (enable) {
+        system("/bin/mkdir -p " BASE_DIR);
+        if (system("/bin/mount /dev/mmcblk0 " BASE_DIR))
+            system("/bin/mount /dev/mmcblk0p1 " BASE_DIR);
+        // XXX possibly invoke sys_serv -> "MOUNT:MOUNT:%s %s", blkdev, mntpoint
+    } else {
+        system("/bin/unmount " BASE_DIR);
+        // XXX possibly invoke sys_serv -> "MOUNT:UNMOUNT:%s %s", mntpoint
+    }
+}
+
 static void save_boot_mode(enum boot_mode mode)
 {
     int fd = open(BASE_DIR "/.rockbox/rb_bl_mode.txt", O_RDWR | O_CREAT | O_TRUNC);
@@ -221,13 +240,12 @@ static enum boot_mode get_boot_mode(void)
 #endif
     while(true)
     {
-        /* on usb detect, return to usb
-         * FIXME this is a hack, we need proper usb detection */
-        if(power_input_status() & POWER_INPUT_USB_CHARGER)
+        /* on usb detect, immediately boot with last choice */
+        if(!adb_running && power_input_status() & POWER_INPUT_USB_CHARGER)
         {
             /* save last choice */
             save_boot_mode(mode);
-            return BOOT_USB;
+            return mode;
         }
         /* inactivity detection */
         int timeout = last_activity + get_inactivity_tmo();
@@ -318,7 +336,7 @@ void error_screen(const char *msg)
     lcd_update();
 }
 
-int choice_screen(const char *title, bool center, int nr_choices, const char *choices[])
+int choice_screen(const char *title, bool center, int nr_choices, const char *choices[], int nr_extra, const char *extra[])
 {
     int choice = 0;
     int max_len = 0;
@@ -360,6 +378,14 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
             line++;
         }
 
+        lcd_set_foreground(LCD_RGBPACK(255, 201, 0));
+        line++;
+        for (int i = 0 ; i < nr_extra && line < nr_lines ; i++) {
+            sprintf(buf, "%s", extra[i]);
+            display_text_center(top_y + h * line, buf);
+            line++;
+	}
+
         lcd_update();
 
         /* wait for a key  */
@@ -370,15 +396,15 @@ int choice_screen(const char *title, bool center, int nr_choices, const char *ch
         if(btn & BUTTON_REPEAT)
             btn &= ~BUTTON_REPEAT;
         /* play -> stop loop and return mode */
-        if(btn == BUTTON_SELECT || btn == BUTTON_LEFT)
+        if (btn == BUTTON_SELECT)
         {
             free(buf);
             return btn == BUTTON_SELECT ? choice : -1;
         }
         /* left/right/up/down: change mode */
-        if(btn == BUTTON_UP)
+        if (btn == BUTTON_UP || btn == BUTTON_LEFT)
             choice = (choice + nr_choices - 1) % nr_choices;
-        if(btn == BUTTON_DOWN)
+        if(btn == BUTTON_DOWN || btn == BUTTON_RIGHT)
             choice = (choice + 1) % nr_choices;
     }
 }
@@ -437,7 +463,7 @@ void run_script_menu(void)
         entries[nr_entries++] = strdup(ent->d_name);
     }
     closedir(dir);
-    int idx = choice_screen("RUN SCRIPT", false, nr_entries, entries);
+    int idx = choice_screen("RUN SCRIPT", false, nr_entries, entries, 0, NULL);
     if(idx >= 0)
         run_file(entries[idx]);
     for(int i = 0; i < nr_entries; i++)
@@ -455,6 +481,7 @@ static void adb(int start)
     }
     int status;
     waitpid(pid, &status, 0);
+    adb_running = start;
 #if 0
     if(WIFEXITED(status))
     {
@@ -471,8 +498,11 @@ static void adb(int start)
 
 static void tools_screen(void)
 {
-    const char *choices[] = {"ADB start", "ADB stop", "Run script", "Restart", "Shutdown"};
-    int choice = choice_screen("TOOLS MENU", true, 5, choices);
+    const char *extra[] = { MODEL_NAME, rbversion };
+    printf("Version: %s\n", rbversion);
+    printf("%s\n", MODEL_NAME);
+    const char *choices[] = {"ADB start", "ADB stop", "Run script", "Remount SD", "Restart", "Shutdown", "Recovery", "Back"};
+    int choice = choice_screen("TOOLS MENU", true, 8, choices, 2, extra);
     if(choice == 0)
     {
         /* run service menu */
@@ -492,11 +522,29 @@ static void tools_screen(void)
     }
     else if(choice == 3)
     {
-        system_reboot();
+        mount_storage(false);
+        mount_storage(true);
     }
     else if(choice == 4)
     {
+        system_reboot();
+    }
+    else if(choice == 5)
+    {
         power_off();
+    }
+    else if(choice == 6)
+    {
+        int fd = open("/proc/jz/reset/reset", O_WRONLY);
+        if (fd >= 0) {
+            const char *buf = "recovery\n";
+            write(fd, buf, strlen(buf));
+            close(fd);
+        }
+    }
+    else if (choice == 7)
+    {
+        return;
     }
 }
 
@@ -555,11 +603,13 @@ int main(int argc, char **argv)
 //    if(font_id >= 0)
 //        lcd_setfont(font_id);
 
+    mount_storage(true);
+
     /* run all tools menu */
     while(true)
     {
         enum boot_mode mode = get_boot_mode();
-        if(mode == BOOT_USB || mode == BOOT_OF)
+        if (mode == BOOT_OF)
         {
 #if 0
             fflush(stdout);
@@ -567,7 +617,7 @@ int main(int argc, char **argv)
             close(fileno(stdout));
             close(fileno(stderr));
 #endif
-            /* for now the only way we have to trigger USB mode it to run the OF */
+            mount_storage(false);
             /* boot OF */
             execvp("/usr/bin/hiby_player", argv);
             error_screen("Cannot boot OF");
@@ -580,12 +630,14 @@ int main(int argc, char **argv)
         else if(mode == BOOT_ROCKBOX)
         {
             fflush(stdout);
+            mount_storage(true);
             system("/bin/cp " BASE_DIR "/.rockbox/" RBFILE " /tmp");
+            system("/bin/chmod +x /tmp/" RBFILE);
             execl("/tmp/" RBFILE, RBFILE, NULL);
             printf("execvp failed: %s\n", strerror(errno));
             /* fallback to OF in case of failure */
             error_screen("Cannot boot Rockbox");
-            sleep(5 * HZ);
+            sleep(2 * HZ);
         }
         else
         {

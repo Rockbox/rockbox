@@ -364,16 +364,7 @@
 #define PACMAN_1UP      BUTTON_VOLUP
 #define PACMAN_COIN     BUTTON_VOLDOWN
 
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define PACMAN_UP       BUTTON_PREV
-#define PACMAN_DOWN     BUTTON_NEXT
-#define PACMAN_LEFT     BUTTON_HOME
-#define PACMAN_RIGHT    BUTTON_VOL_DOWN
-#define PACMAN_MENU     BUTTON_POWER
-#define PACMAN_1UP      BUTTON_VOL_UP
-#define PACMAN_COIN     BUTTON_PLAY
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define PACMAN_UP       BUTTON_PREV
 #define PACMAN_DOWN     BUTTON_NEXT
 #define PACMAN_LEFT     BUTTON_HOME
@@ -391,7 +382,8 @@
 #define PACMAN_1UP      BUTTON_VOL_UP
 #define PACMAN_COIN     BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
+
 #define PACMAN_UP       BUTTON_PREV
 #define PACMAN_DOWN     BUTTON_NEXT
 #define PACMAN_LEFT     BUTTON_HOME
@@ -400,13 +392,12 @@
 #define PACMAN_1UP      BUTTON_VOL_UP
 #define PACMAN_COIN     BUTTON_PLAY
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
-
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define PACMAN_UP       BUTTON_PREV
 #define PACMAN_DOWN     BUTTON_NEXT
-#define PACMAN_LEFT     BUTTON_HOME
-#define PACMAN_RIGHT    BUTTON_VOL_DOWN
-#define PACMAN_MENU     BUTTON_POWER
+#define PACMAN_LEFT     BUTTON_SCROLL_BACK
+#define PACMAN_RIGHT    BUTTON_SCROLL_FWD
+#define PACMAN_MENU     BUTTON_MENU
 #define PACMAN_1UP      BUTTON_VOL_UP
 #define PACMAN_COIN     BUTTON_PLAY
 
@@ -516,7 +507,7 @@
  */
 #if defined(TOSHIBA_GIGABEAT_S) || defined (TOSHIBA_GIGABEAT_F) || \
     defined(SANSA_FUZEPLUS)
-/* Gigabeat S,F and Sansa Fuze+ can manage the full framerate 
+/* Gigabeat S,F and Sansa Fuze+ can manage the full framerate
    (1 in 1 frames) */
 #define FPS 60
 #elif defined(IPOD_NANO)
