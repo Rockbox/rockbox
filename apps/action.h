@@ -146,7 +146,6 @@ enum {
     ACTION_STD_REC,
     ACTION_STD_HOTKEY,
 
-    ACTION_F3, /* just so everything works again, possibly change me */
     /* code context actions */
 
     /* WPS codes */

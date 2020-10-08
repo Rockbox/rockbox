@@ -47,8 +47,7 @@ static const struct button_mapping button_context_standard[]  = {
 /*  { ACTION_STD_KEYLOCK,        BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_STD_REC,            BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_STD_HOTKEY,         BUTTON_,                       BUTTON_ }, */
-/*  { ACTION_F3,                 BUTTON_,                       BUTTON_ }, */
-  
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 

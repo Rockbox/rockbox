@@ -47,8 +47,7 @@ static const struct button_mapping button_context_standard[]  = {
 /*  { ACTION_STD_KEYLOCK,        BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_STD_REC,            BUTTON_,                       BUTTON_ }, */
 /*  { ACTION_STD_HOTKEY,         BUTTON_,                       BUTTON_ }, */
-/*  { ACTION_F3,                 BUTTON_,                       BUTTON_ }, */
-  
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 
@@ -168,7 +167,6 @@ static const struct button_mapping button_context_recscreen[]  = {
     { ACTION_REC_PAUSE,          BUTTON_PLAY,                   BUTTON_NONE },
     { ACTION_REC_NEWFILE,        BUTTON_FUNC|BUTTON_REPEAT,     BUTTON_FUNC },
 /*  { ACTION_REC_F2,             BUTTON_,                       BUTTON_ }, */
-/*  { ACTION_REC_F3,             BUTTON_,                       BUTTON_ }, */
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_SETTINGS)
 }; /* button_context_recscreen */
@@ -212,8 +210,7 @@ static const struct button_mapping button_rc_context_standard[]  = {
 /*  { ACTION_STD_KEYLOCK,        BUTTON_,                          BUTTON_ }, */
 /*  { ACTION_STD_REC,            BUTTON_,                          BUTTON_ }, */
 /*  { ACTION_STD_HOTKEY,         BUTTON_,                          BUTTON_ }, */
-/*  { ACTION_F3,                 BUTTON_,                          BUTTON_ }, */
-  
+
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
 

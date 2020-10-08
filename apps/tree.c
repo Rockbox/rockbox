@@ -743,17 +743,6 @@ static int dirbrowse(void)
                 }
                 break;
 #endif
-#ifdef BUTTON_F3
-            case ACTION_F3:
-                /* don't enter f3 from plugin browser */
-                if (*tc.dirfilter < NUM_FILTER_MODES)
-                {
-                    if (quick_screen_f3(ACTION_F3))
-                        reload_dir = true;
-                    restore = true;
-                }
-                break;
-#endif
 
 #ifdef HAVE_HOTKEY
             case ACTION_TREE_HOTKEY:

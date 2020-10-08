@@ -509,7 +509,6 @@ int handle_radio_presets(void)
                 next_station(0);
                 result = 1;
                 break;
-            case ACTION_F3:
             case ACTION_STD_CONTEXT:
                 selected_preset = gui_synclist_get_sel_pos(&lists);
                 do_menu(&handle_radio_preset_menu, NULL, NULL, false);

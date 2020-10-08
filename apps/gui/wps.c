@@ -844,16 +844,6 @@ long gui_wps_show(void)
 #endif /* HAVE_QUICKSCREEN */
 
                 /* screen settings */
-#ifdef BUTTON_F3
-            case ACTION_F3:
-            {
-                gwps_leave_wps();
-                if (quick_screen_f3(BUTTON_F3))
-                    return GO_TO_ROOT;
-                restore = true;
-            }
-            break;
-#endif /* BUTTON_F3 */
 
                 /* pitch screen */
 #ifdef HAVE_PITCHCONTROL
