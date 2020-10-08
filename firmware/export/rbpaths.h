@@ -42,7 +42,7 @@
 
 #if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
     defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || \
-    defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20) || defined(FIIO_M3K)
+    defined(HIBY_LINUX) || defined(FIIO_M3K)
 
 #if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
 #define HOME_DIR "/mnt/media0"
@@ -51,7 +51,7 @@
 #elif defined(DX50) || defined(DX90)
 /* Where to put save files like recordings, playlists, screen dumps ...*/
 #define HOME_DIR "/mnt/sdcard"
-#elif defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20)
+#elif defined(HIBY_LINUX)
 #define HOME_DIR "/mnt/sd_0"
 #elif defined(FIIO_M3K)
 #define HOME_DIR "/mnt"
@@ -92,7 +92,7 @@
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
 #if defined(APPLICATION) && !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
-    defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || defined(AGPTEK_ROCKER) || defined(XDUOO_X3II) || defined(XDUOO_X20))
+    defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX))
 #define PLUGIN_DATA_DIR          ROCKBOX_DIR "/rocks.data"
 #define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
 #define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR

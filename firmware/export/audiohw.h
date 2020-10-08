@@ -226,6 +226,8 @@ struct sound_settings_info
 #include "xduoolinux_codec.h"
 #elif defined(HAVE_FIIO_LINUX_CODEC)
 #include "fiiolinux_codec.h"
+#elif defined(HAVE_EROSQ_LINUX_CODEC)
+#include "erosqlinux_codec.h"
 #endif
 
 /* convert caps into defines */
