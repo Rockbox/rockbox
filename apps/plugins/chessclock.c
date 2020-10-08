@@ -366,27 +366,7 @@
 #define CHC_SETTINGS_CANCEL BUTTON_RIGHT
 #define CHC_SETTINGS_OK     (BUTTON_SELECT|BUTTON_REPEAT)
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define CHC_QUIT            BUTTON_POWER
-#define CHC_STARTSTOP       BUTTON_PLAY
-#define CHC_RESET           BUTTON_OPTION
-#define CHC_MENU            BUTTON_HOME
-#define CHC_SETTINGS_INC    BUTTON_NEXT
-#define CHC_SETTINGS_DEC    BUTTON_PREV
-#define CHC_SETTINGS_OK     BUTTON_PLAY
-#define CHC_SETTINGS_CANCEL BUTTON_POWER
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define CHC_QUIT            BUTTON_POWER
-#define CHC_STARTSTOP       BUTTON_PLAY
-#define CHC_RESET           BUTTON_OPTION
-#define CHC_MENU            BUTTON_HOME
-#define CHC_SETTINGS_INC    BUTTON_NEXT
-#define CHC_SETTINGS_DEC    BUTTON_PREV
-#define CHC_SETTINGS_OK     BUTTON_PLAY
-#define CHC_SETTINGS_CANCEL BUTTON_POWER
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif (CONFIG_KEYPAD == XDUOO_X3_PAD) || (CONFIG_KEYPAD == XDUOO_X3II_PAD) || (CONFIG_KEYPAD == XDUOO_X20_PAD)
 #define CHC_QUIT            BUTTON_POWER
 #define CHC_STARTSTOP       BUTTON_PLAY
 #define CHC_RESET           BUTTON_OPTION
@@ -406,7 +386,7 @@
 #define CHC_SETTINGS_OK     BUTTON_PLAY
 #define CHC_SETTINGS_CANCEL BUTTON_POWER
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
 #define CHC_QUIT            BUTTON_POWER
 #define CHC_STARTSTOP       BUTTON_PLAY
 #define CHC_RESET           (BUTTON_PLAY|BUTTON_REPEAT)
@@ -416,15 +396,15 @@
 #define CHC_SETTINGS_OK     BUTTON_PLAY
 #define CHC_SETTINGS_CANCEL BUTTON_HOME
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define CHC_QUIT            BUTTON_POWER
 #define CHC_STARTSTOP       BUTTON_PLAY
-#define CHC_RESET           (BUTTON_PLAY|BUTTON_REPEAT)
-#define CHC_MENU            BUTTON_HOME
-#define CHC_SETTINGS_INC    BUTTON_VOL_UP
-#define CHC_SETTINGS_DEC    BUTTON_VOL_DOWN
+#define CHC_RESET           BUTTON_BACK
+#define CHC_MENU            BUTTON_MENU
+#define CHC_SETTINGS_INC    BUTTON_NEXT
+#define CHC_SETTINGS_DEC    BUTTON_PREV
 #define CHC_SETTINGS_OK     BUTTON_PLAY
-#define CHC_SETTINGS_CANCEL BUTTON_HOME
+#define CHC_SETTINGS_CANCEL BUTTON_POWER
 
 #else
 #error No keymap defined!
@@ -481,7 +461,7 @@ static struct {
 } timer_holder[MAX_PLAYERS];
 
 static int run_timer(int nr);
-static int chessclock_set_int(char* string, 
+static int chessclock_set_int(char* string,
                               int* variable,
                               int step,
                               int min,
@@ -784,7 +764,7 @@ static int run_timer(int nr)
     return retval;
 }
 
-static int chessclock_set_int(char* string, 
+static int chessclock_set_int(char* string,
                               int* variable,
                               int step,
                               int min,
@@ -856,4 +836,3 @@ static char * show_time(int seconds)
     rb->snprintf(buf, sizeof(buf), "%02d:%02d", seconds/60, seconds%60);
     return buf;
 }
-
