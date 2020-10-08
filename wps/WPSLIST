@@ -83,7 +83,7 @@ wps.800x480x(16|24):  cabbiev2.800x480x16.wps
 wps.480x800x(16|24):  cabbiev2.480x800x16.wps
 wps.400x240x(16|24):  cabbiev2.400x240x16.wps
 wps.320x480x(16|24):  cabbiev2.320x480x16.wps
-wps.320x240x(16|24):  cabbiev2.320x240x16.wps
+wps.320x240x(16|24|32):  cabbiev2.320x240x16.wps
 wps.240x400x(16|24):  cabbiev2.240x400x16.wps
 wps.240x320x(16|24|32):  cabbiev2.240x320x16.wps
 wps.220x176x(16|24):  cabbiev2.220x176x16.wps
@@ -171,7 +171,7 @@ iconset.800x480x(16|24):  icons/tango_icons.32x32.bmp
 iconset.480x800x(16|24):  icons/tango_icons.32x32.bmp
 iconset.400x240x(16|24):  icons/tango_icons.16x16.bmp
 iconset.320x480x(16|24):  icons/tango_icons.24x24.bmp
-iconset.320x240x(16|24):  icons/tango_icons.16x16.bmp
+iconset.320x240x(16|24|32):  icons/tango_icons.16x16.bmp
 iconset.128x128x(16|24):  icons/tango_icons.12x12.bmp
 iconset.128x160x(16|24|32):  icons/tango_icons.12x12.bmp
 iconset.132x80x(16|24):   icons/tango_icons.12x12.bmp
