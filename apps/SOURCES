@@ -302,4 +302,6 @@ keymaps/keymap-xduoox3ii.c
 keymaps/keymap-xduoox20.c
 #elif CONFIG_KEYPAD == FIIO_M3K_PAD
 keymaps/keymap-fiiom3k.c
+#elif CONFIG_KEYPAD == EROSQ_PAD
+keymaps/keymap-erosq.c
 #endif
