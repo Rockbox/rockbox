@@ -434,6 +434,7 @@ static inline void button_flip_horizontally(int context, int *button)
         return;
     }
 
+#if defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
     newbutton &= ~(BUTTON_LEFT | BUTTON_RIGHT);
     if (has_flag(*button, BUTTON_LEFT))
     {
@@ -444,6 +445,10 @@ static inline void button_flip_horizontally(int context, int *button)
     {
         newbutton |= BUTTON_LEFT;
     }
+#else
+#warning "BUTTON_LEFT / BUTTON_RIGHT not defined!"
+#endif
+
 #ifndef SIMULATOR
 #ifdef HAVE_SCROLLWHEEL
     newbutton &= ~(BUTTON_SCROLL_BACK | BUTTON_SCROLL_FWD);

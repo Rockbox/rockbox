@@ -28,10 +28,6 @@
 #define BUTTON_MENU         0x00000002
 #define BUTTON_PLAY         0x00000004
 
-/* there are no LEFT/RIGHT buttons, but other parts of the code expect them */
-#define BUTTON_LEFT         0
-#define BUTTON_RIGHT        0
-
 #define BUTTON_MAIN (BUTTON_PREVNEXT|BUTTON_MENU|BUTTON_PLAY)
 
 #define POWEROFF_BUTTON BUTTON_PLAY

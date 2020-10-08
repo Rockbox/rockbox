@@ -85,9 +85,11 @@ static void setoptions (void)
 #ifdef HAVE_TOUCHSCREEN
         options.LEFT    = BUTTON_MIDLEFT;
         options.RIGHT   = BUTTON_MIDRIGHT;
-#else
+#elif defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
         options.LEFT    = BUTTON_LEFT;
         options.RIGHT   = BUTTON_RIGHT;
+#else
+#warning "LEFT/RIGHT not defined!"
 #endif
 
 #if CONFIG_KEYPAD == IRIVER_H100_PAD
