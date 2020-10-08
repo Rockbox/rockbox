@@ -543,39 +543,7 @@ enum {
 #define BJACK_QUIT_NAME     "Volume up"
 #define BJACK_DOUBLE_NAME   "Option+Down"
 
-#elif CONFIG_KEYPAD == XDUOO_X3_PAD
-#define BJACK_SELECT_NAME   "PLAY"
-#define BJACK_STAY_NAME     "NEXT"
-#define BJACK_QUIT_NAME     "POWER"
-#define BJACK_DOUBLE_NAME   "PREV"
-#define BJACK_SELECT        BUTTON_PLAY
-#define BJACK_QUIT          BUTTON_POWER
-#define BJACK_MAX           BUTTON_VOL_UP
-#define BJACK_MIN           BUTTON_VOL_DOWN
-#define BJACK_STAY          BUTTON_NEXT
-#define BJACK_DOUBLEDOWN    BUTTON_PREV
-#define BJACK_UP            BUTTON_HOME
-#define BJACK_DOWN          BUTTON_OPTION
-#define BJACK_RIGHT         BUTTON_NEXT
-#define BJACK_LEFT          BUTTON_PREV
-
-#elif CONFIG_KEYPAD == XDUOO_X3II_PAD
-#define BJACK_SELECT_NAME   "PLAY"
-#define BJACK_STAY_NAME     "NEXT"
-#define BJACK_QUIT_NAME     "POWER"
-#define BJACK_DOUBLE_NAME   "PREV"
-#define BJACK_SELECT        BUTTON_PLAY
-#define BJACK_QUIT          BUTTON_POWER
-#define BJACK_MAX           BUTTON_VOL_UP
-#define BJACK_MIN           BUTTON_VOL_DOWN
-#define BJACK_STAY          BUTTON_NEXT
-#define BJACK_DOUBLEDOWN    BUTTON_PREV
-#define BJACK_UP            BUTTON_HOME
-#define BJACK_DOWN          BUTTON_OPTION
-#define BJACK_RIGHT         BUTTON_NEXT
-#define BJACK_LEFT          BUTTON_PREV
-
-#elif CONFIG_KEYPAD == XDUOO_X20_PAD
+#elif CONFIG_KEYPAD == XDUOO_X3_PAD || CONFIG_KEYPAD == XDUOO_X3II_PAD || CONFIG_KEYPAD == XDUOO_X20_PAD
 #define BJACK_SELECT_NAME   "PLAY"
 #define BJACK_STAY_NAME     "NEXT"
 #define BJACK_QUIT_NAME     "POWER"
@@ -607,7 +575,7 @@ enum {
 #define BJACK_RIGHT         BUTTON_NEXT
 #define BJACK_LEFT          BUTTON_PREV
 
-#elif CONFIG_KEYPAD == IHIFI_770_PAD
+#elif CONFIG_KEYPAD == IHIFI_770_PAD || CONFIG_KEYPAD == IHIFI_800_PAD
 #define BJACK_SELECT_NAME   "PLAY"
 #define BJACK_STAY_NAME     "NEXT"
 #define BJACK_QUIT_NAME     "POWER"
@@ -623,7 +591,7 @@ enum {
 #define BJACK_RIGHT         BUTTON_NEXT
 #define BJACK_LEFT          BUTTON_PREV
 
-#elif CONFIG_KEYPAD == IHIFI_800_PAD
+#elif CONFIG_KEYPAD == EROSQ_PAD
 #define BJACK_SELECT_NAME   "PLAY"
 #define BJACK_STAY_NAME     "NEXT"
 #define BJACK_QUIT_NAME     "POWER"
@@ -632,12 +600,12 @@ enum {
 #define BJACK_QUIT          BUTTON_POWER
 #define BJACK_MAX           BUTTON_VOL_UP
 #define BJACK_MIN           BUTTON_VOL_DOWN
-#define BJACK_STAY          BUTTON_NEXT
-#define BJACK_DOUBLEDOWN    BUTTON_PREV
-#define BJACK_UP            BUTTON_HOME
-#define BJACK_DOWN          (BUTTON_POWER | BUTTON_HOME)
-#define BJACK_RIGHT         BUTTON_NEXT
-#define BJACK_LEFT          BUTTON_PREV
+#define BJACK_STAY          BUTTON_MENU
+#define BJACK_DOUBLEDOWN    BUTTON_BACK
+#define BJACK_UP            BUTTON_PREV
+#define BJACK_DOWN          BUTTON_NEXT
+#define BJACK_RIGHT         BUTTON_SCROLL_FWD
+#define BJACK_LEFT          BUTTON_SCROLL_BACK
 
 #else
 #error No keymap defined!
