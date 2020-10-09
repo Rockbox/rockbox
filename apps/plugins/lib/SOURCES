@@ -25,9 +25,7 @@ grey_coldfire.S
 
 #endif /* LCD_DEPTH < 4 */
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 overlay.c
-#endif
 
 #ifdef RB_PROFILE
 profile_plugin.c
