@@ -849,11 +849,11 @@ const struct settings_list settings[] = {
                    "roll_off", "sharp,slow,short sharp,short slow", sound_set_filter_roll_off,
                    4, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW), ID2P(LANG_FILTER_SHORT_SHARP), ID2P(LANG_FILTER_SHORT_SLOW)),
 #elif defined(AUDIOHW_HAVE_SHORT_ROLL_OFF)
-                   "roll_off", "sharp,slow", sound_set_filter_roll_off,
-                   2, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW)),
-#else
                    "roll_off", "sharp,slow,short,bypass", sound_set_filter_roll_off,
                    4, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW), ID2P(LANG_FILTER_SHORT), ID2P(LANG_FILTER_BYPASS)),
+#else
+                   "roll_off", "sharp,slow", sound_set_filter_roll_off,
+                   2, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW)),
 #endif
 #endif
 
