@@ -32,9 +32,6 @@
 #define BUTTON_UP         0x00000100
 #define BUTTON_DOWN       0x00000200
 
-#define BUTTON_LEFT  0
-#define BUTTON_RIGHT 0
-
 #define BUTTON_MAIN  (BUTTON_POWER | BUTTON_HOME | BUTTON_OPTION | BUTTON_PREV | \
                       BUTTON_NEXT | BUTTON_PLAY | BUTTON_VOL_UP | BUTTON_VOL_DOWN | \
                       BUTTON_UP | BUTTON_DOWN)
@@ -47,4 +44,3 @@
 #define POWEROFF_COUNT  25
 
 #endif /* _BUTTON_TARGET_H_ */
-
