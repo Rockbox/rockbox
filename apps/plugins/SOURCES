@@ -60,6 +60,7 @@ alarmclock.c
 iriverify.c
 #endif
 
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* Requires real hardware */
 #if defined(IRIVER_H100_SERIES)
 iriver_flash.c
 #endif
@@ -67,12 +68,13 @@ iriver_flash.c
 #if defined(IPOD_NANO2G)
 crypt_firmware.c
 #endif
+#endif
 
 /* Overlays loaders */
 
 #if defined(HAVE_LCD_COLOR) && \
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
-#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE /*|PLATFORM_HOSTED */)) && (defined(CPU_ARM) || defined(CPU_MIPS))
+#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE |PLATFORM_HOSTED)) && (defined(CPU_ARM) || defined(CPU_MIPS))
 duke3d.c
 quake.c
 wolf3d.c
