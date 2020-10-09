@@ -40,8 +40,6 @@ windows_lnk.c
 remote_control.c
 #endif
 
-
-
 #ifdef HAVE_BACKLIGHT
 lamp.c
 #endif /* HAVE_BACKLIGHT */
@@ -57,22 +55,24 @@ wav2wv.c
 alarmclock.c
 #endif /* CONFIG_RTC */
 
-
-
 /* Platform-specific */
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 iriverify.c
 #endif
 
+#if defined(IRIVER_H100_SERIES)
+iriver_flash.c
+#endif
 
-
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* those plugins only run on hardware */
+#if defined(IPOD_NANO2G)
+crypt_firmware.c
+#endif
 
 /* Overlays loaders */
 
 #if defined(HAVE_LCD_COLOR) && \
     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
-#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE|PLATFORM_HOSTED)) && (defined(CPU_ARM) || defined(CPU_MIPS))
+#if (PLUGIN_BUFFER_SIZE > 0x14000) && (CONFIG_PLATFORM & (PLATFORM_NATIVE /*|PLATFORM_HOSTED */)) && (defined(CPU_ARM) || defined(CPU_MIPS))
 duke3d.c
 quake.c
 wolf3d.c
@@ -93,16 +93,6 @@ goban.c
 pictureflow.c
 
 #endif /* PLUGIN_BUFFER_SIZE <= 0x20000 */
-
-#if defined(IRIVER_H100_SERIES)
-iriver_flash.c
-#endif
-
-#if defined(IPOD_NANO2G)
-crypt_firmware.c
-#endif
-
-#endif /* PLATFORM_NATIVE */
 
 metronome.c
 
