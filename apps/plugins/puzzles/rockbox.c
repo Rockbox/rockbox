@@ -19,15 +19,194 @@
  *
  ***************************************************************************/
 
-/* rockbox frontend for puzzles */
-
-/* This file contains the majority of the rockbox-specific code for
+/* ================================
+ * Rockbox frontend for sgt-puzzles
+ * ================================
+ *
+ * This file contains the majority of the rockbox-specific code for
  * the sgt-puzzles port. It implements a set of functions for the
  * backend to call to actually run the games, as well as rockbox UI
  * code (menus, input, etc). For a good overview of the rest of the
  * puzzles code, see:
  *
  * <https://www.chiark.greenend.org.uk/~sgtatham/puzzles/devel/>.
+ *
+ * For documentation of the contents of this file, read on.
+ *
+ * ---------------------
+ * Contents of this file
+ * ---------------------
+ *
+ * By rough order of appearnce in this file:
+ *
+ *  1) "Zoom" feature
+ *
+ *     This file contains re-implementations of drawing primitives
+ *     (lines, fills, text drawing, etc.) adapted to draw into a
+ *     custom `zoom_fb' framebuffer at a magnification of ZOOM_FACTOR
+ *     (compile-time constant, currently 3x). These are used if the
+ *     global `zoom_enabled' switch is true.
+ *
+ *     The zoom feature uses a modal interface with two modes: viewing
+ *     mode, and interaction mode.
+ *
+ *     Viewing mode is entered by default and is used to pan around the
+ *     game viewport without interacting with the backend game at
+ *     all. Pressing "select" while in viewing mode activates
+ *     interaction mode. Instead of panning around, interaction mode
+ *     sends keystrokes directly to the backend game.
+ *
+ *     It used to be that the zoomed viewport would remain entirely
+ *     static while the user was in interaction mode. This made the
+ *     zoom feature rather klunky to use because it required frequent
+ *     mode switching. In commit 5094aaa, this behavior was changed so
+ *     that the frontend can now query the backend for the on-screen
+ *     cursor location and move the viewport accordingly through the
+ *     new midend_get_cursor_location() API (which is not yet merged
+ *     into Simon's tree as of October 2020).
+ *
+ *  2) Font management
+ *
+ *     Rockbox's bitmap fonts don't allow for easy rendering of text
+ *     of arbitrary size. We work around this by shipping a "font
+ *     pack" of pre-rendered fonts in a continuous size range spanning
+ *     10px to 36px. The code here facilitates dynamic
+ *     loading/unloading of fonts from this font pack.
+ *
+ *     Font loading efficiency is enhanced by a feature called the
+ *     "font table" which remembers the set of fonts used by each
+ *     individual puzzle to allow for pre-loading during subsequent
+ *     runs. On targets with physical hard drives, this enhances
+ *     startup time by loading the fonts while the disk is already
+ *     spinning (from loading the plugin).
+ *
+ *  3) Drawing API
+ *
+ *     The sgt-puzzles backend wants a set of function pointers to the
+ *     usual drawing primitives. [1] If the `zoom_enabled' switch is
+ *     on, these call upon the "zoomed" drawing routines in (1).
+ *
+ *     In the normal un-zoomed case, these functions generally rely on
+ *     the usual lcd_* or the pluginlib's xlcd_* API, with some
+ *     exceptions: we implement a fixed-point antialiased line
+ *     algorithm function and a hacky approximation of a polygon fill
+ *     using triangles. [2]
+ *
+ *     Some things to note: "blitters" are used to save and restore a
+ *     rectangular region of the screen; "clipping" refers to
+ *     temporarily bounding draw operations to a rectangular region
+ *     (this is implemented with rockbox viewports).
+ *
+ *  4) Input tuning and game-specific modes
+ *
+ *     The input schemes of most of the games in the sgt-puzzles
+ *     collection are able to be played fairly well with only
+ *     directional keys and a "select" button. Other games, however,
+ *     need some special accommodations. These are enabled by
+ *     `tune_input()' based on the game name and are listed below:
+ *
+ *     a) Mouse mode
+ *
+ *        This mode is designed to accommodate puzzles without a
+ *        keyboard or cursor interface (currently only "Loopy"). We
+ *        remap the cursor keys to move an on-screen cursor rather
+ *        than sending arrow keys to the game.
+ *
+ *        We also have the option of sending a right-click event when
+ *        the "select" key is held; unfortunately, this conflicts with
+ *        being able to drag the cursor while the virtual "mouse
+ *        button" is depressed. This restriction is enforced by
+ *        `tune_input()'.
+ *
+ *     b) Numerical chooser spinbox
+ *
+ *        Games that require keyboard input beyond the arrow keys and
+ *        "select" (currently Filling, Keen, Solo, Towers, Undead, and
+ *        Unequal) are accommodated via a spinbox-like interface.
+ *
+ *        In these games, the user first uses the directional keys to
+ *        position the cursor, and then presses "select" to activate
+ *        the spinbox mode. Then, the left and right keys are remapped
+ *        to scroll through the list of possible keystrokes accepted
+ *        by the game (retrieved through the midend_request_keys() API
+ *        call). Once the user is happy with their selection, they
+ *        press "select" again to deactivate the chooser, and the
+ *        arrow keys regain their original function.
+ *
+ *     c) Force centering while zoomed
+ *
+ *        (This isn't an input adaptation but it doesn't quite fit
+ *        anywhere else.)
+ *
+ *        In Inertia, we want to keep the ball centered on screen so
+ *        that the user can see everything in all directions.
+ *
+ *     d) Long-press maps to spacebar; chording; falling edge events
+ *
+ *        These are grouped because the first features two are
+ *        dependent on the last. This dependency is enforced with an
+ *        `assert()'.
+ *
+ *        Some games want a spacebar event -- so we send one on a
+ *        long-press of "select". However, we usually send key events
+ *        to the game immediately after the key is depressed, so we
+ *        can't distinguish a hold vs. a short click.
+ *
+ *        A similar issue arises when we want to allow chording of
+ *        multiple keypresses (this is only used for Untangle, which
+ *        allows diagonal movements by chording two arrow keys) -- if
+ *        we detect that a key has just been pressed, we don't know if
+ *        the user is going to press more keys later on to form a
+ *        chorded input.
+ *
+ *        In both of these scenarios we disambiguate the possible
+ *        cases by waiting until a key has been released before we
+ *        send the input keystroke(s) to the game.
+ *
+ *  5) Game configuration and preset management
+ *
+ *     The backend games specify a hierarchy of user-adjustable game
+ *     configuration parameters that control aspects of puzzle
+ *     generation, etc. Also supplied are a set of "presets" that
+ *     specify a predetermined set of configuration parameters.
+ *
+ *  6) In-game help
+ *
+ *     The sgt-puzzles manual (src/puzzles.but) contains a chapter
+ *     describing each game. To aid the user in learning each puzzle,
+ *     each game plugin contains a compiled-in version of each
+ *     puzzle's corresponding manual chapter.
+ *
+ *     The compiled-in help text is automatically generated from the
+ *     puzzles.but file with a system of shell scripts (genhelp.sh),
+ *     which also performs LZ4 compression on the text to conserve
+ *     memory on smaller targets. The output of this script is found
+ *     in the help/ directory. On-target LZ4 decompression is handled
+ *     by lz4tiny.c.
+ *
+ *  7) Debug menu
+ *
+ *     The debug menu is activated by clicking "Quick help" five times
+ *     in a row. Sorry, Android. This is helpful for benchmarking
+ *     optimizations and selecting the activating the input
+ *     accommodations described in (4).
+ *
+ * --------------------
+ * Building and linking
+ * --------------------
+ *
+ * Each sgt-*.rock executable is produced by statically compiling the
+ * backend (i.e. game-specific) source file and help file (see (6)
+ * above) against a set of common source files.
+ *
+ * The backend source files are listed in SOURCES.games; the common
+ * source files are in SOURCES.
+ *
+ * ----------
+ * References
+ * ----------
+ *  [1]: https://www.chiark.greenend.org.uk/~sgtatham/puzzles/devel/drawing.html#drawing
+ *  [2]: https://en.wikipedia.org/wiki/Xiaolin_Wu%27s_line_algorithm
  */
 
 #include "plugin.h"
@@ -1643,6 +1822,12 @@ static void send_click(int button, bool release)
         midend_process_key(me, x, y, button + 6);
 }
 
+/*
+ * Numerical chooser ("spinbox")
+ *
+ * Let the user scroll through the options for the keys they can
+ * press.
+ */
 static int choose_key(void)
 {
     int options = 0;
@@ -3120,7 +3305,9 @@ static void tune_input(const char *name)
         NULL
     };
 
-    /* wait until a key is released to send an action */
+    /* wait until a key is released to send an action (useful for
+     * chording in Inertia; must be enabled if the game needs a
+     * spacebar) */
     input_settings.falling_edge = string_in_list(name, falling_edge);
 
     /* For want_spacebar to work, events must be sent on the falling
@@ -3136,15 +3323,16 @@ static void tune_input(const char *name)
 
     input_settings.ignore_repeats = !string_in_list(name, allow_repeats);
 
-    /* set to false if you want dragging to be possible */
-    static const char *rclick_on_hold[] = {
+    /* disable right-click on hold if you want dragging in mouse
+     * mode */
+    static const char *no_rclick_on_hold[] = {
         "Map",
         "Signpost",
         "Untangle",
         NULL
     };
 
-    input_settings.rclick_on_hold = !string_in_list(name, rclick_on_hold);
+    input_settings.rclick_on_hold = !string_in_list(name, no_rclick_on_hold);
 
     static const char *mouse_games[] = {
         "Loopy",
