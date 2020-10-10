@@ -84,11 +84,11 @@ int xduoo_get_outputs(void){
     const char * const sysfs_bal_switch = "/sys/class/switch/balance/state";
 #endif
 
-    sysfs_get_int(sysfs_hs_switch, &status);
-    if (status) ps = 2; // headset
-
     sysfs_get_int(sysfs_lo_switch, &status);
     if (status) ps = 1; // lineout
+
+    sysfs_get_int(sysfs_hs_switch, &status);
+    if (status) ps = 2; // headset
 
 #if defined(XDUOO_X20)
     sysfs_get_int(sysfs_bal_switch, &status);
