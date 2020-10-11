@@ -79,8 +79,7 @@ PreviewLabel::PreviewLabel(QWidget * parent, Qt::WindowFlags f)
 void PreviewLabel::mouseMoveEvent(QMouseEvent * event)
 {
     hovertimer.start();
-    mousex = event->globalX();
-    mousey = event->globalY();
+    mousepos = event->globalPos();
 }
 void PreviewLabel::enterEvent(QEvent * event)
 {
@@ -95,7 +94,8 @@ void PreviewLabel::leaveEvent(QEvent * event)
 
 void PreviewLabel::timeout()
 {
-    preview->move(mousex-(preview->width()/2) ,mousey-(preview->height()/2));
+    preview->move(mousepos.x() - (preview->width() / 2),
+                  mousepos.y() - (preview->height() / 2));
     preview->setVisible(true);
 }
 

@@ -66,8 +66,7 @@ private slots:
 
 private:
     QTimer hovertimer;
-    int mousex;
-    int mousey;
+    QPoint mousepos;
     PreviewDlg* preview;
 };
 
