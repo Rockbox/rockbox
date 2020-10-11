@@ -225,7 +225,7 @@ static void compare_md5(struct upg_file_t *file, int idx, size_t filesize, uint8
     cprintf_field("  Name: ", "%s ", g_md5name[idx]);
     cprintf(RED, found ? "Found" : " Not found");
     printf("\n");
-    cprintf_field("  Size: ", "%lu", filesize);
+    cprintf_field("  Size: ", "%lu", (unsigned long)filesize);
     cprintf(RED, " %s", !found ? "Cannot check" : filesize == expected_size ? "Ok" : "Mismatch");
     printf("\n");
     cprintf_field("  MD5:", " ");
@@ -423,7 +423,7 @@ static int create_upg(int argc, char **argv)
             MD5_CalculateDigest(md5, buf, size);
             size_t inc_sz = 16 + NWZ_MD5_SIZE * 2 + strlen(g_md5name[i]);
             md5_prepend = realloc(md5_prepend, md5_prepend_sz + inc_sz);
-            md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, "%lu ", size);
+            md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, "%lu ", (unsigned long)size);
             for(int i = 0; i < NWZ_MD5_SIZE; i++)
                 md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, "%02x", md5[i]);
             md5_prepend_sz += sprintf(md5_prepend + md5_prepend_sz, " %s\n", g_md5name[i]);

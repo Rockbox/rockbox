@@ -78,6 +78,31 @@ void MD5_CalculateDigest(void *digest, const void *input, size_t length)
     CryptDestroyHash(hHash);
 }
 
+void *md5_start()
+{
+    if(!check_context())
+        return NULL;
+    HCRYPTHASH hHash;
+    if(!CryptCreateHash(g_hCryptProv, CALG_MD5, 0, 0, &hHash))
+        return NULL;
+    return reinterpret_cast<void *>(hHash);
+}
+
+void md5_update(void *md5_obj, const void *input, size_t length)
+{
+    HCRYPTHASH hHash = reinterpret_cast<HCRYPTHASH>(md5_obj);
+    CryptHashData(hHash, (const BYTE *)input, length, 0);
+}
+
+void md5_final(void *md5_obj, void *digest)
+{
+    HCRYPTHASH hHash = reinterpret_cast<HCRYPTHASH>(md5_obj);
+    DWORD dwSize = 16;
+    if(!CryptGetHashParam(hHash, HP_HASHVAL, (BYTE *)digest, &dwSize, 0))
+        return;
+    CryptDestroyHash(hHash);
+}
+
 void mg_decrypt_fw(void *in, int size, void *out, uint8_t *key)
 {
     if(!check_context() || (size % 8) != 0)
