@@ -7,6 +7,7 @@
 /* YP-R1 need it too of course */
 #ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#define PIVOT_ROOT "/mnt/media0"
 #endif
 
 /* For Rolo and boot loader */
