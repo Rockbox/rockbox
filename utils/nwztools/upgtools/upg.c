@@ -165,7 +165,7 @@ struct upg_file_t *upg_read_memory(void *buf, size_t size, const char *key,
 
     /* check MD5 */
     uint8_t actual_md5[NWZ_MD5_SIZE];
-    MD5_CalculateDigest(actual_md5, (md5 + 1), size - sizeof(struct upg_header_t));
+    MD5_CalculateDigest(actual_md5, (md5 + 1), size - NWZ_MD5_SIZE);
     if(memcmp(actual_md5, md5->md5, NWZ_MD5_SIZE) != 0)
     {
         cprintf(RED, "Mismatch\n");
