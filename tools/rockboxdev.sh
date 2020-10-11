@@ -804,20 +804,26 @@ do
             #        compiles with GCC >6
             #   kernel: 3.10.14
             #   glibc: 2.16
+            #   alsa: 1.0.29
+            #
+            # FiiO M3K:
+            #   kernel: 3.10.14
+            #   glibc: 2.16
+            #   alsa: 1.0.26
             #
             # To maximize compatibility, we use kernel 3.2.85 which is the lastest
             # longterm 3.2 kernel and is supported by the latest glibc, and we
-            # require support for up to glibc 2.4
+            # require support for up to glibc 2.16
             # We use a recent 2.26.1 binutils to avoid any build problems and
             # avoid patches/bugs.
-            glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.4"
+            glibcopts="--enable-kernel=3.2 --enable-oldest-abi=2.16"
             # FIXME: maybe add -mhard-float
             build_linux_toolchain "mipsel-rockbox-linux-gnu" "2.26.1" "" "4.9.4" \
                 "$gccopts" "3.2.85" "2.25" "$glibcopts"
             # build alsa-lib
             # we need to set the prefix to how it is on device (/usr) and then
             # tweak install dir at make install step
-            alsalib_ver="1.0.19"
+            alsalib_ver="1.0.26"
             gettool "alsa-lib" "$alsalib_ver"
             extract "alsa-lib-$alsalib_ver"
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
