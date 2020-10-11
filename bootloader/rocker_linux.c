@@ -51,14 +51,12 @@
 #if defined(AGPTEK_ROCKER)
 #define ICON_WIDTH  70
 #define ICON_HEIGHT 70
-#define RBFILE "rockbox.rocker"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
 #include "bitmaps/hibyicon.h"
 #elif defined(XDUOO_X3II)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
-#define RBFILE "rockbox.x3ii"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
 #define BUTTON_UP     BUTTON_OPTION
@@ -68,7 +66,6 @@
 #elif defined(XDUOO_X20)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
-#define RBFILE "rockbox.x20"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
 #define BUTTON_UP     BUTTON_OPTION
@@ -78,7 +75,6 @@
 #elif defined(FIIO_M3K)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
-#define RBFILE "rockbox.fiiom3k"
 #define ICON_NAME bm_fiioicon
 #define BUTTON_LEFT    BUTTON_PREV
 #define BUTTON_RIGHT   BUTTON_NEXT
@@ -88,7 +84,6 @@
 #elif defined(EROS_Q)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
-#define RBFILE "rockbox.erosq"
 #define ICON_NAME bm_hibyicon
 #define OF_NAME "HIBY PLAYER"
 #define BUTTON_UP     BUTTON_SCROLL_BACK
@@ -99,11 +94,12 @@
 #error "must define ICON_WIDTH/HEIGHT"
 #endif
 
-#ifdef FIIO_M3K
-#define BASE_DIR "/mnt"
-#else
-#define BASE_DIR "/mnt/sd_0"
-#endif
+#define BASE_DIR PIVOT_ROOT
+//#ifdef FIIO_M3K
+//#define BASE_DIR "/mnt"
+//#else
+//#define BASE_DIR "/mnt/sd_0"
+//#endif
 
 /* images */
 #include "bitmaps/rockboxicon.h"
@@ -631,9 +627,9 @@ int main(int argc, char **argv)
         {
             fflush(stdout);
             mount_storage(true);
-            system("/bin/cp " BASE_DIR "/.rockbox/" RBFILE " /tmp");
-            system("/bin/chmod +x /tmp/" RBFILE);
-            execl("/tmp/" RBFILE, RBFILE, NULL);
+            system("/bin/cp " BASE_DIR "/.rockbox/" BOOTFILE " /tmp");
+            system("/bin/chmod +x /tmp/" BOOTFILE);
+            execl("/tmp/" BOOTFILE, BOOTFILE, NULL);
             printf("execvp failed: %s\n", strerror(errno));
             /* fallback to OF in case of failure */
             error_screen("Cannot boot Rockbox");

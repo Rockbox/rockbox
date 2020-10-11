@@ -91,8 +91,14 @@ int rolo_load(const char* filename)
     lcd_remote_update();
 #endif
 
+#ifdef PIVOT_ROOT
+#define EXECDIR PIVOT_ROOT
+#else
+#define EXECDIR ROOT_DIR
+#endif
+
     char buf[256];
-    snprintf(buf, sizeof(buf), "%s/%s", HOME_DIR, filename);
+    snprintf(buf, sizeof(buf), "%s/%s", EXECDIR, filename);
     execl(buf, BOOTFILE, NULL);
 
     rolo_error("Failed to launch!", strerror(errno));

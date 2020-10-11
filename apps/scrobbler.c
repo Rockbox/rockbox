@@ -58,7 +58,7 @@ static int cache_pos = 0;
 static bool pending = false;
 #if CONFIG_RTC
 static time_t timestamp;
-#define BASE_FILENAME       ".scrobbler.log"
+#define BASE_FILENAME       HOME_DIR "/.scrobbler.log"
 #define HDR_STR_TIMELESS
 #define get_timestamp()     ((long)timestamp)
 #define record_timestamp()  ((void)(timestamp = mktime(get_time())))
@@ -72,21 +72,8 @@ static time_t timestamp;
 static void get_scrobbler_filename(char *path, size_t size)
 {
     int used;
-/* Get location of USB mass storage area */
-#ifdef APPLICATION
-#if (CONFIG_PLATFORM & PLATFORM_MAEMO)
-    used = snprintf(path, size, "/home/user/MyDocs/%s", BASE_FILENAME);
-#elif (CONFIG_PLATFORM & PLATFORM_ANDROID)
-    used = snprintf(path, size, "/sdcard/%s", BASE_FILENAME);
-#elif defined (SAMSUNG_YPR0) || defined(DX50) || defined(DX90)
-    used = snprintf(path, size, "%s/%s", HOME_DIR, BASE_FILENAME);
-#else /* Everything else uses a pivot_root strategy.. */
-    used = snprintf(path, size, "/%s", BASE_FILENAME);
-#endif /* (CONFIG_PLATFORM & PLATFORM_MAEMO) */
 
-#else
     used = snprintf(path, size, "/%s", BASE_FILENAME);
-#endif
 
     if (used >= (int)size)
     {

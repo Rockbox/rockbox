@@ -40,24 +40,12 @@
 #define ROCKBOX_DIR_LEN (sizeof(ROCKBOX_DIR)-1)
 #endif /* def __PCTOOL__ */
 
+/* NOTE:  target-specific hosted HOME_DIR resides in filesystem-app.c */
 #if !defined(APPLICATION) || defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
     defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || \
     defined(HIBY_LINUX) || defined(FIIO_M3K)
 
-#if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
-#define HOME_DIR "/mnt/media0"
-#elif defined(SONY_NWZ_LINUX)
-#define HOME_DIR "/contents"
-#elif defined(DX50) || defined(DX90)
-/* Where to put save files like recordings, playlists, screen dumps ...*/
-#define HOME_DIR "/mnt/sdcard"
-#elif defined(HIBY_LINUX)
-#define HOME_DIR "/mnt/sd_0"
-#elif defined(FIIO_M3K)
-#define HOME_DIR "/mnt"
-#else
 #define HOME_DIR "/"
-#endif
 
 /* make sure both are the same for native builds */
 #undef ROCKBOX_LIBRARY_PATH
@@ -69,6 +57,7 @@
 #else /* APPLICATION */
 
 #define HOME_DIR "<HOME>" /* replaced at runtime */
+#define HAVE_SPECIAL_DIRS
 
 #define PLUGIN_DIR          ROCKBOX_LIBRARY_PATH "/rockbox/rocks"
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
@@ -79,10 +68,8 @@
 
 #endif /* !APPLICATION || SAMSUNG_YPR0 */
 
-#define HOME_DIR_LEN (sizeof(HOME_DIR)-1)
-
-#define REC_BASE_DIR        "/Recordings"
-#define PLAYLIST_CATALOG_DEFAULT_DIR "/Playlists"
+#define REC_BASE_DIR        HOME_DIR "/Recordings"
+#define PLAYLIST_CATALOG_DEFAULT_DIR HOME_DIR "/Playlists"
 
 #define LANG_DIR            ROCKBOX_DIR "/langs"
 
@@ -91,8 +78,10 @@
 #define PLUGIN_DEMOS_DIR    PLUGIN_DIR "/demos"
 #define VIEWERS_DIR         PLUGIN_DIR "/viewers"
 
-#if defined(APPLICATION) && !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
-    defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX))
+#if defined(APPLICATION) && \
+        !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || \
+          defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || defined(HIBY_LINUX) || defined(FIIO_M3K))
+
 #define PLUGIN_DATA_DIR          ROCKBOX_DIR "/rocks.data"
 #define PLUGIN_GAMES_DATA_DIR    PLUGIN_DATA_DIR
 #define PLUGIN_APPS_DATA_DIR     PLUGIN_DATA_DIR

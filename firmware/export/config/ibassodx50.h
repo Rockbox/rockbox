@@ -24,7 +24,10 @@
 /* This config file is for Rockbox as an application on Android without JVM. */
 
 /* We don't run on hardware directly */
+#ifndef SIMULATOR
 #define CONFIG_PLATFORM PLATFORM_HOSTED
+#define PIVOT_ROOT "/mnt/sdcard"
+#endif
 #define HAVE_FPU
 
 /* For Rolo and boot loader */

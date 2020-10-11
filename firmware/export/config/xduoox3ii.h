@@ -15,6 +15,7 @@
 
 #ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#define PIVOT_ROOT "/mnt/sd_0"
 #endif
 
 #define HIBY_LINUX
