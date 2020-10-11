@@ -470,6 +470,7 @@ static int create_upg(int argc, char **argv)
     upg->files[1].data = realloc(upg->files[1].data, upg->files[1].size + md5_prepend_sz);
     memmove(upg->files[1].data + md5_prepend_sz, upg->files[1].data, upg->files[1].size);
     memcpy(upg->files[1].data, md5_prepend, md5_prepend_sz);
+    upg->files[1].size += md5_prepend_sz;
 
     size_t size = 0;
     void *buf = upg_write_memory(upg, g_key, g_sig, &size, NULL, generic_std_printf);
