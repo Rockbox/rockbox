@@ -616,7 +616,7 @@ int ft_enter(struct tree_context* c)
                 set_file(buf, (char *)global_settings.kbd_file, MAX_FILENAME);
                 break;
 
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(HAVE_ROLO)
                 /* firmware file */
             case FILE_ATTR_MOD:
                 splash(0, ID2P(LANG_WAIT));

@@ -47,6 +47,10 @@ debug.c
 #endif /* PLATFORM_NATIVE */
 panic.c
 
+#if (CONFIG_PLATFORM & PLATFORM_HOSTED) && defined(BOOTFILE)
+target/hosted/rolo.c
+#endif
+
 #ifdef HAVE_SDL
 target/hosted/sdl/button-sdl.c
 target/hosted/sdl/kernel-sdl.c

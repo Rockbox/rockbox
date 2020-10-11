@@ -45,7 +45,7 @@
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 #include "bootdata.h"
 #include "crc32.h"
-extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*mi4-loader.c*/    
+extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*mi4-loader.c*/
 #endif
 #define LOAD_FIRMWARE(a,b,c) load_mi4(a,b,c)
 #elif defined(RKW_FORMAT)
@@ -56,7 +56,7 @@ extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 #include "bootdata.h"
 #include "crc32.h"
-extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*rb-loader.c*/    
+extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*rb-loader.c*/
 #endif
 #define LOAD_FIRMWARE(a,b,c) load_firmware(a,b,c)
 #endif
@@ -98,7 +98,7 @@ void rolo_restart_cop(void)
 
     /* Invalidate cache */
     commit_discard_idcache();
-    
+
     /* Disable cache */
     CACHE_CTL = CACHE_CTL_DISABLE;
 
