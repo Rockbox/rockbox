@@ -42,6 +42,11 @@
 #undef PIVOT_ROOT
 #endif
 
+#if defined(__PCTOOL__)
+/* We don't want this for tools */
+#undef HAVE_SPECIAL_DIRS
+#endif
+
 #if defined(HAVE_MULTIDRIVE) || defined(HAVE_SPECIAL_DIRS)
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
@@ -52,11 +57,6 @@ static const char *rbhome;
 /* YPR0, YPR1, NWZ, etc */
 static const char rbhome[] = HOME_DIR;
 #endif
-#endif
-
-#if !defined(__PCTOOL__)
-/* We don't want this for tools */
-#undef HAVE_SPECIAL_DIRS
 #endif
 
 #ifdef HAVE_MULTIDRIVE
