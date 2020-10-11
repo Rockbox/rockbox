@@ -4,10 +4,8 @@
 
 #ifndef SIMULATOR
 #define CONFIG_PLATFORM (PLATFORM_HOSTED)
+#define PIVOT_ROOT "/contents"
 #endif
-
-
-
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR
