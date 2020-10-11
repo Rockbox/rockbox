@@ -49,7 +49,6 @@ if ($def_type eq "rb_defines") {
         '^SYS_CHARGER_(DIS|)CONNECTED$',
         '^SYS_(TIMEOUT|POWEROFF)$',
         '^SYS_USB_(DIS|)CONNECTED$',
-        '^HOME_DIR$',
         '^PLUGIN_DIR$',
         '^PLUGIN(_APPS_|_GAMES_|_)DATA_DIR$',
         '^ROCKBOX_DIR$',

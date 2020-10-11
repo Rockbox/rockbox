@@ -1108,7 +1108,6 @@ LUALIB_API int luaopen_rock(lua_State *L)
     static const struct lua_str_reg rlib_const_str[] =
     {
         /* some useful paths constants */
-        RB_STRING_CONSTANT(HOME_DIR),
         RB_STRING_CONSTANT(PLUGIN_DIR),
         RB_STRING_CONSTANT(PLUGIN_APPS_DATA_DIR),
         RB_STRING_CONSTANT(PLUGIN_GAMES_DATA_DIR),

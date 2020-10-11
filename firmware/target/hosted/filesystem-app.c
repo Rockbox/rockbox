@@ -37,14 +37,27 @@
 #include "logf.h"
 
 #if !(defined(BOOTLOADER) || defined(CHECKWPS) || defined(SIMULATOR))
-#if defined(HIBY_LINUX)
+
+/* PIVOT_ROOT adds a fixed prefix to all paths */
+#if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
+#define PIVOT_ROOT "/mnt/media0"
+#elif defined(SONY_NWZ_LINUX)
+#define PIVOT_ROOT "/contents"
+#elif defined(DX50) || defined(DX90)
+#define PIVOT_ROOT "/mnt/sdcard"
+#elif defined(HIBY_LINUX)
 #define PIVOT_ROOT "/mnt/sd_0"
 #elif defined(FIIO_M3K)
-#define PIVOT_ROOT "/mnt"  // XXX check this!
+#define PIVOT_ROOT "/mnt"
 #else
+#define PIVOT_ROOT "/"
 #endif
+
+#define PIVOT_ROOT_LEN (sizeof(PIVOT_ROOT)-1)
+
 #endif // !(BOOTLOADER|WPS|SIM)
 
+#if defined(HAVE_MULTIDRIVE) || defined(HAVE_SPECIAL_DIRS)
 #if (CONFIG_PLATFORM & PLATFORM_ANDROID)
 static const char rbhome[] = "/sdcard";
 #elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) \
@@ -54,15 +67,6 @@ static const char *rbhome;
 /* YPR0, YPR1, NWZ, etc */
 static const char rbhome[] = HOME_DIR;
 #endif
-
-#if !(defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || \
-     defined(SONY_NWZ_LINUX) || defined(DX90) || defined(HIBY_LINUX) || \
-     defined(FIIO_M3K)) &&	\
-    !defined(__PCTOOL__)
-/* Special dirs are user-accessible (and user-writable) dirs which take priority
- * over the ones where Rockbox is installed to. Classic example would be
- * $HOME/.config/rockbox.org vs /usr/share/rockbox */
-#define HAVE_SPECIAL_DIRS
 #endif
 
 #ifdef HAVE_MULTIDRIVE
@@ -202,6 +206,8 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
 {
     (void) flags; (void) buf; (void) bufsize;
 #ifdef HAVE_SPECIAL_DIRS
+#define HOME_DIR_LEN (sizeof(HOME_DIR)-1)
+    /* This replaces HOME_DIR (ie '<HOME'>') with runtime rbhome */
     if (!strncmp(HOME_DIR, dir, HOME_DIR_LEN))
     {
         const char *p = dir + HOME_DIR_LEN;
@@ -216,8 +222,12 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
     dir = handle_special_links(dir, flags, buf, bufsize);
 #endif
 #ifdef PIVOT_ROOT
-    snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
-    dir = buf;
+    /* Prepend root prefix to find actual path */
+    if (strncmp(PIVOT_ROOT, dir, PIVOT_ROOT_LEN))
+    {
+        snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
+        dir = buf;
+    }
 #endif
     return dir;
 }
