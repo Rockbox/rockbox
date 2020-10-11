@@ -94,7 +94,7 @@ int rolo_load(const char* filename)
 #ifdef PIVOT_ROOT
 #define EXECDIR PIVOT_ROOT
 #else
-#define EXECDIR ROOT_DIR
+#define EXECDIR HOME_DIR
 #endif
 
     char buf[256];

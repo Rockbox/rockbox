@@ -128,3 +128,8 @@
 #define BATTERY_CAPACITY_MIN 1100  /* min. capacity selectable */
 #define BATTERY_CAPACITY_MAX 1100 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
+
+/* ROLO */
+#define BOOTFILE_EXT "m3k"
+#define BOOTFILE     "rockbox." BOOTFILE_EXT
+#define BOOTDIR      "/.rockbox"
