@@ -44,7 +44,7 @@
     defined(DX50) || defined(DX90) || defined(SONY_NWZ_LINUX) || \
     defined(HIBY_LINUX) || defined(FIIO_M3K)
 
-#if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1)
+#if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(DX50) || defined(DX90)
 #define HOME_DIR "/mnt/media0"
 #elif defined(SONY_NWZ_LINUX)
 #define HOME_DIR "/contents"

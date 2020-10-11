@@ -37,11 +37,8 @@
 #include "logf.h"
 
 #if !(defined(BOOTLOADER) || defined(CHECKWPS) || defined(SIMULATOR))
-#if defined(HIBY_LINUX)
-#define PIVOT_ROOT "/mnt/sd_0"
-#elif defined(FIIO_M3K)
-#define PIVOT_ROOT "/mnt"  // XXX check this!
-#else
+#if defined(SAMSUNG_YPR0) || defined(SAMSUNG_YPR1) || defined(HIBY_LINUX) || defined(FIIO_M3K)
+#define PIVOT_ROOT HOME_DIR
 #endif
 #endif // !(BOOTLOADER|WPS|SIM)
 
@@ -216,8 +213,11 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
     dir = handle_special_links(dir, flags, buf, bufsize);
 #endif
 #ifdef PIVOT_ROOT
-    snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
-    dir = buf;
+    if (strncmp(HOME_DIR, dir, HOME_DIR_LEN))
+    {
+        snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
+        dir = buf;
+    }
 #endif
     return dir;
 }
