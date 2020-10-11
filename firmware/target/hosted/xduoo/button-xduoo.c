@@ -84,7 +84,7 @@ void button_init_device(void)
 
     for(int i = 0; i < NR_POLL_DESC; i++)
     {
-        int fd = open(input_devs[i], O_RDWR);
+        int fd = open(input_devs[i], O_RDWR | O_CLOEXEC);
 
         if(fd < 0)
         {

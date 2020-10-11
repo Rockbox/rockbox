@@ -69,7 +69,7 @@ int os_relate(const char *ospath1, const char *ospath2)
     }
 
     /* First file must stay open for duration so that its stats don't change */
-    int fd1 = os_open(ospath1, O_RDONLY);
+    int fd1 = os_open(ospath1, O_RDONLY | O_CLOEXEC);
     if (fd1 < 0)
         return -2;
 
@@ -144,7 +144,7 @@ int os_relate(const char *ospath1, const char *ospath2)
 
 bool os_file_exists(const char *ospath)
 {
-    int sim_fd = os_open(ospath, O_RDONLY, 0);
+    int sim_fd = os_open(ospath, O_RDONLY | O_CLOEXEC, 0);
     if (sim_fd < 0)
         return false;
 
@@ -157,7 +157,7 @@ bool os_file_exists(const char *ospath)
 
 int os_opendirfd(const char *osdirname)
 {
-    return os_open(osdirname, O_RDONLY);
+    return os_open(osdirname, O_RDONLY | O_CLOEXEC);
 }
 
 int os_opendir_and_fd(const char *osdirname, DIR **osdirpp, int *osfdp)

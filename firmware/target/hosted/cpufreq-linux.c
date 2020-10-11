@@ -31,7 +31,7 @@
 
 static FILE* open_read(const char* file_name)
 {
-    FILE *f = fopen(file_name, "r");
+    FILE *f = fopen(file_name, "re");
     if(f == NULL)
     {
         DEBUGF("ERROR %s: Can not open %s for reading.", __func__, file_name);
@@ -83,7 +83,7 @@ void cpufreq_available_governors(char* governors, int governors_size, int cpu)
 
 static FILE* open_write(const char* file_name)
 {
-    FILE *f = fopen(file_name, "w");
+    FILE *f = fopen(file_name, "we");
     if(f == NULL)
     {
         DEBUGF("ERROR %s: Can not open %s for writing.", __func__, file_name);

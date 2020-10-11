@@ -62,7 +62,7 @@ int rtc_write_datetime(const struct tm *tm)
     tm_time = gmtime(&now);
 
     /* Try to write the HW RTC, if present. */
-    int rtc = open("/dev/rtc0", O_WRONLY);
+    int rtc = open("/dev/rtc0", O_WRONLY | O_CLOEXEC);
     if (rtc > 0) {
         ioctl(rtc, RTC_SET_TIME, (struct rtc_time *)tm_time);
         close(rtc);
@@ -79,7 +79,7 @@ void rtc_set_alarm(int h, int m)
     struct rtc_time tm;
     long sec;
 
-    int rtc = open("/dev/rtc0", O_WRONLY);
+    int rtc = open("/dev/rtc0", O_WRONLY | O_CLOEXEC);
     if (rtc < 0)
         return;
 
@@ -124,7 +124,7 @@ void rtc_get_alarm(int *h, int *m)
     struct rtc_time tm;
     long sec;
 
-    int rtc = open("/dev/rtc0", O_WRONLY);
+    int rtc = open("/dev/rtc0", O_WRONLY | O_CLOEXEC);
     if (rtc < 0)
         return;
 
@@ -157,7 +157,7 @@ void rtc_get_alarm(int *h, int *m)
 
 void rtc_enable_alarm(bool enable)
 {
-    int rtc = open("/dev/rtc0", O_WRONLY);
+    int rtc = open("/dev/rtc0", O_WRONLY | O_CLOEXEC);
     if (rtc < 0)
         return;
 
@@ -171,7 +171,7 @@ void rtc_enable_alarm(bool enable)
 /* Returns true if alarm was the reason we started up */
 bool rtc_check_alarm_started(bool release_alarm)
 {
-    int rtc = open("/dev/rtc0", O_WRONLY);
+    int rtc = open("/dev/rtc0", O_WRONLY | O_CLOEXEC);
     if (rtc < 0)
         return false;
 
@@ -191,7 +191,7 @@ bool rtc_check_alarm_flag(void)
 {
     struct rtc_wkalrm alrm;
 
-    int rtc = open("/dev/rtc0", O_WRONLY);
+    int rtc = open("/dev/rtc0", O_WRONLY | O_CLOEXEC);
     if (rtc < 0)
         return false;
 

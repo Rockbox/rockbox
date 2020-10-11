@@ -141,7 +141,7 @@ static void write_to_soundcard(struct pcm_udata *udata)
 {
 #ifdef DEBUG
     if (debug_audio && (udata->debug == NULL)) {
-        udata->debug = fopen("audiodebug.raw", "ab");
+        udata->debug = fopen("audiodebug.raw", "abe");
         DEBUGF("Audio debug file open\n");
     }
 #endif
@@ -364,7 +364,7 @@ void pcm_play_dma_init(void)
 #ifdef DEBUG
     udata.debug = NULL;
     if (debug_audio) {
-        udata.debug = fopen("audiodebug.raw", "wb");
+        udata.debug = fopen("audiodebug.raw", "wbe");
         DEBUGF("Audio debug file open\n");
     }
 #endif

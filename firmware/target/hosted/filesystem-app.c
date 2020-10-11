@@ -234,6 +234,7 @@ int app_open(const char *path, int oflag, ...)
     if (!fpath)
         FILE_ERROR_RETURN(ENAMETOOLONG, -1);
 
+    oflag |= O_CLOEXEC;
     return os_open(fpath, oflag __OPEN_MODE_ARG);
 }
 

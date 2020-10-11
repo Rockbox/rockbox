@@ -47,15 +47,10 @@ static void redraw(void)
 void lcd_init_device(void)
 {
     const char * const fb_dev = "/dev/fb0";
-    fd = open(fb_dev, O_RDWR /* | O_SYNC */);
+    fd = open(fb_dev, O_RDWR | O_CLOEXEC);
     if(fd < 0)
     {
         panicf("Cannot open framebuffer: %s\n", fb_dev);
-    }
-
-    if (fcntl( fd, F_SETFD, FD_CLOEXEC ) < 0)
-    {
-        panicf("Can't set CLOEXEC");
     }
 
     /* get fixed and variable information */

@@ -176,7 +176,7 @@ bool current_scaling_governor(int cpu, char* governor, int governor_size)
              sizeof(path),
              "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor",
              cpu);
-    FILE *f = fopen(path, "r");
+    FILE *f = fopen(path, "re");
     if(f == NULL)
     {
         DEBUGF("ERROR %s: Can not open %s for reading.", __func__, path);
@@ -252,7 +252,7 @@ static int read_cpu_frequency(int cpu, enum cpu_frequency_options freqOpt)
         }
     }
 
-    FILE *f = fopen(path, "r");
+    FILE *f = fopen(path, "re");
     if(f == NULL)
     {
         DEBUGF("ERROR %s: Can not open %s for reading.", __func__, path);

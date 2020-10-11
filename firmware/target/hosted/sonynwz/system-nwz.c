@@ -49,7 +49,7 @@ static void compute_kern_mod_list(void)
     kern_mod_list = malloc(sizeof(const char **));
     kern_mod_list[0] = NULL;
     /* read from proc file system */
-    FILE *f = fopen("/proc/modules", "r");
+    FILE *f = fopen("/proc/modules", "re");
     if(f == NULL)
     {
         printf("Cannot open /proc/modules");
@@ -94,7 +94,7 @@ static void dump_proc_map(void)
 {
     const char *file = "/proc/self/maps";
     printf("Dumping %s...\n", file);
-    FILE *f = fopen(file, "r");
+    FILE *f = fopen(file, "re");
     if(f == NULL)
     {
         perror("Cannot open file");

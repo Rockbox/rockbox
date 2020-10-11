@@ -94,7 +94,7 @@ void power_off(void)
 {
     backlight_hw_off();
 
-    axp_hw = open("/dev/axp173", O_RDWR);
+    axp_hw = open("/dev/axp173", O_RDWR | O_CLOEXEC);
     if(axp_hw < 0)
         panicf("Cannot open '/dev/axp173'");
 
