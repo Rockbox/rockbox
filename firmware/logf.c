@@ -361,7 +361,7 @@ static void flush_buffer(void)
     if(logdiskfindex < 1)
         return;
 
-    fd = open(HOME_DIR"/rockbox_log.txt", O_RDWR | O_CREAT | O_APPEND, 0666);
+    fd = open("/rockbox_log.txt", O_RDWR | O_CREAT | O_APPEND, 0666);
     if (fd < 0)
         return;
 
