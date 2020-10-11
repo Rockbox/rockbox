@@ -711,7 +711,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
-#elif defined(HAVE_TOUCHSCREEN)
+#else
+#error "Unsupported keymap!"
+#endif
+
+#if defined(HAVE_TOUCHSCREEN)
 #ifndef PEGBOX_QUIT
 #define PEGBOX_QUIT     BUTTON_TOPLEFT
 #endif
@@ -754,8 +758,6 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef LVL_DOWN_TEXT
 #define LVL_DOWN_TEXT "BOTTOMRIGHT"
 #endif
-#else
-#error Unsupported keymap!
 #endif
 
 /* get several sizes from the bitmaps */

@@ -53,7 +53,8 @@
 #define BATTERY_ON_TXT  "PLAY - start"
 #define BATTERY_OFF_TXT "MENU"
 
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD
+#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD || \
+      CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
 
 #define BATTERY_ON  BUTTON_SELECT
 #define BATTERY_OFF BUTTON_POWER
@@ -85,7 +86,6 @@
 #elif (CONFIG_KEYPAD == IRIVER_H10_PAD ||	\
        CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD || \
        CONFIG_KEYPAD == SONY_NWZ_PAD || \
-       CONFIG_KEYPAD == AGPTEK_ROCKER_PAD || \
        CONFIG_KEYPAD == XDUOO_X3_PAD || \
        CONFIG_KEYPAD == IHIFI_770_PAD || \
        CONFIG_KEYPAD == IHIFI_800_PAD || \
@@ -242,7 +242,11 @@
 #define BATTERY_OFF_TXT "Power"
 #define BATTERY_ON_TXT  "Menu - start"
 
-#elif defined(HAVE_TOUCHSCREEN)
+#else
+#error "No keymap defined!"
+#endif
+
+#if defined(HAVE_TOUCHSCREEN)
 
 #ifndef BATTERY_ON
 #define BATTERY_ON       BUTTON_CENTER
@@ -257,8 +261,6 @@
 #define BATTERY_OFF_TXT "TOPLEFT"
 #endif
 
-#else
-#error No keymap defined!
 #endif
 
 /****************************** Plugin Entry Point ****************************/

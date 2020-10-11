@@ -351,7 +351,11 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN     BUTTON_NEXT
 #define PAUSE    BUTTON_PLAY
 
-#elif defined(HAVE_TOUCHSCREEN)
+#else
+#error "No keymap defined!"
+#endif
+
+#if defined(HAVE_TOUCHSCREEN)
 #ifndef QUIT
 #define QUIT  BUTTON_TOPLEFT
 #endif
@@ -370,8 +374,6 @@ CONFIG_KEYPAD == MROBE500_PAD
 #ifndef PAUSE
 #define PAUSE BUTTON_CENTER
 #endif
-#else
-#error No keymap defined!
 #endif
 
 #define MOVE_NO 0               /* player movement */
