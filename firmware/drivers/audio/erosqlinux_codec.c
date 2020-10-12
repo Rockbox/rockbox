@@ -56,6 +56,8 @@ static void hw_close(void)
     close(fd_hw);
 }
 
+static int muted = -1;
+
 void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
@@ -70,6 +72,7 @@ void audiohw_mute(int mute)
         last_ps = 0;
         erosq_get_outputs();
     }
+    muted = mute;
 }
 
 int erosq_get_outputs(void) {
@@ -95,7 +98,7 @@ int erosq_get_outputs(void) {
 
 void erosq_set_output(int ps)
 {
-    if (!inited) return;
+    if (!inited || muted) return;
 
     if (last_ps != ps)
     {
@@ -119,7 +122,7 @@ void audiohw_preinit(void)
 void audiohw_postinit(void)
 {
     logf("hw postinit");
-    erosq_set_output(erosq_get_outputs());  /* Unmute */
+    erosq_get_outputs(); // Unmutes
 }
 
 void audiohw_close(void)

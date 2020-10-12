@@ -70,7 +70,7 @@ void audiohw_postinit(void)
     long int hp = 2;
 
     /* Output port switch set to Headphones */
-    alsa_controls_set_ints("Output Port Switch", 1, &hp); /* Unmutes */
+    //alsa_controls_set_ints("Output Port Switch", 1, &hp); // Unmute happens on PCM start
 }
 
 void audiohw_close(void)
