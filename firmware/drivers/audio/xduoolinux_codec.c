@@ -41,7 +41,7 @@ static int inited = 0;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
-static long int last_ps = 0;
+static long int last_ps = -1;
 
 static void hw_open(void)
 {
@@ -61,6 +61,11 @@ void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
 
+    if (muted == mute)
+       return;
+
+    muted = mute;
+
     if(mute)
     {
         long int ps0 = 0;
@@ -68,10 +73,8 @@ void audiohw_mute(int mute)
     }
     else
     {
-        last_ps = 0;
         xduoo_get_outputs();
     }
-    muted = mute;
 }
 
 int xduoo_get_outputs(void){
@@ -124,14 +127,12 @@ void audiohw_preinit(void)
     hw_open();
     audiohw_mute(true);  /* Start muted to avoid the POP */
     inited = 1;
+//    const char * const codec_pmdown = "/sys/devices/platform/ingenic-x3ii.0/x3ii-ak4490-i2s/pmdown_time";  // in ms, defaults 5000
 }
 
 void audiohw_postinit(void)
 {
-//    const char * const codec_pmdown = "/sys/devices/platform/ingenic-x3ii.0/x3ii-ak4490-i2s/pmdown_time";  // in ms, defaults 5000
-
     logf("hw postinit");
-    // xduoo_get_outputs(); // Unmute happens upon playback.
 }
 
 void audiohw_close(void)

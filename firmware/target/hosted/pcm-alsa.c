@@ -454,7 +454,6 @@ void cleanup(void)
     snd_pcm_close(handle);
 }
 
-
 void pcm_play_dma_init(void)
 {
     int err;
@@ -533,9 +532,6 @@ static void pcm_dma_apply_settings_nolock(void)
         /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
         audiohw_set_frequency(pcm_sampr);
 #endif
-#ifdef AUDIOHW_MUTE_ON_SRATE_CHANGE
-        audiohw_mute(false);
-#endif
         /* (Will be unmuted by pcm resuming) */
     }
 }
@@ -564,7 +560,7 @@ void pcm_play_dma_stop(void)
     snd_pcm_nonblock(handle, 0);
     snd_pcm_drain(handle);
     snd_pcm_nonblock(handle, 1);
-    last_sample_rate = 0;
+//    last_sample_rate = 0;
 #ifdef AUDIOHW_MUTE_ON_PAUSE
     audiohw_mute(true);
 #endif
@@ -579,7 +575,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_data = addr;
     pcm_size = size;
 
-#if !defined(AUDIOHW_MUTE_ON_PAUSE) || !defined(AUDIOHW_MUTE_ON_SRATE_CHANGE)
+#if !defined(AUDIOHW_MUTE_ON_PAUSE) && defined(AUDIOHW_MUTE_ON_SRATE_CHANGE)
     audiohw_mute(false);
 #endif
 
@@ -615,7 +611,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
                     logf("Start error: %s\n", snd_strerror(err));
                     return;
                 }
-#ifdef AUDIOHW_MUTE_ON_PAUSE
+#if defined(AUDIOHW_MUTE_ON_PAUSE)
                 audiohw_mute(false);
 #endif
                 if (err == 0)
@@ -652,6 +648,10 @@ const void * pcm_play_dma_get_peak_buffer(int *count)
 void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();
+
+#ifdef AUDIOHW_NEEDS_INITIAL_UNMUTE
+    audiohw_mute(false);
+#endif
 }
 
 void pcm_set_mixer_volume(int volume)
