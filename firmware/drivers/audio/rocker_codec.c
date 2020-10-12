@@ -74,7 +74,6 @@ void audiohw_preinit(void)
 
 void audiohw_postinit(void)
 {
-    logf("hw postinit");
 }
 
 void audiohw_close(void)
