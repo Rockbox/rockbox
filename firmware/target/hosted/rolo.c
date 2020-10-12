@@ -79,12 +79,12 @@ int rolo_load(const char* filename)
 #endif
 
 #ifdef HAVE_STORAGE_FLUSH
-    lcd_puts(0, 1, "Flushing storage buffers");
+    lcd_puts(0, 2, "Flushing storage buffers");
     lcd_update();
     storage_flush();
 #endif
 
-    lcd_puts(0, 1, "Executing");
+    lcd_puts(0, 3, "Executing");
     lcd_update();
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_puts(0, 1, "Executing");
