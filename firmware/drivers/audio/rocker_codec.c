@@ -32,6 +32,8 @@ static int fd_hw;
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
 
+static int muted = -1;
+
 static void hw_open(void)
 {
     fd_hw = open("/dev/snd/controlC0", O_RDWR);
@@ -46,6 +48,11 @@ static void hw_close(void)
 
 void audiohw_mute(int mute)
 {
+    if (muted == mute)
+       return;
+
+    muted = mute;
+
     if(mute)
     {
         long int ps0 = 0;
@@ -67,10 +74,7 @@ void audiohw_preinit(void)
 
 void audiohw_postinit(void)
 {
-    long int hp = 2;
-
-    /* Output port switch set to Headphones */
-    //alsa_controls_set_ints("Output Port Switch", 1, &hp); // Unmute happens on PCM start
+    logf("hw postinit");
 }
 
 void audiohw_close(void)

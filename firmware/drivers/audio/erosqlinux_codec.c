@@ -42,7 +42,7 @@ static int inited = 0;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
-static long int last_ps = 0;
+static long int last_ps = -1;
 
 static void hw_open(void)
 {
@@ -62,6 +62,11 @@ void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
 
+    if (muted == mute)
+       return;
+
+    muted = mute;
+
     if(mute)
     {
         long int ps0 = 0;
@@ -69,10 +74,8 @@ void audiohw_mute(int mute)
     }
     else
     {
-        last_ps = 0;
         erosq_get_outputs();
     }
-    muted = mute;
 }
 
 int erosq_get_outputs(void) {
@@ -115,14 +118,14 @@ void audiohw_preinit(void)
     logf("hw preinit");
     alsa_controls_init();
     hw_open();
-    audiohw_mute(true);  /* Start muted to avoid the POP */
+//    audiohw_mute(true);  /* Start muted to avoid the POP */
+    audiohw_mute(false);
     inited = 1;
 }
 
 void audiohw_postinit(void)
 {
     logf("hw postinit");
-    erosq_get_outputs(); // Unmutes
 }
 
 void audiohw_close(void)
