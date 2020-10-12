@@ -174,7 +174,7 @@ static void gui_quickscreen_draw(const struct gui_quickscreen *qs,
     int temp;
     display->set_viewport(parent);
     display->clear_viewport();
-    
+
     for (i = 0; i < QUICKSCREEN_ITEM_COUNT; i++)
     {
         struct viewport *vp = &vps[i];
@@ -318,7 +318,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     bool can_quit = false;
 
     push_current_activity(ACTIVITY_QUICKSCREEN);
-    
+
     FOR_NB_SCREENS(i)
     {
         screens[i].set_viewport(NULL);
@@ -434,32 +434,6 @@ bool quick_screen_quick(int button_enter)
     }
     return usb;
 }
-
-#ifdef BUTTON_F3
-bool quick_screen_f3(int button_enter)
-{
-    struct gui_quickscreen qs;
-    bool usb = false;
-    qs.items[QUICKSCREEN_TOP] = NULL;
-    qs.items[QUICKSCREEN_LEFT] =
-                    find_setting(&global_settings.scrollbar, NULL);
-    qs.items[QUICKSCREEN_RIGHT] =
-                    find_setting(&global_settings.statusbar, NULL);
-    qs.items[QUICKSCREEN_BOTTOM] =
-#ifdef HAVE_LCD_FLIP
-                    find_setting(&global_settings.flip_display, NULL);
-#else
-                    NULL;
-#endif
-    qs.callback = NULL;
-    if (gui_syncquickscreen_run(&qs, button_enter, &usb))
-    {
-        settings_save();
-        settings_apply(false);
-    }
-    return usb;
-}
-#endif /* BUTTON_F3 */
 
 /* stuff to make the quickscreen configurable */
 bool is_setting_quickscreenable(const struct settings_list *setting)

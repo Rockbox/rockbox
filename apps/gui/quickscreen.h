@@ -43,9 +43,6 @@ struct gui_quickscreen
                                                     item is changed */
 };
 
-#ifdef BUTTON_F3
-extern bool quick_screen_f3(int button_enter);
-#endif
 extern bool quick_screen_quick(int button_enter);
 int quickscreen_set_option(void *data);
 bool is_setting_quickscreenable(const struct settings_list *setting);
