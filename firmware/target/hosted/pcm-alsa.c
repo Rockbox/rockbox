@@ -81,8 +81,8 @@ static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format *
 typedef short sample_t;
 #endif
 static const int channels = 2;                                /* count of channels */
-static unsigned int sample_rate = 0;
 static unsigned int real_sample_rate = 0;
+static unsigned int last_sample_rate = 0;
 
 static snd_pcm_t *handle = NULL;
 static snd_pcm_sframes_t buffer_size;
@@ -148,17 +148,17 @@ static int set_hwparams(snd_pcm_t *handle)
         goto error;
     }
     /* set the stream rate */
-    sample_rate = srate = pcm_sampr;
+    srate = pcm_sampr;
     err = snd_pcm_hw_params_set_rate_near(handle, params, &srate, 0);
     if (err < 0)
     {
-        logf("Rate %iHz not available for playback: %s\n", sample_rate, snd_strerror(err));
+        logf("Rate %iHz not available for playback: %s\n", pcm_sampr, snd_strerror(err));
         goto error;
     }
     real_sample_rate = srate;
-    if (real_sample_rate != sample_rate)
+    if (real_sample_rate != pcm_sampr)
     {
-        logf("Rate doesn't match (requested %iHz, get %iHz)\n", sample_rate, real_sample_rate);
+        logf("Rate doesn't match (requested %iHz, get %iHz)\n", pcm_sampr, real_sample_rate);
         err = -EINVAL;
         goto error;
     }
@@ -517,11 +517,13 @@ void pcm_play_unlock(void)
 
 static void pcm_dma_apply_settings_nolock(void)
 {
-    logf("PCM DMA Settings %d %d", sample_rate, pcm_sampr);
+    logf("PCM DMA Settings %d %d", last_sample_rate, pcm_sampr);
 
-    if (sample_rate != pcm_sampr)
+    if (last_sample_rate != pcm_sampr)
     {
-#ifdef AUDIOHW_MUTE_ON_PAUSE
+	last_sample_rate = pcm_sampr;
+
+#ifdef AUDIOHW_MUTE_ON_SRATE_CHANGE
         // XXX AK4450 (xDuoo X3ii) needs to be muted when switching rates.
         audiohw_mute(true);
 #endif
@@ -531,8 +533,10 @@ static void pcm_dma_apply_settings_nolock(void)
         /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
         audiohw_set_frequency(pcm_sampr);
 #endif
-
-	/* (Will be unmuted by pcm resuming) */
+#ifdef AUDIOHW_MUTE_ON_SRATE_CHANGE
+        audiohw_mute(false);
+#endif
+        /* (Will be unmuted by pcm resuming) */
     }
 }
 
@@ -560,7 +564,7 @@ void pcm_play_dma_stop(void)
     snd_pcm_nonblock(handle, 0);
     snd_pcm_drain(handle);
     snd_pcm_nonblock(handle, 1);
-    sample_rate = 0;
+    last_sample_rate = 0;
 #ifdef AUDIOHW_MUTE_ON_PAUSE
     audiohw_mute(true);
 #endif
@@ -574,6 +578,10 @@ void pcm_play_dma_start(const void *addr, size_t size)
 
     pcm_data = addr;
     pcm_size = size;
+
+#if !defined(AUDIOHW_MUTE_ON_PAUSE) || !defined(AUDIOHW_MUTE_ON_SRATE_CHANGE)
+    audiohw_mute(false);
+#endif
 
     while (1)
     {
@@ -605,14 +613,14 @@ void pcm_play_dma_start(const void *addr, size_t size)
                 int err = async_rw(handle);
                 if (err < 0) {
                     logf("Start error: %s\n", snd_strerror(err));
-		    return;
-		}
+                    return;
+                }
 #ifdef AUDIOHW_MUTE_ON_PAUSE
-    audiohw_mute(false);
+                audiohw_mute(false);
 #endif
-		if (err == 0)
-			return;
-		break;
+                if (err == 0)
+                    return;
+                break;
             }
             case SND_PCM_STATE_PAUSED:
             {   /* paused, simply resume */

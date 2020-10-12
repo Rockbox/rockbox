@@ -55,6 +55,8 @@ static void hw_close(void)
     close(fd_hw);
 }
 
+static int muted = -1;
+
 void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
@@ -69,6 +71,7 @@ void audiohw_mute(int mute)
         last_ps = 0;
         xduoo_get_outputs();
     }
+    muted = mute;
 }
 
 int xduoo_get_outputs(void){
@@ -102,7 +105,7 @@ int xduoo_get_outputs(void){
 
 void xduoo_set_output(int ps)
 {
-    if (!inited) return;
+    if (!inited || muted) return;
 
     if (last_ps != ps)
     {
@@ -128,7 +131,7 @@ void audiohw_postinit(void)
 //    const char * const codec_pmdown = "/sys/devices/platform/ingenic-x3ii.0/x3ii-ak4490-i2s/pmdown_time";  // in ms, defaults 5000
 
     logf("hw postinit");
-    xduoo_set_output(xduoo_get_outputs());  /* Unmute */
+    // xduoo_get_outputs(); // Unmute happens upon playback.
 }
 
 void audiohw_close(void)
