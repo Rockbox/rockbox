@@ -140,7 +140,7 @@ print FILE $bootloader_sh;
 close FILE;
 chmod 0755, "$rootfsdir/usr/bin/hiby_player.sh";
 
-# Auto mount/unmount external USB drives
+# Auto mount/unmount external USB drives and SD card
 open  FILE, ">>$rootfsdir/etc/mdev.conf" || die ("can't access mdev conf!");
 print FILE "sd[a-z][0-9]+ 0:0 664 @ /etc/rb_inserting.sh\n";
 print FILE "mmcblk[0-9]p[0-9] 0:0 664 @ /etc/rb_inserting.sh\n";
@@ -154,16 +154,16 @@ my $insert_sh = '
 # $MDEV is the device
 
 case $MDEV in
- mmc*) 
+ mmc*)
    MNT_POINT=/mnt/sd_0
    ;;
- sd*) 
+ sd*)
    MNT_POINT=/mnt/sd_0/USB
    ;;
 esac
 
 if [ ! -d $MNT_POINT ];then
-   mkdir $MNT_POINT 
+   mkdir $MNT_POINT
 fi
 
 mount $MDEV $MNT_POINT
@@ -185,6 +185,9 @@ open FILE, ">$rootfsdir/etc/rb_removing.sh" || die("can't write hotplug helpers!
 print FILE $remove_sh;
 close FILE;
 chmod 0755, "$rootfsdir/etc/rb_removing.sh";
+
+# Deal with a nasty race condition in automount scripts
+system("perl -pni -e 's/rm -rf/#rm -Rf/;' $rootfsdir/etc/init.d/S50sys_server");
 
 # Copy bootloader over
 @sysargs=("cp", "$rbbname", "$rootfsdir/usr/bin/$rbbasename");
