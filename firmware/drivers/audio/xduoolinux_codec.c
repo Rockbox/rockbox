@@ -73,6 +73,7 @@ void audiohw_mute(int mute)
     }
     else
     {
+        last_ps = 0;
         xduoo_get_outputs();
     }
 }

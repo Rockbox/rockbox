@@ -74,6 +74,7 @@ void audiohw_mute(int mute)
     }
     else
     {
+        last_ps = 0;
         erosq_get_outputs();
     }
 }
