@@ -1067,7 +1067,7 @@ enum mc13783_regs_enum
     #define MC13783_ICHRG_1064MA        (0xc << 3) /*  967 1064 1170 */
     #define MC13783_ICHRG_1152MA        (0xd << 3) /* 1048 1152 1268 */
     #define MC13783_ICHRG_1596MA        (0xe << 3) /* 1450 1596 1755 */
-    #define MC13783_ICHRG_FULLY_ON      (0xf << 3) /* Disallow HW FET turn on */ 
+    #define MC13783_ICHRG_FULLY_ON      (0xf << 3) /* Disallow HW FET turn on */
 #define MC13783_ICHRGTR                 (0x7 << 7) /*  Min  Nom  Max */
     #define MC13783_ICHRGTR_POS         (7)
     #define MC13783_ICHRGTR_0MA         (0x0 << 7) /*    0    0    0 */
@@ -1340,11 +1340,12 @@ struct mc13783_event
     {                                                                    \
         static const struct mc13783_event __tbl[] = {
 
+#define MC13783_EVENT_VECTOR_CB(__name)   void MC13783_EVENT_CB_##__name(void)
+
 #define MC13783_EVENT_VECTOR(__name, __sense) \
             { .id       = MC13783_INT_ID_##__name,                 \
               .sense    = (__sense),                               \
-              .callback = ({ void MC13783_EVENT_CB_##__name(void); \
-                             MC13783_EVENT_CB_##__name; }) },
+              .callback = (MC13783_EVENT_CB_##__name) },
 
 #define MC13783_EVENT_VECTOR_TBL_END() \
         };                                              \

@@ -166,11 +166,12 @@ struct gpio_event
     {                                                                 \
         static const struct gpio_event __tbl[] = {
 
+#define GPIO_EVENT_VECTOR_CB(__name)     void __name##_EVENT_CB(void)
+
 #define GPIO_EVENT_VECTOR(__name, __sense) \
-            { .id       = (__name##_ID),                   \
-              .sense    = (__sense),                       \
-              .callback = ({ void __name##_EVENT_CB(void); \
-                             __name##_EVENT_CB; }) },
+        { .id       = (__name##_ID),       \
+          .sense    = (__sense),           \
+          .callback = (__name##_EVENT_CB) },
 
 #define GPIO_VECTOR_TBL_END() \
         };                                              \

@@ -42,6 +42,15 @@ static struct spi_node mc13783_spi =
     0,                             /* SPI clock - no wait states */
 };
 
+MC13783_EVENT_VECTOR_CB(ADCDONE);
+#if CONFIG_RTC
+MC13783_EVENT_VECTOR_CB(1HZ);
+#endif
+MC13783_EVENT_VECTOR_CB(ONOFD1);
+MC13783_EVENT_VECTOR_CB(SE1);
+MC13783_EVENT_VECTOR_CB(USB);
+MC13783_EVENT_VECTOR_CB(ONOFD2);
+
 /* Gigabeat S definitions for static MC13783 event registration */
 MC13783_EVENT_VECTOR_TBL_START()
     /* ADC conversion complete */

@@ -28,6 +28,11 @@
 
 #ifdef DEFINE_GPIO_VECTOR_TABLE
 
+GPIO_EVENT_VECTOR_CB(GPIO1_31);
+#if CONFIG_TUNER
+GPIO_EVENT_VECTOR_CB(GPIO1_27);
+#endif
+
 GPIO_VECTOR_TBL_START()
     /* mc13783 keeps the PRIINT high (no low pulse) if other unmasked
      * interrupts become active when clearing them or if a source being
