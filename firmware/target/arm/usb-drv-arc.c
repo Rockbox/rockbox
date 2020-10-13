@@ -352,12 +352,16 @@ static struct queue_head qh_array[USB_NUM_ENDPOINTS*2]
 static struct semaphore transfer_completion_signal[USB_NUM_ENDPOINTS*2]
     SHAREDBSS_ATTR;
 
-static const unsigned int pipe2mask[] = {
+static const unsigned int pipe2mask[USB_NUM_ENDPOINTS*2] = {
     0x01, 0x010000,
     0x02, 0x020000,
     0x04, 0x040000,
+#if USB_NUM_ENDPOINTS > 3
     0x08, 0x080000,
+#endif
+#if USB_NUM_ENDPOINTS > 4
     0x10, 0x100000,
+#endif
 };
 
 /*-------------------------------------------------------------------------*/

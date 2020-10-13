@@ -326,7 +326,7 @@ static bool pmu_is_hibernated(void)
  */
 void main(void)
 {
-    int fw = FW_ROCKBOX;
+//    int fw = FW_ROCKBOX;
     int rc = 0;
     unsigned char *loadbuffer;
     int (*kernel_entry)(void);
@@ -337,7 +337,7 @@ void main(void)
     i2c_preinit(0);
 
     if (pmu_is_hibernated()) {
-        fw = FW_APPLE;
+//        fw = FW_APPLE;
         rc = launch_onb(1); /* 27/2 = 13.5 MHz. */
     }
 
@@ -375,7 +375,7 @@ void main(void)
         if ((btn == BUTTON_MENU)
                 || (btn == (BUTTON_SELECT|BUTTON_LEFT))
                 || (btn == (BUTTON_SELECT|BUTTON_PLAY))) {
-            fw = FW_APPLE;
+//            fw = FW_APPLE;
             rc = kernel_launch_onb();
         }
     }
@@ -410,7 +410,7 @@ void main(void)
 
         /* We wait until HDD spins up to check for hold button */
         if (button_hold()) {
-            fw = FW_APPLE;
+//            fw = FW_APPLE;
             printf("Executing OF...");
             ata_sleepnow();
             rc = kernel_launch_onb();

@@ -226,7 +226,7 @@ bool rtc_check_alarm_flag(void)
 
     /* read Control 2 register which contains alarm flag */
     rv = i2c_readbytes(RTC_ADDR, RTC_CTRL2, 1, &tmp);
-
+    (void)rv;
     return (tmp & RTC_AF);
 }
 #endif /* HAVE_RTC_ALARM */

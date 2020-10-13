@@ -39,7 +39,9 @@ void ata_reset(void)
 
 void ata_enable(bool on)
 {
+#ifndef BOOTLOADER
     static bool init = true;
+#endif
 
     /* Ide power toggling is a nasty hack to allow USB bridge operation
      * in rockbox. For some reason GL811E bridge doesn't like the state
@@ -59,8 +61,8 @@ void ata_enable(bool on)
             sleep(1);
             ide_power_enable(true);
         }
-#endif
         init = false;
+#endif
     }
     else
     {

@@ -334,7 +334,7 @@ static int get_section_address(int section)
 int flash_rockbox(const char *filename, int section)
 {
     struct flash_header hdr;
-    int pos, i, len, rc;
+    int pos, i, len/*, rc */;
     unsigned long checksum, sum;
     unsigned char *p8;
     uint16_t *p16;
@@ -390,7 +390,7 @@ int flash_rockbox(const char *filename, int section)
         rb->lcd_putsf(0, 3, "Erasing...  %d%%", (i+SEC_SIZE)*100/len);
         rb->lcd_update();
         
-        rc = cfi_erase_sector(FB + (i + pos)/2);
+        /*rc = */cfi_erase_sector(FB + (i + pos)/2);
     }
     
     /* Write the magic and size. */

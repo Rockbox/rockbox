@@ -69,17 +69,21 @@ int button_read_device(void)
     static bool hold_button = false;
     bool remote_hold_button = false;
 
+#ifndef BOOTLOADER
     bool hold_button_old;
+#endif
     bool remote_present;
 
     /* check if we have remote connected */
     remote_present = remote_detect();
 
     /* read hold buttons status */
+#ifndef BOOTLOADER
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
     remote_hold_button = remote_button_hold();
-    
+
 #ifndef BOOTLOADER
     /* Only main hold affects backlight */
     if (hold_button != hold_button_old)

@@ -97,9 +97,11 @@ int button_read_device(void)
     int buttons = int_btn;
     unsigned char state;
     static bool hold_button = false;
+#ifndef BOOTLOADER
     bool hold_button_old;
 
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
 
 #ifndef BOOTLOADER

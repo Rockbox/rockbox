@@ -103,10 +103,14 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
 #endif /* (SAMSUNG_YH920) || (SAMSUNG_YH925) */
     static bool hold_button = false;
+#ifndef BOOTLOADER
     bool hold_button_old;
+#endif
 
     /* Hold */
+#ifndef BOOTLOADER
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
 
 #ifndef BOOTLOADER
