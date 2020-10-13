@@ -16,6 +16,9 @@ BOOTLINK := $(BUILDDIR)/boot.link
 
 CLEANOBJS += $(BUILDDIR)/bootloader.*
 
+# FIXME: PP arm targets need this, otherwise we can't find __div0
+EXTRA_SPECIAL_LIBS = $(call a2lnk, $(CORE_LIBS))
+
 .SECONDEXPANSION:
 
 $(BOOTLINK): $(BOOTLDS) $(CONFIGFILE)
@@ -25,7 +28,7 @@ $(BOOTLINK): $(BOOTLDS) $(CONFIGFILE)
 $(BUILDDIR)/bootloader.elf: $$(OBJ) $(FIRMLIB) $(CORE_LIBS) $$(BOOTLINK)
 	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -nostdlib -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
-		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) \
+		-L$(BUILDDIR)/lib $(call a2lnk, $(CORE_LIBS)) $(EXTRA_SPECIAL_LIBS) \
 		-lgcc -T$(BOOTLINK) $(GLOBAL_LDOPTS) \
 		-Wl,--gc-sections -Wl,-Map,$(BUILDDIR)/bootloader.map
 
