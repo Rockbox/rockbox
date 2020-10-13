@@ -137,9 +137,11 @@ static int button_read_device_v2(void) {
 
 int button_read_device(void) {
     static bool hold_button = false;
+#ifndef BOOTLOADER
     bool hold_button_old;
 
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
 
 #ifndef BOOTLOADER
@@ -147,7 +149,7 @@ int button_read_device(void) {
         backlight_hold_changed(hold_button);
     }
 #endif
-    
+
     if (hold_button) {
         return 0;
     } else if (kbd_type == KEYBOARD_V1) {

@@ -194,13 +194,15 @@ int button_read_device(void)
     int data = 0;
     static bool hold_button = false;
 
+#ifndef BOOTLOADER
     bool hold_button_old;
 
 
     /* read hold buttons status */
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
-    
+
 #ifndef BOOTLOADER
     /* Only main hold affects backlight */
     if (hold_button != hold_button_old)

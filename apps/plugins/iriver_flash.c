@@ -460,7 +460,7 @@ void show_fatal_error(void)
 int flash_bootloader(const char *filename)
 {
     char *bootsector;
-    int pos, i, len, rc;
+    int pos, i, len/*, rc*/;
     unsigned long checksum, sum;
     unsigned char *p8;
     uint16_t *p16;
@@ -509,7 +509,7 @@ int flash_bootloader(const char *filename)
     
     /* Erase the bootloader flash section. */
     for (i = BOOTLOADER_ENTRYPOINT/SEC_SIZE; i < 0x200; i++)
-        rc = cfi_erase_sector(FB + (SEC_SIZE/2) * i);
+        /*rc =*/ cfi_erase_sector(FB + (SEC_SIZE/2) * i);
     
     pos = BOOTLOADER_ENTRYPOINT/2;
     p16 = (uint16_t *)audiobuf;
