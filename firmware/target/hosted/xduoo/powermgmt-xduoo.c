@@ -23,7 +23,7 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3470
+    3443 /* 5% */
 };
 
 /* the OF shuts down at this voltage */
@@ -35,7 +35,7 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3400, 3639, 3697, 3723, 3757, 3786, 3836, 3906, 3980, 4050, 4159 }
+    { 3400, 3498, 3560, 3592, 3624, 3672, 3753, 3840, 3937, 4047, 4189 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
