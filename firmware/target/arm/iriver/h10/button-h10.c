@@ -36,10 +36,10 @@ void button_init_device(void)
 {
     /* Enable REW, FF, Play, Left, Right, Hold buttons */
     GPIO_SET_BITWISE(GPIOA_ENABLE, 0xfc);
-    
+
     /* Enable POWER button */
     GPIO_SET_BITWISE(GPIOB_ENABLE, 0x01);
-    
+
     /* We need to output to pin 6 of GPIOD when reading the scroll pad value */
     GPIO_SET_BITWISE(GPIOD_ENABLE, 0x40);
     GPIO_SET_BITWISE(GPIOD_OUTPUT_EN, 0x40);
@@ -64,13 +64,18 @@ int button_read_device(void)
     int btn = BUTTON_NONE;
     int data;
     unsigned char state;
+
     static bool hold_button = false;
     static bool remote_hold_button = false;
+#ifndef BOOTLOADER
     bool hold_button_old;
     bool remote_hold_button_old;
+#endif
 
     /* Hold */
+#ifndef BOOTLOADER
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
 
 #ifndef BOOTLOADER
@@ -91,10 +96,10 @@ int button_read_device(void)
         if ((state & 0x20) == 0) btn |= BUTTON_REW;
         if ((state & 0x40) == 0) btn |= BUTTON_RIGHT;
         if ((state & 0x80) == 0) btn |= BUTTON_LEFT;
-        
+
         /* Read power button */
         if (GPIOB_INPUT_VAL & 0x1) btn |= BUTTON_POWER;
-        
+
         /* Read scroller */
         if ( GPIOD_INPUT_VAL & 0x20 )
         {
@@ -102,7 +107,7 @@ int button_read_device(void)
             udelay(250);
             data = adc_scan(ADC_SCROLLPAD);
             GPIO_SET_BITWISE(GPIOD_OUTPUT_VAL, 0x40);
-            
+
             if(data < 0x224)
             {
                 btn |= BUTTON_SCROLL_DOWN;
@@ -111,9 +116,11 @@ int button_read_device(void)
             }
         }
     }
-    
+
+#ifndef BOOTLOADER
     /* remote buttons */
     remote_hold_button_old = remote_hold_button;
+#endif
 
     data = adc_scan(ADC_REMOTE);
     remote_hold_button = data < 0x2B;
@@ -143,6 +150,6 @@ int button_read_device(void)
     /* remote play button should be dead if hold */
     if (!remote_hold_button && !(GPIOA_INPUT_VAL & 0x1))
         btn |= BUTTON_RC_PLAY;
-    
+
     return btn;
 }

@@ -60,14 +60,18 @@ bool remote_button_hold(void)
 int button_read_device(void)
 {
     int  btn = BUTTON_NONE;
+#ifndef BOOTLOADER
     bool hold_button_old;
     bool remote_hold_button_old;
+#endif
     static int prev_data = 0xff;
     static int last_valid = 0xff;
     int  data;
 
     /* normal buttons */
+#ifndef BOOTLOADER
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
 
 #ifndef BOOTLOADER
@@ -86,7 +90,7 @@ int button_read_device(void)
             last_valid = data;
         prev_data = data;
         data = last_valid;
-        
+
         if (data < 0xf0)
         {
             if(data < 0x7c)
@@ -114,7 +118,9 @@ int button_read_device(void)
     /* remote buttons */
     data = remote_detect() ? adc_scan(ADC_REMOTE) : 0xff;
 
+#ifndef BOOTLOADER
     remote_hold_button_old = remote_hold_button;
+#endif
     remote_hold_button = data < 0x17;
 
 #ifndef BOOTLOADER
