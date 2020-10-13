@@ -134,7 +134,7 @@ lcd_write_yuv420_lines:
     mac.l   %a5, %d0, %acc0
     mac.l   %a5, %d0, %acc1
     mac.l   %a5, %d0, %acc2
-    
+
     move.w  %d4, (%a0)
     /* 2nd LCD write is delayed one pixel to use it for filling the EMAC latency */
 
@@ -147,7 +147,7 @@ lcd_write_yuv420_lines:
     lsr.l   %d0, %d4
     lsr.l   %d0, %d3
     lsr.l   %d0, %d2
-    
+
     lsl.l   #6, %d2
     or.l    %d3, %d2                /* |00000000|00000000|0000Rrrr|rrGggggg| */
     lsl.l   #7, %d2
@@ -190,7 +190,7 @@ lcd_write_yuv420_lines:
     swap    %d4
     move.w  %d4, (%a0)
     swap    %d4
-    
+
     /* luma for third pixel (top right) as delta from the second */
     clr.l   %d1
     move.b  (%a1, %a3*2), %d1
@@ -199,7 +199,7 @@ lcd_write_yuv420_lines:
     mac.l   %a5, %d0, %acc0
     mac.l   %a5, %d0, %acc1
     mac.l   %a5, %d0, %acc2
-    
+
     move.w  %d4, (%a0)
     /* 2nd LCD write is delayed one pixel to use it for filling the EMAC latency */
 
@@ -211,7 +211,7 @@ lcd_write_yuv420_lines:
     lsr.l   %d0, %d4
     lsr.l   %d0, %d3
     lsr.l   %d0, %d2
-    
+
     lsl.l   #6, %d2
     or.l    %d3, %d2                /* |00000000|00000000|0000Rrrr|rrGggggg| */
     lsl.l   #7, %d2
@@ -264,7 +264,7 @@ lcd_write_yuv420_lines:
     lea.l   (44, %sp), %sp  /* restore registers */
     rts
 .yuv_end:
-    .size   lcd_write_yuv420_lines, yuv_end - lcd_write_yuv420_lines
+    .size   lcd_write_yuv420_lines, .yuv_end - lcd_write_yuv420_lines
 
 
 /* begin lcd_write_data */
