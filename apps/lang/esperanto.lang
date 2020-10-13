@@ -948,7 +948,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Eldona Reĝimo: %s"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>

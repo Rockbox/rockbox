@@ -12244,7 +12244,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "joslas %d pastiprinaajums"
+    gigabeats: "joslas pastiprinaajums"
   </voice>
 </phrase>
 <phrase>
@@ -12261,7 +12261,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "joslas %d frekvence"
+    gigabeats: "joslas frekvence"
   </voice>
 </phrase>
 <phrase>
@@ -12278,7 +12278,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "joslas %d platums"
+    gigabeats: "joslas platums"
   </voice>
 </phrase>
 <phrase>

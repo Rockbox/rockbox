@@ -963,7 +963,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d赫兹频段增益"
+    swcodec: "赫兹频段增益"
   </voice>
 </phrase>
 <phrase>
@@ -997,7 +997,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "带通滤波器%d"
+    swcodec: "带通滤波器"
   </voice>
 </phrase>
 <phrase>
@@ -4649,7 +4649,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "离闹钟响起还有%d:%02d"
+    alarm: "离闹钟响起还有"
   </voice>
 </phrase>
 <phrase>
@@ -6613,7 +6613,7 @@
     *: "插入了%d首曲目(%s)"
   </dest>
   <voice>
-    *: "插入了%d首曲目%s"
+    *: "首曲目 插入了"
   </voice>
 </phrase>
 <phrase>
@@ -6627,7 +6627,7 @@
     *: "列入了%d首曲目(%s)"
   </dest>
   <voice>
-    *: "列入了%d首曲目%s"
+    *: "首曲目 列入了"
   </voice>
 </phrase>
 <phrase>
@@ -6641,7 +6641,7 @@
     *: "保存了%d首曲目(%s)"
   </dest>
   <voice>
-    *: "保存了%d首曲目%s"
+    *: "首曲目 保存了"
   </voice>
 </phrase>
 <phrase>
@@ -9879,7 +9879,7 @@
     *: "%s不存在"
   </dest>
   <voice>
-    *: "%s不存在"
+    *: "不存在"
   </voice>
 </phrase>
 <phrase>
@@ -12039,7 +12039,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "频段 %d 增益"
+    gigabeats: "频段 增益"
   </voice>
 </phrase>
 <phrase>
@@ -12234,7 +12234,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "频段 %d 的频率"
+    gigabeats: "频段 的频率"
   </voice>
 </phrase>
 <phrase>
@@ -12251,7 +12251,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "频段 %d 的宽度"
+    gigabeats: "频段 的宽度"
   </voice>
 </phrase>
 <phrase>

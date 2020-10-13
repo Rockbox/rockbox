@@ -12075,7 +12075,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats: "Band %d Gain"
+    gigabeats: "Band Gain"
   </voice>
 </phrase>
 <phrase>

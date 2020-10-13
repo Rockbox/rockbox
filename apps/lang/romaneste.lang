@@ -1149,7 +1149,7 @@
     masd: none
   </dest>
   <voice>
-    *: "Liniară (%)"
+    *: "Liniară percent"
     masd: none
   </voice>
 </phrase>

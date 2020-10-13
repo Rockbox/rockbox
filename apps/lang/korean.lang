@@ -973,7 +973,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d Hz 밴드 게인"
+    swcodec: "Hertz 밴드 게인"
   </voice>
 </phrase>
 <phrase>
@@ -1007,7 +1007,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "피크 필터 %d"
+    swcodec: "피크 필터"
   </voice>
 </phrase>
 <phrase>

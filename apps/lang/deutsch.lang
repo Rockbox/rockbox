@@ -1068,7 +1068,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d Hz-Band Verstärkung"
+    swcodec: "Hertz-Band Verstärkung"
   </voice>
 </phrase>
 <phrase>
@@ -4448,7 +4448,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Einschalten in %d:%02d"
+    alarm: "Einschalten in"
   </voice>
 </phrase>
 <phrase>
@@ -12132,7 +12132,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band %d Verstärkung"
+    gigabeats,samsungypr1: "Band Verstärkung"
   </voice>
 </phrase>
 <phrase>
@@ -12313,7 +12313,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band %d Grenzfrequenz"
+    gigabeats,samsungypr1: "Band Grenzfrequenz"
   </voice>
 </phrase>
 <phrase>
@@ -12330,7 +12330,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band %d Breite"
+    gigabeats,samsungypr1: "Band Breite"
   </voice>
 </phrase>
 <phrase>

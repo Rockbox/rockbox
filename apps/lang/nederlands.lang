@@ -951,7 +951,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Bewerkmodus %s"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -968,7 +968,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d Hertz bandversterking"
+    swcodec: "Hertz bandversterking"
   </voice>
 </phrase>
 <phrase>
@@ -1002,7 +1002,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Piekfilter %d"
+    swcodec: "Piekfilter"
   </voice>
 </phrase>
 <phrase>
@@ -4140,7 +4140,7 @@
     *: "Zoeken... %d gevonden (%s)"
   </dest>
   <voice>
-    *: "Zoeken... %d gevonden (%s)"
+    *: "gevonden"
   </voice>
 </phrase>
 <phrase>
@@ -4678,7 +4678,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Wekken om: %d:%02d"
+    alarm: "Wekken om:"
   </voice>
 </phrase>
 <phrase>
@@ -4797,8 +4797,8 @@
     lcd_color: "RGB: %02X%02X%02X"
   </dest>
   <voice>
-    *: ""
-    lcd_color: "RGB: %02X%02X%02X"
+    *: none
+    lcd_color: ""
   </voice>
 </phrase>
 <phrase>
@@ -6663,7 +6663,7 @@
     *: "%d nummers ingevoegd (%s)"
   </dest>
   <voice>
-    *: "%d nummers ingevoegd (%s)"
+    *: "nummers ingevoegd"
   </voice>
 </phrase>
 <phrase>
@@ -6677,7 +6677,7 @@
     *: "%d nummers in wachtrij geplaatst (%s)"
   </dest>
   <voice>
-    *: "%d nummers in wachtrij geplaatst (%s)"
+    *: "nummers in wachtrij geplaatst"
   </voice>
 </phrase>
 <phrase>
@@ -6691,7 +6691,7 @@
     *: "%d nummers opgeslagen (%s)"
   </dest>
   <voice>
-    *: "%d nummers opgeslagen (%s)"
+    *: "nummers opgeslagen"
   </voice>
 </phrase>
 <phrase>
@@ -7075,7 +7075,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Zoeken: %d.%02d MHz"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7092,7 +7092,7 @@
   </dest>
   <voice>
     *: none
-    radio: "%d.%02d MHz"
+    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -7388,7 +7388,7 @@
     *: "Kan %s niet openen"
   </dest>
   <voice>
-    *: "Kan %s niet openen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7402,7 +7402,7 @@
     *: "Kan %s niet lezen"
   </dest>
   <voice>
-    *: "Kan %s niet lezen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7799,7 +7799,7 @@
     *: "%s bestaat niet"
   </dest>
   <voice>
-    *: "%s bestaat niet"
+    *: "Afspeellijstcatalogus bestaat niet"
   </voice>
 </phrase>
 <phrase>
@@ -8072,7 +8072,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Bewerkmodus %s %s"
+    swcodec: ""
   </voice>
 </phrase>
 <phrase>
@@ -8256,7 +8256,7 @@
     *: "Laden... %d%% klaar (%s)"
   </dest>
   <voice>
-    *: "Laden... %d%% klaar (%s)"
+    *: "Laden"
   </voice>
 </phrase>
 <phrase>
@@ -9077,13 +9077,7 @@
     archosplayer: "Aanmaken DB %d gev."
   </dest>
   <voice>
-    *: "Aanmaken van database... %d gevonden (OFF = terug)"
-    iriverh100,iriverh120,iriverh300: "Aanmaken van database... %d gevonden (STOP = terug)"
-    ipod*: "Aanmaken van database... %d gevonden (PREV = terug)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Aanmaken van database... %d gevonden (LINKS = terug)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Aanmaken van database... %d gevonden (PREV = terug)"
-    gogearsa9200: "Aanmaken van database... %d gevonden (REW =  terug)"
-    archosplayer: "Aanmaken van database... %d gevonden"
+    *: "aantal bestanden gevonden in database"
   </voice>
 </phrase>
 <phrase>
@@ -12177,7 +12171,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band %d-versterking"
+    gigabeats,samsungypr1: "band versterking"
   </voice>
 </phrase>
 <phrase>
@@ -12361,7 +12355,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band %d-frequentie"
+    gigabeats,samsungypr1: "band frequentie"
   </voice>
 </phrase>
 <phrase>
@@ -12378,7 +12372,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band %d-breedte"
+    gigabeats,samsungypr1: "band breedte"
   </voice>
 </phrase>
 <phrase>

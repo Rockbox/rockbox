@@ -4442,7 +4442,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Dispiertaedje divins %d:%02d"
+    alarm: "Dispiertaedje divins"
   </voice>
 </phrase>
 <phrase>

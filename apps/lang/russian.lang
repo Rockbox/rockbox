@@ -990,7 +990,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Фильтр пиков %d"
+    swcodec: "Фильтр пиков"
   </voice>
 </phrase>
 <phrase>
@@ -4371,7 +4371,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Проснуться через %d:%02d"
+    alarm: "Проснуться через"
   </voice>
 </phrase>
 <phrase>

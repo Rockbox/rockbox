@@ -8443,7 +8443,7 @@
     archosplayer: "Construyendo BD %d encontrados"
   </dest>
   <voice>
-    *: "Construyendo base de datos... %d encontrados"
+    *: "elementos encontrados en base de datos"
   </voice>
 </phrase>
 <phrase>

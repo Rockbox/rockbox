@@ -1125,7 +1125,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Filtre crête %d"
+    swcodec: "Filtre crête"
   </voice>
 </phrase>
 <phrase>
@@ -4288,7 +4288,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Réveil dans %d:%02d"
+    alarm: "Réveil dans"
   </voice>
 </phrase>
 <phrase>

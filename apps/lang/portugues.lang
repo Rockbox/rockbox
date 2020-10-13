@@ -945,7 +945,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "%d Hz Ganho de Banda"
+    swcodec: "Hertz Ganho de Banda"
   </voice>
 </phrase>
 <phrase>

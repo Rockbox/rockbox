@@ -12265,7 +12265,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "バンド %d ゲイン"
+    gigabeats,samsungypr1: "バンド ゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -12282,7 +12282,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "バンド %d 周波数"
+    gigabeats,samsungypr1: "バンド 周波数"
   </voice>
 </phrase>
 <phrase>
@@ -12299,7 +12299,7 @@
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "バンド %d 幅"
+    gigabeats,samsungypr1: "バンド 幅"
   </voice>
 </phrase>
 <phrase>

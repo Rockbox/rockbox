@@ -2737,10 +2737,7 @@ iriverifp7xx: "%d%% %dh %dm"
     iriverh10,ipodmini1g,ipodmini2g: "Bat: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Batería: %d%% %dh %dm"
-
-iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Bat: %d%% %dh %dm"
+    *: "Nivel da batería"
   </voice>
 </phrase>
 <phrase>
@@ -3184,7 +3181,7 @@ iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: none
-    alarm: "Despertando en %d:%02d"
+    alarm: "Despertando en"
   </voice>
 </phrase>
 <phrase>
@@ -5013,7 +5010,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Insertadas %d pistas (%s)"
   </dest>
   <voice>
-    *: "Insertadas %d pistas (%s)"
+    *: "pistas insertadas"
   </voice>
 </phrase>
 <phrase>
@@ -5027,7 +5024,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Encoladas %d pistas (%s)"
   </dest>
   <voice>
-    *: "Encoladas %d pistas (%s)"
+    *: "pistas encoladas"
   </voice>
 </phrase>
 <phrase>
@@ -5041,7 +5038,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Salvadas %d pistas (%s)"
   </dest>
   <voice>
-    *: "Salvadas %d pistas (%s)""
+    *: "pistas salvadas"
   </voice>
 </phrase>
 <phrase>
@@ -5540,7 +5537,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Non se pode abrir %s"
   </dest>
   <voice>
-    *: "Non se pode abrir %s"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5554,7 +5551,7 @@ iriverifp7xx: "%d%% %dh %dm"
     *: "Fallou a lectura de %s"
   </dest>
   <voice>
-    *: "Fallou a lectura de %s"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6441,7 +6438,7 @@ iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: none
-    gigabeats: "Ganancia da banda %d"
+    gigabeats: "banda ganancia"
   </voice>
 </phrase>
 <phrase>

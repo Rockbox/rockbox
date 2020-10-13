@@ -1063,7 +1063,7 @@
   </dest>
   <voice>
     *: none
-    swcodec: "Guany de banda %d Hz"
+    swcodec: "Hertz Guany de banda"
   </voice>
 </phrase>
 <phrase>
