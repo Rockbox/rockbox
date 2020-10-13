@@ -491,7 +491,6 @@ static int get_clip(long id, struct queue_entry *q)
 static bool load_index_table(int fd, const struct voicefile_header *hdr)
 {
     ssize_t ret;
-    struct clip_entry *buf;
 
     if (index_handle > 0) /* nothing to do? */
         return true;
@@ -505,14 +504,15 @@ static bool load_index_table(int fd, const struct voicefile_header *hdr)
 
     if (ret == alloc_size)
     {
+#ifdef ROCKBOX_LITTLE_ENDIAN
+        struct clip_entry *buf;
         buf = core_get_data(index_handle);
         for (int i = 0; i < hdr->id1_max + hdr->id2_max; i++)
         {
-#ifdef ROCKBOX_LITTLE_ENDIAN
             /* doesn't yield() */
             structec_convert(&buf[i], "ll", 1, true);
-#endif
         }
+#endif
     }
     else
         index_handle = core_free(index_handle);
