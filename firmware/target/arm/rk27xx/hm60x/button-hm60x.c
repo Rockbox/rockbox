@@ -43,11 +43,13 @@ int button_read_device(void) {
     int adc_val = adc_read(ADC_BUTTONS);
     int gpio_btn = GPIO_PCDR & BUTTON_POWER;
     static bool hold_button = false;
+#ifndef BOOTLOADER
     bool hold_button_old;
-    
+
     hold_button_old = hold_button;
+#endif
     hold_button = button_hold();
-    
+
 #ifndef BOOTLOADER
     if (hold_button != hold_button_old) {
         backlight_hold_changed(hold_button);

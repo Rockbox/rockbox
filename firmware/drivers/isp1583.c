@@ -365,7 +365,7 @@ static void usb_handle_data_int(int ep, int dir)
         endpoints[ep].in_ack = 1;
     }
     logf("usb_handle_data_int(%d, %d) finished", ep, dir);
-    void(len);
+    (void)len;
 }
 
 bool usb_drv_powered(void)
