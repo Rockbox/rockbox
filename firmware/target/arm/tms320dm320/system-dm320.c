@@ -100,7 +100,7 @@ default_interrupt(RESERVED);
  * change the offset for the interrupt in the entry table.
  */
 
-static const unsigned short const irqpriority[] = 
+static const unsigned short const irqpriority[] =
 {
     IRQ_TIMER0,IRQ_TIMER1,IRQ_TIMER2,IRQ_TIMER3,IRQ_CCD_VD0,IRQ_CCD_VD1,
     IRQ_CCD_WEN,IRQ_VENC,IRQ_SERIAL0,IRQ_SERIAL1,IRQ_EXT_HOST,IRQ_DSPHINT,
@@ -165,7 +165,7 @@ void fiq_handler(void)
 void system_reboot(void)
 {
     /* Code taken from linux/include/asm-arm/arch-itdm320-20/system.h at NeuroSVN */
-    __asm__ __volatile__(                    
+    __asm__ __volatile__(
         "mov     ip, #0                                             \n"
         "mcr     p15, 0, ip, c7, c7, 0           @ invalidate cache \n"
         "mcr     p15, 0, ip, c7, c10,4           @ drain WB         \n"
@@ -175,7 +175,7 @@ void system_reboot(void)
         "bic     ip, ip, #0x2100                 @ ..v....s........ \n"
         "mcr     p15, 0, ip, c1, c0, 0           @ ctrl register    \n"
         "mov     ip, #0xFF000000                                    \n"
-        "orr     pc, ip, #0xFF0000               @ ip = 0xFFFF0000  \n"  
+        "orr     pc, ip, #0xFF0000               @ ip = 0xFFFF0000  \n"
         :
         :
         : "cc"
@@ -198,8 +198,8 @@ void system_exception_wait(void)
 
 void system_init(void)
 {
-    unsigned int vector_addr;
-    /* Pin 33 is connected to a buzzer, for an annoying sound set 
+//    unsigned int vector_addr;
+    /* Pin 33 is connected to a buzzer, for an annoying sound set
      *  PWM0C == 0x3264
      *  PWM0H == 0x1932
      *  Function to 1
@@ -228,8 +228,8 @@ void system_init(void)
     IO_INTC_FISEL2 = 0;
 
     /* Only initially needed clocks should be turned on */
-    IO_CLK_MOD0 =   CLK_MOD0_HPIB | CLK_MOD0_DSP  | CLK_MOD0_SDRAMC | 
-                    CLK_MOD0_EMIF | CLK_MOD0_INTC | CLK_MOD0_AIM    | 
+    IO_CLK_MOD0 =   CLK_MOD0_HPIB | CLK_MOD0_DSP  | CLK_MOD0_SDRAMC |
+                    CLK_MOD0_EMIF | CLK_MOD0_INTC | CLK_MOD0_AIM    |
                     CLK_MOD0_AHB  | CLK_MOD0_BUSC | CLK_MOD0_ARM;
     IO_CLK_MOD1 =   CLK_MOD1_CPBUS;
     IO_CLK_MOD2 =   CLK_MOD2_GIO;
@@ -258,17 +258,17 @@ void system_init(void)
          *      IO_EMIF_CS4CTRL2 = 0x4220;
          *
          * More agressive numbers may be possible, but it depends on the clocking
-         *  setup. 
+         *  setup.
          */
         IO_EMIF_CS4CTRL1 = 0x66AB;
-        IO_EMIF_CS4CTRL2 = 0x4220; 
+        IO_EMIF_CS4CTRL2 = 0x4220;
 
         /* 27 MHz input clock:
          *  PLLA: 27 * 15 / 2 = 202.5 MHz
          *  PLLB: 27 *  9 / 2 = 121.5 MHz (off: bit 12)
          */
         IO_CLK_PLLA = (14 <<  4) | 1;
-        IO_CLK_PLLB = ( 1 << 12) | ( 8 <<  4) | 1;         
+        IO_CLK_PLLB = ( 1 << 12) | ( 8 <<  4) | 1;
 
         /* Set the slow and fast clock speeds used for boosting
          * Slow Setup:
@@ -282,31 +282,31 @@ void system_init(void)
         clock_arm_fast = (1 << 8) | 0;
 
         IO_CLK_DIV0 = clock_arm_slow;
-        
+
         /* SDRAM div= 2     ( 101.25 MHz )
          * AXL div  = 1     ( 202.5  MHz )
          */
         IO_CLK_DIV1 = (0 << 8) | 1;
-        
+
         /* MS div   = 15    ( 13.5 MHz )
          * DSP div  = 4     ( 50.625 MHz - could be double, but this saves power)
-         */ 
+         */
         IO_CLK_DIV2 = (3 << 8) | 14;
-        
+
         /* MMC div  = 256   ( slow )
          * VENC div = 32    ( 843.75 KHz )
          */
         IO_CLK_DIV3 = (31 << 8) | 255;
-        
+
         /* I2C div  = 1     ( 48 MHz if M48XI is running )
          * VLNQ div = 32
          */
         IO_CLK_DIV4 = (31 << 8) | 0;
-        
+
         /* Feed everything from PLLA */
         IO_CLK_SEL0=0x007E;
         IO_CLK_SEL1=0x1000;
-        IO_CLK_SEL2=0x0000; 
+        IO_CLK_SEL2=0x0000;
     }
     else
 #endif
@@ -335,16 +335,16 @@ void system_init(void)
     /* IRQENTRY only reflects enabled interrupts */
     IO_INTC_RAW = 0;
 
-    vector_addr = (unsigned int) irqvector;
+    // vector_addr = (unsigned int) irqvector;
     IO_INTC_ENTRY_TBA0 = 0;//(short) vector_addr & ~0x000F;
     IO_INTC_ENTRY_TBA1 = 0;//(short) (vector_addr >> 16);
 
     int i;
     /* Set interrupt priorities to predefined values */
     for(i = 0; i < 23; i++)
-        DM320_REG(0x0540+i*2) = ((irqpriority[i*2+1] & 0x3F) << 8) | 
+        DM320_REG(0x0540+i*2) = ((irqpriority[i*2+1] & 0x3F) << 8) |
             (irqpriority[i*2] & 0x3F); /* IO_INTC_PRIORITYx */
-    
+
     /* Turn off all timers */
     IO_TIMER0_TMMD = CONFIG_TIMER0_TMMD_STOP;
     IO_TIMER1_TMMD = CONFIG_TIMER1_TMMD_STOP;
@@ -410,12 +410,12 @@ void set_cpu_frequency(long frequency)
         return;
     }
 
-    if (frequency == CPUFREQ_MAX) 
+    if (frequency == CPUFREQ_MAX)
     {
         IO_CLK_DIV0 = clock_arm_fast;
         FREQ = CPUFREQ_MAX;
-    } 
-    else 
+    }
+    else
     {
         IO_CLK_DIV0 = clock_arm_slow;
         FREQ = CPUFREQ_NORMAL;
@@ -477,7 +477,7 @@ void udelay(int usec) {
      * can lead to lockup.
      * Interrupt status bit check below is used to prevent this lockup.
      */
- 
+
     if (stop < count)
     {
         /* udelay will end after counter reset (tick) */
@@ -503,4 +503,3 @@ void system_prepare_fw_start(void)
     IO_INTC_EINT2 = 0;
 }
 #endif
-

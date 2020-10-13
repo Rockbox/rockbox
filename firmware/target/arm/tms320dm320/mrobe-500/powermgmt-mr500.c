@@ -58,33 +58,32 @@ const unsigned short percent_to_volt_charge[11] =
 {
     4000, 4105, 4210, 4315, 4420, 4525, 4630, 4735, 4840, 4945, 5050,
 };
-    
+
 /* Returns battery voltage from ADC [millivolts] */
 int _battery_voltage(void)
 {
     short bat1, bat2, aux;
-    static unsigned last_tick = 0;
+//    static unsigned last_tick = 0;
     short tsadc;
-    
+
     tsadc=tsc2100_readreg(TSADC_PAGE, TSADC_ADDRESS);
-    
+
     /* Set the TSC2100 to read voltages if not busy with pen */
     if(!(tsadc & TSADC_PSTCM))
     {
         tsc2100_set_mode(true, 0x0B);
-        last_tick = current_tick;
+//        last_tick = current_tick;
     }
-    
+
     if(tsc2100_read_volt(&bat1, &bat2, &aux))
-    { 
+    {
         /* Calculation was:
-         *  (val << 10) / 4096 * 6 * 2.5 
+         *  (val << 10) / 4096 * 6 * 2.5
          */
         current_voltage = (short)( (int) (bat1 * 15) >> 2 );
         current_bat2    = (short)( (bat2 * 15) >> 2 );
         current_aux     = (short)( (aux  * 15) >> 2 );
     }
-        
+
     return current_voltage;
 }
-
