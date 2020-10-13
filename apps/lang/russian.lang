@@ -986,11 +986,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Фильтр пиков %d"
+    swcodec: "Полосовой фильтр %d"
   </dest>
   <voice>
     *: none
-    swcodec: "Фильтр пиков"
+    swcodec: "Полосовой фильтр"
   </voice>
 </phrase>
 <phrase>
@@ -1054,11 +1054,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Q"
+    swcodec: "Добротность"
   </dest>
   <voice>
     *: none
-    swcodec: "Q"
+    swcodec: "Добротность"
   </voice>
 </phrase>
 <phrase>
@@ -3399,14 +3399,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Щелочной"
+    xduoox3: "Новый (2000 мАч)"
   </dest>
   <voice>
     *: none
     battery_types: "Щелочной"
+    xduoox3: "Новый 2000 миллиампер часов"
   </voice>
 </phrase>
 <phrase>
@@ -3416,14 +3419,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Никель-металгидридный"
+    xduoox3: "Старый (1500 мАч)"
   </dest>
   <voice>
     *: none
     battery_types: "Никель-металгидридный"
+    xduoox3: "Старый 1500 миллиампер часов"
   </voice>
 </phrase>
 <phrase>
@@ -7247,7 +7253,7 @@
     archosplayer: "Построение БД... %d найдено"
   </dest>
   <voice>
-    *: "найдено записей в базе"
+    *: "записей найдено в базе"
   </voice>
 </phrase>
 <phrase>
@@ -11473,7 +11479,7 @@
   </source>
   <dest>
     *: none
-    usb_hid: "USB HID"
+    usb_hid: "Доступ к HID-устройствам"
   </dest>
   <voice>
     *: none
@@ -12976,11 +12982,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "Haas Surround"
+    swcodec: "Эффект Хааса"
   </dest>
   <voice>
     *: none
-    swcodec: "Haas Surround"
+    swcodec: "Эффект Хааса"
   </voice>
 </phrase>
 <phrase>
@@ -13038,11 +13044,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "f(x2)"
+    swcodec: "Нижняя частота)"
   </dest>
   <voice>
     *: none
-    swcodec: "f(x2)"
+    swcodec: "Нижняя частота"
   </voice>
 </phrase>
 <phrase>
@@ -13194,11 +13200,11 @@
   </source>
   <dest>
     *: none
-    swcodec: "f(x1)"
+    swcodec: "Верхняя частота"
   </dest>
   <voice>
     *: none
-    swcodec: "f(x1)"
+    swcodec: "Верхняя частота"
   </voice>
 </phrase>
 <phrase>
@@ -16220,5 +16226,414 @@ id: VOICE_BAT_BENCH_KEYS
   </dest>
   <voice>
     *: "Обновить кэш"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Нажмите ВЛЕВО для отмены."
+    android,hifietma*,zenvision: "Нажмите НАЗАД для отмены."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Нажмите ВКЛ. для отмены."
+    ihifi760,ihifi960: "Дважды нажмите ВОЗВРАТ для отмены."
+    ihifi770,ihifi770c,ihifi800: "Нажмите ДОМОЙ для отмены."
+    iriverh10,samsungyh*: "Дважды нажмите ВЛЕВО для отмены."
+    mpiohd200: "Дважды нажмите ЗАПИСЬ для отмены."
+    mpiohd300: "Дважды нажмите МЕНЮ для отмены."
+    rx27generic: "Нажмите ГРОМКОСТЬ для отмены."
+    sonynwza860: "Раскладки кнопок не завершены."
+    touchscreen: "Нажмите Середину Слева для отмены."
+    vibe500: "Нажмите ПРЕД. для отмены."
+    xduoox20,xduoox3,xduoox3ii: "Дважды нажмите ДОМОЙ для отмены."
+  </dest>
+  <voice>
+    *: "Нажмите кнопку Влево для отмены."
+    android,hifietma*,zenvision: "Нажмите кнопку Назад для отмены."
+    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Нажмите кнопку включения для отмены."
+    ihifi760,ihifi960: "Дважды нажмите кнопку Назад для отмены."
+    ihifi770,ihifi770c,ihifi800: "Нажмите кнопку Домой для отмены."
+    iriverh10,samsungyh*: "Дважды нажмите кнопку Влево для отмены."
+    mpiohd200: "Дважды нажмите кнопку Запись для отмены."
+    mpiohd300: "Дважды нажмите кнопку Меню для отмены."
+    rx27generic: "Нажмите кнопку Громкость для отмены."
+    touchscreen: "Нажмите Середину Слева для отмены."
+    vibe500: "Нажмите кнопку Предыдущий Трэк для отмены."
+    xduoox20,xduoox3,xduoox3ii: "Дважды нажмите кнопку Домой для отмены."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: "Date"
+  </source>
+  <dest>
+    *: "Дата"
+  </dest>
+  <voice>
+    *: "Дата"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL
+  desc:
+  user: core
+  <source>
+    *: "Clear all"
+  </source>
+  <dest>
+    *: "Очистить все"
+  </dest>
+  <voice>
+    *: "Очистить все"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_0
+  desc: CANCEL.
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Отмена"
+  </dest>
+  <voice>
+    *: "Отмена"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE
+  desc:
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Сохранить"
+  </dest>
+  <voice>
+    *: "Сохранить"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEOUT
+  desc:
+  user: core
+  <source>
+    *: "Timeout"
+  </source>
+  <dest>
+    *: "Таймаут"
+  </dest>
+  <voice>
+    *: "Таймаут"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: none
+    hotkey: "Track"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Трек"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Трэк"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Elapsed"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Проиграно"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Проиграно"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCEMENT_FMT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Announcement format"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Формат сообщения"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Формат сообщения"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAIN
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remain"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Осталось"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Осталось"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GROUPING
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Grouping"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Группирование"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Группирование"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_ON
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce on"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Объявление включено"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Объявление включено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_CHANGE
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Track change"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Смена трека"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Смена трэка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOLD_FOR_SETTINGS
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Hold for settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Удерживайте для настройки"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Удерживайте для настройки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Открыть Плагин"
+  </dest>
+  <voice>
+    *: "Открыть Плагин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Не плагин: %s"
+  </dest>
+  <voice>
+    *: "Не плагин"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Назначить Плагин Режима Воспроизведения"
+  </dest>
+  <voice>
+    *: "Назначить Плагин Режима Воспроизведения"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Параметр"
+  </dest>
+  <voice>
+    *: "Параметр"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Название"
+  </dest>
+  <voice>
+    *: "Название"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Добавить"
+  </dest>
+  <voice>
+    *: "Добавить"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Назад"
+  </dest>
+  <voice>
+    *: "Назад"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Изменить"
+  </dest>
+  <voice>
+    *: "Изменить"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Запустить"
+  </dest>
+  <voice>
+    *: "Запустить"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Экспортировать"
+  </dest>
+  <voice>
+    *: "Экспортировать"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Просмотреть"
+  </dest>
+  <voice>
+    *: "Просмотреть"
   </voice>
 </phrase>
