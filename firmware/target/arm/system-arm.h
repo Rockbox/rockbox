@@ -110,6 +110,18 @@ static inline int set_interrupt_status(int status, int mask)
     unsigned long cpsr;
     int oldstatus;
     /* Read the old levels and set the new ones */
+#if defined(CREATIVE_ZVM) && defined(BOOTLOADER)
+// FIXME:  This workaround is for a problem with inlining;
+// for some reason 'mask' gets treated as a variable/non-immediate constant
+// but only on this build.  All others (including the nearly-identical mrobe500boot) are fine
+    asm volatile (
+        "mrs    %1, cpsr        \n"
+        "bic    %0, %1, %[mask] \n"
+        "orr    %0, %0, %2      \n"
+        "msr    cpsr_c, %0      \n"
+        : "=&r,r"(cpsr), "=&r,r"(oldstatus)
+        : "r,i"(status & mask), [mask]"r,i"(mask));
+#else
     asm volatile (
         "mrs    %1, cpsr        \n"
         "bic    %0, %1, %[mask] \n"
@@ -117,7 +129,7 @@ static inline int set_interrupt_status(int status, int mask)
         "msr    cpsr_c, %0      \n"
         : "=&r,r"(cpsr), "=&r,r"(oldstatus)
         : "r,i"(status & mask), [mask]"i,i"(mask));
-
+#endif
     return oldstatus;
 }
 
