@@ -28,6 +28,8 @@ struct ram ram;
  * make the old maps potentially invalid.
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 void mem_updatemap(void)
 {
     int n;
@@ -46,27 +48,27 @@ void mem_updatemap(void)
         map[0x7] = rom.bank[mbc.rombank] - 0x4000;
     }
     else map[0x4] = map[0x5] = map[0x6] = map[0x7] = NULL;
-	if (R_VBK & 1)
-	{
-		map[0x8] = lcd.vbank[1] - 0x8000;
-		map[0x9] = lcd.vbank[1] - 0x8000;
-	}
-	else
-	{
-		map[0x8] = lcd.vbank[0]/*[R_VBK & 1]*/ - 0x8000;
-		map[0x9] = lcd.vbank[0]/*[R_VBK & 1]*/ - 0x8000;
+    if (0 && (R_STAT & 0x03) == 0x03)
+    {
+        map[0x8] = NULL;
+        map[0x9] = NULL;
+    }
+    else
+    {
+        map[0x8] = lcd.vbank[R_VBK & 1] - 0x8000;
+        map[0x9] = lcd.vbank[R_VBK & 1] - 0x8000;
+    }
 
-	}
     if (mbc.enableram && !(rtc.sel&8))
     {
         map[0xA] = ram.sbank[mbc.rambank] - 0xA000;
         map[0xB] = ram.sbank[mbc.rambank] - 0xA000;
     }
     else map[0xA] = map[0xB] = NULL;
-    map[0xC] = ram.ibank[0] - 0xC000;
+    map[0xC] = ram.ibank[0] - 0xC000; // XXX
     n = R_SVBK & 0x07;
     map[0xD] = ram.ibank[n?n:1] - 0xD000;
-    map[0xE] = ram.ibank[0] - 0xE000;
+    map[0xE] = ram.ibank[0] - 0xE000; // XXX
     map[0xF] = NULL;
 
     map = mbc.wmap;
@@ -79,13 +81,13 @@ void mem_updatemap(void)
         map[0xB] = ram.sbank[mbc.rambank] - 0xA000;
     }
     else map[0xA] = map[0xB] = NULL;
-    map[0xC] = ram.ibank[0] - 0xC000;
+    map[0xC] = ram.ibank[0] - 0xC000; // XXX
     n = R_SVBK & 0x07;
     map[0xD] = ram.ibank[n?n:1] - 0xD000;
-    map[0xE] = ram.ibank[0] - 0xE000;
+    map[0xE] = ram.ibank[0] - 0xE000; // XXX
     map[0xF] = NULL;
 }
-
+#pragma GCC diagnostic pop
 
 /*
  * ioreg_write handles output to io registers in the FF00-FF7F,FFFF
