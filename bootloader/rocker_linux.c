@@ -475,6 +475,11 @@ static void adb(int start)
         execlp("/etc/init.d/K90adb", "K90adb", start ? "start" : "stop", NULL);
         _exit(42);
     }
+#if defined(FIIO_M3K)
+    lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
+    lcd_putsf(0, 1, "ADB not supported!");
+    sleep(2*HZ);
+#else
     int status;
     waitpid(pid, &status, 0);
     adb_running = start;
@@ -489,6 +494,7 @@ static void adb(int start)
         lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
         lcd_putsf(0, 1, "an error occured: %x", status);
     }
+#endif
 #endif
 }
 
