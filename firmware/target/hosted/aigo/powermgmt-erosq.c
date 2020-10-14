@@ -23,7 +23,7 @@
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
-    3470
+    3435
 };
 
 /* the OF shuts down at this voltage */
@@ -35,7 +35,8 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3400, 3639, 3697, 3723, 3757, 3786, 3836, 3906, 3980, 4050, 4159 }
+    /* ErosQ's 1300mAh battery */
+    { 3400, 3478, 3547, 3581, 3618, 3654, 3725, 3820, 3909, 3999, 4159 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */

@@ -122,10 +122,14 @@
 #define HW_SAMPR_CAPS SAMPR_CAP_ALL_192
 
 /* Battery */
-#define BATTERY_CAPACITY_DEFAULT 2000 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN 2000  /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 2000 /* max. capacity selectable */
+#define BATTERY_CAPACITY_DEFAULT 1300 /* default battery capacity */
+#define BATTERY_CAPACITY_MIN 1300  /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX 1500 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 0   /* capacity increment */
+
+#define CURRENT_NORMAL 100      // 1.7mA * 60s
+#define CURRENT_BACKLIGHT 180
+#define CURRENT_MAX_CHG 500     // bursts higher if needed
 
 /* ROLO */
 #define BOOTFILE_EXT "erosq"
