@@ -18,7 +18,7 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
- 
+
 #include "inttypes.h"
 #include "string.h"
 #include "cpu.h"
@@ -31,21 +31,13 @@
 #include "font.h"
 #include "adc.h"
 #include "backlight.h"
-#include "backlight-target.h"
 #include "button.h"
-#include "panic.h"
 #include "power.h"
 #include "file.h"
 #include "common.h"
 #include "rb-loader.h"
 #include "loader_strerror.h"
-#include "rbunicode.h"
 #include "usb.h"
-#include "spi.h"
-#include "uart-target.h"
-#include "tsc2100.h"
-#include "time.h"
-#include "system-arm.h"
 #include "version.h"
 
 void main(void)
@@ -60,7 +52,7 @@ void main(void)
     set_fiq_status(FIQ_DISABLED);
     system_init();
     kernel_init();
-    
+
     /* Now enable interrupts */
     set_irq_level(IRQ_ENABLED);
     set_fiq_status(FIQ_ENABLED);
@@ -70,8 +62,8 @@ void main(void)
     font_init();
     button_init();
     usb_init();
-    
-    
+
+
     power_init();
 //    enable_irq();
 //    enable_fiq();
@@ -112,7 +104,7 @@ void main(void)
         reset_screen();
         lcd_update();
     }
-    
+
     sleep(50);
 
     printf("ATA");
@@ -146,5 +138,5 @@ void main(void)
     rc = kernel_entry();
 
     /* Should not get here! */
-    return rc;
+    while(1);
 }
