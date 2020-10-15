@@ -69,10 +69,11 @@ void audiohw_preinit(void)
 {
     alsa_controls_init();
     hw_open();
-    // set 19/'ADC Mux' 0
-    // set 4/'Digital Capture Volume' 0
-    // set 6/'Mic Volume' 0
-    // set 11/'DACR Playback Volume' 0  (wtf??  vortex used 1, of used 0)
+    // NOTE:
+    // Of the exported controls, only these do anything:
+    // 10 DACL Playback Volume
+    // 11 DACR Playback Volume
+    // 12 Low Mode Switch  (see table 25 in datasheet, not simple..)
 }
 
 void audiohw_postinit(void)
