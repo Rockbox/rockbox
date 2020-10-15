@@ -450,7 +450,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     },
     'erosq' => {
         name => 'AIGO EROS Q / K',
-        status => 1,
+        status => 2,
     },
     'ihifi770' => {
         name => 'Xuelin iHIFI 770',
