@@ -448,7 +448,7 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'FiiO M3K',
         status => 1,
     },
-    'erosq' => {
+    'aigoerosq' => {
         name => 'AIGO EROS Q / K',
         status => 2,
     },

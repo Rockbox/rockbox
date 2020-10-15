@@ -4104,7 +4104,7 @@ fi
     sysfont="16-Terminus"
     ;;
 
-    245|erosq)
+    245|aigoerosq|erosq)
     target_id=113
     application=yes
     app_type="erosq"
