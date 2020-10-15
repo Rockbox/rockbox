@@ -203,7 +203,6 @@ void audiohw_set_frequency(int fsel)
 {
     unsigned int  pll1_speed;
     unsigned short mclk_div, bclk_div, func_mode;
-    unsigned char  dem = CS4398_DEM_NONE;
 
     // bclk is 2,3,4,6,8,12  ONLY
     // mclk is 1..512
@@ -250,21 +249,18 @@ void audiohw_set_frequency(int fsel)
             pll1_speed = 426000000/4;
             mclk_div = 52/4;
             bclk_div = 4;
-            dem = CS4398_DEM_32000;
             func_mode = 0;
             break;
         case HW_FREQ_44: // 2.8224 MHz
             pll1_speed = 508000000 / 3;
             mclk_div = 45 / 3;
             bclk_div = 4;
-            dem = CS4398_DEM_44100;
             func_mode = 0;
             break;
         case HW_FREQ_48: // 3.072 MHz
             pll1_speed = 516000000/2/3;
             mclk_div = 42/2/3;
             bclk_div = 4;
-            dem = CS4398_DEM_48000;
             func_mode = 0;
             break;
         case HW_FREQ_64: // 4.096 MHz
@@ -307,7 +303,7 @@ void audiohw_set_frequency(int fsel)
     /* 0 = Single-Speed Mode (<50KHz);
        1 = Double-Speed Mode (50-100KHz);
        2 = Quad-Speed Mode;  (100-200KHz) */
-    cs4398_write_reg(CS4398_REG_MODECTL, (cs4398_read_reg(CS4398_REG_MODECTL) & ~(CS4398_FM_MASK|CS4398_DEM_MASK)) | func_mode | dem);
+    cs4398_write_reg(CS4398_REG_MODECTL, (cs4398_read_reg(CS4398_REG_MODECTL) & ~(CS4398_FM_MASK|CS4398_DEM_MASK)) | func_mode | CS4398_DEM_NONE);
     if (func_mode == 2)
         cs4398_write_reg(CS4398_REG_MISC, cs4398_read_reg(CS4398_REG_MISC) | CS4398_MCLKDIV2);
     else
