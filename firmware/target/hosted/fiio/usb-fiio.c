@@ -39,8 +39,14 @@ int usb_detect(void)
     return present ? USB_INSERTED : USB_EXTRACTED;
 }
 
+static bool usb_enabled = 0;
+
 void usb_enable(bool on)
 {
+    if (usb_enabled == on)
+        return;
+
+    usb_enabled = on;
     if (on)
     {
 	system ("insmod /lib/modules/3.10.14/kernel/driver/usb/gadget/libcomposite.ko");
