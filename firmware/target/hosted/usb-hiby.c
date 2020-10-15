@@ -26,7 +26,6 @@
 #include "usb.h"
 #include "sysfs.h"
 #include "power.h"
-#include "power-xduoo.h"
 
 static bool adb_mode = false;
 
@@ -63,7 +62,8 @@ int disk_mount_all(void)
     {
         for (int j=0; j<2; j++)
         {
-            if (mount(dev[i], "/mnt/sd_0", fs[j], 0, NULL) == 0)
+            int rval = mount(dev[i], PIVOT_ROOT, fs[j], 0, NULL);
+            if (rval == 0 || errno == -EBUSY)
             {
                 return 1;
             }
@@ -114,5 +114,5 @@ void usb_init_device(void)
     sysfs_set_string("/sys/class/android_usb/android0/iManufacturer", "Rockbox.org");
     sysfs_set_string("/sys/class/android_usb/android0/iProduct", "Rockbox media player");
     sysfs_set_string("/sys/class/android_usb/android0/iSerial", "0123456789ABCDEF");
-    sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/inquiry_string", "xDuoo 0100");
+    sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/inquiry_string", "Rockbox 0100");
 }

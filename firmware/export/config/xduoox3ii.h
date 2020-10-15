@@ -133,3 +133,7 @@
 #define BOOTFILE_EXT "x3ii"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
+
+/* USB */
+#define USB_VID_STR "C502"
+#define USB_PID_STR "003C"

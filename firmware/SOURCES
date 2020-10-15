@@ -134,7 +134,6 @@ target/hosted/agptek/button-agptek.c
 target/hosted/agptek/debug-agptek.c
 target/hosted/agptek/power-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
-target/hosted/agptek/usb-agptek.c
 #endif
 
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
@@ -142,7 +141,10 @@ target/hosted/xduoo/button-xduoo.c
 target/hosted/xduoo/debug-xduoo.c
 target/hosted/xduoo/power-xduoo.c
 target/hosted/xduoo/powermgmt-xduoo.c
-target/hosted/xduoo/usb-xduoo.c
+#endif
+
+#if defined(HIBY_LINUX) && !defined(SIMULATOR)
+target/hosted/usb-hiby.c
 #endif
 
 #if (defined(FIIO_M3K)) && !defined(SIMULATOR)
@@ -160,7 +162,6 @@ target/hosted/aigo/button-erosq.c
 target/hosted/aigo/debug-erosq.c
 target/hosted/aigo/power-erosq.c
 target/hosted/aigo/powermgmt-erosq.c
-target/hosted/aigo/usb-erosq.c
 #endif
 
 #if defined(SAMSUNG_YPR0) && !defined(SIMULATOR)
