@@ -23,6 +23,6 @@
 
 #include <stdint.h>
 
-uint8_t para_noise[1024];
+extern uint8_t para_noise[1024];
 
 #endif /* __para_noise_h__ */
