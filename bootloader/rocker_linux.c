@@ -473,6 +473,7 @@ static void adb(int start)
     lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
     lcd_putsf(0, 1, "ADB not supported!");
     sleep(2*HZ);
+    (void)start;
 #else
     pid_t pid = fork();
     if(pid == 0)

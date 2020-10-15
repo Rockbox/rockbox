@@ -69,6 +69,10 @@ void audiohw_preinit(void)
 {
     alsa_controls_init();
     hw_open();
+    // set 19/'ADC Mux' 0
+    // set 4/'Digital Capture Volume' 0
+    // set 6/'Mic Volume' 0
+    // set 11/'DACR Playback Volume' 0  (wtf??  vortex used 1, of used 0)
 }
 
 void audiohw_postinit(void)
@@ -89,7 +93,7 @@ void audiohw_set_frequency(int fsel)
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     int vol[2];
-   
+
     vol[0] = vol_l / 20;
     vol[1] = vol_r / 20;
 
@@ -145,10 +149,10 @@ void audiohw_set_filter_roll_off(int value)
        1 = Slow;
        2 = Short Sharp
        3 = Short Slow */
-#if defined(FIIO_M3K)
+#if 0 //  defined(FIIO_M3K)
+    // AK4376 supports this but the control isn't wired into ALSA!
     long int value_hw = value;
     alsa_controls_set_ints("AK4376 Digital Filter", 1, &value_hw);
-#else
-    (void)value;
 #endif
+    (void)value;
 }
