@@ -263,6 +263,10 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'Samsung YP-R0',
         status => 2,
     },
+    'samsungypr1' => {
+        name => 'Samsung YP-R1',
+        status => 2,
+    },
     'samsungyps3' => {
         name => 'Samsung YP-S3',
         status => 1,
