@@ -156,7 +156,7 @@ static void key_init_state(int fd)
 
 static void open_input_device(const char *path)
 {
-    int fd = open(path, O_RDWR);
+    int fd = open(path, O_RDONLY | O_CLOEXEC);
     if(fd < 0)
         return;
     /* query name */

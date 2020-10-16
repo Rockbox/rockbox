@@ -85,7 +85,7 @@ static int button_map_on(int keycode)
         case KEY_F8:
             key_power_delay = 0;
             return BUTTON_POWER;
-        
+
         case KEY_HOME:
             key_home_delay = DEF_DELAY;
             return BUTTON_OPTION;
@@ -147,7 +147,7 @@ static int button_map_off(int keycode)
 
         case KEY_F8:
             return BUTTON_POWER;
-        
+
         case KEY_F9:
             return BUTTON_OPTION;
 
@@ -168,7 +168,7 @@ static int button_map_off(int keycode)
 static int button_map_timer(void)
 {
   int map = 0;
-  
+
   if (key_enter_delay)
   {
     if (--key_enter_delay == 0) map |= BUTTON_PLAY;
@@ -219,14 +219,14 @@ static int button_map_timer(void)
 
 void button_init_device(void)
 {
-    const char * const input_devs[] = {
+    const char * const input_devs[NR_POLL_DESC] = {
         "/dev/input/event0",
         "/dev/input/event1",
     };
 
     for(int i = 0; i < NR_POLL_DESC; i++)
     {
-        int fd = open(input_devs[i], O_RDWR | O_CLOEXEC);
+        int fd = open(input_devs[i], O_RDONLY | O_CLOEXEC);
 
         if(fd < 0)
         {

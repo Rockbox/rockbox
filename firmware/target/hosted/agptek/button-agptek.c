@@ -70,14 +70,14 @@ static int button_map(int keycode)
 
 void button_init_device(void)
 {
-    const char * const input_devs[] = {
+    const char * const input_devs[NR_POLL_DESC] = {
         "/dev/input/event0",
         "/dev/input/event1"
     };
 
     for(int i = 0; i < NR_POLL_DESC; i++)
     {
-        int fd = open(input_devs[i], O_RDWR | O_CLOEXEC);
+        int fd = open(input_devs[i], O_RDONLY | O_CLOEXEC);
 
         if(fd < 0)
         {
@@ -146,4 +146,3 @@ void button_close_device(void)
         close(poll_fds[i].fd);
     }
 }
-

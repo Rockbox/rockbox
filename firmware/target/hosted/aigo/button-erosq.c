@@ -38,7 +38,7 @@
 #include "backlight-target.h"
 #include "erosqlinux_codec.h"
 
-#define NR_POLL_DESC    3
+#define NR_POLL_DESC    2
 static struct pollfd poll_fds[NR_POLL_DESC];
 
 static int button_map(int keycode)
@@ -82,18 +82,18 @@ static int button_map(int keycode)
 
 void button_init_device(void)
 {
-    const char * const input_devs[] = {
+    const char * const input_devs[NR_POLL_DESC] = {
         "/dev/input/event0", // Rotary encoder
         "/dev/input/event1"  // Keys
     };
 
     for(int i = 0; i < NR_POLL_DESC; i++)
     {
-        int fd = open(input_devs[i], O_RDWR | O_CLOEXEC);
+        int fd = open(input_devs[i], O_RDONLY | O_CLOEXEC);
 
         if(fd < 0)
         {
-            panicf("Cannot open input device: %s\n", input_devs[i]);
+            panicf("Cannot open input device: %s (%d)\n", input_devs[i], errno);
         }
 
         poll_fds[i].fd = fd;
