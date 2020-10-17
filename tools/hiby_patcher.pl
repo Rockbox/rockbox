@@ -167,12 +167,11 @@ reboot
     print FILE "sd[a-z][0-9]+ 0:0 664 @ /etc/rb_inserting.sh\n";
     print FILE "mmcblk[0-9]p[0-9] 0:0 664 @ /etc/rb_inserting.sh\n";
     print FILE "mmcblk[0-9] 0:0 664 @ /etc/rb_inserting.sh\n";
-    print FILE "sd[a-z] 0:0 664 \$ /etc/rb_removing.sh";
+    print FILE "sd[a-z] 0:0 664 \$ /etc/rb_removing.sh\n";
     print FILE "mmcblk[0-9] 0:0 664 \$ /etc/rb_removing.sh\n";
     close FILE;
 
-    my $insert_sh = '
-#!/bin/sh
+    my $insert_sh = '#!/bin/sh
 # $MDEV is the device
 
 case $MDEV in
@@ -196,11 +195,20 @@ mount $MDEV $MNT_POINT
     close FILE;
     chmod 0755, "$rootfsdir/etc/rb_inserting.sh";
 
-    my $remove_sh = '
-#!/bin/sh
+    my $remove_sh = '#!/bin/sh
 # $MDEV is the device
+
+case $MDEV in
+ mmc*)
+   MNT_POINT=/mnt/sd_0
+   ;;
+ sd*)
+   MNT_POINT=/mnt/usb
+   ;;
+esac
+
 sync;
-unmount -f $MDEV;
+umount -f $MNT_POINT || umount -f $MDEV;
 ';
 
     open FILE, ">$rootfsdir/etc/rb_removing.sh" || die("can't write hotplug helpers!");
