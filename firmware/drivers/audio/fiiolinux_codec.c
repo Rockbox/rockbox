@@ -32,8 +32,8 @@
 #include "pcm-alsa.h"
 #include <sys/ioctl.h>
 
-static int fd_hw;
-static int ak_hw;
+static int fd_hw = -1;
+static int ak_hw = -1;
 
 static      int vol_sw[2] = {0};
 static long int vol_hw[2] = {0};
@@ -61,8 +61,8 @@ static void hw_close(void)
         panicf("Call cmd AK4376_POWER_OFF fail");
     }
     close(ak_hw);
-
     close(fd_hw);
+    ak_hw = fd_hw = -1;
 }
 
 void audiohw_preinit(void)
@@ -91,9 +91,14 @@ void audiohw_set_frequency(int fsel)
     (void)fsel;
 }
 
+static int muted = -1;
+
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     int vol[2];
+
+    if (fd_hw < 0)
+       return;
 
     vol[0] = vol_l / 20;
     vol[1] = vol_r / 20;
@@ -121,14 +126,19 @@ void audiohw_set_volume(int vol_l, int vol_r)
         }
     }
 
-    alsa_controls_set_ints("DACL Playback Volume", 1, &vol_hw[0]);
-    alsa_controls_set_ints("DACR Playback Volume", 1, &vol_hw[1]);
-    pcm_alsa_set_digital_volume(vol_sw[0], vol_sw[1]);
+    if (!muted) {
+       alsa_controls_set_ints("DACL Playback Volume", 1, &vol_hw[0]);
+       alsa_controls_set_ints("DACR Playback Volume", 1, &vol_hw[1]);
+       pcm_alsa_set_digital_volume(vol_sw[0], vol_sw[1]);
+    }
 }
 
 void audiohw_mute(int mute)
 {
     long int vol0 = 0;
+
+    if (fd_hw < 0 || muted == mute)
+       return;
 
     if(mute)
     {
@@ -146,6 +156,9 @@ void audiohw_mute(int mute)
 
 void audiohw_set_filter_roll_off(int value)
 {
+    if (fd_hw < 0)
+       return;
+
     /* 0 = Sharp;
        1 = Slow;
        2 = Short Sharp

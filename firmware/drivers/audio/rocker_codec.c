@@ -27,7 +27,7 @@
 #include "panic.h"
 #include "alsa-controls.h"
 
-static int fd_hw;
+static int fd_hw = -1;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
@@ -44,11 +44,13 @@ static void hw_open(void)
 static void hw_close(void)
 {
     close(fd_hw);
+    fd_hw = -1;
+    muted = -1;
 }
 
 void audiohw_mute(int mute)
 {
-    if (muted == mute)
+    if (fd_hw < 0 || muted == mute)
        return;
 
     muted = mute;
@@ -91,6 +93,9 @@ void audiohw_set_volume(int vol_l, int vol_r)
 {
     vol_l_hw = -vol_l/5;
     vol_r_hw = -vol_r/5;
+
+    if (fd_hw < 0)
+       return;
 
     alsa_controls_set_ints("Left Playback Volume", 1, &vol_l_hw);
     alsa_controls_set_ints("Right Playback Volume", 1, &vol_r_hw);

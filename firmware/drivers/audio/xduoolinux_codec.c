@@ -36,8 +36,7 @@
 
 #include "logf.h"
 
-static int fd_hw;
-static int inited = 0;
+static int fd_hw = -1;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
@@ -53,6 +52,7 @@ static void hw_open(void)
 static void hw_close(void)
 {
     close(fd_hw);
+    fd_hw = -1;
 }
 
 static int muted = -1;
@@ -61,7 +61,7 @@ void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
 
-    if (muted == mute)
+    if (fd_hw < 0 || muted == mute)
        return;
 
     muted = mute;
@@ -83,7 +83,7 @@ int xduoo_get_outputs(void){
 
     int status = 0;
 
-    if (!inited) return ps;
+    if (fd_hw < 0) return ps;
 
     const char * const sysfs_lo_switch = "/sys/class/switch/lineout/state";
     const char * const sysfs_hs_switch = "/sys/class/switch/headset/state";
@@ -109,7 +109,7 @@ int xduoo_get_outputs(void){
 
 void xduoo_set_output(int ps)
 {
-    if (!inited || muted) return;
+    if (fd_hw < 0 || muted) return;
 
     if (last_ps != ps)
     {
@@ -127,7 +127,6 @@ void audiohw_preinit(void)
     alsa_controls_init();
     hw_open();
     audiohw_mute(true);  /* Start muted to avoid the POP */
-    inited = 1;
 //    const char * const codec_pmdown = "/sys/devices/platform/ingenic-x3ii.0/x3ii-ak4490-i2s/pmdown_time";  // in ms, defaults 5000
 }
 
@@ -139,7 +138,6 @@ void audiohw_postinit(void)
 void audiohw_close(void)
 {
     logf("hw close");
-    inited = 0;
     hw_close();
     alsa_controls_close();
 }
@@ -165,6 +163,9 @@ void audiohw_set_volume(int vol_l, int vol_r)
         l = -vol_l/5;
         r = -vol_r/5;
     }
+
+    if (fd_hw < 0)
+       return;
 
     alsa_controls_set_ints("Left Playback Volume", 1, &l);
     alsa_controls_set_ints("Right Playback Volume", 1, &r);
