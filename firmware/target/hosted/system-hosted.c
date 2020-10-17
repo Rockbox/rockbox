@@ -31,10 +31,14 @@
 #include "button.h"
 #include "backlight-target.h"
 #include "lcd.h"
+#include "filesystem-hosted.h"
 
 /* to make thread-internal.h happy */
 uintptr_t *stackbegin;
 uintptr_t *stackend;
+
+/* forward-declare */
+bool os_file_exists(const char *ospath);
 
 static void sig_handler(int sig, siginfo_t *siginfo, void *context)
 {
@@ -134,17 +138,29 @@ bool hostfs_removable(IF_MD_NONVOID(int drive))
         return true;
     else
 #endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+        return true;
+#else
         return false; /* internal: always present */
+#endif
 }
 
 bool hostfs_present(IF_MD_NONVOID(int drive))
 {
 #ifdef HAVE_MULTIDRIVE
-    if (drive > 0) /* Active LOW */
-        return true; //FIXME
+    if (drive > 0)
+#if defined(MULTIDRIVE_DEV)
+        return os_file_exists(MULTIDRIVE_DEV);
+#else
+        return true; // FIXME?
+#endif
     else
 #endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+        return os_file_exists(ROOTDRIVE_DEV);
+#else
         return true; /* internal: always present */
+#endif
 }
 
 #ifdef HAVE_MULTIDRIVE

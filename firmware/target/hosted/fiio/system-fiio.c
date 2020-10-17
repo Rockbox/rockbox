@@ -23,6 +23,8 @@
 #include <string.h>
 #include <ucontext.h>
 #include <backtrace.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
 
 #include "system.h"
 #include "mv.h"
@@ -31,10 +33,12 @@
 #include "button.h"
 #include "backlight-target.h"
 #include "lcd.h"
-
 #include "panic.h"
-#include <fcntl.h>
-#include <sys/ioctl.h>
+
+#include "filesystem-hosted.h"
+
+/* forward-declare */
+bool os_file_exists(const char *ospath);
 
 /* to make thread-internal.h happy */
 uintptr_t *stackbegin;
@@ -102,7 +106,7 @@ void power_off(void)
     {
         panicf("Call AXP173_SHUTDOWN fail");
     }
-    
+
     close(axp_hw);
 }
 
@@ -151,17 +155,29 @@ bool hostfs_removable(IF_MD_NONVOID(int drive))
         return true;
     else
 #endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+        return true;
+#else
         return false; /* internal: always present */
+#endif
 }
 
 bool hostfs_present(IF_MD_NONVOID(int drive))
 {
 #ifdef HAVE_MULTIDRIVE
     if (drive > 0) /* Active LOW */
-        return true; //FIXME
+#if defined(MULTIDRIVE_DEV)
+        return os_file_exists(MULTIDRIVE_DEV);
+#else
+        return true;
+#endif
     else
 #endif
+#ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
+        return os_file_exists(ROOTDRIVE_DEV);
+#else
         return true; /* internal: always present */
+#endif
 }
 
 #ifdef HAVE_MULTIDRIVE
@@ -206,4 +222,3 @@ bool volume_present(int volume)
     return hostfs_present(volume);
 }
 #endif
-
