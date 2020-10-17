@@ -103,9 +103,17 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ           1008000000
 
-/* No special storage */
-#define CONFIG_STORAGE STORAGE_HOSTFS
+/* Supports attaching to external USB drive */
+#define CONFIG_STORAGE (STORAGE_HOSTFS|STORAGE_USB)
+#define HOSTFS_VOL_DEC "microSD"
 #define HAVE_STORAGE_FLUSH
+#define HAVE_MULTIDRIVE  /* But _not_ CONFIG_STORAGE_MULTI */
+#define NUM_DRIVES 2
+#define HAVE_HOTSWAP
+#define HAVE_HOTSWAP_STORAGE_AS_MAIN
+#define MULTIDRIVE_DIR "/mnt/usb"
+#define MULTIDRIVE_DEV "/sys/block/sda"
+#define ROOTDRIVE_DEV "/sys/block/mmcblk0"
 
 /* Battery */
 #define BATTERY_TYPES_COUNT  1
