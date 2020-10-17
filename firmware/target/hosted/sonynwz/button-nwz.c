@@ -17,6 +17,18 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+#include <poll.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <linux/input.h>
+#include <dirent.h>
+#include <fcntl.h>
+#include <string.h>
+#include <stdlib.h>
+#include <system.h>
+
 #include "button.h"
 //#define LOGF_ENABLE
 #include "logf.h"
@@ -26,16 +38,6 @@
 #include "nwz_keys.h"
 #include "nwz_ts.h"
 
-#include <poll.h>
-#include <dir.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <linux/input.h>
-#include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
-#include <system.h>
 
 /* device types */
 #define DEV_KEY     0   /* icx_keys driver */
