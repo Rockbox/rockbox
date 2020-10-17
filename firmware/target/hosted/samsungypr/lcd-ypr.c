@@ -23,11 +23,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <linux/fb.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include "config.h"
-#include "file.h"
 #include "debug.h"
 #include "system.h"
 #include "screendump.h"

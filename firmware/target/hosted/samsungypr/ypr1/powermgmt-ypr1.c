@@ -18,19 +18,19 @@
  *
  ****************************************************************************/
 
-#include "config.h"
 #include <sys/ioctl.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#include "config.h"
 #include "kernel.h"
 #include "powermgmt.h"
 #include "power.h"
-#include "file.h"
 #include "adc.h"
 #include "radio-ypr.h"
 #include "pmu-ypr1.h"
 #include "ioctl-ypr1.h"
-#include "stdio.h"
-#include "unistd.h"
-#include "fcntl.h"
 #include "system.h"
 
 #define MAX17040_VCELL          0x02
