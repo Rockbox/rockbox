@@ -179,7 +179,7 @@ case $MDEV in
    MNT_POINT=/mnt/sd_0
    ;;
  sd*)
-   MNT_POINT=/mnt/sd_0/USB
+   MNT_POINT=/mnt/usb
    ;;
 esac
 
