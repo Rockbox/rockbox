@@ -28,6 +28,11 @@
 #include "power.h"
 #include "power-fiio.h"
 
+#ifdef HAVE_MULTIDRIVE
+void cleanup_rbhome(void);
+void startup_rbhome(void);
+#endif
+
 const char * const sysfs_usb_online =
     "/sys/class/power_supply/usb/online";
 
@@ -68,6 +73,9 @@ void usb_enable(bool on)
 */
 int disk_mount_all(void)
 {
+#ifdef HAVE_MULTIDRIVE
+    startup_rbhome();
+#endif
     return 1;
 }
 
@@ -77,6 +85,10 @@ int disk_mount_all(void)
  */
 int disk_unmount_all(void)
 {
+#ifdef HAVE_MULTIDRIVE
+    cleanup_rbhome();
+#endif
+
     return 1;
 }
 

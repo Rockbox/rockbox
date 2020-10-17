@@ -100,11 +100,20 @@ static const char *handle_special_links(const char* link, unsigned flags,
 
 /* we keep an open descriptor of the home directory to detect when it has been
    opened by opendir() so that its "symlinks" may be enumerated */
-static void cleanup_rbhome(void)
+void cleanup_rbhome(void)
 {
     os_close(rbhome_fildes);
     rbhome_fildes = -1;
 }
+void startup_rbhome(void)
+{
+    /* if this fails then alternate volumes will not work, but this function
+       cannot return that fact */
+    rbhome_fildes = os_opendirfd(rbhome);
+    if (rbhome_fildes >= 0)
+        atexit(cleanup_rbhome);
+}
+
 #endif /* HAVE_MULTIDRIVE */
 
 void paths_init(void)
@@ -140,14 +149,9 @@ void paths_init(void)
     os_mkdir(config_dir __MKDIR_MODE_ARG);
 #endif
 #endif /* HAVE_SPECIAL_DIRS */
-
 #ifdef HAVE_MULTIDRIVE
-    /* if this fails then alternate volumes will not work, but this function
-       cannot return that fact */
-    rbhome_fildes = os_opendirfd(rbhome);
-    if (rbhome_fildes >= 0)
-        atexit(cleanup_rbhome);
-#endif /* HAVE_MULTIDRIVE */
+    startup_rbhome();
+#endif
 }
 
 #ifdef HAVE_SPECIAL_DIRS
