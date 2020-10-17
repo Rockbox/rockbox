@@ -164,7 +164,7 @@
 
 /* External SD card can be mounted */
 #define CONFIG_STORAGE (STORAGE_HOSTFS|STORAGE_SD)
-#define HAVE_MULTIDRIVE
+#define HAVE_MULTIDRIVE  /* But _not_ CONFIG_STORAGE_MULTI */
 #define NUM_DRIVES 2
 #define HAVE_HOTSWAP
 #define HAVE_STORAGE_FLUSH

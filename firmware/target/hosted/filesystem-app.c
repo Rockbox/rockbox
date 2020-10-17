@@ -8,6 +8,7 @@
  * $Id$
  *
  * Copyright (C) 2010 Thomas Martitz
+ * Copyright (C) 2020 Solomon Peachy
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -53,8 +54,10 @@ static const char rbhome[] = "/sdcard";
 #elif (CONFIG_PLATFORM & (PLATFORM_SDL|PLATFORM_MAEMO|PLATFORM_PANDORA)) \
         && !defined(__PCTOOL__)
 static const char *rbhome;
+#elif defined(PIVOT_ROOT)
+static const char rbhome[] = PIVOT_ROOT;
 #else
-/* YPR0, YPR1, NWZ, etc */
+/* Anything else? */
 static const char rbhome[] = HOME_DIR;
 #endif
 #endif
@@ -94,9 +97,7 @@ static const char *handle_special_links(const char* link, unsigned flags,
 
     return link;
 }
-#endif
 
-#ifdef HAVE_MULTIDRIVE
 /* we keep an open descriptor of the home directory to detect when it has been
    opened by opendir() so that its "symlinks" may be enumerated */
 static void cleanup_rbhome(void)
@@ -209,12 +210,19 @@ const char * handle_special_dirs(const char *dir, unsigned flags,
         dir = _get_user_file_path(dir, flags, buf, bufsize);
 #endif
 #ifdef HAVE_MULTIDRIVE
+#define MULTIDRIVE_DIR_LEN (sizeof(MULTIDRIVE_DIR)-1)
+
     dir = handle_special_links(dir, flags, buf, bufsize);
 #endif
 #ifdef PIVOT_ROOT
 #define PIVOT_ROOT_LEN (sizeof(PIVOT_ROOT)-1)
     /* Prepend root prefix to find actual path */
-    if (strncmp(PIVOT_ROOT, dir, PIVOT_ROOT_LEN))
+    if (strncmp(PIVOT_ROOT, dir, PIVOT_ROOT_LEN)
+#ifdef MULTIDRIVE_DIR
+	/* Unless it's a MULTIDRIVE dir, in which case use as-is */
+	&& strncmp(MULTIDRIVE_DIR, dir, MULTIDRIVE_DIR_LEN)
+#endif
+       )
     {
         snprintf(buf, bufsize, "%s/%s", PIVOT_ROOT, dir);
         dir = buf;
