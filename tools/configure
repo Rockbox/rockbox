@@ -4108,7 +4108,7 @@ fi
     target_id=113
     application=yes
     app_type="erosq"
-    modelname="erosq"
+    modelname="aigoerosq"
     target="EROS_Q"
     memory=8
     mipsellinuxcc
