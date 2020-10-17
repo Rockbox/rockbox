@@ -32,14 +32,16 @@
 #define STORAGE_SD_NUM      2
 #define STORAGE_NAND_NUM    3
 #define STORAGE_RAMDISK_NUM 4
-#define STORAGE_HOSTFS_NUM  5
-#define STORAGE_NUM_TYPES   6
+#define STORAGE_USB_NUM     5
+#define STORAGE_HOSTFS_NUM  6
+#define STORAGE_NUM_TYPES   7
 
 #define STORAGE_ATA         (1 << STORAGE_ATA_NUM)
 #define STORAGE_MMC         (1 << STORAGE_MMC_NUM)
 #define STORAGE_SD          (1 << STORAGE_SD_NUM)
 #define STORAGE_NAND        (1 << STORAGE_NAND_NUM)
 #define STORAGE_RAMDISK     (1 << STORAGE_RAMDISK_NUM)
+#define STORAGE_USB         (1 << STORAGE_USB_NUM)
  /* meant for APPLICATION targets (implicit for SIMULATOR) */
 #define STORAGE_HOSTFS      (1 << STORAGE_HOSTFS_NUM)
 
