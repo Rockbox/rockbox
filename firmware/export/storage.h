@@ -34,6 +34,9 @@
 #if (CONFIG_STORAGE & STORAGE_SD)
 #include "sd.h"
 #endif
+#if (CONFIG_STORAGE & STORAGE_USB)
+// TODO:  Doesn't matter until we're native
+#endif
 #if (CONFIG_STORAGE & STORAGE_MMC)
 #include "mmc.h"
 #endif
@@ -96,6 +99,9 @@ int nand_event(long id, intptr_t data);
 #endif
 #if (CONFIG_STORAGE & STORAGE_RAMDISK)
 int ramdisk_event(long id, intptr_t data);
+#endif
+#if (CONFIG_STORAGE & STORAGE_USB)
+// int usb_event(long id, intptr_t data); // TODO: Implement
 #endif
 
 struct storage_info
@@ -278,6 +284,8 @@ static inline void storage_sleep(void) {};
             #define storage_present(drive) ramdisk_present(IF_MD(drive))
         #endif
         #define storage_driver_type(drive) (STORAGE_RAMDISK_NUM)
+    #elif (CONFIG_STORAGE & STORAGE_USB)
+        // TODO:  Eventually fix me
     #else
         //#error No storage driver!
     #endif

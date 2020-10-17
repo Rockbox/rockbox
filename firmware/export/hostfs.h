@@ -54,6 +54,8 @@ extern int hostfs_driver_type(int drive);
 #   define hostfs_driver_type(drive) (STORAGE_ATA_NUM)
 #  elif (CONFIG_STORAGE & STORAGE_SD)
 #   define hostfs_driver_type(drive) (STORAGE_SD_NUM)
+#  elif (CONFIG_STORAGE & STORAGE_USB)
+#   define hostfs_driver_type(drive) (STORAGE_USB_NUM)
 #  elif (CONFIG_STORAGE & STORAGE_MMC)
 #   define hostfs_driver_type(drive) (STORAGE_MMC_NUM)
 #  elif (CONFIG_STORAGE & STORAGE_NAND)

@@ -130,7 +130,7 @@ void system_exception_wait(void)
 bool hostfs_removable(IF_MD_NONVOID(int drive))
 {
 #ifdef HAVE_MULTIDRIVE
-    if (drive > 0) /* Active LOW */
+    if (drive > 0)
         return true;
     else
 #endif
@@ -157,7 +157,11 @@ int volume_drive(int drive)
 #ifdef CONFIG_STORAGE_MULTI
 int hostfs_driver_type(int drive)
 {
+#if (CONFIG_STORAGE & STORAGE_USB)
+    return drive > 0 ? STORAGE_USB_NUM : STORAGE_HOSTFS_NUM;
+#else
     return drive > 0 ? STORAGE_SD_NUM : STORAGE_HOSTFS_NUM;
+#endif
 }
 #endif /* CONFIG_STORAGE_MULTI */
 
@@ -185,4 +189,3 @@ bool volume_present(int volume)
     return hostfs_present(volume);
 }
 #endif
-

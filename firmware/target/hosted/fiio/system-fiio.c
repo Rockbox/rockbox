@@ -174,7 +174,11 @@ int volume_drive(int drive)
 #ifdef CONFIG_STORAGE_MULTI
 int hostfs_driver_type(int drive)
 {
+#if (CONFIG_STORAGE & STORAGE_USB)
+    return drive > 0 ? STORAGE_USB_NUM : STORAGE_HOSTFS_NUM;
+#else
     return drive > 0 ? STORAGE_SD_NUM : STORAGE_HOSTFS_NUM;
+#endif
 }
 #endif /* CONFIG_STORAGE_MULTI */
 
