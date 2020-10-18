@@ -169,3 +169,4 @@
 #define HAVE_HOTSWAP
 #define HAVE_STORAGE_FLUSH
 #define MULTIDRIVE_DIR "/mnt/mmc"
+#define MULTIDRIVE_DEV "/sys/block/mmcblk0"

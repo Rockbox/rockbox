@@ -57,9 +57,6 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x100000
 
-
-
-
 #define CONFIG_TUNER SI4700
 
 /* There is no hardware tone control */
@@ -105,8 +102,18 @@
 /* Define this to the CPU frequency */
 #define CPU_FREQ            532000000
 
+#ifdef NWZ_HAS_SD
+/* External SD card can be mounted */
+#define CONFIG_STORAGE (STORAGE_HOSTFS|STORAGE_SD)
+#define HAVE_MULTIDRIVE  /* But _not_ CONFIG_STORAGE_MULTI */
+#define NUM_DRIVES 2
+#define HAVE_HOTSWAP
+#define MULTIDRIVE_DIR "/mnt/media"
+#define MULTIDRIVE_DEV "/sys/block/mmcblk1"
+#else
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
+#endif
 #define HAVE_STORAGE_FLUSH
 
 /* Battery */

@@ -13,4 +13,6 @@
 /* sqrt(240^2 + 320^2) / 2 = 200 */
 #define LCD_DPI 200
 
+#define NWZ_HAS_SD
+
 #include "sonynwzlinux.h"

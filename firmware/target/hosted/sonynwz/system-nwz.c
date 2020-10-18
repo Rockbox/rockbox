@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  *
  * Copyright (C) 2016 Amaury Pouly
  *
@@ -23,20 +23,24 @@
 #include <signal.h>
 #include <ucontext.h>
 #include <string.h>
+#include <stdio.h>
+
 #include "system.h"
 #include "lcd.h"
 #include "font.h"
-#include "logf.h"
 #include "system.h"
 #include "backlight-target.h"
 #include "button.h"
 #include "adc.h"
 #include "power.h"
+#include "mv.h"
 #include "power-nwz.h"
 #include <backtrace.h>
-#include <stdio.h>
+
+#include "logf.h"
 
 static const char **kern_mod_list;
+bool os_file_exists(const char *ospath);
 
 void power_off(void)
 {
@@ -238,3 +242,57 @@ bool nwz_is_kernel_module_loaded(const char *name)
             return true;
     return false;
 }
+
+#ifdef CONFIG_STORAGE_MULTI
+int hostfs_driver_type(int drive)
+{
+    return drive > 0 ? STORAGE_SD_NUM : STORAGE_HOSTFS_NUM;
+}
+#endif /* CONFIG_STORAGE_MULTI */
+
+#ifdef HAVE_HOTSWAP
+bool hostfs_removable(IF_MD_NONVOID(int volume))
+{
+#ifdef HAVE_MULTIDRIVE
+    if (volume > 0)
+        return true;
+    else
+#endif
+        return false; /* internal: always present */
+}
+
+bool hostfs_present(int volume)
+{
+#ifdef HAVE_MULTIDRIVE
+    if (volume > 0)
+#if defined(MULTIDRIVE_DEV)
+        return os_file_exists(MULTIDRIVE_DEV);
+#else
+        return true; // FIXME?
+#endif
+    else
+#endif
+        return true; /* internal: always present */
+}
+#endif /* HAVE_HOTSWAP */
+
+#ifdef HAVE_MULTIDRIVE
+int volume_drive(int drive)
+{
+    return drive;
+}
+#endif /* HAVE_MULTIDRIVE */
+
+#ifdef HAVE_HOTSWAP
+bool volume_removable(IF_MV_NONVOID(int volume))
+{
+    /* don't support more than one partition yet, so volume == drive */
+    return hostfs_removable(volume);
+}
+
+bool volume_present(int volume)
+{
+    /* don't support more than one partition yet, so volume == drive */
+    return hostfs_present(volume);
+}
+#endif /* HAVE_HOTSWAP */
