@@ -135,6 +135,13 @@ system(@sysargs);
 my $rbbasename = basename($rbbname);
 
 #### Mangle RootFS
+
+# Save version into rootfs
+my $version = `cat rockbox-info.txt | grep Version | cut -f2 -d' '`;
+open FILE, ">$rootfsdir/etc/rockbox-bl-info.txt" || die ("can't write version txt");
+print FILE $version;
+close FILE;
+
 if ($hiby) {
     my $bootloader_sh =
     "#!/bin/sh

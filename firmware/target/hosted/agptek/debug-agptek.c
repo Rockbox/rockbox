@@ -18,6 +18,13 @@
  *
  ****************************************************************************/
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+
 #include "config.h"
 #include "font.h"
 #include "lcd.h"
@@ -34,11 +41,25 @@ bool dbg_hw_info(void)
 {
     int btn = 0;
 
+    /* Try to read the bootloader */
+    char verstr[40];
+    memset(verstr, 0, sizeof(verstr));
+    int fd = open("/etc/rockbox-bl-info.txt", O_RDONLY);
+    if(fd >= 0)
+    {
+        read(fd, verstr, sizeof(verstr) -1);
+        close(fd);
+    }
+
     lcd_setfont(FONT_SYSFIXED);
 
     while(btn ^ BUTTON_POWER) {
         lcd_clear_display();
         line = 0;
+
+        if (verstr[0]) {
+            lcd_putsf(0, line++, "Boot ver: %s", verstr);
+        }
 
         lcd_putsf(0, line++, "pcm srate: %d", pcm_alsa_get_rate());
 #ifdef HAVE_HEADPHONE_DETECTION
