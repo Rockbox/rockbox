@@ -68,7 +68,8 @@ endif
 # fall back to our own librbspeex if no suitable found.
 ifeq ($(SYS_SPEEX),)
 # This sets up 'SRC' based on the files mentioned in SOURCES
-SRC := $(shell $(CC) $(CFLAGS) -E -P -xc $(SPEEXSRC)/SOURCES)
+SPEEXSRCS := $(shell $(CC) $(CFLAGS) -E -P -xc $(SPEEXSRC)/SOURCES)
+LIBSOURCES := $(SPEEXSRCS:%.c=$(SPEEXSRC)/%.c) rbspeex.c
 LIBS = $(TARGET_DIR)librbspeex.a
 else
 LIBS = $(SYS_SPEEX)
@@ -76,57 +77,57 @@ endif
 
 TARGET_DIR ?= $(shell pwd)/
 BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
-SOURCES = $(SRC:%.c=$(SPEEXSRC)/%.c) rbspeex.c rbspeexenc.c rbspeexdec.c
-OBJS = $(addprefix $(BUILD_DIR)/,$(SRC:%.c=%.o))
-DIRS = 
+OBJDIR = $(abspath $(BUILD_DIR))/
+SOURCES = rbspeex.c rbspeexenc.c rbspeexdec.c
+OBJS := $(addsuffix .o,$(addprefix $(OBJDIR),$(notdir $(SOURCES))))
+LIBOBJS := $(addsuffix .o,$(addprefix $(OBJDIR),$(notdir $(LIBSOURCES))))
 
 .PHONY : all
 
 all: ../rbspeexenc ../rbspeexdec
 
-$(foreach src,$(SOURCES),$(eval $(BUILD_DIR)/$(subst .c,.o,$(notdir $(src))): $(src)))
-$(foreach src,$(SOURCES),$(eval $(BUILD_DIR)/$(subst .c,.d,$(notdir $(src))): $(src)))
-DEPS = $(addprefix $(BUILD_DIR)/,$(subst .c,.d,$(notdir $(SOURCES))))
+# create dependency files. Make sure to use the same prefix as with OBJS!
+$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(notdir $(src).o)): $(src)))
+$(foreach src,$(SOURCES) $(LIBSOURCES),$(eval $(addprefix $(OBJDIR),$(notdir $(src).d)): $(src)))
+DEPS = $(addprefix $(OBJDIR),$(addsuffix .d,$(notdir $(SOURCES) $(LIBSOURCES))))
 -include $(DEPS)
-
-%.d:
-	$(SILENT)$(call mkdir,$(BUILD_DIR))
-	$(SILENT)$(CC) -MG -MM -MT $(subst .d,.o,$@) $(CFLAGS) -o $(BUILD_DIR)/$(notdir $@) $<
 
 dll: $(TARGET_DIR)rbspeex.dll
 	
-$(TARGET_DIR)rbspeex.dll: $(OBJS) $(BUILD_DIR)/rbspeex.o
-	@echo DLL $(notdir $@)
+$(TARGET_DIR)rbspeex.dll: $(LIBOBJS)
+	$(info DLL $(notdir $@))
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -shared -o $@ $^ \
 		    -Wl,--output-def,$(TARGET_DIR)rbspeex.def
 
-$(TARGET_DIR)librbspeex.a: $(OBJS) $(BUILD_DIR)/rbspeex.o
-	@echo AR $(notdir $@)
+$(TARGET_DIR)librbspeex.a: $(LIBOBJS)
+	$(info AR $(notdir $@))
 	$(SILENT)$(call rm,$@)
 	$(SILENT)$(CROSS)$(AR) rcs $@ $^
 
 librbspeex.a: $(TARGET_DIR)librbspeex.a
 	
-../rbspeexenc: $(OBJS) $(BUILD_DIR)/rbspeexenc.o librbspeex.a
-	@echo Linking ../rbspeexenc
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(ARCHFLAGS) -o ../rbspeexenc $(BUILD_DIR)/rbspeexenc.o \
+../rbspeexenc: $(OBJS) $(TARGET_DIR)librbspeex.a
+	$(info Linking ../rbspeexenc)
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDFLAGS) $(ARCHFLAGS) -o ../rbspeexenc $(BUILD_DIR)/rbspeexenc.c.o \
 		    $(LIBS) -lm $(TARGET_DIR)librbspeex.a
 
-../rbspeexdec: $(OBJS) librbspeex.a $(BUILD_DIR)/rbspeexdec.o
-	@echo Linking ../rbspeexdec
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(ARCHFLAGS) -o ../rbspeexdec $(BUILD_DIR)/rbspeexdec.o \
+../rbspeexdec: $(OBJS) $(TARGET_DIR)librbspeex.a
+	$(info Linking ../rbspeexdec)
+	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDFLAGS) $(ARCHFLAGS) -o ../rbspeexdec $(BUILD_DIR)/rbspeexdec.c.o \
 		    $(LIBS) -lm $(TARGET_DIR)librbspeex.a
 
-%.o:
-	@echo CC $<
-	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(ARCHFLAGS) -c $< -o $@
+# common rules
+$(OBJDIR)%.c.o:
+	$(info CC $<)
+	$(SILENT)$(call mkdir,$(dir $@))
+	$(SILENT)$(CROSS)$(CC) $(ARCHFLAGS) $(GCCFLAGS) $(CFLAGS) -MMD -c -o $@ $<
 
 clean:
-	$(call rm,$(OBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec)
+	$(call rm,$(OBJS) $(LIBOBJS) $(TARGET_DIR)librbspeex* ../rbspeexenc ../rbspeexdec)
 	$(call rm,$(DEPS))
-	$(call rm,build*)
+	$(call rm,$(BUILD_DIR))
 
 $(BUILD_DIR):
-	@echo MKDIR $(BUILD_DIR)
+	$(info MKDIR $(BUILD_DIR))
 	$(SILENT)$(call mkdir, $(BUILD_DIR))
 
