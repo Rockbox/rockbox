@@ -27,9 +27,6 @@
 
 #define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
 
-/* Define this if you have a software controlled poweroff */
-#define HAVE_SW_POWEROFF
-
 /* Define this to the CPU frequency */
 #define CPU_FREQ           1008000000
 
