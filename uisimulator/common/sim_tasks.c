@@ -248,6 +248,8 @@ int hostfs_driver_type(int drive)
  #define SIMEXT1_TYPE_NUM   STORAGE_NAND_NUM
 #elif (CONFIG_STORAGE & STORAGE_RAMDISK)
  #define SIMEXT1_TYPE_NUM   STORAGE_RAMDISK_NUM
+#elif (CONFIG_STORAGE & STORAGE_USB)
+ #define SIMEXT1_TYPE_NUM   STORAGE_USB_NUM
 #else
 #error Unknown storage driver
 #endif /* CONFIG_STORAGE */
