@@ -35,6 +35,12 @@ EXTRALIBS_OPTS += EXTRALIBS_CC=\"$$QMAKE_CC\"
 EXTRALIBS_OPTS += EXTRALIBS_CXX=\"$$QMAKE_CXX\"
 EXTRALIBS_OPTS += EXTRALIB_CFLAGS=\"$$MACHINEFLAGS\"
 EXTRALIBS_OPTS += EXTRALIB_CXXFLAGS=\"$$MACHINEFLAGS\"
+macx {
+# on recent macOS we need to pass isysroot to the libs, otherwise it won't find
+# the standard libaries. This is caused by the passed compiler (doesn't rely on
+# default compiler but passed full path)
+    EXTRALIBS_OPTS += EXTRALIB_ISYSROOT=\"$$QMAKE_MAC_SDK.macosx.Path\"
+}
 
 MYBUILDDIR = $$OUT_PWD/build/
 MYLIBBUILDDIR = $$MYBUILDDIR/libs/

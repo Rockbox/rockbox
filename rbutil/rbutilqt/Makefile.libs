@@ -32,6 +32,7 @@ export CXXFLAGS=$(EXTRALIB_CXXFLAGS)
 export CC=$(EXTRALIBS_CC)
 export CXX=$(EXTRALIBS_CXX)
 export AR=$(EXTRALIBS_AR)
+export ISYSROOT=$(EXTRALIB_ISYSROOT)
 
 libs: librbspeex libucl libipodpatcher libsansapatcher libmkamsboot libmktccboot libmkmpioboot libchinachippatcher libmkimxboot libmks5lboot libbzip2 libbspatch librbtomcrypt
 

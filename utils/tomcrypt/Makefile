@@ -16,6 +16,10 @@ endif
 CFLAGS := -O3 -g -std=c99 -Wall $(DEFINES) -Isrc/headers
 LDFLAGS :=
 
+ifneq ($(ISYSROOT),)
+CFLAGS += -isysroot $(ISYSROOT)
+endif
+
 SOURCES := \
 	src/ciphers/aes/aes.c src/ciphers/aes/aes_tab.c \
 	src/misc/crypt/crypt_argchk.c src/misc/crypt/crypt_register_cipher.c src/misc/crypt/crypt_cipher_is_valid.c src/misc/crypt/crypt_cipher_descriptor.c \

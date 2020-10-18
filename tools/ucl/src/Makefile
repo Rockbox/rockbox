@@ -36,6 +36,9 @@ ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
 # that to determine if we need to set arch and isysroot.
 ifeq ($(findstring __clang__,$(CPPDEFINES)),__clang__)
 CFLAGS += -mmacosx-version-min=10.5
+ifneq ($(ISYSROOT),)
+CFLAGS += -isysroot $(ISYSROOT)
+endif
 else
 # when building libs for OS X 10.4+ build for both i386 and ppc at the same time.
 # This creates fat objects, and ar can only create the archive but not operate
