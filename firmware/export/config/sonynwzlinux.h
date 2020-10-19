@@ -67,7 +67,7 @@
 /* The A15 and A25 support more sampling rates, in fact they support crazy high bit-rates such
  * as 176.4 and 192 kHz but Rockbox does not support those */
 #if defined(SONY_NWZA10) || defined(SONY_NWA20)
-#define HW_SAMPR_CAPS   (SAMPR_CAP_44 | SAMPR_CAP_48 | SAMPR_CAP_88 | SAMPR_CAP_96)
+#define HW_SAMPR_CAPS   (SAMPR_CAP_44 | SAMPR_CAP_48 | SAMPR_CAP_88 | SAMPR_CAP_96 | SAMPR_CAP_176 | SAMPR_CAP_192)
 #endif
 
 /* KeyPad configuration for plugins */
