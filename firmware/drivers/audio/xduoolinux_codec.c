@@ -126,7 +126,13 @@ void audiohw_preinit(void)
     logf("hw preinit");
     alsa_controls_init();
     hw_open();
+
+#if defined(XDUOO_X3II)
     audiohw_mute(true);  /* Start muted to avoid the POP */
+#else
+    audiohw_mute(false);  /* No need */
+#endif
+
 //    const char * const codec_pmdown = "/sys/devices/platform/ingenic-x3ii.0/x3ii-ak4490-i2s/pmdown_time";  // in ms, defaults 5000
 }
 

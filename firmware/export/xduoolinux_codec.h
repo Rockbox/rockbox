@@ -14,6 +14,10 @@ AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
 #define AUDIOHW_MUTE_ON_SRATE_CHANGE
 #endif
 
+#if defined(XDUOO_X20)
+//#define AUDIOHW_NEEDS_INITIAL_UNMUTE
+#endif
+
 void audiohw_mute(int mute);
 void xduoo_set_output(int ps);
 int xduoo_get_outputs(void);
