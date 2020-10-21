@@ -528,6 +528,13 @@
 #define UI_LCD_POSX                 26
 #define UI_LCD_POSY                 40
 
+#elif defined(EROS_Q)
+#define UI_TITLE                    "AIGO EROS Q"
+#define UI_WIDTH                    400 /* width of GUI window */
+#define UI_HEIGHT                   653 /* height of GUI window */
+#define UI_LCD_POSX                 45
+#define UI_LCD_POSY                 50
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

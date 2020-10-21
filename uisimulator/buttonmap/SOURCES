@@ -85,5 +85,7 @@ xduoo-x3ii.c
 xduoo-x20.c
 #elif (CONFIG_KEYPAD == IHIFI_770_PAD) || (CONFIG_KEYPAD == IHIFI_800_PAD)
 ihifi2.c
+#elif CONFIG_KEYPAD == EROSQ_PAD
+erosq.c
 #endif
 #endif /* SIMULATOR */
