@@ -146,10 +146,7 @@ for(rblib, RBLIBS) {
     LIBS += -l$$rblib
 }
 
-# on win32 libz is linked implicitly.
-!win32 {
-    LIBS += -lz
-}
+LIBS += -lz
 
 # Add a (possibly found) libspeex now, don't do this before -lrbspeex!
 !static:!isEmpty(LIBSPEEX) {
