@@ -38,7 +38,6 @@
  * supposedly safer, it appears to use more CPU (however I didn't measure it
  * accurately, only looked at htop). At least, in this mode the "default"
  * device works which doesnt break with other apps running.
- * device works which doesnt break with other apps running.
  */
 
 #include "autoconf.h"
@@ -66,11 +65,13 @@
 #include <pthread.h>
 #include <signal.h>
 
-#define USE_ASYNC_CALLBACK
 /* plughw:0,0 works with both, however "default" is recommended.
  * default doesnt seem to work with async callback but doesn't break
  * with multple applications running */
-static char device[] = "plughw:0,0";                    /* playback device */
+#define DEFAULT_PLAYBACK_DEVICE "plughw:0,0"
+
+#define USE_ASYNC_CALLBACK
+
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
 #if defined(SONY_NWZ_LINUX) || defined(HAVE_FIIO_LINUX_CODEC)
 /* Sony NWZ must use 32-bit per sample */
@@ -81,8 +82,8 @@ static const snd_pcm_format_t format = SND_PCM_FORMAT_S16;    /* sample format *
 typedef short sample_t;
 #endif
 static const int channels = 2;                                /* count of channels */
-static unsigned int real_sample_rate = 0;
-static unsigned int last_sample_rate = 0;
+static unsigned int real_sample_rate;
+static unsigned int last_sample_rate;
 
 static snd_pcm_t *handle = NULL;
 static snd_pcm_sframes_t buffer_size;
@@ -452,34 +453,39 @@ void cleanup(void)
     free(frames);
     frames = NULL;
     snd_pcm_close(handle);
+    handle = NULL;
 }
 
-void pcm_play_dma_init(void)
+static void open_hwdev(const char *device)
 {
     int err;
 
-    logf("PCM DMA Init");
+    logf("opendev %s (%p)", device, handle);
 
-    audiohw_preinit();
+    /* Close old handle first, if needed */
+    if (handle) {
+        pcm_play_dma_stop();
+        snd_pcm_close(handle);
+        handle = NULL;
+    }
 
     if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
     {
         panicf("%s(): Cannot open device %s: %s\n", __func__, device, snd_strerror(err));
     }
-
     if ((err = snd_pcm_nonblock(handle, 1)))
         panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
-    if ((err = set_hwparams(handle)) < 0)
-    {
-        panicf("Setting of hwparams failed: %s\n", snd_strerror(err));
-    }
-    if ((err = set_swparams(handle)) < 0)
-    {
-        panicf("Setting of swparams failed: %s\n", snd_strerror(err));
-    }
+    last_sample_rate = 0;
+}
 
-    pcm_dma_apply_settings();
+void pcm_play_dma_init(void)
+{
+    logf("PCM DMA Init");
+
+    audiohw_preinit();
+
+    open_hwdev(DEFAULT_PLAYBACK_DEVICE);
 
 #ifdef USE_ASYNC_CALLBACK
     pthread_mutexattr_t attr;
@@ -527,7 +533,10 @@ static void pcm_dma_apply_settings_nolock(void)
         audiohw_mute(true);
 #endif
         snd_pcm_drop(handle);
-        set_hwparams(handle);
+
+        set_hwparams(handle); // FIXME: check return code?
+        set_swparams(handle); // FIXME: check return code?
+
 #if defined(HAVE_NWZ_LINUX_CODEC)
         /* Sony NWZ linux driver uses a nonstandard mecanism to set the sampling rate */
         audiohw_set_frequency(pcm_sampr);
