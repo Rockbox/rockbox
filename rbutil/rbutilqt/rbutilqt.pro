@@ -93,12 +93,11 @@ extralibs.commands = $$SILENT \
 RBLIBS = rbspeex ipodpatcher sansapatcher mkamsboot mktccboot \
          mkmpioboot chinachippatcher mkimxboot mks5lboot bspatch ucl \
          rbtomcrypt
-# NOTE: Linking bzip2 causes problems on Windows (Qt seems to export those
-# symbols as well, similar to what we have with zlib.) Only link that on
-# non-Windows for now.
-!win32 {
-    RBLIBS += bzip2
-}
+# NOTE: Our copy of libbzip2 has to use the name "bz2" to match up with the
+# distro name. Otherwise cross compiling would end up linking two copies of
+# bzip2 using different names, causing symbol clashes. Using the same name
+# makes the compiler pick the one he likes.
+RBLIBS += bz2
 !win32-msvc* {
     QMAKE_EXTRA_TARGETS += extralibs
     PRE_TARGETDEPS += extralibs

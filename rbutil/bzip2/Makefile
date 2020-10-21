@@ -10,6 +10,6 @@
 LIBSOURCES := blocksort.c  compress.c  decompress.c  randtable.c \
 	bzlib.c crctable.c  huffman.c
 
-OUTPUT := bzip2
+OUTPUT := bz2
 
 include ../libtools.make

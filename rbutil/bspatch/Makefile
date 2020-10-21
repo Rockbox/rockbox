@@ -12,6 +12,6 @@ LIBSOURCES := bspatch.c
 SOURCES := main.c
 
 OUTPUT := bspatch
-EXTRADEPS := libbzip2.a
+EXTRADEPS := libbz2.a
 
 include ../libtools.make
