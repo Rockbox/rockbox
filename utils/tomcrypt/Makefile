@@ -13,6 +13,15 @@ ifndef V
     SILENT := @
 endif
 
+ifeq ($(OS),Windows_NT)
+SHELL = cmd.exe
+mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
+rm = if exist $(subst /,\,$(1)) del /q /s $(subst /,\,$(1))
+else
+mkdir = mkdir -p $(1)
+rm = rm -rf $(1)
+endif
+
 CFLAGS := -O3 -g -std=c99 -Wall $(DEFINES) -Isrc/headers
 LDFLAGS :=
 
@@ -38,8 +47,8 @@ $(LIB): $(OBJS)
 
 $(BUILD_DIR)/%.o: %.c
 	$(info CC $(notdir $@))
-	$(SILENT)mkdir -p $(dir $@)
+	$(SILENT)$(call mkdir, $(dir $@))
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -fr $(BUILDDIR) $(LIB)
+	$(call rm,$(BUILDDIR) $(LIB))

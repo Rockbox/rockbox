@@ -13,6 +13,7 @@ SILENT = @
 endif
 
 ifeq ($(OS),Windows_NT)
+SHELL = cmd.exe
 mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
 else
 mkdir = mkdir -p $(1)

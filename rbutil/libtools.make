@@ -22,6 +22,7 @@ endif
 # Get directory this Makefile is in for relative paths.
 TOP := $(dir $(lastword $(MAKEFILE_LIST)))
 ifeq ($(OS),Windows_NT)
+SHELL = cmd.exe
 mkdir = if not exist $(subst /,\,$(1)) mkdir $(subst /,\,$(1))
 rm = if exist $(subst /,\,$(1)) del /q /s $(subst /,\,$(1))
 else
