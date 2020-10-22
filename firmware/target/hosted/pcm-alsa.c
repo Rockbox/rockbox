@@ -94,11 +94,15 @@ static const void  *pcm_data = 0;
 static size_t       pcm_size = 0;
 
 #ifdef USE_ASYNC_CALLBACK
-static snd_async_handler_t *ahandler;
+static snd_async_handler_t *ahandler = NULL;
 static pthread_mutex_t pcm_mtx;
 static char signal_stack[SIGSTKSZ];
 #else
 static int recursion;
+#endif
+
+#ifdef HAVE_RECORDING
+static snd_pcm_stream_t current_alsa_mode;  /* SND_PCM_STREAM_PLAYBACK / _CAPTURE */
 #endif
 
 static int set_hwparams(snd_pcm_t *handle)
@@ -294,11 +298,27 @@ static bool fill_frames(void)
         if (!pcm_size)
         {
             new_buffer = true;
-            if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data,
-                                                &pcm_size))
-            {
-                return false;
+#ifdef HAVE_RECORDING
+	    switch (current_alsa_mode)
+	    {
+            case SND_PCM_STREAM_PLAYBACK:
+#endif
+                if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data, &pcm_size))
+                {
+                    return false;
+                }
+#ifdef HAVE_RECORDING
+                break;
+            case SND_PCM_STREAM_CAPTURE:
+                if (!pcm_play_dma_complete_callback(PCM_DMAST_OK, &pcm_data, &pcm_size))
+                {
+                    return false;
+                }
+                break;
+            default:
+                break;
             }
+#endif
         }
 
         if (pcm_size % 4)
@@ -319,8 +339,22 @@ static bool fill_frames(void)
         }
         else
         {
-            /* Rockbox and PCM have same format: memcopy */
-            memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n * 4);
+#ifdef HAVE_RECORDING
+	    switch (current_alsa_mode)
+	    {
+            case SND_PCM_STREAM_PLAYBACK:
+#endif
+                /* Rockbox and PCM have same format: memcopy */
+                memcpy(&frames[2*(period_size-frames_left)], pcm_data, copy_n * 4);
+#ifdef HAVE_RECORDING
+                break;
+            case SND_PCM_STREAM_CAPTURE:
+                memcpy(pcm_data, &frames[2*(period_size-frames_left)], copy_n * 4);
+                break;
+            default:
+                break;
+            }
+#endif
         }
         pcm_data += copy_n*4;
         pcm_size -= copy_n*4;
@@ -329,7 +363,21 @@ static bool fill_frames(void)
         if (new_buffer)
         {
             new_buffer = false;
-            pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+#ifdef HAVE_RECORDING
+	    switch (current_alsa_mode)
+	    {
+            case SND_PCM_STREAM_PLAYBACK:
+#endif
+                pcm_play_dma_status_callback(PCM_DMAST_STARTED);
+#ifdef HAVE_RECORDING
+                break;
+            case SND_PCM_STREAM_CAPTURE:
+                pcm_rec_dma_status_callback(PCM_DMAST_STARTED);
+                break;
+            default:
+                break;
+            }
+#endif
         }
     }
 
@@ -378,40 +426,9 @@ static int async_rw(snd_pcm_t *handle)
     snd_pcm_sframes_t sample_size;
     sample_t *samples;
 
-#ifdef USE_ASYNC_CALLBACK
-    /* assign alternative stack for the signal handlers */
-    stack_t ss = {
-        .ss_sp = signal_stack,
-        .ss_size = sizeof(signal_stack),
-        .ss_flags = 0
-    };
-    struct sigaction sa;
-
-    err = sigaltstack(&ss, NULL);
-    if (err < 0)
-    {
-        logf("Unable to install alternative signal stack: %s", strerror(err));
-        return err;
-    }
-
-    err = snd_async_add_pcm_handler(&ahandler, handle, async_callback, NULL);
-    if (err < 0)
-    {
-        logf("Unable to register async handler: %s\n", snd_strerror(err));
-        return err;
-    }
-
-    /* only modify the stack the handler runs on */
-    sigaction(SIGIO, NULL, &sa);
-    sa.sa_flags |= SA_ONSTACK;
-    err = sigaction(SIGIO, &sa, NULL);
-    if (err < 0)
-    {
-        logf("Unable to install alternative signal stack: %s", strerror(err));
-        return err;
-    }
+#ifdef HAVE_RECORDING
+    if (current_alsa_mode == SND_PCM_STREAM_PLAYBACK) {
 #endif
-
     /* fill buffer with silence to initiate playback without noisy click */
     sample_size = buffer_size;
     samples = calloc(1, sample_size * channels * sizeof(sample_t));
@@ -430,6 +447,9 @@ static int async_rw(snd_pcm_t *handle)
         logf("Initial write error: written %i expected %li\n", err, sample_size);
         return err;
     }
+#ifdef HAVE_RECORDING
+    }
+#endif
 
     snd_pcm_state_t state = snd_pcm_state(handle);
     logf("PCM RW State %d", state);
@@ -477,6 +497,46 @@ static void open_hwdev(const char *device)
         panicf("Could not set non-block mode: %s\n", snd_strerror(err));
 
     last_sample_rate = 0;
+
+#ifdef USE_ASYNC_CALLBACK
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&pcm_mtx, &attr);
+
+    /* assign alternative stack for the signal handlers */
+    stack_t ss = {
+        .ss_sp = signal_stack,
+        .ss_size = sizeof(signal_stack),
+        .ss_flags = 0
+    };
+    struct sigaction sa;
+
+    err = sigaltstack(&ss, NULL);
+    if (err < 0)
+    {
+        panicf("Unable to install alternative signal stack: %s", strerror(err));
+    }
+
+    err = snd_async_add_pcm_handler(&ahandler, handle, async_callback, NULL);
+    if (err < 0)
+    {
+        panicf("Unable to register async handler: %s\n", snd_strerror(err));
+    }
+
+    /* only modify the stack the handler runs on */
+    sigaction(SIGIO, NULL, &sa);
+    sa.sa_flags |= SA_ONSTACK;
+    err = sigaction(SIGIO, &sa, NULL);
+    if (err < 0)
+    {
+        panicf("Unable to install alternative signal stack: %s", strerror(err));
+    }
+#else
+    tick_add_task(pcm_tick);
+#endif
+
+    atexit(cleanup);
 }
 
 void pcm_play_dma_init(void)
@@ -485,18 +545,13 @@ void pcm_play_dma_init(void)
 
     audiohw_preinit();
 
-    open_hwdev(DEFAULT_PLAYBACK_DEVICE);
-
-#ifdef USE_ASYNC_CALLBACK
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&pcm_mtx, &attr);
-#else
-    tick_add_task(pcm_tick);
+#ifdef HAVE_RECORDING
+    /* Init in PLAYBACK mode */
+    current_alsa_mode = SND_PCM_STREAM_PLAYBACK;
 #endif
 
-    atexit(cleanup);
+    open_hwdev(DEFAULT_PLAYBACK_DEVICE);
+
     return;
 }
 
@@ -676,10 +731,12 @@ int pcm_alsa_get_rate(void)
 #ifdef HAVE_RECORDING
 void pcm_rec_lock(void)
 {
+    pcm_play_lock();
 }
 
 void pcm_rec_unlock(void)
 {
+    pcm_play_unlock();
 }
 
 void pcm_rec_dma_init(void)
@@ -705,11 +762,13 @@ const void * pcm_rec_dma_get_peak_buffer(void)
     return NULL;
 }
 
+#ifdef SIMULATOR
 void audiohw_set_recvol(int left, int right, int type)
 {
     (void)left;
     (void)right;
     (void)type;
 }
+#endif
 
 #endif /* HAVE_RECORDING */
