@@ -28,6 +28,12 @@
 void pcm_alsa_set_digital_volume(int vol_db_l, int vol_db_r);
 #endif
 
+/* These two should be invoked in your audiohw_preinit() call! */
+void pcm_alsa_set_playback_device(const char *device);
+#if defined(HAVE_RECORDING)
+void pcm_alsa_set_capture_device(const char *device);
+#endif
+
 int pcm_alsa_get_rate(void);
 
 #endif /* __PCM_ALSA_RB_H__ */
