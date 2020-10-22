@@ -141,6 +141,8 @@ void audiohw_mute(int mute)
     if (fd_hw < 0 || muted == mute)
        return;
 
+    muted = mute;
+
     if(mute)
     {
         alsa_controls_set_ints("DACL Playback Volume", 1, &vol0);
