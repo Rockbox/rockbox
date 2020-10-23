@@ -107,7 +107,7 @@
 
 /* define the bitmask of recording sample rates */
 #define REC_SAMPR_CAPS HW_SAMPR_CAPS /* Same as playback */
-
+#define HAVE_RECORDING
 
 /* R1 has a standard linux RTC driver on /dev/rtc1 (->/dev/rtc)
  * The RTC is S35392 A
