@@ -55,6 +55,7 @@ const struct button_mapping* plugin_contexts[]= {
 };
 
 #define FIRE_QUIT                   PLA_CANCEL
+#define FIRE_QUIT2                  PLA_EXIT
 #define FIRE_SWITCH_FLAMES_TYPE     PLA_LEFT
 #define FIRE_SWITCH_FLAMES_MOVING   PLA_RIGHT
 
@@ -176,7 +177,7 @@ static inline void fire_convolve(struct fire* fire)
             break;
 
         case 1:
-            mult -= 2; 
+            mult -= 2;
             do{
                 pixel_value = ptr[FIRE_WIDTH-1]  /* fire[y+1][x-1] */
                         + ptr[FIRE_WIDTH]    /* fire[y+1][x] */
@@ -330,6 +331,7 @@ int main(void)
 
         switch(action){
             case FIRE_QUIT:
+            case FIRE_QUIT2:
                 cleanup(NULL);
                 return PLUGIN_OK;
 
