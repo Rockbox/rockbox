@@ -13,7 +13,7 @@ diff -Naur gcc-4.9.4/gcc/config/arm/t-arm-elf gcc-4.9.4-fixed/gcc/config/arm/t-a
  # MULTILIB_OPTIONS    += mcpu=ep9312
  # MULTILIB_DIRNAMES   += ep9312
  # MULTILIB_EXCEPTIONS += *mthumb/*mcpu=ep9312*
-@@ -56,8 +61,8 @@
+@@ -61,8 +61,8 @@
  # MULTILIB_DIRNAMES   += fpu soft
  # MULTILIB_EXCEPTIONS += *mthumb/*mfloat-abi=hard*
  # 
