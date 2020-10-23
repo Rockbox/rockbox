@@ -114,6 +114,9 @@
 #define HAVE_FMRADIO_IN
 #define INPUT_SRC_CAPS SRC_CAP_FMRADIO
 
+#define REC_SAMPR_CAPS HW_SAMPR_CAPS /* Same as playback */
+#define HAVE_RECORDING
+
 /* We have a GPIO pin that detects this */
 #define HAVE_HEADPHONE_DETECTION
 
