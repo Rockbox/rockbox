@@ -195,6 +195,8 @@ static void scroll_thread(void)
 }
 #endif /* HAVE_REMOTE_LCD */
 
+
+#ifndef BOOTLOADER
 void scroll_init(void)
 {
 #ifdef HAVE_REMOTE_LCD
@@ -205,3 +207,9 @@ void scroll_init(void)
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 }
+#else
+void scroll_init(void)
+{
+    /* DUMMY */
+}
+#endif /* ndef BOOTLOADER*/
