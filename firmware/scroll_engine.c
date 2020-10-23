@@ -52,7 +52,6 @@ static const char scroll_tick_table[18] = {
 };
 
 static void scroll_thread(void);
-static char scroll_stack[DEFAULT_STACK_SIZE*3];
 static const char scroll_name[] = "scroll";
 
 #include "drivers/lcd-scroll.c"
@@ -195,8 +194,11 @@ static void scroll_thread(void)
 }
 #endif /* HAVE_REMOTE_LCD */
 
+
+#ifndef BOOTLOADER
 void scroll_init(void)
 {
+    static char scroll_stack[DEFAULT_STACK_SIZE*3];
 #ifdef HAVE_REMOTE_LCD
     queue_init(&scroll_queue, true);
 #endif
@@ -205,3 +207,9 @@ void scroll_init(void)
                   IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 }
+#else
+void scroll_init(void)
+{
+    /* DUMMY */
+}
+#endif /* ndef BOOTLOADER*/

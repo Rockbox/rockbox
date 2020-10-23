@@ -1,4 +1,6 @@
 common.c
+format.c
+snprintf.c
 
 #if defined(IPOD_NANO2G)
 ipodnano2g.c

@@ -118,6 +118,7 @@ void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
     LCDFN(update_rect)(current_vp->x + x, current_vp->y + y, width, height);
 }
 
+#ifndef BOOTLOADER
 /* put a string at a given pixel position, skipping first ofs pixel columns */
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
@@ -257,6 +258,72 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     }
     font_lock(current_vp->font, false);
 }
+#else /* BOOTLOADER */
+/* put a string at a given pixel position, skipping first ofs pixel columns */
+static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
+{
+    unsigned short *ucs;
+    struct font* pf = font_get(current_vp->font);
+    int vp_flags = current_vp->flags;
+    const unsigned char *bits;
+    int width;
+
+    if ((vp_flags & VP_FLAG_ALIGNMENT_MASK) != 0)
+    {
+        int w;
+
+        LCDFN(getstringsize)(str, &w, NULL);
+        /* center takes precedence */
+        if (vp_flags & VP_FLAG_ALIGN_CENTER)
+        {
+            x = ((current_vp->width - w)/ 2) + x;
+            if (x < 0)
+                x = 0;
+        }
+        else
+        {
+            x = current_vp->width - w - x;
+            x += ofs;
+            ofs = 0;
+        }
+    }
+
+    /* allow utf but no diacritics or rtl lang */
+    for (ucs = bidi_l2v(str, 1); *ucs; ucs++)
+    {
+        const unsigned short next_ch = ucs[1];
+
+        if (x >= current_vp->width)
+            break;
+
+        /* Get proportional width and glyph bits */
+        width = font_get_width(pf, *ucs);
+
+        if (ofs > width)
+        {
+            ofs -= width;
+            continue;
+        }
+
+        bits = font_get_bits(pf, *ucs);
+
+#if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
+        if (pf->depth)
+            lcd_alpha_bitmap_part(bits, ofs, 0, width, x, y,
+                                  width - ofs, pf->height);
+        else
+#endif
+            LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x,
+                                    y, width - ofs, pf->height);
+        if (next_ch)
+        {
+            x += width - ofs;
+            ofs = 0;
+        }
+    }
+}
+#endif
+
 
 /*** pixel oriented text output ***/
 
