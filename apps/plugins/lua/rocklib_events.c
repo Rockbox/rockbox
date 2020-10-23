@@ -424,7 +424,10 @@ static void init_event_thread(bool init, struct event_data *ev_data)
                                            IF_COP(, COP));
 
     /* Timer is used to poll waiting events */
-    rb->timer_register(1, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU));
+    if (!rb->timer_register(1, NULL, EV_TIMER_FREQ, rev_timer_isr IF_COP(, CPU)))
+    {
+        rb->splash(100, "No timer available!");
+    }
 }
 
 static void playback_event_callback(unsigned short id, void *data)

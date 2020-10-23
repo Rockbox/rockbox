@@ -104,7 +104,7 @@ void tick_start(unsigned int interval_in_ms)
 }
 
 #define cycles_to_microseconds(cycles) \
-    ((int)((1000000*cycles)/TIMER_FREQ))
+    ((int)((10000*cycles)/(TIMER_FREQ / 100)))
 
 
 static timer_t timer_tid;
