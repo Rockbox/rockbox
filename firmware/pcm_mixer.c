@@ -75,7 +75,7 @@ static struct mixer_channel channels[PCM_MIXER_NUM_CHANNELS] IBSS_ATTR;
 static struct mixer_channel * active_channels[PCM_MIXER_NUM_CHANNELS+1] IBSS_ATTR;
 
 /* Number of silence frames to play after all data has played */
-#define MAX_IDLE_FRAMES     (mixer_sampr*3 / mix_frame_size / 4)
+#define MAX_IDLE_FRAMES     (mixer_sampr*3 / (mix_frame_size / 4))
 static unsigned int idle_counter = 0;
 
 /** Mixing routines, CPU optmized **/
