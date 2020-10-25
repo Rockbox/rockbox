@@ -808,7 +808,7 @@ void pcm_rec_dma_close(void)
 {
     logf("Rec DMA Close");
     // close_hwdev();
-    open_hwdev(playback_dev, SND_PCM_STREAM_PLAYBACK;
+    open_hwdev(playback_dev, SND_PCM_STREAM_PLAYBACK);
 }
 
 void pcm_rec_dma_start(void *start, size_t size)
