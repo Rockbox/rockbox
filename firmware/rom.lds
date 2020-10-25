@@ -12,8 +12,7 @@ STARTUP(target/arm/pp/crt0-pp.o)
 OUTPUT_FORMAT(elf32-littlearm)
 STARTUP(target/arm/crt0.o)
 #else
-OUTPUT_FORMAT(elf32-sh)
-STARTUP(crt0.o)
+#error "Unknown CPU"
 #endif
 
 
@@ -22,7 +21,6 @@ STARTUP(crt0.o)
 #else
 #define PLUGINSIZE 0x8000
 #endif
-
 
 #ifdef IRIVER_H100_SERIES
 #define CODECSIZE CODEC_SIZE
