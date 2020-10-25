@@ -475,7 +475,7 @@ static void async_callback(snd_async_handler_t *ahandler)
         err = snd_pcm_start(handle);
         if (err < 0) {
             logf("cb start error: %s", snd_strerror(err));
-            goto abort;
+            /* Depending on the error we might be SOL */
         }
     }
 
@@ -532,7 +532,7 @@ static void open_hwdev(const char *device, snd_pcm_stream_t mode)
     /* Close old handle */
     close_hwdev();
 
-    if ((err = snd_pcm_open(&handle, device, SND_PCM_STREAM_PLAYBACK, 0)) < 0)
+    if ((err = snd_pcm_open(&handle, device, mode, 0)) < 0)
     {
         panicf("%s(): Cannot open device %s: %s", __func__, device, snd_strerror(err));
     }
@@ -687,7 +687,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
                 return;
             case SND_PCM_STATE_XRUN:
             {
-                logf("Trying to recover from error");
+                logf("Trying to recover from underrun");
                 int err = snd_pcm_recover(handle, -EPIPE, 0);
                 if (err < 0)
                     logf("Recovery failed: %s", snd_strerror(err));
@@ -735,6 +735,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
                 err = snd_pcm_start(handle);
                 if (err < 0) {
                     logf("start error: %s", snd_strerror(err));
+                    /* We will recover on the next iteration */
                 }
 
                 break;
@@ -806,7 +807,8 @@ void pcm_rec_dma_init(void)
 void pcm_rec_dma_close(void)
 {
     logf("Rec DMA Close");
-    close_hwdev();
+    // close_hwdev();
+    open_hwdev(playback_dev, SND_PCM_STREAM_PLAYBACK;
 }
 
 void pcm_rec_dma_start(void *start, size_t size)
