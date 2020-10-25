@@ -27,7 +27,7 @@
 unsigned char *audiobuf;
 ssize_t audiobuf_size;
 
-#ifndef IRIVER_H100_SERIES
+#if !defined(IRIVER_H100_SERIES) && !defined(IRIVER_H300_SERIES)
 #error this platform is not (yet) flashable
 #endif
 
@@ -48,7 +48,7 @@ struct flash_info
     char name[32];
 };
 
-#ifdef IRIVER_H100_SERIES
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 #define SEC_SIZE 4096
 #define BOOTLOADER_ERASEGUARD  (BOOTLOADER_ENTRYPOINT / SEC_SIZE)
 enum sections {

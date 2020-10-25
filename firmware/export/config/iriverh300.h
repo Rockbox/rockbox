@@ -157,6 +157,9 @@
 /* Define this if you want to use coldfire's i2c interface */
 #define CONFIG_I2C I2C_COLDFIRE
 
+/* Define this if you can run rockbox from flash memory */
+#define HAVE_FLASHED_ROCKBOX
+
 /* The size of the flash ROM */
 #define FLASH_SIZE 0x400000
 
@@ -184,12 +187,16 @@
 #define BOOTFILE "rockbox." BOOTFILE_EXT
 #define BOOTDIR "/.rockbox"
 
-#define BOOTLOADER_ENTRYPOINT  0x001F0000
-#define FLASH_ENTRYPOINT       0x00001000
+#define BOOTLOADER_ENTRYPOINT  0x003F0000
+#define FLASH_RAMIMAGE_ENTRY   0x00001000
+#define FLASH_ROMIMAGE_ENTRY   0x00100000
 #define FLASH_MAGIC            0xfbfbfbf1
 
 /* Define this if there is an EEPROM chip */
 #define HAVE_EEPROM
+
+/* Define this if the EEPROM chip is used */
+#define HAVE_EEPROM_SETTINGS
 
 /* Define this for FM radio input available */
 #define HAVE_FMRADIO_IN

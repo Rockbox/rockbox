@@ -61,7 +61,7 @@ iriverify.c
 #endif
 
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) /* Requires real hardware */
-#if defined(IRIVER_H100_SERIES)
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
 iriver_flash.c
 #endif
 
