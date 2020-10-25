@@ -908,7 +908,7 @@ struct plugin_api {
     void (*wheel_send_events)(bool send);
 #endif
 
-#ifdef IRIVER_H100_SERIES
+#if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
     /* Routines for the iriver_flash -plugin. */
     bool (*detect_original_firmware)(void);
     bool (*detect_flashed_ramimage)(void);
