@@ -36,6 +36,48 @@
 
 #include "logf.h"
 
+/*
+
+X3ii:
+
+ PCM device hw:0,0
+
+   ACCESS:  MMAP_INTERLEAVED RW_INTERLEAVED
+   FORMAT:  S16_LE S24_LE
+   SUBFORMAT:  STD
+   SAMPLE_BITS: [16 32]
+   FRAME_BITS: [16 64]
+   CHANNELS: [1 2]
+   RATE: [8000 384000]
+   PERIOD_TIME: (1333 16384000]
+   PERIOD_SIZE: [512 131072]
+   PERIOD_BYTES: [4096 262144]
+   PERIODS: [4 256]
+   BUFFER_TIME: (5333 65536000]
+   BUFFER_SIZE: [2048 524288]
+   BUFFER_BYTES: [4096 1048576]
+   TICK_TIME: ALL
+
+ Mixer controls:
+
+    numid=1,iface=MIXER,name='Left Playback Volume'
+     ; type=INTEGER,access=rw------,values=1,min=0,max=255,step=0
+     : values=0
+    numid=2,iface=MIXER,name='Right Playback Volume'
+     ; type=INTEGER,access=rw------,values=1,min=0,max=255,step=0
+     : values=0
+    numid=3,iface=MIXER,name='AK4490 Digital Filter'
+     ; type=INTEGER,access=rw------,values=1,min=0,max=4,step=0
+     : values=0
+    numid=4,iface=MIXER,name='AK4490 Soft Mute'
+     ; type=BOOLEAN,access=rw------,values=1
+     : values=off
+    numid=5,iface=MIXER,name='Output Port Switch'
+     ; type=INTEGER,access=rw------,values=1,min=0,max=5,step=0
+     : values=0
+
+*/
+
 static int fd_hw = -1;
 
 static long int vol_l_hw = 255;

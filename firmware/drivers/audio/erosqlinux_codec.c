@@ -37,6 +37,32 @@
 
 #include "logf.h"
 
+/*
+ PCM device hw:0,0
+
+   ACCESS:  MMAP_INTERLEAVED RW_INTERLEAVED
+   FORMAT:  S16_LE S24_LE
+   SUBFORMAT:  STD
+   SAMPLE_BITS: [16 32]
+   FRAME_BITS: [16 64]
+   CHANNELS: [1 2]
+   RATE: [8000 192000]
+   PERIOD_TIME: (2666 8192000]
+   PERIOD_SIZE: [512 65536]
+   PERIOD_BYTES: [4096 131072]
+   PERIODS: [4 128]
+   BUFFER_TIME: (10666 32768000]
+   BUFFER_SIZE: [2048 262144]
+   BUFFER_BYTES: [4096 524288]
+   TICK_TIME: ALL
+
+ Mixer controls:
+
+     numid=1,iface=MIXER,name='Output Port Switch'
+      ; type=INTEGER,access=rw------,values=1,min=0,max=5,step=0
+      : values=4
+*/
+
 static int fd_hw = -1;
 
 static long int vol_l_hw = 255;
