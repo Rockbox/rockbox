@@ -165,6 +165,12 @@ bool cfi_get_flash_info(struct flash_info* pInfo)
             rb->strcpy(pInfo->name, "SST39VF160");
             return true;
         }
+        else if (pInfo->id == 0x5B)
+        {
+            pInfo->size = 4096* 1024; /* 4 MiB */
+            rb->strcpy(pInfo->name, "SST39VF3201");
+            return true;
+        }
         else
             return false;
     }
