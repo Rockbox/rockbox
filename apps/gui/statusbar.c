@@ -49,7 +49,7 @@
    but still needed for compatibility with old system */
 #define ICONS_SPACING                           2
 #define STATUSBAR_BATTERY_X_POS                 0*ICONS_SPACING
-#define STATUSBAR_BATTERY_WIDTH                 18
+#define STATUSBAR_BATTERY_WIDTH                 (2+(2*SYSFONT_WIDTH))
 #define STATUSBAR_PLUG_X_POS                    STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 ICONS_SPACING
@@ -58,7 +58,7 @@
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
                                                 2*ICONS_SPACING
-#define STATUSBAR_VOLUME_WIDTH                  16
+#define STATUSBAR_VOLUME_WIDTH                  (2+(2*SYSFONT_WIDTH))
 #define STATUSBAR_ENCODER_X_POS                 STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \

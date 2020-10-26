@@ -101,16 +101,20 @@ extern const unsigned char bitmap_icons_5x8[Icon5x8Last][5];
 extern const unsigned char bitmap_icons_7x8[Icon7x8Last][7];
 extern const unsigned char bitmap_icon_disk[];
 
+#if defined(SYSFONT_HEIGHT) && SYSFONT_HEIGHT != 8
+#warning "SYSFONT_HEIGHT != 8, there will be issues with statusbar!"
+#endif
+
 #define STATUSBAR_X_POS       0
 #define STATUSBAR_Y_POS       0 /* MUST be a multiple of 8 */
-#define STATUSBAR_HEIGHT      8
+#define STATUSBAR_HEIGHT      SYSFONT_HEIGHT
 #define STATUSBAR_WIDTH       LCD_WIDTH
 #define ICON_BATTERY_X_POS    0
 #define ICON_BATTERY_WIDTH    18
 #define ICON_PLUG_X_POS       STATUSBAR_X_POS+ICON_BATTERY_WIDTH+2
 #define ICON_PLUG_WIDTH       7
 #define ICON_VOLUME_X_POS     STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+2+2
-#define ICON_VOLUME_WIDTH     16
+#define ICON_VOLUME_WIDTH     (2+(2*SYSFONT_WIDTH))
 #define ICON_PLAY_STATE_X_POS STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+2+2+2
 #define ICON_PLAY_STATE_WIDTH 7
 #define ICON_PLAY_MODE_X_POS  STATUSBAR_X_POS+ICON_BATTERY_WIDTH+ICON_PLUG_WIDTH+ICON_VOLUME_WIDTH+ICON_PLAY_STATE_WIDTH+2+2+2+2

@@ -38,6 +38,7 @@
 #include "debug.h"
 #include "font.h"
 #include "icon.h"
+#include "icons.h"
 #include "option_select.h"
 #ifdef HAVE_TOUCHSCREEN
 #include "sound.h"
