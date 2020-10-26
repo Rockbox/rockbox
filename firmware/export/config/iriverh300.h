@@ -189,7 +189,7 @@
 
 #define BOOTLOADER_ENTRYPOINT  0x003F0000
 #define FLASH_RAMIMAGE_ENTRY   0x00001000
-#define FLASH_ROMIMAGE_ENTRY   0x00100000
+#define FLASH_ROMIMAGE_ENTRY   0x00200000
 #define FLASH_MAGIC            0xfbfbfbf1
 
 /* Define this if there is an EEPROM chip */
