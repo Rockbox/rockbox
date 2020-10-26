@@ -885,6 +885,9 @@ void lcd_refreshline(void)
         return;
 #endif
 
+#if defined(HAVE_LCD_MODES) && (HAVE_LCD_MODES & LCD_MODE_PAL256)
+    fb_data *lcd_fb = get_framebuffer();
+#endif
     updatepatpix();
 
     L = R_LY;

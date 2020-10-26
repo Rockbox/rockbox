@@ -332,8 +332,8 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short *ucs;
-    struct font* pf = font_get(LCDFN(current_vp)->font);
-    int vp_flags = current_vp->flags;
+    struct font* pf = font_get(LCDFN(current_viewport)->font);
+    int vp_flags = LCDFN(current_viewport)->flags;
     const unsigned char *bits;
     int width;
 
@@ -345,13 +345,13 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         /* center takes precedence */
         if (vp_flags & VP_FLAG_ALIGN_CENTER)
         {
-            x = ((current_vp->width - w)/ 2) + x;
+            x = ((LCDFN(current_viewport)->width - w)/ 2) + x;
             if (x < 0)
                 x = 0;
         }
         else
         {
-            x = current_vp->width - w - x;
+            x = LCDFN(current_viewport)->width - w - x;
             x += ofs;
             ofs = 0;
         }
@@ -362,7 +362,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
     {
         const unsigned short next_ch = ucs[1];
 
-        if (x >= current_vp->width)
+        if (x >= LCDFN(current_viewport)->width)
             break;
 
         /* Get proportional width and glyph bits */
