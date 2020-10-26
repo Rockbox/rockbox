@@ -332,7 +332,7 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
 {
     unsigned short *ucs;
-    struct font* pf = font_get(current_vp->font);
+    struct font* pf = font_get(LCDFN(current_vp)->font);
     int vp_flags = current_vp->flags;
     const unsigned char *bits;
     int width;

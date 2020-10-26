@@ -196,15 +196,18 @@ static bool game_finished;
  *   char *title    - Specify a title 
  *   fb_data *pixmap- Currently unused, but will allow for a graphic
  */
-struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] = 
-  {
-    { {B_MENU_X, B_MENU_Y, B_MENU_W, B_MENU_H, 0, FONT_UI, DRMODE_SOLID, 0, 0xFFFF},
+struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] =
+{
+    { {.x=B_MENU_X, .y=B_MENU_Y, .width=B_MENU_W, .height=B_MENU_H, .flags=0, .buffer= 0,
+        .font=FONT_UI, .drawmode=DRMODE_SOLID, .fg_pattern=0, .bg_pattern=0xFFFF},
       false, REVERSI_BUTTON_MENU, false, "Menu", NULL },
-      
-    { {B_QUIT_X, B_QUIT_Y, B_QUIT_W, B_QUIT_H, 0, FONT_UI, DRMODE_SOLID, 0, 0xFFFF},
+
+    { {.x=B_QUIT_X, .y=B_QUIT_Y, .width=B_QUIT_W, .height=B_QUIT_H, .flags=0, .buffer=0,
+        .font=FONT_UI, .drawmode=DRMODE_SOLID, .fg_pattern=0, .bg_pattern=0xFFFF},
       false, REVERSI_BUTTON_QUIT, false, "Quit", NULL },
-      
-    { {0, 0, XOFS+BOARD_WIDTH, YOFS+BOARD_HEIGHT, 0, 0,  DRMODE_SOLID, 0, 0xFFFF},
+
+    { {.x=0, .y=0, .width=XOFS+BOARD_WIDTH,.height=YOFS+BOARD_HEIGHT, .flags=0, .buffer=0,
+        .font=0,  .drawmode=DRMODE_SOLID, .fg_pattern=0, .bgpattern=0xFFFF},
       false, REVERSI_BUTTON_MAKE_MOVE, true, NULL, NULL }
 };
 #endif
