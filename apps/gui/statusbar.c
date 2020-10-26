@@ -49,7 +49,7 @@
    but still needed for compatibility with old system */
 #define ICONS_SPACING                           2
 #define STATUSBAR_BATTERY_X_POS                 0*ICONS_SPACING
-#define STATUSBAR_BATTERY_WIDTH                 18
+#define STATUSBAR_BATTERY_WIDTH                 (2+(2*SYSFONT_WIDTH))
 #define STATUSBAR_PLUG_X_POS                    STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 ICONS_SPACING
@@ -58,7 +58,7 @@
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
                                                 2*ICONS_SPACING
-#define STATUSBAR_VOLUME_WIDTH                  16
+#define STATUSBAR_VOLUME_WIDTH                  (2+(2*SYSFONT_WIDTH))
 #define STATUSBAR_ENCODER_X_POS                 STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 STATUSBAR_PLUG_WIDTH + \
@@ -281,7 +281,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
             display->mono_bitmap(bitmap_icons_7x8[Icon_USBPlug],
                                  STATUSBAR_PLUG_X_POS,
                                  STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
-                                 STATUSBAR_HEIGHT);
+                                 SB_ICON_HEIGHT);
 #endif /* HAVE_USB_POWER */
 #if CONFIG_CHARGING
 #ifdef HAVE_USB_POWER
@@ -292,7 +292,7 @@ void gui_statusbar_draw(struct gui_statusbar * bar, bool force_redraw, struct vi
             display->mono_bitmap(bitmap_icons_7x8[Icon_Plug],
                                     STATUSBAR_PLUG_X_POS,
                                     STATUSBAR_Y_POS, STATUSBAR_PLUG_WIDTH,
-                                    STATUSBAR_HEIGHT);
+                                    SB_ICON_HEIGHT);
 #endif /* CONFIG_CHARGING */
 #ifdef HAVE_RECORDING
         /* turn off volume display in recording screen */
@@ -453,7 +453,7 @@ static bool gui_statusbar_icon_volume(struct gui_statusbar * bar, int volume)
     if (volume == minvol) {
         display->mono_bitmap(bitmap_icons_7x8[Icon_Mute],
                     STATUSBAR_VOLUME_X_POS + STATUSBAR_VOLUME_WIDTH / 2 - 4,
-                    STATUSBAR_Y_POS, 7, STATUSBAR_HEIGHT);
+                    STATUSBAR_Y_POS, 7, SB_ICON_HEIGHT);
     }
     else {
         /* We want to redraw the icon later on */
@@ -505,7 +505,7 @@ static void gui_statusbar_icon_play_state(struct screen * display, int state)
 {
     display->mono_bitmap(bitmap_icons_7x8[state], STATUSBAR_PLAY_STATE_X_POS,
                     STATUSBAR_Y_POS, STATUSBAR_PLAY_STATE_WIDTH,
-                    STATUSBAR_HEIGHT);
+                    SB_ICON_HEIGHT);
 }
 
 /*
@@ -515,7 +515,7 @@ static void gui_statusbar_icon_play_mode(struct screen * display, int mode)
 {
     display->mono_bitmap(bitmap_icons_7x8[mode], STATUSBAR_PLAY_MODE_X_POS,
                     STATUSBAR_Y_POS, STATUSBAR_PLAY_MODE_WIDTH,
-                    STATUSBAR_HEIGHT);
+                    SB_ICON_HEIGHT);
 }
 
 /*
@@ -525,7 +525,7 @@ static void gui_statusbar_icon_shuffle(struct screen * display)
 {
     display->mono_bitmap(bitmap_icons_7x8[Icon_Shuffle],
                     STATUSBAR_SHUFFLE_X_POS, STATUSBAR_Y_POS,
-                    STATUSBAR_SHUFFLE_WIDTH, STATUSBAR_HEIGHT);
+                    STATUSBAR_SHUFFLE_WIDTH, SB_ICON_HEIGHT);
 }
 
 /*
@@ -535,7 +535,7 @@ static void gui_statusbar_icon_lock(struct screen * display)
 {
     display->mono_bitmap(bitmap_icons_5x8[Icon_Lock_Main],
                          STATUSBAR_LOCKM_X_POS, STATUSBAR_Y_POS,
-                         STATUSBAR_LOCKM_WIDTH, STATUSBAR_HEIGHT);
+                         STATUSBAR_LOCKM_WIDTH, SB_ICON_HEIGHT);
 }
 
 #ifdef HAS_REMOTE_BUTTON_HOLD
@@ -546,7 +546,7 @@ static void gui_statusbar_icon_lock_remote(struct screen * display)
 {
     display->mono_bitmap(bitmap_icons_5x8[Icon_Lock_Remote],
                          STATUSBAR_LOCKR_X_POS, STATUSBAR_Y_POS,
-                         STATUSBAR_LOCKR_WIDTH, STATUSBAR_HEIGHT);
+                         STATUSBAR_LOCKR_WIDTH, SB_ICON_HEIGHT);
 }
 #endif
 
@@ -559,7 +559,7 @@ static void gui_statusbar_led(struct screen * display)
     display->mono_bitmap(bitmap_icon_disk,
                          STATUSBAR_DISK_X_POS(display->getwidth()),
                          STATUSBAR_Y_POS, STATUSBAR_DISK_WIDTH,
-                         STATUSBAR_HEIGHT);
+                         SB_ICON_HEIGHT);
 }
 #endif
 
@@ -609,7 +609,7 @@ static int write_bitmap_number(struct screen * display, int value,
 
     for (ptr = buf; *ptr != '\0'; ptr++, x += BM_GLYPH_WIDTH)
         display->mono_bitmap(bitmap_glyphs_4x8[*ptr - '0'], x, y,
-                             BM_GLYPH_WIDTH, STATUSBAR_HEIGHT);
+                             BM_GLYPH_WIDTH, SB_ICON_HEIGHT);
     return x;
 }
 
@@ -649,7 +649,7 @@ static void gui_statusbar_write_format_info(struct screen * display)
 
     /* Show bitmap - clipping right edge if needed */
     display->mono_bitmap_part(bm, 0, 0, STATUSBAR_ENCODER_WIDTH,
-        xpos, STATUSBAR_Y_POS, width, STATUSBAR_HEIGHT);
+        xpos, STATUSBAR_Y_POS, width, SB_ICON_HEIGHT);
 
     if (rec_format == REC_FORMAT_MPA_L3)
     {
@@ -688,7 +688,7 @@ static void gui_statusbar_write_samplerate_info(struct screen * display)
     /* write the 'k' */
     display->mono_bitmap(bitmap_glyphs_4x8[Glyph_4x8_k], xpos,
                          STATUSBAR_Y_POS, BM_GLYPH_WIDTH,
-                         STATUSBAR_HEIGHT);
+                         SB_ICON_HEIGHT);
 }
 
 static void gui_statusbar_icon_recording_info(struct screen * display)
@@ -704,13 +704,13 @@ static void gui_statusbar_icon_recording_info(struct screen * display)
     {
         display->mono_bitmap(bitmap_icons_5x8[Icon_Mono],
                              STATUSBAR_RECCHANNELS_X_POS , STATUSBAR_Y_POS,
-                             STATUSBAR_RECCHANNELS_WIDTH, STATUSBAR_HEIGHT);
+                             STATUSBAR_RECCHANNELS_WIDTH, SB_ICON_HEIGHT);
     }
     else
     {
         display->mono_bitmap(bitmap_icons_5x8[Icon_Stereo],
                              STATUSBAR_RECCHANNELS_X_POS, STATUSBAR_Y_POS,
-                             STATUSBAR_RECCHANNELS_WIDTH, STATUSBAR_HEIGHT);
+                             STATUSBAR_RECCHANNELS_WIDTH, SB_ICON_HEIGHT);
     }
 }
 #endif /* HAVE_RECORDING */

@@ -1311,7 +1311,7 @@ void peak_meter_draw_trig(int xpos[], int ypos[],
                                HORIZONTAL);
 
         screens[i].mono_bitmap(bitmap_icons_7x8[icon], ixpos[i], ypos[i],
-                        ICON_PLAY_STATE_WIDTH, STATUSBAR_HEIGHT);
+                        ICON_PLAY_STATE_WIDTH, SB_ICON_HEIGHT);
     }
 }
 #endif
