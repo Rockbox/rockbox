@@ -494,7 +494,7 @@ void lcd_update(void)
 
     lcd_begin_write_gram();
 
-    lcd_write_data((unsigned short *)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+    lcd_write_data((unsigned short *)FBADDR(0,0), LCD_WIDTH*LCD_HEIGHT);
 } /* lcd_update */
 
 /* Update a fraction of the display. */
