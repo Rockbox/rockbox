@@ -4057,7 +4057,7 @@ fi
     t_cpu="hosted"
     t_manufacturer="xduoo"
     t_model="xduoo_x3ii"
-    sysfont="16-Terminus"
+    sysfontbl="16-Terminus"
     ;;
 
     243|xduoox20)
@@ -4080,7 +4080,7 @@ fi
     t_cpu="hosted"
     t_manufacturer="xduoo"
     t_model="xduoo_x20"
-    sysfont="16-Terminus"
+    sysfontbl="16-Terminus"
     ;;
 
     244|fiiom3k)
@@ -4103,7 +4103,7 @@ fi
     t_manufacturer="fiio"
     t_model="m3k"
     mipsellinuxcc
-    sysfont="16-Terminus"
+    sysfontbl="16-Terminus"
     ;;
 
     245|aigoerosq|erosq)
@@ -4126,7 +4126,7 @@ fi
     t_cpu="hosted"
     t_manufacturer="aigo"
     t_model="erosq"
-    sysfont="16-Terminus"
+    sysfontbl="16-Terminus"
     ;;
 
    250|ihifi770c)
@@ -4307,6 +4307,7 @@ fi
       fi
       extradefines="$extradefines -DBOOTLOADER -ffunction-sections -fdata-sections"
       bootloader="1"
+      if [ -n "${sysfontbl}" ] ; then sysfont=$sysfontbl ; fi
       echo "Bootloader build selected"
       ;;
     [Ss])
