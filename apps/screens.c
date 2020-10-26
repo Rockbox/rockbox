@@ -367,7 +367,7 @@ static const int id3_headers[]=
 {
     LANG_ID3_TITLE,
     LANG_ID3_ARTIST,
-    LANG_ID3_COMPOSER,    
+    LANG_ID3_COMPOSER,
     LANG_ID3_ALBUM,
     LANG_ID3_ALBUMARTIST,
     LANG_ID3_GROUPING,
@@ -766,7 +766,7 @@ int view_runtime(void)
     while(1)
     {
         global_status.runtime += ((current_tick - lasttime) / HZ);
-        
+
         lasttime = current_tick;
         if (say_runtime)
         {
@@ -841,13 +841,13 @@ int calibrate(void)
     enum touchscreen_mode old_mode = touchscreen_get_mode();
     struct touchscreen_calibration cal;
     int i, ret = 0;
-    
+
     /* hide the statusbar */
     viewportmanager_theme_enable(SCREEN_MAIN, false, NULL);
 
     touchscreen_disable_mapping(); /* set raw mode */
     touchscreen_set_mode(TOUCHSCREEN_POINT);
-    
+
     for(i=0; i<3; i++)
     {
         screen->clear_display();

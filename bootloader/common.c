@@ -145,7 +145,7 @@ int load_raw_firmware(unsigned char* buf, char* firmware, int buffer_size)
     }
 
     len = filesize(fd);
-    
+
     if (len > buffer_size)
         return EFILE_TOO_BIG;
 
@@ -180,11 +180,11 @@ void display_logf(void) /* Doesn't return! */
     int touch, prev_y=0;
 #endif
     char buffer[COLUMNS+1];
-    
+
     while(1)
     {
         index = logfindex + user_index;
-        
+
         lcd_clear_display();
         for(i = LINES-1; i>=0; i--)
         {
@@ -195,19 +195,19 @@ void display_logf(void) /* Doesn't return! */
                 else
                     break; /* done */
             }
-            
+
             memcpy(buffer, logfbuffer[index], COLUMNS);
-            
+
             if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_CONTINUE_LINE)
                 buffer[MAX_LOGF_ENTRY-1] = '>';
             else if (logfbuffer[index][MAX_LOGF_ENTRY] == LOGF_TERMINATE_MULTI_LINE)
                 buffer[MAX_LOGF_ENTRY-1] = '\0';
-            
+
             buffer[COLUMNS] = '\0';
-            
+
             lcd_puts(0, i, buffer);
         }
-        
+
         button = button_get(false);
         if(button == SYS_USB_CONNECTED)
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
@@ -223,16 +223,16 @@ void display_logf(void) /* Doesn't return! */
         else if(button & BUTTON_TOUCHSCREEN)
         {
             touch = button_get_data();
-            
+
             if(button & BUTTON_REL)
                 prev_y = 0;
-            
+
             if(prev_y != 0)
                 user_index += (prev_y - (touch & 0xFFFF)) / SYSFONT_HEIGHT;
             prev_y = touch & 0xFFFF;
         }
 #endif
-        
+
         lcd_update();
         sleep(HZ/16);
     }

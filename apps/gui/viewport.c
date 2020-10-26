@@ -207,7 +207,7 @@ void viewportmanager_theme_undo(enum screen_type screen, bool force_redraw)
     int top = --theme_stack_top[screen];
     if (top < 0)
         panicf("Stack underflow... viewportmanager");
-    
+
     toggle_theme(screen, force_redraw);
 }
 

@@ -1400,7 +1400,7 @@ RB_WRAP(lcd_setfont)
 static void checkint_arr(lua_State *L, int *val, int narg, int elems)
 {
     /* fills passed array of integers with lua integers from stack */
-    for (int i = 0; i < elems; i++) 
+    for (int i = 0; i < elems; i++)
         val[i] = luaL_checkint(L, narg + i);
 }
 
@@ -1538,7 +1538,7 @@ RB_WRAP(lcd_bitmap_transparent_part)
     int v[eCNT];
     checkint_arr(L, v, 2, eCNT);
 
-    RB_SCREENS(L, 9, transparent_bitmap_part, src->data, 
+    RB_SCREENS(L, 9, transparent_bitmap_part, src->data,
               v[src_x], v[src_y], v[stride], v[x], v[y], v[w], v[h]);
     return 0;
 }

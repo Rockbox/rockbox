@@ -60,17 +60,17 @@ struct skin_draw_info {
     int line_number;
     unsigned long refresh_type;
     struct line_desc line_desc;
-    
+
     char* cur_align_start;
     struct align_pos align;
     bool no_line_break;
     bool line_scrolls;
     bool force_redraw;
     bool viewport_change;
-    
+
     char *buf;
     size_t buf_size;
-    
+
     int offset; /* used by the playlist viewer */
 };
 
@@ -102,7 +102,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
 
     switch (token->type)
-    {   
+    {
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1))
         case SKIN_TOKEN_VIEWPORT_FGCOLOUR:
         {
@@ -161,7 +161,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             while (viewport)
             {
                 struct skin_viewport *skinvp = SKINOFFSETTOPTR(skin_buffer, viewport->data);
-                
+
                 char *vplabel = SKINOFFSETTOPTR(skin_buffer, skinvp->label);
                 if (skinvp->label == VP_DEFAULT_LABEL)
                     vplabel = VP_DEFAULT_LABEL_STRING;
@@ -171,7 +171,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                     if (skinvp->hidden_flags&VP_DRAW_HIDDEN)
                     {
                         temp |= VP_DRAW_WASHIDDEN;
-                    }    
+                    }
                     skinvp->hidden_flags = temp;
                 }
                 viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next);
@@ -351,7 +351,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
     struct wps_data *data = gwps->data;
     struct viewport *last_vp;
 
-    /* Tags here are ones which need to be "turned off" or cleared 
+    /* Tags here are ones which need to be "turned off" or cleared
      * if they are in a conditional branch which isnt being used */
     if (branch->type == LINE_ALTERNATOR)
     {
@@ -387,7 +387,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
             {
                 struct image_display *id = SKINOFFSETTOPTR(skin_buffer, token->value.data);
-                struct gui_img *img = skin_find_item(SKINOFFSETTOPTR(skin_buffer, id->label), 
+                struct gui_img *img = skin_find_item(SKINOFFSETTOPTR(skin_buffer, id->label),
                                                      SKIN_FIND_IMAGE, data);
                 clear_image_pos(gwps, img);
             }
@@ -455,7 +455,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
         }
     }
 }
-    
+
 static void fix_line_alignment(struct skin_draw_info *info, struct skin_element *element)
 {
     struct align_pos *align = &info->align;
@@ -497,16 +497,16 @@ static void fix_line_alignment(struct skin_draw_info *info, struct skin_element 
             break;
     }
 }
-    
+
 /* Draw a LINE element onto the display */
 static bool skin_render_line(struct skin_element* line, struct skin_draw_info *info)
 {
     bool needs_update = false;
     int last_value, value;
-    
+
     if (line->children_count == 0)
         return false; /* empty line, do nothing */
-        
+
     struct skin_element *child = get_child(line->children, 0);
     struct conditional *conditional;
     skin_render_func func = skin_render_line;
@@ -518,14 +518,14 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
             case CONDITIONAL:
                 conditional = SKINOFFSETTOPTR(skin_buffer, child->data);
                 last_value = conditional->last_value;
-                value = evaluate_conditional(info->gwps, info->offset, 
+                value = evaluate_conditional(info->gwps, info->offset,
                                              conditional, child->children_count);
                 conditional->last_value = value;
                 if (child->children_count == 1)
                 {
-                    /* special handling so 
+                    /* special handling so
                      * %?aa<true> and %?<true|false> need special handlng here */
-                    
+
                     if (value == -1) /* tag is false */
                     {
                         /* we are in a false branch of a %?aa<true> conditional */
@@ -545,18 +545,18 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 }
                 else if (get_child(child->children, value)->type == LINE)
                     func = skin_render_line;
-                
+
                 if (value != last_value)
                 {
                     info->refresh_type = SKIN_REFRESH_ALL;
                     info->force_redraw = true;
                 }
-                    
+
                 if (func(get_child(child->children, value), info))
                     needs_update = true;
                 else
                     needs_update = needs_update || (last_value != value);
-                    
+
                 info->refresh_type = old_refresh_mode;
                 break;
             case TAG:
@@ -564,9 +564,9 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                     info->no_line_break = true;
                 if (child->tag->type == SKIN_TOKEN_SUBLINE_SCROLL)
                     info->line_scrolls = true;
-                
+
                 fix_line_alignment(info, child);
-                
+
                 if (!SKINOFFSETTOPTR(skin_buffer, child->data))
                 {
                     break;
@@ -583,17 +583,17 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                         if (child->tag->flags&SKIN_RTC_REFRESH)
                             needs_update = needs_update || info->refresh_type&SKIN_REFRESH_DYNAMIC;
 #endif
-                        needs_update = needs_update || 
+                        needs_update = needs_update ||
                                 ((child->tag->flags&info->refresh_type)!=0);
-                        strlcat(info->cur_align_start, valuestr, 
+                        strlcat(info->cur_align_start, valuestr,
                                 info->buf_size - (info->cur_align_start-info->buf));
                     }
                 }
                 break;
             case TEXT:
-                strlcat(info->cur_align_start, SKINOFFSETTOPTR(skin_buffer, child->data), 
+                strlcat(info->cur_align_start, SKINOFFSETTOPTR(skin_buffer, child->data),
                         info->buf_size - (info->cur_align_start-info->buf));
-                needs_update = needs_update || 
+                needs_update = needs_update ||
                                 (info->refresh_type&SKIN_REFRESH_STATIC) != 0;
                 break;
             case COMMENT:
@@ -664,7 +664,7 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
         int try_line = start;
         bool suitable = false;
         int rettimeout = DEFAULT_SUBLINE_TIME_MULTIPLIER*TIMEOUT_UNIT;
-        
+
         /* find a subline which has at least one token in it,
          * and that line doesnt have a timeout set to 0 through conditionals */
         do {
@@ -674,7 +674,7 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
             if (get_child(element->children, try_line)->children_count != 0)
             {
                 current_line = get_child(element->children, try_line);
-                rettimeout = get_subline_timeout(info->gwps, 
+                rettimeout = get_subline_timeout(info->gwps,
                                     get_child(current_line->children, 0));
                 if (rettimeout > 0)
                 {
@@ -683,7 +683,7 @@ bool skin_render_alternator(struct skin_element* element, struct skin_draw_info 
             }
         }
         while (try_line != start && !suitable);
-        
+
         if (suitable)
         {
             alternator->current_line = try_line;
@@ -749,14 +749,14 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
             if (++info.line_desc.line > info.line_desc.nlines)
                 info.line_desc.style = STYLE_DEFAULT;
         }
-#endif    
+#endif
 #endif
         info.cur_align_start = info.buf;
         align->left = info.buf;
         align->center = NULL;
         align->right = NULL;
-        
-        
+
+
         if (line->type == LINE_ALTERNATOR)
             func = skin_render_alternator;
         else if (line->type == LINE)
@@ -798,11 +798,11 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     const int vp_is_appearing = (VP_DRAW_WASHIDDEN|VP_DRAW_HIDEABLE);
     struct wps_data *data = gwps->data;
     struct screen *display = gwps->display;
-    
+
     struct skin_element* viewport;
     struct skin_viewport* skin_viewport;
     char *label;
-    
+
     int old_refresh_mode = refresh_mode;
     skin_buffer = get_skin_buffer(gwps->data);
 
@@ -828,7 +828,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
     if (label && SKINOFFSETTOPTR(skin_buffer, viewport->next) &&
         !strcmp(label,VP_DEFAULT_LABEL_STRING))
         refresh_mode = 0;
-    
+
     for (viewport = SKINOFFSETTOPTR(skin_buffer, data->tree);
          viewport;
          viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next))
@@ -848,7 +848,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             skin_backdrop_show(data->backdrop_id);
         }
 #endif
-        
+
         /* dont redraw the viewport if its disabled */
         if (skin_viewport->hidden_flags&VP_NEVER_VISIBLE)
         {   /* don't draw anything into this one */
@@ -864,7 +864,7 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             vp_refresh_mode = SKIN_REFRESH_ALL;
             skin_viewport->hidden_flags = VP_DRAW_HIDEABLE;
         }
-        
+
         display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
 
         if ((vp_refresh_mode&SKIN_REFRESH_ALL) == SKIN_REFRESH_ALL)
@@ -929,17 +929,17 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
     else
 #endif
     {
-        struct cuesheet *cue = skin_get_global_state()->id3 ? 
+        struct cuesheet *cue = skin_get_global_state()->id3 ?
                                skin_get_global_state()->id3->cuesheet : NULL;
         cur_pos = playlist_get_display_index();
         max = playlist_amount()+1;
         if (cue)
             max += cue->track_count;
-        start_item = MAX(0, cur_pos + viewer->start_offset); 
+        start_item = MAX(0, cur_pos + viewer->start_offset);
     }
     if (max-start_item > nb_lines)
         max = start_item + nb_lines;
-    
+
     line = SKINOFFSETTOPTR(skin_buffer, viewer->line);
     while (start_item < max)
     {
@@ -947,20 +947,20 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         info.no_line_break = false;
         info.line_scrolls = false;
         info.force_redraw = false;
-    
+
         info.cur_align_start = info.buf;
         align->left = info.buf;
         align->center = NULL;
         align->right = NULL;
-        
-        
+
+
         if (line->type == LINE_ALTERNATOR)
             func = skin_render_alternator;
         else if (line->type == LINE)
             func = skin_render_line;
-        
+
         needs_update = func(line, &info);
-        
+
         /* only update if the line needs to be, and there is something to write */
         if (refresh_type && needs_update)
         {

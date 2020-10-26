@@ -64,13 +64,13 @@ enum
 };
 
 
-/* This is a table of semitone percentage values of the appropriate 
+/* This is a table of semitone percentage values of the appropriate
    precision (based on PITCH_SPEED_PRECISION).  Note that these are
    all constant expressions, which will be evaluated at compile time,
-   so no need to worry about how complex the expressions look.  
+   so no need to worry about how complex the expressions look.
    That's just to get the precision right.
 
-   I calculated these values, starting from 50, as 
+   I calculated these values, starting from 50, as
 
    x(n) = 50 * 2^(n/12)
 
@@ -81,7 +81,7 @@ enum
 */
 #define TO_INT_WITH_PRECISION(x) \
     ( (unsigned short)(((x) * PITCH_SPEED_PRECISION * 10 + 5) / 10) )
-    
+
 static const unsigned short semitone_table[] =
 {
     TO_INT_WITH_PRECISION(50.00000000), /* Octave lower */
@@ -115,12 +115,12 @@ static const unsigned short semitone_table[] =
 #define SEMITONE_END    (NUM_SEMITONES/2)
 #define SEMITONE_START  (-SEMITONE_END)
 
-/* A table of values for approximating the cent curve with 
+/* A table of values for approximating the cent curve with
    linear interpolation.  Multipy the next lowest semitone
-   by this much to find the corresponding cent percentage. 
-   
-   These values were calculated as 
-   x(n) = 100 * 2^(n * 20/1200) 
+   by this much to find the corresponding cent percentage.
+
+   These values were calculated as
+   x(n) = 100 * 2^(n * 20/1200)
 */
 
 static const unsigned short cent_interp[] =
@@ -308,16 +308,16 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
             {
                 snprintf(buf, sizeof(buf), "%s: %s%d.%02d", str(LANG_PITCH),
                          semitone >= 0 ? "+" : "-",
-                         abs(semitone / PITCH_SPEED_PRECISION), 
-                         abs((semitone % PITCH_SPEED_PRECISION) / 
+                         abs(semitone / PITCH_SPEED_PRECISION),
+                         abs((semitone % PITCH_SPEED_PRECISION) /
                                          (PITCH_SPEED_PRECISION / 100))
                         );
             }
             else
             {
                 snprintf(buf, sizeof(buf), "%s: %ld.%ld%%", str(LANG_PITCH),
-                         pitch / PITCH_SPEED_PRECISION, 
-                         (pitch % PITCH_SPEED_PRECISION) / 
+                         pitch / PITCH_SPEED_PRECISION,
+                         (pitch % PITCH_SPEED_PRECISION) /
                          (PITCH_SPEED_PRECISION / 10));
             }
         }
@@ -337,8 +337,8 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     /* "Speed:XXX%" */
     if(global_settings.pitch_mode_timestretch)
     {
-        snprintf(buf, sizeof(buf), "%s: %ld.%ld%%", str(LANG_SPEED), 
-                 speed / PITCH_SPEED_PRECISION, 
+        snprintf(buf, sizeof(buf), "%s: %ld.%ld%%", str(LANG_SPEED),
+                 speed / PITCH_SPEED_PRECISION,
                  (speed % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
     }
     else
@@ -347,23 +347,23 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
         {
             snprintf(buf, sizeof(buf), "%s%d.%02d",
                      semitone >= 0 ? "+" : "-",
-                     abs(semitone / PITCH_SPEED_PRECISION), 
-                     abs((semitone % PITCH_SPEED_PRECISION) / 
+                     abs(semitone / PITCH_SPEED_PRECISION),
+                     abs((semitone % PITCH_SPEED_PRECISION) /
                                      (PITCH_SPEED_PRECISION / 100))
                     );
         }
         else
         {
             snprintf(buf, sizeof(buf), "%ld.%ld%%",
-                     pitch / PITCH_SPEED_PRECISION, 
+                     pitch / PITCH_SPEED_PRECISION,
                      (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
         }
     }
 
     display->getstringsize(buf, &w, &h);
     display->putsxy((pitch_viewports[PITCH_MID].width / 2) - (w / 2),
-        show_lang_pitch ? (pitch_viewports[PITCH_MID].height / 2) : 
-                          (pitch_viewports[PITCH_MID].height / 2) - (h / 2), 
+        show_lang_pitch ? (pitch_viewports[PITCH_MID].height / 2) :
+                          (pitch_viewports[PITCH_MID].height / 2) - (h / 2),
         buf);
     if (w > width_used)
         width_used = w;
@@ -401,8 +401,8 @@ static void pitchscreen_draw(struct screen *display, int max_lines,
     {
         display->putsxy(0, (pitch_viewports[PITCH_MID].height / 2) - (h / 2),
                         leftlabel);
-        display->putsxy((pitch_viewports[PITCH_MID].width - w), 
-                        (pitch_viewports[PITCH_MID].height / 2) - (h / 2), 
+        display->putsxy((pitch_viewports[PITCH_MID].width - w),
+                        (pitch_viewports[PITCH_MID].height / 2) - (h / 2),
                         rightlabel);
     }
     display->update_viewport();
@@ -421,7 +421,7 @@ static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cut
     if (pitch_delta < 0)
     {
         /* for large jumps, snap up to whole numbers */
-        if(allow_cutoff && pitch_delta <= -PITCH_SPEED_PRECISION && 
+        if(allow_cutoff && pitch_delta <= -PITCH_SPEED_PRECISION &&
            (pitch + pitch_delta) % PITCH_SPEED_PRECISION != 0)
         {
             pitch_delta += PITCH_SPEED_PRECISION - ((pitch + pitch_delta) % PITCH_SPEED_PRECISION);
@@ -442,7 +442,7 @@ static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cut
     else if (pitch_delta > 0)
     {
         /* for large jumps, snap down to whole numbers */
-        if(allow_cutoff && pitch_delta >= PITCH_SPEED_PRECISION && 
+        if(allow_cutoff && pitch_delta >= PITCH_SPEED_PRECISION &&
            (pitch + pitch_delta) % PITCH_SPEED_PRECISION != 0)
         {
             pitch_delta -= (pitch + pitch_delta) % PITCH_SPEED_PRECISION;
@@ -480,7 +480,7 @@ static int32_t pitch_increase(int32_t pitch, int32_t pitch_delta, bool allow_cut
             new_pitch = GET_PITCH(speed, STRETCH_MAX);
         }
 
-        if(new_stretch >= STRETCH_MAX || 
+        if(new_stretch >= STRETCH_MAX ||
            new_stretch <= STRETCH_MIN)
         {
             at_limit = true;
@@ -505,7 +505,7 @@ static int32_t get_semitone_from_pitch(int32_t pitch)
 
 
     /* now find the fractional part */
-    while(pitch > (cent_interp[fractional_index + 1] * 
+    while(pitch > (cent_interp[fractional_index + 1] *
                    semitone_table[semitone] / PITCH_SPEED_100))
     {
         /* Check to make sure fractional_index isn't too big */
@@ -517,17 +517,17 @@ static int32_t get_semitone_from_pitch(int32_t pitch)
         fractional_index++;
     }
 
-    int32_t semitone_pitch_a = cent_interp[fractional_index] * 
+    int32_t semitone_pitch_a = cent_interp[fractional_index] *
                                semitone_table[semitone] /
                                PITCH_SPEED_100;
-    int32_t semitone_pitch_b = cent_interp[fractional_index + 1] * 
+    int32_t semitone_pitch_b = cent_interp[fractional_index + 1] *
                                semitone_table[semitone] /
                                PITCH_SPEED_100;
     /* this will be the integer offset from the cent_interp entry */
     int32_t semitone_frac_ofs = (pitch - semitone_pitch_a) * CENT_INTERP_INTERVAL /
                             (semitone_pitch_b - semitone_pitch_a);
-    semitone = (semitone + SEMITONE_START) * PITCH_SPEED_PRECISION + 
-                     fractional_index * CENT_INTERP_INTERVAL + 
+    semitone = (semitone + SEMITONE_START) * PITCH_SPEED_PRECISION +
+                     fractional_index * CENT_INTERP_INTERVAL +
                      semitone_frac_ofs;
 
     return semitone;
@@ -543,14 +543,14 @@ static int32_t get_pitch_from_semitone(int32_t semitone)
     /* set pitch to the semitone's integer part value */
     int32_t pitch = semitone_table[semitone_index];
     /* get the range of the cent modification for future calculation */
-    int32_t pitch_mod_a = 
-        cent_interp[(adjusted_semitone % PITCH_SPEED_PRECISION) / 
+    int32_t pitch_mod_a =
+        cent_interp[(adjusted_semitone % PITCH_SPEED_PRECISION) /
                     CENT_INTERP_INTERVAL];
-    int32_t pitch_mod_b = 
-        cent_interp[(adjusted_semitone % PITCH_SPEED_PRECISION) / 
+    int32_t pitch_mod_b =
+        cent_interp[(adjusted_semitone % PITCH_SPEED_PRECISION) /
                     CENT_INTERP_INTERVAL + 1];
     /* figure out the cent mod amount based on the semitone fractional value */
-    int32_t pitch_mod = pitch_mod_a + (pitch_mod_b - pitch_mod_a) * 
+    int32_t pitch_mod = pitch_mod_a + (pitch_mod_b - pitch_mod_a) *
                    (adjusted_semitone % CENT_INTERP_INTERVAL) / CENT_INTERP_INTERVAL;
 
     /* modify pitch based on the mod amount we just calculated */
@@ -558,7 +558,7 @@ static int32_t get_pitch_from_semitone(int32_t semitone)
 }
 
 static int32_t pitch_increase_semitone(int32_t pitch,
-                                       int32_t current_semitone, 
+                                       int32_t current_semitone,
                                        int32_t semitone_delta
                                        , int32_t speed
                                       )
@@ -618,7 +618,7 @@ static int32_t pitch_increase_semitone(int32_t pitch,
 #ifdef HAVE_TOUCHSCREEN
 /*
  * Check for touchscreen presses as per sketch above in this file
- * 
+ *
  * goes through each row of the, checks whether the touchscreen
  * was pressed in it. Then it looks the columns of each row for specific actions
  */
@@ -638,7 +638,7 @@ static int pitchscreen_do_touchscreen(struct viewport vps[])
         if ((x < column || x > (2*column)) && (ret == BUTTON_REL))
             return ACTION_PS_TOGGLE_MODE;
 
-        
+
         else if (x >= column && x <= (2*column))
         {   /* center column pressed */
             if (ret == BUTTON_REPEAT)
@@ -828,7 +828,7 @@ int gui_syncpitchscreen_run(void)
         updated = 0;
 
         button = get_action(CONTEXT_PITCHSCREEN, HZ);
-        
+
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
         {
@@ -841,7 +841,7 @@ int gui_syncpitchscreen_run(void)
             case ACTION_PS_INC_SMALL:
                 if(global_settings.pitch_mode_semitone)
                     pitch_delta = SEMITONE_SMALL_DELTA;
-                else 
+                else
                     pitch_delta = PITCH_SMALL_DELTA;
                 updated = 1;
                 break;
@@ -849,7 +849,7 @@ int gui_syncpitchscreen_run(void)
             case ACTION_PS_INC_BIG:
                 if(global_settings.pitch_mode_semitone)
                     pitch_delta = SEMITONE_BIG_DELTA;
-                else 
+                else
                     pitch_delta = PITCH_BIG_DELTA;
                 updated = 1;
                 break;
@@ -857,7 +857,7 @@ int gui_syncpitchscreen_run(void)
             case ACTION_PS_DEC_SMALL:
                 if(global_settings.pitch_mode_semitone)
                     pitch_delta = -SEMITONE_SMALL_DELTA;
-                else 
+                else
                     pitch_delta = -PITCH_SMALL_DELTA;
                 updated = 1;
                 break;
@@ -865,7 +865,7 @@ int gui_syncpitchscreen_run(void)
             case ACTION_PS_DEC_BIG:
                 if(global_settings.pitch_mode_semitone)
                     pitch_delta = -SEMITONE_BIG_DELTA;
-                else 
+                else
                     pitch_delta = -PITCH_BIG_DELTA;
                 updated = 1;
                 break;
@@ -1045,7 +1045,7 @@ int gui_syncpitchscreen_run(void)
             }
 
             new_stretch = GET_STRETCH(pitch, new_speed);
-            if(new_stretch >= STRETCH_MAX || 
+            if(new_stretch >= STRETCH_MAX ||
                new_stretch <= STRETCH_MIN)
             {
                 at_limit = true;

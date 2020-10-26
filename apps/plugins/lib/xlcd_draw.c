@@ -356,10 +356,10 @@ void xlcd_gray_bitmap_part(const unsigned char *src, int src_x, int src_y,
     fb_data *dst;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {
@@ -426,10 +426,10 @@ void xlcd_color_bitmap_part(const unsigned char *src, int src_x, int src_y,
     fb_data *dst;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT) 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
         || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clipping */
     if (x < 0)
     {

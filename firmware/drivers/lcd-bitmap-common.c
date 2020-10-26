@@ -613,7 +613,7 @@ void LCDFN(nine_segment_bmp)(const struct bitmap* bm, int x, int y,
         LCDFN(bmp_part)(bm, src_x, src_y_top, dst_x, dst_y_top, w, seg_h);
         LCDFN(bmp_part)(bm, src_x, src_y_btm, dst_x, dst_y_btm, w, seg_h);
     }
-        
+
     /* left & right in a single loop */
     src_y = corner_h;
     dst_y = corner_h;

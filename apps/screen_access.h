@@ -130,7 +130,7 @@ struct screen
     bool (*backdrop_load)(const char *filename, char* backdrop_buffer);
     void (*backdrop_show)(char* backdrop_buffer);
 #endif
-#if defined(HAVE_LCD_COLOR)    
+#if defined(HAVE_LCD_COLOR)
     void (*gradient_fillrect)(int x, int y, int width, int height,
             unsigned start, unsigned end);
     void (*gradient_fillrect_part)(int x, int y, int width, int height,

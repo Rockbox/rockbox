@@ -74,7 +74,7 @@ void xlcd_scroll_right(int count)
 
     length = (LCD_WIDTH-count)*LCD_FBHEIGHT;
 
-    rb->memmove(lcd_fb + LCD_HEIGHT*count, 
+    rb->memmove(lcd_fb + LCD_HEIGHT*count,
                 lcd_fb, length * sizeof(fb_data));
 
     oldmode = rb->lcd_get_drawmode();
@@ -92,7 +92,7 @@ void xlcd_scroll_up(int count)
 
 
     int width, length, oldmode;
-    
+
     fb_data *data;
 
     if ((unsigned)count >= LCD_HEIGHT)
@@ -102,10 +102,10 @@ void xlcd_scroll_up(int count)
     }
 
     length = LCD_HEIGHT - count;
-    
+
     width = LCD_WIDTH-1;
     data = lcd_fb;
-    
+
     do {
         rb->memmove(data,data + count,length * sizeof(fb_data));
         data += LCD_HEIGHT;
@@ -126,7 +126,7 @@ void xlcd_scroll_down(int count)
 
 
     int width, length, oldmode;
-    
+
     fb_data *data;
 
     if ((unsigned)count >= LCD_HEIGHT)
@@ -139,7 +139,7 @@ void xlcd_scroll_down(int count)
 
     width = LCD_WIDTH-1;
     data = lcd_fb;
-    
+
     do {
         rb->memmove(data + count, data, length * sizeof(fb_data));
         data += LCD_HEIGHT;
@@ -408,7 +408,7 @@ void xlcd_scroll_down(int count)
     rb->lcd_set_drawmode(oldmode);
 }
 
-#else /* LCD_PIXELFORMAT == VERTICAL_PACKING, 
+#else /* LCD_PIXELFORMAT == VERTICAL_PACKING,
          LCD_PIXELFORMAT == VERTICAL_INTERLEAVED */
 
 /* Scroll up */
@@ -426,7 +426,7 @@ void xlcd_scroll_up(int count)
         rb->lcd_clear_display();
         return;
     }
-        
+
 #if (LCD_DEPTH == 1) \
  || (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     blockcount = count >> 3;
@@ -554,7 +554,7 @@ void xlcd_scroll_down(int count)
         rb->lcd_clear_display();
         return;
     }
-        
+
 #if (LCD_DEPTH == 1) \
  || (LCD_DEPTH == 2) && (LCD_PIXELFORMAT == VERTICAL_INTERLEAVED)
     blockcount = count >> 3;
@@ -638,7 +638,7 @@ void xlcd_scroll_down(int count)
         int x, by;
         fb_data *addr = lcd_fb + blockcount * LCD_FBWIDTH;
         unsigned fill, mask;
-        
+
         fill = patterns[rb->lcd_get_background() & 3] >> (8 - bitcount);
         mask = (0xFFu >> bitcount) << bitcount;
         mask |= mask << 8;

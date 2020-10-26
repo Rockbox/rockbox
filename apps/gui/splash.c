@@ -120,7 +120,7 @@ static void splash_internal(struct screen * screen, const char *fmt, va_list ap)
     vp.y += (vp.height - height) / 2;
     vp.width = width;
     vp.height = height;
-    
+
     vp.flags |=  VP_FLAG_ALIGN_CENTER;
 #if LCD_DEPTH > 1
     if (screen->depth > 1)

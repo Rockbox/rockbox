@@ -80,14 +80,14 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
                  unsigned int update_type)
 {
     struct gui_wps *gwps = skin_get_gwps(skin, screen);
-    /* This maybe shouldnt be here, 
+    /* This maybe shouldnt be here,
      * This is also safe for skined screen which dont use the id3 */
     struct mp3entry *id3 = skin_get_global_state()->id3;
     bool cuesheet_update = (id3 != NULL ? cuesheet_subtrack_changed(id3) : false);
     if (cuesheet_update)
         skin_request_full_update(skin);
- 
-    skin_render(gwps, skin_do_full_update(skin, screen) ? 
+
+    skin_render(gwps, skin_do_full_update(skin, screen) ?
                         SKIN_REFRESH_ALL : update_type);
 }
 
@@ -96,7 +96,7 @@ void skin_update(enum skinnable_screens skin, enum screen_type screen,
 #define DIRECTION_RIGHT 1
 #define DIRECTION_LEFT -1
 
-static int ab_calc_mark_x_pos(int mark, int capacity, 
+static int ab_calc_mark_x_pos(int mark, int capacity,
         int offset, int size)
 {
     return offset + ( (size * mark) / capacity );
@@ -124,7 +124,7 @@ static void ab_draw_arrow_mark(struct screen * screen,
     }
 }
 
-void ab_draw_markers(struct screen * screen, int capacity, 
+void ab_draw_markers(struct screen * screen, int capacity,
                      int x, int y, int w, int h)
 {
     bool a_set, b_set;
@@ -245,13 +245,13 @@ void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
         length = 1;
         end = 0;
     }
-    
+
     if (!pb->horizontal)
     {
         /* we want to fill upwards which is technically inverted. */
         flags = INVERTFILL;
     }
-    
+
     if (pb->invert_fill_direction)
     {
         flags ^= INVERTFILL;
@@ -421,7 +421,7 @@ void wps_display_images(struct gui_wps *gwps, struct viewport* vp)
 /* Evaluate the conditional that is at *token_index and return whether a skip
    has ocurred. *token_index is updated with the new position.
 */
-int evaluate_conditional(struct gui_wps *gwps, int offset, 
+int evaluate_conditional(struct gui_wps *gwps, int offset,
                          struct conditional *conditional, int num_options)
 {
     if (!gwps)
@@ -641,7 +641,7 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
 }
 
 /* do the button loop as often as required for the peak meters to update
- * with a good refresh rate. 
+ * with a good refresh rate.
  */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
 {

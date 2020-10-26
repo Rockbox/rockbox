@@ -236,7 +236,7 @@ struct screen screens[NB_SCREENS] =
         .backdrop_load=&backdrop_load,
         .backdrop_show=&backdrop_show,
 #endif
-#if defined(HAVE_LCD_COLOR)    
+#if defined(HAVE_LCD_COLOR)
         .gradient_fillrect = lcd_gradient_fillrect,
         .gradient_fillrect_part = lcd_gradient_fillrect_part,
 #endif

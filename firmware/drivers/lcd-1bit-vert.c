@@ -219,7 +219,7 @@ static void ICODE_ATTR solidinvblock(FBFN(data) *address, unsigned mask,
                                      unsigned bits)
 {
     unsigned data = *(char *)address;
-    
+
     bits     = ~bits ^ data;
     *address = data ^ (bits & mask);
 }
@@ -255,7 +255,7 @@ void LCDFN(clear_viewport)(void)
         oldmode = CURRENT_VP->drawmode;
 
         /* Invert the INVERSEVID bit and set basic mode to SOLID */
-        CURRENT_VP->drawmode = (~CURRENT_VP->drawmode & DRMODE_INVERSEVID) | 
+        CURRENT_VP->drawmode = (~CURRENT_VP->drawmode & DRMODE_INVERSEVID) |
                                DRMODE_SOLID;
 
         LCDFN(fillrect)(0, 0, CURRENT_VP->width, CURRENT_VP->height);
@@ -271,7 +271,7 @@ void LCDFN(clear_viewport)(void)
 /* Set a single pixel */
 void LCDFN(drawpixel)(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)CURRENT_VP->width) 
+    if (   ((unsigned)x < (unsigned)CURRENT_VP->width)
         && ((unsigned)y < (unsigned)CURRENT_VP->height)
 #if defined(HAVE_VIEWPORT_CLIP)
         && ((unsigned)x < (unsigned)LCDM(WIDTH))
@@ -385,30 +385,30 @@ void LCDFN(hline)(int x1, int x2, int y)
         x1 = x2;
         x2 = x;
     }
-    
+
     /******************** In viewport clipping **********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned)CURRENT_VP->height) || (x1 >= CURRENT_VP->width)
         || (x2 < 0))
-        return;  
-    
+        return;
+
     if (x1 < 0)
         x1 = 0;
     if (x2 >= CURRENT_VP->width)
         x2 = CURRENT_VP->width-1;
-        
+
     /* adjust to viewport */
     x1 += CURRENT_VP->x;
     x2 += CURRENT_VP->x;
     y += CURRENT_VP->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
     if (((unsigned)y >= (unsigned) LCDM(HEIGHT)) || (x1 >= LCDM(WIDTH))
         || (x2 < 0))
-        return;  
-    
+        return;
+
     /* clipping */
     if (x1 < 0)
         x1 = 0;
@@ -449,25 +449,25 @@ void LCDFN(vline)(int x, int y1, int y2)
     /* nothing to draw? */
     if (((unsigned)x >= (unsigned)CURRENT_VP->width) || (y1 >= CURRENT_VP->height)
         || (y2 < 0))
-        return;  
-    
+        return;
+
     if (y1 < 0)
         y1 = 0;
     if (y2 >= CURRENT_VP->height)
         y2 = CURRENT_VP->height-1;
-        
+
     /* adjust for viewport */
     y1 += CURRENT_VP->y;
     y2 += CURRENT_VP->y;
     x += CURRENT_VP->x;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if (( (unsigned) x >= (unsigned)LCDM(WIDTH)) || (y1 >= LCDM(HEIGHT)) 
+    if (( (unsigned) x >= (unsigned)LCDM(WIDTH)) || (y1 >= LCDM(HEIGHT))
         || (y2 < 0))
         return;
-    
+
     /* clipping */
     if (y1 < 0)
         y1 = 0;
@@ -538,18 +538,18 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
         width = CURRENT_VP->width - x;
     if (y + height > CURRENT_VP->height)
         height = CURRENT_VP->height - y;
-        
+
     /* adjust for viewport */
     x += CURRENT_VP->x;
     y += CURRENT_VP->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT))
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -646,7 +646,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     if ((width <= 0) || (height <= 0) || (x >= CURRENT_VP->width)
         || (y >= CURRENT_VP->height) || (x + width <= 0) || (y + height <= 0))
         return;
-        
+
     /* clip image in viewport */
     if (x < 0)
     {
@@ -668,14 +668,14 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     /* adjust for viewport */
     x += CURRENT_VP->x;
     y += CURRENT_VP->y;
-    
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
-    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT)) 
+    if ((x >= LCDM(WIDTH)) || (y >= LCDM(HEIGHT))
         || (x + width <= 0) || (y + height <= 0))
         return;
-    
+
     /* clip image in viewport in screen */
     if (x < 0)
     {
@@ -706,7 +706,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     bfunc  = LCDFN(blockfuncs)[CURRENT_VP->drawmode];
     mask   = 0xFFu << (shift + src_y);
     mask_bottom = 0xFFu >> (~ny & 7);
-    
+
     if (shift == 0)
     {
         bool copyopt = (CURRENT_VP->drawmode == DRMODE_SOLID);
@@ -719,9 +719,9 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
             {
                 const unsigned char *src_row = src;
                 FBFN(data) *dst_row = dst;
-                
+
                 dst_end = dst_row + width;
-                do 
+                do
                     bfunc(dst_row++, mask, *src_row++);
                 while (dst_row < dst_end);
             }
@@ -751,7 +751,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
             FBFN(data) *dst_col = dst++;
             unsigned mask_col = mask;
             unsigned data = 0;
-            
+
             for (y = ny; y >= 8; y -= 8)
             {
                 data |= *src_col << shift;

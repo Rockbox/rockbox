@@ -586,7 +586,7 @@ void lcd_gradient_fillrect_part(int x, int y, int width, int height,
     int x1, x2;
     x1 = x;
     x2 = x + width;
-    
+
     if (height == 0) return;
 
     step_mul = (1 << 16) / src_height;
