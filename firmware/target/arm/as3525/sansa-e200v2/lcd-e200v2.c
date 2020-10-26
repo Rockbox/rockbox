@@ -448,7 +448,7 @@ void lcd_update(void)
 
     lcd_write_cmd(R_WRITE_DATA_2_GRAM);
 
-    dbop_write_data((fb_data*)lcd_framebuffer, LCD_WIDTH*LCD_HEIGHT);
+    dbop_write_data((fb_data*)FBADDR(0,0), LCD_WIDTH*LCD_HEIGHT);
 }
 
 /* Update a fraction of the display. */
@@ -460,7 +460,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         return;
 
     /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) || 
+    if ((width <= 0) || (height <= 0) || (x >= LCD_WIDTH) ||
         (y >= LCD_HEIGHT) || (x + width <= 0) || (y + height <= 0))
         return;
 

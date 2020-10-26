@@ -1,10 +1,10 @@
 /***************************************************************************
- *             __________               __   ___.                  
- *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___  
- *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /  
- *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <   
- *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \  
- *                     \/            \/     \/    \/            \/ 
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
  * $Id$
  *
  * Copyright (C) 2008 by Dave Chapman
@@ -167,9 +167,9 @@ int remote_getwidth(void) { return LCD_REMOTE_WIDTH; }
 int remote_getheight(void) { return LCD_REMOTE_HEIGHT; }
 #endif
 
-static inline bool backdrop_load(const char *filename, char* backdrop_buffer) 	 
-{ 	 
- (void)filename; (void)backdrop_buffer; return true; 	 
+static inline bool backdrop_load(const char *filename, char* backdrop_buffer) 	
+{ 	
+ (void)filename; (void)backdrop_buffer; return true; 	
 }
 
 struct screen screens[NB_SCREENS] =
@@ -253,6 +253,7 @@ struct font* font_get(int font)
 
 int main(int argc, char **argv)
 {
+    int ret = 0;
     int res;
     int filearg = 1;
 
@@ -302,7 +303,8 @@ int main(int argc, char **argv)
         if (!ext)
         {
             printf("Invalid extension\n");
-            return 2;
+            ret = 2;
+            goto done;
         }
         ext++;
         if (!strcmp(ext, "rwps") || !strcmp(ext, "rsbs") || !strcmp(ext, "rfms"))
@@ -321,7 +323,8 @@ int main(int argc, char **argv)
         else
         {
             printf("Invalid extension\n");
-            return 2;
+            ret = 2;
+            goto done;
         }
         wps_screen = &screens[screen];
 
@@ -330,12 +333,17 @@ int main(int argc, char **argv)
         if (!res) {
             printf("WPS parsing failure\n");
             skin_error_format_message();
-            return 3;
+            ret = 3;
+            goto done;
         }
 
         printf("WPS parsed OK\n\n");
         if (wps_verbose_level>2)
             skin_debug_tree(SKINOFFSETTOPTR(skin_buffer, wps.tree));
     }
-    return 0;
+
+done:
+    if (skin_buffer)
+        free(skin_buffer);
+    return ret;
 }
