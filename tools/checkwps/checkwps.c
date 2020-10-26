@@ -144,6 +144,11 @@ void* plugin_get_buffer(size_t *buffer_size)
     return pluginbuf;
 }
 
+static struct viewport* init_viewport(struct viewport* vp)
+{
+    return NULL;
+}
+
 struct user_settings global_settings = {
     .statusbar = STATUSBAR_TOP,
 #ifdef HAVE_LCD_COLOR
@@ -179,6 +184,7 @@ struct screen screens[NB_SCREENS] =
 #else
         .is_color=false,
 #endif
+        .init_viewport=init_viewport,
         .getwidth = getwidth,
         .getheight = getheight,
         .getuifont = getuifont,
@@ -196,6 +202,7 @@ struct screen screens[NB_SCREENS] =
         .depth=LCD_REMOTE_DEPTH,
         .getuifont = getuifont,
         .is_color=false,/* No color remotes yet */
+        .init_viewport=init_viewport,
         .getwidth=remote_getwidth,
         .getheight=remote_getheight,
 #if LCD_REMOTE_DEPTH > 1

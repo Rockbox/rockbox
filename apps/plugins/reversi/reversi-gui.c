@@ -207,7 +207,7 @@ struct touchbutton reversi_buttons[TOUCHBUTTON_COUNT] =
       false, REVERSI_BUTTON_QUIT, false, "Quit", NULL },
 
     { {.x=0, .y=0, .width=XOFS+BOARD_WIDTH,.height=YOFS+BOARD_HEIGHT, .flags=0, .buffer=0,
-        .font=0,  .drawmode=DRMODE_SOLID, .fg_pattern=0, .bgpattern=0xFFFF},
+        .font=0,  .drawmode=DRMODE_SOLID, .fg_pattern=0, .bg_pattern=0xFFFF},
       false, REVERSI_BUTTON_MAKE_MOVE, true, NULL, NULL }
 };
 #endif
