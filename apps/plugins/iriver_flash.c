@@ -514,7 +514,7 @@ int flash_bootloader(const char *filename)
         cfi_program_word(FB + i, p16[i]);
     
     /* Erase the bootloader flash section. */
-    for (i = BOOTLOADER_ENTRYPOINT/SEC_SIZE; i < 0x200; i++)
+    for (i = BOOTLOADER_ERASEGUARD; i < BOOTLOADER_ERASEGUARD+16; i++)
         /*rc =*/ cfi_erase_sector(FB + (SEC_SIZE/2) * i);
     
     pos = BOOTLOADER_ENTRYPOINT/2;
