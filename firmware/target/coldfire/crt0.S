@@ -151,14 +151,14 @@ start:
 
 #ifdef BOOTLOADER
     /* Check if we have a Rockbox ROM image */
-    lea     0x00100000,%a2
+    lea     FLASH_ROMIMAGE_ENTRY,%a2
     move.l  (%a2),%d0
     move.l  #FLASH_MAGIC,%d1
     cmp.l   %d0,%d1
     beq.b   .imagefound
     
     /* Check for RAM image */
-    lea     0x00001000,%a2
+    lea     FLASH_RAMIMAGE_ENTRY,%a2
     move.l  (%a2),%d0
     move.l  #FLASH_MAGIC,%d1
     cmp.l   %d0,%d1
@@ -244,7 +244,7 @@ start:
     
     /* Check if we have a Rockbox ROM image. For RAM image only cookie is
        not set at all. But we could support also RAM images loading. */
-    lea     0x00100000,%a2
+    lea     FLASH_ROMIMAGE_ENTRY,%a2
     move.l  (%a2),%d0
     move.l  #FLASH_MAGIC,%d1
     cmp.l   %d0,%d1
@@ -261,9 +261,9 @@ start:
        Clear the cookie and load the ROM image */
     lea     0x10017ffc,%a2
     clr.l   (%a2)
-    lea     0x00100028+4,%a2
+    lea     FLASH_ROMIMAGE_ENTRY+44,%a2
     move.l  (%a2),%sp
-    lea     0x00100028+8,%a2
+    lea     FLASH_ROMIMAGE_ENTRY+48,%a2
     move.l  (%a2),%d0
     move.l  %d0,%a2
     jmp     (%a2)

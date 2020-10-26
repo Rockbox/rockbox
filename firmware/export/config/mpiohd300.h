@@ -172,7 +172,8 @@
 #define BOOTDIR "/.rockbox"
 
 #define BOOTLOADER_ENTRYPOINT  0x001F0000
-#define FLASH_ENTRYPOINT       0x00001000
+#define FLASH_RAMIMAGE_ENTRY   0x00001000
+#define FLASH_ROMIMAGE_ENTRY   0x00100000
 #define FLASH_MAGIC            0xfbfbfbf1
 
 #endif /* SIMULATOR */
