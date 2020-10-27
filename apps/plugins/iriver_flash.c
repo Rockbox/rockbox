@@ -22,6 +22,13 @@
  ****************************************************************************/
 #include "plugin.h"
 
+/* cfi_program_word() relies on writing to address 0, which normally is illegal.
+   So we need this to ensure we don't helpfully optimize it away into a TRAP
+   when compiled with -fdelete-null-pointer-checks, which is enabled by default
+   at -Os with our current gcc 4.9.x toolchain.
+*/
+#pragma GCC optimize "no-delete-null-pointer-checks"
+
 /* All CFI flash routines are copied and ported from firmware_flash.c */
 
 unsigned char *audiobuf;
