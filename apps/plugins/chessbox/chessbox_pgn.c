@@ -623,6 +623,7 @@ struct pgn_game_node* pgn_list_games(const char* filename){
             /* a new game header is found */
             if (line_buffer[0] == '['){
                 temp_node = (struct pgn_game_node *)pl_malloc(sizeof size_node);
+                if (!temp_node) return NULL;
                 temp_node->next_node = NULL;
                 if (curr_node == NULL) {
                     first_game = curr_node = temp_node;
@@ -773,9 +774,11 @@ void pgn_parse_game(const char* filename,
      */
     if (first_ply != NULL){
         temp_ply = (struct pgn_ply_node *)pl_malloc(sizeof size_ply);
-        temp_ply->player = neutral;
-        temp_ply->prev_node = curr_node;
-        curr_node->next_node = temp_ply;
+        if (temp_ply) {
+            temp_ply->player = neutral;
+            temp_ply->prev_node = curr_node;
+            curr_node->next_node = temp_ply;
+        }
     }
     selected_game->first_ply = first_ply;
 
@@ -793,6 +796,7 @@ struct pgn_game_node* pgn_init_game(void){
 
     /* create an "end of game" dummy ply and assign defaults */
     ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
+    if (!ply) return NULL;
     ply->player = neutral;
     ply->pgn_text[0] = '\0';
     ply->prev_node = NULL;
@@ -800,6 +804,8 @@ struct pgn_game_node* pgn_init_game(void){
 
     /* create the game and assign defaults */
     game = (struct pgn_game_node *)pl_malloc(sizeof game_size);
+    if (!game) return NULL;
+
     game->game_number = 0;
     rb->strcpy(game->white_player,"Player");
     rb->strcpy(game->black_player,"GnuChess");
@@ -823,6 +829,7 @@ void pgn_append_ply(struct pgn_game_node* game,
     struct pgn_ply_node ply_size, *ply, *temp;
 
     ply = (struct pgn_ply_node *)pl_malloc(sizeof ply_size);
+    if (!ply) return;
     ply->player = ply_player;
     ply->column_from = move_buffer[0] - 'a';
     ply->row_from = move_buffer[1] - '1';
@@ -847,6 +854,7 @@ void pgn_append_ply(struct pgn_game_node* game,
     } else {
         temp->prev_node->next_node = ply;
     }
+
     temp->prev_node = ply;
 }
 
