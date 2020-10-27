@@ -50,6 +50,11 @@
 #elif (CONFIG_KEYPAD == MPIO_HD300_PAD)
 #   define DEBUG_CANCEL BUTTON_MENU
 #endif
+
+/* dbg_flash_id() hits address 0, which is nominally illegal.  Make sure
+   GCC doesn't helpfully turn this into an exception.
+ */
+#pragma GCC optimize "no-delete-null-pointer-checks"
 /* Tool function to read the flash manufacturer and type, if available.
    Only chips which could be reprogrammed in system will return values.
    (The mode switch addresses vary between flash manufacturers, hence addr1/2) */
