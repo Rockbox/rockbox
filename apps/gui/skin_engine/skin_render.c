@@ -96,7 +96,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                              struct skin_element *element, struct skin_viewport* skin_vp)
 {
     struct wps_token *token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, element->data);
-
+    if (!token) return false;
     struct viewport *vp = &skin_vp->vp;
     struct wps_data *data = gwps->data;
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
@@ -107,7 +107,9 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_VIEWPORT_FGCOLOUR:
         {
             struct viewport_colour *col = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            if (!col) return false;
             struct viewport *vp = SKINOFFSETTOPTR(skin_buffer, col->vp);
+            if (!vp) return false;
             vp->fg_pattern = col->colour;
             skin_vp->fgbg_changed = true;
         }
@@ -115,7 +117,9 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_VIEWPORT_BGCOLOUR:
         {
             struct viewport_colour *col = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            if (!col) return false;
             struct viewport *vp = SKINOFFSETTOPTR(skin_buffer, col->vp);
+            if (!vp) return false;
             vp->bg_pattern = col->colour;
             skin_vp->fgbg_changed = true;
         }
@@ -124,6 +128,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct line_desc *data = SKINOFFSETTOPTR(skin_buffer, token->value.data);
             struct line_desc *linedes = &info->line_desc;
+            if (!data || !linedes) return false;
             /* gradient colors are handled with a separate tag
              * (SKIN_TOKEN_VIEWPORT_GRADIENT_SETUP, see below). since it may
              * come before the text style tag color fields need to be preserved */
@@ -147,6 +152,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct gradient_config *cfg = SKINOFFSETTOPTR(skin_buffer, token->value.data);
             struct line_desc *linedes = &info->line_desc;
+            if (!cfg || !linedes) return false;
             linedes->text_color     = cfg->text;
             linedes->line_color     = cfg->start;
             linedes->line_end_color = cfg->end;
@@ -162,17 +168,19 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             {
                 struct skin_viewport *skinvp = SKINOFFSETTOPTR(skin_buffer, viewport->data);
 
-                char *vplabel = SKINOFFSETTOPTR(skin_buffer, skinvp->label);
-                if (skinvp->label == VP_DEFAULT_LABEL)
-                    vplabel = VP_DEFAULT_LABEL_STRING;
-                if (vplabel && !skinvp->is_infovp &&
-                    !strcmp(vplabel, label))
-                {
-                    if (skinvp->hidden_flags&VP_DRAW_HIDDEN)
+                if (skinvp) {
+                    char *vplabel = SKINOFFSETTOPTR(skin_buffer, skinvp->label);
+                    if (skinvp->label == VP_DEFAULT_LABEL)
+                        vplabel = VP_DEFAULT_LABEL_STRING;
+                    if (vplabel && !skinvp->is_infovp &&
+                        !strcmp(vplabel, label))
                     {
-                        temp |= VP_DRAW_WASHIDDEN;
+                        if (skinvp->hidden_flags&VP_DRAW_HIDDEN)
+                        {
+                            temp |= VP_DRAW_WASHIDDEN;
+                        }
+                        skinvp->hidden_flags = temp;
                     }
-                    skinvp->hidden_flags = temp;
                 }
                 viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next);
             }
@@ -195,12 +203,13 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
             {
                 struct draw_rectangle *rect =
                         SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                if (!rect) break;
 #ifdef HAVE_LCD_COLOR
                 if (rect->start_colour != rect->end_colour &&
-                        gwps->display->screen_type == SCREEN_MAIN)
+                    gwps->display->screen_type == SCREEN_MAIN)
                 {
                     gwps->display->gradient_fillrect(rect->x, rect->y, rect->width,
-                            rect->height, rect->start_colour, rect->end_colour);
+                        rect->height, rect->start_colour, rect->end_colour);
                 }
                 else
 #endif
@@ -210,7 +219,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                     vp->fg_pattern = rect->start_colour;
 #endif
                     gwps->display->fillrect(rect->x, rect->y, rect->width,
-                            rect->height);
+                        rect->height);
 #if LCD_DEPTH > 1
                     vp->fg_pattern = backup;
 #endif
@@ -245,6 +254,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_IMAGE_DISPLAY_9SEGMENT:
         {
             struct image_display *id = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            if (!id) break;
             const char* label = SKINOFFSETTOPTR(skin_buffer, id->label);
             struct gui_img *img = skin_find_item(label,SKIN_FIND_IMAGE, data);
             if (img && img->loaded)
@@ -313,7 +323,6 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
                 skin_render_playlistviewer(SKINOFFSETTOPTR(skin_buffer, token->value.data), gwps,
                                            info->skin_vp, info->refresh_type);
             break;
-
 #ifdef HAVE_SKIN_VARIABLES
         case SKIN_TOKEN_VAR_SET:
             {
@@ -374,19 +383,21 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                 {
                     do_tags_in_hidden_conditional(get_child(child->children, i), info);
                 }
-                child = SKINOFFSETTOPTR(skin_buffer, child->next);
-                continue;
+                goto skip;
             }
             else if (child->type != TAG || !SKINOFFSETTOPTR(skin_buffer, child->data))
             {
-                child = SKINOFFSETTOPTR(skin_buffer, child->next);
-                continue;
+                goto skip;
             }
+
             token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, child->data);
+
             /* clear all pictures in the conditional and nested ones */
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
             {
                 struct image_display *id = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                if (!id) goto skip;
+
                 struct gui_img *img = skin_find_item(SKINOFFSETTOPTR(skin_buffer, id->label),
                                                      SKIN_FIND_IMAGE, data);
                 clear_image_pos(gwps, img);
@@ -404,6 +415,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                      viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next))
                 {
                     struct skin_viewport *skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
+                    if (!skin_viewport) continue;
                     char *vplabel = SKINOFFSETTOPTR(skin_buffer, skin_viewport->label);
                     if (skin_viewport->label == VP_DEFAULT_LABEL)
                         vplabel = VP_DEFAULT_LABEL_STRING;
@@ -451,6 +463,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                         playback_current_aa_hid(data->playback_aa_slot), true);
             }
 #endif
+        skip:
             child = SKINOFFSETTOPTR(skin_buffer, child->next);
         }
     }
@@ -517,6 +530,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
         {
             case CONDITIONAL:
                 conditional = SKINOFFSETTOPTR(skin_buffer, child->data);
+                if (!conditional) break;
                 last_value = conditional->last_value;
                 value = evaluate_conditional(info->gwps, info->offset,
                                              conditional, child->children_count);
@@ -623,7 +637,8 @@ static int get_subline_timeout(struct gui_wps *gwps, struct skin_element* line)
             element->tag->type == SKIN_TOKEN_SUBLINE_TIMEOUT )
         {
             token = SKINOFFSETTOPTR(skin_buffer, element->data);
-            return token->value.i;
+            if (token)
+                return token->value.i;
         }
         else if (element->type == CONDITIONAL)
         {
@@ -726,8 +741,11 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
     while (imglist)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, imglist->token);
-        struct gui_img *img = (struct gui_img *)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        img->display = -1;
+        if (token) {
+            struct gui_img *img = (struct gui_img *)SKINOFFSETTOPTR(skin_buffer, token->value.data);
+            if (img)
+                img->display = -1;
+        }
         imglist = SKINOFFSETTOPTR(skin_buffer, imglist->next);
     }
 
@@ -755,7 +773,6 @@ void skin_render_viewport(struct skin_element* viewport, struct gui_wps *gwps,
         align->left = info.buf;
         align->center = NULL;
         align->right = NULL;
-
 
         if (line->type == LINE_ALTERNATOR)
             func = skin_render_alternator;
@@ -819,9 +836,10 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
             display->clear_viewport();
         }
     }
-
     viewport = SKINOFFSETTOPTR(skin_buffer, data->tree);
+    if (!viewport) return;
     skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
+    if (!skin_viewport) return;
     label = SKINOFFSETTOPTR(skin_buffer, skin_viewport->label);
     if (skin_viewport->label == VP_DEFAULT_LABEL)
         label = VP_DEFAULT_LABEL_STRING;
@@ -833,8 +851,10 @@ void skin_render(struct gui_wps *gwps, unsigned refresh_mode)
          viewport;
          viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next))
     {
+
         /* SETUP */
         skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
+        if (!skin_viewport) continue;
         unsigned vp_refresh_mode = refresh_mode;
 #if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
         if (skin_viewport->output_to_backdrop_buffer)
