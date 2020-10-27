@@ -106,6 +106,9 @@ $(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINLIBFLAGS) -c $< -o $@
 
+# special rule for iriver_flash
+$(BUILDDIR)/apps/plugins/iriver_flash.o: PLUGINFLAGS += -fno-delete-null-pointer-checks
+
 # special pattern rule for compiling plugins with extra flags
 $(BUILDDIR)/apps/plugins/%.o: $(ROOTDIR)/apps/plugins/%.c
 	$(SILENT)mkdir -p $(dir $@)
