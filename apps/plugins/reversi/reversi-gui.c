@@ -645,7 +645,7 @@ enum plugin_status plugin_start(const void *parameter) {
                 break;
         }
 
-        if(cur_strategy->is_robot && !game_finished) {
+        if(cur_strategy && cur_strategy->is_robot && !game_finished) {
             move_t m = cur_strategy->move_func(&game, cur_player);
             reversi_make_move(&game, MOVE_ROW(m), MOVE_COL(m), cur_player);
             cur_player = reversi_flipped_color(cur_player);
