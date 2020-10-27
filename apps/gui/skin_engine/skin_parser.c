@@ -1709,22 +1709,27 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
     if (wps_data->wps_loaded)
         skin_buffer = get_skin_buffer(wps_data);
 #ifndef __PCTOOL__
+
     struct skin_token_list *list = SKINOFFSETTOPTR(skin_buffer, wps_data->images);
     int *font_ids = SKINOFFSETTOPTR(skin_buffer, wps_data->font_ids);
     while (list)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, list->token);
-        struct gui_img *img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        if (img->buflib_handle > 0)
+        struct gui_img *img = NULL;
+        if (token)
+            img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
+        if (img && img->buflib_handle > 0)
         {
             struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, list->next);
-            core_free(img->buflib_handle);
 
+            core_free(img->buflib_handle);
             while (imglist)
             {
                 struct wps_token *freetoken = SKINOFFSETTOPTR(skin_buffer, imglist->token);
-                struct gui_img *freeimg = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, freetoken->value.data);
-                if (img->buflib_handle == freeimg->buflib_handle)
+                struct gui_img *freeimg = NULL;
+                if (freetoken)
+                    freeimg = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, freetoken->value.data);
+                if (freeimg && img->buflib_handle == freeimg->buflib_handle)
                     freeimg->buflib_handle = -1;
                 imglist = SKINOFFSETTOPTR(skin_buffer, imglist->next);
             }

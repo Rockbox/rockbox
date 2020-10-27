@@ -374,19 +374,21 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                 {
                     do_tags_in_hidden_conditional(get_child(child->children, i), info);
                 }
-                child = SKINOFFSETTOPTR(skin_buffer, child->next);
-                continue;
+                goto skip;
             }
             else if (child->type != TAG || !SKINOFFSETTOPTR(skin_buffer, child->data))
             {
-                child = SKINOFFSETTOPTR(skin_buffer, child->next);
-                continue;
+                goto skip;
             }
+
             token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, child->data);
+
             /* clear all pictures in the conditional and nested ones */
             if (token->type == SKIN_TOKEN_IMAGE_PRELOAD_DISPLAY)
             {
                 struct image_display *id = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                if (!id) goto skip;
+
                 struct gui_img *img = skin_find_item(SKINOFFSETTOPTR(skin_buffer, id->label),
                                                      SKIN_FIND_IMAGE, data);
                 clear_image_pos(gwps, img);
@@ -404,6 +406,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                      viewport = SKINOFFSETTOPTR(skin_buffer, viewport->next))
                 {
                     struct skin_viewport *skin_viewport = SKINOFFSETTOPTR(skin_buffer, viewport->data);
+                    if (!skin_viewport) continue;
                     char *vplabel = SKINOFFSETTOPTR(skin_buffer, skin_viewport->label);
                     if (skin_viewport->label == VP_DEFAULT_LABEL)
                         vplabel = VP_DEFAULT_LABEL_STRING;
@@ -451,6 +454,7 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                         playback_current_aa_hid(data->playback_aa_slot), true);
             }
 #endif
+	skip:
             child = SKINOFFSETTOPTR(skin_buffer, child->next);
         }
     }
