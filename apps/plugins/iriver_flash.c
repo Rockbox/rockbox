@@ -8,7 +8,7 @@
  * $Id$
  *
  * !!! DON'T MESS WITH THIS CODE UNLESS YOU'RE ABSOLUTELY SURE WHAT YOU DO !!!
- * 
+ *
  * Copyright (C) 2006 by Miika Pekkarinen
  *
  * This program is free software; you can redistribute it and/or
@@ -71,26 +71,26 @@ bool cfi_read_id(volatile uint16_t* pBase, uint8_t* pManufacturerID, uint8_t* pD
 {
     uint8_t not_manu, not_id; /* read values before switching to ID mode */
     uint8_t manu, id; /* read values when in ID mode */
-    
+
     pBase = (uint16_t*)((uint32_t)pBase & 0xFFF80000); /* down to 512k align */
-    
+
     /* read the normal content */
     not_manu = pBase[0]; /* should be 'A' (0x41) and 'R' (0x52) */
     not_id   = pBase[1]; /*  from the "ARCH" marker */
-    
+
     pBase[0x5555] = 0xAA; /* enter command mode */
     pBase[0x2AAA] = 0x55;
     pBase[0x5555] = 0x90; /* ID command */
     rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
-    
+
     manu = pBase[0];
     id   = pBase[1];
-    
+
     pBase[0] = 0xF0; /* reset flash (back to normal read mode) */
     rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
-    
+
     /* I assume success if the obtained values are different from
-    the normal flash content. This is not perfectly bulletproof, they 
+    the normal flash content. This is not perfectly bulletproof, they
     could theoretically be the same by chance, causing us to fail. */
     if (not_manu != manu || not_id != id) /* a value has changed */
     {
@@ -106,7 +106,7 @@ bool cfi_read_id(volatile uint16_t* pBase, uint8_t* pManufacturerID, uint8_t* pD
 bool cfi_erase_sector(volatile uint16_t* pAddr)
 {
     unsigned timeout = 430000; /* the timeout loop should be no less than 25ms */
-    
+
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
     FB[0x5555] = 0x80; /* erase command */
@@ -126,20 +126,20 @@ bool cfi_erase_sector(volatile uint16_t* pAddr)
 static inline bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 {
     unsigned timeout = 85; /* the timeout loop should be no less than 20us */
-    
+
     if (~*pAddr & data) /* just a safety feature, not really necessary */
         return false; /* can't set any bit from 0 to 1 */
-    
+
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
     FB[0x5555] = 0xA0; /* byte program command */
-    
+
     *pAddr = data;
-    
+
     /* I counted 7 instructions for this loop -> min. 0.58 us per round */
     /* Plus memory waitstates it will be much more, gives margin */
     while (*pAddr != data && --timeout); /* poll for programmed */
-    
+
     return (timeout != 0);
 }
 
@@ -148,10 +148,10 @@ static inline bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 bool cfi_get_flash_info(struct flash_info* pInfo)
 {
     rb->memset(pInfo, 0, sizeof(struct flash_info));
-    
+
     if (!cfi_read_id(FB, &pInfo->manufacturer, &pInfo->id))
         return false;
-    
+
     if (pInfo->manufacturer == 0xBF) /* SST */
     {
         if (pInfo->id == 0xD6)
@@ -188,12 +188,12 @@ bool cfi_get_flash_info(struct flash_info* pInfo)
 int wait_for_button(void)
 {
     int button;
-    
+
     do
     {
         button = rb->button_get(true);
     } while (IS_SYSEVENT(button) || (button & BUTTON_REL));
-    
+
     return button;
 }
 
@@ -209,8 +209,8 @@ void ShowFlashInfo(struct flash_info* pInfo)
     {
         rb->lcd_putsf(0, 0, "Flash: M=%02x D=%02x",
             pInfo->manufacturer, pInfo->id);
-        
-        
+
+
         if (pInfo->size)
         {
             rb->lcd_puts(0, 1, pInfo->name);
@@ -220,16 +220,16 @@ void ShowFlashInfo(struct flash_info* pInfo)
         {
             rb->lcd_puts(0, 1, "Unsupported chip");
         }
-        
+
     }
-    
+
     rb->lcd_update();
 }
 
 bool show_info(void)
 {
     struct flash_info fi;
-    
+
     rb->lcd_clear_display();
     cfi_get_flash_info(&fi);
     ShowFlashInfo(&fi);
@@ -238,19 +238,19 @@ bool show_info(void)
         rb->splash(HZ*3, "Sorry!");
         return false; /* exit */
     }
-    
+
     return true;
 }
 
 bool confirm(const char *msg)
 {
     bool ret;
-    
+
     rb->splashf(0, "%s ([PLAY] to CONFIRM)", msg);
-    
+
     ret = (wait_for_button() == BUTTON_ON);
     show_info();
-    
+
     return ret;
 }
 
@@ -260,24 +260,24 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
     int len, rc;
     int i;
     uint32_t sum;
-    
+
     fd = rb->open(filename,  O_RDONLY);
     if (fd < 0)
         return -1;
-    
+
     len = rb->filesize(fd);
-    
+
     if (audiobuf_size < len)
     {
         rb->splash(HZ*3, "Aborting: Out of memory!");
         rb->close(fd);
         return -2;
     }
-    
+
     rb->read(fd, checksum, 4);
     rb->lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
     len -= FIRMWARE_OFFSET_FILE_DATA;
-    
+
     rc = rb->read(fd, audiobuf, len);
     rb->close(fd);
     if (rc != len)
@@ -285,22 +285,22 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
         rb->splash(HZ*3, "Aborting: Read failure");
         return -3;
     }
-    
+
     /* Verify the checksum */
     sum = MODEL_NUMBER;
     for (i = 0; i < len; i++)
         sum += audiobuf[i];
-    
+
     if (sum != *checksum)
     {
         rb->splash(HZ*3, "Aborting: Checksums mismatch!");
         return -4;
     }
-    
+
     return len;
 }
 
-unsigned long valid_bootloaders[][2] = { 
+unsigned long valid_bootloaders[][2] = {
     /* Size-8   CRC32 */
 #ifdef IRIVER_H120 /* Iriver H120/H140 checksums */
     { 63788, 0x08ff01a9 }, /* 7-pre3, improved failsafe functions */
@@ -351,10 +351,10 @@ int flash_rockbox(const char *filename, int section)
     unsigned long checksum, sum;
     unsigned char *p8;
     uint16_t *p16;
-    
+
     if (get_section_address(section) < 0)
         return -1;
-    
+
     p8 = (char *)BOOTLOADER_ENTRYPOINT;
     if (!detect_valid_bootloader(p8, 0))
     {
@@ -376,9 +376,9 @@ int flash_rockbox(const char *filename, int section)
     len = load_firmware_file(filename, &checksum);
     if (len <= 0)
         return len * 10;
-    
+
     pos = get_section_address(section);
-    
+
     /* Check if image relocation seems to be sane. */
     if (section == SECT_ROMIMAGE)
     {
@@ -390,39 +390,39 @@ int flash_rockbox(const char *filename, int section)
                          *p32, pos+sizeof(struct flash_header));
             return -1;
         }
-        
+
     }
-    
+
     /* Erase the program flash. */
     for (i = 0; i + pos < BOOTLOADER_ENTRYPOINT && i < len + 32; i += SEC_SIZE)
     {
         /* Additional safety check. */
         if (i + pos < SEC_SIZE)
             return -1;
-        
+
         rb->lcd_putsf(0, 3, "Erasing...  %d%%", (i+SEC_SIZE)*100/len);
         rb->lcd_update();
-        
+
         /*rc = */cfi_erase_sector(FB + (i + pos)/2);
     }
-    
+
     /* Write the magic and size. */
     rb->memset(&hdr, 0, sizeof(struct flash_header));
     hdr.magic = FLASH_MAGIC;
     hdr.length = len;
     // rb->strncpy(hdr.version, rb->rbversion , sizeof(hdr.version)-1);
     p16 = (uint16_t *)&hdr;
-    
+
     rb->lcd_puts(0, 4, "Programming...");
     rb->lcd_update();
-    
+
     pos = get_section_address(section)/2;
     for (i = 0; i < (long)sizeof(struct flash_header)/2; i++)
     {
         cfi_program_word(FB + pos, p16[i]);
         pos++;
     }
-    
+
     p16 = (uint16_t *)audiobuf;
     for (i = 0; i < len/2 && pos + i < (BOOTLOADER_ENTRYPOINT/2); i++)
     {
@@ -431,20 +431,20 @@ int flash_rockbox(const char *filename, int section)
             rb->lcd_putsf(0, 4, "Programming...  %d%%", (i+1)*100/(len/2));
             rb->lcd_update();
         }
-        
+
         cfi_program_word(FB + pos + i, p16[i]);
     }
-    
+
     /* Verify */
     rb->lcd_puts(0, 5, "Verifying");
     rb->lcd_update();
-    
+
     p8 = (char *)get_section_address(section);
     p8 += sizeof(struct flash_header);
     sum = MODEL_NUMBER;
     for (i = 0; i < len; i++)
         sum += p8[i];
-    
+
     if (sum != checksum)
     {
         rb->splash(HZ*3, "Verify failed!");
@@ -456,9 +456,9 @@ int flash_rockbox(const char *filename, int section)
             cfi_erase_sector(FB + FLASH_ROMIMAGE_ENTRY/2);
         return -5;
     }
-    
+
     rb->splash(HZ*2, "Success");
-    
+
     return 0;
 }
 
@@ -481,20 +481,20 @@ int flash_bootloader(const char *filename)
     bootsector = audiobuf;
     audiobuf += SEC_SIZE;
     audiobuf_size -= SEC_SIZE;
-    
+
     if (!confirm("Update bootloader?"))
         return -2;
-    
+
     len = load_firmware_file(filename, &checksum);
     if (len <= 0)
         return len * 10;
-    
+
     if (len > 0xFFFF)
     {
         rb->splash(HZ*3, "Too big bootloader");
         return -1;
     }
-    
+
     /* Verify the crc32 checksum also. */
     if (!detect_valid_bootloader(audiobuf, len))
     {
@@ -508,40 +508,40 @@ int flash_bootloader(const char *filename)
     /* Backup the bootloader sector first. */
     p8 = (char *)FB;
     rb->memcpy(bootsector, p8, SEC_SIZE);
-    
+
     /* Erase the boot sector and write a proper reset vector. */
     cfi_erase_sector(FB);
     p16 = (uint16_t *)audiobuf;
     for (i = 0; i < 8/2; i++)
         cfi_program_word(FB + i, p16[i]);
-    
+
     /* And restore original content for original FW to function. */
     p16 = (uint16_t *)bootsector;
     for (i = 8/2; i < SEC_SIZE/2; i++)
         cfi_program_word(FB + i, p16[i]);
-    
+
     /* Erase the bootloader flash section. */
     for (i = BOOTLOADER_ERASEGUARD; i < BOOTLOADER_ERASEGUARD+16; i++)
         /*rc =*/ cfi_erase_sector(FB + (SEC_SIZE/2) * i);
-    
+
     pos = BOOTLOADER_ENTRYPOINT/2;
     p16 = (uint16_t *)audiobuf;
     for (i = 0; i < len/2; i++)
         cfi_program_word(FB + pos + i, p16[i]);
-    
+
     /* Verify */
     p8 = (char *)BOOTLOADER_ENTRYPOINT;
     sum = MODEL_NUMBER;
     for (i = 0; i < len; i++)
         sum += p8[i];
-    
+
     if (sum != checksum)
     {
         rb->splash(HZ*3, "Verify failed!");
         show_fatal_error();
         return -5;
     }
-    
+
     p8 = (char *)FB;
     for (i = 0; i < 8; i++)
     {
@@ -552,9 +552,9 @@ int flash_bootloader(const char *filename)
             return -6;
         }
     }
-    
+
     rb->splash(HZ*2, "Success");
-    
+
     return 0;
 }
 
@@ -564,22 +564,22 @@ int flash_original_fw(int len)
     int pos, i, rc;
     unsigned char *p8;
     uint16_t *p16;
-    
+
     rb->lcd_puts(0, 3, "Critical section...");
     rb->lcd_update();
 
     p8 = (char *)FB;
     rb->memcpy(reset_vector, p8, sizeof reset_vector);
-    
+
     /* Erase the boot sector and write back the reset vector. */
     cfi_erase_sector(FB);
     p16 = (uint16_t *)reset_vector;
     for (i = 0; i < (long)sizeof(reset_vector)/2; i++)
         cfi_program_word(FB + i, p16[i]);
-    
+
     rb->lcd_puts(0, 4, "Flashing orig. FW");
     rb->lcd_update();
-    
+
     /* Erase the program flash. */
     for (i = 1; i < BOOTLOADER_ERASEGUARD && (i-1)*4096 < len; i++)
     {
@@ -587,18 +587,18 @@ int flash_original_fw(int len)
         rb->lcd_putsf(0, 5, "Erase: 0x%03x  (%d)", i, rc);
         rb->lcd_update();
     }
-    
+
     rb->lcd_puts(0, 6, "Programming");
     rb->lcd_update();
-    
+
     pos = 0x00000008/2;
     p16 = (uint16_t *)audiobuf;
     for (i = 0; i < len/2 && pos + i < (BOOTLOADER_ENTRYPOINT/2); i++)
         cfi_program_word(FB + pos + i, p16[i]);
-    
+
     rb->lcd_puts(0, 7, "Verifying");
     rb->lcd_update();
-    
+
     /* Verify reset vectors. */
     p8 = (char *)FB;
     for (i = 0; i < 8; i++)
@@ -610,7 +610,7 @@ int flash_original_fw(int len)
             break;
         }
     }
-    
+
     /* Verify */
     p8 = (char *)0x00000008;
     for (i = 0; i < len; i++)
@@ -622,9 +622,9 @@ int flash_original_fw(int len)
             return -5;
         }
     }
-    
+
     rb->splash(HZ*2, "Success");
-    
+
     return 0;
 }
 
@@ -633,14 +633,14 @@ int load_original_bin(const char *filename)
     unsigned long magic[2];
     int len, rc;
     int fd;
-    
+
     if (!confirm("Restore original firmware (bootloader will be kept)?"))
         return -2;
-    
+
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return -1;
-    
+
     len = rb->filesize(fd) - 0x228;
     rb->lseek(fd, 0x220, SEEK_SET);
     rb->read(fd, magic, 8);
@@ -650,19 +650,19 @@ int load_original_bin(const char *filename)
         rb->close(fd);
         return -1;
     }
-    
+
     rc = rb->read(fd, audiobuf, len);
     rb->close(fd);
-    
+
     if (rc != len)
     {
         rb->splash(HZ*2, "Read error");
         return -2;
     }
-    
+
     if (len % 2)
         len++;
-    
+
     return flash_original_fw(len);
 }
 
@@ -670,34 +670,34 @@ int load_romdump(const char *filename)
 {
     int len, rc;
     int fd;
-    
+
     if (!confirm("Restore firmware section (bootloader will be kept)?"))
         return -2;
-    
+
     fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return -1;
-    
+
     len = rb->filesize(fd) - 8;
     if (len <= 0)
         return -1;
-    
+
     rb->lseek(fd, 8, SEEK_SET);
     rc = rb->read(fd, audiobuf, len);
     rb->close(fd);
-    
+
     if (rc != len)
     {
         rb->splash(HZ*2, "Read error");
         return -2;
     }
-    
+
     if (len % 2)
         len++;
-    
+
     if (len > BOOTLOADER_ENTRYPOINT - 8)
         len = BOOTLOADER_ENTRYPOINT - 8;
-    
+
     return flash_original_fw(len);
 }
 
@@ -717,7 +717,7 @@ void DoUserDialog(char* filename)
         rb->splash(HZ*3, "Battery too low!");
         return; /* exit */
     }
-    
+
     rb->lcd_setfont(FONT_SYSFIXED);
     if (!show_info())
         return ;
@@ -727,9 +727,9 @@ void DoUserDialog(char* filename)
         rb->splash(HZ*3, "Please use this plugin with \"Open with...\"");
         return ;
     }
-    
+
     audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuf_size);
-    
+
     if (rb->strcasestr(filename, "/rockbox.iriver"))
         flash_rockbox(filename, SECT_RAMIMAGE);
     else if (rb->strcasestr(filename, "/rombox.iriver"))
