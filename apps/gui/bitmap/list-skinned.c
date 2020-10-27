@@ -219,7 +219,9 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
         {
             int original_x, original_y;
             skin_viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->data);
-            char *viewport_label = SKINOFFSETTOPTR(get_skin_buffer(wps.data), skin_viewport->label);
+            char *viewport_label = NULL;
+            if (skin_viewport)
+                viewport_label = SKINOFFSETTOPTR(get_skin_buffer(wps.data), skin_viewport->label);
             if (viewport->children == 0 || !viewport_label ||
                 (skin_viewport->label && strcmp(label, viewport_label))
                 )
@@ -254,13 +256,17 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
             while (imglist)
             {
                 struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(wps.data), imglist->token);
-                struct gui_img *img = SKINOFFSETTOPTR(get_skin_buffer(wps.data), token->value.data);
-                img->display = -1;
+                struct gui_img *img = NULL;
+                if (token)
+                    img = SKINOFFSETTOPTR(get_skin_buffer(wps.data), token->value.data);
+                if (img)
+                    img->display = -1;
                 imglist = SKINOFFSETTOPTR(get_skin_buffer(wps.data), imglist->next);
             }
             struct skin_element** children = SKINOFFSETTOPTR(get_skin_buffer(wps.data), viewport->children);
-            skin_render_viewport(SKINOFFSETTOPTR(get_skin_buffer(wps.data), (intptr_t)children[0]),
-                                 &wps, skin_viewport, SKIN_REFRESH_ALL);
+            if (children && *children)
+                skin_render_viewport(SKINOFFSETTOPTR(get_skin_buffer(wps.data), (intptr_t)children[0]),
+                                     &wps, skin_viewport, SKIN_REFRESH_ALL);
             wps_display_images(&wps, &skin_viewport->vp);
             /* force disableing scroll because it breaks later */
             if (!is_selected)
@@ -278,4 +284,3 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
     current_drawing_line = list->selected_item;
     return true;
 }
-

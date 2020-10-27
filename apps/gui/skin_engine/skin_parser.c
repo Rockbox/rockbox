@@ -183,13 +183,16 @@ void *skin_find_item(const char *label, enum skin_find_what what,
     {
         bool skip = false;
         struct wps_token *token = NULL;
+        itemlabel = NULL;
         if (!isvplist)
             token = SKINOFFSETTOPTR(databuf, list.linkedlist->token);
-        switch (what)
+        if (token)
+            switch (what)
         {
             case SKIN_FIND_UIVP:
             case SKIN_FIND_VP:
                 ret = SKINOFFSETTOPTR(databuf, list.vplist->data);
+                if (!ret) break;
                 if (((struct skin_viewport *)ret)->label == VP_DEFAULT_LABEL)
                     itemlabel = VP_DEFAULT_LABEL_STRING;
                 else
@@ -199,10 +202,12 @@ void *skin_find_item(const char *label, enum skin_find_what what,
                 break;
             case SKIN_FIND_IMAGE:
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
+                if (!ret) break;
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct gui_img *)ret)->label);
                 break;
 #ifdef HAVE_TOUCHSCREEN
             case SKIN_FIND_TOUCHREGION:
+                if (!ret) break;
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct touchregion *)ret)->label);
                 break;
@@ -210,6 +215,7 @@ void *skin_find_item(const char *label, enum skin_find_what what,
 #ifdef HAVE_SKIN_VARIABLES
             case SKIN_VARIABLE:
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
+                if (!ret) break;
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct skin_var *)ret)->label);
                 break;
 #endif
@@ -1708,23 +1714,30 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 {
     if (wps_data->wps_loaded)
         skin_buffer = get_skin_buffer(wps_data);
+    if (!skin_buffer)
+        return;
+
 #ifndef __PCTOOL__
     struct skin_token_list *list = SKINOFFSETTOPTR(skin_buffer, wps_data->images);
     int *font_ids = SKINOFFSETTOPTR(skin_buffer, wps_data->font_ids);
     while (list)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, list->token);
-        struct gui_img *img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        if (img->buflib_handle > 0)
+        struct gui_img *img = NULL;
+        if (token)
+            img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
+        if (img && img->buflib_handle > 0)
         {
             struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, list->next);
-            core_free(img->buflib_handle);
 
+            core_free(img->buflib_handle);
             while (imglist)
             {
                 struct wps_token *freetoken = SKINOFFSETTOPTR(skin_buffer, imglist->token);
-                struct gui_img *freeimg = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, freetoken->value.data);
-                if (img->buflib_handle == freeimg->buflib_handle)
+                struct gui_img *freeimg = NULL;
+                if (freetoken)
+                    freeimg = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, freetoken->value.data);
+                if (freeimg && img->buflib_handle == freeimg->buflib_handle)
                     freeimg->buflib_handle = -1;
                 imglist = SKINOFFSETTOPTR(skin_buffer, imglist->next);
             }
@@ -1885,8 +1898,10 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
     while (list)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, list->token);
+        if (!token) goto skip;
         struct gui_img *img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        if (!img->loaded)
+
+        if (img && !img->loaded)
         {
             if (img->using_preloaded_icons)
             {
@@ -1901,20 +1916,22 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                 handle = load_skin_bmp(wps_data, &img->bm, bmpdir);
                 img->buflib_handle = handle;
                 img->loaded = img->buflib_handle >= 0;
+
                 if (img->loaded)
                 {
                     struct skin_token_list *imglist = SKINOFFSETTOPTR(skin_buffer, list->next);
-
                     img->subimage_height = img->bm.height / img->num_subimages;
                     while (imglist)
                     {
                         token = SKINOFFSETTOPTR(skin_buffer, imglist->token);
-                        img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
-                        if (!strcmp(path, img->bm.data))
-                        {
-                            img->loaded = true;
-                            img->buflib_handle = handle;
-                            img->subimage_height = img->bm.height / img->num_subimages;
+                        if (token) {
+                            img = (struct gui_img*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
+                            if (img && !strcmp(path, img->bm.data))
+                            {
+                                img->loaded = true;
+                                img->buflib_handle = handle;
+                                img->subimage_height = img->bm.height / img->num_subimages;
+                            }
                         }
                         imglist = SKINOFFSETTOPTR(skin_buffer, imglist->next);
                     }
@@ -1923,6 +1940,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                     retval = false;
             }
         }
+    skip:
         list = SKINOFFSETTOPTR(skin_buffer, list->next);
     }
 
@@ -1947,6 +1965,7 @@ static bool skin_load_fonts(struct wps_data *data)
         /* first, find the viewports that have a non-sys/ui-font font */
         struct skin_viewport *skin_vp =
                 SKINOFFSETTOPTR(skin_buffer, vp_list->data);
+        if (!skin_vp) continue;
         struct viewport *vp = &skin_vp->vp;
 
         font_id = skin_vp->parsed_fontid;
@@ -2507,9 +2526,10 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     while (regions)
     {
         struct wps_token *token = SKINOFFSETTOPTR(skin_buffer, regions->token);
-        struct touchregion *r = SKINOFFSETTOPTR(skin_buffer, token->value.data);
-
-        if (r->action != ACTION_TOUCH_SCROLLBAR &&
+        struct touchregion *r = NULL;
+        if (token)
+            r = SKINOFFSETTOPTR(skin_buffer, token->value.data);
+        if (r && r->action != ACTION_TOUCH_SCROLLBAR &&
             r->action != ACTION_TOUCH_VOLUME)
         {
             user_touch_region_found = true;

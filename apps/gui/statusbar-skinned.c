@@ -86,14 +86,15 @@ int sb_preproccess(enum screen_type screen, struct wps_data *data)
 int sb_postproccess(enum screen_type screen, struct wps_data *data)
 {
     if (data->wps_loaded)
-    {  
+    {
         /* hide the sb's default viewport because it has nasty effect with stuff
         * not part of the statusbar,
         * hence .sbs's without any other vps are unsupported*/
         struct skin_viewport *vp = skin_find_item(VP_DEFAULT_LABEL_STRING, SKIN_FIND_VP, data);
         struct skin_element *tree = SKINOFFSETTOPTR(get_skin_buffer(data), data->tree);
-        struct skin_element *next_vp = SKINOFFSETTOPTR(get_skin_buffer(data), tree->next);
-        
+        struct skin_element *next_vp = NULL;
+        if (tree) next_vp = SKINOFFSETTOPTR(get_skin_buffer(data), tree->next);
+
         if (vp)
         {
             if (!next_vp)
@@ -132,9 +133,12 @@ struct viewport *sb_skin_get_info_vp(enum screen_type screen)
         viewportmanager_theme_enable(screen, false, NULL);
         viewportmanager_theme_undo(screen, true);
     }
-    label = SKINOFFSETTOPTR(get_skin_buffer(data), infovp_label[screen]);
     if (infovp_label[screen] == VP_DEFAULT_LABEL)
         label = VP_DEFAULT_LABEL_STRING;
+    else
+        label = SKINOFFSETTOPTR(get_skin_buffer(data), infovp_label[screen]);
+    if (!label)
+        return NULL;
     vp = skin_find_item(label, SKIN_FIND_UIVP, data);
     if (!vp)
         return NULL;

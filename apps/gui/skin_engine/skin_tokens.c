@@ -163,7 +163,7 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
     struct cuesheet *cue = id3?id3->cuesheet:NULL;
     if (!cue || !cue->curr_track)
         return NULL;
-    
+
     struct cue_track_info *track = cue->curr_track;
     if (offset_tracks)
     {
@@ -185,7 +185,7 @@ const char *get_cuesheetid3_token(struct wps_token *token, struct mp3entry *id3,
         case SKIN_TOKEN_METADATA_TRACK_TITLE:
             return *track->title ? track->title : NULL;
         case SKIN_TOKEN_METADATA_TRACK_NUMBER:
-            snprintf(buf, buf_size, "%d/%d",  
+            snprintf(buf, buf_size, "%d/%d",
                      cue->curr_track_idx+offset_tracks+1, cue->track_count);
             return buf;
         default:
@@ -200,7 +200,7 @@ static const char* get_filename_token(struct wps_token *token, char* filename,
     if (filename)
     {
         switch (token->type)
-        {        
+        {
             case SKIN_TOKEN_FILE_PATH:
                 return filename;
             case SKIN_TOKEN_FILE_NAME:
@@ -478,7 +478,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
                 {
                     *intval = val;
                 }
-                else 
+                else
                 {
                     *intval = 1+(limit-1)*(val-min)/(max-1-min);
                 }
@@ -514,7 +514,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
             return buf;
         }
         case SKIN_TOKEN_PRESET_COUNT:
-            snprintf(buf, buf_size, "%d", radio_preset_count());        
+            snprintf(buf, buf_size, "%d", radio_preset_count());
             if (intval)
                 *intval = radio_preset_count();
             return buf;
@@ -580,7 +580,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
     int b;
     bool number_set = true;
     struct wps_token *liftoken = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), lif->token);
-    const char* out_text = get_token_value(gwps, liftoken, offset, buf, buf_size, &a);            
+    const char* out_text = get_token_value(gwps, liftoken, offset, buf, buf_size, &a);
     if (a == -1 && liftoken->type != SKIN_TOKEN_VOLUME)
     {
         a = (out_text && *out_text) ? 1 : 0;
@@ -610,10 +610,13 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
             char temp_buf[MAX_PATH];
             const char *outb;
             struct skin_element *element = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), lif->operand.data.code);
+            if (!element) return NULL;
             struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), element->data);
             b = lif->num_options;
+
             outb = get_token_value(gwps, token, offset, temp_buf,
-                                   sizeof(temp_buf), &b);            
+                                   sizeof(temp_buf), &b);
+
             if (b == -1 && liftoken->type != SKIN_TOKEN_VOLUME)
             {
                 if (!out_text || !outb)
@@ -631,7 +634,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
         case DEFAULT:
             break;
     }
-            
+
     switch (lif->op)
     {
         case IF_EQUALS:
@@ -666,10 +669,12 @@ const char *get_token_value(struct gui_wps *gwps,
 {
     if (!gwps)
         return NULL;
+    if (!token)
+        return NULL;
 
     struct wps_data *data = gwps->data;
     struct wps_state *state = skin_get_global_state();
-    struct mp3entry *id3; /* Think very carefully about using this. 
+    struct mp3entry *id3; /* Think very carefully about using this.
                              maybe get_id3_token() is the better place? */
     const char *out_text = NULL;
     char *filename = NULL;
@@ -680,7 +685,7 @@ const char *get_token_value(struct gui_wps *gwps,
     id3 = get_mp3entry_from_offset(token->next? 1: offset, &filename);
     if (id3)
         filename = id3->path;
-        
+
 #if CONFIG_RTC
     struct tm* tm = NULL;
 
@@ -702,10 +707,10 @@ const char *get_token_value(struct gui_wps *gwps,
         limit = *intval;
         *intval = -1;
     }
-    
+
     if (id3 && id3 == state->id3 && id3->cuesheet )
     {
-        out_text = get_cuesheetid3_token(token, id3, 
+        out_text = get_cuesheetid3_token(token, id3,
                                          token->next?1:offset, buf, buf_size);
         if (out_text)
             return out_text;
@@ -734,6 +739,7 @@ const char *get_token_value(struct gui_wps *gwps,
             char *skinbuffer = get_skin_buffer(data);
             struct skin_element *element =
                     SKINOFFSETTOPTR(skinbuffer, token->value.data);
+            if (!element || !element->params) return NULL;
             struct skin_tag_parameter* params =
                     SKINOFFSETTOPTR(skinbuffer, element->params);
             struct skin_tag_parameter* thistag;
@@ -742,6 +748,7 @@ const char *get_token_value(struct gui_wps *gwps,
                 thistag = &params[i];
                 struct skin_element *tokenelement =
                         SKINOFFSETTOPTR(skinbuffer, thistag->data.code);
+                if (!tokenelement) return NULL;
                 out_text  =  get_token_value(gwps,
                         SKINOFFSETTOPTR(skinbuffer, tokenelement->data),
                         offset, buf, buf_size, intval);
@@ -753,10 +760,12 @@ const char *get_token_value(struct gui_wps *gwps,
             return truecount ? "true" : NULL;
         }
         break;
+
         case SKIN_TOKEN_SUBSTRING:
         {
             struct substring *ss = SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
-            const char *token_val = get_token_value(gwps, 
+            if (!ss) return NULL;
+            const char *token_val = get_token_value(gwps,
                             SKINOFFSETTOPTR(get_skin_buffer(data), ss->token), offset,
                                                     buf, buf_size, intval);
             if (token_val)
@@ -788,13 +797,13 @@ const char *get_token_value(struct gui_wps *gwps,
                 if (ss->expect_number &&
                     intval && (buf[0] >= '0' && buf[0] <= '9'))
                     *intval = atoi(buf) + 1; /* so 0 is the first item */
-                    
+
                 return buf;
             }
             return NULL;
         }
-        break;        
-            
+        break;
+
         case SKIN_TOKEN_CHARACTER:
             if (token->value.c == '\n')
                 return NULL;
@@ -802,7 +811,7 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_STRING:
             return (char*)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
-            
+
         case SKIN_TOKEN_TRANSLATEDSTRING:
             return (char*)P2STR(ID2P(token->value.i));
 
@@ -821,6 +830,7 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_LIST_ITEM_TEXT:
         {
             struct listitem *li = (struct listitem *)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
+            if (!li) return NULL;
             return skinlist_get_item_text(li->offset, li->wrap, buf, buf_size);
         }
         case SKIN_TOKEN_LIST_ITEM_ROW:
@@ -843,6 +853,7 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_LIST_ITEM_ICON:
         {
             struct listitem *li = (struct listitem *)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
+            if (!li) return NULL;
             int icon = skinlist_get_item_icon(li->offset, li->wrap);
             if (intval)
                 *intval = icon;
@@ -905,11 +916,12 @@ const char *get_token_value(struct gui_wps *gwps,
                 if (in_radio_screen() || (get_radio_status() != FMRADIO_OFF))
                 {
                     struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
+                    if (!aa) return NULL;
                     struct dim dim = {aa->width, aa->height};
                     handle = radio_get_art_hid(&dim);
                 }
 #endif
-                if (handle >= 0)    
+                if (handle >= 0)
                     return "C";
             }
             return NULL;
@@ -1009,7 +1021,7 @@ const char *get_token_value(struct gui_wps *gwps,
             int mode = 1; /* stop */
             if (status == STATUS_PLAY)
                 mode = 2; /* play */
-            if (state->is_fading || 
+            if (state->is_fading ||
                (status == STATUS_PAUSE  && !status_get_ffmode()))
                 mode = 3; /* pause */
             else
@@ -1336,13 +1348,13 @@ const char *get_token_value(struct gui_wps *gwps,
                                           token->value.i))
                 return "v";
             return NULL;
-            
         case SKIN_TOKEN_LASTTOUCH:
             {
 #ifdef HAVE_TOUCHSCREEN
             unsigned int last_touch = touchscreen_last_touch();
             char *skin_base = get_skin_buffer(data);
             struct touchregion_lastpress *data = SKINOFFSETTOPTR(skin_base, token->value.data);
+            if (!data) return NULL;
             struct touchregion *region = SKINOFFSETTOPTR(skin_base, data->region);
             if (region)
                 last_touch = region->last_press;
@@ -1669,10 +1681,8 @@ const char *get_token_value(struct gui_wps *gwps,
             }
             return NULL;
 #endif
-
         default:
             return NULL;
     }
+
 }
-
-

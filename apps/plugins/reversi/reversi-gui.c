@@ -637,11 +637,12 @@ enum plugin_status plugin_start(const void *parameter) {
             draw_screen = false;
         }
         switch(cur_player) {
-            case BLACK:
-                cur_strategy = black_strategy;
-                break;
             case WHITE:
                 cur_strategy = white_strategy;
+                break;
+            case BLACK:
+            default:
+                cur_strategy = black_strategy;
                 break;
         }
 
