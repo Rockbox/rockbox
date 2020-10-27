@@ -1661,7 +1661,7 @@ int dircache_readdir_internal(struct filestr_base *stream,
 read_eod:
     fat_empty_fat_direntry(fatent);
     infop->fatfile.e.entries = 0;
-    return 0;    
+    return 0;
 }
 
 /**
@@ -2605,7 +2605,7 @@ static dc_serial_t get_file_serialhash(const struct dircache_file *dcfilep)
 
     dc_serial_t h = DC_SERHASH_START;
 
-    while (idx > 0)
+    while (idx >= 0)
     {
         struct dircache_entry *ce = get_entry(idx);
         h = dc_hash_serialnum(ce->serialnum, h);
@@ -2793,7 +2793,7 @@ file_error:
         dircache_fileref_init(dcfrefp);
 
     dircache_unlock();
-    return rc;    
+    return rc;
 }
 
 /**
@@ -2947,7 +2947,7 @@ void dircache_dump(void)
                      "0x%08X,0,"
                      "\"\",\"\"\n",
                      -volume-1, dcvolp->serialnum,
-                         dc_hash_serialnum(dcvolp->serialnum, DC_SERHASH_START), 
+                         dc_hash_serialnum(dcvolp->serialnum, DC_SERHASH_START),
                      PATH_SEPCH, IF_MV(name,) dcvolp->frontier,
                      ATTR_DIRECTORY | ATTR_VOLUME);
         }

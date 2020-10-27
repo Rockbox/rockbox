@@ -610,10 +610,13 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
             char temp_buf[MAX_PATH];
             const char *outb;
             struct skin_element *element = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), lif->operand.data.code);
+            if (!element) return NULL;
             struct wps_token *token = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), element->data);
             b = lif->num_options;
+
             outb = get_token_value(gwps, token, offset, temp_buf,
-                                   sizeof(temp_buf), &b);            
+                                   sizeof(temp_buf), &b);
+
             if (b == -1 && liftoken->type != SKIN_TOKEN_VOLUME)
             {
                 if (!out_text || !outb)
