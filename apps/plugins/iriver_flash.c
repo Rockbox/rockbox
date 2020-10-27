@@ -67,26 +67,24 @@ static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
 #endif
 
 /* read the manufacturer and device ID */
-bool cfi_read_id(volatile uint16_t* pBase, uint8_t* pManufacturerID, uint8_t* pDeviceID)
+bool cfi_read_id(uint8_t* pManufacturerID, uint8_t* pDeviceID)
 {
     uint8_t not_manu, not_id; /* read values before switching to ID mode */
     uint8_t manu, id; /* read values when in ID mode */
 
-    pBase = (uint16_t*)((uint32_t)pBase & 0xFFF80000); /* down to 512k align */
-
     /* read the normal content */
-    not_manu = pBase[0]; /* should be 'A' (0x41) and 'R' (0x52) */
-    not_id   = pBase[1]; /*  from the "ARCH" marker */
+    not_manu = FB[0]; /* should be 'A' (0x41) and 'R' (0x52) */
+    not_id   = FB[1]; /*  from the "ARCH" marker */
 
-    pBase[0x5555] = 0xAA; /* enter command mode */
-    pBase[0x2AAA] = 0x55;
-    pBase[0x5555] = 0x90; /* ID command */
+    FB[0x5555] = 0xAA; /* enter command mode */
+    FB[0x2AAA] = 0x55;
+    FB[0x5555] = 0x90; /* ID command */
     rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
 
-    manu = pBase[0];
-    id   = pBase[1];
+    manu = FB[0];
+    id   = FB[1];
 
-    pBase[0] = 0xF0; /* reset flash (back to normal read mode) */
+    FB[0] = 0xF0; /* reset flash (back to normal read mode) */
     rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
 
     /* I assume success if the obtained values are different from
@@ -149,7 +147,7 @@ bool cfi_get_flash_info(struct flash_info* pInfo)
 {
     rb->memset(pInfo, 0, sizeof(struct flash_info));
 
-    if (!cfi_read_id(FB, &pInfo->manufacturer, &pInfo->id))
+    if (!cfi_read_id(&pInfo->manufacturer, &pInfo->id))
         return false;
 
     if (pInfo->manufacturer == 0xBF) /* SST */
