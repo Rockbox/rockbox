@@ -587,13 +587,25 @@ void lcd_update_rect(int x, int y, int w, int h)
     if (h <= 0)
         return; /* nothing left to do */
 
+
     imx233_lcdif_wait_ready();
     lcd_write_reg(0x50, x);
     lcd_write_reg(0x51, x + w - 1);
-    lcd_write_reg(0x52, y);
-    lcd_write_reg(0x53, y + h - 1);
     lcd_write_reg(0x20, x);
-    lcd_write_reg(0x21, y);
+#ifdef HAVE_LCD_FLIP
+    if(lcd_reg_3_val&0x20)
+    {
+#endif
+        lcd_write_reg(0x52, y);
+        lcd_write_reg(0x53, y + h - 1);
+        lcd_write_reg(0x21, y);
+#ifdef HAVE_LCD_FLIP
+    }else{
+        lcd_write_reg(0x52, LCD_HEIGHT-(y+h-1));
+        lcd_write_reg(0x53, LCD_HEIGHT-y);
+        lcd_write_reg(0x21, LCD_HEIGHT-(y+h));
+    }
+#endif
     lcd_write_reg(0x22, 0);
     imx233_lcdif_wait_ready();
     imx233_lcdif_set_word_length(16);
