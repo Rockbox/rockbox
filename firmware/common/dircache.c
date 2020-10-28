@@ -2612,7 +2612,8 @@ static dc_serial_t get_file_serialhash(const struct dircache_file *dcfilep)
         idx = ce->up;
     }
 
-    h = dc_hash_serialnum(get_idx_dcvolp(idx)->serialnum, h);
+    if (idx < 0)
+        h = dc_hash_serialnum(get_idx_dcvolp(idx)->serialnum, h);
 
     return h;
 }
