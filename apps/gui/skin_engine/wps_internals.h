@@ -175,7 +175,7 @@ struct gradient_config {
 #define VP_DEFAULT_LABEL_STRING "|"
 struct skin_viewport {
     struct viewport vp;   /* The LCD viewport struct */
-    struct frame_buffer_t framebuf;
+    struct frame_buffer_t framebuf; /* holds reference to current framebuffer */
     char hidden_flags;
     bool is_infovp;
     OFFSETTYPE(char*) label;
