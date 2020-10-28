@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "67d36dcc_62521ea0",
+        "filename": "apps/gui/bitmap/list-skinned.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "if skin_viewport is NULL then viewport_label will also be NULL.\n\n(Granted, it\u0027s implicit...)",
+      "parentUuid": "9febee8f_0d454669",
+      "range": {
+        "startLine": 226,
+        "startChar": 17,
+        "endLine": 226,
+        "endChar": 30
+      },
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a36ee88a_067d1622",
         "filename": "apps/gui/bitmap/list-skinned.c",
         "patchSetId": 10
@@ -36,6 +60,24 @@
       "writtenOn": "2020-10-28T09:12:47Z",
       "side": 1,
       "message": "double pointers isn\u0027t the first deref always there but you need to check *children no?",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4beb1422_613d2c8f",
+        "filename": "apps/gui/bitmap/list-skinned.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "Fixed, but I wonder if the pointer validity should be checked by skin_render_viewport() instead?",
+      "parentUuid": "a36ee88a_067d1622",
       "revId": "6718c8090710b0e11717db13a25bb172666940e9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "dbab54d4_309968fb",
+        "filename": "apps/gui/skin_engine/skin_parser.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "Yep, adding a test for that too.",
+      "parentUuid": "b31458fa_a4fd5305",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d0485737_5f190735",
         "filename": "apps/gui/skin_engine/skin_parser.c",
         "patchSetId": 10
@@ -70,6 +130,24 @@
       "writtenOn": "2020-10-28T09:12:47Z",
       "side": 1,
       "message": "skin_buffer could be NULL from other functions here",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e21d8463_ae18dd1e",
+        "filename": "apps/gui/skin_engine/skin_parser.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1714,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "Check added.",
+      "parentUuid": "d0485737_5f190735",
       "revId": "6718c8090710b0e11717db13a25bb172666940e9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
@@ -110,6 +188,24 @@
     },
     {
       "key": {
+        "uuid": "524c4316_7c12a7da",
+        "filename": "apps/gui/skin_engine/skin_tokens.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "ADded a check to get_token_value()",
+      "parentUuid": "7ae5dbf1_f9af9863",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dd38e628_a73c84f0",
         "filename": "apps/gui/skin_engine/skin_tokens.c",
         "patchSetId": 10
@@ -127,6 +223,24 @@
     },
     {
       "key": {
+        "uuid": "669b980e_19b8de06",
+        "filename": "apps/gui/skin_engine/skin_tokens.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "done.",
+      "parentUuid": "dd38e628_a73c84f0",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "05bf2849_ad495c37",
         "filename": "apps/gui/statusbar-skinned.c",
         "patchSetId": 10
@@ -138,6 +252,24 @@
       "writtenOn": "2020-10-28T09:12:47Z",
       "side": 1,
       "message": "needs checked",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ae62423e_ece3997d",
+        "filename": "apps/gui/statusbar-skinned.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T12:39:01Z",
+      "side": 1,
+      "message": "rearranged slightly, but added.",
+      "parentUuid": "05bf2849_ad495c37",
       "revId": "6718c8090710b0e11717db13a25bb172666940e9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
