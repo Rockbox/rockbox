@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9febee8f_0d454669",
+        "filename": "apps/gui/bitmap/list-skinned.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "This should be guarded too \n|| !skin_viewport",
+      "range": {
+        "startLine": 226,
+        "startChar": 17,
+        "endLine": 226,
+        "endChar": 30
+      },
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a36ee88a_067d1622",
+        "filename": "apps/gui/bitmap/list-skinned.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "double pointers isn\u0027t the first deref always there but you need to check *children no?",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b31458fa_a4fd5305",
+        "filename": "apps/gui/skin_engine/skin_parser.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "token is never checked",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d0485737_5f190735",
+        "filename": "apps/gui/skin_engine/skin_parser.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1714,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "skin_buffer could be NULL from other functions here",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "664f60ad_87b2ff04",
+        "filename": "apps/gui/skin_engine/skin_render.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "Nice",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7ae5dbf1_f9af9863",
+        "filename": "apps/gui/skin_engine/skin_tokens.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "token is never checked here nor in get_token_value()",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "dd38e628_a73c84f0",
+        "filename": "apps/gui/skin_engine/skin_tokens.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 742,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "what about these?",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "05bf2849_ad495c37",
+        "filename": "apps/gui/statusbar-skinned.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-28T09:12:47Z",
+      "side": 1,
+      "message": "needs checked",
+      "revId": "6718c8090710b0e11717db13a25bb172666940e9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
