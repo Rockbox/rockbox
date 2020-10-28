@@ -210,7 +210,8 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp)
         return;
     else if (backdrop_id < 0)
     {
-        svp->vp.buffer = NULL; /*Default*/
+        /* SCREEN_MAIN is ok here screen only matters if passed VP is NULL */
+        screens[SCREEN_MAIN].viewport_set_buffer(&svp->vp, NULL); /*Default*/
         return;
     }
 
@@ -224,6 +225,7 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp)
     {
         svp->framebuf.elems = LCD_BACKDROP_BYTES / sizeof(fb_data);
     }
+    svp->framebuf.stride = 0; /* default stride */
     svp->framebuf.get_address_fn = NULL; /*Default iterator*/
     screens[screen].viewport_set_buffer(&svp->vp, &svp->framebuf);
 }
