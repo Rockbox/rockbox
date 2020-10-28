@@ -147,7 +147,6 @@ static void add_to_ll_chain(OFFSETTYPE(struct skin_token_list *) *listoffset,
 void *skin_find_item(const char *label, enum skin_find_what what,
                      struct wps_data *data)
 {
-    const char *itemlabel = NULL;
     char *databuf = get_skin_buffer(data);
     union {
         struct skin_token_list *linkedlist;
@@ -183,11 +182,10 @@ void *skin_find_item(const char *label, enum skin_find_what what,
     {
         bool skip = false;
         struct wps_token *token = NULL;
-        itemlabel = NULL;
+        const char *itemlabel = NULL;
         if (!isvplist)
             token = SKINOFFSETTOPTR(databuf, list.linkedlist->token);
-        if (token)
-            switch (what)
+        switch (what)
         {
             case SKIN_FIND_UIVP:
             case SKIN_FIND_VP:
@@ -201,25 +199,27 @@ void *skin_find_item(const char *label, enum skin_find_what what,
                     (what==SKIN_FIND_UIVP));
                 break;
             case SKIN_FIND_IMAGE:
+                if (!token) break;
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
                 if (!ret) break;
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct gui_img *)ret)->label);
                 break;
 #ifdef HAVE_TOUCHSCREEN
             case SKIN_FIND_TOUCHREGION:
-                if (!ret) break;
+                if (!token) break;
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
+                if (!ret) break;
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct touchregion *)ret)->label);
                 break;
 #endif
 #ifdef HAVE_SKIN_VARIABLES
             case SKIN_VARIABLE:
+                if (!token) break;
                 ret = SKINOFFSETTOPTR(databuf, token->value.data);
                 if (!ret) break;
                 itemlabel = SKINOFFSETTOPTR(databuf, ((struct skin_var *)ret)->label);
                 break;
 #endif
-
         }
         if (!skip && itemlabel && !strcmp(itemlabel, label))
         {
