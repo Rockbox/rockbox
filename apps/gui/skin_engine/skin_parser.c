@@ -1714,10 +1714,11 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 {
     if (wps_data->wps_loaded)
         skin_buffer = get_skin_buffer(wps_data);
+
+#ifndef __PCTOOL__
     if (!skin_buffer)
         goto abort;
 
-#ifndef __PCTOOL__
     struct skin_token_list *list = SKINOFFSETTOPTR(skin_buffer, wps_data->images);
     int *font_ids = SKINOFFSETTOPTR(skin_buffer, wps_data->font_ids);
     while (list)
