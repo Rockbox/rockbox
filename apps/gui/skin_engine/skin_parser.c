@@ -1715,7 +1715,7 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
     if (wps_data->wps_loaded)
         skin_buffer = get_skin_buffer(wps_data);
     if (!skin_buffer)
-        return;
+        goto abort;
 
 #ifndef __PCTOOL__
     struct skin_token_list *list = SKINOFFSETTOPTR(skin_buffer, wps_data->images);
@@ -1744,13 +1744,15 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
         }
         list = SKINOFFSETTOPTR(skin_buffer, list->next);
     }
-    wps_data->images = PTRTOSKINOFFSET(skin_buffer, NULL);
     if (font_ids != NULL)
     {
         while (wps_data->font_count > 0)
             font_unload(font_ids[--wps_data->font_count]);
     }
-    wps_data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL);
+
+abort:
+    wps_data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL); /* Safe if skin_buffer is NULL */
+    wps_data->images = PTRTOSKINOFFSET(skin_buffer, NULL);
     if (wps_data->buflib_handle > 0)
         core_free(wps_data->buflib_handle);
     wps_data->buflib_handle = -1;
