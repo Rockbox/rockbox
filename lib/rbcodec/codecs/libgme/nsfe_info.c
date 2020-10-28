@@ -152,6 +152,7 @@ blargg_err_t Info_load( struct Nsfe_Info* this, void* data, long size, struct Ns
 	{
 		// read size and tag
 		byte block_header [2] [4];
+		memset(block_header, 0, sizeof(block_header));
 		RETURN_ERR( in_read( block_header, sizeof block_header, data, &offset, size ) );
 		
 		int chunk_size = get_le32( block_header [0] );
