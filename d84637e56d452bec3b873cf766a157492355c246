@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b1c3fe7_7543989b",
+        "filename": "apps/gui/skin_engine/skin_render.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-28T11:54:26Z",
+      "side": 1,
+      "message": "IIUC, this will restore the _default_ viewport, not the \"first\" one?\n\nSo the code doesn\u0027t match the comment above it..",
+      "range": {
+        "startLine": 907,
+        "startChar": 0,
+        "endLine": 907,
+        "endChar": 57
+      },
+      "revId": "d84637e56d452bec3b873cf766a157492355c246",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
