@@ -49,6 +49,9 @@ static int lcd_reg_0x61_val = 1; /* used to invert display */
 static int lcd_reg_3_val = 0x1030; /* controls to flip display */
 #endif
 
+void lcd_write_helper(int x, int y, int w, int h);
+void (*lcd_write_fn)(int x, int y, int w, int h)= &lcd_write_helper;
+
 static enum lcd_kind_t
 {
     LCD_KIND_7783 = 0x7783,
@@ -543,9 +546,28 @@ void lcd_set_invert_display(bool yesno)
 #endif
 
 #ifdef HAVE_LCD_FLIP
+void lcd_write_helper_flipped(int x, int y, int w, int h)
+{
+    imx233_lcdif_wait_ready();
+    lcd_write_reg(0x50, x);
+    lcd_write_reg(0x51, x + w - 1);
+    lcd_write_reg(0x52, LCD_HEIGHT-(y+h-1));
+    lcd_write_reg(0x53, LCD_HEIGHT-y);
+    lcd_write_reg(0x20, x);
+    lcd_write_reg(0x21, LCD_HEIGHT-(y+h));
+    lcd_write_reg(0x22, 0);
+}
 void lcd_set_flip(bool yesno)
 {
-    lcd_reg_3_val = yesno ? 0x1000 : 0x1030;
+    if(yesno)
+    {
+        lcd_reg_3_val = 0x1000;
+        lcd_write_fn = &lcd_write_helper_flipped;
+    }
+    else{
+        lcd_reg_3_val = 0x1030;
+        lcd_write_fn = &lcd_write_helper;
+    }
     #ifdef HAVE_LCD_ENABLE
     if(!lcd_on)
         return;
@@ -554,6 +576,18 @@ void lcd_set_flip(bool yesno)
     lcd_write_reg(3, lcd_reg_3_val);
 }
 #endif
+
+void lcd_write_helper(int x, int y, int w, int h)
+{
+    imx233_lcdif_wait_ready();
+    lcd_write_reg(0x50, x);
+    lcd_write_reg(0x51, x + w - 1);
+    lcd_write_reg(0x52, y);
+    lcd_write_reg(0x53, y + h - 1);
+    lcd_write_reg(0x20, x);
+    lcd_write_reg(0x21, y);
+    lcd_write_reg(0x22, 0);
+}
 
 void lcd_update(void)
 {
@@ -587,14 +621,7 @@ void lcd_update_rect(int x, int y, int w, int h)
     if (h <= 0)
         return; /* nothing left to do */
 
-    imx233_lcdif_wait_ready();
-    lcd_write_reg(0x50, x);
-    lcd_write_reg(0x51, x + w - 1);
-    lcd_write_reg(0x52, y);
-    lcd_write_reg(0x53, y + h - 1);
-    lcd_write_reg(0x20, x);
-    lcd_write_reg(0x21, y);
-    lcd_write_reg(0x22, 0);
+    (*lcd_write_fn)(x, y, w, h);
     imx233_lcdif_wait_ready();
     imx233_lcdif_set_word_length(16);
     imx233_lcdif_set_byte_packing_format(0xf); /* two pixels per 32-bit word */
