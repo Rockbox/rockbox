@@ -161,6 +161,9 @@ QT += widgets
 if (lessThan(QT_MAJOR_VERSION, 6)) {
     QT += multimedia
 }
+if (greaterThan(QT_MAJOR_VERSION, 5)) {
+    QT += core5compat
+}
 
 CONFIG += c++11
 

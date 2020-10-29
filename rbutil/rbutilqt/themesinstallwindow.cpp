@@ -18,6 +18,7 @@
 
 #include <QDialog>
 #include <QMessageBox>
+#include <QTextCodec>
 
 #include "ui_themesinstallfrm.h"
 #include "themesinstallwindow.h"
