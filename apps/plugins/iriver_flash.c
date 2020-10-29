@@ -67,7 +67,7 @@ static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
 #endif
 
 /* read the manufacturer and device ID */
-bool cfi_read_id(uint8_t* pManufacturerID, uint8_t* pDeviceID)
+static bool cfi_read_id(uint8_t* pManufacturerID, uint8_t* pDeviceID)
 {
     uint8_t not_manu, not_id; /* read values before switching to ID mode */
     uint8_t manu, id; /* read values when in ID mode */
@@ -99,12 +99,34 @@ bool cfi_read_id(uint8_t* pManufacturerID, uint8_t* pDeviceID)
     return false; /* fail */
 }
 
+/* wait until the rom signals completion of an operation */
+static bool cfi_wait_for_rom(volatile uint16_t* pAddr)
+{
+    const unsigned MAX_TIMEOUT = 0xffffff; /* should be sufficient for most targets */
+    const unsigned RECOVERY_TIME = 64; /* based on 140MHz MCF 5249 */
+    uint16_t old_data = *pAddr & 0x0040; /* we only want DQ6 */
+    volatile unsigned i; /* disables certain optimizations */
+
+    /* repeat up to MAX_TIMEOUT times or until DQ6 stops flipping */
+    for (i = 0; i < MAX_TIMEOUT; i++)
+    {
+        uint16_t new_data = *pAddr & 0x0040; /* we only want DQ6 */
+        if(old_data == new_data)
+            break;
+        old_data = new_data;
+    }
+
+    bool result = i != MAX_TIMEOUT;
+
+    /* delay at least 1us to give the bus time to recover */
+    for (i = 0; i < RECOVERY_TIME; i++);
+
+    return result;
+}
 
 /* erase the sector which contains the given address */
-bool cfi_erase_sector(volatile uint16_t* pAddr)
+static bool cfi_erase_sector(volatile uint16_t* pAddr)
 {
-    unsigned timeout = 430000; /* the timeout loop should be no less than 25ms */
-
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
     FB[0x5555] = 0x80; /* erase command */
@@ -112,35 +134,19 @@ bool cfi_erase_sector(volatile uint16_t* pAddr)
     FB[0x2AAA] = 0x55;
     *pAddr = 0x30; /* erase the sector */
 
-    /* I counted 7 instructions for this loop -> min. 0.58 us per round */
-    /* Plus memory waitstates it will be much more, gives margin */
-    while (*pAddr != 0xFFFF && --timeout); /* poll for erased */
-
-    return (timeout != 0);
+    return cfi_wait_for_rom(pAddr);
 }
 
-
 /* address must be in an erased location */
-static inline bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
+static bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 {
-    unsigned timeout = 85; /* the timeout loop should be no less than 20us */
-
-    if (~*pAddr & data) /* just a safety feature, not really necessary */
-        return false; /* can't set any bit from 0 to 1 */
-
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
     FB[0x5555] = 0xA0; /* byte program command */
+    *pAddr = data; /* write the word data */
 
-    *pAddr = data;
-
-    /* I counted 7 instructions for this loop -> min. 0.58 us per round */
-    /* Plus memory waitstates it will be much more, gives margin */
-    while (*pAddr != data && --timeout); /* poll for programmed */
-
-    return (timeout != 0);
+    return cfi_wait_for_rom(pAddr);
 }
-
 
 /* this returns true if supported and fills the info struct */
 bool cfi_get_flash_info(struct flash_info* pInfo)
