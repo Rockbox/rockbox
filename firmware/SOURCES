@@ -145,6 +145,7 @@ target/hosted/xduoo/powermgmt-xduoo.c
 
 #if defined(HIBY_LINUX) && !defined(SIMULATOR)
 target/hosted/usb-hiby.c
+target/hosted/button-devinput.c
 #endif
 
 #if (defined(FIIO_M3K)) && !defined(SIMULATOR)
