@@ -210,8 +210,15 @@ void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp)
         return;
     else if (backdrop_id < 0)
     {
-        /* SCREEN_MAIN is ok here screen only matters if passed VP is NULL */
-        screens[SCREEN_MAIN].viewport_set_buffer(&svp->vp, NULL); /*Default*/
+#if 1
+        /* ensure the current vp has been removed so it has to be reselected */
+        screens[SCREEN_MAIN].set_viewport_ex(NULL, 0);
+#   if defined(HAVE_REMOTE_LCD)
+        screens[SCREEN_REMOTE].set_viewport_ex(NULL, 0);
+#   endif
+#endif
+        /* WARNING: vp-> buffer is invaid till viewport is set to a screen */
+        svp->vp.buffer = NULL; /*Default*/
         return;
     }
 
