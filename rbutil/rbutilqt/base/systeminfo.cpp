@@ -203,7 +203,7 @@ QMap<int, QStringList> SystemInfo::usbIdMap(enum MapType type)
             if(id == 0) {
                 continue;
             }
-            if(map.keys().contains(id)) {
+            if(map.contains(id)) {
                 l = map.take(id);
             }
             l.append(target);
