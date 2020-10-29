@@ -19,7 +19,6 @@
  *
  ****************************************************************************/
 #include <poll.h>
-//#include <dir.h>
 #include <errno.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -34,8 +33,6 @@
 #include "panic.h"
 
 #include "kernel.h"
-#include "backlight.h"
-#include "backlight-target.h"
 
 static int key_enter_delay = 0;
 static int key_right_delay = 0;
