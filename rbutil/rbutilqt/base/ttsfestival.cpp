@@ -127,7 +127,7 @@ void TTSFestival::startServer()
         serverProcess.waitForStarted();
 
         /* A friendlier version of a spinlock */
-        while (serverProcess.pid() == 0 && serverProcess.state() != QProcess::Running)
+        while (serverProcess.processId() == 0 && serverProcess.state() != QProcess::Running)
             QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
 
         if(serverProcess.state() == QProcess::Running)
