@@ -49,9 +49,9 @@ ssize_t audiobuf_size;
 
 struct flash_info
 {
-    uint8_t manufacturer;
-    uint8_t id;
-    int size;
+    uint16_t manufacturer;
+    uint16_t id;
+    uint32_t size;
     char name[32];
 };
 
@@ -67,36 +67,20 @@ static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
 #endif
 
 /* read the manufacturer and device ID */
-static bool cfi_read_id(uint8_t* pManufacturerID, uint8_t* pDeviceID)
+static void cfi_read_id(struct flash_info* pInfo)
 {
-    uint8_t not_manu, not_id; /* read values before switching to ID mode */
-    uint8_t manu, id; /* read values when in ID mode */
+    FB[0x5555] = 0xAA; /* enter command mode */
+    FB[0x2AAA] = 0x55;
+    FB[0x5555] = 0x90; /* enter ID mode */
+    rb->sleep(HZ/100); /* we only need to sleep 150ns but 10ms is the minimum */
 
-    /* read the normal content */
-    not_manu = FB[0]; /* should be 'A' (0x41) and 'R' (0x52) */
-    not_id   = FB[1]; /*  from the "ARCH" marker */
+    pInfo->manufacturer = FB[0];
+    pInfo->id = FB[1];
 
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
-    FB[0x5555] = 0x90; /* ID command */
-    rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
-
-    manu = FB[0];
-    id   = FB[1];
-
-    FB[0] = 0xF0; /* reset flash (back to normal read mode) */
-    rb->sleep(HZ/50); /* Atmel wants 20ms pause here */
-
-    /* I assume success if the obtained values are different from
-    the normal flash content. This is not perfectly bulletproof, they
-    could theoretically be the same by chance, causing us to fail. */
-    if (not_manu != manu || not_id != id) /* a value has changed */
-    {
-        *pManufacturerID = manu; /* return the results */
-        *pDeviceID = id;
-        return true; /* success */
-    }
-    return false; /* fail */
+    FB[0x5555] = 0xF0; /* exit ID mode */
+    rb->sleep(HZ/100); /* we only need to sleep 150ns but 10ms is the minimum */
 }
 
 /* wait until the rom signals completion of an operation */
@@ -148,44 +132,34 @@ static bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
     return cfi_wait_for_rom(pAddr);
 }
 
-/* this returns true if supported and fills the info struct */
-bool cfi_get_flash_info(struct flash_info* pInfo)
+/* fills in the struct with data about the flash rom */
+static void cfi_get_flash_info(struct flash_info* pInfo)
 {
-    rb->memset(pInfo, 0, sizeof(struct flash_info));
+    uint32_t size = 0;
+    const char* name = "";
 
-    if (!cfi_read_id(&pInfo->manufacturer, &pInfo->id))
-        return false;
+    cfi_read_id(pInfo);
 
-    if (pInfo->manufacturer == 0xBF) /* SST */
+    switch (pInfo->manufacturer)
     {
-        if (pInfo->id == 0xD6)
-        {
-            pInfo->size = 256* 1024; /* 256k */
-            rb->strcpy(pInfo->name, "SST39VF020");
-            return true;
-        }
-        else if (pInfo->id == 0xD7)
-        {
-            pInfo->size = 512* 1024; /* 512k */
-            rb->strcpy(pInfo->name, "SST39VF040");
-            return true;
-        }
-        else if (pInfo->id == 0x82)
-        {
-            pInfo->size = 2048* 1024; /* 2 MiB */
-            rb->strcpy(pInfo->name, "SST39VF160");
-            return true;
-        }
-        else if (pInfo->id == 0x5B)
-        {
-            pInfo->size = 4096* 1024; /* 4 MiB */
-            rb->strcpy(pInfo->name, "SST39VF3201");
-            return true;
-        }
-        else
-            return false;
+        /* SST */
+        case 0x00BF:
+            switch (pInfo->id)
+            {
+                case 0x2782:
+                    size = 2048 * 1024; /* 2 MiB */
+                    name = "SST39VF160";
+                    break;
+                case 0x235B:
+                    size = 4096 * 1024; /* 4 MiB */
+                    name = "SST39VF3201";
+                    break;
+            }
+            break;
     }
-    return false;
+
+    pInfo->size = size;
+    rb->strcpy(pInfo->name, name);
 }
 
 /***************** User Interface Functions *****************/
@@ -206,25 +180,23 @@ void ShowFlashInfo(struct flash_info* pInfo)
 {
     if (!pInfo->manufacturer)
     {
-        rb->lcd_puts(0, 0, "Flash: M=?? D=??");
+        rb->lcd_puts(0, 0, "Flash: M=???? D=????");
         rb->lcd_puts(0, 1, "Impossible to program");
     }
     else
     {
-        rb->lcd_putsf(0, 0, "Flash: M=%02x D=%02x",
+        rb->lcd_putsf(0, 0, "Flash: M=%04x D=%04x",
             pInfo->manufacturer, pInfo->id);
-
 
         if (pInfo->size)
         {
             rb->lcd_puts(0, 1, pInfo->name);
-            rb->lcd_putsf(0, 2, "Size: %d KB", pInfo->size / 1024);
+            rb->lcd_putsf(0, 2, "Size: %u KB", pInfo->size / 1024);
         }
         else
         {
             rb->lcd_puts(0, 1, "Unsupported chip");
         }
-
     }
 
     rb->lcd_update();
