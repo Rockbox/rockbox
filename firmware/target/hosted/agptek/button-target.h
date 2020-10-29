@@ -39,5 +39,7 @@
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT 25
 
+int button_map(int keycode);
+
 #endif /* _BUTTON_TARGET_H_ */
 
