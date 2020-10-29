@@ -667,6 +667,9 @@ const char *get_token_value(struct gui_wps *gwps,
                            char *buf, int buf_size,
                            int *intval)
 {
+    int intret = -1;
+    const char * bufret = NULL;
+
     if (!gwps)
         return NULL;
     if (!token)
@@ -794,11 +797,10 @@ const char *get_token_value(struct gui_wps *gwps,
                     buf = &buf[start_byte];
 
                 buf[byte_len] = '\0';
-                if (ss->expect_number &&
-                    intval && (buf[0] >= '0' && buf[0] <= '9'))
-                    *intval = atoi(buf) + 1; /* so 0 is the first item */
-
-                return buf;
+                if (ss->expect_number && (buf[0] >= '0' && buf[0] <= '9'))
+                    intret = atoi(buf) + 1; /* so 0 is the first item */
+                bufret = buf;
+                goto ret_intval;
             }
             return NULL;
         }
@@ -823,10 +825,10 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_LIST_TITLE_TEXT:
             return sb_get_title(gwps->display->screen_type);
         case SKIN_TOKEN_LIST_TITLE_ICON:
-            if (intval)
-                *intval = sb_get_icon(gwps->display->screen_type);
+            intret = sb_get_icon(gwps->display->screen_type);
             snprintf(buf, buf_size, "%d",sb_get_icon(gwps->display->screen_type));
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         case SKIN_TOKEN_LIST_ITEM_TEXT:
         {
             struct listitem *li = (struct listitem *)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
@@ -834,20 +836,20 @@ const char *get_token_value(struct gui_wps *gwps,
             return skinlist_get_item_text(li->offset, li->wrap, buf, buf_size);
         }
         case SKIN_TOKEN_LIST_ITEM_ROW:
-            if (intval)
-                *intval = skinlist_get_item_row() + 1;
+            intret = skinlist_get_item_row() + 1;
             snprintf(buf, buf_size, "%d",skinlist_get_item_row() + 1);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         case SKIN_TOKEN_LIST_ITEM_COLUMN:
-            if (intval)
-                *intval = skinlist_get_item_column() + 1;
+            intret = skinlist_get_item_column() + 1;
             snprintf(buf, buf_size, "%d",skinlist_get_item_column() + 1);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         case SKIN_TOKEN_LIST_ITEM_NUMBER:
-            if (intval)
-                *intval = skinlist_get_item_number() + 1;
+            intret = skinlist_get_item_number() + 1;
             snprintf(buf, buf_size, "%d",skinlist_get_item_number() + 1);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         case SKIN_TOKEN_LIST_ITEM_IS_SELECTED:
             return skinlist_is_selected_item()?"s":"";
         case SKIN_TOKEN_LIST_ITEM_ICON:
@@ -855,10 +857,10 @@ const char *get_token_value(struct gui_wps *gwps,
             struct listitem *li = (struct listitem *)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
             if (!li) return NULL;
             int icon = skinlist_get_item_icon(li->offset, li->wrap);
-            if (intval)
-                *intval = icon;
+            intret = icon;
             snprintf(buf, buf_size, "%d", icon);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
         case SKIN_TOKEN_LIST_NEEDS_SCROLLBAR:
             return skinlist_needs_scrollbar(gwps->display->screen_type) ? "s" : "";
@@ -867,9 +869,9 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_PLAYLIST_POSITION:
             snprintf(buf, buf_size, "%d", playlist_get_display_index()+offset);
-            if (intval)
-                *intval = playlist_get_display_index()+offset;
-            return buf;
+            intret = playlist_get_display_index()+offset;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_PLAYLIST_SHUFFLE:
             if ( global_settings.playlist_shuffle )
@@ -880,32 +882,30 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_VOLUME:
             snprintf(buf, buf_size, "%d", global_settings.volume);
-            if (intval)
+            int minvol = sound_min(SOUND_VOLUME);
+            if (limit == TOKEN_VALUE_ONLY)
             {
-                int minvol = sound_min(SOUND_VOLUME);
-                if (limit == TOKEN_VALUE_ONLY)
-                {
-                    *intval = global_settings.volume;
-                }
-                else if (global_settings.volume == minvol)
-                {
-                    *intval = 1;
-                }
-                else if (global_settings.volume == 0)
-                {
-                    *intval = limit - 1;
-                }
-                else if (global_settings.volume > 0)
-                {
-                    *intval = limit;
-                }
-                else
-                {
-                    *intval = (limit-3) * (global_settings.volume - minvol - 1)
-                                / (-1 - minvol) + 2;
-                }
+                intret = global_settings.volume;
             }
-            return buf;
+            else if (global_settings.volume == minvol)
+            {
+                intret = 1;
+            }
+            else if (global_settings.volume == 0)
+            {
+                intret = limit - 1;
+            }
+            else if (global_settings.volume > 0)
+            {
+                intret = limit;
+            }
+            else
+            {
+                intret = (limit-3) * (global_settings.volume - minvol - 1)
+                            / (-1 - minvol) + 2;
+            }
+            bufret = buf;
+            goto ret_intval;
 #ifdef HAVE_ALBUMART
         case SKIN_TOKEN_ALBUMART_FOUND:
             if (SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart))
@@ -931,31 +931,31 @@ const char *get_token_value(struct gui_wps *gwps,
         {
             int l = battery_level();
 
-            if (intval)
+
+            if (limit == TOKEN_VALUE_ONLY)
             {
-                if (limit == TOKEN_VALUE_ONLY)
-                {
-                    *intval = l;
-                }
-                else
-                {
-                    limit = MAX(limit, 3);
-                    if (l > -1) {
-                        /* First enum is used for "unknown level",
-                         * last enum is used for 100%.
-                         */
-                        *intval = (limit - 2) * l / 100 + 2;
-                    } else {
-                        *intval = 1;
-                    }
+                intret = l;
+            }
+            else
+            {
+                limit = MAX(limit, 3);
+                if (l > -1) {
+                    /* First enum is used for "unknown level",
+                     * last enum is used for 100%.
+                     */
+                    intret = (limit - 2) * l / 100 + 2;
+                } else {
+                    intret = 1;
                 }
             }
 
             if (l > -1) {
                 snprintf(buf, buf_size, "%d", l);
-                return buf;
+                bufret = buf;
+                goto ret_intval;
             } else {
-                return "?";
+                bufret = "?";
+                goto ret_intval;
             }
         }
 
@@ -1046,20 +1046,17 @@ const char *get_token_value(struct gui_wps *gwps,
                 mode = 9;
 #endif
 
-            if (intval) {
-                *intval = mode;
-            }
-
+            intret = mode;
             snprintf(buf, buf_size, "%d", mode-1);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
 
         case SKIN_TOKEN_REPEAT_MODE:
-            if (intval)
-                *intval = global_settings.repeat_mode + 1;
+            intret = global_settings.repeat_mode + 1;
             snprintf(buf, buf_size, "%d", global_settings.repeat_mode);
-            return buf;
-
+            bufret = buf;
+            goto ret_intval;
         case SKIN_TOKEN_RTC_PRESENT:
 #if CONFIG_RTC
                 return "c";
@@ -1069,101 +1066,101 @@ const char *get_token_value(struct gui_wps *gwps,
 
 #if CONFIG_RTC
         case SKIN_TOKEN_RTC_12HOUR_CFG:
-            if (intval)
-                *intval = global_settings.timeformat + 1;
+            intret = global_settings.timeformat + 1;
             snprintf(buf, buf_size, "%d", global_settings.timeformat);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_DAY_OF_MONTH:
             /* d: day of month (01..31) */
             snprintf(buf, buf_size, "%02d", tm->tm_mday);
-            if (intval)
-                *intval = tm->tm_mday - 1;
-            return buf;
+            intret = tm->tm_mday - 1;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
             /* e: day of month, blank padded ( 1..31) */
             snprintf(buf, buf_size, "%2d", tm->tm_mday);
-            if (intval)
-                *intval = tm->tm_mday - 1;
-            return buf;
+            intret = tm->tm_mday - 1;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_HOUR_24_ZERO_PADDED:
             /* H: hour (00..23) */
             snprintf(buf, buf_size, "%02d", tm->tm_hour);
-            if (intval)
-                *intval = tm->tm_hour;
-            return buf;
+            intret = tm->tm_hour;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_HOUR_24:
             /* k: hour ( 0..23) */
             snprintf(buf, buf_size, "%2d", tm->tm_hour);
-            if (intval)
-                *intval = tm->tm_hour;
-            return buf;
+            intret = tm->tm_hour;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_HOUR_12_ZERO_PADDED:
             /* I: hour (01..12) */
             snprintf(buf, buf_size, "%02d",
                      (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
-            if (intval)
-                *intval = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
-            return buf;
+            intret = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_HOUR_12:
             /* l: hour ( 1..12) */
             snprintf(buf, buf_size, "%2d",
                      (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12);
-            if (intval)
-                *intval = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
-            return buf;
+            intret = (tm->tm_hour % 12 == 0) ? 12 : tm->tm_hour % 12;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_MONTH:
             /* m: month (01..12) */
-            if (intval)
-                *intval = tm->tm_mon + 1;
+            intret = tm->tm_mon + 1;
             snprintf(buf, buf_size, "%02d", tm->tm_mon + 1);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_MINUTE:
             /* M: minute (00..59) */
             snprintf(buf, buf_size, "%02d", tm->tm_min);
-            if (intval)
-                *intval = tm->tm_min;
-            return buf;
+            intret = tm->tm_min;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_SECOND:
             /* S: second (00..59) */
             snprintf(buf, buf_size, "%02d", tm->tm_sec);
-            if (intval)
-                *intval = tm->tm_sec;
-            return buf;
+            intret = tm->tm_sec;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_YEAR_2_DIGITS:
             /* y: last two digits of year (00..99) */
             snprintf(buf, buf_size, "%02d", tm->tm_year % 100);
-            if (intval)
-                *intval = tm->tm_year % 100;
-            return buf;
+            intret = tm->tm_year % 100;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_YEAR_4_DIGITS:
             /* Y: year (1970...) */
             snprintf(buf, buf_size, "%04d", tm->tm_year + 1900);
-            if (intval)
-                *intval = tm->tm_year + 1900;
-            return buf;
+            intret = tm->tm_year + 1900;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_AM_PM_UPPER:
             /* p: upper case AM or PM indicator */
-            if (intval)
-                *intval = tm->tm_hour/12 == 0 ? 0 : 1;
-            return tm->tm_hour/12 == 0 ? "AM" : "PM";
+            intret = tm->tm_hour/12 == 0 ? 0 : 1;
+            bufret = tm->tm_hour/12 == 0 ? "AM" : "PM";
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_AM_PM_LOWER:
             /* P: lower case am or pm indicator */
-            if (intval)
-                *intval = tm->tm_hour/12 == 0 ? 0 : 1;
-            return tm->tm_hour/12 == 0 ? "am" : "pm";
+            intret= tm->tm_hour/12 == 0 ? 0 : 1;
+            bufret = tm->tm_hour/12 == 0 ? "am" : "pm";
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_WEEKDAY_NAME:
             /* a: abbreviated weekday name (Sun..Sat) */
@@ -1175,17 +1172,17 @@ const char *get_token_value(struct gui_wps *gwps,
 
         case SKIN_TOKEN_RTC_DAY_OF_WEEK_START_MON:
             /* u: day of week (1..7); 1 is Monday */
-            if (intval)
-                *intval = (tm->tm_wday == 0) ? 7 : tm->tm_wday;
+            intret = (tm->tm_wday == 0) ? 7 : tm->tm_wday;
             snprintf(buf, buf_size, "%1d", tm->tm_wday + 1);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_RTC_DAY_OF_WEEK_START_SUN:
             /* w: day of week (0..6); 0 is Sunday */
-            if (intval)
-                *intval = tm->tm_wday + 1;
+            intret = tm->tm_wday + 1;
             snprintf(buf, buf_size, "%1d", tm->tm_wday);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
 #else
         case SKIN_TOKEN_RTC_DAY_OF_MONTH:
         case SKIN_TOKEN_RTC_DAY_OF_MONTH_BLANK_PADDED:
@@ -1219,22 +1216,22 @@ const char *get_token_value(struct gui_wps *gwps,
             val = token->type == SKIN_TOKEN_PEAKMETER_LEFT ?
                     left : right;
             val = peak_meter_scale_value(val, limit==1 ? MAX_PEAK : limit);
-            if (intval)
-                *intval = val;
+            intret = val;
             snprintf(buf, buf_size, "%d", val);
             data->peak_meter_enabled = true;
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
 
         case SKIN_TOKEN_CROSSFADE:
 #ifdef HAVE_CROSSFADE
-            if (intval)
-                *intval = global_settings.crossfade + 1;
+            intret = global_settings.crossfade + 1;
             snprintf(buf, buf_size, "%d", global_settings.crossfade);
 #else
             snprintf(buf, buf_size, "%d", 0);
 #endif
-            return buf;
+            bufret = buf;
+            goto ret_intval;
 
         case SKIN_TOKEN_REPLAYGAIN:
         {
@@ -1257,8 +1254,7 @@ const char *get_token_value(struct gui_wps *gwps,
                     val += 2;
             }
 
-            if (intval)
-                *intval = val;
+            intret = val;
 
             switch (val)
             {
@@ -1276,7 +1272,8 @@ const char *get_token_value(struct gui_wps *gwps,
                     replaygain_itoa(buf, buf_size, id3->album_level);
                     break;
             }
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
 
 #if defined (HAVE_PITCHCONTROL)
@@ -1287,10 +1284,10 @@ const char *get_token_value(struct gui_wps *gwps,
                      pitch / PITCH_SPEED_PRECISION,
              (pitch  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
 
-            if (intval)
-                *intval = pitch_speed_enum(limit, pitch,
+            intret = pitch_speed_enum(limit, pitch,
                            PITCH_SPEED_PRECISION * 100);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
 #endif
 
@@ -1306,10 +1303,10 @@ const char *get_token_value(struct gui_wps *gwps,
         snprintf(buf, buf_size, "%ld.%ld",
                      speed / PITCH_SPEED_PRECISION,
              (speed  % PITCH_SPEED_PRECISION) / (PITCH_SPEED_PRECISION / 10));
-        if (intval)
-            *intval = pitch_speed_enum(limit, speed,
+        intret = pitch_speed_enum(limit, speed,
                            PITCH_SPEED_PRECISION * 100);
-        return buf;
+        bufret = buf;
+        goto ret_intval;
     }
 #endif
 
@@ -1375,62 +1372,62 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_SETTING:
         {
             const struct settings_list *s = settings+token->value.i;
-            if (intval)
+
+            /* Handle contionals */
+            switch (s->flags&F_T_MASK)
             {
-                /* Handle contionals */
-                switch (s->flags&F_T_MASK)
-                {
-                    case F_T_INT:
-                    case F_T_UINT:
-                        if (s->flags&F_T_SOUND)
+                case F_T_INT:
+                case F_T_UINT:
+                    if (s->flags&F_T_SOUND)
+                    {
+                        /* %?St|name|<min|min+1|...|max-1|max> */
+                        int sound_setting = s->sound_setting->setting;
+                        /* settings with decimals can't be used in conditionals */
+                        if (sound_numdecimals(sound_setting) == 0)
                         {
-                            /* %?St|name|<min|min+1|...|max-1|max> */
-                            int sound_setting = s->sound_setting->setting;
-                            /* settings with decimals can't be used in conditionals */
-                            if (sound_numdecimals(sound_setting) == 0)
-                            {
-                                *intval = (*(int*)s->setting-sound_min(sound_setting))
-                                      /sound_steps(sound_setting) + 1;
-                            }
-                            else
-                                *intval = -1;
+                            intret = (*(int*)s->setting-sound_min(sound_setting))
+                                  /sound_steps(sound_setting) + 1;
                         }
-                        else if (s->flags&F_RGB)
-                            /* %?St|name|<#000000|#000001|...|#FFFFFF> */
-                            /* shouldn't overflow since colors are stored
-                             * on 16 bits ...
-                             * but this is pretty useless anyway */
-                            *intval = *(int*)s->setting + 1;
-                        else if (s->cfg_vals == NULL)
-                            /* %?St|name|<1st choice|2nd choice|...> */
-                            *intval = (*(int*)s->setting-s->int_setting->min)
-                                      /s->int_setting->step + 1;
                         else
-                            /* %?St|name|<1st choice|2nd choice|...> */
-                            /* Not sure about this one. cfg_name/vals are
-                             * indexed from 0 right? */
-                            *intval = *(int*)s->setting + 1;
-                        break;
-                    case F_T_BOOL:
-                        /* %?St|name|<if true|if false> */
-                        *intval = *(bool*)s->setting?1:2;
-                        break;
-                    case F_T_CHARPTR:
-                    case F_T_UCHARPTR:
-                        /* %?St|name|<if non empty string|if empty>
-                         * The string's emptyness discards the setting's
-                         * prefix and suffix */
-                        *intval = ((char*)s->setting)[0]?1:2;
-                        /* if there is a prefix we should ignore it here */
-                        if (s->filename_setting->prefix)
-                            return (char*)s->setting;
-                        break;
-                    default:
-                        /* This shouldn't happen ... but you never know */
-                        *intval = -1;
-                        break;
-                }
+                            intret = -1;
+                    }
+                    else if (s->flags&F_RGB)
+                        /* %?St|name|<#000000|#000001|...|#FFFFFF> */
+                        /* shouldn't overflow since colors are stored
+                         * on 16 bits ...
+                         * but this is pretty useless anyway */
+                        intret = *(int*)s->setting + 1;
+                    else if (s->cfg_vals == NULL)
+                        /* %?St|name|<1st choice|2nd choice|...> */
+                        intret = (*(int*)s->setting-s->int_setting->min)
+                                  /s->int_setting->step + 1;
+                    else
+                        /* %?St|name|<1st choice|2nd choice|...> */
+                        /* Not sure about this one. cfg_name/vals are
+                         * indexed from 0 right? */
+                        intret = *(int*)s->setting + 1;
+                    break;
+                case F_T_BOOL:
+                    /* %?St|name|<if true|if false> */
+                    intret = *(bool*)s->setting?1:2;
+                    break;
+                case F_T_CHARPTR:
+                case F_T_UCHARPTR:
+                    /* %?St|name|<if non empty string|if empty>
+                     * The string's emptyness discards the setting's
+                     * prefix and suffix */
+                    intret = ((char*)s->setting)[0]?1:2;
+                    /* if there is a prefix we should ignore it here */
+                    if (s->filename_setting->prefix)
+                        bufret = (char*)s->setting;
+                        goto ret_intval;
+                    break;
+                default:
+                    /* This shouldn't happen ... but you never know */
+                    intret = -1;
+                    break;
             }
+
             /* Special handlng for filenames because we dont want to show the prefix */
             if ((s->flags&F_T_MASK) == F_T_CHARPTR ||
                 (s->flags&F_T_MASK) == F_T_UCHARPTR)
@@ -1439,7 +1436,8 @@ const char *get_token_value(struct gui_wps *gwps,
                     return (char*)s->setting;
             }
             cfg_to_string(token->value.i,buf,buf_size);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
         case SKIN_TOKEN_HAVE_TUNER:
 #if CONFIG_TUNER
@@ -1484,50 +1482,48 @@ const char *get_token_value(struct gui_wps *gwps,
 #endif
                 samprk = rec_freq_sampr[rec_freq];
 #endif /* SIMULATOR */
-            if (intval)
+            switch (rec_freq)
             {
-                switch (rec_freq)
-                {
-                    REC_HAVE_96_(case REC_FREQ_96:
-                        *intval = 1;
-                        break;)
-                    REC_HAVE_88_(case REC_FREQ_88:
-                        *intval = 2;
-                        break;)
-                    REC_HAVE_64_(case REC_FREQ_64:
-                        *intval = 3;
-                        break;)
-                    REC_HAVE_48_(case REC_FREQ_48:
-                        *intval = 4;
-                        break;)
-                    REC_HAVE_44_(case REC_FREQ_44:
-                        *intval = 5;
-                        break;)
-                    REC_HAVE_32_(case REC_FREQ_32:
-                        *intval = 6;
-                        break;)
-                    REC_HAVE_24_(case REC_FREQ_24:
-                        *intval = 7;
-                        break;)
-                    REC_HAVE_22_(case REC_FREQ_22:
-                        *intval = 8;
-                        break;)
-                    REC_HAVE_16_(case REC_FREQ_16:
-                        *intval = 9;
-                        break;)
-                    REC_HAVE_12_(case REC_FREQ_12:
-                        *intval = 10;
-                        break;)
-                    REC_HAVE_11_(case REC_FREQ_11:
-                        *intval = 11;
-                        break;)
-                    REC_HAVE_8_(case REC_FREQ_8:
-                        *intval = 12;
-                        break;)
-                }
+                REC_HAVE_96_(case REC_FREQ_96:
+                    intret = 1;
+                    break;)
+                REC_HAVE_88_(case REC_FREQ_88:
+                    intret = 2;
+                    break;)
+                REC_HAVE_64_(case REC_FREQ_64:
+                    intret = 3;
+                    break;)
+                REC_HAVE_48_(case REC_FREQ_48:
+                    intret = 4;
+                    break;)
+                REC_HAVE_44_(case REC_FREQ_44:
+                    intret = 5;
+                    break;)
+                REC_HAVE_32_(case REC_FREQ_32:
+                    intret = 6;
+                    break;)
+                REC_HAVE_24_(case REC_FREQ_24:
+                    intret = 7;
+                    break;)
+                REC_HAVE_22_(case REC_FREQ_22:
+                    intret = 8;
+                    break;)
+                REC_HAVE_16_(case REC_FREQ_16:
+                    intret = 9;
+                    break;)
+                REC_HAVE_12_(case REC_FREQ_12:
+                    intret = 10;
+                    break;)
+                REC_HAVE_11_(case REC_FREQ_11:
+                    intret = 11;
+                    break;)
+                REC_HAVE_8_(case REC_FREQ_8:
+                    intret = 12;
+                    break;)
             }
             snprintf(buf, buf_size, "%lu.%1lu", samprk/1000,samprk%1000);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
         case SKIN_TOKEN_REC_ENCODER:
         {
@@ -1552,62 +1548,60 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_REC_BITRATE:
             if (global_settings.rec_format == REC_FORMAT_MPA_L3)
             {
-                if (intval)
+                #if 0 /* FIXME: I dont know if this is needed? */
+                switch (1<<global_settings.mp3_enc_config.bitrate)
                 {
-                    #if 0 /* FIXME: I dont know if this is needed? */
-                    switch (1<<global_settings.mp3_enc_config.bitrate)
-                    {
-                        case MP3_BITR_CAP_8:
-                            *intval = 1;
-                            break;
-                        case MP3_BITR_CAP_16:
-                            *intval = 2;
-                            break;
-                        case MP3_BITR_CAP_24:
-                            *intval = 3;
-                            break;
-                        case MP3_BITR_CAP_32:
-                            *intval = 4;
-                            break;
-                        case MP3_BITR_CAP_40:
-                            *intval = 5;
-                            break;
-                        case MP3_BITR_CAP_48:
-                            *intval = 6;
-                            break;
-                        case MP3_BITR_CAP_56:
-                            *intval = 7;
-                            break;
-                        case MP3_BITR_CAP_64:
-                            *intval = 8;
-                            break;
-                        case MP3_BITR_CAP_80:
-                            *intval = 9;
-                            break;
-                        case MP3_BITR_CAP_96:
-                            *intval = 10;
-                            break;
-                        case MP3_BITR_CAP_112:
-                            *intval = 11;
-                            break;
-                        case MP3_BITR_CAP_128:
-                            *intval = 12;
-                            break;
-                        case MP3_BITR_CAP_144:
-                            *intval = 13;
-                            break;
-                        case MP3_BITR_CAP_160:
-                            *intval = 14;
-                            break;
-                        case MP3_BITR_CAP_192:
-                            *intval = 15;
-                            break;
-                    }
-                    #endif
-                    *intval = global_settings.mp3_enc_config.bitrate+1;
+                    case MP3_BITR_CAP_8:
+                        intret = 1;
+                        break;
+                    case MP3_BITR_CAP_16:
+                        intret = 2;
+                        break;
+                    case MP3_BITR_CAP_24:
+                        intret = 3;
+                        break;
+                    case MP3_BITR_CAP_32:
+                        intret = 4;
+                        break;
+                    case MP3_BITR_CAP_40:
+                        intret = 5;
+                        break;
+                    case MP3_BITR_CAP_48:
+                        intret = 6;
+                        break;
+                    case MP3_BITR_CAP_56:
+                        intret = 7;
+                        break;
+                    case MP3_BITR_CAP_64:
+                        intret = 8;
+                        break;
+                    case MP3_BITR_CAP_80:
+                        intret = 9;
+                        break;
+                    case MP3_BITR_CAP_96:
+                        intret = 10;
+                        break;
+                    case MP3_BITR_CAP_112:
+                        intret = 11;
+                        break;
+                    case MP3_BITR_CAP_128:
+                        intret = 12;
+                        break;
+                    case MP3_BITR_CAP_144:
+                        intret = 13;
+                        break;
+                    case MP3_BITR_CAP_160:
+                        intret = 14;
+                        break;
+                    case MP3_BITR_CAP_192:
+                        intret = 15;
+                        break;
                 }
+                #endif
+                intret = global_settings.mp3_enc_config.bitrate+1;
                 snprintf(buf, buf_size, "%lu", global_settings.mp3_enc_config.bitrate+1);
-                return buf;
+                bufret = buf;
+                goto ret_intval;
             }
             else
                 return NULL; /* Fixme later */
@@ -1619,26 +1613,26 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_REC_SECONDS:
         {
             int time = (audio_recorded_time() / HZ) % 60;
-            if (intval)
-                *intval = time;
+            intret = time;
             snprintf(buf, buf_size, "%02d", time);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
         case SKIN_TOKEN_REC_MINUTES:
         {
             int time = (audio_recorded_time() / HZ) / 60;
-            if (intval)
-                *intval = time;
+            intret = time;
             snprintf(buf, buf_size, "%02d", time);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
         case SKIN_TOKEN_REC_HOURS:
         {
             int time = (audio_recorded_time() / HZ) / 3600;
-            if (intval)
-                *intval = time;
+            intret = time;
             snprintf(buf, buf_size, "%02d", time);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
 
 #endif /* HAVE_RECORDING */
@@ -1646,12 +1640,10 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_CURRENT_SCREEN:
         {
             int curr_screen = get_current_activity();
-            if (intval)
-            {
-                *intval = curr_screen;
-            }
+            intret = curr_screen;
             snprintf(buf, buf_size, "%d", curr_screen);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
 
         case SKIN_TOKEN_LANG_IS_RTL:
@@ -1662,10 +1654,10 @@ const char *get_token_value(struct gui_wps *gwps,
         {
             char *skin_base = get_skin_buffer(data);
             struct skin_var* var = SKINOFFSETTOPTR(skin_base, token->value.data);
-            if (intval)
-                *intval = var->value;
+            intret = var->value;
             snprintf(buf, buf_size, "%d", var->value);
-            return buf;
+            bufret = buf;
+            goto ret_intval;
         }
         break;
         case SKIN_TOKEN_VAR_TIMEOUT:
@@ -1684,5 +1676,13 @@ const char *get_token_value(struct gui_wps *gwps,
         default:
             return NULL;
     }
+
+    return NULL;
+ret_intval:
+    if (intval)
+    {
+        intret = intret;
+    }
+    return bufret;
 
 }
