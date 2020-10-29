@@ -18,30 +18,15 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#include <poll.h>
-//#include <dir.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/types.h>
 #include <linux/input.h>
-#include <fcntl.h>
-#include <string.h>
-#include <stdlib.h>
 
-#include "sysfs.h"
 #include "button.h"
 #include "button-target.h"
-#include "panic.h"
 
 #include "kernel.h"
-#include "backlight.h"
-#include "backlight-target.h"
 #include "xduoolinux_codec.h"
 
-#define NR_POLL_DESC    3
-static struct pollfd poll_fds[NR_POLL_DESC];
-
-static int button_map(int keycode)
+int button_map(int keycode)
 {
     switch(keycode)
     {
@@ -74,68 +59,6 @@ static int button_map(int keycode)
     }
 }
 
-void button_init_device(void)
-{
-    const char * const input_devs[NR_POLL_DESC] = {
-        "/dev/input/event0",
-        "/dev/input/event1",
-        "/dev/input/event2"
-    };
-
-    for(int i = 0; i < NR_POLL_DESC; i++)
-    {
-        int fd = open(input_devs[i], O_RDONLY | O_CLOEXEC);
-
-        if(fd < 0)
-        {
-            panicf("Cannot open input device: %s\n", input_devs[i]);
-        }
-
-        poll_fds[i].fd = fd;
-        poll_fds[i].events = POLLIN;
-        poll_fds[i].revents = 0;
-    }
-}
-
-int button_read_device(void)
-{
-    static int button_bitmap = 0;
-    struct input_event event;
-
-    /* check if there are any events pending and process them */
-    while(poll(poll_fds, NR_POLL_DESC, 0))
-    {
-        for(int i = 0; i < NR_POLL_DESC; i++)
-        {
-            /* read only if non-blocking */
-            if(poll_fds[i].revents & POLLIN)
-            {
-                int size = read(poll_fds[i].fd, &event, sizeof(event));
-                if(size == (int)sizeof(event))
-                {
-                    int keycode = event.code;
-                    /* event.value == 1 means press
-                     * event.value == 0 means release
-                     */
-                    bool press = event.value ? true : false;
-
-                    /* map linux event code to rockbox button bitmap */
-                    if(press)
-                    {
-                        button_bitmap |= button_map(keycode);
-                    }
-                    else
-                    {
-                        button_bitmap &= ~button_map(keycode);
-                    }
-                }
-            }
-        }
-    }
-
-    return button_bitmap;
-}
-
 bool headphones_inserted(void)
 {
 #ifdef BOOTLOADER
@@ -155,13 +78,4 @@ bool lineout_inserted(void)
     int ps = xduoo_get_outputs();
 #endif
     return (ps == 1);
-}
-
-void button_close_device(void)
-{
-    /* close descriptors */
-    for(int i = 0; i < NR_POLL_DESC; i++)
-    {
-        close(poll_fds[i].fd);
-    }
 }
