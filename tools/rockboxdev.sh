@@ -194,7 +194,32 @@ gettool() {
             ;;
 
         alsa-lib)
-            url="ftp://ftp.alsa-project.org/pub/lib/"
+            url="ftp://ftp.alsa-project.org/pub/lib"
+            ;;
+
+        libffi)
+            url="ftp://sourceware.org/pub/libffi"
+            ext="tar.gz"
+            ;;
+
+        glib)
+            url="https://ftp.gnome.org/pub/gnome/sources/glib/2.46"
+            ext="tar.xz"
+            ;;
+
+        zlib)
+            url="https://zlib.net"
+            ext="tar.gz"
+            ;;
+
+        dbus)
+            url="https://dbus.freedesktop.org/releases/dbus"
+            ext="tar.gz"
+            ;;
+
+        expat)
+            url="https://src.fedoraproject.org/repo/pkgs/expat/expat-2.1.0.tar.gz/dd7dab7a5fea97d2a6a43f511449b7cd"
+            ext="tar.gz"
             ;;
 
         linux)
@@ -243,6 +268,8 @@ extract() {
         tar xjf "$dlwhere/$1.tar.bz2"
     elif [ -f "$dlwhere/$1.tar.gz" ]; then
         tar xzf "$dlwhere/$1.tar.gz"
+    elif [ -f "$dlwhere/$1.tar.xz" ]; then
+        tar xJf "$dlwhere/$1.tar.xz"
     else
         echo "ROCKBOXDEV: I don't know how to extract $1 (no bzip2 or gzip)"
         exit
@@ -318,14 +345,19 @@ buildtool() {
             cp -r ../$toolname/* .
             cfg_dir="."
             ;;
-
         *)
             # out-of-tree
             cfg_dir="../$toolname";
             ;;
     esac
 
-    if [ "$config_opt" != "NO_CONFIGURE" ]; then
+    if [ "$tool" == "zlib" ]; then
+        echo "ROCKBOXDEV: $toolname/configure"
+        # NOTE glibc requires to be compiled with optimization
+        CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' run_cmd "$logfile" \
+            "$cfg_dir/configure" "--prefix=$prefix" \
+            $config_opt
+    elif [ "$config_opt" != "NO_CONFIGURE" ]; then
         echo "ROCKBOXDEV: $toolname/configure"
         # NOTE glibc requires to be compiled with optimization
         CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' run_cmd "$logfile" \
@@ -716,7 +748,7 @@ if [ -z "$RBDEV_TARGET" ]; then
     echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
     echo "i   - mips     (Jz47xx and ATJ-based players)"
     echo "x   - arm-linux  (Generic Linux ARM: Samsung ypr0, Linux-based Sony NWZ)"
-    echo "y   - mips-linux  (Generic Linux MIPS: AGPTek Rocker)"
+    echo "y   - mips-linux  (Generic Linux MIPS: eg the many HiBy-OS targets)"
     echo "separate multiple targets with spaces"
     echo "(Example: \"m a i\" will build m68k, arm, and mips)"
     echo ""
@@ -831,6 +863,43 @@ do
             extract "alsa-lib-$alsalib_ver"
             prefix="/usr" buildtool "alsa-lib" "$alsalib_ver" \
                 "--host=$target --disable-python" "" "install DESTDIR=$prefix/$target/sysroot"
+            # build libffi
+	    libffi_ver="3.2.1"
+	    gettool "libffi" "$libffi_ver"
+	    extract "libffi-$libffi_ver"
+	    prefix="/usr" buildtool "libffi" "$libffi_ver" \
+               "--includedir=/usr/include --host=$target" "" "install DESTDIR=$prefix/$target/sysroot"
+            (cd $prefix/$target/sysroot/usr/include ; ln -s ../lib/libffi-$libffi_ver/include/ffi.h . ;  ln -s ../lib/libffi-$libffi_ver/include/ffitarget.h . )
+
+            # build zlib
+	    zlib_ver="1.2.11"
+	    gettool "zlib" "$zlib_ver"
+	    extract "zlib-$zlib_ver"
+	    CHOST=$target prefix="/usr" buildtool "zlib" "$zlib_ver" \
+                "" "" "install DESTDIR=$prefix/$target/sysroot"
+
+            # build glib
+	    glib_ver="2.46.2"
+	    gettool "glib" "$glib_ver"
+	    extract "glib-$glib_ver"
+	    prefix="/usr" buildtool "glib" "$glib_ver" \
+               "--host=$target --disable-libelf glib_cv_stack_grows=no glib_cv_uscore=no ac_cv_func_posix_getpwuid_r=yes ac_cv_func_posix_getgrgid_r=yes" "" "install DESTDIR=$prefix/$target/sysroot"
+
+            # build expat
+	    expat_ver="2.1.0"
+	    gettool "expat" "$expat_ver"
+	    extract "expat-$expat_ver"
+	    prefix="/usr" buildtool "expat" "$expat_ver" \
+               "--host=$target --includedir=/usr/include --enable-abstract-sockets" "" "install DESTDIR=$prefix/$target/sysroot "
+
+            # build dbus
+	    dbus_ver="1.10.2"
+	    gettool "dbus" "$dbus_ver"
+	    extract "dbus-$dbus_ver"
+	    prefix="/usr" buildtool "dbus" "$dbus_ver" \
+               "--host=$target --includedir=/usr/include --enable-abstract-sockets ac_cv_lib_expat_XML_ParserCreate_MM=yes --disable-systemd --disable-launchd --enable-x11-autolaunch=no --with-x=no -disable-selinux --disable-apparmor --disable-doxygen-docs " "" "install DESTDIR=$prefix/$target/sysroot "
+
+
             ;;
         *)
             echo "ROCKBOXDEV: Unsupported architecture option: $arch"
