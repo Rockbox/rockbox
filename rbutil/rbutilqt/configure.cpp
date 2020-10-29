@@ -602,7 +602,6 @@ void Config::updateLanguage()
         language = lang.value(a.at(0)->text());
     LOG_INFO() << "new language:" << language;
 
-    QString applang = QLocale::system().name();
     QTranslator *translator = new QTranslator(qApp);
     QTranslator *qttrans = new QTranslator(qApp);
     QString absolutePath = QCoreApplication::instance()->applicationDirPath();
