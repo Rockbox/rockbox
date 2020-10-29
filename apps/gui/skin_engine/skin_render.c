@@ -470,42 +470,40 @@ static void fix_line_alignment(struct skin_draw_info *info, struct skin_element 
 {
     struct align_pos *align = &info->align;
     char *cur_pos = info->cur_align_start + strlen(info->cur_align_start);
+    char *next_pos = cur_pos + 1;
     switch (element->tag->type)
     {
         case SKIN_TOKEN_ALIGN_LEFT:
-            *cur_pos = '\0'; cur_pos++; *cur_pos = '\0';
-            align->left = cur_pos;
-            info->cur_align_start = cur_pos;
+            align->left = next_pos;
+            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_LEFT_RTL:
-            *cur_pos = '\0'; cur_pos++; *cur_pos = '\0';
-            if (lang_is_rtl())
-                align->right = cur_pos;
+            if (UNLIKELY(lang_is_rtl()))
+                align->right = next_pos;
             else
-                align->left = cur_pos;
-            info->cur_align_start = cur_pos;
+                align->left = next_pos;
+            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_CENTER:
-            *cur_pos = '\0'; cur_pos++; *cur_pos = '\0';
-            align->center = cur_pos;
-            info->cur_align_start = cur_pos;
+            align->center = next_pos;
+            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_RIGHT:
-            *cur_pos = '\0'; cur_pos++; *cur_pos = '\0';
-            align->right = cur_pos;
-            info->cur_align_start = cur_pos;
+            align->right = next_pos;
+            info->cur_align_start = next_pos;
             break;
         case SKIN_TOKEN_ALIGN_RIGHT_RTL:
-            *cur_pos = '\0'; cur_pos++; *cur_pos = '\0';
-            if (lang_is_rtl())
-                align->left = cur_pos;
+            if (UNLIKELY(lang_is_rtl()))
+                align->left = next_pos;
             else
-                align->right = cur_pos;
-            info->cur_align_start = cur_pos;
+                align->right = next_pos;
+            info->cur_align_start = next_pos;
             break;
         default:
-            break;
+            return;
     }
+    *cur_pos = '\0';
+    *next_pos = '\0';
 }
 
 /* Draw a LINE element onto the display */
