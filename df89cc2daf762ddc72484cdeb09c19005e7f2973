@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aae0e3cd_9973d9ae",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-29T22:40:45Z",
+      "side": 1,
+      "message": "I take it the removed ones are for targets we don\u0027t have?",
+      "revId": "df89cc2daf762ddc72484cdeb09c19005e7f2973",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a939b17_3e97477e",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-10-29T22:40:45Z",
+      "side": 1,
+      "message": "Please make theses 2 * 1024 * 1024\nand 4 * 1024 * 1024 respectively",
+      "revId": "df89cc2daf762ddc72484cdeb09c19005e7f2973",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
