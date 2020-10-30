@@ -171,7 +171,7 @@ static void cfi_get_flash_info(struct flash_info* pInfo)
 }
 
 /***************** User Interface Functions *****************/
-int wait_for_button(void)
+static int wait_for_button(void)
 {
     int button;
 
@@ -184,7 +184,7 @@ int wait_for_button(void)
 }
 
 /* helper for DoUserDialog() */
-void ShowFlashInfo(struct flash_info* pInfo)
+static void ShowFlashInfo(const struct flash_info* pInfo)
 {
     if (!pInfo->manufacturer)
     {
@@ -210,7 +210,7 @@ void ShowFlashInfo(struct flash_info* pInfo)
     rb->lcd_update();
 }
 
-bool show_info(void)
+static bool show_info(void)
 {
     struct flash_info fi;
 
@@ -226,15 +226,11 @@ bool show_info(void)
     return true;
 }
 
-bool confirm(const char *msg)
+static bool confirm(const char* msg)
 {
-    bool ret;
-
     rb->splashf(0, "%s ([PLAY] to CONFIRM)", msg);
-
-    ret = (wait_for_button() == BUTTON_ON);
+    bool ret = (wait_for_button() == BUTTON_ON);
     show_info();
-
     return ret;
 }
 
@@ -465,7 +461,7 @@ int flash_rockbox(const char *filename, int section)
     return 0;
 }
 
-void show_fatal_error(void)
+static void show_fatal_error(void)
 {
     rb->splash(HZ*30, "Disable idle poweroff, connect AC power and DON'T TURN PLAYER OFF!!");
     rb->splash(HZ*30, "Contact Rockbox developers as soon as possible!");
