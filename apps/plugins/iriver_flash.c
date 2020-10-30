@@ -214,6 +214,7 @@ static bool show_info(void)
 {
     struct flash_info fi;
 
+    rb->lcd_setfont(FONT_SYSFIXED);
     rb->lcd_clear_display();
     cfi_get_flash_info(&fi);
     ShowFlashInfo(&fi);
@@ -701,11 +702,12 @@ int load_romdump(const char *filename)
 }
 
 /* Kind of our main function, defines the application flow. */
-void DoUserDialog(char* filename)
+static void DoUserDialog(const char* filename)
 {
-    /* this can only work if Rockbox runs in DRAM, not flash ROM */
-    if ((uint16_t*)rb >= FB && (uint16_t*)rb < FB + 4096*1024) /* 4 MB max */
-    {   /* we're running from flash */
+    /* check whether we're running from ROM */
+    uint16_t* RB = (uint16_t*) rb;
+    if (RB >= FB && RB < FB + (FLASH_SIZE / sizeof(*FB)))
+    {
         rb->splash(HZ*3, "Not from ROM");
         return; /* exit */
     }
@@ -717,14 +719,13 @@ void DoUserDialog(char* filename)
         return; /* exit */
     }
 
-    rb->lcd_setfont(FONT_SYSFIXED);
     if (!show_info())
-        return ;
+        return; /* exit */
 
     if (filename == NULL)
     {
         rb->splash(HZ*3, "Please use this plugin with \"Open with...\"");
-        return ;
+        return; /* exit */
     }
 
     audiobuf = rb->plugin_get_audio_buffer((size_t *)&audiobuf_size);
@@ -752,7 +753,7 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* now go ahead and have fun! */
     oldmode = rb->system_memory_guard(MEMGUARD_NONE); /*disable memory guard */
-    DoUserDialog((char*) parameter);
+    DoUserDialog(parameter);
     rb->system_memory_guard(oldmode);              /* re-enable memory guard */
 
     return PLUGIN_OK;
