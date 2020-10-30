@@ -66,11 +66,11 @@ enum sections {
 static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
 #endif
 
-#ifdef IRIVER_H100
+#ifdef IRIVER_H100 /* iRiver H110/H115 */
 #define MODEL "h100"
-#elif defined(IRIVER_H120)
+#elif defined(IRIVER_H120) /* iRiver H120/H140 */
 #define MODEL "h120"
-#elif defined(IRIVER_H300)
+#elif defined(IRIVER_H300) /* iRiver H320/H340 */
 #define MODEL "h300"
 #endif
 
@@ -307,33 +307,29 @@ static off_t load_firmware_file(const char* filename, uint32_t* out_checksum)
     return len;
 }
 
-unsigned long valid_bootloaders[][2] = {
-    /* Size-8   CRC32 */
-#ifdef IRIVER_H120 /* Iriver H120/H140 checksums */
+static const uint32_t valid_bootloaders[][2] = {
+    /* Size-8, CRC32 */
+#ifdef IRIVER_H100 /* iRiver H110/H115 */
+    { 48760, 0x2efc3323 }, /* 7-pre4 */
+    { 56896, 0x0cd8dad4 }, /* 7-pre5 */
+#elif defined(IRIVER_H120) /* iRiver H120/H140 */
     { 63788, 0x08ff01a9 }, /* 7-pre3, improved failsafe functions */
     { 48764, 0xc674323e }, /* 7-pre4. Fixed audio thump & remote bootup */
     { 56896, 0x167f5d25 }, /* 7-pre5, various ATA fixes */
+#elif defined(IRIVER_H300) /* iRiver H320/H340 */
 #endif
-#ifdef IRIVER_H100
-    { 48760, 0x2efc3323 }, /* 7-pre4 */
-    { 56896, 0x0cd8dad4 }, /* 7-pre5 */
-#endif
-    { 0,     0 }
+    {}
 };
 
-
-bool detect_valid_bootloader(const unsigned char *addr, int len)
+/* check if the bootloader is a known good one */
+static bool detect_valid_bootloader(const uint8_t* pAddr, uint32_t len)
 {
-    int i;
-    unsigned long crc32;
-
-    /* Try to scan through all valid bootloaders. */
-    for (i = 0; valid_bootloaders[i][0]; i++)
+    for (size_t i = 0; valid_bootloaders[i][0]; i++)
     {
-        if (len > 0 && len != (long)valid_bootloaders[i][0])
+        if (len != valid_bootloaders[i][0])
             continue;
 
-        crc32 = rb->crc_32(addr, valid_bootloaders[i][0], 0xffffffff);
+        uint32_t crc32 = rb->crc_32(pAddr, valid_bootloaders[i][0], 0xffffffff);
         if (crc32 == valid_bootloaders[i][1])
             return true;
     }
