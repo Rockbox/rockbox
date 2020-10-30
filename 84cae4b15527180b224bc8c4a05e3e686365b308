@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f6dbe8a9_434b7d16",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-30T12:28:44Z",
+      "side": 1,
+      "message": "you should restore the UI font after you\u0027re done.  Probably not strictly necessary as the core cleans up after the plugin  but it\u0027s good practice",
+      "range": {
+        "startLine": 217,
+        "startChar": 0,
+        "endLine": 217,
+        "endChar": 35
+      },
+      "revId": "84cae4b15527180b224bc8c4a05e3e686365b308",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1741f6b3_7dd91054",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 709,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-30T12:28:44Z",
+      "side": 1,
+      "message": "Magic numbers bad.  Change the \u00272\u0027 to \u0027sizeof(uint16_t)\u0027",
+      "range": {
+        "startLine": 709,
+        "startChar": 44,
+        "endLine": 709,
+        "endChar": 45
+      },
+      "revId": "84cae4b15527180b224bc8c4a05e3e686365b308",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
