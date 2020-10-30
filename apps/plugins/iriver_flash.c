@@ -31,7 +31,7 @@
 
 /* All CFI flash routines are copied and ported from firmware_flash.c */
 
-unsigned char *audiobuf;
+uint8_t* audiobuf;
 ssize_t audiobuf_size;
 
 #if !defined(IRIVER_H100_SERIES) && !defined(IRIVER_H300_SERIES)
@@ -64,6 +64,14 @@ enum sections {
 };
 
 static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
+#endif
+
+#ifdef IRIVER_H100
+#define MODEL "h100"
+#elif defined(IRIVER_H120)
+#define MODEL "h120"
+#elif defined(IRIVER_H300)
+#define MODEL "h300"
 #endif
 
 /* read the manufacturer and device ID */
@@ -230,19 +238,19 @@ bool confirm(const char *msg)
     return ret;
 }
 
-int load_firmware_file(const char *filename, uint32_t *checksum)
+static off_t load_firmware_file(const char* filename, uint32_t* out_checksum)
 {
     int fd;
-    int len, rc;
-    int i;
+    off_t len;
+    uint32_t checksum;
+    char model[4];
     uint32_t sum;
 
-    fd = rb->open(filename,  O_RDONLY);
+    fd = rb->open(filename, O_RDONLY);
     if (fd < 0)
         return -1;
 
     len = rb->filesize(fd);
-
     if (audiobuf_size < len)
     {
         rb->splash(HZ*3, "Aborting: Out of memory!");
@@ -250,28 +258,51 @@ int load_firmware_file(const char *filename, uint32_t *checksum)
         return -2;
     }
 
-    rb->read(fd, checksum, 4);
-    rb->lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
-    len -= FIRMWARE_OFFSET_FILE_DATA;
-
-    rc = rb->read(fd, audiobuf, len);
-    rb->close(fd);
-    if (rc != len)
+    if (rb->read(fd, &checksum, sizeof(checksum)) != sizeof(checksum))
     {
         rb->splash(HZ*3, "Aborting: Read failure");
+        rb->close(fd);
         return -3;
     }
 
-    /* Verify the checksum */
-    sum = MODEL_NUMBER;
-    for (i = 0; i < len; i++)
-        sum += audiobuf[i];
-
-    if (sum != *checksum)
+    if (rb->read(fd, model, sizeof(model)) != sizeof(model))
     {
-        rb->splash(HZ*3, "Aborting: Checksums mismatch!");
+        rb->splash(HZ*3, "Aborting: Read failure");
+        rb->close(fd);
         return -4;
     }
+
+    len -= FIRMWARE_OFFSET_FILE_DATA;
+
+    if (rb->read(fd, audiobuf, len) != len)
+    {
+        rb->splash(HZ*3, "Aborting: Read failure");
+        rb->close(fd);
+        return -5;
+    }
+
+    rb->close(fd);
+
+    /* Verify the checksum */
+    sum = MODEL_NUMBER;
+    for (off_t i = 0; i < len; i++)
+        sum += audiobuf[i];
+
+    if (sum != checksum)
+    {
+        rb->splash(HZ*3, "Aborting: Checksums mismatch!");
+        return -6;
+    }
+
+    /* Verify the model */
+    if (rb->memcmp(model, MODEL, sizeof(model)) != 0)
+    {
+        rb->splash(HZ*3, "Aborting: Models mismatch!");
+        return -7;
+    }
+
+    if (out_checksum != NULL)
+        *out_checksum = checksum;
 
     return len;
 }
