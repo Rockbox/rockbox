@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "207b2f0c_a3479703",
+        "filename": "firmware/target/hosted/button-devinput.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-30T10:46:35Z",
+      "side": 1,
+      "message": "Yep, this is only the first step.  I intended to hold off on adding code to handle new/removed devices until I had the BT backend code at least partially integrated.\n\n(Actually, I was thinking that it might make more sense to rely on mdev events, because the BT devices could come or go at any time..)",
+      "parentUuid": "1a35ab5a_6a9baf98",
+      "revId": "6c4d9143384233431e70a528fedee3afd62d4e2a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d0639947_823c689e",
         "filename": "firmware/target/hosted/button-devinput.c",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2020-10-30T08:31:46Z",
       "side": 1,
       "message": "why not simpy assign to poll_fds when if (fd \u003e\u003d 0)? IMO would be cleaner",
+      "revId": "6c4d9143384233431e70a528fedee3afd62d4e2a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "69a0f7fa_dd9fb261",
+        "filename": "firmware/target/hosted/button-devinput.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-10-30T10:46:35Z",
+      "side": 1,
+      "message": "Yeah, that\u0027s definitely cleaner.",
+      "parentUuid": "d0639947_823c689e",
       "revId": "6c4d9143384233431e70a528fedee3afd62d4e2a",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": false
