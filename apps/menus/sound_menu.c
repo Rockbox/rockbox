@@ -243,6 +243,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
           ,&func_mode
 #endif
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+          ,&bluetooth_audio_menu
+#endif
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
           ,&surround_menu, &pbe_menu, &afr_enabled
 #ifdef HAVE_PITCHCONTROL

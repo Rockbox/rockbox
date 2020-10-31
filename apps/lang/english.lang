@@ -15587,3 +15587,224 @@
     *: "Enter USB mass storage mode?"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_BLUETOOTH
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Bluetooth"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Bluetooth"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Bluetooth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_ENABLED
+  desc: in the audio settings menu
+  user: core
+  <source>
+    *: none
+    bluetooth: "Enable BT"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Enable BT"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Enable Bluetooth"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_SCAN
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Scan"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Scan"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Scan"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_PAIR
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Pair"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Pair"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Pair"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_TRUSTED
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Trusted"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Trusted"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Trusted"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_CONNECT
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Connect"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Connect"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Connect"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_DISCONNECT
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Disconnect"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Disconnect"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Disconnect"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_FORGET
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Forget"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Forget"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Forget"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_PROFILE
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Profile"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Profile"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Profile"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_ADDRESS
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Address"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Address"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Address"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_NAME
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Name"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Name"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_AUTO_CONNECT
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "Auto Connect"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "Auto Connect"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "Auto Connect"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BLUETOOTH_PIN
+  desc:
+  user: core
+  <source>
+    *: none
+    bluetooth: "PIN"
+  </source>
+  <dest>
+    *: none
+    bluetooth: "PIN"
+  </dest>
+  <voice>
+    *: none
+    bluetooth: "PIN"
+  </voice>
+</phrase>
