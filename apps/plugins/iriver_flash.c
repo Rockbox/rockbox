@@ -116,6 +116,33 @@ static bool cfi_wait_for_rom(volatile uint16_t* pAddr)
     return result;
 }
 
+#if 0
+/* wait until the rom signals completion of an operation */
+static bool flash_wait_for_rom(uint32_t offset)
+{
+    const unsigned MAX_TIMEOUT = 0xffffff; /* should be sufficient for most targets */
+    const unsigned RECOVERY_TIME = 64; /* based on 140MHz MCF 5249 */
+    uint16_t old_data = FB[offset / sizeof(*FB)] & 0x0040; /* we only want DQ6 */
+    volatile unsigned i; /* disables certain optimizations */
+
+    /* repeat up to MAX_TIMEOUT times or until DQ6 stops flipping */
+    for (i = 0; i < MAX_TIMEOUT; i++)
+    {
+        uint16_t new_data = FB[offset / sizeof(*FB)] & 0x0040; /* we only want DQ6 */
+        if(old_data == new_data)
+            break;
+        old_data = new_data;
+    }
+
+    bool result = i != MAX_TIMEOUT;
+
+    /* delay at least 1us to give the bus time to recover */
+    for (i = 0; i < RECOVERY_TIME; i++);
+
+    return result;
+}
+#endif
+
 /* erase the sector which contains the given address */
 static bool cfi_erase_sector(volatile uint16_t* pAddr)
 {
@@ -129,6 +156,21 @@ static bool cfi_erase_sector(volatile uint16_t* pAddr)
     return cfi_wait_for_rom(pAddr);
 }
 
+#if 0
+/* erase the sector at the given offset */
+static bool flash_erase_sector(uint32_t offset)
+{
+    FB[0x5555] = 0xAA; /* enter command mode */
+    FB[0x2AAA] = 0x55;
+    FB[0x5555] = 0x80; /* erase command */
+    FB[0x5555] = 0xAA; /* enter command mode */
+    FB[0x2AAA] = 0x55;
+    FB[offset / sizeof(*FB)] = 0x30; /* erase the sector */
+
+    return flash_wait_for_rom(offset);
+}
+#endif
+
 /* address must be in an erased location */
 static bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 {
@@ -139,6 +181,19 @@ static bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 
     return cfi_wait_for_rom(pAddr);
 }
+
+#if 0
+/* address must be in an erased location */
+static bool flash_program_word(uint32_t offset, uint16_t data)
+{
+    FB[0x5555] = 0xAA; /* enter command mode */
+    FB[0x2AAA] = 0x55;
+    FB[0x5555] = 0xA0; /* byte program command */
+    FB[offset / sizeof(*FB)] = data; /* write the word data */
+
+    return flash_wait_for_rom(offset);
+}
+#endif
 
 /* fills in the struct with data about the flash rom */
 static void flash_get_info(struct flash_info* pInfo)
