@@ -38,6 +38,9 @@
 /* Audio codec */
 #define HAVE_ROCKER_CODEC
 
+/* define this if your device supports bluetooth audio */
+#define AUDIOHW_HAVE_BLUETOOTH
+
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS
 
