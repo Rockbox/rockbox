@@ -122,13 +122,20 @@ static struct viewport rvp1 =
 
 static void *test_address_fn(int x, int y)
 {
-    struct frame_buffer_t *fb = vp0.buffer;
+/* Address lookup function
+ * core will use this to get an address from x/y coord
+ * depending on the lcd function core sometimes uses this for
+ * only the first and last address
+ * and handles subsequent address based on stride */
 
+    struct frame_buffer_t *fb = vp0.buffer;
+/* LCD_STRIDEFORMAT & LCD_NATIVE_STRIDE macros allow Horiz screens to work with RB */
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
     size_t element = (x * LCD_NATIVE_STRIDE(fb->stride)) + y;
 #else
     size_t element = (y * LCD_NATIVE_STRIDE(fb->stride)) + x;
 #endif
+    /* use mod fb->elems to protect from buffer ovfl */
     return fb->fb_ptr + (element % fb->elems);
 }
 
@@ -137,17 +144,39 @@ enum plugin_status plugin_start(const void* parameter)
     (void)parameter;
     char buf[80];
     int i,y;
-    fb_data vp_buffer[LCD_NBELEMS(vp0.width, vp0.height)];
 
+    size_t plugin_buf_len;
+    void* plugin_buf = (unsigned char *)rb->plugin_get_buffer(&plugin_buf_len);
+
+/* Here we will test if viewports of non standard size work with the rb core */
     struct frame_buffer_t fb;
 
+    rb->font_getstringsize("W", NULL, &vp0.height, vp0.font);
+    fb.elems = LCD_NBELEMS(vp0.width, vp0.height);
+
+    /* set stride based on the with or height of our buffer (macro picks the proper one) */
     fb.stride = STRIDE_MAIN(vp0.width, vp0.height);
 
-    fb.fb_ptr = vp_buffer;
-    fb.elems = LCD_NBELEMS(vp0.width, vp0.height);
+    /*set the framebuffer pointer to our buffer (union - pick appropriate data type) */
+    fb.data = plugin_buf;
+    /* Valid data types for fb union
+      void*          - data
+      char*          - ch_ptr,
+      fb_data*       - fb_ptr,
+      fb_remote_data - fb_remote_ptr;
+    */
+    if (fb.elems * sizeof(fb_data) > plugin_buf_len)
+        return PLUGIN_ERROR;
+
+    plugin_buf += fb.elems * sizeof(fb_data);
+    plugin_buf_len -= fb.elems * sizeof(fb_data); /* buffer bookkeeping */
+
+    /* set a frame buffer address lookup function */
     fb.get_address_fn = &test_address_fn;
 
+    /* set our newly built buffer to the viewport */
     rb->viewport_set_buffer(&vp0, &fb, SCREEN_MAIN);
+
     rb->screens[SCREEN_MAIN]->set_viewport(&vp0);
     rb->screens[SCREEN_MAIN]->clear_viewport();
 
