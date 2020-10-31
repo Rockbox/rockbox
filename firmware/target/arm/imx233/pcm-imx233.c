@@ -149,12 +149,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pcm_play_unlock();
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    imx233_dma_freeze_channel(APB_AUDIO_DAC, pause);
-    dac_freezed = pause;
-}
-
 void pcm_play_dma_init(void)
 {
     audiohw_preinit();

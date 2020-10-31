@@ -157,13 +157,6 @@ void pcm_play_dma_stop(void)
     I2STXCOM = 0xa;
 }
 
-/* pause playback by disabling LRCK */
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause) I2STXCOM |= 1;
-    else  I2STXCOM &= ~1;
-}
-
 /* MCLK = 12MHz (MCLKDIV2=1), [CS42L55 DS, s4.8] */
 #define MCLK_FREQ     12000000
 

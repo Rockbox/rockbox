@@ -264,25 +264,6 @@ void pcm_play_dma_stop(void)
     dma_play_lock.state = (1 << 14);
 } /* pcm_play_dma_stop */
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause)
-    {
-        /* pause playback on current buffer */
-        and_l(~(DMA_EEXT | DMA_INT), &DCR0); /* per request and int OFF */
-        DSR0 = 1;                            /* stop channel */
-        iis_play_reset_if_playback(true);
-        dma_play_lock.state = (1 << 14);
-    }
-    else
-    {
-        /* restart playback on current buffer */
-        iis_play_reset_if_playback(true);
-        or_l(DMA_INT | DMA_EEXT | DMA_START, &DCR0); /* everything ON */
-        dma_play_lock.state = (0 << 14);
-    }
-} /* pcm_play_dma_pause */
-
 size_t pcm_get_bytes_waiting(void)
 {
     return BCR0 & 0xffffff;

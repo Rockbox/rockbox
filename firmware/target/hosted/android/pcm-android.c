@@ -153,8 +153,11 @@ void pcm_play_dma_start(const void *addr, size_t size)
 {
     pcm_data_start = addr;
     pcm_data_size = size;
-    
-    pcm_play_dma_pause(false);
+
+    (*env_ptr)->CallVoidMethod(env_ptr,
+                               RockboxPCM_instance,
+                               play_pause_method,
+                               (int)pause);
 }
 
 void pcm_play_dma_stop(void)
@@ -166,14 +169,6 @@ void pcm_play_dma_stop(void)
     (*env)->CallVoidMethod(env,
                            RockboxPCM_instance,
                            stop_method);
-}
-
-void pcm_play_dma_pause(bool pause)
-{
-    (*env_ptr)->CallVoidMethod(env_ptr,
-                               RockboxPCM_instance,
-                               play_pause_method,
-                               (int)pause);
 }
 
 size_t pcm_get_bytes_waiting(void)

@@ -127,20 +127,6 @@ void pcm_play_unlock(void)
 
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause)
-    {
-        DSP_(_dma0_stopped)=2;
-        dsp_wake();
-    }
-    else
-    {
-        DSP_(_dma0_stopped)=0;
-        dsp_wake();
-    }
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return DSP_(_sdem_dsp_size)-DSP_(_sdem_level);

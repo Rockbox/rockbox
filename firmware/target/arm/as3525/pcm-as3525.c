@@ -152,26 +152,6 @@ void pcm_play_dma_stop(void)
     play_callback_pending = false;
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    is_playing = !pause;
-
-    if(pause)
-    {
-        dma_pause_channel(0);
-
-        /* if producer's buffer finished, upper layer starts anew */
-        if (dma_rem_size == 0)
-            play_callback_pending = false;
-    }
-    else
-    {
-        if (play_sub_size != 0)
-            dma_resume_channel(0);
-        /* else unlock calls the callback if sub buffers remain */
-    }
-}
-
 void pcm_play_dma_init(void)
 {
     bitset32(&CGU_PERI, CGU_I2SOUT_APB_CLOCK_ENABLE);

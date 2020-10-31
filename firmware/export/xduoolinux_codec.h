@@ -7,7 +7,7 @@ AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
 #endif
 
 // We want this, but the codec takes over a second to unmute!
-//#define AUDIOHW_MUTE_ON_PAUSE
+//#define AUDIOHW_MUTE_ON_STOP
 
 #if defined(XDUOO_X3II)
 /* The AK4490 glitches when switching sample rates */

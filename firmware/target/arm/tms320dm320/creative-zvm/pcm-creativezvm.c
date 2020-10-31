@@ -85,11 +85,6 @@ void pcm_play_unlock(void)
 
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    (void) pause;
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return 0;

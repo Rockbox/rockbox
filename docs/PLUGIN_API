@@ -1430,11 +1430,6 @@ void pcm_init_recording(void)
     \conditions defined(HAVE_RECORDING)
     \description
 
-bool pcm_is_paused(void)
-    \group sound
-    \return true if playback is paused, else false
-    \description
-
 bool pcm_is_playing(void)
     \group sound
     \return true unless playback is paused
@@ -1451,14 +1446,9 @@ void pcm_play_lock(void)
     \group sound
     \description
 
-void pcm_play_pause(bool play)
-    \group sound
-    \param play
-    \description Pauses or unpauses the playback depending on the truth value of =play=
-
 void pcm_play_stop(void)
     \group sound
-    \description Stops the playback and empties the audio buffer unlike [F[pcm_play_pause]]
+    \description Stops the playback and empties the audio buffer.
 
 void pcm_play_unlock(void)
     \group sound

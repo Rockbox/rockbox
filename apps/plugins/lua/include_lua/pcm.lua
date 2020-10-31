@@ -26,11 +26,9 @@ if not rb.pcm then rb.splash(rb.HZ, "No Support!") return nil end
 
 rb.pcm_apply_settings = function() rb.pcm("apply_settings") end
 rb.pcm_set_frequency = function(freq) rb.pcm("set_frequency", freq) end
-rb.pcm_play_pause = function(bplay) rb.pcm("play_pause", bplay) end
 rb.pcm_play_stop = function() rb.pcm("play_stop") end
 rb.pcm_play_lock = function() rb.pcm("play_lock") end
 rb.pcm_play_unlock = function() rb.pcm("play_unlock") end
 rb.pcm_is_playing = function() return rb.pcm("is_playing") end
-rb.pcm_is_paused = function() return rb.pcm("is_paused") end
 rb.pcm_calculate_peaks = function() return rb.pcm("calculate_peaks") end
 rb.pcm_get_bytes_waiting = function() return rb.pcm("get_bytes_waiting") end
