@@ -278,16 +278,6 @@ void pcm_play_dma_start_int(const void *addr, size_t size)
     start_pcm(true);
 }
 
-void pcm_play_dma_pause_int(bool pause)
-{
-    if (pause)
-        pcm_play_dma_pause(true);
-    else if (src_buf_rem)
-        start_pcm(false);    /* Reprocess in case volume level changed */
-    else
-        pcm_play_stop_int(); /* Playing frame was last frame */
-}
-
 void pcm_play_dma_stop_int(void)
 {
     pcm_play_dma_stop();

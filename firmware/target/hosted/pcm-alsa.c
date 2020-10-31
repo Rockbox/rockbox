@@ -634,20 +634,6 @@ void pcm_dma_apply_settings(void)
     pcm_play_unlock();
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    logf("PCM DMA pause %d", pause);
-    if (!handle) return;
-
-#ifdef AUDIOHW_MUTE_ON_PAUSE
-    if (pause) audiohw_mute(true);
-#endif
-    snd_pcm_pause(handle, pause);
-#ifdef AUDIOHW_MUTE_ON_PAUSE
-    if (!pause) audiohw_mute(false);
-#endif
-}
-
 void pcm_play_dma_stop(void)
 {
     logf("PCM DMA stop (%d)", snd_pcm_state(handle));
@@ -739,11 +725,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
                 }
 
                 break;
-            }
-            case SND_PCM_STATE_PAUSED:
-            {   /* paused, simply resume */
-                pcm_play_dma_pause(0);
-                return;
             }
             case SND_PCM_STATE_DRAINING:
                 /* run until drained */
@@ -848,11 +829,6 @@ void pcm_rec_dma_start(void *start, size_t size)
                 int err = snd_pcm_start(handle);
                 if (err < 0)
                     panicf("Start error: %s", snd_strerror(err));
-                return;
-            }
-            case SND_PCM_STATE_PAUSED:
-            {   /* paused, simply resume */
-                pcm_play_dma_pause(0);
                 return;
             }
             case SND_PCM_STATE_DRAINING:

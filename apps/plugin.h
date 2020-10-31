@@ -677,8 +677,6 @@ struct plugin_api {
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
-    bool (*pcm_is_paused)(void);
-    void (*pcm_play_pause)(bool play);
     size_t (*pcm_get_bytes_waiting)(void);
     void (*pcm_calculate_peaks)(int *left, int *right);
     const void* (*pcm_get_peak_buffer)(int *count);

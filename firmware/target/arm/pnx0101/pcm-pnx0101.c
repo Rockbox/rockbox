@@ -49,11 +49,6 @@ void pcm_play_dma_stop(void)
 {
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    (void)pause;
-}
-
 static inline void fill_dma_buf(int offset)
 {
     short *l, *r, *lend;
@@ -62,7 +57,7 @@ static inline void fill_dma_buf(int offset)
     lend = l + DMA_BUF_SAMPLES / 2;
     r = dma_buf_right + offset;
 
-    if (pcm_playing && !pcm_paused)
+    if (pcm_playing)
     {
         bool new_buffer =false;
 

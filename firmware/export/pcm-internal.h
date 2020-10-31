@@ -119,7 +119,6 @@ pcm_play_dma_status_callback(enum pcm_dma_status status)
 
 #if defined(HAVE_SW_VOLUME_CONTROL) && !defined(PCM_SW_VOLUME_UNBUFFERED)
 void pcm_play_dma_start_int(const void *addr, size_t size);
-void pcm_play_dma_pause_int(bool pause);
 void pcm_play_dma_stop_int(void);
 void pcm_play_stop_int(void);
 const void *pcm_play_dma_get_peak_buffer_int(int *count);
@@ -139,7 +138,6 @@ void * pcm_dma_addr(void *addr);
 #endif
 
 extern volatile bool pcm_playing;
-extern volatile bool pcm_paused;
 
 void pcm_play_dma_lock(void);
 void pcm_play_dma_unlock(void);
@@ -147,7 +145,6 @@ void pcm_play_dma_init(void) INIT_ATTR;
 void pcm_play_dma_postinit(void);
 void pcm_play_dma_start(const void *addr, size_t size);
 void pcm_play_dma_stop(void);
-void pcm_play_dma_pause(bool pause);
 const void * pcm_play_dma_get_peak_buffer(int *count);
 
 void pcm_dma_apply_settings(void);

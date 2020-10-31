@@ -35,7 +35,6 @@
 /*  Driver for the IIS/PCM part of the s5l8700 using DMA
 
     Notes:
-    - pcm_play_dma_pause is untested, not sure if implemented the right way
     - pcm_play_dma_stop is untested, not sure if implemented the right way
     - recording is not implemented
 */
@@ -171,17 +170,6 @@ void pcm_play_dma_stop(void)
                (0 << 2) |   /* 1 = I2S interface enable */
                (1 << 1) |   /* 1 = DMA request enable */
                (0 << 0);    /* 0 = LRCK on */
-}
-
-/* pause playback by disabling the I2S interface */
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause) {
-        I2STXCOM |= (1 << 0);   /* LRCK off */
-    }
-    else {
-        I2STXCOM &= ~(1 << 0);  /* LRCK on */
-    }
 }
 
 static void pcm_dma_set_freq(enum hw_freq_indexes idx)

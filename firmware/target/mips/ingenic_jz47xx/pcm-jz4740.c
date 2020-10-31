@@ -184,18 +184,6 @@ void pcm_play_unlock(void)
     restore_irq(flags);
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    int flags = disable_irq_save();
-
-    if(pause)
-        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) &= ~DMAC_DCCSR_EN;
-    else
-        REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) |= DMAC_DCCSR_EN;
-
-    restore_irq(flags);
-}
-
 static int get_dma_count(void)
 {
     int count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);

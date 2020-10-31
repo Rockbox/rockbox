@@ -195,24 +195,6 @@ void pcm_play_dma_stop(void)
     bitclr32(&CLKCON, 1<<17);
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause)
-    {
-        /* pause playback on current buffer */
-        play_stop_pcm();
-    }
-    else
-    {
-        /* restart playback on current buffer */
-        /* make sure we're aligned on left channel - skip any right
-           channel sample left waiting */
-        DISRC2 = (DCSRC2 + 2) & ~0x3;
-        DCON2  = DMA_CONTROL_SETUP | (DSTAT2 & 0xFFFFE);
-        play_start_pcm();
-    }
-}
-
 void fiq_handler(void)
 {
     static const void *start;

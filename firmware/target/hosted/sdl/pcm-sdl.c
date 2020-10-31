@@ -124,14 +124,6 @@ void pcm_play_dma_stop(void)
 #endif
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause)
-        SDL_PauseAudio(1);
-    else
-        SDL_PauseAudio(0);
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return pcm_data_size;

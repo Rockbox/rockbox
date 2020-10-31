@@ -47,14 +47,12 @@
  *      pcm_play_dma_postinit
  *      pcm_play_dma_start
  *      pcm_play_dma_stop
- *      pcm_play_dma_pause
  *      pcm_play_dma_get_peak_buffer
  *   Data Read/Written within TSP -
  *      pcm_sampr (R)
  *      pcm_fsel (R)
  *      pcm_curr_sampr (R)
  *      pcm_playing (R)
- *      pcm_paused (R)
  *
  * ==Playback/Recording==
  *   Public -
@@ -93,8 +91,6 @@ volatile pcm_status_callback_type
     pcm_play_status_callback SHAREDBSS_ATTR = NULL;
 /* PCM playback state */
 volatile bool pcm_playing SHAREDBSS_ATTR = false;
-/* PCM paused state. paused implies playing */
-volatile bool pcm_paused SHAREDBSS_ATTR = false;
 /* samplerate of currently playing audio - undefined if stopped */
 unsigned long pcm_curr_sampr SHAREDBSS_ATTR = 0;
 /* samplerate waiting to be set */
@@ -103,7 +99,6 @@ unsigned long pcm_sampr SHAREDBSS_ATTR = HW_SAMPR_DEFAULT;
 int pcm_fsel SHAREDBSS_ATTR = HW_FREQ_DEFAULT;
 
 static void pcm_play_data_start_int(const void *addr, size_t size);
-static void pcm_play_pause_int(bool play);
 void pcm_play_stop_int(void);
 
 #if !defined(HAVE_SW_VOLUME_CONTROL) || defined(PCM_SW_VOLUME_UNBUFFERED)
@@ -116,19 +111,6 @@ static inline void pcm_play_dma_start_int(const void *addr, size_t size)
     pcm_sync_pcm_factors();
 #endif
     pcm_play_dma_start(addr, size);
-}
-
-static inline void pcm_play_dma_pause_int(bool pause)
-{
-    if (pause || pcm_get_bytes_waiting() > 0)
-    {
-        pcm_play_dma_pause(pause);
-    }
-    else
-    {
-        logf(" no data");
-        pcm_play_data_start_int(NULL, 0);
-    }
 }
 
 static inline void pcm_play_dma_stop_int(void)
@@ -167,7 +149,6 @@ static void pcm_play_data_start_int(const void *addr, size_t size)
         logf(" pcm_play_dma_start_int");
         pcm_play_dma_start_int(addr, size);
         pcm_playing = true;
-        pcm_paused = false;
     }
     else
     {
@@ -177,22 +158,11 @@ static void pcm_play_data_start_int(const void *addr, size_t size)
     }
 }
 
-static void pcm_play_pause_int(bool play)
-{
-    if (play)
-        pcm_apply_settings();
-
-    logf(" pcm_play_dma_pause_int");
-    pcm_play_dma_pause_int(!play);
-    pcm_paused = !play && pcm_playing;
-}
-
 void pcm_play_stop_int(void)
 {
     pcm_play_dma_stop_int();
     pcm_callback_for_more = NULL;
     pcm_play_status_callback = NULL;
-    pcm_paused = false;
     pcm_playing = false;
 }
 
@@ -282,8 +252,7 @@ void pcm_calculate_peaks(int *left, int *right)
     int count;
     const void *addr = pcm_play_dma_get_peak_buffer_int(&count);
 
-    pcm_do_peak_calculation(&peaks, pcm_playing && !pcm_paused,
-                            addr, count);
+    pcm_do_peak_calculation(&peaks, pcm_playing, addr, count);
 
     if (left)
         *left = peaks.left;
@@ -300,11 +269,6 @@ const void * pcm_get_peak_buffer(int *count)
 bool pcm_is_playing(void)
 {
     return pcm_playing;
-}
-
-bool pcm_is_paused(void)
-{
-    return pcm_paused;
 }
 
 /****************************************************************************
@@ -354,21 +318,6 @@ void pcm_play_data(pcm_play_callback_type get_more,
 
     logf(" pcm_play_data_start_int");
     pcm_play_data_start_int(start, size);
-
-    pcm_play_unlock();
-}
-
-void pcm_play_pause(bool play)
-{
-    logf("pcm_play_pause: %s", play ? "play" : "pause");
-
-    pcm_play_lock();
-
-    if (play == pcm_paused && pcm_playing)
-    {
-        logf(" pcm_play_pause_int");
-        pcm_play_pause_int(play);
-    }
 
     pcm_play_unlock();
 }
