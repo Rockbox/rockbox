@@ -157,7 +157,7 @@ void pcm_play_dma_start(const void *addr, size_t size)
     (*env_ptr)->CallVoidMethod(env_ptr,
                                RockboxPCM_instance,
                                play_pause_method,
-                               (int)pause);
+                               0);
 }
 
 void pcm_play_dma_stop(void)
