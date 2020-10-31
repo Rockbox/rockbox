@@ -364,22 +364,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     pthread_mutex_unlock(&_dma_suspended_mtx);
 }
 
-
-/* TODO: Why is this in the API if it gets never called? */
-void pcm_play_dma_pause(bool pause)
-{
-    TRACE;
-
-    pthread_mutex_lock(&_dma_suspended_mtx);
-    _dma_stopped = pause ? 1 : 0;
-    if(_dma_stopped == 0)
-    {
-        pthread_cond_signal(&_dma_suspended_cond);
-    }
-    pthread_mutex_unlock(&_dma_suspended_mtx);
-}
-
-
 void pcm_play_dma_stop(void)
 {
     TRACE;

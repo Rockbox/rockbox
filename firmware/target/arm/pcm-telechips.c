@@ -194,15 +194,6 @@ void pcm_play_unlock(void)
    restore_fiq(status);
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause) {
-        play_stop_pcm();
-    } else {
-        play_start_pcm();
-    }
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return dma_play_data.size & ~3;

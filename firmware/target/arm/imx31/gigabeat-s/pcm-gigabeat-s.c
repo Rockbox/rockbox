@@ -224,20 +224,6 @@ void pcm_play_dma_stop(void)
     play_stop_pcm();
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (pause)
-    {
-        sdma_channel_pause(DMA_PLAY_CH_NUM);
-        play_stop_pcm();
-    }
-    else
-    {
-        play_start_pcm();
-        sdma_channel_run(DMA_PLAY_CH_NUM);
-    }
-}
-
 /* Return the number of bytes waiting - full L-R sample pairs only */
 size_t pcm_get_bytes_waiting(void)
 {

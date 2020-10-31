@@ -602,8 +602,6 @@ static const struct plugin_api rockbox_api = {
     pcm_play_stop,
     pcm_set_frequency,
     pcm_is_playing,
-    pcm_is_paused,
-    pcm_play_pause,
     pcm_get_bytes_waiting,
     pcm_calculate_peaks,
     pcm_get_peak_buffer,

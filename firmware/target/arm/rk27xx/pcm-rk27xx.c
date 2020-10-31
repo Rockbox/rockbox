@@ -114,21 +114,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     hdma_i2s_transfer(addr, size);
 }
 
-/* pause DMA transfer by disabling clock to DMA module */
-void pcm_play_dma_pause(bool pause)
-{
-    if(pause)
-    {
-        SCU_CLKCFG |= CLKCFG_HDMA;
-        locked = 1;
-    }
-    else
-    {
-        SCU_CLKCFG &= ~CLKCFG_HDMA;
-        locked = 0;
-    }
-}
-
 static void i2s_init(void)
 {
 #if defined(HAVE_RK27XX_CODEC)

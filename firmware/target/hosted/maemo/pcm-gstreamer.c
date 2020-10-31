@@ -154,23 +154,6 @@ void pcm_play_dma_stop(void)
         gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_NULL);
 }
 
-void pcm_play_dma_pause(bool pause)
-{
-    if (inside_feed_data)
-    {
-        if (pause)
-            g_signal_emit_by_name (gst_appsrc, "end-of-stream", NULL);
-        else
-            DEBUGF("ERROR: Called dma_pause(0) while inside feed_data\n");
-    } else
-    {
-        if (pause)
-            gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_NULL);
-        else
-            gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_PLAYING);
-    }
-}
-
 size_t pcm_get_bytes_waiting(void)
 {
     return pcm_data_size;

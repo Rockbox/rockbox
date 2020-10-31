@@ -519,12 +519,12 @@ RB_WRAP(sound)
 
 RB_WRAP(pcm)
 {
-    enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_ISPLAYING, PCM_ISPAUSED,
-                PCM_PLAYSTOP, PCM_PLAYPAUSE, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
+    enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_ISPLAYING,
+                PCM_PLAYSTOP, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
                 PCM_CALCULATEPEAKS, PCM_SETFREQUENCY, PCM_GETBYTESWAITING, PCM_ECOUNT};
 
-    const char *pcm_option[] = {"apply_settings", "is_playing", "is_paused",
-                                "play_stop", "play_pause", "play_lock", "play_unlock",
+    const char *pcm_option[] = {"apply_settings", "is_playing",
+                                "play_stop", "play_lock", "play_unlock",
                                 "calculate_peaks", "set_frequency", "get_bytes_waiting", NULL};
     bool   b_result;
     int    left, right;
@@ -541,13 +541,6 @@ RB_WRAP(pcm)
         case PCM_ISPLAYING:
             b_result = rb->pcm_is_playing();
             lua_pushboolean(L, b_result);
-            break;
-        case PCM_ISPAUSED:
-            b_result = rb->pcm_is_paused();
-            lua_pushboolean(L, b_result);
-            break;
-        case PCM_PLAYPAUSE:
-            rb->pcm_play_pause(luaL_checkboolean(L, 2));
             break;
         case PCM_PLAYSTOP:
             rb->pcm_play_stop();
