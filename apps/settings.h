@@ -826,6 +826,12 @@ struct user_settings
 #ifdef HAVE_USB_POWER
     int usb_mode;
 #endif
+
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+    /* bluetooth */
+    bool         bt_enabled;    /* Enable bluetooth */
+    unsigned int bt_flags;     /* Setup flags -?-?-?- */
+#endif
 };
 
 /** global variables **/
