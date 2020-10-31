@@ -21,10 +21,6 @@
 #include "systeminfo.h"
 #include "Logger.h"
 
-#if defined(Q_OS_LINUX)
-#include <unistd.h>
-#endif
-
 // server infos
 const static struct {
     ServerInfo::ServerInfos info;

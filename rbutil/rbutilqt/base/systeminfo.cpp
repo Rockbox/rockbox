@@ -22,11 +22,6 @@
 #include <QSettings>
 #include "Logger.h"
 
-#if defined(Q_OS_LINUX)
-#include <unistd.h>
-#endif
-
-
 // device settings
 const static struct {
     SystemInfo::SystemInfos info;
