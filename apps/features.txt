@@ -270,3 +270,7 @@ boot_data
 #if defined(HAVE_MULTIBOOT)
 multi_boot
 #endif
+
+#if defined(AUDIOHW_HAVE_BLUETOOTH)
+bluetooth
+#endif
