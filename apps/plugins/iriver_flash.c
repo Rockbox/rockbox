@@ -75,7 +75,7 @@ static volatile uint16_t* FB = (uint16_t*)0x00000000; /* Flash base address */
 #endif
 
 /* read the manufacturer and device ID */
-static void cfi_read_id(struct flash_info* pInfo)
+static void flash_read_id(struct flash_info* pInfo)
 {
     FB[0x5555] = 0xAA; /* enter command mode */
     FB[0x2AAA] = 0x55;
@@ -141,12 +141,12 @@ static bool cfi_program_word(volatile uint16_t* pAddr, uint16_t data)
 }
 
 /* fills in the struct with data about the flash rom */
-static void cfi_get_flash_info(struct flash_info* pInfo)
+static void flash_get_info(struct flash_info* pInfo)
 {
     uint32_t size = 0;
     const char* name = "";
 
-    cfi_read_id(pInfo);
+    flash_read_id(pInfo);
 
     switch (pInfo->manufacturer)
     {
@@ -215,7 +215,7 @@ static bool show_info(void)
     struct flash_info fi;
 
     rb->lcd_clear_display();
-    cfi_get_flash_info(&fi);
+    flash_get_info(&fi);
     ShowFlashInfo(&fi);
     if (fi.size == 0) /* no valid chip */
     {
