@@ -34,6 +34,9 @@ menus/recording_menu.c
 #endif
 menus/settings_menu.c
 menus/sound_menu.c
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+menus/bt_menu.c
+#endif
 #if CONFIG_RTC
 menus/time_menu.c
 #endif

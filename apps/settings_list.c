@@ -66,6 +66,11 @@
 #include "usb-ibasso.h"
 #endif
 
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+/* include bluetooth header */
+#include "menus/bt_menu.h"
+#endif
+
 #define NVRAM(bytes) (bytes<<F_NVRAM_MASK_SHIFT)
 /** NOTE: NVRAM_CONFIG_VERSION is in settings_list.h
      and you may need to update it if you edit this file */
@@ -1750,6 +1755,10 @@ const struct settings_list settings[] = {
 #ifdef AUDIOHW_HAVE_TREBLE_CUTOFF
     SOUND_SETTING(F_NO_WRAP, treble_cutoff, LANG_TREBLE_CUTOFF,
                   "treble cutoff", SOUND_TREBLE_CUTOFF),
+#endif
+#ifdef AUDIOHW_HAVE_BLUETOOTH //&bluetooth_enable_cb
+    OFFON_SETTING(0, bt_enabled, LANG_BLUETOOTH_ENABLED, false,
+                  "bt enabled", NULL),
 #endif
 #ifdef HAVE_DIRCACHE
     /*enable dircache for all targets > 2MB of RAM by default*/
