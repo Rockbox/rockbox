@@ -32,6 +32,10 @@
 #include "string-extra.h"
 #include "diacritic.h"
 
+#ifdef LOGF_ENABLE
+#include "panic.h"
+#endif
+
 #ifndef LCDFN /* Not compiling for remote - define macros for main LCD. */
 #define LCDFN(fn) lcd_ ## fn
 #define FBFN(fn)  fb_ ## fn
@@ -77,7 +81,10 @@ struct viewport* LCDFN(init_viewport)(struct viewport* vp)
 {
     struct frame_buffer_t *fb_default = &LCDFN(framebuffer_default);
     if (!vp) /* NULL vp grabs default viewport */
+    {
         vp = &default_vp;
+        vp->buffer = fb_default;
+    }
 
     /* use defaults if no buffer is provided */
     if (vp->buffer == NULL || vp->buffer->elems == 0)
@@ -92,6 +99,19 @@ struct viewport* LCDFN(init_viewport)(struct viewport* vp)
 
         if (vp->buffer->get_address_fn == NULL)
             vp->buffer->get_address_fn = fb_default->get_address_fn;
+
+#ifdef LOGF_ENABLE
+        if ((size_t)LCD_NBELEMS(vp->width, vp->height) > vp->buffer->elems)
+        {
+            if (vp->buffer != fb_default)
+                panicf("viewport %d x %d > buffer", vp->width, vp->height);
+            logf("viewport %d x %d, %d x %d [%lu] > buffer [%lu]", vp->x, vp->y,
+                 vp->width, vp->height,
+                 (unsigned long) LCD_NBELEMS(vp->width, vp->height),
+                 (unsigned long) vp->buffer->elems);
+
+        }
+#endif
     }
     return vp;
 }
@@ -474,32 +494,34 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     int width, height;
     int w, h, cwidth;
     bool restart;
+    struct viewport * vp = LCDFN(current_viewport);
 
     if (!string)
         return false;
 
     /* prepare rectangle for scrolling. x and y must be calculated early
      * for find_scrolling_line() to work */
-    cwidth = font_get(LCDFN(current_viewport)->font)->maxwidth;
-    height = font_get(LCDFN(current_viewport)->font)->height;
+
+    cwidth = font_get(vp->font)->maxwidth;
+    /* get width (pixels) of the string */
+    LCDFN(getstringsize)(string, &w, &h);
+    height = h;
+
     y = y * (linebased ? height : 1);
     x = x * (linebased ? cwidth : 1);
-    width = LCDFN(current_viewport)->width - x;
+    width = vp->width - x;
 
-    if (y >= LCDFN(current_viewport)->height)
+    if (y >= vp->height || (height + y) > (vp->height))
         return false;
 
     s = find_scrolling_line(x, y);
     restart = !s;
 
-    /* get width (pixeks) of the string */
-    LCDFN(getstringsize)(string, &w, &h);
-
     /* Remove any previously scrolling line at the same location. If
      * the string width is too small to scroll the scrolling line is
      * cleared as well */
     if (w < width || restart) {
-        LCDFN(scroll_stop_viewport_rect)(LCDFN(current_viewport), x, y, width, height);
+        LCDFN(scroll_stop_viewport_rect)(vp, x, y, width, height);
         LCDFN(putsxyofs)(x, y, x_offset, string);
         /* nothing to scroll, or out of scrolling lines. Either way, get out */
         if (w < width || LCDFN(scroll_info).lines >= LCDM(SCROLLABLE_LINES))
@@ -512,7 +534,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     strlcpy(s->linebuffer, string, sizeof(s->linebuffer));
     /* scroll bidirectional or forward only depending on the string width */
     if ( LCDFN(scroll_info).bidir_limit ) {
-        s->bidir = w < (LCDFN(current_viewport)->width) *
+        s->bidir = w < (vp->width) *
             (100 + LCDFN(scroll_info).bidir_limit) / 100;
     }
     else
@@ -526,7 +548,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
         s->y = y;
         s->width = width;
         s->height = height;
-        s->vp = LCDFN(current_viewport);
+        s->vp = vp;
         s->start_tick = current_tick + LCDFN(scroll_info).delay;
         LCDFN(scroll_info).lines++;
     } else {

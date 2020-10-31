@@ -38,6 +38,9 @@
 #include "bidi.h"
 #include "scroll_engine.h"
 
+/*#define LOGF_ENABLE*/
+#include "logf.h"
+
 #define ROW_INC 1
 #define COL_INC lcd_current_viewport->buffer->stride
 
