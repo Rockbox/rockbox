@@ -57,4 +57,27 @@ unix:!macx {
     QMAKE_EXTRA_TARGETS += appimage_dl appimage_prepare appimage
 }
 
+macx {
+    dmgbuild.commands = \
+        python3 -m venv venv; \
+        venv/bin/python -m pip install dmgbuild
+
+    appbundle_merge.commands = \
+        cp -pr rbutilqt/RockboxUtility.app .; \
+        cp ipodpatcher/ipodpatcher.app/Contents/MacOS/ipodpatcher RockboxUtility.app/Contents/MacOS; \
+        cp sansapatcher/sansapatcher.app/Contents/MacOS/sansapatcher RockboxUtility.app/Contents/MacOS
+
+    appbundle_deploy.commands = \
+        $$[QT_INSTALL_BINS]/macdeployqt RockboxUtility.app
+    appbundle_deploy.depends = appbundle_merge
+
+    dmg.commands = \
+        venv/bin/dmgbuild -s $$_PRO_FILE_PWD_/rbutilqt/dmgbuild.cfg \
+            -Dbasepath=$$_PRO_FILE_PWD_ \"Rockbox Utility\" RockboxUtility.dmg
+
+    dmg.depends = appbundle_merge appbundle_deploy dmgbuild
+
+    QMAKE_EXTRA_TARGETS += dmgbuild appbundle_merge appbundle_deploy dmg
+}
+
 
