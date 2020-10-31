@@ -73,6 +73,10 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+
+/* define this if your device supports bluetooth audio */
+#define AUDIOHW_HAVE_BLUETOOTH
+
 /* Supports attaching to external USB drive */
 #define CONFIG_STORAGE (STORAGE_HOSTFS|STORAGE_USB)
 #define HOSTFS_VOL_DEC "microSD"
