@@ -22,31 +22,27 @@
 #include "utils.h"
 #include "Logger.h"
 
-EncoderExe::EncoderExe(QString name,QObject *parent) : EncoderBase(parent)
+EncoderExe::EncoderExe(QString name, QObject *parent) : EncoderBase(parent),
+    m_name(name)
 {
-    m_name = name;
-
-    m_TemplateMap["lame"] = "\"%exe\" %options \"%input\" \"%output\"";
-
 }
-
 
 
 void EncoderExe::generateSettings()
 {
-    QString exepath =RbSettings::subValue(m_name,RbSettings::EncoderPath).toString();
-    if(exepath == "") exepath = Utils::findExecutable(m_name);
+    QString exepath = RbSettings::subValue(m_name,RbSettings::EncoderPath).toString();
+    if(exepath.isEmpty()) exepath = Utils::findExecutable(m_name);
 
-    insertSetting(eEXEPATH,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-            tr("Path to Encoder:"),exepath,EncTtsSetting::eBROWSEBTN));
-    insertSetting(eEXEOPTIONS,new EncTtsSetting(this,EncTtsSetting::eSTRING,
-            tr("Encoder options:"),RbSettings::subValue(m_name,RbSettings::EncoderOptions)));
+    insertSetting(eEXEPATH, new EncTtsSetting(this, EncTtsSetting::eSTRING,
+            tr("Path to Encoder:"), exepath, EncTtsSetting::eBROWSEBTN));
+    insertSetting(eEXEOPTIONS, new EncTtsSetting(this, EncTtsSetting::eSTRING,
+            tr("Encoder options:"), RbSettings::subValue(m_name, RbSettings::EncoderOptions)));
 }
 
 void EncoderExe::saveSettings()
 {
-    RbSettings::setSubValue(m_name,RbSettings::EncoderPath,getSetting(eEXEPATH)->current().toString());
-    RbSettings::setSubValue(m_name,RbSettings::EncoderOptions,getSetting(eEXEOPTIONS)->current().toString());
+    RbSettings::setSubValue(m_name, RbSettings::EncoderPath, getSetting(eEXEPATH)->current().toString());
+    RbSettings::setSubValue(m_name, RbSettings::EncoderOptions, getSetting(eEXEOPTIONS)->current().toString());
     RbSettings::sync();
 }
 
@@ -55,29 +51,20 @@ bool EncoderExe::start()
     m_EncExec = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
     m_EncOpts = RbSettings::subValue(m_name, RbSettings::EncoderOptions).toString();
 
-    m_EncTemplate = m_TemplateMap.value(m_name);
-
     QFileInfo enc(m_EncExec);
-    if(enc.exists())
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return enc.exists();
 }
 
 bool EncoderExe::encode(QString input,QString output)
 {
-    QString execstring = m_EncTemplate;
+    if (!configOk())
+        return false;
 
-    execstring.replace("%exe",m_EncExec);
-    execstring.replace("%options",m_EncOpts);
-    execstring.replace("%input",input);
-    execstring.replace("%output",output);
-    LOG_INFO() << "cmd: " << execstring;
-    int result = QProcess::execute(execstring);
+    QStringList args;
+    args << m_EncOpts;
+    args << input;
+    args << output;
+    int result = QProcess::execute(m_EncExec, args);
     return result == 0;
 }
 
@@ -86,9 +73,6 @@ bool EncoderExe::configOk()
 {
     QString path = RbSettings::subValue(m_name, RbSettings::EncoderPath).toString();
 
-    if (QFileInfo(path).exists())
-        return true;
-
-    return false;
+    return QFileInfo::exists(path);
 }
 

@@ -48,8 +48,6 @@ class EncoderExe : public EncoderBase
         QString m_name;
         QString m_EncExec;
         QString m_EncOpts;
-        QMap<QString,QString> m_TemplateMap;
-        QString m_EncTemplate;
 };
 #endif
 
