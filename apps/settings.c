@@ -1039,6 +1039,12 @@ void settings_apply(bool read_disk)
     ibasso_set_usb_mode(global_settings.usb_mode);
 #endif
 
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+    /* bluetooth initialization */
+    /*?bluetooth_hw_init(bool enabled, int *flags)?*/
+    //bluetooth_hw_init(global_settings.bt_enabled, &global_settings.bt_flags);
+#endif
+
     /* This should stay last */
 #if defined(HAVE_RECORDING)
     enc_global_settings_apply();

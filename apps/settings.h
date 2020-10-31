@@ -33,6 +33,9 @@
 #include "audio.h"
 #include "dsp_proc_settings.h"
 #include "rbpaths.h"
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+#include "bluetooth-target.h"
+#endif
 
 struct opt_items {
     unsigned const char* string;
@@ -825,6 +828,13 @@ struct user_settings
 #endif
 #ifdef HAVE_USB_POWER
     int usb_mode;
+#endif
+
+#ifdef AUDIOHW_HAVE_BLUETOOTH
+    /* bluetooth */
+    bool         bt_enabled;    /* Enable bluetooth */
+    unsigned int bt_flags;     /* Setup flags -?-?-?- */
+    struct bluetooth_device bluetooth_trusted[BT_DEVICE_MAX_DEVICES];
 #endif
 };
 

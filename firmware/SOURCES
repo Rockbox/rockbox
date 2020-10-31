@@ -135,6 +135,10 @@ target/hosted/agptek/debug-agptek.c
 target/hosted/agptek/power-agptek.c
 target/hosted/agptek/powermgmt-agptek.c
 #endif
+#if defined(AGPTEK_ROCKER)
+target/hosted/agptek/bluetooth-agptek.c
+#endif
+
 
 #if (defined(XDUOO_X3II) || defined(XDUOO_X20)) && !defined(SIMULATOR)
 target/hosted/xduoo/button-xduoo.c
