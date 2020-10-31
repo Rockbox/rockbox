@@ -32,6 +32,7 @@
 #include "backlight-target.h"
 #include "lcd.h"
 #include "filesystem-hosted.h"
+#include "logf.h"
 
 /* to make thread-internal.h happy */
 uintptr_t *stackbegin;
