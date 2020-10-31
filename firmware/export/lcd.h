@@ -456,26 +456,26 @@ typedef void lcd_blockfunc_type(fb_data *address, unsigned mask, unsigned bits);
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define LCD_FBSTRIDE(w, h) ((w+7)/8)
 #define LCD_FBWIDTH LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
-#define LCD_NBELEMS(w, h) (((h*LCD_FBSTRIDE(w, h)) + w) / sizeof(fb_data))
+#define LCD_NBELEMS(w, h) ((((h-1)*LCD_FBSTRIDE(w, h)) + w) / sizeof(fb_data))
 #else /* LCD_PIXELFORMAT == VERTICAL_PACKING */
 #define LCD_FBSTRIDE(w, h) ((h+7)/8)
 #define LCD_FBHEIGHT LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
-#define LCD_NBELEMS(w, h) (((w*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
+#define LCD_NBELEMS(w, h) ((((w-1)*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
 #endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 2
 #if LCD_PIXELFORMAT == HORIZONTAL_PACKING
 #define LCD_FBSTRIDE(w, h) ((w+3)>>2)
 #define LCD_NATIVE_STRIDE(s) LCD_FBSTRIDE(s, s)
 #define LCD_FBWIDTH LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
-#define LCD_NBELEMS(w, h) (((h*LCD_FBSTRIDE(w, h)) + w) / sizeof(fb_data))
+#define LCD_NBELEMS(w, h) ((((h-1)*LCD_FBSTRIDE(w, h)) + w) / sizeof(fb_data))
 #elif LCD_PIXELFORMAT == VERTICAL_PACKING
 #define LCD_FBSTRIDE(w, h) ((h+3)/4)
 #define LCD_FBHEIGHT LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
-#define LCD_NBELEMS(w, h) (((w*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
+#define LCD_NBELEMS(w, h) ((((w-1)*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
 #elif LCD_PIXELFORMAT == VERTICAL_INTERLEAVED
 #define LCD_FBSTRIDE(w, h) ((h+7)/8)
 #define LCD_FBHEIGHT LCD_FBSTRIDE(LCD_WIDTH, LCD_HEIGHT)
-#define LCD_NBELEMS(w, h) (((w*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
+#define LCD_NBELEMS(w, h) ((((w-1)*LCD_FBSTRIDE(w, h)) + h) / sizeof(fb_data))
 #endif /* LCD_PIXELFORMAT */
 #endif /* LCD_DEPTH */
 /* Set defaults if not defined different yet. The defaults apply to both
@@ -494,9 +494,9 @@ typedef void lcd_blockfunc_type(fb_data *address, unsigned mask, unsigned bits);
 
 #ifndef LCD_NBELEMS
 #if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
-#define LCD_NBELEMS(w, h) ((w*STRIDE_MAIN(w, h)) + h)
+#define LCD_NBELEMS(w, h) (((w-1)*STRIDE_MAIN(w, h)) + h)
 #else
-#define LCD_NBELEMS(w, h) ((h*STRIDE_MAIN(w, h)) + w)
+#define LCD_NBELEMS(w, h) (((h-1)*STRIDE_MAIN(w, h)) + w)
 #endif
 #define LCD_FBSTRIDE(w, h) STRIDE_MAIN(w, h)
 #endif

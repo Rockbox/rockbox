@@ -63,13 +63,13 @@
 #define LCD_REMOTE_STRIDE(w, h) (h)
 #define LCD_REMOTE_FBSTRIDE(w, h) ((h+7)/8)
 #define LCD_REMOTE_FBHEIGHT LCD_REMOTE_FBSTRIDE(LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT)
-#define LCD_REMOTE_NBELEMS(w, h) (((w*LCD_REMOTE_FBSTRIDE(w, h)) + h)  / sizeof(fb_remote_data))
+#define LCD_REMOTE_NBELEMS(w, h) ((((w-1)*LCD_REMOTE_FBSTRIDE(w, h)) + h)  / sizeof(fb_remote_data))
 #elif LCD_REMOTE_DEPTH == 2
 #if LCD_REMOTE_PIXELFORMAT == VERTICAL_INTERLEAVED
 #define LCD_REMOTE_STRIDE(w, h) (h)
 #define LCD_REMOTE_FBSTRIDE(w, h) ((h+7)/8)
 #define LCD_REMOTE_FBHEIGHT LCD_REMOTE_FBSTRIDE(LCD_REMOTE_WIDTH, LCD_REMOTE_HEIGHT)
-#define LCD_REMOTE_NBELEMS(w, h) (((w*LCD_REMOTE_FBSTRIDE(w, h)) + h)  / sizeof(fb_remote_data))
+#define LCD_REMOTE_NBELEMS(w, h) ((((w-1)*LCD_REMOTE_FBSTRIDE(w, h)) + h)  / sizeof(fb_remote_data))
 #endif
 #endif /* LCD_REMOTE_DEPTH */
 
@@ -84,7 +84,7 @@
 
 #ifndef LCD_REMOTE_NBELEMS
 /* At this time (2020) known remote screens only have vertical stride */
-#define LCD_REMOTE_NBELEMS(w, h) ((w*STRIDE_REMOTE(w, h)) + h) / sizeof(fb_remote_data))
+#define LCD_REMOTE_NBELEMS(w, h) (((w-1)*STRIDE_REMOTE(w, h)) + h) / sizeof(fb_remote_data))
 #define LCD_REMOTE_STRIDE(w, h) STRIDE_REMOTE(w, h)
 #define LCD_REMOTE_FBSTRIDE(w, h) STRIDE_REMOTE(w, h)
 #endif

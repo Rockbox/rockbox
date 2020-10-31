@@ -81,11 +81,12 @@ void lcd_clear_viewport(void)
     }
     else
     {
-        if (!lcd_backdrop)
+        if (lcd_backdrop && lcd_current_viewport->buffer == &lcd_framebuffer_default)
         {
             do
             {
-                memset16(dst, lcd_current_viewport->bg_pattern, len);
+                memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
+                       len * sizeof(fb_data));
                 dst += step;
             }
             while (dst <= dst_end);
@@ -94,8 +95,7 @@ void lcd_clear_viewport(void)
         {
             do
             {
-                memcpy(dst, PTR_ADD(dst, lcd_backdrop_offset),
-                       len * sizeof(fb_data));
+                memset16(dst, lcd_current_viewport->bg_pattern, len);
                 dst += step;
             }
             while (dst <= dst_end);
