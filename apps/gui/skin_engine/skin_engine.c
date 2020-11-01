@@ -29,6 +29,7 @@
 #include "settings.h"
 #include "wps.h"
 #include "file.h"
+#include "misc.h"
 #if CONFIG_TUNER
 #include "radio.h"
 #endif
@@ -314,7 +315,8 @@ bool skin_do_full_update(enum skinnable_screens skin,
 {
     struct viewport *vp = *(screens[screen].current_viewport);
 
-    bool vp_is_dirty = ((vp->flags & VP_FLAG_VP_SET_CLEAN) == VP_FLAG_VP_DIRTY);
+    bool vp_is_dirty = ((vp->flags & VP_FLAG_VP_SET_CLEAN) == VP_FLAG_VP_DIRTY) &&
+                       get_current_activity() == ACTIVITY_WPS;
 
     bool ret = (skins[skin][screen].needs_full_update || vp_is_dirty);
     skins[skin][screen].needs_full_update = false;
