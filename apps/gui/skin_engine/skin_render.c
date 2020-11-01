@@ -435,18 +435,18 @@ static void do_tags_in_hidden_conditional(struct skin_element* branch,
                             {
                                 skin_backdrop_set_buffer(data->backdrop_id, skin_viewport);
                                 skin_backdrop_show(-1);
-                                gwps->display->set_viewport(&skin_viewport->vp);
+                                gwps->display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
                                 gwps->display->clear_viewport();
-                                gwps->display->set_viewport_ex(&info->skin_vp->vp, 0);
+                                gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
                                 skin_backdrop_set_buffer(-1, skin_viewport);
                                 skin_backdrop_show(data->backdrop_id);
                             }
                             else
 #endif
                             {
-                                gwps->display->set_viewport(&skin_viewport->vp);
+                                gwps->display->set_viewport_ex(&skin_viewport->vp, VP_FLAG_VP_SET_CLEAN);
                                 gwps->display->clear_viewport();
-                                gwps->display->set_viewport_ex(&info->skin_vp->vp, 0);
+                                gwps->display->set_viewport_ex(&info->skin_vp->vp, VP_FLAG_VP_SET_CLEAN);
                             }
                             skin_viewport->hidden_flags |= VP_DRAW_HIDDEN;
                         }
@@ -512,6 +512,7 @@ static void fix_line_alignment(struct skin_draw_info *info, struct skin_element 
 static bool skin_render_line(struct skin_element* line, struct skin_draw_info *info)
 {
     bool needs_update = false;
+
     int last_value, value;
 
     if (line->children_count == 0)
@@ -571,6 +572,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 info->refresh_type = old_refresh_mode;
                 break;
             case TAG:
+
                 if (child->tag->flags & NOBREAK)
                     info->no_line_break = true;
                 if (child->tag->type == SKIN_TOKEN_SUBLINE_SCROLL)
@@ -590,6 +592,10 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                                                         sizeof(tempbuf), NULL);
                     if (valuestr)
                     {
+#if defined(ONDA_VX747) || defined(ONDA_VX747P)
+                        /* Doesn't redraw (in sim at least) */
+                        needs_update = true;
+#endif
 #if CONFIG_RTC
                         if (child->tag->flags&SKIN_RTC_REFRESH)
                             needs_update = needs_update || info->refresh_type&SKIN_REFRESH_DYNAMIC;
@@ -602,6 +608,10 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 }
                 break;
             case TEXT:
+#if defined(ONDA_VX747) || defined(ONDA_VX747P)
+                /* Doesn't redraw (in sim at least) */
+                needs_update = true;
+#endif
                 strlcat(info->cur_align_start, SKINOFFSETTOPTR(skin_buffer, child->data),
                         info->buf_size - (info->cur_align_start-info->buf));
                 needs_update = needs_update ||
