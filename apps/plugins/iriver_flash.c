@@ -56,8 +56,12 @@ struct flash_info
 };
 
 #if defined(IRIVER_H100_SERIES) || defined(IRIVER_H300_SERIES)
-#define SEC_SIZE 4096
-#define BOOTLOADER_ERASEGUARD  (BOOTLOADER_ENTRYPOINT / SEC_SIZE)
+#define WORD_SIZE sizeof(uint16_t)
+#define SECTOR_SIZE 4096
+#define BOOT_VECTOR_SIZE 8
+#define BOOT_SECTOR_SIZE (SECTOR_SIZE - BOOT_VECTOR_SIZE)
+#define BOOTLOADER_MAX_SIZE 65536
+#define BOOTLOADER_ERASEGUARD  (BOOTLOADER_ENTRYPOINT / SECTOR_SIZE)
 enum sections {
     SECT_RAMIMAGE = 1,
     SECT_ROMIMAGE = 2,
@@ -393,13 +397,13 @@ int flash_rockbox(const char *filename, int section)
     }
 
     /* Erase the program flash. */
-    for (i = 0; i + pos < BOOTLOADER_ENTRYPOINT && i < len + 32; i += SEC_SIZE)
+    for (i = 0; i + pos < BOOTLOADER_ENTRYPOINT && i < len + 32; i += SECTOR_SIZE)
     {
         /* Additional safety check. */
-        if (i + pos < SEC_SIZE)
+        if (i + pos < SECTOR_SIZE)
             return -1;
 
-        rb->lcd_putsf(0, 3, "Erasing...  %d%%", (i+SEC_SIZE)*100/len);
+        rb->lcd_putsf(0, 3, "Erasing...  %d%%", (i+SECTOR_SIZE)*100/len);
         rb->lcd_update();
 
         /*rc = */cfi_erase_sector(FB + (i + pos)/2);
@@ -425,7 +429,7 @@ int flash_rockbox(const char *filename, int section)
     p16 = (uint16_t *)audiobuf;
     for (i = 0; i < len/2 && pos + i < (BOOTLOADER_ENTRYPOINT/2); i++)
     {
-        if (i % SEC_SIZE == 0)
+        if (i % SECTOR_SIZE == 0)
         {
             rb->lcd_putsf(0, 4, "Programming...  %d%%", (i+1)*100/(len/2));
             rb->lcd_update();
@@ -478,8 +482,8 @@ int flash_bootloader(const char *filename)
     uint16_t *p16;
 
     bootsector = audiobuf;
-    audiobuf += SEC_SIZE;
-    audiobuf_size -= SEC_SIZE;
+    audiobuf += SECTOR_SIZE;
+    audiobuf_size -= SECTOR_SIZE;
 
     if (!confirm("Update bootloader?"))
         return -2;
@@ -506,7 +510,7 @@ int flash_bootloader(const char *filename)
 
     /* Backup the bootloader sector first. */
     p8 = (char *)FB;
-    rb->memcpy(bootsector, p8, SEC_SIZE);
+    rb->memcpy(bootsector, p8, SECTOR_SIZE);
 
     /* Erase the boot sector and write a proper reset vector. */
     cfi_erase_sector(FB);
@@ -516,12 +520,12 @@ int flash_bootloader(const char *filename)
 
     /* And restore original content for original FW to function. */
     p16 = (uint16_t *)bootsector;
-    for (i = 8/2; i < SEC_SIZE/2; i++)
+    for (i = 8/2; i < SECTOR_SIZE/2; i++)
         cfi_program_word(FB + i, p16[i]);
 
     /* Erase the bootloader flash section. */
     for (i = BOOTLOADER_ERASEGUARD; i < BOOTLOADER_ERASEGUARD+16; i++)
-        /*rc =*/ cfi_erase_sector(FB + (SEC_SIZE/2) * i);
+        /*rc =*/ cfi_erase_sector(FB + (SECTOR_SIZE/2) * i);
 
     pos = BOOTLOADER_ENTRYPOINT/2;
     p16 = (uint16_t *)audiobuf;
@@ -582,7 +586,7 @@ int flash_original_fw(int len)
     /* Erase the program flash. */
     for (i = 1; i < BOOTLOADER_ERASEGUARD && (i-1)*4096 < len; i++)
     {
-        rc = cfi_erase_sector(FB + (SEC_SIZE/2) * i);
+        rc = cfi_erase_sector(FB + (SECTOR_SIZE/2) * i);
         rb->lcd_putsf(0, 5, "Erase: 0x%03x  (%d)", i, rc);
         rb->lcd_update();
     }
