@@ -158,7 +158,7 @@ QT += network
 
 message("Qt$$QT_MAJOR_VERSION found")
 QT += widgets
-if (lessThan(QT_MAJOR_VERSION, 6)) {
+lessThan(QT_MAJOR_VERSION, 6) {
     QT += multimedia
 }
 if (greaterThan(QT_MAJOR_VERSION, 5)) {
