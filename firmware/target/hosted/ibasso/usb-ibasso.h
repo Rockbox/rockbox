@@ -25,30 +25,10 @@
 #ifndef _USB_DX50_H_
 #define _USB_DX50_H_
 
-
-/* Supported usb modes. */
-enum ibasso_usb_mode
-{
-    /*
-        USB mass storage mode. On USB connection, Rockbox will terminate and the internel and
-        external storage gets exported to the connected client.
-    */
-    USB_MODE_MASS_STORAGE = 0,
-
-    /*
-        Actually the same, since we to not have proper USB detection.
-        Starts the adb server and enables adb connection over USB. Rockbox will continue to run.
-    */
-    USB_MODE_CHARGE,
-    USB_MODE_ADB
-};
-
-
 /*
     Set the usb mode.
     mode: ibasso_usb_mode
 */
 void ibasso_set_usb_mode(int mode);
-
 
 #endif

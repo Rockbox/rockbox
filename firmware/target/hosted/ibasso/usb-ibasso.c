@@ -60,10 +60,8 @@ static void usb_enable_mass_storage(void)
     DEBUGF("ERROR %s: No command processor available.", __func__);
 }
 
-
 /* Default at boot not known. */
 static int _last_usb_mode = -1;
-
 
 void ibasso_set_usb_mode(int mode)
 {
