@@ -131,6 +131,15 @@ enum
 #endif
 };
 
+/* Supported usb modes. */
+enum
+{
+    USB_MODE_ASK = 0,
+    USB_MODE_MASS_STORAGE,
+    USB_MODE_CHARGE,
+    USB_MODE_ADB
+};
+
 #ifdef HAVE_USB_POWER
 /*allow people to define this in config-target.h if they need it*/
 #if !defined(USBPOWER_BTN_IGNORE)
@@ -215,6 +224,7 @@ void usb_charging_maxcurrent_change(int maxcurrent);
 /* returns the maximum allowed USB current, based on USB charging mode and state */
 int usb_charging_maxcurrent(void);
 #endif /* HAVE_USB_CHARGING_ENABLE */
+void usb_set_mode(int mode);
 #endif /* HAVE_USB_POWER */
 #ifdef HAVE_USBSTACK
 /* USB driver call this function to notify that a transfer has completed */
