@@ -12769,71 +12769,59 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE
+  id: LANG_USB_MODE
   desc: in Settings -> General -> System -> USB Mode
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  id: LANG_USB_MODE_MASS_STORAGE
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE_CHARGE
+  id: LANG_USB_MODE_CHARGE
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: "Charge Only"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: "Charge Only"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: "Charge Only"
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE_ADB
+  id: LANG_USB_MODE_ADB
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -16342,5 +16330,19 @@
   </dest>
   <voice>
     *: "Browse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Enter USB mass storage mode?"
+  </dest>
+  <voice>
+    *: "Enter USB mass storage mode?"
   </voice>
 </phrase>

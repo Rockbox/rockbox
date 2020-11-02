@@ -266,6 +266,9 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
             &usb_charging,
 #endif
          );
+#ifdef HAVE_USB_POWER
+MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
+#endif
 /* Disk */
 #ifdef HAVE_DISK_STORAGE
 MENUITEM_SETTING(disk_spindown, &global_settings.disk_spindown, NULL);
@@ -446,6 +449,8 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 
 #if defined(DX50) || defined(DX90)
             &governor,
+#endif
+#ifdef HAVE_USB_POWER
             &usb_mode,
 #endif
          );

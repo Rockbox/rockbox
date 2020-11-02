@@ -2156,17 +2156,31 @@ const struct settings_list settings[] = {
                    "Interactive",
                    "Powersave",
                    "Performance"),
+#endif
+#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
     CHOICE_SETTING(0,
                    usb_mode,
-                   LANG_IBASSO_USB_MODE,
+                   LANG_USB_MODE,
                    USB_MODE_MASS_STORAGE,
                    "usb mode",
-                   "mass storage,charge,adb",
-                   ibasso_set_usb_mode,
+                   "ask,mass storage,charge"
+#if defined(DX50) || defined(DX90)
+                   ",adb"
+#endif
+                   ,
+                   usb_set_mode,
+#if defined(DX50) || defined(DX90)
+                   4,
+#else
                    3,
-                   ID2P(LANG_IBASSO_USB_MODE_MASS_STORAGE),
-                   ID2P(LANG_IBASSO_USB_MODE_CHARGE),
-                   ID2P(LANG_IBASSO_USB_MODE_ADB)),
+#endif
+                   ID2P(LANG_ASK),
+                   ID2P(LANG_USB_MODE_MASS_STORAGE),
+                   ID2P(LANG_USB_MODE_CHARGE)
+#if defined(DX50) || defined(DX90)
+                   ,ID2P(LANG_USB_MODE_ADB)
+#endif
+	    ),
 #endif
 };
 
