@@ -12414,7 +12414,7 @@ desc: deprecated
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE_MASS_STORAGE
+  id: LANG_USB_MODE_MASS_STORAGE
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
   user: core
   <source>
@@ -12566,7 +12566,7 @@ desc: deprecated
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE_CHARGE
+  id: LANG_USB_MODE_CHARGE
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
@@ -12631,7 +12631,7 @@ desc: deprecated
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE
+  id: LANG_USB_MODE
   desc: in Settings -> General -> System -> USB Mode
   user: core
   <source>
@@ -12676,7 +12676,7 @@ desc: deprecated
   </voice>
 </phrase>
 <phrase>
-  id: LANG_IBASSO_USB_MODE_ADB
+  id: LANG_USB_MODE_ADB
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
   user: core
   <source>
