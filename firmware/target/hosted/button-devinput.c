@@ -109,17 +109,23 @@ int button_read_device(void)
                     /* map linux event code to rockbox button bitmap */
                     if(press)
                     {
-                        button_bitmap |= button_map(keycode);
+                        int bmap = button_map(keycode);
+#if defined(BUTTON_SCROLL_BACK)
+                        /* Keep track of when the last wheel tick happened */
+                        if (bmap & (BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD))
+                            last_tick = current_tick;
+#endif
+                        button_bitmap |= bmap;
                     }
                     else
                     {
+                        int bmap = button_map(keycode);
 #if defined(BUTTON_SCROLL_BACK)
                         /* Wheel gives us press+release back to back; ignore the release */
-                        int bmap = button_map(keycode) & ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
-                        button_bitmap &= ~bmap;
-#else
-                        button_bitmap &= ~button_map(keycode);
+                        bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
 #endif
+                        button_bitmap &= ~bmap;
+
                     }
                 }
             }
