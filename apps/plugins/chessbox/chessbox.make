@@ -24,12 +24,7 @@ else
     ROCKS += $(CHESSBOX_OBJDIR)/chessbox.rock
 endif
 
-ifeq ($(CPU),sh)
-# sh need to retain its' -Os
-CHESSBOXFLAGS = $(PLUGINFLAGS)
-else
 CHESSBOXFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O2
-endif
 
 $(CHESSBOX_OBJDIR)/chessbox.rock: $(CHESSBOX_OBJ)
 
