@@ -4550,9 +4550,7 @@ HOSTAR=${HOSTAR:-${AR}}
 
 if [ -z "$arch" ]; then
     cpp_defines=$(echo "" | $CPP $GCCOPTS -dD)
-    if [ -n "$(echo $cpp_defines | grep -w __sh__)" ]; then
-        arch="sh"
-    elif [ -n "$(echo $cpp_defines | grep -w __m68k__)" ]; then
+    if [ -n "$(echo $cpp_defines | grep -w __m68k__)" ]; then
         arch="m68k"
     elif [ -n "$(echo $cpp_defines | grep -w __arm__)" ]; then
         arch="arm"
