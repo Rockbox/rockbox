@@ -72,6 +72,8 @@ void skin_backdrop_unload(int backdrop_id);
 #define BACKDROP_BUFFERNAME "#backdrop_buffer#"
 void skin_backdrop_set_buffer(int backdrop_id, struct skin_viewport *svp);
 
+/* suspend skin engine to allow full control of screen */
+void skin_set_suspend(bool suspend);
 /* do the button loop as often as required for the peak meters to update
  * with a good refresh rate. 
  * gwps is really gwps[NB_SCREENS]! don't wrap this in FOR_NB_SCREENS()

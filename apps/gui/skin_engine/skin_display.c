@@ -69,6 +69,7 @@
 #include "skin_engine.h"
 #include "statusbar-skinned.h"
 #include "skin_display.h"
+static bool skin_suspend_updates = false;
 
 void skin_render(struct gui_wps *gwps, unsigned refresh_mode);
 
@@ -644,11 +645,21 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
     return draw;
 }
 
+/* suspend skin engine*/
+void skin_set_suspend(bool suspend)
+{
+    skin_suspend_updates = suspend;
+    queue_post(&button_queue, BUTTON_REDRAW, 0);
+    
+}
 /* do the button loop as often as required for the peak meters to update
  * with a good refresh rate.
  */
 int skin_wait_for_action(enum skinnable_screens skin, int context, int timeout)
 {
+    while(skin_suspend_updates)
+        sleep(1);
+
     int button = ACTION_NONE;
     /* when the peak meter is enabled we want to have a
         few extra updates to make it look smooth. On the

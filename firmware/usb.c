@@ -46,6 +46,7 @@
 #include "gui/yesno.h"
 #include "settings.h"
 #include "lang_enum.h"
+#include "gui/skin_engine/skin_engine.h"
 
 /* Conditions under which we want the entire driver */
 #if !defined(BOOTLOADER) || \
@@ -491,12 +492,14 @@ static void NORETURN_ATTR usb_thread(void)
 
             if (new_usbmode == USB_MODE_ASK)
             {
+                skin_set_suspend(true);
                 push_current_activity(ACTIVITY_USBSCREEN);
                 if (yesno_pop(ID2P(LANG_ENTER_USB_STORAGE_MODE_QUERY)))
                     new_usbmode = USB_MODE_MASS_STORAGE;
                 else
                     new_usbmode = USB_MODE_CHARGE;
                 pop_current_activity();
+                skin_set_suspend(false);
                 /* Force full redraw */
 //                queue_post(&button_queue, BUTTON_REDRAW, 0);
 // Alternative approach, as above is supposedly inadequate by design.
