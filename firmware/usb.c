@@ -92,7 +92,8 @@ static bool usb_host_present = false;
 static int usb_num_acks_to_expect = 0;
 static long usb_last_broadcast_tick = 0;
 #ifdef HAVE_USB_POWER
-static bool usb_charging_only = false;
+static int usb_mode = USB_MODE_ASK;
+static int new_usbmode = USB_MODE_ASK;
 #endif
 
 static int usb_release_exclusive_storage(void);
@@ -136,7 +137,6 @@ static inline bool usb_do_screendump(void)
 }
 
 #ifdef HAVE_USB_POWER
-static int usb_mode = USB_MODE_ASK;
 void usb_set_mode(int mode)
 {
     usb_mode = mode;
@@ -145,22 +145,6 @@ void usb_set_mode(int mode)
 #endif
 }
 #endif
-
-/* Power (charging-only) button */
-static inline void usb_detect_charging_only(bool detect)
-{
-#ifdef HAVE_USB_POWER
-    if (detect)
-    {
-        detect = button_status() & ~USBPOWER_BTN_IGNORE;
-        if (!detect)
-            detect = (usb_mode == USB_MODE_CHARGE || usb_mode == USB_MODE_ADB);
-    }
-
-    usb_charging_only = detect;
-#endif
-    (void)detect;
-}
 
 #ifdef USB_FIREWIRE_HANDLING
 static inline bool usb_reboot_button(void)
@@ -392,7 +376,7 @@ static void usb_set_host_present(bool present)
     }
 
 #ifdef HAVE_USB_POWER
-    if (usb_charging_only)
+    if (new_usbmode == USB_MODE_CHARGE || new_usbmode == USB_MODE_ADB)
     {
         /* Only charging is desired */
         usb_configure_drivers(USB_POWERED);
@@ -486,13 +470,32 @@ static void NORETURN_ATTR usb_thread(void)
             usb_state = USB_POWERED;
 
             usb_stack_enable(true);
-            usb_detect_charging_only(true);
 
+            /* Power (charging-only) button */
 #ifdef HAVE_USB_POWER
-            if (!usb_charging_only && usb_mode == USB_MODE_ASK)
+            switch (usb_mode) {
+            case USB_MODE_CHARGE:
+            case USB_MODE_ADB:
+                if (button_status() & ~USBPOWER_BTN_IGNORE)
+                    new_usbmode = USB_MODE_MASS_STORAGE;
+                break;
+            case USB_MODE_MASS_STORAGE:
+                if (button_status() & ~USBPOWER_BTN_IGNORE)
+                    new_usbmode = USB_MODE_CHARGE;
+                    break;
+            case USB_MODE_ASK:
+            default:
+                new_usbmode = USB_MODE_ASK;
+                break;
+	    }
+
+            if (new_usbmode == USB_MODE_ASK)
             {
                 push_current_activity(ACTIVITY_USBSCREEN);
-                usb_charging_only = !yesno_pop(ID2P(LANG_ENTER_USB_STORAGE_MODE_QUERY));
+                if (yesno_pop(ID2P(LANG_ENTER_USB_STORAGE_MODE_QUERY)))
+                    new_usbmode = USB_MODE_MASS_STORAGE;
+                else
+                    new_usbmode = USB_MODE_CHARGE;
                 pop_current_activity();
                 /* Force full redraw */
 //                queue_post(&button_queue, BUTTON_REDRAW, 0);
@@ -530,8 +533,10 @@ static void NORETURN_ATTR usb_thread(void)
                 usb_slave_mode(false);
 
             usb_state = USB_EXTRACTED;
+#ifdef HAVE_USB_POWER
+	    new_usbmode = usb_mode;
+#endif
 
-            usb_detect_charging_only(false);
             usb_set_host_present(false);
             break;
             /* USB_EXTRACTED: */
