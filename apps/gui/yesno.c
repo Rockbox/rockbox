@@ -166,6 +166,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 
     /* make sure to eat any extranous keypresses */
     action_wait_for_release();
+    button_clear_queue();
 
     while (result==-1)
     {
