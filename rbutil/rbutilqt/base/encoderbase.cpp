@@ -58,10 +58,6 @@ EncoderBase* EncoderBase::getEncoder(QObject* parent,QString encoder)
     EncoderBase* enc;
     if(encoder == "lame")
     {
-#if defined(Q_OS_MACX)
-        /* currently not on OS X */
-        enc = new EncoderExe(encoder, parent);
-#else
         enc = new EncoderLame(parent);
         if (!enc->configOk())
         {
@@ -71,7 +67,6 @@ EncoderBase* EncoderBase::getEncoder(QObject* parent,QString encoder)
             enc = new EncoderExe(encoder, parent);
 
         }
-#endif
         return enc;
     }
     else  // rbspeex is default
