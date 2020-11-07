@@ -154,10 +154,9 @@ LIBS += -lz
 
 TEMPLATE = app
 TARGET = RockboxUtility
-QT += network
+QT += network widgets svg
 
 message("Qt$$QT_MAJOR_VERSION found")
-QT += widgets
 lessThan(QT_MAJOR_VERSION, 6) {
     QT += multimedia
 }
