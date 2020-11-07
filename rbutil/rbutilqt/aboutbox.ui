@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>640</width>
     <height>500</height>
    </rect>
   </property>
@@ -127,13 +127,13 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="licenseSpeex">
-      <attribute name="title">
-       <string>&amp;Speex License</string>
+     <widget class="QWidget" name="licenseSpeex" >
+      <attribute name="title" >
+       <string>L&amp;ibraries</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QTextBrowser" name="browserSpeexLicense"/>
+      <layout class="QGridLayout" name="gridLayout_2" >
+       <item row="0" column="0" >
+        <widget class="QTextBrowser" name="browserLicenses"/>
        </item>
       </layout>
      </widget>

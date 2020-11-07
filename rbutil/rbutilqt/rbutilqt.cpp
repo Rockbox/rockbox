@@ -282,12 +282,37 @@ void RbUtilQt::about()
     QTextStream c(&licence);
     about.browserLicense->insertHtml(c.readAll());
     about.browserLicense->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+    licence.close();
 
-    QFile speexlicense(":/docs/COPYING.SPEEX");
-    speexlicense.open(QIODevice::ReadOnly);
-    QTextStream s(&speexlicense);
-    about.browserSpeexLicense->insertHtml("<pre>" + s.readAll() + "</pre>");
-    about.browserSpeexLicense->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
+    QString html = "<p>" + tr("Libraries used") + "</p>";
+    html += "<ul>";
+    html += "<li>Speex: <a href='#speex'>Speex License</a></li>";
+    html += "<li>bspatch: <a href='#bspatch'>bspatch License</a></li>";
+    html += "<li>bzip2: <a href='#bzip2'>bzip2 License</a></li>";
+    html += "<li>mspack: <a href='#lgpl2'>LGPL v2.1 License</a></li>";
+    html += "<li>quazip: <a href='#lgpl2'>LGPL v2.1 License</a></li>";
+    html += "<li>tomcrypt: <a href='#tomcrypt'>Tomcrypt License</a></li>";
+    html += "<li>CuteLogger: <a href='#lgpl2'>LGPL v2.1 License</a></li>";
+    html += "</ul>";
+    about.browserLicenses->insertHtml(html);
+
+    QMap<QString, QString> licenses;
+    licenses[":/docs/COPYING.SPEEX"] = "<a id='speex'>Speex License</a>";
+    licenses[":/docs/lgpl-2.1.txt"] = "<a id='lgpl2'>LGPL v2.1</a>";
+    licenses[":/docs/LICENSE.TOMCRYPT"] = "<a id='tomcrypt'>Tomcrypt License</a>";
+    licenses[":/docs/LICENSE.BZIP2"] = "<a id='bzip2'>bzip2 License</a>";
+    licenses[":/docs/LICENSE.BSPATCH"] = "<a id='bspatch'>bspatch License</a>";
+
+    for (int i = 0; i < licenses.size(); i++) {
+        QString key = licenses.keys().at(i);
+        QFile license(key);
+        license.open(QIODevice::ReadOnly);
+        QTextStream s(&license);
+        about.browserLicenses->insertHtml("<hr/><h2>" + licenses[key] + "</h2><br/>\n");
+        about.browserLicenses->insertHtml("<pre>" + s.readAll() + "</pre>");
+        license.close();
+    }
+    about.browserLicenses->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
 
     QFile credits(":/docs/CREDITS");
     credits.open(QIODevice::ReadOnly);
@@ -304,6 +329,7 @@ void RbUtilQt::about()
         line.remove(QRegExp("^People.*"));
         about.browserCredits->append(line);
     }
+    credits.close();
     about.browserCredits->moveCursor(QTextCursor::Start, QTextCursor::MoveAnchor);
     QString title = QString("<b>The Rockbox Utility</b><br/>Version %1").arg(FULLVERSION);
     about.labelTitle->setText(title);

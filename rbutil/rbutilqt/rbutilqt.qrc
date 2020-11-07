@@ -1,8 +1,12 @@
 <RCC>
     <qresource prefix="/">
-        <file>../../docs/CREDITS</file>
-        <file>../../docs/gpl-2.0.html</file>
+        <file alias="docs/CREDITS">../../docs/CREDITS</file>
+        <file alias="docs/gpl-2.0.html">../../docs/gpl-2.0.html</file>
+        <file alias="docs/lgpl-2.1.txt">logger/LICENSE.LGPL</file>
         <file alias="docs/COPYING.SPEEX">../../lib/rbcodec/codecs/libspeex/COPYING</file>
+        <file alias="docs/LICENSE.TOMCRYPT">../../utils/tomcrypt/LICENSE</file>
+        <file alias="docs/LICENSE.BZIP2">../bzip2/LICENSE</file>
+        <file alias="docs/LICENSE.BSPATCH">../bspatch/LICENSE</file>
         <file alias="docs/changelog.txt">changelog.txt</file>
     </qresource>
     <qresource>
@@ -41,6 +45,7 @@
         <file>icons/view-refresh.svg</file>
         <file>icons/wizard.jpg</file>
         <file alias="icons/rockbox-clef.svg">../../docs/logo/rockbox-clef.svg</file>
+        <file alias="icons/rockbox-logo.svg">../../docs/logo/rockbox-logo.svg</file>
     </qresource>
     <qresource>
         <file>icons/players/archosfmrecorder-small.png</file>
