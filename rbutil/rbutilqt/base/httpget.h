@@ -92,7 +92,7 @@ class HttpGet : public QObject
     private:
         static QString m_globalUserAgent;
         static QNetworkProxy m_globalProxy;
-        QNetworkAccessManager *m_mgr;
+        QNetworkAccessManager m_mgr;
         QNetworkReply *m_reply;
         QNetworkDiskCache *m_cache;
         QDir m_cachedir;

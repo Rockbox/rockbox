@@ -29,18 +29,18 @@ QDir HttpGet::m_globalCache; //< global cach path value for new objects
 QNetworkProxy HttpGet::m_globalProxy;
 
 HttpGet::HttpGet(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_mgr(this),
+      m_reply(nullptr),
+      m_cache(nullptr),
+      m_cachedir(m_globalCache),
+      m_outputFile(nullptr),
+      m_proxy(QNetworkProxy::NoProxy)
 {
-    m_mgr = new QNetworkAccessManager(this);
-    m_cache = NULL;
-    m_cachedir = m_globalCache;
     setCache(true);
-    connect(m_mgr, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(requestFinished(QNetworkReply*)));
-    m_outputFile = NULL;
+    connect(&m_mgr, &QNetworkAccessManager::finished, this,
+            static_cast<void (HttpGet::*)(QNetworkReply*)>(&HttpGet::requestFinished));
     m_lastServerTimestamp = QDateTime();
-    m_proxy = QNetworkProxy::NoProxy;
-    m_reply = NULL;
 }
 
 
@@ -67,7 +67,7 @@ void HttpGet::setCache(bool c)
     // don't delete the old cache directly, it might still be in use. Just
     // instruct it to delete itself later.
     if(m_cache) m_cache->deleteLater();
-    m_cache = NULL;
+    m_cache = nullptr;
 
     QString path = m_cachedir.absolutePath();
 
@@ -83,7 +83,7 @@ void HttpGet::setCache(bool c)
         m_cache = new QNetworkDiskCache(this);
         m_cache->setCacheDirectory(path);
     }
-    m_mgr->setCache(m_cache);
+    m_mgr.setCache(m_cache);
 }
 
 
@@ -107,7 +107,7 @@ void HttpGet::setProxy(const QUrl &proxy)
     m_proxy.setPort(proxy.port());
     m_proxy.setUser(proxy.userName());
     m_proxy.setPassword(proxy.password());
-    m_mgr->setProxy(m_proxy);
+    m_mgr.setProxy(m_proxy);
 }
 
 
@@ -116,8 +116,8 @@ void HttpGet::setProxy(const QUrl &proxy)
  */
 void HttpGet::setProxy(bool enable)
 {
-    if(enable) m_mgr->setProxy(m_proxy);
-    else m_mgr->setProxy(QNetworkProxy::NoProxy);
+    if(enable) m_mgr.setProxy(m_proxy);
+    else m_mgr.setProxy(QNetworkProxy::NoProxy);
 }
 
 
@@ -185,7 +185,7 @@ void HttpGet::requestFinished(QNetworkReply* reply)
         emit done(true);
     }
     reply->deleteLater();
-    m_reply = NULL;
+    m_reply = nullptr;
 }
 
 
@@ -202,11 +202,15 @@ void HttpGet::startRequest(QUrl url)
     if(!m_globalUserAgent.isEmpty())
         req.setRawHeader("User-Agent", m_globalUserAgent.toLatin1());
 
-    m_reply = m_mgr->get(req);
-    connect(m_reply, SIGNAL(error(QNetworkReply::NetworkError)),
-            this, SLOT(networkError(QNetworkReply::NetworkError)));
-    connect(m_reply, SIGNAL(downloadProgress(qint64, qint64)),
-            this, SLOT(downloadProgress(qint64, qint64)));
+    m_reply = m_mgr.get(req);
+#if QT_VERSION < 0x050f00
+    connect(m_reply,
+            static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),
+            this, &HttpGet::networkError);
+#else
+    connect(m_reply, &QNetworkReply::errorOccurred, this, &HttpGet::networkError);
+#endif
+    connect(m_reply, &QNetworkReply::downloadProgress, this, &HttpGet::downloadProgress);
 }
 
 
