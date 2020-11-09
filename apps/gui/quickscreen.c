@@ -415,7 +415,6 @@ bool quick_screen_quick(int button_enter)
     if (gui_syncquickscreen_run(&qs, button_enter, &usb))
     {
         settings_save();
-        settings_apply(false);
         /* make sure repeat/shuffle/any other nasty ones get updated */
         if ( oldrepeat != global_settings.repeat_mode &&
              (audio_status() & AUDIO_STATUS_PLAY) )
