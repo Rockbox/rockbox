@@ -396,6 +396,7 @@ bool quick_screen_quick(int button_enter)
     bool oldshuffle = global_settings.playlist_shuffle;
     int oldrepeat = global_settings.repeat_mode;
     bool usb = false;
+    int fg_color, bg_color;
 
     if (global_settings.shortcuts_replaces_qs)
         return do_shortcut_menu(NULL);
@@ -415,7 +416,11 @@ bool quick_screen_quick(int button_enter)
     if (gui_syncquickscreen_run(&qs, button_enter, &usb))
     {
         settings_save();
+        fg_color=screens[SCREEN_MAIN].get_foreground();
+        bg_color=screens[SCREEN_MAIN].get_background();
         settings_apply(false);
+        screens[SCREEN_MAIN].set_foreground(fg_color);
+        screens[SCREEN_MAIN].set_background(bg_color);
         /* make sure repeat/shuffle/any other nasty ones get updated */
         if ( oldrepeat != global_settings.repeat_mode &&
              (audio_status() & AUDIO_STATUS_PLAY) )
