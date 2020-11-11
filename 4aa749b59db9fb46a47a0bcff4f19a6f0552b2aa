@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c0fd14d_1cfb63dd",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-11T16:15:34Z",
+      "side": 1,
+      "message": "are the comments removed superfluous? If not like to see them marking those byte commands",
+      "revId": "4aa749b59db9fb46a47a0bcff4f19a6f0552b2aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "321ed1f9_67080286",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-11T16:15:34Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "4aa749b59db9fb46a47a0bcff4f19a6f0552b2aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b7ff4105_916589be",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-11T16:15:34Z",
+      "side": 1,
+      "message": "pretty sure this is ok de-referencing ** isnt going to give a compile time error... as long as that is your intention here",
+      "revId": "4aa749b59db9fb46a47a0bcff4f19a6f0552b2aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e46acbb4_7aeb2252",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-11T16:15:34Z",
+      "side": 1,
+      "message": "I assume after failure the user would be able to run this function again\nif there is the possibility you should probably reset the buffer\n\nplugin_release_audio_buffer()",
+      "revId": "4aa749b59db9fb46a47a0bcff4f19a6f0552b2aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1e1e12ca_dab30687",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-11T16:15:34Z",
+      "side": 1,
+      "message": "if buffer plugin_release_audio_buffer()",
+      "revId": "4aa749b59db9fb46a47a0bcff4f19a6f0552b2aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bf9f64d5_b84bbb77",
+        "filename": "apps/plugins/iriver_flash.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 803,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-11T16:15:34Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be your 0x000000000 macro?",
+      "revId": "4aa749b59db9fb46a47a0bcff4f19a6f0552b2aa",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
