@@ -36,8 +36,8 @@ extern void system_init(void);
 extern long cpu_frequency;
 
 struct flash_header {
-    unsigned long magic;
-    unsigned long length;
+    uint32_t magic;
+    uint32_t length;
     char version[32];
 };
 
