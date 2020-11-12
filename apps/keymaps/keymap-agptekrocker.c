@@ -22,7 +22,7 @@
 #include "action.h"
 #include "button.h"
 #include "settings.h"
-
+#define BTN_VOL_COMBO (BUTTON_VOLUP | BUTTON_VOLDOWN)
 /* {Action Code,    Button code,    Prereq button code } */
 
 /*
@@ -84,6 +84,7 @@ static const struct button_mapping button_context_wps[]  = {
  */
 
     { ACTION_STD_KEYLOCK,     BUTTON_POWER,                 BUTTON_NONE },
+    { ACTION_WPS_HOTKEY,      BTN_VOL_COMBO|BUTTON_REL,     BTN_VOL_COMBO},
 
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
@@ -114,8 +115,9 @@ static const struct button_mapping button_context_list[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
-#if 0
+
 static const struct button_mapping button_context_tree[]  = {
+    { ACTION_TREE_HOTKEY,     BTN_VOL_COMBO|BUTTON_REL,    BTN_VOL_COMBO},
 /*    ACTION_TREE_ROOT_INIT,
  *    ACTION_TREE_PGLEFT, optional
  *    ACTION_TREE_PGRIGHT, optional
@@ -129,7 +131,7 @@ static const struct button_mapping button_context_tree[]  = {
  */
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */
-#endif
+
 
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT, BUTTON_SELECT, BUTTON_NONE },
@@ -230,6 +232,7 @@ const struct button_mapping* get_context_mapping(int context)
         case CONTEXT_MAINMENU:
             return button_context_mainmenu;
         case CONTEXT_TREE:
+            return button_context_tree;
         case CONTEXT_LIST:
             return button_context_list;
 

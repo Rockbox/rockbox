@@ -61,3 +61,6 @@
 
 /* Generic HiBy stuff */
 #include "hibylinux.h"
+
+/* Define this if a programmable hotkey is mapped */
+#define HAVE_HOTKEY
