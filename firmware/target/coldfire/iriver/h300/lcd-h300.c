@@ -290,7 +290,9 @@ void lcd_enable(bool on)
         if (on)
         {
             _display_on();
+#ifndef BOOTLOADER
             send_event(LCD_EVENT_ACTIVATION, NULL);
+#endif
         }
         else
         {
