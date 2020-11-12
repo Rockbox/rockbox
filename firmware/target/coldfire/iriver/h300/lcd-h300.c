@@ -32,6 +32,12 @@
 #include "font.h"
 #include "bidi.h"
 
+static fb_data fb[LCD_WIDTH * LCD_HEIGHT + LCD_WIDTH];
+#if defined(FBADDR)
+#undef FBADDR
+#define FBADDR(x,y) fb[0]
+#endif
+
 static bool display_on = false; /* Is the display turned on? */
 static bool display_flipped = false;
 static int xoffset = 0;         /* Needed for flip */
@@ -290,7 +296,9 @@ void lcd_enable(bool on)
         if (on)
         {
             _display_on();
+#ifndef BOOTLOADER
             send_event(LCD_EVENT_ACTIVATION, NULL);
+#endif
         }
         else
         {
@@ -440,6 +448,8 @@ void lcd_update(void)
 
         mutex_unlock(&lcd_mtx);
 #else
+
+        DSR3 = 1; /*clear all bits in the status register */
         DAR3 = 0xf0000002;
         SAR3 = (unsigned long)FBADDR(0, 0);
         BCR3 = LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data);
@@ -501,6 +511,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         mutex_unlock(&lcd_mtx);
 #else
         DAR3 = 0xf0000002;
+        DSR3 = 1; /*clear all bits in the status register */
         unsigned long dma_addr = (unsigned long)FBADDR(x, y);
         width *= sizeof(fb_data);
 

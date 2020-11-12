@@ -69,16 +69,21 @@ int remote_line = 0;
 
 void reset_screen(void)
 {
+#ifndef DBG_DISABLE_LCD 
     lcd_clear_display();
     line = 0;
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_clear_display();
     remote_line = 0;
 #endif
+#endif
 }
 
 int printf(const char *format, ...)
 {
+#ifdef DBG_DISABLE_LCD
+    return 0;
+#endif 
     static char printfbuf[256];
     int len;
     unsigned char *ptr;
@@ -121,8 +126,9 @@ void error(int errortype, int error, bool shutdown)
         printf(loader_strerror(error));
         break;
     }
-
+#ifndef DBG_DISABLE_LCD 
     lcd_update();
+#endif
     sleep(5*HZ);
 
     if(shutdown)
