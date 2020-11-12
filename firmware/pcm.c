@@ -37,7 +37,6 @@
  * ==Playback==
  *   Public -
  *      pcm_postinit
- *      pcm_get_bytes_waiting
  *      pcm_play_lock
  *      pcm_play_unlock
  *   Semi-private -
@@ -47,7 +46,6 @@
  *      pcm_play_dma_postinit
  *      pcm_play_dma_start
  *      pcm_play_dma_stop
- *      pcm_play_dma_get_peak_buffer
  *   Data Read/Written within TSP -
  *      pcm_sampr (R)
  *      pcm_fsel (R)
@@ -116,11 +114,6 @@ static inline void pcm_play_dma_start_int(const void *addr, size_t size)
 static inline void pcm_play_dma_stop_int(void)
 {
     pcm_play_dma_stop();
-}
-
-static inline const void * pcm_play_dma_get_peak_buffer_int(int *count)
-{
-    return pcm_play_dma_get_peak_buffer(count);
 }
 
 bool pcm_play_dma_complete_callback(enum pcm_dma_status status,
@@ -242,28 +235,6 @@ void pcm_do_peak_calculation(struct pcm_peaks *peaks, bool active,
         /* peaks are zero */
         peaks->left = peaks->right = 0;
     }
-}
-
-void pcm_calculate_peaks(int *left, int *right)
-{
-    /* peak data for the global peak values - i.e. what the final output is */
-    static struct pcm_peaks peaks;
-
-    int count;
-    const void *addr = pcm_play_dma_get_peak_buffer_int(&count);
-
-    pcm_do_peak_calculation(&peaks, pcm_playing, addr, count);
-
-    if (left)
-        *left = peaks.left;
-
-    if (right)
-        *right = peaks.right;
-}
-
-const void * pcm_get_peak_buffer(int *count)
-{
-    return pcm_play_dma_get_peak_buffer_int(count);
 }
 
 bool pcm_is_playing(void)

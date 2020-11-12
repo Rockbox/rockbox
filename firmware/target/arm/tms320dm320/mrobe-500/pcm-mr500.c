@@ -120,11 +120,6 @@ void pcm_play_unlock(void)
 
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return DSP_(_sdem_dsp_size)-DSP_(_sdem_level);
-}
-
 /* Only used when debugging */
 static char buffer[80];
 

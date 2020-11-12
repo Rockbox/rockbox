@@ -216,13 +216,6 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    size_t total_bytes;
-    dmac_ch_get_info(&dma_play_ch, NULL, &total_bytes);
-    return total_bytes;
-}
-
 const void* pcm_play_dma_get_peak_buffer(int *count)
 {
     void *addr = dmac_ch_get_info(&dma_play_ch, count, NULL);

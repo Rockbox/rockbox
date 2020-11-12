@@ -154,11 +154,6 @@ void pcm_play_dma_stop(void)
         gst_element_set_state (GST_ELEMENT(gst_pipeline), GST_STATE_NULL);
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return pcm_data_size;
-}
-
 static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
 {
     (void)size_hint;

@@ -260,12 +260,6 @@ void fiq_handler(void)
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    /* lie a little and only return full pairs */
-    return (DSTAT2 & 0xFFFFE) * 2;
-}
-
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     unsigned long addr = DCSRC2;

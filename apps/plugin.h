@@ -155,12 +155,12 @@ int plugin_open(char *plugin, char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 243
+#define PLUGIN_API_VERSION 244
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 243
+#define PLUGIN_MIN_API_VERSION 244
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -677,9 +677,6 @@ struct plugin_api {
     void (*pcm_play_stop)(void);
     void (*pcm_set_frequency)(unsigned int frequency);
     bool (*pcm_is_playing)(void);
-    size_t (*pcm_get_bytes_waiting)(void);
-    void (*pcm_calculate_peaks)(int *left, int *right);
-    const void* (*pcm_get_peak_buffer)(int *count);
     void (*pcm_play_lock)(void);
     void (*pcm_play_unlock)(void);
     void (*beep_play)(unsigned int frequency, unsigned int duration,

@@ -264,11 +264,6 @@ void pcm_play_dma_stop(void)
     dma_play_lock.state = (1 << 14);
 } /* pcm_play_dma_stop */
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return BCR0 & 0xffffff;
-} /* pcm_get_bytes_waiting */
-
 /* DMA0 Interrupt is called when the DMA has finished transfering a chunk
    from the caller's buffer */
 void DMA0(void) __attribute__ ((interrupt_handler, section(".icode")));

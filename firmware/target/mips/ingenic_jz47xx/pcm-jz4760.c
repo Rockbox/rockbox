@@ -192,20 +192,6 @@ static int get_dma_count(void)
     return count;
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    int bytes, flags = disable_irq_save();
-
-    if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
-        bytes = get_dma_count() & ~3;
-    else
-        bytes = 0;
-
-    restore_irq(flags);
-
-    return bytes;
-}
-
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     int flags = disable_irq_save();

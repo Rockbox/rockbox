@@ -171,11 +171,6 @@ void pcm_play_dma_stop(void)
                            stop_method);
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return pcm_data_size;
-}
-
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     uintptr_t addr = (uintptr_t)pcm_data_start;
