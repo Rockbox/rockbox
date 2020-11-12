@@ -30,6 +30,9 @@
 
 bool backlight_hw_init(void)
 {
+#ifdef DBG_DISABLE_LCD_BACKLIGHT
+    return true;
+#endif
     or_l(0x00020000, &GPIO1_ENABLE);
     or_l(0x00020000, &GPIO1_FUNCTION);
     or_l(0x00020000, &GPIO1_OUT);  /* Start with the backlight ON */
@@ -39,6 +42,9 @@ bool backlight_hw_init(void)
 
 void backlight_hw_on(void)
 {
+#ifdef DBG_DISABLE_LCD_BACKLIGHT
+    return;
+#endif
     lcd_enable(true);
     sleep(HZ/100); /* lcd needs time - avoid flashing for dark screens */
     or_l(0x00020000, &GPIO1_OUT);
@@ -46,6 +52,9 @@ void backlight_hw_on(void)
 
 void backlight_hw_off(void)
 {
+#ifdef DBG_DISABLE_LCD_BACKLIGHT
+    return;
+#endif
     and_l(~0x00020000, &GPIO1_OUT);
     lcd_enable(false);
 }
@@ -53,6 +62,9 @@ void backlight_hw_off(void)
 /* set brightness by changing the PWM */
 void backlight_hw_brightness(int val)
 {
+#ifdef DBG_DISABLE_LCD_BACKLIGHT
+    return;
+#endif
     /* disable IRQs while bitbanging */
     int old_irq_level = disable_irq_save();
     pcf50606_write(0x35, (val << 1) | 0x01); /* 512Hz, Enable PWM */
@@ -62,10 +74,16 @@ void backlight_hw_brightness(int val)
 
 void remote_backlight_hw_on(void)
 {
+#ifdef DBG_DISABLE_LCD_BACKLIGHT
+    return;
+#endif
     and_l(~0x00000002, &GPIO1_OUT);
 }
 
 void remote_backlight_hw_off(void)
 {
+#ifdef DBG_DISABLE_LCD_BACKLIGHT
+    return;
+#endif
     or_l(0x00000002, &GPIO1_OUT);
 }

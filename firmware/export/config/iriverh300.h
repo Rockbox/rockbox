@@ -222,3 +222,6 @@
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
+
+#define DBG_DISABLE_LCD
+#define DBG_DISABLE_LCD_BACKLIGHT
