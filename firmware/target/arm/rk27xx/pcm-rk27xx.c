@@ -250,12 +250,6 @@ void pcm_dma_apply_settings(void)
     audiohw_set_frequency(pcm_fsel);
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    /* current terminate count is in transfer size units (4bytes here) */
-    return (HDMA_CCNT0 & 0xffff)<<2;
-}
-
 /* audio DMA ISR called when chunk from callers buffer has been transfered */
 void INT_HDMA(void)
 {

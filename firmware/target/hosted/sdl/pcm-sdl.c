@@ -124,11 +124,6 @@ void pcm_play_dma_stop(void)
 #endif
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return pcm_data_size;
-}
-
 static void write_to_soundcard(struct pcm_udata *udata)
 {
 #ifdef DEBUG

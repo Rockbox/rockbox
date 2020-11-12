@@ -259,12 +259,7 @@ void pcm_play_dma_postinit(void)
 /* set the configured PCM frequency */
 void pcm_dma_apply_settings(void)
 {
-    pcm_dma_set_freq(pcm_fsel);    
-}
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return (nextsize + DMACTCNT0 + 2) << 1;
+    pcm_dma_set_freq(pcm_fsel);
 }
 
 const void * pcm_play_dma_get_peak_buffer(int *count)

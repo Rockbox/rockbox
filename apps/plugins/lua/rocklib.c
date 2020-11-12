@@ -521,14 +521,12 @@ RB_WRAP(pcm)
 {
     enum e_pcm {PCM_APPLYSETTINGS = 0, PCM_ISPLAYING,
                 PCM_PLAYSTOP, PCM_PLAYLOCK, PCM_PLAYUNLOCK,
-                PCM_CALCULATEPEAKS, PCM_SETFREQUENCY, PCM_GETBYTESWAITING, PCM_ECOUNT};
+                PCM_SETFREQUENCY, PCM_ECOUNT};
 
     const char *pcm_option[] = {"apply_settings", "is_playing",
                                 "play_stop", "play_lock", "play_unlock",
-                                "calculate_peaks", "set_frequency", "get_bytes_waiting", NULL};
+                                "set_frequency", NULL};
     bool   b_result;
-    int    left, right;
-    size_t byteswait;
 
     lua_pushnil(L); /*push nil so options w/o return have something to return */
 
@@ -551,17 +549,8 @@ RB_WRAP(pcm)
         case PCM_PLAYUNLOCK:
             rb->pcm_play_unlock();
             break;
-        case PCM_CALCULATEPEAKS:
-            rb->pcm_calculate_peaks(&left, &right);
-            lua_pushinteger(L, left);
-            lua_pushinteger(L, right);
-            return 2;
         case PCM_SETFREQUENCY:
             rb->pcm_set_frequency((unsigned int) luaL_checkint(L, 2));
-            break;
-        case PCM_GETBYTESWAITING:
-            byteswait = rb->pcm_get_bytes_waiting();
-            lua_pushinteger(L, byteswait);
             break;
     }
 

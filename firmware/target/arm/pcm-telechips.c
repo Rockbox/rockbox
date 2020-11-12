@@ -194,11 +194,6 @@ void pcm_play_unlock(void)
    restore_fiq(status);
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return dma_play_data.size & ~3;
-}
-
 #ifdef HAVE_RECORDING
 /* TODO: implement */
 void pcm_rec_dma_init(void)

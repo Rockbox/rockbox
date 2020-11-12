@@ -735,11 +735,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     }
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return pcm_size;
-}
-
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     uintptr_t addr = (uintptr_t)pcm_data;

@@ -200,17 +200,6 @@ void pcm_dma_apply_settings(void)
              0x01ffffff);
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    int oldstatus = disable_irq_save();
-    size_t addr = DMAC_CH_SRC_ADDR(0);
-    size_t start_addr = (size_t)dma_start_addr;
-    size_t start_size = dma_start_size;
-    restore_interrupt(oldstatus);
-
-    return start_size - addr + start_addr;
-}
-
 const void * pcm_play_dma_get_peak_buffer(int *count)
 {
     int oldstatus = disable_irq_save();

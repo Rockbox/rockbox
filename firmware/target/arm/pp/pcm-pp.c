@@ -497,11 +497,6 @@ void pcm_play_dma_stop(void)
 #endif
 }
 
-size_t pcm_get_bytes_waiting(void)
-{
-    return dma_play_data.size & ~3;
-}
-
 void pcm_play_dma_init(void)
 {
     /* Initialize default register values. */

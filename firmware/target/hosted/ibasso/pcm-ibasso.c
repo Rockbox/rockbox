@@ -439,15 +439,6 @@ void pcm_dma_apply_settings(void)
     }
 }
 
-
-size_t pcm_get_bytes_waiting(void)
-{
-    TRACE;
-
-    return _pcm_buffer_size;
-}
-
-
 /* TODO: WTF */
 const void* pcm_play_dma_get_peak_buffer(int* count)
 {

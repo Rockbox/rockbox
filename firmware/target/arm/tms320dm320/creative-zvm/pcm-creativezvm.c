@@ -84,8 +84,3 @@ void pcm_play_unlock(void)
 {
 
 }
-
-size_t pcm_get_bytes_waiting(void)
-{
-    return 0;
-}
