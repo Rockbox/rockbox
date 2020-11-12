@@ -290,7 +290,9 @@ void lcd_enable(bool on)
         if (on)
         {
             _display_on();
+#ifndef BOOTLOADER
             send_event(LCD_EVENT_ACTIVATION, NULL);
+#endif
         }
         else
         {
@@ -440,6 +442,8 @@ void lcd_update(void)
 
         mutex_unlock(&lcd_mtx);
 #else
+
+        DSR3 = 1; /*clear all bits in the status register */
         DAR3 = 0xf0000002;
         SAR3 = (unsigned long)FBADDR(0, 0);
         BCR3 = LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data);

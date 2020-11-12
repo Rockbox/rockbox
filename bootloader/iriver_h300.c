@@ -201,18 +201,24 @@ void main(void)
 
     adc_init();
     button_init();
-    
-    backlight_init();
 
+#ifndef DBG_DISABLE_LCD
     lcd_init();
     lcd_remote_init();
+#endif
+
+#ifndef DBG_DISABLE_LCD_BACKLIGHT    
+    backlight_init();
+#endif
+
+#ifndef DBG_DISABLE_LCD
     font_init();
 
     lcd_setfont(FONT_SYSFIXED);
 
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
-
+#endif
     sleep(HZ/50); /* Allow the button driver to check the buttons */
     rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC)
         || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
@@ -280,12 +286,12 @@ void main(void)
                     blink_toggle = true;
                     msg = complete_msg;
                 }
-                
+#ifndef DBG_DISABLE_LCD                
                 font_getstringsize(msg, &w, &h, FONT_SYSFIXED);
                 reset_screen();
                 if(blink_toggle)
                     lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
-
+#endif
                 check_battery();
                 break;
             }
@@ -309,14 +315,15 @@ void main(void)
     {
         const char msg[] = "Bootloader USB mode";
         int w, h;
+#ifndef DBG_DISABLE_LCD 
         font_getstringsize(msg, &w, &h, FONT_SYSFIXED);
-        reset_screen();
+
         lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
         lcd_update();
 
         lcd_remote_puts(0, 3, msg);
         lcd_remote_update();
-
+#endif
         ide_power_enable(true);
         storage_enable(false);
         sleep(HZ/20);
@@ -335,9 +342,10 @@ void main(void)
 
         cpu_idle_mode(false);
         usb_enable(false);
-
+#ifndef DBG_DISABLE_LCD 
         reset_screen();
         lcd_update();
+#endif
     }
 
     rc = storage_init();
