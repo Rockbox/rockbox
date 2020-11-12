@@ -740,8 +740,6 @@ struct plugin_api {
             unsigned long rec_time, unsigned long header_template,
             void (*progressfunc)(int), bool generate_toc,
             unsigned char* tempbuf, size_t tempbuf_len);
-    unsigned long (*find_next_frame)(int fd, long *offset,
-            long max_offset, unsigned long reference_header);
 #ifdef HAVE_TAGCACHE
     bool (*tagcache_search)(struct tagcache_search *tcs, int tag);
     void (*tagcache_search_set_uniqbuf)(struct tagcache_search *tcs,

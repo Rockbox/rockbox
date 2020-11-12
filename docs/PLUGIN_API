@@ -585,15 +585,6 @@ bool find_albumart(const struct mp3entry *id3, char *buf, int buflen)
     \return
     \description
 
-unsigned long find_next_frame(int fd, long *offset, long max_offset, unsigned long last_header)
-    \group misc
-    \param fd
-    \param offset
-    \param max_offset
-    \param last_header
-    \return
-    \description
-
 void flush_icache(void)
     \conditions (defined(CACHE_FUNCTIONS_AS_CALL))
     \description

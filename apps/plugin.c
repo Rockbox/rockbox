@@ -649,7 +649,6 @@ static const struct plugin_api rockbox_api = {
     mp3info,
     count_mp3_frames,
     create_xing_header,
-    find_next_frame,
 #ifdef HAVE_TAGCACHE
     tagcache_search,
     tagcache_search_set_uniqbuf,
