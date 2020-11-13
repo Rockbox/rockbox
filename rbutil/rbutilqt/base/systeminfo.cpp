@@ -70,16 +70,16 @@ const static struct {
     { SystemInfo::PlayerPicture,    ":platform:/playerpic", "" },
 };
 
-//! pointer to setting object to NULL
-QSettings* SystemInfo::systemInfos = NULL;
+//! pointer to setting object to nullptr
+QSettings* SystemInfo::systemInfos = nullptr;
 
 void SystemInfo::ensureSystemInfoExists()
 {
     //check and create settings object
-    if(systemInfos == NULL)
+    if(systemInfos == nullptr)
     {
         // only use built-in rbutil.ini
-        systemInfos = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat, 0);
+        systemInfos = new QSettings(":/ini/rbutil.ini", QSettings::IniFormat);
     }
 }
 
