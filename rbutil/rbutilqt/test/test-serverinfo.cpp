@@ -93,10 +93,6 @@ const struct testvector testdata[] =
     { "iaudiox5.v",       ServerInfo::BleedingRevision,    "be1be79" },
     { "iaudiox5.v",       ServerInfo::BleedingDate,        "2020-11-14T10:57:23" },
     { "iaudiox5.v",       ServerInfo::CurDevelUrl,         "https://unittest/dev/rockbox-iaudiox5.zip" },
-    { "iaudiox5.v",       ServerInfo::ManualPdfUrl,        "https://unittest/manual/rockbox-iaudiox5.pdf" },
-    { "ipodmini2g",       ServerInfo::ManualPdfUrl,        "https://unittest/manual/rockbox-ipodmini1g.pdf" },
-    { "iriverh100",       ServerInfo::ManualHtmlUrl,       "https://unittest/manual/rockbox-iriverh100/rockbox-build.html" },
-    { "iriverh120",       ServerInfo::ManualZipUrl,        "https://unittest/manual/rockbox-iriverh100-html.zip" },
 };
 
 

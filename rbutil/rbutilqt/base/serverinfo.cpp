@@ -95,17 +95,20 @@ QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
             if(value.toStringList().size() > 1)
                 value = value.toStringList().at(1);
             else if(!version.isEmpty() && info == CurReleaseUrl)
-                value = SystemInfo::value(SystemInfo::ReleaseUrl).toString()
+                value = SystemInfo::value(SystemInfo::BuildUrl,
+                                          SystemInfo::BuildRelease).toString()
                     .replace("%MODEL%", platform)
                     .replace("%RELVERSION%", version);
             else if(!version.isEmpty() && info == RelCandidateUrl)
-                value = SystemInfo::value(SystemInfo::CandidateUrl).toString()
+                value = SystemInfo::value(SystemInfo::BuildUrl,
+                                          SystemInfo::BuildCandidate).toString()
                     .replace("%MODEL%", platform)
                     .replace("%RELVERSION%", version);
         }
         break;
     case CurDevelUrl:
-        value = SystemInfo::value(SystemInfo::BleedingUrl).toString()
+        value = SystemInfo::value(SystemInfo::BuildUrl,
+                                  SystemInfo::BuildCurrent).toString()
                 .replace("%MODEL%", platform);
         break;
     case ManualPdfUrl:

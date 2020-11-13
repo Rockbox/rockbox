@@ -38,27 +38,22 @@ QVariant SystemInfo::platformValue(SystemInfo::PlatformInfo info, QString platfo
     return QString();
 }
 
-QVariant SystemInfo::value(SystemInfo::SystemInfos info)
+QVariant SystemInfo::value(SystemInfo::SystemInfos info, SystemInfo::BuildType type)
 {
-    switch(info) {
-        case SystemInfo::ManualUrl:
-            return QString("https://unittest/manual/rockbox-%MODEL%%FORMAT%");
-            break;
-        case SystemInfo::BleedingUrl:
+    (void)info;  // test is currently only using BuildUrl.
+    switch(type) {
+        case SystemInfo::BuildCurrent:
             return QString("https://unittest/dev/rockbox-%MODEL%.zip");
-            break;
-        case SystemInfo::DailyUrl:
+        case SystemInfo::BuildDaily:
             return QString("https://unittest/daily/rockbox-%MODEL%-%RELVERSION%.zip");
-            break;
-        case SystemInfo::ReleaseUrl:
+        case SystemInfo::BuildRelease:
             return QString("https://unittest/release/%RELVERSION%/rockbox-%MODEL%-%RELVERSION%.zip");
-            break;
-        case SystemInfo::CandidateUrl:
+        case SystemInfo::BuildCandidate:
             return QString("https://unittest/rc/%RELVERSION%/rockbox-%MODEL%-%RELVERSION%.zip");
-            break;
         default:
-            return QString();
+            break;
     }
+    return QString();
 }
 
 QStringList SystemInfo::platforms(SystemInfo::PlatformType type, QString variant)

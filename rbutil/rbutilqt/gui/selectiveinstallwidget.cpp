@@ -428,10 +428,10 @@ void SelectiveInstallWidget::installFonts(void)
     QString relversion = installInfo.release();
     if(relversion.isEmpty()) {
         // release is empty for non-release versions (i.e. daily / current)
-        fontsurl = SystemInfo::value(SystemInfo::DailyFontUrl).toString();
+        fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildDaily).toString();
     }
     else {
-        fontsurl = SystemInfo::value(SystemInfo::ReleaseFontUrl).toString();
+        fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildRelease).toString();
         logversion = installInfo.release();
     }
     fontsurl.replace("%RELEASEVER%", relversion);

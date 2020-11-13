@@ -483,7 +483,8 @@ void RbUtilQt::installVoice()
         return;
     }
     else {
-        voiceurl = SystemInfo::value(SystemInfo::ReleaseVoiceUrl).toString();
+        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl,
+                                     SystemInfo::BuildRelease).toString();
         logversion = installInfo.release();
     }
     if(QMessageBox::question(this, tr("Confirm Installation"),
