@@ -202,13 +202,13 @@ void main(void)
     adc_init();
     button_init();
     
-    backlight_init();
-
     lcd_init();
     lcd_remote_init();
     font_init();
 
     lcd_setfont(FONT_SYSFIXED);
+
+    backlight_init(); /* BUGFIX backlight_init MUST BE AFTER lcd_init */
 
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);

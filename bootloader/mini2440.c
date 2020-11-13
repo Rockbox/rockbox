@@ -62,8 +62,8 @@ int main(void)
 /*    system_init(); */ 
     kernel_init();
 /*    enable_interrupt(IRQ_FIQ_STATUS); */
-    backlight_init();
     lcd_init();
+    backlight_init(); /* BUGFIX backlight_init MUST BE AFTER lcd_init */
     lcd_setfont(FONT_SYSFIXED);
     button_init();
     dma_init();
