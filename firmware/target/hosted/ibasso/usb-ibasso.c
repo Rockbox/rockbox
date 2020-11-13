@@ -27,6 +27,7 @@
 #include "config.h"
 #include "debug.h"
 
+#include "usb.h"
 #include "debug-ibasso.h"
 #include "usb-ibasso.h"
 
