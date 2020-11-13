@@ -184,10 +184,10 @@ void main(void)
 
     enable_irq();
 
-    backlight_init(); /* Turns on the backlight */
-
     lcd_init();
     font_init();
+
+    backlight_init(); /* Turns on backlight -- BUGFIX backlight_init MUST BE AFTER lcd_init */
 
     lcd_set_foreground(LCD_WHITE);
     lcd_set_background(LCD_BLACK);

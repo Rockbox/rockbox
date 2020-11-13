@@ -306,12 +306,11 @@ void* main(void)
     system_init();
     kernel_init();
 
-#ifndef HAVE_BACKLIGHT_INVERSION
-    backlight_init(); /* Turns on the backlight */
-#endif
-
     lcd_init();
     font_init();
+#ifndef HAVE_BACKLIGHT_INVERSION
+    backlight_init(); /* Turns on the backlight BUGFIX backlight_init MUST BE AFTER lcd_init */
+#endif
 
 #ifdef HAVE_LCD_COLOR
     lcd_set_foreground(LCD_WHITE);

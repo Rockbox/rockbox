@@ -485,14 +485,13 @@ void main(void)
         try_flashboot();
 # endif
 
-    backlight_init();
-
-
     lcd_init();
 
     if (!rc_on_button)
         lcd_remote_init();
-    
+
+    backlight_init(); /* BUGFIX backlight_init MUST BE AFTER lcd_init */
+
     /* Bootloader uses simplified backlight thread, so we need to enable
        remote display here. */
     if (remote_detect())
