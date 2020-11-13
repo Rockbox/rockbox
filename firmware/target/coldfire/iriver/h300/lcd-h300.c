@@ -32,16 +32,23 @@
 #include "font.h"
 #include "bidi.h"
 
-static bool display_on = false; /* Is the display turned on? */
-static bool display_flipped = false;
-static int xoffset = 0;         /* Needed for flip */
 #ifndef BOOTLOADER
+#define LCD_MUTEX_INIT() mutex_init(&lcd_mtx)
+#define LCD_MUTEX_LOCK() mutex_lock(&lcd_mtx)
+#define LCD_MUTEX_UNLOCK() mutex_unlock(&lcd_mtx)
 static struct mutex lcd_mtx;    /* The update functions use DMA and yield */
-
 unsigned long dma_addr IBSS_ATTR;
 unsigned int dma_len IBSS_ATTR;
 volatile int dma_count IBSS_ATTR;
-#endif
+#else
+#define LCD_MUTEX_INIT()
+#define LCD_MUTEX_LOCK()
+#define LCD_MUTEX_UNLOCK()
+#endif /* def BOOTLOADER */
+
+static bool display_on = false; /* Is the display turned on? */
+static bool display_flipped = false;
+static int xoffset = 0;         /* Needed for flip */
 
 /* register defines */
 #define R_START_OSC             0x00
@@ -141,13 +148,9 @@ void lcd_set_flip(bool yesno)
 
     if (display_on)
     {
-#ifndef BOOTLOADER
-        mutex_lock(&lcd_mtx);
-#endif
+        LCD_MUTEX_LOCK();
         flip_lcd(yesno);
-#ifndef BOOTLOADER
-        mutex_unlock(&lcd_mtx);
-#endif
+        LCD_MUTEX_UNLOCK();
     }
 }
 
@@ -270,13 +273,12 @@ void lcd_init_device(void)
 
 #ifndef BOOTLOADER
     DAR3 = 0xf0000002; /* Configure DMA channel 3 */
-    DSR3 = 1;
+    DSR3 = 1;          /* Clear all bits in the status register */
     DIVR3 = 57;        /* DMA3 is mapped into vector 57 in system.c */
     ICR9 = (6 << 2);   /* Enable DMA3 interrupt at level 6, priority 0 */
     coldfire_imr_mod(0, 1 << 17);
-
-    mutex_init(&lcd_mtx);
 #endif
+    LCD_MUTEX_INIT();
     _display_on();
 }
 
@@ -284,9 +286,7 @@ void lcd_enable(bool on)
 {
     if (display_on != on)
     {
-#ifndef BOOTLOADER
-        mutex_lock(&lcd_mtx);
-#endif
+        LCD_MUTEX_LOCK();
         if (on)
         {
             _display_on();
@@ -314,9 +314,7 @@ void lcd_enable(bool on)
 
             display_on=false;
         }
-#ifndef BOOTLOADER
-        mutex_unlock(&lcd_mtx);
-#endif
+        LCD_MUTEX_UNLOCK();
     }
 }
 
@@ -352,9 +350,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
     if (!display_on)
         return;
 
-#ifndef BOOTLOADER
-    mutex_lock(&lcd_mtx);
-#endif
+    LCD_MUTEX_LOCK();
     width &= ~1;  /* stay on the safe side */
     height &= ~1;
 
@@ -385,10 +381,9 @@ void lcd_blit_yuv(unsigned char * const src[3],
         usrc += stride >> 1;
         vsrc += stride >> 1;
     }
-    while (ysrc < ysrc_max);
-#ifndef BOOTLOADER
-    mutex_unlock(&lcd_mtx);
-#endif
+    while (ysrc < ysrc_max)
+        ;;
+    LCD_MUTEX_UNLOCK();
 }
 
 #ifndef BOOTLOADER
@@ -396,7 +391,7 @@ void lcd_blit_yuv(unsigned char * const src[3],
 void DMA3(void) __attribute__ ((interrupt_handler, section(".icode")));
 void DMA3(void)
 {
-    DSR3 = 1;
+    DSR3 = 1;  /* Clear all bits in the status register */
     if (--dma_count > 0)
     {
         dma_addr += LCD_WIDTH*sizeof(fb_data);
@@ -415,9 +410,7 @@ void lcd_update(void)
 {
     if (display_on)
     {
-#ifndef BOOTLOADER
-        mutex_lock(&lcd_mtx);
-#endif
+        LCD_MUTEX_LOCK();
 
         lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VERT);
         /* set start position window */
@@ -437,25 +430,33 @@ void lcd_update(void)
 
         while (dma_count > 0)
             yield();
-
-        mutex_unlock(&lcd_mtx);
 #else
         DAR3 = 0xf0000002;
+        DSR3 = 1; /* Clear all bits in the status register */
         SAR3 = (unsigned long)FBADDR(0, 0);
         BCR3 = LCD_WIDTH*LCD_HEIGHT*sizeof(fb_data);
         DCR3 = DMA_AA | DMA_BWC(1)
              | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
              | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
 
-        while (!(DSR3 & 1));
-        DSR3 = 1;
+        while (!(DSR3 & 1))
+            ;;
+        DSR3 = 1; /* Clear all bits in the status register */
 #endif
+        LCD_MUTEX_UNLOCK();
     }
 }
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x, int y, int width, int height)
 {
+#ifdef BOOTLOADER
+    (void)x;
+    (void)y;
+    (void)width;
+    (void)height;
+    lcd_update(); /* in bootloader -- all or nothing */
+#else
     if (display_on)
     {
         if (x + width > LCD_WIDTH)
@@ -466,9 +467,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         if (width <= 0 || height <= 0) /* nothing to do */
             return;
 
-#ifndef BOOTLOADER
-        mutex_lock(&lcd_mtx);
-#endif
+        LCD_MUTEX_LOCK();
 
         lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_VERT);
         /* set update window */
@@ -477,8 +476,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
 
         lcd_begin_write_gram();
-        
-#ifndef BOOTLOADER
+
         if (width == LCD_WIDTH)
         {
             dma_count = 1;
@@ -498,25 +496,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         while (dma_count > 0)
             yield();
 
-        mutex_unlock(&lcd_mtx);
-#else
-        DAR3 = 0xf0000002;
-        unsigned long dma_addr = (unsigned long)FBADDR(x, y);
-        width *= sizeof(fb_data);
-
-        for (; height > 0; height--)
-        {
-            SAR3 = dma_addr;
-            BCR3 = width;
-            DCR3 = DMA_AA | DMA_BWC(1)
-                 | DMA_SINC | DMA_SSIZE(DMA_SIZE_LINE)
-                 | DMA_DSIZE(DMA_SIZE_WORD) | DMA_START;
-
-            dma_addr += LCD_WIDTH*sizeof(fb_data);
-
-            while (!(DSR3 & 1));
-            DSR3 = 1;
-        }
-#endif
+        LCD_MUTEX_UNLOCK();
     }
+#endif /* ndef BOOTLOADER */
 }

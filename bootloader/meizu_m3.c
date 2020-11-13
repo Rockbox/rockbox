@@ -147,8 +147,8 @@ void main(void)
     system_init();
     kernel_init();
 
-    backlight_init();
     lcd_init();
+    backlight_init(); /* BUGFIX backlight_init MUST BE AFTER lcd_init */
     lcd_update();
 
     i2c_init();
