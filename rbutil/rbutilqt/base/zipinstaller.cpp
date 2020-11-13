@@ -110,8 +110,9 @@ void ZipInstaller::downloadDone(bool error)
 
     emit logProgress(1, 1);
     if(m_getter->httpResponse() != 200 && !m_getter->isCached()) {
-        emit logItem(tr("Download error: received HTTP error %1.")
-                    .arg(m_getter->httpResponse()),LOGERROR);
+        emit logItem(tr("Download error: received HTTP error %1\n%2")
+                    .arg(m_getter->httpResponse()).arg(m_getter->errorString()),
+                         LOGERROR);
         emit done(true);
         return;
     }
