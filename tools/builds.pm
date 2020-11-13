@@ -558,6 +558,7 @@ sub allbuilds {
 	    'espeak' => '-vde',
 	    'gtts' => '-l de',
 	},
+        'enabled' => 1,
     },
     'english-us' => {
 	'lang' => 'english-us',
