@@ -58,6 +58,8 @@
 
 #define DRAM_START 0x31000000
 
+#define BACKLIGHT_TIMEOUT 5
+
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
 {
@@ -144,7 +146,6 @@ void main(void)
     bool hold_status = false;
     int data;
     bool rtc_alarm;
-    int button;
     int mask;
     bool usb_charge = false;
 
@@ -262,12 +263,14 @@ void main(void)
         int w, h;
         bool blink_toggle = false;
         bool request_start = false;
+        unsigned int ticks = 0;
 
         cpu_idle_mode(true);
         
         while(charger_inserted() && !request_start)
         {
-            button = button_get_w_tmo(HZ);
+            long button = button_get_w_tmo(HZ);
+            ++ticks;
 
             switch(button)
             {
@@ -276,6 +279,11 @@ void main(void)
                 break;
                 
             case BUTTON_NONE: /* Timeout */
+                if (ticks == BACKLIGHT_TIMEOUT)
+                {
+                    backlight_hw_off();
+                    ticks = 0;
+                }
 
                 if(charging_state())
                 {
@@ -296,6 +304,11 @@ void main(void)
 
                 check_battery();
                 break;
+
+            default: /* any other button press */
+                backlight_hw_on();
+                ticks = 0;
+                break;
             }
         }
         if(!request_start)
@@ -305,6 +318,7 @@ void main(void)
         }
 
         cpu_idle_mode(false);
+        backlight_hw_on();
     }
     
     usb_init();
@@ -314,6 +328,7 @@ void main(void)
     {
         const char msg[] = "Bootloader USB mode";
         int w, h;
+        unsigned int ticks = 0;
         font_getstringsize(msg, &w, &h, FONT_SYSFIXED);
         reset_screen();
         lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
@@ -335,10 +350,26 @@ void main(void)
             check_battery();
             
             storage_spin(); /* Prevent the drive from spinning down */
-            sleep(HZ);
+            long button = button_get_w_tmo(HZ);
+            ++ticks;
+            switch (button)
+            {
+            case BUTTON_NONE: /* timeout */
+                if (ticks == BACKLIGHT_TIMEOUT)
+                {
+                    backlight_hw_off();
+                    ticks = 0;
+                }
+                break;
+            default: /* any other button press */
+                backlight_hw_on();
+                ticks = 0;
+                break;
+            }
         }
 
         cpu_idle_mode(false);
+        backlight_hw_on();
         usb_enable(false);
 
         reset_screen();
