@@ -467,14 +467,24 @@ static inline void charging_algorithm_close(void)
 /* Returns true if any power input is capable of charging. */
 bool charger_inserted(void)
 {
-    return power_thread_inputs & POWER_INPUT_CHARGER;
+#ifndef BOOTLOADER
+    unsigned int data = power_thread_inputs;
+#else
+    unsigned int data = power_input_status();
+#endif
+    return data & POWER_INPUT_CHARGER;
 }
 
 /* Returns true if any power input is connected - charging-capable
  * or not. */
 bool power_input_present(void)
 {
-    return power_thread_inputs & POWER_INPUT;
+#ifndef BOOTLOADER
+    unsigned int data = power_thread_inputs;
+#else
+    unsigned int data = power_input_status();
+#endif
+    return data & POWER_INPUT;
 }
 
 /*
