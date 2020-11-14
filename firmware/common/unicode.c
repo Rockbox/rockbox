@@ -88,7 +88,11 @@ struct cp_info
     const char  *name;
 };
 
-#define MAX_CP_TABLE_SIZE  32768
+#ifdef BOOTLOADER
+# define MAX_CP_TABLE_SIZE 0 /* utf-8 only in bootloaders */
+#else
+#   define MAX_CP_TABLE_SIZE  32768
+#endif
 
 #define CPF_ISO "iso.cp"
 #define CPF_932 "932.cp"  /* SJIS    */
