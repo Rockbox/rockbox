@@ -58,6 +58,10 @@
 
 #define DRAM_START 0x31000000
 
+/* From common.c */
+extern int line;
+extern int remote_line;
+
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
 {
@@ -89,22 +93,22 @@ void start_firmware(void)
 void shutdown(void)
 {
     printf("Shutting down...");
-    
+
     /* We need to gracefully spin down the disk to prevent clicks. */
     if (ide_powered())
     {
         /* Make sure ATA has been initialized. */
         storage_init();
-        
+
         /* And put the disk into sleep immediately. */
         storage_sleepnow();
     }
 
     sleep(HZ*2);
-    
+
     backlight_hw_off();
     remote_backlight_hw_off();
-    
+
     __reset_cookie();
     power_off();
 }
@@ -113,14 +117,14 @@ void shutdown(void)
 void check_battery(void)
 {
     int battery_voltage, batt_int, batt_frac;
-    
+
     battery_voltage = _battery_voltage();
     batt_int = battery_voltage / 1000;
     batt_frac = (battery_voltage % 1000) / 10;
 
     printf("Batt: %d.%02dV", batt_int, batt_frac);
 
-    if (battery_voltage <= 310) 
+    if (battery_voltage <= 310)
     {
         printf("WARNING! BATTERY LOW!!");
         sleep(HZ*2);
@@ -129,10 +133,6 @@ void check_battery(void)
 
 /* From the pcf50606 driver */
 extern unsigned char pcf50606_intregs[3];
-
-/* From common.c */
-extern int line;        
-extern int remote_line;
 
 void main(void)
 {
@@ -144,7 +144,6 @@ void main(void)
     bool hold_status = false;
     int data;
     bool rtc_alarm;
-    int button;
     int mask;
     bool usb_charge = false;
 
@@ -187,7 +186,7 @@ void main(void)
     /* Start with the main backlight OFF. */
     backlight_hw_init();
     backlight_hw_off();
-    
+
     remote_backlight_hw_on();
 
     system_init();
@@ -202,7 +201,7 @@ void main(void)
 
     adc_init();
     button_init();
-    
+
     lcd_init();
     lcd_remote_init();
     font_init();
@@ -222,7 +221,7 @@ void main(void)
 
     if(rtc_alarm)
         printf("RTC alarm detected");
-    
+
     /* Don't start if the Hold button is active on the device you
        are starting with */
     if ((on_button && button_hold()) ||
@@ -230,7 +229,7 @@ void main(void)
     {
         hold_status = true;
     }
-    if (hold_status && !rtc_alarm && (usb_detect() != USB_INSERTED) && 
+    if (hold_status && !rtc_alarm && (usb_detect() != USB_INSERTED) &&
         !charger_inserted())
     {
         if (detect_original_firmware())
@@ -264,17 +263,17 @@ void main(void)
         bool request_start = false;
 
         cpu_idle_mode(true);
-        
+
         while(charger_inserted() && !request_start)
         {
-            button = button_get_w_tmo(HZ);
+            long button = button_get_w_tmo(HZ);
 
             switch(button)
             {
             case BUTTON_ON:
                 request_start = true;
                 break;
-                
+
             case BUTTON_NONE: /* Timeout */
 
                 if(charging_state())
@@ -288,7 +287,7 @@ void main(void)
                     blink_toggle = true;
                     msg = complete_msg;
                 }
-                
+
                 font_getstringsize(msg, &w, &h, FONT_SYSFIXED);
                 reset_screen();
                 if(blink_toggle)
@@ -306,7 +305,7 @@ void main(void)
 
         cpu_idle_mode(false);
     }
-    
+
     usb_init();
 
     /* A hack to enter USB mode without using the USB thread */
@@ -333,7 +332,7 @@ void main(void)
             line = 0;
             remote_line = 0;
             check_battery();
-            
+
             storage_spin(); /* Prevent the drive from spinning down */
             sleep(HZ);
         }
@@ -408,9 +407,9 @@ unsigned short *bidi_l2v(const unsigned char *str, int orientation)
     static unsigned short utf16_buf[SCROLL_LINE_SIZE];
     unsigned short *target;
     (void)orientation;
-    
+
     target = utf16_buf;
-    
+
     while (*str)
         str = utf8decode(str, target++);
     *target = 0;
