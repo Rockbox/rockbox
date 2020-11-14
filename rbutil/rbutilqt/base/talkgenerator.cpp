@@ -56,7 +56,8 @@ TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimt
 
     // Encoder
     emit logItem(tr("Starting Encoder Engine"),LOGINFO);
-    m_enc = EncoderBase::getEncoder(this,SystemInfo::value(SystemInfo::CurEncoder).toString());
+    m_enc = EncoderBase::getEncoder(
+                this, SystemInfo::platformValue(SystemInfo::CurEncoder).toString());
     if(!m_enc->start())
     {
         emit logItem(tr("Init of Encoder engine failed"),LOGERROR);

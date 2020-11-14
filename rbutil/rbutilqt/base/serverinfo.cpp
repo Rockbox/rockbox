@@ -51,9 +51,9 @@ void ServerInfo::readBuildInfo(QString file)
     QSettings info(file, QSettings::IniFormat);
 
     QString developmentRevision = info.value("bleeding/rev").toString();
-    setValue(ServerInfo::BleedingRevision, developmentRevision);
+    setPlatformValue(ServerInfo::BleedingRevision, "", developmentRevision);
     QDateTime date = QDateTime::fromString(info.value("bleeding/timestamp").toString(), "yyyyMMddThhmmssZ");
-    setValue(ServerInfo::BleedingDate, date.toString(Qt::ISODate));
+    setPlatformValue(ServerInfo::BleedingDate, "", date.toString(Qt::ISODate));
 
     info.beginGroup("release");
     QStringList releasekeys = info.allKeys();
@@ -135,10 +135,10 @@ void ServerInfo::readBuildInfo(QString file)
         QString manualHtmlUrl = manualBaseUrl;
         QString manualZipUrl = manualBaseUrl;
 
-        QString buildservermodel = SystemInfo::platformValue(platforms.at(i),
-                SystemInfo::CurBuildserverModel).toString();
-        QString modelman = SystemInfo::platformValue(platforms.at(i),
-                SystemInfo::CurManual).toString();
+        QString buildservermodel = SystemInfo::platformValue(
+                SystemInfo::CurBuildserverModel, platforms.at(i)).toString();
+        QString modelman = SystemInfo::platformValue(
+                SystemInfo::CurManual, platforms.at(i)).toString();
         QString manualBaseName = "rockbox-";
 
         if(modelman.isEmpty()) manualBaseName += buildservermodel;
@@ -153,45 +153,26 @@ void ServerInfo::readBuildInfo(QString file)
 
         // set variants (if any)
         for(int j = 0; j < variants.size(); ++j) {
-            setPlatformValue(variants.at(j), ServerInfo::CurStatus, status);
+            setPlatformValue(ServerInfo::CurStatus, variants.at(j), status);
             if(!releaseUrl.isEmpty()) {
-                setPlatformValue(variants.at(j), ServerInfo::CurReleaseVersion, releaseVersion);
-                setPlatformValue(variants.at(j), ServerInfo::CurReleaseUrl, releaseUrl);
+                setPlatformValue(ServerInfo::CurReleaseVersion, variants.at(j), releaseVersion);
+                setPlatformValue(ServerInfo::CurReleaseUrl, variants.at(j), releaseUrl);
             }
             if(!relCandidateUrl.isEmpty()) {
-                setPlatformValue(variants.at(j), ServerInfo::RelCandidateVersion, relCandidateVersion);
-                setPlatformValue(variants.at(j), ServerInfo::RelCandidateUrl, relCandidateUrl);
+                setPlatformValue(ServerInfo::RelCandidateVersion, variants.at(j), relCandidateVersion);
+                setPlatformValue(ServerInfo::RelCandidateUrl, variants.at(j), relCandidateUrl);
             }
-            setPlatformValue(variants.at(j), ServerInfo::CurDevelUrl, develUrl);
+            setPlatformValue(ServerInfo::CurDevelUrl, variants.at(j), develUrl);
 
-            setPlatformValue(variants.at(j), ServerInfo::ManualPdfUrl, manualPdfUrl);
-            setPlatformValue(variants.at(j), ServerInfo::ManualHtmlUrl, manualHtmlUrl);
-            setPlatformValue(variants.at(j), ServerInfo::ManualZipUrl, manualZipUrl);
+            setPlatformValue(ServerInfo::ManualPdfUrl, variants.at(j), manualPdfUrl);
+            setPlatformValue(ServerInfo::ManualHtmlUrl, variants.at(j), manualHtmlUrl);
+            setPlatformValue(ServerInfo::ManualZipUrl, variants.at(j), manualZipUrl);
         }
     }
 }
 
 
-QVariant ServerInfo::value(enum ServerInfos info)
-{
-    // locate info item
-    int i = 0;
-    while(ServerInfoList[i].info != info)
-        i++;
-
-    QString s = ServerInfoList[i].name;
-    s.replace(":platform:", RbSettings::value(RbSettings::CurrentPlatform).toString());
-    LOG_INFO() << "GET:" << s << serverInfos.value(s, ServerInfoList[i].def).toString();
-    return serverInfos.value(s, ServerInfoList[i].def);
-}
-
-void ServerInfo::setValue(enum ServerInfos setting, QVariant value)
-{
-   QString empty;
-   return setPlatformValue(empty, setting, value);
-}
-
-void ServerInfo::setPlatformValue(QString platform, enum ServerInfos info, QVariant value)
+void ServerInfo::setPlatformValue(enum ServerInfos info, QString platform, QVariant value)
 {
     // locate setting item
     int i = 0;
@@ -204,12 +185,15 @@ void ServerInfo::setPlatformValue(QString platform, enum ServerInfos info, QVari
     LOG_INFO() << "SET:" << s << serverInfos.value(s).toString();
 }
 
-QVariant ServerInfo::platformValue(QString platform, enum ServerInfos info)
+QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
 {
     // locate setting item
     int i = 0;
     while(ServerInfoList[i].info != info)
         i++;
+
+    if(platform.isEmpty())
+        platform = RbSettings::value(RbSettings::CurrentPlatform).toString();
 
     QString s = ServerInfoList[i].name;
     s.replace(":platform:", platform);

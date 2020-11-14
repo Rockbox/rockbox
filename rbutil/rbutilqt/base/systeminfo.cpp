@@ -49,6 +49,13 @@ const static struct {
     { SystemInfo::ThemesUrl,            "themes_url",           "" },
     { SystemInfo::ThemesInfoUrl,        "themes_info_url",      "" },
     { SystemInfo::RbutilUrl,            "rbutil_url",           "" },
+};
+
+const static struct {
+    SystemInfo::PlatformInfo info;
+    const char* name;
+    const char* def;
+} PlatformInfosList[] = {
     { SystemInfo::CurPlatformName,      ":platform:/name",      "" },
     { SystemInfo::CurManual,            ":platform:/manualname","rockbox-:platform:" },
     { SystemInfo::CurBootloaderMethod,  ":platform:/bootloadermethod", "none" },
@@ -85,27 +92,27 @@ QVariant SystemInfo::value(enum SystemInfos info)
     int i = 0;
     while(SystemInfosList[i].info != info)
         i++;
-    QString platform = RbSettings::value(RbSettings::CurrentPlatform).toString();
     QString s = SystemInfosList[i].name;
-    s.replace(":platform:", platform);
     QString d = SystemInfosList[i].def;
-    d.replace(":platform:", platform);
     LOG_INFO() << "GET:" << s << systemInfos->value(s, d).toString();
     return systemInfos->value(s, d);
 }
 
-QVariant SystemInfo::platformValue(QString platform, enum SystemInfos info)
+QVariant SystemInfo::platformValue(enum PlatformInfo info, QString platform)
 {
     ensureSystemInfoExists();
 
     // locate setting item
     int i = 0;
-    while(SystemInfosList[i].info != info)
+    while(PlatformInfosList[i].info != info)
         i++;
 
-    QString s = SystemInfosList[i].name;
+    if (platform.isEmpty())
+        platform = RbSettings::value(RbSettings::CurrentPlatform).toString();
+
+    QString s = PlatformInfosList[i].name;
     s.replace(":platform:", platform);
-    QString d = SystemInfosList[i].def;
+    QString d = PlatformInfosList[i].def;
     d.replace(":platform:", platform);
     LOG_INFO() << "GET P:" << s << systemInfos->value(s, d).toString();
     return systemInfos->value(s, d);

@@ -69,7 +69,7 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
     if(current == "development")
         ui.selectedDescription->setText(tr("The development version is "
                     "updated on every code change. Last update was on %1").arg(
-                        ServerInfo::value(ServerInfo::BleedingDate).toString()));
+                        ServerInfo::platformValue(ServerInfo::BleedingDate).toString()));
     if(current == "rc")
         ui.selectedDescription->setText(tr("This will eventually become the "
                     "next Rockbox version. Install it to help testing."));
@@ -81,8 +81,8 @@ void SelectiveInstallWidget::updateVersion(void)
     // get some configuration values globally
     m_mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
     m_target = RbSettings::value(RbSettings::CurrentPlatform).toString();
-    m_blmethod = SystemInfo::platformValue(m_target,
-            SystemInfo::CurBootloaderMethod).toString();
+    m_blmethod = SystemInfo::platformValue(
+            SystemInfo::CurBootloaderMethod, m_target).toString();
 
     if(m_logger != NULL) {
         delete m_logger;
@@ -91,11 +91,11 @@ void SelectiveInstallWidget::updateVersion(void)
 
     // re-populate all version items
     m_versions.clear();
-    m_versions.insert("release", ServerInfo::value(ServerInfo::CurReleaseVersion).toString());
+    m_versions.insert("release", ServerInfo::platformValue(ServerInfo::CurReleaseVersion).toString());
     // Don't populate RC or development selections if target has been retired.
-    if (ServerInfo::value(ServerInfo::CurStatus) != tr("Stable (Retired)")) {
-        m_versions.insert("development", ServerInfo::value(ServerInfo::BleedingRevision).toString());
-        m_versions.insert("rc", ServerInfo::value(ServerInfo::RelCandidateVersion).toString());
+    if (ServerInfo::platformValue(ServerInfo::CurStatus) != tr("Stable (Retired)")) {
+        m_versions.insert("development", ServerInfo::platformValue(ServerInfo::BleedingRevision).toString());
+        m_versions.insert("rc", ServerInfo::platformValue(ServerInfo::RelCandidateVersion).toString());
     }
 
     ui.selectedVersion->clear();
@@ -237,7 +237,7 @@ void SelectiveInstallWidget::installBootloader(void)
         // create installer
         BootloaderInstallBase *bl =
             BootloaderInstallHelper::createBootloaderInstaller(this,
-                    SystemInfo::value(SystemInfo::CurBootloaderMethod).toString());
+                    SystemInfo::platformValue(SystemInfo::CurBootloaderMethod).toString());
         if(bl == NULL) {
             m_logger->addItem(tr("No install method known."), LOGERROR);
             m_logger->setFinished();
@@ -254,7 +254,7 @@ void SelectiveInstallWidget::installBootloader(void)
         connect(m_logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
 
         // set bootloader filename. Do this now as installed() needs it.
-        QStringList blfile = SystemInfo::value(SystemInfo::CurBootloaderFile).toStringList();
+        QStringList blfile = SystemInfo::platformValue(SystemInfo::CurBootloaderFile).toStringList();
         QStringList blfilepath;
         for(int a = 0; a < blfile.size(); a++) {
             blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
@@ -262,7 +262,7 @@ void SelectiveInstallWidget::installBootloader(void)
         }
         bl->setBlFile(blfilepath);
         QUrl url(SystemInfo::value(SystemInfo::BootloaderUrl).toString()
-                + SystemInfo::value(SystemInfo::CurBootloaderName).toString());
+                + SystemInfo::platformValue(SystemInfo::CurBootloaderName).toString());
         bl->setBlUrl(url);
         bl->setLogfile(RbSettings::value(RbSettings::Mountpoint).toString()
                 + "/.rockbox/rbutil.log");
@@ -282,7 +282,7 @@ void SelectiveInstallWidget::installBootloader(void)
         else if(bl->installed() == BootloaderInstallBase::BootloaderOther
                 && bl->capabilities() & BootloaderInstallBase::Backup)
         {
-            QString targetFolder = SystemInfo::value(SystemInfo::CurPlatformName).toString()
+            QString targetFolder = SystemInfo::platformValue(SystemInfo::CurPlatformName).toString()
                 + " Firmware Backup";
             // remove invalid character(s)
             targetFolder.remove(QRegExp("[:/]"));
@@ -319,7 +319,7 @@ void SelectiveInstallWidget::installBootloader(void)
             // open dialog to browse to of file
             QString offile;
             QString filter
-                = SystemInfo::value(SystemInfo::CurBootloaderFilter).toString();
+                = SystemInfo::platformValue(SystemInfo::CurBootloaderFilter).toString();
             if(!filter.isEmpty()) {
                 filter = tr("Bootloader files (%1)").arg(filter) + ";;";
             }
@@ -385,12 +385,12 @@ void SelectiveInstallWidget::installRockbox(void)
         RbSettings::setValue(RbSettings::Build, selected);
         RbSettings::sync();
 
-        if(selected == "release") url = ServerInfo::platformValue(m_target,
-                ServerInfo::CurReleaseUrl).toString();
-        else if(selected == "development") url = ServerInfo::platformValue(m_target,
-                ServerInfo::CurDevelUrl).toString();
-        else if(selected == "rc") url = ServerInfo::platformValue(m_target,
-                ServerInfo::RelCandidateUrl).toString();
+        if(selected == "release") url = ServerInfo::platformValue(
+                ServerInfo::CurReleaseUrl, m_target).toString();
+        else if(selected == "development") url = ServerInfo::platformValue(
+                ServerInfo::CurDevelUrl, m_target).toString();
+        else if(selected == "rc") url = ServerInfo::platformValue(
+                ServerInfo::RelCandidateUrl, m_target).toString();
 
         //! install build
         if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();

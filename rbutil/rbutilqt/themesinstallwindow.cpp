@@ -86,7 +86,7 @@ void ThemesInstallWindow::downloadInfo()
 
     QString infoUrl = SystemInfo::value(SystemInfo::ThemesInfoUrl).toString();
     infoUrl.replace("%TARGET%",
-            SystemInfo::value(SystemInfo::CurConfigureModel).toString());
+            SystemInfo::platformValue(SystemInfo::CurConfigureModel).toString());
     infoUrl.replace("%REVISION%", installInfo.revision());
     infoUrl.replace("%RELEASE%", installInfo.release());
     infoUrl.replace("%RBUTILVER%", VERSION);

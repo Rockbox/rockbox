@@ -57,6 +57,9 @@ class SystemInfo : public QObject
             ThemesUrl,
             ThemesInfoUrl,
             RbutilUrl,
+        };
+
+        enum PlatformInfo {
             CurPlatformName,
             CurManual,
             CurBootloaderMethod,
@@ -90,7 +93,7 @@ class SystemInfo : public QObject
         //! get a value from system settings
         static QVariant value(enum SystemInfos info);
         //! get a value from system settings for a named platform.
-        static QVariant platformValue(QString platform, enum SystemInfos info);
+        static QVariant platformValue(enum PlatformInfo info, QString platform = "");
 
     private:
         //! you shouldnt call this, its a fully static calls

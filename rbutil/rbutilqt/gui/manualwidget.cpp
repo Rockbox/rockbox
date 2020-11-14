@@ -42,9 +42,9 @@ void ManualWidget::updateManual()
     if(!m_platform.isEmpty())
     {
         ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
-            .arg(ServerInfo::platformValue(m_platform, ServerInfo::ManualPdfUrl).toString()));
+            .arg(ServerInfo::platformValue(ServerInfo::ManualPdfUrl, m_platform).toString()));
         ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
-            .arg(ServerInfo::platformValue(m_platform, ServerInfo::ManualHtmlUrl).toString()));
+            .arg(ServerInfo::platformValue(ServerInfo::ManualHtmlUrl, m_platform).toString()));
     }
     else {
         ui.labelPdfManual->setText(tr("Select a device for a link to the correct manual"));
@@ -65,9 +65,9 @@ void ManualWidget::downloadManual(void)
         QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
     }
-    QString manual = SystemInfo::value(SystemInfo::CurManual).toString();
+    QString manual = SystemInfo::platformValue(SystemInfo::CurManual).toString();
     if(manual.isEmpty()) {
-        manual = "rockbox-" + SystemInfo::value(SystemInfo::CurBuildserverModel).toString();
+        manual = "rockbox-" + SystemInfo::platformValue(SystemInfo::CurBuildserverModel).toString();
     }
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
@@ -78,14 +78,14 @@ void ManualWidget::downloadManual(void)
         installer->setCache(true);
 
     if(ui.radioPdf->isChecked()) {
-        installer->setUrl(ServerInfo::platformValue(m_platform,
-                    ServerInfo::ManualPdfUrl).toString());
+        installer->setUrl(ServerInfo::platformValue(
+                    ServerInfo::ManualPdfUrl, m_platform).toString());
         installer->setLogSection("Manual (PDF)");
         installer->setTarget("/" + manual + ".pdf");
     }
     else {
-        installer->setUrl(ServerInfo::platformValue(m_platform,
-                    ServerInfo::ManualZipUrl).toString());
+        installer->setUrl(ServerInfo::platformValue(
+                    ServerInfo::ManualZipUrl, m_platform).toString());
         installer->setLogSection("Manual (HTML)");
         installer->setTarget("/" + manual + "-" + "-html.zip");
     }

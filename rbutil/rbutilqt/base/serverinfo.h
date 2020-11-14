@@ -45,16 +45,14 @@ class ServerInfo : public QObject
 
         //! read in buildinfo file
         static void readBuildInfo(QString file);
-        //! get a value from server info
-        static QVariant value(enum ServerInfos setting);
         //! get a value from server info for a named platform.
-        static QVariant platformValue(QString platform, enum ServerInfos setting);
+        static QVariant platformValue(enum ServerInfos setting, QString platform = "");
 
     private:
         //! set a server info value
         static void setValue(enum ServerInfos setting, QVariant value);
         //! set a value for a server info for a named platform.
-        static void setPlatformValue(QString platform, enum ServerInfos setting, QVariant value);
+        static void setPlatformValue(enum ServerInfos setting, QString platform, QVariant value);
         //! you shouldnt call this, its a fully static class
         ServerInfo() {}
 
