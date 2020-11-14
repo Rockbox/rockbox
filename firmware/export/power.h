@@ -70,6 +70,13 @@ unsigned int power_input_status(void);
  * > (power_input_status() & POWER_INPUT_CHARGER) != 0 */
 bool charger_inserted(void);
 
+/*
+ * Same as charger_inserted() but bypasses the cache
+ */
+static inline bool raw_charger_inserted(void) {
+    return (power_input_status() & POWER_INPUT_CHARGER) != 0;
+}
+
 /* Returns true if any power input is connected - charging-capable
  * or not.
  * > (power_input_status() & POWER_INPUT) != 0 */

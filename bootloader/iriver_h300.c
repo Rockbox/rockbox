@@ -172,7 +172,7 @@ void main(void)
 
     /* Turn off if we believe the start was accidental */
     if(!(rtc_alarm || on_button || rc_on_button ||
-         (usb_detect() == USB_INSERTED) || charger_inserted())) {
+         (usb_detect() == USB_INSERTED) || raw_charger_inserted())) {
         __reset_cookie();
         power_off();
     }
@@ -230,7 +230,7 @@ void main(void)
         hold_status = true;
     }
     if (hold_status && !rtc_alarm && (usb_detect() != USB_INSERTED) && 
-        !charger_inserted())
+        !raw_charger_inserted())
     {
         if (detect_original_firmware())
         {
@@ -246,7 +246,7 @@ void main(void)
         start_iriver_fw();
     }
 
-    if(charger_inserted())
+    if(raw_charger_inserted())
     {
         const char charging_msg[] = "Charging...";
         const char complete_msg[] = "Charging complete";
@@ -257,7 +257,7 @@ void main(void)
 
         cpu_idle_mode(true);
         
-        while(charger_inserted() && !request_start)
+        while(raw_charger_inserted() && !request_start)
         {
             button = button_get_w_tmo(HZ);
 
