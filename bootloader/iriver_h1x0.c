@@ -61,9 +61,7 @@
 extern int line;
 extern int remote_line;
 
-#ifdef HAVE_EEPROM_SETTINGS
 static bool recovery_mode = false;
-#endif
 
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
@@ -96,12 +94,12 @@ void start_firmware(void)
 void start_flashed_romimage(void)
 {
     uint8_t *src = (uint8_t *)FLASH_ROMIMAGE_ENTRY;
-    int *reset_vector;
+    uint32_t *reset_vector;
 
     if (!detect_flashed_romimage())
         return ;
 
-    reset_vector = (int *)(&src[sizeof(struct flash_header)+4]);
+    reset_vector = (uint32_t *)(&src[sizeof(struct flash_header)+sizeof(uint32_t)]);
 
     asm(" move.w #0x2700,%sr");
     __reset_cookie();
@@ -119,7 +117,7 @@ void start_flashed_romimage(void)
 void start_flashed_ramimage(void)
 {
     struct flash_header hdr;
-    unsigned char *buf = (unsigned char *)DRAM_START;
+    uint8_t *buf = (uint8_t *)DRAM_START;
     uint8_t *src = (uint8_t *)FLASH_RAMIMAGE_ENTRY;
 
     if (!detect_flashed_ramimage())
@@ -141,11 +139,9 @@ void start_flashed_ramimage(void)
 void shutdown(void)
 {
     printf("Shutting down...");
-#ifdef HAVE_EEPROM_SETTINGS
     /* Reset the rockbox crash check. */
     firmware_settings.bl_version = 0;
     eeprom_settings_store();
-#endif
 
     /* We need to gracefully spin down the disk to prevent clicks. */
     if (ide_powered())
@@ -185,7 +181,6 @@ void check_battery(void)
     }
 }
 
-#ifdef HAVE_EEPROM_SETTINGS
 void initialize_eeprom(void)
 {
     if (detect_original_firmware())
@@ -235,17 +230,17 @@ void try_flashboot(void)
     }
 }
 
-static const char *options[] = {
-    "Boot from disk",
-    "Boot RAM image",
-    "Boot ROM image",
-    "Shutdown"
-};
-
-#define FAILSAFE_OPTIONS 4
-#define TIMEOUT (15*HZ)
 void failsafe_menu(void)
 {
+    static const char *options[] =
+    {
+        "Boot from disk",
+        "Boot RAM image",
+        "Boot ROM image",
+        "Shutdown"
+    };
+    const int FAILSAFE_OPTIONS = sizeof(options) / sizeof(*options);
+    const long TIMEOUT = 15 * HZ;
     long start_tick = current_tick;
     int option = 3;
     int button;
@@ -355,7 +350,6 @@ void failsafe_menu(void)
 
     shutdown();
 }
-#endif
 
 /* get rid of a nasty humming sound during boot
  -> RESET signal */
@@ -427,9 +421,7 @@ void main(void)
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
     enable_irq();
 
-#ifdef HAVE_EEPROM_SETTINGS
     initialize_eeprom();
-#endif
 
     usb_init();
     /* A small delay after usb_init is necessary to read the I/O port correctly
@@ -458,19 +450,11 @@ void main(void)
     }
 
     /* Power on the hard drive early, to speed up the loading. */
-    if (!hold_status
-# ifdef HAVE_EEPROM_SETTINGS
-        && !recovery_mode
-# endif
-        )
-    {
+    if (!hold_status && !recovery_mode)
         ide_power_enable(true);
-    }
 
-# ifdef HAVE_EEPROM_SETTINGS
     if (!hold_status && (usb_detect() != USB_INSERTED) && !recovery_mode)
         try_flashboot();
-# endif
 
     lcd_init();
 
@@ -500,11 +484,7 @@ void main(void)
 
     /* Don't start if the Hold button is active on the device you
        are starting with */
-    if ((usb_detect() != USB_INSERTED) && (hold_status
-#ifdef HAVE_EEPROM_SETTINGS
-                          || recovery_mode
-#endif
-                          ))
+    if ((usb_detect() != USB_INSERTED) && (hold_status || recovery_mode))
     {
         if (detect_original_firmware())
         {
@@ -512,9 +492,7 @@ void main(void)
             shutdown();
         }
 
-#ifdef HAVE_EEPROM_SETTINGS
         failsafe_menu();
-#endif
     }
 
     /* Holding REC while starting runs the original firmware */
@@ -537,13 +515,12 @@ void main(void)
         lcd_remote_puts(0, 3, msg);
         lcd_remote_update();
 
-#ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
         {
             firmware_settings.disk_clean = false;
             eeprom_settings_store();
         }
-#endif
+
         ide_power_enable(true);
         storage_enable(false);
         sleep(HZ/20);
@@ -570,6 +547,11 @@ void main(void)
         lcd_update();
     }
 
+    /* boot from flash if that is the default */
+    try_flashboot();
+    if (recovery_mode)
+        printf("Falling back to boot from disk");
+
     rc = storage_init();
     if(rc)
     {
@@ -579,7 +561,6 @@ void main(void)
         printf("a button");
         while(!(button_get(true) & BUTTON_REL));
     }
-
 
     filesystem_init();
 
