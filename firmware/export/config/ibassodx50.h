@@ -36,6 +36,7 @@
 #define MODEL_NAME "iBasso DX50"
 
 #define USB_NONE
+#define HAVE_USB_POWER
 
 /* define this if you have a colour LCD */
 #define HAVE_LCD_COLOR

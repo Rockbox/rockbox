@@ -393,7 +393,6 @@ MAKE_MENU(sel_softlock, ID2P(LANG_SOFTLOCK_SELECTIVE),
 
 #if defined(DX50) || defined(DX90)
 MENUITEM_SETTING(governor, &global_settings.governor, NULL);
-MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
 #endif
 
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),

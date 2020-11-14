@@ -817,13 +817,6 @@ int usb_release_exclusive_storage(void)
     return bccount;
 }
 
-#ifdef HAVE_USB_POWER
-bool usb_powered_only(void)
-{
-    return usb_state == USB_POWERED;
-}
-#endif /* HAVE_USB_POWER */
-
 #ifdef USB_ENABLE_HID
 void usb_set_hid(bool enable)
 {
@@ -831,6 +824,13 @@ void usb_set_hid(bool enable)
     usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 }
 #endif /* USB_ENABLE_HID */
+
+#ifdef HAVE_USB_POWER
+bool usb_powered_only(void)
+{
+    return usb_state == USB_POWERED;
+}
+#endif /* HAVE_USB_POWER */
 
 #elif defined(USB_NONE)
 /* Dummy functions for USB_NONE  */
