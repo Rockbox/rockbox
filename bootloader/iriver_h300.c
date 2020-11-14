@@ -43,11 +43,12 @@
 #include "power.h"
 #include "powermgmt.h"
 #include "file.h"
+#include "eeprom_settings.h"
+#include "rbunicode.h"
 #include "pcf50606.h"
 #include "common.h"
 #include "rb-loader.h"
 #include "loader_strerror.h"
-#include "rbunicode.h"
 #include "isp1362.h"
 #include "version.h"
 
@@ -61,6 +62,8 @@
 /* From common.c */
 extern int line;
 extern int remote_line;
+
+static bool recovery_mode = false;
 
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
@@ -90,9 +93,57 @@ void start_firmware(void)
     asm(" jmp (%a0)");
 }
 
+void start_flashed_romimage(void)
+{
+    uint8_t *src = (uint8_t *)FLASH_ROMIMAGE_ENTRY;
+    uint32_t *reset_vector;
+
+    if (!detect_flashed_romimage())
+        return ;
+
+    reset_vector = (uint32_t *)(&src[sizeof(struct flash_header)+sizeof(uint32_t)]);
+
+    asm(" move.w #0x2700,%sr");
+    __reset_cookie();
+
+    asm(" move.l %0,%%d0" :: "i"(DRAM_START));
+    asm(" movec.l %d0,%vbr");
+    asm(" move.l %0,%%sp" :: "m"(reset_vector[0]));
+    asm(" move.l %0,%%a0" :: "m"(reset_vector[1]));
+    asm(" jmp (%a0)");
+
+    /* Failure */
+    power_off();
+}
+
+void start_flashed_ramimage(void)
+{
+    struct flash_header hdr;
+    uint8_t *buf = (uint8_t *)DRAM_START;
+    uint8_t *src = (uint8_t *)FLASH_RAMIMAGE_ENTRY;
+
+    if (!detect_flashed_ramimage())
+         return;
+
+    /* Load firmware from flash */
+    cpu_boost(true);
+    memcpy(&hdr, src, sizeof(struct flash_header));
+    src += sizeof(struct flash_header);
+    memcpy(buf, src, hdr.length);
+    cpu_boost(false);
+
+    start_firmware();
+
+    /* Failure */
+    power_off();
+}
+
 void shutdown(void)
 {
     printf("Shutting down...");
+    /* Reset the rockbox crash check. */
+    firmware_settings.bl_version = 0;
+    eeprom_settings_store();
 
     /* We need to gracefully spin down the disk to prevent clicks. */
     if (ide_powered())
@@ -106,6 +157,7 @@ void shutdown(void)
 
     sleep(HZ*2);
 
+    /* Backlight OFF */
     backlight_hw_off();
     remote_backlight_hw_off();
 
@@ -129,6 +181,176 @@ void check_battery(void)
         printf("WARNING! BATTERY LOW!!");
         sleep(HZ*2);
     }
+}
+
+void initialize_eeprom(void)
+{
+    if (detect_original_firmware())
+        return ;
+
+    if (!eeprom_settings_init())
+    {
+        recovery_mode = true;
+        return ;
+    }
+
+    /* If bootloader version has not been reset, disk might
+     * not be intact. */
+    if (firmware_settings.bl_version || !firmware_settings.disk_clean)
+    {
+        firmware_settings.disk_clean = false;
+        recovery_mode = true;
+    }
+
+    firmware_settings.bl_version = EEPROM_SETTINGS_BL_MINVER;
+    eeprom_settings_store();
+}
+
+void try_flashboot(void)
+{
+    if (!firmware_settings.initialized)
+        return ;
+
+   switch (firmware_settings.bootmethod)
+    {
+        case BOOT_DISK:
+            return;
+
+        case BOOT_ROM:
+            start_flashed_romimage();
+            recovery_mode = true;
+            break;
+
+        case BOOT_RAM:
+            start_flashed_ramimage();
+            recovery_mode = true;
+            break;
+
+        default:
+            recovery_mode = true;
+            return;
+    }
+}
+
+void failsafe_menu(void)
+{
+    static const char *options[] =
+    {
+        "Boot from disk",
+        "Boot RAM image",
+        "Boot ROM image",
+        "Shutdown"
+    };
+    const int FAILSAFE_OPTIONS = sizeof(options) / sizeof(*options);
+    const long TIMEOUT = 15 * HZ;
+    long start_tick = current_tick;
+    int option = 3;
+    int button;
+    int defopt = -1;
+    char buf[32];
+    int i;
+
+    reset_screen();
+    printf("Bootloader %s", rbversion);
+    check_battery();
+    printf("=========================");
+    line += FAILSAFE_OPTIONS;
+    printf("");
+    printf("  [NAVI] to confirm.");
+    printf("  [REC] to set as default.");
+    printf("");
+
+    if (firmware_settings.initialized)
+    {
+        defopt = firmware_settings.bootmethod;
+        if (defopt < 0 || defopt >= FAILSAFE_OPTIONS)
+            defopt = option;
+    }
+
+    while (current_tick - start_tick < TIMEOUT)
+    {
+        /* Draw the menu. */
+        line = 3;
+        for (i = 0; i < FAILSAFE_OPTIONS; i++)
+        {
+            char *def = "[DEF]";
+            char *arrow = "->";
+
+            if (i != defopt)
+                def = "";
+            if (i != option)
+                arrow = "  ";
+
+            printf("%s %s %s", arrow, options[i], def);
+        }
+
+        snprintf(buf, sizeof(buf), "Time left: %lds",
+                 (TIMEOUT - (current_tick - start_tick)) / HZ);
+        lcd_puts(0, 10, buf);
+        lcd_update();
+        button = button_get_w_tmo(HZ);
+
+        if (button == BUTTON_NONE || button & SYS_EVENT)
+            continue ;
+
+        start_tick = current_tick;
+
+        /* Ignore the ON/PLAY -button because it can cause trouble
+           with the RTC alarm mod. */
+        switch (button & ~(BUTTON_ON))
+        {
+            case BUTTON_UP:
+            case BUTTON_RC_REW:
+                if (option > 0)
+                    option--;
+                break ;
+
+            case BUTTON_DOWN:
+            case BUTTON_RC_FF:
+                if (option < FAILSAFE_OPTIONS-1)
+                    option++;
+                break ;
+
+            case BUTTON_SELECT:
+            case BUTTON_RC_ON:
+                goto execute;
+
+            case BUTTON_REC:
+            case BUTTON_RC_REC:
+                if (firmware_settings.initialized)
+                {
+                    firmware_settings.bootmethod = option;
+                    eeprom_settings_store();
+                    defopt = option;
+                }
+                break ;
+        }
+    }
+
+    execute:
+
+    lcd_puts(0, 10, "Executing command...");
+    lcd_update();
+    sleep(HZ);
+    reset_screen();
+
+    switch (option)
+    {
+        case BOOT_DISK:
+            return ;
+
+        case BOOT_RAM:
+            start_flashed_ramimage();
+            printf("Image not found");
+            break;
+
+        case BOOT_ROM:
+            start_flashed_romimage();
+            printf("Image not found");
+            break;
+    }
+
+    shutdown();
 }
 
 /* From the pcf50606 driver */
@@ -187,6 +409,7 @@ void main(void)
     backlight_hw_init();
     backlight_hw_off();
 
+    /* Remote backlight ON */
     remote_backlight_hw_on();
 
     system_init();
@@ -197,10 +420,19 @@ void main(void)
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
     enable_irq();
 
+    initialize_eeprom();
+
     isp1362_init();
 
     adc_init();
     button_init();
+
+    /* Power on the hard drive early, to speed up the loading. */
+    if (!hold_status && !recovery_mode)
+        ide_power_enable(true);
+
+    if (!hold_status && (usb_detect() != USB_INSERTED) && !recovery_mode)
+        try_flashboot();
 
     lcd_init();
     lcd_remote_init();
@@ -229,14 +461,16 @@ void main(void)
     {
         hold_status = true;
     }
-    if (hold_status && !rtc_alarm && (usb_detect() != USB_INSERTED) &&
-        !charger_inserted())
+    if ((hold_status || recovery_mode) && !rtc_alarm &&
+        (usb_detect() != USB_INSERTED) && !charger_inserted())
     {
         if (detect_original_firmware())
         {
             printf("Hold switch on");
             shutdown();
         }
+
+        failsafe_menu();
     }
 
     /* Holding REC while starting runs the original firmware */
@@ -321,6 +555,12 @@ void main(void)
         lcd_remote_puts(0, 3, msg);
         lcd_remote_update();
 
+        if (firmware_settings.initialized)
+        {
+            firmware_settings.disk_clean = false;
+            eeprom_settings_store();
+        }
+
         ide_power_enable(true);
         storage_enable(false);
         sleep(HZ/20);
@@ -350,6 +590,11 @@ void main(void)
         usb_charging_enable(USB_CHARGING_DISABLE);
         usb_charge = false;
     }
+
+    /* boot from flash if that is the default */
+    try_flashboot();
+    if (recovery_mode)
+        printf("Falling back to boot from disk");
 
     rc = storage_init();
     if(rc)
