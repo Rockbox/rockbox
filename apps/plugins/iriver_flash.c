@@ -22,6 +22,7 @@
  *
  ****************************************************************************/
 #include "plugin.h"
+#include "lib/helper.h"
 
 /*
  * Flash commands may rely on null pointer dereferences to work correctly.
@@ -849,8 +850,14 @@ enum plugin_status plugin_start(const void* parameter)
     /* setup LCD font */
     rb->lcd_setfont(FONT_SYSFIXED);
 
+    /* don't let the backlight turn off or it might scare people */
+    backlight_ignore_timeout();
+
     /* run the main entry function */
     iriver_flash(parameter);
+
+    /* restore the original backlight settings */
+    backlight_use_settings();
 
     /* restore LCD font */
     rb->lcd_setfont(FONT_UI);
