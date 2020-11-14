@@ -58,6 +58,10 @@
 
 #define DRAM_START 0x31000000
 
+/* From common.c */
+extern int line;
+extern int remote_line;
+
 /* Reset the cookie for the crt0 crash check */
 inline void __reset_cookie(void)
 {
@@ -130,10 +134,6 @@ void check_battery(void)
 /* From the pcf50606 driver */
 extern unsigned char pcf50606_intregs[3];
 
-/* From common.c */
-extern int line;
-extern int remote_line;
-
 void main(void)
 {
     int i;
@@ -144,7 +144,6 @@ void main(void)
     bool hold_status = false;
     int data;
     bool rtc_alarm;
-    int button;
     int mask;
     bool usb_charge = false;
 
@@ -267,7 +266,7 @@ void main(void)
 
         while(charger_inserted() && !request_start)
         {
-            button = button_get_w_tmo(HZ);
+            long button = button_get_w_tmo(HZ);
 
             switch(button)
             {

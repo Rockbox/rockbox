@@ -57,6 +57,10 @@
 
 #define DRAM_START 0x31000000
 
+/* From common.c */
+extern int line;
+extern int remote_line;
+
 #ifdef HAVE_EEPROM_SETTINGS
 static bool recovery_mode = false;
 #endif
@@ -89,7 +93,6 @@ void start_firmware(void)
     asm(" jmp (%a0)");
 }
 
-#ifdef IRIVER_H100_SERIES
 void start_flashed_romimage(void)
 {
     uint8_t *src = (uint8_t *)FLASH_ROMIMAGE_ENTRY;
@@ -134,7 +137,6 @@ void start_flashed_ramimage(void)
     /* Failure */
     power_off();
 }
-#endif /* IRIVER_H100_SERIES */
 
 void shutdown(void)
 {
@@ -159,9 +161,7 @@ void shutdown(void)
 
     /* Backlight OFF */
     backlight_hw_off();
-#ifdef HAVE_REMOTE_LCD
     remote_backlight_hw_off();
-#endif
 
     __reset_cookie();
     power_off();
@@ -252,7 +252,6 @@ void failsafe_menu(void)
     int defopt = -1;
     char buf[32];
     int i;
-    extern int line;
 
     reset_screen();
     printf("Bootloader %s", rbversion);
@@ -362,18 +361,14 @@ void failsafe_menu(void)
  -> RESET signal */
 inline static void __uda1380_reset_hi(void)
 {
-#ifdef HAVE_UDA1380
     or_l(1<<29, &GPIO_OUT);
     or_l(1<<29, &GPIO_ENABLE);
     or_l(1<<29, &GPIO_FUNCTION);
-#endif
 }
 
 inline static void __uda1380_reset_lo(void)
 {
-#ifdef HAVE_UDA1380
     and_l(~(1<<29), &GPIO_OUT);
-#endif
 }
 
 void main(void)
@@ -385,8 +380,6 @@ void main(void)
     bool rec_button = false;
     bool hold_status = false;
     int data;
-    extern int line;        /* From common.c */
-    extern int remote_line; /* From common.c */
 
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
@@ -422,22 +415,16 @@ void main(void)
     backlight_hw_off();
 
     /* Remote backlight ON */
-#ifdef HAVE_REMOTE_LCD
     remote_backlight_hw_on();
-#endif
 
     system_init();
     kernel_init();
 
     __uda1380_reset_lo();
 
-#ifdef HAVE_ADJUSTABLE_CPU_FREQ
     /* Set up waitstates for the peripherals */
     set_cpu_frequency(0); /* PLL off */
-#ifdef CPU_COLDFIRE
     coldfire_set_pllcr_audio_bits(DEFAULT_PLLCR_AUDIO_BITS);
-#endif
-#endif
     enable_irq();
 
 #ifdef HAVE_EEPROM_SETTINGS
@@ -547,10 +534,8 @@ void main(void)
         lcd_putsxy((LCD_WIDTH-w)/2, (LCD_HEIGHT-h)/2, msg);
         lcd_update();
 
-#ifdef HAVE_REMOTE_LCD
         lcd_remote_puts(0, 3, msg);
         lcd_remote_update();
-#endif
 
 #ifdef HAVE_EEPROM_SETTINGS
         if (firmware_settings.initialized)
@@ -608,7 +593,7 @@ void main(void)
 
     printf("Loading firmware");
     i = load_firmware((unsigned char *)DRAM_START, BOOTFILE, MAX_LOADSIZE);
-    if(i < 0)
+    if(i <= EFILE_EMPTY)
         printf("Error: %s", loader_strerror(i));
 
     if (i > 0)
