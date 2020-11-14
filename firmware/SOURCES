@@ -827,6 +827,9 @@ usbstack/usb_charging_only.c
 #ifdef USB_ENABLE_HID
 usbstack/usb_hid.c
 #endif
+#ifdef USB_ENABLE_MTP
+usbstack/usb_mtp.c
+#endif
 #if CONFIG_USBOTG == USBOTG_M66591
 drivers/m66591.c
 #elif CONFIG_USBOTG == USBOTG_ARC

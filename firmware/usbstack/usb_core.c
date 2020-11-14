@@ -47,6 +47,10 @@
 #include "usb_hid.h"
 #endif
 
+#if defined(USB_ENABLE_MTP)
+#include "usb_mtp.h"
+#endif
+
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
 
 #ifdef HAVE_AS3514
@@ -272,6 +276,24 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .disconnect = usb_hid_disconnect,
         .transfer_complete = usb_hid_transfer_complete,
         .control_request = usb_hid_control_request,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = NULL,
+#endif
+    },
+#ifdef USB_ENABLE_MTP
+    [USB_DRIVER_MTP] = {
+        .enabled = false,
+        .needs_exclusive_storage = false,
+        .first_interface = 0,
+        .last_interface = 0,
+        .request_endpoints = NULL,
+        .set_first_interface = NULL,
+        .get_config_descriptor = NULL,
+        .init_connection = NULL,
+        .init = NULL,
+        .disconnect = NULL,
+        .transfer_complete = NULL,
+        .control_request = NULL,
 #ifdef HAVE_HOTSWAP
         .notify_hotswap = NULL,
 #endif
