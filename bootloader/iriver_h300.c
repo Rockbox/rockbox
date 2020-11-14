@@ -146,6 +146,7 @@ void main(void)
     bool rtc_alarm;
     int button;
     int mask;
+    bool usb_charge = false;
 
     /* We want to read the buttons as early as possible, before the user
        releases the ON button */
@@ -246,6 +247,13 @@ void main(void)
         start_iriver_fw();
     }
 
+    /* enable usb charging for charge mode and disk mode */
+    if (usb_detect() == USB_INSERTED)
+    {
+        usb_charging_enable(USB_CHARGING_ENABLE);
+        usb_charge = true;
+    }
+
     if(charger_inserted())
     {
         const char charging_msg[] = "Charging...";
@@ -289,9 +297,6 @@ void main(void)
                 check_battery();
                 break;
             }
-
-            if(usb_detect() == USB_INSERTED)
-                request_start = true;
         }
         if(!request_start)
         {
@@ -338,6 +343,13 @@ void main(void)
 
         reset_screen();
         lcd_update();
+    }
+
+    /* disable usb charging if we enabled it earlier */
+    if (usb_charge)
+    {
+        usb_charging_enable(USB_CHARGING_DISABLE);
+        usb_charge = false;
     }
 
     rc = storage_init();
