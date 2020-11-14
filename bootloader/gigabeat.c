@@ -91,9 +91,9 @@ void main(void)
     if(GSTATUS3&0x02)
     {
         GSTATUS3&=0xFFFFFFFD;
-        if(!(GPGDAT&BUTTON_POWER) && charger_inserted())
+        if(!(GPGDAT&BUTTON_POWER) && raw_charger_inserted())
         {
-            while(!(GPGDAT&BUTTON_POWER) && charger_inserted())
+            while(!(GPGDAT&BUTTON_POWER) && raw_charger_inserted())
             {
                 char msg[20];
                 if(charging_state())

@@ -179,7 +179,7 @@ void main(void)
     
     if ((!on_button || button_hold())
         && (!rc_on_button || remote_button_hold())
-        && !charger_inserted())
+        && !raw_charger_inserted())
     {
         /* No need to check for USB connection here, as USB is handled
          * in the cowon loader. */
