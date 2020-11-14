@@ -141,8 +141,13 @@ static bool flash_get_info(const struct flash_info** out_info)
 {
     static const struct flash_info roms[] =
     {
+#if FLASH_SIZE == 2048 * 1024
         { 0x00BF, 0x2782, 2048 * 1024, "SST39VF160"  },
+#elif FLASH_SIZE == 4096 * 1024
         { 0x00BF, 0x235B, 4096 * 1024, "SST39VF3201" },
+#else
+#error "Unsupported rom chip."
+#endif
         {0}
     };
     static struct flash_info unknown_rom = {0};
