@@ -93,7 +93,7 @@ void TestServerInfo::testMain()
 
     unsigned int i;
     for(i = 0; i < sizeof(testdata) / sizeof(struct testvector); i++) {
-        QString result = ServerInfo::platformValue(testdata[i].target, testdata[i].entry).toString();
+        QString result = ServerInfo::platformValue(testdata[i].entry, testdata[i].target).toString();
         QCOMPARE(result, QString(testdata[i].expected));
     }
 }
