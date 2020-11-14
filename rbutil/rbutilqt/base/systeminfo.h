@@ -60,18 +60,18 @@ class SystemInfo : public QObject
         };
 
         enum PlatformInfo {
-            CurPlatformName,
-            CurManual,
-            CurBootloaderMethod,
-            CurBootloaderName,
-            CurBootloaderFile,
-            CurBootloaderFilter,
-            CurEncoder,
-            CurBrand,
-            CurName,
-            CurBuildserverModel,
-            CurConfigureModel,
-            CurPlayerPicture,
+            PlatformName,
+            Manual,
+            BootloaderMethod,
+            BootloaderName,
+            BootloaderFile,
+            BootloaderFilter,
+            Encoder,
+            Brand,
+            Name,
+            BuildserverModel,
+            ConfigureModel,
+            PlayerPicture,
         };
 
         enum PlatformType {

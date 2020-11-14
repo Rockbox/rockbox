@@ -82,7 +82,7 @@ void SelectiveInstallWidget::updateVersion(void)
     m_mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
     m_target = RbSettings::value(RbSettings::CurrentPlatform).toString();
     m_blmethod = SystemInfo::platformValue(
-            SystemInfo::CurBootloaderMethod, m_target).toString();
+            SystemInfo::BootloaderMethod, m_target).toString();
 
     if(m_logger != NULL) {
         delete m_logger;
@@ -237,7 +237,7 @@ void SelectiveInstallWidget::installBootloader(void)
         // create installer
         BootloaderInstallBase *bl =
             BootloaderInstallHelper::createBootloaderInstaller(this,
-                    SystemInfo::platformValue(SystemInfo::CurBootloaderMethod).toString());
+                    SystemInfo::platformValue(SystemInfo::BootloaderMethod).toString());
         if(bl == NULL) {
             m_logger->addItem(tr("No install method known."), LOGERROR);
             m_logger->setFinished();
@@ -254,7 +254,7 @@ void SelectiveInstallWidget::installBootloader(void)
         connect(m_logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
 
         // set bootloader filename. Do this now as installed() needs it.
-        QStringList blfile = SystemInfo::platformValue(SystemInfo::CurBootloaderFile).toStringList();
+        QStringList blfile = SystemInfo::platformValue(SystemInfo::BootloaderFile).toStringList();
         QStringList blfilepath;
         for(int a = 0; a < blfile.size(); a++) {
             blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
@@ -262,7 +262,7 @@ void SelectiveInstallWidget::installBootloader(void)
         }
         bl->setBlFile(blfilepath);
         QUrl url(SystemInfo::value(SystemInfo::BootloaderUrl).toString()
-                + SystemInfo::platformValue(SystemInfo::CurBootloaderName).toString());
+                + SystemInfo::platformValue(SystemInfo::BootloaderName).toString());
         bl->setBlUrl(url);
         bl->setLogfile(RbSettings::value(RbSettings::Mountpoint).toString()
                 + "/.rockbox/rbutil.log");
@@ -282,7 +282,7 @@ void SelectiveInstallWidget::installBootloader(void)
         else if(bl->installed() == BootloaderInstallBase::BootloaderOther
                 && bl->capabilities() & BootloaderInstallBase::Backup)
         {
-            QString targetFolder = SystemInfo::platformValue(SystemInfo::CurPlatformName).toString()
+            QString targetFolder = SystemInfo::platformValue(SystemInfo::PlatformName).toString()
                 + " Firmware Backup";
             // remove invalid character(s)
             targetFolder.remove(QRegExp("[:/]"));
@@ -319,7 +319,7 @@ void SelectiveInstallWidget::installBootloader(void)
             // open dialog to browse to of file
             QString offile;
             QString filter
-                = SystemInfo::platformValue(SystemInfo::CurBootloaderFilter).toString();
+                = SystemInfo::platformValue(SystemInfo::BootloaderFilter).toString();
             if(!filter.isEmpty()) {
                 filter = tr("Bootloader files (%1)").arg(filter) + ";;";
             }

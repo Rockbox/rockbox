@@ -409,7 +409,7 @@ BootloaderInstallBase::BootloaderType BootloaderInstallS5l::installed(void)
                 + "/.rockbox/rbutil.log";
     QSettings s(logfile, QSettings::IniFormat, this);
     QString section = SystemInfo::platformValue(
-                SystemInfo::CurBootloaderName).toString().section('/', -1);
+                SystemInfo::BootloaderName).toString().section('/', -1);
     rbblInstalled = s.contains("Bootloader/" + section);
 
     if (rbblInstalled) {

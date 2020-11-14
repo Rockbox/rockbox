@@ -26,29 +26,28 @@
 const static struct {
     SystemInfo::SystemInfos info;
     const char* name;
-    const char* def;
 } SystemInfosList[] = {
-    { SystemInfo::ManualUrl,            "manual_url",           "" },
-    { SystemInfo::BleedingUrl,          "bleeding_url",         "" },
-    { SystemInfo::BootloaderUrl,        "bootloader_url",       "" },
-    { SystemInfo::BootloaderInfoUrl,    "bootloader_info_url",  "" },
-    { SystemInfo::ReleaseFontUrl,       "release_font_url",     "" },
-    { SystemInfo::DailyFontUrl,         "daily_font_url",       "" },
-    { SystemInfo::DailyVoiceUrl,        "daily_voice_url",      "" },
-    { SystemInfo::ReleaseVoiceUrl,      "release_voice_url",    "" },
-    { SystemInfo::DoomUrl,              "doom_url",             "" },
-    { SystemInfo::Duke3DUrl,            "duke3d_url",           "" },
-    { SystemInfo::PuzzFontsUrl,         "puzzfonts_url",        "" },
-    { SystemInfo::QuakeUrl,             "quake_url",            "" },
-    { SystemInfo::Wolf3DUrl,            "wolf3d_url",           "" },
-    { SystemInfo::XWorldUrl,            "xworld_url",           "" },
-    { SystemInfo::ReleaseUrl,           "release_url",          "" },
-    { SystemInfo::DailyUrl,             "daily_url",            "" },
-    { SystemInfo::BuildInfoUrl,         "build_info_url",       "" },
-    { SystemInfo::GenlangUrl,           "genlang_url",          "" },
-    { SystemInfo::ThemesUrl,            "themes_url",           "" },
-    { SystemInfo::ThemesInfoUrl,        "themes_info_url",      "" },
-    { SystemInfo::RbutilUrl,            "rbutil_url",           "" },
+    { SystemInfo::ManualUrl,            "manual_url"          },
+    { SystemInfo::BleedingUrl,          "bleeding_url"        },
+    { SystemInfo::BootloaderUrl,        "bootloader_url"      },
+    { SystemInfo::BootloaderInfoUrl,    "bootloader_info_url" },
+    { SystemInfo::ReleaseFontUrl,       "release_font_url"    },
+    { SystemInfo::DailyFontUrl,         "daily_font_url"      },
+    { SystemInfo::DailyVoiceUrl,        "daily_voice_url"     },
+    { SystemInfo::ReleaseVoiceUrl,      "release_voice_url"   },
+    { SystemInfo::DoomUrl,              "doom_url"            },
+    { SystemInfo::Duke3DUrl,            "duke3d_url"          },
+    { SystemInfo::PuzzFontsUrl,         "puzzfonts_url"       },
+    { SystemInfo::QuakeUrl,             "quake_url"           },
+    { SystemInfo::Wolf3DUrl,            "wolf3d_url"          },
+    { SystemInfo::XWorldUrl,            "xworld_url"          },
+    { SystemInfo::ReleaseUrl,           "release_url"         },
+    { SystemInfo::DailyUrl,             "daily_url"           },
+    { SystemInfo::BuildInfoUrl,         "build_info_url"      },
+    { SystemInfo::GenlangUrl,           "genlang_url"         },
+    { SystemInfo::ThemesUrl,            "themes_url"          },
+    { SystemInfo::ThemesInfoUrl,        "themes_info_url"     },
+    { SystemInfo::RbutilUrl,            "rbutil_url"          },
 };
 
 const static struct {
@@ -56,18 +55,18 @@ const static struct {
     const char* name;
     const char* def;
 } PlatformInfosList[] = {
-    { SystemInfo::CurPlatformName,      ":platform:/name",      "" },
-    { SystemInfo::CurManual,            ":platform:/manualname","rockbox-:platform:" },
-    { SystemInfo::CurBootloaderMethod,  ":platform:/bootloadermethod", "none" },
-    { SystemInfo::CurBootloaderName,    ":platform:/bootloadername", "" },
-    { SystemInfo::CurBootloaderFile,    ":platform:/bootloaderfile", "" },
-    { SystemInfo::CurBootloaderFilter,  ":platform:/bootloaderfilter", "" },
-    { SystemInfo::CurEncoder,           ":platform:/encoder",   "" },
-    { SystemInfo::CurBrand,             ":platform:/brand",     "" },
-    { SystemInfo::CurName,              ":platform:/name",      "" },
-    { SystemInfo::CurBuildserverModel,  ":platform:/buildserver_modelname", "" },
-    { SystemInfo::CurConfigureModel,    ":platform:/configure_modelname", "" },
-    { SystemInfo::CurPlayerPicture,     ":platform:/playerpic", "" },
+    { SystemInfo::PlatformName,     ":platform:/name",      "" },
+    { SystemInfo::Manual,           ":platform:/manualname","rockbox-:platform:" },
+    { SystemInfo::BootloaderMethod, ":platform:/bootloadermethod", "none" },
+    { SystemInfo::BootloaderName,   ":platform:/bootloadername", "" },
+    { SystemInfo::BootloaderFile,   ":platform:/bootloaderfile", "" },
+    { SystemInfo::BootloaderFilter, ":platform:/bootloaderfilter", "" },
+    { SystemInfo::Encoder,          ":platform:/encoder",   "" },
+    { SystemInfo::Brand,            ":platform:/brand",     "" },
+    { SystemInfo::Name,             ":platform:/name",      "" },
+    { SystemInfo::BuildserverModel, ":platform:/buildserver_modelname", "" },
+    { SystemInfo::ConfigureModel,   ":platform:/configure_modelname", "" },
+    { SystemInfo::PlayerPicture,    ":platform:/playerpic", "" },
 };
 
 //! pointer to setting object to NULL
@@ -93,9 +92,8 @@ QVariant SystemInfo::value(enum SystemInfos info)
     while(SystemInfosList[i].info != info)
         i++;
     QString s = SystemInfosList[i].name;
-    QString d = SystemInfosList[i].def;
-    LOG_INFO() << "GET:" << s << systemInfos->value(s, d).toString();
-    return systemInfos->value(s, d);
+    LOG_INFO() << "GET:" << s << systemInfos->value(s).toString();
+    return systemInfos->value(s);
 }
 
 QVariant SystemInfo::platformValue(enum PlatformInfo info, QString platform)

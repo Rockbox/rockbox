@@ -49,8 +49,6 @@ class ServerInfo : public QObject
         static QVariant platformValue(enum ServerInfos setting, QString platform = "");
 
     private:
-        //! set a server info value
-        static void setValue(enum ServerInfos setting, QVariant value);
         //! set a value for a server info for a named platform.
         static void setPlatformValue(enum ServerInfos setting, QString platform, QVariant value);
         //! you shouldnt call this, its a fully static class

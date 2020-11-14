@@ -194,7 +194,7 @@ QString RbSettings::constructSettingPath(QString path, QString substitute)
         }
         else {
             path.replace(":tts:", userSettings->value("tts").toString());
-            path.replace(":encoder:", SystemInfo::platformValue(SystemInfo::CurEncoder, platform).toString());
+            path.replace(":encoder:", SystemInfo::platformValue(SystemInfo::Encoder, platform).toString());
         }
         path.replace(":platform:", platform);
     }

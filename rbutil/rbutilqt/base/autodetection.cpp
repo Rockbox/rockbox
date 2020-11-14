@@ -108,7 +108,7 @@ void Autodetection::detectUsb()
             LOG_WARNING() << "[USB] detected problem with player" << d.device;
         }
         QString idstring = QString("%1").arg(attached.at(i), 8, 16, QChar('0'));
-        if(!SystemInfo::platformValue(SystemInfo::CurName, idstring).toString().isEmpty()) {
+        if(!SystemInfo::platformValue(SystemInfo::Name, idstring).toString().isEmpty()) {
             struct Detected d;
             d.status = PlayerIncompatible;
             d.device = idstring;

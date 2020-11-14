@@ -390,11 +390,11 @@ void RbUtilQt::updateDevice()
 
     /* Enable bootloader installation, if possible */
     bool bootloaderInstallable =
-        SystemInfo::platformValue(SystemInfo::CurBootloaderMethod) != "none";
+        SystemInfo::platformValue(SystemInfo::BootloaderMethod) != "none";
 
     /* Enable bootloader uninstallation, if possible */
     bool bootloaderUninstallable = bootloaderInstallable &&
-        SystemInfo::platformValue(SystemInfo::CurBootloaderMethod) != "fwpatcher";
+        SystemInfo::platformValue(SystemInfo::BootloaderMethod) != "fwpatcher";
     ui.labelRemoveBootloader->setEnabled(bootloaderUninstallable);
     ui.buttonRemoveBootloader->setEnabled(bootloaderUninstallable);
     ui.actionRemove_bootloader->setEnabled(bootloaderUninstallable);
@@ -405,9 +405,9 @@ void RbUtilQt::updateDevice()
     ui.menuA_ctions->setEnabled(configurationValid);
 
     // displayed device info
-    QString brand = SystemInfo::platformValue(SystemInfo::CurBrand).toString();
+    QString brand = SystemInfo::platformValue(SystemInfo::Brand).toString();
     QString name
-        = QString("%1 (%2)").arg(SystemInfo::platformValue(SystemInfo::CurName).toString(),
+        = QString("%1 (%2)").arg(SystemInfo::platformValue(SystemInfo::Name).toString(),
             ServerInfo::platformValue(ServerInfo::CurStatus).toString());
     ui.labelDevice->setText(QString("<b>%1 %2</b>").arg(brand, name));
 
@@ -423,7 +423,7 @@ void RbUtilQt::updateDevice()
     }
 
     QPixmap pm;
-    QString m = SystemInfo::platformValue(SystemInfo::CurPlayerPicture).toString();
+    QString m = SystemInfo::platformValue(SystemInfo::PlayerPicture).toString();
     pm.load(":/icons/players/" + m + "-small.png");
     pm = pm.scaledToHeight(QFontMetrics(QApplication::font()).height() * 3);
     ui.labelPlayerPic->setPixmap(pm);
@@ -491,7 +491,7 @@ void RbUtilQt::installVoice()
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
-    QString model = SystemInfo::platformValue(SystemInfo::CurBuildserverModel).toString();
+    QString model = SystemInfo::platformValue(SystemInfo::BuildserverModel).toString();
     // replace placeholder in voice url
     voiceurl.replace("%MODEL%", model);
     voiceurl.replace("%RELVERSION%", relversion);
@@ -560,14 +560,14 @@ void RbUtilQt::uninstallBootloader(void)
     // create installer
     BootloaderInstallBase *bl
         = BootloaderInstallHelper::createBootloaderInstaller(this,
-                SystemInfo::platformValue(SystemInfo::CurBootloaderMethod).toString());
+                SystemInfo::platformValue(SystemInfo::BootloaderMethod).toString());
 
     if(bl == NULL) {
         logger->addItem(tr("No uninstall method for this target known."), LOGERROR);
         logger->setFinished();
         return;
     }
-    QStringList blfile = SystemInfo::platformValue(SystemInfo::CurBootloaderFile).toStringList();
+    QStringList blfile = SystemInfo::platformValue(SystemInfo::BootloaderFile).toStringList();
     QStringList blfilepath;
     for(int a = 0; a < blfile.size(); a++) {
         blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()

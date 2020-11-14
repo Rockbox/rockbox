@@ -65,9 +65,9 @@ void ManualWidget::downloadManual(void)
         QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
     }
-    QString manual = SystemInfo::platformValue(SystemInfo::CurManual).toString();
+    QString manual = SystemInfo::platformValue(SystemInfo::Manual).toString();
     if(manual.isEmpty()) {
-        manual = "rockbox-" + SystemInfo::platformValue(SystemInfo::CurBuildserverModel).toString();
+        manual = "rockbox-" + SystemInfo::platformValue(SystemInfo::BuildserverModel).toString();
     }
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);

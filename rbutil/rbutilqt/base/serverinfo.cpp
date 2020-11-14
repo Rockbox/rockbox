@@ -136,9 +136,9 @@ void ServerInfo::readBuildInfo(QString file)
         QString manualZipUrl = manualBaseUrl;
 
         QString buildservermodel = SystemInfo::platformValue(
-                SystemInfo::CurBuildserverModel, platforms.at(i)).toString();
+                SystemInfo::BuildserverModel, platforms.at(i)).toString();
         QString modelman = SystemInfo::platformValue(
-                SystemInfo::CurManual, platforms.at(i)).toString();
+                SystemInfo::Manual, platforms.at(i)).toString();
         QString manualBaseName = "rockbox-";
 
         if(modelman.isEmpty()) manualBaseName += buildservermodel;
