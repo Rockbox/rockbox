@@ -473,20 +473,6 @@ void main(void)
     if(rtc_alarm)
         printf("RTC alarm detected");
 
-    /* Don't start if the Hold button is active on the device you
-       are starting with */
-    if ((hold_status || recovery_mode) && !rtc_alarm &&
-        (usb_detect() != USB_INSERTED) && !charger_inserted())
-    {
-        if (detect_original_firmware())
-        {
-            printf("Hold switch on");
-            shutdown();
-        }
-
-        failsafe_menu();
-    }
-
     /* Holding REC while starting runs the original firmware */
     if (detect_original_firmware() && rec_button)
     {
@@ -605,10 +591,20 @@ void main(void)
         usb_charge = false;
     }
 
-    /* boot from flash if that is the default */
-    try_flashboot();
-    if (recovery_mode)
-        printf("Falling back to boot from disk");
+    /* recheck the hold switch status as it may have changed */
+    hold_status = (button_hold() || remote_button_hold());
+
+    /* hold switch shutdown or failsafe recovery mode */
+    if (hold_status || recovery_mode)
+    {
+        if (detect_original_firmware())
+        {
+            printf("Hold switch on");
+            shutdown();
+        }
+
+        failsafe_menu();
+    }
 
     rc = storage_init();
     if(rc)
