@@ -429,14 +429,12 @@ void main(void)
 
     adc_init();
     button_init();
+    sleep(HZ/50); /* Allow the button driver to check the buttons */
 
     /* Only check remote hold status if remote power button was actually used. */
     if (rc_on_button)
     {
         lcd_remote_init();
-
-        /* Allow the button driver to check the buttons */
-        sleep(HZ/50);
 
         if (remote_button_hold())
             hold_status = true;
@@ -476,8 +474,6 @@ void main(void)
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
 
-    /* No need to wait here more because lcd_init and others already do that. */
-    // sleep(HZ/50); /* Allow the button driver to check the buttons */
     rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC)
         || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
 
