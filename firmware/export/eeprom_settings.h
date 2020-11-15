@@ -26,7 +26,7 @@
 #include "inttypes.h"
 
 #define EEPROM_SETTINGS_VERSION   0x24c01002
-#define EEPROM_SETTINGS_BL_MINVER 7
+#define EEPROM_SETTINGS_BL_MINVER 8
 
 enum boot_methods {
     BOOT_DISK = 0,
