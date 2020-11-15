@@ -1,8 +1,9 @@
 About the text viewer plugin.
 
 Limitation
-    for the target which PLUGIN_BUFFER_SIZE < 0x13000 (i.e., archos series),
+    for targets where PLUGIN_BUFFER_SIZE < 0x13000,
     Only 999 pages can be read.
+    
 
 
 Difference between viewer.rock
@@ -29,17 +30,13 @@ Difference between viewer.rock
 
        [reflow]
            - indent changes is two spaces (changable in the settings).
-           - supports the player which does not define HAVE_LCD_BITMAP.
-
-    [alignment]
-           - the right alignment supports the player which does not define HAVE_LCD_BITMAP.
 
     [bookmark]
            - increased the number of bookmarks that can be registered to 16.
 
 
 TODO list
-  - for the target which PLUGIN_BUFFER_SIZE < 0x13000 (i.e., archos series),   
+  - for the target which PLUGIN_BUFFER_SIZE < 0x13000,   
     support more than 999 pages of text.
 
   - add History feature.
