@@ -105,11 +105,14 @@ static bool detect_valid_bootloader(const void* ptr, uint32_t size)
 #ifdef IRIVER_H100
         { 48760, 0x2efc3323 }, /* 7-pre4 */
         { 56896, 0x0cd8dad4 }, /* 7-pre5 */
+        { 53556, 0x3fa0ad95 }, /* 7 */
 #elif defined(IRIVER_H120)
         { 63788, 0x08ff01a9 }, /* 7-pre3, improved failsafe functions */
         { 48764, 0xc674323e }, /* 7-pre4. Fixed audio thump & remote bootup */
         { 56896, 0x167f5d25 }, /* 7-pre5, various ATA fixes */
+        { 53556, 0x9b960203 }, /* 7 */
 #elif defined(IRIVER_H300)
+        { 57048, 0x0219636d }, /* 7 */
 #endif
         {0}
     };
