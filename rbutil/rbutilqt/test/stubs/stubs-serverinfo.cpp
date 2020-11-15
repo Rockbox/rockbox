@@ -42,8 +42,7 @@ QVariant SystemInfo::value(SystemInfo::SystemInfos info)
 {
     switch(info) {
         case SystemInfo::ManualUrl:
-            //return QString("https://unittest/manual/rockbox-%MODEL%%FORMAT%");
-            return QString("https://unittest/manual/%MANUALBASENAME%.%EXTENSION%");
+            return QString("https://unittest/manual/rockbox-%MODEL%%FORMAT%");
             break;
         case SystemInfo::BleedingUrl:
             return QString("https://unittest/dev/rockbox-%MODEL%.zip");

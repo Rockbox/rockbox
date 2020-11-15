@@ -22,6 +22,10 @@
 #define SERVERINFO_H
 
 #include <QtCore>
+#define STATUS_RETIRED  0
+#define STATUS_UNUSABLE 1
+#define STATUS_UNSTABLE 2
+#define STATUS_STABLE   3
 
 class ServerInfo : public QObject
 {
@@ -47,10 +51,10 @@ class ServerInfo : public QObject
         static void readBuildInfo(QString file);
         //! get a value from server info for a named platform.
         static QVariant platformValue(enum ServerInfos setting, QString platform = "");
+        //! Convert status number to string
+        static QString statusToString(int status);
 
     private:
-        //! set a value for a server info for a named platform.
-        static void setPlatformValue(enum ServerInfos setting, QString platform, QVariant value);
         //! you shouldnt call this, its a fully static class
         ServerInfo() {}
 
