@@ -25,7 +25,6 @@ INCLUDEPATH += . ../base stubs
 SOURCES += \
     test-serverinfo.cpp \
     stubs/stubs-serverinfo.cpp \
-    ../base/systeminfo.cpp \
     ../base/serverinfo.cpp
 
 HEADERS += \
