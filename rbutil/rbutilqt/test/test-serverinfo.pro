@@ -14,7 +14,8 @@
 #
 
 #
-include(tests.pri)
+
+QT += testlib
 
 TEMPLATE = app
 TARGET = test-serverinfo
@@ -23,8 +24,7 @@ INCLUDEPATH += . ../base stubs
 # Input
 SOURCES += \
     test-serverinfo.cpp \
-    ../base/rbsettings.cpp \
-    ../base/rockboxinfo.cpp \
+    stubs/stubs-serverinfo.cpp \
     ../base/systeminfo.cpp \
     ../base/serverinfo.cpp
 
