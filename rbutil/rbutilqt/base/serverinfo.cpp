@@ -81,14 +81,8 @@ QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
         value = ServerInfo::statusToString(value.toInt());
         break;
     case CurReleaseVersion:
-        value = value.toStringList().at(0);
-        break;
     case RelCandidateVersion:
-        // currently only the <version>,<url> format is supported here.
-        if (value.toStringList().size() > 1)
-            value = value.toStringList().at(0);
-        else
-            value.clear();
+        value = value.toStringList().at(0);
         break;
     case CurReleaseUrl:
         {
