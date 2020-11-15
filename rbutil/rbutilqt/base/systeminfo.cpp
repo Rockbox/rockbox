@@ -42,6 +42,7 @@ const static struct {
     { SystemInfo::Wolf3DUrl,            "wolf3d_url"          },
     { SystemInfo::XWorldUrl,            "xworld_url"          },
     { SystemInfo::ReleaseUrl,           "release_url"         },
+    { SystemInfo::CandidateUrl,         "rc_url"              },
     { SystemInfo::DailyUrl,             "daily_url"           },
     { SystemInfo::BuildInfoUrl,         "build_info_url"      },
     { SystemInfo::GenlangUrl,           "genlang_url"         },

@@ -53,6 +53,9 @@ QVariant SystemInfo::value(SystemInfo::SystemInfos info)
         case SystemInfo::ReleaseUrl:
             return QString("https://unittest/release/%RELVERSION%/rockbox-%MODEL%-%RELVERSION%.zip");
             break;
+        case SystemInfo::CandidateUrl:
+            return QString("https://unittest/rc/%RELVERSION%/rockbox-%MODEL%-%RELVERSION%.zip");
+            break;
         default:
             return QString();
     }

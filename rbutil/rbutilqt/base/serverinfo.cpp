@@ -85,21 +85,20 @@ QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
         value = value.toStringList().at(0);
         break;
     case CurReleaseUrl:
+    case RelCandidateUrl:
         {
             QString version = value.toStringList().at(0);
             if(value.toStringList().size() > 1)
                 value = value.toStringList().at(1);
-            else if(!version.isEmpty()) // if value is empty, return empty url.
+            else if(!version.isEmpty() && info == CurReleaseUrl)
                 value = SystemInfo::value(SystemInfo::ReleaseUrl).toString()
                     .replace("%MODEL%", platform)
                     .replace("%RELVERSION%", version);
+            else if(!version.isEmpty() && info == RelCandidateUrl)
+                value = SystemInfo::value(SystemInfo::CandidateUrl).toString()
+                    .replace("%MODEL%", platform)
+                    .replace("%RELVERSION%", version);
         }
-        break;
-    case RelCandidateUrl:
-        if(value.toStringList().size() > 1)
-            value = value.toStringList().at(1);
-        else
-            value.clear();
         break;
     case CurDevelUrl:
         value = SystemInfo::value(SystemInfo::BleedingUrl).toString()

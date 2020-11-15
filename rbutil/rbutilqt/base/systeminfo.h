@@ -50,6 +50,7 @@ class SystemInfo : public QObject
             Wolf3DUrl,
             XWorldUrl,
             ReleaseUrl,
+            CandidateUrl,
             ReleaseVoiceUrl,
             ReleaseFontUrl,
             BuildInfoUrl,
