@@ -65,10 +65,7 @@ void ManualWidget::downloadManual(void)
         QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
     }
-    QString manual = SystemInfo::platformValue(SystemInfo::Manual).toString();
-    if(manual.isEmpty()) {
-        manual = "rockbox-" + SystemInfo::platformValue(SystemInfo::BuildserverModel).toString();
-    }
+    QString manual = ServerInfo::platformValue(ServerInfo::ManualPdfUrl).toString();
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
@@ -81,13 +78,11 @@ void ManualWidget::downloadManual(void)
         installer->setUrl(ServerInfo::platformValue(
                     ServerInfo::ManualPdfUrl, m_platform).toString());
         installer->setLogSection("Manual (PDF)");
-        installer->setTarget("/" + manual + ".pdf");
     }
     else {
         installer->setUrl(ServerInfo::platformValue(
                     ServerInfo::ManualZipUrl, m_platform).toString());
         installer->setLogSection("Manual (HTML)");
-        installer->setTarget("/" + manual + "-" + "-html.zip");
     }
     installer->setLogVersion();
     installer->setUnzip(false);
