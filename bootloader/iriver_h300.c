@@ -211,25 +211,24 @@ void try_flashboot(void)
     if (!firmware_settings.initialized)
         return ;
 
-   switch (firmware_settings.bootmethod)
+    switch (firmware_settings.bootmethod)
     {
         case BOOT_DISK:
             return;
 
         case BOOT_ROM:
             start_flashed_romimage();
-            recovery_mode = true;
             break;
 
         case BOOT_RAM:
             start_flashed_ramimage();
-            recovery_mode = true;
             break;
 
-        default:
-            recovery_mode = true;
-            return;
+        case BOOT_RECOVERY:
+            break;
     }
+
+    recovery_mode = true;
 }
 
 void failsafe_menu(void)
@@ -429,10 +428,12 @@ void main(void)
 
     /* Power on the hard drive early, to speed up the loading. */
     if (!hold_status && !recovery_mode)
+    {
         ide_power_enable(true);
 
-    if (!hold_status && (usb_detect() != USB_INSERTED) && !recovery_mode)
-        try_flashboot();
+        if (usb_detect() != USB_INSERTED)
+            try_flashboot();
+    }
 
     lcd_init();
     lcd_remote_init();
