@@ -425,6 +425,22 @@ void main(void)
 
     adc_init();
     button_init();
+    sleep(HZ/50); /* Allow the button driver to check the buttons */
+
+    /* Only check remote hold status if remote power button was actually used. */
+    if (rc_on_button)
+    {
+        lcd_remote_init();
+
+        if (remote_button_hold())
+            hold_status = true;
+    }
+
+    /* Check main hold switch status too. */
+    if (on_button && button_hold())
+    {
+        hold_status = true;
+    }
 
     /* Power on the hard drive early, to speed up the loading. */
     if (!hold_status && !recovery_mode)
@@ -436,7 +452,10 @@ void main(void)
     }
 
     lcd_init();
-    lcd_remote_init();
+
+    if (!rc_on_button)
+        lcd_remote_init();
+
     font_init();
 
     lcd_setfont(FONT_SYSFIXED);
@@ -446,7 +465,6 @@ void main(void)
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
 
-    sleep(HZ/50); /* Allow the button driver to check the buttons */
     rec_button = ((button_status() & BUTTON_REC) == BUTTON_REC)
         || ((button_status() & BUTTON_RC_REC) == BUTTON_RC_REC);
 
@@ -457,11 +475,6 @@ void main(void)
 
     /* Don't start if the Hold button is active on the device you
        are starting with */
-    if ((on_button && button_hold()) ||
-         (rc_on_button && remote_button_hold()))
-    {
-        hold_status = true;
-    }
     if ((hold_status || recovery_mode) && !rtc_alarm &&
         (usb_detect() != USB_INSERTED) && !charger_inserted())
     {
