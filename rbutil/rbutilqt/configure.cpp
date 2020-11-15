@@ -386,8 +386,8 @@ void Config::setDevices()
             // construct display name
             QString curname = SystemInfo::platformValue(
                                 SystemInfo::Name, platformList.at(it)).toString() +
-                " (" +ServerInfo::platformValue(
-                            ServerInfo::CurStatus, platformList.at(it)).toString() +")";
+                " (" + ServerInfo::statusToString(ServerInfo::platformValue(
+                            ServerInfo::CurStatus, platformList.at(it)).toInt()) +")";
             LOG_INFO() << "add supported device:" << brands.at(c) << curname;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
             w2->setData(0, Qt::UserRole, platformList.at(it));

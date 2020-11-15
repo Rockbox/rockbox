@@ -27,18 +27,19 @@ static QSettings* serverSettings = nullptr;
 const static struct {
     ServerInfo::ServerInfos info;
     const char* name;
+    const char* def;
 } ServerInfoList[] = {
-    { ServerInfo::CurReleaseVersion,    "release/:platform:"            },
-    { ServerInfo::CurReleaseUrl,        "release/:platform:"            },
-    { ServerInfo::RelCandidateVersion,  "release-candidate/:platform:"  },
-    { ServerInfo::RelCandidateUrl,      "release-candidate/:platform:"  },
-    { ServerInfo::CurStatus,            "status/:platform:"             },
-    { ServerInfo::ManualPdfUrl,         ""                              },
-    { ServerInfo::ManualHtmlUrl,        ""                              },
-    { ServerInfo::ManualZipUrl,         ""                              },
-    { ServerInfo::BleedingRevision,     "bleeding/rev"                  },
-    { ServerInfo::BleedingDate,         "bleeding/timestamp"            },
-    { ServerInfo::CurDevelUrl,          ""                              },
+    { ServerInfo::CurReleaseVersion,    "release/:platform:",           "" },
+    { ServerInfo::CurReleaseUrl,        "release/:platform:",           "" },
+    { ServerInfo::RelCandidateVersion,  "release-candidate/:platform:", "" },
+    { ServerInfo::RelCandidateUrl,      "release-candidate/:platform:", "" },
+    { ServerInfo::CurStatus,            "status/:platform:",            "-1" },
+    { ServerInfo::ManualPdfUrl,         "",                             "" },
+    { ServerInfo::ManualHtmlUrl,        "",                             "" },
+    { ServerInfo::ManualZipUrl,         "",                             "" },
+    { ServerInfo::BleedingRevision,     "bleeding/rev",                 "" },
+    { ServerInfo::BleedingDate,         "bleeding/timestamp",           "" },
+    { ServerInfo::CurDevelUrl,          "",                             "" },
 };
 
 QMap<QString, QVariant> ServerInfo::serverInfos;
@@ -73,13 +74,10 @@ QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
     // get value
     QVariant value = QString();
     if(!s.isEmpty() && serverSettings)
-        value = serverSettings->value(s, "");
+        value = serverSettings->value(s, ServerInfoList[i].def);
 
     // depending on the actual value we need more replacements.
     switch(info) {
-    case ServerInfo::CurStatus:
-        value = ServerInfo::statusToString(value.toInt());
-        break;
     case CurReleaseVersion:
     case RelCandidateVersion:
         value = value.toStringList().at(0);

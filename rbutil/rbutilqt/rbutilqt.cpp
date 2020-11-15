@@ -408,7 +408,7 @@ void RbUtilQt::updateDevice()
     QString brand = SystemInfo::platformValue(SystemInfo::Brand).toString();
     QString name
         = QString("%1 (%2)").arg(SystemInfo::platformValue(SystemInfo::Name).toString(),
-            ServerInfo::platformValue(ServerInfo::CurStatus).toString());
+            ServerInfo::statusToString(ServerInfo::platformValue(ServerInfo::CurStatus).toInt()));
     ui.labelDevice->setText(QString("<b>%1 %2</b>").arg(brand, name));
 
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
