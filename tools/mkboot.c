@@ -23,6 +23,13 @@
 #include <string.h>
 #include "mkboot.h"
 
+#define SECTOR_SIZE 0x200
+#define RAW_IMAGE_SIZE 0x400000
+#define TOTAL_IMAGE_SIZE (RAW_IMAGE_SIZE + HEADER2_SIZE)
+#define ALIGNED_IMAGE_SIZE (TOTAL_IMAGE_SIZE + SECTOR_SIZE - (TOTAL_IMAGE_SIZE % SECTOR_SIZE))
+#define HEADER1_SIZE SECTOR_SIZE
+#define HEADER2_SIZE 0x20
+
 #ifndef RBUTIL
 static void usage(void)
 {
@@ -63,7 +70,12 @@ int main(int argc, char *argv[])
 }
 #endif
 
-static unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
+/*
+ * initial header size plus
+ * the rounded up size (includes the raw data and its length header) plus
+ * the checksums for the raw data and its length header
+ */
+static unsigned char image[ALIGNED_IMAGE_SIZE + HEADER1_SIZE + ALIGNED_IMAGE_SIZE / SECTOR_SIZE];
 
 int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile, int origin)
 {
