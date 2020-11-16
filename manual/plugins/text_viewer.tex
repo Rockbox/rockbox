@@ -197,25 +197,19 @@ by using \emph{Open with} from the \emph{Context Menu}
     \begin{description}
     \item[Encoding] Set the codepage in the text viewer.
     Available settings:
-    \setting{ISO-8859-1} (Latin 1).
+    \setting{ISO-8859-1} (Latin 1),
     \setting{ISO-8859-7} (Greek),
-    \opt{lcd_bitmap}{
-        \setting{ISO-8859-8} (Hebrew),
-    }
+    \setting{ISO-8859-8} (Hebrew),
     \setting{CP1251} (Cyrillic),
-    \opt{lcd_bitmap}{
-        \setting{ISO-8859-11} (Thai),
-        \setting{CP1256} (Arabic),
-    }
+    \setting{ISO-8859-11} (Thai),
+    \setting{CP1256} (Arabic),
     \setting{ISO-8859-9} (Turkish),
     \setting{ISO-8859-2} (Latin Extended),
     \setting{CP1250} (Central European),
-    \opt{lcd_bitmap}{
-        \setting{SJIS} (Japanese),
-        \setting{GB-2312} (Simple Chinese),
-        \setting{KSX-1001} (Korean),
-        \setting{BIG5} (Traditional Chinese),
-    }
+    \setting{SJIS} (Japanese),
+    \setting{GB-2312} (Simple Chinese),
+    \setting{KSX-1001} (Korean),
+    \setting{BIG5} (Traditional Chinese),
     \setting{UTF-8} (Unicode),
     This setting only applies to the plugin and is independent from the
     \setting{Default Codepage} setting (see \reference{ref:Defaultcodepage}).
@@ -230,9 +224,7 @@ by using \emph{Open with} from the \emph{Context Menu}
             \item[Join] Join lines together.
             \item[Expand] Add a blank line at newlines. Useful for making paragraphs
             clearer in some book style text files.
-            \opt{lcd_bitmap}{
             \item[Reflow Lines] Justify the text.
-            }
         \end{description}
     \item[Screens Per Page] Set the number of screens per page. Available
       options are \setting{1} to \setting{5} screens per page.
@@ -242,7 +234,6 @@ by using \emph{Open with} from the \emph{Context Menu}
             (Useful for displaying right-to-left languages, such as Arabic or Hebrew)
             \item[Left] Set the text alignment to the left.
         \end{description}
-    \opt{lcd_bitmap}{
     \item[Show Header] Select whether to show the header. The header displays the file path. 
         \begin{description}
             \item[No] Do not display the header.
@@ -263,7 +254,6 @@ by using \emph{Open with} from the \emph{Context Menu}
             \item[No] Do not display the status bar.
             \item[Yes] Display the status bar.
         \end{description}
-    }
     \item[Scroll Settings] The scrolling settings submenu.
         \begin{description}
             \item[Horizontal] Submenu for horizontal scrolling settings.
@@ -299,14 +289,12 @@ by using \emph{Open with} from the \emph{Context Menu}
                             \item[Scroll by Page] Scroll up or down one full screen.
                             \item[Scroll by Line] Scroll up or down one line.
                         \end{description}
-                    \opt{lcd_bitmap}{
                     \item[Overlap Pages] Set whether the last line from the
                     previous screen is retained when scrolling pages.
                         \begin{description}
                            \item[No] Do not retain previous line.
                            \item[Yes] Retain previous line.
                         \end{description}
-                    }
                     \item[Auto-scroll Speed] Control the speed of auto-scrolling
                     in number of lines per second.  Available options are
                     \setting{1} to \setting{10} lines per second. As an example,

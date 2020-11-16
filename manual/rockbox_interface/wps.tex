@@ -3,26 +3,24 @@
 The While Playing Screen (WPS) displays various pieces of information about the
 currently playing audio file.
 %
-\opt{lcd_bitmap}{%
-  The appearance of the WPS can be configured using WPS configuration files.
-  The items shown depend on your configuration -- all items can be turned on
-  or off independently. Refer to \reference{ref:wps_tags} for details on how
-  to change the display of the WPS.
-  \begin{itemize}
-  \item Status bar: The Status bar shows Battery level, charger status,
-    volume, play mode, repeat mode, shuffle mode\opt{rtc}{ and clock}.
-    In contrast to all other items, the status bar is always at the top of
-    the screen.
-  \item (Scrolling) path and filename of the current song.
-  \item The ID3 track name.
-  \item The ID3 album name.
-  \item The ID3 artist name.
-  \item Bit rate. VBR files display average bitrate and ``(avg)''
-  \item Elapsed and total time.
-  \item A slidebar progress meter representing where in the song you are.
-  \item Peak meter.
-  \end{itemize}
-}
+The appearance of the WPS can be configured using WPS configuration files.
+The items shown depend on your configuration -- all items can be turned on
+or off independently. Refer to \reference{ref:wps_tags} for details on how
+to change the display of the WPS.
+\begin{itemize}
+\item Status bar: The Status bar shows Battery level, charger status,
+  volume, play mode, repeat mode, shuffle mode\opt{rtc}{ and clock}.
+  In contrast to all other items, the status bar is always at the top of
+  the screen.
+\item (Scrolling) path and filename of the current song.
+\item The ID3 track name.
+\item The ID3 album name.
+\item The ID3 artist name.
+\item Bit rate. VBR files display average bitrate and ``(avg)''
+\item Elapsed and total time.
+\item A slidebar progress meter representing where in the song you are.
+\item Peak meter.
+\end{itemize}
 %
 
 See \reference{ref:ConfiguringtheWPS} for details of customising
@@ -138,44 +136,43 @@ your WPS (While Playing Screen).
   \end{btnmap}
 
 
-\opt{lcd_bitmap}{
-  \subsection{\label{ref:peak_meter}Peak Meter}
-  The peak meter can be displayed on the While Playing Screen and consists of
-  several indicators.
-  \opt{recording}{
-    For a picture of the peak meter, please see the While
-    Recording Screen in \reference{ref:while_recording_screen}.
-  }
-  \opt{ipodvideo}{
-    \note{Especially the \playerman{} \playertype{}'s performance and battery runtime
-     suffers when this feature is enabled. For this \dap{} it is highly recommended
-     to not use peak meter.}
-  }
-
-  \begin{description}
-  \item [The bar:]
-    This is the wide horizontal bar. It represents the current volume value.
-  \item [The peak indicator:]
-    This is a little vertical line at the right end of the bar. It indicates
-    the peak volume value that occurred recently.
-  \item [The clip indicator:]
-    This is a little black block that is displayed at the very right of the
-    scale when an overflow occurs. It usually does not show up during normal
-    playback unless you play an audio file that is distorted heavily.
-    \opt{recording}{
-      If you encounter clipping while recording, your recording will sound distorted.
-      You should lower the gain.
-    }
-    \note{Note that the clip detection is not very precise.
-     Clipping might occur without being indicated.}
-  \item [The scale:]
-    Between the indicators of the right and left channel there are little dots.
-    These dots represent important volume values. In linear mode each dot is a
-    10\% mark. In dBFS mode the dots represent the following values (from right
-    to left): 0~dB, {}-3~dB, {}-6~dB, {}-9~dB, {}-12~dB, {}-18~dB, {}-24~dB, {}-30~dB,
-    {}-40~dB, {}-50~dB, {}-60~dB.
-  \end{description}
+\subsection{\label{ref:peak_meter}Peak Meter}
+The peak meter can be displayed on the While Playing Screen and consists of
+several indicators.
+\opt{recording}{
+  For a picture of the peak meter, please see the While
+  Recording Screen in \reference{ref:while_recording_screen}.
 }
+\opt{ipodvideo}{
+  \note{Especially the \playerman{} \playertype{}'s performance and battery runtime
+   suffers when this feature is enabled. For this \dap{} it is highly recommended
+   to not use peak meter.}
+}
+
+\begin{description}
+\item [The bar:]
+  This is the wide horizontal bar. It represents the current volume value.
+\item [The peak indicator:]
+  This is a little vertical line at the right end of the bar. It indicates
+  the peak volume value that occurred recently.
+\item [The clip indicator:]
+  This is a little black block that is displayed at the very right of the
+  scale when an overflow occurs. It usually does not show up during normal
+  playback unless you play an audio file that is distorted heavily.
+  \opt{recording}{
+    If you encounter clipping while recording, your recording will sound distorted.
+    You should lower the gain.
+  }
+  \note{Note that the clip detection is not very precise.
+   Clipping might occur without being indicated.}
+\item [The scale:]
+  Between the indicators of the right and left channel there are little dots.
+  These dots represent important volume values. In linear mode each dot is a
+  10\% mark. In dBFS mode the dots represent the following values (from right
+  to left): 0~dB, {}-3~dB, {}-6~dB, {}-9~dB, {}-12~dB, {}-18~dB, {}-24~dB, {}-30~dB,
+  {}-40~dB, {}-50~dB, {}-60~dB.
+\end{description}
+
 \subsection{\label{sec:contextmenu}The WPS Context Menu}
 Like the context menu for the \setting{File Browser}, the \setting{WPS Context Menu}
 allows you quick access to some often used functions.
@@ -267,7 +264,6 @@ This may even be the whole track.
   The rate can be changed in two modes: procentual and semitone.
   Initially, procentual mode is active.
 
-  \opt{swcodec}{
     If you've enabled the \setting{Timestretch} option in
     \setting{Sound Settings} and have since rebooted, you can also use
     timestretch mode. This allows you to change the playback speed
@@ -278,73 +274,43 @@ This may even be the whole track.
     limitations of the algorithm, speed is limited to be between 35\%
     and 250\% of the current pitch value.  Pitch must maintain the
     same ratio as well as remain between 50\% and 200\%.
-  }
 
-  The value of the \opt{swcodec}{rate, pitch and speed}\nopt{swcodec}{rate}
+  The value of the rate, pitch and speed
   is not persistent, i.e. after the \dap\ is turned on it will
-  always be set to 100\%.  \opt{swcodec}{ However, the rate, pitch and speed
+  always be set to 100\%.  However, the rate, pitch and speed
   information will be stored in any bookmarks you may create
   (see \reference{ref:Bookmarkconfigactual}) and will be restored upon
-  playing back those bookmarks.}
+  playing back those bookmarks.
 
-  \nopt{swcodec}{
-      \begin{btnmap}
-        \ActionPsToggleMode
-        & Toggle pitch changing mode. \\
-        %
-        \ActionPsIncSmall{} / \ActionPsDecSmall
-        & Increase~/ Decrease pitch by 0.1\% (in procentual mode) or by 0.1
-          semitone (in semitone mode).\\
-        %
-        \ActionPsIncBig{} / \ActionPsDecBig
-        & Increase~/ Decrease pitch by 1\% (in procentual mode) or a semitone
-          (in semitone mode).\\
-        %
-        \ActionPsNudgeLeft{} / \ActionPsNudgeRight
-        & Temporarily change pitch by 2\% (beatmatch). \\
-        %
-        \ActionPsReset
-        & Reset rate to 100\%. \\
-        %
-        \ActionPsExit
-        & Leave the \setting{Pitch Screen}. \\
-        %
-      \end{btnmap}
-
-    \warn{Changing the pitch can cause audible `Artifacts' or `Dropouts'.}
-  }
-
-  \opt{swcodec}{
-      \begin{btnmap}
-        \ActionPsToggleMode
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsToggleMode}
-        & Toggle pitch changing mode (cycle through all available modes).\\
-        %
-        \ActionPsIncSmall{} / \ActionPsDecSmall
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncSmall{} / \ActionRCPsDecSmall}
-        & Increase~/ Decrease pitch by 0.1\% (in procentual mode) or 0.1
-          semitone (in semitone mode).\\
-        %
-        \nopt{PBELL_VIBE500_PAD}{ % there is no long scroll up or down because of slide
-        \ActionPsIncBig{} / \ActionPsDecBig
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
-        & Increase~/ Decrease pitch by 1\% (in procentual mode) or a semitone
-          (in semitone mode).\\
-        }
-        %
-        \ActionPsNudgeLeft{} / \ActionPsNudgeRight
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsNudgeLeft{} / \ActionRCPsNudgeRight}
-        & Temporarily change pitch by 2\% (beatmatch), or modify speed (in timestretch mode).\\
-        %
-        \ActionPsReset
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsReset}
-        & Reset pitch and speed to 100\%. \\
-        %
-        \ActionPsExit
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsExit}
-        & Leave the \setting{Pitch Screen}. \\
-        %
-      \end{btnmap}
-  }
+  \begin{btnmap}
+    \ActionPsToggleMode
+    \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsToggleMode}
+    & Toggle pitch changing mode (cycle through all available modes).\\
+    %
+    \ActionPsIncSmall{} / \ActionPsDecSmall
+    \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncSmall{} / \ActionRCPsDecSmall}
+    & Increase~/ Decrease pitch by 0.1\% (in procentual mode) or 0.1
+      semitone (in semitone mode).\\
+    %
+    \nopt{PBELL_VIBE500_PAD}{ % there is no long scroll up or down because of slide
+    \ActionPsIncBig{} / \ActionPsDecBig
+    \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsIncBig{} / \ActionRCPsDecBig}
+    & Increase~/ Decrease pitch by 1\% (in procentual mode) or a semitone
+      (in semitone mode).\\
+    }
+    %
+    \ActionPsNudgeLeft{} / \ActionPsNudgeRight
+    \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsNudgeLeft{} / \ActionRCPsNudgeRight}
+    & Temporarily change pitch by 2\% (beatmatch), or modify speed (in timestretch mode).\\
+    %
+    \ActionPsReset
+    \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsReset}
+    & Reset pitch and speed to 100\%. \\
+    %
+    \ActionPsExit
+    \opt{HAVEREMOTEKEYMAP}{& \ActionRCPsExit}
+    & Leave the \setting{Pitch Screen}. \\
+    %
+  \end{btnmap}
 
 }

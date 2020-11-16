@@ -37,8 +37,8 @@ Any other tags and lines without time tags are ignored.
 
 \subsubsection{Location of lyrics files}
 The plugin checks the following directories for lyrics files.
-\opt{swcodec}{If no lyrics file is found and the audio file is a \fname{.mp3},
-  it also checks for SYLT and USLT tags in the id3v2 tags.}
+If no lyrics file is found and the audio file is a \fname{.mp3},
+it also checks for SYLT and USLT tags in the id3v2 tags.
 
 \begin{enumerate}
 \item The directory containing the audio file and its parent directories.
@@ -116,10 +116,8 @@ same order as in that list.
 \begin{description}
   \item[Theme settings.] Change theme related settings.
   \begin{description}
-    \opt{lcd_bitmap}{%
-      \item[Show Statusbar.] Show / hide the statusbar.
-      \item[Display Title.] Show / hide the track title.
-    }%
+    \item[Show Statusbar.] Show / hide the statusbar.
+    \item[Display Title.] Show / hide the track title.
     \item[Display Time.] Show / hide the current time.
     \opt{lcd_color}{%
       \item[Inactive Colour.] Set the colour of the inactive part of the lyrics.
@@ -127,22 +125,18 @@ same order as in that list.
     \item[Backlight Force On.] Do not turn off the backlight while displaying
          the lyrics.
   \end{description}
-  \opt{lcd_bitmap}{%
-    \item[Display Settings.] Change how the lyrics are displayed.
-    \begin{description}
-      \item[Wrap.] Breaks lines at white space.
-      \item[Wipe.] Wipes the text.
-      \item[Alignment.] Align text to the left, centre, or right.
-      \item[Activate Only Current Line.]
-          Activate only the current line, or the current and previous lines.
-    \end{description}
-  }%
+  \item[Display Settings.] Change how the lyrics are displayed.
+  \begin{description}
+    \item[Wrap.] Breaks lines at white space.
+    \item[Wipe.] Wipes the text.
+    \item[Alignment.] Align text to the left, centre, or right.
+    \item[Activate Only Current Line.]
+        Activate only the current line, or the current and previous lines.
+  \end{description}
   \item[Lyrics Settings.] Change how the lyrics files are loaded.
   \begin{description}
     \item[Encoding.] Sets the codepage used in the plugin.
-    \opt{swcodec}{%
-      \item[Read ID3 tag.] Read lyrics from id3 tags in mp3 files.
-    }%
+    \item[Read ID3 tag.] Read lyrics from id3 tags in mp3 files.
     \item[Lrc Directory.] Set the directory where lyrics files are stored,
       must be a maximum of 63 bytes.
   \end{description}

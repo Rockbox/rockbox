@@ -159,11 +159,10 @@ or \config{\%D(2)}), produce the information for the next file to be played.
 \section{Playlist/Song Info}
   \begin{tagmap}
     \config{\%pb} & Progress Bar.
-    \opt{lcd_bitmap}{
-           This will replace the entire line with a progress bar.
-           You can set the position, width and height of the progressbar
-           (in pixels) and load a custom image for it:
-           \config{\%pb(x,y,[width],[height],image.bmp)}} \\
+       This will replace the entire line with a progress bar.
+       You can set the position, width and height of the progressbar
+       (in pixels) and load a custom image for it:
+       \config{\%pb(x,y,[width],[height],image.bmp)} \\
     \config{\%px} & Percentage played in song\\
     \config{\%pc} & Current time in song\\
     \config{\%pe} & Total number of playlist entries\\
@@ -181,8 +180,8 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%pv} & Current volume (in dB). Can also be used in a conditional:
            \config{\%?pv<Mute|\ldots|0 dB|Above 0 dB>}\newline
            Mute is 0\% volume, \ldots is the values between Mute and max, 0 dB is max volume, and Above 0 dB is amplified volume
-         \opt{lcd_bitmap}{This can also be used like \%pb to provide a continuous scale:
-         \config{\%pv(x,y,[width],[height],image.bmp)}} \\
+         This can also be used like \%pb to provide a continuous scale:
+         \config{\%pv(x,y,[width],[height],image.bmp)} \\
     \config{\%pS} & Track is starting. An optional number gives how many seconds
          the tag remains true for after the start of the track. The default is
          10 seconds if no number is specified.
@@ -227,20 +226,16 @@ or \config{\%D(2)}), produce the information for the next file to be played.
     \config{\%ra} & Autoscore for the song\\
   \end{tagmap}
 
-\opt{swcodec}{
 \section{Sound (DSP) settings}
   \begin{tagmap}
     \config{\%Sp} & Current playback pitch \\
-  \opt{swcodec}{
     \config{\%xf} & Crossfade setting, in the order: Off, Auto Skip, Man Skip,
            Shuffle, Shuffle and Man Skip, Always\\
     \config{\%rg} & ReplayGain value in use (x.y~dB). If used as a conditional,
            Replaygain type in use: \config{\%?rg<Off|Track%
            |Album|TrackShuffle|AlbumShuffle%
            |No tag>}\\
-  }
   \end{tagmap}
-}
 
 \section{Hold}
     \begin{tagmap}
@@ -360,13 +355,11 @@ Examples:
 \end{enumerate}
 
 
-\opt{lcd_bitmap}{
 \section{\label{ref:wps_images}Images}
   \begin{tagmap}
     \config{\%X(filename.bmp)}
         & Load and set a backdrop image for the WPS.
           This image must be exactly the same size as your LCD.\\
-    }%
     \config{\%x(n,filename[,x,y])}
         & Load and display an image\newline
           \config{n}: image ID for later referencing in \config{\%xd}\newline
