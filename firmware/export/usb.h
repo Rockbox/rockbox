@@ -145,6 +145,13 @@ enum
 #if !defined(USBPOWER_BTN_IGNORE)
 #define USBPOWER_BTN_IGNORE 0
 #endif
+
+#if defined(BOOTLOADER)
+#define USBMODE_DEFAULT USB_MODE_MASS_STORAGE
+#else
+#define USBMODE_DEFAULT USB_MODE_MASS_STORAGE
+#endif
+
 #endif
 
 #ifdef HAVE_USBSTACK

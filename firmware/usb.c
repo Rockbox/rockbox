@@ -95,8 +95,8 @@ static bool usb_host_present = false;
 static int usb_num_acks_to_expect = 0;
 static long usb_last_broadcast_tick = 0;
 #ifdef HAVE_USB_POWER
-static int usb_mode = USB_MODE_ASK;
-static int new_usbmode = USB_MODE_ASK;
+static int usb_mode = USBMODE_DEFAULT;
+static int new_usbmode = USBMODE_DEFAULT;
 #endif
 
 static int usb_release_exclusive_storage(void);
@@ -476,6 +476,7 @@ static void NORETURN_ATTR usb_thread(void)
 
             /* Power (charging-only) button */
 #ifdef HAVE_USB_POWER
+            new_usbmode = usb_mode;
             switch (usb_mode) {
             case USB_MODE_CHARGE:
             case USB_MODE_ADB:
@@ -491,7 +492,7 @@ static void NORETURN_ATTR usb_thread(void)
             case USB_MODE_MASS_STORAGE:
                 if (button_status() & ~USBPOWER_BTN_IGNORE)
                     new_usbmode = USB_MODE_CHARGE;
-                    break;
+                break;
 	    }
 
 #ifndef BOOTLOADER

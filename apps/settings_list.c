@@ -2161,7 +2161,7 @@ const struct settings_list settings[] = {
     CHOICE_SETTING(0,
                    usb_mode,
                    LANG_USB_MODE,
-                   USB_MODE_MASS_STORAGE,
+                   USBMODE_DEFAULT,
                    "usb mode",
                    "ask,mass storage,charge"
 #if defined(DX50) || defined(DX90)
