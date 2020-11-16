@@ -101,7 +101,8 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
     FILE * outfile = NULL;
     int i = -1;
     unsigned char headerdata[512];
-    unsigned long dwLength1, dwLength2, dwLength3, fp = 0;
+    unsigned int dwLength1, dwLength2, dwLength3, fp = 0;
+    unsigned int minsize, maxsize, sizes[2];
     unsigned char blockdata[16+16];
     unsigned char out[16];
     unsigned char newmunge;
@@ -138,10 +139,7 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
     dwLength3 = headerdata[8] | (headerdata[9]<<8) |
         (headerdata[10]<<16) | (headerdata[11]<<24);
 
-    if( dwLength1 < firmware_minsize[ i ] ||
-        dwLength1 > firmware_maxsize[ i ] ||
-        dwLength2 < firmware_minsize[ i ] ||
-        dwLength2 > dwLength1 ||
+    if( dwLength2 > dwLength1 ||
         dwLength3 > dwLength1 ||
         dwLength2>>9 != dwLength3 ||
         dwLength2+dwLength3+512 != dwLength1 )
@@ -150,6 +148,10 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
                  "iHP firmware - reason: file 'length' data\n" );
 		goto error;
     };
+
+    minsize = firmware_minsize[i];
+    maxsize = firmware_maxsize[i];
+    sizes[0] = sizes[1] = 0;
 
     pChecksums = ppChecksums = (unsigned char *)( malloc( dwLength3 ) );
 
@@ -177,6 +179,12 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
             ck += out[i];
         }
 
+        if (fp <= 32)
+            sizes[fp / 16 - 1] = (out[0] << 24) |
+                                 (out[1] << 16) |
+                                 (out[2] <<  8) |
+                                 (out[3] <<  0);
+
         if( fp > ESTF_SIZE || stripmode != STRIP_HEADER_CHECKSUM_ESTF )
         {
             fwrite( out+4, 1, 12, outfile );
@@ -202,6 +210,16 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
         }
         else
             s+=16;
+    };
+
+    if( sizes[0] < minsize ||
+        sizes[1] < minsize ||
+        sizes[0] > maxsize ||
+        sizes[1] > maxsize )
+    {
+        fprintf( stderr, "This doesn't look like a valid encrypted "
+                 "iHP firmware - reason: ESTFBINR 'length' data\n" );
+        goto error;
     };
 
     if( fp != dwLength2 )
@@ -269,7 +287,8 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
     FILE * outfile = NULL;
     int i = -1;
     unsigned char headerdata[512];
-    unsigned long dwLength1, dwLength2, dwLength3, fp = 0;
+    unsigned int dwLength1, dwLength2, dwLength3, fp = 0;
+    unsigned int minsize, maxsize, sizes[2];
     unsigned char blockdata[16+16];
     unsigned char out[16];
     unsigned char newmunge;
@@ -313,10 +332,7 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
     dwLength3 = headerdata[8] | (headerdata[9]<<8) |
         (headerdata[10]<<16) | (headerdata[11]<<24);
 
-    if( dwLength1 < firmware_minsize[i] ||
-        dwLength1 > firmware_maxsize[i] ||
-        dwLength2 < firmware_minsize[i] ||
-        dwLength2 > dwLength1 ||
+    if( dwLength2 > dwLength1 ||
         dwLength3 > dwLength1 ||
         dwLength2+dwLength3+512 != dwLength1 )
     {
@@ -324,6 +340,10 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
                  " firmware - reason: file 'length' data\n" );
         goto error;
     };
+
+    minsize = firmware_minsize[i];
+    maxsize = firmware_maxsize[i];
+    sizes[0] = sizes[1] = 0;
 
     pChecksums = ppChecksums = (unsigned char *)( malloc( dwLength3 ) );
 
@@ -335,6 +355,13 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
            ( lenread = fread( blockdata+16, 1, 16, infile ) ) == 16 )
     {
         fp += 16;
+
+        if (fp <= 32)
+            sizes[fp / 16 - 1] = (blockdata[28] << 24) |
+                                 (blockdata[29] << 16) |
+                                 (blockdata[30] <<  8) |
+                                 (blockdata[31] <<  0);
+
         for( i=0; i<16; ++i )
         {
             newmunge = blockdata[16+((12+i)&0xf)] ^ blockdata[i];
@@ -353,6 +380,16 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
         }
         else
             s+=16;
+    };
+
+    if( sizes[0] < minsize ||
+        sizes[1] < minsize ||
+        sizes[0] > maxsize ||
+        sizes[1] > maxsize )
+    {
+        fprintf( stderr, "This doesn't look like a valid decoded iHP"
+                 " firmware - reason: ESTFBINR 'length' data\n" );
+        goto error;
     };
 
     if( fp != dwLength2 )
