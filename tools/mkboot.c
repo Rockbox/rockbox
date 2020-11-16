@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 }
 #endif
 
-static unsigned char image[0x400000 + 0x220 + 0x400000/0x200];
+static unsigned char image[0x400000 + 0x220 + 0x440000/0x200];
 
 int mkboot_iriver(const char* infile, const char* bootfile, const char* outfile, int origin)
 {

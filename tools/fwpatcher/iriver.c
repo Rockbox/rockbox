@@ -33,9 +33,9 @@ const char * const models[] = { "iHP-100", "iHP-120/iHP-140", "H300 series",
                                 NULL };
 
 /* aligns with models array;  expected min firmware size */
-const unsigned int firmware_minsize[] = { 0x100000, 0x100000, 0x200000 };
+const unsigned int firmware_minsize[] = { 0x100200, 0x100200, 0x200200 };
 /* aligns with models array;  expected max firmware size */
-const unsigned int firmware_maxsize[] = { 0x200000, 0x200000, 0x400000 };
+const unsigned int firmware_maxsize[] = { 0x200200, 0x200200, 0x400200 };
 
 const unsigned char header[][16] = {
   { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 },
@@ -138,9 +138,8 @@ int iriver_decode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify,
     dwLength3 = headerdata[8] | (headerdata[9]<<8) |
         (headerdata[10]<<16) | (headerdata[11]<<24);
 
-    if( dwLength1 < firmware_minsize[ i ] ||
-        dwLength1 > firmware_maxsize[ i ] ||
-        dwLength2 < firmware_minsize[ i ] ||
+    if( dwLength2 < firmware_minsize[i] ||
+        dwLength2 > firmware_maxsize[i] ||
         dwLength2 > dwLength1 ||
         dwLength3 > dwLength1 ||
         dwLength2>>9 != dwLength3 ||
@@ -313,9 +312,8 @@ int iriver_encode(TCHAR *infile_name, TCHAR *outfile_name, unsigned int modify )
     dwLength3 = headerdata[8] | (headerdata[9]<<8) |
         (headerdata[10]<<16) | (headerdata[11]<<24);
 
-    if( dwLength1 < firmware_minsize[i] ||
-        dwLength1 > firmware_maxsize[i] ||
-        dwLength2 < firmware_minsize[i] ||
+    if( dwLength2 < firmware_minsize[i] ||
+        dwLength2 > firmware_maxsize[i] ||
         dwLength2 > dwLength1 ||
         dwLength3 > dwLength1 ||
         dwLength2+dwLength3+512 != dwLength1 )
