@@ -55,6 +55,8 @@ enum { GREYBUFSIZE = (LCD_WIDTH*((LCD_HEIGHT+7)/8)*16+200) };
 #  endif
 #endif /* ndef HAVE_LCD_COLOR */
 
+static fb_data *lcd_fb = NULL;
+
 #if (LCD_HEIGHT < SYSVID_HEIGHT)
 enum { ROW_RESIZE_STEP = (LCD_HEIGHT << 16) / SYSVID_HEIGHT };
 
@@ -201,7 +203,12 @@ void sysvid_update(const rect_t *rects)
         sourceBuf += sourceColumn + sourceRow * SYSVID_WIDTH;
 
 #ifdef HAVE_LCD_COLOR
-        destBuf = rb->lcd_framebuffer;
+        if(!lcd_fb)
+        {
+            struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+            lcd_fb = vp_main->buffer->fb_ptr;
+        }
+        destBuf = lcd_fb;
 #else
         destBuf = greybuffer;
 #endif /* HAVE_LCD_COLOR */
@@ -255,14 +262,14 @@ void sysvid_update(const rect_t *rects)
         IFDEBUG_VIDEO2(
             for (y = resizedRow; y < resizedRow + resizedHeight; ++y)
             {
-                destBuf = rb->lcd_framebuffer + resizedColumn + y * LCD_WIDTH;
+                destBuf = lcd_fb + resizedColumn + y * LCD_WIDTH;
                 *destBuf = palette[0x01];
                 *(destBuf + resizedWidth - 1) = palette[0x01];
             }
 
             for (x = resizedColumn; x < resizedColumn + resizedWidth; ++x)
             {
-                destBuf = rb->lcd_framebuffer + x + resizedRow * LCD_WIDTH;
+                destBuf = rb->lcd_fb + x + resizedRow * LCD_WIDTH;
                 *destBuf = palette[0x01];
                 *(destBuf + (resizedHeight - 1) * LCD_WIDTH) = palette[0x01];
             }

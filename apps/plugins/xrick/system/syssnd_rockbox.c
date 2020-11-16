@@ -243,7 +243,7 @@ bool syssnd_init(void)
     rb->talk_disable(true);
 
     /* Stop playback to reconfigure audio settings and acquire audio buffer */
-    rb->pcm_play_stop();
+    rb->mixer_channel_stop(PCM_MIXER_CHAN_PLAYBACK);
 
 #if INPUT_SRC_CAPS != 0
     /* Select playback */
@@ -362,7 +362,7 @@ void syssnd_pauseAll(bool pause)
     }
 
     rb->pcm_play_lock();
-    rb->pcm_play_pause(!pause);
+    rb->mixer_channel_play_pause(PCM_MIXER_CHAN_PLAYBACK, !pause);
     rb->pcm_play_unlock();
 }
 

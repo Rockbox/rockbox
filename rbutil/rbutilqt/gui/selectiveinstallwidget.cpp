@@ -497,6 +497,7 @@ static const struct {
     { "Puzzles fonts", "/.rockbox/rocks/games/sgt-blackbox.rock", SystemInfo::PuzzFontsUrl },
     { "Wolf3D",        "/.rockbox/rocks/games/wolf3d.rock",       SystemInfo::Wolf3DUrl    },
     { "XWorld",        "/.rockbox/rocks/games/xworld.rock",       SystemInfo::XWorldUrl    },
+    { "XRick",         "/.rockbox/rocks/games/xrick.rock",        SystemInfo::XRickUrl     },
 };
 
 void SelectiveInstallWidget::installGamefiles(void)

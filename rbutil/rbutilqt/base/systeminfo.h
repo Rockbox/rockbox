@@ -49,6 +49,7 @@ class SystemInfo : public QObject
             PuzzFontsUrl,
             Wolf3DUrl,
             XWorldUrl,
+            XRickUrl,
             ReleaseUrl,
             CandidateUrl,
             ReleaseVoiceUrl,

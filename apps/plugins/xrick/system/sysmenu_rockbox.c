@@ -36,15 +36,17 @@
 #include "lib/grey.h"
 #endif
 
+static fb_data *lcd_fb=NULL;
 #ifdef ENABLE_CHEATS
 /*
  * Cheat settings menu
  */
-static char * sysmenu_cheatItemText(int selected_item, void *data, char *buffer)
+static char * sysmenu_cheatItemText(int selected_item, void *data, char *buffer, size_t buffer_len)
 {
     (void)selected_item;
     cheat_t cheat = (cheat_t)data;
     (void)buffer;
+    (void)buffer_len;
     char * messages[] =
     {
         "Disable Unlimited Lives/Ammo Mode",
@@ -177,7 +179,12 @@ void sysmenu_exec(void)
 #ifdef HAVE_LCD_COLOR
     if (!(control_test(Control_EXIT)))
     {
-        rb->memset(rb->lcd_framebuffer, 0, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
+        if(!lcd_fb)
+        {
+            struct viewport *vp_main = rb->lcd_set_viewport(NULL);
+            lcd_fb = vp_main->buffer->fb_ptr;
+        }
+        rb->memset(lcd_fb, 0, sizeof(fb_data) * LCD_WIDTH * LCD_HEIGHT);
         sysvid_update(&draw_SCREENRECT);
         rb->lcd_update();
     }

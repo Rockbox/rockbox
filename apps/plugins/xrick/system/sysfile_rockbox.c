@@ -29,7 +29,7 @@
 
 #include "plugin.h"
 
-#define XRICK_GAME_DIR PLUGIN_GAMES_DATA_DIR "/xrick"
+#define XRICK_GAME_DIR ROCKBOX_DIR "/xrick/"
 
 /*
  * Global variables
