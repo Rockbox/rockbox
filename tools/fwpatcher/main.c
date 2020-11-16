@@ -83,13 +83,13 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     /* First, read the iriver original firmware into the image */
     f = _tfopen(infile, TEXT("rb"));
     if(!f) {
-        perror(infile);
+        _tperror(infile);
         return 0;
     }
 
     i = fread(image, 1, 16, f);
     if(i < 16) {
-        perror(infile);
+        _tperror(infile);
         return 0;
     }
 
@@ -102,7 +102,7 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     len = binary_length+0x200-16;
     i = fread(image+16, 1, len, f);
     if(i < len) {
-        perror(infile);
+        _tperror(infile);
         return 0;
     }
     
@@ -112,7 +112,7 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     
     f = _tfopen(outfile, TEXT("wb"));
     if(!f) {
-        perror(outfile);
+        _tperror(outfile);
         return 0;
     }
 
@@ -164,7 +164,7 @@ int mkboot(TCHAR *infile, TCHAR *outfile, unsigned char *bldata, int bllen,
     
     i = fwrite(image, 1, total_length, f);
     if(i < total_length) {
-        perror(outfile);
+        _tperror(outfile);
         return 0;
     }
 

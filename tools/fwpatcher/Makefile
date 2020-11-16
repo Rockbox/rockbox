@@ -8,7 +8,7 @@
 #
 
 #value for crosscompiling on linux
-PREFIX=i586-mingw32msvc-
+PREFIX=i686-w64-mingw32-
 
 #value for compiling on cygwin
 #PREFIX=
