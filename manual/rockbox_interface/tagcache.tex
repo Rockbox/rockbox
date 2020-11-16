@@ -3,9 +3,8 @@
 
 \subsection{Introduction}
 This chapter describes the Rockbox music database system. Using the information
-contained in the tags (ID3v1, ID3v2%
-  \opt{swcodec}{, Vorbis Comments, Apev2, etc.}%
-) in your audio files, Rockbox builds and maintains a database of the music
+contained in the tags (ID3v1, ID3v2, Vorbis Comments, Apev2, etc.) in your
+audio files, Rockbox builds and maintains a database of the music
 files on your player and allows you to browse them by Artist, Album, Genre, 
 Song Name, etc.  The criteria the database uses to sort the songs can be completely
  customised. More information on how to achieve this can be found on the Rockbox
@@ -63,12 +62,10 @@ its subdirectories will be scanned and added to the database.
 
 \item[Update Now]
   \setting{Update now} causes the database to detect new and deleted files
-  \opt{swcodec}{
     \note{Unlike the \setting{Auto Update} function, \setting{Update Now}
       will update the database regardless of whether the \setting{Directory Cache}
       is enabled. Thus, an update using \setting{Update now} may take a long
       time.
-    }
   }
   Unlike \setting{Initialize Now}, the \setting{Update Now} function
   does not remove runtime database information.

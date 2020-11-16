@@ -68,10 +68,8 @@ you to configure settings related to audio playback.
     This can happen if the \dap{} is knocked, shaken or jogged heavily while
     Rockbox is trying to read the hard drive.
 
-    \opt{swcodec}{
-      The anti-skip buffer can be set to various values between
-      5 seconds and 10 minutes.\\
-    }
+    The anti-skip buffer can be set to various values between
+    5 seconds and 10 minutes.\\
 
     \note{Having a large anti-skip buffer tends to use more power, and may
       reduce your battery life. It is recommended to always use the lowest
@@ -90,110 +88,108 @@ you to configure settings related to audio playback.
   instead of being played immediately. Pausing and stopping playback is
   disabled as well as skipping songs and launching plugins.
 
-\opt{swcodec}{
-  \opt{crossfade}{
-  \section{Crossfade}
-    This section controls the behavior of the crossfader.  The crossfader, when
-    enabled, smoothly fades one track into the next.  This can occur in two
-    situations: an automatic track change or a manual track skip.  An automatic
-    track change occurs at the end of the track, moving to the next track in the
-    playlist without user intervention.  A manual track skip goes to the next
-    track immediately when the appropriate button is pressed.\\
+\opt{crossfade}{
+\section{Crossfade}
+  This section controls the behavior of the crossfader.  The crossfader, when
+  enabled, smoothly fades one track into the next.  This can occur in two
+  situations: an automatic track change or a manual track skip.  An automatic
+  track change occurs at the end of the track, moving to the next track in the
+  playlist without user intervention.  A manual track skip goes to the next
+  track immediately when the appropriate button is pressed.\\
 
-    Options for crossfade settings are:
-    \begin{description}
-      \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled
-        and all track changes are gapless.  If set to
-        \setting{Automatic Track Change Only}, crossfade occurs for automatic
-        track changes, but not for manual track skips.  The next setting,
-        \setting{Manual Track Skip Only}, is the opposite: tracks will only
-        crossfade when manually skipped.  If set to \setting{Shuffle}, crossfade
-        is enabled for all track changes, automatic or manual, when the shuffle
-        feature is set to \setting{Yes}, but disabled otherwise.  If set to
-        \setting{Shuffle or Manual Track Skip} then crossfade will be active
-        either when shuffle is set to \setting{Yes} or the track is manually
-        skipped.  If set to \setting{Always}, tracks will always crossfade into
-        one another.
-        %
-      \item[Fade In Delay.] The ``fade in delay'' is the length of time between
-        when the crossfade process begins and when the new track begins to fade
-        in.
-        %
-      \item[Fade In Duration.] The length of time, in seconds, that it takes
-        your music to fade in once the \setting{Fade In Delay} has ended.
-        %
-      \item[Fade Out Delay.] The ``fade out delay'' is the length of time
-        between when the crossfade process begins and when the old track begins
-        to fade out.
-        %
-      \item[Fade Out Duration.] The length of time, in seconds, that it takes
-        your music to fade out once the \setting{Fade Out Delay} has ended.
-        %
-      \item[Fade Out Mode.] If set to \setting{Crossfade}, one song will fade
-        out and the next song will simultaneously fade in. If set to 
-        \setting{Mix}, the ending song will not fade out at all, and will
-        continue to play as normal until its end with the starting song fading
-        in from under it. \setting{Mix} mode is not used for manual track skips,
-        even if it is selected here.
-      \end{description}
+  Options for crossfade settings are:
+  \begin{description}
+    \item[Enable Crossfade.] If set to \setting{Off}, crossfade is disabled
+      and all track changes are gapless.  If set to
+      \setting{Automatic Track Change Only}, crossfade occurs for automatic
+      track changes, but not for manual track skips.  The next setting,
+      \setting{Manual Track Skip Only}, is the opposite: tracks will only
+      crossfade when manually skipped.  If set to \setting{Shuffle}, crossfade
+      is enabled for all track changes, automatic or manual, when the shuffle
+      feature is set to \setting{Yes}, but disabled otherwise.  If set to
+      \setting{Shuffle or Manual Track Skip} then crossfade will be active
+      either when shuffle is set to \setting{Yes} or the track is manually
+      skipped.  If set to \setting{Always}, tracks will always crossfade into
+      one another.
+      %
+    \item[Fade In Delay.] The ``fade in delay'' is the length of time between
+      when the crossfade process begins and when the new track begins to fade
+      in.
+      %
+    \item[Fade In Duration.] The length of time, in seconds, that it takes
+      your music to fade in once the \setting{Fade In Delay} has ended.
+      %
+    \item[Fade Out Delay.] The ``fade out delay'' is the length of time
+      between when the crossfade process begins and when the old track begins
+      to fade out.
+      %
+    \item[Fade Out Duration.] The length of time, in seconds, that it takes
+      your music to fade out once the \setting{Fade Out Delay} has ended.
+      %
+    \item[Fade Out Mode.] If set to \setting{Crossfade}, one song will fade
+      out and the next song will simultaneously fade in. If set to 
+      \setting{Mix}, the ending song will not fade out at all, and will
+      continue to play as normal until its end with the starting song fading
+      in from under it. \setting{Mix} mode is not used for manual track skips,
+      even if it is selected here.
+    \end{description}
       
-      \note{The rules above apply except in the instance where
-          \setting{Fade Out Delay} plus \setting{Fade Out Duration} is less then
-          \setting{Fade In Delay} (which would create a gap in the audio). In this case,
-          the \setting{Fade In Delay} is reduced to eliminate the gap.\\}
+    \note{The rules above apply except in the instance where
+        \setting{Fade Out Delay} plus \setting{Fade Out Duration} is less then
+        \setting{Fade In Delay} (which would create a gap in the audio). In this case,
+        the \setting{Fade In Delay} is reduced to eliminate the gap.\\}
 
-          The graphic below illustrates how the different settings work in practice.
+        The graphic below illustrates how the different settings work in practice.
 
-         \includegraphics[width=14cm]{configure_rockbox/images/crossfade_graphic.png}
-    }%\opt{crossfade}
+       \includegraphics[width=14cm]{configure_rockbox/images/crossfade_graphic.png}
+  }%\opt{crossfade}
     
-  \section{\label{ref:ReplayGain}Replaygain}
-    This allows you to control the replaygain function.
-    The purpose of replaygain is to adjust the volume of the music played
-    so that all songs (or albums, depending on your settings) have the
-    same apparent volume. This prevents sudden changes in volume when
-    changing between songs recorded at different volume levels.
-    For replaygain to work, the songs must have been processed by a program
-    that adds replaygain information to the ID3 tags (or Vorbis tags).\\
+\section{\label{ref:ReplayGain}Replaygain}
+  This allows you to control the replaygain function.
+  The purpose of replaygain is to adjust the volume of the music played
+  so that all songs (or albums, depending on your settings) have the
+  same apparent volume. This prevents sudden changes in volume when
+  changing between songs recorded at different volume levels.
+  For replaygain to work, the songs must have been processed by a program
+  that adds replaygain information to the ID3 tags (or Vorbis tags).\\
       
-    Options for replaygain are:
-    \begin{description}
-      \item[Replaygain Type.] Choose the type of replaygain to apply:
-        \begin{description}
-        \item[Album Gain.] Maintain a constant volume level between
-          albums, but keep any intentional volume variations between 
-          songs in an album. (If album gain value is not available,
-          uses track gain information).
-          %
-        \item[Track Gain.] Maintain a constant volume level between
-          tracks. If track gain value is not available, no replaygain 
-          is applied.
-          %
-        \item[Track Gain If Shuffling.] Maintains a constant volume
-          between tracks if \setting{Shuffle} is set to \setting{Yes}.
-          Reverts to album mode if \setting{Shuffle} is set to \setting{No}.
-          %
-        \item[Off.] Do not process replaygain information, i.e. turn off
-          the replaygain function.
-        \end{description}
+  Options for replaygain are:
+  \begin{description}
+    \item[Replaygain Type.] Choose the type of replaygain to apply:
+      \begin{description}
+      \item[Album Gain.] Maintain a constant volume level between
+        albums, but keep any intentional volume variations between 
+        songs in an album. (If album gain value is not available,
+        uses track gain information).
         %
-      \item[Prevent Clipping.] Avoid clipping of a song's waveform.
-        If a song would clip during playback, the volume is lowered for 
-        that song. Replaygain information is needed for this to work.
+      \item[Track Gain.] Maintain a constant volume level between
+        tracks. If track gain value is not available, no replaygain 
+        is applied.
         %
-      \item[Pre-amp.] This allows you to adjust the volume when replaygain
-        is applied. Replaygain often lowers the volume, sometimes quite
-        much, so here you can compensate for that. Please note that a
-        (large) positive pre-amp setting can cause clipping, unless
-        prevent clipping is enabled.  The pre-amp can be set to any
-        decibel (dB) value between -12~dB and +12~dB, in increments of 0.5~dB.
+      \item[Track Gain If Shuffling.] Maintains a constant volume
+        between tracks if \setting{Shuffle} is set to \setting{Yes}.
+        Reverts to album mode if \setting{Shuffle} is set to \setting{No}.
+        %
+      \item[Off.] Do not process replaygain information, i.e. turn off
+        the replaygain function.
       \end{description}
+      %
+    \item[Prevent Clipping.] Avoid clipping of a song's waveform.
+      If a song would clip during playback, the volume is lowered for 
+      that song. Replaygain information is needed for this to work.
+      %
+    \item[Pre-amp.] This allows you to adjust the volume when replaygain
+      is applied. Replaygain often lowers the volume, sometimes quite
+      much, so here you can compensate for that. Please note that a
+      (large) positive pre-amp setting can cause clipping, unless
+      prevent clipping is enabled.  The pre-amp can be set to any
+      decibel (dB) value between -12~dB and +12~dB, in increments of 0.5~dB.
+    \end{description}
 
-  \section{Track Skip Beep}
-    Controls the volume of the beep that is heard when
-    skipping forward or backward between tracks. The beep is disabled when
-    set to \setting{Off}.
-}%\opt{swcodec}
+\section{Track Skip Beep}
+  Controls the volume of the beep that is heard when
+  skipping forward or backward between tracks. The beep is disabled when
+  set to \setting{Off}.
 
 \opt{spdif_power}{
   \section{\label{ref:SPDIF_OnOff}Optical Output}
@@ -294,32 +290,28 @@ you to configure settings related to audio playback.
   if a track ends, which can be achieved by combining this option with
   \setting{Repeat} set to \setting{One}
 
-\opt{swcodec}{
-  \section{Rewind Before Resume}\index{Rewind Before Resume}
-    When restarting a track or a bookmark, a short rewind can be done before the
-    playback is started. This can be useful when listening to speech material,
-    to help remember what was being said just before playback was stopped.
-    The size of the rewind can be set to various values between 0 (off) and
-    60 seconds.
-    \note{This option does not apply to resuming a paused track.  Use
-      the next option for rewinding on pause.}
-    \note{The actual rewind distance may differ a little from the requested
-      value, depending on the file in question.}
-}%\opt{swcodec}
+\section{Rewind Before Resume}\index{Rewind Before Resume}
+  When restarting a track or a bookmark, a short rewind can be done before the
+  playback is started. This can be useful when listening to speech material,
+  to help remember what was being said just before playback was stopped.
+  The size of the rewind can be set to various values between 0 (off) and
+  60 seconds.
+  \note{This option does not apply to resuming a paused track.  Use
+    the next option for rewinding on pause.}
+  \note{The actual rewind distance may differ a little from the requested
+    value, depending on the file in question.}
 
 \section{Rewind on Pause}\index{Rewind on Pause}
   This option rewinds the current track by a small amount whenever it is
   paused (not stopped).  The amount to rewind can be set between 0 and
   15 seconds.
 
-\opt{swcodec}{
-  \opt{play_frequency}{
-    \section{Frequency}\index{Frequency}
-      This is the sampling frequency used for the rockbox playback engine.  Audio
-      at a different sampling rate will be converted to this sampling rate prior to
-      mixing using a cubic Hermite polynomial resampler.
-      \note{For best quality and battery life, select the sampling rate used by
-      your audio.  This is typically 44.1kHz.}
-      \note{Opus files are always 48kHz.}
-  }
-}%\opt{swcodec}
+\opt{play_frequency}{
+  \section{Frequency}\index{Frequency}
+    This is the sampling frequency used for the rockbox playback engine.  Audio
+    at a different sampling rate will be converted to this sampling rate prior to
+    mixing using a cubic Hermite polynomial resampler.
+    \note{For best quality and battery life, select the sampling rate used by
+    your audio.  This is typically 44.1kHz.}
+    \note{Opus files are always 48kHz.}
+}

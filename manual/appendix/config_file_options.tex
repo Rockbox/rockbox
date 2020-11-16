@@ -64,9 +64,7 @@
     bidir limit     & 0 to 200          & \% screen\\
     scroll paginated & on, off & N/A\\
     hold\_lr\_for\_scroll\_in\_list & on, off & N/A\\
-    \opt{lcd_bitmap}{
-      show path in browser & off, current directory, full path & N/A\\
-    }
+    show path in browser & off, current directory, full path & N/A\\
     contrast        & 0 to 63           & N/A\\
     backlight timeout
                     & off, on, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 25, 30,
@@ -167,7 +165,6 @@
       list\_accel\_wait        & 1 to 10  & s\\
     }
 %
-    \opt{swcodec}{
       replaygain type
                     & track, album, track shuffle, off
                                         & N/A\\
@@ -232,7 +229,6 @@
       keyclick repeats & on, off        & N/A\\
       dircache      & on, off           & N/A\\
       tagcache\_ram & on, off           & N/A\\
-    }%
 
     \opt{touchpad}{
       \opt{GIGABEAT_PAD}{
@@ -244,7 +240,6 @@
       }
     }%
 
-    \opt{lcd_bitmap}{
       peak meter release
                     & 1 to 126          & ?\\
        peak meter hold
@@ -284,12 +279,8 @@
       show icons    & on, off           & N/A\\
       iconset       & /path/filename.bmp & N/A\\
       viewers iconset & /path/filename.bmp & N/A\\
-    }%
 
-    \opt{swcodec}{% This doesn't depend on swcodec but using a \nopt here
-                  % causes ondiosp not to build for mysterious reasons.
       backdrop      & /path/filename.bmp    & N/A\\
-    }%
 
     \opt{lcd_color}{
       foreground colour & 000000 to FFFFFF   & RRGGBB\\

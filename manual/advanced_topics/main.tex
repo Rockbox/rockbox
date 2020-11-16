@@ -42,29 +42,26 @@ Rockbox allows you to choose a plugin to run for select menu options.
 Simply choose the option in the setting menu and choose the plugin
 you would like to run.
 
-\opt{lcd_bitmap}{
 \subsection{\label{ref:GettingExtras}Getting Extras}
 
 Rockbox supports custom fonts. A collection of fonts is available for download
-in the font package at \url{http://www.rockbox.org/daily.shtml}.}
+in the font package at \url{http://www.rockbox.org/daily.shtml}.
 
-\opt{lcd_bitmap}{
-  \subsection{\label{ref:Loadingfonts}Loading Fonts}\index{Fonts}
-  Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the
-  \dap{} and ``play'' it in the \setting{File Browser}. If you want a font to
-  be loaded automatically every time you start up, it must be located in the
-  \fname{/.rockbox/fonts} directory and the filename must be at most 24 characters
-  long. You can browse the fonts in \fname{/.rockbox/fonts} under
-  \setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Font}
-  in the \setting{Main Menu}.\\
+\subsection{\label{ref:Loadingfonts}Loading Fonts}\index{Fonts}
+Rockbox can load fonts dynamically. Simply copy the \fname{.fnt} file to the
+\dap{} and ``play'' it in the \setting{File Browser}. If you want a font to
+be loaded automatically every time you start up, it must be located in the
+\fname{/.rockbox/fonts} directory and the filename must be at most 24 characters
+long. You can browse the fonts in \fname{/.rockbox/fonts} under
+\setting{Settings $\rightarrow$ Theme Settings $\rightarrow$ Font}
+in the \setting{Main Menu}.\\
 
-  \note{Advanced Users Only: Any BDF font should
-    be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use
-    the \fname{convbdf} tool. This tool can be found in the \fname{tools}
-    directory of the Rockbox source code. See \wikilink{CreateFonts\#ConvBdf}
-    for more details. Or just run \fname{convbdf} without any parameters to
-    see the possible options.}
-}
+\note{Advanced Users Only: Any BDF font should
+  be usable with Rockbox. To convert from \fname{.bdf} to \fname{.fnt}, use
+  the \fname{convbdf} tool. This tool can be found in the \fname{tools}
+  directory of the Rockbox source code. See \wikilink{CreateFonts\#ConvBdf}
+  for more details. Or just run \fname{convbdf} without any parameters to
+  see the possible options.}
 
 \subsection{\label{ref:Loadinglanguages}Loading Languages}
 \index{Language files}%
@@ -109,15 +106,13 @@ file find the instructions on the Rockbox website:
   \\
   \config{folder, m3u, m3u8, cfg, wps, lng, rock, bmark, cue, colours, mpa,
   \firmwareextension{}, %
-  \opt{swcodec}{mp1, }mp2, mp3%
-  \opt{swcodec}{, ogg, oga, wma, wmv, asf, wav, flac, ac3, a52, mpc,
-  wv, m4a, m4b, mp4, mod, shn, aif, aiff, spx, sid, adx, nsf, nsfe,
-  spc, ape, mac, sap}%
-  \opt{lcd_bitmap}{\opt{swcodec}{, mpg, mpeg}}%
+  mp1, mp2, mp3, ogg, oga, wma, wmv, asf, wav, flac, ac3, a52, mpc, wv,
+  m4a, m4b, mp4, mod, shn, aif, aiff, spx, sid, adx, nsf, nsfe, spc, ape,
+  mac, sap, mpg, mpeg%
   \opt{HAVE_REMOTE_LCD}{, rwps}%
   \opt{lcd_non-mono}{, bmp}%
   \opt{radio}{, fmr}%
-  \opt{lcd_bitmap}{, fnt, kbd}}\\*
+  , fnt, kbd}\\*
   %It'd be ideal to get these from filetypes.c
 
   All file extensions that are not either specifically listed in the
@@ -286,8 +281,8 @@ present in the theme file. The full syntax will be explained later in
 this section. All elements placed before the
 line defining a viewport are displayed in the default viewport. Elements
 defined after a viewport declaration are drawn within that viewport.
-\opt{lcd_bitmap}{Loading images (see Appendix \reference{ref:wps_images})
-  should be done within the default viewport.}
+Loading images (see Appendix \reference{ref:wps_images})
+should be done within the default viewport.
 A viewport ends either with the end of the file, or with the next viewport
 declaration line. Viewports sharing the same
 coordinates and dimensions cannot be displayed at the same time. Viewports
@@ -526,18 +521,17 @@ That is, ``tracknum -- title [artist, album]'', where most fields are only
 displayed if available. Could also be rendered as ``filename'' or ``tracknum --
 title [artist]''.
 
-%\opt{lcd_bitmap}{
-%  \begin{verbatim}
-%    %s%?it<%?in<%in. |>%it|%fn>
-%    %s%?ia<%ia|%?d2<%d(2)|(root)>>
-%    %s%?id<%id|%?d1<%d(1)|(root)>> %?iy<(%iy)|>
+%\begin{verbatim}
+%  %s%?it<%?in<%in. |>%it|%fn>
+%  %s%?ia<%ia|%?d2<%d(2)|(root)>>
+%  %s%?id<%id|%?d1<%d(1)|(root)>> %?iy<(%iy)|>
 %
-%    %al%pc/%pt%ar[%pp:%pe]
-%    %fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>
-%    %pb
-%    %pm
-% % \end{verbatim}
-%}
+%  %al%pc/%pt%ar[%pp:%pe]
+%  %fbkBit %?fv<avg|> %?iv<(id3v%iv)|(no id3)>
+%  %pb
+%  %pm
+% 
+%\end{verbatim}
 
 \section{\label{ref:manage_settings}Managing Rockbox Settings}
 
@@ -713,11 +707,10 @@ current version.
   available.
 
 
-\opt{swcodec}{
   Another area of savings is avoiding or reducing CPU boosting
   through disabling computing intense features (e.g. sound processing) or
   using effective audio codecs.
-} The following provides a short overview of the most relevant settings and
+  The following provides a short overview of the most relevant settings and
   rules of thumb.
 
 \subsection{Display backlight}
@@ -765,16 +758,13 @@ current version.
   that allows correct and continuous playback (see \reference{ref:AntiSkipBuf}).
 }
 
-\opt{swcodec}{
 \subsection{Replaygain}
   Replaygain is a post processing that equalises the playback volume of audio
   files to the same perceived loudness. This post processing applies a factor
   to each single PCM sample and is therefore consuming additional CPU time. If
   you want to achieve some (minor) savings in runtime, switch this feature off
   (see \reference{ref:ReplayGain}).
-}
 
-\opt{lcd_bitmap}{
 \subsection{Peak Meter}
   The peak meter is a feature of the While Playing Screen and will be updated with a
   high framerate. Depending on your \dap{} this might result in a high CPU load. To
@@ -782,15 +772,11 @@ current version.
   \opt{ipodvideo}{
     \note{Especially the \playerman{} \playertype{} suffers from an enabled peak meter.}
   }
-}
 
-\opt{swcodec,disk_storage,flash_storage}{
 \subsection{Audio format and bitrate}
-\opt{swcodec}{
   In general the fastest decoding audio format will be the best in terms of
   battery runtime on your \dap{}. An overview of different codec's performance
   on different \dap{}s can be found at \wikilink{CodecPerformanceComparison}.
-}
 
 \opt{flash_storage}{
   Your target uses flash that consumes a certain amount of power during access.
@@ -813,11 +799,8 @@ current version.
   another based upon the above mentioned. This will reduce the audio quality.
   If you have the choice, select the best suiting codec when encoding the
   original source material.
-}
 
-\opt{swcodec}{
 \subsection{Sound settings}
   In general all kinds of sound processing will need more CPU time and therefore
   consume more power. The less sound processing you use, the better it is for
   the battery runtime (for options see \reference{ref:configure_rockbox_sound}).
-}

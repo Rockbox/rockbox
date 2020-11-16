@@ -197,7 +197,6 @@ change to customise your listening experience.
   }%
 }
 
-\opt{swcodec}{
 \section{Crossfeed}
   Crossfeed attempts to make the experience of listening to music on
   headphones more similar to listening to music with stereo speakers. When you
@@ -250,9 +249,7 @@ change to customise your listening experience.
   % http://www.ohl.to/interests-in-audio/crossfeed-and-eq-for-headphones/ 
   Beware that the crossfeed function is capable of making the audio distort
   if you choose settings which result in a too high output level.
-}
   
-\opt{swcodec}{
 \section{\label{ref:EQ}Equalizer}
   \screenshot{configure_rockbox/images/ss-equalizer}{The graphical equalizer}{}
   Rockbox features a parametric equalizer (EQ). In contrast to non-parametric
@@ -472,9 +469,7 @@ configure the EQ, or use the presets for designing their own custom EQ
 settings.
 
 \end{description}
-}
 
-\opt{swcodec}{
 \section{Dithering}
 This setting controls the dithering and noise shaping functionality of Rockbox.
 
@@ -500,9 +495,7 @@ and not easily noticable.
 
 Rockbox uses highpass triangular distribution noise as the dithering noise
 source, and a third order noise shaper.
-}
 
-\opt{swcodec}{%
 \opt{pitchscreen}{%
 \section{Timestretch}
 Enabling \setting{Timestretch} allows you to change the playback speed without
@@ -512,9 +505,7 @@ intended for speech playback and may significantly dilute your listening
 experience with more complex audio. See \reference{sec:pitchscreen} for more
 details about how to use the feature.
 }
-}
 
-\opt{swcodec}{
 \section{Haas Surround}
 This setting implements the Haas effect with adjustable delay time to enhance 
 the stereo effect of the sound. A full range Haas effect creates the impression
@@ -526,25 +517,19 @@ and \setting{f(x2)} to set frequencies which are not affected. The \setting{SIDE
 setting uses mid-side processing to determine and apply effect to the side channel only. 
 Finally, the \setting{Dry/Wet Mix} setting adjusts the proportion mixed from the 
 original (dry) and 'effected' (wet) signals.
-}
 
-\opt{swcodec}{
 \section{Perceptual Bass Enhancement}
 This setting implements a group delay correction and an additional biophonic EQ to
 emphasize to boost bass perception. The \setting{precut} setting provides
 negative overall gain to prevent possible audio distortion due to the EQ
 gain.  The defult precut value is set to -2.5 dB and can be adjust from 0 dB to -4.5 dB.
 Note that this effect will stack with any other EQ applied.  
-}
 
-\opt{swcodec}{
 \section{Auditory Fatigue Reduction}
 Human hearing is more senstive to some frequency bands. This setting applies additional 
 equalization and bi-shelf filtering to reduce signals in these bands to minimize
 the chance that temporary threshold shift (auditory fatigue) occurs.
-}
 
-\opt{swcodec}{
 \section{Compressor}
 The \setting{Compressor} reduces, or compresses, the dynamic range of the audio
 signal.  This makes the quieter and louder sections closer to the same volume
@@ -592,4 +577,3 @@ the input signal is reduced appropriately, but the gain isn't allowed to
 immediately return to normal levels.  This is necessary to reduce artifacts
 such as ``pumping.''  Instead, the gain is allowed to return to normal at the
 chosen rate.  Release Time is the time for the gain to recover by 10~dB.
-}
