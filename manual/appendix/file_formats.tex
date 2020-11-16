@@ -6,18 +6,14 @@
   & \textbf{Action when selected}}{}{}
 \includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
   & Directory & \emph{none} & Enter the directory \tabularnewline
-\opt{swcodec}{
   \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
   & Audio file & \emph{various}\newline%
   (see \ref{ref:Supportedaudioformats})%
   % do NOT use \reference{} here as that will break the table.
   & Start playing the file and show the WPS\tabularnewline
-}
   & Bookmark & \fname{.bmark} & Display all bookmarks for an audio file\tabularnewline
-\opt{lcd_bitmap}{
   & Game of Life & \fname{.cells} & Show the configuration with the
      ``Rocklife'' plugin\tabularnewline
-}
 \includegraphics[width=0.37cm]{appendix/images/icon-config.png} 
   & Configuration File & \fname{.cfg} & Load the settings file\tabularnewline
 \includegraphics[width=0.37cm]{appendix/images/icon-chip8.png} 
@@ -62,10 +58,8 @@
   \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
   & Rockbox firmware & \fname{.mi4} & Load the new firmware with ROLO \tabularnewline
 }
-\opt{swcodec}{
  \includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png}
  & Video & \fname{.mpg}, \fname{.mpeg}, \fname{.mpv}, \fname{.m2v} & Play the MPEG1/2 video \tabularnewline
-}
 \includegraphics[width=0.37cm]{appendix/images/icon-rock.png} 
   & Plugin & \fname{.rock} & Start the plugin\tabularnewline
 \opt{sansaAMS}{
@@ -79,7 +73,6 @@
   & While Playing Screen & \fname{.wps} & Load the new WPS display configuration\tabularnewline
 \end{rbtabular}
 
-\opt{swcodec}{
   \chapter{Audio and metadata formats}
   \section{\label{ref:Supportedaudioformats}Supported audio formats}
   \subsection{Lossy Codecs}
@@ -375,4 +368,3 @@
               to 90 bytes.
     }
     \end{enumerate}
-}

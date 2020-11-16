@@ -3,7 +3,7 @@
 This plugin offers a way to remove a theme. Open the \setting{Context Menu} (see \reference{ref:Contextmenu}) 
 upon a theme\fname{.cfg} file and select \setting{Open With... $\rightarrow$ theme\_remove}.
 Some files are not removed regardless of the \setting{Remove Options} such as
-\fname{rockbox\_default.wps}\opt{lcd_bitmap}{ and the font file currently in use}.
+\fname{rockbox\_default.wps} and the font file currently in use.
 
 \subsubsection{Theme Remove menu}
 \begin{description}
@@ -34,18 +34,14 @@ Some files are not removed regardless of the \setting{Remove Options} such as
   \end{description}
 
   \begin{description}
-\opt{lcd_bitmap}{
     \item[Font.]
     Specifies how the \fname{.fnt} file belonging to a theme \fname{.cfg} file is handled.
     If this option is set to \setting{Remove if not Used}, the fonts came from rockbox-fonts.zip
     will not be removed as themes may depend on those fonts.
-}%
     \item[WPS.]
     Specifies how the \fname{.wps} file belonging to a theme \fname{.cfg} file is handled.
-\opt{lcd_bitmap}{
     \item[Statusbar Skin.]
     Specifies how the \fname{.sbs} file belonging to a theme \fname{.cfg} file is handled.
-}%
 \opt{HAVE_REMOTE_LCD}{
     \item[Remote WPS.]
     Specifies how the \fname{.rwps} file belonging to a theme \fname{.cfg} file is handled.
@@ -56,12 +52,10 @@ Some files are not removed regardless of the \setting{Remove Options} such as
     \item[Backdrop.]
     Specifies how the backdrop \fname{.bmp} file belonging to a theme \fname{.cfg} file is handled.
 }%
-\opt{lcd_bitmap}{
     \item[Iconset.]
     Specifies how the iconset \fname{.bmp} file belonging to a theme \fname{.cfg} file is handled.
     \item[Viewers Iconset.]
     Specifies how the viewers iconset \fname{.bmp} file belonging to a theme \fname{.cfg} file is handled.
-}%
 \opt{HAVE_REMOTE_LCD}{
     \item[Remote Iconset.]
     Specifies how the remote iconset \fname{.bmp} file belonging to 
