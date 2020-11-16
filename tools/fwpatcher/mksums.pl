@@ -39,7 +39,7 @@ sub mksumfile {
     if($model < 300) {
         foreach("1.63eu","1.63k", "1.63us", "1.65eu","1.65k", "1.65us",
 		"1.66eu", "1.66k", "1.66us", "1.66jp") {
-            `../mkboot $orig_path/h1xx/$_/ihp_$model.bin bootloader-h$model.bin ihp_$model.bin`;
+            `../mkboot -h100 $orig_path/h1xx/$_/ihp_$model.bin bootloader-h$model.bin ihp_$model.bin`;
             `../scramble -iriver ihp_$model.bin ihp_$model.hex`;
             $origsum = `md5sum $orig_path/h1xx/$_/ihp_$model.hex`;
             chomp $origsum;
@@ -52,7 +52,7 @@ sub mksumfile {
         }
     } else {
         foreach("1.28eu", "1.28k", "1.28jp", "1.29eu", "1.29k", "1.29jp",
-		"1.30eu") {
+		"1.30eu", "1.31k") {
             `../mkboot -h300 $orig_path/h3xx/$_/H$model.bin bootloader-h$model.bin H$model.bin`;
             `../scramble -iriver H$model.bin H$model.hex`;
             $origsum = `md5sum $orig_path/h3xx/$_/H$model.hex`;
