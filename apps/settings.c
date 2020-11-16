@@ -1025,6 +1025,10 @@ void settings_apply(bool read_disk)
     usb_charging_enable(global_settings.usb_charging);
 #endif
 
+#ifdef HAVE_USB_POWER
+    usb_set_mode(global_settings.usb_mode);
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
     memcpy(&calibration_parameters, &global_settings.ts_calibration_data, sizeof(struct touchscreen_parameter));
