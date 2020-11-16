@@ -42,8 +42,6 @@ const static struct {
     { ServerInfo::CurDevelUrl,          "",                             "" },
 };
 
-QMap<QString, QVariant> ServerInfo::serverInfos;
-
 void ServerInfo::readBuildInfo(QString file)
 {
     if (serverSettings)

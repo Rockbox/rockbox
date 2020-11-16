@@ -58,8 +58,6 @@ class ServerInfo : public QObject
         //! you shouldnt call this, its a fully static class
         ServerInfo() {}
 
-        //! map of server infos
-        static QMap<QString, QVariant> serverInfos;
 
 };
 
