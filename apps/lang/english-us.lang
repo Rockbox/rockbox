@@ -12420,16 +12420,13 @@
   desc: in Settings -> General -> System -> USB Mode
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "USB Mode"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "USB Mode"
   </voice>
 </phrase>
 <phrase>
@@ -12510,16 +12507,13 @@
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -13150,16 +13144,13 @@
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Mass Storage"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Mass Storage"
   </voice>
 </phrase>
 <phrase>
@@ -13226,16 +13217,13 @@
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Charge Only"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Charge Only"
   </voice>
 </phrase>
 <phrase>
@@ -15472,5 +15460,53 @@
   </dest>
   <voice>
     *: "Browse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Enter USB mass storage mode?"
+  </dest>
+  <voice>
+    *: "Enter USB mass storage mode?"
   </voice>
 </phrase>
