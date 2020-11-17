@@ -31,20 +31,24 @@
 #include "usb_core.h"
 #include "usb_class_driver.h"
 
-#if defined(USB_ENABLE_STORAGE)
+#ifdef USB_ENABLE_STORAGE
 #include "usb_storage.h"
 #endif
 
-#if defined(USB_ENABLE_SERIAL)
+#ifdef USB_ENABLE_SERIAL
 #include "usb_serial.h"
 #endif
 
-#if defined(USB_ENABLE_CHARGING_ONLY)
+#ifdef USB_ENABLE_CHARGING_ONLY
 #include "usb_charging_only.h"
 #endif
 
 #ifdef USB_ENABLE_HID
 #include "usb_hid.h"
+#endif
+
+#ifdef USB_ENABLE_MTP
+#include "usb_mtp.h"
 #endif
 
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
@@ -272,6 +276,25 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
         .disconnect = usb_hid_disconnect,
         .transfer_complete = usb_hid_transfer_complete,
         .control_request = usb_hid_control_request,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = NULL,
+#endif
+    },
+#endif
+#ifdef USB_ENABLE_MTP
+    [USB_DRIVER_MTP] = {
+        .enabled = false,
+        .needs_exclusive_storage = false,
+        .first_interface = 0,
+        .last_interface = 0,
+        .request_endpoints = usb_mtp_request_endpoints,
+        .set_first_interface = usb_mtp_set_first_interface,
+        .get_config_descriptor = usb_mtp_get_config_descriptor,
+        .init_connection = usb_mtp_init_connection,
+        .init = usb_mtp_init,
+        .disconnect = usb_mtp_disconnect,
+        .transfer_complete = usb_mtp_transfer_complete,
+        .control_request = usb_mtp_control_request,
 #ifdef HAVE_HOTSWAP
         .notify_hotswap = NULL,
 #endif
