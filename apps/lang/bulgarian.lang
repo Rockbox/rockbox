@@ -250,23 +250,23 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     creativezen*: "Select = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Да"
-    cowond2*: "MENU или горе ляво = Да"
-    iriverh100,iriverh120,iriverh300: "NAVI = Да"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Да"
-    mrobe500: "PLAY, POWER или горе дясно = Да"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Да"
+    cowond2*: "MENU или горе ляво = Да"
     creativezen*: "Select = Да"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Да"
+    iriverh100,iriverh120,iriverh300: "NAVI = Да"
+    mrobe500: "PLAY, POWER или горе дясно = Да"
+    vibe500: "OK = Да"
   </dest>
   <voice>
     *: ""
@@ -821,16 +821,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Кросфийд"
+    *: "Кросфийд"
   </dest>
   <voice>
-    *: none
-    swcodec: "Кросфийд"
+    *: "Кросфийд"
   </voice>
 </phrase>
 <phrase>
@@ -838,16 +835,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Директно усилване"
+    *: "Директно усилване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Директно усилване"
+    *: "Директно усилване"
   </voice>
 </phrase>
 <phrase>
@@ -855,16 +849,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Кръстосано усилване"
+    *: "Кръстосано усилване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Кръстосано усилване"
+    *: "Кръстосано усилване"
   </voice>
 </phrase>
 <phrase>
@@ -872,16 +863,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "Намаляване на високите честоти"
+    *: "Намаляване на високите честоти"
   </dest>
   <voice>
-    *: none
-    swcodec: "Намаляване на високите честоти"
+    *: "Намаляване на високите честоти"
   </voice>
 </phrase>
 <phrase>
@@ -889,16 +877,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Горна честота на подрязване"
+    *: "Горна честота на подрязване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Горна честота на подрязване"
+    *: "Горна честота на подрязване"
   </voice>
 </phrase>
 <phrase>
@@ -906,16 +891,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "Еквалайзер"
+    *: "Еквалайзер"
   </dest>
   <voice>
-    *: none
-    swcodec: "Еквалайзер"
+    *: "Еквалайзер"
   </voice>
 </phrase>
 <phrase>
@@ -923,16 +905,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Включване на EQ"
+    *: "Включване на EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Включване на еквалайзера"
+    *: "Включване на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -940,16 +919,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Графичен еквалайзер"
+    *: "Графичен еквалайзер"
   </dest>
   <voice>
-    *: none
-    swcodec: "Графичен еквалайзер"
+    *: "Графичен еквалайзер"
   </voice>
 </phrase>
 <phrase>
@@ -957,16 +933,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "Преподрязване"
+    *: "Преподрязване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Преподрязване"
+    *: "Преподрязване"
   </voice>
 </phrase>
 <phrase>
@@ -974,16 +947,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Прости настройки на EQ"
+    *: "Прости настройки на EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Прости настройки на еквалайзера"
+    *: "Прости настройки на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -991,16 +961,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Разширени настройки на EQ"
+    *: "Разширени настройки на EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Разширени настройки на еквалайзера"
+    *: "Разширени настройки на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -1008,16 +975,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "Запазване на настройките на EQ"
+    *: "Запазване на настройките на EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Запазване на настройките на еквалайзера"
+    *: "Запазване на настройките на еквалайзера"
   </voice>
 </phrase>
 <phrase>
@@ -1025,16 +989,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "Разглеждане на EQ конфигурации"
+    *: "Разглеждане на EQ конфигурации"
   </dest>
   <voice>
-    *: none
-    swcodec: "Разглеждане на EQ конфигурации"
+    *: "Разглеждане на EQ конфигурации"
   </voice>
 </phrase>
 <phrase>
@@ -1042,16 +1003,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Режим на редактиране: %s"
+    *: "Режим на редактиране: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1059,16 +1017,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Усилване на лента %d Hz"
+    *: "Усилване на лента %d Hz"
   </dest>
   <voice>
-    *: none
-    swcodec: "Усилване на лента"
+    *: "Усилване на лента"
   </voice>
 </phrase>
 <phrase>
@@ -1076,16 +1031,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Филтър за ниски честоти"
+    *: "Филтър за ниски честоти"
   </dest>
   <voice>
-    *: none
-    swcodec: "Филтър за ниски честоти"
+    *: "Филтър за ниски честоти"
   </voice>
 </phrase>
 <phrase>
@@ -1093,16 +1045,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "Пиков филтър %d"
+    *: "Пиков филтър %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "Пиков филтър"
+    *: "Пиков филтър"
   </voice>
 </phrase>
 <phrase>
@@ -1110,16 +1059,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Филтър за високи честоти"
+    *: "Филтър за високи честоти"
   </dest>
   <voice>
-    *: none
-    swcodec: "Филтър за високи честоти"
+    *: "Филтър за високи честоти"
   </voice>
 </phrase>
 <phrase>
@@ -1127,16 +1073,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Честота на отрязване"
+    *: "Честота на отрязване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Честота на отрязване"
+    *: "Честота на отрязване"
   </voice>
 </phrase>
 <phrase>
@@ -1144,16 +1087,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Централна честота"
+    *: "Централна честота"
   </dest>
   <voice>
-    *: none
-    swcodec: "Централна честота"
+    *: "Централна честота"
   </voice>
 </phrase>
 <phrase>
@@ -1161,16 +1101,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1178,16 +1115,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Колебание"
+    *: "Колебание"
   </dest>
   <voice>
-    *: none
-    swcodec: "Колебание"
+    *: "Колебание"
   </voice>
 </phrase>
 <phrase>
@@ -1731,16 +1665,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Предотвратяване на смущения"
+    *: "Предотвратяване на смущения"
   </dest>
   <voice>
-    *: none
-    swcodec: "Предотвратяване на смущения"
+    *: "Предотвратяване на смущения"
   </voice>
 </phrase>
 <phrase>
@@ -1818,16 +1749,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "Пиукане при смяна на песен"
+    *: "Пиукане при смяна на песен"
   </dest>
   <voice>
-    *: none
-    swcodec: "Пиукане при смяна на песен"
+    *: "Пиукане при смяна на песен"
   </voice>
 </phrase>
 <phrase>
@@ -1835,16 +1763,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "Слабо"
+    *: "Слабо"
   </dest>
   <voice>
-    *: none
-    swcodec: "Слабо"
+    *: "Слабо"
   </voice>
 </phrase>
 <phrase>
@@ -1852,16 +1777,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "Средно"
+    *: "Средно"
   </dest>
   <voice>
-    *: none
-    swcodec: "Средно"
+    *: "Средно"
   </voice>
 </phrase>
 <phrase>
@@ -1869,16 +1791,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "Силно"
+    *: "Силно"
   </dest>
   <voice>
-    *: none
-    swcodec: "Силно"
+    *: "Силно"
   </voice>
 </phrase>
 <phrase>
@@ -2235,21 +2154,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
-    gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "Изграждане на базата данни...  намерени %d (OFF за връщане)"
-    iriverh100,iriverh120,iriverh300: "Изграждане на базата данни...  намерени %d (STOP за връщане)"
-    ipod*: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
-    gogearsa9200: "Изграждане на базата данни...  намерени %d (REW за връщане)"
     archosplayer: "Изгр. на БД %d файла"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Изграждане на базата данни...  намерени %d (LEFT за връщане)"
+    gogearsa9200: "Изграждане на базата данни...  намерени %d (REW за връщане)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Изграждане на базата данни...  намерени %d (PREV за връщане)"
+    iriverh100,iriverh120,iriverh300: "Изграждане на базата данни...  намерени %d (STOP за връщане)"
   </dest>
   <voice>
     *: "Изграждане на базата данни...  намерени записи..."
@@ -2431,16 +2348,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Шрифт"
+    *: "Шрифт"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Шрифт"
+    *: "Шрифт"
   </voice>
 </phrase>
 <phrase>
@@ -2702,16 +2616,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Отгоре надолу"
+    *: "Отгоре надолу"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Отгоре надолу"
+    *: "Отгоре надолу"
   </voice>
 </phrase>
 <phrase>
@@ -2719,16 +2630,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Вид показалец на реда"
+    *: "Вид показалец на реда"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Вид показалец на реда"
+    *: "Вид показалец на реда"
   </voice>
 </phrase>
 <phrase>
@@ -2736,16 +2644,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Стрелка"
+    *: "Стрелка"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Стрелка"
+    *: "Стрелка"
   </voice>
 </phrase>
 <phrase>
@@ -2753,16 +2658,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Лента (инвертирана)"
+    *: "Лента (инвертирана)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Лента (инвертирана)"
+    *: "Лента (инвертирана)"
   </voice>
 </phrase>
 <phrase>
@@ -3052,16 +2954,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Скролиране на екрана извън изгледа"
+    *: "Скролиране на екрана извън изгледа"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Скролиране на екрана извън изгледа"
+    *: "Скролиране на екрана извън изгледа"
   </voice>
 </phrase>
 <phrase>
@@ -3069,16 +2968,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Стъпка при скролиране на екрана"
+    *: "Стъпка при скролиране на екрана"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Стъпка при скролиране на екрана"
+    *: "Стъпка при скролиране на екрана"
   </voice>
 </phrase>
 <phrase>
@@ -3134,16 +3030,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Лента на състоянието-/за позициониране"
+    *: "Лента на състоянието-/за позициониране"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ленти на състоянието и за позициониране"
+    *: "Ленти на състоянието и за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -3151,16 +3044,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Лента за позициониране"
+    *: "Лента за позициониране"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Лента за позициониране"
+    *: "Лента за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -3168,16 +3058,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Лента на състоянието"
+    *: "Лента на състоянието"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Лента на състоянието"
+    *: "Лента на състоянието"
   </voice>
 </phrase>
 <phrase>
@@ -3202,16 +3089,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Показване на сила на звука"
+    *: "Показване на сила на звука"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Показване на сила на звука"
+    *: "Показване на сила на звука"
   </voice>
 </phrase>
 <phrase>
@@ -3219,16 +3103,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Показване на батерията"
+    *: "Показване на батерията"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Показване на батерията"
+    *: "Показване на батерията"
   </voice>
 </phrase>
 <phrase>
@@ -3236,16 +3117,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Изображение"
+    *: "Изображение"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Изображение"
+    *: "Изображение"
   </voice>
 </phrase>
 <phrase>
@@ -3253,16 +3131,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Цифров"
+    *: "Цифров"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Цифров"
+    *: "Цифров"
   </voice>
 </phrase>
 <phrase>
@@ -3482,16 +3357,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Иврит (ISO-8859-8)"
+    *: "Иврит (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Иврит (ISO-8859-8)"
+    *: "Иврит (ISO-8859-8)"
   </voice>
 </phrase>
 <phrase>
@@ -3513,16 +3385,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Тайландски (ISO-8859-11)"
+    *: "Тайландски (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Тайландски (ISO-8859-11)"
+    *: "Тайландски (ISO-8859-11)"
   </voice>
 </phrase>
 <phrase>
@@ -3530,16 +3399,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Арабски (CP1256)"
+    *: "Арабски (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Арабски (CP1256)"
+    *: "Арабски (CP1256)"
   </voice>
 </phrase>
 <phrase>
@@ -3575,16 +3441,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Японски (SJIS)"
+    *: "Японски (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Японски (SJIS)"
+    *: "Японски (SJIS)"
   </voice>
 </phrase>
 <phrase>
@@ -3592,16 +3455,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Опростен китайски (GB2312)"
+    *: "Опростен китайски (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Опростен китайски (GB2312)"
+    *: "Опростен китайски (GB2312)"
   </voice>
 </phrase>
 <phrase>
@@ -3609,16 +3469,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Корейски (KSX1001)"
+    *: "Корейски (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Корейски (KSX1001)"
+    *: "Корейски (KSX1001)"
   </voice>
 </phrase>
 <phrase>
@@ -3626,16 +3483,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Традиционен китайски (BIG5)"
+    *: "Традиционен китайски (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Традиционен китайски (BIG5)"
+    *: "Традиционен китайски (BIG5)"
   </voice>
 </phrase>
 <phrase>
@@ -3659,17 +3513,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Изключване на осветяването на бутоните"
-    sansafuze*,sansae200*: "Изключване на осветяването на колелото"
+    sansae200*,sansafuze*: "Изключване на осветяването на колелото"
   </dest>
   <voice>
     *: none
     button_light: "Изключване на осветяването на бутоните"
-    sansafuze*,sansae200*: "Изключване на осветяването на колелото"
+    sansae200*,sansafuze*: "Изключване на осветяването на колелото"
   </voice>
 </phrase>
 <phrase>
@@ -3940,27 +3794,27 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Запази"
-    mrobe500: "HEART = Запази"
-    iriverh100,iriverh120,iriverh300: "NAVI = Запази"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Запази"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Запази"
     gogearsa9200,samsungyh*: "PLAY = Запази"
-    vibe500: "OK = Запази"
+    iriverh100,iriverh120,iriverh300: "NAVI = Запази"
     mpiohd300: "ENTER = Запази"
+    mrobe500: "HEART = Запази"
+    rtc: "ON = Запази"
+    vibe500: "OK = Запази"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3969,39 +3823,35 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = отказ"
-    mrobe500: "POWER = отказ"
-    iriverh100,iriverh120,iriverh300: "STOP = отказ"
-    ipod*,sansac200*,mpiohd300: "MENU = отказ"
-    iaudiox5,iaudiom5: "RECORD = отказ"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = отказ"
-    gigabeatfx: "POWER = отказ"
-    sansafuzeplus: "BACK = отказ"
-    mrobe100: "DISPLAY = отказ"
-    gigabeats: "BACK = отказ"
+    gigabeatfx,mrobe500: "POWER = отказ"
+    gigabeats,sansafuzeplus: "BACK = отказ"
     gogearsa9200: "LEFT = отказ"
-    vibe500: "CANCEL = отказ"
+    iaudiom5,iaudiox5: "RECORD = отказ"
+    ipod*,mpiohd300,sansac200*: "MENU = отказ"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = отказ"
+    iriverh100,iriverh120,iriverh300: "STOP = отказ"
+    mrobe100: "DISPLAY = отказ"
+    rtc: "OFF = отказ"
     samsungyh*: "REW = отказ"
+    vibe500: "CANCEL = отказ"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4487,22 +4337,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Установяване OFF=Отказ"
+    gigabeats: "SELECT=Установяване POWER=Отказ"
     ipod*: "SELECT=Установяване MENU=Отказ"
     iriverh10,iriverh10_5gb: "SELECT=Установяване PREV=Отказ"
-    gigabeats: "SELECT=Установяване POWER=Отказ"
-    vibe500: "OK=Установяване C=Отказ"
     mpiohd300: "ENTER=Установяване MENU=Отказ"
     sansafuzeplus: "SELECT=Установяване  BACK=Отказ"
+    vibe500: "OK=Установяване C=Отказ"
   </dest>
   <voice>
     *: none
@@ -5607,15 +5457,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "Честота"
+    play_frequency,recording: "Честота"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "Честота"
+    play_frequency,recording: "Честота"
   </voice>
 </phrase>
 <phrase>
@@ -5658,18 +5508,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "Микрофон"
     iriverh100,iriverh120,iriverh300: "Вграден микрофон"
+    recording: "Микрофон"
   </dest>
   <voice>
     *: none
-    recording: "Микрофон"
     iriverh100,iriverh120,iriverh300: "Вграден микрофон"
+    recording: "Микрофон"
   </voice>
 </phrase>
 <phrase>
@@ -6547,13 +6397,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Батерия: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Бат: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Бат: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Зареденост на батерията"
@@ -6610,24 +6460,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
-    xduoox3: "MSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
+    xduoox3: "MSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    xduoox3: "micro S D 2"
     archosondio*: "M M C"
+    multivolume: "H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -7942,23 +7792,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "Дискът е пълен. Натиснете OFF за да продължите."
-    iriverh100,iriverh120,iriverh300: "Дискът е пълен. Натиснете stop за да продължите."
     iaudiom5,iaudiox5: "Дискът е пълен. Натиснете Power за да продължите."
-    sansae200*,sansac200*,vibe500: "Дискът е пълен. Натиснете PREV за да продължите."
+    iriverh100,iriverh120,iriverh300: "Дискът е пълен. Натиснете stop за да продължите."
+    recording: "Дискът е пълен. Натиснете OFF за да продължите."
     samsungyh*: "Дискът е пълен. Натиснете LEFT за да продължите."
+    sansac200*,sansae200*,vibe500: "Дискът е пълен. Натиснете PREV за да продължите."
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8046,23 +7896,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF за отказ"
-    iriverh100,iriverh120,iriverh300: "STOP за отказ"
-    ipod*: "PLAY/PAUSE за отказ"
-    iaudiox5,iaudiom5: "Long PLAY за отказ"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV за отказ"
-    gigabeats: "BACK за отказ"
     gigabeatfx: "POWER за отказ"
-    sansafuzeplus: "BACK за отказ"
+    gigabeats,sansafuzeplus: "BACK за отказ"
+    iaudiom5,iaudiox5: "Long PLAY за отказ"
+    ipod*: "PLAY/PAUSE за отказ"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV за отказ"
+    iriverh100,iriverh120,iriverh300: "STOP за отказ"
   </dest>
   <voice>
     *: ""
@@ -9614,7 +9462,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -9656,16 +9504,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Режим на редактиране: %s %s"
+    *: "Режим на редактиране: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9673,16 +9518,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Отрязване"
+    *: "Отрязване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Честота на отрязване"
+    *: "Честота на отрязване"
   </voice>
 </phrase>
 <phrase>
@@ -9690,16 +9532,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Усилване"
+    *: "Усилване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Усилване"
+    *: "Усилване"
   </voice>
 </phrase>
 <phrase>
@@ -9707,16 +9546,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Режим:"
+    *: "Режим:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10379,15 +10215,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на баса"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Отрязване на баса"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на баса"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Отрязване на баса"
   </voice>
 </phrase>
 <phrase>
@@ -10396,15 +10232,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на високите"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Отрязване на високите"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Отрязване на високите"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Отрязване на високите"
   </voice>
 </phrase>
 <phrase>
@@ -10440,16 +10276,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Цъкане на бутоните"
+    *: "Цъкане на бутоните"
   </dest>
   <voice>
-    *: none
-    swcodec: "Цъкане на бутоните"
+    *: "Цъкане на бутоните"
   </voice>
 </phrase>
 <phrase>
@@ -10457,16 +10290,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Повтаряне на цъканията на бутоните"
+    *: "Повтаряне на цъканията на бутоните"
   </dest>
   <voice>
-    *: none
-    swcodec: "Повтаряне на цъканията на бутоните"
+    *: "Повтаряне на цъканията на бутоните"
   </voice>
 </phrase>
 <phrase>
@@ -11199,16 +11029,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Сгъстяване на времето"
+    *: "Сгъстяване на времето"
   </dest>
   <voice>
-    *: none
-    swcodec: "Сгъстяване на времето"
+    *: "Сгъстяване на времето"
   </voice>
 </phrase>
 <phrase>
@@ -11216,16 +11043,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Скорост"
+    *: "Скорост"
   </dest>
   <voice>
-    *: none
-    swcodec: "Скорост"
+    *: "Скорост"
   </voice>
 </phrase>
 <phrase>
@@ -11479,16 +11303,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ширина на лентата за позициониране"
+    *: "Ширина на лентата за позициониране"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ширина на лентата за позициониране"
+    *: "Ширина на лентата за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -11496,16 +11317,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Позиция на лентата за позициониране"
+    *: "Позиция на лентата за позициониране"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Позиция на лентата за позициониране"
+    *: "Позиция на лентата за позициониране"
   </voice>
 </phrase>
 <phrase>
@@ -11513,16 +11331,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Компресор"
+    *: "Компресор"
   </dest>
   <voice>
-    *: none
-    swcodec: "Компресор"
+    *: "Компресор"
   </voice>
 </phrase>
 <phrase>
@@ -11581,16 +11396,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Праг"
+    *: "Праг"
   </dest>
   <voice>
-    *: none
-    swcodec: "Праг"
+    *: "Праг"
   </voice>
 </phrase>
 <phrase>
@@ -11598,16 +11410,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Коефициент"
+    *: "Коефициент"
   </dest>
   <voice>
-    *: none
-    swcodec: "Коефициент"
+    *: "Коефициент"
   </voice>
 </phrase>
 <phrase>
@@ -11615,16 +11424,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 към 1"
+    *: "2 към 1"
   </voice>
 </phrase>
 <phrase>
@@ -11632,16 +11438,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 към 1"
+    *: "4 към 1"
   </voice>
 </phrase>
 <phrase>
@@ -11649,16 +11452,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 към 1"
+    *: "6 към 1"
   </voice>
 </phrase>
 <phrase>
@@ -11666,16 +11466,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 към 1"
+    *: "10 към 1"
   </voice>
 </phrase>
 <phrase>
@@ -11683,16 +11480,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Ограничение"
+    *: "Ограничение"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ограничение"
+    *: "Ограничение"
   </voice>
 </phrase>
 <phrase>
@@ -11700,16 +11494,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Усилване"
+    *: "Усилване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Усилване"
+    *: "Усилване"
   </voice>
 </phrase>
 <phrase>
@@ -11717,16 +11508,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Автоматично"
+    *: "Автоматично"
   </dest>
   <voice>
-    *: none
-    swcodec: "Автоматично"
+    *: "Автоматично"
   </voice>
 </phrase>
 <phrase>
@@ -11734,16 +11522,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Рязкост"
+    *: "Рязкост"
   </dest>
   <voice>
-    *: none
-    swcodec: "Рязкост"
+    *: "Рязкост"
   </voice>
 </phrase>
 <phrase>
@@ -11751,16 +11536,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Рязко"
+    *: "Рязко"
   </dest>
   <voice>
-    *: none
-    swcodec: "Рязко"
+    *: "Рязко"
   </voice>
 </phrase>
 <phrase>
@@ -11768,16 +11550,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Плавно"
+    *: "Плавно"
   </dest>
   <voice>
-    *: none
-    swcodec: "Плавно"
+    *: "Плавно"
   </voice>
 </phrase>
 <phrase>
@@ -11785,16 +11564,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Време на освобождаване"
+    *: "Време на освобождаване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Време на освобождаване"
+    *: "Време на освобождаване"
   </voice>
 </phrase>
 <phrase>
@@ -11982,16 +11758,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Основна кожа"
+    *: "Основна кожа"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Основна кожа"
+    *: "Основна кожа"
   </voice>
 </phrase>
 <phrase>
@@ -11999,16 +11772,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Основна кожа на дистанционното"
+    *: "Основна кожа на дистанционното"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Основна кожа на дистанционното"
+    *: "Основна кожа на дистанционното"
   </voice>
 </phrase>
 <phrase>
@@ -12135,16 +11905,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Превъртане преди възобновяване"
+    *: "Превъртане преди възобновяване"
   </dest>
   <voice>
-    *: none
-    swcodec: "Превъртане преди възобновяване"
+    *: "Превъртане преди възобновяване"
   </voice>
 </phrase>
 <phrase>
@@ -12932,16 +12699,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "Прост (главен)"
+    *: "Прост (главен)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Прост (главен)"
+    *: "Прост (главен)"
   </voice>
 </phrase>
 <phrase>
@@ -12949,16 +12713,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "Потребителски"
+    *: "Потребителски"
   </dest>
   <voice>
-    *: none
-    swcodec: "Потребителски"
+    *: "Потребителски"
   </voice>
 </phrase>
 <phrase>
@@ -12994,16 +12755,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Време за нападение"
+    *: "Време за нападение"
   </dest>
   <voice>
-    *: none
-    swcodec: "Време за нападение"
+    *: "Време за нападение"
   </voice>
 </phrase>
 <phrase>
@@ -13011,16 +12769,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -13139,18 +12894,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -13158,16 +12910,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "САМО СТРАНИЧНО"
+    *: "САМО СТРАНИЧНО"
   </dest>
   <voice>
-    *: none
-    swcodec: "САМО СТРАНИЧНО"
+    *: "САМО СТРАНИЧНО"
   </voice>
 </phrase>
 <phrase>
@@ -13175,16 +12924,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "Сух / Мокър Mix"
+    *: "Сух / Мокър Mix"
   </dest>
   <voice>
-    *: none
-    swcodec: "Сух / Мокър Mix"
+    *: "Сух / Мокър Mix"
   </voice>
 </phrase>
 <phrase>
@@ -13192,16 +12938,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -13210,18 +12953,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50: "Само зареждане"
-    ibassodx90: "Само зареждане"
+    ibassodx50,ibassodx90: "Само зареждане"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Само зареждане"
-    ibassodx90: "Само зареждане"
+    ibassodx50,ibassodx90: "Само зареждане"
   </voice>
 </phrase>
 <phrase>
@@ -13229,16 +12969,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -13246,16 +12983,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "Осезаемо подобрение на баса"
+    *: "Осезаемо подобрение на баса"
   </dest>
   <voice>
-    *: none
-    swcodec: "Осезаемо подобрение на баса"
+    *: "Осезаемо подобрение на баса"
   </voice>
 </phrase>
 <phrase>
@@ -13264,18 +12998,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50: "USB Режим"
-    ibassodx90: "USB Режим"
+    ibassodx50,ibassodx90: "USB Режим"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Ю Ес Би Режим"
-    ibassodx90: "Ю Ес Би Режим"
+    ibassodx50,ibassodx90: "Ю Ес Би Режим"
   </voice>
 </phrase>
 <phrase>
@@ -13284,18 +13015,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </source>
   <dest>
     *: none
-    ibassodx50: "Управление на мащабирането на честотите"
-    ibassodx90: "Управление на мащабирането на честотите"
+    ibassodx50,ibassodx90: "Управление на мащабирането на честотите"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Управление на мащабирането на честотите"
-    ibassodx90: "Управление на мащабирането на честотите"
+    ibassodx50,ibassodx90: "Управление на мащабирането на честотите"
   </voice>
 </phrase>
 <phrase>
@@ -13304,18 +13032,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50: "Масова памет"
-    ibassodx90: "Масова памет"
+    ibassodx50,ibassodx90: "Масова памет"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Масова памет"
-    ibassodx90: "Масова памет"
+    ibassodx50,ibassodx90: "Масова памет"
   </voice>
 </phrase>
 <phrase>
@@ -13323,16 +13048,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "Намаляване на слуховата умора"
+    *: "Намаляване на слуховата умора"
   </dest>
   <voice>
-    *: none
-    swcodec: "Намаляване на слуховата умора"
+    *: "Намаляване на слуховата умора"
   </voice>
 </phrase>
 <phrase>
@@ -13340,15 +13062,12 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </dest>
   <voice>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </voice>
 </phrase>

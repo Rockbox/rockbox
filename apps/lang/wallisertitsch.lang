@@ -2556,13 +2556,13 @@
   user: core
   <source>
     *: "OFF To Revert"
-    vibe500: "CANCEL To Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL To Revert"
   </source>
   <dest>
     *: "OFF = abbrächu"
-    vibe500: "C = abbrächu"
     samsungyh*: "REW = abbrächu"
+    vibe500: "C = abbrächu"
   </dest>
   <voice>
     *: ""
@@ -2616,13 +2616,13 @@
   user: core
   <source>
     *: "The disk is full. Press OFF to continue."
-    vibe500: "The disk is full. Press PREV to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "Feschtplatta isch voll. Drick OFF."
-    vibe500: "Feschtplatta isch voll. Drick PREV."
     samsungyh*: "Feschtplatta isch voll. Drick LEFT."
+    vibe500: "Feschtplatta isch voll. Drick PREV."
   </dest>
   <voice>
     *: ""
@@ -2690,15 +2690,15 @@
   user: core
   <source>
     *: "PLAY=Set OFF=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "PLAY=Ok OFF=Abbrächu"
-    vibe500: "OK=Ok C=Abbrächu"
     mpiohd300: "ENTER=Ok MENU=Abbrächu"
     sansafuzeplus: "SELECT=Ok  BACK=Abbrächu"
+    vibe500: "OK=Ok C=Abbrächu"
   </dest>
   <voice>
     *: ""
@@ -2720,7 +2720,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps 
+  desc: in wps
   user: core
   <source>
     *: "Artist"

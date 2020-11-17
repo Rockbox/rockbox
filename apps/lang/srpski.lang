@@ -796,16 +796,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </dest>
   <voice>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -813,16 +810,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Појачање директног сигнала"
+    *: "Појачање директног сигнала"
   </dest>
   <voice>
-    *: none
-    swcodec: "Појачање директног сигнала"
+    *: "Појачање директног сигнала"
   </voice>
 </phrase>
 <phrase>
@@ -830,16 +824,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Појачање унакрсног сигнала"
+    *: "Појачање унакрсног сигнала"
   </dest>
   <voice>
-    *: none
-    swcodec: "Појачање унакрсног сигнала"
+    *: "Појачање унакрсног сигнала"
   </voice>
 </phrase>
 <phrase>
@@ -847,16 +838,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "Слабљење високих фрекв."
+    *: "Слабљење високих фрекв."
   </dest>
   <voice>
-    *: none
-    swcodec: "Слабљење високих фреквенција"
+    *: "Слабљење високих фреквенција"
   </voice>
 </phrase>
 <phrase>
@@ -864,16 +852,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Гранична фрекв. ВФ филтра"
+    *: "Гранична фрекв. ВФ филтра"
   </dest>
   <voice>
-    *: none
-    swcodec: "Гранична фрекв ВФ филтра"
+    *: "Гранична фрекв ВФ филтра"
   </voice>
 </phrase>
 <phrase>
@@ -881,16 +866,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "Еквилајзер"
+    *: "Еквилајзер"
   </dest>
   <voice>
-    *: none
-    swcodec: "Еквилајзер"
+    *: "Еквилајзер"
   </voice>
 </phrase>
 <phrase>
@@ -898,16 +880,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Укључи EQ"
+    *: "Укључи EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Укључи еквилајзер"
+    *: "Укључи еквилајзер"
   </voice>
 </phrase>
 <phrase>
@@ -915,16 +894,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Графички EQ"
+    *: "Графички EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Графички еквилајзер"
+    *: "Графички еквилајзер"
   </voice>
 </phrase>
 <phrase>
@@ -932,16 +908,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "Предслабљење"
+    *: "Предслабљење"
   </dest>
   <voice>
-    *: none
-    swcodec: "Предслабљење"
+    *: "Предслабљење"
   </voice>
 </phrase>
 <phrase>
@@ -949,16 +922,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Једноставна EQ подешавања"
+    *: "Једноставна EQ подешавања"
   </dest>
   <voice>
-    *: none
-    swcodec: "Једноставна подешавања еквилајзера"
+    *: "Једноставна подешавања еквилајзера"
   </voice>
 </phrase>
 <phrase>
@@ -966,16 +936,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Напредна EQ подешавања"
+    *: "Напредна EQ подешавања"
   </dest>
   <voice>
-    *: none
-    swcodec: "Напредна подешавања еквилајзера"
+    *: "Напредна подешавања еквилајзера"
   </voice>
 </phrase>
 <phrase>
@@ -983,16 +950,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "Сними EQ поставку"
+    *: "Сними EQ поставку"
   </dest>
   <voice>
-    *: none
-    swcodec: "Сними поставку еквилајзера"
+    *: "Сними поставку еквилајзера"
   </voice>
 </phrase>
 <phrase>
@@ -1000,16 +964,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "Прегледај EQ поставке"
+    *: "Прегледај EQ поставке"
   </dest>
   <voice>
-    *: none
-    swcodec: "Прегледај поставке еквилајзера"
+    *: "Прегледај поставке еквилајзера"
   </voice>
 </phrase>
 <phrase>
@@ -1017,16 +978,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Мод подешавања: %s"
+    *: "Мод подешавања: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1034,16 +992,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Појачање у %d Hz појасу"
+    *: "Појачање у %d Hz појасу"
   </dest>
   <voice>
-    *: none
-    swcodec: "херц појас појачање"
+    *: "херц појас појачање"
   </voice>
 </phrase>
 <phrase>
@@ -1051,16 +1006,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Low Shelf филтер"
+    *: "Low Shelf филтер"
   </dest>
   <voice>
-    *: none
-    swcodec: "Low shelf филтер"
+    *: "Low shelf филтер"
   </voice>
 </phrase>
 <phrase>
@@ -1068,16 +1020,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "Вршни филтер %d"
+    *: "Вршни филтер %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "Вршни филтер"
+    *: "Вршни филтер"
   </voice>
 </phrase>
 <phrase>
@@ -1085,16 +1034,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "High Shelf филтер"
+    *: "High Shelf филтер"
   </dest>
   <voice>
-    *: none
-    swcodec: "High shelf филтер"
+    *: "High shelf филтер"
   </voice>
 </phrase>
 <phrase>
@@ -1102,16 +1048,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Гранична фреквенција"
+    *: "Гранична фреквенција"
   </dest>
   <voice>
-    *: none
-    swcodec: "Гранична фреквенција"
+    *: "Гранична фреквенција"
   </voice>
 </phrase>
 <phrase>
@@ -1119,16 +1062,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Централна фреквенција"
+    *: "Централна фреквенција"
   </dest>
   <voice>
-    *: none
-    swcodec: "Централна фреквенција"
+    *: "Централна фреквенција"
   </voice>
 </phrase>
 <phrase>
@@ -1136,16 +1076,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q-фактор"
+    *: "Q-фактор"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q-фактор"
+    *: "Q-фактор"
   </voice>
 </phrase>
 <phrase>
@@ -1153,16 +1090,13 @@
   desc: in the sound settings and some other menus
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Дитер"
+    *: "Дитер"
   </dest>
   <voice>
-    *: none
-    swcodec: "Дитер"
+    *: "Дитер"
   </voice>
 </phrase>
 <phrase>
@@ -1553,16 +1487,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Спречи клиповање"
+    *: "Спречи клиповање"
   </dest>
   <voice>
-    *: none
-    swcodec: "Спречи клиповање"
+    *: "Спречи клиповање"
   </voice>
 </phrase>
 <phrase>
@@ -1640,16 +1571,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "Бип код прескакања нумера"
+    *: "Бип код прескакања нумера"
   </dest>
   <voice>
-    *: none
-    swcodec: "Бип код прескакања нумера"
+    *: "Бип код прескакања нумера"
   </voice>
 </phrase>
 <phrase>
@@ -1657,16 +1585,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "Тихо"
+    *: "Тихо"
   </dest>
   <voice>
-    *: none
-    swcodec: "Тихо"
+    *: "Тихо"
   </voice>
 </phrase>
 <phrase>
@@ -1674,16 +1599,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "Средње"
+    *: "Средње"
   </dest>
   <voice>
-    *: none
-    swcodec: "Средње"
+    *: "Средње"
   </voice>
 </phrase>
 <phrase>
@@ -1691,16 +1613,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "Јако"
+    *: "Јако"
   </dest>
   <voice>
-    *: none
-    swcodec: "Јако"
+    *: "Јако"
   </voice>
 </phrase>
 <phrase>
@@ -2249,16 +2168,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Фонт"
+    *: "Фонт"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Фонт"
+    *: "Фонт"
   </voice>
 </phrase>
 <phrase>
@@ -2520,16 +2436,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Изврнуто"
+    *: "Изврнуто"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Изврнуто"
+    *: "Изврнуто"
   </voice>
 </phrase>
 <phrase>
@@ -2537,16 +2450,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Тип селектора линије"
+    *: "Тип селектора линије"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Тип селектора линије"
+    *: "Тип селектора линије"
   </voice>
 </phrase>
 <phrase>
@@ -2554,16 +2464,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Показивач"
+    *: "Показивач"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Показивач"
+    *: "Показивач"
   </voice>
 </phrase>
 <phrase>
@@ -2571,16 +2478,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Трака (инверзно)"
+    *: "Трака (инверзно)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Трака инверзно"
+    *: "Трака инверзно"
   </voice>
 </phrase>
 <phrase>
@@ -2870,16 +2774,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Екран скролује ван погледа"
+    *: "Екран скролује ван погледа"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Екран скролује ван погледа"
+    *: "Екран скролује ван погледа"
   </voice>
 </phrase>
 <phrase>
@@ -2887,16 +2788,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Величина корака скроловања"
+    *: "Величина корака скроловања"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Величина корака скроловања"
+    *: "Величина корака скроловања"
   </voice>
 </phrase>
 <phrase>
@@ -2952,16 +2850,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Статусна-/Скрол-линија"
+    *: "Статусна-/Скрол-линија"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Статусна- и скрол-линија"
+    *: "Статусна- и скрол-линија"
   </voice>
 </phrase>
 <phrase>
@@ -2969,16 +2864,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Скрол линија"
+    *: "Скрол линија"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Скрол линија"
+    *: "Скрол линија"
   </voice>
 </phrase>
 <phrase>
@@ -2986,16 +2878,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Статусна линија"
+    *: "Статусна линија"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Статусна линија"
+    *: "Статусна линија"
   </voice>
 </phrase>
 <phrase>
@@ -3003,16 +2892,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Приказ јачине"
+    *: "Приказ јачине"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Приказ јачине"
+    *: "Приказ јачине"
   </voice>
 </phrase>
 <phrase>
@@ -3020,16 +2906,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Приказ батерије"
+    *: "Приказ батерије"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Приказ батерије"
+    *: "Приказ батерије"
   </voice>
 </phrase>
 <phrase>
@@ -3037,16 +2920,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Графички"
+    *: "Графички"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Графички"
+    *: "Графички"
   </voice>
 </phrase>
 <phrase>
@@ -3054,16 +2934,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Бројчано"
+    *: "Бројчано"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Бројчано"
+    *: "Бројчано"
   </voice>
 </phrase>
 <phrase>
@@ -3253,16 +3130,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "хебрејска (ISO-8859-8)"
+    *: "хебрејска (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "хебрејска"
+    *: "хебрејска"
   </voice>
 </phrase>
 <phrase>
@@ -3284,16 +3158,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "тајландска (ISO-8859-11)"
+    *: "тајландска (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "тајландска"
+    *: "тајландска"
   </voice>
 </phrase>
 <phrase>
@@ -3301,16 +3172,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "арапска (CP1256)"
+    *: "арапска (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "арапска"
+    *: "арапска"
   </voice>
 </phrase>
 <phrase>
@@ -3346,16 +3214,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "јапанска (SJIS)"
+    *: "јапанска (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "јапанска"
+    *: "јапанска"
   </voice>
 </phrase>
 <phrase>
@@ -3363,16 +3228,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "кинеска упрошћена (GB2312)"
+    *: "кинеска упрошћена (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "кинеска упрошћена"
+    *: "кинеска упрошћена"
   </voice>
 </phrase>
 <phrase>
@@ -3380,16 +3242,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "корејска (KSX1001)"
+    *: "корејска (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "корејска"
+    *: "корејска"
   </voice>
 </phrase>
 <phrase>
@@ -3397,16 +3256,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "кинеска традиционална (BIG5)"
+    *: "кинеска традиционална (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "кинеска традиционална"
+    *: "кинеска традиционална"
   </voice>
 </phrase>
 <phrase>
@@ -3737,7 +3593,7 @@
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3774,7 +3630,7 @@
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7588,7 +7444,7 @@
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -9233,16 +9089,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Mod izmene: %s %s"
+    *: "Mod izmene: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9250,16 +9103,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Granicna"
+    *: "Granicna"
   </dest>
   <voice>
-    *: none
-    swcodec: "Granicna"
+    *: "Granicna"
   </voice>
 </phrase>
 <phrase>
@@ -9267,16 +9117,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Pojacanje"
+    *: "Pojacanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pojacanje"
+    *: "Pojacanje"
   </voice>
 </phrase>
 <phrase>
@@ -9779,16 +9626,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Клик тастера"
+    *: "Клик тастера"
   </dest>
   <voice>
-    *: none
-    swcodec: "Клик тастера"
+    *: "Клик тастера"
   </voice>
 </phrase>
 <phrase>
@@ -9796,16 +9640,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Клик тастера се понавља"
+    *: "Клик тастера се понавља"
   </dest>
   <voice>
-    *: none
-    swcodec: "Клик тастера се понавља"
+    *: "Клик тастера се понавља"
   </voice>
 </phrase>
 <phrase>
@@ -10290,11 +10131,11 @@
     *: none
     serial_port: "19200"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "19200"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "19200"
   </voice>
@@ -10307,11 +10148,11 @@
     *: none
     serial_port: "Serial Bitrate"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Серијски битски проток"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Серијски битски проток"
   </voice>
@@ -10324,11 +10165,11 @@
     *: none
     serial_port: "9600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "9600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "9600"
   </voice>
@@ -10341,11 +10182,11 @@
     *: none
     serial_port: "38400"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "38400"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "38400"
   </voice>
@@ -10358,11 +10199,11 @@
     *: none
     serial_port: "57600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "57600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "57600"
   </voice>
@@ -10389,11 +10230,11 @@
     *: none
     serial_port: "Auto"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Ауто"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Аутоматски"
   </voice>
@@ -10555,16 +10396,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Release време"
+    *: "Release време"
   </dest>
   <voice>
-    *: none
-    swcodec: "Release време"
+    *: "Release време"
   </voice>
 </phrase>
 <phrase>
@@ -10572,16 +10410,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Праг"
+    *: "Праг"
   </dest>
   <voice>
-    *: none
-    swcodec: "Праг"
+    *: "Праг"
   </voice>
 </phrase>
 <phrase>
@@ -10589,16 +10424,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Појачање за надокнаду"
+    *: "Појачање за надокнаду"
   </dest>
   <voice>
-    *: none
-    swcodec: "Појачање за надокнаду"
+    *: "Појачање за надокнаду"
   </voice>
 </phrase>
 <phrase>
@@ -10606,16 +10438,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Позиција скрол линије"
+    *: "Позиција скрол линије"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Позиција скрол линије"
+    *: "Позиција скрол линије"
   </voice>
 </phrase>
 <phrase>
@@ -10657,16 +10486,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ни"
+    *: "Ни"
   </voice>
 </phrase>
 <phrase>
@@ -10674,16 +10500,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Ауто"
+    *: "Ауто"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ауто"
+    *: "Ауто"
   </voice>
 </phrase>
 <phrase>
@@ -10705,16 +10528,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Софт ни"
+    *: "Софт ни"
   </voice>
 </phrase>
 <phrase>
@@ -10736,16 +10556,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Однос"
+    *: "Однос"
   </dest>
   <voice>
-    *: none
-    swcodec: "Однос"
+    *: "Однос"
   </voice>
 </phrase>
 <phrase>
@@ -10770,16 +10587,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Хард ни"
+    *: "Хард ни"
   </voice>
 </phrase>
 <phrase>
@@ -10866,7 +10680,7 @@
 </phrase>
 <phrase>
   id: LANG_SEMITONE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -10954,16 +10768,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 према 1"
+    *: "10 према 1"
   </voice>
 </phrase>
 <phrase>
@@ -11005,16 +10816,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 према 1"
+    *: "2 према 1"
   </voice>
 </phrase>
 <phrase>
@@ -11039,16 +10847,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Лимит"
+    *: "Лимит"
   </dest>
   <voice>
-    *: none
-    swcodec: "Лимит"
+    *: "Лимит"
   </voice>
 </phrase>
 <phrase>
@@ -11087,16 +10892,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ширина скрол линије"
+    *: "Ширина скрол линије"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ширина скрол линије"
+    *: "Ширина скрол линије"
   </voice>
 </phrase>
 <phrase>
@@ -11163,16 +10965,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </dest>
   <voice>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </voice>
 </phrase>
 <phrase>
@@ -11180,16 +10979,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 према 1"
+    *: "6 према 1"
   </voice>
 </phrase>
 <phrase>
@@ -11197,16 +10993,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Компресор"
+    *: "Компресор"
   </dest>
   <voice>
-    *: none
-    swcodec: "Компресор"
+    *: "Компресор"
   </voice>
 </phrase>
 <phrase>
@@ -11259,16 +11052,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Брзина"
+    *: "Брзина"
   </dest>
   <voice>
-    *: none
-    swcodec: "Брзина"
+    *: "Брзина"
   </voice>
 </phrase>
 <phrase>
@@ -11290,16 +11080,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 према 1"
+    *: "4 према 1"
   </voice>
 </phrase>
 <phrase>
@@ -11406,16 +11193,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Основни Skin"
+    *: "Основни Skin"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Основни Skin"
+    *: "Основни Skin"
   </voice>
 </phrase>
 <phrase>
@@ -11491,16 +11275,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Основни скин на даљинском"
+    *: "Основни скин на даљинском"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Основни скин на даљинском"
+    *: "Основни скин на даљинском"
   </voice>
 </phrase>
 <phrase>
@@ -11576,16 +11357,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Премотај уназад пре настављања"
+    *: "Премотај уназад пре настављања"
   </dest>
   <voice>
-    *: none
-    swcodec: "Премотај уназад пре настављања"
+    *: "Премотај уназад пре настављања"
   </voice>
 </phrase>
 <phrase>
@@ -11875,7 +11653,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
@@ -12201,16 +11979,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "Једноставан (Meier)"
+    *: "Једноставан (Meier)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Једноставан Мејеров"
+    *: "Једноставан Мејеров"
   </voice>
 </phrase>
 <phrase>
@@ -12246,16 +12021,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "Подесиви"
+    *: "Подесиви"
   </dest>
   <voice>
-    *: none
-    swcodec: "Подесиви"
+    *: "Подесиви"
   </voice>
 </phrase>
 <phrase>
@@ -12384,16 +12156,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12418,16 +12187,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Attack време"
+    *: "Attack време"
   </dest>
   <voice>
-    *: none
-    swcodec: "Attack време"
+    *: "Attack време"
   </voice>
 </phrase>
 <phrase>
@@ -12511,16 +12277,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "САМО SIDE"
+    *: "САМО SIDE"
   </dest>
   <voice>
-    *: none
-    swcodec: "САМО SIDE"
+    *: "САМО SIDE"
   </voice>
 </phrase>
 <phrase>
@@ -12584,16 +12347,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -12649,16 +12409,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -12694,16 +12451,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </dest>
   <voice>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </voice>
 </phrase>
 <phrase>
@@ -12725,16 +12479,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "Редукција слушног замора"
+    *: "Редукција слушног замора"
   </dest>
   <voice>
-    *: none
-    swcodec: "Редукција слушног замора"
+    *: "Редукција слушног замора"
   </voice>
 </phrase>
 <phrase>
@@ -12773,16 +12524,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "Однос Чист / Процесиран"
+    *: "Однос Чист / Процесиран"
   </dest>
   <voice>
-    *: none
-    swcodec: "Однос Чист / Процесиран"
+    *: "Однос Чист / Процесиран"
   </voice>
 </phrase>
 <phrase>
@@ -12804,16 +12552,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "Перцептуално побољшавање басова"
+    *: "Перцептуално побољшавање басова"
   </dest>
   <voice>
-    *: none
-    swcodec: "Перцептуално побољшавање басова"
+    *: "Перцептуално побољшавање басова"
   </voice>
 </phrase>
 <phrase>
@@ -13276,16 +13021,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Via Track list"
+    *: "Via Track list"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Преко листе нумера"
+    *: "Преко листе нумера"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Преко листе нумера"
+    *: "Преко листе нумера"
   </voice>
 </phrase>
 <phrase>
@@ -13293,16 +13035,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "WPS Integration"
+    *: "WPS Integration"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "WPS интеграција"
+    *: "WPS интеграција"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "WPS интеграција"
+    *: "WPS интеграција"
   </voice>
 </phrase>
 <phrase>
@@ -13310,16 +13049,13 @@
   desc: spoken only, for announcing chess piece color
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Бела"
+    *: "Бела"
   </voice>
 </phrase>
 <phrase>
@@ -13327,16 +13063,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Resume Game"
+    *: "Resume Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Настави игру"
+    *: "Настави игру"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Настави игру"
+    *: "Настави игру"
   </voice>
 </phrase>
 <phrase>
@@ -13344,16 +13077,13 @@
   desc: spoken only, for announcing chess piece color
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Црна"
+    *: "Црна"
   </voice>
 </phrase>
 <phrase>
@@ -13361,16 +13091,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Always On"
+    *: "Always On"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Увек укључено"
+    *: "Увек укључено"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Увек укључено"
+    *: "Увек укључено"
   </voice>
 </phrase>
 <phrase>
@@ -13406,19 +13133,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Set resume time (min)"
     lowmem: none
-    swcodec: "Set resume time (min)"
   </source>
   <dest>
-    *: none
+    *: "Постави време настављања (мин)"
     lowmem: none
-    swcodec: "Постави време настављања (мин)"
   </dest>
   <voice>
-    *: none
+    *: "Постави време настављања"
     lowmem: none
-    swcodec: "Постави време настављања"
   </voice>
 </phrase>
 <phrase>
@@ -13426,16 +13150,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Diffusion"
+    *: "Diffusion"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Дифузија"
+    *: "Дифузија"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Дифузија"
+    *: "Дифузија"
   </voice>
 </phrase>
 <phrase>
@@ -13457,16 +13178,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arghs Per Food"
+    *: "Arghs Per Food"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Аргхова по храни"
+    *: "Аргхова по храни"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Аргхова по храни"
+    *: "Аргхова по храни"
   </voice>
 </phrase>
 <phrase>
@@ -13474,19 +13192,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Resume automatically"
     lowmem: none
-    swcodec: "Resume automatically"
   </source>
   <dest>
-    *: none
+    *: "Настави аутоматски"
     lowmem: none
-    swcodec: "Настави аутоматски"
   </dest>
   <voice>
-    *: none
+    *: "Настави аутоматски"
     lowmem: none
-    swcodec: "Настави аутоматски"
   </voice>
 </phrase>
 <phrase>
@@ -13494,16 +13209,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 7: 40 moves / 240 min"
+    *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 7: 40 потеза / 240 мин"
+    *: "Ниво 7: 40 потеза / 240 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 7: 40 потеза за 240 мин"
+    *: "Ниво 7: 40 потеза за 240 мин"
   </voice>
 </phrase>
 <phrase>
@@ -13525,16 +13237,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Краљ"
+    *: "Краљ"
   </voice>
 </phrase>
 <phrase>
@@ -13542,16 +13251,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Топ"
+    *: "Топ"
   </voice>
 </phrase>
 <phrase>
@@ -13559,19 +13265,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Skip frames"
     lowmem: none
-    swcodec: "Skip frames"
   </source>
   <dest>
-    *: none
+    *: "Прескачи фрејмове"
     lowmem: none
-    swcodec: "Прескачи фрејмове"
   </dest>
   <voice>
-    *: none
+    *: "Прескачи фрејмове"
     lowmem: none
-    swcodec: "Прескачи фрејмове"
   </voice>
 </phrase>
 <phrase>
@@ -13579,16 +13282,13 @@
   desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Играч"
+    *: "Играч"
   </voice>
 </phrase>
 <phrase>
@@ -13596,16 +13296,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album title"
+    *: "Show album title"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи наслов албума"
+    *: "Прикажи наслов албума"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи наслов албума"
+    *: "Прикажи наслов албума"
   </voice>
 </phrase>
 <phrase>
@@ -13669,16 +13366,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Argh Size"
+    *: "Argh Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Величина аргха"
+    *: "Величина аргха"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Величина аргха"
+    *: "Величина аргха"
   </voice>
 </phrase>
 <phrase>
@@ -13686,16 +13380,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Шах!"
+    *: "Шах!"
   </voice>
 </phrase>
 <phrase>
@@ -13703,16 +13394,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Cache will be rebuilt on next restart"
+    *: "Cache will be rebuilt on next restart"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Кеш ће да се изради при наредном поновном покретању"
+    *: "Кеш ће да се изради при наредном поновном покретању"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Кеш ће да се изради при наредном поновном покретању"
+    *: "Кеш ће да се изради при наредном поновном покретању"
   </voice>
 </phrase>
 <phrase>
@@ -13720,16 +13408,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Playlist Cleared"
+    *: "Playlist Cleared"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Плејлиста је очишћена"
+    *: "Плејлиста је очишћена"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Плејлиста је очишћена"
+    *: "Плејлиста је очишћена"
   </voice>
 </phrase>
 <phrase>
@@ -13737,16 +13422,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 3: 60 moves / 30 min"
+    *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 3: 60 потеза / 30 мин"
+    *: "Ниво 3: 60 потеза / 30 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 3: 60 потеза за 30 minutes"
+    *: "Ниво 3: 60 потеза за 30 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13768,19 +13450,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Tone controls"
     lowmem: none
-    swcodec: "Tone controls"
   </source>
   <dest>
-    *: none
+    *: "Тонске контроле"
     lowmem: none
-    swcodec: "Тонске контроле"
   </dest>
   <voice>
-    *: none
+    *: "Тонске контроле"
     lowmem: none
-    swcodec: "Тонске контроле"
   </voice>
 </phrase>
 <phrase>
@@ -13802,16 +13481,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 4: 40 moves / 30 min"
+    *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 4: 40 потеза / 30 мин"
+    *: "Ниво 4: 40 потеза / 30 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 4: 40 потеза за 30 минута"
+    *: "Ниво 4: 40 потеза за 30 минута"
   </voice>
 </phrase>
 <phrase>
@@ -13819,16 +13495,13 @@
   desc: in the pictureflow main menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Clear playlist"
+    *: "Clear playlist"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Очисти плејлисту"
+    *: "Очисти плејлисту"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Очисти плејлисту"
+    *: "Очисти плејлисту"
   </voice>
 </phrase>
 <phrase>
@@ -13850,16 +13523,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "краљичина страна"
+    *: "краљичина страна"
   </voice>
 </phrase>
 <phrase>
@@ -13881,16 +13551,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Checkmate!"
+    *: "Checkmate!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Шах-мат!"
+    *: "Шах-мат!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Шах-мат!"
+    *: "Шах-мат!"
   </voice>
 </phrase>
 <phrase>
@@ -13926,16 +13593,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Centre margin"
+    *: "Centre margin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Централна маргина"
+    *: "Централна маргина"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Централна маргина"
+    *: "Централна маргина"
   </voice>
 </phrase>
 <phrase>
@@ -13957,16 +13621,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 6: 40 moves / 120 min"
+    *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 6: 40 потеза / 120 мин"
+    *: "Ниво 6: 40 потеза / 120 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 6: 40 потеза за 120 minutes"
+    *: "Ниво 6: 40 потеза за 120 minutes"
   </voice>
 </phrase>
 <phrase>
@@ -13974,16 +13635,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Error parsing game !"
+    *: "Error parsing game !"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Грешка при парсирању игре!"
+    *: "Грешка при парсирању игре!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Грешка при парсирању игре!"
+    *: "Грешка при парсирању игре!"
   </voice>
 </phrase>
 <phrase>
@@ -14019,19 +13677,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Play Mode"
     lowmem: none
-    swcodec: "Play Mode"
   </source>
   <dest>
-    *: none
+    *: "Режим репродукције"
     lowmem: none
-    swcodec: "Режим репродукције"
   </dest>
   <voice>
-    *: none
+    *: "Режим репродукције"
     lowmem: none
-    swcodec: "Режим репродукције"
   </voice>
 </phrase>
 <phrase>
@@ -14039,16 +13694,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Spacing"
+    *: "Spacing"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Размак"
+    *: "Размак"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Размак"
+    *: "Размак"
   </voice>
 </phrase>
 <phrase>
@@ -14056,16 +13708,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Games"
+    *: "Games"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Игре"
+    *: "Игре"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14073,16 +13722,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Saving position"
+    *: "Saving position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Чување позиције"
+    *: "Чување позиције"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Чување позиције"
+    *: "Чување позиције"
   </voice>
 </phrase>
 <phrase>
@@ -14090,16 +13736,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "краљева страна"
+    *: "краљева страна"
   </voice>
 </phrase>
 <phrase>
@@ -14107,16 +13750,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Worm Speed"
+    *: "Worm Speed"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Брзина црва"
+    *: "Брзина црва"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Брзина црва"
+    *: "Брзина црва"
   </voice>
 </phrase>
 <phrase>
@@ -14138,16 +13778,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 2: 60 moves / 15 min"
+    *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 2: 60 потеза / 15 мин"
+    *: "Ниво 2: 60 потеза / 15 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 2: 60 потеза за 15 минута"
+    *: "Ниво 2: 60 потеза за 15 минута"
   </voice>
 </phrase>
 <phrase>
@@ -14155,16 +13792,13 @@
   desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ГНУ Шах"
+    *: "ГНУ Шах"
   </voice>
 </phrase>
 <phrase>
@@ -14172,16 +13806,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Food Size"
+    *: "Food Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Величина хране"
+    *: "Величина хране"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Величина хране"
+    *: "Величина хране"
   </voice>
 </phrase>
 <phrase>
@@ -14203,16 +13834,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Grayscale"
+    *: "Grayscale"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Сиви тонови"
+    *: "Сиви тонови"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Сиви тонови"
+    *: "Сиви тонови"
   </voice>
 </phrase>
 <phrase>
@@ -14220,16 +13848,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Краљица"
+    *: "Краљица"
   </voice>
 </phrase>
 <phrase>
@@ -14237,16 +13862,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "хвата"
+    *: "хвата"
   </voice>
 </phrase>
 <phrase>
@@ -14268,16 +13890,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Slideshow Time"
+    *: "Slideshow Time"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Време слајд шоуа"
+    *: "Време слајд шоуа"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Време слајд шоуа"
+    *: "Време слајд шоуа"
   </voice>
 </phrase>
 <phrase>
@@ -14285,19 +13904,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Resume Options"
     lowmem: none
-    swcodec: "Resume Options"
   </source>
   <dest>
-    *: none
+    *: "Опције настављања"
     lowmem: none
-    swcodec: "Опције настављања"
   </dest>
   <voice>
-    *: none
+    *: "Опције настављања"
     lowmem: none
-    swcodec: "Опције настављања"
   </voice>
 </phrase>
 <phrase>
@@ -14305,16 +13921,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "New Game"
+    *: "New Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Нова игра"
+    *: "Нова игра"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Нова игра"
+    *: "Нова игра"
   </voice>
 </phrase>
 <phrase>
@@ -14322,16 +13935,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "View Played Games"
+    *: "View Played Games"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Преглед одиграних игара"
+    *: "Преглед одиграних игара"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Преглед одиграних игара"
+    *: "Преглед одиграних игара"
   </voice>
 </phrase>
 <phrase>
@@ -14339,19 +13949,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Surround"
     lowmem: none
-    swcodec: "Surround"
   </source>
   <dest>
-    *: none
+    *: "Окружујуће"
     lowmem: none
-    swcodec: "Окружујуће"
   </dest>
   <voice>
-    *: none
+    *: "Окружујуће"
     lowmem: none
-    swcodec: "Окружујуће"
   </voice>
 </phrase>
 <phrase>
@@ -14401,19 +14008,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Play from beginning"
     lowmem: none
-    swcodec: "Play from beginning"
   </source>
   <dest>
-    *: none
+    *: "Играј од почетка"
     lowmem: none
-    swcodec: "Играј од почетка"
   </dest>
   <voice>
-    *: none
+    *: "Играј од почетка"
     lowmem: none
-    swcodec: "Играј од почетка"
   </voice>
 </phrase>
 <phrase>
@@ -14421,16 +14025,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Restart Game"
+    *: "Restart Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Поново покрени игру"
+    *: "Поново покрени игру"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Поново покрени игру"
+    *: "Поново покрени игру"
   </voice>
 </phrase>
 <phrase>
@@ -14438,16 +14039,13 @@
   desc: cannot restart playback splash in imageviewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Cannot restart playback"
+    *: "Cannot restart playback"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Приказивање не може поново да се покрене"
+    *: "Приказивање не може поново да се покрене"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Приказивање не може поново да се покрене"
+    *: "Приказивање не може поново да се покрене"
   </voice>
 </phrase>
 <phrase>
@@ -14469,19 +14067,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Use common setting"
     lowmem: none
-    swcodec: "Use common setting"
   </source>
   <dest>
-    *: none
+    *: "Користи уобичајено подешавање"
     lowmem: none
-    swcodec: "Користи уобичајено подешавање"
   </dest>
   <voice>
-    *: none
+    *: "Користи уобичајено подешавање"
     lowmem: none
-    swcodec: "Користи уобичајено подешавање"
   </voice>
 </phrase>
 <phrase>
@@ -14517,16 +14112,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Ordered"
+    *: "Ordered"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Поређано"
+    *: "Поређано"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Поређано"
+    *: "Поређано"
   </voice>
 </phrase>
 <phrase>
@@ -14534,16 +14126,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show at the top"
+    *: "Show at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи на врху"
+    *: "Прикажи на врху"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи на врху"
+    *: "Прикажи на врху"
   </voice>
 </phrase>
 <phrase>
@@ -14551,16 +14140,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ловац"
+    *: "Ловац"
   </voice>
 </phrase>
 <phrase>
@@ -14568,16 +14154,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Пијун"
+    *: "Пијун"
   </voice>
 </phrase>
 <phrase>
@@ -14585,16 +14168,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Resize Covers"
+    *: "Resize Covers"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Промени величину омота"
+    *: "Промени величину омота"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Промени величину омота"
+    *: "Промени величину омота"
   </voice>
 </phrase>
 <phrase>
@@ -14616,16 +14196,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Zoom"
+    *: "Zoom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Зум"
+    *: "Зум"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Зум"
+    *: "Зум"
   </voice>
 </phrase>
 <phrase>
@@ -14633,19 +14210,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Interpolation"
     lowmem: none
-    swcodec: "Interpolation"
   </source>
   <dest>
-    *: none
+    *: "Интерполација"
     lowmem: none
-    swcodec: "Интерполација"
   </dest>
   <voice>
-    *: none
+    *: "Интерполација"
     lowmem: none
-    swcodec: "Интерполација"
   </voice>
 </phrase>
 <phrase>
@@ -14681,16 +14255,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Loading position"
+    *: "Loading position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Учитавање позиције"
+    *: "Учитавање позиције"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Учитавање позиције"
+    *: "Учитавање позиције"
   </voice>
 </phrase>
 <phrase>
@@ -14698,16 +14269,13 @@
   desc: in the pictureflow main menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Go to WPS"
+    *: "Go to WPS"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Иди на WPS"
+    *: "Иди на WPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Иди на WPS"
+    *: "Иди на WPS"
   </voice>
 </phrase>
 <phrase>
@@ -14715,19 +14283,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "CPU Boost"
     lowmem: none
-    swcodec: "CPU Boost"
   </source>
   <dest>
-    *: none
+    *: "CPU убрзање"
     lowmem: none
-    swcodec: "CPU убрзање"
   </dest>
   <voice>
-    *: none
+    *: "CPU убрзање"
     lowmem: none
-    swcodec: "CPU убрзање"
   </voice>
 </phrase>
 <phrase>
@@ -14735,16 +14300,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show at the bottom"
+    *: "Show at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи на дну"
+    *: "Прикажи на дну"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи на дну"
+    *: "Прикажи на дну"
   </voice>
 </phrase>
 <phrase>
@@ -14752,16 +14314,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hide album title"
+    *: "Hide album title"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Сакриј наслов албума"
+    *: "Сакриј наслов албума"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Сакриј наслов албума"
+    *: "Сакриј наслов албума"
   </voice>
 </phrase>
 <phrase>
@@ -14769,19 +14328,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Limit FPS"
     lowmem: none
-    swcodec: "Limit FPS"
   </source>
   <dest>
-    *: none
+    *: "Ограничи FPS"
     lowmem: none
-    swcodec: "Ограничи FPS"
   </dest>
   <voice>
-    *: none
+    *: "Ограничи FPS"
     lowmem: none
-    swcodec: "Ограничи FPS"
   </voice>
 </phrase>
 <phrase>
@@ -14789,16 +14345,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "No album art found"
+    *: "No album art found"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Није пронађена ниједна слика албума"
+    *: "Није пронађена ниједна слика албума"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Није пронађена ниједна слика албума"
+    *: "Није пронађена ниједна слика албума"
   </voice>
 </phrase>
 <phrase>
@@ -14834,16 +14387,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Rebuild cache"
+    *: "Rebuild cache"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Поново изгради кеш"
+    *: "Поново изгради кеш"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Поново изгради кеш"
+    *: "Поново изгради кеш"
   </voice>
 </phrase>
 <phrase>
@@ -14865,16 +14415,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Коњ"
+    *: "Коњ"
   </voice>
 </phrase>
 <phrase>
@@ -14882,16 +14429,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Illegal move!"
+    *: "Illegal move!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Недозвољен потез!"
+    *: "Недозвољен потез!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Недозвољен потез!"
+    *: "Недозвољен потез!"
   </voice>
 </phrase>
 <phrase>
@@ -14899,16 +14443,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Added to playlist"
+    *: "Added to playlist"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Додато у плејлисту"
+    *: "Додато у плејлисту"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Додато у плејлисту"
+    *: "Додато у плејлисту"
   </voice>
 </phrase>
 <phrase>
@@ -14916,16 +14457,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Direct"
+    *: "Direct"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Директно"
+    *: "Директно"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Директно"
+    *: "Директно"
   </voice>
 </phrase>
 <phrase>
@@ -14933,23 +14471,20 @@
   desc: in mpegplayer settings
   user: core
   <source>
-    *: none
+    *: "Unavailable"
     lowmem: none
-    swcodec: "Unavailable"
   </source>
   <dest>
-    *: none
+    *: "Недоступно"
     lowmem: none
-    swcodec: "Недоступно"
   </dest>
   <voice>
-    *: none
+    *: "Недоступно"
     lowmem: none
-    swcodec: "Недоступно"
   </voice>
 </phrase>
 <phrase>
-id: VOICE_BAT_BENCH_KEYS
+  id: VOICE_BAT_BENCH_KEYS
   desc: Battery bench start up message
   user: core
   <source>
@@ -14967,19 +14502,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Use sound setting"
     lowmem: none
-    swcodec: "Use sound setting"
   </source>
   <dest>
-    *: none
+    *: "Користи подешавање звука"
     lowmem: none
-    swcodec: "Користи подешавање звука"
   </dest>
   <voice>
-    *: none
+    *: "Користи подешавање звука"
     lowmem: none
-    swcodec: "Користи подешавање звука"
   </voice>
 </phrase>
 <phrase>
@@ -15001,19 +14533,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Reverberation"
     lowmem: none
-    swcodec: "Reverberation"
   </source>
   <dest>
-    *: none
+    *: "Реверберација"
     lowmem: none
-    swcodec: "Реверберација"
   </dest>
   <voice>
-    *: none
+    *: "Реверберација"
     lowmem: none
-    swcodec: "Реверберација"
   </voice>
 </phrase>
 <phrase>
@@ -15021,19 +14550,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Panning Separation"
     lowmem: none
-    swcodec: "Panning Separation"
   </source>
   <dest>
-    *: none
+    *: "Сепарација панирања"
     lowmem: none
-    swcodec: "Сепарација панирања"
   </dest>
   <voice>
-    *: none
+    *: "Сепарација панирања"
     lowmem: none
-    swcodec: "Сепарација панирања"
   </voice>
 </phrase>
 <phrase>
@@ -15055,16 +14581,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 8: 1 move / 15 min"
+    *: "Level 8: 1 move / 15 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 8: 1 потез / 15 минута"
+    *: "Ниво 8: 1 потез / 15 минута"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 8: 1 потез за 15 минута"
+    *: "Ниво 8: 1 потез за 15 минута"
   </voice>
 </phrase>
 <phrase>
@@ -15072,19 +14595,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Clear all resumes"
     lowmem: none
-    swcodec: "Clear all resumes"
   </source>
   <dest>
-    *: none
+    *: "Очисти сва настављања"
     lowmem: none
-    swcodec: "Очисти сва настављања"
   </dest>
   <voice>
-    *: none
+    *: "Очисти сва настављања"
     lowmem: none
-    swcodec: "Очисти сва настављања"
   </voice>
 </phrase>
 <phrase>
@@ -15092,16 +14612,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Restore Game"
+    *: "Restore Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Врати игру"
+    *: "Врати игру"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Врати игру"
+    *: "Врати игру"
   </voice>
 </phrase>
 <phrase>
@@ -15109,19 +14626,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Start menu"
     lowmem: none
-    swcodec: "Start menu"
   </source>
   <dest>
-    *: none
+    *: "Старт мени"
     lowmem: none
-    swcodec: "Старт мени"
   </dest>
   <voice>
-    *: none
+    *: "Старт мени"
     lowmem: none
-    swcodec: "Старт мени"
   </voice>
 </phrase>
 <phrase>
@@ -15129,16 +14643,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "No games found !"
+    *: "No games found !"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Није пронађена ниједна игра!"
+    *: "Није пронађена ниједна игра!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Није пронађена ниједна игра!"
+    *: "Није пронађена ниједна игра!"
   </voice>
 </phrase>
 <phrase>
@@ -15146,16 +14657,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 5: 40 moves / 60 min"
+    *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 5: 40 потеза / 60 мин"
+    *: "Ниво 5: 40 потеза / 60 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 5: 40 потеза за 60 минута"
+    *: "Ниво 5: 40 потеза за 60 минута"
   </voice>
 </phrase>
 <phrase>
@@ -15163,16 +14671,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Worm Growth Per Food"
+    *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Раст црва по храни"
+    *: "Раст црва по храни"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Раст црва по храни"
+    *: "Раст црва по храни"
   </voice>
 </phrase>
 <phrase>
@@ -15180,16 +14685,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Витез"
+    *: "Витез"
   </voice>
 </phrase>
 <phrase>
@@ -15211,16 +14713,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "At the beginning of the game"
+    *: "At the beginning of the game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "На почетку игре"
+    *: "На почетку игре"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "На почетку игре"
+    *: "На почетку игре"
   </voice>
 </phrase>
 <phrase>
@@ -15228,19 +14727,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Single"
     lowmem: none
-    swcodec: "Single"
   </source>
   <dest>
-    *: none
+    *: "Сингл"
     lowmem: none
-    swcodec: "Сингл"
   </dest>
   <voice>
-    *: none
+    *: "Сингл"
     lowmem: none
-    swcodec: "Сингл"
   </voice>
 </phrase>
 <phrase>
@@ -15262,16 +14758,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Number of Worms"
+    *: "Number of Worms"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Број црва"
+    *: "Број црва"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Број црва"
+    *: "Број црва"
   </voice>
 </phrase>
 <phrase>
@@ -15279,16 +14772,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: spoken only, for announcing chess piece marking
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15296,16 +14786,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the mpegplayer and pictureflow settings menus
   user: core
   <source>
-    *: none
-    lcd_bitmap,swcodec: "Display FPS"
+    *: "Display FPS"
   </source>
   <dest>
-    *: none
-    lcd_bitmap,swcodec: "Прикажи FPS"
+    *: "Прикажи FPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap,swcodec: "Прикажи FPS"
+    *: "Прикажи FPS"
   </voice>
 </phrase>
 <phrase>
@@ -15327,19 +14814,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Start menu if not completed"
     lowmem: none
-    swcodec: "Start menu if not completed"
   </source>
   <dest>
-    *: none
+    *: "Старт мени ако није завршено"
     lowmem: none
-    swcodec: "Старт мени ако није завршено"
   </dest>
   <voice>
-    *: none
+    *: "Старт мени ако није завршено"
     lowmem: none
-    swcodec: "Старт мени ако није завршено"
   </voice>
 </phrase>
 <phrase>
@@ -15347,16 +14831,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "At the end of the game"
+    *: "At the end of the game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "На крај игре"
+    *: "На крај игре"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "На крај игре"
+    *: "На крај игре"
   </voice>
 </phrase>
 <phrase>
@@ -15406,16 +14887,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Error writing config"
+    *: "Error writing config"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Грешка при упису конфигурације"
+    *: "Грешка при упису конфигурације"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Грешка при упису конфигурације"
+    *: "Грешка при упису конфигурације"
   </voice>
 </phrase>
 <phrase>
@@ -15423,16 +14901,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thinking..."
+    *: "Thinking..."
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Мислим..."
+    *: "Мислим..."
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15440,16 +14915,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Toggle Slideshow Mode"
+    *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Преклапај слајдшоу режим"
+    *: "Преклапај слајдшоу режим"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Преклапај слајдшоу режим"
+    *: "Преклапај слајдшоу режим"
   </voice>
 </phrase>
 <phrase>
@@ -15457,16 +14929,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Save Game"
+    *: "Save Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Сачувај игру"
+    *: "Сачувај игру"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Сачувај игру"
+    *: "Сачувај игру"
   </voice>
 </phrase>
 <phrase>
@@ -15474,16 +14943,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 10: 1 move / 600 min"
+    *: "Level 10: 1 move / 600 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 10: 1 потез / 600 мин"
+    *: "Ниво 10: 1 потез / 600 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 10: 1 потез за 600 минута"
+    *: "Ниво 10: 1 потез за 600 минута"
   </voice>
 </phrase>
 <phrase>
@@ -15491,16 +14957,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Number of slides"
+    *: "Number of slides"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Број слајдова"
+    *: "Број слајдова"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Број слајдова"
+    *: "Број слајдова"
   </voice>
 </phrase>
 <phrase>
@@ -15508,19 +14971,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Audio Options"
     lowmem: none
-    swcodec: "Audio Options"
   </source>
   <dest>
-    *: none
+    *: "Аудио опције"
     lowmem: none
-    swcodec: "Аудио опције"
   </dest>
   <voice>
-    *: none
+    *: "Аудио опције"
     lowmem: none
-    swcodec: "Аудио опције"
   </voice>
 </phrase>
 <phrase>
@@ -15528,16 +14988,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: spoken only, for announcing chess piece unmarking
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Уклоњен маркер"
+    *: "Уклоњен маркер"
   </voice>
 </phrase>
 <phrase>
@@ -15545,17 +15002,14 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 1: 60 moves / 5 min"
+    *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 1: 60 потеза / 5 мин"
+    *: "Ниво 1: 60 потеза / 5 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 1: 60 потеза за 5 минута"
-</voice>
+    *: "Ниво 1: 60 потеза за 5 минута"
+  </voice>
 </phrase>
 <phrase>
   id: LANG_CONTROL_STYLE
@@ -15576,19 +15030,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Backlight brightness"
     lowmem: none
-    swcodec: "Backlight brightness"
   </source>
   <dest>
-    *: none
+    *: "Јачина позадинског светла"
     lowmem: none
-    swcodec: "Јачина позадинског светла"
   </dest>
   <voice>
-    *: none
+    *: "Јачина позадинског светла"
     lowmem: none
-    swcodec: "Јачина позадинског светла"
   </voice>
 </phrase>
 <phrase>
@@ -15596,16 +15047,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 9: 1 move / 60 min"
+    *: "Level 9: 1 move / 60 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ниво 9: 1 потез / 60 мин"
+    *: "Ниво 9: 1 потез / 60 мин"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ниво 9: 1 потез за 60 минута"
+    *: "Ниво 9: 1 потез за 60 минута"
   </voice>
 </phrase>
 <phrase>
@@ -15613,16 +15061,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Play Wormlet!"
+    *: "Play Wormlet!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Играј Вормлет!"
+    *: "Играј Вормлет!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Играј Вормлет!!"
+    *: "Играј Вормлет!!"
   </voice>
 </phrase>
 <phrase>
@@ -15630,16 +15075,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Select Other Game"
+    *: "Select Other Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Избор друге игре"
+    *: "Избор друге игре"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Избор друге игре"
+    *: "Избор друге игре"
   </voice>
 </phrase>
 <phrase>
@@ -15706,16 +15148,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hide information"
+    *: "Hide information"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Сакриј информације"
+    *: "Сакриј информације"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Сакриј информације"
+    *: "Сакриј информације"
   </voice>
 </phrase>
 <phrase>
@@ -15723,16 +15162,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album at the bottom"
+    *: "Show album at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи албум на дну"
+    *: "Прикажи албум на дну"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи албум на дну"
+    *: "Прикажи албум на дну"
   </voice>
 </phrase>
 <phrase>
@@ -15740,16 +15176,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album and artist at the bottom"
+    *: "Show album and artist at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи албум и извођача на дну"
+    *: "Прикажи албум и извођача на дну"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи албум и извођача на дну"
+    *: "Прикажи албум и извођача на дну"
   </voice>
 </phrase>
 <phrase>
@@ -15757,16 +15190,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album and artist at the top"
+    *: "Show album and artist at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи албум и извођача на врху"
+    *: "Прикажи албум и извођача на врху"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи албум и извођача на врху"
+    *: "Прикажи албум и извођача на врху"
   </voice>
 </phrase>
 <phrase>
@@ -15774,16 +15204,13 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album at the top"
+    *: "Show album at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Прикажи албум на врху"
+    *: "Прикажи албум на врху"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Прикажи албум на врху"
+    *: "Прикажи албум на врху"
   </voice>
 </phrase>
 <phrase>
@@ -15791,19 +15218,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "HQ Mixer"
     lowmem: none
-    swcodec: "HQ Mixer"
   </source>
   <dest>
-    *: none
+    *: "ВК миксер"
     lowmem: none
-    swcodec: "ВК миксер"
   </dest>
   <voice>
-    *: none
+    *: "Миксер високог квалитета"
     lowmem: none
-    swcodec: "Миксер високог квалитета"
   </voice>
 </phrase>
 <phrase>
@@ -15980,19 +15404,16 @@ id: VOICE_BAT_BENCH_KEYS
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Sample Rate"
     lowmem: none
-    swcodec: "Sample Rate"
   </source>
   <dest>
-    *: none
+    *: "Учестаност узорковања"
     lowmem: none
-    swcodec: "Учестаност узорковања"
   </dest>
   <voice>
-    *: none
+    *: "Учестаност узорковања"
     lowmem: none
-    swcodec: "Учестаност узорковања"
   </voice>
 </phrase>
 <phrase>

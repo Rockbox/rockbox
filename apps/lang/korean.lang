@@ -623,16 +623,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "크로스피드"
+    *: "크로스피드"
   </dest>
   <voice>
-    *: none
-    swcodec: "크로스피드"
+    *: "크로스피드"
   </voice>
 </phrase>
 <phrase>
@@ -640,16 +637,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "이퀄라이져"
+    *: "이퀄라이져"
   </dest>
   <voice>
-    *: none
-    swcodec: "이퀄라이져"
+    *: "이퀄라이져"
   </voice>
 </phrase>
 <phrase>
@@ -828,16 +822,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "이퀄라이져 켜기"
+    *: "이퀄라이져 켜기"
   </dest>
   <voice>
-    *: none
-    swcodec: "이퀄라이져 켜기"
+    *: "이퀄라이져 켜기"
   </voice>
 </phrase>
 <phrase>
@@ -845,16 +836,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "그래픽 EQ"
+    *: "그래픽 EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "그래픽 EQ"
+    *: "그래픽 EQ"
   </voice>
 </phrase>
 <phrase>
@@ -862,16 +850,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "미리 줄임"
+    *: "미리 줄임"
   </dest>
   <voice>
-    *: none
-    swcodec: "미리 줄임"
+    *: "미리 줄임"
   </voice>
 </phrase>
 <phrase>
@@ -879,16 +864,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "간단한 EQ설정"
+    *: "간단한 EQ설정"
   </dest>
   <voice>
-    *: none
-    swcodec: "간단한 EQ설정"
+    *: "간단한 EQ설정"
   </voice>
 </phrase>
 <phrase>
@@ -896,16 +878,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "고급 EQ설정"
+    *: "고급 EQ설정"
   </dest>
   <voice>
-    *: none
-    swcodec: "고급 EQ설정"
+    *: "고급 EQ설정"
   </voice>
 </phrase>
 <phrase>
@@ -913,16 +892,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "EQ 프리셋 저장"
+    *: "EQ 프리셋 저장"
   </dest>
   <voice>
-    *: none
-    swcodec: "EQ 프리셋 저장"
+    *: "EQ 프리셋 저장"
   </voice>
 </phrase>
 <phrase>
@@ -930,16 +906,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "EQ 프리셋 탐색"
+    *: "EQ 프리셋 탐색"
   </dest>
   <voice>
-    *: none
-    swcodec: "EQ 프리셋 탐색"
+    *: "EQ 프리셋 탐색"
   </voice>
 </phrase>
 <phrase>
@@ -947,16 +920,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "편집 모드: %s"
+    *: "편집 모드: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -964,16 +934,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%d Hz 밴드 게인"
+    *: "%d Hz 밴드 게인"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hertz 밴드 게인"
+    *: "Hertz 밴드 게인"
   </voice>
 </phrase>
 <phrase>
@@ -981,16 +948,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "로우 셀프 필터"
+    *: "로우 셀프 필터"
   </dest>
   <voice>
-    *: none
-    swcodec: "로우 셀프 필터"
+    *: "로우 셀프 필터"
   </voice>
 </phrase>
 <phrase>
@@ -998,16 +962,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "피크 필터 %d"
+    *: "피크 필터 %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "피크 필터"
+    *: "피크 필터"
   </voice>
 </phrase>
 <phrase>
@@ -1015,16 +976,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "하이 셀프 필터"
+    *: "하이 셀프 필터"
   </dest>
   <voice>
-    *: none
-    swcodec: "하이 셀프 필터"
+    *: "하이 셀프 필터"
   </voice>
 </phrase>
 <phrase>
@@ -1032,16 +990,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "컷오프 주파수"
+    *: "컷오프 주파수"
   </dest>
   <voice>
-    *: none
-    swcodec: "컷오프 주파수"
+    *: "컷오프 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -1049,16 +1004,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "센터 주파수"
+    *: "센터 주파수"
   </dest>
   <voice>
-    *: none
-    swcodec: "센터 주파수"
+    *: "센터 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -1066,16 +1018,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q값"
+    *: "Q값"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q값"
+    *: "Q값"
   </voice>
 </phrase>
 <phrase>
@@ -1341,16 +1290,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Beep Volume"
+    *: "Beep Volume"
   </source>
   <dest>
-    *: none
-    swcodec: "삐 소리크기"
+    *: "삐 소리크기"
   </dest>
   <voice>
-    *: none
-    swcodec: "삐 소리크기"
+    *: "삐 소리크기"
   </voice>
 </phrase>
 <phrase>
@@ -1358,16 +1304,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "작음"
+    *: "작음"
   </dest>
   <voice>
-    *: none
-    swcodec: "작음"
+    *: "작음"
   </voice>
 </phrase>
 <phrase>
@@ -1375,16 +1318,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "중간"
+    *: "중간"
   </dest>
   <voice>
-    *: none
-    swcodec: "중간"
+    *: "중간"
   </voice>
 </phrase>
 <phrase>
@@ -1392,16 +1332,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "큼"
+    *: "큼"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1695,16 +1632,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Browse Fonts"
+    *: "Browse Fonts"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "폰트 찾기"
+    *: "폰트 찾기"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "폰트 찾기"
+    *: "폰트 찾기"
   </voice>
 </phrase>
 <phrase>
@@ -1788,16 +1722,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "상태/스크롤 바"
+    *: "상태/스크롤 바"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "상태/스크롤 바"
+    *: "상태/스크롤 바"
   </voice>
 </phrase>
 <phrase>
@@ -1864,16 +1795,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "히브리어 (ISO-8859-8)"
+    *: "히브리어 (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "히브리어"
+    *: "히브리어"
   </voice>
 </phrase>
 <phrase>
@@ -1895,16 +1823,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "태국어 (ISO-8859-11)"
+    *: "태국어 (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "태국어"
+    *: "태국어"
   </voice>
 </phrase>
 <phrase>
@@ -1912,16 +1837,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "아랍어 (CP1256)"
+    *: "아랍어 (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "아랍어"
+    *: "아랍어"
   </voice>
 </phrase>
 <phrase>
@@ -1957,16 +1879,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "일본어 (SJIS)"
+    *: "일본어 (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "일본어"
+    *: "일본어"
   </voice>
 </phrase>
 <phrase>
@@ -1974,16 +1893,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "중국어 간체 (GB2312)"
+    *: "중국어 간체 (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "중국어 간체"
+    *: "중국어 간체"
   </voice>
 </phrase>
 <phrase>
@@ -1991,16 +1907,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "한국어 (KSX1001)"
+    *: "한국어 (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "한국어"
+    *: "한국어"
   </voice>
 </phrase>
 <phrase>
@@ -2008,16 +1921,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "중국어 번체 (BIG5)"
+    *: "중국어 번체 (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "중국어 번체"
+    *: "중국어 번체"
   </voice>
 </phrase>
 <phrase>
@@ -2363,15 +2273,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "주파수"
+    play_frequency,recording: "주파수"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "주파수"
+    play_frequency,recording: "주파수"
   </voice>
 </phrase>
 <phrase>
@@ -2397,18 +2307,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "외부 마이크"
     iriverh100,iriverh120,iriverh300: "내장 마이크"
+    recording: "외부 마이크"
   </dest>
   <voice>
     *: none
-    recording: "외부 마이크"
     iriverh100,iriverh120,iriverh300: "내장 마이크"
+    recording: "외부 마이크"
   </voice>
 </phrase>
 <phrase>
@@ -2750,16 +2660,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "클리핑 방지"
+    *: "클리핑 방지"
   </dest>
   <voice>
-    *: none
-    swcodec: "클리핑 방지"
+    *: "클리핑 방지"
   </voice>
 </phrase>
 <phrase>
@@ -2995,16 +2902,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "뒤집기"
+    *: "뒤집기"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "뒤집기"
+    *: "뒤집기"
   </voice>
 </phrase>
 <phrase>
@@ -3012,16 +2916,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "라인 선택기 타입"
+    *: "라인 선택기 타입"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "라인 선택기 타입"
+    *: "라인 선택기 타입"
   </voice>
 </phrase>
 <phrase>
@@ -3029,16 +2930,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "포인터"
+    *: "포인터"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "포인터"
+    *: "포인터"
   </voice>
 </phrase>
 <phrase>
@@ -3046,16 +2944,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "바(반전)"
+    *: "바(반전)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "바(반전)"
+    *: "바(반전)"
   </voice>
 </phrase>
 <phrase>
@@ -3232,16 +3127,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "화면을 이동해 긴 문자 보기"
+    *: "화면을 이동해 긴 문자 보기"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "화면을 이동해 긴 문자 보기"
+    *: "화면을 이동해 긴 문자 보기"
   </voice>
 </phrase>
 <phrase>
@@ -3249,16 +3141,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "화면 이동 크기"
+    *: "화면 이동 크기"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "화면 이동 크기"
+    *: "화면 이동 크기"
   </voice>
 </phrase>
 <phrase>
@@ -3280,16 +3169,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "스크롤 바"
+    *: "스크롤 바"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "스크롤 바"
+    *: "스크롤 바"
   </voice>
 </phrase>
 <phrase>
@@ -3297,16 +3183,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "상태 바"
+    *: "상태 바"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "상태 바"
+    *: "상태 바"
   </voice>
 </phrase>
 <phrase>
@@ -3331,16 +3214,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "볼륨 표시"
+    *: "볼륨 표시"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "볼륨 표시"
+    *: "볼륨 표시"
   </voice>
 </phrase>
 <phrase>
@@ -3348,16 +3228,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "배터리 표시"
+    *: "배터리 표시"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "배터리 표시"
+    *: "배터리 표시"
   </voice>
 </phrase>
 <phrase>
@@ -3365,16 +3242,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "그래픽"
+    *: "그래픽"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "그래픽"
+    *: "그래픽"
   </voice>
 </phrase>
 <phrase>
@@ -3382,16 +3256,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "숫자"
+    *: "숫자"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "숫자"
+    *: "숫자"
   </voice>
 </phrase>
 <phrase>
@@ -4241,13 +4112,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "배터리: %d%% (%d시간 %d분)"
+    ipodmini1g,ipodmini2g,iriverh10: "배터리: %d%% %d시간 %d분"
     iriverifp7xx: "%d%% %d시간 %d분"
-    iriverh10,ipodmini1g,ipodmini2g: "배터리: %d%% %d시간 %d분"
   </dest>
   <voice>
     *: "배터리 레벨"
@@ -4304,24 +4175,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1 "
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    xduoox3: "micro S D 2"
     archosondio*: "M M C"
+    multivolume: "H D 1 "
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -4451,29 +4322,29 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,gogearsa9200,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "A = Revert"
-    mrobe100: "DISPLAY = Revert"
     gigabeats: "BACK = Revert"
-    vibe500: "CANCEL = Revert"
+    gogearsa9200,ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "[끔]: 원상태 복구"
-    iriverh100,iriverh120,iriverh300: "[정지]: 원상태 복구"
-    ipod*,sansac200*,gogearsa9200,mpiohd300: "[메뉴]: 원상태 복구"
-    iaudiox5,iaudiom5: "[녹음]: 원상태 복구"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "[이전]: 원상태 복구"
     gigabeatfx: "[전원]: 원상태 복구"
-    mrobe100: "[화면]: 원상태 복구"
     gigabeats: "[뒤]: 원상태 복구"
-    vibe500: "C: 원상태 복구"
+    gogearsa9200,ipod*,mpiohd300,sansac200*: "[메뉴]: 원상태 복구"
+    iaudiom5,iaudiox5: "[녹음]: 원상태 복구"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "[이전]: 원상태 복구"
+    iriverh100,iriverh120,iriverh300: "[정지]: 원상태 복구"
+    mrobe100: "[화면]: 원상태 복구"
+    rtc: "[끔]: 원상태 복구"
     samsungyh*: "REW: 원상태 복구"
+    vibe500: "C: 원상태 복구"
   </dest>
   <voice>
     *: none
@@ -4536,19 +4407,19 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press UP to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press UP to continue."
   </source>
   <dest>
     *: none
-    recording: "디스크 공간이 부족합니다. [끔] 버튼을 누르세요."
-    iriverh100,iriverh120,iriverh300: "디스크 공간이 부족합니다. [정지] 버튼을 누르세요."
     iaudiom5,iaudiox5: "디스크 공간이 부족합니다. [전원] 버튼을 누르세요."
-    sansae200*,sansac200*,vibe500: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
+    iriverh100,iriverh120,iriverh300: "디스크 공간이 부족합니다. [정지] 버튼을 누르세요."
+    recording: "디스크 공간이 부족합니다. [끔] 버튼을 누르세요."
     samsungyh*: "디스크 공간이 부족합니다. LEFT 버튼을 누르세요."
+    sansac200*,sansae200*,vibe500: "디스크 공간이 부족합니다. [위] 버튼을 누르세요."
   </dest>
   <voice>
     *: none
@@ -4714,21 +4585,21 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "[재생]: 설정   [꺼짐]: 취소"
+    gigabeats: "[선택]: 설정   [꺼짐]: 취소"
     ipod*: "[선택]: 설정   [메뉴]: 취소"
     iriverh10,iriverh10_5gb: "[선택]: 설정   [이전]: 취소"
-    gigabeats: "[선택]: 설정   [꺼짐]: 취소"
-    vibe500: "OK: 설정   C: 취소"
     mpiohd300: "ENTER: 설정   MENU: 취소"
+    vibe500: "OK: 설정   C: 취소"
   </dest>
   <voice>
     *: none
@@ -7154,22 +7025,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "[꺼짐]: 중지"
-    iriverh100,iriverh120,iriverh300: "[정지]: 중지"
-    ipod*: "[재생/일시정지]: 중지"
-    iaudiox5,iaudiom5: "[재생 길게누름]: 중지"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "[이전]: 중지"
-    gigabeats: "[뒤]: 중지"
     gigabeatfx: "[전원]: 중지"
+    gigabeats: "[뒤]: 중지"
+    iaudiom5,iaudiox5: "[재생 길게누름]: 중지"
+    ipod*: "[재생/일시정지]: 중지"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "[이전]: 중지"
+    iriverh100,iriverh120,iriverh300: "[정지]: 중지"
   </dest>
   <voice>
     *: ""
@@ -7512,16 +7382,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "다이렉트 게인"
+    *: "다이렉트 게인"
   </dest>
   <voice>
-    *: none
-    swcodec: "다이렉트 게인"
+    *: "다이렉트 게인"
   </voice>
 </phrase>
 <phrase>
@@ -7529,16 +7396,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "크로스 게인"
+    *: "크로스 게인"
   </dest>
   <voice>
-    *: none
-    swcodec: "크로스 게인"
+    *: "크로스 게인"
   </voice>
 </phrase>
 <phrase>
@@ -7546,16 +7410,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "고주파수 감쇄율"
+    *: "고주파수 감쇄율"
   </dest>
   <voice>
-    *: none
-    swcodec: "고주파수 감쇄율"
+    *: "고주파수 감쇄율"
   </voice>
 </phrase>
 <phrase>
@@ -7563,16 +7424,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "고주파수 컷오프"
+    *: "고주파수 컷오프"
   </dest>
   <voice>
-    *: none
-    swcodec: "고주파수 컷오프"
+    *: "고주파수 컷오프"
   </voice>
 </phrase>
 <phrase>
@@ -8000,16 +7858,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "편집 모드: %s %s"
+    *: "편집 모드: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8017,16 +7872,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "컷오프 주파수"
+    *: "컷오프 주파수"
   </dest>
   <voice>
-    *: none
-    swcodec: "컷오프 주파수"
+    *: "컷오프 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -8472,16 +8324,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "디더링"
+    *: "디더링"
   </dest>
   <voice>
-    *: none
-    swcodec: "디더링"
+    *: "디더링"
   </voice>
 </phrase>
 <phrase>
@@ -9014,17 +8863,15 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
+    gogearsa9200,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "Building database... %d found (PREV to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "음악 DB 생성 중... %d개 완료 ([꺼짐]: 돌아가기)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
+    gogearsa9200,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
     iriverh100,iriverh120,iriverh300: "음악 DB 생성 중... %d개 완료 ([정지]: 돌아가기)"
-    ipod*: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "음악 DB 생성 중... %d개 완료 ([왼쪽]: 돌아가기)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,gogearsa9200,vibe500: "음악 DB 생성 중... %d개 완료 ([이전]: 돌아가기)"
   </dest>
   <voice>
     *: "음악 DB의 요소를 찾음"
@@ -9051,17 +8898,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "버튼 조명 시간"
-    sansafuze*,sansae200*: "휠 조명 시간"
+    sansae200*,sansafuze*: "휠 조명 시간"
   </dest>
   <voice>
     *: none
     button_light: "버튼 조명 시간"
-    sansafuze*,sansae200*: "휠 조명 시간"
+    sansae200*,sansafuze*: "휠 조명 시간"
   </voice>
 </phrase>
 <phrase>
@@ -9202,15 +9049,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "중저음 컷오프 주파수"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "중저음 컷오프 주파수"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "중저음 컷오프 주파수"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "중저음 컷오프 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -9635,16 +9482,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "[재생] = 예"
-    iriverh100,iriverh120,iriverh300: "[네비] = 예"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,gogearsa9200: "[선택] = 예"
     archosplayer: "(재생/정지)"
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "[선택] = 예"
+    iriverh100,iriverh120,iriverh300: "[네비] = 예"
     vibe500: "OK = 예"
   </dest>
   <voice>
@@ -9657,21 +9504,21 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "[켬] = 설정"
-    iriverh100,iriverh120,iriverh300: "[네비] = 설정"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100: "[선택] = 설정"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "[선택] = 설정"
     gogearsa9200,samsungyh*: "PLAY = 설정"
-    vibe500: "OK = 설정"
+    iriverh100,iriverh120,iriverh300: "[네비] = 설정"
     mpiohd300: "ENTER = 설정"
+    rtc: "[켬] = 설정"
+    vibe500: "OK = 설정"
   </dest>
   <voice>
     *: none
@@ -9896,16 +9743,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "게인"
+    *: "게인"
   </dest>
   <voice>
-    *: none
-    swcodec: "게인"
+    *: "게인"
   </voice>
 </phrase>
 <phrase>
@@ -9975,16 +9819,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "모드:"
+    *: "모드:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10175,16 +10016,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "키클릭"
+    *: "키클릭"
   </dest>
   <voice>
-    *: none
-    swcodec: "키클릭"
+    *: "키클릭"
   </voice>
 </phrase>
 <phrase>
@@ -10621,15 +10459,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "고음역 컷오프 주파수"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "고음역 컷오프 주파수"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "고음역 컷오프 주파수"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "고음역 컷오프 주파수"
   </voice>
 </phrase>
 <phrase>
@@ -10800,16 +10638,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "반복 키클릭"
+    *: "반복 키클릭"
   </dest>
   <voice>
-    *: none
-    swcodec: "반복 키클릭"
+    *: "반복 키클릭"
   </voice>
 </phrase>
 <phrase>
@@ -10918,7 +10753,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
