@@ -6766,34 +6766,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_KEYBOARD_LOADED
   desc: shown when a keyboard has been loaded from the dir browser
   user: core
@@ -7054,20 +7026,6 @@
   </source>
   <dest>
     *: "No Settings found. AutoScan?"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_SAVE_CHANGES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
   </dest>
   <voice>
     *: ""

@@ -7052,40 +7052,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_KEYBOARD_LOADED
   desc: shown when a keyboard has been loaded from the dir browser
   user: core
@@ -7350,23 +7316,6 @@
   <voice>
     *: none
     radio: "Asetuksia ei löydy. Etsitäänkö kanavia?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_SAVE_CHANGES
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    radio: ""
-  </source>
-  <dest>
-    *: none
-    radio: ""
-  </dest>
-  <voice>
-    *: none
-    radio: ""
   </voice>
 </phrase>
 <phrase>
@@ -9611,20 +9560,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PITCH_UP_SEMITONE
   desc: in wps
   user: core
@@ -11155,20 +11090,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SKIN_RAM_USAGE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_STATUSBAR_BOTTOM
   desc: in Settings -> General -> Display -> statusbar
   user: core
@@ -12081,20 +12002,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
   desc: in sound_menu, advanced settings for hardware equalizer tone controls
   user: core
@@ -12509,20 +12416,6 @@
   </dest>
   <voice>
     *: "näytä kansikuvat"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTORESUME_ENABLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>

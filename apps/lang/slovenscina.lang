@@ -2626,23 +2626,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_SAVE_CHANGES
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    radio: ""
-  </source>
-  <dest>
-    *: none
-    radio: ""
-  </dest>
-  <voice>
-    *: none
-    radio: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SERIAL_BITRATE_19200
   desc: in system settings menu
   user: core
@@ -7983,23 +7966,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR_RATIO_10
   desc: in sound settings
   user: core
@@ -8414,20 +8380,6 @@
   </dest>
   <voice>
     *: "B"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9588,20 +9540,6 @@
   <voice>
     *: none
     lcd_color: "Bar (Solid Colour)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SKIN_RAM_USAGE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11250,23 +11188,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_MILLION
   desc: spoken only, for composing numbers
   user: core
@@ -12333,20 +12254,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_KBD_CANCEL
   desc: in keyboard
   user: core
@@ -12538,20 +12445,6 @@
   <voice>
     *: none
     charging: "Osvetlitev ozadja (med priklopom)"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTORESUME_ENABLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>

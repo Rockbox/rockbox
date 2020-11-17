@@ -5769,23 +5769,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_SAVE_CHANGES
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    radio: ""
-  </source>
-  <dest>
-    *: none
-    radio: ""
-  </dest>
-  <voice>
-    *: none
-    radio: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SERIAL_BITRATE_19200
   desc: in system settings menu
   user: core
@@ -9525,23 +9508,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_COMPRESSOR_RATIO_10
   desc: in sound settings
   user: core
@@ -9601,20 +9567,6 @@
   </dest>
   <voice>
     *: "O ficheiro ou directorio xa existe. Sobrescribir?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9810,20 +9762,6 @@
   <voice>
     *: none
     radio: "Rexión"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
@@ -10666,20 +10604,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SKIN_RAM_USAGE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BOOKMARK_DONT_RESUME
   desc: top item in the list when asking user about bookmark auto load
   user: core
@@ -11352,20 +11276,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FORCE
   desc: alternative to yes/no for tristate settings
   user: core
@@ -11785,23 +11695,6 @@
   </dest>
   <voice>
     *: "Borrar tempo?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
   </voice>
 </phrase>
 <phrase>

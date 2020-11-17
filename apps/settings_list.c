@@ -389,7 +389,7 @@ static const char* formatter_time_unit_0_is_always(char *buffer, size_t buffer_s
     (void) buffer_size;
     (void) unit;
     if (val == -1)
-        return str(LANG__NEVER);
+        return str(LANG_NEVER);
     else if (val == 0)
         return str(LANG_ALWAYS);
     return buffer;
@@ -398,7 +398,7 @@ static const char* formatter_time_unit_0_is_always(char *buffer, size_t buffer_s
 static int32_t getlang_time_unit_0_is_always(int value, int unit)
 {
     if (value == -1)
-        return LANG__NEVER;
+        return LANG_NEVER;
     else if (value == 0)
         return LANG_ALWAYS;
     else

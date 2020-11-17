@@ -1832,20 +1832,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_VOICE_MENU
   desc: item of voice menu, enable/disable the voice UI
   user: core
@@ -5119,48 +5105,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KILOBYTE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEGABYTE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GIGABYTE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_POINT
   desc: decimal separator for composing numbers
   user: core
@@ -6476,23 +6420,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_FM_SAVE_CHANGES
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    radio: ""
-  </source>
-  <dest>
-    *: none
-    radio: ""
-  </dest>
-  <voice>
-    *: none
-    radio: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_EQUALIZER_ADVANCED
   desc: in the equalizer settings menu
   user: core
@@ -6957,23 +6884,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_REMOTE_UNIT
   desc: in record settings menu.
   user: core
@@ -7351,23 +7261,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: none
-    lcd_non-mono: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_non-mono: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SET_AS_BACKDROP
   desc: text for onplay menu entry
   user: core
@@ -7698,23 +7591,6 @@
   </dest>
   <voice>
     *: "kilobiter per sekund"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NEVER
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_sleep: ""
-  </source>
-  <dest>
-    *: none
-    lcd_sleep: ""
-  </dest>
-  <voice>
-    *: none
-    lcd_sleep: ""
   </voice>
 </phrase>
 <phrase>
@@ -9739,20 +9615,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PITCH_UP_SEMITONE
   desc: in wps
   user: core
@@ -11023,20 +10885,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_RESET_START_DIR
   desc: reset the browser start directory
   user: core
@@ -11079,20 +10927,6 @@
   </dest>
   <voice>
     *: "Vesteuropeisk"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SKIN_RAM_USAGE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -11592,20 +11426,6 @@
   <voice>
     *: none
     touchscreen: "Absolutt punkt"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTORESUME_ENABLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13805,7 +13625,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG__NEVER
+  id: LANG_NEVER
   desc: in lcd settings
   user: core
   <source>

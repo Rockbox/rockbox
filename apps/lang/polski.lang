@@ -1754,20 +1754,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_HEADPHONE_UNPLUG_RW
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
   desc: in pause_phones_menu.
   user: core
@@ -2371,21 +2357,6 @@
   <voice>
     *: none
     lcd_sleep: "Uśpienie po wyłączeniu podświetlenia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NEVER
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_sleep: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -4256,20 +4227,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_LANGUAGE
   desc: in settings_menu
   user: core
@@ -4904,21 +4861,6 @@
   <voice>
     *: none
     radio: "Brak zapisanych stacji. Wyszukać?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_SAVE_CHANGES
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    radio: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7032,36 +6974,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BACKDROP_LOADED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BACKDROP_FAILED
-  desc: deprecated
-  user: core
-  <source>
-    *: none
-    lcd_non-mono: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ONPLAY_OPEN_WITH
   desc: Onplay open with
   user: core
@@ -7753,48 +7665,6 @@
   </source>
   <dest>
     *: "B"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KILOBYTE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEGABYTE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GIGABYTE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
   </dest>
   <voice>
     *: ""
@@ -10560,20 +10430,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SKIN_RAM_USAGE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SCROLLBAR_WIDTH
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
@@ -11704,34 +11560,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_AUTORESUME_ENABLE_YES
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTORESUME_ENABLE
-  desc: deprecated
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUTORESUME_CUSTOM
   desc: enable customization of resume on automatic track change
   user: core
@@ -12712,7 +12540,7 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG__NEVER
+  id: LANG_NEVER
   desc: in lcd settings
   user: core
   <source>
