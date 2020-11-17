@@ -1,4 +1,3 @@
-﻿#             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
@@ -613,16 +612,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "交叉馈音"
+    *: "交叉馈音"
   </dest>
   <voice>
-    *: none
-    swcodec: "交叉馈音"
+    *: "交叉馈音"
   </voice>
 </phrase>
 <phrase>
@@ -630,16 +626,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "均衡器"
+    *: "均衡器"
   </dest>
   <voice>
-    *: none
-    swcodec: "均衡器"
+    *: "均衡器"
   </voice>
 </phrase>
 <phrase>
@@ -818,16 +811,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "开启均衡器"
+    *: "开启均衡器"
   </dest>
   <voice>
-    *: none
-    swcodec: "开启均衡器"
+    *: "开启均衡器"
   </voice>
 </phrase>
 <phrase>
@@ -835,16 +825,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "图形化均衡器"
+    *: "图形化均衡器"
   </dest>
   <voice>
-    *: none
-    swcodec: "图形化均衡器"
+    *: "图形化均衡器"
   </voice>
 </phrase>
 <phrase>
@@ -852,16 +839,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "预增益"
+    *: "预增益"
   </dest>
   <voice>
-    *: none
-    swcodec: "预增益"
+    *: "预增益"
   </voice>
 </phrase>
 <phrase>
@@ -869,16 +853,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "简易均衡器设置"
+    *: "简易均衡器设置"
   </dest>
   <voice>
-    *: none
-    swcodec: "简易均衡器设置"
+    *: "简易均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -886,16 +867,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "高级均衡器设置"
+    *: "高级均衡器设置"
   </dest>
   <voice>
-    *: none
-    swcodec: "高级均衡器设置"
+    *: "高级均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -903,16 +881,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "保存均衡器设置"
+    *: "保存均衡器设置"
   </dest>
   <voice>
-    *: none
-    swcodec: "保存均衡器设置"
+    *: "保存均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -920,16 +895,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "浏览均衡器设置"
+    *: "浏览均衡器设置"
   </dest>
   <voice>
-    *: none
-    swcodec: "浏览均衡器设置"
+    *: "浏览均衡器设置"
   </voice>
 </phrase>
 <phrase>
@@ -937,16 +909,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "编辑:%s"
+    *: "编辑:%s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -954,16 +923,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%dHz频段增益"
+    *: "%dHz频段增益"
   </dest>
   <voice>
-    *: none
-    swcodec: "赫兹频段增益"
+    *: "赫兹频段增益"
   </voice>
 </phrase>
 <phrase>
@@ -971,16 +937,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "低架滤波器"
+    *: "低架滤波器"
   </dest>
   <voice>
-    *: none
-    swcodec: "低架滤波器"
+    *: "低架滤波器"
   </voice>
 </phrase>
 <phrase>
@@ -988,16 +951,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "带通滤波器%d"
+    *: "带通滤波器%d"
   </dest>
   <voice>
-    *: none
-    swcodec: "带通滤波器"
+    *: "带通滤波器"
   </voice>
 </phrase>
 <phrase>
@@ -1005,16 +965,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "高架滤波器"
+    *: "高架滤波器"
   </dest>
   <voice>
-    *: none
-    swcodec: "高架滤波器"
+    *: "高架滤波器"
   </voice>
 </phrase>
 <phrase>
@@ -1022,16 +979,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "截止频率"
+    *: "截止频率"
   </dest>
   <voice>
-    *: none
-    swcodec: "截止频率"
+    *: "截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -1039,16 +993,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "中心频率"
+    *: "中心频率"
   </dest>
   <voice>
-    *: none
-    swcodec: "中心频率"
+    *: "中心频率"
   </voice>
 </phrase>
 <phrase>
@@ -1056,16 +1007,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q值(品质因素)"
+    *: "Q值(品质因素)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q值(品质因素)"
+    *: "Q值(品质因素)"
   </voice>
 </phrase>
 <phrase>
@@ -1331,16 +1279,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "曲目更换提示音"
+    *: "曲目更换提示音"
   </dest>
   <voice>
-    *: none
-    swcodec: "曲目更换时发出提示音"
+    *: "曲目更换时发出提示音"
   </voice>
 </phrase>
 <phrase>
@@ -1348,16 +1293,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "弱"
+    *: "弱"
   </dest>
   <voice>
-    *: none
-    swcodec: "弱"
+    *: "弱"
   </voice>
 </phrase>
 <phrase>
@@ -1365,16 +1307,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "适中"
+    *: "适中"
   </dest>
   <voice>
-    *: none
-    swcodec: "适中"
+    *: "适中"
   </voice>
 </phrase>
 <phrase>
@@ -1382,16 +1321,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "强"
+    *: "强"
   </dest>
   <voice>
-    *: none
-    swcodec: "强"
+    *: "强"
   </voice>
 </phrase>
 <phrase>
@@ -1685,16 +1621,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "字体"
+    *: "字体"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "字体"
+    *: "字体"
   </voice>
 </phrase>
 <phrase>
@@ -1778,16 +1711,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "状态栏/滚动条"
+    *: "状态栏/滚动条"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "状态栏与滚动条"
+    *: "状态栏与滚动条"
   </voice>
 </phrase>
 <phrase>
@@ -1854,16 +1784,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "希伯来文(ISO-8859-8)"
+    *: "希伯来文(ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "希伯来文"
+    *: "希伯来文"
   </voice>
 </phrase>
 <phrase>
@@ -1885,16 +1812,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "泰语(ISO-8859-11)"
+    *: "泰语(ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "泰语"
+    *: "泰语"
   </voice>
 </phrase>
 <phrase>
@@ -1902,16 +1826,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "阿拉伯文(CP1256)"
+    *: "阿拉伯文(CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "阿拉伯文"
+    *: "阿拉伯文"
   </voice>
 </phrase>
 <phrase>
@@ -1947,16 +1868,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "日文(SJIS)"
+    *: "日文(SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "日文"
+    *: "日文"
   </voice>
 </phrase>
 <phrase>
@@ -1964,16 +1882,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "简体中文(GB2312)"
+    *: "简体中文(GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "简体中文"
+    *: "简体中文"
   </voice>
 </phrase>
 <phrase>
@@ -1981,16 +1896,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "韩文(KSX1001)"
+    *: "韩文(KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "韩文"
+    *: "韩文"
   </voice>
 </phrase>
 <phrase>
@@ -1998,16 +1910,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "繁体中文(BIG5)"
+    *: "繁体中文(BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "繁体中文"
+    *: "繁体中文"
   </voice>
 </phrase>
 <phrase>
@@ -2353,15 +2262,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "频率"
+    play_frequency,recording: "频率"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "频率"
+    play_frequency,recording: "频率"
   </voice>
 </phrase>
 <phrase>
@@ -2387,18 +2296,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "麦克风"
     iriverh100,iriverh120,iriverh300: "内置麦克风"
+    recording: "麦克风"
   </dest>
   <voice>
     *: none
-    recording: "麦克风"
     iriverh100,iriverh120,iriverh300: "内置麦克风"
+    recording: "麦克风"
   </voice>
 </phrase>
 <phrase>
@@ -2740,16 +2649,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "防止削波"
+    *: "防止削波"
   </dest>
   <voice>
-    *: none
-    swcodec: "防止削波"
+    *: "防止削波"
   </voice>
 </phrase>
 <phrase>
@@ -2985,16 +2891,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "上下翻转"
+    *: "上下翻转"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "上下翻转"
+    *: "上下翻转"
   </voice>
 </phrase>
 <phrase>
@@ -3002,16 +2905,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "选择条类型"
+    *: "选择条类型"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "选择条类型"
+    *: "选择条类型"
   </voice>
 </phrase>
 <phrase>
@@ -3019,16 +2919,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "指示符"
+    *: "指示符"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "指示符"
+    *: "指示符"
   </voice>
 </phrase>
 <phrase>
@@ -3036,16 +2933,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "反色条"
+    *: "反色条"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "反色条"
+    *: "反色条"
   </voice>
 </phrase>
 <phrase>
@@ -3222,16 +3116,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "允许列表查看时滚动全屏"
+    *: "允许列表查看时滚动全屏"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "允许列表查看时滚动整个屏幕"
+    *: "允许列表查看时滚动整个屏幕"
   </voice>
 </phrase>
 <phrase>
@@ -3239,16 +3130,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "屏幕滚动步长"
+    *: "屏幕滚动步长"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "屏幕滚动步长"
+    *: "屏幕滚动步长"
   </voice>
 </phrase>
 <phrase>
@@ -3270,16 +3158,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "滚动条"
+    *: "滚动条"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "滚动条"
+    *: "滚动条"
   </voice>
 </phrase>
 <phrase>
@@ -3287,16 +3172,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "状态栏"
+    *: "状态栏"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "状态栏"
+    *: "状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -3321,16 +3203,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "音量显示"
+    *: "音量显示"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "音量显示"
+    *: "音量显示"
   </voice>
 </phrase>
 <phrase>
@@ -3338,16 +3217,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "电量显示"
+    *: "电量显示"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "电量显示"
+    *: "电量显示"
   </voice>
 </phrase>
 <phrase>
@@ -3355,16 +3231,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "图形式"
+    *: "图形式"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "图形式"
+    *: "图形式"
   </voice>
 </phrase>
 <phrase>
@@ -3372,16 +3245,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "数值式"
+    *: "数值式"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "数值式"
+    *: "数值式"
   </voice>
 </phrase>
 <phrase>
@@ -4231,13 +4101,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "剩余电量:%d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "电量:%d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "电量:%d%% %dh %dm"
   </dest>
   <voice>
     *: "剩余电量"
@@ -4294,24 +4164,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "磁盘1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "磁盘1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "磁盘1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD卡"
-    xduoox3: "mSD卡2"
     archosondio*: "MMC卡"
+    multivolume: "磁盘1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD卡"
+    xduoox3: "mSD卡2"
   </voice>
 </phrase>
 <phrase>
@@ -4441,35 +4311,32 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF:取消"
-    mrobe500: "电源:取消"
-    iriverh100,iriverh120,iriverh300: "STOP:取消"
-    ipod*,sansac200*,mpiohd300: "MENU:取消"
-    iaudiox5,iaudiom5: "RECORD:取消"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV:取消"
     gigabeatfx: "POWER:取消"
-    sansafuzeplus: "BACK:取消"
-    mrobe100: "DISPLAY:取消"
-    gigabeats: "BACK:取消"
+    gigabeats,sansafuzeplus: "BACK:取消"
     gogearsa9200: "LEFT:取消"
-    vibe500: "CANCEL:取消"
+    iaudiom5,iaudiox5: "RECORD:取消"
+    ipod*,mpiohd300,sansac200*: "MENU:取消"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV:取消"
+    iriverh100,iriverh120,iriverh300: "STOP:取消"
+    mrobe100: "DISPLAY:取消"
+    mrobe500: "电源:取消"
+    rtc: "OFF:取消"
     samsungyh*: "REW:取消"
+    vibe500: "CANCEL:取消"
   </dest>
   <voice>
     *: none
@@ -4515,19 +4382,19 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "磁盘已满，按下OFF继续."
-    iriverh100,iriverh120,iriverh300: "磁盘已满，按下STOP继续."
     iaudiom5,iaudiox5: "磁盘已满，按下POWER继续."
-    sansae200*,sansac200*,vibe500: "磁盘，按下PREV继续."
+    iriverh100,iriverh120,iriverh300: "磁盘已满，按下STOP继续."
+    recording: "磁盘已满，按下OFF继续."
     samsungyh*: "磁盘，按下LEFT继续."
+    sansac200*,sansae200*,vibe500: "磁盘，按下PREV继续."
   </dest>
   <voice>
     *: none
@@ -4693,29 +4560,26 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=设置 OFF=取消"
+    gigabeats: "SELECT=设置 POWER=取消"
     ipod*: "SELECT=设置 MENU=取消"
     iriverh10,iriverh10_5gb: "SELECT=设置 PREV=取消"
-    gigabeats: "SELECT=设置 POWER=取消"
-    vibe500: "OK=设置 C=取消"
     mpiohd300: "ENTER=设置 MENU=取消"
     sansafuzeplus: "SELECT=设置  BACK=取消"
+    vibe500: "OK=设置 C=取消"
   </dest>
   <voice>
-   *: none
-    alarm: ""
-    ipod*: ""
-    iriverh10,iriverh10_5gb: ""
-    gigabeats: ""
+    *: none
+    alarm,gigabeats,ipod*,iriverh10,iriverh10_5gb: ""
   </voice>
 </phrase>
 <phrase>
@@ -7152,22 +7016,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "按OFF键取消"
-    iriverh100,iriverh120,iriverh300: "按STOP键取消"
-    ipod*: "按PLAY/PAUSE键取消"
-    iaudiox5,iaudiom5: "长按PLAY键取消"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "按PREV键取消"
-    gigabeats: "按BACK键取消"
     gigabeatfx: "按POWER键取消"
+    gigabeats: "按BACK键取消"
+    iaudiom5,iaudiox5: "长按PLAY键取消"
+    ipod*: "按PLAY/PAUSE键取消"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "按PREV键取消"
+    iriverh100,iriverh120,iriverh300: "按STOP键取消"
   </dest>
   <voice>
     *: ""
@@ -7510,16 +7373,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "直接增益"
+    *: "直接增益"
   </dest>
   <voice>
-    *: none
-    swcodec: "直接增益"
+    *: "直接增益"
   </voice>
 </phrase>
 <phrase>
@@ -7527,16 +7387,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "交叉增益"
+    *: "交叉增益"
   </dest>
   <voice>
-    *: none
-    swcodec: "交叉增益"
+    *: "交叉增益"
   </voice>
 </phrase>
 <phrase>
@@ -7544,16 +7401,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "高频衰减"
+    *: "高频衰减"
   </dest>
   <voice>
-    *: none
-    swcodec: "高频衰减"
+    *: "高频衰减"
   </voice>
 </phrase>
 <phrase>
@@ -7561,16 +7415,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "高频截止频率"
+    *: "高频截止频率"
   </dest>
   <voice>
-    *: none
-    swcodec: "高频截止频率"
+    *: "高频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -7912,21 +7763,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
-    gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "数据库更新中...已找到%d个(按OFF键返回)"
-    iriverh100,iriverh120,iriverh300: "数据库更新中...已找到%d个(按STOP键返回)"
-    ipod*: "数据库更新中...已找到%d个(按PREV键返回)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "数据库更新中...已找到%d个(按LEFT键返回)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "数据库更新中...已找到%d个(按PREV键返回)"
-    gogearsa9200: "数据库更新中...已找到%d个(按REW键返回)"
     archosplayer: "数据库更新中...已找到%d个"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "数据库更新中...已找到%d个(按LEFT键返回)"
+    gogearsa9200: "数据库更新中...已找到%d个(按REW键返回)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "数据库更新中...已找到%d个(按PREV键返回)"
+    iriverh100,iriverh120,iriverh300: "数据库更新中...已找到%d个(按STOP键返回)"
   </dest>
   <voice>
     *: "数据库更新中"
@@ -8055,7 +7904,7 @@
 </phrase>
 <phrase>
   id: LANG_DELETING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Deleting..."
@@ -8373,7 +8222,7 @@
 </phrase>
 <phrase>
   id: LANG_REC_DIR_NOT_WRITABLE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -8408,20 +8257,20 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU, or top-right = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY:是"
-    cowond2*: "MENU或TOP-RIGHT:是"
-    iriverh100,iriverh120,iriverh300: "NAVI=是"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT:是"
-    mrobe500: "PLAY,POWER或TOP-RIGHT:是"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU或TOP-RIGHT:是"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT:是"
+    iriverh100,iriverh120,iriverh300: "NAVI=是"
+    mrobe500: "PLAY,POWER或TOP-RIGHT:是"
     vibe500: "OK:是"
   </dest>
   <voice>
@@ -8434,23 +8283,23 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON:设置"
-    mrobe500: "HEART:设置"
-    iriverh100,iriverh120,iriverh300: "NAVI=设置"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT:设置"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT:设置"
     gogearsa9200,samsungyh*: "PLAY:设置"
-    vibe500: "OK:设置"
+    iriverh100,iriverh120,iriverh300: "NAVI=设置"
     mpiohd300: "ENTER:设置"
+    mrobe500: "HEART:设置"
+    rtc: "ON:设置"
+    vibe500: "OK:设置"
   </dest>
   <voice>
     *: none
@@ -8474,7 +8323,7 @@
 </phrase>
 <phrase>
   id: LANG_BROWSE_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: "Browse Cuesheet"
@@ -8592,7 +8441,7 @@
 </phrase>
 <phrase>
   id: LANG_ADD_TO_FAVES
-  desc: 
+  desc:
   user: core
   <source>
     *: "Add to Shortcuts"
@@ -8685,7 +8534,7 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_REC_DIR
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -8767,16 +8616,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "模式:"
+    *: "模式:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9488,16 +9334,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "高频抖动"
+    *: "高频抖动"
   </dest>
   <voice>
-    *: none
-    swcodec: "高频抖动"
+    *: "高频抖动"
   </voice>
 </phrase>
 <phrase>
@@ -9533,7 +9376,7 @@
 </phrase>
 <phrase>
   id: LANG_MOVING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Moving..."
@@ -9589,7 +9432,7 @@
 </phrase>
 <phrase>
   id: VOICE_EXT_CUESHEET
-  desc: 
+  desc:
   user: core
   <source>
     *: ""
@@ -9636,17 +9479,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "按键背光自动关闭时滞"
-    sansafuze*,sansae200*: "转盘背光自动关闭时滞"
+    sansae200*,sansafuze*: "转盘背光自动关闭时滞"
   </dest>
   <voice>
     *: none
     button_light: "按键背光自动关闭时滞"
-    sansafuze*,sansae200*: "转盘背光自动关闭时滞"
+    sansae200*,sansafuze*: "转盘背光自动关闭时滞"
   </voice>
 </phrase>
 <phrase>
@@ -9898,7 +9741,7 @@
 </phrase>
 <phrase>
   id: LANG_COPYING
-  desc: 
+  desc:
   user: core
   <source>
     *: "Copying..."
@@ -10071,15 +9914,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "低频截止频率"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "低频截止频率"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "低频截止频率"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "低频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -10277,15 +10120,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "高频截止频率"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高频截止频率"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "高频截止频率"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高频截止频率"
   </voice>
 </phrase>
 <phrase>
@@ -10335,16 +10178,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "按键声"
+    *: "按键声"
   </dest>
   <voice>
-    *: none
-    swcodec: "按键声"
+    *: "按键声"
   </voice>
 </phrase>
 <phrase>
@@ -10352,16 +10192,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "重复按键声"
+    *: "重复按键声"
   </dest>
   <voice>
-    *: none
-    swcodec: "重复按键声"
+    *: "重复按键声"
   </voice>
 </phrase>
 <phrase>
@@ -11111,16 +10948,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "启动时间"
+    *: "启动时间"
   </dest>
   <voice>
-    *: none
-    swcodec: "启动时间"
+    *: "启动时间"
   </voice>
 </phrase>
 <phrase>
@@ -11128,16 +10962,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "恢复时间"
+    *: "恢复时间"
   </dest>
   <voice>
-    *: none
-    swcodec: "恢复时间"
+    *: "恢复时间"
   </voice>
 </phrase>
 <phrase>
@@ -11145,16 +10976,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "阀值"
+    *: "阀值"
   </dest>
   <voice>
-    *: none
-    swcodec: "阀值"
+    *: "阀值"
   </voice>
 </phrase>
 <phrase>
@@ -11162,16 +10990,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "增益"
+    *: "增益"
   </dest>
   <voice>
-    *: none
-    swcodec: "增益"
+    *: "增益"
   </voice>
 </phrase>
 <phrase>
@@ -11179,16 +11004,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "状态栏"
+    *: "状态栏"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "状态栏"
+    *: "状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -11196,16 +11018,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "滚动栏位置"
+    *: "滚动栏位置"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "滚动栏位置"
+    *: "滚动栏位置"
   </voice>
 </phrase>
 <phrase>
@@ -11247,16 +11066,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "柔和度"
+    *: "柔和度"
   </dest>
   <voice>
-    *: none
-    swcodec: "柔和度"
+    *: "柔和度"
   </voice>
 </phrase>
 <phrase>
@@ -11264,16 +11080,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "自动"
+    *: "自动"
   </dest>
   <voice>
-    *: none
-    swcodec: "自动"
+    *: "自动"
   </voice>
 </phrase>
 <phrase>
@@ -11295,16 +11108,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "柔和"
+    *: "柔和"
   </dest>
   <voice>
-    *: none
-    swcodec: "柔和"
+    *: "柔和"
   </voice>
 </phrase>
 <phrase>
@@ -11326,16 +11136,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "压缩比"
+    *: "压缩比"
   </dest>
   <voice>
-    *: none
-    swcodec: "压缩比例"
+    *: "压缩比例"
   </voice>
 </phrase>
 <phrase>
@@ -11360,16 +11167,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "锐利"
+    *: "锐利"
   </dest>
   <voice>
-    *: none
-    swcodec: "锐利"
+    *: "锐利"
   </voice>
 </phrase>
 <phrase>
@@ -11411,16 +11215,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "线控状态栏"
+    *: "线控状态栏"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "线控状态栏"
+    *: "线控状态栏"
   </voice>
 </phrase>
 <phrase>
@@ -11561,16 +11362,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 to 1"
+    *: "10 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -11612,16 +11410,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 to 1"
+    *: "2 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -11646,16 +11441,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "极限(Limit)"
+    *: "极限(Limit)"
   </dest>
   <voice>
-    *: none
-    swcodec: "极限 Limit"
+    *: "极限 Limit"
   </voice>
 </phrase>
 <phrase>
@@ -11694,16 +11486,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "滚动栏宽度"
+    *: "滚动栏宽度"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "滚动栏宽度"
+    *: "滚动栏宽度"
   </voice>
 </phrase>
 <phrase>
@@ -11770,16 +11559,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "音调/音速"
+    *: "音调/音速"
   </dest>
   <voice>
-    *: none
-    swcodec: "音调/音速"
+    *: "音调/音速"
   </voice>
 </phrase>
 <phrase>
@@ -11787,16 +11573,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 to 1"
+    *: "6 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -11804,16 +11587,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "压限器"
+    *: "压限器"
   </dest>
   <voice>
-    *: none
-    swcodec: "压限器"
+    *: "压限器"
   </voice>
 </phrase>
 <phrase>
@@ -11866,16 +11646,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "速度"
+    *: "速度"
   </dest>
   <voice>
-    *: none
-    swcodec: "速度"
+    *: "速度"
   </voice>
 </phrase>
 <phrase>
@@ -11897,16 +11674,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 to 1"
+    *: "4 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -12146,16 +11920,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "恢复播放时自动快退时长"
+    *: "恢复播放时自动快退时长"
   </dest>
   <voice>
-    *: none
-    swcodec: "恢复播放时自动快退时长"
+    *: "恢复播放时自动快退时长"
   </voice>
 </phrase>
 <phrase>
@@ -12178,15 +11949,15 @@
   user: core
   <source>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D Enhancement"
+    creativezenxfi2,creativezenxfi3,gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D Enhancement"
   </source>
   <dest>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "3-D增强"
+    creativezenxfi2,creativezenxfi3,gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "3-D增强"
   </dest>
   <voice>
     *: none
-    gigabeats,mpiohd200,mpiohd300,sansafuzeplus,creativezenxfi2,creativezenxfi3: "三维增强"
+    creativezenxfi2,creativezenxfi3,gigabeats,mpiohd200,mpiohd300,sansafuzeplus: "三维增强"
   </voice>
 </phrase>
 <phrase>
@@ -12321,7 +12092,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
@@ -12594,16 +12365,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "简单 (Meier)"
+    *: "简单 (Meier)"
   </dest>
   <voice>
-    *: none
-    swcodec: "简单"
+    *: "简单"
   </voice>
 </phrase>
 <phrase>
@@ -12749,16 +12517,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "定制"
+    *: "定制"
   </dest>
   <voice>
-    *: none
-    swcodec: "定制"
+    *: "定制"
   </voice>
 </phrase>
 <phrase>
@@ -12974,16 +12739,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "感知性低音增强"
+    *: "感知性低音增强"
   </dest>
   <voice>
-    *: none
-    swcodec: "感知性低音增强音效"
+    *: "感知性低音增强音效"
   </voice>
 </phrase>
 <phrase>
@@ -12991,16 +12753,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "声学抗疲劳"
+    *: "声学抗疲劳"
   </dest>
   <voice>
-    *: none
-    swcodec: "声学抗疲劳音效"
+    *: "声学抗疲劳音效"
   </voice>
 </phrase>
 <phrase>
@@ -13008,16 +12767,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "哈斯环绕"
+    *: "哈斯环绕"
   </dest>
   <voice>
-    *: none
-    swcodec: "哈斯环绕音效"
+    *: "哈斯环绕音效"
   </voice>
 </phrase>
 <phrase>
@@ -13025,16 +12781,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -13042,16 +12795,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -13059,16 +12809,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </dest>
   <voice>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </voice>
 </phrase>
 <phrase>
@@ -13076,16 +12823,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "干湿混合度"
+    *: "干湿混合度"
   </dest>
   <voice>
-    *: none
-    swcodec: "干湿混合度"
+    *: "干湿混合度"
   </voice>
 </phrase>
 <phrase>
@@ -13094,18 +12838,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </source>
   <dest>
     *: none
-    ibassodx50: "CPU频率管理器"
-    ibassodx90: "CPU频率管理器"
+    ibassodx50,ibassodx90: "CPU频率管理器"
   </dest>
   <voice>
     *: none
-    ibassodx50: "CPU频率管理器"
-    ibassodx90: "CPU频率管理器"
+    ibassodx50,ibassodx90: "CPU频率管理器"
   </voice>
 </phrase>
 <phrase>
@@ -13114,18 +12855,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50: "USB模式"
-    ibassodx90: "USB模式"
+    ibassodx50,ibassodx90: "USB模式"
   </dest>
   <voice>
     *: none
-    ibassodx50: "USB模式"
-    ibassodx90: "USB模式"
+    ibassodx50,ibassodx90: "USB模式"
   </voice>
 </phrase>
 <phrase>
@@ -13134,18 +12872,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50: "大容量存储"
-    ibassodx90: "大容量存储"
+    ibassodx50,ibassodx90: "大容量存储"
   </dest>
   <voice>
     *: none
-    ibassodx50: "大容量存储"
-    ibassodx90: "大容量存储"
+    ibassodx50,ibassodx90: "大容量存储"
   </voice>
 </phrase>
 <phrase>
@@ -13154,18 +12889,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50: "仅充电"
-    ibassodx90: "仅充电"
+    ibassodx50,ibassodx90: "仅充电"
   </dest>
   <voice>
     *: none
-    ibassodx50: "仅充电"
-    ibassodx90: "仅充电"
+    ibassodx50,ibassodx90: "仅充电"
   </voice>
 </phrase>
 <phrase>
@@ -13174,18 +12906,14 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50: "ADB调试"
-    ibassodx90: "ADB调试"
+    ibassodx50,ibassodx90: "ADB调试"
   </dest>
   <voice>
     *: none
-    ibassodx50: "ADB调试"
-    ibassodx90: "ADB调试"
+    ibassodx50,ibassodx90: "ADB调试"
   </voice>
 </phrase>
-

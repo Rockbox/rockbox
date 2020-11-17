@@ -247,20 +247,20 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU, or top-right = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = ใช่"
-    cowond2*: "MENU = ใช่"
-    iriverh100,iriverh120,iriverh300: "NAVI = ใช่"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ใช่"
-    mrobe500: "PLAY, POWER, หรือ มุมบนขวา = ใช่"
     archosplayer: "(เล่น/หยุด)"
+    cowond2*: "MENU = ใช่"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = ใช่"
+    iriverh100,iriverh120,iriverh300: "NAVI = ใช่"
+    mrobe500: "PLAY, POWER, หรือ มุมบนขวา = ใช่"
     vibe500: "OK = ใช่"
   </dest>
   <voice>
@@ -799,16 +799,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "ผสมเสียงข้ามช่อง"
+    *: "ผสมเสียงข้ามช่อง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -816,16 +813,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "อัตราขยายโดยตรง"
+    *: "อัตราขยายโดยตรง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Direct gain"
+    *: "Direct gain"
   </voice>
 </phrase>
 <phrase>
@@ -833,16 +827,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "อัตราขยายที่จุดตัด"
+    *: "อัตราขยายที่จุดตัด"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cross gain"
+    *: "Cross gain"
   </voice>
 </phrase>
 <phrase>
@@ -850,16 +841,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "อัตราลดทอนความถี่สูง"
+    *: "อัตราลดทอนความถี่สูง"
   </dest>
   <voice>
-    *: none
-    swcodec: "High-frequency attenuation"
+    *: "High-frequency attenuation"
   </voice>
 </phrase>
 <phrase>
@@ -867,16 +855,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "จุดตัดความถี่สูง"
+    *: "จุดตัดความถี่สูง"
   </dest>
   <voice>
-    *: none
-    swcodec: "High-frequency cutoff"
+    *: "High-frequency cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -884,16 +869,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "ปรับแต่งเสียง"
+    *: "ปรับแต่งเสียง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -901,16 +883,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "เปิดใช้การปรับแต่งเสียง"
+    *: "เปิดใช้การปรับแต่งเสียง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Enable equalizer"
+    *: "Enable equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -918,16 +897,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "ปรับแต่งเสียงแบบกราฟฟิก"
+    *: "ปรับแต่งเสียงแบบกราฟฟิก"
   </dest>
   <voice>
-    *: none
-    swcodec: "Graphical equalizer"
+    *: "Graphical equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -935,16 +911,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "ลดเสียงลง"
+    *: "ลดเสียงลง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pre-cut"
+    *: "Pre-cut"
   </voice>
 </phrase>
 <phrase>
@@ -952,16 +925,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "ปรับแต่งเสียงอย่างง่าย"
+    *: "ปรับแต่งเสียงอย่างง่าย"
   </dest>
   <voice>
-    *: none
-    swcodec: "Simple equalizer settings"
+    *: "Simple equalizer settings"
   </voice>
 </phrase>
 <phrase>
@@ -969,16 +939,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "ปรับแต่งเสียงขั้นสูง"
+    *: "ปรับแต่งเสียงขั้นสูง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Advanced equalizer settings"
+    *: "Advanced equalizer settings"
   </voice>
 </phrase>
 <phrase>
@@ -986,16 +953,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "บันทึกค่าการปรับแต่งเสียง"
+    *: "บันทึกค่าการปรับแต่งเสียง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Save equalizer preset"
+    *: "Save equalizer preset"
   </voice>
 </phrase>
 <phrase>
@@ -1003,16 +967,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "เปิดดูบันทึกการปรับแต่งเสียง"
+    *: "เปิดดูบันทึกการปรับแต่งเสียง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Browse equalizer presets"
+    *: "Browse equalizer presets"
   </voice>
 </phrase>
 <phrase>
@@ -1020,16 +981,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "โหมดแก้ไข: %s"
+    *: "โหมดแก้ไข: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1037,16 +995,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "อัตราขยายช่วง %d Hz"
+    *: "อัตราขยายช่วง %d Hz"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1054,16 +1009,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "ขอบล่างตัวกรองความถี่ต่ำ"
+    *: "ขอบล่างตัวกรองความถี่ต่ำ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Low shelf filter"
+    *: "Low shelf filter"
   </voice>
 </phrase>
 <phrase>
@@ -1071,16 +1023,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "ตัวกรองความถี่ที่ %d"
+    *: "ตัวกรองความถี่ที่ %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "Peak filter"
+    *: "Peak filter"
   </voice>
 </phrase>
 <phrase>
@@ -1088,16 +1037,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "ขอบบนตัวกรองความถี่สูง"
+    *: "ขอบบนตัวกรองความถี่สูง"
   </dest>
   <voice>
-    *: none
-    swcodec: "High shelf filter"
+    *: "High shelf filter"
   </voice>
 </phrase>
 <phrase>
@@ -1105,16 +1051,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "ความถี่ตัดผ่าน"
+    *: "ความถี่ตัดผ่าน"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -1122,16 +1065,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "ความถี่กลาง"
+    *: "ความถี่กลาง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Center frequency"
+    *: "Center frequency"
   </voice>
 </phrase>
 <phrase>
@@ -1139,16 +1079,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1156,16 +1093,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </dest>
   <voice>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -1709,16 +1643,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "ป้องกันการตัดยอด"
+    *: "ป้องกันการตัดยอด"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </voice>
 </phrase>
 <phrase>
@@ -1796,16 +1727,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "เสียงบี๊ปข้ามเพลง"
+    *: "เสียงบี๊ปข้ามเพลง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </voice>
 </phrase>
 <phrase>
@@ -1813,16 +1741,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "เบา"
+    *: "เบา"
   </dest>
   <voice>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </voice>
 </phrase>
 <phrase>
@@ -1830,16 +1755,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "ปานกลาง"
+    *: "ปานกลาง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </voice>
 </phrase>
 <phrase>
@@ -1847,16 +1769,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "ดัง"
+    *: "ดัง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </voice>
 </phrase>
 <phrase>
@@ -2216,19 +2135,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (OFF เพื่อย้อนกลับ)"
-    iriverh100,iriverh120,iriverh300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
-    ipod*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (LEFT เพื่อย้อนกลับ)"
     gogearsa9200: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (REW เพื่อย้อนกลับ)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (PREV เพื่อย้อนกลับ)"
+    iriverh100,iriverh120,iriverh300: "กำลังสร้างฐานข้อมูล...พบแล้ว %d (STOP เพื่อย้อนกลับ)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -2410,16 +2327,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ฟอนต์"
+    *: "ฟอนต์"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -2681,16 +2595,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "กลับหัว"
+    *: "กลับหัว"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </voice>
 </phrase>
 <phrase>
@@ -2698,16 +2609,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "การแสดงบรรทัด"
+    *: "การแสดงบรรทัด"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Line Selector"
+    *: "Line Selector"
   </voice>
 </phrase>
 <phrase>
@@ -2715,16 +2623,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ตัวชี้"
+    *: "ตัวชี้"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </voice>
 </phrase>
 <phrase>
@@ -2732,16 +2637,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "แถบสี (กลับสี)"
+    *: "แถบสี (กลับสี)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Inverse Bar"
+    *: "Inverse Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3031,16 +2933,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "เลื่อนจอเมื่อตกขอบ"
+    *: "เลื่อนจอเมื่อตกขอบ"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </voice>
 </phrase>
 <phrase>
@@ -3048,16 +2947,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ขนาดการเลื่อนจอ"
+    *: "ขนาดการเลื่อนจอ"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </voice>
 </phrase>
 <phrase>
@@ -3113,16 +3009,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "สถานะ-/แถบเลื่อน"
+    *: "สถานะ-/แถบเลื่อน"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Status- and Scrollbar"
+    *: "Status- and Scrollbar"
   </voice>
 </phrase>
 <phrase>
@@ -3130,16 +3023,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "แถบเลื่อน"
+    *: "แถบเลื่อน"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3147,16 +3037,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "แถบสถานะ"
+    *: "แถบสถานะ"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3181,16 +3068,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "แสดงความดัง"
+    *: "แสดงความดัง"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </voice>
 </phrase>
 <phrase>
@@ -3198,16 +3082,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "แสดงแบตเตอรี่"
+    *: "แสดงแบตเตอรี่"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </voice>
 </phrase>
 <phrase>
@@ -3215,16 +3096,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "กราฟฟิก"
+    *: "กราฟฟิก"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </voice>
 </phrase>
 <phrase>
@@ -3232,16 +3110,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ตัวเลข"
+    *: "ตัวเลข"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </voice>
 </phrase>
 <phrase>
@@ -3461,16 +3336,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hebrew"
+    *: "Hebrew"
   </voice>
 </phrase>
 <phrase>
@@ -3492,16 +3364,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ไทย (ISO-8859-11)"
+    *: "ไทย (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Thai"
+    *: "Thai"
   </voice>
 </phrase>
 <phrase>
@@ -3509,16 +3378,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arabic"
+    *: "Arabic"
   </voice>
 </phrase>
 <phrase>
@@ -3554,16 +3420,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Japanese"
+    *: "Japanese"
   </voice>
 </phrase>
 <phrase>
@@ -3571,16 +3434,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Simplified Chinese"
+    *: "Simplified Chinese"
   </voice>
 </phrase>
 <phrase>
@@ -3588,16 +3448,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Korean"
+    *: "Korean"
   </voice>
 </phrase>
 <phrase>
@@ -3605,16 +3462,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Traditional Chinese"
+    *: "Traditional Chinese"
   </voice>
 </phrase>
 <phrase>
@@ -3638,17 +3492,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "เวลาเปิดไฟปุ่ม"
-    sansafuze*,sansae200*: "เวลาเปิดไฟล้อหมุน"
+    sansae200*,sansafuze*: "เวลาเปิดไฟล้อหมุน"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -3902,23 +3756,23 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = ตั้งค่า"
-    mrobe500: "HEART = ตั้งค่า"
-    iriverh100,iriverh120,iriverh300: "NAVI = ตั้งค่า"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = ตั้งค่า"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = ตั้งค่า"
     gogearsa9200,samsungyh*: "PLAY = ตั้งค่า"
-    vibe500: "OK = ตั้งค่า"
+    iriverh100,iriverh120,iriverh300: "NAVI = ตั้งค่า"
     mpiohd300: "ENTER = ตั้งค่า"
+    mrobe500: "HEART = ตั้งค่า"
+    rtc: "ON = ตั้งค่า"
+    vibe500: "OK = ตั้งค่า"
   </dest>
   <voice>
     *: none
@@ -3930,35 +3784,31 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = ยกเลิก"
-    mrobe500: "POWER = ยกเลิก"
-    iriverh100,iriverh120,iriverh300: "STOP = ยกเลิก"
-    ipod*,sansac200*,mpiohd300: "MENU = ยกเลิก"
-    iaudiox5,iaudiom5: "RECORD = ยกเลิก"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = ยกเลิก"
-    gigabeatfx: "POWER = ยกเลิก"
-    sansafuzeplus: "BACK = ยกเลิก"
-    mrobe100: "DISPLAY = ยกเลิก"
-    gigabeats: "BACK = ยกเลิก"
+    gigabeatfx,mrobe500: "POWER = ยกเลิก"
+    gigabeats,sansafuzeplus: "BACK = ยกเลิก"
     gogearsa9200: "LEFT = ยกเลิก"
-    vibe500: "C = ยกเลิก"
+    iaudiom5,iaudiox5: "RECORD = ยกเลิก"
+    ipod*,mpiohd300,sansac200*: "MENU = ยกเลิก"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = ยกเลิก"
+    iriverh100,iriverh120,iriverh300: "STOP = ยกเลิก"
+    mrobe100: "DISPLAY = ยกเลิก"
+    rtc: "OFF = ยกเลิก"
     samsungyh*: "REW = ยกเลิก"
+    vibe500: "C = ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -4447,22 +4297,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=ตั้งเวลา OFF=ยกเลิก"
+    gigabeats: "SELECT=ตั้งเวลา POWER=ยกเลิก"
     ipod*: "SELECT=ตั้งเวลา MENU=ยกเลิก"
     iriverh10,iriverh10_5gb: "SELECT=ตั้งเวลา PREV=ยกเลิก"
-    gigabeats: "SELECT=ตั้งเวลา POWER=ยกเลิก"
-    vibe500: "OK=ตั้งเวลา C=ยกเลิก"
     mpiohd300: "ENTER=ตั้งเวลา MENU=ยกเลิก"
     sansafuzeplus: "SELECT=ตั้งเวลา  BACK=ยกเลิก"
+    vibe500: "OK=ตั้งเวลา C=ยกเลิก"
   </dest>
   <voice>
     *: none
@@ -5566,15 +5416,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "ความถี่"
+    play_frequency,recording: "ความถี่"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -5617,18 +5467,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "ไมโครโฟน"
     iriverh100,iriverh120,iriverh300: "ไมโครโฟนภายใน"
+    recording: "ไมโครโฟน"
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -6506,13 +6356,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "แบตเตอรี่: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "แบต: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "แบต: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -6569,24 +6419,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro Secure Digital card:"
-    xduoox3: "micro Secure Digital card 2:"
     archosondio*: "Multimedia card"
+    multivolume: "H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro Secure Digital card:"
+    xduoox3: "micro Secure Digital card 2:"
   </voice>
 </phrase>
 <phrase>
@@ -7902,23 +7752,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "ดีสก์เต็ม กดปุ่ม OFF เพื่อทำงานต่อ"
-    iriverh100,iriverh120,iriverh300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
     iaudiom5,iaudiox5: "ดีสก์เต็ม กดปุ่ม POWER เพื่อทำงานต่อ"
-    sansae200*,sansac200*,vibe500: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
+    iriverh100,iriverh120,iriverh300: "ดีสก์เต็ม กดปุ่ม STOP เพื่อทำงานต่อ"
+    recording: "ดีสก์เต็ม กดปุ่ม OFF เพื่อทำงานต่อ"
     samsungyh*: "ดีสก์เต็ม กดปุ่ม LEFT เพื่อทำงานต่อ"
+    sansac200*,sansae200*,vibe500: "ดีสก์เต็ม กดปุ่ม PREV เพื่อทำงานต่อ"
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8006,23 +7856,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF เพื่อยกเลิก"
-    iriverh100,iriverh120,iriverh300: "STOP เพื่อยกเลิก"
-    ipod*: "PLAY/PAUSE เพื่อยกเลิก"
-    iaudiox5,iaudiom5: "Long PLAY เพื่อยกเลิก"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV เพื่อยกเลิก"
-    gigabeats: "BACK เพื่อยกเลิก"
     gigabeatfx: "POWER เพื่อยกเลิก"
-    sansafuzeplus: "BACK เพื่อยกเลิก"
+    gigabeats,sansafuzeplus: "BACK เพื่อยกเลิก"
+    iaudiom5,iaudiox5: "Long PLAY เพื่อยกเลิก"
+    ipod*: "PLAY/PAUSE เพื่อยกเลิก"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV เพื่อยกเลิก"
+    iriverh100,iriverh120,iriverh300: "STOP เพื่อยกเลิก"
   </dest>
   <voice>
     *: ""
@@ -9574,7 +9422,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -9616,16 +9464,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "โหมดแก้ไข: %s %s"
+    *: "โหมดแก้ไข: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9633,16 +9478,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "ความถี่ตัดผ่าน"
+    *: "ความถี่ตัดผ่าน"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -9650,16 +9492,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "อัตราขยาย"
+    *: "อัตราขยาย"
   </dest>
   <voice>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </voice>
 </phrase>
 <phrase>
@@ -9667,16 +9506,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "โหมด:"
+    *: "โหมด:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10136,15 +9972,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "ความถี่ตัดเสียงทุ้ม"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "ความถี่ตัดเสียงทุ้ม"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -10370,15 +10206,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "ความถี่ตัดเสียงแหลม"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "ความถี่ตัดเสียงแหลม"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -10640,16 +10476,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "เสียงกดปุ่ม"
+    *: "เสียงกดปุ่ม"
   </dest>
   <voice>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </voice>
 </phrase>
 <phrase>
@@ -10891,16 +10724,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "กดปุ่มซ้ำ"
+    *: "กดปุ่มซ้ำ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </voice>
 </phrase>
 <phrase>
@@ -10987,16 +10817,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ตำแหน่งแถบเลื่อน"
+    *: "ตำแหน่งแถบเลื่อน"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Scroll bar position"
+    *: "Scroll bar position"
   </voice>
 </phrase>
 <phrase>
@@ -11267,16 +11094,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ความกว้างแถบเลื่อน"
+    *: "ความกว้างแถบเลื่อน"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Scroll bar width"
+    *: "Scroll bar width"
   </voice>
 </phrase>
 <phrase>
@@ -11329,16 +11153,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "ขยายเวลาเล่น"
+    *: "ขยายเวลาเล่น"
   </dest>
   <voice>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </voice>
 </phrase>
 <phrase>
@@ -11360,16 +11181,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "ตัวบีบอัดเสียง"
+    *: "ตัวบีบอัดเสียง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </voice>
 </phrase>
 <phrase>
@@ -11422,16 +11240,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "ความเร็ว"
+    *: "ความเร็ว"
   </dest>
   <voice>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </voice>
 </phrase>
 <phrase>
@@ -11484,16 +11299,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "เวลาปล่อย"
+    *: "เวลาปล่อย"
   </dest>
   <voice>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </voice>
 </phrase>
 <phrase>
@@ -11501,16 +11313,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "ช่วงการบีบ"
+    *: "ช่วงการบีบ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </voice>
 </phrase>
 <phrase>
@@ -11518,16 +11327,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "ปรับแต่งอัตราขยาย"
+    *: "ปรับแต่งอัตราขยาย"
   </dest>
   <voice>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </voice>
 </phrase>
 <phrase>
@@ -11535,16 +11341,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "หน้ากากหลัก"
+    *: "หน้ากากหลัก"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </voice>
 </phrase>
 <phrase>
@@ -11569,16 +11372,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ฐาน"
+    *: "ฐาน"
   </dest>
   <voice>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </voice>
 </phrase>
 <phrase>
@@ -11586,16 +11386,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "อัตโนมัติ"
+    *: "อัตโนมัติ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </voice>
 </phrase>
 <phrase>
@@ -11617,16 +11414,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ฐานเบา"
+    *: "ฐานเบา"
   </dest>
   <voice>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </voice>
 </phrase>
 <phrase>
@@ -11648,16 +11442,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </voice>
 </phrase>
 <phrase>
@@ -11682,16 +11473,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </voice>
 </phrase>
 <phrase>
@@ -11699,16 +11487,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "หน้ากากหลักรีโมท"
+    *: "หน้ากากหลักรีโมท"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </voice>
 </phrase>
 <phrase>
@@ -11784,16 +11569,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 to 1"
+    *: "10 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -11818,16 +11600,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 to 1"
+    *: "2 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -11852,16 +11631,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </dest>
   <voice>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </voice>
 </phrase>
 <phrase>
@@ -11931,16 +11707,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 to 1"
+    *: "6 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -11962,16 +11735,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 to 1"
+    *: "4 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -12228,16 +11998,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "เริ่มเล่นใหม่หลังเปิดเครื่อง"
+    *: "เริ่มเล่นใหม่หลังเปิดเครื่อง"
   </dest>
   <voice>
-    *: none
-    swcodec: "Rewind before resume"
+    *: "Rewind before resume"
   </voice>
 </phrase>
 <phrase>
@@ -12485,7 +12252,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"

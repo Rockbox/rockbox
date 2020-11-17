@@ -218,16 +218,16 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeatfx,sansae200*,sansac200*,iriverh10,iriverh10_5gb: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    gigabeatfx,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "बजाना = हां"
-    iriverh100,iriverh120,iriverh300: "NAVI = हां"
-    ipod*,iaudiox5,iaudiom5,gigabeatfx,sansae200*,sansac200*,iriverh10,iriverh10_5gb: "चुन = हां"
     archosplayer: "(बजाना/रोक)"
+    gigabeatfx,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*: "चुन = हां"
+    iriverh100,iriverh120,iriverh300: "NAVI = हां"
     vibe500: "OK = हां"
   </dest>
   <voice>
@@ -598,16 +598,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "EQ चालू कर"
+    *: "EQ चालू कर"
   </dest>
   <voice>
-    *: none
-    swcodec: "Equalizer चालू कर"
+    *: "Equalizer चालू कर"
   </voice>
 </phrase>
 <phrase>
@@ -615,16 +612,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "सिमपल EQ सेटिनगस"
+    *: "सिमपल EQ सेटिनगस"
   </dest>
   <voice>
-    *: none
-    swcodec: "सिमपल equalizer सेटिनगस"
+    *: "सिमपल equalizer सेटिनगस"
   </voice>
 </phrase>
 <phrase>
@@ -632,16 +626,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "अडवानसड EQ सेटिनगस"
+    *: "अडवानसड EQ सेटिनगस"
   </dest>
   <voice>
-    *: none
-    swcodec: "अडवानसड equalizer सेटिनगस"
+    *: "अडवानसड equalizer सेटिनगस"
   </voice>
 </phrase>
 <phrase>
@@ -840,16 +831,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Clipping कम करो"
+    *: "Clipping कम करो"
   </dest>
   <voice>
-    *: none
-    swcodec: "Clipping कम करो"
+    *: "Clipping कम करो"
   </voice>
 </phrase>
 <phrase>
@@ -857,16 +845,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "धीमा"
+    *: "धीमा"
   </dest>
   <voice>
-    *: none
-    swcodec: "धीमा"
+    *: "धीमा"
   </voice>
 </phrase>
 <phrase>
@@ -874,16 +859,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "बीच का"
+    *: "बीच का"
   </dest>
   <voice>
-    *: none
-    swcodec: "बीच का"
+    *: "बीच का"
   </voice>
 </phrase>
 <phrase>
@@ -891,16 +873,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "जोरदार"
+    *: "जोरदार"
   </dest>
   <voice>
-    *: none
-    swcodec: "जोरदार"
+    *: "जोरदार"
   </voice>
 </phrase>
 <phrase>
@@ -1114,17 +1093,15 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
     iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
   </source>
   <dest>
     *: "डाटाबेस बन रहा है... %d मिले (OFF to बढ़)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
     iriverh100,iriverh120,iriverh300: "डाटाबेस बन रहा है... %d मिले (STOP to बढ़)"
-    ipod*: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "डाटाबेस बन रहा है... %d मिले (LEFT to बढ़)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "डाटाबेस बन रहा है... %d मिले (PREV to बढ़)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -1323,16 +1300,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ऊलटा"
+    *: "ऊलटा"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ऊलटा"
+    *: "ऊलटा"
   </voice>
 </phrase>
 <phrase>
@@ -1907,18 +1881,18 @@
     alarm: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=लगा OFF=बंद"
     ipod*: "SELECT=लगा MENU=बंद"
     iriverh10,iriverh10_5gb: "SELECT=लगा PREV=बंद"
-    vibe500: "OK=लगा C=बंद"
     mpiohd300: "ENTER=लगा MENU=बंद"
     sansafuzeplus: "SELECT=लगा  BACK=बंद"
+    vibe500: "OK=लगा C=बंद"
   </dest>
   <voice>
     *: none
@@ -3762,23 +3736,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "दिसक भरी ह. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
     iaudiom5,iaudiox5: "दिसक भरी ह. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "दिसक भरी ह. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "दिसक भरी ह. Press STOP to continue."
+    recording: "दिसक भरी ह. Press OFF to continue."
     samsungyh*: "दिसक भरी ह. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "दिसक भरी ह. Press PREV to continue."
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>

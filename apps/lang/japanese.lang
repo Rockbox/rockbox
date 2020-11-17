@@ -252,23 +252,23 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = Yes"
+    cowond2*: "MENU, or top-right = Yes"
     creativezen*: "Select = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
+    vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = はい"
-    cowond2*: "MENU または top-right = はい"
-    iriverh100,iriverh120,iriverh300: "NAVI = はい"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = はい"
-    mrobe500: "PLAY または POWER, top-right = はい"
     archosplayer: "(PLAY/STOP)"
-    vibe500: "OK = はい"
+    cowond2*: "MENU または top-right = はい"
     creativezen*: "Select = はい"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = はい"
+    iriverh100,iriverh120,iriverh300: "NAVI = はい"
+    mrobe500: "PLAY または POWER, top-right = はい"
+    vibe500: "OK = はい"
   </dest>
   <voice>
     *: ""
@@ -823,16 +823,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "クロスフィード"
+    *: "クロスフィード"
   </dest>
   <voice>
-    *: none
-    swcodec: "クロスフィード"
+    *: "クロスフィード"
   </voice>
 </phrase>
 <phrase>
@@ -840,16 +837,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "ダイレクトゲイン"
+    *: "ダイレクトゲイン"
   </dest>
   <voice>
-    *: none
-    swcodec: "ダイレクトゲイン"
+    *: "ダイレクトゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -857,16 +851,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "クロスゲイン"
+    *: "クロスゲイン"
   </dest>
   <voice>
-    *: none
-    swcodec: "クロスゲイン"
+    *: "クロスゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -874,16 +865,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "高周波アッテネーション"
+    *: "高周波アッテネーション"
   </dest>
   <voice>
-    *: none
-    swcodec: "高周波アッテネーション"
+    *: "高周波アッテネーション"
   </voice>
 </phrase>
 <phrase>
@@ -891,16 +879,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "高周波カットオフ"
+    *: "高周波カットオフ"
   </dest>
   <voice>
-    *: none
-    swcodec: "高周波カットオフ"
+    *: "高周波カットオフ"
   </voice>
 </phrase>
 <phrase>
@@ -908,16 +893,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "イコライザ"
+    *: "イコライザ"
   </dest>
   <voice>
-    *: none
-    swcodec: "イコライザ"
+    *: "イコライザ"
   </voice>
 </phrase>
 <phrase>
@@ -925,16 +907,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "イコライザの有効化"
+    *: "イコライザの有効化"
   </dest>
   <voice>
-    *: none
-    swcodec: "イコライザの有効化"
+    *: "イコライザの有効化"
   </voice>
 </phrase>
 <phrase>
@@ -942,16 +921,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "グラフィックEQ"
+    *: "グラフィックEQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "グラフィックイコライザ"
+    *: "グラフィックイコライザ"
   </voice>
 </phrase>
 <phrase>
@@ -959,16 +935,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "プレカット"
+    *: "プレカット"
   </dest>
   <voice>
-    *: none
-    swcodec: "プレカット"
+    *: "プレカット"
   </voice>
 </phrase>
 <phrase>
@@ -976,16 +949,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "簡易EQ設定"
+    *: "簡易EQ設定"
   </dest>
   <voice>
-    *: none
-    swcodec: "簡易イコライザ設定"
+    *: "簡易イコライザ設定"
   </voice>
 </phrase>
 <phrase>
@@ -993,16 +963,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "詳細EQ設定"
+    *: "詳細EQ設定"
   </dest>
   <voice>
-    *: none
-    swcodec: "詳細イコライザ設定"
+    *: "詳細イコライザ設定"
   </voice>
 </phrase>
 <phrase>
@@ -1010,16 +977,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "EQプリセットの保存"
+    *: "EQプリセットの保存"
   </dest>
   <voice>
-    *: none
-    swcodec: "イコライザプリセットの保存"
+    *: "イコライザプリセットの保存"
   </voice>
 </phrase>
 <phrase>
@@ -1027,16 +991,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "EQプリセットの参照"
+    *: "EQプリセットの参照"
   </dest>
   <voice>
-    *: none
-    swcodec: "イコライザプリセットの参照"
+    *: "イコライザプリセットの参照"
   </voice>
 </phrase>
 <phrase>
@@ -1044,16 +1005,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "調整項目: %s"
+    *: "調整項目: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1061,16 +1019,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%d Hz帯 ゲイン"
+    *: "%d Hz帯 ゲイン"
   </dest>
   <voice>
-    *: none
-    swcodec: "ヘルツたい ゲイン"
+    *: "ヘルツたい ゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -1078,16 +1033,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "ローブースト・フィルタ"
+    *: "ローブースト・フィルタ"
   </dest>
   <voice>
-    *: none
-    swcodec: "ローブースト・フィルタ"
+    *: "ローブースト・フィルタ"
   </voice>
 </phrase>
 <phrase>
@@ -1095,16 +1047,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "ピーク・フィルタ %d"
+    *: "ピーク・フィルタ %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "ピーク・フィルタ"
+    *: "ピーク・フィルタ"
   </voice>
 </phrase>
 <phrase>
@@ -1112,16 +1061,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "ハイブースト・フィルタ"
+    *: "ハイブースト・フィルタ"
   </dest>
   <voice>
-    *: none
-    swcodec: "ハイブースト・フィルタ"
+    *: "ハイブースト・フィルタ"
   </voice>
 </phrase>
 <phrase>
@@ -1129,16 +1075,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "カットオフ周波数"
+    *: "カットオフ周波数"
   </dest>
   <voice>
-    *: none
-    swcodec: "カットオフ周波数"
+    *: "カットオフ周波数"
   </voice>
 </phrase>
 <phrase>
@@ -1146,16 +1089,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "中心周波数"
+    *: "中心周波数"
   </dest>
   <voice>
-    *: none
-    swcodec: "中心周波数"
+    *: "中心周波数"
   </voice>
 </phrase>
 <phrase>
@@ -1163,16 +1103,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q値"
+    *: "Q値"
   </dest>
   <voice>
-    *: none
-    swcodec: "きゅーち"
+    *: "きゅーち"
   </voice>
 </phrase>
 <phrase>
@@ -1180,16 +1117,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "ディザリング"
+    *: "ディザリング"
   </dest>
   <voice>
-    *: none
-    swcodec: "ディザリング"
+    *: "ディザリング"
   </voice>
 </phrase>
 <phrase>
@@ -1733,16 +1667,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "クリッピング防止"
+    *: "クリッピング防止"
   </dest>
   <voice>
-    *: none
-    swcodec: "クリッピング防止"
+    *: "クリッピング防止"
   </voice>
 </phrase>
 <phrase>
@@ -1820,16 +1751,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "スキップ時のビープ音量"
+    *: "スキップ時のビープ音量"
   </dest>
   <voice>
-    *: none
-    swcodec: "スキップ時のビープ音量"
+    *: "スキップ時のビープ音量"
   </voice>
 </phrase>
 <phrase>
@@ -1837,16 +1765,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "弱"
+    *: "弱"
   </dest>
   <voice>
-    *: none
-    swcodec: "弱"
+    *: "弱"
   </voice>
 </phrase>
 <phrase>
@@ -1854,16 +1779,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "中"
+    *: "中"
   </dest>
   <voice>
-    *: none
-    swcodec: "中"
+    *: "中"
   </voice>
 </phrase>
 <phrase>
@@ -1871,16 +1793,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "強"
+    *: "強"
   </dest>
   <voice>
-    *: none
-    swcodec: "強"
+    *: "強"
   </voice>
 </phrase>
 <phrase>
@@ -2237,21 +2156,20 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
-    gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "データベース構築中... %d 件 (OFFで戻る)"
-    iriverh100,iriverh120,iriverh300: "データベース構築中... %d 件 (STOPで戻る)"
-    ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "データベース構築中... %d 件 (左で戻る)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "データベース構築中... %d 件 (PREVで戻る)"
-    gogearsa9200: "データベース構築中... %d 件 (REWで戻る)"
     archosplayer: "DB構築中... %d 件"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "データベース構築中... %d 件 (左で戻る)"
+    gogearsa9200: "データベース構築中... %d 件 (REWで戻る)"
+    ipod*: "データベース構築中... %d 件 (PLAY/PAUSEで戻る)"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "データベース構築中... %d 件 (PREVで戻る)"
+    iriverh100,iriverh120,iriverh300: "データベース構築中... %d 件 (STOPで戻る)"
   </dest>
   <voice>
     *: "データベースに登録"
@@ -2433,16 +2351,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "フォント"
+    *: "フォント"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "フォント"
+    *: "フォント"
   </voice>
 </phrase>
 <phrase>
@@ -2704,16 +2619,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "画面の上下反転"
+    *: "画面の上下反転"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "画面の上下反転"
+    *: "画面の上下反転"
   </voice>
 </phrase>
 <phrase>
@@ -2721,16 +2633,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "選択アイテムの表示方法"
+    *: "選択アイテムの表示方法"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "選択アイテムの表示方法"
+    *: "選択アイテムの表示方法"
   </voice>
 </phrase>
 <phrase>
@@ -2738,16 +2647,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ポインタ表示"
+    *: "ポインタ表示"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ポインタ表示"
+    *: "ポインタ表示"
   </voice>
 </phrase>
 <phrase>
@@ -2755,16 +2661,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "バー (反転)"
+    *: "バー (反転)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "バー 反転"
+    *: "バー 反転"
   </voice>
 </phrase>
 <phrase>
@@ -3054,16 +2957,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "画面範囲外スクロール"
+    *: "画面範囲外スクロール"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "画面範囲外スクロール"
+    *: "画面範囲外スクロール"
   </voice>
 </phrase>
 <phrase>
@@ -3071,16 +2971,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "スクロールのステップ"
+    *: "スクロールのステップ"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "スクロールのステップ"
+    *: "スクロールのステップ"
   </voice>
 </phrase>
 <phrase>
@@ -3136,16 +3033,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ステータス/スクロールバー"
+    *: "ステータス/スクロールバー"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ステータスバー スクロールバー"
+    *: "ステータスバー スクロールバー"
   </voice>
 </phrase>
 <phrase>
@@ -3153,16 +3047,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "スクロールバー"
+    *: "スクロールバー"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "スクロールバー"
+    *: "スクロールバー"
   </voice>
 </phrase>
 <phrase>
@@ -3170,16 +3061,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ステータスバー"
+    *: "ステータスバー"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ステータスバー"
+    *: "ステータスバー"
   </voice>
 </phrase>
 <phrase>
@@ -3204,16 +3092,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "音量表示"
+    *: "音量表示"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "音量表示"
+    *: "音量表示"
   </voice>
 </phrase>
 <phrase>
@@ -3221,16 +3106,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "バッテリー表示"
+    *: "バッテリー表示"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "バッテリー表示"
+    *: "バッテリー表示"
   </voice>
 </phrase>
 <phrase>
@@ -3238,16 +3120,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "グラフ"
+    *: "グラフ"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "グラフ"
+    *: "グラフ"
   </voice>
 </phrase>
 <phrase>
@@ -3255,16 +3134,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "数値"
+    *: "数値"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "数値"
+    *: "数値"
   </voice>
 </phrase>
 <phrase>
@@ -3484,16 +3360,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ヘブライ語 (ISO-8859-8)"
+    *: "ヘブライ語 (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ヘブライ語"
+    *: "ヘブライ語"
   </voice>
 </phrase>
 <phrase>
@@ -3515,16 +3388,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "タイ語 (ISO-8859-11)"
+    *: "タイ語 (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "タイ語"
+    *: "タイ語"
   </voice>
 </phrase>
 <phrase>
@@ -3532,16 +3402,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "アラビア語 (CP1256)"
+    *: "アラビア語 (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "アラビア語"
+    *: "アラビア語"
   </voice>
 </phrase>
 <phrase>
@@ -3577,16 +3444,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "日本語 (SJIS)"
+    *: "日本語 (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "日本語"
+    *: "日本語"
   </voice>
 </phrase>
 <phrase>
@@ -3594,16 +3458,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "簡体字中国語 (GB2312)"
+    *: "簡体字中国語 (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "簡体字中国語"
+    *: "簡体字中国語"
   </voice>
 </phrase>
 <phrase>
@@ -3611,16 +3472,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "韓国語 (KSX1001)"
+    *: "韓国語 (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "韓国語"
+    *: "韓国語"
   </voice>
 </phrase>
 <phrase>
@@ -3628,16 +3486,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "繁体字中国語 (BIG5)"
+    *: "繁体字中国語 (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "繁体字中国語"
+    *: "繁体字中国語"
   </voice>
 </phrase>
 <phrase>
@@ -3661,17 +3516,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "ボタンライトのタイムアウト"
-    sansafuze*,sansae200*: "ホイールライトのタイムアウト"
+    sansae200*,sansafuze*: "ホイールライトのタイムアウト"
   </dest>
   <voice>
     *: none
     button_light: "ボタンライトのタイムアウト"
-    sansafuze*,sansae200*: "ホイールライトのタイムアウト"
+    sansae200*,sansafuze*: "ホイールライトのタイムアウト"
   </voice>
 </phrase>
 <phrase>
@@ -3942,27 +3797,27 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = 設定"
-    mrobe500: "HEART = 設定"
-    iriverh100,iriverh120,iriverh300: "NAVI = 設定"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = 設定"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = 設定"
     gogearsa9200,samsungyh*: "PLAY = 設定"
-    vibe500: "OK = 設定"
+    iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     mpiohd300: "ENTER = 設定"
+    mrobe500: "HEART = 設定"
+    rtc: "ON = 設定"
+    vibe500: "OK = 設定"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3971,39 +3826,35 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = 元に戻す"
-    mrobe500: "POWER = 元に戻す"
-    iriverh100,iriverh120,iriverh300: "STOP = 元に戻す"
-    ipod*,sansac200*,mpiohd300: "MENU = 元に戻す"
-    iaudiox5,iaudiom5: "RECORD = 元に戻す"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 元に戻す"
-    gigabeatfx: "POWER = 元に戻す"
-    sansafuzeplus: "BACK = 元に戻す"
-    mrobe100: "DISPLAY = 元に戻す"
-    gigabeats: "BACK = 元に戻す"
+    gigabeatfx,mrobe500: "POWER = 元に戻す"
+    gigabeats,sansafuzeplus: "BACK = 元に戻す"
     gogearsa9200: "LEFT = 元に戻す"
-    vibe500: "CANCEL = 元に戻す"
+    iaudiom5,iaudiox5: "RECORD = 元に戻す"
+    ipod*,mpiohd300,sansac200*: "MENU = 元に戻す"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 元に戻す"
+    iriverh100,iriverh120,iriverh300: "STOP = 元に戻す"
+    mrobe100: "DISPLAY = 元に戻す"
+    rtc: "OFF = 元に戻す"
     samsungyh*: "REW = 元に戻す"
+    vibe500: "CANCEL = 元に戻す"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4489,22 +4340,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=設定 OFF=取り消し"
+    gigabeats: "SELECT=設定 POWER=取り消し"
     ipod*: "SELECT=設定 MENU=取り消し"
     iriverh10,iriverh10_5gb: "SELECT=設定 PREV=取り消し"
-    gigabeats: "SELECT=設定 POWER=取り消し"
-    vibe500: "OK=設定 C=取り消し"
     mpiohd300: "ENTER=設定 MENU=取り消し"
     sansafuzeplus: "SELECT=設定  BACK=取り消し"
+    vibe500: "OK=設定 C=取り消し"
   </dest>
   <voice>
     *: none
@@ -5609,15 +5460,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "周波数"
+    play_frequency,recording: "周波数"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "周波数"
+    play_frequency,recording: "周波数"
   </voice>
 </phrase>
 <phrase>
@@ -5660,18 +5511,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "マイク"
     iriverh100,iriverh120,iriverh300: "内蔵のマイク"
+    recording: "マイク"
   </dest>
   <voice>
     *: none
-    recording: "マイク"
     iriverh100,iriverh120,iriverh300: "内蔵のマイク"
+    recording: "マイク"
   </voice>
 </phrase>
 <phrase>
@@ -6549,13 +6400,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "バッテリー: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "バッテリー容量"
@@ -6612,24 +6463,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "マイクロSD"
-    xduoox3: "マイクロSD2"
     archosondio*: "マルチメディアカード"
+    multivolume: "H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "マイクロSD"
+    xduoox3: "マイクロSD2"
   </voice>
 </phrase>
 <phrase>
@@ -7944,23 +7795,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "ディスクが一杯です. OFFボタンを押してください"
-    iriverh100,iriverh120,iriverh300: "ディスクが一杯です. STOPボタンを押してください"
     iaudiom5,iaudiox5: "ディスクが一杯です. POWERボタンを押してください"
-    sansae200*,sansac200*,vibe500: "ディスクが一杯です. PREVボタンを押してください"
+    iriverh100,iriverh120,iriverh300: "ディスクが一杯です. STOPボタンを押してください"
+    recording: "ディスクが一杯です. OFFボタンを押してください"
     samsungyh*: "ディスクが一杯です. LEFTボタンを押してください"
+    sansac200*,sansae200*,vibe500: "ディスクが一杯です. PREVボタンを押してください"
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8048,23 +7899,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF: 取り消し"
-    iriverh100,iriverh120,iriverh300: "STOP: 取り消し"
-    ipod*: "PLAY/PAUSE: 取り消し"
-    iaudiox5,iaudiom5: "Long PLAY: 取り消し"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV: 取り消し"
-    gigabeats: "BACK: 取り消し"
     gigabeatfx: "POWER: 取り消し"
-    sansafuzeplus: "BACK: 取り消し"
+    gigabeats,sansafuzeplus: "BACK: 取り消し"
+    iaudiom5,iaudiox5: "Long PLAY: 取り消し"
+    ipod*: "PLAY/PAUSE: 取り消し"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV: 取り消し"
+    iriverh100,iriverh120,iriverh300: "STOP: 取り消し"
   </dest>
   <voice>
     *: ""
@@ -9616,7 +9465,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "キューシート"
@@ -9658,16 +9507,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "調整項目: %s %s"
+    *: "調整項目: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9675,16 +9521,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "カットオフ周波数"
+    *: "カットオフ周波数"
   </dest>
   <voice>
-    *: none
-    swcodec: "カットオフ周波数"
+    *: "カットオフ周波数"
   </voice>
 </phrase>
 <phrase>
@@ -9692,16 +9535,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "ゲイン"
+    *: "ゲイン"
   </dest>
   <voice>
-    *: none
-    swcodec: "ゲイン"
+    *: "ゲイン"
   </voice>
 </phrase>
 <phrase>
@@ -9709,16 +9549,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "項目:"
+    *: "項目:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10347,7 +10184,7 @@
     multivolume: "なし"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_TALK_BATTERY_LEVEL
   desc: Setting for spontaneous battery level announcement
   user: core
@@ -10381,15 +10218,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "低音域カットオフ"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "低音域カットオフ"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "低音域カットオフ"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "低音域カットオフ"
   </voice>
 </phrase>
 <phrase>
@@ -10398,15 +10235,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "高音域カットオフ"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高音域カットオフ"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "高音域カットオフ"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高音域カットオフ"
   </voice>
 </phrase>
 <phrase>
@@ -10442,16 +10279,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "クリッカー"
+    *: "クリッカー"
   </dest>
   <voice>
-    *: none
-    swcodec: "クリッカー"
+    *: "クリッカー"
   </voice>
 </phrase>
 <phrase>
@@ -10459,16 +10293,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "クリッカーのリピート"
+    *: "クリッカーのリピート"
   </dest>
   <voice>
-    *: none
-    swcodec: "クリッカーのリピート"
+    *: "クリッカーのリピート"
   </voice>
 </phrase>
 <phrase>
@@ -10589,11 +10420,11 @@
     *: none
     serial_port: "Serial Bitrate"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "シリアル通信のビットレート"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "シリアル通信のビットレート"
   </voice>
@@ -10606,11 +10437,11 @@
     *: none
     serial_port: "Auto"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "自動"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "自動"
   </voice>
@@ -10623,11 +10454,11 @@
     *: none
     serial_port: "9600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "9600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "9600"
   </voice>
@@ -10640,11 +10471,11 @@
     *: none
     serial_port: "19200"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "19200"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "19200"
   </voice>
@@ -10657,11 +10488,11 @@
     *: none
     serial_port: "38400"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "38400"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "38400"
   </voice>
@@ -10674,11 +10505,11 @@
     *: none
     serial_port: "57600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "57600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "57600"
   </voice>
@@ -11201,16 +11032,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "タイムストレッチ"
+    *: "タイムストレッチ"
   </dest>
   <voice>
-    *: none
-    swcodec: "タイムストレッチ"
+    *: "タイムストレッチ"
   </voice>
 </phrase>
 <phrase>
@@ -11218,16 +11046,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "スピード"
+    *: "スピード"
   </dest>
   <voice>
-    *: none
-    swcodec: "スピード"
+    *: "スピード"
   </voice>
 </phrase>
 <phrase>
@@ -11328,7 +11153,7 @@
 </phrase>
 <phrase>
   id: LANG_SEMITONE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -11481,16 +11306,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "スクロールバーの幅"
+    *: "スクロールバーの幅"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "スクロールバーの幅"
+    *: "スクロールバーの幅"
   </voice>
 </phrase>
 <phrase>
@@ -11498,16 +11320,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "スクロールバーの位置"
+    *: "スクロールバーの位置"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "スクロールバーの位置"
+    *: "スクロールバーの位置"
   </voice>
 </phrase>
 <phrase>
@@ -11515,16 +11334,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "コンプレッサ"
+    *: "コンプレッサ"
   </dest>
   <voice>
-    *: none
-    swcodec: "コンプレッサ"
+    *: "コンプレッサ"
   </voice>
 </phrase>
 <phrase>
@@ -11583,16 +11399,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "しきい値"
+    *: "しきい値"
   </dest>
   <voice>
-    *: none
-    swcodec: "しきい値"
+    *: "しきい値"
   </voice>
 </phrase>
 <phrase>
@@ -11600,16 +11413,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "圧縮率"
+    *: "圧縮率"
   </dest>
   <voice>
-    *: none
-    swcodec: "圧縮率"
+    *: "圧縮率"
   </voice>
 </phrase>
 <phrase>
@@ -11617,16 +11427,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 対 1"
+    *: "2 対 1"
   </voice>
 </phrase>
 <phrase>
@@ -11634,16 +11441,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 対 1"
+    *: "4 対 1"
   </voice>
 </phrase>
 <phrase>
@@ -11651,16 +11455,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 対 1"
+    *: "6 対 1"
   </voice>
 </phrase>
 <phrase>
@@ -11668,16 +11469,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 対 1"
+    *: "10 対 1"
   </voice>
 </phrase>
 <phrase>
@@ -11685,16 +11483,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "リミット"
+    *: "リミット"
   </dest>
   <voice>
-    *: none
-    swcodec: "リミット"
+    *: "リミット"
   </voice>
 </phrase>
 <phrase>
@@ -11702,16 +11497,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "ゲインの構成"
+    *: "ゲインの構成"
   </dest>
   <voice>
-    *: none
-    swcodec: "ゲインの構成"
+    *: "ゲインの構成"
   </voice>
 </phrase>
 <phrase>
@@ -11719,16 +11511,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "自動"
+    *: "自動"
   </dest>
   <voice>
-    *: none
-    swcodec: "自動"
+    *: "自動"
   </voice>
 </phrase>
 <phrase>
@@ -11736,16 +11525,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ニー"
+    *: "ニー"
   </dest>
   <voice>
-    *: none
-    swcodec: "ニー"
+    *: "ニー"
   </voice>
 </phrase>
 <phrase>
@@ -11753,16 +11539,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ハード・ニー"
+    *: "ハード・ニー"
   </dest>
   <voice>
-    *: none
-    swcodec: "ハード ニー"
+    *: "ハード ニー"
   </voice>
 </phrase>
 <phrase>
@@ -11770,16 +11553,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ソフト・ニー"
+    *: "ソフト・ニー"
   </dest>
   <voice>
-    *: none
-    swcodec: "ソフト・ニー"
+    *: "ソフト・ニー"
   </voice>
 </phrase>
 <phrase>
@@ -11787,16 +11567,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "リリースタイム"
+    *: "リリースタイム"
   </dest>
   <voice>
-    *: none
-    swcodec: "リリースタイム"
+    *: "リリースタイム"
   </voice>
 </phrase>
 <phrase>
@@ -11984,16 +11761,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "基本スキン"
+    *: "基本スキン"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "基本スキン"
+    *: "基本スキン"
   </voice>
 </phrase>
 <phrase>
@@ -12001,16 +11775,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "リモコンの基本スキン"
+    *: "リモコンの基本スキン"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "リモコンの基本スキン"
+    *: "リモコンの基本スキン"
   </voice>
 </phrase>
 <phrase>
@@ -12137,16 +11908,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "レジューム時の巻き戻し時間"
+    *: "レジューム時の巻き戻し時間"
   </dest>
   <voice>
-    *: none
-    swcodec: "レジューム時の巻き戻し時間"
+    *: "レジューム時の巻き戻し時間"
   </voice>
 </phrase>
 <phrase>
@@ -12521,7 +12289,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
@@ -12799,16 +12567,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "アタック・タイム"
+    *: "アタック・タイム"
   </dest>
   <voice>
-    *: none
-    swcodec: "アタック・タイム"
+    *: "アタック・タイム"
   </voice>
 </phrase>
 <phrase>
@@ -12830,16 +12595,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12847,16 +12609,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "パーペプチュアル低音増強"
+    *: "パーペプチュアル低音増強"
   </dest>
   <voice>
-    *: none
-    swcodec: "パーペプチュアル低音増強"
+    *: "パーペプチュアル低音増強"
   </voice>
 </phrase>
 <phrase>
@@ -12878,16 +12637,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "カスタム"
+    *: "カスタム"
   </dest>
   <voice>
-    *: none
-    swcodec: "カスタム"
+    *: "カスタム"
   </voice>
 </phrase>
 <phrase>
@@ -12941,18 +12697,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50: "充電のみ"
-    ibassodx90: "充電のみ"
+    ibassodx50,ibassodx90: "充電のみ"
   </dest>
   <voice>
     *: none
-    ibassodx50: "充電のみ"
-    ibassodx90: "充電のみ"
+    ibassodx50,ibassodx90: "充電のみ"
   </voice>
 </phrase>
 <phrase>
@@ -12961,18 +12714,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50: "USBモード"
-    ibassodx90: "USBモード"
+    ibassodx50,ibassodx90: "USBモード"
   </dest>
   <voice>
     *: none
-    ibassodx50: "USBモード"
-    ibassodx90: "USBモード"
+    ibassodx50,ibassodx90: "USBモード"
   </voice>
 </phrase>
 <phrase>
@@ -13039,16 +12789,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "シンプル（メイヤー）"
+    *: "シンプル（メイヤー）"
   </dest>
   <voice>
-    *: none
-    swcodec: "シンプル"
+    *: "シンプル"
   </voice>
 </phrase>
 <phrase>
@@ -13056,16 +12803,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -13088,18 +12832,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50: "マス・ストレージ"
-    ibassodx90: "マス・ストレージ"
+    ibassodx50,ibassodx90: "マス・ストレージ"
   </dest>
   <voice>
     *: none
-    ibassodx50: "マス・ストレージ"
-    ibassodx90: "マス・ストレージ"
+    ibassodx50,ibassodx90: "マス・ストレージ"
   </voice>
 </phrase>
 <phrase>
@@ -13107,16 +12848,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "ドライ／ウエット ミックス"
+    *: "ドライ／ウエット ミックス"
   </dest>
   <voice>
-    *: none
-    swcodec: "ドライ／ウエット ミックス"
+    *: "ドライ／ウエット ミックス"
   </voice>
 </phrase>
 <phrase>
@@ -13141,16 +12879,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -13158,16 +12893,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "聴覚疲労低減"
+    *: "聴覚疲労低減"
   </dest>
   <voice>
-    *: none
-    swcodec: "聴覚疲労低減"
+    *: "聴覚疲労低減"
   </voice>
 </phrase>
 <phrase>
@@ -13189,16 +12921,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "ハース・サラウンド"
+    *: "ハース・サラウンド"
   </dest>
   <voice>
-    *: none
-    swcodec: "ハース・サラウンド"
+    *: "ハース・サラウンド"
   </voice>
 </phrase>
 <phrase>
@@ -13252,18 +12981,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -13285,16 +13011,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "サイドのみ"
+    *: "サイドのみ"
   </dest>
   <voice>
-    *: none
-    swcodec: "サイドのみ"
+    *: "サイドのみ"
   </voice>
 </phrase>
 <phrase>
@@ -13317,18 +13040,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </source>
   <dest>
     *: none
-    ibassodx50: "周波数スケーリング・ガバナー"
-    ibassodx90: "周波数スケーリング・ガバナー"
+    ibassodx50,ibassodx90: "周波数スケーリング・ガバナー"
   </dest>
   <voice>
     *: none
-    ibassodx50: "周波数スケーリング・ガバナー"
-    ibassodx90: "周波数スケーリング・ガバナー"
+    ibassodx50,ibassodx90: "周波数スケーリング・ガバナー"
   </voice>
 </phrase>
 <phrase>

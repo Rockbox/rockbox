@@ -820,16 +820,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </dest>
   <voice>
-    *: none
-    swcodec: "krosfid"
+    *: "krosfid"
   </voice>
 </phrase>
 <phrase>
@@ -837,16 +834,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Wzm. główne"
+    *: "Wzm. główne"
   </dest>
   <voice>
-    *: none
-    swcodec: "Wzmocnienie główne"
+    *: "Wzmocnienie główne"
   </voice>
 </phrase>
 <phrase>
@@ -854,16 +848,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Wzm. skrośne"
+    *: "Wzm. skrośne"
   </dest>
   <voice>
-    *: none
-    swcodec: "wzmocnienie skrośne"
+    *: "wzmocnienie skrośne"
   </voice>
 </phrase>
 <phrase>
@@ -871,16 +862,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "Tłumienie tonów wysokich"
+    *: "Tłumienie tonów wysokich"
   </dest>
   <voice>
-    *: none
-    swcodec: "Tłumienie tonów wysokich"
+    *: "Tłumienie tonów wysokich"
   </voice>
 </phrase>
 <phrase>
@@ -888,16 +876,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Górna częstotliwość graniczna"
+    *: "Górna częstotliwość graniczna"
   </dest>
   <voice>
-    *: none
-    swcodec: "Górna częstotliwość graniczna"
+    *: "Górna częstotliwość graniczna"
   </voice>
 </phrase>
 <phrase>
@@ -905,16 +890,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "Korektor"
+    *: "Korektor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Korektor"
+    *: "Korektor"
   </voice>
 </phrase>
 <phrase>
@@ -922,16 +904,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Włącz korektor"
+    *: "Włącz korektor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Włącz korektor"
+    *: "Włącz korektor"
   </voice>
 </phrase>
 <phrase>
@@ -939,16 +918,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Korektor graficzny"
+    *: "Korektor graficzny"
   </dest>
   <voice>
-    *: none
-    swcodec: "Korektor graficzny"
+    *: "Korektor graficzny"
   </voice>
 </phrase>
 <phrase>
@@ -956,16 +932,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "Kompensacja poziomu"
+    *: "Kompensacja poziomu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kompensacja poziomu"
+    *: "Kompensacja poziomu"
   </voice>
 </phrase>
 <phrase>
@@ -973,16 +946,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Ustawienia podstawowe"
+    *: "Ustawienia podstawowe"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ustawnienia podstawowe korektora"
+    *: "Ustawnienia podstawowe korektora"
   </voice>
 </phrase>
 <phrase>
@@ -990,16 +960,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Ustawienia zaawansowane"
+    *: "Ustawienia zaawansowane"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ustawienia zaawansowane korektora"
+    *: "Ustawienia zaawansowane korektora"
   </voice>
 </phrase>
 <phrase>
@@ -1007,16 +974,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "Zapisz ustawienia"
+    *: "Zapisz ustawienia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zapisz ustawienia korektora"
+    *: "Zapisz ustawienia korektora"
   </voice>
 </phrase>
 <phrase>
@@ -1024,16 +988,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "Przeglądaj ustawienia"
+    *: "Przeglądaj ustawienia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Przeglądaj ustawienia korektora"
+    *: "Przeglądaj ustawienia korektora"
   </voice>
 </phrase>
 <phrase>
@@ -1041,16 +1002,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Parametr: %s"
+    *: "Parametr: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1058,16 +1016,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Wzm. pasma %d Hz"
+    *: "Wzm. pasma %d Hz"
   </dest>
   <voice>
-    *: none
-    swcodec: "Wzmocnienie pasma podane w hercach"
+    *: "Wzmocnienie pasma podane w hercach"
   </voice>
 </phrase>
 <phrase>
@@ -1075,16 +1030,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Filtr dolnoprzepustowy"
+    *: "Filtr dolnoprzepustowy"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filtr dolnoprzepustowy"
+    *: "Filtr dolnoprzepustowy"
   </voice>
 </phrase>
 <phrase>
@@ -1092,16 +1044,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "Filtr pasmowy %d"
+    *: "Filtr pasmowy %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filtr pasmowy"
+    *: "Filtr pasmowy"
   </voice>
 </phrase>
 <phrase>
@@ -1109,16 +1058,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Filtr górnoprzepustowy"
+    *: "Filtr górnoprzepustowy"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filtr górnoprzepustowy"
+    *: "Filtr górnoprzepustowy"
   </voice>
 </phrase>
 <phrase>
@@ -1126,16 +1072,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Częstotliwość graniczna"
+    *: "Częstotliwość graniczna"
   </dest>
   <voice>
-    *: none
-    swcodec: "Częstotliwość graniczna"
+    *: "Częstotliwość graniczna"
   </voice>
 </phrase>
 <phrase>
@@ -1143,16 +1086,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Częstotliwość środkowa"
+    *: "Częstotliwość środkowa"
   </dest>
   <voice>
-    *: none
-    swcodec: "Częstotliwość środkowa"
+    *: "Częstotliwość środkowa"
   </voice>
 </phrase>
 <phrase>
@@ -1160,16 +1100,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1177,16 +1114,13 @@
   desc: in the sound settings and some other menus
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Rozpraszanie"
+    *: "Rozpraszanie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Rozpraszanie"
+    *: "Rozpraszanie"
   </voice>
 </phrase>
 <phrase>
@@ -1577,16 +1511,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Unikaj przesterowania"
+    *: "Unikaj przesterowania"
   </dest>
   <voice>
-    *: none
-    swcodec: "Unikaj przesterowania"
+    *: "Unikaj przesterowania"
   </voice>
 </phrase>
 <phrase>
@@ -1664,16 +1595,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "Brzęczyk przy przejściu"
+    *: "Brzęczyk przy przejściu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Brzęczyk przy przejściu"
+    *: "Brzęczyk przy przejściu"
   </voice>
 </phrase>
 <phrase>
@@ -1681,16 +1609,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "Cichy"
+    *: "Cichy"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cichy"
+    *: "Cichy"
   </voice>
 </phrase>
 <phrase>
@@ -1698,16 +1623,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "Średni"
+    *: "Średni"
   </dest>
   <voice>
-    *: none
-    swcodec: "Średni"
+    *: "Średni"
   </voice>
 </phrase>
 <phrase>
@@ -1715,16 +1637,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "Głośny"
+    *: "Głośny"
   </dest>
   <voice>
-    *: none
-    swcodec: "Głośny"
+    *: "Głośny"
   </voice>
 </phrase>
 <phrase>
@@ -2273,16 +2192,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Czcionka"
+    *: "Czcionka"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Czcionka"
+    *: "Czcionka"
   </voice>
 </phrase>
 <phrase>
@@ -2542,16 +2458,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Odwrócony"
+    *: "Odwrócony"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Odwrócony"
+    *: "Odwrócony"
   </voice>
 </phrase>
 <phrase>
@@ -2559,16 +2472,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zaznaczanie linii"
+    *: "Zaznaczanie linii"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zaznaczanie linii"
+    *: "Zaznaczanie linii"
   </voice>
 </phrase>
 <phrase>
@@ -2576,16 +2486,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wskaźnik"
+    *: "Wskaźnik"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wskaźnik"
+    *: "Wskaźnik"
   </voice>
 </phrase>
 <phrase>
@@ -2593,16 +2500,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pasek (w negatywie)"
+    *: "Pasek (w negatywie)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pasek w negatywie"
+    *: "Pasek w negatywie"
   </voice>
 </phrase>
 <phrase>
@@ -2892,16 +2796,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Przesuwanie poza ekran"
+    *: "Przesuwanie poza ekran"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Przesuwanie poza ekran"
+    *: "Przesuwanie poza ekran"
   </voice>
 </phrase>
 <phrase>
@@ -2909,16 +2810,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Krok przesuwania ekranu"
+    *: "Krok przesuwania ekranu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Krok przesuwania ekranu"
+    *: "Krok przesuwania ekranu"
   </voice>
 </phrase>
 <phrase>
@@ -2974,16 +2872,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pasek stanu/przewijania"
+    *: "Pasek stanu/przewijania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pasek stanu oraz przewijania"
+    *: "Pasek stanu oraz przewijania"
   </voice>
 </phrase>
 <phrase>
@@ -2991,16 +2886,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pasek przewijania"
+    *: "Pasek przewijania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pasek przewijania"
+    *: "Pasek przewijania"
   </voice>
 </phrase>
 <phrase>
@@ -3008,16 +2900,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pasek stanu"
+    *: "Pasek stanu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pasek stanu"
+    *: "Pasek stanu"
   </voice>
 </phrase>
 <phrase>
@@ -3025,16 +2914,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Stan poziomu głośności"
+    *: "Stan poziomu głośności"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Stan poziomu głośności"
+    *: "Stan poziomu głośności"
   </voice>
 </phrase>
 <phrase>
@@ -3042,16 +2928,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Stan baterii"
+    *: "Stan baterii"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Stan baterii"
+    *: "Stan baterii"
   </voice>
 </phrase>
 <phrase>
@@ -3059,16 +2942,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Graficzny"
+    *: "Graficzny"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Graficzny"
+    *: "Graficzny"
   </voice>
 </phrase>
 <phrase>
@@ -3076,16 +2956,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Liczbowy"
+    *: "Liczbowy"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Liczbowy"
+    *: "Liczbowy"
   </voice>
 </phrase>
 <phrase>
@@ -3275,16 +3152,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hebrajski (ISO-8859-8)"
+    *: "Hebrajski (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hebrajski"
+    *: "Hebrajski"
   </voice>
 </phrase>
 <phrase>
@@ -3306,16 +3180,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Tajski (ISO-8859-11)"
+    *: "Tajski (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Tajski"
+    *: "Tajski"
   </voice>
 </phrase>
 <phrase>
@@ -3323,16 +3194,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arabski (CP1256)"
+    *: "Arabski (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arabski"
+    *: "Arabski"
   </voice>
 </phrase>
 <phrase>
@@ -3368,16 +3236,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Japoński (SJIS)"
+    *: "Japoński (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Japoński"
+    *: "Japoński"
   </voice>
 </phrase>
 <phrase>
@@ -3385,16 +3250,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Chiński upr. (GB2312)"
+    *: "Chiński upr. (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Chiński uproszczony"
+    *: "Chiński uproszczony"
   </voice>
 </phrase>
 <phrase>
@@ -3402,16 +3264,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Koreański (KSX1001)"
+    *: "Koreański (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Koreański"
+    *: "Koreański"
   </voice>
 </phrase>
 <phrase>
@@ -3419,16 +3278,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Chiński trad. (BIG5)"
+    *: "Chiński trad. (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Chiński tradycyjny"
+    *: "Chiński tradycyjny"
   </voice>
 </phrase>
 <phrase>
@@ -9243,16 +9099,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Parametr: %s %s"
+    *: "Parametr: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9260,16 +9113,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Granica"
+    *: "Granica"
   </dest>
   <voice>
-    *: none
-    swcodec: "Granica"
+    *: "Granica"
   </voice>
 </phrase>
 <phrase>
@@ -9277,16 +9127,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Wzmocnienie"
+    *: "Wzmocnienie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Wzmocnienie"
+    *: "Wzmocnienie"
   </voice>
 </phrase>
 <phrase>
@@ -9789,16 +9636,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Dźwięk przycisków"
+    *: "Dźwięk przycisków"
   </dest>
   <voice>
-    *: none
-    swcodec: "Dźwięk przycisków"
+    *: "Dźwięk przycisków"
   </voice>
 </phrase>
 <phrase>
@@ -9806,16 +9650,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Powtarzaj dźwięk przycisków"
+    *: "Powtarzaj dźwięk przycisków"
   </dest>
   <voice>
-    *: none
-    swcodec: "Powtarzaj dźwięk przycisków"
+    *: "Powtarzaj dźwięk przycisków"
   </voice>
 </phrase>
 <phrase>
@@ -10548,16 +10389,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Szybciej/wolniej"
+    *: "Szybciej/wolniej"
   </dest>
   <voice>
-    *: none
-    swcodec: "Szybciej/wolniej"
+    *: "Szybciej/wolniej"
   </voice>
 </phrase>
 <phrase>
@@ -10565,16 +10403,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Prędkość"
+    *: "Prędkość"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prędkość"
+    *: "Prędkość"
   </voice>
 </phrase>
 <phrase>
@@ -10743,16 +10578,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Szerokość paska przewijania"
+    *: "Szerokość paska przewijania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Szerokość paska przewijania"
+    *: "Szerokość paska przewijania"
   </voice>
 </phrase>
 <phrase>
@@ -10760,16 +10592,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pozycja paska przewijania"
+    *: "Pozycja paska przewijania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pozycja paska przewijania"
+    *: "Pozycja paska przewijania"
   </voice>
 </phrase>
 <phrase>
@@ -10777,16 +10606,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Kompresor"
+    *: "Kompresor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kompresor"
+    *: "Kompresor"
   </voice>
 </phrase>
 <phrase>
@@ -10839,16 +10665,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Czas zwolnienia"
+    *: "Czas zwolnienia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Czas zwolnienia"
+    *: "Czas zwolnienia"
   </voice>
 </phrase>
 <phrase>
@@ -10873,16 +10696,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Próg wzbudzenia"
+    *: "Próg wzbudzenia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Próg wzbudzenia"
+    *: "Próg wzbudzenia"
   </voice>
 </phrase>
 <phrase>
@@ -10907,16 +10727,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Kompensacja poziomu"
+    *: "Kompensacja poziomu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kompensacja poziomu"
+    *: "Kompensacja poziomu"
   </voice>
 </phrase>
 <phrase>
@@ -10924,16 +10741,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Styl bazowy"
+    *: "Styl bazowy"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Styl bazowy"
+    *: "Styl bazowy"
   </voice>
 </phrase>
 <phrase>
@@ -11009,16 +10823,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Krzywa kompresji"
+    *: "Krzywa kompresji"
   </dest>
   <voice>
-    *: none
-    swcodec: "Krzywa kompresji"
+    *: "Krzywa kompresji"
   </voice>
 </phrase>
 <phrase>
@@ -11026,16 +10837,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Automatycznie"
+    *: "Automatycznie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Automatycznie"
+    *: "Automatycznie"
   </voice>
 </phrase>
 <phrase>
@@ -11057,16 +10865,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Gładka"
+    *: "Gładka"
   </dest>
   <voice>
-    *: none
-    swcodec: "Gładka"
+    *: "Gładka"
   </voice>
 </phrase>
 <phrase>
@@ -11088,16 +10893,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Stopień kompresji"
+    *: "Stopień kompresji"
   </dest>
   <voice>
-    *: none
-    swcodec: "Stopień kompresji"
+    *: "Stopień kompresji"
   </voice>
 </phrase>
 <phrase>
@@ -11122,16 +10924,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Ostra"
+    *: "Ostra"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ostra"
+    *: "Ostra"
   </voice>
 </phrase>
 <phrase>
@@ -11139,16 +10938,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Styl bazowy pilota"
+    *: "Styl bazowy pilota"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Styl bazowy pilota"
+    *: "Styl bazowy pilota"
   </voice>
 </phrase>
 <phrase>
@@ -11275,16 +11071,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Cofnij przed wznowieniem"
+    *: "Cofnij przed wznowieniem"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cofnij przed wznowieniem"
+    *: "Cofnij przed wznowieniem"
   </voice>
 </phrase>
 <phrase>
@@ -11323,16 +11116,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "dziesięć do jednego"
+    *: "dziesięć do jednego"
   </voice>
 </phrase>
 <phrase>
@@ -11391,16 +11181,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "dwa do jednego"
+    *: "dwa do jednego"
   </voice>
 </phrase>
 <phrase>
@@ -11459,16 +11246,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </dest>
   <voice>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </voice>
 </phrase>
 <phrase>
@@ -11555,16 +11339,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "sześć do jednego"
+    *: "sześć do jednego"
   </voice>
 </phrase>
 <phrase>
@@ -11637,16 +11418,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "cztery do jednego"
+    *: "cztery do jednego"
   </voice>
 </phrase>
 <phrase>
@@ -12222,16 +12000,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "Prosty (Meier)"
+    *: "Prosty (Meier)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prosty Mejer"
+    *: "Prosty Mejer"
   </voice>
 </phrase>
 <phrase>
@@ -12267,16 +12042,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "Własny"
+    *: "Własny"
   </dest>
   <voice>
-    *: none
-    swcodec: "Własny"
+    *: "Własny"
   </voice>
 </phrase>
 <phrase>
@@ -12360,16 +12132,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Czas ataku"
+    *: "Czas ataku"
   </dest>
   <voice>
-    *: none
-    swcodec: "Czas ataku"
+    *: "Czas ataku"
   </voice>
 </phrase>
 <phrase>
@@ -12408,16 +12177,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12487,16 +12253,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "Redukcja zmęczenia słuchowego"
+    *: "Redukcja zmęczenia słuchowego"
   </dest>
   <voice>
-    *: none
-    swcodec: "Redukcja zmęczenia słuchowego"
+    *: "Redukcja zmęczenia słuchowego"
   </voice>
 </phrase>
 <phrase>
@@ -12504,16 +12267,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "Miks suchy / mokry"
+    *: "Miks suchy / mokry"
   </dest>
   <voice>
-    *: none
-    swcodec: "Miks suchy mokry"
+    *: "Miks suchy mokry"
   </voice>
 </phrase>
 <phrase>
@@ -12538,16 +12298,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "Tylko strona"
+    *: "Tylko strona"
   </dest>
   <voice>
-    *: none
-    swcodec: "Tylko strona"
+    *: "Tylko strona"
   </voice>
 </phrase>
 <phrase>
@@ -12589,16 +12346,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "Przestrzenny Haas"
+    *: "Przestrzenny Haas"
   </dest>
   <voice>
-    *: none
-    swcodec: "Przestrzenny Haas"
+    *: "Przestrzenny Haas"
   </voice>
 </phrase>
 <phrase>
@@ -12606,16 +12360,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -12657,16 +12408,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -12674,16 +12422,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "Percepcyjne rozszerzenie basu"
+    *: "Percepcyjne rozszerzenie basu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Percepcyjne rozszerzenie basu"
+    *: "Percepcyjne rozszerzenie basu"
   </voice>
 </phrase>
 <phrase>
@@ -13013,16 +12758,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Slideshow Time"
+    *: "Slideshow Time"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Czas pokazu slajdów"
+    *: "Czas pokazu slajdów"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Czas pokazu slajdów"
+    *: "Czas pokazu slajdów"
   </voice>
 </phrase>
 <phrase>
@@ -13044,16 +12786,13 @@
   desc: spoken only, for announcing chess piece unmarking
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nieoznakowany"
+    *: "Nieoznakowany"
   </voice>
 </phrase>
 <phrase>
@@ -13061,16 +12800,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hide album title"
+    *: "Hide album title"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ukryj tytuł albumu"
+    *: "Ukryj tytuł albumu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ukryj tytuł albumu"
+    *: "Ukryj tytuł albumu"
   </voice>
 </phrase>
 <phrase>
@@ -13078,19 +12814,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Play Mode"
     lowmem: none
-    swcodec: "Play Mode"
   </source>
   <dest>
-    *: none
+    *: "Tryb odtwarzania"
     lowmem: none
-    swcodec: "Tryb odtwarzania"
   </dest>
   <voice>
-    *: none
+    *: "Tryb odtwarzania"
     lowmem: none
-    swcodec: "Tryb odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -13112,16 +12845,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Restore Game"
+    *: "Restore Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Przywróć grę"
+    *: "Przywróć grę"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Przywróć grę"
+    *: "Przywróć grę"
   </voice>
 </phrase>
 <phrase>
@@ -13129,16 +12859,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Checkmate!"
+    *: "Checkmate!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Szach mat!"
+    *: "Szach mat!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Szach mat!"
+    *: "Szach mat!"
   </voice>
 </phrase>
 <phrase>
@@ -13146,16 +12873,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 3: 60 moves / 30 min"
+    *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 3: 60 ruchów / 30 min"
+    *: "Poziom 3: 60 ruchów / 30 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 3: 60 ruchów na 30 minut"
+    *: "Poziom 3: 60 ruchów na 30 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13194,16 +12918,13 @@
   desc: spoken only, for announcing chess piece marking
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Oznakowany"
+    *: "Oznakowany"
   </voice>
 </phrase>
 <phrase>
@@ -13211,16 +12932,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "No games found !"
+    *: "No games found !"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nie znaleziono gier!"
+    *: "Nie znaleziono gier!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nie znaleziono gier!"
+    *: "Nie znaleziono gier!"
   </voice>
 </phrase>
 <phrase>
@@ -13228,16 +12946,13 @@
   desc: in the mpegplayer and pictureflow settings menus
   user: core
   <source>
-    *: none
-    lcd_bitmap,swcodec: "Display FPS"
+    *: "Display FPS"
   </source>
   <dest>
-    *: none
-    lcd_bitmap,swcodec: "Wyświetl FPS"
+    *: "Wyświetl FPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap,swcodec: "Wyświetl FPS"
+    *: "Wyświetl FPS"
   </voice>
 </phrase>
 <phrase>
@@ -13259,19 +12974,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Use sound setting"
     lowmem: none
-    swcodec: "Use sound setting"
   </source>
   <dest>
-    *: none
+    *: "Użyj ustawienia dźwięku"
     lowmem: none
-    swcodec: "Użyj ustawienia dźwięku"
   </dest>
   <voice>
-    *: none
+    *: "Użyj ustawienia dźwięku"
     lowmem: none
-    swcodec: "Użyj ustawienia dźwięku"
   </voice>
 </phrase>
 <phrase>
@@ -13307,19 +13019,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Resume Options"
     lowmem: none
-    swcodec: "Resume Options"
   </source>
   <dest>
-    *: none
+    *: "Opcje wznawiania"
     lowmem: none
-    swcodec: "Opcje wznawiania"
   </dest>
   <voice>
-    *: none
+    *: "Opcje wznawiania"
     lowmem: none
-    swcodec: "Opcje wznawiania"
   </voice>
 </phrase>
 <phrase>
@@ -13327,19 +13036,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Interpolation"
     lowmem: none
-    swcodec: "Interpolation"
   </source>
   <dest>
-    *: none
+    *: "Interpolacja"
     lowmem: none
-    swcodec: "Interpolacja"
   </dest>
   <voice>
-    *: none
+    *: "Interpolacja"
     lowmem: none
-    swcodec: "Interpolacja"
   </voice>
 </phrase>
 <phrase>
@@ -13347,16 +13053,13 @@
   desc: in the pictureflow main menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Go to WPS"
+    *: "Go to WPS"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Przejdź do WPS"
+    *: "Przejdź do WPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Przejdź do WPS"
+    *: "Przejdź do WPS"
   </voice>
 </phrase>
 <phrase>
@@ -13364,16 +13067,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Play Wormlet!"
+    *: "Play Wormlet!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zagraj w Wormlet!"
+    *: "Zagraj w Wormlet!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zagraj w Wormlet!"
+    *: "Zagraj w Wormlet!"
   </voice>
 </phrase>
 <phrase>
@@ -13409,16 +13109,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Zoom"
+    *: "Zoom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Powiększenie"
+    *: "Powiększenie"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Powiększenie"
+    *: "Powiększenie"
   </voice>
 </phrase>
 <phrase>
@@ -13454,16 +13151,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 1: 60 moves / 5 min"
+    *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 1: 60 ruchów / 5 min"
+    *: "Poziom 1: 60 ruchów / 5 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 1: 60 ruchów na 5 minut"
+    *: "Poziom 1: 60 ruchów na 5 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13471,19 +13165,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Play from beginning"
     lowmem: none
-    swcodec: "Play from beginning"
   </source>
   <dest>
-    *: none
+    *: "Odtwarzaj od początku"
     lowmem: none
-    swcodec: "Odtwarzaj od początku"
   </dest>
   <voice>
-    *: none
+    *: "Odtwarzaj od początku"
     lowmem: none
-    swcodec: "Odtwarzaj od początku"
   </voice>
 </phrase>
 <phrase>
@@ -13491,16 +13182,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 8: 1 move / 15 min"
+    *: "Level 8: 1 move / 15 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 8: 1 ruch / 15 min"
+    *: "Poziom 8: 1 ruch / 15 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 8: 1 ruch na 15 minut"
+    *: "Poziom 8: 1 ruch na 15 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13508,16 +13196,13 @@
   desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Gracz"
+    *: "Gracz"
   </voice>
 </phrase>
 <phrase>
@@ -13525,16 +13210,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 4: 40 moves / 30 min"
+    *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 4: 40 ruchów / 30 min"
+    *: "Poziom 4: 40 ruchów / 30 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 4: 40 ruchów na 30 minut"
+    *: "Poziom 4: 40 ruchów na 30 minut"
   </voice>
 </phrase>
 <phrase>
@@ -13542,16 +13224,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Food Size"
+    *: "Food Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wielkość żywności"
+    *: "Wielkość żywności"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wielkość żywności"
+    *: "Wielkość żywności"
   </voice>
 </phrase>
 <phrase>
@@ -13587,19 +13266,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Skip frames"
     lowmem: none
-    swcodec: "Skip frames"
   </source>
   <dest>
-    *: none
+    *: "Pomiń klatki"
     lowmem: none
-    swcodec: "Pomiń klatki"
   </dest>
   <voice>
-    *: none
+    *: "Pomiń klatki"
     lowmem: none
-    swcodec: "Pomiń klatki"
   </voice>
 </phrase>
 <phrase>
@@ -13607,16 +13283,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pionek"
+    *: "Pionek"
   </voice>
 </phrase>
 <phrase>
@@ -13638,16 +13311,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Illegal move!"
+    *: "Illegal move!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nielegalny ruch!"
+    *: "Nielegalny ruch!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nielegalny ruch!"
+    *: "Nielegalny ruch!"
   </voice>
 </phrase>
 <phrase>
@@ -13655,16 +13325,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "New Game"
+    *: "New Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nowa gra"
+    *: "Nowa gra"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nowa gra"
+    *: "Nowa gra"
   </voice>
 </phrase>
 <phrase>
@@ -13672,16 +13339,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Rebuild cache"
+    *: "Rebuild cache"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Odbuduj pamięć podręczną"
+    *: "Odbuduj pamięć podręczną"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Odbuduj pamięć podręczną"
+    *: "Odbuduj pamięć podręczną"
   </voice>
 </phrase>
 <phrase>
@@ -13731,16 +13395,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Królowa"
+    *: "Królowa"
   </voice>
 </phrase>
 <phrase>
@@ -13748,19 +13409,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Resume automatically"
     lowmem: none
-    swcodec: "Resume automatically"
   </source>
   <dest>
-    *: none
+    *: "Wznów automatycznie"
     lowmem: none
-    swcodec: "Wznów automatycznie"
   </dest>
   <voice>
-    *: none
+    *: "Wznów automatycznie"
     lowmem: none
-    swcodec: "Wznów automatycznie"
   </voice>
 </phrase>
 <phrase>
@@ -13782,16 +13440,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Via Track list"
+    *: "Via Track list"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poprzez listę utworów"
+    *: "Poprzez listę utworów"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poprzez listę utworów"
+    *: "Poprzez listę utworów"
   </voice>
 </phrase>
 <phrase>
@@ -13799,19 +13454,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Reverberation"
     lowmem: none
-    swcodec: "Reverberation"
   </source>
   <dest>
-    *: none
+    *: "Pogłos"
     lowmem: none
-    swcodec: "Pogłos"
   </dest>
   <voice>
-    *: none
+    *: "Pogłos"
     lowmem: none
-    swcodec: "Pogłos"
   </voice>
 </phrase>
 <phrase>
@@ -13847,16 +13499,13 @@
   desc: in the pictureflow main menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Clear playlist"
+    *: "Clear playlist"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wyczyść listę odtwarzania"
+    *: "Wyczyść listę odtwarzania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wyczyść listę odtwarzania"
+    *: "Wyczyść listę odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -13864,16 +13513,13 @@
   desc: cannot restart playback splash in imageviewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Cannot restart playback"
+    *: "Cannot restart playback"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nie można ponownie uruchomić odtwarzania"
+    *: "Nie można ponownie uruchomić odtwarzania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nie można ponownie uruchomić odtwarzania"
+    *: "Nie można ponownie uruchomić odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -13881,19 +13527,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Limit FPS"
     lowmem: none
-    swcodec: "Limit FPS"
   </source>
   <dest>
-    *: none
+    *: "Ogranicz FPS"
     lowmem: none
-    swcodec: "Ogranicz FPS"
   </dest>
   <voice>
-    *: none
+    *: "Ogranicz FPS"
     lowmem: none
-    swcodec: "Ogranicz FPS"
   </voice>
 </phrase>
 <phrase>
@@ -13901,19 +13544,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Clear all resumes"
     lowmem: none
-    swcodec: "Clear all resumes"
   </source>
   <dest>
-    *: none
+    *: "Wyczyść wszystko wznawia"
     lowmem: none
-    swcodec: "Wyczyść wszystko wznawia"
   </dest>
   <voice>
-    *: none
+    *: "Wyczyść wszystko wznawia"
     lowmem: none
-    swcodec: "Wyczyść wszystko wznawia"
   </voice>
 </phrase>
 <phrase>
@@ -13921,16 +13561,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "strona królowej"
+    *: "strona królowej"
   </voice>
 </phrase>
 <phrase>
@@ -13938,16 +13575,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Error writing config"
+    *: "Error writing config"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Błąd zapisu konfiguracji"
+    *: "Błąd zapisu konfiguracji"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Błąd zapisu konfiguracji"
+    *: "Błąd zapisu konfiguracji"
   </voice>
 </phrase>
 <phrase>
@@ -13955,16 +13589,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Save Game"
+    *: "Save Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zapisz grę"
+    *: "Zapisz grę"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zapisz grę"
+    *: "Zapisz grę"
   </voice>
 </phrase>
 <phrase>
@@ -14000,16 +13631,13 @@
   desc: spoken only, for announcing chess piece color
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Biały"
+    *: "Biały"
   </voice>
 </phrase>
 <phrase>
@@ -14031,16 +13659,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "View Played Games"
+    *: "View Played Games"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wyświetl zagrane gry"
+    *: "Wyświetl zagrane gry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wyświetl zagrane gry"
+    *: "Wyświetl zagrane gry"
   </voice>
 </phrase>
 <phrase>
@@ -14048,16 +13673,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Playlist Cleared"
+    *: "Playlist Cleared"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wyczyszczono listę odtwarzania"
+    *: "Wyczyszczono listę odtwarzania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wyczyszczono listę odtwarzania"
+    *: "Wyczyszczono listę odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -14079,16 +13701,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Diffusion"
+    *: "Diffusion"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Dyfuzja"
+    *: "Dyfuzja"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Dyfuzja"
+    *: "Dyfuzja"
   </voice>
 </phrase>
 <phrase>
@@ -14096,16 +13715,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Resume Game"
+    *: "Resume Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Kontynuuj grę"
+    *: "Kontynuuj grę"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Kontynuuj grę"
+    *: "Kontynuuj grę"
   </voice>
 </phrase>
 <phrase>
@@ -14113,19 +13729,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Audio Options"
     lowmem: none
-    swcodec: "Audio Options"
   </source>
   <dest>
-    *: none
+    *: "Opcje audio"
     lowmem: none
-    swcodec: "Opcje audio"
   </dest>
   <voice>
-    *: none
+    *: "Opcje audio"
     lowmem: none
-    swcodec: "Opcje audio"
   </voice>
 </phrase>
 <phrase>
@@ -14150,19 +13763,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "CPU Boost"
     lowmem: none
-    swcodec: "CPU Boost"
   </source>
   <dest>
-    *: none
+    *: "Przyspieszenie CPU"
     lowmem: none
-    swcodec: "Przyspieszenie CPU"
   </dest>
   <voice>
-    *: none
+    *: "Przyspieszenie CPU"
     lowmem: none
-    swcodec: "Przyspieszenie CPU"
   </voice>
 </phrase>
 <phrase>
@@ -14170,16 +13780,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 7: 40 moves / 240 min"
+    *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 7: 40 ruchów / 240 min"
+    *: "Poziom 7: 40 ruchów / 240 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 7: 40 ruchów na 240 minut"
+    *: "Poziom 7: 40 ruchów na 240 minut"
   </voice>
 </phrase>
 <phrase>
@@ -14187,19 +13794,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Start menu"
     lowmem: none
-    swcodec: "Start menu"
   </source>
   <dest>
-    *: none
+    *: "Menu startowe"
     lowmem: none
-    swcodec: "Menu startowe"
   </dest>
   <voice>
-    *: none
+    *: "Menu startowe"
     lowmem: none
-    swcodec: "Menu startowe"
   </voice>
 </phrase>
 <phrase>
@@ -14207,16 +13811,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 2: 60 moves / 15 min"
+    *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 2: 60 ruchów / 15 min"
+    *: "Poziom 2: 60 ruchów / 15 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 2: 60 ruchów na 15 minut"
+    *: "Poziom 2: 60 ruchów na 15 minut"
   </voice>
 </phrase>
 <phrase>
@@ -14224,16 +13825,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album title"
+    *: "Show album title"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż tytuł albumu"
+    *: "Pokaż tytuł albumu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż tytuł albumu"
+    *: "Pokaż tytuł albumu"
   </voice>
 </phrase>
 <phrase>
@@ -14269,19 +13867,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Backlight brightness"
     lowmem: none
-    swcodec: "Backlight brightness"
   </source>
   <dest>
-    *: none
+    *: "Jasność podświetlenia"
     lowmem: none
-    swcodec: "Jasność podświetlenia"
   </dest>
   <voice>
-    *: none
+    *: "Jasność podświetlenia"
     lowmem: none
-    swcodec: "Jasność podświetlenia"
   </voice>
 </phrase>
 <phrase>
@@ -14289,16 +13884,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Number of Worms"
+    *: "Number of Worms"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Liczba robaków"
+    *: "Liczba robaków"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Liczba robaków"
+    *: "Liczba robaków"
   </voice>
 </phrase>
 <phrase>
@@ -14306,16 +13898,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show at the bottom"
+    *: "Show at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż na dole"
+    *: "Pokaż na dole"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż na dole"
+    *: "Pokaż na dole"
   </voice>
 </phrase>
 <phrase>
@@ -14323,16 +13912,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Szach!"
+    *: "Szach!"
   </voice>
 </phrase>
 <phrase>
@@ -14382,16 +13968,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Skoczek"
+    *: "Skoczek"
   </voice>
 </phrase>
 <phrase>
@@ -14399,16 +13982,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Centre margin"
+    *: "Centre margin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Margines środkowy"
+    *: "Margines środkowy"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Margines środkowy"
+    *: "Margines środkowy"
   </voice>
 </phrase>
 <phrase>
@@ -14416,16 +13996,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 6: 40 moves / 120 min"
+    *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 6: 40 ruchów / 120 min"
+    *: "Poziom 6: 40 ruchów / 120 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 6: 40 ruchów na 120 minut"
+    *: "Poziom 6: 40 ruchów na 120 minut"
   </voice>
 </phrase>
 <phrase>
@@ -14433,16 +14010,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arghs Per Food"
+    *: "Arghs Per Food"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arghi na żywność"
+    *: "Arghi na żywność"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arghi na żywność"
+    *: "Arghi na żywność"
   </voice>
 </phrase>
 <phrase>
@@ -14481,19 +14055,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Start menu if not completed"
     lowmem: none
-    swcodec: "Start menu if not completed"
   </source>
   <dest>
-    *: none
+    *: "Menu startowe, jeśli nie zostało ukończone"
     lowmem: none
-    swcodec: "Menu startowe, jeśli nie zostało ukończone"
   </dest>
   <voice>
-    *: none
+    *: "Menu startowe, jeśli nie zostało ukończone"
     lowmem: none
-    swcodec: "Menu startowe, jeśli nie zostało ukończone"
   </voice>
 </phrase>
 <phrase>
@@ -14501,16 +14072,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Games"
+    *: "Games"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Gry"
+    *: "Gry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14532,16 +14100,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Number of slides"
+    *: "Number of slides"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Liczba slajdów"
+    *: "Liczba slajdów"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Liczba slajdów"
+    *: "Liczba slajdów"
   </voice>
 </phrase>
 <phrase>
@@ -14549,19 +14114,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Single"
     lowmem: none
-    swcodec: "Single"
   </source>
   <dest>
-    *: none
+    *: "Pojedynczy"
     lowmem: none
-    swcodec: "Pojedynczy"
   </dest>
   <voice>
-    *: none
+    *: "Pojedynczy"
     lowmem: none
-    swcodec: "Pojedynczy"
   </voice>
 </phrase>
 <phrase>
@@ -14586,16 +14148,13 @@
   desc: spoken only, for announcing chess piece color
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Czarny"
+    *: "Czarny"
   </voice>
 </phrase>
 <phrase>
@@ -14603,16 +14162,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 5: 40 moves / 60 min"
+    *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 5: 40 ruchów / 60 min"
+    *: "Poziom 5: 40 ruchów / 60 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 5: 40 ruchów na 60 minut"
+    *: "Poziom 5: 40 ruchów na 60 minut"
   </voice>
 </phrase>
 <phrase>
@@ -14620,16 +14176,13 @@
   desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Program GNU Chess"
+    *: "Program GNU Chess"
   </voice>
 </phrase>
 <phrase>
@@ -14637,16 +14190,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thinking..."
+    *: "Thinking..."
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Myślę..."
+    *: "Myślę..."
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14668,16 +14218,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Król"
+    *: "Król"
   </voice>
 </phrase>
 <phrase>
@@ -14685,16 +14232,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Error parsing game !"
+    *: "Error parsing game !"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Błąd parsowania gry!"
+    *: "Błąd parsowania gry!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Błąd parsowania gry!"
+    *: "Błąd parsowania gry!"
   </voice>
 </phrase>
 <phrase>
@@ -14702,16 +14246,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wieża"
+    *: "Wieża"
   </voice>
 </phrase>
 <phrase>
@@ -14719,19 +14260,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Tone controls"
     lowmem: none
-    swcodec: "Tone controls"
   </source>
   <dest>
-    *: none
+    *: "Sterowanie tonami"
     lowmem: none
-    swcodec: "Sterowanie tonami"
   </dest>
   <voice>
-    *: none
+    *: "Sterowanie tonami"
     lowmem: none
-    swcodec: "Sterowanie tonami"
   </voice>
 </phrase>
 <phrase>
@@ -14753,16 +14291,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Saving position"
+    *: "Saving position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zapisywanie pozycji"
+    *: "Zapisywanie pozycji"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zapisywanie pozycji"
+    *: "Zapisywanie pozycji"
   </voice>
 </phrase>
 <phrase>
@@ -14770,19 +14305,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Set resume time (min)"
     lowmem: none
-    swcodec: "Set resume time (min)"
   </source>
   <dest>
-    *: none
+    *: "Ustaw czas wznowienia (min)"
     lowmem: none
-    swcodec: "Ustaw czas wznowienia (min)"
   </dest>
   <voice>
-    *: none
+    *: "Ustaw czas wznowienia"
     lowmem: none
-    swcodec: "Ustaw czas wznowienia"
   </voice>
 </phrase>
 <phrase>
@@ -14807,16 +14339,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Worm Speed"
+    *: "Worm Speed"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Prędkość robaka"
+    *: "Prędkość robaka"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Prędkość robaka"
+    *: "Prędkość robaka"
   </voice>
 </phrase>
 <phrase>
@@ -14824,16 +14353,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "At the end of the game"
+    *: "At the end of the game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pod koniec gry"
+    *: "Pod koniec gry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pod koniec gry"
+    *: "Pod koniec gry"
   </voice>
 </phrase>
 <phrase>
@@ -14855,16 +14381,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "WPS Integration"
+    *: "WPS Integration"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Integracja WPS"
+    *: "Integracja WPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Integracja WPS"
+    *: "Integracja WPS"
   </voice>
 </phrase>
 <phrase>
@@ -14872,16 +14395,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Loading position"
+    *: "Loading position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ładowanie pozycji"
+    *: "Ładowanie pozycji"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ładowanie pozycji"
+    *: "Ładowanie pozycji"
   </voice>
 </phrase>
 <phrase>
@@ -14903,16 +14423,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 10: 1 move / 600 min"
+    *: "Level 10: 1 move / 600 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 10: 1 ruch / 600 min"
+    *: "Poziom 10: 1 ruch / 600 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 10: 1 ruch na 600 minut"
+    *: "Poziom 10: 1 ruch na 600 minut"
   </voice>
 </phrase>
 <phrase>
@@ -14920,16 +14437,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Spacing"
+    *: "Spacing"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Rozstaw"
+    *: "Rozstaw"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Rozstaw"
+    *: "Rozstaw"
   </voice>
 </phrase>
 <phrase>
@@ -14982,16 +14496,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Ordered"
+    *: "Ordered"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Uszeregowane"
+    *: "Uszeregowane"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Uszeregowane"
+    *: "Uszeregowane"
   </voice>
 </phrase>
 <phrase>
@@ -14999,16 +14510,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Resize Covers"
+    *: "Resize Covers"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zmień rozmiar okładek"
+    *: "Zmień rozmiar okładek"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zmień rozmiar okładek"
+    *: "Zmień rozmiar okładek"
   </voice>
 </phrase>
 <phrase>
@@ -15044,16 +14552,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "No album art found"
+    *: "No album art found"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nie znaleziono okładki albumu"
+    *: "Nie znaleziono okładki albumu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nie znaleziono okładki albumu"
+    *: "Nie znaleziono okładki albumu"
   </voice>
 </phrase>
 <phrase>
@@ -15061,19 +14566,16 @@
   desc: in mpegplayer settings
   user: core
   <source>
-    *: none
+    *: "Unavailable"
     lowmem: none
-    swcodec: "Unavailable"
   </source>
   <dest>
-    *: none
+    *: "Niedostępne"
     lowmem: none
-    swcodec: "Niedostępne"
   </dest>
   <voice>
-    *: none
+    *: "Niedostępne"
     lowmem: none
-    swcodec: "Niedostępne"
   </voice>
 </phrase>
 <phrase>
@@ -15081,16 +14583,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Select Other Game"
+    *: "Select Other Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wybierz inną grę"
+    *: "Wybierz inną grę"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wybierz inną grę"
+    *: "Wybierz inną grę"
   </voice>
 </phrase>
 <phrase>
@@ -15112,16 +14611,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show at the top"
+    *: "Show at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż na górze"
+    *: "Pokaż na górze"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż na górze"
+    *: "Pokaż na górze"
   </voice>
 </phrase>
 <phrase>
@@ -15129,16 +14625,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Worm Growth Per Food"
+    *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Wzrost robaka na żywność"
+    *: "Wzrost robaka na żywność"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Wzrost robaka na żywność"
+    *: "Wzrost robaka na żywność"
   </voice>
 </phrase>
 <phrase>
@@ -15146,16 +14639,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Argh Size"
+    *: "Argh Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Rozmiar Argh"
+    *: "Rozmiar Argh"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Rozmiar Argh"
+    *: "Rozmiar Argh"
   </voice>
 </phrase>
 <phrase>
@@ -15180,19 +14670,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Panning Separation"
     lowmem: none
-    swcodec: "Panning Separation"
   </source>
   <dest>
-    *: none
+    *: "Separacja panoramowania"
     lowmem: none
-    swcodec: "Separacja panoramowania"
   </dest>
   <voice>
-    *: none
+    *: "Separacja panoramowania"
     lowmem: none
-    swcodec: "Separacja panoramowania"
   </voice>
 </phrase>
 <phrase>
@@ -15200,16 +14687,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "strona króla"
+    *: "strona króla"
   </voice>
 </phrase>
 <phrase>
@@ -15231,19 +14715,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Use common setting"
     lowmem: none
-    swcodec: "Use common setting"
   </source>
   <dest>
-    *: none
+    *: "Użyj wspólnego ustawienia"
     lowmem: none
-    swcodec: "Użyj wspólnego ustawienia"
   </dest>
   <voice>
-    *: none
+    *: "Użyj wspólnego ustawienia"
     lowmem: none
-    swcodec: "Użyj wspólnego ustawienia"
   </voice>
 </phrase>
 <phrase>
@@ -15265,16 +14746,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Grayscale"
+    *: "Grayscale"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Skala szarości"
+    *: "Skala szarości"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Skala szarości"
+    *: "Skala szarości"
   </voice>
 </phrase>
 <phrase>
@@ -15324,16 +14802,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "zdobycia"
+    *: "zdobycia"
   </voice>
 </phrase>
 <phrase>
@@ -15369,19 +14844,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Surround"
     lowmem: none
-    swcodec: "Surround"
   </source>
   <dest>
-    *: none
+    *: "Przestrzenny"
     lowmem: none
-    swcodec: "Przestrzenny"
   </dest>
   <voice>
-    *: none
+    *: "Przestrzenny"
     lowmem: none
-    swcodec: "Przestrzenny"
   </voice>
 </phrase>
 <phrase>
@@ -15389,16 +14861,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Goniec"
+    *: "Goniec"
   </voice>
 </phrase>
 <phrase>
@@ -15406,16 +14875,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "At the beginning of the game"
+    *: "At the beginning of the game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Na początku gry"
+    *: "Na początku gry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Na początku gry"
+    *: "Na początku gry"
   </voice>
 </phrase>
 <phrase>
@@ -15423,16 +14889,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Restart Game"
+    *: "Restart Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zrestartuj grę"
+    *: "Zrestartuj grę"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zrestartuj grę"
+    *: "Zrestartuj grę"
   </voice>
 </phrase>
 <phrase>
@@ -15468,16 +14931,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 9: 1 move / 60 min"
+    *: "Level 9: 1 move / 60 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Poziom 9: 1 ruch / 60 min"
+    *: "Poziom 9: 1 ruch / 60 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Poziom 9: 1 ruch na 60 minut"
+    *: "Poziom 9: 1 ruch na 60 minut"
   </voice>
 </phrase>
 <phrase>
@@ -15485,16 +14945,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Toggle Slideshow Mode"
+    *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Przełącz tryb pokazu slajdów"
+    *: "Przełącz tryb pokazu slajdów"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Przełącz tryb pokazu slajdów"
+    *: "Przełącz tryb pokazu slajdów"
   </voice>
 </phrase>
 <phrase>
@@ -15502,16 +14959,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Always On"
+    *: "Always On"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zawsze włączone"
+    *: "Zawsze włączone"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zawsze włączone"
+    *: "Zawsze włączone"
   </voice>
 </phrase>
 <phrase>
@@ -15575,16 +15029,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Cache will be rebuilt on next restart"
+    *: "Cache will be rebuilt on next restart"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pamięć podręczna zostanie odbudowana po restarcie"
+    *: "Pamięć podręczna zostanie odbudowana po restarcie"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pamięć podręczna zostanie odbudowana po restarcie"
+    *: "Pamięć podręczna zostanie odbudowana po restarcie"
   </voice>
 </phrase>
 <phrase>
@@ -15592,16 +15043,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Added to playlist"
+    *: "Added to playlist"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Dodano do listy odtwarzania"
+    *: "Dodano do listy odtwarzania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Dodano do listy odtwarzania"
+    *: "Dodano do listy odtwarzania"
   </voice>
 </phrase>
 <phrase>
@@ -15651,16 +15099,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Direct"
+    *: "Direct"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Bezpośrednie"
+    *: "Bezpośrednie"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Bezpośrednie"
+    *: "Bezpośrednie"
   </voice>
 </phrase>
 <phrase>
@@ -15668,16 +15113,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "roszada"
+    *: "roszada"
   </voice>
 </phrase>
 <phrase>
@@ -15685,16 +15127,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album at the bottom"
+    *: "Show album at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż album na dole"
+    *: "Pokaż album na dole"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż album na dole"
+    *: "Pokaż album na dole"
   </voice>
 </phrase>
 <phrase>
@@ -15716,16 +15155,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hide information"
+    *: "Hide information"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ukryj informacje"
+    *: "Ukryj informacje"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ukryj informacje"
+    *: "Ukryj informacje"
   </voice>
 </phrase>
 <phrase>
@@ -15733,16 +15169,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album and artist at the top"
+    *: "Show album and artist at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż album i wykonawcę na górze"
+    *: "Pokaż album i wykonawcę na górze"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż album i wykonawcę na górze"
+    *: "Pokaż album i wykonawcę na górze"
   </voice>
 </phrase>
 <phrase>
@@ -15750,16 +15183,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album at the top"
+    *: "Show album at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż album na górze"
+    *: "Pokaż album na górze"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż album na górze"
+    *: "Pokaż album na górze"
   </voice>
 </phrase>
 <phrase>
@@ -15767,16 +15197,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album and artist at the bottom"
+    *: "Show album and artist at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokaż album i wykonawcę na dole"
+    *: "Pokaż album i wykonawcę na dole"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokaż album i wykonawcę na dole"
+    *: "Pokaż album i wykonawcę na dole"
   </voice>
 </phrase>
 <phrase>
@@ -16039,19 +15466,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "HQ Mixer"
     lowmem: none
-    swcodec: "HQ Mixer"
   </source>
   <dest>
-    *: none
+    *: "Mikser HQ"
     lowmem: none
-    swcodec: "Mikser HQ"
   </dest>
   <voice>
-    *: none
+    *: "Mikser wysokiej jakości"
     lowmem: none
-    swcodec: "Mikser wysokiej jakości"
   </voice>
 </phrase>
 <phrase>
@@ -16059,19 +15483,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Sample Rate"
     lowmem: none
-    swcodec: "Sample Rate"
   </source>
   <dest>
-    *: none
+    *: "Częstotliwość próbkowania"
     lowmem: none
-    swcodec: "Częstotliwość próbkowania"
   </dest>
   <voice>
-    *: none
+    *: "Częstotliwość próbkowania"
     lowmem: none
-    swcodec: "Częstotliwość próbkowania"
   </voice>
 </phrase>
 <phrase>

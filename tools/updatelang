@@ -59,6 +59,14 @@ sub parselangfile {
 	    my @targets = split(',', $1);
 	    foreach (@targets) {
 		my $l = trim($_);
+
+		# Strip out some keys
+#		if ($l eq "swcodec") {
+#		    $l = "*";
+#		} elsif ($l eq "lcd_bitmap") {
+#		    $l = "*";
+#		}
+
 		$thisphrase{$pos}->{$l} = $2;
 	    }
 	}
@@ -220,11 +228,15 @@ foreach my $id (@langorder) {
 	}
     }
 
+    if (!defined($ep{'user'}) || length($ep{'user'}) == 0) {
+	$lp{'user'} = 'core';
+    }
+
     if (!defined($lp{'user'}) || $lp{'user'} ne $ep{'user'}) {
-	if (!defined($lp{'user'})) {
+	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from the english!\n### the previously used desc is commented below:\n### desc: $lp{user}\n";
+	if (!defined($lp{'user'}) || length($lp{'user'}) == 0) {
 	    $lp{'user'} = $ep{'user'};
 	}
-	$lang{$id}{'notes'} .= "### The 'user' field for '$id' differs from the english!\n### the previously used desc is commented below:\n### desc: $lp{user}\n";
 	$lang{$id}{'phrase'}{'user'} = $english{$id}{'phrase'}{'user'};
 #	print "#!! '$id' changed user\n";
     }
@@ -389,6 +401,10 @@ foreach my $id (@finalorder) {
 
     # phrase
     %lp = %{$lang{$id}{'phrase'}};
+
+    # Drop all deprecated phrases?
+#    next if ($lp{'desc'} eq 'deprecated');
+
     if (length($lang{$id}{'notes'}) && $printnotes) {
 	print $fh "$lang{$id}{notes}";
     }

@@ -17,6013 +17,5861 @@
 # Tagalog language file, translated by:
 # - Melba Sitjar
 <phrase>
- id: LANG_SET_BOOL_YES
- desc: bool true representation
- user: core
- <source>
+  id: LANG_SET_BOOL_YES
+  desc: bool true representation
+  user: core
+  <source>
     *: "Yes"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Oo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Oo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SET_BOOL_NO
- desc: bool false representation
- user: core
- <source>
+  id: LANG_SET_BOOL_NO
+  desc: bool false representation
+  user: core
+  <source>
     *: "No"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Hindi"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Hindi"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ON
- desc: Used in a lot of places
- user: core
- <source>
+  id: LANG_ON
+  desc: Used in a lot of places
+  user: core
+  <source>
     *: "On"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bukas"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Bukas"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_OFF
- desc: Used in a lot of places
- user: core
- <source>
+  id: LANG_OFF
+  desc: Used in a lot of places
+  user: core
+  <source>
     *: "Off"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Isara"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Isara"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ASK
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_ASK
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Ask"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Itanong"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Itanong"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALWAYS
- desc: used in various places
- user: core
- <source>
+  id: LANG_ALWAYS
+  desc: used in various places
+  user: core
+  <source>
     *: "Always"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Palagi"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Palagi"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_NORMAL
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_NORMAL
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Normal"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Karaniwan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Karaniwan"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_GAIN
- desc: Generic string for gain used in EQ menu and recording screen
- user: core
- <source>
+  id: LANG_GAIN
+  desc: Generic string for gain used in EQ menu and recording screen
+  user: core
+  <source>
     *: "Gain"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Tubo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Tubo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WAIT
- desc: general please wait splash
- user: core
- <source>
+  id: LANG_WAIT
+  desc: general please wait splash
+  user: core
+  <source>
     *: "Loading..."
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ikarga..."
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Ikarga"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LOADING_PERCENT
- desc: splash number of percents loaded
- user: core
- <source>
+  id: LANG_LOADING_PERCENT
+  desc: splash number of percents loaded
+  user: core
+  <source>
     *: "Loading... %d%% done (%s)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ikarga... %d%% tapusin (%s)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCANNING_DISK
- desc: when booting up and rebuilding the cache and calculating free space
- user: core
- <source>
+  id: LANG_SCANNING_DISK
+  desc: when booting up and rebuilding the cache and calculating free space
+  user: core
+  <source>
     *: "Scanning disk..."
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bumasa..."
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Bumasa"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHUTTINGDOWN
- desc: in main menu
- user: core
- <source>
+  id: LANG_SHUTTINGDOWN
+  desc: in main menu
+  user: core
+  <source>
     *: "Shutting down..."
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magsara..."
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Magsara"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CANCEL
- desc: Visual confirmation of canceling a changed setting
- user: core
- <source>
+  id: LANG_CANCEL
+  desc: Visual confirmation of canceling a changed setting
+  user: core
+  <source>
     *: "Cancelled"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Kansilahin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Kansilahin"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FAILED
- desc: Something failed. To be appended after actions
- user: core
- <source>
+  id: LANG_FAILED
+  desc: Something failed. To be appended after actions
+  user: core
+  <source>
     *: "Failed"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lagpak"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Lagpak"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNELS
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Channels"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Channel"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Channel"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RESET_ASK
- desc: confirm to reset settings
- user: core
- <source>
+  id: LANG_RESET_ASK
+  desc: confirm to reset settings
+  user: core
+  <source>
     *: "Are You Sure?"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sigurado Ka Ba?"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Sigurado Ka Ba?"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CONFIRM_WITH_BUTTON
- desc: Generic string to use to confirm
- user: core
- <source>
+  id: LANG_CONFIRM_WITH_BUTTON
+  desc: Generic string to use to confirm
+  user: core
+  <source>
     *: "PLAY = Yes"
+    archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
-    archosplayer: "(PLAY/STOP)"
     vibe500: "OK = Yes"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "PLAY = Oo"
-    cowond2*: "MENU = Oo"
-    iriverh100,iriverh120,iriverh300: "NAVI = Oo"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Oo"
-    mrobe500: "PLAY, POWER, or top-right = Oo"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU = Oo"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Oo"
+    iriverh100,iriverh120,iriverh300: "NAVI = Oo"
+    mrobe500: "PLAY, POWER, or top-right = Oo"
     vibe500: "OK = Oo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CANCEL_WITH_ANY
- desc: Generic string to use to cancel
- user: core
- <source>
+  id: LANG_CANCEL_WITH_ANY
+  desc: Generic string to use to cancel
+  user: core
+  <source>
     *: "Any Other = No"
     archosplayer: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ibang wala = Hindi"
     archosplayer: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: ""
     archosplayer: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ROCKBOX_TITLE
- desc: main menu title
- user: core
- <source>
+  id: LANG_ROCKBOX_TITLE
+  desc: main menu title
+  user: core
+  <source>
     *: "Rockbox"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Rockbox"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Rockbox"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
- desc: in the main menu
- user: core
- <source>
+  id: LANG_BOOKMARK_MENU_RECENT_BOOKMARKS
+  desc: in the main menu
+  user: core
+  <source>
     *: "Recent Bookmarks"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Di pa natatagalan Bookmark"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Di pa natatagalan Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DIR_BROWSER
- desc: main menu title
- user: core
- <source>
+  id: LANG_DIR_BROWSER
+  desc: main menu title
+  user: core
+  <source>
     *: "Files"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "File"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TAGCACHE
- desc: in the main menu and the settings menu
- user: core
- <source>
+  id: LANG_TAGCACHE
+  desc: in the main menu and the settings menu
+  user: core
+  <source>
     *: "Database"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Database"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Database"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_NOW_PLAYING
- desc: in the main menu
- user: core
- <source>
+  id: LANG_NOW_PLAYING
+  desc: in the main menu
+  user: core
+  <source>
     *: "Now Playing"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Laro"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Laro"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RESUME_PLAYBACK
- desc: in the main menu
- user: core
- <source>
+  id: LANG_RESUME_PLAYBACK
+  desc: in the main menu
+  user: core
+  <source>
     *: "Resume Playback"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magpatuloy"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Magpatuloy"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SETTINGS
- desc:  in main menu and visual confirmation after settings reset
- user: core
- <source>
+  id: LANG_SETTINGS
+  desc:  in main menu and visual confirmation after settings reset
+  user: core
+  <source>
     *: "Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ilagay"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Ilagay"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING
- desc: in the main menu
- user: core
- <source>
+  id: LANG_RECORDING
+  desc: in the main menu
+  user: core
+  <source>
     *: none
     recording: "Recording"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Rekording"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Recording"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_RADIO
- desc: in the main menu
- user: core
- <source>
+  id: LANG_FM_RADIO
+  desc: in the main menu
+  user: core
+  <source>
     *: none
     radio: "FM Radio"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "FM Radyo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "FM Radyo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PLAYLISTS
- desc: in the main menu and file view setting
- user: core
- <source>
+  id: LANG_PLAYLISTS
+  desc: in the main menu and file view setting
+  user: core
+  <source>
     *: "Playlists"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Listahan"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PLUGINS
- desc: in the main menu
- user: core
- <source>
+  id: LANG_PLUGINS
+  desc: in the main menu
+  user: core
+  <source>
     *: "Plugins"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Plugins"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Plugins"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SYSTEM
- desc: in the main menu and settings menu
- user: core
- <source>
+  id: LANG_SYSTEM
+  desc: in the main menu and settings menu
+  user: core
+  <source>
     *: "System"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sistema"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Sistema"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SELECT_BOOKMARK
- desc: bookmark selection list title
- user: core
- <source>
+  id: LANG_BOOKMARK_SELECT_BOOKMARK
+  desc: bookmark selection list title
+  user: core
+  <source>
     *: "Select Bookmark"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pinili Bookmark"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Pinili Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_DONT_RESUME
- desc: top item in the list when asking user about bookmark auto load
- user: core
- <source>
+  id: LANG_BOOKMARK_DONT_RESUME
+  desc: top item in the list when asking user about bookmark auto load
+  user: core
+  <source>
     *: "<Don't Resume>"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "<Hindi Tuloy>"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Hindi Tuloy"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SHUFFLE
- desc: bookmark selection list, bookmark enables shuffle
- user: core
- <source>
+  id: LANG_BOOKMARK_SHUFFLE
+  desc: bookmark selection list, bookmark enables shuffle
+  user: core
+  <source>
     *: ", Shuffle"
- </source>
- <dest>
+  </source>
+  <dest>
     *: ", Balasahin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Balasahin"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_INVALID
- desc: bookmark selection list, bookmark couldn't be parsed
- user: core
- <source>
+  id: LANG_BOOKMARK_INVALID
+  desc: bookmark selection list, bookmark couldn't be parsed
+  user: core
+  <source>
     *: "<Invalid Bookmark>"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "<Walang-saysay Bookmark>"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Walang-saysay Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_CONTEXT_MENU
- desc: bookmark selection list context menu
- user: core
- <source>
+  id: LANG_BOOKMARK_CONTEXT_MENU
+  desc: bookmark selection list context menu
+  user: core
+  <source>
     *: "Bookmark Actions"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Kilos Bookmark"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Kilos Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_CONTEXT_RESUME
- desc: bookmark context menu, resume this bookmark
- user: core
- <source>
+  id: LANG_BOOKMARK_CONTEXT_RESUME
+  desc: bookmark context menu, resume this bookmark
+  user: core
+  <source>
     *: "Resume"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Tuloy"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Tuloy"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_CONTEXT_DELETE
- desc: bookmark context menu, delete this bookmark
- user: core
- <source>
+  id: LANG_BOOKMARK_CONTEXT_DELETE
+  desc: bookmark context menu, delete this bookmark
+  user: core
+  <source>
     *: "Delete"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Alisin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Alisin"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AUTO_BOOKMARK_QUERY
- desc: prompt for user to decide to create an bookmark
- user: core
- <source>
+  id: LANG_AUTO_BOOKMARK_QUERY
+  desc: prompt for user to decide to create an bookmark
+  user: core
+  <source>
     *: "Create a Bookmark?"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Gumawa ng Bookmark?"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Gumawa ng Bookmark?"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_CREATE_SUCCESS
- desc: Indicates bookmark was successfully created
- user: core
- <source>
+  id: LANG_BOOKMARK_CREATE_SUCCESS
+  desc: Indicates bookmark was successfully created
+  user: core
+  <source>
     *: "Bookmark Created"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Nagumawa Bookmark"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Nagumawa Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_CREATE_FAILURE
- desc: Indicates bookmark was not created
- user: core
- <source>
+  id: LANG_BOOKMARK_CREATE_FAILURE
+  desc: Indicates bookmark was not created
+  user: core
+  <source>
     *: "Bookmark Failed!"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mahulog Bookmark!"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Mahulog Bookmark!"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_LOAD_EMPTY
- desc: Indicates bookmark was empty
- user: core
- <source>
+  id: LANG_BOOKMARK_LOAD_EMPTY
+  desc: Indicates bookmark was empty
+  user: core
+  <source>
     *: "Bookmark Empty"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Walang laman Bookmark"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Walang laman Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SOUND_SETTINGS
- desc: in the main menu
- user: core
- <source>
+  id: LANG_SOUND_SETTINGS
+  desc: in the main menu
+  user: core
+  <source>
     *: "Sound Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Tunog Ilagay"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Tunog Ilagay"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOLUME
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_VOLUME
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Volume"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bulumen"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Bulumen"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BASS
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_BASS
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Bass"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Tinig"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Tinig"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TREBLE
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_TREBLE
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Treble"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lawum ng Tingog"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Lawum ng Tingog"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BALANCE
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_BALANCE
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Balance"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Timbangan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Timbangan"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_CONFIGURATION
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_CONFIGURATION
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Channel Configuration"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lubog Channel"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Lubog Channel"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_STEREO
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_STEREO
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Stereo"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Stereo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Stereo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_MONO
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_MONO
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Mono"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mono"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Mono"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_CUSTOM
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_CUSTOM
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Custom"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Gawi"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Gawi"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_LEFT
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_LEFT
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Mono Left"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mono Kaliwa"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Mono Kaliwa"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_RIGHT
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_RIGHT
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Mono Right"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mono Deretso"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Mono Deretso"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CHANNEL_KARAOKE
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_CHANNEL_KARAOKE
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Karaoke"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Karaoke"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Karaoke"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_STEREO_WIDTH
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_STEREO_WIDTH
+  desc: in sound_settings
+  user: core
+  <source>
     *: "Stereo Width"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lapad Stereo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Lapad Stereo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFEED
- desc: in sound settings
- user: core
- <source>
-    *: none
-    swcodec: "Crossfeed"
- </source>
- <dest>
-    *: none
-    swcodec: "Crossfeed"
- </dest>
- <voice>
-    *: none
-    swcodec: "Crossfeed"
- </voice>
-</phrase>
-<phrase>
- id: LANG_CROSSFEED_DIRECT_GAIN
- desc: in crossfeed settings
- user: core
- <source>
-    *: none
-    swcodec: "Direct Gain"
- </source>
- <dest>
-    *: none
-    swcodec: "Matuwid Tubo"
- </dest>
- <voice>
-    *: none
-    swcodec: "Matuwid Tubo"
- </voice>
-</phrase>
-<phrase>
- id: LANG_CROSSFEED_CROSS_GAIN
- desc: in crossfeed settings
+  id: LANG_CROSSFEED
+  desc: in sound settings
   user: core
- <source>
-    *: none
-    swcodec: "Cross Gain"
- </source>
- <dest>
-    *: none
-    swcodec: "Tumawid Tubo"
- </dest>
- <voice>
-    *: none
-    swcodec: "Tumawid Tubo"
- </voice>
+  <source>
+    *: "Crossfeed"
+  </source>
+  <dest>
+    *: "Crossfeed"
+  </dest>
+  <voice>
+    *: "Crossfeed"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFEED_HF_ATTENUATION
- desc: in crossfeed settings
+  id: LANG_CROSSFEED_DIRECT_GAIN
+  desc: in crossfeed settings
   user: core
- <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
- </source>
- <dest>
-    *: none
-    swcodec: "Mataas ng Dalas Attenuation"
- </dest>
- <voice>
-    *: none
-    swcodec: "High-frequency attenuation"
- </voice>
+  <source>
+    *: "Direct Gain"
+  </source>
+  <dest>
+    *: "Matuwid Tubo"
+  </dest>
+  <voice>
+    *: "Matuwid Tubo"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFEED_HF_CUTOFF
- desc: in crossfeed settings
+  id: LANG_CROSSFEED_CROSS_GAIN
+  desc: in crossfeed settings
   user: core
- <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
- </source>
- <dest>
-    *: none
-    swcodec: "Mataas ng Dalas Cutoff"
- </dest>
- <voice>
-    *: none
-    swcodec: "High-frequency cutoff"
- </voice>
+  <source>
+    *: "Cross Gain"
+  </source>
+  <dest>
+    *: "Tumawid Tubo"
+  </dest>
+  <voice>
+    *: "Tumawid Tubo"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER
- desc: in the sound settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Equalizer"
- </source>
- <dest>
-    *: none
-    swcodec: "Equalizer"
- </dest>
- <voice>
-    *: none
-    swcodec: "Equalizer"
- </voice>
+  id: LANG_CROSSFEED_HF_ATTENUATION
+  desc: in crossfeed settings
+  user: core
+  <source>
+    *: "High-Frequency Attenuation"
+  </source>
+  <dest>
+    *: "Mataas ng Dalas Attenuation"
+  </dest>
+  <voice>
+    *: "High-frequency attenuation"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_ENABLED
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Enable EQ"
- </source>
- <dest>
-    *: none
-    swcodec: "Magbigay-kaya EQ"
- </dest>
- <voice>
-    *: none
-    swcodec: "Enable equalizer"
- </voice>
+  id: LANG_CROSSFEED_HF_CUTOFF
+  desc: in crossfeed settings
+  user: core
+  <source>
+    *: "High-Frequency Cutoff"
+  </source>
+  <dest>
+    *: "Mataas ng Dalas Cutoff"
+  </dest>
+  <voice>
+    *: "High-frequency cutoff"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_GRAPHICAL
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Graphical EQ"
- </source>
- <dest>
-    *: none
-    swcodec: "Graphical EQ"
- </dest>
- <voice>
-    *: none
-    swcodec: "Graphical equalizer"
- </voice>
+  id: LANG_EQUALIZER
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: "Equalizer"
+  </source>
+  <dest>
+    *: "Equalizer"
+  </dest>
+  <voice>
+    *: "Equalizer"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_PRECUT
- desc: in eq settings
- user: core
- <source>
-    *: none
-    swcodec: "Precut"
- </source>
- <dest>
-    *: none
-    swcodec: "Precut"
- </dest>
- <voice>
-    *: none
-    swcodec: "Pre-cut"
- </voice>
+  id: LANG_EQUALIZER_ENABLED
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Enable EQ"
+  </source>
+  <dest>
+    *: "Magbigay-kaya EQ"
+  </dest>
+  <voice>
+    *: "Enable equalizer"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_GAIN
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Simple EQ Settings"
- </source>
- <dest>
-    *: none
-    swcodec: "Yano EQ Tagpuan"
- </dest>
- <voice>
-    *: none
-    swcodec: "Simple equalizer settings"
- </voice>
+  id: LANG_EQUALIZER_GRAPHICAL
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Graphical EQ"
+  </source>
+  <dest>
+    *: "Graphical EQ"
+  </dest>
+  <voice>
+    *: "Graphical equalizer"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_ADVANCED
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
- </source>
- <dest>
-    *: none
-    swcodec: "Adelantado EQ Tagpuan"
- </dest>
- <voice>
-    *: none
-    swcodec: "Advanced equalizer settings"
- </voice>
+  id: LANG_EQUALIZER_PRECUT
+  desc: in eq settings
+  user: core
+  <source>
+    *: "Precut"
+  </source>
+  <dest>
+    *: "Precut"
+  </dest>
+  <voice>
+    *: "Pre-cut"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_SAVE
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Save EQ Preset"
- </source>
- <dest>
-    *: none
-    swcodec: "Iligtas EQ Preset"
- </dest>
- <voice>
-    *: none
-    swcodec: "Save equalizer preset"
- </voice>
+  id: LANG_EQUALIZER_GAIN
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Simple EQ Settings"
+  </source>
+  <dest>
+    *: "Yano EQ Tagpuan"
+  </dest>
+  <voice>
+    *: "Simple equalizer settings"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BROWSE
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Browse EQ Presets"
- </source>
- <dest>
-    *: none
-    swcodec: "Tumingin EQ Presets"
- </dest>
- <voice>
-    *: none
-    swcodec: "Browse equalizer presets"
- </voice>
+  id: LANG_EQUALIZER_ADVANCED
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Advanced EQ Settings"
+  </source>
+  <dest>
+    *: "Adelantado EQ Tagpuan"
+  </dest>
+  <voice>
+    *: "Advanced equalizer settings"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_EDIT_MODE
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Edit mode: %s"
- </source>
- <dest>
-    *: none
-    swcodec: "Mamatnugot paraan: %s"
- </dest>
- <voice>
-    *: none
-    swcodec: ""
- </voice>
+  id: LANG_EQUALIZER_SAVE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Save EQ Preset"
+  </source>
+  <dest>
+    *: "Iligtas EQ Preset"
+  </dest>
+  <voice>
+    *: "Save equalizer preset"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_GAIN_ITEM
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
- </source>
- <dest>
-    *: none
-    swcodec: "%d Hz Band Gain"
- </dest>
- <voice>
-    *: none
-    swcodec: "hertz band gain"
- </voice>
+  id: LANG_EQUALIZER_BROWSE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Browse EQ Presets"
+  </source>
+  <dest>
+    *: "Tumingin EQ Presets"
+  </dest>
+  <voice>
+    *: "Browse equalizer presets"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BAND_LOW_SHELF
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Low Shelf Filter"
- </source>
- <dest>
-    *: none
-    swcodec: "Mababa Shelf Filter"
- </dest>
- <voice>
-    *: none
-    swcodec: "Low shelf filter"
- </voice>
+  id: LANG_EQUALIZER_EDIT_MODE
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Edit mode: %s"
+  </source>
+  <dest>
+    *: "Mamatnugot paraan: %s"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BAND_PEAK
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Peak Filter %d"
- </source>
- <dest>
-    *: none
-    swcodec: "Peak Filter %d"
- </dest>
- <voice>
-    *: none
-    swcodec: "Peak filter"
- </voice>
+  id: LANG_EQUALIZER_GAIN_ITEM
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "%d Hz Band Gain"
+  </source>
+  <dest>
+    *: "%d Hz Band Gain"
+  </dest>
+  <voice>
+    *: "hertz band gain"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BAND_HIGH_SHELF
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "High Shelf Filter"
- </source>
- <dest>
-    *: none
-    swcodec: "Mataas ng Shelf Filter"
- </dest>
- <voice>
-    *: none
-    swcodec: "High shelf filter"
- </voice>
+  id: LANG_EQUALIZER_BAND_LOW_SHELF
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Low Shelf Filter"
+  </source>
+  <dest>
+    *: "Mababa Shelf Filter"
+  </dest>
+  <voice>
+    *: "Low shelf filter"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BAND_CUTOFF
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Cutoff Frequency"
- </source>
- <dest>
-    *: none
-    swcodec: "Cutoff ng Dalas"
- </dest>
- <voice>
-    *: none
-    swcodec: "Cutoff Frequency"
- </voice>
+  id: LANG_EQUALIZER_BAND_PEAK
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Peak Filter %d"
+  </source>
+  <dest>
+    *: "Peak Filter %d"
+  </dest>
+  <voice>
+    *: "Peak filter"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BAND_CENTER
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Centre Frequency"
- </source>
- <dest>
-    *: none
-    swcodec: "Sentro ng Dalas"
- </dest>
- <voice>
-    *: none
-    swcodec: "Center frequency"
- </voice>
+  id: LANG_EQUALIZER_BAND_HIGH_SHELF
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "High Shelf Filter"
+  </source>
+  <dest>
+    *: "Mataas ng Shelf Filter"
+  </dest>
+  <voice>
+    *: "High shelf filter"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_EQUALIZER_BAND_Q
- desc: in the equalizer settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Q"
- </source>
- <dest>
-    *: none
-    swcodec: "Q"
- </dest>
- <voice>
-    *: none
-    swcodec: "Q"
- </voice>
+  id: LANG_EQUALIZER_BAND_CUTOFF
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Cutoff Frequency"
+  </source>
+  <dest>
+    *: "Cutoff ng Dalas"
+  </dest>
+  <voice>
+    *: "Cutoff Frequency"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DITHERING
- desc: in the sound settings menu
- user: core
- <source>
-    *: none
-    swcodec: "Dithering"
- </source>
- <dest>
-    *: none
-    swcodec: "Dithering"
- </dest>
- <voice>
-    *: none
-    swcodec: "Dithering"
- </voice>
+  id: LANG_EQUALIZER_BAND_CENTER
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Centre Frequency"
+  </source>
+  <dest>
+    *: "Sentro ng Dalas"
+  </dest>
+  <voice>
+    *: "Center frequency"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LOUDNESS
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_EQUALIZER_BAND_Q
+  desc: in the equalizer settings menu
+  user: core
+  <source>
+    *: "Q"
+  </source>
+  <dest>
+    *: "Q"
+  </dest>
+  <voice>
+    *: "Q"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DITHERING
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: "Dithering"
+  </source>
+  <dest>
+    *: "Dithering"
+  </dest>
+  <voice>
+    *: "Dithering"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOUDNESS
+  desc: in sound_settings
+  user: core
+  <source>
     *: none
     masf: "Loudness"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Matunog"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "Loudness"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AUTOVOL
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_AUTOVOL
+  desc: in sound_settings
+  user: core
+  <source>
     *: none
     masf: "Auto Volume"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Kusa Bulumen"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "Auto Volume"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DECAY
- desc: in sound_settings
- user: core
- <source>
+  id: LANG_DECAY
+  desc: in sound_settings
+  user: core
+  <source>
     *: none
     masf: "AV Decay Time"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "AV Sira Oras"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SUPERBASS
- desc: in sound settings
- user: core
- <source>
+  id: LANG_SUPERBASS
+  desc: in sound settings
+  user: core
+  <source>
     *: none
     masf: "Super Bass"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Super lawum ng Tingog"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "Super Bass"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MDB_ENABLE
- desc: in sound settings
- user: core
- <source>
+  id: LANG_MDB_ENABLE
+  desc: in sound settings
+  user: core
+  <source>
     *: none
     masf: "MDB Enable"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Magbigay-kaya ng MDB"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "MDB Enable"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MDB_STRENGTH
- desc: in sound settings
- user: core
- <source>
+  id: LANG_MDB_STRENGTH
+  desc: in sound settings
+  user: core
+  <source>
     *: none
     masf: "MDB Strength"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Lakas ng MDB "
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "MDB Strength"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MDB_HARMONICS
- desc: in sound settings
- user: core
- <source>
+  id: LANG_MDB_HARMONICS
+  desc: in sound settings
+  user: core
+  <source>
     *: none
     masf: "MDB Harmonics"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "MDB Kaugma"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "MDB Harmonics"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MDB_CENTER
- desc: in sound settings
- user: core
- <source>
+  id: LANG_MDB_CENTER
+  desc: in sound settings
+  user: core
+  <source>
     *: none
     masf: "MDB Centre Frequency"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Sentro ng Dalas MDB"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "MDB Center Frequency"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MDB_SHAPE
- desc: in sound settings
- user: core
- <source>
+  id: LANG_MDB_SHAPE
+  desc: in sound settings
+  user: core
+  <source>
     *: none
     masf: "MDB Shape"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     masf: "Hugis ng MDB"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     masf: "MDB Shape"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_GENERAL_SETTINGS
- desc: in the main menu
- user: core
- <source>
+  id: LANG_GENERAL_SETTINGS
+  desc: in the main menu
+  user: core
+  <source>
     *: "General Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Heneral Tagpuan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "General Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PLAYBACK
- desc: in settings_menu()
- user: core
- <source>
+  id: LANG_PLAYBACK
+  desc: in settings_menu()
+  user: core
+  <source>
     *: "Playback Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Playback"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Playback"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHUFFLE
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SHUFFLE
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Shuffle"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Balasahin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Shuffle"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPEAT
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_REPEAT
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Repeat"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ulitin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Repeat"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALL
- desc: generic string used both in dir file filter and repeat mode selection
- user: core
- <source>
+  id: LANG_ALL
+  desc: generic string used both in dir file filter and repeat mode selection
+  user: core
+  <source>
     *: "All"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lahat"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "All"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPEAT_ONE
- desc: repeat one song
- user: core
- <source>
+  id: LANG_REPEAT_ONE
+  desc: repeat one song
+  user: core
+  <source>
     *: "One"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Isa"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "One"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPEAT_AB
- desc: repeat range from point A to B
- user: core
- <source>
+  id: LANG_REPEAT_AB
+  desc: repeat range from point A to B
+  user: core
+  <source>
     *: "A-B"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "A-B"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "A-B"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PLAY_SELECTED
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_PLAY_SELECTED
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Play Selected First"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Maglaro pang una"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Play Selected File First"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WIND_MENU
- desc: in the playback sub menu
- user: core
- <source>
+  id: LANG_WIND_MENU
+  desc: in the playback sub menu
+  user: core
+  <source>
     *: "Fast-Forward/Rewind"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ipadala/Likod"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Fast forward and Rewind"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FFRW_STEP
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_FFRW_STEP
+  desc: in settings_menu
+  user: core
+  <source>
     *: "FF/RW Min Step"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "FF/RW Min Step"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Minimum Step"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FFRW_ACCEL
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_FFRW_ACCEL
+  desc: in settings_menu
+  user: core
+  <source>
     *: "FF/RW Accel"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "FF/RW Pabilisin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Acceleration"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MP3BUFFER_MARGIN
- desc: MP3 buffer margin time
- user: core
- <source>
+  id: LANG_MP3BUFFER_MARGIN
+  desc: MP3 buffer margin time
+  user: core
+  <source>
     *: "Anti-Skip Buffer"
     flash_storage: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Kalabin Ilaktaw ng Buffer "
     flash_storage: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Anti-Skip Buffer"
     flash_storage: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FADE_ON_STOP
- desc: options menu to set fade on stop or pause
- user: core
- <source>
+  id: LANG_FADE_ON_STOP
+  desc: options menu to set fade on stop or pause
+  user: core
+  <source>
     *: "Fade on Stop/Pause"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mawala sa ibabaw Pahintuin/Tumigil"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Fade On Stop and Pause"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PARTY_MODE
- desc: party mode
- user: core
- <source>
+  id: LANG_PARTY_MODE
+  desc: party mode
+  user: core
+  <source>
     *: "Party Mode"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lapian Paraan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Party Mode"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE
- desc: in playback settings
- user: core
- <source>
+  id: LANG_CROSSFADE
+  desc: in playback settings
+  user: core
+  <source>
     *: none
     crossfade: "Crossfade"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Crossfade"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Crossfade"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE_ENABLE
- desc: in crossfade settings menu
- user: core
- <source>
+  id: LANG_CROSSFADE_ENABLE
+  desc: in crossfade settings menu
+  user: core
+  <source>
     *: none
     crossfade: "Enable Crossfade"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Magbigay-kaya ng Crossfade"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Enable Crossfade"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MANTRACKSKIP
- desc: in crossfade settings
- user: core
- <source>
+  id: LANG_MANTRACKSKIP
+  desc: in crossfade settings
+  user: core
+  <source>
     *: none
     crossfade: "Manual Track Skip Only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Landas Laktawan Tangi"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Manual Track Skip Only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHUFFLE_TRACKSKIP
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SHUFFLE_TRACKSKIP
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     crossfade: "Shuffle or Manual Track Skip"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Magbalasa at Landas Laktawan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Shuffle or Manual Track Skip"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE_FADE_IN_DELAY
- desc: in crossfade settings menu
- user: core
- <source>
+  id: LANG_CROSSFADE_FADE_IN_DELAY
+  desc: in crossfade settings menu
+  user: core
+  <source>
     *: none
     crossfade: "Fade-In Delay"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Pagpapalit ng abala"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Fade-In Delay"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE_FADE_IN_DURATION
- desc: in crossfade settings menu
- user: core
- <source>
+  id: LANG_CROSSFADE_FADE_IN_DURATION
+  desc: in crossfade settings menu
+  user: core
+  <source>
     *: none
     crossfade: "Fade-In Duration"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Pagpapalit ng Tagal"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Fade-In Duration"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE_FADE_OUT_DELAY
- desc: in crossfade settings menu
- user: core
- <source>
+  id: LANG_CROSSFADE_FADE_OUT_DELAY
+  desc: in crossfade settings menu
+  user: core
+  <source>
     *: none
     crossfade: "Fade-Out Delay"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Pagpapalit ng abala"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Fade-Out Delay"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE_FADE_OUT_DURATION
- desc: in crossfade settings menu
- user: core
- <source>
+  id: LANG_CROSSFADE_FADE_OUT_DURATION
+  desc: in crossfade settings menu
+  user: core
+  <source>
     *: none
     crossfade: "Fade-Out Duration"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Pagpapalit ng Tagal"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Fade-Out Duration"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CROSSFADE_FADE_OUT_MODE
- desc: in crossfade settings menu
- user: core
- <source>
+  id: LANG_CROSSFADE_FADE_OUT_MODE
+  desc: in crossfade settings menu
+  user: core
+  <source>
     *: none
     crossfade: "Fade-Out Mode"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Pagpapalit ng Paraan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Fade-Out Mode"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MIX
- desc: in playback settings, crossfade option
- user: core
- <source>
+  id: LANG_MIX
+  desc: in playback settings, crossfade option
+  user: core
+  <source>
     *: none
     crossfade: "Mix"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     crossfade: "Haluin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     crossfade: "Mix"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPLAYGAIN
- desc: in replaygain
- user: core
- <source>
+  id: LANG_REPLAYGAIN
+  desc: in replaygain
+  user: core
+  <source>
     *: "Replaygain"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ulitin ng tubo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Replaygain"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPLAYGAIN_NOCLIP
- desc: in replaygain
- user: core
- <source>
-    *: none
-    swcodec: "Prevent Clipping"
- </source>
- <dest>
-    *: none
-    swcodec: "Pigilin ng klip"
- </dest>
- <voice>
-    *: none
-    swcodec: "Prevent Clipping"
- </voice>
+  id: LANG_REPLAYGAIN_NOCLIP
+  desc: in replaygain
+  user: core
+  <source>
+    *: "Prevent Clipping"
+  </source>
+  <dest>
+    *: "Pigilin ng klip"
+  </dest>
+  <voice>
+    *: "Prevent Clipping"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPLAYGAIN_MODE
- desc: in replaygain
- user: core
- <source>
+  id: LANG_REPLAYGAIN_MODE
+  desc: in replaygain
+  user: core
+  <source>
     *: "Replaygain Type"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ulitin ng tubo tipo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Replaygain Type"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALBUM_GAIN
- desc: in replaygain
- user: core
- <source>
+  id: LANG_ALBUM_GAIN
+  desc: in replaygain
+  user: core
+  <source>
     *: "Album Gain"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Rekord ng tubo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Album Gain"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TRACK_GAIN
- desc: in replaygain
- user: core
- <source>
+  id: LANG_TRACK_GAIN
+  desc: in replaygain
+  user: core
+  <source>
     *: "Track Gain"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Landas ng tubo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Track Gain"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHUFFLE_GAIN
- desc: use track gain if shuffle mode is on, album gain otherwise
- user: core
- <source>
+  id: LANG_SHUFFLE_GAIN
+  desc: use track gain if shuffle mode is on, album gain otherwise
+  user: core
+  <source>
     *: "Track Gain if Shuffling"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Landas ng tubo kung balasahin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Track Gain if Shuffling"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REPLAYGAIN_PREAMP
- desc: in replaygain settings
- user: core
- <source>
+  id: LANG_REPLAYGAIN_PREAMP
+  desc: in replaygain settings
+  user: core
+  <source>
     *: "Pre-amp"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pre-amp"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Preamp"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BEEP
- desc: in playback settings
- user: core
- <source>
-    *: none
-    swcodec: "Track Skip Beep"
- </source>
- <dest>
-    *: none
-    swcodec: "Landas Laktawan Beep"
- </dest>
- <voice>
-    *: none
-    swcodec: "Landas Laktawan Beep"
- </voice>
+  id: LANG_BEEP
+  desc: in playback settings
+  user: core
+  <source>
+    *: "Track Skip Beep"
+  </source>
+  <dest>
+    *: "Landas Laktawan Beep"
+  </dest>
+  <voice>
+    *: "Landas Laktawan Beep"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEAK
- desc: in beep volume in playback settings
- user: core
- <source>
-    *: none
-    swcodec: "Weak"
- </source>
- <dest>
-    *: none
-    swcodec: "Mahina"
- </dest>
- <voice>
-    *: none
-    swcodec: "Weak"
- </voice>
+  id: LANG_WEAK
+  desc: in beep volume in playback settings
+  user: core
+  <source>
+    *: "Weak"
+  </source>
+  <dest>
+    *: "Mahina"
+  </dest>
+  <voice>
+    *: "Weak"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MODERATE
- desc: in beep volume in playback settings
- user: core
- <source>
-    *: none
-    swcodec: "Moderate"
- </source>
- <dest>
-    *: none
-    swcodec: "Kainaman"
- </dest>
- <voice>
-    *: none
-    swcodec: "Moderate"
- </voice>
+  id: LANG_MODERATE
+  desc: in beep volume in playback settings
+  user: core
+  <source>
+    *: "Moderate"
+  </source>
+  <dest>
+    *: "Kainaman"
+  </dest>
+  <voice>
+    *: "Moderate"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_STRONG
- desc: in beep volume in playback settings
- user: core
- <source>
-    *: none
-    swcodec: "Strong"
- </source>
- <dest>
-    *: none
-    swcodec: "Malakas"
- </dest>
- <voice>
-    *: none
-    swcodec: "Strong"
- </voice>
+  id: LANG_STRONG
+  desc: in beep volume in playback settings
+  user: core
+  <source>
+    *: "Strong"
+  </source>
+  <dest>
+    *: "Malakas"
+  </dest>
+  <voice>
+    *: "Strong"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SPDIF_ENABLE
- desc: in playback settings menu. enable/disable the optical out
- user: core
- <source>
+  id: LANG_SPDIF_ENABLE
+  desc: in playback settings menu. enable/disable the optical out
+  user: core
+  <source>
     *: none
     spdif_power: "Optical Output"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     spdif_power: "Tungkol sa mata ng kabuuang producto"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     spdif_power: "Optical Output"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_NEXT_FOLDER
- desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
- user: core
- <source>
-    *: "Auto-Change Directory"
- </source>
- <dest>
-    *: "Kusa palitan ng listahan"
- </dest>
- <voice>
-    *: "Auto-Change Directory"
- </voice>
-</phrase>
-<phrase>
- id: LANG_RANDOM
- desc: random folder
+  id: LANG_NEXT_FOLDER
+  desc: in settings_menu. Should we allow move to next/prev folder from last/first track of current one
   user: core
- <source>
+  <source>
+    *: "Auto-Change Directory"
+  </source>
+  <dest>
+    *: "Kusa palitan ng listahan"
+  </dest>
+  <voice>
+    *: "Auto-Change Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RANDOM
+  desc: random folder
+  user: core
+  <source>
     *: "Random"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pagkakataon"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Random"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AUDIOSCROBBLER
- desc: "Last.fm Log" in the playback menu
- user: core
- <source>
+  id: LANG_AUDIOSCROBBLER
+  desc: "Last.fm Log" in the playback menu
+  user: core
+  <source>
     *: "Last.fm Log"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Last.fm Log"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Last.fm Log"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CUESHEET_ENABLE
- desc: cuesheet support option
- user: core
- <source>
+  id: LANG_CUESHEET_ENABLE
+  desc: cuesheet support option
+  user: core
+  <source>
     *: "Cuesheet Support"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Paunawa sustento"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Cuesheet Support"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_HEADPHONE_UNPLUG
- desc: in settings_menu.
- user: core
- <source>
+  id: LANG_HEADPHONE_UNPLUG
+  desc: in settings_menu.
+  user: core
+  <source>
     *: none
     headphone_detection: "Pause on Headphone Unplug"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     headphone_detection: "Tumigil sa headphone alisin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     headphone_detection: "Pause on Headphone Unplug"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_HEADPHONE_UNPLUG_RESUME
- desc: in pause_phones_menu.
- user: core
- <source>
+  id: LANG_HEADPHONE_UNPLUG_RESUME
+  desc: in pause_phones_menu.
+  user: core
+  <source>
     *: none
     headphone_detection: "Pause and Resume"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     headphone_detection: "Tumigil at ipagpatuloy"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     headphone_detection: "Pause and Resume"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_HEADPHONE_UNPLUG_RW
- desc: in pause_phones_menu.
- user: core
- <source>
+  id: LANG_HEADPHONE_UNPLUG_RW
+  desc: in pause_phones_menu.
+  user: core
+  <source>
     *: none
     headphone_detection: "Duration to Rewind"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     headphone_detection: "Tagal sa likod"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     headphone_detection: "Duration to Rewind"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
- desc: in pause_phones_menu.
- user: core
- <source>
+  id: LANG_HEADPHONE_UNPLUG_DISABLE_AUTORESUME
+  desc: in pause_phones_menu.
+  user: core
+  <source>
     *: none
     headphone_detection: "Disable resume on startup if phones unplugged"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     headphone_detection: "Mahina ipagpatuloy sa simulan kung headphones wala ng plug"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     headphone_detection: "Disable resume on startup if phones unplugged"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FILE
- desc: in settings_menu()
- user: core
- <source>
+  id: LANG_FILE
+  desc: in settings_menu()
+  user: core
+  <source>
     *: "File View"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pagtingin Salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "File View"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_CASE
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SORT_CASE
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Sort Case Sensitive"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pag-uri-uriin usapin sensitibo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Sort Case Sensitive"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_DIR
- desc: browser sorting setting
- user: core
- <source>
+  id: LANG_SORT_DIR
+  desc: browser sorting setting
+  user: core
+  <source>
     *: "Sort Directories"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pag-uri-uriin ng listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "sort directories"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_FILE
- desc: browser sorting setting
- user: core
- <source>
+  id: LANG_SORT_FILE
+  desc: browser sorting setting
+  user: core
+  <source>
     *: "Sort Files"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pag-uri-uriin salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "sort files"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_ALPHA
- desc: browser sorting setting
- user: core
- <source>
+  id: LANG_SORT_ALPHA
+  desc: browser sorting setting
+  user: core
+  <source>
     *: "Alphabetical"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sa alpabeto"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Alphabetical"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_DATE
- desc: browser sorting setting
- user: core
- <source>
+  id: LANG_SORT_DATE
+  desc: browser sorting setting
+  user: core
+  <source>
     *: "By Date"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sa petsa"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "By Date"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_DATE_REVERSE
- desc: browser sorting setting
- user: core
- <source>
+  id: LANG_SORT_DATE_REVERSE
+  desc: browser sorting setting
+  user: core
+  <source>
     *: "By Newest Date"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bago sa petsa"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "By Newest Date"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SORT_TYPE
- desc: browser sorting setting
- user: core
- <source>
+  id: LANG_SORT_TYPE
+  desc: browser sorting setting
+  user: core
+  <source>
     *: "By Type"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sa tipo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "By Type"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FILTER
- desc: setting name for dir filter
- user: core
- <source>
+  id: LANG_FILTER
+  desc: setting name for dir filter
+  user: core
+  <source>
     *: "Show Files"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magpakita salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Show Files"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FILTER_SUPPORTED
- desc: show all file types supported by Rockbox
- user: core
- <source>
+  id: LANG_FILTER_SUPPORTED
+  desc: show all file types supported by Rockbox
+  user: core
+  <source>
     *: "Supported"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sustentuhan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Supported"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FILTER_MUSIC
- desc: show only music-related files
- user: core
- <source>
+  id: LANG_FILTER_MUSIC
+  desc: show only music-related files
+  user: core
+  <source>
     *: "Music"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Musika"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Music"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FOLLOW
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_FOLLOW
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Follow Playlist"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sumunod listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Follow Playlist"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHOW_PATH
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SHOW_PATH
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Show Path"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magpakita landas"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Show Path"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHOW_PATH_CURRENT
- desc: in show path menu
- user: core
- <source>
+  id: LANG_SHOW_PATH_CURRENT
+  desc: in show path menu
+  user: core
+  <source>
     *: "Current Directory Only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Lamang ng koryente listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Current Directory Only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DISPLAY_FULL_PATH
- desc: track display options
- user: core
- <source>
+  id: LANG_DISPLAY_FULL_PATH
+  desc: track display options
+  user: core
+  <source>
     *: "Full Path"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Puno landas"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Full Path"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BUILDING_DATABASE
- desc: splash database building progress
- user: core
- <source>
+  id: LANG_BUILDING_DATABASE
+  desc: splash database building progress
+  user: core
+  <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
- </source>
- <dest>
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
+  </source>
+  <dest>
     *: "Gumawa database... %d found (OFF sa pagbalik)"
-    iriverh100,iriverh120,iriverh300: "Gumawa database... %d found (STOP sa pagbalik)"
-    ipod*: "Gumawa database... %d found (PLAY/PAUSE sa pagbalik)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Gumawa database... %d found (LEFT sa pagbalik)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Gumawa database... %d found (PREV sa pagbalik)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Gumawa database... %d found (LEFT sa pagbalik)"
     gogearsa9200: "Gumawa database... %d found (REW sa pagbalik)"
- </dest>
- <voice>
+    ipod*: "Gumawa database... %d found (PLAY/PAUSE sa pagbalik)"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Gumawa database... %d found (PREV sa pagbalik)"
+    iriverh100,iriverh120,iriverh300: "Gumawa database... %d found (STOP sa pagbalik)"
+  </dest>
+  <voice>
     *: "entries found for database"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TAGCACHE_RAM
- desc: in tag cache settings
- user: core
- <source>
+  id: LANG_TAGCACHE_RAM
+  desc: in tag cache settings
+  user: core
+  <source>
     *: none
     tc_ramcache: "Load to RAM"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     tc_ramcache: "Ikaraga sa RAM"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     tc_ramcache: "Load to RAM"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TAGCACHE_AUTOUPDATE
- desc: in tag cache settings
- user: core
- <source>
-    *: "Auto Update"
- </source>
- <dest>
-    *: "Kusa baguhin"
- </dest>
- <voice>
-    *: "Auto Update"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_FORCE_UPDATE
- desc: in tag cache settings
- user: core
- <source>
-    *: "Initialize Now"
- </source>
- <dest>
-    *: "Tumakbo ngayon"
- </dest>
- <voice>
-    *: "Initialize Now"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_UPDATE
- desc: in tag cache settings
- user: core
- <source>
-    *: "Update Now"
- </source>
- <dest>
-    *: "Baguhin ngayon"
- </dest>
- <voice>
-    *: "Update Now"
- </voice>
-</phrase>
-<phrase>
- id: LANG_RUNTIMEDB_ACTIVE
- desc: in settings_menu.
- user: core
- <source>
-    *: "Gather Runtime Data"
- </source>
- <dest>
-    *: "Ipunin data"
- </dest>
- <voice>
-    *: "Gather Runtime Data"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_EXPORT
- desc: in tag cache settings
- user: core
- <source>
-    *: "Export Modifications"
- </source>
- <dest>
-    *: "Maglabas pagbabago"
- </dest>
- <voice>
-    *: "Export Modifications"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_IMPORT
- desc: in tag cache settings
- user: core
- <source>
-    *: "Import Modifications"
- </source>
- <dest>
-    *: "Umangkat pagbabago"
- </dest>
- <voice>
-    *: "Import Modifications"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
- desc: in tag cache settings
- user: core
- <source>
-    *: "Updating in background"
- </source>
- <dest>
-    *: "Baguhin sa background"
- </dest>
- <voice>
-    *: "Updating in background"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_INIT
- desc: while initializing tagcache on boot
- user: core
- <source>
-    *: "Committing database"
- </source>
- <dest>
-    *: "Gumawa database"
- </dest>
- <voice>
-    *: "Committing database"
- </voice>
-</phrase>
-<phrase>
- id: LANG_TAGCACHE_BUSY
- desc: when trying to shutdown and tagcache is committing
+  id: LANG_TAGCACHE_AUTOUPDATE
+  desc: in tag cache settings
   user: core
- <source>
+  <source>
+    *: "Auto Update"
+  </source>
+  <dest>
+    *: "Kusa baguhin"
+  </dest>
+  <voice>
+    *: "Auto Update"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE
+  desc: in tag cache settings
+  user: core
+  <source>
+    *: "Initialize Now"
+  </source>
+  <dest>
+    *: "Tumakbo ngayon"
+  </dest>
+  <voice>
+    *: "Initialize Now"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_UPDATE
+  desc: in tag cache settings
+  user: core
+  <source>
+    *: "Update Now"
+  </source>
+  <dest>
+    *: "Baguhin ngayon"
+  </dest>
+  <voice>
+    *: "Update Now"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUNTIMEDB_ACTIVE
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: "Gather Runtime Data"
+  </source>
+  <dest>
+    *: "Ipunin data"
+  </dest>
+  <voice>
+    *: "Gather Runtime Data"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_EXPORT
+  desc: in tag cache settings
+  user: core
+  <source>
+    *: "Export Modifications"
+  </source>
+  <dest>
+    *: "Maglabas pagbabago"
+  </dest>
+  <voice>
+    *: "Export Modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_IMPORT
+  desc: in tag cache settings
+  user: core
+  <source>
+    *: "Import Modifications"
+  </source>
+  <dest>
+    *: "Umangkat pagbabago"
+  </dest>
+  <voice>
+    *: "Import Modifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_FORCE_UPDATE_SPLASH
+  desc: in tag cache settings
+  user: core
+  <source>
+    *: "Updating in background"
+  </source>
+  <dest>
+    *: "Baguhin sa background"
+  </dest>
+  <voice>
+    *: "Updating in background"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_INIT
+  desc: while initializing tagcache on boot
+  user: core
+  <source>
+    *: "Committing database"
+  </source>
+  <dest>
+    *: "Gumawa database"
+  </dest>
+  <voice>
+    *: "Committing database"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TAGCACHE_BUSY
+  desc: when trying to shutdown and tagcache is committing
+  user: core
+  <source>
     *: "Database is not ready"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Wala sa database"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Database is not ready"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TAGNAVI_ALL_TRACKS
- desc: "<All tracks>" entry in tag browser
- user: core
- <source>
+  id: LANG_TAGNAVI_ALL_TRACKS
+  desc: "<All tracks>" entry in tag browser
+  user: core
+  <source>
     *: "<All tracks>"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "<Lahat ng landas>"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "All tracks"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DISPLAY
- desc: in settings_menu()
- user: core
- <source>
+  id: LANG_DISPLAY
+  desc: in settings_menu()
+  user: core
+  <source>
     *: "Display"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pakita"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Display"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CUSTOM_FONT
- desc: in setting_menu()
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Font"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Tumingin sa font"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Browse Fonts"
- </voice>
+  id: LANG_CUSTOM_FONT
+  desc: in setting_menu()
+  user: core
+  <source>
+    *: "Font"
+  </source>
+  <dest>
+    *: "Tumingin sa font"
+  </dest>
+  <voice>
+    *: "Browse Fonts"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WHILE_PLAYING
- desc: in settings_menu()
- user: core
- <source>
+  id: LANG_WHILE_PLAYING
+  desc: in settings_menu()
+  user: core
+  <source>
     *: "While Playing Screen"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Tumingin sa .wps salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Browse while-playing-screen files"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REMOTE_WHILE_PLAYING
- desc: in settings_menu()
- user: core
- <source>
+  id: LANG_REMOTE_WHILE_PLAYING
+  desc: in settings_menu()
+  user: core
+  <source>
     *: none
     remote: "Remote While Playing Screen"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote: "Tumingin sa .rwps salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote: "Browse remote while-playing-screen files"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LCD_MENU
- desc: in the display sub menu
- user: core
- <source>
+  id: LANG_LCD_MENU
+  desc: in the display sub menu
+  user: core
+  <source>
     *: "LCD Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "LCD Tagpuan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "LCD Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKLIGHT
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BACKLIGHT
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Backlight"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magilaw sa likod"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Backlight"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKLIGHT_ON_WHEN_CHARGING
- desc: in display_settings_menu, backlight timeout with charger connected
- user: core
- <source>
+  id: LANG_BACKLIGHT_ON_WHEN_CHARGING
+  desc: in display_settings_menu, backlight timeout with charger connected
+  user: core
+  <source>
     *: none
     charging: "Backlight (While Plugged In)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     charging: "Magilaw sa likod (Tapon samantala)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     charging: "Backlight (While Plugged In)"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKLIGHT_ON_BUTTON_HOLD
- desc: in lcd settings
- user: core
- <source>
+  id: LANG_BACKLIGHT_ON_BUTTON_HOLD
+  desc: in lcd settings
+  user: core
+  <source>
     *: none
     hold_button: "Backlight on Hold"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     hold_button: "Magilaw sa likod pigilin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     hold_button: "Backlight on hold"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CAPTION_BACKLIGHT
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_CAPTION_BACKLIGHT
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Caption Backlight"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magilaw sa likod ng pamagat"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Caption Backlight"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKLIGHT_FADE_IN
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BACKLIGHT_FADE_IN
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     backlight_fade*: "Backlight Fade In"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     backlight_fade*: "Magilaw sa likod pagpapalit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     backlight_fade*: "Backlight Fade In"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKLIGHT_FADE_OUT
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BACKLIGHT_FADE_OUT
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     backlight_fade*: "Backlight Fade Out"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     backlight_fade*: "Magilaw sa likod pagpapalit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     backlight_fade*: "Backlight Fade Out"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
- desc: Backlight behaviour setting
- user: core
- <source>
+  id: LANG_BACKLIGHT_FILTER_FIRST_KEYPRESS
+  desc: Backlight behaviour setting
+  user: core
+  <source>
     *: "First Buttonpress Enables Backlight Only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pang-una pindutin buttones magbigay-kaya lamang magilaw sa likod"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "First Buttonpress Enables Backlight Only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
- desc: In display settings, time to switch LCD chip into power saving state
- user: core
- <source>
+  id: LANG_LCD_SLEEP_AFTER_BACKLIGHT_OFF
+  desc: In display settings, time to switch LCD chip into power saving state
+  user: core
+  <source>
     *: none
     lcd_sleep: "Sleep (After Backlight Off)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_sleep: "Pagtulog (Magtapos magilaw sa likod)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_sleep: "Sleep after backlight off"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_NEVER
- desc: in lcd settings
- user: core
- <source>
+  id: LANG_NEVER
+  desc: in lcd settings
+  user: core
+  <source>
     *: none
     lcd_sleep: "Never"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_sleep: "Hindi Kailanman"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_sleep: "Hindi Kailanman"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BRIGHTNESS
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BRIGHTNESS
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     backlight_brightness: "Brightness"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     backlight_brightness: "Maliwanag"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     backlight_brightness: "Brightness"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CONTRAST
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_CONTRAST
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Contrast"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Kaibahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Contrast"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_INVERT
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_INVERT
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     lcd_invert,remote_lcd_invert: "LCD Mode"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_invert,remote_lcd_invert: "LCD paraan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_invert,remote_lcd_invert: "LCD Mode"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_INVERT_LCD_INVERSE
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_INVERT_LCD_INVERSE
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     lcd_invert,remote_lcd_invert: "Inverse"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_invert,remote_lcd_invert: "Bali"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_invert,remote_lcd_invert: "Inverse"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FLIP_DISPLAY
- desc: in settings_menu, option to turn display+buttos by 180 degrees
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Upside Down"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Ibaba"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Upside Down"
- </voice>
+  id: LANG_FLIP_DISPLAY
+  desc: in settings_menu, option to turn display+buttos by 180 degrees
+  user: core
+  <source>
+    *: "Upside Down"
+  </source>
+  <dest>
+    *: "Ibaba"
+  </dest>
+  <voice>
+    *: "Upside Down"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_INVERT_CURSOR
- desc: in settings_menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Piliin Guhit Tipo"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Line Selector Type"
- </voice>
+  id: LANG_INVERT_CURSOR
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Line Selector Type"
+  </source>
+  <dest>
+    *: "Piliin Guhit Tipo"
+  </dest>
+  <voice>
+    *: "Line Selector Type"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_INVERT_CURSOR_POINTER
- desc: in settings_menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Pointer"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Ituro"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Pointer"
- </voice>
+  id: LANG_INVERT_CURSOR_POINTER
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Pointer"
+  </source>
+  <dest>
+    *: "Ituro"
+  </dest>
+  <voice>
+    *: "Pointer"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_INVERT_CURSOR_BAR
- desc: in settings_menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Hadlang (Bali)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Inverse Bar"
- </voice>
+  id: LANG_INVERT_CURSOR_BAR
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Bar (Inverse)"
+  </source>
+  <dest>
+    *: "Hadlang (Bali)"
+  </dest>
+  <voice>
+    *: "Inverse Bar"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CLEAR_BACKDROP
- desc: text for LCD settings menu
- user: core
- <source>
+  id: LANG_CLEAR_BACKDROP
+  desc: text for LCD settings menu
+  user: core
+  <source>
     *: none
     lcd_non-mono: "Clear Backdrop"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_non-mono: "Alisin Backdrop"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_non-mono: "Clear Backdrop"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BACKGROUND_COLOR
- desc: menu entry to set the background color
- user: core
- <source>
+  id: LANG_BACKGROUND_COLOR
+  desc: menu entry to set the background color
+  user: core
+  <source>
     *: none
     lcd_color: "Background Colour"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_color: "Background Kulay"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_color: "Background Colour"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FOREGROUND_COLOR
- desc: menu entry to set the foreground color
- user: core
- <source>
+  id: LANG_FOREGROUND_COLOR
+  desc: menu entry to set the foreground color
+  user: core
+  <source>
     *: none
     lcd_color: "Foreground Colour"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_color: "Foreground Kulay"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_color: "Foreground Colour"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RESET_COLORS
- desc: menu
- user: core
- <source>
+  id: LANG_RESET_COLORS
+  desc: menu
+  user: core
+  <source>
     *: none
     lcd_color: "Reset Colours"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_color: "Muling itakda kulay"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_color: "Reset Colours"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_COLOR_RGB_LABELS
- desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
- user: core
- <source>
+  id: LANG_COLOR_RGB_LABELS
+  desc: what to show for the 'R' 'G' 'B' ONE LETTER EACH
+  user: core
+  <source>
     *: none
     lcd_color: "RGB"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_color: "RGB"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_color: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_COLOR_RGB_VALUE
- desc: in color screen
- user: core
- <source>
+  id: LANG_COLOR_RGB_VALUE
+  desc: in color screen
+  user: core
+  <source>
     *: none
     lcd_color: "RGB: %02X%02X%02X"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_color: "RGB: %02X%02X%02X"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_color: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_COLOR_UNACCEPTABLE
- desc: splash when user selects an invalid colour
- user: core
- <source>
+  id: LANG_COLOR_UNACCEPTABLE
+  desc: splash when user selects an invalid colour
+  user: core
+  <source>
     *: none
     lcd_color: "Invalid colour"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     lcd_color: "Walang-saysay kulay"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     lcd_color: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LCD_REMOTE_MENU
- desc: in the display sub menu
- user: core
- <source>
+  id: LANG_LCD_REMOTE_MENU
+  desc: in the display sub menu
+  user: core
+  <source>
     *: none
     remote: "Remote-LCD Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote: "Remote-LCD Tagpuan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote: "Remote LCD settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REDUCE_TICKING
- desc: in remote lcd settings menu
- user: core
- <source>
+  id: LANG_REDUCE_TICKING
+  desc: in remote lcd settings menu
+  user: core
+  <source>
     *: none
     remote_ticking: "Reduce Ticking"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote_ticking: "Bawasan tik-tak ng orasan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote_ticking: "Reduce Ticking"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SHOW_ICONS
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SHOW_ICONS
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Show Icons"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magpakita Icons"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Show Icons"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_MENU
- desc: in display_settings_menu()
- user: core
- <source>
+  id: LANG_SCROLL_MENU
+  desc: in display_settings_menu()
+  user: core
+  <source>
     *: "Scrolling"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Umikot"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Scrolling"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SCROLL
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Scroll Speed Setting Example"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bilis Umikot Tagpuan Uliran"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_SPEED
- desc: in display_settings_menu()
- user: core
- <source>
+  id: LANG_SCROLL_SPEED
+  desc: in display_settings_menu()
+  user: core
+  <source>
     *: "Scroll Speed"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bilis Umikot"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Scroll Speed"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_DELAY
- desc: Delay before scrolling
- user: core
- <source>
+  id: LANG_SCROLL_DELAY
+  desc: Delay before scrolling
+  user: core
+  <source>
     *: "Scroll Start Delay"
- </source>
- <dest>
+  </source>
+  <dest>
     *: " Magumpisa umikot abala"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Scroll Start Delay"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_STEP
- desc: Pixels to advance per scroll
- user: core
- <source>
+  id: LANG_SCROLL_STEP
+  desc: Pixels to advance per scroll
+  user: core
+  <source>
     *: "Scroll Step Size"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Umikot Laki"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Scroll Step Size"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_STEP_EXAMPLE
- desc: Pixels to advance per scroll
- user: core
- <source>
+  id: LANG_SCROLL_STEP_EXAMPLE
+  desc: Pixels to advance per scroll
+  user: core
+  <source>
     *: "Scroll Step Size Setting Example Text"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Umikot Tagpuan Uliran"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BIDIR_SCROLL
- desc: Bidirectional scroll limit
- user: core
- <source>
+  id: LANG_BIDIR_SCROLL
+  desc: Bidirectional scroll limit
+  user: core
+  <source>
     *: "Bidirectional Scroll Limit"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Dalwa Umikot Hangga"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Bidirectional Scroll Limit"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REMOTE_SCROLL_SETS
- desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
- user: core
- <source>
+  id: LANG_REMOTE_SCROLL_SETS
+  desc: "Remote Scrolling Options" Submenu in "Scrolling Options" menu
+  user: core
+  <source>
     *: none
     remote: "Remote Scrolling Options"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote: "Remote Umikot ng karaptang makipili"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote: "Remote Scrolling Options"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCREEN_SCROLL_VIEW
- desc: should lines scroll out of the screen
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: " Pagtingin nasa labas ng umikot sa screen"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
- </voice>
+  id: LANG_SCREEN_SCROLL_VIEW
+  desc: should lines scroll out of the screen
+  user: core
+  <source>
+    *: "Screen Scrolls Out Of View"
+  </source>
+  <dest>
+    *: " Pagtingin nasa labas ng umikot sa screen"
+  </dest>
+  <voice>
+    *: "Screen Scrolls Out Of View"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCREEN_SCROLL_STEP
- desc: Pixels to advance per Screen scroll
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Umikot sa screen kalakihan"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
- </voice>
+  id: LANG_SCREEN_SCROLL_STEP
+  desc: Pixels to advance per Screen scroll
+  user: core
+  <source>
+    *: "Screen Scroll Step Size"
+  </source>
+  <dest>
+    *: "Umikot sa screen kalakihan"
+  </dest>
+  <voice>
+    *: "Screen Scroll Step Size"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_PAGINATED
- desc: jump to new page when scrolling
- user: core
- <source>
+  id: LANG_SCROLL_PAGINATED
+  desc: jump to new page when scrolling
+  user: core
+  <source>
     *: "Paged Scrolling"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Paged Scrolling"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Paged scrolling"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LISTACCEL_START_DELAY
- desc: Delay before list starts accelerating
- user: core
- <source>
+  id: LANG_LISTACCEL_START_DELAY
+  desc: Delay before list starts accelerating
+  user: core
+  <source>
     *: "List Acceleration Start Delay"
     wheel_acceleration: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bilisihan ng listahan umpisahan abala"
     wheel_acceleration: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "List Acceleration Start Delay"
     wheel_acceleration: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LISTACCEL_ACCEL_SPEED
- desc: list acceleration speed
- user: core
- <source>
+  id: LANG_LISTACCEL_ACCEL_SPEED
+  desc: list acceleration speed
+  user: core
+  <source>
     *: "List Acceleration Speed"
     wheel_acceleration: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bilisihan ng listahan tulin"
     wheel_acceleration: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "List Acceleration Speed"
     wheel_acceleration: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BARS_MENU
- desc: in the display sub menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Estado-/Umikot Hadlang"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Status- and Scrollbar"
- </voice>
+  id: LANG_BARS_MENU
+  desc: in the display sub menu
+  user: core
+  <source>
+    *: "Status-/Scrollbar"
+  </source>
+  <dest>
+    *: "Estado-/Umikot Hadlang"
+  </dest>
+  <voice>
+    *: "Status- and Scrollbar"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SCROLL_BAR
- desc: display menu, F3 substitute
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Umikot Hadlang"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Scroll Bar"
- </voice>
+  id: LANG_SCROLL_BAR
+  desc: display menu, F3 substitute
+  user: core
+  <source>
+    *: "Scroll Bar"
+  </source>
+  <dest>
+    *: "Umikot Hadlang"
+  </dest>
+  <voice>
+    *: "Scroll Bar"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_STATUS_BAR
- desc: display menu, F3 substitute
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Status Bar"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Estado Hadlang"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Status Bar"
- </voice>
+  id: LANG_STATUS_BAR
+  desc: display menu, F3 substitute
+  user: core
+  <source>
+    *: "Status Bar"
+  </source>
+  <dest>
+    *: "Estado Hadlang"
+  </dest>
+  <voice>
+    *: "Status Bar"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BUTTON_BAR
- desc: in settings menu
- user: core
- <source>
+  id: LANG_BUTTON_BAR
+  desc: in settings menu
+  user: core
+  <source>
     *: none
     recorder_pad: "Button Bar"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recorder_pad: "Buttones Hadlang"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recorder_pad: "Button Bar"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOLUME_DISPLAY
- desc: Volume type title
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Volume Display"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Pakita Bulumen"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Pakita Bulumen"
- </voice>
+  id: LANG_VOLUME_DISPLAY
+  desc: Volume type title
+  user: core
+  <source>
+    *: "Volume Display"
+  </source>
+  <dest>
+    *: "Pakita Bulumen"
+  </dest>
+  <voice>
+    *: "Pakita Bulumen"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BATTERY_DISPLAY
- desc: Battery type title
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Battery Display"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Pakita Batirya"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Pakita Batirya"
- </voice>
+  id: LANG_BATTERY_DISPLAY
+  desc: Battery type title
+  user: core
+  <source>
+    *: "Battery Display"
+  </source>
+  <dest>
+    *: "Pakita Batirya"
+  </dest>
+  <voice>
+    *: "Pakita Batirya"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DISPLAY_GRAPHIC
- desc: Label for type of icon display
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Graphic"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Graphic"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Graphic"
- </voice>
+  id: LANG_DISPLAY_GRAPHIC
+  desc: Label for type of icon display
+  user: core
+  <source>
+    *: "Graphic"
+  </source>
+  <dest>
+    *: "Graphic"
+  </dest>
+  <voice>
+    *: "Graphic"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DISPLAY_NUMERIC
- desc: Label for type of icon display
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Numeric"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Numeric"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Numeric"
- </voice>
+  id: LANG_DISPLAY_NUMERIC
+  desc: Label for type of icon display
+  user: core
+  <source>
+    *: "Numeric"
+  </source>
+  <dest>
+    *: "Numeric"
+  </dest>
+  <voice>
+    *: "Numeric"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_MENU
- desc: in the display menu
- user: core
- <source>
+  id: LANG_PM_MENU
+  desc: in the display menu
+  user: core
+  <source>
     *: "Peak Meter"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Peak Metro"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Peak Meter"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_CLIP_HOLD
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_CLIP_HOLD
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Clip Hold Time"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Clip Hold Time"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Clip Hold Time"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_PEAK_HOLD
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_PEAK_HOLD
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Peak Hold Time"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Peak pigilin oras"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Peak Hold Time"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_ETERNAL
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_ETERNAL
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Eternal"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Walang kamatayan"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Eternal"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_RELEASE
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Peak Release"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Peak pakawalan"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Peak Release"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_SCALE
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_SCALE
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Scale"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Timbangan"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Scale"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_DBFS
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_DBFS
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Logarithmic (dB)"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Logarithmic (dB)"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Logarithmic decibel"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_LINEAR
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_LINEAR
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Linear (%)"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Linear (%)"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Linear percent"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_MIN
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_MIN
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Minimum Of Range"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pinakamababa sa lagay"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Minimum Of Range"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PM_MAX
- desc: in the peak meter menu
- user: core
- <source>
+  id: LANG_PM_MAX
+  desc: in the peak meter menu
+  user: core
+  <source>
     *: "Maximum Of Range"
     masd: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sukduean sa lagay"
     masd: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Maximum Of Range"
     masd: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DEFAULT_CODEPAGE
- desc: default encoding used with id3 tags
- user: core
- <source>
+  id: LANG_DEFAULT_CODEPAGE
+  desc: default encoding used with id3 tags
+  user: core
+  <source>
     *: "Default Codepage"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pumaltos Codepage"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Default codepage"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_LATIN1
- desc: in codepage setting menu
- user: core
- <source>
+  id: LANG_CODEPAGE_LATIN1
+  desc: in codepage setting menu
+  user: core
+  <source>
     *: "Latin1 (ISO-8859-1)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Latin1 (ISO-8859-1)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Latin 1"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_GREEK
- desc: in codepage setting menu
- user: core
- <source>
+  id: LANG_CODEPAGE_GREEK
+  desc: in codepage setting menu
+  user: core
+  <source>
     *: "Greek (ISO-8859-7)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Greek (ISO-8859-7)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Greek"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_HEBREW
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Hebrew"
- </voice>
+  id: LANG_CODEPAGE_HEBREW
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Hebrew (ISO-8859-8)"
+  </source>
+  <dest>
+    *: "Hebrew (ISO-8859-8)"
+  </dest>
+  <voice>
+    *: "Hebrew"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_CYRILLIC
- desc: in codepage setting menu
- user: core
- <source>
+  id: LANG_CODEPAGE_CYRILLIC
+  desc: in codepage setting menu
+  user: core
+  <source>
     *: "Cyrillic (CP1251)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Cyrillic (CP1251)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Cyrillic"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_THAI
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Thai"
- </voice>
+  id: LANG_CODEPAGE_THAI
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Thai (ISO-8859-11)"
+  </source>
+  <dest>
+    *: "Thai (ISO-8859-11)"
+  </dest>
+  <voice>
+    *: "Thai"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_ARABIC
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Arabic"
- </voice>
+  id: LANG_CODEPAGE_ARABIC
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Arabic (CP1256)"
+  </source>
+  <dest>
+    *: "Arabic (CP1256)"
+  </dest>
+  <voice>
+    *: "Arabic"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_TURKISH
- desc: in codepage setting menu
- user: core
- <source>
+  id: LANG_CODEPAGE_TURKISH
+  desc: in codepage setting menu
+  user: core
+  <source>
     *: "Turkish (ISO-8859-9)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Turkish (ISO-8859-9)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Turkish"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_LATIN_EXTENDED
- desc: in codepage setting menu
- user: core
- <source>
+  id: LANG_CODEPAGE_LATIN_EXTENDED
+  desc: in codepage setting menu
+  user: core
+  <source>
     *: "Latin Extended (ISO-8859-2)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Latin Extended (ISO-8859-2)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Latin extended"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_JAPANESE
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Japanese"
- </voice>
+  id: LANG_CODEPAGE_JAPANESE
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Japanese (SJIS)"
+  </source>
+  <dest>
+    *: "Japanese (SJIS)"
+  </dest>
+  <voice>
+    *: "Japanese"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_SIMPLIFIED
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Simplified Chinese"
- </voice>
+  id: LANG_CODEPAGE_SIMPLIFIED
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Simp. Chinese (GB2312)"
+  </source>
+  <dest>
+    *: "Simp. Chinese (GB2312)"
+  </dest>
+  <voice>
+    *: "Simplified Chinese"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_KOREAN
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Korean"
- </voice>
+  id: LANG_CODEPAGE_KOREAN
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Korean (KSX1001)"
+  </source>
+  <dest>
+    *: "Korean (KSX1001)"
+  </dest>
+  <voice>
+    *: "Korean"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_TRADITIONAL
- desc: in codepage setting menu
- user: core
- <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
- </source>
- <dest>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
- </dest>
- <voice>
-    *: none
-    lcd_bitmap: "Traditional Chinese"
- </voice>
+  id: LANG_CODEPAGE_TRADITIONAL
+  desc: in codepage setting menu
+  user: core
+  <source>
+    *: "Trad. Chinese (BIG5)"
+  </source>
+  <dest>
+    *: "Trad. Chinese (BIG5)"
+  </dest>
+  <voice>
+    *: "Traditional Chinese"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CODEPAGE_UTF8
- desc: in codepage setting menu
- user: core
- <source>
+  id: LANG_CODEPAGE_UTF8
+  desc: in codepage setting menu
+  user: core
+  <source>
     *: "Unicode (UTF-8)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Unicode (UTF-8)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Unicode"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BUTTONLIGHT_TIMEOUT
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BUTTONLIGHT_TIMEOUT
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
- </source>
- <dest>
+    sansae200*,sansafuze*: "Wheel Light Timeout"
+  </source>
+  <dest>
     *: none
     button_light: "Pahintuin buttones sa ilaw"
-    sansafuze*,sansae200*: "Pahintuin gulong sa ilaw"
- </dest>
- <voice>
+    sansae200*,sansafuze*: "Pahintuin gulong sa ilaw"
+  </dest>
+  <voice>
     *: none
     button_light: ""
-    sansafuze*,sansae200*: "Wheel Light Timeout"
- </voice>
+    sansae200*,sansafuze*: "Wheel Light Timeout"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BUTTONLIGHT_BRIGHTNESS
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BUTTONLIGHT_BRIGHTNESS
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     buttonlight_brightness: "Button Light Brightness"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     buttonlight_brightness: "Buttones liwanag sa ilaw"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     buttonlight_brightness: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_START_SCREEN
- desc: in the system sub menu
- user: core
- <source>
+  id: LANG_START_SCREEN
+  desc: in the system sub menu
+  user: core
+  <source>
     *: "Start Screen"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Magumpisa Tabing"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Start Screen"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MAIN_MENU
- desc: in start screen setting
- user: core
- <source>
+  id: LANG_MAIN_MENU
+  desc: in start screen setting
+  user: core
+  <source>
     *: "Main Menu"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Panguna mga putahe"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Main Menu"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PREVIOUS_SCREEN
- desc: in start screen setting
- user: core
- <source>
+  id: LANG_PREVIOUS_SCREEN
+  desc: in start screen setting
+  user: core
+  <source>
     *: "Previous Screen"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Nauuna Tabing"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Previous Screen"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BATTERY_MENU
- desc: in the system sub menu
- user: core
- <source>
+  id: LANG_BATTERY_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
     *: "Battery"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Batirya"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Batirya"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BATTERY_CAPACITY
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_BATTERY_CAPACITY
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Battery Capacity"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Laman Batirya"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Laman Batirya"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BATTERY_TYPE
- desc: in battery settings
- user: core
- <source>
+  id: LANG_BATTERY_TYPE
+  desc: in battery settings
+  user: core
+  <source>
     *: none
     battery_types: "Battery Type"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     battery_types: "Batirya Typo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     battery_types: "Battery type"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BATTERY_TYPE_1
- desc: in battery settings
- user: core
- <source>
+  id: LANG_BATTERY_TYPE_1
+  desc: in battery settings
+  user: core
+  <source>
     *: none
     battery_types: "Alkaline"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     battery_types: "Alkaline"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     battery_types: "Alkaline"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BATTERY_TYPE_2
- desc: in battery settings
- user: core
- <source>
+  id: LANG_BATTERY_TYPE_2
+  desc: in battery settings
+  user: core
+  <source>
     *: none
     battery_types: "NiMH"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     battery_types: "NiMH"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     battery_types: "Nickel metal hydride"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DISK_MENU
- desc: in the system sub menu
- user: core
- <source>
+  id: LANG_DISK_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
     *: "Disk"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Disk"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Disk"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SPINDOWN
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SPINDOWN
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Disk Spindown"
     flash_storage: none
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Disk Spindown"
     flash_storage: none
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Disk Spindown"
     flash_storage: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_DIRCACHE_ENABLE
- desc: in directory cache settings
- user: core
- <source>
+  id: LANG_DIRCACHE_ENABLE
+  desc: in directory cache settings
+  user: core
+  <source>
     *: none
     dircache: "Directory Cache"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     dircache: "Directory Cache"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     dircache: "Directory Cache"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TIME_MENU
- desc: in the system sub menu
- user: core
- <source>
+  id: LANG_TIME_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
     *: none
     rtc: "Time & Date"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Petsa at Oras"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Petsa at Oras"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SET_TIME
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_SET_TIME
+  desc: in settings_menu
+  user: core
+  <source>
     *: none
     rtc: "Set Time/Date"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Ilagay Oras/Petsa"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Set Time and Date"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TIMEFORMAT
- desc: select the time format of time in status bar
- user: core
- <source>
+  id: LANG_TIMEFORMAT
+  desc: select the time format of time in status bar
+  user: core
+  <source>
     *: "Time Format"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Paraan Oras"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Time Format"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_12_HOUR_CLOCK
- desc: option for 12 hour clock
- user: core
- <source>
+  id: LANG_12_HOUR_CLOCK
+  desc: option for 12 hour clock
+  user: core
+  <source>
     *: "12 Hour Clock"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "12 Orasan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "12 Hour Clock"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_24_HOUR_CLOCK
- desc: option for 24 hour clock
- user: core
- <source>
+  id: LANG_24_HOUR_CLOCK
+  desc: option for 24 hour clock
+  user: core
+  <source>
     *: "24 Hour Clock"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "24 Orasan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "24 Hour Clock"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TIME_SET_BUTTON
- desc: used in set_time()
- user: core
- <source>
+  id: LANG_TIME_SET_BUTTON
+  desc: used in set_time()
+  user: core
+  <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
- </source>
- <dest>
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
+  </source>
+  <dest>
     *: none
-    rtc: "ON = Ilagay"
-    mrobe500: "HEART =Ilagay"
-    iriverh100,iriverh120,iriverh300: "NAVI = Ilagay"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Ilagay"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Ilagay"
     gogearsa9200,samsungyh*: "PLAY = Ilagay"
-    vibe500: "OK = Ilagay"
+    iriverh100,iriverh120,iriverh300: "NAVI = Ilagay"
     mpiohd300: "ENTER = Ilagay"
- </dest>
- <voice>
+    mrobe500: "HEART =Ilagay"
+    rtc: "ON = Ilagay"
+    vibe500: "OK = Ilagay"
+  </dest>
+  <voice>
     *: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_TIME_REVERT
- desc: used in set_time()
- user: core
- <source>
+  id: LANG_TIME_REVERT
+  desc: used in set_time()
+  user: core
+  <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
- </source>
- <dest>
+    vibe500: "CANCEL = Revert"
+  </source>
+  <dest>
     *: none
-    rtc: "OFF = Mabalik"
-    mrobe500: "POWER = Mabalik"
-    iriverh100,iriverh120,iriverh300: "STOP = Mabalik"
-    ipod*,sansac200*,mpiohd300: "MENU = Mabalik"
-    iaudiox5,iaudiom5: "RECORD = Mabalik"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mabalik"
-    gigabeatfx: "POWER = Mabalik"
-    sansafuzeplus: "BACK = Mabalik"
-    mrobe100: "DISPLAY = Mabalik"
-    gigabeats: "BACK = Mabalik"
+    gigabeatfx,mrobe500: "POWER = Mabalik"
+    gigabeats,sansafuzeplus: "BACK = Mabalik"
     gogearsa9200: "LEFT = Mabalik"
-    vibe500: "C = Mabalik"
+    iaudiom5,iaudiox5: "RECORD = Mabalik"
+    ipod*,mpiohd300,sansac200*: "MENU = Mabalik"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Mabalik"
+    iriverh100,iriverh120,iriverh300: "STOP = Mabalik"
+    mrobe100: "DISPLAY = Mabalik"
+    rtc: "OFF = Mabalik"
     samsungyh*: "REW = Mabalik"
- </dest>
- <voice>
+    vibe500: "C = Mabalik"
+  </dest>
+  <voice>
     *: none
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_SUNDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_SUNDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Sun"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Lin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Linggo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_MONDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_MONDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Mon"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Lun"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Lunes"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_TUESDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_TUESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Tue"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Mar"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Martes"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_WEDNESDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_WEDNESDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Wed"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Miy"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Miyerkoles"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_THURSDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_THURSDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Thu"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Huw"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Huwebes"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_FRIDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_FRIDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Fri"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Biy"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Biyernes"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_WEEKDAY_SATURDAY
- desc: Maximum 3-letter abbreviation for weekday
- user: core
- <source>
+  id: LANG_WEEKDAY_SATURDAY
+  desc: Maximum 3-letter abbreviation for weekday
+  user: core
+  <source>
     *: none
     rtc: "Sat"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     rtc: "Sab"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     rtc: "Sabado"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_JANUARY
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_JANUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Jan"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ene"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Enero"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_FEBRUARY
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_FEBRUARY
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Feb"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Peb"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Pebrero"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_MARCH
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_MARCH
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Mar"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mar"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Marso"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_APRIL
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_APRIL
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Apr"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Abr"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Abril"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_MAY
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_MAY
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "May"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "May"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Mayo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_JUNE
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_JUNE
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Jun"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Hun"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Hunyo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_JULY
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_JULY
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Jul"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Hul"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Hulyo"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_AUGUST
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_AUGUST
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Aug"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ago"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Agosto"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_SEPTEMBER
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_SEPTEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Sep"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sep"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Septiyembre"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_OCTOBER
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_OCTOBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Oct"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Okt"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Oktubre"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_NOVEMBER
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_NOVEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Nov"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Nob"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Nobiyembre"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MONTH_DECEMBER
- desc: Maximum 3-letter abbreviation for monthname
- user: core
- <source>
+  id: LANG_MONTH_DECEMBER
+  desc: Maximum 3-letter abbreviation for monthname
+  user: core
+  <source>
     *: "Dec"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Dis"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Disiyembre"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_POWEROFF_IDLE
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_POWEROFF_IDLE
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Idle Poweroff"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Nakatigil pagpihit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Idle Poweroff"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SLEEP_TIMER
- desc: sleep timer setting
- user: core
- <source>
+  id: LANG_SLEEP_TIMER
+  desc: sleep timer setting
+  user: core
+  <source>
     *: "Sleep Timer"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Matulog ng oras"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Sleep Timer"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LIMITS_MENU
- desc: in the system sub menu
- user: core
- <source>
+  id: LANG_LIMITS_MENU
+  desc: in the system sub menu
+  user: core
+  <source>
     *: "Limits"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Hangga"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Limits"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MAX_FILES_IN_DIR
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_MAX_FILES_IN_DIR
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Max Entries in File Browser"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sukduean isalansan sa pakita listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Maximum files in directory browser"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MAX_FILES_IN_PLAYLIST
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_MAX_FILES_IN_PLAYLIST
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Max Playlist Size"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sukduean Listahan Laki"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Maximum playlist size"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CAR_ADAPTER_MODE
- desc: Displayed for setting car adapter mode to on/off
- user: core
- <source>
+  id: LANG_CAR_ADAPTER_MODE
+  desc: Displayed for setting car adapter mode to on/off
+  user: core
+  <source>
     *: none
     charging: "Car Adapter Mode"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
-    charging: "Paraan ng Kotse Adapter " 
- </dest>
- <voice>
+    charging: "Paraan ng Kotse Adapter "
+  </dest>
+  <voice>
     *: none
     charging: "Car Adapter Mode"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_ALARM_MENU
- desc: The name of the additional entry in the main menu for the RTC alarm mod.
- user: core
- <source>
+  id: LANG_ALARM_MOD_ALARM_MENU
+  desc: The name of the additional entry in the main menu for the RTC alarm mod.
+  user: core
+  <source>
     *: none
     alarm: "Wake-Up Alarm"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Magising Alarma"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: "Wake-Up Alarm"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_WAKEUP_SCREEN
- desc: in alarm menu setting
- user: core
- <source>
+  id: LANG_ALARM_WAKEUP_SCREEN
+  desc: in alarm menu setting
+  user: core
+  <source>
     *: none
     alarm: "Alarm Wake up Screen"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Magising Alarma Tabing"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: "Alarm Wake up Screen"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_TIME
- desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
- user: core
- <source>
+  id: LANG_ALARM_MOD_TIME
+  desc: The current alarm time shown in the alarm menu for the RTC alarm mod.
+  user: core
+  <source>
     *: none
     alarm: "Alarm Time:"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Alarma oras:"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_TIME_TO_GO
- desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
- user: core
- <source>
+  id: LANG_ALARM_MOD_TIME_TO_GO
+  desc: The time until the alarm will go off shown in the alarm menu for the RTC alarm mod.
+  user: core
+  <source>
     *: none
     alarm: "Waking Up In %d:%02d"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Magising Alarma sa In %d:%02d"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: "Magising Alarma sa In"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_SHUTDOWN
- desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
- user: core
- <source>
+  id: LANG_ALARM_MOD_SHUTDOWN
+  desc: The text that tells the user that the alarm time is ok and the device shuts off (for the RTC alarm mod).
+  user: core
+  <source>
     *: none
     alarm: "Alarm Set"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Ilagay Alarma"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: "Alarm set"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_ERROR
- desc: The text that tells that the time is incorrect (for the RTC alarm mod).
- user: core
- <source>
+  id: LANG_ALARM_MOD_ERROR
+  desc: The text that tells that the time is incorrect (for the RTC alarm mod).
+  user: core
+  <source>
     *: none
     alarm: "Alarm Time Is Too Soon!"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Alarma oras ay madali!"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: "Alarm Time Is Too Soon!"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_KEYS
- desc: Shown key functions in alarm menu (for the RTC alarm mod).
- user: core
- <source>
+  id: LANG_ALARM_MOD_KEYS
+  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  user: core
+  <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
- </source>
- <dest>
+    vibe500: "OK=Set C=Cancel"
+  </source>
+  <dest>
     *: none
     alarm: "PLAY=Ilagay OFF=Kanselahin"
+    gigabeats: "SELECT = Ilagay POWER = Kanselahin"
     ipod*: "SELECT=Ilagay MENU=Kanselahin"
     iriverh10,iriverh10_5gb: "SELECT = Ilagay MENU = Kanselahin"
-    gigabeats: "SELECT = Ilagay POWER = Kanselahin"
-    vibe500: "OK=Ilagay C=Kanselahin"
     mpiohd300: "ENTER=Ilagay MENU=Kanselahin"
     sansafuzeplus: "SELECT=Ilagay  BACK=Kanselahin"
- </dest>
- <voice>
+    vibe500: "OK=Ilagay C=Kanselahin"
+  </dest>
+  <voice>
     *: none
-    alarm: ""
-    ipod*: ""
-    iriverh10,iriverh10_5gb: ""
-    gigabeats: ""
- </voice>
+    alarm,gigabeats,ipod*,iriverh10,iriverh10_5gb: ""
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ALARM_MOD_DISABLE
- desc: Announce that the RTC alarm has been turned off
- user: core
- <source>
+  id: LANG_ALARM_MOD_DISABLE
+  desc: Announce that the RTC alarm has been turned off
+  user: core
+  <source>
     *: none
     alarm: "Alarm Disabled"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     alarm: "Paghintuin Alarma"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     alarm: "Alarm Disabled"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS
- desc: in general settings
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS
+  desc: in general settings
+  user: core
+  <source>
     *: "Bookmarking"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bookmarking"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Bookmarking"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
- desc: prompt for user to decide to create an bookmark
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS_AUTOCREATE
+  desc: prompt for user to decide to create an bookmark
+  user: core
+  <source>
     *: "Bookmark on Stop"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Paghinto sa Bookmark "
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Bookmark on Stop"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
- desc: Save in recent bookmarks only
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_YES
+  desc: Save in recent bookmarks only
+  user: core
+  <source>
     *: "Yes - Recent only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Oo - Di pa natatagalan lamang"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Yes - Recent only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
- desc: Save in recent bookmarks only
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS_RECENT_ONLY_ASK
+  desc: Save in recent bookmarks only
+  user: core
+  <source>
     *: "Ask - Recent only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: " Itanong - Di pa natatagalan lamang"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Ask - Recent only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
- desc: prompt for user to decide to create a bookmark
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS_AUTOLOAD
+  desc: prompt for user to decide to create a bookmark
+  user: core
+  <source>
     *: "Load Last Bookmark"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ikarga huli Bookmark"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Load Last Bookmark"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
- desc: Configuration option to maintain a list of recent bookmarks
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS_MAINTAIN_RECENT_BOOKMARKS
+  desc: Configuration option to maintain a list of recent bookmarks
+  user: core
+  <source>
     *: "Maintain a List of Recent Bookmarks?"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pamalagiin listahan di pa natatagalan ng Bookmarks?"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Maintain a List of Recent Bookmarks?"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
- desc: Save only on bookmark for each playlist in recent bookmarks
- user: core
- <source>
+  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
+  desc: Save only on bookmark for each playlist in recent bookmarks
+  user: core
+  <source>
     *: "Unique only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Walang kaparis"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Unique only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LANGUAGE
- desc: in settings_menu
- user: core
- <source>
+  id: LANG_LANGUAGE
+  desc: in settings_menu
+  user: core
+  <source>
     *: "Language"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Salita"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Language"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LANGUAGE_LOADED
- desc: shown when a language has been loaded from the dir browser
- user: core
- <source>
+  id: LANG_LANGUAGE_LOADED
+  desc: shown when a language has been loaded from the dir browser
+  user: core
+  <source>
     *: "New Language"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Bago Salita"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "New Language"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE
- desc: root of voice menu
- user: core
- <source>
+  id: LANG_VOICE
+  desc: root of voice menu
+  user: core
+  <source>
     *: "Voice"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Boses"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Voice"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_MENU
- desc: item of voice menu, enable/disable the voice UI
- user: core
- <source>
+  id: LANG_VOICE_MENU
+  desc: item of voice menu, enable/disable the voice UI
+  user: core
+  <source>
     *: "Voice Menus"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Boses Mga Puthe"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Voice Menus"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_DIR
- desc: item of voice menu, set the voice mode for directories
- user: core
- <source>
+  id: LANG_VOICE_DIR
+  desc: item of voice menu, set the voice mode for directories
+  user: core
+  <source>
     *: "Voice Directories"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Boses Listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Voice Directories"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_DIR_TALK
- desc: Item of voice menu, whether to use directory .talk clips
- user: core
- <source>
+  id: LANG_VOICE_DIR_TALK
+  desc: Item of voice menu, whether to use directory .talk clips
+  user: core
+  <source>
     *: "Use Directory .talk Clips"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Gamitin Listahan .talk Klips"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Use Directory .talk Clips"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_FILE
- desc: item of voice menu, set the voice mode for files
- user: core
- <source>
+  id: LANG_VOICE_FILE
+  desc: item of voice menu, set the voice mode for files
+  user: core
+  <source>
     *: "Voice Filenames"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Boses Pangalan ng salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Voice Filenames"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_FILE_TALK
- desc: Item of voice menu, whether to use file .talk clips
- user: core
- <source>
+  id: LANG_VOICE_FILE_TALK
+  desc: Item of voice menu, whether to use file .talk clips
+  user: core
+  <source>
     *: "Use File .talk Clips"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Gamitin Salansan .talk Klips"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Use File .talk Clips"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_NUMBER
- desc: "talkbox" mode for files+directories
- user: core
- <source>
+  id: LANG_VOICE_NUMBER
+  desc: "talkbox" mode for files+directories
+  user: core
+  <source>
     *: "Numbers"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Numero"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Numbers"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_SPELL
- desc: "talkbox" mode for files+directories
- user: core
- <source>
+  id: LANG_VOICE_SPELL
+  desc: "talkbox" mode for files+directories
+  user: core
+  <source>
     *: "Spell"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Engkanto"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Spell"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_VOICE_DIR_HOVER
- desc: "talkbox" mode for directories + files
- user: core
- <source>
+  id: LANG_VOICE_DIR_HOVER
+  desc: "talkbox" mode for directories + files
+  user: core
+  <source>
     *: ".talk Clip"
- </source>
- <dest>
+  </source>
+  <dest>
     *: ".talk klip"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "talk mp3 clip"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MANAGE_MENU
- desc: in the main menu
- user: core
- <source>
+  id: LANG_MANAGE_MENU
+  desc: in the main menu
+  user: core
+  <source>
     *: "Manage Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Panagasiwaan Tagpuan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Manage Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CUSTOM_CFG
- desc: in setting_menu()
- user: core
- <source>
+  id: LANG_CUSTOM_CFG
+  desc: in setting_menu()
+  user: core
+  <source>
     *: "Browse .cfg Files"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pakita .cfg Salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Browse configuration files"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SETTINGS_LOADED
- desc: Feedback shown when a .cfg file is loaded
- user: core
- <source>
+  id: LANG_SETTINGS_LOADED
+  desc: Feedback shown when a .cfg file is loaded
+  user: core
+  <source>
     *: "Settings Loaded"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ilagay ng karga"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Settings Loaded"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RESET
- desc: in system_settings_menu()
- user: core
- <source>
+  id: LANG_RESET
+  desc: in system_settings_menu()
+  user: core
+  <source>
     *: "Reset Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Ilagay muling itakda"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Reset Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RESET_DONE_CLEAR
- desc: visual confirmation after settings reset
- user: core
- <source>
+  id: LANG_RESET_DONE_CLEAR
+  desc: visual confirmation after settings reset
+  user: core
+  <source>
     *: "Cleared"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Alisin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Settings Cleared"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SAVE_SETTINGS
- desc: in system_settings_menu()
- user: core
- <source>
+  id: LANG_SAVE_SETTINGS
+  desc: in system_settings_menu()
+  user: core
+  <source>
     *: "Save .cfg File"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Sumulat .cfg salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Write configuration file"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SETTINGS_SAVED
- desc: Feedback shown when a .cfg file is saved
- user: core
- <source>
+  id: LANG_SETTINGS_SAVED
+  desc: Feedback shown when a .cfg file is saved
+  user: core
+  <source>
     *: "Settings Saved"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mag-ipon"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Settings Saved"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SAVE_THEME
- desc: save a theme file
- user: core
- <source>
+  id: LANG_SAVE_THEME
+  desc: save a theme file
+  user: core
+  <source>
     *: "Save Theme Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Mag-ipun Tema"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Save Theme Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CUSTOM_THEME
- desc: in the main menu
- user: core
- <source>
+  id: LANG_CUSTOM_THEME
+  desc: in the main menu
+  user: core
+  <source>
     *: "Browse Theme Files"
- </source>
- <dest>
+  </source>
+  <dest>
     *: "Pakita Tema"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: "Browse Themes"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_SETTINGS
- desc: in the main menu
- user: core
- <source>
+  id: LANG_RECORDING_SETTINGS
+  desc: in the main menu
+  user: core
+  <source>
     *: none
     recording: "Recording Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Ilagay Rekording"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Recording Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_MENU
- desc: fm menu title
- user: core
- <source>
+  id: LANG_FM_MENU
+  desc: fm menu title
+  user: core
+  <source>
     *: none
     radio: "FM Radio Menu"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "FM Radyo Mga putahe"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "FM Radio Menu"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_NO_PRESETS
- desc: error when preset list is empty
- user: core
- <source>
+  id: LANG_FM_NO_PRESETS
+  desc: error when preset list is empty
+  user: core
+  <source>
     *: none
     radio: "No presets"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Wala presets"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "No presets"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_ADD_PRESET
- desc: in radio menu
- user: core
- <source>
+  id: LANG_FM_ADD_PRESET
+  desc: in radio menu
+  user: core
+  <source>
     *: none
     radio: "Add Preset"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Idagdag Preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Add Preset"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_EDIT_PRESET
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_EDIT_PRESET
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio: "Edit Preset"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Mamatnugot Preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Edit Preset"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_DELETE_PRESET
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_DELETE_PRESET
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio: "Remove Preset"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Alisin Preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Remove Preset"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_PRESET_SAVE_FAILED
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_PRESET_SAVE_FAILED
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio: "Preset Save Failed"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Wala ng mag-ipun preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Preset Save Failed"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_NO_FREE_PRESETS
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_NO_FREE_PRESETS
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio: "The Preset List is Full"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Puno sa listahan ng preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "The Preset List is Full"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BUTTONBAR_MENU
- desc: in button bar
- user: core
- <source>
+  id: LANG_BUTTONBAR_MENU
+  desc: in button bar
+  user: core
+  <source>
     *: none
     radio_screen_button_bar: "Menu"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio_screen_button_bar: "Mga putahe"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio_screen_button_bar: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_BUTTONBAR_EXIT
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_BUTTONBAR_EXIT
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio_screen_button_bar: "Exit"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio_screen_button_bar: "Labasan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio_screen_button_bar: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_BUTTONBAR_ACTION
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_BUTTONBAR_ACTION
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio_screen_button_bar: "Action"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio_screen_button_bar: "Kilos"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio_screen_button_bar: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_PRESET
- desc: in button bar and radio screen / menu
- user: core
- <source>
+  id: LANG_PRESET
+  desc: in button bar and radio screen / menu
+  user: core
+  <source>
     *: none
     radio: "Preset"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_BUTTONBAR_ADD
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_BUTTONBAR_ADD
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio_screen_button_bar: "Add"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio_screen_button_bar: "Idagdag"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio_screen_button_bar: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_BUTTONBAR_RECORD
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_BUTTONBAR_RECORD
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio_screen_button_bar: "Record"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio_screen_button_bar: "Rekord"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio_screen_button_bar: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_MONO_MODE
- desc: in radio screen
- user: core
- <source>
+  id: LANG_FM_MONO_MODE
+  desc: in radio screen
+  user: core
+  <source>
     *: none
     radio: "Force Mono"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Pumilit mono"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Force Mono"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_FREEZE
- desc: splash screen during freeze in radio mode
- user: core
- <source>
+  id: LANG_FM_FREEZE
+  desc: splash screen during freeze in radio mode
+  user: core
+  <source>
     *: none
     radio: "Screen frozen!"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Tabingan amuonanigas!"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_SCAN_PRESETS
- desc: in radio menu
- user: core
- <source>
+  id: LANG_FM_SCAN_PRESETS
+  desc: in radio menu
+  user: core
+  <source>
     *: none
     radio: "Auto-Scan Presets"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Kusa siglawan Presets"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Auto scan presets"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_CLEAR_PRESETS
- desc: confirmation if presets can be cleared
- user: core
- <source>
+  id: LANG_FM_CLEAR_PRESETS
+  desc: confirmation if presets can be cleared
+  user: core
+  <source>
     *: none
     radio: "Clear Current Presets?"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Alisin koryente preset?"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Clear Current Presets?"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_SCANNING
- desc: during auto scan
- user: core
- <source>
+  id: LANG_FM_SCANNING
+  desc: during auto scan
+  user: core
+  <source>
     *: none
     radio: "Scanning %d.%02d MHz"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Siglawan %d.%02d MHz"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_DEFAULT_PRESET_NAME
- desc: default preset name for auto scan mode
- user: core
- <source>
+  id: LANG_FM_DEFAULT_PRESET_NAME
+  desc: default preset name for auto scan mode
+  user: core
+  <source>
     *: none
     radio: "%d.%02d MHz"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "%d.%02d MHz"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RADIO_SCAN_MODE
- desc: in radio screen / menu
- user: core
- <source>
+  id: LANG_RADIO_SCAN_MODE
+  desc: in radio screen / menu
+  user: core
+  <source>
     *: none
     radio: "Scan"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Siglawan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_PRESET_LOAD
- desc: load preset list in fm radio
- user: core
- <source>
+  id: LANG_FM_PRESET_LOAD
+  desc: load preset list in fm radio
+  user: core
+  <source>
     *: none
     radio: "Load Preset List"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Ikarga Listahan ng preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Load Preset List"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_PRESET_SAVE
- desc: Save preset list in fm radio
- user: core
- <source>
+  id: LANG_FM_PRESET_SAVE
+  desc: Save preset list in fm radio
+  user: core
+  <source>
     *: none
     radio: "Save Preset List"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Mag-ipon listahan ng preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Save Preset List"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_PRESET_CLEAR
- desc: clear preset list in fm radio
- user: core
- <source>
+  id: LANG_FM_PRESET_CLEAR
+  desc: clear preset list in fm radio
+  user: core
+  <source>
     *: none
     radio: "Clear Preset List"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Alisin listahan ng preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Clear Preset List"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FMR
- desc: Used when you need to say Preset List, also voiced
- user: core
- <source>
+  id: LANG_FMR
+  desc: Used when you need to say Preset List, also voiced
+  user: core
+  <source>
     *: none
     radio: "Preset List"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Listahan ng preset"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Preset List"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_FIRST_AUTOSCAN
- desc: When you run the radio without an fmr file in settings
- user: core
- <source>
+  id: LANG_FM_FIRST_AUTOSCAN
+  desc: When you run the radio without an fmr file in settings
+  user: core
+  <source>
     *: none
     radio: "No settings found. Autoscan?"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Wala pakita ng ilagay. Kusa siglawan?"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "No settings found. Autoscan?"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_SAVE_CHANGES
+  id: LANG_FM_SAVE_CHANGES
   desc: deprecated
- user: core
- <source>
+  user: core
+  <source>
     *: none
     radio: ""
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: ""
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: ""
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_REGION
- desc: fm tuner region setting
+  id: LANG_FM_REGION
+  desc: fm tuner region setting
   user: core
- <source>
+  <source>
     *: none
     radio: "Region"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Rehiyon"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Region"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_EUROPE
- desc: fm tuner region europe
+  id: LANG_FM_EUROPE
+  desc: fm tuner region europe
   user: core
- <source>
+  <source>
     *: none
     radio: "Europe"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Europa"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Europe"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_US
- desc: fm region us / canada
+  id: LANG_FM_US
+  desc: fm region us / canada
   user: core
- <source>
+  <source>
     *: none
     radio: "US / Canada"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "US / Canada"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "US and Canada"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_JAPAN
- desc: fm region japan
+  id: LANG_FM_JAPAN
+  desc: fm region japan
   user: core
- <source>
+  <source>
     *: none
     radio: "Japan"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Japan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Japan"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_FM_KOREA
- desc: fm region korea
+  id: LANG_FM_KOREA
+  desc: fm region korea
   user: core
- <source>
+  <source>
     *: none
     radio: "Korea"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     radio: "Korea"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     radio: "Korea"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_FORMAT
- desc: audio format item in recording menu
- user: core
- <source>
+  id: LANG_RECORDING_FORMAT
+  desc: audio format item in recording menu
+  user: core
+  <source>
     *: none
     recording: "Format"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Format"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Format"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AFMT_MPA_L3
- desc: audio format description
- user: core
- <source>
+  id: LANG_AFMT_MPA_L3
+  desc: audio format description
+  user: core
+  <source>
     *: none
     recording: "MPEG Layer 3"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "MPEG Layer 3"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "MPEG Layer 3"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AFMT_PCM_WAV
- desc: audio format description
- user: core
- <source>
+  id: LANG_AFMT_PCM_WAV
+  desc: audio format description
+  user: core
+  <source>
     *: none
     recording: "PCM Wave"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "PCM Wave"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "PCM Wave"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AFMT_WAVPACK
- desc: audio format description
- user: core
- <source>
+  id: LANG_AFMT_WAVPACK
+  desc: audio format description
+  user: core
+  <source>
     *: none
     recording_swcodec: "WavPack"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording_swcodec: "WavPack"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording_swcodec: "WavPack"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_AFMT_AIFF
- desc: audio format description
- user: core
- <source>
+  id: LANG_AFMT_AIFF
+  desc: audio format description
+  user: core
+  <source>
     *: none
     recording: "AIFF"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "AIFF"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "AIFF"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_ENCODER_SETTINGS
- desc: encoder settings
- user: core
- <source>
+  id: LANG_ENCODER_SETTINGS
+  desc: encoder settings
+  user: core
+  <source>
     *: none
     recording: "Encoder Settings"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Encoder Tagpuan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Encoder Settings"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_BITRATE
- desc: bits-kilobits per unit time
- user: core
- <source>
+  id: LANG_BITRATE
+  desc: bits-kilobits per unit time
+  user: core
+  <source>
     *: none
     recording_swcodec: "Bitrate"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording_swcodec: "Bitrate"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording_swcodec: "Bitrate"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_NO_SETTINGS
- desc: when something has settings in a certain context
- user: core
- <source>
+  id: LANG_NO_SETTINGS
+  desc: when something has settings in a certain context
+  user: core
+  <source>
     *: none
     recording: "(No Settings)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "(Wala Tagpuan)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "No settings available"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_QUALITY
- desc: in the recording settings
- user: core
- <source>
+  id: LANG_RECORDING_QUALITY
+  desc: in the recording settings
+  user: core
+  <source>
     *: none
     recording_hwcodec: "Quality"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording_hwcodec: "Uri"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording_hwcodec: "Quality"
- </voice>
+  </voice>
 </phrase>
 <phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
- user: core
- <source>
+  user: core
+  <source>
     *: none
-    recording,play_frequency: "Frequency"
- </source>
- <dest>
+    play_frequency,recording: "Frequency"
+  </source>
+  <dest>
     *: none
-    recording,play_frequency: "Dalas"
- </dest>
- <voice>
+    play_frequency,recording: "Dalas"
+  </dest>
+  <voice>
     *: none
-    recording,play_frequency: "Frequency"
- </voice>
+    play_frequency,recording: "Frequency"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SOURCE_FREQUENCY
- desc: when recording source frequency setting must follow source
- user: core
- <source>
+  id: LANG_SOURCE_FREQUENCY
+  desc: when recording source frequency setting must follow source
+  user: core
+  <source>
     *: none
     recording: "(Same As Source)"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "(Gaya ng puno)"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Same As Source"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_SOURCE
- desc: in the recording settings
- user: core
- <source>
+  id: LANG_RECORDING_SOURCE
+  desc: in the recording settings
+  user: core
+  <source>
     *: none
     recording: "Source"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Puno"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Source"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_SRC_MIC
- desc: in the recording settings
- user: core
- <source>
+  id: LANG_RECORDING_SRC_MIC
+  desc: in the recording settings
+  user: core
+  <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
- </source>
- <dest>
+    recording: "Microphone"
+  </source>
+  <dest>
     *: none
-    recording: "Mikropono"
     iriverh100,iriverh120,iriverh300: "Panloob mikropono"
- </dest>
- <voice>
+    recording: "Mikropono"
+  </dest>
+  <voice>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
- </voice>
+    recording: "Microphone"
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_SRC_DIGITAL
- desc: in the recording settings
- user: core
- <source>
+  id: LANG_RECORDING_SRC_DIGITAL
+  desc: in the recording settings
+  user: core
+  <source>
     *: none
     recording: "Digital"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Digital"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Digital"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_LINE_IN
- desc: in the recording settings
- user: core
- <source>
+  id: LANG_LINE_IN
+  desc: in the recording settings
+  user: core
+  <source>
     *: none
     recording: "Line In"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Sa Guhit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Line In"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORDING_EDITABLE
- desc: Editable recordings setting
- user: core
- <source>
+  id: LANG_RECORDING_EDITABLE
+  desc: Editable recordings setting
+  user: core
+  <source>
     *: none
     recording_hwcodec: "Independent Frames"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording_hwcodec: "May kasarinlan o pagsasarili kuwardo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording_hwcodec: "Independent Frames"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORD_TIMESPLIT
- desc: Record split menu
- user: core
- <source>
+  id: LANG_RECORD_TIMESPLIT
+  desc: Record split menu
+  user: core
+  <source>
     *: none
     recording: "File Split Options"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Maghati-hati salansan karapatang makapilii"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "File Split Options"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SPLIT_MEASURE
- desc: in record timesplit options
+  id: LANG_SPLIT_MEASURE
+  desc: in record timesplit options
   user: core
- <source>
+  <source>
     *: none
     recording: "Split Measure"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Maghati-hati takalan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Split Measure"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SPLIT_TYPE
- desc: in record timesplit options
+  id: LANG_SPLIT_TYPE
+  desc: in record timesplit options
   user: core
- <source>
+  <source>
     *: none
     recording: "What to do when Splitting"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Ano gawin kung hatiin"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Ano gawin kung hatiin"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_START_NEW_FILE
- desc: in record timesplit options
- user: core
- <source>
+  id: LANG_START_NEW_FILE
+  desc: in record timesplit options
+  user: core
+  <source>
     *: none
     recording: "Start new file"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Magumpisa bago salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Start new file"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_STOP_RECORDING
- desc: in record timesplit options
- user: core
- <source>
+  id: LANG_STOP_RECORDING
+  desc: in record timesplit options
+  user: core
+  <source>
     *: none
     recording: "Stop recording"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Paghintuin rekord"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Stop recording"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SPLIT_TIME
- desc: in record timesplit options
+  id: LANG_SPLIT_TIME
+  desc: in record timesplit options
   user: core
- <source>
+  <source>
     *: none
     recording: "Split Time"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Maghati-hati oras"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Split Time"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SPLIT_SIZE
- desc: in record timesplit options
+  id: LANG_SPLIT_SIZE
+  desc: in record timesplit options
   user: core
- <source>
+  <source>
     *: none
     recording: "Split Filesize"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Maghati-hati dami salansan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Split Filesize"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORD_PRERECORD_TIME
- desc: in recording settings_menu
- user: core
- <source>
+  id: LANG_RECORD_PRERECORD_TIME
+  desc: in recording settings_menu
+  user: core
+  <source>
     *: none
     recording: "Prerecord Time"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Prerecord Time"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Pre-Record time"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORD_DIRECTORY
- desc: in recording settings_menu
- user: core
- <source>
+  id: LANG_RECORD_DIRECTORY
+  desc: in recording settings_menu
+  user: core
+  <source>
     *: none
     recording: "Directory"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Listahan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Listahan"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_SET_AS_REC_DIR
- desc: used in the onplay menu to set a recording dir
- user: core
- <source>
+  id: LANG_SET_AS_REC_DIR
+  desc: used in the onplay menu to set a recording dir
+  user: core
+  <source>
     *: none
     recording: "Set As Recording Directory"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Ilagay Listahan ng rekording"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Ilagay Listahan ng rekording"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CLEAR_REC_DIR
- desc:
- user: core
- <source>
+  id: LANG_CLEAR_REC_DIR
+  desc:
+  user: core
+  <source>
     *: none
     recording: "Clear Recording Directory"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Alisin Listahan ng rekording"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Alisin Listahan ng rekording"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REC_DIR_NOT_WRITABLE
- desc:
- user: core
- <source>
+  id: LANG_REC_DIR_NOT_WRITABLE
+  desc:
+  user: core
+  <source>
     *: none
     recording: "Can't write to recording directory"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Di maaari sulatan sa listahan ng rekording"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Can't write to recording directory"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_CLIP_LIGHT
- desc: in record settings menu.
- user: core
- <source>
+  id: LANG_CLIP_LIGHT
+  desc: in record settings menu.
+  user: core
+  <source>
     *: none
     recording: "Clipping Light"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Klip ilaw"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Clipping Light"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_MAIN_UNIT
- desc: in record settings menu.
- user: core
- <source>
+  id: LANG_MAIN_UNIT
+  desc: in record settings menu.
+  user: core
+  <source>
     *: none
     remote: "Main Unit Only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote: "Panguna Lamang yunit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote: "Main unit only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REMOTE_UNIT
- desc: in record settings menu.
- user: core
- <source>
+  id: LANG_REMOTE_UNIT
+  desc: in record settings menu.
+  user: core
+  <source>
     *: none
     remote: "Remote Unit Only"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote: "Panguna Remote yunit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote: "Remote unit only"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_REMOTE_MAIN
- desc: in record settings menu.
- user: core
- <source>
+  id: LANG_REMOTE_MAIN
+  desc: in record settings menu.
+  user: core
+  <source>
     *: none
     remote: "Main and Remote Unit"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     remote: "Paguna at Remote yunit"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     remote: "Main and remote unit"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORD_TRIGGER
- desc: in recording settings_menu
- user: core
- <source>
+  id: LANG_RECORD_TRIGGER
+  desc: in recording settings_menu
+  user: core
+  <source>
     *: none
     recording: "Trigger"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Trigger"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Trigger"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORD_TRIG_NOREARM
- desc: in recording settings_menu
- user: core
- <source>
+  id: LANG_RECORD_TRIG_NOREARM
+  desc: in recording settings_menu
+  user: core
+  <source>
     *: none
     recording: "Once"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Minsan"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Once"
- </voice>
+  </voice>
 </phrase>
 <phrase>
- id: LANG_RECORD_TRIGGER_TYPE
- desc: in recording trigger menu
+  id: LANG_RECORD_TRIGGER_TYPE
+  desc: in recording trigger menu
   user: core
- <source>
+  <source>
     *: none
     recording: "Trigtype"
- </source>
- <dest>
+  </source>
+  <dest>
     *: none
     recording: "Trigtypo"
- </dest>
- <voice>
+  </dest>
+  <voice>
     *: none
     recording: "Trigger type"
- </voice>
+  </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_FILETYPE
@@ -6089,16 +5937,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Mamatnugot paraan: %s %s"
+    *: "Mamatnugot paraan: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -6194,15 +6039,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass araw ng katapusan"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass araw ng katapusan"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass araw ng katapusan"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass araw ng katapusan"
   </voice>
 </phrase>
 <phrase>
@@ -6536,16 +6381,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -7115,23 +6957,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "Puno disk. Magpatuloy Pindutin OFF."
-    iriverh100,iriverh120,iriverh300: "Puno disk. Magpatuloy Pindutin STOP."
     iaudiom5,iaudiox5: "Puno disk. Magpatuloy Pindutin POWER."
-    sansae200*,sansac200*,vibe500: "Puno disk. Magpatuloy Pindutin PREV."
+    iriverh100,iriverh120,iriverh300: "Puno disk. Magpatuloy Pindutin STOP."
+    recording: "Puno disk. Magpatuloy Pindutin OFF."
     samsungyh*: "Puno disk. Magpatuloy Pindutin LEFT."
+    sansac200*,sansae200*,vibe500: "Puno disk. Magpatuloy Pindutin PREV."
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7477,23 +7319,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF sa agas"
-    iriverh100,iriverh120,iriverh300: "STOP sa agas"
-    ipod*: "PLAY/PAUSE sa agas"
-    iaudiox5,iaudiom5: "Long PLAY sa agas"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV sa agas"
-    gigabeats: "BACK sa agas"
     gigabeatfx: "POWER sa agas"
-    sansafuzeplus: "BACK sa agas"
+    gigabeats,sansafuzeplus: "BACK sa agas"
+    iaudiom5,iaudiox5: "Long PLAY sa agas"
+    ipod*: "PLAY/PAUSE sa agas"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV sa agas"
+    iriverh100,iriverh120,iriverh300: "STOP sa agas"
   </dest>
   <voice>
     *: ""
@@ -7547,13 +7387,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -7727,16 +7567,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Tubo"
+    *: "Tubo"
   </dest>
   <voice>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </voice>
 </phrase>
 <phrase>
@@ -7980,16 +7817,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Paraan:"
+    *: "Paraan:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9174,24 +9008,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1:"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
-    xduoox3: "MSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
+    xduoox3: "MSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D Isa"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    xduoox3: "micro S D 2"
     archosondio*: "M M C"
+    multivolume: "H D Isa"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -9595,7 +9429,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -9793,15 +9627,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Pagtatluhin araw ng katapusan"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Pagtatluhin araw ng katapusan"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Pagtatluhin araw ng katapusan"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Pagtatluhin araw ng katapusan"
   </voice>
 </phrase>
 <phrase>
@@ -10528,16 +10362,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </dest>
   <voice>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </voice>
 </phrase>
 <phrase>
@@ -10629,16 +10460,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Ulitin Keyclick"
+    *: "Ulitin Keyclick"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ulitin Keyclick"
+    *: "Ulitin Keyclick"
   </voice>
 </phrase>
 <phrase>
@@ -11169,16 +10997,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Pahabain ang oras"
+    *: "Pahabain ang oras"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pahabain ang oras"
+    *: "Pahabain ang oras"
   </voice>
 </phrase>
 <phrase>
@@ -11186,16 +11011,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Tulin"
+    *: "Tulin"
   </dest>
   <voice>
-    *: none
-    swcodec: "Tulin"
+    *: "Tulin"
   </voice>
 </phrase>
 <phrase>
@@ -11203,16 +11025,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Scroll bar position"
+    *: "Scroll bar position"
   </voice>
 </phrase>
 <phrase>
@@ -11336,16 +11155,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Scroll bar width"
+    *: "Scroll bar width"
   </voice>
 </phrase>
 <phrase>
@@ -11471,16 +11287,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Release Oras"
+    *: "Release Oras"
   </dest>
   <voice>
-    *: none
-    swcodec: "Release Oras"
+    *: "Release Oras"
   </voice>
 </phrase>
 <phrase>
@@ -11522,16 +11335,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Pasukan"
+    *: "Pasukan"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pasukan"
+    *: "Pasukan"
   </voice>
 </phrase>
 <phrase>
@@ -11556,16 +11366,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Kabuuan Makakuha Ng"
+    *: "Kabuuan Makakuha Ng"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kabuuan Makakuha Ng"
+    *: "Kabuuan Makakuha Ng"
   </voice>
 </phrase>
 <phrase>
@@ -11573,16 +11380,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Base Balat"
+    *: "Base Balat"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Base Balat"
+    *: "Base Balat"
   </voice>
 </phrase>
 <phrase>
@@ -11658,16 +11462,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </voice>
 </phrase>
 <phrase>
@@ -11675,16 +11476,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Awto"
+    *: "Awto"
   </dest>
   <voice>
-    *: none
-    swcodec: "Awto"
+    *: "Awto"
   </voice>
 </phrase>
 <phrase>
@@ -11720,16 +11518,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </voice>
 </phrase>
 <phrase>
@@ -11751,16 +11546,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Proporsyon"
+    *: "Proporsyon"
   </dest>
   <voice>
-    *: none
-    swcodec: "Proporsyon"
+    *: "Proporsyon"
   </voice>
 </phrase>
 <phrase>
@@ -11802,16 +11594,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </voice>
 </phrase>
 <phrase>
@@ -11836,16 +11625,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Remote Base sa Balat"
+    *: "Remote Base sa Balat"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Remote Base sa Balat"
+    *: "Remote Base sa Balat"
   </voice>
 </phrase>
 <phrase>
@@ -11972,16 +11758,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Rewind Bago Resume"
+    *: "Rewind Bago Resume"
   </dest>
   <voice>
-    *: none
-    swcodec: "Rewind bago resume"
+    *: "Rewind bago resume"
   </voice>
 </phrase>
 <phrase>
@@ -12020,16 +11803,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 to 1"
+    *: "10 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -12133,16 +11913,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 to 1"
+    *: "2 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -12218,16 +11995,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Limitasyon"
+    *: "Limitasyon"
   </dest>
   <voice>
-    *: none
-    swcodec: "Limitasyon"
+    *: "Limitasyon"
   </voice>
 </phrase>
 <phrase>
@@ -12330,16 +12104,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 to 1"
+    *: "6 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -12392,16 +12163,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </voice>
 </phrase>
 <phrase>
@@ -12457,16 +12225,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 to 1"
+    *: "4 to 1"
   </voice>
 </phrase>
 <phrase>
@@ -12533,7 +12298,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"

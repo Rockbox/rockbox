@@ -247,18 +247,18 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Igen"
-    cowond2*: "MENU = Igen"
-    iriverh100,iriverh120,iriverh300: "NAVI = Igen"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Igen"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU = Igen"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Igen"
+    iriverh100,iriverh120,iriverh300: "NAVI = Igen"
     vibe500: "OK = Igen"
   </dest>
   <voice>
@@ -797,16 +797,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </dest>
   <voice>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -814,33 +811,27 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Közvetlen módosítás"
+    *: "Közvetlen módosítás"
   </dest>
   <voice>
-    *: none
-    swcodec: "Direct gain"
+    *: "Direct gain"
   </voice>
 </phrase>
 <phrase>
   id: LANG_CROSSFEED_CROSS_GAIN
   desc: in crossfeed settings
   user: core
-  <source>  
-    *: none
-    swcodec: "Cross Gain"
+  <source>
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Módosítás mértéke"
+    *: "Módosítás mértéke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cross gain"
+    *: "Cross gain"
   </voice>
 </phrase>
 <phrase>
@@ -848,16 +839,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "Magas frekvencia enyhítés"
+    *: "Magas frekvencia enyhítés"
   </dest>
   <voice>
-    *: none
-    swcodec: "High-frequency attenuation"
+    *: "High-frequency attenuation"
   </voice>
 </phrase>
 <phrase>
@@ -865,16 +853,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Magas frekvencia levágás"
+    *: "Magas frekvencia levágás"
   </dest>
   <voice>
-    *: none
-    swcodec: "High-frequency cutoff"
+    *: "High-frequency cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -882,16 +867,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </dest>
   <voice>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </voice>
 </phrase>
 <phrase>
@@ -899,16 +881,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "EQ bekapcsolása"
+    *: "EQ bekapcsolása"
   </dest>
   <voice>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </voice>
 </phrase>
 <phrase>
@@ -916,16 +895,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "EQ beállítás"
+    *: "EQ beállítás"
   </dest>
   <voice>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </voice>
 </phrase>
 <phrase>
@@ -933,16 +909,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pre-cut"
+    *: "Pre-cut"
   </voice>
 </phrase>
 <phrase>
@@ -950,16 +923,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Alap EQ beállítások"
+    *: "Alap EQ beállítások"
   </dest>
   <voice>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </voice>
 </phrase>
 <phrase>
@@ -967,16 +937,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Haladó EQ beállítások"
+    *: "Haladó EQ beállítások"
   </dest>
   <voice>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </voice>
 </phrase>
 <phrase>
@@ -984,16 +951,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "EQ beállítások elmentése"
+    *: "EQ beállítások elmentése"
   </dest>
   <voice>
-    *: none
-    swcodec: "Save equalizer preset"
+    *: "Save equalizer preset"
   </voice>
 </phrase>
 <phrase>
@@ -1001,16 +965,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "Elmentett EQ beállítások"
+    *: "Elmentett EQ beállítások"
   </dest>
   <voice>
-    *: none
-    swcodec: "Browse equalizer presets"
+    *: "Browse equalizer presets"
   </voice>
 </phrase>
 <phrase>
@@ -1018,16 +979,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Mód: %s"
+    *: "Mód: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1035,16 +993,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%d Hz sáv módosítás"
+    *: "%d Hz sáv módosítás"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1052,16 +1007,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Alsó perem szűrő"
+    *: "Alsó perem szűrő"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1069,16 +1021,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "Csúcsszűrő %d"
+    *: "Csúcsszűrő %d"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1086,16 +1035,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Felső perem szűrő"
+    *: "Felső perem szűrő"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1103,16 +1049,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Határfrekvencia"
+    *: "Határfrekvencia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -1120,16 +1063,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Középfrekvencia"
+    *: "Középfrekvencia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Center frequency"
+    *: "Center frequency"
   </voice>
 </phrase>
 <phrase>
@@ -1137,16 +1077,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1154,16 +1091,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </dest>
   <voice>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -1706,16 +1640,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Túlvezérlés megelőzése"
+    *: "Túlvezérlés megelőzése"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prevent clipping"
+    *: "Prevent clipping"
   </voice>
 </phrase>
 <phrase>
@@ -1793,16 +1724,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "Pittyegés erőssége"
+    *: "Pittyegés erőssége"
   </dest>
   <voice>
-    *: none
-    swcodec: "Beep volume"
+    *: "Beep volume"
   </voice>
 </phrase>
 <phrase>
@@ -1810,16 +1738,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "Halk"
+    *: "Halk"
   </dest>
   <voice>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </voice>
 </phrase>
 <phrase>
@@ -1827,16 +1752,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "Közepes"
+    *: "Közepes"
   </dest>
   <voice>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </voice>
 </phrase>
 <phrase>
@@ -1844,16 +1766,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "Hangos"
+    *: "Hangos"
   </dest>
   <voice>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </voice>
 </phrase>
 <phrase>
@@ -2210,19 +2129,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "Készítem az adatbázist... %d-t találtam (OFF - vissza)"
-    iriverh100,iriverh120,iriverh300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
-    ipod*: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Készítem az adatbázist... %d-t találtam (BAL - vissza)"
     gogearsa9200: "Készítem az adatbázist... %d-t találtam (REW - vissza)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Készítem az adatbázist... %d-t találtam (PREV - vissza)"
+    iriverh100,iriverh120,iriverh300: "Készítem az adatbázist... %d-t találtam (STOP - vissza)"
   </dest>
   <voice>
     *: "entries found for database"
@@ -2404,16 +2321,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Betűtípus választás"
+    *: "Betűtípus választás"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Browse Fonts"
+    *: "Browse Fonts"
   </voice>
 </phrase>
 <phrase>
@@ -2532,11 +2446,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*:"Világítás beúsztatása"
+    backlight_fade*: "Világítás beúsztatása"
   </dest>
   <voice>
     *: none
-    backlight_fade*:"Backlight fade in"
+    backlight_fade*: "Backlight fade in"
   </voice>
 </phrase>
 <phrase>
@@ -2549,11 +2463,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*:"Világítás kiúsztatása"
+    backlight_fade*: "Világítás kiúsztatása"
   </dest>
   <voice>
     *: none
-    backlight_fade*:"Backlight fade out"
+    backlight_fade*: "Backlight fade out"
   </voice>
 </phrase>
 <phrase>
@@ -2674,16 +2588,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Fejjel lefelé"
+    *: "Fejjel lefelé"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </voice>
 </phrase>
 <phrase>
@@ -2691,16 +2602,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Sor kiválasztása"
+    *: "Sor kiválasztása"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </voice>
 </phrase>
 <phrase>
@@ -2708,16 +2616,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Mutató"
+    *: "Mutató"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </voice>
 </phrase>
 <phrase>
@@ -2725,16 +2630,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Teljes sor kiemelése"
+    *: "Teljes sor kiemelése"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Inverse Bar"
+    *: "Inverse Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3024,16 +2926,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Gördítés képernyőn túl"
+    *: "Gördítés képernyőn túl"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </voice>
 </phrase>
 <phrase>
@@ -3041,16 +2940,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Képernyőgördítés egysége"
+    *: "Képernyőgördítés egysége"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </voice>
 </phrase>
 <phrase>
@@ -3106,16 +3002,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Állapot-/Gördítősáv"
+    *: "Állapot-/Gördítősáv"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Status- and Scrollbar"
+    *: "Status- and Scrollbar"
   </voice>
 </phrase>
 <phrase>
@@ -3123,16 +3016,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Gördítő sáv"
+    *: "Gördítő sáv"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3140,16 +3030,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Állapotjelző"
+    *: "Állapotjelző"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </voice>
 </phrase>
 <phrase>
@@ -3174,16 +3061,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hangerő kijelzés"
+    *: "Hangerő kijelzés"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </voice>
 </phrase>
 <phrase>
@@ -3191,16 +3075,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Akku kijelzés"
+    *: "Akku kijelzés"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </voice>
 </phrase>
 <phrase>
@@ -3208,16 +3089,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Grafikusan"
+    *: "Grafikusan"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </voice>
 </phrase>
 <phrase>
@@ -3225,16 +3103,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Számmal"
+    *: "Számmal"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </voice>
 </phrase>
 <phrase>
@@ -3454,16 +3329,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Héber (ISO-8859-8)"
+    *: "Héber (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hebrew"
+    *: "Hebrew"
   </voice>
 </phrase>
 <phrase>
@@ -3485,16 +3357,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Thai"
+    *: "Thai"
   </voice>
 </phrase>
 <phrase>
@@ -3502,16 +3371,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arab (CP1256)"
+    *: "Arab (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arabic"
+    *: "Arabic"
   </voice>
 </phrase>
 <phrase>
@@ -3547,16 +3413,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Japán (SJIS)"
+    *: "Japán (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </voice>
 </phrase>
 <phrase>
@@ -3564,16 +3427,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Egyszerűsített kínai (GB2312)"
+    *: "Egyszerűsített kínai (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Simplified Chinese"
+    *: "Simplified Chinese"
   </voice>
 </phrase>
 <phrase>
@@ -3581,16 +3441,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Koreai (KSX1001)"
+    *: "Koreai (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Korean"
+    *: "Korean"
   </voice>
 </phrase>
 <phrase>
@@ -3598,16 +3455,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hagyományos kínai (BIG5)"
+    *: "Hagyományos kínai (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Traditional Chinese"
+    *: "Traditional Chinese"
   </voice>
 </phrase>
 <phrase>
@@ -3631,17 +3485,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Gomb világításának hossza"
-    sansafuze*,sansae200*: "Kerék világításának hossza"
+    sansae200*,sansafuze*: "Kerék világításának hossza"
   </dest>
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </voice>
 </phrase>
 <phrase>
@@ -3912,23 +3766,23 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Beállít"
-    mrobe500: "SZÍV = Beállít"
-    iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Beállít"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Beállít"
     gogearsa9200,samsungyh*: "PLAY = Beállít"
-    vibe500: "OK = Beállít"
+    iriverh100,iriverh120,iriverh300: "NAVI = Beállít"
     mpiohd300: "ENTER = Beállít"
+    mrobe500: "SZÍV = Beállít"
+    rtc: "ON = Beállít"
+    vibe500: "OK = Beállít"
   </dest>
   <voice>
     *: none
@@ -3940,35 +3794,32 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "KI = mégsem"
-    mrobe500: "POWER = mégsem"
-    iriverh100,iriverh120,iriverh300: "STOP = mégsem"
-    ipod*,sansac200*,mpiohd300: "MENU = mégsem"
-    iaudiox5,iaudiom5: "RECORD = mégsem"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = mégsem"
-    gigabeatfx: "POWER = mégsem"
-    sansafuzeplus: "BACK = mégsem"
-    mrobe100: "DISPLAY = mégsem"
+    gigabeatfx,mrobe500: "POWER = mégsem"
     gigabeats: "VISSZA = mégsem"
     gogearsa9200: "BAL = mégsem"
-    vibe500: "C = mégsem"
+    iaudiom5,iaudiox5: "RECORD = mégsem"
+    ipod*,mpiohd300,sansac200*: "MENU = mégsem"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = mégsem"
+    iriverh100,iriverh120,iriverh300: "STOP = mégsem"
+    mrobe100: "DISPLAY = mégsem"
+    rtc: "KI = mégsem"
     samsungyh*: "REW = mégsem"
+    sansafuzeplus: "BACK = mégsem"
+    vibe500: "C = mégsem"
   </dest>
   <voice>
     *: none
@@ -4457,22 +4308,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=OK KI=Mégsem"
+    gigabeats: "SELECT=OK POWER=Mégsem"
     ipod*: "SELECT=OK MENU=Mégsem"
     iriverh10,iriverh10_5gb: "SELECT=OK PREV=Mégsem"
-    gigabeats: "SELECT=OK POWER=Mégsem"
-    vibe500: "OK=OK C=Mégsem"
     mpiohd300: "ENTER=OK MENU=Mégsem"
     sansafuzeplus: "SELECT=OK  BACK=Mégsem"
+    vibe500: "OK=OK C=Mégsem"
   </dest>
   <voice>
     *: none
@@ -5375,8 +5226,7 @@
     radio: "US / Canada"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Észak-Amerika"
+    *: "Észak-Amerika"
   </dest>
   <voice>
     *: none
@@ -5576,15 +5426,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "Mintavétel"
+    play_frequency,recording: "Mintavétel"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -5627,18 +5477,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "Mikrofon"
     iriverh100,iriverh120,iriverh300: "Belső mikrofon"
+    recording: "Mikrofon"
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -6516,13 +6366,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Akku: %d%% %d óra %d perc"
+    ipodmini1g,ipodmini2g,iriverh10: "Akku: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Akku: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -6579,23 +6429,23 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro Secure Digital card:"
-    xduoox3: "micro Secure Digital card 2:"
     archosondio*: "Multimedia card"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro Secure Digital card:"
+    xduoox3: "micro Secure Digital card 2:"
   </voice>
 </phrase>
 <phrase>
@@ -7911,23 +7761,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "A merevlemez tele van. Folytatáshoz nyomj OFF-ot."
-    iriverh100,iriverh120,iriverh300: "A merevlemez tele van. Folytatáshoz nyomj STOP-ot."
     iaudiom5,iaudiox5: "A merevlemez tele van. Folytatáshoz nyomd meg a POWER gombot."
-    sansae200*,sansac200*,vibe500: "A merevlemez tele van. Folytatáshoz nyomd meg a PREV gombot."
+    iriverh100,iriverh120,iriverh300: "A merevlemez tele van. Folytatáshoz nyomj STOP-ot."
+    recording: "A merevlemez tele van. Folytatáshoz nyomj OFF-ot."
     samsungyh*: "A merevlemez tele van. Folytatáshoz nyomd meg a LEFT gombot."
+    sansac200*,sansae200*,vibe500: "A merevlemez tele van. Folytatáshoz nyomd meg a PREV gombot."
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8015,22 +7865,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF - megszakít"
-    iriverh100,iriverh120,iriverh300: "STOP - megszakít"
-    ipod*: "PLAY/PAUSE - megszakít"
-    iaudiox5,iaudiom5: "PLAY hosszan - megszakít"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV - megszakít"
-    gigabeats: "VISSZA - megszakít"
     gigabeatfx: "POWER - megszakít"
+    gigabeats: "VISSZA - megszakít"
+    iaudiom5,iaudiox5: "PLAY hosszan - megszakít"
+    ipod*: "PLAY/PAUSE - megszakít"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV - megszakít"
+    iriverh100,iriverh120,iriverh300: "STOP - megszakít"
     sansafuzeplus: "BACK - megszakít"
   </dest>
   <voice>
@@ -9582,7 +9431,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "cuesheet"
@@ -9624,16 +9473,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Szerkesztés: %s %s"
+    *: "Szerkesztés: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9641,16 +9487,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Határfrekvencia"
+    *: "Határfrekvencia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -9658,16 +9501,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Módosítás"
+    *: "Módosítás"
   </dest>
   <voice>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </voice>
 </phrase>
 <phrase>
@@ -9675,16 +9515,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Mód:"
+    *: "Mód:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10132,11 +9969,11 @@
     *: none
     serial_port: "19200"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "19200"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "19200"
   </voice>
@@ -10195,15 +10032,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Alsó határfrekvencia"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Alsó határfrekvencia"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -10341,11 +10178,11 @@
     *: none
     serial_port: "Serial Bitrate"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Soros port szélessége"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Serial Bitrate"
   </voice>
@@ -10372,11 +10209,11 @@
     *: none
     serial_port: "9600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "9600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "9600"
   </voice>
@@ -10617,16 +10454,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Billentyűhangok"
+    *: "Billentyűhangok"
   </dest>
   <voice>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </voice>
 </phrase>
 <phrase>
@@ -10637,11 +10471,11 @@
     *: none
     serial_port: "38400"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "38400"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "38400"
   </voice>
@@ -10654,11 +10488,11 @@
     *: none
     serial_port: "57600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "57600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "57600"
   </voice>
@@ -10875,15 +10709,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Magas határfrekvencia"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Magas határfrekvencia"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </voice>
 </phrase>
 <phrase>
@@ -10981,16 +10815,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Billentyűhang ismétlés"
+    *: "Billentyűhang ismétlés"
   </dest>
   <voice>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </voice>
 </phrase>
 <phrase>
@@ -11018,11 +10849,11 @@
     *: none
     serial_port: "Auto"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Automatikus"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Automatic"
   </voice>
@@ -11156,16 +10987,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Gördítősáv pozíció"
+    *: "Gördítősáv pozíció"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Gördítősáv pozíció"
+    *: "Gördítősáv pozíció"
   </voice>
 </phrase>
 <phrase>
@@ -11306,16 +11134,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Gördítősáv szélesség"
+    *: "Gördítősáv szélesség"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Gördítősáv szélesség"
+    *: "Gördítősáv szélesség"
   </voice>
 </phrase>
 <phrase>
@@ -11351,16 +11176,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Időnyújtás"
+    *: "Időnyújtás"
   </dest>
   <voice>
-    *: none
-    swcodec: "Időnyújtás"
+    *: "Időnyújtás"
   </voice>
 </phrase>
 <phrase>
@@ -11368,16 +11190,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Határoló erősítő"
+    *: "Határoló erősítő"
   </dest>
   <voice>
-    *: none
-    swcodec: "Határoló erősítő"
+    *: "Határoló erősítő"
   </voice>
 </phrase>
 <phrase>
@@ -11430,21 +11249,18 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Sebesség"
+    *: "Sebesség"
   </dest>
   <voice>
-    *: none
-    swcodec: "Sebesség"
+    *: "Sebesség"
   </voice>
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
@@ -11461,16 +11277,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Maximum"
+    *: "Maximum"
   </dest>
   <voice>
-    *: none
-    swcodec: "Maximum"
+    *: "Maximum"
   </voice>
 </phrase>
 <phrase>
@@ -11495,16 +11308,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </dest>
   <voice>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </voice>
 </phrase>
 <phrase>
@@ -11560,16 +11370,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q érték"
+    *: "Q érték"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q érték"
+    *: "Q érték"
   </voice>
 </phrase>
 <phrase>
@@ -11591,16 +11398,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "Hallgatásteher Csökkentése"
+    *: "Hallgatásteher Csökkentése"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hallgatásteher Csökkentése"
+    *: "Hallgatásteher Csökkentése"
   </voice>
 </phrase>
 <phrase>
@@ -11622,16 +11426,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "Egyszerű (Meier)"
+    *: "Egyszerű (Meier)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Egyszerű"
+    *: "Egyszerű"
   </voice>
 </phrase>
 <phrase>
@@ -11701,16 +11502,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "Száraz / Nedves Keverés"
+    *: "Száraz / Nedves Keverés"
   </dest>
   <voice>
-    *: none
-    swcodec: "Száraz / Nedves Keverés"
+    *: "Száraz / Nedves Keverés"
   </voice>
 </phrase>
 <phrase>
@@ -11766,16 +11564,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </voice>
 </phrase>
 <phrase>
@@ -11797,16 +11592,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Küszöb"
+    *: "Küszöb"
   </dest>
   <voice>
-    *: none
-    swcodec: "Küszöb"
+    *: "Küszöb"
   </voice>
 </phrase>
 <phrase>
@@ -11831,16 +11623,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </voice>
 </phrase>
 <phrase>
@@ -11849,18 +11638,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "USB Mode"
-    ibassodx90: "USB Mode"
+    ibassodx50,ibassodx90: "USB Mode"
   </source>
   <dest>
     *: none
-    ibassodx50: "USB Mód"
-    ibassodx90: "USB Mód"
+    ibassodx50,ibassodx90: "USB Mód"
   </dest>
   <voice>
     *: none
-    ibassodx50: "USB Mód"
-    ibassodx90: "USB Mód"
+    ibassodx50,ibassodx90: "USB Mód"
   </voice>
 </phrase>
 <phrase>
@@ -11930,16 +11716,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Előretekerés Folytatás Előtt"
+    *: "Előretekerés Folytatás Előtt"
   </dest>
   <voice>
-    *: none
-    swcodec: "Előretekerés Folytatás Előtt"
+    *: "Előretekerés Folytatás Előtt"
   </voice>
 </phrase>
 <phrase>
@@ -11947,16 +11730,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Átmenet"
+    *: "Átmenet"
   </dest>
   <voice>
-    *: none
-    swcodec: "Átmenet"
+    *: "Átmenet"
   </voice>
 </phrase>
 <phrase>
@@ -12184,16 +11964,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Alap skin"
+    *: "Alap skin"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Alap skin"
+    *: "Alap skin"
   </voice>
 </phrase>
 <phrase>
@@ -12215,16 +11992,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -12232,16 +12006,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Nyereség"
+    *: "Nyereség"
   </dest>
   <voice>
-    *: none
-    swcodec: "Nyereség"
+    *: "Nyereség"
   </voice>
 </phrase>
 <phrase>
@@ -12249,16 +12020,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -12297,16 +12065,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </voice>
 </phrase>
 <phrase>
@@ -12331,16 +12096,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Működési idő"
+    *: "Működési idő"
   </dest>
   <voice>
-    *: none
-    swcodec: "Működési idő"
+    *: "Működési idő"
   </voice>
 </phrase>
 <phrase>
@@ -12509,16 +12271,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Hatásidő"
+    *: "Hatásidő"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hatásidő"
+    *: "Hatásidő"
   </voice>
 </phrase>
 <phrase>
@@ -12527,18 +12286,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Charge Only"
-    ibassodx90: "Charge Only"
+    ibassodx50,ibassodx90: "Charge Only"
   </source>
   <dest>
     *: none
-    ibassodx50: "Csak Töltés"
-    ibassodx90: "Csak Töltés"
+    ibassodx50,ibassodx90: "Csak Töltés"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Csak Töltés"
-    ibassodx90: "Csak Töltés"
+    ibassodx50,ibassodx90: "Csak Töltés"
   </voice>
 </phrase>
 <phrase>
@@ -12546,16 +12302,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Arány"
+    *: "Arány"
   </dest>
   <voice>
-    *: none
-    swcodec: "Arány"
+    *: "Arány"
   </voice>
 </phrase>
 <phrase>
@@ -12563,16 +12316,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "Egyéni"
+    *: "Egyéni"
   </dest>
   <voice>
-    *: none
-    swcodec: "Egyéni"
+    *: "Egyéni"
   </voice>
 </phrase>
 <phrase>
@@ -12598,18 +12348,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Freq Scaling Governor"
-    ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Freq Scaling Governor"
   </source>
   <dest>
     *: none
-    ibassodx50: "Frekvencia szabályzó"
-    ibassodx90: "Frekvencia szabályzó"
+    ibassodx50,ibassodx90: "Frekvencia szabályzó"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Frekvencia szabályzó"
-    ibassodx90: "Frekvencia szabályzó"
+    ibassodx50,ibassodx90: "Frekvencia szabályzó"
   </voice>
 </phrase>
 <phrase>
@@ -12665,16 +12412,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Enyhe küszöb"
+    *: "Enyhe küszöb"
   </dest>
   <voice>
-    *: none
-    swcodec: "Enyhe küszöb"
+    *: "Enyhe küszöb"
   </voice>
 </phrase>
 <phrase>
@@ -12848,16 +12592,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "CSAK OLDALT"
+    *: "CSAK OLDALT"
   </dest>
   <voice>
-    *: none
-    swcodec: "CSAK OLDALT"
+    *: "CSAK OLDALT"
   </voice>
 </phrase>
 <phrase>
@@ -12992,16 +12733,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </voice>
 </phrase>
 <phrase>
@@ -13023,16 +12761,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </voice>
 </phrase>
 <phrase>
@@ -13088,16 +12823,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Éles küszöb"
+    *: "Éles küszöb"
   </dest>
   <voice>
-    *: none
-    swcodec: "Éles küszöb"
+    *: "Éles küszöb"
   </voice>
 </phrase>
 <phrase>
@@ -13168,18 +12900,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Mass Storage"
-    ibassodx90: "Mass Storage"
+    ibassodx50,ibassodx90: "Mass Storage"
   </source>
   <dest>
     *: none
-    ibassodx50: "Cserélhető lemez mód"
-    ibassodx90: "Cserélhető lemez mód"
+    ibassodx50,ibassodx90: "Cserélhető lemez mód"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Cserélhető lemez mód"
-    ibassodx90: "Cserélhető lemez mód"
+    ibassodx50,ibassodx90: "Cserélhető lemez mód"
   </voice>
 </phrase>
 <phrase>
@@ -13202,18 +12931,15 @@
   user: core
   <source>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </source>
   <dest>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </dest>
   <voice>
     *: none
-    ibassodx50: "Android Debug Bridge"
-    ibassodx90: "Android Debug Bridge"
+    ibassodx50,ibassodx90: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -13221,16 +12947,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "Haas Térhatás"
+    *: "Haas Térhatás"
   </dest>
   <voice>
-    *: none
-    swcodec: "Haas Térhatás"
+    *: "Haas Térhatás"
   </voice>
 </phrase>
 <phrase>
@@ -13325,15 +13048,12 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "Mélyhangkiemelés"
+    *: "Mélyhangkiemelés"
   </dest>
   <voice>
-    *: none
-    swcodec: "Mélyhangkiemelés"
+    *: "Mélyhangkiemelés"
   </voice>
 </phrase>

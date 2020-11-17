@@ -812,16 +812,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Krížový prenos (Crossfeed)"
+    *: "Krížový prenos (Crossfeed)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Krížový Prenos zátvorka Crossfeed koniec zátvorky"
+    *: "Krížový Prenos zátvorka Crossfeed koniec zátvorky"
   </voice>
 </phrase>
 <phrase>
@@ -829,16 +826,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Zosilnenie Priameho Sygnálu"
+    *: "Zosilnenie Priameho Sygnálu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zosilnenie Priameho Sygnálu"
+    *: "Zosilnenie Priameho Sygnálu"
   </voice>
 </phrase>
 <phrase>
@@ -846,16 +840,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Zosilnenie Prenášaného Sygnálu"
+    *: "Zosilnenie Prenášaného Sygnálu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zosilnenie Prenášaného Sygnálu"
+    *: "Zosilnenie Prenášaného Sygnálu"
   </voice>
 </phrase>
 <phrase>
@@ -863,16 +854,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "Tlmenie Vysokých Frekvencií"
+    *: "Tlmenie Vysokých Frekvencií"
   </dest>
   <voice>
-    *: none
-    swcodec: "Tlmenie Vysokých Frekvencií"
+    *: "Tlmenie Vysokých Frekvencií"
   </voice>
 </phrase>
 <phrase>
@@ -880,16 +868,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Hranica Tlmenia Vysokých Frekvencií"
+    *: "Hranica Tlmenia Vysokých Frekvencií"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hranica tlmenia Vysokých Frekvencií"
+    *: "Hranica tlmenia Vysokých Frekvencií"
   </voice>
 </phrase>
 <phrase>
@@ -897,16 +882,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "Ekvalizér"
+    *: "Ekvalizér"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ekvalizér"
+    *: "Ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -914,16 +896,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Zapnúť EKV"
+    *: "Zapnúť EKV"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zapnúť Ekvalizér"
+    *: "Zapnúť Ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -931,16 +910,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Grafický EKV"
+    *: "Grafický EKV"
   </dest>
   <voice>
-    *: none
-    swcodec: "Grafický Ekvalizér"
+    *: "Grafický Ekvalizér"
   </voice>
 </phrase>
 <phrase>
@@ -948,16 +924,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "Celkové Zosilnenie"
+    *: "Celkové Zosilnenie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Celkové Zosilnenie"
+    *: "Celkové Zosilnenie"
   </voice>
 </phrase>
 <phrase>
@@ -965,16 +938,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Jednoduché Nastavenie EKV"
+    *: "Jednoduché Nastavenie EKV"
   </dest>
   <voice>
-    *: none
-    swcodec: "Jednoduché Nastavenie Ekvalizéra"
+    *: "Jednoduché Nastavenie Ekvalizéra"
   </voice>
 </phrase>
 <phrase>
@@ -982,16 +952,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Pokročilé Nastavenie EKV"
+    *: "Pokročilé Nastavenie EKV"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pokročilé nastavenie ekvalizéra"
+    *: "Pokročilé nastavenie ekvalizéra"
   </voice>
 </phrase>
 <phrase>
@@ -999,16 +966,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "Uložiť Ako Predvoľbu"
+    *: "Uložiť Ako Predvoľbu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Uložiť ako predvoľbu"
+    *: "Uložiť ako predvoľbu"
   </voice>
 </phrase>
 <phrase>
@@ -1016,16 +980,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "Prehľadávať Predvoľby EKV"
+    *: "Prehľadávať Predvoľby EKV"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prehľadávať predvoľby ekvalizéra"
+    *: "Prehľadávať predvoľby ekvalizéra"
   </voice>
 </phrase>
 <phrase>
@@ -1033,16 +994,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Upraviť Režim: %s"
+    *: "Upraviť Režim: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1050,16 +1008,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%d Hz Zosilnenie Pásma"
+    *: "%d Hz Zosilnenie Pásma"
   </dest>
   <voice>
-    *: none
-    swcodec: "hertz zosilnenie pásma"
+    *: "hertz zosilnenie pásma"
   </voice>
 </phrase>
 <phrase>
@@ -1067,16 +1022,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Filter Dolného Prahu"
+    *: "Filter Dolného Prahu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filter dolného prahu"
+    *: "Filter dolného prahu"
   </voice>
 </phrase>
 <phrase>
@@ -1084,16 +1036,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "Filter Pásma %d"
+    *: "Filter Pásma %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filter Pásma"
+    *: "Filter Pásma"
   </voice>
 </phrase>
 <phrase>
@@ -1101,16 +1050,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Filter Horného Prahu"
+    *: "Filter Horného Prahu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filter horného prahu"
+    *: "Filter horného prahu"
   </voice>
 </phrase>
 <phrase>
@@ -1118,16 +1064,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Hraničná Frekvencia"
+    *: "Hraničná Frekvencia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Hraničná frekvencia"
+    *: "Hraničná frekvencia"
   </voice>
 </phrase>
 <phrase>
@@ -1135,16 +1078,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Stredová Frekvencia"
+    *: "Stredová Frekvencia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Stredová frekvencia"
+    *: "Stredová frekvencia"
   </voice>
 </phrase>
 <phrase>
@@ -1152,16 +1092,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1169,16 +1106,13 @@
   desc: in the sound settings and some other menus
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Kolísanie"
+    *: "Kolísanie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kolísanie"
+    *: "Kolísanie"
   </voice>
 </phrase>
 <phrase>
@@ -1569,16 +1503,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Zabrániť Praskaniu"
+    *: "Zabrániť Praskaniu"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zabrániť praskaniu"
+    *: "Zabrániť praskaniu"
   </voice>
 </phrase>
 <phrase>
@@ -1656,16 +1587,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "Pípnutie pri Preskočení stopy"
+    *: "Pípnutie pri Preskočení stopy"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pípnutie pri preskočení stopy"
+    *: "Pípnutie pri preskočení stopy"
   </voice>
 </phrase>
 <phrase>
@@ -1673,16 +1601,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "Tiché"
+    *: "Tiché"
   </dest>
   <voice>
-    *: none
-    swcodec: "Tiché"
+    *: "Tiché"
   </voice>
 </phrase>
 <phrase>
@@ -1690,16 +1615,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "Stredne Silné"
+    *: "Stredne Silné"
   </dest>
   <voice>
-    *: none
-    swcodec: "Stredne silné"
+    *: "Stredne silné"
   </voice>
 </phrase>
 <phrase>
@@ -1707,16 +1629,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "Silné"
+    *: "Silné"
   </dest>
   <voice>
-    *: none
-    swcodec: "Silné"
+    *: "Silné"
   </voice>
 </phrase>
 <phrase>
@@ -2265,16 +2184,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </voice>
 </phrase>
 <phrase>
@@ -2534,16 +2450,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hore Nohami"
+    *: "Hore Nohami"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hore nohami"
+    *: "Hore nohami"
   </voice>
 </phrase>
 <phrase>
@@ -2551,16 +2464,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Kurzor"
+    *: "Kurzor"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Kurzor"
+    *: "Kurzor"
   </voice>
 </phrase>
 <phrase>
@@ -2568,16 +2478,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Šípka"
+    *: "Šípka"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Šípka"
+    *: "Šípka"
   </voice>
 </phrase>
 <phrase>
@@ -2585,16 +2492,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Inverzný Kurzor"
+    *: "Inverzný Kurzor"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Inverzný kurzor"
+    *: "Inverzný kurzor"
   </voice>
 </phrase>
 <phrase>
@@ -2884,16 +2788,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Obrazovka Roluje Mimo Zobrazenia"
+    *: "Obrazovka Roluje Mimo Zobrazenia"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Obrazovka roluje mimo zobrazenia"
+    *: "Obrazovka roluje mimo zobrazenia"
   </voice>
 </phrase>
 <phrase>
@@ -2901,16 +2802,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Dĺžka Kroku Obrazovkového Rolovania"
+    *: "Dĺžka Kroku Obrazovkového Rolovania"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Dĺžka kroku obrazovkového rolovania"
+    *: "Dĺžka kroku obrazovkového rolovania"
   </voice>
 </phrase>
 <phrase>
@@ -2966,16 +2864,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Stavový Riadok / Posuvník"
+    *: "Stavový Riadok / Posuvník"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Stavový riadok alebo posuvník"
+    *: "Stavový riadok alebo posuvník"
   </voice>
 </phrase>
 <phrase>
@@ -2983,16 +2878,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Rolovací Pás"
+    *: "Rolovací Pás"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Rolovací pás"
+    *: "Rolovací pás"
   </voice>
 </phrase>
 <phrase>
@@ -3000,16 +2892,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Stavový riadok"
+    *: "Stavový riadok"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Stavový riadok"
+    *: "Stavový riadok"
   </voice>
 </phrase>
 <phrase>
@@ -3017,16 +2906,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobrazenie Hlasitosti"
+    *: "Zobrazenie Hlasitosti"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobrazenie hlasitosti"
+    *: "Zobrazenie hlasitosti"
   </voice>
 </phrase>
 <phrase>
@@ -3034,16 +2920,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobrazenie Batérie"
+    *: "Zobrazenie Batérie"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobrazenie batérie"
+    *: "Zobrazenie batérie"
   </voice>
 </phrase>
 <phrase>
@@ -3051,16 +2934,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ikona"
+    *: "Ikona"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ikona"
+    *: "Ikona"
   </voice>
 </phrase>
 <phrase>
@@ -3068,16 +2948,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Numericky"
+    *: "Numericky"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Numericky"
+    *: "Numericky"
   </voice>
 </phrase>
 <phrase>
@@ -3267,16 +3144,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hebrejčina (ISO-8859-8)"
+    *: "Hebrejčina (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hebrejčina"
+    *: "Hebrejčina"
   </voice>
 </phrase>
 <phrase>
@@ -3298,16 +3172,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Thajčina (ISO-8859-11)"
+    *: "Thajčina (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Thajčina"
+    *: "Thajčina"
   </voice>
 </phrase>
 <phrase>
@@ -3315,16 +3186,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arabčina (CP1256)"
+    *: "Arabčina (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arabčina"
+    *: "Arabčina"
   </voice>
 </phrase>
 <phrase>
@@ -3360,16 +3228,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Japončina (SJIS)"
+    *: "Japončina (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Japončina"
+    *: "Japončina"
   </voice>
 </phrase>
 <phrase>
@@ -3377,16 +3242,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zjednod. Čínština (GB2312)"
+    *: "Zjednod. Čínština (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zjednodušená čínština"
+    *: "Zjednodušená čínština"
   </voice>
 </phrase>
 <phrase>
@@ -3394,16 +3256,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Kórejčina (KSX1001)"
+    *: "Kórejčina (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Kórejčina"
+    *: "Kórejčina"
   </voice>
 </phrase>
 <phrase>
@@ -3411,16 +3270,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Trad. Čínština (BIG5)"
+    *: "Trad. Čínština (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Tradičná čínština"
+    *: "Tradičná čínština"
   </voice>
 </phrase>
 <phrase>
@@ -9193,7 +9049,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "Hárok stôp (cuesheet)"
@@ -9235,16 +9091,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Režim Editovania: %s %s"
+    *: "Režim Editovania: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9252,16 +9105,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Rez"
+    *: "Rez"
   </dest>
   <voice>
-    *: none
-    swcodec: "Frekvencia rezu"
+    *: "Frekvencia rezu"
   </voice>
 </phrase>
 <phrase>
@@ -9269,16 +9119,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Zosilnenie"
+    *: "Zosilnenie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zosilnenie"
+    *: "Zosilnenie"
   </voice>
 </phrase>
 <phrase>
@@ -9686,7 +9533,7 @@
     multivolume: "Nieje"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_TALK_BATTERY_LEVEL
   desc: Setting for spontaneous battery level announcement
   user: core
@@ -9781,16 +9628,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Klikanie Pri Klávesoch"
+    *: "Klikanie Pri Klávesoch"
   </dest>
   <voice>
-    *: none
-    swcodec: "Klikanie pri klávesoch"
+    *: "Klikanie pri klávesoch"
   </voice>
 </phrase>
 <phrase>
@@ -9798,16 +9642,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Opakované Klikanie"
+    *: "Opakované Klikanie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Opakované klikanie"
+    *: "Opakované klikanie"
   </voice>
 </phrase>
 <phrase>
@@ -9929,11 +9770,11 @@
     *: none
     serial_port: "Serial Bitrate"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Sériová bitová rýchlosť"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Sériová bitová rýchlosť"
   </voice>
@@ -9946,11 +9787,11 @@
     *: none
     serial_port: "Auto"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Auto"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Automaticky"
   </voice>
@@ -9963,11 +9804,11 @@
     *: none
     serial_port: "9600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "9600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "9600"
   </voice>
@@ -9980,11 +9821,11 @@
     *: none
     serial_port: "19200"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "19200"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "19200"
   </voice>
@@ -9997,11 +9838,11 @@
     *: none
     serial_port: "38400"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "38400"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "38400"
   </voice>
@@ -10014,11 +9855,11 @@
     *: none
     serial_port: "57600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "57600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "57600"
   </voice>
@@ -10541,16 +10382,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Úprava Rýchlosti"
+    *: "Úprava Rýchlosti"
   </dest>
   <voice>
-    *: none
-    swcodec: "Úprava Rýchlosti"
+    *: "Úprava Rýchlosti"
   </voice>
 </phrase>
 <phrase>
@@ -10558,16 +10396,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Rýchlosť"
+    *: "Rýchlosť"
   </dest>
   <voice>
-    *: none
-    swcodec: "Rýchlosť"
+    *: "Rýchlosť"
   </voice>
 </phrase>
 <phrase>
@@ -10668,7 +10503,7 @@
 </phrase>
 <phrase>
   id: LANG_SEMITONE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -10821,16 +10656,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Dĺžka rolovacieho pásu"
+    *: "Dĺžka rolovacieho pásu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Dĺžka rolovacieho pásu"
+    *: "Dĺžka rolovacieho pásu"
   </voice>
 </phrase>
 <phrase>
@@ -10838,16 +10670,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Umiestnenie Rolovacieho Pásu"
+    *: "Umiestnenie Rolovacieho Pásu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Umiestnenie rolovacieho pásu"
+    *: "Umiestnenie rolovacieho pásu"
   </voice>
 </phrase>
 <phrase>
@@ -10855,16 +10684,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Kompresor"
+    *: "Kompresor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kompresor"
+    *: "Kompresor"
   </voice>
 </phrase>
 <phrase>
@@ -10923,16 +10749,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Prah"
+    *: "Prah"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prah"
+    *: "Prah"
   </voice>
 </phrase>
 <phrase>
@@ -10940,16 +10763,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Pomer"
+    *: "Pomer"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pomer"
+    *: "Pomer"
   </voice>
 </phrase>
 <phrase>
@@ -10957,16 +10777,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 ku 1"
+    *: "2 ku 1"
   </voice>
 </phrase>
 <phrase>
@@ -10974,16 +10791,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 ku 1"
+    *: "4 ku 1"
   </voice>
 </phrase>
 <phrase>
@@ -10991,16 +10805,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 ku 1"
+    *: "6 ku 1"
   </voice>
 </phrase>
 <phrase>
@@ -11008,16 +10819,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 ku 1"
+    *: "10 ku 1"
   </voice>
 </phrase>
 <phrase>
@@ -11025,16 +10833,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </dest>
   <voice>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </voice>
 </phrase>
 <phrase>
@@ -11042,16 +10847,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Zosilnenie Po Kompresii"
+    *: "Zosilnenie Po Kompresii"
   </dest>
   <voice>
-    *: none
-    swcodec: "Zosilnenie po kompresii"
+    *: "Zosilnenie po kompresii"
   </voice>
 </phrase>
 <phrase>
@@ -11059,16 +10861,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </dest>
   <voice>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </voice>
 </phrase>
 <phrase>
@@ -11076,16 +10875,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Prechod Do Kompresie"
+    *: "Prechod Do Kompresie"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prechod do kompresie"
+    *: "Prechod do kompresie"
   </voice>
 </phrase>
 <phrase>
@@ -11093,16 +10889,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Tvrdý Prechod"
+    *: "Tvrdý Prechod"
   </dest>
   <voice>
-    *: none
-    swcodec: "Tvrdý prechod"
+    *: "Tvrdý prechod"
   </voice>
 </phrase>
 <phrase>
@@ -11110,16 +10903,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Mäkký Prechod"
+    *: "Mäkký Prechod"
   </dest>
   <voice>
-    *: none
-    swcodec: "Mäkký prechod"
+    *: "Mäkký prechod"
   </voice>
 </phrase>
 <phrase>
@@ -11127,16 +10917,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Čas Zotavenia"
+    *: "Čas Zotavenia"
   </dest>
   <voice>
-    *: none
-    swcodec: "Čas zotavenia"
+    *: "Čas zotavenia"
   </voice>
 </phrase>
 <phrase>
@@ -11226,7 +11013,7 @@
     *: "Vložiť Nakoniec Zamiešané"
   </dest>
   <voice>
-    *:"Vložiť nakoniec zamiešané"
+    *: "Vložiť nakoniec zamiešané"
   </voice>
 </phrase>
 <phrase>
@@ -11324,16 +11111,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Základný Vzhľad"
+    *: "Základný Vzhľad"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Základný vzhľad"
+    *: "Základný vzhľad"
   </voice>
 </phrase>
 <phrase>
@@ -11341,16 +11125,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Vzdialený Základný Vzhľad"
+    *: "Vzdialený Základný Vzhľad"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Vzdialený základný vzhľad"
+    *: "Vzdialený základný vzhľad"
   </voice>
 </phrase>
 <phrase>
@@ -11443,16 +11224,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Vrátiť Pred Obnovením Prehrávania"
+    *: "Vrátiť Pred Obnovením Prehrávania"
   </dest>
   <voice>
-    *: none
-    swcodec: "Vrátiť pred obnovením prehrávania"
+    *: "Vrátiť pred obnovením prehrávania"
   </voice>
 </phrase>
 <phrase>
@@ -11861,7 +11639,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
@@ -12215,16 +11993,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Simple (Meier)"
+    *: "Simple (Meier)"
   </source>
   <dest>
-    *: none
-    swcodec: "Jednoduché (Meier)"
+    *: "Jednoduché (Meier)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Jednoduché"
+    *: "Jednoduché"
   </voice>
 </phrase>
 <phrase>
@@ -12260,16 +12035,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Custom"
+    *: "Custom"
   </source>
   <dest>
-    *: none
-    swcodec: "Vlastné"
+    *: "Vlastné"
   </dest>
   <voice>
-    *: none
-    swcodec: "Vlastné"
+    *: "Vlastné"
   </voice>
 </phrase>
 <phrase>
@@ -12364,16 +12136,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -12412,16 +12181,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Attack Time"
+    *: "Attack Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Čas Začiatku"
+    *: "Čas Začiatku"
   </dest>
   <voice>
-    *: none
-    swcodec: "Čas Začiatku"
+    *: "Čas Začiatku"
   </voice>
 </phrase>
 <phrase>
@@ -12480,16 +12246,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </source>
   <dest>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </dest>
   <voice>
-    *: none
-    swcodec: "Dry / Wet Mix"
+    *: "Dry / Wet Mix"
   </voice>
 </phrase>
 <phrase>
@@ -12497,16 +12260,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Perceptual Bass Enhancement"
+    *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: none
-    swcodec: "Vylepšenie basov"
+    *: "Vylepšenie basov"
   </dest>
   <voice>
-    *: none
-    swcodec: "Vylepšenie basov"
+    *: "Vylepšenie basov"
   </voice>
 </phrase>
 <phrase>
@@ -12514,16 +12274,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auditory Fatigue Reduction"
+    *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: none
-    swcodec: "Redukcia rušivých tónov"
+    *: "Redukcia rušivých tónov"
   </dest>
   <voice>
-    *: none
-    swcodec: "Redukcia rušivých tónov"
+    *: "Redukcia rušivých tónov"
   </voice>
 </phrase>
 <phrase>
@@ -12531,16 +12288,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </source>
   <dest>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </dest>
   <voice>
-    *: none
-    swcodec: "SIDE ONLY"
+    *: "SIDE ONLY"
   </voice>
 </phrase>
 <phrase>
@@ -12548,16 +12302,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x1)"
+    *: "f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -12565,16 +12316,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </source>
   <dest>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </dest>
   <voice>
-    *: none
-    swcodec: "Haas Surround"
+    *: "Haas Surround"
   </voice>
 </phrase>
 <phrase>
@@ -12650,16 +12398,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </source>
   <dest>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </dest>
   <voice>
-    *: none
-    swcodec: "f(x2)"
+    *: "f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -13007,16 +12752,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Via Track list"
+    *: "Via Track list"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Cez zoznam stôp"
+    *: "Cez zoznam stôp"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Cez zoznam stôp"
+    *: "Cez zoznam stôp"
   </voice>
 </phrase>
 <phrase>
@@ -13024,16 +12766,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Veža"
+    *: "Veža"
   </voice>
 </phrase>
 <phrase>
@@ -13055,16 +12794,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Zoom"
+    *: "Zoom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zväčšenie"
+    *: "Zväčšenie"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zväčšenie"
+    *: "Zväčšenie"
   </voice>
 </phrase>
 <phrase>
@@ -13086,16 +12822,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Number of slides"
+    *: "Number of slides"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Počet slidov"
+    *: "Počet slidov"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Počet slidov"
+    *: "Počet slidov"
   </voice>
 </phrase>
 <phrase>
@@ -13131,16 +12864,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "strana kráľovnej"
+    *: "strana kráľovnej"
   </voice>
 </phrase>
 <phrase>
@@ -13148,16 +12878,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Food Size"
+    *: "Food Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Veľkosť potravy"
+    *: "Veľkosť potravy"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Veľkosť potravy"
+    *: "Veľkosť potravy"
   </voice>
 </phrase>
 <phrase>
@@ -13179,19 +12906,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Play from beginning"
     lowmem: none
-    swcodec: "Play from beginning"
   </source>
   <dest>
-    *: none
+    *: "Prehrať od začiatku"
     lowmem: none
-    swcodec: "Prehrať od začiatku"
   </dest>
   <voice>
-    *: none
+    *: "Prehrať od začiatku"
     lowmem: none
-    swcodec: "Prehrať od začiatku"
   </voice>
 </phrase>
 <phrase>
@@ -13227,19 +12951,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Limit FPS"
     lowmem: none
-    swcodec: "Limit FPS"
   </source>
   <dest>
-    *: none
+    *: "Limit FPS"
     lowmem: none
-    swcodec: "Limit FPS"
   </dest>
   <voice>
-    *: none
+    *: "Limit FPS"
     lowmem: none
-    swcodec: "Limit FPS"
   </voice>
 </phrase>
 <phrase>
@@ -13247,16 +12968,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "WPS Integration"
+    *: "WPS Integration"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Integrácia WPS"
+    *: "Integrácia WPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Integrácia WPS"
+    *: "Integrácia WPS"
   </voice>
 </phrase>
 <phrase>
@@ -13264,16 +12982,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "At the beginning of the game"
+    *: "At the beginning of the game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Na začiatku hry"
+    *: "Na začiatku hry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Na začiatku hry"
+    *: "Na začiatku hry"
   </voice>
 </phrase>
 <phrase>
@@ -13281,16 +12996,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Grayscale"
+    *: "Grayscale"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Odtiene šedej"
+    *: "Odtiene šedej"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Odtiene šedej"
+    *: "Odtiene šedej"
   </voice>
 </phrase>
 <phrase>
@@ -13312,16 +13024,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Error parsing game !"
+    *: "Error parsing game !"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Chyba načítania hry!"
+    *: "Chyba načítania hry!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Chyba načítania hry!"
+    *: "Chyba načítania hry!"
   </voice>
 </phrase>
 <phrase>
@@ -13329,16 +13038,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Illegal move!"
+    *: "Illegal move!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nesprávny ťah!"
+    *: "Nesprávny ťah!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nesprávny ťah!"
+    *: "Nesprávny ťah!"
   </voice>
 </phrase>
 <phrase>
@@ -13360,19 +13066,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Reverberation"
     lowmem: none
-    swcodec: "Reverberation"
   </source>
   <dest>
-    *: none
+    *: "Reverberation"
     lowmem: none
-    swcodec: "Reverberation"
   </dest>
   <voice>
-    *: none
+    *: "Reverberation"
     lowmem: none
-    swcodec: "Reverberation"
   </voice>
 </phrase>
 <phrase>
@@ -13380,16 +13083,13 @@
   desc: cannot restart playback splash in imageviewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Cannot restart playback"
+    *: "Cannot restart playback"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "nemožno reštartovať prehrávanie"
+    *: "nemožno reštartovať prehrávanie"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "nemožno reštartovať prehrávanie"
+    *: "nemožno reštartovať prehrávanie"
   </voice>
 </phrase>
 <phrase>
@@ -13397,16 +13097,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Saving position"
+    *: "Saving position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ukladám pozíciu"
+    *: "Ukladám pozíciu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ukladám pozíciu"
+    *: "Ukladám pozíciu"
   </voice>
 </phrase>
 <phrase>
@@ -13414,16 +13111,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album title"
+    *: "Show album title"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobraziť názov albumu"
+    *: "Zobraziť názov albumu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobraziť názov albumu"
+    *: "Zobraziť názov albumu"
   </voice>
 </phrase>
 <phrase>
@@ -13431,19 +13125,16 @@
   desc: in mpegplayer settings
   user: core
   <source>
-    *: none
+    *: "Unavailable"
     lowmem: none
-    swcodec: "Unavailable"
   </source>
   <dest>
-    *: none
+    *: "Nedostupné"
     lowmem: none
-    swcodec: "Nedostupné"
   </dest>
   <voice>
-    *: none
+    *: "Nedostupné"
     lowmem: none
-    swcodec: "Nedostupné"
   </voice>
 </phrase>
 <phrase>
@@ -13465,16 +13156,13 @@
   desc: spoken only, for announcing chess piece color
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Čierny"
+    *: "Čierny"
   </voice>
 </phrase>
 <phrase>
@@ -13482,16 +13170,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 5: 40 moves / 60 min"
+    *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 5: 40 ťahov / 60 min"
+    *: "Úroveň 5: 40 ťahov / 60 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 5: 40 ťahov za 60 minút"
+    *: "Úroveň 5: 40 ťahov za 60 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13499,16 +13184,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "View Played Games"
+    *: "View Played Games"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobraziť odohrané hry"
+    *: "Zobraziť odohrané hry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobraziť odohrané hry"
+    *: "Zobraziť odohrané hry"
   </voice>
 </phrase>
 <phrase>
@@ -13530,16 +13212,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Rebuild cache"
+    *: "Rebuild cache"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Obnoviť cache"
+    *: "Obnoviť cache"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Obnoviť cache"
+    *: "Obnoviť cache"
   </voice>
 </phrase>
 <phrase>
@@ -13547,16 +13226,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Kráľ"
+    *: "Kráľ"
   </voice>
 </phrase>
 <phrase>
@@ -13592,16 +13268,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 4: 40 moves / 30 min"
+    *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 4: 40 ťahov / 30 min"
+    *: "Úroveň 4: 40 ťahov / 30 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 4: 40 ťahov za 30 minút"
+    *: "Úroveň 4: 40 ťahov za 30 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13626,16 +13299,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Play Wormlet!"
+    *: "Play Wormlet!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hraj Wormlet!"
+    *: "Hraj Wormlet!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hraj Wormlet!"
+    *: "Hraj Wormlet!"
   </voice>
 </phrase>
 <phrase>
@@ -13643,16 +13313,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Diffusion"
+    *: "Diffusion"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Difúzia"
+    *: "Difúzia"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Difúzia"
+    *: "Difúzia"
   </voice>
 </phrase>
 <phrase>
@@ -13660,16 +13327,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Centre margin"
+    *: "Centre margin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Centrovať okraj"
+    *: "Centrovať okraj"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Centrovať okraj"
+    *: "Centrovať okraj"
   </voice>
 </phrase>
 <phrase>
@@ -13691,16 +13355,13 @@
   desc: spoken only, for announcing chess piece marking
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "označené"
+    *: "označené"
   </voice>
 </phrase>
 <phrase>
@@ -13708,19 +13369,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Start menu"
     lowmem: none
-    swcodec: "Start menu"
   </source>
   <dest>
-    *: none
+    *: "Menu štart"
     lowmem: none
-    swcodec: "Menu štart"
   </dest>
   <voice>
-    *: none
+    *: "Menu štart"
     lowmem: none
-    swcodec: "Menu štart"
   </voice>
 </phrase>
 <phrase>
@@ -13728,16 +13386,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Number of Worms"
+    *: "Number of Worms"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Počet wormov"
+    *: "Počet wormov"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Počet wormov"
+    *: "Počet wormov"
   </voice>
 </phrase>
 <phrase>
@@ -13745,16 +13400,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Restore Game"
+    *: "Restore Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Obnoviť hru"
+    *: "Obnoviť hru"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Obnoviť hru"
+    *: "Obnoviť hru"
   </voice>
 </phrase>
 <phrase>
@@ -13762,16 +13414,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Direct"
+    *: "Direct"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Priamy"
+    *: "Priamy"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "priamy"
+    *: "priamy"
   </voice>
 </phrase>
 <phrase>
@@ -13779,19 +13428,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Surround"
     lowmem: none
-    swcodec: "Surround"
   </source>
   <dest>
-    *: none
+    *: "Surround"
     lowmem: none
-    swcodec: "Surround"
   </dest>
   <voice>
-    *: none
+    *: "Surround"
     lowmem: none
-    swcodec: "Surround"
   </voice>
 </phrase>
 <phrase>
@@ -13799,19 +13445,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Tone controls"
     lowmem: none
-    swcodec: "Tone controls"
   </source>
   <dest>
-    *: none
+    *: "hodnoty eq"
     lowmem: none
-    swcodec: "hodnoty eq"
   </dest>
   <voice>
-    *: none
+    *: "hodnoty výšok a hĺbok"
     lowmem: none
-    swcodec: "hodnoty výšok a hĺbok"
   </voice>
 </phrase>
 <phrase>
@@ -13819,16 +13462,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Restart Game"
+    *: "Restart Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Reštartovať hru"
+    *: "Reštartovať hru"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Reštartovať hru"
+    *: "Reštartovať hru"
   </voice>
 </phrase>
 <phrase>
@@ -13850,16 +13490,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "kôň"
+    *: "kôň"
   </voice>
 </phrase>
 <phrase>
@@ -13881,16 +13518,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 9: 1 move / 60 min"
+    *: "Level 9: 1 move / 60 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 9: 1 ťah / 60 min"
+    *: "Úroveň 9: 1 ťah / 60 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 9: 1 ťah za 60 minút"
+    *: "Úroveň 9: 1 ťah za 60 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13898,16 +13532,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 8: 1 move / 15 min"
+    *: "Level 8: 1 move / 15 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 8: 1 ťah / 15 min"
+    *: "Úroveň 8: 1 ťah / 15 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 8: 1 ťah za 15 minút"
+    *: "Úroveň 8: 1 ťah za 15 minút"
   </voice>
 </phrase>
 <phrase>
@@ -13915,19 +13546,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Play Mode"
     lowmem: none
-    swcodec: "Play Mode"
   </source>
   <dest>
-    *: none
+    *: "Režim prehrávania"
     lowmem: none
-    swcodec: "Režim prehrávania"
   </dest>
   <voice>
-    *: none
+    *: "Režim prehrávania"
     lowmem: none
-    swcodec: "Režim prehrávania"
   </voice>
 </phrase>
 <phrase>
@@ -13935,16 +13563,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Worm Growth Per Food"
+    *: "Worm Growth Per Food"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nárast Worma po Potrave"
+    *: "Nárast Worma po Potrave"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nárast Worma po Potrave"
+    *: "Nárast Worma po Potrave"
   </voice>
 </phrase>
 <phrase>
@@ -13966,16 +13591,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Strana kráľa"
+    *: "Strana kráľa"
   </voice>
 </phrase>
 <phrase>
@@ -13997,16 +13619,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Cache will be rebuilt on next restart"
+    *: "Cache will be rebuilt on next restart"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Cache bude vytvorená po reštarte"
+    *: "Cache bude vytvorená po reštarte"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Cache bude vytvorená po reštarte"
+    *: "Cache bude vytvorená po reštarte"
   </voice>
 </phrase>
 <phrase>
@@ -14028,16 +13647,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Toggle Slideshow Mode"
+    *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Prepnúť režim slide show"
+    *: "Prepnúť režim slide show"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Prepnúť režim slide show"
+    *: "Prepnúť režim slide show"
   </voice>
 </phrase>
 <phrase>
@@ -14059,16 +13675,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arghs Per Food"
+    *: "Arghs Per Food"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arghs Per Food"
+    *: "Arghs Per Food"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arghs Per Food"
+    *: "Arghs Per Food"
   </voice>
 </phrase>
 <phrase>
@@ -14076,16 +13689,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Worm Speed"
+    *: "Worm Speed"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "rýchlosť worma"
+    *: "rýchlosť worma"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "rýchlosť worma"
+    *: "rýchlosť worma"
   </voice>
 </phrase>
 <phrase>
@@ -14093,16 +13703,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Resize Covers"
+    *: "Resize Covers"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zmeniť veľkosť"
+    *: "Zmeniť veľkosť"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zmeniť veľkosť"
+    *: "Zmeniť veľkosť"
   </voice>
 </phrase>
 <phrase>
@@ -14166,16 +13773,13 @@
   desc: spoken only, for announcing chess piece color
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Biely"
+    *: "Biely"
   </voice>
 </phrase>
 <phrase>
@@ -14183,16 +13787,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Strelec"
+    *: "Strelec"
   </voice>
 </phrase>
 <phrase>
@@ -14214,16 +13815,13 @@
   desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hráč"
+    *: "Hráč"
   </voice>
 </phrase>
 <phrase>
@@ -14259,16 +13857,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Games"
+    *: "Games"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hry"
+    *: "Hry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14290,19 +13885,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Backlight brightness"
     lowmem: none
-    swcodec: "Backlight brightness"
   </source>
   <dest>
-    *: none
+    *: "Jas podsvietenia"
     lowmem: none
-    swcodec: "Jas podsvietenia"
   </dest>
   <voice>
-    *: none
+    *: "Jas podsvietenia"
     lowmem: none
-    swcodec: "Jas podsvietenia"
   </voice>
 </phrase>
 <phrase>
@@ -14310,16 +13902,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hide album title"
+    *: "Hide album title"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Skryť názov albumu"
+    *: "Skryť názov albumu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Skryť názov albumu"
+    *: "Skryť názov albumu"
   </voice>
 </phrase>
 <phrase>
@@ -14327,19 +13916,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Panning Separation"
     lowmem: none
-    swcodec: "Panning Separation"
   </source>
   <dest>
-    *: none
+    *: "Separácia panningu"
     lowmem: none
-    swcodec: "Separácia panningu"
   </dest>
   <voice>
-    *: none
+    *: "Separácia panningu"
     lowmem: none
-    swcodec: "Separácia panningu"
   </voice>
 </phrase>
 <phrase>
@@ -14361,16 +13947,13 @@
   desc: in the pictureflow main menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Clear playlist"
+    *: "Clear playlist"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "vičistiť playlist"
+    *: "vičistiť playlist"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "vičistiť playlist"
+    *: "vičistiť playlist"
   </voice>
 </phrase>
 <phrase>
@@ -14392,19 +13975,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Clear all resumes"
     lowmem: none
-    swcodec: "Clear all resumes"
   </source>
   <dest>
-    *: none
+    *: "Vymazať všetky obnovenia"
     lowmem: none
-    swcodec: "Vymazať všetky obnovenia"
   </dest>
   <voice>
-    *: none
+    *: "Vymazať všetky obnovenia"
     lowmem: none
-    swcodec: "Vymazať všetky obnovenia"
   </voice>
 </phrase>
 <phrase>
@@ -14412,16 +13992,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show at the top"
+    *: "Show at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ukázať navrchu"
+    *: "Ukázať navrchu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ukázať navrchu"
+    *: "Ukázať navrchu"
   </voice>
 </phrase>
 <phrase>
@@ -14429,16 +14006,13 @@
   desc: For wormlet menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Argh Size"
+    *: "Argh Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Veľkosť plochy"
+    *: "Veľkosť plochy"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Veľkosť plochy"
+    *: "Veľkosť plochy"
   </voice>
 </phrase>
 <phrase>
@@ -14446,19 +14020,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Single"
     lowmem: none
-    swcodec: "Single"
   </source>
   <dest>
-    *: none
+    *: "Single"
     lowmem: none
-    swcodec: "Single"
   </dest>
   <voice>
-    *: none
+    *: "Single"
     lowmem: none
-    swcodec: "Single"
   </voice>
 </phrase>
 <phrase>
@@ -14483,19 +14054,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Use common setting"
     lowmem: none
-    swcodec: "Use common setting"
   </source>
   <dest>
-    *: none
+    *: "Použiť zvyčajné nastavenie"
     lowmem: none
-    swcodec: "Použiť zvyčajné nastavenie"
   </dest>
   <voice>
-    *: none
+    *: "Použiť zvyčajné nastavenie"
     lowmem: none
-    swcodec: "Použiť zvyčajné nastavenie"
   </voice>
 </phrase>
 <phrase>
@@ -14503,16 +14071,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Always On"
+    *: "Always On"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Vždy zapnuté"
+    *: "Vždy zapnuté"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Vždy zapnuté"
+    *: "Vždy zapnuté"
   </voice>
 </phrase>
 <phrase>
@@ -14520,16 +14085,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "No games found !"
+    *: "No games found !"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Žiadne hry!"
+    *: "Žiadne hry!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Žiadne hry!"
+    *: "Žiadne hry!"
   </voice>
 </phrase>
 <phrase>
@@ -14537,19 +14099,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Use sound setting"
     lowmem: none
-    swcodec: "Use sound setting"
   </source>
   <dest>
-    *: none
+    *: "Použiť nastavenie zvuku"
     lowmem: none
-    swcodec: "Použiť nastavenie zvuku"
   </dest>
   <voice>
-    *: none
+    *: "Použiť nastavenie zvuku"
     lowmem: none
-    swcodec: "Použiť nastavenie zvuku"
   </voice>
 </phrase>
 <phrase>
@@ -14574,16 +14133,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Slideshow Time"
+    *: "Slideshow Time"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Čas slideshow"
+    *: "Čas slideshow"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Čas slideshow"
+    *: "Čas slideshow"
   </voice>
 </phrase>
 <phrase>
@@ -14605,16 +14161,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 2: 60 moves / 15 min"
+    *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 2: 60 ťahov / 15 min"
+    *: "Úroveň 2: 60 ťahov / 15 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "úroveň 2: 60 ťahov za 15 minút"
+    *: "úroveň 2: 60 ťahov za 15 minút"
   </voice>
 </phrase>
 <phrase>
@@ -14622,16 +14175,13 @@
   desc: in the chessbox game viewer
   user: core
   <source>
-    *: none
-    lcd_bitmap: "At the end of the game"
+    *: "At the end of the game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Na konci hry"
+    *: "Na konci hry"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Na konci hry"
+    *: "Na konci hry"
   </voice>
 </phrase>
 <phrase>
@@ -14667,16 +14217,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "rošáda"
+    *: "rošáda"
   </voice>
 </phrase>
 <phrase>
@@ -14684,16 +14231,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Save Game"
+    *: "Save Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Uložiť hru"
+    *: "Uložiť hru"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Uložiť hru"
+    *: "Uložiť hru"
   </voice>
 </phrase>
 <phrase>
@@ -14746,19 +14290,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Audio Options"
     lowmem: none
-    swcodec: "Audio Options"
   </source>
   <dest>
-    *: none
+    *: "Nastavenia zvuku"
     lowmem: none
-    swcodec: "Nastavenia zvuku"
   </dest>
   <voice>
-    *: none
+    *: "Nastavenia zvuku"
     lowmem: none
-    swcodec: "Nastavenia zvuku"
   </voice>
 </phrase>
 <phrase>
@@ -14766,16 +14307,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thinking..."
+    *: "Thinking..."
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Premýšľam..."
+    *: "Premýšľam..."
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14797,16 +14335,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 6: 40 moves / 120 min"
+    *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 6: 40 ťahov / 120 min"
+    *: "Úroveň 6: 40 ťahov / 120 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 6: 40 ťahov za 120 minút"
+    *: "Úroveň 6: 40 ťahov za 120 minút"
   </voice>
 </phrase>
 <phrase>
@@ -14814,19 +14349,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Start menu if not completed"
     lowmem: none
-    swcodec: "Start menu if not completed"
   </source>
   <dest>
-    *: none
+    *: "Spustiť ponuku ak nieje dokončené"
     lowmem: none
-    swcodec: "Spustiť ponuku ak nieje dokončené"
   </dest>
   <voice>
-    *: none
+    *: "Spustiť ponuku ak nieje dokončené"
     lowmem: none
-    swcodec: "Spustiť ponuku ak nieje dokončené"
   </voice>
 </phrase>
 <phrase>
@@ -14848,16 +14380,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show at the bottom"
+    *: "Show at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ukázať naspodku"
+    *: "Ukázať naspodku"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ukázať naspodku"
+    *: "Ukázať naspodku"
   </voice>
 </phrase>
 <phrase>
@@ -14882,16 +14411,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Šach!"
+    *: "Šach!"
   </voice>
 </phrase>
 <phrase>
@@ -14899,16 +14425,13 @@
   desc: spoken only, for announcing chess piece unmarking
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Neoznačené"
+    *: "Neoznačené"
   </voice>
 </phrase>
 <phrase>
@@ -15048,16 +14571,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 1: 60 moves / 5 min"
+    *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 1: 60 ťahov / 5 min"
+    *: "Úroveň 1: 60 ťahov / 5 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 1: 60 ťahov / 5 min"
+    *: "Úroveň 1: 60 ťahov / 5 min"
   </voice>
 </phrase>
 <phrase>
@@ -15065,16 +14585,13 @@
   desc: spoken only, for announcing player's id
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "GNU Chess"
+    *: "GNU Chess"
   </voice>
 </phrase>
 <phrase>
@@ -15124,16 +14641,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Error writing config"
+    *: "Error writing config"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Chyba pri zápise konfigu"
+    *: "Chyba pri zápise konfigu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Chyba pri zápise konfigurácie"
+    *: "Chyba pri zápise konfigurácie"
   </voice>
 </phrase>
 <phrase>
@@ -15155,16 +14669,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 7: 40 moves / 240 min"
+    *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 7: 40 ťahov / 240 min"
+    *: "Úroveň 7: 40 ťahov / 240 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 7: 40 ťahov počas 240 minút"
+    *: "Úroveň 7: 40 ťahov počas 240 minút"
   </voice>
 </phrase>
 <phrase>
@@ -15172,16 +14683,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 3: 60 moves / 30 min"
+    *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 3: 60 ťahov / 30 min"
+    *: "Úroveň 3: 60 ťahov / 30 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 3: 60 ťahov za 30 minút"
+    *: "Úroveň 3: 60 ťahov za 30 minút"
   </voice>
 </phrase>
 <phrase>
@@ -15189,16 +14697,13 @@
   desc: in the imageviewer settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Ordered"
+    *: "Ordered"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zoradené"
+    *: "Zoradené"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zoradené"
+    *: "Zoradené"
   </voice>
 </phrase>
 <phrase>
@@ -15206,19 +14711,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Interpolation"
     lowmem: none
-    swcodec: "Interpolation"
   </source>
   <dest>
-    *: none
+    *: "Interpolácia"
     lowmem: none
-    swcodec: "Interpolácia"
   </dest>
   <voice>
-    *: none
+    *: "Interpolácia"
     lowmem: none
-    swcodec: "Interpolácia"
   </voice>
 </phrase>
 <phrase>
@@ -15226,16 +14728,13 @@
   desc: in the pictureflow main menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Go to WPS"
+    *: "Go to WPS"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Choď na WPS"
+    *: "Choď na WPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Choď na WPS"
+    *: "Choď na WPS"
   </voice>
 </phrase>
 <phrase>
@@ -15243,16 +14742,13 @@
   desc: in the pictureflow settings menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Spacing"
+    *: "Spacing"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Medzery"
+    *: "Medzery"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Medzery"
+    *: "Medzery"
   </voice>
 </phrase>
 <phrase>
@@ -15274,16 +14770,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Resume Game"
+    *: "Resume Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Obnoviť hru"
+    *: "Obnoviť hru"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Obnoviť hru"
+    *: "Obnoviť hru"
   </voice>
 </phrase>
 <phrase>
@@ -15291,17 +14784,13 @@
   desc: in the mpegplayer and pictureflow settings menus
   user: core
   <source>
-    *: none
-    lcd_bitmap,swcodec: "Display FPS"
+    *: "Display FPS"
   </source>
   <dest>
-    *: none
-    lcd_bitmap,swcodec: "Zobraziť FPS"
+    *: "Zobraziť FPS"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "zobraziť FPS"
-    swcodec: "Zobraziť FPS"
+    *: "Zobraziť FPS"
   </voice>
 </phrase>
 <phrase>
@@ -15309,16 +14798,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "No album art found"
+    *: "No album art found"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Album art nenájdený"
+    *: "Album art nenájdený"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Album art nenájdený"
+    *: "Album art nenájdený"
   </voice>
 </phrase>
 <phrase>
@@ -15326,16 +14812,13 @@
   desc: spoken only, for announcing chess moves
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Berie"
+    *: "Berie"
   </voice>
 </phrase>
 <phrase>
@@ -15343,16 +14826,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Checkmate!"
+    *: "Checkmate!"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Mat!"
+    *: "Mat!"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Mat!"
+    *: "Mat!"
   </voice>
 </phrase>
 <phrase>
@@ -15360,16 +14840,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Playlist Cleared"
+    *: "Playlist Cleared"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Playlist vymazaný"
+    *: "Playlist vymazaný"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Playlist vymazaný"
+    *: "Playlist vymazaný"
   </voice>
 </phrase>
 <phrase>
@@ -15391,19 +14868,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Set resume time (min)"
     lowmem: none
-    swcodec: "Set resume time (min)"
   </source>
   <dest>
-    *: none
+    *: "nastaviť čas obnovenia (min)"
     lowmem: none
-    swcodec: "nastaviť čas obnovenia (min)"
   </dest>
   <voice>
-    *: none
+    *: "nastaviť čas obnovenia"
     lowmem: none
-    swcodec: "nastaviť čas obnovenia"
   </voice>
 </phrase>
 <phrase>
@@ -15439,19 +14913,16 @@
   desc: in the mpegplayer settings menu
   user: core
   <source>
-    *: none
+    *: "Skip frames"
     lowmem: none
-    swcodec: "Skip frames"
   </source>
   <dest>
-    *: none
+    *: "preskočiť frejmy"
     lowmem: none
-    swcodec: "preskočiť frejmy"
   </dest>
   <voice>
-    *: none
+    *: "Preskočiť frejmy"
     lowmem: none
-    swcodec: "Preskočiť frejmy"
   </voice>
 </phrase>
 <phrase>
@@ -15459,16 +14930,13 @@
   desc: in the pictureflow splash messages
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Added to playlist"
+    *: "Added to playlist"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pridané do playlistu"
+    *: "Pridané do playlistu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pridané do playlistu"
+    *: "Pridané do playlistu"
   </voice>
 </phrase>
 <phrase>
@@ -15490,19 +14958,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "CPU Boost"
     lowmem: none
-    swcodec: "CPU Boost"
   </source>
   <dest>
-    *: none
+    *: "CPU Boost"
     lowmem: none
-    swcodec: "CPU Boost"
   </dest>
   <voice>
-    *: none
+    *: "CPU Boost"
     lowmem: none
-    swcodec: "CPU Boost"
   </voice>
 </phrase>
 <phrase>
@@ -15524,16 +14989,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Kráľovná"
+    *: "Kráľovná"
   </voice>
 </phrase>
 <phrase>
@@ -15541,19 +15003,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Resume Options"
     lowmem: none
-    swcodec: "Resume Options"
   </source>
   <dest>
-    *: none
+    *: "Nastavenia obnovenia"
     lowmem: none
-    swcodec: "Nastavenia obnovenia"
   </dest>
   <voice>
-    *: none
+    *: "Nastavenia obnovenia"
     lowmem: none
-    swcodec: "Nastavenia obnovenia"
   </voice>
 </phrase>
 <phrase>
@@ -15561,16 +15020,13 @@
   desc: in the chessbox game level selection
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Level 10: 1 move / 600 min"
+    *: "Level 10: 1 move / 600 min"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Úroveň 10: 1 ťah / 600 min"
+    *: "Úroveň 10: 1 ťah / 600 min"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Úroveň 10: 1 ťah za 600 minút"
+    *: "Úroveň 10: 1 ťah za 600 minút"
   </voice>
 </phrase>
 <phrase>
@@ -15578,16 +15034,13 @@
   desc: in chessbox
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Loading position"
+    *: "Loading position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Načítavam pozíciu"
+    *: "Načítavam pozíciu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Načítavam pozíciu"
+    *: "Načítavam pozíciu"
   </voice>
 </phrase>
 <phrase>
@@ -15595,19 +15048,16 @@
   desc: in mpegplayer menus
   user: core
   <source>
-    *: none
+    *: "Resume automatically"
     lowmem: none
-    swcodec: "Resume automatically"
   </source>
   <dest>
-    *: none
+    *: "Obnoviť automaticky"
     lowmem: none
-    swcodec: "Obnoviť automaticky"
   </dest>
   <voice>
-    *: none
+    *: "Obnoviť automaticky"
     lowmem: none
-    swcodec: "Obnoviť automaticky"
   </voice>
 </phrase>
 <phrase>
@@ -15615,16 +15065,13 @@
   desc: spoken only, for announcing chess piece names
   user: core
   <source>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pešiak"
+    *: "Pešiak"
   </voice>
 </phrase>
 <phrase>
@@ -15646,16 +15093,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "New Game"
+    *: "New Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Nová hra"
+    *: "Nová hra"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Nová hra"
+    *: "Nová hra"
   </voice>
 </phrase>
 <phrase>
@@ -15663,16 +15107,13 @@
   desc: in the chessbox menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Select Other Game"
+    *: "Select Other Game"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Vybrať inú hru"
+    *: "Vybrať inú hru"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Vybrať inú hru"
+    *: "Vybrať inú hru"
   </voice>
 </phrase>
 <phrase>
@@ -15680,16 +15121,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album at the top"
+    *: "Show album at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobraziť album navrchu"
+    *: "Zobraziť album navrchu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobraziť album navrchu"
+    *: "Zobraziť album navrchu"
   </voice>
 </phrase>
 <phrase>
@@ -15711,16 +15149,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album and artist at the bottom"
+    *: "Show album and artist at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobraziť album a umelca naspodku"
+    *: "Zobraziť album a umelca naspodku"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobraziť album a umelca naspodku"
+    *: "Zobraziť album a umelca naspodku"
   </voice>
 </phrase>
 <phrase>
@@ -15728,16 +15163,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album at the bottom"
+    *: "Show album at the bottom"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobraziť album naspodku"
+    *: "Zobraziť album naspodku"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobraziť album naspodku"
+    *: "Zobraziť album naspodku"
   </voice>
 </phrase>
 <phrase>
@@ -15745,16 +15177,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hide information"
+    *: "Hide information"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Skryť info"
+    *: "Skryť info"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Skryť info"
+    *: "Skryť info"
   </voice>
 </phrase>
 <phrase>
@@ -15762,16 +15191,13 @@
   desc: in the pictureflow settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Show album and artist at the top"
+    *: "Show album and artist at the top"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Zobraziť album a umelca navrchu"
+    *: "Zobraziť album a umelca navrchu"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Zobraziť album a umelca navrchu"
+    *: "Zobraziť album a umelca navrchu"
   </voice>
 </phrase>
 <phrase>
@@ -15779,19 +15205,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "HQ Mixer"
     lowmem: none
-    swcodec: "HQ Mixer"
   </source>
   <dest>
-    *: none
+    *: "HQ Mixer"
     lowmem: none
-    swcodec: "HQ Mixer"
   </dest>
   <voice>
-    *: none
+    *: "Kvalitný Mixér"
     lowmem: none
-    swcodec: "Kvalitný Mixér"
   </voice>
 </phrase>
 <phrase>
@@ -15799,19 +15222,16 @@
   desc: in mikmod settings menu
   user: core
   <source>
-    *: none
+    *: "Sample Rate"
     lowmem: none
-    swcodec: "Sample Rate"
   </source>
   <dest>
-    *: none
+    *: "Vzorkovacia frekvencia"
     lowmem: none
-    swcodec: "Vzorkovacia frekvencia"
   </dest>
   <voice>
-    *: none
+    *: "Vzorkovacia frekvencia"
     lowmem: none
-    swcodec: "Vzorkovacia frekvencia"
   </voice>
 </phrase>
 <phrase>
@@ -15836,8 +15256,8 @@
   <dest>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
     cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
+    hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"
@@ -15852,8 +15272,8 @@
   <voice>
     *: "Stlačte LEFT pre zrušenie"
     android: "Stlačte späť pre zrušenie"
-    hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
     cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Stlačte POWER pre zrušenie"
+    hifietma*,zenvision: "Stlačte BACK Pre zrušenie"
     ihifi760,ihifi960: "Poklepte RETURN pre zrušenie"
     ihifi770,ihifi770c,ihifi800: "Stlačte HOME pre zrušenie"
     iriverh10,samsungyh*: "Poklepte LEFT pre zrušenie"

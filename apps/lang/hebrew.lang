@@ -20,9 +20,6 @@
 # - Rani Hod
 # - Tomer Shalev
 # - Sasha Khamkov
-<options>
-  rtl: 1
-</options>
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -253,20 +250,20 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU, or top-right = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "כן = PLAY"
-    cowond2*: "או פינה ימנית-עליונה = כן MENU"
-    iriverh100,iriverh120,iriverh300: "כן = NAVI"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*: "כן = SELECT"
-    mrobe500: "או פינה ימנית-עליונה = כן Power, Play"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "או פינה ימנית-עליונה = כן MENU"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansae200*,sansafuze*: "כן = SELECT"
+    iriverh100,iriverh120,iriverh300: "כן = NAVI"
+    mrobe500: "או פינה ימנית-עליונה = כן Power, Play"
     vibe500: "כן = OK"
   </dest>
   <voice>
@@ -822,16 +819,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </dest>
   <voice>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </voice>
 </phrase>
 <phrase>
@@ -839,16 +833,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "הגברה ישירה"
+    *: "הגברה ישירה"
   </dest>
   <voice>
-    *: none
-    swcodec: "הגברה ישירה"
+    *: "הגברה ישירה"
   </voice>
 </phrase>
 <phrase>
@@ -856,16 +847,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "הגברה הפוכה"
+    *: "הגברה הפוכה"
   </dest>
   <voice>
-    *: none
-    swcodec: "הגברה הפוכה"
+    *: "הגברה הפוכה"
   </voice>
 </phrase>
 <phrase>
@@ -873,16 +861,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "הנמכת צלילים בתדירות גבוהה"
+    *: "הנמכת צלילים בתדירות גבוהה"
   </dest>
   <voice>
-    *: none
-    swcodec: "הנמכת צלילים בתדירות גבוהה"
+    *: "הנמכת צלילים בתדירות גבוהה"
   </voice>
 </phrase>
 <phrase>
@@ -890,16 +875,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "חיתוך צלילים בתדירות גבוהה"
+    *: "חיתוך צלילים בתדירות גבוהה"
   </dest>
   <voice>
-    *: none
-    swcodec: "חיתוך צלילים בתדירות גבוהה"
+    *: "חיתוך צלילים בתדירות גבוהה"
   </voice>
 </phrase>
 <phrase>
@@ -907,16 +889,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "אקולייזר"
+    *: "אקולייזר"
   </dest>
   <voice>
-    *: none
-    swcodec: "אקולייזר"
+    *: "אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -924,16 +903,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "הפעל אקולייזר"
+    *: "הפעל אקולייזר"
   </dest>
   <voice>
-    *: none
-    swcodec: "הפעל אקולייזר"
+    *: "הפעל אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -941,16 +917,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "אקולייזר גרפי"
+    *: "אקולייזר גרפי"
   </dest>
   <voice>
-    *: none
-    swcodec: "אקולייזר גרפי"
+    *: "אקולייזר גרפי"
   </voice>
 </phrase>
 <phrase>
@@ -958,16 +931,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "חיתוך מראש"
+    *: "חיתוך מראש"
   </dest>
   <voice>
-    *: none
-    swcodec: "חיתוך מראש"
+    *: "חיתוך מראש"
   </voice>
 </phrase>
 <phrase>
@@ -975,16 +945,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "הגדרות אקולייזר פשוטות"
+    *: "הגדרות אקולייזר פשוטות"
   </dest>
   <voice>
-    *: none
-    swcodec: "הגדרות אקולייזר פשוטות"
+    *: "הגדרות אקולייזר פשוטות"
   </voice>
 </phrase>
 <phrase>
@@ -992,16 +959,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "הגדרות אקולייזר מתקדמות"
+    *: "הגדרות אקולייזר מתקדמות"
   </dest>
   <voice>
-    *: none
-    swcodec: "הגדרות אקולייזר מתקדמות"
+    *: "הגדרות אקולייזר מתקדמות"
   </voice>
 </phrase>
 <phrase>
@@ -1009,16 +973,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "שמור הגדרות אקולייזר"
+    *: "שמור הגדרות אקולייזר"
   </dest>
   <voice>
-    *: none
-    swcodec: "שמור הגדרות אקולייזר"
+    *: "שמור הגדרות אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -1026,16 +987,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "דפדף בהגדרות אקולייזר"
+    *: "דפדף בהגדרות אקולייזר"
   </dest>
   <voice>
-    *: none
-    swcodec: "דפדף בהגדרות אקולייזר"
+    *: "דפדף בהגדרות אקולייזר"
   </voice>
 </phrase>
 <phrase>
@@ -1043,16 +1001,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "מצב עריכה: %s"
+    *: "מצב עריכה: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1060,16 +1015,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%d Hz רצועה מוגברת"
+    *: "%d Hz רצועה מוגברת"
   </dest>
   <voice>
-    *: none
-    swcodec: "הרץ רצועה מוגברת"
+    *: "הרץ רצועה מוגברת"
   </voice>
 </phrase>
 <phrase>
@@ -1077,16 +1029,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "מסנך רף נמוך"
+    *: "מסנך רף נמוך"
   </dest>
   <voice>
-    *: none
-    swcodec: "מסנך רף נמוך"
+    *: "מסנך רף נמוך"
   </voice>
 </phrase>
 <phrase>
@@ -1094,16 +1043,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "%d מסנן פסגה"
+    *: "%d מסנן פסגה"
   </dest>
   <voice>
-    *: none
-    swcodec: "מסנן פסגה"
+    *: "מסנן פסגה"
   </voice>
 </phrase>
 <phrase>
@@ -1111,16 +1057,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "מסנן רף גבוה"
+    *: "מסנן רף גבוה"
   </dest>
   <voice>
-    *: none
-    swcodec: "מסנן רף גבוה"
+    *: "מסנן רף גבוה"
   </voice>
 </phrase>
 <phrase>
@@ -1128,16 +1071,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "תדירות חיתוך צליל"
+    *: "תדירות חיתוך צליל"
   </dest>
   <voice>
-    *: none
-    swcodec: "תדירות חיתוך צליל"
+    *: "תדירות חיתוך צליל"
   </voice>
 </phrase>
 <phrase>
@@ -1145,16 +1085,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "תדירות מרכזית"
+    *: "תדירות מרכזית"
   </dest>
   <voice>
-    *: none
-    swcodec: "תדירות מרכזית"
+    *: "תדירות מרכזית"
   </voice>
 </phrase>
 <phrase>
@@ -1162,16 +1099,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1179,16 +1113,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </dest>
   <voice>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -1732,16 +1663,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "מנע עיוותים"
+    *: "מנע עיוותים"
   </dest>
   <voice>
-    *: none
-    swcodec: "מנע עיוותים"
+    *: "מנע עיוותים"
   </voice>
 </phrase>
 <phrase>
@@ -1819,16 +1747,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "צפצוף מעבר שיר"
+    *: "צפצוף מעבר שיר"
   </dest>
   <voice>
-    *: none
-    swcodec: "צפצוף מעבר שיר"
+    *: "צפצוף מעבר שיר"
   </voice>
 </phrase>
 <phrase>
@@ -1836,16 +1761,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "חלש"
+    *: "חלש"
   </dest>
   <voice>
-    *: none
-    swcodec: "חלש"
+    *: "חלש"
   </voice>
 </phrase>
 <phrase>
@@ -1853,16 +1775,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "בינוני"
+    *: "בינוני"
   </dest>
   <voice>
-    *: none
-    swcodec: "בינוני"
+    *: "בינוני"
   </voice>
 </phrase>
 <phrase>
@@ -1870,16 +1789,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "חזק"
+    *: "חזק"
   </dest>
   <voice>
-    *: none
-    swcodec: "חזק"
+    *: "חזק"
   </voice>
 </phrase>
 <phrase>
@@ -2239,19 +2155,17 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "בונה מסד נתונים... %d נמצאו (OFF כדי לחזור)"
-    iriverh100,iriverh120,iriverh300: "בונה מסד נתונים... %d נמצאו (STOP כדי לחזור)"
-    ipod*: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "בונה מסד נתונים... %d נמצאו (LEFT כדי לחזור)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "בונה מסד נתונים... %d נמצאו (LEFT כדי לחזור)"
     gogearsa9200: "בונה מסד נתונים... %d נמצאו (REW כדי לחזור)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "בונה מסד נתונים... %d נמצאו (PREV כדי לחזור)"
+    iriverh100,iriverh120,iriverh300: "בונה מסד נתונים... %d נמצאו (STOP כדי לחזור)"
   </dest>
   <voice>
     *: "רשומות נמצאו עבור מסד הנתונים"
@@ -2433,16 +2347,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "גופנים"
+    *: "גופנים"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "גופנים"
+    *: "גופנים"
   </voice>
 </phrase>
 <phrase>
@@ -2704,16 +2615,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "במהופך"
+    *: "במהופך"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "במהופך"
+    *: "במהופך"
   </voice>
 </phrase>
 <phrase>
@@ -2721,16 +2629,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "סוג בורר השורה"
+    *: "סוג בורר השורה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "סוג בורר השורה"
+    *: "סוג בורר השורה"
   </voice>
 </phrase>
 <phrase>
@@ -2738,16 +2643,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "מצביע"
+    *: "מצביע"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "מצביע"
+    *: "מצביע"
   </voice>
 </phrase>
 <phrase>
@@ -2755,16 +2657,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "(שורה (נגדי"
+    *: "(שורה (נגדי"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "שורה נגדית"
+    *: "שורה נגדית"
   </voice>
 </phrase>
 <phrase>
@@ -3054,16 +2953,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "מסך נגלל מחוץ לתצוגה"
+    *: "מסך נגלל מחוץ לתצוגה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "מסך נגלל מחוץ לתצוגה"
+    *: "מסך נגלל מחוץ לתצוגה"
   </voice>
 </phrase>
 <phrase>
@@ -3071,16 +2967,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "גודל צעד בגלילת מסך"
+    *: "גודל צעד בגלילת מסך"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "גודל צעד בגלילת מסך"
+    *: "גודל צעד בגלילת מסך"
   </voice>
 </phrase>
 <phrase>
@@ -3136,16 +3029,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "שורת מצב/פס גלילה"
+    *: "שורת מצב/פס גלילה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "שורת מצב ופס גלילה"
+    *: "שורת מצב ופס גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3153,16 +3043,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "פס גלילה"
+    *: "פס גלילה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "פס גלילה"
+    *: "פס גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -3170,16 +3057,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "שורת מצב"
+    *: "שורת מצב"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "שורת מצב"
+    *: "שורת מצב"
   </voice>
 </phrase>
 <phrase>
@@ -3204,16 +3088,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "תצוגת עוצמת קול"
+    *: "תצוגת עוצמת קול"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "תצוגת עוצמת קול"
+    *: "תצוגת עוצמת קול"
   </voice>
 </phrase>
 <phrase>
@@ -3221,16 +3102,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "תצוגת סוללה"
+    *: "תצוגת סוללה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "תצוגת סוללה"
+    *: "תצוגת סוללה"
   </voice>
 </phrase>
 <phrase>
@@ -3238,16 +3116,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "גרפית"
+    *: "גרפית"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "גרפית"
+    *: "גרפית"
   </voice>
 </phrase>
 <phrase>
@@ -3255,16 +3130,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "מספרית"
+    *: "מספרית"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "מספרית"
+    *: "מספרית"
   </voice>
 </phrase>
 <phrase>
@@ -3484,16 +3356,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "עברית (ISO-8859-8)"
+    *: "עברית (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "עברית"
+    *: "עברית"
   </voice>
 </phrase>
 <phrase>
@@ -3515,16 +3384,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "תאילנדית (ISO-8859-11)"
+    *: "תאילנדית (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "תאילנדית"
+    *: "תאילנדית"
   </voice>
 </phrase>
 <phrase>
@@ -3532,16 +3398,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "ערבית (CP1256)"
+    *: "ערבית (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "ערבית"
+    *: "ערבית"
   </voice>
 </phrase>
 <phrase>
@@ -3577,16 +3440,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "יפנית (SJIS)"
+    *: "יפנית (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "יפנית"
+    *: "יפנית"
   </voice>
 </phrase>
 <phrase>
@@ -3594,16 +3454,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "סינית מפושטת (GB2312)"
+    *: "סינית מפושטת (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "סינית מפושטת"
+    *: "סינית מפושטת"
   </voice>
 </phrase>
 <phrase>
@@ -3611,16 +3468,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "קוריאנית (KSX1001)"
+    *: "קוריאנית (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "קוריאנית"
+    *: "קוריאנית"
   </voice>
 </phrase>
 <phrase>
@@ -3628,16 +3482,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "סינית מסורתית (BIG5)"
+    *: "סינית מסורתית (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "סינית מסורתית"
+    *: "סינית מסורתית"
   </voice>
 </phrase>
 <phrase>
@@ -3661,17 +3512,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "זמן תאורת כפתורים"
-    sansafuze*,sansae200*: "זמן תאורת גלגל"
+    sansae200*,sansafuze*: "זמן תאורת גלגל"
   </dest>
   <voice>
     *: none
     button_light: "זמן תאורת כפתורים"
-    sansafuze*,sansae200*: "זמן תאורת גלגל"
+    sansae200*,sansafuze*: "זמן תאורת גלגל"
   </voice>
 </phrase>
 <phrase>
@@ -3942,27 +3793,27 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "קבע = ON"
-    mrobe500: "קבע = HEART"
-    iriverh100,iriverh120,iriverh300: "קבע = NAVI"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*: "קבע = SELECT"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansae200*,sansafuze*: "קבע = SELECT"
     gogearsa9200,samsungyh*: "קבע = PLAY"
-    vibe500: "קבע = OK"
+    iriverh100,iriverh120,iriverh300: "קבע = NAVI"
     mpiohd300: "קבע = ENTER"
+    mrobe500: "קבע = HEART"
+    rtc: "קבע = ON"
+    vibe500: "קבע = OK"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3971,38 +3822,35 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "החזר = OFF"
-    mrobe500: "החזר = POWER"
-    iriverh100,iriverh120,iriverh300: "החזר = STOP"
-    ipod*,sansac200*,mpiohd300: "החזר = MENU"
-    iaudiox5,iaudiom5: "החזר = RECORD"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "החזר = PREV"
-    gigabeatfx: "החזר = POWER"
-    mrobe100: "החזר = DISPLAY"
+    gigabeatfx,mrobe500: "החזר = POWER"
     gigabeats: "החזר = BACK"
     gogearsa9200: "החזר = LEFT"
-    vibe500: "החזר = C"
+    iaudiom5,iaudiox5: "החזר = RECORD"
+    ipod*,mpiohd300,sansac200*: "החזר = MENU"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "החזר = PREV"
+    iriverh100,iriverh120,iriverh300: "החזר = STOP"
+    mrobe100: "החזר = DISPLAY"
+    rtc: "החזר = OFF"
     samsungyh*: "החזר = Revert"
+    vibe500: "החזר = C"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4488,21 +4336,21 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "ביטול=OFF קבע=PLAY"
+    gigabeats: "ביטול=POWER קבע=SELECT"
     ipod*: "ביטול=MENU קבע=SELECT"
     iriverh10,iriverh10_5gb: "ביטול=PREV קבע=SELECT"
-    gigabeats: "ביטול=POWER קבע=SELECT"
-    vibe500: "ביטול=C קבע=OK"
     mpiohd300: "ביטול=MENU קבע=ENTER"
+    vibe500: "ביטול=C קבע=OK"
   </dest>
   <voice>
     *: none
@@ -5607,15 +5455,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "תדירות"
+    play_frequency,recording: "תדירות"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "תדירות"
+    play_frequency,recording: "תדירות"
   </voice>
 </phrase>
 <phrase>
@@ -5658,18 +5506,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "מיקרופון"
     iriverh100,iriverh120,iriverh300: "מיקרופון פנימי"
+    recording: "מיקרופון"
   </dest>
   <voice>
     *: none
-    recording: "מיקרופון"
     iriverh100,iriverh120,iriverh300: "מיקרופון פנימי"
+    recording: "מיקרופון"
   </voice>
 </phrase>
 <phrase>
@@ -6547,13 +6395,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "סוללה: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "סולל: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "סולל: %d%% %dh %dm"
   </dest>
   <voice>
     *: "רמת סוללה"
@@ -6610,24 +6458,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
-    xduoox3: "MSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
+    xduoox3: "MSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    xduoox3: "micro S D 2"
     archosondio*: "M M C"
+    multivolume: "H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -7942,23 +7790,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "הכונן מלא. לחץ על OFF כדי להמשיך"
-    iriverh100,iriverh120,iriverh300: "הכונן מלא. לחץ על STOP כדי להמשיך"
     iaudiom5,iaudiox5: "הכונן מלא. לחץ על POWER כדי להמשיך"
-    sansae200*,sansac200*,vibe500: "הכונן מלא. לחץ על PREV כדי להמשיך"
+    iriverh100,iriverh120,iriverh300: "הכונן מלא. לחץ על STOP כדי להמשיך"
+    recording: "הכונן מלא. לחץ על OFF כדי להמשיך"
     samsungyh*: "הכונן מלא. לחץ על LEFT כדי להמשיך"
+    sansac200*,sansae200*,vibe500: "הכונן מלא. לחץ על PREV כדי להמשיך"
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8046,22 +7894,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "כדי לבטל OFF"
-    iriverh100,iriverh120,iriverh300: "כדי לבטל STOP"
-    ipod*: "כדי לבטל PLAY/PAUSE"
-    iaudiox5,iaudiom5: "PLAY ארוך כדי לבטל"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "כדי לבטל PREV"
-    gigabeats: "כדי לבטל BACK"
     gigabeatfx: "כדי לבטל POWER"
+    gigabeats: "כדי לבטל BACK"
+    iaudiom5,iaudiox5: "PLAY ארוך כדי לבטל"
+    ipod*: "כדי לבטל PLAY/PAUSE"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "כדי לבטל PREV"
+    iriverh100,iriverh120,iriverh300: "כדי לבטל STOP"
   </dest>
   <voice>
     *: ""
@@ -9613,7 +9460,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "גליון סימנים"
@@ -9655,16 +9502,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: none
-    swcodec: "מצב עריכה: %s %s"
+    *: "מצב עריכה: %s %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9672,16 +9516,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "חיתוך"
+    *: "חיתוך"
   </dest>
   <voice>
-    *: none
-    swcodec: "תדירות חיתוך"
+    *: "תדירות חיתוך"
   </voice>
 </phrase>
 <phrase>
@@ -9689,16 +9530,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "הגברה"
+    *: "הגברה"
   </dest>
   <voice>
-    *: none
-    swcodec: "הגברה"
+    *: "הגברה"
   </voice>
 </phrase>
 <phrase>
@@ -9706,16 +9544,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: ":מצב"
+    *: ":מצב"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10344,7 +10179,7 @@
     multivolume: "לא קיים"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_TALK_BATTERY_LEVEL
   desc: Setting for spontaneous battery level announcement
   user: core
@@ -10378,15 +10213,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "חיתוך בס"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "חיתוך בס"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "חיתוך בס"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "חיתוך בס"
   </voice>
 </phrase>
 <phrase>
@@ -10395,15 +10230,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "חיתוך טרבל"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "חיתוך טרבל"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "חיתוך טרבל"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "חיתוך טרבל"
   </voice>
 </phrase>
 <phrase>
@@ -10439,16 +10274,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "קליק לחיצה"
+    *: "קליק לחיצה"
   </dest>
   <voice>
-    *: none
-    swcodec: "קליק לחיצה"
+    *: "קליק לחיצה"
   </voice>
 </phrase>
 <phrase>
@@ -10456,16 +10288,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "חזרה על צליל לחיצה"
+    *: "חזרה על צליל לחיצה"
   </dest>
   <voice>
-    *: none
-    swcodec: "חזרה על צליל לחיצה"
+    *: "חזרה על צליל לחיצה"
   </voice>
 </phrase>
 <phrase>
@@ -10586,11 +10415,11 @@
     *: none
     serial_port: "Serial Bitrate"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "קצב סיביות טורי"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "קצב סיביות טורי"
   </voice>
@@ -10603,11 +10432,11 @@
     *: none
     serial_port: "Auto"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "אוטו"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "אוטומאטית"
   </voice>
@@ -10620,11 +10449,11 @@
     *: none
     serial_port: "9600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "9600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "9600"
   </voice>
@@ -10637,11 +10466,11 @@
     *: none
     serial_port: "19200"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "19200"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "19200"
   </voice>
@@ -10654,11 +10483,11 @@
     *: none
     serial_port: "38400"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "38400"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "38400"
   </voice>
@@ -10671,11 +10500,11 @@
     *: none
     serial_port: "57600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "57600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "57600"
   </voice>
@@ -11198,16 +11027,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "מתיחת זמן"
+    *: "מתיחת זמן"
   </dest>
   <voice>
-    *: none
-    swcodec: "מתיחת זמן"
+    *: "מתיחת זמן"
   </voice>
 </phrase>
 <phrase>
@@ -11215,16 +11041,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "מהירות"
+    *: "מהירות"
   </dest>
   <voice>
-    *: none
-    swcodec: "מהירות"
+    *: "מהירות"
   </voice>
 </phrase>
 <phrase>
@@ -11325,7 +11148,7 @@
 </phrase>
 <phrase>
   id: LANG_SEMITONE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -11478,16 +11301,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "רוחב פס גלילה"
+    *: "רוחב פס גלילה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "רוחב פס גלילה"
+    *: "רוחב פס גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -11495,16 +11315,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "מיקום פס גלילה"
+    *: "מיקום פס גלילה"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "מיקום פס גלילה"
+    *: "מיקום פס גלילה"
   </voice>
 </phrase>
 <phrase>
@@ -11512,16 +11329,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </voice>
 </phrase>
 <phrase>
@@ -11580,16 +11394,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "רמת סף"
+    *: "רמת סף"
   </dest>
   <voice>
-    *: none
-    swcodec: "רמת סף"
+    *: "רמת סף"
   </voice>
 </phrase>
 <phrase>
@@ -11597,16 +11408,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "יחס"
+    *: "יחס"
   </dest>
   <voice>
-    *: none
-    swcodec: "יחס"
+    *: "יחס"
   </voice>
 </phrase>
 <phrase>
@@ -11614,16 +11422,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 ל- 1"
+    *: "2 ל- 1"
   </voice>
 </phrase>
 <phrase>
@@ -11631,16 +11436,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 ל- 1"
+    *: "4 ל- 1"
   </voice>
 </phrase>
 <phrase>
@@ -11648,16 +11450,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 ל- 1"
+    *: "6 ל- 1"
   </voice>
 </phrase>
 <phrase>
@@ -11665,16 +11464,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 ל- 1"
+    *: "10 ל- 1"
   </voice>
 </phrase>
 <phrase>
@@ -11682,16 +11478,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "גבול"
+    *: "גבול"
   </dest>
   <voice>
-    *: none
-    swcodec: "גבול"
+    *: "גבול"
   </voice>
 </phrase>
 <phrase>
@@ -11699,16 +11492,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "הגברת פיצוי"
+    *: "הגברת פיצוי"
   </dest>
   <voice>
-    *: none
-    swcodec: "הגברת פיצוי"
+    *: "הגברת פיצוי"
   </voice>
 </phrase>
 <phrase>
@@ -11716,16 +11506,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "אוטו"
+    *: "אוטו"
   </dest>
   <voice>
-    *: none
-    swcodec: "אוטו"
+    *: "אוטו"
   </voice>
 </phrase>
 <phrase>
@@ -11733,16 +11520,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ברך"
+    *: "ברך"
   </dest>
   <voice>
-    *: none
-    swcodec: "ברך"
+    *: "ברך"
   </voice>
 </phrase>
 <phrase>
@@ -11750,16 +11534,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ברך קשה"
+    *: "ברך קשה"
   </dest>
   <voice>
-    *: none
-    swcodec: "ברך קשה"
+    *: "ברך קשה"
   </voice>
 </phrase>
 <phrase>
@@ -11767,16 +11548,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "ברך רכה"
+    *: "ברך רכה"
   </dest>
   <voice>
-    *: none
-    swcodec: "ברך רכה"
+    *: "ברך רכה"
   </voice>
 </phrase>
 <phrase>
@@ -11784,16 +11562,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "זמן שחרור"
+    *: "זמן שחרור"
   </dest>
   <voice>
-    *: none
-    swcodec: "זמן שחרור"
+    *: "זמן שחרור"
   </voice>
 </phrase>
 <phrase>
@@ -11981,16 +11756,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </voice>
 </phrase>
 <phrase>
@@ -11998,16 +11770,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </voice>
 </phrase>
 <phrase>
@@ -12233,16 +12002,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </dest>
   <voice>
-    *: none
-    swcodec: "Rewind before resume"
+    *: "Rewind before resume"
   </voice>
 </phrase>
 <phrase>
@@ -12518,7 +12284,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"

@@ -830,7 +830,7 @@
 </phrase>
 <phrase>
   id: LANG_ID3_ARTIST
-  desc: in wps 
+  desc: in wps
   user: core
   <source>
     *: "Artist"

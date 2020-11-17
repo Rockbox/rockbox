@@ -246,20 +246,20 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    cowond2*: "MENU, or top-right = Yes"
-    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Yes"
-    mrobe500: "PLAY, POWER, or top-right = Yes"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU, or top-right = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    iriverh100,iriverh120,iriverh300: "NAVI = Yes"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Da"
-    cowond2*: "MENU, ili gore desno = Da"
-    iriverh100,iriverh120,iriverh300: "NAVI = Da"
-    ipod*,iaudiox5,iaudiom5,gigabeat*,sansae200*,sansac200*,iriverh10,iriverh10_5gb,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Da"
-    mrobe500: "PLAY, POWER, ili gore desno = Da"
     archosplayer: "(PLAY/STOP)"
+    cowond2*: "MENU, ili gore desno = Da"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Da"
+    iriverh100,iriverh120,iriverh300: "NAVI = Da"
+    mrobe500: "PLAY, POWER, ili gore desno = Da"
     vibe500: "OK = DA"
   </dest>
   <voice>
@@ -815,16 +815,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Crossfeed"
+    *: "Crossfeed"
   </source>
   <dest>
-    *: none
-    swcodec: "Pretapanje"
+    *: "Pretapanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pretapanje"
+    *: "Pretapanje"
   </voice>
 </phrase>
 <phrase>
@@ -832,16 +829,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Direct Gain"
+    *: "Direct Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Direktno pojačanje"
+    *: "Direktno pojačanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Direktno pojačanje"
+    *: "Direktno pojačanje"
   </voice>
 </phrase>
 <phrase>
@@ -849,16 +843,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "Cross Gain"
+    *: "Cross Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Pojačanje pretapanja"
+    *: "Pojačanje pretapanja"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pojačanje pretapanja"
+    *: "Pojačanje pretapanja"
   </voice>
 </phrase>
 <phrase>
@@ -866,16 +857,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Attenuation"
+    *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: none
-    swcodec: "Visokofrekvencijsko oslabljenje"
+    *: "Visokofrekvencijsko oslabljenje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Visokofrekvencijsko oslabljenje"
+    *: "Visokofrekvencijsko oslabljenje"
   </voice>
 </phrase>
 <phrase>
@@ -883,16 +871,13 @@
   desc: in crossfeed settings
   user: core
   <source>
-    *: none
-    swcodec: "High-Frequency Cutoff"
+    *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Visokofrekvencijsko odsijecanje"
+    *: "Visokofrekvencijsko odsijecanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Visokofrekvencijsko odsijecanje"
+    *: "Visokofrekvencijsko odsijecanje"
   </voice>
 </phrase>
 <phrase>
@@ -900,16 +885,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Equalizer"
+    *: "Equalizer"
   </source>
   <dest>
-    *: none
-    swcodec: "Izjednačivač (EQ)"
+    *: "Izjednačivač (EQ)"
   </dest>
   <voice>
-    *: none
-    swcodec: "Izjednačivač (EQ)"
+    *: "Izjednačivač (EQ)"
   </voice>
 </phrase>
 <phrase>
@@ -917,16 +899,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Enable EQ"
+    *: "Enable EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Omogući EQ"
+    *: "Omogući EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Omogući izjednačivač"
+    *: "Omogući izjednačivač"
   </voice>
 </phrase>
 <phrase>
@@ -934,16 +913,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Graphical EQ"
+    *: "Graphical EQ"
   </source>
   <dest>
-    *: none
-    swcodec: "Grafički EQ"
+    *: "Grafički EQ"
   </dest>
   <voice>
-    *: none
-    swcodec: "Grafički izjednačivač"
+    *: "Grafički izjednačivač"
   </voice>
 </phrase>
 <phrase>
@@ -951,16 +927,13 @@
   desc: in eq settings
   user: core
   <source>
-    *: none
-    swcodec: "Precut"
+    *: "Precut"
   </source>
   <dest>
-    *: none
-    swcodec: "Prednji rez"
+    *: "Prednji rez"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prednji rez"
+    *: "Prednji rez"
   </voice>
 </phrase>
 <phrase>
@@ -968,16 +941,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Simple EQ Settings"
+    *: "Simple EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Jednostavne EQ postavke"
+    *: "Jednostavne EQ postavke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Jednostavne postavke izjednačivača"
+    *: "Jednostavne postavke izjednačivača"
   </voice>
 </phrase>
 <phrase>
@@ -985,16 +955,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Advanced EQ Settings"
+    *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: none
-    swcodec: "Napredne EQ postavke"
+    *: "Napredne EQ postavke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Napredne postavke izjednačivača"
+    *: "Napredne postavke izjednačivača"
   </voice>
 </phrase>
 <phrase>
@@ -1002,16 +969,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Save EQ Preset"
+    *: "Save EQ Preset"
   </source>
   <dest>
-    *: none
-    swcodec: "Spremi EQ postavke"
+    *: "Spremi EQ postavke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Spremi postavke izjednačivača"
+    *: "Spremi postavke izjednačivača"
   </voice>
 </phrase>
 <phrase>
@@ -1019,16 +983,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Browse EQ Presets"
+    *: "Browse EQ Presets"
   </source>
   <dest>
-    *: none
-    swcodec: "Pregledaj EQ postavke"
+    *: "Pregledaj EQ postavke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pregledaj postavke izjedačivača"
+    *: "Pregledaj postavke izjedačivača"
   </voice>
 </phrase>
 <phrase>
@@ -1036,16 +997,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s"
+    *: "Edit mode: %s"
   </source>
   <dest>
-    *: none
-    swcodec: "Način uređivanja: %s"
+    *: "Način uređivanja: %s"
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -1053,16 +1011,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "%d Hz Band Gain"
+    *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "%d Hz pojasno pojačanje"
+    *: "%d Hz pojasno pojačanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "herca pojasno pojačanje"
+    *: "herca pojasno pojačanje"
   </voice>
 </phrase>
 <phrase>
@@ -1070,16 +1025,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Low Shelf Filter"
+    *: "Low Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Niskofrekvencijski filter"
+    *: "Niskofrekvencijski filter"
   </dest>
   <voice>
-    *: none
-    swcodec: "Niskofrekvencijski filter"
+    *: "Niskofrekvencijski filter"
   </voice>
 </phrase>
 <phrase>
@@ -1087,16 +1039,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Peak Filter %d"
+    *: "Peak Filter %d"
   </source>
   <dest>
-    *: none
-    swcodec: "Filter vršnih frekvencija %d"
+    *: "Filter vršnih frekvencija %d"
   </dest>
   <voice>
-    *: none
-    swcodec: "Filter vršnih frekvencija"
+    *: "Filter vršnih frekvencija"
   </voice>
 </phrase>
 <phrase>
@@ -1104,16 +1053,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "High Shelf Filter"
+    *: "High Shelf Filter"
   </source>
   <dest>
-    *: none
-    swcodec: "Viskofrekvencijski filter"
+    *: "Viskofrekvencijski filter"
   </dest>
   <voice>
-    *: none
-    swcodec: "Viskofrekvencijski filter"
+    *: "Viskofrekvencijski filter"
   </voice>
 </phrase>
 <phrase>
@@ -1121,16 +1067,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff Frequency"
+    *: "Cutoff Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Frekvencija odsijecanja"
+    *: "Frekvencija odsijecanja"
   </dest>
   <voice>
-    *: none
-    swcodec: "Frekvencija odsijecanja"
+    *: "Frekvencija odsijecanja"
   </voice>
 </phrase>
 <phrase>
@@ -1138,16 +1081,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Centre Frequency"
+    *: "Centre Frequency"
   </source>
   <dest>
-    *: none
-    swcodec: "Središnja frekvencija"
+    *: "Središnja frekvencija"
   </dest>
   <voice>
-    *: none
-    swcodec: "Središnja frekvencija"
+    *: "Središnja frekvencija"
   </voice>
 </phrase>
 <phrase>
@@ -1155,16 +1095,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </source>
   <dest>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </dest>
   <voice>
-    *: none
-    swcodec: "Q"
+    *: "Q"
   </voice>
 </phrase>
 <phrase>
@@ -1172,16 +1109,13 @@
   desc: in the sound settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </source>
   <dest>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </dest>
   <voice>
-    *: none
-    swcodec: "Dithering"
+    *: "Dithering"
   </voice>
 </phrase>
 <phrase>
@@ -1724,16 +1658,13 @@
   desc: in replaygain
   user: core
   <source>
-    *: none
-    swcodec: "Prevent Clipping"
+    *: "Prevent Clipping"
   </source>
   <dest>
-    *: none
-    swcodec: "Spriječi isijecanje"
+    *: "Spriječi isijecanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Spriječi isijecanje"
+    *: "Spriječi isijecanje"
   </voice>
 </phrase>
 <phrase>
@@ -1811,16 +1742,13 @@
   desc: in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Track Skip Beep"
+    *: "Track Skip Beep"
   </source>
   <dest>
-    *: none
-    swcodec: "Signal pri preskakanju pjesme"
+    *: "Signal pri preskakanju pjesme"
   </dest>
   <voice>
-    *: none
-    swcodec: "Signal pri preskakanju pjesme"
+    *: "Signal pri preskakanju pjesme"
   </voice>
 </phrase>
 <phrase>
@@ -1828,16 +1756,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Weak"
+    *: "Weak"
   </source>
   <dest>
-    *: none
-    swcodec: "Slab"
+    *: "Slab"
   </dest>
   <voice>
-    *: none
-    swcodec: "Slab"
+    *: "Slab"
   </voice>
 </phrase>
 <phrase>
@@ -1845,16 +1770,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Moderate"
+    *: "Moderate"
   </source>
   <dest>
-    *: none
-    swcodec: "Umjeren"
+    *: "Umjeren"
   </dest>
   <voice>
-    *: none
-    swcodec: "Umjeren"
+    *: "Umjeren"
   </voice>
 </phrase>
 <phrase>
@@ -1862,16 +1784,13 @@
   desc: in beep volume in playback settings
   user: core
   <source>
-    *: none
-    swcodec: "Strong"
+    *: "Strong"
   </source>
   <dest>
-    *: none
-    swcodec: "Jak"
+    *: "Jak"
   </dest>
   <voice>
-    *: none
-    swcodec: "Jak"
+    *: "Jak"
   </voice>
 </phrase>
 <phrase>
@@ -2228,21 +2147,19 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
-    ipod*: "Building database... %d found (PREV to return)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
-    gogearsa9200: "Building database... %d found (REW to return)"
     archosplayer: "Building DB %d found"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
+    gogearsa9200: "Building database... %d found (REW to return)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
+    iriverh100,iriverh120,iriverh300: "Building database... %d found (STOP to return)"
   </source>
   <dest>
     *: "Izgrađivanje baze podataka... %d pronađeno (OFF za povratak)"
-    iriverh100,iriverh120,iriverh300: "Izgrađivanje baze podataka... %d pronađeno (STOP za povratak)"
-    ipod*: "Izgrađivanje baze podataka... %d pronađeno (PREV za povratak)"
-    iaudiox5,iaudiom5,gigabeat*,mrobe100,samsungyh*: "Izgrađivanje baze podataka... %d pronađeno (LEFT za povratak)"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,sansafuze*,vibe500: "Izgrađivanje baze podataka... %d pronađeno (PREV za povratak)"
-    gogearsa9200: "Izgrađivanje baze podataka... %d pronađeno (REW za povratak)"
     archosplayer: "Izgrađivanje DB %d pronađeno"
+    gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Izgrađivanje baze podataka... %d pronađeno (LEFT za povratak)"
+    gogearsa9200: "Izgrađivanje baze podataka... %d pronađeno (REW za povratak)"
+    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Izgrađivanje baze podataka... %d pronađeno (PREV za povratak)"
+    iriverh100,iriverh120,iriverh300: "Izgrađivanje baze podataka... %d pronađeno (STOP za povratak)"
   </dest>
   <voice>
     *: "pronađeni unosi za bazu podataka"
@@ -2424,16 +2341,13 @@
   desc: in setting_menu()
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Font"
+    *: "Font"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pismo"
+    *: "Pismo"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pismo"
+    *: "Pismo"
   </voice>
 </phrase>
 <phrase>
@@ -2695,16 +2609,13 @@
   desc: in settings_menu, option to turn display+buttos by 180 degrees
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Upside Down"
+    *: "Upside Down"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Naopako"
+    *: "Naopako"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Naopako"
+    *: "Naopako"
   </voice>
 </phrase>
 <phrase>
@@ -2712,16 +2623,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Line Selector Type"
+    *: "Line Selector Type"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Vrsta birača retka"
+    *: "Vrsta birača retka"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Vrsta birača retka"
+    *: "Vrsta birača retka"
   </voice>
 </phrase>
 <phrase>
@@ -2729,16 +2637,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Pointer"
+    *: "Pointer"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pokazivač"
+    *: "Pokazivač"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pokazivač"
+    *: "Pokazivač"
   </voice>
 </phrase>
 <phrase>
@@ -2746,16 +2651,13 @@
   desc: in settings_menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Bar (Inverse)"
+    *: "Bar (Inverse)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Traka (obrnuto)"
+    *: "Traka (obrnuto)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Obrnuta traka"
+    *: "Obrnuta traka"
   </voice>
 </phrase>
 <phrase>
@@ -3045,16 +2947,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ekran se skliže van pogleda"
+    *: "Ekran se skliže van pogleda"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ekran se skliže van pogleda"
+    *: "Ekran se skliže van pogleda"
   </voice>
 </phrase>
 <phrase>
@@ -3062,16 +2961,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Veličina koraka sklizanja ekrana"
+    *: "Veličina koraka sklizanja ekrana"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Veličina koraka sklizanja ekrana"
+    *: "Veličina koraka sklizanja ekrana"
   </voice>
 </phrase>
 <phrase>
@@ -3127,16 +3023,13 @@
   desc: in the display sub menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status-/Scrollbar"
+    *: "Status-/Scrollbar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Stanje-/Traka sklizanja"
+    *: "Stanje-/Traka sklizanja"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Stanje- i traka sklizanja"
+    *: "Stanje- i traka sklizanja"
   </voice>
 </phrase>
 <phrase>
@@ -3144,16 +3037,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar"
+    *: "Scroll Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Traka sklizanja"
+    *: "Traka sklizanja"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Traka sklizanja"
+    *: "Traka sklizanja"
   </voice>
 </phrase>
 <phrase>
@@ -3161,16 +3051,13 @@
   desc: display menu, F3 substitute
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Status Bar"
+    *: "Status Bar"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Traka stanja"
+    *: "Traka stanja"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Traka stanja"
+    *: "Traka stanja"
   </voice>
 </phrase>
 <phrase>
@@ -3195,16 +3082,13 @@
   desc: Volume type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Volume Display"
+    *: "Volume Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Prikaz glasnoće"
+    *: "Prikaz glasnoće"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Prikaz glasnoće"
+    *: "Prikaz glasnoće"
   </voice>
 </phrase>
 <phrase>
@@ -3212,16 +3096,13 @@
   desc: Battery type title
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Battery Display"
+    *: "Battery Display"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Prikaz baterije"
+    *: "Prikaz baterije"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Prikaz baterije"
+    *: "Prikaz baterije"
   </voice>
 </phrase>
 <phrase>
@@ -3229,16 +3110,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Graphic"
+    *: "Graphic"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Grafika"
+    *: "Grafika"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Grafika"
+    *: "Grafika"
   </voice>
 </phrase>
 <phrase>
@@ -3246,16 +3124,13 @@
   desc: Label for type of icon display
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Numeric"
+    *: "Numeric"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Broj"
+    *: "Broj"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Broj"
+    *: "Broj"
   </voice>
 </phrase>
 <phrase>
@@ -3475,16 +3350,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Hebrew (ISO-8859-8)"
+    *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Hebrejski (ISO-8859-8)"
+    *: "Hebrejski (ISO-8859-8)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Hebrejski"
+    *: "Hebrejski"
   </voice>
 </phrase>
 <phrase>
@@ -3506,16 +3378,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Thai (ISO-8859-11)"
+    *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Tajlandski (ISO-8859-11)"
+    *: "Tajlandski (ISO-8859-11)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Tajlandski"
+    *: "Tajlandski"
   </voice>
 </phrase>
 <phrase>
@@ -3523,16 +3392,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Arabic (CP1256)"
+    *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Arapski (CP1256)"
+    *: "Arapski (CP1256)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Arapski"
+    *: "Arapski"
   </voice>
 </phrase>
 <phrase>
@@ -3568,16 +3434,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Japanese (SJIS)"
+    *: "Japanese (SJIS)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Japanski (SJIS)"
+    *: "Japanski (SJIS)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Japanski"
+    *: "Japanski"
   </voice>
 </phrase>
 <phrase>
@@ -3585,16 +3448,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Simp. Chinese (GB2312)"
+    *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Jed. kineski (GB2312)"
+    *: "Jed. kineski (GB2312)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Jednostavni kineski"
+    *: "Jednostavni kineski"
   </voice>
 </phrase>
 <phrase>
@@ -3602,16 +3462,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Korean (KSX1001)"
+    *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Korejski (KSX1001)"
+    *: "Korejski (KSX1001)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Korejski"
+    *: "Korejski"
   </voice>
 </phrase>
 <phrase>
@@ -3619,16 +3476,13 @@
   desc: in codepage setting menu
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Trad. Chinese (BIG5)"
+    *: "Trad. Chinese (BIG5)"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Trad. kineski (BIG5)"
+    *: "Trad. kineski (BIG5)"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Tradicionalni kineski"
+    *: "Tradicionalni kineski"
   </voice>
 </phrase>
 <phrase>
@@ -3652,17 +3506,17 @@
   <source>
     *: none
     button_light: "Button Light Timeout"
-    sansafuze*,sansae200*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "Wheel Light Timeout"
   </source>
   <dest>
     *: none
     button_light: "Istek vremena za svjetlo tipki"
-    sansafuze*,sansae200*: "Istek vremena za svjetlo kruga"
+    sansae200*,sansafuze*: "Istek vremena za svjetlo kruga"
   </dest>
   <voice>
     *: none
     button_light: "Istek vremena za svjetlo tipki"
-    sansafuze*,sansae200*: "Istek vremena za svjetlo kruga"
+    sansae200*,sansafuze*: "Istek vremena za svjetlo kruga"
   </voice>
 </phrase>
 <phrase>
@@ -3933,27 +3787,27 @@
   user: core
   <source>
     *: none
-    rtc: "ON = Set"
-    mrobe500: "HEART = Set"
-    iriverh100,iriverh120,iriverh300: "NAVI = Set"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Set"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Set"
     gogearsa9200,samsungyh*: "PLAY = Set"
-    vibe500: "OK = Set"
+    iriverh100,iriverh120,iriverh300: "NAVI = Set"
     mpiohd300: "ENTER = Set"
+    mrobe500: "HEART = Set"
+    rtc: "ON = Set"
+    vibe500: "OK = Set"
   </source>
   <dest>
     *: none
-    rtc: "ON = Postavi"
-    mrobe500: "HEART = Postavi"
-    iriverh100,iriverh120,iriverh300: "NAVI = Postavi"
-    ipod*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,sansae200*,sansac200*,gigabeat*,mrobe100,sansaclip*,sansafuze*,sansaconnect: "SELECT = Postavi"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Postavi"
     gogearsa9200,samsungyh*: "PLAY = Postavi"
-    vibe500: "OK = Postavi"
+    iriverh100,iriverh120,iriverh300: "NAVI = Postavi"
     mpiohd300: "ENTER = Postavi"
+    mrobe500: "HEART = Postavi"
+    rtc: "ON = Postavi"
+    vibe500: "OK = Postavi"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,iriverh10,iriverh10_5gb,iaudiox5,iaudiom5,ipod*,sansae200*,sansac200*,gigabeat*,mrobe100,gogearsa9200,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3962,39 +3816,35 @@
   user: core
   <source>
     *: none
-    rtc: "OFF = Revert"
-    mrobe500: "POWER = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5,iaudiom5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
-    gigabeatfx: "POWER = Revert"
-    sansafuzeplus: "BACK = Revert"
-    mrobe100: "DISPLAY = Revert"
-    gigabeats: "BACK = Revert"
+    gigabeatfx,mrobe500: "POWER = Revert"
+    gigabeats,sansafuzeplus: "BACK = Revert"
     gogearsa9200: "LEFT = Revert"
-    vibe500: "CANCEL = Revert"
+    iaudiom5,iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    mrobe100: "DISPLAY = Revert"
+    rtc: "OFF = Revert"
     samsungyh*: "REW = Revert"
+    vibe500: "CANCEL = Revert"
   </source>
   <dest>
     *: none
-    rtc: "OFF = Povrati"
-    mrobe500: "POWER = Povrati"
-    iriverh100,iriverh120,iriverh300: "STOP = Povrati"
-    ipod*,sansac200*,mpiohd300: "MENU = Povrati"
-    iaudiox5,iaudiom5: "RECORD = Povrati"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Povrati"
-    gigabeatfx: "POWER = Povrati"
-    sansafuzeplus: "BACK = Povrati"
-    mrobe100: "DISPLAY = Povrati"
-    gigabeats: "BACK = Povrati"
+    gigabeatfx,mrobe500: "POWER = Povrati"
+    gigabeats,sansafuzeplus: "BACK = Povrati"
     gogearsa9200: "LEFT = Povrati"
-    vibe500: "CANCEL = Povrati"
+    iaudiom5,iaudiox5: "RECORD = Povrati"
+    ipod*,mpiohd300,sansac200*: "MENU = Povrati"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Povrati"
+    iriverh100,iriverh120,iriverh300: "STOP = Povrati"
+    mrobe100: "DISPLAY = Povrati"
+    rtc: "OFF = Povrati"
     samsungyh*: "REW = Povrati"
+    vibe500: "CANCEL = Povrati"
   </dest>
   <voice>
     *: none
-    rtc,iriverh100,iriverh120,iriverh300,ipod*,sansae200*,sansac200*,iaudiox5,iaudiom5,iriverh10,iriverh10_5gb,gigabeat*,mrobe100,gogearsa9200: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4479,22 +4329,22 @@
   <source>
     *: none
     alarm: "PLAY=Set OFF=Cancel"
+    gigabeats: "SELECT=Set POWER=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
     iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: none
     alarm: "PLAY=Na OFF=Otkaži"
+    gigabeats: "SELECT=Na POWER=Otkaži"
     ipod*: "SELECT=Na MENU=Otkaži"
     iriverh10,iriverh10_5gb: "SELECT=Na PREV=Otkaži"
-    gigabeats: "SELECT=Na POWER=Otkaži"
-    vibe500: "OK=Na C=Otkaži"
     mpiohd300: "ENTER=Na MENU=Otkaži"
     sansafuzeplus: "SELECT=Na  BACK=Otkaži"
+    vibe500: "OK=Na C=Otkaži"
   </dest>
   <voice>
     *: none
@@ -5599,15 +5449,15 @@
   user: core
   <source>
     *: none
-    recording,play_frequency: "Frequency"
+    play_frequency,recording: "Frequency"
   </source>
   <dest>
     *: none
-    recording,play_frequency: "Frekvencija"
+    play_frequency,recording: "Frekvencija"
   </dest>
   <voice>
     *: none
-    recording,play_frequency: "Frekvencija"
+    play_frequency,recording: "Frekvencija"
   </voice>
 </phrase>
 <phrase>
@@ -5650,18 +5500,18 @@
   user: core
   <source>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Internal Microphone"
+    recording: "Microphone"
   </source>
   <dest>
     *: none
-    recording: "Mikrofon"
     iriverh100,iriverh120,iriverh300: "Unutrašnji mikrofon"
+    recording: "Mikrofon"
   </dest>
   <voice>
     *: none
-    recording: "Microphone"
     iriverh100,iriverh120,iriverh300: "Unutrašnji mikrofon"
+    recording: "Microphone"
   </voice>
 </phrase>
 <phrase>
@@ -6539,13 +6389,13 @@
   user: core
   <source>
     *: "Battery: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Baterija: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Bat: %d%% %dh %dm"
     iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Bat: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Razina baterije"
@@ -6602,24 +6452,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
-    xduoox3: "MSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
+    xduoox3: "MSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mikro S D"
-    xduoox3: "mikro S D 2"
     archosondio*: "M M C"
+    multivolume: "H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro S D"
+    xduoox3: "mikro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -7934,23 +7784,23 @@
   user: core
   <source>
     *: none
-    recording: "The disk is full. Press OFF to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    sansae200*,sansac200*,vibe500: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    sansac200*,sansae200*,vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: none
-    recording: "Disk je pun. Pritisnite OFF za nastavak."
-    iriverh100,iriverh120,iriverh300: "Disk je pun. Pritisnite STOP za nastavak."
     iaudiom5,iaudiox5: "Disk je pun. Pritisnite POWER za nastavak."
-    sansae200*,sansac200*,vibe500: "Disk je pun. Pritisnite PREV za nastavak."
+    iriverh100,iriverh120,iriverh300: "Disk je pun. Pritisnite STOP za nastavak."
+    recording: "Disk je pun. Pritisnite OFF za nastavak."
     samsungyh*: "Disk je pun. Pritisnite LEFT za nastavak."
+    sansac200*,sansae200*,vibe500: "Disk je pun. Pritisnite PREV za nastavak."
   </dest>
   <voice>
     *: none
-    recording,iriverh100,iriverh120,iriverh300,iaudiom5,iaudiox5,sansae200*,sansac200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8038,23 +7888,21 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iaudiox5,iaudiom5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV to abort"
-    gigabeats: "BACK to abort"
     gigabeatfx: "POWER to abort"
-    sansafuzeplus: "BACK to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
+    iaudiom5,iaudiox5: "Long PLAY to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF za prekid"
-    iriverh100,iriverh120,iriverh300: "STOP za prekid"
-    ipod*: "PLAY/PAUSE za prekid"
-    iaudiox5,iaudiom5: "Dugo PLAY za prekid"
-    iriverh10,iriverh10_5gb,sansae200*,sansac200*,vibe500: "PREV za prekid"
-    gigabeats: "BACK za prekid"
     gigabeatfx: "POWER za prekid"
-    sansafuzeplus: "BACK za prekid"
+    gigabeats,sansafuzeplus: "BACK za prekid"
+    iaudiom5,iaudiox5: "Dugo PLAY za prekid"
+    ipod*: "PLAY/PAUSE za prekid"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV za prekid"
+    iriverh100,iriverh120,iriverh300: "STOP za prekid"
   </dest>
   <voice>
     *: ""
@@ -9606,7 +9454,7 @@
     *: ""
   </source>
   <dest>
-     *: ""
+    *: ""
   </dest>
   <voice>
     *: "popis znakova za izvođenje"
@@ -9648,15 +9496,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Edit mode: %s %s"
+    *: "Edit mode: %s %s"
   </source>
   <dest>
     *: none
   </dest>
   <voice>
-    *: none
-    swcodec: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9664,16 +9510,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Cutoff"
+    *: "Cutoff"
   </source>
   <dest>
-    *: none
-    swcodec: "Odsijecanje"
+    *: "Odsijecanje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Frekvencija odsijecanja"
+    *: "Frekvencija odsijecanja"
   </voice>
 </phrase>
 <phrase>
@@ -9681,16 +9524,13 @@
   desc: in the equalizer settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Gain"
+    *: "Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Ujednačenje glasnoće"
+    *: "Ujednačenje glasnoće"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ujednačenje glasnoće"
+    *: "Ujednačenje glasnoće"
   </voice>
 </phrase>
 <phrase>
@@ -9698,16 +9538,13 @@
   desc: in wps F2 pressed
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Mode:"
+    *: "Mode:"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Način rada:"
+    *: "Način rada:"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -10336,7 +10173,7 @@
     multivolume: "Nije prisutna"
   </voice>
 </phrase>
-<phrase>  
+<phrase>
   id: LANG_TALK_BATTERY_LEVEL
   desc: Setting for spontaneous battery level announcement
   user: core
@@ -10370,15 +10207,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje basa"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Odsijecanje basa"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje basa"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Odsijecanje basa"
   </voice>
 </phrase>
 <phrase>
@@ -10387,15 +10224,15 @@
   user: core
   <source>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
   </source>
   <dest>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje treblea"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Odsijecanje treblea"
   </dest>
   <voice>
     *: none
-    ipodvideo,ipod6g,mpiohd200,mpiohd300,gigabeatfx,mrobe100: "Odsijecanje treblea"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Odsijecanje treblea"
   </voice>
 </phrase>
 <phrase>
@@ -10431,16 +10268,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick"
+    *: "Keyclick"
   </source>
   <dest>
-    *: none
-    swcodec: "Pritisak tipke"
+    *: "Pritisak tipke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Pritisak tipke"
+    *: "Pritisak tipke"
   </voice>
 </phrase>
 <phrase>
@@ -10448,16 +10282,13 @@
   desc: in keyclick settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Keyclick Repeats"
+    *: "Keyclick Repeats"
   </source>
   <dest>
-    *: none
-    swcodec: "Ponovljeni pritisci tipke"
+    *: "Ponovljeni pritisci tipke"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ponovljeni pritisci tipke"
+    *: "Ponovljeni pritisci tipke"
   </voice>
 </phrase>
 <phrase>
@@ -10578,11 +10409,11 @@
     *: none
     serial_port: "Serial Bitrate"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Serijski protok bitova"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Serijski protok bitova"
   </voice>
@@ -10595,11 +10426,11 @@
     *: none
     serial_port: "Auto"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "Auto"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "Automatsko"
   </voice>
@@ -10612,11 +10443,11 @@
     *: none
     serial_port: "9600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "9600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "9600"
   </voice>
@@ -10629,11 +10460,11 @@
     *: none
     serial_port: "19200"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "19200"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "19200"
   </voice>
@@ -10646,11 +10477,11 @@
     *: none
     serial_port: "38400"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "38400"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "38400"
   </voice>
@@ -10663,11 +10494,11 @@
     *: none
     serial_port: "57600"
   </source>
-  <dest> 
+  <dest>
     *: none
     serial_port: "57600"
   </dest>
-  <voice> 
+  <voice>
     *: none
     serial_port: "57600"
   </voice>
@@ -11188,16 +11019,13 @@
   desc: timestretch enable
   user: core
   <source>
-    *: none
-    swcodec: "Timestretch"
+    *: "Timestretch"
   </source>
   <dest>
-    *: none
-    swcodec: "Rastezanje vremena"
+    *: "Rastezanje vremena"
   </dest>
   <voice>
-    *: none
-    swcodec: "Rastezanje vremena"
+    *: "Rastezanje vremena"
   </voice>
 </phrase>
 <phrase>
@@ -11205,16 +11033,13 @@
   desc: timestretch speed
   user: core
   <source>
-    *: none
-    swcodec: "Speed"
+    *: "Speed"
   </source>
   <dest>
-    *: none
-    swcodec: "Brzina"
+    *: "Brzina"
   </dest>
   <voice>
-    *: none
-    swcodec: "Brzina"
+    *: "Brzina"
   </voice>
 </phrase>
 <phrase>
@@ -11315,7 +11140,7 @@
 </phrase>
 <phrase>
   id: LANG_SEMITONE
-  desc: 
+  desc:
   user: core
   <source>
     *: none
@@ -11466,16 +11291,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Width"
+    *: "Scroll Bar Width"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Širina trake sklizanja"
+    *: "Širina trake sklizanja"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Širina trake sklizanja"
+    *: "Širina trake sklizanja"
   </voice>
 </phrase>
 <phrase>
@@ -11483,16 +11305,13 @@
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Scroll Bar Position"
+    *: "Scroll Bar Position"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Pozicija trake sklizanja"
+    *: "Pozicija trake sklizanja"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Pozicija trake sklizanja"
+    *: "Pozicija trake sklizanja"
   </voice>
 </phrase>
 <phrase>
@@ -11500,16 +11319,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Compressor"
+    *: "Compressor"
   </source>
   <dest>
-    *: none
-    swcodec: "Kompresor"
+    *: "Kompresor"
   </dest>
   <voice>
-    *: none
-    swcodec: "Kompresor"
+    *: "Kompresor"
   </voice>
 </phrase>
 <phrase>
@@ -11568,16 +11384,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Threshold"
+    *: "Threshold"
   </source>
   <dest>
-    *: none
-    swcodec: "Prag"
+    *: "Prag"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prag"
+    *: "Prag"
   </voice>
 </phrase>
 <phrase>
@@ -11585,16 +11398,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Ratio"
+    *: "Ratio"
   </source>
   <dest>
-    *: none
-    swcodec: "Omjer"
+    *: "Omjer"
   </dest>
   <voice>
-    *: none
-    swcodec: "Omjer"
+    *: "Omjer"
   </voice>
 </phrase>
 <phrase>
@@ -11602,16 +11412,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </source>
   <dest>
-    *: none
-    swcodec: "2:1"
+    *: "2:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "2 naprema 1"
+    *: "2 naprema 1"
   </voice>
 </phrase>
 <phrase>
@@ -11619,16 +11426,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </source>
   <dest>
-    *: none
-    swcodec: "4:1"
+    *: "4:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "4 naprema 1"
+    *: "4 naprema 1"
   </voice>
 </phrase>
 <phrase>
@@ -11636,16 +11440,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </source>
   <dest>
-    *: none
-    swcodec: "6:1"
+    *: "6:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "6 naprema 1"
+    *: "6 naprema 1"
   </voice>
 </phrase>
 <phrase>
@@ -11653,16 +11454,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </source>
   <dest>
-    *: none
-    swcodec: "10:1"
+    *: "10:1"
   </dest>
   <voice>
-    *: none
-    swcodec: "10 naprema 1"
+    *: "10 naprema 1"
   </voice>
 </phrase>
 <phrase>
@@ -11670,16 +11468,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Limit"
+    *: "Limit"
   </source>
   <dest>
-    *: none
-    swcodec: "Ograničenje"
+    *: "Ograničenje"
   </dest>
   <voice>
-    *: none
-    swcodec: "Ograničenje"
+    *: "Ograničenje"
   </voice>
 </phrase>
 <phrase>
@@ -11687,16 +11482,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Makeup Gain"
+    *: "Makeup Gain"
   </source>
   <dest>
-    *: none
-    swcodec: "Naknadno ujednačenje glasnoće"
+    *: "Naknadno ujednačenje glasnoće"
   </dest>
   <voice>
-    *: none
-    swcodec: "Naknadno ujednačenje glasnoće"
+    *: "Naknadno ujednačenje glasnoće"
   </voice>
 </phrase>
 <phrase>
@@ -11704,16 +11496,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </source>
   <dest>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </dest>
   <voice>
-    *: none
-    swcodec: "Auto"
+    *: "Auto"
   </voice>
 </phrase>
 <phrase>
@@ -11721,16 +11510,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Knee"
+    *: "Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Prijelaz"
+    *: "Prijelaz"
   </dest>
   <voice>
-    *: none
-    swcodec: "Prijelaz"
+    *: "Prijelaz"
   </voice>
 </phrase>
 <phrase>
@@ -11738,16 +11524,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Hard Knee"
+    *: "Hard Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Nagli prijelaz"
+    *: "Nagli prijelaz"
   </dest>
   <voice>
-    *: none
-    swcodec: "Nagli prijelaz"
+    *: "Nagli prijelaz"
   </voice>
 </phrase>
 <phrase>
@@ -11755,16 +11538,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Soft Knee"
+    *: "Soft Knee"
   </source>
   <dest>
-    *: none
-    swcodec: "Postupni prijelaz"
+    *: "Postupni prijelaz"
   </dest>
   <voice>
-    *: none
-    swcodec: "Postupni prijelaz"
+    *: "Postupni prijelaz"
   </voice>
 </phrase>
 <phrase>
@@ -11772,16 +11552,13 @@
   desc: in sound settings
   user: core
   <source>
-    *: none
-    swcodec: "Release Time"
+    *: "Release Time"
   </source>
   <dest>
-    *: none
-    swcodec: "Vrijeme otpuštanja"
+    *: "Vrijeme otpuštanja"
   </dest>
   <voice>
-    *: none
-    swcodec: "Vrijeme otpuštanja"
+    *: "Vrijeme otpuštanja"
   </voice>
 </phrase>
 <phrase>
@@ -11969,16 +11746,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Base Skin"
+    *: "Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Glavna presvlaka"
+    *: "Glavna presvlaka"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Glavna presvlaka"
+    *: "Glavna presvlaka"
   </voice>
 </phrase>
 <phrase>
@@ -11986,16 +11760,13 @@
   desc: browse for the base skin in theme settings
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Remote Base Skin"
+    *: "Remote Base Skin"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Udaljena glavna presvlaka"
+    *: "Udaljena glavna presvlaka"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Udaljena glavna presvlaka"
+    *: "Udaljena glavna presvlaka"
   </voice>
 </phrase>
 <phrase>
@@ -12122,16 +11893,13 @@
   desc: in playback settings menu
   user: core
   <source>
-    *: none
-    swcodec: "Rewind Before Resume"
+    *: "Rewind Before Resume"
   </source>
   <dest>
-    *: none
-    swcodec: "Premotaj prije nastavljanja"
+    *: "Premotaj prije nastavljanja"
   </dest>
   <voice>
-    *: none
-    swcodec: "Premotaj prije nastavljanja"
+    *: "Premotaj prije nastavljanja"
   </voice>
 </phrase>
 <phrase>
@@ -12523,7 +12291,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"

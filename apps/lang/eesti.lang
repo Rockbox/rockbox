@@ -1334,7 +1334,7 @@
 </phrase>
 <phrase>
   id: LANG_TAGCACHE_DISK
-  desc: 
+  desc:
   user: core
   <source>
     *: ""
@@ -1973,7 +1973,7 @@
     *: "Äratusalarm"
   </dest>
   <voice>
-    *: "Äratusalarm
+    *: "Äratusalarm"
   </voice>
 </phrase>
 <phrase>
@@ -2057,7 +2057,7 @@
     *: "Küsi - ainult hiljutised"
   </dest>
   <voice>
-    *: "Küsi - ainult hiljutised
+    *: "Küsi - ainult hiljutised"
   </voice>
 </phrase>
 <phrase>
@@ -2170,7 +2170,7 @@
   </dest>
   <voice>
     *: "Veeri"
-  </voice>	
+  </voice>
 </phrase>
 <phrase>
   id: LANG_VOICE_DIR_HOVER
@@ -2961,16 +2961,13 @@
   desc: should lines scroll out of the screen
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scrolls Out Of View"
+    *: "Screen Scrolls Out Of View"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Kerimiseribad vaateväljast väljas"
+    *: "Kerimiseribad vaateväljast väljas"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Kerimiseribad vaateväljast väljas"
+    *: "Kerimiseribad vaateväljast väljas"
   </voice>
 </phrase>
 <phrase>
@@ -2978,16 +2975,13 @@
   desc: Pixels to advance per Screen scroll
   user: core
   <source>
-    *: none
-    lcd_bitmap: "Screen Scroll Step Size"
+    *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: none
-    lcd_bitmap: "Ekraanikerimise aste pikkus"
+    *: "Ekraanikerimise aste pikkus"
   </dest>
   <voice>
-    *: none
-    lcd_bitmap: "Ekraanikerimise aste pikkus"
+    *: "Ekraanikerimise aste pikkus"
   </voice>
 </phrase>
 <phrase>
@@ -3334,7 +3328,7 @@
     *: "Set Time/Date"
   </source>
   <dest>
-    *: "Sea kella/kuupäeva
+    *: "Sea kella/kuupäeva"
   </dest>
   <voice>
     *: "Sea kella ja kuupäeva"
@@ -3907,12 +3901,12 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     archosondiofm,iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
     archosondiofm,iriverifp7xx: "%d%% %dh %dm"
-    iriverh10,ipodmini1g,ipodmini2g: "Batt: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
   </dest>
   <voice>
     *: "Aku"
@@ -3969,24 +3963,24 @@
   user: core
   <source>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "mSD:"
-    xduoox3: "mSD2:"
     archosondio*: "MMC:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
+    xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "MSD:"
-    xduoox3: "MSD2:"
     archosondio*: "MMK:"
+    multivolume: "HD1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "MSD:"
+    xduoox3: "MSD2:"
   </dest>
   <voice>
     *: none
-    multivolume: "H D 1"
-    sansae200*,sansac200*,sansafuze*,sansaclipplus: "micro S D"
-    xduoox3: "micro S D 2"
     archosondio*: "Multimeedia kaart"
+    multivolume: "H D 1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -4107,25 +4101,25 @@
   user: core
   <source>
     *: "OFF = Revert"
-    iriverh100,iriverh120,iriverh300: "STOP = Revert"
-    ipod*,sansac200*,mpiohd300: "MENU = Revert"
-    iaudiox5: "RECORD = Revert"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
     gigabeatfx: "POWER = Revert"
+    iaudiox5: "RECORD = Revert"
+    ipod*,mpiohd300,sansac200*: "MENU = Revert"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = Revert"
+    iriverh100,iriverh120,iriverh300: "STOP = Revert"
+    samsungyh*: "REW = Revert"
     sansafuzeplus: "BACK = Revert"
     vibe500: "CANCEL = Revert"
-    samsungyh*: "REW = Revert"
   </source>
   <dest>
     *: "OFF tagasi pöördumiseks"
-    iriverh100,iriverh120,iriverh300: "STOP tagasi pöördumiseks"
-    ipod*,sansac200*,mpiohd300: "MENU tagasi pöördumiseks"
-    iaudiox5: "RECORD tagasi pöördumiseks"
-    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV tagasi pöördumiseks"
     gigabeatfx: "POWER tagasi pöördumiseks"
+    iaudiox5: "RECORD tagasi pöördumiseks"
+    ipod*,mpiohd300,sansac200*: "MENU tagasi pöördumiseks"
+    iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV tagasi pöördumiseks"
+    iriverh100,iriverh120,iriverh300: "STOP tagasi pöördumiseks"
+    samsungyh*: "REW tagasi pöördumiseks"
     sansafuzeplus: "BACK tagasi pöördumiseks"
     vibe500: "C tagasi pöördumiseks"
-    samsungyh*: "REW tagasi pöördumiseks"
   </dest>
   <voice>
     *: ""
@@ -4208,14 +4202,14 @@
   <source>
     *: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
-    vibe500: "The disk is full. Press PREV to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </source>
   <dest>
     *: "The disk is full. Press OFF to continue."
     iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
-    vibe500: "The disk is full. Press PREV to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
+    vibe500: "The disk is full. Press PREV to continue."
   </dest>
   <voice>
     *: ""
@@ -4354,16 +4348,16 @@
   <source>
     *: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </source>
   <dest>
     *: "PLAY=Set OFF=Cancel"
     ipod*: "SELECT=Set MENU=Cancel"
-    vibe500: "OK=Set C=Cancel"
     mpiohd300: "ENTER=Set MENU=Cancel"
     sansafuzeplus: "SELECT=Set  BACK=Cancel"
+    vibe500: "OK=Set C=Cancel"
   </dest>
   <voice>
     *: ""
@@ -6741,19 +6735,17 @@
   user: core
   <source>
     *: "OFF to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
-    ipod*: "PLAY/PAUSE to abort"
     iaudiox5: "Long PLAY to abort"
-    iriverh10,iriverh10_5gb: "PREV to abort"
-    sansae200*,sansac200*,vibe500: "PREV to abort"
+    ipod*: "PLAY/PAUSE to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
+    iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
     *: "OFF katkestamiseks"
-    iriverh100,iriverh120,iriverh300: "STOP katkestamiseks"
-    ipod*: "PLAY/PAUSE katkestamiseks"
     iaudiox5: "Long PLAY katkestamiseks"
-    iriverh10,iriverh10_5gb: "PREV katkestamiseks"
-    sansae200*,sansac200*,vibe500: "PREV katkestamiseks"
+    ipod*: "PLAY/PAUSE katkestamiseks"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV katkestamiseks"
+    iriverh100,iriverh120,iriverh300: "STOP katkestamiseks"
   </dest>
   <voice>
     *: ""
@@ -7220,7 +7212,7 @@
   <voice>
     *: "Remote Scrolling Options"
   </voice>
-</phrase>   
+</phrase>
 <phrase>
   id: LANG_SYSFONT_RECORD_TRIGGER
   desc: in recording settings_menu
@@ -7308,6 +7300,7 @@
 <phrase>
   id: LANG_AGC_DJSET
   desc: AGC preset
+  user: core
   <source>
     *: "DJ-Set (slow)"
   </source>
@@ -7922,7 +7915,7 @@
 </phrase>
 <phrase>
   id: LANG_FILESIZE
-  desc: in record timesplit options and in track information viewer 
+  desc: in record timesplit options and in track information viewer
   user: core
   <source>
     *: "Filesize"
