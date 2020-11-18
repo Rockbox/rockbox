@@ -919,7 +919,7 @@ whichadvanced () {
     interact=1
     echo ""
     printf "Enter your developer options (press only enter when done)\n\
-(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (W)in32 crosscompile,\n\
+(D)EBUG, (L)ogf, Boot(c)hart, (S)imulator, (P)rofiling, (V)oice, (U)SB Serial, (W)in32 crosscompile,\n\
 Win(6)4 crosscompile, (T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
     if [ "$modelname" = "iaudiom5" ]; then
       printf ", (F)M radio MOD"
@@ -998,6 +998,11 @@ Win(6)4 crosscompile, (T)est plugins, S(m)all C lib, Logf to Ser(i)al port:"
           have_rtc_alarm="#define HAVE_RTC_ALARM"
           echo "RTC functions enabled (DS1339/DS3231)"
         fi
+        ;;
+      [Uu])
+        echo "USB Serial support enabled"
+        use_usb_serial="#define USB_ENABLE_SERIAL"
+        logf="yes"
         ;;
       [Ww])
         echo "Enabling Windows cross-compiling (32-bit)"
@@ -4660,14 +4665,11 @@ ${use_logf_serial}
 /* Define this to record a chart with timings for the stages of boot */
 ${use_bootchart}
 
-/* optional define for a backlight modded Ondio */
-${have_backlight}
-
 /* optional define for FM radio mod for iAudio M5 */
 ${have_fmradio_in}
 
-/* optional define for ATA poweroff on Player */
-${have_ata_poweroff}
+/* optional define for USB Serial */
+${use_usb_serial}
 
 /* optional defines for RTC mod for h1x0 */
 ${config_rtc}

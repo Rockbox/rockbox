@@ -43,6 +43,8 @@
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #include "usbstack/usb_serial.h"
+#else
+#undef USB_ENABLE_SERIAL
 #endif
 
 #ifdef ROCKBOX_HAS_LOGDISKF
