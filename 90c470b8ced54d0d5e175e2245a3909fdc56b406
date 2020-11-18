@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d8d0170_5a9d8a15",
+        "filename": "manual/plugins/main.tex",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-11-18T14:35:46Z",
+      "side": 1,
+      "message": "can drop the {} around this (and several others later in the file)",
+      "range": {
+        "startLine": 57,
+        "startChar": 0,
+        "endLine": 57,
+        "endChar": 3
+      },
+      "revId": "90c470b8ced54d0d5e175e2245a3909fdc56b406",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8c2318d_828f4581",
+        "filename": "manual/plugins/main.tex",
+        "patchSetId": 1
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2020-11-18T14:35:46Z",
+      "side": 1,
+      "message": "pretty sure this list is incomplete",
+      "range": {
+        "startLine": 207,
+        "startChar": 0,
+        "endLine": 210,
+        "endChar": 28
+      },
+      "revId": "90c470b8ced54d0d5e175e2245a3909fdc56b406",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
