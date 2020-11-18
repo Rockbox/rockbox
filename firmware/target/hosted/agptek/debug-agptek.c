@@ -62,6 +62,7 @@ bool dbg_hw_info(void)
         }
 
         lcd_putsf(0, line++, "pcm srate: %d", pcm_alsa_get_rate());
+        lcd_putsf(0, line++, "pcm xruns: %d", pcm_alsa_get_xruns());
 #ifdef HAVE_HEADPHONE_DETECTION
         lcd_putsf(0, line++, "hp: %d", headphones_inserted());
 #endif
