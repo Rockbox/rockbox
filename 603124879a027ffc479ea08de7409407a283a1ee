@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f40a5112_3cc85543",
+        "filename": "apps/settings.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-11-19T18:22:11Z",
+      "side": 1,
+      "message": "ATM the only flags I can think of is if the device needs a PIN or user supplies a PIN",
+      "parentUuid": "77c5e25b_dc3a30e8",
+      "range": {
+        "startLine": 833,
+        "startChar": 0,
+        "endLine": 833,
+        "endChar": 6
+      },
+      "revId": "603124879a027ffc479ea08de7409407a283a1ee",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "15fba45e_1eea2c0e",
         "filename": "firmware/export/config/agptekrocker.h",
         "patchSetId": 1
