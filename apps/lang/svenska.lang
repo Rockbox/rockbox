@@ -779,15 +779,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono vänster + höger"
+    recording: "Mono vänster + höger"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono vänster plus höger"
+    recording: "Mono vänster plus höger"
   </voice>
 </phrase>
 <phrase>
@@ -5326,15 +5326,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5377,15 +5377,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Datahastighet"
+    recording: "Datahastighet"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Datahastighet"
+    recording: "Datahastighet"
   </voice>
 </phrase>
 <phrase>
@@ -10705,15 +10705,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Monoläge"
+    recording: "Monoläge"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Monoläge"
+    recording: "Monoläge"
   </voice>
 </phrase>
 <phrase>

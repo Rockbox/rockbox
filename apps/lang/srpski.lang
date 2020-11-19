@@ -4987,15 +4987,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5038,15 +5038,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Битски проток"
+    recording: "Битски проток"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Битски проток"
+    recording: "Битски проток"
   </voice>
 </phrase>
 <phrase>
@@ -9878,15 +9878,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно Леви + Десни"
+    recording: "Моно Леви + Десни"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно Леви плус Десни"
+    recording: "Моно Леви плус Десни"
   </voice>
 </phrase>
 <phrase>
@@ -9974,15 +9974,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно мод"
+    recording: "Моно мод"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно мод"
+    recording: "Моно мод"
   </voice>
 </phrase>
 <phrase>

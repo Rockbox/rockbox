@@ -777,15 +777,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно Ляв + Десен"
+    recording: "Моно Ляв + Десен"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно Ляв + Десен"
+    recording: "Моно Ляв + Десен"
   </voice>
 </phrase>
 <phrase>
@@ -5324,15 +5324,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5375,15 +5375,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Побитова скорост"
+    recording: "Побитова скорост"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Побитова скорост"
+    recording: "Побитова скорост"
   </voice>
 </phrase>
 <phrase>
@@ -10703,15 +10703,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно режим"
+    recording: "Моно режим"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно режим"
+    recording: "Моно режим"
   </voice>
 </phrase>
 <phrase>

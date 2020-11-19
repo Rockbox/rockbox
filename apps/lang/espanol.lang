@@ -8453,15 +8453,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Ueifpack"
+    recording: "Ueifpack"
   </voice>
 </phrase>
 <phrase>
@@ -8925,15 +8925,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Tasa de bits"
+    recording: "Tasa de bits"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Tasa de bits"
+    recording: "Tasa de bits"
   </voice>
 </phrase>
 <phrase>
@@ -10580,15 +10580,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono izquierda + derecha"
+    recording: "Mono izquierda + derecha"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono izquierda mas derecha"
+    recording: "Mono izquierda mas derecha"
   </voice>
 </phrase>
 <phrase>
@@ -10676,15 +10676,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Modo mono"
+    recording: "Modo mono"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Modo mono"
+    recording: "Modo mono"
   </voice>
 </phrase>
 <phrase>

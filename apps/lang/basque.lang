@@ -771,15 +771,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono Ezker + Eskuin"
+    recording: "Mono Ezker + Eskuin"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Ezker gehi Eskuin"
+    recording: "Mono Ezker gehi Eskuin"
   </voice>
 </phrase>
 <phrase>
@@ -5319,15 +5319,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5370,15 +5370,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Bit-tasa"
+    recording: "Bit-tasa"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bit-tasa"
+    recording: "Bit-tasa"
   </voice>
 </phrase>
 <phrase>
@@ -10698,15 +10698,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono modua"
+    recording: "Mono modua"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono modua"
+    recording: "Mono modua"
   </voice>
 </phrase>
 <phrase>

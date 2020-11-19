@@ -8162,15 +8162,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -8276,15 +8276,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </voice>
 </phrase>
 <phrase>

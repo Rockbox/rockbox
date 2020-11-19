@@ -779,15 +779,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "モノラル (左右)"
+    recording: "モノラル (左右)"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "モノラル 左右"
+    recording: "モノラル 左右"
   </voice>
 </phrase>
 <phrase>
@@ -5327,15 +5327,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "ウェーブパック"
+    recording: "ウェーブパック"
   </voice>
 </phrase>
 <phrase>
@@ -5378,15 +5378,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "ビットレート"
+    recording: "ビットレート"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "ビットレート"
+    recording: "ビットレート"
   </voice>
 </phrase>
 <phrase>
@@ -10706,15 +10706,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "モノラル"
+    recording: "モノラル"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "モノラル"
+    recording: "モノラル"
   </voice>
 </phrase>
 <phrase>

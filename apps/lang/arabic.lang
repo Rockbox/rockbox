@@ -3950,15 +3950,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "أحادي يسار+يمين"
+    recording: "أحادي يسار+يمين"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Left plus Right"
+    recording: "Mono Left plus Right"
   </voice>
 </phrase>
 <phrase>
@@ -5923,15 +5923,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "معدل البت"
+    recording: "معدل البت"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "معدل البت"
+    recording: "معدل البت"
   </voice>
 </phrase>
 <phrase>

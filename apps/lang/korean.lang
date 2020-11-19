@@ -8339,15 +8339,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -8407,15 +8407,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "비트레이트"
+    recording: "비트레이트"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "비트레이트"
+    recording: "비트레이트"
   </voice>
 </phrase>
 <phrase>
@@ -9108,15 +9108,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "모노 (좌 + 우)"
+    recording: "모노 (좌 + 우)"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "좌 우 합한 모노"
+    recording: "좌 우 합한 모노"
   </voice>
 </phrase>
 <phrase>
@@ -10425,15 +10425,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "모노 모드"
+    recording: "모노 모드"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "모노 모드"
+    recording: "모노 모드"
   </voice>
 </phrase>
 <phrase>

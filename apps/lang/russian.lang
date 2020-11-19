@@ -6836,15 +6836,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -7526,15 +7526,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Битрейт"
+    recording: "Битрейт"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Битрейт"
+    recording: "Битрейт"
   </voice>
 </phrase>
 <phrase>
@@ -10011,15 +10011,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно Левый + Правый"
+    recording: "Моно Левый + Правый"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно, Левый плюс Правый"
+    recording: "Моно, Левый плюс Правый"
   </voice>
 </phrase>
 <phrase>
@@ -10121,15 +10121,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Режим моно"
+    recording: "Режим моно"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Режим моно"
+    recording: "Режим моно"
   </voice>
 </phrase>
 <phrase>
@@ -12387,7 +12387,7 @@
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
-    *: Charge Only"
+    *: "Charge Only"
   </source>
   <dest>
     *: "Только зарядка"

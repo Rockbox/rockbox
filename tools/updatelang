@@ -60,12 +60,14 @@ sub parselangfile {
 	    foreach (@targets) {
 		my $l = trim($_);
 
-		# Strip out some keys
-#		if ($l eq "swcodec") {
-#		    $l = "*";
-#		} elsif ($l eq "lcd_bitmap") {
-#		    $l = "*";
-#		}
+		# Convert some obsolete keys
+		if ($l eq "swcodec") {
+		    $l = "*";
+		} elsif ($l eq "lcd_bitmap") {
+		    $l = "*";
+		} elsif ($l eq "recording_swcodec") {
+		    $l = "recording";
+		}
 
 		$thisphrase{$pos}->{$l} = $2;
 	    }

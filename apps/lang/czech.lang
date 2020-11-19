@@ -777,15 +777,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono Levé + Pravé"
+    recording: "Mono Levé + Pravé"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono Levé plus Pravé"
+    recording: "Mono Levé plus Pravé"
   </voice>
 </phrase>
 <phrase>
@@ -5310,15 +5310,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5361,15 +5361,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Datový tok"
+    recording: "Datový tok"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Datový tok"
+    recording: "Datový tok"
   </voice>
 </phrase>
 <phrase>
@@ -10715,15 +10715,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono mód"
+    recording: "Mono mód"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono mód"
+    recording: "Mono mód"
   </voice>
 </phrase>
 <phrase>

@@ -107,7 +107,6 @@ radio_remote
 
 #if defined(HAVE_RECORDING)
 recording
-recording_swcodec
 #if defined(HAVE_LINE_IN)
 recording_linein
 #endif

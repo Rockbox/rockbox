@@ -7809,15 +7809,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack(.wv)"
+    recording: "WavPack(.wv)"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -8304,15 +8304,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "码率"
+    recording: "码率"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "码率"
+    recording: "码率"
   </voice>
 </phrase>
 <phrase>
@@ -10503,15 +10503,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "单声道(左)+单声道(右)"
+    recording: "单声道(左)+单声道(右)"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "单声道 左边 和 单声道 右边"
+    recording: "单声道 左边 和 单声道 右边"
   </voice>
 </phrase>
 <phrase>
@@ -10520,15 +10520,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "单声道模式"
+    recording: "单声道模式"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "单声道模式"
+    recording: "单声道模式"
   </voice>
 </phrase>
 <phrase>

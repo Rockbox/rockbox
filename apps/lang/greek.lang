@@ -5273,15 +5273,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Γουέιβ Πάκ"
+    recording: "Γουέιβ Πάκ"
   </voice>
 </phrase>
 <phrase>
@@ -5324,15 +5324,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Ρυθμός μετάδοσης"
+    recording: "Ρυθμός μετάδοσης"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Ρυθμός μετάδοσης"
+    recording: "Ρυθμός μετάδοσης"
   </voice>
 </phrase>
 <phrase>
@@ -10508,15 +10508,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Μονοφωνικό αριστερά + δεξιά"
+    recording: "Μονοφωνικό αριστερά + δεξιά"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Μονοφωνικό αριστερά συν δεξιά"
+    recording: "Μονοφωνικό αριστερά συν δεξιά"
   </voice>
 </phrase>
 <phrase>
@@ -10604,15 +10604,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Μονοφωνικός τρόπος"
+    recording: "Μονοφωνικός τρόπος"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Μονοφωνικός τρόπος"
+    recording: "Μονοφωνικός τρόπος"
   </voice>
 </phrase>
 <phrase>

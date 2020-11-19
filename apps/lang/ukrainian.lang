@@ -771,15 +771,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Моно Лiве+Праве"
+    recording: "Моно Лiве+Праве"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Моно Лiве плюс Праве"
+    recording: "Моно Лiве плюс Праве"
   </voice>
 </phrase>
 <phrase>
@@ -5316,15 +5316,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5367,15 +5367,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Бiтрейт"
+    recording: "Бiтрейт"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Бiтрейт"
+    recording: "Бiтрейт"
   </voice>
 </phrase>
 <phrase>
@@ -10695,15 +10695,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Режим моно"
+    recording: "Режим моно"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Режим моно"
+    recording: "Режим моно"
   </voice>
 </phrase>
 <phrase>

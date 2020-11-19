@@ -8314,15 +8314,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -8382,15 +8382,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Bittinopeus"
+    recording: "Bittinopeus"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bittinopeus"
+    recording: "Bittinopeus"
   </voice>
 </phrase>
 <phrase>
@@ -10581,15 +10581,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Vasen + oikea"
+    recording: "Vasen + oikea"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Vasen plus oikea"
+    recording: "Vasen plus oikea"
   </voice>
 </phrase>
 <phrase>
@@ -10598,15 +10598,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Monotila"
+    recording: "Monotila"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Monotila"
+    recording: "Monotila"
   </voice>
 </phrase>
 <phrase>

@@ -771,15 +771,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono lijevo + desno"
+    recording: "Mono lijevo + desno"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono lijevo plus desno"
+    recording: "Mono lijevo plus desno"
   </voice>
 </phrase>
 <phrase>
@@ -5316,15 +5316,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5367,15 +5367,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Protok bitova"
+    recording: "Protok bitova"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Protok bitova"
+    recording: "Protok bitova"
   </voice>
 </phrase>
 <phrase>
@@ -10695,15 +10695,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono način"
+    recording: "Mono način"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono način"
+    recording: "Mono način"
   </voice>
 </phrase>
 <phrase>

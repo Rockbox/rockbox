@@ -776,15 +776,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono lewy + prawy"
+    recording: "Mono lewy + prawy"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Monofoncziny lewy plus prawy"
+    recording: "Monofoncziny lewy plus prawy"
   </voice>
 </phrase>
 <phrase>
@@ -5005,15 +5005,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5056,15 +5056,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Prędkość transmisji"
+    recording: "Prędkość transmisji"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Prędkość transmisji"
+    recording: "Prędkość transmisji"
   </voice>
 </phrase>
 <phrase>
@@ -9998,15 +9998,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Tryb mono"
+    recording: "Tryb mono"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Tryb monofoniczny"
+    recording: "Tryb monofoniczny"
   </voice>
 </phrase>
 <phrase>

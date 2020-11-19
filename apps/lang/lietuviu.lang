@@ -838,15 +838,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono kairė + dešinė"
+    recording: "Mono kairė + dešinė"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono kairė plius dešinė"
+    recording: "Mono kairė plius dešinė"
   </voice>
 </phrase>
 <phrase>
@@ -5394,15 +5394,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5445,15 +5445,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Bitreitas"
+    recording: "Bitreitas"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bitreitas"
+    recording: "Bitreitas"
   </voice>
 </phrase>
 <phrase>
@@ -10773,15 +10773,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono rėžimas"
+    recording: "Mono rėžimas"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono rėžimas"
+    recording: "Mono rėžimas"
   </voice>
 </phrase>
 <phrase>

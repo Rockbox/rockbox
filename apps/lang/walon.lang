@@ -775,15 +775,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono hintche + droete"
+    recording: "Mono hintche + droete"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono hintche + droete"
+    recording: "Mono hintche + droete"
   </voice>
 </phrase>
 <phrase>
@@ -5337,15 +5337,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -5388,15 +5388,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Debit"
+    recording: "Debit"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Debit"
+    recording: "Debit"
   </voice>
 </phrase>
 <phrase>
@@ -10714,15 +10714,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Môde mono"
+    recording: "Môde mono"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Môde mono"
+    recording: "Môde mono"
   </voice>
 </phrase>
 <phrase>

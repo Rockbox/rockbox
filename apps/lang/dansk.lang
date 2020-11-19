@@ -8204,15 +8204,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </source>
   <dest>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "WavPack"
+    recording: "WavPack"
   </voice>
 </phrase>
 <phrase>
@@ -8365,15 +8365,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Bitrate"
+    recording: "Bitrate"
   </voice>
 </phrase>
 <phrase>
@@ -10593,15 +10593,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono Left + Right"
+    recording: "Mono Left + Right"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono højre + venstre"
+    recording: "Mono højre + venstre"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono højre plus venstre"
+    recording: "Mono højre plus venstre"
   </voice>
 </phrase>
 <phrase>
@@ -10624,15 +10624,15 @@
   user: core
   <source>
     *: none
-    recording_swcodec: "Mono mode"
+    recording: "Mono mode"
   </source>
   <dest>
     *: none
-    recording_swcodec: "Mono tilstand"
+    recording: "Mono tilstand"
   </dest>
   <voice>
     *: none
-    recording_swcodec: "Mono tilstand"
+    recording: "Mono tilstand"
   </voice>
 </phrase>
 <phrase>
