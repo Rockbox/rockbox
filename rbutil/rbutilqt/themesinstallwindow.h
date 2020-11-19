@@ -45,9 +45,6 @@ class ThemesInstallWindow : public QDialog
     public slots:
         void accept(void);
 
-    signals:
-        void done(bool);
-
     private:
         Ui::ThemeInstallFrm ui;
         HttpGet *getter;
