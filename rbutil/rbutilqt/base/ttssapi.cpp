@@ -124,7 +124,7 @@ bool TTSSapi::start(QString *errStr)
     execstring.replace("%speed",m_TTSSpeed);
 
     LOG_INFO() << "Start:" << execstring;
-    voicescript = new QProcess(NULL);
+    voicescript = new QProcess(nullptr);
     //connect(voicescript,SIGNAL(readyReadStandardError()),this,SLOT(error()));
     voicescript->start(execstring);
     LOG_INFO() << "wait for process";
@@ -190,7 +190,7 @@ QStringList TTSSapi::getVoiceList(QString language)
     execstring.replace("%lang",language);
 
     LOG_INFO() << "Start:" << execstring;
-    voicescript = new QProcess(NULL);
+    voicescript = new QProcess(nullptr);
     voicescript->start(execstring);
     LOG_INFO() << "wait for process";
     if(!voicescript->waitForStarted()) {

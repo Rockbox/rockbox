@@ -26,7 +26,7 @@ class InfoWidget : public QWidget
 {
     Q_OBJECT
     public:
-        InfoWidget(QWidget *parent = 0);
+        InfoWidget(QWidget *parent = nullptr);
 
     public slots:
         void updateInfo(void);

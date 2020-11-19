@@ -28,7 +28,7 @@ class TTSMssp: public TTSSapi
 {
     Q_OBJECT
     public:
-        TTSMssp(QObject* parent=NULL) : TTSSapi(parent)
+        TTSMssp(QObject* parent=nullptr) : TTSSapi(parent)
         {
             m_TTSTemplate = "cscript //nologo \"%exe\" "
                 "/language:%lang /voice:\"%voice\" "

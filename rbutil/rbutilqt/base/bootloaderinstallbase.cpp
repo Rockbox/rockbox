@@ -246,7 +246,7 @@ bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
         delete zu;
 
     // if ZIP failed, try CAB
-    if(util == 0)
+    if(util == nullptr)
     {
         MsPackUtil *msu = new MsPackUtil(this);
         if(msu->open(of))

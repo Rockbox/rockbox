@@ -28,7 +28,7 @@ class TTSFlite : public TTSExes
 {
     Q_OBJECT
     public:
-        TTSFlite(QObject* parent=NULL) : TTSExes(parent)
+        TTSFlite(QObject* parent=nullptr) : TTSExes(parent)
         {
             m_name = "flite";
 

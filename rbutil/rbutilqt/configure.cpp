@@ -370,7 +370,7 @@ void Config::setDevices()
     QStringList brands = manuf.uniqueKeys();
     QTreeWidgetItem *w;
     QTreeWidgetItem *w2;
-    QTreeWidgetItem *w3 = 0;
+    QTreeWidgetItem *w3 = nullptr;
 
     QString selected = RbSettings::value(RbSettings::Platform).toString();
     for(int c = 0; c < brands.size(); c++) {
@@ -408,7 +408,7 @@ void Config::setDevices()
     while(widgetitem);
     // add new items
     ui.treeDevices->insertTopLevelItems(0, items);
-    if(w3 != 0) {
+    if(w3 != nullptr) {
         ui.treeDevices->setCurrentItem(w3); // hilight old selection
         ui.treeDevices->scrollToItem(w3);
     }

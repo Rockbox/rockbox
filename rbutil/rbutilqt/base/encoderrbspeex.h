@@ -34,7 +34,7 @@ class EncoderRbSpeex : public EncoderBase
 
     Q_OBJECT
     public:
-        EncoderRbSpeex(QObject *parent = NULL);
+        EncoderRbSpeex(QObject *parent = nullptr);
         bool encode(QString input,QString output);
         bool start();
         bool stop() {return true;}

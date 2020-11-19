@@ -45,7 +45,7 @@ BootloaderInstallIpod::~BootloaderInstallIpod()
 
 bool BootloaderInstallIpod::install(void)
 {
-    if(ipod.sectorbuf == NULL) {
+    if(ipod.sectorbuf == nullptr) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
         emit done(true);
         return false;

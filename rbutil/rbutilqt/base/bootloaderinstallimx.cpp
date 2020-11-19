@@ -63,7 +63,7 @@ void BootloaderThreadImx::run(void)
 BootloaderInstallImx::BootloaderInstallImx(QObject *parent)
         : BootloaderInstallBase(parent)
 {
-    m_thread = NULL;
+    m_thread = nullptr;
 }
 
 

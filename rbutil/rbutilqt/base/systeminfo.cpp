@@ -200,7 +200,7 @@ QMap<int, QStringList> SystemInfo::usbIdMap(enum MapType type)
         int j = ids.size();
         while(j--) {
             QStringList l;
-            int id = ids.at(j).toInt(0, 16);
+            int id = ids.at(j).toInt(nullptr, 16);
             if(id == 0) {
                 continue;
             }

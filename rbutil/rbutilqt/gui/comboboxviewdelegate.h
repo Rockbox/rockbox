@@ -22,7 +22,7 @@ class ComboBoxViewDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
     public:
-        ComboBoxViewDelegate(QObject* parent = 0) : QStyledItemDelegate(parent) { }
+        ComboBoxViewDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) { }
 
         void paint(QPainter *painter, const QStyleOptionViewItem &option,
                 const QModelIndex &index) const;

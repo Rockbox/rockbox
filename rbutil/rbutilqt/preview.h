@@ -33,7 +33,7 @@ class PreviewDlg : public QDialog
     Q_OBJECT
 
 public:
-    PreviewDlg(QWidget *parent = 0);
+    PreviewDlg(QWidget *parent = nullptr);
     void setPixmap(QPixmap p);
     void setText(QString text);
 
@@ -54,7 +54,7 @@ class PreviewLabel : public QLabel
     Q_OBJECT
 
 public:
-    PreviewLabel(QWidget * parent = 0, Qt::WindowFlags f = Qt::WindowFlags());
+    PreviewLabel(QWidget * parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
     void setPixmap(QPixmap p);
     void setText(QString text);

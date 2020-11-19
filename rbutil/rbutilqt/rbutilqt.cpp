@@ -371,7 +371,7 @@ void RbUtilQt::updateSettings()
                 " or review your settings."));
         configDialog();
     }
-    else if(chkConfig(0)) {
+    else if(chkConfig(nullptr)) {
         QApplication::processEvents();
         QMessageBox::critical(this, tr("Configuration error"),
             tr("Your configuration is invalid. This is most likely due "
@@ -400,7 +400,7 @@ void RbUtilQt::updateDevice()
     ui.actionRemove_bootloader->setEnabled(bootloaderUninstallable);
 
     /* Disable the whole tab widget if configuration is invalid */
-    bool configurationValid = !chkConfig(0);
+    bool configurationValid = !chkConfig(nullptr);
     ui.tabWidget->setEnabled(configurationValid);
     ui.menuA_ctions->setEnabled(configurationValid);
 
@@ -562,7 +562,7 @@ void RbUtilQt::uninstallBootloader(void)
         = BootloaderInstallHelper::createBootloaderInstaller(this,
                 SystemInfo::platformValue(SystemInfo::BootloaderMethod).toString());
 
-    if(bl == NULL) {
+    if(bl == nullptr) {
         logger->addItem(tr("No uninstall method for this target known."), LOGERROR);
         logger->setFinished();
         return;

@@ -65,7 +65,7 @@ int main( int argc, char ** argv ) {
     // check for a configuration file in the program folder.
     QSettings *user;
     if(QFileInfo(absolutePath + "/RockboxUtility.ini").isFile())
-        user = new QSettings(absolutePath + "/RockboxUtility.ini", QSettings::IniFormat, 0);
+        user = new QSettings(absolutePath + "/RockboxUtility.ini", QSettings::IniFormat, nullptr);
     else user = new QSettings(QSettings::IniFormat, QSettings::UserScope, "rockbox.org", "RockboxUtility");
 
     QString applang = QLocale::system().name();
@@ -98,7 +98,7 @@ int main( int argc, char ** argv ) {
     QList<QTranslator*> translators;
     translators.append(&translator);
     translators.append(&qttrans);
-    RbUtilQt window(0);
+    RbUtilQt window(nullptr);
     RbUtilQt::translators = translators;
     window.show();
 

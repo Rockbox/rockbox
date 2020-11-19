@@ -32,7 +32,7 @@ class Autodetection :public QObject
     Q_OBJECT
 
 public:
-    Autodetection(QObject* parent=0);
+    Autodetection(QObject* parent=nullptr);
 
     enum PlayerStatus {
         PlayerOk,

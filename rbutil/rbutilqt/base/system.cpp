@@ -242,18 +242,18 @@ QMultiMap<uint32_t, QString> System::listUsbDevices(void)
     LOG_INFO() << "Searching for USB devices";
 #if defined(Q_OS_LINUX)
     libusb_device **devs;
-    if(libusb_init(NULL) != 0) {
+    if(libusb_init(nullptr) != 0) {
         LOG_ERROR() << "Initializing libusb-1 failed.";
         return usbids;
     }
 
-    if(libusb_get_device_list(NULL, &devs) < 1) {
+    if(libusb_get_device_list(nullptr, &devs) < 1) {
         LOG_ERROR() << "Error getting device list.";
         return usbids;
     }
     libusb_device *dev;
     int i = 0;
-    while((dev = devs[i++]) != NULL) {
+    while((dev = devs[i++]) != nullptr) {
         QString name;
         unsigned char buf[256];
         uint32_t id;
@@ -279,7 +279,7 @@ QMultiMap<uint32_t, QString> System::listUsbDevices(void)
     }
 
     libusb_free_device_list(devs, 1);
-    libusb_exit(NULL);
+    libusb_exit(nullptr);
 #endif
 
 #if defined(Q_OS_MACX)

@@ -30,7 +30,7 @@ class Config : public QDialog
 {
     Q_OBJECT
     public:
-        Config(QWidget *parent = 0,int index=0);
+        Config(QWidget *parent = nullptr,int index=0);
 
     signals:
         void settingsUpdated(void);

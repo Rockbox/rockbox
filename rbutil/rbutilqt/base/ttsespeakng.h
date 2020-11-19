@@ -28,7 +28,7 @@ class TTSEspeakNG : public TTSExes
 {
     Q_OBJECT
     public:
-        TTSEspeakNG(QObject* parent=NULL) : TTSExes(parent)
+        TTSEspeakNG(QObject* parent=nullptr) : TTSExes(parent)
         {
             m_name = "espeak-ng";
 

@@ -57,7 +57,7 @@ bool BootloaderInstallTcc::install(void)
 
 void BootloaderInstallTcc::installStage2(void)
 {
-    unsigned char *of_buf, *boot_buf = NULL, *patched_buf = NULL;
+    unsigned char *of_buf, *boot_buf = nullptr, *patched_buf = nullptr;
     int n, of_size, boot_size, patched_size;
     char errstr[200];
     bool ret = false;
@@ -76,7 +76,7 @@ void BootloaderInstallTcc::installStage2(void)
 
     /* Load original firmware file */
     of_buf = file_read(m_offile.toLocal8Bit().data(), &of_size);
-    if (of_buf == NULL)
+    if (of_buf == nullptr)
     {
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(m_offile), LOGERROR);
@@ -93,7 +93,7 @@ void BootloaderInstallTcc::installStage2(void)
 
     /* Load bootloader file */
     boot_buf = file_read(bootfile.toLocal8Bit().data(), &boot_size);
-    if (boot_buf == NULL)
+    if (boot_buf == nullptr)
     {
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not load %1").arg(bootfile), LOGERROR);
@@ -105,7 +105,7 @@ void BootloaderInstallTcc::installStage2(void)
 
     patched_buf = patch_firmware_tcc(of_buf, of_size, boot_buf, boot_size,
             &patched_size);
-    if (patched_buf == NULL)
+    if (patched_buf == nullptr)
     {
         emit logItem(errstr, LOGERROR);
         emit logItem(tr("Could not patch firmware"), LOGERROR);

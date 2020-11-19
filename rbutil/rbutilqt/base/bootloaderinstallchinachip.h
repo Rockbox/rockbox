@@ -27,7 +27,7 @@ class BootloaderInstallChinaChip : public BootloaderInstallBase
     Q_OBJECT
 
     public:
-        BootloaderInstallChinaChip(QObject *parent = 0);
+        BootloaderInstallChinaChip(QObject *parent = nullptr);
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);

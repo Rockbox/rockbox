@@ -34,7 +34,7 @@ class Sysinfo : public QDialog
             InfoHtml,
             InfoText,
         };
-        Sysinfo(QWidget *parent = 0);
+        Sysinfo(QWidget *parent = nullptr);
 
         static QString getInfo(InfoType type = InfoHtml);
     private:

@@ -28,7 +28,7 @@ class TTSMimic : public TTSExes
 {
     Q_OBJECT
     public:
-        TTSMimic(QObject* parent=NULL) : TTSExes(parent)
+        TTSMimic(QObject* parent=nullptr) : TTSExes(parent)
         {
             m_name = "mimic";
 

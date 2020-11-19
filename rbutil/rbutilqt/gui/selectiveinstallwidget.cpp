@@ -45,9 +45,9 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     RockboxInfo info(m_mountpoint);
     ui.bootloaderCheckbox->setChecked(!info.success());
 
-    m_logger = NULL;
-    m_zipinstaller = NULL;
-    m_themesinstaller = NULL;
+    m_logger = nullptr;
+    m_zipinstaller = nullptr;
+    m_themesinstaller = nullptr;
 
     connect(ui.installButton, SIGNAL(clicked()), this, SLOT(startInstall()));
     connect(this, SIGNAL(installSkipped(bool)), this, SLOT(continueInstall(bool)));
@@ -84,9 +84,9 @@ void SelectiveInstallWidget::updateVersion(void)
     m_blmethod = SystemInfo::platformValue(
             SystemInfo::BootloaderMethod, m_target).toString();
 
-    if(m_logger != NULL) {
+    if(m_logger != nullptr) {
         delete m_logger;
-        m_logger = NULL;
+        m_logger = nullptr;
     }
 
     // re-populate all version items
@@ -166,7 +166,7 @@ void SelectiveInstallWidget::startInstall(void)
     saveSettings();
 
     m_installStage = 0;
-    if(m_logger != NULL) delete m_logger;
+    if(m_logger != nullptr) delete m_logger;
     m_logger = new ProgressLoggerGui(this);
     QString warning = Utils::checkEnvironment(false);
     if(!warning.isEmpty())
@@ -238,7 +238,7 @@ void SelectiveInstallWidget::installBootloader(void)
         BootloaderInstallBase *bl =
             BootloaderInstallHelper::createBootloaderInstaller(this,
                     SystemInfo::platformValue(SystemInfo::BootloaderMethod).toString());
-        if(bl == NULL) {
+        if(bl == nullptr) {
             m_logger->addItem(tr("No install method known."), LOGERROR);
             m_logger->setFinished();
             return;
@@ -393,7 +393,7 @@ void SelectiveInstallWidget::installRockbox(void)
                 ServerInfo::RelCandidateUrl, m_target).toString();
 
         //! install build
-        if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
+        if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
         m_zipinstaller->setUrl(url);
         m_zipinstaller->setLogSection("Rockbox (Base)");
@@ -437,7 +437,7 @@ void SelectiveInstallWidget::installFonts(void)
     fontsurl.replace("%RELEASEVER%", relversion);
 
     // create new zip installer
-    if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
+    if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
     m_zipinstaller = new ZipInstaller(this);
     m_zipinstaller->setUrl(fontsurl);
     m_zipinstaller->setLogSection("Fonts");
@@ -460,7 +460,7 @@ void SelectiveInstallWidget::installFonts(void)
 
 void SelectiveInstallWidget::customizeThemes(void)
 {
-    if(m_themesinstaller == NULL)
+    if(m_themesinstaller == nullptr)
         m_themesinstaller = new ThemesInstallWindow(this);
 
     m_themesinstaller->setSelectOnly(true);
@@ -472,7 +472,7 @@ void SelectiveInstallWidget::installThemes(void)
 {
     if(ui.themesCheckbox->isChecked()) {
         LOG_INFO() << "installing themes";
-        if(m_themesinstaller == NULL)
+        if(m_themesinstaller == nullptr)
             m_themesinstaller = new ThemesInstallWindow(this);
 
         connect(m_themesinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
@@ -526,7 +526,7 @@ void SelectiveInstallWidget::installGamefiles(void)
         LOG_INFO() << "installing gamefiles";
 
         // create new zip installer
-        if(m_zipinstaller != NULL) m_zipinstaller->deleteLater();
+        if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
 
         m_zipinstaller->setUrl(gameUrls);

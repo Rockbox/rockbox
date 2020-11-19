@@ -32,7 +32,7 @@ class HttpGet : public QObject
     Q_OBJECT
 
     public:
-        HttpGet(QObject *parent = 0);
+        HttpGet(QObject *parent = nullptr);
 
         void getFile(const QUrl &url);
         void setProxy(const QUrl &url);

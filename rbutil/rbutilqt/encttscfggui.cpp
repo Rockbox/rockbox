@@ -44,8 +44,8 @@ EncTtsCfgGui::EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QStri
     m_busyDlg= new QProgressDialog("", "", 0, 0,this);
     m_busyDlg->setWindowTitle(tr("Waiting for engine..."));
     m_busyDlg->setModal(true);
-    m_busyDlg->setLabel(0);
-    m_busyDlg->setCancelButton(0);
+    m_busyDlg->setLabel(nullptr);
+    m_busyDlg->setCancelButton(nullptr);
     m_busyDlg->hide();
     connect(iface,SIGNAL(busy()),this,SLOT(showBusy()));
     connect(iface,SIGNAL(busyEnd()),this,SLOT(hideBusy()));
@@ -74,7 +74,7 @@ void EncTtsCfgGui::setUpWindow()
         gridLayout->addWidget(widget, i, 1);
         widget->setLayoutDirection(Qt::LeftToRight);
         QWidget *btn = createButton(m_settingsList.at(i));
-        if(btn != NULL)
+        if(btn != nullptr)
         {
             gridLayout->addWidget(btn, i, 2);
         }
@@ -113,7 +113,7 @@ void EncTtsCfgGui::setUpWindow()
 QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
 {
     // value display
-    QWidget* value = NULL;
+    QWidget* value = nullptr;
     switch(setting->type())
     {
         case EncTtsSetting::eDOUBLE:
@@ -181,7 +181,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
     }
 
     // remember widget
-    if(value != NULL)
+    if(value != nullptr)
     {
         m_settingsWidgetsMap.insert(setting,value);
         connect(setting,SIGNAL(updateGui()),this,SLOT(updateWidget()));
@@ -208,14 +208,14 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
         return refreshbtn;
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 void EncTtsCfgGui::updateSetting()
 {
     //cast and get the sender widget
     QWidget* widget = qobject_cast<QWidget*>(QObject::sender());
-    if(widget == NULL) return;
+    if(widget == nullptr) return;
     // get the corresponding setting
     EncTtsSetting* setting = m_settingsWidgetsMap.key(widget);
 
@@ -264,7 +264,7 @@ void EncTtsCfgGui::updateWidget()
 {
     // get sender setting
     EncTtsSetting* setting = qobject_cast<EncTtsSetting*>(QObject::sender());
-    if(setting == NULL) return;
+    if(setting == nullptr) return;
     // get corresponding widget
     QWidget* widget = m_settingsWidgetsMap.value(setting);
 
@@ -370,7 +370,7 @@ void EncTtsCfgGui::browse(QObject* settingObj)
 {
     // cast top setting
     EncTtsSetting* setting= qobject_cast<EncTtsSetting*>(settingObj);
-    if(setting == NULL) return;
+    if(setting == nullptr) return;
 
     //current path
     QString curPath = setting->current().toString();

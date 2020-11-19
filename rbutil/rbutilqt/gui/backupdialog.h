@@ -29,7 +29,7 @@ class BackupDialog : public QDialog
 {
     Q_OBJECT
     public:
-        BackupDialog(QWidget* parent = 0);
+        BackupDialog(QWidget* parent = nullptr);
 
     private slots:
         void changeBackupPath(void);

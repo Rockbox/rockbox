@@ -31,7 +31,7 @@ class UninstallWindow : public QDialog
 {
     Q_OBJECT
     public:
-        UninstallWindow(QWidget *parent = 0);
+        UninstallWindow(QWidget *parent = nullptr);
 
     public slots:
         void accept(void);

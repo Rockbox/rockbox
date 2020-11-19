@@ -26,7 +26,7 @@ class ManualWidget : public QWidget
 {
     Q_OBJECT
     public:
-        ManualWidget(QWidget *parent = 0);
+        ManualWidget(QWidget *parent = nullptr);
 
     public slots:
         void downloadManual(void);

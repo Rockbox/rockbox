@@ -83,11 +83,11 @@ bool EncoderRbSpeex::encode(QString input,QString output)
     char errstr[512];
 
     FILE *fin,*fout;
-    if ((fin = fopen(input.toLocal8Bit(), "rb")) == NULL) {
+    if ((fin = fopen(input.toLocal8Bit(), "rb")) == nullptr) {
         LOG_ERROR() << "Error: could not open input file\n";
         return false;
     }
-    if ((fout = fopen(output.toLocal8Bit(), "wb")) == NULL) {
+    if ((fout = fopen(output.toLocal8Bit(), "wb")) == nullptr) {
         LOG_ERROR() << "Error: could not open output file\n";
         fclose(fin);
         return false;

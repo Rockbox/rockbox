@@ -32,7 +32,7 @@ class InstallTalkWindow : public QDialog
 {
     Q_OBJECT
     public:
-        InstallTalkWindow(QWidget *parent = 0);
+        InstallTalkWindow(QWidget *parent = nullptr);
 
     public slots:
         void accept(void);

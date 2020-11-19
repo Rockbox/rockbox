@@ -31,7 +31,7 @@ class BootloaderInstallHex : public BootloaderInstallBase
     Q_OBJECT
 
     public:
-        BootloaderInstallHex(QObject *parent = 0);
+        BootloaderInstallHex(QObject *parent = nullptr);
         bool install(void);
         bool uninstall(void);
         BootloaderInstallBase::BootloaderType installed(void);

@@ -29,7 +29,7 @@ class SelectiveInstallWidget : public QWidget
 {
     Q_OBJECT
     public:
-        SelectiveInstallWidget(QWidget* parent = 0);
+        SelectiveInstallWidget(QWidget* parent = nullptr);
 
     public slots:
         void updateVersion(void);

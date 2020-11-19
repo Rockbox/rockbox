@@ -26,7 +26,7 @@ class Changelog : public QDialog
 {
     Q_OBJECT
 public:
-    Changelog(QWidget *parent = 0);
+    Changelog(QWidget *parent = nullptr);
 
 public slots:
     void accept(void);

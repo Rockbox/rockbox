@@ -28,7 +28,7 @@ class TTSSwift : public TTSExes
 {
     Q_OBJECT
     public:
-        TTSSwift(QObject* parent=NULL) : TTSExes(parent)
+        TTSSwift(QObject* parent=nullptr) : TTSExes(parent)
         {
             m_name = "swift";
             m_TTSTemplate = "\"%exe\" %options -o \"%wavfile\" -- \"%text\"";

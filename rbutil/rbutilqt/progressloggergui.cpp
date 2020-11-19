@@ -161,7 +161,7 @@ void ProgressLoggerGui::saveErrorLog()
 
     int i=0;
     loggerTexts = "";
-    while(dp.listProgress->item(i) != NULL)
+    while(dp.listProgress->item(i) != nullptr)
     {
         loggerTexts.append(dp.listProgress->item(i)->text());
         loggerTexts.append("\n");

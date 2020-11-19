@@ -28,7 +28,7 @@ class TTSEspeak : public TTSExes
 {
     Q_OBJECT
     public:
-        TTSEspeak(QObject* parent=NULL) : TTSExes(parent)
+        TTSEspeak(QObject* parent=nullptr) : TTSExes(parent)
         {
             m_name = "espeak";
 

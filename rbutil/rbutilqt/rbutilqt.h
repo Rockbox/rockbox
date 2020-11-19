@@ -42,9 +42,9 @@ class RbUtilQt : public QMainWindow
     Q_OBJECT
 
     public:
-        RbUtilQt(QWidget *parent = 0);
+        RbUtilQt(QWidget *parent = nullptr);
         static QList<QTranslator*> translators;
-        static bool chkConfig(QWidget *parent = 0);
+        static bool chkConfig(QWidget *parent = nullptr);
 
     private:
         ManualWidget *manual;

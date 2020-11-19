@@ -30,7 +30,7 @@ class BootloaderInstallSansa : public BootloaderInstallBase
     Q_OBJECT
 
     public:
-        BootloaderInstallSansa(QObject *parent = 0);
+        BootloaderInstallSansa(QObject *parent = nullptr);
         ~BootloaderInstallSansa();
         bool install(void);
         bool uninstall(void);

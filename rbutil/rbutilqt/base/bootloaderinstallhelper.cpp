@@ -73,7 +73,7 @@ BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObjec
         return new BootloaderInstallBSPatch(parent);
     }
     else {
-        return NULL;
+        return nullptr;
     }
 }
 

@@ -69,7 +69,7 @@ void TTSBase::initTTSList()
 TTSBase* TTSBase::getTTS(QObject* parent,QString ttsName)
 {
 
-    TTSBase* tts = 0;
+    TTSBase* tts = nullptr;
 #if defined(Q_OS_WIN)
     if(ttsName == "sapi")
         tts = new TTSSapi(parent);

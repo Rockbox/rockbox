@@ -24,8 +24,8 @@
 MsPackUtil::MsPackUtil(QObject* parent)
     :ArchiveUtil(parent)
 {
-    m_cabd = mspack_create_cab_decompressor(NULL);
-    m_cabinet = NULL;
+    m_cabd = mspack_create_cab_decompressor(nullptr);
+    m_cabinet = nullptr;
     if(!m_cabd)
         LOG_ERROR() << "CAB decompressor creation failed!";
 }
@@ -41,20 +41,20 @@ bool MsPackUtil::open(QString& mspackfile)
 {
     close();
 
-    if(m_cabd == NULL)
+    if(m_cabd == nullptr)
     {
         LOG_ERROR() << "No CAB decompressor available: cannot open file!";
         return false;
     }
     m_cabinet = m_cabd->search(m_cabd, QFile::encodeName(mspackfile).constData());
-    return m_cabinet != NULL;
+    return m_cabinet != nullptr;
 }
 
 bool MsPackUtil::close(void)
 {
     if(m_cabd && m_cabinet)
         m_cabd->close(m_cabd, m_cabinet);
-    m_cabinet = NULL;
+    m_cabinet = nullptr;
     return true;
 }
 
@@ -76,7 +76,7 @@ bool MsPackUtil::extractArchive(const QString& dest, QString file)
     else if(!file.isEmpty())
         singleoutfile = dest;
     struct mscabd_file *f = m_cabinet->files;
-    if(f == NULL)
+    if(f == nullptr)
     {
         LOG_WARNING() << "CAB doesn't contain file" << file;
         return true;

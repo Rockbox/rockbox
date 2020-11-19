@@ -57,7 +57,7 @@ void BootloaderThreadBSPatch::run(void)
 BootloaderInstallBSPatch::BootloaderInstallBSPatch(QObject *parent)
         : BootloaderInstallBase(parent)
 {
-    m_thread = NULL;
+    m_thread = nullptr;
 }
 
 QString BootloaderInstallBSPatch::ofHint()

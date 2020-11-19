@@ -36,7 +36,7 @@ class TTSFestival : public TTSBase
 
     Q_OBJECT
     public:
-        TTSFestival(QObject* parent=NULL) : TTSBase(parent) {}
+        TTSFestival(QObject* parent=nullptr) : TTSBase(parent) {}
         ~TTSFestival();
         bool start(QString *errStr);
         bool stop();

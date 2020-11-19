@@ -250,7 +250,7 @@ void Autodetection::mergePatcher(void)
     // try ipodpatcher
     // initialize sector buffer. Needed.
     struct ipod_t ipod;
-    ipod.sectorbuf = NULL;
+    ipod.sectorbuf = nullptr;
     ipod_alloc_buffer(&ipod, BUFFER_SIZE);
     n = ipod_scan(&ipod);
     // FIXME: handle more than one Ipod connected in ipodpatcher.

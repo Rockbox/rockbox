@@ -29,7 +29,7 @@
 
 ZipUtil::ZipUtil(QObject* parent) : ArchiveUtil(parent)
 {
-    m_zip = NULL;
+    m_zip = nullptr;
 }
 
 
@@ -65,7 +65,7 @@ bool ZipUtil::close(void)
         error = m_zip->getZipError();
     }
     delete m_zip;
-    m_zip = NULL;
+    m_zip = nullptr;
     return (error == UNZ_OK) ? true : false;
 }
 

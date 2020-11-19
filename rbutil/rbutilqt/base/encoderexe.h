@@ -34,7 +34,7 @@ class EncoderExe : public EncoderBase
 
     Q_OBJECT
     public:
-        EncoderExe(QString name,QObject *parent = NULL);
+        EncoderExe(QString name,QObject *parent = nullptr);
         bool encode(QString input,QString output);
         bool start();
         bool stop() {return true;}
