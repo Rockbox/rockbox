@@ -171,7 +171,7 @@ void Config::accept()
         errormsg += "<li>" + tr("No mountpoint given") + "</li>";
         error = true;
     }
-    else if(!QFileInfo(mountpoint).exists()) {
+    else if(!QFileInfo::exists(mountpoint)) {
         errormsg += "<li>" + tr("Mountpoint does not exist") + "</li>";
         error = true;
     }

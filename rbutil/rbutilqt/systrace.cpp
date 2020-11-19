@@ -120,7 +120,7 @@ void SysTrace::savePreviousTrace(void)
 void SysTrace::rotateTrace(void)
 {
     QString f = QDir::tempPath() + "/rbutil-trace.log.1";
-    if(QFileInfo(f).exists()) {
+    if(QFileInfo::exists(f)) {
         QFile::remove(f);
     }
     QFile::rename(QDir::tempPath() + "/rbutil-trace.log", f);
