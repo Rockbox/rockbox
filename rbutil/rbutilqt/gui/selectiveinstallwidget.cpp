@@ -69,7 +69,7 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
     if(current == "development")
         ui.selectedDescription->setText(tr("The development version is "
                     "updated on every code change. Last update was on %1").arg(
-                        ServerInfo::platformValue(ServerInfo::BleedingDate).toString()));
+                        ServerInfo::instance()->platformValue(ServerInfo::BleedingDate).toString()));
     if(current == "rc")
         ui.selectedDescription->setText(tr("This will eventually become the "
                     "next Rockbox version. Install it to help testing."));
@@ -91,11 +91,11 @@ void SelectiveInstallWidget::updateVersion(void)
 
     // re-populate all version items
     m_versions.clear();
-    m_versions.insert("release", ServerInfo::platformValue(ServerInfo::CurReleaseVersion).toString());
+    m_versions.insert("release", ServerInfo::instance()->platformValue(ServerInfo::CurReleaseVersion).toString());
     // Don't populate RC or development selections if target has been retired.
-    if (ServerInfo::platformValue(ServerInfo::CurStatus).toInt() != STATUS_RETIRED) {
-        m_versions.insert("development", ServerInfo::platformValue(ServerInfo::BleedingRevision).toString());
-        m_versions.insert("rc", ServerInfo::platformValue(ServerInfo::RelCandidateVersion).toString());
+    if (ServerInfo::instance()->platformValue(ServerInfo::CurStatus).toInt() != STATUS_RETIRED) {
+        m_versions.insert("development", ServerInfo::instance()->platformValue(ServerInfo::BleedingRevision).toString());
+        m_versions.insert("rc", ServerInfo::instance()->platformValue(ServerInfo::RelCandidateVersion).toString());
     }
 
     ui.selectedVersion->clear();
@@ -385,11 +385,11 @@ void SelectiveInstallWidget::installRockbox(void)
         RbSettings::setValue(RbSettings::Build, selected);
         RbSettings::sync();
 
-        if(selected == "release") url = ServerInfo::platformValue(
+        if(selected == "release") url = ServerInfo::instance()->platformValue(
                 ServerInfo::CurReleaseUrl, m_target).toString();
-        else if(selected == "development") url = ServerInfo::platformValue(
+        else if(selected == "development") url = ServerInfo::instance()->platformValue(
                 ServerInfo::CurDevelUrl, m_target).toString();
-        else if(selected == "rc") url = ServerInfo::platformValue(
+        else if(selected == "rc") url = ServerInfo::instance()->platformValue(
                 ServerInfo::RelCandidateUrl, m_target).toString();
 
         //! install build

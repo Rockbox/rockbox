@@ -252,7 +252,7 @@ void RbUtilQt::downloadDone(bool error)
 
     // read info into ServerInfo object
     buildInfo.open();
-    ServerInfo::readBuildInfo(buildInfo.fileName());
+    ServerInfo::instance()->readBuildInfo(buildInfo.fileName());
     buildInfo.close();
 
     ui.statusbar->showMessage(tr("Download build information finished."), 5000);
@@ -408,7 +408,7 @@ void RbUtilQt::updateDevice()
     QString brand = SystemInfo::platformValue(SystemInfo::Brand).toString();
     QString name
         = QString("%1 (%2)").arg(SystemInfo::platformValue(SystemInfo::Name).toString(),
-            ServerInfo::statusToString(ServerInfo::platformValue(ServerInfo::CurStatus).toInt()));
+            ServerInfo::instance()->statusAsString());
     ui.labelDevice->setText(QString("<b>%1 %2</b>").arg(brand, name));
 
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
@@ -789,7 +789,7 @@ void RbUtilQt::changeEvent(QEvent *e)
     if(e->type() == QEvent::LanguageChange) {
         ui.retranslateUi(this);
         buildInfo.open();
-        ServerInfo::readBuildInfo(buildInfo.fileName());
+        ServerInfo::instance()->readBuildInfo(buildInfo.fileName());
         buildInfo.close();
         updateDevice();
     } else {

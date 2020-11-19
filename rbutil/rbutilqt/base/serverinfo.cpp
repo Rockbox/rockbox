@@ -21,7 +21,15 @@
 #include "systeminfo.h"
 #include "Logger.h"
 
-static QSettings* serverSettings = nullptr;
+ServerInfo* ServerInfo::infoInstance = nullptr;
+
+ServerInfo* ServerInfo::instance()
+{
+    if (infoInstance == nullptr) {
+        infoInstance = new ServerInfo();
+    }
+    return infoInstance;
+}
 
 // server infos
 const static struct {
@@ -131,10 +139,10 @@ QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
     return value;
 }
 
-QString ServerInfo::statusToString(int status)
+QString ServerInfo::statusAsString(QString platform)
 {
     QString value;
-    switch(status)
+    switch(platformValue(CurStatus, platform).toInt())
     {
     case STATUS_RETIRED:
         value = tr("Stable (Retired)");

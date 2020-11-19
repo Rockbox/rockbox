@@ -110,11 +110,11 @@ void TestServerInfo::testMain()
     tf.write(testinfo);
     tf.close();
 
-    ServerInfo::readBuildInfo(filename);
+    ServerInfo::instance()->readBuildInfo(filename);
 
     unsigned int i;
     for(i = 0; i < sizeof(testdata) / sizeof(struct testvector); i++) {
-        QString result = ServerInfo::platformValue(testdata[i].entry, testdata[i].target).toString();
+        QString result = ServerInfo::instance()->platformValue(testdata[i].entry, testdata[i].target).toString();
         QCOMPARE(result, QString(testdata[i].expected));
     }
 }

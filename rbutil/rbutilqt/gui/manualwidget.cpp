@@ -42,9 +42,9 @@ void ManualWidget::updateManual()
     if(!m_platform.isEmpty())
     {
         ui.labelPdfManual->setText(tr("<a href='%1'>PDF Manual</a>")
-            .arg(ServerInfo::platformValue(ServerInfo::ManualPdfUrl, m_platform).toString()));
+            .arg(ServerInfo::instance()->platformValue(ServerInfo::ManualPdfUrl, m_platform).toString()));
         ui.labelHtmlManual->setText(tr("<a href='%1'>HTML Manual (opens in browser)</a>")
-            .arg(ServerInfo::platformValue(ServerInfo::ManualHtmlUrl, m_platform).toString()));
+            .arg(ServerInfo::instance()->platformValue(ServerInfo::ManualHtmlUrl, m_platform).toString()));
     }
     else {
         ui.labelPdfManual->setText(tr("Select a device for a link to the correct manual"));
@@ -65,7 +65,7 @@ void ManualWidget::downloadManual(void)
         QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes) {
         return;
     }
-    QString manual = ServerInfo::platformValue(ServerInfo::ManualPdfUrl).toString();
+    QString manual = ServerInfo::instance()->platformValue(ServerInfo::ManualPdfUrl).toString();
 
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
@@ -75,12 +75,12 @@ void ManualWidget::downloadManual(void)
         installer->setCache(true);
 
     if(ui.radioPdf->isChecked()) {
-        installer->setUrl(ServerInfo::platformValue(
+        installer->setUrl(ServerInfo::instance()->platformValue(
                     ServerInfo::ManualPdfUrl, m_platform).toString());
         installer->setLogSection("Manual (PDF)");
     }
     else {
-        installer->setUrl(ServerInfo::platformValue(
+        installer->setUrl(ServerInfo::instance()->platformValue(
                     ServerInfo::ManualZipUrl, m_platform).toString());
         installer->setLogSection("Manual (HTML)");
     }
