@@ -114,23 +114,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Нажмите OFF для выключения"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SHUTTINGDOWN
   desc: in main menu
   user: core
@@ -142,23 +125,6 @@
   </dest>
   <voice>
     *: "Выключаюсь"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "Пожалуйста, выньте карту MMC"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Пожалуйста, выньте карту"
   </voice>
 </phrase>
 <phrase>
@@ -291,23 +257,6 @@
   </dest>
   <voice>
     *: "Плагины"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Выключить"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Выключить"
   </voice>
 </phrase>
 <phrase>
@@ -462,159 +411,6 @@
   </dest>
   <voice>
     *: "Ширина стерео"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Средние частоты"
-  </dest>
-  <voice>
-    *: none
-    masf: "Средние частоты"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Автогромкость"
-  </dest>
-  <voice>
-    *: none
-    masf: "Автогромкость"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "Время спада автогромкости"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Супербас"
-  </dest>
-  <voice>
-    *: none
-    masf: "Супербас"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "Выключить MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Выключить MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "Сила MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Сила MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "Гармоники MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Гармоники MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "Центральная частота MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Центральная частота MDB"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "Форма сигнала MDB"
-  </dest>
-  <voice>
-    *: none
-    masf: "Форма сигнала MDB"
   </voice>
 </phrase>
 <phrase>
@@ -2135,23 +1931,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Качество"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Качество"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -2220,23 +1999,6 @@
   <voice>
     *: none
     recording: "Цифровой"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Независимые отрезки"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Независимые отрезки"
   </voice>
 </phrase>
 <phrase>
@@ -2992,23 +2754,6 @@
   </dest>
   <voice>
     *: "Панель состояния"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Панель кнопок"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Панель кнопок"
   </voice>
 </phrase>
 <phrase>
@@ -3780,23 +3525,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "Аккумулятор: Выше возможного"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "Аккумулятор: Выше возможного"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BATTERY_TRICKLE_CHARGE
   desc: in info display, shows that trickle charge is running
   user: core
@@ -3881,21 +3609,18 @@
   user: core
   <source>
     *: none
-    archosondio*: "MMC:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    archosondio*: "MMC:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    archosondio*: "Эм Эм Си"
     multivolume: "Эйч Ди 1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Эс Ди"
     xduoox3: "микро Эс Ди 2"
@@ -12648,16 +12373,13 @@
   desc: in Settings -> General -> System -> USB Mode
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Режим USB"
+    *: "Режим USB"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Режим USB"
+    *: "Режим USB"
   </voice>
 </phrase>
 <phrase>
@@ -12665,16 +12387,13 @@
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: Charge Only"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Только зарядка"
+    *: "Только зарядка"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Только зарядка"
+    *: "Только зарядка"
   </voice>
 </phrase>
 <phrase>
@@ -12696,16 +12415,13 @@
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Отладочный мост Android"
+    *: "Отладочный мост Android"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Отладочный мост Android"
+    *: "Отладочный мост Android"
   </voice>
 </phrase>
 <phrase>
@@ -12786,16 +12502,13 @@
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Устройство хранения информации"
+    *: "Устройство хранения информации"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Устройство хранения информации"
+    *: "Устройство хранения информации"
   </voice>
 </phrase>
 <phrase>
