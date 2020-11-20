@@ -3593,14 +3593,17 @@
   <source>
     *: "Int:"
     xduoox3: "mSD1:"
+    hibylinux: "mSD:"
   </source>
   <dest>
     *: "Внутр:"
     xduoox3: "mSD1:"
+    hibylinux: "mSD:"
   </dest>
   <voice>
     *: "Внутр"
     xduoox3: "микро Эс Ди 1"
+    hibylinux: "микро Эс Ди"
   </voice>
 </phrase>
 <phrase>
@@ -9250,10 +9253,10 @@
     *: "Album Artist"
   </source>
   <dest>
-    *: "Исполнитель"
+    *: "Исполнитель альбома"
   </dest>
   <voice>
-    *: "Исполнитель"
+    *: "Исполнитель альбома"
   </voice>
 </phrase>
 <phrase>
@@ -9424,15 +9427,15 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
+    *: "Backlight on Lock"
     hold_button: "Backlight on Hold"
   </source>
   <dest>
-    *: none
+    *: "Подсветка в режиме блокировки"
     hold_button: "Подсветка при блокировке"
   </dest>
   <voice>
-    *: none
+    *: "Подсветка в режиме блокировки"
     hold_button: "Подсветка при блокировке"
   </voice>
 </phrase>
@@ -15555,5 +15558,1065 @@
   </dest>
   <voice>
     *: "Просмотреть"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Разрешить доступ к данным через USB?"
+  </dest>
+  <voice>
+    *: "Разрешить доступ к данным через USB?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Громкость голосовых подсказок"
+  </dest>
+  <voice>
+    *: "Громкость голосовых подсказок"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Режим питания ЦАП"
+    es9218: "Выходной уровень ЦАП"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Режим питания ЦАП"
+    es9218: "Выходной уровень ЦАП"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Высокая производительность"
+    es9218: "Высокая громкость (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Высокая производительность"
+    es9218: "Высокая громкость"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Экономия батареи"
+    es9218: "Низкая громкость (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Экономия батареи"
+    es9218: "Низкая громкость"
+  </voice>
+</phrase>
+ <phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Очистить список и играть следующий"
+  </dest>
+  <voice>
+    *: "Очистить список и играть следующий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Очередь..."
+  </dest>
+  <voice>
+    *: "Очередь..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Показать настройки очереди"
+  </dest>
+  <voice>
+    *: "Показать настройки очереди"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Показать настройки случайного добавления"
+  </dest>
+  <voice>
+    *: "Показать настройки случайного добавления"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "В подменю"
+  </dest>
+  <voice>
+    *: "В подменю"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Очистить список и играть в случайном порядке"
+  </dest>
+  <voice>
+    *: "Очистить список и играть в случайном порядке"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Запретить все оповещения о блокировке"
+  </dest>
+  <voice>
+    *: "Запретить все оповещения о блокировке"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Регулировка громкости"
+  </dest>
+  <voice>
+    *: "Регулировка громкости"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Автоблокировка всегда"
+  </dest>
+  <voice>
+    *: "Автоблокировка всегда"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
+  desc: reload playlist after saving
+  user: core
+  <source>
+    *: "Reload After Saving"
+  </source>
+  <dest>
+    *: "Перезагрузить после сохранения"
+  </dest>
+  <voice>
+    *: "Перезагрузить после сохранения"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Линейный Быстрый"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Линейный Быстрый"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Линейный Медленный"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Линейный Медленный"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Минимальный Быстрый"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Минимальный Быстрый"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Минимальный Медленный"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Минимальный Медленный"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Аподизационный 1-го типа"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Аподизационный первого типа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Аподизационный 2-го типа"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Аподизационный второго типа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Гибридный Быстрый"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Гибридный Быстрый"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Кирпичная Стена"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Кирпичная Стена"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Супермедленный"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Супермедленный"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Исполнитель альбома]"
+  </dest>
+  <voice>
+    *: "Исполнитель альбома"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_GENRE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Жанр]"
+  </dest>
+  <voice>
+    *: "Жанр"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Комментарий]"
+  </dest>
+  <voice>
+    *: "Комментарий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Композитор]"
+  </dest>
+  <voice>
+    *: "Композитор"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Год]"
+  </dest>
+  <voice>
+    *: "Год"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Номер трека]"
+  </dest>
+  <voice>
+    *: "Номер трека"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Номер диска]"
+  </dest>
+  <voice>
+    *: "Номер диска"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Частота]"
+  </dest>
+  <voice>
+    *: "Частота"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Битрейт]"
+  </dest>
+  <voice>
+    *: "Битрейт"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Одиночный режим"
+  </dest>
+  <voice>
+    *: "Одиночный режим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "Зацикливание списков"
+  </dest>
+  <voice>
+    *: "Зацикливание списков"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Сообщать о выключении"
+  </dest>
+  <voice>
+    *: "Сообщать о выключении"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "Порядок списков"
+  </dest>
+  <voice>
+    *: "Порядок списков"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Восходящий"
+  </dest>
+  <voice>
+    *: "Восходящий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Нисходящий"
+  </dest>
+  <voice>
+    *: "Нисходящий"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Обложка"
+  </dest>
+  <voice>
+    *: "Обложка"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Предпочитать встроенную"
+  </dest>
+  <voice>
+    *: "Предпочитать встроенную"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Предпочитать файл с картинкой"
+  </dest>
+  <voice>
+    *: "Предпочитать файл с картинкой"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Подстройка часов по радио"
+  </dest>
+  <voice>
+    *: none
+    rds: "Подстройка часов по радио"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Сортировать альбомы по"
+  </dest>
+  <voice>
+    *: "Сортировать альбомы по"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Исполнителю и названию"
+  </dest>
+  <voice>
+    *: "Исполнителю и названию"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Исполнителю и году"
+  </dest>
+  <voice>
+    *: "Исполнителю и году"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Порядок сортировки по году"
+  </dest>
+  <voice>
+    *: "Порядок сортировки по году"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Показывать год в заголовке альбома"
+  </dest>
+  <voice>
+    *: "Показывать год в заголовке альбома"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Сначала надо закончить обновление кэша!"
+  </dest>
+  <voice>
+    *: "Сначало надо закончить обновление кэша!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Информация о треке"
+  </dest>
+  <voice>
+    *: "Информация о треке"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Проиграть"
+  </dest>
+  <voice>
+    *: "Проиграть"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Проиграть в случайном порядке"
+  </dest>
+  <voice>
+    *: "Проиграть в случайном порядке"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Сохранять текущий трек при замене списка проигрывания"
+  </dest>
+  <voice>
+    *: "Сохранять текущий трек при замене списка проигрывания"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    ipodcolor,ipodnano1g,ipodvideo,ipod4g,ipodmini1g,ipodmini2g: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
+  </source>
+  <dest>
+    *: none
+    ipodcolor,ipodnano1g,ipodvideo,ipod4g,ipodmini1g,ipodmini2g: "Сбросить настройки при включенной блокировке во время загрузки"
+    clear_settings_on_hold, iriverh10: "Сбросит настройки при нажатой кнопке сброса во время загрузки"
+  </dest>
+  <voice>
+    *: none
+    ipodcolor,ipodnano1g,ipodvideo,ipod4g,ipodmini1g,ipodmini2g: "Сбросить настройки при включенной блокировке во время загрузки"
+    clear_settings_on_hold, iriverh10: "Сбросит настройки при нажатой кнопке сброса во время загрузки"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Перемотка через границы треков"
+  </dest>
+  <voice>
+    *: "Перемотка через границы треков"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Set As..."
+  </source>
+  <dest>
+    *: "Установить как..."
+  </dest>
+  <voice>
+    *: "Установить как..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playlist Directory"
+  </source>
+  <dest>
+    *: "Каталог списков проигрывания"
+  </dest>
+  <voice>
+    *: "Каталог списков проигрывания"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_START_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Start Directory"
+  </source>
+  <dest>
+    *: "Начальную папку"
+  </dest>
+  <voice>
+    *: "Начальную папку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RECORDING_DIR
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Папку записи"
+  </dest>
+  <voice>
+    *: none
+    recording: "Папку записи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Playlist..."
+  </source>
+  <dest>
+    *: "Добавить к списку проигрывания..."
+  </dest>
+  <voice>
+    *: "Добавить к списку проигрывания..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_TO_EXISTING_PL
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add to Existing Playlist"
+  </source>
+  <dest>
+    *: "Добавить к существующему списку"
+  </dest>
+  <voice>
+    *: "Добавить к существующему списку"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Playing Next..."
+  </source>
+  <dest>
+    *: "Дальнейшее проигрывание..."
+  </dest>
+  <voice>
+    *: "Дальнейшее проигрывание..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_NEXT
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Next"
+  </source>
+  <dest>
+    *: "Играть следующим"
+  </dest>
+  <voice>
+    *: "Играть следующим"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Add Shuffled"
+  </source>
+  <dest>
+    *: "Добавить случайный трек"
+  </dest>
+  <voice>
+    *: "Добавить случайный трэк"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last"
+  </source>
+  <dest>
+    *: "Играть последним"
+  </dest>
+  <voice>
+    *: "Играть последним"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_LAST_SHUFFLED
+  desc: used in the onplay menu
+  user: core
+  <source>
+    *: "Play Last Shuffled"
+  </source>
+  <dest>
+    *: "Играть случайный трек последним"
+  </dest>
+  <voice>
+    *: "Играть случайный трэк последним"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_MODE
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Volume Adjustment Mode"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Режим регулировки громкости"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Режим регулировки громкости"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOLUME_ADJUST_NORM_STEPS
+  desc: in system settings
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Number of Volume Steps"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "Число градаций громкости"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "Число градаций громкости"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PERCEPTUAL
+  desc: in system settings -> volume adjustment mode
+  user: core
+  <source>
+    *: none
+    perceptual_volume: "Perceptual"
+  </source>
+  <dest>
+    *: none
+    perceptual_volume: "По ощущениям"
+  </dest>
+  <voice>
+    *: none
+    perceptual_volume: "По ощущениям"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_TRACKS_WHILE_BROWSING
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Show Tracks While Browsing"
+  </source>
+  <dest>
+    *: "Показывать треки при просмотре"
+  </dest>
+  <voice>
+    *: "Показывать трэки при просмотре"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_LAST_ALBUM
+  desc: in PictureFlow Main Menu
+  user: core
+  <source>
+    *: "Go to Last Album"
+  </source>
+  <dest>
+    *: "Перейти к последнему альбому"
+  </dest>
+  <voice>
+    *: "Перейти к последнему альбому"
   </voice>
 </phrase>
