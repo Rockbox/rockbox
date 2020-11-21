@@ -483,7 +483,7 @@ void SelectiveInstallWidget::installFonts(void)
             logversion = installInfo.release();
         }
         fontsurl = SystemInfo::value(SystemInfo::FontUrl, m_buildtype).toString();
-        fontsurl.replace("%RELEASEVER%", relversion);
+        fontsurl.replace("%RELVERSION%", relversion);
 
         // create new zip installer
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
