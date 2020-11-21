@@ -63,23 +63,29 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
 
 void SelectiveInstallWidget::selectedVersionChanged(int index)
 {
-    m_buildtype = ui.selectedVersion->itemData(index).toString();
+    m_buildtype = static_cast<SystemInfo::BuildType>(ui.selectedVersion->itemData(index).toInt());
     bool voice = true;
-    if(m_buildtype == "release") {
+    switch(m_buildtype) {
+    case SystemInfo::BuildRelease:
         ui.selectedDescription->setText(tr("This is the latest stable "
                     "release available."));
         voice = true;
-    }
-    if(m_buildtype == "development") {
+        break;
+    case SystemInfo::BuildCurrent:
         ui.selectedDescription->setText(tr("The development version is "
                     "updated on every code change. Last update was on %1").arg(
                         ServerInfo::instance()->platformValue(ServerInfo::BleedingDate).toString()));
         voice = false;
-    }
-    if(m_buildtype == "rc") {
+        break;
+    case SystemInfo::BuildCandidate:
         ui.selectedDescription->setText(tr("This will eventually become the "
                     "next Rockbox version. Install it to help testing."));
         voice = false;
+        break;
+    case SystemInfo::BuildDaily:
+        ui.selectedDescription->setText(tr("Daily updated development version."));
+        voice = true;
+        break;
     }
     ui.voiceCheckbox->setEnabled(voice);
     ui.voiceCombobox->setEnabled(voice);
@@ -102,25 +108,28 @@ void SelectiveInstallWidget::updateVersion(void)
 
     // re-populate all version items
     m_versions.clear();
-    m_versions.insert("release", ServerInfo::instance()->platformValue(ServerInfo::CurReleaseVersion).toString());
+    m_versions.insert(SystemInfo::BuildRelease, ServerInfo::instance()->platformValue(
+                          ServerInfo::CurReleaseVersion).toString());
     // Don't populate RC or development selections if target has been retired.
     if (ServerInfo::instance()->platformValue(ServerInfo::CurStatus).toInt() != STATUS_RETIRED) {
-        m_versions.insert("development", ServerInfo::instance()->platformValue(ServerInfo::BleedingRevision).toString());
-        m_versions.insert("rc", ServerInfo::instance()->platformValue(ServerInfo::RelCandidateVersion).toString());
+        m_versions.insert(SystemInfo::BuildCurrent, ServerInfo::instance()->platformValue(
+                              ServerInfo::BleedingRevision).toString());
+        m_versions.insert(SystemInfo::BuildCandidate, ServerInfo::instance()->platformValue(
+                              ServerInfo::RelCandidateVersion).toString());
     }
 
     ui.selectedVersion->clear();
-    if(!m_versions["release"].isEmpty()) {
+    if(!m_versions[SystemInfo::BuildRelease].isEmpty()) {
         ui.selectedVersion->addItem(tr("Stable Release (Version %1)").arg(
-                    m_versions["release"]), "release");
+                    m_versions[SystemInfo::BuildRelease]), SystemInfo::BuildRelease);
     }
-    if(!m_versions["development"].isEmpty()) {
+    if(!m_versions[SystemInfo::BuildCurrent].isEmpty()) {
         ui.selectedVersion->addItem(tr("Development Version (Revison %1)").arg(
-                    m_versions["development"]), "development");
+                    m_versions[SystemInfo::BuildCurrent]), SystemInfo::BuildCurrent);
     }
-    if(!m_versions["rc"].isEmpty()) {
+    if(!m_versions[SystemInfo::BuildCandidate].isEmpty()) {
         ui.selectedVersion->addItem(tr("Release Candidate (Revison %1)").arg(
-                    m_versions["rc"]), "rc");
+                    m_versions[SystemInfo::BuildCandidate]), SystemInfo::BuildCandidate);
     }
 
     // select previously selected version
@@ -128,7 +137,7 @@ void SelectiveInstallWidget::updateVersion(void)
     if(index != -1) {
         ui.selectedVersion->setCurrentIndex(index);
     }
-    else if(!m_versions["release"].isEmpty()) {
+    else if(!m_versions[SystemInfo::BuildRelease].isEmpty()) {
         index = ui.selectedVersion->findData("release");
         ui.selectedVersion->setCurrentIndex(index);
     }
@@ -418,13 +427,20 @@ void SelectiveInstallWidget::installRockbox(void)
         RbSettings::setValue(RbSettings::Build, m_buildtype);
         RbSettings::sync();
 
-        if(m_buildtype == "release") url = ServerInfo::instance()->platformValue(
-                ServerInfo::CurReleaseUrl, m_target).toString();
-        else if(m_buildtype == "development") url = ServerInfo::instance()->platformValue(
-                ServerInfo::CurDevelUrl, m_target).toString();
-        else if(m_buildtype == "rc") url = ServerInfo::instance()->platformValue(
-                ServerInfo::RelCandidateUrl, m_target).toString();
-
+        switch(m_buildtype) {
+        case SystemInfo::BuildRelease:
+            url = ServerInfo::instance()->platformValue(
+                        ServerInfo::CurReleaseUrl, m_target).toString();
+            break;
+        case SystemInfo::BuildCurrent:
+            url = ServerInfo::instance()->platformValue(
+                        ServerInfo::CurDevelUrl, m_target).toString();
+            break;
+        case SystemInfo::BuildCandidate:
+            url = ServerInfo::instance()->platformValue(
+                        ServerInfo::RelCandidateUrl, m_target).toString();
+            break;
+        }
         //! install build
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
@@ -459,14 +475,11 @@ void SelectiveInstallWidget::installFonts(void)
         QString fontsurl;
         QString logversion;
         QString relversion = installInfo.release();
-        if(relversion.isEmpty()) {
+        if(!relversion.isEmpty()) {
             // release is empty for non-release versions (i.e. daily / current)
-            fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildDaily).toString();
-        }
-        else {
-            fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildRelease).toString();
             logversion = installInfo.release();
         }
+        fontsurl = SystemInfo::value(SystemInfo::FontUrl, m_buildtype).toString();
         fontsurl.replace("%RELEASEVER%", relversion);
 
         // create new zip installer
@@ -501,19 +514,14 @@ void SelectiveInstallWidget::installVoicefile(void)
     QString voiceurl;
     QString logversion;
     QString relversion = installInfo.release();
-    if(m_buildtype == "release") {
+    if(m_buildtype != SystemInfo::BuildRelease) {
         // release is empty for non-release versions (i.e. daily / current)
-        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, SystemInfo::BuildRelease).toString();
-    }
-    else {
-        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, SystemInfo::BuildDaily).toString();
         logversion = installInfo.release();
     }
+    voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, m_buildtype).toString();
     voiceurl.replace("%RELVERSION%", m_versions[m_buildtype]);
     voiceurl.replace("%MODEL%", m_target);
     voiceurl.replace("%LANGUAGE%", lang);
-
-    LOG_INFO() << "voicurl" << voiceurl;
 
     // create new zip installer
     if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();

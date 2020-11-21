@@ -24,6 +24,7 @@
 #include "progressloggergui.h"
 #include "zipinstaller.h"
 #include "themesinstallwindow.h"
+#include "systeminfo.h"
 
 class SelectiveInstallWidget : public QWidget
 {
@@ -61,9 +62,9 @@ class SelectiveInstallWidget : public QWidget
         ProgressLoggerGui *m_logger;
         int m_installStage;
         ZipInstaller *m_zipinstaller;
-        QMap<QString, QString> m_versions;
+        QMap<SystemInfo::BuildType, QString> m_versions;
         ThemesInstallWindow *m_themesinstaller;
-        QString m_buildtype;
+        SystemInfo::BuildType m_buildtype;
 };
 
 #endif
