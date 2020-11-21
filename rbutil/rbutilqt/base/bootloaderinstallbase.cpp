@@ -48,11 +48,11 @@ void BootloaderInstallBase::downloadBlStart(QUrl source)
 {
     m_http.setFile(&m_tempfile);
     m_http.setCache(true);
-    connect(&m_http, SIGNAL(done(bool)), this, SLOT(downloadBlFinish(bool)));
+    connect(&m_http, &HttpGet::done, this, &BootloaderInstallBase::downloadBlFinish);
     // connect the http read signal to our logProgess *signal*
     // to immediately emit it without any helper function.
-    connect(&m_http, SIGNAL(dataReadProgress(int, int)),
-            this, SIGNAL(logProgress(int, int)));
+    connect(&m_http, &HttpGet::dataReadProgress,
+            this, &BootloaderInstallBase::logProgress);
     m_http.getFile(source);
 }
 

@@ -66,7 +66,7 @@ bool BootloaderInstallS5l::installStage1(void)
     if (doInstall) {
         // download firmware from server
         emit logItem(tr("Downloading bootloader file..."), LOGINFO);
-        connect(this, SIGNAL(downloadDone()), this, SLOT(installStageMkdfu()));
+        connect(this, &BootloaderInstallBase::downloadDone, this, &BootloaderInstallS5l::installStageMkdfu);
         downloadBlStart(m_blurl);
     }
     else {
@@ -87,8 +87,8 @@ void BootloaderInstallS5l::installStageMkdfu(void)
 
     setProgress(0);
     aborted = false;
-    connect(this, SIGNAL(installAborted()), this, SLOT(abortInstall()));
-    connect(this, SIGNAL(done(bool)), this, SLOT(installDone(bool)));
+    connect(this, &BootloaderInstallBase::installAborted, this, &BootloaderInstallS5l::abortInstall);
+    connect(this, &BootloaderInstallBase::done, this, &BootloaderInstallS5l::installDone);
 
     if (doInstall) {
         dfu_type = DFU_INST;
@@ -142,7 +142,7 @@ void BootloaderInstallS5l::installStageWaitForEject(void)
                             LOGWARNING);
             actionShown = true;
         }
-        QTimer::singleShot(250, this, SLOT(installStageWaitForEject()));
+        QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageWaitForEject);
         return;
     }
     emit logItem(tr("Device successfully ejected."), LOGINFO);
@@ -169,7 +169,7 @@ void BootloaderInstallS5l::installStageWaitForProcs(void)
                             "  Quit iTunes application."), LOGWARNING);
             actionShown = true;
         }
-        QTimer::singleShot(250, this, SLOT(installStageWaitForProcs()));
+        QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageWaitForProcs);
         return;
     }
     if (actionShown) {
@@ -206,7 +206,7 @@ void BootloaderInstallS5l::installStageWaitForSpindown(void)
         return; /* aborted */
 
     if (progressTimer.elapsed() < progressTimeout) {
-        QTimer::singleShot(250, this, SLOT(installStageWaitForSpindown()));
+        QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageWaitForSpindown);
         return;
     }
 
@@ -232,7 +232,7 @@ void BootloaderInstallS5l::installStageWaitForDfu(void)
         scanTimer.start();
     }
     if (!scanSuccess) {
-        QTimer::singleShot(250, this, SLOT(installStageWaitForDfu()));
+        QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageWaitForDfu);
         return;
     }
     emit logItem(tr("DFU mode detected."), LOGINFO);
@@ -256,7 +256,7 @@ void BootloaderInstallS5l::installStageSendDfu(void)
         return; /* aborted */
 
     if (progressTimer.elapsed() < progressTimeout) {
-        QTimer::singleShot(250, this, SLOT(installStageSendDfu()));
+        QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageSendDfu);
         return;
     }
 
@@ -324,7 +324,7 @@ void BootloaderInstallS5l::installStageWaitForRemount(void)
                             LOGWARNING);
             actionShown = true;
         }
-        QTimer::singleShot(250, this, SLOT(installStageWaitForRemount()));
+        QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageWaitForRemount);
         return;
     }
     emit logItem(tr("Device remounted."), LOGINFO);
@@ -350,7 +350,7 @@ void BootloaderInstallS5l::abortInstall(void)
 {
     LOG_INFO() << "abortInstall";
     aborted = true;
-    disconnect(this, SIGNAL(installAborted()), this, SLOT(abortInstall()));
+    disconnect(this, &BootloaderInstallBase::installAborted, this, &BootloaderInstallS5l::abortInstall);
 }
 
 

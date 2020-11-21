@@ -34,7 +34,7 @@ bool BootloaderInstallMi4::install(void)
     emit logItem(tr("Downloading bootloader"), LOGINFO);
     LOG_INFO() << "installing bootloader";
     downloadBlStart(m_blurl);
-    connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
+    connect(this, &BootloaderInstallBase::downloadDone, this, &BootloaderInstallMi4::installStage2);
     return true;
 }
 

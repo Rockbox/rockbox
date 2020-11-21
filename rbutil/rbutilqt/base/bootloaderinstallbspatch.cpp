@@ -88,7 +88,7 @@ bool BootloaderInstallBSPatch::install(void)
     LOG_INFO() << "downloading bootloader";
     // download bootloader from server
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
-    connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
+    connect(this, &BootloaderInstallBase::downloadDone, this, &BootloaderInstallBSPatch::installStage2);
     downloadBlStart(m_blurl);
     return true;
 }
@@ -109,7 +109,7 @@ void BootloaderInstallBSPatch::installStage2(void)
     m_thread->setOutputFile(m_patchedFile.fileName());
     m_tempfile.close();
     m_patchedFile.close();
-    connect(m_thread, SIGNAL(finished()), this, SLOT(installStage3()));
+    connect(m_thread, &QThread::finished, this, &BootloaderInstallBSPatch::installStage3);
     m_thread->start();
 }
 

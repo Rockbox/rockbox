@@ -57,7 +57,7 @@ bool BootloaderInstallAms::install(void)
     // download firmware from server
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
 
-    connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
+    connect(this, &BootloaderInstallBase::downloadDone, this, &BootloaderInstallAms::installStage2);
     downloadBlStart(m_blurl);
 
     return true;

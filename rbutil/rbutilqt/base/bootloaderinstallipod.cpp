@@ -80,7 +80,7 @@ bool BootloaderInstallIpod::install(void)
     emit logItem(tr("Downloading bootloader file"), LOGINFO);
 
     downloadBlStart(m_blurl);
-    connect(this, SIGNAL(downloadDone()), this, SLOT(installStage2()));
+    connect(this, &BootloaderInstallBase::downloadDone, this, &BootloaderInstallIpod::installStage2);
     return true;
 }
 
