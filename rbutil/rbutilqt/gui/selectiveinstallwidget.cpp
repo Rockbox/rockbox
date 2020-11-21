@@ -506,38 +506,38 @@ void SelectiveInstallWidget::installFonts(void)
 
 void SelectiveInstallWidget::installVoicefile(void)
 {
-    if(ui.voiceCheckbox->isChecked()) {
+    if(ui.voiceCheckbox->isChecked() && ui.voiceCheckbox->isEnabled()) {
         LOG_INFO() << "installing Voice file";
-    QString lang = ui.voiceCombobox->currentData().toString();
+        QString lang = ui.voiceCombobox->currentData().toString();
 
-    RockboxInfo installInfo(m_mountpoint);
-    QString voiceurl;
-    QString logversion;
-    QString relversion = installInfo.release();
-    if(m_buildtype != SystemInfo::BuildRelease) {
-        // release is empty for non-release versions (i.e. daily / current)
-        logversion = installInfo.release();
-    }
-    voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, m_buildtype).toString();
-    voiceurl.replace("%RELVERSION%", m_versions[m_buildtype]);
-    voiceurl.replace("%MODEL%", m_target);
-    voiceurl.replace("%LANGUAGE%", lang);
+        RockboxInfo installInfo(m_mountpoint);
+        QString voiceurl;
+        QString logversion;
+        QString relversion = installInfo.release();
+        if(m_buildtype != SystemInfo::BuildRelease) {
+            // release is empty for non-release versions (i.e. daily / current)
+            logversion = installInfo.release();
+        }
+        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, m_buildtype).toString();
+        voiceurl.replace("%RELVERSION%", m_versions[m_buildtype]);
+        voiceurl.replace("%MODEL%", m_target);
+        voiceurl.replace("%LANGUAGE%", lang);
 
-    // create new zip installer
-    if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
-    m_zipinstaller = new ZipInstaller(this);
-    m_zipinstaller->setUrl(voiceurl);
-    m_zipinstaller->setLogSection("Voice (" + lang + ")");
-    m_zipinstaller->setLogVersion(logversion);
-    m_zipinstaller->setMountPoint(m_mountpoint);
-    if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
-        m_zipinstaller->setCache(true);
+        // create new zip installer
+        if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
+        m_zipinstaller = new ZipInstaller(this);
+        m_zipinstaller->setUrl(voiceurl);
+        m_zipinstaller->setLogSection("Voice (" + lang + ")");
+        m_zipinstaller->setLogVersion(logversion);
+        m_zipinstaller->setMountPoint(m_mountpoint);
+        if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
+            m_zipinstaller->setCache(true);
 
-    connect(m_zipinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
-    connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
-    connect(m_zipinstaller, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
-    connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
-    m_zipinstaller->install();
+        connect(m_zipinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
+        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
+        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        m_zipinstaller->install();
     }
     else {
         LOG_INFO() << "Voice install disabled.";
