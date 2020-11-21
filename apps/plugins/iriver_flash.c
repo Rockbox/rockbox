@@ -23,6 +23,7 @@
  ****************************************************************************/
 #include "plugin.h"
 #include "lib/helper.h"
+#include "checksum.h"
 
 /*
  * Flash commands may rely on null pointer dereferences to work correctly.
@@ -395,7 +396,6 @@ static bool load_firmware(const char* filename, enum firmware firmware,
     {
         uint32_t checksum;
         uint8_t model[4];
-        uint32_t sum;
 
         /* subtract the header length */
         fd_len -= sizeof(checksum) + sizeof(model);
@@ -418,13 +418,8 @@ static bool load_firmware(const char* filename, enum firmware firmware,
             goto bail;
         }
 
-        /* calculate the checksum */
-        sum = MODEL_NUMBER;
-        for (off_t i = 0; i < fd_len; i++)
-            sum += buffer[i];
-
         /* verify the checksum */
-        if (sum != checksum)
+        if (!verify_checksum(checksum, buffer, fd_len))
         {
             msg = "Aborting: checksum mismatch";
             goto bail;

@@ -36,8 +36,7 @@
 */
 
 #include "plugin.h"
-
-
+#include "checksum.h"
 
 static void aes_encrypt(void* data, uint32_t size)
 {
@@ -131,17 +130,6 @@ static void put_uint32be(unsigned char* buf, uint32_t x)
     buf[1] = (x & 0xff0000) >> 16;
     buf[2] = (x & 0xff00) >> 8;
     buf[3] = x & 0xff;
-}
-
-static uint32_t calc_checksum(uint32_t sum, unsigned char* buf, int len)
-{
-   int i;
-
-   for (i = 0; i < len ; i++) {
-      sum += buf[i];
-   }
-
-   return sum;
 }
 
 enum plugin_status plugin_start(const void* parameter)

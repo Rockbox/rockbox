@@ -24,6 +24,7 @@
 #include "system.h"
 #include "file.h"
 #include "loader_strerror.h"
+#include "checksum.h"
 
 #if defined(HAVE_BOOTDATA)
 #include "bootdata.h"
@@ -129,8 +130,7 @@ static int load_firmware_filename(unsigned char* buf,
                                   int buffer_size)
 {
     int len;
-    unsigned long chksum, sum;
-    int i;
+    unsigned long chksum;
     int ret;
     int fd = open(filename, O_RDONLY);
 
@@ -162,14 +162,7 @@ static int load_firmware_filename(unsigned char* buf,
         goto end;
     }
 
-    sum = MODEL_NUMBER;
-
-    for(i = 0;i < len;i++)
-    {
-        sum += buf[i];
-    }
-
-    if (sum != chksum)
+    if (!verify_checksum(chksum, buf, len))
     {
         ret = EBAD_CHKSUM;
         goto end;
