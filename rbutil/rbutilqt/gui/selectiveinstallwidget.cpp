@@ -50,11 +50,14 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     m_zipinstaller = nullptr;
     m_themesinstaller = nullptr;
 
-    connect(ui.installButton, SIGNAL(clicked()), this, SLOT(startInstall()));
-    connect(this, SIGNAL(installSkipped(bool)), this, SLOT(continueInstall(bool)));
-    connect(ui.themesCustomize, SIGNAL(clicked()), this, SLOT(customizeThemes()));
-    connect(ui.selectedVersion, SIGNAL(currentIndexChanged(int)),
-            this, SLOT(selectedVersionChanged(int)));
+    connect(ui.installButton, &QAbstractButton::clicked,
+            this, &SelectiveInstallWidget::startInstall);
+    connect(this, &SelectiveInstallWidget::installSkipped,
+            this, &SelectiveInstallWidget::continueInstall);
+    connect(ui.themesCustomize, &QAbstractButton::clicked,
+            this, &SelectiveInstallWidget::customizeThemes);
+    connect(ui.selectedVersion, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &SelectiveInstallWidget::selectedVersionChanged);
     // update version information. This also handles setting the previously
     // selected build type and bootloader disabling.
     updateVersion();
