@@ -47,6 +47,7 @@ const static struct {
     { RbSettings::InstallFonts,         "install_fonts",        "true" },
     { RbSettings::InstallThemes,        "install_themes",       "false" },
     { RbSettings::InstallGamefiles,     "install_gamefiles",    "true" },
+    { RbSettings::InstallVoice,         "install_voice",        "false" },
 #if defined(Q_OS_WIN32)
     { RbSettings::Tts,                  "tts",                  "sapi" },
 #elif defined(Q_OS_MACX)

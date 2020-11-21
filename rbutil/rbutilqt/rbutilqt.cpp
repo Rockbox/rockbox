@@ -496,6 +496,7 @@ void RbUtilQt::installVoice()
     // replace placeholder in voice url
     voiceurl.replace("%MODEL%", model);
     voiceurl.replace("%RELVERSION%", relversion);
+    voiceurl.replace("%LANGUAGE%", "english");
 
     LOG_INFO() << "voicefile URL:" << voiceurl;
 

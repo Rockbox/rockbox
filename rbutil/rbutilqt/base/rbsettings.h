@@ -46,6 +46,7 @@ class RbSettings : public QObject
             InstallFonts,
             InstallThemes,
             InstallGamefiles,
+            InstallVoice,
             Tts,
             UseTtsCorrections,
             TalkFolders,

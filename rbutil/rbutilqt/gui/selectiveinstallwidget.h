@@ -41,6 +41,7 @@ class SelectiveInstallWidget : public QWidget
         void installBootloader(void);
         void installRockbox(void);
         void installFonts(void);
+        void installVoicefile(void);
         void installThemes(void);
         void installGamefiles(void);
         void installBootloaderPost(void);
@@ -62,6 +63,7 @@ class SelectiveInstallWidget : public QWidget
         ZipInstaller *m_zipinstaller;
         QMap<QString, QString> m_versions;
         ThemesInstallWindow *m_themesinstaller;
+        QString m_buildtype;
 };
 
 #endif

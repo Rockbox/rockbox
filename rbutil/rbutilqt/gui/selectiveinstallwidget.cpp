@@ -39,6 +39,7 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     ui.fontsCheckbox->setChecked(RbSettings::value(RbSettings::InstallFonts).toBool());
     ui.themesCheckbox->setChecked(RbSettings::value(RbSettings::InstallThemes).toBool());
     ui.gamefileCheckbox->setChecked(RbSettings::value(RbSettings::InstallGamefiles).toBool());
+    ui.voiceCheckbox->setChecked(RbSettings::value(RbSettings::InstallVoice).toBool());
 
     // check if Rockbox is installed by looking after rockbox-info.txt.
     // If installed uncheck bootloader installation.
@@ -62,17 +63,27 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
 
 void SelectiveInstallWidget::selectedVersionChanged(int index)
 {
-    QString current = ui.selectedVersion->itemData(index).toString();
-    if(current == "release")
+    m_buildtype = ui.selectedVersion->itemData(index).toString();
+    bool voice = true;
+    if(m_buildtype == "release") {
         ui.selectedDescription->setText(tr("This is the latest stable "
                     "release available."));
-    if(current == "development")
+        voice = true;
+    }
+    if(m_buildtype == "development") {
         ui.selectedDescription->setText(tr("The development version is "
                     "updated on every code change. Last update was on %1").arg(
                         ServerInfo::instance()->platformValue(ServerInfo::BleedingDate).toString()));
-    if(current == "rc")
+        voice = false;
+    }
+    if(m_buildtype == "rc") {
         ui.selectedDescription->setText(tr("This will eventually become the "
                     "next Rockbox version. Install it to help testing."));
+        voice = false;
+    }
+    ui.voiceCheckbox->setEnabled(voice);
+    ui.voiceCombobox->setEnabled(voice);
+    ui.voiceLabel->setEnabled(voice);
 }
 
 
@@ -144,7 +155,27 @@ void SelectiveInstallWidget::updateVersion(void)
         RockboxInfo info(m_mountpoint);
         ui.bootloaderCheckbox->setChecked(!info.success());
     }
-
+    // populate languages for voice file.
+    // FIXME: currently only english. Need to get the available languages from
+    // build-info later.
+    QVariant current = ui.voiceCombobox->currentData();
+    QMap<QString, QStringList> languages = SystemInfo::languages(true);
+    QStringList voicelangs;
+    voicelangs << "english";
+    ui.voiceCombobox->clear();
+    for(int i = 0; i < voicelangs.size(); i++) {
+        QString key = voicelangs.at(i);
+        if(!languages.contains(key)) {
+            LOG_WARNING() << "trying to add unknown language" << key;
+            continue;
+        }
+        ui.voiceCombobox->addItem(languages.value(key).at(0), key);
+    }
+    // try to select the previously selected one again (if still present)
+    // TODO: Fall back to system language if not found, or english.
+    int sel = ui.voiceCombobox->findData(current);
+    if(sel >= 0)
+        ui.voiceCombobox->setCurrentIndex(sel);
 
 }
 
@@ -157,6 +188,8 @@ void SelectiveInstallWidget::saveSettings(void)
     RbSettings::setValue(RbSettings::InstallFonts, ui.fontsCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallThemes, ui.themesCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallGamefiles, ui.gamefileCheckbox->isChecked());
+    RbSettings::setValue(RbSettings::InstallVoice, ui.voiceCheckbox->isChecked());
+    RbSettings::setValue(RbSettings::VoiceLanguage, ui.voiceCombobox->currentData().toString());
 }
 
 
@@ -209,7 +242,8 @@ void SelectiveInstallWidget::continueInstall(bool error)
         case 3: installFonts(); break;
         case 4: installThemes(); break;
         case 5: installGamefiles(); break;
-        case 6: installBootloaderPost(); break;
+        case 6: installVoicefile(); break;
+        case 7: installBootloaderPost(); break;
         default: break;
     }
 
@@ -381,15 +415,14 @@ void SelectiveInstallWidget::installRockbox(void)
         LOG_INFO() << "installing Rockbox";
         QString url;
 
-        QString selected = ui.selectedVersion->itemData(ui.selectedVersion->currentIndex()).toString();
-        RbSettings::setValue(RbSettings::Build, selected);
+        RbSettings::setValue(RbSettings::Build, m_buildtype);
         RbSettings::sync();
 
-        if(selected == "release") url = ServerInfo::instance()->platformValue(
+        if(m_buildtype == "release") url = ServerInfo::instance()->platformValue(
                 ServerInfo::CurReleaseUrl, m_target).toString();
-        else if(selected == "development") url = ServerInfo::instance()->platformValue(
+        else if(m_buildtype == "development") url = ServerInfo::instance()->platformValue(
                 ServerInfo::CurDevelUrl, m_target).toString();
-        else if(selected == "rc") url = ServerInfo::instance()->platformValue(
+        else if(m_buildtype == "rc") url = ServerInfo::instance()->platformValue(
                 ServerInfo::RelCandidateUrl, m_target).toString();
 
         //! install build
@@ -399,7 +432,7 @@ void SelectiveInstallWidget::installRockbox(void)
         m_zipinstaller->setLogSection("Rockbox (Base)");
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
             m_zipinstaller->setCache(true);
-        m_zipinstaller->setLogVersion(m_versions[selected]);
+        m_zipinstaller->setLogVersion(m_versions[m_buildtype]);
         m_zipinstaller->setMountPoint(m_mountpoint);
 
         connect(m_zipinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
@@ -422,25 +455,71 @@ void SelectiveInstallWidget::installFonts(void)
     if(ui.fontsCheckbox->isChecked()) {
         LOG_INFO() << "installing Fonts";
 
-    RockboxInfo installInfo(m_mountpoint);
-    QString fontsurl;
-    QString logversion;
-    QString relversion = installInfo.release();
-    if(relversion.isEmpty()) {
-        // release is empty for non-release versions (i.e. daily / current)
-        fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildDaily).toString();
+        RockboxInfo installInfo(m_mountpoint);
+        QString fontsurl;
+        QString logversion;
+        QString relversion = installInfo.release();
+        if(relversion.isEmpty()) {
+            // release is empty for non-release versions (i.e. daily / current)
+            fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildDaily).toString();
+        }
+        else {
+            fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildRelease).toString();
+            logversion = installInfo.release();
+        }
+        fontsurl.replace("%RELEASEVER%", relversion);
+
+        // create new zip installer
+        if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
+        m_zipinstaller = new ZipInstaller(this);
+        m_zipinstaller->setUrl(fontsurl);
+        m_zipinstaller->setLogSection("Fonts");
+        m_zipinstaller->setLogVersion(logversion);
+        m_zipinstaller->setMountPoint(m_mountpoint);
+        if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
+            m_zipinstaller->setCache(true);
+
+        connect(m_zipinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
+        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
+        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        m_zipinstaller->install();
     }
     else {
-        fontsurl = SystemInfo::value(SystemInfo::FontUrl, SystemInfo::BuildRelease).toString();
+        LOG_INFO() << "Fonts install disabled.";
+        emit installSkipped(false);
+    }
+}
+
+void SelectiveInstallWidget::installVoicefile(void)
+{
+    if(ui.voiceCheckbox->isChecked()) {
+        LOG_INFO() << "installing Voice file";
+    QString lang = ui.voiceCombobox->currentData().toString();
+
+    RockboxInfo installInfo(m_mountpoint);
+    QString voiceurl;
+    QString logversion;
+    QString relversion = installInfo.release();
+    if(m_buildtype == "release") {
+        // release is empty for non-release versions (i.e. daily / current)
+        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, SystemInfo::BuildRelease).toString();
+    }
+    else {
+        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl, SystemInfo::BuildDaily).toString();
         logversion = installInfo.release();
     }
-    fontsurl.replace("%RELEASEVER%", relversion);
+    voiceurl.replace("%RELVERSION%", m_versions[m_buildtype]);
+    voiceurl.replace("%MODEL%", m_target);
+    voiceurl.replace("%LANGUAGE%", lang);
+
+    LOG_INFO() << "voicurl" << voiceurl;
 
     // create new zip installer
     if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
     m_zipinstaller = new ZipInstaller(this);
-    m_zipinstaller->setUrl(fontsurl);
-    m_zipinstaller->setLogSection("Fonts");
+    m_zipinstaller->setUrl(voiceurl);
+    m_zipinstaller->setLogSection("Voice (" + lang + ")");
     m_zipinstaller->setLogVersion(logversion);
     m_zipinstaller->setMountPoint(m_mountpoint);
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
@@ -453,7 +532,7 @@ void SelectiveInstallWidget::installFonts(void)
     m_zipinstaller->install();
     }
     else {
-        LOG_INFO() << "Fonts install disabled.";
+        LOG_INFO() << "Voice install disabled.";
         emit installSkipped(false);
     }
 }
