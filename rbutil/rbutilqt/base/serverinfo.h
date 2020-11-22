@@ -45,6 +45,8 @@ class ServerInfo : public QObject
             BleedingDate,
             RelCandidateVersion,
             RelCandidateUrl,
+            DailyVersion,
+            DailyUrl
         };
 
         static ServerInfo* instance();

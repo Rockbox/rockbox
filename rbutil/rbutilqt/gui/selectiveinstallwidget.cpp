@@ -124,6 +124,8 @@ void SelectiveInstallWidget::updateVersion(void)
                               ServerInfo::BleedingRevision).toString());
         m_versions.insert(SystemInfo::BuildCandidate, ServerInfo::instance()->platformValue(
                               ServerInfo::RelCandidateVersion).toString());
+        m_versions.insert(SystemInfo::BuildDaily, ServerInfo::instance()->platformValue(
+                              ServerInfo::DailyVersion).toString());
     }
 
     ui.selectedVersion->clear();
@@ -138,6 +140,10 @@ void SelectiveInstallWidget::updateVersion(void)
     if(!m_versions[SystemInfo::BuildCandidate].isEmpty()) {
         ui.selectedVersion->addItem(tr("Release Candidate (Revison %1)").arg(
                     m_versions[SystemInfo::BuildCandidate]), SystemInfo::BuildCandidate);
+    }
+    if(!m_versions[SystemInfo::BuildDaily].isEmpty()) {
+        ui.selectedVersion->addItem(tr("Daily Build (%1)").arg(
+                    m_versions[SystemInfo::BuildDaily]), SystemInfo::BuildDaily);
     }
 
     // select previously selected version
@@ -450,6 +456,9 @@ void SelectiveInstallWidget::installRockbox(void)
             url = ServerInfo::instance()->platformValue(
                         ServerInfo::RelCandidateUrl, m_target).toString();
             break;
+        case SystemInfo::BuildDaily:
+            url = ServerInfo::instance()->platformValue(
+                        ServerInfo::DailyUrl, m_target).toString();
         }
         //! install build
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
