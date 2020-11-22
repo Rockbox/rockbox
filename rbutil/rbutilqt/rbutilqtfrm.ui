@@ -171,34 +171,7 @@
         <string>Install accessibility add-ons</string>
        </attribute>
        <layout class="QGridLayout">
-        <item row="0" column="0">
-         <widget class="QToolButton" name="buttonVoice">
-          <property name="text">
-           <string>Install Voice files</string>
-          </property>
-          <property name="icon">
-           <iconset resource="rbutilqt.qrc">
-            <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>56</width>
-            <height>46</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="labelVoice">
-          <property name="text">
-           <string>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
+        <item row="1" column="0">
          <widget class="QToolButton" name="buttonTalk">
           <property name="text">
            <string>Install Talk files</string>
@@ -215,14 +188,14 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="1" column="1">
          <widget class="QLabel" name="labelTalk">
           <property name="text">
            <string>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="2" column="0">
          <spacer>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -235,7 +208,7 @@
           </property>
          </spacer>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <spacer>
           <property name="orientation">
            <enum>Qt::Vertical</enum>
@@ -248,7 +221,7 @@
           </property>
          </spacer>
         </item>
-        <item row="1" column="0">
+        <item row="0" column="0">
          <widget class="QToolButton" name="buttonCreateVoice">
           <property name="text">
            <string>Create Voice files</string>
@@ -265,7 +238,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="0" column="1">
          <widget class="QLabel" name="labelCreateVoice">
           <property name="text">
            <string>&lt;b&gt;Create Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the  user interface. Speaking is enabled by default, so
@@ -436,7 +409,6 @@
      <property name="title">
       <string>&amp;Accessibility</string>
      </property>
-     <addaction name="actionInstall_Voice_File"/>
      <addaction name="actionCreate_Voice_File"/>
      <addaction name="actionCreate_Talk_Files"/>
     </widget>
@@ -656,7 +628,6 @@
   <tabstop>buttonChangeDevice</tabstop>
   <tabstop>buttonRemoveBootloader</tabstop>
   <tabstop>buttonRemoveRockbox</tabstop>
-  <tabstop>buttonVoice</tabstop>
   <tabstop>buttonCreateVoice</tabstop>
   <tabstop>buttonTalk</tabstop>
  </tabstops>

@@ -158,13 +158,11 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     connect(ui.buttonEject, SIGNAL(clicked()), this, SLOT(eject()));
     connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
     connect(ui.buttonCreateVoice, SIGNAL(clicked()), this, SLOT(createVoiceFile()));
-    connect(ui.buttonVoice, SIGNAL(clicked()), this, SLOT(installVoice()));
     connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
     connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
     connect(ui.buttonBackup, SIGNAL(clicked()), this, SLOT(backup()));
 
     // actions accessible from the menu
-    connect(ui.actionInstall_Voice_File, SIGNAL(triggered()), this, SLOT(installVoice()));
     connect(ui.actionCreate_Voice_File, SIGNAL(triggered()), this, SLOT(createVoiceFile()));
     connect(ui.actionCreate_Talk_Files, SIGNAL(triggered()), this, SLOT(createTalkFiles()));
     connect(ui.actionRemove_bootloader, SIGNAL(triggered()), this, SLOT(uninstallBootloader()));
@@ -436,80 +434,6 @@ void RbUtilQt::installdone(bool error)
     LOG_INFO() << "install done";
     m_installed = true;
     m_error = error;
-}
-
-void RbUtilQt::installVoice()
-{
-    if(chkConfig(this)) return;
-
-    if(m_gotInfo == false)
-    {
-       QMessageBox::warning(this, tr("Warning"),
-       tr("The Application is still downloading Information about new Builds."
-          " Please try again shortly."));
-        return;
-    }
-
-    QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
-    RockboxInfo installInfo(mountpoint);
-
-    QString voiceurl;
-    QString logversion;
-    QString relversion = installInfo.release();
-    // if no version is found abort.
-    if(installInfo.revision().isEmpty() && relversion.isEmpty()) {
-        QMessageBox::critical(this, tr("No Rockbox installation found"),
-                tr("Could not determine the installed Rockbox version. "
-                    "Please install a Rockbox build before installing "
-                    "voice files."));
-        return;
-    }
-    if(relversion.isEmpty()) {
-        // release is empty for development builds.
-        // No voice files are available for development builds.
-        QMessageBox::critical(this, tr("No voice file available"),
-                tr("The installed version of Rockbox is a development version. "
-                    "Pre-built voices are only available for release versions "
-                    "of Rockbox. Please generate a voice yourself using the "
-                    "\"Create voice file\" functionality."));
-        return;
-    }
-    else {
-        voiceurl = SystemInfo::value(SystemInfo::VoiceUrl,
-                                     SystemInfo::BuildRelease).toString();
-        logversion = installInfo.release();
-    }
-    if(QMessageBox::question(this, tr("Confirm Installation"),
-       tr("Do you really want to install the voice file?"),
-       QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-        return;
-
-    QString model = SystemInfo::platformValue(SystemInfo::BuildserverModel).toString();
-    // replace placeholder in voice url
-    voiceurl.replace("%MODEL%", model);
-    voiceurl.replace("%RELVERSION%", relversion);
-    voiceurl.replace("%LANGUAGE%", "english");
-
-    LOG_INFO() << "voicefile URL:" << voiceurl;
-
-    // create logger
-    logger = new ProgressLoggerGui(this);
-    logger->show();
-    // create zip installer
-    installer = new ZipInstaller(this);
-
-    installer->setUrl(voiceurl);
-    installer->setLogSection("Voice");
-    installer->setLogVersion(logversion);
-    installer->setMountPoint(mountpoint);
-    if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
-        installer->setCache(true);
-    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
-    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
-    connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
-    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
-    installer->install();
-
 }
 
 

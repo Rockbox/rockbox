@@ -91,7 +91,6 @@ class RbUtilQt : public QMainWindow
         void downloadInfo(void);
         void backup(void);
 
-        void installVoice(void);
         void uninstall(void);
         void uninstallBootloader(void);
         void installPortable(void);
