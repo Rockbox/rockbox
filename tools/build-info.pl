@@ -10,15 +10,25 @@
 
 require "./builds.pm";
 
+my $baseurl="https://download.rockbox.org";
+
 print "[release]\n";
+print "build_url=$baseurl/release/%VERSION%/rockbox-%MODEL%-%VERSION%.zip\n";
+print "voice_url=$baseurl/release/%VERSION%/%MODEL%-%VERSION%-%LANGUAGE%.zip\n";
+print "manual_url=$baseurl/release/%VERSION%/rockbox-%MODEL%-%VERSION%%FORMAT%\n";
+print "font_url=$baseurl/release/%VERSION%/rockbox-fonts-%VERSION%.zip\n";
+print "source_url=$baseurl/release/%VERSION%/rockbox-%VERSION%.7z\n";
 
 foreach my $b (&stablebuilds) {
+    my $ver;
     if(exists($builds{$b}{release})) {
-        print "$b=$builds{$b}{release}\n";
+	$ver = $builds{$b}{release};
     }
     else {
-        print "$b=$publicrelease\n";
+	$ver = $publicrelease;
     }
+#    print "$b=$ver,$baseurl/release/$ver/rockbox-$b-$ver.zip\n";
+    print "$b=$ver\n";
 }
 
 print "[status]\n";
