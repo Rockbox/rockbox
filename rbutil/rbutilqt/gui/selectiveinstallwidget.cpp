@@ -147,18 +147,17 @@ void SelectiveInstallWidget::updateVersion(void)
     }
 
     // select previously selected version
-    int index = ui.selectedVersion->findData(RbSettings::value(RbSettings::Build).toString());
-    if(index != -1) {
-        ui.selectedVersion->setCurrentIndex(index);
+    int index = ui.selectedVersion->findData(
+                static_cast<SystemInfo::BuildType>(RbSettings::value(RbSettings::Build).toInt()));
+    if(index < 0) {
+        if(!m_versions[SystemInfo::BuildRelease].isEmpty()) {
+            index = ui.selectedVersion->findData(SystemInfo::BuildRelease);
+        }
+        else {
+            index = ui.selectedVersion->findData(SystemInfo::BuildCurrent);
+        }
     }
-    else if(!m_versions[SystemInfo::BuildRelease].isEmpty()) {
-        index = ui.selectedVersion->findData("release");
-        ui.selectedVersion->setCurrentIndex(index);
-    }
-    else {
-        index = ui.selectedVersion->findData("development");
-        ui.selectedVersion->setCurrentIndex(index);
-    }
+    ui.selectedVersion->setCurrentIndex(index);
     // check if Rockbox is installed. If it is untick the bootloader option, as
     // well as if the selected player doesn't need a bootloader.
     if(m_blmethod == "none") {
