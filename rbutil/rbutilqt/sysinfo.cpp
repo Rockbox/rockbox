@@ -30,8 +30,8 @@ Sysinfo::Sysinfo(QWidget *parent) : QDialog(parent)
     ui.setupUi(this);
 
     updateSysinfo();
-    connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(close()));
-    connect(ui.buttonRefresh, SIGNAL(clicked()), this, SLOT(updateSysinfo()));
+    connect(ui.buttonOk, &QAbstractButton::clicked, this, &Sysinfo::close);
+    connect(ui.buttonRefresh, &QAbstractButton::clicked, this, &Sysinfo::updateSysinfo);
 }
 
 void Sysinfo::updateSysinfo(void)
