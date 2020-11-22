@@ -12796,16 +12796,13 @@
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Armazenamento em Massa"
+    *: "Armazenamento em Massa"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Armazenamento em Massa"
+    *: "Armazenamento em Massa"
   </voice>
 </phrase>
 <phrase>
@@ -12872,16 +12869,13 @@
   desc: in Settings -> General -> System -> USB Mode
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Modo USB"
+    *: "Modo USB"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Modo USB"
+    *: "Modo USB"
   </voice>
 </phrase>
 <phrase>
@@ -12889,16 +12883,13 @@
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: "Charge Only"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Carregar só"
+    *: "Carregar só"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Carregar só"
+    *: "Carregar só"
   </voice>
 </phrase>
 <phrase>
@@ -12948,15 +12939,12 @@
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "Ponte de Debug Android"
+    *: "Ponte de Debug Android"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "Ponte de Debug Android"
+    *: "Ponte de Debug Android"
   </voice>
 </phrase>
