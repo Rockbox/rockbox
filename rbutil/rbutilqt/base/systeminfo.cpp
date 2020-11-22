@@ -51,18 +51,18 @@ const static struct {
     const char* name;
     const char* def;
 } PlatformInfosList[] = {
-    { SystemInfo::PlatformName,     ":platform:/name",      "" },
-    { SystemInfo::Manual,           ":platform:/manualname","rockbox-:platform:" },
-    { SystemInfo::BootloaderMethod, ":platform:/bootloadermethod", "none" },
-    { SystemInfo::BootloaderName,   ":platform:/bootloadername", "" },
-    { SystemInfo::BootloaderFile,   ":platform:/bootloaderfile", "" },
-    { SystemInfo::BootloaderFilter, ":platform:/bootloaderfilter", "" },
-    { SystemInfo::Encoder,          ":platform:/encoder",   "" },
-    { SystemInfo::Brand,            ":platform:/brand",     "" },
-    { SystemInfo::Name,             ":platform:/name",      "" },
+    { SystemInfo::PlatformName,     ":platform:/name",              "" },
+    { SystemInfo::Manual,           ":platform:/manualname",        ":platform:" },
+    { SystemInfo::BootloaderMethod, ":platform:/bootloadermethod",  "none" },
+    { SystemInfo::BootloaderName,   ":platform:/bootloadername",    "" },
+    { SystemInfo::BootloaderFile,   ":platform:/bootloaderfile",    "" },
+    { SystemInfo::BootloaderFilter, ":platform:/bootloaderfilter",  "" },
+    { SystemInfo::Encoder,          ":platform:/encoder",           "" },
+    { SystemInfo::Brand,            ":platform:/brand",             "" },
+    { SystemInfo::Name,             ":platform:/name",              "" },
     { SystemInfo::BuildserverModel, ":platform:/buildserver_modelname", "" },
     { SystemInfo::ConfigureModel,   ":platform:/configure_modelname", "" },
-    { SystemInfo::PlayerPicture,    ":platform:/playerpic", "" },
+    { SystemInfo::PlayerPicture,    ":platform:/playerpic",         "" },
 };
 
 //! pointer to setting object to nullptr

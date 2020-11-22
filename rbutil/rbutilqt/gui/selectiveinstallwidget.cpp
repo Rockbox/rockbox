@@ -40,6 +40,11 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     ui.themesCheckbox->setChecked(RbSettings::value(RbSettings::InstallThemes).toBool());
     ui.gamefileCheckbox->setChecked(RbSettings::value(RbSettings::InstallGamefiles).toBool());
     ui.voiceCheckbox->setChecked(RbSettings::value(RbSettings::InstallVoice).toBool());
+    ui.manualCheckbox->setChecked(RbSettings::value(RbSettings::InstallManual).toBool());
+
+    ui.manualCombobox->addItem("PDF", "pdf");
+    ui.manualCombobox->addItem("HTML (zip)", "zip");
+    ui.manualCombobox->addItem("HTML", "html");
 
     // check if Rockbox is installed by looking after rockbox-info.txt.
     // If installed uncheck bootloader installation.
@@ -201,6 +206,7 @@ void SelectiveInstallWidget::saveSettings(void)
     RbSettings::setValue(RbSettings::InstallThemes, ui.themesCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallGamefiles, ui.gamefileCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallVoice, ui.voiceCheckbox->isChecked());
+    RbSettings::setValue(RbSettings::InstallManual, ui.manualCheckbox->isChecked());
     RbSettings::setValue(RbSettings::VoiceLanguage, ui.voiceCombobox->currentData().toString());
 }
 
@@ -244,7 +250,7 @@ void SelectiveInstallWidget::continueInstall(bool error)
     if(error) {
         LOG_ERROR() << "Last part returned error.";
         m_logger->setFinished();
-        m_installStage = 7;
+        m_installStage = 9;
     }
     m_installStage++;
     switch(m_installStage) {
@@ -255,11 +261,12 @@ void SelectiveInstallWidget::continueInstall(bool error)
         case 4: installThemes(); break;
         case 5: installGamefiles(); break;
         case 6: installVoicefile(); break;
-        case 7: installBootloaderPost(); break;
+        case 7: installManual(); break;
+        case 8: installBootloaderPost(); break;
         default: break;
     }
 
-    if(m_installStage > 6) {
+    if(m_installStage > 8) {
         LOG_INFO() << "All install stages done.";
         m_logger->setFinished();
         if(m_blmethod != "none") {
@@ -544,6 +551,57 @@ void SelectiveInstallWidget::installVoicefile(void)
     }
     else {
         LOG_INFO() << "Voice install disabled.";
+        emit installSkipped(false);
+    }
+}
+
+void SelectiveInstallWidget::installManual(void)
+{
+    if(ui.manualCheckbox->isChecked() && ui.manualCheckbox->isEnabled()) {
+        LOG_INFO() << "installing Manual";
+        QString mantype = ui.manualCombobox->currentData().toString();
+
+        RockboxInfo installInfo(m_mountpoint);
+        QString manualurl;
+        QString logversion;
+        QString relversion = installInfo.release();
+        if(m_buildtype != SystemInfo::BuildRelease) {
+            // release is empty for non-release versions (i.e. daily / current)
+            logversion = installInfo.release();
+        }
+
+        manualurl = SystemInfo::value(SystemInfo::ManualUrl, m_buildtype).toString();
+        manualurl.replace("%RELVERSION%", m_versions[m_buildtype]);
+        QString model = SystemInfo::platformValue(SystemInfo::Manual, m_target).toString();
+        if(model.isEmpty())
+            model = m_target;
+        manualurl.replace("%MODEL%", model);
+
+        if(mantype == "pdf")
+            manualurl.replace("%FORMAT%", ".pdf");
+        else
+            manualurl.replace("%FORMAT%", "-html.zip");
+
+        // create new zip installer
+        if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
+        m_zipinstaller = new ZipInstaller(this);
+        m_zipinstaller->setUrl(manualurl);
+        m_zipinstaller->setLogSection("Manual Voice (" + mantype + ")");
+        m_zipinstaller->setLogVersion(logversion);
+        m_zipinstaller->setMountPoint(m_mountpoint);
+        if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
+            m_zipinstaller->setCache(true);
+        // if type is html extract it.
+        m_zipinstaller->setUnzip(mantype == "html");
+
+        connect(m_zipinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
+        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
+        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        m_zipinstaller->install();
+    }
+    else {
+        LOG_INFO() << "Manual install disabled.";
         emit installSkipped(false);
     }
 }

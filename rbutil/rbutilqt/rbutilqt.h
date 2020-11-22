@@ -32,7 +32,6 @@
 #include "zipinstaller.h"
 #include "progressloggergui.h"
 #include "bootloaderinstallbase.h"
-#include "manualwidget.h"
 #include "infowidget.h"
 #include "selectiveinstallwidget.h"
 #include "backupdialog.h"
@@ -47,7 +46,6 @@ class RbUtilQt : public QMainWindow
         static bool chkConfig(QWidget *parent = nullptr);
 
     private:
-        ManualWidget *manual;
         InfoWidget *info;
         SelectiveInstallWidget* selectiveinstallwidget;
         BackupDialog *backupdialog;

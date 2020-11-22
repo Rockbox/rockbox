@@ -17,7 +17,6 @@
 
 # common files
 SOURCES += \
- gui/manualwidget.cpp \
  gui/infowidget.cpp \
  rbutilqt.cpp \
  main.cpp \
@@ -86,7 +85,6 @@ SOURCES += \
 
 
 HEADERS += \
- gui/manualwidget.h \
  gui/infowidget.h \
  rbutilqt.h \
  base/httpget.h \
@@ -178,7 +176,6 @@ HEADERS += \
 
 
 FORMS += \
- gui/manualwidgetfrm.ui \
  gui/infowidgetfrm.ui \
  rbutilqtfrm.ui \
  aboutbox.ui \

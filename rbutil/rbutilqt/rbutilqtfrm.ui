@@ -19,6 +19,31 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="0">
+     <widget class="QLabel" name="logoLabel">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="text">
+       <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox."/>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="rbutilqt.qrc">:/icons/rblogo.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
     <item row="0" column="1">
      <widget class="QGroupBox" name="groupBoxDevice">
       <property name="sizePolicy">
@@ -123,31 +148,6 @@
         </widget>
        </item>
       </layout>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="logoLabel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="baseSize">
-       <size>
-        <width>0</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="text">
-       <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox."/>
-      </property>
-      <property name="pixmap">
-       <pixmap resource="rbutilqt.qrc">:/icons/rblogo.png</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
      </widget>
     </item>
     <item row="1" column="0" colspan="2">
@@ -388,14 +388,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="manual">
-       <attribute name="title">
-        <string>&amp;Manual</string>
-       </attribute>
-       <attribute name="toolTip">
-        <string>View and download the manual</string>
-       </attribute>
-      </widget>
       <widget class="QWidget" name="info">
        <attribute name="title">
         <string>Inf&amp;o</string>
@@ -411,7 +403,7 @@
      <x>0</x>
      <y>0</y>
      <width>650</width>
-     <height>23</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

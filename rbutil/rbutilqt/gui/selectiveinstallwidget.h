@@ -39,15 +39,18 @@ class SelectiveInstallWidget : public QWidget
 
     private slots:
         void continueInstall(bool);
+        void customizeThemes(void);
+        void selectedVersionChanged(int);
+
+    private:
         void installBootloader(void);
         void installRockbox(void);
         void installFonts(void);
         void installVoicefile(void);
+        void installManual(void);
         void installThemes(void);
         void installGamefiles(void);
         void installBootloaderPost(void);
-        void customizeThemes(void);
-        void selectedVersionChanged(int);
 
     signals:
         void installSkipped(bool);

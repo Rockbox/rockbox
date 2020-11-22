@@ -38,7 +38,6 @@
 #include "serverinfo.h"
 #include "systeminfo.h"
 #include "ziputil.h"
-#include "manualwidget.h"
 #include "infowidget.h"
 #include "selectiveinstallwidget.h"
 #include "backupdialog.h"
@@ -135,12 +134,6 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
 
     m_gotInfo = false;
     m_auto = false;
-
-    // insert ManualWidget() widget in manual tab
-    QGridLayout *mantablayout = new QGridLayout(this);
-    ui.manual->setLayout(mantablayout);
-    manual = new ManualWidget(this);
-    mantablayout->addWidget(manual);
 
     // selective "install" tab.
     QGridLayout *selectivetablayout = new QGridLayout(this);
@@ -358,7 +351,6 @@ void RbUtilQt::updateSettings()
 {
     LOG_INFO() << "updating current settings";
     updateDevice();
-    manual->updateManual();
     QString c = RbSettings::value(RbSettings::CachePath).toString();
     HttpGet::setGlobalCache(c.isEmpty() ? QDir::tempPath() : c);
     HttpGet::setGlobalProxy(proxy());

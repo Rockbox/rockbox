@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>663</width>
-    <height>399</height>
+    <height>409</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -54,6 +54,20 @@
       <string>Rockbox components to install</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="bootloaderCheckbox">
+        <property name="text">
+         <string>&amp;Bootloader</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../rbutilqt.qrc">
+          <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0">
        <widget class="QCheckBox" name="rockboxCheckbox">
         <property name="text">
@@ -68,8 +82,8 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="bootloaderLabel">
+      <item row="3" column="2">
+       <widget class="QLabel" name="themesLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -77,7 +91,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>The bootloader is required for starting Rockbox. Only necessary for first time install.</string>
+         <string>Themes allow adjusting the user interface of Rockbox. Use &quot;Customize&quot; to select themes.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -95,33 +109,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="3">
-       <widget class="QPushButton" name="themesCustomize">
-        <property name="text">
-         <string>Customize</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Minimum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>1</width>
-          <height>1</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
       <item row="2" column="0">
        <widget class="QCheckBox" name="fontsCheckbox">
         <property name="text">
@@ -136,19 +123,8 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QCheckBox" name="gamefileCheckbox">
-        <property name="text">
-         <string>Game Files</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/input-gaming.svg</normaloff>:/icons/input-gaming.svg</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1">
-       <widget class="QLabel" name="themesLabel">
+      <item row="0" column="2">
+       <widget class="QLabel" name="bootloaderLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -156,30 +132,14 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Themes allow adjusting the user interface of Rockbox. Use &quot;Customize&quot; to select themes.</string>
+         <string>The bootloader is required for starting Rockbox. Only necessary for first time install.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="fontsLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Additional fonts for the User Interface.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
+      <item row="6" column="2">
        <widget class="QLabel" name="gameLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -195,7 +155,93 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="3" column="4">
+       <widget class="QPushButton" name="themesCustomize">
+        <property name="text">
+         <string>Customize</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../rbutilqt.qrc">
+          <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="fontsLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Additional fonts for the User Interface.</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="2">
+       <widget class="QLabel" name="voiceLabel">
+        <property name="text">
+         <string>Install prerendered voice file.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QCheckBox" name="gamefileCheckbox">
+        <property name="text">
+         <string>Game Files</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../rbutilqt.qrc">
+          <normaloff>:/icons/input-gaming.svg</normaloff>:/icons/input-gaming.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Minimum</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>1</width>
+          <height>1</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="manualCheckbox">
+        <property name="text">
+         <string>&amp;Manual</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../rbutilqt.qrc">
+          <normaloff>:/icons/edit-find.svg</normaloff>:/icons/edit-find.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QCheckBox" name="voiceCheckbox">
+        <property name="text">
+         <string>&amp;Voice File</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../rbutilqt.qrc">
+          <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="4">
+       <widget class="QComboBox" name="voiceCombobox"/>
+      </item>
+      <item row="1" column="2">
        <widget class="QLabel" name="rockboxLabel">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -211,40 +257,15 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="bootloaderCheckbox">
+      <item row="8" column="2">
+       <widget class="QLabel" name="manualLabel">
         <property name="text">
-         <string>&amp;Bootloader</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/preferences-system.svg</normaloff>:/icons/preferences-system.svg</iconset>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>Save a copy of the manual on the player.</string>
         </property>
        </widget>
       </item>
-      <item row="7" column="0">
-       <widget class="QCheckBox" name="voiceCheckbox">
-        <property name="text">
-         <string>&amp;Voice File</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../rbutilqt.qrc">
-          <normaloff>:/icons/audio-volume-high.svg</normaloff>:/icons/audio-volume-high.svg</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QLabel" name="voiceLabel">
-        <property name="text">
-         <string>Install prerendered voice file.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="3">
-       <widget class="QComboBox" name="voiceCombobox"/>
+      <item row="8" column="4">
+       <widget class="QComboBox" name="manualCombobox"/>
       </item>
      </layout>
     </widget>
