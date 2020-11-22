@@ -11345,16 +11345,13 @@
   desc: in Settings -> General -> System -> USB Mode
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "USB Mode"
+    *: "USB Mode"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "USB模式"
+    *: "USB模式"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "USB模式"
+    *: "USB模式"
   </voice>
 </phrase>
 <phrase>
@@ -11362,16 +11359,13 @@
   desc: in Settings -> General -> System -> USB Mode: Mass Storage
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Mass Storage"
+    *: "Mass Storage"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "大容量存儲"
+    *: "大容量存儲"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "大容量存儲"
+    *: "大容量存儲"
   </voice>
 </phrase>
 <phrase>
@@ -11379,16 +11373,13 @@
   desc: in Settings -> General -> System -> USB Mode: Charge Only
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Charge Only"
+    *: "Charge Only"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "僅充電"
+    *: "僅充電"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "僅充電"
+    *: "僅充電"
   </voice>
 </phrase>
 <phrase>
@@ -11396,16 +11387,13 @@
   desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
   user: core
   <source>
-    *: none
-    ibassodx50,ibassodx90: "Android Debug Bridge"
+    *: "Android Debug Bridge"
   </source>
   <dest>
-    *: none
-    ibassodx50,ibassodx90: "ADB偵錯"
+    *: "ADB偵錯"
   </dest>
   <voice>
-    *: none
-    ibassodx50,ibassodx90: "ADB偵錯"
+    *: "ADB偵錯"
   </voice>
 </phrase>
 <phrase>
