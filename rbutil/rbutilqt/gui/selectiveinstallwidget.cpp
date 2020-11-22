@@ -537,7 +537,7 @@ void SelectiveInstallWidget::installVoicefile(void)
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
         m_zipinstaller->setUrl(voiceurl);
-        m_zipinstaller->setLogSection("Voice (" + lang + ")");
+        m_zipinstaller->setLogSection("Prerendered Voice (" + lang + ")");
         m_zipinstaller->setLogVersion(logversion);
         m_zipinstaller->setMountPoint(m_mountpoint);
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
@@ -586,7 +586,7 @@ void SelectiveInstallWidget::installManual(void)
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
         m_zipinstaller->setUrl(manualurl);
-        m_zipinstaller->setLogSection("Manual Voice (" + mantype + ")");
+        m_zipinstaller->setLogSection("Manual (" + mantype + ")");
         m_zipinstaller->setLogVersion(logversion);
         m_zipinstaller->setMountPoint(m_mountpoint);
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
