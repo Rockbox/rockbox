@@ -105,6 +105,11 @@ QVariant ServerInfo::platformValue(enum ServerInfos info, QString platform)
                                           SystemInfo::BuildCandidate).toString()
                     .replace("%MODEL%", platform)
                     .replace("%RELVERSION%", version);
+            else if(!version.isEmpty() && info == DailyUrl)
+                value = SystemInfo::value(SystemInfo::BuildUrl,
+                                          SystemInfo::BuildDaily).toString()
+                    .replace("%MODEL%", platform)
+                    .replace("%RELVERSION%", version);
         }
         break;
     case CurDevelUrl:
