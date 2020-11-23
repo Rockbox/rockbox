@@ -863,7 +863,7 @@ void Config::cacheClear()
     if(QMessageBox::critical(this, tr("Really delete cache?"),
        tr("Do you really want to delete the cache? "
          "Make absolutely sure this setting is correct as it will "
-         "remove <b>all</b> files in this folder!").arg(ui.cachePath->text()),
+         "remove <b>all</b> files in this folder!"),
        QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
         return;
 
