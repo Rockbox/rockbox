@@ -51,7 +51,6 @@ const static struct {
     const char* name;
     const char* def;
 } PlatformInfosList[] = {
-    { SystemInfo::PlatformName,     ":platform:/name",              "" },
     { SystemInfo::Manual,           ":platform:/manualname",        ":platform:" },
     { SystemInfo::BootloaderMethod, ":platform:/bootloadermethod",  "none" },
     { SystemInfo::BootloaderName,   ":platform:/bootloadername",    "" },

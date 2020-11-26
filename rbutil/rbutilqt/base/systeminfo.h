@@ -64,7 +64,6 @@ class SystemInfo : public QObject
         };
 
         enum PlatformInfo {
-            PlatformName,
             Manual,
             BootloaderMethod,
             BootloaderName,

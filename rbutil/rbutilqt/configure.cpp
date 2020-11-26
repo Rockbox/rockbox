@@ -742,7 +742,7 @@ void Config::autodetect()
             }
             msg += QString("<li>%1</li>").arg(tr("%1 at %2").arg(
                         SystemInfo::platformValue(
-                            SystemInfo::PlatformName, detected.at(i).device).toString(),
+                            SystemInfo::Name, detected.at(i).device).toString(),
                         QDir::toNativeSeparators(mp)));
         }
         msg += "</ul>";

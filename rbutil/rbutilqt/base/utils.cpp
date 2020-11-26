@@ -385,8 +385,8 @@ QString Utils::checkEnvironment(bool permission)
     {
         text += tr("<li>Target mismatch detected.<br/>"
                 "Installed target: %1<br/>Selected target: %2.</li>")
-            .arg(SystemInfo::platformValue(SystemInfo::PlatformName, installed).toString(),
-                 SystemInfo::platformValue(SystemInfo::PlatformName).toString());
+            .arg(SystemInfo::platformValue(SystemInfo::Name, installed).toString(),
+                 SystemInfo::platformValue(SystemInfo::Name).toString());
     }
 
     if(!text.isEmpty())

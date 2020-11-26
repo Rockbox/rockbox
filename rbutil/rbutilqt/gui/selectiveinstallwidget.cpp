@@ -340,7 +340,7 @@ void SelectiveInstallWidget::installBootloader(void)
         else if(bl->installed() == BootloaderInstallBase::BootloaderOther
                 && bl->capabilities() & BootloaderInstallBase::Backup)
         {
-            QString targetFolder = SystemInfo::platformValue(SystemInfo::PlatformName).toString()
+            QString targetFolder = SystemInfo::platformValue(SystemInfo::Name).toString()
                 + " Firmware Backup";
             // remove invalid character(s)
             targetFolder.remove(QRegExp("[:/]"));
