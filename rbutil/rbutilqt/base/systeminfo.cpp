@@ -59,7 +59,6 @@ const static struct {
     { SystemInfo::Encoder,          ":platform:/encoder",           "" },
     { SystemInfo::Brand,            ":platform:/brand",             "" },
     { SystemInfo::Name,             ":platform:/name",              "" },
-    { SystemInfo::BuildserverModel, ":platform:/buildserver_modelname", "" },
     { SystemInfo::ConfigureModel,   ":platform:/configure_modelname", "" },
     { SystemInfo::PlayerPicture,    ":platform:/playerpic",         "" },
 };
