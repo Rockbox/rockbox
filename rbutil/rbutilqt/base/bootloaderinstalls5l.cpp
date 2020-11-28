@@ -23,7 +23,7 @@
 #include "utils.h"
 #include "system.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 
 #include "../mks5lboot/mks5lboot.h"
 
@@ -408,8 +408,8 @@ BootloaderInstallBase::BootloaderType BootloaderInstallS5l::installed(void)
     QString logfile = RbSettings::value(RbSettings::Mountpoint).toString()
                 + "/.rockbox/rbutil.log";
     QSettings s(logfile, QSettings::IniFormat, this);
-    QString section = SystemInfo::platformValue(
-                SystemInfo::BootloaderName).toString().section('/', -1);
+    QString section = PlayerBuildInfo::instance()->value(
+                PlayerBuildInfo::BootloaderName).toString().section('/', -1);
     rbblInstalled = s.contains("Bootloader/" + section);
 
     if (rbblInstalled) {

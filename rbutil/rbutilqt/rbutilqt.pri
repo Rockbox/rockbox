@@ -48,7 +48,6 @@ SOURCES += \
  base/voicefile.cpp \
  createvoicewindow.cpp \
  base/rbsettings.cpp \
- base/serverinfo.cpp \
  base/systeminfo.cpp \
  base/system.cpp \
  sysinfo.cpp \
@@ -82,6 +81,7 @@ SOURCES += \
  mspack/system-mspack.c \
  base/mspackutil.cpp \
  base/archiveutil.cpp \
+ base/playerbuildinfo.cpp
 
 
 HEADERS += \
@@ -127,7 +127,6 @@ HEADERS += \
  base/voicefile.h \
  createvoicewindow.h \
  base/rbsettings.h \
- base/serverinfo.h \
  base/systeminfo.h \
  sysinfo.h \
  base/system.h \
@@ -173,6 +172,7 @@ HEADERS += \
  mspack/szdd.h \
  base/mspackutil.h \
  base/archiveutil.h \
+ base/playerbuildinfo.h
 
 
 FORMS += \

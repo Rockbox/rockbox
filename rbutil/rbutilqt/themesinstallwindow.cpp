@@ -26,7 +26,7 @@
 #include "progressloggergui.h"
 #include "utils.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include "rockboxinfo.h"
 #include "version.h"
 #include "Logger.h"
@@ -84,7 +84,7 @@ void ThemesInstallWindow::downloadInfo()
     LOG_INFO() << "downloading info to" << themesInfo.fileName();
     themesInfo.close();
 
-    QString infoUrl = SystemInfo::value(SystemInfo::ThemesInfoUrl).toString();
+    QString infoUrl = PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemesInfoUrl).toString();
     infoUrl.replace("%TARGET%",
             RbSettings::value(RbSettings::CurrentPlatform).toString().split(".").at(0));
     infoUrl.replace("%REVISION%", installInfo.revision());
@@ -218,9 +218,9 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
     iniDetails.beginGroup(cur->data(Qt::UserRole).toString());
 
     QUrl img, txt;
-    txt = QUrl(QString(SystemInfo::value(SystemInfo::ThemesUrl).toString() + "/"
+    txt = QUrl(QString(PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemesUrl).toString() + "/"
         + iniDetails.value("descriptionfile").toString()));
-    img = QUrl(QString(SystemInfo::value(SystemInfo::ThemesUrl).toString() + "/"
+    img = QUrl(QString(PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemesUrl).toString() + "/"
         + iniDetails.value("image").toString()));
 
     QString text;
@@ -334,7 +334,7 @@ void ThemesInstallWindow::install()
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
     for(int i = 0; i < ui.listThemes->selectedItems().size(); i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems().at(i)->data(Qt::UserRole).toString());
-        zip = SystemInfo::value(SystemInfo::ThemesUrl).toString()
+        zip = PlayerBuildInfo::instance()->value(PlayerBuildInfo::ThemesUrl).toString()
                 + "/" + iniDetails.value("archive").toString();
         themes.append(zip);
         names.append("Theme: " +

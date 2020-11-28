@@ -20,7 +20,7 @@
 #include "rockboxinfo.h"
 #include "system.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include "Logger.h"
 
 #if !defined(_UNICODE)
@@ -385,8 +385,10 @@ QString Utils::checkEnvironment(bool permission)
     {
         text += tr("<li>Target mismatch detected.<br/>"
                 "Installed target: %1<br/>Selected target: %2.</li>")
-            .arg(SystemInfo::platformValue(SystemInfo::Name, installed).toString(),
-                 SystemInfo::platformValue(SystemInfo::Name).toString());
+            .arg(PlayerBuildInfo::instance()->value(
+                     PlayerBuildInfo::DisplayName, installed).toString(),
+                 PlayerBuildInfo::instance()->value(
+                     PlayerBuildInfo::DisplayName).toString());
     }
 
     if(!text.isEmpty())

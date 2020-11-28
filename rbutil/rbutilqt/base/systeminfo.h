@@ -34,47 +34,6 @@ class SystemInfo : public QObject
             MapIncompatible,
         };
 
-        enum BuildType {
-            BuildCurrent,
-            BuildDaily,
-            BuildRelease,
-            BuildCandidate
-        };
-
-        //! All system settings
-        enum SystemInfos {
-            BuildUrl,
-            FontUrl,
-            VoiceUrl,
-            ManualUrl,
-            BootloaderUrl,
-            BootloaderInfoUrl,
-            DoomUrl,
-            Duke3DUrl,
-            QuakeUrl,
-            PuzzFontsUrl,
-            Wolf3DUrl,
-            XWorldUrl,
-            ReleaseUrl,
-            BuildInfoUrl,
-            GenlangUrl,
-            ThemesUrl,
-            ThemesInfoUrl,
-            RbutilUrl,
-        };
-
-        enum PlatformInfo {
-            Manual,
-            BootloaderMethod,
-            BootloaderName,
-            BootloaderFile,
-            BootloaderFilter,
-            Encoder,
-            Brand,
-            Name,
-            PlayerPicture,
-        };
-
         enum PlatformType {
             PlatformAll,
             PlatformAllDisabled,
@@ -93,9 +52,6 @@ class SystemInfo : public QObject
         //! returns a map of usb-ids and their targets
         static QMap<int, QStringList> usbIdMap(enum MapType type);
         //! get a value from system settings
-        static QVariant value(enum SystemInfos info, BuildType type = BuildCurrent);
-        //! get a value from system settings for a named platform.
-        static QVariant platformValue(enum PlatformInfo info, QString platform = "");
 
     private:
         //! you shouldnt call this, its a fully static calls

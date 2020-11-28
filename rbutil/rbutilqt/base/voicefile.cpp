@@ -21,7 +21,7 @@
 #include "utils.h"
 #include "rockboxinfo.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include "ziputil.h"
 #include "Logger.h"
 
@@ -148,7 +148,8 @@ bool VoiceFileCreator::createVoiceFile()
     // genlang output as previously from the webserver.
 
     // prepare download url
-    QString genlang = SystemInfo::value(SystemInfo::GenlangUrl).toString();
+    QString genlang = PlayerBuildInfo::instance()->value(
+                PlayerBuildInfo::GenlangUrl).toString();
     genlang.replace("%LANG%", m_lang);
     genlang.replace("%TARGET%", target);
     genlang.replace("%REVISION%", version);

@@ -17,7 +17,7 @@
  ****************************************************************************/
 
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include <QSettings>
 #include "Logger.h"
 
@@ -196,7 +196,8 @@ QString RbSettings::constructSettingPath(QString path, QString substitute)
         }
         else {
             path.replace(":tts:", userSettings->value("tts").toString());
-            path.replace(":encoder:", SystemInfo::platformValue(SystemInfo::Encoder, platform).toString());
+            path.replace(":encoder:", PlayerBuildInfo::instance()->value(
+                             PlayerBuildInfo::Encoder, platform).toString());
         }
         path.replace(":platform:", platform);
     }

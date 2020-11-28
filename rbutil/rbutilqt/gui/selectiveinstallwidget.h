@@ -25,6 +25,7 @@
 #include "zipinstaller.h"
 #include "themesinstallwindow.h"
 #include "systeminfo.h"
+#include "playerbuildinfo.h"
 
 class SelectiveInstallWidget : public QWidget
 {
@@ -65,9 +66,8 @@ class SelectiveInstallWidget : public QWidget
         ProgressLoggerGui *m_logger;
         int m_installStage;
         ZipInstaller *m_zipinstaller;
-        QMap<SystemInfo::BuildType, QString> m_versions;
         ThemesInstallWindow *m_themesinstaller;
-        SystemInfo::BuildType m_buildtype;
+        PlayerBuildInfo::BuildType m_buildtype;
 };
 
 #endif

@@ -18,7 +18,7 @@
 
 #include "talkgenerator.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include "wavtrim.h"
 #include "Logger.h"
 
@@ -56,8 +56,8 @@ TalkGenerator::Status TalkGenerator::process(QList<TalkEntry>* list,int wavtrimt
 
     // Encoder
     emit logItem(tr("Starting Encoder Engine"),LOGINFO);
-    m_enc = EncoderBase::getEncoder(
-                this, SystemInfo::platformValue(SystemInfo::Encoder).toString());
+    m_enc = EncoderBase::getEncoder(this, PlayerBuildInfo::instance()->value(
+                    PlayerBuildInfo::Encoder).toString());
     if(!m_enc->start())
     {
         emit logItem(tr("Init of Encoder engine failed"),LOGERROR);
@@ -156,7 +156,8 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
         QString error;
         LOG_INFO() << "voicing: " << list->at(i).toSpeak
                  << "to" << list->at(i).wavfilename;
-        TTSStatus status = m_tts->voice(list->at(i).toSpeak,list->at(i).wavfilename, &error);
+        TTSStatus status = m_tts->voice(list->at(i).toSpeak,
+                                        list->at(i).wavfilename, &error);
         if(status == Warning)
         {
             warnings = true;

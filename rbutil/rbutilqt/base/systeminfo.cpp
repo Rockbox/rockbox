@@ -23,44 +23,6 @@
 #include "Logger.h"
 
 // device settings
-const static struct {
-    SystemInfo::SystemInfos info;
-    const char* name;
-} SystemInfosList[] = {
-    { SystemInfo::ManualUrl,            ":build:/manual_url"      },
-    { SystemInfo::BuildUrl,             ":build:/build_url"       },
-    { SystemInfo::FontUrl,              ":build:/font_url"        },
-    { SystemInfo::VoiceUrl,             ":build:/voice_url"       },
-    { SystemInfo::BootloaderUrl,        "bootloader/download_url" },
-    { SystemInfo::BootloaderInfoUrl,    "bootloader/info_url"     },
-    { SystemInfo::DoomUrl,              "doom_url"                },
-    { SystemInfo::Duke3DUrl,            "duke3d_url"              },
-    { SystemInfo::PuzzFontsUrl,         "puzzfonts_url"           },
-    { SystemInfo::QuakeUrl,             "quake_url"               },
-    { SystemInfo::Wolf3DUrl,            "wolf3d_url"              },
-    { SystemInfo::XWorldUrl,            "xworld_url"              },
-    { SystemInfo::BuildInfoUrl,         "build_info_url"          },
-    { SystemInfo::GenlangUrl,           "genlang_url"             },
-    { SystemInfo::ThemesUrl,            "themes_url"              },
-    { SystemInfo::ThemesInfoUrl,        "themes_info_url"         },
-    { SystemInfo::RbutilUrl,            "rbutil_url"              },
-};
-
-const static struct {
-    SystemInfo::PlatformInfo info;
-    const char* name;
-    const char* def;
-} PlatformInfosList[] = {
-    { SystemInfo::Manual,           ":platform:/manualname",        ":platform:" },
-    { SystemInfo::BootloaderMethod, ":platform:/bootloadermethod",  "none" },
-    { SystemInfo::BootloaderName,   ":platform:/bootloadername",    "" },
-    { SystemInfo::BootloaderFile,   ":platform:/bootloaderfile",    "" },
-    { SystemInfo::BootloaderFilter, ":platform:/bootloaderfilter",  "" },
-    { SystemInfo::Encoder,          ":platform:/encoder",           "" },
-    { SystemInfo::Brand,            ":platform:/brand",             "" },
-    { SystemInfo::Name,             ":platform:/name",              "" },
-    { SystemInfo::PlayerPicture,    ":platform:/playerpic",         "" },
-};
 
 //! pointer to setting object to nullptr
 QSettings* SystemInfo::systemInfos = nullptr;
@@ -75,53 +37,6 @@ void SystemInfo::ensureSystemInfoExists()
     }
 }
 
-
-QVariant SystemInfo::value(enum SystemInfos info, BuildType type)
-{
-    ensureSystemInfoExists();
-
-    // locate setting item
-    int i = 0;
-    while(SystemInfosList[i].info != info)
-        i++;
-    QString s = SystemInfosList[i].name;
-    switch(type) {
-    case BuildDaily:
-        s.replace(":build:", "daily");
-        break;
-    case BuildCurrent:
-        s.replace(":build:", "development");
-        break;
-    case BuildCandidate:
-        s.replace(":build:", "release-candidate");
-        break;
-    case BuildRelease:
-        s.replace(":build:", "release");
-        break;
-    }
-    LOG_INFO() << "GET:" << s << systemInfos->value(s).toString();
-    return systemInfos->value(s);
-}
-
-QVariant SystemInfo::platformValue(enum PlatformInfo info, QString platform)
-{
-    ensureSystemInfoExists();
-
-    // locate setting item
-    int i = 0;
-    while(PlatformInfosList[i].info != info)
-        i++;
-
-    if (platform.isEmpty())
-        platform = RbSettings::value(RbSettings::CurrentPlatform).toString();
-
-    QString s = PlatformInfosList[i].name;
-    s.replace(":platform:", platform);
-    QString d = PlatformInfosList[i].def;
-    d.replace(":platform:", platform);
-    LOG_INFO() << "GET P:" << s << systemInfos->value(s, d).toString();
-    return systemInfos->value(s, d);
-}
 
 QStringList SystemInfo::platforms(enum SystemInfo::PlatformType type, QString variant)
 {

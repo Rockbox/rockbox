@@ -18,19 +18,18 @@
 QT += testlib
 
 TEMPLATE = app
-TARGET = test-serverinfo
+TARGET = test-playerbuildinfo
 INCLUDEPATH += . ../base stubs
 
 # Input
 SOURCES += \
-    test-serverinfo.cpp \
-    stubs/stubs-serverinfo.cpp \
-    ../base/serverinfo.cpp
+    test-playerbuildinfo.cpp \
+    stubs/stubs-playerbuildinfo.cpp \
+    ../base/playerbuildinfo.cpp
 
 HEADERS += \
     ../base/rbsettings.h \
     ../base/rockboxinfo.h \
     ../base/systeminfo.h \
-    ../base/serverinfo.h \
 
 RESOURCES += ../rbutilqt.qrc
