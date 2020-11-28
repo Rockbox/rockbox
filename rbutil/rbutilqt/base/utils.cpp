@@ -381,7 +381,7 @@ QString Utils::checkEnvironment(bool permission)
     RockboxInfo rbinfo(RbSettings::value(RbSettings::Mountpoint).toString());
     QString installed = rbinfo.target();
     if(!installed.isEmpty() && installed !=
-       SystemInfo::platformValue(SystemInfo::ConfigureModel).toString())
+       RbSettings::value(RbSettings::CurrentPlatform).toString().split(".").at(0))
     {
         text += tr("<li>Target mismatch detected.<br/>"
                 "Installed target: %1<br/>Selected target: %2.</li>")

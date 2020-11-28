@@ -72,7 +72,6 @@ class SystemInfo : public QObject
             Encoder,
             Brand,
             Name,
-            ConfigureModel,
             PlayerPicture,
         };
 
