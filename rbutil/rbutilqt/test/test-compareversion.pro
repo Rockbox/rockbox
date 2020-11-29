@@ -16,7 +16,8 @@
 
 # Test: Utils::compareVersionStrings().
 #
-include(tests.pri)
+
+QT += testlib
 
 TEMPLATE = app
 TARGET = test-compareversion
@@ -25,14 +26,12 @@ INCLUDEPATH += . ../base stubs
 # Input
 SOURCES += \
     test-compareversion.cpp \
-    ../base/rbsettings.cpp \
-    ../base/rockboxinfo.cpp \
-    ../base/systeminfo.cpp \
+    stubs/stubs-compareversion.cpp \
     ../base/utils.cpp
 
 HEADERS += \
     ../base/rbsettings.h \
+    ../base/playerbuildinfo.h \
     ../base/rockboxinfo.h \
-    ../base/systeminfo.h \
     ../base/utils.h
 
