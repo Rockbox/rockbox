@@ -259,6 +259,14 @@ static inline int ipod_4g_button_read(void)
             }
 
         }
+        else if ((status & 0x800000ff) != 0x8000003a &&
+                 status != 0xFFFFFFFF)
+        {
+            udelay(2000);
+            outl(inl(0x7000c100) & ~0x60000000, 0x7000c100);
+            outl(inl(0x7000c104) | 0x04000000, 0x7000c104);
+            outl(inl(0x7000c100) | 0x60000000, 0x7000c100);
+        }
 #if CONFIG_CPU==S5L8701 || CONFIG_CPU==S5L8702
         else if ((status & 0x8000FFFF) == 0x8000023A)
         {
