@@ -28,22 +28,24 @@ class TestRockboxInfo : public QObject
     Q_OBJECT
         private slots:
         void testVersion();
+        void testVersion_data();
         void testMemory();
+        void testMemory_data();
         void testTarget();
+        void testTarget_data();
         void testFeatures();
+        void testFeatures_data();
 };
 
 
-void TestRockboxInfo::testVersion()
+void TestRockboxInfo::testVersion_data()
 {
-    struct testvector {
-        const char* versionline;
-        const char* revisionstring;
-        const char* versionstring;
-        const char* releasestring;
-    };
-
-    const struct testvector testdata[] =
+    struct {
+        const char* input;
+        const char* revision;
+        const char* version;
+        const char* release;
+    } const testdata[] =
     {
         /* Input string               revision    full version       release version */
         { "Version: r29629-110321",   "29629",    "r29629-110321",   "" },
@@ -58,92 +60,122 @@ void TestRockboxInfo::testVersion()
     };
 
 
+    QTest::addColumn<QString>("input");
+    QTest::addColumn<QString>("revision");
+    QTest::addColumn<QString>("version");
+    QTest::addColumn<QString>("release");
     unsigned int i;
-    for(i = 0; i < sizeof(testdata) / sizeof(struct testvector); i++) {
+    for(i = 0; i < sizeof(testdata) / sizeof(testdata[0]); i++) {
+        for (size_t i = 0; i < sizeof(testdata) / sizeof(testdata[0]); i++) {
+            QTest::newRow(testdata[i].input)
+                << testdata[i].input << testdata[i].revision
+                << testdata[i].version << testdata[i].release;
+        }
+    }
+}
+
+
+void TestRockboxInfo::testVersion()
+{
+    QFETCH(QString, input);
+    QFETCH(QString, revision);
+    QFETCH(QString, version);
+    QFETCH(QString, release);
+    QTemporaryFile tf(this);
+    tf.open();
+    QString filename = tf.fileName();
+    tf.write(input.toLatin1());
+    tf.write("\n");
+    tf.close();
+
+    RockboxInfo info("", filename);
+    QCOMPARE(info.version(), QString(version));
+    QCOMPARE(info.revision(), QString(revision));
+    QCOMPARE(info.release(), QString(release));
+}
+
+void TestRockboxInfo::testTarget_data()
+{
+    QTest::addColumn<QString>("target");
+    QTest::newRow("sansae200") << "sansae200";
+    QTest::newRow("gigabeats") << "gigabeats";
+    QTest::newRow("iriverh100") << "iriverh100";
+    QTest::newRow("unknown") << "unknown";
+}
+
+void TestRockboxInfo::testTarget()
+{
+    int j;
+    QStringList prefix;
+    prefix << "Target: "; // << "Target:\t" << "Target:   ";
+    for(j = 0; j < prefix.size(); ++j) {
+        QFETCH(QString, target);
         QTemporaryFile tf(this);
         tf.open();
         QString filename = tf.fileName();
-        tf.write(testdata[i].versionline);
+        tf.write(prefix.at(j).toLatin1());
+        tf.write(target.toLatin1());
         tf.write("\n");
         tf.close();
 
         RockboxInfo info("", filename);
-        QCOMPARE(info.version(), QString(testdata[i].versionstring));
-        QCOMPARE(info.revision(), QString(testdata[i].revisionstring));
-        QCOMPARE(info.release(), QString(testdata[i].releasestring));
+        QCOMPARE(info.target(), target);
     }
 }
 
-
-void TestRockboxInfo::testTarget()
+void TestRockboxInfo::testMemory_data()
 {
-    int i, j;
-    QStringList targets;
-    targets << "sansae200" << "gigabeats" << "iriverh100" << "unknown";
-    QStringList prefix;
-    prefix << "Target: "; // << "Target:\t" << "Target:   ";
-    for(j = 0; j < prefix.size(); ++j) {
-        for(i = 0; i < targets.size(); i++) {
-            QTemporaryFile tf(this);
-            tf.open();
-            QString filename = tf.fileName();
-            tf.write(prefix.at(j).toLocal8Bit());
-            tf.write(targets.at(i).toLocal8Bit());
-            tf.write("\n");
-            tf.close();
-
-            RockboxInfo info("", filename);
-            QCOMPARE(info.target(), targets.at(i));
-        }
-    }
+    QTest::addColumn<QString>("memory");
+    QTest::newRow("8") << "8";
+    QTest::newRow("16") << "16";
+    QTest::newRow("32") << "32";
+    QTest::newRow("64") << "64";
 }
-
 
 void TestRockboxInfo::testMemory()
 {
-    int i, j;
-    QStringList memsizes;
-    memsizes << "8" << "16" << "32" << "64";
+    int j;
     QStringList prefix;
     prefix << "Memory: " << "Memory:\t" << "Memory:   ";
     for(j = 0; j < prefix.size(); ++j) {
-        for(i = 0; i < memsizes.size(); i++) {
-            QTemporaryFile tf(this);
-            tf.open();
-            QString filename = tf.fileName();
-            tf.write(prefix.at(j).toLocal8Bit());
-            tf.write(memsizes.at(i).toLocal8Bit());
-            tf.write("\n");
-            tf.close();
+        QFETCH(QString, memory);
+        QTemporaryFile tf(this);
+        tf.open();
+        QString filename = tf.fileName();
+        tf.write(prefix.at(j).toLatin1());
+        tf.write(memory.toLatin1());
+        tf.write("\n");
+        tf.close();
 
-            RockboxInfo info("", filename);
-            QCOMPARE(info.ram(), memsizes.at(i).toInt());
-        }
+        RockboxInfo info("", filename);
+        QCOMPARE(info.ram(), memory.toInt());
     }
 }
 
+void TestRockboxInfo::testFeatures_data()
+{
+    QTest::addColumn<QString>("features");
+    QTest::newRow("1") << "backlight_brightness:button_light:dircache:flash_storage";
+    QTest::newRow("2") << "pitchscreen:multivolume:multidrive_usb:quickscreen";
+}
 
 void TestRockboxInfo::testFeatures()
 {
-    int i, j;
-    QStringList features;
-    features << "backlight_brightness:button_light:dircache:flash_storage"
-             << "pitchscreen:multivolume:multidrive_usb:quickscreen";
+    int j;
     QStringList prefix;
     prefix << "Features: " << "Features:\t" << "Features:   ";
     for(j = 0; j < prefix.size(); ++j) {
-        for(i = 0; i < features.size(); i++) {
-            QTemporaryFile tf(this);
-            tf.open();
-            QString filename = tf.fileName();
-            tf.write(prefix.at(j).toLocal8Bit());
-            tf.write(features.at(i).toLocal8Bit());
-            tf.write("\n");
-            tf.close();
+        QFETCH(QString, features);
+        QTemporaryFile tf(this);
+        tf.open();
+        QString filename = tf.fileName();
+        tf.write(prefix.at(j).toLatin1());
+        tf.write(features.toLatin1());
+        tf.write("\n");
+        tf.close();
 
-            RockboxInfo info("", filename);
-            QCOMPARE(info.features(), features.at(i));
-        }
+        RockboxInfo info("", filename);
+        QCOMPARE(info.features(), features);
     }
 }
 

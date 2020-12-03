@@ -14,7 +14,7 @@
 #
 
 #
-include(tests.pri)
+QT += testlib
 
 TEMPLATE = app
 TARGET = test-rockboxinfo
