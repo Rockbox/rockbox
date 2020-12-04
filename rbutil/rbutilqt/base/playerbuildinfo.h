@@ -66,6 +66,9 @@ public:
         Encoder,
         Brand,
         PlayerPicture,
+
+        TargetNamesAll,
+        TargetNamesEnabled,
     };
 
     enum SystemUrl {
@@ -97,6 +100,10 @@ protected:
     explicit PlayerBuildInfo();
 
 private:
+    //! Return a list with all target names (as used internally).
+    //! @all false filter out all targets with status = disabled.
+    QStringList targetNames(bool all);
+
     static PlayerBuildInfo* infoInstance;
     QSettings* serverInfo;
     QSettings playerInfo;

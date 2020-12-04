@@ -38,39 +38,6 @@ void SystemInfo::ensureSystemInfoExists()
 }
 
 
-QStringList SystemInfo::platforms(enum SystemInfo::PlatformType type, QString variant)
-{
-    ensureSystemInfoExists();
-
-    QStringList result;
-    systemInfos->beginGroup("platforms");
-    QStringList a = systemInfos->childKeys();
-    systemInfos->endGroup();
-    for(int i = 0; i < a.size(); i++)
-    {
-        QString target = systemInfos->value("platforms/"+a.at(i), "null").toString();
-        QRegExp regex("\\..*$");
-        QString targetbase = target;
-        targetbase.remove(regex);
-        // only add target if its not disabled unless Platform*Disabled requested
-        if(type != PlatformAllDisabled && type != PlatformBaseDisabled
-                && type != PlatformVariantDisabled
-                && systemInfos->value(target+"/status").toString() == "disabled")
-            continue;
-        // report only matching target if PlatformVariant* is requested
-        if((type == PlatformVariant || type == PlatformVariantDisabled)
-                && (targetbase != variant))
-            continue;
-        // report only base targets when PlatformBase* is requested
-        if((type == PlatformBase || type == PlatformBaseDisabled))
-            result.append(targetbase);
-        else
-            result.append(target);
-    }
-    result.removeDuplicates();
-    return result;
-}
-
 QMap<QString, QStringList> SystemInfo::languages(bool namesOnly)
 {
     ensureSystemInfoExists();

@@ -34,18 +34,6 @@ class SystemInfo : public QObject
             MapIncompatible,
         };
 
-        enum PlatformType {
-            PlatformAll,
-            PlatformAllDisabled,
-            PlatformBase,
-            PlatformBaseDisabled,
-            PlatformVariant,
-            PlatformVariantDisabled
-        };
-
-        //! return a list of all platforms (rbutil internal names)
-        static QStringList platforms(enum PlatformType type = PlatformAll,
-                                     QString variant="");
         //! returns a map of all languages.
         //! Maps <language code> to (<language name>, <display name>)
         static QMap<QString, QStringList> languages(bool namesOnly = false);

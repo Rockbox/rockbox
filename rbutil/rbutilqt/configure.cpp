@@ -346,18 +346,20 @@ void Config::setDevices()
     // setup devices table
     LOG_INFO() << "setting up devices list";
 
-    QStringList platformList;
+    QStringList targets;
     if(ui.showDisabled->isChecked())
-        platformList = SystemInfo::platforms(SystemInfo::PlatformAllDisabled);
+        targets = PlayerBuildInfo::instance()->value(
+                    PlayerBuildInfo::TargetNamesAll).toStringList();
     else
-        platformList = SystemInfo::platforms(SystemInfo::PlatformAll);
+        targets = PlayerBuildInfo::instance()->value(
+                    PlayerBuildInfo::TargetNamesEnabled).toStringList();
 
     QMultiMap <QString, QString> manuf;
-    for(int it = 0; it < platformList.size(); it++)
+    for(int it = 0; it < targets.size(); it++)
     {
         QString curbrand = PlayerBuildInfo::instance()->value(
-                    PlayerBuildInfo::Brand, platformList.at(it)).toString();
-        manuf.insert(curbrand, platformList.at(it));
+                    PlayerBuildInfo::Brand, targets.at(it)).toString();
+        manuf.insert(curbrand, targets.at(it));
     }
 
     // set up devices table
@@ -379,20 +381,20 @@ void Config::setDevices()
         w->setText(0, brands.at(c));
         items.append(w);
         // go through platforms and add all players matching the current brand
-        for(int it = 0; it < platformList.size(); it++) {
+        for(int it = 0; it < targets.size(); it++) {
             // skip if not current brand
-            if(!manuf.values(brands.at(c)).contains(platformList.at(it)))
+            if(!manuf.values(brands.at(c)).contains(targets.at(it)))
                 continue;
             // construct display name
             QString curname = QString("%1 (%2)").arg(
                 PlayerBuildInfo::instance()->value(PlayerBuildInfo::DisplayName,
-                                                   platformList.at(it)).toString(),
-                PlayerBuildInfo::instance()->statusAsString(platformList.at(it)));
+                                                   targets.at(it)).toString(),
+                PlayerBuildInfo::instance()->statusAsString(targets.at(it)));
             LOG_INFO() << "add supported device:" << brands.at(c) << curname;
             w2 = new QTreeWidgetItem(w, QStringList(curname));
-            w2->setData(0, Qt::UserRole, platformList.at(it));
+            w2->setData(0, Qt::UserRole, targets.at(it));
 
-            if(platformList.at(it) == selected) {
+            if(targets.at(it) == selected) {
                 w2->setSelected(true);
                 w->setExpanded(true);
                 w3 = w2; // save pointer to hilight old selection

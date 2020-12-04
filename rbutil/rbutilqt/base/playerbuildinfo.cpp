@@ -57,15 +57,17 @@ const static struct {
     PlayerBuildInfo::DeviceInfo item;
     const char* name;
 } PlayerInfoList[] = {
-    { PlayerBuildInfo::BuildStatus,       "status/:target:"            },
-    { PlayerBuildInfo::DisplayName,       ":target:/name"              },
-    { PlayerBuildInfo::BootloaderMethod,  ":target:/bootloadermethod"  },
-    { PlayerBuildInfo::BootloaderName,    ":target:/bootloadername"    },
-    { PlayerBuildInfo::BootloaderFile,    ":target:/bootloaderfile"    },
-    { PlayerBuildInfo::BootloaderFilter,  ":target:/bootloaderfilter"  },
-    { PlayerBuildInfo::Encoder,           ":target:/encoder"           },
-    { PlayerBuildInfo::Brand,             ":target:/brand"             },
-    { PlayerBuildInfo::PlayerPicture,     ":target:/playerpic"         },
+    { PlayerBuildInfo::BuildStatus,        "status/:target:"           },
+    { PlayerBuildInfo::DisplayName,        ":target:/name"             },
+    { PlayerBuildInfo::BootloaderMethod,   ":target:/bootloadermethod" },
+    { PlayerBuildInfo::BootloaderName,     ":target:/bootloadername"   },
+    { PlayerBuildInfo::BootloaderFile,     ":target:/bootloaderfile"   },
+    { PlayerBuildInfo::BootloaderFilter,   ":target:/bootloaderfilter" },
+    { PlayerBuildInfo::Encoder,            ":target:/encoder"          },
+    { PlayerBuildInfo::Brand,              ":target:/brand"            },
+    { PlayerBuildInfo::PlayerPicture,      ":target:/playerpic"        },
+    { PlayerBuildInfo::TargetNamesAll,     ""                          },
+    { PlayerBuildInfo::TargetNamesEnabled, ""                          },
 };
 
 const static struct {
@@ -216,6 +218,14 @@ QVariant PlayerBuildInfo::value(DeviceInfo item, QString target)
             result = -1;
         break;
     }
+    case TargetNamesAll:
+        // list of all internal target names. Doesn't depend on the passed target.
+        result = targetNames(true);
+        break;
+    case TargetNamesEnabled:
+        // list of all non-disabled target names. Doesn't depend on the passed target.
+        result = targetNames(false);
+        break;
 
     default:
         result = playerInfo.value(s);
@@ -263,3 +273,22 @@ QString PlayerBuildInfo::statusAsString(QString platform)
 
     return result;
 }
+
+
+QStringList PlayerBuildInfo::targetNames(bool all)
+{
+    QStringList result;
+    playerInfo.beginGroup("platforms");
+    QStringList a = playerInfo.childKeys();
+    playerInfo.endGroup();
+    for(int i = 0; i < a.size(); i++)
+    {
+        QString target = playerInfo.value("platforms/" + a.at(i), "null").toString();
+        if(playerInfo.value(target + "/status").toString() != "disabled" || all) {
+            result.append(target);
+        }
+    }
+    result.removeDuplicates();
+    return result;
+}
+
