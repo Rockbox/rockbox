@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>663</width>
-    <height>409</height>
+    <height>440</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -140,7 +140,7 @@
        </widget>
       </item>
       <item row="6" column="2">
-       <widget class="QLabel" name="gameLabel">
+       <widget class="QLabel" name="pluginDataLabe">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -148,7 +148,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Some game plugins require additional files.</string>
+         <string>Some plugins require additional data files.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -190,9 +190,9 @@
        </widget>
       </item>
       <item row="6" column="0">
-       <widget class="QCheckBox" name="gamefileCheckbox">
+       <widget class="QCheckBox" name="pluginDataCheckbox">
         <property name="text">
-         <string>Game Files</string>
+         <string>Plugin Data</string>
         </property>
         <property name="icon">
          <iconset resource="../rbutilqt.qrc">
@@ -306,7 +306,7 @@
   <tabstop>fontsCheckbox</tabstop>
   <tabstop>themesCheckbox</tabstop>
   <tabstop>themesCustomize</tabstop>
-  <tabstop>gamefileCheckbox</tabstop>
+  <tabstop>pluginDataCheckbox</tabstop>
   <tabstop>installButton</tabstop>
  </tabstops>
  <resources>

@@ -38,7 +38,7 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     ui.rockboxCheckbox->setChecked(RbSettings::value(RbSettings::InstallRockbox).toBool());
     ui.fontsCheckbox->setChecked(RbSettings::value(RbSettings::InstallFonts).toBool());
     ui.themesCheckbox->setChecked(RbSettings::value(RbSettings::InstallThemes).toBool());
-    ui.gamefileCheckbox->setChecked(RbSettings::value(RbSettings::InstallGamefiles).toBool());
+    ui.pluginDataCheckbox->setChecked(RbSettings::value(RbSettings::InstallPluginData).toBool());
     ui.voiceCheckbox->setChecked(RbSettings::value(RbSettings::InstallVoice).toBool());
     ui.manualCheckbox->setChecked(RbSettings::value(RbSettings::InstallManual).toBool());
 
@@ -194,7 +194,7 @@ void SelectiveInstallWidget::saveSettings(void)
     RbSettings::setValue(RbSettings::InstallRockbox, ui.rockboxCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallFonts, ui.fontsCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallThemes, ui.themesCheckbox->isChecked());
-    RbSettings::setValue(RbSettings::InstallGamefiles, ui.gamefileCheckbox->isChecked());
+    RbSettings::setValue(RbSettings::InstallPluginData, ui.pluginDataCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallVoice, ui.voiceCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallManual, ui.manualCheckbox->isChecked());
     RbSettings::setValue(RbSettings::VoiceLanguage, ui.voiceCombobox->currentData().toString());
@@ -249,7 +249,7 @@ void SelectiveInstallWidget::continueInstall(bool error)
         case 2: installRockbox(); break;
         case 3: installFonts(); break;
         case 4: installThemes(); break;
-        case 5: installGamefiles(); break;
+        case 5: installPluginData(); break;
         case 6: installVoicefile(); break;
         case 7: installManual(); break;
         case 8: installBootloaderPost(); break;
@@ -612,39 +612,40 @@ void SelectiveInstallWidget::installThemes(void)
 }
 
 static const struct {
-    const char *name;
-    const char *rockfile;
-    PlayerBuildInfo::BuildInfo zipurl; // add new games to PlayerBuildInfo
-} GamesList[] = {
+    const char *name;                   // display name
+    const char *rockfile;               // rock file to look for
+    PlayerBuildInfo::BuildInfo zipurl;  // download url
+} PluginDataFiles[] = {
     { "Doom",          "games/doom.rock",         PlayerBuildInfo::DoomUrl      },
     { "Duke3D",        "games/duke3d.rock",       PlayerBuildInfo::Duke3DUrl    },
     { "Quake",         "games/quake.rock",        PlayerBuildInfo::QuakeUrl     },
     { "Puzzles fonts", "games/sgt-blackbox.rock", PlayerBuildInfo::PuzzFontsUrl },
     { "Wolf3D",        "games/wolf3d.rock",       PlayerBuildInfo::Wolf3DUrl    },
     { "XWorld",        "games/xworld.rock",       PlayerBuildInfo::XWorldUrl    },
+    { "MIDI Patchset", "viewers/midi.rock",       PlayerBuildInfo::MidiPatchsetUrl },
 };
 
-void SelectiveInstallWidget::installGamefiles(void)
+void SelectiveInstallWidget::installPluginData(void)
 {
-    if(ui.gamefileCheckbox->isChecked()) {
+    if(ui.pluginDataCheckbox->isChecked()) {
         // build a list of zip urls that we need, then install
-        QStringList gameUrls;
-        QStringList gameNames;
+        QStringList dataUrls;
+        QStringList dataName;
 
-        for(unsigned int i = 0; i < sizeof(GamesList) / sizeof(GamesList[0]); i++)
+        for(size_t i = 0; i < sizeof(PluginDataFiles) / sizeof(PluginDataFiles[0]); i++)
         {
             // check if installed Rockbox has this plugin.
-            if(QFileInfo(m_mountpoint + "/.rockbox/rocks/" + GamesList[i].rockfile).exists()) {
-                gameNames.append(GamesList[i].name);
+            if(QFileInfo(m_mountpoint + "/.rockbox/rocks/" + PluginDataFiles[i].rockfile).exists()) {
+                dataName.append(PluginDataFiles[i].name);
                 // game URLs do not depend on the actual build type, but we need
                 // to pass it (simplifies the API, and will allow to make them
                 // type specific later if needed)
-                gameUrls.append(PlayerBuildInfo::instance()->value(
-                                    GamesList[i].zipurl, m_buildtype).toString());
+                dataUrls.append(PlayerBuildInfo::instance()->value(
+                                    PluginDataFiles[i].zipurl, m_buildtype).toString());
             }
         }
 
-        if(gameUrls.size() == 0)
+        if(dataUrls.size() == 0)
         {
             m_logger->addItem(tr("Your installation doesn't require any game files, skipping."), LOGINFO);
             emit installSkipped(false);
@@ -657,8 +658,8 @@ void SelectiveInstallWidget::installGamefiles(void)
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
         m_zipinstaller = new ZipInstaller(this);
 
-        m_zipinstaller->setUrl(gameUrls);
-        m_zipinstaller->setLogSection(gameNames);
+        m_zipinstaller->setUrl(dataUrls);
+        m_zipinstaller->setLogSection(dataName);
         m_zipinstaller->setLogVersion();
         m_zipinstaller->setMountPoint(m_mountpoint);
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())

@@ -45,7 +45,7 @@ class RbSettings : public QObject
             InstallRockbox,
             InstallFonts,
             InstallThemes,
-            InstallGamefiles,
+            InstallPluginData,
             InstallVoice,
             InstallManual,
             Tts,

@@ -50,7 +50,7 @@ class SelectiveInstallWidget : public QWidget
         void installVoicefile(void);
         void installManual(void);
         void installThemes(void);
-        void installGamefiles(void);
+        void installPluginData(void);
         void installBootloaderPost(void);
 
     signals:

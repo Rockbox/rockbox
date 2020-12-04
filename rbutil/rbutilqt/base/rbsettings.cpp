@@ -46,7 +46,7 @@ const static struct {
     { RbSettings::InstallRockbox,       "install_rockbox",      "true" },
     { RbSettings::InstallFonts,         "install_fonts",        "true" },
     { RbSettings::InstallThemes,        "install_themes",       "false" },
-    { RbSettings::InstallGamefiles,     "install_gamefiles",    "true" },
+    { RbSettings::InstallPluginData,    "install_plugin_data",  "true" },
     { RbSettings::InstallVoice,         "install_voice",        "false" },
     { RbSettings::InstallManual,        "install_manual",       "false" },
 #if defined(Q_OS_WIN32)
