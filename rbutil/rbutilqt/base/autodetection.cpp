@@ -54,19 +54,24 @@ bool Autodetection::detect(void)
     // hasn't been merged later. This indicates a problem during detection
     // (ambiguous player but refining it failed). In this case create an entry
     // for eacho of those so the user can select.
+    QList<struct Detected> detected;
     for(int i = 0; i < m_detected.size(); ++i) {
         int j = m_detected.at(i).usbdevices.size();
         if(j > 0) {
-            struct Detected entry = m_detected.takeAt(i);
+            struct Detected entry = m_detected.at(i);
             while(j--) {
                 struct Detected d;
                 d.device = entry.usbdevices.at(j);
                 d.mountpoint = entry.mountpoint;
                 d.status = PlayerAmbiguous;
-                m_detected.append(d);
+                detected.append(d);
             }
         }
+        else {
+            detected.append(m_detected.at(i));
+        }
     }
+    m_detected = detected;
     for(int i = 0; i < m_detected.size(); ++i) {
         LOG_INFO() << "Detected player:" << m_detected.at(i).device
                    << "at" << m_detected.at(i).mountpoint
@@ -329,20 +334,12 @@ QString Autodetection::detectAjbrec(QString root)
     switch(header[11]) {
         case 2:
             return "recorderv2";
-            break;
-
         case 4:
             return "fmrecorder";
-            break;
-
         case 8:
             return "ondiofm";
-            break;
-
         case 16:
             return "ondiosp";
-            break;
-
         default:
             break;
     }
