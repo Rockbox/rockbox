@@ -34,9 +34,6 @@ class SystemInfo : public QObject
             MapIncompatible,
         };
 
-        //! returns a map of all languages.
-        //! Maps <language code> to (<language name>, <display name>)
-        static QMap<QString, QStringList> languages(bool namesOnly = false);
         //! returns a map of usb-ids and their targets
         static QMap<int, QStringList> usbIdMap(enum MapType type);
         //! get a value from system settings

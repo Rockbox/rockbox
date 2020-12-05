@@ -22,7 +22,7 @@
 
 #include "configure.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include "Logger.h"
 
 CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
@@ -70,26 +70,32 @@ void CreateVoiceWindow::accept()
  */
 void CreateVoiceWindow::updateSettings(void)
 {
-    // fill in language combobox
-    QMap<QString, QStringList> languages = SystemInfo::languages();
-
-    for(int i = 0; i < languages.keys().size(); i++) {
-        QString key = languages.keys().at(i);
-        ui.comboLanguage->addItem(languages.value(key).at(1), languages.value(key).at(0));
+    // fill in language combobox. Map has QString as value, but is stored as QVariant.
+    QMap<QString, QVariant> langs
+            = PlayerBuildInfo::instance()->value(PlayerBuildInfo::LanguageList).toMap();
+    for(auto it = langs.begin(); it != langs.end(); it++) {
+        ui.comboLanguage->addItem(it.value().toString(), it.key());
     }
     // set saved lang
     int sel = ui.comboLanguage->findData(
             RbSettings::value(RbSettings::VoiceLanguage).toString());
     // if no saved language is found try to figure the language from the UI lang
     if(sel == -1) {
+        // the UI language is stored as ISO 631-1 code. Try to resolve it to the
+        // Rockbox language string.
         QString uilang = RbSettings::value(RbSettings::Language).toString();
-        // if no language is set default to english. Make sure not to check an empty string.
-        QString f = "english";
-        if(!uilang.isEmpty() && languages.contains(uilang)) {
-            f = languages.value(uilang).at(0);
+        // default to english if no language is set.
+        if(uilang.isEmpty()) {
+            // FIXME: we try to set the UI language from the environment, but
+            // don't store it unless changed. Falling back to en is only valid
+            // if the system is actually english.
+            uilang = "en";
         }
-        sel = ui.comboLanguage->findData(f);
-        LOG_INFO() << "Selected language index:" << sel;
+        QString l = PlayerBuildInfo::instance()->value(
+                    PlayerBuildInfo::LanguageInfo, uilang).toStringList().at(0);
+        if(!l.isEmpty()) {
+            sel = ui.comboLanguage->findData(l);
+        }
     }
     ui.comboLanguage->setCurrentIndex(sel);
 

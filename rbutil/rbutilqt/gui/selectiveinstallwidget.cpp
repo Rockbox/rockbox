@@ -24,7 +24,6 @@
 #include "playerbuildinfo.h"
 #include "rbsettings.h"
 #include "rockboxinfo.h"
-#include "systeminfo.h"
 #include "progressloggergui.h"
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallhelper.h"
@@ -100,6 +99,8 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
     ui.voiceCheckbox->setEnabled(voice);
     ui.voiceCombobox->setEnabled(voice);
     ui.voiceLabel->setEnabled(voice);
+
+    updateVoiceLangs();
 }
 
 
@@ -162,21 +163,25 @@ void SelectiveInstallWidget::updateVersion(void)
         RockboxInfo info(m_mountpoint);
         ui.bootloaderCheckbox->setChecked(!info.success());
     }
+
+    updateVoiceLangs();
+}
+
+void SelectiveInstallWidget::updateVoiceLangs()
+{
     // populate languages for voice file.
-    // FIXME: currently only english. Need to get the available languages from
-    // build-info later.
     QVariant current = ui.voiceCombobox->currentData();
-    QMap<QString, QStringList> languages = SystemInfo::languages(true);
-    QStringList voicelangs;
-    voicelangs << "english";
+    QMap<QString, QVariant> langs = PlayerBuildInfo::instance()->value(
+                PlayerBuildInfo::LanguageList).toMap();
+    QStringList voicelangs = PlayerBuildInfo::instance()->value(
+                PlayerBuildInfo::BuildVoiceLangs, m_buildtype).toStringList();
     ui.voiceCombobox->clear();
-    for(int i = 0; i < voicelangs.size(); i++) {
-        QString key = voicelangs.at(i);
-        if(!languages.contains(key)) {
-            LOG_WARNING() << "trying to add unknown language" << key;
-            continue;
+    for(auto it = langs.begin(); it != langs.end(); it++) {
+        if(voicelangs.contains(it.key())) {
+            ui.voiceCombobox->addItem(it.value().toString(), it.key());
+            LOG_INFO() << "available voices: adding" << it.key();
         }
-        ui.voiceCombobox->addItem(languages.value(key).at(0), key);
+
     }
     // try to select the previously selected one again (if still present)
     // TODO: Fall back to system language if not found, or english.

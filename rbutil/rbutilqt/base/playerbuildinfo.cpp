@@ -66,8 +66,10 @@ const static struct {
     { PlayerBuildInfo::Encoder,            ":target:/encoder"          },
     { PlayerBuildInfo::Brand,              ":target:/brand"            },
     { PlayerBuildInfo::PlayerPicture,      ":target:/playerpic"        },
-    { PlayerBuildInfo::TargetNamesAll,     ""                          },
-    { PlayerBuildInfo::TargetNamesEnabled, ""                          },
+    { PlayerBuildInfo::TargetNamesAll,     "_targets/all"              },
+    { PlayerBuildInfo::TargetNamesEnabled, "_targets/enabled"          },
+    { PlayerBuildInfo::LanguageInfo,       "languages/:target:"        },
+    { PlayerBuildInfo::LanguageList,       "_languages/list"           },
 };
 
 const static struct {
@@ -225,6 +227,25 @@ QVariant PlayerBuildInfo::value(DeviceInfo item, QString target)
     case TargetNamesEnabled:
         // list of all non-disabled target names. Doesn't depend on the passed target.
         result = targetNames(false);
+        break;
+
+    case LanguageList:
+        // Return a map (language, display string).
+        {
+            // need to use (QString, QVariant) here, so we can put the map into
+            // a QVariant by itself.
+            QMap<QString, QVariant> m;
+
+            playerInfo.beginGroup("languages");
+            QStringList a = playerInfo.childKeys();
+
+            for(int i = 0; i < a.size(); i++) {
+                QStringList v = playerInfo.value(a.at(i)).toStringList();
+                m[v.at(0)] = v.at(1);
+            }
+            playerInfo.endGroup();
+            result = m;
+        }
         break;
 
     default:

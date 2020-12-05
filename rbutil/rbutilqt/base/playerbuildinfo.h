@@ -69,6 +69,8 @@ public:
 
         TargetNamesAll,
         TargetNamesEnabled,
+        LanguageInfo,
+        LanguageList,
     };
 
     enum SystemUrl {

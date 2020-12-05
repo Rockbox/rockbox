@@ -38,26 +38,6 @@ void SystemInfo::ensureSystemInfoExists()
 }
 
 
-QMap<QString, QStringList> SystemInfo::languages(bool namesOnly)
-{
-    ensureSystemInfoExists();
-
-    QMap<QString, QStringList> result;
-    systemInfos->beginGroup("languages");
-    QStringList a = systemInfos->childKeys();
-    for(int i = 0; i < a.size(); i++)
-    {
-        QStringList data = systemInfos->value(a.at(i), "null").toStringList();
-        if(namesOnly)
-            result.insert(data.at(0), QStringList(data.at(1)));
-        else
-            result.insert(a.at(i), data);
-    }
-    systemInfos->endGroup();
-    return result;
-}
-
-
 QMap<int, QStringList> SystemInfo::usbIdMap(enum MapType type)
 {
     ensureSystemInfoExists();

@@ -19,7 +19,7 @@
 #include "ttssapi.h"
 #include "utils.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
+#include "playerbuildinfo.h"
 #include "Logger.h"
 
 TTSSapi::TTSSapi(QObject* parent) : TTSBase(parent)
@@ -40,15 +40,12 @@ TTSBase::Capabilities TTSSapi::capabilities()
 void TTSSapi::generateSettings()
 {
     // language
-    QMap<QString, QStringList> languages = SystemInfo::languages();
-    QStringList langs;
-    for(int i = 0; i < languages.size(); ++i) {
-        langs.append(languages.values().at(i).at(0));
-    }
+    QMap<QString, QVariant> langmap = PlayerBuildInfo::instance()->value(
+                PlayerBuildInfo::LanguageList).toMap();
     EncTtsSetting* setting = new EncTtsSetting(this,
             EncTtsSetting::eSTRINGLIST, tr("Language:"),
             RbSettings::subValue(m_TTSType, RbSettings::TtsLanguage),
-            langs);
+            langmap.keys());
     connect(setting,SIGNAL(dataChanged()),this,SLOT(updateVoiceList()));
     insertSetting(eLANGUAGE,setting);
     // voice

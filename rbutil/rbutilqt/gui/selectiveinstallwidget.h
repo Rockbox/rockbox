@@ -42,6 +42,7 @@ class SelectiveInstallWidget : public QWidget
         void continueInstall(bool);
         void customizeThemes(void);
         void selectedVersionChanged(int);
+        void updateVoiceLangs();
 
     private:
         void installBootloader(void);
