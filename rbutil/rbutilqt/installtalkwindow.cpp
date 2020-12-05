@@ -22,7 +22,6 @@
 
 #include "configure.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
 #include "Logger.h"
 
 InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)

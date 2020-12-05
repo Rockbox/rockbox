@@ -19,7 +19,6 @@
 #include <QtCore>
 #include "autodetection.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
 #include "playerbuildinfo.h"
 
 #include "../ipodpatcher/ipodpatcher.h"
@@ -82,30 +81,25 @@ bool Autodetection::detect(void)
  */
 void Autodetection::detectUsb()
 {
-    // usbids holds the mapping in the form
-    // ((VID<<16)|(PID)), targetname
-    // the ini file needs to hold the IDs as hex values.
-    QMap<int, QStringList> usbids = SystemInfo::usbIdMap(SystemInfo::MapDevice);
-    QMap<int, QStringList> usberror = SystemInfo::usbIdMap(SystemInfo::MapError);
-
     // usb pid detection
     QList<uint32_t> attached;
     attached = System::listUsbIds();
 
     int i = attached.size();
     while(i--) {
-        if(usbids.contains(attached.at(i))) {
-            // we found a USB device that might be ambiguous.
+        QStringList a = PlayerBuildInfo::instance()->value(PlayerBuildInfo::UsbIdTargetList, attached.at(i)).toStringList();
+        if(a.size() > 0) {
             struct Detected d;
             d.status = PlayerOk;
-            d.usbdevices = usbids.value(attached.at(i));
+            d.usbdevices = a;
             m_detected.append(d);
             LOG_INFO() << "[USB] detected supported player" << d.usbdevices;
         }
-        if(usberror.contains(attached.at(i))) {
+        QStringList b = PlayerBuildInfo::instance()->value(PlayerBuildInfo::UsbIdErrorList, attached.at(i)).toStringList();
+        if(b.size() > 0) {
             struct Detected d;
             d.status = PlayerMtpMode;
-            d.device = usberror.value(attached.at(i)).at(0);
+            d.usbdevices = b;
             m_detected.append(d);
             LOG_WARNING() << "[USB] detected problem with player" << d.device;
         }

@@ -24,7 +24,6 @@
 #include "progressloggergui.h"
 #include "zipinstaller.h"
 #include "themesinstallwindow.h"
-#include "systeminfo.h"
 #include "playerbuildinfo.h"
 
 class SelectiveInstallWidget : public QWidget

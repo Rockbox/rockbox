@@ -71,6 +71,8 @@ public:
         TargetNamesEnabled,
         LanguageInfo,
         LanguageList,
+        UsbIdErrorList,
+        UsbIdTargetList,
     };
 
     enum SystemUrl {
@@ -89,6 +91,10 @@ public:
 
     // Get information about a device. This data does not depend on the build type.
     QVariant value(DeviceInfo item, QString target = "");
+
+    // Get information about a device. Make a numeric match
+    // (only sensible implementation for USB IDs)
+    QVariant value(DeviceInfo item, unsigned int match);
 
     // Get build information for currently selected player.
     QVariant value(BuildInfo item, BuildType type);

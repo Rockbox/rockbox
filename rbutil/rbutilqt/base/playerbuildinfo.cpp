@@ -70,6 +70,8 @@ const static struct {
     { PlayerBuildInfo::TargetNamesEnabled, "_targets/enabled"          },
     { PlayerBuildInfo::LanguageInfo,       "languages/:target:"        },
     { PlayerBuildInfo::LanguageList,       "_languages/list"           },
+    { PlayerBuildInfo::UsbIdErrorList,     "_usb/error"                },
+    { PlayerBuildInfo::UsbIdTargetList,    "_usb/target"               },
 };
 
 const static struct {
@@ -257,6 +259,52 @@ QVariant PlayerBuildInfo::value(DeviceInfo item, QString target)
     return result;
 }
 
+QVariant PlayerBuildInfo::value(DeviceInfo item, unsigned int match)
+{
+    QStringList result;
+    int i = 0;
+    while(PlayerInfoList[i].item != item)
+        i++;
+    QString s = PlayerInfoList[i].name;
+
+    switch(item) {
+    case UsbIdErrorList:
+    {
+        // go through all targets and find the one indicated by the usb id "target".
+        // return list of matching players (since it could be more than one)
+        QStringList targets = targetNames(true);
+        for(int i = 0; i < targets.size(); i++) {
+            QStringList usbids = playerInfo.value(targets.at(i) + "/usberror").toStringList();
+            for(int j = 0; j < usbids.size(); j++) {
+                if(usbids.at(j).toUInt(nullptr, 0) == match) {
+                    result << targets.at(i);
+                }
+            }
+        }
+        break;
+    }
+
+    case UsbIdTargetList:
+    {
+        QStringList targets = targetNames(true);
+        for(int i = 0; i < targets.size(); i++) {
+            QStringList usbids = playerInfo.value(targets.at(i) + "/usbid").toStringList();
+            for(int j = 0; j < usbids.size(); j++) {
+                if(usbids.at(j).toUInt(nullptr, 0) == match) {
+                    result << targets.at(i);
+                }
+            }
+        }
+        break;
+    }
+
+    default:
+        break;
+    }
+    LOG_INFO() << "T:" << s << result;
+    return result;
+}
+
 QVariant PlayerBuildInfo::value(SystemUrl item)
 {
     // locate setting item in server info file
@@ -309,7 +357,6 @@ QStringList PlayerBuildInfo::targetNames(bool all)
             result.append(target);
         }
     }
-    result.removeDuplicates();
     return result;
 }
 

@@ -36,7 +36,6 @@
 #include "systrace.h"
 #include "rbsettings.h"
 #include "playerbuildinfo.h"
-#include "systeminfo.h"
 #include "ziputil.h"
 #include "infowidget.h"
 #include "selectiveinstallwidget.h"

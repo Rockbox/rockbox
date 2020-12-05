@@ -33,7 +33,6 @@
 #include "system.h"
 #include "encttscfggui.h"
 #include "rbsettings.h"
-#include "systeminfo.h"
 #include "playerbuildinfo.h"
 #include "utils.h"
 #include "comboboxviewdelegate.h"

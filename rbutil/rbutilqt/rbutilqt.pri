@@ -48,7 +48,6 @@ SOURCES += \
  base/voicefile.cpp \
  createvoicewindow.cpp \
  base/rbsettings.cpp \
- base/systeminfo.cpp \
  base/system.cpp \
  sysinfo.cpp \
  systrace.cpp \
@@ -127,7 +126,6 @@ HEADERS += \
  base/voicefile.h \
  createvoicewindow.h \
  base/rbsettings.h \
- base/systeminfo.h \
  sysinfo.h \
  base/system.h \
  systrace.h \
