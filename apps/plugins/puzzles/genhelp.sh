@@ -1,10 +1,10 @@
 #!/bin/bash
 # usage: ./genhelp.sh
 #
-# expects halibut to be installed in $PATH:
-# http://www.chiark.greenend.org.uk/~sgtatham/halibut
+# Expects halibut to be installed in $PATH:
+# https://www.fwei.tk/git/halibut
 #
-# also requires host CC and lz4 library to be available
+# Also requires host CC and lz4 library to be available
 
 halibut --text src/puzzles.but
 
