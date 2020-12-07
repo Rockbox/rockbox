@@ -347,7 +347,7 @@ const char *identify_game(char **name,
                           bool (*read)(void *ctx, void *buf, int len),
                           void *rctx);
 void midend_request_id_changes(midend *me, void (*notify)(void *), void *ctx);
-void midend_get_cursor_location(midend *me, int *x, int *y, int *w, int *h);
+bool midend_get_cursor_location(midend *me, int *x, int *y, int *w, int *h);
 
 /* Printing functions supplied by the mid-end */
 const char *midend_print_puzzle(midend *me, document *doc, bool with_soln);
