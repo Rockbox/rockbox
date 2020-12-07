@@ -1566,8 +1566,7 @@ static void rb_end_draw(void *handle)
     {
         rb->lcd_set_foreground(LCD_RGBPACK(255,0,255));
         int x, y, w, h;
-        midend_get_cursor_location(me, &x, &y, &w, &h);
-        if(x >= 0)
+        if(midend_get_cursor_location(me, &x, &y, &w, &h))
             rb->lcd_drawrect(x, y, w, h);
     }
 
@@ -2230,10 +2229,7 @@ static void zoom_center_on_cursor(void) {
     /* get cursor bounding rectangle */
     int x, y, w, h;
 
-    midend_get_cursor_location(me, &x, &y, &w, &h);
-
-    /* no cursor */
-    if(x < 0)
+    if(!midend_get_cursor_location(me, &x, &y, &w, &h))
         return;
 
     /* check if either of the top-left and bottom-right corners are
