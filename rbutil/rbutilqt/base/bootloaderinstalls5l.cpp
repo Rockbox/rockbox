@@ -66,7 +66,8 @@ bool BootloaderInstallS5l::installStage1(void)
     if (doInstall) {
         // download firmware from server
         emit logItem(tr("Downloading bootloader file..."), LOGINFO);
-        connect(this, &BootloaderInstallBase::downloadDone, this, &BootloaderInstallS5l::installStageMkdfu);
+        connect(this, &BootloaderInstallBase::downloadDone,
+                this, &BootloaderInstallS5l::installStageMkdfu);
         downloadBlStart(m_blurl);
     }
     else {
@@ -87,8 +88,10 @@ void BootloaderInstallS5l::installStageMkdfu(void)
 
     setProgress(0);
     aborted = false;
-    connect(this, &BootloaderInstallBase::installAborted, this, &BootloaderInstallS5l::abortInstall);
-    connect(this, &BootloaderInstallBase::done, this, &BootloaderInstallS5l::installDone);
+    connect(this, &BootloaderInstallBase::installAborted,
+            this, &BootloaderInstallS5l::abortInstall);
+    connect(this, &BootloaderInstallBase::done,
+            this, &BootloaderInstallS5l::installDone);
 
     if (doInstall) {
         dfu_type = DFU_INST;
@@ -329,8 +332,10 @@ void BootloaderInstallS5l::installStageWaitForRemount(void)
     }
     emit logItem(tr("Device remounted."), LOGINFO);
 
-    emit logItem(tr("Bootloader successfully %1.").
-            arg(tr(doInstall ? "installed" : "uninstalled")), LOGOK);
+    if (doInstall)
+        emit logItem(tr("Bootloader successfully installed."), LOGOK);
+    else
+        emit logItem(tr("Bootloader successfully uninstalled."), LOGOK);
 
     logInstall(doInstall ? LogAdd : LogRemove);
     emit logProgress(1, 1);
@@ -350,7 +355,8 @@ void BootloaderInstallS5l::abortInstall(void)
 {
     LOG_INFO() << "abortInstall";
     aborted = true;
-    disconnect(this, &BootloaderInstallBase::installAborted, this, &BootloaderInstallS5l::abortInstall);
+    disconnect(this, &BootloaderInstallBase::installAborted,
+               this, &BootloaderInstallS5l::abortInstall);
 }
 
 
@@ -358,8 +364,10 @@ bool BootloaderInstallS5l::abortDetected(void)
 {
     if (aborted) {
         LOG_ERROR() << "abortDetected";
-        emit logItem(tr("%1 aborted by user.").
-                arg(tr(doInstall ? "Install" : "Uninstall")), LOGERROR);
+        if (doInstall)
+            emit logItem(tr("Install aborted by user."), LOGERROR);
+        else
+            emit logItem(tr("Uninstall aborted by user."), LOGERROR);
         emit done(true);
         return true;
     }
