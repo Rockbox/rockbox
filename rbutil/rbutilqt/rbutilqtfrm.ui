@@ -21,26 +21,35 @@
    <layout class="QGridLayout" name="gridLayout_3">
     <item row="0" column="0">
      <widget class="QLabel" name="logoLabel">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+      <property name="minimumSize">
+       <size>
+        <width>200</width>
+        <height>62</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>200</width>
+        <height>62</height>
+       </size>
       </property>
       <property name="baseSize">
        <size>
-        <width>0</width>
-        <height>0</height>
+        <width>200</width>
+        <height>62</height>
        </size>
       </property>
       <property name="text">
        <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox."/>
       </property>
       <property name="pixmap">
-       <pixmap resource="rbutilqt.qrc">:/icons/rblogo.png</pixmap>
+       <pixmap resource="rbutilqt.qrc">:/icons/rockbox-logo.svg</pixmap>
       </property>
       <property name="scaledContents">
-       <bool>false</bool>
+       <bool>true</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
       </property>
      </widget>
     </item>
@@ -473,7 +482,7 @@
   </action>
   <action name="actionComplete_Installation">
    <property name="icon">
-    <iconset resource="rbutilqt.qrc">
+    <iconset>
      <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
    </property>
    <property name="text">
@@ -482,7 +491,7 @@
   </action>
   <action name="actionSmall_Installation">
    <property name="icon">
-    <iconset resource="rbutilqt.qrc">
+    <iconset>
      <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text">
@@ -491,7 +500,7 @@
   </action>
   <action name="actionInstall_Bootloader">
    <property name="icon">
-    <iconset resource="rbutilqt.qrc">
+    <iconset>
      <normaloff>:/icons/bootloader_btn.png</normaloff>:/icons/bootloader_btn.png</iconset>
    </property>
    <property name="text">
@@ -500,7 +509,7 @@
   </action>
   <action name="actionInstall_Rockbox">
    <property name="icon">
-    <iconset resource="rbutilqt.qrc">
+    <iconset>
      <normaloff>:/icons/rbinstall_btn.png</normaloff>:/icons/rbinstall_btn.png</iconset>
    </property>
    <property name="text">
@@ -509,7 +518,7 @@
   </action>
   <action name="actionFonts_Package">
    <property name="icon">
-    <iconset resource="rbutilqt.qrc">
+    <iconset>
      <normaloff>:/icons/font_btn.png</normaloff>:/icons/font_btn.png</iconset>
    </property>
    <property name="text">
