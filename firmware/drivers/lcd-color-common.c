@@ -47,7 +47,9 @@ static long lcd_backdrop_offset IDATA_ATTR = 0;
 /* shouldn't be changed unless you want system-wide framebuffer changes! */
 struct frame_buffer_t lcd_framebuffer_default =
 {
-    .fb_ptr         = &lcd_static_framebuffer[0][0],
+    {
+        .fb_ptr     = &lcd_static_framebuffer[0][0]
+    },
     .get_address_fn = &lcd_frameaddress_default,
     .stride         = STRIDE_MAIN(LCD_WIDTH, LCD_HEIGHT),
     .elems          = (LCD_FBWIDTH*LCD_FBHEIGHT),
