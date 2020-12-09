@@ -2050,6 +2050,15 @@ int clip_jpeg_fd(int fd,
     if (!(status & DHT)) /* if no Huffman table present: */
         default_huff_tbl(p_jpeg); /* use default */
     fix_headers(p_jpeg); /* derive Huffman and other lookup-tables */
+
+    /*the dim array in rockbox is limited to 2^15-1 pixels, so we cannot resize
+      images larger than this without overflowing */
+    if(p_jpeg->x_size > 32767 || p_jpeg->y_size > 32767)
+    {
+        JDEBUGF("Aborting resize of image > 32767 pixels\n");
+        return -1;
+    }
+
     src_dim.width = p_jpeg->x_size;
     src_dim.height = p_jpeg->y_size;
     if (format & FORMAT_RESIZE)
