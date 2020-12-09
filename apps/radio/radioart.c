@@ -88,7 +88,7 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
     user_data.embedded_albumart = NULL;
     user_data.dim = &ra->dim;
     ra->handle = bufopen(path, 0, TYPE_BITMAP, &user_data);
-    if (ra->handle == ERR_BUFFER_FULL)
+    if (ra->handle == ERR_BUFFER_FULL || ra->handle == ERR_BITMAP_TOO_LARGE)
     {
         int i = find_oldest_image_index();
         if (i != -1)

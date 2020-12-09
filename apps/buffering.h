@@ -47,6 +47,7 @@ enum data_type {
 #define ERR_HANDLE_NOT_DONE     -5
 #define ERR_UNSUPPORTED_TYPE    -6
 #define ERR_WRONG_THREAD        -7
+#define ERR_BITMAP_TOO_LARGE    -8
 
 /* Initialise the buffering subsystem */
 void buffering_init(void) INIT_ATTR;

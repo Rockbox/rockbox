@@ -999,7 +999,14 @@ int bufopen(const char *file, off_t offset, enum data_type type,
         DEBUGF("%s(): failed to add handle\n", __func__);
         mutex_unlock(&llist_mutex);
         close(fd);
+
+        /*warn playback.c if it is trying to buffer too large of an image*/
+        if(type == TYPE_BITMAP && padded_size >= buffer_len - 64*1024)
+        {
+            return ERR_BITMAP_TOO_LARGE;
+        }
         return ERR_BUFFER_FULL;
+
     }
 
     handle_id = h->id;
