@@ -1983,9 +1983,10 @@ static int audio_finish_load_track(struct track_info *infop)
     /* Try to load album art for the track */
     if (!audio_load_albumart(infop, track_id3))
     {
-        /* No space for album art on buffer, not an error */
-        filling = STATE_FULL;
-        goto audio_finish_load_track_exit;
+        /* No space for album art on buffer, either because the buffer had too
+        litle space remaining or because the file is larger than the buffer.
+        In either case, this is not an error, so proceed and attempt to buffer
+        audio data. */
     }
 #endif
 
