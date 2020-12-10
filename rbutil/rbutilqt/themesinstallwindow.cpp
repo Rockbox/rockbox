@@ -116,6 +116,7 @@ void ThemesInstallWindow::downloadDone(bool error)
     themesInfo.open();
 
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
+    iniDetails.setIniCodec(QTextCodec::codecForName("UTF-8"));
     QStringList tl = iniDetails.childGroups();
     LOG_INFO() << "Theme site result:"
                << iniDetails.value("error/code").toString()
@@ -189,6 +190,7 @@ void ThemesInstallWindow::updateSize(void)
     long size = 0;
     // sum up size for all selected themes
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
+    iniDetails.setIniCodec(QTextCodec::codecForName("UTF-8"));
     int items = ui.listThemes->selectedItems().size();
     for(int i = 0; i < items; i++) {
         iniDetails.beginGroup(ui.listThemes->selectedItems()
@@ -207,6 +209,7 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
         return;
 
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
+    iniDetails.setIniCodec(QTextCodec::codecForName("UTF-8"));
 
     QCoreApplication::processEvents();
     ui.themeDescription->setText(tr("fetching details for %1")
