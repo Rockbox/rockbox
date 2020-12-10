@@ -3403,14 +3403,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Alkaliczna"
+    xduoox3: "Nowsza (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Alkaliczna"
+    xduoox3: "Nowsza 2000 miliamperogodzin"
   </voice>
 </phrase>
 <phrase>
@@ -3420,14 +3423,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Starsza (1500 mAh)"
   </dest>
   <voice>
     *: none
-    battery_types: "Niklowo metalowo wodorkowy"
+    battery_types: "Niklowo metalowo wodorkowa"
+    xduoox3: "Starsza 1500 miliamperogodzin"
   </voice>
 </phrase>
 <phrase>
@@ -15463,5 +15469,53 @@
   </dest>
   <voice>
     *: "Przeglądaj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Krótki ostry"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Krutki ostry"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Krótki wolny"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Krutki wolny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Przejść do trybu pamięci masowej USB?"
+  </dest>
+  <voice>
+    *: "Przejść do trybu pamięci masowej uesbe?"
   </voice>
 </phrase>
