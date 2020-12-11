@@ -616,7 +616,8 @@ sub buildzip {
     # copy the already built lng files
     glob_copy('apps/lang/*.lng', "$temp_dir/langs/");
     glob_copy('apps/lang/*.zip', "$temp_dir/langs/");
-    glob_copy('apps/lang/*.talk', "$temp_dir/langs/");
+    # Copy over the Invalid Language fallback stuff
+    glob_copy("$ROOT/apps/lang/Invalid*.talk", "$temp_dir/langs/");
 
     # copy the .lua files
     glob_mkdir("$temp_dir/rocks/viewers/lua/");
