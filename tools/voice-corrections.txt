@@ -41,6 +41,7 @@
 /.*/.*/.*/last\.fm/Last F M/ig
 
   English
+
 /english/(sapi|festival)/.*/plugin(s?)/plug-in$1/ig
 /english/festival/.*/\ba\b/ay/ig
 /english/festival/.*//$/./
@@ -107,3 +108,29 @@
 /italiano/sapi/ScanSoft, Inc/V/v/ig
 /italiano/sapi/ScanSoft, Inc/X/x/ig
 /italiano/sapi/ScanSoft, Inc/stop/stohp/ig
+
+   Japanese
+
+/japanese/sapi/L&H/・//ig
+/japanese/sapi/L&H/ /・/ig
+/japanese/sapi/L&H/早送り/ハヤオクリ/ig
+/japanese/sapi/L&H/巻き戻し/巻きも度し/ig
+/japanese/sapi/L&H/大文字/王文字/ig
+/japanese/sapi/L&H/背景色/背景蜀/ig
+/japanese/sapi/L&H/文字色/文字蜀/ig
+/japanese/sapi/L&H/簡体字/カンタイ字/ig
+/japanese/sapi/L&H/USB/ユーヱスビー/ig
+/japanese/sapi/L&H/一杯/いっぱい/ig
+/japanese/sapi/L&H/無い場合レジューム/無い場合、レジューム/ig
+/japanese/sapi/L&H/プレイリスト管理ファイルの更新エラー/プレイリスト管理ファイルの・更新エラー/ig
+/japanese/sapi/Voiceware/が から です/が、殻です/ig
+/japanese/sapi/Voiceware/小文字/こもじ/ig
+/japanese/sapi/Voiceware/巻き戻し$/巻き戻し(っ)/ig
+/japanese/sapi/Voiceware/背景色/ハイケイショク/ig
+/japanese/sapi/Voiceware/文字色/文字ショク/ig
+/japanese/sapi/Voiceware/簡体字/カンタイ字/ig
+/japanese/sapi/Voiceware/繁体字/ハンタイ字/ig
+/japanese/sapi/Voiceware/^強$/きょう/ig
+/japanese/sapi/Voiceware/一杯/いっぱい/ig
+/japanese/sapi/Voiceware/無い場合レジューム/無い場合、れじゅうむ/ig
+/japanese/sapi/Create System Development Co, Ltd./一杯/いっぱい/ig
