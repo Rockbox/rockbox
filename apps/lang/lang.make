@@ -55,6 +55,7 @@ $(BUILDDIR)/%.lng $(BUILDDIR)/%.vstrings: $(ROOTDIR)/%.lang $(BUILDDIR)/apps/gen
 	$(SILENT)rm -f $@.tmp
 
 $(BUILDDIR)/apps/lang/voice-corrections.txt: $(ROOTDIR)/tools/voice-corrections.txt
+	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CP $(subst $(ROOTDIR)/,,$<))cp $< $@
 
 $(BUILDDIR)/apps/lang/voicestrings.zip: $(VOICEOBJ) $(wildcard $(BUILDDIR)/apps/lang/*.talk) $(BUILDDIR)/apps/lang/voice-corrections.txt
