@@ -90,8 +90,8 @@ my %gtts_lang_map = (
         'greek' => 'el',
         'magyar' => 'hu',
         'italiano' => 'it',
-#        'nederlands' => 'nl',  # not supported
-	'norsk' => 'no',
+        'nederlands' => 'nl',
+        'norsk' => 'no',
 	'polski' => 'pl',
 	'russian' => 'ru',
 	'slovak' => 'sk',
@@ -112,13 +112,14 @@ my %espeak_lang_map = (
         'magyar' => 'hu',
         'italiano' => 'it',
         'japanese' => 'ja',
-	'norsk' => 'no',
-	'polski' => 'pl',
-	'russian' => 'ru',
-	'slovak' => 'sk',
+        'nederlands' => 'nl',
+        'norsk' => 'no',
+        'polski' => 'pl',
+        'russian' => 'ru',
+        'slovak' => 'sk',
         'srpski' => 'sr',
         'svenska' => 'sv',
-	'turkce' => 'tr',
+        'turkce' => 'tr',
 );
 
 # Initialize TTS engine. May return an object or value which will be passed

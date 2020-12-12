@@ -22,25 +22,25 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'Archos FM Recorder',
         status => 0,
         ram => 2,
-        release => '3.15', 
+        release => '3.15',
     },
     'archosondiofm' => {
         name => 'Archos Ondio FM',
         status => 0,
         ram => 2,
-        release => '3.15', 
+        release => '3.15',
     },
     'archosondiosp' => {
         name => 'Archos Ondio SP',
         status => 0,
         ram => 2,
-        release => '3.15', 
+        release => '3.15',
     },
     'archosplayer' => {
         name => 'Archos Player/Studio',
         status => 0,
         ram => 2,
-        release => '3.15', 
+        release => '3.15',
     },
     'archosrecorder' => {
         name => 'Archos Recorder v1',
@@ -53,7 +53,7 @@ $releasenotes="/wiki/ReleaseNotes315";
         status => 0,
         ram => 2,
         manual => "archosfmrecorder",
-        release => '3.15', 
+        release => '3.15',
     },
     'cowond2' => {
         name => 'Cowon D2',
@@ -604,6 +604,17 @@ sub allbuilds {
 	    'gtts' => '-l it',
 	},
         'enabled' => 1,
+    },
+    'nederlands' => {
+	'lang' => 'nederlands',
+	'name' => 'Nederlands (Dutch)',
+        'short' => 'nl',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vnl',
+	    'gtts' => '-l nl',
+	},
+	'enabled' => 1,
     },
     'norsk' => {
 	'lang' => 'norsk',
