@@ -216,6 +216,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             indent += SCROLLBAR_WIDTH;
     }
 
+    display->set_viewport(list_text_vp);
     for (i=start; i<end && i<list->nb_items; i++)
     {
         /* do the text */
@@ -246,7 +247,6 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         }
         line_indent += indent;
 
-        display->set_viewport(list_text_vp);
         /* position the string at the correct offset place */
         int item_width,h;
         display->getstringsize(entry_name, &item_width, &h);
