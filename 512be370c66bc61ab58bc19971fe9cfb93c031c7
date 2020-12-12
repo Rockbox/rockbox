@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f5dbdaed_438abfd9",
+        "filename": "apps/gui/bitmap/list.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2020-12-12T05:43:41Z",
+      "side": 1,
+      "message": "Just setting the text viewport earlier solves the issue, I suspect what is happening in that the call below to \n\u0027callback_get_item_name\u0027 is yielding and the scroll thread tries to scroll the text in the scrollbar viewport\n\nso perhaps an existing condition but for sure a bug",
+      "revId": "512be370c66bc61ab58bc19971fe9cfb93c031c7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
