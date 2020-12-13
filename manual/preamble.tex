@@ -308,17 +308,17 @@
 % set link to download server
 % Usage: \download{bootloader/bootloader-ipodnano.ipod}
 %        gets expanded to 
-%        "http://download.rockbox.org/bootloader/bootloader-ipodnano.ipod"
-\newcommand{\download}[1]{\url{http://download.rockbox.org/#1}}
+%        "https://download.rockbox.org/bootloader/bootloader-ipodnano.ipod"
+\newcommand{\download}[1]{\url{https://download.rockbox.org/#1}}
 
 % set link to the wiki.
 % Usage: \wikilink{WebHome}
 %        with "WebHome" being the wiki page name
-\newcommand{\wikibaseurl}{http://www.rockbox.org/wiki/}
+\newcommand{\wikibaseurl}{https://www.rockbox.org/wiki/}
 \Ifpdfoutput{\newcommand{\wikiicon}{\Pointinghand}}
     {\newcommand{\wikiicon}{}}
 \newcommand{\wikilink}[1]{\wikiicon{}\href{\wikibaseurl#1}{#1}}
-%\newcommand{\wikilink}[1]{\url{http://www.rockbox.org/wiki/#1}}
+%\newcommand{\wikilink}[1]{\url{https://www.rockbox.org/wiki/#1}}
 
 % define environment "code" based on fancyvrb.
 % use it to set code the user should type / see on his screen.
