@@ -310,7 +310,7 @@ foreach my $id (@langorder) {
 	if (!defined($lp{$tgt})) {
 	    # If it doesn't exist in the language, copy it from English
 	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
-		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is missing! Copying from english\n";
+		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is missing! Copying from english!\n";
 #		print "#!! '$id:$tgt' dest missing\n";
 	    }
 	    $lang{$id}{'dest'}{$tgt} = $english{$id}{'dest'}{$tgt};
@@ -359,7 +359,7 @@ foreach my $id (@langorder) {
 	if (!defined($lp{$tgt})) {
 	    # If it doesn't exist in the language, copy it from English
 	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
-		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is missing! Copying from english\n";
+		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is missing! Copying from english!\n";
 #		print "#!! '$id:$tgt' voice missing\n";
 	    }
 	    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
