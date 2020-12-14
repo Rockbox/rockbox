@@ -75,7 +75,7 @@ void thread_quit(void);
 static int voice_general_info(bool testing);
 static unsigned char* voice_info_group(unsigned char* current_token, bool testing);
 
-int main(const void* parameter); /* main loop */
+int plugin_main(const void* parameter); /* main loop */
 enum plugin_status plugin_start(const void* parameter); /* entry */
 
 
