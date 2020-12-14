@@ -632,6 +632,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
         }
         break;
         case DEFAULT:
+            b = -1;
             break;
     }
 
