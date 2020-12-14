@@ -646,6 +646,7 @@ sub allbuilds {
 	    'espeak' => '-vru',
 	    'gtts' => '-l ru',
 	},
+        'enabled' => 1,
     },
     'slovak' => {
 	'lang' => 'slovak',
