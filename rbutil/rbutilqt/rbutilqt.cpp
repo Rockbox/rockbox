@@ -88,20 +88,8 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     HttpGet::setGlobalProxy(proxy());
     // init startup & autodetection
     ui.setupUi(this);
-#if defined(Q_OS_LINUX)
     QIcon windowIcon(":/icons/rockbox-clef.svg");
     this->setWindowIcon(windowIcon);
-#endif
-#if defined(Q_OS_WIN32)
-    QIcon windowIcon = QIcon();
-    windowIcon.addFile(":/icons/rockbox-16.png");
-    windowIcon.addFile(":/icons/rockbox-32.png");
-    windowIcon.addFile(":/icons/rockbox-48.png");
-    windowIcon.addFile(":/icons/rockbox-64.png");
-    windowIcon.addFile(":/icons/rockbox-128.png");
-    windowIcon.addFile(":/icons/rockbox-256.png");
-    this->setWindowIcon(windowIcon);
-#endif
 #if defined(Q_OS_MACX)
     // don't translate menu entries that are handled specially on OS X
     // (Configure, Quit). Qt handles them for us if they use english string.

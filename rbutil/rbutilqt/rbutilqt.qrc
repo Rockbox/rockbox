@@ -33,13 +33,6 @@
         <file>icons/preferences-desktop-locale.svg</file>
         <file>icons/preferences-system.svg</file>
         <file>icons/process-stop.svg</file>
-        <file>icons/rblogo.png</file>
-        <file>icons/rockbox-16.png</file>
-        <file>icons/rockbox-32.png</file>
-        <file>icons/rockbox-48.png</file>
-        <file>icons/rockbox-64.png</file>
-        <file>icons/rockbox-128.png</file>
-        <file>icons/rockbox-256.png</file>
         <file>icons/system-search.svg</file>
         <file>icons/user-trash-full.svg</file>
         <file>icons/view-refresh.svg</file>
