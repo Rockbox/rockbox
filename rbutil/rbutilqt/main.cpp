@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QSettings>
+#include <QStyleFactory>
 #include "rbutilqt.h"
 #include "systrace.h"
 #include "Logger.h"
@@ -43,6 +44,9 @@ int main( int argc, char ** argv ) {
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
     QApplication app( argc, argv );
+#ifdef Q_OS_WIN
+    qApp->setStyle(QStyleFactory::create("Fusion"));
+#endif
     ConsoleAppender* consoleAppender = new ConsoleAppender();
     consoleAppender->setFormat("[%{file}:%{line} %{type}] %{message}\n");
     cuteLoggerInstance()->registerAppender(consoleAppender);
