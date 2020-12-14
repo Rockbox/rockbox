@@ -524,7 +524,7 @@ static void update_playlist_filename(struct playlist_info* playlist,
     
     /* If the dir does not end in trailing slash, we use a separator.
        Otherwise we don't. */
-    if('/' != dir[dirlen-1])
+    if(!dirlen || '/' != dir[dirlen-1])
     {
         sep="/";
         dirlen++;
