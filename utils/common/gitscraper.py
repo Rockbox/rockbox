@@ -43,7 +43,7 @@ def get_refs(repo):
     '''
     print("Getting list of refs")
     output = subprocess.Popen(
-        ["git", "show-ref", "--abbrev"],
+        ["git", "show-ref", "--abbrev", "--head"],
         stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
     cmdout = output.communicate()
     refs = dict()

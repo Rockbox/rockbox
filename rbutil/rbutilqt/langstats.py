@@ -65,18 +65,20 @@ def main():
         description='Print translation statistics for pasting in the wiki.')
     parser.add_argument('-p', '--pretty', action='store_true',
                         help='Display pretty output instead of wiki-style')
+    parser.add_argument('-c', '--commit', nargs='?', help='Git commit hash')
 
     args = parser.parse_args()
 
-    langstat(args.pretty)
+    langstat(args.pretty, args.commit)
 
 
-def langstat(pretty=True):
+def langstat(pretty=True, tree=None):
     '''Get translation stats and print to stdout.'''
     # get gitpaths to temporary folder
     workfolder = tempfile.mkdtemp() + "/"
     repo = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
-    tree = gitscraper.get_refs(repo)['refs/remotes/origin/master']
+    if tree is None:
+        tree = gitscraper.get_refs(repo)['HEAD']
     filesprops = gitscraper.scrape_files(
         repo, tree, GITPATHS, dest=workfolder,
         timestamp_files=["rbutil/rbutilqt/lang"])
@@ -130,8 +132,7 @@ def langstat(pretty=True):
               "| *Done* |")
 
     # scan output
-    for i in range(len(lines)):
-        line = lines[i]
+    for i, line in enumerate(lines):
         if re_updating.search(line):
             lang = re_qmlang.findall(line)
             tsfile = "rbutil/rbutilqt/lang/%s.ts" % re_qmbase.findall(line)[0]
