@@ -30,6 +30,8 @@
 // For build info data retrieved from the build server has to be passed.
 class PlayerBuildInfo : public QObject
 {
+    Q_OBJECT
+
 public:
 
     enum BuildType {
