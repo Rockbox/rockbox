@@ -1046,3 +1046,17 @@ bool Utils::ejectDevice(QString device)
     return false;
 }
 
+
+qint64 Utils::recursiveFolderSize(QString path)
+{
+    qint64 size = 0;
+    QList<QFileInfo> items = QDir(path).entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    for (auto item: items) {
+        size += item.size();
+    }
+    QList<QString> folders = QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (auto folder: folders) {
+        size += recursiveFolderSize(path + "/" + folder);
+    }
+    return size;
+}

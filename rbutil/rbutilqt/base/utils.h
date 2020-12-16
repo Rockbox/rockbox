@@ -57,6 +57,7 @@ public:
     static QMap<QString, QList<int> > findRunningProcess(QStringList names);
     static QList<int> suspendProcess(QList<int> pidlist, bool suspend);
     static bool ejectDevice(QString device);
+    static qint64 recursiveFolderSize(QString path);
 };
 
 #endif

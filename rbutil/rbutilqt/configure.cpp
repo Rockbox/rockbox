@@ -306,12 +306,7 @@ void Config::setUserSettings()
 
 void Config::updateCacheInfo(QString path)
 {
-    QList<QFileInfo> fs;
-    fs = QDir(path + "/rbutil-cache/").entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    qint64 sz = 0;
-    for(int i = 0; i < fs.size(); i++) {
-        sz += fs.at(i).size();
-    }
+    qint64 sz = Utils::recursiveFolderSize(path + "/rbutil-cache");
     ui.cacheSize->setText(tr("Current cache size is %L1 kiB.")
             .arg(sz/1024));
 }
