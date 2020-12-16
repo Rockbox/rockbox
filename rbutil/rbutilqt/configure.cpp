@@ -875,13 +875,7 @@ void Config::cacheClear()
         return;
     }
     QDir dir(cache);
-    QStringList fn;
-    fn = dir.entryList(QStringList("*"), QDir::Files, QDir::Name);
-
-    for(int i = 0; i < fn.size(); i++) {
-        QString f = cache + fn.at(i);
-        QFile::remove(f);
-    }
+    dir.removeRecursively();
     updateCacheInfo(RbSettings::value(RbSettings::CachePath).toString());
 }
 
