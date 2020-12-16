@@ -21,6 +21,7 @@
 
 /* KeyPad configuration for plugins */
 #define CONFIG_KEYPAD EROSQ_PAD
+#define HAVE_SCROLLWHEEL
 
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST

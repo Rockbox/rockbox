@@ -77,16 +77,8 @@ int button_read_device(void)
     static int button_bitmap = 0;
     struct input_event event;
 
-#if defined(BUTTON_SCROLL_BACK)
-    // FIXME TODO:  Make this work via HAVE_SCROLL_WHEEL instead
-
-    /* Wheel gives us press+release back to back, clear them after time elapses */
-    static long last_tick = 0;
-    if (button_bitmap & (BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD) &&
-        current_tick - last_tick >= 2)
-    {
-        button_bitmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
-    }
+#ifdef HAVE_SCROLLWHEEL
+    int wheel_ticks = 0;
 #endif
 
     /* check if there are any events pending and process them */
@@ -110,17 +102,22 @@ int button_read_device(void)
                     if(press)
                     {
                         int bmap = button_map(keycode);
-#if defined(BUTTON_SCROLL_BACK)
-                        /* Keep track of when the last wheel tick happened */
-                        if (bmap & (BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD))
-                            last_tick = current_tick;
+
+#ifdef HAVE_SCROLLWHEEL
+			/* Filter out wheel ticks */
+                        if (bmap & BUTTON_SCROLL_BACK)
+                            wheel_ticks--;
+                        else if (bmap & BUTTON_SCROLL_FWD)
+                            wheel_ticks++;
+                        bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
 #endif
                         button_bitmap |= bmap;
                     }
                     else
                     {
                         int bmap = button_map(keycode);
-#if defined(BUTTON_SCROLL_BACK)
+
+#ifdef HAVE_SCROLLWHEEL
                         /* Wheel gives us press+release back to back; ignore the release */
                         bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
 #endif
@@ -131,6 +128,25 @@ int button_read_device(void)
             }
         }
     }
+
+#ifdef HAVE_SCROLLWHEEL
+    // TODO: Is there a better way to handle this?
+    // TODO: enable BUTTON_REPEAT if the events happen quickly enough
+    if (wheel_ticks > 0)
+    {
+        while (wheel_ticks-- > 0)
+        {
+            queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
+        }
+    }
+    else
+    {
+        while (wheel_ticks++ < 0)
+        {
+            queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
+        }
+    }
+#endif
 
     return button_bitmap;
 }
