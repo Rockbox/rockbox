@@ -166,9 +166,9 @@ bool VoiceFileCreator::createVoiceFile()
     getter = new HttpGet(this);
     getter->setFile(downloadFile);
 
-    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(getter, SIGNAL(dataReadProgress(int, int)), this, SIGNAL(logProgress(int, int)));
-    connect(this, SIGNAL(aborted()), getter, SLOT(abort()));
+    connect(getter, &HttpGet::done, this, &VoiceFileCreator::downloadDone);
+    connect(getter, &HttpGet::dataReadProgress, this, &VoiceFileCreator::logProgress);
+    connect(this, &VoiceFileCreator::aborted, getter, &HttpGet::abort);
     emit logItem(tr("Downloading voice info..."),LOGINFO);
     getter->getFile(genlangUrl);
     return true;
@@ -284,10 +284,10 @@ void VoiceFileCreator::create(void)
         // set language for string correction. If not set no correction will be made.
         if(useCorrection)
             generator.setLang(m_lang);
-        connect(&generator,SIGNAL(done(bool)),this,SIGNAL(done(bool)));
-        connect(&generator,SIGNAL(logItem(QString,int)),this,SIGNAL(logItem(QString,int)));
-        connect(&generator,SIGNAL(logProgress(int,int)),this,SIGNAL(logProgress(int,int)));
-        connect(this,SIGNAL(aborted()),&generator,SLOT(abort()));
+        connect(&generator, &TalkGenerator::done, this, &VoiceFileCreator::done);
+        connect(&generator, &TalkGenerator::logItem, this, &VoiceFileCreator::logItem);
+        connect(&generator, &TalkGenerator::logProgress, this, &VoiceFileCreator::logProgress);
+        connect(this, &VoiceFileCreator::aborted, &generator, &TalkGenerator::abort);
 
         if(generator.process(&m_talkList, m_wavtrimThreshold) == TalkGenerator::eERROR)
         {

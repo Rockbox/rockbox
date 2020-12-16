@@ -46,7 +46,7 @@ void TTSSapi::generateSettings()
             EncTtsSetting::eSTRINGLIST, tr("Language:"),
             RbSettings::subValue(m_TTSType, RbSettings::TtsLanguage),
             langmap.keys());
-    connect(setting,SIGNAL(dataChanged()),this,SLOT(updateVoiceList()));
+    connect(setting, &EncTtsSetting::dataChanged, this, &TTSSapi::updateVoiceList);
     insertSetting(eLANGUAGE,setting);
     // voice
     setting = new EncTtsSetting(this,
@@ -55,7 +55,7 @@ void TTSSapi::generateSettings()
             getVoiceList(RbSettings::subValue(m_TTSType,
                     RbSettings::TtsLanguage).toString()),
             EncTtsSetting::eREFRESHBTN);
-    connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
+    connect(setting, &EncTtsSetting::refresh, this, &TTSSapi::updateVoiceList);
     insertSetting(eVOICE,setting);
     //speed
     int speed = RbSettings::subValue(m_TTSType, RbSettings::TtsSpeed).toInt();

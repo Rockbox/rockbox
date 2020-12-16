@@ -58,14 +58,17 @@ void TTSFestival::generateSettings()
                         EncTtsSetting::eSTRINGLIST, tr("Voice:"),
                         RbSettings::subValue("festival", RbSettings::TtsVoice),
                         getVoiceList(), EncTtsSetting::eREFRESHBTN);
-    connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceList()));
-    connect(setting,SIGNAL(dataChanged()),this,SLOT(clearVoiceDescription()));
+    connect(setting, &EncTtsSetting::refresh,
+            this, &TTSFestival::updateVoiceList);
+    connect(setting, &EncTtsSetting::dataChanged,
+            this, &TTSFestival::clearVoiceDescription);
     insertSetting(eVOICE,setting);
 
     //voice description
     setting = new EncTtsSetting(this,EncTtsSetting::eREADONLYSTRING,
         tr("Voice description:"),"",EncTtsSetting::eREFRESHBTN);
-    connect(setting,SIGNAL(refresh()),this,SLOT(updateVoiceDescription()));
+    connect(setting, &EncTtsSetting::refresh,
+            this, &TTSFestival::updateVoiceDescription);
     insertSetting(eVOICEDESC,setting);
 }
 

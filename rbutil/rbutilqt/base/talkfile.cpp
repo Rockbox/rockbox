@@ -49,19 +49,17 @@ bool TalkFileCreator::createTalkFiles()
     QCoreApplication::processEvents();
 
     // generate entries
-    {
-        TalkGenerator generator(this);
-        // no string corrections yet: do not set language for TalkGenerator.
-        connect(&generator,SIGNAL(done(bool)),this,SIGNAL(done(bool)));
-        connect(&generator,SIGNAL(logItem(QString,int)),this,SIGNAL(logItem(QString,int)));
-        connect(&generator,SIGNAL(logProgress(int,int)),this,SIGNAL(logProgress(int,int)));
-        connect(this,SIGNAL(aborted()),&generator,SLOT(abort()));
+    TalkGenerator generator(this);
+    // no string corrections yet: do not set language for TalkGenerator.
+    connect(&generator, &TalkGenerator::done, this, &TalkFileCreator::done);
+    connect(&generator, &TalkGenerator::logItem, this, &TalkFileCreator::logItem);
+    connect(&generator, &TalkGenerator::logProgress, this, &TalkFileCreator::logProgress);
+    connect(this, &TalkFileCreator::aborted, &generator, &TalkGenerator::abort);
 
-        if(generator.process(&m_talkList) == TalkGenerator::eERROR)
-        {
-            doAbort();
-            return false;
-        }
+    if(generator.process(&m_talkList) == TalkGenerator::eERROR)
+    {
+        doAbort();
+        return false;
     }
 
     // Copying talk files
