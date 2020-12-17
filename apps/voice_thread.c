@@ -87,7 +87,6 @@ static unsigned int voice_thread_id = 0;
 /* Needed at least on the Sony NWZ hosted targets, but probably a good idea on all of them */
 #define VOICE_STACK_EXTRA   0x500
 #else
-#warning "3c0"
 #define VOICE_STACK_EXTRA   0x3c0
 #endif
 static long voice_stack[(DEFAULT_STACK_SIZE + VOICE_STACK_EXTRA)/sizeof(long)]
