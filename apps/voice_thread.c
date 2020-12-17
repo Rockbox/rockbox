@@ -83,7 +83,11 @@ static unsigned int voice_thread_id = 0;
 #elif defined(CPU_COLDFIRE)
 /* ISR uses any available stack - need a bit more room */
 #define VOICE_STACK_EXTRA   0x400
+#elif (CONFIG_PLATFORM & PLATFORM_HOSTED)
+/* Needed at least on the Sony NWZ hosted targets, but probably a good idea on all of them */
+#define VOICE_STACK_EXTRA   0x500
 #else
+#warning "3c0"
 #define VOICE_STACK_EXTRA   0x3c0
 #endif
 static long voice_stack[(DEFAULT_STACK_SIZE + VOICE_STACK_EXTRA)/sizeof(long)]
