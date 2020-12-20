@@ -80,10 +80,7 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
         break;
     case PlayerBuildInfo::TypeDevel:
         ui.selectedDescription->setText(tr("The development version is "
-                "updated on every code change. Last update was on %1").arg(
-                    PlayerBuildInfo::instance()->value(
-                        PlayerBuildInfo::BuildVersion,
-                        PlayerBuildInfo::TypeDevel).toString()));
+                "updated on every code change."));
         voice = false;
         break;
     case PlayerBuildInfo::TypeCandidate:
@@ -99,6 +96,7 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
     ui.voiceCheckbox->setEnabled(voice);
     ui.voiceCombobox->setEnabled(voice);
     ui.voiceLabel->setEnabled(voice);
+    ui.voiceCheckbox->setToolTip(voice ? "" : tr("Not available for the selected version"));
 
     updateVoiceLangs();
 }
@@ -652,12 +650,14 @@ void SelectiveInstallWidget::installPluginData(void)
 
         if(dataUrls.size() == 0)
         {
-            m_logger->addItem(tr("Your installation doesn't require any game files, skipping."), LOGINFO);
+            m_logger->addItem(
+                    tr("Your installation doesn't require any plugin data files, skipping."),
+                    LOGINFO);
             emit installSkipped(false);
             return;
         }
 
-        LOG_INFO() << "installing gamefiles";
+        LOG_INFO() << "installing plugin data files";
 
         // create new zip installer
         if(m_zipinstaller != nullptr) m_zipinstaller->deleteLater();
