@@ -41,6 +41,7 @@
 #endif
 #include "logf.h"
 #include "screendump.h"
+#include "powermgmt.h"
 
 #ifndef BOOTLOADER
 #include "misc.h"
@@ -435,6 +436,8 @@ static void NORETURN_ATTR usb_thread(void)
     while(1)
     {
         queue_wait(&usb_queue, &ev);
+
+        reset_poweroff_timer(); /* Any USB event counts */
 
         switch(ev.id)
         {
