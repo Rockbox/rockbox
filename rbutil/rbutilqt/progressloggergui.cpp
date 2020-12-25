@@ -33,11 +33,6 @@ ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): ProgressloggerInterface(p
     setRunning();
 }
 
-void ProgressLoggerGui::addItem(const QString &text)
-{
-    addItem(text, LOGNOICON);
-}
-
 void ProgressLoggerGui::addItem(const QString &text, int flag)
 {
     QListWidgetItem* item = new QListWidgetItem(text);

@@ -45,7 +45,6 @@ signals:
 
 
 public slots:
-    virtual void addItem(const QString &text)=0; //! add a string to the progress
     virtual void addItem(const QString &text, int flag)=0; //! add a string to the list, with icon
 
     virtual void close()=0;

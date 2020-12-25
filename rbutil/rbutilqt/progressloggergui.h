@@ -41,7 +41,6 @@ signals:
     void closed();
 
 public slots:
-    virtual void addItem(const QString &text);  //! add a string to the progress list
     virtual void addItem(const QString &text, int flag);  //! add a string to the list
     virtual void setProgress(int, int); //! set progress bar
 
