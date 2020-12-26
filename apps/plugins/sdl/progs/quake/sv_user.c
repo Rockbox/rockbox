@@ -454,6 +454,17 @@ void SV_ReadClientMove (usercmd_t *move)
 		
 // read movement
 	move->forwardmove = MSG_ReadShort ();
+        /*
+         * FW 12/7/20: I'm seeing an issue where the game always
+         * thinks the user wants to move forward. forwardmove is
+         * coming through as 400 qu here, despite the SDL input not
+         * showing anything errorneous.
+         *
+         * So the issue is somewhere between the SDL input layer and
+         * here...
+         */
+        //printf("forward move: %d", (int)move->forwardmove);
+        //move->forwardmove = 0;
 	move->sidemove = MSG_ReadShort ();
 	move->upmove = MSG_ReadShort ();
 	

@@ -797,6 +797,12 @@ void SCR_BringDownConsole (void)
 }
 
 
+#define check() do {                                                    \
+    extern uint8_t SDL_ButtonState;                                     \
+    if(SDL_ButtonState)                                                 \
+        rb->splashf(3 * HZ, "state = %d in %s:%d", SDL_ButtonState, __func__, __LINE__); \
+    } while(0)
+
 /*
 ==================
 SCR_UpdateScreen
@@ -813,12 +819,13 @@ void SCR_UpdateScreen (void)
 	static float	oldscr_viewsize;
 	static float	oldlcd_x;
 	vrect_t		vrect;
-	
+	check();
 	if (scr_skipupdate || block_drawing)
 		return;
 
 	scr_copytop = 0;
 	scr_copyeverything = 0;
+	check();
 
 	if (scr_disabled_for_loading)
 	{
@@ -830,12 +837,15 @@ void SCR_UpdateScreen (void)
 		else
 			return;
 	}
+	check();
 
 	if (cls.state == ca_dedicated)
 		return;				// stdout only
+	check();
 
 	if (!scr_initialized || !con_initialized)
 		return;				// not initialized yet
+	check();
 
 	if (scr_viewsize.value != oldscr_viewsize)
 	{
@@ -843,6 +853,7 @@ void SCR_UpdateScreen (void)
 		vid.recalc_refdef = 1;
 	}
 	
+	check();
 //
 // check for vid changes
 //
@@ -851,29 +862,34 @@ void SCR_UpdateScreen (void)
 		oldfov = scr_fov.value;
 		vid.recalc_refdef = true;
 	}
+	check();
 	
 	if (oldlcd_x != lcd_x.value)
 	{
 		oldlcd_x = lcd_x.value;
 		vid.recalc_refdef = true;
 	}
+	check();
 	
 	if (oldscreensize != scr_viewsize.value)
 	{
 		oldscreensize = scr_viewsize.value;
 		vid.recalc_refdef = true;
 	}
+	check();
 	
 	if (vid.recalc_refdef)
 	{
 	// something changed, so reorder the screen
 		SCR_CalcRefdef ();
 	}
+	check();
 
 //
 // do 3D refresh drawing, and then update the screen
 //
 	D_EnableBackBufferAccess ();	// of all overlay stuff if drawing directly
+	check();
 
 	if (scr_fullupdate++ < vid.numpages)
 	{	// clear the entire screen
@@ -881,69 +897,107 @@ void SCR_UpdateScreen (void)
 		Draw_TileClear (0,0,vid.width,vid.height);
 		Sbar_Changed ();
 	}
+	check();
 
 	pconupdate = NULL;
 
+	check();
 
 	SCR_SetUpToDrawConsole ();
+	check();
 	SCR_EraseCenterString ();
+	check();
 
 	D_DisableBackBufferAccess ();	// for adapters that can't stay mapped in
 									//  for linear writes all the time
+	check();
 
 	VID_LockBuffer ();
+	check();
 
+        /* overwrite happens in here --> */
 	V_RenderView ();
+	check();
 
 	VID_UnlockBuffer ();
+	check();
 
 	D_EnableBackBufferAccess ();	// of all overlay stuff if drawing directly
+	check();
 
 	if (scr_drawdialog)
 	{
 		Sbar_Draw ();
+	check();
 		Draw_FadeScreen ();
+	check();
 		SCR_DrawNotifyString ();
+	check();
 		scr_copyeverything = true;
 	}
 	else if (scr_drawloading)
 	{
+	check();
 		SCR_DrawLoading ();
+	check();
 		Sbar_Draw ();
+	check();
 	}
 	else if (cl.intermission == 1 && key_dest == key_game)
 	{
+	check();
 		Sbar_IntermissionOverlay ();
+	check();
 	}
 	else if (cl.intermission == 2 && key_dest == key_game)
 	{
+	check();
 		Sbar_FinaleOverlay ();
+	check();
 		SCR_CheckDrawCenterString ();
+	check();
 	}
 	else if (cl.intermission == 3 && key_dest == key_game)
 	{
+	check();
 		SCR_CheckDrawCenterString ();
+	check();
 	}
 	else
 	{
+	check();
 		SCR_DrawRam ();
+	check();
 		SCR_DrawNet ();
+	check();
 		SCR_DrawTurtle ();
+	check();
 		SCR_DrawPause ();
+	check();
 		SCR_CheckDrawCenterString ();
+	check();
 		Sbar_Draw ();
+	check();
 		SCR_DrawConsole ();
+	check();
 		M_Draw ();
+	check();
 	}
 
+	check();
 	D_DisableBackBufferAccess ();	// for adapters that can't stay mapped in
+	check();
 									//  for linear writes all the time
 	if (pconupdate)
 	{
+	check();
 		D_UpdateRects (pconupdate);
+	check();
 	}
 
+	check();
 	V_UpdatePalette ();
+	check();
 
 //
 // update one of three areas
@@ -979,6 +1033,7 @@ void SCR_UpdateScreen (void)
 	
 		VID_Update (&vrect);
 	}
+	check();
 }
 
 

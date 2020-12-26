@@ -13,12 +13,14 @@ extern int desired_bits;
 // SDL hereby demands `len' samples in stream, *NOW*!
 static void paint_audio(void *unused, Uint8 *stream, int len)
 {
+    check();
 	if ( shm ) {
 		shm->buffer = stream;
 		shm->samplepos += len/(shm->samplebits/8)/2;
 		// Check for samplepos overflow?
 		S_PaintChannels (shm->samplepos);
 	}
+        check();
 }
 
 qboolean SNDDMA_Init(void)

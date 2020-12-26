@@ -990,10 +990,12 @@ The player's clipping box goes from (-16 -16 -24) to (16 16 32) from
 the entity origin, so any view position inside that will be valid
 ==================
 */
+
 extern vrect_t	scr_vrect;
 
 void V_RenderView (void)
 {
+        check();
 	if (con_forcedup)
 		return;
 
@@ -1004,6 +1006,7 @@ void V_RenderView (void)
 		Cvar_Set ("scr_ofsy", "0");
 		Cvar_Set ("scr_ofsz", "0");
 	}
+        check();
 
 	if (cl.intermission)
 	{	// intermission / finale rendering
@@ -1014,8 +1017,10 @@ void V_RenderView (void)
 		if (!cl.paused /* && (sv.maxclients > 1 || key_dest == key_game) */ )
 			V_CalcRefdef ();
 	}
+        check();
 
 	R_PushDlights ();
+        check();
 
 	if (lcd_x.value)
 	{
@@ -1026,31 +1031,43 @@ void V_RenderView (void)
 
 		vid.rowbytes <<= 1;
 		vid.aspect *= 0.5;
+        check();
 
 		r_refdef.viewangles[YAW] -= lcd_yaw.value;
 		for (i=0 ; i<3 ; i++)
 			r_refdef.vieworg[i] -= right[i]*lcd_x.value;
+        check();
 		R_RenderView ();
+        check();
 
 		vid.buffer += vid.rowbytes>>1;
+        check();
 
 		R_PushDlights ();
+        check();
 
 		r_refdef.viewangles[YAW] += lcd_yaw.value*2;
+        check();
 		for (i=0 ; i<3 ; i++)
 			r_refdef.vieworg[i] += 2*right[i]*lcd_x.value;
+        check();
 		R_RenderView ();
+        check();
 
 		vid.buffer -= vid.rowbytes>>1;
+        check();
 
 		r_refdef.vrect.height <<= 1;
+        check();
 
 		vid.rowbytes >>= 1;
 		vid.aspect *= 2;
 	}
 	else
 	{
+        check();
 		R_RenderView ();
+        check();
 	}
 
 #ifndef GLQUAKE
@@ -1058,6 +1075,7 @@ void V_RenderView (void)
 		Draw_Character (scr_vrect.x + scr_vrect.width/2 + cl_crossx.value, 
 			scr_vrect.y + scr_vrect.height/2 + cl_crossy.value, '+');
 #endif
+        check();
 		
 }
 

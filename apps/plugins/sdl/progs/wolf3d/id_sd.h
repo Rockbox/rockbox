@@ -123,7 +123,7 @@ extern  int             DigiChannel[];
 
 #define GetTimeCount()  ((SDL_GetTicks()*7)/100)
 
-inline void Delay(int wolfticks)
+static void Delay(int wolfticks)
 {
     if(wolfticks>0) SDL_Delay(wolfticks * 100 / 7);
 }

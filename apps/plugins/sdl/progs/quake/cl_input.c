@@ -39,8 +39,8 @@ its key number as a parameter to the command so it can be matched up with
 the release.
 
 state bit 0 is the current state of the key
-state bit 1 is edge triggered on the up to down transition
-state bit 2 is edge triggered on the down to up transition
+state bit 1 is edge triggered on the up to down transition (aka impulse down)
+state bit 2 is edge triggered on the down to up transition (aka impulse up)
 
 ===============================================================================
 */
@@ -57,6 +57,10 @@ int			in_impulse;
 
 void KeyDown (kbutton_t *b)
 {
+    if(b == &in_forward) {
+        printf("KeyDown(in_forward)");
+        rb->splash(HZ, "Forward key down!");
+    }
 	int		k;
 	char	*c;
 
@@ -130,7 +134,13 @@ void IN_LeftDown(void) {KeyDown(&in_left);}
 void IN_LeftUp(void) {KeyUp(&in_left);}
 void IN_RightDown(void) {KeyDown(&in_right);}
 void IN_RightUp(void) {KeyUp(&in_right);}
-void IN_ForwardDown(void) {KeyDown(&in_forward);}
+void IN_ForwardDown(void) {
+    /* FW 12/7/20: This is getting erroneously called... its only
+     * callee relationship is as the handler for the +forward command
+     * -- so why is +forward being executed? */
+    rb->splashf(HZ, "IN_ForwardDown");
+    KeyDown(&in_forward);
+}
 void IN_ForwardUp(void) {KeyUp(&in_forward);}
 void IN_BackDown(void) {KeyDown(&in_back);}
 void IN_BackUp(void) {KeyUp(&in_back);}
@@ -178,6 +188,9 @@ float CL_KeyState (kbutton_t *key)
 	down = key->state & 1;
 	val = 0;
 
+        if(key == &in_forward && key->state & 1)
+            printf("forward key is down");
+
 	if (impulsedown && !impulseup) {
 		if (down)
 			val = 0.5;	// pressed and held this frame
@@ -202,6 +215,9 @@ float CL_KeyState (kbutton_t *key)
 
 	key->state &= 1;		// clear impulses
 
+        /* FW 12/7/20: This also has the erroneous value. */
+        //if(key == &in_forward)
+        //    printf("CL_KeyState(in_forward) -> %d / 4", (int)val * 4);
 	return val;
 }
 
@@ -352,7 +368,9 @@ void CL_SendMove (usercmd_t *cmd)
 
 	for (i=0 ; i<3 ; i++)
 		MSG_WriteAngle (&buf, cl.viewangles[i]);
-	
+
+        // FW 12/7/20: This has the erroneous value of 400 qu/s.
+        ///printf("client forward move: %d\n", (int)cmd->forwardmove);
     MSG_WriteShort (&buf, cmd->forwardmove);
     MSG_WriteShort (&buf, cmd->sidemove);
     MSG_WriteShort (&buf, cmd->upmove);

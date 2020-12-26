@@ -287,7 +287,7 @@ void Sys_SendKeyEvents(void)
                 // If we're not directly handled and still above 255
                 // just force it to 0
                 if(sym > 255) sym = 0;
-                Key_Event(sym, state);
+                Key_Event(sym, state); /* SDL_PRESSED=1, SDL_RELEASED=0 - FW 12/7/20 */
                 break;
 
             case SDL_MOUSEMOTION:
@@ -339,8 +339,11 @@ void IN_Commands (void)
     /* Quake swaps the second and third buttons */
     mouse_buttonstate = (i & ~0x06) | ((i & 0x02)<<1) | ((i & 0x04)>>1);
     for (i=0 ; i<3 ; i++) {
-        if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) )
+        if ( (mouse_buttonstate & (1<<i)) && !(mouse_oldbuttonstate & (1<<i)) ) {
+            rb->splashf(HZ, "mouse button %d pressed (wrong!) state = %d", i + 1, mouse_buttonstate);
+            rb->splashf(HZ, "SDL state = %d\n", SDL_GetMouseState(NULL, NULL));
             Key_Event (K_MOUSE1 + i, true);
+        }
 
         if ( !(mouse_buttonstate & (1<<i)) && (mouse_oldbuttonstate & (1<<i)) )
             Key_Event (K_MOUSE1 + i, false);

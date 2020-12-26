@@ -36,7 +36,9 @@ static Sint16 SDL_DeltaX = 0;
 static Sint16 SDL_DeltaY = 0;
 static Sint16 SDL_MouseMaxX = 0;
 static Sint16 SDL_MouseMaxY = 0;
-static Uint8  SDL_ButtonState = 0;
+
+/* Something else is overwriting this!?!?! */
+Uint8  SDL_ButtonState = 0;
 
 
 /* Public functions */
@@ -51,6 +53,8 @@ int SDL_MouseInit(void)
 	SDL_MouseMaxY = 0;
 	SDL_ButtonState = 0;
 
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_ButtonState = %d at point 3", SDL_ButtonState);
 	/* That's it! */
 	return(0);
 }
@@ -67,6 +71,9 @@ void SDL_ResetMouse(void)
 			SDL_PrivateMouseButton(SDL_RELEASED, i, 0, 0);
 		}
 	}
+
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_ButtonState = %d at point 4", SDL_ButtonState);
 }
 
 Uint8 SDL_GetMouseState (int *x, int *y)
@@ -77,6 +84,10 @@ Uint8 SDL_GetMouseState (int *x, int *y)
 	if ( y ) {
 		*y = SDL_MouseY;
 	}
+#if 0
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_GetMouseState -> %d (%d)", SDL_ButtonState, SDL_MouseMaxY);
+#endif
 	return(SDL_ButtonState);
 }
 
@@ -105,8 +116,14 @@ static void ClipOffset(Sint16 *x, Sint16 *y)
 
 void SDL_SetMouseRange(int maxX, int maxY)
 {
+
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_ButtonState = %d at point a", SDL_ButtonState);
 	SDL_MouseMaxX = (Sint16)maxX;
 	SDL_MouseMaxY = (Sint16)maxY;
+
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_ButtonState = %d at point b", SDL_ButtonState);
 }
 
 /* These are global for SDL_eventloop.c */
@@ -168,6 +185,8 @@ printf("Mouse event didn't change state - dropped!\n");
 	}
 
 	/* Update internal mouse state */
+        if(buttonstate)
+            rb->splashf(HZ, "SDL_PrivateMouseMotion setting button state=%d", buttonstate);
 	SDL_ButtonState = buttonstate;
 	SDL_MouseX = X;
 	SDL_MouseY = Y;
@@ -191,6 +210,10 @@ printf("Mouse event didn't change state - dropped!\n");
 			SDL_PushEvent(&event);
 		}
 	}
+
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_ButtonState = %d at point 1", SDL_ButtonState);
+
 	return(posted);
 }
 
@@ -244,6 +267,9 @@ int SDL_PrivateMouseButton(Uint8 state, Uint8 button, Sint16 x, Sint16 y)
 	}
 
 	/* Update internal mouse state */
+
+        if(buttonstate)
+            rb->splashf(HZ, "SDL_PrivateMouseButton setting button state=%d", buttonstate);
 	SDL_ButtonState = buttonstate;
 	if ( move_mouse ) {
 		SDL_MouseX = x;
@@ -263,6 +289,9 @@ int SDL_PrivateMouseButton(Uint8 state, Uint8 button, Sint16 x, Sint16 y)
 			SDL_PushEvent(&event);
 		}
 	}
+
+        if(SDL_ButtonState)
+            rb->splashf(HZ, "SDL_ButtonState = %d at point 2", SDL_ButtonState);
 	return(posted);
 }
 

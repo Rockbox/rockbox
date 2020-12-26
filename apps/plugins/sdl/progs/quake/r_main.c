@@ -999,7 +999,6 @@ void R_EdgeDrawing (void)
 		R_ScanEdges ();
 }
 
-
 /*
 ================
 R_RenderView
@@ -1009,46 +1008,64 @@ r_refdef must be set before the first call
 */
 void R_RenderView_ (void)
 {
+        check();
 	byte	warpbuffer[WARP_WIDTH * WARP_HEIGHT];
 
+        check();
 	r_warpbuffer = warpbuffer;
 
+        check();
 	if (r_timegraph.value || r_speeds.value || r_dspeeds.value)
 		r_time1 = Sys_FloatTime ();
 
+        check();
 	R_SetupFrame ();
 
+        check();
 #ifdef PASSAGES
 SetVisibilityByPassages ();
 #else
 	R_MarkLeaves ();	// done here so we know if we're in water
 #endif
 
+        check();
 // make FDIV fast. This reduces timing precision after we've been running for a
 // while, so we don't do it globally.  This also sets chop mode, and we do it
 // here so that setup stuff like the refresh area calculations match what's
 // done in screen.c
 	Sys_LowFPPrecision ();
 
+        check();
 	if (!cl_entities[0].model || !cl.worldmodel)
 		Sys_Error ("R_RenderView: NULL worldmodel");
 		
+        check();
 	if (!r_dspeeds.value)
 	{
 		VID_UnlockBuffer ();
+        check();
 		S_ExtraUpdate ();	// don't let sound get messed up if going slow
+        check();
 		VID_LockBuffer ();
+        check();
 	}
 	
+        check();
 	R_EdgeDrawing ();
+        check();
 
-        rb->yield(); // let sound run
+        //rb->yield(); // let sound run
         
+        check();
 	if (!r_dspeeds.value)
 	{
+        check();
 		VID_UnlockBuffer ();
+        check();
 		S_ExtraUpdate ();	// don't let sound get messed up if going slow
+        check();
 		VID_LockBuffer ();
+        check();
 	}
 	
 	if (r_dspeeds.value)
@@ -1057,54 +1074,69 @@ SetVisibilityByPassages ();
 		de_time1 = se_time2;
 	}
 
+        check();
 	R_DrawEntitiesOnList ();
 
+        check();
 	if (r_dspeeds.value)
 	{
 		de_time2 = Sys_FloatTime ();
 		dv_time1 = de_time2;
 	}
 
+        check();
 	R_DrawViewModel ();
 
+        check();
 	if (r_dspeeds.value)
 	{
 		dv_time2 = Sys_FloatTime ();
 		dp_time1 = Sys_FloatTime ();
 	}
 
+        check();
 	R_DrawParticles ();
 
+        check();
         rb->yield(); // let sound run
 
 	if (r_dspeeds.value)
 		dp_time2 = Sys_FloatTime ();
 
+        check();
 	if (r_dowarp)
 		D_WarpScreen ();
 
+        check();
 	V_SetContentsColor (r_viewleaf->contents);
 
+        check();
 	if (r_timegraph.value)
 		R_TimeGraph ();
 
+        check();
 	if (r_aliasstats.value)
 		R_PrintAliasStats ();
 		
+        check();
 	if (r_speeds.value)
 		R_PrintTimes ();
 
+        check();
 	if (r_dspeeds.value)
 		R_PrintDSpeeds ();
 
+        check();
 	if (r_reportsurfout.value && r_outofsurfaces)
 		Con_Printf ("Short %d surfaces\n", r_outofsurfaces);
 
 	if (r_reportedgeout.value && r_outofedges)
 		Con_Printf ("Short roughly %d edges\n", r_outofedges * 2 / 3);
 
+        check();
 // back to high floating-point precision
 	Sys_HighFPPrecision ();
+        check();
 }
 
 void R_RenderView (void)
@@ -1125,7 +1157,9 @@ void R_RenderView (void)
 	if ( (long)(&r_warpbuffer) & 3 )
 		Sys_Error ("Globals are missaligned");
 
+        check();
 	R_RenderView_ ();
+        check();
 }
 
 /*

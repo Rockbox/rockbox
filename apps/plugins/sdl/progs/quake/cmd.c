@@ -644,6 +644,20 @@ void	Cmd_ExecuteString (char *text, cmd_source_t src)
 	{
 		if (!Q_strcasecmp (cmd_argv[0],cmd->name))
 		{
+                    extern void IN_ForwardDown(void);
+                    if(cmd->function == IN_ForwardDown)
+                    {
+                        /* FW 12/7/20: The offending command is:
+                         *
+                         *  +forward 201 (source = src_command)
+                         *
+                         * This is the key -- 201 is the code for
+                         * MOUSE2 -- which rockbox doesn't have. Is
+                         * SDL perhaps generating this erroneously?
+                         */
+                        rb->splashf(HZ, "Executing IN_ForwardDown!");
+                        rb->splashf(HZ * 2, "Part of command: '%s' (source=%d)", text, src);
+                    }
 			cmd->function ();
 			return;
 		}

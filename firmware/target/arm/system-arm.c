@@ -104,8 +104,9 @@ static void piezo_tone(uint32_t period /*uS*/, int32_t duration /*ms*/)
     GPIOCMD = 0x0060e;
 }
 
-#define HI 1136
-#define LO 2272
+/* peak frequency response is around 3400-3900 Hz */
+#define HI 263
+#define LO 285
 
 void beep_int(unsigned int n)
 {
@@ -122,6 +123,11 @@ void beep_int(unsigned int n)
 
 void NORETURN_ATTR UIE(unsigned int pc, unsigned int num)
 {
+    for(;;)
+    {
+        beep_int(0x55555555);
+    }
+
     register unsigned address;
     /* read FAR (fault address register) */
     asm volatile( "mrc p15, 0, %0, c6, c0\n" : "=r"(address));

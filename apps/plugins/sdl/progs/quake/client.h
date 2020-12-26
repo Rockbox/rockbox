@@ -24,6 +24,13 @@ typedef struct
 	vec3_t	viewangles;
 
 // intended velocities
+    /*
+     * FW 12/7/20: It seems that these are stored as 32-bit floats,
+     * but are transmitted/received as 16-bit short integers!?!? See
+     * sv_user.c and cl_input.c.
+     *
+     * WTF?
+     */
 	float	forwardmove;
 	float	sidemove;
 	float	upmove;

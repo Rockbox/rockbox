@@ -1372,7 +1372,7 @@ void GP2X_ButtonUp(int button);
 =============================================================================
 */
 
-static inline fixed FixedMul(fixed a, fixed b)
+static fixed FixedMul(fixed a, fixed b)
 {
 	return (fixed)(((int64_t)a * b + 0x8000) >> 16);
 }
@@ -1394,13 +1394,13 @@ static inline fixed FixedMul(fixed a, fixed b)
 
 #define CHECKMALLOCRESULT(x) if(!(x)) Quit("Out of memory at %s:%i", __FILE__, __LINE__)
 
-static inline char* itoa(int value, char* string, int radix)
+static char* itoa(int value, char* string, int radix)
 {
 	sprintf(string, "%d", value);
 	return string;
 }
 
-static inline char* ltoa(long value, char* string, int radix)
+static char* ltoa(long value, char* string, int radix)
 {
 	sprintf(string, "%ld", value);
 	return string;
@@ -1409,14 +1409,14 @@ static inline char* ltoa(long value, char* string, int radix)
 #define lengthof(x) (sizeof(x) / sizeof(*(x)))
 #define endof(x)    ((x) + lengthof(x))
 
-static inline word READWORD(byte **ptr)
+static word READWORD(byte **ptr)
 {
     word val = (*ptr)[0] | (*ptr)[1] << 8;
     *ptr += 2;
     return val;
 }
 
-static inline longword READLONGWORD(byte **ptr)
+static longword READLONGWORD(byte **ptr)
 {
     longword val = (*ptr)[0] | (*ptr)[1] << 8 | (*ptr)[2] << 16 | (*ptr)[3] << 24;
     *ptr += 4;
@@ -1454,7 +1454,7 @@ static inline longword READLONGWORD(byte **ptr)
      *************************************************************/
 
     // The feature flags are stored as a wall in the upper right corner of each level
-    static inline word GetFeatureFlags()
+    static word GetFeatureFlags()
     {
         return ffDataTopRight;
     }

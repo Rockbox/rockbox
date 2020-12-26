@@ -640,13 +640,14 @@ void _Host_Frame (float time)
 	if (setjmp (host_abortserver) )
 		return;			// something bad happened, or the server disconnected
 
+        
 // keep the random time dependent
 	rand ();
 	
 // decide the simulation time
 	if (!Host_FilterTime (time))
 		return;			// don't run too fast, or packets will flood out
-		
+
 // get new key events
 	Sys_SendKeyEvents ();
 
@@ -661,6 +662,7 @@ void _Host_Frame (float time)
 // if running the server locally, make intentions now
 	if (sv.active)
 		CL_SendCmd ();
+
 	
 //-------------------
 //
@@ -696,7 +698,8 @@ void _Host_Frame (float time)
 // update video
 	if (host_speeds.value)
 		time1 = Sys_FloatTime ();
-		
+
+        /* overwrite is happening in here --> */
 	SCR_UpdateScreen ();
 
 	if (host_speeds.value)

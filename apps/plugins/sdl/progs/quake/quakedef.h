@@ -24,6 +24,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "SDL.h"
 #include <stdarg.h>
 #include <setjmp.h>
+#define check() do {                                                    \
+    extern uint8_t SDL_ButtonState;                                     \
+    if(SDL_ButtonState) {                                               \
+        *(char*)NULL = 0;                                               \
+        rb->splashf(3 * HZ, "state = %d in %s:%d", SDL_ButtonState, __func__, __LINE__); \
+    }                                                                   \
+} while(0)
 
 #define FIXEDPOINT_OPT // FW: enable fixed-point optimizations
 
