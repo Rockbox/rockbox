@@ -138,10 +138,10 @@ void BootloaderInstallS5l::installStageWaitForEject(void)
     }
     if (!scanSuccess) {
         if (!actionShown) {
-            emit logItem(tr("Action required:\n"
-                            "  Please make sure no programs are accessing\n"
-                            "  files on the device. If ejecting still fails\n"
-                            "  please use your computers eject funtionality."),
+            emit logItem(tr("Action required:\n\n"
+                            "Please make sure no programs are accessing "
+                            "files on the device. If ejecting still fails "
+                            "please use your computers eject functionality."),
                             LOGWARNING);
             actionShown = true;
         }
@@ -168,8 +168,8 @@ void BootloaderInstallS5l::installStageWaitForProcs(void)
     }
     if (!scanSuccess) {
         if (!actionShown) {
-            emit logItem(tr("Action required:\n"
-                            "  Quit iTunes application."), LOGWARNING);
+            emit logItem(tr("Action required:\n\n"
+                            "Quit iTunes application."), LOGWARNING);
             actionShown = true;
         }
         QTimer::singleShot(250, this, &BootloaderInstallS5l::installStageWaitForProcs);
@@ -189,7 +189,7 @@ void BootloaderInstallS5l::installStageWaitForProcs(void)
 #endif
     suspendedPids = Utils::suspendProcess(helperPids, true);
     if (suspendedPids.size() != helperPids.size()) {
-        emit logItem(tr("Could not suspend iTunesHelper. Stop it\n"
+        emit logItem(tr("Could not suspend iTunesHelper. Stop it "
                         "using the Task Manager, and try again."), LOGERROR);
         emit done(true);
         return;
@@ -215,11 +215,11 @@ void BootloaderInstallS5l::installStageWaitForSpindown(void)
 
     LOG_INFO() << "preparing installStageWaitForDfu";
     emit logItem(tr("Waiting for DFU mode..."), LOGINFO);
-    emit logItem(tr("Action required:\n"
-                    "  Press and hold SELECT+MENU buttons, after\n"
-                    "  about 12 seconds a new action will require\n"
-                    "  you to release the buttons, DO IT QUICKLY,\n"
-                    "  otherwise the process could fail."), LOGWARNING);
+    emit logItem(tr("Action required:\n\n"
+                    "Press and hold SELECT+MENU buttons, after "
+                    "about 12 seconds a new action will require "
+                    "you to release the buttons, DO IT QUICKLY, "
+                    "otherwise the process could fail."), LOGWARNING);
     scanTimer.invalidate();
     installStageWaitForDfu();
 }
@@ -240,8 +240,8 @@ void BootloaderInstallS5l::installStageWaitForDfu(void)
     }
     emit logItem(tr("DFU mode detected."), LOGINFO);
 
-    emit logItem(tr("Action required:\n"
-                    "  Release SELECT+MENU buttons and wait..."), LOGWARNING);
+    emit logItem(tr("Action required:\n\n"
+                    "Release SELECT+MENU buttons and wait..."), LOGWARNING);
 
     // Once the iPod enters DFU mode, the device will reset again if
     // SELECT+MENU remains pressed for another 8 seconds. To avoid a
@@ -265,8 +265,8 @@ void BootloaderInstallS5l::installStageSendDfu(void)
 
     if (!System::listUsbIds().contains(0x05ac1223)) {
         LOG_ERROR() << "device not in DFU mode";
-        emit logItem(tr("Device is not in DFU mode. It seems that\n"
-                        "the previous required action failed, please\n"
+        emit logItem(tr("Device is not in DFU mode. It seems that "
+                        "the previous required action failed, please "
                         "try again."), LOGERROR);
         emit done(true);
         return;
@@ -282,8 +282,8 @@ void BootloaderInstallS5l::installStageSendDfu(void)
 #if defined(Q_OS_WIN32)
         if (strstr(errstr, "DFU device not found"))
         {
-            emit logItem(tr("No valid DFU USB driver found.\n"
-                            "Install iTunes (or the Apple Device Driver)\n"
+            emit logItem(tr("No valid DFU USB driver found.\n\n"
+                            "Install iTunes (or the Apple Device Driver) "
                             "and try again."),
                             LOGERROR);
         }
@@ -318,12 +318,12 @@ void BootloaderInstallS5l::installStageWaitForRemount(void)
     }
     if (!scanSuccess) {
         if (!actionShown && (progressTimer.elapsed() > progressTimeout)) {
-            emit logItem(tr("Action required:\n"
-                            "  Could not remount the device, try to do it\n"
-                            "  manually. If the iPod didn't restart, force\n"
-                            "  a reset by pressing SELECT+MENU buttons\n"
-                            "  for about 5 seconds. If the problem could\n"
-                            "  not be solved then click 'Abort' to cancel."),
+            emit logItem(tr("Action required:\n\n"
+                            "Could not remount the device, try to do it "
+                            "manually. If the iPod didn't restart, force "
+                            "a reset by pressing SELECT+MENU buttons "
+                            "for about 5 seconds. If the problem could "
+                            "not be solved then click 'Abort' to cancel."),
                             LOGWARNING);
             actionShown = true;
         }
