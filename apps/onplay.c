@@ -949,7 +949,9 @@ static int remove_dir(struct dirrecurse_params *parm)
 /* share code for file and directory deletion, saves space */
 static int delete_file_dir(void)
 {
-    if (confirm_delete(selected_file) != YESNO_YES) {
+    const char *to_delete=selected_file;
+    const int   to_delete_attr=selected_file_attr;
+    if (confirm_delete(to_delete) != YESNO_YES) {
         return 1;
     }
 
@@ -958,9 +960,9 @@ static int delete_file_dir(void)
 
     int rc = -1;
 
-    if (selected_file_attr & ATTR_DIRECTORY) { /* true if directory */
+    if (to_delete_attr & ATTR_DIRECTORY) { /* true if directory */
         struct dirrecurse_params parm;
-        parm.append = strlcpy(parm.path, selected_file, sizeof (parm.path));
+        parm.append = strlcpy(parm.path, to_delete, sizeof (parm.path));
 
         if (parm.append < sizeof (parm.path)) {
             cpu_boost(true);
@@ -968,7 +970,7 @@ static int delete_file_dir(void)
             cpu_boost(false);
         }
     } else {
-        rc = remove(selected_file);
+        rc = remove(to_delete);
     }
 
     if (rc < OPRC_SUCCESS) {
