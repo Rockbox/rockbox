@@ -299,7 +299,7 @@ if ($hiby) {
     open UPDATEO, ">$versionname.new" || die ("Can't open version.txt!");
 
     while (<UPDATE>) {
-	s/ver=1\.0\.0\.0/ver=2018-10-07T00:00:00+08:00/;
+	s/ver=1\.0\.0\.0/ver=ver=2018-10-07T00:00:00+08:00/;
 	print UPDATEO;
     }
 
