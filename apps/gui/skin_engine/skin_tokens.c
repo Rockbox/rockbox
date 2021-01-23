@@ -598,7 +598,7 @@ static const char* NOINLINE get_lif_token_value(struct gui_wps *gwps,
             break;
         }
         case INTEGER:
-            if (!number_set && out_text && *out_text >= '0' && *out_text <= '9')
+            if (!number_set && out_text && ((*out_text >= '0' && *out_text <= '9') || *out_text == '-'))
                 a = atoi(out_text);
             /* fall through */
         case PERCENT:
