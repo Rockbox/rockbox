@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f20ff906_2fe3e79c",
+        "filename": "apps/gui/skin_engine/skin_tokens.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-01-26T20:45:44Z",
+      "side": 1,
+      "message": "Instead of this you\u0027d want something like:\n\n(*out_text \u003d\u003d \u0027-\u0027 \u0026\u0026 isDigit(out_text[1]))",
+      "range": {
+        "startLine": 601,
+        "startChar": 86,
+        "endLine": 601,
+        "endChar": 103
+      },
+      "revId": "ba02bebfd5859bc7e06b4729434d8bef552a37af",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
