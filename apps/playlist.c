@@ -3428,7 +3428,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
     return result;
 }
 
-int playlist_reverse(struct playlist_info* playlist, bool start_current)
+int playlist_reverse(struct playlist_info* playlist)
 {
     struct node *prevNode, *curNode;
 
