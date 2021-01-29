@@ -271,7 +271,7 @@ extract() {
     elif [ -f "$dlwhere/$1.tar.xz" ]; then
         tar xJf "$dlwhere/$1.tar.xz"
     else
-        echo "ROCKBOXDEV: I don't know how to extract $1 (no bzip2 or gzip)"
+        echo "ROCKBOXDEV: unknown compression for $1"
         exit
     fi
 }
