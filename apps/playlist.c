@@ -1236,6 +1236,15 @@ static int compare(const void* p1, const void* p2)
         return *e1 - *e2;
 }
 
+static int compare_descending(const void* p1, const void* p2)
+{
+    unsigned long* e1 = (unsigned long*) p1;
+    unsigned long* e2 = (unsigned long*) p2;
+    if (e1 < e2) return -1;
+    else if (e1 == e2) return 0;
+    else return 1;
+}
+
 #ifdef HAVE_DIRCACHE
 /**
  * Thread to update filename pointers to dircache on background
@@ -3428,28 +3437,42 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
     return result;
 }
 
-int playlist_reverse(struct playlist_info* playlist)
+int playlist_reverse(struct playlist_info* playlist, bool start_current)
 {
-    struct node *prevNode, *curNode;
 
-    if(playlist != NULL)
+
+    if(!playlist)
+        playlist = &current_playlist;
+
+    unsigned int current = playlist->indices[playlist->index];
+
+//    unsigned int current = playlist->indices[playlist->index];
+
+    if (playlist->amount > 0)
+        qsort((void*)playlist->indices, playlist->amount,
+              sizeof(playlist->indices[0]), compare_descending);
+
+#ifdef HAVE_DIRCACHE
+    /** We need to re-check the song names from disk because qsort can't
+     * sort two arrays at once :/
+     * FIXME: Please implement a better way to do this. */
+    copy_filerefs(playlist->dcfrefs, NULL, playlist->max_playlist_size);
+    queue_post(&playlist_queue, PLAYLIST_LOAD_POINTERS, 0);
+#endif
+
+    if (start_current)
+        find_and_set_playlist_index(playlist, current);
+
+    /* indices have been moved so last insert position is no longer valid */
+    playlist->last_insert_pos = -1;
+
+    if (!playlist->num_inserted_tracks && !playlist->deleted)
+        playlist->shuffle_modified = false;
+    if (playlist->control_fd >= 0)
     {
-        prevNode = playlist;
-        curNode = playlist->next;
-        playlist = playlist->next;
-
-        prevNode->next = NULL; // Make first node as last node
-
-        while(playlist != NULL)
-        {
-            playlist = playlist->next;
-            curNode->next = prevNode;
-
-            prevNode = curNode;
-            curNode = head;
-        }
-
-        playlist = prevNode; // Make last node as head
+        playlist->first_index = 0;
+        update_control(playlist, PLAYLIST_COMMAND_UNSHUFFLE,
+                       playlist->first_index, -1, NULL, NULL, NULL);
     }
 
     return 0;

@@ -169,7 +169,7 @@ int playlist_move(struct playlist_info* playlist, int index, int new_index);
 int playlist_randomise(struct playlist_info* playlist, unsigned int seed,
                        bool start_current);
 int playlist_sort(struct playlist_info* playlist, bool start_current);
-int playlist_reverse(struct playlist_info* playlist);
+int playlist_reverse(struct playlist_info* playlist, bool start_current);
 bool playlist_modified(const struct playlist_info* playlist);
 int playlist_get_first_index(const struct playlist_info* playlist);
 int playlist_get_seed(const struct playlist_info* playlist);
