@@ -707,12 +707,12 @@ if [ -n "$missingtools" ]; then
     exit 1
 fi
 
-echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD or use --download= to change)"
+echo "Download directory : $dlwhere (set RBDEV_DOWNLOAD or use --dlwhere= to change)"
 echo "Install prefix     : $prefix  (set RBDEV_PREFIX or use --prefix= to change)"
 echo "Build dir          : $builddir (set RBDEV_BUILD or use --builddir= to change)"
 echo "Make options       : $MAKEFLAGS (set MAKEFLAGS or use --makeflags= to change)"
 echo "Restart step       : $RBDEV_RESTART (set RBDEV_RESTART or use --restart= to change)"
-echo "Target arch        : $RBDEV_TARGET (set RBDEV_TARGET or use --target to change)"
+echo "Target arch        : $RBDEV_TARGET (set RBDEV_TARGET or use --target= to change)"
 
 # Verify download directory
 if test -d "$dlwhere"; then
