@@ -1965,16 +1965,26 @@ drivers/touchpad.c
 
 /* firmware/kernel section */
 #ifdef HAVE_CORELOCK_OBJECT
+#ifdef HAVE_PTHREAD
+kernel/pthread/corelock.c
+#else
 kernel/corelock.c
 #endif
+#endif
 kernel/mrsw_lock.c
+#ifdef HAVE_PTHREAD
+kernel/pthread/mutex.c
+#else
 kernel/mutex.c
+#endif
 kernel/queue.c
 #ifdef HAVE_SEMAPHORE_OBJECTS
 kernel/semaphore.c
 #endif
 #if defined(HAVE_SDL_THREADS)
 target/hosted/sdl/thread-sdl.c
+#elif defined(HAVE_PTHREAD)
+kernel/pthread/thread.c
 #else
 kernel/thread.c
 #endif

@@ -31,6 +31,10 @@ struct mutex
     struct blocker      blocker;   /* priority inheritance info
                                       for waiters and owner*/
     IF_COP( struct corelock cl; )  /* multiprocessor sync */
+
+#ifdef HAVE_PTHREAD
+    pthread_mutex_t mutex;
+#endif
 };
 
 extern void mutex_init(struct mutex *m);
