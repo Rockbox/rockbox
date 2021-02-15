@@ -446,6 +446,8 @@ static bool playing_time(void)
 /* CONTEXT_WPS playlist options */
 static bool shuffle_playlist(void)
 {
+    if (!warn_on_pl_erase())
+        return false;
     playlist_sort(NULL, true);
     playlist_randomise(NULL, current_tick, true);
 
