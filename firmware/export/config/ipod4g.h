@@ -231,7 +231,7 @@
  * writes appear to be ~25% slower.
  */
 #ifndef BOOTLOADER
-#define HAVE_ATA_DMA
+/* Switched off due to reported instabilities. #define HAVE_ATA_DMA */
 #endif
 
 /* Define this, if you can switch on/off the lineout */
