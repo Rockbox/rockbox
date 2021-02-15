@@ -809,6 +809,19 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
+    /* "active" here means "spinning and needs to be shut down" */
+
+    /* SSDs are considered always "inactive" */
+    if (ata_disk_isssd())
+        return false;
+
+    /* We can't directly detect the common iFlash adapters, but they
+       don't claim to support powermanagement.  Without ATA power
+       management we can never spin down anyway, so there's
+       no point in even trying. */
+    if (!(identify_info[82] & (1 << 3)))
+        return false;
+
     return ata_state >= ATA_SPINUP;
 }
 
