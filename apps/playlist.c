@@ -858,10 +858,10 @@ static int directory_search_callback(char* filename, void* context)
     
     (c->count)++;
     
-    /* Make sure tracks are inserted in correct order if user requests
-       INSERT_FIRST */
-    if (c->position == PLAYLIST_INSERT_FIRST || c->position >= 0)
-        c->position = insert_pos + 1;
+    /* After first INSERT_FIRST switch to INSERT so that all the
+    rest of the tracks get inserted one after the other */
+    if (c->position == PLAYLIST_INSERT_FIRST)
+        c->position = PLAYLIST_INSERT;
     
     if (((c->count)%PLAYLIST_DISPLAY_COUNT) == 0)
     {
@@ -3189,10 +3189,10 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
                 break;
             }
 
-            /* Make sure tracks are inserted in correct order if user
-               requests INSERT_FIRST */
-            if (position == PLAYLIST_INSERT_FIRST || position >= 0)
-                position = insert_pos + 1;
+            /* After first INSERT_FIRST switch to INSERT so that all the
+            rest of the tracks get inserted one after the other */
+            if (position == PLAYLIST_INSERT_FIRST)
+                position = PLAYLIST_INSERT;
 
             count++;
             
