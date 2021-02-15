@@ -475,7 +475,7 @@ MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
 /* CONTEXT_[TREE|ID3DB] playlist options */
 static bool add_to_playlist(int position, bool queue)
 {
-    bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY);
+    bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY) && (global_status.resume_index == -1 || playlist_resume() == -1);
     const char *lines[] = {
         ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
         selected_file
