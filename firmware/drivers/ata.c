@@ -809,6 +809,11 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
+    /* Indicate inactive disk if the device doesn't support
+    power management. */
+    if (!(identify_info[82] & (1 << 3)))
+        return false;
+    
     return ata_state >= ATA_SPINUP;
 }
 
