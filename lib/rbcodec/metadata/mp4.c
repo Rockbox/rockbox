@@ -758,7 +758,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
                Ignore them. */
             if(size == 0)
                 break;
-            id3->filesize = size;
+            /* mdat chunks accumulate! */
+            id3->filesize += size;
             if(id3->samples > 0) {
                 /* We've already seen the moov chunk. */
                 done = true;
