@@ -2608,7 +2608,6 @@ void playlist_start(int start_index, unsigned long elapsed,
     playlist->started = true;
     sync_control(playlist, false);
     audio_play(elapsed, offset);
-    audio_resume();
 }
 
 /* Returns false if 'steps' is out of bounds, else true */
