@@ -63,7 +63,7 @@
 /* Maximum multi-word DMA mode supported by the controller */
 #define ATA_MAX_MWDMA 2
 
-#ifndef BOOTLOADER    
+#if !defined(BOOTLOADER) && !defined(IPOD_4G)
 /* The PP5020 supports UDMA 4, but it needs cpu boosting and only
  * improves performance by ~10% with a stock disk.
  * UDMA 2 is stable at 30 Mhz.
@@ -77,7 +77,8 @@
 #error "CPU speeds under 24Mhz have not been tested with DMA"
 #endif
 #else
-/* The bootloader runs at 24 Mhz and needs a slower mode */
+/* A slower mode is used on iPod 4Gs due to reported instabilities.
+The bootloader runs at 24 Mhz and always needs a slower mode */
 #define ATA_MAX_UDMA 1
 #endif
 
