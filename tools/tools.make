@@ -38,7 +38,7 @@ $(TOOLSDIR)/uclpack: $(TOOLSDIR)/ucl/uclpack.c $(wildcard $(TOOLSDIR)/ucl/src/*.
 $(TOOLSDIR)/convttf: $(TOOLSDIR)/convttf.c
 	$(call PRINTS,CC $(@F))
 	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -lm -O2 -Wall -g $+ -o $@ \
-		`freetype-config --libs` `freetype-config --cflags`
+		`pkg-config --cflags --libs freetype2`
 
 # implicit rule for simple tools
 $(TOOLSDIR)/%: $(TOOLSDIR)/%.c

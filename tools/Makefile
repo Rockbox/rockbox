@@ -94,7 +94,7 @@ usb_benchmark: usb_benchmark.c
 convttf: convttf.c
 	$(call PRINTS,CC $(@F))
 	$(SILENT)$(CC) $(CFLAGS) -lm -std=c99 -O2 -Wall -g $+ -o $@ \
-		`freetype-config --libs` `freetype-config --cflags`
+		`pkg-config --cflags --libs freetype2`
 
 clean:
 	@echo "Cleaning tools"
