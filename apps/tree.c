@@ -638,6 +638,7 @@ static int dirbrowse(void)
         return GO_TO_PREVIOUS;  /* No files found for rockbox_browse() */
     }
 
+    send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
     gui_synclist_draw(&tree_lists);
     while(1) {
         bool restore = false;
