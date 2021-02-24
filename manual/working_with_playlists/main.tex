@@ -49,10 +49,9 @@ song.
   playlist, see the section below on how to add music to a playlist.}
 
 \subsubsection{By using Insert and Queue functions}
-If playback is stopped, the \setting{Insert} and \setting{Queue} functions
-can be used as described in \ref{ref:playlist_submenu}
-to create a new playlist instead of adding to an existing one.
-This will \emph{erase} any dynamic playlist.
+If a dynamic playlist has finished playing, the \setting{Insert} and 
+\setting{Queue} functions as described in \ref{ref:playlist_submenu} will 
+\emph{replace} it with the selected tracks instead of adding to it.
 
 \subsubsection{\label{ref:playlist_catalogue}By using the Playlist catalogue}
 The \setting{Playlist catalogue} makes it possible to modify and create
@@ -91,8 +90,8 @@ options:
 \item [Insert.] Add track(s) immediately after any tracks added via the most
   recent \setting{Insert} operation. If no tracks have yet been added via an
   \setting{Insert}, new tracks will be added immediately after the current
-  playing track. If playback is stopped a new dynamic playlist will get
-  created with the selected tracks.
+  playing track. If the dynamic playlist has finished playing, 
+  it will be \emph{replaced} with the selected tracks.
   
 \item [Insert Next.] Add track(s) immediately after current playing
   track, no matter what else has been inserted.
