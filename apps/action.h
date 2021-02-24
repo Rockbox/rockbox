@@ -245,6 +245,8 @@ enum {
     ACTION_QS_RIGHT,
     ACTION_QS_DOWN,
     ACTION_QS_TOP,
+    ACTION_QS_VOLUP,
+    ACTION_QS_VOLDOWN,
 
     /* pitchscreen */
     /* obviously ignore if you dont have thise screen */
