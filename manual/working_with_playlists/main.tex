@@ -49,10 +49,9 @@ song.
   playlist, see the section below on how to add music to a playlist.}
 
 \subsubsection{By using Insert and Queue functions}
-If playback is stopped, the \setting{Insert} and \setting{Queue} functions
-can be used as described in \ref{ref:playlist_submenu}
-to create a new playlist instead of adding to an existing one.
-This will \emph{erase} any dynamic playlist.
+If a dynamic playlist has finished playing, the \setting{Insert} and
+\setting{Queue} functions as described in \ref{ref:playlist_submenu} will
+\emph{replace} the playlist with the selected tracks instead of adding to it.
 
 \subsubsection{\label{ref:playlist_catalogue}By using the Playlist catalogue}
 The \setting{Playlist catalogue} makes it possible to modify and create
@@ -80,23 +79,23 @@ in the \setting{Main Menu}. The created playlist will be named
 \screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{}
 The \setting{Playlist Submenu} is a submenu in the \setting{Context Menu} (see
 \reference{ref:Contextmenu}), it allows you to put tracks into a
-``dynamic playlist''. If there is no music currently playing, Rockbox will
+``dynamic playlist''. If the current playlist has finished playing, Rockbox will
 create a new dynamic playlist and put the selected track(s) into it.
 If there is music currently playing, Rockbox will put the
 selected track(s) into the current playlist. The place in which the newly
 selected tracks are added to the playlist is determined by the following
 options:
 
-\begin{description} 
+\begin{description}
 \item [Insert.] Add track(s) immediately after any tracks added via the most
   recent \setting{Insert} operation. If no tracks have yet been added via an
   \setting{Insert}, new tracks will be added immediately after the current
-  playing track. If playback is stopped a new dynamic playlist will get
-  created with the selected tracks.
-  
+  playing track. If a dynamic playlist has finished playing,
+  it will be \emph{replaced} by the selected track(s).
+
 \item [Insert Next.] Add track(s) immediately after current playing
   track, no matter what else has been inserted.
-  
+
 \item [Insert Last.] Add track(s) to end of playlist.
 
 \item [Insert Shuffled.] Add track(s) to the playlist in a random order.
