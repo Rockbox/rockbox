@@ -26,6 +26,7 @@
 #include "font.h"
 #include "kernel.h"
 #include "misc.h"
+#include "sound.h"
 #include "action.h"
 #include "settings_list.h"
 #include "lang.h"
@@ -361,7 +362,14 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         }
         else if (button == button_enter)
             can_quit = true;
-
+        else if (button == ACTION_QS_VOLUP) {
+            global_settings.volume += sound_steps(SOUND_VOLUME);
+            setvol();
+        }
+        else if (button == ACTION_QS_VOLDOWN) {
+            global_settings.volume -= sound_steps(SOUND_VOLUME);
+            setvol();
+        }
         if ((button == button_enter) && can_quit)
             break;
 
