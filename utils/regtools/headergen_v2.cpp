@@ -1004,6 +1004,9 @@ bool common_generator::generate_macro_header(error_context_t& ectx)
     print_guard(fout, guard, true);
     fout << "\n";
 
+    /* ensure that types uintXX_t are defined */
+    fout << "#include <stdint.h>\n\n";
+
     /* print variadic OR macros:
      * __VAR_OR1(prefix, suffix) expands to prefix##suffix
      * and more n>=2, using multiple layers of macros:
