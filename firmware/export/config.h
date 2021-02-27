@@ -82,6 +82,7 @@
 #define AS3525v2    35252
 #define IMX233        233
 #define RK27XX       2700
+#define X1000        1000
 
 /* platforms
  * bit fields to allow PLATFORM_HOSTED to be OR'ed e.g. with a
@@ -165,6 +166,7 @@
 #define XDUOO_X20_PAD      70
 #define FIIO_M3K_LINUX_PAD 71
 #define EROSQ_PAD          72
+#define FIIO_M3K_PAD       73
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -281,6 +283,7 @@
 #define LCD_IHIFI770      66 /* as used by IHIFI 770 */
 #define LCD_IHIFI770C     67 /* as used by IHIFI 770C */
 #define LCD_IHIFI800      68 /* as used by IHIFI 800 */
+#define LCD_FIIOM3K       69 /* as used by the FiiO M3K */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -320,6 +323,7 @@ Lyre prototype 1 */
 #define I2C_S5L8702 16 /* Same as S5L8700, but with two channels */
 #define I2C_IMX233  17
 #define I2C_RK27XX  18
+#define I2C_X1000   19
 
 /* CONFIG_LED */
 #define LED_REAL     1 /* SW controlled LED (Archos recorders, player) */
@@ -356,6 +360,7 @@ Lyre prototype 1 */
 #define RTC_IMX233   20
 #define RTC_STM41T62 21 /* ST M41T62 */
 #define RTC_JZ4760   22 /* Ingenic Jz4760 */
+#define RTC_X1000    23 /* Ingenic X1000 */
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */
@@ -605,6 +610,8 @@ Lyre prototype 1 */
 #include "config/xduoox20.h"
 #elif defined(FIIO_M3K_LINUX)
 #include "config/fiiom3klinux.h"
+#elif defined(FIIO_M3K)
+#include "config/fiiom3k.h"
 #elif defined(EROS_Q)
 #include "config/aigoerosq.h"
 #else

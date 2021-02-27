@@ -25,7 +25,7 @@
 #include "system.h"
 #include "mmu-mips.h"
 
-#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B || CONFIG_CPU == X1000
 /* XBurst core has 32 JTLB entries */
 #define NR_TLB_ENTRIES  32
 #else
@@ -134,7 +134,7 @@ void mmu_init(void)
 /* Target specific operations:
  * - invalidate BTB (Branch Table Buffer)
  * - sync barrier after cache operations */
-#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B
+#if CONFIG_CPU == JZ4732 || CONFIG_CPU == JZ4760B || CONFIG_CPU == X1000
 #define INVALIDATE_BTB()                     \
 do {                                         \
         register unsigned long tmp;          \

@@ -121,6 +121,77 @@ node LCD {
     reg SMWT 0xbc
 }
 
+node AIC {
+    title "Audio interface controller"
+    addr 0xb0020000
+
+    reg CFG 0x00 {
+        fld 27 24 RFTH
+        fld 20 16 TFTH
+        bit    12 MSB
+        bit    10 IBCKD
+        bit     9 ISYNCD
+        bit     8 DMODE
+        bit     7 CDC_SLAVE
+        bit     6 LSMP
+        bit     5 ICDC
+        bit     4 AUSEL
+        bit     3 RST
+        bit     2 BCKD
+        bit     1 SYNCD
+        bit     0 ENABLE
+    }
+
+    reg CCR 0x04 {
+        bit    28 PACK16
+        fld 26 24 CHANNEL
+        fld 21 19 OSS
+        fld 18 16 ISS
+        bit    15 RDMS
+        bit    14 TDMS
+        bit    11 M2S
+        bit    10 ENDSW
+        bit     9 ASVTSU
+        bit     8 TFLUSH
+        bit     7 RFLUSH
+        bit     6 EROR
+        bit     5 ETUR
+        bit     4 ERFS
+        bit     3 ETFS
+        bit     2 ENLBF
+        bit     1 ERPL
+        bit     0 EREC
+    }
+
+    reg I2SCR 0x10 {
+        bit 17 RFIRST
+        bit 16 SWLH
+        bit 13 ISTPBK
+        bit 12 STPBK
+        bit  4 ESCLK
+        bit  0 AMSL
+    }
+
+    reg SR 0x14 {
+        fld 29 24 RFL
+        bit 13  8 TFL
+        bit     6 ROR
+        bit     5 TUR
+        bit     4 RFS
+        bit     3 TFS
+    }
+
+    reg I2SSR 0x1c {
+        bit 5 CHBSY
+        bit 4 TBSY
+        bit 3 RBSY
+        bit 2 BSY
+    }
+
+    reg I2SDIV 0x30
+    reg DR 0x34
+}
+
 node DDRC {
     title "DDR controller AHB2 group"
     desc "note: incomplete, only lists registers used by DDR init code"
@@ -185,6 +256,108 @@ node DDRPHY {
     reg DXGCR { instance 0x1c0 0x40 4 }
 }
 
+node SFC {
+    title "SPI flash controller"
+    addr 0xb3440000
+
+    reg GLB 0x00 {
+        bit    13 TRAN_DIR { enum READ 0; enum WRITE 1 }
+        fld 12  7 THRESHOLD
+        bit     6 OP_MODE { enum SLAVE 0; enum DMA 1 }
+        fld  5  3 PHASE_NUM
+        bit     2 WP_EN
+        bit  1  0 BURST_MD { enum INCR4 0; enum INCR8 1;
+                             enum INCR16 2; enum INCR32 3 }
+    }
+
+    reg DEV_CONF 0x04 {
+        fld 17 16 SMP_DELAY
+        bit    15 CMD_TYPE { enum 8BITS 0; enum 16BITS 1 }
+        fld 14 13 STA_TYPE { enum 1BYTE 0; enum 2BYTE 1;
+                             enum 3BYTE 2; enum 4BYTE 3 }
+        fld 12 11 THOLD
+        fld 10  9 TSETUP
+        fld  8  5 TSH
+        bit     4 CPHA
+        bit     3 CPOL
+        bit     2 CE_DL
+        bit     1 HOLD_DL
+        bit     0 WP_DL
+    }
+
+    reg DEV_STA_EXP 0x08
+    reg DEV_STA_RT 0x0c
+    reg DEV_STA_MSK 0x10
+
+    reg TRAN_CONF {
+        instance 0x14 0x04 6
+        fld 31 29 MODE
+        fld 28 26 ADDR_WIDTH
+        bit    25 POLL_EN
+        bit    24 CMD_EN
+        bit    23 PHASE_FMT
+        fld 22 17 DUMMY_BITS
+        bit    16 DATA_EN
+        fld 15  0 COMMAND
+    }
+
+    reg TRAN_LENGTH 0x2c
+    reg DEV_ADDR { instance 0x30 0x04 6 }
+    reg DEV_PLUS { instance 0x48 0x40 6 }
+    reg MEM_ADDR 0x60
+
+    reg TRIG 0x64 {
+        bit 2 FLUSH
+        bit 1 STOP
+        bit 0 START
+    }
+
+    reg SR 0x68 {
+        fld 22 16 FIFO_NUM
+        fld  6  5 BUSY
+        bit     4 END
+        bit     3 TREQ
+        bit     2 RREQ
+        bit     1 OVER
+        bit     0 UNDER
+    }
+
+    reg SCR 0x6c {
+        bit 4 CLR_END
+        bit 3 CLR_TREQ
+        bit 2 CLR_RREQ
+        bit 1 CLR_OVER
+        bit 0 CLR_UNDER
+    }
+
+    reg INTC 0x70 {
+        bit 4 MSK_END
+        bit 3 MSK_TREQ
+        bit 2 MSK_RREQ
+        bit 1 MSK_OVER
+        bit 0 MSK_UNDER
+    }
+
+    reg FSM 0x74 {
+        fld 19 16 STATE_AHB
+        fld 15 11 STATE_SPI
+        fld  9  6 STATE_CLK
+        fld  5  3 STATE_DMAC
+        bit  2  0 STATE_RMC
+    }
+
+    reg CGE 0x78 {
+        bit 5 SFC
+        bit 4 FIFO
+        bit 3 DMA
+        bit 2 RMC
+        bit 1 SPI
+        bit 0 REG
+    }
+
+    reg DATA 0x1000
+}
+
 node CPM {
     title "Clock, Reset and Power Manager"
     addr 0xb0000000
@@ -227,6 +400,16 @@ node CPM {
         fld  3  0 CLKDIV
     }
 
+    reg I2SCDR 0x60 {
+        bit 31 PCS { enum SCLK_A 0; enum MPLL 1; }
+        bit 30 CS  { enum EXCLK 0; enum PLL 1; }
+        bit 29 CE
+        fld 21 13 DIV_M
+        fld 12  0 DIV_N
+    }
+
+    reg I2SCDR1 0x70
+
     reg LPCDR 0x64 {
         bit 31 CLKSRC { enum SCLK_A 0; enum MPLL 1; }
         bit 28 CE
@@ -249,6 +432,15 @@ node CPM {
         bit 28 BUSY
         bit 27 STOP
         bit 15 S_CLK1_SEL { enum 90DEG 0; enum 180DEG 1; }
+        fld 7 0 CLKDIV
+    }
+
+    reg SSICDR 0x74 {
+        bit 31 SFC_CS { enum SCLK_A 0; enum MPLL 1 }
+        bit 30 SSI_CS { enum EXCLK 0; enum HALF_SFC 1 }
+        bit 29 CE
+        bit 28 BUSY
+        bit 27 STOP
         fld 7 0 CLKDIV
     }
 
@@ -318,6 +510,25 @@ node CPM {
         bit  3 OTG
         bit  2 SFC
         bit  1 EFUSE
+    }
+
+    reg OPCR 0x24 {
+        bit    31 IDLE_DIS
+        bit    30 MASK_INT
+        bit    29 MASK_VPU
+        bit    28 GATE_SCLK_A_BUS
+        bit    25 L2C_PD
+        bit    24 REQ_MODE
+        bit    23 GATE_USBPHY_CLK
+        bit    22 DIS_STOP_MUX
+        fld 19  8 O1ST
+        bit     7 SPENDN0
+        bit     6 SPENDN1
+        bit     5 CPU_MODE
+        bit     4 O1SE
+        bit     3 PD
+        bit     2 ERCS
+        bit     1 BUS_MODE
     }
 }
 
@@ -412,21 +623,150 @@ node WDT {
     }
 }
 
+node DMA {
+    title "DMA controller"
+    addr 0xb3421000
+
+    reg CTRL 0x00 {
+        bit 31 FMSC
+        bit 30 FSSI
+        bit 29 FTSSI
+        bit 28 FUART
+        bit 27 FAIC
+        bit 3 HALT
+        bit 2 AR
+        bit 0 ENABLE
+    }
+
+    reg IRQP 0x04
+    reg DB   0x08 { variant set 4 }
+    reg DIP  0x10
+    reg DIC  0x14
+}
+
+node DMA_CHN {
+    title "DMA channel registers"
+    instance 0xb3420000 0x20 8
+
+    reg SA 0x00
+    reg TA 0x04
+    reg TC 0x08 {
+        fld 31 24 DOA
+        fld 23  0 CNT
+    }
+
+    reg RT 0x0c {
+        field 5 0 TYPE {
+            enum DMIC_RX  5
+            enum I2S_TX   6
+            enum I2S_RX   7
+            enum AUTO     8
+            enum UART2_TX 16
+            enum UART2_RX 17
+            enum UART1_TX 18
+            enum UART1_RX 19
+            enum UART0_TX 20
+            enum UART0_RX 21
+            enum SSI_TX   22
+            enum SSI_RX   23
+            enum MSC0_TX  26
+            enum MSC0_RX  27
+            enum MSC1_TX  28
+            enum MSC1_RX  29
+            enum PCM_TX   32
+            enum PCM_RX   33
+            enum I2C0_TX  36
+            enum I2C0_RX  37
+            enum I2C1_TX  38
+            enum I2C1_RX  39
+            enum I2C2_TX  40
+            enum I2C2_RX  41
+        }
+    }
+
+    reg CS 0x10 {
+        bit    31 NDES
+        bit    30 DES8
+        fld 15  8 CDOA
+        bit     4 AR
+        bit     3 TT
+        bit     2 HLT
+        bit     0 CTE
+    }
+
+    reg CM 0x14 {
+        bit    23 SAI
+        bit    22 DAI
+        fld 19 16 RDIL
+        fld 15 14 SP { enum 32BIT 0; enum 8BIT 1; enum 16BIT 2 }
+        fld 13 12 DP { enum 32BIT 0; enum 8BIT 1; enum 16BIT 2 }
+        fld 10  8 TSZ { enum 32BIT 0; enum 8BIT 1; enum 16BIT 2;
+                        enum 16BYTE 3; enum 32BYTE 4; enum 64BYTE 5;
+                        enum 128BYTE 6; enum AUTO 7; }
+        bit     2 STDE
+        bit     1 TIE
+        bit     0 LINK
+    }
+
+    reg DA 0x18 {
+        fld 31 12 DBA
+        fld 11  4 DOA
+    }
+
+    reg SD 0x1c {
+        fld 31 16 TSD
+        fld 15  0 SSD
+    }
+}
+
 node RTC {
     title "Realtime clock"
     addr 0xb0003000
 
-    reg CR 0x00
+    reg CR 0x00 {
+        bit 7 WRDY
+        bit 6 1HZ
+        bit 5 1HZIE
+        bit 4 AF
+        bit 3 AIE
+        bit 2 AE
+        bit 1 SELEXC
+        bit 0 ENABLE
+    }
+
     reg SR 0x04
     reg SAR 0x08
-    reg GR 0x0c
+
+    reg GR 0x0c {
+        bit    31 LOCK
+        fld 25 16 ADJC
+        fld 15  0 NC1HZ
+    }
+
     reg HCR 0x20
-    reg WFCR 0x24
-    reg RCR 0x28
-    reg WCR 0x2c
-    reg RSR 0x30
-    reg SPR 0x34
-    reg WENR 0x3c
+    reg HWFCR 0x24
+    reg HRCR 0x28
+
+    reg HWCR 0x2c {
+        fld 31 3 EPDET
+        bit    1 EALM
+    }
+
+    reg HWRSR 0x30 {
+        bit 8 APD
+        bit 5 HR
+        bit 4 PPR
+        bit 1 PIN
+        bit 0 ALM
+    }
+
+    reg HSPR 0x34
+
+    reg WENR 0x3c {
+        bit    31 WEN
+        bit 15  0 WENPAT
+    }
+
     reg WKUPPINCR 0x48
 }
 
@@ -544,7 +884,13 @@ node I2C {
         bit 0 ACTIVE
     }
 
-    reg TAR 0x04
+    reg TAR 0x04 {
+        bit 12 10BITS
+        bit 11 SPECIAL
+        bit 10 GC_OR_START
+        fld 9 0 ADDR
+    }
+
     reg SAR 0x08
     reg SHCNT 0x14
     reg SLCNT 0x18

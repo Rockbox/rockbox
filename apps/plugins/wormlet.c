@@ -398,6 +398,15 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define BTN_QUIT          BUTTON_POWER
 #define BTN_STOPRESET     BUTTON_BACK
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#define BTN_DIR_UP      BUTTON_UP
+#define BTN_DIR_DOWN    BUTTON_DOWN
+#define BTN_DIR_LEFT    BUTTON_LEFT
+#define BTN_DIR_RIGHT   BUTTON_RIGHT
+#define BTN_STARTPAUSE  BUTTON_PLAY
+#define BTN_QUIT        BUTTON_POWER
+#define BTN_STOPRESET   BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif

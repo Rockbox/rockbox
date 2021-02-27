@@ -194,6 +194,8 @@ struct sound_settings_info
 #include "jz4740-codec.h"
 #elif defined(HAVE_AK4537)
 #include "ak4537.h"
+#elif defined(HAVE_AK4376)
+#include "ak4376.h"
 #elif defined(HAVE_RK27XX_CODEC)
 #include "rk27xx_codec.h"
 #elif defined(HAVE_AIC3X)

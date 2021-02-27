@@ -331,6 +331,8 @@ int main (int argc, char** argv)
             modelnum = 108;
         else if (!strcmp(&argv[1][5], "e350")) /* Sony NWZ-E350 series */
             modelnum = 109;
+        else if (!strcmp(&argv[1][5], "fiiom3k")) /* FiiO M3K */
+            modelnum = 114;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

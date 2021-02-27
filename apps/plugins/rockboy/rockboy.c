@@ -467,6 +467,17 @@ static void setoptions (void)
         options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+        options.UP      = BUTTON_UP;
+        options.DOWN    = BUTTON_DOWN;
+        options.LEFT    = BUTTON_LEFT;
+        options.RIGHT   = BUTTON_RIGHT;
+        options.A       = BUTTON_MENU;
+        options.B       = BUTTON_BACK;
+        options.START   = BUTTON_VOL_DOWN;
+        options.SELECT  = BUTTON_VOL_UP;
+        options.MENU    = BUTTON_POWER;
+
 #else
 #error No Keymap Defined!
 #endif

@@ -477,6 +477,16 @@
 #define ROCKBLOX_DROP          BUTTON_PLAY
 #define ROCKBLOX_RESTART       BUTTON_BACK
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#define ROCKBLOX_OFF            BUTTON_POWER
+#define ROCKBLOX_ROTATE_CCW     BUTTON_UP
+#define ROCKBLOX_ROTATE_CW      BUTTON_DOWN
+#define ROCKBLOX_DOWN           BUTTON_SELECT
+#define ROCKBLOX_LEFT           BUTTON_LEFT
+#define ROCKBLOX_RIGHT          BUTTON_RIGHT
+#define ROCKBLOX_DROP           BUTTON_PLAY
+#define ROCKBLOX_RESTART        BUTTON_BACK
+
 #else
 #error No keymap defined!
 #endif
