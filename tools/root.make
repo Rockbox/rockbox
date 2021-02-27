@@ -23,6 +23,7 @@ TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
 	$(TOOLSDIR)/codepages $(TOOLSDIR)/scramble $(TOOLSDIR)/bmp2rb \
 	$(TOOLSDIR)/uclpack $(TOOLSDIR)/mkboot $(TOOLSDIR)/iaudio_bl_flash.c \
 	$(TOOLSDIR)/iaudio_bl_flash.h
+TOOLS += $(foreach tool,$(TOOLSET),$(TOOLSDIR)/$(tool))
 
 
 ifeq (,$(PREFIX))
