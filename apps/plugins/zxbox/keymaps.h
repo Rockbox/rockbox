@@ -298,6 +298,14 @@
 #define ZX_UP           BUTTON_PREV
 #define ZX_DOWN         BUTTON_NEXT
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#define ZX_SELECT       BUTTON_SELECT
+#define ZX_MENU         BUTTON_MENU
+#define ZX_LEFT         BUTTON_LEFT
+#define ZX_RIGHT        BUTTON_RIGHT
+#define ZX_UP           BUTTON_UP
+#define ZX_DOWN         BUTTON_DOWN
+
 #else
 #error Keymap not defined!
 

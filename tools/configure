@@ -586,6 +586,16 @@ mipselcc () {
  gccchoice="4.9.4"
 }
 
+mipsr2elcc () {
+ prefixtools mipsel-elf-
+ # mips is predefined, but we want it for paths. use __mips instead
+ GCCOPTS="$CCOPTS -march=mips32r2 -mno-mips16 -mno-long-calls -Umips"
+ GCCOPTS="$GCCOPTS -ffunction-sections -msoft-float -G 0 -Wno-parentheses"
+ GCCOPTIMIZE="-fomit-frame-pointer"
+ endian="little"
+ gccchoice="4.9.4"
+}
+
 maemocc () {
  # Scratchbox sets up "gcc" based on the active target
  prefixtools ""
@@ -1596,8 +1606,7 @@ cat <<EOF
  240) Rocker                                     228) NWZ-A860 series
                           ==FiiO==               229) NWZ-S750 series
  ==AIGO==                 244) M3K Linux
- 245) Eros Q / K
-
+ 245) Eros Q / K          246) M3K baremetal
 EOF
 
   buildfor=`input`;
@@ -4200,6 +4209,31 @@ fi
     t_model="ihifi2"
     ;;
 
+  246|fiiom3k)
+    target_id=114
+    modelname="fiiom3k"
+    target="FIIO_M3K"
+    memory=64
+    mipsr2elcc
+    appextra="recorder:gui"
+    plugins="yes"
+    tool="$rootdir/tools/scramble -add=fiiom3k "
+    boottool="$rootdir/tools/scramble -add=fiiom3k "
+    spltool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    output="rockbox.m3k"
+    bootoutput="bootloader.m3k"
+    sploutput="spl.m3k"
+    # toolset is the tools within the tools directory that we build for
+    # this particular target.
+    toolset="$toolset mkspl-x1000"
+    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
+    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
+    # architecture, manufacturer and model for the target-tree build
+    t_cpu="mips"
+    t_manufacturer="ingenic_x1000"
+    t_model="fiiom3k"
+    ;;
+
    *)
     echo "Please select a supported target platform!"
     exit 7
@@ -4275,6 +4309,9 @@ case $modelname in
   sansae200)
      gdbstub=", (E)raser"
      ;;
+  fiiom3k)
+     gdbstub=", (X) SPL loader"
+     ;;
   *)
      ;;
 esac
@@ -4299,6 +4336,15 @@ fi
       extradefines="$extradefines -DBOOTLOADER -DSANSA_PP_ERASE -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "sansa eraser build selected"
+      ;;
+    [Xx])
+      appsdir='$(ROOTDIR)/bootloader'
+      apps="bootloader"
+      extradefines="$extradefines -DBOOTLOADER -DBOOTLOADER_SPL -ffunction-sections -fdata-sections"
+      bootloader="1"
+      tool="$spltool"
+      output="$sploutput"
+      echo "SPL bootloader build selected"
       ;;
     [Bb])
       appsdir='$(ROOTDIR)/bootloader'

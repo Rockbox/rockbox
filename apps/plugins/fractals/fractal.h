@@ -506,6 +506,18 @@
 #define FRACTAL_PRECISION_DEC   BUTTON_BACK
 #define FRACTAL_RESET           BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#define FRACTAL_QUIT            BUTTON_POWER
+#define FRACTAL_UP              BUTTON_UP
+#define FRACTAL_DOWN            BUTTON_DOWN
+#define FRACTAL_LEFT            BUTTON_LEFT
+#define FRACTAL_RIGHT           BUTTON_RIGHT
+#define FRACTAL_ZOOM_IN         BUTTON_VOL_UP
+#define FRACTAL_ZOOM_OUT        BUTTON_VOL_DOWN
+#define FRACTAL_PRECISION_INC   BUTTON_MENU
+#define FRACTAL_PRECISION_DEC   BUTTON_BACK
+#define FRACTAL_RESET           BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif
