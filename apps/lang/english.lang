@@ -9702,15 +9702,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
   </voice>
 </phrase>
 <phrase>

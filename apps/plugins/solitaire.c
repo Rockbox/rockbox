@@ -722,6 +722,25 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK      "DBL PLAY"
 #   define HK_REM2STACK      "NEXT"
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#   define SOL_QUIT         BUTTON_POWER
+#   define SOL_UP           BUTTON_UP
+#   define SOL_DOWN         BUTTON_DOWN
+#   define SOL_LEFT         BUTTON_LEFT
+#   define SOL_RIGHT        BUTTON_RIGHT
+#   define SOL_MOVE_PRE     BUTTON_SELECT
+#   define SOL_MOVE         (BUTTON_SELECT|BUTTON_REL)
+#   define SOL_DRAW         BUTTON_PLAY
+#   define SOL_REM2CUR      BUTTON_VOL_DOWN
+#   define SOL_CUR2STACK_PRE BUTTON_SELECT
+#   define SOL_CUR2STACK    (BUTTON_SELECT|BUTTON_REPEAT)
+#   define SOL_REM2STACK    BUTTON_VOL_UP
+#   define HK_MOVE          "SELECT"
+#   define HK_DRAW          "PLAY"
+#   define HK_REM2CUR       "VOL-"
+#   define HK_CUR2STACK     "HOLD SELECT"
+#   define HK_REM2STACK     "VOL+"
+
 #else
 #error No keymap defined!
 #endif

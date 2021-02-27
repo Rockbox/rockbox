@@ -398,6 +398,8 @@ drivers/rtc/rtc_tcc77x.c
 drivers/rtc/rtc_jz4740.c
 #elif (CONFIG_RTC == RTC_JZ4760)
 drivers/rtc/rtc_jz4760.c
+#elif (CONFIG_RTC == RTC_X1000)
+drivers/rtc/rtc_x1000.c
 #elif (CONFIG_RTC == RTC_S35390A)
 drivers/rtc/rtc_s35390a.c
 #elif (CONFIG_RTC == RTC_S35380A)
@@ -488,6 +490,8 @@ drivers/audio/as3514.c
 drivers/audio/tlv320.c
 #elif defined(HAVE_AK4537)
 drivers/audio/ak4537.c
+#elif defined(HAVE_AK4376)
+drivers/audio/ak4376.c
 #elif defined(HAVE_UDA1341)
 drivers/audio/uda1341.c
 #elif defined(HAVE_CS42L55)
@@ -1721,6 +1725,30 @@ target/mips/ingenic_jz47xx/pcm-jz4760.c
 drivers/nand_id.c
 #endif /* CONFIG_CPU == JZ4760B */
 
+#if CONFIG_CPU == X1000
+target/mips/ingenic_x1000/crt0.S
+target/mips/ingenic_x1000/aic-x1000.c
+target/mips/ingenic_x1000/clk-x1000.c
+target/mips/ingenic_x1000/debug-x1000.c
+target/mips/ingenic_x1000/dma-x1000.c
+target/mips/ingenic_x1000/gpio-x1000.c
+target/mips/ingenic_x1000/i2c-x1000.c
+target/mips/ingenic_x1000/kernel-x1000.c
+target/mips/ingenic_x1000/lcd-x1000.c
+target/mips/ingenic_x1000/nand-x1000.c
+target/mips/ingenic_x1000/pcm-x1000.c
+target/mips/ingenic_x1000/pwm-x1000.c
+target/mips/ingenic_x1000/sfc-x1000.c
+target/mips/ingenic_x1000/system-x1000.c
+target/mips/ingenic_x1000/timer-x1000.c
+#if (CONFIG_STORAGE & (STORAGE_SD|STORAGE_MMC|STORAGE_ATA))
+target/mips/ingenic_x1000/msc-x1000.c
+#endif
+#if (CONFIG_STORAGE & STORAGE_SD)
+target/mips/ingenic_x1000/sd-x1000.c
+#endif
+#endif /* CONFIG_CPU == X1000 */
+
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
 target/mips/ingenic_jz47xx/onda_vx747/backlight-onda_vx7X7.c
 target/mips/ingenic_jz47xx/onda_vx747/lcd-onda_vx747.c
@@ -1743,6 +1771,16 @@ target/mips/ingenic_jz47xx/xduoo_x3/lcd-xduoo_x3.c
 target/mips/ingenic_jz47xx/xduoo_x3/power-xduoo_x3.c
 target/mips/ingenic_jz47xx/xduoo_x3/sadc-xduoo_x3.c
 #endif /* XDUOO_X3 */
+
+#if defined(FIIO_M3K)
+target/mips/ingenic_x1000/fiiom3k/audiohw-fiiom3k.c
+target/mips/ingenic_x1000/fiiom3k/backlight-fiiom3k.c
+target/mips/ingenic_x1000/fiiom3k/button-fiiom3k.c
+target/mips/ingenic_x1000/fiiom3k/installer-fiiom3k.c
+target/mips/ingenic_x1000/fiiom3k/lcd-fiiom3k.c
+target/mips/ingenic_x1000/fiiom3k/nand-fiiom3k.c
+target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c
+#endif /* FIIO_M3K */
 
 #if defined(LYRE_PROTO1)
 target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c
@@ -1967,6 +2005,10 @@ drivers/touchpad.c
 
 #ifdef HAVE_I2C_ASYNC
 drivers/i2c-async.c
+#endif
+
+#ifdef HAVE_AXP173
+drivers/axp173.c
 #endif
 
 /* firmware/kernel section */

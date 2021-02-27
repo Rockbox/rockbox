@@ -76,6 +76,10 @@ OUTPUT_FORMAT(elf32-littlemips)
 #elif CONFIG_CPU==IMX233
 #include "cpu.h"
 #define DRAMSIZE (DRAM_SIZE - PLUGIN_BUFFER_SIZE - CODEC_SIZE - FRAME_SIZE - TTB_SIZE)
+#elif CONFIG_CPU==X1000
+#include "config.h"
+#undef STUBOFFSET
+#define STUBOFFSET 0x4000
 #endif
 
  /* default to full RAM (minus codecs&plugins) unless specified otherwise */
@@ -173,6 +177,11 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define IRAM DRAM
 #define IRAMSIZE 0
 /* The bit of IRAM that is available is used in the core */
+
+#elif CONFIG_CPU == X1000
+#define DRAMORIG (0x80000000 + STUBOFFSET)
+#define IRAM DRAM
+#define IRAMSIZE 0
 
 #elif CONFIG_CPU == RK27XX
 #define DRAMORIG 0x60000000
