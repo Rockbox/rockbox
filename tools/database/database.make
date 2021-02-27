@@ -9,20 +9,9 @@
 
 GCCOPTS += -g -DDEBUG -D__PCTOOL__ -DDBTOOL
 
-# Make compatibility hack
-H := \#
-createsrc = $(shell cat $(1) > $(3); echo "$(H)if CONFIG_CODEC == SWCODEC" >> $(3); \
-                                     echo $(2) | sed 's/ /\n/g' >> $(3); \
-                                     echo "$(H)endif" >> $(3); \
-                                     echo $(3))
+METADATAS := $(wildcard $(ROOTDIR)/lib/rbcodec/metadata/*.c)
 
-METADATAS := $(call full_path_subst,$(ROOTDIR)/%,../../%,$(wildcard $(ROOTDIR)/lib/rbcodec/metadata/*.c))
-
-SRCFILE := $(call createsrc, $(TOOLSDIR)/database/SOURCES, \
-                             $(METADATAS), \
-                             $(TOOLSDIR)/database/SOURCES.build)
-
-DATABASE_SRC = $(call preprocess, $(SRCFILE))
+DATABASE_SRC = $(call preprocess, $(TOOLSDIR)/database/SOURCES) $(METADATAS)
 DATABASE_OBJ = $(call c2obj,$(DATABASE_SRC))
 
 OTHER_SRC += $(DATABASE_SRC)
