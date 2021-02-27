@@ -289,3 +289,10 @@ __pycache__
 /utils/zenutils/source/zen_crypt/CMakeFiles
 /utils/zenutils/source/zen_crypt/cmake_install.cmake
 /utils/zenutils/source/zen_crypt/Makefile
+
+# /utils/regtools/
+/utils/regtools/headergen_v1
+/utils/regtools/headergen_v2
+/utils/regtools/regtool
+/utils/regtools/swiss_knife
+/utils/regtools/tester_v1
