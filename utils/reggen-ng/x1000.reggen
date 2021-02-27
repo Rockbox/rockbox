@@ -1,0 +1,742 @@
+name    "x1000"
+title   "Ingenic X1000"
+isa     "mips"
+version "1.0"
+author  "Aidan MacDonald"
+
+node LCD {
+    title "LCD controller"
+    addr 0xb3050000
+
+    reg CFG 0x00 {
+        bit 17 INVDAT
+    }
+
+    reg CTRL 0x30 {
+        fld 30 28 BURST { enum 4WORD 0; enum 8WORD 1; enum 16WORD 2;
+                          enum 32WORD 3; enum 64WORD 4; }
+        bit 13 EOFM
+        bit 12 SOFM
+        bit 10 IFUM
+        bit  7 QDM
+        bit  6 BEDN
+        bit  5 PEDN
+        bit  3 ENABLE
+        fld 2 0 BPP {
+            enum 15BIT_OR_16BIT 4
+            enum 18BIT_OR_24BIT 5
+            enum 24BIT_COMPRESSED 6
+            enum 30BIT 7
+        }
+    }
+
+    reg STATE 0x34 {
+        bit 7 QD
+        bit 5 EOF
+        bit 4 SOF
+        bit 2 IFU
+    }
+
+    reg OSDCTRL 0x104
+    reg BGC 0x10c
+    reg DAH 0x10
+    reg DAV 0x14
+    reg VAT 0x0c
+    reg VSYNC 0x04
+    reg HSYNC 0x08
+
+    reg IID 0x38
+    reg DA 0x40
+
+    reg MCFG 0xa0 {
+        # other fields are useless according to Ingenic
+        field 9 8 CWIDTH {
+            enum 16BIT_OR_9BIT 0
+            enum 8BIT 1
+            enum 18BIT 2
+            enum 24BIT 3
+        }
+    }
+
+    reg MCFG_NEW 0xb8 {
+        field 15 13 DWIDTH {
+            enum 8BIT 0
+            enum 9BIT 1
+            enum 16BIT 2
+            enum 18BIT 3
+            enum 24BIT 4
+        }
+
+        field 9 8 DTIMES {
+            enum 1TIME 0
+            enum 2TIME 1
+            enum 3TIME 2
+        }
+
+        bit 11 6800_MODE
+        bit 10 CMD_9BIT
+        bit 5 CSPLY
+        bit 4 RSPLY
+        bit 3 CLKPLY
+        bit 2 DTYPE { enum SERIAL 1; enum PARALLEL 0 }
+        bit 1 CTYPE { enum SERIAL 1; enum PARALLEL 0 }
+        bit 0 FMT_CONV
+    }
+
+    reg MCTRL 0xa4 {
+        bit 10 NARROW_TE
+        bit  9 TE_INV
+        bit  8 NOT_USE_TE
+        bit  7 DCSI_SEL
+        bit  6 MIPI_SLCD
+        bit  4 FAST_MODE
+        bit  3 GATE_MASK
+        bit  2 DMA_MODE
+        bit  1 DMA_START
+        bit  0 DMA_TX_EN
+    }
+
+    reg MSTATE 0xa8 {
+        fld 31 16 LCD_ID
+        bit     0 BUSY
+    }
+
+    reg MDATA 0xac {
+        fld 31 30 TYPE { enum CMD 1; enum DAT 0 }
+        fld 23  0 DATA
+    }
+
+    reg WTIME 0xb0 {
+        fld 31 24 DHTIME
+        fld 23 16 DLTIME
+        fld 15  8 CHTIME
+        fld  7  0 CLTIME
+    }
+
+    reg TASH 0xb4 {
+        fld 15 8 TAH
+        fld  7 0 TAS
+    }
+
+    reg SMWT 0xbc
+}
+
+node DDRC {
+    title "DDR controller AHB2 group"
+    desc "note: incomplete, only lists registers used by DDR init code"
+    addr 0xb34f0000
+
+    reg STATUS  0x00
+    reg CFG     0x04
+    reg CTRL    0x08
+    reg TIMING1 0x60
+    reg TIMING2 0x64
+    reg TIMING3 0x68
+    reg TIMING4 0x6c
+    reg TIMING5 0x70
+    reg TIMING6 0x74
+    reg REFCNT  0x18
+    reg MMAP0   0x24
+    reg MMAP1   0x28
+    reg DLP     0xbc
+    reg REMAP1  0x9c
+    reg REMAP2  0xa0
+    reg REMAP3  0xa4
+    reg REMAP4  0xa8
+    reg REMAP5  0xac
+    reg AUTOSR_CNT 0x308
+    reg AUTOSR_EN  0x304
+}
+
+node DDRC_APB {
+    title "DDR controller APB group"
+    desc "note: incomplete, only lists registers used by DDR init code"
+    addr 0xb3012000
+
+    reg CLKSTP_CFG 0x68
+    reg PHYRST_CFG 0x80
+}
+
+node DDRPHY {
+    title "DDR PHY group"
+    desc "note: incomplete, only lists registers used by DDR init code"
+    addr 0xb3011000
+
+    reg PIR     0x04
+    reg PGCR    0x08
+    reg PGSR    0x0c
+    reg DLLGCR  0x10
+    reg ACDLLCR 0x14
+    reg PTR0    0x18
+    reg PTR1    0x1c
+    reg PTR2    0x20
+    reg ACIOCR  0x24
+    reg DXCCR   0x28
+    reg DSGCR   0x2c
+    reg DCR     0x30
+    reg DTPR0   0x34
+    reg DTPR1   0x38
+    reg DTPR2   0x3c
+    reg MR0     0x40
+    reg MR1     0x44
+    reg MR2     0x48
+    reg MR3     0x4c
+    reg DTAR    0x54
+    reg DXGCR { instance 0x1c0 0x40 4 }
+}
+
+node CPM {
+    title "Clock, Reset and Power Manager"
+    addr 0xb0000000
+
+    reg CCR 0x00 {
+        fld 31 30 SEL_SRC { enum STOP 0; enum EXCLK 1; enum APLL 2; }
+        fld 29 28 SEL_CPLL { enum STOP 0; enum SCLK_A 1; enum MPLL 2; }
+        fld 27 26 SEL_H0PLL { enum STOP 0; enum SCLK_A 1; enum MPLL 2; }
+        fld 25 24 SEL_H2PLL { enum STOP 0; enum SCLK_A 1; enum MPLL 2; }
+        bit    23 GATE_SCLKA
+        bit    22 CE_CPU
+        bit    21 CE_AHB0
+        bit    20 CE_AHB2
+        fld 19 16 PDIV
+        fld 15 12 H2DIV
+        fld 11  8 H0DIV
+        fld  7  4 L2DIV
+        fld  3  0 CDIV
+    }
+
+    reg CSR 0xd4 {
+        bit 31 SRC_MUX
+        bit 30 CPU_MUX
+        bit 29 AHB0_MUX
+        bit 28 AHB2_MUX
+        bit 27 DDR_MUX
+        bit  2 H2DIV_BUSY
+        bit  1 H0DIV_BUSY
+        bit  0 CDIV_BUSY
+    }
+
+    reg DDRCDR 0x2c {
+        fld 31 30 CLKSRC { enum STOP 0; enum SCLK_A 1; enum MPLL 2; }
+        bit    29 CE
+        bit    28 BUSY
+        bit    27 STOP
+        bit    26 GATE_EN
+        bit    25 CHANGE_EN
+        bit    24 FLAG
+        fld  3  0 CLKDIV
+    }
+
+    reg LPCDR 0x64 {
+        bit 31 CLKSRC { enum SCLK_A 0; enum MPLL 1; }
+        bit 28 CE
+        bit 27 BUSY
+        bit 26 STOP
+        fld 7 0 CLKDIV
+    }
+
+    reg MSC0CDR 0x68 {
+        bit 31 CLKSRC { enum SCLK_A 0; enum MPLL 1; }
+        bit 29 CE
+        bit 28 BUSY
+        bit 27 STOP
+        bit 15 S_CLK0_SEL { enum 90DEG 0; enum 180DEG 1; }
+        fld 7 0 CLKDIV
+    }
+
+    reg MSC1CDR 0xa4 {
+        bit 29 CE
+        bit 28 BUSY
+        bit 27 STOP
+        bit 15 S_CLK1_SEL { enum 90DEG 0; enum 180DEG 1; }
+        fld 7 0 CLKDIV
+    }
+
+    reg DRCG 0xd0
+
+    reg APCR 0x10 {
+        bit    31 BS
+        fld 30 24 PLLM
+        fld 22 18 PLLN
+        fld 17 16 PLLOD
+        bit    15 LOCK
+        bit    10 ON
+        bit     9 BYPASS
+        bit     8 ENABLE
+        fld  7  0 PLLST
+    }
+
+    reg MPCR 0x14 {
+        bit    31 BS
+        fld 30 24 PLLM
+        fld 22 18 PLLN
+        fld 17 16 PLLOD
+        bit     7 ENABLE
+        bit     6 BYPASS
+        bit     1 LOCK
+        bit     0 ON
+    }
+
+    reg LCR 0x04 {
+        fld 19 8 PST
+        fld  1 0 LPM { enum IDLE 0; enum SLEEP 1 }
+    }
+
+    reg PSWC0ST 0x90
+    reg PSWC1ST 0x94
+    reg PSWC2ST 0x98
+    reg PSWC3ST 0x9c
+
+    reg CLKGR 0x20 {
+        desc "Clock gate register"
+        bit 31 DDR
+        bit 30 CPU_BIT  # can't be called CPU because Rockbox #defines that
+        bit 29 AHB0
+        bit 28 APB0
+        bit 27 RTC
+        bit 26 PCM
+        bit 25 MAC
+        bit 24 AES
+        bit 23 LCD
+        bit 22 CIM
+        bit 21 PDMA
+        bit 20 OST
+        bit 19 SSI
+        bit 18 TCU
+        bit 17 DMIC
+        bit 16 UART2
+        bit 15 UART1
+        bit 14 UART0
+        bit 12 JPEG
+        bit 11 AIC
+        bit  9 I2C2
+        bit  8 I2C1
+        bit  7 I2C0
+        bit  6 SCC
+        bit  5 MSC1
+        bit  4 MSC0
+        bit  3 OTG
+        bit  2 SFC
+        bit  1 EFUSE
+    }
+}
+
+node TCU {
+    title "Timer/counter unit"
+    addr 0xb0002000
+
+    reg STATUS 0xf0 { variant set 4; variant clr 8 }
+    reg STOP   0x1c { variant set 0x10; variant clr 0x20 }
+    reg ENABLE 0x10 { variant set 4; variant clr 8 }
+    reg FLAG   0x20 { variant set 4; variant clr 8 }
+    reg MASK   0x30 { variant set 4; variant clr 8 }
+    reg CMP_FULL {
+        desc "called Data FULL by Ingenic"
+        instance 0x40 0x10 8
+    }
+    reg CMP_HALF {
+        desc "called Data HALF by Ingenic"
+        instance 0x44 0x10 8
+    }
+    reg COUNT {
+        instance 0x48 0x10 8
+    }
+    reg CTRL {
+        instance 0x4c 0x10 8
+        bit   11 BYPASS
+        bit   10 CLRZ
+        bit    9 SHUTDOWN { enum GRACEFUL 0; enum ABRUPT 1; }
+        bit    8 INIT_LVL
+        bit    7 PWM_EN
+        bit    6 PWM_IN_EN
+        fld 5  3 PRESCALE { enum BY_1 0; enum BY_4 1; enum BY_16 2;
+                            enum BY_64 3; enum BY_256 4; enum BY_1024 5; }
+        fld 2  0 SOURCE { enum EXT 4; enum RTC 2; enum PCLK 1; }
+    }
+}
+
+node OST {
+    title "Operating system timer"
+    addr 0xb2000000
+
+    reg CTRL 0x00 {
+        field 5 3 PRESCALE2 { enum BY_1 0; enum BY_4 1; enum BY_16 2; }
+        field 2 0 PRESCALE1 { enum BY_1 0; enum BY_4 1; enum BY_16 2; }
+    }
+
+    reg ENABLE 0x04 {
+        variant set 0x30
+        variant clr 0x34
+        bit 0 OST1
+        bit 1 OST2
+    }
+
+    reg CLEAR 0x08 {
+        bit 0 OST1
+        bit 1 OST2
+    }
+
+    reg 1FLG 0x0c
+    reg 1MSK 0x10
+    reg 1DFR 0x14
+    reg 1CNT 0x18
+
+    reg 2CNTH  0x1c
+    reg 2CNTL  0x20
+    reg 2CNTHB 0x24
+}
+
+node INTC {
+    title "Interrupt controller"
+    # Documented address in Ingenic's manual is a typo (= GPIO base address).
+    # This is the correct address from their Linux source.
+    addr 0xb0001000
+
+    reg SRC { instance 0x00 0x20 2 }
+    reg MSK { instance 0x04 0x20 2; variant set 4; variant clr 8 }
+    reg PND { instance 0x10 0x20 2 }
+}
+
+node WDT {
+    title "Watchdog timer"
+    addr 0xb0002000
+
+    reg DATA   0x00
+    reg ENABLE 0x04
+    reg COUNT  0x08
+
+    reg CTRL 0x0c {
+        field 5 3 PRESCALE { enum BY_1 0; enum BY_4 1; enum BY_16 2;
+                             enum BY_64 3; enum BY_256 4; enum BY_1024 5; }
+        field 2 0 SOURCE { enum EXT 4; enum RTC 2; enum PLCK 1; }
+    }
+}
+
+node RTC {
+    title "Realtime clock"
+    addr 0xb0003000
+
+    reg CR 0x00
+    reg SR 0x04
+    reg SAR 0x08
+    reg GR 0x0c
+    reg HCR 0x20
+    reg WFCR 0x24
+    reg RCR 0x28
+    reg WCR 0x2c
+    reg RSR 0x30
+    reg SPR 0x34
+    reg WENR 0x3c
+    reg WKUPPINCR 0x48
+}
+
+node GPIO {
+    title "General purpose I/O"
+    addr 0xb0010000
+
+    # Note: only instances 0-3 and 7 are instantiated in hardware
+    reg PIN  { instance 0x00 0x100 8 }
+    reg INT  { instance 0x10 0x100 8; variant set 4; variant clr 8 }
+    reg MSK  { instance 0x20 0x100 8; variant set 4; variant clr 8 }
+    reg PAT1 { instance 0x30 0x100 8; variant set 4; variant clr 8 }
+    reg PAT0 { instance 0x40 0x100 8; variant set 4; variant clr 8 }
+    reg FLAG { instance 0x50 0x100 8; variant clr 8 }
+    reg PULL { instance 0x70 0x100 8; variant set 4; variant clr 8 }
+
+    node C_GLITCH {
+        desc "GPIO port C: glitch filter registers"
+        addr 0x200
+        reg CFG0 0x800 { variant set 4; variant clr 8 }
+        reg CFG1 0x810 { variant set 4; variant clr 8 }
+        reg CFG2 0x820 { variant set 4; variant clr 8 }
+        reg CFG3 0x830 { variant set 4; variant clr 8 }
+    }
+
+    reg Z_GID2LD {
+        desc "GPIO port Z: atomic load register"
+        addr 0x7f0
+    }
+}
+
+node I2C {
+    title "I2C bus controller"
+    instance 0xb0050000 0x1000 3
+
+    reg CON 0x00 {
+        bit 6 SLVDIS
+        bit 5 RESTART
+        bit 4 MATP
+        bit 3 SATP
+        fld 2 1 SPEED { enum 100K 1; enum 400K 2; }
+        bit 0 MD
+    }
+
+    reg DC 0x10 {
+        bit  10 RESTART
+        bit   9 STOP
+        bit   8 CMD
+        fld 7 0 DAT
+    }
+
+    reg INTST 0x2c {
+        bit 11 GC
+        bit 10 STT
+        bit  9 STP
+        bit  8 ACT
+        bit  7 RXDN
+        bit  6 TXABT
+        bit  5 RDREQ
+        bit  4 TXEMP
+        bit  3 TXOF
+        bit  2 RXFL
+        bit  1 RXOF
+        bit  0 RXUF
+    }
+
+    reg INTMSK 0x30 {
+        bit 11 GC
+        bit 10 STT
+        bit  9 STP
+        bit  8 ACT
+        bit  7 RXDN
+        bit  6 TXABT
+        bit  5 RDREQ
+        bit  4 TXEMP
+        bit  3 TXOF
+        bit  2 RXFL
+        bit  1 RXOF
+        bit  0 RXUF
+    }
+
+    reg RINTST 0x34 {
+        bit 11 GC
+        bit 10 STT
+        bit  9 STP
+        bit  8 ACT
+        bit  7 RXDN
+        bit  6 TXABT
+        bit  5 RDREQ
+        bit  4 TXEMP
+        bit  3 TXOF
+        bit  2 RXFL
+        bit  1 RXOF
+        bit  0 RXUF
+    }
+
+    reg ENABLE 0x6c {
+        bit 1 ABORT
+        bit 0 ACTIVE
+    }
+
+    reg STATUS 0x70 {
+        bit 6 SLVACT
+        bit 5 MSTACT
+        bit 4 RFF
+        bit 3 RFNE
+        bit 2 TFE
+        bit 1 TFNF
+        bit 0 ACT
+    }
+
+    reg ENBST 0x9c {
+        bit 2 SLVRDLST
+        bit 1 SLVDISB
+        bit 0 ACTIVE
+    }
+
+    reg TAR 0x04
+    reg SAR 0x08
+    reg SHCNT 0x14
+    reg SLCNT 0x18
+    reg FHCNT 0x1c
+    reg FLCNT 0x20
+    reg RXTL 0x38
+    reg TXTL 0x3c
+    reg TXFLR 0x74
+    reg RXFLR 0x78
+    reg SDAHD 0x7c
+    reg ABTSRC 0x80
+    reg DMACR 0x88
+    reg DMATDLR 0x8c
+    reg DMARDLR 0x90
+    reg SDASU 0x94
+    reg ACKGC 0x98
+    reg FLT 0xa0
+
+    reg CINT 0x40
+    reg CRXUF 0x44
+    reg CRXOF 0x48
+    reg CTXOF 0x4c
+    reg CRXREQ 0x50
+    reg CTXABT 0x54
+    reg CRXDN 0x58
+    reg CACT 0x5c
+    reg CSTP 0x60
+    reg CSTT 0x64
+    reg CGC 0x68
+}
+
+node MSC {
+    title "MMC/SD/CE-ATA controller"
+    instance 0xb3450000 0x10000 2
+
+    reg CTRL 0x00 {
+        bit 15 SEND_CCSD
+        bit 14 SEND_AS_CCSD
+        bit  7 EXIT_MULTIPLE
+        bit  6 EXIT_TRANSFER
+        bit  5 START_READ_WAIT
+        bit  4 STOP_READ_WAIT
+        bit  3 RESET
+        bit  2 START_OP
+        fld 1 0 CLOCK { enum DO_NOTHING 0; enum STOP 1; enum START 2; }
+    }
+
+    reg STAT 0x04 {
+        bit    31 AUTO_CMD12_DONE
+        fld 28 24 PINS
+        bit    20 BCE
+        bit    19 BDE
+        bit    18 BAE
+        bit    17 BAR
+        bit    16 DMAEND
+        bit    15 IS_RESETTING
+        bit    14 SDIO_INT_ACTIVE
+        bit    13 PROG_DONE
+        bit    12 DATA_TRAN_DONE
+        bit    11 END_CMD_RES
+        bit    10 DATA_FIFO_AFULL
+        bit     9 IS_READ_WAIT
+        bit     8 CLOCK_EN
+        bit     7 DATA_FIFO_FULL
+        bit     6 DATA_FIFO_EMPTY
+        bit     5 CRC_RES_ERROR
+        bit     4 CRC_READ_ERROR
+        fld  3  2 CRC_WRITE_ERROR { enum NONE 0; enum BADDATA 1; enum NOCRC 2 }
+        bit     1 TIME_OUT_RES
+        bit     0 TIME_OUT_READ
+    }
+
+    reg CMDAT 0x0c {
+        bit 31 CCS_EXPECTED
+        bit 30 READ_CEATA
+        bit 27 DIS_BOOT
+        bit 25 EXP_BOOT_ACK
+        bit 24 BOOT_MODE
+        bit 17 SDIO_PRDT
+        bit 16 AUTO_CMD12
+        fld 15 14 RTRG { enum GE16 0; enum GE32 1; enum GE64 2; enum GE96 3 }
+        fld 13 12 TTRG { enum LE16 0; enum LE32 1; enum LE64 2; enum LE96 3 }
+        bit 11 IO_ABORT
+        fld 10 9 BUS_WIDTH { enum 1BIT 0; enum 4BIT 2; enum 8BIT 3; }
+        bit 7 INIT
+        bit 6 BUSY
+        bit 5 STREAM_BLOCK
+        bit 4 WRITE_READ
+        bit 3 DATA_EN
+        fld 2 0 RESP_FMT
+    }
+
+    reg IMASK 0x24 {
+        bit 31 DMA_DATA_DONE
+        fld 28 24 PINS
+        bit 23 WR_ALL_DONE
+        bit 20 BCE
+        bit 19 BDE
+        bit 18 BAE
+        bit 17 BAR
+        bit 16 DMAEND
+        bit 15 AUTO_CMD12_DONE
+        bit 14 DATA_FIFO_FULL
+        bit 13 DATA_FIFO_EMPTY
+        bit 12 CRC_RES_ERROR
+        bit 11 CRC_READ_ERROR
+        bit 10 CRC_WRITE_ERROR
+        bit  9 TIME_OUT_RES
+        bit  8 TIME_OUT_READ
+        bit  7 SDIO
+        bit  6 TXFIFO_WR_REQ
+        bit  5 RXFIFO_RD_REQ
+        bit  2 END_CMD_RES
+        bit  1 PROG_DONE
+        bit  0 DATA_TRAN_DONE
+    }
+
+    reg IFLAG 0x28 {
+        bit 31 DMA_DATA_DONE
+        fld 28 24 PINS
+        bit 23 WR_ALL_DONE
+        bit 20 BCE
+        bit 19 BDE
+        bit 18 BAE
+        bit 17 BAR
+        bit 16 DMAEND
+        bit 15 AUTO_CMD12_DONE
+        bit 14 DATA_FIFO_FULL
+        bit 13 DATA_FIFO_EMPTY
+        bit 12 CRC_RES_ERROR
+        bit 11 CRC_READ_ERROR
+        bit 10 CRC_WRITE_ERROR
+        bit  9 TIME_OUT_RES
+        bit  8 TIME_OUT_READ
+        bit  7 SDIO
+        bit  6 TXFIFO_WR_REQ
+        bit  5 RXFIFO_RD_REQ
+        bit  2 END_CMD_RES
+        bit  1 PROG_DONE
+        bit  0 DATA_TRAN_DONE
+    }
+
+    reg LPM 0x40 {
+        fld 31 30 DRV_SEL {
+            enum FALL_EDGE 0
+            enum RISE_EDGE_DELAY_1NS 1
+            enum RISE_EDGE_DELAY_QTR_PHASE 2
+        }
+
+        fld 29 28 SMP_SEL {
+            enum RISE_EDGE 0
+            enum RISE_EDGE_DELAYED 1
+        }
+
+        bit 0 ENABLE
+    }
+
+    reg DMAC 0x44 {
+        bit 7 MODE_SEL
+        fld 6 5 ADDR_OFFSET
+        bit 4 ALIGN_EN
+        fld 3 2 INCR
+        bit 1 DMASEL
+        bit 0 ENABLE
+    }
+
+    reg CTRL2 0x58 {
+        fld 28 24 PIN_INT_POLARITY
+        bit 4 STPRM
+        fld 2 0 SPEED {
+            enum DEFAULT 0
+            enum HIGHSPEED 1
+            enum SDR12 2
+            enum SDR25 3
+            enum SDR50 4
+        }
+    }
+
+    reg CLKRT 0x08
+    reg RESTO 0x10
+    reg RDTO 0x14
+    reg BLKLEN 0x18
+    reg NOB 0x1c
+    reg SNOB 0x20
+    reg CMD 0x2c
+    reg ARG 0x30
+    reg RES 0x34
+    reg RXFIFO 0x38
+    reg TXFIFO 0x3c
+    reg DMANDA 0x48
+    reg DMADA 0x4c
+    reg DMALEN 0x50
+    reg DMACMD 0x54
+    reg RTCNT 0x5c
+}
