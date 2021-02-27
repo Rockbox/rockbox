@@ -15,6 +15,7 @@ $(TOOLSDIR)/scramble: $(TOOLSDIR)/scramble.c $(TOOLSDIR)/iriver.c \
 		$(TOOLSDIR)/iaudio_bl_flash.c \
 		$(TOOLSDIR)/creative.c $(TOOLSDIR)/hmac-sha1.c \
 		$(TOOLSDIR)/rkw.c
+$(TOOLSDIR)/descramble: $(TOOLSDIR)/descramble.c $(TOOLSDIR)/iriver.c $(TOOLSDIR)/gigabeat.c
 
 $(TOOLSDIR)/rdf2binary:	$(TOOLSDIR)/rdf2binary.c
 $(TOOLSDIR)/convbdf: $(TOOLSDIR)/convbdf.c
