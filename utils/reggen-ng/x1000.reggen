@@ -121,6 +121,77 @@ node LCD {
     reg SMWT 0xbc
 }
 
+node AIC {
+    title "Audio interface controller"
+    addr 0xb0020000
+
+    reg CFG 0x00 {
+        fld 27 24 RFTH
+        fld 20 16 TFTH
+        bit    12 MSB
+        bit    10 IBCKD
+        bit     9 ISYNCD
+        bit     8 DMODE
+        bit     7 CDC_SLAVE
+        bit     6 LSMP
+        bit     5 ICDC
+        bit     4 AUSEL
+        bit     3 RST
+        bit     2 BCKD
+        bit     1 SYNCD
+        bit     0 ENABLE
+    }
+
+    reg CCR 0x04 {
+        bit    28 PACK16
+        fld 26 24 CHANNEL
+        fld 21 19 OSS
+        fld 18 16 ISS
+        bit    15 RDMS
+        bit    14 TDMS
+        bit    11 M2S
+        bit    10 ENDSW
+        bit     9 ASVTSU
+        bit     8 TFLUSH
+        bit     7 RFLUSH
+        bit     6 EROR
+        bit     5 ETUR
+        bit     4 ERFS
+        bit     3 ETFS
+        bit     2 ENLBF
+        bit     1 ERPL
+        bit     0 EREC
+    }
+
+    reg I2SCR 0x10 {
+        bit 17 RFIRST
+        bit 16 SWLH
+        bit 13 ISTPBK
+        bit 12 STPBK
+        bit  4 ESCLK
+        bit  0 AMSL
+    }
+
+    reg SR 0x14 {
+        fld 29 24 RFL
+        bit 13  8 TFL
+        bit     6 ROR
+        bit     5 TUR
+        bit     4 RFS
+        bit     3 TFS
+    }
+
+    reg I2SSR 0x1c {
+        bit 5 CHBSY
+        bit 4 TBSY
+        bit 3 RBSY
+        bit 2 BSY
+    }
+
+    reg I2SDIV 0x30
+    reg DR 0x34
+}
+
 node DDRC {
     title "DDR controller AHB2 group"
     desc "note: incomplete, only lists registers used by DDR init code"
@@ -226,6 +297,16 @@ node CPM {
         bit    24 FLAG
         fld  3  0 CLKDIV
     }
+
+    reg I2SCDR 0x60 {
+        bit 31 PCS { enum SCLK_A 0; enum MPLL 1; }
+        bit 30 CS  { enum EXCLK 0; enum PLL 1; }
+        bit 29 CE
+        fld 21 13 DIV_M
+        fld 12  0 DIV_N
+    }
+
+    reg I2SCDR1 0x70
 
     reg LPCDR 0x64 {
         bit 31 CLKSRC { enum SCLK_A 0; enum MPLL 1; }
@@ -409,6 +490,98 @@ node WDT {
         field 5 3 PRESCALE { enum BY_1 0; enum BY_4 1; enum BY_16 2;
                              enum BY_64 3; enum BY_256 4; enum BY_1024 5; }
         field 2 0 SOURCE { enum EXT 4; enum RTC 2; enum PLCK 1; }
+    }
+}
+
+node DMA {
+    title "DMA controller"
+    addr 0xb3421000
+
+    reg CTRL 0x00 {
+        bit 31 FMSC
+        bit 30 FSSI
+        bit 29 FTSSI
+        bit 28 FUART
+        bit 27 FAIC
+        bit 3 HALT
+        bit 2 AR
+        bit 0 ENABLE
+    }
+
+    reg IRQP 0x04
+    reg DB   0x08 { variant set 4 }
+    reg DIP  0x10
+    reg DIC  0x14
+}
+
+node DMA_CHN {
+    title "DMA channel registers"
+    instance 0xb3420000 0x20 8
+
+    reg SA 0x00
+    reg TA 0x04
+    reg TC 0x08
+    reg RT 0x0c {
+        field 5 0 TYPE {
+            enum DMIC_RX  5
+            enum I2S_TX   6
+            enum I2S_RX   7
+            enum AUTO     8
+            enum UART2_TX 16
+            enum UART2_RX 17
+            enum UART1_TX 18
+            enum UART1_RX 19
+            enum UART0_TX 20
+            enum UART0_RX 21
+            enum SSI_TX   22
+            enum SSI_RX   23
+            enum MSC0_TX  26
+            enum MSC0_RX  27
+            enum MSC1_TX  28
+            enum MSC1_RX  29
+            enum PCM_TX   32
+            enum PCM_RX   33
+            enum I2C0_TX  36
+            enum I2C0_RX  37
+            enum I2C1_TX  38
+            enum I2C1_RX  39
+            enum I2C2_TX  40
+            enum I2C2_RX  41
+        }
+    }
+
+    reg CS 0x10 {
+        bit    31 NDES
+        bit    30 DES8
+        fld 15  8 CDOA
+        bit     4 AR
+        bit     3 TT
+        bit     2 HLT
+        bit     0 CTE
+    }
+
+    reg CM 0x14 {
+        bit    23 SAI
+        bit    22 DAI
+        fld 19 16 RDIL
+        fld 15 14 SP { enum 32BIT 0; enum 8BIT 1; enum 16BIT 2 }
+        fld 13 12 DP { enum 32BIT 0; enum 8BIT 1; enum 16BIT 2 }
+        fld 10  8 TSZ { enum 32BIT 0; enum 8BIT 1; enum 16BIT 2;
+                        enum 16BYTE 3; enum 32BYTE 4; enum 64BYTE 5;
+                        enum 128BYTE 6; enum AUTO 7; }
+        bit     2 STDE
+        bit     1 TIE
+        bit     0 LINK
+    }
+
+    reg DA 0x18 {
+        fld 31 12 DBA
+        fld 11  4 DOA
+    }
+
+    reg SD 0x1c {
+        fld 31 16 TSD
+        fld 15  0 SSD
     }
 }
 
