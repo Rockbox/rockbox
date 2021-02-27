@@ -300,8 +300,8 @@ keymaps/keymap-xduoox3.c
 keymaps/keymap-xduoox3ii.c
 #elif CONFIG_KEYPAD == XDUOO_X20_PAD
 keymaps/keymap-xduoox20.c
-#elif CONFIG_KEYPAD == FIIO_M3K_PAD
-keymaps/keymap-fiiom3k.c
+#elif CONFIG_KEYPAD == FIIO_M3K_LINUX_PAD
+keymaps/keymap-fiiom3klinux.c
 #elif CONFIG_KEYPAD == EROSQ_PAD
 keymaps/keymap-erosq.c
 #endif

@@ -115,7 +115,7 @@ target/hosted/sonynwz/nvp-nwz.c
 target/hosted/sonynwz/nwz-db.c
 #endif
 
-#if ((defined(HIBY_LINUX) || defined(FIIO_M3K)) && !defined(SIMULATOR))
+#if ((defined(HIBY_LINUX) || defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR))
 drivers/lcd-memframe.c
 target/hosted/alsa-controls.c
 target/hosted/pcm-alsa.c
@@ -148,7 +148,7 @@ target/hosted/usb-hiby.c
 target/hosted/button-devinput.c
 #endif
 
-#if (defined(FIIO_M3K)) && !defined(SIMULATOR)
+#if (defined(FIIO_M3K_LINUX)) && !defined(SIMULATOR)
 target/hosted/fiio/buttonlight-fiio.c
 target/hosted/fiio/button-fiio.c
 target/hosted/fiio/debug-fiio.c

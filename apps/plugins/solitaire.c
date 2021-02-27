@@ -665,7 +665,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK      "DBL PLAY"
 #   define HK_REM2STACK      "NEXT"
 
-#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#elif CONFIG_KEYPAD == FIIO_M3K_LINUX_PAD
 #   define SOL_QUIT          BUTTON_POWER
 #   define SOL_UP            BUTTON_HOME
 #   define SOL_DOWN          BUTTON_OPTION

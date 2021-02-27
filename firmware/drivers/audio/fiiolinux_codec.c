@@ -166,7 +166,7 @@ void audiohw_set_filter_roll_off(int value)
        1 = Slow;
        2 = Short Sharp
        3 = Short Slow */
-#if 0 //  defined(FIIO_M3K)
+#if 0 //  defined(FIIO_M3K_LINUX)
     // AK4376 supports this but the control isn't wired into ALSA!
     long int value_hw = value;
     alsa_controls_set_ints("AK4376 Digital Filter", 1, &value_hw);

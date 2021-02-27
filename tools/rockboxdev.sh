@@ -845,7 +845,7 @@ do
             #   glibc: 2.16
             #   alsa: 1.0.29
             #
-            # FiiO M3K:
+            # FiiO M3K Linux:
             #   kernel: 3.10.14
             #   glibc: 2.16
             #   alsa: 1.0.26
