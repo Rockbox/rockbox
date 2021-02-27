@@ -126,6 +126,10 @@
 #include "bootdata.h"
 #endif
 
+#ifdef FIIO_M3K
+#include "installer.h"
+#endif
+
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
@@ -2482,6 +2486,63 @@ static bool dbg_boot_data(void)
 }
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
 
+#ifdef FIIO_M3K
+/* Note: this is temporary and should NOT be merged, ensure it is removed */
+extern void audiohw_set_power_save(bool enable);
+static int fiio_debug_menu_action_callback(int action, struct gui_synclist *lists)
+{
+    if(action == ACTION_REDRAW) {
+        simplelist_set_line_count(0);
+        simplelist_addline("Back to menu");
+        simplelist_addline("Install bootloader");
+        simplelist_addline("Dump bootloader");
+        simplelist_addline("Set DAC high mode");
+        simplelist_addline("Set DAC low mode");
+        action = ACTION_REDRAW;
+    }
+
+    if(action == ACTION_STD_OK) {
+        int sel = gui_synclist_get_sel_pos(lists);
+        int rc = 0;
+        switch(sel) {
+        case 1:
+            rc = install_bootloader("/boot.install");
+            break;
+        case 2:
+            rc = dump_bootloader("/boot.dump");
+            break;
+        case 3:
+            audiohw_set_power_save(false);
+            splashf(HZ, "DAC power save off");
+            break;
+        case 4:
+            audiohw_set_power_save(true);
+            splashf(HZ, "DAC power save on");
+            break;
+        default:
+            break;
+        }
+
+        if(sel == 1 || sel == 2) {
+            const char* msg = installer_strerror(rc);
+            splashf(3*HZ, "(%d) %s", rc, msg);
+        }
+
+        action = ACTION_STD_CANCEL;
+    }
+
+    return action;
+}
+
+static bool dbg_fiio_menu(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, "FiiO debug menu", 3, NULL);
+    info.action_callback = fiio_debug_menu_action_callback;
+    return simplelist_show_list(&info);
+}
+#endif
+
 /****** The menu *********/
 static const struct {
     unsigned char *desc; /* string or ID */
@@ -2588,6 +2649,9 @@ static const struct {
         {"Talk engine stats", dbg_talk },
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
         {"Boot data", dbg_boot_data },
+#endif
+#ifdef FIIO_M3K
+        {"FiiO debug menu", dbg_fiio_menu},
 #endif
 };
 
