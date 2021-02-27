@@ -72,7 +72,7 @@
 #define BUTTON_DOWN   BUTTON_HOME
 #define BUTTON_SELECT BUTTON_PLAY
 #include "bitmaps/hibyicon.h"
-#elif defined(FIIO_M3K)
+#elif defined(FIIO_M3K_LINUX)
 #define ICON_WIDTH  130
 #define ICON_HEIGHT 130
 #define ICON_NAME bm_fiioicon
@@ -95,7 +95,7 @@
 #endif
 
 #define BASE_DIR PIVOT_ROOT
-//#ifdef FIIO_M3K
+//#ifdef FIIO_M3K_LINUX
 //#define BASE_DIR "/mnt"
 //#else
 //#define BASE_DIR "/mnt/sd_0"
@@ -469,7 +469,7 @@ void run_script_menu(void)
 
 static void adb(int start)
 {
-#if defined(FIIO_M3K)
+#if defined(FIIO_M3K_LINUX)
     lcd_set_foreground(LCD_RGBPACK(255, 0, 0));
     lcd_putsf(0, 1, "ADB not supported!");
     sleep(2*HZ);
@@ -622,7 +622,7 @@ int main(int argc, char **argv)
 #endif
             mount_storage(false);
             /* boot OF */
-#if defined(FIIO_M3K)
+#if defined(FIIO_M3K_LINUX)
             execvp("/usr/project/bin/player_daemon", argv);
 #else
             execvp("/usr/bin/hiby_player", argv);

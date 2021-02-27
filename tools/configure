@@ -1595,7 +1595,7 @@ cat <<EOF
  ==AgpTek==               252) 800               227) NW-A20 series
  240) Rocker                                     228) NWZ-A860 series
                           ==FiiO==               229) NWZ-S750 series
- ==AIGO==                 244) M3K
+ ==AIGO==                 244) M3K Linux
  245) Eros Q / K
 
 EOF
@@ -4088,12 +4088,12 @@ fi
     sysfontbl="16-Terminus"
     ;;
 
-    244|fiiom3k)
+    244|fiiom3klinux)
     application="yes"
     app_type="fiio"
     target_id=112
-    modelname="fiiom3k"
-    target="FIIO_M3K"
+    modelname="fiiom3klinux"
+    target="FIIO_M3K_LINUX"
     memory=16 # XXX Can probably go over 32?
     tool="cp "
     boottool="cp "

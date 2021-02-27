@@ -19,7 +19,7 @@
  *
  ****************************************************************************/
 
-/* Button Code Definitions for FiiO M3K target */
+/* Button Code Definitions for FiiO M3K Linux target */
 
 #include "config.h"
 #include "action.h"
