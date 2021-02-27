@@ -325,6 +325,14 @@
 #define MIDI_VOL_DOWN     BUTTON_VOL_DOWN
 #define MIDI_PLAYPAUSE    BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#define MIDI_QUIT         BUTTON_POWER
+#define MIDI_FFWD         BUTTON_LEFT
+#define MIDI_REWIND       BUTTON_RIGHT
+#define MIDI_VOL_UP       BUTTON_VOL_UP
+#define MIDI_VOL_DOWN     BUTTON_VOL_DOWN
+#define MIDI_PLAYPAUSE    BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

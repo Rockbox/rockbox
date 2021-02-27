@@ -242,6 +242,12 @@
 #define BATTERY_OFF_TXT "Power"
 #define BATTERY_ON_TXT  "Menu - start"
 
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#define BATTERY_ON      BUTTON_PLAY
+#define BATTERY_OFF     BUTTON_POWER
+#define BATTERY_ON_TXT  "Play"
+#define BATTERY_OFF_TXT "Power"
+
 #else
 #error "No keymap defined!"
 #endif
