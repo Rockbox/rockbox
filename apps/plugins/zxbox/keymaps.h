@@ -274,7 +274,7 @@
 #define ZX_UP           BUTTON_HOME
 #define ZX_DOWN         BUTTON_OPTION
 
-#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+#elif CONFIG_KEYPAD == FIIO_M3K_LINUX_PAD
 #define ZX_SELECT       BUTTON_PLAY
 #define ZX_MENU         BUTTON_POWER
 #define ZX_LEFT         BUTTON_PREV

@@ -448,7 +448,7 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'xDuoo X20',
         status => 2,
     },
-    'fiiom3k' => {
+    'fiiom3klinux' => {
         name => 'FiiO M3K',
         status => 1,
     },

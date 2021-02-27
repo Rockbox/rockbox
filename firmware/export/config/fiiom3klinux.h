@@ -1,5 +1,5 @@
 /*
- * This config file is for the FiiO M3K
+ * This config file is for the FiiO M3K (Linux version)
  */
 
 /* For Rolo and boot loader */
@@ -74,7 +74,7 @@
 #define HAVE_HEADPHONE_DETECTION
 
 /* KeyPad configuration for plugins */
-#define CONFIG_KEYPAD FIIO_M3K_PAD
+#define CONFIG_KEYPAD FIIO_M3K_LINUX_PAD
 
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
