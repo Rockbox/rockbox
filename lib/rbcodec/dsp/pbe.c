@@ -64,6 +64,9 @@ static void pbe_buffer_free(void)
 
 static void dsp_pbe_flush(void)
 {
+    if (handle < 0)
+        return;
+
     memset(core_get_data(handle), 0, PBE_BUFSIZE);
 
     b0_r[0] = 0; b0_w[0] = 0;
@@ -141,6 +144,9 @@ static void pbe_process(struct dsp_proc_entry *this,
     int32_t x;
 
     int32_t *b0[2], *b2[2], *b3[2];
+
+    if (handle < 0)
+        return;
 
     b0[0] = core_get_data(handle);
     b0[1] = b0[0] + B0_SIZE;
