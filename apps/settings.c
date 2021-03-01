@@ -196,13 +196,29 @@ static bool write_nvram_data(char* buf, int max_len)
                     max_len-NVRAM_DATA_START-1,0xffffffff);
     memcpy(&buf[4],&crc32,4);
 #ifndef HAVE_RTC_RAM
-    fd = open(NVRAM_FILE,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+#ifndef RB_NO_TEMP_CONFIG_FILES
+    bool f_exists = file_exists(filename);
+#else
+    bool f_exists = false;
+#endif
+
+    if (f_exists)
+        fd = open(NVRAM_FILE ".tmp", O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    else
+        fd = open(NVRAM_FILE, O_CREAT|O_TRUNC|O_WRONLY, 0666);
+
     if (fd >= 0)
     {
         int len = write(fd,buf,max_len);
         close(fd);
         if (len < 8)
             return false;
+    }
+
+    if (f_exists)
+    {
+        remove(NVRAM_FILE);
+        return (rename(NVRAM_FILE ".tmp", NVRAM_FILE) >= 0);
     }
 #else
     /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
@@ -540,10 +556,26 @@ static bool settings_write_config(const char* filename, int options)
 {
     int i;
     int fd;
-    char value[MAX_PATH];
-    fd = open(filename,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    char value[MAX_PATH + 4]; /*extra chars for '.tmp'*/
+
+#ifndef RB_NO_TEMP_CONFIG_FILES
+    bool f_exists = file_exists(filename);
+#else
+    bool f_exists = false;
+#endif
+
+
+    if (f_exists)
+    {
+        snprintf(value, sizeof(value), "%s/%s", filename, ".tmp")
+        fd = open(value,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    }
+    else
+        fd = open(filename,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+
     if (fd < 0)
         return false;
+
     fdprintf(fd, "# .cfg file created by rockbox %s - "
                  "http://www.rockbox.org\r\n\r\n", rbversion);
     for(i=0; i<nb_settings; i++)
@@ -584,6 +616,14 @@ static bool settings_write_config(const char* filename, int options)
         fdprintf(fd,"%s: %s\r\n",settings[i].cfg_name,value);
     } /* for(...) */
     close(fd);
+
+    if (f_exists)
+    {
+        snprintf(value, sizeof(value), "%s/%s", filename, ".tmp")
+        remove(filename);
+        return (rename(value, filename) >= 0);
+    }
+
     return true;
 }
 #ifndef HAVE_RTC_RAM
