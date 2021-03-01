@@ -931,13 +931,9 @@ void settings_apply(bool read_disk)
         CHART("<icons_init");
 
 #ifdef HAVE_LCD_COLOR
-        if (global_settings.colors_file[0]
-            && global_settings.colors_file[0] != '-')
-        {
-            CHART(">read_color_theme_file");
-            read_color_theme_file();
-            CHART("<read_color_theme_file");
-        }
+        CHART(">read_color_theme_file");
+        read_color_theme_file();
+        CHART("<read_color_theme_file");
 #endif
     }
 #ifdef HAVE_LCD_COLOR
