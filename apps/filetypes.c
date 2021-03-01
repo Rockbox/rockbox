@@ -257,6 +257,7 @@ void read_color_theme_file(void) {
     for (i = 0; i < MAX_FILETYPES; i++) {
         custom_colors[i] = -1;
     }
+    unknown_file.color = -1;
     if (!global_settings.colors_file[0] || global_settings.colors_file[0] == '-')
         return;
     snprintf(buffer, MAX_PATH, THEME_DIR "/%s.colours",
