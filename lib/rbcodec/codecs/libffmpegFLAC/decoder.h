@@ -3,9 +3,10 @@
  
 #include "bitstream.h"
 
-#define MAX_CHANNELS 6       /* Maximum supported channels, only left/right will be played back */
-#define MAX_BLOCKSIZE 4608   /* Maxsize in samples of one uncompressed frame */
-#define MAX_FRAMESIZE 65536  /* Maxsize in bytes of one compressed frame */
+#define MAX_CHANNELS   6      /* Maximum supported channels, only left/right will be played back */
+#define MAX_BLOCKSIZE  4608   /* Maxsize in samples of one uncompressed frame */
+#define MAX_FRAMESIZE  65536  /* Maxsize in bytes of one compressed frame */
+#define MIN_FRAME_SIZE 11     /* smallest valid FLAC frame possible */
 
 #define FLAC_OUTPUT_DEPTH 29 /* Provide samples left-shifted to 28 bits+sign */
 
@@ -23,10 +24,10 @@ typedef struct FLACContext {
     int min_framesize, max_framesize;
     int samplerate, channels;
     int blocksize/*, last_blocksize*/;
-    int bps, curr_bps;
+    int bps;
     unsigned long samplenumber;
     unsigned long totalsamples;
-    enum decorrelation_type decorrelation;
+    enum decorrelation_type ch_mode;
 
     int filesize;
     int length;
