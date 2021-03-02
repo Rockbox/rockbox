@@ -23,7 +23,7 @@ typedef struct FLACContext {
     int min_framesize, max_framesize;
     int samplerate, channels;
     int blocksize/*, last_blocksize*/;
-    int bps, curr_bps;
+    int bps;
     unsigned long samplenumber;
     unsigned long totalsamples;
     enum decorrelation_type decorrelation;
