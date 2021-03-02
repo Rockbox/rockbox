@@ -135,50 +135,57 @@ static int get_crc8(const uint8_t *buf, int count)
 }
 
 static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR_FLAC;
-static int decode_residuals(FLACContext *s, int32_t* decoded, int pred_order)
+static int decode_residuals(FLACContext *s, int32_t *decoded, int pred_order)
 {
+    GetBitContext gb = s->gb;
     int i, tmp, partition, method_type, rice_order;
-    int sample = 0, samples;
+    int rice_bits, rice_esc;
+    int samples;
 
-    method_type = get_bits(&s->gb, 2);
-    if (method_type > 1){
-        //fprintf(stderr,"illegal residual coding method %d\n", method_type);
+    method_type = get_bits(&gb, 2);
+    rice_order  = get_bits(&gb, 4);
+
+    samples   = s->blocksize >> rice_order;
+    rice_bits = 4 + method_type;
+    rice_esc  = (1 << rice_bits) - 1;
+
+    decoded += pred_order;
+    i        = pred_order;
+
+    if (method_type > 1 || pred_order > samples)
         return -3;
-    }
-    
-    rice_order = get_bits(&s->gb, 4);
 
-    samples= s->blocksize >> rice_order;
+    for (partition = 0; partition < (1 << rice_order); partition++) {
+        tmp = get_bits(&gb, rice_bits);
+        if (tmp == rice_esc) {
+            tmp = get_bits(&gb, 5);
+            for (; i < samples; i++)
+                *decoded++ = get_sbits(&gb, tmp);
+        } else {
+            int real_limit = tmp ? (INT_MAX >> tmp) + 2 : INT_MAX;
+            for (; i < samples; i++) {
+                int v = get_sr_golomb_flac(&gb, tmp, real_limit, 0);
+                if ((unsigned) v == 0x80000000){
+                    return -3;
+                }
 
-    sample= 
-    i= pred_order;
-    for (partition = 0; partition < (1 << rice_order); partition++)
-    {
-        tmp = get_bits(&s->gb, method_type == 0 ? 4 : 5);
-        if (tmp == (method_type == 0 ? 15 : 31))
-        {
-            //fprintf(stderr,"fixed len partition\n");
-            tmp = get_bits(&s->gb, 5);
-            for (; i < samples; i++, sample++)
-                decoded[sample] = get_sbits(&s->gb, tmp);
-        }
-        else
-        {
-            for (; i < samples; i++, sample++){
-                decoded[sample] = get_sr_golomb_flac(&s->gb, tmp, INT_MAX, 0);
+                *decoded++ = v;
             }
         }
         i= 0;
     }
 
+    s->gb = gb;
+
     return 0;
-}    
+}  
 
 static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order) ICODE_ATTR_FLAC;
 static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_order)
 {
     const int blocksize = s->blocksize;
-    int a, b, c, d, i;
+    unsigned a, b, c, d;
+    int i;
         
     /* warm up samples */
     for (i = 0; i < pred_order; i++)
@@ -192,7 +199,7 @@ static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_orde
     a = decoded[pred_order-1];
     b = a - decoded[pred_order-2];
     c = b - decoded[pred_order-2] + decoded[pred_order-3];
-    d = c - decoded[pred_order-2] + 2*decoded[pred_order-3] - decoded[pred_order-4];
+    d = c - decoded[pred_order-2] + 2U*decoded[pred_order-3] - decoded[pred_order-4];
 
     switch(pred_order)
     {
@@ -234,7 +241,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
     {
         decoded[i] = get_sbits(&s->gb, s->curr_bps);
     }
-    
+
     coeff_prec = get_bits(&s->gb, 4) + 1;
     if (coeff_prec == 16)
     {
@@ -288,6 +295,8 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order)
                 wsum += (int64_t)coeffs[j] * (int64_t)decoded[i-j-1];
             decoded[i] += wsum >> qlevel;
         }
+
+            ;;
         #endif
     }
     
@@ -370,7 +379,7 @@ static inline int decode_subframe(FLACContext *s, int channel, int32_t* decoded)
         return -12;
     }
         
-    if (wasted)
+    if (wasted && wasted < 32)
     {
         int i;
         for (i = 0; i < s->blocksize; i++)

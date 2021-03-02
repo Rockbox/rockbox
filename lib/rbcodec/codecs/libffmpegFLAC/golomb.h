@@ -33,6 +33,69 @@
 /**
  * read unsigned golomb rice code (jpegls).
  */
+static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit,
+                                       int esc_len)
+{
+    unsigned int buf;
+    int log;
+
+    OPEN_READER(re, gb);
+    UPDATE_CACHE(re, gb);
+    buf = GET_CACHE(re, gb);
+
+    log = av_log2(buf);
+
+    if (log - k >= 32 - MIN_CACHE_BITS + (MIN_CACHE_BITS == 32) &&
+        32 - log < limit) {
+        buf >>= log - k;
+        buf  += (30U - log) << k;
+        LAST_SKIP_BITS(re, gb, 32 + k - log);
+        CLOSE_READER(re, gb);
+
+        return buf;
+    } else {
+        int i;
+        for (i = 0; i < limit && SHOW_UBITS(re, gb, 1) == 0; i++) {
+            if (gb->size_in_bits <= (signed) re_index) {
+                CLOSE_READER(re, gb);
+                return -1;
+            }
+            LAST_SKIP_BITS(re, gb, 1);
+            UPDATE_CACHE(re, gb);
+        }
+        SKIP_BITS(re, gb, 1);
+
+        if (i < limit - 1) {
+            if (k) {
+                if (k > MIN_CACHE_BITS - 1) {
+                    buf = SHOW_UBITS(re, gb, 16) << (k-16);
+                    LAST_SKIP_BITS(re, gb, 16);
+                    UPDATE_CACHE(re, gb);
+                    buf |= SHOW_UBITS(re, gb, k-16);
+                    LAST_SKIP_BITS(re, gb, k-16);
+                } else {
+                    buf = SHOW_UBITS(re, gb, k);
+                    LAST_SKIP_BITS(re, gb, k);
+                }
+            } else {
+                buf = 0;
+            }
+
+            buf += (i << k);
+        } else if (i == limit - 1) {
+            buf = SHOW_UBITS(re, gb, esc_len);
+            LAST_SKIP_BITS(re, gb, esc_len);
+
+            buf ++;
+        } else {
+            buf = -1;
+        }
+        CLOSE_READER(re, gb);
+        return buf;
+    }
+}
+#if 0
+
 static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit, int esc_len){
     unsigned int buf;
     int log;
@@ -78,6 +141,7 @@ static inline int get_ur_golomb_jpegls(GetBitContext *gb, int k, int limit, int 
             return -1;
     }
 }
+#endif
 
 /**
  * read signed golomb rice code (flac).
