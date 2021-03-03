@@ -235,7 +235,7 @@ void discard_dcache_range(const void *base, unsigned int size)
     }
 
     /* Interior of region is safe to discard */
-    for(; ptr != end; ptr += CACHEALIGN_SIZE)
+    for(; ptr <= end; ptr += CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, ptr);
 
     SYNC_WB();
