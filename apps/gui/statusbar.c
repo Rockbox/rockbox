@@ -53,6 +53,7 @@
 #define STATUSBAR_PLUG_X_POS                    STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
                                                 ICONS_SPACING
+#define STATUSBAR_BATTERY_HEIGHT                SB_ICON_HEIGHT - 1
 #define STATUSBAR_PLUG_WIDTH                    7
 #define STATUSBAR_VOLUME_X_POS                  STATUSBAR_X_POS + \
                                                 STATUSBAR_BATTERY_WIDTH + \
@@ -400,12 +401,13 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
     }
     else {
         /* draw battery */
-        display->drawrect(STATUSBAR_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
-        display->vline(STATUSBAR_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
-                       STATUSBAR_Y_POS + 4);
+        display->drawrect(STATUSBAR_BATTERY_X_POS, STATUSBAR_Y_POS,
+                          STATUSBAR_BATTERY_WIDTH - 1, STATUSBAR_BATTERY_HEIGHT);
+        display->vline(STATUSBAR_BATTERY_X_POS + STATUSBAR_BATTERY_WIDTH - 1,
+                       STATUSBAR_Y_POS + 2, STATUSBAR_Y_POS + 4);
 
         display->fillrect(STATUSBAR_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1,
-                          fill, 5);
+                          fill, STATUSBAR_BATTERY_HEIGHT - 2);
 #if LCD_DEPTH > 1
         if (display->depth > 1)
         {
@@ -413,8 +415,8 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
             display->set_foreground(LCD_DARKGRAY);
         }
 #endif
-        display->fillrect(STATUSBAR_BATTERY_X_POS + 1 + fill,
-                          STATUSBAR_Y_POS + 1, endfill - fill, 5);
+        display->fillrect(STATUSBAR_BATTERY_X_POS + 1 + fill, STATUSBAR_Y_POS + 1,
+                          endfill - fill, STATUSBAR_BATTERY_HEIGHT - 2);
 #if LCD_DEPTH > 1
         if (display->depth > 1)
             display->set_foreground(prevfg);
