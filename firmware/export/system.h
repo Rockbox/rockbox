@@ -253,6 +253,10 @@ static inline void cpu_boost_unlock(void)
     #define MIN_STACK_ALIGN 8
 #endif
 
+#ifdef CPU_MIPS
+    #define HAVE_CPU_CACHE_ALIGN
+#endif
+
 /* Define this if target has support for generating backtraces */
 #ifdef CPU_ARM
     #define HAVE_RB_BACKTRACE
