@@ -302,9 +302,9 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         return -7;
     }
 
-    for (i = 0; i < pred_order; i++)
+    for (j = 0; i < pred_order; j++)
     {
-        coeffs[i] = get_sbits(&s->gb, coeff_prec);
+        coeffs[j] = get_sbits(&s->gb, coeff_prec);
     }
     
     if (decode_residuals(s, decoded, pred_order) < 0)
@@ -312,11 +312,11 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
 
     if ((s->bps + coeff_prec + av_log2(pred_order)) <= 32) {
         #if defined(CPU_COLDFIRE)
-        (void)sum, j;
+        (void)sum;
         lpc_decode_emac(s->blocksize - pred_order, qlevel, pred_order,
                         decoded + pred_order, coeffs);
         #elif defined(CPU_ARM)
-        (void)sum, j;
+        (void)sum;
         lpc_decode_arm(s->blocksize - pred_order, qlevel, pred_order,
                        decoded + pred_order, coeffs);
         #else
