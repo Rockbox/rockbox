@@ -192,10 +192,11 @@ void commit_discard_dcache(void)
  */
 void commit_discard_dcache_range(const void *base, unsigned int size)
 {
-    register char *s;
+    char *ptr = CACHEALIGN_DOWN((char*)base);
+    char *end = CACHEALIGN_UP((char*)base + size);
 
-    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
-        __CACHE_OP(DCHitWBInv, s);
+    for(; ptr != end; ptr += CACHEALIGN_SIZE)
+        __CACHE_OP(DCHitWBInv, ptr);
 
     SYNC_WB();
 }
@@ -204,10 +205,11 @@ void commit_discard_dcache_range(const void *base, unsigned int size)
  */
 void commit_dcache_range(const void *base, unsigned int size)
 {
-    register char *s;
+    char *ptr = CACHEALIGN_DOWN((char*)base);
+    char *end = CACHEALIGN_UP((char*)base + size);
 
-    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
-        __CACHE_OP(DCHitWB, s);
+    for(; ptr != end; ptr += CACHEALIGN_SIZE)
+        __CACHE_OP(DCHitWB, ptr);
 
     SYNC_WB();
 }
@@ -217,17 +219,24 @@ void commit_dcache_range(const void *base, unsigned int size)
  */
 void discard_dcache_range(const void *base, unsigned int size)
 {
-    register char *s;
+    char *ptr = CACHEALIGN_DOWN((char*)base);
+    char *end = CACHEALIGN_UP((char*)base + size);
 
-    if (((int)base & CACHEALIGN_SIZE - 1) ||
-	(((int)base + size) & CACHEALIGN_SIZE - 1)) {
-            /* Overlapping sections, so we need to write back instead */
-            commit_discard_dcache_range(base, size);
-            return;
-    };
+    if(ptr != base) {
+        /* Start of region not cache aligned */
+        __CACHE_OP(DCHitWBInv, ptr);
+        ptr += CACHEALIGN_SIZE;
+    }
 
-    for (s=(char *)base; s<(char *)base+size; s+=CACHEALIGN_SIZE)
-        __CACHE_OP(DCHitInv, s);
+    if(base+size != end) {
+        /* End of region not cache aligned */
+        end -= CACHEALIGN_SIZE;
+        __CACHE_OP(DCHitWBInv, end);
+    }
+
+    /* Interior of region is safe to discard */
+    for(; ptr != end; ptr += CACHEALIGN_SIZE)
+        __CACHE_OP(DCHitInv, ptr);
 
     SYNC_WB();
 }
