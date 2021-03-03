@@ -230,6 +230,7 @@ static int decode_subframe_fixed(FLACContext *s, int32_t* decoded, int pred_orde
     return 0;
 }
 
+#if !defined(CPU_COLDFIRE)
 static void flac_lpc_32_c(int32_t *decoded, int coeffs[],
                           int pred_order, int qlevel, int len) ICODE_ATTR_FLAC;
 static void flac_lpc_32_c(int32_t *decoded, int coeffs[],
@@ -273,6 +274,7 @@ static void lpc_analyze_remodulate(int32_t *decoded, int coeffs[],
         decoded[j] += p >> qlevel;
     }
 }
+#endif
 
 static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order, int bps) ICODE_ATTR_FLAC;
 static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order, int bps)
@@ -310,11 +312,11 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
 
     if ((s->bps + coeff_prec + av_log2(pred_order)) <= 32) {
         #if defined(CPU_COLDFIRE)
-        (void)sum;
+        (void)sum, j;
         lpc_decode_emac(s->blocksize - pred_order, qlevel, pred_order,
                         decoded + pred_order, coeffs);
         #elif defined(CPU_ARM)
-        (void)sum;
+        (void)sum, j;
         lpc_decode_arm(s->blocksize - pred_order, qlevel, pred_order,
                        decoded + pred_order, coeffs);
         #else
@@ -328,11 +330,9 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         #endif
     } else {
         #if defined(CPU_COLDFIRE)
-        (void)j;
         lpc_decode_emac_wide(s->blocksize - pred_order, qlevel, pred_order,
                              decoded + pred_order, coeffs);
         #else
-
         flac_lpc_32_c(decoded, coeffs, pred_order, qlevel, s->blocksize);
 
         if (bps <= 16)
