@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "8289e134_200e49a2",
+        "filename": "bootloader/SOURCES",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "agreed",
+      "parentUuid": "30e36384_69bf0b86",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 11
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "be840e1c_40372355",
         "filename": "bootloader/fiiom3k.c",
         "patchSetId": 4
@@ -36,6 +60,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "we\u0027ll probably want to get rid of the logo in teh bootloader, but keep display features in case we want to emit an error message..",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 16
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dbecf4fa_baa98fc0",
+        "filename": "bootloader/fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Agreed, logo is only there for debugging.",
+      "parentUuid": "be840e1c_40372355",
       "range": {
         "startLine": 58,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "0fae4fa6_b73ba3c0",
+        "filename": "firmware/drivers/audio/ak4376.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "No, it cannot. All registers are controlled by the host.",
+      "parentUuid": "afad72df_a4ce3325",
+      "range": {
+        "startLine": 45,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 28
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "59ba2907_0f19b6ca",
         "filename": "firmware/drivers/rtc/rtc_x1000.c",
         "patchSetId": 4
@@ -82,6 +154,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "I guess this will be implemented later; probably worth adding a TODO comment...",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 16
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7e51c83_5121e27e",
+        "filename": "firmware/drivers/rtc/rtc_x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will do",
+      "parentUuid": "59ba2907_0f19b6ca",
       "range": {
         "startLine": 22,
         "startChar": 0,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "ba5acd30_a7a7d2c5",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will do, must be a holdover from old code",
+      "parentUuid": "5fbecb61_ab78905b",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 31
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "459fc2ff_e988248f",
         "filename": "firmware/export/config/fiiom3k.h",
         "patchSetId": 4
@@ -134,6 +254,24 @@
     },
     {
       "key": {
+        "uuid": "3d62a894_9b4d22c4",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "No problem; the code should be ready to support that.\nLooks like I should also add HAVE_HOTSWAP_STORAGE_AS_MAIN too",
+      "parentUuid": "459fc2ff_e988248f",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2e2c6617_6011748a",
         "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.c",
         "patchSetId": 4
@@ -145,6 +283,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "One thing worth considering is special-casing the DMA channel used for audio.  Or always using channel 0 for audio so it\u0027s checked first.",
+      "range": {
+        "startLine": 79,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e17c4ae_d60d0432",
+        "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will use channel 0 for audio, I\u0027ll just define the channel numbering in the header file so it\u0027s easy to see. Also reduce iteration count from 8 to the number of channels we actually use.",
+      "parentUuid": "2e2c6617_6011748a",
       "range": {
         "startLine": 79,
         "startChar": 4,
@@ -180,6 +342,30 @@
     },
     {
       "key": {
+        "uuid": "ffe343c2_2f56a78b",
+        "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will do.",
+      "parentUuid": "a93cc1a8_06b25779",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 18
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2c9a0931_fe9443ba",
         "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/audiohw-fiiom3k.c",
         "patchSetId": 4
@@ -191,6 +377,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "it would be good to optimize this a bit, so we don\u0027t run the PLL any faster than we need.  but this is down-the-line..",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d75f03d6_068a807c",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/audiohw-fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Currently the audio is running off SCLK_A \u003d APLL \u003d 1008 MHz, and MPLL is disabled. I found it was possible to handle all the required sampling frequencies without having to use the second PLL.\n\nIt\u0027s possible to dial down APLL, but this would have to be done globally at startup and we\u0027d lose the ability to run the CPU at 1 GHz.",
+      "parentUuid": "2c9a0931_fe9443ba",
       "range": {
         "startLine": 71,
         "startChar": 0,
@@ -226,6 +436,30 @@
     },
     {
       "key": {
+        "uuid": "417604e0_a5c29211",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/button-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "My original code predates the published M3K Linux port. These names are just holdovers from my early work; I\u0027m fine with changing them.\n\nThere\u0027s a minor issue: scrolling per se currently isn\u0027t implemented, the button code just treats pressing on the upper/lower areas of the scrollbar as BUTTON_UP/BUTTON_DOWN. I intend to fix this later, but it\u0027s not a priority for me right now.\n\nIt would be possible to implement scrolling AND keep this behaviour, which would give this port more usable buttons than the Linux port. But I\u0027m not sure this is a good idea myself. It might be useful mainly for the games.",
+      "parentUuid": "0fff7c83_f7bb5307",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 34
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b4ef5338_64813ca4",
         "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c",
         "patchSetId": 4
@@ -237,6 +471,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "There\u0027s probably not a lot of savings to be had by killing power to the LCD entirely (vs a soft-off of the LCD itself) but every bit helps.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9a8c1e3_427d30e4",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "You\u0027re probably right, and needing to turn on the power would introduce extra latency after waking the screen from sleep, so I\u0027ll probably scratch that TODO",
+      "parentUuid": "b4ef5338_64813ca4",
       "range": {
         "startLine": 32,
         "startChar": 0,
@@ -272,6 +530,30 @@
     },
     {
       "key": {
+        "uuid": "ebae3b2c_efff4208",
+        "filename": "firmware/target/mips/ingenic_x1000/lcd-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "That\u0027s what I\u0027m intending on doing, and it\u0027s what Ingenic suggests as well, but I couldn\u0027t get the LCD DMA controller to do anything. It\u0027s probably a silly mistake I made. Debugging everything with flashing backlights and no LCD was a huge pain which is why I was happy to leave it in this sad state and move on.",
+      "parentUuid": "95020745_f90d9731",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 36
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f7554291_8b8348b8",
         "filename": "firmware/target/mips/ingenic_x1000/pcm-x1000.c",
         "patchSetId": 4
@@ -289,6 +571,24 @@
     },
     {
       "key": {
+        "uuid": "98ee6661_aae38cca",
+        "filename": "firmware/target/mips/ingenic_x1000/pcm-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "yes, I was just too lazy to implement it. Also I have defined UNDERRUN_LOGF \u003d panicf so it will be obvious if an underrun occurs. I never got one after playing a big (\u003e60 songs, 300-400 MB) album with all EQs/DSPs enabled.",
+      "parentUuid": "f7554291_8b8348b8",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6093f1f5_aec4ef62",
         "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
         "patchSetId": 4
@@ -300,6 +600,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "We can use the WSBH instruction to implement native byteswapping routines.  (mips32r2+ only!)",
+      "range": {
+        "startLine": 40,
+        "startChar": 7,
+        "endLine": 40,
+        "endChar": 30
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c7114a29_862a65c0",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "I know about the instruction but it was simply a low priority for me.\nWill definitely try it out.",
+      "parentUuid": "6093f1f5_aec4ef62",
       "range": {
         "startLine": 40,
         "startChar": 7,
@@ -335,6 +659,30 @@
     },
     {
       "key": {
+        "uuid": "0971de69_625dbe39",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will do",
+      "parentUuid": "e9ba6bd3_0831380d",
+      "range": {
+        "startLine": 126,
+        "startChar": 7,
+        "endLine": 126,
+        "endChar": 52
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "31a4e694_1341b729",
         "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
         "patchSetId": 4
@@ -346,6 +694,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "If I\u0027m doing my math correctly, a 64-bit OST will take 24,372 years to wrap, even running at 24MHz.  So we probably don\u0027t need to worry about wrapping.\n\nAlso, it\u0027s best to add +1 to us to guarantee that we will always delay at least as long as the requested time.  (otherwise we could under-delay by a fraction of a us..  on the other hand, you\u0027re using 64-bit math, which probably makes up the difference and then some..)",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 139,
+        "endChar": 33
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b8d7a95_3bae27cd",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "so add +1 in case the first ost_read() happens near the end of the tick. Thanks, will definitely fix.",
+      "parentUuid": "31a4e694_1341b729",
       "range": {
         "startLine": 137,
         "startChar": 0,
@@ -381,6 +753,30 @@
     },
     {
       "key": {
+        "uuid": "4165c1c1_d7f3a1ff",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "can change it if you want, but IIRC my biggest mdelay is only 120 milliseconds so I\u0027m not concerned about overflow; hence the WARNING.",
+      "parentUuid": "eef3603c_5b44d81b",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 36
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "11e5655f_3dcf9026",
         "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
         "patchSetId": 4
@@ -398,6 +794,24 @@
     },
     {
       "key": {
+        "uuid": "2a745bc4_c4dab717",
+        "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "For sure.",
+      "parentUuid": "11e5655f_3dcf9026",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "30cd1b8b_5a774579",
         "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
         "patchSetId": 4
@@ -409,6 +823,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "Do we really need full 24MHz resolution on OST2?  Why not cut it down to /4 to save a little bit of power?  (we\u0027ll still have 6 ticks per us, plenty of granularity)",
+      "range": {
+        "startLine": 131,
+        "startChar": 4,
+        "endLine": 131,
+        "endChar": 43
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d0c1009_f4eaf93d",
+        "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will do, it should\u0027ve been 4 and I can\u0027t remember why I changed it to 1.",
+      "parentUuid": "30cd1b8b_5a774579",
       "range": {
         "startLine": 131,
         "startChar": 4,
@@ -444,6 +882,30 @@
     },
     {
       "key": {
+        "uuid": "95feb93c_59e97d6a",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4207,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "I will do that once I verify some mips32r2 instruction actually works (just out of paranoia)",
+      "parentUuid": "194c8201_db3a3126",
+      "range": {
+        "startLine": 4207,
+        "startChar": 0,
+        "endLine": 4207,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "332de233_7ccf0fe9",
         "filename": "tools/configure",
         "patchSetId": 4
@@ -467,6 +929,30 @@
     },
     {
       "key": {
+        "uuid": "cbee5daf_051e7c74",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4208,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "plugins\u003d\"yes\" is missing on purpose, only because of hundreds of keymaps and longer compile times.\n\nRegarding keymaps, see my reply in fiiom3k/button-target.h, esp. about the scrollbar. Once we\u0027ve come to a decision on that I\u0027m happy to get the keymaps in order and enable plugins.",
+      "parentUuid": "332de233_7ccf0fe9",
+      "range": {
+        "startLine": 4208,
+        "startChar": 1,
+        "endLine": 4208,
+        "endChar": 27
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "656d6bd1_c79faaea",
         "filename": "tools/configure",
         "patchSetId": 4
@@ -478,6 +964,30 @@
       "writtenOn": "2021-03-03T21:32:53Z",
       "side": 1,
       "message": "this is redundant; everything is SWCODEC now.",
+      "range": {
+        "startLine": 4209,
+        "startChar": 1,
+        "endLine": 4209,
+        "endChar": 17
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb66e33d_9b9ee44f",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4209,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-03T22:54:08Z",
+      "side": 1,
+      "message": "Will remove, it\u0027s another holdover from old code",
+      "parentUuid": "656d6bd1_c79faaea",
       "range": {
         "startLine": 4209,
         "startChar": 1,
