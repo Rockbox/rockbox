@@ -302,7 +302,7 @@ static int decode_subframe_lpc(FLACContext *s, int32_t* decoded, int pred_order,
         return -7;
     }
 
-    for (j = 0; i < pred_order; j++)
+    for (j = 0; j < pred_order; j++)
     {
         coeffs[j] = get_sbits(&s->gb, coeff_prec);
     }
