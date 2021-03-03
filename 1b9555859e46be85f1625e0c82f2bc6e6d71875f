@@ -1,0 +1,492 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30e36384_69bf0b86",
+        "filename": "bootloader/SOURCES",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "as discussed we should probably drop the logo from the bootloader.",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 11
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be840e1c_40372355",
+        "filename": "bootloader/fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "we\u0027ll probably want to get rid of the logo in teh bootloader, but keep display features in case we want to emit an error message..",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 16
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "afad72df_a4ce3325",
+        "filename": "firmware/drivers/audio/ak4376.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "Can the AK4376 ever update a register on its own?",
+      "range": {
+        "startLine": 45,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 28
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59ba2907_0f19b6ca",
+        "filename": "firmware/drivers/rtc/rtc_x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "I guess this will be implemented later; probably worth adding a TODO comment...",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 16
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5fbecb61_ab78905b",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "This is redundant and can be nuked.",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 31
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "459fc2ff_e988248f",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "we should #define HAVE_HOTSWAP too, since the SD card is removable and we can detect it.",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e2c6617_6011748a",
+        "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "One thing worth considering is special-casing the DMA channel used for audio.  Or always using channel 0 for audio so it\u0027s checked first.",
+      "range": {
+        "startLine": 79,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a93cc1a8_06b25779",
+        "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "please use fixed-width types (ie uint32_t) for hw-defined field sizes\n\n(Minor quibble but this way it\u0027s unambiguous...)",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 18
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c9a0931_fe9443ba",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/audiohw-fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "it would be good to optimize this a bit, so we don\u0027t run the PLL any faster than we need.  but this is down-the-line..",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0fff7c83_f7bb5307",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/button-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "IMO these should be named the same as the M3K Linux port.  Any particular reason for the naming discrepancies?",
+      "range": {
+        "startLine": 24,
+        "startChar": 0,
+        "endLine": 35,
+        "endChar": 34
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b4ef5338_64813ca4",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "There\u0027s probably not a lot of savings to be had by killing power to the LCD entirely (vs a soft-off of the LCD itself) but every bit helps.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95020745_f90d9731",
+        "filename": "firmware/target/mips/ingenic_x1000/lcd-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "This is obviously pretty slow.  DMA obviously would help a lot here, but perhaps instead of DMAing an updated region on demand perhaps it makes more sense to maintain a shadow framebuffer and have the HW continually (~30fps) refresh via auto-restarting DMA?",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 36
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f7554291_8b8348b8",
+        "filename": "firmware/target/mips/ingenic_x1000/pcm-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "I found it quite useful to keep a counter of underruns and include it in the hw debug UI.",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6093f1f5_aec4ef62",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "We can use the WSBH instruction to implement native byteswapping routines.  (mips32r2+ only!)",
+      "range": {
+        "startLine": 40,
+        "startChar": 7,
+        "endLine": 40,
+        "endChar": 30
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9ba6bd3_0831380d",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "See my comments in system-x1000.c; we could use the /4 prescaler here with no meaningful loss.",
+      "range": {
+        "startLine": 126,
+        "startChar": 7,
+        "endLine": 126,
+        "endChar": 52
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "31a4e694_1341b729",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "If I\u0027m doing my math correctly, a 64-bit OST will take 24,372 years to wrap, even running at 24MHz.  So we probably don\u0027t need to worry about wrapping.\n\nAlso, it\u0027s best to add +1 to us to guarantee that we will always delay at least as long as the requested time.  (otherwise we could under-delay by a fraction of a us..  on the other hand, you\u0027re using 64-bit math, which probably makes up the difference and then some..)",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 139,
+        "endChar": 33
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eef3603c_5b44d81b",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "It\u0027s preferable to change this into a loop, each for 1000us.  This way we don\u0027t have to worry about math overflow in udelay().  (OTOH, 32-bit overflow occurs at 179s @ 24MHz..)",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 36
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "11e5655f_3dcf9026",
+        "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "Can you document the nominal clock speed these clock configurations result in?",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30cd1b8b_5a774579",
+        "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "Do we really need full 24MHz resolution on OST2?  Why not cut it down to /4 to save a little bit of power?  (we\u0027ll still have 6 ticks per us, plenty of granularity)",
+      "range": {
+        "startLine": 131,
+        "startChar": 4,
+        "endLine": 131,
+        "endChar": 43
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "194c8201_db3a3126",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4207,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "we should modify mipselcc to paramaterize GCCOPTS -- the jz4740/4760 are mips32r1, but the x1000 implements mips32r2 (or at least enough of it such that Linux uses -march\u003dmips32r2 in its CFLAGS)",
+      "range": {
+        "startLine": 4207,
+        "startChar": 0,
+        "endLine": 4207,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "332de233_7ccf0fe9",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4208,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "plugins\u003d\"...\" is missing, which is implicitly plugins\u003dno.  No surprise given that the plugins require a lot of keymap work, but we should still have the line in the configure script.\n\nI wonder if it might be feasible to blanket re-use the keymap definitions from the M3K_LINUX port?",
+      "range": {
+        "startLine": 4208,
+        "startChar": 1,
+        "endLine": 4208,
+        "endChar": 27
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "656d6bd1_c79faaea",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4209,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "this is redundant; everything is SWCODEC now.",
+      "range": {
+        "startLine": 4209,
+        "startChar": 1,
+        "endLine": 4209,
+        "endChar": 17
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}

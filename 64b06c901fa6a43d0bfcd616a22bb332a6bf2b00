@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab408ff1_7e971389",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-03T21:32:53Z",
+      "side": 1,
+      "message": "CONFIG_CODEC is not used anywhere; rockbox is currently SWCODEC only.  :)",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 1
+      },
+      "revId": "64b06c901fa6a43d0bfcd616a22bb332a6bf2b00",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
