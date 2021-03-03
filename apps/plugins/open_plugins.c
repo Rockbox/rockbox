@@ -742,12 +742,6 @@ enum plugin_status plugin_start(const void* parameter)
         exit = true;
 
     items = rb->lseek(fd_dat, 0, SEEK_END) / op_entry_sz;
-    if (items == 0 && !parameter)
-    {
-        rb->plugin_open(rb->plugin_get_current_filename(), NULL);
-        rb->close(fd_dat);
-        return PLUGIN_GOTO_PLUGIN;
-    }
 
     if (parameter)
     {
@@ -798,6 +792,15 @@ enum plugin_status plugin_start(const void* parameter)
             }
         }/* OP_EXT */
     }
+    
+    if (items == 0 && !exit)
+    {
+        rb->plugin_open(rb->plugin_get_current_filename(), NULL);
+        rb->close(fd_dat);
+        return PLUGIN_GOTO_PLUGIN;
+    }
+
+
 
     if (!exit)
     {
