@@ -400,9 +400,10 @@ static void gui_statusbar_icon_battery(struct screen * display, int percent,
     }
     else {
         /* draw battery */
-        display->drawrect(STATUSBAR_BATTERY_X_POS, STATUSBAR_Y_POS, 17, 7);
-        display->vline(STATUSBAR_BATTERY_X_POS + 17, STATUSBAR_Y_POS + 2,
-                       STATUSBAR_Y_POS + 4);
+        display->drawrect(STATUSBAR_BATTERY_X_POS, STATUSBAR_Y_POS,
+                          STATUSBAR_BATTERY_WIDTH - 1, 7);
+        display->vline(STATUSBAR_BATTERY_X_POS + STATUSBAR_BATTERY_WIDTH - 1,
+                       STATUSBAR_Y_POS + 2, STATUSBAR_Y_POS + 4);
 
         display->fillrect(STATUSBAR_BATTERY_X_POS + 1, STATUSBAR_Y_POS + 1,
                           fill, 5);
