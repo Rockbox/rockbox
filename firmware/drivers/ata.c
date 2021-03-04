@@ -809,16 +809,17 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-    /* "active" here means "spinning and needs to be shut down" */
+    /* "active" here means "spinning / not sleeping"
+       we normally leave active state by putting the device to
+       sleep (using ATA powersave commands) which flushes all writes
+       and puts the device into an inactive/quiescent state.
 
-    /* SSDs are considered always "inactive" */
-    if (ata_disk_isssd())
-        return false;
-
-    /* We can't directly detect the common iFlash adapters, but they
-       don't claim to support powermanagement.  Without ATA power
-       management we can never spin down anyway, so there's
-       no point in even trying. */
+       Unfortuantely the CF->SD chipset used by the common iFlash
+       adapters does not support ATA powersave, which makes the
+       "active/not" distinction irrelevant, so insead we just mirror
+       the sd/mmc/flash storage drivers and claim that we're always
+       inactive.
+     */
     if (!(identify_info[82] & (1 << 3)))
         return false;
 
@@ -828,7 +829,7 @@ bool ata_disk_is_active(void)
 void ata_sleepnow(void)
 {
     /* Don't enter sleep if the device doesn't support
-       power management. */
+       power management.  See comment in ata_disk_is_active() */
     if (!(identify_info[82] & (1 << 3)))
        return;
 
