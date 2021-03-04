@@ -164,8 +164,8 @@ static inline bool ata_power_off_timed_out(void)
 static ICODE_ATTR int wait_for_bsy(void)
 {
     long timeout = current_tick + HZ*30;
-    
-    do 
+
+    do
     {
         if (!(ATA_IN8(ATA_STATUS) & STATUS_BSY))
             return 1;
@@ -184,8 +184,8 @@ static ICODE_ATTR int wait_for_rdy(void)
         return 0;
 
     timeout = current_tick + HZ*10;
-    
-    do 
+
+    do
     {
         if (ATA_IN8(ATA_ALT_STATUS) & STATUS_RDY)
             return 1;
@@ -220,6 +220,15 @@ static int ata_perform_wakeup(int state)
 
 static int ata_perform_sleep(void)
 {
+    /* Don't issue the sleep command if the device
+       doesn't support (mandatory!) ATA power management commands!
+
+       The FC1307A ATA->SD chipset (used by the common iFlash adapters)
+       is the only known offender, and will eat your data if told to sleep.
+    */
+    if (!(identify_info[82] & (1 << 3)))
+       return 0;
+
     ATA_OUT8(ATA_SELECT, ata_device);
 
     if(!wait_for_rdy()) {
@@ -250,15 +259,15 @@ static ICODE_ATTR int wait_for_end_of_transfer(void)
 {
     if (!wait_for_bsy())
         return 0;
-    return (ATA_IN8(ATA_ALT_STATUS) & 
+    return (ATA_IN8(ATA_ALT_STATUS) &
             (STATUS_BSY|STATUS_RDY|STATUS_DF|STATUS_DRQ|STATUS_ERR))
            == STATUS_RDY;
-}    
+}
 
 #if (CONFIG_LED == LED_REAL)
 /* Conditionally block LED access for the ATA driver, so the LED can be
  * (mis)used for other purposes */
-static void ata_led(bool on) 
+static void ata_led(bool on)
 {
     ata_led_on = on;
     if (ata_led_enabled)
@@ -591,7 +600,7 @@ static int cache_sector(unsigned long sector)
 {
     int rc;
 
-    sector &= ~(phys_sector_mult - 1); 
+    sector &= ~(phys_sector_mult - 1);
               /* round down to physical sector boundary */
 
     /* check whether the sector is already cached */
@@ -602,7 +611,7 @@ static int cache_sector(unsigned long sector)
     sector_cache.inuse = false;
     rc = ata_transfer_sectors(sector, phys_sector_mult, sector_cache.data, false);
     if (!rc)
-    {    
+    {
         sector_cache.sectornum = sector;
         sector_cache.inuse = true;
     }
@@ -627,19 +636,19 @@ int ata_read_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
-    
+
     offset = start & (phys_sector_mult - 1);
-    
+
     if (offset) /* first partial sector */
     {
         int partcount = MIN(incount, phys_sector_mult - offset);
-        
+
         rc = cache_sector(start);
         if (rc)
         {
             rc = rc * 10 - 1;
             goto error;
-        }                          
+        }
         memcpy(inbuf, sector_cache.data + offset * SECTOR_SIZE,
                partcount * SECTOR_SIZE);
 
@@ -651,7 +660,7 @@ int ata_read_sectors(IF_MD(int drive,)
     {
         offset = incount & (phys_sector_mult - 1);
         incount -= offset;
-        
+
         if (incount)
         {
             rc = ata_transfer_sectors(start, incount, inbuf, false);
@@ -693,9 +702,9 @@ int ata_write_sectors(IF_MD(int drive,)
     (void)drive; /* unused for now */
 #endif
     mutex_lock(&ata_mtx);
-    
+
     offset = start & (phys_sector_mult - 1);
-    
+
     if (offset) /* first partial sector */
     {
         int partcount = MIN(count, phys_sector_mult - offset);
@@ -705,7 +714,7 @@ int ata_write_sectors(IF_MD(int drive,)
         {
             rc = rc * 10 - 1;
             goto error;
-        }                          
+        }
         memcpy(sector_cache.data + offset * SECTOR_SIZE, buf,
                partcount * SECTOR_SIZE);
         rc = flush_current_sector();
@@ -713,7 +722,7 @@ int ata_write_sectors(IF_MD(int drive,)
         {
             rc = rc * 10 - 2;
             goto error;
-        }                          
+        }
         start += partcount;
         buf += partcount * SECTOR_SIZE;
         count -= partcount;
@@ -722,7 +731,7 @@ int ata_write_sectors(IF_MD(int drive,)
     {
         offset = count & (phys_sector_mult - 1);
         count -= offset;
-        
+
         if (count)
         {
             rc = ata_transfer_sectors(start, count, (void*)buf, true);
@@ -742,7 +751,7 @@ int ata_write_sectors(IF_MD(int drive,)
                 rc = rc * 10 - 4;
                 goto error;
             }
-            memcpy(sector_cache.data, buf, offset * SECTOR_SIZE); 
+            memcpy(sector_cache.data, buf, offset * SECTOR_SIZE);
             rc = flush_current_sector();
             if (rc)
             {
@@ -809,30 +818,11 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
-    /* "active" here means "spinning / not sleeping"
-       we normally leave active state by putting the device to
-       sleep (using ATA powersave commands) which flushes all writes
-       and puts the device into an inactive/quiescent state.
-
-       Unfortuantely the CF->SD chipset used by the common iFlash
-       adapters does not support ATA powersave, which makes the
-       "active/not" distinction irrelevant, so insead we just mirror
-       the sd/mmc/flash storage drivers and claim that we're always
-       inactive.
-     */
-    if (!(identify_info[82] & (1 << 3)))
-        return false;
-
     return ata_state >= ATA_SPINUP;
 }
 
 void ata_sleepnow(void)
 {
-    /* Don't enter sleep if the device doesn't support
-       power management.  See comment in ata_disk_is_active() */
-    if (!(identify_info[82] & (1 << 3)))
-       return;
-
     if (ata_state >= ATA_SPINUP) {
         mutex_lock(&ata_mtx);
         if (ata_state == ATA_ON) {
@@ -954,7 +944,7 @@ static int perform_soft_reset(void)
 int ata_soft_reset(void)
 {
     int ret = -6;
-    
+
     mutex_lock(&ata_mtx);
 
     if (ata_state > ATA_OFF) {
@@ -969,7 +959,7 @@ int ata_soft_reset(void)
 static int ata_power_on(void)
 {
     int rc;
-    
+
     ide_power_enable(true);
     sleep(HZ/4); /* allow voltage to build up */
 
@@ -1100,7 +1090,7 @@ static int set_features(void)
     }
     else
         features[4].id_word = 88;
-    
+
     features[4].id_bit = dma_mode & 7;
     features[4].parameter = dma_mode;
 #endif /* HAVE_ATA_DMA */
@@ -1172,7 +1162,7 @@ static int STORAGE_INIT_ATTR init_and_check(bool hard_reset)
     rc = check_registers();
     if (rc)
         return -30 + rc;
-    
+
     return 0;
 }
 
@@ -1243,7 +1233,7 @@ int STORAGE_INIT_ATTR ata_init(void)
         {                                    /* (needs BigLBA addressing) */
             if (identify_info[102] || identify_info[103])
                 panicf("Unsupported disk size: >= 2^32 sectors");
-                
+
             total_sectors = identify_info[100] | (identify_info[101] << 16);
             lba48 = true; /* use BigLBA */
         }
@@ -1282,7 +1272,7 @@ int STORAGE_INIT_ATTR ata_init(void)
             if (rc == 0)
                 phys_sector_mult = 1;
         }
- 
+
         if (phys_sector_mult > (MAX_PHYS_SECTOR_SIZE/SECTOR_SIZE))
             panicf("Unsupported physical sector size: %d",
                    phys_sector_mult * SECTOR_SIZE);
@@ -1301,7 +1291,7 @@ error:
 }
 
 #if (CONFIG_LED == LED_REAL)
-void ata_set_led_enabled(bool enabled) 
+void ata_set_led_enabled(bool enabled)
 {
     ata_led_enabled = enabled;
     if (ata_led_enabled)
@@ -1372,7 +1362,7 @@ int ata_num_drives(int first_drive)
 {
     /* We don't care which logical drive number(s) we have been assigned */
     (void)first_drive;
-    
+
     return 1;
 }
 #endif
