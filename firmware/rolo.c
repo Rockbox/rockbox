@@ -237,7 +237,7 @@ int rolo_load(const char* filename)
     lcd_remote_update();
 #endif
 
-    audio_stop();
+    audio_hard_stop();
 
     /* get the system buffer. release only in case of error, otherwise
      * we don't return anyway */
