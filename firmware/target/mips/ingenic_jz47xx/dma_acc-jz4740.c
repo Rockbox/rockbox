@@ -53,6 +53,8 @@ void memset(void *target, unsigned char c, size_t len)
             for(d = 0;d < (len % 32); d++)
                 *dp++ = c;
         }
+        if(((unsigned int)target < 0xa0000000) && len)
+            discard_dcache_range(target, len);
     }
 }
 
@@ -84,6 +86,8 @@ void memset16(void *target, unsigned short c, size_t len)
             for(d = 0; d < (len % 32); d++)
                 *dp++ = c;
         }
+        if(((unsigned int)target < 0xa0000000) && len)
+            discard_dcache_range(target, len);
     }
 }
 
@@ -115,4 +119,6 @@ void memcpy(void *target, const void *source, size_t len)
         for(i = 0; i < (len % 4); i++)
             *dp++ = *source;
     }
+    if(((unsigned int)target < 0xa0000000) && len)
+        discard_dcache_range(target, len);
 }

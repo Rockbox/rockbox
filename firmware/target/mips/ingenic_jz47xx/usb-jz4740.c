@@ -334,6 +334,8 @@ static void EPOUT_handler(unsigned int endpoint)
 
             if(size < ep->fifo_size || ep->received >= ep->length)
             {
+                /* Just to be safe */
+                discard_dcache_range((void*)ep->buf, ep->length);
                 usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
                 ep_transfer_completed(ep);
                 logf("receive transfer_complete");
@@ -365,7 +367,7 @@ static void EPDMA_handler(int number)
         /* Disable DMA */
         REG_USB_REG_CNTL2 = 0;
 
-        commit_discard_dcache(); // XXX range?
+        discard_dcache_range(ep->buf, ep->length);
 
         select_endpoint(endpoint);
         /* Read out last packet manually */

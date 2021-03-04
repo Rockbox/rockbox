@@ -206,6 +206,7 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
     //REG_DMAC_DCCSR(DMA_NAND_CHANNEL) &= ~DMAC_DCCSR_EN; /* Disable DMA channel */
 
     dma_disable();
+    discard_dcache_range(target, len);
 
     mutex_unlock(&nand_dma_mtx);
 }

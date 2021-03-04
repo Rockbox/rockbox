@@ -63,6 +63,9 @@ void memset_dma(void *target, int c, size_t len, unsigned int bits)
     while (REG_MDMAC_DTCR(MDMA_CHANNEL));
 
     REG_MDMAC_DCCSR(MDMA_CHANNEL) = 0;
+
+    if(((unsigned int)target < 0xa0000000) && len)
+         discard_dcache_range(target, len);
 }
 
 void memcpy_dma(void *target, const void *source, size_t len, unsigned int bits)
@@ -99,4 +102,7 @@ void memcpy_dma(void *target, const void *source, size_t len, unsigned int bits)
     while (REG_MDMAC_DTCR(MDMA_CHANNEL));
 
     REG_MDMAC_DCCSR(MDMA_CHANNEL) = 0;
+
+    if(((unsigned int)target < 0xa0000000) && len)
+         discard_dcache_range(target, len);
 }
