@@ -222,20 +222,7 @@ void discard_dcache_range(const void *base, unsigned int size)
     char *ptr = CACHEALIGN_DOWN((char*)base);
     char *end = CACHEALIGN_UP((char*)base + size);
 
-    if(ptr != base) {
-        /* Start of region not cache aligned */
-        __CACHE_OP(DCHitWBInv, ptr);
-        ptr += CACHEALIGN_SIZE;
-    }
-
-    if(base+size != end) {
-        /* End of region not cache aligned */
-        end -= CACHEALIGN_SIZE;
-        __CACHE_OP(DCHitWBInv, end);
-    }
-
-    /* Interior of region is safe to discard */
-    for(; ptr <= end; ptr += CACHEALIGN_SIZE)
+    for(; ptr != end; ptr += CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, ptr);
 
     SYNC_WB();
