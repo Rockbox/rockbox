@@ -1258,6 +1258,9 @@ void tagtree_init(void)
     menu = NULL;
     rootmenu = -1;
     tagtree_handle = core_alloc_maximum("tagtree", &tagtree_bufsize, &ops);
+    if (tagtree_handle < 0)
+        panicf("tagtree OOM");
+
     if (!parse_menu(FILE_SEARCH_INSTRUCTIONS))
     {
         tagtree_unload(NULL);
