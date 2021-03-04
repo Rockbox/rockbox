@@ -234,7 +234,7 @@ void discard_dcache_range(const void *base, unsigned int size)
        cacheline and shrink down the region to discard. */
     if (ptr != end && (end !=((char*)base + size))) {
         end -= CACHEALIGN_SIZE;
-        __CACHE_OP(DCHitWBInv, ptr);
+        __CACHE_OP(DCHitWBInv, end);
     }
 
     /* Finally, discard whatever is left */
