@@ -222,6 +222,16 @@ void discard_dcache_range(const void *base, unsigned int size)
     char *ptr = CACHEALIGN_DOWN((char*)base);
     char *end = CACHEALIGN_UP((char*)base + size);
 
+    if (base != ptr) {
+        __CACHE_OP(DCHitWBInv, ptr);
+        ptr += CACHEALIGN_SIZE;
+    }
+
+    if (ptr != end && (end !=((char*)base + size))) {
+        end -= CACHEALIGN_SIZE;
+        __CACHE_OP(DCHitWBInv, ptr);
+    }
+
     for(; ptr != end; ptr += CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, ptr);
 
