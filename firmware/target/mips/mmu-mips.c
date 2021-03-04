@@ -222,6 +222,10 @@ void discard_dcache_range(const void *base, unsigned int size)
     char *ptr = CACHEALIGN_DOWN((char*)base);
     char *end = CACHEALIGN_UP((char*)base + size);
 
+    /* If the block is unaligned, do a writeback just to be safe */
+    if (base != ptr || end != ((char*)base + size)
+        return commit_discard_dcache_range(base, size);
+
     for(; ptr != end; ptr += CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, ptr);
 
