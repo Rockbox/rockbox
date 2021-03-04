@@ -244,7 +244,7 @@ int rolo_load(const char* filename)
     rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
     if (rolo_handle < 0)
     {
-        splash(HZ, "Rolo Failed - OOM");
+        rolo_error("OOM");
         return -1;
     }
 
