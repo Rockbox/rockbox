@@ -1,7 +1,7 @@
 #include "os_types.h"
 #include <tlsf.h>
 
-#if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include <setjmp.h>
 extern jmp_buf rb_jump_buf;
 #define LONGJMP(x)  longjmp(rb_jump_buf, x)
@@ -31,7 +31,7 @@ void *ogg_malloc(size_t size)
 
     if (x == NULL)
         LONGJMP(1);
-    
+
     return x;
 }
 
@@ -41,7 +41,7 @@ void *ogg_calloc(size_t nmemb, size_t size)
 
     if (x == NULL)
         LONGJMP(1);
-    
+
     return x;
 }
 
@@ -51,7 +51,7 @@ void *ogg_realloc(void *ptr, size_t size)
 
     if (x == NULL)
         LONGJMP(1);
-    
+
     return x;
 }
 
