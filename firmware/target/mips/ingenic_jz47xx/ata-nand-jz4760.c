@@ -207,6 +207,9 @@ static void jz_nand_read_dma(void *target, unsigned int len, int bw)
 
     dma_disable();
 
+    if(((unsigned int)target < 0xa0000000) && len)
+        discard_dcache_range(target, len);
+
     mutex_unlock(&nand_dma_mtx);
 }
 

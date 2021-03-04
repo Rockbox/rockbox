@@ -440,6 +440,9 @@ static void jz_sd_receive_data_dma(struct sd_request *req)
     while( !(REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) & DMAC_DCCSR_TT) );
 #endif
 
+    /* Discard again just to be safe */
+    discard_dcache_range(req->buffer, req->cnt);
+
     /* clear status and disable channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL) = 0;
 }

@@ -649,6 +649,8 @@ static void EPOUT_ready(unsigned int endpoint)
         /* It we're done, clean up */
         if (size < ep->fifo_size || ep->received >= ep->length) {
             ep->use_dma = -1;
+            /* Just to be safe */
+            discard_dcache_range((void*)ep->buf, ep->length);
             usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
             ep_transfer_completed(ep);
             logf("DMA RX transfer_complete");
