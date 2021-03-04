@@ -243,6 +243,12 @@ int rolo_load(const char* filename)
     /* get the system buffer. release only in case of error, otherwise
      * we don't return anyway */
     rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
+    if (rolo_handle < 0)
+    {
+        splash(HZ, "Rolo Failed - OOM");
+        return -1;
+    }
+
     filebuf = core_get_data(rolo_handle);
 
     err = LOAD_FIRMWARE(filebuf, filename, filebuf_size);
