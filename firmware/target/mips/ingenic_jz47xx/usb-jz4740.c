@@ -365,8 +365,6 @@ static void EPDMA_handler(int number)
         /* Disable DMA */
         REG_USB_REG_CNTL2 = 0;
 
-        commit_discard_dcache(); // XXX range?
-
         select_endpoint(endpoint);
         /* Read out last packet manually */
         unsigned int lpack_size = REG_USB_REG_OUTCOUNT;
