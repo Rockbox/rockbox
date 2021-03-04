@@ -558,6 +558,9 @@ static int jz_sd_receive_data_dma(const int drive, struct sd_request *req)
            yield();
 #endif
 
+    /* Discard again just to be safe */
+    discard_dcache_range(req->buffer, req->cnt);
+
     /* clear status and disable channel */
     REG_DMAC_DCCSR(DMA_SD_RX_CHANNEL(drive)) = 0;
 
