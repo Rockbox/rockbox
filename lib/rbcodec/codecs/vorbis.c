@@ -28,7 +28,7 @@
 
 CODEC_HEADER
 
-#if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
 #include <setjmp.h>
 jmp_buf rb_jump_buf;
 #endif
@@ -135,7 +135,7 @@ enum codec_status codec_run(void)
     ogg_int64_t vf_pcmlengths[2];
     intptr_t param;
 
-#if defined(CPU_ARM) || defined(CPU_COLDFIRE) || defined(CPU_MIPS)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     if (setjmp(rb_jump_buf) != 0) {
         /* malloc failed; finish with this track */
         goto done;
@@ -153,7 +153,7 @@ enum codec_status codec_run(void)
 
     /* Open a non-seekable stream */
     error = ov_open_callbacks(ci, &vf, NULL, 0, callbacks);
-    
+
     /* If the non-seekable open was successful, we need to supply the missing
      * data to make it seekable.  This is a hack, but it's reasonable since we
      * don't want to run the whole file through the buffer before we start

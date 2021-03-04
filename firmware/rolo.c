@@ -219,7 +219,6 @@ extern unsigned long loadaddress;
  * Filename must be a fully defined filename including the path and extension
  *
  ***************************************************************************/
-#if defined(CPU_COLDFIRE) || defined(CPU_ARM) || defined(CPU_MIPS)
 int rolo_load(const char* filename)
 {
     unsigned char* ramstart = (void*)&loadaddress;
@@ -323,7 +322,7 @@ int rolo_load(const char* filename)
     /* never reached */
     return 0;
 }
-#endif /* CPU_COLDFIRE | CPU_ARM | CPU_MIPS  */
+
 #else  /* !defined(IRIVER_IFP7XX_SERIES) */
 int rolo_load(const char* filename)
 {
