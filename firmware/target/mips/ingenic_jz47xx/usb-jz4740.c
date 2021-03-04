@@ -334,6 +334,8 @@ static void EPOUT_handler(unsigned int endpoint)
 
             if(size < ep->fifo_size || ep->received >= ep->length)
             {
+                /* Just to be safe */
+                discard_dcache_range((void*)ep->buf, ep->length);
                 usb_core_transfer_complete(endpoint, USB_DIR_OUT, 0, ep->received);
                 ep_transfer_completed(ep);
                 logf("receive transfer_complete");
