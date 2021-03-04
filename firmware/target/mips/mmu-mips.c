@@ -222,6 +222,22 @@ void discard_dcache_range(const void *base, unsigned int size)
     char *ptr = CACHEALIGN_DOWN((char*)base);
     char *end = CACHEALIGN_UP((char*)base + size);
 
+    /* If the start of the buffer is unaligned, write
+       back that cacheline and shrink up the region
+       to discard. */
+    if (base != ptr) {
+        __CACHE_OP(DCHitWBInv, ptr);
+        ptr += CACHEALIGN_SIZE;
+    }
+
+    /* If the end of the buffer is unaligned, write back that
+       cacheline and shrink down the region to discard. */
+    if (ptr != end && (end !=((char*)base + size))) {
+        end -= CACHEALIGN_SIZE;
+        __CACHE_OP(DCHitWBInv, ptr);
+    }
+
+    /* Finally, discard whatever is left */
     for(; ptr != end; ptr += CACHEALIGN_SIZE)
         __CACHE_OP(DCHitInv, ptr);
 
