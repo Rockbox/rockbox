@@ -120,6 +120,33 @@ typedef enum usage_page
 #define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_SWAP_PRIMARY_SECONDARY         0xB6
 #define HID_GENERIC_DESKTOP_SYSTEM_DISPLAY_LCD_AUTOSCALE                  0xB7
 
+/* Generic Device Controls Page (0x06) */
+#define HID_GENERIC_DEVICE_UNDEFINED                                      0x00
+#define HID_GENERIC_DEVICE_BACKGROUND_CONTROLS                            0x01
+#define HID_GENERIC_DEVICE_BATTERY_STRENGTH                               0x20
+#define HID_GENERIC_DEVICE_WIRELESS_CHANNEL                               0x21
+#define HID_GENERIC_DEVICE_WIRELESS_ID                                    0x22
+#define HID_GENERIC_DEVICE_DISCOVER_WIRELESS_CHANNEL                      0x23
+#define HID_GENERIC_DEVICE_SECURITY_CODE_CHARACTER_ENTERED                0x24
+#define HID_GENERIC_DEVICE_SECURITY_CODE_CHARACTER_ERASED                 0x25
+#define HID_GENERIC_DEVICE_SECURITY_CODE_CLEARED                          0x26
+#define HID_GENERIC_DEVICE_SEQUENCE_ID                                    0x27
+#define HID_GENERIC_DEVICE_SEQUENCE_ID_RESET                              0x28
+#define HID_GENERIC_DEVICE_RF_SIGNAL_STRENGTH                             0x29
+#define HID_GENERIC_DEVICE_SOFTWARE_VERSION                               0x2A
+#define HID_GENERIC_DEVICE_PROTOCOL_VERSION                               0x2B
+#define HID_GENERIC_DEVICE_HARDWARE_VERSION                               0x2C
+#define HID_GENERIC_DEVICE_MAJOR                                          0x2D
+#define HID_GENERIC_DEVICE_MINOR                                          0x2E
+#define HID_GENERIC_DEVICE_REVISION                                       0x2F
+#define HID_GENERIC_DEVICE_HANDEDNESS                                     0x30
+#define HID_GENERIC_DEVICE_EITHER_HAND                                    0x31
+#define HID_GENERIC_DEVICE_LEFT_HAND                                      0x32
+#define HID_GENERIC_DEVICE_RIGHT_HAND                                     0x33
+#define HID_GENERIC_DEVICE_BOTH_HANDS                                     0x34
+#define HID_GENERIC_DEVICE_GRIP_POSE_OFFSET                               0x40
+#define HID_GENERIC_DEVICE_POINTER_POSE_OFFSET                            0x41
+
 /* Keyboard/Keypad Page (0x07) */
 #define HID_KEYBOARD_RESERVED                                             0x00
 #define HID_KEYBOARD_ERROR_ROLLOVER                                       0x01
