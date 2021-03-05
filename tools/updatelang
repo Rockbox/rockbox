@@ -307,7 +307,7 @@ foreach my $id (@langorder) {
 	}
     }
     foreach my $tgt (keys(%ep)) {
-	if (!defined($lp{$tgt})) {
+	if (!defined($lp{$tgt}) || ($lp{$tgt} eq 'none')) {
 	    # If it doesn't exist in the language, copy it from English
 	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
 		$lang{$id}{'notes'} .= "### The <dest> section for '$id:$tgt' is missing! Copying from english!\n";
@@ -356,7 +356,7 @@ foreach my $id (@langorder) {
 	}
     }
     foreach my $tgt (keys(%ep)) {
-	if (!defined($lp{$tgt})) {
+	if (!defined($lp{$tgt}) || ($lp{$tgt} eq 'none')) {
 	    # If it doesn't exist in the language, copy it from English
 	    if ($ep{$tgt} ne 'none' && $ep{$tgt} ne '' ) {
 		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is missing! Copying from english!\n";
