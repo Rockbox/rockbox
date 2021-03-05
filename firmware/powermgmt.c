@@ -48,6 +48,9 @@
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
+#ifdef USB_ENABLE_HID
+#include "usbstack/usb_hid.h"
+#endif
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
     && !defined (SIMULATOR)
@@ -637,6 +640,13 @@ static void collect_power_history(void)
     power_history[0] = power_hist_item();
 }
 
+#ifdef USB_ENABLE_HID
+static void emit_battery_strength(void)
+{
+    usb_hid_send(HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS, battery_percent);
+}
+#endif
+
 /*
  * Monitor the presence of a charger and perform critical frequent steps
  * such as running the battery voltage filter.
@@ -713,6 +723,12 @@ static void power_thread(void)
     collect_power_history();
     /* call target specific init now */
     powermgmt_init_target();
+    /* emit initial battery strength */
+#ifdef USB_ENABLE_HID
+    long next_battery_strength;
+    emit_battery_strength();
+    next_battery_strength = current_tick + HZ;
+#endif
 
     next_power_hist = current_tick + HZ*60;
 
@@ -750,6 +766,15 @@ static void power_thread(void)
             next_power_hist += HZ*60;
             collect_power_history();
         }
+
+#ifdef USB_ENABLE_HID
+        if (TIME_AFTER(current_tick, next_battery_strength)) {
+            // only send updates every second or so
+            // so we do not spam the HID driver
+            next_battery_strength += HZ;
+            emit_battery_strength();
+        }
+#endif
     }
 } /* power_thread */
 
