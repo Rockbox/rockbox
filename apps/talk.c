@@ -443,7 +443,7 @@ static int get_clip(long id, struct queue_entry *q)
     size_t clipsize;
 
     index = id2index(id);
-    if (index == -1)
+    if (index == -1 || index_handle <= 0)
         return -1;
 
     clipbuf = core_get_data(index_handle);
@@ -891,6 +891,7 @@ int talk_id(int32_t id, bool enqueue)
     int32_t unit;
     int decimals;
     struct queue_entry clip;
+    bool isloaded = false;
 
     if (!has_voicefile)
         return 0; /* no voicefile loaded, not an error -> pretent success */
@@ -904,11 +905,11 @@ int talk_id(int32_t id, bool enqueue)
         int fd = open_voicefile();
         if (fd < 0 || !load_voicefile_index(fd))
             return -1;
-        load_voicefile_data(fd);
+        isloaded = load_voicefile_data(fd);
         close(fd);
     }
 
-    if (id == -1) /* -1 is an indication for silence */
+    if (id == -1 || !isloaded) /* -1 is an indication for silence */
         return -1;
 
     decimals = (((uint32_t)id) >> DECIMAL_SHIFT) & 0x7;
