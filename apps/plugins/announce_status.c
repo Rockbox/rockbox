@@ -141,7 +141,8 @@ static void playback_event_callback(unsigned short id, void *data)
 {
     (void)id;
     (void)data;
-    rb->queue_post(&gThread.queue, EV_TRACKCHANGE, 0);
+    if (gThread.id > 0)
+        rb->queue_post(&gThread.queue, EV_TRACKCHANGE, 0);
 }
 
 /****************** config functions *****************/
@@ -458,10 +459,10 @@ void thread_create(void)
     {
         rb->splash(HZ*2, "Out of memory");
         gThread.exiting = true;
+        rb->remove_event(PLAYBACK_EVENT_TRACK_CHANGE, playback_event_callback);
         gThread.id = UINT_MAX;
         return;
     }
-
 
     /* put the thread's queue in the bcast list */
     rb->queue_init(&gThread.queue, true);
@@ -480,6 +481,8 @@ void thread_quit(void)
     if (!gThread.exiting) {
         rb->queue_post(&gThread.queue, EV_EXIT, 0);
         rb->thread_wait(gThread.id);
+        /* we don't want any more events */
+        rb->remove_event(PLAYBACK_EVENT_TRACK_CHANGE, playback_event_callback);
         /* remove the thread's queue from the broadcast list */
         rb->queue_delete(&gThread.queue);
         gThread.exiting = true;
@@ -511,7 +514,6 @@ int plugin_main(const void* parameter)
     gAnnounce.index = 0;
     gAnnounce.timeout = 0;
 
-
     rb->splash(HZ / 2, "Announce Status");
 
     if (configfile_load(CFG_FILE, config, gCfg_sz, CFG_VER) < 0)
@@ -520,17 +522,13 @@ int plugin_main(const void* parameter)
         config_set_defaults();
         configfile_save(CFG_FILE, config, gCfg_sz, CFG_VER);
 
-    if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING)
-    {
-        while (rb->mixer_channel_get_bytes_waiting(PCM_MIXER_CHAN_PLAYBACK) > 0)
-            rb->sleep(HZ / 10);
-    }
-
-    rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
-
         rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
     }
 
+    if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
+    {
+        rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
+    }
     rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
 
     rb->button_clear_queue();
@@ -567,6 +565,7 @@ int plugin_main(const void* parameter)
         rb->add_event(PLAYBACK_EVENT_TRACK_CHANGE, playback_event_callback);
 
     thread_create();
+
     return 0;
 }
 
@@ -578,8 +577,6 @@ enum plugin_status plugin_start(const void* parameter)
 {
     /* now go ahead and have fun! */
     int ret = plugin_main(parameter);
-
-    rb->remove_event(PLAYBACK_EVENT_START_PLAYBACK, playback_event_callback);
     return (ret==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }
 
