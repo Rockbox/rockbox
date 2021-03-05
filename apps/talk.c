@@ -624,6 +624,9 @@ static bool load_voicefile_data(int fd)
     /* the first alloc is the clip metadata table */
     metadata_alloc_size = max_clips * sizeof(struct clip_cache_metadata);
     metadata_table_handle = buflib_alloc(&clip_ctx, metadata_alloc_size);
+    if (metadata_table_handle <= 0)
+        talk_status = TALK_STATUS_ERR_OOM;
+        return false;
     memset(buflib_get_data(&clip_ctx, metadata_table_handle), 0, metadata_alloc_size);
 
     load_initial_clips(fd);
@@ -891,7 +894,7 @@ int talk_id(int32_t id, bool enqueue)
     int32_t unit;
     int decimals;
     struct queue_entry clip;
-    bool isloaded = false;
+    bool isloaded = true;
 
     if (!has_voicefile)
         return 0; /* no voicefile loaded, not an error -> pretent success */
