@@ -2385,10 +2385,43 @@ static long transfer(struct bpb *fat_bpb, unsigned long start, long count,
     }
     else
     {
-        rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
-                                  start + fat_bpb->startsector, count, buf);
+#ifdef STORAGE_WANTS_ALIGN
+#define BOUNCE_SECTORS 10
+        static uint8_t bounce[BOUNCE_SECTORS * SECTOR_SIZE] STORAGE_ALIGN_ATTR;
+	void *xferbuf = buf;
+	int remain = count;
+	int xferred = 0;
+	int aligned = 1;
+        if (STORAGE_OVERLAP((uintptr_t)buf)) {
+            xferbuf = bounce;
+	    aligned = 0;
+            count = MIN(remain, BOUNCE_SECTORS);
+	}
+
+	while (remain > 0) {
+#endif
+            rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
+                                      start + fat_bpb->startsector, count, xferbuf);
+
+#ifdef STORAGE_WANTS_ALIGN
+            if (rc < 0)
+                goto done;
+            if (LIKELY(aligned))
+                goto done;
+
+            memcpy(buf, xferbuf, rc * SECTOR_SIZE);
+            buf += rc * SECTOR_SIZE;
+
+            xferred += rc;
+            start += rc;
+            remain -= rc;
+            count = MIN(remain, BOUNCE_SECTORS);
+        }
+        rc = xferred;
+#endif
     }
 
+done:
     if (rc < 0)
     {
         DEBUGF("Couldn't %s sector %lx (err %ld)\n",
