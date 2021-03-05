@@ -2122,7 +2122,8 @@ int playlist_resume(void)
      * default buflib buffers can be moved around which must be avoided */
     static struct buflib_callbacks dummy_ops;
     /* use mp3 buffer for maximum load speed */
-    talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
+    if (core_allocatable() < (1 << 10))
+        talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
     handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
     if (handle < 0)
         panicf("%s(): OOM", __func__);
