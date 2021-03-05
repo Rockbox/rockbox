@@ -2385,8 +2385,37 @@ static long transfer(struct bpb *fat_bpb, unsigned long start, long count,
     }
     else
     {
-        rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
-                                  start + fat_bpb->startsector, count, buf);
+#if STORAGE_WANTS_ALIGNED
+        static uint8_t bounce[NUM_SECTORS * SECTOR_SIZE];
+	void *xferbuf = buf;
+	int remain = count;
+	int xferred = 0;
+        if (STORAGE_UNALIGNED(buf)) {
+		xferbuf = bounce;
+		count = min(remain, NUM_SECTORS);
+	}
+
+	while (remain > 0) {
+#endif
+            rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
+                                      start + fat_bpb->startsector, count, xferbuf);
+
+#if STORAGE_WANTS_ALIGNED
+	    if (rc < 0) {
+		    xferred = rc;
+		    break;
+	    }
+            xferred += rc;
+            start += rc;
+            remain -= rc;
+            if (STORAGE_UNALIGNED(buf)) {
+                memcpy(buf, xferbuf, rc * SECTOR_SIZE);
+                buf += rc * SECTOR_SIZE;
+            }
+            count = min(remain, NUM_SECTORS);
+        }
+        rc = xferred;
+#endif
     }
 
     if (rc < 0)
