@@ -12423,10 +12423,52 @@
     *: "USB Mode"
   </source>
   <dest>
-    *: none
+    *: "USB Mode"
   </dest>
   <voice>
-    *: none
+    *: "USB Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_MASS_STORAGE
+  desc: in Settings -> General -> System -> USB Mode: Mass Storage
+  user: core
+  <source>
+    *: "Mass Storage"
+  </source>
+  <dest>
+    *: "Mass Storage"
+  </dest>
+  <voice>
+    *: "Mass Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_CHARGE
+  desc: in Settings -> General -> System -> USB Mode: Charge Only
+  user: core
+  <source>
+    *: "Charge Only"
+  </source>
+  <dest>
+    *: "Charge Only"
+  </dest>
+  <voice>
+    *: "Charge Only"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_MODE_ADB
+  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
+  user: core
+  <source>
+    *: "Android Debug Bridge"
+  </source>
+  <dest>
+    *: "Android Debug Bridge"
+  </dest>
+  <voice>
+    *: "Android Debug Bridge"
   </voice>
 </phrase>
 <phrase>
@@ -12500,20 +12542,6 @@
   </dest>
   <voice>
     *: "castle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_MODE_ADB
-  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
-  user: core
-  <source>
-    *: "Android Debug Bridge"
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
@@ -13140,20 +13168,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_USB_MODE_MASS_STORAGE
-  desc: in Settings -> General -> System -> USB Mode: Mass Storage
-  user: core
-  <source>
-    *: "Mass Storage"
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
   id: LANG_BACKLIGHT_BRIGHTNESS
   desc: in the mpegplayer settings menu
   user: core
@@ -13210,20 +13224,6 @@
   </dest>
   <voice>
     *: "Line Separator Color"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_MODE_CHARGE
-  desc: in Settings -> General -> System -> USB Mode: Charge Only
-  user: core
-  <source>
-    *: "Charge Only"
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
   </voice>
 </phrase>
 <phrase>
