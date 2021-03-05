@@ -411,13 +411,15 @@ void thread(void)
         interval = gAnnounce.interval * HZ;
         switch (ev.id)
         {
+            case SYS_USB_CONNECTED:
+                rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
             case EV_EXIT:
                 return;
             case EV_OTHINSTANCE:
                 if (*rb->current_tick - last_tick >= interval)
                 {
                     last_tick += interval;
-                    rb->sleep(0);
+                    rb->sleep(HZ / 10);
                     announce();
                 }
                 break;
@@ -425,7 +427,7 @@ void thread(void)
                 rb->beep_play(1500, 100, 1000);
                 break;
             case EV_TRACKCHANGE:
-                rb->sleep(0);
+                rb->sleep(HZ / 10);
                 announce();
                 break;
         }
@@ -509,7 +511,7 @@ int plugin_main(const void* parameter)
     gAnnounce.index = 0;
     gAnnounce.timeout = 0;
 
-    rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
+
     rb->splash(HZ / 2, "Announce Status");
 
     if (configfile_load(CFG_FILE, config, gCfg_sz, CFG_VER) < 0)
@@ -517,6 +519,14 @@ int plugin_main(const void* parameter)
         /* If the loading failed, save a new config file */
         config_set_defaults();
         configfile_save(CFG_FILE, config, gCfg_sz, CFG_VER);
+
+    if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) == CHANNEL_PLAYING)
+    {
+        while (rb->mixer_channel_get_bytes_waiting(PCM_MIXER_CHAN_PLAYBACK) > 0)
+            rb->sleep(HZ / 10);
+    }
+
+    rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
 
         rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
     }
