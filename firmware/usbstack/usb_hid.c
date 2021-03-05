@@ -23,6 +23,7 @@
 #include "usb_core.h"
 #include "usb_drv.h"
 #include "kernel.h"
+#include "powermgmt.h"
 #include "usb_hid.h"
 #include "usb_class_driver.h"
 /*#define LOGF_ENABLE*/
@@ -109,6 +110,7 @@ typedef enum
 #ifdef HAVE_USB_HID_MOUSE
     REPORT_ID_MOUSE,
 #endif
+    REPORT_ID_BACKGROUND,
     REPORT_ID_COUNT,
 } report_id_t;
 
@@ -450,6 +452,15 @@ static uint8_t buf_set_mouse(unsigned char *buf, int id)
 }
 #endif /* HAVE_USB_HID_MOUSE */
 
+#define BUF_LEN_BACKGROUND 1
+static uint8_t buf_set_background(unsigned char *buf, int id)
+{
+    memset(buf, 0, BUF_LEN_BACKGROUND);
+    buf[0] = (uint8_t)id;
+
+    return BUF_LEN_BACKGROUND;
+}
+
 static size_t descriptor_report_get(unsigned char *dest)
 {
     unsigned char *report = dest;
@@ -551,6 +562,24 @@ static size_t descriptor_report_get(unsigned char *dest)
     PACK_VAL(report, END_COLLECTION);
 #endif /* HAVE_USB_HID_MOUSE */
 
+    /* Background controls */
+    usb_hid_report = &usb_hid_reports[REPORT_ID_BACKGROUND];
+    usb_hid_report->usage_page = HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS;
+    usb_hid_report->buf_set = buf_set_background;
+    usb_hid_report->is_key_released = 0;
+
+    pack_parameter(&report, 0, 1, USAGE_PAGE, HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DEVICE_BACKGROUND_CONTROLS);
+    pack_parameter(&report, 0, 1, COLLECTION, COLLECTION_APPLICATION);
+    pack_parameter(&report, 0, 1, REPORT_ID, REPORT_ID_BACKGROUND);
+    pack_parameter(&report, 0, 0, CONSUMER_USAGE, HID_GENERIC_DEVICE_BATTERY_STRENGTH);
+    pack_parameter(&report, 0, 1, LOGICAL_MINIMUM, 0);
+    pack_parameter(&report, 0, 1, LOGICAL_MAXIMUM, 100);
+    pack_parameter(&report, 0, 1, REPORT_SIZE, 8);
+    pack_parameter(&report, 0, 1, REPORT_COUNT, 1);
+    pack_parameter(&report, 0, 1, INPUT, MAIN_ITEM_VARIABLE);
+    PACK_VAL(report, END_COLLECTION);
+
     return (size_t)(report - dest);
 }
 
@@ -591,9 +620,9 @@ int usb_hid_get_config_descriptor(unsigned char *dest, int max_packet_size)
 void usb_hid_init_connection(void)
 {
     logf("hid: init connection");
-
     active = true;
     currently_sending = false;
+    set_battery_reporting(true);
 }
 
 /* called by usb_core_init() */
@@ -614,6 +643,7 @@ void usb_hid_init(void)
 void usb_hid_disconnect(void)
 {
     logf("hid: disconnect");
+    set_battery_reporting(false);
     active = false;
     currently_sending = false;
 }
