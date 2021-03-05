@@ -993,6 +993,8 @@ static void audio_reset_buffer(void)
         core_free(audiobuf_handle);
         audiobuf_handle = 0;
     }
+    if (core_allocatable() < (1 << 10))
+        talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
     audiobuf_handle = core_alloc_maximum("audiobuf", &filebuflen, &ops);
 
     if (audiobuf_handle > 0)
