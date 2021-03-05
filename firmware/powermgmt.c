@@ -48,6 +48,9 @@
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
+#ifdef USB_ENABLE_HID
+#include "usbstack/usb_hid.h"
+#endif
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
     && !defined (SIMULATOR)
@@ -716,6 +719,10 @@ static void power_thread(void)
 
     next_power_hist = current_tick + HZ*60;
 
+#ifdef USB_ENABLE_HID
+    long next_battery_strength = current_tick + HZ;
+#endif
+
     while (1)
     {
 #if CONFIG_CHARGING
@@ -750,6 +757,15 @@ static void power_thread(void)
             next_power_hist += HZ*60;
             collect_power_history();
         }
+
+#ifdef USB_ENABLE_HID
+        if (TIME_AFTER(current_tick, next_battery_strength)) {
+            // only send updates every second or so
+            // so we do not spam the HID driver
+            next_battery_strength = current_tick + HZ;
+            usb_hid_send(HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS, battery_percent);
+        }
+#endif
     }
 } /* power_thread */
 
