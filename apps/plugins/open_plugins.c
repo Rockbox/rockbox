@@ -758,7 +758,7 @@ reopen_datfile:
         while (path[0] == ' ')
             path++;
 
-        if (strncasecmp(path, "-add", 4) == 0)
+        if (rb->strncasecmp(path, "-add", 4) == 0)
         {
             parameter = NULL;
             op_entry_browse_add(-1);
