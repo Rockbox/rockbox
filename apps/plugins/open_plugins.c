@@ -51,7 +51,7 @@ const off_t op_entry_sz = sizeof(struct open_plugin_entry_t);
 /* we only need the names for the first menu so don't bother reading paths yet */
 const off_t op_name_sz = OPEN_PLUGIN_NAMESZ + (op_entry.name - (char*)&op_entry);
 
-static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter);
+static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter, bool use_key);
 
 static bool _yesno_pop(const char* text)
 {
@@ -175,7 +175,7 @@ static int op_entry_set_path(void)
     if (op_entry.path[0] == '\0')
         rb->strcpy(op_entry.path, PLUGIN_DIR"/");
 
-    rb->browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, "",
+    rb->browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, rb->str(LANG_ADD),
                          Icon_Plugin, op_entry.path, NULL);
 
     browse.buf = tmp_buf;
@@ -289,12 +289,13 @@ static int op_entry_transfer(int fd, int fd_tmp,
     return entries + 1;
 }
 
-static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter)
+static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter, bool use_key)
 {
-    int len;
+    int len, extlen;
     uint32_t hash;
     char *pos = "";;
     int fd_tmp = -1;
+    use_key = (use_key == true && key != NULL);
 
     if (key)
     {
@@ -313,13 +314,20 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
     if (plugin)
     {
         /* name */
+        if (use_key)
+        {
+            op_entry.lang_id = -1;
+            rb->strlcpy(op_entry.name, key, OPEN_PLUGIN_NAMESZ);
+        }
+
         if (pathbasename(plugin, (const char **)&pos) == 0)
             pos = "\0";
         if (op_entry.name[0] == '\0' || op_entry.lang_id >= 0)
             rb->strlcpy(op_entry.name, pos, OPEN_PLUGIN_NAMESZ);
 
         len = rb->strlen(pos);
-        if(len > 5 && rb->strcasecmp(&(pos[len-5]), "." ROCK_EXT) == 0)
+        extlen = rb->strlen("." ROCK_EXT);
+        if(len > extlen && rb->strcasecmp(&(pos[len-extlen]), "." ROCK_EXT) == 0)
         {
             fd_tmp = rb->open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
             if (fd_tmp < 0)
@@ -398,7 +406,7 @@ void op_entry_browse_add(int selection)
         else
             key = op_entry.path;
 
-        op_entry_add_path(key, op_entry.path, NULL);
+        op_entry_add_path(key, op_entry.path, NULL, false);
     }
 }
 
@@ -681,7 +689,7 @@ static void edit_menu(int selection)
         if (param[0] == '\0')
             param = NULL;
 
-        op_entry_add_path(NULL, op_entry.path, param);
+        op_entry_add_path(NULL, op_entry.path, param, false);
         fd_dat = rb->open(OPEN_PLUGIN_DAT, O_RDWR, 0666);
     }
 }
@@ -737,11 +745,27 @@ enum plugin_status plugin_start(const void* parameter)
     bool exit = false;
 
     const int creat_flags = O_RDWR | O_CREAT;
+
+reopen_datfile:
     fd_dat = rb->open(OPEN_PLUGIN_DAT, creat_flags, 0666);
     if (!fd_dat)
         exit = true;
 
     items = rb->lseek(fd_dat, 0, SEEK_END) / op_entry_sz;
+    if (parameter)
+    {
+        path = (char*)parameter;
+        while (path[0] == ' ')
+            path++;
+
+        if (strncasecmp(path, "-add", 4) == 0)
+        {
+            parameter = NULL;
+            op_entry_browse_add(-1);
+            rb->close(fd_dat);
+            goto reopen_datfile;
+        }
+    }
 
     if (parameter)
     {
@@ -781,7 +805,7 @@ enum plugin_status plugin_start(const void* parameter)
             else
             {
                 op_entry_read(fd_dat, selection, op_entry_sz);
-                if (op_entry_add_path(parameter, parameter, "\0") > 0)
+                if (op_entry_add_path(parameter, parameter, "\0", false) > 0)
                 {
                     selection = 0;
                     items++;
@@ -792,12 +816,19 @@ enum plugin_status plugin_start(const void* parameter)
             }
         }/* OP_EXT */
     }
-    
-    if (items == 0 && !exit)
+
+    if (items < 1 && !exit)
     {
-        rb->plugin_open(rb->plugin_get_current_filename(), NULL);
+        char* cur_filename = rb->plugin_get_current_filename();
+
+        if (op_entry_add_path(rb->str(LANG_ADD), cur_filename, "-add", true))
+        {
+            rb->close(fd_dat);
+            parameter = NULL;
+            goto reopen_datfile;
+        }
         rb->close(fd_dat);
-        return PLUGIN_GOTO_PLUGIN;
+        return PLUGIN_ERROR;
     }
 
 
