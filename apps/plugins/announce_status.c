@@ -106,6 +106,8 @@ static struct
     unsigned int index;
     int bin_added;
 
+    bool show_prompt;
+
     unsigned char wps_fmt[MAX_ANNOUNCE_WPS+1];
 } gAnnounce;
 
@@ -115,6 +117,7 @@ static struct configdata config[] =
    {TYPE_INT, 0, 2, { .int_p = &gAnnounce.announce_on }, "Announce", NULL},
    {TYPE_INT, 0, 10, { .int_p = &gAnnounce.grouping }, "Grouping", NULL},
    {TYPE_INT, 0, 10000, { .int_p = &gAnnounce.bin_added }, "Added", NULL},
+   {TYPE_BOOL, 0, 1, { .bool_p = &gAnnounce.show_prompt }, "Prompt", NULL},
    {TYPE_STRING, 0, MAX_ANNOUNCE_WPS+1,
                    { .string =  (char*)&gAnnounce.wps_fmt }, "Fmt", NULL},
 };
@@ -153,6 +156,7 @@ static void config_set_defaults(void)
     gAnnounce.announce_on = 0;
     gAnnounce.grouping = 0;
     gAnnounce.wps_fmt[0] = '\0';
+    gAnnounce.show_prompt = true; 
 }
 
 static void config_reset_voice(void)
@@ -189,7 +193,7 @@ static void announce_test(void)
     rb->talk_force_shutup();
     rb->sleep(HZ / 2);
     voice_info_group(gAnnounce.wps_fmt, true);
-
+    rb->splash(HZ, "...");
     //rb->talk_force_enqueue_next();
 }
 
@@ -267,7 +271,7 @@ static int announce_menu_cb(int action,
                 announce_add("D2Dd ;");
                 break;
             case 2: /*Track*/
-                announce_add("TT T1TeT2Tr ;");
+                announce_add("TT TA T1TeT2Tr ;");
                 break;
             case 3: /*Playlist*/
                 announce_add("P1PC P2PN ;");
@@ -525,11 +529,14 @@ int plugin_main(const void* parameter)
         rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
     }
 
-    if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
+    if (gAnnounce.show_prompt)
     {
-        rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
+        if (rb->mixer_channel_status(PCM_MIXER_CHAN_PLAYBACK) != CHANNEL_PLAYING)
+        {
+            rb->talk_id(LANG_HOLD_FOR_SETTINGS, false);
+        }
+        rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
     }
-    rb->splash(HZ, ID2P(LANG_HOLD_FOR_SETTINGS));
 
     rb->button_clear_queue();
     if (rb->button_get_w_tmo(HZ) > BUTTON_NONE)
@@ -733,6 +740,10 @@ static unsigned char* voice_info_group(unsigned char* current_token, bool testin
             else if (current_char == 'T' && id3->title)
             {
                 rb->talk_spell(id3->title, true);
+            }
+            else if (current_char == 'A' && id3->artist)
+            {
+                rb->talk_spell(id3->artist, true);
             }
             else if (current_char == 'A' && id3->albumartist)
             {
