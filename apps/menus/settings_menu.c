@@ -449,7 +449,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if defined(DX50) || defined(DX90)
             &governor,
 #endif
-#ifdef HAVE_USB_POWER
+#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
             &usb_mode,
 #endif
          );
