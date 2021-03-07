@@ -709,10 +709,11 @@ static int talk_callback(int action,
 MENUITEM_SETTING(talk_filetype_item, &global_settings.talk_filetype, NULL);
 MENUITEM_SETTING(talk_battery_level_item,
                  &global_settings.talk_battery_level, NULL);
+MENUITEM_SETTING(talk_mixer_amp_item, &global_settings.talk_mixer_amp, NULL);
 MAKE_MENU(voice_settings_menu, ID2P(LANG_VOICE), 0, Icon_Voice,
           &talk_menu_item, &talk_dir_item, &talk_dir_clip_item,
           &talk_file_item, &talk_file_clip_item, &talk_filetype_item,
-          &talk_battery_level_item);
+          &talk_battery_level_item, &talk_mixer_amp_item);
 /*    VOICE MENU                   */
 /***********************************/
 

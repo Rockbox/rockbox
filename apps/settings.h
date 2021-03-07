@@ -588,6 +588,7 @@ struct user_settings
     bool talk_file_clip; /* use file .talk clips */
     bool talk_filetype; /* say file type */
     bool talk_battery_level;
+    int  talk_mixer_amp; /* Relative volume of voices, MIX_AMP_MPUTE->MIX_AMP_UNITY */
 
     /* file browser sorting */
     bool sort_case; /* dir sort order: 0=case insensitive, 1=sensitive */
