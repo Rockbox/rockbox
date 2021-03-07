@@ -738,7 +738,12 @@ static int dirbrowse(void)
                 /* don't enter f2 from plugin browser */
                 if (*tc.dirfilter < NUM_FILTER_MODES)
                 {
-                    if (quick_screen_quick(button))
+                    if (global_settings.shortcuts_replaces_qs)
+                    {
+                        global_status.last_screen = GO_TO_SHORTCUTMENU;
+                        return quick_screen_quick(button);
+                    }
+                    else if (quick_screen_quick(button))
                         reload_dir = true;
                     restore = true;
                 }

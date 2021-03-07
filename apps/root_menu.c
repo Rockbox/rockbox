@@ -822,21 +822,27 @@ void root_menu(void)
             case GO_TO_PLUGIN:
             {
                 char *key;
-                switch (last_screen)
+                if (global_status.last_screen == GO_TO_SHORTCUTMENU)
                 {
-                    case GO_TO_ROOT:
-                        key = ID2P(LANG_START_SCREEN);
-                        break;
-                    case GO_TO_WPS:
-                        key = ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN);
-                        break;
-                    case GO_TO_SHORTCUTMENU:
-                        key = ID2P(LANG_SHORTCUTS);
-                        break;
-                    default:
-                        key = ID2P(LANG_OPEN_PLUGIN);
-                        break;
+                    global_status.last_screen = last_screen;
+                    key = ID2P(LANG_SHORTCUTS);
                 }
+                else
+                    switch (last_screen)
+                    {
+                        case GO_TO_ROOT:
+                            key = ID2P(LANG_START_SCREEN);
+                            break;
+                        case GO_TO_WPS:
+                            key = ID2P(LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN);
+                            break;
+                        case GO_TO_SHORTCUTMENU:
+                            key = ID2P(LANG_SHORTCUTS);
+                            break;
+                        default:
+                            key = ID2P(LANG_OPEN_PLUGIN);
+                            break;
+                    }
 
                 open_plugin_get_entry(key, &open_plugin_entry);
                 char *path = open_plugin_entry.path;

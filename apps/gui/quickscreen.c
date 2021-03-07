@@ -398,7 +398,7 @@ static const struct settings_list *get_setting(int gs_value,
     return defaultval;
 }
 
-bool quick_screen_quick(int button_enter)
+int quick_screen_quick(int button_enter)
 {
     struct gui_quickscreen qs;
     bool oldshuffle = global_settings.playlist_shuffle;
@@ -439,7 +439,7 @@ bool quick_screen_quick(int button_enter)
                 playlist_sort(NULL, true);
         }
     }
-    return usb;
+    return (usb ? 1:0);
 }
 
 /* stuff to make the quickscreen configurable */

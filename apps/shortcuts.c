@@ -395,8 +395,6 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
                                            char * buffer, size_t buffer_len)
 {
     (void)data;
-    (void)buffer;
-    (void)buffer_len;
     struct shortcut *sc = get_shortcut(selected_item);
     if (!sc)
         return "";
@@ -409,6 +407,16 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
         /* No translation support as only soft_shutdown has LANG_SHUTDOWN defined */
         return type_strings[SHORTCUT_SHUTDOWN];
     }
+    else if (sc->type == SHORTCUT_BROWSER && (sc->u.path)[0] != '\0')
+    {
+        char* pos;
+        if (path_basename(sc->u.path, (const char **)&pos) > 0)
+        {
+            if (snprintf(buffer, buffer_len, "%s (%s)", pos, sc->u.path) < (int)buffer_len)
+                return buffer;
+        }
+    }
+
     return sc->name[0] ? sc->name : sc->u.path;
 }
 
@@ -609,7 +617,6 @@ int do_shortcut_menu(void *ignored)
                     /* else fall through */
                 case SHORTCUT_BROWSER:
                 {
-
                     if(open_plugin_add_path(ID2P(LANG_SHORTCUTS), sc->u.path, NULL) != 0)
                     {
                         done = GO_TO_PLUGIN;

@@ -427,7 +427,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #ifdef HAVE_QUICKSCREEN
         else if (action == ACTION_STD_QUICKSCREEN)
         {
-            quick_screen_quick(action);
+            if (global_settings.shortcuts_replaces_qs)
+            {
+                global_status.last_screen = GO_TO_SHORTCUTMENU;
+                ret = quick_screen_quick(action);
+            }
+            else
+                quick_screen_quick(action);
             redraw_lists = true;
         }
 #endif

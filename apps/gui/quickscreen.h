@@ -43,7 +43,7 @@ struct gui_quickscreen
                                                     item is changed */
 };
 
-extern bool quick_screen_quick(int button_enter);
+extern int quick_screen_quick(int button_enter);
 int quickscreen_set_option(void *data);
 bool is_setting_quickscreenable(const struct settings_list *setting);
 void set_as_qs_item(const struct settings_list *setting,
