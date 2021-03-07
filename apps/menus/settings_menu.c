@@ -266,7 +266,7 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
             &usb_charging,
 #endif
          );
-#ifdef HAVE_USB_POWER
+#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
 MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
 #endif
 /* Disk */
