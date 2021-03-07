@@ -824,7 +824,7 @@ struct user_settings
 #if defined(DX50) || defined(DX90)
     int governor;
 #endif
-#ifdef HAVE_USB_POWER
+#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
     int usb_mode;
 #endif
 };
