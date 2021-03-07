@@ -27,6 +27,11 @@
 #include "splash.h"
 #include "lang.h"
 
+#define ROCK_EXT "rock"
+#define ROCK_LEN 5
+#define OP_EXT "opx"
+#define OP_LEN 4
+
 struct open_plugin_entry_t open_plugin_entry;
 
 static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
@@ -34,9 +39,11 @@ static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter)
 {
     int len;
+    bool is_valid = false;
     uint32_t hash;
     char *pos;
     int fd = 0;
+    int fd1 = 0;
 
     /*strlcpy(plug_entry.key, key, sizeof(plug_entry.key));*/
     open_plugin_entry.lang_id = P2ID((unsigned char*)key);
@@ -52,12 +59,9 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
             pos = "\0";
 
         len = strlcpy(open_plugin_entry.name, pos, OPEN_PLUGIN_NAMESZ);
-
-        if(len > 5 && strcasecmp(&(pos[len-5]), ".rock") == 0)
+        if (len > ROCK_LEN && strcasecmp(&(pos[len-ROCK_LEN]), "." ROCK_EXT) == 0)
         {
-            fd = open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-            if (!fd)
-                return 0;
+            is_valid = true;
 
             /* path */
             strlcpy(open_plugin_entry.path, plugin, OPEN_PLUGIN_BUFSZ);
@@ -66,7 +70,24 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
                 strlcpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
             else
                 open_plugin_entry.param[0] = '\0';
+        }
+        else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)
+        {
+            is_valid = true;
+            /* path */
+            strlcpy(open_plugin_entry.path,
+                  VIEWERS_DATA_DIR "/open_plugins." ROCK_EXT, OPEN_PLUGIN_BUFSZ);
+            /* parameter */
+            strlcpy(open_plugin_entry.param, plugin, OPEN_PLUGIN_BUFSZ);
 
+            write(fd, &open_plugin_entry, op_entry_sz);
+        }
+
+        if (is_valid)
+        {
+            fd = open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+            if (!fd)
+                return 0;
             write(fd, &open_plugin_entry, op_entry_sz);
         }
         else
@@ -77,7 +98,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
         }
     }
 
-    int fd1 = open(OPEN_PLUGIN_DAT, O_RDONLY);
+    fd1 = open(OPEN_PLUGIN_DAT, O_RDONLY);
     if (fd1)
     {
         while (read(fd1, &open_plugin_entry, op_entry_sz) == op_entry_sz)

@@ -36,7 +36,10 @@
 #include "../open_plugin.h"
 
 #define ROCK_EXT "rock"
+#define ROCK_LEN 5
+
 #define OP_EXT "opx"
+#define OP_LEN 4
 
 #define OP_PLUGIN_RESTART (PLUGIN_GOTO_PLUGIN | 0x8000)
 
@@ -106,7 +109,7 @@ static int op_entry_read_opx(const char *path)
     int len;
 
     len = rb->strlen(path);
-    if(len > 4 && rb->strcasecmp(&((path)[len-4]), "." OP_EXT) == 0)
+    if(len > OP_LEN && rb->strcasecmp(&((path)[len-OP_LEN]), "." OP_EXT) == 0)
     {
         fd_opx = rb->open(path, O_RDONLY);
         if (fd_opx)
@@ -136,8 +139,8 @@ static void op_entry_export(int selection)
     if( !rb->kbd_input( filename, MAX_PATH, NULL ) )
     {
         len = rb->strlen(filename);
-        if(len > 4 && filename[len] != PATH_SEPCH &&
-            rb->strcasecmp(&((filename)[len-4]), "." OP_EXT) != 0)
+        if(len > OP_LEN && filename[len] != PATH_SEPCH &&
+            rb->strcasecmp(&((filename)[len-OP_LEN]), "." OP_EXT) != 0)
         {
             rb->strcat(filename, "." OP_EXT);
         }
@@ -291,7 +294,7 @@ static int op_entry_transfer(int fd, int fd_tmp,
 
 static uint32_t op_entry_add_path(const char *key, const char *plugin, const char *parameter, bool use_key)
 {
-    int len, extlen;
+    int len;
     uint32_t hash;
     char *pos = "";;
     int fd_tmp = -1;
@@ -326,8 +329,7 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
             rb->strlcpy(op_entry.name, pos, OPEN_PLUGIN_NAMESZ);
 
         len = rb->strlen(pos);
-        extlen = rb->strlen("." ROCK_EXT);
-        if(len > extlen && rb->strcasecmp(&(pos[len-extlen]), "." ROCK_EXT) == 0)
+        if(len > ROCK_LEN && rb->strcasecmp(&(pos[len-ROCK_LEN]), "." ROCK_EXT) == 0)
         {
             fd_tmp = rb->open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
             if (fd_tmp < 0)
@@ -478,7 +480,7 @@ static int op_entry_run(void)
     char* param;
     if (op_entry.hash != 0 && op_entry.path[0] != '\0')
     {
-        rb->splash(1, ID2P(LANG_OPEN_PLUGIN));
+        //rb->splash(1, ID2P(LANG_OPEN_PLUGIN));
         path = op_entry.path;
         param = op_entry.param;
         if (param[0] == '\0')
