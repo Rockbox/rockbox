@@ -61,6 +61,8 @@
 #include "onplay.h"
 #endif
 
+#include "voice_thread.h"
+
 #if defined(DX50) || defined(DX90)
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
@@ -1327,6 +1329,8 @@ const struct settings_list settings[] = {
                   "talk filetype", NULL),
     OFFON_SETTING(F_TEMPVAR, talk_battery_level, LANG_TALK_BATTERY_LEVEL, false,
                   "Announce Battery Level", NULL),
+    INT_SETTING(0, talk_mixer_amp, LANG_TALK_MIXER_LEVEL, 100,
+        "talk mixer level", UNIT_PERCENT, 0, 100, 5, NULL, NULL, voice_set_mixer_level),
 
 #ifdef HAVE_RECORDING
      /* recording */

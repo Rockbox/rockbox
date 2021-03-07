@@ -9500,6 +9500,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Voice prompt volume"
+  </dest>
+  <voice>
+    *: "Voice prompt volume"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VOICE_FILETYPE
   desc: voice settings menu
   user: core
