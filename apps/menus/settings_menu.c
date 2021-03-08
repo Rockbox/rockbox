@@ -266,7 +266,7 @@ MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
             &usb_charging,
 #endif
          );
-#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
+#if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
 MENUITEM_SETTING(usb_mode, &global_settings.usb_mode, NULL);
 #endif
 /* Disk */
@@ -449,7 +449,7 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #if defined(DX50) || defined(DX90)
             &governor,
 #endif
-#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
+#if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
             &usb_mode,
 #endif
          );
