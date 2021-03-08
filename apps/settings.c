@@ -1021,18 +1021,19 @@ void settings_apply(bool read_disk)
     usb_charging_enable(global_settings.usb_charging);
 #endif
 
-#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
-    usb_set_mode(global_settings.usb_mode);
-#endif
-
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(global_settings.touch_mode);
     memcpy(&calibration_parameters, &global_settings.ts_calibration_data, sizeof(struct touchscreen_parameter));
 #endif
 
 #if defined(DX50) || defined(DX90)
-    ibasso_set_governor(global_settings.governor);
     ibasso_set_usb_mode(global_settings.usb_mode);
+#elif defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
+    usb_set_mode(global_settings.usb_mode);
+#endif
+
+#if defined(DX50) || defined(DX90)
+    ibasso_set_governor(global_settings.governor);
 #endif
 
     /* This should stay last */

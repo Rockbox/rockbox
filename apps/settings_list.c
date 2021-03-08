@@ -2161,7 +2161,7 @@ const struct settings_list settings[] = {
                    "Powersave",
                    "Performance"),
 #endif
-#if defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR)
+#if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
     CHOICE_SETTING(0,
                    usb_mode,
                    LANG_USB_MODE,
@@ -2172,10 +2172,11 @@ const struct settings_list settings[] = {
                    ",adb"
 #endif
                    ,
-                   usb_set_mode,
 #if defined(DX50) || defined(DX90)
+                   ibasso_set_usb_mode,
                    4,
 #else
+                   usb_set_mode,
                    3,
 #endif
                    ID2P(LANG_ASK),
