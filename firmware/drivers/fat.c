@@ -266,6 +266,13 @@ static struct bpb
 
 } fat_bpbs[NUM_VOLUMES]; /* mounted partition info */
 
+#ifdef STORAGE_WANTS_ALIGN
+#define FAT_BOUNCE_SECTORS 10
+static uint8_t fat_bounce_buffers[NUM_VOLUMES][SECTOR_SIZE*FAT_BOUNCE_SECTORS] STORAGE_ALIGN_ATTR;
+#define FAT_BOUNCE_BUFFER(bpb) \
+    (fat_bounce_buffers[IF_MV_VOL((bpb)->volume)])
+#endif
+
 #define IS_FAT_SECTOR(bpb, sector) \
     (!((sector) >= (bpb)->fatrgnend || (sector) < (bpb)->fatrgnstart))
 
@@ -2385,8 +2392,35 @@ static long transfer(struct bpb *fat_bpb, unsigned long start, long count,
     }
     else
     {
-        rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
-                                  start + fat_bpb->startsector, count, buf);
+        void* xferbuf = buf;
+#ifdef STORAGE_WANTS_ALIGN
+        int remain = count;
+        int xferred = 0;
+        int aligned = 1;
+        if(STORAGE_OVERLAP((uintptr_t)buf)) {
+            xferbuf = FAT_BOUNCE_BUFFER(fat_bpb);
+            aligned = 0;
+            count = MIN(remain, FAT_BOUNCE_SECTORS);
+        }
+
+        while(remain > 0) {
+#endif
+            rc = storage_read_sectors(IF_MD(fat_bpb->drive,)
+                                      start + fat_bpb->startsector, count, xferbuf);
+#ifdef STORAGE_WANTS_ALIGN
+            if(rc < 0)
+                break;
+            if(LIKELY(aligned))
+                break;
+
+            memcpy(buf, xferbuf, count * SECTOR_SIZE);
+            buf += count * SECTOR_SIZE;
+            xferred += count;
+            start += count;
+            remain -= count;
+            count = MIN(remain, FAT_BOUNCE_SECTORS);
+        }
+#endif
     }
 
     if (rc < 0)
