@@ -66,6 +66,7 @@
 
 static int context;
 static const char *selected_file = NULL;
+static char selected_file_path[MAX_PATH];
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
 extern struct menu_item_ex file_menu; /* settings_menu.c  */
@@ -1856,7 +1857,13 @@ int onplay(char* file, int attr, int from, bool hotkey)
     const struct menu_item_ex *menu;
     onplay_result = ONPLAY_OK;
     context = from;
-    selected_file = file;
+    if (file == NULL)
+        selected_file = NULL;
+    else
+    {
+        strlcpy(selected_file_path, file, MAX_PATH);
+        selected_file = selected_file_path;
+    }
     selected_file_attr = attr;
     int menu_selection;
 #ifdef HAVE_HOTKEY
