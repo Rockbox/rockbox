@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c81a2ed0_9aabf77a",
+        "filename": "firmware/drivers/fat.c",
+        "patchSetId": 3
+      },
+      "lineNbr": 2407,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-09T21:25:21Z",
+      "side": 1,
+      "message": "Comment removed by: Solomon Peachy; Reason: draft note to self",
+      "range": {
+        "startLine": 2407,
+        "startChar": 13,
+        "endLine": 2407,
+        "endChar": 23
+      },
+      "revId": "7db7dd19d62af55e1d4ffa4d0ba518d30edd3462",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
