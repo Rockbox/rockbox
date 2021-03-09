@@ -8203,16 +8203,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Играть следующий"
+    *: ""
   </dest>
   <voice>
-    *: "Играть следующий"
+    *: ""
   </voice>
 </phrase>
 <phrase>
