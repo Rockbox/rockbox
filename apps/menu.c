@@ -431,6 +431,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             {
                 global_status.last_screen = GO_TO_SHORTCUTMENU;
                 ret = quick_screen_quick(action);
+                done = true;
             }
             else
                 quick_screen_quick(action);

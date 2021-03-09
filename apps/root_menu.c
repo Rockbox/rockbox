@@ -738,6 +738,7 @@ void root_menu(void)
 {
     int previous_browser = GO_TO_FILEBROWSER;
     int selected = 0;
+    int shortcut_origin = GO_TO_ROOT;
 
     push_current_activity(ACTIVITY_MAINMENU);
 
@@ -824,10 +825,12 @@ void root_menu(void)
                 char *key;
                 if (global_status.last_screen == GO_TO_SHORTCUTMENU)
                 {
+                    shortcut_origin = last_screen;
                     global_status.last_screen = last_screen;
                     key = ID2P(LANG_SHORTCUTS);
                 }
                 else
+                {
                     switch (last_screen)
                     {
                         case GO_TO_ROOT:
@@ -843,6 +846,7 @@ void root_menu(void)
                             key = ID2P(LANG_OPEN_PLUGIN);
                             break;
                     }
+                }
 
                 open_plugin_get_entry(key, &open_plugin_entry);
                 char *path = open_plugin_entry.path;
@@ -851,6 +855,14 @@ void root_menu(void)
                     param = NULL;
 
                 next_screen = load_plugin_screen(path, param);
+
+                /* shortcuts may take several trips through the GO_TO_PLUGIN case
+                   make sure we preserve and restore the origin */
+                if (next_screen == GO_TO_PREVIOUS && shortcut_origin != GO_TO_ROOT)
+                {
+                    next_screen = shortcut_origin;
+                    shortcut_origin = GO_TO_ROOT;
+                }
 
                 previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PLUGIN;
                 break;

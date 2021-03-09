@@ -425,6 +425,8 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
     (void)lists;
     if (action == ACTION_STD_OK)
         return ACTION_STD_CANCEL;
+    else if (action == ACTION_STD_QUICKSCREEN && action != ACTION_STD_CONTEXT)
+        return ACTION_STD_CANCEL;
     else if (action == ACTION_STD_CONTEXT)
     {
         int selection = gui_synclist_get_sel_pos(lists);
@@ -459,7 +461,7 @@ static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data
             case SHORTCUT_FILE:
                 return filetype_get_icon(filetype_get_attr(sc->u.path));
             case SHORTCUT_BROWSER:
-                return Icon_Folder;
+                return Icon_Plugin;
             case SHORTCUT_SETTING:
                 return Icon_Menu_setting;
             case SHORTCUT_DEBUGITEM:
