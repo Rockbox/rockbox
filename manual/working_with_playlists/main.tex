@@ -48,10 +48,10 @@ song.
   rather than erasing the current
   playlist, see the section below on how to add music to a playlist.}
 
-\subsubsection{By using Insert and Queue functions}
-If a dynamic playlist has finished playing, the \setting{Insert} and
-\setting{Queue} functions as described in \ref{ref:playlist_submenu} will
-\emph{replace} the playlist with the selected tracks instead of adding to it.
+\subsubsection{By using the Play Next function}
+The \setting{Play Next} function as described in \ref{ref:playlist_submenu} will
+\emph{replace} the dynamic playlist with the selected tracks. If a track is
+currently playing, it is only removed once it’s finished playing.
 
 \subsubsection{\label{ref:playlist_catalogue}By using the Playlist catalogue}
 The \setting{Playlist catalogue} makes it possible to modify and create
@@ -79,10 +79,7 @@ in the \setting{Main Menu}. The created playlist will be named
 \screenshot{rockbox_interface/images/ss-playlist-menu}{The Playlist Submenu}{}
 The \setting{Playlist Submenu} is a submenu in the \setting{Context Menu} (see
 \reference{ref:Contextmenu}), it allows you to put tracks into a
-``dynamic playlist''. If the current playlist has finished playing, Rockbox will
-create a new dynamic playlist and put the selected track(s) into it.
-If there is music currently playing, Rockbox will put the
-selected track(s) into the current playlist. The place in which the newly
+``dynamic playlist''. The place in which the newly
 selected tracks are added to the playlist is determined by the following
 options:
 
@@ -90,8 +87,7 @@ options:
 \item [Insert.] Add track(s) immediately after any tracks added via the most
   recent \setting{Insert} operation. If no tracks have yet been added via an
   \setting{Insert}, new tracks will be added immediately after the current
-  playing track. If a dynamic playlist has finished playing,
-  it will be \emph{replaced} by the selected track(s).
+  playing track.
 
 \item [Insert Next.] Add track(s) immediately after current playing
   track, no matter what else has been inserted.
@@ -115,8 +111,8 @@ options:
 
 \item [Queue Last Shuffled.] Queue tracks in a random order at the end of the playlist.
 
-\item [Play Next.] Replaces all but the current playing track with track(s).
-    Current playing track is queued.
+\item [Play Next.] Replaces all tracks in the dynamic playlist.
+If a track is currently playing, it is only removed once it’s finished playing.
 \end{description}
 
 The \setting{Playlist Submenu}  can be used to add either single tracks or
