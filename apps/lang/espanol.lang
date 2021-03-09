@@ -8000,16 +8000,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Reproducir siguiente"
+    *: ""
   </dest>
   <voice>
-    *: "Reproducir siguiente"
+    *: ""
   </voice>
 </phrase>
 <phrase>
