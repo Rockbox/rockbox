@@ -6278,16 +6278,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Graj następne"
+    *: ""
   </dest>
   <voice>
-    *: "Graj następne"
+    *: ""
   </voice>
 </phrase>
 <phrase>
