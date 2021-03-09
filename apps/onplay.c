@@ -640,7 +640,7 @@ MENUITEM_FUNCTION(q_last_shuf_pl_item, MENU_FUNC_USEPARAM,
                   (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED,
                   treeplaylist_callback, Icon_Playlist);
 /* replace playlist */
-MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_REPLACE),
+MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_CLEAR_LIST_AND_PLAY_NEXT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_REPLACE,
                   NULL, Icon_Playlist);
 

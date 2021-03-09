@@ -6619,16 +6619,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Aktuelle ersetzen"
+    *: ""
   </dest>
   <voice>
-    *: "Aktuelle ersetzen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15588,5 +15588,19 @@
   </dest>
   <voice>
     *: "Element nach unten verschieben"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Liste löschen & als Nächstes spielen"
+  </dest>
+  <voice>
+    *: "Liste löschen & als Nächstes spielen"
   </voice>
 </phrase>
