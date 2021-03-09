@@ -477,7 +477,18 @@ MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
 /* CONTEXT_[TREE|ID3DB] playlist options */
 static bool add_to_playlist(int position, bool queue)
 {
-    bool new_playlist = !(audio_status() & AUDIO_STATUS_PLAY) && (global_status.resume_index == -1 || playlist_resume() == -1);
+    bool new_playlist = false;
+    if (!(audio_status() & AUDIO_STATUS_PLAY))
+    {
+        if (position == PLAYLIST_REPLACE)
+        {
+            new_playlist = true;
+            position = PLAYLIST_INSERT;
+        }
+        else if (global_status.resume_index == -1 || playlist_resume() == -1)
+            new_playlist = true;
+    }
+
     const char *lines[] = {
         ID2P(LANG_RECURSE_DIRECTORY_QUESTION),
         selected_file
@@ -594,7 +605,7 @@ static int treeplaylist_callback(int action,
 /* insert items */
 MENUITEM_FUNCTION(i_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT,
-                  NULL, Icon_Playlist);
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(i_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_INSERT_FIRST),
                   playlist_insert_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
                   treeplaylist_wplayback_callback, Icon_Playlist);
@@ -630,7 +641,7 @@ MENUITEM_FUNCTION(q_last_shuf_pl_item, MENU_FUNC_USEPARAM,
 /* replace playlist */
 MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_REPLACE),
                   playlist_insert_func, (intptr_t*)PLAYLIST_REPLACE,
-                  treeplaylist_wplayback_callback, Icon_Playlist);
+                  NULL, Icon_Playlist);
 
 /* others */
 MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
@@ -680,11 +691,17 @@ static int treeplaylist_callback(int action,
                     return action;
                 }
             }
+            else if (this_item == &i_pl_item)
+            {
+                if (global_status.resume_index != -1)
+                    return action;
+            }
             else if (this_item == &i_shuf_pl_item)
             {
-                if ((audio_status() & AUDIO_STATUS_PLAY) ||
-                    (selected_file_attr & ATTR_DIRECTORY) ||
-                    ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U))
+                if ((global_status.resume_index != -1) &&
+                        ((audio_status() & AUDIO_STATUS_PLAY) ||
+                        (selected_file_attr & ATTR_DIRECTORY) ||
+                        ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)))
                 {
                     return action;
                 }
