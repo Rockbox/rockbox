@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "7eb188d3_34ebf703",
+        "filename": "bootloader/SOURCES",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8289e134_200e49a2",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 11
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "be840e1c_40372355",
         "filename": "bootloader/fiiom3k.c",
         "patchSetId": 4
@@ -93,6 +117,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d36213b1_06700e90",
+        "filename": "bootloader/fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dbecf4fa_baa98fc0",
+      "range": {
+        "startLine": 58,
+        "startChar": 0,
+        "endLine": 58,
+        "endChar": 16
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -143,6 +191,30 @@
     },
     {
       "key": {
+        "uuid": "b51e8ac0_aad4b429",
+        "filename": "firmware/drivers/audio/ak4376.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0fae4fa6_b73ba3c0",
+      "range": {
+        "startLine": 45,
+        "startChar": 1,
+        "endLine": 49,
+        "endChar": 28
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "59ba2907_0f19b6ca",
         "filename": "firmware/drivers/rtc/rtc_x1000.c",
         "patchSetId": 4
@@ -187,6 +259,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "642f78b3_8a524f53",
+        "filename": "firmware/drivers/rtc/rtc_x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done, implemented the driver",
+      "parentUuid": "c7e51c83_5121e27e",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 22,
+        "endChar": 16
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -237,6 +333,30 @@
     },
     {
       "key": {
+        "uuid": "0386043e_85a936b2",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba5acd30_a7a7d2c5",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 31
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "459fc2ff_e988248f",
         "filename": "firmware/export/config/fiiom3k.h",
         "patchSetId": 4
@@ -269,6 +389,24 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d61e75ac_1c7a9a24",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d62a894_9b4d22c4",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -319,6 +457,30 @@
     },
     {
       "key": {
+        "uuid": "94a3df0a_da4a7748",
+        "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e17c4ae_d60d0432",
+      "range": {
+        "startLine": 79,
+        "startChar": 4,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a93cc1a8_06b25779",
         "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.h",
         "patchSetId": 4
@@ -366,6 +528,30 @@
     },
     {
       "key": {
+        "uuid": "2041e718_35b88890",
+        "filename": "firmware/target/mips/ingenic_x1000/dma-x1000.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ffe343c2_2f56a78b",
+      "range": {
+        "startLine": 33,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 18
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2c9a0931_fe9443ba",
         "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/audiohw-fiiom3k.c",
         "patchSetId": 4
@@ -410,6 +596,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e1d4013_7d9f0228",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/audiohw-fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d75f03d6_068a807c",
+      "range": {
+        "startLine": 71,
+        "startChar": 0,
+        "endLine": 71,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -504,6 +714,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "909513ab_2ecbe7a8",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9a8c1e3_427d30e4",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -636,6 +870,30 @@
     },
     {
       "key": {
+        "uuid": "772abb0a_73d2be89",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done, chip supports WSBH instruction",
+      "parentUuid": "c7114a29_862a65c0",
+      "range": {
+        "startLine": 40,
+        "startChar": 7,
+        "endLine": 40,
+        "endChar": 30
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e9ba6bd3_0831380d",
         "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
         "patchSetId": 4
@@ -680,6 +938,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "982b5111_9742db61",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0971de69_625dbe39",
+      "range": {
+        "startLine": 126,
+        "startChar": 7,
+        "endLine": 126,
+        "endChar": 52
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -730,6 +1012,30 @@
     },
     {
       "key": {
+        "uuid": "19fbccb5_abfee1a5",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b8d7a95_3bae27cd",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 139,
+        "endChar": 33
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "eef3603c_5b44d81b",
         "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
         "patchSetId": 4
@@ -777,6 +1083,30 @@
     },
     {
       "key": {
+        "uuid": "59dca3ec_6d1d166d",
+        "filename": "firmware/target/mips/ingenic_x1000/system-target.h",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done, added implementations to handle full argument range",
+      "parentUuid": "4165c1c1_d7f3a1ff",
+      "range": {
+        "startLine": 145,
+        "startChar": 0,
+        "endLine": 145,
+        "endChar": 36
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "11e5655f_3dcf9026",
         "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
         "patchSetId": 4
@@ -809,6 +1139,24 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0b2ca39_879e9462",
+        "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a745bc4_c4dab717",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -859,6 +1207,30 @@
     },
     {
       "key": {
+        "uuid": "a2d76790_7c91210d",
+        "filename": "firmware/target/mips/ingenic_x1000/system-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d0c1009_f4eaf93d",
+      "range": {
+        "startLine": 131,
+        "startChar": 4,
+        "endLine": 131,
+        "endChar": 43
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "194c8201_db3a3126",
         "filename": "tools/configure",
         "patchSetId": 4
@@ -903,6 +1275,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ac128e2_5d4913da",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4207,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done, seems to compile and run fine as mip32r2",
+      "parentUuid": "95feb93c_59e97d6a",
+      "range": {
+        "startLine": 4207,
+        "startChar": 0,
+        "endLine": 4207,
+        "endChar": 1
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -997,6 +1393,30 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "15dc3355_21d975b1",
+        "filename": "tools/configure",
+        "patchSetId": 4
+      },
+      "lineNbr": 4209,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb66e33d_9b9ee44f",
+      "range": {
+        "startLine": 4209,
+        "startChar": 1,
+        "endLine": 4209,
+        "endChar": 17
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }

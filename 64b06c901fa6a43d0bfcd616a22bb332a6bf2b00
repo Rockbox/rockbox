@@ -22,6 +22,30 @@
       "revId": "64b06c901fa6a43d0bfcd616a22bb332a6bf2b00",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e46391a_8d4273a8",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-09T20:27:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab408ff1_7e971389",
+      "range": {
+        "startLine": 52,
+        "startChar": 0,
+        "endLine": 52,
+        "endChar": 1
+      },
+      "revId": "64b06c901fa6a43d0bfcd616a22bb332a6bf2b00",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
