@@ -602,7 +602,7 @@ int do_shortcut_menu(void *ignored)
             sc = get_shortcut(list.selection);
             if (!sc)
                 continue;
-            splashf(200, "%i", sc->type);
+
             switch (sc->type)
             {
                 case SHORTCUT_PLAYLISTMENU:
@@ -625,7 +625,6 @@ int do_shortcut_menu(void *ignored)
                     /* else fall through */
                 case SHORTCUT_BROWSER:
                 {
-                    splashf(200, "b %i %s", sc->type, sc->u.path);
                     if(open_plugin_add_path(ID2P(LANG_SHORTCUTS), sc->u.path, NULL) != 0)
                     {
                         done = GO_TO_PLUGIN;
