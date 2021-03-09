@@ -3396,14 +3396,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Alcalina"
+    xduoox3: "Nuovo tipo (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Alcalina"
+    xduoox3: "Nuovo tipo 2000 milliamp ora"
   </voice>
 </phrase>
 <phrase>
@@ -3413,14 +3416,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Nickel metal idrato"
+    xduoox3: "Vecchio tipo (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Nickel metal idrato"
+    xduoox3: "Vecchio tipo 1500 milliamp ora"
   </voice>
 </phrase>
 <phrase>
@@ -15456,5 +15462,67 @@
   </dest>
   <voice>
     *: "Sfoglia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Volume dei prompt vocali"
+  </dest>
+  <voice>
+    *: "Volume dei prompt vocali"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Acuto breve"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Acuto breve"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Basso breve"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "basso breve"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Entrare in modo memoria di massa USB?"
+  </dest>
+  <voice>
+    *: "Entrare in modo memoria di massa USB?"
   </voice>
 </phrase>
