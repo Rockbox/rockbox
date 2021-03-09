@@ -451,17 +451,22 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 static enum themable_icons shortcut_menu_get_icon(int selected_item, void * data)
 {
     (void)data;
+    int icon;
     struct shortcut *sc = get_shortcut(selected_item);
     if (!sc)
         return Icon_NOICON;
     if (sc->icon == Icon_NOICON)
     {
+
         switch (sc->type)
         {
             case SHORTCUT_FILE:
                 return filetype_get_icon(filetype_get_attr(sc->u.path));
             case SHORTCUT_BROWSER:
-                return Icon_Plugin;
+                icon = filetype_get_icon(filetype_get_attr(sc->u.path));
+                if (icon <= 0)
+                    icon = Icon_Folder;
+                return icon;
             case SHORTCUT_SETTING:
                 return Icon_Menu_setting;
             case SHORTCUT_DEBUGITEM:
@@ -597,6 +602,7 @@ int do_shortcut_menu(void *ignored)
             sc = get_shortcut(list.selection);
             if (!sc)
                 continue;
+            splashf(200, "%i", sc->type);
             switch (sc->type)
             {
                 case SHORTCUT_PLAYLISTMENU:
@@ -619,6 +625,7 @@ int do_shortcut_menu(void *ignored)
                     /* else fall through */
                 case SHORTCUT_BROWSER:
                 {
+                    splashf(200, "b %i %s", sc->type, sc->u.path);
                     if(open_plugin_add_path(ID2P(LANG_SHORTCUTS), sc->u.path, NULL) != 0)
                     {
                         done = GO_TO_PLUGIN;
