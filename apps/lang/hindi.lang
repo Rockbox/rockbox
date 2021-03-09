@@ -3039,16 +3039,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "अगला पलाय कर"
+    *: ""
   </dest>
   <voice>
-    *: "अगला पलाय कर"
+    *: ""
   </voice>
 </phrase>
 <phrase>
