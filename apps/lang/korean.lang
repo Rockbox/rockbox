@@ -8589,16 +8589,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "다음곡으로 재생"
+    *: ""
   </dest>
   <voice>
-    *: "다음곡으로 재생"
+    *: ""
   </voice>
 </phrase>
 <phrase>

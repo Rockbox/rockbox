@@ -6346,16 +6346,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Play Next"
+    *: ""
   </dest>
   <voice>
-    *: "Play Next"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15599,5 +15599,19 @@
   </dest>
   <voice>
     *: "Enter USB mass storage mode?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Clear List & Play Next"
+  </dest>
+  <voice>
+    *: "Clear List & Play Next"
   </voice>
 </phrase>
