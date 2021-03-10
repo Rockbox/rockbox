@@ -36,27 +36,6 @@
 #include "sysfs-ibasso.h"
 #include "vold-ibasso.h"
 
-
-unsigned int power_input_status(void)
-{
-    /*TRACE;*/
-
-    /*
-        /sys/class/power_supply/usb/present
-        0: No external power supply connected.
-        1: External power supply connected.
-    */
-    int val = 0;
-    if(! sysfs_get_int(SYSFS_USB_POWER_PRESENT, &val))
-    {
-        DEBUGF("ERROR %s: Can not get power supply status.", __func__);
-        return POWER_INPUT_NONE;
-    }
-
-    return val ? POWER_INPUT_USB_CHARGER : POWER_INPUT_NONE;
-}
-
-
 void power_off(void)
 {
     TRACE;
@@ -74,24 +53,4 @@ void power_off(void)
     }
 
     reboot(RB_POWER_OFF);
-}
-
-
-/* Returns true, if battery is charging, false else. */
-bool charging_state(void)
-{
-    /*TRACE;*/
-
-    /*
-        /sys/class/power_supply/battery/status
-        "Full", "Charging", "Discharging"
-    */
-    char state[9];
-    if(! sysfs_get_string(SYSFS_BATTERY_STATUS, state, 9))
-    {
-        DEBUGF("ERROR %s: Can not get battery charging state.", __func__);
-        return false;
-    }
-
-    return(strcmp(state, "Charging") == 0);;
 }

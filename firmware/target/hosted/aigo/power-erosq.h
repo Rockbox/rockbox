@@ -23,9 +23,6 @@
 #include <stdbool.h>
 #include "config.h"
 
-unsigned int erosq_power_input_status(void);
-bool erosq_power_charging_status(void);
 unsigned int erosq_power_get_battery_voltage(void);
 unsigned int erosq_power_get_battery_capacity(void);
 #endif /* _POWER_XDUOO_H_ */
-

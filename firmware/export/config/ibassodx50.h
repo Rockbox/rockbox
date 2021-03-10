@@ -143,3 +143,7 @@
 /* No special storage */
 #define CONFIG_STORAGE STORAGE_HOSTFS
 #define HAVE_STORAGE_FLUSH
+
+/* More common stuff */
+#define BATTERY_DEV_NAME "battery"
+#define POWER_DEV_NAME "usb"

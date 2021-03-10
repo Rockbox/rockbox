@@ -45,18 +45,7 @@ const unsigned short const percent_to_volt_charge[11] =
       3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
 };
 
-unsigned int power_input_status(void)
-{
-    /* POWER_INPUT_USB_CHARGER, POWER_INPUT_NONE */
-    return erosq_power_input_status();
-}
-
 int _battery_voltage(void)
 {
     return erosq_power_get_battery_voltage();
-}
-
-bool charging_state(void)
-{
-    return erosq_power_charging_status();
 }

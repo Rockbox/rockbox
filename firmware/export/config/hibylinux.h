@@ -84,3 +84,7 @@
 #define MULTIDRIVE_DIR "/mnt/usb"
 #define MULTIDRIVE_DEV "/sys/block/sda"
 #define ROOTDRIVE_DEV "/sys/block/mmcblk0"
+
+/* More common stuff */
+#define BATTERY_DEV_NAME "battery"
+#define POWER_DEV_NAME "usb"

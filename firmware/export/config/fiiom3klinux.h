@@ -128,3 +128,7 @@
 #define BOOTFILE_EXT "m3k"
 #define BOOTFILE     "rockbox." BOOTFILE_EXT
 #define BOOTDIR      "/.rockbox"
+
+/* More stuff */
+#define BATTERY_DEV_NAME "battery"
+#define POWER_DEV_NAME "ac"

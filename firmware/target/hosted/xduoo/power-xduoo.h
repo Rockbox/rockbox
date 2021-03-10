@@ -23,9 +23,6 @@
 #include <stdbool.h>
 #include "config.h"
 
-unsigned int xduoo_power_input_status(void);
-bool xduoo_power_charging_status(void);
 unsigned int xduoo_power_get_battery_voltage(void);
 unsigned int xduoo_power_get_battery_capacity(void);
 #endif /* _POWER_XDUOO_H_ */
-

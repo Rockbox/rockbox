@@ -32,28 +32,6 @@
 const char * const sysfs_bat_voltage =
     "/sys/class/power_supply/battery/voltage_now";
 
-const char * const sysfs_bat_status =
-    "/sys/class/power_supply/battery/status";
-
-const char * const sysfs_pow_supply =
-    "/sys/class/power_supply/usb/present";
-
-unsigned int agptek_power_input_status(void)
-{
-    int present = 0;
-    sysfs_get_int(sysfs_pow_supply, &present);
-
-    return present ? POWER_INPUT_USB_CHARGER : POWER_INPUT_NONE;
-}
-
-bool agptek_power_charging_status(void)
-{
-    char buf[12] = {0};
-    sysfs_get_string(sysfs_bat_status, buf, sizeof(buf));
-
-    return (strncmp(buf, "Charging", 8) == 0);
-}
-
 unsigned int agptek_power_get_battery_voltage(void)
 {
     int battery_voltage;
