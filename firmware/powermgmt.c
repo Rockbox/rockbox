@@ -48,9 +48,6 @@
 #if (CONFIG_PLATFORM & PLATFORM_HOSTED)
 #include <time.h>
 #endif
-#ifdef USB_ENABLE_HID
-#include "usbstack/usb_hid.h"
-#endif
 
 #if (defined(IAUDIO_X5) || defined(IAUDIO_M5) || defined(COWON_D2)) \
     && !defined (SIMULATOR)
@@ -640,17 +637,6 @@ static void collect_power_history(void)
     power_history[0] = power_hist_item();
 }
 
-#ifdef USB_ENABLE_HID
-static bool battery_reporting = false;
-static int battery_report_percent = -1;
-
-void set_battery_reporting(bool enable)
-{
-    battery_reporting = enable;
-    battery_report_percent = -1;
-}
-#endif
-
 /*
  * Monitor the presence of a charger and perform critical frequent steps
  * such as running the battery voltage filter.
@@ -764,13 +750,6 @@ static void power_thread(void)
             next_power_hist += HZ*60;
             collect_power_history();
         }
-
-#ifdef USB_ENABLE_HID
-        if (battery_reporting && battery_report_percent != battery_percent) {
-            battery_report_percent = battery_percent;
-            usb_hid_send(HID_USAGE_PAGE_GENERIC_DEVICE_CONTROLS, battery_report_percent);
-        }
-#endif
     }
 } /* power_thread */
 
