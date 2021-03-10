@@ -644,16 +644,9 @@ MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_CLEAR_LIST_AND_
                   playlist_insert_func, (intptr_t*)PLAYLIST_REPLACE,
                   NULL, Icon_Playlist);
 
-/* others */
-MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
-                  view_playlist, NULL,
-                  treeplaylist_callback, Icon_Playlist);
 
 MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
                  treeplaylist_callback, Icon_Playlist,
-
-                 /* view */
-                 &view_playlist_item,
 
                  /* insert */
                  &i_pl_item, &i_first_pl_item, &i_last_pl_item,
@@ -680,14 +673,6 @@ static int treeplaylist_callback(int action,
                         FILE_ATTR_AUDIO) ||
                     ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)||
                      (selected_file_attr & ATTR_DIRECTORY))
-                {
-                    return action;
-                }
-            }
-            else if (this_item == &view_playlist_item)
-            {
-                if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U &&
-                        context == CONTEXT_TREE)
                 {
                     return action;
                 }
@@ -1679,10 +1664,15 @@ MAKE_ONPLAYMENU( wps_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            &pitch_screen_item,
 #endif
          );
+
+MENUITEM_FUNCTION(view_playlist_item, 0, ID2P(LANG_VIEW),
+                  view_playlist, NULL,
+                  onplaymenu_callback, Icon_Playlist);
+
 /* used when onplay() is not called in the CONTEXT_WPS context */
 MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
            onplaymenu_callback, Icon_file_view_menu,
-           &tree_playlist_menu, &cat_playlist_menu,
+           &view_playlist_item, &tree_playlist_menu, &cat_playlist_menu,
            &rename_file_item, &clipboard_cut_item, &clipboard_copy_item,
            &clipboard_paste_item, &delete_file_item, &delete_dir_item,
 #if LCD_DEPTH > 1
@@ -1707,6 +1697,15 @@ static int onplaymenu_callback(int action,
                 list_stop_handler();
                 return ACTION_STD_CANCEL;
             }
+            break;
+        case ACTION_REQUEST_MENUITEM:
+            if (this_item == &view_playlist_item)
+            {
+                if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U &&
+                        context == CONTEXT_TREE)
+                    return action;
+            }
+            return ACTION_EXIT_MENUITEM;
             break;
         case ACTION_EXIT_MENUITEM:
             return ACTION_EXIT_AFTER_THIS_MENUITEM;
