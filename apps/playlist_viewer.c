@@ -487,10 +487,10 @@ static int onplay_menu(int index)
     int result, ret = 0;
     struct playlist_entry * current_track =
         playlist_buffer_get_track(&viewer.buffer, index);
-    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL, 
+    MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL,
                         ID2P(LANG_CURRENT_PLAYLIST), ID2P(LANG_CATALOG),
                         ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_SHUFFLE),
-                        ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
+                        ID2P(LANG_SAVE),
                         ID2P(LANG_PLAYLISTVIEWER_SETTINGS));
     bool current = (current_track->index == viewer.current_playing_track);
 
