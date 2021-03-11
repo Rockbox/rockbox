@@ -141,7 +141,7 @@ int xduoo_get_outputs(void){
 
 #if defined(XDUOO_X20)
     sysfs_get_int(sysfs_bal_switch, &status);
-    if (status) ps = 3; // balance
+    if (status) ps = 3; // balanced output
 #endif
 
     xduoo_set_output(ps);
@@ -159,7 +159,12 @@ void xduoo_set_output(int ps)
         /* Output port switch */
         last_ps = ps;
         alsa_controls_set_ints("Output Port Switch", 1, &last_ps);
-	audiohw_set_volume(vol_l_hw, vol_r_hw);
+        audiohw_set_volume(vol_l_hw, vol_r_hw);
+
+#if defined(XDUOO_X3II)
+        /* Enable/disable headphone remote ADC */
+        sysfs_set_string("/sys/devices/platform/earpods_adc.0/earpods_adc/earpods_adc_sw", (ps == 2) ? "on" : "off");
+#endif
     }
 }
 

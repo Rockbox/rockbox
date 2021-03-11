@@ -37,10 +37,10 @@ int button_map(int keycode)
             return BUTTON_OPTION;
 
         case KEY_UP:
-            return BUTTON_PREV;
+            return BUTTON_NEXT;
 
         case KEY_DOWN:
-            return BUTTON_NEXT;
+            return BUTTON_PREV;
 
         case KEY_ENTER:
             return BUTTON_PLAY;
@@ -54,6 +54,17 @@ int button_map(int keycode)
         case KEY_POWER:
             return BUTTON_POWER;
 
+#if defined(XDUOO_X3II) /* Headphone remote */
+        case KEY_NEXTSONG:
+            return (BUTTON_NEXT | BUTTON_DELAY_RELEASE);
+
+        case KEY_PLAYPAUSE:
+            return (BUTTON_PLAY | BUTTON_DELAY_RELEASE);
+
+        case KEY_PREVIOUSSONG:
+            return (BUTTON_PREV | BUTTON_DELAY_RELEASE);
+
+#endif
         default:
             return 0;
     }

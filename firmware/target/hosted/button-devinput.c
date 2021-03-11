@@ -19,7 +19,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
 #include <poll.h>
 #include <errno.h>
 #include <unistd.h>
@@ -72,6 +71,11 @@ void button_close_device(void)
     num_devices = 0;
 }
 
+#ifdef BUTTON_DELAY_RELEASE
+static int button_delay_release = 0;
+static int delay_tick = 0;
+#endif
+
 int button_read_device(void)
 {
     static int button_bitmap = 0;
@@ -79,6 +83,15 @@ int button_read_device(void)
 
 #ifdef HAVE_SCROLLWHEEL
     int wheel_ticks = 0;
+#endif
+
+#ifdef BUTTON_DELAY_RELEASE
+    /* First de-assert delayed-release buttons */
+    if (button_delay_release && current_tick >= delay_tick)
+    {
+        button_bitmap &= ~button_delay_release;
+        button_delay_release = 0;
+    }
 #endif
 
     /* check if there are any events pending and process them */
@@ -92,17 +105,14 @@ int button_read_device(void)
                 int size = read(poll_fds[i].fd, &event, sizeof(event));
                 if(size == (int)sizeof(event))
                 {
-                    int keycode = event.code;
+                    /* map linux event code to rockbox button bitmap */
+                    int bmap = button_map(event.code);
+
                     /* event.value == 0x10000 means press
                      * event.value == 0 means release
                      */
-                    bool press = event.value ? true : false;
-
-                    /* map linux event code to rockbox button bitmap */
-                    if(press)
+                    if(event.value)
                     {
-                        int bmap = button_map(keycode);
-
 #ifdef HAVE_SCROLLWHEEL
 			/* Filter out wheel ticks */
                         if (bmap & BUTTON_SCROLL_BACK)
@@ -111,18 +121,28 @@ int button_read_device(void)
                             wheel_ticks++;
                         bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
 #endif
+#ifdef BUTTON_DELAY_RELEASE
+                        bmap &= ~BUTTON_DELAY_RELEASE;
+#endif
                         button_bitmap |= bmap;
                     }
                     else
                     {
-                        int bmap = button_map(keycode);
+#ifdef BUTTON_DELAY_RELEASE
+                        /* Delay the release of any requested buttons */
+                        if (bmap & BUTTON_DELAY_RELEASE)
+                        {
+                            button_delay_release |= bmap & ~BUTTON_DELAY_RELEASE;
+                            delay_tick = current_tick + HZ/20;
+                            bmap = 0;
+                        }
+#endif
 
 #ifdef HAVE_SCROLLWHEEL
                         /* Wheel gives us press+release back to back; ignore the release */
                         bmap &= ~(BUTTON_SCROLL_BACK|BUTTON_SCROLL_FWD);
 #endif
                         button_bitmap &= ~bmap;
-
                     }
                 }
             }
