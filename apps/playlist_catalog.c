@@ -342,8 +342,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
             /* If sel is empty, root, or playlist directory  we use 'all' */
             if (!sel || !strcmp(sel, "/") || !strcmp(sel, playlist_dir))
             {
-                if (!sel || !strcmp(sel, PLAYLIST_CATALOG_DEFAULT_DIR))
-                    sel = "/";
+                sel = "/";
                 name = "/all";
             }
             else /*If sel is a folder, we prefill the text field with its name*/
