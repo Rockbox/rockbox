@@ -856,6 +856,9 @@ void root_menu(void)
 
                 next_screen = load_plugin_screen(path, param);
 
+                if (next_screen != GO_TO_PLUGIN)
+                    open_plugin_add_path(NULL, NULL, NULL);
+
                 /* shortcuts may take several trips through the GO_TO_PLUGIN case
                    make sure we preserve and restore the origin */
                 if (next_screen == GO_TO_PREVIOUS && shortcut_origin != GO_TO_ROOT)
