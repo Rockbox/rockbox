@@ -29,6 +29,9 @@
 #include "sysfs.h"
 
 #include "tick.h"
+#ifdef FIIO_M3K_LINUX
+#include "usb.h"
+#endif
 
 #define BATTERY_STATUS_PATH "/sys/class/power_supply/" BATTERY_DEV_NAME "/status"
 #define POWER_STATUS_PATH "/sys/class/power_supply/" POWER_DEV_NAME "/online"
