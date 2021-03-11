@@ -2,7 +2,7 @@
    when the .lng and .voice files are built. That means that a change in this
    file will break compatibility with older .lng and .voice files and that those
    version numbers should be updated. It also means that changing defines in
-   the various config*.h files could also break back compatibility */  
+   the various config*.h files could also break back compatibility */
 
 #if defined(HAVE_ACCESSORY_SUPPLY)
 accessory_supply
@@ -269,4 +269,8 @@ boot_data
 
 #if defined(HAVE_MULTIBOOT)
 multi_boot
+#endif
+
+#if defined(HIBY_LINUX)
+hibylinux
 #endif

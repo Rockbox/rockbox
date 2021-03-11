@@ -6115,14 +6115,17 @@
   <source>
     *: "Int:"
     xduoox3: "mSD1:"
+    hibylinux: "mSD:"
   </source>
   <dest>
     *: "Int:"
     xduoox3: "mSD1:"
+    hibylinux: "mSD:"
   </dest>
   <voice>
     *: "Internal"
     xduoox3: "micro S D 1"
+    hibylinux: "micro S D"
   </voice>
 </phrase>
 <phrase>
