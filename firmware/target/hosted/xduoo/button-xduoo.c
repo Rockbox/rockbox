@@ -42,6 +42,9 @@ int button_map(int keycode)
         case KEY_DOWN:
             return BUTTON_NEXT;
 
+#if defined(XDUOO_X3II)
+        case KEY_PLAYPAUSE:  /* On headphone remote */
+#endif
         case KEY_ENTER:
             return BUTTON_PLAY;
 
