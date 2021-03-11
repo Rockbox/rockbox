@@ -59,6 +59,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry);
 void open_plugin_browse(const char *key);
 int open_plugin_run(const char *key);
+void open_plugin_cache_flush(void); /* flush to disk */
 #endif
 
 #endif /*ndef __PCTOOL__ */

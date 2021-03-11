@@ -32,25 +32,82 @@
 #define OP_EXT "opx"
 #define OP_LEN 4
 
-struct open_plugin_entry_t open_plugin_entry;
+struct open_plugin_entry_t open_plugin_entry = {0};
 
 static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
+
+static int open_plugin_hash_get_entry(uint32_t hash,
+                  struct open_plugin_entry_t *entry,
+                               const char* dat_file);
+
+static inline void op_clear_entry(struct open_plugin_entry_t *entry)
+{
+    if (entry)
+    {
+        memset(entry, 0, op_entry_sz);
+        entry->lang_id = -1;
+    }
+}
+
+static int op_update_dat(struct open_plugin_entry_t *entry)
+{
+    int fd, fd1;
+    uint32_t hash;
+
+    if (!entry || entry->hash == 0)
+        return -1;
+
+    hash = entry->hash;
+
+    fd = open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (!fd)
+        return -1;
+    write(fd, entry, op_entry_sz);
+
+    fd1 = open(OPEN_PLUGIN_DAT, O_RDONLY);
+    if (fd1)
+    {
+        while (read(fd1, &open_plugin_entry, op_entry_sz) == op_entry_sz)
+        {
+            if (open_plugin_entry.hash != hash)
+                write(fd, &open_plugin_entry, op_entry_sz);
+        }
+        close(fd1);
+        remove(OPEN_PLUGIN_DAT);
+    }
+    close(fd);
+
+    rename(OPEN_PLUGIN_DAT ".tmp", OPEN_PLUGIN_DAT);
+
+    op_clear_entry(&open_plugin_entry);
+    return 0;
+}
 
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter)
 {
     int len;
     bool is_valid = false;
     uint32_t hash;
-    char *pos;
-    int fd = 0;
-    int fd1 = 0;
+    int32_t lang_id;
+    char *pos = "\0";
 
-    /*strlcpy(plug_entry.key, key, sizeof(plug_entry.key));*/
-    open_plugin_entry.lang_id = P2ID((unsigned char*)key);
+    if(!key)
+    {
+        op_clear_entry(&open_plugin_entry);
+        return 0;
+    }
+
+    lang_id = P2ID((unsigned char*)key);
     key = P2STR((unsigned char *)key);
 
     open_plugin_get_hash(key, &hash);
-    open_plugin_entry.hash = hash;
+
+
+    if(open_plugin_entry.hash != hash)
+    {
+        /* the entry in ram needs saved */
+        op_update_dat(&open_plugin_entry);
+    }
 
     if (plugin)
     {
@@ -74,49 +131,22 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
         else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)
         {
             is_valid = true;
-            /* path */
-            strlcpy(open_plugin_entry.path,
-                  VIEWERS_DATA_DIR "/open_plugins." ROCK_EXT, OPEN_PLUGIN_BUFSZ);
-            /* parameter */
-            strlcpy(open_plugin_entry.param, plugin, OPEN_PLUGIN_BUFSZ);
-
-            write(fd, &open_plugin_entry, op_entry_sz);
-        }
-
-        if (is_valid)
-        {
-            fd = open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-            if (!fd)
-                return 0;
-            write(fd, &open_plugin_entry, op_entry_sz);
-        }
-        else
-        {
-            if (open_plugin_entry.lang_id != LANG_SHORTCUTS)
-                splashf(HZ / 2, str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
-            return 0;
+            open_plugin_hash_get_entry(0, &open_plugin_entry, plugin);
         }
     }
 
-    fd1 = open(OPEN_PLUGIN_DAT, O_RDONLY);
-    if (fd1)
+    if (!is_valid)
     {
-        while (read(fd1, &open_plugin_entry, op_entry_sz) == op_entry_sz)
-        {
-            if (open_plugin_entry.hash != hash)
-                write(fd, &open_plugin_entry, op_entry_sz);
-        }
-        close(fd1);
-    }
-    close(fd);
-
-    if(fd1)
-    {
-        remove(OPEN_PLUGIN_DAT);
-        rename(OPEN_PLUGIN_DAT ".tmp", OPEN_PLUGIN_DAT);
+        if (open_plugin_entry.lang_id != LANG_SHORTCUTS)
+            splashf(HZ / 2, str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
+        op_clear_entry(&open_plugin_entry);
+        hash = 0;
     }
     else
-        hash = 0;
+    {
+        open_plugin_entry.hash = hash;
+        open_plugin_entry.lang_id = lang_id;
+    }
 
     return hash;
 }
@@ -140,20 +170,31 @@ void open_plugin_browse(const char *key)
         open_plugin_add_path(key, tmp_buf, NULL);
 }
 
-static int open_plugin_hash_get_entry(uint32_t hash, struct open_plugin_entry_t *entry)
+static int open_plugin_hash_get_entry(uint32_t hash,
+                  struct open_plugin_entry_t *entry,
+                               const char* dat_file)
 {
     int ret = -1, record = -1;
 
     if (entry)
     {
-        int fd = open(OPEN_PLUGIN_DAT, O_RDONLY);
+
+        if (hash != 0)
+        {
+            if(entry->hash == hash) /* hasn't been flushed yet? */
+                return 0;
+            else
+                op_update_dat(&open_plugin_entry);
+        }
+
+        int fd = open(dat_file, O_RDONLY);
 
         if (fd)
         {
             while (read(fd, entry, op_entry_sz) == op_entry_sz)
             {
                 record++;
-                if (entry->hash == hash)
+                if (hash == 0 || entry->hash == hash)
                 {
                     ret = record;
                     break;
@@ -176,8 +217,8 @@ int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry)
     uint32_t hash;
     key = P2STR((unsigned char *)key);
 
-    open_plugin_get_hash(key, &hash);
-    return open_plugin_hash_get_entry(hash, entry);
+    open_plugin_get_hash(key, &hash); /* in open_plugin.h */
+    return open_plugin_hash_get_entry(hash, entry, OPEN_PLUGIN_DAT);
 }
 
 int open_plugin_run(const char *key)
@@ -196,7 +237,15 @@ int open_plugin_run(const char *key)
     if (path)
         ret = plugin_load(path, param);
 
+    if (ret != GO_TO_PLUGIN)
+        op_clear_entry(&open_plugin_entry);
+
     return ret;
+}
+
+void open_plugin_cache_flush(void)
+{
+    op_update_dat(&open_plugin_entry);
 }
 
 #endif /* ndef __PCTOOL__ */
