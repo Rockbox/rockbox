@@ -154,38 +154,44 @@ The details of this menu are covered in
 
 \opt{radio}{\input{main_menu/fmradio.tex}}
 
-\section{\label{ref:playlistoptions}Playlists}
-  This menu allows you to work with playlists. Playlists can be created in 
+\section{\label{ref:playlistoptions}Playlist Catalogue}
+  This menu provides a simple interface to maintain
+  several playlists (see \reference{ref:working_with_playlists}). Playlists can be created in
   three ways. Playing a file in a directory causes all the files in it
   to be placed in a playlist. Playlists can be created manually by
   either using the  \setting{Context Menu} (see \reference{ref:Contextmenu}) or using
   the \setting{Playlist} menu. Both automatically and manually created
   playlists can be edited using this menu.
 
+\subsection{The Playlist Catalogue Context Menu}
+
 \begin{description}
 \item[Create Playlist:]
-  Rockbox will create a playlist with all tracks in the current directory 
-and all sub-directories. The playlist will be created one directory level ``up'' 
-from where you currently are.
-  
+  Rockbox will create a playlist with all tracks from the directory that is
+currently selected in the \setting{File Browser}, including
+all of its sub-directories. If you have selected the root level or your Playlist Catalogue directory,
+Rockbox will instead create a playlist with all tracks from all directories. The playlist
+will be saved in the Playlist Catalogue directory.
+
 \item[View Current Playlist:]
-  Displays the contents of the playlist currently stored in memory.
-  
+  Displays the contents of the current dynamic playlist.
+
 \item[Save Current Playlist:]
-  Saves the current dynamic playlist, excluding queued tracks, to the 
-specified file. If no path is provided then playlist is saved to the current 
+  Saves the current dynamic playlist, excluding queued tracks, to the
+specified file. If no path is provided then playlist is saved to the current
 directory.
 
-\item[View Catalogue:]
-  Provides a simple interface to maintain
-  several playlists (see \reference{ref:working_with_playlists}).
+\item[Reset Playlist Catalogue Directory:]
+  Will reset the default location for playlists to the \fname{/Playlists}
+directory. Playlists stored in other locations are not included in the catalogue.
+
 \end{description}
 
 \section{Plugins}
   With this option you can load and run various plugins that have been
 written for Rockbox. There are a wide variety of these supplied with
 Rockbox, including several games, some impressive demos and a number of
-utilities. A detailed description of the different plugins is to be found in 
+utilities. A detailed description of the different plugins is to be found in
 \reference{ref:plugins}.
 
 \section{\label{ref:Info}System}
