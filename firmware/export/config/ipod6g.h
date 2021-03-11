@@ -139,10 +139,14 @@
 /* The number of bytes reserved for loadable plugins */
 #define PLUGIN_BUFFER_SIZE 0x80000
 
-/* 6g has a standard battery of 550mAh, except for the thick 6g (2007 160gb) which has a standard battery of 850mAh */
+/* 6g has a standard battery of 550mAh, except for the thick 6g (2007 160gb)
+ * which has a standard battery of 850mAh.
+ * 
+ * It's possible to buy 3rd party batteries up to 3000mAh.
+ */
 #define BATTERY_CAPACITY_DEFAULT 550 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN     300 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX     1000 /* max. capacity selectable */
+#define BATTERY_CAPACITY_MAX     3000 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC      10 /* capacity increment */
 #define BATTERY_TYPES_COUNT        1 /* only one type */
 
