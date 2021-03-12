@@ -18,6 +18,9 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+
+//#define LOGF_ENABLE
+
 #include <stdbool.h>
 #include <inttypes.h>
 #include "led.h"
@@ -31,6 +34,15 @@
 #include "ata-defines.h"
 #include "fs_defines.h"
 #include "storage.h"
+#include "logf.h"
+
+/* The FC1307A ATA->SD chipset (used by the common iFlash adapters)
+   doesn't support mandatory ATA power management commands.  Unfortunately
+   simply gating off the SLEEP command isn't sufficient; we need to
+   disable advanced powersaving entirely because otherwise we might
+   kill power before the device has finished flusing writes.
+*/
+//#define FC1307A_WORKAROUND
 
 #define SELECT_DEVICE1  0x10
 #define SELECT_LBA      0x40
@@ -63,6 +75,7 @@
 
 #ifdef HAVE_ATA_POWER_OFF
 #define ATA_POWER_OFF_TIMEOUT 2*HZ
+#define ATA_POWER_OFF_TIMEOUT_NOPM 5*HZ
 #endif
 
 #if defined(HAVE_USBSTACK)
@@ -147,7 +160,12 @@ static inline bool ata_sleep_timed_out(void)
 static inline void schedule_ata_power_off(void)
 {
 #ifdef HAVE_ATA_POWER_OFF
-    power_off_tick = current_tick + ATA_POWER_OFF_TIMEOUT;
+    power_off_tick = current_tick;
+    /* If our device doesn't support SLEEP give a bit more time to flush */
+    if (!(identify_info[82] & (1 << 3)))
+        power_off_tick += ATA_POWER_OFF_TIMEOUT_NOPM;
+    else
+        power_off_tick += ATA_POWER_OFF_TIMEOUT;
 #endif
 }
 
@@ -202,6 +220,7 @@ static ICODE_ATTR int wait_for_rdy(void)
 
 static int ata_perform_wakeup(int state)
 {
+    logf("ata WAKE %ld", current_tick);
     if (state > ATA_OFF) {
         if (perform_soft_reset()) {
             return -1;
@@ -222,12 +241,11 @@ static int ata_perform_sleep(void)
 {
     /* Don't issue the sleep command if the device
        doesn't support (mandatory!) ATA power management commands!
-
-       The FC1307A ATA->SD chipset (used by the common iFlash adapters)
-       is the only known offender, and will eat your data if told to sleep.
     */
     if (!(identify_info[82] & (1 << 3)))
        return 0;
+
+    logf("ata SLEEP %ld", current_tick);
 
     ATA_OUT8(ATA_SELECT, ata_device);
 
@@ -818,12 +836,26 @@ void ata_spindown(int seconds)
 
 bool ata_disk_is_active(void)
 {
+#ifdef FC1307A_WORKAROUND
+    /* "active" == "spinning" in this context.
+       without power management this becomes moot */
+    if (!(identify_info[82] & (1 << 3)))
+        return false;
+#endif
+
     return ata_state >= ATA_SPINUP;
 }
 
 void ata_sleepnow(void)
 {
+#ifdef FC1307A_WORKAROUND
+    /* Completely disable all power management */
+    if (!(identify_info[82] & (1 << 3)))
+       return;
+#endif
+
     if (ata_state >= ATA_SPINUP) {
+        logf("ata SLEEPNOW %ld", current_tick);
         mutex_lock(&ata_mtx);
         if (ata_state == ATA_ON) {
             if (!ata_perform_sleep()) {
@@ -904,6 +936,8 @@ static int perform_soft_reset(void)
     int ret;
     int retry_count;
 
+    logf("ata SOFT RESET %ld", current_tick);
+
     ATA_OUT8(ATA_SELECT, SELECT_LBA | ata_device );
     ATA_OUT8(ATA_CONTROL, CONTROL_nIEN|CONTROL_SRST );
     sleep(1); /* >= 5us */
@@ -959,6 +993,8 @@ int ata_soft_reset(void)
 static int ata_power_on(void)
 {
     int rc;
+
+    logf("ata ON %ld", current_tick);
 
     ide_power_enable(true);
     sleep(HZ/4); /* allow voltage to build up */
@@ -1381,6 +1417,7 @@ int ata_event(long id, intptr_t data)
             if (state == ATA_SLEEPING && ata_power_off_timed_out()) {
                 mutex_lock(&ata_mtx);
                 if (ata_state == ATA_SLEEPING) {
+                    logf("ata OFF %ld", current_tick);
                     ide_power_enable(false);
                     ata_state = ATA_OFF;
                 }
@@ -1397,6 +1434,7 @@ int ata_event(long id, intptr_t data)
     }
 #ifndef USB_NONE
     else if (id == SYS_USB_CONNECTED) {
+        logf("deq USB %ld", current_tick);
         if (ATA_ACTIVE_IN_USB) {
             /* There is no need to force ATA power on */
             STG_EVENT_ASSERT_ACTIVE(STORAGE_ATA);
