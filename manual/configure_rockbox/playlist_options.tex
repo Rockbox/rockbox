@@ -1,14 +1,46 @@
 % $Id:$ %
-\section{\label{ref:PlaylistOptions}Playlist}
-The \setting{Playlist} sub menu allows you to configure settings
+\section{\label{ref:PlaylistOptions}Playlists}
+
+The \setting{Playlists} submenu allows you to configure settings
 related to playlists.
+
+
 \begin{description}
+
+\item[Playlist Viewer Settings.]
+   This submenu contains settings related to the Playlist Viewer.
+   \begin{description}
+    \item[Show Icons.] This toggles display of the icon for the currently
+    selected playlist entry and the icon for moving a playlist entry
+    \item[Show Indices.] This toggles display of the line numbering for
+       the playlist
+    \item[Track Display.] This toggles between filename only and full path
+       for playlist entries
+  \end{description}
+
 \item[Recursively Insert Directories.]
-  If set to \setting{On}, then when a directory is inserted or queued into a 
+  If set to \setting{On}, then when a directory is inserted or queued into a
   dynamic playlist, all subdirectories will also be inserted. If set to \setting{Ask},
   Rockbox will prompt the user about whether to include sub-directories.
 
-\item[Warn When Erasing Dynamic Playlist.]
+\item[Current Playlist.]
+  This submenu contains settings related to the current dynamic playlist.
+  \begin{description}
+
+  \item[Warn When Erasing Dynamic Playlist.]
   If set to \setting{Yes}, Rockbox will provide a warning if the user attempts to
   take an action that will cause Rockbox to erase the current dynamic playlist.
+
+  \item[Show Shuffled Adding Options.]
+  If set to \setting{No}, Rockbox will not offer to add shuffled tracks
+  in the \setting{Current Playlist submenu}.
+
+  \item[Show Queue Options.]
+  If set to \setting{No}, Rockbox will not display the options to queue items in
+  the \setting{Current Playlist submenu}.
+  If set to \setting{In Submenu}, Rockbox will move the options into a
+  separate submenu.
+
+  \end{description}
+
 \end{description}

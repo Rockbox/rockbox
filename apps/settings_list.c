@@ -1788,6 +1788,15 @@ const struct settings_list settings[] = {
     OFFON_SETTING(0, warnon_erase_dynplaylist, LANG_WARN_ERASEDYNPLAYLIST_MENU,
                   true, "warn when erasing dynamic playlist",NULL),
 
+    OFFON_SETTING(0, show_shuffled_adding_options, LANG_SHOW_SHUFFLED_ADDING_OPTIONS, true,
+                      "show shuffled adding options", NULL),
+    CHOICE_SETTING(0, show_queue_options, LANG_SHOW_QUEUE_OPTIONS, 1,
+                      "show queue options", "off,on,in submenu",
+                      NULL, 3,
+                      ID2P(LANG_SET_BOOL_NO),
+                      ID2P(LANG_SET_BOOL_YES),
+                      ID2P(LANG_IN_SUBMENU)),
+
 #ifdef HAVE_BACKLIGHT
 #ifdef HAS_BUTTON_HOLD
     CHOICE_SETTING(0, backlight_on_button_hold, LANG_BACKLIGHT_ON_BUTTON_HOLD,
