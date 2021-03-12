@@ -69,10 +69,9 @@ the selected track or directory.
   \reference{ref:Contextmenu}).}
 
 \subsubsection{By using the Main Menu}
-To create a playlist containing all music on your \dap{}, you can use the
-\setting{Create Playlist} command in the \setting{Playlists} menu found
-in the \setting{Main Menu}. The created playlist will be named
-\fname{root.m3u8} and saved in the root of your \daps{} disk.
+To create a playlist containing some or all of the music on your \dap{}, you can use the
+\setting{Create Playlist} command in the \setting{Playlist Catalogue Context Menu}
+(see \reference{ref:Contextmenu}).
 
 \subsection{Adding music to playlists}
 
@@ -85,35 +84,36 @@ selected tracks are added to the playlist is determined by the following
 options:
 
 \begin{description}
-\item [Insert.] Add track(s) immediately after any tracks added via the most
-  recent \setting{Insert} operation. If no tracks have yet been added via an
-  \setting{Insert}, new tracks will be added immediately after the current
-  playing track.
+\item [Insert.] Add track(s) after the most recently added tracks or, if tracks
+have not been added yet, immediately after the currently playing track.
 
-\item [Insert Next.] Add track(s) immediately after current playing
-  track, no matter what else has been inserted.
+\item [Insert Next.] Add track(s) immediately after the currently playing track.
 
-\item [Insert Last.] Add track(s) to end of playlist.
+\item [Insert Last.] Add track(s) to the end of the playlist.
 
-\item [Insert Shuffled.] Add track(s) to the playlist in a random order.
+\item [Insert Shuffled.] Add track(s) to the playlist at random positions.
 
 \item [Insert Last Shuffled.] Add tracks in a random order to the end of the playlist.
 
-\item [Queue.] Queue is the same as Insert except queued tracks are
-  deleted immediately from the playlist after they have been played. Also,
-  queued tracks are not saved to the playlist file (see
-  \reference{ref:playlistoptions}).
-
-\item [Queue Next.] Queue track(s) immediately after current playing track.
-
-\item [Queue Last.] Queue track(s) at end of playlist.
-
-\item [Queue Shuffled.] Queue track(s) in a random order.
-
-\item [Queue Last Shuffled.] Queue tracks in a random order at the end of the playlist.
-
 \item [Clear List \& Play Next.] Replaces all tracks in the dynamic playlist.
 If a track is currently playing, it is only removed once it’s finished playing.
+\end{description}
+
+There are also options for adding tracks only temporarily to the dynamic playlist.
+In Rockbox’s parlance, this is called queuing. Queued tracks are automatically
+removed from the playlist after they have been played. They are also not saved
+to the playlist file (see \reference{ref:playlistoptions}).
+
+\begin{description}
+\item [Queue.] Corresponds to \setting{Insert}.
+
+\item [Queue Next.] Corresponds to \setting{Insert Next}.
+
+\item [Queue Last.] Corresponds to \setting{Insert Last}.
+
+\item [Queue Shuffled.] Corresponds to \setting{Insert Shuffled}.
+
+\item [Queue Last Shuffled.] Corresponds to \setting{Insert Last Shuffled}.
 \end{description}
 
 The \setting{Current Playlist Submenu}  can be used to add either single tracks or
@@ -165,7 +165,7 @@ accept it and you are done.
 
 \subsection{Loading saved playlists}
 \subsubsection{Through the \setting{File Browser}}
-Playlist files, like regular music tracks, can be selected through the 
+Playlist files, like regular music tracks, can be selected through the
 \setting{File Browser}. When loading a playlist from disk it will replace
 the current dynamic playlist.
 
