@@ -582,22 +582,8 @@ static int playlist_queue_func(void *param)
 }
 
 static int treeplaylist_wplayback_callback(int action,
-                                        const struct menu_item_ex* this_item,
-                                        struct gui_synclist *this_list)
-{
-    (void)this_item;
-    (void)this_list;
-    switch (action)
-    {
-        case ACTION_REQUEST_MENUITEM:
-            if (audio_status() & AUDIO_STATUS_PLAY)
-                return action;
-            else
-                return ACTION_EXIT_MENUITEM;
-            break;
-    }
-    return action;
-}
+                                           const struct menu_item_ex* this_item,
+                                           struct gui_synclist *this_list);
 
 static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item,
@@ -624,40 +610,95 @@ MENUITEM_FUNCTION(i_last_shuf_pl_item, MENU_FUNC_USEPARAM,
 /* queue items */
 MENUITEM_FUNCTION(q_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT,
-                  treeplaylist_wplayback_callback, Icon_Playlist);
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(q_first_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_FIRST),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
-                  treeplaylist_wplayback_callback, Icon_Playlist);
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(q_last_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_LAST),
                   playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_LAST,
-                  treeplaylist_wplayback_callback, Icon_Playlist);
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(q_shuf_pl_item, MENU_FUNC_USEPARAM,
                   ID2P(LANG_QUEUE_SHUFFLED), playlist_queue_func,
                   (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
-                  treeplaylist_wplayback_callback, Icon_Playlist);
+                  treeplaylist_callback, Icon_Playlist);
 MENUITEM_FUNCTION(q_last_shuf_pl_item, MENU_FUNC_USEPARAM,
                   ID2P(LANG_QUEUE_LAST_SHUFFLED), playlist_queue_func,
                   (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED,
                   treeplaylist_callback, Icon_Playlist);
+
+/* queue items in submenu */
+MENUITEM_FUNCTION(q_pl_submenu_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE),
+                  playlist_queue_func, (intptr_t*)PLAYLIST_INSERT,
+                  NULL, Icon_Playlist);
+MENUITEM_FUNCTION(q_first_pl_submenu_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_FIRST),
+                  playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_FIRST,
+                  NULL, Icon_Playlist);
+MENUITEM_FUNCTION(q_last_pl_submenu_item, MENU_FUNC_USEPARAM, ID2P(LANG_QUEUE_LAST),
+                  playlist_queue_func, (intptr_t*)PLAYLIST_INSERT_LAST,
+                  NULL, Icon_Playlist);
+MENUITEM_FUNCTION(q_shuf_pl_submenu_item, MENU_FUNC_USEPARAM,
+                  ID2P(LANG_QUEUE_SHUFFLED), playlist_queue_func,
+                  (intptr_t*)PLAYLIST_INSERT_SHUFFLED,
+                  treeplaylist_callback, Icon_Playlist);
+MENUITEM_FUNCTION(q_last_shuf_pl_submenu_item, MENU_FUNC_USEPARAM,
+                  ID2P(LANG_QUEUE_LAST_SHUFFLED), playlist_queue_func,
+                  (intptr_t*)PLAYLIST_INSERT_LAST_SHUFFLED,
+                  treeplaylist_callback, Icon_Playlist);
+
+MAKE_ONPLAYMENU(queue_menu, ID2P(LANG_QUEUE_MENU),
+                treeplaylist_wplayback_callback, Icon_Playlist,
+                &q_pl_submenu_item,
+                &q_first_pl_submenu_item,
+                &q_last_pl_submenu_item,
+                &q_shuf_pl_submenu_item,
+                &q_last_shuf_pl_submenu_item);
+
+static int treeplaylist_wplayback_callback(int action,
+                                        const struct menu_item_ex* this_item,
+                                        struct gui_synclist *this_list)
+{
+    (void)this_list;
+    switch (action)
+    {
+        case ACTION_REQUEST_MENUITEM:
+            if ((audio_status() & AUDIO_STATUS_PLAY) &&
+                (this_item != &queue_menu ||
+                 global_settings.show_queue_options == QUEUE_SHOW_IN_SUBMENU))
+                    return action;
+            else
+                return ACTION_EXIT_MENUITEM;
+            break;
+    }
+    return action;
+}
+
 /* replace playlist */
 MENUITEM_FUNCTION(replace_pl_item, MENU_FUNC_USEPARAM, ID2P(LANG_CLEAR_LIST_AND_PLAY_NEXT),
                   playlist_insert_func, (intptr_t*)PLAYLIST_REPLACE,
                   NULL, Icon_Playlist);
 
+MAKE_ONPLAYMENU(tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
+                treeplaylist_callback, Icon_Playlist,
 
-MAKE_ONPLAYMENU( tree_playlist_menu, ID2P(LANG_CURRENT_PLAYLIST),
-                 treeplaylist_callback, Icon_Playlist,
+                /* insert */
+                &i_pl_item,
+                &i_first_pl_item,
+                &i_last_pl_item,
+                &i_shuf_pl_item,
+                &i_last_shuf_pl_item,
 
-                 /* insert */
-                 &i_pl_item, &i_first_pl_item, &i_last_pl_item,
-                 &i_shuf_pl_item, &i_last_shuf_pl_item,
-                 /* queue */
+                /* queue */
+                &q_pl_item,
+                &q_first_pl_item,
+                &q_last_pl_item,
+                &q_shuf_pl_item,
+                &q_last_shuf_pl_item,
 
-                 &q_pl_item, &q_first_pl_item, &q_last_pl_item,
-                 &q_shuf_pl_item, &q_last_shuf_pl_item,
+                /* Queue submenu */
+                &queue_menu,
 
-                 /* replace */
-                 &replace_pl_item
+                /* replace */
+                &replace_pl_item
                );
 static int treeplaylist_callback(int action,
                                  const struct menu_item_ex *this_item,
@@ -669,36 +710,55 @@ static int treeplaylist_callback(int action,
         case ACTION_REQUEST_MENUITEM:
             if (this_item == &tree_playlist_menu)
             {
-                if (((selected_file_attr & FILE_ATTR_MASK) ==
-                        FILE_ATTR_AUDIO) ||
-                    ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)||
-                     (selected_file_attr & ATTR_DIRECTORY))
+                if ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO ||
+                    (selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U ||
+                    (selected_file_attr & ATTR_DIRECTORY))
+                        return action;
+            }
+            else if (this_item == &i_pl_item &&
+                     global_status.resume_index != -1)
+            {
+                return action;
+            }
+            else if ((this_item == &q_pl_item ||
+                      this_item == &q_first_pl_item ||
+                      this_item == &q_last_pl_item) &&
+                     global_settings.show_queue_options == QUEUE_SHOW_AT_TOPLEVEL &&
+                     (audio_status() & AUDIO_STATUS_PLAY))
+            {
+                return action;
+            }
+            else if (this_item == &i_shuf_pl_item)
+            {
+                if (global_settings.show_shuffled_adding_options &&
+                    (global_status.resume_index != -1) &&
+                    ((audio_status() & AUDIO_STATUS_PLAY) ||
+                     (selected_file_attr & ATTR_DIRECTORY) ||
+                     ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)))
                 {
                     return action;
                 }
             }
-            else if (this_item == &i_pl_item)
+            else if (this_item == &q_shuf_pl_submenu_item ||
+                     (this_item == &q_shuf_pl_item &&
+                      global_settings.show_queue_options == QUEUE_SHOW_AT_TOPLEVEL))
             {
-                if (global_status.resume_index != -1)
-                    return action;
-            }
-            else if (this_item == &i_shuf_pl_item)
-            {
-                if ((global_status.resume_index != -1) &&
-                        ((audio_status() & AUDIO_STATUS_PLAY) ||
-                        (selected_file_attr & ATTR_DIRECTORY) ||
-                        ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)))
+                if (global_settings.show_shuffled_adding_options &&
+                    (audio_status() & AUDIO_STATUS_PLAY))
                 {
                     return action;
                 }
             }
             else if (this_item == &i_last_shuf_pl_item ||
-                     this_item == &q_last_shuf_pl_item)
+                     this_item == &q_last_shuf_pl_submenu_item ||
+                     (this_item == &q_last_shuf_pl_item &&
+                      global_settings.show_queue_options == QUEUE_SHOW_AT_TOPLEVEL))
             {
-                if ((playlist_amount() > 0) &&
+                if (global_settings.show_shuffled_adding_options &&
+                    (playlist_amount() > 0) &&
                     (audio_status() & AUDIO_STATUS_PLAY) &&
                     ((selected_file_attr & ATTR_DIRECTORY) ||
-                    ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)))
+                     ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U)))
                 {
                     return action;
                 }

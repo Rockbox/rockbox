@@ -109,6 +109,12 @@ enum
     NUM_REPEAT_MODES
 };
 
+enum
+{
+    QUEUE_HIDE = 0,
+    QUEUE_SHOW_AT_TOPLEVEL,
+    QUEUE_SHOW_IN_SUBMENU
+};
 
 /* dir filter options */
 /* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
@@ -574,6 +580,8 @@ struct user_settings
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool playlist_shuffle;
     bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
+    bool show_shuffled_adding_options; /* whether to display options for adding shuffled tracks to dynamic playlist */
+    int show_queue_options; /* how and whether to display options to queue tracks */
 
     /* playlist viewer settings */
     bool playlist_viewer_icons; /* display icons on viewer */

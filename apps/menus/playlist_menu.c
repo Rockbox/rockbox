@@ -80,15 +80,14 @@ static int playlist_view_(void)
     playlist_viewer_ex(NULL);
     return 0;
 }
-MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST), 
+MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST),
                   create_playlist, NULL, NULL, Icon_NOICON);
 MENUITEM_FUNCTION(view_cur_playlist, 0,
-                  ID2P(LANG_VIEW_DYNAMIC_PLAYLIST), 
+                  ID2P(LANG_VIEW_DYNAMIC_PLAYLIST),
                   playlist_view_, NULL, NULL, Icon_NOICON);
-MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST), 
+MENUITEM_FUNCTION(save_playlist, MENU_FUNC_USEPARAM, ID2P(LANG_SAVE_DYNAMIC_PLAYLIST),
                   save_playlist_screen, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(recursive_dir_insert, &global_settings.recursive_dir_insert, NULL);
-MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
 static int clear_catalog_directory(void)
 {
     catalog_set_directory(NULL);
@@ -96,22 +95,29 @@ static int clear_catalog_directory(void)
     splash(HZ, ID2P(LANG_RESET_DONE_CLEAR));
     return false;
 }
-MENUITEM_FUNCTION(clear_catalog_directory_item, 0, ID2P(LANG_RESET_PLAYLISTCAT_DIR), 
+MENUITEM_FUNCTION(clear_catalog_directory_item, 0, ID2P(LANG_RESET_PLAYLISTCAT_DIR),
                   clear_catalog_directory, NULL, NULL, Icon_file_view_menu);
 
 /* Playlist viewer settings submenu */
 MENUITEM_SETTING(show_icons, &global_settings.playlist_viewer_icons, NULL);
 MENUITEM_SETTING(show_indices, &global_settings.playlist_viewer_indices, NULL);
-MENUITEM_SETTING(track_display, 
+MENUITEM_SETTING(track_display,
                  &global_settings.playlist_viewer_track_display, NULL);
-MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS), 
+MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
           NULL, Icon_Playlist,
           &show_icons, &show_indices, &track_display);
 
+/* Current Playlist submenu */
+MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
+MENUITEM_SETTING(show_shuffled_adding_options, &global_settings.show_shuffled_adding_options, NULL);
+MENUITEM_SETTING(show_queue_options, &global_settings.show_queue_options, NULL);
+MAKE_MENU(currentplaylist_settings_menu, ID2P(LANG_CURRENT_PLAYLIST),
+          NULL, Icon_Playlist,
+          &warn_on_erase, &show_shuffled_adding_options, &show_queue_options);
 
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
-          &viewer_settings_menu, &recursive_dir_insert, &warn_on_erase);
+          &viewer_settings_menu, &recursive_dir_insert, &currentplaylist_settings_menu);
 MAKE_MENU(playlist_options, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
           &create_playlist_item, &view_cur_playlist,

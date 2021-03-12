@@ -15618,3 +15618,59 @@
     *: "Clear List & Play Next"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Queue..."
+  </dest>
+  <voice>
+    *: "Queue..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Show Queue Options"
+  </dest>
+  <voice>
+    *: "Show Queue Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Show Shuffled Adding Options"
+  </dest>
+  <voice>
+    *: "Show Shuffled Adding Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "In Submenu"
+  </dest>
+  <voice>
+    *: "In Submenu"
+  </voice>
+</phrase>
