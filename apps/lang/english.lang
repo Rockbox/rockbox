@@ -15618,3 +15618,87 @@
     *: "Clear List & Play Next"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Queue..."
+  </dest>
+  <voice>
+    *: "Queue..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_OPTIONS
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue Options"
+  </source>
+  <dest>
+    *: "Queue Options"
+  </dest>
+  <voice>
+    *: "Queue Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHUFFLED_ADDING
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Shuffled Adding"
+  </source>
+  <dest>
+    *: "Shuffled Adding"
+  </dest>
+  <voice>
+    *: "Shuffled Adding"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Show"
+  </source>
+  <dest>
+    *: "Show"
+  </dest>
+  <voice>
+    *: "Show"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Hide"
+  </source>
+  <dest>
+    *: "Hide"
+  </dest>
+  <voice>
+    *: "Hide"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RELOCATE_TO_SUBMENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Relocate to Submenu"
+  </source>
+  <dest>
+    *: "Relocate to Submenu"
+  </dest>
+  <voice>
+    *: "Relocate to Submenu"
+  </voice>
+</phrase>
