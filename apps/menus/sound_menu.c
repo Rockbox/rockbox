@@ -126,10 +126,6 @@ MENUITEM_SETTING(roll_off, &global_settings.roll_off, NULL);
 MENUITEM_SETTING(power_mode, &global_settings.power_mode, NULL);
 #endif
 
-#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
-MENUITEM_SETTING(func_mode, &global_settings.func_mode, NULL);
-#endif
-
     /* Crossfeed Submenu */
     MENUITEM_SETTING(crossfeed, &global_settings.crossfeed, lowlatency_callback);
     MENUITEM_SETTING(crossfeed_direct_gain,
@@ -246,9 +242,6 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #ifdef AUDIOHW_HAVE_POWER_MODE
           ,&power_mode
-#endif
-#ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
-          ,&func_mode
 #endif
           ,&crossfeed_menu, &equalizer_menu, &dithering_enabled
           ,&surround_menu, &pbe_menu, &afr_enabled
