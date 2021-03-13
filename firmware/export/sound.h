@@ -57,6 +57,10 @@ void sound_set_depth_3d(int value);
 void sound_set_filter_roll_off(int value);
 #endif
 
+#if defined(AUDIOHW_HAVE_POWER_MODE)
+void sound_set_power_mode(int value);
+#endif
+
 #ifdef AUDIOHW_HAVE_EQ
 /*
  * band = SOUND_EQ_BANDb

@@ -782,6 +782,10 @@ struct user_settings
     int roll_off;
 #endif
 
+#ifdef AUDIOHW_HAVE_POWER_MODE
+    int power_mode;
+#endif
+
 #ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
     int func_mode;
 #endif
