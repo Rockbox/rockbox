@@ -1,0 +1,119 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f6f8b1d_ce0e993d",
+        "filename": "apps/debug_menu.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "FWIW, traditionally we\u0027ve implemented flash write/update functionality as a plugin, so we don\u0027t always carry around the overhead of the otherwise-useless flash code.\n\nProbably not worth the hassle right now, but if we ever decide to put more than the bootloader into flash we might want to revisit this.",
+      "range": {
+        "startLine": 129,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 6
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b809746c_a1f6c0bb",
+        "filename": "firmware/drivers/axp173.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "Traditionally we rely on the current battery voltage.  \n\nCharge counters seem to be potentially more accurate but coming in cold I don\u0027t see any way to come up with a reasonable estimate.",
+      "range": {
+        "startLine": 182,
+        "startChar": 0,
+        "endLine": 184,
+        "endChar": 47
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf6c0540_cc5b91a8",
+        "filename": "firmware/target/mips/ingenic_x1000/debug-x1000.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "If we set the font, we should restore it after we\u0027re done.",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 1
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12f975e4_7bf638e3",
+        "filename": "firmware/target/mips/ingenic_x1000/fiiom3k/axp173-fiiom3k.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "Can we get rid of the magic numbers in this function?",
+      "range": {
+        "startLine": 51,
+        "startChar": 0,
+        "endLine": 51,
+        "endChar": 5
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b131f6a_11cdd40c",
+        "filename": "tools/scramble.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "should be fiiom3kB or something like that, be consistent with the normal case.",
+      "range": {
+        "startLine": 336,
+        "startChar": 37,
+        "endLine": 336,
+        "endChar": 47
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}

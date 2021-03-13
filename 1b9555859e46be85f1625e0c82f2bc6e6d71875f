@@ -788,6 +788,30 @@
     },
     {
       "key": {
+        "uuid": "c4527e66_80cf8689",
+        "filename": "firmware/target/mips/ingenic_x1000/lcd-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ebae3b2c_efff4208",
+      "range": {
+        "startLine": 213,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 36
+      },
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f7554291_8b8348b8",
         "filename": "firmware/target/mips/ingenic_x1000/pcm-x1000.c",
         "patchSetId": 4
@@ -820,6 +844,24 @@
       "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e90629d_0ffd49b5",
+        "filename": "firmware/target/mips/ingenic_x1000/pcm-x1000.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-13T13:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "98ee6661_aae38cca",
+      "revId": "1b9555859e46be85f1625e0c82f2bc6e6d71875f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
