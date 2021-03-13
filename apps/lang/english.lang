@@ -12208,6 +12208,57 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "DAC's power mode"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "DAC's power mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "High performance"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "High performance"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Save battery"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Save battery"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_VOLUME_LIMIT
   desc: in sound_settings
   user: core

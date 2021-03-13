@@ -746,6 +746,9 @@ void sound_settings_apply(void)
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
     sound_set(SOUND_FILTER_ROLL_OFF, global_settings.roll_off);
 #endif
+#ifdef AUDIOHW_HAVE_POWER_MODE
+    sound_set(SOUND_POWER_MODE, global_settings.power_mode);
+#endif
 #ifdef AUDIOHW_HAVE_EQ
     int b;
 

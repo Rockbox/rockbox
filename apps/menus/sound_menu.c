@@ -122,6 +122,10 @@ MENUITEM_SETTING(depth_3d, &global_settings.depth_3d, NULL);
 MENUITEM_SETTING(roll_off, &global_settings.roll_off, NULL);
 #endif
 
+#ifdef AUDIOHW_HAVE_POWER_MODE
+MENUITEM_SETTING(power_mode, &global_settings.power_mode, NULL);
+#endif
+
 #ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
 MENUITEM_SETTING(func_mode, &global_settings.func_mode, NULL);
 #endif
@@ -239,6 +243,9 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
 #endif
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
           ,&roll_off
+#endif
+#ifdef AUDIOHW_HAVE_POWER_MODE
+          ,&power_mode
 #endif
 #ifdef AUDIOHW_HAVE_FUNCTIONAL_MODE
           ,&func_mode

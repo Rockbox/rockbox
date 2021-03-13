@@ -118,6 +118,10 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 void audiohw_set_filter_roll_off(int value)
     { (void)value; }
 #endif
+#if defined(AUDIOHW_HAVE_POWER_MODE)
+void audiohw_set_power_mode(int value)
+    { (void)value; }
+#endif
 
 void audiohw_close(void) {}
 

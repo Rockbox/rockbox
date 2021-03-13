@@ -859,6 +859,12 @@ const struct settings_list settings[] = {
 #endif
 #endif
 
+#ifdef AUDIOHW_HAVE_POWER_MODE
+    CHOICE_SETTING(F_SOUNDSETTING, power_mode, LANG_DAC_POWER_MODE, 0,
+                   "dac_power_mode", "high,low", sound_set_power_mode,
+                   2, ID2P(LANG_DAC_POWER_HIGH), ID2P(LANG_DAC_POWER_LOW)),
+#endif
+
     /* playback */
     OFFON_SETTING(0, playlist_shuffle, LANG_SHUFFLE, false, "shuffle", NULL),
     SYSTEM_SETTING(NVRAM(4), resume_index, -1),
