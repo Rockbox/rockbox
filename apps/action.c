@@ -128,21 +128,23 @@ static bool is_action_filtered(int action, unsigned int mask, int context)
         case ACTION_FM_PLAY:
             match = has_flag(mask, SEL_ACTION_PLAY);
             break;
-        case ACTION_STD_PREVREPEAT:
-        case ACTION_STD_NEXTREPEAT:
+        //case ACTION_STD_PREVREPEAT: // seek not exempted outside of WPS
+        //case ACTION_STD_NEXTREPEAT:
         case ACTION_WPS_SEEKBACK:
         case ACTION_WPS_SEEKFWD:
         case ACTION_WPS_STOPSEEK:
             match = has_flag(mask, SEL_ACTION_SEEK);
             break;
-        case ACTION_STD_PREV:
-        case ACTION_STD_NEXT:
+        //case ACTION_STD_PREV: // skip/scrollwheel not exempted outside of WPS
+        //case ACTION_STD_NEXT:
         case ACTION_WPS_SKIPNEXT:
         case ACTION_WPS_SKIPPREV:
         case ACTION_FM_NEXT_PRESET:
         case ACTION_FM_PREV_PRESET:
             match = has_flag(mask, SEL_ACTION_SKIP);
             break;
+        case ACTION_LIST_VOLUP: // volume exempted outside of WPS
+        case ACTION_LIST_VOLDOWN:
         case ACTION_WPS_VOLUP:
         case ACTION_WPS_VOLDOWN:
             match = has_flag(mask, SEL_ACTION_VOL);
@@ -900,7 +902,9 @@ static inline int do_backlight(action_last_t *last, action_cur_t *cur, int actio
                      && power_input_present());
 #endif
     /* skip if backlight on | incorrect context | SEL_ACTION_NOEXT + ext pwr */
-    if ((cur->context == CONTEXT_FM || cur->context == CONTEXT_WPS) && bl_is_off)
+    if ((cur->context == CONTEXT_FM || cur->context == CONTEXT_WPS
+         || cur->context == CONTEXT_MAINMENU || cur->context == CONTEXT_TREE
+         || cur->context == CONTEXT_LIST) && bl_is_off)
     {
         filtered = is_action_filtered(action, last->backlight_mask, cur->context);
         bl_activate = !is_action_discarded(cur, filtered, &last->bl_filter_tick);
