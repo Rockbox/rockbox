@@ -1439,10 +1439,9 @@ bool tagcache_search_add_filter(struct tagcache_search *tcs,
 }
 
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
-                                struct tagcache_search_clause *clause)
+                                struct tagcache_search_clause *clause,
+                                bool addfullclause)
 {
-    int i;
-    
     if (tcs->clause_count >= TAGCACHE_MAX_CLAUSES)
     {
         logf("Too many clauses");
@@ -1451,15 +1450,6 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
 
     if (clause->type != clause_logical_or)
     {
-        /* Check if there is already a similar filter in present (filters are
-         * much faster than clauses). 
-         */
-        for (i = 0; i < tcs->filter_count; i++)
-        {
-            if (tcs->filter_tag[i] == clause->tag)
-                return true;
-        }
-        
         if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
         {
             char buf[MAX_PATH];
@@ -1469,8 +1459,12 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
         }
     }
     
-    tcs->clause[tcs->clause_count] = clause;
-    tcs->clause_count++;
+    // Only add the full clause if required
+    if (addfullclause)
+    {
+        tcs->clause[tcs->clause_count] = clause;
+        tcs->clause_count++;
+    }
     
     return true;
 }
