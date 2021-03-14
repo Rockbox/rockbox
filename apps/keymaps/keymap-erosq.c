@@ -42,6 +42,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_CANCEL,     BUTTON_BACK,                   BUTTON_NONE },
     { ACTION_STD_CONTEXT,    BUTTON_MENU|BUTTON_REPEAT,     BUTTON_MENU },
     { ACTION_STD_MENU,       BUTTON_MENU|BUTTON_REL,        BUTTON_MENU },
+    { ACTION_STD_KEYLOCK,    BUTTON_POWER,                  BUTTON_NONE },
 
 /*    ACTION_STD_QUICKSCREEN,
  *    ACTION_STD_KEYLOCK
