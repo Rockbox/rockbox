@@ -128,21 +128,25 @@ static bool is_action_filtered(int action, unsigned int mask, int context)
         case ACTION_FM_PLAY:
             match = has_flag(mask, SEL_ACTION_PLAY);
             break;
-        case ACTION_STD_PREVREPEAT:
-        case ACTION_STD_NEXTREPEAT:
+        //case ACTION_STD_PREVREPEAT: // seek not exempted outside of WPS
+        //case ACTION_STD_NEXTREPEAT:
         case ACTION_WPS_SEEKBACK:
         case ACTION_WPS_SEEKFWD:
         case ACTION_WPS_STOPSEEK:
             match = has_flag(mask, SEL_ACTION_SEEK);
             break;
-        case ACTION_STD_PREV:
-        case ACTION_STD_NEXT:
+        //case ACTION_STD_PREV: // skip/scrollwheel not exempted outside of WPS
+        //case ACTION_STD_NEXT:
         case ACTION_WPS_SKIPNEXT:
         case ACTION_WPS_SKIPPREV:
         case ACTION_FM_NEXT_PRESET:
         case ACTION_FM_PREV_PRESET:
             match = has_flag(mask, SEL_ACTION_SKIP);
             break;
+#ifdef HAVE_VOLUME_IN_LIST
+        case ACTION_LIST_VOLUP: // volume exempted outside of WPS if the device supports it
+        case ACTION_LIST_VOLDOWN:
+#endif
         case ACTION_WPS_VOLUP:
         case ACTION_WPS_VOLDOWN:
             match = has_flag(mask, SEL_ACTION_VOL);
