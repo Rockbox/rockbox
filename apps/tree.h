@@ -33,6 +33,7 @@ struct entry {
     char *name;
     int attr; /* FAT attributes + file type flags */
     unsigned time_write; /* Last write time */
+    int strip;
 };
 
 #define BROWSE_SELECTONLY       0x0001  /* exit on selecting a file */

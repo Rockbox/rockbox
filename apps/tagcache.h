@@ -52,7 +52,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x5443480f
+#define TAGCACHE_MAGIC  0x54434810
 
 /* Dump store/restore header version 'TCSxx'. */
 #define TAGCACHE_STATEFILE_MAGIC 0x54435301
@@ -221,7 +221,8 @@ void tagcache_search_set_uniqbuf(struct tagcache_search *tcs,
 bool tagcache_search_add_filter(struct tagcache_search *tcs,
                                 int tag, int seek);
 bool tagcache_search_add_clause(struct tagcache_search *tcs,
-                                struct tagcache_search_clause *clause);
+                                struct tagcache_search_clause *clause,
+                                bool addfullclause);
 bool tagcache_get_next(struct tagcache_search *tcs);
 bool tagcache_retrieve(struct tagcache_search *tcs, int idxid, 
                        int tag, char *buf, long size);
