@@ -32,7 +32,7 @@
  * Insert LAST_ITEM_IN_LIST at the end of each mapping
  */
 static const struct button_mapping button_context_standard[]  = {
-    { ACTION_STD_PREV,       BUTTON_SCROLL_BACK,              BUTTON_NONE },
+    { ACTION_STD_PREV,       BUTTON_SCROLL_BACK,            BUTTON_NONE },
     { ACTION_STD_PREV,       BUTTON_PREV,                   BUTTON_NONE },
     { ACTION_STD_PREVREPEAT, BUTTON_PREV|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_NEXT,       BUTTON_SCROLL_FWD,             BUTTON_NONE },
@@ -81,7 +81,6 @@ static const struct button_mapping button_context_wps[]  = {
  *    ACTION_WPS_LIST_BOOKMARKS,  optional
  *    ACTION_WPS_CREATE_BOOKMARK, optional
  */
-
     { ACTION_STD_KEYLOCK,     BUTTON_POWER,                 BUTTON_NONE },
 
     LAST_ITEM_IN_LIST
@@ -114,22 +113,16 @@ static const struct button_mapping button_context_list[]  = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
-#if 0 // XXX?
 static const struct button_mapping button_context_tree[]  = {
-/*    ACTION_TREE_ROOT_INIT,
- *    ACTION_TREE_PGLEFT, optional
- *    ACTION_TREE_PGRIGHT, optional
- *    ACTION_TREE_STOP,
- *    ACTION_TREE_WPS,
- *    ACTION_TREE_HOTKEY,
- */
-/*    { ACTION_TREE_WPS, BUTTON_UP|BUTTON_REL, BUTTON_UP },
- *    { ACTION_TREE_STOP,   BUTTON_POWER|BUTTON_REL,      BUTTON_POWER },
- *    { ACTION_TREE_HOTKEY, BUTTON_REC|BUTTON_REL,        BUTTON_REC },
- */
+/*
+    { ACTION_TREE_WPS,        BUTTON_OPTION|BUTTON_REL,         BUTTON_OPTION },
+    { ACTION_TREE_STOP,       BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
+    { ACTION_TREE_HOTKEY,     BUTTON_HOME|BUTTON_REPEAT,        BUTTON_HOME },
+*/
+    { ACTION_STD_MENU,        BUTTON_MENU,      BUTTON_MENU },
+
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST),
 }; /* button_context_tree */
-#endif
 
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT, BUTTON_PLAY, BUTTON_NONE },
@@ -223,7 +216,10 @@ const struct button_mapping* get_context_mapping(int context)
 
         case CONTEXT_MAINMENU:
             return button_context_mainmenu;
+
         case CONTEXT_TREE:
+            return button_context_tree;
+
         case CONTEXT_LIST:
             return button_context_list;
 
