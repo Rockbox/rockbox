@@ -6039,14 +6039,17 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "MSD1:"
   </dest>
   <voice>
     *: "Interno"
+    hibylinux: "micro S D"
     xduoox3: "Micro SD 1"
   </voice>
 </phrase>
@@ -6271,16 +6274,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Riproduce Come Prossima"
+    *: ""
   </dest>
   <voice>
-    *: "Riproduce Come Prossima"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15524,5 +15527,19 @@
   </dest>
   <voice>
     *: "Entrare in modo memoria di massa USB?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Cancella Lista e Riproduci Successivo"
+  </dest>
+  <voice>
+    *: "Cancella Lista e Riproduci Successivo"
   </voice>
 </phrase>
