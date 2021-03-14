@@ -69,6 +69,7 @@ struct tagentry {
     char* name;
     int newtable;
     int extraseek;
+    int strip;
 };
 
 static struct tagentry* tagtree_get_entry(struct tree_context *c, int id);
@@ -107,6 +108,12 @@ enum variables {
     menu_load,
     menu_reload,
 };
+
+/* String presentation of the tags defined in tagcache.h. Must be in correct order! */
+static const char *tags_str[] = { "artist", "album", "genre", "title",
+    "filename", "composer", "comment", "albumartist", "grouping", "year",
+    "discnumber", "tracknumber", "bitrate", "length", "playcount", "rating",
+    "playtime", "lastplayed", "commitid", "mtime", "lastelapsed", "lastoffset" };
 
 /* Capacity 10 000 entries (for example 10k different artists) */
 #define UNIQBUF_SIZE (64*1024)
@@ -1419,7 +1426,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 {
     struct tagcache_search tcs;
     struct display_format *fmt;
-    int i;
+    int i, j;
     int namebufused = 0;
     int total_count = 0;
     int special_entry_count = 0;
@@ -1427,7 +1434,9 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     int tag;
     bool sort = false;
     int sort_limit;
-    int strip;
+    bool strip = false;
+    bool alltracks = false;
+    char all_tracks_fmt[MAX_PATH];
 
     /* Show search progress straight away if the disk needs to spin up,
        otherwise show it after the normal 1/2 second delay */
@@ -1441,6 +1450,8 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
     if (c->currtable == ALLSUBENTRIES)
     {
+        alltracks = true;    /* cache flag defining whether this is the AllTracks menu */
+        sort = true;         /* default the all subentries to always sort */
         tag = tag_title;
         level--;
     }
@@ -1459,6 +1470,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     if (level || csi->clause_count[0] || TAGCACHE_IS_NUMERIC(tag))
         sort = true;
 
+    /* Add filters for each parent level */
     for (i = 0; i < level; i++)
     {
         if (TAGCACHE_IS_NUMERIC(csi->tagorder[i]))
@@ -1470,7 +1482,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             cc.type = clause_is;
             cc.numeric = true;
             cc.numeric_data = csi->result_seek[i];
-            tagcache_search_add_clause(&tcs, &cc);
+            tagcache_search_add_clause(&tcs, &cc, true);
         }
         else
         {
@@ -1482,12 +1494,13 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     /* because tagcache saves the clauses, we need to lock the buffer
      * for the entire duration of the search */
     tagtree_lock();
+    
+    /* Add clauses for each level in the menu */
     for (i = 0; i <= level; i++)
     {
-        int j;
 
         for (j = 0; j < csi->clause_count[i]; j++)
-            tagcache_search_add_clause(&tcs, csi->clause[i][j]);
+            tagcache_search_add_clause(&tcs, csi->clause[i][j], true);
     }
 
     current_offset = offset;
@@ -1495,24 +1508,66 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     c->dirfull = false;
 
     fmt = NULL;
-    for (i = 0; i < format_count; i++)
+    if (alltracks)
     {
-        if (formats[i]->group_id == csi->format_id[level])
-            fmt = formats[i];
+        /* All Tracks format functionality */
+        sort = true;
+        all_tracks_fmt[0] = '\0';
+
+        /* Construct the All format name by concatenating the menu level tags */
+        for (i = 0; i <= level; i++)
+        {
+            strcat(all_tracks_fmt, tags_str[csi->tagorder[i]]);
+            strcat(all_tracks_fmt, ".");
+        }
+        strcat(all_tracks_fmt, "All");
+
+        /* look for any AllTracks format matching the derived format name */
+        for (i = 0; i < format_count; i++)
+        {
+            if (!strcasecmp(formats[i]->name, all_tracks_fmt))
+            {
+                /* add all possible clauses for all formats */
+                fmt = formats[i];
+                for (j = 0; j < fmt->clause_count; j++)
+                {
+                    tagcache_search_add_clause(&tcs, fmt->clause[j], false);
+                }
+            }
+        }
     }
+    else
+    {
+        /* Normal track format functionality */
+        for (i = 0; i < format_count; i++)
+        {
+            if (formats[i]->group_id == csi->format_id[level])
+            {
+                /* Ensure that tags from all clauses for the fmt are loaded */
+                fmt = formats[i];
+                for (j = 0; j < fmt->clause_count; j++)
+                {
+                    tagcache_search_add_clause(&tcs, fmt->clause[j], false);
+                }
+            }
+        }
+     }
+     
+    /* The assigning of the sort_inverse and sort_limit fields here is a bit arbitrary since any
+     * track title can match any one of the associated formats, each of which can have a different
+     * set of values for the sort inverse and sort limit attributes. [JG] */
 
     if (fmt)
     {
         sort_inverse = fmt->sort_inverse;
         sort_limit = fmt->limit;
-        strip = fmt->strip;
         sort = true;
     }
     else
     {
+        /* No global format */
         sort_inverse = false;
         sort_limit = 0;
-        strip = 0;
     }
 
     /* lock buflib out due to possible yields */
@@ -1523,6 +1578,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     {
         if (offset == 0)
         {
+            /* Adds the <All Tracks> option */
             dptr->newtable = ALLSUBENTRIES;
             dptr->name = str(LANG_TAGNAVI_ALL_TRACKS);
             dptr++;
@@ -1531,6 +1587,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         }
         if (offset <= 1)
         {
+            /* Adds the <Random> option */
             dptr->newtable = NAVIBROWSE;
             dptr->name = str(LANG_TAGNAVI_RANDOM);
             dptr->extraseek = -1;
@@ -1539,29 +1596,35 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
             special_entry_count++;
         }
 
-        total_count += 2;
+        total_count += special_entry_count;
     }
 
+    /* Now cycle through each entry and apply any formatting */
     while (tagcache_get_next(&tcs))
     {
         if (total_count++ < offset)
             continue;
 
-        dptr->newtable = NAVIBROWSE;
+        dptr->strip = 0;     /* set the default strip amount for this entry */
         if (tag == tag_title || tag == tag_filename)
         {
             dptr->newtable = PLAYTRACK;
             dptr->extraseek = tcs.idx_id;
         }
         else
+        {
+            dptr->newtable = NAVIBROWSE;
             dptr->extraseek = tcs.result_seek;
+        }
 
         fmt = NULL;
         /* Check the format */
         tagtree_lock();
         for (i = 0; i < format_count; i++)
         {
-            if (formats[i]->group_id != csi->format_id[level])
+            /* Handle the allsubentries case as well - look for format defined in all_tracks_fm */
+            if (((formats[i]->group_id != csi->format_id[level]) && !alltracks)
+                || (alltracks && strcasecmp(formats[i]->name, all_tracks_fmt)))
                 continue;
 
             if (tagcache_check_clauses(&tcs, formats[i]->clause,
@@ -1605,6 +1668,11 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
                 }
                 else
                     namebufused += strlen(dptr->name)+1;
+                
+                /* Set the strip amount for this track if the title was successfully formatted */
+                dptr->strip = fmt->strip;
+                if (!strip && (fmt->strip > 0))
+                    strip = true;    /* cached strip flag */
             }
             else
             {
@@ -1689,20 +1757,23 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
     if (strip)
     {
+        /* Now perform strip based on the format applied to each track name */
         dptr = get_entries(c);
         for (i = special_entry_count; i < current_entry_count; i++, dptr++)
         {
-            int len = strlen(dptr->name);
+            if (dptr->strip > 0)
+            {
+                int len = strlen(dptr->name);
 
-            if (len < strip)
-                continue;
+                if (len < dptr->strip)
+                    continue;
 
-            dptr->name = &dptr->name[strip];
+                dptr->name = &dptr->name[dptr->strip];
+            }
         }
     }
 
     return total_count;
-
 }
 
 static int load_root(struct tree_context *c)
