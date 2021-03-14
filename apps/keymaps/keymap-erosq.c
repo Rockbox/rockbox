@@ -39,7 +39,7 @@ static const struct button_mapping button_context_standard[]  = {
     { ACTION_STD_NEXT,       BUTTON_NEXT,                   BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT, BUTTON_NEXT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_OK,         BUTTON_PLAY|BUTTON_REL,        BUTTON_PLAY },
-    { ACTION_STD_CANCEL,     BUTTON_BACK,                   BUTTON_NONE },
+    { ACTION_STD_CANCEL,     BUTTON_BACK|BUTTON_REL,        BUTTON_BACK }, // release just because it feels better to use
     { ACTION_STD_CONTEXT,    BUTTON_MENU|BUTTON_REPEAT,     BUTTON_MENU },
     { ACTION_STD_MENU,       BUTTON_MENU|BUTTON_REL,        BUTTON_MENU },
     { ACTION_STD_KEYLOCK,    BUTTON_POWER,                  BUTTON_NONE },
@@ -54,7 +54,9 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 static const struct button_mapping button_context_mainmenu[]  = {
-    { ACTION_TREE_WPS,       BUTTON_BACK,                  BUTTON_NONE },
+    { ACTION_TREE_WPS,       BUTTON_BACK|BUTTON_REPEAT,      BUTTON_BACK }, // settings menu is mainmenu context,
+    									    // so if we don't use repeat it will
+    									    // jump back to main menu root
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE),
 }; /* button_context_mainmenu as with sansa clip mapping - "back" button returns you to WPS */
