@@ -54,10 +54,22 @@ static int volume_limit_callback(int action,
     volume_limit_int_setting.formatter = NULL;
     volume_limit_int_setting.get_talk_id = NULL;
 
+    int decimals = sound_num_decimals(SOUND_VOLUME);
+
+    if (decimals)
+    {
+        volume_limit_int_setting.min /= 10 * decimals; /* Ok to round down */
+
+        volume_limit_int_setting.max += (10 * decimals) - 1;
+        volume_limit_int_setting.max /= 10 * decimals; /* Round up */
+
+        volume_limit_int_setting.step += (10 * decimals) - 1;
+        volume_limit_int_setting.step /= 10 * decimals; /* Round up */
+    }
     struct settings_list setting;
     setting.flags = F_BANFROMQS|F_INT_SETTING|F_T_INT|F_NO_WRAP;
     setting.lang_id = LANG_VOLUME_LIMIT;
-    setting.default_val.int_ = sound_max(SOUND_VOLUME);
+    setting.default_val.int_ = volume_limit_int_setting.max;
     setting.int_setting = &volume_limit_int_setting;
 
     switch (action)
@@ -65,6 +77,14 @@ static int volume_limit_callback(int action,
         case ACTION_ENTER_MENUITEM:
             setting.setting = &global_settings.volume_limit;
             option_screen(&setting, NULL, false, ID2P(LANG_VOLUME_LIMIT));
+            if (decimals)
+            {
+                global_settings.volume_limit *= 10 * decimals;
+                if (global_settings.volume_limit > volume_limit_int_setting.max)
+                {
+                    global_settings.volume_limit = volume_limit_int_setting.max;
+                }
+            }
         case ACTION_EXIT_MENUITEM: /* on exit */
             setvol();
             break;
@@ -253,4 +273,3 @@ MAKE_MENU(sound_settings, ID2P(LANG_SOUND_SETTINGS), NULL, Icon_Audio,
          ,&speaker_mode
 #endif
          );
-

@@ -54,7 +54,7 @@ static const struct sound_setting_entry * get_setting_entry(int setting)
         { "", 0, 0, 0, 0, 0 };
 
     static const struct sound_setting_entry default_entry =
-        { &default_info, NULL }; 
+        { &default_info, NULL };
 
     if ((unsigned)setting >= ARRAYLEN(sound_setting_entries))
         return &default_entry;
@@ -120,7 +120,7 @@ int sound_current(int setting)
 {
     switch(setting)
     {
-#ifndef BOOTLOADER 
+#ifndef BOOTLOADER
 #ifndef PLATFORM_HAS_VOLUME_CHANGE
         SOUND_CUR_SET(VOLUME,             global_settings.volume)
 #endif
