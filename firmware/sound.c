@@ -98,6 +98,11 @@ int sound_default(int setting)
     return get_settings_info(setting)->defaultval;
 }
 
+int sound_num_decimals(int setting)
+{
+    return get_settings_info(setting)->numdecimals;
+}
+
 sound_set_type * sound_get_fn(int setting)
 {
     return get_setting_entry(setting)->function;
