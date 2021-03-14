@@ -6037,14 +6037,17 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Internal"
+    hibylinux: "micro S D"
     xduoox3: "micro S D 1"
   </voice>
 </phrase>
