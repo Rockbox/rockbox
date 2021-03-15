@@ -15674,3 +15674,17 @@
     *: "In Submenu"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Clear List & Play Shuffled"
+  </dest>
+  <voice>
+    *: "Clear List & Play Shuffled"
+  </voice>
+</phrase>
