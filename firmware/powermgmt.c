@@ -705,14 +705,14 @@ static void power_thread(void)
     power_thread_inputs = power_input_status();
 #endif
 
+    /* call target specific init now */
+    powermgmt_init_target();
     /* initialize voltage averaging (if available) */
     average_init();
     /* get initial battery level value (in %) */
     init_battery_percent();
     /* get some initial data for the power curve */
     collect_power_history();
-    /* call target specific init now */
-    powermgmt_init_target();
 
     next_power_hist = current_tick + HZ*60;
 
