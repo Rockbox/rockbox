@@ -54,9 +54,6 @@ static const struct button_mapping button_context_standard[]  = {
 }; /* button_context_standard */
 
 static const struct button_mapping button_context_mainmenu[]  = {
-    { ACTION_TREE_WPS,       BUTTON_BACK|BUTTON_REPEAT,      BUTTON_BACK }, // settings menu is mainmenu context,
-    									    // so if we don't use repeat it will
-    									    // jump back to main menu root
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE),
 }; /* button_context_mainmenu as with sansa clip mapping - "back" button returns you to WPS */
@@ -105,6 +102,7 @@ static const struct button_mapping button_context_list[]  = {
 /*    ACTION_LISTTREE_PGUP, optional
  *    ACTION_LISTTREE_PGDOWN, optional
  */
+    { ACTION_TREE_WPS,       BUTTON_BACK|BUTTON_REPEAT,      BUTTON_BACK }, // back returns to WPS from many contexts
 
 #ifdef HAVE_VOLUME_IN_LIST
     { ACTION_LIST_VOLUP,   BUTTON_VOL_UP,                 BUTTON_NONE },
