@@ -80,7 +80,7 @@ To create a playlist containing some or all of the music on your \dap{}, you can
 The \setting{Current Playlist Submenu} is a submenu in the \setting{Context Menu} (see
 \reference{ref:Contextmenu}), it allows you to put tracks into a
 ``dynamic playlist''. The place in which the newly
-selected tracks are added to the playlist is determined by the following
+selected tracks are added to the playlist is determined by these
 options:
 
 \begin{description}
@@ -94,15 +94,23 @@ have not been added yet, immediately after the currently playing track.
 \item [Insert Shuffled.] Add track(s) to the playlist at random positions.
 
 \item [Insert Last Shuffled.] Add tracks in a random order to the end of the playlist.
-
-\item [Clear List \& Play Next.] Replace all tracks in the dynamic playlist.
-If a track is currently playing, it is only removed once it’s finished playing.
-
-\item [Clear List \& Play Shuffled.] Replace dynamic playlist with selected tracks
-in random order. Available, if playback is stopped.
 \end{description}
 
-There are also options for adding tracks only temporarily to the dynamic playlist.
+If you want the existing playlist entries to first be removed before
+selected tracks are inserted, the following two options will achieve that effect.
+They are also available when playback is stopped, whereas the rest of the options
+require music to be playing or paused.
+
+\begin{description}
+\item [Clear List \& Play Next.] Replace all entries in the dynamic playlist with
+selected tracks. If a track is currently playing, it will be removed once it’s
+finished playing.
+
+\item [Clear List \& Play Shuffled.] Similar, except tracks are added in random order.
+Only available when playback is stopped.
+\end{description}
+
+Another possibility is to add tracks \emph{temporarily} to the dynamic playlist.
 In Rockbox’s parlance, this is called queuing. Queued tracks are automatically
 removed from the playlist after they have been played. They are also not saved
 to the playlist file (see \reference{ref:playlistoptions}).
