@@ -137,7 +137,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 
     if (!is_valid)
     {
-        if (open_plugin_entry.lang_id != LANG_SHORTCUTS)
+        if (lang_id != LANG_SHORTCUTS) /* from shortcuts menu */
             splashf(HZ / 2, str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
         op_clear_entry(&open_plugin_entry);
         hash = 0;
