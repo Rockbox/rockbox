@@ -863,7 +863,8 @@ void root_menu(void)
                    make sure we preserve and restore the origin */
                 if (next_screen == GO_TO_PREVIOUS && shortcut_origin != GO_TO_ROOT)
                 {
-                    next_screen = shortcut_origin;
+                    if (shortcut_origin != GO_TO_WPS)
+                        next_screen = shortcut_origin;
                     shortcut_origin = GO_TO_ROOT;
                 }
 
