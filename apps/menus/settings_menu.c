@@ -83,17 +83,18 @@ static int selectivesoftlock_set_mask(void* param)
     (void)param;
 int mask = global_settings.bt_selective_softlock_actions_mask;
             struct s_mask_items maskitems[]={
-                                       {ID2P(LANG_VOLUME)     , SEL_ACTION_VOL},
-                                       {ID2P(LANG_ACTION_PLAY), SEL_ACTION_PLAY},
-                                       {ID2P(LANG_ACTION_SEEK), SEL_ACTION_SEEK},
-                                       {ID2P(LANG_ACTION_SKIP), SEL_ACTION_SKIP},
+                                       {ID2P(LANG_ACTION_VOLUME), SEL_ACTION_VOL},
+                                       {ID2P(LANG_ACTION_PLAY),   SEL_ACTION_PLAY},
+                                       {ID2P(LANG_ACTION_SEEK),   SEL_ACTION_SEEK},
+                                       {ID2P(LANG_ACTION_SKIP),   SEL_ACTION_SKIP},
  #ifdef HAVE_BACKLIGHT
-                            {ID2P(LANG_ACTION_AUTOLOCK_ON), SEL_ACTION_AUTOLOCK},
+                                       {ID2P(LANG_ACTION_AUTOLOCK_ON),    SEL_ACTION_AUTOLOCK},
  #endif
  #if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
-                        {ID2P(LANG_ACTION_DISABLE_TOUCH) , SEL_ACTION_NOTOUCH},
+                                       {ID2P(LANG_ACTION_DISABLE_TOUCH),  SEL_ACTION_NOTOUCH},
  #endif
-                         {ID2P(LANG_ACTION_DISABLE_NOTIFY), SEL_ACTION_NONOTIFY}
+                                       {ID2P(LANG_ACTION_DISABLE_NOTIFY), SEL_ACTION_NONOTIFY},
+                                       {ID2P(LANG_SOFTLOCK_DISABLE_ALL_NOTIFY), SEL_ACTION_ALLNONOTIFY}
                                             };
 
             mask = mask_select(mask, ID2P(LANG_SOFTLOCK_SELECTIVE)
