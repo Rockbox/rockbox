@@ -797,13 +797,16 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
             sleep(HZ/2);
         }
 #endif
-        if (last->keys_locked)
+        if (!has_flag(last->softlock_mask, SEL_ACTION_ALLNONOTIFY))
         {
-            splash(HZ/2, ID2P(LANG_KEYLOCK_ON));
-        }
-        else
-        {
-            splash(HZ/2, ID2P(LANG_KEYLOCK_OFF));
+            if (last->keys_locked)
+            {
+                splash(HZ/2, ID2P(LANG_KEYLOCK_ON));
+            }
+            else
+            {
+                splash(HZ/2, ID2P(LANG_KEYLOCK_OFF));
+            }
         }
 
         action       = ACTION_REDRAW;

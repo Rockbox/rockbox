@@ -12476,13 +12476,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
-    *: "Play"
+    *: "Exempt Play"
   </dest>
   <voice>
-    *: "Play"
+    *: "Exempt Play"
   </voice>
 </phrase>
 <phrase>
@@ -12490,13 +12490,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
-    *: "Seek"
+    *: "Exempt Seek"
   </dest>
   <voice>
-    *: "Seek"
+    *: "Exempt Seek"
   </voice>
 </phrase>
 <phrase>
@@ -12504,13 +12504,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
-    *: "Skip"
+    *: "Exempt Skip"
   </dest>
   <voice>
-    *: "Skip"
+    *: "Exempt Skip"
   </voice>
 </phrase>
 <phrase>
@@ -12602,13 +12602,13 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </dest>
   <voice>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </voice>
 </phrase>
 <phrase>
@@ -15737,5 +15737,33 @@
   </dest>
   <voice>
     *: "Clear List & Play Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Disable All Lock Notifications"
+  </dest>
+  <voice>
+    *: "Disable All Lock Notifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Exempt Volume"
+  </dest>
+  <voice>
+    *: "Exempt Volume"
   </voice>
 </phrase>
