@@ -730,10 +730,19 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
     {
         action = do_auto_softlock(last, cur);
     }
+
     /* Lock/Unlock toggled by ACTION_STD_KEYLOCK presses*/
     if ((action == ACTION_STD_KEYLOCK)
          || (last->keys_locked && last->unlock_combo == cur->button))
     {
+#ifdef HAVE_BACKLIGHT
+	// if backlight is off and keys are unlocked, do nothing and exit.
+	// The backlight should come on without locking keypad.
+	if ((!last->keys_locked) && (!is_backlight_on(false)))
+	{
+	    return;
+	}
+#endif
         last->unlock_combo = cur->button;
         do_key_lock(!last->keys_locked);
         notify_user = true;
