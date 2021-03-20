@@ -2196,6 +2196,9 @@ const struct settings_list settings[] = {
 #endif
 	    ),
 #endif
+#ifndef HAS_HOLD_BUTTON
+    OFFON_SETTING(0, softlock_notify_enable, LANG_SOFTLOCK_NOTIFY_ENABLE, true, "softlock notifications", NULL),
+#endif
 };
 
 const int nb_settings = sizeof(settings)/sizeof(*settings);

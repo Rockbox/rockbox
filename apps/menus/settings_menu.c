@@ -395,6 +395,10 @@ MAKE_MENU(sel_softlock, ID2P(LANG_SOFTLOCK_SELECTIVE),
 MENUITEM_SETTING(governor, &global_settings.governor, NULL);
 #endif
 
+#ifndef HAS_HOLD_BUTTON
+MENUITEM_SETTING(softlock_notify_enable, &global_settings.softlock_notify_enable, NULL);
+#endif
+
 MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
           0, Icon_System_menu,
 #if (BATTERY_CAPACITY_INC > 0) || (BATTERY_TYPES_COUNT > 1)
@@ -437,6 +441,9 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
 #endif
 #ifndef HAS_BUTTON_HOLD
             &sel_softlock,
+#endif
+#ifndef HAS_HOLD_BUTTON
+            &softlock_notify_enable,
 #endif
 #ifdef USB_ENABLE_HID
             &usb_hid,

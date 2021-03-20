@@ -15688,3 +15688,17 @@
     *: "Clear List & Play Shuffled"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SOFTLOCK_NOTIFY_ENABLE
+  desc: enable softlock notifications
+  user: core
+  <source>
+    *: "Key Lock Notifications"
+  </source>
+  <dest>
+    *: "Key Lock Notifications"
+  </dest>
+  <voice>
+    *: "Key Lock Notifications"
+  </voice>
+</phrase>
