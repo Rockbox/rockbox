@@ -730,6 +730,16 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
     {
         action = do_auto_softlock(last, cur);
     }
+ 
+#ifdef HAVE_BACKLIGHT
+    // if backlight is off, keys are unlocked, and ACTION_STD_KEYLOCK is pressed,
+    // do nothing and exit. The backlight should come on.
+    if ((!last->keys_locked) && (action == ACTION_STD_KEYLOCK) && (!is_backlight_on(false)))
+    {
+    	return;
+    }
+#endif
+
     /* Lock/Unlock toggled by ACTION_STD_KEYLOCK presses*/
     if ((action == ACTION_STD_KEYLOCK)
          || (last->keys_locked && last->unlock_combo == cur->button))
