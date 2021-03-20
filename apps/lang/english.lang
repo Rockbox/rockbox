@@ -12551,13 +12551,13 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </dest>
   <voice>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </voice>
 </phrase>
 <phrase>
@@ -15686,5 +15686,75 @@
   </dest>
   <voice>
     *: "Clear List & Play Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Disable All Lock Notifications"
+  </dest>
+  <voice>
+    *: "Disable All Lock Notifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_ALLOW_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Allow Volume Buttons"
+  </source>
+  <dest>
+    *: "Allow Volume Buttons"
+  </dest>
+  <voice>
+    *: "Allow Volume Buttons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_ALLOW_PLAY
+  desc: exempt Play from softlock
+  user: core
+  <source>
+    *: "Allow Play Button"
+  </source>
+  <dest>
+    *: "Allow Play Button"
+  </dest>
+  <voice>
+    *: "Allow Play Button"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_ALLOW_SEEK
+  desc: exempt Seek from softlock
+  user: core
+  <source>
+    *: "Allow Seek Buttons"
+  </source>
+  <dest>
+    *: "Allow Seek Buttons"
+  </dest>
+  <voice>
+    *: "Allow Seek Buttons"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_ALLOW_SKIP
+  desc: exempt Skip from softlock
+  user: core
+  <source>
+    *: "Allow Skip Buttons"
+  </source>
+  <dest>
+    *: "Allow Skip Buttons"
+  </dest>
+  <voice>
+    *: "Allow Skip Buttons"
   </voice>
 </phrase>
