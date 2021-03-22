@@ -1428,6 +1428,15 @@ static int disk_callback(int btn, struct gui_synclist *lists)
                 '0' + (i & 7));
     }
 #endif /* HAVE_ATA_DMA */
+    i = identity_info[0] & (1 << 15);
+    simplelist_addline(
+            "ATA device: %s", i ? "yes" : "no");
+    i = identity_info[0] & (1 << 6);
+    simplelist_addline(
+            "Fixed device: %s", i ? "yes" : "no");
+    i = identity_info[0] & (1 << 7);
+    simplelist_addline(
+            "Removeable media: %s", i ? "yes" : "no");
     return btn;
 }
 
