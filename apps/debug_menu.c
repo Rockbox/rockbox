@@ -1430,7 +1430,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
 #endif /* HAVE_ATA_DMA */
     i = identify_info[0] & (1 << 15);
     simplelist_addline(
-            "ATA device: %s", i ? "yes" : "no");
+            "CF compatible: %s", i ? "yes" : "no");
     i = identify_info[0] & (1 << 6);
     simplelist_addline(
             "Fixed device: %s", i ? "yes" : "no");
