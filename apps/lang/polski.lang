@@ -12317,13 +12317,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
-    *: "Przewijanie"
+    *: "Zwolnij przewijanie"
   </dest>
   <voice>
-    *: "Przewijanie"
+    *: "Zwolnij przewijanie"
   </voice>
 </phrase>
 <phrase>
@@ -12359,13 +12359,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
-    *: "Pomijanie"
+    *: "Zwolnij pomijanie"
   </dest>
   <voice>
-    *: "Pomijanie"
+    *: "Zwolnij pomijanie"
   </voice>
 </phrase>
 <phrase>
@@ -12401,13 +12401,13 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Wyłącz powiadomienie"
+    *: "Wyłącz zablokowane przypomnienia"
   </dest>
   <voice>
-    *: "Wyłącz powiadomienie"
+    *: "Wyłącz zablokowane przypomnienia"
   </voice>
 </phrase>
 <phrase>
@@ -12415,13 +12415,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
-    *: "Odtwarzanie"
+    *: "Zwolnij odtwarzanie"
   </dest>
   <voice>
-    *: "Odtwarzanie"
+    *: "Zwolnij odtwarzanie"
   </voice>
 </phrase>
 <phrase>
@@ -15618,5 +15618,84 @@
   </dest>
   <voice>
     *: "Wyczyść listę i odtwarzaj losowe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Tryb zasilania DAC-a"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Tryb zasilania daka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Wysoka wydajność"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Wysoka wydajność"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Oszczędzaj baterię"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Oszczędzaj baterię"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Wyłącz wszystkie powiadomienia blokady"
+  </dest>
+  <voice>
+    *: "Wyłącz wszystkie powiadomienia blokady"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Zwolnij głośność"
+  </dest>
+  <voice>
+    *: "Zwolnij głośność"
   </voice>
 </phrase>
