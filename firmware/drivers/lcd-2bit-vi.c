@@ -80,12 +80,12 @@ static struct viewport default_vp =
     .height   = LCDM(HEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .buffer   = NULL,
+    .buffer   = &LCDFN(framebuffer_default),
     .fg_pattern = LCDM(DEFAULT_FG),
     .bg_pattern = LCDM(DEFAULT_BG)
 };
 
-struct viewport * CURRENT_VP IBSS_ATTR;
+struct viewport * CURRENT_VP IBSS_ATTR MEM_ALIGN_ATTR = NULL;
 
 static unsigned fg_pattern IBSS_ATTR;
 static unsigned bg_pattern IBSS_ATTR;
