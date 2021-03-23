@@ -6046,15 +6046,18 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Dysk:"
-    xduoox3: "microSD1:"
+    *: "Wew.:"
+    hibylinux: "mSD:"
+    xduoox3: "mSD1:"
   </dest>
   <voice>
-    *: "Dysk wewnętzny"
-    xduoox3: "mikro es di 1"
+    *: "Wewnętrzny"
+    hibylinux: "mikro es de"
+    xduoox3: "mikro es de 1"
   </voice>
 </phrase>
 <phrase>
@@ -6278,16 +6281,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Graj następne"
+    *: ""
   </dest>
   <voice>
-    *: "Graj następne"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15517,5 +15520,103 @@
   </dest>
   <voice>
     *: "Przejść do trybu pamięci masowej uesbe?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Głośność komunikatów głosowych"
+  </dest>
+  <voice>
+    *: "Głośność komunikatów głosowych"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Wyczyść listę i odtwarzaj następne"
+  </dest>
+  <voice>
+    *: "Wyczyść listę i odtwarzaj następne"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Kolejka..."
+  </dest>
+  <voice>
+    *: "Kolejka"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Pokaż opcje kolejki"
+  </dest>
+  <voice>
+    *: "Pokaż opcje kolejki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Pokaż opcje dodawania losowego"
+  </dest>
+  <voice>
+    *: "Pokaż opcje dodawania losowego"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "W podmenu"
+  </dest>
+  <voice>
+    *: "W podmenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Wyczyść listę i odtwarzaj losowe"
+  </dest>
+  <voice>
+    *: "Wyczyść listę i odtwarzaj losowe"
   </voice>
 </phrase>
