@@ -63,12 +63,12 @@ static struct viewport default_vp =
     .height   = LCD_HEIGHT,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .buffer   = NULL,
+    .buffer   = &lcd_framebuffer_default,
     .fg_pattern   = LCD_DEFAULT_FG,
     .bg_pattern   = LCD_DEFAULT_BG,
 };
 
-struct viewport* lcd_current_viewport IDATA_ATTR;
+struct viewport* lcd_current_viewport = &default_vp;
 
 static void *lcd_frameaddress_default(int x, int y)
 {
@@ -87,6 +87,8 @@ static void *lcd_frameaddress_default(int x, int y)
 void lcd_init(void)
 {
     /* Initialize the viewport */
+    lcd_current_viewport = NULL;
+    default_vp.buffer = NULL;
     lcd_set_viewport(NULL);
 
     lcd_clear_display();
