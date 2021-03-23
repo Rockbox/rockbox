@@ -1965,6 +1965,10 @@ target/hosted/sdl/filesystem-sdl.c
 drivers/touchpad.c
 #endif
 
+#ifdef HAVE_I2C_ASYNC
+drivers/i2c-async.c
+#endif
+
 /* firmware/kernel section */
 #ifdef HAVE_CORELOCK_OBJECT
 kernel/corelock.c
