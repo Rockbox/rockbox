@@ -68,7 +68,7 @@ static struct viewport default_vp =
     .bg_pattern   = LCD_DEFAULT_BG,
 };
 
-struct viewport* lcd_current_viewport IDATA_ATTR;
+struct viewport* lcd_current_viewport IDATA_ATTR MEM_ALIGN_ATTR;
 
 static void *lcd_frameaddress_default(int x, int y)
 {

@@ -73,7 +73,7 @@ static struct viewport default_vp =
     .bg_pattern = LCD_DEFAULT_BG
 };
 
-struct viewport* lcd_current_viewport IBSS_ATTR;
+struct viewport* lcd_current_viewport IBSS_ATTR MEM_ALIGN_ATTR;
 static unsigned fg_pattern IBSS_ATTR;
 static unsigned bg_pattern IBSS_ATTR;
 
