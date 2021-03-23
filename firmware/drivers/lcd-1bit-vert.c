@@ -76,7 +76,7 @@ static struct viewport default_vp =
     .buffer   = NULL,
 };
 
-struct viewport* CURRENT_VP;
+struct viewport* CURRENT_VP MEM_ALIGN_ATTR;
 
 static void *LCDFN(frameaddress_default)(int x, int y)
 {
