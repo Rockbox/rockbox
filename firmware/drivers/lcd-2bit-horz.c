@@ -66,12 +66,12 @@ static struct viewport default_vp =
     .height   = LCD_HEIGHT,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .buffer   = NULL,
+    .buffer   = &lcd_framebuffer_default,
     .fg_pattern = LCD_DEFAULT_FG,
     .bg_pattern = LCD_DEFAULT_BG
 };
 
-struct viewport* lcd_current_viewport IBSS_ATTR;
+struct viewport* lcd_current_viewport IBSS_ATTR MEM_ALIGN_ATTR = NULL;
 static unsigned fg_pattern IBSS_ATTR;
 static unsigned bg_pattern IBSS_ATTR;
 
@@ -93,7 +93,6 @@ void lcd_init(void)
 {
     /* Initialize the viewport */
     lcd_set_viewport(NULL);
-
     lcd_clear_display();
     /* Call device specific init */
     lcd_init_device();
