@@ -73,10 +73,10 @@ static struct viewport default_vp =
     .height   = LCDM(HEIGHT),
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
-    .buffer   = &LCDFN(framebuffer_default),
+    .buffer   = NULL,
 };
 
-struct viewport* CURRENT_VP MEM_ALIGN_ATTR = NULL;
+struct viewport* CURRENT_VP;
 
 static void *LCDFN(frameaddress_default)(int x, int y)
 {
@@ -94,6 +94,7 @@ static void *LCDFN(frameaddress_default)(int x, int y)
 /* LCD init */
 void LCDFN(init)(void)
 {
+
     /* Initialize the viewport */
     LCDFN(set_viewport)(NULL);
     LCDFN(clear_display)();
