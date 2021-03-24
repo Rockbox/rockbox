@@ -4616,7 +4616,7 @@ if [ "$ARG_RBDIR" != "" ]; then
   echo "Using alternate rockbox dir: ${rbdir}"
 fi
 
-cat > autoconf.h <<EOF
+cat > autoconf.h.new <<EOF
 /* This header was made by configure */
 #ifndef __BUILD_AUTOCONF_H
 #define __BUILD_AUTOCONF_H
@@ -4690,6 +4690,12 @@ ${app_lcd_height}
 
 #endif /* __BUILD_AUTOCONF_H */
 EOF
+
+# Make sure the file is different.
+if ! diff -q autoconf.h.new autoconf.h > /dev/null 2>&1 ; then
+    mv autoconf.h.new autoconf.h
+    echo "Created autoconf.h"
+fi
 
 if test -n "$t_cpu"; then
   TARGET_INC="-I\$(FIRMDIR)/target/$t_cpu/$t_manufacturer/$t_model"
