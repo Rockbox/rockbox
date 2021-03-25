@@ -45,7 +45,7 @@ $(BUILDDIR)/bootloader.fnt: $(BL_FONT) $(TOOLS)
 	$(call PRINTS,CONVBDF $(subst $(ROOTDIR)/,,$<))$(TOOLSDIR)/convbdf -l $(MAXCHAR) -f -o $@ $<
 
 $(BUILDDIR)/bootloader.elf : $$(OBJ) $(FIRMLIB) $(CORE_LIBS)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -o $@ $(OBJ) \
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(BUILDDIR)/lib $(call a2lnk,$(CORE_LIBS)) \
 		$(LDOPTS) $(GLOBAL_LDOPTS) -Wl,--gc-sections -Wl,-Map,$(BUILDDIR)/bootloader.map
@@ -69,7 +69,7 @@ $(BUILDDIR)/$(BINARY): $(BUILDDIR)/bootloader.elf $(BUILDDIR)/bootloader.fnt
 else # bootloader
 
 $(BUILDDIR)/rockbox.elf : $$(OBJ) $(FIRMLIB) $(VOICESPEEXLIB) $(CORE_LIBS)
-	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -Os -o $@ $(OBJ) \
+	$(call PRINTS,LD $(@F))$(CC) $(GCCOPTS) -o $@ $(OBJ) \
 		-L$(BUILDDIR)/firmware -lfirmware \
 		-L$(RBCODEC_BLD)/codecs $(call a2lnk, $(VOICESPEEXLIB)) \
 		-L$(BUILDDIR)/lib $(call a2lnk,$(CORE_LIBS)) \
