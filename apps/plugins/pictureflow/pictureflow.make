@@ -22,12 +22,7 @@ else
     ROCKS += $(PICTUREFLOW_OBJDIR)/pictureflow.rock
 endif
 
-ifeq ($(CPU),sh)
-# sh need to retain its' -Os
-PICTUREFLOWFLAGS = $(PLUGINFLAGS)
-else
 PICTUREFLOWFLAGS = $(filter-out -O%,$(PLUGINFLAGS)) -O2
-endif
 
 $(PICTUREFLOW_OBJDIR)/pictureflow.rock: $(PICTUREFLOW_OBJ)
 
