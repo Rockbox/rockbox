@@ -27,7 +27,6 @@
 #include "cpu.h"
 #include "config.h"
 #include "events.h"
-#include "system.h"
 
 
 /* Frame buffer stride
@@ -166,9 +165,9 @@ struct frame_buffer_t {
         fb_remote_data *fb_remote_ptr;
 #endif
     };
+    void   *(*get_address_fn)(int x, int y);
     ptrdiff_t stride;
     size_t    elems;
-    void   *(*get_address_fn)(int x, int y) MEM_ALIGN_ATTR;
 };
 
 #define VP_FLAG_ALIGN_RIGHT  0x01
