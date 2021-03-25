@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd20c766_0cf9cadd",
+        "filename": "firmware/drivers/fat.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-25T16:48:22Z",
+      "side": 1,
+      "message": "I think we need to allow for target-implemented alignment buffers; for example the as3525 uses an uncacheable address for its internal realignment buffer.  With this patch as-is, we\u0027ll realign twice,\n\nAlternatively, perhaps we could call this STORAGE_WANTS_ALIGN_GENERIC to show that we want to use this buffer vs everything getting properly fixed up in the target driver?\n\nAlso, outside of target-specific code, the only actual user of the WANTS_ALIGN macros is in apps.buffering.c -- I wonder if that special casing might actually be superfluous in light of this patch?  Or perhaps this patch is actually slower/less optimal than how the buffering handles things?",
+      "range": {
+        "startLine": 269,
+        "startChar": 0,
+        "endLine": 269,
+        "endChar": 26
+      },
+      "revId": "3e40dce8ccdf668768b79fdd816ce77016397062",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
