@@ -43,5 +43,12 @@ void usb_drv_set_address(int address);
 int usb_drv_port_speed(void);
 void usb_drv_configure_endpoint(int ep_num, int type);
 
+/* USB_STRING_INITIALIZER(u"Example String") */
+#define USB_STRING_INITIALIZER(S) { \
+    sizeof(struct usb_string_descriptor) + sizeof(S) - sizeof(*S), \
+    USB_DT_STRING, \
+    S \
+}
+
 #endif /* _USB_DRV_H */
  

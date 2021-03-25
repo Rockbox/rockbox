@@ -120,43 +120,22 @@ static const struct usb_qualifier_descriptor __attribute__((aligned(2)))
 
 static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     usb_string_iManufacturer =
-{
-    24,
-    USB_DT_STRING,
-    {'R', 'o', 'c', 'k', 'b', 'o', 'x', '.', 'o', 'r', 'g'}
-};
+USB_STRING_INITIALIZER(u"Rockbox.org");
 
 static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     usb_string_iProduct =
-{
-    42,
-    USB_DT_STRING,
-    {'R', 'o', 'c', 'k', 'b', 'o', 'x', ' ',
-     'm', 'e', 'd', 'i', 'a', ' ',
-     'p', 'l', 'a', 'y', 'e', 'r'}
-};
+USB_STRING_INITIALIZER(u"Rockbox media player");
 
 static struct usb_string_descriptor __attribute__((aligned(2)))
                                     usb_string_iSerial =
-{
-    84,
-    USB_DT_STRING,
-    {'0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
-     '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
-     '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
-     '0', '0', '0', '0', '0', '0', '0', '0'}
-};
+USB_STRING_INITIALIZER(u"00000000000000000000000000000000000000000");
 
 /* Generic for all targets */
 
 /* this is stringid #0: languages supported */
 static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     lang_descriptor =
-{
-    4,
-    USB_DT_STRING,
-    {0x0409} /* LANGID US English */
-};
+USB_STRING_INITIALIZER(u"\x0409"); /* LANGID US English */
 
 static const struct usb_string_descriptor* const usb_strings[] =
 {

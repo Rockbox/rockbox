@@ -80,4 +80,11 @@ bool usb_drv_connected(void);
 int usb_drv_request_endpoint(int type, int dir);
 void usb_drv_release_endpoint(int ep);
 
+/* USB_STRING_INITIALIZER(u"Example String") */
+#define USB_STRING_INITIALIZER(S) { \
+    sizeof(struct usb_string_descriptor) + sizeof(S) - sizeof(*S), \
+    USB_DT_STRING, \
+    S \
+}
+
 #endif /* _USB_DRV_H */
