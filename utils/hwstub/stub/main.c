@@ -95,35 +95,17 @@ static struct usb_interface_descriptor interface_descriptor =
 };
 
 static const struct usb_string_descriptor usb_string_iManufacturer =
-{
-    24,
-    USB_DT_STRING,
-    {'R', 'o', 'c', 'k', 'b', 'o', 'x', '.', 'o', 'r', 'g'}
-};
+USB_STRING_INITIALIZER(u"Rockbox.org");
 
 static const struct usb_string_descriptor usb_string_iProduct =
-{
-    44,
-    USB_DT_STRING,
-    {'R', 'o', 'c', 'k', 'b', 'o', 'x', ' ',
-     'h', 'a', 'r', 'd', 'w', 'a', 'r', 'e', ' ',
-     's', 't', 'u', 'b'}
-};
+USB_STRING_INITIALIZER(u"Rockbox hardware stub");
 
 static const struct usb_string_descriptor usb_string_iInterface =
-{
-    14,
-    USB_DT_STRING,
-    {'H', 'W', 'S', 't', 'u', 'b'}
-};
+USB_STRING_INITIALIZER(u"HWStub");
 
 /* this is stringid #0: languages supported */
 static const struct usb_string_descriptor lang_descriptor =
-{
-    4,
-    USB_DT_STRING,
-    {0x0409} /* LANGID US English */
-};
+USB_STRING_INITIALIZER(u"\x0409"); /* LANGID US English */
 
 static struct hwstub_version_desc_t version_descriptor =
 {
