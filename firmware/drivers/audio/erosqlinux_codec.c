@@ -35,6 +35,8 @@
 #include "pcm-alsa.h"
 #include "pcm_sw_volume.h"
 
+#include "settings.h"
+
 #include "logf.h"
 
 /*
@@ -175,8 +177,12 @@ void audiohw_set_volume(int vol_l, int vol_r)
     vol_r_hw = vol_r;
 
     if (lineout_inserted()) {
-        l = 0;
-        r = 0;
+        /* On the EROS Q/K hardware, line out is _very_ hot
+           at ~5.8Vpp. As the hardware provides no way to reduce
+           output gain, we have to back off on the PCM signal
+           to avoid blowing out the signal.
+        */
+        l = r = global_settings.volume_limit;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
@@ -198,8 +204,8 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
     (void)vol_r;
 
     if (lineout_inserted()) {
-        l = 0;
-        r = 0;
+        l = -180;
+        r = -180;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
