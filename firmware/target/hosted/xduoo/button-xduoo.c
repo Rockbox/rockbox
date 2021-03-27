@@ -26,6 +26,8 @@
 #include "kernel.h"
 #include "xduoolinux_codec.h"
 
+#define USE_REMOTE /* Comment out to disable headphone remote */
+
 int button_map(int keycode)
 {
     switch(keycode)
@@ -54,7 +56,7 @@ int button_map(int keycode)
         case KEY_POWER:
             return BUTTON_POWER;
 
-#if defined(XDUOO_X3II) /* Headphone remote */
+#if defined(XDUOO_X3II) && defined(USE_REMOTE) /* Headphone remote */
         case KEY_NEXTSONG:
             return (BUTTON_NEXT | BUTTON_DELAY_RELEASE);
 
