@@ -119,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "ff2a5ba6_d9ea4397",
+        "filename": "firmware/export/config/fiiom3k.h",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-27T23:03:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3ca0eb5_9a9f4c11",
+      "range": {
+        "startLine": 84,
+        "startChar": 0,
+        "endLine": 84,
+        "endChar": 1
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bf6c0540_cc5b91a8",
         "filename": "firmware/target/mips/ingenic_x1000/debug-x1000.c",
         "patchSetId": 5
@@ -163,6 +187,30 @@
       "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91521f0c_9a58af0b",
+        "filename": "firmware/target/mips/ingenic_x1000/debug-x1000.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-27T23:03:25Z",
+      "side": 1,
+      "message": "This is fixed in latest patchset",
+      "parentUuid": "4ab17cd1_a55d1dab",
+      "range": {
+        "startLine": 131,
+        "startChar": 0,
+        "endLine": 131,
+        "endChar": 1
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -257,6 +305,30 @@
       "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "036e1675_1bcd2bc8",
+        "filename": "tools/scramble.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-03-27T23:03:25Z",
+      "side": 1,
+      "message": "I\u0027ll just axe this and use the fiiom3k scramble method. My original intent was to prevent the bootloader and normal rockbox images looking the same, since scramble only stores the first 4 characters. I\u0027m going to rework the boot setup anyway when I get around to adding M3K support to the Rockbox utility.",
+      "parentUuid": "9fdc7715_98350917",
+      "range": {
+        "startLine": 336,
+        "startChar": 37,
+        "endLine": 336,
+        "endChar": 47
+      },
+      "revId": "8822841d35e76144e36c9bfd36075a4716aaa866",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
