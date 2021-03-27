@@ -53,5 +53,6 @@ void commit_discard_idcache(void);
 #define CPUFREQ_MAX     200000000
 
 #define STORAGE_WANTS_ALIGN
+#define STORAGE_NEEDS_BOUNCE_BUFFER
 
 #endif /* SYSTEM_TARGET_H */

@@ -41,6 +41,7 @@
 #include "sysfont.h"
 
 #define RES_NO (-1)
+// #define ALIGN_BUF
 
 /* debug stuff */
 unsigned long sd_debug_time_rd = 0;
@@ -51,7 +52,9 @@ static tCardInfo card_info;
 /* for compatibility */
 static long last_disk_activity = -1;
 
+#ifdef ALIGN_BUF
 static unsigned char aligned_buf[512] STORAGE_ALIGN_ATTR;
+#endif
 
 static struct mutex       sd_mtx SHAREDBSS_ATTR;
 #ifndef BOOTLOADER
@@ -397,8 +400,10 @@ static inline void read_sd_data(unsigned char **dst)
 {
     void *buf = *dst;
 
+#ifdef ALIGN_BUF
     if (!IS_ALIGNED(((unsigned long)*dst), CACHEALIGN_SIZE))
         buf = aligned_buf;
+#endif
 
     commit_discard_dcache_range((const void *)buf, 512);
 
@@ -413,8 +418,10 @@ static inline void read_sd_data(unsigned char **dst)
     /* wait for DMA engine to finish transfer */
     while (A2A_DMA_STS & 1);
 
+#ifdef ALIGN_BUF
     if (buf == aligned_buf)
         memcpy(*dst, aligned_buf, 512);
+#endif
 
     *dst += 512;
 }
@@ -423,11 +430,13 @@ static inline void write_sd_data(unsigned char **src)
 {
     void *buf = *src;
 
+#ifdef ALIGN_BUF
     if (!IS_ALIGNED(((unsigned long)*src), CACHEALIGN_SIZE))
     {
         buf = aligned_buf;
         memcpy(aligned_buf, *src, 512);
     }
+#endif
 
     commit_discard_dcache_range((const void *)buf, 512);
 
