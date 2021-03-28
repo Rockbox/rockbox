@@ -449,6 +449,10 @@ $releasenotes="/wiki/ReleaseNotes315";
         status => 2,
     },
     'fiiom3klinux' => {
+        name => 'FiiO M3K (Linux)',
+        status => 1,
+    },
+    'fiiom3k' => {
         name => 'FiiO M3K',
         status => 1,
     },
