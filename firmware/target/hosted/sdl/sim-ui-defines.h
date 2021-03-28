@@ -535,6 +535,14 @@
 #define UI_LCD_POSX                 45
 #define UI_LCD_POSY                 50
 
+#elif defined(FIIO_M3K) || defined(FIIO_M3K_LINUX)
+#define UI_TITLE                    "FiiO M3K"
+#define UI_WIDTH                    287 /* width of GUI window */
+#define UI_HEIGHT                   589 /* height of GUI window */
+#define UI_LCD_POSX                 25
+#define UI_LCD_POSY                 15
+
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

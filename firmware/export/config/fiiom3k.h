@@ -10,7 +10,11 @@
 /* CPU defines */
 #define CONFIG_CPU          X1000
 #define X1000_EXCLK_FREQ    24000000
+
+#ifndef SIMULATOR
 #define TIMER_FREQ          X1000_EXCLK_FREQ
+#endif
+
 #define CPU_FREQ            1008000000
 #define CPUFREQ_MAX         CPU_FREQ
 /* TODO: figure out if this does in fact affect power consumption. */
@@ -88,11 +92,13 @@
 /* TODO: implement HAVE_RTC_ALARM */
 
 /* Power management */
+#ifndef SIMULATOR
 #define HAVE_AXP173
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 #define CONFIG_CHARGING        CHARGING_MONITOR
 #define HAVE_SW_POWEROFF
 #define HAVE_POWEROFF_WHILE_CHARGING
+#endif
 
 /* Only one battery type */
 #define BATTERY_CAPACITY_DEFAULT 1100
@@ -102,7 +108,9 @@
 #define BATTERY_TYPES_COUNT      1
 
 /* USB is still TODO. */
+#ifndef SIMULATOR
 #define USB_NONE
+#endif
 
 /* Rockbox capabilities */
 #define HAVE_FAT16SUPPORT

@@ -2495,7 +2495,7 @@ static bool dbg_boot_data(void)
 }
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */
 
-#ifdef FIIO_M3K
+#if defined(FIIO_M3K) && !defined(SIMULATOR)
 /* Note: this is temporary and should NOT be merged, ensure it is removed */
 static int fiio_debug_menu_action_callback(int action, struct gui_synclist *lists)
 {
@@ -2648,7 +2648,7 @@ static const struct {
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
         {"Boot data", dbg_boot_data },
 #endif
-#ifdef FIIO_M3K
+#if defined(FIIO_M3K) && !defined(SIMULATOR)
         {"FiiO debug menu", dbg_fiio_menu},
 #endif
 };

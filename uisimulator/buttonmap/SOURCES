@@ -87,5 +87,7 @@ xduoo-x20.c
 ihifi2.c
 #elif CONFIG_KEYPAD == EROSQ_PAD
 erosq.c
+#elif CONFIG_KEYPAD == FIIO_M3K_PAD
+fiio-m3k.c
 #endif
 #endif /* SIMULATOR */
