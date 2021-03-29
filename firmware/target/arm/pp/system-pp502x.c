@@ -223,9 +223,35 @@ void ICODE_ATTR commit_discard_idcache(void)
     if (CACHE_CTL & CACHE_CTL_ENABLE)
     {
         register int istat = disable_interrupt_save(IRQ_FIQ_STATUS);
-
         commit_dcache();
-
+#if 1 /* h10 bugfix */
+	
+	
+        static uint8_t cache_trashed[(1<<11)] CACHEALIGN_ATTR;
+	
+        register unsigned long a, s, l;
+	
+        for (a = (unsigned long)cache_trashed;
+	
+             a < (unsigned long)cache_trashed + sizeof(cache_trashed); 
+	
+             a += CACHEALIGN_SIZE)
+	
+        {
+	
+            s = (a >> 11) | 0x800000;
+	
+            l = (unsigned long)&CACHE_STATUS_BASE + (a & 0x7F0UL);
+	
+            /* we map 4 cache lines to the same buffer */
+	
+            for (unsigned long m = 0; m < 4; m++)
+	
+                *(volatile unsigned long *)(l + (m * 0x800UL)) = s;
+	
+        }
+	
+#else
         /* Cache lines which are not marked as valid can cause memory
          * corruption when there are many writes to and code fetches from
          * cached memory. This workaround points all cache status words past
@@ -234,13 +260,12 @@ void ICODE_ATTR commit_discard_idcache(void)
          * they're effectively discarded. Interrupts must be disabled here
          * because any change they make to cached memory could be discarded.
          */
-
         register volatile unsigned long *p;
         for (p = &CACHE_STATUS_BASE;
              p < (&CACHE_STATUS_BASE) + 512*16/sizeof(*p);
              p += 16/sizeof(*p))
             *p = ((MEMORYSIZE*0x100000) >> 11) | 0x800000;
-
+#endif
         restore_interrupt(istat);
     }
 }
