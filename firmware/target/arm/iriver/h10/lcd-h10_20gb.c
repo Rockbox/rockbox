@@ -402,7 +402,7 @@ void lcd_yuv_set_options(unsigned options)
 {
     lcd_yuv_options = options;
 }
-
+#if 1 /* ASM version */
 /* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
 extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
                                    int width,
@@ -484,7 +484,181 @@ void lcd_blit_yuv(unsigned char * const src[3],
     /* DIT=0, BGR=1, HWM=0, I/D1-0=10, AM=1, LG2-0=000 */
     lcd_write_reg(R_ENTRY_MODE, 0x1028);
 }
+#else /* Original C version*/
 
+#define CSUB_X 2
+#define CSUB_Y 2
+
+#define RYFAC (31*257)
+#define GYFAC (31*257)
+#define BYFAC (31*257)
+#define RVFAC 11170     /* 31 * 257 *  1.402    */
+#define GVFAC (-5690)  /* 31 * 257 * -0.714136 */
+#define GUFAC (-2742)   /* 31 * 257 * -0.344136 */
+#define BUFAC 14118     /* 31 * 257 *  1.772    */
+
+#define ROUNDOFFS (127*257)
+#define ROUNDOFFSG (63*257)
+/* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_yuv_blit(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    int y0, x0, y1, x1;
+    int ymax;
+
+    if (!display_on)
+        return;
+
+    width = (width + 1) & ~1;
+
+    /* calculate the drawing region */
+    x0 = x;
+    x1 = x + width - 1;
+    y0 = y;
+    y1 = y + height - 1;
+
+    /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
+     * is actually the bottom left and horizontal and vertical are swapped. 
+     * Rockbox expects the origin to be the top left so we need to use 
+     * 127 - y instead of just y */
+     
+    /* max horiz << 8 | start horiz */
+    lcd_send_cmd(R_HORIZ_RAM_ADDR_POS);
+    lcd_send_data( (((LCD_HEIGHT-1)-y0+y_offset) << 8) | ((LCD_HEIGHT-1)-y1+y_offset) );
+    
+    /* max vert << 8 | start vert */
+    lcd_send_cmd(R_VERT_RAM_ADDR_POS);
+    lcd_send_data((x1 << 8) | x0);
+
+    /* position cursor (set AD0-AD15) */
+    /* start vert << 8 | start horiz */
+    lcd_send_cmd(R_RAM_ADDR_SET);
+    lcd_send_data( (x0 << 8) | ((LCD_HEIGHT-1)-y0+y_offset) );
+    
+    /* start drawing */
+    lcd_send_cmd(R_WRITE_DATA_2_GRAM);
+
+    ymax = y + height - 1 ;
+
+    const int stride_div_csub_x = stride/CSUB_X;
+
+    for (; y <= ymax ; y++)
+    {
+        /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+        const unsigned char *ysrc = src[0] + stride * src_y + src_x;
+
+        const int uvoffset = stride_div_csub_x * (src_y/CSUB_Y) +
+                             (src_x/CSUB_X);
+
+        const unsigned char *usrc = src[1] + uvoffset;
+        const unsigned char *vsrc = src[2] + uvoffset;
+        const unsigned char *row_end = ysrc + width;
+
+        int y, u, v;
+        int red1, green1, blue1;
+        int red2, green2, blue2;
+        unsigned rbits, gbits, bbits;
+
+        int rc, gc, bc;
+
+        do
+        {
+            u = *usrc++ - 128;
+            v = *vsrc++ - 128;
+            rc = RVFAC * v + ROUNDOFFS;
+            gc = GVFAC * v + GUFAC * u + ROUNDOFFSG;
+            bc = BUFAC * u + ROUNDOFFS;
+
+            /* Pixel 1 */
+            y = *ysrc++;
+
+            red1   = RYFAC * y + rc;
+            green1 = GYFAC * y + gc;
+            blue1  = BYFAC * y + bc;
+
+            /* Pixel 2 */
+            y = *ysrc++;
+            red2   = RYFAC * y + rc;
+            green2 = GYFAC * y + gc;
+            blue2  = BYFAC * y + bc;
+
+            /* Since out of bounds errors are relatively rare, we check two
+               pixels at once to see if any components are out of bounds, and
+               then fix whichever is broken. This works due to high values and
+               negative values both becoming larger than the cutoff when
+               casted to unsigned.  And ORing them together checks all of them
+               simultaneously.  */
+            if (((unsigned)(red1 | green1 | blue1 |
+                     red2 | green2 | blue2)) > (RYFAC*255+ROUNDOFFS)) {
+                if (((unsigned)(red1 | green1 | blue1)) > 
+                    (RYFAC*255+ROUNDOFFS)) {
+                    if ((unsigned)red1 > (RYFAC*255+ROUNDOFFS))
+                    {
+                        if (red1 < 0)
+                            red1 = 0;
+                        else
+                            red1 = (RYFAC*255+ROUNDOFFS);
+                    }
+                    if ((unsigned)green1 > (GYFAC*255+ROUNDOFFSG))
+                    {
+                        if (green1 < 0)
+                            green1 = 0;
+                        else
+                            green1 = (GYFAC*255+ROUNDOFFSG);
+                    }
+                    if ((unsigned)blue1 > (BYFAC*255+ROUNDOFFS))
+                    {
+                        if (blue1 < 0)
+                            blue1 = 0;
+                        else
+                            blue1 = (BYFAC*255+ROUNDOFFS);
+                    }
+                }
+
+                if (((unsigned)(red2 | green2 | blue2)) > 
+                    (RYFAC*255+ROUNDOFFS)) {
+                    if ((unsigned)red2 > (RYFAC*255+ROUNDOFFS))
+                    {
+                        if (red2 < 0)
+                            red2 = 0;
+                        else
+                            red2 = (RYFAC*255+ROUNDOFFS);
+                    }
+                    if ((unsigned)green2 > (GYFAC*255+ROUNDOFFSG))
+                    {
+                        if (green2 < 0)
+                            green2 = 0;
+                        else
+                            green2 = (GYFAC*255+ROUNDOFFSG);
+                    }
+                    if ((unsigned)blue2 > (BYFAC*255+ROUNDOFFS))
+                    {
+                        if (blue2 < 0)
+                            blue2 = 0;
+                        else
+                            blue2 = (BYFAC*255+ROUNDOFFS);
+                    }
+                }
+            }
+                
+            rbits = red1 >> 16 ;
+            gbits = green1 >> 15 ;
+            bbits = blue1 >> 16 ;
+            lcd_send_data((rbits << 11) | (gbits << 5) | bbits);
+
+            rbits = red2 >> 16 ;
+            gbits = green2 >> 15 ;
+            bbits = blue2 >> 16 ;
+            lcd_send_data((rbits << 11) | (gbits << 5) | bbits);
+        }
+        while (ysrc < row_end);
+
+        src_y++;
+    }
+}
+
+#endif
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x0, int y0, int width, int height)
