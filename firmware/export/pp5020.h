@@ -204,7 +204,8 @@
  * Reading CPU_CTL after the nop will return 0x48000000
  */
 
-
+/* Cache Size */
+#define CACHE_SIZE       0x2000
 /* Cache Control */
 #define CACHE_PRIORITY   (*(volatile unsigned long *)(0x60006044))
 #define CACHE_CTL        (*(volatile unsigned long *)(0x6000c000))

@@ -237,10 +237,13 @@ void ICODE_ATTR commit_discard_idcache(void)
 
         register volatile unsigned long *p;
         for (p = &CACHE_STATUS_BASE;
-             p < (&CACHE_STATUS_BASE) + 512*16/sizeof(*p);
-             p += 16/sizeof(*p))
+             p < (&CACHE_STATUS_BASE) + CACHE_SIZE/sizeof(*p);
+             p += CACHEALIGN_SIZE/sizeof(*p))
+#if defined (IRIVER_H10)
+            *p = ((MEMORYSIZE*0x100000) >> 11);
+#else
             *p = ((MEMORYSIZE*0x100000) >> 11) | 0x800000;
-
+#endif
         restore_interrupt(istat);
     }
 }
@@ -280,9 +283,8 @@ static void init_cache(void)
 
     /* Note:  Don't start at 0x0, as the compiler thinks it's a
        null pointer dereference and will helpfully blow up the code. */
-
-    register volatile char *p;
-    for (p = (volatile char *)0x1000; p < (volatile char *)0x3000; p += 0x10)
+    register volatile char *p = (volatile char*) 0x1000;
+    for (; p < (volatile char *)CACHE_SIZE + 0x1000; p += CACHEALIGN_SIZE)
         (void)*p;
 }
 #endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
