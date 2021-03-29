@@ -29,6 +29,15 @@
 #include "button-target.h"
 #include "usb_drv.h"
 
+/* Bit 23: Cache line dirty */
+#define CACHE_LINE_DIRTY    (1<<22)
+/* Bit 23: Cache line valid */
+#define CACHE_LINE_VALID    (1<<23)
+/* Bit 0 - 21: Cached Address */
+#define CACHE_ADDRESS_MASK ((1<<21)-1)
+/* Cache Size - 8K*/
+#define CACHE_SIZE       0x2000
+
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
 extern void TIMER2(void);
@@ -233,14 +242,23 @@ void ICODE_ATTR commit_discard_idcache(void)
          * is never accessed, the cache lines don't affect anything, and
          * they're effectively discarded. Interrupts must be disabled here
          * because any change they make to cached memory could be discarded.
+         *  A status word is 32 bits and is mirrored four times for each cache line
+            bit 0-20	line_address >> 11
+            bit 21		unused?
+            bit 22		line_dirty
+            bit 23		line_valid
+            bit 24-31	unused?
          */
 
         register volatile unsigned long *p;
         for (p = &CACHE_STATUS_BASE;
-             p < (&CACHE_STATUS_BASE) + 512*16/sizeof(*p);
-             p += 16/sizeof(*p))
-            *p = ((MEMORYSIZE*0x100000) >> 11) | 0x800000;
-
+             p < (&CACHE_STATUS_BASE) + CACHE_SIZE/CACHEALIGN_BITS;
+             p += CACHEALIGN_BITS)
+        {
+            unsigned long v = *p & ~CACHE_LINE_DIRTY; /* clear dirty bit */
+            v |= CACHE_ADDRESS_MASK; /* set all address bits */
+            *p = v  | CACHE_LINE_VALID;
+        }
         restore_interrupt(istat);
     }
 }
