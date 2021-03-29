@@ -29,6 +29,19 @@
 #include "button-target.h"
 #include "usb_drv.h"
 
+/* Bit 0 - 20: Cached Address */
+#define CACHE_ADDRESS_MASK ((1<<21)-1)
+/* Bit 22: Cache line dirty */
+#define CACHE_LINE_DIRTY    (1<<22)
+/* Bit 23: Cache line valid */
+#define CACHE_LINE_VALID    (1<<23)
+
+/* Cache Size - 8K*/
+#define CACHE_SIZE       0x2000
+/*Initial memory address used to prime cache 
+ * could be targeted to a more 'important' address */
+#define CACHED_INIT_ADDR 0x2000
+
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
 extern void TIMER2(void);
@@ -233,14 +246,23 @@ void ICODE_ATTR commit_discard_idcache(void)
          * is never accessed, the cache lines don't affect anything, and
          * they're effectively discarded. Interrupts must be disabled here
          * because any change they make to cached memory could be discarded.
+         *  A status word is 32 bits and is mirrored four times for each cache line
+            bit 0-20	line_address >> 11
+            bit 21		unused?
+            bit 22		line_dirty
+            bit 23		line_valid
+            bit 24-31	unused?
          */
 
         register volatile unsigned long *p;
         for (p = &CACHE_STATUS_BASE;
-             p < (&CACHE_STATUS_BASE) + 512*16/sizeof(*p);
-             p += 16/sizeof(*p))
-            *p = ((MEMORYSIZE*0x100000) >> 11) | 0x800000;
-
+             p < (&CACHE_STATUS_BASE) + CACHE_SIZE/CACHEALIGN_BITS;
+             p += CACHEALIGN_BITS)
+        {
+            unsigned long v = *p & ~CACHE_LINE_DIRTY; /* clear dirty bit */
+            v |= CACHE_LINE_VALID | CACHE_ADDRESS_MASK; /* set all address bits */
+            *p = v;
+        }
         restore_interrupt(istat);
     }
 }
@@ -281,8 +303,8 @@ static void init_cache(void)
     /* Note:  Don't start at 0x0, as the compiler thinks it's a
        null pointer dereference and will helpfully blow up the code. */
 
-    register volatile char *p;
-    for (p = (volatile char *)0x1000; p < (volatile char *)0x3000; p += 0x10)
+    register volatile char *p = (volatile char *)CACHED_INIT_ADDR;
+    for (;p < (volatile char *)CACHED_INIT_ADDR + CACHE_SIZE; p += CACHEALIGN_SIZE)
         (void)*p;
 }
 #endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
