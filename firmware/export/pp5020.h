@@ -584,8 +584,10 @@
 #define CACHE_DATA_BASE         (*(volatile unsigned long*)(0xf0000000))
 /* 0xf0002000-0xf0003fff */
 #define CACHE_DATA_MIRROR_BASE  (*(volatile unsigned long*)(0xf0002000))
-/* 0xf0004000-0xf0007fff */
-#define CACHE_STATUS_BASE       (*(volatile unsigned long*)(0xf0004000))
+/* 0xf0004000-0xf0005fff */
+#define CACHE_STATUS_BASE_CPU   (*(volatile unsigned long*)(0xf0004000))
+/* 0xf0006000-0xf0007fff */
+#define CACHE_STATUS_BASE_COP   (*(volatile unsigned long*)(0xf0006000))
 #define CACHE_FLUSH_BASE        (*(volatile unsigned long*)(0xf0008000))
 #define CACHE_INVALID_BASE      (*(volatile unsigned long*)(0xf000c000))
 #define MMAP_PHYS_READ_MASK     0x0100
