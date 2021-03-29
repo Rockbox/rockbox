@@ -29,6 +29,20 @@
 #include "button-target.h"
 #include "usb_drv.h"
 
+/* Bit 0 - 20: Cached Address */
+#define CACHE_ADDRESS_MASK ((1<<21)-1)
+/* Bit 22: Cache line dirty */
+#define CACHE_LINE_DIRTY    (1<<22)
+/* Bit 23: Cache line valid */
+#define CACHE_LINE_VALID    (1<<23)
+/* Cache Size - 8K*/
+#define CACHE_SIZE       0x2000
+/*Initial memory address used to prime cache
+ * could be targeted to a more 'important' address
+ * Note:  Don't start at 0x0, as the compiler thinks it's a
+ * null pointer dereference and will helpfully blow up the code. */
+#define CACHED_INIT_ADDR CACHEALIGN_UP(0x2000)
+
 #if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_USB_MODE)
 extern void TIMER1(void);
 extern void TIMER2(void);
@@ -218,6 +232,34 @@ void ICODE_ATTR commit_dcache(void)
     }
 }
 
+static void ICODE_ATTR cache_invalidate_special(void)
+{
+    /* Cache lines which are not marked as valid can cause memory
+     * corruption when there are many writes to and code fetches from
+     * cached memory. This workaround points all cache status to the
+     * maximum line address and marked valid but not dirty. Since that area
+     * is never accessed, the cache lines don't affect anything, and
+     * they're effectively discarded. Interrupts must be disabled here
+     * because any change they make to cached memory could be discarded.
+     *  A status word is 32 bits and is mirrored four times for each cache line
+        bit 0-20	line_address >> 11
+        bit 21		unused?
+        bit 22		line_dirty
+        bit 23		line_valid
+        bit 24-31	unused?
+     */
+
+    register volatile unsigned long *p;
+    for (p = &CACHE_STATUS_BASE;
+         p < (&CACHE_FLUSH_BASE); /*!! 0x4000 status words total !!*/
+         p += CACHEALIGN_BITS)
+    {
+        /* BUGFIX h10 */
+        volatile unsigned long v = CACHE_LINE_VALID | CACHE_ADDRESS_MASK;
+        *p = v; //(volatile unsigned long)(CACHE_LINE_VALID | CACHE_ADDRESS_MASK);
+    }
+}
+
 void ICODE_ATTR commit_discard_idcache(void)
 {
     if (CACHE_CTL & CACHE_CTL_ENABLE)
@@ -225,21 +267,7 @@ void ICODE_ATTR commit_discard_idcache(void)
         register int istat = disable_interrupt_save(IRQ_FIQ_STATUS);
 
         commit_dcache();
-
-        /* Cache lines which are not marked as valid can cause memory
-         * corruption when there are many writes to and code fetches from
-         * cached memory. This workaround points all cache status words past
-         * end of RAM and marks them as valid, but not dirty. Since that area
-         * is never accessed, the cache lines don't affect anything, and
-         * they're effectively discarded. Interrupts must be disabled here
-         * because any change they make to cached memory could be discarded.
-         */
-
-        register volatile unsigned long *p;
-        for (p = &CACHE_STATUS_BASE;
-             p < (&CACHE_STATUS_BASE) + 512*16/sizeof(*p);
-             p += 16/sizeof(*p))
-            *p = ((MEMORYSIZE*0x100000) >> 11) | 0x800000;
+        cache_invalidate_special();
 
         restore_interrupt(istat);
     }
@@ -278,11 +306,8 @@ static void init_cache(void)
      * can run from cached RAM, rewriting of cache status words may not
      * be safe and the cache is filled instead by reading. */
 
-    /* Note:  Don't start at 0x0, as the compiler thinks it's a
-       null pointer dereference and will helpfully blow up the code. */
-
-    register volatile char *p;
-    for (p = (volatile char *)0x1000; p < (volatile char *)0x3000; p += 0x10)
+    register volatile char *p = (volatile char *)CACHED_INIT_ADDR;
+    for (;p < (volatile char *)CACHED_INIT_ADDR + CACHE_SIZE; p += CACHEALIGN_SIZE)
         (void)*p;
 }
 #endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
