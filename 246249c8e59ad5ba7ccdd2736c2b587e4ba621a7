@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2414de14_a04a8ac8",
+        "filename": "firmware/target/arm/pp/system-pp502x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-30T11:15:12Z",
+      "side": 1,
+      "message": "What\u0027s the point of read-modify-write of the status word?  Purely preventing the use of an immediate store?\n\nAnd from what I can tell the only effective difference here is that we\u0027re setting the address to all 1s instead of just \"past the end of RAM\" as the comment says; I presume this works but the comment needs to be corrected to say \"at the end of the address range\" or something like that.\n\n(Or did you intend to actually use CACHE_ADDRESS_MASK as a mask but left out the address?)",
+      "range": {
+        "startLine": 262,
+        "startChar": 0,
+        "endLine": 264,
+        "endChar": 19
+      },
+      "revId": "246249c8e59ad5ba7ccdd2736c2b587e4ba621a7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "008bd050_01d26e67",
+        "filename": "firmware/target/arm/pp/system-pp502x.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-03-30T11:15:12Z",
+      "side": 1,
+      "message": "This comment needs to be moved up to the definition of CACHED_INIT_ADDR",
+      "range": {
+        "startLine": 302,
+        "startChar": 0,
+        "endLine": 304,
+        "endChar": 71
+      },
+      "revId": "246249c8e59ad5ba7ccdd2736c2b587e4ba621a7",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
