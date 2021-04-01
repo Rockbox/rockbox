@@ -253,15 +253,15 @@ static void ICODE_ATTR cache_invalidate_special(void)
     if (CURRENT_CORE == CPU)
     {
         for (p = &CACHE_STATUS_BASE_CPU;
-             p < (&CACHE_STATUS_BASE_CPU) + CACHE_SIZE;
-             p += CACHEALIGN_BITS) /* sizeof(p) * CACHEALIGN_BITS */
+             p < (&CACHE_STATUS_BASE_CPU) + CACHE_SIZE/sizeof(*p);
+             p += CACHEALIGN_SIZE/sizeof(*p))
             *p = CACHE_LINE_VALID | CACHE_ADDRESS_MASK;
     }
     else
     {
         for (p = &CACHE_STATUS_BASE_COP;
-             p < (&CACHE_STATUS_BASE_COP) + CACHE_SIZE;
-             p += CACHEALIGN_BITS)
+             p < (&CACHE_STATUS_BASE_COP) + CACHE_SIZE/sizeof(*p);
+             p += CACHEALIGN_SIZE/sizeof(*p))
             *p = CACHE_LINE_VALID | CACHE_ADDRESS_MASK;
     }
 }
