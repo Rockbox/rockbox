@@ -39,8 +39,14 @@
 #define BUTTON_LEFT      BUTTON_PREV
 #define BUTTON_RIGHT     BUTTON_NEXT
 
+#define BUTTON_TOUCHPAD (BUTTON_UP|BUTTON_DOWN|BUTTON_PREV|BUTTON_NEXT|\
+                         BUTTON_HOME|BUTTON_OPTION)
+
 /* Software power-off */
 #define POWEROFF_BUTTON BUTTON_POWER
 #define POWEROFF_COUNT  25
+
+void touchpad_enable_device(bool en);
+
 
 #endif /* _BUTTON_TARGET_H_ */

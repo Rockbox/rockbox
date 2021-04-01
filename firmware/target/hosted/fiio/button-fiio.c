@@ -46,6 +46,8 @@ static int key_up_delay = 0;
 static int key_down_delay = 0;
 static int key_f12_delay = 0;
 
+static int tp_enabled = 1;
+
 #define NR_POLL_DESC	2
 static struct pollfd poll_fds[NR_POLL_DESC];
 
@@ -236,6 +238,11 @@ void button_init_device(void)
     }
 }
 
+void touchpad_enable_device(bool en)
+{
+    tp_enabled = en;
+}
+
 int button_read_device(void)
 {
     static int button_bitmap = 0;
@@ -247,6 +254,9 @@ int button_read_device(void)
     {
         for(int i = 0; i < NR_POLL_DESC; i++)
         {
+            if (i == 1 && !tp_enabled) /* Ignore touchpad ? */
+               continue;
+
             /* read only if non-blocking */
             if(poll_fds[i].revents & POLLIN)
             {

@@ -51,6 +51,9 @@
 #define HAVE_BUTTON_LIGHT
 #define HAVE_BUTTONLIGHT_BRIGHTNESS
 
+/* We have a touchpad */
+#define HAVE_TOUCHPAD
+
 /* Main LCD backlight brightness range and defaults: the backlight driver
  * has levels from 0 to 32. But 0 is off so start at 1.
  */
