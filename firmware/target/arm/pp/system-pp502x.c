@@ -233,7 +233,7 @@ void ICODE_ATTR commit_dcache(void)
     }
 }
 
-static void ICODE_ATTR cache_invalidate_special(void)
+static void ICODE_ATTR cache_invalidate_special(unsigned int core)
 {
     /* Cache lines which are not marked as valid can cause memory
      * corruption when there are many writes to and code fetches from
@@ -250,7 +250,7 @@ static void ICODE_ATTR cache_invalidate_special(void)
         bit 24-31	unused?
      */
     register volatile unsigned long *p;
-    if (IF_COP_CORE(CPU) == CPU)
+    if (core == CPU)
     {
         for (p = &CACHE_STATUS_BASE_CPU;
              p < (&CACHE_STATUS_BASE_CPU) + CACHE_SIZE;
@@ -273,7 +273,7 @@ void ICODE_ATTR commit_discard_idcache(void)
         register int istat = disable_interrupt_save(IRQ_FIQ_STATUS);
 
         commit_dcache();
-        cache_invalidate_special();
+        cache_invalidate_special(IF_COP_CORE(CPU));
 
         restore_interrupt(istat);
     }
@@ -315,6 +315,11 @@ static void init_cache(void)
     register volatile char *p = (volatile char *)CACHED_INIT_ADDR;
     for (;p < (volatile char *)CACHED_INIT_ADDR + CACHE_SIZE; p += CACHEALIGN_SIZE)
         (void)*p;
+
+    /* initialize the cache for the other core */
+    IF_COP( unsigned int othercore = 1 - CURRENT_CORE;)
+    IF_COP( cache_invalidate_special(othercore); nop; )
+
 }
 #endif /* BOOTLOADER || HAVE_BOOTLOADER_USB_MODE */
 
