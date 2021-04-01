@@ -59,7 +59,7 @@ unsigned char probed_ramsize;
 
 void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
-    if(IF_COP_CORE(CPU) == CPU)
+    if(CURRENT_CORE == CPU)
     {
         if (CPU_INT_STAT & TIMER1_MASK) {
             TIMER1();
@@ -273,7 +273,7 @@ void ICODE_ATTR commit_discard_idcache(void)
         register int istat = disable_interrupt_save(IRQ_FIQ_STATUS);
 
         commit_dcache();
-        cache_invalidate_special(IF_COP_CORE(CPU));
+        cache_invalidate_special(CURRENT_CORE);
 
         restore_interrupt(istat);
     }
@@ -292,7 +292,7 @@ static void init_cache(void)
 
 #ifndef BOOTLOADER
     /* what's this do? */
-    CACHE_PRIORITY |= IF_COP_CORE(CPU) == CPU ? 0x10 : 0x20;
+    CACHE_PRIORITY |= CURRENT_CORE == CPU ? 0x10 : 0x20;
 #endif
 
     /* Cache if (addr & mask) >> 16 == (mask & match) >> 16:
@@ -329,7 +329,7 @@ static void init_cache(void)
 void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
 {
-    unsigned int core = IF_COP_CORE(CPU);
+    unsigned int core = CURRENT_CORE;
     IF_COP( unsigned int othercore = 1 - core; )
     static int oldstatus IBSS_ATTR;
 
@@ -478,7 +478,7 @@ static void pp_set_cpu_frequency(long frequency)
 #ifndef BOOTLOADER
 void system_init(void)
 {
-    if (IF_COP_CORE(CPU) == CPU)
+    if (CURRENT_CORE == CPU)
     {
 #if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_COLOR)
         /* set minimum startup configuration */
@@ -664,7 +664,7 @@ void system_exception_wait(void)
     COP_INT_DIS = -1;
 
     /* Halt */
-    PROC_CTL(IF_COP_CORE(CPU)) = 0x40000000;
+    PROC_CTL(CURRENT_CORE) = 0x40000000;
     while (1);
 }
 
