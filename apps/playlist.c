@@ -3436,11 +3436,7 @@ int playlist_sort(struct playlist_info* playlist, bool start_current)
 bool playlist_modified(const struct playlist_info* playlist)
 {
     if (!playlist)
-    {
         playlist = &current_playlist;
-        if (global_status.resume_index != -1 && !playlist->control_created && playlist_resume() == -1)
-            return false;
-    }
 
     if (playlist->shuffle_modified ||
         playlist->deleted ||
