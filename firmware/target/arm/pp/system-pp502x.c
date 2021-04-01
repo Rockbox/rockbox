@@ -59,7 +59,7 @@ unsigned char probed_ramsize;
 
 void __attribute__((interrupt("IRQ"))) irq_handler(void)
 {
-    if(IF_COP_CORE(CPU) == CPU)
+    if(CURRENT_CORE == CPU)
     {
         if (CPU_INT_STAT & TIMER1_MASK) {
             TIMER1();
@@ -250,7 +250,7 @@ static void ICODE_ATTR cache_invalidate_special(void)
         bit 24-31	unused?
      */
     register volatile unsigned long *p;
-    if (IF_COP_CORE(CPU) == CPU)
+    if (CURRENT_CORE == CPU)
     {
         for (p = &CACHE_STATUS_BASE_CPU;
              p < (&CACHE_STATUS_BASE_CPU) + CACHE_SIZE;
@@ -292,7 +292,7 @@ static void init_cache(void)
 
 #ifndef BOOTLOADER
     /* what's this do? */
-    CACHE_PRIORITY |= IF_COP_CORE(CPU) == CPU ? 0x10 : 0x20;
+    CACHE_PRIORITY |= (CURRENT_CORE == CPU) ? 0x10 : 0x20;
 #endif
 
     /* Cache if (addr & mask) >> 16 == (mask & match) >> 16:
@@ -324,7 +324,7 @@ static void init_cache(void)
 void scale_suspend_core(bool suspend) ICODE_ATTR;
 void scale_suspend_core(bool suspend)
 {
-    unsigned int core = IF_COP_CORE(CPU);
+    unsigned int core = CURRENT_CORE;
     IF_COP( unsigned int othercore = 1 - core; )
     static int oldstatus IBSS_ATTR;
 
@@ -366,9 +366,9 @@ static void pp_set_cpu_frequency(long frequency)
       /* Note1: The PP5022 PLL must be run at >= 96MHz
        * Bits 20..21 select the post divider (1/2/4/8).
        * PP5026 is similar to PP5022 except it doesn't
-       * have this limitation (and the post divider?) 
+       * have this limitation (and the post divider?)
        * Note2: CLOCK_SOURCE is set via 0=32kHz, 1=16MHz,
-       * 2=24MHz, 3=33MHz, 4=48MHz, 5=SLOW, 6=FAST, 7=PLL. 
+       * 2=24MHz, 3=33MHz, 4=48MHz, 5=SLOW, 6=FAST, 7=PLL.
        * SLOW = 24MHz / (DIV_SLOW + 1), DIV = Bits 16-19
        * FAST = PLL   / (DIV_FAST + 1), DIV = Bits 20-23 */
       case CPUFREQ_SLEEP:
@@ -473,7 +473,7 @@ static void pp_set_cpu_frequency(long frequency)
 #ifndef BOOTLOADER
 void system_init(void)
 {
-    if (IF_COP_CORE(CPU) == CPU)
+    if (CURRENT_CORE == CPU)
     {
 #if defined (IRIVER_H10) || defined(IRIVER_H10_5GB) || defined(IPOD_COLOR)
         /* set minimum startup configuration */
@@ -659,7 +659,7 @@ void system_exception_wait(void)
     COP_INT_DIS = -1;
 
     /* Halt */
-    PROC_CTL(IF_COP_CORE(CPU)) = 0x40000000;
+    PROC_CTL(CURRENT_CORE) = 0x40000000;
     while (1);
 }
 
