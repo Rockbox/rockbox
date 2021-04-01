@@ -92,11 +92,12 @@
 /* TODO: implement HAVE_RTC_ALARM */
 
 /* Power management */
-#ifndef SIMULATOR
-#define HAVE_AXP173
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 #define CONFIG_CHARGING        CHARGING_MONITOR
 #define HAVE_SW_POWEROFF
+
+#ifndef SIMULATOR
+#define HAVE_AXP173
 #define HAVE_POWEROFF_WHILE_CHARGING
 #endif
 
