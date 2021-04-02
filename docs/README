@@ -22,14 +22,13 @@ Build Your Own Rockbox
    $ mkdir build
    $ cd build
 
-3. Make sure you have sh/arm/m68k-elf-gcc and siblings in the PATH. Make sure
+3. Make sure you have mips/m68k/arm-elf-gcc and siblings in the PATH. Make sure
    that you have 'perl' in your PATH too. Your gcc cross compiler needs to be
    a particular version depending on what player you are compiling for. These
-   can be acquired with the rockboxdev.sh script in the /tools/ folder of the
-   source, or will have been included if you've installed one of the
-   toolchains or development environments provided at http://www.rockbox.org/
+   can be generated using the rockboxdev.sh script in the /tools/ folder of the
+   source.
 
-   $ which sh-elf-gcc
+   $ which arm-elf-eabi-gcc
    $ which perl
 
 4. In your build directory, run the 'tools/configure' script and enter what
@@ -54,12 +53,12 @@ Build Your Own Rockbox
 If you want to build for more than one target, just create several build
 directories and create a setup for each target:
 
-   $ mkdir build-fmrecorder
-   $ cd build-fmrecorder
+   $ mkdir build-fuzeplus
+   $ cd build-fuzeplus
    $ ../tools/configure
 
-   $ mkdir build-player
-   $ cd build-player
+   $ mkdir build-xduoox3
+   $ cd build-xduoox3
    $ ../tools/configure
 
-Questions anyone? Ask on the mailing list. We'll be happy to help you!
+Questions anyone? Ask on the mailing list or on IRC. We'll be happy to help you!
