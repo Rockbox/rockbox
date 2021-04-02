@@ -69,6 +69,11 @@ static action_last_t action_last =
     .tick             = 0,
     .wait_for_release = false,
 
+#ifndef DISABLE_BUTTON_REMAP
+    .check_remap       = false,
+    .core_button_map = NULL,
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     .ts_data        = 0,
     .ts_short_press = false,
@@ -498,6 +503,13 @@ static inline int action_code_worker(action_last_t *last,
     unsigned int found = 0;
     while (cur->items[i].button_code != BUTTON_NONE)
     {
+#ifndef DISABLE_BUTTON_REMAP
+        if (last->check_remap && CORE_CONTEXT(cur->items[i].action_code) != cur->context)
+        {
+            /* core button remap */
+            /* NOT the right context fall through and try next entry */
+        } else
+#endif 
         if (cur->items[i].button_code == cur->button)
         {
             /********************************************************
@@ -583,7 +595,7 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
     int  action  = ACTION_NONE;
     int  context = cur->context;
     int  i = 0;
-
+    last->check_remap = last->core_button_map != NULL;
     cur->is_prebutton = false;
 
     for(;;)
@@ -598,13 +610,29 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 
         if ((context & CONTEXT_PLUGIN) && cur->get_context_map)
             cur->items = cur->get_context_map(context);
+        else if(last->check_remap) /*attempt to look up the button in user supplied remap */
+        {
+            cur->items = last->core_button_map;
+            action = action_code_worker(last, cur, &i);
+            if (action != ACTION_UNKNOWN)
+                break;
+            else if (cur->is_prebutton == true)
+                continue; /* wait for completed action */
+            else
+            {
+                /* Not found -- fall through to inbuilt keymaps */
+                i = 0;
+                last->check_remap = false;
+                cur->items = get_context_mapping(context);
+            }
+        }
         else
             cur->items = get_context_mapping(context);
 
         if (cur->items != NULL)
         {
             action = action_code_worker(last, cur, &i);
-
+            
             if (action == ACTION_UNKNOWN)
             {
                 context = get_next_context(cur->items, i);
@@ -1099,6 +1127,14 @@ int get_action(int context, int timeout)
     action = do_backlight(&action_last, &current, action);
 
     return action;
+}
+
+void set_button_map(struct button_mapping* core_button_map, int count)
+{
+    if ((unsigned int) core_button_map[0].action_code == CONTEXT_STOPSEARCHING &&
+        core_button_map[0].button_code == BUTTON_NONE &&
+        core_button_map[count - 1].button_code == BUTTON_NONE) /* Check for sentinel */
+            action_last.core_button_map = core_button_map;
 }
 
 int get_custom_action(int context,int timeout,
