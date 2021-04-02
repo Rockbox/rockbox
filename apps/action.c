@@ -69,6 +69,10 @@ static action_last_t action_last =
     .tick             = 0,
     .wait_for_release = false,
 
+#ifndef DISABLE_BUTTON_REMAP
+    .core_button_map = NULL,
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     .ts_data        = 0,
     .ts_short_press = false,
@@ -482,6 +486,78 @@ static inline void button_flip_horizontally(int context, int *button)
 } /* button_flip_horizontally */
 
 /**********************************************************************
+* action_code_worker_remap is the worker function for action_code_lookup.
+* returns ACTION_UNKNOWN or the requested return value from the list.
+* BE AWARE IF YOUR DESIRED ACTION IS IN A LOWER 'CHAINED' CONTEXT::
+* *** is_prebutton can miss pre_buttons
+* ** An action without pre_button_code (pre_button_code = BUTTON_NONE)
+* *  will be returned from the higher context
+*/
+static inline int action_code_worker_remap(action_last_t *last,
+                                     action_cur_t  *cur,
+                                              int  *end  )
+{
+    int ret = ACTION_UNKNOWN;
+    int i = 0;
+    unsigned int found = 0;
+    while (cur->items[i].button_code != BUTTON_NONE)
+    {
+        if (CORE_CONTEXT(cur->items[i].action_code) != cur->context)
+        {
+            /* NOT the right context fall through and try next entry */
+        }
+        else if (cur->items[i].button_code == cur->button)
+        {
+            /********************************************************
+            * { Action Code,   Button code,    Prereq button code }
+            * CAVEAT: This will allways return the action without
+            * pre_button_code (pre_button_code = BUTTON_NONE)
+            * if it is found before 'falling through'
+            * to a lower 'chained' context.
+            *
+            * Example: button = UP|REL, last_button = UP;
+            *  while looking in CONTEXT_WPS there is an action defined
+            *  {ACTION_FOO, BUTTON_UP|BUTTON_REL, BUTTON_NONE}
+            *  then ACTION_FOO in CONTEXT_WPS will be returned
+            *  EVEN THOUGH you are expecting a fully matched
+            *  ACTION_BAR from CONTEXT_STD
+            *  {ACTION_BAR, BUTTON_UP|BUTTON_REL, BUTTON_UP}
+            */
+            if (cur->items[i].pre_button_code == last->button)
+            {   /* Always allow an exact match */
+                found++;
+                *end = i;
+            }
+            else if (!found && cur->items[i].pre_button_code == BUTTON_NONE)
+            {   /* Only allow Loose match if exact match wasn't found */
+                found++;
+                *end = i;
+            }
+        }
+        else if (has_flag(cur->items[i].pre_button_code, cur->button))
+        { /* This could be another action depending on next button press */
+            cur->is_prebutton = true;
+            if (found > 1) /* There is already an exact match */
+            {
+                break;
+            }
+        }
+        i++;
+    }
+
+    if (!found)
+    {
+        *end = i;
+    }
+    else
+    {
+        ret = cur->items[*end].action_code;
+    }
+
+    return ret;
+}
+
+/**********************************************************************
 * action_code_worker is the worker function for action_code_lookup.
 * returns ACTION_UNKNOWN or the requested return value from the list.
 * BE AWARE IF YOUR DESIRED ACTION IS IN A LOWER 'CHAINED' CONTEXT::
@@ -583,7 +659,7 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
     int  action  = ACTION_NONE;
     int  context = cur->context;
     int  i = 0;
-
+    bool has_remap = last->core_button_map != NULL;
     cur->is_prebutton = false;
 
     for(;;)
@@ -598,13 +674,29 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 
         if ((context & CONTEXT_PLUGIN) && cur->get_context_map)
             cur->items = cur->get_context_map(context);
+        else if(has_remap) /*attempt to look up the button in user supplied remap */
+        {
+            cur->items = last->core_button_map;
+            action = action_code_worker_remap(last, cur, &i);
+            if (action != ACTION_UNKNOWN)
+                break;
+            else if (cur->is_prebutton == true)
+                continue; /* wait for completed action */
+            else
+            {
+                /* Not here fall through to inbuilt keymaps */
+                i = 0;
+                has_remap = false;
+                cur->items = get_context_mapping(context);
+            }
+        }
         else
             cur->items = get_context_mapping(context);
 
         if (cur->items != NULL)
         {
             action = action_code_worker(last, cur, &i);
-
+            
             if (action == ACTION_UNKNOWN)
             {
                 context = get_next_context(cur->items, i);
@@ -1100,6 +1192,12 @@ int get_action(int context, int timeout)
 
     return action;
 }
+
+void set_button_map(struct button_mapping* core_button_map)
+{
+    action_last.core_button_map = core_button_map;
+}
+
 
 int get_custom_action(int context,int timeout,
                       const struct button_mapping* (*get_context_map)(int))
