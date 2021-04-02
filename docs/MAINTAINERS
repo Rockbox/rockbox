@@ -25,9 +25,11 @@ NOTE: Port maintainers are simply developers who use a particular
 target on a daily basis and are therefore able to report issues
 specific to that target.
 
+:AGPTek Rocker:Solomon Peachy
 :Creative Zen Vision:
 :Creative Zen Vision:M: Maurus Cuelenaere
 :Creative Zen Vision:M 60GB:
+:Eros Q / K:Solomon Peachy
 :Iriver H100/H115: Linus Nielsen Feltzing
 :Iriver H120/H140: Miika Pekkarinen, Linus Nielsen Feltzing
 :Iriver H320/H340: Peter D'Hoye
@@ -52,7 +54,9 @@ specific to that target.
 :Sansa C200:
 :Toshiba Gigabeat F: Michael Sevakis
 :Toshiba Gigabeat X:
-
+:xDuoo X3:Solomon Peachy
+:xDuoo X3ii:Solomon Peachy
+:xDuoo X20:Solomon Peachy
 
 Core code (low-level)
 ---------------------
@@ -280,8 +284,8 @@ Bootloaders
 Build Tools
 -----------
 
-:configure script and build system: Daniel Stenberg
-:genlang: Daniel Stenberg
+:configure script and build system: Solomon Peachy
+:genlang: Solomon Peachy
 :bdf2bmp:
 :bmp2rb: Daniel Stenberg
 :checkwps: Nicolas Pennequin
@@ -296,7 +300,7 @@ Build Tools
 :scramble: Linus Nielsen Feltzing
 :descramble: Linus Nielsen Feltzing
 :mkinfo: Daniel Stenberg
-:voice perl script: Jonas Häggqvist
+:voice perl script: Solomon Peachy
 
 Install Tools
 -------------
@@ -322,4 +326,4 @@ Utilities
 Web site stuff
 --------------
 
-:web site scripts and server-side admin:Daniel Stenberg,Björn Stenberg,Linus Nielsen Feltzing
+:web site scripts and server-side admin:Solomon Peachy
