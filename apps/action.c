@@ -69,6 +69,10 @@ static action_last_t action_last =
     .tick             = 0,
     .wait_for_release = false,
 
+#ifndef DISABLE_BUTTON_REMAP
+    .core_button_map = NULL;
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     .ts_data        = 0,
     .ts_short_press = false,
@@ -1085,7 +1089,7 @@ void action_wait_for_release(void)
 int get_action(int context, int timeout)
 {
     action_cur_t current;
-    init_act_cur(&current, context, timeout, NULL);
+    init_act_cur(&current, context, timeout, action_last.core_button_map);
 
     int action = get_action_worker(&action_last, &current);
 
@@ -1100,6 +1104,12 @@ int get_action(int context, int timeout)
 
     return action;
 }
+
+void set_button_map(const struct button_mapping* core_button_map)
+{
+    action_last.core_button_map = core_button_map;
+}
+
 
 int get_custom_action(int context,int timeout,
                       const struct button_mapping* (*get_context_map)(int))
