@@ -68,11 +68,11 @@ int key_to_button(int keyboard_button)
             break;
         case SDLK_BACKSPACE:
             new_btn = BUTTON_BACK;
-
+            break;
         case SDLK_KP_ENTER:
         case SDLK_RETURN:
             new_btn = BUTTON_SELECT;
-	    break;
+            break;
         case SDLK_SPACE:
         case SDLK_KP5:
             new_btn = BUTTON_PLAY;
