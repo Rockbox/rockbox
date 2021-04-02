@@ -30,7 +30,7 @@
 
 static struct semaphore headphone_wakeup;
 static unsigned int headphone_thread_id;
-static unsigned int headphone_stack[176/sizeof(int)]; /* Little stack needed */
+static unsigned int headphone_stack[200/sizeof(int)]; /* Little stack needed; 184 bytes as of this writing. */
 static const char * const headphone_thread_name = "headphone";
 static bool headphones_detect = false;
 
