@@ -69,6 +69,11 @@ static action_last_t action_last =
     .tick             = 0,
     .wait_for_release = false,
 
+#ifndef DISABLE_ACTION_REMAP
+    .check_remap     = false,
+    .core_keymap = NULL,
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     .ts_data        = 0,
     .ts_short_press = false,
@@ -494,7 +499,7 @@ static inline int action_code_worker(action_last_t *last,
                                               int  *end  )
 {
     int ret = ACTION_UNKNOWN;
-    int i = 0;
+    int i = *end;
     unsigned int found = 0;
     while (cur->items[i].button_code != BUTTON_NONE)
     {
@@ -583,7 +588,9 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
     int  action  = ACTION_NONE;
     int  context = cur->context;
     int  i = 0;
-
+#ifndef DISABLE_ACTION_REMAP
+    last->check_remap = (last->core_keymap != NULL);
+#endif
     cur->is_prebutton = false;
 
     for(;;)
@@ -597,9 +604,42 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 #endif
 
         if ((context & CONTEXT_PLUGIN) && cur->get_context_map)
+        {
             cur->items = cur->get_context_map(context);
+        }
+#ifndef DISABLE_ACTION_REMAP
+        else if(last->check_remap) /*attempt to look up the button in user supplied remap */
+        {
+            cur->items = last->core_keymap;
+            i = 0;
+            action = ACTION_UNKNOWN;
+            /* check the lut at the beginning for the desired context */
+            while (cur->items[i].action_code != (int) CONTEXT_STOPSEARCHING)
+            {
+                if (cur->items[i].action_code == CORE_CONTEXT_REMAP(context))
+                {
+                    i = cur->items[i].button_code;
+                    action = action_code_worker(last, cur, &i);
+                    break;
+                }
+                i++;
+            }
+
+            if (action != ACTION_UNKNOWN)
+                break;
+            else
+            {
+                /* Not found -- fall through to inbuilt keymaps */
+                i = 0;
+                last->check_remap = false;
+                cur->items = get_context_mapping(context);
+            }
+        }
+#endif
         else
+        {
             cur->items = get_context_mapping(context);
+        }
 
         if (cur->items != NULL)
         {
@@ -1106,6 +1146,59 @@ int get_action(int context, int timeout)
     action = do_backlight(&action_last, &current, action);
 
     return action;
+}
+
+int action_set_keymap(struct button_mapping* core_keymap, int count)
+{
+
+#ifdef DISABLE_ACTION_REMAP
+    count = -1;
+#else
+    if (count > 0) /* saf-tey checks :) */
+    {
+        int i = 0;
+        if (core_keymap[count - 1].action_code != (int) CONTEXT_STOPSEARCHING ||
+        core_keymap[count - 1].button_code != BUTTON_NONE) /* check for sentinel at end*/
+            count = -1;
+#if 1
+        /* check the lut at the beginning for invalid offsets */
+        while (count > 0 && core_keymap[i].action_code != (int) CONTEXT_STOPSEARCHING)
+        {
+            if ((core_keymap[i].action_code & CONTEXT_REMAPPED) == CONTEXT_REMAPPED)
+            {
+                if (core_keymap[i].button_code > count ||
+                    core_keymap[i].button_code < i)
+                {
+                    /* offset out of bounds */
+                    count = -2;
+                    break;
+                }
+            }
+            else /* something other than a context remap in the lut */
+            {
+                count = -3;
+                break;
+            }
+
+            i++;
+
+            if (i >= count) /* no sentinel in the lut */
+            {
+                count = -4;
+                break;
+            }
+        }
+#endif
+        if (count <= 0)
+            core_keymap = NULL;
+    }
+    else
+#endif
+    {
+        core_keymap = NULL;
+    }
+    action_last.core_keymap = core_keymap;
+    return count;
 }
 
 int get_custom_action(int context,int timeout,
