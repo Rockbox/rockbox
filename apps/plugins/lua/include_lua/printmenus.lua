@@ -239,7 +239,7 @@ function print_menu(menu_t, func_t, selected, settings, copy_screen)
         if copy_screen == true then _LCD:copy(screen_img) end
 
         if func_t and func_t[i] then
-            if func_t[i](i, menu_t) == true then break end
+            if func_t[i](i, menu_t, func_t) == true then break end
         else
             break
         end
