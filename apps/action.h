@@ -51,7 +51,7 @@
 #define SEL_ACTION_SKIP       0x008U
 #define SEL_ACTION_NOUNMAPPED 0x010U/* disable backlight on unmapped buttons */
 #define SEL_ACTION_ALLNONOTIFY  0x020U/* disable switch for all softlock notifications */
-                                    /* Available 0x040U*/
+#define SEL_ACTION_ALWAYSAUTOLOCK 0x040U/* always prime autolock, requires autolock enabled */
 #define SEL_ACTION_NOTOUCH    0x080U/* disable touch screen/pad on screen lock */
 #define SEL_ACTION_AUTOLOCK   0x100U/* autolock on backlight off */
 #define SEL_ACTION_NOEXT      0x200U/* disable selective backlight while charge*/

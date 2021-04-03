@@ -262,16 +262,16 @@ therefore result in better runtime.
         \item[Settings.]
         Allows to select actions that will \emph{not} be blocked by the key lock.
                 \begin{itemize}
-                \item[Volume.]
+                \item[Exempt Volume]
                 Volume up/down.
-                \item[Play.]
+                \item[Exempt Play]
                 Toggling Play/Pause.
-                \item[Seek.]
+                \item[Exempt Seek]
                 Seeking in a track.
-                \item[Skip.]
+                \item[Exempt Skip]
                 Skipping of a track.
                 \opt{HAVE_BACKLIGHT}{
-                \item[Autolock On.]
+                \item[Autolock On]
                 When the backlight turns off, softlock will lock the screen,
                 activates when you press the lock key and if you manually lock
                 again, while active it then disables autolock.
@@ -284,16 +284,29 @@ therefore result in better runtime.
                         \item
                         (Lock Button Pressed \#3) >(device unlocked).
                 \end{itemize}
+                \item[Always Autolock]
+                Force Autolock to always be active rather than cycling through the
+                list above. The device can be locked and unlocked manually, but
+                the lock will always engage when the backlight turns off. Requires
+                Autolock On to be enabled.
+                \note{The lock button must be pressed at least once after enabling
+                this setting and at least once every time the device is powered up.}
                 } %\opt{HAVE_BACKLIGHT}
                 \opt{touchpad}{
                 \item[Disable Touch.]
                  Blocks touch screen buttons like the original.
                 }
-                \item[Disable Notify.]
+                \item[Disable Locked Reminders]
                 Suppresses the notification 'Buttons Locked'
                     (still will if power button is pressed).
                 \note{This is a pre-requisite for \setting{selectivebacklight}
                 \reference{ref:selectivebacklight} to work also during key lock.}
+                \item[Disable All Lock Notifications]
+                Disable all softlock notifications, including when power button
+                is pressed.
+                \note{When this is enabled, Disable Locked Reminders is still required to 
+                be enabled for \setting{selectivebacklight} \reference{ref:selectivebacklight}
+                to work during key lock.}
 
                 \end{itemize}
         Selected actions are indicated by a leading +.
