@@ -53,6 +53,8 @@ if ($def_type eq "rb_defines") {
         '^PLUGIN_DIR$',
         '^PLUGIN(_APPS_|_GAMES_|_)DATA_DIR$',
         '^ROCKBOX_DIR$',
+        '^CORE_KEYMAP_FILE$',
+        'CONTEXT_(STOPSEARCHING|REMOTE|CUSTOM|CUSTOM2|PLUGIN|REMAPPED)$', 
         '^VIEWERS_DATA_DIR$');
 }
 elsif ($def_type eq "sound_defines") {
