@@ -675,24 +675,31 @@ static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
     }
     else if (action == ACTION_STD_KEYLOCK)
     {
-        last->unlock_combo = cur->button;/* set unlock combo to allow unlock */
-        last->softlock_mask ^= SEL_ACTION_ALOCK_OK;
-        action_handle_backlight(true, false);
-            /* If we don't wait for a moment for the backlight queue
-             *  to process, the user will never see the message */
-        if (!is_backlight_on(false))
+        if (!has_flag(last->softlock_mask, SEL_ACTION_ALWAYSAUTOLOCK)) // normal operation, clear/arm autolock
         {
-            sleep(HZ/2);
-        }
+            last->unlock_combo = cur->button;/* set unlock combo to allow unlock */
+            last->softlock_mask ^= SEL_ACTION_ALOCK_OK;
+            action_handle_backlight(true, false);
+                /* If we don't wait for a moment for the backlight queue
+                 *  to process, the user will never see the message */
+            if (!is_backlight_on(false))
+            {
+                sleep(HZ/2);
+            }
 
-        if (has_flag(last->softlock_mask, SEL_ACTION_ALOCK_OK))
+            if (has_flag(last->softlock_mask, SEL_ACTION_ALOCK_OK))
+            {
+                splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_ON));
+                action = ACTION_REDRAW;
+            }
+            else
+            {
+                splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_OFF));
+            }
+        } else if (!has_flag(last->softlock_mask, SEL_ACTION_ALOCK_OK)) // always autolock, but not currently armed
         {
-            splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_ON));
-            action = ACTION_REDRAW;
-        }
-        else
-        {
-            splash(HZ/2, ID2P(LANG_ACTION_AUTOLOCK_OFF));
+            last->unlock_combo = cur->button;/* set unlock combo to allow unlock */
+            last->softlock_mask ^= SEL_ACTION_ALOCK_OK;
         }
     }
 
