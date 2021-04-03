@@ -37,6 +37,7 @@
 #include "menu.h"
 #include "usb.h"
 #include "powermgmt.h"
+#include "core_keymap.h"
 #if !defined(DX50) && !defined(DX90)
 #include "adc.h"
 #endif
@@ -174,6 +175,15 @@ int main(void)
 #ifdef HAVE_USBSTACK
     /* All threads should be created and public queues registered by now */
     usb_start_monitoring();
+#endif
+
+#ifndef DISABLE_BUTTON_REMAP
+    if (file_exists(CORE_KEYMAP_FILE))
+    {
+        int mapct = core_load_key_remap(CORE_KEYMAP_FILE);
+        if (mapct <= 0)
+            splashf(HZ, "key remap failed: %d,  %s", mapct, CORE_KEYMAP_FILE);
+    }
 #endif
 
 #ifdef AUTOROCK
