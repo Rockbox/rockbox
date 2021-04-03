@@ -27,7 +27,7 @@
 */
 #ifndef _ACTION_HELPER_H_
 #define _ACTION_HELPER_H_
-
+extern const size_t action_helper_maxbuffer;
 char* action_name(int action);
 char* context_name(int context);
 

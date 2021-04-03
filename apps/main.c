@@ -31,6 +31,7 @@
 #include "led.h"
 #include "../kernel-internal.h"
 #include "button.h"
+#include "core_keymap.h"
 #include "tree.h"
 #include "filetypes.h"
 #include "panic.h"
@@ -173,6 +174,15 @@ int main(void)
 #ifdef HAVE_USBSTACK
     /* All threads should be created and public queues registered by now */
     usb_start_monitoring();
+#endif
+
+#if !defined(DISABLE_ACTION_REMAP) && defined(CORE_KEYREMAP_FILE)
+    if (file_exists(CORE_KEYREMAP_FILE))
+    {
+        int mapct = core_load_key_remap(CORE_KEYREMAP_FILE);
+        if (mapct <= 0)
+            splashf(HZ, "key remap failed: %d,  %s", mapct, CORE_KEYREMAP_FILE);
+    }
 #endif
 
 #ifdef AUTOROCK

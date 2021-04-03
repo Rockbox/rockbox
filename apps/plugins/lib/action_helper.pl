@@ -140,10 +140,12 @@ printf "#define CONTEXTBUFSZ %d\n\n", $len_max_context;
 
 if ($len_max_action > $len_max_context)
 {
+    print "const size_t action_helper_maxbuffer = ACTIONBUFSZ;\n";
     print "static char name_buf[ACTIONBUFSZ];\n";
 }
 else
 {
+    print "const size_t action_helper_maxbuffer = CONTEXTBUFSZ;\n";
     print "static char name_buf[CONTEXTBUFSZ];\n";
 }
 print <<EOF

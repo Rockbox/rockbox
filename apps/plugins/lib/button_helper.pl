@@ -26,12 +26,15 @@ my @buttons = ();
 my $count = 1; #null sentinel
 my $val;
 my $def;
+my $len_max_button = 0;
 while(my $line = <STDIN>)
 {
     chomp($line);
     if($line =~ /^#define (BUTTON_[^\s]+) (.+)$/)
     {
         $def = "{\"$1\", $2},\n";
+        my $slen = length($1) + 1; # NULL terminator
+        if ($slen > $len_max_button) { $len_max_button = $slen; }
         $val = $2;
         if($val =~ /^0/)
         {
@@ -52,6 +55,8 @@ print <<EOF
 #include "plugin.h"
 #include "button.h"
 #include "button_helper.h"
+
+const size_t button_helper_maxbuffer = $len_max_button;
 
 static const struct available_button buttons[$count] = {
 EOF

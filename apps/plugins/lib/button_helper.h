@@ -32,7 +32,9 @@ struct available_button
  * generated at compile time you can still call it as such though
 * eg available_buttons[0] or  available_buttons[available_button_count] (NULL SENTINEL, 0)*/
 
+extern const size_t button_helper_maxbuffer;
 extern const struct available_button * const available_buttons;
 extern const int available_button_count;
+
 int get_button_names(char *buf, size_t bufsz, unsigned long button);
 #endif /* _BUTTON_HELPER_H_ */

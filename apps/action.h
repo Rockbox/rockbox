@@ -28,10 +28,13 @@
 #define TIMEOUT_NOBLOCK  0
 
 #define CONTEXT_STOPSEARCHING 0xFFFFFFFF
+
 #define CONTEXT_REMOTE  0x80000000 /* | this against another context to get remote buttons for that context */
 #define CONTEXT_CUSTOM  0x40000000 /* | this against anything to get your context number */
 #define CONTEXT_CUSTOM2 0x20000000 /* as above */
 #define CONTEXT_PLUGIN  0x10000000 /* for plugins using get_custom_action */
+#define CONTEXT_REMAPPED 0x08000000 /* marker for key remap context table */
+#define CORE_CONTEXT_REMAP(context) (CONTEXT_REMAPPED | context)
 #ifdef HAVE_LOCKED_ACTIONS
 #define CONTEXT_LOCKED  0x04000000 /* flag to use alternate keymap when screen is locked */
 #endif
@@ -415,6 +418,11 @@ typedef struct
     bool          repeated;
     bool          wait_for_release;
 
+#ifndef DISABLE_ACTION_REMAP
+    bool check_remap;
+    struct button_mapping* core_keymap;
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     bool     ts_short_press;
     int      ts_data;
@@ -440,6 +448,9 @@ bool action_userabort(int timeout);
 
 /* no other code should need this apart from action.c */
 const struct button_mapping* get_context_mapping(int context);
+
+/* load a key map to allow buttons for actions to be remapped see: core_keymap */
+int action_set_keymap(struct button_mapping* core_button_map, int count);
 
 /* returns the status code variable from action.c for the button just pressed
    If button != NULL it will be set to the actual button code */
