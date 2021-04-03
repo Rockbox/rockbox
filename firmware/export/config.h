@@ -646,6 +646,8 @@ Lyre prototype 1 */
 /* setup CPU-specific defines */
 
 #ifndef __PCTOOL__
+/* If exists remap file will be loaded at startup */
+#define CORE_KEYMAP_FILE ROCKBOX_DIR "/keyremap.kmf"
 
 /* define for all cpus from coldfire family */
 #if (ARCH == ARCH_M68K) && ((CONFIG_CPU == MCF5249) || (CONFIG_CPU == MCF5250))
