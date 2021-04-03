@@ -33,6 +33,11 @@
 #define CONTEXT_CUSTOM2 0x20000000 /* as above */
 #define CONTEXT_PLUGIN  0x10000000 /* for plugins using get_custom_action */
 
+/*we shift the context up a word so we can store action and context together in a single int */
+#define CORE_CONTEXT_ACTION(context, action) ((context << 16) | action)
+#define CORE_ACTION(core_action) (core_action & 0xFFFF)
+#define CORE_CONTEXT(core_action) (core_action >> 16)
+
 #define LAST_ITEM_IN_LIST { CONTEXT_STOPSEARCHING, BUTTON_NONE, BUTTON_NONE }
 #define LAST_ITEM_IN_LIST__NEXTLIST(a) { a, BUTTON_NONE, BUTTON_NONE }
 
@@ -405,6 +410,11 @@ typedef struct
     bool          repeated;
     bool          wait_for_release;
 
+#ifndef DISABLE_BUTTON_REMAP
+    bool check_remap;
+    struct button_mapping* core_button_map;
+#endif
+
 #ifdef HAVE_TOUCHSCREEN
     bool     ts_short_press;
     int      ts_data;
@@ -430,6 +440,12 @@ bool action_userabort(int timeout);
 
 /* no other code should need this apart from action.c */
 const struct button_mapping* get_context_mapping(int context);
+
+/* allow buttons for actions to be remapped
+ * 3 ints per entry [action, button, prebtn]
+ * last entry is the sentinel [CONTEXT_STOPSEARCHING, BUTTON_NONE, BUTTON_NONE]
+ */
+void action_set_keymap(struct button_mapping* core_button_map, int count);
 
 /* returns the status code variable from action.c for the button just pressed
    If button != NULL it will be set to the actual button code */
