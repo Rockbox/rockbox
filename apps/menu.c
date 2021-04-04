@@ -705,6 +705,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     continue;
 
             gui_synclist_draw(&lists);
+            send_event(GUI_EVENT_ACTIONUPDATE, (void*)1); /* force a redraw */
             gui_synclist_speak_item(&lists);
         }
     }
