@@ -735,18 +735,18 @@ static int dirbrowse(void)
                 break;
 #ifdef HAVE_QUICKSCREEN
             case ACTION_STD_QUICKSCREEN:
-                /* don't enter f2 from plugin browser */
-                if (*tc.dirfilter < NUM_FILTER_MODES)
+                if (global_settings.shortcuts_replaces_qs)
                 {
-                    if (global_settings.shortcuts_replaces_qs)
+                    if (*tc.dirfilter < NUM_FILTER_MODES)
                     {
                         global_status.last_screen = GO_TO_SHORTCUTMENU;
                         return quick_screen_quick(button);
                     }
-                    else if (quick_screen_quick(button))
-                        reload_dir = true;
-                    restore = true;
+                    break;
                 }
+                else if (quick_screen_quick(button))
+                    reload_dir = true;
+                restore = true;
                 break;
 #endif
 

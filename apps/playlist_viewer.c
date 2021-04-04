@@ -853,6 +853,24 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
             case ACTION_STD_MENU:
                 ret = PLAYLIST_VIEWER_MAINMENU;
                 goto exit;
+#ifdef HAVE_QUICKSCREEN
+            case ACTION_STD_QUICKSCREEN:
+                    if (!global_settings.shortcuts_replaces_qs)
+                    {
+                        quick_screen_quick(button);
+                        update_playlist(true);
+                        gui_synclist_set_voice_callback(&playlist_lists,
+                                                        global_settings.talk_file?
+                                                        &playlist_callback_voice:NULL);
+                        gui_synclist_set_icon_callback(&playlist_lists,
+                                      global_settings.playlist_viewer_icons?
+                                      &playlist_callback_icons:NULL);
+                        gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
+                        gui_synclist_draw(&playlist_lists);
+                        gui_synclist_speak_item(&playlist_lists);
+                        break;
+                    }
+#endif
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {
