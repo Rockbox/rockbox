@@ -135,8 +135,8 @@
 #define HAVE_HEADPHONE_DETECTION
 
 #define BATTERY_CAPACITY_DEFAULT 630 /* default battery capacity */
-#define BATTERY_CAPACITY_MIN     630 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX     630 /* max. capacity selectable */
+#define BATTERY_CAPACITY_MIN     600 /* min. capacity selectable */
+#define BATTERY_CAPACITY_MAX     700 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC       0 /* capacity increment */
 #define BATTERY_TYPES_COUNT        1 /* only one type */
 
