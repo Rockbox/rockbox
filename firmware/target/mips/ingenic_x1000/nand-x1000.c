@@ -40,11 +40,15 @@
 /* Defined by target */
 extern const nand_chip_desc target_nand_chip_descs[];
 
-/* Globals for the driver
- * TODO: get rid of pagebuffer in the SPL to save code size
- */
-static unsigned char pagebuffer[NAND_MAX_PAGE_SIZE] CACHEALIGN_ATTR;
-static unsigned char auxbuffer[NAND_AUX_BUFFER_SIZE] CACHEALIGN_ATTR;
+#ifdef BOOTLOADER_SPL
+# define NANDBUFFER_ATTR __attribute__((section(".sdram"))) CACHEALIGN_ATTR
+#else
+# define NANDBUFFER_ATTR CACHEALIGN_ATTR
+#endif
+
+/* Globals for the driver */
+static unsigned char pagebuffer[NAND_MAX_PAGE_SIZE] NANDBUFFER_ATTR;
+static unsigned char auxbuffer[NAND_AUX_BUFFER_SIZE] NANDBUFFER_ATTR;
 static nand_drv nand_driver;
 
 static void nand_drv_reset(nand_drv* d)
