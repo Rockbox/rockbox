@@ -72,7 +72,7 @@ void power_init(void)
     i2c_reg_modify1(AXP173_BUS, AXP173_ADDR, 0x80, 0, 0xc0, NULL);
 
     /* Short delay to give power outputs time to stabilize */
-    mdelay(5);
+    mdelay(500);
 }
 
 void adc_init(void)

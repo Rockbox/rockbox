@@ -26,6 +26,15 @@
 #include "loader_strerror.h"
 #include "checksum.h"
 
+#if defined(BOOTLOADER) && !defined(BOOTLOADER_SPL)
+#include "lcd.h"
+extern int GLB_LINE;
+#else
+# define lcd_update(...) do {} while(0)
+# define lcd_puts(...) do {} while(0)
+# define lcd_putsf(...) do {} while(0)
+#endif
+
 #if defined(HAVE_BOOTDATA)
 #include "bootdata.h"
 #include "crc32.h"
@@ -129,15 +138,24 @@ static int load_firmware_filename(unsigned char* buf,
                                   const char* filename,
                                   int buffer_size)
 {
+    lcd_putsf(0, GLB_LINE++, "Open: %s", filename);
+    lcd_update();
+
     int len;
     unsigned long chksum;
     int ret;
     int fd = open(filename, O_RDONLY);
 
-    if (fd < 0)
+    if (fd < 0) {
+        lcd_puts(0, GLB_LINE++, "Couldn't open file");
+        lcd_update();
         return EFILE_NOT_FOUND;
+    }
 
     len = filesize(fd) - 8;
+
+    lcd_putsf(0, GLB_LINE++, "file size = %d", len+8);
+    lcd_update();
 
     if (len > buffer_size)
     {
@@ -145,29 +163,50 @@ static int load_firmware_filename(unsigned char* buf,
         goto end;
     }
 
+    lcd_puts(0, GLB_LINE++, "try to read checksum");
+    lcd_update();
+
     lseek(fd, FIRMWARE_OFFSET_FILE_CRC, SEEK_SET);
 
     if (read(fd, &chksum, 4) < 4)
     {
+        lcd_putsf(0, GLB_LINE++, "checksum read failed!");
+        lcd_update();
+
         ret = EREAD_CHKSUM_FAILED;
         goto end;
     }
     chksum = betoh32(chksum); /* Rockbox checksums are big-endian */
 
+    lcd_putsf(0, GLB_LINE++, "Read: %d @ %08x", len, buf);
+    lcd_update();
+
     lseek(fd, FIRMWARE_OFFSET_FILE_DATA, SEEK_SET);
 
     if (read(fd, buf, len) < len)
     {
+        lcd_puts(0, GLB_LINE++, "Read failed!");
+        lcd_update();
+
         ret = EREAD_IMAGE_FAILED;
         goto end;
     }
 
+    lcd_puts(0, GLB_LINE++, "Verify checksum");
+    lcd_update();
+
     if (!verify_checksum(chksum, buf, len))
     {
+        lcd_puts(0, GLB_LINE++, "Checksum failed!");
+        lcd_update();
+
         ret = EBAD_CHKSUM;
         goto end;
     }
     ret = len;
+
+    lcd_puts(0, GLB_LINE++, "Success");
+    lcd_update();
 
 end:
     close(fd);
