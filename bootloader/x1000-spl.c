@@ -225,6 +225,10 @@ void main(void)
     /* init DDR memory */
     ddr_init();
 
+    /* zero 1M of memory */
+    for(int i = 0; i < 1024 * 1024 / 4; ++i)
+        ((volatile unsigned int*)0xa2000000)[i] = 0x00;
+
     /* jump to the target's main routine */
-    spl_main();
+    /* spl_main(); */
 }
