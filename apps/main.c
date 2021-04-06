@@ -390,6 +390,8 @@ static void init(void)
     core_allocator_init();
     kernel_init();
 
+    backlight_init();
+
     /* early early early! */
     filesystem_init();
 
@@ -455,7 +457,7 @@ static void init(void)
     m5636_init();
 #endif
 
-    backlight_init();
+    //backlight_init();
 
     button_init();
 
