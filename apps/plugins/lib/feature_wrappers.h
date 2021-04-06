@@ -30,7 +30,7 @@
  * but can easily be implement in pluginlib as long as the database is
  * available.
  */
-#if defined(HAVE_ALBUMART) && defined(HAVE_JPEG)
+#if defined(HAVE_ALBUMART) && (defined(HAVE_JPEG) || defined(HAVE_PNG))
 #define search_albumart_files rb->search_albumart_files
 #endif
 
@@ -52,5 +52,10 @@
 #else
 #endif
 
+#ifdef HAVE_PNG
+#define read_png_file rb->read_png_file
+#define read_png_fd rb->read_png_fd
+#else
 #endif
 
+#endif

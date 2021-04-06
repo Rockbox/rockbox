@@ -92,7 +92,12 @@ int plugin_open(char *plugin, char *parameter);
 #include "playlist.h"
 #include "screendump.h"
 #include "scrollbar.h"
+#ifdef HAVE_JPEG
 #include "jpeg_load.h"
+#endif
+#ifdef HAVE_PNG
+#include "png_load.h"
+#endif
 #include "../recorder/bmp.h"
 #include "statusbar.h"
 #include "menu.h"
@@ -155,7 +160,7 @@ int plugin_open(char *plugin, char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 244
+#define PLUGIN_API_VERSION 999  // PNG_TODO
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -890,6 +895,12 @@ struct plugin_api {
     int (*read_jpeg_file)(const char* filename, struct bitmap *bm, int maxsize,
                           int format, const struct custom_format *cformat);
     int (*read_jpeg_fd)(int fd, struct bitmap *bm, int maxsize,
+                        int format, const struct custom_format *cformat);
+#endif
+#ifdef HAVE_PNG
+    int (*read_png_file)(const char* filename, struct bitmap *bm, int maxsize,
+                          int format, const struct custom_format *cformat);
+    int (*read_png_fd)(int fd, struct bitmap *bm, int maxsize,
                         int format, const struct custom_format *cformat);
 #endif
     void (*screen_dump_set_hook)(void (*hook)(int fh));

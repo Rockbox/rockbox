@@ -385,7 +385,7 @@ static inline int rgbcmp(const struct uint8_rgb *rgb1, const struct uint8_rgb *r
 }
 
 #if LCD_DEPTH > 1
-#if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_BMP_SCALING)
+#if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_PNG) && !defined(HAVE_BMP_SCALING)
 static inline
 #endif
 void output_row_8_native(uint32_t row, void * row_in,
@@ -461,7 +461,7 @@ void output_row_8_native(uint32_t row, void * row_in,
                 fb_data *dest = STRIDE_MAIN((fb_data *)ctx->bm->data + fb_width * row,
                                             (fb_data *)ctx->bm->data + row);
                 int delta = 127;
-                unsigned r, g, b;                
+                unsigned r, g, b;
                 /* setup alpha channel buffer */
                 unsigned char *bm_alpha = NULL;
                 if (ctx->bm->alpha_offset > 0)
@@ -800,7 +800,7 @@ int read_bmp_fd(int fd,
         .dither = dither,
     };
 #endif
-#if defined(PLUGIN) || defined(HAVE_JPEG) || defined(HAVE_BMP_SCALING)
+#if defined(PLUGIN) || defined(HAVE_JPEG) || defined(HAVE_PNG) || defined(HAVE_BMP_SCALING)
 #if LCD_DEPTH > 1
     void (*output_row_8)(uint32_t, void*, struct scaler_context*) =
         output_row_8_native;
@@ -894,7 +894,7 @@ int read_bmp_fd(int fd,
     (LCD_REMOTE_DEPTH > 1) */
 #if LCD_DEPTH > 1 || defined(PLUGIN)
             {
-#if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_BMP_SCALING)
+#if !defined(PLUGIN) && !defined(HAVE_JPEG) && !defined(HAVE_PNG) && !defined(HAVE_BMP_SCALING)
                 output_row_8_native(row, buf, &ctx);
 #else
                 output_row_8(row, buf, &ctx);
