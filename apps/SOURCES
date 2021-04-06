@@ -124,13 +124,20 @@ hosted/android/keyboard.c
 recorder/keyboard.c
 #endif
 recorder/peakmeter.c
-#if defined(HAVE_ALBUMART) || defined(HAVE_JPEG)
+#if defined(HAVE_ALBUMART) || defined(HAVE_JPEG) || defined(HAVE_PNG)
 recorder/resize.c
 #endif
 #ifdef HAVE_JPEG
 recorder/jpeg_load.c
 #ifdef CPU_ARM
 recorder/jpeg_idct_arm.S
+#endif
+#ifdef HAVE_PNG
+recorder/png_load.c
+recorder/crc32.c
+recorder/tinfzlib.c
+recorder/tinflate.c
+recorder/png_decoder.c
 #endif
 #endif
 #ifdef HAVE_ALBUMART
