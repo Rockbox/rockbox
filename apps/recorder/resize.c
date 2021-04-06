@@ -589,7 +589,7 @@ static inline bool scale_v_linear(struct rowset *rset,
 }
 #endif /* HAVE_UPSCALER */
 
-#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(HAVE_PNG) || defined(PLUGIN))
 static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
                                struct scaler_context *ctx)
 {
@@ -608,7 +608,7 @@ static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
     fb_data *dest = (fb_data *)ctx->bm->data + Y_STEP * row;
     int delta = 127;
     unsigned r, g, b, y, u, v;
-    
+
     for (col = 0; col < ctx->bm->width; col++) {
         (void) delta;
         if (ctx->dither)
@@ -740,7 +740,8 @@ static void output_row_32_native(uint32_t row, void * row_in,
 }
 #endif
 
-#if defined(PLUGIN) && LCD_DEPTH > 1
+// PNG_TODO
+#if /*defined(PLUGIN) &&*/ LCD_DEPTH > 1
 unsigned int get_size_native(struct bitmap *bm)
 {
     return BM_SIZE(bm->width,bm->height,FORMAT_NATIVE,0);
@@ -748,7 +749,7 @@ unsigned int get_size_native(struct bitmap *bm)
 
 const struct custom_format format_native = {
     .output_row_8 = output_row_8_native,
-#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(PLUGIN))
+#if defined(HAVE_LCD_COLOR) && (defined(HAVE_JPEG) || defined(HAVE_PNG) || defined(PLUGIN))
     .output_row_32 = {
         output_row_32_native,
         output_row_32_native_fromyuv
@@ -823,7 +824,7 @@ int resize_on_load(struct bitmap *bm, bool dither, struct dim *src,
     ctx.src = src;
     ctx.dither = dither;
 #if !defined(PLUGIN)
-#if defined(HAVE_LCD_COLOR) && defined(HAVE_JPEG)
+#if defined(HAVE_LCD_COLOR) && defined(HAVE_JPEG) // PNG_TODO
     ctx.output_row = format_index ? output_row_32_native_fromyuv
                                   : output_row_32_native;
 #else

@@ -1,0 +1,1 @@
+../plugins/imageviewer/png/png_decoder.h

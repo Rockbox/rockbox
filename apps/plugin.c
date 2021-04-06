@@ -766,6 +766,10 @@ static const struct plugin_api rockbox_api = {
     read_jpeg_file,
     read_jpeg_fd,
 #endif
+#ifdef HAVE_PNG
+    read_png_file,
+    read_png_fd,
+#endif
     screen_dump_set_hook,
     show_logo,
 

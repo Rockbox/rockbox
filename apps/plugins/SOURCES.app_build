@@ -27,6 +27,7 @@ test_codec.c
 #ifdef HAVE_JPEG
 test_core_jpeg.c
 #endif
+// PNG_TODO
 test_disk.c
 #if LCD_DEPTH < 4 && !defined(SIMULATOR)
 test_scanrate.c

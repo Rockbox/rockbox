@@ -28,6 +28,8 @@
 
 /* define this to enable JPEG decoding */
 #define HAVE_JPEG
+#define HAVE_PNG
+
 #endif /* HAVE_LCD_COLOR */
 
 /* define this if you would like tagcache to build on this target */

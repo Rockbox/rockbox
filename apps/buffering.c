@@ -33,9 +33,15 @@
 #include "bmp.h"
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
-#include "jpeg_load.h"
 #include "playback.h"
+#ifdef HAVE_JPEG
+#include "jpeg_load.h"
 #endif
+#ifdef HAVE_PNG
+#include "png_load.h"
+#endif
+#endif
+
 #include "buffering.h"
 #include "linked_list.h"
 
@@ -853,7 +859,7 @@ static int load_image(int fd, const char *path,
                       struct bufopen_bitmap_data *data,
                       size_t bufidx)
 {
-    int rc;
+    int rc = 0;
     struct bitmap *bmp = ringbuf_ptr(bufidx);
     struct dim *dim = data->dim;
     struct mp3_albumart *aa = data->embedded_albumart;
@@ -869,12 +875,28 @@ static int load_image(int fd, const char *path,
     int free = (int)MIN(buffer_len - bytes_used(), buffer_len - bufidx)
                         - sizeof(struct bitmap);
 
-#ifdef HAVE_JPEG
-    if (aa != NULL) {
+#if defined(HAVE_JPEG) || defined(HAVE_PNG)
+    if (aa != NULL && aa->size) { /* aa->pos could theoretically be 0 */
         lseek(fd, aa->pos, SEEK_SET);
-        rc = clip_jpeg_fd(fd, aa->size, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
-                         FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+#if defined(HAVE_JPEG)
+	if (!rc && aa->type == AA_TYPE_JPG)
+            rc = clip_jpeg_fd(fd, aa->size, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                              FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+#endif
+#if defined(HAVE_PNG)
+	if (!rc && aa->type == AA_TYPE_PNG)
+            rc = clip_png_fd(fd, aa->size, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                             FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+#endif
     }
+#endif
+#ifdef HAVE_PNG
+    else if (!strcmp(path + strlen(path) - 4, ".png")) {
+        rc = read_png_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
+                          FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+	}
+#endif
+#ifdef HAVE_JPEG
     else if (strcmp(path + strlen(path) - 4, ".bmp"))
         rc = read_jpeg_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
                           FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);

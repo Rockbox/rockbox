@@ -35,8 +35,8 @@
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
-#if defined(HAVE_JPEG) || defined(PLUGIN)
-#define USE_JPEG_COVER
+#if defined(HAVE_JPEG) || defined(HAVE_PNG) || defined(PLUGIN)
+#define USE_ADVANCED_COVER
 #endif
 
 /* Strip filename from a full path
@@ -72,7 +72,7 @@ static char* strip_filename(char* buf, int buf_size, const char* fullpath)
 }
 
 /* Make sure part of path only contain chars valid for a FAT32 long name.
- * Double quotes are replaced with single quotes, other unsupported chars 
+ * Double quotes are replaced with single quotes, other unsupported chars
  * are replaced with an underscore.
  *
  * path   - path to modify.
@@ -83,9 +83,9 @@ static void fix_path_part(char* path, int offset, int count)
 {
     static const char invalid_chars[] = "*/:<>?\\|";
     int i;
-    
+
     path += offset;
-    
+
     for (i = 0; i <= count; i++, path++)
     {
         if (*path == 0)
@@ -97,9 +97,23 @@ static void fix_path_part(char* path, int offset, int count)
     }
 }
 
-#ifdef USE_JPEG_COVER
-static const char * extensions[] = { "jpeg", "jpg", "bmp" };
-static const unsigned char extension_lens[] = { 4, 3, 3 };
+#ifdef USE_ADVANCED_COVER
+static const char * extensions[] = {
+#ifdef HAVE_JPEG
+	"jpeg", "jpg",
+#endif
+#ifdef HAVE_PNG
+	"png",
+#endif
+	"bmp" };
+static const unsigned char extension_lens[] = {
+#ifdef HAVE_JPEG
+	4, 3,
+#endif
+#ifdef HAVE_PNG
+	3,
+#endif
+	3 };
 /* Try checking for several file extensions, return true if a file is found and
  * leaving the path modified to include the matching extension.
  */
@@ -123,11 +137,11 @@ static bool try_exts(char *path, int len)
 #endif
 
 /* Look for the first matching album art bitmap in the following list:
- *  ./<trackname><size>.{jpeg,jpg,bmp}
- *  ./<albumname><size>.{jpeg,jpg,bmp}
+ *  ./<trackname><size>.{jpeg,jpg,png,bmp}
+ *  ./<albumname><size>.{jpeg,jpg,png,bmp}
  *  ./cover<size>.bmp
- *  ../<albumname><size>.{jpeg,jpg,bmp}
- *  ../cover<size>.{jpeg,jpg,bmp}
+ *  ../<albumname><size>.{jpeg,jpg,png,bmp}
+ *  ../cover<size>.{jpeg,jpg,png,bmp}
  *  ROCKBOX_DIR/albumart/<artist>-<albumname><size>.{jpeg,jpg,bmp}
  * <size> is the value of the size_string parameter, <trackname> and
  * <albumname> are read from the ID3 metadata.
@@ -180,7 +194,7 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
                             trackname);
             strcat(path, size_string);
             strcat(path, "." EXT);
-#ifdef USE_JPEG_COVER
+#ifdef USE_ADVANCED_COVER
             pathlen = strlen(path);
 #endif
             found = try_exts(path, pathlen);
@@ -205,10 +219,17 @@ bool search_albumart_files(const struct mp3entry *id3, const char *size_string,
             found = try_exts(path, pathlen);
         }
 
-#ifdef USE_JPEG_COVER
+#if defined(USE_ADVANCED_COVER) && defined(HAVE_JPEG)
         if (!found && !*size_string)
         {
             snprintf (path, sizeof(path), "%sfolder.jpg", dir);
+            found = file_exists(path);
+        }
+#endif
+#if defined(USE_ADVANCED_COVER) && defined(HAVE_PNG)
+        if (!found && !*size_string)
+        {
+            snprintf (path, sizeof(path), "%sfolder.png", dir);
             found = file_exists(path);
         }
 #endif
@@ -309,7 +330,7 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 
     if (!aa)
         return;
-        
+
     struct bitmap *bmp;
     if (bufgetdata(handle_id, 0, (void *)&bmp) <= 0)
         return;
@@ -346,8 +367,8 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
     if (!clear)
     {
         /* Draw the bitmap */
-        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0, 
-                                    STRIDE(gwps->display->screen_type, 
+        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0,
+                                    STRIDE(gwps->display->screen_type,
                                         bmp->width, bmp->height),
                                    x, y, width, height);
 #ifdef HAVE_LCD_INVERT
