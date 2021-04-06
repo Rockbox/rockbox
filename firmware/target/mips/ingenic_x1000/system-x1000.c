@@ -34,6 +34,28 @@
 #include "x1000/intc.h"
 #include "x1000/msc.h"
 #include "x1000/aic.h"
+#include "lcd.h"
+
+void DIE(void)
+{
+    const int pin = (1 << 24);
+
+    /* Turn on button light */
+    jz_clr(GPIO_INT(GPIO_C), pin);
+    jz_set(GPIO_MSK(GPIO_C), pin);
+    jz_clr(GPIO_PAT1(GPIO_C), pin);
+    jz_set(GPIO_PAT0(GPIO_C), pin);
+
+    for(int i = 0; i < INT_MAX; ++i) {
+        /* Turn it off */
+        mdelay(100);
+        jz_set(GPIO_PAT0(GPIO_C), pin);
+
+        /* Turn it on */
+        mdelay(100);
+        jz_clr(GPIO_PAT0(GPIO_C), pin);
+    }
+}
 
 int __cpu_idle_avg = 0;
 int __cpu_idle_cur = 0;
@@ -106,6 +128,9 @@ void system_init(void)
     jz_set(TCU_MASK, 0xff10ff);
     jz_clr(TCU_FLAG, 0xff10ff);
     jz_set(TCU_STOP, 0x180ff);
+#ifndef BOOTLOADER
+    DIE();
+#endif
 
     /* Start OST2, needed for delay timer */
     jz_writef(OST_CTRL, PRESCALE2_V(BY_4));
@@ -345,6 +370,8 @@ static int vector_irq(void)
     return n;
 }
 
+volatile int LCD_INITED=0;
+
 void intr_handler(unsigned cause)
 {
     /* OST interrupt is handled separately */
@@ -356,6 +383,14 @@ void intr_handler(unsigned cause)
     /* Gather pending interrupts */
     ipr0 |= REG_INTC_PND(0);
     ipr1 |= REG_INTC_PND(1);
+
+    if(LCD_INITED) {
+    lcd_fillrect(0, LCD_HEIGHT - 36, LCD_WIDTH, 24);
+    lcd_putsxyf(0, LCD_HEIGHT-36, "ipr0:%08x ipr1:%08x", ipr0);
+    lcd_putsxyf(0, LCD_HEIGHT-28, "irq epc:%08x", read_c0_epc());
+    lcd_putsxyf(0, LCD_HEIGHT-20, "t = %ld", __ost_read32());
+    lcd_update();
+    }
 
     /* Process and dispatch interrupt */
     irq = vector_irq();
