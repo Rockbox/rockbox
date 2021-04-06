@@ -31,6 +31,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include "nand-x1000-err.h"
 
 /* Chip supports quad I/O for page read/write */
 #define NANDCHIP_FLAG_QUAD      0x01
@@ -123,7 +124,7 @@ extern int nand_enable_writes(bool en);
 /* Byte-based NAND operations */
 extern int nand_read_bytes(uint32_t byteaddr, int count, void* buf);
 extern int nand_write_bytes(uint32_t byteaddr, int count, const void* buf);
-extern int nand_erase_block(uint32_t byteaddr);
+extern int nand_erase_bytes(uint32_t byteaddr, int count);
 
 /* NAND command numbers */
 #define NAND_CMD_READ_ID            0x9f

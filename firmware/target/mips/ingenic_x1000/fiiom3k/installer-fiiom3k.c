@@ -50,7 +50,7 @@ static int install_from_buffer(const void* buf)
         goto _exit;
     }
 
-    if(nand_erase_block(0)) {
+    if(nand_erase_bytes(0, BOOT_IMAGE_SIZE)) {
         status = ERR_FLASH_ERASE_FAILED;
         goto _exit;
     }
