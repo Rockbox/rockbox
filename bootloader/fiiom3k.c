@@ -55,11 +55,6 @@ void exec(void* dst, const void* src, int bytes)
 
 static void error(const char* msg)
 {
-    /* Initialization of the LCD/buttons only if needed */
-    lcd_init();
-    backlight_init();
-    button_init();
-
     lcd_clear_display();
     lcd_puts(0, 0, msg);
     lcd_puts(0, 2, "Press POWER to power off");
@@ -75,22 +70,48 @@ void main(void)
     kernel_init();
     i2c_init();
     power_init();
+
     enable_irq();
+
+    int line = 0;
+
+    lcd_init();
+    lcd_clear_display();
+    lcd_puts(0, line++, "Booting");
+    lcd_update();
+
+    backlight_init();
+    button_init();
+
+    lcd_puts(0, line++, "Storage...");
+    lcd_update();
 
     if(storage_init() < 0)
         error("Storage initialization failed");
+
+    lcd_puts(0, line++, "Filesystem...");
+    lcd_update();
 
     filesystem_init();
 
     if(!storage_present(0))
         error("No SD card present");
 
+    lcd_puts(0, line++, "Mounting disk...");
+    lcd_update();
+
     if(disk_mount_all() <= 0)
         error("Unable to mount filesystem");
+
+    lcd_puts(0, line++, "Loading firmware...");
+    lcd_update();
 
     int loadsize = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
     if(loadsize <= 0)
         error(loader_strerror(loadsize));
+
+    lcd_putsf(0, line++, "Jumping...");
+    lcd_update();
 
     disable_irq();
 
