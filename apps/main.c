@@ -142,6 +142,8 @@
 #endif
 #endif
 
+extern void DIE(void);
+
 /*#define AUTOROCK*/ /* define this to check for "autostart.rock" on boot */
 
 static void init(void);
@@ -390,6 +392,8 @@ static void init(void)
     core_allocator_init();
     kernel_init();
 
+    backlight_init();
+
     /* early early early! */
     filesystem_init();
 
@@ -428,6 +432,7 @@ static void init(void)
     CHART("<show_logo");
     lang_init(core_language_builtin, language_strings,
               LANG_LAST_INDEX_IN_ARRAY);
+    DIE();
 
 #ifdef DEBUG
     debug_init();
@@ -455,7 +460,7 @@ static void init(void)
     m5636_init();
 #endif
 
-    backlight_init();
+    //backlight_init();
 
     button_init();
 
