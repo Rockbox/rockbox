@@ -29,6 +29,9 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "system.h"
+#include "mipsregs.h"
+
 #ifndef BOOTLOADER
 # include "font.h"
 #endif
@@ -440,8 +443,11 @@ static void hp_detect_init(void)
 void button_init_device(void)
 {
     /* Configure physical button GPIOs */
-    gpio_config(GPIO_A, (1 << 17) | (1 << 19), GPIO_INPUT);
+    gpio_config(GPIO_A, /* (1 << 17) | */ (1 << 19), GPIO_INPUT);
     gpio_config(GPIO_B, (1 << 28) | (1 << 31), GPIO_INPUT);
+
+    gpio_config(GPIO_A, 1 << 17, GPIO_IRQ_EDGE(0));
+    gpio_enable_irq(GPIO_A, 1 << 17);
 
     /* Initialize touchpad */
     ft_init();
@@ -466,6 +472,15 @@ int button_read_device(void)
     if((b & (1 << 31)) == 0) r |= BUTTON_POWER;
 
     return r;
+}
+
+void GPIOA17(void)
+{
+    static int COUNT = 0;
+    lcd_fillrect(0, LCD_HEIGHT - 12, LCD_WIDTH, 12);
+    lcd_putsxyf(0, LCD_HEIGHT-8, "btn %d epc: %08x", COUNT++, read_c0_epc());
+    lcd_update();
+    mdelay(50); /* avoid bounce */
 }
 
 bool headphones_inserted()
