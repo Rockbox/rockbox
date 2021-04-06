@@ -34,6 +34,28 @@
 #include "x1000/intc.h"
 #include "x1000/msc.h"
 #include "x1000/aic.h"
+#include "lcd.h"
+
+void DIE(void)
+{
+    const int pin = (1 << 24);
+
+    /* Turn on button light */
+    jz_clr(GPIO_INT(GPIO_C), pin);
+    jz_set(GPIO_MSK(GPIO_C), pin);
+    jz_clr(GPIO_PAT1(GPIO_C), pin);
+    jz_set(GPIO_PAT0(GPIO_C), pin);
+
+    for(int i = 0; i < INT_MAX; ++i) {
+        /* Turn it off */
+        mdelay(100);
+        jz_set(GPIO_PAT0(GPIO_C), pin);
+
+        /* Turn it on */
+        mdelay(100);
+        jz_clr(GPIO_PAT0(GPIO_C), pin);
+    }
+}
 
 int __cpu_idle_avg = 0;
 int __cpu_idle_cur = 0;
@@ -43,7 +65,7 @@ uint32_t __cpu_idle_reftick = 0;
 static void system_init_clk(void)
 {
     /* Gate all clocks except CPU/bus/memory/RTC */
-    REG_CPM_CLKGR = ~jz_orm(CPM_CLKGR, CPU_BIT, DDR, AHB0, APB0, RTC);
+    REG_CPM_CLKGR = ~jz_orm(CPM_CLKGR, CPU_BIT, DDR, AHB0, APB0, RTC, TCU, OST);
 
     /* Switch to EXCLK */
     clk_set_ccr_mux(CLKMUX_SCLK_A(EXCLK) | CLKMUX_CPU(SCLK_A) |
@@ -61,6 +83,10 @@ static void system_init_clk(void)
       */
     jz_writef(CPM_APCR, BS(1), PLLM(41), PLLN(0), PLLOD(0), ENABLE(1));
     while(jz_readf(CPM_APCR, ON) == 0);
+
+#ifndef BOOTLOADER
+    DIE();
+#endif
 
     clk_set_ccr_div(1, 2, 5, 5, 10);
     clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) | CLKMUX_CPU(SCLK_A) |
@@ -345,6 +371,8 @@ static int vector_irq(void)
     return n;
 }
 
+volatile int LCD_INITED=0;
+
 void intr_handler(unsigned cause)
 {
     /* OST interrupt is handled separately */
@@ -356,6 +384,14 @@ void intr_handler(unsigned cause)
     /* Gather pending interrupts */
     ipr0 |= REG_INTC_PND(0);
     ipr1 |= REG_INTC_PND(1);
+
+    if(LCD_INITED) {
+    lcd_fillrect(0, LCD_HEIGHT - 36, LCD_WIDTH, 24);
+    lcd_putsxyf(0, LCD_HEIGHT-36, "ipr0:%08x ipr1:%08x", ipr0);
+    lcd_putsxyf(0, LCD_HEIGHT-28, "irq epc:%08x", read_c0_epc());
+    lcd_putsxyf(0, LCD_HEIGHT-20, "t = %ld", __ost_read32());
+    lcd_update();
+    }
 
     /* Process and dispatch interrupt */
     irq = vector_irq();
