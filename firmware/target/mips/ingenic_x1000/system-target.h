@@ -28,6 +28,15 @@
 #define CACHEALIGN_BITS 5
 #define CACHE_SIZE      (16*1024)
 
+#ifdef BOOTLOADER_SPL
+/* This saves ~200 bytes in the SPL by allowing -ffunction-sections to split
+ * up the cache management functions, most of which aren't called by the SPL.
+ * If they are placed in .icode, then they all end up in one section and the
+ * linker can't discard the unused functions.
+ */
+# define MIPS_CACHEFUNC_ATTR
+#endif
+
 #include "mmu-mips.h"
 #include "mipsregs.h"
 #include "mipsr2-endian.h"
