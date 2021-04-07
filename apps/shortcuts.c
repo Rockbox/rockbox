@@ -519,9 +519,11 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
                                     if (info.attribute & ATTR_DIRECTORY)
                                         talk_dir_or_spell(sc->u.path, NULL, false);
                                     else talk_file_or_spell(path, filename, NULL, false);
+                                    closedir(dir);
                                     return 0;
                                 }
                             }
+                            closedir(dir);
                         }
                     }
                     else
