@@ -199,6 +199,8 @@ void spl_main(void)
     /* Flush caches and jump to address */
     void* execaddr = (void*)opt->exec_addr;
     commit_discard_idcache();
-    __asm__ __volatile__ ("jr %0" :: "r"(execaddr));
+    __asm__ __volatile__ ("jr %0\n"
+                          "nop\n"
+                          :: "r"(execaddr));
     __builtin_unreachable();
 }

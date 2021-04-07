@@ -47,7 +47,9 @@ void exec(void* dst, const void* src, int bytes)
 {
     memcpy(dst, src, bytes);
     commit_discard_idcache();
-    __asm__ __volatile__ ("jr %0" :: "r"(dst));
+    __asm__ __volatile__ ("jr %0\n"
+                          "nop\n"
+                          :: "r"(dst));
     __builtin_unreachable();
 }
 

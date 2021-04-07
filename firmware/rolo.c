@@ -204,6 +204,7 @@ void rolo_restart(const unsigned char* source, unsigned char* dest,
     commit_discard_idcache();
     asm volatile(
         "jr     %0               \n"
+        "nop\n"
         : : "r"(dest)
     );
 #endif
