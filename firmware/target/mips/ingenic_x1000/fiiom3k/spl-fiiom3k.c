@@ -19,28 +19,16 @@
  *
  ****************************************************************************/
 
-#include "config.h"
-#include "nand-x1000.h"
+#include "spl-x1000.h"
 #include "gpio-x1000.h"
-#include "mmu-mips.h"
+#include "nand-x1000.h"
+#include "system.h"
 #include <string.h>
 
-/* "fiio" in little endian */
-#define BOOTMAGIC 0x6f696966
-
-/* Argument structure needed by Linux */
-struct linux_kargs {
-    void* arg0;
-    void* arg1;
-};
-
-#define LINUX_KARGSADDR 0x80004000
-
-static const char recovery_cmdline[] = "mem=xxM@0x0\
- no_console_suspend\
- console=ttyS2,115200n8\
- lpj=5009408\
- ip=off";
+/* Boot select button state must remain stable for this duration
+ * before the choice will be accepted. Currently 100ms.
+ */
+#define BTN_STABLE_TIME (100 * (X1000_EXCLK_FREQ / 4000))
 
 static const char normal_cmdline[] = "mem=64M@0x0\
  no_console_suspend\
@@ -55,18 +43,13 @@ static const char normal_cmdline[] = "mem=64M@0x0\
  rw\
  loglevel=8";
 
-#define BOOTOPTION_ROCKBOX   0
-#define BOOTOPTION_FIIOLINUX 1
-#define BOOTOPTION_RECOVERY  2
-#define NUM_BOOTOPTIONS      3
+static const char recovery_cmdline[] = "mem=64M@0x0\
+ no_console_suspend\
+ console=ttyS2,115200n8\
+ lpj=5009408\
+ ip=off";
 
-static const struct bootoption {
-    uint32_t nand_addr;
-    uint32_t nand_size;
-    unsigned long load_addr;
-    unsigned long exec_addr;
-    const char* cmdline;
-} boot_options[NUM_BOOTOPTIONS] = {
+const struct spl_boot_option spl_boot_options[] = {
     {
         /* Rockbox: the first unused NAND page is 26 KiB in, and the
          * remainder of the block is unused, giving us 102 KiB to use.
@@ -95,10 +78,7 @@ static const struct bootoption {
     },
 };
 
-/* Simple diagnostic if something goes wrong -- a little nicer than wondering
- * what's going on when the machine hangs
- */
-void die(void)
+void spl_error(void)
 {
     const int pin = (1 << 24);
 
@@ -119,12 +99,7 @@ void die(void)
     }
 }
 
-/* Boot select button state must remain stable for this duration
- * before the choice will be accepted. Currently 100ms.
- */
-#define BTN_STABLE_TIME (100 * (X1000_EXCLK_FREQ / 4000))
-
-int get_boot_option(void)
+int spl_get_boot_option(void)
 {
     const uint32_t pinmask = (1 << 17) | (1 << 19);
 
@@ -146,61 +121,12 @@ int get_boot_option(void)
 
     /* Play button boots original firmware */
     if(pin == (1 << 17))
-        return BOOTOPTION_FIIOLINUX;
+        return SPL_BOOTOPT_ORIG_FW;
 
     /* Volume up boots recovery */
     if(pin == (1 << 19))
-        return BOOTOPTION_RECOVERY;
+        return SPL_BOOTOPT_RECOVERY;
 
     /* Default is to boot Rockbox */
-    return BOOTOPTION_ROCKBOX;
-}
-
-void spl_main(void)
-{
-    /* Get user boot option */
-    int booti = get_boot_option();
-    const struct bootoption* opt = &boot_options[booti];
-
-    /* Load selected firmware from flash */
-    if(nand_open())
-        die();
-    if(nand_read_bytes(opt->nand_addr, opt->nand_size, (void*)opt->load_addr))
-        die();
-
-    if(booti == BOOTOPTION_ROCKBOX) {
-        /* If bootloader is not installed, return back to boot ROM.
-         * Also read in the first eraseblock of NAND flash so it can be
-         * dumped back over USB.
-         */
-        if(*(unsigned*)(opt->load_addr + 4) != BOOTMAGIC) {
-            nand_read_bytes(0, 128 * 1024, (void*)0x80000000);
-            commit_discard_idcache();
-            return;
-        }
-    } else {
-        /* TODO: Linux boot not implemented yet
-         *
-         * - Have to initialize UART2, as it's used for the serial console
-         * - Must initialize APLL and change clocks over
-         * - There are some other clocks which need to be initialized
-         * - We should turn off OST since the OF SPL does not turn it on
-         */
-        die();
-    }
-
-    if(boot_options[booti].cmdline) {
-        /* Handle Linux command line arguments */
-        struct linux_kargs* kargs = (struct linux_kargs*)LINUX_KARGSADDR;
-        kargs->arg0 = 0;
-        kargs->arg1 = (void*)boot_options[booti].cmdline;
-    }
-
-    /* Flush caches and jump to address */
-    void* execaddr = (void*)opt->exec_addr;
-    commit_discard_idcache();
-    __asm__ __volatile__ ("jr %0\n"
-                          "nop\n"
-                          :: "r"(execaddr));
-    __builtin_unreachable();
+    return SPL_BOOTOPT_ROCKBOX;
 }

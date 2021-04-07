@@ -19,26 +19,26 @@
  *
  ****************************************************************************/
 
-#include "system.h"
+#include "spl-x1000.h"
+#include "spl-target.h"
 #include "clk-x1000.h"
+#include "nand-x1000.h"
+#include "system.h"
 #include "x1000/cpm.h"
 #include "x1000/ost.h"
 #include "x1000/ddrc.h"
 #include "x1000/ddrc_apb.h"
 #include "x1000/ddrphy.h"
 
-#ifdef FIIO_M3K
-# define DDR_USE_AUTOSR  1
-# define DDR_NEED_BYPASS 1
-# define DDR_MEMORYSIZE  64
-#else
-# error "Please add DDR definitions for new target!"
-#endif
+struct x1000_spl_arguments* const spl_arguments =
+    (struct x1000_spl_arguments*)SPL_ARGUMENTS_ADDRESS;
 
-#define hang() do { } while(1)
+struct x1000_spl_status* const spl_status =
+    (struct x1000_spl_status*)SPL_STATUS_ADDRESS;
 
-/* Target-specific routine to load & execute the Rockbox bootloader */
-extern void spl_main(void);
+/* defined to be Linux compatible; Rockbox needs no arguments so there
+ * is no harm in passing them and we save a little code size */
+typedef void(*entry_fn)(int, char**, int, int);
 
 /* Note: This is based purely on disassembly of the SPL from the FiiO M3K.
  * The code there is somewhat generic and corresponds roughly to Ingenic's
@@ -95,9 +95,9 @@ static void ddr_init(void)
     while(i > 0 && REG_DDRPHY_PGSR != 7 && REG_DDRPHY_PGSR != 0x1f)
         i -= 1;
     if(i == 0)
-        hang();
+        spl_error();
 
-#if DDR_NEED_BYPASS
+#if SPL_DDR_NEED_BYPASS
     REG_DDRPHY_ACDLLCR = 0x80000000;
     REG_DDRPHY_DSGCR &= ~0x10;
     REG_DDRPHY_DLLGCR |= 0x800000;
@@ -109,7 +109,7 @@ static void ddr_init(void)
     while(i > 0 && REG_DDRPHY_PGSR != 0xf && REG_DDRPHY_PGSR != 0x1f)
         i -= 1;
     if(i == 0)
-        hang();
+        spl_error();
 
     REG_DDRC_APB_PHYRST_CFG = 0x400000;
     mdelay(3);
@@ -118,7 +118,7 @@ static void ddr_init(void)
 
     REG_DDRC_CFG = 0xa468aec;
     REG_DDRC_CTRL = 2;
-#if DDR_NEED_BYPASS
+#if SPL_DDR_NEED_BYPASS
     REG_DDRPHY_PIR = 0x20020081;
 #else
     REG_DDRPHY_PIR = 0x85;
@@ -132,10 +132,10 @@ static void ddr_init(void)
     }
 
     if(i == 0)
-        hang();
+        spl_error();
 
     if((REG_DDRPHY_PGSR & 0x60) != 0 && REG_DDRPHY_PGSR != 0)
-        hang();
+        spl_error();
 
     REG_DDRC_CTRL = 0;
     REG_DDRC_CTRL = 10;
@@ -147,10 +147,10 @@ static void ddr_init(void)
     REG_DDRC_TIMING4 = 0xb7a0251;
     REG_DDRC_TIMING5 = 0xff090200;
     REG_DDRC_TIMING6 = 0xa0a0202;
-#if DDR_MEMORYSIZE == 64
+#if SPL_DDR_MEMORYSIZE == 64
     REG_DDRC_MMAP0   = 0x20fc;
     REG_DDRC_MMAP1   = 0x2400;
-#elif DDR_MEMORYSIZE == 32
+#elif SPL_DDR_MEMORYSIZE == 32
     REG_DDRC_MMAP0   = 0x20fe;
     REG_DDRC_MMAP1   = 0x2200;
 #else
@@ -160,13 +160,13 @@ static void ddr_init(void)
     REG_DDRC_REFCNT  = 0x2f0003;
     REG_DDRC_CTRL    = 0xc91e;
 
-#if DDR_MEMORYSIZE == 64
+#if SPL_DDR_MEMORYSIZE == 64
     REG_DDRC_REMAP1 = 0x03020c0b;
     REG_DDRC_REMAP2 = 0x07060504;
     REG_DDRC_REMAP3 = 0x000a0908;
     REG_DDRC_REMAP4 = 0x0f0e0d01;
     REG_DDRC_REMAP5 = 0x13121110;
-#elif DDR_MEMORYSIZE == 32
+#elif SPL_DDR_MEMORYSIZE == 32
     REG_DDRC_REMAP1 = 0x03020b0a;
     REG_DDRC_REMAP2 = 0x07060504;
     REG_DDRC_REMAP3 = 0x01000908;
@@ -178,8 +178,8 @@ static void ddr_init(void)
 
     REG_DDRC_STATUS &= ~0x40;
 
-#if DDR_USE_AUTOSR
-#if DDR_NEED_BYPASS
+#if SPL_DDR_AUTOSR_EN
+#if SPL_DDR_NEED_BYPASS
     jz_writef(CPM_DDRCDR, GATE_EN(1));
     REG_DDRC_APB_CLKSTP_CFG = 0x9000000f;
 #else
@@ -187,10 +187,10 @@ static void ddr_init(void)
 #endif
 #endif
 
-    REG_DDRC_AUTOSR_EN = DDR_USE_AUTOSR;
+    REG_DDRC_AUTOSR_EN = SPL_DDR_AUTOSR_EN;
 }
 
-void main(void)
+static void init(void)
 {
     /* from original firmware SPL */
     REG_CPM_PSWC0ST = 0x00;
@@ -224,7 +224,89 @@ void main(void)
 
     /* init DDR memory */
     ddr_init();
+}
 
-    /* jump to the target's main routine */
-    spl_main();
+static int nandread(uint32_t addr, uint32_t size, void* buffer)
+{
+    int rc;
+
+    if((rc = nand_open()))
+        return rc;
+
+    rc = nand_read_bytes(addr, size, buffer);
+    nand_close();
+    return rc;
+}
+
+static int nandwrite(uint32_t addr, uint32_t size, void* buffer)
+{
+    int rc;
+
+    if((rc = nand_open()))
+        return rc;
+
+    if((rc = nand_enable_writes(true)))
+        goto _end;
+
+    if((rc = nand_erase_bytes(addr, size)))
+        goto _end1;
+
+    rc = nand_write_bytes(addr, size, buffer);
+
+  _end1:
+    /* an error here is very unlikely, so ignore it */
+    nand_enable_writes(false);
+
+  _end:
+    nand_close();
+    return rc;
+}
+
+void main(void)
+{
+    if(!(SPL_ARGUMENTS->flags & SPL_FLAG_SKIP_INIT))
+        init();
+
+    switch(SPL_ARGUMENTS->command) {
+    case SPL_CMD_BOOT: {
+        int option = SPL_ARGUMENTS->param1;
+        if(option == SPL_BOOTOPT_CHOOSE)
+            option = spl_get_boot_option();
+        if(option == SPL_BOOTOPT_NONE)
+            return;
+
+        const struct spl_boot_option* opt = &spl_boot_options[option-1];
+        if(nandread(opt->nand_addr, opt->nand_size, (void*)opt->load_addr))
+            spl_error();
+
+        /* TODO: implement dual boot */
+
+        /* Reading the Linux command line from the bootloader is handled by
+         * arch/mips/xburst/core/prom.c -- see Ingenic kernel sources.
+         *
+         * Rockbox doesn't use arguments, but passing them does not hurt and it
+         * saves an unnecessary branch.
+         */
+        entry_fn entry = (entry_fn)opt->exec_addr;
+        char** argv = (char**)0x80004000;
+        argv[0] = 0;
+        argv[1] = (char*)opt->cmdline;
+
+        commit_discard_idcache();
+        entry(2, argv, 0, 0);
+        __builtin_unreachable();
+    }
+
+    case SPL_CMD_FLASH_READ:
+        SPL_STATUS->err_code = nandread(SPL_ARGUMENTS->param1,
+                                        SPL_ARGUMENTS->param2,
+                                        (void*)SPL_BUFFER_ADDRESS);
+        return;
+
+    case SPL_CMD_FLASH_WRITE:
+        SPL_STATUS->err_code = nandwrite(SPL_ARGUMENTS->param1,
+                                         SPL_ARGUMENTS->param2,
+                                         (void*)SPL_BUFFER_ADDRESS);
+        return;
+    }
 }
