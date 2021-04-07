@@ -53,22 +53,22 @@ int ipod_verbose = 0;
 
 
 /* The following string appears at the start of the firmware partition */
-static const char *apple_stop_sign = "{{~~  /-----\\   "\
-                                     "{{~~ /       \\  "\
-                                     "{{~~|         | "\
-                                     "{{~~| S T O P | "\
-                                     "{{~~|         | "\
-                                     "{{~~ \\       /  "\
-                                     "{{~~  \\-----/   "\
-                                     "Copyright(C) 200"\
-                                     "1 Apple Computer"\
-                                     ", Inc.----------"\
-                                     "----------------"\
-                                     "----------------"\
-                                     "----------------"\
-                                     "----------------"\
-                                     "----------------"\
-                                     "---------------";
+static const char apple_stop_sign[] = "{{~~  /-----\\   "\
+                                      "{{~~ /       \\  "\
+                                      "{{~~|         | "\
+                                      "{{~~| S T O P | "\
+                                      "{{~~|         | "\
+                                      "{{~~ \\       /  "\
+                                      "{{~~  \\-----/   "\
+                                      "Copyright(C) 200"\
+                                      "1 Apple Computer"\
+                                      ", Inc.----------"\
+                                      "----------------"\
+                                      "----------------"\
+                                      "----------------"\
+                                      "----------------"\
+                                      "----------------"\
+                                      "---------------";
 
 /* Windows requires the buffer for disk I/O to be aligned in memory on a 
    multiple of the disk volume size - so we use a single global variable
