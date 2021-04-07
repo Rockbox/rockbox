@@ -663,22 +663,22 @@ static int iaudio_encode(char *iname, char *oname, char *idstring)
 
 static int ipod_encode(char *iname, char *oname, int fw_ver, bool fake_rsrc)
 {
-    static const char *apple_stop_sign = "{{~~  /-----\\   "\
-                                         "{{~~ /       \\  "\
-                                         "{{~~|         | "\
-                                         "{{~~| S T O P | "\
-                                         "{{~~|         | "\
-                                         "{{~~ \\       /  "\
-                                         "{{~~  \\-----/   "\
-                                         "Copyright(C) 200"\
-                                         "1 Apple Computer"\
-                                         ", Inc.----------"\
-                                         "----------------"\
-                                         "----------------"\
-                                         "----------------"\
-                                         "----------------"\
-                                         "----------------"\
-                                         "---------------";
+    static const char apple_stop_sign[] = "{{~~  /-----\\   "\
+                                          "{{~~ /       \\  "\
+                                          "{{~~|         | "\
+                                          "{{~~| S T O P | "\
+                                          "{{~~|         | "\
+                                          "{{~~ \\       /  "\
+                                          "{{~~  \\-----/   "\
+                                          "Copyright(C) 200"\
+                                          "1 Apple Computer"\
+                                          ", Inc.----------"\
+                                          "----------------"\
+                                          "----------------"\
+                                          "----------------"\
+                                          "----------------"\
+                                          "----------------"\
+                                          "---------------";
     size_t len;
     int length;
     int rsrclength;
