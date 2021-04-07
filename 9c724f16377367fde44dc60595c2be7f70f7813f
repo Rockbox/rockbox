@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5a7bd3d_50d3b4c3",
+        "filename": "apps/recorder/recording.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1807,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-04-07T17:03:58Z",
+      "side": 1,
+      "message": "Since We don\u0027t care about the status of the VP maybe a better idea would be to use set_viewport_ex(NULL, 0) and have it check for a case of flags \u003d 0 as a reason to not touch the last vp\n\nlcd_bitmap_common.c: set_viewport_ex() ln 149\n    if(last_vp \u0026\u0026 (flags !\u003d 0))\n    {\n        if ((flags \u0026 VP_FLAG_CLEAR_FLAG) \u003d\u003d VP_FLAG_CLEAR_FLAG)\n            last_vp-\u003eflags \u0026\u003d ~flags;\n        else\n            last_vp-\u003eflags |\u003d flags;\n    }",
+      "revId": "9c724f16377367fde44dc60595c2be7f70f7813f",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    }
+  ]
+}
