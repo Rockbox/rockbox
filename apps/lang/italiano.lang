@@ -9613,15 +9613,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Sensibilità Touchpad"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Sensibilità Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Sensibilità Touchpad"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Sensibilità Touchpad"
   </voice>
 </phrase>
 <phrase>
@@ -12097,13 +12097,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
-    *: "Skip"
+    *: "Skip Esente"
   </dest>
   <voice>
-    *: "Skip"
+    *: "Skip Esente"
   </voice>
 </phrase>
 <phrase>
@@ -12139,13 +12139,13 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Disabilitare le Notifiche"
+    *: "Disabilita Notifiche di Blocco"
   </dest>
   <voice>
-    *: "Disabilitare le Notifiche"
+    *: "Disabilita Notifiche di Blocco"
   </voice>
 </phrase>
 <phrase>
@@ -12298,11 +12298,11 @@
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Gestore Freq Scaling"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Gestore Freq Scaling"
   </voice>
 </phrase>
 <phrase>
@@ -12310,13 +12310,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
-    *: "Seek"
+    *: "Seek Esente"
   </dest>
   <voice>
-    *: "Seek"
+    *: "Seek Esente"
   </voice>
 </phrase>
 <phrase>
@@ -12338,13 +12338,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
-    *: "Play"
+    *: "Play Esente"
   </dest>
   <voice>
-    *: "Play"
+    *: "Play Esente"
   </voice>
 </phrase>
 <phrase>
@@ -15541,5 +15541,168 @@
   </dest>
   <voice>
     *: "Cancella Lista e Riproduci Successivo"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Modalità di Alimentazione del DAC"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Modalità di Alimentazione del DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Alte Prestazioni"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Alte prestazioni"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Risparmio batteria"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Risparmio batteria"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Coda..."
+  </dest>
+  <voice>
+    *: "Coda..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Mostra Opzioni Coda"
+  </dest>
+  <voice>
+    *: "Mostra Opzioni Coda"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Mostra Opzioni di Aggiunta in Ordine Casuale"
+  </dest>
+  <voice>
+    *: "Mostra Opzioni di Aggiunta in Ordine Casuale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "Nel Sottomenu"
+  </dest>
+  <voice>
+    *: "Nel sottomenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Cancella Lista e Riproduci in Ordine Casuale"
+  </dest>
+  <voice>
+    *: "Cancella Lista e Riproduci in Ordine Casuale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Disabilita Tutte Le Notifiche Di Blocco"
+  </dest>
+  <voice>
+    *: "Disabilita Tutte Le Notifiche Di Blocco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Volume Esente"
+  </dest>
+  <voice>
+    *: "Volume Esente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Sempre Blocco Automatico"
+  </dest>
+  <voice>
+    *: "Sempre Blocco Automatico"
   </voice>
 </phrase>
