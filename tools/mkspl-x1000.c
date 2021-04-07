@@ -136,7 +136,6 @@ void do_flash(const uint8_t* spl_code,
     uint8_t hdr_buf[SPL_HEADER_SIZE];
     memset(hdr_buf, 0, SPL_HEADER_SIZE);
     memcpy(hdr_buf, &sig, sizeof(sig));
-    hdr_buf[sizeof(sig)] = 1; /* ??? used in the FiiO M3K */
 
     /* create null key */
     uint8_t null_key[SPL_KEY_SIZE];
