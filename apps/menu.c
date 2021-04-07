@@ -180,7 +180,8 @@ static void init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback,
                      struct viewport parent[NB_SCREENS])
 {
-    int i, count = MENU_GET_COUNT(menu->flags);
+    int i;
+    int count = MIN(MENU_GET_COUNT(menu->flags), MAX_MENU_SUBITEMS);
     int type = (menu->flags&MENU_TYPE_MASK);
     menu_callback_type menu_callback = NULL;
     int icon;
@@ -210,6 +211,7 @@ static void init_menu_lists(const struct menu_item_ex *menu,
             current_subitems_count++;
         }
     }
+
     current_submenus_menu = (struct menu_item_ex *)menu;
 
     gui_synclist_init(lists,get_menu_item_name,(void*)menu,false,1, parent);
