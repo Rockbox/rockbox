@@ -1062,7 +1062,15 @@ int gui_syncpitchscreen_run(void)
             new_speed = 0;
         }
     }
+
     pcmbuf_set_low_latency(false);
     pop_current_activity();
+
+    /* Clean up */
+    FOR_NB_SCREENS(i)
+    {
+        screens[i].set_viewport(NULL);
+    }
+
     return 0;
 }

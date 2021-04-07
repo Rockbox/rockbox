@@ -1084,7 +1084,7 @@ bool recording_screen(bool no_source)
                 pm_y[i] = font_get(vp_top[i].font)->height * 2;
                 trig_ypos[i] = font_get(vp_top[i].font)->height * 3;
                 if(compact_view[i])
-                trig_ypos[i] -= (font_get(vp_top[i].font)->height)/2;
+                    trig_ypos[i] -= (font_get(vp_top[i].font)->height)/2;
             }
 
             /* init the bottom list */
@@ -1803,8 +1803,10 @@ rec_abort:
     rec_status &= ~RCSTAT_IN_RECSCREEN;
     sound_settings_apply();
 
-    FOR_NB_SCREENS(i)
+    FOR_NB_SCREENS(i) {
+        screens[i].set_viewport(NULL);
         screens[i].setfont(FONT_UI);
+    }
 
     /* if the directory was created or recording happened, make sure the
        browser is updated */
