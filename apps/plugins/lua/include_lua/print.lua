@@ -141,6 +141,7 @@ local _print = {} do
                     ovfl = "auto",
                     justify = "left",
                     autoupdate = true,
+                    drawsep = false,
                   }
         _p_opts.max_line = max_lines(_p_opts)
 
@@ -292,7 +293,12 @@ local _print = {} do
                 col_buf_insert(msg, o.line, o)
             end
         end
-
+        if o.drawsep == true then
+            if s_lines[o.line] == true then
+                rb.set_viewport(o) --nned to revert drawmode if selected
+            end
+            rb.lcd_drawline(0, line * h, o.width, line * h)
+        end
         --only update the line we changed
         update_line(o.autoupdate, o, line, h)
 
