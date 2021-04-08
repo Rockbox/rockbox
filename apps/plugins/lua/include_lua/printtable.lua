@@ -152,14 +152,15 @@ function print_table(t, t_count, settings)
     end
 
     local wrap, justify, start, curpos, co_routine, hasheader, m_sel
-    local header_fgc, header_bgc, item_fgc, item_bgc, item_selc
+    local header_fgc, header_bgc, item_fgc, item_bgc, item_selc, drawsep
     do
         local s = settings or _print.get_settings()
         wrap, justify = s.wrap, s.justify
         start, curpos = s.start, s.curpos
         co_routine    = s.co_routine
         hasheader     = s.hasheader
-        m_sel          = false
+        drawsep       = s.drawsep
+        m_sel         = false
         if co_routine == nil then
             --no multi select in incremental mode
             m_sel = s.msel
@@ -350,6 +351,11 @@ function print_table(t, t_count, settings)
     _print.opt.sel_line(table_p.vcursor)
     _print.opt.overflow("manual")
     _print.opt.justify(justify)
+
+    local opts = _print.opt.get()
+    opts.drawsep = drawsep
+    _print.opt.set(opts)
+
 
     -- initialize vertical scrollbar
     set_vsb(); do
