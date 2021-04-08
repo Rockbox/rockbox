@@ -263,6 +263,14 @@ simcc () {
  GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
 
  GCCOPTS="$GCCOPTS -fno-builtin -g"
+
+ if [ "$ARG_ADDR_SAN" = "1" ] ; then
+   # Use AddressSanitizer!
+   echo "Using AddressSanitizer"
+   GCCOPTS="$GCCOPTS -fsanitize=address -fPIC"
+   LDOPTS="$LDOPTS -fsanitize=address -lasan"
+ fi
+
  # Some linux setups like to warn about unused results. They are correct,
  # but cleaning this up is a lot of work.
  GCCOPTS="$GCCOPTS -Wno-unused-result"
@@ -467,6 +475,11 @@ EOF
  # use wildcard here to make it work even if it was named *.exe like
  # on cygwin
  rm -f $tmpdir/conftest-$id*
+
+ # AddressSanitizer requires SDL threads
+ if [ "$ARG_ADDR_SAN" = "1" ] ; then
+     ARG_THREAD_SUPPORT=1
+ fi
 
  thread_support=
  if [ -z "$ARG_THREAD_SUPPORT" ] || [ "$ARG_THREAD_SUPPORT" = "0" ]; then
@@ -1407,10 +1420,12 @@ help() {
     --no-thumb        The opposite of --thumb (don't use thumb even for targets
                       where this is the default
     --sdl-threads     Force use of SDL threads. They have inferior performance,
-                      but are better debuggable with GDB
+                      but are better debuggable with GDB and valgrind
     --no-sdl-threads  Disallow use of SDL threads. This prevents the default
                       behavior of falling back to them if no native thread
                       support was found.
+    --with-address-sanitizer
+                      Enasbles the AddressSanitizer feature. Forces SDL threads.
     --32-bit          Force a 32-bit simulator (use with --sdl-threads for duke3d)
     --prefix          Target installation directory
     --compiler-prefix Override compiler prefix (inherently dangerous)
@@ -1435,6 +1450,7 @@ ARG_ARM_THUMB=
 ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
 ARG_32BIT=
+ARG_ADDR_SAN=
 err=
 for arg in "$@"; do
 	case "$arg" in
@@ -1457,6 +1473,7 @@ for arg in "$@"; do
         --sdl-threads)ARG_THREAD_SUPPORT=1;;
         --no-sdl-threads)
                       ARG_THREAD_SUPPORT=0;;
+        --with-address-sanitizer) ARG_ADDR_SAN=1;;
         --prefix=*)   ARG_PREFIX=`echo "$arg" | cut -d = -f 2`;;
         --compiler-prefix=*)   ARG_COMPILER_PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
@@ -4741,6 +4758,8 @@ EOF
 if ! diff -q autoconf.h.new autoconf.h > /dev/null 2>&1 ; then
     mv autoconf.h.new autoconf.h
     echo "Created autoconf.h"
+else
+    rm -f autoconf.h.new
 fi
 
 if test -n "$t_cpu"; then
