@@ -22,6 +22,30 @@
       "revId": "e11fd588c75299fe10083269eaf68f7a3f2d5871",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "549ad1a8_c11477ac",
+        "filename": "firmware/drivers/audio/erosqlinux_codec.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-08T18:42:30Z",
+      "side": 1,
+      "message": "That makes a lot of sense. Probably would eventually want its own setting, but it makes plenty of sense given that it\u0027s already there.",
+      "parentUuid": "80b8a922_b4c98be8",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 17
+      },
+      "revId": "e11fd588c75299fe10083269eaf68f7a3f2d5871",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
