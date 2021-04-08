@@ -141,6 +141,7 @@ local _print = {} do
                     ovfl = "auto",
                     justify = "left",
                     autoupdate = true,
+                    drawsep = false,
                   }
         _p_opts.max_line = max_lines(_p_opts)
 
@@ -284,6 +285,8 @@ local _print = {} do
         end
 
         local line = o.line - 1 -- rb is 0-based lua is 1-based
+
+
         if(o.ovfl == "auto" and w >= o.width) then -- -o.x
             rb.lcd_puts_scroll(0, line, msg)
         else
@@ -292,7 +295,10 @@ local _print = {} do
                 col_buf_insert(msg, o.line, o)
             end
         end
-
+        if o.drawsep == true then
+            rb.set_viewport(o)
+            rb.lcd_drawline(0, line * h, o.width, line * h)
+        end
         --only update the line we changed
         update_line(o.autoupdate, o, line, h)
 
