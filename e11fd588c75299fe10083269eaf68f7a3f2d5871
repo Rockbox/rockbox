@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "80b8a922_b4c98be8",
+        "filename": "firmware/drivers/audio/erosqlinux_codec.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-04-08T17:41:55Z",
+      "side": 1,
+      "message": "How about this -- instead of a fixed value here, how about using the global volume_limit setting?  This way the cap is configurable.\n\nIt should be as simple as \u0027l \u003d r \u003d global_settings.volume_limit;\u0027",
+      "range": {
+        "startLine": 178,
+        "startChar": 0,
+        "endLine": 179,
+        "endChar": 17
+      },
+      "revId": "e11fd588c75299fe10083269eaf68f7a3f2d5871",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
