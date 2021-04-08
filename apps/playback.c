@@ -1872,10 +1872,37 @@ static int audio_load_track(void)
          playlist_peek_offset);
 
     /* Get track name from current playlist read position */
+    int fd = -1;
     char path_buf[MAX_PATH + 1];
-    const char *path = playlist_peek(playlist_peek_offset,
-                                     path_buf,
-                                     sizeof (path_buf));
+    const char *path;
+
+    while (1)
+    {
+        path = playlist_peek(playlist_peek_offset,
+                             path_buf,
+                             sizeof (path_buf));
+
+        if (!path)
+            break;
+
+        /* Test for broken playlists by probing for the files */
+        fd = open(path, O_RDONLY);
+        if (fd >= 0)
+            break;
+
+        logf("Open failed");
+
+        /* only skip if failed track has a successor in playlist */
+        if (!playlist_peek(playlist_peek_offset + 1, NULL, 0))
+            break;
+
+        /* Skip invalid entry from playlist */
+        playlist_skip_entry(NULL, playlist_peek_offset);
+
+        /* Sync the playlist if it isn't finished */
+        if (playlist_peek(playlist_peek_offset, NULL, 0))
+            playlist_next(0);
+    }
 
     if (!path)
     {
@@ -1911,14 +1938,12 @@ static int audio_load_track(void)
         /* Load the metadata for the first unbuffered track */
         ub_id3 = id3_get(UNBUFFERED_ID3);
 
-        int fd = open(path, O_RDONLY);
         if (fd >= 0)
         {
             id3_mutex_lock();
             if(!get_metadata(ub_id3, fd, path))
                 wipe_mp3entry(ub_id3);
             id3_mutex_unlock();
-            close(fd);
         }
 
         if (filling != STATE_FULL)
@@ -1936,13 +1961,16 @@ static int audio_load_track(void)
         {
             track_list_free_info(&info);
             track_list.in_progress_hid = 0;
+            if (fd >= 0)
+                close(fd);
             return LOAD_TRACK_ERR_FAILED;
         }
 
         /* Successful load initiation */
         track_list.in_progress_hid = info.self_hid;
     }
-
+    if (fd >= 0)
+        close(fd);
     return LOAD_TRACK_OK;
 }
 
