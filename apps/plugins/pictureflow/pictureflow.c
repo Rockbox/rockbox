@@ -2311,7 +2311,7 @@ static int read_pfraw(char* filename, int prio)
 
     if (hid < 0) {
         rb->close( fh );
-        return 0;
+        return -1;
     }
 
     rb->yield(); /* allow audio to play when fast scrolling */
@@ -2347,7 +2347,7 @@ static inline bool load_and_prepare_surface(const int slide_index,
                  hash_album, hash_artist);
 
     int hid = read_pfraw(pfraw_file, prio);
-    if (!hid)
+    if (hid < 0)
         return false;
 
     pf_sldcache.cache[cache_index].hid = hid;
@@ -3589,9 +3589,10 @@ static int pictureflow_main(void)
 
     pf_idx.buf_sz -= aa_bufsz;
     ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
-    aa_cache.buf = (char*) pf_idx.buf + aa_bufsz;
+    aa_cache.buf = (char*) pf_idx.buf;
     aa_cache.buf_sz = aa_bufsz;
-    ALIGN_BUFFER(aa_cache.buf, aa_cache.buf_sz, 4);
+    pf_idx.buf += aa_bufsz;
+    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
 
     if (!create_empty_slide(pf_cfg.cache_version != CACHE_VERSION)) {
         config_save(CACHE_REBUILD);
@@ -3613,7 +3614,7 @@ static int pictureflow_main(void)
 
     rb->buflib_init(&buf_ctx, (void *)pf_idx.buf, pf_idx.buf_sz);
 
-    if (!(empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)))
+    if ((empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0)) < 0)
     {
         error_wait("Unable to load empty slide image");
         return PLUGIN_ERROR;
