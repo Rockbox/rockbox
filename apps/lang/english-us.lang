@@ -9611,15 +9611,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </voice>
 </phrase>
 <phrase>
@@ -15688,5 +15688,19 @@
   </dest>
   <voice>
     *: "Exempt Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Always Autolock"
+  </dest>
+  <voice>
+    *: "Always Autolock"
   </voice>
 </phrase>
