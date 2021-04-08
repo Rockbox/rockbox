@@ -670,6 +670,7 @@ const char *get_token_value(struct gui_wps *gwps,
 {
     int numeric_ret = -1;
     const char *numeric_buf = "?";
+    int fmt_size;
 
     if (!gwps)
         return NULL;
@@ -886,7 +887,18 @@ const char *get_token_value(struct gui_wps *gwps,
             break;
 
         case SKIN_TOKEN_VOLUME:
-            snprintf(buf, buf_size, "%d", global_settings.volume);
+            fmt_size = format_sound_value(buf, buf_size, SOUND_VOLUME,
+                                          global_settings.volume);
+            /* FIXME: this is a cheap hack to avoid breaking existing themes.
+             * The new formatting includes a unit based on the AUDIOHW_SETTING
+             * definition -- on all targets, it's defined to be "dB". But the
+             * old formatting was just an integer value, and many themes append
+             * "dB" manually. So we need to strip the unit to unbreak all those
+             * existing themes.
+             */
+            if(fmt_size >= 3 && !strcmp(&buf[fmt_size - 3], " dB"))
+                buf[fmt_size - 3] = 0;
+
             if (intval)
             {
                 int minvol = sound_min(SOUND_VOLUME);
