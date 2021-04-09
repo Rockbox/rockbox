@@ -687,7 +687,7 @@ static int button_read(void)
        status twice in a row. */
 #ifndef HAVE_TOUCHSCREEN
     if (btn != last_read)
-            retval = lastbtn;
+        retval = lastbtn;
     else
 #endif
         retval = btn;

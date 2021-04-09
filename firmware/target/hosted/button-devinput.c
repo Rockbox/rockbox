@@ -33,6 +33,22 @@
 #include "button.h"
 #include "panic.h"
 
+#ifdef HAVE_SCROLLWHEEL
+#include "powermgmt.h"
+#if defined(HAVE_BACKLIGHT) || defined(HAVE_BUTTON_LIGHT)
+#include "backlight.h"
+#endif
+#endif /* HAVE_SCROLLWHEEL */
+
+/* TODO:  HAVE_SCROLLWHEEL is a hack.  Instead of posting the exact number
+   of clicks, instead do it similar to the ipod clickwheel and post
+   the wheel angular velocity (degrees per second)
+
+   * Track the relative position  (ie based on click events)
+   * Use WHEELCLICKS_PER_ROTATION to convert clicks to angular distance
+   * Compute to angular velocity (degrees per second)
+
+ */
 #define NR_POLL_DESC    4
 
 static int num_devices = 0;
@@ -150,8 +166,17 @@ int button_read_device(void)
     }
 
 #ifdef HAVE_SCROLLWHEEL
-    // TODO: Is there a better way to handle this?
-    // TODO: enable BUTTON_REPEAT if the events happen quickly enough
+    /* Reset backlight and poweroff timers */
+    if (wheel_ticks) {
+#ifdef HAVE_BACKLIGHT
+        backlight_on();
+#endif
+#ifdef HAVE_BUTTON_LIGHT
+        buttonlight_on();
+#endif
+        reset_poweroff_timer();
+    }
+
     if (wheel_ticks > 0)
     {
         while (wheel_ticks-- > 0)
@@ -159,14 +184,14 @@ int button_read_device(void)
             queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
         }
     }
-    else
+    else if (wheel_ticks < 0)
     {
         while (wheel_ticks++ < 0)
         {
             queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
         }
     }
-#endif
+#endif /* HAVE_SCROLLWHEEL */
 
     return button_bitmap;
 }
