@@ -69,7 +69,7 @@
 #endif
 
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
-#if defined(HAE_ALSA_32BIT)
+#if defined(HAVE_ALSA_32BIT)
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
 typedef int32_t sample_t;
 #else
