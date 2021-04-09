@@ -277,7 +277,7 @@ static int dig_vol_mult_r = 2 << 16; /* multiplicative factor to apply to each s
 void pcm_set_mixer_volume(int vol_db_l, int vol_db_r)
 {
     if(vol_db_l > 0 || vol_db_r > 0 || vol_db_l < -43 || vol_db_r < -43)
-        panicf("invalid pcm alsa volume");
+        panicf("invalid pcm alsa volume %d %d",   vol_db_l, vol_db_r);
     if(format != SND_PCM_FORMAT_S32_LE)
         panicf("this function assumes 32-bit sample size");
     vol_db_l += 48; /* -42dB .. 0dB => 5dB .. 48dB */

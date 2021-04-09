@@ -36,8 +36,7 @@
 
 /* Audio codec */
 #define HAVE_EROSQ_LINUX_CODEC
-/* Rockbox has to handle the volume level */
-#define HAVE_SW_VOLUME_CONTROL
+#define HAVE_ALSA_32BIT
 
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS

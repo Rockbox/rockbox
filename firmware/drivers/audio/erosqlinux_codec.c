@@ -169,6 +169,10 @@ void audiohw_set_frequency(int fsel)
     (void)fsel;
 }
 
+/* min/max for pcm volume */
+const int min_pcm = -430;
+const int max_pcm = 0;
+
 void audiohw_set_volume(int vol_l, int vol_r)
 {
     logf("hw vol %d %d", vol_l, vol_r);
@@ -179,7 +183,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     vol_r_hw = vol_r;
 
     if (lineout_inserted()) {
-        /* On the EROS Q/K hardware, line out is _very_ hot
+        /* On the EROS Q/K hardware, full scale line out is _very_ hot
            at ~5.8Vpp. As the hardware provides no way to reduce
            output gain, we have to back off on the PCM signal
            to avoid blowing out the signal.
@@ -190,10 +194,9 @@ void audiohw_set_volume(int vol_l, int vol_r)
         r = vol_r_hw;
     }
 
-    /* SW volume for <= 1.0 gain, HW at unity, < -740 == MUTE */
-    int sw_volume_l = l <= -740 ? PCM_MUTE_LEVEL : MIN(l, 0);
-    int sw_volume_r = r <= -740 ? PCM_MUTE_LEVEL : MIN(r, 0);
-    pcm_set_master_volume(sw_volume_l, sw_volume_r);
+    int sw_volume_l = l <= min_pcm ? min_pcm : MIN(l, max_pcm);
+    int sw_volume_r = r <= min_pcm ? min_pcm : MIN(r, max_pcm);
+    pcm_set_mixer_volume(sw_volume_l / 10, sw_volume_r / 10);
 }
 
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
@@ -212,7 +215,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
         r = vol_r_hw;
     }
 
-    int sw_volume_l = l <= -740 ? PCM_MUTE_LEVEL : MIN(l, 0);
-    int sw_volume_r = r <= -740 ? PCM_MUTE_LEVEL : MIN(r, 0);
-    pcm_set_master_volume(sw_volume_l, sw_volume_r);
+    int sw_volume_l = l <= min_pcm ? min_pcm : MIN(l, max_pcm);
+    int sw_volume_r = r <= min_pcm ? min_pcm : MIN(r, max_pcm);
+    pcm_set_mixer_volume(sw_volume_l / 10, sw_volume_r / 10);
 }
