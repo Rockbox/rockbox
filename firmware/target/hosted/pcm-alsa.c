@@ -69,8 +69,7 @@
 #endif
 
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
-#if defined(SONY_NWZ_LINUX) || defined(HAVE_FIIO_LINUX_CODEC)
-/* Sony NWZ must use 32-bit per sample */
+#if defined(HAE_ALSA_32BIT)
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
 typedef int32_t sample_t;
 #else
@@ -262,6 +261,7 @@ error:
     return err;
 }
 
+#if defined(HAVE_ALSA_32BIT)
 /* Digital volume explanation:
  * with very good approximation (<0.1dB) the convertion from dB to multiplicative
  * factor, for dB>=0, is 2^(dB/3). We can then notice that if we write dB=3*k+r
@@ -303,6 +303,7 @@ void pcm_set_mixer_volume(int vol_db_l, int vol_db_r)
         dig_vol_mult_r = 1 << vol_shift_r | 1 << (vol_shift_r - 1);
     logf("r: %d dB -> factor = %d", vol_db_r - 48, dig_vol_mult_r);
 }
+#endif
 
 /* copy pcm samples to a spare buffer, suitable for snd_pcm_writei() */
 static bool copy_frames(bool first)
@@ -343,37 +344,40 @@ static bool copy_frames(bool first)
             panicf("Wrong pcm_size");
         /* the compiler will optimize this test away */
         nframes = MIN((ssize_t)pcm_size/4, frames_left);
-        if (format == SND_PCM_FORMAT_S32_LE)
-        {
-            /* We have to convert 16-bit to 32-bit, the need to multiply the
-             * sample by some value so the sound is not too low */
-            const int16_t *pcm_ptr = pcm_data;
-            sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
-            for (int i = 0; i < nframes; i++)
-            {
-                *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_l;
-                *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_r;
-            }
-        }
-        else
-        {
+
 #ifdef HAVE_RECORDING
-            switch (current_alsa_mode)
-            {
-            case SND_PCM_STREAM_PLAYBACK:
+        switch (current_alsa_mode)
+        {
+        case SND_PCM_STREAM_PLAYBACK:
 #endif
+#if defined(HAVE_ALSA_32BIT)
+            if (format == SND_PCM_FORMAT_S32_LE)
+            {
+                /* We have to convert 16-bit to 32-bit, the need to multiply the
+                 * sample by some value so the sound is not too low */
+                const int16_t *pcm_ptr = pcm_data;
+                sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
+                for (int i = 0; i < nframes; i++)
+                {
+                    *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_l;
+                    *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_r;
+                }
+            }
+            else
+#endif
+            {
                 /* Rockbox and PCM have same format: memcopy */
                 memcpy(&frames[2*(period_size-frames_left)], pcm_data, nframes * 4);
+	    }
 #ifdef HAVE_RECORDING
-                break;
-            case SND_PCM_STREAM_CAPTURE:
-                memcpy(pcm_data_rec, &frames[2*(period_size-frames_left)], nframes * 4);
-                break;
-            default:
-                break;
-            }
-#endif
+            break;
+        case SND_PCM_STREAM_CAPTURE:
+            memcpy(pcm_data_rec, &frames[2*(period_size-frames_left)], nframes * 4);
+            break;
+        default:
+            break;
         }
+#endif
         pcm_data += nframes*4;
         pcm_size -= nframes*4;
         frames_left -= nframes;

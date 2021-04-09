@@ -117,6 +117,7 @@
 
 /* Audio codec */
 #define HAVE_FIIO_LINUX_CODEC
+#define HAVE_ALSA_32BIT
 
 /* We don't have hardware controls */
 #define HAVE_SW_TONE_CONTROLS

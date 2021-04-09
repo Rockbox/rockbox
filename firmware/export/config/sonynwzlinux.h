@@ -82,6 +82,7 @@
 
 /* Audio codec */
 #define HAVE_NWZ_LINUX_CODEC
+#define HAVE_ALSA_32BIT
 
 #endif /* SIMULATOR */
 
