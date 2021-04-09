@@ -1,7 +1,7 @@
 % $Id$ %
 \screenshot{configure_rockbox/images/ss-sound-settings}{The sound settings screen}{}
 
-The sound settings menu offers a selection of sound settings you may 
+The sound settings menu offers a selection of sound settings you may
 change to customise your listening experience.
 
 \section{\label{ref:volume}Volume}
@@ -22,17 +22,17 @@ change to customise your listening experience.
       minimum of -73~dB to a maximum of +6~dB.}%
   \opt{ipodnano}{minimum of -72~dB to a maximum of +6~dB.}%
   \opt{ipodvideo,cowond2}{minimum of -89~dB to a maximum of +6~dB.}%
-  \opt{ipodnano2g,ipodcolor,ipod1g2g,iriverh10,iriverh10_5gb,sansa,sansaAMS}{minimum of 
+  \opt{ipodnano2g,ipodcolor,ipod1g2g,iriverh10,iriverh10_5gb,sansa,sansaAMS}{minimum of
       -74~dB to a maximum of +6~dB.}%
   \opt{gigabeats}{minimum of -90~dB to a maximum of +6~dB.}%
   \opt{gigabeatf,vibe500}{minimum of -74~dB to a maximum of +6~dB.}%
   \opt{fuzeplus}{minimum of -100~dB to a maximum of +6~dB.}
   \opt{samsungyh}{minimum of -128~dB to a maximum of 0~dB.}
-  \opt{ipodvideo}{\\Remark: Lowering the volume below -57~dB will also affect the line-out 
+  \opt{ipodvideo}{\\Remark: Lowering the volume below -57~dB will also affect the line-out
   and the recording gain.}
   \opt{cowond2}{\\Remark: Lowering the volume below -57~dB will also affect the line-out.}
 
-\nopt{gigabeats}{  
+\nopt{gigabeats}{
 \section{Bass}
   This setting emphasises
   \nopt{iriverh100,iriverh300}{or suppresses}
@@ -50,6 +50,7 @@ change to customise your listening experience.
   default set to the maximum volume which equals to no limit. To set a volume
   limit, select a volume from the list and the maximum volume will be limited to
   the selected value all over the system.
+  \opt{xduoox3}{This setting also applies to the Line Out of the \dap{}, as at full scale the \dap{} overdrives the signal.}
 
 \opt{ipodvideo}{
 \section{Bass Cutoff}
@@ -87,7 +88,7 @@ change to customise your listening experience.
   implemented in hardware, and therefore does not tax the processor when in use.
   Rockbox also features a more advanced five-band equalizer (see
   \reference{ref:EQ}) that is implemented in software and allows more fine
-  grained control, but also requires more processor time. 
+  grained control, but also requires more processor time.
 
   \begin{description}
   \item[Band 1 Gain.]
@@ -110,14 +111,14 @@ change to customise your listening experience.
   \item[Advanced Tone Control Settings.]
         This submenu allows you to change advanced parameters for each band.
   \end{description}
-  
+
   As a general guide, EQ band 1 should be used for low frequencies, EQ bands 2
   to 4 should be used for mids, and EQ band 5 should be used for highs.\\*
 
   \subsection{Advanced Tone Control Settings}
     As in the previous menu, the ``gain'' setting controls how much the
     loudness of the band is adjusted.  In addition the following parameters
-    can be adjusted:  
+    can be adjusted:
 
   \begin{description}
     \item[Band 1 Frequency.]
@@ -168,8 +169,8 @@ change to customise your listening experience.
       \item[Karaoke.]
           Removes all sound that is common to both channels. Since most
           music is recorded with vocals being equally present in both channels
-          to make the singer sound centrally placed, this often (but not 
-          always) has the effect of removing the voice track from a song. This 
+          to make the singer sound centrally placed, this often (but not
+          always) has the effect of removing the voice track from a song. This
           setting also very often has other undesirable effects on the sound.
   \end{description}
 
@@ -212,7 +213,7 @@ change to customise your listening experience.
   the right ear hears only the right channel. The result is that sound from
   headphones does not provide the same spatial cues to your ear and brain as
   speakers, and might for that reason sound unnatural to some listeners.\\
-    
+
   The crossfeed function uses an algorithm to feed a delayed and filtered
   portion of the signal from the right channel into the left channel and vice
   versa in order to simulate the spatial cues that the ear and brain receive
@@ -238,7 +239,7 @@ change to customise your listening experience.
     of both this setting and the \setting{Cross Gain} setting.
   \item[High-Frequency Cutoff.]
     Decides at which frequency the cross path audio will start to be cut
-    by the amount described by the \setting{High-Frequency Attenuation} 
+    by the amount described by the \setting{High-Frequency Attenuation}
     setting.
   \end{description}
 
@@ -246,31 +247,31 @@ change to customise your listening experience.
   for the more adventurous user the settings can be fine-tuned to provide a
   virtual speaker placement suited to ones preference.
   % TODO: adapt the guidelines for crossfeed settings found here?
-  % http://www.ohl.to/interests-in-audio/crossfeed-and-eq-for-headphones/ 
+  % http://www.ohl.to/interests-in-audio/crossfeed-and-eq-for-headphones/
   Beware that the crossfeed function is capable of making the audio distort
   if you choose settings which result in a too high output level.
-  
+
 \section{\label{ref:EQ}Equalizer}
   \screenshot{configure_rockbox/images/ss-equalizer}{The graphical equalizer}{}
   Rockbox features a parametric equalizer (EQ). In contrast to non-parametric
   equalizers, a parametric EQ enables adjusting the center frequency, gain, and
   width of EQ bands separately.  The ability to adjust the frequency and width
-  of bands enables more precise control of the EQ frequency response while 
-  avoiding the use of a large number of bands (often 12+) needed in a 
+  of bands enables more precise control of the EQ frequency response while
+  avoiding the use of a large number of bands (often 12+) needed in a
   non-parametric EQ.
-  
+
   The graphic below illustrates how the width of 10kHz band can be adjusted to
   cover a wider (lower Q) or narrower (higher Q) range of frequencies.
-  
+
   \includegraphics[width=14cm]{configure_rockbox/images/Q_factor.png}
-  
+
   \nopt{gigabeats}{In some ways the EQ is similar to the
   \setting{Bass} and \setting{Treble} settings described earlier, but the EQ
   allows you to control the sound much more carefully.  Note that the parameteric
-  EQ bands will be applied in addition to any bass or treble tone controls. 
-  } \opt{gigabeats}{The EQ  is similar to the \setting{Tone Controls} described 
+  EQ bands will be applied in addition to any bass or treble tone controls.
+  } \opt{gigabeats}{The EQ  is similar to the \setting{Tone Controls} described
   above, but allows more delicate control.}\\
-  
+
   \note{A maximum of 10 EQ bands are possible on most devices, but using more
         than are required will waste battery and introduce additional rounding
         noise.  For best results, use the fewest number of bands required.}
@@ -324,7 +325,7 @@ change to customise your listening experience.
   This option brings up a graphic EQ screen, which allows adjustment of each of
   the three parameters described above (gain, centre frequency, and Q) for each
   of the five EQ bands.
-  
+
     \begin{btnmap}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,GIGABEAT_PAD%
           ,GIGABEAT_S_PAD,SANSA_C200_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
@@ -406,7 +407,7 @@ change to customise your listening experience.
       \opt{touchscreen}{\TouchCenter
           \opt{COWON_D2_PAD}{/ \ButtonMenu}}
           &
-      \opt{HAVEREMOTEKEYMAP}{     
+      \opt{HAVEREMOTEKEYMAP}{
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCSelect}
           \opt{GIGABEAT_RC_PAD,IAUDIO_RC_PAD}{\ButtonRCPlay}
           &}
@@ -426,7 +427,7 @@ change to customise your listening experience.
       \opt{touchscreen}{\TouchTopLeft
           \opt{COWON_D2_PAD}{/ \ButtonPower}}
           &
-      \opt{HAVEREMOTEKEYMAP}{ 
+      \opt{HAVEREMOTEKEYMAP}{
           \opt{IRIVER_RC_H100_PAD}{\ButtonRCStop}
           \opt{GIGABEAT_RC_PAD}{\ButtonRCDsp}
           \opt{IAUDIO_RC_PAD}{\ButtonRCRec}
@@ -437,16 +438,16 @@ change to customise your listening experience.
     \end{btnmap}
 
   \item[Pre-cut.]
-  If too much positive gain is added through the graphical EQ, your music may 
+  If too much positive gain is added through the graphical EQ, your music may
   distort.  The \setting{Precut} setting allows you to apply a global negative
   gain to decoded audio, cancelling out positive gain from the EQ.  This will
-  prevent distortion when boosting certain frequency ranges, at the expense of 
+  prevent distortion when boosting certain frequency ranges, at the expense of
   making audio quieter.
-  
+
   Alternatively, precut can be used with a flat EQ curve to implement a volume
   cap.  For example, on a player that allows overdriving the headphone output
   to +6dB, maximum volume can be capped to +0dB by applying 6dB of precut. Note
-  that precut is not applied if EQ is disabled.  
+  that precut is not applied if EQ is disabled.
 
 \item[Simple EQ.]
 This option provides an easier alternative for those who are daunted by all of
@@ -507,15 +508,15 @@ details about how to use the feature.
 }
 
 \section{Haas Surround}
-This setting implements the Haas effect with adjustable delay time to enhance 
+This setting implements the Haas effect with adjustable delay time to enhance
 the stereo effect of the sound. A full range Haas effect creates the impression
-that sound  starts from one channel and ends in the other.  Therefore, four additional 
+that sound  starts from one channel and ends in the other.  Therefore, four additional
 functions are provided to move the stage back to the center:
-\setting{Balance} to change the left-right channel output ratio.  
-A bypass band for frequencies that mostly contain vocals, using \setting{f(x1)}, 
-and \setting{f(x2)} to set frequencies which are not affected. The \setting{SIDE ONLY} 
-setting uses mid-side processing to determine and apply effect to the side channel only. 
-Finally, the \setting{Dry/Wet Mix} setting adjusts the proportion mixed from the 
+\setting{Balance} to change the left-right channel output ratio.
+A bypass band for frequencies that mostly contain vocals, using \setting{f(x1)},
+and \setting{f(x2)} to set frequencies which are not affected. The \setting{SIDE ONLY}
+setting uses mid-side processing to determine and apply effect to the side channel only.
+Finally, the \setting{Dry/Wet Mix} setting adjusts the proportion mixed from the
 original (dry) and 'effected' (wet) signals.
 
 \section{Perceptual Bass Enhancement}
@@ -523,10 +524,10 @@ This setting implements a group delay correction and an additional biophonic EQ 
 emphasize to boost bass perception. The \setting{precut} setting provides
 negative overall gain to prevent possible audio distortion due to the EQ
 gain.  The defult precut value is set to -2.5 dB and can be adjust from 0 dB to -4.5 dB.
-Note that this effect will stack with any other EQ applied.  
+Note that this effect will stack with any other EQ applied.
 
 \section{Auditory Fatigue Reduction}
-Human hearing is more senstive to some frequency bands. This setting applies additional 
+Human hearing is more senstive to some frequency bands. This setting applies additional
 equalization and bi-shelf filtering to reduce signals in these bands to minimize
 the chance that temporary threshold shift (auditory fatigue) occurs.
 

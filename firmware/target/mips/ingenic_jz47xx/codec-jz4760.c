@@ -27,6 +27,7 @@
 #include "cs4398.h"
 #include "kernel.h"
 #include "button.h"
+#include "settings.h"
 
 #define PIN_CS_RST      (32*1+10)
 #define PIN_CODEC_PWRON (32*1+13)
@@ -73,6 +74,7 @@ static void audiohw_mute(bool mute)
         cs4398_write_reg(CS4398_REG_MUTE, cs4398_read_reg(CS4398_REG_MUTE) & ~(CS4398_MUTE_A | CS4398_MUTE_B));
 }
 
+/* TODO:  Note this is X3-specific! */
 void audiohw_preinit(void)
 {
     cs4398_write_reg(CS4398_REG_MISC, CS4398_CPEN | CS4398_PDN);
@@ -155,6 +157,8 @@ static void jz4760_set_vol(int vol_l, int vol_r)
     cs4398_write_reg(CS4398_REG_MISC, val);
 }
 
+/* The xDuoo X3's line out is a bit on the hot side, with about 4.3Vpp
+   so allow the level to be backed off by using the global volume_limit */
 void audiohw_set_volume(int vol_l, int vol_r)
 {
 #ifdef HAVE_LINEOUT_DETECTION
@@ -162,8 +166,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     real_vol_r = vol_r;
 
     if (lineout_inserted()) {
-       vol_l = 0;
-       vol_r = 0;
+       vol_l = vol_r = global_settings.volume_limit;
     }
 #endif
     jz4760_set_vol(vol_l, vol_r);
@@ -176,7 +179,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 
 #ifdef HAVE_LINEOUT_DETECTION
     if (lineout_inserted()) {
-       jz4760_set_vol(0, 0);
+       jz4760_set_vol(global_settings.volume_limit, global_settings.volume_limit);
     } else {
        jz4760_set_vol(real_vol_l, real_vol_r);
     }
