@@ -20,6 +20,8 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
+#define RB_FILESYSTEM_OS  // VERY important this is before settings.h
+                          // because that pulls in rbpaths.h which breaks open()
 
 //#define LOGF_ENABLE
 
@@ -204,8 +206,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
     (void)vol_r;
 
     if (lineout_inserted()) {
-        l = -180;
-        r = -180;
+        l = r = global_settings.volume_limit;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
