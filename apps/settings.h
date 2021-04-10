@@ -32,7 +32,7 @@
 #include "button.h"
 #include "audio.h"
 #include "dsp_proc_settings.h"
-#include "rbpaths.h"
+//#include "rbpaths.h"
 
 struct opt_items {
     unsigned const char* string;

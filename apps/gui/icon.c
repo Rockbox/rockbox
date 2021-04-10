@@ -28,6 +28,7 @@
 #include "screen_access.h"
 #include "icons.h"
 #include "settings.h"
+#include "rbpaths.h"
 #include "bmp.h"
 #include "filetypes.h"
 #include "language.h"
