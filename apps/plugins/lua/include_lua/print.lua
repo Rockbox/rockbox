@@ -123,6 +123,44 @@ local _print = {} do
         return w, h, msg
     end
 --------------------------------------------------------------------------------
+    local function set_linedesc(t_linedesc, opts)
+        local o = opts or _print.opt.get(true)
+        --local out = function() local t = {} for k, v in pairs(o) do t[#t + 1] = tostring(k) t[#t + 1] = tostring(v) end return table.concat(t, "\n") end
+        --rb.splash_scroller(1000, out())
+        local linedesc ={
+                      --These are the defaults - changes will be made below if you supplied t_linedesc
+                      indent = 0, -- internal indent text
+                      line = 0, -- line index within group
+                      nlines = 1, -- selection grouping
+                      offset = 0, -- internal item offset
+                      scroll = true,
+                      selected = false, --internal
+                      separator_height = 0,
+                      show_cursor = false,
+                      show_icons = false,
+                      icon = -1,
+                      icon_fn = nil,
+                      style = rb.STYLE_DEFAULT,
+                      text_color = o.fg_pattern or WHITE,
+                      line_color = o.bg_pattern or BLACK,
+                      line_end_color= o.bg_pattern or BLACK,
+                    }
+        if type(t_linedesc) == "table" then
+
+            if not o.linedesc then
+                o.linedesc = {}
+                for k, v in pairs(linedesc) do
+                    o.linedesc[k] = v
+                end
+            end
+
+            for k, v in pairs(t_linedesc) do
+                o.linedesc[k] = v
+            end
+            return
+        end
+        o.linedesc = linedesc
+    end
 
     -- set defaults for print view
     local function set_defaults()
@@ -138,11 +176,15 @@ local _print = {} do
                     line = 1,
                     max_line = _NIL,
                     col = 0,
-                    ovfl = "auto",
-                    justify = "left",
-                    autoupdate = true,
-                    drawsep = false,
+                    header = false, --Internal use - treats first entry as header
+                    ovfl = "auto", -- auto, manual, none
+                    justify = "left", --left, center, right
+                    autoupdate = true, --updates screen as items are added
+                    drawsep = false,   -- separator between items
+                    showcursor = false,
+                    linestyle = rb.STYLE_COLORBAR
                   }
+        set_linedesc(nil, _p_opts) -- default line display
         _p_opts.max_line = max_lines(_p_opts)
 
         s_lines, col_buf = {}, {}
@@ -183,33 +225,6 @@ local _print = {} do
         end
         o.sel_pattern = selclr or o.sel_pattern
         o.bg_pattern = bgclr or o.bg_pattern
-    end
-
-    -- helper function sets up colors/marker for selected items
-    local function show_selected(iLine, msg)
-        local o = get_settings() -- using a copy of opts so changes revert
-
-        if s_lines[iLine] == true then
-            if not rb.lcd_set_background then
-                o.drawmode = bit.bxor(o.drawmode, 4)
-            else
-                o.fg_pattern = o.bg_pattern
-                o.bg_pattern = o.sel_pattern
-            end
-            -- alternative selection method
-            --msg = "> " .. msg
-        end
-
-        if not o then rb.set_viewport() return end
-
-        if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
-            o.fg_pattern = 3 - o.fg_pattern
-            o.bg_pattern = 3 - o.bg_pattern
-        end
-
-        rb.set_viewport(o)
-
-        o = _NIL
     end
 
     -- sets line explicitly or increments line if line is _NIL
@@ -276,29 +291,76 @@ local _print = {} do
 
     -- Internal print function
     local function print_internal(t_opts, x, w, h, msg)
-
+        local linedesc
+        local x_in = x
         local o = t_opts
+        local line_indent = 0
+
         if o.justify == "center" then
-            x = x + (o.width - w) / 2
+            line_indent = (o.width - w) / 2
         elseif o.justify == "right" then
-            x = x + (o.width - w)
+            line_indent = (o.width - w)
         end
 
         local line = o.line - 1 -- rb is 0-based lua is 1-based
-        if(o.ovfl == "auto" and w >= o.width) then -- -o.x
-            rb.lcd_puts_scroll(0, line, msg)
-        else
-            rb.lcd_putsxy(x, line * h, msg)
-            if o.ovfl == "manual" then --save msg for later side scroll
-                col_buf_insert(msg, o.line, o)
-            end
+
+        if o.ovfl == "manual" then --save msg for later side scroll
+            col_buf_insert(msg, o.line, o)
         end
-        if o.drawsep == true then
-            if s_lines[o.line] == true then
-                rb.set_viewport(o) --nned to revert drawmode if selected
+
+        if o.line == 1 and o.header then
+            local header_linedesc ={ scroll = true,
+                                     separator_height = 1,
+                                     show_cursor = false,
+                                     selected = false,
+                                     style = rb.STYLE_DEFAULT,
+                                     text_color = o.fg_pattern,
+                                     line_color = o.bg_pattern,
+                                     indent = line_indent
+                      }
+            set_linedesc(header_linedesc, o)
+        else
+            local line_separator = o.linedesc.separator_height or 0 > 0
+            local ovfl = ((o.ovfl == "auto" and s_lines[o.line] == true)
+                          and w >= o.width and x_in == 0)
+
+            local body_linedesc ={ scroll = ovfl,
+                                   separator_height = 0, -- disable builtin line sep
+                                   show_cursor = o.showcursor,
+                                   selected = s_lines[o.line],
+                                   style = rb.STYLE_DEFAULT,
+                                   text_color = o.fg_pattern,
+                                   line_color = o.bg_pattern,
+                                   line_end_color = o.bg_pattern,
+                                   indent = line_indent
+                      }
+
+            if body_linedesc.selected and not body_linedesc.show_cursor then
+                --/* Display colour line selector */
+                body_linedesc.style = o.linestyle or rb.STYLE_COLORBAR
+                body_linedesc.text_color = o.bg_pattern
+                body_linedesc.line_color = o.sel_pattern
+                if body_linedesc.indent < 0 then --rb scroller doesn't like negative offset!
+                    body_linedesc.indent = 0
+                end
+            end
+            set_linedesc(body_linedesc, o)
+        end
+        if o.linedesc.show_icons and type(o.linedesc.icon_fn) == "function" then
+            o.linedesc.icon = o.linedesc.icon_fn(line, o.linedesc.icon or -1)
+        end
+
+        rb.lcd_put_line(x, line *h, msg, o.linedesc)
+
+        if line_separator then
+            if linedesc.selected == true then
+                rb.set_viewport(o) -- revert drawmode if selected
             end
             rb.lcd_drawline(0, line * h, o.width, line * h)
+            rb.lcd_drawline(0, line * h + h, o.width, line * h + h) --only to add the last line
+            -- but we don't have an idea which line is the last line here so every line is the last line!
         end
+
         --only update the line we changed
         update_line(o.autoupdate, o, line, h)
 
@@ -308,7 +370,7 @@ local _print = {} do
     -- Helper function that acts mostly like a normal printf() would
     local function printf(fmt, v1, ...)
         local o = get_settings(true)
-        local w, h, msg
+        local w, h, msg, rep
         local line = o.line - 1 -- rb is 0-based lua is 1-based
 
         if not (fmt) or (fmt) == "\n" then -- handles blank line / single '\n'
@@ -322,9 +384,12 @@ local _print = {} do
             return o.line, o.max_line, o.width, h
         end
 
+        fmt, rep = fmt.gsub(fmt or "", "%%h", "%%s")
+        o.header = (rep == 1)
+
         msg = string.format(fmt, v1, ...)
 
-        show_selected(o.line, msg)
+        --show_selected(o.line, msg)
 
         w, h, msg = check_escapes(o, msg)
 
@@ -337,6 +402,8 @@ local _print = {} do
     local function set_column(x)
         local o = get_settings()
         if o.ovfl ~= "manual" then return end -- no buffer stored to scroll
+        rb.lcd_scroll_stop()
+
         local res, w, h, str, line
 
         for key, value in pairs(col_buf) do
@@ -344,7 +411,7 @@ local _print = {} do
             o.line = key
 
             if value then
-                show_selected(key, value)
+                --show_selected(key, value)
                 res, w, h = text_extent(value, o.font)
                 clear_line(o, line, h)
 
@@ -367,6 +434,7 @@ local _print = {} do
     _print.opt.justify    = set_justify
     _print.opt.sel_line   = select_line
     _print.opt.line       = set_line
+    _print.opt.linedesc   = set_linedesc
     _print.opt.autoupdate = set_update
     _print.clear = clear
     _print.f     = printf
