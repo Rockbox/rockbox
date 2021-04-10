@@ -20,8 +20,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-
-
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -39,7 +37,6 @@
 #include "button.h"
 #include "debug.h"
 #include "panic.h"
-#include "settings.h"
 #include "touchscreen.h"
 
 #include "button-ibasso.h"
