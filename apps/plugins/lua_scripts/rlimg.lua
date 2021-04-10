@@ -36,7 +36,7 @@ local _draw_text      = require("draw_text")
 
 --package.path = scrpath .. "/?.lua;" .. package.path --add lua_scripts directory to path
 
-require("printmenu") --menu
+require("printmenus") --menu
 
 --[[ RBIMAGE library functions
 NOTE!! on x, y coordinates + width & height

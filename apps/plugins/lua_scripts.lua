@@ -24,13 +24,15 @@
 local scrpath = rb.current_path() .. "/lua_scripts/"
 
 package.path = scrpath .. "/?.lua;" .. package.path --add lua_scripts directory to path
-require("printtable")
+require("printmenus")
 
 rb.actions = nil
 package.loaded["actions"] = nil
 
 local excludedsrc = ";filebrowse.lua;fileviewers.lua;printmenu.lua;dbgettags.lua;"
 --------------------------------------------------------------------------------
+local Icon_Plugin = 0x9
+
 
 local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
 
@@ -120,6 +122,15 @@ local function get_files(path, norecurse, finddir, findfile, f_t, d_t)
 end -- get_files
 --------------------------------------------------------------------------------
 
+function icon_fn(item, icon)
+    if item ~= 0 then
+        icon = Icon_Plugin
+    else
+        icon = -1
+    end
+    return icon
+end
+
 -- uses print_table and get_files to display simple file browser
 function script_choose(dir, title)
     local dstr
@@ -128,8 +139,8 @@ function script_choose(dir, title)
     local norecurse  = true
     local f_finddir  = false -- function to match directories; nil all, false none
     local f_findfile = nil -- function to match files; nil all, false none
-
-    local p_settings = {wrap = true, hasheader = true}
+    local t_linedesc = {show_icons = true, icon_fn = icon_fn}
+    local p_settings = {wrap = true, hasheader = true, justify = "left", linedesc = t_linedesc}
     local files = {}
     local dirs = {}
     local item = 1
@@ -142,10 +153,11 @@ function script_choose(dir, title)
         for i = 1, #files do
             table.insert(dirs, "\t" .. string.gsub(files[i], ".*/",""))
         end
-
-        item = print_table(dirs, #dirs, p_settings)
+        --print_menu(menu_t, func_t, selected, settings, copy_screen)
+        _, item = print_menu(dirs, nil, 0, p_settings)
 
         -- If item was selected follow directory or return filename
+        item = item or -1
         if item > 0 then
             dir = files[item - 1]
             if not rb.dir_exists("/" .. dir) then
