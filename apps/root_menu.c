@@ -366,13 +366,11 @@ static int miscscrn(void * param)
 
 static int playlist_view_catalog(void * param)
 {
-    /* kludge untill catalog_view_playlists() returns something useful */
-    int old_playstatus = audio_status();
     (void)param;
     push_current_activity(ACTIVITY_PLAYLISTBROWSER);
-    catalog_view_playlists();
+    bool item_was_selected = catalog_view_playlists();
     pop_current_activity();
-    if (!old_playstatus && audio_status())
+    if (item_was_selected)
         return GO_TO_WPS;
     return GO_TO_PREVIOUS;
 }

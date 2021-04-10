@@ -441,27 +441,31 @@ static char* create_bookmark()
 /* ----------------------------------------------------------------------- */
 /* This function will determine if an autoload is necessary.  This is an   */
 /* interface function.                                                     */
-/* Returns true on bookmark load or bookmark selection.                    */
+/* Returns                                                                 */
+/* BOOKMARK_DO_RESUME    on bookmark load or bookmark selection.           */
+/* BOOKMARK_DONT_RESUME  if we're not going to resume                      */
+/* BOOKMARK_CANCEL       if user canceled                                  */
 /* ------------------------------------------------------------------------*/
-bool bookmark_autoload(const char* file)
+int bookmark_autoload(const char* file)
 {
     char* bookmark;
 
     if(global_settings.autoloadbookmark == BOOKMARK_NO)
-        return false;
+        return BOOKMARK_DONT_RESUME;
 
     /*Checking to see if a bookmark file exists.*/
     if(!generate_bookmark_file_name(file))
     {
-        return false;
+        return BOOKMARK_DONT_RESUME;
     }
 
     if(!file_exists(global_bookmark_file_name))
-        return false;
+        return BOOKMARK_DONT_RESUME;
 
     if(global_settings.autoloadbookmark == BOOKMARK_YES)
     {
-        return bookmark_load(global_bookmark_file_name, true);
+        return bookmark_load(global_bookmark_file_name, true) ? BOOKMARK_DO_RESUME :
+                                                                BOOKMARK_DONT_RESUME;
     }
     else
     {
@@ -478,10 +482,10 @@ bool bookmark_autoload(const char* file)
             /* Act as if autoload was done even if it failed, since the
              * user did make an active selection.
              */
-            return true;
+            return BOOKMARK_DO_RESUME;
         }
 
-        return ret != BOOKMARK_SUCCESS;
+        return ret != BOOKMARK_SUCCESS ? BOOKMARK_CANCEL : BOOKMARK_DONT_RESUME;
     }
 }
 

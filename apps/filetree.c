@@ -100,7 +100,8 @@ bool ft_play_playlist(char* pathname, char* dirname,
 
     if (!skip_warn_and_bookmarks)
     {
-        if (bookmark_autoload(pathname) || !warn_on_pl_erase())
+        int res =  bookmark_autoload(pathname);
+        if (res == BOOKMARK_CANCEL || res == BOOKMARK_DO_RESUME || !warn_on_pl_erase())
             return false;
     }
 
@@ -481,7 +482,9 @@ int ft_enter(struct tree_context* c)
                 break;
 
             case FILE_ATTR_AUDIO:
-                if (bookmark_autoload(c->currdir))
+            {
+                int res = bookmark_autoload(c->currdir);
+                if (res == BOOKMARK_CANCEL || res == BOOKMARK_DO_RESUME)
                     break;
 
                 splash(0, ID2P(LANG_WAIT));
@@ -515,7 +518,7 @@ int ft_enter(struct tree_context* c)
                     play = true;
                 }
                 break;
-
+            }
 #if CONFIG_TUNER
                 /* fmr preset file */
             case FILE_ATTR_FMR:

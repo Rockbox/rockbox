@@ -820,7 +820,10 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
     struct gui_synclist playlist_lists;
 
     if (!open_playlist_viewer(filename, &playlist_lists, false))
+    {
+        ret = PLAYLIST_VIEWER_CANCEL;
         goto exit;
+    }
 
     while (!exit)
     {
@@ -958,10 +961,17 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 else if (pv_onplay_result == PV_ONPLAY_CLOSED)
                 {
                     if (!open_playlist_viewer(filename, &playlist_lists, true))
+                    {
+                        ret = PLAYLIST_VIEWER_CANCEL;
                         goto exit;
+                    }
                     break;
                 }
-                exit = update_viewer_with_changes(&playlist_lists, pv_onplay_result);
+                if (update_viewer_with_changes(&playlist_lists, pv_onplay_result))
+                {
+                    exit = true;
+                    ret = PLAYLIST_VIEWER_CANCEL;
+                }
                 break;
             }
             case ACTION_STD_MENU:
@@ -996,7 +1006,10 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     if (do_plugin(current_track) == PV_ONPLAY_USB_CLOSED)
                         return PLAYLIST_VIEWER_USB;
                     else if (!open_playlist_viewer(filename, &playlist_lists, true))
+                    {
+                        ret = PLAYLIST_VIEWER_CANCEL;
                         goto exit;
+                    }
                 }
                 else if (global_settings.hotkey_tree == HOTKEY_PROPERTIES)
                 {
@@ -1008,10 +1021,16 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     update_lists(&playlist_lists);
                 }
                 else if (global_settings.hotkey_tree == HOTKEY_DELETE)
-                    exit = update_viewer_with_changes(&playlist_lists,
+                {
+                    if (update_viewer_with_changes(&playlist_lists,
                             delete_track(current_track->index,
                             viewer.selected_track,
-                            (current_track->index == viewer.current_playing_track)));
+                            (current_track->index == viewer.current_playing_track))))
+                    {
+                        ret = PLAYLIST_VIEWER_CANCEL;
+                        exit = true;
+                    }
+                }
                 else
                     onplay(current_track->name, FILE_ATTR_AUDIO, CONTEXT_STD, true);
                 break;
