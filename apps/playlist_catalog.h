@@ -29,7 +29,7 @@ void catalog_set_directory(const char* directory);
 
 /* 
  * View list of playlists in catalog.
- *  ret : true if no error
+ *  ret : true if item was selected
  */
 bool catalog_view_playlists(void);
 
