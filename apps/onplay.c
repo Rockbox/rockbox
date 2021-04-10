@@ -550,12 +550,11 @@ static bool add_to_playlist(int position, bool queue)
 
 static bool view_playlist(void)
 {
-    bool was_playing = audio_status() & AUDIO_STATUS_PLAY;
     bool result;
 
     result = playlist_viewer_ex(selected_file);
 
-    if (!was_playing && (audio_status() & AUDIO_STATUS_PLAY) &&
+    if (result == PLAYLIST_VIEWER_OK &&
         onplay_result == ONPLAY_OK)
         /* playlist was started from viewer */
         onplay_result = ONPLAY_START_PLAY;
