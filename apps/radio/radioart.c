@@ -24,7 +24,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "system.h"
-#include "settings.h"
+#include "rbpaths.h"
 #include "radio.h"
 #include "buffering.h"
 #include "playback.h" /* bufopen_user_data */

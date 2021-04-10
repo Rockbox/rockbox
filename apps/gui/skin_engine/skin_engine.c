@@ -27,6 +27,7 @@
 #include "action.h"
 #include "crc32.h"
 #include "settings.h"
+#include "rbpaths.h"
 #include "wps.h"
 #include "file.h"
 #include "misc.h"
