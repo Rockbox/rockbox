@@ -53,6 +53,7 @@ if ($def_type eq "rb_defines") {
         '^PLUGIN_DIR$',
         '^PLUGIN(_APPS_|_GAMES_|_)DATA_DIR$',
         '^ROCKBOX_DIR$',
+        '^STYLE_(NONE|DEFAULT|INVERT|COLORBAR|GRADIENT|COLORED)',
         '^VIEWERS_DATA_DIR$');
 }
 elsif ($def_type eq "sound_defines") {

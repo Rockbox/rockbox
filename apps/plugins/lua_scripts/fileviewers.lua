@@ -205,6 +205,7 @@ function print_file(filename, maxlinelen, settings)
     end
     settings.hasheader = true
     settings.co_routine = nil
+    settings.ovfl = "manual"
 
     local sel =
         print_table(ftable, #ftable, settings)
@@ -309,6 +310,7 @@ function print_file_increment(filename, settings)
     settings.hasheader = true
     settings.co_routine = co
     settings.msel = false
+    settings.ovfl = "manual"
 
     table.insert(file_t, 1, hstr) --position 1 is header/title
     local sel =
@@ -437,6 +439,7 @@ function print_file_hex(filename, bytesperline, settings)
     settings.co_routine = co
     settings.start = start
     settings.curpos = vcur
+    settings.ovfl = "manual"
 
     while sel > 0 do
         settings.start = start

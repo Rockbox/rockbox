@@ -33,7 +33,7 @@ local scrpath = rb.current_path()--rb.PLUGIN_DIR .. "/demos/lua_scripts/"
 
 package.path = scrpath .. "/?.lua;" .. package.path --add lua_scripts directory to path
 
-require("printmenu") --menu
+require("printmenus") --menu
 require("filebrowse") -- file browser
 require("fileviewers") -- fileviewer, hexviewer
 
