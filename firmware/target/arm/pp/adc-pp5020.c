@@ -146,7 +146,7 @@ void adc_init(void)
     ADC_STATUS |= 0x20;
 
     /* Enable channel 1 (unknown) */
-    DEV_INIT1  &=~30;
+    DEV_INIT1  &=~0x30;
     ADC_ADDR   |= 0x2000000;
     ADC_STATUS |= 0x2000;
 
