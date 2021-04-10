@@ -45,6 +45,7 @@
 #include "talk.h"
 #include "playlist_viewer.h"
 #include "bookmark.h"
+#include "root_menu.h"
 
 /* Use for recursive directory search */
 struct add_track_context {
@@ -155,7 +156,8 @@ static int display_playlists(char* playlist, bool view)
 
 restart:
     browse.flags &= ~BROWSE_SELECTED;
-    rockbox_browse(&browse);
+    if (rockbox_browse(&browse) == GO_TO_WPS)
+        result = 0;
 
     if (browse.flags & BROWSE_SELECTED)
     {
@@ -164,13 +166,23 @@ restart:
 
         if (view)
         {
-            
-            if (!bookmark_autoload(selected_playlist))
+
+            if (bookmark_autoload(selected_playlist))
+               result = 0;
+            else
             {
-                if (playlist_viewer_ex(selected_playlist) == PLAYLIST_VIEWER_CANCEL)
-                    goto restart;
+                switch (playlist_viewer_ex(selected_playlist)) {
+                    case PLAYLIST_VIEWER_OK:
+                        result = 0;
+                        break;
+                    case PLAYLIST_VIEWER_CANCEL:
+                        goto restart;
+                    case PLAYLIST_VIEWER_USB:
+                    case PLAYLIST_VIEWER_MAINMENU:
+                    default:
+                        break;
+                }
             }
-            result = 0;
         }
         else
         {
@@ -187,7 +199,7 @@ restart:
 static void display_insert_count(int count)
 {
     static long talked_tick = 0;
-    if(global_settings.talk_menu && count && 
+    if(global_settings.talk_menu && count &&
         (talked_tick == 0 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
     {
         talked_tick = current_tick;
