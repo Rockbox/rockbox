@@ -27,6 +27,7 @@
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
+#include "rbpaths.h"
 #include "menu.h"
 #include "open_plugin.h"
 #include "keyboard.h"

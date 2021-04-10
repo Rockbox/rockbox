@@ -32,6 +32,7 @@
 #include "backlight.h"
 #include "sound.h"
 #include "settings.h"
+#include "rbpaths.h"
 #include "settings_list.h"
 #include "usb.h"
 #include "audio.h"

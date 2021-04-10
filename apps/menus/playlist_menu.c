@@ -26,6 +26,7 @@
 #include "lang.h"
 #include "action.h"
 #include "settings.h"
+#include "string-extra.h"
 #include "menu.h"
 #include "playlist_menu.h"
 

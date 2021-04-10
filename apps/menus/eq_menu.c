@@ -31,6 +31,7 @@
 #include "menu.h"
 #include "action.h"
 #include "settings.h"
+#include "rbpaths.h"
 #include "screens.h"
 #include "icons.h"
 #include "font.h"

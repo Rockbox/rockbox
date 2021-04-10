@@ -34,6 +34,7 @@
 #include "system.h"
 #include "kernel.h"
 #include "lcd.h"
+#include "string-extra.h"
 #include "font.h"
 #include "file.h"
 #include "core_alloc.h"

@@ -24,8 +24,6 @@
 
 #include <stdbool.h>
 #include "autoconf.h"
-#include "string-extra.h"
-
 
 /* name of directory where configuration, fonts and other data
  * files are stored */

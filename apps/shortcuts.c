@@ -33,6 +33,7 @@
 #include "list.h"
 #include "settings.h"
 #include "settings_list.h"
+#include "string-extra.h"
 #include "lang.h"
 #include "menu.h"
 #include "misc.h"

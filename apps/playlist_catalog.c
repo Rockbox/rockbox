@@ -36,6 +36,7 @@
 #include "onplay.h"
 #include "playlist.h"
 #include "settings.h"
+#include "rbpaths.h"
 #include "splash.h"
 #include "tree.h"
 #include "yesno.h"

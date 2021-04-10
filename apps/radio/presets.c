@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "settings.h"
+#include "rbpaths.h"
 #include "general.h"
 #include "radio.h"
 #include "tuner.h"

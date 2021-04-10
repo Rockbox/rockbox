@@ -20,9 +20,6 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#define RB_FILESYSTEM_OS  // VERY important this is before settings.h
-                          // because that pulls in rbpaths.h which breaks open()
-
 //#define LOGF_ENABLE
 
 #include "config.h"

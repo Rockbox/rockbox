@@ -31,11 +31,11 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #include "kernel.h"
 #include "audio.h"
 #include "core_alloc.h"
-#include "settings.h"
+#include "rbpaths.h"
 #include "ata_idle_notify.h"
 #include "pathfuncs.h"
 #include "appevents.h"
-
+#include "string-extra.h"
 #if CONFIG_RTC
 #include "time.h"
 #include "timefuncs.h"
