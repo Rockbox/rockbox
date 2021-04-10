@@ -25,7 +25,7 @@
 --local scrpath = rb.current_path()"
 
 --package.path = scrpath .. "/?.lua;" .. package.path --add lua_scripts directory to path
-require("printmenu")
+require("printmenus")
 require("printtable")
 require("dbgettags")
 

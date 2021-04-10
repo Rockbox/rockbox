@@ -27,9 +27,9 @@ require("actions")   -- Contains rb.actions & rb.contexts
 local _clr   = require("color")
 local _print = require("print")
 local _timer = require("timer")
+local sb_width = 5
 
 -- Button definitions --
-local EXIT_BUTTON = rb.PLA_EXIT
 local CANCEL_BUTTON = rb.actions.PLA_CANCEL
 local DOWN_BUTTON = rb.actions.PLA_DOWN
 local DOWNR_BUTTON = rb.actions.PLA_DOWN_REPEAT
@@ -71,8 +71,8 @@ end
 -- time since last button press is returned in ticks..
 -- make xi, xir, yi, yir negative to flip direction...
 ]]
-
-local function dpad(x, xi, xir, y, yi, yir, timeout)
+local function dpad(x, xi, xir, y, yi, yir, timeout, overflow)
+    local scroll_is_fixed = overflow ~= "manual"
     _timer("dpad") -- start a persistant timer; keeps time between button events
     if timeout == nil then timeout = -1 end
     local cancel, select = 0, 0
@@ -98,10 +98,18 @@ local function dpad(x, xi, xir, y, yi, yir, timeout)
             timeout = timeout + 1
         elseif button == LEFT_BUTTON then
             x_chg = x_chg - xi
+            if scroll_is_fixed then
+                cancel = 1
+                break;
+            end
         elseif button == LEFTR_BUTTON then
             x_chg = x_chg - xir
         elseif button == RIGHT_BUTTON then
             x_chg = x_chg + xi
+            if scroll_is_fixed then
+                select = 1
+                timeout = timeout + 1
+            end
         elseif button == RIGHTR_BUTTON then
             x_chg = x_chg + xir
         elseif button == UP_BUTTON then
@@ -152,19 +160,26 @@ function print_table(t, t_count, settings)
     end
 
     local wrap, justify, start, curpos, co_routine, hasheader, m_sel
-    local header_fgc, header_bgc, item_fgc, item_bgc, item_selc, drawsep
+    local header_fgc, header_bgc, item_fgc, item_bgc, item_selc
+    local table_linedesc, drawsep, overflow, dpad_fn
     do
         local s = settings or _print.get_settings()
-        wrap, justify = s.wrap, s.justify
-        start, curpos = s.start, s.curpos
-        co_routine    = s.co_routine
-        hasheader     = s.hasheader
-        drawsep       = s.drawsep
-        m_sel         = false
+        wrap, justify  = s.wrap, s.justify
+        start, curpos  = s.start, s.curpos
+        co_routine     = s.co_routine
+        hasheader      = s.hasheader
+        drawsep        = s.drawsep
+        sb_width       = s.sb_width or sb_width
+        m_sel          = false
+        table_linedesc = s.linedesc
+        dpad_fn        = s.dpad_fn
+        if type(dpad_fn) ~= "function" then dpad_fn = dpad end
+
         if co_routine == nil then
             --no multi select in incremental mode
             m_sel = s.msel
         end
+        overflow   = s.ovfl or "auto"
         header_fgc = s.hfgc  or _clr.set( 0, 000, 000, 000)
         header_bgc = s.hbgc  or _clr.set(-1, 255, 255, 255)
         item_fgc   = s.ifgc  or _clr.set(-1, 000, 255, 060)
@@ -210,16 +225,19 @@ function print_table(t, t_count, settings)
     -- displays header text at top
     local function disp_header(hstr)
         local header = header or hstr
-        local opts = _print.opt.get()
-        _print.opt.overflow("none") -- don't scroll header; colors change
+        local opts = _print.opt.get() -- save to restore settings
+        _print.opt.overflow("auto") -- don't scroll header; colors change
         _print.opt.color(header_fgc, header_bgc)
         _print.opt.line(1)
 
+        rb.set_viewport(_print.opt.get(true))
         _print.f()
-        local line = _print.f(header)
+        _print.f("%h", tostring(header)) --hack to signal header
 
-        _print.opt.set(opts)
+        _print.opt.set(opts) -- restore settings
         _print.opt.line(2)
+        rb.set_viewport(opts)
+        opts = nil
         return 2
     end
 
@@ -229,7 +247,7 @@ function print_table(t, t_count, settings)
         rb.lcd_update()
 
         local quit, select, x_chg, xi, y_chg, yi, timeb =
-                          dpad(t_p.col, -1, -t_p.col_scrl, t_p.row, -1, -t_p.row_scrl)
+                          dpad_fn(t_p.col, -1, -t_p.col_scrl, t_p.row, -1, -t_p.row_scrl, nil, overflow)
 
         t_p.vcursor = t_p.vcursor + y_chg
 
@@ -322,6 +340,7 @@ function print_table(t, t_count, settings)
 
             rb.button_clear_queue() -- keep the button queue from overflowing
         end
+        rb.lcd_scroll_stop()
         return sel
     end -- display_table
 --============================================================================--
@@ -331,7 +350,7 @@ function print_table(t, t_count, settings)
     _print.opt.color(item_fgc, item_bgc, item_selc)
 
     table_p = init_position(15, 5)
-    line, maxline = _print.opt.area(5, 1, rb.LCD_WIDTH - 10, rb.LCD_HEIGHT - 2)
+    line, maxline = _print.opt.area(5, 1, rb.LCD_WIDTH - 10 - sb_width, rb.LCD_HEIGHT - 2)
     maxline = math.min(maxline, t_count)
 
     -- allow user to start at a position other than the beginning
@@ -349,8 +368,10 @@ function print_table(t, t_count, settings)
     end
 
     _print.opt.sel_line(table_p.vcursor)
-    _print.opt.overflow("manual")
+    _print.opt.overflow(overflow)
     _print.opt.justify(justify)
+
+    _print.opt.linedesc(table_linedesc)
 
     local opts = _print.opt.get()
     opts.drawsep = drawsep
@@ -360,17 +381,19 @@ function print_table(t, t_count, settings)
     -- initialize vertical scrollbar
     set_vsb(); do
         local vsb =_print.opt.get()
+        vsb.width = vsb.width + sb_width
+
         if rb.LCD_DEPTH  == 2 then -- invert 2-bit screens
             vsb.fg_pattern = 3 - vsb.fg_pattern
             vsb.bg_pattern = 3 - vsb.bg_pattern
         end
 
         set_vsb = function (item)
-            if t_count > (maxline or t_count) then
+            if sb_width > 0 and t_count > (maxline or t_count) then
                 rb.set_viewport(vsb)
                 item = item or 0
                 local m = maxline / 2 + 1
-                rb.gui_scrollbar_draw(vsb.width - 5, vsb.y, 5, vsb.height,
+                rb.gui_scrollbar_draw(vsb.width - sb_width, vsb.y, sb_width, vsb.height,
                                       t_count, math.max(0, item - m), 
                                       math.min(item + m, t_count), 0)
             end
@@ -378,7 +401,7 @@ function print_table(t, t_count, settings)
     end -- set_vsb
     local selected = display_table(table_p, 0, 1, 0)
 
-    _print.opt.defaults()
+    _print.opt.defaults() --restore settings
 
     if m_sel == true then -- walk the table to get selected items
         selected = {}

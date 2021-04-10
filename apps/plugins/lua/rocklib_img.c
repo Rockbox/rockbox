@@ -23,6 +23,9 @@
 
 #define lrockimg_c
 #define LUA_LIB
+#define ICON_PADDING_S "1"
+
+
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -1292,6 +1295,137 @@ RB_WRAP(lcd_puts)
     return 0;
 }
 
+/* Helper function for opt_viewport lcd_put_line */
+static int check_tablevalue_def(lua_State *L, const char* key, int tablepos, int def)
+{
+    lua_getfield(L, tablepos, key); /* Find table[key] */
+
+    int val;
+
+    if (lua_isboolean(L, -1))
+        val = lua_toboolean (L, -1);  /*True = 1 and False = 0*/
+    else
+        val = luaL_optinteger(L, -1, def);
+
+    lua_pop(L, 1); /* Pop the value off the stack */
+    return val;
+}
+
+/* Helper function for opt_viewport lcd_put_line */
+static int check_tablevalue(lua_State *L, const char* key, int tablepos)
+{
+    /* returns 0 if key doesn't exist */
+    return check_tablevalue_def(L, key, tablepos, 0);
+}
+
+RB_WRAP(lcd_put_line)
+{
+    /*x, y, text, t_linedesc, [screen = MAIN]*/
+
+#if 0
+    /* height of the line (in pixels). -1 to inherit the height
+     * from the font. The text will be centered if the height is larger,
+     * but the decorations will span the entire height */
+    int height;
+    /* multiline support: For some decorations (e.g. gradient) to work
+     * across multiple lines (e.g. to draw a line selector across 2 lines)
+     * the line index and line count must be known. For normal, single
+     * lines specify nlines=1 and line=0 */
+    /* line count of a group */
+    int16_t nlines;
+    /* index of the line in the group */
+    int16_t line;
+    /* line text color if STYLE_COLORED is specified, in native
+     * lcd format (convert with LCD_RGBPACK() if necessary) */
+    unsigned text_color;
+    /* line color if STYLE_COLORBAR or STYLE_GRADIENT is specified, in native
+     * lcd format (convert with LCD_RGBPACK() if necessary) */
+    unsigned line_color, line_end_color;
+    /* line decorations, see STYLE_DEFAULT etc. */
+    enum line_styles style;
+    /* whether the line can scroll */
+    bool scroll;
+    /* height of the line separator (in pixels). 0 to disable drawing
+     * of the separator */
+    int8_t separator_height;
+#endif
+
+/*LINE_DESC_DEFINIT { .style = STYLE_DEFAULT, .height = -1, .separator_height = 0, .line = 0, .nlines = 1, .scroll = false }*/
+
+    struct line_desc linedes = LINE_DESC_DEFINIT;
+
+    bool is_selected = false;
+    bool show_icons  = false;
+    bool show_cursor = false;
+
+    int line_indent = 0;
+    int item_offset = 0;
+
+    int x = (int) luaL_checkint(L, 1);
+    int y = (int) luaL_checkint(L, 2);
+
+    const unsigned char * string = luaL_checkstring(L, 3);
+    int icon = Icon_NOICON;
+    const int narg = 4;
+
+    if(lua_type(L, narg) == LUA_TTABLE)
+    {
+        /* check_tablevalue only returns INTS */
+        linedes.line = check_tablevalue(L, "line", narg);
+        linedes.height = check_tablevalue_def(L, "height", narg, -1);
+        linedes.nlines = check_tablevalue_def(L, "nlines", narg, 1);
+        linedes.style = check_tablevalue_def(L, "style", narg, STYLE_DEFAULT);
+        linedes.separator_height = check_tablevalue(L, "separator_height", narg);
+        linedes.scroll = check_tablevalue(L, "scroll", narg) > 0;
+
+        linedes.text_color = check_tablevalue(L, "text_color", narg);
+        linedes.line_color = check_tablevalue(L, "line_color", narg);
+        linedes.line_end_color = check_tablevalue(L, "line_end_color", narg);
+
+        icon = check_tablevalue_def(L, "icon", narg, Icon_NOICON);
+        show_icons  = check_tablevalue(L, "show_icons", narg) > 0 && icon > Icon_NOICON;
+        show_cursor = check_tablevalue(L, "show_cursor", narg) > 0;
+        is_selected = check_tablevalue(L, "selected", narg) > 0;
+
+        line_indent = check_tablevalue(L, "indent", narg);
+        item_offset = check_tablevalue(L, "offset", narg);
+
+    }
+
+    while (*string == '\t')
+    {
+        line_indent++;
+        string++;
+    }
+
+    /* mask out gradient and colorbar styles for non-color displays */
+    if (RB_SCREEN_STRUCT(L, 5)->depth < 16)
+    {
+        if (linedes.style & (STYLE_COLORBAR|STYLE_GRADIENT))
+        {
+            linedes.style &= ~(STYLE_COLORBAR|STYLE_GRADIENT);
+            linedes.style |= STYLE_INVERT;
+        }
+        linedes.style &= ~STYLE_COLORED;
+    }
+
+    if (show_cursor && (show_icons && icon > Icon_NOICON))
+        RB_SCREENS(L, 5, put_line, x, y, &linedes,
+                "$*s$"ICON_PADDING_S"I$i$"ICON_PADDING_S"s$*t",
+                line_indent, is_selected ? Icon_Cursor : Icon_NOICON,
+                icon, item_offset, string);
+    else if (show_cursor || (show_icons && icon > Icon_NOICON))
+        RB_SCREENS(L, 5, put_line, x, y, &linedes,
+                "$*s$"ICON_PADDING_S"I$*t", line_indent,
+                show_cursor ? (is_selected ? Icon_Cursor:Icon_NOICON):icon,
+                item_offset, string);
+    else
+        RB_SCREENS(L, 5, put_line, x, y, &linedes, "$*s$*t", line_indent, item_offset, string);
+
+
+    return 0;
+}
+
 RB_WRAP(lcd_puts_scroll)
 {
     int x, y;
@@ -1305,17 +1439,6 @@ RB_WRAP(lcd_scroll_stop)
 {
     RB_SCREENS(L, 1, scroll_stop);
     return 0;
-}
-
-/* Helper function for opt_viewport */
-static int check_tablevalue(lua_State *L, const char* key, int tablepos)
-{
-    lua_getfield(L, tablepos, key); /* Find table[key] */
-
-    int val = lua_tointeger(L, -1);
-
-    lua_pop(L, 1); /* Pop the value off the stack */
-    return val;
 }
 
 static inline struct viewport* opt_viewport(lua_State *L,
@@ -1333,7 +1456,7 @@ static inline struct viewport* opt_viewport(lua_State *L,
     vp->width = check_tablevalue(L, "width", narg);
     vp->height = check_tablevalue(L, "height", narg);
     vp->font = check_tablevalue(L, "font", narg);
-    vp->drawmode = check_tablevalue(L, "drawmode", narg);
+    vp->drawmode = check_tablevalue_def(L, "drawmode", narg, DRMODE_SOLID);
 #if LCD_DEPTH > 1
     vp->fg_pattern = (unsigned int) check_tablevalue(L, "fg_pattern", narg);
     vp->bg_pattern = (unsigned int) check_tablevalue(L, "bg_pattern", narg);
@@ -1686,6 +1809,7 @@ static const luaL_Reg rocklib_img[] =
     R(lcd_set_drawmode),
     R(lcd_putsxy),
     R(lcd_puts),
+    R(lcd_put_line),
     R(lcd_puts_scroll),
     R(lcd_scroll_stop),
     R(set_viewport),
