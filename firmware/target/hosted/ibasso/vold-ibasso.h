@@ -38,5 +38,7 @@ void vold_monitor_start(void);
 */
 bool vold_monitor_forced_close_imminent(void);
 
+/* Track the state of the SD card */
+extern bool extsd_present;
 
 #endif
