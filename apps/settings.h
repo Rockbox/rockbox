@@ -169,20 +169,25 @@ enum {  ALARM_START_WPS = 0,
 #define KEYCLICK_DURATION 2
 
 /** virtual pointer stuff.. move to another .h maybe? **/
+
 /* These define "virtual pointers", which could either be a literal string,
    or a mean a string ID if the pointer is in a certain range.
-   This helps to save space for menus and options. */
+   This helps to save space for menus and options.
 
+   NOTE:  VIRT_PTR must point at an *invalid* address in the target
+          memory map!
+*/
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 #if defined(CPU_S5L870X)
-/* the S5L870X has IRAM at 0, so we use 0xffff bytes right after that */
+/* the S5L870X has IRAM at 0, so we use 0xfffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x40000)
 #elif CONFIG_CPU==DM320
 /* the DM320 has IRAM at 0, so we use 0xffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x4000)
 #else
-/* a location where we won't store strings, 0 is the fastest */
-#define VIRT_PTR ((unsigned char*)0)
+/* 0 is ideal, but that could result in a nullptr for ID==0, so
+   offset it slightly so offset it slightly! */
+#define VIRT_PTR ((unsigned char*)(sizeof(char *)))
 #endif
 
 /* form a "virtual pointer" out of a language ID */
