@@ -481,7 +481,7 @@ bool bookmark_autoload(const char* file)
             return true;
         }
 
-        return ret != BOOKMARK_SUCCESS;
+        return ret == BOOKMARK_SUCCESS;
     }
 }
 
