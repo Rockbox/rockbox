@@ -175,14 +175,15 @@ enum {  ALARM_START_WPS = 0,
 
 #define VIRT_SIZE 0xFFFF /* more than enough for our string ID range */
 #if defined(CPU_S5L870X)
-/* the S5L870X has IRAM at 0, so we use 0xffff bytes right after that */
+/* the S5L870X has IRAM at 0, so we use 0xfffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x40000)
 #elif CONFIG_CPU==DM320
 /* the DM320 has IRAM at 0, so we use 0xffff bytes right after that */
 #define VIRT_PTR ((unsigned char*)0x4000)
 #else
-/* a location where we won't store strings, 0 is the fastest */
-#define VIRT_PTR ((unsigned char*)0)
+/* a location where we won't store strings, 0 is the fastest
+   but that could result in a null pointer, so offset slightly! */
+#define VIRT_PTR ((unsigned char*)(sizeof(char *)))
 #endif
 
 /* form a "virtual pointer" out of a language ID */
