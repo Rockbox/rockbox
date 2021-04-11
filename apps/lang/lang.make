@@ -37,13 +37,13 @@ $(BUILDDIR)/lang/lang_core.o: $(BUILDDIR)/lang/lang.h $(BUILDDIR)/lang/lang_core
 # instead we pretend that genlang create lang_core.c and that lang.c depends from lang.h
 # it will work fine as long as one never manually removes lang.c and not lang.h, and it will avoid
 # race conditions such as running genlang twice or worse in parallel with other things!
-$(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(ENGLISH).lang $(BUILDDIR)/apps/features
+$(BUILDDIR)/lang/lang.h: $(APPSDIR)/lang/$(ENGLISH).lang $(BUILDDIR)/apps/features $(TOOLSDIR)/genlang
 	$(call PRINTS,GEN lang.h)
 	$(SILENT)for f in `cat $(BUILDDIR)/apps/features`; do feat="$$feat:$$f" ; done; \
 		perl -s $(TOOLSDIR)/genlang -p=$(BUILDDIR)/lang -t=$(MODELNAME)$$feat $<
-$(BUILDDIR)/lang/lang_core.c: $(BUILDDIR)/lang/lang.h
+$(BUILDDIR)/lang/lang_core.c: $(BUILDDIR)/lang/lang.h $(TOOLSDIR)/genlang
 
-$(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h
+$(BUILDDIR)/lang_enum.h: $(BUILDDIR)/lang/lang.h $(TOOLSDIR)/genlang
 
 # NOTE: for some weird reasons in GNU make, multi targets rules WITH patterns actually express
 # the fact that the two files are created as the result of one invocation of the rule
