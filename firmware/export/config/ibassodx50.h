@@ -140,9 +140,15 @@
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
 
-/* No special storage */
-#define CONFIG_STORAGE STORAGE_HOSTFS
+/* Supports internal and microSD storage */
+#define CONFIG_STORAGE (STORAGE_HOSTFS|STORAGE_SD)
+#define HOSTFS_VOL_DEC "Internal"
 #define HAVE_STORAGE_FLUSH
+#define HAVE_MULTIDRIVE  /* But _not_ CONFIG_STORAGE_MULTI */
+#define NUM_DRIVES 2
+#define HAVE_HOTSWAP
+#define MULTIDRIVE_DIR "/mnt/external_sd"
+#define MULTIDRIVE_DEV "/dev/block/void179:1"
 
 /* More common stuff */
 #define BATTERY_DEV_NAME "battery"
