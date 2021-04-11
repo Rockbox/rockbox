@@ -45,7 +45,6 @@
 static const char VOLD_MONITOR_SOCKET_NAME[] = "UNIX_domain";
 static int _vold_monitor_socket_fd           = -1;
 
-
 static void vold_monitor_open_socket(void)
 {
     TRACE;
@@ -82,6 +81,8 @@ static void vold_monitor_open_socket(void)
     }
 }
 
+/* Track state of external SD */
+bool extsd_present = false;
 
 /*
     bionic does not have pthread_cancel.
@@ -161,10 +162,12 @@ static void* vold_monitor_run(void* nothing)
             else if(strcmp(msg, "Volume sdcard /mnt/external_sd state changed from 4 (Mounted) to 5 (Unmounting)") == 0)
             {
                 /* We are loosing the external sdcard, inform Rockbox. */
+                extsd_present = false;
             }
             else  if(strcmp(msg, "Volume sdcard /mnt/external_sd state changed from 3 (Checking) to 4 (Mounted)") == 0)
             {
                 /* The external sdcard is back, inform Rockbox. */
+                extsd_present = true;
             }
         }
     }
