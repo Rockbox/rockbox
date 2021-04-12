@@ -26,6 +26,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <sys/poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -82,7 +83,7 @@ static void vold_monitor_open_socket(void)
 }
 
 /* Track state of external SD */
-bool extsd_present = false;
+bool extsd_present = true; /* Worst-case is it will show up empty */
 
 /*
     bionic does not have pthread_cancel.
@@ -106,6 +107,10 @@ static void* vold_monitor_run(void* nothing)
     (void) nothing;
 
     DEBUGF("DEBUG %s: Thread start.", __func__);
+
+    /* Check to see if external SD is mounted */
+//    extsd_present = !system("mountpoint -q /mnt/external_sd");
+//    extsd_present = !system("mount -o remount,rw /mnt/external_sd");
 
     vold_monitor_open_socket();
     if(_vold_monitor_socket_fd < 0)
