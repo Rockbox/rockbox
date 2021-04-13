@@ -97,6 +97,7 @@ __pycache__
 /rbutil/mknwzboot/mknwzboot
 /rbutil/mkzenboot/mkzenboot
 /rbutil/sansapatcher/sansapatcher
+/rbutil/jztool/jztool
 /rbutil/tools/bin2c
 
 # /tools/
