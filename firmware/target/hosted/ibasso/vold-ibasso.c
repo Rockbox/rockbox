@@ -110,7 +110,7 @@ static void* vold_monitor_run(void* nothing)
 
     /* Check to see if external SD is mounted */
 //    extsd_present = !system("mountpoint -q /mnt/external_sd");
-//    extsd_present = !system("mount -o remount,rw /mnt/external_sd");
+    extsd_present = !system("mount -o remount,rw /mnt/external_sd");
 
     vold_monitor_open_socket();
     if(_vold_monitor_socket_fd < 0)
