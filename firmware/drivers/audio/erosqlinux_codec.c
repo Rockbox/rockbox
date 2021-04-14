@@ -151,7 +151,7 @@ void audiohw_set_frequency(int fsel)
 }
 
 /* min/max for pcm volume */
-const int min_pcm = -430;
+const int min_pcm = -740;
 const int max_pcm = 0;
 
 void audiohw_set_volume(int vol_l, int vol_r)
@@ -169,7 +169,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
            output gain, we have to back off on the PCM signal
            to avoid blowing out the signal.
         */
-        l = r = global_settings.volume_limit;
+        l = r = global_settings.volume_limit * 10;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
@@ -177,7 +177,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
 
     int sw_volume_l = l <= min_pcm ? min_pcm : MIN(l, max_pcm);
     int sw_volume_r = r <= min_pcm ? min_pcm : MIN(r, max_pcm);
-    pcm_set_mixer_volume(sw_volume_l / 10, sw_volume_r / 10);
+    pcm_set_mixer_volume(sw_volume_l / 20, sw_volume_r / 20);
 }
 
 void audiohw_set_lineout_volume(int vol_l, int vol_r)
@@ -190,7 +190,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
     (void)vol_r;
 
     if (lineout_inserted()) {
-        l = r = global_settings.volume_limit;
+        l = r = global_settings.volume_limit * 10;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
@@ -198,5 +198,5 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
 
     int sw_volume_l = l <= min_pcm ? min_pcm : MIN(l, max_pcm);
     int sw_volume_r = r <= min_pcm ? min_pcm : MIN(r, max_pcm);
-    pcm_set_mixer_volume(sw_volume_l / 10, sw_volume_r / 10);
+    pcm_set_mixer_volume(sw_volume_l / 20, sw_volume_r / 20);
 }
