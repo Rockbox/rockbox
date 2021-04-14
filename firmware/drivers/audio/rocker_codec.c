@@ -27,30 +27,16 @@
 #include "panic.h"
 #include "alsa-controls.h"
 
-static int fd_hw = -1;
+static int hw_init = 0;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
 
 static int muted = -1;
 
-static void hw_open(void)
-{
-    fd_hw = open("/dev/snd/controlC0", O_RDWR);
-    if(fd_hw < 0)
-        panicf("Cannot open '/dev/snd/controlC0'");
-}
-
-static void hw_close(void)
-{
-    close(fd_hw);
-    fd_hw = -1;
-    muted = -1;
-}
-
 void audiohw_mute(int mute)
 {
-    if (fd_hw < 0 || muted == mute)
+    if (!hw_init || muted == mute)
        return;
 
     muted = mute;
@@ -70,7 +56,7 @@ void audiohw_mute(int mute)
 void audiohw_preinit(void)
 {
     alsa_controls_init("default");
-    hw_open();
+    hw_init = 1;
 #if defined(AUDIOHW_MUTE_ON_STOP) || defined(AUDIOHW_NEEDS_INITIAL_UNMUTE)
     audiohw_mute(true);  /* Start muted to avoid the POP */
 #else
@@ -84,7 +70,8 @@ void audiohw_postinit(void)
 
 void audiohw_close(void)
 {
-    hw_close();
+    hw_init = 0;
+    muted = -1;
     alsa_controls_close();
 }
 
@@ -98,7 +85,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     vol_l_hw = -vol_l/5;
     vol_r_hw = -vol_r/5;
 
-    if (fd_hw < 0)
+    if (!hw_init)
        return;
 
     alsa_controls_set_ints("Left Playback Volume", 1, &vol_l_hw);

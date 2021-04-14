@@ -32,7 +32,6 @@
 #include "pcm-alsa.h"
 #include <sys/ioctl.h>
 
-static int fd_hw = -1;
 static int ak_hw = -1;
 
 static      int vol_sw[2] = {0};
@@ -40,10 +39,6 @@ static long int vol_hw[2] = {0};
 
 static void hw_open(void)
 {
-    fd_hw = open("/dev/snd/controlC0", O_RDWR);
-    if(fd_hw < 0)
-        panicf("Cannot open '/dev/snd/controlC0'");
-
     ak_hw = open("/dev/ak4376", O_RDWR);
     if(ak_hw < 0)
         panicf("Cannot open '/dev/ak4376'");
@@ -61,8 +56,7 @@ static void hw_close(void)
         panicf("Call cmd AK4376_POWER_OFF fail");
     }
     close(ak_hw);
-    close(fd_hw);
-    ak_hw = fd_hw = -1;
+    ak_hw = -1;
 }
 
 void audiohw_preinit(void)
@@ -98,7 +92,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
 {
     int vol[2];
 
-    if (fd_hw < 0)
+    if (ak_hw < 0)
        return;
 
     vol[0] = vol_l / 20;
@@ -138,7 +132,7 @@ void audiohw_mute(int mute)
 {
     long int vol0 = 0;
 
-    if (fd_hw < 0 || muted == mute)
+    if (ak_hw < 0 || muted == mute)
        return;
 
     muted = mute;
@@ -159,14 +153,14 @@ void audiohw_mute(int mute)
 
 void audiohw_set_filter_roll_off(int value)
 {
-    if (fd_hw < 0)
+#if 0 //  defined(FIIO_M3K_LINUX)
+    if (ak_hw < 0)
        return;
 
     /* 0 = Sharp;
        1 = Slow;
        2 = Short Sharp
        3 = Short Slow */
-#if 0 //  defined(FIIO_M3K_LINUX)
     // AK4376 supports this but the control isn't wired into ALSA!
     long int value_hw = value;
     alsa_controls_set_ints("AK4376 Digital Filter", 1, &value_hw);
