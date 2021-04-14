@@ -25,15 +25,11 @@
 #include "config.h"
 #include "audio.h"
 #include "audiohw.h"
-#include "button.h"
 #include "system.h"
-#include "kernel.h"
 #include "panic.h"
 #include "sysfs.h"
 #include "alsa-controls.h"
 #include "pcm-alsa.h"
-#include "pcm_sw_volume.h"
-
 #include "settings.h"
 
 #include "logf.h"
@@ -64,24 +60,11 @@
       : values=4
 */
 
-static int fd_hw = -1;
+static int hw_init = 0;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
 static long int last_ps = -1;
-
-static void hw_open(void)
-{
-    fd_hw = open("/dev/snd/controlC0", O_RDWR);
-    if(fd_hw < 0)
-        panicf("Cannot open '/dev/snd/controlC0'");
-}
-
-static void hw_close(void)
-{
-    close(fd_hw);
-    fd_hw = -1;
-}
 
 static int muted = -1;
 
@@ -89,7 +72,7 @@ void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
 
-    if (fd_hw < 0 || muted == mute)
+    if (hw_init < 0 || muted == mute)
        return;
 
     muted = mute;
@@ -111,7 +94,7 @@ int erosq_get_outputs(void) {
 
     int status = 0;
 
-    if (fd_hw < 0) return ps;
+    if (!hw_init) return ps;
 
     const char * const sysfs_lo_switch = "/sys/class/switch/lineout/state";
     const char * const sysfs_hs_switch = "/sys/class/switch/headset/state";
@@ -129,7 +112,7 @@ int erosq_get_outputs(void) {
 
 void erosq_set_output(int ps)
 {
-    if (fd_hw < 0 || muted) return;
+    if (!hw_init || muted) return;
 
     if (last_ps != ps)
     {
@@ -145,7 +128,7 @@ void audiohw_preinit(void)
 {
     logf("hw preinit");
     alsa_controls_init("default");
-    hw_open();
+    hw_init = 1;
     audiohw_mute(false);  /* No need to stay muted */
 }
 
@@ -157,7 +140,8 @@ void audiohw_postinit(void)
 void audiohw_close(void)
 {
     logf("hw close");
-    hw_close();
+    hw_init = 0;
+    muted = -1;
     alsa_controls_close();
 }
 

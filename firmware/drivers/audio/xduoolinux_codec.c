@@ -78,24 +78,11 @@ X3ii:
 
 */
 
-static int fd_hw = -1;
+static int hw_init = 0;
 
 static long int vol_l_hw = 255;
 static long int vol_r_hw = 255;
 static long int last_ps = -1;
-
-static void hw_open(void)
-{
-    fd_hw = open("/dev/snd/controlC0", O_RDWR);
-    if(fd_hw < 0)
-        panicf("Cannot open '/dev/snd/controlC0'");
-}
-
-static void hw_close(void)
-{
-    close(fd_hw);
-    fd_hw = -1;
-}
 
 static int muted = -1;
 
@@ -103,7 +90,7 @@ void audiohw_mute(int mute)
 {
     logf("mute %d", mute);
 
-    if (fd_hw < 0 || muted == mute)
+    if (!hw_init || muted == mute)
        return;
 
     muted = mute;
@@ -125,7 +112,7 @@ int xduoo_get_outputs(void){
 
     int status = 0;
 
-    if (fd_hw < 0) return ps;
+    if (!hw_init) return ps;
 
     const char * const sysfs_lo_switch = "/sys/class/switch/lineout/state";
     const char * const sysfs_hs_switch = "/sys/class/switch/headset/state";
@@ -151,7 +138,7 @@ int xduoo_get_outputs(void){
 
 void xduoo_set_output(int ps)
 {
-    if (fd_hw < 0 || muted) return;
+    if (!hw_init || muted) return;
 
     if (last_ps != ps)
     {
@@ -172,7 +159,7 @@ void audiohw_preinit(void)
 {
     logf("hw preinit");
     alsa_controls_init("default");
-    hw_open();
+    hw_init = 1;
 
 #if defined(XDUOO_X3II)
     audiohw_mute(true);  /* Start muted to avoid the POP */
@@ -191,7 +178,7 @@ void audiohw_postinit(void)
 void audiohw_close(void)
 {
     logf("hw close");
-    hw_close();
+    hw_init = 0;
     alsa_controls_close();
 }
 
@@ -217,7 +204,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
         r = -vol_r/5;
     }
 
-    if (fd_hw < 0)
+    if (!hw_init)
        return;
 
     alsa_controls_set_ints("Left Playback Volume", 1, &l);
