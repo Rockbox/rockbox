@@ -32,19 +32,15 @@ void gpio_init(void)
     mutex_init(&gpio_z_mutex);
 #endif
 
-    /* Set all pins to input state */
+    /* Any GPIO pins left in an IRQ trigger state need to be switched off,
+     * because the drivers won't be ready to handle the interrupts until they
+     * get initialized later in the boot. */
     for(int i = 0; i < 4; ++i) {
-        jz_clr(GPIO_INT(GPIO_Z), 0xffffffff);
-        jz_set(GPIO_MSK(GPIO_Z), 0xffffffff);
-        jz_set(GPIO_PAT1(GPIO_Z), 0xffffffff);
-        jz_clr(GPIO_PAT0(GPIO_Z), 0xffffffff);
-        REG_GPIO_Z_GID2LD = i;
-    }
-
-    /* Clear flag and disable pull resistor */
-    for(int i = 0; i < 4; ++i) {
-        jz_clr(GPIO_FLAG(i), 0xffffffff);
-        jz_set(GPIO_PULL(i), 0xffffffff);
+        uint32_t intbits = REG_GPIO_INT(i);
+        if(intbits) {
+            gpio_config(i, intbits, GPIO_INPUT);
+            jz_clr(GPIO_FLAG(i), intbits);
+        }
     }
 }
 
