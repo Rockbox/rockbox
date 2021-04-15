@@ -40,40 +40,6 @@ int __cpu_idle_cur = 0;
 uint32_t __cpu_idle_ticks = 0;
 uint32_t __cpu_idle_reftick = 0;
 
-static void system_init_clk(void)
-{
-    /* Gate all clocks except CPU/bus/memory/RTC */
-    REG_CPM_CLKGR = ~jz_orm(CPM_CLKGR, CPU_BIT, DDR, AHB0, APB0, RTC);
-
-    /* Switch to EXCLK */
-    clk_set_ccr_mux(CLKMUX_SCLK_A(EXCLK) | CLKMUX_CPU(SCLK_A) |
-                    CLKMUX_AHB0(SCLK_A) | CLKMUX_AHB2(SCLK_A));
-    clk_set_ccr_div(1, 1, 1, 1, 1);
-
-#ifdef FIIO_M3K
-     /* Nominal clock configuration
-      * ---------------------------
-      * APLL at 1 GHz, MPLL disabled
-      * CPU at 1 GHz, L2 cache at 500 MHz
-      * AHB0 and AHB2 at 200 MHz
-      * PCLK at 100 MHz
-      * DDR at 200 MHz
-      */
-    jz_writef(CPM_APCR, BS(1), PLLM(41), PLLN(0), PLLOD(0), ENABLE(1));
-    while(jz_readf(CPM_APCR, ON) == 0);
-
-    clk_set_ccr_div(1, 2, 5, 5, 10);
-    clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) | CLKMUX_CPU(SCLK_A) |
-                    CLKMUX_AHB0(SCLK_A) | CLKMUX_AHB2(SCLK_A));
-    clk_set_ddr(X1000_CLK_SCLK_A, 5);
-
-    /* Shut off MPLL, since nobody should be using it now */
-    jz_writef(CPM_MPCR, ENABLE(0));
-#else
-# error "Please define system clock configuration for target"
-#endif
-}
-
 /* Prepare the CPU to process interrupts, but don't enable them yet */
 static void system_init_irq(void)
 {
@@ -94,8 +60,8 @@ static void system_init_irq(void)
 /* First thing called from Rockbox main() */
 void system_init(void)
 {
-    /* Setup system clocks */
-    system_init_clk();
+    /* Gate all clocks except CPU/bus/memory/RTC */
+    REG_CPM_CLKGR = ~jz_orm(CPM_CLKGR, CPU_BIT, DDR, AHB0, APB0, RTC);
 
     /* Ungate timers and turn them all off by default */
     jz_writef(CPM_CLKGR, TCU(0), OST(0));

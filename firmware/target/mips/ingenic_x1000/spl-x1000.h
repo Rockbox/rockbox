@@ -39,11 +39,17 @@ struct spl_boot_option {
 extern const struct spl_boot_option spl_boot_options[];
 
 /* Called on a fatal error */
-void spl_error(void) __attribute__((noreturn));
+extern void spl_error(void) __attribute__((noreturn));
 
 /* When SPL boots with SPL_BOOTOPTION_CHOOSE, this function is invoked
  * to let the target figure out the boot option based on buttons the
  * user is pressing */
 extern int spl_get_boot_option(void);
+
+/* Do any setup/initialization needed for the given boot option, this
+ * will be called right before flushing caches + jumping to the image.
+ * Typical use is to set up system clocks, etc.
+ */
+extern void spl_handle_pre_boot(int bootopt);
 
 #endif /* __SPL_X1000_H__ */
