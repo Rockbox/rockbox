@@ -279,7 +279,8 @@ void main(void)
         if(nandread(opt->nand_addr, opt->nand_size, (void*)opt->load_addr))
             spl_error();
 
-        /* TODO: implement dual boot */
+        /* Let target handle necessary pre-boot setup */
+        spl_handle_pre_boot(option);
 
         /* Reading the Linux command line from the bootloader is handled by
          * arch/mips/xburst/core/prom.c -- see Ingenic kernel sources.
