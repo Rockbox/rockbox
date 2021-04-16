@@ -166,7 +166,7 @@ static void matrix_loop(void)
 */
     /* A little more random now for spaces */
                if (rb->rand() % randomness == 1){
-               while (i <= ROWS && (matrix[i][j].val == 129 ||
+               while (i < ROWS && (matrix[i][j].val == 129 ||
                             matrix[i][j].val == -1)){
                     i++;
             randomness--;
@@ -179,19 +179,19 @@ static void matrix_loop(void)
         }
 
 
-                if (i > ROWS)
+                if (i >= ROWS)
                     break;
 
                 /* Go to the head of this collumn */
                 z = i;
                 y = 0;
-                while (i <= ROWS && (matrix[i][j].val != 129 &&
+                while (i < ROWS && (matrix[i][j].val != 129 &&
                             matrix[i][j].val != -1)) {
                     i++;
                     y++;
                 }
 
-                if (i > ROWS) {
+                if (i >= ROWS) {
                     matrix[z][j].val = 129;
                     matrix[ROWS - 1][j].bold = 1;
                     matrix_blit_char(z - 1, j, matrix[z][j].val);
@@ -200,7 +200,7 @@ static void matrix_loop(void)
 
                 matrix[i][j].val = rb->rand() % (MAXCHARS-1) + 1;
 
-                if (matrix[i - 1][j].bold == 2) {
+                if (i > 0 && matrix[i - 1][j].bold == 2) {
                     matrix[i - 1][j].bold = 1;
                     matrix[i][j].bold = 2;
                 }
