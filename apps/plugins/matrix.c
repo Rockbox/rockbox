@@ -76,10 +76,11 @@ typedef struct cmatrix {
 } cmatrix;
 
 /* The matrix - who'd have guessed it was just a few hundred bytes? */
-static cmatrix matrix[ROWS][COLS];
-static int length[COLS];
-static int spaces[COLS];
-static int updates[COLS];
+static cmatrix matrix[ROWS + 1][COLS + 1];
+static int length[COLS + 1];
+static int spaces[COLS + 1];
+static int updates[COLS + 1];
+/* BUGFIX -- Off by one */
 
 static void matrix_init(void) {
     int i,j;
@@ -200,7 +201,7 @@ static void matrix_loop(void)
 
                 matrix[i][j].val = rb->rand() % (MAXCHARS-1) + 1;
 
-                if (matrix[i - 1][j].bold == 2) {
+                if (i > 0 && matrix[i - 1][j].bold == 2) {
                     matrix[i - 1][j].bold = 1;
                     matrix[i][j].bold = 2;
                 }
