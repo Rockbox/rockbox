@@ -10,18 +10,11 @@
 /* CPU defines */
 #define CONFIG_CPU          X1000
 #define X1000_EXCLK_FREQ    24000000
+#define CPU_FREQ            1008000000
 
 #ifndef SIMULATOR
 #define TIMER_FREQ          X1000_EXCLK_FREQ
 #endif
-
-#define CPU_FREQ            1008000000
-#define CPUFREQ_MAX         CPU_FREQ
-/* TODO: figure out if this does in fact affect power consumption. */
-#define CPUFREQ_DEFAULT     (CPUFREQ_MAX/4)
-#define CPUFREQ_NORMAL      (CPUFREQ_MAX/4)
-#define HAVE_ADJUSTABLE_CPU_FREQ
-#define HAVE_GUI_BOOST
 
 /* Kernel defines */
 #define INCLUDE_TIMEOUT_API
