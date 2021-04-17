@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5c288df7_ce59ba66",
+        "filename": "firmware/drivers/audio/erosqlinux_codec.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-04-17T12:15:25Z",
+      "side": 1,
+      "message": "volume_limit is by definition using the same scale/units as voume, why the *10?",
+      "range": {
+        "startLine": 172,
+        "startChar": 15,
+        "endLine": 172,
+        "endChar": 50
+      },
+      "revId": "4dc602dd7f763a2ceea7c3e01501cdc3e9de375c",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
