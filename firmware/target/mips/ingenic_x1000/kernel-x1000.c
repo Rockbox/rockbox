@@ -57,6 +57,7 @@ void tick_start(unsigned interval_in_ms)
 
 void OST(void)
 {
+#ifdef X1000_CPUIDLE_STATS
     /* CPU idle time accounting */
     uint32_t now = __ost_read32();
     uint32_t div = now - __cpu_idle_reftick;
@@ -67,6 +68,7 @@ void OST(void)
         __cpu_idle_ticks = 0;
         __cpu_idle_reftick = now;
     }
+#endif
 
     /* Call regular kernel tick */
     jz_write(OST_1FLG, 0);

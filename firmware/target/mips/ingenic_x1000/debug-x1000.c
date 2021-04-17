@@ -130,6 +130,7 @@ static bool dbg_audio(void)
     return false;
 }
 
+#ifdef X1000_CPUIDLE_STATS
 static bool dbg_cpuidle(void)
 {
     do {
@@ -143,6 +144,7 @@ static bool dbg_cpuidle(void)
 
     return false;
 }
+#endif
 
 #ifdef FIIO_M3K
 extern bool dbg_fiiom3k_touchpad(void);
@@ -156,7 +158,9 @@ static const struct {
 } menuitems[] = {
     {"Clocks", &dbg_clocks},
     {"GPIOs", &dbg_gpios},
+#ifdef X1000_CPUIDLE_STATS
     {"CPU idle", &dbg_cpuidle},
+#endif
     {"Audio", &dbg_audio},
 #ifdef FIIO_M3K
     {"Touchpad", &dbg_fiiom3k_touchpad},
