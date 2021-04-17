@@ -23,26 +23,6 @@
 #include "system.h"
 #include "x1000/ost.h"
 
-/* TODO: implement a CPU frequency switching policy based on CPU utilization
- *
- * The basic assumption is that the workload consumes a fixed number of CPU
- * cycles per second on average (= utilization), so we can set the frequency
- * based on that value. Audio playback should fit this usage pattern well, so
- * it's a good fit for Rockbox.
- *
- * It's easier to understand in terms of fluid flow -- we need to keep
- * a reservoir of water topped up, CPU frequency is the inflow rate, and
- * CPU utilization is the outflow rate. The goal is to avoid running dry
- * and minimize the inflow rate.
- *
- * The only tricky part here is handing usage spikes -- CPU frequency has to
- * increase faster than utilization or there's a risk of audio dropouts.
- *
- * Rockbox CPU boost could be used as a hint to scale up frequency faster.
- * If that's not necessary to get good results, HAVE_ADJUSTABLE_CPU_FREQ can
- * be disabled entirely.
- */
-
 #define CPU_IDLE_SAMPLES 100
 
 void tick_start(unsigned interval_in_ms)
