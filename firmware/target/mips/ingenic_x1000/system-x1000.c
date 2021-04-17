@@ -35,10 +35,12 @@
 #include "x1000/msc.h"
 #include "x1000/aic.h"
 
+#ifdef X1000_CPUIDLE_STATS
 int __cpu_idle_avg = 0;
 int __cpu_idle_cur = 0;
 uint32_t __cpu_idle_ticks = 0;
 uint32_t __cpu_idle_reftick = 0;
+#endif
 
 /* Prepare the CPU to process interrupts, but don't enable them yet */
 static void system_init_irq(void)
