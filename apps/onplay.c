@@ -63,6 +63,7 @@
 #include "viewport.h"
 #include "pathfuncs.h"
 #include "shortcuts.h"
+#include "filetree.h"
 
 static int context;
 static const char *selected_file = NULL;
@@ -456,7 +457,37 @@ static bool shuffle_playlist(void)
 }
 static bool save_playlist(void)
 {
-    save_playlist_screen(NULL);
+    char newplaylist[MAX_PATH+1];
+    char directoryonly[MAX_PATH+1];
+    int orig_index;
+    uint32_t resumeelapsed;
+    uint32_t resumeoffset;
+    
+    if (!save_playlist_screen(NULL, newplaylist))
+    {
+
+        strncpy(directoryonly, newplaylist, (strrchr(newplaylist, '/') - newplaylist));
+        
+        // there's probably a more elegant way to add a null termination...
+        directoryonly[strrchr(newplaylist, '/') - newplaylist] = '\0';
+        
+        struct mp3entry* id3 = audio_current_track();
+        struct playlist_info* playlist = playlist_get_current();
+        
+        // record elapsed and offset so they don't
+        // change when we load new playlist
+        resumeelapsed = id3->elapsed;
+        resumeoffset = id3->offset;
+        
+        // can't trust index info from id3 (dunno why), get it from playlist
+        orig_index = playlist->index;
+        
+        // start playlist and load resume point
+        ft_play_playlist(newplaylist, directoryonly, (strrchr(newplaylist, '/') + 1));
+        playlist_start(orig_index, resumeelapsed, resumeoffset);
+    
+    }
+    
     return false;
 }
 
