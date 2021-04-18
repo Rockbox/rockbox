@@ -1531,4 +1531,21 @@ enum current_activity get_current_activity(void)
     return current_activity[current_activity_top?current_activity_top-1:0];
 }
 
+/* searches for an activity in the stack, 
+ * if found, return the location it's found at
+ * if not found, return -1. */
+int search_for_activity(enum current_activity activity)
+{
+    
+    for (int i = current_activity_top; i >= 0; i--)
+    {
+        if (current_activity[i] == activity)
+        {
+            return i;
+        }
+    }
+    
+    return ACTIVITY_NOT_FOUND;
+}
+
 #endif

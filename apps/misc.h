@@ -179,6 +179,8 @@ enum current_activity {
     ACTIVITY_USBSCREEN
 };
 
+#define ACTIVITY_NOT_FOUND -1
+
 void beep_play(unsigned int frequency, unsigned int duration,
                unsigned int amplitude);
 
@@ -210,6 +212,7 @@ void replaygain_update(void);
 void push_current_activity(enum current_activity screen);
 void pop_current_activity(void);
 enum current_activity get_current_activity(void);
+int search_for_activity(enum current_activity activity);
 
 /* format a sound value like: -1.05 dB */
 int format_sound_value(char *buf, size_t len, int snd, int val);

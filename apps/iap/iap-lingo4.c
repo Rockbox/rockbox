@@ -108,7 +108,7 @@ static void seek_to_playlist(unsigned long index)
                                        MAX_PATH);
                     ft_play_playlist(selected_playlist,
                                      global_settings.playlist_catalog_dir,
-                                     strrchr(selected_playlist, '/') + 1);
+                                     strrchr(selected_playlist, '/') + 1, false);
 }
 
 static unsigned long nbr_total_playlists(void)
@@ -176,15 +176,15 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *  4   0x00  Command ID (bits 15:8)
              *  5   0x01  Command ID (bits 7:0)
              *  6   0xNN  Command result status. Possible values are:
-             *            0x00 = Success (OK)
+             *            0x00 = Success (OK)
              *            0x01 = ERROR: Unknown database category
-             *            0x02 = ERROR: Command failed
+             *            0x02 = ERROR: Command failed
              *            0x03 = ERROR: Out of resources
              *            0x04 = ERROR: Bad parameter
              *            0x05 = ERROR: Unknown ID
              *            0x06 = Reserved
              *            0x07 = Accessory not authenticated
-             *            0x08 - 0xFF = Reserved
+             *            0x08 - 0xFF = Reserved
              *  7  0xNN   The ID of the command being acknowledged (bits 15:8).
              *  8  0xNN   The ID of the command being acknowledged (bits 7:0).
              *  9  0xNN   Telegram payload checksum byte
@@ -428,7 +428,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             /* The following is the description for the Apple Firmware
              *
              * Requests the current iPod audiobook speed state. The iPod
-             * responds with the “Command 0x000A: ReturnAudiobookSpeed”
+             * responds with the “Command 0x000A: ReturnAudiobookSpeed„1¤7
              * telegram indicating the current audiobook speed.
              *
              * Byte Value Meaning
@@ -2218,7 +2218,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * 0x00  Shuffle off
              * 0x01  Shuffle tracks
              * 0x02  Shuffle albums
-             * 0x03 – 0xFF Reserved
+             * 0x03 „1¤7 0xFF Reserved
              *
              */
         {
@@ -2463,7 +2463,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              * GetColorDisplayImageLimits telegram to obtain the iPod color
              * display width,height,and pixel formats. The color display
              * information is returned in the Command 0x003A:
-             * ReturnColorDisplayImageLimits” telegram.
+             * ReturnColorDisplayImageLimits„1¤7 telegram.
              * To set a display image, the device must successfully send
              * SetDisplayImage descriptor and data telegrams to the iPod. The
              * SetDisplayImage descriptor telegram (telegram index 0x0000) must
@@ -2898,8 +2898,8 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *                    GetNumberCategorizedDBRecords in step 4.
              *
              * The sort order of artist names ignores certain articles such
-             * that the artist “The Doors” is sorted under the letter ‘D’ and
-             * not ‘T’; this matches the behavior of iTunes. The sort order is
+             * that the artist “The Doors„1¤7 is sorted under the letter ‘D„1¤7 and
+             * not ‘T„1¤7; this matches the behavior of iTunes. The sort order is
              * different depending on the language setting used in the iPod.
              * The list of ignored articles may change in the future without
              * notice.

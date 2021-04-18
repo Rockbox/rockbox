@@ -38,12 +38,21 @@
 #include "talk.h"
 #include "playlist_catalog.h"
 #include "splash.h"
+#include "filetree.h"
+#include "misc.h"
 
+/* load a screen to save the playlist passed in (or current playlist if NULL is passed) */
 int save_playlist_screen(struct playlist_info* playlist)
 {
+    char directoryonly[MAX_PATH+1];
+    int resume_index;
+    uint32_t resume_elapsed;
+    uint32_t resume_offset;
+    char *path_slash;
+    
     char temp[MAX_PATH+1], *dot;
     int len;
-
+    
     playlist_get_name(playlist, temp, sizeof(temp)-1);
 
     len = strlen(temp);
@@ -71,6 +80,51 @@ int save_playlist_screen(struct playlist_info* playlist)
 
         /* reload in case playlist was saved to cwd */
         reload_directory();
+
+        /* only reload newly saved playlist if:
+         * WPS is on the activity stack AND setting is turned on 
+         * 
+         * if WPS is on the activity stack at all, we must have gotten here
+         * from there */
+        if ((global_settings.playlist_reload_after_save == true) && 
+            (search_for_activity(ACTIVITY_WPS) != ACTIVITY_NOT_FOUND))
+        {
+            /* if we're not in the root dir without a slash - most common situation */
+            if (strrchr(temp, '/') != NULL)
+            {
+                path_slash = strrchr(temp, '/');
+                strcpy(directoryonly, temp);
+                directoryonly[path_slash - temp] = '\0';
+            } else /* root dir without a slash, uncommon? */
+            {
+                path_slash = 0; // indication that a slash is not present
+                directoryonly[0] = '/';
+                directoryonly[1] = '\0';
+            }
+
+            struct mp3entry* id3 = audio_current_track();
+
+            /* record elapsed and offset so they don't
+            * change when we load new playlist */
+            resume_elapsed = id3->elapsed;
+            resume_offset = id3->offset;
+
+            /* can't trust index from id3 (don't know why), get it from playlist */
+            resume_index = playlist_get_current()->index;
+
+            if (path_slash != 0) /* slash is present in temp */
+            {
+                ft_play_playlist(temp, directoryonly, (path_slash + 1), true);
+            } else
+            {
+                ft_play_playlist(temp, directoryonly, temp, true);
+            }
+            
+            playlist_start(resume_index, resume_elapsed, resume_offset);
+        }
+    /* cancelled out of name selection */
+    } else {
+        return 1;
     }
 
     return 0;
@@ -112,9 +166,10 @@ MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
 MENUITEM_SETTING(show_shuffled_adding_options, &global_settings.show_shuffled_adding_options, NULL);
 MENUITEM_SETTING(show_queue_options, &global_settings.show_queue_options, NULL);
+MENUITEM_SETTING(playlist_reload_after_save, &global_settings.playlist_reload_after_save, NULL);
 MAKE_MENU(currentplaylist_settings_menu, ID2P(LANG_CURRENT_PLAYLIST),
           NULL, Icon_Playlist,
-          &warn_on_erase, &show_shuffled_adding_options, &show_queue_options);
+          &warn_on_erase, &show_shuffled_adding_options, &show_queue_options, &playlist_reload_after_save);
 
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
