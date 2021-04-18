@@ -576,6 +576,7 @@ struct user_settings
     bool constrain_next_folder; /* whether next_folder is constrained to
                                    directories within start_directory */
     int  recursive_dir_insert; /* should directories be inserted recursively */
+    bool playlist_reload_after_save; /* reload and resume playlist after saving */
     bool fade_on_stop; /* fade on pause/unpause/stop */
     bool playlist_shuffle;
     bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */

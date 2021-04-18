@@ -15778,3 +15778,17 @@
     *: "Always Autolock"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
+  desc: reload playlist after saving
+  user: core
+  <source>
+    *: "Reload After Saving"
+  </source>
+  <dest>
+    *: "Reload After Saving"
+  </dest>
+  <voice>
+    *: "Reload After Saving"
+  </voice>
+</phrase>

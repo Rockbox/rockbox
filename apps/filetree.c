@@ -86,12 +86,12 @@ int ft_build_playlist(struct tree_context* c, int start_index)
  * or started via bookmark autoload, true otherwise.
  *
  * Pointers to both the full pathname and the separated parts needed to
- * avoid allocating yet another path buffer on the stack (and save some 
+ * avoid allocating yet another path buffer on the stack (and save some
  * code; the caller typically needs to create the full pathname anyway)...
  */
-bool ft_play_playlist(char* pathname, char* dirname, char* filename)
+bool ft_play_playlist(char* pathname, char* dirname, char* filename, bool skip_dyn_warning)
 {
-    if (global_settings.party_mode && audio_status()) 
+    if (global_settings.party_mode && audio_status())
     {
         splash(HZ, ID2P(LANG_PARTY_MODE));
         return false;
@@ -105,9 +105,13 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
     splash(0, ID2P(LANG_WAIT));
 
     /* about to create a new current playlist...
-       allow user to cancel the operation */
-    if (!warn_on_pl_erase())
-        return false;
+     * allow user to cancel the operation.
+     * Do not show if skip_dyn_warning is true */
+    if (!skip_dyn_warning)
+    {
+        if (!warn_on_pl_erase())
+            return false;
+    }
 
     if (playlist_create(dirname, filename) != -1)
     {
@@ -115,11 +119,11 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
         {
             playlist_shuffle(current_tick, -1);
         }
-        
+
         playlist_start(0, 0, 0);
         return true;
     }
-    
+
     return false;
 }
 
@@ -465,7 +469,7 @@ int ft_enter(struct tree_context* c)
 
         switch ( file_attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
-                play = ft_play_playlist(buf, c->currdir, file->name);
+                play = ft_play_playlist(buf, c->currdir, file->name, false);
 
                 if (play)
                 {
