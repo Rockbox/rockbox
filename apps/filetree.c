@@ -89,7 +89,7 @@ int ft_build_playlist(struct tree_context* c, int start_index)
  * avoid allocating yet another path buffer on the stack (and save some 
  * code; the caller typically needs to create the full pathname anyway)...
  */
-bool ft_play_playlist(char* pathname, char* dirname, char* filename)
+bool ft_play_playlist(char* pathname, char* dirname, char* filename, bool skip_dyn_warning)
 {
     if (global_settings.party_mode && audio_status()) 
     {
@@ -105,9 +105,13 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename)
     splash(0, ID2P(LANG_WAIT));
 
     /* about to create a new current playlist...
-       allow user to cancel the operation */
-    if (!warn_on_pl_erase())
-        return false;
+     * allow user to cancel the operation.
+     * Do not show if skip_dyn_warning is true */
+    if (!skip_dyn_warning)
+    {
+        if (!warn_on_pl_erase())
+            return false;
+    }
 
     if (playlist_create(dirname, filename) != -1)
     {
@@ -465,7 +469,7 @@ int ft_enter(struct tree_context* c)
 
         switch ( file_attr & FILE_ATTR_MASK ) {
             case FILE_ATTR_M3U:
-                play = ft_play_playlist(buf, c->currdir, file->name);
+                play = ft_play_playlist(buf, c->currdir, file->name, false);
 
                 if (play)
                 {

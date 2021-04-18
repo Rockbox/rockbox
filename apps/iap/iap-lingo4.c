@@ -108,7 +108,8 @@ static void seek_to_playlist(unsigned long index)
                                        MAX_PATH);
                     ft_play_playlist(selected_playlist,
                                      global_settings.playlist_catalog_dir,
-                                     strrchr(selected_playlist, '/') + 1);
+                                     strrchr(selected_playlist, '/') + 1,
+                                     false);
 }
 
 static unsigned long nbr_total_playlists(void)
