@@ -968,6 +968,9 @@ Lyre prototype 1 */
 #define USB_DETECT_BY_REQUEST
 #endif /* CONFIG_USB == */
 #endif /* HAVE_USBSTACK */
+#ifdef USB_STATUS_BY_EVENT
+#undef USB_STATUS_BY_EVENT // HACK FIXME
+#endif
 
 #endif /* BOOTLOADER */
 
