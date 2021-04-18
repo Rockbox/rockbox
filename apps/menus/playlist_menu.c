@@ -39,7 +39,9 @@
 #include "playlist_catalog.h"
 #include "splash.h"
 
-int save_playlist_screen(struct playlist_info* playlist)
+/* load a screen to save the playlist passed in (or current playlist if NULL is passed),
+ * the path of the newly saved playlist is copied into newpath (pass NULL to disable) */
+int save_playlist_screen(struct playlist_info* playlist, char *newpath)
 {
     char temp[MAX_PATH+1], *dot;
     int len;
@@ -71,6 +73,22 @@ int save_playlist_screen(struct playlist_info* playlist)
 
         /* reload in case playlist was saved to cwd */
         reload_directory();
+        
+        if (newpath)
+        {
+            /* ensure if root dir, we add a slash to the beginning */
+            if (strrchr(temp, '/') == NULL)
+            {
+                newpath[0] = '/';
+                strncpy(newpath+1, temp, sizeof(temp)-1);
+            } else
+            {
+                strncpy(newpath, temp, sizeof(temp)-1);
+            }
+        }
+    /* cancelled out of name selection */
+    } else {
+        return 1;
     }
 
     return 0;
