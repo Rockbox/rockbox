@@ -553,7 +553,7 @@ static int onplay_menu(int index)
                 break;
             case 5:
                 /* save playlist */
-                save_playlist_screen(viewer.playlist);
+                save_playlist_screen(viewer.playlist, NULL);
                 ret = 0;
                 break;
             case 6:
@@ -887,7 +887,7 @@ exit:
     if (viewer.playlist)
     {
         if(dirty && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
-            save_playlist_screen(viewer.playlist);
+            save_playlist_screen(viewer.playlist, NULL);
         playlist_close(viewer.playlist);
     }
     return ret;
