@@ -303,11 +303,48 @@ void axp173_cc_enable(bool en)
     i2c_reg_setbit1(AXP173_BUS, AXP173_ADDR, 0xb8, 7, en ? 1 : 0, NULL);
 }
 
+static const int chargecurrent_tbl[] = {
+    100,  190,  280,  360,
+    450,  550,  630,  700,
+    780,  880,  960,  1000,
+    1080, 1160, 1240, 1320,
+};
+
+static const int chargecurrent_tblsz = sizeof(chargecurrent_tbl)/sizeof(int);
+
+void axp173_set_charge_current(int maxcurrent)
+{
+    /* Find the charge current just higher than maxcurrent */
+    int value = 0;
+    while(value < chargecurrent_tblsz &&
+          chargecurrent_tbl[value] <= maxcurrent)
+        ++value;
+
+    /* Select the next lower current, the greatest current <= maxcurrent */
+    if(value >= chargecurrent_tblsz)
+        value = chargecurrent_tblsz - 1;
+    else if(value > 0)
+        --value;
+
+    /* Update register */
+    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR, 0x33, 0x0f, value & 0xf, NULL);
+}
+
+int axp173_get_charge_current(void)
+{
+    int val = i2c_reg_read1(AXP173_BUS, AXP173_ADDR, 0x33);
+    if(val < 0)
+        return -1;
+    else
+        return chargecurrent_tbl[val & 0xf];
+}
+
 #ifndef BOOTLOADER
 #define AXP173_DEBUG_BATTERY_STATUS 0
 #define AXP173_DEBUG_INPUT_STATUS   1
-#define AXP173_DEBUG_ADC_RATE       2
-#define AXP173_DEBUG_FIRST_ADC      3
+#define AXP173_DEBUG_CHARGE_CURRENT 2
+#define AXP173_DEBUG_ADC_RATE       3
+#define AXP173_DEBUG_FIRST_ADC      4
 #define AXP173_DEBUG_ENTRIES        (AXP173_DEBUG_FIRST_ADC + NUM_ADC_CHANNELS)
 
 static int axp173_debug_menu_cb(int action, struct gui_synclist* lists)
@@ -374,6 +411,12 @@ static const char* axp173_debug_menu_get_name(int item, void* data,
         const char* usb = (s & AXP173_INPUT_USB) ? " USB" : "";
         const char* batt = (s & AXP173_INPUT_BATTERY) ? " Battery" : "";
         snprintf(buf, buflen, "Inputs:%s%s%s", ac, usb, batt);
+        return buf;
+    } break;
+
+    case AXP173_DEBUG_CHARGE_CURRENT: {
+        int current = axp173_get_charge_current();
+        snprintf(buf, buflen, "Max charge current: %d mA", current);
         return buf;
     } break;
 

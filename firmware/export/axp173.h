@@ -88,6 +88,10 @@ extern void axp173_cc_read(uint32_t* charge, uint32_t* discharge);
 extern void axp173_cc_clear(void);
 extern void axp173_cc_enable(bool en);
 
+/* Set/get maximum charging current in milliamps */
+extern void axp173_set_charge_current(int maxcurrent);
+extern int axp173_get_charge_current(void);
+
 /* Debug menu */
 extern bool axp173_debug_menu(void);
 

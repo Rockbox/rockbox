@@ -71,9 +71,24 @@ void power_init(void)
     i2c_reg_modify1(AXP173_BUS, AXP173_ADDR, 0x12, 0, 0x5f, NULL);
     i2c_reg_modify1(AXP173_BUS, AXP173_ADDR, 0x80, 0, 0xc0, NULL);
 
+    /* Set the default charging current. This is the same as the
+     * OF's setting, although it's not strictly within the USB spec. */
+    axp173_set_charge_current(780);
+
     /* Short delay to give power outputs time to stabilize */
     mdelay(5);
 }
+
+#ifdef HAVE_USB_CHARGING_ENABLE
+void usb_charging_maxcurrent_change(int maxcurrent)
+{
+    static int cur_max = -1;
+    if(maxcurrent != cur_max) {
+        cur_max = maxcurrent;
+        axp173_set_charge_current(maxcurrent);
+    }
+}
+#endif
 
 void adc_init(void)
 {

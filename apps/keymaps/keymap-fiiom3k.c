@@ -185,6 +185,17 @@ static const struct button_mapping button_context_keyboard[] = {
     LAST_ITEM_IN_LIST
 }; /* button_context_keyboard */
 
+static const struct button_mapping button_context_usb_hid_mode_multimedia[] = {
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_VOL_DOWN,                BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_DOWN,         BUTTON_VOL_DOWN|BUTTON_REPEAT,  BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_VOL_UP,                  BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_UP,           BUTTON_VOL_UP|BUTTON_REPEAT,    BUTTON_NONE},
+    {ACTION_USB_HID_MULTIMEDIA_VOLUME_MUTE,         BUTTON_POWER|BUTTON_REL,        BUTTON_POWER},
+    {ACTION_USB_HID_MULTIMEDIA_PLAYBACK_PLAY_PAUSE, BUTTON_PLAY|BUTTON_REL,         BUTTON_PLAY},
+    {ACTION_USB_HID_MULTIMEDIA_PLAYBACK_STOP,       BUTTON_PLAY|BUTTON_REPEAT,      BUTTON_PLAY},
+    LAST_ITEM_IN_LIST,
+}; /* button_context_usb_hid_mode_multimedia */
+
 const struct button_mapping* get_context_mapping(int context)
 {
     switch (context)
@@ -215,5 +226,7 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_yesnoscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
+        case CONTEXT_USB_HID_MODE_MULTIMEDIA:
+            return button_context_usb_hid_mode_multimedia;
     }
 }
