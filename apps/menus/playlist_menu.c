@@ -38,9 +38,20 @@
 #include "talk.h"
 #include "playlist_catalog.h"
 #include "splash.h"
+#include "filetree.h"
 
-int save_playlist_screen(struct playlist_info* playlist)
+static bool called_from_wps = false;
+
+/* load a screen to save the playlist passed in (or current playlist if NULL is passed),
+ * load_new_playlist signals load the newly saved playlist and resume (true) or not (false) */
+int save_playlist_screen(struct playlist_info* playlist, bool load_new_playlist)
 {
+    char newpath[MAX_PATH+1];
+    char directoryonly[MAX_PATH+1];
+    int resume_index;
+    uint32_t resume_elapsed;
+    uint32_t resume_offset;
+    
     char temp[MAX_PATH+1], *dot;
     int len;
 
@@ -71,14 +82,56 @@ int save_playlist_screen(struct playlist_info* playlist)
 
         /* reload in case playlist was saved to cwd */
         reload_directory();
+
+        /* check if we need to load the newly saved playlist
+         * called_from_wps is a var local to this file */
+        if ((global_settings.playlist_reload_after_save == true) && 
+            (load_new_playlist == true || called_from_wps == true))
+        {
+            /* ensure if root dir, we add a slash to the beginning */
+            if (strrchr(temp, '/') == NULL)
+            {
+                newpath[0] = '/';
+                strncpy(newpath+1, temp, sizeof(temp)-1);
+            } else
+            {
+                strncpy(newpath, temp, sizeof(temp)-1);
+            }
+
+            strncpy(directoryonly, newpath, (strrchr(newpath, '/') - newpath));
+            directoryonly[strrchr(newpath, '/') - newpath] = '\0';
+
+            struct mp3entry* id3 = audio_current_track();
+
+            /* record elapsed and offset so they don't
+            * change when we load new playlist */
+            resume_elapsed = id3->elapsed;
+            resume_offset = id3->offset;
+
+            /* can't trust index from id3 (don't know why), get it from playlist */
+            resume_index = playlist_get_current()->index;
+
+            ft_play_playlist(newpath, directoryonly, (strrchr(newpath, '/') + 1));
+            playlist_start(resume_index, resume_elapsed, resume_offset);
+        }
+    /* cancelled out of name selection */
+    } else {
+        return 1;
     }
 
     return 0;
 }
 
+/* playlist_view_() appears to only be called from the 
+ * context menu in the WPS screen, so if save_playlist_screen()
+ * is called from this, we want to load the newly saved playlist */
 static int playlist_view_(void)
 {
+    /* signal to save_playlist_screen() that it came from here,
+     * and should reload and resume the newly saved playlist */
+    called_from_wps = true;
     playlist_viewer_ex(NULL);
+    called_from_wps = false;
     return 0;
 }
 MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST),
@@ -112,9 +165,10 @@ MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
 MENUITEM_SETTING(show_shuffled_adding_options, &global_settings.show_shuffled_adding_options, NULL);
 MENUITEM_SETTING(show_queue_options, &global_settings.show_queue_options, NULL);
+MENUITEM_SETTING(playlist_reload_after_save, &global_settings.playlist_reload_after_save, NULL);
 MAKE_MENU(currentplaylist_settings_menu, ID2P(LANG_CURRENT_PLAYLIST),
           NULL, Icon_Playlist,
-          &warn_on_erase, &show_shuffled_adding_options, &show_queue_options);
+          &warn_on_erase, &show_shuffled_adding_options, &show_queue_options, &playlist_reload_after_save);
 
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,
