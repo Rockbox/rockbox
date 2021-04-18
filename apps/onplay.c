@@ -456,7 +456,8 @@ static bool shuffle_playlist(void)
 }
 static bool save_playlist(void)
 {
-    save_playlist_screen(NULL);
+    /* save_playlist_screen should load the newly saved playlist and resume */
+    save_playlist_screen(NULL, true); 
     return false;
 }
 
