@@ -23,6 +23,6 @@
 
 #include "playlist.h"
 
-int save_playlist_screen(struct playlist_info* playlist);
+int save_playlist_screen(struct playlist_info* playlist, char *newpath);
 
 #endif
