@@ -308,7 +308,7 @@ default_t defaults[] =
       {"screen_height",{&desired_screenheight, NULL},{200, NULL},200,1200,
        def_int,ss_none, 0, 0},*/
 #if(LCD_HEIGHT>LCD_WIDTH)
-      {"rotate_screen",{(void *)&rotate_screen, NULL},{0, NULL},0,1,
+      {"rotate_screen",{&rotate_screen, NULL},{0, NULL},0,1,
        def_bool,ss_none, 0, 0}, /* kwk - rotate the screen 90 degrees */
 #endif
       {"fake_contrast",{&fake_contrast, NULL},{1, NULL},0,1,

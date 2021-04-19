@@ -34,7 +34,7 @@
 
 // Location for any defines turned variables.
 #if(LCD_HEIGHT>LCD_WIDTH)
-bool rotate_screen=0;
+int rotate_screen=0;
 int SCREENWIDTH;
 int SCREENHEIGHT;
 #endif

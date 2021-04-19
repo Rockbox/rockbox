@@ -94,7 +94,7 @@ typedef unsigned Language_t;
 // when multiple screen sizes are supported
 
 #if(LCD_HEIGHT>LCD_WIDTH)
-extern bool rotate_screen;
+extern int rotate_screen;
 // proff 08/17/98: Changed for high-res
 #define MAX_SCREENWIDTH  LCD_HEIGHT
 #define MAX_SCREENHEIGHT LCD_HEIGHT
