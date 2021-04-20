@@ -1101,7 +1101,6 @@ voiceconfig () {
         FLITE_OPTS=""
         DEFAULT_TTS="flite"
         DEFAULT_TTS_OPTS=$FLITE_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="l"
     fi
     if [ -n "`findtool espeak`" ]; then
@@ -1109,7 +1108,6 @@ voiceconfig () {
         ESPEAK_OPTS=""
         DEFAULT_TTS="espeak"
         DEFAULT_TTS_OPTS=$ESPEAK_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
     if [ -n "`findtool espeak-ng`" ]; then
@@ -1117,7 +1115,6 @@ voiceconfig () {
         ESPEAK_OPTS=""
         DEFAULT_TTS="espeak-ng"
         DEFAULT_TTS_OPTS=$ESPEAK_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="e"
     fi
     if [ -n "`findtool festival`" ]; then
@@ -1125,7 +1122,6 @@ voiceconfig () {
         FESTIVAL_OPTS=""
         DEFAULT_TTS="festival"
         DEFAULT_TTS_OPTS=$FESTIVAL_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="f"
     fi
     if [ -n "`findtool mimic`" ]; then
@@ -1133,7 +1129,6 @@ voiceconfig () {
         MIMIC_OPTS=""
         DEFAULT_TTS="mimic"
         DEFAULT_TTS_OPTS=$MIMIC_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="M"
     fi
     if [ -n "`findtool swift`" ]; then
@@ -1141,7 +1136,6 @@ voiceconfig () {
         SWIFT_OPTS=""
         DEFAULT_TTS="swift"
         DEFAULT_TTS_OPTS=$SWIFT_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="w"
     fi
     # Allow SAPI if Windows is in use
@@ -1150,7 +1144,6 @@ voiceconfig () {
         SAPI_OPTS=""
         DEFAULT_TTS="sapi"
         DEFAULT_TTS_OPTS=$SAPI_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="S"
     fi
     if [ -n "`findtool gtts-cli`" ]; then
@@ -1158,7 +1151,6 @@ voiceconfig () {
         GTTS_OPTS=""
         DEFAULT_TTS="gtts"
         DEFAULT_TTS_OPTS=$GTTS_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="g"
     fi
     if [ -n "`findtool rbspeak`" ]; then
@@ -1166,7 +1158,6 @@ voiceconfig () {
         RBSPEAK_OPTS=""
         DEFAULT_TTS="rbspeak"
         DEFAULT_TTS_OPTS=$RBSPEAK_OPTS
-        DEFAULT_NOISEFLOOR="500"
         DEFAULT_CHOICE="O"
     fi
 
@@ -1186,48 +1177,39 @@ voiceconfig () {
     case "$option" in
         [Ll]|flite)
         TTS_ENGINE="flite"
-        NOISEFLOOR="500" # TODO: check this value
         TTS_OPTS=$FLITE_OPTS
         ;;
         [Ee]|espeak)
         TTS_ENGINE="espeak"
-        NOISEFLOOR="500"
         TTS_OPTS=$ESPEAK_OPTS
         ;;
         [Ff]|festival)
         TTS_ENGINE="festival"
-        NOISEFLOOR="500"
         TTS_OPTS=$FESTIVAL_OPTS
         ;;
         [Mm]|mimic)
         TTS_ENGINE="mimic"
-        NOISEFLOOR="500"
         TTS_OPTS=$MIMIC_OPTS
         ;;
         [Ss]|sapi)
         TTS_ENGINE="sapi"
-        NOISEFLOOR="500"
         TTS_OPTS=$SAPI_OPTS
         ;;
 	[Ww]|swift)
         TTS_ENGINE="swift"
-        NOISEFLOOR="500"
         TTS_OPTS=$SWIFT_OPTS
 	;;
 	[Gg]|gtts)
         TTS_ENGINE="gtts"
-        NOISEFLOOR="500"
         TTS_OPTS=$GTTS_OPTS
 	;;
 	[Oo]|rbspeak)
         TTS_ENGINE="rbspeak"
-        NOISEFLOOR="500"
         TTS_OPTS=$RBSPEAK_OPTS
 	;;
         *)
         TTS_ENGINE=$DEFAULT_TTS
         TTS_OPTS=$DEFAULT_TTS_OPTS
-        NOISEFLOOR=$DEFAULT_NOISEFLOOR
     esac
     echo "Using $TTS_ENGINE for TTS"
 
