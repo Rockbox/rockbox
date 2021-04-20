@@ -169,7 +169,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
            output gain, we have to back off on the PCM signal
            to avoid blowing out the signal.
         */
-        l = r = global_settings.volume_limit * 10;
+        l = r = global_settings.volume_limit;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
@@ -190,7 +190,7 @@ void audiohw_set_lineout_volume(int vol_l, int vol_r)
     (void)vol_r;
 
     if (lineout_inserted()) {
-        l = r = global_settings.volume_limit * 10;
+        l = r = global_settings.volume_limit;
     } else {
         l = vol_l_hw;
         r = vol_r_hw;
