@@ -65,6 +65,10 @@ extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume
 #include "ascodec.h"
 #endif
 
+#if defined(FIIO_M3K)
+#include "backlight-target.h"
+#endif
+
 #if !defined(IRIVER_IFP7XX_SERIES)
 /* FIX: this doesn't work on iFP */
 
@@ -292,6 +296,12 @@ int rolo_load(const char* filename)
     lcd_remote_puts(0, 1, "Executing");
     lcd_remote_update();
 #endif
+
+#if defined(FIIO_M3K)
+    /* Avoids the LCD backlight ramping down & up weirdly */
+    backlight_hw_off();
+#endif
+
     adc_close();
 #if CONFIG_CPU == AS3525v2
     /* Set CVDD1 power supply to default*/
