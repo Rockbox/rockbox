@@ -68,8 +68,14 @@ void power_init(void)
     axp173_adc_set_enabled(bits);
 
     /* Turn on all power outputs */
-    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR, 0x12, 0, 0x5f, NULL);
-    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR, 0x80, 0, 0xc0, NULL);
+    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR,
+                    AXP173_REG_PWROUTPUTCTRL, 0, 0x5f, NULL);
+    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR,
+                    AXP173_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
+
+    /* Set the default charging current. This is the same as the
+     * OF's setting, although it's not strictly within the USB spec. */
+    axp173_set_charge_current(780);
 
     /* Short delay to give power outputs time to stabilize */
     mdelay(5);
@@ -82,7 +88,8 @@ void adc_init(void)
 void power_off(void)
 {
     /* Set the shutdown bit */
-    i2c_reg_setbit1(AXP173_BUS, AXP173_ADDR, 0x32, 7, 1, NULL);
+    i2c_reg_setbit1(AXP173_BUS, AXP173_ADDR,
+                    AXP173_REG_SHUTDOWNLEDCTRL, 7, 1, NULL);
     while(1);
 }
 
