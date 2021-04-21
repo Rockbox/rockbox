@@ -4222,6 +4222,7 @@ fi
     output="rockbox.m3k"
     bootoutput="bootloader.m3k"
     sploutput="spl.m3k"
+    sysfontbl="16-Terminus"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
     toolset="$toolset mkspl-x1000"
