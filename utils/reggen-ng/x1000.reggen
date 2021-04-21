@@ -435,6 +435,17 @@ node CPM {
         fld 7 0 CLKDIV
     }
 
+    reg USBCDR 0x50 {
+        fld 31 30 CLKSRC { enum EXCLK 0; enum SCLK_A 2; enum MPLL 3; }
+        bit 29 CE
+        bit 28 BUSY
+        bit 27 STOP
+        # PHY_GATE bit undocumented but present in Ingenic kernel sources,
+        # it's not clear it does anything.
+        bit 26 PHY_GATE
+        fld 7 0 CLKDIV
+    }
+
     reg SSICDR 0x74 {
         bit 31 SFC_CS { enum SCLK_A 0; enum MPLL 1 }
         bit 30 SSI_CS { enum EXCLK 0; enum HALF_SFC 1 }
@@ -444,7 +455,59 @@ node CPM {
         fld 7 0 CLKDIV
     }
 
+    reg INTR 0xb0 {
+        bit 1 VBUS
+        bit 0 ADEV
+    }
+
+    reg INTR_EN 0xb4 {
+        bit 1 VBUS
+        bit 0 ADEV
+    }
+
     reg DRCG 0xd0
+
+    reg USBPCR 0x3c {
+        bit    31 USB_MODE { enum USB 0; enum OTG 1; }
+        bit    30 AVLD_REG
+        fld 29 28 IDPULLUP_MASK { enum ALWAYS 2; enum ALWAYS_SUSPEND 1; enum FROM_OTG 0; }
+        bit    27 INCR_MASK
+        bit    26 TXRISETUNE
+        bit    25 COMMONONN
+        bit    24 VBUSVLDEXT
+        bit    23 VBUSVLDEXTSEL
+        bit    22 POR
+        bit    21 SIDDQ
+        bit    20 OTG_DISABLE
+        fld 19 17 COMPDISTUNE
+        fld 16 14 OTGTUNE
+        fld 13 11 SQRXTUNE
+        fld 10  7 TXFSLSTUNE
+        bit     6 TXPREEMPHTUNE
+        fld  5  4 TXHSXVTUNE
+        fld  3  0 TXVREFTUNE
+    }
+
+    reg USBRDT 0x40 {
+        bit    26 HB_MASK
+        bit    25 VBFIL_LD_EN
+        bit    24 IDDIG_EN
+        bit    23 IDDIG_REG
+        fld 22  0 RDT
+    }
+
+    reg USBVBFIL 0x44 {
+        fld 31 16 IDDIGFIL
+        fld 15  0 VBFIL
+    }
+
+    reg USBPCR1 0x48 {
+        bit    31 BVLD_REG
+        fld 27 26 REFCLK_SEL { enum CLKCORE 2; enum EXTERNAL 1; enum CRYSTAL 0 }
+        fld 25 24 REFCLK_DIV { enum 48MHZ 2; enum 24MHZ 1; enum 12MHZ 0 }
+        bit    21 PORT_RST
+        bit    19 WORD_IF { enum 16BIT 1; enum 8BIT 0 }
+    }
 
     reg APCR 0x10 {
         bit    31 BS
@@ -510,6 +573,24 @@ node CPM {
         bit  3 OTG
         bit  2 SFC
         bit  1 EFUSE
+    }
+
+    reg SRBC 0xc4 {
+        bit 31 JPEG_SR
+        bit 30 JPEG_STOP
+        bit 29 JPEG_ACK
+        bit 25 LCD_SR
+        bit 24 LCD_STOP
+        bit 23 LCD_ACK
+        bit 21 CIM_STOP
+        bit 20 CIM_ACK
+        bit 15 CPU_STOP
+        bit 14 CPU_ACK
+        bit 12 OTG_SR
+        bit  8 AHB2_STOP
+        bit  7 AHB2_ACK
+        bit  6 DDR_STOP
+        bit  5 DDR_ACK
     }
 
     reg OPCR 0x24 {

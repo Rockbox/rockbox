@@ -53,6 +53,15 @@
 #define COMMIT_DCACHE_RANGE(b,s)    commit_dcache_range(b,s)
 #endif
 
+/* On some platforms, virtual addresses must be mangled to
+ * get a physical address for DMA
+ */
+#if CONFIG_CPU == X1000
+# define DMA_ADDR2PHYS(x) PHYSADDR(x)
+#else
+# define DMA_ADDR2PHYS(x) x
+#endif
+
 #ifndef USB_DW_TOUTCAL
 #define USB_DW_TOUTCAL 0
 #endif
@@ -449,7 +458,7 @@ static void usb_dw_nptx_unqueue(int epnum)
             dw_ep->addr -= (bytesinfifo + 3) >> 2;
 #else
             (void) bytesinfifo;
-            DWC_DIEPDMA(ep) = (uint32_t)(dw_ep->addr) + sentbytes;
+            DWC_DIEPDMA(ep) = DMA_ADDR2PHYS((uint32_t)(dw_ep->addr) + sentbytes);
 #endif
             DWC_DIEPTSIZ(ep) = PKTCNT(packetsleft) | (dw_ep->size - sentbytes);
 
@@ -676,7 +685,7 @@ static void usb_dw_start_xfer(int epnum,
     /* Set up data source */
     dw_ep->addr = (uint32_t*)buf;
 #ifndef USB_DW_ARCH_SLAVE
-    DWC_EPDMA(epnum, epdir) = (uint32_t)buf;
+    DWC_EPDMA(epnum, epdir) = DMA_ADDR2PHYS((uint32_t)buf);
 #endif
 
     if (epdir == USB_DW_EPDIR_IN)

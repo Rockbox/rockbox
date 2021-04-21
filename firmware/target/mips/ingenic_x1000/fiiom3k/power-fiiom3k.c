@@ -23,6 +23,9 @@
 #include "adc.h"
 #include "system.h"
 #include "kernel.h"
+#ifdef HAVE_USB_CHARGING_ENABLE
+# include "usb_core.h"
+#endif
 #include "axp173.h"
 #include "i2c-x1000.h"
 #include "gpio-x1000.h"
@@ -80,6 +83,13 @@ void power_init(void)
     /* Short delay to give power outputs time to stabilize */
     mdelay(5);
 }
+
+#ifdef HAVE_USB_CHARGING_ENABLE
+void usb_charging_maxcurrent_change(int maxcurrent)
+{
+    axp173_set_charge_current(maxcurrent);
+}
+#endif
 
 void adc_init(void)
 {
