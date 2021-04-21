@@ -42,6 +42,9 @@
 # define X1000_CPUIDLE_STATS
 #endif
 
+#define OTGBASE 0xb3500000
+#define USB_NUM_ENDPOINTS 9
+
 #include "mmu-mips.h"
 #include "mipsregs.h"
 #include "mipsr2-endian.h"

@@ -191,6 +191,8 @@ static void UIRQ(void)
 }
 
 #define intr(name) extern __attribute__((weak, alias("UIRQ"))) void name(void)
+/* DWC2 USB interrupt */
+#define OTG INT_USB_FUNC
 
 /* Main interrupts */
 intr(DMIC); intr(AIC);   intr(SFC);   intr(SSI0);  intr(OTG);   intr(AES);

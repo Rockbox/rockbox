@@ -401,6 +401,51 @@
 #define BF_CPM_MSC1CDR_S_CLK1_SEL_V(e)      BF_CPM_MSC1CDR_S_CLK1_SEL(BV_CPM_MSC1CDR_S_CLK1_SEL__##e)
 #define BFM_CPM_MSC1CDR_S_CLK1_SEL_V(v)     BM_CPM_MSC1CDR_S_CLK1_SEL
 
+#define REG_CPM_USBCDR                  jz_reg(CPM_USBCDR)
+#define JA_CPM_USBCDR                   (0xb0000000 + 0x50)
+#define JT_CPM_USBCDR                   JIO_32_RW
+#define JN_CPM_USBCDR                   CPM_USBCDR
+#define JI_CPM_USBCDR                   
+#define BP_CPM_USBCDR_CLKSRC            30
+#define BM_CPM_USBCDR_CLKSRC            0xc0000000
+#define BV_CPM_USBCDR_CLKSRC__EXCLK     0x0
+#define BV_CPM_USBCDR_CLKSRC__SCLK_A    0x2
+#define BV_CPM_USBCDR_CLKSRC__MPLL      0x3
+#define BF_CPM_USBCDR_CLKSRC(v)         (((v) & 0x3) << 30)
+#define BFM_CPM_USBCDR_CLKSRC(v)        BM_CPM_USBCDR_CLKSRC
+#define BF_CPM_USBCDR_CLKSRC_V(e)       BF_CPM_USBCDR_CLKSRC(BV_CPM_USBCDR_CLKSRC__##e)
+#define BFM_CPM_USBCDR_CLKSRC_V(v)      BM_CPM_USBCDR_CLKSRC
+#define BP_CPM_USBCDR_CLKDIV            0
+#define BM_CPM_USBCDR_CLKDIV            0xff
+#define BF_CPM_USBCDR_CLKDIV(v)         (((v) & 0xff) << 0)
+#define BFM_CPM_USBCDR_CLKDIV(v)        BM_CPM_USBCDR_CLKDIV
+#define BF_CPM_USBCDR_CLKDIV_V(e)       BF_CPM_USBCDR_CLKDIV(BV_CPM_USBCDR_CLKDIV__##e)
+#define BFM_CPM_USBCDR_CLKDIV_V(v)      BM_CPM_USBCDR_CLKDIV
+#define BP_CPM_USBCDR_CE                29
+#define BM_CPM_USBCDR_CE                0x20000000
+#define BF_CPM_USBCDR_CE(v)             (((v) & 0x1) << 29)
+#define BFM_CPM_USBCDR_CE(v)            BM_CPM_USBCDR_CE
+#define BF_CPM_USBCDR_CE_V(e)           BF_CPM_USBCDR_CE(BV_CPM_USBCDR_CE__##e)
+#define BFM_CPM_USBCDR_CE_V(v)          BM_CPM_USBCDR_CE
+#define BP_CPM_USBCDR_BUSY              28
+#define BM_CPM_USBCDR_BUSY              0x10000000
+#define BF_CPM_USBCDR_BUSY(v)           (((v) & 0x1) << 28)
+#define BFM_CPM_USBCDR_BUSY(v)          BM_CPM_USBCDR_BUSY
+#define BF_CPM_USBCDR_BUSY_V(e)         BF_CPM_USBCDR_BUSY(BV_CPM_USBCDR_BUSY__##e)
+#define BFM_CPM_USBCDR_BUSY_V(v)        BM_CPM_USBCDR_BUSY
+#define BP_CPM_USBCDR_STOP              27
+#define BM_CPM_USBCDR_STOP              0x8000000
+#define BF_CPM_USBCDR_STOP(v)           (((v) & 0x1) << 27)
+#define BFM_CPM_USBCDR_STOP(v)          BM_CPM_USBCDR_STOP
+#define BF_CPM_USBCDR_STOP_V(e)         BF_CPM_USBCDR_STOP(BV_CPM_USBCDR_STOP__##e)
+#define BFM_CPM_USBCDR_STOP_V(v)        BM_CPM_USBCDR_STOP
+#define BP_CPM_USBCDR_PHY_GATE          26
+#define BM_CPM_USBCDR_PHY_GATE          0x4000000
+#define BF_CPM_USBCDR_PHY_GATE(v)       (((v) & 0x1) << 26)
+#define BFM_CPM_USBCDR_PHY_GATE(v)      BM_CPM_USBCDR_PHY_GATE
+#define BF_CPM_USBCDR_PHY_GATE_V(e)     BF_CPM_USBCDR_PHY_GATE(BV_CPM_USBCDR_PHY_GATE__##e)
+#define BFM_CPM_USBCDR_PHY_GATE_V(v)    BM_CPM_USBCDR_PHY_GATE
+
 #define REG_CPM_SSICDR                  jz_reg(CPM_SSICDR)
 #define JA_CPM_SSICDR                   (0xb0000000 + 0x74)
 #define JT_CPM_SSICDR                   JIO_32_RW
@@ -447,11 +492,264 @@
 #define BF_CPM_SSICDR_STOP_V(e)         BF_CPM_SSICDR_STOP(BV_CPM_SSICDR_STOP__##e)
 #define BFM_CPM_SSICDR_STOP_V(v)        BM_CPM_SSICDR_STOP
 
+#define REG_CPM_INTR            jz_reg(CPM_INTR)
+#define JA_CPM_INTR             (0xb0000000 + 0xb0)
+#define JT_CPM_INTR             JIO_32_RW
+#define JN_CPM_INTR             CPM_INTR
+#define JI_CPM_INTR             
+#define BP_CPM_INTR_VBUS        1
+#define BM_CPM_INTR_VBUS        0x2
+#define BF_CPM_INTR_VBUS(v)     (((v) & 0x1) << 1)
+#define BFM_CPM_INTR_VBUS(v)    BM_CPM_INTR_VBUS
+#define BF_CPM_INTR_VBUS_V(e)   BF_CPM_INTR_VBUS(BV_CPM_INTR_VBUS__##e)
+#define BFM_CPM_INTR_VBUS_V(v)  BM_CPM_INTR_VBUS
+#define BP_CPM_INTR_ADEV        0
+#define BM_CPM_INTR_ADEV        0x1
+#define BF_CPM_INTR_ADEV(v)     (((v) & 0x1) << 0)
+#define BFM_CPM_INTR_ADEV(v)    BM_CPM_INTR_ADEV
+#define BF_CPM_INTR_ADEV_V(e)   BF_CPM_INTR_ADEV(BV_CPM_INTR_ADEV__##e)
+#define BFM_CPM_INTR_ADEV_V(v)  BM_CPM_INTR_ADEV
+
+#define REG_CPM_INTR_EN             jz_reg(CPM_INTR_EN)
+#define JA_CPM_INTR_EN              (0xb0000000 + 0xb4)
+#define JT_CPM_INTR_EN              JIO_32_RW
+#define JN_CPM_INTR_EN              CPM_INTR_EN
+#define JI_CPM_INTR_EN              
+#define BP_CPM_INTR_EN_VBUS         1
+#define BM_CPM_INTR_EN_VBUS         0x2
+#define BF_CPM_INTR_EN_VBUS(v)      (((v) & 0x1) << 1)
+#define BFM_CPM_INTR_EN_VBUS(v)     BM_CPM_INTR_EN_VBUS
+#define BF_CPM_INTR_EN_VBUS_V(e)    BF_CPM_INTR_EN_VBUS(BV_CPM_INTR_EN_VBUS__##e)
+#define BFM_CPM_INTR_EN_VBUS_V(v)   BM_CPM_INTR_EN_VBUS
+#define BP_CPM_INTR_EN_ADEV         0
+#define BM_CPM_INTR_EN_ADEV         0x1
+#define BF_CPM_INTR_EN_ADEV(v)      (((v) & 0x1) << 0)
+#define BFM_CPM_INTR_EN_ADEV(v)     BM_CPM_INTR_EN_ADEV
+#define BF_CPM_INTR_EN_ADEV_V(e)    BF_CPM_INTR_EN_ADEV(BV_CPM_INTR_EN_ADEV__##e)
+#define BFM_CPM_INTR_EN_ADEV_V(v)   BM_CPM_INTR_EN_ADEV
+
 #define REG_CPM_DRCG    jz_reg(CPM_DRCG)
 #define JA_CPM_DRCG     (0xb0000000 + 0xd0)
 #define JT_CPM_DRCG     JIO_32_RW
 #define JN_CPM_DRCG     CPM_DRCG
 #define JI_CPM_DRCG     
+
+#define REG_CPM_USBPCR                              jz_reg(CPM_USBPCR)
+#define JA_CPM_USBPCR                               (0xb0000000 + 0x3c)
+#define JT_CPM_USBPCR                               JIO_32_RW
+#define JN_CPM_USBPCR                               CPM_USBPCR
+#define JI_CPM_USBPCR                               
+#define BP_CPM_USBPCR_IDPULLUP_MASK                 28
+#define BM_CPM_USBPCR_IDPULLUP_MASK                 0x30000000
+#define BV_CPM_USBPCR_IDPULLUP_MASK__ALWAYS         0x2
+#define BV_CPM_USBPCR_IDPULLUP_MASK__ALWAYS_SUSPEND 0x1
+#define BV_CPM_USBPCR_IDPULLUP_MASK__FROM_OTG       0x0
+#define BF_CPM_USBPCR_IDPULLUP_MASK(v)              (((v) & 0x3) << 28)
+#define BFM_CPM_USBPCR_IDPULLUP_MASK(v)             BM_CPM_USBPCR_IDPULLUP_MASK
+#define BF_CPM_USBPCR_IDPULLUP_MASK_V(e)            BF_CPM_USBPCR_IDPULLUP_MASK(BV_CPM_USBPCR_IDPULLUP_MASK__##e)
+#define BFM_CPM_USBPCR_IDPULLUP_MASK_V(v)           BM_CPM_USBPCR_IDPULLUP_MASK
+#define BP_CPM_USBPCR_COMPDISTUNE                   17
+#define BM_CPM_USBPCR_COMPDISTUNE                   0xe0000
+#define BF_CPM_USBPCR_COMPDISTUNE(v)                (((v) & 0x7) << 17)
+#define BFM_CPM_USBPCR_COMPDISTUNE(v)               BM_CPM_USBPCR_COMPDISTUNE
+#define BF_CPM_USBPCR_COMPDISTUNE_V(e)              BF_CPM_USBPCR_COMPDISTUNE(BV_CPM_USBPCR_COMPDISTUNE__##e)
+#define BFM_CPM_USBPCR_COMPDISTUNE_V(v)             BM_CPM_USBPCR_COMPDISTUNE
+#define BP_CPM_USBPCR_OTGTUNE                       14
+#define BM_CPM_USBPCR_OTGTUNE                       0x1c000
+#define BF_CPM_USBPCR_OTGTUNE(v)                    (((v) & 0x7) << 14)
+#define BFM_CPM_USBPCR_OTGTUNE(v)                   BM_CPM_USBPCR_OTGTUNE
+#define BF_CPM_USBPCR_OTGTUNE_V(e)                  BF_CPM_USBPCR_OTGTUNE(BV_CPM_USBPCR_OTGTUNE__##e)
+#define BFM_CPM_USBPCR_OTGTUNE_V(v)                 BM_CPM_USBPCR_OTGTUNE
+#define BP_CPM_USBPCR_SQRXTUNE                      11
+#define BM_CPM_USBPCR_SQRXTUNE                      0x3800
+#define BF_CPM_USBPCR_SQRXTUNE(v)                   (((v) & 0x7) << 11)
+#define BFM_CPM_USBPCR_SQRXTUNE(v)                  BM_CPM_USBPCR_SQRXTUNE
+#define BF_CPM_USBPCR_SQRXTUNE_V(e)                 BF_CPM_USBPCR_SQRXTUNE(BV_CPM_USBPCR_SQRXTUNE__##e)
+#define BFM_CPM_USBPCR_SQRXTUNE_V(v)                BM_CPM_USBPCR_SQRXTUNE
+#define BP_CPM_USBPCR_TXFSLSTUNE                    7
+#define BM_CPM_USBPCR_TXFSLSTUNE                    0x780
+#define BF_CPM_USBPCR_TXFSLSTUNE(v)                 (((v) & 0xf) << 7)
+#define BFM_CPM_USBPCR_TXFSLSTUNE(v)                BM_CPM_USBPCR_TXFSLSTUNE
+#define BF_CPM_USBPCR_TXFSLSTUNE_V(e)               BF_CPM_USBPCR_TXFSLSTUNE(BV_CPM_USBPCR_TXFSLSTUNE__##e)
+#define BFM_CPM_USBPCR_TXFSLSTUNE_V(v)              BM_CPM_USBPCR_TXFSLSTUNE
+#define BP_CPM_USBPCR_TXHSXVTUNE                    4
+#define BM_CPM_USBPCR_TXHSXVTUNE                    0x30
+#define BF_CPM_USBPCR_TXHSXVTUNE(v)                 (((v) & 0x3) << 4)
+#define BFM_CPM_USBPCR_TXHSXVTUNE(v)                BM_CPM_USBPCR_TXHSXVTUNE
+#define BF_CPM_USBPCR_TXHSXVTUNE_V(e)               BF_CPM_USBPCR_TXHSXVTUNE(BV_CPM_USBPCR_TXHSXVTUNE__##e)
+#define BFM_CPM_USBPCR_TXHSXVTUNE_V(v)              BM_CPM_USBPCR_TXHSXVTUNE
+#define BP_CPM_USBPCR_TXVREFTUNE                    0
+#define BM_CPM_USBPCR_TXVREFTUNE                    0xf
+#define BF_CPM_USBPCR_TXVREFTUNE(v)                 (((v) & 0xf) << 0)
+#define BFM_CPM_USBPCR_TXVREFTUNE(v)                BM_CPM_USBPCR_TXVREFTUNE
+#define BF_CPM_USBPCR_TXVREFTUNE_V(e)               BF_CPM_USBPCR_TXVREFTUNE(BV_CPM_USBPCR_TXVREFTUNE__##e)
+#define BFM_CPM_USBPCR_TXVREFTUNE_V(v)              BM_CPM_USBPCR_TXVREFTUNE
+#define BP_CPM_USBPCR_USB_MODE                      31
+#define BM_CPM_USBPCR_USB_MODE                      0x80000000
+#define BV_CPM_USBPCR_USB_MODE__USB                 0x0
+#define BV_CPM_USBPCR_USB_MODE__OTG                 0x1
+#define BF_CPM_USBPCR_USB_MODE(v)                   (((v) & 0x1) << 31)
+#define BFM_CPM_USBPCR_USB_MODE(v)                  BM_CPM_USBPCR_USB_MODE
+#define BF_CPM_USBPCR_USB_MODE_V(e)                 BF_CPM_USBPCR_USB_MODE(BV_CPM_USBPCR_USB_MODE__##e)
+#define BFM_CPM_USBPCR_USB_MODE_V(v)                BM_CPM_USBPCR_USB_MODE
+#define BP_CPM_USBPCR_AVLD_REG                      30
+#define BM_CPM_USBPCR_AVLD_REG                      0x40000000
+#define BF_CPM_USBPCR_AVLD_REG(v)                   (((v) & 0x1) << 30)
+#define BFM_CPM_USBPCR_AVLD_REG(v)                  BM_CPM_USBPCR_AVLD_REG
+#define BF_CPM_USBPCR_AVLD_REG_V(e)                 BF_CPM_USBPCR_AVLD_REG(BV_CPM_USBPCR_AVLD_REG__##e)
+#define BFM_CPM_USBPCR_AVLD_REG_V(v)                BM_CPM_USBPCR_AVLD_REG
+#define BP_CPM_USBPCR_INCR_MASK                     27
+#define BM_CPM_USBPCR_INCR_MASK                     0x8000000
+#define BF_CPM_USBPCR_INCR_MASK(v)                  (((v) & 0x1) << 27)
+#define BFM_CPM_USBPCR_INCR_MASK(v)                 BM_CPM_USBPCR_INCR_MASK
+#define BF_CPM_USBPCR_INCR_MASK_V(e)                BF_CPM_USBPCR_INCR_MASK(BV_CPM_USBPCR_INCR_MASK__##e)
+#define BFM_CPM_USBPCR_INCR_MASK_V(v)               BM_CPM_USBPCR_INCR_MASK
+#define BP_CPM_USBPCR_TXRISETUNE                    26
+#define BM_CPM_USBPCR_TXRISETUNE                    0x4000000
+#define BF_CPM_USBPCR_TXRISETUNE(v)                 (((v) & 0x1) << 26)
+#define BFM_CPM_USBPCR_TXRISETUNE(v)                BM_CPM_USBPCR_TXRISETUNE
+#define BF_CPM_USBPCR_TXRISETUNE_V(e)               BF_CPM_USBPCR_TXRISETUNE(BV_CPM_USBPCR_TXRISETUNE__##e)
+#define BFM_CPM_USBPCR_TXRISETUNE_V(v)              BM_CPM_USBPCR_TXRISETUNE
+#define BP_CPM_USBPCR_COMMONONN                     25
+#define BM_CPM_USBPCR_COMMONONN                     0x2000000
+#define BF_CPM_USBPCR_COMMONONN(v)                  (((v) & 0x1) << 25)
+#define BFM_CPM_USBPCR_COMMONONN(v)                 BM_CPM_USBPCR_COMMONONN
+#define BF_CPM_USBPCR_COMMONONN_V(e)                BF_CPM_USBPCR_COMMONONN(BV_CPM_USBPCR_COMMONONN__##e)
+#define BFM_CPM_USBPCR_COMMONONN_V(v)               BM_CPM_USBPCR_COMMONONN
+#define BP_CPM_USBPCR_VBUSVLDEXT                    24
+#define BM_CPM_USBPCR_VBUSVLDEXT                    0x1000000
+#define BF_CPM_USBPCR_VBUSVLDEXT(v)                 (((v) & 0x1) << 24)
+#define BFM_CPM_USBPCR_VBUSVLDEXT(v)                BM_CPM_USBPCR_VBUSVLDEXT
+#define BF_CPM_USBPCR_VBUSVLDEXT_V(e)               BF_CPM_USBPCR_VBUSVLDEXT(BV_CPM_USBPCR_VBUSVLDEXT__##e)
+#define BFM_CPM_USBPCR_VBUSVLDEXT_V(v)              BM_CPM_USBPCR_VBUSVLDEXT
+#define BP_CPM_USBPCR_VBUSVLDEXTSEL                 23
+#define BM_CPM_USBPCR_VBUSVLDEXTSEL                 0x800000
+#define BF_CPM_USBPCR_VBUSVLDEXTSEL(v)              (((v) & 0x1) << 23)
+#define BFM_CPM_USBPCR_VBUSVLDEXTSEL(v)             BM_CPM_USBPCR_VBUSVLDEXTSEL
+#define BF_CPM_USBPCR_VBUSVLDEXTSEL_V(e)            BF_CPM_USBPCR_VBUSVLDEXTSEL(BV_CPM_USBPCR_VBUSVLDEXTSEL__##e)
+#define BFM_CPM_USBPCR_VBUSVLDEXTSEL_V(v)           BM_CPM_USBPCR_VBUSVLDEXTSEL
+#define BP_CPM_USBPCR_POR                           22
+#define BM_CPM_USBPCR_POR                           0x400000
+#define BF_CPM_USBPCR_POR(v)                        (((v) & 0x1) << 22)
+#define BFM_CPM_USBPCR_POR(v)                       BM_CPM_USBPCR_POR
+#define BF_CPM_USBPCR_POR_V(e)                      BF_CPM_USBPCR_POR(BV_CPM_USBPCR_POR__##e)
+#define BFM_CPM_USBPCR_POR_V(v)                     BM_CPM_USBPCR_POR
+#define BP_CPM_USBPCR_SIDDQ                         21
+#define BM_CPM_USBPCR_SIDDQ                         0x200000
+#define BF_CPM_USBPCR_SIDDQ(v)                      (((v) & 0x1) << 21)
+#define BFM_CPM_USBPCR_SIDDQ(v)                     BM_CPM_USBPCR_SIDDQ
+#define BF_CPM_USBPCR_SIDDQ_V(e)                    BF_CPM_USBPCR_SIDDQ(BV_CPM_USBPCR_SIDDQ__##e)
+#define BFM_CPM_USBPCR_SIDDQ_V(v)                   BM_CPM_USBPCR_SIDDQ
+#define BP_CPM_USBPCR_OTG_DISABLE                   20
+#define BM_CPM_USBPCR_OTG_DISABLE                   0x100000
+#define BF_CPM_USBPCR_OTG_DISABLE(v)                (((v) & 0x1) << 20)
+#define BFM_CPM_USBPCR_OTG_DISABLE(v)               BM_CPM_USBPCR_OTG_DISABLE
+#define BF_CPM_USBPCR_OTG_DISABLE_V(e)              BF_CPM_USBPCR_OTG_DISABLE(BV_CPM_USBPCR_OTG_DISABLE__##e)
+#define BFM_CPM_USBPCR_OTG_DISABLE_V(v)             BM_CPM_USBPCR_OTG_DISABLE
+#define BP_CPM_USBPCR_TXPREEMPHTUNE                 6
+#define BM_CPM_USBPCR_TXPREEMPHTUNE                 0x40
+#define BF_CPM_USBPCR_TXPREEMPHTUNE(v)              (((v) & 0x1) << 6)
+#define BFM_CPM_USBPCR_TXPREEMPHTUNE(v)             BM_CPM_USBPCR_TXPREEMPHTUNE
+#define BF_CPM_USBPCR_TXPREEMPHTUNE_V(e)            BF_CPM_USBPCR_TXPREEMPHTUNE(BV_CPM_USBPCR_TXPREEMPHTUNE__##e)
+#define BFM_CPM_USBPCR_TXPREEMPHTUNE_V(v)           BM_CPM_USBPCR_TXPREEMPHTUNE
+
+#define REG_CPM_USBRDT                  jz_reg(CPM_USBRDT)
+#define JA_CPM_USBRDT                   (0xb0000000 + 0x40)
+#define JT_CPM_USBRDT                   JIO_32_RW
+#define JN_CPM_USBRDT                   CPM_USBRDT
+#define JI_CPM_USBRDT                   
+#define BP_CPM_USBRDT_RDT               0
+#define BM_CPM_USBRDT_RDT               0x7fffff
+#define BF_CPM_USBRDT_RDT(v)            (((v) & 0x7fffff) << 0)
+#define BFM_CPM_USBRDT_RDT(v)           BM_CPM_USBRDT_RDT
+#define BF_CPM_USBRDT_RDT_V(e)          BF_CPM_USBRDT_RDT(BV_CPM_USBRDT_RDT__##e)
+#define BFM_CPM_USBRDT_RDT_V(v)         BM_CPM_USBRDT_RDT
+#define BP_CPM_USBRDT_HB_MASK           26
+#define BM_CPM_USBRDT_HB_MASK           0x4000000
+#define BF_CPM_USBRDT_HB_MASK(v)        (((v) & 0x1) << 26)
+#define BFM_CPM_USBRDT_HB_MASK(v)       BM_CPM_USBRDT_HB_MASK
+#define BF_CPM_USBRDT_HB_MASK_V(e)      BF_CPM_USBRDT_HB_MASK(BV_CPM_USBRDT_HB_MASK__##e)
+#define BFM_CPM_USBRDT_HB_MASK_V(v)     BM_CPM_USBRDT_HB_MASK
+#define BP_CPM_USBRDT_VBFIL_LD_EN       25
+#define BM_CPM_USBRDT_VBFIL_LD_EN       0x2000000
+#define BF_CPM_USBRDT_VBFIL_LD_EN(v)    (((v) & 0x1) << 25)
+#define BFM_CPM_USBRDT_VBFIL_LD_EN(v)   BM_CPM_USBRDT_VBFIL_LD_EN
+#define BF_CPM_USBRDT_VBFIL_LD_EN_V(e)  BF_CPM_USBRDT_VBFIL_LD_EN(BV_CPM_USBRDT_VBFIL_LD_EN__##e)
+#define BFM_CPM_USBRDT_VBFIL_LD_EN_V(v) BM_CPM_USBRDT_VBFIL_LD_EN
+#define BP_CPM_USBRDT_IDDIG_EN          24
+#define BM_CPM_USBRDT_IDDIG_EN          0x1000000
+#define BF_CPM_USBRDT_IDDIG_EN(v)       (((v) & 0x1) << 24)
+#define BFM_CPM_USBRDT_IDDIG_EN(v)      BM_CPM_USBRDT_IDDIG_EN
+#define BF_CPM_USBRDT_IDDIG_EN_V(e)     BF_CPM_USBRDT_IDDIG_EN(BV_CPM_USBRDT_IDDIG_EN__##e)
+#define BFM_CPM_USBRDT_IDDIG_EN_V(v)    BM_CPM_USBRDT_IDDIG_EN
+#define BP_CPM_USBRDT_IDDIG_REG         23
+#define BM_CPM_USBRDT_IDDIG_REG         0x800000
+#define BF_CPM_USBRDT_IDDIG_REG(v)      (((v) & 0x1) << 23)
+#define BFM_CPM_USBRDT_IDDIG_REG(v)     BM_CPM_USBRDT_IDDIG_REG
+#define BF_CPM_USBRDT_IDDIG_REG_V(e)    BF_CPM_USBRDT_IDDIG_REG(BV_CPM_USBRDT_IDDIG_REG__##e)
+#define BFM_CPM_USBRDT_IDDIG_REG_V(v)   BM_CPM_USBRDT_IDDIG_REG
+
+#define REG_CPM_USBVBFIL                jz_reg(CPM_USBVBFIL)
+#define JA_CPM_USBVBFIL                 (0xb0000000 + 0x44)
+#define JT_CPM_USBVBFIL                 JIO_32_RW
+#define JN_CPM_USBVBFIL                 CPM_USBVBFIL
+#define JI_CPM_USBVBFIL                 
+#define BP_CPM_USBVBFIL_IDDIGFIL        16
+#define BM_CPM_USBVBFIL_IDDIGFIL        0xffff0000
+#define BF_CPM_USBVBFIL_IDDIGFIL(v)     (((v) & 0xffff) << 16)
+#define BFM_CPM_USBVBFIL_IDDIGFIL(v)    BM_CPM_USBVBFIL_IDDIGFIL
+#define BF_CPM_USBVBFIL_IDDIGFIL_V(e)   BF_CPM_USBVBFIL_IDDIGFIL(BV_CPM_USBVBFIL_IDDIGFIL__##e)
+#define BFM_CPM_USBVBFIL_IDDIGFIL_V(v)  BM_CPM_USBVBFIL_IDDIGFIL
+#define BP_CPM_USBVBFIL_VBFIL           0
+#define BM_CPM_USBVBFIL_VBFIL           0xffff
+#define BF_CPM_USBVBFIL_VBFIL(v)        (((v) & 0xffff) << 0)
+#define BFM_CPM_USBVBFIL_VBFIL(v)       BM_CPM_USBVBFIL_VBFIL
+#define BF_CPM_USBVBFIL_VBFIL_V(e)      BF_CPM_USBVBFIL_VBFIL(BV_CPM_USBVBFIL_VBFIL__##e)
+#define BFM_CPM_USBVBFIL_VBFIL_V(v)     BM_CPM_USBVBFIL_VBFIL
+
+#define REG_CPM_USBPCR1                     jz_reg(CPM_USBPCR1)
+#define JA_CPM_USBPCR1                      (0xb0000000 + 0x48)
+#define JT_CPM_USBPCR1                      JIO_32_RW
+#define JN_CPM_USBPCR1                      CPM_USBPCR1
+#define JI_CPM_USBPCR1                      
+#define BP_CPM_USBPCR1_REFCLK_SEL           26
+#define BM_CPM_USBPCR1_REFCLK_SEL           0xc000000
+#define BV_CPM_USBPCR1_REFCLK_SEL__CLKCORE  0x2
+#define BV_CPM_USBPCR1_REFCLK_SEL__EXTERNAL 0x1
+#define BV_CPM_USBPCR1_REFCLK_SEL__CRYSTAL  0x0
+#define BF_CPM_USBPCR1_REFCLK_SEL(v)        (((v) & 0x3) << 26)
+#define BFM_CPM_USBPCR1_REFCLK_SEL(v)       BM_CPM_USBPCR1_REFCLK_SEL
+#define BF_CPM_USBPCR1_REFCLK_SEL_V(e)      BF_CPM_USBPCR1_REFCLK_SEL(BV_CPM_USBPCR1_REFCLK_SEL__##e)
+#define BFM_CPM_USBPCR1_REFCLK_SEL_V(v)     BM_CPM_USBPCR1_REFCLK_SEL
+#define BP_CPM_USBPCR1_REFCLK_DIV           24
+#define BM_CPM_USBPCR1_REFCLK_DIV           0x3000000
+#define BV_CPM_USBPCR1_REFCLK_DIV__48MHZ    0x2
+#define BV_CPM_USBPCR1_REFCLK_DIV__24MHZ    0x1
+#define BV_CPM_USBPCR1_REFCLK_DIV__12MHZ    0x0
+#define BF_CPM_USBPCR1_REFCLK_DIV(v)        (((v) & 0x3) << 24)
+#define BFM_CPM_USBPCR1_REFCLK_DIV(v)       BM_CPM_USBPCR1_REFCLK_DIV
+#define BF_CPM_USBPCR1_REFCLK_DIV_V(e)      BF_CPM_USBPCR1_REFCLK_DIV(BV_CPM_USBPCR1_REFCLK_DIV__##e)
+#define BFM_CPM_USBPCR1_REFCLK_DIV_V(v)     BM_CPM_USBPCR1_REFCLK_DIV
+#define BP_CPM_USBPCR1_BVLD_REG             31
+#define BM_CPM_USBPCR1_BVLD_REG             0x80000000
+#define BF_CPM_USBPCR1_BVLD_REG(v)          (((v) & 0x1) << 31)
+#define BFM_CPM_USBPCR1_BVLD_REG(v)         BM_CPM_USBPCR1_BVLD_REG
+#define BF_CPM_USBPCR1_BVLD_REG_V(e)        BF_CPM_USBPCR1_BVLD_REG(BV_CPM_USBPCR1_BVLD_REG__##e)
+#define BFM_CPM_USBPCR1_BVLD_REG_V(v)       BM_CPM_USBPCR1_BVLD_REG
+#define BP_CPM_USBPCR1_PORT_RST             21
+#define BM_CPM_USBPCR1_PORT_RST             0x200000
+#define BF_CPM_USBPCR1_PORT_RST(v)          (((v) & 0x1) << 21)
+#define BFM_CPM_USBPCR1_PORT_RST(v)         BM_CPM_USBPCR1_PORT_RST
+#define BF_CPM_USBPCR1_PORT_RST_V(e)        BF_CPM_USBPCR1_PORT_RST(BV_CPM_USBPCR1_PORT_RST__##e)
+#define BFM_CPM_USBPCR1_PORT_RST_V(v)       BM_CPM_USBPCR1_PORT_RST
+#define BP_CPM_USBPCR1_WORD_IF              19
+#define BM_CPM_USBPCR1_WORD_IF              0x80000
+#define BV_CPM_USBPCR1_WORD_IF__16BIT       0x1
+#define BV_CPM_USBPCR1_WORD_IF__8BIT        0x0
+#define BF_CPM_USBPCR1_WORD_IF(v)           (((v) & 0x1) << 19)
+#define BFM_CPM_USBPCR1_WORD_IF(v)          BM_CPM_USBPCR1_WORD_IF
+#define BF_CPM_USBPCR1_WORD_IF_V(e)         BF_CPM_USBPCR1_WORD_IF(BV_CPM_USBPCR1_WORD_IF__##e)
+#define BFM_CPM_USBPCR1_WORD_IF_V(v)        BM_CPM_USBPCR1_WORD_IF
 
 #define REG_CPM_APCR                jz_reg(CPM_APCR)
 #define JA_CPM_APCR                 (0xb0000000 + 0x10)
@@ -790,6 +1088,102 @@
 #define BFM_CPM_CLKGR_EFUSE(v)      BM_CPM_CLKGR_EFUSE
 #define BF_CPM_CLKGR_EFUSE_V(e)     BF_CPM_CLKGR_EFUSE(BV_CPM_CLKGR_EFUSE__##e)
 #define BFM_CPM_CLKGR_EFUSE_V(v)    BM_CPM_CLKGR_EFUSE
+
+#define REG_CPM_SRBC                jz_reg(CPM_SRBC)
+#define JA_CPM_SRBC                 (0xb0000000 + 0xc4)
+#define JT_CPM_SRBC                 JIO_32_RW
+#define JN_CPM_SRBC                 CPM_SRBC
+#define JI_CPM_SRBC                 
+#define BP_CPM_SRBC_JPEG_SR         31
+#define BM_CPM_SRBC_JPEG_SR         0x80000000
+#define BF_CPM_SRBC_JPEG_SR(v)      (((v) & 0x1) << 31)
+#define BFM_CPM_SRBC_JPEG_SR(v)     BM_CPM_SRBC_JPEG_SR
+#define BF_CPM_SRBC_JPEG_SR_V(e)    BF_CPM_SRBC_JPEG_SR(BV_CPM_SRBC_JPEG_SR__##e)
+#define BFM_CPM_SRBC_JPEG_SR_V(v)   BM_CPM_SRBC_JPEG_SR
+#define BP_CPM_SRBC_JPEG_STOP       30
+#define BM_CPM_SRBC_JPEG_STOP       0x40000000
+#define BF_CPM_SRBC_JPEG_STOP(v)    (((v) & 0x1) << 30)
+#define BFM_CPM_SRBC_JPEG_STOP(v)   BM_CPM_SRBC_JPEG_STOP
+#define BF_CPM_SRBC_JPEG_STOP_V(e)  BF_CPM_SRBC_JPEG_STOP(BV_CPM_SRBC_JPEG_STOP__##e)
+#define BFM_CPM_SRBC_JPEG_STOP_V(v) BM_CPM_SRBC_JPEG_STOP
+#define BP_CPM_SRBC_JPEG_ACK        29
+#define BM_CPM_SRBC_JPEG_ACK        0x20000000
+#define BF_CPM_SRBC_JPEG_ACK(v)     (((v) & 0x1) << 29)
+#define BFM_CPM_SRBC_JPEG_ACK(v)    BM_CPM_SRBC_JPEG_ACK
+#define BF_CPM_SRBC_JPEG_ACK_V(e)   BF_CPM_SRBC_JPEG_ACK(BV_CPM_SRBC_JPEG_ACK__##e)
+#define BFM_CPM_SRBC_JPEG_ACK_V(v)  BM_CPM_SRBC_JPEG_ACK
+#define BP_CPM_SRBC_LCD_SR          25
+#define BM_CPM_SRBC_LCD_SR          0x2000000
+#define BF_CPM_SRBC_LCD_SR(v)       (((v) & 0x1) << 25)
+#define BFM_CPM_SRBC_LCD_SR(v)      BM_CPM_SRBC_LCD_SR
+#define BF_CPM_SRBC_LCD_SR_V(e)     BF_CPM_SRBC_LCD_SR(BV_CPM_SRBC_LCD_SR__##e)
+#define BFM_CPM_SRBC_LCD_SR_V(v)    BM_CPM_SRBC_LCD_SR
+#define BP_CPM_SRBC_LCD_STOP        24
+#define BM_CPM_SRBC_LCD_STOP        0x1000000
+#define BF_CPM_SRBC_LCD_STOP(v)     (((v) & 0x1) << 24)
+#define BFM_CPM_SRBC_LCD_STOP(v)    BM_CPM_SRBC_LCD_STOP
+#define BF_CPM_SRBC_LCD_STOP_V(e)   BF_CPM_SRBC_LCD_STOP(BV_CPM_SRBC_LCD_STOP__##e)
+#define BFM_CPM_SRBC_LCD_STOP_V(v)  BM_CPM_SRBC_LCD_STOP
+#define BP_CPM_SRBC_LCD_ACK         23
+#define BM_CPM_SRBC_LCD_ACK         0x800000
+#define BF_CPM_SRBC_LCD_ACK(v)      (((v) & 0x1) << 23)
+#define BFM_CPM_SRBC_LCD_ACK(v)     BM_CPM_SRBC_LCD_ACK
+#define BF_CPM_SRBC_LCD_ACK_V(e)    BF_CPM_SRBC_LCD_ACK(BV_CPM_SRBC_LCD_ACK__##e)
+#define BFM_CPM_SRBC_LCD_ACK_V(v)   BM_CPM_SRBC_LCD_ACK
+#define BP_CPM_SRBC_CIM_STOP        21
+#define BM_CPM_SRBC_CIM_STOP        0x200000
+#define BF_CPM_SRBC_CIM_STOP(v)     (((v) & 0x1) << 21)
+#define BFM_CPM_SRBC_CIM_STOP(v)    BM_CPM_SRBC_CIM_STOP
+#define BF_CPM_SRBC_CIM_STOP_V(e)   BF_CPM_SRBC_CIM_STOP(BV_CPM_SRBC_CIM_STOP__##e)
+#define BFM_CPM_SRBC_CIM_STOP_V(v)  BM_CPM_SRBC_CIM_STOP
+#define BP_CPM_SRBC_CIM_ACK         20
+#define BM_CPM_SRBC_CIM_ACK         0x100000
+#define BF_CPM_SRBC_CIM_ACK(v)      (((v) & 0x1) << 20)
+#define BFM_CPM_SRBC_CIM_ACK(v)     BM_CPM_SRBC_CIM_ACK
+#define BF_CPM_SRBC_CIM_ACK_V(e)    BF_CPM_SRBC_CIM_ACK(BV_CPM_SRBC_CIM_ACK__##e)
+#define BFM_CPM_SRBC_CIM_ACK_V(v)   BM_CPM_SRBC_CIM_ACK
+#define BP_CPM_SRBC_CPU_STOP        15
+#define BM_CPM_SRBC_CPU_STOP        0x8000
+#define BF_CPM_SRBC_CPU_STOP(v)     (((v) & 0x1) << 15)
+#define BFM_CPM_SRBC_CPU_STOP(v)    BM_CPM_SRBC_CPU_STOP
+#define BF_CPM_SRBC_CPU_STOP_V(e)   BF_CPM_SRBC_CPU_STOP(BV_CPM_SRBC_CPU_STOP__##e)
+#define BFM_CPM_SRBC_CPU_STOP_V(v)  BM_CPM_SRBC_CPU_STOP
+#define BP_CPM_SRBC_CPU_ACK         14
+#define BM_CPM_SRBC_CPU_ACK         0x4000
+#define BF_CPM_SRBC_CPU_ACK(v)      (((v) & 0x1) << 14)
+#define BFM_CPM_SRBC_CPU_ACK(v)     BM_CPM_SRBC_CPU_ACK
+#define BF_CPM_SRBC_CPU_ACK_V(e)    BF_CPM_SRBC_CPU_ACK(BV_CPM_SRBC_CPU_ACK__##e)
+#define BFM_CPM_SRBC_CPU_ACK_V(v)   BM_CPM_SRBC_CPU_ACK
+#define BP_CPM_SRBC_OTG_SR          12
+#define BM_CPM_SRBC_OTG_SR          0x1000
+#define BF_CPM_SRBC_OTG_SR(v)       (((v) & 0x1) << 12)
+#define BFM_CPM_SRBC_OTG_SR(v)      BM_CPM_SRBC_OTG_SR
+#define BF_CPM_SRBC_OTG_SR_V(e)     BF_CPM_SRBC_OTG_SR(BV_CPM_SRBC_OTG_SR__##e)
+#define BFM_CPM_SRBC_OTG_SR_V(v)    BM_CPM_SRBC_OTG_SR
+#define BP_CPM_SRBC_AHB2_STOP       8
+#define BM_CPM_SRBC_AHB2_STOP       0x100
+#define BF_CPM_SRBC_AHB2_STOP(v)    (((v) & 0x1) << 8)
+#define BFM_CPM_SRBC_AHB2_STOP(v)   BM_CPM_SRBC_AHB2_STOP
+#define BF_CPM_SRBC_AHB2_STOP_V(e)  BF_CPM_SRBC_AHB2_STOP(BV_CPM_SRBC_AHB2_STOP__##e)
+#define BFM_CPM_SRBC_AHB2_STOP_V(v) BM_CPM_SRBC_AHB2_STOP
+#define BP_CPM_SRBC_AHB2_ACK        7
+#define BM_CPM_SRBC_AHB2_ACK        0x80
+#define BF_CPM_SRBC_AHB2_ACK(v)     (((v) & 0x1) << 7)
+#define BFM_CPM_SRBC_AHB2_ACK(v)    BM_CPM_SRBC_AHB2_ACK
+#define BF_CPM_SRBC_AHB2_ACK_V(e)   BF_CPM_SRBC_AHB2_ACK(BV_CPM_SRBC_AHB2_ACK__##e)
+#define BFM_CPM_SRBC_AHB2_ACK_V(v)  BM_CPM_SRBC_AHB2_ACK
+#define BP_CPM_SRBC_DDR_STOP        6
+#define BM_CPM_SRBC_DDR_STOP        0x40
+#define BF_CPM_SRBC_DDR_STOP(v)     (((v) & 0x1) << 6)
+#define BFM_CPM_SRBC_DDR_STOP(v)    BM_CPM_SRBC_DDR_STOP
+#define BF_CPM_SRBC_DDR_STOP_V(e)   BF_CPM_SRBC_DDR_STOP(BV_CPM_SRBC_DDR_STOP__##e)
+#define BFM_CPM_SRBC_DDR_STOP_V(v)  BM_CPM_SRBC_DDR_STOP
+#define BP_CPM_SRBC_DDR_ACK         5
+#define BM_CPM_SRBC_DDR_ACK         0x20
+#define BF_CPM_SRBC_DDR_ACK(v)      (((v) & 0x1) << 5)
+#define BFM_CPM_SRBC_DDR_ACK(v)     BM_CPM_SRBC_DDR_ACK
+#define BF_CPM_SRBC_DDR_ACK_V(e)    BF_CPM_SRBC_DDR_ACK(BV_CPM_SRBC_DDR_ACK__##e)
+#define BFM_CPM_SRBC_DDR_ACK_V(v)   BM_CPM_SRBC_DDR_ACK
 
 #define REG_CPM_OPCR                        jz_reg(CPM_OPCR)
 #define JA_CPM_OPCR                         (0xb0000000 + 0x24)

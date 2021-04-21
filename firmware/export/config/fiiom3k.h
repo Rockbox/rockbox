@@ -101,9 +101,17 @@
 #define BATTERY_CAPACITY_INC     0
 #define BATTERY_TYPES_COUNT      1
 
-/* USB is still TODO. */
+/* USB support */
 #ifndef SIMULATOR
-#define USB_NONE
+#define CONFIG_USBOTG USBOTG_DESIGNWARE
+#define USB_DW_TURNAROUND 5
+#define HAVE_USBSTACK
+#define USB_VENDOR_ID 0x2972
+#define USB_PRODUCT_ID 0x0003
+#define USB_DEVBSS_ATTR __attribute__((aligned(32)))
+#define HAVE_USB_POWER
+#define HAVE_USB_CHARGING_ENABLE
+#define HAVE_BOOTLOADER_USB_MODE
 #endif
 
 /* Rockbox capabilities */

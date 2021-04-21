@@ -24,13 +24,17 @@
 #include "i2c.h"
 #include "power.h"
 #include "lcd.h"
+#include "font.h"
 #include "backlight.h"
+#include "backlight-target.h"
 #include "button.h"
 #include "storage.h"
 #include "file_internal.h"
 #include "disk.h"
+#include "usb.h"
 #include "rb-loader.h"
 #include "loader_strerror.h"
+#include "version.h"
 
 /* Load address where the binary needs to be placed */
 extern unsigned char loadaddress[];
@@ -53,20 +57,67 @@ void exec(void* dst, const void* src, int bytes)
     __builtin_unreachable();
 }
 
-static void error(const char* msg)
-{
-    /* Initialization of the LCD/buttons only if needed */
-    lcd_init();
-    backlight_init();
-    button_init();
+static bool lcd_inited = false;
+static bool usb_inited = false;
 
+static void init_lcd(void)
+{
+    if(lcd_inited)
+        return;
+
+    lcd_init();
+    font_init();
+    lcd_setfont(FONT_SYSFIXED);
+
+    /* Clear screen before turning backlight on, otherwise we might
+     * display random garbage on the screen */
     lcd_clear_display();
-    lcd_puts(0, 0, msg);
-    lcd_puts(0, 2, "Press POWER to power off");
     lcd_update();
 
-    while(button_get(true) != BUTTON_POWER);
-    power_off();
+    backlight_init();
+
+    lcd_inited = true;
+}
+
+static void do_splash2(int delay, const char* msg, const char* msg2)
+{
+    init_lcd();
+    lcd_clear_display();
+    lcd_putsxy((LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
+               (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
+    if(msg2) {
+        lcd_putsxy((LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg2))) / 2,
+                   (LCD_HEIGHT + 2*SYSFONT_HEIGHT) / 2, msg2);
+    }
+
+    lcd_putsxy((LCD_WIDTH - (SYSFONT_WIDTH * strlen(rbversion))) / 2,
+               (LCD_HEIGHT - SYSFONT_HEIGHT), rbversion);
+    lcd_update();
+    sleep(delay);
+}
+
+static void do_splash(int delay, const char* msg)
+{
+    do_splash2(delay, msg, NULL);
+}
+
+static void do_usb(void)
+{
+    if(!usb_inited) {
+        usb_init();
+        usb_start_monitoring();
+        usb_inited = true;
+    }
+
+    do_splash(0, "Waiting for USB");
+
+    while(button_get(true) != SYS_USB_CONNECTED);
+    do_splash(0, "USB mode");
+
+    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    while(button_get(true) != SYS_USB_DISCONNECTED);
+
+    do_splash(3*HZ, "USB disconnected");
 }
 
 void main(void)
@@ -75,22 +126,40 @@ void main(void)
     kernel_init();
     i2c_init();
     power_init();
+    button_init();
     enable_irq();
 
-    if(storage_init() < 0)
-        error("Storage initialization failed");
+    if(storage_init() < 0) {
+        do_splash(3*HZ, "Failed to init storage");
+        power_off();
+    }
 
     filesystem_init();
 
-    if(!storage_present(0))
-        error("No SD card present");
+    int loadsize = 0;
+    do {
+        if(!storage_present(0)) {
+            do_splash(HZ, "Insert SD card");
+            continue;
+        }
 
-    if(disk_mount_all() <= 0)
-        error("Unable to mount filesystem");
+        if(disk_mount_all() <= 0) {
+            do_splash(5*HZ, "Cannot mount filesystem");
+            do_usb();
+            continue;
+        }
 
-    int loadsize = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
-    if(loadsize <= 0)
-        error(loader_strerror(loadsize));
+        loadsize = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
+        if(loadsize <= 0) {
+            do_splash2(5*HZ, "Error loading Rockbox",
+                       loader_strerror(loadsize));
+            do_usb();
+            continue;
+        }
+    } while(loadsize <= 0);
+
+    if(lcd_inited)
+        backlight_hw_off();
 
     disable_irq();
 
