@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/* ADC channels */
 #define ADC_ACIN_VOLTAGE        0
 #define ADC_ACIN_CURRENT        1
 #define ADC_VBUS_VOLTAGE        2
@@ -54,6 +55,25 @@
 #define AXP173_INPUT_USB        (1 << 1)
 #define AXP173_INPUT_BATTERY    (1 << 2)
 #define AXP173_INPUT_EXTERNAL   (AXP173_INPUT_AC|AXP173_INPUT_USB)
+
+/* Registers -- common to AXP173 and AXP192 (incomplete listing) */
+#define AXP173_REG_POWERSTATUS          0x00
+#define AXP173_REG_CHARGESTATUS         0x01
+#define AXP173_REG_PWROUTPUTCTRL        0x12
+#define AXP173_REG_SHUTDOWNLEDCTRL      0x32
+#define AXP173_REG_CHARGECONTROL1       0x33
+#define AXP173_REG_DCDCWORKINGMODE      0x80
+#define AXP173_REG_ADCENABLE1           0x82
+#define AXP173_REG_ADCENABLE2           0x83
+#define AXP173_REG_ADCSAMPLERATE        0x84
+#define AXP173_REG_COULOMBCOUNTERBASE   0xb0
+#define AXP173_REG_COULOMBCOUNTERCTRL   0xb8
+
+/* AXP192-only registers (incomplete listing) */
+#define AXP192_REG_GPIO0FUNCTION        0x90
+#define AXP192_REG_GPIO1FUNCTION        0x92
+#define AXP192_REG_GPIO2FUNCTION        0x93
+#define AXP192_REG_GPIOSTATE1           0x94
 
 /* Must be called from power_init() to initialize the driver state */
 extern void axp173_init(void);
@@ -87,6 +107,10 @@ extern void axp173_adc_set_rate(int rate);
 extern void axp173_cc_read(uint32_t* charge, uint32_t* discharge);
 extern void axp173_cc_clear(void);
 extern void axp173_cc_enable(bool en);
+
+/* Set/get maximum charging current in milliamps */
+extern void axp173_set_charge_current(int maxcurrent);
+extern int axp173_get_charge_current(void);
 
 /* Debug menu */
 extern bool axp173_debug_menu(void);

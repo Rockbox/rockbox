@@ -23,13 +23,14 @@
 #include "kernel.h"
 #include "backlight.h"
 #include "panic.h"
-#include "lcd.h"
+#include "axp173.h"
 #include "gpio-x1000.h"
 #include "i2c-x1000.h"
 #include <string.h>
 #include <stdbool.h>
 
 #ifndef BOOTLOADER
+# include "lcd.h"
 # include "font.h"
 #endif
 
@@ -409,7 +410,7 @@ static int hp_detect_tmo_cb(struct timeout* tmo)
 static void hp_detect_init(void)
 {
     static struct timeout tmo;
-    static const uint8_t gpio_reg = 0x94;
+    static const uint8_t gpio_reg = AXP192_REG_GPIOSTATE1;
     static i2c_descriptor desc = {
         .slave_addr = AXP173_ADDR,
         .bus_cond = I2C_START | I2C_STOP,
@@ -423,9 +424,8 @@ static void hp_detect_init(void)
         .next = NULL,
     };
 
-    /* Headphone detect is wired to an undocumented GPIO on the AXP173.
-     * This sets it to input mode so we can see the pin state. */
-    i2c_reg_write1(AXP173_BUS, AXP173_ADDR, 0x93, 0x01);
+    /* Headphone detect is wired to AXP192 GPIO: set it to input state */
+    i2c_reg_write1(AXP173_BUS, AXP173_ADDR, AXP192_REG_GPIO2FUNCTION, 0x01);
 
     /* Get an initial reading before startup */
     int r = i2c_reg_read1(AXP173_BUS, AXP173_ADDR, gpio_reg);
