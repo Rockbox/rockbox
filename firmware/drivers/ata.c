@@ -62,6 +62,7 @@
 #define CMD_STANDBY                0xE2
 #define CMD_IDENTIFY               0xEC
 #define CMD_SLEEP                  0xE6
+#define CMD_FLUSH_CACHE            0xE7
 #define CMD_SET_FEATURES           0xEF
 #define CMD_SECURITY_FREEZE_LOCK   0xF5
 #ifdef HAVE_ATA_DMA
@@ -161,10 +162,12 @@ static inline void schedule_ata_power_off(void)
 {
 #ifdef HAVE_ATA_POWER_OFF
     power_off_tick = current_tick;
+#ifdef FC1307A_WORKAROUND
     /* If our device doesn't support SLEEP give a bit more time to flush */
     if (!(identify_info[82] & (1 << 3)))
         power_off_tick += ATA_POWER_OFF_TIMEOUT_NOPM;
     else
+#endif
         power_off_tick += ATA_POWER_OFF_TIMEOUT;
 #endif
 }
@@ -239,11 +242,13 @@ static int ata_perform_wakeup(int state)
 
 static int ata_perform_sleep(void)
 {
-    /* Don't issue the sleep command if the device
-       doesn't support (mandatory!) ATA power management commands!
+#ifdef FC1307A_WORKAROUND
+    /* Don't issue the sleep command if the device claims to not
+       support (mandatory!) ATA power management commands!
     */
     if (!(identify_info[82] & (1 << 3)))
        return 0;
+#endif
 
     logf("ata SLEEP %ld", current_tick);
 
@@ -254,16 +259,56 @@ static int ata_perform_sleep(void)
         return -1;
     }
 
-    ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
+    /* STANDBY IMMEDIATE
+        - writes all cached data
+        - transitions to PM2:Standby
+        - enters Standby_z power condition
+      So it is safe to power off after it is completed but
+      the drive is not in the lowest-power state.
 
-    if (!wait_for_rdy())
-    {
+      Appears to be needed for the FC1307A adapters
+    */
+    if (ata_disk_isssd()) {
+        ATA_OUT8(ATA_COMMAND, CMD_STANDBY_IMMEDIATE);
+    } else {
+        ATA_OUT8(ATA_COMMAND, CMD_SLEEP);
+    }
+
+    if (!wait_for_rdy()) {
         DEBUGF("ata_perform_sleep() - CMD failed\n");
         return -2;
     }
 
     return 0;
 }
+
+static int ata_perform_flush_cache(void)
+{
+    /* Don't issue the flush cache command if the device
+       doesn't support it, even though it's mandatory.
+    */
+    if (!(identify_info[83] & (1 << 12)))
+       return 0;
+
+    logf("ata FLUSH CACHE %ld", current_tick);
+
+    ATA_OUT8(ATA_SELECT, ata_device);
+
+    if(!wait_for_rdy()) {
+        DEBUGF("ata_perform_flush_cache() - not RDY\n");
+        return -1;
+    }
+
+    ATA_OUT8(ATA_COMMAND, CMD_FLUSH_CACHE);
+
+    if (!wait_for_rdy()) {
+        DEBUGF("ata_perform_flush_cache() - CMD failed\n");
+        return -2;
+    }
+
+    return 0;
+}
+
 
 static ICODE_ATTR int wait_for_start_of_transfer(void)
 {
@@ -361,7 +406,12 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 
 int ata_disk_isssd(void)
 {
-    /* offset 217 is "Nominal Rotation rate"
+    /* offset 0 is 0x848a for CF, but that's not guaranteed.
+       offset 83 b2 is set to show device implementes CFA commands
+
+       But both don't guarantee it's SSD, as microdrives are also CFA!
+
+       offset 217 is "Nominal Rotation rate"
        0x0000 == Not reported
        0x0001 == Solid State
        0x0401 -> 0xffe == RPM
@@ -369,7 +419,9 @@ int ata_disk_isssd(void)
 
        Some CF cards return 0x0100 (ie byteswapped 0x0001) so accept either
      */
-    return (identify_info[217] == 0x0001 || identify_info[217] == 0x0100);
+    return (identify_info[0] == 0x848a ||
+	    identify_info[83] & (1<<2) ||
+	    identify_info[217] == 0x0001 || identify_info[217] == 0x0100);
 }
 
 static int ata_transfer_sectors(unsigned long start,
@@ -858,7 +910,7 @@ void ata_sleepnow(void)
         logf("ata SLEEPNOW %ld", current_tick);
         mutex_lock(&ata_mtx);
         if (ata_state == ATA_ON) {
-            if (!ata_perform_sleep()) {
+            if (!ata_perform_flush_cache() && !ata_perform_sleep()) {
                 ata_state = ATA_SLEEPING;
                 schedule_ata_power_off();
             }
@@ -1093,7 +1145,7 @@ static int set_features(void)
         unsigned char parameter;
     } features[] = {
         { 83, 14, 0x03, 0 },   /* force PIO mode */
-        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */
+        { 83, 3, 0x05, 0x80 }, /* adv. power management: lowest w/o standby */  // What about FC1307A that doesn't advertise this properly?
         { 83, 9, 0x42, 0x80 }, /* acoustic management: lowest noise */
         { 82, 6, 0xaa, 0 },    /* enable read look-ahead */
 #ifdef HAVE_ATA_DMA
