@@ -50,9 +50,6 @@
 #if CONFIG_CPU == IMX31L
 #include "imx31l.h"
 #endif
-#ifdef CPU_TCC77X
-#include "tcc77x.h"
-#endif
 #ifdef CPU_TCC780X
 #include "tcc780x.h"
 #endif

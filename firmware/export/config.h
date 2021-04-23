@@ -68,9 +68,6 @@
 #define DSC25          25
 #define DM320         320
 #define IMX31L         31
-#define TCC770        770
-#define TCC771L       771
-#define TCC773L       773
 #define TCC7801      7801
 #define S5L8700      8700
 #define S5L8701      8701
@@ -113,15 +110,12 @@
 #define MROBE100_PAD       17
 #define MROBE500_PAD       18
 #define GIGABEAT_S_PAD     19
-#define LOGIK_DAX_PAD      20
-#define IAUDIO67_PAD       21
 #define COWON_D2_PAD        22
 #define IAUDIO_M3_PAD      23
 #define CREATIVEZVM_PAD    24
 #define SANSA_M200_PAD     25
 #define CREATIVEZV_PAD     26
 #define PHILIPS_SA9200_PAD 27
-#define SANSA_C100_PAD     28
 #define PHILIPS_HDD1630_PAD 29
 #define MEIZU_M6SL_PAD     30
 #define ONDAVX747_PAD      31
@@ -236,13 +230,11 @@
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 #define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
 #define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
-#define LCD_LOGIKDAX 20 /* as used by Logik DAX - SSD1815 */
-#define LCD_IAUDIO67 21 /* as used by iAudio 6/7 - unknown */
 #define LCD_CREATIVEZVM 22 /* as used by Creative Zen Vision:M */
 #define LCD_TL0350A  23 /* as used by the iAudio M3 remote, treated as main LCD */
 #define LCD_COWOND2  24 /* as used by Cowon D2 - LTV250QV, TCC7801 driver */
 #define LCD_SA9200   25 /* as used by the Philips SA9200 */
-#define LCD_S6B33B2  26 /* as used by the Sansa c100 */
+#define LCD_S6B33B2  26 /* as used by the Samsumg YH820 */
 #define LCD_HDD1630  27 /* as used by the Philips HDD1630 */
 #define LCD_MEIZUM6  28 /* as used by the Meizu M6SP and M6SL (various models) */
 #define LCD_ONDAVX747 29 /* as used by the Onda VX747 */
@@ -314,7 +306,6 @@ Lyre prototype 1 */
 #define I2C_S3C2440  7
 #define I2C_PP5024   8 /* PP5024 style */
 #define I2C_IMX31L   9
-#define I2C_TCC77X  10
 #define I2C_TCC780X 11
 #define I2C_DM320   12 /* DM320 style */
 #define I2C_S5L8700 13
@@ -347,7 +338,6 @@ Lyre prototype 1 */
 #define RTC_DS1339_DS3231   7 /* h1x0 RTC mod */
 #define RTC_IMX31L   8
 #define RTC_RX5X348AB 9
-#define RTC_TCC77X   10
 #define RTC_TCC780X  11
 #define RTC_MR100  12
 #define RTC_MC13783  13 /* Freescale MC13783 PMIC */
@@ -438,18 +428,12 @@ Lyre prototype 1 */
 #include "config/sansae200.h"
 #elif defined(SANSA_C200)
 #include "config/sansac200.h"
-#elif defined(SANSA_M200)
-#include "config/sansam200.h"
 #elif defined(TATUNG_TPJ1022)
 #include "config/tatungtpj1022.h"
 #elif defined(MROBE_100)
 #include "config/mrobe100.h"
 #elif defined(MROBE_500)
 #include "config/mrobe500.h"
-#elif defined(LOGIK_DAX)
-#include "config/logikdax.h"
-#elif defined(IAUDIO_7)
-#include "config/iaudio7.h"
 #elif defined(COWON_D2)
 #include "config/cowond2.h"
 #elif defined(CREATIVE_ZVM)
@@ -468,8 +452,6 @@ Lyre prototype 1 */
 #include "config/gogearhdd1630.h"
 #elif defined(PHILIPS_HDD6330)
 #include "config/gogearhdd6330.h"
-#elif defined(SANSA_C100)
-#include "config/sansac100.h"
 #elif defined(MEIZU_M6SL)
 #include "config/meizum6sl.h"
 #elif defined(MEIZU_M6SP)
@@ -664,11 +646,6 @@ Lyre prototype 1 */
 /* define for all cpus from S5L870X family */
 #if (CONFIG_CPU == S5L8700) || (CONFIG_CPU == S5L8701) || (CONFIG_CPU == S5L8702)
 #define CPU_S5L870X
-#endif
-
-/* define for all cpus from TCC77X family */
-#if (CONFIG_CPU == TCC771L) || (CONFIG_CPU == TCC773L) || (CONFIG_CPU == TCC770)
-#define CPU_TCC77X
 #endif
 
 /* define for all cpus from TCC780 family */
@@ -1202,7 +1179,7 @@ Lyre prototype 1 */
     (CONFIG_USBOTG == USBOTG_RK27XX)
 #define USB_HAS_BULK
 #define USB_HAS_INTERRUPT
-#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
+#elif defined(CPU_TCC780X)
 #define USB_HAS_BULK
 #elif CONFIG_USBOTG == USBOTG_S3C6400X
 #define USB_HAS_BULK
@@ -1219,7 +1196,7 @@ Lyre prototype 1 */
 
 /* enable usb storage for targets that do bootloader usb */
 #if defined(HAVE_BOOTLOADER_USB_MODE) || \
-     defined(CREATIVE_ZVx) || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
+     defined(CREATIVE_ZVx) || defined(CPU_TCC780X) || \
      CONFIG_USBOTG == USBOTG_JZ4740 || CONFIG_USBOTG == USBOTG_AS3525 || \
      CONFIG_USBOTG == USBOTG_S3C6400X || CONFIG_USBOTG == USBOTG_DESIGNWARE || \
      CONFIG_USBOTG == USBOTG_JZ4760

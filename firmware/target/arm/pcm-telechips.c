@@ -82,19 +82,6 @@ void pcm_play_dma_init(void)
 
     /* Enable DAI block in Master mode, 256fs->32fs, 16bit LSB */
     DAMR = 0x3c8e80;
-#elif defined(IAUDIO_7)
-    BCLKCTR &= ~DEV_DAI;
-    PCLK_DAI = (0x800a << 16) | (PCLK_DAI & 0xffff);
-    BCLKCTR |= DEV_DAI;
-
-    /* Master mode, 256->64fs, 16bit LSB*/
-    DAMR = 0x3cce20;
-#elif defined(LOGIK_DAX)
-    /* TODO */
-#elif defined(SANSA_M200)
-    /* TODO */
-#elif defined(SANSA_C100)
-    /* TODO */
 #else
 #error "Target isn't supported"
 #endif
@@ -228,7 +215,7 @@ const void * pcm_rec_dma_get_peak_buffer(void)
 }
 #endif
 
-#if defined(CPU_TCC77X) || defined(CPU_TCC780X)
+#if defined(CPU_TCC780X)
 void fiq_handler(void) ICODE_ATTR __attribute__((naked));
 void fiq_handler(void)
 {
@@ -245,9 +232,6 @@ void fiq_handler(void)
 #if defined(CPU_TCC780X)
         "mov     r8, #0xc000         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
         "ldr     r9, =0xf3001004     \n" /* CREQ */
-#elif defined(CPU_TCC77X)
-        "mov     r8, #0x0030         \n" /* DAI_TX_IRQ_MASK | DAI_RX_IRQ_MASK */
-        "ldr     r9, =0x80000104     \n" /* CREQ */
 #endif
         "str     r8, [r9]            \n" /* clear DAI IRQs */
         "ldmia   r11, { r8-r9 }      \n" /* r8 = p, r9 = size */

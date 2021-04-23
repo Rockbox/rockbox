@@ -1553,7 +1553,7 @@ cat <<EOF
  ==Cowon/iAudio==         ==iriver==             ==Apple iPod==
  30) X5/X5V/X5L           10) H120/H140          20) Color/Photo
  31) M5/M5L               11) H320/H340          21) Nano 1G
- 32) 7                    12) iHP-100/110/115    22) Video
+                          12) iHP-100/110/115    22) Video
  33) D2                   13) iFP-790            23) 3G
  34) M3/M3L               14) H10 20Gb           24) 4G Grayscale
                           15) H10 5/6Gb          25) Mini 1G
@@ -1566,8 +1566,8 @@ cat <<EOF
  94) Zen X-Fi3            70) M:Robe 500         50) Sansa e200
  96) Zen X-Fi             71) M:Robe 100         51) Sansa e200R
  97) Zen Mozaic                                  52) Sansa c200
- 98) Zen                  ==Philips==            53) Sansa m200
-                          100) GoGear SA9200     54) Sansa c100
+ 98) Zen                  ==Philips==
+                          100) GoGear SA9200
  ==Onda==                 101) GoGear HDD1630/   55) Sansa Clip
  120) VX747                    HDD1830           56) Sansa e200v2
  121) VX767               102) GoGear HDD6330    57) Sansa m200v4
@@ -1581,8 +1581,8 @@ cat <<EOF
  143) YP-S3               150) Elio TPJ-1022     65) Sansa Clip Zip
  144) YP-Z5                                      66) Sansa Connect
                           ==Packard Bell==
- ==Application==          160) Vibe 500          ==Logik==
- 200) SDL                                        80) DAX 1GB MP3/DAB
+ ==Application==          160) Vibe 500
+ 200) SDL
  201) Android             ==MPIO==
  202) Nokia N8xx          170) HD200             ==Lyre project==
  203) Nokia N900          171) HD300             130) Lyre proto 1
@@ -2080,29 +2080,6 @@ fi
     t_model="m5"
     ;;
 
-   32|iaudio7)
-    target_id=32
-    modelname="iaudio7"
-    target="IAUDIO_7"
-    memory=16 # always
-    arm946cc
-    tool="$rootdir/tools/scramble -add=i7"
-    boottool="$rootdir/tools/scramble -tcc=crc"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.iaudio"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    bootoutput="I7_FW.BIN"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset="$tccbitmaptools"
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tcc77x"
-    t_model="iaudio7"
-    ;;
-
     33|cowond2)
     target_id=34
     modelname="cowond2"
@@ -2236,30 +2213,6 @@ fi
     t_soc="pp"
     t_manufacturer="olympus"
     t_model="mrobe-100"
-    ;;
-
-   80|logikdax)
-    target_id=31
-    modelname="logikdax"
-    target="LOGIK_DAX"
-    memory=2 # always
-    arm946cc
-    tool="$rootdir/tools/scramble -add=ldax"
-    boottool="$rootdir/tools/scramble -tcc=crc"
-    bootoutput="player.rom"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.logik"
-    appextra="recorder:gui:radio"
-    plugins=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$tccbitmaptools
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tcc77x"
-    t_model="logikdax"
-    sysfont="08-Rockfont"
     ;;
 
     89|creativezenxfistyle)
@@ -2537,54 +2490,6 @@ fi
     t_model="sansa-c200"
     ;;
 
-   53|sansam200)
-    target_id=48
-    modelname="sansam200"
-    target="SANSA_M200"
-    memory=1 # always
-    arm946cc
-    tool="$rootdir/tools/scramble -add=m200"
-    boottool="$rootdir/tools/scramble -tcc=crc"
-    bootoutput="player.rom"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.m200"
-    appextra="recorder:gui:radio"
-    plugins=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$tccbitmaptools
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tcc77x"
-    t_model="m200"
-    sysfont="08-Rockfont"
-    ;;
-
-   54|sansac100)
-    target_id=42
-    modelname="sansac100"
-    target="SANSA_C100"
-    memory=2
-    arm946cc
-    tool="$rootdir/tools/scramble -add=c100"
-    boottool="$rootdir/tools/scramble -tcc=crc"
-    bootoutput="player.rom"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    output="rockbox.c100"
-    appextra="recorder:gui:radio"
-    plugins=""
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$tccbitmaptools
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_manufacturer="tcc77x"
-    t_model="c100"
-    sysfont="08-Rockfont"
-    ;;
-
    55|sansaclip)
     target_id=50
     modelname="sansaclip"
@@ -2605,7 +2510,6 @@ fi
     if [ "$ARG_ARM_THUMB" != 0 ]; then ARG_ARM_THUMB=1; fi
     arm9tdmicc
     ;;
-
 
    56|sansae200v2)
     target_id=51

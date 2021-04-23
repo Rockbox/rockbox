@@ -15031,7 +15031,7 @@
   <source>
     *: "Press LEFT to cancel."
     android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
     iriverh10,samsungyh*: "Double tap LEFT to cancel."
@@ -15046,7 +15046,7 @@
   <dest>
     *: "Premere LEFT per annullare."
     android,hifietma*,zenvision: "Premere BACK per annullare."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
     ihifi760,ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
     iriverh10,samsungyh*: "Premere due volte LEFT per annullare."
@@ -15061,7 +15061,7 @@
   <voice>
     *: "Premere LEFT per annullare."
     android,hifietma*,zenvision: "Premere BACK per annullare."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Premere POWER per annullare."
     ihifi760,ihifi960: "Premere due volte RETURN per annullare."
     ihifi770,ihifi770c,ihifi800: "Premere HOME per annullare."
     iriverh10,samsungyh*: "Premere due volte LEFT per annullare."

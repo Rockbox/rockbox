@@ -15318,7 +15318,7 @@
   <source>
     *: "Press LEFT to cancel."
     android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
     iriverh10,samsungyh*: "Double tap LEFT to cancel."
@@ -15333,7 +15333,7 @@
   <dest>
     *: "Притисните LEFT за прекид."
     android,hifietma*,zenvision: "Притисните BACK за прекид."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Притисните POWER за прекид."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Притисните POWER за прекид."
     ihifi760,ihifi960: "Дупли тап RETURN за прекид."
     ihifi770,ihifi770c,ihifi800: "Притисните HOME за прекид."
     iriverh10,samsungyh*: "Дупли тап LEFT за прекид."
@@ -15348,7 +15348,7 @@
   <voice>
     *: "Притисните LEFT за прекид."
     android,hifietma*,zenvision: "Притисните BACK за прекид."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Притисните POWER за прекид."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Притисните POWER за прекид."
     ihifi760,ihifi960: "Дупли тап RETURN за прекид."
     ihifi770,ihifi770c,ihifi800: "Притисните HOME за прекид."
     iriverh10,samsungyh*: "Дупли тап LEFT за прекид."
