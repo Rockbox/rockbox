@@ -1085,7 +1085,7 @@ static void blackjack_savegame(struct game_context* bj) {
 /*****************************************************************************
 * blackjack_get_yes_no() gets a yes/no answer from the user
 ******************************************************************************/
-static unsigned int blackjack_get_yes_no(char message[20]) {
+static unsigned int blackjack_get_yes_no(const char *message) {
     int button;
     unsigned int w, h, b, choice = 0;
     bool breakout = false;
@@ -1146,7 +1146,7 @@ static unsigned int blackjack_get_yes_no(char message[20]) {
 /*****************************************************************************
 * blackjack_get_amount() gets an amount from the player to be used
 ******************************************************************************/
-static signed int blackjack_get_amount(const char message[20],
+static signed int blackjack_get_amount(const char *message,
                                        signed int lower_limit,
                                        signed int upper_limit,
                                        signed int start) {
