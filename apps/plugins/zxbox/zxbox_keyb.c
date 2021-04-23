@@ -512,27 +512,27 @@ int zx_kbd_input(char* text/*, int buflen*/)
         len_utf8 = rb->utf8length(text);
 #endif
         FOR_NB_SCREENS(l)
+        {
             rb->screens[l]->clear_display();
+        }
 
-
-            /* draw page */
-            FOR_NB_SCREENS(l)
-            {
-                rb->screens[l]->setfont(param[l].curfont);
-                k = param[l].page*param[l].max_chars*param[l].lines;
-                for (i=j=0; j < param[l].lines && k < param[l].nchars; k++) {
-                    utf8 = rb->utf8encode(param[l].kbd_buf[k], outline);
-                    *utf8 = 0;
-                    rb->screens[l]->getstringsize(outline, &w, NULL);
-                    rb->screens[l]->putsxy(i*param[l].font_w + (param[l].font_w-w)/2, j*param[l].font_h
-                          + statusbar_size, outline);
-                    if (++i == param[l].max_chars) {
-                        i = 0;
-                        j++;
-                    }
+        /* draw page */
+        FOR_NB_SCREENS(l)
+        {
+            rb->screens[l]->setfont(param[l].curfont);
+            k = param[l].page*param[l].max_chars*param[l].lines;
+            for (i=j=0; j < param[l].lines && k < param[l].nchars; k++) {
+                utf8 = rb->utf8encode(param[l].kbd_buf[k], outline);
+                *utf8 = 0;
+                rb->screens[l]->getstringsize(outline, &w, NULL);
+                rb->screens[l]->putsxy(i*param[l].font_w + (param[l].font_w-w)/2, j*param[l].font_h
+                      + statusbar_size, outline);
+                if (++i == param[l].max_chars) {
+                    i = 0;
+                    j++;
                 }
             }
-
+        }
 
         /* separator */
         FOR_NB_SCREENS(l)
@@ -581,19 +581,20 @@ int zx_kbd_input(char* text/*, int buflen*/)
         }
         cur_blink = !cur_blink;
 
-
-            /* highlight the key that has focus */
-            FOR_NB_SCREENS(l)
-            {
-                rb->screens[l]->set_drawmode(DRMODE_COMPLEMENT);
-                rb->screens[l]->fillrect(param[l].font_w * param[l].x,
-                                        statusbar_size + param[l].font_h * param[l].y,
-                                        param[l].font_w, param[l].font_h);
-                rb->screens[l]->set_drawmode(DRMODE_SOLID);
-            }
+        /* highlight the key that has focus */
+        FOR_NB_SCREENS(l)
+        {
+            rb->screens[l]->set_drawmode(DRMODE_COMPLEMENT);
+            rb->screens[l]->fillrect(param[l].font_w * param[l].x,
+                                    statusbar_size + param[l].font_h * param[l].y,
+                                    param[l].font_w, param[l].font_h);
+            rb->screens[l]->set_drawmode(DRMODE_SOLID);
+        }
 
         FOR_NB_SCREENS(l)
-        rb->screens[l]->update();
+        {
+            rb->screens[l]->update();
+        }
 
         button = rb->button_get_w_tmo(HZ/2);
 
