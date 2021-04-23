@@ -13,12 +13,6 @@
 #include "asm.h"
 #endif
 
-/* GCC 11 complains about the code style.  Just turn this off. */
-#if __GNUC__ >= 11
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmisleading-identation"
-#endif
-
 struct cpu cpu IBSS_ATTR;
 bool plugbuf;
 
@@ -769,25 +763,32 @@ next:
     __JR:
         JR; break;
     case 0x20: /* JR NZ */
-        if (!(F&FZ)) goto __JR; NOJR; break;
+        if (!(F&FZ)) goto __JR;
+        NOJR; break;
     case 0x28: /* JR Z */
-        if (F&FZ) goto __JR; NOJR; break;
+        if (F&FZ) goto __JR;
+        NOJR; break;
     case 0x30: /* JR NC */
-        if (!(F&FC)) goto __JR; NOJR; break;
+        if (!(F&FC)) goto __JR;
+        NOJR; break;
     case 0x38: /* JR C */
-        if (F&FC) goto __JR; NOJR; break;
-
+        if (F&FC) goto __JR;
+        NOJR; break;
     case 0xC3: /* JP */
     __JP:
         JP; break;
     case 0xC2: /* JP NZ */
-        if (!(F&FZ)) goto __JP; NOJP; break;
+        if (!(F&FZ)) goto __JP;
+        NOJP; break;
     case 0xCA: /* JP Z */
-        if (F&FZ) goto __JP; NOJP; break;
+        if (F&FZ) goto __JP;
+        NOJP; break;
     case 0xD2: /* JP NC */
-        if (!(F&FC)) goto __JP; NOJP; break;
+        if (!(F&FC)) goto __JP;
+        NOJP; break;
     case 0xDA: /* JP C */
-        if (F&FC) goto __JP; NOJP; break;
+        if (F&FC) goto __JP;
+        NOJP; break;
     case 0xE9: /* JP HL */
         PC = HL; break;
 
@@ -795,13 +796,17 @@ next:
     __RET:
         RET; break;
     case 0xC0: /* RET NZ */
-        if (!(F&FZ)) goto __RET; NORET; break;
+        if (!(F&FZ)) goto __RET;
+        NORET; break;
     case 0xC8: /* RET Z */
-        if (F&FZ) goto __RET; NORET; break;
+        if (F&FZ) goto __RET;
+        NORET; break;
     case 0xD0: /* RET NC */
-        if (!(F&FC)) goto __RET; NORET; break;
+        if (!(F&FC)) goto __RET;
+        NORET; break;
     case 0xD8: /* RET C */
-        if (F&FC) goto __RET; NORET; break;
+        if (F&FC) goto __RET;
+        NORET; break;
     case 0xD9: /* RETI */
         IME = IMA = 1; goto __RET;
 
@@ -809,13 +814,17 @@ next:
     __CALL:
         CALL; break;
     case 0xC4: /* CALL NZ */
-        if (!(F&FZ)) goto __CALL; NOCALL; break;
+        if (!(F&FZ)) goto __CALL;
+        NOCALL; break;
     case 0xCC: /* CALL Z */
-        if (F&FZ) goto __CALL; NOCALL; break;
+        if (F&FZ) goto __CALL;
+        NOCALL; break;
     case 0xD4: /* CALL NC */
-        if (!(F&FC)) goto __CALL; NOCALL; break;
+        if (!(F&FC)) goto __CALL;
+        NOCALL; break;
     case 0xDC: /* CALL C */
-        if (F&FC) goto __CALL; NOCALL; break;
+        if (F&FC) goto __CALL;
+        NOCALL; break;
 
     case 0xC7: /* RST 0 */
         b = 0x00; goto __RST;
@@ -1009,7 +1018,3 @@ next:
 }
 
 #endif /* ASM_CPU_EMULATE */
-
-#if __GNUC__ >= 11
-#pragma GCC diagnostic pop
-#endif
