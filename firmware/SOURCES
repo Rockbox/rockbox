@@ -336,9 +336,6 @@ drivers/touchscreen.c
 
 /* Storage */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-#if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_IFP7XX)
-drivers/ata_flash.c
-#endif
 #if (CONFIG_STORAGE & STORAGE_NAND) && (CONFIG_NAND == NAND_TCC)
 target/arm/ata-nand-telechips.c
 #endif
@@ -1039,12 +1036,9 @@ target/coldfire/iaudio/audio-iaudio.c
 #endif
 #endif /* IAUDIO_M3 */
 
-#ifdef IRIVER_IFP7XX_SERIES
 #ifdef STUB
-ifp_usb_serial.c
 libc/sscanf.c
 #endif /* STUB */
-#endif /* IRIVER_IFP7XX_SERIES */
 
 #if defined(IRIVER_H300_SERIES) || defined(IRIVER_H100_SERIES)
 target/coldfire/iriver/ata-iriver.c
@@ -1348,19 +1342,6 @@ target/arm/ipod/button-mini1g.c
 #ifdef IPOD_MINI2G
 target/arm/ipod/button-clickwheel.c
 #endif /* IPOD_MINI2G */
-
-#ifdef IRIVER_IFP7XX
-target/arm/pnx0101/iriver-ifp7xx/adc-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/backlight-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/button-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/lcd-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/power-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/powermgmt-ifp7xx.c
-target/arm/pnx0101/iriver-ifp7xx/usb-ifp7xx.c
-#ifndef BOOTLOADER
-target/arm/pnx0101/pcm-pnx0101.c
-#endif /* BOOTLOADER */
-#endif /* IRIVER_IFP7XX */
 
 #ifdef SANSA_CLIPPLUS
 target/arm/as3525/sansa-clipplus/lcd-clip-plus.c

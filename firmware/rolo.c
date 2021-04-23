@@ -69,9 +69,6 @@ extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume
 #include "backlight-target.h"
 #endif
 
-#if !defined(IRIVER_IFP7XX_SERIES)
-/* FIX: this doesn't work on iFP */
-
 #define IRQ0_EDGE_TRIGGER 0x80
 
 static int rolo_handle;
@@ -331,13 +328,3 @@ int rolo_load(const char* filename)
     /* never reached */
     return 0;
 }
-
-#else  /* !defined(IRIVER_IFP7XX_SERIES) */
-int rolo_load(const char* filename)
-{
-    /* dummy */
-    (void)filename;
-    return 0;
-}
-
-#endif /* !defined(IRIVER_IFP7XX_SERIES) */

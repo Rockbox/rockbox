@@ -104,22 +104,6 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-#define BJACK_SELECT_NAME    "MODE"
-#define BJACK_STAY_NAME     "MODE"
-#define BJACK_QUIT_NAME     "PLAY"
-#define BJACK_DOUBLE_NAME   "SELECT"
-#define BJACK_SELECT        BUTTON_MODE
-#define BJACK_QUIT          BUTTON_PLAY
-#define BJACK_MAX           (BUTTON_EQ|BUTTON_UP)
-#define BJACK_MIN           (BUTTON_EQ|BUTTON_DOWN)
-#define BJACK_STAY          BUTTON_MODE
-#define BJACK_DOUBLEDOWN    BUTTON_SELECT
-#define BJACK_UP            BUTTON_UP
-#define BJACK_DOWN          BUTTON_DOWN
-#define BJACK_RIGHT         BUTTON_RIGHT
-#define BJACK_LEFT          BUTTON_LEFT
-
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
 #define BJACK_SELECT_NAME    "SELECT"
 #define BJACK_STAY_NAME     "VOL-"

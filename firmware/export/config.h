@@ -101,7 +101,6 @@
 #define IPOD_4G_PAD         7
 #define IPOD_3G_PAD         8
 #define IPOD_1G2G_PAD       9
-#define IRIVER_IFP7XX_PAD  10
 #define GIGABEAT_PAD       11
 #define IRIVER_H10_PAD     12
 #define SANSA_E200_PAD     13
@@ -222,7 +221,6 @@
 #define LCD_IPODVIDEO 8 /* as used by iPod Video */
 #define LCD_IPOD2BPP  9 /* as used by all fullsize greyscale iPods */
 #define LCD_IPODMINI 10 /* as used by iPod Mini g1/g2 */
-#define LCD_IFP7XX   11 /* as used by iRiver iFP 7xx/8xx */
 #define LCD_GIGABEAT 12
 #define LCD_H10_20GB 13 /* as used by iriver H10 20Gb */
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
@@ -322,7 +320,6 @@ Lyre prototype 1 */
 /* else                   HW controlled LED (iRiver H1x0) */
 
 /* CONFIG_NAND */
-#define NAND_IFP7XX  1
 #define NAND_TCC     2
 #define NAND_SAMSUNG 3
 #define NAND_CC      4 /* ChinaChip */
@@ -410,8 +407,6 @@ Lyre prototype 1 */
 #include "config/ipodnano2g.h"
 #elif defined(IPOD_6G)
 #include "config/ipod6g.h"
-#elif defined(IRIVER_IFP7XX)
-#include "config/iriverifp7xx.h"
 #elif defined(GIGABEAT_F)
 #include "config/gigabeatfx.h"
 #elif defined(GIGABEAT_S)

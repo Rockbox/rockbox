@@ -57,7 +57,6 @@
 # H120/H140         iriverh120
 # H320/H340         iriverh300
 # H10               iriverh10
-# IFP 7XX           iriverifp7xx
 # iaudio/Cowon
 # X5                iaudiox5
 # M5                iaudiom5
@@ -6069,12 +6068,10 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
