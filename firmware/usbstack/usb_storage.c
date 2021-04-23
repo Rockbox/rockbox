@@ -47,7 +47,7 @@
 #endif
 
 #ifndef USBSTOR_WRITE_SECTORS_FILTER
-#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; }) 
+#define USBSTOR_WRITE_SECTORS_FILTER() ({ 0; })
 #endif
 
 /* the ARC driver currently supports up to 64k USB transfers. This is
@@ -433,7 +433,7 @@ void usb_storage_init_connection(void)
     /* prime rx endpoint. We only need room for commands */
     state = WAITING_FOR_COMMAND;
 
-#if (CONFIG_CPU == IMX31L || defined(CPU_TCC77X) || defined(CPU_TCC780X) || \
+#if (CONFIG_CPU == IMX31L || defined(CPU_TCC780X) || \
      CONFIG_CPU == S5L8702 || CONFIG_CPU == S5L8701 || CONFIG_CPU == AS3525v2 || \
      defined(BOOTLOADER) || CONFIG_CPU == DM320) && !defined(CPU_PP502x)
     static unsigned char _cbw_buffer[MAX_CBW_SIZE]

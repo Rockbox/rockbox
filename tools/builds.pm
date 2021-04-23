@@ -103,10 +103,6 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'HiFiMAN HM-801',
         status => 2,
     },
-    'iaudio7' => {
-        name => 'iAudio 7',
-        status => 1,
-    },
     'iaudiom3' => {
         name => 'iAudio M3',
         status => 3,
@@ -195,10 +191,6 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'iriver iFP-7xx',
         status => 1,
     },
-    'logikdax' => {
-        name => 'Logik DAX',
-        status => 1,
-    },
     'lyreproto1' => {
         name => 'Lyre Prototype 1',
         status => 1,
@@ -271,10 +263,6 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'Samsung YP-S3',
         status => 1,
     },
-    'sansac100' => {
-        name => 'SanDisk Sansa c100',
-        status => 1,
-    },
     'sansac200' => {
         name => 'SanDisk Sansa c200',
         status => 3,
@@ -323,10 +311,6 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'SanDisk Sansa Fuze+',
         status => 3,
         icon => 'sansafuzeplus',
-    },
-    'sansam200' => {
-        name => 'SanDisk Sansa m200',
-        status => 1,
     },
     'sansam200v4' => {
         name => 'SanDisk Sansa m200 v4',

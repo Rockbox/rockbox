@@ -15161,7 +15161,7 @@
   <source>
     *: "Press LEFT to cancel."
     android,hifietma*,zenvision: "Press BACK to cancel."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
     ihifi760,ihifi960: "Double tap RETURN to cancel."
     ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
     iriverh10,samsungyh*: "Double tap LEFT to cancel."
@@ -15176,7 +15176,7 @@
   <dest>
     *: "Нажмите ВЛЕВО для отмены."
     android,hifietma*,zenvision: "Нажмите НАЗАД для отмены."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Нажмите ВКЛ. для отмены."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Нажмите ВКЛ. для отмены."
     ihifi760,ihifi960: "Дважды нажмите ВОЗВРАТ для отмены."
     ihifi770,ihifi770c,ihifi800: "Нажмите ДОМОЙ для отмены."
     iriverh10,samsungyh*: "Дважды нажмите ВЛЕВО для отмены."
@@ -15191,7 +15191,7 @@
   <voice>
     *: "Нажмите кнопку Влево для отмены."
     android,hifietma*,zenvision: "Нажмите кнопку Назад для отмены."
-    cowond2,creativezenxfi2,iaudio7,ibassodx50,ibassodx90,mrobe500,ondavx747: "Нажмите кнопку включения для отмены."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Нажмите кнопку включения для отмены."
     ihifi760,ihifi960: "Дважды нажмите кнопку Назад для отмены."
     ihifi770,ihifi770c,ihifi800: "Нажмите кнопку Домой для отмены."
     iriverh10,samsungyh*: "Дважды нажмите кнопку Влево для отмены."

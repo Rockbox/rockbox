@@ -34,8 +34,6 @@
 #if defined(COWON_D2)
 /* The D2's audio codec uses an I2C address of 0x34 */
 #define I2C_AUDIO_ADDRESS 0x34
-#elif defined (IAUDIO_7) || defined(LOGIK_DAX) || defined(SANSA_M200)
-#define I2C_AUDIO_ADDRESS 0x34
 #else
 #error wmcodec not implemented for this target!
 #endif

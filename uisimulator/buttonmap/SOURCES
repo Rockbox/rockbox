@@ -33,8 +33,6 @@ mrobe500.c
 mrobe100.c
 #elif CONFIG_KEYPAD == COWON_D2_PAD
 cowon-d2.c
-#elif CONFIG_KEYPAD == IAUDIO67_PAD
-iaudio-6_7.c
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 creative-zvm.c
 #elif CONFIG_KEYPAD == MEIZU_M6SL_PAD

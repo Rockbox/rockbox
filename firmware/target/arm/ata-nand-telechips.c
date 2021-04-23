@@ -48,7 +48,7 @@ static long next_yield = 0;
 
 static struct mutex ata_mtx SHAREDBSS_ATTR;
 
-#if defined(COWON_D2) || defined(IAUDIO_7)
+#if defined(COWON_D2)
 #define FTL_V2
 #define MAX_WRITE_CACHES    8
 #else
@@ -906,13 +906,6 @@ int nand_init(void)
     
     mutex_init(&ata_mtx);
 
-#ifdef CPU_TCC77X
-    CSCFG2 = 0x018a8010 | tcc77x_cscfg_bw(TCC77X_CSCFG_BW8);
-
-    GPIOC_FUNC &= ~(CS_GPIO_BIT | WE_GPIO_BIT);
-    GPIOC_FUNC |= 0x1;
-#endif
-    
     /* Set GPIO direction for chip select & write protect */
     NAND_GPIO_OUT_EN(CS_GPIO_BIT | WE_GPIO_BIT);
 

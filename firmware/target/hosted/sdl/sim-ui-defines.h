@@ -226,13 +226,6 @@
 #define UI_LCD_POSX                 58 /* x position of lcd */
 #define UI_LCD_POSY                 67 /* y position of lcd */
 
-#elif defined(IAUDIO_7)
-#define UI_TITLE                    "iAudio7"
-#define UI_WIDTH                    494 /* width of GUI window */
-#define UI_HEIGHT                   214 /* height of GUI window */
-#define UI_LCD_POSX                 131 /* x position of lcd */
-#define UI_LCD_POSY                 38 /* y position of lcd */
-
 #elif defined(CREATIVE_ZVM) || defined(CREATIVE_ZVM60GB)
 #ifdef CREATIVE_ZVM
  #define UI_TITLE                    "Creative Zen Vision:M 30GB"

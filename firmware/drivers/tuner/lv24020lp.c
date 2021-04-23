@@ -80,16 +80,6 @@ static int fd_log = -1;
 #define FM_CLOCK_PIN    4
 #define FM_DATA_PIN     5
 
-#elif defined(IAUDIO_7)
-#define TUNER_GPIO_INPUT_VAL              GPIOA
-#define TUNER_GPIO_OUTPUT_EN_SET(mask)    (GPIOA_DIR |= (mask))
-#define TUNER_GPIO_OUTPUT_EN_CLEAR(mask)  (GPIOA_DIR &= ~(mask))
-#define TUNER_GPIO_OUTPUT_VAL_SET(mask)   (GPIOA |= (mask))
-#define TUNER_GPIO_OUTPUT_VAL_CLEAR(mask) (GPIOA &= ~(mask))
-#define FM_CLOCK_PIN    5
-#define FM_DATA_PIN     6
-#define FM_NRW_PIN      7
-
 #elif defined(COWON_D2)
 #define TUNER_GPIO_INPUT_VAL              GPIOC
 #define TUNER_GPIO_OUTPUT_EN_SET(mask)    (GPIOC_DIR |= (mask))

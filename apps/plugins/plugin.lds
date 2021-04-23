@@ -54,7 +54,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 #elif CONFIG_CPU==S3C2440
 #include "cpu.h"
 /* must be 16Kb (0x4000) aligned */
-#define TTB_SIZE         (0x4000) 
+#define TTB_SIZE         (0x4000)
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_BUFFER_SIZE - TTB_SIZE
 
 #elif CONFIG_CPU==TCC7801
@@ -127,7 +127,7 @@ OUTPUT_FORMAT(elf32-littlemips)
 /* The bit of IRAM that is available is used in the core */
 #define IRAMSIZE 0
 
-#elif defined(CPU_TCC780X) || defined(CPU_TCC77X)
+#elif defined(CPU_TCC780X)
 #define DRAMORIG 0x20000000
 #if CONFIG_CPU==TCC7801
 #define IRAMORIG 0x1000c000
@@ -272,7 +272,7 @@ SECTIONS
         *(.idata)
 #endif
     } > PLUGIN_RAM
-    
+
 #if NOCACHE_BASE != 0
     .ncdata . + NOCACHE_BASE :
     {
@@ -281,7 +281,7 @@ SECTIONS
         . = ALIGN(CACHEALIGN_SIZE);
 /* EABI currently needs these defined here, otherwise .iram and .bss can
    sometimes have an incorrect load address, breaking codecs and plugins. */
-        bssaddr = . - NOCACHE_BASE; 
+        bssaddr = . - NOCACHE_BASE;
 #if defined(IRAMSIZE) && IRAMSIZE != 0
         iramcopy = . - NOCACHE_BASE;
 #endif
@@ -314,7 +314,7 @@ SECTIONS
         *(COMMON)
         . = ALIGN(0x4);
     } > PLUGIN_RAM
-    
+
 #if NOCACHE_BASE != 0
     .ncbss . + NOCACHE_BASE (NOLOAD) :
     {
@@ -354,7 +354,7 @@ SECTIONS
         . = ALIGN(0x4);
         iend = .;
     } > PLUGIN_IRAM
-    
+
     loadendaddr = MAX(plugin_end_addr, LOADADDR(.iram) + SIZEOF(.iram));
 #else
     loadendaddr = plugin_end_addr;

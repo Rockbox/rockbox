@@ -161,15 +161,6 @@ const struct button_mapping pla_main_ctx[] =
     { PLA_DOWN_REPEAT,      BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_LEFT_REPEAT,      BUTTON_PREV|BUTTON_REPEAT,          BUTTON_NONE },
     { PLA_RIGHT_REPEAT,     BUTTON_NEXT|BUTTON_REPEAT,          BUTTON_NONE },
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-    { PLA_UP,               BUTTON_STOP,                        BUTTON_NONE },
-    { PLA_DOWN,             BUTTON_PLAY,                        BUTTON_NONE },
-    { PLA_LEFT,             BUTTON_LEFT,                        BUTTON_NONE },
-    { PLA_RIGHT,            BUTTON_RIGHT,                       BUTTON_NONE },
-    { PLA_UP_REPEAT,        BUTTON_STOP|BUTTON_REPEAT,          BUTTON_NONE },
-    { PLA_DOWN_REPEAT,      BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE },
-    { PLA_LEFT_REPEAT,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE },
-    { PLA_RIGHT_REPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE },
 #elif (CONFIG_KEYPAD == PBELL_VIBE500_PAD)
     { PLA_UP,                BUTTON_UP,                         BUTTON_NONE},
     { PLA_DOWN,              BUTTON_DOWN,                       BUTTON_NONE},
@@ -394,12 +385,6 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-    {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
-    {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
-    {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT           BUTTON_NONE},
 #elif (CONFIG_KEYPAD == CREATIVEZVM_PAD)
     {PLA_CANCEL,            BUTTON_BACK|BUTTON_REL,             BUTTON_BACK},
     {PLA_EXIT,              BUTTON_BACK|BUTTON_REPEAT,          BUTTON_NONE},

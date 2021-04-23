@@ -171,16 +171,6 @@
 #elif CONFIG_KEYPAD == COWON_D2_PAD
 #define CUBE_QUIT          BUTTON_POWER
 
-#elif (CONFIG_KEYPAD == IAUDIO67_PAD)
-#define CUBE_QUIT          BUTTON_POWER
-#define CUBE_NEXT          BUTTON_RIGHT
-#define CUBE_PREV          BUTTON_LEFT
-#define CUBE_INC           BUTTON_VOLUP
-#define CUBE_DEC           BUTTON_VOLDOWN
-#define CUBE_MODE          BUTTON_MENU
-#define CUBE_PAUSE         BUTTON_PLAY
-#define CUBE_HIGHSPEED     BUTTON_STOP
-
 #elif CONFIG_KEYPAD == CREATIVEZVM_PAD
 #define CUBE_QUIT          BUTTON_BACK
 #define CUBE_NEXT          BUTTON_RIGHT
