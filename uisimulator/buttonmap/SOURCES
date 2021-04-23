@@ -15,8 +15,6 @@ ipod.c
 iriver-h10.c
 #elif (CONFIG_KEYPAD == IRIVER_H100_PAD) || (CONFIG_KEYPAD == IRIVER_H300_PAD)
 iriver-h100_h300.c
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-iriver-ifp7xx.c
 #elif CONFIG_KEYPAD == SANSA_C200_PAD
 sansa-c200.c
 #elif CONFIG_KEYPAD == SANSA_CLIP_PAD

@@ -128,8 +128,6 @@ const struct button_mapping pf_context_buttons[] =
 #endif
 #elif CONFIG_KEYPAD == SANSA_E200_PAD
     {PF_QUIT,         BUTTON_POWER,               BUTTON_NONE},
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-    {PF_QUIT,         BUTTON_EQ,                  BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
     || (CONFIG_KEYPAD == IPOD_4G_PAD) \
