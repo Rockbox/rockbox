@@ -1554,7 +1554,7 @@ cat <<EOF
  30) X5/X5V/X5L           10) H120/H140          20) Color/Photo
  31) M5/M5L               11) H320/H340          21) Nano 1G
                           12) iHP-100/110/115    22) Video
- 33) D2                   13) iFP-790            23) 3G
+ 33) D2                                          23) 3G
  34) M3/M3L               14) H10 20Gb           24) 4G Grayscale
                           15) H10 5/6Gb          25) Mini 1G
  ==Creative==                                    26) Mini 2G
@@ -1731,27 +1731,6 @@ fi
     t_cpu="coldfire"
     t_manufacturer="iriver"
     t_model="h100"
-    ;;
-
-   13|iriverifp7xx)
-    target_id=19
-    modelname="iriverifp7xx"
-    target="IRIVER_IFP7XX"
-    memory=1
-    arm7tdmicc short
-    tool="cp"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 0"
-    output="rockbox.wma"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$genericbitmaptools
-    t_cpu="arm"
-    t_manufacturer="pnx0101"
-    t_model="iriver-ifp7xx"
-    sysfont="08-Rockfont"
     ;;
 
    14|iriverh10)
@@ -4198,12 +4177,7 @@ fi
 # Figure out build "type"
 #
 
-  # the ifp7x0 is the only platform that supports building a gdb stub like
-  # this
 case $modelname in
-  iriverifp7xx)
-     gdbstub=", (G)DB stub"
-     ;;
   sansae200r|sansae200)
      gdbstub=", (I)nstaller"
      ;;
@@ -4279,19 +4253,6 @@ fi
     [Aa]*)
       echo "Advanced build selected"
       whichadvanced $btype
-      ;;
-    [Gg])
-      extradefines="$extradefines -DSTUB" # for target makefile symbol EXTRA_DEFINES
-      appsdir='$(ROOTDIR)/gdb'
-      apps="stub"
-      case $modelname in
-          iriverifp7xx)
-              output="stub.wma"
-              ;;
-          *)
-              ;;
-      esac
-      echo "GDB stub build selected"
       ;;
     [Cc])
       uname=`uname`

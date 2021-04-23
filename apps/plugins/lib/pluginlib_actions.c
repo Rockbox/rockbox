@@ -91,7 +91,6 @@ const struct button_mapping pla_main_ctx[] =
     || (CONFIG_KEYPAD == IRIVER_H300_PAD)   \
     || (CONFIG_KEYPAD == IAUDIO_X5M5_PAD)     \
     || (CONFIG_KEYPAD == GIGABEAT_PAD)      \
-    || (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD) \
     || (CONFIG_KEYPAD == SANSA_C200_PAD) \
     || (CONFIG_KEYPAD == GIGABEAT_S_PAD) \
     || (CONFIG_KEYPAD == MROBE100_PAD) \
@@ -348,12 +347,6 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_PLAY,                        BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
     {PLA_SELECT_REPEAT,     BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_NONE},
-#elif (CONFIG_KEYPAD == IRIVER_IFP7XX_PAD)
-    {PLA_CANCEL,            BUTTON_EQ|BUTTON_REL,               BUTTON_EQ},
-    {PLA_EXIT,              BUTTON_EQ|BUTTON_REPEAT,            BUTTON_NONE},
-    {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
-    {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
-    {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
 #elif (CONFIG_KEYPAD == MROBE500_PAD)
     {PLA_CANCEL,            BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     {PLA_EXIT,              BUTTON_POWER|BUTTON_REPEAT,         BUTTON_NONE},

@@ -187,10 +187,6 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'iriver H320/340',
         status => 3,
     },
-    'iriverifp7xx' => {
-        name => 'iriver iFP-7xx',
-        status => 1,
-    },
     'lyreproto1' => {
         name => 'Lyre Prototype 1',
         status => 1,

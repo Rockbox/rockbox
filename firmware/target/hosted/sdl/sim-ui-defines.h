@@ -203,13 +203,6 @@
 #define UI_LCD_POSX                 42 /* x position of lcd */
 #define UI_LCD_POSY                 35  /* y position of lcd */
 
-#elif defined(IRIVER_IFP7XX)
-#define UI_TITLE                    "iriver iFP7xx"
-#define UI_WIDTH                    425 /* width of GUI window */
-#define UI_HEIGHT                   183 /* height of GUI window */
-#define UI_LCD_POSX                 115 /* x position of lcd */
-#define UI_LCD_POSY                 54 /* y position of lcd */
-
 #elif defined(MROBE_100)
 #define UI_TITLE                    "Olympus M:Robe 100"
 #define UI_WIDTH                    247 /* width of GUI window */

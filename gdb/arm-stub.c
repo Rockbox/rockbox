@@ -21,9 +21,7 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include "ifp_usb_serial.h"
 #include "sscanf.h"
-#include "pnx0101.h"
 #include "gdb_api.h"
 
 #define BUFMAX 1024

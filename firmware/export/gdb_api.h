@@ -25,9 +25,6 @@
 #include "config.h"
 
 #define GDB_API_MAGIC 0x6db570b
-#ifdef IRIVER_IFP7XX_SERIES
-#define GDB_API_ADDRESS 0xc06000
-#endif
 
 struct gdb_api
 {

@@ -122,16 +122,6 @@ static void setoptions (void)
         options.SELECT  = BUTTON_NONE;
         options.MENU    = (BUTTON_SELECT | BUTTON_REPEAT);
 
-#elif CONFIG_KEYPAD == IRIVER_IFP7XX_PAD
-        options.UP      = BUTTON_UP;
-        options.DOWN    = BUTTON_DOWN;
-
-        options.A       = BUTTON_PLAY;
-        options.B       = BUTTON_EQ;
-        options.START   = BUTTON_MODE;
-        options.SELECT  = (BUTTON_SELECT | BUTTON_REL);
-        options.MENU    = (BUTTON_SELECT | BUTTON_REPEAT);
-
 #elif CONFIG_KEYPAD == GIGABEAT_PAD
         options.UP      = BUTTON_UP;
         options.DOWN    = BUTTON_DOWN;

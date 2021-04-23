@@ -7,7 +7,7 @@
 # $Id$
 #
 
-ifeq ($(MODELNAME),ifp7xx)
+ifeq ($(MODELNAME),EXAMPLE)
 
 INCLUDES= -I$(FIRMDIR)/include -I$(FIRMDIR)/export -I. -I$(OBJDIR)	\
  -I$(BUILDDIR)
