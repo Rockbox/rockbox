@@ -13,6 +13,11 @@
 #include "asm.h"
 #endif
 
+/* GCC 11 complains about the code style.  Just turn this off. */
+#if __GNUC__ >= 11
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmisleading-identation"
+#endif
 
 struct cpu cpu IBSS_ATTR;
 bool plugbuf;
@@ -1004,3 +1009,7 @@ next:
 }
 
 #endif /* ASM_CPU_EMULATE */
+
+#if __GNUC__ >= 11
+#pragma GCC diagnostic pop
+#endif
