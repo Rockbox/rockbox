@@ -22,35 +22,23 @@
 #ifndef __SYSTEM_TARGET_H__
 #define __SYSTEM_TARGET_H__
 
-/* For the sake of system.h CACHEALIGN macros.
- * We need this to align DMA buffers, etc.
- */
-#define CACHEALIGN_BITS 5
-#define CACHE_SIZE      (16*1024)
-
 #ifdef DEBUG
 /* Define this to get CPU idle stats, visible in the debug menu. */
 # define X1000_CPUIDLE_STATS
 #endif
 
-#define OTGBASE 0xb3500000
-#define USB_NUM_ENDPOINTS 9
-
+#include "cpu.h"
 #include "mmu-mips.h"
 #include "mipsregs.h"
 #include "mipsr2-endian.h"
 #include <stdint.h>
-
-/* Get physical address for DMA */
-#define PHYSADDR(addr)  (((unsigned long)(addr)) & 0x1fffffff)
-
-#define HIGHEST_IRQ_LEVEL 0
 
 /* Rockbox API */
 #define enable_irq()        set_c0_status(ST0_IE)
 #define disable_irq()       clear_c0_status(ST0_IE)
 #define disable_irq_save()  set_irq_level(0)
 #define restore_irq(arg)    write_c0_status(arg)
+#define HIGHEST_IRQ_LEVEL   0
 
 static inline int set_irq_level(int lev)
 {
