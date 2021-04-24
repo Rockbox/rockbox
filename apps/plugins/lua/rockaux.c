@@ -133,28 +133,32 @@ int splash_scroller(int timeout, const char* str)
         }
 
         rb->lcd_update();
-
-        action = rb->get_action(CONTEXT_STD, timeout);
-        switch(action)
+        if (timeout >= TIMEOUT_BLOCK)
         {
-            case ACTION_STD_OK:
-            case ACTION_STD_CANCEL:
-                cycles--;
-            /* Fall Through */
-            case ACTION_NONE:
-                cycles--;
-                break;
-            case ACTION_STD_PREV:
-                timeout = TIMEOUT_BLOCK; /* disable timeout */
-                if(firstline > 0)
-                    firstline--;
-                break;
-            case ACTION_STD_NEXT:
-                timeout = TIMEOUT_BLOCK; /* disable timeout */
-                if (linesdisp == max_lines)
-                    firstline++;
-                break;
+            action = rb->get_action(CONTEXT_STD, timeout);
+            switch(action)
+            {
+                case ACTION_STD_OK:
+                case ACTION_STD_CANCEL:
+                    cycles--;
+                /* Fall Through */
+                case ACTION_NONE:
+                    cycles--;
+                    break;
+                case ACTION_STD_PREV:
+                    timeout = TIMEOUT_BLOCK; /* disable timeout */
+                    if(firstline > 0)
+                        firstline--;
+                    break;
+                case ACTION_STD_NEXT:
+                    timeout = TIMEOUT_BLOCK; /* disable timeout */
+                    if (linesdisp == max_lines)
+                        firstline++;
+                    break;
+            }
         }
+        else
+            break;
     }
     return action;
 }
