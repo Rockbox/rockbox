@@ -665,9 +665,9 @@ void backlight_thread(void)
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
 
-            case SYS_POWEROFF:  /* Lock backlight on poweroff so it doesn't */
-                locked = true;      /* go off before power is actually cut. */
-                /* fall through */
+            case SYS_POWEROFF:  /* Lock backlight on poweroff */
+                locked = true;
+                break;
 #if CONFIG_CHARGING
             case SYS_CHARGER_CONNECTED:
             case SYS_CHARGER_DISCONNECTED:

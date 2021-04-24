@@ -964,7 +964,7 @@ void handle_auto_poweroff(void)
     }
 
     if (!shutdown_timeout && query_force_shutdown()) {
-        backlight_on();
+        //backlight_on();
         sys_poweroff();
     }
 
