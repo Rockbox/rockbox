@@ -47,7 +47,7 @@ if ($def_type eq "rb_defines") {
         '^PLAYLIST_(INSERT|PREPEND|REPLACE)',
         '^TOUCHSCREEN_(POINT|BUTTON)$',
         '^SYS_CHARGER_(DIS|)CONNECTED$',
-        '^SYS_(TIMEOUT|POWEROFF)$',
+        '^SYS_(TIMEOUT|POWEROFF|BATTERY_UPDATE)$',
         '^SYS_USB_(DIS|)CONNECTED$',
         '^HOME_DIR$',
         '^PLUGIN_DIR$',
