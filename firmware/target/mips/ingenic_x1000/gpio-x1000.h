@@ -26,12 +26,11 @@
  * --------
  *
  * To assign a new function to a GPIO, call gpio_config(). This uses the
- * hardware's GPIO Z facility to atomically most GPIO registers at once,
+ * hardware's GPIO Z facility to atomically set most GPIO registers at once,
  * so it can be used to make any state transition safely. Since GPIO Z is
- * protected by a mutex, you can't call gpio_config() from interrupt context.
- *
- * If you need to use GPIO Z directly, then use gpio_lock() and gpio_unlock()
- * to acquire the mutex.
+ * a global hardware resource, it is unsafe to call gpio_config() from IRQ
+ * context -- if the interrupted code was also running gpio_config(), then
+ * the results would be unpredictable.
  *
  * Depending on the current GPIO state, certain state transitions are safe to
  * perform without locking, as they only change one register:
@@ -74,8 +73,6 @@
 #define GPIO_IRQ_EDGE(i)    (0x1e|((i)&1))
 
 extern void gpio_init(void);
-extern void gpio_lock(void);
-extern void gpio_unlock(void);
 extern void gpio_config(int port, unsigned pinmask, int func);
 
 static inline void gpio_out_level(int port, unsigned pinmask, int level)

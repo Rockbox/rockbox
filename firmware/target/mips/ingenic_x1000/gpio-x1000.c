@@ -22,16 +22,8 @@
 #include "gpio-x1000.h"
 #include "kernel.h"
 
-#ifndef BOOTLOADER_SPL
-struct mutex gpio_z_mutex;
-#endif
-
 void gpio_init(void)
 {
-#ifndef BOOTLOADER_SPL
-    mutex_init(&gpio_z_mutex);
-#endif
-
     /* Any GPIO pins left in an IRQ trigger state need to be switched off,
      * because the drivers won't be ready to handle the interrupts until they
      * get initialized later in the boot. */
@@ -44,20 +36,6 @@ void gpio_init(void)
     }
 }
 
-void gpio_lock(void)
-{
-#ifndef BOOTLOADER_SPL
-    mutex_lock(&gpio_z_mutex);
-#endif
-}
-
-void gpio_unlock(void)
-{
-#ifndef BOOTLOADER_SPL
-    mutex_unlock(&gpio_z_mutex);
-#endif
-}
-
 void gpio_config(int port, unsigned pinmask, int func)
 {
     unsigned intr = REG_GPIO_INT(port);
@@ -65,7 +43,6 @@ void gpio_config(int port, unsigned pinmask, int func)
     unsigned pat1 = REG_GPIO_PAT1(port);
     unsigned pat0 = REG_GPIO_PAT0(port);
 
-    gpio_lock();
     if(func & 8) jz_set(GPIO_INT(GPIO_Z), (intr & pinmask) ^ pinmask);
     else         jz_clr(GPIO_INT(GPIO_Z), (~intr & pinmask) ^ pinmask);
     if(func & 4) jz_set(GPIO_MSK(GPIO_Z), (mask & pinmask) ^ pinmask);
@@ -75,6 +52,5 @@ void gpio_config(int port, unsigned pinmask, int func)
     if(func & 1) jz_set(GPIO_PAT0(GPIO_Z), (pat0 & pinmask) ^ pinmask);
     else         jz_clr(GPIO_PAT0(GPIO_Z), (~pat0 & pinmask) ^ pinmask);
     REG_GPIO_Z_GID2LD = port;
-    gpio_unlock();
     gpio_set_pull(port, pinmask, func & 16);
 }
