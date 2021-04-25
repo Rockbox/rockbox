@@ -91,4 +91,11 @@ SECTIONS
          . += 0x400;
          irqstackend = .;
     } > IRAM
+
+    /DISCARD/ :
+    {
+        *(.MIPS.abiflags);
+        *(.eh_frame);
+        *(.rel.dyn);
+    }
 }
