@@ -113,6 +113,7 @@ SECTIONS
 
     /DISCARD/ :
     {
+        *(.MIPS.abiflags);
         *(.eh_frame);
         *(.rel.dyn);
     }

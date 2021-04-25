@@ -299,6 +299,7 @@ SECTIONS
     {
         *(.eh_frame)
 #ifdef CPU_MIPS
+        *(.MIPS.abiflags)
         *(.rel.dyn)
 #endif
     }
