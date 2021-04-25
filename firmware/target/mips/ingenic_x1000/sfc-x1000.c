@@ -28,10 +28,10 @@
 #include "x1000/sfc.h"
 #include "x1000/cpm.h"
 
-#ifndef BOOTLOADER_SPL
-/* DMA only works once the system is properly booted */
-# define NEED_SFC_DMA
-#endif
+/* DMA works, but not in the SPL due to some hardware not being set up right.
+ * Only the SPL and bootloader actually require flash access, so to keep it
+ * simple, DMA is unconditionally disabled. */
+//#define NEED_SFC_DMA
 
 #if defined(BOOTLOADER_SPL)
 # if X1000_EXCLK_FREQ == 24000000
