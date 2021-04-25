@@ -58,7 +58,7 @@ SECTIONS
         KEEP(*(.vectors.4));
         KEEP(*(.vectors));
 
-        *(.icode);
+        *(.icode*);
         *(.irodata);
         *(.idata);
         KEEP(*(.vectors*))

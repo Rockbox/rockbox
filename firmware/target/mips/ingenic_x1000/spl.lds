@@ -26,6 +26,7 @@ SECTIONS
     {
         *(.init.text);
         *(.text*);
+        *(.icode*);
     } > TCSM
 
     . = ALIGN(4);
