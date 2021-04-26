@@ -262,6 +262,9 @@ static int nandwrite(uint32_t addr, uint32_t size, void* buffer)
     return rc;
 }
 
+/* Kernel command line arguments */
+static char* argv[2];
+
 void main(void)
 {
     if(!(SPL_ARGUMENTS->flags & SPL_FLAG_SKIP_INIT))
@@ -289,7 +292,6 @@ void main(void)
          * saves an unnecessary branch.
          */
         entry_fn entry = (entry_fn)opt->exec_addr;
-        char** argv = (char**)0x80004000;
         argv[0] = 0;
         argv[1] = (char*)opt->cmdline;
 
