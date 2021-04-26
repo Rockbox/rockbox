@@ -77,3 +77,6 @@
 #if CONFIG_CPU == RK27XX
 #include "rk27xx.h"
 #endif
+#if CONFIG_CPU == X1000
+#include "x1000.h"
+#endif

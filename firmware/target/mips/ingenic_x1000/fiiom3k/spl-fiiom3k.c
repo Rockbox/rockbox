@@ -56,8 +56,8 @@ const struct spl_boot_option spl_boot_options[] = {
          */
         .nand_addr = 0x6800,
         .nand_size = 0x19800,
-        .load_addr = 0x80003ff8, /* first 8 bytes are bootloader ID */
-        .exec_addr = 0x80004000,
+        .load_addr = X1000_DRAM_BASE - 8, /* first 8 bytes are bootloader ID */
+        .exec_addr = X1000_DRAM_BASE,
         .cmdline = NULL,
     },
     {
