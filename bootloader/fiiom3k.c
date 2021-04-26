@@ -35,6 +35,8 @@
 #include "rb-loader.h"
 #include "loader_strerror.h"
 #include "version.h"
+#include "spl-x1000.h"
+#include "x1000/cpm.h"
 
 /* Load address where the binary needs to be placed */
 extern unsigned char loadaddress[];
@@ -122,6 +124,13 @@ static void do_usb(void)
 
 void main(void)
 {
+    /* This hack is needed because when USB booting, we cannot initialize
+     * clocks in the SPL -- it may break the mask ROM's USB code. So if the
+     * SPL has not already initialized the clocks, we need to do that now.
+     */
+    if(jz_readf(CPM_MPCR, ENABLE))
+        spl_handle_pre_boot(0);
+
     system_init();
     kernel_init();
     i2c_init();

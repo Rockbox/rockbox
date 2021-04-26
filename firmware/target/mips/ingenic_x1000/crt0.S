@@ -34,33 +34,6 @@
     .section .init.text
 
 _start:
-    /* Clear data watchpoint */
-    mtc0    zero, C0_WATCHLO
-    mtc0    zero, C0_WATCHHI
-
-    /* Set BEV, ERL, mask interrupts */
-    li      v0, 0x40fc04
-    mtc0    v0, C0_Status
-
-    /* Set Cause_IV to 1 (use special interrupt vector) */
-    li      v0, M_CauseIV
-    mtc0    v0, C0_Cause
-
-    /* Set CPU_MODE and BUS_MODE to 1 in CPM_OPCR (Ingenic does this) */
-    lui     v0, 0xb000
-    lw      v1, 0x24(v0)
-    ori     v1, v1, 0x22
-    sw      v1, 0x24(v0)
-
-    /* Enable kseg0 cacheability */
-    li      v0, 3
-    mtc0    v0, C0_Config
-    nop
-
-    /* According to ingenic: "enable idx-store-data cache insn" */
-    li      v0, 0x20000000
-    mtc0    v0, C0_ErrCtl
-
     /* Cache init */
     li      v0, 0x80000000
     ori     v1, v0, 0x4000
@@ -80,7 +53,6 @@ _cache_loop:
     mtc0    v0, C0_Config, 7
     nop
 
-#ifndef BOOTLOADER_SPL
     /* Copy IRAM from BSS to low memory. */
     la      t0, _iramcopy
     la      t1, _iramstart
@@ -91,7 +63,6 @@ _iram_loop:
     addiu   t0, 4
     bne     t1, t2, _iram_loop
     sw      t3, -4(t1)
-#endif
 
     /* Clear the BSS segment (needed to zero-initialize C static values) */
     la      t0, _bssbegin
@@ -103,7 +74,6 @@ _bss_loop:
     sw      zero, -4(t0)
 _bss_done:
 
-#ifndef BOOTLOADER_SPL
     /* Set stack pointer and clear the stack */
     la      sp, stackend
     la      t0, stackbegin
@@ -120,13 +90,11 @@ _irqstack_loop:
     addiu   t0, 4
     bne     t0, k0, _irqstack_loop
     sw      t1, -4(t0)
-#endif
 
     /* Jump to C code */
     j       main
     nop
 
-#ifndef BOOTLOADER_SPL
     /* Exception entry points */
     .section .vectors.1, "ax", %progbits
     j       tlb_refill_handler
@@ -260,6 +228,5 @@ _exception_return:
     lw      sp, 0x80(sp)
     eret
     nop
-#endif
 
     .set pop

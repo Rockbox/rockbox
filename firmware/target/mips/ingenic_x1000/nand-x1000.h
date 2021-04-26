@@ -36,7 +36,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include "nand-x1000-err.h"
+
+/* Error codes which can be returned by the NAND API */
+#define NAND_SUCCESS              0
+#define NAND_ERR_UNKNOWN_CHIP     (-1)
+#define NAND_ERR_UNALIGNED        (-2)
+#define NAND_ERR_WRITE_PROTECT    (-3)
+#define NAND_ERR_CONTROLLER       (-4)
+#define NAND_ERR_COMMAND          (-5)
 
 /* Chip supports quad I/O for page read/write */
 #define NANDCHIP_FLAG_QUAD      0x01
