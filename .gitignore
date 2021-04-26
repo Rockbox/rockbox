@@ -120,6 +120,7 @@ __pycache__
 /tools/mktccboot
 /tools/mkzenboot
 /tools/mkspl-x1000
+/tools/makeucl
 /tools/iaudio_bl_flash.c
 /tools/iaudio_bl_flash.h
 /tools/.vagrant

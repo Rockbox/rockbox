@@ -32,6 +32,10 @@ $(TOOLSDIR)/bmp2rb: $(TOOLSDIR)/bmp2rb.c
 	$(call PRINTS,CC $(@F))
 	$(SILENT)$(HOSTCC) -DAPPLICATION_NAME=\"$@\" $(TOOLSCFLAGS) $+ -o $@
 
+$(TOOLSDIR)/makeucl: $(TOOLSDIR)/makeucl.c $(wildcard $(TOOLSDIR)/ucl/src/*.c)
+	$(call PRINTS,CC $(@F))$(HOSTCC) $(TOOLSCFLAGS) -I$(TOOLSDIR)/ucl \
+		-I$(TOOLSDIR)/ucl/include -o $@ $^
+
 $(TOOLSDIR)/uclpack: $(TOOLSDIR)/ucl/uclpack.c $(wildcard $(TOOLSDIR)/ucl/src/*.c)
 	$(call PRINTS,CC $(@F))$(HOSTCC) $(TOOLSCFLAGS) -I$(TOOLSDIR)/ucl \
 		-I$(TOOLSDIR)/ucl/include -o $@ $^

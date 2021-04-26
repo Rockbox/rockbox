@@ -22,10 +22,11 @@
 #ifndef __SPL_X1000_H__
 #define __SPL_X1000_H__
 
-#include "spl-x1000-defs.h"
+#include <stdint.h>
 
-#define SPL_ARGUMENTS ((struct x1000_spl_arguments*)SPL_ARGUMENTS_ADDRESS)
-#define SPL_STATUS    ((struct x1000_spl_status*)SPL_STATUS_ADDRESS)
+#define SPL_BOOTOPT_ROCKBOX  1
+#define SPL_BOOTOPT_ORIG_FW  2
+#define SPL_BOOTOPT_RECOVERY 3
 
 struct spl_boot_option {
     uint32_t nand_addr;

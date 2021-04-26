@@ -61,6 +61,9 @@ mkspl-x1000: mkspl-x1000.c
 mkzenboot.exe: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) -lz $+ C:\MingW\lib\libz.a -o $@
 
+makeucl: makeucl.c $(wildcard ucl/src/*.c)
+	$(SILENT)$(CC) $(CFLAGS) -Iucl/include $+ -o $@
+
 lngdump: lngdump.c
 	$(SILENT)$(CC) $(CFLAGS) $+ -o $@
 
