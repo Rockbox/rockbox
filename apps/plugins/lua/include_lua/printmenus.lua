@@ -23,74 +23,18 @@
 if not rb.lcd_framebuffer then rb.splash(rb.HZ, "No Support!") return nil end
 
 require("printtable")
+require("menucoresettings") --loads user settings from rockbox
 
 local _clr = require("color")
+
 
 local _LCD = rb.lcd_framebuffer()
 
 --[[ -- dpad requires:
-require("actions")   -- Contains rb.actions & rb.contexts
+local BUTTON = require("menubuttons")
 local _timer = require("timer")
--- Button definitions --
-local CANCEL_BUTTON = rb.actions.PLA_CANCEL
-local DOWN_BUTTON = rb.actions.PLA_DOWN
-local DOWNR_BUTTON = rb.actions.PLA_DOWN_REPEAT
-local EXIT_BUTTON = rb.actions.PLA_EXIT
-local LEFT_BUTTON = rb.actions.PLA_LEFT
-local LEFTR_BUTTON = rb.actions.PLA_LEFT_REPEAT
-local RIGHT_BUTTON = rb.actions.PLA_RIGHT
-local RIGHTR_BUTTON = rb.actions.PLA_RIGHT_REPEAT
-local SEL_BUTTON = rb.actions.PLA_SELECT
-local SELREL_BUTTON = rb.actions.PLA_SELECT_REL
-local SELR_BUTTON = rb.actions.PLA_SELECT_REPEAT
-local UP_BUTTON = rb.actions.PLA_UP
-local UPR_BUTTON = rb.actions.PLA_UP_REPEAT
 ]]
 --------------------------------------------------------------------------------
-local function get_core_settings()
-    if rb.core_color_table ~= nil and rb.core_talk_table ~= nil and
-       rb.core_list_settings_table ~= nil then return end
-
-    local rbs_is_loaded = (package.loaded.rbsettings ~= nil)
-    local s_is_loaded = (package.loaded.settings ~= nil)
-
-    require("rbsettings")
-    require("settings")
-    rb.metadata = nil -- remove track metadata settings
-
-    local rb_settings = rb.settings.dump('global_settings', "system")
-    local color_table = {}
-    local talk_table = {}
-    local list_settings_table = {}
-    local list_settings = "cursor_style|show_icons|statusbar|scrollbar|scrollbar_width|list_separator_height|backdrop_file|"
-    for key, value in pairs(rb_settings) do
-            key = key or ""
-            if (key:find("color")) then
-                    color_table[key]=value
-            elseif (key:find("talk")) then
-                    talk_table[key]=value
-            elseif (list_settings:find(key)) then
-                    list_settings_table[key]=value
-            end
-    end
-
-    if not s_is_loaded then
-        rb.settings = nil
-        package.loaded.settings = nil
-    end
-
-    if not rbs_is_loaded then
-        rb.system = nil
-        rb.metadata = nil
-        package.loaded.rbsettings = nil
-    end
-
-    rb.core_color_table = color_table
-    rb.core_talk_table = talk_table
-    rb.core_list_settings_table = list_settings_table
-    collectgarbage("collect")
-end
-
 --[[ cursor style button routine
 -- left / right are x, xi is increment xir is increment when repeat
 -- up / down are y, yi is increment yir is increment when repeat
@@ -112,44 +56,44 @@ local function dpad(x, xi, xir, y, yi, yir, timeout, overflow)
     while true do
         button = rb.get_plugin_action(timeout)
 
-        if button == CANCEL_BUTTON then
+        if button == BUTTON.CANCEL then
             cancel = 1
             break;
-        elseif button == EXIT_BUTTON then
+        elseif button == BUTTON.EXIT then
             cancel = 1
             break;
-        elseif button == SEL_BUTTON then
+        elseif button == BUTTON.SEL then
             select = 1
             timeout = timeout + 1
-        elseif button == SELR_BUTTON then
+        elseif button == BUTTON.SELR then
             select = 2
             timeout = timeout + 1
-        elseif button == SELREL_BUTTON then
+        elseif button == BUTTON.SELREL then
             select = -1
             timeout = timeout + 1
-        elseif button == LEFT_BUTTON then
+        elseif button == BUTTON.LEFT then
             x_chg = x_chg - xi
             if scroll_is_fixed then
                 cancel = 1
                 break;
             end
-        elseif button == LEFTR_BUTTON then
+        elseif button == BUTTON.LEFTR then
             x_chg = x_chg - xir
-        elseif button == RIGHT_BUTTON then
+        elseif button == BUTTON.RIGHT then
             x_chg = x_chg + xi
             if scroll_is_fixed then
                 select = 1
                 timeout = timeout + 1
             end
-        elseif button == RIGHTR_BUTTON then
+        elseif button == BUTTON.RIGHTR then
             x_chg = x_chg + xir
-        elseif button == UP_BUTTON then
+        elseif button == BUTTON.UP then
             y_chg = y_chg + yi
-        elseif button == UPR_BUTTON then
+        elseif button == BUTTON.UPR then
             y_chg = y_chg + yir
-        elseif button == DOWN_BUTTON then
+        elseif button == BUTTON.DOWN then
             y_chg = y_chg - yi
-        elseif button == DOWNR_BUTTON then
+        elseif button == BUTTON.DOWNR then
             y_chg = y_chg - yir
         elseif timeout >= 0 then--and rb.button_queue_count() < 1 then
             break;
@@ -175,7 +119,6 @@ function print_menu(menu_t, func_t, selected, settings, copy_screen)
     if selected then vcur = selected + 1 end
     if vcur and vcur <= 1 then vcur = 2 end
 
-    get_core_settings()
     local c_table = rb.core_color_table or {}
 
     if not settings then
@@ -239,7 +182,7 @@ function print_menu(menu_t, func_t, selected, settings, copy_screen)
         if copy_screen == true then _LCD:copy(screen_img) end
 
         if func_t and func_t[i] then
-            if func_t[i](i, menu_t) == true then break end
+            if func_t[i](i, menu_t, func_t) == true then break end
         else
             break
         end

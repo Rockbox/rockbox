@@ -343,20 +343,15 @@ local _print = {} do
             tld.line_end_color = line_end_color
         end
 
-        line_separator = ld.line_separator
-
+        line_separator = ld.line_separator or o.drawsep
+        local indent = line_indent < 0 and 0 or line_indent --rb scroller doesn't like negative offset!
         if o.line == 1 and o.header then
-            --rb scroller doesn't like negative offset!
-            local indent = line_indent < 0 and 0 or line_indent
             set_desc(ld, true, 1, false, rb.STYLE_DEFAULT,
                      indent, o.fg_pattern, o.bg_pattern, o.bg_pattern)
             ld.show_cursor = false
         elseif s_lines[o.line] then
             --/* Display line selector */
             local style = show_cursor == true and rb.STYLE_DEFAULT or linestyle
-
-            local indent = line_indent < 0 and 0 or line_indent
-                --rb scroller doesn't like negative offset!
             local ovfl = (o.ovfl == "auto" and w >= o.width and x == 0)
             set_desc(ld, ovfl, 0, true, style, indent,
                      o.bg_pattern, o.sel_pattern, o.sel_pattern)
@@ -377,7 +372,9 @@ local _print = {} do
             if ld.selected == true then
                 rb.set_viewport(o) -- revert drawmode if selected
             end
-            rb.lcd_drawline(0, line * h, o.width, line * h)
+            if not o.header then
+                rb.lcd_drawline(0, line * h, o.width, line * h)
+            end
             rb.lcd_drawline(0, line * h + h, o.width, line * h + h) --only to add the last line
             -- but we don't have an idea which line is the last line here so every line is the last line!
         end
@@ -457,6 +454,7 @@ local _print = {} do
     _print.opt.line       = set_line
     _print.opt.linedesc   = set_linedesc
     _print.opt.autoupdate = set_update
+    _print.selected       = function() return s_lines end
     _print.clear = clear
     _print.f     = printf
 

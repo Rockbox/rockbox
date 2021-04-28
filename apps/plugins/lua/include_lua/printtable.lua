@@ -22,27 +22,11 @@
 ]]
 if not rb.lcd_framebuffer then rb.splash(rb.HZ, "No Support!") return nil end
 
-require("actions")   -- Contains rb.actions & rb.contexts
-
 local _clr   = require("color")
 local _print = require("print")
 local _timer = require("timer")
+local BUTTON = require("menubuttons")
 local sb_width = 5
-
--- Button definitions --
-local CANCEL_BUTTON = rb.actions.PLA_CANCEL
-local DOWN_BUTTON = rb.actions.PLA_DOWN
-local DOWNR_BUTTON = rb.actions.PLA_DOWN_REPEAT
-local EXIT_BUTTON = rb.actions.PLA_EXIT
-local LEFT_BUTTON = rb.actions.PLA_LEFT
-local LEFTR_BUTTON = rb.actions.PLA_LEFT_REPEAT
-local RIGHT_BUTTON = rb.actions.PLA_RIGHT
-local RIGHTR_BUTTON = rb.actions.PLA_RIGHT_REPEAT
-local SEL_BUTTON = rb.actions.PLA_SELECT
-local SELREL_BUTTON = rb.actions.PLA_SELECT_REL
-local SELR_BUTTON = rb.actions.PLA_SELECT_REPEAT
-local UP_BUTTON = rb.actions.PLA_UP
-local UPR_BUTTON = rb.actions.PLA_UP_REPEAT
 
 -- clamps value to >= min and <= max
 local function clamp(iVal, iMin, iMax)
@@ -71,7 +55,7 @@ end
 -- time since last button press is returned in ticks..
 -- make xi, xir, yi, yir negative to flip direction...
 ]]
-local function dpad(x, xi, xir, y, yi, yir, timeout, overflow)
+local function dpad(x, xi, xir, y, yi, yir, timeout, overflow, selected)
     local scroll_is_fixed = overflow ~= "manual"
     _timer("dpad") -- start a persistant timer; keeps time between button events
     if timeout == nil then timeout = -1 end
@@ -81,44 +65,44 @@ local function dpad(x, xi, xir, y, yi, yir, timeout, overflow)
     while true do
         button = rb.get_plugin_action(timeout)
 
-        if button == CANCEL_BUTTON then
+        if button == BUTTON.CANCEL then
             cancel = 1
             break;
-        elseif button == EXIT_BUTTON then
+        elseif button == BUTTON.EXIT then
             cancel = 1
             break;
-        elseif button == SEL_BUTTON then
+        elseif button == BUTTON.SEL then
             select = 1
             timeout = timeout + 1
-        elseif button == SELR_BUTTON then
+        elseif button == BUTTON.SELR then
             select = 2
             timeout = timeout + 1
-        elseif button == SELREL_BUTTON then
+        elseif button == BUTTON.SELREL then
             select = -1
             timeout = timeout + 1
-        elseif button == LEFT_BUTTON then
+        elseif button == BUTTON.LEFT then
             x_chg = x_chg - xi
             if scroll_is_fixed then
                 cancel = 1
                 break;
             end
-        elseif button == LEFTR_BUTTON then
+        elseif button == BUTTON.LEFTR then
             x_chg = x_chg - xir
-        elseif button == RIGHT_BUTTON then
+        elseif button == BUTTON.RIGHT then
             x_chg = x_chg + xi
             if scroll_is_fixed then
                 select = 1
                 timeout = timeout + 1
             end
-        elseif button == RIGHTR_BUTTON then
+        elseif button == BUTTON.RIGHTR then
             x_chg = x_chg + xir
-        elseif button == UP_BUTTON then
+        elseif button == BUTTON.UP then
             y_chg = y_chg + yi
-        elseif button == UPR_BUTTON then
+        elseif button == BUTTON.UPR then
             y_chg = y_chg + yir
-        elseif button == DOWN_BUTTON then
+        elseif button == BUTTON.DOWN then
             y_chg = y_chg - yi
-        elseif button == DOWNR_BUTTON then
+        elseif button == BUTTON.DOWNR then
             y_chg = y_chg - yir
         elseif timeout >= 0 then--and rb.button_queue_count() < 1 then
             break;
@@ -247,7 +231,8 @@ function print_table(t, t_count, settings)
         rb.lcd_update()
 
         local quit, select, x_chg, xi, y_chg, yi, timeb =
-                          dpad_fn(t_p.col, -1, -t_p.col_scrl, t_p.row, -1, -t_p.row_scrl, nil, overflow)
+                          dpad_fn(t_p.col, -1, -t_p.col_scrl, t_p.row, -1, -t_p.row_scrl,
+                                  nil, overflow, (t_p.row + t_p.vcursor - 1))
 
         t_p.vcursor = t_p.vcursor + y_chg
 
@@ -316,7 +301,7 @@ function print_table(t, t_count, settings)
                 if t[i] == nil then
                     rb.splash(1, string.format("ERROR %d is nil", i))
                     t[i] = "???"
-                    if rb.get_plugin_action(10) == CANCEL_BUTTON then return 0 end
+                    if rb.get_plugin_action(10) == BUTTON.CANCEL then return 0 end
                 end
 
                 if m_sel == true and t[i]:sub(-1) == "\0" then
