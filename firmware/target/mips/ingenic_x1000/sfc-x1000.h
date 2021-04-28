@@ -99,7 +99,7 @@ extern void sfc_close(void);
 #define sfc_set_wp_enable(en) \
     jz_writef(SFC_GLB, WP_EN((en) ? 1 : 0))
 
-extern void sfc_set_clock(x1000_clk_t clksrc, uint32_t freq);
+extern void sfc_set_clock(uint32_t freq);
 
 /* Execute an operation. Returns zero on success, nonzero on failure. */
 extern int sfc_exec(const sfc_op* op);

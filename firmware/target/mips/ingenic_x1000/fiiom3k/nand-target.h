@@ -25,11 +25,6 @@
 /* The max page size (main + spare) of all NAND chips used by this target */
 #define NAND_MAX_PAGE_SIZE (2048 + 64)
 
-/* The clock source to use for the SFC controller. Note the SPL has special
- * handling which ignores this choice, so it only applies to bootloader & app.
- */
-#define NAND_CLOCK_SOURCE X1000_CLK_SCLK_A
-
 /* The clock speed to use for the SFC controller during chip identification */
 #define NAND_INIT_CLOCK_SPEED 150000000
 

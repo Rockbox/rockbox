@@ -73,7 +73,7 @@ int nand_open(void)
     /* Init hardware */
     sfc_open();
     sfc_set_dev_conf(NAND_INIT_SFC_DEV_CONF);
-    sfc_set_clock(NAND_CLOCK_SOURCE, NAND_INIT_CLOCK_SPEED);
+    sfc_set_clock(NAND_INIT_CLOCK_SPEED);
 
     /* Identify NAND chip */
     int status = 0;
@@ -103,7 +103,7 @@ int nand_open(void)
 
     /* Configure hardware and run init op */
     sfc_set_dev_conf(desc->data->dev_conf);
-    sfc_set_clock(NAND_CLOCK_SOURCE, desc->data->clock_freq);
+    sfc_set_clock(desc->data->clock_freq);
 
     if((status = desc->ops->open(&nand_driver)) < 0)
         goto _err;

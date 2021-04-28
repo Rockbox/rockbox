@@ -33,18 +33,6 @@
  * simple, DMA is unconditionally disabled. */
 //#define NEED_SFC_DMA
 
-#if defined(BOOTLOADER_SPL)
-# if X1000_EXCLK_FREQ == 24000000
-#  define FIXED_CLK_FREQ  600000000
-#  define FIXED_CLK_SRC   X1000_CLK_MPLL
-# elif X1000_EXCLK_FREQ == 26000000
-#  define FIXED_CLK_FREQ  598000000
-#  define FIXED_CLK_SRC   X1000_CLK_MPLL
-# else
-#  error "bad EXCLK freq"
-# endif
-#endif
-
 #define FIFO_THRESH 31
 
 #define SFC_STATUS_PENDING (-1)
@@ -111,16 +99,16 @@ void sfc_close(void)
     jz_writef(CPM_CLKGR, SFC(1));
 }
 
-void sfc_set_clock(x1000_clk_t clksrc, uint32_t freq)
+void sfc_set_clock(uint32_t freq)
 {
-    uint32_t in_freq;
-#ifdef FIXED_CLK_FREQ
-    /* Small optimization to save code space in SPL by not polling clock */
-    clksrc = FIXED_CLK_SRC;
-    in_freq = FIXED_CLK_FREQ;
-#else
-    in_freq = clk_get(clksrc);
-#endif
+    /* TODO: This is a hack so we can use MPLL in the SPL.
+     * There must be a better way to do this... */
+    x1000_clk_t clksrc = X1000_CLK_MPLL;
+    uint32_t in_freq = clk_get(clksrc);
+    if(in_freq < freq) {
+        clksrc = X1000_CLK_SCLK_A;
+        in_freq = clk_get(clksrc);
+    }
 
     uint32_t div = clk_calc_div(in_freq, freq);
     jz_writef(CPM_SSICDR, CE(1), CLKDIV(div - 1),
