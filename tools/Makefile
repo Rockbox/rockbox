@@ -13,10 +13,10 @@ LDFLAGS := -g
 CLEANALL := scramble descramble iriver bmp2rb rdf2binary convbdf \
     generate_rocklatin mkboot ipod_fw codepages uclpack mi4 gigabeat lngdump \
     telechips gigabeats creative hmac-sha1 rbspeexenc mkzenboot mk500boot \
-    convttf mkspl-x1000
+    convttf mkjzboot
 
 all: scramble descramble rdf2binary mkboot mkzenboot convbdf codepages \
-	uclpack rbspeexenc voicefont mk500boot mkspl-x1000
+	uclpack rbspeexenc voicefont mk500boot mkjzboot
 
 scramble: scramble.o iriver.o mi4.o gigabeat.o gigabeats.o telechips.o \
 	iaudio_bl_flash.o creative.o hmac-sha1.o rkw.o
@@ -55,8 +55,8 @@ mkzenboot.o: mkzenboot.c
 mkzenboot: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) $+ -lz -o $@
 
-mkspl-x1000: mkspl-x1000.c
-	$(SILENT)$(CC) $(LDFLAGS) $+ -o $@
+mkjzboot: $(wildcard jzboot/*.c) $(wildcard ucl/src/*.c)
+	$(SILENT)$(CC) -Iucl/include $(LDFLAGS) $+ -o $@
 
 mkzenboot.exe: mkzenboot.o hmac-sha1.o
 	$(SILENT)$(CC) $(LDFLAGS) -lz $+ C:\MingW\lib\libz.a -o $@

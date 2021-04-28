@@ -41,6 +41,10 @@ $(TOOLSDIR)/convttf: $(TOOLSDIR)/convttf.c
 	$(SILENT)$(HOSTCC) $(TOOLSFLAGS) -lm -O2 -Wall -g $+ -o $@ \
 		`pkg-config --cflags --libs freetype2`
 
+$(TOOLSDIR)/mkjzboot: $(wildcard $(TOOLSDIR)/jzboot/*.c) $(wildcard $(TOOLSDIR)/ucl/src/*.c)
+	$(call PRINTS,CC $(@F))$(HOSTCC) $(TOOLSCFLAGS) -I$(TOOLSDIR)/ucl \
+		-I$(TOOLSDIR)/ucl/include -o $@ $^
+
 # implicit rule for simple tools
 $(TOOLSDIR)/%: $(TOOLSDIR)/%.c
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$@))

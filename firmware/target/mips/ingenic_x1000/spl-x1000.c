@@ -265,7 +265,7 @@ static int nandwrite(uint32_t addr, uint32_t size, void* buffer)
 /* Kernel command line arguments */
 static char* argv[2];
 
-void main(void)
+void spl_main(void)
 {
     if(!(SPL_ARGUMENTS->flags & SPL_FLAG_SKIP_INIT))
         init();

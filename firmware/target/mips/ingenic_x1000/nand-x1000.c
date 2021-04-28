@@ -40,11 +40,7 @@
 /* Defined by target */
 extern const nand_chip_desc target_nand_chip_descs[];
 
-#ifdef BOOTLOADER_SPL
-# define NANDBUFFER_ATTR __attribute__((section(".sdram"))) CACHEALIGN_ATTR
-#else
-# define NANDBUFFER_ATTR CACHEALIGN_ATTR
-#endif
+#define NANDBUFFER_ATTR __attribute__((section(".sdram"))) CACHEALIGN_ATTR
 
 /* Globals for the driver */
 static unsigned char pagebuffer[NAND_MAX_PAGE_SIZE] NANDBUFFER_ATTR;

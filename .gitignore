@@ -116,6 +116,7 @@ __pycache__
 /tools/voicefont
 /tools/rbspeexenc
 /tools/rbspeexdec
+/tools/mkjzboot
 /tools/mknkboot
 /tools/mktccboot
 /tools/mkzenboot

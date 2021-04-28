@@ -3,8 +3,8 @@
 
 OUTPUT_FORMAT("elf32-littlemips")
 OUTPUT_ARCH(MIPS)
-ENTRY(_start)
-STARTUP(target/mips/ingenic_x1000/crt0.o)
+ENTRY(_spl_start)
+STARTUP(target/mips/ingenic_x1000/spl-start.o)
 
 MEMORY {
     /* First 4k of TCSM is used by mask ROM for stack + variables,
@@ -23,7 +23,7 @@ SECTIONS
 {
     .text :
     {
-        *(.init.text);
+        *(.init.spl);
         *(.text*);
         *(.icode*);
     } > TCSM
