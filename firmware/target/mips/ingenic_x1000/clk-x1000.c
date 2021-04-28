@@ -25,99 +25,129 @@
 #include "x1000/msc.h"
 #include "x1000/aic.h"
 
-static uint32_t pll_get(uint32_t pllreg, uint32_t onbit)
+struct clk_info {
+    uint8_t mux_reg;    /* offset from CPM_BASE for mux register */
+    uint8_t mux_shift;  /* shift to get mux */
+    uint8_t mux_mask;   /* mask to get mux after shifting */
+    uint8_t mux_type;   /* type of mux, maps register bits to clock source */
+    uint8_t div_reg;    /* offset from CPM_BASE for divider register */
+    uint8_t div_shift;  /* shift to get divider */
+    uint8_t div_mask;   /* mask to get divider after shifting */
+    uint8_t miscbits;   /* inclk shift, clkgr bit, and fake mux value */
+};
+
+/* Ugliness to pack/unpack stuff in clk_info->miscbits */
+#define INCLK_SHIFT(n)              ((n) & 1)
+#define CLKGR_BIT(n)                (((n) & 0x1f) << 1)
+#define FAKEMUX(n)                  (((n) & 3) << 6)
+#define GET_INCLK_SHIFT(miscbits)   ((miscbits) & 1)
+#define GET_CLKGR_BIT(miscbits)     (((miscbits) >> 1) & 0x1f)
+#define GET_FAKEMUX(miscbits)       (((miscbits) >> 6) & 3)
+
+/* Clock sources -- the order here is important! */
+#define S_STOP   0
+#define S_EXCLK  1
+#define S_APLL   2
+#define S_MPLL   3
+#define S_SCLK_A 4
+
+/* Muxes */
+#define MUX_TWOBIT    0
+#define MUX_ONEBIT    1
+#define MUX_USB       2
+#define MUX_PHONY     3
+#define MUX_NUM_TYPES 4
+
+/* Ugliness to define muxes */
+#define MKSEL(x,i)      (((x) & 0xf) << ((i)*4))
+#define GETSEL(x,i)     (((x) >> ((i)*4)) & 0xf)
+#define STOP(i)         MKSEL(S_STOP, i)
+#define EXCLK(i)        MKSEL(S_EXCLK, i)
+#define APLL(i)         MKSEL(S_APLL, i)
+#define MPLL(i)         MKSEL(S_MPLL, i)
+#define SCLK_A(i)       MKSEL(S_SCLK_A, i)
+#define MKMUX(a,b,c,d)  (a(0)|b(1)|c(2)|d(3))
+
+/* Ugliness to shorten the clk_info table */
+#define JA(x) (JA_CPM_##x & 0xff)
+#define BM(x) ((BM_CPM_##x) >> (BP_CPM_##x))
+#define BP(x) (BP_CPM_##x)
+#define CG(x) CLKGR_BIT(BP_CPM_CLKGR_##x)
+#define M(r,f,t) JA(r), BP(r##_##f), BM(r##_##f), t
+#define D(r,f)   JA(r), BP(r##_##f), BM(r##_##f)
+
+static const uint16_t clk_mux[MUX_NUM_TYPES] = {
+    /*    00      01      10      11 */
+    MKMUX(STOP,   SCLK_A, MPLL,   STOP),    /* MUX_TWOBIT */
+    MKMUX(SCLK_A, MPLL,   STOP,   STOP),    /* MUX_ONEBIT */
+    MKMUX(EXCLK,  EXCLK,  SCLK_A, MPLL),    /* MUX_USB */
+    MKMUX(EXCLK,  APLL,   MPLL,   SCLK_A),  /* MUX_PHONY */
+};
+
+/* Keep in order with enum x1000_clk_t */
+const struct clk_info clk_info[X1000_NUM_SIMPLE_CLKS] = {
+    {0, 0, 0, MUX_PHONY, 0, 0, 0, CG(CPU_BIT)|FAKEMUX(0)},
+    {0, 0, 0, MUX_PHONY, 0, 0, 0, CG(CPU_BIT)|FAKEMUX(1)},
+    {0, 0, 0, MUX_PHONY, 0, 0, 0, CG(CPU_BIT)|FAKEMUX(2)},
+    {0, 0, 0, MUX_PHONY, 0, 0, 0, CG(CPU_BIT)|FAKEMUX(3)},
+    {M(CCR,     SEL_CPLL,   MUX_TWOBIT), D(CCR,     CDIV),   CG(CPU_BIT)},
+    {M(CCR,     SEL_CPLL,   MUX_TWOBIT), D(CCR,     L2DIV),  CG(CPU_BIT)},
+    {M(CCR,     SEL_H0PLL,  MUX_TWOBIT), D(CCR,     H0DIV),  CG(AHB0)},
+    {M(CCR,     SEL_H2PLL,  MUX_TWOBIT), D(CCR,     H2DIV),  CG(APB0)},
+    {M(CCR,     SEL_H2PLL,  MUX_TWOBIT), D(CCR,     PDIV),   CG(APB0)},
+    {M(DDRCDR,  CLKSRC,     MUX_TWOBIT), D(DDRCDR,  CLKDIV), CG(DDR)},
+    {M(LPCDR,   CLKSRC,     MUX_ONEBIT), D(LPCDR,   CLKDIV), CG(LCD)},
+    {M(MSC0CDR, CLKSRC,     MUX_ONEBIT), D(MSC0CDR, CLKDIV), CG(MSC0)|INCLK_SHIFT(1)},
+    {M(MSC0CDR, CLKSRC,     MUX_ONEBIT), D(MSC1CDR, CLKDIV), CG(MSC1)|INCLK_SHIFT(1)},
+    {M(SSICDR,  SFC_CS,     MUX_ONEBIT), D(SSICDR,  CLKDIV), CG(SFC)},
+    {M(USBCDR,  CLKSRC,     MUX_USB),    D(USBCDR,  CLKDIV), CG(OTG)},
+};
+
+static uint32_t clk_get_in_rate(uint8_t mux_type, uint32_t mux)
 {
-    if((pllreg & (1 << onbit)) == 0)
+    uint32_t reg, onbit;
+    uint32_t src = GETSEL(clk_mux[mux_type], mux);
+  again:
+    switch(src) {
+    default:       return 0;
+    case S_EXCLK:  return X1000_EXCLK_FREQ;
+    case S_APLL:   reg = REG_CPM_APCR; onbit = BM_CPM_APCR_ON; break;
+    case S_MPLL:   reg = REG_CPM_MPCR; onbit = BM_CPM_MPCR_ON; break;
+    case S_SCLK_A: src = jz_readf(CPM_CCR, SEL_SRC); goto again;
+    }
+
+    if(!(reg & onbit))
         return 0;
 
-    /* Both PLL registers share the same layout of N/M/OD bits.
-     * The max multiplier is 128 and max EXCLK is 26 MHz, so the
-     * multiplication should fit within 32 bits without overflow.
-     */
     uint32_t rate = X1000_EXCLK_FREQ;
-    rate *= jz_vreadf(pllreg, CPM_APCR, PLLM) + 1;
-    rate /= jz_vreadf(pllreg, CPM_APCR, PLLN) + 1;
-    rate >>= jz_vreadf(pllreg, CPM_APCR, PLLOD);
+    rate *= jz_vreadf(reg, CPM_APCR, PLLM) + 1;
+    rate /= jz_vreadf(reg, CPM_APCR, PLLN) + 1;
+    rate >>= jz_vreadf(reg, CPM_APCR, PLLOD);
     return rate;
 }
 
-static uint32_t sclk_a_get(void)
+static uint32_t clk_get_simple(const struct clk_info* info)
 {
-    switch(jz_readf(CPM_CCR, SEL_SRC)) {
-    case 1:  return X1000_EXCLK_FREQ;
-    case 2:  return clk_get(X1000_CLK_APLL);
-    default: return 0;
-    }
-}
-
-static uint32_t ccr_get(uint32_t selbit, uint32_t divbit)
-{
-    uint32_t reg = REG_CPM_CCR;
-    uint32_t sel = (reg >> selbit) & 0x3;
-    uint32_t div = (reg >> divbit) & 0xf;
-
-    switch(sel) {
-    case 1:  return clk_get(X1000_CLK_SCLK_A) / (div + 1);
-    case 2:  return clk_get(X1000_CLK_MPLL) / (div + 1);
-    default: return 0;
-    }
-}
-
-static uint32_t ddr_get(void)
-{
-    uint32_t reg = REG_CPM_DDRCDR;
-    uint32_t div = jz_vreadf(reg, CPM_DDRCDR, CLKDIV);
-
-    switch(jz_vreadf(reg, CPM_DDRCDR, CLKSRC)) {
-    case 1:  return clk_get(X1000_CLK_SCLK_A) / (div + 1);
-    case 2:  return clk_get(X1000_CLK_MPLL) / (div + 1);
-    default: return 0;
-    }
-}
-
-static uint32_t lcd_get(void)
-{
-    if(jz_readf(CPM_CLKGR, LCD))
+    if(REG_CPM_CLKGR & (1 << GET_CLKGR_BIT(info->miscbits)))
         return 0;
 
-    uint32_t reg = REG_CPM_LPCDR;
-    uint32_t rate;
-    switch(jz_vreadf(reg, CPM_LPCDR, CLKSRC)) {
-    case 0: rate = clk_get(X1000_CLK_SCLK_A); break;
-    case 1: rate = clk_get(X1000_CLK_MPLL); break;
-    default: return 0;
-    }
+    uint32_t base = 0xb0000000;
+    uint32_t mux_reg = *(const volatile uint32_t*)(base + info->mux_reg);
+    uint32_t div_reg = *(const volatile uint32_t*)(base + info->div_reg);
 
-    rate /= jz_vreadf(reg, CPM_LPCDR, CLKDIV) + 1;
+    uint32_t mux = (mux_reg >> info->mux_shift) & info->mux_mask;
+    uint32_t div = (div_reg >> info->div_shift) & info->div_mask;
+
+    mux |= GET_FAKEMUX(info->miscbits);
+
+    uint32_t rate = clk_get_in_rate(info->mux_type, mux);
+    rate >>= GET_INCLK_SHIFT(info->miscbits);
+    rate /= (div + 1);
     return rate;
 }
 
-static uint32_t msc_get(int msc)
-{
-    if((msc == 0 && jz_readf(CPM_CLKGR, MSC0)) ||
-       (msc == 1 && jz_readf(CPM_CLKGR, MSC1)))
-        return 0;
-
-    uint32_t reg = REG_CPM_MSC0CDR;
-    uint32_t rate;
-    switch(jz_vreadf(reg, CPM_MSC0CDR, CLKSRC)) {
-    case 0: rate = clk_get(X1000_CLK_SCLK_A); break;
-    case 1: rate = clk_get(X1000_CLK_MPLL); break;
-    default: return 0;
-    }
-
-    uint32_t div;
-    if(msc == 0)
-        div = jz_readf(CPM_MSC0CDR, CLKDIV);
-    else
-        div = jz_readf(CPM_MSC1CDR, CLKDIV);
-
-    rate /= 2 * (div + 1);
-    rate >>= REG_MSC_CLKRT(msc);
-    return rate;
-}
-
-static uint32_t i2s_mclk_get(void)
+#ifndef BOOTLOADER
+static uint32_t clk_get_i2s_mclk(void)
 {
     if(jz_readf(CPM_CLKGR, AIC))
         return 0;
@@ -143,48 +173,29 @@ static uint32_t i2s_mclk_get(void)
     return rate;
 }
 
-static uint32_t i2s_bclk_get(void)
+static uint32_t clk_get_i2s_bclk(void)
 {
-    return i2s_mclk_get() / (REG_AIC_I2SDIV + 1);
+    return clk_get_i2s_mclk() / (REG_AIC_I2SDIV + 1);
 }
 
-static uint32_t sfc_get(void)
+static uint32_t clk_get_decimal(x1000_clk_t clk)
 {
-    if(jz_readf(CPM_CLKGR, SFC))
-        return 0;
-
-    uint32_t reg = REG_CPM_SSICDR;
-    uint32_t rate;
-    if(jz_vreadf(reg, CPM_SSICDR, SFC_CS) == 0)
-        rate = clk_get(X1000_CLK_SCLK_A);
-    else
-        rate = clk_get(X1000_CLK_MPLL);
-
-    rate /= jz_vreadf(reg, CPM_SSICDR, CLKDIV) + 1;
-    return rate;
+    switch(clk) {
+    case X1000_CLK_I2S_MCLK: return clk_get_i2s_mclk();
+    case X1000_CLK_I2S_BCLK: return clk_get_i2s_bclk();
+    default:                 return 0;
+    }
 }
+#endif
 
 uint32_t clk_get(x1000_clk_t clk)
 {
-    switch(clk) {
-    case X1000_CLK_EXCLK:    return X1000_EXCLK_FREQ;
-    case X1000_CLK_APLL:     return pll_get(REG_CPM_APCR, BP_CPM_APCR_ON);
-    case X1000_CLK_MPLL:     return pll_get(REG_CPM_MPCR, BP_CPM_MPCR_ON);
-    case X1000_CLK_SCLK_A:   return sclk_a_get();
-    case X1000_CLK_CPU:      return ccr_get(BP_CPM_CCR_SEL_CPLL, BP_CPM_CCR_CDIV);
-    case X1000_CLK_L2CACHE:  return ccr_get(BP_CPM_CCR_SEL_CPLL, BP_CPM_CCR_L2DIV);
-    case X1000_CLK_AHB0:     return ccr_get(BP_CPM_CCR_SEL_H0PLL, BP_CPM_CCR_H0DIV);
-    case X1000_CLK_AHB2:     return ccr_get(BP_CPM_CCR_SEL_H2PLL, BP_CPM_CCR_H2DIV);
-    case X1000_CLK_PCLK:     return ccr_get(BP_CPM_CCR_SEL_H2PLL, BP_CPM_CCR_PDIV);
-    case X1000_CLK_DDR:      return ddr_get();
-    case X1000_CLK_LCD:      return lcd_get();
-    case X1000_CLK_MSC0:     return msc_get(0);
-    case X1000_CLK_MSC1:     return msc_get(1);
-    case X1000_CLK_I2S_MCLK: return i2s_mclk_get();
-    case X1000_CLK_I2S_BCLK: return i2s_bclk_get();
-    case X1000_CLK_SFC:      return sfc_get();
-    default:                 return 0;
-    }
+#ifndef BOOTLOADER
+    if(clk >= X1000_NUM_SIMPLE_CLKS)
+        return clk_get_decimal(clk);
+#endif
+
+    return clk_get_simple(&clk_info[clk]);
 }
 
 const char* clk_get_name(x1000_clk_t clk)
@@ -204,9 +215,10 @@ const char* clk_get_name(x1000_clk_t clk)
         CASE(LCD);
         CASE(MSC0);
         CASE(MSC1);
+        CASE(SFC);
+        CASE(USB);
         CASE(I2S_MCLK);
         CASE(I2S_BCLK);
-        CASE(SFC);
 #undef CASE
     default:
         return "NONE";
