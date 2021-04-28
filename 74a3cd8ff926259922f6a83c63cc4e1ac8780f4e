@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "276c7fbd_cc954e41",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 9
+      },
+      "lineNbr": 15789,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-04-28T21:50:16Z",
+      "side": 1,
+      "message": "\u0027after\u0027 should be capitalized",
+      "range": {
+        "startLine": 15789,
+        "startChar": 0,
+        "endLine": 15789,
+        "endChar": 1
+      },
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9337f95f_c00f85ec",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-04-28T21:50:16Z",
+      "side": 1,
+      "message": "You can get rid of \u0027newpath\u0027 since in the end it is just \u0027temp\u0027 with \u0027/\u0027 prepended if necessary. AFAICT, temp will normally begin with \u0027/\u0027, and it appears Rockbox interprets a path like \u0027foo/bar\u0027 as \u0027/foo/bar\u0027 anyway. I\u0027m not 100% certain of the existing logic, but I doubt prepending \u0027/\u0027 directly to temp will cause problems.",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16e0c690_95e7ed55",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-04-28T21:50:16Z",
+      "side": 1,
+      "message": "strncpy is not in Rockbox\u0027s libc so this doesn\u0027t link on native targets. Just use strcpy here. temp appears to be null terminated by construction, if not then it\u0027s a bug in other functions.\n\nAlso, if strlen(temp) \u003d\u003d MAX_PATH then newpath will not be null terminated.\n\nBut see my comment above about getting rid of newpath, which would make these issues moot.",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5cbf4877_9bd50bc6",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-04-28T21:50:16Z",
+      "side": 1,
+      "message": "same null termination problem as above",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "158c81d1_3204aa2f",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-04-28T21:50:16Z",
+      "side": 1,
+      "message": "prefer to save result of strrchr in a variable, it\u0027s more readable.",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9521a7f8_75515c51",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-04-28T21:50:16Z",
+      "side": 1,
+      "message": "I don\u0027t like this hack. Worse, the logic breaks down if you enter the current playlist menu by pressing the WPS hotkey because it gets to the playlist viewer by another means. (hotkey is not on all players, btw.)\n\nRockbox already keeps track of the current activity in a stack, but you can only query the current activity and I don\u0027t think that\u0027s enough for what you need to detect.\n\nI *think* you\u0027d want to check if the activity stack looks like this--\n\n(bottom of stack) \u003e ... \u003e ACTIVITY_WPS \u003e ... \u003e ACTIVITY_PLAYLISTVIEWER (top of stack)\n\nie. we were in WPS activity and after that got to the playlist viewer somehow. See apps/misc.c, get_current_activity(). It should be easy to add another function which checks for nested activities like above and then use it instead of this variable hack.",
+      "range": {
+        "startLine": 132,
+        "startChar": 4,
+        "endLine": 132,
+        "endChar": 19
+      },
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
