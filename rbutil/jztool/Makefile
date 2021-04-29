@@ -26,7 +26,9 @@ ifeq ($(findstring WIN32,$(CPPDEFINES)),WIN32)
 # TODO: support Windows
 else
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
-# TODO: support OSX
+# OSX -- /opt location is cheesy attempt to support ARM macs
+CFLAGS += -I/usr/local/include -I/opt/homebrew/include
+LDOPTS += -L/usr/local/lib -L/opt/homebrew/lib -lusb-1.0
 else
 # Linux
 CFLAGS += `pkg-config --cflags libusb-1.0`

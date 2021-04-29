@@ -22,8 +22,24 @@
 #include "jztool_private.h"
 #include "../../../firmware/target/mips/ingenic_x1000/spl-x1000-defs.h"
 #include "../../../firmware/target/mips/ingenic_x1000/nand-x1000-err.h"
-#include <endian.h> // TODO: portability
 #include <string.h>
+
+static uint32_t to_le32(uint32_t x)
+{
+    union { uint32_t u; uint8_t p[4]; } f;
+    f.p[0] = x & 0xff;
+    f.p[1] = (x >> 8) & 0xff;
+    f.p[2] = (x >> 16) & 0xff;
+    f.p[3] = (x >> 24) & 0xff;
+    return f.u;
+}
+
+static uint32_t from_le32(uint32_t x)
+{
+    union { uint32_t u; uint8_t p[4]; } f;
+    f.u = x;
+    return f.p[0] | (f.p[1] << 8) | (f.p[2] << 16) | (f.p[3] << 24);
+}
 
 static const char* jz_x1000_nand_strerror(int rc)
 {
@@ -54,10 +70,10 @@ static const char* jz_x1000_nand_strerror(int rc)
 
 static int jz_x1000_send_args(jz_usbdev* dev, struct x1000_spl_arguments* args)
 {
-    args->command = htole32(args->command);
-    args->param1 = htole32(args->param1);
-    args->param2 = htole32(args->param2);
-    args->flags = htole32(args->flags);
+    args->command = to_le32(args->command);
+    args->param1 = to_le32(args->param1);
+    args->param2 = to_le32(args->param2);
+    args->flags = to_le32(args->flags);
     return jz_usb_send(dev, SPL_ARGUMENTS_ADDRESS, sizeof(*args), args);
 }
 
@@ -67,8 +83,8 @@ static int jz_x1000_recv_status(jz_usbdev* dev, struct x1000_spl_status* status)
     if(rc < 0)
         return rc;
 
-    status->err_code = le32toh(status->err_code);
-    status->reserved = le32toh(status->reserved);
+    status->err_code = from_le32(status->err_code);
+    status->reserved = from_le32(status->reserved);
     return JZ_SUCCESS;
 }
 
