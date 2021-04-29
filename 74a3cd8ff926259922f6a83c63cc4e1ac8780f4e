@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "6611ffc2_ea31cf0c",
+        "filename": "apps/lang/english.lang",
+        "patchSetId": 9
+      },
+      "lineNbr": 15789,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-29T01:16:35Z",
+      "side": 1,
+      "message": "Will be fixed in next patchset",
+      "parentUuid": "276c7fbd_cc954e41",
+      "range": {
+        "startLine": 15789,
+        "startChar": 0,
+        "endLine": 15789,
+        "endChar": 1
+      },
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9337f95f_c00f85ec",
         "filename": "apps/menus/playlist_menu.c",
         "patchSetId": 9
@@ -36,6 +60,24 @@
       "writtenOn": "2021-04-28T21:50:16Z",
       "side": 1,
       "message": "You can get rid of \u0027newpath\u0027 since in the end it is just \u0027temp\u0027 with \u0027/\u0027 prepended if necessary. AFAICT, temp will normally begin with \u0027/\u0027, and it appears Rockbox interprets a path like \u0027foo/bar\u0027 as \u0027/foo/bar\u0027 anyway. I\u0027m not 100% certain of the existing logic, but I doubt prepending \u0027/\u0027 directly to temp will cause problems.",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b840535_c279bdf6",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-29T01:16:35Z",
+      "side": 1,
+      "message": "In my testing, having a path that lacked \u0027/\u0027 completely, like just \u0027foo\u0027, caused an issue in playlist_start() for some reason. Or, at least that\u0027s where the simulator appears to segfault. I can try to prepend \u0027/\u0027 directly to temp though.",
+      "parentUuid": "9337f95f_c00f85ec",
       "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "246f95af_50a60d8b",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-29T01:16:35Z",
+      "side": 1,
+      "message": "\u003e strncpy is not in Rockbox\u0027s libc so this doesn\u0027t link on native targets. Just use strcpy here. temp appears to be null terminated by construction, if not then it\u0027s a bug in other functions.\n\nWill be fixed in next patchset\n\n\u003e Also, if strlen(temp) \u003d\u003d MAX_PATH then newpath will not be null terminated.\n\u003e \n\u003e But see my comment above about getting rid of newpath, which would make these issues moot.\n\nBased on my testing of rockbox crashing when no \u0027/\u0027 is present in the path at playlist_start() for some reason, perhaps then temp should be sized to MAX_PATH + 2? \n\nThough the only time that would be a concern is if someone used a filename that was the maximum path length, without a \u0027/\u0027, in the root directory. I\u0027m not even sure if the original function checked for that condition when appending \".m3u8\" to the filename. All the same, should probably protect against that scenario.",
+      "parentUuid": "16e0c690_95e7ed55",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5cbf4877_9bd50bc6",
         "filename": "apps/menus/playlist_menu.c",
         "patchSetId": 9
@@ -73,6 +133,24 @@
       "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8baea101_8390ddd6",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-29T01:16:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5cbf4877_9bd50bc6",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -93,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "24d75455_c261cb43",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-29T01:16:35Z",
+      "side": 1,
+      "message": "Sure, will be fixed in next patchset",
+      "parentUuid": "158c81d1_3204aa2f",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9521a7f8_75515c51",
         "filename": "apps/menus/playlist_menu.c",
         "patchSetId": 9
@@ -104,6 +200,30 @@
       "writtenOn": "2021-04-28T21:50:16Z",
       "side": 1,
       "message": "I don\u0027t like this hack. Worse, the logic breaks down if you enter the current playlist menu by pressing the WPS hotkey because it gets to the playlist viewer by another means. (hotkey is not on all players, btw.)\n\nRockbox already keeps track of the current activity in a stack, but you can only query the current activity and I don\u0027t think that\u0027s enough for what you need to detect.\n\nI *think* you\u0027d want to check if the activity stack looks like this--\n\n(bottom of stack) \u003e ... \u003e ACTIVITY_WPS \u003e ... \u003e ACTIVITY_PLAYLISTVIEWER (top of stack)\n\nie. we were in WPS activity and after that got to the playlist viewer somehow. See apps/misc.c, get_current_activity(). It should be easy to add another function which checks for nested activities like above and then use it instead of this variable hack.",
+      "range": {
+        "startLine": 132,
+        "startChar": 4,
+        "endLine": 132,
+        "endChar": 19
+      },
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8181e2ce_2dea58f4",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-04-29T01:16:35Z",
+      "side": 1,
+      "message": "\u003e I don\u0027t like this hack.\n\nMe neither. But, it was the only way I could think of to get this information into here without modifying each function to pass it as a parameter to get from there to here. I think it\u0027s 4 or 5 function calls.\n\nI actually wasn\u0027t aware there was an activity stack, I\u0027ll try to figure out how it works. If it\u0027s \"last in first out\" (I think), then I could just search for ACTIVITY_WPS at a specified spot to see if that\u0027s where we came from. It might get messy though if the user wanders around the context menu in and out of stuff before landing in the save playlist screen.",
+      "parentUuid": "9521a7f8_75515c51",
       "range": {
         "startLine": 132,
         "startChar": 4,
