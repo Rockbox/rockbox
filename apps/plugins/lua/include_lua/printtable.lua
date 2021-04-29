@@ -336,6 +336,11 @@ function print_table(t, t_count, settings)
 
     table_p = init_position(15, 5)
     line, maxline = _print.opt.area(5, 1, rb.LCD_WIDTH - 10 - sb_width, rb.LCD_HEIGHT - 2)
+
+    if curpos > maxline then
+        start = start or 1 + curpos - maxline
+        curpos = maxline
+    end
     maxline = math.min(maxline, t_count)
 
     -- allow user to start at a position other than the beginning
