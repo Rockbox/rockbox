@@ -315,14 +315,20 @@ static void LCDFN(putsxyofs)(int x, int y, int ofs, const unsigned char *str)
         }
 
         bits = font_get_bits(pf, *ucs);
-
+        
+        int stride = width;
+        /* 'Bugfix' mono_bitmap_part reads ahead in the buffer,
+	     * if the height is <= char bit pixels other memory gets read
+         */
+        if (pf->height <= CHAR_BIT)
+            stride = 0;
 #if defined(MAIN_LCD) && defined(HAVE_LCD_COLOR)
         if (pf->depth)
-            lcd_alpha_bitmap_part(bits, ofs, 0, width, x + base_ofs, y,
+            lcd_alpha_bitmap_part(bits, ofs, 0, stride, x + base_ofs, y,
                                   width - ofs, pf->height);
         else
 #endif
-            LCDFN(mono_bitmap_part)(bits, ofs, 0, width, x + base_ofs,
+            LCDFN(mono_bitmap_part)(bits, ofs, 0, stride, x + base_ofs,
                                     y, width - ofs, pf->height);
         if (is_diac)
         {
