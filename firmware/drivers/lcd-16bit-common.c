@@ -341,6 +341,11 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 #endif
+    /* 'Bugfix' mono_bitmap_part reads ahead in the buffer,
+     * if the height is <= char bit pixels other memory gets read
+     */
+    if (height <= CHAR_BIT)
+        stride = 0;
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
@@ -462,14 +467,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
 /* Draw a full monochrome bitmap */
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
-    int stride = width;
-
-    /* 'Bugfix' mono_bitmap_part reads ahead in the buffer,
-     * if the height is <= char bit pixels other memory gets read
-     */
-    if (height <= CHAR_BIT)
-        stride = 0;
-    lcd_mono_bitmap_part(src, 0, 0, stride, x, y, width, height);
+    lcd_mono_bitmap_part(src, 0, 0, width, x, y, width, height);
 }
 
 
