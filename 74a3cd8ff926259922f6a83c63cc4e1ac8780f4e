@@ -102,6 +102,24 @@
     },
     {
       "key": {
+        "uuid": "414715af_96803af4",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-01T01:37:43Z",
+      "side": 1,
+      "message": "Yeah, figured out why it was crashing, it had to do with directoryonly. newpath will be gone in next patchset, temp used in its place. Turns out, no need to have a \u0027/\u0027 in temp, but it\u0027s necessary in directoryonly.",
+      "parentUuid": "ab038519_3524a623",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "16e0c690_95e7ed55",
         "filename": "apps/menus/playlist_menu.c",
         "patchSetId": 9
@@ -134,6 +152,24 @@
       "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7e75a46a_2ec1b3b8",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-01T01:37:43Z",
+      "side": 1,
+      "message": "\u003e \u003e Also, if strlen(temp) \u003d\u003d MAX_PATH then newpath will not be null terminated.\n\u003e \u003e \n\u003e \u003e But see my comment above about getting rid of newpath, which would make these issues moot.\n\u003e \n\u003e Based on my testing of rockbox crashing when no \u0027/\u0027 is present in the path at playlist_start() for some reason, perhaps then temp should be sized to MAX_PATH + 2? \n\u003e \n\u003e Though the only time that would be a concern is if someone used a filename that was the maximum path length, without a \u0027/\u0027, in the root directory. I\u0027m not even sure if the original function checked for that condition when appending \".m3u8\" to the filename. All the same, should probably protect against that scenario.\n\nThis whole strcpy into newpath block will go away in next patchset.",
+      "parentUuid": "246f95af_50a60d8b",
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
