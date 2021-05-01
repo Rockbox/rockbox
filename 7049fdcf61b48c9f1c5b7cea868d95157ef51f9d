@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5e3c1646_4db855d5",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-05-01T15:33:45Z",
+      "side": 1,
+      "message": "This still doesn\u0027t work if you get to the playlist from the WPS hotkey :(\n\nTurns out on further investigation, the hotkey and ACTION_WPS_VIEW_PLAYLIST keybinding do not actually enter the playlist viewer as a sub-activity. Instead, they pop the WPS activity and the root menu code handles popping back to the WPS when the list is finished... who\u0027d have guessed?\n\nWhich gets me thinking, maybe this is the wrong way to go about things. The intent here is to only reload the playlist if it\u0027s a dynamic one being saved, right? And only the current playlist can be the dynamic playlist, which means playlist \u003d\u003d NULL. So I replaced the search_for_activity check with (playlist \u003d\u003d NULL), and it seems to work as intended:\n\n1. if you save the current playlist, it\u0027s seamlessly reloaded\n2. editing a playlist in the catalogue works, and does NOT trigger an automatic reload\n\nI think that\u0027s everything. Is there anything I\u0027m missing here which might be affected?",
+      "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e975cfe7_f6e2fe07",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-05-01T15:33:45Z",
+      "side": 1,
+      "message": "Suggest rewriting this whole segment a bit. Right now if temp \u003d \"Playlists/foo\" is entered, then directoryonly \u003d \"Playlists\" and the reload fails.\n\nI\u0027m thinking something along these lines:\n\n  char directoryonly[MAX_PATH+3];\n  directoryonly[0] \u003d \u0027/\u0027; // hack: prepending two slashes simplifies the code\n  directoryonly[1] \u003d \u0027/\u0027;\n  strcpy(directoryonly+2, temp);\n\n  char* filename \u003d strrchr(directoryonly, \u0027/\u0027);\n  *filename \u003d \u0027\\0\u0027;\n  filename +\u003d 1;\n\n  ft_play_playlist(temp, directoryonly, filename, true);\n\nThis hack gives the right filename and directory, but the directory might start with two or three leading slashes in some cases. From my testing, it doesn\u0027t cause problems. It\u0027s not easy to prevent this in general, because users can enter stuff like \"////pl////blegh\". Rockbox seems to ignore redundant separators anyway, following the usual *nix conventions.\n\nThese types of things, are what I hate most in C. The simplest stuff can get so annoying and error prone...",
+      "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44ada315_a31c0aa1",
+        "filename": "apps/misc.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1540,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-05-01T15:33:45Z",
+      "side": 1,
+      "message": "Off by one error, cf. get_current_activity() above.\nSet i \u003d current_activity - 1.",
+      "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}

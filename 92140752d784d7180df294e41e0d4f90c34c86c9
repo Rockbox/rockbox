@@ -22,6 +22,30 @@
       "revId": "92140752d784d7180df294e41e0d4f90c34c86c9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a678f7f_5a2e31bd",
+        "filename": "apps/iap/iap-lingo4.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-05-01T15:33:45Z",
+      "side": 0,
+      "message": "1st problem: The whitespace changes are caused by replacing a space with a non-breakable space, and \u0027straight\u0027 ASCII double quotes are getting converted to \u0027curly\u0027 left/right quotes. This is probably some auto-formatting setting in your editor -- it should be easy to disable.\n\n2nd problem: The character encoding seems to be Latin-1. Set your editor to UTF-8 instead.\n\nIt seems only this file has these issues. You can revert to the original state with git:\n\n    git checkout origin/master -- apps/iap/iap-lingo4.c\n\nThen you can do the intended change without the editor \"helpfully\" reformatting the file :)",
+      "parentUuid": "8cebae11_44c6ec5f",
+      "range": {
+        "startLine": 179,
+        "startChar": 33,
+        "endLine": 179,
+        "endChar": 40
+      },
+      "revId": "92140752d784d7180df294e41e0d4f90c34c86c9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
