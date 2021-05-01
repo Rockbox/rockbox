@@ -30,6 +30,7 @@
 #include "lauxlib.h"
 #include "rocklib.h"
 #include "lib/helper.h"
+#include "lib/kbd_helper.c"
 
 /*
  * http://www.lua.org/manual/5.1/manual.html#lua_CFunction
@@ -147,6 +148,9 @@ RB_WRAP(kbd_input)
     luaL_buffinit(L, &b);
 
     const char *input = lua_tostring(L, 1);
+    size_t layout_len;
+    const char *layout = lua_tolstring(L, 2, &layout_len);
+    unsigned short *pbuf = NULL;
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
@@ -154,7 +158,34 @@ RB_WRAP(kbd_input)
     else
         buffer[0] = '\0';
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, NULL))
+    if(layout && layout_len > 0)
+    {   int bufsz =  (layout_len * 2) * sizeof(unsigned short);
+        unsigned short *buf = (unsigned short *) lua_newuserdata(L, bufsz + 2);
+        /* make sure to leave room for the final length and finalizer signature */
+        const unsigned char *p = layout;
+        int len = 0;
+        int next;
+        pbuf = buf;
+        while (*p && (pbuf - buf < bufsz))
+        {
+            next = len + 1;
+            p = rb->utf8decode(p, &pbuf[next]);
+            if (pbuf[next] == '\n')
+            {
+                *pbuf = len;
+                pbuf += next;
+                len = 0;
+            }
+            else
+                len++;
+        }
+        next = len + 1;
+        *pbuf = len;
+        pbuf[next] = 0xFEFF;   /* mark end of characters */
+        pbuf = buf;
+	}
+
+    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, pbuf))
     {
         luaL_addstring(&b, buffer);
         luaL_pushresult(&b);
