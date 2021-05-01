@@ -143,10 +143,17 @@ RB_WRAP(touchscreen_mode)
 
 RB_WRAP(kbd_input)
 {
+    /*kbd_input(text, layout)*
+      note: layout needs special formatting
+      see includes/create_kbd_layout.lua
+      or lib/kbd_helper.c
+   */
     luaL_Buffer b;
     luaL_buffinit(L, &b);
 
     const char *input = lua_tostring(L, 1);
+    size_t layout_len;
+    const char *layout = lua_tolstring(L, 2, &layout_len);
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
@@ -154,7 +161,10 @@ RB_WRAP(kbd_input)
     else
         buffer[0] = '\0';
 
-    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, NULL))
+    if(layout_len <= 1 || (unsigned short)layout[layout_len - 1] != 0xFFFE)
+        layout = NULL;
+
+    if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, (unsigned short *)layout))
     {
         luaL_addstring(&b, buffer);
         luaL_pushresult(&b);

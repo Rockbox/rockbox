@@ -22,7 +22,7 @@ LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua \
 						math_ex.lua print.lua timer.lua playlist.lua pcm.lua \
 						sound.lua rbcompat.lua rbsettings.lua poly_points.lua \
 						printtable.lua printmenus.lua printsubmenu.lua \
-						menubuttons.lua menucoresettings.lua)
+						menubuttons.lua menucoresettings.lua create_kbd_layout.lua)
 
 ifndef APP_TYPE
     ROCKS += $(LUA_BUILDDIR)/lua.rock
