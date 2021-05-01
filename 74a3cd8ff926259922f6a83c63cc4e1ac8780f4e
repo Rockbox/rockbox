@@ -287,6 +287,30 @@
       "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d4cf7e5_f24e49ef",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-01T03:38:23Z",
+      "side": 1,
+      "message": "Ok, I think I get how the activity stack works. \n\nI am unsure, though if I should look specifically in the second and third (to the top) locations, or search the whole stack and see if I can find ACTIVITY_WPS at all. I think I\u0027m going to go with the latter. Should be fixed in next patchset.",
+      "parentUuid": "8181e2ce_2dea58f4",
+      "range": {
+        "startLine": 132,
+        "startChar": 4,
+        "endLine": 132,
+        "endChar": 19
+      },
+      "revId": "74a3cd8ff926259922f6a83c63cc4e1ac8780f4e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }

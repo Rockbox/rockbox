@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8cebae11_44c6ec5f",
+        "filename": "apps/iap/iap-lingo4.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-01T03:38:23Z",
+      "side": 0,
+      "message": "... I\u0027m not sure how all these comment single character changes happened in this file, and I\u0027m not sure how to get rid of them? Is there a way with git? I do have a legitimate change in the file (see above)",
+      "range": {
+        "startLine": 179,
+        "startChar": 33,
+        "endLine": 179,
+        "endChar": 40
+      },
+      "revId": "92140752d784d7180df294e41e0d4f90c34c86c9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
