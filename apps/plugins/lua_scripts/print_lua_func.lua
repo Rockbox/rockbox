@@ -1,23 +1,26 @@
+
 --RB LUA show all global variables; BILGUS
-require "actions"
-require "audio"
-require "buttons"
-require "color"
-require "draw"
-require "draw_floodfill"
-require "draw_poly"
-require "draw_text"
+if not ... then --if executed directly this is nil
+    require "actions"
+    require "audio"
+    require "buttons"
+    require "color"
+    require "draw"
+    require "draw_floodfill"
+    require "draw_poly"
+    require "draw_text"
 
-require "image"
-require "image_save"
+    require "image"
+    require "image_save"
 
-require "lcd"
-require "math_ex"
-require "pcm"
-require "playlist"
-require "print"
---require "settings" --uses a lot of memory
-require "sound"
+    require "lcd"
+    require "math_ex"
+    require "pcm"
+    require "playlist"
+    require "print"
+    --require "settings" --uses a lot of memory
+    require "sound"
+end
 collectgarbage("collect")
 
 local sDumpFile = "/rb-lua_functions.txt"
