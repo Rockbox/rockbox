@@ -16,6 +16,24 @@
       "revId": "0110b96b050b98a91697d584266ceb3732353620",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b2c23084_809b4c89",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 14
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-02T20:41:14Z",
+      "side": 1,
+      "message": "Oh, that is a remnant of when I was trying to do all this logic in onplay.c. I left it in just because I figured it\u0027s not hurting anything and might be useful for other purposes. This is so that when you cancel out of the save screen, it returns a different value than when you go through with saving. I can remove it if you wish, but I figured it\u0027s alright to keep.",
+      "parentUuid": "a18a1122_acf19c89",
+      "revId": "0110b96b050b98a91697d584266ceb3732353620",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
