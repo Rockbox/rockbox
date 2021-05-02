@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "529f4092_5fc69ca1",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-02T16:11:49Z",
+      "side": 1,
+      "message": "\u003e This still doesn\u0027t work if you get to the playlist from the WPS hotkey :(\n\u003e \n\u003e Turns out on further investigation, the hotkey and ACTION_WPS_VIEW_PLAYLIST keybinding do not actually enter the playlist viewer as a sub-activity. Instead, they pop the WPS activity and the root menu code handles popping back to the WPS when the list is finished... who\u0027d have guessed?\n\nThat\u0027s... really disappointing? What\u0027s the point of even having the activity stack if you\u0027re just going to go in one direction as far as the user can see and go the other direction for bookkeeping? Sigh...\n\nIt looks like the playlist is indeed null whenever it\u0027s dealing with the current active playlist, regardless of whether it was loaded from a playlist or just saved to a file. Or, at least it is in all the scenarios I could think to look at. I just printed out whether or not the playlist was null in the simulator.\n\nIt just seems like \"there\u0027s no way it could have been that easy.\"\n\nAnyway, yeah it seems to work just fine, so it should be fixed in next patchset.",
+      "parentUuid": "5e3c1646_4db855d5",
+      "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e975cfe7_f6e2fe07",
         "filename": "apps/menus/playlist_menu.c",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2021-05-01T15:33:45Z",
       "side": 1,
       "message": "Suggest rewriting this whole segment a bit. Right now if temp \u003d \"Playlists/foo\" is entered, then directoryonly \u003d \"Playlists\" and the reload fails.\n\nI\u0027m thinking something along these lines:\n\n  char directoryonly[MAX_PATH+3];\n  directoryonly[0] \u003d \u0027/\u0027; // hack: prepending two slashes simplifies the code\n  directoryonly[1] \u003d \u0027/\u0027;\n  strcpy(directoryonly+2, temp);\n\n  char* filename \u003d strrchr(directoryonly, \u0027/\u0027);\n  *filename \u003d \u0027\\0\u0027;\n  filename +\u003d 1;\n\n  ft_play_playlist(temp, directoryonly, filename, true);\n\nThis hack gives the right filename and directory, but the directory might start with two or three leading slashes in some cases. From my testing, it doesn\u0027t cause problems. It\u0027s not easy to prevent this in general, because users can enter stuff like \"////pl////blegh\". Rockbox seems to ignore redundant separators anyway, following the usual *nix conventions.\n\nThese types of things, are what I hate most in C. The simplest stuff can get so annoying and error prone...",
+      "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "02c23398_7fd4dc61",
+        "filename": "apps/menus/playlist_menu.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-02T16:11:49Z",
+      "side": 1,
+      "message": "\u003e Suggest rewriting this whole segment a bit. Right now if temp \u003d \"Playlists/foo\" is entered, then directoryonly \u003d \"Playlists\" and the reload fails.\n\u003e \n\u003e I\u0027m thinking something along these lines:\n\u003e \n\u003e   char directoryonly[MAX_PATH+3];\n\u003e   directoryonly[0] \u003d \u0027/\u0027; // hack: prepending two slashes simplifies the code\n\u003e   directoryonly[1] \u003d \u0027/\u0027;\n\u003e   strcpy(directoryonly+2, temp);\n\nThe only thing I\u0027m unsure about, is why prepend two slashes? Wouldn\u0027t one be sufficient?\n\n\u003e   char* filename \u003d strrchr(directoryonly, \u0027/\u0027);\n\u003e   *filename \u003d \u0027\\0\u0027;\n\u003e   filename +\u003d 1;\n\nI think this effectively does the same thing as what I\u0027m already doing with the \"path_slash\" variable, I might play around with it and see what\u0027s easier to read though, I had to sit and look at these three lines for a while before I really got what they did.",
+      "parentUuid": "e975cfe7_f6e2fe07",
       "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
@@ -50,6 +86,24 @@
       "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d522f58f_c35f6b95",
+        "filename": "apps/misc.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 1540,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-02T16:11:49Z",
+      "side": 1,
+      "message": "It looks like this function isn\u0027t going to be necessary in the next patchset anyway, but good note, I\u0027ll remember it next time. \n\nShould be removed in next patchset.",
+      "parentUuid": "44ada315_a31c0aa1",
+      "revId": "7049fdcf61b48c9f1c5b7cea868d95157ef51f9d",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }

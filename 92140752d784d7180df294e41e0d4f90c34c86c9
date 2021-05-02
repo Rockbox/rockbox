@@ -46,6 +46,30 @@
       "revId": "92140752d784d7180df294e41e0d4f90c34c86c9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f1d8887_af111038",
+        "filename": "apps/iap/iap-lingo4.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-02T16:11:49Z",
+      "side": 0,
+      "message": "It looks like this file is encoded in \"Western\" (maybe cp 1252, according to my ide?) even in the online git repository: see here https://git.rockbox.org/cgit/rockbox.git/tree/apps/iap/iap-lingo4.c (Ctrl-F search for \"Doors\")\n\nI\u0027ll just leave it in that encoding, heck for all I know it might be on purpose. These changes should be removed in next commit.",
+      "parentUuid": "8a678f7f_5a2e31bd",
+      "range": {
+        "startLine": 179,
+        "startChar": 33,
+        "endLine": 179,
+        "endChar": 40
+      },
+      "revId": "92140752d784d7180df294e41e0d4f90c34c86c9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
