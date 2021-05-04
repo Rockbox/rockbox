@@ -153,7 +153,7 @@ RB_WRAP(kbd_input)
 
     const char *input = lua_tostring(L, 1);
     size_t layout_len;
-    const char *layout = lua_tolstring(L, 2, &layout_len);
+    const unsigned char *layout = lua_tolstring(L, 2, &layout_len);
     char *buffer = luaL_prepbuffer(&b);
 
     if(input != NULL)
@@ -161,8 +161,12 @@ RB_WRAP(kbd_input)
     else
         buffer[0] = '\0';
 
-    if(layout_len <= 1 || (unsigned short)layout[layout_len - 1] != 0xFFFE)
+    if(layout_len <= 2 ||
+       layout[layout_len - 1] != 0xFE ||
+       layout[layout_len - 2] != 0xFF)
+    {
         layout = NULL;
+    }
 
     if(!rb->kbd_input(buffer, LUAL_BUFFERSIZE, (unsigned short *)layout))
     {
