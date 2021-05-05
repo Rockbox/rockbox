@@ -31,6 +31,7 @@ int set_time(const struct tm *tm);
 #if CONFIG_RTC
 bool valid_time(const struct tm *tm);
 void set_day_of_week(struct tm *tm);
+void set_day_of_year(struct tm *tm);
 #endif
 
 #endif /* _TIMEFUNCS_H_ */
