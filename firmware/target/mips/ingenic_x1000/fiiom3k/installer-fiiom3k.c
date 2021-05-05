@@ -21,6 +21,7 @@
 
 #include "installer.h"
 #include "nand-x1000.h"
+#include "system.h"
 #include "core_alloc.h"
 #include "file.h"
 
@@ -40,22 +41,27 @@
 
 static int install_from_buffer(const void* buf)
 {
+    int status = INSTALL_SUCCESS;
+    int mf_id, dev_id;
+
     if(nand_open())
         return ERR_FLASH_OPEN_FAILED;
-
-    int status = INSTALL_SUCCESS;
+    if(nand_identify(&mf_id, &dev_id)) {
+        status = ERR_FLASH_OPEN_FAILED;
+        goto _exit;
+    }
 
     if(nand_enable_writes(true)) {
         status = ERR_FLASH_DISABLE_WP_FAILED;
         goto _exit;
     }
 
-    if(nand_erase_bytes(0, BOOT_IMAGE_SIZE)) {
+    if(nand_erase(0, BOOT_IMAGE_SIZE)) {
         status = ERR_FLASH_ERASE_FAILED;
         goto _exit;
     }
 
-    if(nand_write_bytes(0, BOOT_IMAGE_SIZE, buf)) {
+    if(nand_write(0, BOOT_IMAGE_SIZE, (const uint8_t*)buf)) {
         status = ERR_FLASH_WRITE_FAILED;
         goto _exit;
     }
@@ -72,12 +78,17 @@ static int install_from_buffer(const void* buf)
 
 static int dump_to_buffer(void* buf)
 {
+    int status = INSTALL_SUCCESS;
+    int mf_id, dev_id;
+
     if(nand_open())
         return ERR_FLASH_OPEN_FAILED;
+    if(nand_identify(&mf_id, &dev_id)) {
+        status = ERR_FLASH_OPEN_FAILED;
+        goto _exit;
+    }
 
-    int status = INSTALL_SUCCESS;
-
-    if(nand_read_bytes(0, BOOT_IMAGE_SIZE, buf)) {
+    if(nand_read(0, BOOT_IMAGE_SIZE, (uint8_t*)buf)) {
         status = ERR_FLASH_READ_FAILED;
         goto _exit;
     }
@@ -90,12 +101,14 @@ static int dump_to_buffer(void* buf)
 int install_bootloader(const char* path)
 {
     /* Allocate memory to hold image */
-    int handle = core_alloc("boot_image", BOOT_IMAGE_SIZE);
+    size_t bufsize = BOOT_IMAGE_SIZE + CACHEALIGN_SIZE - 1;
+    int handle = core_alloc("boot_image", bufsize);
     if(handle < 0)
         return ERR_OUT_OF_MEMORY;
 
     int status = INSTALL_SUCCESS;
     void* buffer = core_get_data(handle);
+    CACHEALIGN_BUFFER(buffer, bufsize);
 
     /* Open the boot image */
     int fd = open(path, O_RDONLY);
@@ -132,13 +145,15 @@ int install_bootloader(const char* path)
 int dump_bootloader(const char* path)
 {
     /* Allocate memory to hold image */
-    int handle = core_alloc("boot_image", BOOT_IMAGE_SIZE);
+    size_t bufsize = BOOT_IMAGE_SIZE + CACHEALIGN_SIZE - 1;
+    int handle = core_alloc("boot_image", bufsize);
     if(handle < 0)
         return -1;
 
     /* Read data from flash */
     int fd = -1;
     void* buffer = core_get_data(handle);
+    CACHEALIGN_BUFFER(buffer, bufsize);
     int status = dump_to_buffer(buffer);
     if(status)
         goto _exit;

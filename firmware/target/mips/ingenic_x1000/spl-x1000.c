@@ -229,29 +229,39 @@ static void init(void)
 static int nandread(uint32_t addr, uint32_t size, void* buffer)
 {
     int rc;
+    int mf_id, dev_id;
 
     if((rc = nand_open()))
         return rc;
+    if((rc = nand_identify(&mf_id, &dev_id))) {
+        nand_close();
+        return rc;
+    }
 
-    rc = nand_read_bytes(addr, size, buffer);
+    rc = nand_read(addr, size, (uint8_t*)buffer);
     nand_close();
     return rc;
 }
 
-static int nandwrite(uint32_t addr, uint32_t size, void* buffer)
+static int nandwrite(uint32_t addr, uint32_t size, const void* buffer)
 {
     int rc;
+    int mf_id, dev_id;
 
     if((rc = nand_open()))
         return rc;
+    if((rc = nand_identify(&mf_id, &dev_id))) {
+        nand_close();
+        return rc;
+    }
 
     if((rc = nand_enable_writes(true)))
         goto _end;
 
-    if((rc = nand_erase_bytes(addr, size)))
+    if((rc = nand_erase(addr, size)))
         goto _end1;
 
-    rc = nand_write_bytes(addr, size, buffer);
+    rc = nand_write(addr, size, (const uint8_t*)buffer);
 
   _end1:
     /* an error here is very unlikely, so ignore it */
@@ -309,7 +319,7 @@ void main(void)
     case SPL_CMD_FLASH_WRITE:
         SPL_STATUS->err_code = nandwrite(SPL_ARGUMENTS->param1,
                                          SPL_ARGUMENTS->param2,
-                                         (void*)SPL_BUFFER_ADDRESS);
+                                         (const void*)SPL_BUFFER_ADDRESS);
         return;
     }
 }
