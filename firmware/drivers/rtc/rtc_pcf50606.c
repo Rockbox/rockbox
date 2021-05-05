@@ -56,7 +56,7 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_hour = buf[2];
     tm->tm_mday = buf[4];
     tm->tm_mon = buf[5] - 1;
-    tm->tm_yday = 0; /* Not implemented for now */
+
 #ifdef IRIVER_H300_SERIES 
     /* Special kludge to coexist with the iriver firmware. The iriver firmware
        stores the date as 1965+nn, and allows a range of 1980..2064. We use
@@ -68,6 +68,7 @@ int rtc_read_datetime(struct tm *tm)
 #endif /* IRIVER_H300_SERIES */
 
     set_day_of_week(tm);
+    set_day_of_year(tm);
 
     return rc;
 }
