@@ -135,5 +135,21 @@ void set_day_of_week(struct tm *tm)
     if(m == 0 || m == 1) y--;
     tm->tm_wday = (d + mo[m] + y + y/4 - y/100 + y/400) % 7;
 }
+
+void set_day_of_year(struct tm *tm)
+{
+    int y=tm->tm_year+1900;
+    int d=tm->tm_mday;
+    int m=tm->tm_mon;
+    d+=m*30;
+    if( ( (m>1) && !(y%4) ) &&  (  (y%100) ||  !(y%400)  )  )
+        d++;
+    if(m>6)
+    {
+        d+=4;
+        m-=7;
+    }
+    tm->tm_yday = d + ((m+1) /2);
+}
 #endif /* CONFIG_RTC */
 

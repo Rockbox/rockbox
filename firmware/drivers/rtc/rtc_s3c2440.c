@@ -39,9 +39,9 @@ int rtc_read_datetime(struct tm *tm)
     tm->tm_mday = BCD2DEC(BCDDATE);
     tm->tm_mon = BCD2DEC(BCDMON) - 1;
     tm->tm_year = BCD2DEC(BCDYEAR) + 100;
-    tm->tm_yday = 0; /* Not implemented for now */
 
     set_day_of_week(tm);
+    set_day_of_year(tm);
 
     return 1;
 }
