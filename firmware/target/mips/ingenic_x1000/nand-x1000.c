@@ -20,253 +20,350 @@
  ****************************************************************************/
 
 #include "nand-x1000.h"
-#include "nand-target.h"
 #include "sfc-x1000.h"
 #include "system.h"
-#include <string.h>
+#include <stddef.h>
 
-#if !defined(NAND_MAX_PAGE_SIZE) ||     \
-    !defined(NAND_INIT_SFC_DEV_CONF) || \
-    !defined(NAND_INIT_CLOCK_SPEED)
-# error "Target needs to specify NAND driver parameters"
-#endif
+/* NAND command numbers */
+#define NAND_CMD_READ_ID            0x9f
+#define NAND_CMD_WRITE_ENABLE       0x06
+#define NAND_CMD_GET_FEATURE        0x0f
+#define NAND_CMD_SET_FEATURE        0x1f
+#define NAND_CMD_PAGE_READ_TO_CACHE 0x13
+#define NAND_CMD_READ_FROM_CACHE    0x0b
+#define NAND_CMD_READ_FROM_CACHEx4  0x6b
+#define NAND_CMD_PROGRAM_LOAD       0x02
+#define NAND_CMD_PROGRAM_LOADx4     0x32
+#define NAND_CMD_PROGRAM_EXECUTE    0x10
+#define NAND_CMD_BLOCK_ERASE        0xd8
 
-/* Must be at least as big as a cacheline */
-#define NAND_AUX_BUFFER_SIZE CACHEALIGN_SIZE
+/* NAND device register addresses for GET_FEATURE / SET_FEATURE */
+#define NAND_FREG_PROTECTION        0xa0
+#define NAND_FREG_FEATURE           0xb0
+#define NAND_FREG_STATUS            0xc0
 
-/* Writes have been enabled */
-#define NAND_DRV_FLAG_WRITEABLE 0x01
+/* Protection register bits */
+#define NAND_FREG_PROTECTION_BRWD   0x80
+#define NAND_FREG_PROTECTION_BP2    0x20
+#define NAND_FREG_PROTECTION_BP1    0x10
+#define NAND_FREG_PROTECTION_BP0    0x80
+/* Mask of BP bits 0-2 */
+#define NAND_FREG_PROTECTION_ALLBP  (0x38)
 
-/* Defined by target */
-extern const nand_chip_desc target_nand_chip_descs[];
+/* Feature register bits */
+#define NAND_FREG_FEATURE_QE        0x01
 
-#ifdef BOOTLOADER_SPL
-# define NANDBUFFER_ATTR __attribute__((section(".sdram"))) CACHEALIGN_ATTR
+/* Status register bits */
+#define NAND_FREG_STATUS_OIP        0x01
+#define NAND_FREG_STATUS_WEL        0x02
+#define NAND_FREG_STATUS_E_FAIL     0x04
+#define NAND_FREG_STATUS_P_FAIL     0x08
+
+/* NAND chip config */
+const nand_chip_data target_nand_chip_data[] = {
+#ifdef FIIO_M3K
+    {
+        /* ATO25D1GA */
+        .mf_id = 0x9b,
+        .dev_id = 0x12,
+        .dev_conf = jz_orf(SFC_DEV_CONF, CE_DL(1), HOLD_DL(1), WP_DL(1),
+                           CPHA(0), CPOL(0), TSH(7), TSETUP(0), THOLD(0),
+                           STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS), SMP_DELAY(1)),
+        .clock_freq = 150000000,
+        .log2_page_size = 11, /* = 2048 bytes */
+        .log2_block_size = 6, /* = 64 pages */
+        .rowaddr_width = 3,
+        .coladdr_width = 2,
+        .flags = NANDCHIP_FLAG_QUAD,
+    }
 #else
-# define NANDBUFFER_ATTR CACHEALIGN_ATTR
+    /* Nobody will use this anyway if the device has no NAND flash */
+    { 0 },
 #endif
+};
 
-/* Globals for the driver */
-static unsigned char pagebuffer[NAND_MAX_PAGE_SIZE] NANDBUFFER_ATTR;
-static unsigned char auxbuffer[NAND_AUX_BUFFER_SIZE] NANDBUFFER_ATTR;
-static nand_drv nand_driver;
+const size_t target_nand_chip_count =
+    sizeof(target_nand_chip_data) / sizeof(nand_chip_data);
 
-static void nand_drv_reset(nand_drv* d)
+/* NAND ops -- high level primitives used by the driver */
+static int nandop_wait_status(int errbit);
+static int nandop_read_page(uint32_t row_addr, uint8_t* buf);
+static int nandop_write_page(uint32_t row_addr, const uint8_t* buf);
+static int nandop_erase_block(uint32_t block_addr);
+static int nandop_set_write_protect(bool en);
+
+/* NAND commands -- 1-to-1 mapping between chip commands and functions */
+static int nandcmd_read_id(int* mf_id, int* dev_id);
+static int nandcmd_write_enable(void);
+static int nandcmd_get_feature(uint8_t reg);
+static int nandcmd_set_feature(uint8_t reg, uint8_t val);
+static int nandcmd_page_read_to_cache(uint32_t row_addr);
+static int nandcmd_read_from_cache(uint8_t* buf);
+static int nandcmd_program_load(const uint8_t* buf);
+static int nandcmd_program_execute(uint32_t row_addr);
+static int nandcmd_block_erase(uint32_t block_addr);
+
+struct nand_drv {
+    const nand_chip_data* chip_data;
+    bool write_enabled;
+};
+
+static struct nand_drv nand_drv;
+static uint8_t nand_auxbuf[32] CACHEALIGN_ATTR;
+
+static void nand_drv_reset(void)
 {
-    d->chip_ops = NULL;
-    d->chip_data = NULL;
-    d->pagebuf = &pagebuffer[0];
-    d->auxbuf = &auxbuffer[0];
-    d->raw_page_size = 0;
-    d->flags = 0;
+    nand_drv.chip_data = NULL;
+    nand_drv.write_enabled = false;
 }
 
-/* Driver code */
 int nand_open(void)
 {
     sfc_init();
     sfc_lock();
 
-    /* Reset driver state */
-    nand_drv_reset(&nand_driver);
-
-    /* Init hardware */
+    nand_drv_reset();
     sfc_open();
-    sfc_set_dev_conf(NAND_INIT_SFC_DEV_CONF);
-    sfc_set_clock(NAND_INIT_CLOCK_SPEED);
 
-    /* Identify NAND chip */
-    int status = 0;
-    int nandid = nandcmd_read_id(&nand_driver);
-    if(nandid < 0) {
-        status = NANDERR_CHIP_UNSUPPORTED;
-        goto _err;
-    }
+    const nand_chip_data* chip_data = &target_nand_chip_data[0];
+    sfc_set_dev_conf(chip_data->dev_conf);
+    sfc_set_clock(chip_data->clock_freq);
 
-    unsigned char mf_id = nandid >> 8;
-    unsigned char dev_id = nandid & 0xff;
-    const nand_chip_desc* desc = &target_nand_chip_descs[0];
-    while(1) {
-        if(desc->data == NULL || desc->ops == NULL) {
-            status = NANDERR_CHIP_UNSUPPORTED;
-            goto _err;
-        }
-
-        if(desc->data->mf_id == mf_id && desc->data->dev_id == dev_id)
-            break;
-    }
-
-    /* Fill driver parameters */
-    nand_driver.chip_ops = desc->ops;
-    nand_driver.chip_data = desc->data;
-    nand_driver.raw_page_size = desc->data->page_size + desc->data->spare_size;
-
-    /* Configure hardware and run init op */
-    sfc_set_dev_conf(desc->data->dev_conf);
-    sfc_set_clock(desc->data->clock_freq);
-
-    if((status = desc->ops->open(&nand_driver)) < 0)
-        goto _err;
-
-  _exit:
-    sfc_unlock();
-    return status;
-  _err:
-    nand_drv_reset(&nand_driver);
-    sfc_close();
-    goto _exit;
+    return NAND_SUCCESS;
 }
 
 void nand_close(void)
 {
     sfc_lock();
-    nand_driver.chip_ops->close(&nand_driver);
-    nand_drv_reset(&nand_driver);
     sfc_close();
+    nand_drv_reset();
     sfc_unlock();
 }
 
-int nand_enable_writes(bool en)
+int nand_identify(int* mf_id, int* dev_id)
 {
     sfc_lock();
 
-    int st = nand_driver.chip_ops->set_wp_enable(&nand_driver, en);
-    if(st >= 0) {
-        if(en)
-            nand_driver.flags |= NAND_DRV_FLAG_WRITEABLE;
+    int status = nandcmd_read_id(mf_id, dev_id);
+    if(status < 0)
+        goto error;
+
+    for(size_t i = 0; i < target_nand_chip_count; ++i) {
+        const nand_chip_data* data = &target_nand_chip_data[i];
+        if(data->mf_id == *mf_id && data->dev_id == *dev_id) {
+            nand_drv.chip_data = data;
+            break;
+        }
+    }
+
+    if(!nand_drv.chip_data) {
+        status = NAND_ERR_UNKNOWN_CHIP;
+        goto error;
+    }
+
+    /* Set parameters according to new chip data */
+    sfc_set_dev_conf(nand_drv.chip_data->dev_conf);
+    sfc_set_clock(nand_drv.chip_data->clock_freq);
+    status = NAND_SUCCESS;
+
+  error:
+    sfc_unlock();
+    return status;
+}
+
+const nand_chip_data* nand_get_chip_data(void)
+{
+    return nand_drv.chip_data;
+}
+
+extern int nand_enable_writes(bool en)
+{
+    if(en == nand_drv.write_enabled)
+        return NAND_SUCCESS;
+
+    int rc = nandop_set_write_protect(!en);
+    if(rc == NAND_SUCCESS)
+        nand_drv.write_enabled = en;
+
+    return rc;
+}
+
+static int nand_rdwr(bool write, uint32_t addr, uint32_t size, uint8_t* buf)
+{
+    const uint32_t page_size = (1 << nand_drv.chip_data->log2_page_size);
+
+    if(addr & (page_size - 1))
+        return NAND_ERR_UNALIGNED;
+    if(size & (page_size - 1))
+        return NAND_ERR_UNALIGNED;
+    if(size <= 0)
+        return NAND_SUCCESS;
+    if(write && !nand_drv.write_enabled)
+        return NAND_ERR_WRITE_PROTECT;
+    /* FIXME: re-enable this check after merging new SPL+bootloader.
+     * It's only necessary for DMA, which is currently not used, but it's a
+     * good practice anyway. Disable for now due to SPL complications. */
+    /*if((uint32_t)buf & (CACHEALIGN_SIZE - 1))
+        return NAND_ERR_UNALIGNED;*/
+
+    addr >>= nand_drv.chip_data->log2_page_size;
+    size >>= nand_drv.chip_data->log2_page_size;
+
+    int rc = NAND_SUCCESS;
+    sfc_lock();
+
+    for(; size > 0; --size, ++addr, buf += page_size) {
+        if(write)
+            rc = nandop_write_page(addr, buf);
         else
-            nand_driver.flags &= ~NAND_DRV_FLAG_WRITEABLE;
+            rc = nandop_read_page(addr, buf);
+
+        if(rc)
+            break;
     }
 
     sfc_unlock();
-    return st;
+    return rc;
 }
 
-extern int nand_read_bytes(uint32_t byteaddr, int count, void* buf)
+int nand_read(uint32_t addr, uint32_t size, uint8_t* buf)
 {
-    if(count <= 0)
-        return 0;
+    return nand_rdwr(false, addr, size, buf);
+}
 
-    nand_drv* d = &nand_driver;
-    uint32_t rowaddr = byteaddr / d->chip_data->page_size;
-    uint32_t coladdr = byteaddr % d->chip_data->page_size;
-    unsigned char* dstbuf = (unsigned char*)buf;
-    int status = 0;
+int nand_write(uint32_t addr, uint32_t size, const uint8_t* buf)
+{
+    return nand_rdwr(true, addr, size, (uint8_t*)buf);
+}
 
+int nand_erase(uint32_t addr, uint32_t size)
+{
+    const uint32_t page_size = 1 << nand_drv.chip_data->log2_page_size;
+    const uint32_t block_size = page_size << nand_drv.chip_data->log2_block_size;
+    const uint32_t pages_per_block = 1 << nand_drv.chip_data->log2_page_size;
+
+    if(addr & (block_size - 1))
+        return NAND_ERR_UNALIGNED;
+    if(size & (block_size - 1))
+        return NAND_ERR_UNALIGNED;
+    if(size <= 0)
+        return NAND_SUCCESS;
+    if(!nand_drv.write_enabled)
+        return NAND_ERR_WRITE_PROTECT;
+
+    addr >>= nand_drv.chip_data->log2_page_size;
+    size >>= nand_drv.chip_data->log2_page_size;
+    size >>= nand_drv.chip_data->log2_block_size;
+
+    int rc = NAND_SUCCESS;
     sfc_lock();
-    do {
-        if(d->chip_ops->read_page(d, rowaddr, d->pagebuf) < 0) {
-            status = NANDERR_READ_FAILED;
-            goto _end;
-        }
 
-        if(d->chip_ops->ecc_read(d, d->pagebuf) < 0) {
-            status = NANDERR_ECC_FAILED;
-            goto _end;
-        }
+    for(; size > 0; --size, addr += pages_per_block)
+        if((rc = nandop_erase_block(addr)))
+            break;
 
-        int amount = d->chip_data->page_size - coladdr;
-        if(amount > count)
-            amount = count;
-
-        memcpy(dstbuf, d->pagebuf, amount);
-        dstbuf += amount;
-        count -= amount;
-        rowaddr += 1;
-        coladdr = 0;
-    } while(count > 0);
-
-  _end:
     sfc_unlock();
-    return status;
+    return rc;
 }
 
-int nand_write_bytes(uint32_t byteaddr, int count, const void* buf)
+/*
+ * NAND ops
+ */
+
+static int nandop_wait_status(int errbit)
 {
-    nand_drv* d = &nand_driver;
-
-    if((d->flags & NAND_DRV_FLAG_WRITEABLE) == 0)
-        return NANDERR_WRITE_PROTECTED;
-
-    if(count <= 0)
-        return 0;
-
-    uint32_t rowaddr = byteaddr / d->chip_data->page_size;
-    uint32_t coladdr = byteaddr % d->chip_data->page_size;
-
-    /* Only support whole page writes right now */
-    if(coladdr != 0)
-        return NANDERR_UNALIGNED_ADDRESS;
-    if(count % d->chip_data->page_size)
-        return NANDERR_UNALIGNED_LENGTH;
-
-    const unsigned char* srcbuf = (const unsigned char*)buf;
-    int status = 0;
-
-    sfc_lock();
+    int reg;
     do {
-        memcpy(d->pagebuf, srcbuf, d->chip_data->page_size);
-        d->chip_ops->ecc_write(d, d->pagebuf);
+        reg = nandcmd_get_feature(NAND_FREG_STATUS);
+        if(reg < 0)
+            return reg;
+    } while(reg & NAND_FREG_STATUS_OIP);
 
-        if(d->chip_ops->write_page(d, rowaddr, d->pagebuf) < 0) {
-            status = NANDERR_PROGRAM_FAILED;
-            goto _end;
-        }
+    if(reg & errbit)
+        return NAND_ERR_COMMAND;
 
-        rowaddr += 1;
-        srcbuf += d->chip_data->page_size;
-        count -= d->chip_data->page_size;
-    } while(count > 0);
-
-  _end:
-    sfc_unlock();
-    return status;
+    return reg;
 }
 
-int nand_erase_bytes(uint32_t byteaddr, int count)
+static int nandop_read_page(uint32_t row_addr, uint8_t* buf)
 {
-    nand_drv* d = &nand_driver;
+    int status;
 
-    if((d->flags & NAND_DRV_FLAG_WRITEABLE) == 0)
-        return NANDERR_WRITE_PROTECTED;
+    if((status = nandcmd_page_read_to_cache(row_addr)) < 0)
+        return status;
+    if((status = nandop_wait_status(0)) < 0)
+        return status;
+    if((status = nandcmd_read_from_cache(buf)) < 0)
+        return status;
 
-    /* Ensure address is aligned to a block boundary */
-    if(byteaddr % d->chip_data->page_size)
-        return NANDERR_UNALIGNED_ADDRESS;
+    return NAND_SUCCESS;
+}
 
-    uint32_t blockaddr = byteaddr / d->chip_data->page_size;
-    if(blockaddr % d->chip_data->block_size)
-        return NANDERR_UNALIGNED_ADDRESS;
+static int nandop_write_page(uint32_t row_addr, const uint8_t* buf)
+{
+    int status;
 
-    /* Ensure length is also aligned to the size of a block */
-    if(count % d->chip_data->page_size)
-        return NANDERR_UNALIGNED_LENGTH;
+    if((status = nandcmd_write_enable()) < 0)
+        return status;
+    if((status = nandcmd_program_load(buf)) < 0)
+        return status;
+    if((status = nandcmd_program_execute(row_addr)) < 0)
+        return status;
+    if((status = nandop_wait_status(NAND_FREG_STATUS_P_FAIL)) < 0)
+        return status;
 
-    count /= d->chip_data->page_size;
-    if(count % d->chip_data->block_size)
-        return NANDERR_UNALIGNED_LENGTH;
+    return NAND_SUCCESS;
+}
 
-    count /= d->chip_data->block_size;
+static int nandop_erase_block(uint32_t block_addr)
+{
+    int status;
 
-    int status = 0;
-    sfc_lock();
+    if((status = nandcmd_write_enable()) < 0)
+        return status;
+    if((status = nandcmd_block_erase(block_addr)) < 0)
+        return status;
+    if((status = nandop_wait_status(NAND_FREG_STATUS_E_FAIL)) < 0)
+        return status;
 
-    for(int i = 0; i < count; ++i) {
-        if(d->chip_ops->erase_block(d, blockaddr)) {
-            status = NANDERR_ERASE_FAILED;
-            goto _end;
-        }
+    return NAND_SUCCESS;
+}
 
-        /* Advance to next block */
-        blockaddr += d->chip_data->block_size;
+static int nandop_set_write_protect(bool en)
+{
+    int val = nandcmd_get_feature(NAND_FREG_PROTECTION);
+    if(val < 0)
+        return val;
+
+    if(en) {
+        val &= ~NAND_FREG_PROTECTION_ALLBP;
+        if(nand_drv.chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
+            val &= ~NAND_FREG_PROTECTION_BRWD;
+    } else {
+        val |= NAND_FREG_PROTECTION_ALLBP;
+        if(nand_drv.chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
+            val |= NAND_FREG_PROTECTION_BRWD;
     }
 
-  _end:
-    sfc_unlock();
-    return status;
+    /* NOTE: The WP pin typically only protects changes to the protection
+     * register -- it doesn't actually prevent writing to the chip. That's
+     * why it should be re-enabled after setting the new protection status.
+     */
+    sfc_set_wp_enable(false);
+    int status = nandcmd_set_feature(NAND_FREG_PROTECTION, val);
+    sfc_set_wp_enable(true);
+
+    if(status < 0)
+        return status;
+
+    return NAND_SUCCESS;
 }
 
-int nandcmd_read_id(nand_drv* d)
+/*
+ * Low-level NAND commands
+ */
+
+static int nandcmd_read_id(int* mf_id, int* dev_id)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_READ_ID;
@@ -274,72 +371,72 @@ int nandcmd_read_id(nand_drv* d)
     op.addr_bytes = 1;
     op.addr_lo = 0;
     op.data_bytes = 2;
-    op.buffer = d->auxbuf;
+    op.buffer = nand_auxbuf;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return (d->auxbuf[0] << 8) | d->auxbuf[1];
+    *mf_id = nand_auxbuf[0];
+    *dev_id = nand_auxbuf[1];
+    return NAND_SUCCESS;
 }
 
-int nandcmd_write_enable(nand_drv* d)
+static int nandcmd_write_enable(void)
 {
-    (void)d;
-
     sfc_op op = {0};
     op.command = NAND_CMD_WRITE_ENABLE;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
+    return NAND_SUCCESS;
 }
 
-int nandcmd_get_feature(nand_drv* d, int reg)
+static int nandcmd_get_feature(uint8_t reg)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_GET_FEATURE;
     op.flags = SFC_FLAG_READ;
     op.addr_bytes = 1;
-    op.addr_lo = reg & 0xff;
+    op.addr_lo = reg;
     op.data_bytes = 1;
-    op.buffer = d->auxbuf;
+    op.buffer = nand_auxbuf;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return d->auxbuf[0];
+    return nand_auxbuf[0];
 }
 
-int nandcmd_set_feature(nand_drv* d, int reg, int val)
+static int nandcmd_set_feature(uint8_t reg, uint8_t val)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_SET_FEATURE;
     op.flags = SFC_FLAG_READ;
     op.addr_bytes = 1;
-    op.addr_lo = reg & 0xff;
+    op.addr_lo = reg;
     op.data_bytes = 1;
-    op.buffer = d->auxbuf;
-    d->auxbuf[0] = val & 0xff;
+    op.buffer = nand_auxbuf;
+    nand_auxbuf[0] = val;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
+    return NAND_SUCCESS;
 }
 
-int nandcmd_page_read_to_cache(nand_drv* d, uint32_t rowaddr)
+static int nandcmd_page_read_to_cache(uint32_t row_addr)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_PAGE_READ_TO_CACHE;
-    op.addr_bytes = d->chip_data->rowaddr_width;
-    op.addr_lo = rowaddr;
+    op.addr_bytes = nand_drv.chip_data->rowaddr_width;
+    op.addr_lo = row_addr;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
+    return NAND_SUCCESS;
 }
 
-int nandcmd_read_from_cache(nand_drv* d, unsigned char* buf)
+static int nandcmd_read_from_cache(uint8_t* buf)
 {
     sfc_op op = {0};
-    if(d->chip_data->flags & NANDCHIP_FLAG_QUAD) {
+    if(nand_drv.chip_data->flags & NANDCHIP_FLAG_QUAD) {
         op.command = NAND_CMD_READ_FROM_CACHEx4;
         op.mode = SFC_MODE_QUAD_IO;
     } else {
@@ -348,21 +445,21 @@ int nandcmd_read_from_cache(nand_drv* d, unsigned char* buf)
     }
 
     op.flags = SFC_FLAG_READ;
-    op.addr_bytes = d->chip_data->coladdr_width;
+    op.addr_bytes = nand_drv.chip_data->coladdr_width;
     op.addr_lo = 0;
-    op.dummy_bits = 8;
-    op.data_bytes = d->raw_page_size;
+    op.dummy_bits = 8; // NOTE: this may need a chip_data parameter
+    op.data_bytes = (1 << nand_drv.chip_data->log2_page_size);
     op.buffer = buf;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
+    return NAND_SUCCESS;
 }
 
-int nandcmd_program_load(nand_drv* d, const unsigned char* buf)
+static int nandcmd_program_load(const uint8_t* buf)
 {
     sfc_op op = {0};
-    if(d->chip_data->flags & NANDCHIP_FLAG_QUAD) {
+    if(nand_drv.chip_data->flags & NANDCHIP_FLAG_QUAD) {
         op.command = NAND_CMD_PROGRAM_LOADx4;
         op.mode = SFC_MODE_QUAD_IO;
     } else {
@@ -371,156 +468,36 @@ int nandcmd_program_load(nand_drv* d, const unsigned char* buf)
     }
 
     op.flags = SFC_FLAG_WRITE;
-    op.addr_bytes = d->chip_data->coladdr_width;
+    op.addr_bytes = nand_drv.chip_data->coladdr_width;
     op.addr_lo = 0;
-    op.data_bytes = d->raw_page_size;
+    op.data_bytes = (1 << nand_drv.chip_data->log2_page_size);
     op.buffer = (void*)buf;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
+    return NAND_SUCCESS;
 }
 
-int nandcmd_program_execute(nand_drv* d, uint32_t rowaddr)
+static int nandcmd_program_execute(uint32_t row_addr)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_PROGRAM_EXECUTE;
-    op.addr_bytes = d->chip_data->rowaddr_width;
-    op.addr_lo = rowaddr;
+    op.addr_bytes = nand_drv.chip_data->rowaddr_width;
+    op.addr_lo = row_addr;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
+    return NAND_SUCCESS;
 }
 
-int nandcmd_block_erase(nand_drv* d, uint32_t blockaddr)
+static int nandcmd_block_erase(uint32_t block_addr)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_BLOCK_ERASE;
-    op.addr_bytes = d->chip_data->rowaddr_width;
-    op.addr_lo = blockaddr;
+    op.addr_bytes = nand_drv.chip_data->rowaddr_width;
+    op.addr_lo = block_addr;
     if(sfc_exec(&op))
-        return NANDERR_COMMAND_FAILED;
+        return NAND_ERR_CONTROLLER;
 
-    return 0;
-}
-
-const nand_chip_ops nand_chip_ops_std = {
-    .open = nandop_std_open,
-    .close = nandop_std_close,
-    .read_page = nandop_std_read_page,
-    .write_page = nandop_std_write_page,
-    .erase_block = nandop_std_erase_block,
-    .set_wp_enable = nandop_std_set_wp_enable,
-    .ecc_read = nandop_ecc_none_read,
-    .ecc_write = nandop_ecc_none_write,
-};
-
-/* Helper needed by other ops */
-static int nandop_std_wait_status(nand_drv* d, int errbit)
-{
-    int reg;
-    do {
-        reg = nandcmd_get_feature(d, NAND_FREG_STATUS);
-        if(reg < 0)
-            return reg;
-    } while(reg & NAND_FREG_STATUS_OIP);
-
-    if(reg & errbit)
-        return NANDERR_OTHER;
-
-    return reg;
-}
-
-int nandop_std_open(nand_drv* d)
-{
-    (void)d;
-    return 0;
-}
-
-void nandop_std_close(nand_drv* d)
-{
-    (void)d;
-}
-
-int nandop_std_read_page(nand_drv* d, uint32_t rowaddr, unsigned char* buf)
-{
-    int status;
-
-    if((status = nandcmd_page_read_to_cache(d, rowaddr)) < 0)
-        return status;
-    if((status = nandop_std_wait_status(d, 0)) < 0)
-        return status;
-    if((status = nandcmd_read_from_cache(d, buf)) < 0)
-        return status;
-
-    return 0;
-}
-
-int nandop_std_write_page(nand_drv* d, uint32_t rowaddr, const unsigned char* buf)
-{
-    int status;
-
-    if((status = nandcmd_write_enable(d)) < 0)
-        return status;
-    if((status = nandcmd_program_load(d, buf)) < 0)
-        return status;
-    if((status = nandcmd_program_execute(d, rowaddr)) < 0)
-        return status;
-    if((status = nandop_std_wait_status(d, NAND_FREG_STATUS_P_FAIL)) < 0)
-        return status;
-
-    return 0;
-}
-
-int nandop_std_erase_block(nand_drv* d, uint32_t blockaddr)
-{
-    int status;
-
-    if((status = nandcmd_write_enable(d)) < 0)
-        return status;
-    if((status = nandcmd_block_erase(d, blockaddr)) < 0)
-        return status;
-    if((status = nandop_std_wait_status(d, NAND_FREG_STATUS_E_FAIL) < 0))
-        return status;
-
-    return 0;
-}
-
-int nandop_std_set_wp_enable(nand_drv* d, bool en)
-{
-    int val = nandcmd_get_feature(d, NAND_FREG_PROTECTION);
-    if(val < 0)
-        return val;
-
-    if(en) {
-        val &= ~NAND_FREG_PROTECTION_ALLBP;
-        if(d->chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
-            val &= ~NAND_FREG_PROTECTION_BRWD;
-    } else {
-        val |= NAND_FREG_PROTECTION_ALLBP;
-        if(d->chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
-            val |= NAND_FREG_PROTECTION_BRWD;
-    }
-
-    sfc_set_wp_enable(false);
-    int status = nandcmd_set_feature(d, NAND_FREG_PROTECTION, val);
-    sfc_set_wp_enable(true);
-
-    if(status < 0)
-        return status;
-
-    return 0;
-}
-
-int nandop_ecc_none_read(nand_drv* d, unsigned char* buf)
-{
-    (void)d;
-    (void)buf;
-    return 0;
-}
-
-void nandop_ecc_none_write(nand_drv* d, unsigned char* buf)
-{
-    memset(&buf[d->chip_data->page_size], 0xff, d->chip_data->spare_size);
+    return NAND_SUCCESS;
 }

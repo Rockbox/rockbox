@@ -15,4 +15,13 @@
 #define NANDERR_COMMAND_FAILED    (-9)
 #define NANDERR_OTHER             (-99)
 
+/* TEMPORARY -- compatibility hack for jztool's sake.
+ * This will go away once the new bootloader gets merged */
+#define NAND_SUCCESS              0
+#define NAND_ERR_UNKNOWN_CHIP     NANDERR_CHIP_UNSUPPORTED
+#define NAND_ERR_UNALIGNED        NANDERR_UNALIGNED_ADDRESS
+#define NAND_ERR_WRITE_PROTECT    NANDERR_WRITE_PROTECTED
+#define NAND_ERR_CONTROLLER       NANDERR_OTHER
+#define NAND_ERR_COMMAND          NANDERR_COMMAND_FAILED
+
 #endif /* __NAND_X1000_ERR_H__ */

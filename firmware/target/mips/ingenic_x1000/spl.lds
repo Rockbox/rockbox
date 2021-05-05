@@ -11,12 +11,6 @@ MEMORY {
      * and the next 2k are occupied by SPL header */
     TCSM : ORIGIN = X1000_TCSM_BASE + 0x1800,
            LENGTH = X1000_TCSM_SIZE - 0x1800
-
-    /* Small area of DRAM is required for NAND bounce buffers,
-     * though not strictly necessary as ECC isn't really practical
-     * this early in the boot */
-    DRAM : ORIGIN = X1000_DRAM_END - 16K,
-           LENGTH = 16K
 }
 
 SECTIONS
@@ -51,11 +45,6 @@ SECTIONS
         *(.scommon*);
         _bssend = .;
     } > TCSM
-
-    .sdram (NOLOAD) :
-    {
-        *(.sdram);
-    } > DRAM
 
     /DISCARD/ :
     {

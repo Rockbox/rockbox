@@ -1698,7 +1698,6 @@ target/mips/ingenic_x1000/fiiom3k/backlight-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/button-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/installer-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/lcd-fiiom3k.c
-target/mips/ingenic_x1000/fiiom3k/nand-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c
 #ifdef BOOTLOADER_SPL
 target/mips/ingenic_x1000/fiiom3k/spl-fiiom3k.c
