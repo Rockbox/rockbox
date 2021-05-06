@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c95e45e_d00c135c",
+        "filename": "apps/plugins/lua/include_lua/menubuttons.lua",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-06T19:30:07Z",
+      "side": 1,
+      "message": "needs copyright notice",
+      "revId": "abf812a67d15b9700ec5a6a3629fe8df66dd9444",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1cf97374_aa855531",
+        "filename": "apps/plugins/lua/include_lua/menucoresettings.lua",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-06T19:30:07Z",
+      "side": 1,
+      "message": "needs copyright notice",
+      "revId": "abf812a67d15b9700ec5a6a3629fe8df66dd9444",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9c34a19_53604b82",
+        "filename": "apps/plugins/lua/include_lua/temploader.lua",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-06T19:30:07Z",
+      "side": 1,
+      "message": "need to add a way to push calling module name in [...] varargs to act like the inbuilt require function",
+      "range": {
+        "startLine": 24,
+        "startChar": 74,
+        "endLine": 24,
+        "endChar": 75
+      },
+      "revId": "abf812a67d15b9700ec5a6a3629fe8df66dd9444",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
