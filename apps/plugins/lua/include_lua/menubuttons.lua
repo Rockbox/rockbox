@@ -1,6 +1,42 @@
+--[[
+/***************************************************************************
+ *             __________               __   ___.
+ *   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
+ *   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
+ *   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
+ *   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
+ *                     \/            \/     \/    \/            \/
+ * $Id$
+ *
+ * Copyright (C) 2021 William Wilgus
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
+ * KIND, either express or implied.
+ *
+ ****************************************************************************/
+]]
+-- Bilgus 4/2021
+local oldrb = rb
+local tmploader = require("temploader")
 
-local rbac_is_loaded = (package.loaded.actions ~= nil)
-require("actions")   -- Contains rb.actions & rb.contexts
+local a_is_loaded = (package.loaded.actions ~= nil)
+local rbold = rb
+
+if not a_is_loaded then
+    --replace the rb table so we can keep the defines out of the namespace
+    rb = {}
+end
+
+--require("actions")   -- Contains rb.actions & rb.contexts
+local actions, err = tmploader("actions")
+if err then
+    error(err)
+end
 
 -- Menu Button definitions --
 local button_t = {
@@ -19,10 +55,5 @@ local button_t = {
     UPR = rb.actions.PLA_UP_REPEAT,
 }
 
-if not rbac_is_loaded then
-    rb.actions = nil
-    rb.contexts = nil
-    package.loaded.actionss = nil
-end
-
+rb = oldrb
 return button_t

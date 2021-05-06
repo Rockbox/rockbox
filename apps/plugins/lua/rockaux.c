@@ -52,6 +52,8 @@ char *strerror(int errnum)
 */
 int splash_scroller(int timeout, const char* str)
 {
+    if (!str)
+        str = "[nil]";
     int w, ch_w, ch_h;
     rb->lcd_getstringsize("W", &ch_w, &ch_h);
 
