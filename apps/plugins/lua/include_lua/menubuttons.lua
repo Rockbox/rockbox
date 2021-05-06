@@ -1,6 +1,14 @@
+-- Bilgus 4/2021
+local oldrb = rb
+local tmploader = require("temploader")
 
-local rbac_is_loaded = (package.loaded.actions ~= nil)
-require("actions")   -- Contains rb.actions & rb.contexts
+rb = {} --replace the rb table so we can keep the defines out of the namespace
+--require("actions")   -- Contains rb.actions & rb.contexts
+
+local actions, err = tmploader("actions")
+if err then
+    error(err)
+end
 
 -- Menu Button definitions --
 local button_t = {
@@ -19,10 +27,5 @@ local button_t = {
     UPR = rb.actions.PLA_UP_REPEAT,
 }
 
-if not rbac_is_loaded then
-    rb.actions = nil
-    rb.contexts = nil
-    package.loaded.actionss = nil
-end
-
+rb = oldrb
 return button_t

@@ -2,18 +2,28 @@
 --Bilgus 4/2021
 
 local function get_core_settings()
+    local tmploader = require("temploader")
+    -- rbsettings is a large module to have sitting in RAM
+    -- if user already has it in RAM then use that
     local rbs_is_loaded = (package.loaded.rbsettings ~= nil)
     local s_is_loaded = (package.loaded.settings ~= nil)
+    local rbold = rb
 
-    require("rbsettings")
-    require("settings")
-    rb.metadata = nil -- remove track metadata settings
+    if not rbs_is_loaded then
+        --replace the rb table so we can keep the defines out of the namespace
+        rb = { global_settings = rb.global_settings,
+               global_status = rb.global_status}
+    end
+
+    tmploader("rbsettings")
+    tmploader("settings")
 
     local rb_settings = rb.settings.dump('global_settings', "system")
     local color_table = {}
     local talk_table = {}
     local list_settings_table = {}
     local list_settings = "cursor_style|show_icons|statusbar|scrollbar|scrollbar_width|list_separator_height|backdrop_file|"
+
     for key, value in pairs(rb_settings) do
             key = key or ""
             if (key:find("color")) then
@@ -27,15 +37,9 @@ local function get_core_settings()
 
     if not s_is_loaded then
         rb.settings = nil
-        package.loaded.settings = nil
     end
 
-    if not rbs_is_loaded then
-        rb.system = nil
-        rb.metadata = nil
-        package.loaded.rbsettings = nil
-    end
-
+    rb = rbold
     rb.core_color_table = color_table
     rb.core_talk_table = talk_table
     rb.core_list_settings_table = list_settings_table
