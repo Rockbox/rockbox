@@ -15,6 +15,7 @@
 
 /* define this if you have access to the quickscreen */
 #define HAVE_QUICKSCREEN
+#define HAVE_HOTKEY
 
 #define HAVE_HEADPHONE_DETECTION
 #define HAVE_LINEOUT_DETECTION
