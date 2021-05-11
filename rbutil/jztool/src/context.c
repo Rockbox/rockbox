@@ -27,6 +27,10 @@
 #include <stdio.h>
 #include <time.h>
 
+#ifdef WIN32
+# include <windows.h>
+#endif
+
 /** \brief Allocate a library context
  * \returns New context or NULL if out of memory
  */
@@ -137,13 +141,18 @@ void jz_log_cb_stderr(jz_log_level lev, const char* msg)
  */
 void jz_sleepms(int ms)
 {
+#ifdef WIN32
+    Sleep(ms);
+#else
     struct timespec ts;
     long ns = ms % 1000;
     ts.tv_nsec = ns * 1000 * 1000;
     ts.tv_sec = ms / 1000;
     nanosleep(&ts, NULL);
+#endif
 }
 
+/** \brief Add reference to libusb context, allocating it if necessary */
 int jz_context_ref_libusb(jz_context* jz)
 {
     if(jz->usb_ctxref == 0) {
@@ -158,6 +167,7 @@ int jz_context_ref_libusb(jz_context* jz)
     return JZ_SUCCESS;
 }
 
+/** \brief Remove reference to libusb context, freeing if it hits zero */
 void jz_context_unref_libusb(jz_context* jz)
 {
     if(--jz->usb_ctxref == 0) {

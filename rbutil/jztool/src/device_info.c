@@ -22,30 +22,6 @@
 #include "jztool.h"
 #include <string.h>
 
-static const char* const fiiom3k_action_names[] = {
-    "install",
-    "backup",
-    "restore",
-};
-
-static const char* const fiiom3k_install_action_params[] =
-    {"spl", "bootloader", "backup", "without-backup", NULL};
-
-static const char* const fiiom3k_backuprestore_action_params[] =
-    {"spl", "image", NULL};
-
-static const char* const* fiiom3k_action_params[] = {
-    fiiom3k_install_action_params,
-    fiiom3k_backuprestore_action_params,
-    fiiom3k_backuprestore_action_params,
-};
-
-static const jz_device_action_fn fiiom3k_action_funcs[] = {
-    jz_fiiom3k_install,
-    jz_fiiom3k_backup,
-    jz_fiiom3k_restore,
-};
-
 static const jz_device_info infotable[] = {
     {
         .name = "fiiom3k",
@@ -54,10 +30,6 @@ static const jz_device_info infotable[] = {
         .cpu_type = JZ_CPU_X1000,
         .vendor_id = 0xa108,
         .product_id = 0x1000,
-        .num_actions = sizeof(fiiom3k_action_names)/sizeof(void*),
-        .action_names = fiiom3k_action_names,
-        .action_funcs = fiiom3k_action_funcs,
-        .action_params = fiiom3k_action_params,
     },
 };
 
@@ -69,6 +41,7 @@ int jz_get_num_device_info(void)
     return infotable_size;
 }
 
+/** \brief Lookup info for a device by type, returns NULL if not found. */
 const jz_device_info* jz_get_device_info(jz_device_type type)
 {
     for(int i = 0; i < infotable_size; ++i)
