@@ -703,6 +703,9 @@ Georg Gadinger
 Wolfram Sang
 Aidan MacDonald
 Caleb Connolly
+Spencer Brennessel
+Dana Conrad
+Albert Song
 
 The libmad team
 The wavpack team
@@ -730,7 +733,6 @@ The libpng team
 The Pure Data team (Miller Puckette and others)
 The MikMod team
 Michael McTernan (The ARM unwinder author)
-Albert Song
 The New RAW team (Piotr Padkowski and others)
 The Fabother World team (Fabien Sanglard and others)
 The sgt-puzzles team (Simon Tatham and others)
@@ -743,5 +745,4 @@ The Pocket Quake team (Dan East and others)
 The bzip2 team
 The bsdiff team
 The libtomcrypt team
-Spencer Brennessel
-Dana Conrad
+The microtar team (rxi and others)
