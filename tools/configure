@@ -1624,7 +1624,8 @@ fi
   genericbitmaptools="$toolset bmp2rb"
   # scramble is used by all other targets
   scramblebitmaptools="$genericbitmaptools scramble"
-
+  # used by X1000 targets
+  x1000tools="$genericbitmaptools scramble mkspl-x1000 uclpack"
 
   #  ---- For each target ----
   #
@@ -4100,15 +4101,13 @@ fi
     appextra="recorder:gui"
     plugins="yes"
     tool="$rootdir/tools/scramble -add=fiiom3k "
-    boottool="$rootdir/tools/scramble -add=fiiom3k "
-    spltool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
+    boottool="" # not used
     output="rockbox.m3k"
     bootoutput="bootloader.m3k"
-    sploutput="spl.m3k"
     sysfontbl="16-Terminus"
     # toolset is the tools within the tools directory that we build for
     # this particular target.
-    toolset="$toolset mkspl-x1000"
+    toolset="$x1000tools"
     bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
     bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
     # architecture, manufacturer and model for the target-tree build
@@ -4187,9 +4186,6 @@ case $modelname in
   sansae200)
      gdbstub=", (E)raser"
      ;;
-  fiiom3k)
-     gdbstub=", (X) SPL loader"
-     ;;
   *)
      ;;
 esac
@@ -4214,15 +4210,6 @@ fi
       extradefines="$extradefines -DBOOTLOADER -DSANSA_PP_ERASE -ffunction-sections -fdata-sections"
       bootloader="1"
       echo "sansa eraser build selected"
-      ;;
-    [Xx])
-      appsdir='$(ROOTDIR)/bootloader'
-      apps="bootloader"
-      extradefines="$extradefines -DBOOTLOADER -DBOOTLOADER_SPL -ffunction-sections -fdata-sections"
-      bootloader="1"
-      tool="$spltool"
-      output="$sploutput"
-      echo "SPL bootloader build selected"
       ;;
     [Bb])
       appsdir='$(ROOTDIR)/bootloader'

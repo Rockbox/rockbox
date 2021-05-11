@@ -20,7 +20,6 @@
  ****************************************************************************/
 
 #include "spl-x1000.h"
-#include "spl-target.h"
 #include "clk-x1000.h"
 #include "nand-x1000.h"
 #include "system.h"
@@ -29,16 +28,15 @@
 #include "x1000/ddrc.h"
 #include "x1000/ddrc_apb.h"
 #include "x1000/ddrphy.h"
+#include "ucl_decompress.h"
 
-struct x1000_spl_arguments* const spl_arguments =
-    (struct x1000_spl_arguments*)SPL_ARGUMENTS_ADDRESS;
-
-struct x1000_spl_status* const spl_status =
-    (struct x1000_spl_status*)SPL_STATUS_ADDRESS;
-
-/* defined to be Linux compatible; Rockbox needs no arguments so there
- * is no harm in passing them and we save a little code size */
-typedef void(*entry_fn)(int, char**, int, int);
+#ifdef FIIO_M3K
+# define SPL_DDR_MEMORYSIZE  64
+# define SPL_DDR_AUTOSR_EN   1
+# define SPL_DDR_NEED_BYPASS 1
+#else
+# error "please add SPL memory definitions"
+#endif
 
 /* Note: This is based purely on disassembly of the SPL from the FiiO M3K.
  * The code there is somewhat generic and corresponds roughly to Ingenic's
@@ -243,83 +241,70 @@ static int nandread(uint32_t addr, uint32_t size, void* buffer)
     return rc;
 }
 
-static int nandwrite(uint32_t addr, uint32_t size, const void* buffer)
-{
-    int rc;
-    int mf_id, dev_id;
-
-    if((rc = nand_open()))
-        return rc;
-    if((rc = nand_identify(&mf_id, &dev_id))) {
-        nand_close();
-        return rc;
-    }
-
-    if((rc = nand_enable_writes(true)))
-        goto _end;
-
-    if((rc = nand_erase(addr, size)))
-        goto _end1;
-
-    rc = nand_write(addr, size, (const uint8_t*)buffer);
-
-  _end1:
-    /* an error here is very unlikely, so ignore it */
-    nand_enable_writes(false);
-
-  _end:
-    nand_close();
-    return rc;
-}
+/* Entry point function type, defined to be Linux compatible. */
+typedef void(*entry_fn)(int, char**, int, int);
 
 /* Kernel command line arguments */
 static char* argv[2];
 
-void main(void)
+/* This variable is defined by the maskrom. It's simply the level of the
+ * boot_sel[2:0] pins (GPIOs B28-30) at boot time. Meaning of the bits:
+ *
+ * boot_sel[2] boot_sel[1] boot_sel[0]      Description
+ * -----------------------------------------------------------------
+ * 1           X           X                EXCLK is 26 MHz
+ * 0           X           X                EXCLK is 24 MHz
+ * X           1           1                Boot from SFC0
+ * X           0           1                Boot from MSC0
+ * X           1           0                Boot from USB 2.0 device
+ * -----------------------------------------------------------------
+ * Source: X1000 PM pg. 687, "XBurst Boot ROM Specification"
+ */
+extern const uint32_t boot_sel;
+
+void spl_main(void)
 {
-    if(!(SPL_ARGUMENTS->flags & SPL_FLAG_SKIP_INIT))
-        init();
+    int opt_index;
+    uint8_t* load_addr;
+    const struct spl_boot_option* opt;
 
-    switch(SPL_ARGUMENTS->command) {
-    case SPL_CMD_BOOT: {
-        int option = SPL_ARGUMENTS->param1;
-        if(option == SPL_BOOTOPT_CHOOSE)
-            option = spl_get_boot_option();
-        if(option == SPL_BOOTOPT_NONE)
-            return;
+    /* Basic hardware init */
+    init();
 
-        const struct spl_boot_option* opt = &spl_boot_options[option-1];
-        if(nandread(opt->nand_addr, opt->nand_size, (void*)opt->load_addr))
+    /* If doing a USB boot, host PC will upload 2nd stage itself,
+     * we should not load anything from flash or change clocks. */
+    if((boot_sel & 3) == 2)
+        return;
+
+    /* Get the boot option */
+    opt_index = spl_get_boot_option();
+    opt = &spl_boot_options[opt_index];
+    load_addr = (uint8_t*)opt->load_addr;
+
+    /* Set up hardware, load stuff from flash */
+    spl_handle_pre_boot(opt_index);
+    if(nandread(opt->nand_addr, opt->nand_size, load_addr))
+        spl_error();
+
+    if(!opt->cmdline) {
+        /* No command line => we are booting Rockbox, decompress bootloader.
+         * In the case of Rockbox, load binary directly to exec address */
+        uint32_t out_size = X1000_DRAM_END - opt->exec_addr;
+        int rc = ucl_unpack(load_addr, opt->nand_size,
+                            (uint8_t*)opt->exec_addr, &out_size);
+        if(rc != UCL_E_OK)
             spl_error();
-
-        /* Let target handle necessary pre-boot setup */
-        spl_handle_pre_boot(option);
-
-        /* Reading the Linux command line from the bootloader is handled by
-         * arch/mips/xburst/core/prom.c -- see Ingenic kernel sources.
-         *
-         * Rockbox doesn't use arguments, but passing them does not hurt and it
-         * saves an unnecessary branch.
-         */
-        entry_fn entry = (entry_fn)opt->exec_addr;
-        argv[0] = 0;
-        argv[1] = (char*)opt->cmdline;
-
-        commit_discard_idcache();
-        entry(2, argv, 0, 0);
-        __builtin_unreachable();
     }
 
-    case SPL_CMD_FLASH_READ:
-        SPL_STATUS->err_code = nandread(SPL_ARGUMENTS->param1,
-                                        SPL_ARGUMENTS->param2,
-                                        (void*)SPL_BUFFER_ADDRESS);
-        return;
+    /* Reading the Linux command line from the bootloader is handled by
+     * arch/mips/xburst/core/prom.c -- see Ingenic kernel sources. It's
+     * simply an (int argc, char* argv[]) thing.
+     */
+    entry_fn entry = (entry_fn)opt->exec_addr;
+    argv[0] = 0;
+    argv[1] = (char*)opt->cmdline;
 
-    case SPL_CMD_FLASH_WRITE:
-        SPL_STATUS->err_code = nandwrite(SPL_ARGUMENTS->param1,
-                                         SPL_ARGUMENTS->param2,
-                                         (const void*)SPL_BUFFER_ADDRESS);
-        return;
-    }
+    commit_discard_idcache();
+    entry(2, argv, 0, 0);
+    __builtin_unreachable();
 }

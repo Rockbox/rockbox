@@ -22,10 +22,7 @@
 #ifndef __SPL_X1000_H__
 #define __SPL_X1000_H__
 
-#include "spl-x1000-defs.h"
-
-#define SPL_ARGUMENTS ((struct x1000_spl_arguments*)SPL_ARGUMENTS_ADDRESS)
-#define SPL_STATUS    ((struct x1000_spl_status*)SPL_STATUS_ADDRESS)
+#include <stdint.h>
 
 struct spl_boot_option {
     uint32_t nand_addr;
@@ -35,15 +32,13 @@ struct spl_boot_option {
     const char* cmdline; /* for Linux */
 };
 
-/* Defined by target, indices are 0 = ROCKBOX, 1 = ORIG_FW, etc... */
+/* Defined by target, order is not important */
 extern const struct spl_boot_option spl_boot_options[];
 
 /* Called on a fatal error */
 extern void spl_error(void) __attribute__((noreturn));
 
-/* When SPL boots with SPL_BOOTOPTION_CHOOSE, this function is invoked
- * to let the target figure out the boot option based on buttons the
- * user is pressing */
+/* Invoked by SPL main routine to determine the boot option */
 extern int spl_get_boot_option(void);
 
 /* Do any setup/initialization needed for the given boot option, this
