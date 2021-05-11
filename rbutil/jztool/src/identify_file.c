@@ -81,6 +81,14 @@ static uint8_t crc7(const uint8_t* buf, size_t len)
     return crc;
 }
 
+/** \brief Identify a file as an SPL for X1000 CPUs
+ * \param data      File data buffer
+ * \param len       Length of file
+ * \return JZ_SUCCESS if file looks correct, or one of the following errors
+ * \retval JZ_IDERR_WRONG_SIZE   file too small or size doesn't match header
+ * \retval JZ_IDERR_BAD_HEADER   missing magic bytes from header
+ * \retval JZ_IDERR_BAD_CHECKSUM CRC7 mismatch
+ */
 int jz_identify_x1000_spl(const void* data, size_t len)
 {
     /* Use <= check because a header-only file is not really valid,
@@ -115,6 +123,14 @@ static const struct scramble_model_info {
     {NULL, 0},
 };
 
+/** \brief Identify a file as a Rockbox `scramble` image
+ * \param data      File data buffer
+ * \param len       Length of file
+ * \return JZ_SUCCESS if file looks correct, or one of the following errors
+ * \retval JZ_IDERR_WRONG_SIZE          file too small to be valid
+ * \retval JZ_IDERR_UNRECOGNIZED_MODEL  unsupported/unknown model type
+ * \retval JZ_IDERR_BAD_CHECKSUM        checksum mismatch
+ */
 int jz_identify_scramble_image(const void* data, size_t len)
 {
     /* 4 bytes checksum + 4 bytes player model */
@@ -140,40 +156,6 @@ int jz_identify_scramble_image(const void* data, size_t len)
     uint32_t fsum = (dat[0] << 24) | (dat[1] << 16) | (dat[2] << 8) | dat[3];
     if(sum != fsum)
         return JZ_IDERR_BAD_CHECKSUM;
-
-    return JZ_SUCCESS;
-}
-
-int jz_identify_fiiom3k_bootimage(const void* data, size_t len)
-{
-    /* The bootloader image is simply a dump of the first NAND eraseblock,
-     * so it has a fixed 128 KiB size */
-    if(len != 128*1024)
-        return JZ_IDERR_WRONG_SIZE;
-
-    /* We'll verify the embedded SPL, but we have to drag out the correct
-     * length from the header. Length should be more than 12 KiB, due to
-     * limitations of the hardware */
-    const struct x1000_spl_header* spl_header;
-    spl_header = (const struct x1000_spl_header*)data;
-    if(spl_header->length > 12 * 1024)
-        return JZ_IDERR_BAD_HEADER;
-
-    int rc = jz_identify_x1000_spl(data, spl_header->length);
-    if(rc < 0)
-        return rc;
-
-    const uint8_t* dat = (const uint8_t*)data;
-
-    /* Check the partition table is present */
-    if(memcmp(&dat[0x3c00], "nand", 4))
-        return JZ_IDERR_OTHER;
-
-    /* Check first bytes of PDMA firmware. It doesn't change
-     * between OF versions, and Rockbox doesn't modify it. */
-    static const uint8_t pdma_fw[] = {0x54, 0x25, 0x42, 0xb3, 0x70, 0x25, 0x42, 0xb3};
-    if(memcmp(&dat[0x4000], pdma_fw, sizeof(pdma_fw)))
-       return JZ_IDERR_OTHER;
 
     return JZ_SUCCESS;
 }

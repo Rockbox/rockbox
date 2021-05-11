@@ -26,21 +26,68 @@
 #include <stdbool.h>
 
 jz_context* jz = NULL;
+jz_usbdev* usbdev = NULL;
 const jz_device_info* dev_info = NULL;
-int dev_action = -1;
-jz_paramlist* action_params = NULL;
+
+void usage_fiiom3k(void)
+{
+    printf("Usage:\n"
+           "  jztool fiiom3k load <bootloader.m3k>\n"
+           "\n"
+           "The 'load' command is used to boot the Rockbox bootloader in\n"
+           "recovery mode, which allows you to install the Rockbox bootloader\n"
+           "and backup or restore bootloader images. You need to connect the\n"
+           "M3K in USB boot mode in order to use this tool.\n"
+           "\n"
+           "On Windows, you will need to install the WinUSB driver for the M3K\n"
+           "using a 3rd-party tool such as Zadig <https://zadig.akeo.ie>. For\n"
+           "more details check the jztool README.md file or the Rockbox wiki at\n"
+           "<https://rockbox.org/wiki/FiioM3K>.\n"
+           "\n"
+           "To connect the M3K in USB boot mode, plug the microUSB into the\n"
+           "M3K, and hold the VOL- button while plugging the USB into your\n"
+           "computer. If successful, the button light will turn on and the\n"
+           "LCD will remain black. If you encounter any errors and need to\n"
+           "reconnect the device, you must force a power off by holding POWER\n"
+           "for more than 10 seconds.\n"
+           "\n"
+           "Once the Rockbox bootloader is installed on your M3K, you can\n"
+           "access the recovery menu by holding VOL+ while powering on the\n"
+           "device.\n");
+    exit(4);
+}
+
+int cmdline_fiiom3k(int argc, char** argv)
+{
+    if(argc < 2 || strcmp(argv[0], "load")) {
+        usage_fiiom3k();
+        return 2;
+    }
+
+    int rc = jz_usb_open(jz, &usbdev, dev_info->vendor_id, dev_info->product_id);
+    if(rc < 0) {
+        jz_log(jz, JZ_LOG_ERROR, "Cannot open USB device: %d", rc);
+        return 1;
+    }
+
+    rc = jz_fiiom3k_boot(usbdev, argv[1]);
+    if(rc < 0) {
+        jz_log(jz, JZ_LOG_ERROR, "Boot failed: %d", rc);
+        return 1;
+    }
+
+    return 0;
+}
 
 void usage(void)
 {
     printf("Usage:\n"
-           "  jztool [global options] <device> <action> [action options]\n"
+           "  jztool [global options] <device> <command> [command arguments]\n"
            "\n"
            "Global options:\n"
-           "\n"
            "  -h, --help            Display this help\n"
            "  -q, --quiet           Don't log anything except errors\n"
-           "  -v, --verbose         Display detailed logging output\n"
-           "  -l, --loglevel LEVEL  Set log level\n");
+           "  -v, --verbose         Display detailed logging output\n\n");
 
     printf("Supported devices:\n\n");
     int n = jz_get_num_device_info();
@@ -49,39 +96,17 @@ void usage(void)
         printf("  %s - %s\n", info->name, info->description);
     }
 
-    printf(
-"\n"
-"Available actions for fiiom3k:\n"
-"\n"
-"  install --spl <spl.m3k> --bootloader <bootloader.m3k>\n"
-"          [--without-backup yes] [--backup IMAGE]\n"
-"    Install or update the Rockbox bootloader on a device.\n"
-"\n"
-"    If --backup is given, back up the current bootloader to IMAGE before\n"
-"    installing the new bootloader. The installer will normally refuse to\n"
-"    overwrite your current bootloader; pass '--without-backup yes' if you\n"
-"    really want to proceed without taking a backup.\n"
-"\n"
-"    WARNING: it is NOT RECOMMENDED to install the Rockbox bootloader\n"
-"    without taking a backup of the original firmware bootloader. It may\n"
-"    be very difficult or impossible to recover your player without one.\n"
-"    At least one M3Ks is known to not to work with the Rockbox bootloader,\n"
-"    so it is very important to take a backup.\n"
-"\n"
-"  backup --image IMAGE\n"
-"    Backup the current bootloader to the file IMAGE\n"
-"\n"
-"  restore --image IMAGE\n"
-"    Restore a bootloader image backup from the file IMAGE\n"
-"\n");
+    printf("\n"
+           "For device-specific help run 'jztool DEVICE' without arguments,\n"
+           "eg. 'jztool fiiom3k' will display help for the FiiO M3K.\n");
 
     exit(4);
 }
 
 void cleanup(void)
 {
-    if(action_params)
-        jz_paramlist_free(action_params);
+    if(usbdev)
+        jz_usb_close(usbdev);
     if(jz)
         jz_context_destroy(jz);
 }
@@ -157,71 +182,14 @@ int main(int argc, char** argv)
         exit(2);
     }
 
-    /* Read the action */
+    /* Dispatch to device handler */
     --argc, ++argv;
-    if(argc == 0) {
-        jz_log(jz, JZ_LOG_ERROR, "No action specified (try jztool --help)");
-        exit(2);
+    switch(dev_info->device_type) {
+    case JZ_DEVICE_FIIOM3K:
+        return cmdline_fiiom3k(argc, argv);
+
+    default:
+        jz_log(jz, JZ_LOG_ERROR, "INTERNAL ERROR: unhandled device type");
+        return 1;
     }
-
-    for(dev_action = 0; dev_action < dev_info->num_actions; ++dev_action)
-        if(!strcmp(*argv, dev_info->action_names[dev_action]))
-            break;
-
-    if(dev_action == dev_info->num_actions) {
-        jz_log(jz, JZ_LOG_ERROR, "Unknown action '%s' (try jztool --help)", *argv);
-        exit(2);
-    }
-
-    /* Parse the action options */
-    action_params = jz_paramlist_new();
-    if(!action_params) {
-        jz_log(jz, JZ_LOG_ERROR, "Out of memory: can't create paramlist");
-        exit(1);
-    }
-
-    const char* const* allowed_params = dev_info->action_params[dev_action];
-
-    --argc, ++argv;
-    while(argc > 0 && argv[0][0] == '-') {
-        if(argv[0][1] != '-') {
-            jz_log(jz, JZ_LOG_ERROR, "Invalid option '%s' for action", *argv);
-            exit(2);
-        }
-
-        bool bad_option = true;
-        for(int i = 0; allowed_params[i] != NULL; ++i) {
-            if(!strcmp(&argv[0][2], allowed_params[i])) {
-                ++argv;
-                if(--argc == 0) {
-                    jz_log(jz, JZ_LOG_ERROR, "Missing argument for parameter '%s'", *argv);
-                    exit(2);
-                }
-
-                int rc = jz_paramlist_set(action_params, allowed_params[i], *argv);
-                if(rc < 0) {
-                    jz_log(jz, JZ_LOG_ERROR, "Out of memory");
-                    exit(1);
-                }
-
-                bad_option = false;
-            }
-        }
-
-        if(bad_option) {
-            jz_log(jz, JZ_LOG_ERROR, "Invalid option '%s' for action", *argv);
-            exit(2);
-        }
-
-        --argc, ++argv;
-    }
-
-    if(argc != 0) {
-        jz_log(jz, JZ_LOG_ERROR, "Excess arguments on command line");
-        exit(2);
-    }
-
-    /* Invoke action handler */
-    int rc = dev_info->action_funcs[dev_action](jz, action_params);
-    return (rc < 0) ? 1 : 0;
 }
