@@ -25,6 +25,11 @@
 #include "system.h"
 #include <string.h>
 
+/* Available boot options */
+#define BOOTOPTION_ROCKBOX  0
+#define BOOTOPTION_ORIG_FW  1
+#define BOOTOPTION_RECOVERY 2
+
 /* Boot select button state must remain stable for this duration
  * before the choice will be accepted. Currently 100ms.
  */
@@ -56,7 +61,7 @@ const struct spl_boot_option spl_boot_options[] = {
          */
         .nand_addr = 0x6800,
         .nand_size = 0x19800,
-        .load_addr = X1000_DRAM_BASE - 8, /* first 8 bytes are bootloader ID */
+        .load_addr = X1000_DRAM_END - 0x19800,
         .exec_addr = X1000_DRAM_BASE,
         .cmdline = NULL,
     },
@@ -80,7 +85,7 @@ const struct spl_boot_option spl_boot_options[] = {
 
 void spl_error(void)
 {
-    const int pin = (1 << 24);
+    const uint32_t pin = (1 << 24);
 
     /* Turn on button light */
     jz_clr(GPIO_INT(GPIO_C), pin);
@@ -105,6 +110,10 @@ int spl_get_boot_option(void)
 
     uint32_t pin = 1, lastpin = 0;
     uint32_t deadline = 0;
+    /* Iteration count guards against unlikely case of broken buttons
+     * which never stabilize; if this occurs, we always boot Rockbox. */
+    int iter_count = 0;
+    const int max_iter_count = 30;
 
     /* Configure the button GPIOs as inputs */
     gpio_config(GPIO_A, pinmask, GPIO_INPUT);
@@ -116,19 +125,18 @@ int spl_get_boot_option(void)
         if(pin != lastpin) {
             /* This will always be set on the first iteration */
             deadline = __ost_read32() + BTN_STABLE_TIME;
+            iter_count += 1;
         }
-    } while(__ost_read32() < deadline);
+    } while(iter_count < max_iter_count && __ost_read32() < deadline);
 
-    /* Play button boots original firmware */
-    if(pin == (1 << 17))
-        return SPL_BOOTOPT_ORIG_FW;
-
-    /* Volume up boots recovery */
-    if(pin == (1 << 19))
-        return SPL_BOOTOPT_RECOVERY;
-
-    /* Default is to boot Rockbox */
-    return SPL_BOOTOPT_ROCKBOX;
+    if(iter_count < max_iter_count && (pin & (1 << 17))) {
+        if(pin & (1 << 19))
+            return BOOTOPTION_RECOVERY; /* Play+Volume Up */
+        else
+            return BOOTOPTION_ORIG_FW; /* Play */
+    } else {
+        return BOOTOPTION_ROCKBOX; /* Volume Up or no buttons */
+    }
 }
 
 void spl_handle_pre_boot(int bootopt)
@@ -145,7 +153,7 @@ void spl_handle_pre_boot(int bootopt)
     /* System clock setup -- common to Rockbox and FiiO firmware
      * ----
      * CPU at 1 GHz, L2 cache at 500 MHz
-     * AHB0 and AHB2 and 200 MHz
+     * AHB0 and AHB2 at 200 MHz
      * PCLK at 100 MHz
      * DDR at 200 MHz
      */
@@ -153,7 +161,7 @@ void spl_handle_pre_boot(int bootopt)
     clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) | CLKMUX_CPU(SCLK_A) |
                     CLKMUX_AHB0(SCLK_A) | CLKMUX_AHB2(SCLK_A));
 
-    if(bootopt == SPL_BOOTOPT_ROCKBOX) {
+    if(bootopt == BOOTOPTION_ROCKBOX) {
         /* We don't use MPLL in Rockbox, so switch DDR memory to APLL */
         clk_set_ddr(X1000_CLK_SCLK_A, 5);
 

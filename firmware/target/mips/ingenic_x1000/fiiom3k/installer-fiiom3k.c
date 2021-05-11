@@ -19,192 +19,265 @@
  *
  ****************************************************************************/
 
-#include "installer.h"
+#include "installer-fiiom3k.h"
 #include "nand-x1000.h"
 #include "system.h"
 #include "core_alloc.h"
 #include "file.h"
+#include "microtar.h"
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 
-#define INSTALL_SUCCESS             0
-#define ERR_FLASH_OPEN_FAILED       (-1)
-#define ERR_FLASH_ENABLE_WP_FAILED  (-2)
-#define ERR_FLASH_DISABLE_WP_FAILED (-3)
-#define ERR_FLASH_ERASE_FAILED      (-4)
-#define ERR_FLASH_WRITE_FAILED      (-5)
-#define ERR_FLASH_READ_FAILED       (-6)
-#define ERR_OUT_OF_MEMORY           (-7)
-#define ERR_CANNOT_READ_FILE        (-8)
-#define ERR_CANNOT_WRITE_FILE       (-9)
-#define ERR_WRONG_SIZE              (-10)
+#define IMAGE_SIZE  (128 * 1024)
+#define TAR_SIZE    (256 * 1024)
 
-#define BOOT_IMAGE_SIZE (128 * 1024)
-
-static int install_from_buffer(const void* buf)
+static int flash_prepare(void)
 {
-    int status = INSTALL_SUCCESS;
     int mf_id, dev_id;
+    int rc;
 
-    if(nand_open())
-        return ERR_FLASH_OPEN_FAILED;
-    if(nand_identify(&mf_id, &dev_id)) {
-        status = ERR_FLASH_OPEN_FAILED;
-        goto _exit;
+    rc = nand_open();
+    if(rc < 0)
+        return INSTALL_ERR_FLASH(NAND_OPEN, rc);
+
+    rc = nand_identify(&mf_id, &dev_id);
+    if(rc < 0) {
+        nand_close();
+        return INSTALL_ERR_FLASH(NAND_IDENTIFY, rc);
     }
 
-    if(nand_enable_writes(true)) {
-        status = ERR_FLASH_DISABLE_WP_FAILED;
-        goto _exit;
-    }
-
-    if(nand_erase(0, BOOT_IMAGE_SIZE)) {
-        status = ERR_FLASH_ERASE_FAILED;
-        goto _exit;
-    }
-
-    if(nand_write(0, BOOT_IMAGE_SIZE, (const uint8_t*)buf)) {
-        status = ERR_FLASH_WRITE_FAILED;
-        goto _exit;
-    }
-
-    if(nand_enable_writes(false)) {
-        status = ERR_FLASH_ENABLE_WP_FAILED;
-        goto _exit;
-    }
-
-  _exit:
-    nand_close();
-    return status;
+    return INSTALL_SUCCESS;
 }
 
-static int dump_to_buffer(void* buf)
+static void flash_finish(void)
 {
-    int status = INSTALL_SUCCESS;
-    int mf_id, dev_id;
-
-    if(nand_open())
-        return ERR_FLASH_OPEN_FAILED;
-    if(nand_identify(&mf_id, &dev_id)) {
-        status = ERR_FLASH_OPEN_FAILED;
-        goto _exit;
-    }
-
-    if(nand_read(0, BOOT_IMAGE_SIZE, (uint8_t*)buf)) {
-        status = ERR_FLASH_READ_FAILED;
-        goto _exit;
-    }
-
-  _exit:
+    /* Ensure writes are always disabled when we finish.
+     * Errors are safe to ignore here, there's nothing we could do anyway. */
+    nand_enable_writes(false);
     nand_close();
-    return status;
 }
 
-int install_bootloader(const char* path)
+static int flash_img_read(uint8_t* buffer)
 {
-    /* Allocate memory to hold image */
-    size_t bufsize = BOOT_IMAGE_SIZE + CACHEALIGN_SIZE - 1;
-    int handle = core_alloc("boot_image", bufsize);
-    if(handle < 0)
-        return ERR_OUT_OF_MEMORY;
+    int rc = flash_prepare();
+    if(rc < 0)
+        goto error;
 
-    int status = INSTALL_SUCCESS;
-    void* buffer = core_get_data(handle);
+    rc = nand_read(0, IMAGE_SIZE, buffer);
+    if(rc < 0) {
+        rc = INSTALL_ERR_FLASH(NAND_READ, rc);
+        goto error;
+    }
+
+  error:
+    flash_finish();
+    return rc;
+}
+
+static int flash_img_write(const uint8_t* buffer)
+{
+    int rc = flash_prepare();
+    if(rc < 0)
+        goto error;
+
+    rc = nand_enable_writes(true);
+    if(rc < 0) {
+        rc = INSTALL_ERR_FLASH(NAND_ENABLE_WRITES, rc);
+        goto error;
+    }
+
+    rc = nand_erase(0, IMAGE_SIZE);
+    if(rc < 0) {
+        rc = INSTALL_ERR_FLASH(NAND_ERASE, rc);
+        goto error;
+    }
+
+    rc = nand_write(0, IMAGE_SIZE, buffer);
+    if(rc < 0) {
+        rc = INSTALL_ERR_FLASH(NAND_WRITE, rc);
+        goto error;
+    }
+
+  error:
+    flash_finish();
+    return rc;
+}
+
+static int patch_img(mtar_t* tar, uint8_t* buffer, const char* filename,
+                     size_t patch_offset, size_t patch_size)
+{
+    /* Seek to file */
+    mtar_header_t h;
+    int rc = mtar_find(tar, filename, &h);
+    if(rc != MTAR_ESUCCESS) {
+        rc = INSTALL_ERR_MTAR(TAR_FIND, rc);
+        return rc;
+    }
+
+    /* We need a normal file */
+    if(h.type != 0 && h.type != MTAR_TREG)
+        return INSTALL_ERR_BAD_FORMAT;
+
+    /* Check size does not exceed patch area */
+    if(h.size > patch_size)
+        return INSTALL_ERR_BAD_FORMAT;
+
+    /* Read data directly into patch area, fill unused bytes with 0xff */
+    memset(&buffer[patch_offset], 0xff, patch_size);
+    rc = mtar_read_data(tar, &buffer[patch_offset], h.size);
+    if(rc != MTAR_ESUCCESS) {
+        rc = INSTALL_ERR_MTAR(TAR_READ, rc);
+        return rc;
+    }
+
+    return INSTALL_SUCCESS;
+}
+
+int install_boot(const char* srcfile)
+{
+    int rc;
+    mtar_t* tar = NULL;
+    int handle = -1;
+
+    /* Allocate enough memory for image and tar state */
+    size_t bufsize = IMAGE_SIZE + sizeof(mtar_t) + 2*CACHEALIGN_SIZE;
+    handle = core_alloc("boot_image", bufsize);
+    if(handle < 0) {
+        rc = INSTALL_ERR_OUT_OF_MEMORY;
+        goto error;
+    }
+
+    uint8_t* buffer = core_get_data(handle);
+
+    /* Tar state alloc */
+    CACHEALIGN_BUFFER(buffer, bufsize);
+    tar = (mtar_t*)buffer;
+    memset(tar, 0, sizeof(tar));
+
+    /* Image buffer alloc */
+    buffer += sizeof(mtar_t);
     CACHEALIGN_BUFFER(buffer, bufsize);
 
-    /* Open the boot image */
-    int fd = open(path, O_RDONLY);
-    if(fd < 0) {
-        status = ERR_CANNOT_READ_FILE;
-        goto _exit;
+    /* Read the flash -- we need an existing image to patch */
+    rc = flash_img_read(buffer);
+    if(rc < 0)
+        goto error;
+
+    /* Open the tarball */
+    rc = mtar_open(tar, srcfile, "r");
+    if(rc != MTAR_ESUCCESS) {
+        rc = INSTALL_ERR_MTAR(TAR_OPEN, rc);
+        goto error;
     }
 
-    /* Check file size */
-    off_t fsize = filesize(fd);
-    if(fsize != BOOT_IMAGE_SIZE) {
-        status = ERR_WRONG_SIZE;
-        goto _exit;
-    }
+    /* Extract the needed files & patch 'em in */
+    rc = patch_img(tar, buffer, "spl.m3k", 0, 12 * 1024);
+    if(rc < 0)
+        goto error;
 
-    /* Read the file into the buffer */
-    ssize_t cnt = read(fd, buffer, BOOT_IMAGE_SIZE);
-    if(cnt != BOOT_IMAGE_SIZE) {
-        status = ERR_CANNOT_READ_FILE;
-        goto _exit;
-    }
+    rc = patch_img(tar, buffer, "bootloader.ucl", 0x6800, 102 * 1024);
+    if(rc < 0)
+        goto error;
 
-    /* Perform the installation */
-    status = install_from_buffer(buffer);
+    /* Flash the new image */
+    rc = flash_img_write(buffer);
+    if(rc < 0)
+        goto error;
 
-  _exit:
-    if(fd >= 0)
-        close(fd);
-    core_free(handle);
-    return status;
+    rc = INSTALL_SUCCESS;
+
+  error:
+    if(tar && tar->close)
+        mtar_close(tar);
+    if(handle >= 0)
+        core_free(handle);
+    return rc;
 }
 
-/* Dump the current bootloader to a file */
-int dump_bootloader(const char* path)
+int backup_boot(const char* destfile)
 {
-    /* Allocate memory to hold image */
-    size_t bufsize = BOOT_IMAGE_SIZE + CACHEALIGN_SIZE - 1;
-    int handle = core_alloc("boot_image", bufsize);
-    if(handle < 0)
-        return -1;
-
-    /* Read data from flash */
+    int rc;
+    int handle = -1;
     int fd = -1;
-    void* buffer = core_get_data(handle);
+    size_t bufsize = IMAGE_SIZE + CACHEALIGN_SIZE - 1;
+    handle = core_alloc("boot_image", bufsize);
+    if(handle < 0) {
+        rc = INSTALL_ERR_OUT_OF_MEMORY;
+        goto error;
+    }
+
+    uint8_t* buffer = core_get_data(handle);
     CACHEALIGN_BUFFER(buffer, bufsize);
-    int status = dump_to_buffer(buffer);
-    if(status)
-        goto _exit;
 
-    /* Open file */
-    fd = open(path, O_CREAT|O_TRUNC|O_WRONLY);
+    rc = flash_img_read(buffer);
+    if(rc < 0)
+        goto error;
+
+    fd = open(destfile, O_CREAT|O_TRUNC|O_WRONLY);
     if(fd < 0) {
-        status = ERR_CANNOT_WRITE_FILE;
-        goto _exit;
+        rc = INSTALL_ERR_FILE_IO;
+        goto error;
     }
 
-    /* Write data to file */
-    ssize_t cnt = write(fd, buffer, BOOT_IMAGE_SIZE);
-    if(cnt != BOOT_IMAGE_SIZE) {
-        status = ERR_CANNOT_WRITE_FILE;
-        goto _exit;
+    ssize_t cnt = write(fd, buffer, IMAGE_SIZE);
+    if(cnt != IMAGE_SIZE) {
+        rc = INSTALL_ERR_FILE_IO;
+        goto error;
     }
 
-  _exit:
+  error:
     if(fd >= 0)
         close(fd);
-    core_free(handle);
-    return status;
+    if(handle >= 0)
+        core_free(handle);
+    return rc;
 }
 
-const char* installer_strerror(int rc)
+int restore_boot(const char* srcfile)
 {
-    switch(rc) {
-    case INSTALL_SUCCESS:
-        return "Success";
-    case ERR_FLASH_OPEN_FAILED:
-        return "Can't open flash device";
-    case ERR_FLASH_ENABLE_WP_FAILED:
-        return "Couldn't re-enable write protect";
-    case ERR_FLASH_DISABLE_WP_FAILED:
-        return "Can't disable write protect";
-    case ERR_FLASH_ERASE_FAILED:
-        return "Flash erase failed";
-    case ERR_FLASH_WRITE_FAILED:
-        return "Flash write error";
-    case ERR_FLASH_READ_FAILED:
-        return "Flash read error";
-    case ERR_OUT_OF_MEMORY:
-        return "Out of memory";
-    case ERR_CANNOT_READ_FILE:
-        return "Error reading file";
-    case ERR_CANNOT_WRITE_FILE:
-        return "Error writing file";
-    case ERR_WRONG_SIZE:
-        return "Wrong file size";
-    default:
-        return "Unknown error";
+    int rc;
+    int handle = -1;
+    int fd = -1;
+    size_t bufsize = IMAGE_SIZE + CACHEALIGN_SIZE - 1;
+    handle = core_alloc("boot_image", bufsize);
+    if(handle < 0) {
+        rc = INSTALL_ERR_OUT_OF_MEMORY;
+        goto error;
     }
+
+    uint8_t* buffer = core_get_data(handle);
+    CACHEALIGN_BUFFER(buffer, bufsize);
+
+    fd = open(srcfile, O_RDONLY);
+    if(fd < 0) {
+        rc = INSTALL_ERR_FILE_NOT_FOUND;
+        goto error;
+    }
+
+    off_t fsize = filesize(fd);
+    if(fsize != IMAGE_SIZE) {
+        rc = INSTALL_ERR_BAD_FORMAT;
+        goto error;
+    }
+
+    ssize_t cnt = read(fd, buffer, IMAGE_SIZE);
+    if(cnt != IMAGE_SIZE) {
+        rc = INSTALL_ERR_FILE_IO;
+        goto error;
+    }
+
+    close(fd);
+    fd = -1;
+
+    rc = flash_img_write(buffer);
+    if(rc < 0)
+        goto error;
+
+  error:
+    if(fd >= 0)
+        close(fd);
+    if(handle >= 0)
+        core_free(handle);
+    return rc;
 }

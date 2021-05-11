@@ -89,6 +89,6 @@ show_logo.c
 #elif defined(SANSA_CONNECT)
 sansaconnect.c
 show_logo.c
-#elif defined(FIIO_M3K) && !defined(BOOTLOADER_SPL)
+#elif defined(FIIO_M3K)
 fiiom3k.c
 #endif

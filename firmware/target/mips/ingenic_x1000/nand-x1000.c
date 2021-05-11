@@ -200,11 +200,8 @@ static int nand_rdwr(bool write, uint32_t addr, uint32_t size, uint8_t* buf)
         return NAND_SUCCESS;
     if(write && !nand_drv.write_enabled)
         return NAND_ERR_WRITE_PROTECT;
-    /* FIXME: re-enable this check after merging new SPL+bootloader.
-     * It's only necessary for DMA, which is currently not used, but it's a
-     * good practice anyway. Disable for now due to SPL complications. */
-    /*if((uint32_t)buf & (CACHEALIGN_SIZE - 1))
-        return NAND_ERR_UNALIGNED;*/
+    if((uint32_t)buf & (CACHEALIGN_SIZE - 1))
+        return NAND_ERR_UNALIGNED;
 
     addr >>= nand_drv.chip_data->log2_page_size;
     size >>= nand_drv.chip_data->log2_page_size;
