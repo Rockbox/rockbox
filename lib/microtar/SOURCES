@@ -1,0 +1,6 @@
+src/microtar.c
+#ifdef ROCKBOX
+src/microtar-rockbox.c
+#else
+src/microtar-stdio.c
+#endif
