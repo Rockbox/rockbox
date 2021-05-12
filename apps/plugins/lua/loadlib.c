@@ -130,9 +130,11 @@ static int ll_require (lua_State *L) {
   lua_pushliteral(L, "");  /* error message accumulator */
   for (i=1; ; i++) {
     lua_rawgeti(L, -2, i);  /* get a loader */
-    if (lua_isnil(L, -1))
+    if (lua_isnil(L, -1)) {
+      lua_setfield(L, 2, name);  /* _LOADED[name] = nil */
       luaL_error(L, "module " LUA_QS " not found:%s",
                     name, lua_tostring(L, -2));
+    }
     lua_pushstring(L, name);
     lua_call(L, 1, 1);  /* call it */
     if (lua_isfunction(L, -1))  /* did it find module? */

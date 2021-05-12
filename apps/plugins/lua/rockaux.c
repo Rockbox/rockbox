@@ -106,7 +106,8 @@ int splash_scroller(int timeout, const char* str)
             {
                 brk = strpbrk_n(ch+1, max_ch, break_chars);
                 chars_next_break = (brk - ch);
-                if (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w)
+                if (brk &&
+                 (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w))
                 {
                     if (!isprint(line[linepos]))
                     {
@@ -261,14 +262,16 @@ int filetol(int fd, long *num)
                 neg = true;
             else
             {
-                rb->lseek(fd, -1, SEEK_CUR);
-                break;
+                //rb->lseek(fd, -1, SEEK_CUR);
+                //break;
+                goto get_digits;
             }
         }
     }
 
     while (rb->read(fd, &chbuf, 1) == 1)
     {
+get_digits:
         if(!isdigit(chbuf))
         {
             rb->lseek(fd, -1, SEEK_CUR);
