@@ -324,25 +324,28 @@ static int latebind_func_pairs(lua_State *L)
 {
   /* basetable @ top of stack 1(basetable)-1 */
   luaL_argcheck(L, lua_istable(L, 1), 1, "table expected");
-  lua_getglobal(L, "pairs"); /* function to be called / returned (btable;pairs) */
+  lua_getglobal(L, "next"); /* function to be called / returned (btable;next) */
 
-  lua_createtable(L, 0, 15); /* btable;pairs;newtable; */
+  lua_createtable(L, 0, 15); /* btable;next;newtable; */
   /* clone base table */
   lua_pushnil(L); /* first key */
   while(lua_next(L, 1) != 0) {
-    /* (btable;pairs;ntable;k;v) */
+    /* (btable;next;ntable;k;v) */
     lua_pushvalue(L, -2); /* dupe key Stk = (..;k;v -> ..k;v;k)*/
     lua_insert(L, -2); /* Stk = (..k;k;v) */
-    lua_rawset(L, 3); /* btable;pairs;ntable;k */
+    lua_rawset(L, 3); /* btable;next;ntable;k */
   }
-
+  /* fill the new table with all the latebound functions */
   lua_pushnil(L); /*nil name retrieves all unbound late bound functions */
-  latebind_func_index(L);/* (btable;pairs;ntable;nil) -> (btable;pairs;ntable) */
-
-  /* (btable;pairs;ntable) */
-  lua_call(L, 1, 3); /* pairs(ntable) -> (btable;iter;state;value) */
-
-  return 3;
+  latebind_func_index(L);/* (btable;next;ntable;nil) -> (btable;next;ntable) */
+  /* make the keys in the new table weak so they can be collected */
+  lua_createtable(L, 0, 2);
+  lua_pushstring(L, "k");
+  lua_setfield(L, -2, "__mode");
+  lua_setmetatable(L, -2);
+  lua_pushnil(L); /*nil initial key for next*/
+  /* stack = (btable;next;ntable;nil) */
+  return 3; /*(next,ntable,nil)*/
 }
 
 
