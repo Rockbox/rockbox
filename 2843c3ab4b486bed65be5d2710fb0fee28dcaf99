@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "ffcec5a2_aeb88f46",
+        "filename": "apps/action.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-12T22:06:57Z",
+      "side": 1,
+      "message": "I don\u0027t see an issue on the fuzev2 with these commented out but there are a bunch of different players so maybe a way to differentiate between lock and backlight needs devised but first I want to know what it does for your player..",
+      "parentUuid": "e7f94946_3b2fcc39",
+      "revId": "2843c3ab4b486bed65be5d2710fb0fee28dcaf99",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f23aa0e5_9db788e8",
         "filename": "apps/action.c",
         "patchSetId": 6
