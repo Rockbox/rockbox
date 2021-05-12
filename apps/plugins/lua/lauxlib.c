@@ -268,7 +268,8 @@ static int latebind_func_index(lua_State *L)
   const char *name = lua_tostring(L, -1);
 
   lua_pushstring (L, "__latebind");/* basetable;name;__latebind;*/
-  lua_rawget (L, -3);/* basetable;name;__latebind(t);*/
+  if(lua_istable(L, -3))
+    lua_rawget (L, -3);/* basetable;name;__latebind(t);*/
 
   luaL_argcheck(L, lua_istable(L, -3) && lua_istable(L, -1), 1,
                 "__latebind table expected");
@@ -324,25 +325,31 @@ static int latebind_func_pairs(lua_State *L)
 {
   /* basetable @ top of stack 1(basetable)-1 */
   luaL_argcheck(L, lua_istable(L, 1), 1, "table expected");
-  lua_getglobal(L, "pairs"); /* function to be called / returned (btable;pairs) */
 
-  lua_createtable(L, 0, 15); /* btable;pairs;newtable; */
-  /* clone base table */
+#if 0
+  lua_getglobal(L, "next"); /* function to be called / returned (btable;next) */
+  lua_createtable(L, 0, 15); /* btable;next;newtable; */
+  lua_pushnil(L); /* nil name retrieves all unbound latebound functions */
   lua_pushnil(L); /* first key */
-  while(lua_next(L, 1) != 0) {
-    /* (btable;pairs;ntable;k;v) */
+#else
+  /* this way is more RAM efficient in testing */
+  if(luaL_dostring(L, "return next, {}, nil, nil")!= 0)
+    lua_error(L);
+#endif
+  /* (btable;next;ntable;nil;nil) */
+  /* clone base table */
+  while(lua_next(L, 1) > 0) {
+    /* (btable;next;ntable;nil;k;v) */
     lua_pushvalue(L, -2); /* dupe key Stk = (..;k;v -> ..k;v;k)*/
     lua_insert(L, -2); /* Stk = (..k;k;v) */
-    lua_rawset(L, 3); /* btable;pairs;ntable;k */
+    lua_rawset(L, -5); /* btable;next;ntable;nil;k */
   }
-
-  lua_pushnil(L); /*nil name retrieves all unbound late bound functions */
-  latebind_func_index(L);/* (btable;pairs;ntable;nil) -> (btable;pairs;ntable) */
-
-  /* (btable;pairs;ntable) */
-  lua_call(L, 1, 3); /* pairs(ntable) -> (btable;iter;state;value) */
-
-  return 3;
+  /* fill the new table with all the latebound functions */
+  /* nil name retrieves all unbound latebound functions */
+  latebind_func_index(L);/* (btable;next;ntable;nil) -> (btable;next;ntable) */
+  lua_pushnil(L); /*nil initial key for next*/
+  /* stack = (btable;next;ntable;nil) */
+  return 3; /*(next,ntable,nil)*/
 }
 
 
