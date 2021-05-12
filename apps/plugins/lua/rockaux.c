@@ -261,14 +261,16 @@ int filetol(int fd, long *num)
                 neg = true;
             else
             {
-                rb->lseek(fd, -1, SEEK_CUR);
-                break;
+                //rb->lseek(fd, -1, SEEK_CUR);
+                //break;
+                goto get_digits;
             }
         }
     }
 
     while (rb->read(fd, &chbuf, 1) == 1)
     {
+get_digits:
         if(!isdigit(chbuf))
         {
             rb->lseek(fd, -1, SEEK_CUR);
