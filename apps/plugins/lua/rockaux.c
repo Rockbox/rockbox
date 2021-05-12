@@ -106,7 +106,8 @@ int splash_scroller(int timeout, const char* str)
             {
                 brk = strpbrk_n(ch+1, max_ch, break_chars);
                 chars_next_break = (brk - ch);
-                if (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w)
+                if (brk &&
+                 (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w))
                 {
                     if (!isprint(line[linepos]))
                     {
@@ -245,30 +246,42 @@ int filetol(int fd, long *num)
     int    retn = -1;
     char   chbuf = 0;
     size_t count = 0;
-    bool   neg   = false;
+    int    neg = 0;
     long   val;
 
     while (rb->read(fd, &chbuf, 1) == 1)
     {
         if(!isspace(chbuf) || retn == 1)
         {
-            if(chbuf == '0') /* strip preceeding zeros */
+            switch(chbuf)
             {
-                *num = 0;
-                retn = 1;
-            }
-            else if(chbuf == '-' && retn != 1)
-                neg = true;
-            else
-            {
-                rb->lseek(fd, -1, SEEK_CUR);
-                break;
+                case '-':
+                    neg = 1;
+                    continue;
+                case '0':  /* strip preceeding zeros */
+                {
+                    *num = 0;
+                    retn = 1;
+                    continue;
+                }
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                default:
+                    goto get_digits;
             }
         }
     }
 
     while (rb->read(fd, &chbuf, 1) == 1)
     {
+get_digits:
         if(!isdigit(chbuf))
         {
             rb->lseek(fd, -1, SEEK_CUR);
@@ -278,9 +291,9 @@ int filetol(int fd, long *num)
             buffer[count++] = chbuf;
     }
 
+    buffer[count] = '\0';
     if(count)
     {
-        buffer[count] = '\0';
         val = strtol(buffer, NULL, 10);
         *num = (neg)? -val:val;
         retn = 1;
