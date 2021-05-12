@@ -335,10 +335,12 @@ void msc_set_speed(msc_drv* d, int rate)
         jz_writef(MSC_LPM(d->msc_nr),
                   DRV_SEL_V(RISE_EDGE_DELAY_QTR_PHASE),
                   SMP_SEL_V(RISE_EDGE_DELAYED));
+        jz_writef(MSC_CTRL2(d->msc_nr), SPEED_V(HIGHSPEED));
     } else {
         jz_writef(MSC_LPM(d->msc_nr),
                   DRV_SEL_V(FALL_EDGE),
                   SMP_SEL_V(RISE_EDGE));
+        jz_writef(MSC_CTRL2(d->msc_nr), SPEED_V(DEFAULT));
     }
 
     /* Restart clock if it was running before */
@@ -443,10 +445,16 @@ void msc_async_start(msc_drv* d, msc_req* r)
         else
             discard_dcache_range(r->data, d->dma_desc.len);
 
-        /* TODO - should use MODE_SEL bit? what value of INCR? */
-        unsigned long addr_off = ((unsigned long)r->data) & 3;
-        jz_writef(MSC_DMAC(d->msc_nr), MODE_SEL(0), INCR(0), DMASEL(0),
-                  ALIGN_EN(addr_off != 0 ? 1 : 0), ADDR_OFFSET(addr_off));
+        /* Unaligned address for DMA doesn't seem to work correctly.
+         * FAT FS driver should ensure proper alignment of all buffers,
+         * so in practice this panic should not occur, but if it does
+         * I want to hear about it. */
+        if(UNLIKELY(d->dma_desc.mem & 3)) {
+            panicf("msc%d bad align: %08x", d->msc_nr,
+                   (unsigned)d->dma_desc.mem);
+        }
+
+        jz_writef(MSC_DMAC(d->msc_nr), MODE_SEL(0), INCR(0), DMASEL(0));
         REG_MSC_DMANDA(d->msc_nr) = PHYSADDR(&d->dma_desc);
     }
 
