@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b904218d_9cff0eca",
+        "filename": "apps/action.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-12T11:23:23Z",
+      "side": 1,
+      "message": "maybe all the key maps have been altered accordingly but I doubt it\nwhat does commenting this out do for you on the device you are testing this on?\n\nI suspect we will again run into the players that prompted the fall through actions the first time I vaguely remember ipods and the fuzev2 due to their scroll wheels",
+      "revId": "2843c3ab4b486bed65be5d2710fb0fee28dcaf99",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
