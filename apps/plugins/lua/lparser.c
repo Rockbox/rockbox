@@ -603,7 +603,12 @@ static void parlist (LexState *ls) {
     } while (!f->is_vararg && testnext(ls, ','));
   }
   adjustlocalvars(ls, nparams);
+  //f->numparams = cast_byte(fs->nactvar - (f->is_vararg & VARARG_HASARG));
+#if defined(LUA_COMPAT_VARARG)
   f->numparams = cast_byte(fs->nactvar - (f->is_vararg & VARARG_HASARG));
+#else
+  f->numparams = cast_byte(fs->nactvar);
+#endif
   luaK_reserveregs(fs, fs->nactvar);  /* reserve register for parameters */
 }
 

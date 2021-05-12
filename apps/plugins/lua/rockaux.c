@@ -106,7 +106,8 @@ int splash_scroller(int timeout, const char* str)
             {
                 brk = strpbrk_n(ch+1, max_ch, break_chars);
                 chars_next_break = (brk - ch);
-                if (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w)
+                if (brk &&
+                 (chars_next_break < 2 || w + (ch_w * chars_next_break) > max_w))
                 {
                     if (!isprint(line[linepos]))
                     {
@@ -226,7 +227,7 @@ int get_current_path(lua_State *L, int level)
         }
     }
 
-    lua_pushnil(L);    
+    lua_pushnil(L);
     return 1;
 }
 
@@ -250,25 +251,32 @@ int filetol(int fd, long *num)
 
     while (rb->read(fd, &chbuf, 1) == 1)
     {
-        if(!isspace(chbuf) || retn == 1)
+        if(retn || !isspace(chbuf))
         {
-            if(chbuf == '0') /* strip preceeding zeros */
+            switch(chbuf)
             {
-                *num = 0;
-                retn = 1;
-            }
-            else if(chbuf == '-' && retn != 1)
-                neg = true;
-            else
-            {
-                rb->lseek(fd, -1, SEEK_CUR);
-                break;
+                case '-':
+                {
+                    if (retn) /* 0 preceeds, this negative sign must be in error */
+                        goto get_digits;
+                    neg = true;
+                    continue;
+                }
+                case '0':  /* strip preceeding zeros */
+                {
+                    *num = 0;
+                    retn = 1;
+                    continue;
+                }
+                default:
+                    goto get_digits;
             }
         }
     }
 
     while (rb->read(fd, &chbuf, 1) == 1)
     {
+get_digits:
         if(!isdigit(chbuf))
         {
             rb->lseek(fd, -1, SEEK_CUR);
