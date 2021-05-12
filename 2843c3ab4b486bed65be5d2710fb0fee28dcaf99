@@ -16,6 +16,24 @@
       "revId": "2843c3ab4b486bed65be5d2710fb0fee28dcaf99",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e8fb195_0d488d55",
+        "filename": "apps/action.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-12T12:16:31Z",
+      "side": 1,
+      "message": "I\u0027ll have to test it out after work today, but if I recall correctly, this prevents scrolling from being keylock-exempted when the user turned on seek/skip keylock exemption. It seemed like exempting scrolling from keylock was a weird thing to do anyway.",
+      "parentUuid": "b904218d_9cff0eca",
+      "revId": "2843c3ab4b486bed65be5d2710fb0fee28dcaf99",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
