@@ -91,6 +91,24 @@
     },
     {
       "key": {
+        "uuid": "ade6793f_25ec205f",
+        "filename": "apps/action.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-13T11:13:32Z",
+      "side": 1,
+      "message": "clearly its an exemption so kinda fits the def?\n\nproblem being the logic shared with backlight exemptions, \nyour player has those keys mapped so should show the problem\ntry using those cursor keys with the backlight off\n\nwere you able to move the cursor without the backlight coming back on?",
+      "parentUuid": "f7c02474_56f68d0b",
+      "revId": "2843c3ab4b486bed65be5d2710fb0fee28dcaf99",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f23aa0e5_9db788e8",
         "filename": "apps/action.c",
         "patchSetId": 6
