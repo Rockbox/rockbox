@@ -109,6 +109,24 @@
     },
     {
       "key": {
+        "uuid": "5dc8f549_e5b3386e",
+        "filename": "apps/action.c",
+        "patchSetId": 6
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-13T12:35:49Z",
+      "side": 1,
+      "message": "With these lines uncommented, they are still not exempted from the backlight when seek/skip are selected as exempted. So regardless, the backlight turns on when the cursor moves. Which makes a lot of sense to me.\n\nIs moving the cursor while the device is locked a desirable trait? And does it make sense from the user\u0027s perspective to bundle moving the cursor in with seek and skip, which are media actions?\n\nIf the former is true and we want to give the ability to exempt cursor movement from the keylock, I guess can try  to break them out into their own line item rather than bundle them with seek and skip. I think bundling cursor movements with media movements for this feature makes very little sense, enough to be considered a bug.\n\nI guess my opinion though is that the keylock exemptions are really intended for media actions like play/pause/seek/skip, so being able to exempt cursor movements from the keylock makes little to no sense from the user\u0027s point of view.",
+      "parentUuid": "ade6793f_25ec205f",
+      "revId": "2843c3ab4b486bed65be5d2710fb0fee28dcaf99",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f23aa0e5_9db788e8",
         "filename": "apps/action.c",
         "patchSetId": 6
