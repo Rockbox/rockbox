@@ -720,6 +720,8 @@ static void doMultiple(double* operandOne, int* powerOne,
                        double  operandTwo, int  powerTwo);
 static void doAdd (double* operandOne, int* powerOne,
                    double  operandTwo, int  powerTwo);
+static void doExponent(double* operandOne, int* powerOne,
+                       double  operandTwo, int  powerTwo);
 static void printResult(void);
 static void formatResult(void);
 static void oneOperand(void);
@@ -1049,6 +1051,30 @@ static void doMultiple(double* operandOne, int* powerOne,
 }
 
 /* -----------------------------------------------------------------------
+exponentiate in scientific number format
+----------------------------------------------------------------------- */
+static void doExponent(double* operandOne, int* powerOne,
+                       double  operandTwo, int  powerTwo)
+{
+    (*operandOne) = myLn(*operandOne) + (double) (*powerOne) * 2.302585092994046;
+    (*powerOne) = 0;
+    doMultiple(operandOne, powerOne, operandTwo, powerTwo);
+    while(*powerOne)
+    {
+        if(*powerOne)
+        {
+            (*operandOne) *= 10;
+            (*powerOne) --;
+        }
+        else{
+            (*operandOne) /= 10;
+            (*powerOne) ++;
+        }
+    }
+    (*operandOne) = myExp(*operandOne);
+}
+
+/* -----------------------------------------------------------------------
 Handles all one operand calculations
 ----------------------------------------------------------------------- */
 static void oneOperand(void)
@@ -1192,6 +1218,9 @@ static void twoOperands(void)
             else
                 calStatus = cal_error;
             break;
+        case '^':
+            doExponent(&operand, &operandPower, result, power);
+       break;
         default: /* ' ' */
             switchOperands(); /* counter switchOperands() below */
             break;
@@ -1740,8 +1769,15 @@ static void sciButtonsProcess(void){
                     break;
 
                 case sci_xy:
-                    /*Not implemented yet
-                    Maybe it could use x^y = exp(y*ln(x))*/
+                    if(!operInputted) {twoOperands(); operInputted = true;}
+                    oper = '^';
+#ifdef CALCULATOR_OPERATORS
+                    case_cycle_operators:  /* F2 shortkey entrance */
+#endif
+                    calStatus = cal_normal;
+                    formatResult();
+                    operand = result;
+                    operandPower = power;
                     break;
 
                 case sci_sci:
