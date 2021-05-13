@@ -720,12 +720,83 @@ static void doMultiple(double* operandOne, int* powerOne,
                        double  operandTwo, int  powerTwo);
 static void doAdd (double* operandOne, int* powerOne,
                    double  operandTwo, int  powerTwo);
+static void doExponent(double* operandOne, int* powerOne,
+                       double  operandTwo, int  powerTwo);
 static void printResult(void);
 static void formatResult(void);
 static void oneOperand(void);
 
 static void drawLines(void);
 static void drawButtons(int group);
+
+double      strtod(const char *nptr, char **endptr);
+long long atoll(const char *nptr);
+
+/* -----------------------------------------------------------------------
+Standard library function
+----------------------------------------------------------------------- */
+double strtod(const char *nptr, char **endptr)
+{
+    double out;
+    long mantissa;
+    int length=0, end=0;
+    mantissa=atoll(nptr);
+    while(!end)
+    {
+        switch(*nptr)
+        {
+            case '\0':
+              end=1;
+              break;
+            case ',':
+            case '.':
+            case '\'':
+              end=1;
+            default:
+              nptr++;
+        }
+    }
+    out=atoll(nptr);
+    while( (*nptr == '0')||(*nptr == '1')||(*nptr == '2')||(*nptr == '3')||(*nptr == '4')||
+        (*nptr == '5')||(*nptr == '6')||(*nptr == '7')||(*nptr == '8')||(*nptr == '9') )
+    {
+        nptr++;
+        length++;
+    }
+    for(;length;length--)
+        out /= 10;
+    out += mantissa;
+    if(endptr != NULL)
+        *endptr=(char *) nptr;
+    return out;
+}
+
+// WARNING Unsafe: Use strtoll instead
+long long atoll(const char *nptr)
+{
+    long long result=0;
+    char negative=0;
+    while( (*nptr == ' ') || (*nptr == '\f') || (*nptr == '\n')||
+      (*nptr == '\r') || (*nptr == '\t') || (*nptr == '\v') )
+        nptr++;
+    if(*nptr == '+')
+        nptr++;
+    if(*nptr == '-')
+    {
+        negative++;
+        nptr++;
+    }
+    while (*nptr)
+    {
+        if( (*nptr < '0') || (*nptr > '9') )
+            break;
+        result *=10;
+        result+= (*(nptr++) -'0');
+    }
+    if(negative)
+        result = 0 - result;
+    return result;
+}
 
 /* -----------------------------------------------------------------------
 Handy functions
@@ -1049,6 +1120,91 @@ static void doMultiple(double* operandOne, int* powerOne,
 }
 
 /* -----------------------------------------------------------------------
+exponentiate in scientific number format
+----------------------------------------------------------------------- */
+static void doExponent(double* operandOne, int* powerOne,
+                       double  operandTwo, int  powerTwo)
+{
+    char negative=0;
+    char *lastDigit;
+    char negativeBuffer[25];
+    if (*operandOne == 0)
+    {
+        if (operandTwo == 0)
+        {
+            calStatus=cal_error; // result is undefined
+        }
+        else{
+            *powerOne = 0;
+            *operandOne = 0;
+        }
+        return;
+    }
+    if (operandTwo == 0)
+    {
+        *powerOne = 1;
+        *operandOne = 0.1;
+        return;
+    }
+    if (operandTwo < 0)
+    {
+        negative+=2;
+        operandTwo= ABS(operandTwo);
+    }
+    if (*operandOne < 0)
+    {
+#if MEMORYSIZE < 8
+        calStatus=cal_error;
+        return;
+#else
+        if(powerTwo < 0)
+        {
+            calStatus=cal_error; // result is imaginary
+            return;
+        }
+
+        /*Truncate operandTwo to three places past the radix
+        in order to eliminate floating point artifacts
+        (function should set error if truncating a non-integer) */
+        rb->snprintf(negativeBuffer, 25, "%.*f", powerTwo+3, operandTwo);
+        operandTwo = strtod(negativeBuffer, NULL);
+
+        /*Truncate operandTwo to powerTwo digits by way of string
+        in order to confirm operandTwo *10^powerTwo is an integer*/
+        rb->snprintf(negativeBuffer, 25, "%.*f", powerTwo, operandTwo);
+
+        if(strtod(negativeBuffer, &lastDigit) != operandTwo)
+        {
+            calStatus=cal_error; // result is imaginary
+            return;
+        }
+        if(rb->atoi(lastDigit-1) % 2)
+            negative++;
+#endif
+    }
+    (*operandOne) = myLn(ABS(*operandOne)) + (double) (*powerOne) * 2.302585092994046;
+    (*powerOne) = 0;
+    doMultiple(operandOne, powerOne, ABS(operandTwo), powerTwo);
+   while(*powerOne)
+    {
+        if(*powerOne > 0)
+        {
+            (*operandOne) *= 10;
+            (*powerOne) --;
+        }
+        else{
+            (*operandOne) /= 10;
+            (*powerOne) ++;
+        }
+    }
+    (*operandOne) = myExp(*operandOne);
+    if(negative & 2)
+        (*operandOne) = 1/(*operandOne);
+    if(negative & 1)
+        *operandOne = -(*operandOne);
+}
+
+/* -----------------------------------------------------------------------
 Handles all one operand calculations
 ----------------------------------------------------------------------- */
 static void oneOperand(void)
@@ -1191,6 +1347,9 @@ static void twoOperands(void)
             }
             else
                 calStatus = cal_error;
+            break;
+        case '^':
+            doExponent(&operand, &operandPower, result, power);
             break;
         default: /* ' ' */
             switchOperands(); /* counter switchOperands() below */
@@ -1684,7 +1843,9 @@ static void basicButtonsProcess(void){
 #ifdef CALCULATOR_OPERATORS
                     case_cycle_operators:  /* F2 shortkey entrance */
 #endif
-                    calStatus = cal_normal;
+                    if (calStatus == cal_typing ||
+                        calStatus == cal_dotted)
+                            calStatus = cal_normal;
                     formatResult();
                     operand = result;
                     operandPower = power;
@@ -1740,8 +1901,17 @@ static void sciButtonsProcess(void){
                     break;
 
                 case sci_xy:
-                    /*Not implemented yet
-                    Maybe it could use x^y = exp(y*ln(x))*/
+                    if(!operInputted) {twoOperands(); operInputted = true;}
+                    oper = '^';
+#ifdef CALCULATOR_OPERATORS
+                    case_cycle_operators:  /* F2 shortkey entrance */
+#endif
+                    if (calStatus == cal_typing ||
+                        calStatus == cal_dotted)
+                            calStatus = cal_normal;
+                    formatResult();
+                    operand = result;
+                    operandPower = power;
                     break;
 
                 case sci_sci:
