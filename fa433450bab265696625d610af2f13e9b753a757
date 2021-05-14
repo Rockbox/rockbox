@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e3171d3d_679dde09",
+        "filename": "apps/plugins/calculator.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1059,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-05-14T10:13:43Z",
+      "side": 1,
+      "message": "myLn probably causes the infinite loop I mentioned on IRC.\n\nPerhaps just disallow negative x inputs because x^y isn\u0027t defined \"most places\" in that case?",
+      "revId": "fa433450bab265696625d610af2f13e9b753a757",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
