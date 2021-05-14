@@ -96,11 +96,9 @@
 /* Which backlight fading type? */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 
-
-
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_SW_VOLUME_CONTROL
-#define HW_SAMPR_CAPS SAMPR_CAP_ALL_96
+#define HW_SAMPR_CAPS SAMPR_CAP_ALL_192
 
 //#define HAVE_MULTIMEDIA_KEYS
 #define CONFIG_KEYPAD DX50_PAD
@@ -110,7 +108,7 @@
 
 #define BATTERY_CAPACITY_DEFAULT 2100 /* default battery capacity */
 #define BATTERY_CAPACITY_MIN 1700 /* min. capacity selectable */
-#define BATTERY_CAPACITY_MAX 3200 /* max. capacity selectable */
+#define BATTERY_CAPACITY_MAX 7300 /* max. capacity selectable */
 #define BATTERY_CAPACITY_INC 50   /* capacity increment */
 #define BATTERY_TYPES_COUNT  1    /* only one type */
 
