@@ -515,15 +515,21 @@ static inline int action_code_worker(action_last_t *last,
             *  ACTION_BAR from CONTEXT_STD
             *  {ACTION_BAR, BUTTON_UP|BUTTON_REL, BUTTON_UP}
             */
-            if (cur->items[i].pre_button_code == last->button)
-            {   /* Always allow an exact match */
-                found++;
-                *end = i;
-            }
-            else if (!found && cur->items[i].pre_button_code == BUTTON_NONE)
-            {   /* Only allow Loose match if exact match wasn't found */
-                found++;
-                *end = i;
+#if !defined(HAS_BUTTON_HOLD)
+            if (!has_flag(cur->items[i].action_code, ACTION_WHEN_LOCKED) ||
+                is_keys_locked())
+#endif
+            {
+                if (cur->items[i].pre_button_code == last->button)
+                {   /* Always allow an exact match */
+                    found++;
+                    *end = i;
+                }
+                else if (!found && cur->items[i].pre_button_code == BUTTON_NONE)
+                {   /* Only allow Loose match if exact match wasn't found */
+                    found++;
+                    *end = i;
+                }
             }
         }
         else if (has_flag(cur->items[i].pre_button_code, cur->button))
@@ -543,7 +549,7 @@ static inline int action_code_worker(action_last_t *last,
     }
     else
     {
-        ret = cur->items[*end].action_code;
+        ret = cur->items[*end].action_code & ~ACTION_WHEN_LOCKED;
     }
 
     return ret;

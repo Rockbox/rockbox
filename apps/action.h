@@ -367,6 +367,10 @@ enum {
     LAST_ACTION_PLACEHOLDER, /* custom actions should be this + something */
 };
 
+/* if OR'd with an action in a keymap, then the action is only performed
+ * if softlock is active, otherwise it is skipped and searching continues */
+#define ACTION_WHEN_LOCKED 0x40000000
+
  /* act_cur holds action state during get_action() call */
 typedef struct
 {
