@@ -321,10 +321,6 @@ static void init(void)
         global_status.font_id[i] = FONT_SYSFIXED;
     font_init();
     show_logo();
-#ifndef USB_NONE
-    usb_init();
-    usb_start_monitoring();
-#endif
     button_init();
     powermgmt_init();
     backlight_init();
@@ -374,6 +370,13 @@ static void init(void)
     audio_init();
     talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
     settings_apply_skins();
+
+/* do USB last so prompt (if enabled) can work correctly if USB was inserted with device off,
+ * also doesn't hurt that it will display the nice pretty backdrop this way too. */
+#ifndef USB_NONE
+    usb_init();
+    usb_start_monitoring();
+#endif
 }
 
 #else /* CONFIG_PLATFORM & PLATFORM_HOSTED */
