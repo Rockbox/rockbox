@@ -177,7 +177,20 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
             talked_tick = current_tick;
             talk_text_message(main_message, false);
         }
-        button = get_action(CONTEXT_YESNOSCREEN, HZ*5);
+
+        /* USB somehow causes get_action() to miss keypress release events
+         * if the timeout is set to HZ*5 - for now just do not block
+         * when we're doing the USB mode prompt
+         *
+         * TODO: Figure out why USB seemingly messes with get_action() */
+        if (get_current_activity() == ACTIVITY_USBSCREEN)
+        {
+            button = get_action(CONTEXT_YESNOSCREEN, TIMEOUT_NOBLOCK);
+        } else
+        {
+            button = get_action(CONTEXT_YESNOSCREEN, HZ*5);
+        }
+
         switch (button)
         {
 #ifdef HAVE_TOUCHSCREEN
@@ -201,8 +214,13 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                 result=YESNO_YES;
                 break;
             case ACTION_NONE:
+            case ACTION_UNKNOWN:
             case SYS_CHARGER_DISCONNECTED:
             case SYS_BATTERY_UPDATE:
+            case SYS_TIMEOUT:
+#if CONFIG_CHARGING
+            case SYS_CHARGER_CONNECTED:
+#endif
                 /* ignore some SYS events that can happen */
                 continue;
             default:
