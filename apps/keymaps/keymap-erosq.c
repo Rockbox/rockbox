@@ -118,7 +118,7 @@ static const struct button_mapping button_context_tree[]  = {
 }; /* button_context_tree */
 
 static const struct button_mapping button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT, BUTTON_PLAY, BUTTON_NONE },
+    { ACTION_YESNO_ACCEPT, BUTTON_PLAY|BUTTON_REL, BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings_yesno */
