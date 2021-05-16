@@ -76,6 +76,16 @@ static const struct button_mapping button_context_wps[] = {
     LAST_ITEM_IN_LIST
 }; /* button_context_wps */
 
+static const struct button_mapping button_context_wps_locked[] = {
+    {ACTION_WPS_SKIPNEXT,       BUTTON_VOL_UP|BUTTON_REL,                  BUTTON_PLAY|BUTTON_VOL_UP},
+    {ACTION_WPS_SEEKFWD,        BUTTON_PLAY|BUTTON_VOL_UP|BUTTON_REPEAT,   BUTTON_NONE},
+    {ACTION_WPS_STOPSEEK,       BUTTON_PLAY|BUTTON_VOL_UP|BUTTON_REL,      BUTTON_PLAY|BUTTON_VOL_UP|BUTTON_REPEAT},
+    {ACTION_WPS_SKIPPREV,       BUTTON_VOL_DOWN|BUTTON_REL,                BUTTON_PLAY|BUTTON_VOL_DOWN},
+    {ACTION_WPS_SEEKBACK,       BUTTON_PLAY|BUTTON_VOL_DOWN|BUTTON_REPEAT, BUTTON_NONE},
+    {ACTION_WPS_STOPSEEK,       BUTTON_PLAY|BUTTON_VOL_DOWN|BUTTON_REL,    BUTTON_PLAY|BUTTON_VOL_DOWN|BUTTON_REPEAT},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_WPS)
+}; /* button_context_wps_locked */
+
 static const struct button_mapping button_context_tree[] = {
     {ACTION_TREE_STOP,          BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_PLAY},
     {ACTION_TREE_WPS,           BUTTON_BACK|BUTTON_REPEAT,          BUTTON_BACK},
@@ -242,6 +252,15 @@ static const struct button_mapping button_context_usb_hid_mode_browser[] = {
 
 const struct button_mapping* get_context_mapping(int context)
 {
+    switch (context)
+    {
+        case CONTEXT_WPS|CONTEXT_LOCKED:
+            return button_context_wps_locked;
+        default:
+            context &= ~CONTEXT_LOCKED;
+            break;
+    }
+
     switch (context)
     {
         default:
