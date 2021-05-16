@@ -177,7 +177,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
             talked_tick = current_tick;
             talk_text_message(main_message, false);
         }
-        button = get_action(CONTEXT_YESNOSCREEN, HZ*5);
+        button = get_action(CONTEXT_YESNOSCREEN, TIMEOUT_NOBLOCK);
         switch (button)
         {
 #ifdef HAVE_TOUCHSCREEN
@@ -201,6 +201,7 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                 result=YESNO_YES;
                 break;
             case ACTION_NONE:
+            case ACTION_UNKNOWN:
             case SYS_CHARGER_DISCONNECTED:
             case SYS_BATTERY_UPDATE:
                 /* ignore some SYS events that can happen */
