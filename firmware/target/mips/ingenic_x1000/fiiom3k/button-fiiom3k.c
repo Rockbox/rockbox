@@ -110,6 +110,19 @@ static struct ft_state_machine {
     int cur_x, cur_y;
 } fsm;
 
+/* coordinates below this are the left hand buttons,
+ * coordinates above this are part of the scrollbar */
+#define SCROLLSTRIP_LEFT_X  80
+
+/* top and bottom cutoffs for the center of the strip,
+ * divides it into top/middle/bottom zones */
+#define SCROLLSTRIP_TOP_Y 105
+#define SCROLLSTRIP_BOT_Y 185
+
+/* cutoffs for the menu/left button zones */
+#define MENUBUTTON_Y    80
+#define LEFTBUTTON_Y    190
+
 static int touch_to_button(int x, int y)
 {
     if(x == 900) {
@@ -120,19 +133,19 @@ static int touch_to_button(int x, int y)
             return BUTTON_RIGHT;
         else
             return 0;
-    } else if(x < 80) {
+    } else if(x < SCROLLSTRIP_LEFT_X) {
         /* Left strip */
-        if(y < 80)
+        if(y < MENUBUTTON_Y)
             return BUTTON_MENU;
-        else if(y > 190)
+        else if(y > LEFTBUTTON_Y)
             return BUTTON_LEFT;
         else
             return 0;
     } else {
         /* Middle strip */
-        if(y < 100)
+        if(y < SCROLLSTRIP_TOP_Y)
             return BUTTON_UP;
-        else if(y > 220)
+        else if(y > SCROLLSTRIP_BOT_Y)
             return BUTTON_DOWN;
         else
             return BUTTON_SELECT;
@@ -489,6 +502,24 @@ bool dbg_fiiom3k_touchpad(void)
         "IDLE", "PRESS", "REPORT", "SCROLL_PRESS", "SCROLLING"
     };
 
+    /* definition of box used to represent the touchpad */
+    const int pad_w = LCD_WIDTH;
+    const int pad_h = LCD_HEIGHT;
+    const int box_h = pad_h - SYSFONT_HEIGHT*5;
+    const int box_w = pad_w * box_h / pad_h;
+    const int box_x = (LCD_WIDTH - box_w) / 2;
+    const int box_y = SYSFONT_HEIGHT * 9 / 2;
+
+    /* cutoffs converted to box coordinates */
+    const int ss_left_x = box_x + SCROLLSTRIP_LEFT_X * box_w / pad_w;
+    const int ss_top_y  = box_y + SCROLLSTRIP_TOP_Y * box_h / pad_h;
+    const int ss_bot_y  = box_y + SCROLLSTRIP_BOT_Y * box_h / pad_h;
+    const int menubtn_y = box_y + MENUBUTTON_Y * box_h / pad_h;
+    const int leftbtn_y = box_y + LEFTBUTTON_Y * box_h / pad_h;
+
+    bool draw_areas = true;
+    bool draw_border = true;
+
     do {
         int line = 0;
         lcd_clear_display();
@@ -496,6 +527,26 @@ bool dbg_fiiom3k_touchpad(void)
         lcd_putsf(0, line++, "button: %08x", fsm.buttons);
         lcd_putsf(0, line++, "pos x: %4d  orig x: %4d", fsm.cur_x, fsm.orig_x);
         lcd_putsf(0, line++, "pos y: %4d  orig y: %4d", fsm.cur_y, fsm.orig_y);
+
+        /* draw touchpad box borders */
+        if(draw_border)
+            lcd_drawrect(box_x, box_y, box_w, box_h);
+
+        /* draw crosshair */
+        int tx = box_x + fsm.cur_x * box_w / pad_w;
+        int ty = box_y + fsm.cur_y * box_h / pad_h;
+        lcd_hline(tx-2, tx+2, ty);
+        lcd_vline(tx, ty-2, ty+2);
+
+        /* draw the button areas */
+        if(draw_areas) {
+            lcd_vline(ss_left_x, box_y, box_y+box_h);
+            lcd_hline(ss_left_x, box_x+box_w, ss_top_y);
+            lcd_hline(ss_left_x, box_x+box_w, ss_bot_y);
+            lcd_hline(box_x, ss_left_x, menubtn_y);
+            lcd_hline(box_x, ss_left_x, leftbtn_y);
+        }
+
         lcd_update();
     } while(getbtn() != BUTTON_POWER);
     return false;
