@@ -586,6 +586,13 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 
     cur->is_prebutton = false;
 
+#ifdef HAVE_LOCKED_ACTIONS
+    /* This only applies to the first context, to allow locked contexts to
+     * specify a fall through to their non-locked version */
+    if (is_keys_locked())
+        context |= CONTEXT_LOCKED;
+#endif
+
     for(;;)
     {
         /* logf("context = %x",context); */
