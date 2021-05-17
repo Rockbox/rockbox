@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9e92075c_e3bf3305",
+        "filename": "apps/gui/yesno.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-17T12:47:03Z",
+      "side": 1,
+      "message": "try this its a bit hacky but I think follows similar logic to what I did in lua splash scroller\n\nenum yesno_res gui_syncyesno_run(const struct text_message * main_message,\n                                 const struct text_message * yes_message,\n                                 const struct text_message * no_message)\n{\n    const int timeout \u003d (HZ * 5); /* talk repeat interval as well */\n    const int result_none \u003d (-1);\n\n    int button;\n    int result\u003d-1;\n    bool result_displayed;\n    struct gui_yesno yn[NB_SCREENS];\n    struct viewport vp[NB_SCREENS];\n\n    long talked_tick \u003d 0;\n    long entered_tick \u003d current_tick;\n\n    FOR_NB_SCREENS(i)\n    {\n        yn[i].main_message\u003dmain_message;\n        yn[i].result_message[YESNO_YES]\u003dyes_message;\n        yn[i].result_message[YESNO_NO]\u003dno_message;\n        yn[i].display\u003d\u0026screens[i];\n        yn[i].vp \u003d \u0026vp[i];\n        viewportmanager_theme_enable(i, true, yn[i].vp);\n        screens[i].scroll_stop();\n        gui_yesno_draw(\u0026(yn[i]));\n    }\n\n    /* make sure to eat any extranous keypresses */\n    action_wait_for_release();\n    button_clear_queue();\n\n    while (result \u003d\u003d result_none)\n    {\n        /* Repeat the question every 5secs (more or less) */\n        if (global_settings.talk_menu\n            \u0026\u0026 (talked_tick\u003d\u003d0 || TIME_AFTER(current_tick, talked_tick + timeout)))\n        {\n            talked_tick \u003d current_tick;\n            talk_text_message(main_message, false);\n        }\n        button \u003d get_action(CONTEXT_YESNOSCREEN, timeout);\n        switch (button)\n        {\n#ifdef HAVE_TOUCHSCREEN\n            case ACTION_TOUCHSCREEN:\n                {\n                    short int x, y;\n                    if (action_get_touchscreen_press_in_vp(\u0026x, \u0026y, yn[0].vp) \u003d\u003d BUTTON_REL)\n                    {\n                        if (y \u003e yn[0].vp-\u003eheight/2)\n                        {\n                            if (x \u003c\u003d yn[0].vp-\u003ewidth/2)\n                                result \u003d YESNO_YES;\n                            else\n                                result \u003d YESNO_NO;\n                        }\n                    }\n                }\n                break;\n#endif\n            case ACTION_YESNO_ACCEPT:\n                result\u003dYESNO_YES;\n                break;\n            case ACTION_NONE:\n            case ACTION_UNKNOWN:\n            case SYS_CHARGER_DISCONNECTED:\n            case SYS_BATTERY_UPDATE:\n                /* ignore some SYS events that can happen */\n                continue;\n            case SYS_TIMEOUT:\n                if (TIME_BEFORE(current_tick, entered_tick + timeout))\n                    continue;\n                /* FALL THROUGH */\n            default:\n                if(default_event_handler(button) \u003d\u003d SYS_USB_CONNECTED)\n                    return(YESNO_USB);\n                result \u003d YESNO_NO;\n        }\n    }\n\n    FOR_NB_SCREENS(i)\n        result_displayed\u003dgui_yesno_draw_result(\u0026(yn[i]), result);\n\n    if (global_settings.talk_menu)\n    {\n        talk_text_message((result \u003d\u003d YESNO_YES) ? yes_message\n                          : no_message, false);\n        talk_force_enqueue_next();\n    }\n    if(result_displayed)\n        sleep(HZ);\n\n    FOR_NB_SCREENS(i)\n    {\n        screens[i].scroll_stop_viewport(yn[i].vp);\n        viewportmanager_theme_undo(i, true);\n    }\n\n    return(result);\n}",
+      "revId": "0ec1d1467f86422b595983aa663e6c4ea453c702",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "16fa3cae_5e10aa24",
+        "filename": "apps/gui/yesno.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-17T12:47:03Z",
+      "side": 1,
+      "message": "this is where your HZ * 5 timeout is used\n\nalso belies that current behavior auto timeout returns NO automatically\n\nmaybe we should be checking if talk is enabled on that too since a blind user might miss a prompt",
+      "revId": "0ec1d1467f86422b595983aa663e6c4ea453c702",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
