@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a1c63d42_7b86b3d1",
+        "filename": "apps/action.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-17T19:36:54Z",
+      "side": 1,
+      "message": "might wanna verify you won\u0027t get issues using the same number for CONTEXT_LOCKED\n\nor are you using the side effect? if the latter comments appreciated.",
+      "revId": "c9013a7b7964721f663cefe5e31ed044d3d6e514",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
