@@ -33,6 +33,23 @@
       "revId": "0ec1d1467f86422b595983aa663e6c4ea453c702",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44e1dc6e_e22d094d",
+        "filename": "apps/gui/yesno.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-05-17T14:11:53Z",
+      "side": 1,
+      "message": "or in light of above it should be             \ncase SYS_TIMEOUT:\n    /* ignore some SYS events that can happen */",
+      "revId": "0ec1d1467f86422b595983aa663e6c4ea453c702",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
