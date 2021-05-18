@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eb811294_df4e6706",
+        "filename": "apps/gui/yesno.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-18T22:51:37Z",
+      "side": 1,
+      "message": "I\u0027m not sure what all events should be ignored here, I think these were the ones mentioned on IRC yesterday. Should the tick timeout code mentioned in the last patchset be implemented here?",
+      "revId": "d52b2bcc376a5926173aaad79f095b8c42ba06b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
