@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b5cd0663_a89090b7",
+        "filename": "apps/gui/yesno.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-18T00:17:17Z",
+      "side": 1,
+      "message": "Unfortunately it doesn\u0027t look like this fixed the issue - I\u0027m getting the same behavior. I\u0027m going to look a little closer into get_action() I think. It sure seems like something to do with USB is causing it to miss buttons or something like that.\n\nIn addition, neither this version nor the original seems to time out. They should both time out after 5 seconds, right? Maybe that\u0027s a clue...\n\nAlternate hack: What if we somehow checked to see if this is the USB mode prompt or some other prompt and only did TIMEOUT_NOBLOCK on USB mode prompt? By definition the device is connected to power at that point anyway.",
+      "parentUuid": "9e92075c_e3bf3305",
+      "revId": "0ec1d1467f86422b595983aa663e6c4ea453c702",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "16fa3cae_5e10aa24",
         "filename": "apps/gui/yesno.c",
         "patchSetId": 8
