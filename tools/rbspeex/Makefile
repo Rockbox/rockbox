@@ -77,6 +77,7 @@ LIBSOURCES := $(SPEEXSRCS:%.c=$(SPEEXSRC)/%.c) rbspeex.c
 LIBS = $(TARGET_DIR)librbspeex.a
 else
 LIBS = $(SYS_SPEEX)
+LIBSOURCES = rbspeex.c
 endif
 
 TARGET_DIR ?= $(shell pwd)/
