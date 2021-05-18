@@ -73,11 +73,13 @@ endif
 ifeq ($(SYS_SPEEX),)
 # This sets up 'SRC' based on the files mentioned in SOURCES
 SPEEXSRCS := $(shell $(CC) $(CFLAGS) -E -P -xc $(SPEEXSRC)/SOURCES)
-LIBSOURCES := $(SPEEXSRCS:%.c=$(SPEEXSRC)/%.c) rbspeex.c
+LIBSOURCES := $(SPEEXSRCS:%.c=$(SPEEXSRC)/%.c)
 LIBS = $(TARGET_DIR)librbspeex.a
 else
 LIBS = $(SYS_SPEEX)
 endif
+
+LIBSOURCES += rbspeex.c
 
 TARGET_DIR ?= $(shell pwd)/
 BUILD_DIR ?= $(TARGET_DIR)build$(COMPILETARGET)
