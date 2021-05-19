@@ -2239,7 +2239,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
     
     masterfd_pos = lseek(masterfd, tcmh.tch.entry_count * sizeof(struct index_entry),
                          SEEK_CUR);
-    if (masterfd_pos == filesize(masterfd))
+    if (masterfd_pos < 0)
     {
         logf("we can't append!");
         close(masterfd);
@@ -2988,12 +2988,7 @@ static bool commit(void)
     }
 
     if (tch.entry_count == 0)
-    {
         logf("nothing to commit");
-        close(tmpfd);
-        remove(TAGCACHE_FILE_TEMP);
-        return true;
-    }
 
     /* Fully initialize existing headers (if any) before going further. */
     tc_stat.ready = check_all_headers();
