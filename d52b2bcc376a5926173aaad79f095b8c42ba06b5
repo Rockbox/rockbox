@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "82efed4e_d182e8f3",
+        "filename": "apps/gui/yesno.c",
+        "patchSetId": 9
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-19T01:12:27Z",
+      "side": 1,
+      "message": "Hack idea: only do \"TIMEOUT_NOBLOCK\" if the current activity is USB. Not ideal (it is a hack, after all), but works really well on my eros q and m3k (modified m3k for button release to test). Behavior is unchanged for all other yes/no screens.\n\n        if (get_current_activity() \u003d\u003d ACTIVITY_USBSCREEN)\n        {\n            button \u003d get_action(CONTEXT_YESNOSCREEN, TIMEOUT_NOBLOCK);\n        } else\n        {\n            button \u003d get_action(CONTEXT_YESNOSCREEN, HZ*5);\n        }",
+      "revId": "d52b2bcc376a5926173aaad79f095b8c42ba06b5",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "eb811294_df4e6706",
         "filename": "apps/gui/yesno.c",
         "patchSetId": 9
