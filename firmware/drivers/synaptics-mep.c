@@ -560,7 +560,10 @@ int touchpad_read_device(char *data, int len)
             {
 /* for HDD6330 an absolute packet will follow for sensor nr 0 which we ignore */
 #if defined(PHILIPS_HDD6330)
-                if ((data[3]>>6) == 0) syn_read(tmp, 4);
+                if ((data[3]>>6) == 0)
+                    syn_read(tmp, 4);
+                else
+                    tmp[1] = 0x0; /* Initialize explicitly */
                 // relay tap gesture packet
                 if (tmp[1]==0x02) { data[1]=0x02; data[2]=0x00; data[3]=0x00; }
 #endif
