@@ -151,12 +151,15 @@ function rb.settings.read(s_settings, s_var, s_groupname)
     return data
 end
 
-function rb.settings.dump(s_settings, s_groupname, s_structname, t_output)
+function rb.settings.dump(s_settings, s_groupname, s_structname, t_output, fn_filter)
     t_output = t_output or {}
+    fn_filter = fn_filter or function(s,k) return true end
     local tgroup = rb[s_groupname]
     s_structname = s_structname or s_settings
     for k, v in pairs(tgroup[s_structname]) do
-        t_output[k] = rb.settings.read(s_settings, v, s_groupname)
+        if fn_filter(s_structname, k) then
+            t_output[k] = rb.settings.read(s_settings, v, s_groupname)
+        end
     end
     return t_output
 end
