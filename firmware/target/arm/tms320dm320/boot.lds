@@ -38,12 +38,12 @@ STARTUP(target/arm/tms320dm320/crt0.o)
 
 #ifdef SANSA_CONNECT
 /* Offset in flash from beginning, we don't want overwrite OF bootloader
-   due to recovery mode and more importantly - hardware block protection.
-   This offset makes Rockbox bootloader a replacement for OF vmlinux.
-   In .srr file header add any valid memory address from following
-   <0x1000000; 0x1300180) u (0x131EAF4; 0x1420000) u (0x1440000; 0x5000000>
-   ensuring that complete bootloader fits in.
-   Entry point in .srr file should be equal to _loadaddress. */
+ * due to recovery mode and more importantly - hardware block protection.
+ * Rockbox bootloader is flashed into kernel partition and chainloaded
+ * from OF bootloader via Arbitrary Code Execution exploit. The first
+ * instruction must be position independent as Rockbox bootloader will be
+ * copied to RAM at 0x01000000 and executed from RAM.
+ */
 #define FLASHSIZE     0x00400000
 #define FLASHMEMORIG  0x00120010
 /* Kernel partition is 2 M, srr header is 16 bytes, sig is 2048 bytes */
