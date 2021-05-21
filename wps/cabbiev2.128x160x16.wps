@@ -42,7 +42,7 @@
 #NowPlaying - AA
 %Vl(a,5,88,118,24,1)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 #Album Art
 %Vl(a,5,15,118,70,1)
 %Cl(0,0,118,70)
@@ -52,7 +52,7 @@
 %Vl(b,0,15,-,84,1)
 
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
 %s%acNext Track:

@@ -31,23 +31,23 @@
 
 %Vl(a,153,30,-,130,1)
 %s%al%?it<%it|%fn>
-%s%al%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 #%s%al%iy
 
 %s%al%Sx(Next Track:)
 %s%al%?It<%It|%Fn>
-%s%al%Ia
+%s%al%?Ia<%Ia|%IA>
 
 %Vl(b,0,30,-,130,1)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%iy
 
 %ac%Sx(Next Track:)
 %s%ac%?It<%It|%Fn>
-%s%ac%Ia
+%s%ac%?Ia<%Ia|%IA>
 
 %V(0,180,-,20,1)
 #touch the X of X regions to let the playlist viewer pop up

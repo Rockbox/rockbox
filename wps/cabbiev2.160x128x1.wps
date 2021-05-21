@@ -52,7 +52,7 @@
 # Track Info - No Album Art
 %V(0,12,-,75,-)
 %s%ac%?it<%it|%fn>
-%s%ac%?ia<%ia|%?d(2)<%d(2)|%(root%)>>
+%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
 %s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
 %ac%Sx(Next Track:)
