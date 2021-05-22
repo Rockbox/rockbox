@@ -21,7 +21,7 @@ LUA_INCLUDELIST := $(addprefix $(LUA_BUILDDIR)/,audio.lua blit.lua color.lua \
 						draw_text.lua files.lua image.lua image_save.lua lcd.lua \
 						math_ex.lua print.lua timer.lua playlist.lua pcm.lua \
 						sound.lua rbcompat.lua rbsettings.lua poly_points.lua \
-						printtable.lua printmenus.lua printsubmenu.lua \
+						printtable.lua printmenus.lua printsubmenu.lua printcells.lua\
 						menubuttons.lua menucoresettings.lua create_kbd_layout.lua \
                         temploader.lua)
 
