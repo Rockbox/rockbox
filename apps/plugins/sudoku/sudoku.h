@@ -460,6 +460,9 @@
 #define SUDOKU_BUTTON_MENU       BUTTON_MENU
 #define SUDOKU_BUTTON_POSSIBLE   BUTTON_BACK
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

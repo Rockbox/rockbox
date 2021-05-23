@@ -298,4 +298,6 @@ keymaps/keymap-fiiom3klinux.c
 keymaps/keymap-fiiom3k.c
 #elif CONFIG_KEYPAD == EROSQ_PAD
 keymaps/keymap-erosq.c
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+keymaps/keymap-shanlingq1.c
 #endif

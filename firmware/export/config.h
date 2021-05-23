@@ -160,6 +160,7 @@
 #define FIIO_M3K_LINUX_PAD 71
 #define EROSQ_PAD          72
 #define FIIO_M3K_PAD       73
+#define SHANLING_Q1_PAD    74
 
 /* CONFIG_REMOTE_KEYPAD */
 #define H100_REMOTE   1
@@ -274,6 +275,7 @@
 #define LCD_IHIFI770C     67 /* as used by IHIFI 770C */
 #define LCD_IHIFI800      68 /* as used by IHIFI 800 */
 #define LCD_FIIOM3K       69 /* as used by the FiiO M3K */
+#define LCD_SHANLING_Q1   70 /* as used by the Shanling Q1 */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -592,6 +594,8 @@ Lyre prototype 1 */
 #include "config/fiiom3k.h"
 #elif defined(EROS_Q)
 #include "config/aigoerosq.h"
+#elif defined(SHANLING_Q1)
+#include "config/shanlingq1.h"
 #else
 //#error "unknown hwardware platform!"
 #endif

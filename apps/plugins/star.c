@@ -668,6 +668,10 @@
 #define STAR_LEVEL_DOWN_NAME "VOL-"
 #define STAR_LEVEL_REPEAT_NAME "BACK"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define STAR_QUIT           BUTTON_POWER
+#define STAR_QUIT_NAME      "POWER"
+
 #else
 #error No keymap defined!
 #endif
