@@ -581,6 +581,9 @@
 #define CB_SCROLL_LEFT  (BUTTON_LEFT|BUTTON_REPEAT)
 #define CB_SCROLL_RIGHT (BUTTON_RIGHT|BUTTON_REPEAT)
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

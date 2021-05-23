@@ -614,6 +614,10 @@ void I_ShutdownGraphics(void)
 #define DOOMBUTTON_WEAPON  BUTTON_VOL_UP
 #define DOOMBUTTON_MAP     BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define DOOMBUTTON_ESC     BUTTON_POWER
+#define DOOMBUTTON_MAP     BUTTON_PREV
+
 #else
 #error Keymap not defined!
 #endif

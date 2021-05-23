@@ -120,6 +120,15 @@ enum {
 #define XOFS          128
 #define MAX_FPS       40
 
+/* Shanling Q1: TODO: test this */
+#elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 400)
+#define XOFS          86
+/*#define ROW_HEIGHT    32*/
+#define SCORE_TXT_X     28
+#define SCORE_TXT_WIDTH 32
+#define SCORE_TXT_Y   48
+#define MAX_FPS       40
+
 /* 22x22 bubbles (iPod Video) */
 #elif (LCD_HEIGHT == 240) && (LCD_WIDTH == 320)
 #define XOFS          72

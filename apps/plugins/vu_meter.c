@@ -452,6 +452,9 @@
 #define LABEL_MENU      "MENU"
 #define LABEL_VOLUME    "VOL+/VOL-"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

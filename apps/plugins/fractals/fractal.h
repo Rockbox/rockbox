@@ -504,6 +504,9 @@
 #define FRACTAL_PRECISION_DEC   BUTTON_BACK
 #define FRACTAL_RESET           BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define FRACTAL_QUIT            BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
