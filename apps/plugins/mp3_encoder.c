@@ -2580,6 +2580,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define MP3ENC_DONE     BUTTON_POWER
 #define MP3ENC_SELECT   BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

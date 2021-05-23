@@ -58,7 +58,7 @@
 #define FREG_STATUS_ECC_UNCOR_ERR (2 << 4)
 
 const nand_chip supported_nand_chips[] = {
-#if defined(FIIO_M3K)
+#if defined(FIIO_M3K) || defined(SHANLING_Q1)
     {
         /* ATO25D1GA */
         .mf_id = 0x9b,

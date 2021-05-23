@@ -711,6 +711,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define LVL_UP_TEXT "VOL+"
 #define LVL_DOWN_TEXT "VOL-"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error "Unsupported keymap!"
 #endif

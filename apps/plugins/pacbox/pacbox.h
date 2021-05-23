@@ -398,6 +398,9 @@
 #define PACMAN_1UP      BUTTON_VOL_UP
 #define PACMAN_COIN     BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 
 #error Keymap not defined!

@@ -255,6 +255,9 @@
 #define BTN_FIRE        BUTTON_SELECT
 #define BTN_PAUSE       BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error Unsupported keypad
 #endif
