@@ -61,7 +61,7 @@
 
 /* NAND chip config */
 const nand_chip_data target_nand_chip_data[] = {
-#ifdef FIIO_M3K
+#if defined(FIIO_M3K) || defined(SHANLING_Q1)
     {
         /* ATO25D1GA */
         .mf_id = 0x9b,
@@ -165,6 +165,32 @@ int nand_identify(int* mf_id, int* dev_id)
     /* Set parameters according to new chip data */
     sfc_set_dev_conf(nand_drv.chip_data->dev_conf);
     sfc_set_clock(nand_drv.chip_data->clock_freq);
+
+#ifdef SHANLING_Q1
+    /* HACK: We need to set the quad enable bit
+     *
+     * The M3K should need the same thing, but I think because the M3K's
+     * kernel is incapable of doing a clean shutdown -- a magic ioctl is
+     * used to shut off the AXP192 instead -- the NAND chip isn't reset,
+     * and the quad bit stays set when Rockbox boots. As we never issue
+     * the software reset command, we never run into this problem...
+     *
+     * I believe the Q1 has a clean shutdown because its AXP driver is
+     * hooked up to the right Linux kernel APIs, hence, the NAND chip
+     * registers get properly cleared on shutdown.
+     */
+    int freg = nandcmd_get_feature(0xb0);
+    if(freg < 0) {
+        status = freg;
+        goto error;
+    }
+
+    freg |= 1;
+    status = nandcmd_set_feature(0xb0, 1);
+    if(status < 0)
+        goto error;
+#endif
+
     status = NAND_SUCCESS;
 
   error:
