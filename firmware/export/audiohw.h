@@ -216,6 +216,8 @@ struct sound_settings_info
 #include "cs4398.h"
 #elif defined(HAVE_ES9018)
 #include "es9018.h"
+#elif defined(HAVE_ES9218)
+#include "es9218.h"
 #elif (CONFIG_PLATFORM & (PLATFORM_ANDROID | PLATFORM_MAEMO \
        | PLATFORM_PANDORA | PLATFORM_SDL))
 #include "hosted_codec.h"

@@ -350,6 +350,9 @@ CONFIG_KEYPAD == SANSA_CONNECT_PAD
 #define UP          BUTTON_UP
 #define DOWN        BUTTON_DOWN
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define QUIT        BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

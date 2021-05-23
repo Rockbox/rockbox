@@ -42,7 +42,7 @@
 #define DEBOUNCE_TIME (HZ/10)
 
 static const msc_config msc_configs[] = {
-#ifdef FIIO_M3K
+#if defined(FIIO_M3K)
 #define MSC_CLOCK_SOURCE X1000_CLK_SCLK_A
     {
         .msc_nr = 0,
@@ -52,6 +52,17 @@ static const msc_config msc_configs[] = {
         .cd_gpio = GPIO_MSC0_CD,
         .cd_active_level = 0,
     },
+#elif defined(SHANLING_Q1)
+#define MSC_CLOCK_SOURCE  X1000_CLK_MPLL
+    {
+        .msc_nr = 0,
+        .msc_type = MSC_TYPE_SD,
+        .bus_width = 4,
+        .label = "microSD",
+        .cd_gpio = GPIO_MSC0_CD,
+        .cd_active_level = 0,
+    },
+    /* NOTE: SDIO wifi card is on msc1 */
 #else
 # error "Please add X1000 MSC config"
 #endif

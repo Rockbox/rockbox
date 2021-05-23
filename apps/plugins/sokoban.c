@@ -696,6 +696,9 @@
 #define BUTTON_SAVE        BUTTON_BACK
 #define BUTTON_SAVE_NAME   "BACK"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

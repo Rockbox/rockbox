@@ -529,6 +529,14 @@
 #define UI_LCD_POSY                 15
 
 
+#elif defined(SHANLING_Q1)
+#define UI_TITLE                    "Shanling Q1"
+#define UI_WIDTH                    466
+#define UI_HEIGHT                   526
+#define UI_LCD_POSX                 46
+#define UI_LCD_POSY                 61
+
+
 #elif defined(SIMULATOR)
 #error no UI defines
 #endif

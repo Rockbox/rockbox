@@ -62,6 +62,18 @@ Head and Tail are stored
     #define TOP_X4 548 /* x-coord of the lowerright item (hi-score) */
     #define TOP_Y1 8   /* y-coord of the top row of items */
     #define TOP_Y2 50  /* y-coord of the bottom row of items */
+#elif (LCD_WIDTH >= 360) && (LCD_HEIGHT >= 400)
+    #define MULTIPLIER 12 /*Modifier for porting on other screens*/
+    #define MODIFIER_1 12
+    #define MODIFIER_2 10
+    #define CENTER_X 12
+    #define CENTER_Y 40
+    #define TOP_X1 34  /* x-coord of the upperleft item (game type) */
+    #define TOP_X2 320 /* x-coord of the upperright item (maze type) */
+    #define TOP_X3 42  /* x-coord of the lowerleft item (speed) */
+    #define TOP_X4 314 /* x-coord of the lowerright item (hi-score) */
+    #define TOP_Y1 4   /* y-coord of the top row of items */
+    #define TOP_Y2 25  /* y-coord of the bottom row of items */
 #elif (LCD_WIDTH >= 320) && (LCD_HEIGHT >= 240)
     #define MULTIPLIER 10 /*Modifier for porting on other screens*/
     #define MODIFIER_1 10
@@ -445,6 +457,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define SNAKE2_QUIT         BUTTON_POWER
 #define SNAKE2_PLAYPAUSE    BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE_TEXT "PLAY"
+
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
 
 #else
 #error No keymap defined!

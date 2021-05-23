@@ -395,6 +395,9 @@
 #define CHC_SETTINGS_OK     BUTTON_SELECT
 #define CHC_SETTINGS_CANCEL BUTTON_POWER
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define CHC_QUIT            BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

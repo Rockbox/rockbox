@@ -357,6 +357,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define PUZZLE_SHUFFLE  BUTTON_BACK
 #define PUZZLE_PICTURE  BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

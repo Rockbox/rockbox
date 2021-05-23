@@ -572,6 +572,9 @@
 #define TV_LINE_DOWN    BUTTON_SCROLL_FWD
 #define TV_BOOKMARK     BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define TV_BOOKMARK     BUTTON_PLAY
+
 #else
 #error No keymap defined!
 #endif

@@ -443,6 +443,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define MINESWP_DISCOVER     (BUTTON_SELECT|BUTTON_REPEAT)
 #   define MINESWP_INFO         BUTTON_MENU
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

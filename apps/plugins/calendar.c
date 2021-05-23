@@ -421,6 +421,9 @@
 #define CALENDAR_NEXT_MONTH BUTTON_VOL_UP
 #define CALENDAR_PREV_MONTH BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error "No keypad setting."
 #endif

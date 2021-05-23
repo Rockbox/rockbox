@@ -407,6 +407,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define BTN_QUIT        BUTTON_POWER
 #define BTN_STOPRESET   BUTTON_BACK
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif
@@ -492,7 +495,8 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define SPEED 4
 #define MAX_WORM_SEGMENTS 512
 #elif ((LCD_WIDTH == 320) && (LCD_HEIGHT == 240)) || \
-    ((LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400)))
+    ((LCD_WIDTH == 240) && ((LCD_HEIGHT == 320) || (LCD_HEIGHT == 400))) || \
+    ((LCD_WIDTH == 360) && (LCD_HEIGHT == 400))
 #define FOOD_SIZE 7
 #define ARGH_SIZE 8
 #define SPEED 4

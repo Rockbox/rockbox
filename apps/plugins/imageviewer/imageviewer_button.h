@@ -539,6 +539,9 @@
 #define IMGVIEW_MENU        BUTTON_POWER
 #define IMGVIEW_SLIDE_SHOW  BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

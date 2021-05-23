@@ -1291,6 +1291,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define CHIP8_KEY6  BUTTON_RIGHT
 #define CHIP8_KEY8  BUTTON_BACK
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

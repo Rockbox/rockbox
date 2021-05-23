@@ -280,7 +280,7 @@ function arrangeButtons(btns)
     end
 end
 
-rb.touchscreen_set_mode(rb.TOUCHSCREEN_POINT)
+rb.touchscreen_mode(rb.TOUCHSCREEN_POINT)
 
 LapsView:init()
 

@@ -468,6 +468,9 @@ static void setoptions (void)
         options.SELECT  = BUTTON_VOL_UP;
         options.MENU    = BUTTON_POWER;
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+        /* use touchscreen */
+
 #else
 #error No Keymap Defined!
 #endif

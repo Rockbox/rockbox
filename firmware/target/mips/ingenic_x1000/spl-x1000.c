@@ -34,7 +34,7 @@
 #include "ucl_decompress.h"
 #include <string.h>
 
-#ifdef FIIO_M3K
+#if defined(FIIO_M3K) || defined(SHANLING_Q1)
 # define SPL_DDR_MEMORYSIZE  64
 # define SPL_DDR_AUTOSR_EN   1
 # define SPL_DDR_NEED_BYPASS 1

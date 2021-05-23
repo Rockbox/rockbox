@@ -404,6 +404,9 @@
 #define ROCKPAINT_LEFT      BUTTON_LEFT
 #define ROCKPAINT_RIGHT     BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error "Please define keys for this keypad"
 #endif

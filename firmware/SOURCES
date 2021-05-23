@@ -503,6 +503,8 @@ drivers/audio/pcm1792.c
 drivers/audio/cs4398.c
 #elif defined (HAVE_ES9018)
 drivers/audio/es9018.c
+#elif defined (HAVE_ES9218)
+drivers/audio/es9218.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -1716,6 +1718,15 @@ target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/spl-fiiom3k.c
 #endif /* FIIO_M3K */
 
+#if defined(SHANLING_Q1)
+target/mips/ingenic_x1000/shanlingq1/audiohw-shanlingq1.c
+target/mips/ingenic_x1000/shanlingq1/backlight-shanlingq1.c
+target/mips/ingenic_x1000/shanlingq1/button-shanlingq1.c
+target/mips/ingenic_x1000/shanlingq1/lcd-shanlingq1.c
+target/mips/ingenic_x1000/shanlingq1/power-shanlingq1.c
+target/mips/ingenic_x1000/shanlingq1/spl-shanlingq1.c
+#endif /* SHANLING_Q1 */
+
 #if defined(LYRE_PROTO1)
 target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c
 target/arm/at91sam/lyre_proto1/backlight-lyre_proto1.c
@@ -1947,6 +1958,9 @@ drivers/axp-pmu.c
 #endif
 #ifdef HAVE_FT6x06
 drivers/ft6x06.c
+#endif
+#ifdef HAVE_CW2015
+drivers/cw2015.c
 #endif
 #endif
 

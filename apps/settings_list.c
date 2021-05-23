@@ -242,6 +242,9 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONT_HEIGHT 12
 #elif LCD_HEIGHT <= 320
   #define DEFAULT_FONT_HEIGHT 15
+#elif defined(SHANLING_Q1)
+  /* 16pt font looks pretty aliased & ugly */
+  #define DEFAULT_FONT_HEIGHT 18
 #elif LCD_HEIGHT <= 400
   #define DEFAULT_FONT_HEIGHT 16
 #elif LCD_HEIGHT <= 480 && LCD_WIDTH < 800
@@ -261,7 +264,7 @@ static const char graphic_numeric[] = "graphic,numeric";
 #endif
 
 #ifdef HAVE_LCD_COLOR
-  #if DEFAULT_FONT_HEIGHT >= 31
+  #if DEFAULT_FONT_HEIGHT >= 31 || defined(SHANLING_Q1)
     #define DEFAULT_ICONSET "tango_icons.32x32"
     #define DEFAULT_VIEWERS_ICONSET "tango_icons_viewers.32x32"
   #elif DEFAULT_FONT_HEIGHT >= 23
@@ -848,7 +851,11 @@ const struct settings_list settings[] = {
 
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
     CHOICE_SETTING(F_SOUNDSETTING, roll_off, LANG_FILTER_ROLL_OFF, 0,
-#if defined(AUDIOHW_HAVE_SHORT2_ROLL_OFF)
+#if defined(AUDIOHW_HAVE_ES9218_ROLL_OFF)
+                   "roll_off", "linear fast,linear slow,minimum fast,minimum slow,apodizing 1,apodizing 2,hybrid fast,brick wall", sound_set_filter_roll_off,
+                   8, ID2P(LANG_FILTER_LINEAR_FAST), ID2P(LANG_FILTER_LINEAR_SLOW), ID2P(LANG_FILTER_MINIMUM_FAST), ID2P(LANG_FILTER_MINIMUM_SLOW),
+                   ID2P(LANG_FILTER_APODIZING_1), ID2P(LANG_FILTER_APODIZING_2), ID2P(LANG_FILTER_HYBRID_FAST), ID2P(LANG_FILTER_BRICK_WALL)),
+#elif defined(AUDIOHW_HAVE_SHORT2_ROLL_OFF)
                    "roll_off", "sharp,slow,short sharp,short slow", sound_set_filter_roll_off,
                    4, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW), ID2P(LANG_FILTER_SHORT_SHARP), ID2P(LANG_FILTER_SHORT_SLOW)),
 #elif defined(AUDIOHW_HAVE_SHORT_ROLL_OFF)

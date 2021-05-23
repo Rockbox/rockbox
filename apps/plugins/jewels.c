@@ -377,6 +377,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define HK_SELECT "SELECT"
 #define HK_CANCEL "BACK"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

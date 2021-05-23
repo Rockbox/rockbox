@@ -85,5 +85,7 @@ ihifi2.c
 erosq.c
 #elif CONFIG_KEYPAD == FIIO_M3K_PAD
 fiio-m3k.c
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+shanling-q1.c
 #endif
 #endif /* SIMULATOR */

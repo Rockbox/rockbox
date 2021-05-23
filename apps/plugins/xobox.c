@@ -351,6 +351,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define DOWN    BUTTON_DOWN
 #define PAUSE   BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error "No keymap defined!"
 #endif

@@ -465,6 +465,9 @@
 #define ROCKBLOX_DROP           BUTTON_PLAY
 #define ROCKBLOX_RESTART        BUTTON_BACK
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif
@@ -533,6 +536,22 @@
 #define SCORE_Y 58
 #define LEVEL_Y 142
 #define LINES_Y 218
+
+#elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 400)
+
+#define BLOCK_WIDTH 19
+#define BLOCK_HEIGHT 19
+#define BOARD_X 27
+#define BOARD_Y 0
+#define LABEL_X 258
+#define SCORE_Y 40
+#define LEVEL_Y 92
+#define LINES_Y 140
+#define HIGH_LABEL_X   258
+#define HIGH_SCORE_Y   200
+#define HIGH_LEVEL_Y   258
+#define PREVIEW_X 258
+#define PREVIEW_Y 300
 
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
 

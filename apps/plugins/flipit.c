@@ -496,6 +496,9 @@
 #define FLIPIT_STEP_BY_STEP BUTTON_VOL_UP
 #define FLIPIT_TOGGLE       BUTTON_SELECT
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

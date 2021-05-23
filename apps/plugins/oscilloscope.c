@@ -548,6 +548,9 @@
 #define OSCILLOSCOPE_VOL_UP         BUTTON_VOL_UP
 #define OSCILLOSCOPE_VOL_DOWN       BUTTON_VOL_DOWN
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif
