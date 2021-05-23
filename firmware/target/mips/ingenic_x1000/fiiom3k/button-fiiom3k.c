@@ -22,6 +22,7 @@
 #include "button.h"
 #include "kernel.h"
 #include "backlight.h"
+#include "powermgmt.h"
 #include "panic.h"
 #include "axp173.h"
 #include "gpio-x1000.h"
@@ -313,6 +314,7 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
             /* Poke the backlight */
             backlight_on();
             buttonlight_on();
+            reset_poweroff_timer();
 
             fsm.orig_x = fsm.cur_x;
             fsm.orig_y = fsm.cur_y;
@@ -481,7 +483,7 @@ int button_read_device(void)
     return r;
 }
 
-bool headphones_inserted()
+bool headphones_inserted(void)
 {
     return hp_detect_reg & 0x40 ? true : false;
 }

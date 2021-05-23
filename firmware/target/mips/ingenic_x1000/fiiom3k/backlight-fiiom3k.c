@@ -43,7 +43,6 @@ bool backlight_hw_init(void)
     pwm_enable(BL_BTN_CHN);
     backlight_hw_brightness(MAX_BRIGHTNESS_SETTING);
     buttonlight_hw_brightness(MAX_BRIGHTNESS_SETTING);
-    /* TODO: avoid buttonlight flicker when powering up the machine */
     return true;
 }
 
