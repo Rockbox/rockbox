@@ -741,6 +741,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #   define HK_CUR2STACK     "HOLD SELECT"
 #   define HK_REM2STACK     "VOL+"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#   define SOL_QUIT         BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif

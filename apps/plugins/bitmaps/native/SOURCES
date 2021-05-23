@@ -388,7 +388,9 @@ invadrox_shield.22x16x16.bmp
 invadrox_ufo.16x7x16.bmp
 invadrox_ufo_explode.21x8x16.bmp
 invadrox_numbers.50x7x16.bmp
-#if LCD_WIDTH == 320
+#if LCD_WIDTH == 360
+invadrox_background.320x240x16.bmp
+#elif LCD_WIDTH == 320
 invadrox_background.320x240x16.bmp
 #elif LCD_WIDTH == 240
 invadrox_background.240x320x16.bmp
@@ -456,6 +458,8 @@ jewels.220x176x16.bmp
 #elif (LCD_WIDTH == 240) && (LCD_HEIGHT >= 320)
 jewels.320x240x16.bmp
 #elif (LCD_WIDTH == 320) && (LCD_HEIGHT == 240)
+jewels.320x240x16.bmp
+#elif (LCD_WIDTH == 360) && (LCD_HEIGHT == 400)
 jewels.320x240x16.bmp
 #elif   ((LCD_WIDTH == 640) && (LCD_HEIGHT == 480)) || \
         ((LCD_WIDTH == 480) && (LCD_HEIGHT == 640))
@@ -874,7 +878,8 @@ superdom_boarditems.176x132x16.bmp
 #elif (LCD_WIDTH == 320 && LCD_HEIGHT == 240)
 superdom_boarditems.320x240x16.bmp
 #elif ((LCD_WIDTH == 240) && (LCD_HEIGHT == 320)) || \
-      ((LCD_WIDTH == 240) && (LCD_HEIGHT == 400))
+      ((LCD_WIDTH == 240) && (LCD_HEIGHT == 400)) || \
+      ((LCD_WIDTH == 360) && (LCD_HEIGHT == 400))
 superdom_boarditems.240x320x16.bmp
 #elif (LCD_WIDTH == 480 && LCD_HEIGHT == 640) 
 superdom_boarditems.480x640x16.bmp

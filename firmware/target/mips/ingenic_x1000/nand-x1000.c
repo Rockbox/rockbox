@@ -61,7 +61,9 @@
 
 /* NAND chip config */
 const nand_chip_data target_nand_chip_data[] = {
-#ifdef FIIO_M3K
+/* TODO: add Shanling Q1 here after SFC/NAND restructuring.
+ * we need to do things better to avoid silly hacks */
+#if defined(FIIO_M3K) /* || defined(SHANLING_Q1) */
     {
         /* ATO25D1GA */
         .mf_id = 0x9b,

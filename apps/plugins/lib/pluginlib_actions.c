@@ -499,6 +499,8 @@ const struct button_mapping pla_main_ctx[] =
     {PLA_SELECT,            BUTTON_SELECT,                      BUTTON_NONE},
     {PLA_SELECT_REL,        BUTTON_SELECT|BUTTON_REL,           BUTTON_SELECT},
     {PLA_SELECT_REPEAT,     BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_NONE},
+#elif (CONFIG_KEYPAD == SHANLING_Q1_PAD)
+    {PLA_EXIT,              BUTTON_POWER,                       BUTTON_NONE},
 #else
 #   ifndef HAVE_TOUCHSCREEN
 #       error pluginlib_actions: No actions defined

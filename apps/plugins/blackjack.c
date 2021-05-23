@@ -607,6 +607,10 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define BJACK_QUIT          BUTTON_POWER
+#define BJACK_QUIT_NAME     "QUIT"
+
 #else
 #error No keymap defined!
 #endif

@@ -325,6 +325,9 @@
 #define MIDI_VOL_DOWN     BUTTON_VOL_DOWN
 #define MIDI_PLAYPAUSE    BUTTON_PLAY
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

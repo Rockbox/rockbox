@@ -325,6 +325,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define PONG_RIGHT_UP   BUTTON_BACK
 #define PONG_RIGHT_DOWN BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif
