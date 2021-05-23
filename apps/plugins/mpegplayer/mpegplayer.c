@@ -486,6 +486,9 @@ CONFIG_KEYPAD == SANSA_M200_PAD
 #define MPEG_RW         BUTTON_LEFT
 #define MPEG_FF         BUTTON_RIGHT
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif

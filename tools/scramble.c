@@ -333,6 +333,8 @@ int main (int argc, char** argv)
             modelnum = 109;
         else if (!strcmp(&argv[1][5], "fiiom3k")) /* FiiO M3K */
             modelnum = 114;
+        else if (!strcmp(&argv[1][5], "shq1")) /* Shanling Q1 */
+            modelnum = 115;
         else {
             fprintf(stderr, "unsupported model: %s\n", &argv[1][5]);
             return 2;

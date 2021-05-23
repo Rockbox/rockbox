@@ -234,6 +234,9 @@
 #define BATTERY_ON_TXT  "Play"
 #define BATTERY_OFF_TXT "Power"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error "No keymap defined!"
 #endif

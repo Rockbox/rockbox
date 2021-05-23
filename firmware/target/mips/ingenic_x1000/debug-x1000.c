@@ -152,6 +152,9 @@ extern bool dbg_fiiom3k_touchpad(void);
 #ifdef HAVE_AXP_PMU
 extern bool axp_debug_menu(void);
 #endif
+#ifdef HAVE_CW2015
+extern bool cw2015_debug_menu(void);
+#endif
 
 /* Menu definition */
 static const struct {
@@ -169,6 +172,9 @@ static const struct {
 #endif
 #ifdef HAVE_AXP_PMU
     {"Power stats", &axp_debug_menu},
+#endif
+#ifdef HAVE_CW2015
+    {"CW2015 debug", &cw2015_debug_menu},
 #endif
 };
 

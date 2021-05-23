@@ -446,6 +446,9 @@ CONFIG_KEYPAD == MROBE500_PAD
 #define SNAKE2_PLAYPAUSE    BUTTON_PLAY
 #define SNAKE2_PLAYPAUSE_TEXT "PLAY"
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+/* use touchscreen */
+
 #else
 #error No keymap defined!
 #endif
