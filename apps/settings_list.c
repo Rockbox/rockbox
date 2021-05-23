@@ -848,7 +848,11 @@ const struct settings_list settings[] = {
 
 #ifdef AUDIOHW_HAVE_FILTER_ROLL_OFF
     CHOICE_SETTING(F_SOUNDSETTING, roll_off, LANG_FILTER_ROLL_OFF, 0,
-#if defined(AUDIOHW_HAVE_SHORT2_ROLL_OFF)
+#if defined(AUDIOHW_HAVE_ES9218_ROLL_OFF)
+                   "roll_off", "linear fast,linear slow,minimum fast,minimum slow,apodizing 1,apodizing 2,hybrid fast,brick wall", sound_set_filter_roll_off,
+                   8, ID2P(LANG_FILTER_LINEAR_FAST), ID2P(LANG_FILTER_LINEAR_SLOW), ID2P(LANG_FILTER_MINIMUM_FAST), ID2P(LANG_FILTER_MINIMUM_SLOW),
+                   ID2P(LANG_FILTER_APODIZING_1), ID2P(LANG_FILTER_APODIZING_2), ID2P(LANG_FILTER_HYBRID_FAST), ID2P(LANG_FILTER_BRICK_WALL)),
+#elif defined(AUDIOHW_HAVE_SHORT2_ROLL_OFF)
                    "roll_off", "sharp,slow,short sharp,short slow", sound_set_filter_roll_off,
                    4, ID2P(LANG_FILTER_SHARP), ID2P(LANG_FILTER_SLOW), ID2P(LANG_FILTER_SHORT_SHARP), ID2P(LANG_FILTER_SHORT_SLOW)),
 #elif defined(AUDIOHW_HAVE_SHORT_ROLL_OFF)
