@@ -533,6 +533,9 @@ F3: equal to "="
 #define CALCULATOR_CALC     BUTTON_MENU
 #define CALCULATOR_CLEAR    BUTTON_BACK
 
+#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
+#define CALCULATOR_QUIT     BUTTON_POWER
+
 #else
 #error No keymap defined!
 #endif
