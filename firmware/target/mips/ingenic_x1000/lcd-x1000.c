@@ -65,8 +65,10 @@ static fb_data shadowfb[LCD_HEIGHT*LCD_WIDTH] __attribute__((aligned(64)));
 /* Signals DMA copy to shadow FB is done */
 static volatile int fbcopy_done;
 
+#if defined(HAVE_LCD_SLEEP) || defined(LCD_X1000_FASTSLEEP)
 /* True if we're in sleep mode */
 static bool lcd_sleeping = false;
+#endif
 
 /* Check if running with interrupts disabled (eg: panic screen) */
 #define lcd_panic_mode \
@@ -98,16 +100,16 @@ static void lcd_init_controller(const struct lcd_tgt_config* cfg)
     default: break;
     }
 
-    if(lcd_tgt_config.use_serial)
+    if(cfg->use_serial)
         mcfg_new |= jz_orf(LCD_MCFG_NEW, DTYPE_V(SERIAL), CTYPE_V(SERIAL));
     else
         mcfg_new |= jz_orf(LCD_MCFG_NEW, DTYPE_V(PARALLEL), CTYPE_V(PARALLEL));
 
     jz_vwritef(mcfg_new, LCD_MCFG_NEW,
-               6800_MODE(lcd_tgt_config.use_6800_mode),
-               CSPLY(lcd_tgt_config.wr_polarity ? 0 : 1),
-               RSPLY(lcd_tgt_config.dc_polarity),
-               CLKPLY(lcd_tgt_config.clk_polarity));
+               6800_MODE(cfg->use_6800_mode),
+               CSPLY(cfg->wr_polarity ? 0 : 1),
+               RSPLY(cfg->dc_polarity),
+               CLKPLY(cfg->clk_polarity));
 
     /* Program the configuration. Note we cannot enable TE signal at
      * this stage, because the panel will need to be configured first.
@@ -122,9 +124,9 @@ static void lcd_init_controller(const struct lcd_tgt_config* cfg)
     jz_write(LCD_SMWT, 0);
 
     /* DMA settings */
-    jz_writef(LCD_CTRL, BURST_V(64WORD),
+    jz_writef(LCD_CTRL, ENABLE(0), BURST_V(64WORD),
               EOFM(1), SOFM(0), IFUM(0), QDM(0),
-              BEDN(0), PEDN(0), ENABLE(0));
+              BEDN(cfg->big_endian), PEDN(0));
     jz_write(LCD_DAH, LCD_WIDTH);
     jz_write(LCD_DAV, LCD_HEIGHT);
 }
@@ -274,8 +276,10 @@ static void lcd_fbcopy_dma_partial(int x, int y, int width, int height)
 
 static void lcd_dma_start(void)
 {
-    /* Set format conversion bit, seems necessary for DMA mode */
-    jz_writef(LCD_MCFG_NEW, FMT_CONV(1));
+    /* Set format conversion bit, seems necessary for DMA mode.
+     * Must set DTIMES here if we use an 8-bit bus type. */
+    int dtimes = lcd_tgt_config.bus_width == 8 ? (LCD_DEPTH/8 - 1) : 0;
+    jz_writef(LCD_MCFG_NEW, FMT_CONV(1), DTIMES(dtimes));
 
     /* Program vsync configuration */
     jz_writef(LCD_MCTRL, NARROW_TE(lcd_tgt_config.te_narrow),
@@ -288,21 +292,6 @@ static void lcd_dma_start(void)
     jz_write(LCD_DA, PHYSADDR(&lcd_dma_desc[0]));
     jz_writef(LCD_MCTRL, DMA_MODE(1), DMA_START(1), DMA_TX_EN(1));
     jz_writef(LCD_CTRL, ENABLE(1));
-}
-
-static void lcd_dma_stop(void)
-{
-    /* Stop the DMA transfer */
-    jz_writef(LCD_CTRL, ENABLE(0));
-    jz_writef(LCD_MCTRL, DMA_TX_EN(0));
-
-    /* Wait for disable to take effect */
-    while(jz_readf(LCD_STATE, QD) == 0);
-    jz_writef(LCD_STATE, QD(0));
-
-    /* Clear format conversion bit, disable vsync */
-    jz_writef(LCD_MCFG_NEW, FMT_CONV(0));
-    jz_writef(LCD_MCTRL, NARROW_TE(0), TE_INV(0), NOT_USE_TE(1));
 }
 
 static bool lcd_wait_frame(void)
@@ -319,6 +308,26 @@ static bool lcd_wait_frame(void)
     while(jz_readf(LCD_MSTATE, BUSY));
     jz_writef(LCD_STATE, EOF(0));
     return true;
+}
+
+static void lcd_dma_stop(void)
+{
+#ifdef LCD_X1000_DMA_WAIT_FOR_FRAME
+    /* Wait for frame to finish to avoid misaligning the write pointer */
+    lcd_wait_frame();
+#endif
+
+    /* Stop the DMA transfer */
+    jz_writef(LCD_CTRL, ENABLE(0));
+    jz_writef(LCD_MCTRL, DMA_TX_EN(0));
+
+    /* Wait for disable to take effect */
+    while(jz_readf(LCD_STATE, QD) == 0);
+    jz_writef(LCD_STATE, QD(0));
+
+    /* Clear format conversion bit, disable vsync */
+    jz_writef(LCD_MCFG_NEW, FMT_CONV(0), DTIMES(0));
+    jz_writef(LCD_MCTRL, NARROW_TE(0), TE_INV(0), NOT_USE_TE(1));
 }
 
 static void lcd_send(uint32_t d)
@@ -404,7 +413,8 @@ void lcd_enable(bool en)
     restore_irq(irq);
 
     /* Deal with sleep mode */
-#ifdef LCD_X1000_FASTSLEEP
+#if defined(HAVE_LCD_SLEEP) || defined(LCD_X1000_FASTSLEEP)
+#if defined(LCD_X1000_FASTSLEEP)
     if(bit && !en) {
         lcd_tgt_sleep(true);
         lcd_sleeping = true;
@@ -414,6 +424,7 @@ void lcd_enable(bool en)
         lcd_tgt_sleep(false);
         lcd_sleeping = false;
     }
+#endif
 
     /* Handle turning the LCD back on */
     if(!bit && en)
