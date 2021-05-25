@@ -38,34 +38,37 @@
 
 struct lcd_tgt_config {
     /* Data bus width, in bits */
-    int bus_width: 8;
+    unsigned bus_width: 8;
 
     /* Command bus width, in bits */
-    int cmd_width: 8;
+    unsigned cmd_width: 8;
 
     /* 1 = use 6800 timings, 0 = use 8080 timings */
-    int use_6800_mode: 1;
+    unsigned use_6800_mode: 1;
 
     /* 1 = serial interface, 0 = parallel interface */
-    int use_serial: 1;
+    unsigned use_serial: 1;
 
     /* Clock active edge: 0 = falling edge, 1 = rising edge */
-    int clk_polarity: 1;
+    unsigned clk_polarity: 1;
 
     /* DC pin levels: 1 = data high, command low; 0 = data low, command high */
-    int dc_polarity: 1;
+    unsigned dc_polarity: 1;
 
     /* WR pin level during idle: 1 = keep high; 0 = keep low */
-    int wr_polarity: 1;
+    unsigned wr_polarity: 1;
 
     /* 1 to enable vsync, so DMA transfer is synchronized with TE signal */
-    int te_enable: 1;
+    unsigned te_enable: 1;
 
     /* Active level of TE signal: 1 = high, 0 = low */
-    int te_polarity: 1;
+    unsigned te_polarity: 1;
 
     /* 1 = support narrow TE signal (<=3 pixel clocks); 0 = don't support */
-    int te_narrow: 1;
+    unsigned te_narrow: 1;
+
+    /* 1 = big endian mode, 0 = little endian mode */
+    unsigned big_endian: 1;
 
     /* Commands used to initiate a framebuffer write. Buffer must be
      * aligned to 64-byte boundary and size must be a multiple of 4,
