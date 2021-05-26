@@ -31,7 +31,7 @@
 #define FT6x06_BUS  1
 #define FT6x06_ADDR 0x38
 
-#define AXP173_BUS  2
-#define AXP173_ADDR 0x34
+#define AXP_PMU_BUS  2
+#define AXP_PMU_ADDR 0x34
 
 #endif /* __I2C_TARGET_H__ */

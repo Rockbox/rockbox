@@ -26,7 +26,7 @@
 #ifdef HAVE_USB_CHARGING_ENABLE
 # include "usb_core.h"
 #endif
-#include "axp173.h"
+#include "axp-pmu.h"
 #include "i2c-x1000.h"
 #include "gpio-x1000.h"
 
@@ -53,32 +53,32 @@ const unsigned short percent_to_volt_charge[11] =
       3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
 };
 
-#define AXP173_IRQ_PORT GPIO_B
-#define AXP173_IRQ_PIN  (1 << 10)
+#define AXP_IRQ_PORT GPIO_B
+#define AXP_IRQ_PIN  (1 << 10)
 
 void power_init(void)
 {
     /* Initialize driver */
     i2c_x1000_set_freq(2, I2C_FREQ_400K);
-    axp173_init();
+    axp_init();
 
     /* Set lowest sample rate */
-    axp173_adc_set_rate(AXP173_ADC_RATE_25HZ);
+    axp_adc_set_rate(AXP_ADC_RATE_25HZ);
 
     /* Ensure battery voltage ADC is enabled */
-    int bits = axp173_adc_get_enabled();
+    int bits = axp_adc_get_enabled();
     bits |= (1 << ADC_BATTERY_VOLTAGE);
-    axp173_adc_set_enabled(bits);
+    axp_adc_set_enabled(bits);
 
     /* Turn on all power outputs */
-    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR,
-                    AXP173_REG_PWROUTPUTCTRL, 0, 0x5f, NULL);
-    i2c_reg_modify1(AXP173_BUS, AXP173_ADDR,
-                    AXP173_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
+    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                    AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
+    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                    AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
 
     /* Set the default charging current. This is the same as the
      * OF's setting, although it's not strictly within the USB spec. */
-    axp173_set_charge_current(780);
+    axp_set_charge_current(780);
 
     /* Short delay to give power outputs time to stabilize */
     mdelay(5);
@@ -87,7 +87,7 @@ void power_init(void)
 #ifdef HAVE_USB_CHARGING_ENABLE
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
-    axp173_set_charge_current(maxcurrent);
+    axp_set_charge_current(maxcurrent);
 }
 #endif
 
@@ -97,18 +97,16 @@ void adc_init(void)
 
 void power_off(void)
 {
-    /* Set the shutdown bit */
-    i2c_reg_setbit1(AXP173_BUS, AXP173_ADDR,
-                    AXP173_REG_SHUTDOWNLEDCTRL, 7, 1, NULL);
+    axp_power_off();
     while(1);
 }
 
 bool charging_state(void)
 {
-    return axp173_battery_status() == AXP173_BATT_CHARGING;
+    return axp_battery_status() == AXP_BATT_CHARGING;
 }
 
 int _battery_voltage(void)
 {
-    return axp173_adc_read(ADC_BATTERY_VOLTAGE);
+    return axp_adc_read(ADC_BATTERY_VOLTAGE);
 }

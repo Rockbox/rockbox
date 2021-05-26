@@ -1929,8 +1929,8 @@ drivers/touchpad.c
 drivers/i2c-async.c
 #endif
 
-#ifdef HAVE_AXP173
-drivers/axp173.c
+#ifdef HAVE_AXP_PMU
+drivers/axp-pmu.c
 #endif
 
 /* firmware/kernel section */

@@ -24,7 +24,7 @@
 #include "backlight.h"
 #include "powermgmt.h"
 #include "panic.h"
-#include "axp173.h"
+#include "axp-pmu.h"
 #include "gpio-x1000.h"
 #include "i2c-x1000.h"
 #include <string.h>
@@ -418,7 +418,7 @@ static uint8_t hp_detect_reg = 0x00;
 static int hp_detect_tmo_cb(struct timeout* tmo)
 {
     i2c_descriptor* d = (i2c_descriptor*)tmo->data;
-    i2c_async_queue(AXP173_BUS, TIMEOUT_NOBLOCK, I2C_Q_ADD, 0, d);
+    i2c_async_queue(AXP_PMU_BUS, TIMEOUT_NOBLOCK, I2C_Q_ADD, 0, d);
     return HPD_POLL_TIME;
 }
 
@@ -427,7 +427,7 @@ static void hp_detect_init(void)
     static struct timeout tmo;
     static const uint8_t gpio_reg = AXP192_REG_GPIOSTATE1;
     static i2c_descriptor desc = {
-        .slave_addr = AXP173_ADDR,
+        .slave_addr = AXP_PMU_ADDR,
         .bus_cond = I2C_START | I2C_STOP,
         .tran_mode = I2C_READ,
         .buffer[0] = (void*)&gpio_reg,
@@ -440,10 +440,10 @@ static void hp_detect_init(void)
     };
 
     /* Headphone detect is wired to AXP192 GPIO: set it to input state */
-    i2c_reg_write1(AXP173_BUS, AXP173_ADDR, AXP192_REG_GPIO2FUNCTION, 0x01);
+    i2c_reg_write1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP192_REG_GPIO2FUNCTION, 0x01);
 
     /* Get an initial reading before startup */
-    int r = i2c_reg_read1(AXP173_BUS, AXP173_ADDR, gpio_reg);
+    int r = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, gpio_reg);
     if(r >= 0)
         hp_detect_reg = r;
 
