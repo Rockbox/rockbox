@@ -148,7 +148,9 @@ static bool dbg_cpuidle(void)
 
 #ifdef FIIO_M3K
 extern bool dbg_fiiom3k_touchpad(void);
-extern bool axp173_debug_menu(void);
+#endif
+#ifdef HAVE_AXP_PMU
+extern bool axp_debug_menu(void);
 #endif
 
 /* Menu definition */
@@ -164,7 +166,9 @@ static const struct {
     {"Audio", &dbg_audio},
 #ifdef FIIO_M3K
     {"Touchpad", &dbg_fiiom3k_touchpad},
-    {"Power stats", &axp173_debug_menu},
+#endif
+#ifdef HAVE_AXP_PMU
+    {"Power stats", &axp_debug_menu},
 #endif
 };
 
