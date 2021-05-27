@@ -73,6 +73,7 @@ static int selectivesoftlock_callback(int action,
             set_selective_softlock_actions(
                             global_settings.bt_selective_softlock_actions,
                             global_settings.bt_selective_softlock_actions_mask);
+            action_autosoftlock_init();
             break;
     }
 
