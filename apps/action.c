@@ -735,8 +735,11 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
 #else
     int  action = cur->action;
 
-    if (!last->screen_has_lock)
-    { /* no need to check softlock return immediately */
+    /* check to make sure we don't get stuck without a way to unlock - if locked,
+     * we can still use unlock_combo to unlock */
+    if (!last->screen_has_lock && !last->keys_locked)
+    {
+        /* no need to check softlock return immediately */
         return;
     }
 
@@ -1180,7 +1183,7 @@ void set_selective_backlight_actions(bool selective, unsigned int mask,
 #ifndef HAS_BUTTON_HOLD
 bool is_keys_locked(void)
 {
-    return (action_last.screen_has_lock && action_last.keys_locked);
+    return (action_last.keys_locked);
 }
 
 /* Enable selected actions to bypass a locked state */
@@ -1196,7 +1199,57 @@ void set_selective_softlock_actions(bool selective, unsigned int mask)
         action_last.softlock_mask = SEL_ACTION_NONE;
     }
 }
+
+
+void action_autosoftlock_init(void)
+{
+    action_cur_t cur;
+    int i = 0;
+
+    if (action_last.unlock_combo == BUTTON_NONE)
+    {
+        /* search CONTEXT_WPS, should be here */
+        cur.items = get_context_mapping(CONTEXT_WPS);
+        while (cur.items[i].button_code != BUTTON_NONE)
+        {
+            if (cur.items[i].action_code == ACTION_STD_KEYLOCK)
+            {
+                action_last.unlock_combo = cur.items[i].button_code;
+                break;
+            }
+            i = i + 1;
+        }
+
+        /* not there... let's try std
+        * I doubt any targets will need this, but... */
+        if (action_last.unlock_combo == BUTTON_NONE)
+        {
+            i = 0;
+            cur.items = get_context_mapping(CONTEXT_STD);
+            while (cur.items[i].button_code != BUTTON_NONE)
+            {
+                if (cur.items[i].action_code == ACTION_STD_KEYLOCK)
+                {
+                    action_last.unlock_combo = cur.items[i].button_code;
+                    break;
+                }
+                i = i + 1;
+            }
+        }
+    }
+
+    /* if we have autolock and alwaysautolock, go ahead and arm it */
+    if (has_flag(action_last.softlock_mask, SEL_ACTION_AUTOLOCK) &&
+        has_flag(action_last.softlock_mask, SEL_ACTION_ALWAYSAUTOLOCK) &&
+        (action_last.unlock_combo != BUTTON_NONE))
+    {
+        action_last.softlock_mask = action_last.softlock_mask | SEL_ACTION_ALOCK_OK;
+    }
+
+    return;
+}
 #endif /* !HAS_BUTTON_HOLD */
+
 /*
 *******************************************************************************
 * END EXPORTED ACTION FUNCTIONS ***********************************************

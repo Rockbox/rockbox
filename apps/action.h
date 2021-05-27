@@ -68,10 +68,17 @@
 #if !defined(HAS_BUTTON_HOLD)
 /* returns true if keys_locked and screen_has_lock */
 bool is_keys_locked(void);
+
 /* Enable selected actions to bypass a locked state
 * mask is combination of Selective action selection flags */
 void set_selective_softlock_actions(bool selective, unsigned int mask);
-#endif
+
+/* search the standard and wps contexts for ACTION_STD_KEYLOCK,
+ * load it into unlock_combo if we find it,
+ * also arm autolock if enabled. */
+void action_autosoftlock_init(void);
+
+#endif /* !defined(HAS_BUTTON_HOLD) */
 
 #if defined(HAVE_BACKLIGHT)
 /* Enable selected actions to leave the backlight off
