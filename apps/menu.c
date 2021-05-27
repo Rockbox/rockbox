@@ -394,8 +394,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         int new_audio_status;
         redraw_lists = false;
         keyclick_set_callback(gui_synclist_keyclick_callback, &lists);
+#ifdef HAVE_KEYLOCK_OUTSIDE_WPS
         action = get_action(CONTEXT_MAINMENU|ALLOW_SOFTLOCK,
                             list_do_action_timeout(&lists, HZ));
+#else
+        action = get_action(CONTEXT_MAINMENU,
+                            list_do_action_timeout(&lists, HZ));
+#endif
 
         /* query audio status to see if it changed */
         new_audio_status = audio_status();

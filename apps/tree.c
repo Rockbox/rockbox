@@ -646,8 +646,13 @@ static int dirbrowse(void)
             tc.dirlevel = 0; /* shouldnt be needed.. this code needs work! */
 
         keyclick_set_callback(gui_synclist_keyclick_callback, &tree_lists);
+#ifdef HAVE_KEYLOCK_OUTSIDE_WPS
         button = get_action(CONTEXT_TREE|ALLOW_SOFTLOCK,
                             list_do_action_timeout(&tree_lists, HZ/2));
+#else
+        button = get_action(CONTEXT_TREE,
+                            list_do_action_timeout(&tree_lists, HZ/2));
+#endif
         oldbutton = button;
         gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
         tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
