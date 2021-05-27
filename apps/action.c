@@ -735,8 +735,11 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
 #else
     int  action = cur->action;
 
-    if (!last->screen_has_lock)
-    { /* no need to check softlock return immediately */
+    /* check to make sure we don't get stuck without a way to unlock - if locked,
+     * we can still use unlock_combo to unlock */
+    if (!last->screen_has_lock && !last->keys_locked)
+    {
+        /* no need to check softlock return immediately */
         return;
     }
 
