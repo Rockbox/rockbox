@@ -146,6 +146,9 @@
 /* Define this if a programmable hotkey is mapped */
 #define HAVE_HOTKEY
 
+/* define this if there is an ACTION_STD_KEYLOCK action defined outside the WPS */
+#define HAVE_KEYLOCK_OUTSIDE_WPS
+
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

@@ -735,7 +735,12 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
 #else
     int  action = cur->action;
 
+#ifndef HAVE_KEYLOCK_OUTSIDE_WPS
+    if (!last->screen_has_lock && !last->keys_locked) /* bailout condition to make sure we don't get stuck
+                                                       * with no way to unlock */
+#else
     if (!last->screen_has_lock)
+#endif
     { /* no need to check softlock return immediately */
         return;
     }

@@ -26,6 +26,9 @@
 /* define this if the target has volume keys which can be used in the lists */
 #define HAVE_VOLUME_IN_LIST
 
+/* define this if there is an ACTION_STD_KEYLOCK action defined outside the WPS */
+#define HAVE_KEYLOCK_OUTSIDE_WPS
+
 #define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
 
 /* Define this to the CPU frequency */
