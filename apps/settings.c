@@ -1010,6 +1010,7 @@ void settings_apply(bool read_disk)
     set_selective_softlock_actions(
                             global_settings.bt_selective_softlock_actions,
                             global_settings.bt_selective_softlock_actions_mask);
+    action_autosoftlock_init();
 #endif
 
 #ifdef HAVE_TOUCHPAD_SENSITIVITY_SETTING
