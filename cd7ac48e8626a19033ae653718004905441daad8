@@ -69,6 +69,24 @@
       "revId": "cd7ac48e8626a19033ae653718004905441daad8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0df4fced_788f3afb",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-28T01:45:45Z",
+      "side": 1,
+      "message": "Yeah, see line 767, the unlock_combo gets set to the lock button at lock time.",
+      "parentUuid": "397076cc_fea2c5da",
+      "revId": "cd7ac48e8626a19033ae653718004905441daad8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
