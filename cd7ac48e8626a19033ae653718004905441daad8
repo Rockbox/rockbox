@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7ac8a820_50a81733",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 739,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-28T01:39:03Z",
+      "side": 1,
+      "message": "Hm, perhaps that would be wise to not have it if def\u0027d even if it does have the expanded softlock feature? There are still some screens which softlock doesn\u0027t work on, even with expanding to the mainmenu and tree contexts.",
+      "parentUuid": "e91ddc40_8af61dfa",
+      "revId": "cd7ac48e8626a19033ae653718004905441daad8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6b0fdfd1_ef21747b",
         "filename": "apps/action.c",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2021-05-28T00:35:35Z",
       "side": 1,
       "message": "you should double check the unlock_combo is unlocking the screen even when the action is not mapped.",
+      "revId": "cd7ac48e8626a19033ae653718004905441daad8",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "397076cc_fea2c5da",
+        "filename": "apps/action.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 759,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-05-28T01:39:03Z",
+      "side": 1,
+      "message": "If I recall correctly, the unlock combo get set to the lock button at lock time? I\u0027ll look into that... If true, it means we shouldn\u0027t need to reorder the code at all, just need the extra condition added above to get here if the keys are locked.",
+      "parentUuid": "6b0fdfd1_ef21747b",
       "revId": "cd7ac48e8626a19033ae653718004905441daad8",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
