@@ -41,4 +41,11 @@ static inline uint16_t swap16_hw(uint16_t value)
     return (uint16_t)out;
 }
 
+static inline uint32_t swap_odd_even32_hw(uint32_t value)
+{
+    register uint32_t out;
+    __asm__ ("wsbh %0, %1" : "=r"(out) : "r"(value));
+    return out;
+}
+
 #endif /* __MIPSR2_ENDIAN_H__ */
