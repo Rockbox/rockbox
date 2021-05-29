@@ -21,6 +21,7 @@
 
 #include "system.h"
 #include "kernel.h"
+#include "audio.h"
 #include "audiohw.h"
 #include "pcm.h"
 #include "pcm-internal.h"
@@ -155,6 +156,58 @@ void pcm_play_unlock(void)
 
     restore_irq(irq);
 }
+
+#ifdef HAVE_RECORDING
+/*
+ * Recording
+ */
+
+/* FIXME need to implement this!! */
+
+void pcm_rec_dma_init(void)
+{
+}
+
+void pcm_rec_dma_close(void)
+{
+}
+
+void pcm_rec_dma_start(void* addr, size_t size)
+{
+    (void)addr;
+    (void)size;
+}
+
+void pcm_rec_dma_stop(void)
+{
+}
+
+void pcm_rec_lock(void)
+{
+
+}
+
+void pcm_rec_unlock(void)
+{
+
+}
+
+const void* pcm_rec_dma_get_peak_buffer(void)
+{
+    return NULL;
+}
+
+void audio_set_output_source(int source)
+{
+    (void)source;
+}
+
+void audio_input_mux(int source, unsigned flags)
+{
+    (void)source;
+    (void)flags;
+}
+#endif /* HAVE_RECORDING */
 
 void AIC(void)
 {
