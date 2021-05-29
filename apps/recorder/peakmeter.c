@@ -58,6 +58,8 @@ static int pm_max_right;
 #if defined(HAVE_AGC) || defined(HAVE_HISTOGRAM)
 static int pm_peakhold_left;   /* max. peak values between peakhold calls */
 static int pm_peakhold_right;  /* used for AGC and histogram display */
+#endif
+#ifdef HAVE_HISTOGRAM
 static long next_histogram_update;
 #endif
 
