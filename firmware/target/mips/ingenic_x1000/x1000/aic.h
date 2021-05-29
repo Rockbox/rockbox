@@ -356,4 +356,262 @@
 #define JN_AIC_DR   AIC_DR
 #define JI_AIC_DR   
 
+#define REG_AIC_SPENA   jz_reg(AIC_SPENA)
+#define JA_AIC_SPENA    (0xb0020000 + 0x80)
+#define JT_AIC_SPENA    JIO_32_RW
+#define JN_AIC_SPENA    AIC_SPENA
+#define JI_AIC_SPENA    
+
+#define REG_AIC_SPCTRL                  jz_reg(AIC_SPCTRL)
+#define JA_AIC_SPCTRL                   (0xb0020000 + 0x84)
+#define JT_AIC_SPCTRL                   JIO_32_RW
+#define JN_AIC_SPCTRL                   AIC_SPCTRL
+#define JI_AIC_SPCTRL                   
+#define BP_AIC_SPCTRL_DMA_EN            15
+#define BM_AIC_SPCTRL_DMA_EN            0x8000
+#define BF_AIC_SPCTRL_DMA_EN(v)         (((v) & 0x1) << 15)
+#define BFM_AIC_SPCTRL_DMA_EN(v)        BM_AIC_SPCTRL_DMA_EN
+#define BF_AIC_SPCTRL_DMA_EN_V(e)       BF_AIC_SPCTRL_DMA_EN(BV_AIC_SPCTRL_DMA_EN__##e)
+#define BFM_AIC_SPCTRL_DMA_EN_V(v)      BM_AIC_SPCTRL_DMA_EN
+#define BP_AIC_SPCTRL_D_TYPE            14
+#define BM_AIC_SPCTRL_D_TYPE            0x4000
+#define BF_AIC_SPCTRL_D_TYPE(v)         (((v) & 0x1) << 14)
+#define BFM_AIC_SPCTRL_D_TYPE(v)        BM_AIC_SPCTRL_D_TYPE
+#define BF_AIC_SPCTRL_D_TYPE_V(e)       BF_AIC_SPCTRL_D_TYPE(BV_AIC_SPCTRL_D_TYPE__##e)
+#define BFM_AIC_SPCTRL_D_TYPE_V(v)      BM_AIC_SPCTRL_D_TYPE
+#define BP_AIC_SPCTRL_SIGN_N            13
+#define BM_AIC_SPCTRL_SIGN_N            0x2000
+#define BF_AIC_SPCTRL_SIGN_N(v)         (((v) & 0x1) << 13)
+#define BFM_AIC_SPCTRL_SIGN_N(v)        BM_AIC_SPCTRL_SIGN_N
+#define BF_AIC_SPCTRL_SIGN_N_V(e)       BF_AIC_SPCTRL_SIGN_N(BV_AIC_SPCTRL_SIGN_N__##e)
+#define BFM_AIC_SPCTRL_SIGN_N_V(v)      BM_AIC_SPCTRL_SIGN_N
+#define BP_AIC_SPCTRL_INVALID           12
+#define BM_AIC_SPCTRL_INVALID           0x1000
+#define BF_AIC_SPCTRL_INVALID(v)        (((v) & 0x1) << 12)
+#define BFM_AIC_SPCTRL_INVALID(v)       BM_AIC_SPCTRL_INVALID
+#define BF_AIC_SPCTRL_INVALID_V(e)      BF_AIC_SPCTRL_INVALID(BV_AIC_SPCTRL_INVALID__##e)
+#define BFM_AIC_SPCTRL_INVALID_V(v)     BM_AIC_SPCTRL_INVALID
+#define BP_AIC_SPCTRL_SFT_RST           11
+#define BM_AIC_SPCTRL_SFT_RST           0x800
+#define BF_AIC_SPCTRL_SFT_RST(v)        (((v) & 0x1) << 11)
+#define BFM_AIC_SPCTRL_SFT_RST(v)       BM_AIC_SPCTRL_SFT_RST
+#define BF_AIC_SPCTRL_SFT_RST_V(e)      BF_AIC_SPCTRL_SFT_RST(BV_AIC_SPCTRL_SFT_RST__##e)
+#define BFM_AIC_SPCTRL_SFT_RST_V(v)     BM_AIC_SPCTRL_SFT_RST
+#define BP_AIC_SPCTRL_SPDIF_I2S         10
+#define BM_AIC_SPCTRL_SPDIF_I2S         0x400
+#define BF_AIC_SPCTRL_SPDIF_I2S(v)      (((v) & 0x1) << 10)
+#define BFM_AIC_SPCTRL_SPDIF_I2S(v)     BM_AIC_SPCTRL_SPDIF_I2S
+#define BF_AIC_SPCTRL_SPDIF_I2S_V(e)    BF_AIC_SPCTRL_SPDIF_I2S(BV_AIC_SPCTRL_SPDIF_I2S__##e)
+#define BFM_AIC_SPCTRL_SPDIF_I2S_V(v)   BM_AIC_SPCTRL_SPDIF_I2S
+#define BP_AIC_SPCTRL_M_TRIG            1
+#define BM_AIC_SPCTRL_M_TRIG            0x2
+#define BF_AIC_SPCTRL_M_TRIG(v)         (((v) & 0x1) << 1)
+#define BFM_AIC_SPCTRL_M_TRIG(v)        BM_AIC_SPCTRL_M_TRIG
+#define BF_AIC_SPCTRL_M_TRIG_V(e)       BF_AIC_SPCTRL_M_TRIG(BV_AIC_SPCTRL_M_TRIG__##e)
+#define BFM_AIC_SPCTRL_M_TRIG_V(v)      BM_AIC_SPCTRL_M_TRIG
+#define BP_AIC_SPCTRL_M_FFUR            0
+#define BM_AIC_SPCTRL_M_FFUR            0x1
+#define BF_AIC_SPCTRL_M_FFUR(v)         (((v) & 0x1) << 0)
+#define BFM_AIC_SPCTRL_M_FFUR(v)        BM_AIC_SPCTRL_M_FFUR
+#define BF_AIC_SPCTRL_M_FFUR_V(e)       BF_AIC_SPCTRL_M_FFUR(BV_AIC_SPCTRL_M_FFUR__##e)
+#define BFM_AIC_SPCTRL_M_FFUR_V(v)      BM_AIC_SPCTRL_M_FFUR
+
+#define REG_AIC_SPSTATE                 jz_reg(AIC_SPSTATE)
+#define JA_AIC_SPSTATE                  (0xb0020000 + 0x88)
+#define JT_AIC_SPSTATE                  JIO_32_RW
+#define JN_AIC_SPSTATE                  AIC_SPSTATE
+#define JI_AIC_SPSTATE                  
+#define BP_AIC_SPSTATE_FIFO_LEVEL       8
+#define BM_AIC_SPSTATE_FIFO_LEVEL       0x7f00
+#define BF_AIC_SPSTATE_FIFO_LEVEL(v)    (((v) & 0x7f) << 8)
+#define BFM_AIC_SPSTATE_FIFO_LEVEL(v)   BM_AIC_SPSTATE_FIFO_LEVEL
+#define BF_AIC_SPSTATE_FIFO_LEVEL_V(e)  BF_AIC_SPSTATE_FIFO_LEVEL(BV_AIC_SPSTATE_FIFO_LEVEL__##e)
+#define BFM_AIC_SPSTATE_FIFO_LEVEL_V(v) BM_AIC_SPSTATE_FIFO_LEVEL
+#define BP_AIC_SPSTATE_BUSY             7
+#define BM_AIC_SPSTATE_BUSY             0x80
+#define BF_AIC_SPSTATE_BUSY(v)          (((v) & 0x1) << 7)
+#define BFM_AIC_SPSTATE_BUSY(v)         BM_AIC_SPSTATE_BUSY
+#define BF_AIC_SPSTATE_BUSY_V(e)        BF_AIC_SPSTATE_BUSY(BV_AIC_SPSTATE_BUSY__##e)
+#define BFM_AIC_SPSTATE_BUSY_V(v)       BM_AIC_SPSTATE_BUSY
+#define BP_AIC_SPSTATE_F_TRIG           1
+#define BM_AIC_SPSTATE_F_TRIG           0x2
+#define BF_AIC_SPSTATE_F_TRIG(v)        (((v) & 0x1) << 1)
+#define BFM_AIC_SPSTATE_F_TRIG(v)       BM_AIC_SPSTATE_F_TRIG
+#define BF_AIC_SPSTATE_F_TRIG_V(e)      BF_AIC_SPSTATE_F_TRIG(BV_AIC_SPSTATE_F_TRIG__##e)
+#define BFM_AIC_SPSTATE_F_TRIG_V(v)     BM_AIC_SPSTATE_F_TRIG
+#define BP_AIC_SPSTATE_F_FFUR           0
+#define BM_AIC_SPSTATE_F_FFUR           0x1
+#define BF_AIC_SPSTATE_F_FFUR(v)        (((v) & 0x1) << 0)
+#define BFM_AIC_SPSTATE_F_FFUR(v)       BM_AIC_SPSTATE_F_FFUR
+#define BF_AIC_SPSTATE_F_FFUR_V(e)      BF_AIC_SPSTATE_F_FFUR(BV_AIC_SPSTATE_F_FFUR__##e)
+#define BFM_AIC_SPSTATE_F_FFUR_V(v)     BM_AIC_SPSTATE_F_FFUR
+
+#define REG_AIC_SPCFG1                  jz_reg(AIC_SPCFG1)
+#define JA_AIC_SPCFG1                   (0xb0020000 + 0x8c)
+#define JT_AIC_SPCFG1                   JIO_32_RW
+#define JN_AIC_SPCFG1                   AIC_SPCFG1
+#define JI_AIC_SPCFG1                   
+#define BP_AIC_SPCFG1_TRIG              12
+#define BM_AIC_SPCFG1_TRIG              0x3000
+#define BF_AIC_SPCFG1_TRIG(v)           (((v) & 0x3) << 12)
+#define BFM_AIC_SPCFG1_TRIG(v)          BM_AIC_SPCFG1_TRIG
+#define BF_AIC_SPCFG1_TRIG_V(e)         BF_AIC_SPCFG1_TRIG(BV_AIC_SPCFG1_TRIG__##e)
+#define BFM_AIC_SPCFG1_TRIG_V(v)        BM_AIC_SPCFG1_TRIG
+#define BP_AIC_SPCFG1_SRC_NUM           8
+#define BM_AIC_SPCFG1_SRC_NUM           0xf00
+#define BF_AIC_SPCFG1_SRC_NUM(v)        (((v) & 0xf) << 8)
+#define BFM_AIC_SPCFG1_SRC_NUM(v)       BM_AIC_SPCFG1_SRC_NUM
+#define BF_AIC_SPCFG1_SRC_NUM_V(e)      BF_AIC_SPCFG1_SRC_NUM(BV_AIC_SPCFG1_SRC_NUM__##e)
+#define BFM_AIC_SPCFG1_SRC_NUM_V(v)     BM_AIC_SPCFG1_SRC_NUM
+#define BP_AIC_SPCFG1_CH1_NUM           4
+#define BM_AIC_SPCFG1_CH1_NUM           0xf0
+#define BF_AIC_SPCFG1_CH1_NUM(v)        (((v) & 0xf) << 4)
+#define BFM_AIC_SPCFG1_CH1_NUM(v)       BM_AIC_SPCFG1_CH1_NUM
+#define BF_AIC_SPCFG1_CH1_NUM_V(e)      BF_AIC_SPCFG1_CH1_NUM(BV_AIC_SPCFG1_CH1_NUM__##e)
+#define BFM_AIC_SPCFG1_CH1_NUM_V(v)     BM_AIC_SPCFG1_CH1_NUM
+#define BP_AIC_SPCFG1_CH2_NUM           0
+#define BM_AIC_SPCFG1_CH2_NUM           0xf
+#define BF_AIC_SPCFG1_CH2_NUM(v)        (((v) & 0xf) << 0)
+#define BFM_AIC_SPCFG1_CH2_NUM(v)       BM_AIC_SPCFG1_CH2_NUM
+#define BF_AIC_SPCFG1_CH2_NUM_V(e)      BF_AIC_SPCFG1_CH2_NUM(BV_AIC_SPCFG1_CH2_NUM__##e)
+#define BFM_AIC_SPCFG1_CH2_NUM_V(v)     BM_AIC_SPCFG1_CH2_NUM
+#define BP_AIC_SPCFG1_INIT_LEVEL        17
+#define BM_AIC_SPCFG1_INIT_LEVEL        0x20000
+#define BF_AIC_SPCFG1_INIT_LEVEL(v)     (((v) & 0x1) << 17)
+#define BFM_AIC_SPCFG1_INIT_LEVEL(v)    BM_AIC_SPCFG1_INIT_LEVEL
+#define BF_AIC_SPCFG1_INIT_LEVEL_V(e)   BF_AIC_SPCFG1_INIT_LEVEL(BV_AIC_SPCFG1_INIT_LEVEL__##e)
+#define BFM_AIC_SPCFG1_INIT_LEVEL_V(v)  BM_AIC_SPCFG1_INIT_LEVEL
+#define BP_AIC_SPCFG1_ZERO_VALID        16
+#define BM_AIC_SPCFG1_ZERO_VALID        0x10000
+#define BF_AIC_SPCFG1_ZERO_VALID(v)     (((v) & 0x1) << 16)
+#define BFM_AIC_SPCFG1_ZERO_VALID(v)    BM_AIC_SPCFG1_ZERO_VALID
+#define BF_AIC_SPCFG1_ZERO_VALID_V(e)   BF_AIC_SPCFG1_ZERO_VALID(BV_AIC_SPCFG1_ZERO_VALID__##e)
+#define BFM_AIC_SPCFG1_ZERO_VALID_V(v)  BM_AIC_SPCFG1_ZERO_VALID
+
+#define REG_AIC_SPCFG2                  jz_reg(AIC_SPCFG2)
+#define JA_AIC_SPCFG2                   (0xb0020000 + 0x90)
+#define JT_AIC_SPCFG2                   JIO_32_RW
+#define JN_AIC_SPCFG2                   AIC_SPCFG2
+#define JI_AIC_SPCFG2                   
+#define BP_AIC_SPCFG2_FS                26
+#define BM_AIC_SPCFG2_FS                0x3c000000
+#define BF_AIC_SPCFG2_FS(v)             (((v) & 0xf) << 26)
+#define BFM_AIC_SPCFG2_FS(v)            BM_AIC_SPCFG2_FS
+#define BF_AIC_SPCFG2_FS_V(e)           BF_AIC_SPCFG2_FS(BV_AIC_SPCFG2_FS__##e)
+#define BFM_AIC_SPCFG2_FS_V(v)          BM_AIC_SPCFG2_FS
+#define BP_AIC_SPCFG2_ORG_FRQ           22
+#define BM_AIC_SPCFG2_ORG_FRQ           0x3c00000
+#define BF_AIC_SPCFG2_ORG_FRQ(v)        (((v) & 0xf) << 22)
+#define BFM_AIC_SPCFG2_ORG_FRQ(v)       BM_AIC_SPCFG2_ORG_FRQ
+#define BF_AIC_SPCFG2_ORG_FRQ_V(e)      BF_AIC_SPCFG2_ORG_FRQ(BV_AIC_SPCFG2_ORG_FRQ__##e)
+#define BFM_AIC_SPCFG2_ORG_FRQ_V(v)     BM_AIC_SPCFG2_ORG_FRQ
+#define BP_AIC_SPCFG2_SAMPL_WL          19
+#define BM_AIC_SPCFG2_SAMPL_WL          0x380000
+#define BF_AIC_SPCFG2_SAMPL_WL(v)       (((v) & 0x7) << 19)
+#define BFM_AIC_SPCFG2_SAMPL_WL(v)      BM_AIC_SPCFG2_SAMPL_WL
+#define BF_AIC_SPCFG2_SAMPL_WL_V(e)     BF_AIC_SPCFG2_SAMPL_WL(BV_AIC_SPCFG2_SAMPL_WL__##e)
+#define BFM_AIC_SPCFG2_SAMPL_WL_V(v)    BM_AIC_SPCFG2_SAMPL_WL
+#define BP_AIC_SPCFG2_CLK_ACU           16
+#define BM_AIC_SPCFG2_CLK_ACU           0x30000
+#define BF_AIC_SPCFG2_CLK_ACU(v)        (((v) & 0x3) << 16)
+#define BFM_AIC_SPCFG2_CLK_ACU(v)       BM_AIC_SPCFG2_CLK_ACU
+#define BF_AIC_SPCFG2_CLK_ACU_V(e)      BF_AIC_SPCFG2_CLK_ACU(BV_AIC_SPCFG2_CLK_ACU__##e)
+#define BFM_AIC_SPCFG2_CLK_ACU_V(v)     BM_AIC_SPCFG2_CLK_ACU
+#define BP_AIC_SPCFG2_CAT_CODE          8
+#define BM_AIC_SPCFG2_CAT_CODE          0xff00
+#define BF_AIC_SPCFG2_CAT_CODE(v)       (((v) & 0xff) << 8)
+#define BFM_AIC_SPCFG2_CAT_CODE(v)      BM_AIC_SPCFG2_CAT_CODE
+#define BF_AIC_SPCFG2_CAT_CODE_V(e)     BF_AIC_SPCFG2_CAT_CODE(BV_AIC_SPCFG2_CAT_CODE__##e)
+#define BFM_AIC_SPCFG2_CAT_CODE_V(v)    BM_AIC_SPCFG2_CAT_CODE
+#define BP_AIC_SPCFG2_CH_MD             6
+#define BM_AIC_SPCFG2_CH_MD             0xc0
+#define BF_AIC_SPCFG2_CH_MD(v)          (((v) & 0x3) << 6)
+#define BFM_AIC_SPCFG2_CH_MD(v)         BM_AIC_SPCFG2_CH_MD
+#define BF_AIC_SPCFG2_CH_MD_V(e)        BF_AIC_SPCFG2_CH_MD(BV_AIC_SPCFG2_CH_MD__##e)
+#define BFM_AIC_SPCFG2_CH_MD_V(v)       BM_AIC_SPCFG2_CH_MD
+#define BP_AIC_SPCFG2_MAX_WL            18
+#define BM_AIC_SPCFG2_MAX_WL            0x40000
+#define BF_AIC_SPCFG2_MAX_WL(v)         (((v) & 0x1) << 18)
+#define BFM_AIC_SPCFG2_MAX_WL(v)        BM_AIC_SPCFG2_MAX_WL
+#define BF_AIC_SPCFG2_MAX_WL_V(e)       BF_AIC_SPCFG2_MAX_WL(BV_AIC_SPCFG2_MAX_WL__##e)
+#define BFM_AIC_SPCFG2_MAX_WL_V(v)      BM_AIC_SPCFG2_MAX_WL
+#define BP_AIC_SPCFG2_PRE               3
+#define BM_AIC_SPCFG2_PRE               0x8
+#define BF_AIC_SPCFG2_PRE(v)            (((v) & 0x1) << 3)
+#define BFM_AIC_SPCFG2_PRE(v)           BM_AIC_SPCFG2_PRE
+#define BF_AIC_SPCFG2_PRE_V(e)          BF_AIC_SPCFG2_PRE(BV_AIC_SPCFG2_PRE__##e)
+#define BFM_AIC_SPCFG2_PRE_V(v)         BM_AIC_SPCFG2_PRE
+#define BP_AIC_SPCFG2_COPY_N            2
+#define BM_AIC_SPCFG2_COPY_N            0x4
+#define BF_AIC_SPCFG2_COPY_N(v)         (((v) & 0x1) << 2)
+#define BFM_AIC_SPCFG2_COPY_N(v)        BM_AIC_SPCFG2_COPY_N
+#define BF_AIC_SPCFG2_COPY_N_V(e)       BF_AIC_SPCFG2_COPY_N(BV_AIC_SPCFG2_COPY_N__##e)
+#define BFM_AIC_SPCFG2_COPY_N_V(v)      BM_AIC_SPCFG2_COPY_N
+#define BP_AIC_SPCFG2_AUDIO_N           1
+#define BM_AIC_SPCFG2_AUDIO_N           0x2
+#define BF_AIC_SPCFG2_AUDIO_N(v)        (((v) & 0x1) << 1)
+#define BFM_AIC_SPCFG2_AUDIO_N(v)       BM_AIC_SPCFG2_AUDIO_N
+#define BF_AIC_SPCFG2_AUDIO_N_V(e)      BF_AIC_SPCFG2_AUDIO_N(BV_AIC_SPCFG2_AUDIO_N__##e)
+#define BFM_AIC_SPCFG2_AUDIO_N_V(v)     BM_AIC_SPCFG2_AUDIO_N
+#define BP_AIC_SPCFG2_CON_PRO           0
+#define BM_AIC_SPCFG2_CON_PRO           0x1
+#define BF_AIC_SPCFG2_CON_PRO(v)        (((v) & 0x1) << 0)
+#define BFM_AIC_SPCFG2_CON_PRO(v)       BM_AIC_SPCFG2_CON_PRO
+#define BF_AIC_SPCFG2_CON_PRO_V(e)      BF_AIC_SPCFG2_CON_PRO(BV_AIC_SPCFG2_CON_PRO__##e)
+#define BFM_AIC_SPCFG2_CON_PRO_V(v)     BM_AIC_SPCFG2_CON_PRO
+
+#define REG_AIC_SPFIFO  jz_reg(AIC_SPFIFO)
+#define JA_AIC_SPFIFO   (0xb0020000 + 0x94)
+#define JT_AIC_SPFIFO   JIO_32_RW
+#define JN_AIC_SPFIFO   AIC_SPFIFO
+#define JI_AIC_SPFIFO   
+
+#define REG_AIC_RGADW               jz_reg(AIC_RGADW)
+#define JA_AIC_RGADW                (0xb0020000 + 0xa4)
+#define JT_AIC_RGADW                JIO_32_RW
+#define JN_AIC_RGADW                AIC_RGADW
+#define JI_AIC_RGADW                
+#define BP_AIC_RGADW_ADDR           8
+#define BM_AIC_RGADW_ADDR           0x7f00
+#define BF_AIC_RGADW_ADDR(v)        (((v) & 0x7f) << 8)
+#define BFM_AIC_RGADW_ADDR(v)       BM_AIC_RGADW_ADDR
+#define BF_AIC_RGADW_ADDR_V(e)      BF_AIC_RGADW_ADDR(BV_AIC_RGADW_ADDR__##e)
+#define BFM_AIC_RGADW_ADDR_V(v)     BM_AIC_RGADW_ADDR
+#define BP_AIC_RGADW_DATA           0
+#define BM_AIC_RGADW_DATA           0xff
+#define BF_AIC_RGADW_DATA(v)        (((v) & 0xff) << 0)
+#define BFM_AIC_RGADW_DATA(v)       BM_AIC_RGADW_DATA
+#define BF_AIC_RGADW_DATA_V(e)      BF_AIC_RGADW_DATA(BV_AIC_RGADW_DATA__##e)
+#define BFM_AIC_RGADW_DATA_V(v)     BM_AIC_RGADW_DATA
+#define BP_AIC_RGADW_ICRST          31
+#define BM_AIC_RGADW_ICRST          0x80000000
+#define BF_AIC_RGADW_ICRST(v)       (((v) & 0x1) << 31)
+#define BFM_AIC_RGADW_ICRST(v)      BM_AIC_RGADW_ICRST
+#define BF_AIC_RGADW_ICRST_V(e)     BF_AIC_RGADW_ICRST(BV_AIC_RGADW_ICRST__##e)
+#define BFM_AIC_RGADW_ICRST_V(v)    BM_AIC_RGADW_ICRST
+#define BP_AIC_RGADW_RGWR           16
+#define BM_AIC_RGADW_RGWR           0x10000
+#define BF_AIC_RGADW_RGWR(v)        (((v) & 0x1) << 16)
+#define BFM_AIC_RGADW_RGWR(v)       BM_AIC_RGADW_RGWR
+#define BF_AIC_RGADW_RGWR_V(e)      BF_AIC_RGADW_RGWR(BV_AIC_RGADW_RGWR__##e)
+#define BFM_AIC_RGADW_RGWR_V(v)     BM_AIC_RGADW_RGWR
+
+#define REG_AIC_RGDATA              jz_reg(AIC_RGDATA)
+#define JA_AIC_RGDATA               (0xb0020000 + 0xa8)
+#define JT_AIC_RGDATA               JIO_32_RW
+#define JN_AIC_RGDATA               AIC_RGDATA
+#define JI_AIC_RGDATA               
+#define BP_AIC_RGDATA_DATA          0
+#define BM_AIC_RGDATA_DATA          0xff
+#define BF_AIC_RGDATA_DATA(v)       (((v) & 0xff) << 0)
+#define BFM_AIC_RGDATA_DATA(v)      BM_AIC_RGDATA_DATA
+#define BF_AIC_RGDATA_DATA_V(e)     BF_AIC_RGDATA_DATA(BV_AIC_RGDATA_DATA__##e)
+#define BFM_AIC_RGDATA_DATA_V(v)    BM_AIC_RGDATA_DATA
+#define BP_AIC_RGDATA_IRQ           8
+#define BM_AIC_RGDATA_IRQ           0x100
+#define BF_AIC_RGDATA_IRQ(v)        (((v) & 0x1) << 8)
+#define BFM_AIC_RGDATA_IRQ(v)       BM_AIC_RGDATA_IRQ
+#define BF_AIC_RGDATA_IRQ_V(e)      BF_AIC_RGDATA_IRQ(BV_AIC_RGDATA_IRQ__##e)
+#define BFM_AIC_RGDATA_IRQ_V(v)     BM_AIC_RGDATA_IRQ
+
 #endif /* __HEADERGEN_AIC_H__*/

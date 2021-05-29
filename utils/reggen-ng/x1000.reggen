@@ -190,6 +190,115 @@ node AIC {
 
     reg I2SDIV 0x30
     reg DR 0x34
+    reg SPENA 0x80
+
+    reg SPCTRL 0x84 {
+        bit 15 DMA_EN
+        bit 14 D_TYPE
+        bit 13 SIGN_N
+        bit 12 INVALID
+        bit 11 SFT_RST
+        bit 10 SPDIF_I2S
+        bit 1  M_TRIG
+        bit 0  M_FFUR
+    }
+
+    reg SPSTATE 0x88 {
+        fld 14  8 FIFO_LEVEL
+        bit     7 BUSY
+        bit     1 F_TRIG
+        bit     0 F_FFUR
+    }
+
+    reg SPCFG1 0x8c {
+        bit    17 INIT_LEVEL
+        bit    16 ZERO_VALID
+        fld 13 12 TRIG
+        fld 11  8 SRC_NUM
+        fld  7  4 CH1_NUM
+        fld  3  0 CH2_NUM
+    }
+
+    reg SPCFG2 0x90 {
+        fld 29 26 FS
+        fld 25 22 ORG_FRQ
+        fld 21 19 SAMPL_WL
+        bit    18 MAX_WL
+        fld 17 16 CLK_ACU
+        fld 15  8 CAT_CODE
+        fld  7  6 CH_MD
+        bit     3 PRE
+        bit     2 COPY_N
+        bit     1 AUDIO_N
+        bit     0 CON_PRO
+    }
+
+    reg SPFIFO 0x94
+
+    reg RGADW 0xa4 {
+        bit    31 ICRST
+        bit    16 RGWR
+        fld 14  8 ADDR
+        fld 7   0 DATA
+    }
+
+    reg RGDATA 0xa8 {
+        bit   8 IRQ
+        fld 7 0 DATA
+    }
+}
+
+node PCM {
+    title "PCM interface controller"
+    addr 0xb0071000
+
+    reg CTL 0x00 {
+        bit 9 ERDMA
+        bit 8 ETDMA
+        bit 7 LSMP
+        bit 6 ERPL
+        bit 5 EREC
+        bit 4 FLUSH
+        bit 3 RST
+        bit 1 CLKEN
+        bit 0 PCMEN
+    }
+
+    reg CFG 0x04 {
+        fld 14 13 SLOT
+        bit    12 ISS
+        bit    11 OSS
+        bit    10 IMSBPOS
+        bit     9 OMSBPOS
+        fld  8  5 RFTH
+        fld  4  1 TFTH
+        bit     0 PCMMOD
+    }
+
+    reg DP 0x08
+
+    reg INTC 0x0c {
+        bit 3 ETFS
+        bit 2 ETUR
+        bit 1 ERFS
+        bit 0 EROR
+    }
+
+    reg INTS 0x10 {
+        bit    14 RSTS
+        fld 13  9 TFL
+        bit     8 TFS
+        bit     7 TUR
+        bit  6  2 RFL
+        bit     1 RFS
+        bit     0 ROR
+    }
+
+    reg DIV 0x14 {
+        fld 16 11 SYNL
+        fld 10  6 SYNDIV
+        fld  5  0 CLKDIV
+    }
 }
 
 node DDRC {
@@ -851,6 +960,44 @@ node RTC {
     reg WKUPPINCR 0x48
 }
 
+node EFUSE {
+    title "EFUSE interface"
+    instance 0xb3540000
+
+    reg CTRL 0x00 {
+        fld 27 21 ADDR
+        fld 20 16 LENGTH
+        bit    15 PG_EN
+        bit     1 WR_EN
+        bit     0 RD_EN
+    }
+
+    reg CFG 0x04 {
+        bit 31    INT_EN
+        fld 21 20 RD_AJD
+        fld 18 16 RD_STROBE
+        fld 13 12 WR_ADJ
+        fld  8  0 WR_STROBE
+    }
+
+    reg STATE 0x08 {
+        bit 23 UK_PRT
+        bit 22 NKU_PRT
+        bit 21 EXKEY_EN
+        bit 15 CUSTID_PRT
+        bit 14 CHIPID_PRT
+        bit 12 SECBOOT_PRT
+        bit 11 DIS_JTAG
+        bit  8 SECBOOT_EN
+        bit  1 WR_DONE
+        bit  0 RD_DONE
+    }
+
+    reg DATA {
+        instance 0x0c 0x04 8
+    }
+}
+
 node GPIO {
     title "General purpose I/O"
     addr 0xb0010000
@@ -1001,6 +1148,156 @@ node I2C {
     reg CSTP 0x60
     reg CSTT 0x64
     reg CGC 0x68
+}
+
+node SSI {
+    title "Synchronous serial interface"
+    instance 0xb0043000
+
+    reg DR 0x00
+
+    reg CR0 0x04 {
+        fld 19 18 TENDIAN
+        fld 17 16 RENDIAN
+        bit    15 SSIE
+        bit    14 TIE
+        bit    13 RIE
+        bit    12 TEIE
+        bit    11 REIE
+        bit    10 LOOP
+        bit     9 RFINE
+        bit     8 RFINC
+        bit     7 EACLRUN
+        bit     6 FSEL
+        bit     4 VRCNT
+        bit     3 TFMODE
+        bit     2 TFLUSH
+        bit     1 RFLUSH
+        bit     0 DISREV
+    }
+
+    reg CR1 0x08 {
+        fld 31 30 FRMHL
+        fld 29 28 TFVCK
+        fld 27 26 TCKFI
+        bit    24 ITFRM
+        bit    23 UNFIN
+        fld 21 20 FMAT
+        fld 19 16 TTRG
+        fld 15 12 MCOM
+        fld 11  8 RTRG
+        fld  7  3 FLEN
+        bit     1 PHA
+        bit     0 POL
+    }
+
+    reg SR 0x0c {
+        fld 24 16 TFIFO_NUM
+        fld 15  8 RFIFO_NUM
+        bit     7 END
+        bit     6 BUSY
+        bit     5 TFF
+        bit     4 RFE
+        bit     3 TFHE
+        bit     2 RFHF
+        bit     1 UNDR
+        bit     0 OVER
+    }
+
+    reg ITR 0x10 {
+        bit    15 CNTCLK
+        fld 14  0 IVLTM
+    }
+
+    reg ICR 0x14
+    reg GR 0x18
+    reg RCNT 0x1c
+}
+
+node UART {
+    title "UART controller"
+    instance 0xb0030000 0x1000 3
+
+    # Note there is some hardware multiplexing controlled by the
+    # ULCR register going on here which is why some registers share
+    # the same address.
+
+    reg URBR 0x00
+    reg UTHR 0x00
+    reg UDLLR 0x00
+    reg UDLHR 0x04
+
+    reg UIER 0x04 {
+        bit 4 RTOIE
+        bit 3 MSIE
+        bit 2 RLSIE
+        bit 1 TDRIE
+        bit 0 RDRIE
+    }
+
+    reg UIIR 0x08 {
+        fld 7 6 FFMSEL { enum NON_FIFO_MODE 0; enum FIFO_MODE 1; }
+        fld 3 1 INID { enum MODEM_STATUS 0; enum TRANSMIT_DATA_REQ 1; enum RECEIVE_DATA_READY 2
+                       enum RECEIVE_LINE_STATUS 3; enum RECEIVE_TIME_OUT 6 }
+        bit   0 INPEND
+    }
+
+    reg UFCR 0x08 {
+        fld 7 6 RDTR { enum 1BYTE 0; enum 16BYTE 1; enum 32BYTE 2; enum 60BYTE 3; }
+        bit   4 UME
+        bit   3 DME
+        bit   2 TFRT
+        bit   1 RFRT
+        bit   0 FME
+    }
+
+    reg ULCR 0x0c {
+        bit   7 DLAB
+        bit   6 SBK
+        bit   5 STPAR
+        bit   4 PARM { enum ODD 0; enum EVEN 1; }
+        bit   3 PARE
+        bit   2 SBLS { enum 1_STOP_BIT 0; enum 2_STOP_BITS 1; }
+        fld 1 0 WLS { enum 5BITS 0; enum 6BITS 1; enum 7BITS 2; enum 8BITS 3; }
+    }
+
+    reg UMCR 0x10 {
+        bit 7 MDCE
+        bit 6 FCM
+        bit 4 LOOP
+        bit 1 RTS
+    }
+
+    reg ULSR 0x14 {
+        bit 7 FIFOE
+        bit 6 TEMP
+        bit 5 TDRQ
+        bit 4 BI
+        bit 3 FMER
+        bit 2 PARER
+        bit 1 OVER
+        bit 0 DRY
+    }
+
+    reg UMSR 0x18 {
+        bit 4 CTS
+        bit 0 CCTS
+    }
+
+    reg USPR 0x1c
+
+    reg ISR 0x20 {
+        bit 4 RDPL
+        bit 3 TDPL
+        bit 2 XMODE
+        bit 1 RCVEIR
+        bit 0 XMITIR
+    }
+
+    reg UMR 0x24
+    reg UACR 0x28
+    reg URCR 0x40
+    reg UTCR 0x44
 }
 
 node MSC {
