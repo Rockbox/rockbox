@@ -22,7 +22,9 @@
 #ifndef __AK4376_H__
 #define __AK4376_H__
 
-#define AUDIOHW_CAPS (FILTER_ROLL_OFF_CAP|POWER_MODE_CAP)
+/* The target config must define this; defining it here would prevent
+   the target from supporting audio recording via an alternate codec. */
+/* #define AUDIOHW_CAPS (FILTER_ROLL_OFF_CAP|POWER_MODE_CAP) */
 #define AUDIOHW_HAVE_SHORT2_ROLL_OFF
 
 #define AK4376_MIN_VOLUME (-890)

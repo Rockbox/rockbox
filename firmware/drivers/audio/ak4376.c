@@ -83,7 +83,7 @@ void ak4376_open(void)
     ak4376_set_pdn_pin(1);
     mdelay(1);
 
-    static const int init_config[] = {
+    static const uint8_t init_config[] = {
         /* Ensure HPRHZ, HPLHZ are 0 */
         AK4376_REG_OUTPUT_MODE,  0x00,
         /* Mute all volume controls */

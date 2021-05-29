@@ -57,6 +57,16 @@ void pcm_play_dma_init(void)
     jz_writef(CPM_CLKGR, AIC(0));
     gpio_config(GPIO_B, 0x1f, GPIO_DEVICE(1));
 
+#if defined(HAVE_RECORDING)
+#if defined(HAVE_X1000_ICODEC_REC)
+    /* Enable pins for the internal codec's microphone */
+    gpio_config(GPIO_B, (3 << 21), GPIO_DEVICE(0));
+#else
+    /* External codecs must be connected to this pin */
+    gpio_config(GPIO_B, (1 << 5), GPIO_DEVICE(1));
+#endif
+#endif
+
     /* Configure AIC with some sane defaults */
     jz_writef(AIC_CFG, RST(1));
     jz_writef(AIC_I2SCR, STPBK(1));
@@ -226,17 +236,6 @@ void pcm_rec_unlock(void)
 const void* pcm_rec_dma_get_peak_buffer(void)
 {
     return NULL;
-}
-
-void audio_set_output_source(int source)
-{
-    (void)source;
-}
-
-void audio_input_mux(int source, unsigned flags)
-{
-    (void)source;
-    (void)flags;
 }
 #endif /* HAVE_RECORDING */
 
