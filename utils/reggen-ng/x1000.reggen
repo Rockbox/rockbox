@@ -144,9 +144,9 @@ node AIC {
 
     reg CCR 0x04 {
         bit    28 PACK16
-        fld 26 24 CHANNEL
-        fld 21 19 OSS
-        fld 18 16 ISS
+        fld 26 24 CHANNEL { enum MONO 0; enum STEREO 1 }
+        fld 21 19 OSS { enum 8BIT 0; enum 16BIT 1; enum 18BIT 2; enum 20BIT 3; enum 24BIT 4 }
+        fld 18 16 ISS { enum 8BIT 0; enum 16BIT 1; enum 18BIT 2; enum 20BIT 3; enum 24BIT 4 }
         bit    15 RDMS
         bit    14 TDMS
         bit    11 M2S

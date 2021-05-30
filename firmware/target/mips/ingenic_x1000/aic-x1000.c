@@ -31,12 +31,12 @@
  * is complete if this value is less than "cnt", and may be incomplete if it
  * is equal to "cnt". (Note the leading zero term is not written to "buf".)
  */
-static unsigned cf_derive(unsigned m, unsigned n, unsigned* buf, unsigned cnt)
+static uint32_t cf_derive(uint32_t m, uint32_t n, uint32_t* buf, uint32_t cnt)
 {
-    unsigned wrote = 0;
-    unsigned a = m / n;
+    uint32_t wrote = 0;
+    uint32_t a = m / n;
     while(cnt--) {
-        unsigned tmp = n;
+        uint32_t tmp = n;
         n = m - n * a;
         if(n == 0)
             break;
@@ -54,16 +54,16 @@ static unsigned cf_derive(unsigned m, unsigned n, unsigned* buf, unsigned cnt)
  * calculate the rational number m/n which it represents. Returns m and n.
  * If count is zero, then m and n are undefined.
  */
-static void cf_expand(const unsigned* buf, unsigned count,
-                      unsigned* m, unsigned* n)
+static void cf_expand(const uint32_t* buf, uint32_t count,
+                      uint32_t* m, uint32_t* n)
 {
     if(count == 0)
         return;
 
-    unsigned i = count - 1;
-    unsigned mx = 1, nx = buf[i];
+    uint32_t i = count - 1;
+    uint32_t mx = 1, nx = buf[i];
     while(i--) {
-        unsigned tmp = nx;
+        uint32_t tmp = nx;
         nx = mx + buf[i] * nx;
         mx = tmp;
     }
@@ -72,48 +72,102 @@ static void cf_expand(const unsigned* buf, unsigned count,
     *n = nx;
 }
 
-int aic_i2s_set_mclk(x1000_clk_t clksrc, unsigned fs, unsigned mult)
+static int calc_i2s_clock_params(x1000_clk_t clksrc,
+                                 uint32_t fs, uint32_t mult,
+                                 uint32_t* div_m, uint32_t* div_n,
+                                 uint32_t* i2sdiv)
 {
-    /* get the input clock rate */
-    uint32_t src_freq = clk_get(clksrc);
+    if(clksrc == X1000_CLK_EXCLK) {
+        /* EXCLK mode bypasses the CPM clock so it's more limited */
+        *div_m = 0;
+        *div_n = 0;
+        *i2sdiv = X1000_EXCLK_FREQ / 64 / fs;
 
-    /* reject invalid parameters */
+        /* clamp to maximum value */
+        if(*i2sdiv > 0x200)
+            *i2sdiv = 0x200;
+
+        return 0;
+    }
+
+    /* ensure a valid clock was selected */
+    if(clksrc != X1000_CLK_SCLK_A &&
+       clksrc != X1000_CLK_MPLL)
+        return -1;
+
+    /* ensure bit clock constraint is respected */
     if(mult % 64 != 0)
         return -1;
 
-    if(clksrc == X1000_EXCLK_FREQ) {
-        if(mult != 0)
-            return -1;
+    /* ensure master clock frequency is not too high */
+    if(fs > UINT32_MAX/mult)
+        return -1;
 
-        jz_writef(AIC_I2SCR, STPBK(1));
+    /* get frequencies */
+    uint32_t tgt_freq = fs * mult;
+    uint32_t src_freq = clk_get(clksrc);
+
+    /* calculate best rational approximation fitting hardware constraints */
+    uint32_t m = 0, n = 0;
+    uint32_t buf[16];
+    uint32_t cnt = cf_derive(tgt_freq, src_freq, &buf[0], 16);
+    do {
+        cf_expand(&buf[0], cnt, &m, &n);
+        cnt -= 1;
+    } while(cnt > 0 && (m > 512 || n > 8192) && (n >= 2*m));
+
+    /* unrepresentable */
+    if(cnt == 0 || n == 0 || m == 0)
+        return -1;
+
+    *div_m = m;
+    *div_n = n;
+    *i2sdiv = mult / 64;
+    return 0;
+}
+
+uint32_t aic_calc_i2s_clock(x1000_clk_t clksrc, uint32_t fs, uint32_t mult)
+{
+    uint32_t m, n, i2sdiv;
+    if(calc_i2s_clock_params(clksrc, fs, mult, &m, &n, &i2sdiv))
+        return 0;
+
+    unsigned long long rate = clk_get(clksrc);
+    rate *= m;
+    rate /= n * i2sdiv; /* this multiply can't overflow. */
+
+    /* clamp */
+    if(rate > 0xffffffffull)
+        rate = 0xffffffff;
+
+    return rate;
+}
+
+int aic_set_i2s_clock(x1000_clk_t clksrc, uint32_t fs, uint32_t mult)
+{
+    uint32_t m, n, i2sdiv;
+    if(calc_i2s_clock_params(clksrc, fs, mult, &m, &n, &i2sdiv))
+        return -1;
+
+    /* turn off bit clock */
+    bool bitclock_en = !jz_readf(AIC_I2SCR, STPBK);
+    jz_writef(AIC_I2SCR, STPBK(1));
+
+    /* handle master clock */
+    if(clksrc == X1000_CLK_EXCLK) {
         jz_writef(CPM_I2SCDR, CS(0), CE(0));
-        REG_AIC_I2SDIV = X1000_EXCLK_FREQ / 64 / fs;
     } else {
-        if(mult == 0)
-            return -1;
-        if(fs*mult > src_freq)
-            return -1;
-
-        /* calculate best rational approximation that fits our constraints */
-        unsigned m = 0, n = 0;
-        unsigned buf[16];
-        unsigned cnt = cf_derive(fs*mult, src_freq, &buf[0], 16);
-        do {
-            cf_expand(&buf[0], cnt, &m, &n);
-            cnt -= 1;
-        } while(cnt > 0 && (m > 512 || n > 8192) && (n >= 2*m));
-
-        /* wrong values */
-        if(cnt == 0 || n == 0 || m == 0)
-            return -1;
-
-        jz_writef(AIC_I2SCR, STPBK(1));
         jz_writef(CPM_I2SCDR, PCS(clksrc == X1000_CLK_MPLL ? 1 : 0),
                   CS(1), CE(1), DIV_M(m), DIV_N(n));
         jz_write(CPM_I2SCDR1, REG_CPM_I2SCDR1);
-        REG_AIC_I2SDIV = (mult / 64) - 1;
     }
 
-    jz_writef(AIC_I2SCR, STPBK(0));
+    /* set bit clock divider */
+    REG_AIC_I2SDIV = i2sdiv - 1;
+
+    /* re-enable the bit clock */
+    if(bitclock_en)
+        jz_writef(AIC_I2SCR, STPBK(0));
+
     return 0;
 }

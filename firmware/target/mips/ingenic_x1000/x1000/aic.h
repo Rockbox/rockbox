@@ -123,18 +123,30 @@
 #define JI_AIC_CCR                  
 #define BP_AIC_CCR_CHANNEL          24
 #define BM_AIC_CCR_CHANNEL          0x7000000
+#define BV_AIC_CCR_CHANNEL__MONO    0x0
+#define BV_AIC_CCR_CHANNEL__STEREO  0x1
 #define BF_AIC_CCR_CHANNEL(v)       (((v) & 0x7) << 24)
 #define BFM_AIC_CCR_CHANNEL(v)      BM_AIC_CCR_CHANNEL
 #define BF_AIC_CCR_CHANNEL_V(e)     BF_AIC_CCR_CHANNEL(BV_AIC_CCR_CHANNEL__##e)
 #define BFM_AIC_CCR_CHANNEL_V(v)    BM_AIC_CCR_CHANNEL
 #define BP_AIC_CCR_OSS              19
 #define BM_AIC_CCR_OSS              0x380000
+#define BV_AIC_CCR_OSS__8BIT        0x0
+#define BV_AIC_CCR_OSS__16BIT       0x1
+#define BV_AIC_CCR_OSS__18BIT       0x2
+#define BV_AIC_CCR_OSS__20BIT       0x3
+#define BV_AIC_CCR_OSS__24BIT       0x4
 #define BF_AIC_CCR_OSS(v)           (((v) & 0x7) << 19)
 #define BFM_AIC_CCR_OSS(v)          BM_AIC_CCR_OSS
 #define BF_AIC_CCR_OSS_V(e)         BF_AIC_CCR_OSS(BV_AIC_CCR_OSS__##e)
 #define BFM_AIC_CCR_OSS_V(v)        BM_AIC_CCR_OSS
 #define BP_AIC_CCR_ISS              16
 #define BM_AIC_CCR_ISS              0x70000
+#define BV_AIC_CCR_ISS__8BIT        0x0
+#define BV_AIC_CCR_ISS__16BIT       0x1
+#define BV_AIC_CCR_ISS__18BIT       0x2
+#define BV_AIC_CCR_ISS__20BIT       0x3
+#define BV_AIC_CCR_ISS__24BIT       0x4
 #define BF_AIC_CCR_ISS(v)           (((v) & 0x7) << 16)
 #define BFM_AIC_CCR_ISS(v)          BM_AIC_CCR_ISS
 #define BF_AIC_CCR_ISS_V(e)         BF_AIC_CCR_ISS(BV_AIC_CCR_ISS__##e)
