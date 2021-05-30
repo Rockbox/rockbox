@@ -21,13 +21,16 @@
 
 #include "system.h"
 #include "kernel.h"
+#include "audio.h"
 #include "audiohw.h"
 #include "pcm.h"
 #include "pcm-internal.h"
 #include "panic.h"
 #include "dma-x1000.h"
 #include "irq-x1000.h"
+#include "gpio-x1000.h"
 #include "x1000/aic.h"
+#include "x1000/cpm.h"
 
 #define AIC_STATE_STOPPED   0
 #define AIC_STATE_PLAYING   1
@@ -41,21 +44,45 @@ static volatile int aic_dma_pending_event = DMA_EVENT_NONE;
 
 static dma_desc aic_dma_desc;
 
-static void pcm_dma_int_cb(int event);
+static void pcm_play_dma_int_cb(int event);
+#ifdef HAVE_RECORDING
+static void pcm_rec_dma_int_cb(int event);
+#endif
 
 void pcm_play_dma_init(void)
 {
+    /* Ungate clock, assign pins. NB this overlaps with pins labeled "sa0-sa4"
+     * on Ingenic's datasheets but I'm not sure what they are. Probably safe to
+     * assume they are not useful to Rockbox... */
+    jz_writef(CPM_CLKGR, AIC(0));
+    gpio_config(GPIO_B, 0x1f, GPIO_DEVICE(1));
+
+    /* Configure AIC with some sane defaults */
+    jz_writef(AIC_CFG, RST(1));
+    jz_writef(AIC_I2SCR, STPBK(1));
+    jz_writef(AIC_CFG, MSB(0), LSMP(1), ICDC(0), AUSEL(1), BCKD(0), SYNCD(0));
+    jz_writef(AIC_CCR, ENDSW(0), ASVTSU(0));
+    jz_writef(AIC_I2SCR, RFIRST(0), ESCLK(0), AMSL(0));
+    jz_write(AIC_SPENA, 0);
+
     /* Let the target initialize its hardware and setup the AIC */
     audiohw_init();
 
-    /* Set DMA callback */
-    dma_set_callback(DMA_CHANNEL_AUDIO, pcm_dma_int_cb);
+    /* Program audio format (stereo, packed 16 bit samples) */
+    jz_writef(AIC_CCR, PACK16(1), CHANNEL_V(STEREO),
+              OSS_V(16BIT), ISS_V(16BIT), M2S(0));
+    jz_writef(AIC_I2SCR, SWLH(0));
 
-    /* Program FIFO threshold -- DMA settings must match */
-    jz_writef(AIC_CFG, TFTH(16));
+    /* Set DMA settings */
+    jz_writef(AIC_CFG, TFTH(16), RFTH(16));
+    dma_set_callback(DMA_CHANNEL_AUDIO, pcm_play_dma_int_cb);
+#ifdef HAVE_RECORDING
+    dma_set_callback(DMA_CHANNEL_RECORD, pcm_rec_dma_int_cb);
+#endif
 
-    /* Ensure all playback is disabled */
-    jz_writef(AIC_CCR, ERPL(0));
+    /* Mask all interrupts and disable playback/recording */
+    jz_writef(AIC_CCR, EROR(0), ETUR(0), ERFS(0), ETFS(0),
+              ENLBF(0), ERPL(0), EREC(0));
 
     /* Enable the controller */
     jz_writef(AIC_CFG, ENABLE(1));
@@ -112,7 +139,7 @@ static void pcm_dma_handle_event(int event)
     }
 }
 
-static void pcm_dma_int_cb(int event)
+static void pcm_play_dma_int_cb(int event)
 {
     if(aic_lock) {
         aic_dma_pending_event = event;
@@ -155,6 +182,63 @@ void pcm_play_unlock(void)
 
     restore_irq(irq);
 }
+
+#ifdef HAVE_RECORDING
+/*
+ * Recording
+ */
+
+/* FIXME need to implement this!! */
+
+static void pcm_rec_dma_int_cb(int event)
+{
+    (void)event;
+}
+
+void pcm_rec_dma_init(void)
+{
+}
+
+void pcm_rec_dma_close(void)
+{
+}
+
+void pcm_rec_dma_start(void* addr, size_t size)
+{
+    (void)addr;
+    (void)size;
+}
+
+void pcm_rec_dma_stop(void)
+{
+}
+
+void pcm_rec_lock(void)
+{
+
+}
+
+void pcm_rec_unlock(void)
+{
+
+}
+
+const void* pcm_rec_dma_get_peak_buffer(void)
+{
+    return NULL;
+}
+
+void audio_set_output_source(int source)
+{
+    (void)source;
+}
+
+void audio_input_mux(int source, unsigned flags)
+{
+    (void)source;
+    (void)flags;
+}
+#endif /* HAVE_RECORDING */
 
 void AIC(void)
 {
