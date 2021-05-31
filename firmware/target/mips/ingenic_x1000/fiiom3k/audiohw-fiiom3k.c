@@ -22,10 +22,24 @@
 #include "audiohw.h"
 #include "system.h"
 #include "pcm_sampr.h"
-#include "logf.h"
 #include "aic-x1000.h"
 #include "i2c-x1000.h"
 #include "gpio-x1000.h"
+#include "logf.h"
+
+static int cur_fsel = HW_FREQ_48;
+static int cur_power_mode = 0;
+
+static void set_ak_freqmode(void)
+{
+    int freq = hw_freq_sampr[cur_fsel];
+    int mult = freq >= SAMPR_176 ? 128 : 256;
+
+    aic_enable_i2s_bit_clock(false);
+    aic_set_i2s_clock(X1000_CLK_SCLK_A, freq, mult);
+    ak4376_set_freqmode(cur_fsel, mult, cur_power_mode);
+    aic_enable_i2s_bit_clock(true);
+}
 
 void audiohw_init(void)
 {
@@ -36,7 +50,8 @@ void audiohw_init(void)
 
     /* Initialize DAC */
     i2c_x1000_set_freq(AK4376_BUS, I2C_FREQ_400K);
-    ak4376_init();
+    ak4376_open();
+    set_ak_freqmode();
 }
 
 void audiohw_postinit(void)
@@ -48,22 +63,29 @@ void audiohw_close(void)
     ak4376_close();
 }
 
+void audiohw_set_volume(int vol_l, int vol_r)
+{
+    ak4376_set_volume(vol_l, vol_r);
+}
+
+void audiohw_set_filter_roll_off(int val)
+{
+    ak4376_set_filter_roll_off(val);
+}
+
+void audiohw_set_frequency(int fsel)
+{
+    cur_fsel = fsel;
+    set_ak_freqmode();
+}
+
+void audiohw_set_power_mode(int mode)
+{
+    cur_power_mode = mode;
+    set_ak_freqmode();
+}
+
 void ak4376_set_pdn_pin(int level)
 {
     gpio_config(GPIO_A, 1 << 16, GPIO_OUTPUT(level ? 1 : 0));
-}
-
-int ak4376_set_mclk_freq(int hw_freq, bool enabled)
-{
-    int freq = hw_freq_sampr[hw_freq];
-    int mult = freq >= SAMPR_176 ? 128 : 256;
-
-    if(enabled) {
-        if(aic_set_i2s_clock(X1000_CLK_SCLK_A, freq, mult)) {
-            logf("WARNING: unachievable audio rate %d x %d!?", freq, mult);
-        }
-    }
-
-    aic_enable_i2s_bit_clock(enabled);
-    return mult;
 }

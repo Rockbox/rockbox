@@ -104,10 +104,12 @@ AUDIOHW_SETTING(POWER_MODE, "", 0, 1, 0, 1, 0)
 #define AK4376_FS_176 17
 #define AK4376_FS_192 18
 
-/* Functions to power on / off the DAC which should be called from
- * the target's audiohw_init() / audiohw_close() implementation.
+/* Functions to power on / off the DAC.
+ *
+ * NOTE: Target must call ak4376_set_frequency() after ak4376_open() to
+ * finish the power-up sequence of the headphone amp.
  */
-extern void ak4376_init(void);
+extern void ak4376_open(void);
 extern void ak4376_close(void);
 
 /* Register read/write. Cached to avoid redundant reads/writes. */
@@ -117,16 +119,17 @@ extern int  ak4376_read(int reg);
 /* Target-specific function to set the PDN pin level. */
 extern void ak4376_set_pdn_pin(int level);
 
-/* Target-specific function to control the external master clock frequency.
- * This is called by the ak4376's audiohw implementation when switching to
- * or from a frequency that is configured to use this clock source.
+/* Set overall output volume */
+extern void ak4376_set_volume(int vol_l, int vol_r);
+
+/* Set the roll-off filter */
+extern void ak4376_set_filter_roll_off(int val);
+
+/* Set audio sampling frequency and power mode.
  *
- * - hw_freq is the new sample rate -- one of the HW_FREQ_XX constants.
- * - enabled is true if clock should be output, false if not.
- *
- * The return value is the master clock rate as a multiple of the sampling
- * frequency. The allowed multiples depend on the sampling frequency, shown
- * in the table below.
+ * If the I2S master clock is being supplied externally, the caller must also
+ * give the master clock multiplier 'mult'. The accepted values depend on the
+ * sampling rate, see below:
  *
  * +-----------+------------------------+
  * | frequency | master clock rate      |
@@ -137,16 +140,13 @@ extern void ak4376_set_pdn_pin(int level);
  * | 128 - 192 | 128fs                  |
  * +-----------+------------------------+
  *
- * For example, at 48 KHz you could return either 256 or 512 depending on
- * the rate you decided to actually use.
+ * Switching between high-power and low-power mode requires the same registers
+ * and power-up / power-down sequences as a frequency switch, so both settings
+ * are controlled by this function.
  *
- * You need to return a valid master multiplier for supported frequencies
- * even when enabled = false, since the driver needs to know the multiplier
- * _before_ enabling the clock.
- *
- * For unsupported frequencies you don't need to return a valid master
- * multiplier, because the DAC doesn't need the return value in such cases.
+ * high power mode -- use power_mode=0
+ * low power mode  -- use power_mode=1
  */
-extern int ak4376_set_mclk_freq(int hw_freq, bool enabled);
+extern void ak4376_set_freqmode(int fsel, int mult, int power_mode);
 
 #endif /* __AK4376_H__ */

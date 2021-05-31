@@ -27,6 +27,18 @@
 #include "system.h"
 #include "i2c-async.h"
 
+/* sample rates supported by the hardware */
+#define CAPS (SAMPR_CAP_192 | SAMPR_CAP_176 | \
+              SAMPR_CAP_96  | SAMPR_CAP_88  | SAMPR_CAP_64 | \
+              SAMPR_CAP_48  | SAMPR_CAP_44  | SAMPR_CAP_32 | \
+              SAMPR_CAP_24  | SAMPR_CAP_22  | SAMPR_CAP_16 | \
+              SAMPR_CAP_12  | SAMPR_CAP_11  | SAMPR_CAP_8)
+
+/* future proofing */
+#if (HW_SAMPR_CAPS & ~CAPS) != 0
+# error "incorrect HW_SAMPR_CAPS"
+#endif
+
 #ifndef HAVE_SW_VOLUME_CONTROL
 # error "AK4376 requires HAVE_SW_VOLUME_CONTROL!"
 #endif
@@ -40,7 +52,7 @@
  */
 
 /* Converts HW_FREQ_XX constants to register values */
-static const int ak4376_fsel_to_hw[] = {
+static const uint8_t ak4376_fsel_to_hw[] = {
     HW_HAVE_192_(AK4376_FS_192,)
     HW_HAVE_176_(AK4376_FS_176,)
     HW_HAVE_96_(AK4376_FS_96,)
@@ -57,19 +69,13 @@ static const int ak4376_fsel_to_hw[] = {
     HW_HAVE_8_(AK4376_FS_8,)
 };
 
-static struct ak4376 {
-    int fsel;
-    int low_mode;
-    int regs[AK4376_NUM_REGS];
-} ak4376;
+static int ak4376_regs[AK4376_NUM_REGS];
 
-void ak4376_init(void)
+void ak4376_open(void)
 {
     /* Initialize DAC state */
-    ak4376.fsel = HW_FREQ_48;
-    ak4376.low_mode = 0;
     for(int i = 0; i < AK4376_NUM_REGS; ++i)
-        ak4376.regs[i] = -1;
+        ak4376_regs[i] = -1;
 
     /* Initial reset after power-on */
     ak4376_set_pdn_pin(0);
@@ -102,9 +108,6 @@ void ak4376_init(void)
     /* Write initial configuration prior to power-up */
     for(size_t i = 0; i < ARRAYLEN(init_config); i += 2)
         ak4376_write(init_config[i], init_config[i+1]);
-
-    /* Initial frequency setting, also handles DAC/amp power-up */
-    audiohw_set_frequency(HW_FREQ_48);
 }
 
 void ak4376_close(void)
@@ -121,22 +124,22 @@ void ak4376_close(void)
 void ak4376_write(int reg, int value)
 {
     /* Ensure value is sensible and differs from the last set value */
-    if((value & 0xff) == value && ak4376.regs[reg] != value) {
+    if((value & 0xff) == value && ak4376_regs[reg] != value) {
         int r = i2c_reg_write1(AK4376_BUS, AK4376_ADDR, reg, value);
         if(r == I2C_STATUS_OK)
-            ak4376.regs[reg] = value;
+            ak4376_regs[reg] = value;
         else
-            ak4376.regs[reg] = -1;
+            ak4376_regs[reg] = -1;
     }
 }
 
 int ak4376_read(int reg)
 {
     /* Only read from I2C if we don't already know the value */
-    if(ak4376.regs[reg] < 0)
-        ak4376.regs[reg] = i2c_reg_read1(AK4376_BUS, AK4376_ADDR, reg);
+    if(ak4376_regs[reg] < 0)
+        ak4376_regs[reg] = i2c_reg_read1(AK4376_BUS, AK4376_ADDR, reg);
 
-    return ak4376.regs[reg];
+    return ak4376_regs[reg];
 }
 
 static int round_step_up(int x, int step)
@@ -180,7 +183,7 @@ static int amp_vol_to_hw(int vol)
     return (vol - AK4376_AMP_VOLUME_MIN) / AK4376_AMP_VOLUME_STEP + 1;
 }
 
-void audiohw_set_volume(int vol_l, int vol_r)
+void ak4376_set_volume(int vol_l, int vol_r)
 {
     int amp;
     int mix_l = AK4376_MIX_LCH, dig_l, sw_l;
@@ -210,7 +213,7 @@ void audiohw_set_volume(int vol_l, int vol_r)
     pcm_set_master_volume(sw_l, sw_r);
 }
 
-void audiohw_set_filter_roll_off(int val)
+void ak4376_set_filter_roll_off(int val)
 {
     int reg = ak4376_read(AK4376_REG_FILTER);
     reg &= ~0xc0;
@@ -218,11 +221,8 @@ void audiohw_set_filter_roll_off(int val)
     ak4376_write(AK4376_REG_FILTER, reg);
 }
 
-void audiohw_set_frequency(int fsel)
+void ak4376_set_freqmode(int fsel, int mult, int power_mode)
 {
-    /* Determine master clock multiplier */
-    int mult = ak4376_set_mclk_freq(fsel, false);
-
     /* Calculate clock mode for frequency. Multipliers of 32/64 are only
      * for rates >= 256 KHz which are not supported by Rockbox, so they
      * are commented out -- but they're in the correct place. */
@@ -248,27 +248,11 @@ void audiohw_set_frequency(int fsel)
 
     /* Handle the DSMLP bit in the MODE_CTRL register */
     int mode_ctrl = 0x00;
-    if(ak4376.low_mode || hw_freq_sampr[fsel] <= SAMPR_12)
+    if(power_mode || hw_freq_sampr[fsel] <= SAMPR_12)
         mode_ctrl |= 0x40;
 
     /* Program the new settings */
     ak4376_write(AK4376_REG_CLOCK_MODE, clock_mode);
     ak4376_write(AK4376_REG_MODE_CTRL, mode_ctrl);
-    ak4376_write(AK4376_REG_PWR3, ak4376.low_mode ? 0x11 : 0x01);
-
-    /* Enable the master clock */
-    ak4376_set_mclk_freq(fsel, true);
-
-    /* Remember the frequency */
-    ak4376.fsel = fsel;
-}
-
-void audiohw_set_power_mode(int mode)
-{
-    /* This is handled via audiohw_set_frequency() since changing LPMODE
-     * bit requires power-down/power-up & changing other bits as well */
-    if(ak4376.low_mode != mode) {
-        ak4376.low_mode = mode;
-        audiohw_set_frequency(ak4376.fsel);
-    }
+    ak4376_write(AK4376_REG_PWR3, power_mode ? 0x11 : 0x01);
 }
