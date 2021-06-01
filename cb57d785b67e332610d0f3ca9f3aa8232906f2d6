@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "edd6b0f5_74af5c0d",
+        "filename": "apps/recorder/keyboard.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-01T19:30:47Z",
+      "side": 1,
+      "message": "I\u0027m not really sure how to refer to a specific font. The backend font API is in firmware/export/font.h. I assume the font numbers ultimately come from font_load().\n\nIt _does_ seem like the font loading code is smart enough to re-use fonts that are already loaded in memory. So it may be reasonable to allow using a font different from the main UI font. If they happen to be identical then there would be no extra memory usage.\n\nIt may be enough to just allow choosing between FONT_SYSFIXED (what is currently used for the keyboard) and the UI font. Maybe with a fallback to FONT_SYSFIXED in case the UI font is so ridiculously huge it would make the keyboard unusable.",
+      "revId": "cb57d785b67e332610d0f3ca9f3aa8232906f2d6",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
