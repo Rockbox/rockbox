@@ -370,17 +370,18 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
 
             if (sc->getwidth() >= 160 && sc->getheight() >= 96)
             {
-                p = "ABCDEFG abcdefg !?\" @#$%+'\n"
-                    "HIJKLMN hijklmn 789 &_()-`\n"
-                    "OPQRSTU opqrstu 456 §|{}/<\n"
-                    "VWXYZ., vwxyz.,0123 ~=[]*>\n"
-                    "ÀÁÂÃÄÅÆ ÌÍÎÏ ÈÉÊË ¢£¤¥¦§©®\n"
-                    "àáâãäåæ ìíîï èéêë «»°ºª¹²³\n"
-                    "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ ¯±×÷¡¿µ·\n"
-                    "òóôõöø çðþýÿ ùúûü ¼½¾¬¶¨:;";
-
-                pm->default_lines = 8;
-                pm->max_line_len = 26;
+                p = " RY\n"
+                    "QSF\n"
+                    "JIM\n"
+                    "VAC\n"
+                    "PED\n"
+                    "BTL\n"
+                    "KOU\n"
+                    "XNW\n"
+                    "ZHG";
+                
+                pm->default_lines = 9;
+                pm->max_line_len = 3;
             }
             else
 #endif /* LCD_WIDTH >= 160 && LCD_HEIGHT >= 96 */
@@ -399,7 +400,6 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
                     "àáâãäåæ ìíîï èéêë\n"
                     "ÓÒÔÕÖØ ÇÐÞÝß ÙÚÛÜ\n"
                     "òóôõöø çðþýÿ ùúûü";
-
                 pm->default_lines = 4;
                 pm->max_line_len = 18;
             }
@@ -436,7 +436,15 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
             pm->kbd_buf_ptr = pm->kbd_buf; /* internal layout buffer */
 
         struct screen *sc = &screens[l];
+        
         kbd_calc_params(pm, sc, &state);
+        pm->x = 1;
+                pm->y = 4;
+                pm->font_h = 30;
+                pm->text_w = 11;
+                pm->main_y = 300;
+                pm->curfont = 10;
+                
     }
 
     if (global_settings.talk_menu)      /* voice UI? */
@@ -578,7 +586,7 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
                 /* select doubles as backspace in line_edit */
                 if (pm->line_edit)
                     kbd_backspace(&state);
-                else
+                else {
 #ifdef HAVE_MORSE_INPUT
                 if (state.morse_mode)
                 {
@@ -590,9 +598,12 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
                         state.morse_code = 1;
                     }
                 }
-                else
+                else {
 #endif /* HAVE_MORSE_INPUT */
                     kbd_insert_selected(pm, &state);
+                    pm->x = 1;
+                    pm->y = 4;
+                }
                 break;
 
             case ACTION_KBD_BACKSPACE:
