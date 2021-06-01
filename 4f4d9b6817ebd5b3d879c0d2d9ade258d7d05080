@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d96e28d4_967b0f57",
+        "filename": "apps/plugins/calculator.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1096,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-01T20:46:29Z",
+      "side": 1,
+      "message": "this may not work on native targets because our printf implementation does not necessarily handle floats -- it is easy to enable everywhere but I\u0027m not yet sure if there\u0027s some dire code size impact on low memory targets.",
+      "revId": "4f4d9b6817ebd5b3d879c0d2d9ade258d7d05080",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "158015aa_7af8de66",
+        "filename": "apps/plugins/calculator.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1116,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-01T20:46:29Z",
+      "side": 1,
+      "message": "should be *powerOne \u003e 0, correct?",
+      "revId": "4f4d9b6817ebd5b3d879c0d2d9ade258d7d05080",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "694f0091_45c080f2",
+        "filename": "apps/plugins/calculator.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1772,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-01T20:46:29Z",
+      "side": 1,
+      "message": "This has borked the input handling -- typing the following\n1 . 0 + 1\n\nis causing 1.01 to be entered, it doesn\u0027t start a second operand.\nI think you need to do if(calStatus \u003d\u003d cal_typing || calStatus \u003d\u003d cal_dotted)\n\nHow come this was needed anyway (out of curiosity?)",
+      "revId": "4f4d9b6817ebd5b3d879c0d2d9ade258d7d05080",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1dde3a66_961d65da",
+        "filename": "apps/plugins/calculator.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 1834,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-01T20:46:29Z",
+      "side": 1,
+      "message": "same issue as above",
+      "revId": "4f4d9b6817ebd5b3d879c0d2d9ade258d7d05080",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
