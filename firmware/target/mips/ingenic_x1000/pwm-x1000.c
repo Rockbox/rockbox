@@ -33,7 +33,6 @@ struct pwm_gpio_data {
 };
 
 struct pwm_state {
-    struct pwm_gpio_data gpio;
     int period_ns;
     int duty_ns;
     int full_ticks;
@@ -41,12 +40,20 @@ struct pwm_state {
     int prescaler;
 };
 
+static const struct pwm_gpio_data pwm_gpios[] = {
+    {GPIO_C, 1 << 25, GPIO_DEVICE(0)},
+    {GPIO_C, 1 << 26, GPIO_DEVICE(1)},
+    {GPIO_C, 1 << 27, GPIO_DEVICE(1)},
+    {GPIO_B, 1 <<  6, GPIO_DEVICE(2)},
+    {GPIO_C, 1 << 24, GPIO_DEVICE(0)},
+};
+
 static struct pwm_state pwm_state[] = {
-    {{GPIO_C, 1 << 25, GPIO_DEVICE(0)}, -1, -1, -1, -1, -1},
-    {{GPIO_C, 1 << 26, GPIO_DEVICE(1)}, -1, -1, -1, -1, -1},
-    {{GPIO_C, 1 << 27, GPIO_DEVICE(1)}, -1, -1, -1, -1, -1},
-    {{GPIO_B, 1 <<  6, GPIO_DEVICE(2)}, -1, -1, -1, -1, -1},
-    {{GPIO_C, 1 << 24, GPIO_DEVICE(0)}, -1, -1, -1, -1, -1},
+    {-1, -1, -1, -1, -1},
+    {-1, -1, -1, -1, -1},
+    {-1, -1, -1, -1, -1},
+    {-1, -1, -1, -1, -1},
+    {-1, -1, -1, -1, -1},
 };
 
 void pwm_init(int chn)
@@ -60,7 +67,8 @@ void pwm_init(int chn)
     st->prescaler = -1;
 
     /* clear GPIO and disable timer */
-    gpio_config(st->gpio.port, st->gpio.pin, GPIO_OUTPUT(0));
+    const struct pwm_gpio_data* pg = &pwm_gpios[chn];
+    gpio_config(pg->port, pg->pin, GPIO_OUTPUT(0));
     jz_clr(TCU_STOP, 1 << chn);
     jz_clr(TCU_ENABLE, 1 << chn);
     jz_set(TCU_STOP, 1 << chn);
@@ -126,11 +134,10 @@ void pwm_set_period(int chn, int period_ns, int duty_ns)
 
     if(full_ticks != st->full_ticks || half_ticks != st->half_ticks) {
         if(enabled) {
-            /* avoid changing PWM settings in the middle of a cycle */
-            unsigned cmp = REG_TCU_CMP_FULL(chn) - 1;
-            long deadline = current_tick + 3;
-            while(REG_TCU_COUNT(chn) < cmp
-               && TIME_BEFORE(current_tick, deadline));
+            /* avoid changing PWM settings in the middle of a cycle,
+             * because for some reason, that is supposed to be "bad" */
+            jz_clr(TCU_FLAG, 1 << chn);
+            while((REG_TCU_FLAG & (1 << chn)) == 0);
         }
 
         /* these can be changed while the timer is running */
@@ -154,15 +161,15 @@ void pwm_enable(int chn)
     jz_set(TCU_ENABLE, 1 << chn);
 
     /* Configure GPIO function */
-    struct pwm_state* st = &pwm_state[chn];
-    gpio_config(st->gpio.port, st->gpio.pin, st->gpio.func);
+    const struct pwm_gpio_data* pg = &pwm_gpios[chn];
+    gpio_config(pg->port, pg->pin, pg->func);
 }
 
 void pwm_disable(int chn)
 {
     /* Set GPIO to output 0 */
-    struct pwm_state* st = &pwm_state[chn];
-    gpio_config(st->gpio.port, st->gpio.pin, GPIO_OUTPUT(0));
+    const struct pwm_gpio_data* pg = &pwm_gpios[chn];
+    gpio_config(pg->port, pg->pin, GPIO_OUTPUT(0));
 
     /* Stop timer */
     jz_clr(TCU_ENABLE, 1 << chn);
