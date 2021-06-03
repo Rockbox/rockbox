@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "709311ca_13ed14d8",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-03T17:38:53Z",
+      "side": 1,
+      "message": "I can\u0027t think of any way that unlock_combo could get screwed up, but do you think it would be better to call action_autosoftlock_init here -- where autosoftlock activates -- rather than in two different places in the settings code? \n\nThat would also allow it to become a static function and use the current context to do the lookup instead of hardcoding CONTEXT_WPS etc.\n\n... in light of my other comment maybe this should be handled in a follow up patch anyway.",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9bec2704_1cdc9662",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1204,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-03T17:38:53Z",
+      "side": 1,
+      "message": "Note this is missing stuff like handling fallthrough contexts. It\u0027s fine to merge as-is IMO; better to keep the patch focused on one issue. \n\nLater it may be a good idea to refactor the keymap search from action_code_lookup() into a separate function, then call it from here. For example if key remapping gets implemented that will ensure things keep working as expected even if users remap the keylock action.",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
