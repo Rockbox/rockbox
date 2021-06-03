@@ -37,6 +37,41 @@
     },
     {
       "key": {
+        "uuid": "d0b54461_eaa55e6b",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-03T23:29:31Z",
+      "side": 1,
+      "message": "ah well \u0027priming\u0027 the lock would not work if you put it here obviously, but setting unlock_combo would work. Arguably that issue of priming is another unrelated bug.\n\nAs for hot path... don\u0027t worry about it :) this happens very rarely, when the backlight times out. The action code is doing more processing than this, basically twice per keypress (once for press, once for release) and it\u0027s no issue on puny ~100 MHz CPUs...",
+      "parentUuid": "fb3f6bd6_26a70b67",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9893478_70cfc18c",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1186,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-03T23:29:31Z",
+      "side": 1,
+      "message": "you may want to remove this check for screen_has_lock while you\u0027re here -- this controls if the GUI displays a lock icon, and there is little point hiding it if in fact the keys are actually locked.",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9bec2704_1cdc9662",
         "filename": "apps/action.c",
         "patchSetId": 8
@@ -72,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "56967da2_28fe9c1b",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1204,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-03T23:29:31Z",
+      "side": 1,
+      "message": "OK makes sense. Like I said it should be perfectly fine as it is right now.",
+      "parentUuid": "c51ccb42_011a0214",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0cea1f73_dd148807",
         "filename": "apps/action.c",
         "patchSetId": 8
@@ -83,6 +136,24 @@
       "writtenOn": "2021-06-03T18:21:49Z",
       "side": 1,
       "message": "instead of\n\n      if (has_flag(action_last.softlock_mask, SEL_ACTION_AUTOLOCK) \u0026\u0026\n        has_flag(action_last.softlock_mask, SEL_ACTION_ALWAYSAUTOLOCK))\n\ndo\n\n      if (has_flag(action_last.softlock_mask, SEL_ACTION_AUTOLOCK) \u0026\u0026\n        has_flag(action_last.softlock_mask, SEL_ACTION_ALWAYSAUTOLOCK) \u0026\u0026\n        (action_last.unlock_combo !\u003d BUTTON_NONE))\n\nPretty easy, though that reminds me I should probably test what happens if there are /no/ unlock keys available in either context.",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c4335fa1_042f7c71",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1243,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-03T23:29:31Z",
+      "side": 1,
+      "message": "Seems sane",
+      "parentUuid": "0cea1f73_dd148807",
       "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
