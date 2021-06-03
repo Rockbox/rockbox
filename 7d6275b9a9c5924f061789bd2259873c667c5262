@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fb3f6bd6_26a70b67",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 685,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-06-03T18:21:49Z",
+      "side": 1,
+      "message": "I don\u0027t believe that would work unfortunately - the SEL_ACTION_ALOCK_OK flag needs to be set in order to set the timeout in a previous loop as above. My other concern would be adding initialization stuff to the \"hot path\", though this would probably be fairly innocuous.\n\nI kind of figured it fits in enough with both calls to set_selective_softlock_actions() that it\u0027s logical it would be called from the settings stuff, but that\u0027s debatable.",
+      "parentUuid": "709311ca_13ed14d8",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9bec2704_1cdc9662",
         "filename": "apps/action.c",
         "patchSetId": 8
@@ -30,6 +48,41 @@
       "writtenOn": "2021-06-03T17:38:53Z",
       "side": 1,
       "message": "Note this is missing stuff like handling fallthrough contexts. It\u0027s fine to merge as-is IMO; better to keep the patch focused on one issue. \n\nLater it may be a good idea to refactor the keymap search from action_code_lookup() into a separate function, then call it from here. For example if key remapping gets implemented that will ensure things keep working as expected even if users remap the keylock action.",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c51ccb42_011a0214",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1204,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-06-03T18:21:49Z",
+      "side": 1,
+      "message": "Yeah, this is a pretty hack \u0027n\u0027 slash approach, but I think it should fail pretty gracefully if no lock key is found. Perhaps I should ensure that an unlock_combo is indeed found before arming the autolock, though. I\u0027ll make a quick change after work, it should be pretty easy.\n\nIf you want to try it before I get it added, I\u0027ll comment with it below.\n\nRe: action_code_lookup() - kind of the reason I did this is all the existing code goes in the opposite direction - \"We have the button, find the action\", rather than \"We know the action we want, find the button that will get us there\".",
+      "parentUuid": "9bec2704_1cdc9662",
+      "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0cea1f73_dd148807",
+        "filename": "apps/action.c",
+        "patchSetId": 8
+      },
+      "lineNbr": 1243,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-06-03T18:21:49Z",
+      "side": 1,
+      "message": "instead of\n\n      if (has_flag(action_last.softlock_mask, SEL_ACTION_AUTOLOCK) \u0026\u0026\n        has_flag(action_last.softlock_mask, SEL_ACTION_ALWAYSAUTOLOCK))\n\ndo\n\n      if (has_flag(action_last.softlock_mask, SEL_ACTION_AUTOLOCK) \u0026\u0026\n        has_flag(action_last.softlock_mask, SEL_ACTION_ALWAYSAUTOLOCK) \u0026\u0026\n        (action_last.unlock_combo !\u003d BUTTON_NONE))\n\nPretty easy, though that reminds me I should probably test what happens if there are /no/ unlock keys available in either context.",
       "revId": "7d6275b9a9c5924f061789bd2259873c667c5262",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
