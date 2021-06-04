@@ -360,7 +360,7 @@ buildtool() {
     elif [ "$config_opt" != "NO_CONFIGURE" ]; then
         echo "ROCKBOXDEV: $toolname/configure"
         # NOTE glibc requires to be compiled with optimization
-        CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' run_cmd "$logfile" \
+        CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' CXXFLAGS='-std=c++03' run_cmd "$logfile" \
             "$cfg_dir/configure" "--prefix=$prefix" \
             --disable-docs $config_opt
     fi
@@ -470,7 +470,7 @@ build() {
             ./configure --prefix=$prefix $configure_params
         ;;
         *)
-            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
+            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' CXXFLAGS='-std=c++03' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
         ;;
     esac
 
