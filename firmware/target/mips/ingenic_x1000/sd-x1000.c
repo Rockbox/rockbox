@@ -23,6 +23,7 @@
 #include "sdmmc.h"
 #include "sd.h"
 #include "msc-x1000.h"
+#include "gpio-x1000.h"
 #include <string.h>
 
 /* #define LOGF_ENABLE */
@@ -201,7 +202,7 @@ bool sd_removable(IF_MD_NONVOID(int drive))
     if(drive < 0)
         return false;
 
-    return sd_to_msc[IF_MD_DRV(drive)]->config->cd_gpio.pin != 0;
+    return sd_to_msc[IF_MD_DRV(drive)]->config->cd_gpio != GPIO_NONE;
 }
 
 #ifndef CONFIG_STORAGE_MULTI

@@ -87,5 +87,5 @@ void audiohw_set_power_mode(int mode)
 
 void ak4376_set_pdn_pin(int level)
 {
-    gpio_config(GPIO_A, 1 << 16, GPIO_OUTPUT(level ? 1 : 0));
+    gpio_set_level(GPIO_AK4376_POWER, level ? 1 : 0);
 }

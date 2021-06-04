@@ -35,8 +35,6 @@
 # include "font.h"
 #endif
 
-#define FT_RST_PIN      (1 << 15)
-#define FT_INT_PIN      (1 << 12)
 #define ft_interrupt    GPIOB12
 
 /* Touch event types */
@@ -389,11 +387,13 @@ static void ft_init(void)
     i2c_x1000_set_freq(FT6x06_BUS, I2C_FREQ_400K);
 
     /* Reset chip */
-    gpio_config(GPIO_B, FT_RST_PIN|FT_INT_PIN, GPIO_OUTPUT(0));
+    gpio_set_level(GPIO_FT6x06_RESET, 0);
     mdelay(5);
-    gpio_out_level(GPIO_B, FT_RST_PIN, 1);
-    gpio_config(GPIO_B, FT_INT_PIN, GPIO_IRQ_EDGE(0));
-    gpio_enable_irq(GPIO_B, FT_INT_PIN);
+    gpio_set_level(GPIO_FT6x06_RESET, 1);
+
+    /* Configure the interrupt pin */
+    gpio_set_function(GPIO_FT6x06_INTERRUPT, GPIOF_IRQ_EDGE(0));
+    gpio_enable_irq(GPIO_FT6x06_INTERRUPT);
 }
 
 void touchpad_set_sensitivity(int level)
@@ -454,10 +454,6 @@ static void hp_detect_init(void)
 /* Rockbox interface */
 void button_init_device(void)
 {
-    /* Configure physical button GPIOs */
-    gpio_config(GPIO_A, (1 << 17) | (1 << 19), GPIO_INPUT);
-    gpio_config(GPIO_B, (1 << 28) | (1 << 31), GPIO_INPUT);
-
     /* Initialize touchpad */
     ft_init();
 

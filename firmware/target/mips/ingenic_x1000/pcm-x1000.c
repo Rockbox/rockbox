@@ -28,7 +28,6 @@
 #include "panic.h"
 #include "dma-x1000.h"
 #include "irq-x1000.h"
-#include "gpio-x1000.h"
 #include "x1000/aic.h"
 #include "x1000/cpm.h"
 
@@ -55,7 +54,6 @@ void pcm_play_dma_init(void)
      * on Ingenic's datasheets but I'm not sure what they are. Probably safe to
      * assume they are not useful to Rockbox... */
     jz_writef(CPM_CLKGR, AIC(0));
-    gpio_config(GPIO_B, 0x1f, GPIO_DEVICE(1));
 
     /* Configure AIC with some sane defaults */
     jz_writef(AIC_CFG, RST(1));

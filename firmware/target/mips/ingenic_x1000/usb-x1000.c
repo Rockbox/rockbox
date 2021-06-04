@@ -29,19 +29,8 @@
 #include "x1000/cpm.h"
 
 #ifdef FIIO_M3K
-# define USB_DETECT_PORT     GPIO_B
-# define USB_DETECT_PIN      (1 << 11)
-# define USB_DETECT_PIN_INT  GPIOB11
-# define USB_ID_PORT         GPIO_B
-# define USB_ID_PIN          (1 << 7)
-#else
-# ifndef USB_NONE
-#  error "please add USB GPIO pins"
-# endif
+# define USB_DETECT_PIN_INT GPIOB11 // TODO remove me
 #endif
-
-#define USB_DRVVBUS_PORT GPIO_B
-#define USB_DRVVBUS_PIN  (1 << 25)
 
 /*
  * USB-Designware driver API
@@ -165,7 +154,8 @@ static volatile int usb_status = USB_EXTRACTED;
 
 static int __usb_detect(void)
 {
-    if(REG_GPIO_PIN(USB_DETECT_PORT) & USB_DETECT_PIN)
+    /* XXX: Do we need an active level define for this? */
+    if(gpio_get_level(GPIO_USB_DETECT))
         return USB_INSERTED;
     else
         return USB_EXTRACTED;
@@ -183,7 +173,7 @@ void usb_init_device(void)
 {
     /* Disable drvvbus pin -- it is only used when acting as a host,
      * which Rockbox does not support */
-    gpio_config(USB_DRVVBUS_PORT, USB_DRVVBUS_PIN, GPIO_OUTPUT(0));
+    gpio_set_function(GPIO_USB_DRVVBUS, GPIOF_OUTPUT(0));
 
     /* Power up the core clocks to allow writing
        to some registers needed to power it down */
@@ -194,9 +184,9 @@ void usb_init_device(void)
 #ifdef USB_STATUS_BY_EVENT
     /* Setup USB detect pin IRQ */
     usb_status = __usb_detect();
-    int level = (REG_GPIO_PIN(USB_DETECT_PORT) & USB_DETECT_PIN) ? 1 : 0;
-    gpio_config(USB_DETECT_PORT, USB_DETECT_PIN, GPIO_IRQ_EDGE(level ? 0 : 1));
-    gpio_enable_irq(USB_DETECT_PORT, USB_DETECT_PIN);
+    gpio_set_function(GPIO_USB_DETECT, GPIOF_IRQ_EDGE(1));
+    gpio_flip_edge_irq(GPIO_USB_DETECT);
+    gpio_enable_irq(GPIO_USB_DETECT);
 #endif
 }
 
@@ -215,7 +205,7 @@ void USB_DETECT_PIN_INT(void)
 {
     /* Update status and flip the IRQ trigger edge */
     usb_status = __usb_detect();
-    REG_GPIO_PAT0(USB_DETECT_PORT) ^= USB_DETECT_PIN;
+    gpio_flip_edge_irq(GPIO_USB_DETECT);
 
     /* Notify Rockbox of event */
     usb_status_event(usb_status);

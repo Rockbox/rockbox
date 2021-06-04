@@ -25,9 +25,6 @@
 #include "gpio-x1000.h"
 #include "system.h"
 
-#define CS_PIN (1 << 18)
-#define RD_PIN (1 << 16)
-
 static const uint32_t fiio_lcd_cmd_enable[] = {
     /* Software reset */
     LCD_INSTR_CMD,      0x01,
@@ -169,17 +166,27 @@ const struct lcd_tgt_config lcd_tgt_config = {
 void lcd_tgt_enable(bool enable)
 {
     if(enable) {
-        gpio_config(GPIO_A, 0xffff, GPIO_DEVICE(1));
-        gpio_config(GPIO_B, 0x1f << 16, GPIO_DEVICE(1));
-        gpio_config(GPIO_B, CS_PIN|RD_PIN, GPIO_OUTPUT(1));
+        /* reset controller, probably */
+        gpio_set_level(GPIO_LCD_CE, 1);
+        gpio_set_level(GPIO_LCD_RD, 1);
         mdelay(5);
-        gpio_out_level(GPIO_B, CS_PIN, 0);
+        gpio_set_level(GPIO_LCD_CE, 0);
+
+        /* set the clock whatever it is... */
         lcd_set_clock(X1000_CLK_SCLK_A, 30000000);
+
+        /* program the initial configuration */
         lcd_exec_commands(&fiio_lcd_cmd_enable[0]);
     } else {
+        /* go to sleep mode first */
         lcd_exec_commands(&fiio_lcd_cmd_sleep[0]);
-        mdelay(115); /* ensure we wait a total of 120ms before power off */
-        gpio_config(GPIO_B, CS_PIN|RD_PIN, 0);
+
+        /* ensure we wait a total of 120ms before power off */
+        mdelay(115);
+
+        /* this is intended to power off the panel but I'm not sure it does */
+        gpio_set_level(GPIO_LCD_CE, 0);
+        gpio_set_level(GPIO_LCD_RD, 0);
     }
 }
 
