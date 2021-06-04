@@ -51,7 +51,7 @@
 #define CMD_WRITE_MULTIPLE_EXT     0x39
 #define CMD_SET_MULTIPLE_MODE      0xC6
 #ifdef HAVE_ATA_SMART
-#define CMD_SMART
+#define CMD_SMART                  0xB0
 #endif
 #define CMD_STANDBY_IMMEDIATE      0xE0
 #define CMD_STANDBY                0xE2
