@@ -30,11 +30,26 @@
 #include "s5l8702.h"
 #include "led.h"
 
-
 #ifndef ATA_RETRIES
 #define ATA_RETRIES 3
 #endif
 
+#define CMD_READ_SECTORS           0x20
+#define CMD_READ_DMA_EXT           0x25
+#define CMD_READ_MULTIPLE_EXT      0x29
+#define CMD_WRITE_SECTORS          0x30
+#define CMD_WRITE_DMA_EXT          0x35
+#define CMD_WRITE_MULTIPLE_EXT     0x39
+#ifdef HAVE_ATA_SMART
+#define CMD_SMART                  0xB0
+#endif
+#define CMD_READ_MULTIPLE          0xC4
+#define CMD_WRITE_MULTIPLE         0xC5
+#define CMD_READ_DMA               0xC8
+#define CMD_WRITE_DMA              0xCA
+#define CMD_STANDBY_IMMEDIATE      0xE0
+#define CMD_IDENTIFY               0xEC
+#define CMD_SET_FEATURES           0xEF
 
 #define CEATA_POWERUP_TIMEOUT 20000000
 #define CEATA_COMMAND_TIMEOUT 1000000
@@ -482,7 +497,7 @@ static int ata_identify(uint16_t* buf)
     if (ceata)
     {
         memset(ceata_taskfile, 0, 16);
-        ceata_taskfile[0xf] = 0xec;
+        ceata_taskfile[0xf] = CMD_IDENTIFY;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
         PASS_RC(ceata_rw_multiple_block(false, buf, 1, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
@@ -491,7 +506,7 @@ static int ata_identify(uint16_t* buf)
     {
         PASS_RC(ata_wait_for_not_bsy(10000000), 1, 0);
         ata_write_cbr(&ATA_PIO_DVR, 0);
-        ata_write_cbr(&ATA_PIO_CSD, 0xec);
+        ata_write_cbr(&ATA_PIO_CSD, CMD_IDENTIFY);
         PASS_RC(ata_wait_for_start_of_transfer(10000000), 1, 1);
         for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
     }
@@ -515,7 +530,7 @@ static int ata_set_feature(uint32_t feature, uint32_t param)
         memset(ceata_taskfile, 0, 16);
         ceata_taskfile[0x1] = feature;
         ceata_taskfile[0x2] = param;
-        ceata_taskfile[0xf] = 0xef;
+        ceata_taskfile[0xf] = CMD_SET_FEATURES;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
         PASS_RC(ceata_wait_idle(), 2, 2);
@@ -526,7 +541,7 @@ static int ata_set_feature(uint32_t feature, uint32_t param)
         ata_write_cbr(&ATA_PIO_DVR, 0);
         ata_write_cbr(&ATA_PIO_FED, feature);
         ata_write_cbr(&ATA_PIO_SCR, param);
-        ata_write_cbr(&ATA_PIO_CSD, 0xef);
+        ata_write_cbr(&ATA_PIO_CSD, CMD_SET_FEATURES);
         PASS_RC(ata_wait_for_rdy(2000000), 2, 1);
     }
     return 0;
@@ -690,7 +705,7 @@ static void ata_power_down(void)
     if (ceata)
     {
         memset(ceata_taskfile, 0, 16);
-        ceata_taskfile[0xf] = 0xe0;
+        ceata_taskfile[0xf] = CMD_STANDBY_IMMEDIATE;
         ceata_wait_idle();
         ceata_write_multiple_register(0, ceata_taskfile, 16);
         ceata_wait_idle();
@@ -701,7 +716,7 @@ static void ata_power_down(void)
     {
         ata_wait_for_rdy(1000000);
         ata_write_cbr(&ATA_PIO_DVR, 0);
-        ata_write_cbr(&ATA_PIO_CSD, 0xe0);
+        ata_write_cbr(&ATA_PIO_CSD, CMD_STANDBY_IMMEDIATE);
         ata_wait_for_rdy(1000000);
         sleep(HZ / 30);
         ATA_CONTROL = 0;
@@ -730,7 +745,7 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
         ceata_taskfile[0xb] = sector << 3;
         ceata_taskfile[0xc] = sector >> 5;
         ceata_taskfile[0xd] = sector >> 13;
-        ceata_taskfile[0xf] = write ? 0x35 : 0x25;
+        ceata_taskfile[0xf] = write ? CMD_WRITE_DMA_EXT : CMD_READ_DMA_EXT;
         PASS_RC(ceata_wait_idle(), 2, 0);
         PASS_RC(ceata_write_multiple_register(0, ceata_taskfile, 16), 2, 1);
         PASS_RC(ceata_rw_multiple_block(write, buffer, cnt << 3, CEATA_COMMAND_TIMEOUT * HZ / 1000000), 2, 2);
@@ -750,8 +765,10 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
             ata_write_cbr(&ATA_PIO_LMR, (sector >> 5) & 0xff);
             ata_write_cbr(&ATA_PIO_LLR, (sector << 3) & 0xff);
             ata_write_cbr(&ATA_PIO_DVR, BIT(6));
-            if (write) ata_write_cbr(&ATA_PIO_CSD, ata_dma ? 0x35 : 0x39);
-            else ata_write_cbr(&ATA_PIO_CSD, ata_dma ? 0x25 : 0x29);
+            if (write)
+                ata_write_cbr(&ATA_PIO_CSD, ata_dma ? CMD_WRITE_DMA_EXT : CMD_WRITE_MULTIPLE_EXT);
+            else
+                ata_write_cbr(&ATA_PIO_CSD, ata_dma ? CMD_READ_DMA_EXT : CMD_READ_MULTIPLE_EXT);
         }
         else
         {
@@ -760,8 +777,10 @@ static int ata_rw_chunk_internal(uint64_t sector, uint32_t cnt, void* buffer, bo
             ata_write_cbr(&ATA_PIO_LMR, (sector >> 5) & 0xff);
             ata_write_cbr(&ATA_PIO_LLR, (sector << 3) & 0xff);
             ata_write_cbr(&ATA_PIO_DVR, BIT(6) | ((sector >> 21) & 0xf));
-            if (write) ata_write_cbr(&ATA_PIO_CSD, ata_dma ? 0xca : 0x30);
-            else ata_write_cbr(&ATA_PIO_CSD, ata_dma ? 0xc8 : 0xc4);
+            if (write)
+                ata_write_cbr(&ATA_PIO_CSD, ata_dma ? CMD_WRITE_DMA : CMD_WRITE_SECTORS);
+            else
+                ata_write_cbr(&ATA_PIO_CSD, ata_dma ? CMD_READ_DMA : CMD_READ_MULTIPLE);
         }
         if (ata_dma)
         {
@@ -1017,7 +1036,7 @@ static int ata_smart(uint16_t* buf)
         ceata_taskfile[0xc] = 0x4f;
         ceata_taskfile[0xd] = 0xc2;
         ceata_taskfile[0xe] = BIT(6);
-        ceata_taskfile[0xf] = 0xb0;
+        ceata_taskfile[0xf] = CMD_SMART;
         PASS_RC(ceata_wait_idle(), 3, 1);
         if (((uint8_t*)ata_identify_data)[54] != 'A')  /* Model != aAmsung */
         {
@@ -1037,7 +1056,7 @@ static int ata_smart(uint16_t* buf)
         ata_write_cbr(&ATA_PIO_LMR, 0x4f);
         ata_write_cbr(&ATA_PIO_LHR, 0xc2);
         ata_write_cbr(&ATA_PIO_DVR, BIT(6));
-        ata_write_cbr(&ATA_PIO_CSD, 0xb0);
+        ata_write_cbr(&ATA_PIO_CSD, CMD_SMART);
         PASS_RC(ata_wait_for_start_of_transfer(10000000), 3, 7);
         for (i = 0; i < 0x100; i++) buf[i] = ata_read_cbr(&ATA_PIO_DTR);
     }
