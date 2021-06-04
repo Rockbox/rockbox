@@ -50,6 +50,9 @@
 #define CMD_WRITE_MULTIPLE         0xC5
 #define CMD_WRITE_MULTIPLE_EXT     0x39
 #define CMD_SET_MULTIPLE_MODE      0xC6
+#ifdef HAVE_ATA_SMART
+#define CMD_SMART
+#endif
 #define CMD_STANDBY_IMMEDIATE      0xE0
 #define CMD_STANDBY                0xE2
 #define CMD_IDENTIFY               0xEC
