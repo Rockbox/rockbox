@@ -354,6 +354,14 @@ buildtool() {
             ;;
     esac
 
+    if [ "$RESTART_STEP" == "gcc-stage1" ] ; then
+	CXXFLAGS="-std=gnu++03"
+    elif [ "$RESTART_STEP" == "gcc-stage2" ] ; then
+	CXXFLAGS="-std=gnu++11"
+    else
+	CXXFLAGS=""
+    fi
+
     if [ "$tool" == "zlib" ]; then
         echo "ROCKBOXDEV: $toolname/configure"
         # NOTE glibc requires to be compiled with optimization
@@ -363,7 +371,7 @@ buildtool() {
     elif [ "$config_opt" != "NO_CONFIGURE" ]; then
         echo "ROCKBOXDEV: $toolname/configure"
         # NOTE glibc requires to be compiled with optimization
-        CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' CXXFLAGS='-std=c++03' run_cmd "$logfile" \
+        CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -O2' CXXFLAGS="$CXXFLAGS" run_cmd "$logfile" \
             "$cfg_dir/configure" "--prefix=$prefix" \
             --disable-docs $config_opt
     fi
@@ -473,7 +481,7 @@ build() {
             ./configure --prefix=$prefix $configure_params
         ;;
         *)
-            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' CXXFLAGS='-std=c++03' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
+            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' CXXFLAGS='-std=gnu++03' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
         ;;
     esac
 
@@ -634,11 +642,13 @@ build_linux_toolchain () {
     # build glibc using the first stage cross compiler
     # we need to set the prefix to /usr because the glibc runs on the actual
     # target and is indeed installed in /usr
+    RESTART_STEP="glibc" \
     prefix="/usr" \
     buildtool "glibc" "$glibc_ver" "--target=$target --host=$target --build=$MACHTYPE \
         --with-__thread --with-headers=$sysroot/usr/include $glibc_opts" \
         "" "install install_root=$sysroot"
     # build stage 2 compiler
+    RESTART_STEP="gcc-stage2" \
     buildtool "gcc" "$gcc_ver" "$gcc_opts --enable-languages=c,c++ --target=$target \
         --with-sysroot=$sysroot" "" ""
 }
