@@ -22,33 +22,6 @@
 #ifndef __GPIO_X1000_H__
 #define __GPIO_X1000_H__
 
-/* GPIO API
- * --------
- *
- * To assign a new function to a GPIO, call gpio_config(). This uses the
- * hardware's GPIO Z facility to atomically set most GPIO registers at once,
- * so it can be used to make any state transition safely. Since GPIO Z is
- * a global hardware resource, it is unsafe to call gpio_config() from IRQ
- * context -- if the interrupted code was also running gpio_config(), then
- * the results would be unpredictable.
- *
- * Depending on the current GPIO state, certain state transitions are safe to
- * perform without locking, as they only change one register:
- *
- * - for pins in GPIO_OUTPUT state:
- *   - use gpio_out_level() to change the output level
- *
- * - for pins in GPIO_IRQ_LEVEL or GPIO_IRQ_EDGE state:
- *   - use gpio_irq_level() to change the trigger level
- *   - use gpio_irq_mask() to mask/unmask the IRQ
- *
- * - for pins in GPIO_DEVICE or GPIO_INPUT state:
- *   - no special transitions allowed
- *
- * - in all states:
- *   - use gpio_set_pull() to change the pull-up/pull-down state
- */
-
 #include "x1000/gpio.h"
 
 /* GPIO port numbers */
@@ -66,42 +39,137 @@
 #define GPIO_F_PAT0 1
 
 /* GPIO function numbers */
-#define GPIO_DEVICE(i)      ((i)&3)
-#define GPIO_OUTPUT(i)      (0x4|((i)&1))
-#define GPIO_INPUT          0x16
-#define GPIO_IRQ_LEVEL(i)   (0x1c|((i)&1))
-#define GPIO_IRQ_EDGE(i)    (0x1e|((i)&1))
+#define GPIOF_DEVICE(i)     ((i)&3)
+#define GPIOF_OUTPUT(i)     (0x4|((i)&1))
+#define GPIOF_INPUT         0x16
+#define GPIOF_IRQ_LEVEL(i)  (0x1c|((i)&1))
+#define GPIOF_IRQ_EDGE(i)   (0x1e|((i)&1))
 
+/* GPIO pin numbers */
+#define GPION_CREATE(port, pin) ((((port) & 3) << 5) | ((pin) & 0x1f))
+#define GPION_PORT(gpio)        (((gpio) >> 5) & 3)
+#define GPION_PIN(gpio)         ((gpio) & 0x1f)
+#define GPION_MASK(gpio)        (1u << GPION_PIN(gpio))
+
+/* Easy pin number macros */
+#define GPIO_PA(x)  GPION_CREATE(GPIO_A, x)
+#define GPIO_PB(x)  GPION_CREATE(GPIO_B, x)
+#define GPIO_PC(x)  GPION_CREATE(GPIO_C, x)
+#define GPIO_PD(x)  GPION_CREATE(GPIO_D, x)
+
+/* Pingroup settings are used for system devices */
+struct pingroup_setting {
+    int port;
+    uint32_t pins;
+    int func;
+};
+
+/* GPIO settings are used for single pins under software control */
+struct gpio_setting {
+    int gpio;
+    int func;
+};
+
+/* Target pins are defined as GPIO_XXX constants usable with the GPIO API */
+enum {
+#define DEFINE_GPIO(_name, _gpio, _func) GPIO_##_name = _gpio,
+#define DEFINE_PINGROUP(...)
+#include "gpio-target.h"
+#undef DEFINE_GPIO
+#undef DEFINE_PINGROUP
+    GPIO_NONE = -1,
+};
+
+/* These are pin IDs which index gpio_settings */
+enum {
+#define DEFINE_GPIO(_name, ...) PIN_##_name,
+#define DEFINE_PINGROUP(...)
+#include "gpio-target.h"
+#undef DEFINE_GPIO
+#undef DEFINE_PINGROUP
+    PIN_COUNT,
+};
+
+/* Pingroup IDs which index pingroup_settings */
+enum {
+#define DEFINE_GPIO(...)
+#define DEFINE_PINGROUP(_name, ...) PINGROUP_##_name,
+#include "gpio-target.h"
+#undef DEFINE_GPIO
+#undef DEFINE_PINGROUP
+    PINGROUP_COUNT,
+};
+
+/* arrays which define the target's GPIO settings */
+extern const struct gpio_setting gpio_settings[PIN_COUNT];
+extern const struct pingroup_setting pingroup_settings[PINGROUP_COUNT];
+
+/* stringified names for use in debug menus */
+extern const char* const gpio_names[PIN_COUNT];
+extern const char* const pingroup_names[PINGROUP_COUNT];
+
+/* called at early init to set up GPIOs */
 extern void gpio_init(void);
-extern void gpio_config(int port, unsigned pinmask, int func);
 
-static inline void gpio_out_level(int port, unsigned pinmask, int level)
+/* Use GPIO Z to reconfigure several pins atomically */
+extern void gpioz_configure(int port, uint32_t pins, int func);
+
+static inline void gpio_set_function(int gpio, int func)
 {
-    if(level)
-        jz_set(GPIO_PAT0(port), pinmask);
-    else
-        jz_clr(GPIO_PAT0(port), pinmask);
+    gpioz_configure(GPION_PORT(gpio), GPION_MASK(gpio), func);
 }
 
-#define gpio_irq_level gpio_out_level
-
-static inline void gpio_irq_mask(int port, unsigned pinmask, int masked)
+static inline int gpio_get_level(int gpio)
 {
-    if(masked)
-        jz_set(GPIO_MSK(port), pinmask);
-    else
-        jz_clr(GPIO_MSK(port), pinmask);
+    return REG_GPIO_PIN(GPION_PORT(gpio)) & GPION_MASK(gpio) ? 1 : 0;
 }
 
-#define gpio_enable_irq(port, pinmask)  gpio_irq_mask((port), (pinmask), 0)
-#define gpio_disable_irq(port, pinmask) gpio_irq_mask((port), (pinmask), 1)
+static inline void gpio_set_level(int gpio, int value)
+{
+    if(value)
+        jz_set(GPIO_PAT0(GPION_PORT(gpio)), GPION_MASK(gpio));
+    else
+        jz_clr(GPIO_PAT0(GPION_PORT(gpio)), GPION_MASK(gpio));
+}
 
-static inline void gpio_set_pull(int port, unsigned pinmask, int state)
+static inline void gpio_set_pull(int gpio, int state)
 {
     if(state)
-        jz_set(GPIO_PULL(port), pinmask);
+        jz_set(GPIO_PULL(GPION_PORT(gpio)), GPION_MASK(gpio));
     else
-        jz_clr(GPIO_PULL(port), pinmask);
+        jz_clr(GPIO_PULL(GPION_PORT(gpio)), GPION_MASK(gpio));
+}
+
+static inline void gpio_mask_irq(int gpio, int mask)
+{
+    if(mask)
+        jz_set(GPIO_MSK(GPION_PORT(gpio)), GPION_MASK(gpio));
+    else
+        jz_clr(GPIO_MSK(GPION_PORT(gpio)), GPION_MASK(gpio));
+}
+
+#define gpio_set_irq_level      gpio_set_level
+#define gpio_enable_irq(gpio)   gpio_mask_irq((gpio), 0)
+#define gpio_disable_irq(gpio)  gpio_mask_irq((gpio), 1)
+
+/* Helper function for edge-triggered IRQs when you want to get an
+ * interrupt on both the rising and falling edges. The hardware can
+ * only be set up to interrupt on one edge, so interrupt handlers
+ * can call this function to flip the trigger to the other edge.
+ *
+ * Despite the name, this doesn't depend on the currently set edge,
+ * it just reads the GPIO state and sets up an edge trigger to detect
+ * a change to the other state -- if some transitions were missed the
+ * IRQ trigger may remain unchanged.
+ *
+ * It can be safely used to initialize the IRQ level.
+ */
+static inline void gpio_flip_edge_irq(int gpio)
+{
+    if(gpio_get_level(gpio))
+        gpio_set_irq_level(gpio, 0);
+    else
+        gpio_set_irq_level(gpio, 1);
 }
 
 #endif /* __GPIO_X1000_H__ */

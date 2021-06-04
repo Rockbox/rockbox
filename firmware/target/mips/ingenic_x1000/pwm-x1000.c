@@ -26,12 +26,6 @@
 #include "kernel.h"
 #include "x1000/tcu.h"
 
-struct pwm_gpio_data {
-    int port;
-    unsigned pin;
-    int func;
-};
-
 struct pwm_state {
     int period_ns;
     int duty_ns;
@@ -40,20 +34,28 @@ struct pwm_state {
     int prescaler;
 };
 
-static const struct pwm_gpio_data pwm_gpios[] = {
-    {GPIO_C, 1 << 25, GPIO_DEVICE(0)},
-    {GPIO_C, 1 << 26, GPIO_DEVICE(1)},
-    {GPIO_C, 1 << 27, GPIO_DEVICE(1)},
-    {GPIO_B, 1 <<  6, GPIO_DEVICE(2)},
-    {GPIO_C, 1 << 24, GPIO_DEVICE(0)},
-};
-
 static struct pwm_state pwm_state[] = {
     {-1, -1, -1, -1, -1},
     {-1, -1, -1, -1, -1},
     {-1, -1, -1, -1, -1},
     {-1, -1, -1, -1, -1},
     {-1, -1, -1, -1, -1},
+};
+
+static const int pwm_gpio[] = {
+    GPIO_PC(25),
+    GPIO_PC(26),
+    GPIO_PC(27),
+    GPIO_PB(6),
+    GPIO_PC(24),
+};
+
+static const int pwm_gpio_func[] = {
+    GPIOF_DEVICE(0),
+    GPIOF_DEVICE(1),
+    GPIOF_DEVICE(1),
+    GPIOF_DEVICE(2),
+    GPIOF_DEVICE(0),
 };
 
 void pwm_init(int chn)
@@ -67,8 +69,7 @@ void pwm_init(int chn)
     st->prescaler = -1;
 
     /* clear GPIO and disable timer */
-    const struct pwm_gpio_data* pg = &pwm_gpios[chn];
-    gpio_config(pg->port, pg->pin, GPIO_OUTPUT(0));
+    gpio_set_function(pwm_gpio[chn], GPIOF_OUTPUT(0));
     jz_clr(TCU_STOP, 1 << chn);
     jz_clr(TCU_ENABLE, 1 << chn);
     jz_set(TCU_STOP, 1 << chn);
@@ -161,15 +162,13 @@ void pwm_enable(int chn)
     jz_set(TCU_ENABLE, 1 << chn);
 
     /* Configure GPIO function */
-    const struct pwm_gpio_data* pg = &pwm_gpios[chn];
-    gpio_config(pg->port, pg->pin, pg->func);
+    gpio_set_function(pwm_gpio[chn], pwm_gpio_func[chn]);
 }
 
 void pwm_disable(int chn)
 {
     /* Set GPIO to output 0 */
-    const struct pwm_gpio_data* pg = &pwm_gpios[chn];
-    gpio_config(pg->port, pg->pin, GPIO_OUTPUT(0));
+    gpio_set_function(pwm_gpio[chn], GPIOF_OUTPUT(0));
 
     /* Stop timer */
     jz_clr(TCU_ENABLE, 1 << chn);

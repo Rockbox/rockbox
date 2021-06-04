@@ -23,7 +23,6 @@
 #include "kernel.h"
 #include "panic.h"
 #include "sfc-x1000.h"
-#include "gpio-x1000.h"
 #include "irq-x1000.h"
 #include "x1000/sfc.h"
 #include "x1000/cpm.h"
@@ -75,7 +74,6 @@ void sfc_unlock(void)
 
 void sfc_open(void)
 {
-    gpio_config(GPIO_A, 0x3f << 26, GPIO_DEVICE(1));
     jz_writef(CPM_CLKGR, SFC(0));
     jz_writef(SFC_GLB, OP_MODE_V(SLAVE), PHASE_NUM(1),
               THRESHOLD(FIFO_THRESH), WP_EN(1));

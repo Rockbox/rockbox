@@ -1659,7 +1659,9 @@ target/mips/ingenic_x1000/pwm-x1000.c
 target/mips/ingenic_x1000/sfc-x1000.c
 target/mips/ingenic_x1000/system-x1000.c
 target/mips/ingenic_x1000/timer-x1000.c
+#ifndef USB_NONE
 target/mips/ingenic_x1000/usb-x1000.c
+#endif
 #if (CONFIG_STORAGE & (STORAGE_SD|STORAGE_MMC|STORAGE_ATA))
 target/mips/ingenic_x1000/msc-x1000.c
 #endif

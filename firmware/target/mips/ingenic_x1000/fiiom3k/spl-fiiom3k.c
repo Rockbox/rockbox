@@ -116,7 +116,7 @@ int spl_get_boot_option(void)
     const int max_iter_count = 30;
 
     /* Configure the button GPIOs as inputs */
-    gpio_config(GPIO_A, pinmask, GPIO_INPUT);
+    gpioz_configure(GPIO_A, pinmask, GPIOF_INPUT);
 
     /* Poll the pins for a short duration to detect a keypress */
     do {

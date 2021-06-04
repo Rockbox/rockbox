@@ -25,7 +25,6 @@
 #include "kernel.h"
 #include "panic.h"
 #include "logf.h"
-#include "gpio-x1000.h"
 #include "clk-x1000.h"
 #include "irq-x1000.h"
 #include "x1000/i2c.h"
@@ -375,18 +374,6 @@ void i2c_init(void)
 /* Stuff only required during initialization is below, basically the same as
  * the old driver except for how the IRQs are initially set up. */
 
-static const struct {
-    int port;
-    unsigned pins;
-    int func;
-} i2c_x1000_gpio_data[] = {
-    {GPIO_B, 3 << 23, GPIO_DEVICE(0)},
-    {GPIO_C, 3 << 26, GPIO_DEVICE(0)},
-    /* Note: I2C1 is also on the following pins (normally used by LCD) */
-    /* {GPIO_A, 3 <<  0, GPIO_DEVICE(2)}, */
-    {GPIO_D, 3 <<  0, GPIO_DEVICE(1)},
-};
-
 static void i2c_x1000_gate(int chn, int gate)
 {
     switch(chn) {
@@ -467,11 +454,6 @@ void i2c_x1000_set_freq(int chn, int freq)
         jz_write(I2C_FLCNT(chn), t_LOW);
         jz_write(I2C_FHCNT(chn), t_HIGH);
     }
-
-    /* Claim pins */
-    gpio_config(i2c_x1000_gpio_data[chn].port,
-                i2c_x1000_gpio_data[chn].pins,
-                i2c_x1000_gpio_data[chn].func);
 
     /* Enable the controller */
     i2c_x1000_enable(chn);

@@ -48,7 +48,8 @@ static const msc_config msc_configs[] = {
         .msc_type = MSC_TYPE_SD,
         .bus_width = 4,
         .label = "microSD",
-        .cd_gpio = {GPIO_B, 1 << 6, 0},
+        .cd_gpio = GPIO_MSC0_CD,
+        .cd_active_level = 0,
     },
 #else
 # error "Please add X1000 MSC config"
@@ -117,40 +118,14 @@ static void msc_init_one(msc_drv* d, int msc)
     msc_full_reset(d);
     system_enable_irq(msc == 0 ? IRQ_MSC0 : IRQ_MSC1);
 
-    /* Configure bus pins */
-    int port, device;
-    unsigned pins;
-    if(msc == 0) {
-        port = GPIO_A;
-        device = 1;
-        switch(d->config->bus_width) {
-        case 8:  pins = 0x3ff << 16; break;
-        case 4:  pins = 0x03f << 20; break;
-        case 1:  pins = 0x007 << 23; break;
-        default: pins = 0; break;
-        }
-    } else {
-        port = GPIO_C;
-        device = 0;
-        switch(d->config->bus_width) {
-        case 4:  pins = 0x3f; break;
-        case 1:  pins = 0x07; break;
-        default: pins = 0; break;
-        }
-    }
-
-    gpio_config(port, pins, GPIO_DEVICE(device));
-
     /* Setup the card detect IRQ */
-    if(d->config->cd_gpio.pin) {
-        port = d->config->cd_gpio.port;
-        pins = d->config->cd_gpio.pin;
-        int level = (REG_GPIO_PIN(port) & pins) ? 1 : 0;
-        if(level != d->config->cd_gpio.active_level)
+    if(d->config->cd_gpio != GPIO_NONE) {
+        if(gpio_get_level(d->config->cd_gpio) != d->config->cd_active_level)
             d->card_present = 0;
 
-        gpio_config(port, pins, GPIO_IRQ_EDGE(level ? 0 : 1));
-        gpio_enable_irq(port, pins);
+        gpio_set_function(d->config->cd_gpio, GPIOF_IRQ_EDGE(1));
+        gpio_flip_edge_irq(d->config->cd_gpio);
+        gpio_enable_irq(d->config->cd_gpio);
     }
 }
 
@@ -212,12 +187,10 @@ void msc_full_reset(msc_drv* d)
 
 bool msc_card_detect(msc_drv* d)
 {
-    if(!d->config->cd_gpio.pin)
+    if(d->config->cd_gpio == GPIO_NONE)
         return true;
 
-    int l = REG_GPIO_PIN(d->config->cd_gpio.port) & d->config->cd_gpio.pin;
-    l = l ? 1 : 0;
-    return l == d->config->cd_gpio.active_level;
+    return gpio_get_level(d->config->cd_gpio) == d->config->cd_active_level;
 }
 
 /* ---------------------------------------------------------------------------
@@ -661,7 +634,7 @@ static void msc_cd_interrupt(msc_drv* d)
     }
 
     /* Invert the IRQ */
-    REG_GPIO_PAT0(d->config->cd_gpio.port) ^= d->config->cd_gpio.pin;
+    gpio_flip_edge_irq(d->config->cd_gpio);
 }
 
 void MSC0(void)

@@ -28,7 +28,6 @@
 #endif
 #include "axp-pmu.h"
 #include "i2c-x1000.h"
-#include "gpio-x1000.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
 {
@@ -52,9 +51,6 @@ const unsigned short percent_to_volt_charge[11] =
 {
       3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
 };
-
-#define AXP_IRQ_PORT GPIO_B
-#define AXP_IRQ_PIN  (1 << 10)
 
 void power_init(void)
 {

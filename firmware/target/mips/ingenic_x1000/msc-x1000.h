@@ -83,18 +83,13 @@
 #define MSC_SPEED_FAST  25000000
 #define MSC_SPEED_HIGH  50000000
 
-typedef struct msc_gpio_data {
-    int port;
-    int pin;
-    int active_level;
-} msc_gpio_data;
-
 typedef struct msc_config {
     int msc_nr;
     int msc_type;
     int bus_width;
     const char* label;
-    struct msc_gpio_data cd_gpio;
+    int cd_gpio;
+    int cd_active_level;
 } msc_config;
 
 typedef struct msc_req {
