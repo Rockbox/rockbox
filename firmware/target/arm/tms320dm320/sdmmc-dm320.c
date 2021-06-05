@@ -713,8 +713,6 @@ sd_transfer_retry:
             goto sd_transfer_error;
         }
 
-        count -= count_per_dma;
-
         if (write == false)
         {
             discard_dcache_range(use_direct_dma ? buffer : aligned_buffer,
@@ -725,9 +723,6 @@ sd_transfer_retry:
                 memcpy(buffer, aligned_buffer, count_per_dma*SD_BLOCK_SIZE);
             }
         }
-
-        buffer += count_per_dma*SD_BLOCK_SIZE;
-        start_addr += count_per_dma;
 
         last_disk_activity = current_tick;
 
@@ -742,6 +737,10 @@ sd_transfer_retry:
         {
             goto sd_transfer_error;
         }
+
+        count -= count_per_dma;
+        buffer += count_per_dma*SD_BLOCK_SIZE;
+        start_addr += count_per_dma;
     } while (count > 0);
 
     while (1)
