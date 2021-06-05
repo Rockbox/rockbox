@@ -25,15 +25,23 @@ ifeq ($(findstring WIN32,$(CPPDEFINES)),WIN32)
 # TODO: support Windows
 else
 ifeq ($(findstring APPLE,$(CPPDEFINES)),APPLE)
-# OSX -- /opt location is cheesy attempt to support ARM macs
-# COMPLETELY UNTESTED, testing from someone with an actual Mac is appreciated!
-CFLAGS += -I/usr/local/include -I/opt/homebrew/include
-LDOPTS += -L/usr/local/lib -L/opt/homebrew/lib -lusb-1.0
+# Mac, tested on x86 only -- may need to adjust paths if building on ARM.
+# paths should work with homebrew libusb.
+LIBUSB_CFLAGS ?= -I/usr/local/include/libusb-1.0
+ifdef STATIC
+LIBUSB_LDOPTS ?= /usr/local/lib/libusb-1.0.a -framework IOKit -framework CoreFoundation
 else
-# Linux
-CFLAGS += `pkg-config --cflags libusb-1.0`
-LDOPTS += `pkg-config --libs libusb-1.0`
+LIBUSB_LDOPTS ?= -L/usr/local/lib -lusb-1.0
+endif
+else
+# Linux; note for static builds you need to build a copy of libusb without
+# udev support and specify the includes / libs manually
+LIBUSB_CFLAGS ?= `pkg-config --cflags libusb-1.0`
+LIBUSB_LDOPTS ?= `pkg-config --libs libusb-1.0`
 endif
 endif
+
+CFLAGS += $(LIBUSB_CFLAGS)
+LDOPTS += $(LIBUSB_LDOPTS)
 
 include ../libtools.make
