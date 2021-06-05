@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id: $
 *
-* Copyright (C) 2011 by Tomasz Moń
+* Copyright (C) 2011-2021 by Tomasz Moń
 *
 * All files in this archive are subject to the GNU General Public License.
 * See the file COPYING in the source tree root for full license agreement.
@@ -32,6 +32,7 @@
 #include "uart-target.h"
 #include "power.h"
 #include "loader_strerror.h"
+#include "usb.h"
 
 #define FLASH_BASE              0x00100000
 #define PARAMETERS_FLASH_OFFSET 0x00010000
@@ -206,6 +207,8 @@ void main(void)
 
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
+    usb_init();
+    usb_start_monitoring();
 
     clear_recoverzap();
 
@@ -214,6 +217,17 @@ void main(void)
         printf("SD error: %d", ret);
 
     filesystem_init();
+
+    if (usb_detect() == USB_INSERTED)
+    {
+        usb_enable(true);
+        while (usb_detect() == USB_INSERTED)
+        {
+            sleep(HZ);
+            storage_spin();
+        }
+        usb_enable(false);
+    }
 
     ret = disk_mount_all();
     if (ret <= 0)
@@ -269,8 +283,8 @@ void main(void)
         ret = kernel_entry();
         printf("FAILED!");
     }
-    
+
     storage_sleepnow();
-    
+
     while(1);
 }
