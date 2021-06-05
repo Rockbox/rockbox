@@ -30,6 +30,7 @@
 #define CPUFREQ_MAX     175000000
 
 void udelay(int usec);
+void mdelay(int msec);
 
 #if defined(CREATIVE_ZVx) && defined(BOOTLOADER)
     /* hacky.. */

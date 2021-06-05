@@ -182,11 +182,18 @@
 /* Offset ( in the firmware file's header ) to the real data */
 #define FIRMWARE_OFFSET_FILE_DATA 8
 
-#if 0
+/* Hardware controlled charging */
+#define CONFIG_CHARGING CHARGING_SIMPLE
+
+#define CONFIG_USBOTG USBOTG_TNETV105
+
 #define HAVE_USBSTACK
+#define HAVE_USB_POWER
+#define HAVE_USB_CHARGING_ENABLE
+#define HAVE_BOOTLOADER_USB_MODE
 #define USB_VENDOR_ID 0x0781
 #define USB_PRODUCT_ID 0x7480
-#endif
+#define USB_NUM_ENDPOINTS 5
 
 #define INCLUDE_TIMEOUT_API
 

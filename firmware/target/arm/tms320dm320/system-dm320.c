@@ -494,6 +494,13 @@ void udelay(int usec) {
     }
 }
 
+void mdelay(int msec)
+{
+    int ms_per_tick = 1000 / HZ;
+    /* Round up to next full tick */
+    sleep((msec + ms_per_tick - 1) / ms_per_tick);
+}
+
 #ifdef BOOTLOADER
 void system_prepare_fw_start(void)
 {
