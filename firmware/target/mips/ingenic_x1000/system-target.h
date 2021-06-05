@@ -90,6 +90,9 @@ static inline void core_sleep(void)
 }
 
 /* IRQ control */
+typedef void(*irq_handler_t)(void);
+
+extern irq_handler_t system_set_irq_handler(int irq, irq_handler_t handler);
 extern void system_enable_irq(int irq);
 extern void system_disable_irq(int irq);
 

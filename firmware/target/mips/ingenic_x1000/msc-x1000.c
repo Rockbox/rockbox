@@ -42,7 +42,6 @@
 static const msc_config msc_configs[] = {
 #ifdef FIIO_M3K
 #define MSC_CLOCK_SOURCE X1000_CLK_SCLK_A
-#define msc0_cd_interrupt GPIOB06
     {
         .msc_nr = 0,
         .msc_type = MSC_TYPE_SD,
@@ -66,6 +65,9 @@ static const msc_config* msc_lookup_config(int msc)
 }
 
 static msc_drv msc_drivers[MSC_COUNT];
+
+static void msc0_cd_interrupt(void);
+static void msc1_cd_interrupt(void);
 
 /* ---------------------------------------------------------------------------
  * Initialization
@@ -123,6 +125,8 @@ static void msc_init_one(msc_drv* d, int msc)
         if(gpio_get_level(d->config->cd_gpio) != d->config->cd_active_level)
             d->card_present = 0;
 
+        system_set_irq_handler(GPIO_TO_IRQ(d->config->cd_gpio),
+                               msc == 0 ? msc0_cd_interrupt : msc1_cd_interrupt);
         gpio_set_function(d->config->cd_gpio, GPIOF_IRQ_EDGE(1));
         gpio_flip_edge_irq(d->config->cd_gpio);
         gpio_enable_irq(d->config->cd_gpio);
@@ -647,19 +651,15 @@ void MSC1(void)
     msc_interrupt(&msc_drivers[1]);
 }
 
-#ifdef msc0_cd_interrupt
-void msc0_cd_interrupt(void)
+static void msc0_cd_interrupt(void)
 {
     msc_cd_interrupt(&msc_drivers[0]);
 }
-#endif
 
-#ifdef msc1_cd_interrupt
-void msc1_cd_interrupt(void)
+static void msc1_cd_interrupt(void)
 {
     msc_cd_interrupt(&msc_drivers[1]);
 }
-#endif
 
 /* ---------------------------------------------------------------------------
  * SD command helpers

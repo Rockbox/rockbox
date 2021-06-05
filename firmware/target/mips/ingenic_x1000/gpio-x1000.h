@@ -57,6 +57,9 @@
 #define GPIO_PC(x)  GPION_CREATE(GPIO_C, x)
 #define GPIO_PD(x)  GPION_CREATE(GPIO_D, x)
 
+/* GPIO number to IRQ number (need to include "irq-x1000.h") */
+#define GPIO_TO_IRQ(gpio) IRQ_GPIO(GPION_PORT(gpio), GPION_PIN(gpio))
+
 /* Pingroup settings are used for system devices */
 struct pingroup_setting {
     int port;
