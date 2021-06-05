@@ -35,8 +35,6 @@
 # include "font.h"
 #endif
 
-#define ft_interrupt    GPIOB12
-
 /* Touch event types */
 #define EVENT_NONE      (-1)
 #define EVENT_PRESS     0
@@ -348,7 +346,8 @@ static void ft_i2c_callback(int status, i2c_descriptor* desc)
     ft_step_state(__ost_read32(), evt, tx, ty);
 }
 
-void ft_interrupt(void)
+/* ft6x06 interrupt pin */
+void GPIOB12(void)
 {
     /* We don't care if this fails */
     i2c_async_queue(FT6x06_BUS, TIMEOUT_NOBLOCK, I2C_Q_ONCE,

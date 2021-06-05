@@ -233,7 +233,7 @@ intr(OST);
 
 #undef intr
 
-static void(*const irqvector[])(void) = {
+static void(*irqvector[])(void) = {
     /* ICSR0: 0 - 31 */
     DMIC,   AIC,    UIRQ,   UIRQ,   UIRQ,   UIRQ,   UIRQ,   SFC,
     SSI0,   UIRQ,   PDMA,   PDMAD,  UIRQ,   UIRQ,   UIRQ,   UIRQ,
@@ -262,6 +262,13 @@ static void(*const irqvector[])(void) = {
     /* GPIO D: 160 - 165 */
     GPIOD00, GPIOD01, GPIOD02, GPIOD03, GPIOD04, GPIOD05,
 };
+
+irq_handler_t system_set_irq_handler(int irq, irq_handler_t handler)
+{
+    irq_handler_t old_handler = irqvector[irq];
+    irqvector[irq] = handler;
+    return old_handler;
+}
 
 void system_enable_irq(int irq)
 {

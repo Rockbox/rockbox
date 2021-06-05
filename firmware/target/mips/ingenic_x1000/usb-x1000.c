@@ -28,10 +28,6 @@
 #include "gpio-x1000.h"
 #include "x1000/cpm.h"
 
-#ifdef FIIO_M3K
-# define USB_DETECT_PIN_INT GPIOB11 // TODO remove me
-#endif
-
 /*
  * USB-Designware driver API
  */
@@ -150,6 +146,7 @@ void usb_dw_target_clear_irq(void)
 
 #ifdef USB_STATUS_BY_EVENT
 static volatile int usb_status = USB_EXTRACTED;
+static void usb_detect_interrupt(void);
 #endif
 
 static int __usb_detect(void)
@@ -184,6 +181,7 @@ void usb_init_device(void)
 #ifdef USB_STATUS_BY_EVENT
     /* Setup USB detect pin IRQ */
     usb_status = __usb_detect();
+    system_set_irq_handler(GPIO_TO_IRQ(GPIO_USB_DETECT), usb_detect_interrupt);
     gpio_set_function(GPIO_USB_DETECT, GPIOF_IRQ_EDGE(1));
     gpio_flip_edge_irq(GPIO_USB_DETECT);
     gpio_enable_irq(GPIO_USB_DETECT);
@@ -201,7 +199,7 @@ int usb_detect(void)
     return usb_status;
 }
 
-void USB_DETECT_PIN_INT(void)
+static void usb_detect_interrupt(void)
 {
     /* Update status and flip the IRQ trigger edge */
     usb_status = __usb_detect();
