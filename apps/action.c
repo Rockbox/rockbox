@@ -642,11 +642,14 @@ static inline void action_code_lookup(action_last_t *last, action_cur_t *cur)
 * on user selection it will be locked
 * or unlocked as well
 */
-static inline void do_key_lock(bool lock)
+static inline void do_key_lock(bool lock, bool preserve_queue)
 {
     action_last.keys_locked = lock;
-    action_last.button = BUTTON_NONE;
-    button_clear_queue();
+    if (!preserve_queue)
+    {
+        action_last.button = BUTTON_NONE;
+        button_clear_queue();
+    }
 #if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
  /* disable touch device on keylock if std behavior or selected disable touch */
     if (!has_flag(action_last.softlock_mask, SEL_ACTION_ENABLED) ||
@@ -682,7 +685,15 @@ static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
 
     if (is_timeout)
     {
-        do_key_lock(true);
+        sleep(HZ/2);
+        do_key_lock(true, true);
+        
+        if (!touchpad_filter(cur->button))
+        {
+            action_last.button = BUTTON_NONE;
+            button_clear_queue();
+        }
+        //action = ACTION_NONE;
     }
     else if (action == ACTION_STD_KEYLOCK)
     {
@@ -765,7 +776,7 @@ static inline void do_softlock(action_last_t *last, action_cur_t *cur)
 	}
 #endif
         last->unlock_combo = cur->button;
-        do_key_lock(!last->keys_locked);
+        do_key_lock(!last->keys_locked, false);
         notify_user = true;
     }
 #if (BUTTON_REMOTE != 0)/* Allow remote actions through */
