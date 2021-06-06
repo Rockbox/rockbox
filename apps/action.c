@@ -682,6 +682,7 @@ static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
 
     if (is_timeout)
     {
+        sleep(HZ/2);
         do_key_lock(true);
     }
     else if (action == ACTION_STD_KEYLOCK)
