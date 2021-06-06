@@ -182,17 +182,21 @@ depth_3d
 #endif
 
 /* This should be AUDIOHW_HAVE_FILTER_ROLL_OFF but that is only defined later */
-#if defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740) || defined(HAVE_ES9018) || defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_AK4376)
+#if defined(DX50) || defined(HAVE_DF1704_CODEC) || defined(HAVE_PCM1792_CODEC) || defined(HAVE_CS4398) || defined(HAVE_WM8740) || defined(HAVE_ES9018) || defined(HAVE_XDUOO_LINUX_CODEC) || defined(HAVE_FIIO_LINUX_CODEC) || defined(HAVE_AK4376) || defined(HAVE_ES9218)
 filter_roll_off
 #endif
 
 /* This should be AUDIOHW_HAVE_POWER_MODE but that is not defined yet */
-#if defined(HAVE_AK4376)
+#if defined(HAVE_AK4376) || defined(HAVE_ES9218)
 dac_power_mode
 #endif
 
 #if defined(HAVE_ES9018)
 es9018
+#endif
+
+#if defined(HAVE_ES9218)
+es9218
 #endif
 
 /* These features are only used by the manual so they won't break binary
