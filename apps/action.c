@@ -683,6 +683,17 @@ static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
     if (is_timeout)
     {
         do_key_lock(true);
+
+#if defined(HAVE_TOUCHPAD)
+        /* if the touchpad is supposed to be off and the current buttonpress
+         * is from the touchpad, nullify it. */
+        if (!touchpad_filter(cur->button) &&
+            (!has_flag(action_last.softlock_mask, SEL_ACTION_ENABLED) ||
+            has_flag(action_last.softlock_mask, SEL_ACTION_NOTOUCH)))
+        {
+            cur->button = BUTTON_NONE;
+        }
+#endif
     }
     else if (action == ACTION_STD_KEYLOCK)
     {
