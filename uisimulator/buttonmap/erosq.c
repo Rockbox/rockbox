@@ -53,6 +53,7 @@ int key_to_button(int keyboard_button)
             break;
         case SDLK_BACKSPACE:
             new_btn = BUTTON_BACK;
+            break;
         case SDLK_KP_PERIOD:
         case SDLK_INSERT:
             new_btn = BUTTON_MENU;
@@ -70,6 +71,7 @@ int key_to_button(int keyboard_button)
         case SDLK_KP_PLUS:
         case SDLK_PAGEDOWN:
             new_btn = BUTTON_VOL_DOWN;
+            break;
     }
     return new_btn;
 }
