@@ -591,7 +591,7 @@ static int tnetv_ep_start_xmit(int epn, void *buf, int size)
     {
         dma_addr_t buffer = (dma_addr_t)buf;
         commit_discard_dcache_range(buf, size);
-        if ((buffer >= CONFIG_SDRAM_START) && (buffer <= CONFIG_SDRAM_START + SDRAM_SIZE))
+        if ((buffer >= CONFIG_SDRAM_START) && (buffer + size < CONFIG_SDRAM_START + SDRAM_SIZE))
         {
             if (tnetv_cppi_send(&cppi, (epn - 1), buffer, size, 0))
             {
@@ -675,6 +675,7 @@ static int tnetv_gadget_ep_enable(int epn, bool in)
 {
     UsbEpCfgCtrlType epCfg;
     int flags;
+    enum usb_device_speed speed;
 
     if (epn == 0 || epn >= USB_NUM_ENDPOINTS)
     {
@@ -684,7 +685,8 @@ static int tnetv_gadget_ep_enable(int epn, bool in)
     flags = disable_irq_save();
 
     /* set the maxpacket for this endpoint based on the current speed */
-    ep_runtime[epn].max_packet_size = MAX_PACKET(epn, usb_drv_port_speed());
+    speed = usb_drv_port_speed() ? USB_SPEED_HIGH : USB_SPEED_FULL;
+    ep_runtime[epn].max_packet_size = MAX_PACKET(epn, speed);
 
     /* Enable the endpoint */
     epCfg.val = tnetv_usb_reg_read(TNETV_USB_EPx_CFG(epn));
@@ -819,8 +821,21 @@ static void ep_write(int epn)
     }
     else
     {
-        /* DMA takes care of splitting the buffer into packets */
-        tx_size = ep->tx_remaining;
+        /* DMA takes care of splitting the buffer into packets,
+         * but only up to CPPI_MAX_FRAG. After the data is sent
+         * a single interrupt is generated. There appears to be
+         * splitting code in the tnetv_cppi_send() function but
+         * it is somewhat suspicious (it doesn't seem like it
+         * will work with requests larger than 2*CPPI_MAX_FRAG).
+         * Also, if tnetv_cppi_send() does the splitting, we will
+         * get an interrupt after CPPI_MAX_FRAG but before the
+         * full request is sent.
+         *
+         * CPPI_MAX_FRAG is multiple of both 64 and 512 so we
+         * don't have to worry about this split prematurely ending
+         * the transfer.
+         */
+        tx_size = MIN(CPPI_MAX_FRAG, ep->tx_remaining);
     }
     tnetv_ep_start_xmit(epn, ep->tx_buf, tx_size);
     ep->tx_remaining -= tx_size;
