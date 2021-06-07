@@ -301,16 +301,20 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
         int dy = fsm.cur_y - fsm.orig_y;
         int dp = (dx*dx) + (dy*dy);
         if(dp >= ftd.scroll_thresh_sqr) {
-            if(dy < 0) {
-                queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
-            } else {
-                queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
-            }
+            /* avoid generating events if we're supposed to be inactive...
+             * should not be necessary but better to be safe. */
+            if(ftd.active) {
+                if(dy < 0) {
+                    queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
+                } else {
+                    queue_post(&button_queue, BUTTON_SCROLL_FWD, 0);
+                }
 
-            /* Poke the backlight */
-            backlight_on();
-            buttonlight_on();
-            reset_poweroff_timer();
+                /* Poke the backlight */
+                backlight_on();
+                buttonlight_on();
+                reset_poweroff_timer();
+            }
 
             fsm.orig_x = fsm.cur_x;
             fsm.orig_y = fsm.cur_y;
@@ -475,7 +479,7 @@ int button_read_device(void)
     if((b & (1 << 28)) == 0) r |= BUTTON_VOL_DOWN;
     if((b & (1 << 31)) == 0) r |= BUTTON_POWER;
 
-    return r;
+    return touchpad_filter(r);
 }
 
 bool headphones_inserted(void)
