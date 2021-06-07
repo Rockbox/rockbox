@@ -676,7 +676,7 @@ static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
     int  timeout;
     if (has_flag(last->softlock_mask, SEL_ACTION_ALOCK_OK))
     {
-        timeout = backlight_get_current_timeout();
+        timeout = backlight_get_current_timeout() + (5 * HZ);
         is_timeout = (timeout > 0 && (current_tick > action_last.tick + timeout));
     }
 
