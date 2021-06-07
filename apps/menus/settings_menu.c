@@ -390,9 +390,12 @@ MENUITEM_SETTING(bt_selective_actions,
 MENUITEM_FUNCTION(sel_softlock_mask, 0, ID2P(LANG_SETTINGS),
                   selectivesoftlock_set_mask, NULL,
                                  selectivesoftlock_callback, Icon_Menu_setting);
+MENUITEM_SETTING(selective_softlock_autolock_delay,
+                 &global_settings.selective_softlock_autolock_delay, NULL);
 
 MAKE_MENU(sel_softlock, ID2P(LANG_SOFTLOCK_SELECTIVE),
-          NULL, Icon_Menu_setting, &bt_selective_actions, &sel_softlock_mask);
+          NULL, Icon_Menu_setting, &bt_selective_actions, &sel_softlock_mask,
+          &selective_softlock_autolock_delay);
 #endif /* !HAS_BUTTON_HOLD */
 
 #if defined(DX50) || defined(DX90)

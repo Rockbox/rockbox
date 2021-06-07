@@ -1129,6 +1129,10 @@ const struct settings_list settings[] = {
                 LANG_SOFTLOCK_SELECTIVE,
                 0, "Selective Screen Lock Actions", UNIT_INT,
                 0, 2048,2, NULL, NULL, NULL),
+    INT_SETTING(F_BANFROMQS, selective_softlock_autolock_delay,
+                LANG_AUTOLOCK_DELAY,
+                3, "Autolock Delay", UNIT_INT, 0, 10, 1, NULL, NULL,
+                NULL),
 #endif /* !HAS_BUTTON_HOLD */
 
 #ifdef HAVE_BACKLIGHT

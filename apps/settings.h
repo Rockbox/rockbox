@@ -652,6 +652,7 @@ struct user_settings
 #ifndef HAS_BUTTON_HOLD
     bool bt_selective_softlock_actions;
     int bt_selective_softlock_actions_mask;
+    int selective_softlock_autolock_delay; /* Amount of delay before autolock, in seconds */
 #endif
 #ifdef HAVE_BACKLIGHT
     bool bl_selective_actions; /* backlight disable on some actions */

@@ -15792,3 +15792,17 @@
     *: "Reload After Saving"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_AUTOLOCK_DELAY
+  desc: delay autolock in seconds
+  user: core
+  <source>
+    *: "Autolock Delay"
+  </source>
+  <dest>
+    *: "Autolock Delay"
+  </dest>
+  <voice>
+    *: "Autolock Delay"
+  </voice>
+</phrase>
