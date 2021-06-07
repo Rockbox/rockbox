@@ -71,6 +71,7 @@
 #define BLOCKS_PER_BANK    0x7A7800
 
 /* command flags for send_cmd */
+#define SDHC_RESP_FMT_MASK 0x0600
 #define SDHC_RESP_FMT_NONE 0x0000
 #define SDHC_RESP_FMT_1    0x0200
 #define SDHC_RESP_FMT_2    0x0400
@@ -306,16 +307,23 @@ static int sd_command(int cmd, unsigned long arg,
     {
         /* discard response */
     }
-    else if ((cmdat & SDHC_RESP_FMT_1) || (cmdat & SDHC_RESP_FMT_3))
+    else
     {
-        response[0] = (IO_MMC_RESPONSE7 << 16) | IO_MMC_RESPONSE6;
-    }
-    else if (cmdat & SDHC_RESP_FMT_2)
-    {
-        response[0] = (IO_MMC_RESPONSE7 << 16) | IO_MMC_RESPONSE6;
-        response[1] = (IO_MMC_RESPONSE5 << 16) | IO_MMC_RESPONSE4;
-        response[2] = (IO_MMC_RESPONSE3 << 16) | IO_MMC_RESPONSE2;
-        response[3] = (IO_MMC_RESPONSE1 << 16) | IO_MMC_RESPONSE0;
+        switch (cmdat & SDHC_RESP_FMT_MASK)
+        {
+            case SDHC_RESP_FMT_1:
+            case SDHC_RESP_FMT_3:
+                response[0] = (IO_MMC_RESPONSE7 << 16) | IO_MMC_RESPONSE6;
+                break;
+            case SDHC_RESP_FMT_2:
+                response[0] = (IO_MMC_RESPONSE7 << 16) | IO_MMC_RESPONSE6;
+                response[1] = (IO_MMC_RESPONSE5 << 16) | IO_MMC_RESPONSE4;
+                response[2] = (IO_MMC_RESPONSE3 << 16) | IO_MMC_RESPONSE2;
+                response[3] = (IO_MMC_RESPONSE1 << 16) | IO_MMC_RESPONSE0;
+                break;
+            default:
+                break;
+        }
     }
 
     return 0;
