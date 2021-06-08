@@ -391,6 +391,23 @@ struct usb_debug_descriptor {
 } __attribute__((packed));
 
 /*-------------------------------------------------------------------------*/
+
+/* USB_DT_INTERFACE_ASSOCIATION: groups interfaces */
+struct usb_interface_assoc_descriptor {
+        uint8_t  bLength;
+        uint8_t  bDescriptorType;
+
+        uint8_t  bFirstInterface;
+        uint8_t  bInterfaceCount;
+        uint8_t  bFunctionClass;
+        uint8_t  bFunctionSubClass;
+        uint8_t  bFunctionProtocol;
+        uint8_t  iFunction;
+} __attribute__ ((packed));
+
+#define USB_DT_INTERFACE_ASSOCIATION_SIZE	8
+
+/*-------------------------------------------------------------------------*/
 /* USB 2.0 defines three speeds, here's how Linux identifies them */
 
 enum usb_device_speed {
