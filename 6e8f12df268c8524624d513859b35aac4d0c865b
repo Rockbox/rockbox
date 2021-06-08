@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "247bb0bd_cf414b56",
+        "filename": "apps/action.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-08T09:42:21Z",
+      "side": 1,
+      "message": "For the sake of correctness this should probably be:\n\n  if(!has_flag(.., SEL_ACTION_ENABLED) || has_flag(.., SEL_ACTION_NOTOUCH)) {\n    cur-\u003ebutton \u003d touchpad_filter(cur-\u003ebutton)\n  }\n\nAnd shouldn\u0027t action be cleared, eg. to ACTION_NONE or whatever the appropriate value is? The action is already decided by this point.\n\nI\u0027m guessing for the M3K, just clearing the buttons of the press event works, as the release event won\u0027t be able to trigger the keymap entry because the pre-button code has been zeroed here.",
+      "revId": "6e8f12df268c8524624d513859b35aac4d0c865b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23710736_938fb29d",
+        "filename": "apps/action.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 994,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-08T09:42:21Z",
+      "side": 1,
+      "message": "just want to draw your attention to this function, to see the order of processing",
+      "revId": "6e8f12df268c8524624d513859b35aac4d0c865b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
