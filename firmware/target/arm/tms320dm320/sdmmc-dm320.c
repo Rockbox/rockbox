@@ -781,20 +781,10 @@ int sd_read_sectors(IF_MD(int card_no,) unsigned long start, int incount,
 int sd_write_sectors(IF_MD(int card_no,) unsigned long start, int count,
                       const void* outbuf)
 {
-#ifndef BOOTLOADER
 #ifndef HAVE_MULTIDRIVE
     const int card_no = 0;
 #endif
     return sd_transfer_sectors(card_no, start, count, (void*)outbuf, true);
-#else /* we don't need write support in bootloader */
-#ifdef HAVE_MULTIDRIVE
-    (void)card_no;
-#endif
-    (void)start;
-    (void)count;
-    (void)outbuf;
-    return 0;
-#endif
 }
 
 int sd_init(void)
@@ -809,9 +799,7 @@ int sd_init(void)
 
     mutex_lock(&sd_mtx);
 
-#ifndef BOOTLOADER
     enable_controller(false);
-#endif
 
     /* based on linux/drivers/mmc/dm320mmc.c
        Copyright (C) 2006 ZSI, All Rights Reserved.
@@ -858,8 +846,6 @@ int sd_init(void)
     IO_INTC_EINT2 |= INTR_EINT2_EXT14;
 #endif
 #endif
-
-    sd_select_device(1);
 
     /* Disable Memory Card CLK - it is enabled on demand by TMS320DM320 */
     bitclr16(&IO_MMC_MEM_CLK_CONTROL, (1 << 8));

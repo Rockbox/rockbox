@@ -902,6 +902,10 @@ Lyre prototype 1 */
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
 #endif
+#if defined(HAVE_USBSTACK) && CONFIG_USBOTG == USBOTG_TNETV105
+#define INCLUDE_TIMEOUT_API
+#define USB_DRIVER_CLOSE
+#endif
 #endif
 
 #else /* !BOOTLOADER */

@@ -1034,7 +1034,7 @@ static int cppi_timeout_cb(struct timeout *tmo)
     int flags = disable_irq_save();
     bool requeue = tnetv_handle_cppi();
     restore_irq(flags);
-    return requeue ? HZ/10 : 0;
+    return requeue ? 1 : 0;
 }
 
 void VLYNQ(void) __attribute__ ((section(".icode")));
@@ -1205,7 +1205,7 @@ void VLYNQ(void)
 
         if (tnetv_handle_cppi())
         {
-            timeout_register(&cppi_timeout, cppi_timeout_cb, HZ/10, 0);
+            timeout_register(&cppi_timeout, cppi_timeout_cb, 1, 0);
         }
     }
 }

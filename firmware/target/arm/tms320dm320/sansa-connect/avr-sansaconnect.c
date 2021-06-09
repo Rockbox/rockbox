@@ -374,7 +374,13 @@ void btn_thread(void)
     while (1)
     {
         queue_wait(&btn_queue, &ev);
-        
+
+        if (ev.id == SYS_USB_CONNECTED)
+        {
+            /* Allow USB to gain exclusive storage access */
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+        }
+
         /* Ignore all messages except BTN_INTERRUPT */
         if (ev.id != BTN_INTERRUPT)
             continue;

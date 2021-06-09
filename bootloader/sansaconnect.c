@@ -172,6 +172,49 @@ static void clear_recoverzap(void)
     }
 }
 
+static void handle_usb(int connect_timeout)
+{
+    long end_tick = 0;
+
+    if (usb_detect() != USB_INSERTED)
+    {
+        return;
+    }
+
+    usb_init();
+    usb_start_monitoring();
+
+    printf("USB: Connecting");
+
+    if (connect_timeout != TIMEOUT_BLOCK)
+    {
+        end_tick = current_tick + connect_timeout;
+    }
+
+    while (usb_detect() == USB_INSERTED)
+    {
+        if (button_get_w_tmo(HZ/2) == SYS_USB_CONNECTED)
+        {
+            printf("Bootloader USB mode");
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            while (button_get_w_tmo(HZ/2) != SYS_USB_DISCONNECTED)
+            {
+                storage_spin();
+            }
+            break;
+        }
+
+        if (connect_timeout != TIMEOUT_BLOCK &&
+            TIME_AFTER(current_tick, end_tick))
+        {
+            printf("USB: Timed out");
+            break;
+        }
+    }
+
+    usb_close();
+}
+
 extern void show_logo(void);
 
 void main(void)
@@ -203,12 +246,8 @@ void main(void)
     reset_screen();
     show_logo();
 
-    btn = button_read_device();
-
     printf("Rockbox boot loader");
     printf("Version %s", rbversion);
-    usb_init();
-    usb_start_monitoring();
 
     clear_recoverzap();
 
@@ -218,20 +257,13 @@ void main(void)
 
     filesystem_init();
 
-    if (usb_detect() == USB_INSERTED)
-    {
-        usb_enable(true);
-        while (usb_detect() == USB_INSERTED)
-        {
-            sleep(HZ);
-            storage_spin();
-        }
-        usb_enable(false);
-    }
+    handle_usb(2*HZ);
 
     ret = disk_mount_all();
     if (ret <= 0)
         error(EDISK, ret, true);
+
+    btn = button_read_device();
 
     if (btn & BUTTON_PREV)
     {
