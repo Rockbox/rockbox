@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5aab001b_796fd6c5",
+        "filename": "apps/action.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 694,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-06-09T00:20:46Z",
+      "side": 1,
+      "message": "I think the new patchset implements this acceptably.",
+      "parentUuid": "247bb0bd_cf414b56",
+      "revId": "6e8f12df268c8524624d513859b35aac4d0c865b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "23710736_938fb29d",
         "filename": "apps/action.c",
         "patchSetId": 7
@@ -33,6 +51,24 @@
       "revId": "6e8f12df268c8524624d513859b35aac4d0c865b",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d741b75_c5b27f2c",
+        "filename": "apps/action.c",
+        "patchSetId": 7
+      },
+      "lineNbr": 994,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-06-09T00:20:46Z",
+      "side": 1,
+      "message": "Oh, yeah sure enough the action is determined prior to softlock. Which, I guess makes sense in the normal situation of using the lock button.",
+      "parentUuid": "23710736_938fb29d",
+      "revId": "6e8f12df268c8524624d513859b35aac4d0c865b",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
