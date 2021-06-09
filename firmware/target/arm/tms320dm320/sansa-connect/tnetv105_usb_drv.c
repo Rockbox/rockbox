@@ -590,10 +590,21 @@ static int tnetv_ep_start_xmit(int epn, void *buf, int size)
     else
     {
         dma_addr_t buffer = (dma_addr_t)buf;
-        commit_discard_dcache_range(buf, size);
+        int send_zlp = 0;
+        if (size == 0)
+        {
+            /* Any address in SDRAM will do, contents do not matter */
+            buffer = CONFIG_SDRAM_START;
+            size = 1;
+            send_zlp = 1;
+        }
+        else
+        {
+            commit_discard_dcache_range(buf, size);
+        }
         if ((buffer >= CONFIG_SDRAM_START) && (buffer + size < CONFIG_SDRAM_START + SDRAM_SIZE))
         {
-            if (tnetv_cppi_send(&cppi, (epn - 1), buffer, size, 0))
+            if (tnetv_cppi_send(&cppi, (epn - 1), buffer, size, send_zlp))
             {
                 panicf("tnetv_cppi_send() failed");
             }
