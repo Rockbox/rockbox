@@ -147,7 +147,7 @@
 #define BATTERY_CAPACITY_INC 100     /* capacity increment */
 #define BATTERY_TYPES_COUNT  1       /* only one type */
 
-#define CONFIG_BATTERY_MEASURE VOLTAGE_MEASURE
+#define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
 
 /* define current usage levels */
 #if 0
@@ -155,9 +155,6 @@
 #define CURRENT_NORMAL     85
 #define CURRENT_BACKLIGHT  200
 #endif
-
-/* Hardware controlled charging with monitoring */
-//#define CONFIG_CHARGING CHARGING_MONITOR
 
 #define CONFIG_CPU DM320
 

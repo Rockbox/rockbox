@@ -79,6 +79,8 @@ static const char btn_thread_name[] = "buttons";
 static struct event_queue btn_queue;
 #endif
 
+static int current_battery_level = 100;
+
 static inline unsigned short be2short(unsigned char* buf)
 {
    return (unsigned short)((buf[0] << 8) | buf[1]);
@@ -284,8 +286,11 @@ void avr_hid_init(void)
     mutex_init(&avr_mtx);
 }
 
-/* defined in powermgmt-sansaconnect.c */
-void set_battery_level(unsigned int level);
+int _battery_level(void)
+{
+    /* Force shutoff when level read by AVR is 4 or lower */
+    return (current_battery_level > 4) ? current_battery_level : 0;
+}
 
 static void avr_hid_get_state(void)
 {
@@ -302,7 +307,7 @@ static void avr_hid_get_state(void)
      *  buf[8] contains some battery/charger related information (unknown)
      *  buf[9] contains battery level in percents (0-100)
      */
-    set_battery_level((unsigned int)buf[9]);
+    current_battery_level = (int)buf[9];
 
     spi_txrx(cmd_empty, NULL, 1); /* request interrupt on button press */
 

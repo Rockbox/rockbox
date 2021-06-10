@@ -1263,7 +1263,6 @@ target/arm/tms320dm320/sansa-connect/crt0-board.S
 target/arm/tms320dm320/sansa-connect/lcd-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/adc-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/power-sansaconnect.c
-target/arm/tms320dm320/sansa-connect/powermgmt-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/tnetv105_cppi.c
 target/arm/tms320dm320/sansa-connect/tnetv105_usb_drv.c
 target/arm/tms320dm320/sansa-connect/usb-sansaconnect.c
