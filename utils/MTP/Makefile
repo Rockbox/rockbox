@@ -11,7 +11,7 @@ $(OUTPUT): sendfirm.c
 	gcc $(EXTRA_CFLAGS) $(CFLAGS) -o $(OUTPUT) sendfirm.c $(LIBS)
 
 $(OUTPUT).exe: sendfirm_win.c
-	mingw32-gcc $(CFLAGS) -o $(OUTPUT).exe sendfirm_win.c MTP_DLL.dll
+	i686-w64-mingw32-gcc $(CFLAGS) -o $(OUTPUT).exe sendfirm_win.c MTP_DLL.dll
 
 clean:
-	rm -f $(OUTPUT)
+	rm -f $(OUTPUT) $(OUTPUT).exe
