@@ -26,6 +26,7 @@
 #include "logf.h"
 #include "avr-sansaconnect.h"
 #include "uart-target.h"
+#include "usb.h"
 #include "button.h"
 #include "backlight.h"
 #include "powermgmt.h"
