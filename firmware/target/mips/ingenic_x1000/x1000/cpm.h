@@ -233,6 +233,44 @@
 #define BF_CPM_DDRCDR_FLAG_V(e)         BF_CPM_DDRCDR_FLAG(BV_CPM_DDRCDR_FLAG__##e)
 #define BFM_CPM_DDRCDR_FLAG_V(v)        BM_CPM_DDRCDR_FLAG
 
+#define REG_CPM_MACCDR                  jz_reg(CPM_MACCDR)
+#define JA_CPM_MACCDR                   (0xb0000000 + 0x54)
+#define JT_CPM_MACCDR                   JIO_32_RW
+#define JN_CPM_MACCDR                   CPM_MACCDR
+#define JI_CPM_MACCDR                   
+#define BP_CPM_MACCDR_CLKDIV            0
+#define BM_CPM_MACCDR_CLKDIV            0xff
+#define BF_CPM_MACCDR_CLKDIV(v)         (((v) & 0xff) << 0)
+#define BFM_CPM_MACCDR_CLKDIV(v)        BM_CPM_MACCDR_CLKDIV
+#define BF_CPM_MACCDR_CLKDIV_V(e)       BF_CPM_MACCDR_CLKDIV(BV_CPM_MACCDR_CLKDIV__##e)
+#define BFM_CPM_MACCDR_CLKDIV_V(v)      BM_CPM_MACCDR_CLKDIV
+#define BP_CPM_MACCDR_CLKSRC            31
+#define BM_CPM_MACCDR_CLKSRC            0x80000000
+#define BV_CPM_MACCDR_CLKSRC__SCLK_A    0x0
+#define BV_CPM_MACCDR_CLKSRC__MPLL      0x1
+#define BF_CPM_MACCDR_CLKSRC(v)         (((v) & 0x1) << 31)
+#define BFM_CPM_MACCDR_CLKSRC(v)        BM_CPM_MACCDR_CLKSRC
+#define BF_CPM_MACCDR_CLKSRC_V(e)       BF_CPM_MACCDR_CLKSRC(BV_CPM_MACCDR_CLKSRC__##e)
+#define BFM_CPM_MACCDR_CLKSRC_V(v)      BM_CPM_MACCDR_CLKSRC
+#define BP_CPM_MACCDR_CE                29
+#define BM_CPM_MACCDR_CE                0x20000000
+#define BF_CPM_MACCDR_CE(v)             (((v) & 0x1) << 29)
+#define BFM_CPM_MACCDR_CE(v)            BM_CPM_MACCDR_CE
+#define BF_CPM_MACCDR_CE_V(e)           BF_CPM_MACCDR_CE(BV_CPM_MACCDR_CE__##e)
+#define BFM_CPM_MACCDR_CE_V(v)          BM_CPM_MACCDR_CE
+#define BP_CPM_MACCDR_BUSY              28
+#define BM_CPM_MACCDR_BUSY              0x10000000
+#define BF_CPM_MACCDR_BUSY(v)           (((v) & 0x1) << 28)
+#define BFM_CPM_MACCDR_BUSY(v)          BM_CPM_MACCDR_BUSY
+#define BF_CPM_MACCDR_BUSY_V(e)         BF_CPM_MACCDR_BUSY(BV_CPM_MACCDR_BUSY__##e)
+#define BFM_CPM_MACCDR_BUSY_V(v)        BM_CPM_MACCDR_BUSY
+#define BP_CPM_MACCDR_STOP              27
+#define BM_CPM_MACCDR_STOP              0x8000000
+#define BF_CPM_MACCDR_STOP(v)           (((v) & 0x1) << 27)
+#define BFM_CPM_MACCDR_STOP(v)          BM_CPM_MACCDR_STOP
+#define BF_CPM_MACCDR_STOP_V(e)         BF_CPM_MACCDR_STOP(BV_CPM_MACCDR_STOP__##e)
+#define BFM_CPM_MACCDR_STOP_V(v)        BM_CPM_MACCDR_STOP
+
 #define REG_CPM_I2SCDR              jz_reg(CPM_I2SCDR)
 #define JA_CPM_I2SCDR               (0xb0000000 + 0x60)
 #define JT_CPM_I2SCDR               JIO_32_RW
@@ -491,6 +529,108 @@
 #define BFM_CPM_SSICDR_STOP(v)          BM_CPM_SSICDR_STOP
 #define BF_CPM_SSICDR_STOP_V(e)         BF_CPM_SSICDR_STOP(BV_CPM_SSICDR_STOP__##e)
 #define BFM_CPM_SSICDR_STOP_V(v)        BM_CPM_SSICDR_STOP
+
+#define REG_CPM_CIMCDR                  jz_reg(CPM_CIMCDR)
+#define JA_CPM_CIMCDR                   (0xb0000000 + 0x7c)
+#define JT_CPM_CIMCDR                   JIO_32_RW
+#define JN_CPM_CIMCDR                   CPM_CIMCDR
+#define JI_CPM_CIMCDR                   
+#define BP_CPM_CIMCDR_CLKDIV            0
+#define BM_CPM_CIMCDR_CLKDIV            0xff
+#define BF_CPM_CIMCDR_CLKDIV(v)         (((v) & 0xff) << 0)
+#define BFM_CPM_CIMCDR_CLKDIV(v)        BM_CPM_CIMCDR_CLKDIV
+#define BF_CPM_CIMCDR_CLKDIV_V(e)       BF_CPM_CIMCDR_CLKDIV(BV_CPM_CIMCDR_CLKDIV__##e)
+#define BFM_CPM_CIMCDR_CLKDIV_V(v)      BM_CPM_CIMCDR_CLKDIV
+#define BP_CPM_CIMCDR_CLKSRC            31
+#define BM_CPM_CIMCDR_CLKSRC            0x80000000
+#define BV_CPM_CIMCDR_CLKSRC__SCLK_A    0x1
+#define BV_CPM_CIMCDR_CLKSRC__MPLL      0x1
+#define BF_CPM_CIMCDR_CLKSRC(v)         (((v) & 0x1) << 31)
+#define BFM_CPM_CIMCDR_CLKSRC(v)        BM_CPM_CIMCDR_CLKSRC
+#define BF_CPM_CIMCDR_CLKSRC_V(e)       BF_CPM_CIMCDR_CLKSRC(BV_CPM_CIMCDR_CLKSRC__##e)
+#define BFM_CPM_CIMCDR_CLKSRC_V(v)      BM_CPM_CIMCDR_CLKSRC
+#define BP_CPM_CIMCDR_CE                29
+#define BM_CPM_CIMCDR_CE                0x20000000
+#define BF_CPM_CIMCDR_CE(v)             (((v) & 0x1) << 29)
+#define BFM_CPM_CIMCDR_CE(v)            BM_CPM_CIMCDR_CE
+#define BF_CPM_CIMCDR_CE_V(e)           BF_CPM_CIMCDR_CE(BV_CPM_CIMCDR_CE__##e)
+#define BFM_CPM_CIMCDR_CE_V(v)          BM_CPM_CIMCDR_CE
+#define BP_CPM_CIMCDR_BUSY              28
+#define BM_CPM_CIMCDR_BUSY              0x10000000
+#define BF_CPM_CIMCDR_BUSY(v)           (((v) & 0x1) << 28)
+#define BFM_CPM_CIMCDR_BUSY(v)          BM_CPM_CIMCDR_BUSY
+#define BF_CPM_CIMCDR_BUSY_V(e)         BF_CPM_CIMCDR_BUSY(BV_CPM_CIMCDR_BUSY__##e)
+#define BFM_CPM_CIMCDR_BUSY_V(v)        BM_CPM_CIMCDR_BUSY
+#define BP_CPM_CIMCDR_STOP              27
+#define BM_CPM_CIMCDR_STOP              0x8000000
+#define BF_CPM_CIMCDR_STOP(v)           (((v) & 0x1) << 27)
+#define BFM_CPM_CIMCDR_STOP(v)          BM_CPM_CIMCDR_STOP
+#define BF_CPM_CIMCDR_STOP_V(e)         BF_CPM_CIMCDR_STOP(BV_CPM_CIMCDR_STOP__##e)
+#define BFM_CPM_CIMCDR_STOP_V(v)        BM_CPM_CIMCDR_STOP
+
+#define REG_CPM_PCMCDR              jz_reg(CPM_PCMCDR)
+#define JA_CPM_PCMCDR               (0xb0000000 + 0x84)
+#define JT_CPM_PCMCDR               JIO_32_RW
+#define JN_CPM_PCMCDR               CPM_PCMCDR
+#define JI_CPM_PCMCDR               
+#define BP_CPM_PCMCDR_DIV_M         13
+#define BM_CPM_PCMCDR_DIV_M         0x3fe000
+#define BF_CPM_PCMCDR_DIV_M(v)      (((v) & 0x1ff) << 13)
+#define BFM_CPM_PCMCDR_DIV_M(v)     BM_CPM_PCMCDR_DIV_M
+#define BF_CPM_PCMCDR_DIV_M_V(e)    BF_CPM_PCMCDR_DIV_M(BV_CPM_PCMCDR_DIV_M__##e)
+#define BFM_CPM_PCMCDR_DIV_M_V(v)   BM_CPM_PCMCDR_DIV_M
+#define BP_CPM_PCMCDR_DIV_N         0
+#define BM_CPM_PCMCDR_DIV_N         0x1fff
+#define BF_CPM_PCMCDR_DIV_N(v)      (((v) & 0x1fff) << 0)
+#define BFM_CPM_PCMCDR_DIV_N(v)     BM_CPM_PCMCDR_DIV_N
+#define BF_CPM_PCMCDR_DIV_N_V(e)    BF_CPM_PCMCDR_DIV_N(BV_CPM_PCMCDR_DIV_N__##e)
+#define BFM_CPM_PCMCDR_DIV_N_V(v)   BM_CPM_PCMCDR_DIV_N
+#define BP_CPM_PCMCDR_PCS           31
+#define BM_CPM_PCMCDR_PCS           0x80000000
+#define BV_CPM_PCMCDR_PCS__SCLK_A   0x0
+#define BV_CPM_PCMCDR_PCS__MPLL     0x1
+#define BF_CPM_PCMCDR_PCS(v)        (((v) & 0x1) << 31)
+#define BFM_CPM_PCMCDR_PCS(v)       BM_CPM_PCMCDR_PCS
+#define BF_CPM_PCMCDR_PCS_V(e)      BF_CPM_PCMCDR_PCS(BV_CPM_PCMCDR_PCS__##e)
+#define BFM_CPM_PCMCDR_PCS_V(v)     BM_CPM_PCMCDR_PCS
+#define BP_CPM_PCMCDR_CS            30
+#define BM_CPM_PCMCDR_CS            0x40000000
+#define BV_CPM_PCMCDR_CS__EXCLK     0x0
+#define BV_CPM_PCMCDR_CS__PLL       0x1
+#define BF_CPM_PCMCDR_CS(v)         (((v) & 0x1) << 30)
+#define BFM_CPM_PCMCDR_CS(v)        BM_CPM_PCMCDR_CS
+#define BF_CPM_PCMCDR_CS_V(e)       BF_CPM_PCMCDR_CS(BV_CPM_PCMCDR_CS__##e)
+#define BFM_CPM_PCMCDR_CS_V(v)      BM_CPM_PCMCDR_CS
+#define BP_CPM_PCMCDR_CE            29
+#define BM_CPM_PCMCDR_CE            0x20000000
+#define BF_CPM_PCMCDR_CE(v)         (((v) & 0x1) << 29)
+#define BFM_CPM_PCMCDR_CE(v)        BM_CPM_PCMCDR_CE
+#define BF_CPM_PCMCDR_CE_V(e)       BF_CPM_PCMCDR_CE(BV_CPM_PCMCDR_CE__##e)
+#define BFM_CPM_PCMCDR_CE_V(v)      BM_CPM_PCMCDR_CE
+
+#define REG_CPM_PCMCDR1             jz_reg(CPM_PCMCDR1)
+#define JA_CPM_PCMCDR1              (0xb0000000 + 0xe0)
+#define JT_CPM_PCMCDR1              JIO_32_RW
+#define JN_CPM_PCMCDR1              CPM_PCMCDR1
+#define JI_CPM_PCMCDR1              
+#define BP_CPM_PCMCDR1_DIV_D        0
+#define BM_CPM_PCMCDR1_DIV_D        0x1fff
+#define BF_CPM_PCMCDR1_DIV_D(v)     (((v) & 0x1fff) << 0)
+#define BFM_CPM_PCMCDR1_DIV_D(v)    BM_CPM_PCMCDR1_DIV_D
+#define BF_CPM_PCMCDR1_DIV_D_V(e)   BF_CPM_PCMCDR1_DIV_D(BV_CPM_PCMCDR1_DIV_D__##e)
+#define BFM_CPM_PCMCDR1_DIV_D_V(v)  BM_CPM_PCMCDR1_DIV_D
+#define BP_CPM_PCMCDR1_N_EN         31
+#define BM_CPM_PCMCDR1_N_EN         0x80000000
+#define BF_CPM_PCMCDR1_N_EN(v)      (((v) & 0x1) << 31)
+#define BFM_CPM_PCMCDR1_N_EN(v)     BM_CPM_PCMCDR1_N_EN
+#define BF_CPM_PCMCDR1_N_EN_V(e)    BF_CPM_PCMCDR1_N_EN(BV_CPM_PCMCDR1_N_EN__##e)
+#define BFM_CPM_PCMCDR1_N_EN_V(v)   BM_CPM_PCMCDR1_N_EN
+#define BP_CPM_PCMCDR1_D_EN         30
+#define BM_CPM_PCMCDR1_D_EN         0x40000000
+#define BF_CPM_PCMCDR1_D_EN(v)      (((v) & 0x1) << 30)
+#define BFM_CPM_PCMCDR1_D_EN(v)     BM_CPM_PCMCDR1_D_EN
+#define BF_CPM_PCMCDR1_D_EN_V(e)    BF_CPM_PCMCDR1_D_EN(BV_CPM_PCMCDR1_D_EN__##e)
+#define BFM_CPM_PCMCDR1_D_EN_V(v)   BM_CPM_PCMCDR1_D_EN
 
 #define REG_CPM_INTR            jz_reg(CPM_INTR)
 #define JA_CPM_INTR             (0xb0000000 + 0xb0)

@@ -509,6 +509,14 @@ node CPM {
         fld  3  0 CLKDIV
     }
 
+    reg MACCDR 0x54 {
+        bit   31 CLKSRC { enum SCLK_A 0; enum MPLL 1; }
+        bit   29 CE
+        bit   28 BUSY
+        bit   27 STOP
+        fld 7  0 CLKDIV
+    }
+
     reg I2SCDR 0x60 {
         bit 31 PCS { enum SCLK_A 0; enum MPLL 1; }
         bit 30 CS  { enum EXCLK 0; enum PLL 1; }
@@ -562,6 +570,35 @@ node CPM {
         bit 28 BUSY
         bit 27 STOP
         fld 7 0 CLKDIV
+    }
+
+    reg CIMCDR 0x7c {
+        bit   31 CLKSRC { enum SCLK_A 1; enum MPLL 1 }
+        bit   29 CE
+        bit   28 BUSY
+        bit   27 STOP
+        fld 7  0 CLKDIV
+    }
+
+    reg PCMCDR 0x84 {
+        # Hardware manual says this is the correct definition, but based
+        # on Ingenic's sources, the format is actually like I2SCDR.
+        #fld 31 30 CLKSRC { enum SCLK_A 0; enum EXCLK 1; enum MPLL 2 }
+
+        # Note this format hasn't been verified to work because none of
+        # the X1000 targets are using a PCM interface.
+        bit 31 PCS { enum SCLK_A 0; enum MPLL 1; }
+        bit 30 CS  { enum EXCLK 0; enum PLL 1; }
+
+        bit    29 CE
+        fld 21 13 DIV_M
+        fld 12  0 DIV_N
+    }
+
+    reg PCMCDR1 0xe0 {
+        bit    31 N_EN
+        bit    30 D_EN
+        fld 12  0 DIV_D
     }
 
     reg INTR 0xb0 {
