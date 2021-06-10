@@ -10,12 +10,12 @@ OUTPUT=beastpatcher.exe
 CROSS=
 else
 OUTPUT=beastpatcher
-CROSS=i586-mingw32msvc-
+CROSS=i686-w64-mingw32-
 endif
 endif
 
 ifneq ($(findstring MINGW,$(shell uname)),MINGW)
-LIBS := -lmtp -lusb
+LIBS := -lmtp
 ifdef STATIC
 LIBS := -Wl,-Bstatic $(LIBS) -Wl,-Bdynamic
 endif

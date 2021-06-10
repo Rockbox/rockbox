@@ -123,6 +123,8 @@ int mtp_send_firmware(struct mtp_info_t* mtp_info, unsigned char* fwbuf,
     size_t n;
     FILE* fwfile;
 
+    (void) ret; /* suppress a set but not used warning */
+
     /* Open a temporary file - this will be automatically deleted when closed */
     fwfile = tmpfile();
 
