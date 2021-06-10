@@ -26,6 +26,7 @@
 #define _LARGEFILE_SOURCE
 #define _LARGEFILE64_SOURCE
 
+#include <stdlib.h>
 #include <string.h>
 #include <libgen.h>
 #include <sys/stat.h>
