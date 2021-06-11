@@ -166,7 +166,7 @@ void SFC(void)
  * so please do NOT try to rearrange the code without testing it first!
  */
 
-void sfc_fifo_read(unsigned* buffer, int data_bytes)
+static void sfc_fifo_read(unsigned* buffer, int data_bytes)
 {
     int data_words = (data_bytes + 3) / 4;
     while(data_words > 0) {
@@ -183,7 +183,7 @@ void sfc_fifo_read(unsigned* buffer, int data_bytes)
     }
 }
 
-void sfc_fifo_write(const unsigned* buffer, int data_bytes)
+static void sfc_fifo_write(const unsigned* buffer, int data_bytes)
 {
     int data_words = (data_bytes + 3) / 4;
     while(data_words > 0) {

@@ -99,7 +99,7 @@ extern int nand_enable_writes(bool en);
 extern int nand_read(uint32_t addr, uint32_t size, uint8_t* buf);
 extern int nand_write(uint32_t addr, uint32_t size, const uint8_t* buf);
 
-/* Ereas eoperates on whole blocks. Like the page read/write operations,
+/* Erase operates on whole blocks. Like the page read/write operations,
  * the address and size must be aligned to a multiple of the block size.
  * If not, no blocks are erased and an error code is returned. */
 extern int nand_erase(uint32_t addr, uint32_t size);

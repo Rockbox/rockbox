@@ -46,9 +46,9 @@
 #define NAND_FREG_PROTECTION_BRWD   0x80
 #define NAND_FREG_PROTECTION_BP2    0x20
 #define NAND_FREG_PROTECTION_BP1    0x10
-#define NAND_FREG_PROTECTION_BP0    0x80
+#define NAND_FREG_PROTECTION_BP0    0x08
 /* Mask of BP bits 0-2 */
-#define NAND_FREG_PROTECTION_ALLBP  (0x38)
+#define NAND_FREG_PROTECTION_ALLBP  0x38
 
 /* Feature register bits */
 #define NAND_FREG_FEATURE_QE        0x01
@@ -129,6 +129,7 @@ int nand_open(void)
     sfc_set_dev_conf(chip_data->dev_conf);
     sfc_set_clock(chip_data->clock_freq);
 
+    sfc_unlock();
     return NAND_SUCCESS;
 }
 
@@ -237,7 +238,7 @@ int nand_erase(uint32_t addr, uint32_t size)
 {
     const uint32_t page_size = 1 << nand_drv.chip_data->log2_page_size;
     const uint32_t block_size = page_size << nand_drv.chip_data->log2_block_size;
-    const uint32_t pages_per_block = 1 << nand_drv.chip_data->log2_page_size;
+    const uint32_t pages_per_block = 1 << nand_drv.chip_data->log2_block_size;
 
     if(addr & (block_size - 1))
         return NAND_ERR_UNALIGNED;
@@ -333,13 +334,13 @@ static int nandop_set_write_protect(bool en)
         return val;
 
     if(en) {
-        val &= ~NAND_FREG_PROTECTION_ALLBP;
-        if(nand_drv.chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
-            val &= ~NAND_FREG_PROTECTION_BRWD;
-    } else {
         val |= NAND_FREG_PROTECTION_ALLBP;
         if(nand_drv.chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
             val |= NAND_FREG_PROTECTION_BRWD;
+    } else {
+        val &= ~NAND_FREG_PROTECTION_ALLBP;
+        if(nand_drv.chip_data->flags & NANDCHIP_FLAG_USE_BRWD)
+            val &= ~NAND_FREG_PROTECTION_BRWD;
     }
 
     /* NOTE: The WP pin typically only protects changes to the protection
@@ -406,7 +407,7 @@ static int nandcmd_set_feature(uint8_t reg, uint8_t val)
 {
     sfc_op op = {0};
     op.command = NAND_CMD_SET_FEATURE;
-    op.flags = SFC_FLAG_READ;
+    op.flags = SFC_FLAG_WRITE;
     op.addr_bytes = 1;
     op.addr_lo = reg;
     op.data_bytes = 1;
