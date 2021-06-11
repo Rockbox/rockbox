@@ -25,7 +25,9 @@
 #include "powermgmt.h"
 #include "panic.h"
 #include "axp-pmu.h"
+#include "ft6x06.h"
 #include "gpio-x1000.h"
+#include "irq-x1000.h"
 #include "i2c-x1000.h"
 #include <string.h>
 #include <stdbool.h>
@@ -34,12 +36,6 @@
 # include "lcd.h"
 # include "font.h"
 #endif
-
-/* Touch event types */
-#define EVENT_NONE      (-1)
-#define EVENT_PRESS     0
-#define EVENT_RELEASE   1
-#define EVENT_CONTACT   2
 
 /* FSM states */
 #define STATE_IDLE          0
@@ -65,17 +61,6 @@
 
 /* Number of touch samples to smooth before reading */
 #define TOUCH_SAMPLES   3
-
-static struct ft_driver {
-    int i2c_cookie;
-    i2c_descriptor i2c_desc;
-    uint8_t raw_data[6];
-    bool active;
-
-    /* Number of pixels squared which must be moved before
-     * a scrollbar pulse is generated */
-    int scroll_thresh_sqr;
-} ftd;
 
 static struct ft_state_machine {
     /* Current button state, used by button_read_device() */
@@ -105,6 +90,12 @@ static struct ft_state_machine {
 
     /* Current touch position */
     int cur_x, cur_y;
+
+    /* Motion threshold squared, in 'pixels', required to trigger scrolling */
+    int scroll_thresh_sqr;
+
+    /* Touchpad enabled state */
+    bool active;
 } fsm;
 
 /* coordinates below this are the left hand buttons,
@@ -210,9 +201,9 @@ static void ft_start_report_or_scroll(void)
 static void ft_step_state(uint32_t t, int evt, int tx, int ty)
 {
     /* Generate a release event automatically in case we missed it */
-    if(evt == EVENT_NONE) {
+    if(evt == FT6x06_EVT_NONE) {
         if(TICKS_SINCE(t, fsm.last_event_t) >= AUTORELEASE_TIME) {
-            evt = EVENT_RELEASE;
+            evt = FT6x06_EVT_RELEASE;
             tx = fsm.cur_x;
             ty = fsm.cur_y;
         }
@@ -220,7 +211,7 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
 
     switch(fsm.state) {
     case STATE_IDLE: {
-        if(evt == EVENT_PRESS || evt == EVENT_CONTACT) {
+        if(evt == FT6x06_EVT_PRESS || evt == FT6x06_EVT_CONTACT) {
             /* Move to REPORT or PRESS state */
             if(ft_accum_touch(t, tx, ty))
                 ft_start_report_or_scroll();
@@ -230,10 +221,10 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
     } break;
 
     case STATE_PRESS: {
-        if(evt == EVENT_RELEASE) {
+        if(evt == FT6x06_EVT_RELEASE) {
             /* Ignore if the number of samples is too low */
             ft_go_idle();
-        } else if(evt == EVENT_PRESS || evt == EVENT_CONTACT) {
+        } else if(evt == FT6x06_EVT_PRESS || evt == FT6x06_EVT_CONTACT) {
             /* Accumulate the touch position in the filter */
             if(ft_accum_touch(t, tx, ty))
                 ft_start_report_or_scroll();
@@ -241,14 +232,14 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
     } break;
 
     case STATE_REPORT: {
-        if(evt == EVENT_RELEASE)
+        if(evt == FT6x06_EVT_RELEASE)
             ft_go_idle();
-        else if(evt == EVENT_PRESS || evt == EVENT_CONTACT)
+        else if(evt == FT6x06_EVT_PRESS || evt == FT6x06_EVT_CONTACT)
             ft_accum_touch(t, tx, ty);
     } break;
 
     case STATE_SCROLL_PRESS: {
-        if(evt == EVENT_RELEASE) {
+        if(evt == FT6x06_EVT_RELEASE) {
             /* This _should_ synthesize a button press.
              *
              * - ft_start_report() will set the button bit based on the
@@ -257,10 +248,10 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
              *
              * - The next button_read_device() will see the button bit
              *   and report it back to Rockbox, then step the FSM with
-             *   EVENT_NONE.
+             *   FT6x06_EVT_NONE.
              *
-             * - The EVENT_NONE stepping will eventually autogenerate a
-             *   RELEASE event and restore the button state back to 0
+             * - The FT6x06_EVT_NONE stepping will eventually autogenerate
+             *   a RELEASE event and restore the button state back to 0
              *
              * - There's a small logic hole in the REPORT state which
              *   could cause it to miss an immediately repeated PRESS
@@ -271,7 +262,7 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
             break;
         }
 
-        if(evt == EVENT_PRESS || evt == EVENT_CONTACT)
+        if(evt == FT6x06_EVT_PRESS || evt == FT6x06_EVT_CONTACT)
             ft_accum_touch(t, tx, ty);
 
         int dx = fsm.cur_x - fsm.orig_x;
@@ -289,21 +280,21 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
     } break;
 
     case STATE_SCROLLING: {
-        if(evt == EVENT_RELEASE) {
+        if(evt == FT6x06_EVT_RELEASE) {
             ft_go_idle();
             break;
         }
 
-        if(evt == EVENT_PRESS || evt == EVENT_CONTACT)
+        if(evt == FT6x06_EVT_PRESS || evt == FT6x06_EVT_CONTACT)
             ft_accum_touch(t, tx, ty);
 
         int dx = fsm.cur_x - fsm.orig_x;
         int dy = fsm.cur_y - fsm.orig_y;
         int dp = (dx*dx) + (dy*dy);
-        if(dp >= ftd.scroll_thresh_sqr) {
+        if(dp >= fsm.scroll_thresh_sqr) {
             /* avoid generating events if we're supposed to be inactive...
              * should not be necessary but better to be safe. */
-            if(ftd.active) {
+            if(fsm.active) {
                 if(dy < 0) {
                     queue_post(&button_queue, BUTTON_SCROLL_BACK, 0);
                 } else {
@@ -327,18 +318,8 @@ static void ft_step_state(uint32_t t, int evt, int tx, int ty)
     }
 }
 
-static void ft_i2c_callback(int status, i2c_descriptor* desc)
+static void ft_event_cb(int evt, int tx, int ty)
 {
-    (void)desc;
-    if(status != I2C_STATUS_OK)
-        return;
-
-    /* The panel is oriented such that its X axis is vertical,
-     * so swap the axes for reporting */
-    int evt = ftd.raw_data[1] >> 6;
-    int ty = ftd.raw_data[2] | ((ftd.raw_data[1] & 0xf) << 8);
-    int tx = ftd.raw_data[4] | ((ftd.raw_data[3] & 0xf) << 8);
-
     /* TODO: convert the touch positions to linear positions.
      *
      * Points reported by the touch controller are distorted and non-linear,
@@ -346,36 +327,11 @@ static void ft_i2c_callback(int status, i2c_descriptor* desc)
      * the middle of the touchpad than on the edges, so scrolling feels slow
      * in the middle and faster near the edge.
      */
-
     ft_step_state(__ost_read32(), evt, tx, ty);
-}
-
-/* ft6x06 interrupt pin */
-void GPIOB12(void)
-{
-    /* We don't care if this fails */
-    i2c_async_queue(FT6x06_BUS, TIMEOUT_NOBLOCK, I2C_Q_ONCE,
-                    ftd.i2c_cookie, &ftd.i2c_desc);
 }
 
 static void ft_init(void)
 {
-    /* Initialize the driver state */
-    ftd.i2c_cookie = i2c_async_reserve_cookies(FT6x06_BUS, 1);
-    ftd.i2c_desc.slave_addr = FT6x06_ADDR;
-    ftd.i2c_desc.bus_cond   = I2C_START | I2C_STOP;
-    ftd.i2c_desc.tran_mode  = I2C_READ;
-    ftd.i2c_desc.buffer[0]  = &ftd.raw_data[5];
-    ftd.i2c_desc.count[0]   = 1;
-    ftd.i2c_desc.buffer[1]  = &ftd.raw_data[0];
-    ftd.i2c_desc.count[1]   = 5;
-    ftd.i2c_desc.callback   = ft_i2c_callback;
-    ftd.i2c_desc.arg        = 0;
-    ftd.i2c_desc.next       = NULL;
-    ftd.raw_data[5] = 0x02;
-    ftd.active = true;
-    touchpad_set_sensitivity(DEFAULT_TOUCHPAD_SENSITIVITY_SETTING);
-
     /* Initialize the state machine */
     fsm.buttons = 0;
     fsm.state = STATE_IDLE;
@@ -385,9 +341,15 @@ static void ft_init(void)
     fsm.sum_x = fsm.sum_y = 0;
     fsm.orig_x = fsm.orig_y = 0;
     fsm.cur_x = fsm.cur_y = 0;
+    fsm.active = true;
+    touchpad_set_sensitivity(DEFAULT_TOUCHPAD_SENSITIVITY_SETTING);
 
     /* Bring up I2C bus */
     i2c_x1000_set_freq(FT6x06_BUS, I2C_FREQ_400K);
+
+    /* Driver init */
+    ft6x06_init();
+    ft6x06_set_event_cb(ft_event_cb);
 
     /* Reset chip */
     gpio_set_level(GPIO_FT6x06_RESET, 0);
@@ -395,6 +357,8 @@ static void ft_init(void)
     gpio_set_level(GPIO_FT6x06_RESET, 1);
 
     /* Configure the interrupt pin */
+    system_set_irq_handler(GPIO_TO_IRQ(GPIO_FT6x06_INTERRUPT),
+                           ft6x06_irq_handler);
     gpio_set_function(GPIO_FT6x06_INTERRUPT, GPIOF_IRQ_EDGE(0));
     gpio_enable_irq(GPIO_FT6x06_INTERRUPT);
 }
@@ -403,13 +367,13 @@ void touchpad_set_sensitivity(int level)
 {
     int pixels = 40;
     pixels -= level;
-    ftd.scroll_thresh_sqr = pixels * pixels;
+    fsm.scroll_thresh_sqr = pixels * pixels;
 }
 
 void touchpad_enable_device(bool en)
 {
-    i2c_reg_write1(FT6x06_BUS, FT6x06_ADDR, 0xa5, en ? 0 : 3);
-    ftd.active = en;
+    ft6x06_enable(en);
+    fsm.active = en;
 }
 
 /* Value of headphone detect register */
@@ -467,7 +431,7 @@ void button_init_device(void)
 int button_read_device(void)
 {
     int r = fsm.buttons;
-    ft_step_state(__ost_read32(), EVENT_NONE, 0, 0);
+    ft_step_state(__ost_read32(), FT6x06_EVT_NONE, 0, 0);
 
     /* Read GPIOs for physical buttons */
     uint32_t a = REG_GPIO_PIN(GPIO_A);

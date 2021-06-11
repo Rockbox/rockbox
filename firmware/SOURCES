@@ -1928,12 +1928,17 @@ target/hosted/sdl/filesystem-sdl.c
 drivers/touchpad.c
 #endif
 
+/* Hardware drivers */
+#ifndef SIMULATOR
 #ifdef HAVE_I2C_ASYNC
 drivers/i2c-async.c
 #endif
-
 #ifdef HAVE_AXP_PMU
 drivers/axp-pmu.c
+#endif
+#ifdef HAVE_FT6x06
+drivers/ft6x06.c
+#endif
 #endif
 
 /* firmware/kernel section */

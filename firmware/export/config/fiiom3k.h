@@ -22,6 +22,8 @@
 
 /* Drivers */
 #define HAVE_I2C_ASYNC
+#define HAVE_FT6x06
+#define FT6x06_SWAP_AXES
 
 /* Buffer for plugins and codecs. */
 #define PLUGIN_BUFFER_SIZE  0x200000 /* 2 MiB */
