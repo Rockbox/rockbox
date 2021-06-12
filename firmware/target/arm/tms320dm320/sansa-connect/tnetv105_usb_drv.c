@@ -393,12 +393,18 @@ static void tnetv_init_endpoints(void)
         epCfg.val = tnetv_usb_reg_read(TNETV_USB_EPx_CFG(epn));
         epStartAddr.val = tnetv_usb_reg_read(TNETV_USB_EPx_ADR(epn));
 
-        epCfg.f.in_dbl_buf = 1;
+        /* Linux kernel enables dbl buf for both IN and OUT.
+         * For IN this is problematic when tnetv_cppi_send() is called
+         * to send single ZLP, it will actually send two ZLPs.
+         * Disable the dbl buf here as datasheet is not available and
+         * this results in working mass storage on Windows 10.
+         */
+        epCfg.f.in_dbl_buf = 0;
         epCfg.f.in_toggle_rst = 1;
         epCfg.f.in_ack_int = 0;
         epCfg.f.in_stall = 0;
         epCfg.f.in_nak_int = 0;
-        epCfg.f.out_dbl_buf = 1;
+        epCfg.f.out_dbl_buf = 0;
         epCfg.f.out_toggle_rst = 1;
         epCfg.f.out_ack_int = 0;
         epCfg.f.out_stall = 0;
