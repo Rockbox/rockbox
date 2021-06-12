@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3595f326_a6bfd19b",
+        "filename": "apps/action.c",
+        "patchSetId": 10
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-12T19:50:12Z",
+      "side": 1,
+      "message": "please change this to action \u003d ACTION_NONE.\n\nThis function returns \u0027action\u0027 and the return value is checked by do_softlock. Then do_softlock will set cur-\u003eaction before it returns.",
+      "revId": "9214cd7b47f2300be71dd5b10322fca729c507c9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
