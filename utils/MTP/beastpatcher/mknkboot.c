@@ -42,6 +42,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include "md5.h"
 #if defined(_MSC_VER)
 #include "pstdint.h"
 #else
@@ -99,6 +100,21 @@ mknkboot.c appends two images:
 #define DISABLE_INSN    0xe3a00001
 #define DISABLE_SUM     (0xe3+0xa0+0x00+0x01)  
 
+// firmware table struct
+struct firmentry
+{
+    int version;
+    uint8_t sum[16];
+};
+
+// firmware table
+static const struct firmentry firmtable[] =
+{
+    {0x0102, "\xdc\xd8\xe9\x04\x2c\x4d\x14\x84\x85\xbe\xef\x9c\xa5\xe6\x7b\x90"},
+    {0x0103, "\x19\x9f\x97\x5b\x5e\xef\x66\xf8\x91\x2c\x34\xf2\x11\x4c\xb1\xb4"},
+    {},
+};
+
 /* Code to dual-boot - this is inserted at NK_ENTRY_POINT */
 static uint32_t dualboot[] = 
 {
@@ -118,7 +134,6 @@ static uint32_t dualboot[] =
     0x53fa4000,      /* GPIO3_DR */
     BL_ENTRY_POINT   /* RB bootloader load address/entry point */
 };
-
 
 static void put_uint32le(uint32_t x, unsigned char* p)
 {
@@ -141,6 +156,29 @@ static off_t filesize(int fd) {
 }
 #endif
 
+int verifyfirm(const struct filebuf* firmdata)
+{
+    for(int i = 0; firmtable[i].version; i++)
+    {
+        md5_context ctx;
+	uint8_t sum[16];
+
+	md5_starts(&ctx);
+	md5_update(&ctx, firmdata->buf, firmdata->len);
+	md5_finish(&ctx, sum);
+
+	if(memcmp(firmtable[i].sum, sum, 16) == 0)
+        {
+            fprintf(stderr, "[INFO]  Firmware file version %d.%d\n",
+                    firmtable[i].version >> 8, firmtable[i].version & 0xff);
+            return firmtable[i].version;
+        }
+    }
+
+    fprintf(stderr, "[ERR]  Unknown firmware file!\n");
+
+    return -1;
+}
 
 int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
              struct filebuf *outdata)
@@ -158,7 +196,7 @@ int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
 
     if (outdata->buf==NULL)
     {
-        printf("[ERR]  Could not allocate memory, aborting\n");
+        fprintf(stderr, "[ERR]  Could not allocate memory, aborting\n");
         return -1;
     }
 
@@ -220,7 +258,7 @@ int mknkboot(const struct filebuf *indata, const struct filebuf *bootdata,
 #if !defined(BEASTPATCHER)
 static void usage(void)
 {
-    printf("Usage: mknkboot <firmware file> <boot file> <output file>\n");
+    fprintf(stderr, "Usage: mknkboot <firmware file> <boot file> <output file>\n");
 
     exit(1);
 }
@@ -264,25 +302,30 @@ int main(int argc, char* argv[])
     bootdata.buf = (unsigned char*)malloc(bootdata.len);
     if(indata.buf == NULL || bootdata.buf == NULL)
     {
-        printf("[ERR]  Could not allocate memory, aborting\n");
+        fprintf(stderr, "[ERR]  Could not allocate memory, aborting\n");
         result = 4;
         goto quit;
     }
     n = read(fdin, indata.buf, indata.len);
     if (n != indata.len)
     {
-        printf("[ERR]  Could not read from %s\n",infile);
+        fprintf(stderr, "[ERR]  Could not read from %s\n",infile);
         result = 5;
         goto quit;
     }
     n = read(fdboot, bootdata.buf, bootdata.len);
     if (n != bootdata.len)
     {
-        printf("[ERR]  Could not read from %s\n",bootfile);
+        fprintf(stderr, "[ERR]  Could not read from %s\n",bootfile);
         result = 6;
         goto quit;
     }
 
+    if (verifyfirm(&indata) < 0)
+    {
+        result = 7;
+        goto quit;
+    }
     result = mknkboot(&indata, &bootdata, &outdata);
     if(result != 0)
     {
@@ -292,15 +335,15 @@ int main(int argc, char* argv[])
     if (fdout < 0)
     {
         perror(outfile);
-        result = 7;
+        result = 8;
         goto quit;
     }
 
     n = write(fdout, outdata.buf, outdata.len);
     if (n != outdata.len)
     {
-        printf("[ERR] Could not write output file %s\n",outfile);
-        result = 8;
+        fprintf(stderr, "[ERR] Could not write output file %s\n",outfile);
+        result = 9;
         goto quit;
     }
 

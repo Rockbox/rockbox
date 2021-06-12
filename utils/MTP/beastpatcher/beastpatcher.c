@@ -213,7 +213,7 @@ int beastpatcher(const char* bootfile, const char* firmfile, int interactive)
     {
         if(firmfile) {
             /* if a firmware file is given create a dualboot image. */
-            if(mknkboot(&firmware, &bootloader, &fw))
+            if(verifyfirm(&firmware) < 0 || mknkboot(&firmware, &bootloader, &fw))
             {
                 fprintf(stderr,"[ERR]  Creating dualboot firmware failed.\n");
                 return 1;
