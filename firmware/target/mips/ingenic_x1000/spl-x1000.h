@@ -22,21 +22,13 @@
 #ifndef __SPL_X1000_H__
 #define __SPL_X1000_H__
 
-#include <stdint.h>
-
-struct spl_boot_option {
-    uint32_t nand_addr;
-    uint32_t nand_size;
-    uint32_t load_addr;
-    uint32_t exec_addr;
-    const char* cmdline; /* for Linux */
-};
-
-/* Defined by target, order is not important */
-extern const struct spl_boot_option spl_boot_options[];
+/* TODO: this needs some refactoring... */
 
 /* Called on a fatal error */
 extern void spl_error(void) __attribute__((noreturn));
+
+/* Called by SPL to handle a main boot */
+extern void spl_target_boot(void);
 
 /* Invoked by SPL main routine to determine the boot option */
 extern int spl_get_boot_option(void);

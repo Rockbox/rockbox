@@ -21,14 +21,12 @@
 
 #include "spl-x1000.h"
 #include "clk-x1000.h"
-#include "nand-x1000.h"
 #include "system.h"
 #include "x1000/cpm.h"
 #include "x1000/ost.h"
 #include "x1000/ddrc.h"
 #include "x1000/ddrc_apb.h"
 #include "x1000/ddrphy.h"
-#include "ucl_decompress.h"
 
 #ifdef FIIO_M3K
 # define SPL_DDR_MEMORYSIZE  64
@@ -224,29 +222,6 @@ static void init(void)
     ddr_init();
 }
 
-static int nandread(uint32_t addr, uint32_t size, void* buffer)
-{
-    int rc;
-    int mf_id, dev_id;
-
-    if((rc = nand_open()))
-        return rc;
-    if((rc = nand_identify(&mf_id, &dev_id))) {
-        nand_close();
-        return rc;
-    }
-
-    rc = nand_read(addr, size, (uint8_t*)buffer);
-    nand_close();
-    return rc;
-}
-
-/* Entry point function type, defined to be Linux compatible. */
-typedef void(*entry_fn)(int, char**, int, int);
-
-/* Kernel command line arguments */
-static char* argv[2];
-
 /* This variable is defined by the maskrom. It's simply the level of the
  * boot_sel[2:0] pins (GPIOs B28-30) at boot time. Meaning of the bits:
  *
@@ -264,10 +239,6 @@ extern const uint32_t boot_sel;
 
 void spl_main(void)
 {
-    int opt_index;
-    uint8_t* load_addr;
-    const struct spl_boot_option* opt;
-
     /* Basic hardware init */
     init();
 
@@ -276,35 +247,6 @@ void spl_main(void)
     if((boot_sel & 3) == 2)
         return;
 
-    /* Get the boot option */
-    opt_index = spl_get_boot_option();
-    opt = &spl_boot_options[opt_index];
-    load_addr = (uint8_t*)opt->load_addr;
-
-    /* Set up hardware, load stuff from flash */
-    spl_handle_pre_boot(opt_index);
-    if(nandread(opt->nand_addr, opt->nand_size, load_addr))
-        spl_error();
-
-    if(!opt->cmdline) {
-        /* No command line => we are booting Rockbox, decompress bootloader.
-         * In the case of Rockbox, load binary directly to exec address */
-        uint32_t out_size = X1000_DRAM_END - opt->exec_addr;
-        int rc = ucl_unpack(load_addr, opt->nand_size,
-                            (uint8_t*)opt->exec_addr, &out_size);
-        if(rc != UCL_E_OK)
-            spl_error();
-    }
-
-    /* Reading the Linux command line from the bootloader is handled by
-     * arch/mips/xburst/core/prom.c -- see Ingenic kernel sources. It's
-     * simply an (int argc, char* argv[]) thing.
-     */
-    entry_fn entry = (entry_fn)opt->exec_addr;
-    argv[0] = 0;
-    argv[1] = (char*)opt->cmdline;
-
-    commit_discard_idcache();
-    entry(2, argv, 0, 0);
-    __builtin_unreachable();
+    /* Just pass control to the target... */
+    spl_target_boot();
 }
