@@ -7,7 +7,7 @@
 *                     \/            \/     \/    \/            \/
 * $Id: $
 *
-* Copyright (C) 2011 by Tomasz Moń
+* Copyright (C) 2011-2021 by Tomasz Moń
 *
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License
@@ -61,6 +61,7 @@
 #define CMD_WHEEL_EN    0xD0
 #define CMD_SET_INTCHRG 0xD1
 #define CMD_CODEC_RESET 0xD7
+#define CMD_AMP_ENABLE  0xCA
 #define CMD_FILL        0xFF
 
 #define CMD_SYS_CTRL 0xDA
@@ -74,9 +75,9 @@ static struct mutex avr_mtx;
 static int btn = 0;
 static bool hold_switch;
 #ifndef BOOTLOADER
-static long btn_stack[DEFAULT_STACK_SIZE/sizeof(long)];
-static const char btn_thread_name[] = "buttons";
-static struct event_queue btn_queue;
+static long avr_stack[DEFAULT_STACK_SIZE/sizeof(long)];
+static const char avr_thread_name[] = "avr";
+static struct semaphore avr_thread_trigger;
 #endif
 
 static int current_battery_level = 100;
@@ -365,6 +366,13 @@ void avr_hid_reset_codec(void)
     spi_txrx(codec_reset, NULL, sizeof(codec_reset));
 }
 
+void avr_hid_set_amp_enable(unsigned char enable)
+{
+    unsigned char amp_enable[4] = {CMD_SYNC, CMD_AMP_ENABLE, enable, CMD_CLOSE};
+
+    spi_txrx(amp_enable, NULL, sizeof(amp_enable));
+}
+
 void avr_hid_power_off(void)
 {
     unsigned char prg[4] = {CMD_SYNC, CMD_SYS_CTRL, SYS_CTRL_POWEROFF, CMD_CLOSE};
@@ -373,36 +381,54 @@ void avr_hid_power_off(void)
 }
 
 #ifndef BOOTLOADER
-void btn_thread(void)
+static bool avr_state_changed(void)
 {
-    struct queue_event ev;
+    return (IO_GIO_BITSET0 & 0x1) ? false : true;
+}
+
+static bool headphones_inserted(void)
+{
+    return (IO_GIO_BITSET0 & 0x04) ? false : true;
+}
+
+static void set_audio_output(bool headphones)
+{
+    if (headphones)
+    {
+        /* Stereo output on headphones */
+        avr_hid_set_amp_enable(0);
+        aic3x_switch_output(true);
+    }
+    else
+    {
+        /* Mono output on built-in speaker */
+        aic3x_switch_output(false);
+        avr_hid_set_amp_enable(1);
+    }
+}
+
+void avr_thread(void)
+{
+    bool headphones_active_state = headphones_inserted();
+    bool headphones_state;
+
+    set_audio_output(headphones_active_state);
 
     while (1)
     {
-        queue_wait(&btn_queue, &ev);
+        semaphore_wait(&avr_thread_trigger, TIMEOUT_BLOCK);
 
-        if (ev.id == SYS_USB_CONNECTED)
+        if (avr_state_changed())
         {
-            /* Allow USB to gain exclusive storage access */
-            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            /* Read buttons state */
+            avr_hid_get_state();
         }
 
-        /* Ignore all messages except BTN_INTERRUPT */
-        if (ev.id != BTN_INTERRUPT)
-            continue;
-
-        /* Enable back button interrupt */
-        IO_INTC_EINT1 |= INTR_EINT1_EXT0;
-
-        /* Read buttons state */
-        avr_hid_get_state();
-
-        yield();
-
-        if (queue_empty(&btn_queue) && ((IO_GIO_BITSET0 & 0x1) == 0))
+        headphones_state = headphones_inserted();
+        if (headphones_state != headphones_active_state)
         {
-            /* for some reason we have lost next interrupt */
-            queue_post(&btn_queue, BTN_INTERRUPT, 0);
+            set_audio_output(headphones_state);
+            headphones_active_state = headphones_state;
         }
     }
 }
@@ -412,39 +438,17 @@ void GIO0(void)
 {
     /* Clear interrupt */
     IO_INTC_IRQ1 = (1 << 5);
-    /* Disable interrupt */
-    IO_INTC_EINT1 &= ~INTR_EINT1_EXT0;
 
-    /* interrupt will be enabled back after button read */
-    queue_post(&btn_queue, BTN_INTERRUPT, 0);
-}
-
-static int headphones_inserted_callback(struct timeout *tmo)
-{
-    (void)tmo;
-
-    if (IO_GIO_BITSET0 & 0x04)
-    {
-        aic3x_switch_output(false);
-    }
-    else
-    {
-        aic3x_switch_output(true);
-    }
-
-    return 0;
+    semaphore_release(&avr_thread_trigger);
 }
 
 void GIO2(void) __attribute__ ((section(".icode")));
 void GIO2(void)
 {
-    static struct timeout headphones_oneshot;
-
     /* Clear interrupt */
     IO_INTC_IRQ1 = (1 << 7);
 
-    timeout_register(&headphones_oneshot, headphones_inserted_callback,
-                     HZ/2, 0);
+    semaphore_release(&avr_thread_trigger);
 }
 #endif
 
@@ -453,9 +457,9 @@ void button_init_device(void)
     btn = 0;
     hold_switch = false;
 #ifndef BOOTLOADER
-    queue_init(&btn_queue, true);
-    create_thread(btn_thread, btn_stack, sizeof(btn_stack), 0,
-                  btn_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
+    semaphore_init(&avr_thread_trigger, 1, 1);
+    create_thread(avr_thread, avr_stack, sizeof(avr_stack), 0,
+                  avr_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
 #endif
     IO_GIO_DIR0 |= 0x01; /* Set GIO0 as input */

@@ -305,8 +305,8 @@ void aic3x_switch_output(bool stereo)
 {
     if (stereo)
     {
-        /* mute MONO_LOP/M */
-        aic3x_change_reg(AIC3X_MONO_LOP_M_LVL, 0x00, 0xF6);
+        /* MONO_LOP/M not fully powered up */
+        aic3x_change_reg(AIC3X_MONO_LOP_M_LVL, 0x00, 0xFE);
         /* HPLOUT fully powered up */
         aic3x_change_reg(AIC3X_HPLOUT_LVL, 0x01, 0xFF);
         /* HPROUT fully powered up */
@@ -316,8 +316,8 @@ void aic3x_switch_output(bool stereo)
     }
     else
     {
-        /* MONO_LOP/M not muted */
-        aic3x_change_reg(AIC3X_MONO_LOP_M_LVL, 0x09, 0xFF);
+        /* MONO_LOP/M fully powered up */
+        aic3x_change_reg(AIC3X_MONO_LOP_M_LVL, 0x01, 0xFF);
         /* HPLOUT not fully powered up */
         aic3x_change_reg(AIC3X_HPLOUT_LVL, 0x00, 0xFE);
         /* HPROUT not fully powered up */
