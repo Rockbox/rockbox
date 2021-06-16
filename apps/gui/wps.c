@@ -190,8 +190,10 @@ static int skintouch_to_wps(struct wps_data *data)
         {
             const int min_vol = sound_min(SOUND_VOLUME);
             const int max_vol = sound_max(SOUND_VOLUME);
+            const int step_vol = sound_steps(SOUND_VOLUME);
             global_settings.volume = (offset * (max_vol - min_vol)) / 100;
             global_settings.volume += min_vol;
+            global_settings.volume -= (global_settings.volume % step_vol);
             setvol();
         }
         return ACTION_TOUCHSCREEN;
