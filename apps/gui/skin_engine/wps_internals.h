@@ -201,6 +201,8 @@ struct touchregion {
     short int y;             /* y-pos */
     short int width;         /* width */
     short int height;        /* height */
+    short int wpad;          /* padding to width */
+    short int hpad;          /* padding to height */
     bool reverse_bar;        /* if true 0% is the left or top */
     bool allow_while_locked;
     enum {

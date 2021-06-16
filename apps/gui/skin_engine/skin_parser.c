@@ -1148,7 +1148,6 @@ static int parse_progressbar_tag(struct skin_element* element,
     {
         struct touchregion *region = skin_buffer_alloc(sizeof(*region));
         struct skin_token_list *item;
-        int wpad, hpad;
 
         if (!region)
             return 0;
@@ -1163,24 +1162,24 @@ static int parse_progressbar_tag(struct skin_element* element,
         /* try to add some extra space on either end to make pressing the
          * full bar easier. ~5% on either side
          */
-        wpad = pb->width * 5 / 100;
-        if (wpad > 10)
-            wpad = 10;
-        hpad = pb->height * 5 / 100;
-        if (hpad > 10)
-            hpad = 10;
+        region->wpad = pb->width * 5 / 100;
+        if (region->wpad > 10)
+            region->wpad = 10;
+        region->hpad = pb->height * 5 / 100;
+        if (region->hpad > 10)
+            region->hpad = 10;
 
-        region->x = pb->x - wpad;
+        region->x = pb->x;
         if (region->x < 0)
             region->x = 0;
-        region->width = pb->width + 2 * wpad;
+        region->width = pb->width;
         if (region->x + region->width > curr_vp->vp.x + curr_vp->vp.width)
             region->width = curr_vp->vp.x + curr_vp->vp.width - region->x;
 
-        region->y = pb->y - hpad;
+        region->y = pb->y;
         if (region->y < 0)
             region->y = 0;
-        region->height = pb->height + 2 * hpad;
+        region->height = pb->height;
         if (region->y + region->height > curr_vp->vp.y + curr_vp->vp.height)
             region->height = curr_vp->vp.y + curr_vp->vp.height - region->y;
 
@@ -1540,6 +1539,10 @@ static int parse_touchregion(struct skin_element *element,
 
     /* should probably do some bounds checking here with the viewport... but later */
     region->action = ACTION_NONE;
+
+    /* padding is only for bars, user defined regions have no need of it */
+    region->wpad = 0;
+    region->hpad = 0;
 
     if (get_param(element, 0)->type == STRING)
     {

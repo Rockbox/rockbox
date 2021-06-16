@@ -92,6 +92,18 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
              * are relative to a preceding viewport */
             vx = x - wvp->vp.x;
             vy = y - wvp->vp.y;
+
+            /* project touches in the padding region so they clamp to the
+             * edge of the region instead */
+            if(r->x - r->wpad <= vx && vx < r->x)
+                vx = r->x;
+            else if(r->x + r->width <= vx && vx < r->x + r->width + r->wpad)
+                vx = r->x + r->width - 1;
+            if(r->y - r->hpad <= vy && vy < r->y)
+                vy = r->y;
+            else if(r->y + r->height <= vy && vy < r->y + r->height + r->hpad)
+                vy = r->y + r->height - 1;
+
             /* now see if the point is inside this region */
             if (vx >= r->x && vx < r->x+r->width &&
                 vy >= r->y && vy < r->y+r->height)
