@@ -1154,6 +1154,8 @@ static void doExponent(double* operandOne, int* powerOne,
     if (*operandOne < 0)
     {
 #if MEMORYSIZE < 8
+        (void)negativeBuffer;
+        (void)lastDigit;
         calStatus=cal_error;
         return;
 #else
@@ -1903,9 +1905,6 @@ static void sciButtonsProcess(void){
                 case sci_xy:
                     if(!operInputted) {twoOperands(); operInputted = true;}
                     oper = '^';
-#ifdef CALCULATOR_OPERATORS
-                    case_cycle_operators:  /* F2 shortkey entrance */
-#endif
                     if (calStatus == cal_typing ||
                         calStatus == cal_dotted)
                             calStatus = cal_normal;
