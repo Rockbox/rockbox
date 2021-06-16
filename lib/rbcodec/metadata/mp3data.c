@@ -260,26 +260,29 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
                  * seek to this byte position and check if there is another
                  * valid MPEG frame header of the same type. */
                 struct mp3info info;
-                
+
                 /* Gather frame size from given header and seek to next
                  * frame header. */
-                mp3headerinfo(&info, header);
+                if (!mp3headerinfo(&info, header)) continue;
                 lseek(fd, info.frame_size-4, SEEK_CUR);
-                
+
                 /* Read possible next frame header and seek back to last frame
                  * headers byte position. */
                 reference_header = 0;
                 read_uint32be_mp3data(fd, &reference_header);
-                //
-                lseek(fd, -info.frame_size, SEEK_CUR);
-                
-                /* If the current header is of the same type as the previous 
-                 * header we are finished. */
-                if (headers_have_same_type(header, reference_header))
+
+                /* If the current header is of the same type as the previous
+                 * header we are finished.  Rewind to frame data start. */
+                if (headers_have_same_type(header, reference_header)) {
+                    lseek(fd, -info.frame_size, SEEK_CUR);
                     break;
+                }
+                /* Otherwise keep going. Rewind to to start of "next" frame. */
+                lseek(fd, -4, SEEK_CUR);
+                pos += info.frame_size - 4;
             }
         }
-  
+
     } while (true);
 
     *offset = pos - 4;
@@ -511,8 +514,8 @@ static int get_next_header_info(int fd, long *bytecount, struct mp3info *info,
 {
     long tmp;
     unsigned long header = 0;
-    
-    header = __find_next_frame(fd, &tmp, 0x20000, 0, fileread, single_header);
+
+    header = __find_next_frame(fd, &tmp, 0x100000, 0, fileread, single_header);
     if(header == 0)
         return -1;
 
