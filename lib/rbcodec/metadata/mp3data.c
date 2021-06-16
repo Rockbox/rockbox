@@ -212,18 +212,27 @@ static bool headers_have_same_type(unsigned long header1,
     return header1 ? (header1 == header2) : true;
 }
 
+/* Helper function to read 4-byte in big endian format. */
+static void read_uint32be_mp3data(int fd, unsigned long *data)
+{
+#ifdef ROCKBOX_BIG_ENDIAN
+    (void)read(fd, (char*)data, 4);
+#else
+    (void)read(fd, (char*)data, 4);
+    *data = betoh32(*data);
+#endif
+}
+
 static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
                                        unsigned long reference_header,
                                        int(*getfunc)(int fd, unsigned char *c),
                                        bool single_header)
 {
-    uint32_t header=0;
-    uint32_t ref_header=0;
-    long     ref_header_pos=0;
+    unsigned long header=0;
     unsigned char tmp;
     long pos      = 0;
 
-    /* We will search until we find two consecutive MPEG frame headers with
+    /* We will search until we find two consecutive MPEG frame headers with 
      * the same MPEG version, layer and sampling frequency. The first header
      * of this pair is assumed to be the first valid MPEG frame header of the
      * whole stream. */
@@ -234,33 +243,43 @@ static unsigned long __find_next_frame(int fd, long *offset, long max_offset,
             return 0;
         header |= tmp;
         pos++;
-
+        
         /* Abort if max_offset is reached. Stop parsing. */
         if (max_offset > 0 && pos > max_offset)
             return 0;
-
+        
         if (is_mp3frameheader(header)) {
             if (single_header) {
                 /* We search for one _single_ valid header that has the same
-                 * type as the reference_header (if reference_header != 0).
+                 * type as the reference_header (if reference_header != 0). 
                  * In this case we are finished. */
                 if (headers_have_same_type(reference_header, header))
                     break;
             } else {
-                /* The current header is valid. Compare it against the last
-                   one we found. NOTE: ref_header MUST come second! */
-                if (headers_have_same_type(header, ref_header)) {
-                    /* Found a match, return the header and offset of the FIRST */
-                    header = ref_header;
-                    lseek(fd, ref_header_pos, SEEK_SET);
+                /* The current header is valid. Now gather the frame size,
+                 * seek to this byte position and check if there is another
+                 * valid MPEG frame header of the same type. */
+                struct mp3info info;
+                
+                /* Gather frame size from given header and seek to next
+                 * frame header. */
+                mp3headerinfo(&info, header);
+                lseek(fd, info.frame_size-4, SEEK_CUR);
+                
+                /* Read possible next frame header and seek back to last frame
+                 * headers byte position. */
+                reference_header = 0;
+                read_uint32be_mp3data(fd, &reference_header);
+                //
+                lseek(fd, -info.frame_size, SEEK_CUR);
+                
+                /* If the current header is of the same type as the previous 
+                 * header we are finished. */
+                if (headers_have_same_type(header, reference_header))
                     break;
-                }
-                /* Otherwise look for another.. */
-                ref_header = header;
-                ref_header_pos = lseek(fd, 0, SEEK_CUR);
             }
         }
-
+  
     } while (true);
 
     *offset = pos - 4;
