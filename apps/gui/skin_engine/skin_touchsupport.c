@@ -109,12 +109,21 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                         {
                             struct progressbar *bar =
                                     SKINOFFSETTOPTR(skin_buffer, r->bar);
-                            if(r->width > r->height)
-                                *edge_offset = vx*100/r->width;
-                            else /* vertical bars are bottom-up by default */
-                                *edge_offset = 100 - vy*100/r->height;
+                            if(r->width > r->height) {
+                                if(r->width > 1)
+                                    *edge_offset = vx*1000/(r->width - 1);
+                                else
+                                    *edge_offset = 0;
+                            } else {
+                                /* vertical bars are bottom-up by default */
+                                if(r->height > 1)
+                                    *edge_offset = 1000 - vy*1000/(r->height - 1);
+                                else
+                                    *edge_offset = 0;
+                            }
+
                             if (r->reverse_bar || (bar && bar->invert_fill_direction))
-                                *edge_offset = 100 - *edge_offset;
+                                *edge_offset = 1000 - *edge_offset;
                         }
                         temp = r;
                         returncode = r->action;
@@ -294,7 +303,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset,
                 {                    
                     int val, count;
                     get_setting_info_for_bar(bar->setting_id, &count, &val);
-                    val = *edge_offset * count / 100;
+                    val = *edge_offset * count / 1000;
                     update_setting_value_from_touch(bar->setting_id, val);
                 }
             }

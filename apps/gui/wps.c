@@ -182,7 +182,7 @@ static int skintouch_to_wps(struct wps_data *data)
             return ACTION_WPS_HOTKEY;
 #endif
         case ACTION_TOUCH_SCROLLBAR:
-            skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/100;
+            skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/1000;
             audio_pre_ff_rewind();
             audio_ff_rewind(skin_get_global_state()->id3->elapsed);
             return ACTION_TOUCHSCREEN;
@@ -191,7 +191,7 @@ static int skintouch_to_wps(struct wps_data *data)
             const int min_vol = sound_min(SOUND_VOLUME);
             const int max_vol = sound_max(SOUND_VOLUME);
             const int step_vol = sound_steps(SOUND_VOLUME);
-            global_settings.volume = (offset * (max_vol - min_vol)) / 100;
+            global_settings.volume = (offset * (max_vol - min_vol)) / 1000;
             global_settings.volume += min_vol;
             global_settings.volume -= (global_settings.volume % step_vol);
             setvol();
