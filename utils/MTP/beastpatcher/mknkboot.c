@@ -158,16 +158,16 @@ static off_t filesize(int fd) {
 
 int verifyfirm(const struct filebuf* firmdata)
 {
+    md5_context ctx;
+    uint8_t sum[16];
+
+    md5_starts(&ctx);
+    md5_update(&ctx, firmdata->buf, firmdata->len);
+    md5_finish(&ctx, sum);
+
     for(int i = 0; firmtable[i].version; i++)
     {
-        md5_context ctx;
-	uint8_t sum[16];
-
-	md5_starts(&ctx);
-	md5_update(&ctx, firmdata->buf, firmdata->len);
-	md5_finish(&ctx, sum);
-
-	if(memcmp(firmtable[i].sum, sum, 16) == 0)
+        if(memcmp(firmtable[i].sum, sum, 16) == 0)
         {
             fprintf(stderr, "[INFO]  Firmware file version %d.%d\n",
                     firmtable[i].version >> 8, firmtable[i].version & 0xff);
