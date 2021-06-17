@@ -333,15 +333,25 @@ fullzip:
 7zip:
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o "rockbox.7z" -z "7za a -mx=9" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
 
-tar:
+ifdef NODEPS
+$(BUILDDIR)/rockbox.tar:
+else
+$(BUILDDIR)/rockbox.tar: build
+endif
 	$(SILENT)rm -f rockbox.tar
+	$(call PRINTS,TAR $(notdir $@))
 	$(SILENT)$(TOOLSDIR)/buildzip.pl $(VERBOSEOPT) --app=$(APPLICATION) -m \"$(MODELNAME)\" -i \"$(TARGET_ID)\"  -o "rockbox.tar" -z "tar -cf" -r "$(ROOTDIR)" --rbdir="$(RBDIR)" $(TARGET) $(BINARY)
+
+tar: $(BUILDDIR)/rockbox.tar
 
 bzip2: tar
 	$(SILENT)bzip2 -f9 rockbox.tar
 
 gzip: tar
 	$(SILENT)gzip -f9 rockbox.tar
+
+xz: tar
+	$(SILENT)xz -f rockbox.tar
 
 manual manual-pdf:
 	$(SILENT)$(MAKE) -C $(MANUALDIR) OBJDIR=$(BUILDDIR)/manual manual-pdf
@@ -403,6 +413,7 @@ help:
 	@echo "zip            - creates a rockbox.zip of your build (no fonts)"
 	@echo "gzip           - creates a rockbox.tar.gz of your build (no fonts)"
 	@echo "bzip2          - creates a rockbox.tar.bz2 of your build (no fonts)"
+	@echo "xz             - creates a rockbox.tar.xz of your build (no fonts)"
 	@echo "7zip           - creates a rockbox.7z of your build (no fonts)"
 	@echo "fontzip        - creates rockbox-fonts.zip"
 	@echo "mapzip         - creates rockbox-maps.zip with all .map files"
