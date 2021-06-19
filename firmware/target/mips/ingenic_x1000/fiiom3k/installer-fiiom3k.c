@@ -32,75 +32,45 @@
 #define IMAGE_SIZE  (128 * 1024)
 #define TAR_SIZE    (256 * 1024)
 
-static int flash_prepare(void)
-{
-    int mf_id, dev_id;
-    int rc;
-
-    rc = nand_open();
-    if(rc < 0)
-        return INSTALL_ERR_FLASH(NAND_OPEN, rc);
-
-    rc = nand_identify(&mf_id, &dev_id);
-    if(rc < 0) {
-        nand_close();
-        return INSTALL_ERR_FLASH(NAND_IDENTIFY, rc);
-    }
-
-    return INSTALL_SUCCESS;
-}
-
-static void flash_finish(void)
-{
-    /* Ensure writes are always disabled when we finish.
-     * Errors are safe to ignore here, there's nothing we could do anyway. */
-    nand_enable_writes(false);
-    nand_close();
-}
-
 static int flash_img_read(uint8_t* buffer)
 {
-    int rc = flash_prepare();
+    nand_drv* drv = nand_init();
+    nand_lock(drv);
+
+    int rc = nand_open(drv);
     if(rc < 0)
         goto error;
 
-    rc = nand_read(0, IMAGE_SIZE, buffer);
+    rc = nand_read_bytes(drv, 0, IMAGE_SIZE, buffer);
     if(rc < 0) {
         rc = INSTALL_ERR_FLASH(NAND_READ, rc);
         goto error;
     }
 
   error:
-    flash_finish();
+    nand_close(drv);
+    nand_unlock(drv);
     return rc;
 }
 
 static int flash_img_write(const uint8_t* buffer)
 {
-    int rc = flash_prepare();
+    nand_drv* drv = nand_init();
+    nand_lock(drv);
+
+    int rc = nand_open(drv);
     if(rc < 0)
         goto error;
 
-    rc = nand_enable_writes(true);
-    if(rc < 0) {
-        rc = INSTALL_ERR_FLASH(NAND_ENABLE_WRITES, rc);
-        goto error;
-    }
-
-    rc = nand_erase(0, IMAGE_SIZE);
-    if(rc < 0) {
-        rc = INSTALL_ERR_FLASH(NAND_ERASE, rc);
-        goto error;
-    }
-
-    rc = nand_write(0, IMAGE_SIZE, buffer);
+    rc = nand_write_bytes(drv, 0, IMAGE_SIZE, buffer);
     if(rc < 0) {
         rc = INSTALL_ERR_FLASH(NAND_WRITE, rc);
         goto error;
     }
 
   error:
-    flash_finish();
+    nand_close(drv);
+    nand_unlock(drv);
     return rc;
 }
 
