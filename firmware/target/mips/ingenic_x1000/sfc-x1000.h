@@ -19,87 +19,107 @@
  *
  ****************************************************************************/
 
+#ifndef __SFC_X1000_H__
+#define __SFC_X1000_H__
+
+#include "x1000/sfc.h"
 #include <stdint.h>
 #include <stdbool.h>
-#include "clk-x1000.h"
-#include "x1000/sfc.h"
 
-/* SPI flash controller interface -- this is a low-level driver upon which
- * you can build NAND/NOR flash drivers. The main function is sfc_exec(),
- * used to issue commands, transfer data, etc.
- */
-
-#define SFC_FLAG_READ       0x01 /* Read data */
-#define SFC_FLAG_WRITE      0x02 /* Write data */
-#define SFC_FLAG_DUMMYFIRST 0x04 /* Do dummy bits before sending address.
-                                  * Default is dummy bits after address.
-                                  */
-
-/* SPI transfer mode. If in doubt, check with the X1000 manual and confirm
- * the transfer format is what you expect.
- */
-#define SFC_MODE_STANDARD           0
-#define SFC_MODE_DUAL_IN_DUAL_OUT   1
-#define SFC_MODE_DUAL_IO            2
-#define SFC_MODE_FULL_DUAL_IO       3
-#define SFC_MODE_QUAD_IN_QUAD_OUT   4
-#define SFC_MODE_QUAD_IO            5
-#define SFC_MODE_FULL_QUAD_IO       6
-
-/* Return status codes for sfc_exec() */
-#define SFC_STATUS_OK        0
-#define SFC_STATUS_OVERFLOW  1
-#define SFC_STATUS_UNDERFLOW 2
-#define SFC_STATUS_LOCKUP    3
-
-typedef struct sfc_op {
-    int command;        /* Command number */
-    int mode;           /* SPI transfer mode */
-    int flags;          /* Flags for this op */
-    int addr_bytes;     /* Number of address bytes */
-    int dummy_bits;     /* Number of dummy bits (yes: bits, not bytes) */
-    uint32_t addr_lo;   /* Lower 32 bits of address */
-    uint32_t addr_hi;   /* Upper 32 bits of address */
-    int data_bytes;     /* Number of data bytes to read/write */
-    void* buffer;       /* Data buffer -- MUST be word-aligned */
-} sfc_op;
-
-/* One-time driver init for mutexes/etc needed for handling interrupts.
- * This can be safely called multiple times; only the first call will
- * actually perform the init.
- */
-extern void sfc_init(void);
-
-/* Controller mutex -- lock before touching the driver */
-extern void sfc_lock(void);
-extern void sfc_unlock(void);
-
-/* Open/close the driver. The driver must be open in order to do operations.
- * Closing the driver shuts off the hardware; the driver can be re-opened at
- * a later time when it's needed again.
+/* SPI transfer mode. SFC_TMODE_X_Y_Z means:
  *
- * After opening the driver, you must also program a valid device configuration
- * and clock rate using sfc_set_dev_conf() and sfc_set_clock().
+ * - X lines for command phase
+ * - Y lines for address+dummy phase
+ * - Z lines for data phase
  */
+#define SFC_TMODE_1_1_1 0
+#define SFC_TMODE_1_1_2 1
+#define SFC_TMODE_1_2_2 2
+#define SFC_TMODE_2_2_2 3
+#define SFC_TMODE_1_1_4 4
+#define SFC_TMODE_1_4_4 5
+#define SFC_TMODE_4_4_4 6
+
+/* Phase format
+ *  _____________________
+ * / SFC_PFMT_ADDR_FIRST \
+ * +-----+-------+-------+------+
+ * | cmd | addr  | dummy | data |
+ * +-----+-------+-------+------+
+ *  ______________________
+ * / SFC_PFMT_DUMMY_FIRST \
+ * +-----+-------+-------+------+
+ * | cmd | dummy | addr  | data |
+ * +-----+-------+-------+------+
+ */
+#define SFC_PFMT_ADDR_FIRST  0
+#define SFC_PFMT_DUMMY_FIRST 1
+
+/* Direction of transfer flag */
+#define SFC_READ    0
+#define SFC_WRITE   (1 << 31)
+
+/** \brief Macro to generate an SFC command for use with sfc_exec()
+ * \param cmd       Command number (up to 16 bits)
+ * \param tmode     SPI transfer mode
+ * \param awidth    Number of address bytes
+ * \param dwidth    Number of dummy cycles (1 cycle = 1 bit)
+ * \param pfmt      Phase format (address first or dummy first)
+ * \param data_en   1 to enable data phase, 0 to omit it
+ */
+#define SFC_CMD(cmd, tmode, awidth, dwidth, pfmt, data_en) \
+    jz_orf(SFC_TRAN_CONF, COMMAND(cmd), CMD_EN(1), \
+           MODE(tmode), ADDR_WIDTH(awidth), DUMMY_BITS(dwidth), \
+           PHASE_FMT(pfmt), DATA_EN(data_en))
+
+/* Open/close SFC hardware */
 extern void sfc_open(void);
 extern void sfc_close(void);
 
-/* These functions can be called at any time while the driver is open, but
- * must not be called while there is an operation in progress. It's the
- * caller's job to ensure the configuration will work with the device and
- * be capable of reading back data correctly.
- *
- * - sfc_set_dev_conf() writes its argument to the SFC_DEV_CONF register.
- * - sfc_set_wp_enable() sets the state of the write-protect pin (WP).
- * - sfc_set_clock() sets the controller clock frequency (in Hz).
- */
-#define sfc_set_dev_conf(dev_conf) \
-    do { REG_SFC_DEV_CONF = (dev_conf); } while(0)
+/* Enable IRQ mode, instead of busy waiting for operations to complete.
+ * Needs to be called separately after sfc_open(), because the SPL has to
+ * use busy waiting, but we cannot #ifdef it for the SPL due to limitations
+ * of the build system. */
+extern void sfc_irq_begin(void);
+extern void sfc_irq_end(void);
 
-#define sfc_set_wp_enable(en) \
-    jz_writef(SFC_GLB, WP_EN((en) ? 1 : 0))
-
+/* Change the SFC clock frequency */
 extern void sfc_set_clock(uint32_t freq);
 
-/* Execute an operation. Returns zero on success, nonzero on failure. */
-extern int sfc_exec(const sfc_op* op);
+/* Set the device configuration register */
+inline void sfc_set_dev_conf(uint32_t conf)
+{
+    REG_SFC_DEV_CONF = conf;
+}
+
+/* Control the state of the write protect pin */
+inline void sfc_set_wp_enable(bool en)
+{
+    jz_writef(SFC_GLB, WP_EN(en ? 1 : 0));
+}
+
+/** \brief Execute a command
+ * \param cmd   Command encoded by `SFC_CMD` macro.
+ * \param addr  Address up to 32 bits; pass 0 if the command doesn't need it
+ * \param data  Buffer for data transfer commands, must be cache-aligned
+ * \param size  Number of data bytes / direction of transfer flag
+ * \returns SFC status code: 0 on success and < 0 on failure.
+ *
+ * - Non-data commands must pass `data = NULL` and `size = 0` in order to
+ *   get correct results.
+ *
+ * - Data commands must specify a direction of transfer using the high bit
+ *   of the `size` argument by OR'ing in `SFC_READ` or `SFC_WRITE`.
+ */
+extern void sfc_exec(uint32_t cmd, uint32_t addr, void* data, uint32_t size);
+
+/* NOTE: the above will need to be changed if we need better performance
+ * The hardware can do multiple commands in a sequence, including polling,
+ * and emit an interrupt only at the end.
+ *
+ * Also, some chips need more than 4 address bytes even though the block
+ * and page numbers would still fit in 32 bits; the current API cannot
+ * handle this.
+ */
+
+#endif /* __SFC_X1000_H__ */

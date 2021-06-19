@@ -119,6 +119,29 @@ void spl_error(void)
     }
 }
 
+nand_drv* alloc_nand_drv(uint32_t laddr, uint32_t lsize)
+{
+    size_t need_size = sizeof(nand_drv) +
+                       NAND_DRV_SCRATCHSIZE +
+                       NAND_DRV_MAXPAGESIZE;
+
+    /* find a hole to keep the buffers */
+    uintptr_t addr;
+    if(X1000_SDRAM_BASE + need_size <= laddr)
+        addr = X1000_SDRAM_BASE;
+    else
+        addr = CACHEALIGN_UP(X1000_SDRAM_BASE + laddr + lsize);
+
+    uint8_t* page_buf = (uint8_t*)addr;
+    uint8_t* scratch_buf = page_buf + NAND_DRV_MAXPAGESIZE;
+    nand_drv* drv = (nand_drv*)(scratch_buf + NAND_DRV_SCRATCHSIZE);
+
+    drv->page_buf = page_buf;
+    drv->scratch_buf = scratch_buf;
+    drv->refcount = 0;
+    return drv;
+}
+
 void spl_target_boot(void)
 {
     int opt_index = spl_get_boot_option();
@@ -134,33 +157,26 @@ void spl_target_boot(void)
     gpioz_configure(GPIO_A, 0x3f << 26, GPIOF_DEVICE(1));
 
     /* Open NAND chip */
-    int rc = nand_open();
+    nand_drv* ndrv = alloc_nand_drv(opt->load_addr, opt->nand_size);
+    int rc = nand_open(ndrv);
     if(rc)
         spl_error();
 
-    int mf_id, dev_id;
-    rc = nand_identify(&mf_id, &dev_id);
-    if(rc)
-        goto nand_err;
-
     /* For OF only: load DMA coprocessor's firmware from flash */
     if(opt_index != BOOTOPTION_ROCKBOX) {
-        rc = nand_read(0x4000, 0x2000, (uint8_t*)0xb3422000);
+        rc = nand_read_bytes(ndrv, 0x4000, 0x2000, (uint8_t*)0xb3422000);
         if(rc)
             goto nand_err;
     }
 
     /* Read the firmware */
-    rc = nand_read(opt->nand_addr, opt->nand_size, load_addr);
+    rc = nand_read_bytes(ndrv, opt->nand_addr, opt->nand_size, load_addr);
     if(rc)
         goto nand_err;
 
-    /* Rockbox doesn't need the NAND; for the OF, we should leave it open
-     * and also make sure to turn off the write protect bits. */
+    /* Rockbox doesn't need the NAND; for the OF, we should leave it open */
     if(opt_index == BOOTOPTION_ROCKBOX)
-        nand_close();
-    else
-        nand_enable_writes(true);
+        nand_close(ndrv);
 
     /* Kernel arguments pointer, for Linux only */
     char** kargv = (char**)0x80004000;
@@ -184,7 +200,7 @@ void spl_target_boot(void)
     __builtin_unreachable();
 
   nand_err:
-    nand_close();
+    nand_close(ndrv);
     spl_error();
 }
 

@@ -22,86 +22,161 @@
 #ifndef __NAND_X1000_H__
 #define __NAND_X1000_H__
 
-/* NOTE: this is a very minimal API designed only to support a bootloader.
- * Not suitable for general data storage. It doesn't have proper support for
- * partial page writes, access to spare area, etc, which are all necessary
- * for an effective flash translation layer.
- *
- * There's no ECC support. This can be added if necessary, but it's unlikely
- * the boot area on any X1000 device uses software ECC as Ingenic's SPL simply
- * doesn't have much room for more code (theirs programmed to work on multiple
- * hardware configurations, so it's bigger than ours).
- */
-
 #include <stdint.h>
-#include <stdbool.h>
 #include <stddef.h>
+#include <stdbool.h>
+#include "kernel.h"
 
-/* Error codes which can be returned by the NAND API */
-#define NAND_SUCCESS              0
-#define NAND_ERR_UNKNOWN_CHIP     (-1)
-#define NAND_ERR_UNALIGNED        (-2)
-#define NAND_ERR_WRITE_PROTECT    (-3)
-#define NAND_ERR_CONTROLLER       (-4)
-#define NAND_ERR_COMMAND          (-5)
+#define NAND_SUCCESS            0
+#define NAND_ERR_UNKNOWN_CHIP   (-1)
+#define NAND_ERR_PROGRAM_FAIL   (-2)
+#define NAND_ERR_ERASE_FAIL     (-3)
+#define NAND_ERR_UNALIGNED      (-4)
 
-/* Chip supports quad I/O for page read/write */
-#define NANDCHIP_FLAG_QUAD      0x01
+/* keep max page size in sync with the NAND chip table in the .c file */
+#define NAND_DRV_SCRATCHSIZE 32
+#define NAND_DRV_MAXPAGESIZE 2112
 
-/* Set/clear the BRWD bit when enabling/disabling write protection */
-#define NANDCHIP_FLAG_USE_BRWD  0x02
+/* Quad I/O support bit */
+#define NAND_CHIPFLAG_QUAD          0x0001
+/* Chip requires QE bit set to enable quad I/O mode */
+#define NAND_CHIPFLAG_HAS_QE_BIT    0x0002
 
-typedef struct nand_chip_data {
-    /* Chip manufacturer / device ID */
-    uint8_t  mf_id;
-    uint8_t  dev_id;
+/* Types to distinguish between block & page addresses in the API.
+ *
+ *                BIT 31                            log2_ppb bits
+ *                +-------------------------------+---------------+
+ *  nand_page_t = | block nr                      | page nr       |
+ *                +-------------------------------+---------------+
+ *                                                            BIT 0
+ *
+ * The page address is split into block and page numbers. Page numbers occupy
+ * the lower log2_ppb bits, and the block number occupies the upper bits.
+ *
+ * Block addresses are structured the same as page addresses, but with a page
+ * number of 0. So block number N has address N << log2_ppb.
+ */
+typedef uint32_t nand_block_t;
+typedef uint32_t nand_page_t;
 
-    /* Width of row/column addresses in bytes */
-    uint8_t  rowaddr_width;
-    uint8_t  coladdr_width;
+typedef struct nand_chip {
+    /* Manufacturer and device ID bytes */
+    uint8_t mf_id;
+    uint8_t dev_id;
 
-    /* SFC dev conf and clock frequency to use for this device */
-    uint32_t dev_conf;
+    /* Row/column address width */
+    uint8_t row_cycles;
+    uint8_t col_cycles;
+
+    /* Base2 logarithm of the number of pages per block */
+    unsigned log2_ppb;
+
+    /* Size of a page's main / oob areas, in bytes. */
+    unsigned page_size;
+    unsigned oob_size;
+
+    /* Total number of blocks in the chip */
+    unsigned nr_blocks;
+
+    /* Clock frequency to use */
     uint32_t clock_freq;
 
-    /* Page size in bytes = 1 << log2_page_size */
-    uint32_t log2_page_size;
+    /* Value of sfc_dev_conf */
+    uint32_t dev_conf;
 
-    /* Block size in number of pages = 1 << log2_block_size */
-    uint32_t log2_block_size;
-
-    /* Chip flags */
+    /* Chip specific flags */
     uint32_t flags;
-} nand_chip_data;
+} nand_chip;
 
-/* Open or close the NAND driver. The NAND driver takes control of the SFC,
- * so that driver must be in the closed state before opening the NAND driver.
+typedef struct nand_drv {
+    /* NAND access lock. Needs to be held during any operations. */
+    struct mutex mutex;
+
+    /* Reference count for open/close operations */
+    unsigned refcount;
+
+    /* Scratch and page buffers. Both need to be cacheline-aligned and are
+     * provided externally by the caller prior to nand_open().
+     *
+     * - The scratch buffer is NAND_DRV_SCRATCHSIZE bytes long and is used
+     *   for small data transfers associated with commands. It must not be
+     *   disturbed while any NAND operation is in progress.
+     *
+     * - The page buffer is used by certain functions like nand_read_bytes(),
+     *   but it's main purpose is to provide a common temporary buffer for
+     *   driver users to perform I/O with. Must be fpage_size bytes long.
+     */
+    uint8_t* scratch_buf;
+    uint8_t* page_buf;
+
+    /* Pointer to the chip data. */
+    const nand_chip* chip;
+
+    /* Pages per block = 1 << chip->log2_ppb */
+    unsigned ppb;
+
+    /* Full page size = chip->page_size + chip->oob_size */
+    unsigned fpage_size;
+
+    /* Probed mf_id / dev_id for debugging, in case identification fails. */
+    uint8_t mf_id;
+    uint8_t dev_id;
+
+    /* SFC commands used for I/O, these are set based on chip data */
+    uint32_t cmd_page_read;
+    uint32_t cmd_read_cache;
+    uint32_t cmd_program_load;
+    uint32_t cmd_program_execute;
+    uint32_t cmd_block_erase;
+} nand_drv;
+
+extern const nand_chip supported_nand_chips[];
+extern const size_t nr_supported_nand_chips;
+
+/* Return the static NAND driver instance.
+ *
+ * ALL normal Rockbox code should use this instance. The SPL does not
+ * use it, because it needs to manually place buffers in external RAM.
  */
-extern int nand_open(void);
-extern void nand_close(void);
+extern nand_drv* nand_init(void);
 
-/* Identify the NAND chip. This must be done after opening the driver and
- * prior to any data access, in order to set the chip parameters. */
-extern int nand_identify(int* mf_id, int* dev_id);
+static inline void nand_lock(nand_drv* drv)
+{
+    mutex_lock(&drv->mutex);
+}
 
-/* Return the chip data for the identified NAND chip.
- * Returns NULL if the chip is not identified. */
-const nand_chip_data* nand_get_chip_data(void);
+static inline void nand_unlock(nand_drv* drv)
+{
+    mutex_unlock(&drv->mutex);
+}
 
-/* Controls the chip's write protect features. The driver also keeps track of
- * this flag and refuses to perform write or erase operations unless you have
- * enabled writes. Writes should be disabled again when you finish writing. */
-extern int nand_enable_writes(bool en);
+/* Open or close the NAND driver
+ *
+ * The NAND driver is reference counted, and opening / closing it will
+ * increment and decrement the reference count. The hardware is only
+ * controlled when the reference count rises above or falls to 0, else
+ * these functions are no-ops which always succeed.
+ *
+ * These functions require the lock to be held.
+ */
+extern int nand_open(nand_drv* drv);
+extern void nand_close(nand_drv* drv);
 
-/* Reading and writing operates on whole pages at a time. If the address or
- * size is not aligned to a multiple of the page size, no data will be read
- * or written and an error code is returned. */
-extern int nand_read(uint32_t addr, uint32_t size, uint8_t* buf);
-extern int nand_write(uint32_t addr, uint32_t size, const uint8_t* buf);
+/* Read / program / erase operations. Buffer needs to be cache-aligned for DMA.
+ * Read and program operate on full page data, ie. including OOB data areas.
+ *
+ * NOTE: ECC is not implemented. If it ever needs to be, these functions will
+ * probably use ECC transparently. All code should be written to expect this.
+ */
+extern int nand_block_erase(nand_drv* drv, nand_block_t block);
+extern int nand_page_program(nand_drv* drv, nand_page_t page, const void* buffer);
+extern int nand_page_read(nand_drv* drv, nand_page_t page, void* buffer);
 
-/* Erase operates on whole blocks. Like the page read/write operations,
- * the address and size must be aligned to a multiple of the block size.
- * If not, no blocks are erased and an error code is returned. */
-extern int nand_erase(uint32_t addr, uint32_t size);
+/* Wrappers to read/write bytes. For simple access to the main data area only.
+ * The write address / length must align to a block boundary. Reads do not have
+ * any alignment requirement. OOB data is never read, and is written as 0xff.
+ */
+extern int nand_read_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* buffer);
+extern int nand_write_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, const void* buffer);
 
 #endif /* __NAND_X1000_H__ */

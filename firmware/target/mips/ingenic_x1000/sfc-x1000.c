@@ -21,86 +21,71 @@
 
 #include "system.h"
 #include "kernel.h"
-#include "panic.h"
 #include "sfc-x1000.h"
+#include "clk-x1000.h"
 #include "irq-x1000.h"
-#include "x1000/sfc.h"
-#include "x1000/cpm.h"
 
-/* DMA works, but not in the SPL due to some hardware not being set up right.
- * Only the SPL and bootloader actually require flash access, so to keep it
- * simple, DMA is unconditionally disabled. */
-//#define NEED_SFC_DMA
-
+/* #define USE_DMA */
 #define FIFO_THRESH 31
 
-#define SFC_STATUS_PENDING (-1)
+static void sfc_poll_wait(void);
+#ifdef USE_DMA
+static void sfc_irq_wait(void);
 
-#ifdef NEED_SFC_DMA
-static struct mutex sfc_mutex;
 static struct semaphore sfc_sema;
-static struct timeout sfc_lockup_tmo;
-static bool sfc_inited = false;
-static volatile int sfc_status;
-#else
-# define sfc_status SFC_STATUS_OK
-#endif
 
-void sfc_init(void)
-{
-#ifdef NEED_SFC_DMA
-    if(sfc_inited)
-        return;
-
-    mutex_init(&sfc_mutex);
-    semaphore_init(&sfc_sema, 1, 0);
-    sfc_inited = true;
+/* This function pointer thing is a hack for the SPL, since it has to use
+ * the NAND driver directly and we can't afford to drag in the whole kernel
+ * just to wait on a semaphore. */
+static void(*sfc_wait)(void) = sfc_poll_wait;
 #endif
-}
-
-void sfc_lock(void)
-{
-#ifdef NEED_SFC_DMA
-    mutex_lock(&sfc_mutex);
-#endif
-}
-
-void sfc_unlock(void)
-{
-#ifdef NEED_SFC_DMA
-    mutex_unlock(&sfc_mutex);
-#endif
-}
 
 void sfc_open(void)
 {
     jz_writef(CPM_CLKGR, SFC(0));
+#ifdef USE_DMA
+    jz_writef(SFC_GLB, OP_MODE_V(DMA), BURST_MD_V(INCR32),
+              PHASE_NUM(1), THRESHOLD(FIFO_THRESH), WP_EN(1));
+#else
     jz_writef(SFC_GLB, OP_MODE_V(SLAVE), PHASE_NUM(1),
               THRESHOLD(FIFO_THRESH), WP_EN(1));
+#endif
     REG_SFC_CGE = 0;
     REG_SFC_INTC = 0x1f;
     REG_SFC_MEM_ADDR = 0;
-
-#ifdef NEED_SFC_DMA
-    jz_writef(SFC_GLB, OP_MODE_V(DMA), BURST_MD_V(INCR32));
-    system_enable_irq(IRQ_SFC);
-#endif
 }
 
 void sfc_close(void)
 {
-#ifdef NEED_SFC_DMA
-    system_disable_irq(IRQ_SFC);
-#endif
-
     REG_SFC_CGE = 0x1f;
     jz_writef(CPM_CLKGR, SFC(1));
 }
 
+void sfc_irq_begin(void)
+{
+#ifdef USE_DMA
+    static bool inited = false;
+    if(!inited) {
+        semaphore_init(&sfc_sema, 1, 0);
+        inited = true;
+    }
+
+    system_enable_irq(IRQ_SFC);
+    sfc_wait = sfc_irq_wait;
+#endif
+}
+
+void sfc_irq_end(void)
+{
+#ifdef USE_DMA
+    system_disable_irq(IRQ_SFC);
+    sfc_wait = sfc_poll_wait;
+#endif
+}
+
 void sfc_set_clock(uint32_t freq)
 {
-    /* TODO: This is a hack so we can use MPLL in the SPL.
-     * There must be a better way to do this... */
+    /* FIXME: Get rid of this hack & allow defining a real clock tree... */
     x1000_clk_t clksrc = X1000_CLK_MPLL;
     uint32_t in_freq = clk_get(clksrc);
     if(in_freq < freq) {
@@ -115,170 +100,99 @@ void sfc_set_clock(uint32_t freq)
     jz_writef(CPM_SSICDR, CE(0));
 }
 
-#ifdef NEED_SFC_DMA
-static int sfc_lockup_tmo_cb(struct timeout* tmo)
+#ifndef USE_DMA
+static void sfc_fifo_rdwr(bool write, void* buffer, uint32_t data_bytes)
 {
-    (void)tmo;
+    uint32_t* word_buf = (uint32_t*)buffer;
+    uint32_t sr_bit = write ? BM_SFC_SR_TREQ : BM_SFC_SR_RREQ;
+    uint32_t clr_bit = write ? BM_SFC_SCR_CLR_TREQ : BM_SFC_SCR_CLR_RREQ;
+    uint32_t data_words = (data_bytes + 3) / 4;
+    while(data_words > 0) {
+        if(REG_SFC_SR & sr_bit) {
+            REG_SFC_SCR = clr_bit;
 
-    int irq = disable_irq_save();
-    if(sfc_status == SFC_STATUS_PENDING) {
-        sfc_status = SFC_STATUS_LOCKUP;
-        jz_overwritef(SFC_TRIG, STOP(1));
-        semaphore_release(&sfc_sema);
+            /* We need to read/write in bursts equal to FIFO threshold amount
+             * X1000 PM, 10.8.5, SFC > software guidelines > slave mode */
+            uint32_t amount = MIN(data_words, FIFO_THRESH);
+            data_words -= amount;
+
+            uint32_t* endptr = word_buf + amount;
+            for(; word_buf != endptr; ++word_buf) {
+                if(write)
+                    REG_SFC_DATA = *word_buf;
+                else
+                    *word_buf = REG_SFC_DATA;
+            }
+        }
+    }
+}
+#endif
+
+void sfc_exec(uint32_t cmd, uint32_t addr, void* data, uint32_t size)
+{
+    /* Deal with transfer direction */
+    bool write = (size & SFC_WRITE) != 0;
+    uint32_t glb = REG_SFC_GLB;
+    if(data) {
+        if(write) {
+            jz_vwritef(glb, SFC_GLB, TRAN_DIR_V(WRITE));
+            size &= ~SFC_WRITE;
+#ifdef USE_DMA
+            commit_dcache_range(data, size);
+#endif
+        } else {
+            jz_vwritef(glb, SFC_GLB, TRAN_DIR_V(READ));
+#ifdef USE_DMA
+            discard_dcache_range(data, size);
+#endif
+        }
     }
 
-    restore_irq(irq);
-    return 0;
+    /* Program transfer configuration */
+    REG_SFC_GLB = glb;
+    REG_SFC_TRAN_LENGTH = size;
+#ifdef USE_DMA
+    REG_SFC_MEM_ADDR = PHYSADDR(data);
+#endif
+    REG_SFC_TRAN_CONF(0) = cmd;
+    REG_SFC_DEV_ADDR(0) = addr;
+    REG_SFC_DEV_PLUS(0) = 0;
+
+    /* Clear old interrupts */
+    REG_SFC_SCR = 0x1f;
+    jz_writef(SFC_INTC, MSK_END(0));
+
+    /* Start the command */
+    jz_overwritef(SFC_TRIG, FLUSH(1));
+    jz_overwritef(SFC_TRIG, START(1));
+
+    /* Data transfer by PIO or DMA, and wait for completion */
+#ifndef USE_DMA
+    sfc_fifo_rdwr(write, data, size);
+    sfc_poll_wait();
+#else
+    sfc_wait();
+#endif
 }
 
-static void sfc_wait_end(void)
+static void sfc_poll_wait(void)
+{
+    while(jz_readf(SFC_SR, END) == 0);
+    jz_overwritef(SFC_SCR, CLR_END(1));
+}
+
+#ifdef USE_DMA
+static void sfc_irq_wait(void)
 {
     semaphore_wait(&sfc_sema, TIMEOUT_BLOCK);
 }
 
 void SFC(void)
 {
-    unsigned sr = REG_SFC_SR & ~REG_SFC_INTC;
-
-    if(jz_vreadf(sr, SFC_SR, OVER)) {
-        jz_overwritef(SFC_SCR, CLR_OVER(1));
-        sfc_status = SFC_STATUS_OVERFLOW;
-    } else if(jz_vreadf(sr, SFC_SR, UNDER)) {
-        jz_overwritef(SFC_SCR, CLR_UNDER(1));
-        sfc_status = SFC_STATUS_UNDERFLOW;
-    } else if(jz_vreadf(sr, SFC_SR, END)) {
-        jz_overwritef(SFC_SCR, CLR_END(1));
-        sfc_status = SFC_STATUS_OK;
-    } else {
-        panicf("SFC IRQ bug");
-        return;
-    }
-
-    /* Not sure this is wholly correct */
-    if(sfc_status != SFC_STATUS_OK)
-        jz_overwritef(SFC_TRIG, STOP(1));
-
-    REG_SFC_INTC = 0x1f;
+    /* the only interrupt we use is END; errors are basically not
+     * possible with the SPI interface... */
     semaphore_release(&sfc_sema);
+    jz_overwritef(SFC_SCR, CLR_END(1));
+    jz_writef(SFC_INTC, MSK_END(1));
 }
-#else
-/* Note the X1000 is *very* picky about how the SFC FIFOs are accessed
- * so please do NOT try to rearrange the code without testing it first!
- */
-
-static void sfc_fifo_read(unsigned* buffer, int data_bytes)
-{
-    int data_words = (data_bytes + 3) / 4;
-    while(data_words > 0) {
-        if(jz_readf(SFC_SR, RREQ)) {
-            jz_overwritef(SFC_SCR, CLR_RREQ(1));
-
-            int amount = data_words > FIFO_THRESH ? FIFO_THRESH : data_words;
-            data_words -= amount;
-            while(amount > 0) {
-                *buffer++ = REG_SFC_DATA;
-                amount -= 1;
-            }
-        }
-    }
-}
-
-static void sfc_fifo_write(const unsigned* buffer, int data_bytes)
-{
-    int data_words = (data_bytes + 3) / 4;
-    while(data_words > 0) {
-        if(jz_readf(SFC_SR, TREQ)) {
-            jz_overwritef(SFC_SCR, CLR_TREQ(1));
-
-            int amount = data_words > FIFO_THRESH ? FIFO_THRESH : data_words;
-            data_words -= amount;
-            while(amount > 0) {
-                REG_SFC_DATA = *buffer++;
-                amount -= 1;
-            }
-        }
-    }
-}
-
-static void sfc_wait_end(void)
-{
-    while(jz_readf(SFC_SR, END) == 0);
-    jz_overwritef(SFC_SCR, CLR_TREQ(1));
-}
-
-#endif /* NEED_SFC_DMA */
-
-int sfc_exec(const sfc_op* op)
-{
-#ifdef NEED_SFC_DMA
-    uint32_t intc_clear = jz_orm(SFC_INTC, MSK_END);
 #endif
-
-    if(op->flags & (SFC_FLAG_READ|SFC_FLAG_WRITE)) {
-        jz_writef(SFC_TRAN_CONF(0), DATA_EN(1));
-        REG_SFC_TRAN_LENGTH = op->data_bytes;
-#ifdef NEED_SFC_DMA
-        REG_SFC_MEM_ADDR = PHYSADDR(op->buffer);
-#endif
-
-        if(op->flags & SFC_FLAG_READ)
-        {
-            jz_writef(SFC_GLB, TRAN_DIR_V(READ));
-#ifdef NEED_SFC_DMA
-            discard_dcache_range(op->buffer, op->data_bytes);
-            intc_clear |= jz_orm(SFC_INTC, MSK_OVER);
-#endif
-        }
-        else
-        {
-            jz_writef(SFC_GLB, TRAN_DIR_V(WRITE));
-#ifdef NEED_SFC_DMA
-            commit_dcache_range(op->buffer, op->data_bytes);
-            intc_clear |= jz_orm(SFC_INTC, MSK_UNDER);
-#endif
-        }
-    } else {
-        jz_writef(SFC_TRAN_CONF(0), DATA_EN(0));
-        REG_SFC_TRAN_LENGTH = 0;
-#ifdef NEED_SFC_DMA
-        REG_SFC_MEM_ADDR = 0;
-#endif
-    }
-
-    bool dummy_first = (op->flags & SFC_FLAG_DUMMYFIRST) != 0;
-    jz_writef(SFC_TRAN_CONF(0),
-              MODE(op->mode), POLL_EN(0),
-              ADDR_WIDTH(op->addr_bytes),
-              PHASE_FMT(dummy_first ? 1 : 0),
-              DUMMY_BITS(op->dummy_bits),
-              COMMAND(op->command), CMD_EN(1));
-
-    REG_SFC_DEV_ADDR(0) = op->addr_lo;
-    REG_SFC_DEV_PLUS(0) = op->addr_hi;
-
-#ifdef NEED_SFC_DMA
-    sfc_status = SFC_STATUS_PENDING;
-    timeout_register(&sfc_lockup_tmo, sfc_lockup_tmo_cb, 10*HZ, 0);
-    REG_SFC_SCR = 0x1f;
-    REG_SFC_INTC &= ~intc_clear;
-#endif
-
-    jz_overwritef(SFC_TRIG, FLUSH(1));
-    jz_overwritef(SFC_TRIG, START(1));
-
-#ifndef NEED_SFC_DMA
-    if(op->flags & SFC_FLAG_READ)
-        sfc_fifo_read((unsigned*)op->buffer, op->data_bytes);
-    if(op->flags & SFC_FLAG_WRITE)
-        sfc_fifo_write((const unsigned*)op->buffer, op->data_bytes);
-#endif
-
-    sfc_wait_end();
-
-#ifdef NEED_SFC_DMA
-    if(op->flags & SFC_FLAG_READ)
-        discard_dcache_range(op->buffer, op->data_bytes);
-#endif
-
-    return sfc_status;
-}
