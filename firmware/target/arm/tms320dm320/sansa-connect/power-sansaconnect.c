@@ -74,21 +74,7 @@ void power_off(void)
     avr_hid_power_off();
 }
 
-#if CONFIG_CHARGING
-unsigned int power_input_status(void)
-{
-    return POWER_INPUT_NONE;
-}
-
-/* Returns true if the unit is charging the batteries. */
-bool charging_state(void)
-{
-    return false;
-}
-#endif
-
 void ide_power_enable(bool on)
 {
   (void)on;
 }
-
