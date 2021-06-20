@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include "config.h"
 #include "system.h"
+#include "power.h"
 #include "kernel.h"
 #include "logf.h"
 #include "avr-sansaconnect.h"
@@ -80,7 +81,17 @@ static const char avr_thread_name[] = "avr";
 static struct semaphore avr_thread_trigger;
 #endif
 
-static int current_battery_level = 100;
+/* OF bootloader will refuse to start software if low power is set
+ * Bits 3, 4, 5, 6 and 7 are unknown.
+ */
+#define BATTERY_STATUS_LOW_POWER         (1 << 2)
+#define BATTERY_STATUS_CHARGER_CONNECTED (1 << 1)
+#define BATTERY_STATUS_CHARGING          (1 << 0)
+static uint8_t avr_battery_status;
+
+#define BATTERY_LEVEL_NOT_DETECTED       (1 << 7)
+#define BATTERY_LEVEL_PERCENTAGE_MASK     0x7F
+static uint8_t avr_battery_level = 100;
 
 static inline unsigned short be2short(unsigned char* buf)
 {
@@ -289,8 +300,26 @@ void avr_hid_init(void)
 
 int _battery_level(void)
 {
-    /* Force shutoff when level read by AVR is 4 or lower */
-    return (current_battery_level > 4) ? current_battery_level : 0;
+    /* OF still plays music when level is at 0 */
+    if (avr_battery_level & BATTERY_LEVEL_NOT_DETECTED)
+    {
+        return 0;
+    }
+    return avr_battery_level & BATTERY_LEVEL_PERCENTAGE_MASK;
+}
+
+unsigned int power_input_status(void)
+{
+    if (avr_battery_status & BATTERY_STATUS_CHARGER_CONNECTED)
+    {
+        return POWER_INPUT_USB_CHARGER;
+    }
+    return POWER_INPUT_NONE;
+}
+
+bool charging_state(void)
+{
+    return (avr_battery_status & BATTERY_STATUS_CHARGING) != 0;
 }
 
 static void avr_hid_get_state(void)
@@ -300,18 +329,16 @@ static void avr_hid_get_state(void)
       CMD_CLOSE};
 
     static unsigned char buf[11];
-    static unsigned char cmd_empty[1] = {0xCC};
 
-    spi_txrx(cmd, buf, sizeof(cmd));
+    /* In very unlikely case the command has to be repeated */
+    do
+    {
+        spi_txrx(cmd, buf, sizeof(cmd));
+    }
+    while ((buf[1] != CMD_SYNC) || (buf[10] != CMD_CLOSE));
 
-    /*
-     *  buf[8] contains some battery/charger related information (unknown)
-     *  buf[9] contains battery level in percents (0-100)
-     */
-    current_battery_level = (int)buf[9];
-
-    spi_txrx(cmd_empty, NULL, 1); /* request interrupt on button press */
-
+    avr_battery_status = buf[8];
+    avr_battery_level = buf[9];
     parse_button_state(buf);
 }
 
