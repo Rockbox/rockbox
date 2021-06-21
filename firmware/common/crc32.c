@@ -61,3 +61,33 @@ uint32_t crc_32(const void *src, uint32_t len, uint32_t crc32)
     return crc32;
 }
 
+
+/* crc_32r (derived from tinf crc32 which was taken from zlib)
+ * CRC32 algorithm taken from the zlib source, which is
+ * Copyright (C) 1995-1998 Jean-loup Gailly and Mark Adler
+ */
+
+/* Tool function to calculate a CRC32 (reversed polynomial) across some buffer */
+/* third argument is either the starting value or value from last piece */
+uint32_t crc_32r(const void *src, uint32_t len, uint32_t crc32)
+{
+    const unsigned char* buf = src;
+
+    /* reversed polynomial from other crc32 function -- 0xEDB88320 */
+    static const unsigned crc32_lookup[16] =
+    {
+        0x00000000, 0x1DB71064, 0x3B6E20C8, 0x26D930AC,
+        0x76DC4190, 0x6B6B51F4, 0x4DB26158, 0x5005713C,
+        0xEDB88320, 0xF00F9344, 0xD6D6A3E8, 0xCB61B38C,
+        0x9B64C2B0, 0x86D3D2D4, 0xA00AE278, 0xBDBDF21C
+    };
+
+    for(uint32_t i = 0; i < len; i++)
+    {
+        crc32 ^= buf[i];
+        crc32 = crc32_lookup[crc32 & 0x0F] ^ (crc32 >> 4);
+        crc32 = crc32_lookup[crc32 & 0x0F] ^ (crc32 >> 4);
+    }
+
+    return crc32;
+}

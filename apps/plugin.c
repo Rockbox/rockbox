@@ -792,6 +792,7 @@ static const struct plugin_api rockbox_api = {
 #ifdef PLUGIN_USE_IRAM
     audio_hard_stop,
 #endif
+    crc_32r,
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

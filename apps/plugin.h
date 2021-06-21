@@ -919,6 +919,7 @@ struct plugin_api {
 #ifdef PLUGIN_USE_IRAM
     void (*audio_hard_stop)(void);
 #endif
+    uint32_t (*crc_32r)(const void *src, uint32_t len, uint32_t crc32);
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */

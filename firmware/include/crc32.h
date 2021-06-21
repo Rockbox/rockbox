@@ -24,6 +24,7 @@
 #define _CRC32_H
 
 uint32_t crc_32(const void *src, uint32_t len, uint32_t crc32);
+uint32_t crc_32r(const void *src, uint32_t len, uint32_t crc32);
 
 #endif
 
