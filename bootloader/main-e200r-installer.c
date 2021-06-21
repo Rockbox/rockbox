@@ -35,7 +35,7 @@
 #include "file.h"
 #include "button.h"
 #include "disk.h"
-#include "crc32-mi4.h"
+#include "crc32.h"
 #include <string.h>
 #include "i2c.h"
 #include "backlight-target.h"
@@ -138,7 +138,7 @@ void* main(void)
 
     storage_read_sectors(pinfo.start + START_SECTOR_OF_ROM + ROMSECTOR_TO_HACK,
                          1 , sector);
-    crc32 = chksum_crc32 (sector, 512);
+    crc32 = crc_32r (sector, 512, 0);
 
 #if 0 /* not needed in release builds */
     printf("--- Hack Status ---");

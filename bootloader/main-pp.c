@@ -37,7 +37,7 @@
 #include "adc.h"
 #include "button.h"
 #include "disk.h"
-#include "crc32-mi4.h"
+#include "crc32.h"
 #include "mi4-loader.h"
 #include "loader_strerror.h"
 #include <string.h>
@@ -169,7 +169,7 @@ int load_mi4_part(unsigned char* buf, struct partinfo* pinfo,
                         (mi4header.mi4size-MI4_HEADER_SIZE)/512, buf);
 
     /* Check CRC32 to see if we have a valid file */
-    sum = chksum_crc32 (buf,mi4header.mi4size-MI4_HEADER_SIZE);
+    sum = crc_32r (buf,mi4header.mi4size-MI4_HEADER_SIZE,0);
 
     printf("Calculated CRC32: %x", sum);
 

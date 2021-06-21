@@ -40,7 +40,6 @@
 
 #include "loader_strerror.h"
 #if defined(MI4_FORMAT)
-#include "crc32-mi4.h"
 #include "mi4-loader.h"
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 #include "bootdata.h"

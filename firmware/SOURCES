@@ -242,9 +242,6 @@ common/crc32.c
 #ifdef MODEL_NUMBER
 common/loader_strerror.c
 #endif
-#ifdef MI4_FORMAT
-common/crc32-mi4.c
-#endif
 #ifdef RKW_FORMAT
 common/crc32-rkw.c
 #endif
