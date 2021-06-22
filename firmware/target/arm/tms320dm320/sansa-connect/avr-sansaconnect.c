@@ -24,6 +24,8 @@
 #include "system.h"
 #include "power.h"
 #include "kernel.h"
+#include "panic.h"
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 #include "avr-sansaconnect.h"
 #include "uart-target.h"
@@ -48,25 +50,56 @@
 #define dbgprintf(...)
 #endif
 
-#define CMD_SYNC        0xAA
-#define CMD_CLOSE       0xCC
-#define CMD_LCM_POWER   0xC9
-#define LCM_POWER_OFF   0x00
-#define LCM_POWER_ON    0x01
-#define LCM_POWER_SLEEP 0x02
-#define LCM_POWER_WAKE  0x03
-#define LCM_REPOWER_ON  0x04
+#define AVR_DELAY_US            100
 
-#define CMD_STATE       0xBB
-#define CMD_VER         0xBC
-#define CMD_WHEEL_EN    0xD0
-#define CMD_SET_INTCHRG 0xD1
-#define CMD_CODEC_RESET 0xD7
-#define CMD_AMP_ENABLE  0xCA
-#define CMD_FILL        0xFF
+#define CMD_SYNC                0xAA
+#define CMD_CLOSE               0xCC
+#define CMD_FILL                0xFF
 
-#define CMD_SYS_CTRL 0xDA
-#define SYS_CTRL_POWEROFF 0x00
+/* Actual command opcodes handled by AVR */
+#define CMD_STATE               0xBB
+#define CMD_VER                 0xBC
+#define CMD_MONOTIME            0xBD
+#define CMD_PGMWAKE             0xBF
+#define CMD_HDQ_READ            0xC0
+#define CMD_HDQ_WRITE           0xC1
+#define CMD_HDQ_STATUS          0xC2
+#define CMD_GET_LAST_RESET_TYPE 0xC4
+#define CMD_UNKNOWN_C5          0xC5
+#define CMD_GET_BATTERY_TEMP    0xC8
+#define CMD_LCM_POWER           0xC9
+#define CMD_AMP_ENABLE          0xCA
+#define CMD_WHEEL_EN            0xD0
+#define CMD_SET_INTCHRG         0xD1
+#define CMD_GET_INTCHRG         0xD2
+#define CMD_UNKNOWN_D3          0xD3
+#define CMD_UNKNOWN_D4          0xD4
+#define CMD_UNKNOWN_D5          0xD5
+#define CMD_UNKNOWN_D6          0xD6
+#define CMD_CODEC_RESET         0xD7
+#define CMD_ADC_START           0xD8
+#define CMD_ADC_RESULT          0xD9
+#define CMD_SYS_CTRL            0xDA
+#define CMD_SET_USBCHRG         0xE2
+#define CMD_GET_USBCHRG         0xE3
+#define CMD_MONORSTCNT          0xE4
+
+/* CMD_LCM_POWER parameters */
+#define LCM_POWER_OFF           0x00
+#define LCM_POWER_ON            0x01
+#define LCM_POWER_SLEEP         0x02
+#define LCM_POWER_WAKE          0x03
+#define LCM_REPOWER_ON          0x04
+
+/* CMD_SYS_CTRL parameters */
+#define SYS_CTRL_POWEROFF       0x00
+#define SYS_CTRL_RESET          0x01
+#define SYS_CTRL_SLEEP          0x02
+#define SYS_CTRL_DISABLE_WD     0x03
+#define SYS_CTRL_KICK_WD        0x04
+#define SYS_CTRL_EN_HDQ_THERM   0x05
+#define SYS_CTRL_EN_TS_THERM    0x06
+#define SYS_CTRL_FRESET         0x80
 
 /* protects spi avr commands from concurrent access */
 static struct mutex avr_mtx;
@@ -93,21 +126,21 @@ static uint8_t avr_battery_status;
 #define BATTERY_LEVEL_PERCENTAGE_MASK     0x7F
 static uint8_t avr_battery_level = 100;
 
-static inline unsigned short be2short(unsigned char* buf)
+static inline uint16_t be2short(uint8_t *buf)
 {
-   return (unsigned short)((buf[0] << 8) | buf[1]);
+   return (uint16_t)((buf[0] << 8) | buf[1]);
 }
 
 #define BUTTON_DIRECT_MASK (BUTTON_LEFT | BUTTON_UP | BUTTON_RIGHT | BUTTON_DOWN | BUTTON_SELECT | BUTTON_VOL_UP | BUTTON_VOL_DOWN | BUTTON_NEXT | BUTTON_PREV)
 
 #ifndef BOOTLOADER
-static void handle_wheel(unsigned char wheel)
+static void handle_wheel(uint8_t wheel)
 {
     static int key = 0;
-    static unsigned char velocity = 0;
-    static unsigned long wheel_delta = 1ul << 24;
-    static unsigned char wheel_prev = 0;
-    static long nextbacklight_hw_on = 0;
+    static uint8_t velocity = 0;
+    static uint32_t wheel_delta = 1ul << 24;
+    static uint8_t wheel_prev = 0;
+    static unsigned long nextbacklight_hw_on = 0;
     static int prev_key = -1;
     static int prev_key_post = 0;
 
@@ -168,18 +201,18 @@ static void handle_wheel(unsigned char wheel)
 }
 #endif
 
-/* buf must be 11-byte array of byte (reply from avr_hid_get_state() */
-static void parse_button_state(unsigned char *buf)
+/* buf must be 8-byte state array (reply from avr_hid_get_state() */
+static void parse_button_state(uint8_t *state)
 {
-    unsigned short main_btns_state = be2short(&buf[4]);
+    uint16_t main_btns_state = be2short(&state[2]);
 #ifdef BUTTON_DEBUG
-    unsigned short main_btns_changed = be2short(&buf[6]);
+    uint16_t main_btns_changed = be2short(&state[4]);
 #endif
 
     /* make sure other bits doesn't conflict with our "free bits" buttons */
     main_btns_state &= BUTTON_DIRECT_MASK;
 
-    if (buf[3] & 0x01) /* is power button pressed? */
+    if (state[1] & 0x01) /* is power button pressed? */
     {
         main_btns_state |= BUTTON_POWER;
     }
@@ -188,11 +221,11 @@ static void parse_button_state(unsigned char *buf)
 
 #ifndef BOOTLOADER
     /* check if stored hold_switch state changed (prevents lost changes) */
-    if ((buf[3] & 0x20) /* hold change notification */ ||
-        (hold_switch != ((buf[3] & 0x02) >> 1)))
+    if ((state[1] & 0x20) /* hold change notification */ ||
+        (hold_switch != ((state[1] & 0x02) >> 1)))
     {
 #endif
-        hold_switch = (buf[3] & 0x02) >> 1;
+        hold_switch = (state[1] & 0x02) >> 1;
 #ifdef BUTTON_DEBUG
         dbgprintf("HOLD changed (%d)", hold_switch);
 #endif
@@ -201,14 +234,14 @@ static void parse_button_state(unsigned char *buf)
     }
 #endif
 #ifndef BOOTLOADER
-    if ((hold_switch == false) && (buf[3] & 0x80)) /* scrollwheel change */
+    if ((hold_switch == false) && (state[1] & 0x80)) /* scrollwheel change */
     {
-        handle_wheel(buf[2]);
+        handle_wheel(state[0]);
     }
 #endif
 
 #ifdef BUTTON_DEBUG
-    if (buf[3] & 0x10) /* power button change */
+    if (state[1] & 0x10) /* power button change */
     {
         /* power button state has changed */
         main_btns_changed |= BUTTON_POWER;
@@ -230,50 +263,164 @@ static void parse_button_state(unsigned char *buf)
 #endif
 }
 
-static void spi_txrx(unsigned char *buf_tx, unsigned char *buf_rx, int n)
+static bool avr_command_reads_data(uint8_t opcode)
 {
-    int i;
-    unsigned short rxdata;
+    switch (opcode)
+    {
+        case CMD_STATE:
+        case CMD_VER:
+        case CMD_GET_LAST_RESET_TYPE:
+        case CMD_GET_INTCHRG:
+        case CMD_MONOTIME:
+        case CMD_UNKNOWN_C5:
+        case CMD_MONORSTCNT:
+        case CMD_HDQ_STATUS:
+        case CMD_GET_BATTERY_TEMP:
+        case CMD_GET_USBCHRG:
+        case CMD_ADC_RESULT:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static size_t avr_command_data_size(uint8_t opcode)
+{
+    switch (opcode)
+    {
+        case CMD_STATE:               return 8;
+        case CMD_VER:                 return 1;
+        case CMD_MONOTIME:            return 4;
+        case CMD_PGMWAKE:             return 4;
+        case CMD_HDQ_READ:            return 1;
+        case CMD_HDQ_WRITE:           return 2;
+        case CMD_HDQ_STATUS:          return 2;
+        case CMD_GET_LAST_RESET_TYPE: return 1;
+        case CMD_UNKNOWN_C5:          return 1;
+        case CMD_GET_BATTERY_TEMP:    return 2;
+        case CMD_LCM_POWER:           return 1;
+        case CMD_AMP_ENABLE:          return 1;
+        case CMD_WHEEL_EN:            return 1;
+        case CMD_SET_INTCHRG:         return 1;
+        case CMD_GET_INTCHRG:         return 1;
+        case CMD_UNKNOWN_D3:          return 1;
+        case CMD_UNKNOWN_D4:          return 1;
+        case CMD_UNKNOWN_D5:          return 2;
+        case CMD_UNKNOWN_D6:          return 2;
+        case CMD_CODEC_RESET:         return 0;
+        case CMD_ADC_START:           return 1;
+        case CMD_ADC_RESULT:          return 2;
+        case CMD_SYS_CTRL:            return 1;
+        case CMD_SET_USBCHRG:         return 1;
+        case CMD_GET_USBCHRG:         return 1;
+        case CMD_MONORSTCNT:          return 2;
+        default:
+            panicf("Invalid AVR opcode %02X", opcode);
+            return 0;
+    }
+}
+
+static uint8_t spi_read_byte(void)
+{
+    uint16_t rxdata;
+
+    do
+    {
+        rxdata = IO_SERIAL1_RX_DATA;
+    }
+    while (rxdata & (1<<8));
+
+    return rxdata & 0xFF;
+}
+
+static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
+{
+    bool success = true;
+    const bool is_read = avr_command_reads_data(opcode);
+    size_t i;
+    uint8_t rx;
+
+    /* Verify command data size and also make sure command is valid */
+    if (avr_command_data_size(opcode) != data_length)
+    {
+        panicf("AVR %02x invalid data length", opcode);
+    }
 
     mutex_lock(&avr_mtx);
 
     bitset16(&IO_CLK_MOD2, CLK_MOD2_SIF1);
     IO_SERIAL1_TX_ENABLE = 0x0001;
 
-    for (i = 0; i<n; i++)
+    IO_SERIAL1_TX_DATA = CMD_SYNC;
+    spi_read_byte();
+    /* Allow AVR to process CMD_SYNC */
+    udelay(AVR_DELAY_US);
+
+    IO_SERIAL1_TX_DATA = opcode;
+    rx = spi_read_byte();
+    if (rx != CMD_SYNC)
     {
-        IO_SERIAL1_TX_DATA = buf_tx[i];
+        /* AVR failed to register CMD_SYNC */
+        success = false;
+    }
+    /* Allow AVR to process opcode */
+    udelay(AVR_DELAY_US);
 
-        /* 100 us wait for AVR */
-        udelay(100);
-
-        do
+    if (is_read)
+    {
+        for (i = 0; i < data_length; i++)
         {
-            rxdata = IO_SERIAL1_RX_DATA;
-        } while (rxdata & (1<<8));
+            IO_SERIAL1_TX_DATA = CMD_FILL;
+            data[i] = spi_read_byte();
+            udelay(AVR_DELAY_US);
+        }
+    }
+    else
+    {
+        for (i = 0; i < data_length; i++)
+        {
+            IO_SERIAL1_TX_DATA = data[i];
+            spi_read_byte();
+            udelay(AVR_DELAY_US);
+        }
+    }
 
-        if (buf_rx != NULL)
-            buf_rx[i] = rxdata & 0xFF;
-
-        /* 100 us wait to give AVR time to process data */
-        udelay(100);
+    IO_SERIAL1_TX_DATA = CMD_CLOSE;
+    rx = spi_read_byte();
+    udelay(AVR_DELAY_US);
+    if (is_read)
+    {
+        success = success && (rx == CMD_CLOSE);
     }
 
     IO_SERIAL1_TX_ENABLE = 0;
     bitclr16(&IO_CLK_MOD2, CLK_MOD2_SIF1);
 
     mutex_unlock(&avr_mtx);
+
+    return success;
 }
 
-void avr_hid_sync(void)
-{
-    int i;
-    unsigned char prg[4] = {CMD_SYNC, CMD_VER, CMD_FILL, CMD_CLOSE};
 
-    /* Send SYNC three times */
-    for (i = 0; i<3; i++)
+static void avr_hid_sync(void)
+{
+    uint8_t data;
+    while (!avr_run_command(CMD_VER, &data, sizeof(data)))
     {
-        spi_txrx(prg, NULL, sizeof(prg));
+        /* TODO: Program HID if failing for long time.
+         * To do so, unfortunately, AVR firmware would have to be written
+         * from scratch as OF blob cannot be used due to licensing.
+         */
+    }
+
+}
+
+static void avr_execute_command(uint8_t opcode, uint8_t *data, size_t data_length)
+{
+    while (!avr_run_command(opcode, data, data_length))
+    {
+        /* Resync and try again */
+        avr_hid_sync();
     }
 }
 
@@ -324,87 +471,70 @@ bool charging_state(void)
 
 static void avr_hid_get_state(void)
 {
-    static unsigned char cmd[11] = {CMD_SYNC, CMD_STATE,
-      CMD_FILL, CMD_FILL, CMD_FILL, CMD_FILL, CMD_FILL, CMD_FILL, CMD_FILL, CMD_FILL,
-      CMD_CLOSE};
+    uint8_t state[8];
+    avr_execute_command(CMD_STATE, state, sizeof(state));
 
-    static unsigned char buf[11];
-
-    /* In very unlikely case the command has to be repeated */
-    do
-    {
-        spi_txrx(cmd, buf, sizeof(cmd));
-    }
-    while ((buf[1] != CMD_SYNC) || (buf[10] != CMD_CLOSE));
-
-    avr_battery_status = buf[8];
-    avr_battery_level = buf[9];
-    parse_button_state(buf);
+    avr_battery_status = state[6];
+    avr_battery_level = state[7];
+    parse_button_state(state);
 }
 
 static void avr_hid_enable_wheel(void)
 {
-    unsigned char wheel_en[4] = {CMD_SYNC, CMD_WHEEL_EN, 0x01, CMD_CLOSE};
-
-    spi_txrx(wheel_en, NULL, sizeof(wheel_en));
+    uint8_t enable = 0x01;
+    avr_execute_command(CMD_WHEEL_EN, &enable, sizeof(enable));
 }
 
 /* command that is sent by "hidtool -J 1" issued on every OF boot */
 void avr_hid_enable_charger(void)
 {
-    unsigned char charger_en[4] = {CMD_SYNC, CMD_SET_INTCHRG, 0x01, CMD_CLOSE};
+    uint8_t enable = 0x01;
+    avr_execute_command(CMD_SET_INTCHRG, &enable, sizeof(enable));
+}
 
-    spi_txrx(charger_en, NULL, sizeof(charger_en));
+static void avr_hid_lcm_power(uint8_t parameter)
+{
+    avr_execute_command(CMD_LCM_POWER, &parameter, sizeof(parameter));
 }
 
 void avr_hid_lcm_sleep(void)
 {
-    unsigned char lcm_sleep[4] = {CMD_SYNC, CMD_LCM_POWER, LCM_POWER_SLEEP, CMD_CLOSE};
-
-    spi_txrx(lcm_sleep, NULL, sizeof(lcm_sleep));
+    avr_hid_lcm_power(LCM_POWER_SLEEP);
 }
-
 
 void avr_hid_lcm_wake(void)
 {
-    unsigned char lcm_wake[4] = {CMD_SYNC, CMD_LCM_POWER, LCM_POWER_WAKE, CMD_CLOSE};
-
-    spi_txrx(lcm_wake, NULL, sizeof(lcm_wake));
+    avr_hid_lcm_power(LCM_POWER_WAKE);
 }
 
 void avr_hid_lcm_power_on(void)
 {
-    unsigned char lcm_power_on[4] = {CMD_SYNC, CMD_LCM_POWER, LCM_POWER_ON, CMD_CLOSE};
-
-    spi_txrx(lcm_power_on, NULL, sizeof(lcm_power_on));
+    avr_hid_lcm_power(LCM_POWER_ON);
 }
 
 void avr_hid_lcm_power_off(void)
 {
-    unsigned char lcm_power_off[4] = {CMD_SYNC, CMD_LCM_POWER, LCM_POWER_OFF, CMD_CLOSE};
-
-    spi_txrx(lcm_power_off, NULL, sizeof(lcm_power_off));
+    avr_hid_lcm_power(LCM_POWER_OFF);
 }
 
 void avr_hid_reset_codec(void)
 {
-    unsigned char codec_reset[4] = {CMD_SYNC, CMD_CODEC_RESET, CMD_CLOSE, CMD_FILL};
-
-    spi_txrx(codec_reset, NULL, sizeof(codec_reset));
+    avr_execute_command(CMD_CODEC_RESET, NULL, 0);
 }
 
-void avr_hid_set_amp_enable(unsigned char enable)
+void avr_hid_set_amp_enable(uint8_t enable)
 {
-    unsigned char amp_enable[4] = {CMD_SYNC, CMD_AMP_ENABLE, enable, CMD_CLOSE};
+    avr_execute_command(CMD_AMP_ENABLE, &enable, sizeof(enable));
+}
 
-    spi_txrx(amp_enable, NULL, sizeof(amp_enable));
+static void avr_hid_sys_ctrl(uint8_t parameter)
+{
+    avr_execute_command(CMD_SYS_CTRL, &parameter, sizeof(parameter));
 }
 
 void avr_hid_power_off(void)
 {
-    unsigned char prg[4] = {CMD_SYNC, CMD_SYS_CTRL, SYS_CTRL_POWEROFF, CMD_CLOSE};
-
-    spi_txrx(prg, NULL, sizeof(prg));
+    avr_hid_sys_ctrl(SYS_CTRL_POWEROFF);
 }
 
 #ifndef BOOTLOADER
@@ -490,6 +620,9 @@ void button_init_device(void)
                   IF_COP(, CPU));
 #endif
     IO_GIO_DIR0 |= 0x01; /* Set GIO0 as input */
+
+    /* Get in sync with AVR */
+    avr_hid_sync();
 
     /* Enable wheel */
     avr_hid_enable_wheel();
