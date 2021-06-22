@@ -734,7 +734,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                     if (list_display_title(list, screen))
                         line -= 1; /* adjust for the list title */
                 }
-                if (line >= list->nb_items)
+                if (list_start_item+line >= list->nb_items)
                     return ACTION_NONE;
                 list->selected_item = list_start_item+line;
 
