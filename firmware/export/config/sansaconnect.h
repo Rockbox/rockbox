@@ -114,7 +114,7 @@
 //#define HW_SAMPR_CAPS SAMPR_CAP_44 | SAMPR_CAP_22 | SAMPR_CAP_11 | SAMPR_CAP_8
 
 /* define this if you have a real-time clock */
-//#define CONFIG_RTC RTC_STM41T62
+#define CONFIG_RTC RTC_CONNECT
 
 /* define this if the unit uses a scrollwheel for navigation */
 #define HAVE_SCROLLWHEEL

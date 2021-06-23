@@ -348,6 +348,7 @@ Lyre prototype 1 */
 #define RTC_STM41T62 21 /* ST M41T62 */
 #define RTC_JZ4760   22 /* Ingenic Jz4760 */
 #define RTC_X1000    23 /* Ingenic X1000 */
+#define RTC_CONNECT  24 /* Sansa Connect AVR */
 
 /* USB On-the-go */
 #define USBOTG_M66591   6591 /* M:Robe 500 */

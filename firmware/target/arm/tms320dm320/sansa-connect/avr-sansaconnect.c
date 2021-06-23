@@ -21,7 +21,9 @@
 
 #include <stdio.h>
 #include "config.h"
+#include "file.h"
 #include "system.h"
+#include "time.h"
 #include "power.h"
 #include "kernel.h"
 #include "panic.h"
@@ -104,15 +106,28 @@
 /* protects spi avr commands from concurrent access */
 static struct mutex avr_mtx;
 
-/* buttons thread */
-#define BTN_INTERRUPT 1
+/* AVR thread events */
+#define INPUT_INTERRUPT          1
+#define MONOTIME_OFFSET_UPDATE   2
 static int btn = 0;
 static bool hold_switch;
-#ifndef BOOTLOADER
+static bool input_interrupt_pending;
+/* AVR implements 32-bit counter incremented every second.
+ * The counter value cannot be modified to arbitrary value,
+ * so the epoch offset needs to be stored in a file.
+ */
+#define MONOTIME_OFFSET_FILE ROCKBOX_DIR "/monotime_offset.dat"
+static uint32_t monotime_offset;
+/* Buffer last read monotime value. Reading monotime takes
+ * atleast 700 us so the tick counter is used together with
+ * last read monotime value to return current time.
+ */
+static uint32_t monotime_value;
+static unsigned long monotime_value_tick;
+
 static long avr_stack[DEFAULT_STACK_SIZE/sizeof(long)];
 static const char avr_thread_name[] = "avr";
-static struct semaphore avr_thread_trigger;
-#endif
+static struct event_queue avr_queue;
 
 /* OF bootloader will refuse to start software if low power is set
  * Bits 3, 4, 5, 6 and 7 are unknown.
@@ -133,7 +148,6 @@ static inline uint16_t be2short(uint8_t *buf)
 
 #define BUTTON_DIRECT_MASK (BUTTON_LEFT | BUTTON_UP | BUTTON_RIGHT | BUTTON_DOWN | BUTTON_SELECT | BUTTON_VOL_UP | BUTTON_VOL_DOWN | BUTTON_NEXT | BUTTON_PREV)
 
-#ifndef BOOTLOADER
 static void handle_wheel(uint8_t wheel)
 {
     static int key = 0;
@@ -199,7 +213,6 @@ static void handle_wheel(uint8_t wheel)
 
     prev_key = key;
 }
-#endif
 
 /* buf must be 8-byte state array (reply from avr_hid_get_state() */
 static void parse_button_state(uint8_t *state)
@@ -219,26 +232,23 @@ static void parse_button_state(uint8_t *state)
 
     btn = main_btns_state;
 
-#ifndef BOOTLOADER
     /* check if stored hold_switch state changed (prevents lost changes) */
     if ((state[1] & 0x20) /* hold change notification */ ||
         (hold_switch != ((state[1] & 0x02) >> 1)))
     {
-#endif
         hold_switch = (state[1] & 0x02) >> 1;
 #ifdef BUTTON_DEBUG
         dbgprintf("HOLD changed (%d)", hold_switch);
 #endif
 #ifndef BOOTLOADER
         backlight_hold_changed(hold_switch);
-    }
 #endif
-#ifndef BOOTLOADER
+    }
+
     if ((hold_switch == false) && (state[1] & 0x80)) /* scrollwheel change */
     {
         handle_wheel(state[0]);
     }
-#endif
 
 #ifdef BUTTON_DEBUG
     if (state[1] & 0x10) /* power button change */
@@ -496,6 +506,13 @@ static void avr_hid_get_state(void)
     parse_button_state(state);
 }
 
+static uint32_t avr_hid_get_monotime(void)
+{
+    uint8_t tmp[4];
+    avr_execute_command(CMD_MONOTIME, tmp, sizeof(tmp));
+    return (tmp[0]) | (tmp[1] << 8) | (tmp[2] << 16) | (tmp[3] << 24);
+}
+
 static void avr_hid_enable_wheel(void)
 {
     uint8_t enable = 0x01;
@@ -554,7 +571,6 @@ void avr_hid_power_off(void)
     avr_hid_sys_ctrl(SYS_CTRL_POWEROFF);
 }
 
-#ifndef BOOTLOADER
 static bool avr_state_changed(void)
 {
     return (IO_GIO_BITSET0 & 0x1) ? false : true;
@@ -567,6 +583,9 @@ static bool headphones_inserted(void)
 
 static void set_audio_output(bool headphones)
 {
+#ifdef BOOTLOADER
+    (void)headphones;
+#else
     if (headphones)
     {
         /* Stereo output on headphones */
@@ -579,19 +598,115 @@ static void set_audio_output(bool headphones)
         aic3x_switch_output(false);
         avr_hid_set_amp_enable(1);
     }
+#endif
+}
+
+static void read_monotime_offset(void)
+{
+    int fd = open(MONOTIME_OFFSET_FILE, O_RDONLY);
+    if (fd >= 0)
+    {
+        uint32_t offset;
+        if (sizeof(offset) == read(fd, &offset, sizeof(offset)))
+        {
+            monotime_offset = offset;
+        }
+        close(fd);
+    }
+}
+
+static bool write_monotime_offset(void)
+{
+    bool success = false;
+    int fd = open(MONOTIME_OFFSET_FILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd >= 0)
+    {
+        uint32_t offset = monotime_offset;
+        if (sizeof(monotime_offset) == write(fd, &offset, sizeof(offset)))
+        {
+            success = true;
+        }
+        close(fd);
+    }
+    return success;
+}
+
+static void read_monotime(void)
+{
+    uint32_t value = avr_hid_get_monotime();
+    int flags = disable_irq_save();
+    monotime_value = value;
+    monotime_value_tick = current_tick;
+    restore_irq(flags);
+}
+
+static time_t get_timestamp(void)
+{
+    time_t timestamp;
+    int flags = disable_irq_save();
+    timestamp = monotime_value;
+    timestamp += monotime_offset;
+    timestamp += ((current_tick - monotime_value_tick) / HZ);
+    restore_irq(flags);
+    return timestamp;
+}
+
+void rtc_init(void)
+{
+    /* This is called before disk is mounted */
+}
+
+int rtc_read_datetime(struct tm *tm)
+{
+    time_t time = get_timestamp();
+    gmtime_r(&time, tm);
+    return 1;
+}
+
+int rtc_write_datetime(const struct tm *tm)
+{
+    time_t offset = mktime((struct tm *)tm);
+    int flags = disable_irq_save();
+    offset -= monotime_value;
+    offset -= ((current_tick - monotime_value_tick) / HZ);
+    monotime_offset = offset;
+    restore_irq(flags);
+    queue_post(&avr_queue, MONOTIME_OFFSET_UPDATE, 0);
+    return 1;
 }
 
 void avr_thread(void)
 {
+    struct queue_event ev;
     bool headphones_active_state = headphones_inserted();
     bool headphones_state;
+    bool disk_access_available = true;
+    bool monotime_offset_update_pending = false;
 
     set_audio_output(headphones_active_state);
+    read_monotime_offset();
+    read_monotime();
 
     while (1)
     {
-        semaphore_wait(&avr_thread_trigger, TIMEOUT_BLOCK);
+        queue_wait(&avr_queue, &ev);
 
+        if (ev.id == SYS_USB_CONNECTED)
+        {
+            /* Allow USB to gain exclusive storage access */
+            usb_acknowledge(SYS_USB_CONNECTED_ACK);
+            disk_access_available = false;
+        }
+        else if (ev.id == SYS_USB_DISCONNECTED)
+        {
+            disk_access_available = true;
+        }
+        else if (ev.id == MONOTIME_OFFSET_UPDATE)
+        {
+            monotime_offset_update_pending = true;
+        }
+
+        input_interrupt_pending = false;
         if (avr_state_changed())
         {
             /* Read buttons state */
@@ -604,6 +719,20 @@ void avr_thread(void)
             set_audio_output(headphones_state);
             headphones_active_state = headphones_state;
         }
+
+        if (disk_access_available)
+        {
+            if (monotime_offset_update_pending && write_monotime_offset())
+            {
+                monotime_offset_update_pending = false;
+            }
+        }
+
+        /* Update buffered monotime value every hour */
+        if (TIME_AFTER(current_tick, monotime_value_tick + 3600 * HZ))
+        {
+            read_monotime();
+        }
     }
 }
 
@@ -613,7 +742,11 @@ void GIO0(void)
     /* Clear interrupt */
     IO_INTC_IRQ1 = (1 << 5);
 
-    semaphore_release(&avr_thread_trigger);
+    if (!input_interrupt_pending)
+    {
+        input_interrupt_pending = true;
+        queue_post(&avr_queue, INPUT_INTERRUPT, 0);
+    }
 }
 
 void GIO2(void) __attribute__ ((section(".icode")));
@@ -622,20 +755,26 @@ void GIO2(void)
     /* Clear interrupt */
     IO_INTC_IRQ1 = (1 << 7);
 
-    semaphore_release(&avr_thread_trigger);
+    /* Prevent event queue overflow by allowing just one pending event */
+    if (!input_interrupt_pending)
+    {
+        input_interrupt_pending = true;
+        queue_post(&avr_queue, INPUT_INTERRUPT, 0);
+    }
 }
-#endif
 
 void button_init_device(void)
 {
     btn = 0;
     hold_switch = false;
-#ifndef BOOTLOADER
-    semaphore_init(&avr_thread_trigger, 1, 1);
+
+    queue_init(&avr_queue, true);
+    input_interrupt_pending = true;
+    queue_post(&avr_queue, INPUT_INTERRUPT, 0);
     create_thread(avr_thread, avr_stack, sizeof(avr_stack), 0,
                   avr_thread_name IF_PRIO(, PRIORITY_USER_INTERFACE)
                   IF_COP(, CPU));
-#endif
+
     IO_GIO_DIR0 |= 0x01; /* Set GIO0 as input */
 
     /* Get in sync with AVR */
@@ -646,7 +785,6 @@ void button_init_device(void)
     /* Read button status and tell avr we want interrupt on next change */
     avr_hid_get_state();
 
-#ifndef BOOTLOADER
     IO_GIO_IRQPORT |= 0x05; /* Enable GIO0/GIO2 external interrupt */
     IO_GIO_INV0 &= ~0x05; /* Clear INV for GIO0/GIO2 */
     /* falling edge detection on GIO0, any edge on GIO2 */
@@ -654,7 +792,6 @@ void button_init_device(void)
 
     /* Enable GIO0 and GIO2 interrupts */
     IO_INTC_EINT1 |= INTR_EINT1_EXT0 | INTR_EINT1_EXT2;
-#endif
 }
 
 int button_read_device(void)
@@ -674,4 +811,3 @@ void lcd_enable(bool on)
 {
     (void)on;
 }
-
