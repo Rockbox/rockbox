@@ -333,6 +333,18 @@ static uint8_t spi_read_byte(void)
     return rxdata & 0xFF;
 }
 
+static void avr_hid_select(void)
+{
+    /* Drive GIO29 (AVR SS) low */
+    IO_GIO_BITCLR1 = (1 << 13);
+}
+
+static void avr_hid_release(void)
+{
+    /* Drive GIO29 (AVR SS) high */
+    IO_GIO_BITSET1 = (1 << 13);
+}
+
 static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
 {
     bool success = true;
@@ -350,6 +362,8 @@ static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
 
     bitset16(&IO_CLK_MOD2, CLK_MOD2_SIF1);
     IO_SERIAL1_TX_ENABLE = 0x0001;
+
+    avr_hid_select();
 
     IO_SERIAL1_TX_DATA = CMD_SYNC;
     spi_read_byte();
@@ -393,6 +407,8 @@ static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
         success = success && (rx == CMD_CLOSE);
     }
 
+    avr_hid_release();
+
     IO_SERIAL1_TX_ENABLE = 0;
     bitclr16(&IO_CLK_MOD2, CLK_MOD2_SIF1);
 
@@ -428,16 +444,17 @@ void avr_hid_init(void)
 {
     /*
        setup alternate GIO functions:
-       GIO29 - SIF1 Enable (Directly connected to AVR's SS)
        GIO30 - SIF1 Clock
        GIO31 - SIF1 Data In
        GIO32 - SIF1 Data Out
+       Manually drive GIO29 output (directly connected to AVR's SS).
     */
-    IO_GIO_FSEL2 = (IO_GIO_FSEL2 & 0x00FF) | 0xAA00;
+    IO_GIO_FSEL2 = (IO_GIO_FSEL2 & 0x00FF) | 0xA800;
     /* GIO29, GIO30 - outputs, GIO31 - input */
     IO_GIO_DIR1 = (IO_GIO_DIR1 & ~((1 << 13) | (1 << 14))) | (1 << 15);
     /* GIO32 - output */
     bitclr16(&IO_GIO_DIR2, (1 << 0));
+    avr_hid_release();
 
     /* RATE = 219 (0xDB) -> 200 kHz */
     IO_SERIAL1_MODE = 0x6DB;
