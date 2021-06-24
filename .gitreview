@@ -1,0 +1,5 @@
+[gerrit]
+host=gerrit.rockbox.org
+port=29418
+project=rockbox.git
+defaultbranch=master
