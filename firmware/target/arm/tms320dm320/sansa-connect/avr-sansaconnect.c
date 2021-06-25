@@ -53,6 +53,7 @@
 #endif
 
 #define AVR_DELAY_US            100
+#define AVR_MAX_RETRIES         3
 
 #define CMD_SYNC                0xAA
 #define CMD_CLOSE               0xCC
@@ -428,26 +429,38 @@ static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
 }
 
 
-static void avr_hid_sync(void)
+static bool avr_hid_sync(void)
 {
     uint8_t data;
-    while (!avr_run_command(CMD_VER, &data, sizeof(data)))
+    int retry;
+    for (retry = 0; retry < AVR_MAX_RETRIES; retry++)
     {
-        /* TODO: Program HID if failing for long time.
-         * To do so, unfortunately, AVR firmware would have to be written
-         * from scratch as OF blob cannot be used due to licensing.
-         */
+        if (avr_run_command(CMD_VER, &data, sizeof(data)))
+        {
+            return true;
+        }
     }
-
+    /* TODO: Program HID as it appears to be not programmed.
+     * To do so, unfortunately, AVR firmware would have to be written
+     * from scratch as OF blob cannot be used due to licensing.
+     */
+    return false;
 }
 
-static void avr_execute_command(uint8_t opcode, uint8_t *data, size_t data_length)
+static bool avr_execute_command(uint8_t opcode, uint8_t *data, size_t data_length)
 {
-    while (!avr_run_command(opcode, data, data_length))
+    int retry;
+    for (retry = 0; retry < AVR_MAX_RETRIES; retry++)
     {
+        if (avr_run_command(opcode, data, data_length))
+        {
+            return true;
+        }
+
         /* Resync and try again */
         avr_hid_sync();
     }
+    return false;
 }
 
 void avr_hid_init(void)
@@ -499,18 +512,22 @@ bool charging_state(void)
 static void avr_hid_get_state(void)
 {
     uint8_t state[8];
-    avr_execute_command(CMD_STATE, state, sizeof(state));
-
-    avr_battery_status = state[6];
-    avr_battery_level = state[7];
-    parse_button_state(state);
+    if (avr_execute_command(CMD_STATE, state, sizeof(state)))
+    {
+        avr_battery_status = state[6];
+        avr_battery_level = state[7];
+        parse_button_state(state);
+    }
 }
 
 static uint32_t avr_hid_get_monotime(void)
 {
     uint8_t tmp[4];
-    avr_execute_command(CMD_MONOTIME, tmp, sizeof(tmp));
-    return (tmp[0]) | (tmp[1] << 8) | (tmp[2] << 16) | (tmp[3] << 24);
+    if (avr_execute_command(CMD_MONOTIME, tmp, sizeof(tmp)))
+    {
+        return (tmp[0]) | (tmp[1] << 8) | (tmp[2] << 16) | (tmp[3] << 24);
+    }
+    return 0;
 }
 
 static void avr_hid_enable_wheel(void)
