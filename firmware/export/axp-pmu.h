@@ -92,6 +92,7 @@
 #define AXP192_REG_GPIO2FUNCTION    0x93
 #define AXP192_REG_GPIOSTATE1       0x94
 
+
 /* Must be called from power_init() to initialize the driver state */
 extern void axp_init(void);
 
