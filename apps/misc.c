@@ -66,6 +66,7 @@
 #include "list.h"
 #include "fixedpoint.h"
 #include "open_plugin.h"
+#include "spl-x1000.h"
 
 #include "debug.h"
 
