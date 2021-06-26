@@ -34,6 +34,7 @@
 #include "x1000/intc.h"
 #include "x1000/msc.h"
 #include "x1000/aic.h"
+#include "spl-x1000.h"
 
 #ifdef X1000_CPUIDLE_STATS
 int __cpu_idle_avg = 0;
@@ -62,6 +63,9 @@ static void system_init_irq(void)
 /* First thing called from Rockbox main() */
 void system_init(void)
 {
+    // HACK FIXME: this is only for USB booting Rockbox, REMOVE ME
+    spl_handle_pre_boot(0);
+    
     /* Gate all clocks except CPU/bus/memory/RTC */
     REG_CPM_CLKGR = ~jz_orm(CPM_CLKGR, CPU_BIT, DDR, AHB0, APB0, RTC);
 

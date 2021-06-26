@@ -32,6 +32,10 @@
 # define SPL_DDR_MEMORYSIZE  64
 # define SPL_DDR_AUTOSR_EN   1
 # define SPL_DDR_NEED_BYPASS 1
+#elif defined(EROS_QN)
+# define SPL_DDR_MEMORYSIZE 32
+# define SPL_DDR_AUTOSR_EN   1
+# define SPL_DDR_NEED_BYPASS 1
 #else
 # error "please add SPL memory definitions"
 #endif
@@ -188,6 +192,8 @@ static void ddr_init(void)
 
 static void init(void)
 {
+//    const uint32_t pin = (1 << 25);
+//    jz_set(GPIO_INT(GPIO_C), pin);
     /* from original firmware SPL */
     REG_CPM_PSWC0ST = 0x00;
     REG_CPM_PSWC1ST = 0x10;
