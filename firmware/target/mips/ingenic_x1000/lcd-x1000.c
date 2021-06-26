@@ -29,6 +29,7 @@
 #include "x1000/cpm.h"
 #include <stdint.h>
 #include <string.h>
+#include "spl-x1000.h"
 
 #define LCD_DMA_CMD_SOFINT  (1 << 31)
 #define LCD_DMA_CMD_EOFINT  (1 << 30)
@@ -304,7 +305,9 @@ static bool lcd_wait_frame(void)
         return false;
 
     /* Usual case -- wait for EOF, wait for FIFO to drain, clear EOF */
+    /* TODO: this is where we get hung up */
     while(jz_readf(LCD_STATE, EOF) == 0);
+    spl_error();
     while(jz_readf(LCD_MSTATE, BUSY));
     jz_writef(LCD_STATE, EOF(0));
     return true;
@@ -381,30 +384,33 @@ void lcd_init_device(void)
 
     lcd_tgt_enable(true);
 
-    lcd_dma_start();
+    // TODO: make dma work
+    //lcd_dma_start();
 }
 
 #ifdef HAVE_LCD_SHUTDOWN
 void lcd_shutdown(void)
 {
-    if(lcd_sleeping)
-        lcd_tgt_sleep(false);
-    else if(jz_readf(LCD_CTRL, ENABLE))
-        lcd_dma_stop();
-
-    lcd_tgt_enable(false);
-    jz_writef(CPM_CLKGR, LCD(1));
+//     if(lcd_sleeping)
+//         lcd_tgt_sleep(false);
+//     else if(jz_readf(LCD_CTRL, ENABLE))
+//         lcd_dma_stop();
+// 
+//     lcd_tgt_enable(false);
+//     jz_writef(CPM_CLKGR, LCD(1));
 }
 #endif
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
-    return jz_readf(LCD_CTRL, ENABLE);
+    return true;
+    //return jz_readf(LCD_CTRL, ENABLE);
 }
 
 void lcd_enable(bool en)
 {
+#if 0
     /* Must disable IRQs to turn off the running LCD */
     int irq = disable_irq_save();
     int bit = jz_readf(LCD_CTRL, ENABLE);
@@ -429,6 +435,7 @@ void lcd_enable(bool en)
     /* Handle turning the LCD back on */
     if(!bit && en)
         lcd_dma_start();
+#endif
 }
 #endif
 
@@ -439,50 +446,65 @@ void lcd_enable(bool en)
 
 void lcd_sleep(void)
 {
+#if 0
     if(!lcd_sleeping) {
         lcd_enable(false);
         lcd_tgt_sleep(true);
         lcd_sleeping = true;
     }
+#endif
 }
 #endif
 
 void lcd_update(void)
 {
-    if(!lcd_wait_frame())
-        return;
-
-    commit_dcache();
-    lcd_fbcopy_dma_full();
-    jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));
+    for (int y = 0; y < LCD_HEIGHT; ++y) {
+        for (int x = 0; x < LCD_WIDTH; ++x) {
+            //unsigned* pixel = FBADDR(x, y);
+            unsigned pixel = 0xffffffff;
+            // 24 bit RGB on 8 bit bus
+            lcd_send(pixel & 0xff);
+            lcd_send((pixel >> 8) & 0xff);
+            lcd_send((pixel >> 8) & 0xff);
+        }
+    }
+//     if(!lcd_wait_frame())
+//         return;
+// 
+//         
+//     commit_dcache();
+//     lcd_fbcopy_dma_full();
+//     jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));
 }
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    /* Clamp the coordinates */
-    if(x < 0) {
-        width += x;
-        x = 0;
-    }
-
-    if(y < 0) {
-        height += y;
-        y = 0;
-    }
-
-    if(width > LCD_WIDTH - x)
-        width = LCD_WIDTH - x;
-
-    if(height > LCD_HEIGHT - y)
-        height = LCD_HEIGHT - y;
-
-    if(width < 0 || height < 0)
-        return;
-
-    if(!lcd_wait_frame())
-        return;
-
-    commit_dcache();
-    lcd_fbcopy_dma_partial(x, y, width, height);
-    jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));
+    // I think this is correct for pio mode?
+    lcd_update();
+//     /* Clamp the coordinates */
+//     if(x < 0) {
+//         width += x;
+//         x = 0;
+//     }
+// 
+//     if(y < 0) {
+//         height += y;
+//         y = 0;
+//     }
+// 
+//     if(width > LCD_WIDTH - x)
+//         width = LCD_WIDTH - x;
+// 
+//     if(height > LCD_HEIGHT - y)
+//         height = LCD_HEIGHT - y;
+// 
+//     if(width < 0 || height < 0)
+//         return;
+// 
+//     if(!lcd_wait_frame())
+//         return;
+// 
+//     commit_dcache();
+//     lcd_fbcopy_dma_partial(x, y, width, height);
+//     jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));
 }
