@@ -32,6 +32,10 @@
 # define SPL_DDR_MEMORYSIZE  64
 # define SPL_DDR_AUTOSR_EN   1
 # define SPL_DDR_NEED_BYPASS 1
+#elif defined(EROS_QN)
+# define SPL_DDR_MEMORYSIZE 32
+# define SPL_DDR_AUTOSR_EN   1
+# define SPL_DDR_NEED_BYPASS 1
 #else
 # error "please add SPL memory definitions"
 #endif
@@ -67,7 +71,13 @@ static void ddr_init(void)
     REG_DDRC_CTRL = 0;
     mdelay(3);
 
-    REG_DDRC_CFG = 0xa468a6c;
+#if SPL_DDR_MEMORYSIZE == 64
+    REG_DDRC_CFG = 0xa468a6c; /* need 10-bit addressing for 64M */
+#elif SPL_DDR_MEMORYSIZE == 32
+    REG_DDRC_CFG = 0xa46896c; /* need 9-bit addressing for 32M */
+#else
+# error "Unsupported DDR_MEMORYSIZE"
+#endif
     REG_DDRC_CTRL = 2;
     REG_DDRPHY_DTAR = 0x150000;
     REG_DDRPHY_DCR = 0;
@@ -112,7 +122,13 @@ static void ddr_init(void)
     REG_DDRC_APB_PHYRST_CFG = 0;
     mdelay(3);
 
-    REG_DDRC_CFG = 0xa468aec;
+#if SPL_DDR_MEMORYSIZE == 64
+    REG_DDRC_CFG = 0xa468aec; /* need 10-bit addressing for 64M */
+#elif SPL_DDR_MEMORYSIZE == 32
+    REG_DDRC_CFG = 0xa4689ec; /* need 9-bit addressing for 32M */
+#else
+# error "Unsupported DDR_MEMORYSIZE"
+#endif
     REG_DDRC_CTRL = 2;
 #if SPL_DDR_NEED_BYPASS
     REG_DDRPHY_PIR = 0x20020081;
@@ -136,7 +152,13 @@ static void ddr_init(void)
     REG_DDRC_CTRL = 0;
     REG_DDRC_CTRL = 10;
     REG_DDRC_CTRL = 0;
-    REG_DDRC_CFG  = 0xa468a6c;
+#if SPL_DDR_MEMORYSIZE == 64
+    REG_DDRC_CFG  = 0xa468a6c; /* need 10-bit addressing for 64M */
+#elif SPL_DDR_MEMORYSIZE == 32
+    REG_DDRC_CFG  = 0xa46896c; /* need 9-bit addressing for 32M */
+#else
+# error "Unsupported DDR_MEMORYSIZE"
+#endif
     REG_DDRC_TIMING1 = 0x2050501;
     REG_DDRC_TIMING2 = 0x4090404;
     REG_DDRC_TIMING3 = 0x2704030d;
@@ -163,9 +185,9 @@ static void ddr_init(void)
     REG_DDRC_REMAP4 = 0x0f0e0d01;
     REG_DDRC_REMAP5 = 0x13121110;
 #elif SPL_DDR_MEMORYSIZE == 32
-    REG_DDRC_REMAP1 = 0x03020b0a;
+    REG_DDRC_REMAP1 = 0x03020100;
     REG_DDRC_REMAP2 = 0x07060504;
-    REG_DDRC_REMAP3 = 0x01000908;
+    REG_DDRC_REMAP3 = 0x0b0a0908;
     REG_DDRC_REMAP4 = 0x0f0e0d0c;
     REG_DDRC_REMAP5 = 0x13121110;
 #else
