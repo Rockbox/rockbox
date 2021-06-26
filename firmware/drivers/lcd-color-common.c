@@ -22,7 +22,7 @@
  *
  ****************************************************************************/
 
-
+#include "spl-x1000.h"
 /* to be #included by lcd-16bit*.c */
 
 #if !defined(ROW_INC) || !defined(COL_INC)

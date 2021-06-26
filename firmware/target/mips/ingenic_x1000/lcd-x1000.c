@@ -29,6 +29,7 @@
 #include "x1000/cpm.h"
 #include <stdint.h>
 #include <string.h>
+#include "spl-x1000.h"
 
 #define LCD_DMA_CMD_SOFINT  (1 << 31)
 #define LCD_DMA_CMD_EOFINT  (1 << 30)
@@ -304,6 +305,7 @@ static bool lcd_wait_frame(void)
         return false;
 
     /* Usual case -- wait for EOF, wait for FIFO to drain, clear EOF */
+    /* TODO: this is where we get hung up */
     while(jz_readf(LCD_STATE, EOF) == 0);
     while(jz_readf(LCD_MSTATE, BUSY));
     jz_writef(LCD_STATE, EOF(0));
@@ -381,6 +383,7 @@ void lcd_init_device(void)
 
     lcd_tgt_enable(true);
 
+    // TODO: make dma work
     lcd_dma_start();
 }
 
@@ -400,11 +403,13 @@ void lcd_shutdown(void)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 bool lcd_active(void)
 {
+//     return true;
     return jz_readf(LCD_CTRL, ENABLE);
 }
 
 void lcd_enable(bool en)
 {
+#if 1
     /* Must disable IRQs to turn off the running LCD */
     int irq = disable_irq_save();
     int bit = jz_readf(LCD_CTRL, ENABLE);
@@ -429,6 +434,7 @@ void lcd_enable(bool en)
     /* Handle turning the LCD back on */
     if(!bit && en)
         lcd_dma_start();
+#endif
 }
 #endif
 
@@ -439,19 +445,40 @@ void lcd_enable(bool en)
 
 void lcd_sleep(void)
 {
+#if 1
     if(!lcd_sleeping) {
         lcd_enable(false);
         lcd_tgt_sleep(true);
         lcd_sleeping = true;
     }
+#endif
 }
 #endif
 
 void lcd_update(void)
 {
+//     // we need this for PIO, but how does it factor into DMA mode?
+//     lcd_send(0x2c | jz_orf(LCD_MDATA, TYPE_V(CMD)));
+// 
+//     for (int y = 0; y < LCD_HEIGHT; ++y) {
+//         for (int x = 0; x < LCD_WIDTH; ++x) {
+//             unsigned* pixel = FBADDR(x, y);
+// 
+//             // 24 bit RGB on 8 bit bus - also works for 18 bit, but is it correct there?
+//             //lcd_send((*pixel >> 16) & 0xff);
+//             //lcd_send((*pixel >> 8) & 0xff);
+//             //lcd_send((*pixel) & 0xff);
+//             
+//             // 16 bit RGB565 - seems to work the best, but smaller colorspace
+//             // I think this might actually be RGB565SWAPPED as far as RB is concerned
+//             lcd_send((*pixel >> 8) & 0xff);
+//             lcd_send((*pixel) & 0xff);
+//         }
+//     }
     if(!lcd_wait_frame())
         return;
 
+        
     commit_dcache();
     lcd_fbcopy_dma_full();
     jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));
@@ -459,6 +486,8 @@ void lcd_update(void)
 
 void lcd_update_rect(int x, int y, int width, int height)
 {
+    // I think this is correct for pio mode?
+//     lcd_update();
     /* Clamp the coordinates */
     if(x < 0) {
         width += x;
