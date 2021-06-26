@@ -417,6 +417,7 @@ static void init(void)
 
     unicode_init();
     lcd_init();
+
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
 #endif
