@@ -29,6 +29,7 @@
 #include "x1000/cpm.h"
 #include <stdint.h>
 #include <string.h>
+#include "spl-x1000.h"
 
 #define LCD_DMA_CMD_SOFINT  (1 << 31)
 #define LCD_DMA_CMD_EOFINT  (1 << 30)
@@ -304,7 +305,9 @@ static bool lcd_wait_frame(void)
         return false;
 
     /* Usual case -- wait for EOF, wait for FIFO to drain, clear EOF */
+    /* TODO: this is where we get hung up */
     while(jz_readf(LCD_STATE, EOF) == 0);
+    spl_error();
     while(jz_readf(LCD_MSTATE, BUSY));
     jz_writef(LCD_STATE, EOF(0));
     return true;
@@ -452,6 +455,7 @@ void lcd_update(void)
     if(!lcd_wait_frame())
         return;
 
+        
     commit_dcache();
     lcd_fbcopy_dma_full();
     jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));

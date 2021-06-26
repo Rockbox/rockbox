@@ -93,6 +93,8 @@
 #include "pcm_record.h"
 #endif
 
+#include "spl-x1000.h"
+
 #ifdef BUTTON_REC
     #define SETTINGS_RESET BUTTON_REC
 #elif (CONFIG_KEYPAD == GIGABEAT_PAD)
@@ -417,6 +419,10 @@ static void init(void)
 
     unicode_init();
     lcd_init();
+    
+    // TODO: debug stuff
+    backlight_init();
+    
 #ifdef HAVE_REMOTE_LCD
     lcd_remote_init();
 #endif
@@ -458,7 +464,7 @@ static void init(void)
     m5636_init();
 #endif
 
-    backlight_init();
+//     backlight_init();
 
     button_init();
 
