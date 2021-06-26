@@ -38,6 +38,10 @@
 # define SPL_DDR_MEMORYSIZE  64
 # define SPL_DDR_AUTOSR_EN   1
 # define SPL_DDR_NEED_BYPASS 1
+#elif defined(EROS_QN)
+# define SPL_DDR_MEMORYSIZE 32
+# define SPL_DDR_AUTOSR_EN   1
+# define SPL_DDR_NEED_BYPASS 1
 #else
 # error "please define DRAM settings"
 #endif

@@ -505,6 +505,8 @@ drivers/audio/cs4398.c
 drivers/audio/es9018.c
 #elif defined (HAVE_ES9218)
 drivers/audio/es9218.c
+#elif defined (HAVE_EROS_QN_CODEC)
+drivers/audio/eros_qn_codec.c
 #endif /* defined(HAVE_*) */
 #else /* PLATFORM_HOSTED */
 #if defined(SAMSUNG_YPR0) && defined(HAVE_AS3514)
@@ -1726,6 +1728,15 @@ target/mips/ingenic_x1000/shanlingq1/lcd-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/power-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/spl-shanlingq1.c
 #endif /* SHANLING_Q1 */
+
+#if defined(EROS_QN)
+target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c
+target/mips/ingenic_x1000/erosqnative/backlight-erosqnative.c
+target/mips/ingenic_x1000/erosqnative/button-erosqnative.c
+target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c
+target/mips/ingenic_x1000/erosqnative/power-erosqnative.c
+target/mips/ingenic_x1000/erosqnative/spl-erosqnative.c
+#endif /* EROS_QN */
 
 #if defined(LYRE_PROTO1)
 target/arm/at91sam/lyre_proto1/adc-lyre_proto1.c

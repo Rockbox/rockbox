@@ -77,6 +77,17 @@
 # define BL_SELECT_NAME "PLAY"
 # define BL_QUIT_NAME   "POWER"
 # define BOOTBACKUP_FILE "/shanlingq1-boot.bin"
+#elif defined(EROS_QN)
+# define BL_RECOVERY    BUTTON_VOL_UP
+# define BL_UP          BUTTON_SCROLL_BACK
+# define BL_DOWN        BUTTON_SCROLL_FWD
+# define BL_SELECT      BUTTON_PLAY
+# define BL_QUIT        BUTTON_POWER
+# define BL_UP_NAME     "Up"
+# define BL_DOWN_NAME   "Scroll Down"
+# define BL_SELECT_NAME "PLAY"
+# define BL_QUIT_NAME   "POWER"
+# define BOOTBACKUP_FILE "/erosqnative-boot.bin"
 #else
 # error "Missing keymap!"
 #endif

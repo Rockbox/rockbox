@@ -407,6 +407,17 @@
 #elif CONFIG_KEYPAD == SHANLING_Q1_PAD
 /* use touchscreen */
 
+#elif CONFIG_KEYPAD == EROSQ_PAD
+#define ROCKPAINT_QUIT      BUTTON_POWER
+#define ROCKPAINT_DRAW      BUTTON_PLAY
+#define ROCKPAINT_MENU      BUTTON_MENU
+#define ROCKPAINT_TOOLBAR   BUTTON_VOL_UP
+#define ROCKPAINT_TOOLBAR2  BUTTON_VOL_DOWN
+#define ROCKPAINT_UP        BUTTON_PREV
+#define ROCKPAINT_DOWN      BUTTON_NEXT
+#define ROCKPAINT_LEFT      BUTTON_SCROLL_BACK
+#define ROCKPAINT_RIGHT     BUTTON_SCROLL_FWD
+
 #else
 #error "Please define keys for this keypad"
 #endif

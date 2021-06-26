@@ -265,7 +265,7 @@ void clk_init(void)
     jz_writef(CPM_APCR, BS(1), PLLM(42 - 1), PLLN(0), PLLOD(0), ENABLE(1));
     while(jz_readf(CPM_APCR, ON) == 0);
 
-#if defined(FIIO_M3K)
+#if (defined(FIIO_M3K) || defined(EROS_QN))
     /* TODO: Allow targets to define their clock frequencies in their config,
      * instead of having this be a random special case. */
     if(get_boot_option() == BOOT_OPTION_ROCKBOX) {
@@ -296,7 +296,7 @@ void clk_init(void)
                         CLKMUX_CPU(SCLK_A) |
                         CLKMUX_AHB0(MPLL) |
                         CLKMUX_AHB2(MPLL));
-#if defined(FIIO_M3K)
+#if (defined(FIIO_M3K) || defined(EROS_QN))
     }
 #endif
 

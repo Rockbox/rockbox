@@ -276,6 +276,7 @@
 #define LCD_IHIFI800      68 /* as used by IHIFI 800 */
 #define LCD_FIIOM3K       69 /* as used by the FiiO M3K */
 #define LCD_SHANLING_Q1   70 /* as used by the Shanling Q1 */
+#define LCD_EROSQ         71 /* as used by the ErosQ (native) */
 
 /* LCD_PIXELFORMAT */
 #define HORIZONTAL_PACKING 1
@@ -596,6 +597,8 @@ Lyre prototype 1 */
 #include "config/aigoerosq.h"
 #elif defined(SHANLING_Q1)
 #include "config/shanlingq1.h"
+#elif defined(EROS_QN)
+#include "config/erosqnative.h"
 #else
 //#error "unknown hwardware platform!"
 #endif
