@@ -91,4 +91,6 @@ sansaconnect.c
 show_logo.c
 #elif defined(FIIO_M3K)
 fiiom3k.c
+#elif defined(EROS_QN)
+erosqnative.c
 #endif
