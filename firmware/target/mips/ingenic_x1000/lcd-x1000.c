@@ -457,6 +457,10 @@ void lcd_update(void)
     jz_writef(LCD_MCTRL, DMA_START(1), DMA_MODE(1));
 }
 
+/* We can do partial updates even though the DMA doesn't seem to handle it well,
+ * due to the fact that this is actually putting it into a buffer, and then
+ * it gets transferred via DMA to a secondary buffer, which gets transferred in
+ * its entirety to the LCD through a different DMA process.                      */
 void lcd_update_rect(int x, int y, int width, int height)
 {
     /* Clamp the coordinates */
