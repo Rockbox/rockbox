@@ -52,8 +52,8 @@
 #define dbgprintf(...)
 #endif
 
-#define AVR_DELAY_US            100
-#define AVR_MAX_RETRIES         3
+#define AVR_DELAY_US            200
+#define AVR_MAX_RETRIES         10
 
 #define CMD_SYNC                0xAA
 #define CMD_CLOSE               0xCC
@@ -428,17 +428,29 @@ static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
     return success;
 }
 
+static bool avr_hid_get_state(void)
+{
+    uint8_t state[8];
+    if (avr_run_command(CMD_STATE, state, sizeof(state)))
+    {
+        avr_battery_status = state[6];
+        avr_battery_level = state[7];
+        parse_button_state(state);
+        return true;
+    }
+    return false;
+}
 
 static bool avr_hid_sync(void)
 {
-    uint8_t data;
     int retry;
     for (retry = 0; retry < AVR_MAX_RETRIES; retry++)
     {
-        if (avr_run_command(CMD_VER, &data, sizeof(data)))
+        if (avr_hid_get_state())
         {
             return true;
         }
+        mdelay(100);
     }
     /* TODO: Program HID as it appears to be not programmed.
      * To do so, unfortunately, AVR firmware would have to be written
@@ -507,17 +519,6 @@ unsigned int power_input_status(void)
 bool charging_state(void)
 {
     return (avr_battery_status & BATTERY_STATUS_CHARGING) != 0;
-}
-
-static void avr_hid_get_state(void)
-{
-    uint8_t state[8];
-    if (avr_execute_command(CMD_STATE, state, sizeof(state)))
-    {
-        avr_battery_status = state[6];
-        avr_battery_level = state[7];
-        parse_button_state(state);
-    }
 }
 
 static uint32_t avr_hid_get_monotime(void)
