@@ -115,12 +115,12 @@ librbspeex.a: $(TARGET_DIR)librbspeex.a
 ../rbspeexenc: $(OBJS) $(TARGET_DIR)librbspeex.a
 	$(info Linking ../rbspeexenc)
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDFLAGS) $(ARCHFLAGS) -o ../rbspeexenc $(BUILD_DIR)/rbspeexenc.c.o \
-		    $(LIBS) -lm $(TARGET_DIR)librbspeex.a
+		    $(TARGET_DIR)librbspeex.a $(LIBS) -lm
 
 ../rbspeexdec: $(OBJS) $(TARGET_DIR)librbspeex.a
 	$(info Linking ../rbspeexdec)
 	$(SILENT)$(CROSS)$(CC) $(CFLAGS) $(LDFLAGS) $(ARCHFLAGS) -o ../rbspeexdec $(BUILD_DIR)/rbspeexdec.c.o \
-		    $(LIBS) -lm $(TARGET_DIR)librbspeex.a
+		    $(TARGET_DIR)librbspeex.a $(LIBS) -lm
 
 # common rules
 $(OBJDIR)%.c.o:
