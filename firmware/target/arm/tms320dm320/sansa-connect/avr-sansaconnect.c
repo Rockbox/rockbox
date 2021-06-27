@@ -120,9 +120,10 @@ static bool input_interrupt_pending;
 #define MONOTIME_OFFSET_FILE ROCKBOX_DIR "/monotime_offset.dat"
 static uint32_t monotime_offset;
 /* Buffer last read monotime value. Reading monotime takes
- * atleast 700 us so the tick counter is used together with
+ * atleast 1400 us so the tick counter is used together with
  * last read monotime value to return current time.
  */
+static bool monotime_available;
 static uint32_t monotime_value;
 static unsigned long monotime_value_tick;
 
@@ -521,16 +522,6 @@ bool charging_state(void)
     return (avr_battery_status & BATTERY_STATUS_CHARGING) != 0;
 }
 
-static uint32_t avr_hid_get_monotime(void)
-{
-    uint8_t tmp[4];
-    if (avr_execute_command(CMD_MONOTIME, tmp, sizeof(tmp)))
-    {
-        return (tmp[0]) | (tmp[1] << 8) | (tmp[2] << 16) | (tmp[3] << 24);
-    }
-    return 0;
-}
-
 static void avr_hid_enable_wheel(void)
 {
     uint8_t enable = 0x01;
@@ -651,22 +642,48 @@ static bool write_monotime_offset(void)
 
 static void read_monotime(void)
 {
-    uint32_t value = avr_hid_get_monotime();
-    int flags = disable_irq_save();
-    monotime_value = value;
-    monotime_value_tick = current_tick;
-    restore_irq(flags);
+    uint8_t tmp[4];
+    uint32_t t1, t2;
+
+    if (!avr_execute_command(CMD_MONOTIME, tmp, sizeof(tmp)))
+    {
+        return;
+    }
+    t1 = (tmp[0]) | (tmp[1] << 8) | (tmp[2] << 16) | (tmp[3] << 24);
+
+    if (!avr_execute_command(CMD_MONOTIME, tmp, sizeof(tmp)))
+    {
+        return;
+    }
+    t2 = (tmp[0]) | (tmp[1] << 8) | (tmp[2] << 16) | (tmp[3] << 24);
+
+    if ((t1 == t2) || (t1 + 1 == t2))
+    {
+        int flags = disable_irq_save();
+        monotime_value = t1;
+        monotime_value_tick = current_tick;
+        restore_irq(flags);
+        monotime_available = true;
+    }
 }
 
 static time_t get_timestamp(void)
 {
     time_t timestamp;
-    int flags = disable_irq_save();
-    timestamp = monotime_value;
-    timestamp += monotime_offset;
-    timestamp += ((current_tick - monotime_value_tick) / HZ);
-    restore_irq(flags);
-    return timestamp;
+    if (!monotime_available)
+    {
+        read_monotime();
+    }
+    if (monotime_available)
+    {
+        int flags = disable_irq_save();
+        timestamp = monotime_value;
+        timestamp += monotime_offset;
+        timestamp += ((current_tick - monotime_value_tick) / HZ);
+        restore_irq(flags);
+        return timestamp;
+    }
+    return 0;
 }
 
 void rtc_init(void)
