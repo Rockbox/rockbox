@@ -52,7 +52,7 @@
 #define dbgprintf(...)
 #endif
 
-#define AVR_DELAY_US            100
+#define AVR_DELAY_US            200
 #define AVR_MAX_RETRIES         3
 
 #define CMD_SYNC                0xAA
@@ -439,6 +439,7 @@ static bool avr_hid_sync(void)
         {
             return true;
         }
+        mdelay(100);
     }
     /* TODO: Program HID as it appears to be not programmed.
      * To do so, unfortunately, AVR firmware would have to be written
