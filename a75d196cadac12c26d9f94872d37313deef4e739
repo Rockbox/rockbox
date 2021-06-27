@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4167e053_b3a29a75",
+        "filename": "bootloader/erosqnative.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "tip: instead of loading rockbox.bin you can put code here for quick debugging and load bootloader.bin. It\u0027s more predictable since you control everything (and a much faster build).\n\nmaybe you should try putting the blinking light here \u0026 see what happens?",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e7d519fd_7ecccd20",
+        "filename": "firmware/export/config/erosqnative.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "you will have to play around a bit here, and check the X1000 manual (SLCD controller) for details, I\u0027m not sure if a 24-bit framebuffer will work. You might need to use 32-bit XRGB8888 format.",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4238e5e8_435de7bf",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "you should add yourself to any new files :-)",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79e5cfb1_89258a17",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/gpio-target.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "BL_PWR is not needed. The PWM code sets GPIO functions itself -- it will switch between GPIOF_DEVICE setting when PWM is enabled and GPIOF_OUTPUT when PWM is disabled, so it doesn\u0027t really fit into the table.",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c41a7277_154e73d0",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/gpio-target.h",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be GPIO_PB(28)?",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbe2d90c_4868313c",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "this should be okay.\n\n24bpp is the framebuffer format and the CPU will convert it to the appropriate data on the bus, either sending 18 bits directly (truncating the low order bits on CPU side) or sending the full 24 bits and the LCD controller will just ignore the low order bits itself.",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "65f6b5d8_a4142af0",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/spl-erosqnative.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "not very important right now, but are these the real command lines or just M3K\u0027s with memory adjusted to be 32M?\n\nif you need to fix these put a TODO comment so you don\u0027t forget about it.",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee5ef7ee_6609f1c4",
+        "filename": "firmware/target/mips/ingenic_x1000/spl-x1000.c",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-27T15:55:51Z",
+      "side": 1,
+      "message": "you can try setting NEED_BYPASS to 0. I\u0027m not sure it\u0027s correct but if you have DRAM problems it\u0027s worth trying and seeing if it gets you any further.",
+      "revId": "a75d196cadac12c26d9f94872d37313deef4e739",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
