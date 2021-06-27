@@ -376,6 +376,7 @@ static bool avr_run_command(uint8_t opcode, uint8_t *data, size_t data_length)
     IO_SERIAL1_TX_ENABLE = 0x0001;
 
     avr_hid_select();
+    udelay(10);
 
     IO_SERIAL1_TX_DATA = CMD_SYNC;
     spi_read_byte();
@@ -660,7 +661,7 @@ static void read_monotime(void)
     if ((t1 == t2) || (t1 + 1 == t2))
     {
         int flags = disable_irq_save();
-        monotime_value = t1;
+        monotime_value = t2;
         monotime_value_tick = current_tick;
         restore_irq(flags);
         monotime_available = true;
