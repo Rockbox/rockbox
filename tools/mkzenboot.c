@@ -24,6 +24,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <stdbool.h>
 #include <inttypes.h>
 #include <zlib.h>
