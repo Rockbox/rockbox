@@ -201,7 +201,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #endif
 #ifdef USB_ENABLE_SERIAL
     [USB_DRIVER_SERIAL] = {
-        .enabled = false,
+        .enabled = true,
         .needs_exclusive_storage = false,
         .first_interface = 0,
         .last_interface = 0,

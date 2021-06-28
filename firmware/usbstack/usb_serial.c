@@ -183,7 +183,7 @@ static struct cdc_line_coding line_coding;
  * bytes, it doesn't hurt because data can be sent over several transfers.
  */
 #define BUFFER_SIZE 512
-#define TRANSIT_BUFFER_SIZE 32
+#define TRANSIT_BUFFER_SIZE 4096
 static unsigned char send_buffer[BUFFER_SIZE];
 static unsigned char transit_buffer[TRANSIT_BUFFER_SIZE]
     USB_DEVBSS_ATTR __attribute__((aligned(4)));

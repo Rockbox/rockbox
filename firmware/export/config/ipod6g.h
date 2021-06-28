@@ -242,7 +242,7 @@
 #define USB_DW_CLOCK 0
 #define USB_DW_TURNAROUND 5
 /* logf() over USB serial (http://www.rockbox.org/wiki/PortalPlayerUsb) */
-//#define USB_ENABLE_SERIAL
+#define USB_ENABLE_SERIAL
 #define HAVE_USBSTACK
 #define HAVE_USB_HID_MOUSE
 #define USB_VENDOR_ID 0x05AC
