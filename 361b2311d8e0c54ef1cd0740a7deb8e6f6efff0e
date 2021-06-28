@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "98925588_6075c166",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-06-28T22:22:12Z",
+      "side": 1,
+      "message": "try changing this to te_enable\u003d0. Setting this bit to 1 will make the CPU wait for a pulse on the panel\u0027s TE (tearing effect) output line before it starts sending data; this lets it sync up with the controller\u0027s scan line and not overwrite data that\u0027s being actively scanned out, to avoid screen tearing.\n\nSo, if there\u0027s no TE pulse the frame will never even get started.\n\nAlternatively, you can enable the TE signal on the panel and keep te_enable\u003d1. The standard command for this is:\n\n    LCD_INSTR_CMD, 0x35, /* cmd 0x35, set_tear_on */\n    LCD_INSTR_DAT,    M, /* M\u003d0x00 (v-blank only)\n                          * M\u003d0x01 (h-blank and v-blank)\n                          */\n\nI wasn\u0027t able to get this to work properly on the M3K. It might\u0027ve been a misconfiguration on the M3K\u0027s panel, or the CPU, but I\u0027m pretty sure I tried all the combinations and failed to get the CPU to respect the TE signal correctly; it just wrote out frames as fast as it could. \n\nThat\u0027s why the LCD driver is a bit convoluted. With the TE signal not working properly, one-shot DMA was the only way I could avoid tearing and the rest of it is just to allow lcd_update() to kick off an asynchronous transfer and return as quickly as possible.\n\nUnfortunately I just got \"flicker\" problems instead, due to Rockbox trying to be efficient and avoid overdraw by partial LCD updates... that\u0027s actually the worst way to use the X1000 LCD driver, since multiple update calls per \"logical\" frame force the driver to wait for multiple real frames and you will see every intermediate result on the screen.\n\nI intend to fix all that someday, somehow, but I never get around to it.",
+      "revId": "361b2311d8e0c54ef1cd0740a7deb8e6f6efff0e",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
