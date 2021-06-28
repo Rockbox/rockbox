@@ -42,20 +42,25 @@ static void rbsdl_runthread(void)
     SDL_RunThread(args);
 }
 
+#define RBSDL_THREAD_STACK_SIZE (DEFAULT_STACK_SIZE * 4)
 #define MAX_THREAD 4
 static char names[MAX_THREAD][16];
-static long stacks[MAX_THREAD][DEFAULT_STACK_SIZE / sizeof(long)];
+static long stacks[MAX_THREAD][RBSDL_THREAD_STACK_SIZE / sizeof(long)];
 
 int SDL_SYS_CreateThread(SDL_Thread *thread, void *args)
 {
     static int threadnum = 0;
+
+    if(threadnum >= MAX_THREAD)
+        return -1;
+
     snprintf(names[threadnum], 16, "sdl_%d", threadnum);
 
     while(global_args) rb->yield(); /* busy wait, pray that this works */
 
     global_args = args;
 
-    thread->handle = rb->create_thread(rbsdl_runthread, stacks[threadnum], DEFAULT_STACK_SIZE,
+    thread->handle = rb->create_thread(rbsdl_runthread, stacks[threadnum], RBSDL_THREAD_STACK_SIZE,
                                        0, names[threadnum] /* collisions allowed? */
                                        IF_PRIO(, PRIORITY_BUFFERING) // this is used for sound mixing
                                        IF_COP(, CPU));
