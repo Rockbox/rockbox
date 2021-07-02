@@ -70,6 +70,30 @@
       "revId": "d1a92aafff55defefcb8cf8f4b045701325088b2",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d219354_e56bd184",
+        "filename": "firmware/target/arm/tms320dm320/system-dm320.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1000054
+      },
+      "writtenOn": "2021-07-02T17:35:59Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "ad10ff19_bb2cb254",
+      "range": {
+        "startLine": 372,
+        "startChar": 0,
+        "endLine": 374,
+        "endChar": 41
+      },
+      "revId": "d1a92aafff55defefcb8cf8f4b045701325088b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
