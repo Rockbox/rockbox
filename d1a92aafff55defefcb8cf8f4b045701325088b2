@@ -22,6 +22,30 @@
       "revId": "d1a92aafff55defefcb8cf8f4b045701325088b2",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6df92e2e_c723e84a",
+        "filename": "firmware/target/arm/tms320dm320/system-dm320.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1000054
+      },
+      "writtenOn": "2021-07-02T14:15:34Z",
+      "side": 0,
+      "message": "I think the HAVE_WIFI is pretty much going be in sansa connect config and wrapping this here with #ifndef HAVE_WIFI just doesn\u0027t seem justified to me.\n\nI don\u0027t think this code belongs here at all though - I originally put it here because I didn\u0027t have any better place for it. Also, the importance of this is much smaller than the importance of PD (configured via AVR command). Basically setting PD to 0 equals really significant current reduction (as compared to PD equal 1), while setting CS and reset change close to nothing if PD is 0 (which is default after booting).",
+      "parentUuid": "6faf77a7_c68fb291",
+      "range": {
+        "startLine": 372,
+        "startChar": 0,
+        "endLine": 374,
+        "endChar": 41
+      },
+      "revId": "d1a92aafff55defefcb8cf8f4b045701325088b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
