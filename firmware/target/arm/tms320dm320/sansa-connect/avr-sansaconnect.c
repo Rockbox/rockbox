@@ -75,7 +75,7 @@
 #define CMD_WHEEL_EN            0xD0
 #define CMD_SET_INTCHRG         0xD1
 #define CMD_GET_INTCHRG         0xD2
-#define CMD_UNKNOWN_D3          0xD3
+#define CMD_WIFI_PD             0xD3
 #define CMD_UNKNOWN_D4          0xD4
 #define CMD_UNKNOWN_D5          0xD5
 #define CMD_UNKNOWN_D6          0xD6
@@ -315,7 +315,7 @@ static size_t avr_command_data_size(uint8_t opcode)
         case CMD_WHEEL_EN:            return 1;
         case CMD_SET_INTCHRG:         return 1;
         case CMD_GET_INTCHRG:         return 1;
-        case CMD_UNKNOWN_D3:          return 1;
+        case CMD_WIFI_PD:             return 1;
         case CMD_UNKNOWN_D4:          return 1;
         case CMD_UNKNOWN_D5:          return 2;
         case CMD_UNKNOWN_D6:          return 2;
@@ -534,6 +534,12 @@ void avr_hid_enable_charger(void)
 {
     uint8_t enable = 0x01;
     avr_execute_command(CMD_SET_INTCHRG, &enable, sizeof(enable));
+}
+
+void avr_hid_wifi_pd(int high)
+{
+    uint8_t state = high ? 0x01 : 0x00;
+    avr_execute_command(CMD_WIFI_PD, &state, sizeof(state));
 }
 
 static void avr_hid_lcm_power(uint8_t parameter)

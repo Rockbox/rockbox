@@ -369,9 +369,11 @@ void system_init(void)
 #endif
 
 #ifdef SANSA_CONNECT
+#ifndef HAVE_WIFI
     /* keep WIFI CS and reset high to save power */
     IO_GIO_DIR0 &= ~((1 << 4) /* CS */ | (1 << 3) /* reset */);
     IO_GIO_BITSET0 = (1 << 4) | (1 << 3);
+#endif
 
     i2c_init();
     avr_hid_init();
