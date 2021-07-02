@@ -28,6 +28,8 @@ void avr_hid_init(void);
 
 void avr_hid_enable_charger(void);
 
+void avr_hid_wifi_pd(int high);
+
 void avr_hid_lcm_sleep(void);
 void avr_hid_lcm_wake(void);
 void avr_hid_lcm_power_on(void);

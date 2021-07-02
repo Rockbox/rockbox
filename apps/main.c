@@ -36,6 +36,7 @@
 #include "panic.h"
 #include "menu.h"
 #include "usb.h"
+#include "wifi.h"
 #include "powermgmt.h"
 #if !defined(DX50) && !defined(DX90)
 #include "adc.h"
@@ -635,6 +636,10 @@ static void init(void)
     audio_init();
     CHART("<audio_init");
     talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
+
+#ifdef HAVE_WIFI
+    wifi_init();
+#endif
 
     /* runtime database has to be initialized after audio_init() */
     cpu_boost(false);

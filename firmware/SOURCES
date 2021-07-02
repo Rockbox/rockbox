@@ -536,6 +536,15 @@ target/hosted/sdl/pcm-sdl.c
 
 #endif /* !defined(BOOTLOADER) */
 
+/* WiFi */
+#if !defined(BOOTLOADER)
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+#if defined(HAVE_W8686_SPI)
+drivers/libertas/if_spi.c
+#endif
+#endif /* (CONFIG_PLATFORM & PLATFORM_NATIVE) */
+#endif /* !defined(BOOTLOADER) */
+
 /* CPU Specific - By class then particular chip if applicable */
 #if defined(CPU_COLDFIRE)
 
@@ -1266,6 +1275,7 @@ target/arm/tms320dm320/sansa-connect/usb-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/avr-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/backlight-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/pcm-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/wifi-sansaconnect.c
 target/arm/tms320dm320/dma-dm320.c
 #endif /* SANSA_CONNECT */
 

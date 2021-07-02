@@ -387,6 +387,11 @@ sub buildzip {
         open(NOMEDIA, ">$temp_dir/.nomedia")  || die "can't open .nomedia";
         close(NOMEDIA);
     }
+    # copy wifi firmware
+    if ($modelname =~ /sansaconnect/) {
+        glob_mkdir("$temp_dir/libertas");
+        glob_copy("$ROOT/firmware/drivers/libertas/firmware/*", "$temp_dir/libertas/");
+    }
 
     glob_mkdir("$temp_dir/langs");
     glob_mkdir("$temp_dir/rocks");
