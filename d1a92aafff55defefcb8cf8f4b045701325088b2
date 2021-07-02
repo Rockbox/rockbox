@@ -46,6 +46,30 @@
       "revId": "d1a92aafff55defefcb8cf8f4b045701325088b2",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad10ff19_bb2cb254",
+        "filename": "firmware/target/arm/tms320dm320/system-dm320.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1000054
+      },
+      "writtenOn": "2021-07-02T17:30:26Z",
+      "side": 0,
+      "message": "Apparently, it makes sense to not include HAVE_WIFI in bootloader.",
+      "parentUuid": "6df92e2e_c723e84a",
+      "range": {
+        "startLine": 372,
+        "startChar": 0,
+        "endLine": 374,
+        "endChar": 41
+      },
+      "revId": "d1a92aafff55defefcb8cf8f4b045701325088b2",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
     }
   ]
 }
