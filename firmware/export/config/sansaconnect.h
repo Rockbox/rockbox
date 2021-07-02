@@ -135,6 +135,10 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
+#define HAVE_WIFI
+/* define this if the target has Marvell 88W8686 interfaced over SPI */
+#define HAVE_W8686_SPI
+
 /* The number of bytes reserved for loadable codecs */
 #define CODEC_SIZE 0x100000
 
