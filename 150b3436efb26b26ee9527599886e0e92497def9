@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "65b8c333_f080ae08",
+        "filename": "firmware/target/mips/ingenic_x1000/shanlingq1/button-shanlingq1.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-03T21:49:08Z",
+      "side": 1,
+      "message": "Just a thought, what\u0027s the symptom? I had an issue on the eros\u0027 scrollwheel where it would not register unless I spun it fast (super weird - the exact opposite of most quadrature issues), the fix ended up being to use queue_post() rather than the normal button check. I don\u0027t know why, but that fixed it. Just thought I\u0027d mention that in case you hadn\u0027t tried it.\n\nAlso re: skipping opposite direction, maybe give the method used for the eros\u0027 wheel in my patchset a try? I\u0027ve used the table lookup method in a much more demanding situation at work (2000 count/rev encoder @ 70mph) without issue, and it seems to work well on the eros as well.",
+      "revId": "150b3436efb26b26ee9527599886e0e92497def9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
