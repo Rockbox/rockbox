@@ -32,6 +32,20 @@
 
 static struct tm tm;
 
+time_t dostime_mktime(uint16_t dosdate, uint16_t dostime)
+{
+    /* this knows our mktime() only uses these struct tm fields */
+    struct tm tm;
+    tm.tm_sec  = ((dostime      ) & 0x1f) * 2;
+    tm.tm_min  = ((dostime >>  5) & 0x3f);
+    tm.tm_hour = ((dostime >> 11)       );
+    tm.tm_mday = ((dosdate      ) & 0x1f);
+    tm.tm_mon  = ((dosdate >>  5) & 0x0f) - 1;
+    tm.tm_year = ((dosdate >>  9)       ) + 80;
+
+    return mktime(&tm);
+}
+
 #if !CONFIG_RTC
 static inline bool rtc_dirty(void)
 {

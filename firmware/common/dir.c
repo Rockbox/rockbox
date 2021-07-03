@@ -26,6 +26,7 @@
 #include "debug.h"
 #include "dir.h"
 #include "pathfuncs.h"
+#include "timefuncs.h"
 #include "fileobj_mgr.h"
 #include "dircache_redirect.h"
 
@@ -406,7 +407,7 @@ struct dirinfo dir_get_info(DIR *dirp, struct dirent *entry)
     {
         .attribute = entry->info.attr,
         .size      = entry->info.size,
-        .mtime     = fattime_mktime(entry->info.wrtdate, entry->info.wrttime),
+        .mtime     = dostime_mktime(entry->info.wrtdate, entry->info.wrttime),
     };
 
 file_error:

@@ -2954,20 +2954,6 @@ void fat_empty_fat_direntry(struct fat_direntry *entry)
     entry->firstcluster = 0;
 }
 
-time_t fattime_mktime(uint16_t fatdate, uint16_t fattime)
-{
-    /* this knows our mktime() only uses these struct tm fields */
-    struct tm tm;
-    tm.tm_sec  = ((fattime      ) & 0x1f) * 2;
-    tm.tm_min  = ((fattime >>  5) & 0x3f);
-    tm.tm_hour = ((fattime >> 11)       );
-    tm.tm_mday = ((fatdate      ) & 0x1f);
-    tm.tm_mon  = ((fatdate >>  5) & 0x0f) - 1;
-    tm.tm_year = ((fatdate >>  9)       ) + 80;
-
-    return mktime(&tm);
-}
-
 void fat_init(void)
 {
     dc_lock_cache();

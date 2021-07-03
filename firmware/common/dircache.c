@@ -2956,7 +2956,7 @@ void dircache_dump(void)
         FOR_EACH_CACHE_ENTRY(ce)
         {
         #ifdef DIRCACHE_NATIVE
-            time_t mtime = fattime_mktime(ce->wrtdate, ce->wrttime);
+            time_t mtime = dostime_mktime(ce->wrtdate, ce->wrttime);
         #else
             time_t mtime = ce->mtime;
         #endif

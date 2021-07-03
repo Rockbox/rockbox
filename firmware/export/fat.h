@@ -174,7 +174,6 @@ void fat_recalc_free(IF_MV_NONVOID(int volume));
 bool fat_size(IF_MV(int volume,) unsigned long *size, unsigned long *free);
 
 /** Misc. **/
-time_t fattime_mktime(uint16_t fatdate, uint16_t fattime);
 void fat_empty_fat_direntry(struct fat_direntry *entry);
 void fat_init(void);
 

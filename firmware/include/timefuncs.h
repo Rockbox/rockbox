@@ -24,8 +24,10 @@
 
 #include "config.h"
 #include <stdbool.h>
+#include <stdint.h>
 #include "time.h"
 
+time_t dostime_mktime(uint16_t dosdate, uint16_t dostime);
 struct tm *get_time(void);
 int set_time(const struct tm *tm);
 #if CONFIG_RTC
