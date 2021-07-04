@@ -70,7 +70,6 @@ void power_off(void)
     /* Disable GIO0 and GIO2 interrupts */
     IO_INTC_EINT1 &= ~(INTR_EINT1_EXT2 | INTR_EINT1_EXT0);
 
-    avr_hid_reset_codec();
     avr_hid_power_off();
 }
 

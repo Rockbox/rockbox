@@ -110,6 +110,7 @@ static struct mutex avr_mtx;
 /* AVR thread events */
 #define INPUT_INTERRUPT          1
 #define MONOTIME_OFFSET_UPDATE   2
+#define POWER_OFF_REQUEST        3
 static int btn = 0;
 static bool hold_switch;
 static bool input_interrupt_pending;
@@ -584,7 +585,10 @@ static void avr_hid_sys_ctrl(uint8_t parameter)
 
 void avr_hid_power_off(void)
 {
-    avr_hid_sys_ctrl(SYS_CTRL_POWEROFF);
+    /* Do not execute command directly here because we can get called inside
+     * tick task context that must not acquire mutex.
+     */
+    queue_post(&avr_queue, POWER_OFF_REQUEST, 0);
 }
 
 static bool avr_state_changed(void)
@@ -746,6 +750,11 @@ void avr_thread(void)
         else if (ev.id == MONOTIME_OFFSET_UPDATE)
         {
             monotime_offset_update_pending = true;
+        }
+        else if (ev.id == POWER_OFF_REQUEST)
+        {
+            avr_hid_reset_codec();
+            avr_hid_sys_ctrl(SYS_CTRL_POWEROFF);
         }
 
         input_interrupt_pending = false;
