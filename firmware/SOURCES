@@ -268,6 +268,7 @@ common/structec.c
 common/timefuncs.c
 common/unicode.c
 common/vuprintf.c
+common/zip.c
 
 /* Display */
 scroll_engine.c
