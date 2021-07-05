@@ -857,8 +857,3 @@ bool button_hold(void)
 {
     return hold_switch;
 }
-
-void lcd_enable(bool on)
-{
-    (void)on;
-}

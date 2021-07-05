@@ -29,60 +29,109 @@
 #include "lcd.h"
 #include "lcd-target.h"
 #include "avr-sansaconnect.h"
+#include "backlight-target.h"
 
-extern bool lcd_on; /* lcd-memframe.c */
+/* See lcd-memframe.c */
+extern void lcd_set_active(bool active);
 
-#if defined(HAVE_LCD_SLEEP)
+static bool lcd_powered;
+
 void lcd_sleep(void)
 {
-    if (lcd_on)
+    if (lcd_powered)
     {
-        lcd_on = false;
+        lcd_set_active(false);
 
-        avr_hid_lcm_sleep();
-        sleep(HZ/20);
+        avr_hid_lcm_power_off();
+        mdelay(100);
 
+        /* Disable OSD window */
+        bitclr16(&IO_OSD_OSDWINMD0, 0x01);
         /* disable video encoder */
-        bitclr16(&IO_VID_ENC_VMOD, 0x01);
+        bitclr16(&IO_VID_ENC_VMOD, VENC_VMOD_VENC);
+        mdelay(66);
 
-        sleep(HZ/20);
+        /* disable video encoder and OSD clocks */
+        bitclr16(&IO_CLK_MOD1, CLK_MOD1_VENC | CLK_MOD1_OSD);
 
-        /* disable video encoder clock */
-        bitclr16(&IO_CLK_MOD1, CLK_MOD1_VENC);
+        lcd_powered = false;
     }
 }
 
 void lcd_awake(void)
 {
-    if (!lcd_on)
+    if (!lcd_powered)
     {
-        lcd_on = true;
+        /* Enable Video Encoder and OSD clocks */
+        bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC | CLK_MOD1_OSD);
+        /* Enable OSD window */
+        bitset16(&IO_OSD_OSDWINMD0, 0x01);
+        /* Enable video encoder */
+        bitset16(&IO_VID_ENC_VMOD, VENC_VMOD_VENC);
 
-        /* enable video encoder clock */
-        bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC); 
-
-        /* enable video encoder */
-        bitset16(&IO_VID_ENC_VMOD, 0x01);
-
+        avr_hid_lcm_power_on();
+        lcd_set_active(true);
         avr_hid_lcm_wake();
 
+        lcd_powered = true;
         send_event(LCD_EVENT_ACTIVATION, NULL);
-
-        lcd_update();
     }
 }
-#endif
+
+void lcd_shutdown(void)
+{
+    backlight_hw_off();
+    lcd_sleep();
+}
+
+void lcd_enable(bool enable)
+{
+    if (lcd_active() == enable)
+        return;
+
+    lcd_set_active(enable);
+
+    if (enable)
+    {
+        /* Enable Video Encoder and OSD clocks */
+        bitset16(&IO_CLK_MOD1, CLK_MOD1_VENC | CLK_MOD1_OSD);
+        /* Enable OSD window */
+        bitset16(&IO_OSD_OSDWINMD0, 0x01);
+        /* Enable video encoder */
+        bitset16(&IO_VID_ENC_VMOD, VENC_VMOD_VENC);
+
+        avr_hid_lcm_wake();
+        mdelay(30);
+
+        send_event(LCD_EVENT_ACTIVATION, NULL);
+    }
+    else
+    {
+        mdelay(30);
+        avr_hid_lcm_sleep();
+        mdelay(10);
+
+        /* Disable OSD window */
+        bitclr16(&IO_OSD_OSDWINMD0, 0x01);
+        /* disable video encoder */
+        bitclr16(&IO_VID_ENC_VMOD, VENC_VMOD_VENC);
+        mdelay(66);
+
+        /* disable video encoder and OSD clocks */
+        bitclr16(&IO_CLK_MOD1, CLK_MOD1_VENC | CLK_MOD1_OSD);
+    }
+}
 
 void lcd_init_device(void)
 {
     unsigned int addr;
- 
+
     /* Disable Video Encoder clock */
     bitclr16(&IO_CLK_MOD1, CLK_MOD1_VENC);
 
     /* configure GIO39, GIO34 as outputs */
     IO_GIO_DIR2 &= ~((1 << 7) /* GIO39 */ | (1 << 2) /* GIO34 */);
-    
+
     IO_GIO_FSEL3 = (IO_GIO_FSEL3 & ~(0x300F)) |
                    (0x1000) /* GIO39 - FIELD_VENC */ |
                    (0x4);   /* GIO34 - PWM1 (brightness control) */
@@ -121,9 +170,8 @@ void lcd_init_device(void)
     IO_VID_ENC_VMOD = 0x2015; /* OF sets 0x2011 */
 
     /* Copy Rockbox frame buffer to the second framebuffer */
+    lcd_set_active(true);
     lcd_update();
-
-    avr_hid_lcm_power_on();
 
     /* set framebuffer address - OF sets RAM start address to 0x1000000 */
     addr = ((int)FRAME-CONFIG_SDRAM_START)/32;
@@ -149,8 +197,9 @@ void lcd_init_device(void)
 
     /* Enable Video Encoder - RGB666, custom timing */
     IO_VID_ENC_VMOD = 0x2015;
+
+    lcd_powered = true;
     avr_hid_lcm_wake();
-    lcd_on = true;
 }
 
 #ifdef LCD_USE_DMA
@@ -167,14 +216,14 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
     /* Set source and destination addresses */
     dst = (char*)(FRAME + LCD_WIDTH*y + x);
     src = (char*)(FBADDR(x,y));
- 
+
     /* Flush cache to memory */
     commit_dcache();
 
     /* Addresses are relative to start of SDRAM */
     src -= CONFIG_SDRAM_START;
     dst -= CONFIG_SDRAM_START;
-    
+
     /* Enable Image Buffer clock */
     bitset16(&IO_CLK_MOD1, CLK_MOD1_IMGBUF);
 
@@ -191,7 +240,7 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
 
     /* Set the start address of buffer */
     COP_BUF_ADDR = 0x0000;
-    
+
     /* Setup SDRAM stride */
     COP_SDEM_LOFST = LCD_WIDTH;
 
@@ -200,28 +249,28 @@ static void dma_lcd_copy_buffer_rect(int x, int y, int width, int height)
 
         addr = (int)src;
         addr >>= 1; /* Addresses are in 16-bit words */
-        
+
         /* Setup the registers to initiate the read from SDRAM */
         COP_SDEM_ADDRH = addr >> 16;
         COP_SDEM_ADDRL = addr & 0xFFFF;
-        
+
         /* Set direction and start */
         COP_DMA_CTRL = 0x0001;
         COP_DMA_CTRL |= 0x0002;
 
         /* Wait for read to finish */
         while (COP_DMA_CTRL & 0x02) {};
-        
+
         addr = (int)dst;
         addr >>= 1;
-        
+
         COP_SDEM_ADDRH = addr >> 16;
         COP_SDEM_ADDRL = addr & 0xFFFF;
-        
+
         /* Set direction and start transfer */
         COP_DMA_CTRL = 0x0000;
         COP_DMA_CTRL |= 0x0002;
-        
+
         /* Wait for the transfer to complete */
         while (COP_DMA_CTRL & 0x02) {};
 
@@ -246,7 +295,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         __attribute__ ((section(".icode")));
 void lcd_update_rect(int x, int y, int width, int height)
 {
-    if (!lcd_on)
+    if (!lcd_active())
         return;
 
     if ((width | height) < 0)
@@ -270,7 +319,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 void lcd_update(void) __attribute__ ((section(".icode")));
 void lcd_update(void)
 {
-    if (!lcd_on)
+    if (!lcd_active())
         return;
 
     lcd_update_rect(0, 0, LCD_WIDTH, LCD_HEIGHT);

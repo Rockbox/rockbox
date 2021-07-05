@@ -239,9 +239,7 @@ void main(void)
     font_init();
     button_init();
 
-#ifdef HAVE_LCD_ENABLE
     lcd_enable(true);
-#endif
     lcd_setfont(FONT_SYSFIXED);
     reset_screen();
     show_logo();
@@ -288,10 +286,12 @@ void main(void)
 
         if (ret > 0)
         {
+            lcd_enable(false);
             system_prepare_fw_start();
 
             kernel_entry = (void*)0x01008000;
             ret = kernel_entry();
+            lcd_enable(true);
             printf("FAILED to boot OF");
         }
     }
@@ -309,10 +309,12 @@ void main(void)
     }
     else
     {
+        lcd_enable(false);
         system_prepare_fw_start();
 
         kernel_entry = (void*) loadbuffer;
         ret = kernel_entry();
+        lcd_enable(true);
         printf("FAILED!");
     }
 

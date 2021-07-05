@@ -81,9 +81,8 @@
 #define LCD_PIXELFORMAT RGB565 /* rgb565 */
 
 #define HAVE_LCD_ENABLE
-#ifndef BOOTLOADER
 #define HAVE_LCD_SLEEP
-#endif
+#define HAVE_LCD_SHUTDOWN
 
 #define LCD_SLEEP_TIMEOUT (2*HZ)
 
