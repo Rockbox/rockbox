@@ -612,6 +612,8 @@ node CPM {
     }
 
     reg DRCG 0xd0
+    reg SCRATCH_PROT 0x38
+    reg SCRATCH 0x34
 
     reg USBPCR 0x3c {
         bit    31 USB_MODE { enum USB 0; enum OTG 1; }
@@ -756,6 +758,13 @@ node CPM {
         bit     3 PD
         bit     2 ERCS
         bit     1 BUS_MODE
+    }
+
+    reg RSR 0x08 {
+        bit 3 HR
+        bit 2 P0R
+        bit 1 WR
+        bit 0 PR
     }
 }
 

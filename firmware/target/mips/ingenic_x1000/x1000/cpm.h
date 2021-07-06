@@ -674,6 +674,18 @@
 #define JN_CPM_DRCG     CPM_DRCG
 #define JI_CPM_DRCG     
 
+#define REG_CPM_SCRATCH_PROT    jz_reg(CPM_SCRATCH_PROT)
+#define JA_CPM_SCRATCH_PROT     (0xb0000000 + 0x38)
+#define JT_CPM_SCRATCH_PROT     JIO_32_RW
+#define JN_CPM_SCRATCH_PROT     CPM_SCRATCH_PROT
+#define JI_CPM_SCRATCH_PROT     
+
+#define REG_CPM_SCRATCH jz_reg(CPM_SCRATCH)
+#define JA_CPM_SCRATCH  (0xb0000000 + 0x34)
+#define JT_CPM_SCRATCH  JIO_32_RW
+#define JN_CPM_SCRATCH  CPM_SCRATCH
+#define JI_CPM_SCRATCH  
+
 #define REG_CPM_USBPCR                              jz_reg(CPM_USBPCR)
 #define JA_CPM_USBPCR                               (0xb0000000 + 0x3c)
 #define JT_CPM_USBPCR                               JIO_32_RW
@@ -1426,5 +1438,35 @@
 #define BFM_CPM_OPCR_BUS_MODE(v)            BM_CPM_OPCR_BUS_MODE
 #define BF_CPM_OPCR_BUS_MODE_V(e)           BF_CPM_OPCR_BUS_MODE(BV_CPM_OPCR_BUS_MODE__##e)
 #define BFM_CPM_OPCR_BUS_MODE_V(v)          BM_CPM_OPCR_BUS_MODE
+
+#define REG_CPM_RSR             jz_reg(CPM_RSR)
+#define JA_CPM_RSR              (0xb0000000 + 0x8)
+#define JT_CPM_RSR              JIO_32_RW
+#define JN_CPM_RSR              CPM_RSR
+#define JI_CPM_RSR              
+#define BP_CPM_RSR_HR           3
+#define BM_CPM_RSR_HR           0x8
+#define BF_CPM_RSR_HR(v)        (((v) & 0x1) << 3)
+#define BFM_CPM_RSR_HR(v)       BM_CPM_RSR_HR
+#define BF_CPM_RSR_HR_V(e)      BF_CPM_RSR_HR(BV_CPM_RSR_HR__##e)
+#define BFM_CPM_RSR_HR_V(v)     BM_CPM_RSR_HR
+#define BP_CPM_RSR_P0R          2
+#define BM_CPM_RSR_P0R          0x4
+#define BF_CPM_RSR_P0R(v)       (((v) & 0x1) << 2)
+#define BFM_CPM_RSR_P0R(v)      BM_CPM_RSR_P0R
+#define BF_CPM_RSR_P0R_V(e)     BF_CPM_RSR_P0R(BV_CPM_RSR_P0R__##e)
+#define BFM_CPM_RSR_P0R_V(v)    BM_CPM_RSR_P0R
+#define BP_CPM_RSR_WR           1
+#define BM_CPM_RSR_WR           0x2
+#define BF_CPM_RSR_WR(v)        (((v) & 0x1) << 1)
+#define BFM_CPM_RSR_WR(v)       BM_CPM_RSR_WR
+#define BF_CPM_RSR_WR_V(e)      BF_CPM_RSR_WR(BV_CPM_RSR_WR__##e)
+#define BFM_CPM_RSR_WR_V(v)     BM_CPM_RSR_WR
+#define BP_CPM_RSR_PR           0
+#define BM_CPM_RSR_PR           0x1
+#define BF_CPM_RSR_PR(v)        (((v) & 0x1) << 0)
+#define BFM_CPM_RSR_PR(v)       BM_CPM_RSR_PR
+#define BF_CPM_RSR_PR_V(e)      BF_CPM_RSR_PR(BV_CPM_RSR_PR__##e)
+#define BFM_CPM_RSR_PR_V(v)     BM_CPM_RSR_PR
 
 #endif /* __HEADERGEN_CPM_H__*/
