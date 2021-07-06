@@ -27,6 +27,7 @@
 #include "dma-x1000.h"
 #include "irq-x1000.h"
 #include "clk-x1000.h"
+#include "boot-x1000.h"
 #include "x1000/cpm.h"
 #include "x1000/ost.h"
 #include "x1000/tcu.h"
@@ -57,6 +58,27 @@ static void system_init_irq(void)
     /* Setup CP0 registers */
     write_c0_status(M_StatusCU0 | M_StatusIM2 | M_StatusIM3);
     write_c0_cause(M_CauseIV);
+}
+
+/* First function called by crt0.S */
+void system_early_init(void)
+{
+#if defined(FIIO_M3K) && !defined(BOOTLOADER)
+    /* HACK for compatibility: CPM scratchpad has undefined contents at
+     * time of reset and old bootloader revisions don't initialize it.
+     * Therefore we can't rely on its contents on the FiiO M3K. This does
+     * kind of break the entire point of boot flags, but right now they
+     * are really only used by the bootloader so it's not a huge issue.
+     * This hack should keep everything working as usual. */
+    if(jz_readf(CPM_MPCR, ON) == 0) {
+        init_boot_flags();
+        set_boot_option(BOOT_OPTION_ROCKBOX);
+        set_boot_flag(BOOT_FLAG_CLK_INIT);
+    }
+#endif
+
+    /* Finish up clock init */
+    clk_init();
 }
 
 /* First thing called from Rockbox main() */

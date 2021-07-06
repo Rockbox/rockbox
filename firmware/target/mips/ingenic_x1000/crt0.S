@@ -24,6 +24,7 @@
 
     .text
     .extern main
+    .extern system_early_init
     .global _start
 
     .set push
@@ -92,6 +93,8 @@ _irqstack_loop:
     sw      t1, -4(t0)
 
     /* Jump to C code */
+    jal     system_early_init
+    nop
     j       main
     nop
 

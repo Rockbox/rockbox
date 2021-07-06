@@ -31,6 +31,13 @@
 #define CLKMUX_AHB0(x)   jz_orf(CPM_CCR, SEL_H0PLL_V(x))
 #define CLKMUX_AHB2(x)   jz_orf(CPM_CCR, SEL_H2PLL_V(x))
 
+/* Arguments to clk_set_ccr_div() */
+#define CLKDIV_CPU(x)    jz_orf(CPM_CCR, CDIV((x) - 1))
+#define CLKDIV_L2(x)     jz_orf(CPM_CCR, L2DIV((x) - 1))
+#define CLKDIV_AHB0(x)   jz_orf(CPM_CCR, H0DIV((x) - 1))
+#define CLKDIV_AHB2(x)   jz_orf(CPM_CCR, H2DIV((x) - 1))
+#define CLKDIV_PCLK(x)   jz_orf(CPM_CCR, PDIV((x) - 1))
+
 typedef enum x1000_clk_t {
     X1000_CLK_EXCLK,
     X1000_CLK_APLL,
@@ -59,11 +66,15 @@ extern uint32_t clk_get(x1000_clk_t clk);
 /* Get the name of a clock for debug purposes */
 extern const char* clk_get_name(x1000_clk_t clk);
 
+/* Clock initialization */
+extern void clk_init_early(void);
+extern void clk_init(void);
+
 /* Sets system clock multiplexers */
 extern void clk_set_ccr_mux(uint32_t muxbits);
 
 /* Sets system clock dividers */
-extern void clk_set_ccr_div(int cpu, int l2, int ahb0, int ahb2, int pclk);
+extern void clk_set_ccr_div(uint32_t divbits);
 
 /* Sets DDR clock source and divider */
 extern void clk_set_ddr(x1000_clk_t src, uint32_t div);

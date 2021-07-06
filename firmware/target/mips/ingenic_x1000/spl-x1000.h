@@ -22,21 +22,51 @@
 #ifndef __SPL_X1000_H__
 #define __SPL_X1000_H__
 
-/* TODO: this needs some refactoring... */
+#include "boot-x1000.h"
+#include <stddef.h>
+#include <stdint.h>
 
-/* Called on a fatal error */
-extern void spl_error(void) __attribute__((noreturn));
+#define BOOTFLAG_COMPRESSED  0x0f /* mask for compression flags */
+#define BOOTFLAG_UCLPACK     0x01 /* image is compressed with 'uclpack' */
 
-/* Called by SPL to handle a main boot */
-extern void spl_target_boot(void);
+struct spl_boot_option {
+    uint32_t storage_addr;  /* image's location in storage */
+    uint32_t storage_size;  /* number of bytes to load */
+    uint32_t load_addr;     /* address to load image to */
+    uint32_t exec_addr;     /* address of the entry point */
+    uint32_t flags;         /* any special flags */
+    const char* cmdline;    /* command line; use NULL if not needed */
+    uint32_t cmdline_addr;  /* address to contain command line 'argv[]' */
+    int(*setup)(void);      /* setup hook, called before jumping to image */
+};
 
-/* Invoked by SPL main routine to determine the boot option */
+/* array of boot option descriptions */
+extern const struct spl_boot_option spl_boot_options[];
+
+/* Memory allocator. Allocation starts from the top of DRAM and counts down.
+ * Allocation sizes are rounded up to a multiple of the cacheline size, so
+ * the returned address is always suitably aligned for DMA. */
+extern void* spl_alloc(size_t count);
+
+/* Access to boot storage medium, eg. flash or MMC/SD card.
+ *
+ * Read address and length is given in bytes. To make life easier, no
+ * alignment restrictions are placed on the buffer, length, or address.
+ * The buffer doesn't even need to be in DRAM.
+ */
+extern int spl_storage_open(void);
+extern void spl_storage_close(void);
+extern int spl_storage_read(uint32_t addr, uint32_t length, void* buffer);
+
+/* Helpers for dual-booting with the Ingenic Linux OF */
+extern void spl_dualboot_init_clocktree(void);
+extern void spl_dualboot_init_uart2(void);
+
+/* Get the boot option selected by the user, eg. by a key press */
 extern int spl_get_boot_option(void);
 
-/* Do any setup/initialization needed for the given boot option, this
- * will be called right before flushing caches + jumping to the image.
- * Typical use is to set up system clocks, etc.
- */
-extern void spl_handle_pre_boot(int bootopt);
+/* Called on a fatal error -- it should do something visible to the user
+ * like flash the backlight repeatedly. */
+extern void spl_error(void) __attribute__((noreturn));
 
 #endif /* __SPL_X1000_H__ */
