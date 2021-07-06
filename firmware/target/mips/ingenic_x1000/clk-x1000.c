@@ -21,6 +21,7 @@
 
 #include "system.h"
 #include "clk-x1000.h"
+#include "boot-x1000.h"
 #include "x1000/cpm.h"
 #include "x1000/msc.h"
 #include "x1000/aic.h"
@@ -225,7 +226,89 @@ const char* clk_get_name(x1000_clk_t clk)
     }
 }
 
+/* At present we've only got 24 MHz targets, and they are all using
+ * the same "standard" configuration. */
+#if X1000_EXCLK_FREQ == 24000000
+void clk_init_early(void)
+{
+    jz_writef(CPM_MPCR, ENABLE(0));
+    while(jz_readf(CPM_MPCR, ON));
+
+    /* 24 MHz * 25 = 600 MHz */
+    jz_writef(CPM_MPCR, BS(1), PLLM(25 - 1), PLLN(0), PLLOD(0), ENABLE(1));
+    while(jz_readf(CPM_MPCR, ON) == 0);
+
+    /* 600 MHz / 3 = 200 MHz */
+    clk_set_ddr(X1000_CLK_MPLL, 3);
+}
+
+void clk_init(void)
+{
+    /* make sure we only initialize the clocks once */
+    if(get_boot_flag(BOOT_FLAG_CLK_INIT))
+        return;
+
+    clk_set_ccr_mux(CLKMUX_SCLK_A(EXCLK) |
+                    CLKMUX_CPU(SCLK_A) |
+                    CLKMUX_AHB0(SCLK_A) |
+                    CLKMUX_AHB2(SCLK_A));
+    clk_set_ccr_div(CLKDIV_CPU(1) |
+                    CLKDIV_L2(1) |
+                    CLKDIV_AHB0(1) |
+                    CLKDIV_AHB2(1) |
+                    CLKDIV_PCLK(1));
+
+    jz_writef(CPM_APCR, ENABLE(0));
+    while(jz_readf(CPM_APCR, ON));
+
+    /* 24 MHz * 42 = 1008 MHz */
+    jz_writef(CPM_APCR, BS(1), PLLM(42 - 1), PLLN(0), PLLOD(0), ENABLE(1));
+    while(jz_readf(CPM_APCR, ON) == 0);
+
+#if defined(FIIO_M3K)
+    /* TODO: Allow targets to define their clock frequencies in their config,
+     * instead of having this be a random special case. */
+    if(get_boot_option() == BOOT_OPTION_ROCKBOX) {
+        clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
+                        CLKDIV_L2(2) |      /* 504 MHz */
+                        CLKDIV_AHB0(5) |    /* 201.6 MHz */
+                        CLKDIV_AHB2(5) |    /* 201.6 MHz */
+                        CLKDIV_PCLK(10));   /* 100.8 MHz */
+        clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
+                        CLKMUX_CPU(SCLK_A) |
+                        CLKMUX_AHB0(SCLK_A) |
+                        CLKMUX_AHB2(SCLK_A));
+
+        /* DDR to 201.6 MHz */
+        clk_set_ddr(X1000_CLK_SCLK_A, 5);
+
+        /* Disable MPLL */
+        jz_writef(CPM_MPCR, ENABLE(0));
+        while(jz_readf(CPM_MPCR, ON));
+    } else {
+#endif
+        clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
+                        CLKDIV_L2(2) |      /* 504 MHz */
+                        CLKDIV_AHB0(3) |    /* 200 MHz */
+                        CLKDIV_AHB2(3) |    /* 200 MHz */
+                        CLKDIV_PCLK(6));    /* 100 MHz */
+        clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
+                        CLKMUX_CPU(SCLK_A) |
+                        CLKMUX_AHB0(MPLL) |
+                        CLKMUX_AHB2(MPLL));
+#if defined(FIIO_M3K)
+    }
+#endif
+
+    /* mark that clocks have been initialized */
+    set_boot_flag(BOOT_FLAG_CLK_INIT);
+}
+#else
+# error "please write a new clk_init() for this EXCLK frequency"
+#endif
+
 #define CCR_MUX_BITS jz_orm(CPM_CCR, SEL_SRC, SEL_CPLL, SEL_H0PLL, SEL_H2PLL)
+#define CCR_DIV_BITS jz_orm(CPM_CCR, CDIV, L2DIV, H0DIV, H2DIV, PDIV)
 #define CSR_MUX_BITS jz_orm(CPM_CSR, SRC_MUX, CPU_MUX, AHB0_MUX, AHB2_MUX)
 #define CSR_DIV_BITS jz_orm(CPM_CSR, H2DIV_BUSY, H0DIV_BUSY, CDIV_BUSY)
 
@@ -241,12 +324,14 @@ void clk_set_ccr_mux(uint32_t muxbits)
     while((REG_CPM_CSR & CSR_MUX_BITS) != CSR_MUX_BITS);
 }
 
-void clk_set_ccr_div(int cpu, int l2, int ahb0, int ahb2, int pclk)
+void clk_set_ccr_div(uint32_t divbits)
 {
     /* Set new divider configuration */
-    jz_writef(CPM_CCR, CDIV(cpu - 1), L2DIV(l2 - 1),
-              H0DIV(ahb0 - 1), H2DIV(ahb2 - 1), PDIV(pclk - 1),
-              CE_CPU(1), CE_AHB0(1), CE_AHB2(1));
+    uint32_t reg = REG_CPM_CCR;
+    reg &= ~CCR_DIV_BITS;
+    reg |= divbits & CCR_DIV_BITS;
+    reg |= jz_orm(CPM_CCR, CE_CPU, CE_AHB0, CE_AHB2);
+    REG_CPM_CCR = reg;
 
     /* Wait until divider change completes */
     while(REG_CPM_CSR & CSR_DIV_BITS);

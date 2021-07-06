@@ -15,9 +15,6 @@ MEMORY {
 
 SECTIONS
 {
-    /* Mask ROM variables, addresses found by disassembly */
-    boot_sel = X1000_TCSM_BASE + 0x1ec;
-
     .text :
     {
         *(.init.spl);

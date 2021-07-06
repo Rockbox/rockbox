@@ -37,7 +37,7 @@
 #include "loader_strerror.h"
 #include "version.h"
 #include "installer-fiiom3k.h"
-#include "spl-x1000.h"
+#include "boot-x1000.h"
 #include "x1000/cpm.h"
 
 /* Load address where the binary needs to be placed */
@@ -331,17 +331,8 @@ void main(void)
 {
     bool recovery_mode = false;
 
-    /* This hack is needed because when USB booting, we cannot initialize
-     * clocks in the SPL -- it may break the mask ROM's USB code. So if the
-     * SPL has not already initialized the clocks, we need to do that now.
-     *
-     * Also use this as a sign that we should enter the recovery menu since
-     * this is probably the expected result if the user is USB booting...
-     */
-    if(jz_readf(CPM_MPCR, ENABLE)) {
-        spl_handle_pre_boot(0);
+    if(get_boot_flag(BOOT_FLAG_USB_BOOT))
         recovery_mode = true;
-    }
 
     system_init();
     core_allocator_init();
