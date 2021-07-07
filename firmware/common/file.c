@@ -1123,6 +1123,35 @@ file_error:
     return rc;
 }
 
+int utime(const char *path, const struct utimbuf* times)
+{
+    int rc, open1rc = -1;
+    struct filestr_base pathstr;
+    struct path_component_info pathinfo;
+
+    file_internal_lock_WRITER();
+
+    open1rc = open_stream_internal(path, FF_ANYTYPE | FF_PARENTINFO,
+                                   &pathstr, &pathinfo);
+    if (open1rc <= 0)
+    {
+        if (open1rc == 0)
+            FILE_ERROR(ENOENT, -1);
+        else
+            FILE_ERROR(ERRNO, open1rc * 10 - 1);
+    }
+
+    rc = fat_utime(&pathinfo.parentinfo.fatfile, pathstr.fatstr.fatfilep,
+                   times);
+    if (rc < 0)
+        FILE_ERROR(ERRNO, rc * 10 - 2);
+
+file_error:
+    if (open1rc >= 0)
+        close_stream_internal(&pathstr);
+    file_internal_unlock_WRITER();
+    return rc;
+}
 
 /** Extensions **/
 
