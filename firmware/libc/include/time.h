@@ -28,6 +28,12 @@ struct tm
 #if !defined(_TIME_T_DEFINED) && !defined(_TIME_T_DECLARED)
 typedef long time_t;
 
+struct utimbuf
+{
+    time_t actime;
+    time_t modtime;
+};
+
 /* this define below is used by the mingw headers to prevent duplicate
    typedefs */
 #define _TIME_T_DEFINED
