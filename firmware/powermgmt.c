@@ -103,9 +103,11 @@ static unsigned int avgbat;
 /* filtered battery voltage, millivolts */
 static unsigned int battery_millivolts;
 #else
+#ifndef SIMULATOR
 int _battery_voltage(void) { return -1; }
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 const unsigned short percent_to_volt_charge[11];
+#endif
 #endif
 
 #if !(CONFIG_BATTERY_MEASURE & TIME_MEASURE)
