@@ -27,9 +27,12 @@
 #include "system.h"
 #include "kernel.h"
 #include "panic.h"
-#include "logf.h"
 #include "tnetv105_usb_drv.h"
 #include "tnetv105_cppi.h"
+#if USB_CPPI_LOGGING
+#define LOGF_ENABLE
+#endif
+#include "logf.h"
 
 /* This file is pretty much directly copied from the Sansa Connect
  * Linux kernel source code. This is because the functionality is
@@ -71,11 +74,11 @@ static uint8_t ch0_rx_buf[CPPI_DMA_RX_BUF_SIZE];
 static uint8_t ch1_rx_buf[CPPI_DMA_RX_BUF_SIZE];
 
 #if USB_CPPI_LOGGING
-#define cppi_log_event0(msg)  usb_log_event(msg, LOG_EVENT_D0, 0, 0, 0, 0)
-#define cppi_log_event1(msg, data0)  usb_log_event(msg, LOG_EVENT_D1, data0, 0, 0, 0)
-#define cppi_log_event2(msg, data0, data1)  usb_log_event(msg, LOG_EVENT_D2, data0, data1, 0, 0)
-#define cppi_log_event3(msg, data0, data1, data2)  usb_log_event(msg, LOG_EVENT_D3, data0, data1, data2, 0)
-#define cppi_log_event4(msg, data0, data1, data2, data3)  usb_log_event(msg, LOG_EVENT_D4, data0, data1, data2, data3)
+#define cppi_log_event0(msg) logf(msg)
+#define cppi_log_event1(msg, data0) logf(msg " %lx", (uint32_t)data0)
+#define cppi_log_event2(msg, data0, data1) logf(msg " %lx %lx", (uint32_t)data0, (uint32_t)data1)
+#define cppi_log_event3(msg, data0, data1, data2) logf(msg " %lx %lx %lx", (uint32_t)data0, (uint32_t)data1, (uint32_t)data2)
+#define cppi_log_event4(msg, data0, data1, data2, data3) logf(msg " %lx %lx %lx %lx", (uint32_t)data0, (uint32_t)data1, (uint32_t)data2, (uint32_t)data3)
 #else
 #define cppi_log_event0(x)
 #define cppi_log_event1(x, y)
@@ -439,7 +442,7 @@ void tnetv_cppi_dump_info(struct cppi_info *cppi)
     cppi_rcb *rcb;
 
     logf("CPPI struct:\n");
-    logf("Buf mem: %x Buf size: %d int: %x %x\n\n", (uint32_t) cppi->dma_mem, cppi->dma_size, tnetv_usb_reg_read(TNETV_USB_RX_INT_STATUS), tnetv_usb_reg_read(DM320_VLYNQ_INTST));
+    logf("Buf mem: %lx Buf size: %d int: %lx %lx\n\n", (uint32_t) cppi->dma_mem, cppi->dma_size, tnetv_usb_reg_read(TNETV_USB_RX_INT_STATUS), tnetv_usb_reg_read(VL_INTST));
 
     for (ch = 0; ch < CPPI_NUM_CHANNELS; ch++)
     {
@@ -447,9 +450,9 @@ void tnetv_cppi_dump_info(struct cppi_info *cppi)
         pTxCtl = &cppi->tx_ctl[ch];
 
         logf("ch: %d\n", ch);
-        logf("  rx_numbufs: %d active %d free_buf_cnt %d\n", pRxCtl->RxNumBuffers, pRxCtl->RxActive, tnetv_usb_reg_read(TNETV_USB_RX_FREE_BUF_CNT(ch)));
-        logf("  q_cnt %d head %x tail %x\n", pRxCtl->RxActQueueCount, (uint32_t) pRxCtl->RxActQueueHead, (uint32_t) pRxCtl->RxActQueueTail);
-        logf("  fake_head: %x fake_tail: %x\n", (uint32_t) pRxCtl->RxFakeRcvHead, (uint32_t) pRxCtl->RxFakeRcvTail);
+        logf("  rx_numbufs: %d active %ld free_buf_cnt %ld\n", pRxCtl->RxNumBuffers, pRxCtl->RxActive, tnetv_usb_reg_read(TNETV_USB_RX_FREE_BUF_CNT(ch)));
+        logf("  q_cnt %ld head %lx tail %lx\n", pRxCtl->RxActQueueCount, (uint32_t) pRxCtl->RxActQueueHead, (uint32_t) pRxCtl->RxActQueueTail);
+        logf("  fake_head: %lx fake_tail: %lx\n", (uint32_t) pRxCtl->RxFakeRcvHead, (uint32_t) pRxCtl->RxFakeRcvTail);
 
         rcb = (cppi_rcb *) pRxCtl->RcbStart;
         do
@@ -457,16 +460,16 @@ void tnetv_cppi_dump_info(struct cppi_info *cppi)
             if (!rcb)
                 break;
 
-            logf("   Rcb: %x\n", (uint32_t) rcb);
-            logf("      HNext %x BufPtr %x Off_BLen %x mode %x\n", rcb->HNext, rcb->BufPtr, rcb->Off_BLen, rcb->mode);
-            logf("      Next %x Eop %x dma_handle %x fake_bytes %x\n", (uint32_t) rcb->Next, (uint32_t) rcb->Eop, rcb->dma_handle, rcb->fake_bytes);
+            logf("   Rcb: %lx\n", (uint32_t) rcb);
+            logf("      HNext %lx BufPtr %lx Off_BLen %lx mode %lx\n", rcb->HNext, rcb->BufPtr, rcb->Off_BLen, rcb->mode);
+            logf("      Next %lx Eop %lx dma_handle %lx fake_bytes %lx\n", (uint32_t) rcb->Next, (uint32_t) rcb->Eop, rcb->dma_handle, rcb->fake_bytes);
             rcb = rcb->Next;
 
         } while (rcb && rcb != (cppi_rcb *) pRxCtl->RcbStart);
 
         logf("\n");
-        logf("  tx_numbufs: %d active %d\n", pTxCtl->TxNumBuffers, pTxCtl->TxActive);
-        logf("  q_cnt %d head %x tail %x\n", pTxCtl->TxActQueueCount, (uint32_t) pTxCtl->TxActQueueHead, (uint32_t) pTxCtl->TxActQueueTail);
+        logf("  tx_numbufs: %d active %ld\n", pTxCtl->TxNumBuffers, pTxCtl->TxActive);
+        logf("  q_cnt %ld head %lx tail %lx\n", pTxCtl->TxActQueueCount, (uint32_t) pTxCtl->TxActQueueHead, (uint32_t) pTxCtl->TxActQueueTail);
 
         tcb = (cppi_tcb *) pTxCtl->TcbPool;
         do
@@ -474,9 +477,9 @@ void tnetv_cppi_dump_info(struct cppi_info *cppi)
             if (!tcb)
                 break;
 
-            logf("   Tcb (pool): %x\n", (uint32_t) tcb);
-            logf("      HNext %x BufPtr %x Off_BLen %x mode %x\n", tcb->HNext, tcb->BufPtr, tcb->Off_BLen, tcb->mode);
-            logf("      Next %x Eop %x dma_handle %x\n", (uint32_t) tcb->Next, (uint32_t) tcb->Eop, tcb->dma_handle);
+            logf("   Tcb (pool): %lx\n", (uint32_t) tcb);
+            logf("      HNext %lx BufPtr %lx Off_BLen %lx mode %lx\n", tcb->HNext, tcb->BufPtr, tcb->Off_BLen, tcb->mode);
+            logf("      Next %lx Eop %lx dma_handle %lx\n", (uint32_t) tcb->Next, (uint32_t) tcb->Eop, tcb->dma_handle);
             tcb = tcb->Next;
 
         } while (tcb && tcb != (cppi_tcb *) pTxCtl->TcbPool);
@@ -487,9 +490,9 @@ void tnetv_cppi_dump_info(struct cppi_info *cppi)
             if (!tcb)
                 break;
 
-            logf("   Tcb (act): %x\n", (uint32_t) tcb);
-            logf("      HNext %x BufPtr %x Off_BLen %x mode %x\n", tcb->HNext, tcb->BufPtr, tcb->Off_BLen, tcb->mode);
-            logf("      Next %x Eop %x dma_handle %x\n", (uint32_t) tcb->Next, (uint32_t) tcb->Eop, tcb->dma_handle);
+            logf("   Tcb (act): %lx\n", (uint32_t) tcb);
+            logf("      HNext %lx BufPtr %lx Off_BLen %lx mode %lx\n", tcb->HNext, tcb->BufPtr, tcb->Off_BLen, tcb->mode);
+            logf("      Next %lx Eop %lx dma_handle %lx\n", (uint32_t) tcb->Next, (uint32_t) tcb->Eop, tcb->dma_handle);
             tcb = tcb->Next;
 
         } while (tcb && tcb != (cppi_tcb *) pTxCtl->TxActQueueTail);
@@ -556,7 +559,7 @@ int tnetv_cppi_rx_int_recv(struct cppi_info *cppi, int ch, int *buf_size, void *
     CurrentRcb = pRxCtl->RxFakeRcvHead;
     if (!CurrentRcb)
     {
-        cppi_log_event2("[cppi] rx_int recv: nothing in q", tnetv_usb_reg_read(TNETV_USB_RX_INT_STATUS), tnetv_usb_reg_read(DM320_VLYNQ_INTST));
+        cppi_log_event2("[cppi] rx_int recv: nothing in q", tnetv_usb_reg_read(TNETV_USB_RX_INT_STATUS), tnetv_usb_reg_read(VL_INTST));
         return -1;
     }
 

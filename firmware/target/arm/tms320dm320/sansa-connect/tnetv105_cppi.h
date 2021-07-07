@@ -26,11 +26,11 @@
 #define TNETV105_CPPI_H
 
 #include <stdint.h>
+#include "errno.h"
 
 typedef uint32_t dma_addr_t;
 #define USB_CPPI_LOGGING   0
-#define EAGAIN             11 /* Try again */
-#define CPPI_RX_NUM_BUFS   129
+#define CPPI_RX_NUM_BUFS   2
 #define CPPI_INFO_MEM_SIZE (2 * CPPI_RX_NUM_BUFS * sizeof(cppi_rcb) + 4 * 2 * sizeof(cppi_tcb))
 
 #define CPPI_NUM_CHANNELS    4
