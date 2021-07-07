@@ -88,16 +88,12 @@ static long last_event_tick = 0;
 #if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) == PERCENTAGE_MEASURE
 #ifdef SIMULATOR
 int _battery_level(void) { return -1; }
-int _battery_voltage(void);
-extern const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
-extern const unsigned short percent_to_volt_charge[11];
-#else
-int _battery_voltage(void) { return -1; }
-const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
-const unsigned short percent_to_volt_charge[11];
 #endif
-#elif (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE) == VOLTAGE_MEASURE
+#else
 int _battery_level(void) { return -1; }
+#endif
+
+#if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE) == VOLTAGE_MEASURE
 /*
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter (aka. exponential moving average, scaled):
@@ -106,10 +102,8 @@ int _battery_level(void) { return -1; }
 static unsigned int avgbat;
 /* filtered battery voltage, millivolts */
 static unsigned int battery_millivolts;
-#elif (CONFIG_BATTERY_MEASURE == 0)
+#else
 int _battery_voltage(void) { return -1; }
-int _battery_level(void) { return -1; }
-
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11];
 const unsigned short percent_to_volt_charge[11];
 #endif
@@ -156,9 +150,9 @@ void battery_read_info(int *voltage, int *level)
         *voltage = millivolts;
 
     if (level)  {
-        percent = voltage_to_battery_level(millivolts);
+        percent = _battery_level();
         if (percent < 0)
-            percent = _battery_level();
+            percent = voltage_to_battery_level(millivolts);
         *level = percent;
     }
 }

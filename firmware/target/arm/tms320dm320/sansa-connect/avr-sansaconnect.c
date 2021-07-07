@@ -104,8 +104,15 @@
 #define SYS_CTRL_EN_TS_THERM    0x06
 #define SYS_CTRL_FRESET         0x80
 
+/* HDQ status codes */
+#define HDQ_STATUS_OK           0x00
+#define HDQ_STATUS_NOT_READY    0x01
+#define HDQ_STATUS_TIMEOUT      0x02
+
 /* protects spi avr commands from concurrent access */
 static struct mutex avr_mtx;
+/* serializes hdq read/write and status retrieval */
+static struct mutex hdq_mtx;
 
 /* AVR thread events */
 #define INPUT_INTERRUPT          1
@@ -498,6 +505,7 @@ void avr_hid_init(void)
     IO_SERIAL1_MODE = 0x6DB;
 
     mutex_init(&avr_mtx);
+    mutex_init(&hdq_mtx);
 }
 
 int _battery_level(void)
@@ -508,6 +516,17 @@ int _battery_level(void)
         return 0;
     }
     return avr_battery_level & BATTERY_LEVEL_PERCENTAGE_MASK;
+}
+
+int _battery_voltage(void)
+{
+    return avr_hid_hdq_read_short(HDQ_REG_VOLT);
+}
+
+int _battery_time(void)
+{
+    /* HDQ_REG_TTE reads as 65535 when charging */
+    return avr_hid_hdq_read_short(HDQ_REG_TTE);
 }
 
 unsigned int power_input_status(void)
@@ -522,6 +541,70 @@ unsigned int power_input_status(void)
 bool charging_state(void)
 {
     return (avr_battery_status & BATTERY_STATUS_CHARGING) != 0;
+}
+
+static int avr_hid_hdq_read_byte_internal(uint8_t address)
+{
+    uint8_t result[2];
+
+    if (!avr_execute_command(CMD_HDQ_READ, &address, sizeof(address)))
+    {
+        return -1;
+    }
+
+    do
+    {
+        mdelay(10);
+        if (!avr_execute_command(CMD_HDQ_STATUS, result, sizeof(result)))
+        {
+            return -1;
+        }
+    }
+    while (result[0] == HDQ_STATUS_NOT_READY);
+
+    if (result[0] != HDQ_STATUS_OK)
+    {
+        logf("HDQ read %d status %d", address, result[0]);
+        return -1;
+    }
+
+    return result[1];
+}
+
+int avr_hid_hdq_read_byte(uint8_t address)
+{
+    int retry;
+    int value = -1;
+    for (retry = 0; (retry < 3) && (value < 0); retry++)
+    {
+        mutex_lock(&hdq_mtx);
+        value = avr_hid_hdq_read_byte_internal(address);
+        mutex_unlock(&hdq_mtx);
+    }
+    return value;
+}
+
+int avr_hid_hdq_read_short(uint8_t address)
+{
+    int old_hi = -1, old_lo = -1, hi = -2, lo = -2;
+    /* Keep reading until we read the same value twice.
+     * There's no atomic 16-bit value retrieval, so keep reading
+     * until we read the same value twice. HDQ registers update
+     * no more than once per 2.56 seconds so usually there will
+     * be 4 reads and sometimes 6 reads.
+     */
+    while ((old_hi != hi) || (old_lo != lo))
+    {
+        old_hi = hi;
+        old_lo = lo;
+        hi = avr_hid_hdq_read_byte(address + 1);
+        lo = avr_hid_hdq_read_byte(address);
+    }
+    if ((hi < 0) || (lo < 0))
+    {
+        return -1;
+    }
+    return (hi << 8) | lo;
 }
 
 static void avr_hid_enable_wheel(void)

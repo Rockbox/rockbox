@@ -152,7 +152,15 @@
 #define BATTERY_CAPACITY_INC 100     /* capacity increment */
 #define BATTERY_TYPES_COUNT  1       /* only one type */
 
-#define CONFIG_BATTERY_MEASURE PERCENTAGE_MEASURE
+/* bq27000 provides voltage, percentage and time measure.
+ * Voltage reading is available every 2.56 seconds and does not need filtering.
+ * Read the measured voltage every 3 seconds so we are guaranteed to not read
+ * the same value twice (do not try to read every 2.56 seconds as clocks are
+ * not synchronized).
+ */
+#define CONFIG_BATTERY_MEASURE (VOLTAGE_MEASURE|PERCENTAGE_MEASURE|TIME_MEASURE)
+#define BATT_AVE_SAMPLES 1
+#define POWER_THREAD_STEP_TICKS (3*HZ)
 
 /* define current usage levels */
 #if 0
