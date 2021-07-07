@@ -140,6 +140,8 @@ enum fat_remove_op           /* what should fat_remove(), remove? */
 int fat_remove(struct fat_file *file, enum fat_remove_op what);
 int fat_rename(struct fat_file *parent, struct fat_file *file,
                const unsigned char *newname);
+int fat_utime(struct fat_file *parent, struct fat_file *file,
+              const struct utimbuf *utimes);
 
 /** File stream functions **/
 int fat_closewrite(struct fat_filestr *filestr, uint32_t size,

@@ -85,6 +85,9 @@ int fdprintf(int fildes, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
 #ifndef rename
 #define rename          FS_PREFIX(rename)
 #endif
+#ifndef utime
+#define utime           FS_PREFIX(utime)
+#endif
 #ifndef filesize
 #define filesize        FS_PREFIX(filesize)
 #endif

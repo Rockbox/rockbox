@@ -2276,6 +2276,41 @@ fat_error:
     return rc;
 }
 
+int fat_utime(struct fat_file *parent, struct fat_file *file,
+              const struct utimbuf *times)
+{
+    struct bpb * const fat_bpb = FAT_BPB(parent->volume);
+
+    if (!fat_bpb)
+        return -1;
+
+    int rc;
+
+    struct fat_filestr parentstr;
+    fat_filestr_init(&parentstr, parent);
+
+    dc_lock_cache();
+
+    union raw_dirent *ent = cache_direntry(fat_bpb, &parentstr, file->e.entry);
+    if (!ent)
+        FAT_ERROR(-2);
+
+    uint16_t date;
+    uint16_t time;
+    dostime_localtime(times->modtime, &date, &time);
+
+    ent->wrttime    = htole16(time);
+    ent->wrtdate    = htole16(date);
+    ent->lstaccdate = htole16(date);
+
+    dc_dirty_buf(ent);
+
+    rc = 0;
+fat_error:
+    dc_unlock_cache();
+    cache_commit(fat_bpb);
+    return rc;
+}
 
 /** File stream functions **/
 
