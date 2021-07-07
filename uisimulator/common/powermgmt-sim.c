@@ -79,7 +79,7 @@ static void battery_status_update(void)
 #if CONFIG_CHARGING >= CHARGING_MONITOR
             /* Keep external power until tick */
             ext_power_until_tick = current_tick + POWER_AFTER_CHARGE_TICKS;
-#elif CONFIG_CHARGING 
+#elif CONFIG_CHARGING
             /* Pretend the charger was disconnected */
             charger_input_state = CHARGER_UNPLUGGED;
 #endif
@@ -111,12 +111,16 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 const unsigned short percent_to_volt_charge[11] =
 { 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300  };
 
-
 int _battery_voltage(void)
 {
     battery_status_update();
     return battery_millivolts;
 }
+
+#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE)
+static int powermgmt_est_runningtime_min;
+int _battery_time(void) { return powermgmt_est_runningtime_min; }
+#endif
 
 #if CONFIG_CHARGING
 unsigned int power_input_status(void)
