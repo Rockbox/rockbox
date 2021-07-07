@@ -46,6 +46,23 @@ time_t dostime_mktime(uint16_t dosdate, uint16_t dostime)
     return mktime(&tm);
 }
 
+void dostime_localtime(time_t time, uint16_t* dosdate, uint16_t* dostime)
+{
+    struct tm tm;
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+    gmtime_r(&time, &tm);
+#else
+    localtime_r(&time, &tm);
+#endif
+
+    *dostime = ((tm.tm_sec  /  2) <<  0)|
+               ((tm.tm_min      ) <<  5)|
+               ((tm.tm_hour     ) << 11);
+    *dosdate = ((tm.tm_mday     ) <<  0)|
+               ((tm.tm_mon  +  1) <<  5)|
+               ((tm.tm_year - 80) <<  9);
+}
+
 #if !CONFIG_RTC
 static inline bool rtc_dirty(void)
 {
