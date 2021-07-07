@@ -818,7 +818,19 @@ void avr_thread(void)
 
     while (1)
     {
-        queue_wait(&avr_queue, &ev);
+        if (avr_state_changed())
+        {
+            /* We have to read AVR state, simply check if there's any event
+             * pending but do not block. It is possible that AVR interrupt
+             * line is held active even though we read the state (change
+             * occured during read).
+             */
+            queue_wait_w_tmo(&avr_queue, &ev, 0);
+        }
+        else
+        {
+            queue_wait(&avr_queue, &ev);
+        }
 
         if (ev.id == SYS_USB_CONNECTED)
         {
