@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d56f64e_d48b0f1a",
+        "filename": "apps/talk.c",
+        "patchSetId": 1
+      },
+      "lineNbr": 1211,
+      "author": {
+        "id": 1000521
+      },
+      "writtenOn": "2021-07-08T13:35:35Z",
+      "side": 1,
+      "message": "how does this work? isnt tbuf[0] !\u003d0 then it checks the same element in the loop \u003d\u003d 0?",
+      "revId": "a7554e7cbfde125a376f57707c4e0ca20ac14f4a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
