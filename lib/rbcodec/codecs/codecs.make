@@ -26,7 +26,7 @@ CODECFLAGS := $(CFLAGS) $(RBCODEC_CFLAGS) -fstrict-aliasing \
 			 -I$(RBCODECLIB_DIR)/codecs -I$(RBCODECLIB_DIR)/codecs/lib -DCODEC
 
 ifdef APP_TYPE
- CODECLDFLAGS = $(SHARED_LDFLAG) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
+ CODECLDFLAGS = $(SHARED_LDFLAGS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map
  CODECFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
  CODECLDFLAGS = -T$(CODECLINK_LDS) -Wl,--gc-sections -Wl,-Map,$(CODECDIR)/$*.map

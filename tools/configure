@@ -293,7 +293,7 @@ simcc () {
  fi
 
  # default share option, override below if needed
- SHARED_LDFLAG="-shared"
+ SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS="-fPIC -fvisibility=hidden"
 
  if [ "$win32crosscompile" = "yes" ]; then
@@ -379,7 +379,7 @@ simcc () {
    sigaltstack=`check_sigaltstack`
    echo "Darwin host detected"
    LDOPTS="$LDOPTS -ldl"
-   SHARED_LDFLAG="-dynamiclib -Wl\,-single_module"
+   SHARED_LDFLAGS="-dynamiclib -Wl\,-single_module"
    ;;
 
    SunOS)
@@ -618,7 +618,7 @@ maemocc () {
  GCCOPTIMIZE=''
  LDOPTS="-lm -ldl $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_LDFLAG="-shared"
+ SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS=''
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
@@ -713,7 +713,7 @@ pandoracc () {
  GCCOPTIMIZE=''
  LDOPTS="-lm -ldl $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_LDFLAG="-shared"
+ SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS=''
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
@@ -744,7 +744,7 @@ arm1176jzlinuxcc () {
  GCCOPTIMIZE=''
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs" # warn about undefined symbols in shared libraries
- SHARED_LDFLAG="-shared"
+ SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS=''
  endian="little"
  app_type="ypr0"
@@ -787,7 +787,7 @@ androidcc () {
     if [ "$modelname" != "ibassodx50" ] && [ "$modelname" != "ibassodx90" ]; then
         LDOPTS="$LDOPTS -Wl,-soname,librockbox.so -shared"
     fi
-    SHARED_LDFLAG="-shared"
+    SHARED_LDFLAGS="-shared"
     SHARED_CFLAGS=''
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
     thread_support="HAVE_SIGALTSTACK_THREADS"
@@ -873,7 +873,7 @@ androidndkcc()
 
     GCCOPTS=`echo $CCOPTS | sed -e s/-ffreestanding// -e s/-nostdlib// -e s/-Wundef//`
     LDOPTS="$LDOPTS -ldl -llog"
-    SHARED_LDFLAG="-shared"
+    SHARED_LDFLAGS="-shared"
     SHARED_CFLAGS=''
     GLOBAL_LDOPTS="-Wl,-z,defs -Wl,-z,noexecstack"
 
@@ -918,7 +918,7 @@ mipsellinuxcc () {
  GCCOPTIMIZE=''
  LDOPTS="-lasound -lpthread -lm -ldl -lrt $LDOPTS"
  GLOBAL_LDOPTS="$GLOBAL_LDOPTS -Wl,-z,defs"
- SHARED_LDFLAG="-shared"
+ SHARED_LDFLAGS="-shared"
  SHARED_CFLAGS='-fPIC -fvisibility=hidden'
  endian="little"
  thread_support="HAVE_SIGALTSTACK_THREADS"
@@ -4699,7 +4699,7 @@ export SIMDIR=\$(ROOTDIR)/uisimulator/sdl
 export GCCOPTS=${GCCOPTS}
 export TARGET_INC=${TARGET_INC}
 export LOADADDRESS=${loadaddress}
-export SHARED_LDFLAG=${SHARED_LDFLAG}
+export SHARED_LDFLAGS=${SHARED_LDFLAGS}
 export SHARED_CFLAGS=${SHARED_CFLAGS}
 export LDOPTS=${LDOPTS}
 export GLOBAL_LDOPTS=${GLOBAL_LDOPTS}
