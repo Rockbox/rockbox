@@ -3845,16 +3845,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Sun"
+    *: "Sun"
   </source>
   <dest>
-    *: none
-    rtc: "Нед"
+    *: "Нед"
   </dest>
   <voice>
-    *: none
-    rtc: "Нед"
+    *: "Нед"
   </voice>
 </phrase>
 <phrase>
@@ -3862,16 +3859,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Mon"
+    *: "Mon"
   </source>
   <dest>
-    *: none
-    rtc: "Пон"
+    *: "Пон"
   </dest>
   <voice>
-    *: none
-    rtc: "Пон"
+    *: "Пон"
   </voice>
 </phrase>
 <phrase>
@@ -3879,16 +3873,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Tue"
+    *: "Tue"
   </source>
   <dest>
-    *: none
-    rtc: "Вт"
+    *: "Вт"
   </dest>
   <voice>
-    *: none
-    rtc: "Вт"
+    *: "Вт"
   </voice>
 </phrase>
 <phrase>
@@ -3896,16 +3887,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Wed"
+    *: "Wed"
   </source>
   <dest>
-    *: none
-    rtc: "Ср"
+    *: "Ср"
   </dest>
   <voice>
-    *: none
-    rtc: "Ср"
+    *: "Ср"
   </voice>
 </phrase>
 <phrase>
@@ -3913,16 +3901,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Thu"
+    *: "Thu"
   </source>
   <dest>
-    *: none
-    rtc: "Чет"
+    *: "Чет"
   </dest>
   <voice>
-    *: none
-    rtc: "Чет"
+    *: "Чет"
   </voice>
 </phrase>
 <phrase>
@@ -3930,16 +3915,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Fri"
+    *: "Fri"
   </source>
   <dest>
-    *: none
-    rtc: "Пет"
+    *: "Пет"
   </dest>
   <voice>
-    *: none
-    rtc: "Пет"
+    *: "Пет"
   </voice>
 </phrase>
 <phrase>
@@ -3947,16 +3929,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Sat"
+    *: "Sat"
   </source>
   <dest>
-    *: none
-    rtc: "Съб"
+    *: "Съб"
   </dest>
   <voice>
-    *: none
-    rtc: "Съб"
+    *: "Съб"
   </voice>
 </phrase>
 <phrase>
@@ -12950,5 +12929,131 @@
   </dest>
   <voice>
     *: "Haas Surround"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ONE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "100"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWO_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "200"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THREE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "300"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOUR_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "400"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIVE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "500"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIX_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "600"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVEN_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "700"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHT_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "800"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "900"
   </voice>
 </phrase>

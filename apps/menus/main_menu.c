@@ -211,13 +211,13 @@ static const char* info_getname(int selected_item, void *data,
             tm = get_time();
             if (valid_time(tm))
             {
-                snprintf(buffer, buffer_len, "%02d:%02d:%02d %s",
-                    global_settings.timeformat == 0 ? tm->tm_hour :
+                snprintf(buffer, buffer_len, "%02d:%02d:%02d%s",
+                         global_settings.timeformat == 0 ? tm->tm_hour :
                          ((tm->tm_hour + 11) % 12) + 1,
                          tm->tm_min,
                          tm->tm_sec,
                          global_settings.timeformat == 0 ? "" :
-                         tm->tm_hour>11 ? "P" : "A");
+                         tm->tm_hour>11 ? " P" : " A");
             }
             else
             {
@@ -228,10 +228,11 @@ static const char* info_getname(int selected_item, void *data,
             tm = get_time();
             if (valid_time(tm))
             {
-                snprintf(buffer, buffer_len, "%s %d %d",
-                    str(LANG_MONTH_JANUARY + tm->tm_mon),
-                    tm->tm_mday,
-                    tm->tm_year+1900);
+                snprintf(buffer, buffer_len, "%s %s %d %d",
+                         str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
+                         str(LANG_MONTH_JANUARY + tm->tm_mon),
+                         tm->tm_mday,
+                         tm->tm_year+1900);
             }
             else
             {
@@ -476,6 +477,8 @@ MENUITEM_FUNCTION(show_info_item, 0, ID2P(LANG_ROCKBOX_INFO),
 int time_screen(void* ignored);
 MENUITEM_FUNCTION(timedate_item, MENU_FUNC_CHECK_RETVAL, ID2P(LANG_TIME_MENU),
                     time_screen, NULL,  NULL, Icon_Menu_setting );
+#else
+MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 #endif
 
 MENUITEM_FUNCTION(show_credits_item, 0, ID2P(LANG_CREDITS),
@@ -506,6 +509,8 @@ MAKE_MENU(main_menu_, ID2P(LANG_SETTINGS), NULL,
 #endif
 #if CONFIG_RTC
         &timedate_item,
+#else
+        &timeformat,
 #endif
         &manage_settings,
         );

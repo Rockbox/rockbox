@@ -57,7 +57,7 @@ static int timedate_set(void)
     /* This prevents problems with time/date setting after a power loss */
     if (!valid_time(&tm))
     {
-/* Macros to convert a 2-digit string to a decimal constant. 
+/* Macros to convert a 2-digit string to a decimal constant.
         (YEAR), MONTH and DAY are set by the date command, which outputs
         DAY as 00..31 and MONTH as 01..12. The leading zero would lead to
         misinterpretation as an octal constant. */
@@ -81,7 +81,7 @@ static int timedate_set(void)
     return result;
 }
 
-MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME), 
+MENUITEM_FUNCTION(time_set, 0, ID2P(LANG_SET_TIME),
                   timedate_set, NULL, NULL, Icon_NOICON);
 MENUITEM_SETTING(timeformat, &global_settings.timeformat, NULL);
 #ifdef HAVE_RTC_ALARM
@@ -134,7 +134,7 @@ static int alarm_setting(void)
     i++;
 #endif
     return set_option(str(LANG_ALARM_WAKEUP_SCREEN),
-                      &global_settings.alarm_wake_up_screen, 
+                      &global_settings.alarm_wake_up_screen,
                       INT, items, i, NULL);
 }
 
@@ -178,14 +178,15 @@ static void draw_timedate(struct viewport *vp, struct screen *display)
 
     if (valid_time(tm))
     {
-        snprintf(time, sizeof(time), "%02d:%02d:%02d%s", 
+        snprintf(time, sizeof(time), "%02d:%02d:%02d%s",
                 global_settings.timeformat == 0 ? tm->tm_hour :
                         ((tm->tm_hour + 11) % 12) + 1,
-                            tm->tm_min, 
-                            tm->tm_sec, 
+                            tm->tm_min,
+                            tm->tm_sec,
                         global_settings.timeformat == 0 ? "" :
                                 tm->tm_hour>11 ? " P" : " A");
-        snprintf(date, sizeof(date), "%s %d %d", 
+        snprintf(date, sizeof(date), "%s %s %d %d",
+                str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
                 str(LANG_MONTH_JANUARY + tm->tm_mon),
                     tm->tm_mday,
                     tm->tm_year+1900);
