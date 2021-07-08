@@ -23,6 +23,9 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
+#ifndef __PCTOOL__
+#include <utime.h>
+#endif
 #include <time.h>
 #include "config.h"
 #include "system.h"
