@@ -1123,9 +1123,11 @@ file_error:
     return rc;
 }
 
-int utime(const char *path, const struct utimbuf* times)
+/** Extensions **/
+
+int modtime(const char *path, time_t modtime)
 {
-    DEBUGF("utime(path=\"%s\",times->modtime=%u)\n", path, times->modtime);
+    DEBUGF("modtime(path=\"%s\",modtime=%d)\n", path, (int) modtime);
 
     int rc, open1rc = -1;
     struct filestr_base pathstr;
@@ -1133,25 +1135,22 @@ int utime(const char *path, const struct utimbuf* times)
 
     file_internal_lock_WRITER();
 
-    if (!times)
-        FILE_ERROR(EINVAL, -1);
-
     open1rc = open_stream_internal(path, FF_ANYTYPE | FF_PARENTINFO,
                                    &pathstr, &pathinfo);
     if (open1rc <= 0)
     {
         DEBUGF("Failed opening path: %d\n", open1rc);
         if (open1rc == 0)
-            FILE_ERROR(ENOENT, -2);
+            FILE_ERROR(ENOENT, -1);
         else
             FILE_ERROR(ERRNO, open1rc * 10 - 1);
     }
 
-    rc = fat_utime(&pathinfo.parentinfo.fatfile, pathstr.fatstr.fatfilep,
-                   times);
+    rc = fat_modtime(&pathinfo.parentinfo.fatfile, pathstr.fatstr.fatfilep,
+                     modtime);
     if (rc < 0)
     {
-        DEBUGF("I/O error during utime: %d\n", rc);
+        DEBUGF("I/O error during modtime: %d\n", rc);
         FILE_ERROR(ERRNO, rc * 10 - 2);
     }
 
@@ -1161,8 +1160,6 @@ file_error:
     file_internal_unlock_WRITER();
     return rc;
 }
-
-/** Extensions **/
 
 /* get the binary size of a file (in bytes) */
 off_t filesize(int fildes)

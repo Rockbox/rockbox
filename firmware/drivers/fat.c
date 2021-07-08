@@ -2276,8 +2276,8 @@ fat_error:
     return rc;
 }
 
-int fat_utime(struct fat_file *parent, struct fat_file *file,
-              const struct utimbuf *times)
+int fat_modtime(struct fat_file *parent, struct fat_file *file,
+                time_t modtime)
 {
     struct bpb * const fat_bpb = FAT_BPB(parent->volume);
 
@@ -2297,7 +2297,7 @@ int fat_utime(struct fat_file *parent, struct fat_file *file,
 
     uint16_t date;
     uint16_t time;
-    dostime_localtime(times->modtime, &date, &time);
+    dostime_localtime(modtime, &date, &time);
 
     ent->wrttime    = htole16(time);
     ent->wrtdate    = htole16(date);

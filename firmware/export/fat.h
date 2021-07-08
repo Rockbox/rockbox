@@ -23,9 +23,6 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#if defined(__PCTOOL__) || defined(SIMULATOR) || ((CONFIG_PLATFORM & PLATFORM_HOSTED) == PLATFORM_HOSTED)
-#include <utime.h>
-#endif
 #include <time.h>
 #include "config.h"
 #include "system.h"
@@ -143,8 +140,8 @@ enum fat_remove_op           /* what should fat_remove(), remove? */
 int fat_remove(struct fat_file *file, enum fat_remove_op what);
 int fat_rename(struct fat_file *parent, struct fat_file *file,
                const unsigned char *newname);
-int fat_utime(struct fat_file *parent, struct fat_file *file,
-              const struct utimbuf *utimes);
+int fat_modtime(struct fat_file *parent, struct fat_file *file,
+                time_t modtime);
 
 /** File stream functions **/
 int fat_closewrite(struct fat_filestr *filestr, uint32_t size,

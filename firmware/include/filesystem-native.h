@@ -55,7 +55,7 @@ ssize_t read(int fildes, void *buf, size_t nbyte);
 ssize_t write(int fildes, const void *buf, size_t nbyte);
 int     remove(const char *path);
 int     rename(const char *old, const char *new);
-int     utime(const char *path, const struct utimbuf* times);
+int     modtime(const char *path, time_t modtime);
 off_t   filesize(int fildes);
 int     fsamefile(int fildes1, int fildes2);
 int     relate(const char *path1, const char *path2);
