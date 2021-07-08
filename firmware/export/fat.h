@@ -23,7 +23,7 @@
 
 #include <stdbool.h>
 #include <sys/types.h>
-#if defined(__PCTOOL__) || defined(SIMULATOR) || (CONFIG_PLATFORM == PLATFORM_HOSTED)
+#if defined(__PCTOOL__) || defined(SIMULATOR) || ((CONFIG_PLATFORM & PLATFORM_HOSTED) == PLATFORM_HOSTED)
 #include <utime.h>
 #endif
 #include <time.h>
