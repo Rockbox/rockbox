@@ -36,7 +36,6 @@ OUTPUT_FORMAT(elf32-littlemips)
 
 #elif CONFIG_CPU==DM320
 
-/* Give this 1 meg to allow it to align to the MMU boundary */
 #ifndef LCD_NATIVE_WIDTH
 #define LCD_NATIVE_WIDTH LCD_WIDTH
 #endif
@@ -45,9 +44,17 @@ OUTPUT_FORMAT(elf32-littlemips)
 #define LCD_NATIVE_HEIGHT LCD_HEIGHT
 #endif
 
+#ifdef MROBE_500
+/* Give this 1 meg to allow it to align to the MMU boundary */
 #define LCD_FUDGE       LCD_NATIVE_WIDTH%32
-#define LCD_BUFFER_SIZE  ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
+#define LCD_BUFFER_SIZE ((LCD_NATIVE_WIDTH+LCD_FUDGE)*LCD_NATIVE_HEIGHT*2)
 #define LCD_TTB_AREA    0x100000*((LCD_BUFFER_SIZE>>19)+1)
+#else
+/* must be 16Kb (0x4000) aligned */
+#define TTB_SIZE        (0x4000)
+#define LCD_BUFFER_SIZE (LCD_NATIVE_WIDTH*LCD_NATIVE_HEIGHT*2)
+#define LCD_TTB_AREA    (TTB_SIZE + LCD_BUFFER_SIZE)
+#endif
 
 #define DRAMSIZE (MEMORYSIZE * 0x100000) - STUBOFFSET - PLUGIN_BUFFER_SIZE - CODEC_SIZE - LCD_TTB_AREA
 
