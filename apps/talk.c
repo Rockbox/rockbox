@@ -1233,8 +1233,11 @@ void talk_fractional(char *tbuf, int value, int unit)
     talk_number(value, true);
     if (tbuf[0] != 0)
     {
+        char *ptr;
         talk_id(LANG_POINT, true);
-        talk_spell(tbuf, true);
+        /* Voice each digit individually */
+        for (ptr = tbuf; *ptr ; ptr++)
+            talk_id(VOICE_ZERO + (*ptr - '0'), true);
     }
     talk_id(unit, true);
 }
