@@ -1493,9 +1493,13 @@ void talk_time(const struct tm *tm, bool enqueue)
     else
     {
         /* Voice the time in 24 hour format */
+        if(tm->tm_hour < 10)
+            talk_id(VOICE_OH, true);
         talk_number(tm->tm_hour, enqueue);
         if (tm->tm_min == 0)
-            talk_ids(true, VOICE_HUNDRED, VOICE_HOUR);
+        {
+            talk_ids(true, VOICE_HUNDRED, VOICE_HOURS);
+        }
         else
         {
             /* Pronounce the leading 0 */
