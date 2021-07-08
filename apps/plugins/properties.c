@@ -105,10 +105,18 @@ static bool file_properties(const char* selected_file)
                 size_unit = units[log];
                 rb->snprintf(str_size, sizeof str_size, "%lu %s", nsize, rb->str(size_unit));
                 rb->gmtime_r(&info.mtime, &tm);
-                rb->snprintf(str_date, sizeof str_date, "%04d/%02d/%02d",
-                    tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
-                rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d",
-                    tm.tm_hour, tm.tm_min, tm.tm_sec);
+                rb->snprintf(str_date, sizeof str_date, "%s %s %d %d",
+                             rb->str(LANG_WEEKDAY_SUNDAY + tm.tm_wday),
+                             rb->str(LANG_MONTH_JANUARY + tm.tm_mon),
+                             tm.tm_mday,
+                             tm.tm_year + 1900);
+                rb->snprintf(str_time, sizeof str_time, "%02d:%02d:%02d%s",
+                             rb->global_settings->timeformat ?
+                             (((tm.tm_hour + 11) % 12) + 1) :
+                             tm.tm_hour,
+                             tm.tm_min, tm.tm_sec,
+                             rb->global_settings->timeformat ?
+                             (tm.tm_hour > 11 ? " P" : " A") : "");
 
                 num_properties = 5;
 

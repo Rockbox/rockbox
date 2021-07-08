@@ -3848,16 +3848,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Sun"
+    *: "Sun"
   </source>
   <dest>
-    *: none
-    rtc: "日"
+    *: "日"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3865,16 +3862,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Mon"
+    *: "Mon"
   </source>
   <dest>
-    *: none
-    rtc: "月"
+    *: "月"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3882,16 +3876,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Tue"
+    *: "Tue"
   </source>
   <dest>
-    *: none
-    rtc: "火"
+    *: "火"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3899,16 +3890,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Wed"
+    *: "Wed"
   </source>
   <dest>
-    *: none
-    rtc: "水"
+    *: "水"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3916,16 +3904,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Thu"
+    *: "Thu"
   </source>
   <dest>
-    *: none
-    rtc: "木"
+    *: "木"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3933,16 +3918,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Fri"
+    *: "Fri"
   </source>
   <dest>
-    *: none
-    rtc: "金"
+    *: "金"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -3950,16 +3932,13 @@
   desc: Maximum 3-letter abbreviation for weekday
   user: core
   <source>
-    *: none
-    rtc: "Sat"
+    *: "Sat"
   </source>
   <dest>
-    *: none
-    rtc: "土"
+    *: "土"
   </dest>
   <voice>
-    *: none
-    rtc: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -12944,5 +12923,131 @@
   </dest>
   <voice>
     *: "１つ以上のディレクトリを選択"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ONE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "100"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TWO_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "200"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_THREE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "300"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FOUR_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "400"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_FIVE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "500"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SIX_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "600"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_SEVEN_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "700"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_EIGHT_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "800"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NINE_HUNDRED
+  desc: spoken only, for composing numbers
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "900"
   </voice>
 </phrase>

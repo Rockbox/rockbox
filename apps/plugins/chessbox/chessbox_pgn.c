@@ -574,6 +574,7 @@ static void say_player(const char *name, bool enqueue) {
 
 static int speak_game_selection(int selected_item, void *data){
     struct pgn_game_node *temp_node = get_game_info(selected_item, data);
+    struct tm tm;
 
     if (temp_node != NULL){
         say_player(temp_node->white_player, false);
@@ -583,9 +584,11 @@ static int speak_game_selection(int selected_item, void *data){
             rb->strcpy(buf, temp_node->game_date);
             buf[4] = 0;
             buf[7] = 0;
-            rb->talk_id(LANG_MONTH_JANUARY + rb->atoi(&(buf[5])) - 1, true);
-            rb->talk_number(rb->atoi(&(buf[8])), true);
-            rb->talk_number(rb->atoi(buf), true);
+            tm.tm_year = rb->atoi(buf) - 1900;
+            tm.tm_mon = rb->atoi(&(buf[5])) - 1;
+            tm.tm_mday = rb->atoi(&(buf[8]));
+            tm.tm_wday = -1;
+            rb->talk_date(&tm, true);
         }
     }
 

@@ -24,6 +24,7 @@
  ****************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <stddef.h>
 #include "string-extra.h"
 #include "file.h"
@@ -1168,10 +1169,7 @@ int talk_number(long n, bool enqueue)
             int ones = segment % 100;
 
             if (hundreds)
-            {
-                talk_id(VOICE_ZERO + hundreds, true);
-                talk_id(VOICE_HUNDRED, true);
-            }
+                talk_id(VOICE_ONE_HUNDRED + hundreds - 1, true);
 
             /* combination indexing */
             if (ones > 20)
@@ -1193,27 +1191,6 @@ int talk_number(long n, bool enqueue)
     }
 
     return 0;
-}
-
-/* Say year like "nineteen ninety nine" instead of "one thousand 9
-   hundred ninety nine". */
-static int talk_year(long year, bool enqueue)
-{
-    int rem;
-    if(year < 1100 || year >=2000)
-        /* just say it as a regular number */
-        return talk_number(year, enqueue);
-    /* Say century */
-    talk_number(year/100, enqueue);
-    rem = year%100;
-    if(rem == 0)
-        /* as in 1900 */
-        return talk_id(VOICE_HUNDRED, true);
-    if(rem <10)
-        /* as in 1905 */
-        talk_id(VOICE_ZERO, true);
-    /* sub-century year */
-    return talk_number(rem, true);
 }
 
 /* Say time duration/interval. Input is time in seconds,
@@ -1295,7 +1272,7 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
 
     /* special pronounciation for year number */
     if (unit == UNIT_DATEYEAR)
-        return talk_year(n, enqueue);
+        return talk_number(n, enqueue);
     /* special case for time duration */
     if (unit == UNIT_TIME)
         return talk_time_unit(n, enqueue);
@@ -1454,7 +1431,12 @@ void talk_setting(const void *global_settings_variable)
 
 void talk_date(const struct tm *tm, bool enqueue)
 {
-    talk_id(LANG_MONTH_JANUARY + tm->tm_mon, enqueue);
+    if (tm->tm_wday >= 0)
+    {
+        int rc = talk_id(LANG_WEEKDAY_SUNDAY + tm->tm_wday, enqueue);
+        talk_id(LANG_MONTH_JANUARY + tm->tm_mon, enqueue || !rc);
+    }
+    else talk_id(LANG_MONTH_JANUARY + tm->tm_mon, enqueue);
     talk_number(tm->tm_mday, true);
     talk_number(1900 + tm->tm_year, true);
 }
