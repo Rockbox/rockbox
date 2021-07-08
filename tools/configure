@@ -63,9 +63,9 @@ prefixtools () {
  WINDRES=${prefix}windres
  DLLTOOL=${prefix}dlltool
  DLLWRAP=${prefix}dllwrap
- RANLIB=${prefix}ranlib
+ RANLIB=${prefix}gcc-ranlib
  LD=${prefix}ld
- AR=${prefix}ar
+ AR=${prefix}gcc-ar
  AS=${prefix}as
  OC=${prefix}objcopy
 }
@@ -249,7 +249,6 @@ EOF
 }
 
 simcc () {
-
  # default tool setup for native building
  prefixtools "$CROSS_COMPILE"
  ARG_ARM_THUMB=0 # can't use thumb in native builds
@@ -510,13 +509,6 @@ EOF
 # the gcc version should most likely match what versions we build with
 # rockboxdev.sh
 #
-calmrisccc () {
- prefixtools calmrisc16-unknown-elf-
- GCCOPTS="-Wl\,--no-check-sections $CCOPTS"
- GCCOPTIMIZE="-fomit-frame-pointer"
- endian="big"
- gccchoice="4.9.4"
-}
 
 coldfirecc () {
  prefixtools m68k-elf-
