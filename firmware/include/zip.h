@@ -40,7 +40,7 @@ struct zip_args {
     uint16_t entries;
     char* name;
     uint32_t file_size;
-    time_t modts;
+    time_t mtime;
     void* block;
     uint32_t block_size;
     uint32_t read_size;
