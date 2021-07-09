@@ -369,7 +369,7 @@ void stretch_image_plane(const uint8_t * src, uint8_t *dst, int stride,
 bool vo_draw_frame_thumb(uint8_t * const * buf, const struct vo_rect *rc)
 {
     void *mem;
-    size_t bufsize;
+    size_t bufsize = 0;
     uint8_t *yuv[3];
     struct vo_rect thumb_rc;
     int thumb_width, thumb_height;
