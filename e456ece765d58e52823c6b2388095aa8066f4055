@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "254a3d72_5695366a",
+        "filename": "apps/talk.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1172,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-07-09T01:03:26Z",
+      "side": 1,
+      "message": "all of the languages in this patch are handled the same way as the old \"[number] hundred\" composiition.  So what\u0027s the point of this?",
+      "range": {
+        "startLine": 1172,
+        "startChar": 0,
+        "endLine": 1172,
+        "endChar": 7
+      },
+      "revId": "e456ece765d58e52823c6b2388095aa8066f4055",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}

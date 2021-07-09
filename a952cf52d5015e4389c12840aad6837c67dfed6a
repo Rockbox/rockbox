@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "405b9fe7_d3ca0b07",
+        "filename": "apps/talk.c",
+        "patchSetId": 4
+      },
+      "lineNbr": 1217,
+      "author": {
+        "id": 1000603
+      },
+      "writtenOn": "2021-07-09T01:03:26Z",
+      "side": 0,
+      "message": "I don\u0027t think removing year-specific speaking rules is wise; years are often spoken differently from general numbers.",
+      "range": {
+        "startLine": 1200,
+        "startChar": 0,
+        "endLine": 1217,
+        "endChar": 1
+      },
+      "revId": "a952cf52d5015e4389c12840aad6837c67dfed6a",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
