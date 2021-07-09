@@ -16,7 +16,6 @@ INCLUDES = -I$(BUILDDIR) -I$(BUILDDIR)/lang $(TARGET_INC)
 
 CFLAGS = $(INCLUDES) $(DEFINES) $(GCCOPTS)
 PPCFLAGS = $(filter-out -g -Dmain=SDL_main,$(CFLAGS)) # cygwin sdl-config fix
-ASMFLAGS = -D__ASSEMBLER__      # work around gcc 3.4.x bug with -std=gnu99, only meant for .S files
 CORE_LDOPTS = $(GLOBAL_LDOPTS)  # linker ops specifically for core build
 
 TOOLS = $(TOOLSDIR)/rdf2binary $(TOOLSDIR)/convbdf \
@@ -436,7 +435,7 @@ $(BUILDDIR)/%.o: $(ROOTDIR)/%.c
 
 $(BUILDDIR)/%.o: $(ROOTDIR)/%.S
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) $(ASMFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
 
 # generated definitions for use in .S files
 $(BUILDDIR)/%_asmdefs.h: $(ROOTDIR)/%_asmdefs.c
@@ -451,7 +450,7 @@ $(BUILDDIR)/%_asmdefs.h: $(ROOTDIR)/%_asmdefs.c
 
 %.o: %.S
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) $(ASMFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(CFLAGS) -c $< -o $@
 
 Makefile: $(TOOLSDIR)/configure
 ifneq (reconf,$(MAKECMDGOALS))

@@ -206,7 +206,7 @@ $(CODECDIR)/%.o: $(RBCODECLIB_DIR)/codecs/%.c
 $(CODECDIR)/%.o: $(RBCODECLIB_DIR)/codecs/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
-		-I$(dir $<) $(CODECFLAGS) $(ASMFLAGS) -c $< -o $@
+		-I$(dir $<) $(CODECFLAGS) -c $< -o $@
 
 $(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODECS_LIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*-pre.elf \

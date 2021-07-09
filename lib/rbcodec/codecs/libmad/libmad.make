@@ -45,7 +45,7 @@ $(CODECDIR)/libmad-mpeg/%.o : $(RBCODECLIB_DIR)/codecs/libmad/%.c
 $(CODECDIR)/libmad-mpeg/%.o : $(RBCODECLIB_DIR)/codecs/libmad/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<)) \
-		$(CC) $(MPEGMADFLAGS) $(ASMFLAGS) -c $< -o $@
+		$(CC) $(MPEGMADFLAGS) -c $< -o $@
 
 $(CODECDIR)/libmad/%.o: $(RBCODECLIB_DIR)/codecs/libmad/%.c
 	$(SILENT)mkdir -p $(dir $@)
@@ -55,4 +55,4 @@ $(CODECDIR)/libmad/%.o: $(RBCODECLIB_DIR)/codecs/libmad/%.c
 $(CODECDIR)/libmad/%.o: $(RBCODECLIB_DIR)/codecs/libmad/%.S
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<)) \
-		$(CC) $(MADFLAGS) $(ASMFLAGS) -c $< -o $@
+		$(CC) $(MADFLAGS) -c $< -o $@

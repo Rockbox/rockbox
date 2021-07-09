@@ -45,7 +45,7 @@ $(CODECDIR)/libspeex-voice/%.o : $(RBCODECLIB_DIR)/codecs/libspeex/%.c
 
 $(CODECDIR)/libspeex-voice/%.o : $(RBCODECLIB_DIR)/codecs/libspeex/%.S
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(VOICESPEEXFLAGS) $(ASMFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(VOICESPEEXFLAGS) -c $< -o $@
 
 $(CODECDIR)/libspeex/%.o: $(RBCODECLIB_DIR)/codecs/libspeex/%.c
 	$(SILENT)mkdir -p $(dir $@)
@@ -53,4 +53,4 @@ $(CODECDIR)/libspeex/%.o: $(RBCODECLIB_DIR)/codecs/libspeex/%.c
 
 $(CODECDIR)/libspeex/%.o: $(RBCODECLIB_DIR)/codecs/libspeex/%.S
 	$(SILENT)mkdir -p $(dir $@)
-	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SPEEXFLAGS) $(ASMFLAGS) -c $< -o $@
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) $(SPEEXFLAGS) -c $< -o $@
