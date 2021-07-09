@@ -305,7 +305,7 @@ static int zip_read_cd(struct zip* z, bool use_cb) {
 
             args->entry = i + 1;
             args->file_size = cd->uncompressed_size;
-            args->modts = dostime_mktime(letoh16(cdd->date), letoh16(cdd->time));
+            args->mtime = dostime_mktime(letoh16(cdd->date), letoh16(cdd->time));
 
             memcpy(lf->name, mem, name_length);
             lf->name[name_length] = '\0';
@@ -426,7 +426,7 @@ static int zip_read_entry(struct zip* z, uint16_t i, void* mem, uint32_t mem_siz
 
     args->entry = i + 1;
     args->file_size = lf->uncompressed_size;
-    args->modts = dostime_mktime(lf->date, lf->time);
+    args->mtime = dostime_mktime(lf->date, lf->time);
     args->block = NULL;
     args->block_size = 0;
     args->read_size = 0;
