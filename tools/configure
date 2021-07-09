@@ -1153,7 +1153,7 @@ voiceconfig () {
         DEFAULT_CHOICE="O"
     fi
 
-    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC"] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$GTTS" ] && [ "$GTTS" = "$RBSPEAK" ] ; then
+    if [ "$FESTIVAL" = "$FLITE" ] && [ "$FLITE" = "$ESPEAK" ] && [ "$ESPEAK" = "$SAPI" ] && [ "$SAPI" = "$MIMIC" ] && [ "$MIMIC" = "$SWIFT" ] && [ "$SWIFT" = "$GTTS" ] && [ "$GTTS" = "$RBSPEAK" ] ; then
         echo "You need Festival, eSpeak, Mimic, Flite, gtts, or rbspeak in your path, or SAPI available to build voice files"
         exit 3
     fi
