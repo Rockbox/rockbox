@@ -91,15 +91,15 @@ static bool flac_init(FLACContext* fc, int first_frame_offset)
     nseekpoints=0;
 
     fc->sample_skip = 0;
-    
+
     /* Reset sample buffers */
-    memset(decoded0, 0, sizeof(decoded0));
-    memset(decoded1, 0, sizeof(decoded1));
-    memset(decoded2, 0, sizeof(decoded2));
-    memset(decoded3, 0, sizeof(decoded3));
-    memset(decoded4, 0, sizeof(decoded4));
-    memset(decoded5, 0, sizeof(decoded5));
-    
+    ci->memset(decoded0, 0, sizeof(decoded0));
+    ci->memset(decoded1, 0, sizeof(decoded1));
+    ci->memset(decoded2, 0, sizeof(decoded2));
+    ci->memset(decoded3, 0, sizeof(decoded3));
+    ci->memset(decoded4, 0, sizeof(decoded4));
+    ci->memset(decoded5, 0, sizeof(decoded5));
+
     /* Set sample buffers in decoder structure */
     fc->decoded[0] = decoded0;
     fc->decoded[1] = decoded1;
