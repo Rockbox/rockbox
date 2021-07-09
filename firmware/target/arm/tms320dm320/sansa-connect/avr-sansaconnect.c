@@ -501,7 +501,10 @@ void avr_hid_init(void)
     bitclr16(&IO_GIO_DIR2, (1 << 0));
     avr_hid_release();
 
-    /* RATE = 219 (0xDB) -> 200 kHz */
+    /* Master, MSB first, RATE = 219 (Bit rate = ARM clock / 2*(RATE + 1)))
+     * Boosted 148.5 MHz / 440 = 337.5 kHz
+     * Default 74.25 MHz / 440 = 168.75 kHz
+     */
     IO_SERIAL1_MODE = 0x6DB;
 
     mutex_init(&avr_mtx);

@@ -312,7 +312,14 @@ void system_init(void)
 #endif
     {
 #ifdef SANSA_CONNECT
-        /* Setting AHB divisor to 0 increases power consumption */
+        /* Setting AHB divisor to 0 increases power consumption
+         * Slow Setup:
+         *  ARM div  = 4    ( 74.25  MHz )
+         *  AHB div  = 2    ( 37.125 MHz )
+         * Fast Setup:
+         *  ARM div  = 2    ( 148.5  MHz )
+         *  AHB div  = 2    ( 74.25  MHz )
+         */
         clock_arm_slow = (1 << 8) | 3;
         clock_arm_fast = (1 << 8) | 1;
 #else

@@ -58,10 +58,10 @@ _init_board:
     /* Setup the EMIF interface timings */
 
     /* FLASH interface:
-     * These are based on the OF setup 
+     * These are based on the OF setup
      */
     /* IO_EMIF_CS0CTRL1 and
-     * IO_EMIF_CS0CTRL2 
+     * IO_EMIF_CS0CTRL2
      */
     mwh     0x30A00, 0x889A
     mwh     0x30A02, 0x1110
@@ -75,7 +75,7 @@ _init_board:
     mwh     0x30A0E, 0x0222
 
     /* IO_EMIF_CS3CTRL1 and
-     * IO_EMIF_CS3CTRL2 
+     * IO_EMIF_CS3CTRL2
      */
     mwh     0x30A10, 0x8899
     mwh     0x30A12, 0x5110
@@ -96,37 +96,49 @@ _init_board:
 _clock_setup:
     /* Clock initialization */
 
+    /* Disable peripheral clocks */
+    mwhm 0x3089A, 0
+    mwhm 0x3089C, 0
+
     /* IO_CLK_BYP: Bypass the PLLs for the following changes */
     mwh 0x30894, 0x1111
 
     /*
-     *  IO_CLK_PLLA
-     *  IO_CLK_PLLB
+     *  IO_CLK_PLLA: 27 MHz * 11 / 1 = 297 MHz
+     *  IO_CLK_PLLB: 27 MHz
      */
-    mwhm 0x30880, 0x00A0
+    mwh 0x30880, 0x10A0
     mwhm 0x30882, 0x1000
 
-    /* IO_CLK_SEL0 */
+    /* IO_CLK_SEL0: Timer 0 and 1, UART 0 and 1 from PLLIN (27 MHz) */
     mwh 0x30884, 0x0066
 
-    /* IO_CLK_SEL1 */
+    /* IO_CLK_SEL1: VENC from PLLA, OSD clock = VENC clock / 2 */
     mwhm 0x30886, 0x0003
 
-    # IO_CLK_SEL2: ARM, AXL, SDRAM and DSP are from PLLA */
+    /* IO_CLK_SEL2: ARM, AXL, SDRAM and DSP are from PLLA */
     mwh 0x30888, 0
 
-    /* IO_CLK_DIV0: Set the slow clock speed for the ARM/AHB */
+    /* IO_CLK_DIV0: Set the fast clock speed for the ARM/AHB
+     * ARM = PLLA / 2 = 148.5 MHz
+     * AHB = ARM / 2 = 74.25 MHz
+     */
     mwh 0x3088A, 0x0101
 
-    /* IO_CLK_DIV1: Accelerator, SDRAM */
+    /* IO_CLK_DIV1: Accelerator, SDRAM
+     * AXL = PLLA / 2 = 148.5 MHz
+     * SDRAM = PLLA / 3 = 99 MHz
+     */
     mwh 0x3088C, 0x0102
 
     /* IO_CLK_DIV2: DSP, MS Clock
      * OF must be booted with this value
+     * DSP = PLLA / 3 = 99 MHz
+     * MS = PLLA / 1 = 297 MHz
      */
     mwhm 0x3088E, 0x0200
 
-    # PLLA &= ~0x1000 (BIC #0x1000)
+    /* PLLA &= ~0x1000 (BIC #0x1000) */
     mrh     0x30880
     bic     r0, r0, #0x1000
     strh    r0, [r1]
@@ -141,25 +153,27 @@ _plla_wait:
     /* IO_CLK_BYP: Enable PLL feeds  */
     mwhm 0x30894, 0x0
 
-    /* IO_CLK_MOD0 */
+    /* IO_CLK_MOD0
+     * Enable clocks:
+     *   ARM, Bus Controller, AHB, ARM internal memory, EMIF, SDRAM
+     * Disable clocks:
+     *   ETM, E2ICE, INTC, EXTHOST, DSP, HPIB
+     */
     mwh 0x30898, 0x01A7
 
-    /* IO_CLK_MOD1 */
-    mwhm 0x3089A, 0x18
-
-    /* IO_CLK_MOD2 */
-    mwhm 0x3089C, 0x4A0
+    /* IO_CLK_MOD2: Enable GIO and SIF1 clocks */
+    mwhm 0x3089C, 0x0420
 
     /* Setup the SDRAM range on the AHB bus */
     /* SDRAMSA */
     mov    r0, #0x60000
     mov    r1, #0x1000000
     str    r1, [r0, #0xF00]
-    
+
     /* SDRAMEA: 64MB */
     mov    r1, #0x5000000
     str    r1, [r0, #0xF04]
-    
+
     /* SDRC_REFCTL */
     mwh    0x309A8, 0
 
@@ -183,8 +197,11 @@ _plla_wait:
 
     mwhm   0x309A8, 0x0140
 
+    /* IMGBUF SDRAM priority bit 2 set */
     mwhm   0x309BE, 0x4
+    /* SDRAM refresh priority bit 1 set */
     mwhm   0x309BC, 0x2
+    /* Use defined priority bits */
     ldr    r0, =0x309C4
     ldr    r1, [r0]
     orr    r1, r1, #1
@@ -198,10 +215,11 @@ _plla_wait:
     orr    r1, r1, #0x40
     strh   r1, [r0]
 
+    /* Enable auto refresh with interval (64 + 1) * 8 SDRAM clocks */
     mwhm   0x309A8, 0x0140
 
     /* Go through the GPIO initialization */
-    /* Warning: setting some of the functions wrong will make OF unable 
+    /* Warning: setting some of the functions wrong will make OF unable
        to boot (freeze during startup) */
     /* IO_GIO_FSEL0: Set up the GPIO pin functions 0-16 */
     mwhm   0x305A4, 0xC000
@@ -223,7 +241,7 @@ _plla_wait:
 
     /* IO_GIO_DIR2 */
     mwh     0x30584, 0x01FD
-    
+
     /* IO_GIO_INV0 */
     mwh     0x30586, 0x0000
 
@@ -235,6 +253,6 @@ _plla_wait:
 
     bx     lr
 
-.ltorg  
+.ltorg
 .size       _init_board, .-_init_board
 

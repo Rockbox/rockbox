@@ -805,8 +805,9 @@ int sd_init(void)
     bitclr16(&IO_CLK_MOD2, CLK_MOD2_MMC);
     bitset16(&IO_CLK_INV, CLK_INV_MMC);
 
-    /* mmc module clock: 75 Mhz (AHB) / 2 = ~37.5 Mhz
-     * (Frequencies above are taken from Sansa Connect's OF source code) */
+    /* mmc module clock when boosted 74.25 Mhz (AHB) / 2 = 37.125 Mhz
+     * default 37.125 (AHB) / 2 = 18.5625 MHz
+     * (Frequencies above are valid for Sansa Connect) */
     IO_CLK_DIV3 = (IO_CLK_DIV3 & 0xFF00) | 0x01;
 
     bitset16(&IO_CLK_MOD2, CLK_MOD2_MMC);

@@ -141,7 +141,7 @@ void lcd_init_device(void)
        VENC Clock from PLLA */
     IO_CLK_SEL1 = 0x3;
 
-    /* Set VENC Clock Division to 11
+    /* Set VENC Clock Division to 11 (PLLA / 11 = 297 MHz / 11 = 27 MHz)
        OF bootloader sets division to 8, vmlinux sets it to 11 */
     IO_CLK_DIV3 = (IO_CLK_DIV3 & ~(0x1F00)) | 0xB00;
 

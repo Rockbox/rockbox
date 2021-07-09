@@ -40,7 +40,9 @@ void libertas_spi_init(void)
     IO_SERIAL0_TX_ENABLE = 0x0001;
 
     /* SELSDEN = 0, SLVEN = 0, SIOCLR = 0, SCLKM = 1, MSB = 1, MSSEL = 0,
-     * RATE = 2 -> 15MHz
+     * RATE = 1 (Bit rate = ARM clock / 2*(RATE + 1)))
+     * Boosted 148.5 MHz / 4 = 37.125 MHz
+     * Default 74.25 MHz / 4 = 18.5625 MHz
      */
     IO_SERIAL0_MODE = 0x0601;
 
