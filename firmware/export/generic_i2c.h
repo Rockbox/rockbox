@@ -49,5 +49,15 @@ int i2c_write_data(int bus_index, int bus_address, int address,
 int i2c_read_data(int bus_index, int bus_address, int address,
                   unsigned char* buf, int count);
 
+/* Special function for devices that can appear on I2C bus but do not
+ * comply to I2C specification. Such devices include AT88SC6416C crypto
+ * memory. To read data from AT88SC6416C, a write I2C transaction starts,
+ * 3 bytes are written and then, in the middle of transaction, the device
+ * starts sending data.
+ */
+int i2c_write_read_data(int bus_index, int bus_address,
+                        const unsigned char* buf_write, int count_write,
+                        unsigned char* buf_read, int count_read);
+
 #endif /* _GEN_I2C_ */
 

@@ -31,6 +31,9 @@ int i2c_read(unsigned short address, unsigned char* buf, int count);
 #ifdef HAVE_SOFTWARE_I2C
 int i2c_read_bytes(unsigned short address, unsigned short reg,
                    unsigned char* buf, int count);
+int i2c_write_read_bytes(unsigned short address,
+                         const unsigned char* buf_write, int count_write,
+                         unsigned char* buf_read, int count_read);
 #endif
 
 #endif

@@ -294,4 +294,12 @@ int i2c_read_bytes(unsigned short address, unsigned short reg,
     return i2c_read_data(dm320_i2c_bus, address, reg, buf, count);
 }
 
+int i2c_write_read_bytes(unsigned short address,
+                         const unsigned char* buf_write, int count_write,
+                         unsigned char* buf_read, int count_read)
+{
+    return i2c_write_read_data(dm320_i2c_bus, address, buf_write, count_write,
+                               buf_read, count_read);
+}
+
 #endif

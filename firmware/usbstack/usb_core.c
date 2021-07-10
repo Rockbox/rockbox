@@ -62,6 +62,10 @@
 #include "ocotp-imx233.h"
 #endif
 
+#ifdef SANSA_CONNECT
+#include "cryptomem-sansaconnect.h"
+#endif
+
 #ifndef USB_MAX_CURRENT
 #define USB_MAX_CURRENT 500
 #endif
@@ -326,6 +330,22 @@ static void set_serial_descriptor(void)
         }
     }
     usb_string_iSerial.bLength = 2 + 2 * (1 + IMX233_NUM_OCOTP_OPS * 8);
+}
+#elif defined(SANSA_CONNECT)
+static void set_serial_descriptor(void)
+{
+    char deviceid[32];
+    short* p = &usb_string_iSerial.wString[1];
+    int i;
+
+    if(!cryptomem_read_deviceid(deviceid)) {
+        for(i = 0; i < 32; i++) {
+            *p++ = deviceid[i];
+        }
+        usb_string_iSerial.bLength = 2 + 2 * (1 + 32);
+    } else {
+        device_descriptor.iSerialNumber = 0;
+    }
 }
 #elif (CONFIG_STORAGE & STORAGE_ATA)
 /* If we don't know the device serial number, use the one

@@ -1274,6 +1274,7 @@ target/arm/tms320dm320/sansa-connect/tnetv105_cppi.c
 target/arm/tms320dm320/sansa-connect/tnetv105_usb_drv.c
 target/arm/tms320dm320/sansa-connect/usb-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/avr-sansaconnect.c
+target/arm/tms320dm320/sansa-connect/cryptomem-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/backlight-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/pcm-sansaconnect.c
 target/arm/tms320dm320/sansa-connect/wifi-sansaconnect.c

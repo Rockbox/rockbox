@@ -198,6 +198,40 @@ end:
     return ret;
 }
 
+int i2c_write_read_data(int bus_index, int bus_address,
+                        const unsigned char* buf_write, int count_write,
+                        unsigned char* buf_read, int count_read)
+{
+    int i;
+    int ret = 0;
+    const struct i2c_interface *iface = i2c_if[bus_index];
+
+    i2c_start(iface);
+    if (!i2c_outb(iface, bus_address))
+    {
+        ret = -2;
+        goto end;
+    }
+
+    for(i = 0;i < count_write;i++)
+    {
+        if (!i2c_outb(iface, buf_write[i]))
+        {
+            ret = -3;
+            goto end;
+        }
+    }
+
+    for(i = 0;i < count_read-1;i++)
+        buf_read[i] = i2c_inb(iface, true);
+
+    buf_read[i] = i2c_inb(iface, false);
+
+end:
+    i2c_stop(iface);
+    return ret;
+}
+
 /* returns bus index which can be used as a handle, or <0 on error */
 int i2c_add_node(const struct i2c_interface *iface)
 {
