@@ -3,7 +3,6 @@
 
 #define AUDIOHW_CAPS (LINEOUT_CAP | FILTER_ROLL_OFF_CAP)
 AUDIOHW_SETTING(VOLUME, "dB", 1, 5, -102*10,  0, -30*10)
-AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
 #endif
 
 // We want this, but the codec takes over a second to unmute!
@@ -12,10 +11,14 @@ AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
 #if defined(XDUOO_X3II)
 /* The AK4490 glitches when switching sample rates */
 #define AUDIOHW_MUTE_ON_SRATE_CHANGE
+AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 5, 0)
+#define AUDIOHW_HAVE_SS_ROLL_OFF
 #endif
 
 #if defined(XDUOO_X20)
 //#define AUDIOHW_NEEDS_INITIAL_UNMUTE
+AUDIOHW_SETTING(FILTER_ROLL_OFF, "", 0, 1, 0, 4, 0)
+#define AUDIOHW_HAVE_SHORT2_ROLL_OFF
 #endif
 
 void audiohw_mute(int mute);
