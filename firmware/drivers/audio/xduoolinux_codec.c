@@ -238,7 +238,8 @@ void audiohw_set_filter_roll_off(int value)
     /* 0 = Sharp;
        1 = Slow;
        2 = Short Sharp
-       3 = Short Slow */
+       3 = Short Slow
+       4 = Super Slow */
 #if defined(XDUOO_X3II)
     long int value_hw = value;
     alsa_controls_set_ints("AK4490 Digital Filter", 1, &value_hw);
