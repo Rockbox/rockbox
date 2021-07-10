@@ -70,6 +70,7 @@ void lcd_awake(void)
         bitset16(&IO_VID_ENC_VMOD, VENC_VMOD_VENC);
 
         avr_hid_lcm_power_on();
+        mdelay(66);
         lcd_set_active(true);
         avr_hid_lcm_wake();
 
