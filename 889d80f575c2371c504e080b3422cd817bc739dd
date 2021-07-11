@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fa5cb695_da8bd40a",
+        "filename": "firmware/drivers/audio/pcm5102a.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T19:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2ea3375_7755ab86",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6000f855_83b2a570",
         "filename": "firmware/target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c",
         "patchSetId": 24
@@ -69,6 +87,24 @@
       "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd7a5ae3_1d56b580",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T19:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9696037_40026498",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -107,6 +143,24 @@
     },
     {
       "key": {
+        "uuid": "259ffd6d_ee1e62a0",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T19:52:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3dd6564b_a937f438",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ca0b60d5_dbec87b7",
         "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-target.h",
         "patchSetId": 24
@@ -121,6 +175,24 @@
       "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f82ad74c_8b1486ac",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-target.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T19:52:23Z",
+      "side": 1,
+      "message": "Ah, whoops yep, will be removed in next patchset.",
+      "parentUuid": "ca0b60d5_dbec87b7",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
@@ -159,6 +231,24 @@
     },
     {
       "key": {
+        "uuid": "bea10ee2_7a8763c2",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/gpio-target.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T19:52:23Z",
+      "side": 1,
+      "message": "I think I\u0027m just going to put all my notes in the top of this file and label them /* NOTES */, if that works.",
+      "parentUuid": "9b952dc8_fa480228",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c8d8564e_9eac91d7",
         "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
         "patchSetId": 24
@@ -191,6 +281,24 @@
       "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b7e7a718_7ee0abc7",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T19:52:23Z",
+      "side": 1,
+      "message": "The LCD doesn\u0027t seem to like that, it would appear we can\u0027t get past initialization with it. I\u0027ll leave TE off for now.",
+      "parentUuid": "4700bfcd_b52f861f",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     },
     {
       "key": {
