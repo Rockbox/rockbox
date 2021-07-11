@@ -1676,9 +1676,12 @@ target/mips/ingenic_x1000/msc-x1000.c
 #if (CONFIG_STORAGE & STORAGE_SD)
 target/mips/ingenic_x1000/sd-x1000.c
 #endif
+#ifdef BOOTLOADER
+target/mips/ingenic_x1000/installer-x1000.c
 target/mips/ingenic_x1000/spl-start.S
 target/mips/ingenic_x1000/spl-x1000.c
 common/ucl_decompress.c
+#endif
 #endif /* CONFIG_CPU == X1000 */
 
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)
@@ -1711,9 +1714,6 @@ target/mips/ingenic_x1000/fiiom3k/button-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/lcd-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/spl-fiiom3k.c
-#ifdef BOOTLOADER
-target/mips/ingenic_x1000/fiiom3k/installer-fiiom3k.c
-#endif
 #endif /* FIIO_M3K */
 
 #if defined(LYRE_PROTO1)

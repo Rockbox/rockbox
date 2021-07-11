@@ -48,15 +48,12 @@
 #include "loader_strerror.h"
 #include "version.h"
 #include "boot-x1000.h"
+#include "installer-x1000.h"
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdarg.h>
-
-#ifdef FIIO_M3K
-# include "installer-fiiom3k.h"
-#endif
 
 #if defined(FIIO_M3K)
 # define BL_RECOVERY    BUTTON_VOL_UP
@@ -68,6 +65,7 @@
 # define BL_DOWN_NAME   "VOL-"
 # define BL_SELECT_NAME "PLAY"
 # define BL_QUIT_NAME   "POWER"
+# define BOOTBACKUP_FILE "/fiiom3k-boot.bin"
 #else
 # error "Missing keymap!"
 #endif
@@ -387,14 +385,12 @@ void reboot(void)
     while(1);
 }
 
-/* TODO: clean this up, make the installer generic as well */
 enum {
     INSTALL,
     BACKUP,
     RESTORE,
 };
 
-#ifdef FIIO_M3K
 void bootloader_action(int which)
 {
     if(init_disk() != 0) {
@@ -414,14 +410,14 @@ void bootloader_action(int which)
 
     int rc;
     switch(which) {
-    case INSTALL: rc = install_boot("/bootloader.m3k");   break;
-    case BACKUP:  rc =  backup_boot("/fiiom3k-boot.bin"); break;
-    case RESTORE: rc = restore_boot("/fiiom3k-boot.bin"); break;
+    case INSTALL: rc = install_bootloader("/bootloader." BOOTFILE_EXT); break;
+    case BACKUP:  rc = backup_bootloader(BOOTBACKUP_FILE); break;
+    case RESTORE: rc = restore_bootloader(BOOTBACKUP_FILE); break;
     default: return;
     }
 
     static char buf[64];
-    snprintf(buf, sizeof(buf), "Failed! Error: %d", rc);
+    snprintf(buf, sizeof(buf), "%s (%d)", installer_strerror(rc), rc);
     const char* msg1 = rc == 0 ? "Success" : buf;
     const char* msg2 = "Press " BL_QUIT_NAME " to continue";
     splash2(0, msg1, msg2);
@@ -429,13 +425,6 @@ void bootloader_action(int which)
     button_clear_queue();
     while(button_get(true) != BL_QUIT);
 }
-#else
-void bootloader_action(int which)
-{
-    (void)which;
-    splash(5*HZ, "Not implemented!");
-}
-#endif
 
 void bootloader_install(void)
 {
