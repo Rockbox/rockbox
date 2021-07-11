@@ -21,6 +21,7 @@
 
 #include "zip.h"
 #include <string.h>
+#include "strlcpy.h"
 #include "file.h"
 #include "dir.h"
 #include "system.h"
