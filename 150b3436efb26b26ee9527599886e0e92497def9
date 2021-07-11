@@ -16,6 +16,24 @@
       "revId": "150b3436efb26b26ee9527599886e0e92497def9",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "05293dc9_ebb843a6",
+        "filename": "firmware/target/mips/ingenic_x1000/shanlingq1/button-shanlingq1.c",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T18:15:16Z",
+      "side": 1,
+      "message": "Thanks for the scrollwheel advice; a while ago I came across this algorithm (at the bottom of the page)\nhttps://www.best-microcontroller-projects.com/rotary-encoder.html\nwhich uses basically the same idea as your code. I\u0027d like to see how well it works by just polling at 100 Hz from button_read_device(). I think what\u0027s causing my skipping-back problem is contact bounce (on the page I linked he mentions that exact problem). I don\u0027t think the X1000 has a debounce filter on its GPIOs so I\u0027d rather not interrupt on a noisy line if I can avoid it.",
+      "parentUuid": "65b8c333_f080ae08",
+      "revId": "150b3436efb26b26ee9527599886e0e92497def9",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": false
     }
   ]
 }
