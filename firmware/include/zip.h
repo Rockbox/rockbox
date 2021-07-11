@@ -58,6 +58,10 @@ int zip_read_shallow(struct zip* z, zip_callback cb, void* ctx);
 // this can also pickup where a successful shallow read leftoff
 int zip_read_deep(struct zip* z, zip_callback cb, void* ctx);
 
+// extract the contents to an existing directory
+// this can also pickup where a successful shallow read leftoff
+int zip_extract(struct zip* z, const char* root, zip_callback cb, void* ctx);
+
 // returns system resources
 void zip_close(struct zip* z);
 

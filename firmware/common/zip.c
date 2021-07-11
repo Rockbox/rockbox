@@ -22,9 +22,12 @@
 #include "zip.h"
 #include <string.h>
 #include "file.h"
+#include "dir.h"
 #include "system.h"
+#include "errno.h"
 #include "core_alloc.h"
 #include "timefuncs.h"
+#include "pathfuncs.h"
 #include "crc32.h"
 #include "rbendian.h"
 
@@ -155,6 +158,16 @@ struct zip_mem {
     const uint8_t* mem;
     off_t mem_offset;
     off_t mem_size;
+};
+
+struct zip_extract {
+    zip_callback cb;
+    void* ctx;
+    size_t name_offset;
+    size_t name_size;
+    char* name;
+    int file;
+    char path[MAX_PATH];
 };
 
 static int zip_read_ed(struct zip* z) {
@@ -606,6 +619,100 @@ static void zip_mem_init(struct zip_mem* z, int zip_handle, int mem_handle, cons
     z->mem_size = mem_size;
 }
 
+static int zip_extract_start(const struct zip_args* args, struct zip_extract* ze) {
+    size_t name_length;
+    const char* dir;
+    size_t dir_length;
+
+    if ((name_length = strlcpy(ze->name, args->name, ze->name_size)) >= ze->name_size)
+        return 5;
+
+    if ((dir_length = path_dirname(ze->name, &dir)) > 0) {
+        char c = ze->name[dir_length];
+
+        ze->name[dir_length] = '\0';
+
+        if (!dir_exists(ze->path)) {
+            const char* path = ze->name;
+            const char* name;
+
+            while (parse_path_component(&path, &name) > 0) {
+                size_t offset = path - ze->name;
+                char c = ze->name[offset];
+
+                ze->name[offset] = '\0';
+
+                if (mkdir(ze->path) < 0 && errno != EEXIST)
+                    return 6;
+
+                ze->name[offset] = c;
+            }
+        }
+
+        ze->name[dir_length] = c;
+    }
+
+    if (ze->name[name_length - 1] == PATH_SEPCH) {
+        if (mkdir(ze->path) < 0 && errno != EEXIST)
+            return 7;
+
+        return 0;
+    }
+
+    if ((ze->file = creat(ze->path, 0666)) < 0)
+        return 8;
+
+    return 0;
+}
+
+static int zip_extract_data(const struct zip_args* args, struct zip_extract* ze) {
+    if (write(ze->file, args->block, args->block_size) != (ssize_t) args->block_size) {
+        return 9;
+    }
+
+    return 0;
+}
+
+static int zip_extract_end(const struct zip_args* args, struct zip_extract* ze) {
+    int rv;
+
+    if (ze->file >= 0) {
+        rv = close(ze->file);
+
+        ze->file = -1;
+
+        if (rv < 0)
+            return 10;
+    }
+
+    if (modtime(ze->path, args->mtime) < 0)
+        return 11;
+
+    return 0;
+}
+
+static int zip_extract_callback(const struct zip_args* args, int pass, void* ctx) {
+    struct zip_extract* ze = ctx;
+    int rv;
+
+    if (ze->cb != NULL && (rv = ze->cb(args, pass, ze->ctx)) != 0)
+        return rv;
+
+    switch (pass) {
+        case ZIP_PASS_START:
+            return zip_extract_start(args, ze);
+
+        case ZIP_PASS_DATA:
+            return zip_extract_data(args, ze);
+
+        case ZIP_PASS_END:
+            return zip_extract_end(args, ze);
+
+        default:
+            return 1;
+    }
+}
+
 struct zip* zip_open(const char* name, bool try_mem) {
     int file = -1;
     int mem_handle = -1;
@@ -690,6 +797,77 @@ int zip_read_deep(struct zip* z, zip_callback cb, void* ctx) {
 
 read_entries:
     return zip_read_entries(z);
+}
+
+int zip_extract(struct zip* z, const char* root, zip_callback cb, void* ctx) {
+    int rv;
+    int ze_handle = -1;
+    struct zip_extract* ze;
+    char* path;
+    size_t size;
+    size_t length;
+
+    if (root == NULL || root[0] == '\0')
+        root = PATH_ROOTSTR;
+
+    if (root[0] != PATH_SEPCH) {
+        rv = -1;
+        goto bail;
+    }
+
+    if (!dir_exists(root)) {
+        rv = 1;
+        goto bail;
+    }
+
+    if ((ze_handle = zip_core_alloc(sizeof(struct zip_extract))) < 0) {
+        rv = 2;
+        goto bail;
+    }
+
+    ze = core_get_data(ze_handle);
+    ze->cb = cb;
+    ze->ctx = ctx;
+    ze->file = -1;
+
+    path = ze->path;
+    size = sizeof(ze->path);
+    length = strlcpy(path, root, size);
+
+    if (length >= size) {
+        rv = 3;
+        goto bail;
+    }
+
+    path += length;
+    size -= length;
+
+    if (path[-1] != PATH_SEPCH) {
+        length = strlcpy(path, PATH_SEPSTR, size);
+
+        if (length >= size) {
+            rv = 4;
+            goto bail;
+        }
+
+        path += length;
+        size -= length;
+    }
+
+    ze->name_offset = path - ze->path;
+    ze->name_size = size;
+    ze->name = path;
+
+    rv = zip_read_deep(z, zip_extract_callback, ze);
+
+bail:
+    if (ze_handle >= 0) {
+        if (ze->file >= 0)
+            close(ze->file);
+
+        core_free(ze_handle);
+    }
+    return rv;
 }
 
 void zip_close(struct zip* z) {
