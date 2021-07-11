@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
+#include <utime.h>
 #include "config.h"
 #include "system.h"
 #include "file.h"
@@ -34,6 +35,17 @@
 
 #define SAME_FILE_INFO(sb1p, sb2p) \
     ((sb1p)->st_dev == (sb2p)->st_dev && (sb1p)->st_ino == (sb2p)->st_ino)
+
+int os_modtime(const char *path, time_t modtime)
+{
+    struct utimbuf times =
+    {
+        .actime = modtime,
+        .modtime = modtime,
+    };
+
+    return utime(path, &times);
+}
 
 off_t os_filesize(int osfd)
 {

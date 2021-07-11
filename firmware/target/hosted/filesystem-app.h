@@ -82,6 +82,7 @@ ssize_t app_write(int fildes, const void *buf, size_t nbyte);
 #endif /* HAVE_SDL_THREADS */
 int     app_remove(const char *path);
 int     app_rename(const char *old, const char *new);
+#define app_modtime     os_modtime
 #define app_filesize    os_filesize
 #define app_fsamefile   os_fsamefile
 int     app_relate(const char *path1, const char *path2);

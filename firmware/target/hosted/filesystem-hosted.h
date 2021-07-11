@@ -33,6 +33,7 @@ void * os_lc_open(const char *ospath);
 #define _FILESYSTEM_HOSTED__FILE_H_
 
 #ifndef OSFUNCTIONS_DECLARED
+int os_modtime(const char *path, time_t modtime);
 off_t os_filesize(int osfd);
 int os_fsamefile(int osfd1, int osfd2);
 int os_relate(const char *path1, const char *path2);
