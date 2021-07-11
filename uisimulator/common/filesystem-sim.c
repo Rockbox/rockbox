@@ -569,6 +569,16 @@ int sim_rename(const char *old, const char *new)
     return rc;
 }
 
+int sim_modtime(const char *path, time_t modtime)
+{
+    char ospath[SIM_TMPBUF_MAX_PATH];
+
+    if (sim_get_os_path(ospath, path, sizeof (ospath)) < 0)
+        return false;
+
+    return os_modtime(ospath, modtime);
+}
+
 off_t sim_filesize(int fildes)
 {
     struct filestr_desc *filestr = get_filestr(fildes);

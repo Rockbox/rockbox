@@ -68,6 +68,7 @@ ssize_t sim_read(int fildes, void *buf, size_t nbyte);
 ssize_t sim_write(int fildes, const void *buf, size_t nbyte);
 int     sim_remove(const char *path);
 int     sim_rename(const char *old, const char *new);
+int     sim_modtime(const char *path, time_t modtime);
 off_t   sim_filesize(int fildes);
 int     sim_fsamefile(int fildes1, int fildes2);
 int     sim_relate(const char *path1, const char *path2);
