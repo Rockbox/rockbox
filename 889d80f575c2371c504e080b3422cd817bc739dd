@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b2ea3375_7755ab86",
+        "filename": "firmware/drivers/audio/pcm5102a.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T17:59:02Z",
+      "side": 1,
+      "message": "I could have sworn \"||\" made sense, but yeah you\u0027re right, it should be \"\u0026\u0026\". Will be fixed in next patchset.\n\nSpeaking of this file though, I wonder if it should be renamed \"erosqnative-codec.c\" or something along those lines, or does pcm5102a.c make sense? I\u0027ve been on the fence about that.",
+      "parentUuid": "ff7da0e9_cb822cc9",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6000f855_83b2a570",
         "filename": "firmware/target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c",
         "patchSetId": 24
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "c9696037_40026498",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T17:59:02Z",
+      "side": 1,
+      "message": "I see. So I should be safe to always use 256 you think?",
+      "parentUuid": "6000f855_83b2a570",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f3f62907_9f805827",
         "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-erosqnative.c",
         "patchSetId": 24
@@ -47,6 +83,24 @@
       "writtenOn": "2021-07-11T15:54:02Z",
       "side": 1,
       "message": "the reason is to do with some special treatment of these buttons by Rockbox. All the other targets using BUTTON_SCROLL_FWD/BACK have a rotary encoder or similar hardware and the app layer \"knows\" these can\u0027t work like normal push buttons.",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3dd6564b_a937f438",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T17:59:02Z",
+      "side": 1,
+      "message": "I see. That makes sense!",
+      "parentUuid": "f3f62907_9f805827",
       "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "9b952dc8_fa480228",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/gpio-target.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T17:59:02Z",
+      "side": 1,
+      "message": "Will do, I didn\u0027t want to remove them in case I needed them. I should probably move all my notes from this file somewhere else anyway.",
+      "parentUuid": "b52f01eb_3b8ffaa8",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c8d8564e_9eac91d7",
         "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
         "patchSetId": 24
@@ -98,6 +170,24 @@
       "writtenOn": "2021-07-11T15:54:02Z",
       "side": 1,
       "message": "it should be enough to add this to the cmd_enable[] table\n\n    /* Tearing effect line ON, mode\u003d0 (vsync signal) */\n    LCD_INSTR_CMD,      0x35,\n    LCD_INSTR_DAT,      0x00,",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4700bfcd_b52f861f",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000721
+      },
+      "writtenOn": "2021-07-11T17:59:02Z",
+      "side": 1,
+      "message": "Hm, I\u0027ll give it a try. Though it doesn\u0027t matter a whole lot at this stage because we always send a full frame to the LCD, right? Well, right now that is.",
+      "parentUuid": "c8d8564e_9eac91d7",
       "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
       "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
       "unresolved": true
