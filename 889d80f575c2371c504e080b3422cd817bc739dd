@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff7da0e9_cb822cc9",
+        "filename": "firmware/drivers/audio/pcm5102a.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "|| -\u003e \u0026\u0026\nboth functions are called so the || is incorrect but I\u0027m being a bit pedantic anyhow.\n(It\u0027s not like anybody else is using the code... yet)",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6000f855_83b2a570",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/audiohw-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "note this conditional is needed only for the AK4376 DAC on the M3K, it\u0027s not an X1000 limitation.",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3f62907_9f805827",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "the reason is to do with some special treatment of these buttons by Rockbox. All the other targets using BUTTON_SCROLL_FWD/BACK have a rotary encoder or similar hardware and the app layer \"knows\" these can\u0027t work like normal push buttons.",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca0b60d5_dbec87b7",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/button-target.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "this seems to be unused",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b52f01eb_3b8ffaa8",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/gpio-target.h",
+        "patchSetId": 24
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "just remove these groups if they are not used",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c8d8564e_9eac91d7",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "it should be enough to add this to the cmd_enable[] table\n\n    /* Tearing effect line ON, mode\u003d0 (vsync signal) */\n    LCD_INSTR_CMD,      0x35,\n    LCD_INSTR_DAT,      0x00,",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4f97fbd_f35896b3",
+        "filename": "firmware/target/mips/ingenic_x1000/erosqnative/spl-erosqnative.c",
+        "patchSetId": 24
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1000718
+      },
+      "writtenOn": "2021-07-11T15:54:02Z",
+      "side": 1,
+      "message": "IIRC your kernels are gzipped. it\u0027d be a hard task decompressing them from the SPL, given the limited code space available.\n\nYour best bet is probably to load u-boot and let it load the kernels. I have no idea if the existing dualboot helpers will set up the hardware right for u-boot, though.",
+      "revId": "889d80f575c2371c504e080b3422cd817bc739dd",
+      "serverId": "583131e1-1a33-4f2b-b8ec-82434880f207",
+      "unresolved": true
+    }
+  ]
+}
