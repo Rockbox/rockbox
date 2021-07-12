@@ -112,6 +112,10 @@
 #include "pmu-target.h"
 #endif
 
+#ifdef SANSA_CONNECT
+#include "avr-sansaconnect.h"
+#endif
+
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
 #endif
@@ -1091,6 +1095,17 @@ static bool view_battery(void)
                     y = pmu_read(0x2d + (i << 1)) * 100 + 900;
                     lcd_putsf(0, 10 + i, "LDO%d: %x / %d mV", i + 1, x, y);
                 }
+#elif defined(SANSA_CONNECT)
+                lcd_putsf(0, 3, "Charger: %s",
+                         charger_inserted() ? "present" : "absent");
+                x = (avr_hid_hdq_read_short(HDQ_REG_TEMP) / 4) - 273;
+                lcd_putsf(0, 4, "Battery temperature: %d C", x);
+                x = (avr_hid_hdq_read_short(HDQ_REG_AI) * 357) / 200;
+                lcd_putsf(0, 5, "Battery current: %d.%01d mA", x / 10, x % 10);
+                x = (avr_hid_hdq_read_short(HDQ_REG_AP) * 292) / 20;
+                lcd_putsf(0, 6, "Discharge power: %d.%01d mW", x / 10, x % 10);
+                x = (avr_hid_hdq_read_short(HDQ_REG_SAE) * 292) / 2;
+                lcd_putsf(0, 7, "Available energy: %d.%01d mWh", x / 10, x % 10);
 #else
                 lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
