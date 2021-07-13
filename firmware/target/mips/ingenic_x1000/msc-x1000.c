@@ -39,6 +39,8 @@
  * ensure that removing the card always resets the driver to a sane state.
  */
 
+#define DEBOUNCE_TIME (HZ/10)
+
 static const msc_config msc_configs[] = {
 #ifdef FIIO_M3K
 #define MSC_CLOCK_SOURCE X1000_CLK_SCLK_A
@@ -105,6 +107,7 @@ static void msc_init_one(msc_drv* d, int msc)
     d->req = NULL;
     d->iflag_done = 0;
     d->card_present = 1;
+    d->card_present_last = 1;
     d->req_running = 0;
     mutex_init(&d->lock);
     semaphore_init(&d->cmd_done, 1, 0);
@@ -122,8 +125,10 @@ static void msc_init_one(msc_drv* d, int msc)
 
     /* Setup the card detect IRQ */
     if(d->config->cd_gpio != GPIO_NONE) {
-        if(gpio_get_level(d->config->cd_gpio) != d->config->cd_active_level)
+        if(gpio_get_level(d->config->cd_gpio) != d->config->cd_active_level) {
             d->card_present = 0;
+            d->card_present_last = 0;
+        }
 
         system_set_irq_handler(GPIO_TO_IRQ(d->config->cd_gpio),
                                msc == 0 ? msc0_cd_interrupt : msc1_cd_interrupt);
@@ -613,11 +618,25 @@ static void msc_interrupt(msc_drv* d)
 static int msc_cd_callback(struct timeout* tmo)
 {
     msc_drv* d = (msc_drv*)tmo->data;
+    int now_present = msc_card_detect(d) ? 1 : 0;
 
-    /* If card is still present we assume the card is properly inserted */
-    if(msc_card_detect(d)) {
-        d->card_present = 1;
-        queue_broadcast(SYS_HOTSWAP_INSERTED, d->drive_nr);
+    /* If the CD pin level changed during the timeout interval, then the
+     * signal is not yet stable and we need to wait longer. */
+    if(now_present != d->card_present_last) {
+        d->card_present_last = now_present;
+        return DEBOUNCE_TIME;
+    }
+
+    /* If there is a change, then broadcast the hotswap event */
+    if(now_present != d->card_present) {
+        if(now_present) {
+            d->card_present = 1;
+            queue_broadcast(SYS_HOTSWAP_INSERTED, d->drive_nr);
+        } else {
+            msc_async_abort(d, MSC_REQ_EXTRACTED);
+            d->card_present = 0;
+            queue_broadcast(SYS_HOTSWAP_EXTRACTED, d->drive_nr);
+        }
     }
 
     return 0;
@@ -625,17 +644,9 @@ static int msc_cd_callback(struct timeout* tmo)
 
 static void msc_cd_interrupt(msc_drv* d)
 {
-    if(!msc_card_detect(d)) {
-        /* Immediately abort and notify when removing a card */
-        msc_async_abort(d, MSC_REQ_EXTRACTED);
-        if(d->card_present) {
-            d->card_present = 0;
-            queue_broadcast(SYS_HOTSWAP_EXTRACTED, d->drive_nr);
-        }
-    } else {
-        /* Timer to debounce input */
-        timeout_register(&d->cd_tmo, msc_cd_callback, HZ/4, (intptr_t)d);
-    }
+    /* Timer to debounce input */
+    d->card_present_last = msc_card_detect(d) ? 1 : 0;
+    timeout_register(&d->cd_tmo, msc_cd_callback, DEBOUNCE_TIME, (intptr_t)d);
 
     /* Invert the IRQ */
     gpio_flip_edge_irq(d->config->cd_gpio);

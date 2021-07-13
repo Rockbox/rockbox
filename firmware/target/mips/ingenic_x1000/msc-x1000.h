@@ -126,7 +126,8 @@ typedef struct msc_drv {
     unsigned iflag_done;
 
     volatile int req_running;
-    volatile int card_present;
+    volatile int card_present; /* Debounced status */
+    volatile int card_present_last; /* Status when we last polled it */
 
     struct mutex lock;
     struct semaphore cmd_done;
