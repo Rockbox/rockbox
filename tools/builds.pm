@@ -456,6 +456,10 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'Xuelin iHIFI 800',
         status => 2,
     },
+    'shanlingq1' => {
+        name => 'Shanling Q1'
+        status => 2,
+    },
 );
 
 sub manualname {
