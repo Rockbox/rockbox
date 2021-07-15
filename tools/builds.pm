@@ -457,7 +457,7 @@ $releasenotes="/wiki/ReleaseNotes315";
         status => 2,
     },
     'shanlingq1' => {
-        name => 'Shanling Q1'
+        name => 'Shanling Q1',
         status => 2,
     },
 );
