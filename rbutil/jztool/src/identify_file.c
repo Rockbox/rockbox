@@ -118,43 +118,52 @@ int jz_identify_x1000_spl(const void* data, size_t len)
 static const struct scramble_model_info {
     const char* name;
     int model_num;
+    size_t offset_crc;
+    size_t offset_name;
+    size_t offset_data;
 } scramble_models[] = {
-    {"fiio", 114},
-    {NULL, 0},
+    {"fiio", 114, 0, 4, 8},
+    {"shq1", 115, 0, 4, 8},
+    {"eros", 116, 0, 4, 8},
+    {NULL, 0, 0, 0, 0},
 };
 
 /** \brief Identify a file as a Rockbox `scramble` image
  * \param data      File data buffer
  * \param len       Length of file
  * \return JZ_SUCCESS if file looks correct, or one of the following errors
- * \retval JZ_IDERR_WRONG_SIZE          file too small to be valid
  * \retval JZ_IDERR_UNRECOGNIZED_MODEL  unsupported/unknown model type
  * \retval JZ_IDERR_BAD_CHECKSUM        checksum mismatch
  */
 int jz_identify_scramble_image(const void* data, size_t len)
 {
-    /* 4 bytes checksum + 4 bytes player model */
-    if(len < 8)
-        return JZ_IDERR_WRONG_SIZE;
+    const uint8_t* dat;
+    const struct scramble_model_info* model_info;
+    uint32_t sum, file_sum;
+
+    dat = (const uint8_t*)data;
+    model_info = &scramble_models[0];
 
     /* Look up the model number */
-    const uint8_t* dat = (const uint8_t*)data;
-    const struct scramble_model_info* model_info = &scramble_models[0];
-    for(; model_info->name != NULL; ++model_info)
-        if(!memcmp(&dat[4], model_info->name, 4))
+    for(; model_info->name != NULL; ++model_info) {
+        if(model_info->offset_name + 4 > len)
+            continue;
+        if(!memcmp(&dat[model_info->offset_name], model_info->name, 4))
             break;
+    }
 
     if(model_info->name == NULL)
         return JZ_IDERR_UNRECOGNIZED_MODEL;
 
     /* Compute the checksum */
-    uint32_t sum = model_info->model_num;
-    for(size_t i = 8; i < len; ++i)
+    sum = model_info->model_num;
+    for(size_t i = model_info->offset_data; i < len; ++i)
         sum += dat[i];
 
     /* Compare with file's checksum, it's stored in big-endian form */
-    uint32_t fsum = (dat[0] << 24) | (dat[1] << 16) | (dat[2] << 8) | dat[3];
-    if(sum != fsum)
+    dat += model_info->offset_crc;
+    file_sum = (dat[0] << 24) | (dat[1] << 16) | (dat[2] << 8) | dat[3];
+    if(sum != file_sum)
         return JZ_IDERR_BAD_CHECKSUM;
 
     return JZ_SUCCESS;

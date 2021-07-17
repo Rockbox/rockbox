@@ -1,26 +1,45 @@
 # jztool -- Ingenic device utility & bootloader installer
 
 The `jztool` utility can help install, backup, and restore the bootloader on
-Rockbox players based on a supported Ingenic SoC.
+Rockbox players based on a supported Ingenic SoC (currently only the X1000).
 
-## FiiO M3K
+## Running jztool
 
-First, get a copy of the `bootloader.m3k` file, either by downloading it
-from <https://rockbox.org>, or by compiling it yourself (choose 'B'ootloader
-build when configuring your build).
+### Getting a bootloader
 
-The first time you install Rockbox, you need to load the Rockbox bootloader
-over USB by entering USB boot mode. The easiest way to do this is by plugging
-in the microUSB cable to the M3K and holding the VOL- button while plugging
-the USB into your computer. If you entered USB boot mode, the button light
-will turn on but the LCD will remain black.
+To use `jztool` you need to compile or download a bootloader for your player.
+It's recommended to use only official released bootloaders, since bootloaders
+compiled from Git are not tested and might be buggy.
 
-Copy the `bootloader.m3k` next to the `jztool` executable and follow the
-instructions below which are appropriate to your OS.
+You can download released bootloaders from <https://download.rockbox.org/>.
 
-### Running jztool
+The bootloader file is named after the target: for example, the FiiO M3K
+bootloader is called `bootloader.m3k`. The FiiO M3K is used as an example
+here, but the instructions apply to all X1000-based players.
 
-#### Linux/Mac
+Use `jztool --help` to find out the model name of your player.
+
+### Entering USB boot mode
+
+USB boot mode is a low-level mode provided by the CPU which allows a computer
+to load firmware onto the device. You need to put your player into this mode
+manually before using `jztool` (unfortunately, it can't be done automatically.)
+
+To connect the player in USB boot mode, follow these steps:
+
+1. Ensure the player is fully powered off.
+2. Plug one end of the USB cable into your player.
+3. Hold down your player's USB boot key (see below).
+4. Plug the other end of the USB cable into your computer.
+5. Let go of the USB boot key.
+
+The USB boot key depends on your player:
+
+- FiiO M3K: Volume Down
+- Shanling Q1: Play
+- Eros Q: Menu
+
+### Linux/Mac
 
 Run the following command in a terminal. Note that on Linux, you will need to
 have root access to allow libusb to access the USB device.
@@ -32,9 +51,9 @@ have root access to allow libusb to access the USB device.
 $ ./jztool fiiom3k load bootloader.m3k
 ```
 
-#### Windows
+### Windows
 
-To allow `jztool` access to the M3K in USB boot mode, you need to install
+To allow `jztool` access to your player in USB boot mode, you need to install
 the WinUSB driver. The recommended way to install it is using Zadig, which
 may be downloaded from its homepage <https://zadig.akeo.ie>. Please note
 this is 3rd party software not maintained or supported by Rockbox developers.
@@ -42,10 +61,10 @@ this is 3rd party software not maintained or supported by Rockbox developers.
 
 When running Zadig you must select the WinUSB driver; the other driver options
 will not work properly with `jztool`. You will have to select the correct USB
-device in Zadig -- the name and USB IDs of the M3K in USB boot mode are listed
-below. NOTE: the device name may show only as "X" and a hollow square in Zadig.
-The IDs will not change, so those are the most reliable way to confirm you have
-selected the correct device.
+device in Zadig. All X1000-based players use the same USB ID while in USB boot
+mode, listed below. NOTE: the device name may show only as "X" and a hollow
+square in Zadig. The IDs will not change, so those are the most reliable way
+to confirm you have selected the correct device.
 
 ```
 Name:   Ingenic Semiconductor Co.,Ltd X1000
@@ -63,21 +82,27 @@ Type the following command to load the Rockbox bootloader:
 $ jztool.exe fiiom3k load bootloader.m3k
 ```
 
-### Further instructions
+## Using the recovery menu
 
-After running `jztool` successfully your M3K will display the recovery menu
-of the Rockbox bootloader. If you want to permanently install Rockbox to your
-M3K, copy `bootloader.m3k` to the root of an SD card, insert it to your device,
-then choose "Install/update bootloader" from the menu.
+If `jztool` runs successfully your player will display the Rockbox bootloader's
+recovery menu. If you want to permanently install Rockbox to your device, copy
+the bootloader file you downloaded to the root of your SD card, insert the SD
+card to your player, and choose "Install/update bootloader" from the menu.
 
 It is _highly_ recommended that you take a backup of your existing bootloader
 in case of any trouble -- choose "Backup bootloader" from the recovery menu.
-The backup file is called "fiiom3k-boot.bin" and will be saved to the root of
-the SD card. If you need to restore it, simply place the file at the root of
-your SD card and select "Restore bootloader".
+The backup file is called `PLAYER-boot.bin`, where `PLAYER` is the model name.
+(Example: `fiiom3k-boot.bin`.)
 
-In the future if you want to backup, restore, or update the bootloader, you
-can access the Rockbox bootloader's recovery menu by holding VOL+ when booting.
+You can restore the backup later by putting it on the root of your SD card and
+selecting "Restor bootloader" in the recovery menu.
+
+After installing the Rockbox bootloader, you can access the recovery menu by
+holding a key while booting:
+
+- FiiO M3K: Volume Up
+- Shanling Q1: Next (button on the lower left)
+- Eros Q: Volume Up
 
 ### Known issues
 

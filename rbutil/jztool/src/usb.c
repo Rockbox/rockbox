@@ -22,6 +22,7 @@
 #include "jztool_private.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
 #define VR_GET_CPU_INFO     0
 #define VR_SET_DATA_ADDRESS 1
@@ -145,11 +146,12 @@ void jz_usb_close(jz_usbdev* dev)
 
 // Does an Ingenic-specific vendor request
 // Written with X1000 in mind but other Ingenic CPUs have the same commands
-static int jz_usb_vendor_req(jz_usbdev* dev, int req, uint32_t arg)
+static int jz_usb_vendor_req(jz_usbdev* dev, int req, uint32_t arg,
+                             void* buffer, int buflen)
 {
     int rc = libusb_control_transfer(dev->handle,
         LIBUSB_ENDPOINT_OUT | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
-        req, arg >> 16, arg & 0xffff, NULL, 0, 1000);
+        req, arg >> 16, arg & 0xffff, buffer, buflen, 1000);
 
     if(rc < 0) {
         jz_log(dev->jz, JZ_LOG_ERROR, "libusb_control_transfer: %s", libusb_strerror(rc));
@@ -200,11 +202,11 @@ static int jz_usb_sendrecv(jz_usbdev* dev, bool write, uint32_t addr,
                            size_t len, void* data)
 {
     int rc;
-    rc = jz_usb_vendor_req(dev, VR_SET_DATA_ADDRESS, addr);
+    rc = jz_usb_vendor_req(dev, VR_SET_DATA_ADDRESS, addr, NULL, 0);
     if(rc < 0)
         return rc;
 
-    rc = jz_usb_vendor_req(dev, VR_SET_DATA_LENGTH, len);
+    rc = jz_usb_vendor_req(dev, VR_SET_DATA_LENGTH, len, NULL, 0);
     if(rc < 0)
         return rc;
 
@@ -242,7 +244,7 @@ int jz_usb_recv(jz_usbdev* dev, uint32_t addr, size_t len, void* data)
  */
 int jz_usb_start1(jz_usbdev* dev, uint32_t addr)
 {
-    return jz_usb_vendor_req(dev, VR_PROGRAM_START1, addr);
+    return jz_usb_vendor_req(dev, VR_PROGRAM_START1, addr, NULL, 0);
 }
 
 /** \brief Execute stage2 program jumping to the specified address
@@ -252,7 +254,7 @@ int jz_usb_start1(jz_usbdev* dev, uint32_t addr)
  */
 int jz_usb_start2(jz_usbdev* dev, uint32_t addr)
 {
-    return jz_usb_vendor_req(dev, VR_PROGRAM_START2, addr);
+    return jz_usb_vendor_req(dev, VR_PROGRAM_START2, addr, NULL, 0);
 }
 
 /** \brief Ask device to flush CPU caches
@@ -261,5 +263,29 @@ int jz_usb_start2(jz_usbdev* dev, uint32_t addr)
  */
 int jz_usb_flush_caches(jz_usbdev* dev)
 {
-    return jz_usb_vendor_req(dev, VR_FLUSH_CACHES, 0);
+    return jz_usb_vendor_req(dev, VR_FLUSH_CACHES, 0, NULL, 0);
+}
+
+/** \brief Ask device for CPU info string
+ * \param dev       USB device
+ * \param buffer    Buffer to hold the info string
+ * \param buflen    Size of the buffer, in bytes
+ * \return either JZ_SUCCESS on success or a failure code
+ *
+ * The buffer will always be null terminated, but to ensure the info string is
+ * not truncated the buffer needs to be at least `JZ_CPUINFO_BUFLEN` byes long.
+ */
+int jz_usb_get_cpu_info(jz_usbdev* dev, char* buffer, size_t buflen)
+{
+    char tmpbuf[JZ_CPUINFO_BUFLEN];
+    int rc = jz_usb_vendor_req(dev, VR_GET_CPU_INFO, 0, tmpbuf, 8);
+    if(rc != JZ_SUCCESS)
+        return rc;
+
+    if(buflen > 0) {
+        strncpy(buffer, tmpbuf, buflen);
+        buffer[buflen - 1] = 0;
+    }
+
+    return JZ_SUCCESS;
 }

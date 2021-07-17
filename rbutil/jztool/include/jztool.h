@@ -33,9 +33,12 @@ extern "C" {
  * Types, enumerations, etc
  */
 
+#define JZ_CPUINFO_BUFLEN 9
+
 typedef struct jz_context       jz_context;
 typedef struct jz_usbdev        jz_usbdev;
 typedef struct jz_device_info   jz_device_info;
+typedef struct jz_cpu_info      jz_cpu_info;
 typedef struct jz_buffer        jz_buffer;
 
 typedef enum jz_error           jz_error;
@@ -77,19 +80,46 @@ enum jz_log_level {
 
 enum jz_device_type {
     JZ_DEVICE_FIIOM3K,
+    JZ_DEVICE_SHANLINGQ1,
+    JZ_DEVICE_EROSQ,
+    JZ_NUM_DEVICES,
 };
 
 enum jz_cpu_type {
     JZ_CPU_X1000,
+    JZ_NUM_CPUS,
 };
 
 struct jz_device_info {
+    /* internal device name and file extension */
     const char* name;
+    const char* file_ext;
+
+    /* human-readable name */
     const char* description;
+
+    /* device and CPU type */
     jz_device_type device_type;
     jz_cpu_type cpu_type;
+
+    /* USB IDs of the device in mass storage mode */
     uint16_t vendor_id;
     uint16_t product_id;
+};
+
+struct jz_cpu_info {
+    /* CPU info string, as reported by the boot ROM */
+    const char* info_str;
+
+    /* USB IDs of the boot ROM */
+    uint16_t vendor_id;
+    uint16_t product_id;
+
+    /* default addresses for running binaries */
+    uint32_t stage1_load_addr;
+    uint32_t stage1_exec_addr;
+    uint32_t stage2_load_addr;
+    uint32_t stage2_exec_addr;
 };
 
 struct jz_buffer {
@@ -119,10 +149,12 @@ void jz_sleepms(int ms);
  * Device and file info
  */
 
-int jz_get_num_device_info(void);
 const jz_device_info* jz_get_device_info(jz_device_type type);
 const jz_device_info* jz_get_device_info_named(const char* name);
 const jz_device_info* jz_get_device_info_indexed(int index);
+
+const jz_cpu_info* jz_get_cpu_info(jz_cpu_type type);
+const jz_cpu_info* jz_get_cpu_info_named(const char* info_str);
 
 int jz_identify_x1000_spl(const void* data, size_t len);
 int jz_identify_scramble_image(const void* data, size_t len);
@@ -139,15 +171,16 @@ int jz_usb_recv(jz_usbdev* dev, uint32_t addr, size_t len, void* data);
 int jz_usb_start1(jz_usbdev* dev, uint32_t addr);
 int jz_usb_start2(jz_usbdev* dev, uint32_t addr);
 int jz_usb_flush_caches(jz_usbdev* dev);
+int jz_usb_get_cpu_info(jz_usbdev* dev, char* buffer, size_t buflen);
 
 /******************************************************************************
  * Rockbox loader (all functions are model-specific, see docs)
  */
 
-int jz_fiiom3k_boot(jz_usbdev* dev, const char* filename);
+int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename);
 
 /******************************************************************************
- * Simple buffer API
+ * Buffer API and other functions
  */
 
 jz_buffer* jz_buffer_alloc(size_t size, const void* data);
@@ -155,6 +188,8 @@ void jz_buffer_free(jz_buffer* buf);
 
 int jz_buffer_load(jz_buffer** buf, const char* filename);
 int jz_buffer_save(jz_buffer* buf, const char* filename);
+
+jz_buffer* jz_ucl_unpack(const uint8_t* src, uint32_t src_len, uint32_t* dst_len);
 
 /******************************************************************************
  * END
