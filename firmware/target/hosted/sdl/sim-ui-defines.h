@@ -514,7 +514,7 @@
 #define UI_LCD_POSX                 26
 #define UI_LCD_POSY                 40
 
-#elif defined(EROS_Q)
+#elif defined(EROS_Q) || defined(EROS_QN)
 #define UI_TITLE                    "AIGO EROS Q"
 #define UI_WIDTH                    400 /* width of GUI window */
 #define UI_HEIGHT                   653 /* height of GUI window */
