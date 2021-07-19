@@ -92,6 +92,11 @@ static const struct button_mapping button_context_tree[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_LIST)
 }; /* button_context_tree */
 
+static const struct button_mapping button_context_bmark[] = {
+    {ACTION_BMS_DELETE,         BUTTON_PLAY,                        BUTTON_NONE},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_TREE),
+}; /* button_context_bmark */
+
 static const struct button_mapping button_context_list[] = {
     {ACTION_LISTTREE_PGUP,      BUTTON_LEFT,                        BUTTON_NONE},
     {ACTION_LISTTREE_PGUP,      BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE},
@@ -270,8 +275,9 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_wps;
         case CONTEXT_TREE:
         case CONTEXT_MAINMENU:
-        case CONTEXT_BOOKMARKSCREEN:
             return button_context_tree;
+        case CONTEXT_BOOKMARKSCREEN:
+            return button_context_bmark;
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_SETTINGS:
