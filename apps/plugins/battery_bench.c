@@ -30,7 +30,7 @@
 #define EV_EXIT 1337
 
 /* seems to work with 1300, but who knows... */
-#define MIN_THREAD_STACK_SIZE DEFAULT_STACK_SIZE + 0x200
+#define THREAD_STACK_SIZE 4*DEFAULT_STACK_SIZE
 
 #if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
       (CONFIG_KEYPAD == IRIVER_H300_PAD)
@@ -279,8 +279,7 @@ static struct batt_info
 static struct
 {
     unsigned int id; /* worker thread id */
-    long   *stack;
-    ssize_t stacksize;
+    long stack[THREAD_STACK_SIZE / sizeof(long)];
 } gThread;
 
 static struct event_queue thread_q SHAREDBSS_ATTR;
@@ -607,25 +606,9 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     rb->memset(&gThread, 0, sizeof(gThread));
-    void   *buf;
-    size_t  buf_size;
-    buf = rb->plugin_get_buffer(&buf_size);
-    ALIGN_BUFFER(buf, buf_size, sizeof(long));
-    rb->memset(buf, 0, buf_size);
-
-    gThread.stacksize = buf_size;
-    gThread.stack = (long *) buf;
-
-    if (gThread.stacksize < MIN_THREAD_STACK_SIZE)
-    {
-        rb->splash(HZ*2, "Out of memory");
-        gThread.id = UINT_MAX;
-        return PLUGIN_ERROR;
-    }
-
     rb->queue_init(&thread_q, true); /* put the thread's queue in the bcast list */
-    gThread.id = rb->create_thread(thread, gThread.stack,
-                                   gThread.stacksize, 0, "Battery Benchmark"
+    gThread.id = rb->create_thread(thread, gThread.stack, sizeof(gThread.stack),
+                                   0, "Battery Benchmark"
                                    IF_PRIO(, PRIORITY_BACKGROUND)
                                    IF_COP(, CPU));
 
