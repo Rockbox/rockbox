@@ -86,13 +86,13 @@ static inline int rtc_read_datetime(struct tm *tm)
 #if CONFIG_RTC
 bool valid_time(const struct tm *tm)
 {
-    if (tm->tm_hour < 0 || tm->tm_hour > 23 ||
+    if (!tm || (tm->tm_hour < 0 || tm->tm_hour > 23 ||
         tm->tm_sec < 0 || tm->tm_sec > 59 || 
         tm->tm_min < 0 || tm->tm_min > 59 ||
         tm->tm_year < 100 || tm->tm_year > 199 ||
         tm->tm_mon < 0 || tm->tm_mon > 11 ||
         tm->tm_wday < 0 || tm->tm_wday > 6 ||
-        tm->tm_mday < 1 || tm->tm_mday > 31)
+        tm->tm_mday < 1 || tm->tm_mday > 31))
         return false;
     else
         return true;
