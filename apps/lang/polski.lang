@@ -15625,14 +15625,17 @@
   <source>
     *: none
     dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
   </source>
   <dest>
     *: none
     dac_power_mode: "Tryb zasilania DAC-a"
+    es9218: "Poziom wyjściowy DAC-a"
   </dest>
   <voice>
     *: none
     dac_power_mode: "Tryb zasilania daka"
+    es9218: "Poziom wyjściowy daka"
   </voice>
 </phrase>
 <phrase>
@@ -15642,14 +15645,17 @@
   <source>
     *: none
     dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
   </source>
   <dest>
     *: none
     dac_power_mode: "Wysoka wydajność"
+    es9218: "Wysoki zysk (2 Vrms)"
   </dest>
   <voice>
     *: none
     dac_power_mode: "Wysoka wydajność"
+    es9218: "Wysoki zysk dwa fałeremes"
   </voice>
 </phrase>
 <phrase>
@@ -15659,14 +15665,17 @@
   <source>
     *: none
     dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
   </source>
   <dest>
     *: none
     dac_power_mode: "Oszczędzaj baterię"
+    es9218: "Niski zysk (1 Vrms)"
   </dest>
   <voice>
     *: none
     dac_power_mode: "Oszczędzaj baterię"
+    es9218: "Niski zysk jeden fałeremes"
   </voice>
 </phrase>
 <phrase>
@@ -15723,5 +15732,158 @@
   </dest>
   <voice>
     *: "Załaduj ponownie po zapisaniu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Super wolny"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Super wolny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Liniowy szybki"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Liniowy szybki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Liniowy wolny"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Liniowy wolny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimalny szybki"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimalny szybki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimalny wolny"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimalny wolny"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Typ apodyzacji 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Typ apodyzacji jeden"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Typ apodyzacji 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Typ apodyzacji dwa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Hybrydowy szybki"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Hybrydowy szybki"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Ściana"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Ściana"
   </voice>
 </phrase>
