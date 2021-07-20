@@ -550,7 +550,12 @@ alloc_err:
         index_handle = core_free(index_handle);
     return false;
 }
-
+static inline int load_voicefile_failure(int fd)
+{
+    /*if (fd >= 0) probably redundant */
+    close(fd);
+    return -1;
+}
 /* load the voice file into the mp3 buffer */
 static bool load_voicefile_index(int fd)
 {
@@ -909,7 +914,7 @@ int talk_id(int32_t id, bool enqueue)
     {
         int fd = open_voicefile();
         if (fd < 0 || !load_voicefile_index(fd))
-            return -1;
+            return load_voicefile_failure(fd);
         isloaded = load_voicefile_data(fd);
         close(fd);
     }
@@ -984,7 +989,7 @@ static int _talk_file(const char* filename,
     {
         int fd = open_voicefile();
         if (fd < 0 || !load_voicefile_index(fd))
-            return -1;
+            return load_voicefile_failure(fd);
         load_voicefile_data(fd);
         close(fd);
     }
@@ -1158,6 +1163,11 @@ int talk_number(long n, bool enqueue)
 
     while (n)
     {
+        if (mil < 1)
+        {
+            talk_id(VOICE_CHAR_E, true);
+            return 0;
+        }
         int segment = n / mil; /* extract in groups of 3 digits */
         n -= segment * mil; /* remove the used digits from number */
         mil /= 1000; /* digit place for next round */
@@ -1356,7 +1366,7 @@ int talk_time_intervals(long time, int unit_idx, bool enqueue)
     {
         int fd = open_voicefile();
         if (fd < 0 || !load_voicefile_index(fd))
-            return -1;
+            return load_voicefile_failure(fd);
         load_voicefile_data(fd);
         close(fd);
     }
@@ -1526,21 +1536,21 @@ void talk_announce_voice_invalid(void)
 
         voice_fd = open(talkfile, O_RDONLY);
         if (voice_fd < 0)
-            return; /* can't open */
+            goto out; /* can't open */
 
         voice_sz= lseek(voice_fd, 0, SEEK_END);
         if (voice_sz == 0 || voice_sz > (64<<10))
-            return; /* nothing here or too big */
+            goto out; /* nothing here or too big */
 
         lseek(voice_fd, 0, SEEK_SET);
         /* add a bit extra for buflib overhead (2K) */
         if (!create_clip_buffer(ALIGN_UP(voice_sz, sizeof(long)) + (2<<10)))
-            return;
+            goto out;
         mutex_lock(&read_buffer_mutex);
         buf_handle = buflib_alloc(&clip_ctx, ALIGN_UP(voice_sz, sizeof(long)));
 
         if (buf_handle < 0)
-            return;
+            goto out;
 
         if (read_to_handle_ex(voice_fd, &clip_ctx, buf_handle, 0, voice_sz) > 0)
         {
@@ -1553,10 +1563,12 @@ void talk_announce_voice_invalid(void)
         }
 
         mutex_unlock(&read_buffer_mutex);
-        close(voice_fd);
 
         buf_handle = buflib_free(&clip_ctx, buf_handle);
         talk_handle = core_free(talk_handle);
+    out:
+        close(voice_fd);
+        return;
     }
 }
 
@@ -1600,6 +1612,14 @@ bool talk_get_debug_data(struct talk_debug_data *data)
             data->max_clipsize = size;
         data->avg_clipsize += size;
     }
+    if (!(real_clips > 0))
+    {
+        if (data->status == TALK_STATUS_OK)
+            data->status = TALK_STATUS_ERR_NOFILE;
+
+        return false;
+    }
+
     cc = buflib_get_data(&clip_ctx, metadata_table_handle);
     for (int i = 0; i < (int) max_clips; i++)
     {
