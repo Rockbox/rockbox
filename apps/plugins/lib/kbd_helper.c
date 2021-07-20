@@ -34,11 +34,12 @@
  * success returns size of buffer used
  * failure returns 0
 */
-int kbd_create_layout(char *layout, unsigned short *buf, int bufsz)
+int kbd_create_layout(const char *layout, unsigned short *buf, int bufsz)
 {
     unsigned short *pbuf;
     const unsigned char *p = layout;
     int len = 0;
+    int total_len = 0;
     pbuf = buf;
     while (*p && (pbuf - buf + (ptrdiff_t) sizeof(unsigned short)) < bufsz)
     {
@@ -47,6 +48,7 @@ int kbd_create_layout(char *layout, unsigned short *buf, int bufsz)
         {
             *pbuf = len;
             pbuf += len+1;
+            total_len += len + 1;
             len = 0;
         }
         else
@@ -57,7 +59,9 @@ int kbd_create_layout(char *layout, unsigned short *buf, int bufsz)
     {
         *pbuf = len;
         pbuf[len+1] = 0xFEFF;   /* mark end of characters */
-        return len + 1;
+        total_len += len + 1;
+        return total_len * sizeof(unsigned short);
     }
+
     return 0;
 }

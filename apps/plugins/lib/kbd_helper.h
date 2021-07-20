@@ -22,6 +22,6 @@
 #define KBD_HELPER_H
 
 /* create a custom keyboard layout for kbd_input */
-int kbd_create_layout(char *layout, unsigned short *buf, int bufsz);
+int kbd_create_layout(const char *layout, unsigned short *buf, int bufsz);
 
 #endif /* KBD_HELPER_H */
