@@ -44,6 +44,8 @@
 #define CFG_FILE "/VoiceTSR.cfg"
 #define CFG_VER  1
 
+#define THREAD_STACK_SIZE 4*DEFAULT_STACK_SIZE
+
 #if CONFIG_RTC
     #define K_TIME     "DT D1;\n\n"
     #define K_DATE     "DD D2;\n\n"
@@ -59,7 +61,15 @@
 #define K_BATTERY  "BP BM B1;\n"
 #define K_SLEEP    "RS R2 R3;\n"
 #define K_RUNTIME  "RT R1;"
-#define KEYBD_LAYOUT  (K_TIME K_DATE K_TRACK_TA K_TRACK K_TRACK1 K_PLAYLIST K_BATTERY K_SLEEP K_RUNTIME)
+
+static const char keybd_layout[] =
+    K_TIME K_DATE K_TRACK_TA K_TRACK K_TRACK1 K_PLAYLIST K_BATTERY K_SLEEP K_RUNTIME;
+
+/* - each character in keybd_layout will consume one element
+ * - \n does not create a key, but it also consumes one element
+ * - the final null terminator is equivalent to \n
+ * - since sizeof includes the null terminator we don't need +1 for that. */
+static unsigned short kbd_buf[sizeof(keybd_layout)];
 
 /****************** prototypes ******************/
 void print_scroll(char* string); /* implements a scrolling screen */
@@ -88,11 +98,7 @@ static struct
     bool exiting; /* signal to the thread that we want to exit */
     unsigned int id; /* worker thread id */
     struct  event_queue queue; /* thread event queue */
-    long   *stack;
-    ssize_t stacksize;
-    void   *buf;
-    size_t  buf_size;
-
+    long stack[THREAD_STACK_SIZE / sizeof(long)];
 } gThread;
 
 static struct
@@ -241,8 +247,7 @@ static int announce_menu_cb(int action,
                             struct gui_synclist *this_list)
 {
     (void)this_item;
-    unsigned short *kbd_p = gThread.buf;
-    size_t kbd_bufsz = gThread.buf_size;
+    unsigned short* kbd_p;
 
     int selection = rb->gui_synclist_get_sel_pos(this_list);
 
@@ -293,7 +298,8 @@ static int announce_menu_cb(int action,
                 rb->splash(HZ / 2, ID2P(LANG_RESET_DONE_CLEAR));
                 break;
             case 9: /* inspect it */
-                if (!kbd_create_layout(KEYBD_LAYOUT, kbd_p, kbd_bufsz))
+                kbd_p = kbd_buf;
+                if (!kbd_create_layout(keybd_layout, kbd_p, sizeof(kbd_buf)))
                     kbd_p = NULL;
 
                 rb->kbd_input(gAnnounce.wps_fmt, MAX_ANNOUNCE_WPS, kbd_p);
@@ -439,45 +445,16 @@ void thread(void)
     }
 }
 
-void plugin_buffer_init(void)
-{
-    if (gThread.buf == 0)
-    {
-        rb->memset(&gThread, 0, sizeof(gThread));
-        gThread.buf = rb->plugin_get_buffer(&gThread.buf_size);
-        ALIGN_BUFFER(gThread.buf, gThread.buf_size, sizeof(long));
-    }
-}
-
 void thread_create(void)
 {
-    /* init the worker thread */
-    gThread.stacksize = gThread.buf_size;
-    gThread.buf_size -= gThread.stacksize;
-
-    gThread.stack = (long *) gThread.buf;
-
-    ALIGN_BUFFER(gThread.stack, gThread.stacksize, sizeof(long));
-
-    if (gThread.stacksize < DEFAULT_STACK_SIZE)
-    {
-        rb->splash(HZ*2, "Out of memory");
-        gThread.exiting = true;
-        rb->remove_event(PLAYBACK_EVENT_TRACK_CHANGE, playback_event_callback);
-        gThread.id = UINT_MAX;
-        return;
-    }
-
     /* put the thread's queue in the bcast list */
     rb->queue_init(&gThread.queue, true);
-
-    gThread.id = rb->create_thread(thread, gThread.stack, gThread.stacksize,
+    gThread.id = rb->create_thread(thread, gThread.stack, sizeof(gThread.stack),
                                       0, "vTSR"
                                       IF_PRIO(, PRIORITY_BACKGROUND)
                                       IF_COP(, CPU));
     rb->queue_post(&gThread.queue, EV_STARTUP, 0);
     rb->yield();
-
 }
 
 void thread_quit(void)
@@ -514,6 +491,8 @@ int plugin_main(const void* parameter)
     (void)parameter;
     bool settings = false;
     int i = 0;
+
+    rb->memset(&gThread, 0, sizeof(gThread));
 
     gAnnounce.index = 0;
     gAnnounce.timeout = 0;
@@ -554,8 +533,6 @@ int plugin_main(const void* parameter)
             rb->sleep(HZ / 5);
         }
     }
-
-    plugin_buffer_init(); /* need buffer for custom keyboard layout */
 
     if (settings)
     {
@@ -673,7 +650,7 @@ static unsigned char* voice_info_group(unsigned char* current_token, bool testin
             /*
                 Sleep timer and runtime
             */
-            int sleep_remaining = sleep_remaining = rb->get_sleep_timer();
+            int sleep_remaining = rb->get_sleep_timer();
             int runtime;
 
             current_token++;
