@@ -1490,7 +1490,7 @@ static bool autoresumable(struct mp3entry *id3)
 
     is_resumable = false;
 
-    if (id3->path)
+    if (*id3->path)
     {
         for (path = global_settings.autoresume_paths;
              *path;                     /* search terms left? */
