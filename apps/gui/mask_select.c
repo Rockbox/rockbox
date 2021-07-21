@@ -79,11 +79,14 @@ static int calculate_mask_r(struct category *root, int mask)
     while (i < root->children_count)
     {
         struct child *this = &root->children[i];
-        if (this->state == SELECTED)
-            mask |= this->key_value;
+        if (this)
+        {
+            if (this->state == SELECTED)
+                mask |= this->key_value;
 
-        else if (this->state == EXPANDED)
-            mask = calculate_mask_r(this->category, mask);
+            else if (this->state == EXPANDED)
+                mask = calculate_mask_r(this->category, mask);
+        }
         i++;
     }
 return mask;
@@ -97,7 +100,7 @@ static int count_items(struct category *start)
     for (i=0; i<start->children_count; i++)
     {
         struct child *foo = &start->children[i];
-        if (foo->state == EXPANDED)
+        if (foo && foo->state == EXPANDED)
             count += count_items(foo->category);
         count++;
     }
@@ -120,7 +123,7 @@ static struct child* find_index(struct category *start,
             return foo;
         }
         i++;
-        if (foo->state == EXPANDED)
+        if (foo && foo->state == EXPANDED)
         {
             struct child *bar = find_index(foo->category, index - i, parent);
             if (bar)
@@ -141,7 +144,7 @@ static int item_action_callback(int action, struct gui_synclist *list)
     struct category *parent;
     struct child *this = find_index(root, list->selected_item, &parent);
 
-    if (action == ACTION_STD_OK)
+    if (action == ACTION_STD_OK && this)
     {
         switch (this->state)
         {
@@ -194,16 +197,18 @@ static const char * item_get_name(int selected_item, void * data,
         for(int i = 0; i <= parent->depth; i++)
             strcat(buffer, "\t\0");
 
-    /* state of selection needs icons so if icons are disabled use text*/
-    if (!global_settings.show_icons)
-        {
-            if (this->state == SELECTED)
-                strcat(buffer, "+\0");
-            else
-                strcat(buffer,"  \0");
-        }
-    strlcat(buffer, P2STR((const unsigned char *)this->name), buffer_len);
-
+    if (this)
+    {
+        /* state of selection needs icons so if icons are disabled use text*/
+        if (!global_settings.show_icons)
+            {
+                if (this->state == SELECTED)
+                    strcat(buffer, "+\0");
+                else
+                    strcat(buffer,"  \0");
+            }
+        strlcat(buffer, P2STR((const unsigned char *)this->name), buffer_len);
+    }
     return buffer;
 }
 
@@ -212,7 +217,7 @@ static int item_get_talk(int selected_item, void *data)
     struct category *root = (struct category*)data;
     struct category *parent;
     struct child *this = find_index(root, selected_item , &parent);
-    if (global_settings.talk_menu)
+    if (global_settings.talk_menu && this)
         {
             long id = P2ID((const unsigned char *)(this->name));
             if(id>=0)
@@ -234,16 +239,19 @@ static enum themable_icons item_get_icon(int selected_item, void * data)
     struct category *parent;
     struct child *this = find_index(root, selected_item, &parent);
 
-    switch (this->state)
+    if (this)
     {
-        case SELECTED:
-            return Icon_Submenu;
-        case COLLAPSED:
-            return Icon_NOICON;
-        case EXPANDED:
-            return Icon_Submenu_Entered;
-        default:
-            return Icon_NOICON;
+        switch (this->state)
+        {
+            case SELECTED:
+                return Icon_Submenu;
+            case COLLAPSED:
+                return Icon_NOICON;
+            case EXPANDED:
+                return Icon_Submenu_Entered;
+            default:
+                return Icon_NOICON;
+        }
     }
     return Icon_NOICON;
 }
