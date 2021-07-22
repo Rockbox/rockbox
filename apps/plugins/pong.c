@@ -535,7 +535,7 @@ static void ball(struct pong *p)
     p->ball.x += p->ball.speedx;
     p->ball.y += p->ball.speedy;
 
-    newx = p->ball.x/RES;
+    /*newx = p->ball.x/RES;*/
     newy = p->ball.y/RES;
 
     /* detect if ball hits a wall */

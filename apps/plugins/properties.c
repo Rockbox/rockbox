@@ -195,7 +195,7 @@ static bool _dir_properties(DPS *dps)
             dps->dc++; /* new directory */
             if (*rb->current_tick - lasttick > (HZ/8))
             {
-                unsigned log = human_size_log(dps->bc);
+                unsigned log;
                 lasttick = *rb->current_tick;
                 rb->lcd_clear_display();
                 rb->lcd_puts(0,0,"SCANNING...");
