@@ -73,6 +73,7 @@ static int volume_limit_callback(int action,
         case ACTION_ENTER_MENUITEM:
             setting.setting = &global_settings.volume_limit;
             option_screen(&setting, NULL, false, ID2P(LANG_VOLUME_LIMIT));
+            /* Fallthrough */
         case ACTION_EXIT_MENUITEM: /* on exit */
             setvol();
             break;
