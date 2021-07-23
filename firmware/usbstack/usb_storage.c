@@ -1245,7 +1245,7 @@ static void fill_inquiry(IF_MD_NONVOID(int lun))
 
     tb.inquiry->DeviceType = DIRECT_ACCESS_DEVICE;
     tb.inquiry->AdditionalLength = 0x1f;
-    memset(tb.inquiry->Reserved, 0, 3);
+//    memset(tb.inquiry->Reserved, 0, sizeof(tb.inquiry->Reserved)); // Redundant
     tb.inquiry->Versions = 4; /* SPC-2 */
     tb.inquiry->Format = 2; /* SPC-2/3 inquiry format */
 
