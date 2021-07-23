@@ -1,0 +1,28 @@
+% $Id$ %
+\def\UseOption{fiiom3k}
+\edef\UseOption{\UseOption,FIIO_M3K_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+\edef\UseOption{\UseOption,fiiom3k}
+
+\newcommand{\playerman}{FiiO}
+\newcommand{\playertype}{M3K}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{240}
+\newcommand{\dapdisplayheight}{320}
+\newcommand{\dapdisplaydepth}{16}
+\newcommand{\specimg}{fiiom3k}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.m3k}}
+\newcommand{\bootfilename}{\fname{bootloader.m3k}}
+\newcommand{\firmwareextension}{\fname{m3k}}
+\newcommand{\bootbackupfilename}{\fname{fiiom3k-boot.bin}}
+\newcommand{\jztoolsubcommand}{fiiom3k}
+\newcommand{\screenshotsize}{8cm}
+\newcommand{\disk}{SD card}
+
+% link external keymap file
+\input{platform/keymap-fiiom3k.tex}

@@ -1,0 +1,95 @@
+% $Id$
+
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonPrev}{\btnfnt{Previous}}
+\newcommand{\ButtonNext}{\btnfnt{Next}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonPrev{} or \TouchActionStdPrev}
+\newcommand{\ActionStdPrevRepeat}{Long \ButtonPrev{} or \TouchActionStdPrevRepeat}
+\newcommand{\ActionStdNext}{\ButtonNext{} or \TouchActionStdNext}
+\newcommand{\ActionStdNextRepeat}{Long \ButtonNext{} or \TouchActionStdNextRepeat}
+\newcommand{\ActionStdCancel}{\ButtonPower{} or \TouchActionStdCancel}
+\newcommand{\ActionStdContext}{\TouchActionStdContext}
+\newcommand{\ActionStdQuickScreen}{\TouchActionStdQuickScreen}
+\newcommand{\ActionQuickScreenExit}{\TouchActionQuickScreenExit}
+\newcommand{\ActionStdMenu}{\TouchActionStdMenu}
+\newcommand{\ActionStdOk}{\ButtonPlay{} or \TouchActionStdOk}
+\newcommand{\ActionStdUsbCharge}{\ButtonPlay}
+
+%Button actions, wps context
+\newcommand{\ActionWpsPlay}{\ButtonPlay{} or \TouchActionWpsPlay}
+\newcommand{\ActionWpsSkipNext}{\ButtonNext{} or \TouchActionWpsSkipNext}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonNext{} \TouchActionWpsSeekFwd}
+\newcommand{\ActionWpsSkipPrev}{\ButtonPrev{} or \TouchActionWpsSkipPrev}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonPrev{} or \TouchActionWpsSeekBack}
+\newcommand{\ActionWpsStop}{Long \ButtonPlay{} or \TouchActionWpsStop}
+\newcommand{\ActionWpsVolDown}{\ButtonVolDown{} or \TouchActionWpsVolDown}
+\newcommand{\ActionWpsVolUp}{\ButtonVolUp{} or \TouchActionWpsVolUp}
+\newcommand{\ActionWpsQuickScreen}{\TouchActionWpsQuickScreen}
+\newcommand{\ActionWpsMenu}{\TouchActionWpsMenu}
+\newcommand{\ActionWpsContext}{\TouchActionWpsContext}
+\newcommand{\ActionWpsBrowse}{\TouchActionWpsBrowse}
+\newcommand{\ActionWpsPitchScreen}{\TouchActionWpsPitchScreen}
+\newcommand{\ActionWpsIdThreeScreen}{\TouchActionWpsIdThreeScreen}
+\newcommand{\ActionWpsAbSetBNextDir}{\TouchActionWpsAbSetBNextDir}
+\newcommand{\ActionWpsAbSetAPrevDir}{\TouchActionWpsAbSetAPrevDir}
+\newcommand{\ActionWpsAbReset}{\TouchActionWpsAbReset}
+\newcommand{\ActionWpsHotkey}{\TouchBottomRight}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{\TouchActionTreeWps}
+\newcommand{\ActionTreeStop}{\TouchActionTreeStop}
+\newcommand{\ActionTreeEnter}{\TouchActionTreeEnter}
+\newcommand{\ActionTreeParentDirectory}{\TouchActionTreeParentDirectory}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\TouchActionYesNoAccept}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdLeft}{\TouchActionKbdLeft}
+\newcommand{\ActionKbdRight}{\TouchActionKbdRight}
+\newcommand{\ActionKbdSelect}{\TouchActionKbdSelect}
+\newcommand{\ActionKbdDone}{\TouchActionKbdDone}
+\newcommand{\ActionKbdAbort}{\TouchActionKbdAbort}
+\newcommand{\ActionKbdUp}{\TouchActionKbdUp}
+\newcommand{\ActionKbdDown}{\TouchActionKbdDown}
+\newcommand{\ActionKbdCursorLeft}{\TouchActionKbdCursorLeft}
+\newcommand{\ActionKbdCursorRight}{\TouchActionKbdCursorRight}
+\newcommand{\ActionKbdBackSpace}{\TouchActionKbdBackSpace}
+\newcommand{\ActionKbdPageFlip}{\TouchActionKbdPageFlip}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\TouchActionPsToggleMode}
+\newcommand{\ActionPsIncSmall}{\TouchActionPsIncSmall}
+\newcommand{\ActionPsIncBig}{\TouchActionPsIncBig}
+\newcommand{\ActionPsDecSmall}{\TouchActionPsDecSmall}
+\newcommand{\ActionPsDecBig}{\TouchActionPsDecBig}
+\newcommand{\ActionPsNudgeLeft}{\TouchActionPsNudgeLeft}
+\newcommand{\ActionPsNudgeRight}{\TouchActionPsNudgeRight}
+\newcommand{\ActionPsReset}{\TouchActionPsReset}
+\newcommand{\ActionPsExit}{\TouchActionPsExit}
+\newcommand{\ActionPsSlower}{\TouchActionPsSlower}
+\newcommand{\ActionPsFaster}{\TouchActionPsFaster}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{\TouchActionBmDelete}
+
+%Plugin lib actions
+\newcommand{\PluginUp}{\TouchTopMiddle}
+\newcommand{\PluginDown}{\TouchBottomMiddle}
+\newcommand{\PluginLeft}{\TouchMidLeft}
+\newcommand{\PluginRight}{\TouchMidRight}
+\newcommand{\PluginCancel}{\ButtonPower or \TouchBottomRight}
+\newcommand{\PluginExit}{\ButtonPower}
+\newcommand{\PluginSelect}{\TouchCenter}
+\newcommand{\PluginSelectRepeat}{Long \TouchCenter}
+
+%Bootloader keys
+\newcommand{\ActionIngenicUSBBoot}{\ButtonPlay}
+\newcommand{\ActionBootRecoveryMenu}{\ButtonNext}
+\newcommand{\ActionBootOFPlayer}{\ButtonPrev}
+\newcommand{\ActionBootOFRecovery}{\ButtonPrev{} and \ButtonNext}

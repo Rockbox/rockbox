@@ -1,0 +1,100 @@
+% $Id$
+
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonPlay}{\btnfnt{Play}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonLeft}{\btnfnt{Prev}}
+\newcommand{\ButtonRight}{\btnfnt{Next}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+\newcommand{\ButtonBack}{\btnfnt{Back}}
+\newcommand{\ButtonMenu}{\btnfnt{Menu}}
+\newcommand{\ButtonScrollFwd}{\btnfnt{Scroll Down}}
+\newcommand{\ButtonScrollBack}{\btnfnt{Scroll Up}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp{} or \ButtonScrollBack}
+\newcommand{\ActionStdPrevRepeat}{\ButtonUp{} or \ButtonScrollBack}
+\newcommand{\ActionStdNext}{\ButtonDown{} or \ButtonScrollFwd}
+\newcommand{\ActionStdNextRepeat}{\ButtonDown{} or \ButtonScrollFwd}
+\newcommand{\ActionStdOk}{\ButtonSelect}
+\newcommand{\ActionStdCancel}{\ButtonBack}
+\newcommand{\ActionStdContext}{\ButtonMenu{} or Long \ButtonSelect}
+\newcommand{\ActionStdMenu}{Long \ButtonBack}
+\newcommand{\ActionStdQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionQuickScreenExit}{\ButtonBack{}, \ButtonPower{}, or \ButtonSelect}
+\newcommand{\ActionStdUsbCharge}{\ButtonPlay}
+
+%Button actions, wps context
+\newcommand{\ActionWpsStop}{Long \ButtonPower}
+\newcommand{\ActionWpsBrowse}{Long \ButtonBack}
+\newcommand{\ActionWpsVolUp}{\ButtonVolUp}
+\newcommand{\ActionWpsVolDown}{\ButtonVolDown}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsPlay}{\ButtonPlay{} or \ButtonSelect}
+\newcommand{\ActionWpsContext}{\ButtonMenu}
+\newcommand{\ActionWpsMenu}{\ButtonBack}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonMenu}
+\newcommand{\ActionWpsHotkey}{Long \ButtonPlay}
+\newcommand{\ActionWpsAbSetAPrevDir}{Long \ButtonUp}
+\newcommand{\ActionWpsAbSetBNextDir}{Long \ButtonDown}
+\newcommand{\ActionWpsAbReset}{Long \ButtonSelect}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{Long \ButtonBack}
+\newcommand{\ActionTreeStop}{Long \ButtonPlay}
+\newcommand{\ActionTreeParentDirectory}{\ButtonBack}
+\newcommand{\ActionTreeEnter}{\ButtonSelect}
+\newcommand{\ActionTreeHotkey}{\ButtonPlay}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonPlay{} or \ButtonSelect}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdUp}{\ButtonUp}
+\newcommand{\ActionKbdDown}{\ButtonDown}
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdPageFlip}{\ButtonMenu}
+\newcommand{\ActionKbdDone}{\ButtonPlay}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonSelect}
+\newcommand{\ActionPsIncSmall}{\ButtonUp{} or \ButtonScrollBack}
+\newcommand{\ActionPsDecSmall}{\ButtonDown{} or \ButtonScrollFwd}
+\newcommand{\ActionPsIncBig}{\ButtonVolUp}
+\newcommand{\ActionPsDecBig}{\ButtonVolDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{Long \ButtonSelect}
+\newcommand{\ActionPsExit}{\ButtonPower}
+\newcommand{\ActionPsFaster}{\ButtonBack}
+\newcommand{\ActionPsSlower}{\ButtonMenu}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{\ButtonPlay}
+
+%Plugin lib actions
+\newcommand{\PluginUp}{\ButtonUp}
+\newcommand{\PluginDown}{\ButtonDown}
+\newcommand{\PluginLeft}{\ButtonLeft}
+\newcommand{\PluginRight}{\ButtonRight}
+\newcommand{\PluginSelect}{\ButtonSelect}
+\newcommand{\PluginSelectRepeat}{Long \ButtonSelect}
+\newcommand{\PluginCancel}{\ButtonBack}
+\newcommand{\PluginExit}{\ButtonPower}
+\newcommand{\PluginScrollFwd}{\ButtonScrollFwd}
+\newcommand{\PluginScrollBack}{\ButtonScrollBack}
+
+%Bootloader keys
+\newcommand{\ActionIngenicUSBBoot}{\ButtonVolDown}
+\newcommand{\ActionBootRecoveryMenu}{\ButtonVolUp}
+\newcommand{\ActionBootOFPlayer}{\ButtonPlay}
+\newcommand{\ActionBootOFRecovery}{\ButtonPlay{} and \ButtonVolUp}

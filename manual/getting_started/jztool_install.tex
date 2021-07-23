@@ -1,0 +1,156 @@
+You need a computer running Windows, Linux, or Mac to install the bootloader.
+The installation utility \fname{jztool} is a command line tool used to load the
+Rockbox bootloader on your \dap{}. Please note that it \emph{only} loads the
+Rockbox bootloader and does not modify your \dap{} in any way. Flashing the
+bootloader happens entirely on the \dap{}, without the intervention of your PC.
+
+It's possible to install Rockbox alongside any original firmware version.
+\opt{fiiom3k}{This includes the ``unofficial'' XVortex firmware.}
+It's also possible to update the original firmware after installing the Rockbox
+bootloader, but this will erase the Rockbox bootloader and you will have to
+install it again if you want to keep using Rockbox.
+
+\begin{itemize}\label{ref:jztool_load_bootloader}
+\item Download the Rockbox bootloader, \bootfilename{}, from
+  \opt{fiiom3k}{\download{bootloader/fiio/m3k/}.}
+  \opt{shanlingq1}{\download{bootloader/shanling/q1/}.}
+\item Download \fname{jztool} from \download{bootloader/fiio/m3k/}.
+\item Connect your player in USB boot mode:
+  \begin{enumerate}
+    \item Make sure your player is fully powered off.
+    \item Connect a USB cable to your player -- but don't plug it in to your
+      computer yet!
+    \item While holding the \ActionIngenicUSBBoot{} button, plug the other end
+      of the USB cable into your computer.
+    \item If your player has entered USB boot mode%
+      \opt{fiiom3k}{the button light will light up and the LCD will remain
+        black. The \playerman{} splash screen will not be displayed.}
+      \opt{shanlingq1}{the LCD will remain black and the \playerman{} splash
+        screen will not be displayed.}
+  \end{enumerate}
+\item Windows users need to follow \reference{ref:install_usb_driver} now
+  to make the \playertype{} accessible to \fname{jztool} before continuing.
+\item Open a command prompt or terminal in the folder where you downloaded
+  \fname{jztool}. Copy \bootfilename{} to that folder so you can easily refer
+  to it on the command line.
+
+  On Windows, run this command to load the bootloader onto your \dap{}.
+  \begin{code}
+    jztool.exe \jztoolsubcommand{} load \bootfilename{}
+  \end{code}
+  Linux or Mac users should run this command. Linux users need to run
+  \fname{jztool} as root to allow it access the USB device.
+  \begin{code}
+    ./jztool \jztoolsubcommand{} load \bootfilename{}
+  \end{code}
+\item If your \dap{} is showing the Rockbox recovery menu, then the Rockbox
+  bootloader has been loaded correctly.
+  % TODO: Screenshot of the recovery menu
+\end{itemize}
+
+To finish the install, you need to flash the Rockbox bootloader to your \dap{}
+using the recovery menu.
+
+\begin{itemize}
+\item Copy \bootfilename{} to the root of a FAT32-formatted SD card, and insert
+  it into your \dap{}.
+\item Select \emph{Backup bootloader} to back up the original firmware's
+  bootloader. This will create a file \bootbackupfilename{} on the root of your
+  SD card. You should back up this file somewhere safe before continuing with
+  the installation. In the unlikely event anything goes wrong, you can copy
+  \bootbackupfilename{} onto your SD card and choose \emph{Restore bootloader}
+  to restore the original \playerman{} bootloader.
+\item Select \emph{Install/update bootloader} from the menu. The installation
+  takes less than a second and once it has finished successfully, you can
+  unplug and power off your \dap{}.
+\end{itemize}
+
+Rarely, a new bootloader might be released to fix bugs or add certain features.
+Updating the bootloader follows the same process as the initial installation.
+Taking a backup is not necessary if you are only updating an existing Rockbox
+bootloader.
+
+Normally the installation will complete without incident, but you may encounter
+one of the following errors. Some are benign and easily corrected while others
+are more serious. You should seek help on one of the Rockbox support channels
+if you get a serious error.
+
+\begin{description}
+\item[File not found.]
+  If you selected \emph{Install/update bootloader}, the missing file is
+  \bootfilename{}; if you selected \emph{Restore bootloader}, the missing file
+  is \bootbackupfilename{}. Copy the missing file to your SD card, and make
+  sure your card is formatted to FAT32, then try again.
+\item[Bad archive.]
+  The file \bootfilename{} appears to be corrupted or doesn't contain the
+  expected contents. Try deleting it from your SD card and copying it again.
+  If the error persists, you might have a corrupted download; try downloading
+  the bootloader again.
+\item[NAND open/read/write error.]
+  This indicates a problem accessing your \daps{} internal flash memory.
+  Write errors are the most serious -- your existing bootloader may be
+  corrupted, leaving your \dap{} unbootable. Seek assistance if you encounter
+  any of these errors \emph{before} retrying the installation.
+\item[Disk I/O error.]
+  There was a problem reading or writing data on the SD card. This message can
+  also be displayed by \emph{Restore bootloader} if the backup file
+  \bootbackupfilename{} does not have the correct size.
+\item[Out of memory or Unknown error.]
+  These are serious errors indicating some low-level system problem.
+  They should never be encountered in normal circumstances.
+\end{description}
+
+\subsubsection{Install the USB driver}\label{ref:install_usb_driver}
+\note{This section is only applicable if you are running \fname{jztool} from
+a Windows computer. Linux and Mac users can safely ignore this section.}
+
+To use \fname{jztool} on a Windows computer, you need to install a USB driver
+so it can access the \dap{} in USB boot mode. \fname{jztool} uses a library
+called \fname{libusb} to access your \dap{}, and on Windows \fname{libusb} can
+use a number of different back-end drivers to access USB devices.
+
+Zadig (\url{https://zadig.akeo.ie/}) is a third-party tool which allows you to
+install various back-end drivers for use with \fname{libusb}-based programs.
+The recommended driver is WinUSB, which is provided by Microsoft and comes
+bundled with recent versions of Windows.
+
+\note{The Rockbox project is not associated with Zadig or its development.
+  In the unlikely event you encounter a Zadig-specific issue that cannot be
+  resolved on Rockbox support channels you may need to seek help elsewhere.}
+
+You will need administrator access to run Zadig. When you are ready, follow the
+steps below to install the driver.
+
+\begin{itemize}
+\item Download Zadig from \url{https://zadig.akeo.ie/}.
+\item Make sure your \dap{} is connected in USB boot mode
+  (see \reference{ref:jztool_load_bootloader}).
+\item Run Zadig and select the USB device corresponding to your player.
+  The USB ID of the \playername{} is \texttt{A108 1000} when it is connected in
+  USB boot mode.
+  % TODO: Screenshot of Zadig window
+  \warn{Be careful not to select the wrong USB device in Zadig! Zadig allows
+    you to override the USB driver of any USB device, and accidentally
+    overwriting the driver for an important device like your mouse or keyboard
+    can cause major problems. Always double check the device before clicking
+    install.}
+\item Select the WinUSB driver from the list and click \emph{Install}.
+\item Wait for the installation to finish, then close Zadig.
+\end{itemize}
+
+If the installation was successful you can return to
+\reference{ref:jztool_load_bootloader} and run \fname{jztool}. If you get
+``Cannot open USB device'' errors from \fname{jztool} or any
+\fname{libusb}-related errors, you can try some of the steps below to fix the
+problem.
+
+\begin{itemize}
+\item Unplug your \dap{} and force a power-off by holding the power button
+  for 10 seconds. Then reconnect it and try running \fname{jztool} again.
+\item Restart your computer and try again.
+\item Try installing a different USB driver, for example ``libusbK''.
+  Some users have reported difficulties with the WinUSB driver and have
+  had success by trying an alternate driver.
+\end{itemize}
+
+If problems persist you should ask for help on the Rockbox support channels.

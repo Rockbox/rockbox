@@ -111,7 +111,36 @@ follow the instructions at
 \end{description}
 }
 
-\nopt{gigabeats}{
+\opt{fiiom3k,shanlingq1}{
+Although Rockbox is considered fully functional on the \playername{}, there are
+a few limitations compared to the original firmware which you should be aware
+of before installing.
+\begin{description}
+  \item[Filesystem support.] Rockbox only supports the FAT32 filesystem. Other
+    filesystems such as exFAT or NTFS are not supported.
+  \item[USB DAC.] This feature is not supported by Rockbox, but you can
+    dual-boot the original firmware if you want to use it.
+  \opt{shanlingq1}{\item[Wireless.] There is no support for Bluetooth or WiFi.
+    You can dual-boot the original firmware to use wireless functionality.}
+  \item[Hotswapping SD cards.] Rockbox runs from the SD card, not the internal
+    flash memory. Hotswapping is technically possible, but you need to install
+    the same version of Rockbox to each SD card.
+
+    Some features might not work correctly after hotswapping and you may
+    experience crashes or instability. Removing the SD card while data is being
+    written is liable to cause crashes and data loss, and possibly corrupt your
+    filesystem.
+  \opt{shanlingq1}{\item[Touchscreen.] There is only basic touchscreen support.
+    Further work is required to make the UI more usable with a touchscreen in
+    general.
+    \note{The touchscreen can be used in two modes, either a 3$\times$3 grid mode
+      which divides the screen into areas to emulate a set of physical
+      buttons (the default setting), or ``absolute point'' mode where the
+      touchscreen is used to point to items on the screen.\\}}
+\end{description}
+}
+
+\nopt{gigabeats,fiiom3k,shanlingq1}{
 \begin{description}
 
 \nopt{ipod1g2g}{
@@ -237,7 +266,8 @@ people. Rockbox Utility is a graphical application that does almost everything
 for you. However, should you encounter a problem, then the manual way is
 still available to you.\\
 
-\opt{gigabeats}{\note{The automated install is not yet available for the
+\opt{gigabeats,fiiom3k,shanlingq1}{
+  \note{The automated install is not yet available for the
   \playerlongtype{}. For now you can use the manual method to install Rockbox.
   Please still read the section on the automatic install as it explains
   various important aspects of Rockbox, such as the different versions
@@ -312,9 +342,9 @@ housekeeping tool \caps{Rockbox Utility}. It allows you to:
 Prebuilt binaries for Windows, Linux and Mac OS X are
 available at the \wikilink{RockboxUtility} wiki page.\\
 
-\opt{gigabeats,ondavx777}{\note{Rockbox Utility does not currently support the
-\playertype{} and you will therefore need to follow the manual install
-instructions below.\\}}
+\opt{gigabeats,ondavx777,fiiom3k,shanlingq1}{
+\note{Rockbox Utility does not currently support the \playertype{} and you will
+therefore need to follow the manual install instructions below.\\}}
 
 When first starting \caps{Rockbox Utility} run ``Autodetect'',
 found in the configuration dialog (File $\rightarrow$ Configure). Autodetection
@@ -514,6 +544,7 @@ by Rockbox, in the main directory of your \daps{} drive.
         \opt{IMX233}{\input{getting_started/IMX233_install.tex}}
         \opt{samsungyh}{\input{getting_started/samsungyh_install.tex}}
         \opt{xduoox3}{\input{getting_started/xduoox3_install.tex}}
+        \opt{fiiom3k,shanlingq1}{\input{getting_started/jztool_install.tex}}
     }
 }
 
@@ -609,6 +640,9 @@ by Rockbox, in the main directory of your \daps{} drive.
 }
 \opt{e200}{Your e200 will automatically reboot and Rockbox should load.}
 
+\opt{fiiom3k,shanlingq1}{
+  Safely eject / unmount your \dap{}.
+}
 
 
 \subsection{Enabling Speech Support (optional)}\label{sec:enabling_speech_support}
@@ -772,11 +806,25 @@ completely follow the manual uninstallation instructions below.}}
     \playerman{} firmware.
 }
 
+\opt{fiiom3k,shanlingq1}{
+    If you want to remove the Rockbox bootloader, copy an original firmware
+    update to your microSD card and run the \playerman{} update by holding
+    \ActionBootOFRecovery{} while powering on the \dap{}.
+
+    Alternatively, if you took a backup of the original \playerman{} bootloader
+    you can copy the backup file, \bootbackupfilename{}, to your SD card and
+    select \emph{Restore bootloader} from the recovery menu. The recovery menu
+    can be accessed by holding \ActionBootRecoveryMenu{} when powering on. If
+    your \dap won't boot, use \fname{jztool} to load the bootloader over USB
+    and enter the recovery menu -- see \reference{ref:jztool_load_bootloader}.
+}
+
 \nopt{gigabeats}{
   If you wish to clean up your disk, you may also wish to delete the
   \fname{.rockbox} directory and its contents.
-  \nopt{iaudiom3,iaudiom5,iaudiox5}{Turn the \playerman{} off.
-    Turn the \dap{} back on and the original \playerman{} software will load.}
+  \nopt{iaudiom3,iaudiom5,iaudiox5,fiiom3k,shanlingq1}{
+    Turn the \playerman{} off. Turn the \dap{} back on and the original
+    \playerman{} software will load.}
 }
 
 \opt{gigabeats}{
