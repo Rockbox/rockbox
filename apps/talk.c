@@ -377,7 +377,7 @@ static ssize_t read_clip_data(int fd, int index, int clip_handle)
 {
     struct clip_entry* clipbuf;
     size_t clipsize;
-    ssize_t ret;
+    ssize_t ret = -1;
 
     if (fd < 0)
     {
@@ -388,8 +388,8 @@ static ssize_t read_clip_data(int fd, int index, int clip_handle)
     clipbuf = core_get_data(index_handle);
     /* this must not be called with LOADED_MASK set in clipsize */
     clipsize = clipbuf[index].size;
-    lseek(fd, clipbuf[index].offset, SEEK_SET);
-    ret = read_to_handle_ex(fd, &clip_ctx, clip_handle, 0, clipsize);
+    if (lseek(fd, clipbuf[index].offset, SEEK_SET) >= 0)
+        ret = read_to_handle_ex(fd, &clip_ctx, clip_handle, 0, clipsize);
 
     if (ret < 0 || clipsize != (size_t)ret)
     {
@@ -978,7 +978,8 @@ static int _talk_file(const char* filename,
 {
     int fd;
     int size;
-    int handle, oldest = -1;
+    int handle = -1;
+    int oldest = -1;
 
     /* reload needed? */
     if (talk_temp_disable_count > 0)
@@ -1005,11 +1006,15 @@ static int _talk_file(const char* filename,
     }
     size = filesize(fd);
 
-    /* free clips from cache until this one succeeds to allocate */
-    while ((handle = buflib_alloc(&clip_ctx, size)) < 0)
-        oldest = free_oldest_clip();
+    if (size > 0)
+    {
+        /* free clips from cache until this one succeeds to allocate */
+        while ((handle = buflib_alloc(&clip_ctx, size)) < 0)
+            oldest = free_oldest_clip();
 
-    size = read_to_handle_ex(fd, &clip_ctx, handle, 0, size);
+        size = read_to_handle_ex(fd, &clip_ctx, handle, 0, size);
+    }
+
     close(fd);
 
     /* ToDo: find audio, skip ID headers and trailers */
