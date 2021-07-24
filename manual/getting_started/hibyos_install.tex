@@ -1,0 +1,26 @@
+This player's firmware is based on a Linux platform called HibyOS.  Rockbox
+runs as an application, replacing the stock \emph{Hibyplayer} application.
+
+In order to install Rockbox's bootloader, you will need a copy of the
+original player firmware.  This can be downloaded from the manufacturer's
+web site.  The following stock firmware versions are currently supported:
+
+\begin{itemize}
+ \opt{agptekrocker}{
+   \item 20171101
+   }
+\end{itemize}
+
+After downloading the firmware, you will need to download the corresponding
+binary patch file (\fname{.bsdiff}) for the firmware version in question, from
+the following location:
+
+\begin{itemize}
+ \opt{agptekrocker}{
+  \item \download{bootloader/agptek}
+  }
+\end{itemize}
+
+Using the \emph{bspatch} utility, apply the binary patch to the original bootloader, with an output file \fname{update.upt}.  Place this file into the top-level directory of an SD card.
+
+Insert the SD card into the player, turn it on, and navigate the to the \emph{tools} menu, and select \emph{update firmware}.  The device will restart to perform the update, then restart again, after which it will display the Rockbox bootloader menu.

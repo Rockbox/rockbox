@@ -420,6 +420,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'agptekrocker' => {
         name => 'Agptek Rocker',
         status => 2
+        manualok => 1, # Remove once status moves to 3
     },
     'xduoox3' => {
         name => 'xDuoo X3',

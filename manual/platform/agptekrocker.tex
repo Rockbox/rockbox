@@ -1,0 +1,26 @@
+% $Id$ %
+\def\UseOption{agptekrocker}
+\edef\UseOption{\UseOption,AGPTEK_ROCKER_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+\edef\UseOption{\UseOption,agptekrocker}
+
+\newcommand{\playerman}{AGPtek}
+\newcommand{\playertype}{Rocker}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{128}
+\newcommand{\dapdisplayheight}{160}
+\newcommand{\dapdisplaydepth}{16}
+\newcommand{\specimg}{agptekrocker}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.rocker}}
+\newcommand{\bootfilename}{\fname{bootloader.rocker}}
+\newcommand{\firmwareextension}{\fname{rocker}}
+\newcommand{\screenshotsize}{8cm}
+\newcommand{\disk}{SD card}
+
+% link external keymap file
+\input{platform/keymap-agptekrocker.tex}

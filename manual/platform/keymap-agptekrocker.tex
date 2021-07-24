@@ -1,0 +1,82 @@
+% $Id$
+
+\newcommand{\ButtonPower}{\btnfnt{Power}}
+\newcommand{\ButtonVolUp}{\btnfnt{Volume Up}}
+\newcommand{\ButtonVolDown}{\btnfnt{Volume Down}}
+\newcommand{\ButtonUp}{\btnfnt{Up}}
+\newcommand{\ButtonDown}{\btnfnt{Down}}
+\newcommand{\ButtonLeft}{\btnfnt{Left}}
+\newcommand{\ButtonRight}{\btnfnt{Right}}
+\newcommand{\ButtonSelect}{\btnfnt{Select}}
+
+%Button actions, standard context
+\newcommand{\ActionStdPrev}{\ButtonUp{}}
+\newcommand{\ActionStdPrevRepeat}{\ButtonUp{}}
+\newcommand{\ActionStdNext}{\ButtonDown{}}
+\newcommand{\ActionStdNextRepeat}{\ButtonDown{}}
+\newcommand{\ActionStdOk}{\ButtonSelect}
+\newcommand{\ActionStdCancel}{\ButtonLeft}
+\newcommand{\ActionStdContext}{Long \ButtonSelect{}}
+\newcommand{\ActionStdMenu}{\ButtonPower{}}
+\newcommand{\ActionStdUsbCharge}{\ButtonSelect{}}
+
+%Button actions, wps context
+\newcommand{\ActionWpsStop}{Long \ButtonSelect}
+\newcommand{\ActionWpsBrowse}{Long \ButtonUp}
+\newcommand{\ActionWpsVolUp}{\ButtonVolUp}
+\newcommand{\ActionWpsVolDown}{\ButtonVolDown}
+\newcommand{\ActionWpsSkipPrev}{\ButtonLeft}
+\newcommand{\ActionWpsSkipNext}{\ButtonRight}
+\newcommand{\ActionWpsSeekBack}{Long \ButtonLeft}
+\newcommand{\ActionWpsSeekFwd}{Long \ButtonRight}
+\newcommand{\ActionWpsPlay}{\ButtonSelect{}}
+\newcommand{\ActionWpsContext}{\ButtonDown}
+\newcommand{\ActionWpsMenu}{\ButtonUp}
+\newcommand{\ActionWpsQuickScreen}{Long \ButtonDown}
+\newcommand{\ActionWpsHotkey}{\ButtonVolUp{} and  \ButtonVolDown{}}
+
+%Button actions, tree context
+\newcommand{\ActionTreeWps}{Long \ButtonLeft}
+\newcommand{\ActionTreeStop}{Long \ButtonSelect}
+\newcommand{\ActionTreeParentDirectory}{\ButtonLeft}
+\newcommand{\ActionTreeEnter}{\ButtonSelect}
+\newcommand{\ActionTreeHotkey}{\ButtonVolUp{} and  \ButtonVolDown{}}
+
+%Button actions, YesNo context
+\newcommand{\ActionYesNoAccept}{\ButtonSelect{}}
+
+%Button actions, Virtual Keyboard Context
+\newcommand{\ActionKbdSelect}{\ButtonSelect}
+\newcommand{\ActionKbdUp}{\ButtonVolUp}
+\newcommand{\ActionKbdDown}{\ButtonVolDown}
+\newcommand{\ActionKbdLeft}{\ButtonLeft}
+\newcommand{\ActionKbdRight}{\ButtonRight}
+\newcommand{\ActionKbdPageFlip}{\ButtonPower{} and \ButtonSelect{}}
+\newcommand{\ActionKbdDone}{\ButtonUp}
+\newcommand{\ActionKbdAbort}{\ButtonPower}
+
+%Button actions, Pitch Screen context
+\newcommand{\ActionPsToggleMode}{\ButtonSelect}
+\newcommand{\ActionPsIncSmall}{\ButtonUp{}}
+\newcommand{\ActionPsDecSmall}{\ButtonDown{}}
+\newcommand{\ActionPsIncBig}{Long \ButtonUp}
+\newcommand{\ActionPsDecBig}{Long \ButtonDown}
+\newcommand{\ActionPsNudgeLeft}{\ButtonLeft}
+\newcommand{\ActionPsNudgeRight}{\ButtonRight}
+\newcommand{\ActionPsReset}{Long \ButtonSelect}
+\newcommand{\ActionPsExit}{\ButtonPower}
+\newcommand{\ActionPsFaster}{Long \ButtonRight}
+\newcommand{\ActionPsSlower}{Long \ButtonLeft}
+
+%Button actions, Bookmark screen context
+\newcommand{\ActionBmDelete}{\ButtonSelect}
+
+%Plugin lib actions
+\newcommand{\PluginUp}{\ButtonUp}
+\newcommand{\PluginDown}{\ButtonDown}
+\newcommand{\PluginLeft}{\ButtonLeft}
+\newcommand{\PluginRight}{\ButtonRight}
+\newcommand{\PluginSelect}{\ButtonSelect}
+\newcommand{\PluginSelectRepeat}{Long \ButtonSelect}
+\newcommand{\PluginCancel}{\ButtonPower}
+\newcommand{\PluginExit}{\ButtonPower}
