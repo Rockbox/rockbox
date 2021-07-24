@@ -15,6 +15,7 @@ $releasenotes="/wiki/ReleaseNotes315";
 #    icon => 'modelname3',               # optional (uses modelname3's icon)
 #    voice => 'modelname4'               # optional (uses modelname4's voice)
 #    release => '3.14',                  # optional (final release version, if different from above)
+#    manualok => 1,                      # optional (builds manual even if target is not stable)
 # }
 
 %builds = (
@@ -439,6 +440,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'fiiom3k' => {
         name => 'FiiO M3K',
         status => 2,
+        manualok => 1, # Remove once status moves to 3
     },
     'aigoerosq' => {
         name => 'AIGO EROS Q / K',
@@ -459,6 +461,7 @@ $releasenotes="/wiki/ReleaseNotes315";
     'shanlingq1' => {
         name => 'Shanling Q1',
         status => 2,
+        manualok => 1, # Remove once status moves to 3
     },
 );
 
@@ -482,7 +485,7 @@ sub usablebuilds {
     my @list;
 
     for my $b (sort byname keys %builds) {
-        push @list, $b if ($builds{$b}{status} >= 2);
+        push @list, $b if ($builds{$b}{status} >= 2 || defined($builds{$b}{manualok}));
     }
 
     return @list;
