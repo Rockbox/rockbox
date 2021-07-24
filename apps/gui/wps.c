@@ -223,6 +223,7 @@ bool ffwd_rew(int button)
         {
             case ACTION_WPS_SEEKFWD:
                  direction = 1;
+                 /* Fallthrough */
             case ACTION_WPS_SEEKBACK:
                 if (skin_get_global_state()->ff_rewind)
                 {

@@ -498,6 +498,7 @@ void a52_downmix (sample_t * samples, int acmod, int output,
     case CONVERT (A52_2F1R, A52_MONO):
         if (slev == 0)
             goto mix_2to1;
+        /* fallthrough */
     case CONVERT (A52_3F, A52_MONO):
     mix_3to1:
         mix3to1 (samples);
@@ -506,9 +507,11 @@ void a52_downmix (sample_t * samples, int acmod, int output,
     case CONVERT (A52_3F1R, A52_MONO):
         if (slev == 0)
             goto mix_3to1;
+        /* fallthrough */
     case CONVERT (A52_2F2R, A52_MONO):
         if (slev == 0)
             goto mix_2to1;
+        /* fallthrough */
         mix4to1 (samples);
         break;
 

@@ -780,6 +780,7 @@ static bool cb_start_viewer(const char* filename){
                         break;
                     case COMMAND_QUIT:
                         exit_app = true;
+                        /* fallthrough */
                     case COMMAND_RETURN:
                         exit_viewer = true;
                         break;

@@ -150,6 +150,7 @@ static bool load_cellfile(const char *file, char *pgrid){
         switch(c) {
         case '!':
             comment = true;
+            break;
         case '.':
             if (!comment)
                 x++;

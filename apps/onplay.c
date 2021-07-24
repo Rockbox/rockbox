@@ -1441,10 +1441,13 @@ static int clipboard_paste(void)
     {
     case OPRC_CANCELLED:
         splash_cancelled();
+        /* Fallthrough */
     case OPRC_SUCCESS:
         onplay_result = ONPLAY_RELOAD_DIR;
+        /* Fallthrough */
     case OPRC_NOOP:
         clipboard_clear_selection(&clipboard);
+        /* Fallthrough */
     case OPRC_NOOVERWRT:
         break;
     default:

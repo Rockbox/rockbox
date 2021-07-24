@@ -270,6 +270,7 @@ char* sb_create_from_settings(enum screen_type screen)
         {
             case STATUSBAR_TOP:
                 y = STATUSBAR_HEIGHT;
+                /* Fallthrough */
             case STATUSBAR_BOTTOM:
                 height = screens[screen].lcdheight - STATUSBAR_HEIGHT;
                 break;

@@ -1663,11 +1663,13 @@ enum plugin_status plugin_start(const void* file)
                     break;
                 case METRONOME_LEFT:
                     bpm_step_counter = 0;
+                    /* fallthrough */
                 case METRONOME_LEFT_REP:
                     change_bpm(-1);
                     break;
                 case METRONOME_RIGHT:
                     bpm_step_counter = 0;
+                    /* fallthrough */
                 case METRONOME_RIGHT_REP:
                     change_bpm(1);
                     break;

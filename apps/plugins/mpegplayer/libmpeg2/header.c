@@ -307,6 +307,7 @@ static int sequence_ext (mpeg2dec_t * mpeg2dec)
         return 1;
     case 2:        /* 4:2:0 */
         sequence->chroma_height >>= 1;
+        /* fallthrough */
     case 4:        /* 4:2:2 */
         sequence->chroma_width >>= 1;
     }

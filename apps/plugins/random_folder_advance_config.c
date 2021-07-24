@@ -366,6 +366,7 @@ static int edit_list(void)
                 {
                     case 0:
                         save_list();
+                        /* fallthrough */
                     case 1:
                         exit = true;
                         ret = -2;

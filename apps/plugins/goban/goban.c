@@ -524,6 +524,7 @@ plugin_start (const void *parameter)
 
         case BUTTON_NONE:
             is_idle = true;
+            /* fallthrough */
         default:
             if (rb->default_event_handler (btn) == SYS_USB_CONNECTED)
             {

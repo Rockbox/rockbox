@@ -1907,6 +1907,7 @@ static void draw_text( int x, int y )
                 rb->lcd_set_foreground( rp_colors[ drawcolor ] );
                 buffer_putsxyofs( save_buffer, COLS, ROWS, x, y, 0,
                                   buffer->text.text );
+                /* fallthrough */
             case TEXT_MENU_CANCEL:
             default:
                 restore_screen();

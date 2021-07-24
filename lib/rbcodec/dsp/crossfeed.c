@@ -334,6 +334,7 @@ static intptr_t crossfeed_configure(struct dsp_proc_entry *this,
     case DSP_PROC_INIT:
         if (value == 0)
             this->data = (intptr_t)&crossfeed_state;
+        /* Fallthrough */
 
     case DSP_SET_OUT_FREQUENCY:
         update_process_fn(this, dsp);

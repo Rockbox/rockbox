@@ -227,6 +227,7 @@ static int lrc_set_time(const char *title, const char *unit, long *pval,
             case PLA_UP_REPEAT:
             case PLA_DOWN_REPEAT:
                 mult *= 10;
+                /* fallthrough */
             case PLA_DOWN:
             case PLA_UP:
                 if (button == PLA_DOWN_REPEAT || button == PLA_DOWN)

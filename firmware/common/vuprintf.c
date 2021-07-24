@@ -753,6 +753,7 @@ static int format_double_radix(double f,
         if (prec_rem) {
             prec_rem--;
         }
+        /* fallthrough */
     case 1: /* %e, %E */
         explen = 2;
         break;

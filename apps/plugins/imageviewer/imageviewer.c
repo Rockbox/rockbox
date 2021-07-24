@@ -600,6 +600,7 @@ static int scroll_bmp(struct image_info *info)
             if (entries > 1 && info->width <= LCD_WIDTH
                             && info->height <= LCD_HEIGHT)
                 return change_filename(DIR_PREV);
+            /* fallthrough */
         case IMGVIEW_LEFT | BUTTON_REPEAT:
             pan_view_left(info);
             break;
@@ -608,6 +609,7 @@ static int scroll_bmp(struct image_info *info)
             if (entries > 1 && info->width <= LCD_WIDTH
                             && info->height <= LCD_HEIGHT)
                 return change_filename(DIR_NEXT);
+            /* fallthrough */
         case IMGVIEW_RIGHT | BUTTON_REPEAT:
             pan_view_right(info);
             break;

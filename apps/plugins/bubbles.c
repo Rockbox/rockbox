@@ -76,7 +76,7 @@ enum {
 #endif
 
 #define ANGLE_STEP          2
-#define ANGLE_STEP_REP      4
+#define ANGLE_STEP_REP      6
 
 #define BUBBLES_QUIT1       PLA_EXIT
 #define BUBBLES_QUIT2       PLA_CANCEL
@@ -2367,12 +2367,14 @@ static int bubbles_handlebuttons(struct game_context* bb, bool animblock,
     switch(button){
         case BUBBLES_LEFT_REP:
             if(bb->angle > MIN_ANGLE) bb->angle -= ANGLE_STEP_REP;
+            break;
         case BUBBLES_LEFT:   /* change angle to the left */
             if(bb->angle > MIN_ANGLE) bb->angle -= ANGLE_STEP;
             break;
 
         case BUBBLES_RIGHT_REP:
             if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP_REP;
+            break;
         case BUBBLES_RIGHT:  /* change angle to the right */
             if(bb->angle < MAX_ANGLE) bb->angle += ANGLE_STEP;
             break;

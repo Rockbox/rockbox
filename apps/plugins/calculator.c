@@ -755,6 +755,7 @@ double strtod(const char *nptr, char **endptr)
             case '.':
             case '\'':
               end=1;
+              /* fallthrough */
             default:
               nptr++;
         }
@@ -1687,6 +1688,7 @@ static void typingProcess(void){
                     clearInput();
                     *typingbufPointer = '0';
                     typingbufPointer++;
+                    /* Fallthrough */
                 case cal_typing:
                     calStatus = cal_dotted;
                     *typingbufPointer = '.';

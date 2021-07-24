@@ -4824,6 +4824,7 @@ static void tagcache_thread(void)
 
             case Q_START_SCAN:
                 check_done = false;
+                /* fallthrough */
             case SYS_TIMEOUT:
                 if (check_done || !tc_stat.ready)
                     break ;

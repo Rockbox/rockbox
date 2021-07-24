@@ -647,6 +647,7 @@ int open_stream_internal(const char *path, unsigned int callflags,
     {
     case WALK_RC_FOUND_ROOT:
         IF_MV( rc = rootrc; )
+        /* fallthrough */
     case WALK_RC_NOT_FOUND:
     case WALK_RC_FOUND:
         /* FF_PROBE leaves nothing for caller to clean up */

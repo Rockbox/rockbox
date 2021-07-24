@@ -748,6 +748,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
                 return true;
             }
             *actionptr = ACTION_TREE_PGLEFT;
+            /* fallthrough */
         case ACTION_TREE_PGLEFT:
             if(pgleft_allow_cancel && (lists->offset_position[0] == 0))
             {

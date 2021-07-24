@@ -1726,6 +1726,7 @@ static bool dbg_disk_info(void)
 #ifdef HAVE_DIRCACHE
 static int dircache_callback(int btn, struct gui_synclist *lists)
 {
+    (void)lists;
     struct dircache_info info;
     dircache_get_info(&info);
 
@@ -1737,6 +1738,7 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
             splash(HZ/2, "Rebuilding cache");
             dircache_suspend();
             *(int *)lists->data = dircache_resume();
+            /* Fallthrough */
         case ACTION_UNKNOWN:
             btn = ACTION_NONE;
             break;
@@ -1776,7 +1778,6 @@ static int dircache_callback(int btn, struct gui_synclist *lists)
         btn = ACTION_REDRAW;
 
     return btn;
-    (void)lists;
 }
 
 static bool dbg_dircache_info(void)
