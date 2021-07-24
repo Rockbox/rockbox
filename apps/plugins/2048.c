@@ -811,8 +811,7 @@ static int do_2048_pause_menu(void)
                         "Help",
                         "Quit without Saving",
                         "Quit");
-    bool quit = false;
-    while(!quit)
+    while(1)
     {
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
@@ -849,9 +848,10 @@ static int do_2048_pause_menu(void)
         }
         case 6:
             return 3;
+        default:
+            break;
         }
     }
-    return 0;
 }
 
 static void exit_handler(void)
@@ -1017,8 +1017,7 @@ static enum plugin_status do_2048_menu(void)
                         "Help",
                         "Quit without Saving",
                         "Quit");
-    bool quit = false;
-    while(!quit)
+    while(true)
     {
         switch(rb->do_menu(&menu, &sel, NULL, false))
         {
@@ -1065,6 +1064,7 @@ static enum plugin_status do_2048_menu(void)
         case 5:
             if(confirm_quit())
                 return PLUGIN_OK;
+            break;
         case 6:
             if(loaded)
                 save_game();
@@ -1073,7 +1073,6 @@ static enum plugin_status do_2048_menu(void)
             break;
         }
     }
-    return PLUGIN_OK;
 }
 
 /* plugin entry point */
