@@ -1103,12 +1103,10 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
 /* Changing this function could result in how the bookmarks are stored.    */
 /* it would be here that the centralized/decentralized bookmark code       */
 /* could be placed.                                                        */
-/* Always returns true                                                     */
+/* Returns true if the file name is generated, false if it was too long    */
 /* ----------------------------------------------------------------------- */
 static bool generate_bookmark_file_name(const char *in)
 {
-    int len = strlen(in);
-
     /* if this is a root dir MP3, rename the bookmark file root_dir.bmark */
     /* otherwise, name it based on the in variable */
     if (!strcmp("/", in))
@@ -1121,15 +1119,24 @@ static bool generate_bookmark_file_name(const char *in)
         path_strip_volume(in, &filename, true);
         bool volume_root = *filename == '\0';
 #endif
-        strcpy(global_bookmark_file_name, in);
-        if(global_bookmark_file_name[len-1] == '/')
+        size_t len = strlcpy(global_bookmark_file_name, in, MAX_PATH);
+        if(len >= MAX_PATH)
+            return false;
+
+        if(global_bookmark_file_name[len-1] == '/') {
+            global_bookmark_file_name[len-1] = '\0';
             len--;
+        }
+
 #ifdef HAVE_MULTIVOLUME
         if (volume_root)
-            strcpy(&global_bookmark_file_name[len], "/volume_dir.bmark");
+            len = strlcat(global_bookmark_file_name, "/volume_dir.bmark", MAX_PATH);
         else
 #endif
-            strcpy(&global_bookmark_file_name[len], ".bmark");
+            len = strlcat(global_bookmark_file_name, ".bmark", MAX_PATH);
+
+        if(len >= MAX_PATH)
+            return false;
     }
 
     return true;
