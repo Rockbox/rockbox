@@ -26,7 +26,10 @@ int atoi (const char *str)
 {
     int value = 0;
     int sign = 1;
-    
+
+    if (!str)
+        return 0;
+
     while (isspace(*str))
     {
         str++;
