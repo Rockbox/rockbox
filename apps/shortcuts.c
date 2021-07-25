@@ -372,8 +372,11 @@ void shortcuts_init(void)
     if (fd < 0)
         return;
     first_handle = core_alloc_ex("shortcuts_head", sizeof(struct shortcut_handle), &shortcut_ops);
-    if (first_handle <= 0)
+    if (first_handle <= 0) {
+        close(fd);
         return;
+    }
+
     h = core_get_data(first_handle);
     h->next_handle = 0;
 
