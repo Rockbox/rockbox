@@ -439,17 +439,6 @@ void pcm_dma_apply_settings(void)
     }
 }
 
-/* TODO: WTF */
-const void* pcm_play_dma_get_peak_buffer(int* count)
-{
-    TRACE;
-
-    uintptr_t addr = (uintptr_t) _pcm_buffer;
-    *count = _pcm_buffer_size / 4;
-    return (void*) ((addr + 3) & ~3);
-}
-
-
 void pcm_close_device(void)
 {
     TRACE;

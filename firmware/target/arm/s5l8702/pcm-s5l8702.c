@@ -216,13 +216,6 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-const void* pcm_play_dma_get_peak_buffer(int *count)
-{
-    void *addr = dmac_ch_get_info(&dma_play_ch, count, NULL);
-    *count >>= 2; /* bytes to samples */
-    return addr; /* aligned to dest burst */
-}
-
 #ifdef HAVE_PCM_DMA_ADDRESS
 void * pcm_dma_addr(void *addr)
 {

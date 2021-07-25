@@ -775,13 +775,6 @@ void pcm_play_dma_start(const void *addr, size_t size)
     }
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_size / 4;
-    return (void *)((addr + 3) & ~3);
-}
-
 void pcm_play_dma_postinit(void)
 {
     audiohw_postinit();

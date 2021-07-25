@@ -276,13 +276,6 @@ static void sdl_audio_callback(struct pcm_udata *udata, Uint8 *stream, int len)
     SDL_UnlockMutex(audio_lock);
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_data_size / 4;
-    return (void *)((addr + 2) & ~3);
-}
-
 #ifdef HAVE_RECORDING
 void pcm_rec_lock(void)
 {

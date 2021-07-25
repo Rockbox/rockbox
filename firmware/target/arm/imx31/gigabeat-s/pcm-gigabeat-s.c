@@ -224,34 +224,6 @@ void pcm_play_dma_stop(void)
     play_stop_pcm();
 }
 
-/* Return a pointer to the samples and the number of them in *count */
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    static unsigned long dsa NOCACHEBSS_ATTR;
-    unsigned long addr;
-    long offs, size;
-    int oldstatus;
-
-    /* read burst dma source address register in channel context */
-    sdma_read_words(&dsa, CHANNEL_CONTEXT_ADDR(DMA_PLAY_CH_NUM)+0x0b, 1);
-
-    oldstatus = disable_irq_save();
-    addr = dsa;
-    offs = addr - (unsigned long)dma_play_bd.buf_addr;
-    size = dma_play_bd.mode.count;
-    restore_irq(oldstatus);
-
-    /* Be addresses are coherent (no buffer change during read) */
-    if (offs >= 0 && offs < size)
-    {
-        *count = (size - offs) >> 2;
-        return (void *)((addr + 2) & ~3);
-    }
-
-    *count = 0;
-    return NULL;
-}
-
 void * pcm_dma_addr(void *addr)
 {
     return (void *)addr_virt_to_phys((unsigned long)addr);

@@ -301,21 +301,6 @@ void DMA0(void)
     /* else inished playing */
 } /* DMA0 */
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr, cnt;
-
-    /* Make sure interrupt doesn't change the second value after we read the
-     * first value. */
-    int level = set_irq_level(DMA_IRQ_LEVEL);
-    addr = SAR0;
-    cnt = BCR0;
-    restore_irq(level);
-
-    *count = (cnt & 0xffffff) >> 2;
-    return (void *)((addr + 2) & ~3);
-} /* pcm_play_dma_get_peak_buffer */
-
 #ifdef HAVE_RECORDING
 /****************************************************************************
  ** Recording DMA transfer

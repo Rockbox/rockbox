@@ -262,12 +262,6 @@ void pcm_dma_apply_settings(void)
     pcm_dma_set_freq(pcm_fsel);
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    *count = DMACTCNT0 >> 1;
-    return (void *)(((DMACADDR0 + 2) & ~3) | 0x40000000);
-}
-
 #ifdef HAVE_PCM_DMA_ADDRESS
 void * pcm_dma_addr(void *addr)
 {

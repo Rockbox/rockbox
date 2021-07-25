@@ -171,13 +171,6 @@ void pcm_play_dma_stop(void)
                            stop_method);
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data_start;
-    *count = pcm_data_size / 4;
-    return (void *)((addr + 3) & ~3);
-}
-
 void pcm_play_dma_init(void)
 {
     /* in order to have background music playing after leaving the activity,

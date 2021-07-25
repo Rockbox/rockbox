@@ -52,12 +52,6 @@ void pcm_play_dma_postinit(void)
 //    dsp_wake();
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    (void) count;
-    return 0;
-}
-
 void pcm_dma_apply_settings(void)
 {
     audiohw_set_frequency(pcm_fsel);

@@ -259,11 +259,3 @@ void fiq_handler(void)
 
     pcm_play_dma_status_callback(PCM_DMAST_STARTED);
 }
-
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr = DCSRC2;
-    int cnt = DSTAT2;
-    *count = (cnt & 0xFFFFF) >> 1;
-    return (void *)((addr + 2) & ~3);
-}

@@ -285,23 +285,6 @@ void pcm_play_dma_stop_int(void)
     src_buf_rem = 0;
 }
 
-/* Return playing buffer from the source buffer */
-const void * pcm_play_dma_get_peak_buffer_int(int *count)
-{
-    const void *addr = src_buf_addr;
-    size_t size = src_buf_rem;
-    const void *addr2 = src_buf_addr;
-
-    if (addr == addr2 && size)
-    {
-        *count = size / PCM_SAMPLE_SIZE;
-        return addr;
-    }
-
-    *count = 0;
-    return NULL;
-}
-
 #endif /* PCM_SW_VOLUME_UNBUFFERED */
 
 

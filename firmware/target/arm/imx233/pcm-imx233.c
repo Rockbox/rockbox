@@ -175,17 +175,6 @@ void pcm_dma_apply_settings(void)
     pcm_play_unlock();
 }
 
-const void *pcm_play_dma_get_peak_buffer(int *count)
-{
-    if(!dac_freezed)
-        imx233_dma_freeze_channel(APB_AUDIO_DAC, true);
-    struct imx233_dma_info_t info = imx233_dma_get_info(APB_AUDIO_DAC, DMA_INFO_AHB_BYTES | DMA_INFO_BAR);
-    if(!dac_freezed)
-        imx233_dma_freeze_channel(APB_AUDIO_DAC, false);
-    *count = info.ahb_bytes;
-    return (void *)info.bar;
-}
-
 /*
  * Recording
  */

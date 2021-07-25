@@ -191,14 +191,6 @@ static void feed_data(GstElement * appsrc, guint size_hint, void *unused)
     unlock_audio();
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uintptr_t addr = (uintptr_t)pcm_data;
-    *count = pcm_data_size / 4;
-    return (void *)((addr + 2) & ~3);
-}
-
-
 static gboolean
 gst_bus_message (GstBus * bus, GstMessage * message, void *unused)
 {

@@ -42,22 +42,6 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-/* Return the current location in the SDRAM to SARAM transfer along with the
- *  number of bytes read in the current buffer (count).  There is latency with
- *  this method equivalent to ~ the size of the SARAM buffer since there is
- *  another buffer between your ears and this calculation, but this works for
- *  key clicks and an approximate peak meter.
- */
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    int cnt = DSP_(_sdem_level);
-
-    unsigned long addr = (unsigned long) start + cnt;
-    
-    *count = (cnt & 0xFFFFF) >> 1;
-    return (void *)((addr + 2) & ~3);
-}
-
 void pcm_play_dma_init(void)
 {
     /* GIO16 is DSP/AIC3X CLK */

@@ -263,18 +263,6 @@ void INT_HDMA(void)
     }
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    uint32_t addr;
-    
-    int old = disable_irq_save();
-    addr = HDMA_CSRC0;
-    *count = ((HDMA_CCNT0 & 0xffff)<<2);
-    restore_interrupt(old);
-
-    return (void*)addr;
-}
-
 /****************************************************************************
  ** Recording DMA transfer
  **/

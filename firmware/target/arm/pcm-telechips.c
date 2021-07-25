@@ -62,14 +62,6 @@ struct dma_data dma_play_data SHAREDBSS_ATTR =
     .state = 0
 };
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr = (unsigned long)dma_play_data.p;
-    size_t cnt = dma_play_data.size;
-    *count = cnt >> 2;
-    return (void *)((addr + 2) & ~3);
-}
-
 void pcm_play_dma_init(void)
 {
     DAVC = 0x0;         /* Digital Volume = max */

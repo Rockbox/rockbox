@@ -512,19 +512,6 @@ void pcm_play_dma_postinit(void)
     audiohw_postinit();
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    unsigned long addr, size;
-
-    int status = disable_fiq_save();
-    addr = dma_play_data.addr;
-    size = dma_play_data.size;
-    restore_fiq(status);
-
-    *count = size >> 2;
-    return (void *)((addr + 2) & ~3);
-}
-
 /****************************************************************************
  ** Recording DMA transfer
  **/

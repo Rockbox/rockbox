@@ -203,28 +203,6 @@ static int get_dma_count(void)
     return count;
 }
 
-const void * pcm_play_dma_get_peak_buffer(int *count)
-{
-    int flags = disable_irq_save();
-
-    const void* addr;
-    if(REG_DMAC_DCCSR(DMA_AIC_TX_CHANNEL) & DMAC_DCCSR_EN)
-    {
-        int bytes = get_dma_count();
-        *count = bytes >> 2;
-        addr = (const void*)((int)(playback_address + bytes + 2) & ~3);
-    }
-    else
-    {
-        *count = 0;
-        addr = NULL;
-    }
-
-    restore_irq(flags);
-
-    return addr;
-}
-
 void audiohw_close(void)
 {
     /* TODO: prevent pop */
