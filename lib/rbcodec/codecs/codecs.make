@@ -208,7 +208,7 @@ $(CODECDIR)/%.o: $(RBCODECLIB_DIR)/codecs/%.S
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) \
 		-I$(dir $<) $(CODECFLAGS) -c $< -o $@
 
-$(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODECS_LIBS)
+$(CODECDIR)/%-pre.map: $(CODEC_CRT0) $(CODECLINK_LDS) $(CODECDIR)/%.o $(CODEC_LIBS)
 	$(call PRINTS,LD $(@F))$(CC) $(CODECFLAGS) -o $(CODECDIR)/$*-pre.elf \
 		$(filter %.o, $^) \
 		$(filter-out $(CODECLIB),$(filter %.a, $+)) $(CODECLIB) \
