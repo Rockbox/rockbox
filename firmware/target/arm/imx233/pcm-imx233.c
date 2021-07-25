@@ -42,7 +42,6 @@ __ENSURE_STRUCT_CACHE_FRIENDLY(struct pcm_dma_command_t)
 
 static int dac_locked = 0;
 static struct pcm_dma_command_t dac_dma;
-static bool dac_freezed = false;
 
 static const void *dac_buf; /* current buffer */
 static size_t dac_size; /* remaining size */

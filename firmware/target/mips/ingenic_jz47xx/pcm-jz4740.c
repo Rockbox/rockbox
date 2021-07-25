@@ -184,25 +184,6 @@ void pcm_play_unlock(void)
     restore_irq(flags);
 }
 
-static int get_dma_count(void)
-{
-    int count = REG_DMAC_DTCR(DMA_AIC_TX_CHANNEL);
-    switch(REG_DMAC_DCMD(DMA_AIC_TX_CHANNEL) & DMAC_DCMD_DS_MASK)
-    {
-        case DMAC_DCMD_DS_16BIT:
-            count *= 2;
-            break;
-        case DMAC_DCMD_DS_32BIT:
-            count *= 4;
-            break;
-        case DMAC_DCMD_DS_16BYTE:
-            count *= 16;
-            break;
-    }
-
-    return count;
-}
-
 void audiohw_close(void)
 {
     /* TODO: prevent pop */
