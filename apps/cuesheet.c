@@ -118,6 +118,53 @@ static char *get_string(const char *line)
     return start;
 }
 
+static unsigned long parse_cue_index(const char *line)
+{
+    /* assumes strncmp(line, "INDEX 01", 8) & NULL terminated string */
+    /* INDEX 01 MM:SS:FF\0 (00:00:00\0 - 99:99:99\0)*/
+    const unsigned field_m[3] = {60 * 1000, 1000, 13}; /* MM:SS:~FF*/
+    const char f_sep = ':';
+    int field = -1;
+    unsigned long offset = 0; /* ms from start of track */
+    unsigned long value = 0;
+    while (*line)
+    {
+        if (!isdigit(*line))  /* search for numbers */
+        {
+            line++;
+            continue;
+        }
+
+        while (isdigit(*line))
+        {
+            value = 10 * value + (*line - '0');
+            if (value > 99) /* Sanity check bail early */
+                return 0;
+            line++;
+        }
+
+        if (field < 0) /*Filter INDEX 01*/
+        {
+            /* safe to assume value == 1 */
+        }
+        else if (field <= 2)
+        {
+            while(*line && *line != f_sep)
+                    line++;
+
+            if (*line || field == 2) /* if *line valid we found f_sep */
+                offset += (unsigned long) field_m[field] * value;
+        }
+        else
+            break;
+
+        value = 0;
+        field++;
+    }
+
+    return offset;
+}
+
 /* parse cuesheet "cue_file" and store the information in "cue" */
 bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
 {
@@ -204,6 +251,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
         else if (!strncmp(s, "INDEX 01", 8))
         {
+#if 0
             s = strchr(s,' ');
             s = skip_whitespace(s);
             s = strchr(s,' ');
@@ -213,6 +261,9 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
             cue->tracks[cue->track_count-1].offset += 1000 * atoi(s);
             s = strchr(s,':') + 1;
             cue->tracks[cue->track_count-1].offset += 13 * atoi(s);
+#else
+            cue->tracks[cue->track_count-1].offset = parse_cue_index(s);
+#endif
         }
         else if (!strncmp(s, "TITLE", 5)
                  || !strncmp(s, "PERFORMER", 9)
