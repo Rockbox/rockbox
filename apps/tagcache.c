@@ -363,12 +363,13 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
     char buf[MAX_PATH];
+    const int bufsz = sizeof(buf);
     int rc;
 
     if (TAGCACHE_IS_NUMERIC(tag) || tag < 0 || tag >= TAG_COUNT)
         return -1;
 
-    snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag);
+    snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, tag);
 
     fd = open(buf, write ? O_RDWR : O_RDONLY);
     if (fd < 0)
@@ -508,6 +509,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
     struct tagfile_entry tfe;
     int fd;
     char buf[TAG_MAXLEN+32];
+    const long bufsz = sizeof(buf);
     int i;
     int pos = -1;
 
@@ -549,7 +551,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
             break ;
         }
 
-        if (tfe.tag_length >= (long)sizeof(buf))
+        if (tfe.tag_length >= bufsz)
         {
             logf("too long tag #1");
             close(fd);
@@ -568,6 +570,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
             last_pos = -1;
             return -3;
         }
+        buf[tfe.tag_length] = '\0';
 
         if (!strcmp(filename, buf))
         {
@@ -1056,6 +1059,7 @@ static bool check_clauses(struct tagcache_search *tcs,
     {
         int seek;
         char buf[256];
+        const int bufsz = sizeof(buf);
         char *str = buf;
         struct tagcache_search_clause *clause = clauses[i];
 
@@ -1076,7 +1080,7 @@ static bool check_clauses(struct tagcache_search *tcs,
                     || clause->tag == tag_virt_basename)
                 {
                     retrieve(tcs, IF_DIRCACHE(tcs->idx_id,) idx, tag_filename,
-                             buf, sizeof buf);
+                             buf, bufsz);
                 }
                 else
                 {
@@ -1102,13 +1106,18 @@ static bool check_clauses(struct tagcache_search *tcs,
                 int fd = tcs->idxfd[tag];
                 lseek(fd, seek, SEEK_SET);
                 ecread_tagfile_entry(fd, &tfe);
-                if (tfe.tag_length >= (int)sizeof(buf))
+                if (tfe.tag_length >= bufsz)
                 {
                     logf("Too long tag read!");
                     return false;
                 }
 
-                read(fd, str, tfe.tag_length);
+                if (read(fd, str, tfe.tag_length)!= tfe.tag_length)
+                {
+                    logf("read error #15");
+                    return false;
+                }
+
                 str[tfe.tag_length] = '\0';
 
                 /* Check if entry has been deleted. */
@@ -1303,7 +1312,8 @@ static void remove_files(void)
 {
     int i;
     char buf[MAX_PATH];
-
+    const int bufsz = sizeof(buf);
+    
     tc_stat.ready = false;
     tc_stat.ramcache = false;
     tc_stat.econ = false;
@@ -1313,7 +1323,7 @@ static void remove_files(void)
         if (TAGCACHE_IS_NUMERIC(i))
             continue;
 
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, i);
+        snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, i);
         remove(buf);
     }
 }
@@ -1463,8 +1473,9 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
         if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
         {
             char buf[MAX_PATH];
-
-            snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, clause->tag);
+            const int bufsz = sizeof(buf);
+            
+            snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, clause->tag);        
             tcs->idxfd[clause->tag] = open(buf, O_RDONLY);
         }
     }
@@ -1477,7 +1488,9 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
 
 static bool get_next(struct tagcache_search *tcs)
 {
+    /* WARNING pointers into buf are used in outside functions */
     static char buf[TAG_MAXLEN+32];
+    const int bufsz = sizeof(buf);
     struct tagfile_entry entry;
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
     long flag = 0;
@@ -1540,7 +1553,7 @@ static bool get_next(struct tagcache_search *tcs)
 
     if (TAGCACHE_IS_NUMERIC(tcs->type))
     {
-        snprintf(buf, sizeof(buf), "%ld", tcs->position);
+        snprintf(buf, bufsz, "%ld", tcs->position);
         tcs->result = buf;
         tcs->result_len = strlen(buf) + 1;
         return true;
@@ -1600,8 +1613,8 @@ static bool get_next(struct tagcache_search *tcs)
         tcs->valid = false;
         return false;
     }
-
-    if (entry.tag_length > (long)sizeof(buf))
+    
+    if (entry.tag_length > (long)bufsz)
     {
         tcs->valid = false;
         logf("too long tag #2");
@@ -1621,6 +1634,7 @@ static bool get_next(struct tagcache_search *tcs)
      if filters or clauses are being used).
      */
     tcs->position += sizeof(struct tagfile_entry) + entry.tag_length;
+    buf[entry.tag_length] = '\0';
     tcs->result = buf;
     tcs->result_len = strlen(tcs->result) + 1;
     tcs->idx_id = entry.idx_id;
@@ -2014,8 +2028,9 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
     unsigned crc32;
     unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
     char buf[TAG_MAXLEN+32];
-
-    for (i = 0; str[i] != '\0' && i < (int)sizeof(buf)-1; i++)
+    const int bufsz = sizeof(buf);
+    
+    for (i = 0; str[i] != '\0' && i < bufsz-1; i++)
         buf[i] = tolower(str[i]);
     buf[i] = '\0';
 
@@ -2227,7 +2242,9 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
     int max_entries;
     int entries_processed = 0;
     int i, j;
-    char buf[TAG_MAXLEN];
+
+    char buf[TAG_MAXLEN + 32];
+    const int bufsz = sizeof(buf);
 
     max_entries = tempbuf_size / sizeof(struct temp_file_entry) - 1;
 
@@ -2279,7 +2296,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
              */
 #define tmpdb_read_string_tag(tag) \
     lseek(tmpfd, tfe->tag_offset[tag], SEEK_CUR); \
-    if ((unsigned long)tfe->tag_length[tag] > sizeof buf) \
+    if ((unsigned long)tfe->tag_length[tag] > (unsigned long)bufsz) \
     { \
         logf("read fail: buffer overflow"); \
         close(masterfd); \
@@ -2293,6 +2310,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         close(masterfd); \
         return false; \
     } \
+    buf[tfe->tag_length[tag]] = '\0'; \
     \
     tfe->tag_offset[tag] = crc_32(buf, strlen(buf), 0xffffffff); \
     lseek(tmpfd, datastart, SEEK_SET)
@@ -2467,6 +2485,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     struct index_entry idxbuf[IDX_BUF_DEPTH];
     int idxbuf_pos;
     char buf[TAG_MAXLEN+32];
+    const long bufsz = sizeof(buf);
     int fd = -1, masterfd;
     bool error = false;
     int init;
@@ -2543,6 +2562,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     if (tempbuf_left - TAGFILE_ENTRY_AVG_LENGTH * commit_entry_count < 0)
     {
         logf("Buffer way too small!");
+        close(fd);
         return 0;
     }
 
@@ -2569,7 +2589,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     return -2;
                 }
 
-                if (entry.tag_length >= (int)sizeof(buf))
+                if (entry.tag_length >= bufsz)
                 {
                     logf("too long tag #3");
                     close(fd);
@@ -2582,7 +2602,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                     close(fd);
                     return -2;
                 }
-
+                buf[entry.tag_length] = '\0';
                 /* Skip deleted entries. */
                 if (buf[0] == '\0')
                     continue;
@@ -2613,7 +2633,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * Creating new index file to store the tags. No need to preload
          * anything whether the index type is sorted or not.
          */
-        snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, index_type);
+        snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, index_type);
         fd = open(buf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
         if (fd < 0)
         {
@@ -2715,7 +2735,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
             }
 
             /* Read data. */
-            if (entry.tag_length[index_type] >= (long)sizeof(buf))
+            if (entry.tag_length[index_type] >= (long)bufsz)
             {
                 logf("too long entry!");
                 error = true;
@@ -2730,6 +2750,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 error = true;
                 goto error_exit;
             }
+            buf[entry.tag_length[index_type]] = '\0';
 
             if (TAGCACHE_IS_UNIQUE(index_type))
                 error = !tempbuf_insert(buf, i, -1, true);
@@ -3306,9 +3327,11 @@ void tagcache_update_numeric(int idx_id, int tag, long data)
 static bool write_tag(int fd, const char *tagstr, const char *datastr)
 {
     char buf[512];
+    const int bufsz = sizeof(buf);
     int i;
 
-    snprintf(buf, sizeof buf, "%s=\"", tagstr);
+    snprintf(buf, bufsz, "%s=\"", tagstr);
+
     for (i = strlen(buf); i < (long)sizeof(buf)-4; i++)
     {
         if (*datastr == '\0')
@@ -3327,7 +3350,8 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
         buf[i] = *(datastr++);
     }
 
-    strcpy(&buf[i], "\" ");
+    buf[bufsz - 1] = '\0';
+    strlcpy(&buf[i], "\" ", (bufsz - i - 1));
 
     write(fd, buf, i + 2);
 
@@ -3487,6 +3511,7 @@ bool tagcache_import_changelog(void)
     int clfd;
     long masterfd;
     char buf[2048];
+    const int bufsz = sizeof(buf);
 
     if (!tc_stat.ready)
         return false;
@@ -3510,8 +3535,8 @@ bool tagcache_import_changelog(void)
     write_lock++;
 
     filenametag_fd = open_tag_fd(&tch, tag_filename, false);
-
-    fast_readline(clfd, buf, sizeof buf, (void *)(intptr_t)masterfd,
+    
+    fast_readline(clfd, buf, bufsz, (void *)(intptr_t)masterfd,
                   parse_changelog_line);
 
     close(clfd);
@@ -3537,6 +3562,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
     struct master_header myhdr;
     struct index_entry idx;
     char buf[TAG_MAXLEN+32];
+    const int bufsz = sizeof(buf);
     char temp[32];
     int clfd;
     int i, j;
@@ -3600,7 +3626,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
             }
 
             tcs->type = j;
-            tagcache_retrieve(tcs, i, tcs->type, buf, sizeof buf);
+            tagcache_retrieve(tcs, i, tcs->type, buf, bufsz);
             write_tag(clfd, tagcache_tag_to_str(j), buf);
         }
 
@@ -3623,6 +3649,7 @@ static bool delete_entry(long idx_id)
     struct index_entry idx, myidx;
     struct master_header myhdr;
     char buf[TAG_MAXLEN+32];
+    const int bufsz = sizeof(buf);
     int in_use[TAG_COUNT];
 
     logf("delete_entry(): %ld", idx_id);
@@ -3737,11 +3764,18 @@ static bool delete_entry(long idx_id)
                 goto cleanup;
             }
 
+            if (tfe.tag_length >= (long)bufsz)
+            {
+                logf("too long tag #4");
+                goto cleanup;
+            }
+
             if (read(fd, buf, tfe.tag_length) != tfe.tag_length)
             {
                 logf("delete_entry(): read error #4");
                 goto cleanup;
             }
+            buf[tfe.tag_length] = '\0';
 
             myidx.tag_seek[tag] = crc_32(buf, strlen(buf), 0xffffffff);
         }
@@ -4254,10 +4288,11 @@ static bool check_deleted_files(void)
 {
     int fd;
     char buf[TAG_MAXLEN+32];
+    const int bufsz = sizeof(buf);
     struct tagfile_entry tfe;
 
     logf("reverse scan...");
-    snprintf(buf, sizeof buf, TAGCACHE_FILE_INDEX, tag_filename);
+    snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, tag_filename);
     fd = open(buf, O_RDONLY);
 
     if (fd < 0)
@@ -4270,7 +4305,7 @@ static bool check_deleted_files(void)
     while (ecread_tagfile_entry(fd, &tfe) == sizeof(struct tagfile_entry)
            && !check_event_queue())
     {
-        if (tfe.tag_length >= (long)sizeof(buf)-1)
+        if (tfe.tag_length >= (long)bufsz-1)
         {
             logf("too long tag");
             close(fd);
@@ -4283,6 +4318,7 @@ static bool check_deleted_files(void)
             close(fd);
             return false;
         }
+        buf[tfe.tag_length] = '\0';
 
         /* Check if the file has already deleted from the db. */
         if (*buf == '\0')
@@ -4314,12 +4350,13 @@ static void NO_INLINE check_ignore(const char *dirname,
     int *ignore, int *unignore)
 {
     char newpath[MAX_PATH];
+    const int bufsz = sizeof(newpath);
 
     /* check for a database.ignore file */
-    snprintf(newpath, MAX_PATH, "%s/database.ignore", dirname);
+    snprintf(newpath, bufsz, "%s/database.ignore", dirname);
     *ignore = file_exists(newpath);
     /* check for a database.unignore file */
-    snprintf(newpath, MAX_PATH, "%s/database.unignore", dirname);
+    snprintf(newpath, bufsz, "%s/database.unignore", dirname);
     *unignore = file_exists(newpath);
 }
 
@@ -4365,6 +4402,7 @@ static bool add_search_root(const char *name)
 #ifndef WIN32
     struct search_roots_ll *this, *prev = NULL;
     char target[MAX_PATH];
+    const int target_bufsz = sizeof(target);
     /* Okay, realpath() is almost completely broken on android
      *
      * It doesn't accept NULL for resolved_name to dynamically allocate
@@ -4378,7 +4416,7 @@ static bool add_search_root(const char *name)
     static char abs_target[PATH_MAX];
     ssize_t len;
 
-    len = readlink(name, target, sizeof(target)-1);
+    len = readlink(name, target, target_bufsz-1);
     if (len < 0)
         return false;
 
@@ -4396,7 +4434,7 @@ static bool add_search_root(const char *name)
     {
         size_t len = strlen(abs_target) + 1; /* count \0 */
         this = malloc(sizeof(struct search_roots_ll) + len );
-        if (!this || len > MAX_PATH)
+        if (!this || len > MIN(PATH_MAX, MAX_PATH))
         {
             logf("Error at adding a search root: %s", this ? "path too long":"OOM");
             free(this);
@@ -4583,7 +4621,7 @@ void do_tagcache_build(const char *path[])
     /* check_dir might add new roots */
     for(this = &roots_ll[0]; this; this = this->next)
     {
-        strcpy(curpath, this->path);
+        strlcpy(curpath, this->path, sizeof(curpath));
         ret = ret && check_dir(this->path, true);
     }
     free_search_roots(&roots_ll[0]);
