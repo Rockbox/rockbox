@@ -542,7 +542,7 @@ static void update_playlist_filename(struct playlist_info* playlist,
 static int add_indices_to_playlist(struct playlist_info* playlist,
                                    char* buffer, size_t buflen)
 {
-    unsigned int nread;
+    ssize_t nread;
     unsigned int i = 0;
     unsigned int count = 0;
     bool store_index;
@@ -572,7 +572,7 @@ static int add_indices_to_playlist(struct playlist_info* playlist,
 
         p = (unsigned char *)buffer;
 
-        for(count=0; count < nread; count++,p++) {
+        for(count=0; count < (unsigned int)nread; count++,p++) {
 
             /* Are we on a new line? */
             if((*p == '\n') || (*p == '\r'))
@@ -1493,8 +1493,8 @@ static int get_next_dir(char *dir, bool is_forward)
         if (fd >= 0)
         {
             int folder_count = 0;
-            read(fd,&folder_count,sizeof(int));
-            if (folder_count)
+            ssize_t nread = read(fd,&folder_count,sizeof(int));
+            if ((nread == sizeof(int)) && folder_count)
             {
                 char buffer[MAX_PATH];
                 /* give up looking for a directory after we've had four
@@ -2703,7 +2703,7 @@ int playlist_next(int steps)
         {
             index = get_next_index(playlist, i, -1);
             
-            if (playlist->indices[index] & PLAYLIST_QUEUE_MASK)
+            if (index >= 0 && playlist->indices[index] & PLAYLIST_QUEUE_MASK)
             {
                 remove_track_from_playlist(playlist, index, true);
                 steps--; /* one less track */
@@ -3151,7 +3151,11 @@ int playlist_insert_playlist(struct playlist_info* playlist, const char *filenam
     {
         if (playlist_remove_all_tracks(playlist) == 0)
             position = PLAYLIST_INSERT_LAST;
-        else return -1;
+        else
+        {
+            close(fd);
+            return -1;
+        }
     }
 
     cpu_boost(true);
