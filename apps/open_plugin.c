@@ -60,12 +60,12 @@ static int op_update_dat(struct open_plugin_entry_t *entry)
     hash = entry->hash;
 
     fd = open(OPEN_PLUGIN_DAT ".tmp", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    if (!fd)
+    if (fd < 0)
         return -1;
     write(fd, entry, op_entry_sz);
 
     fd1 = open(OPEN_PLUGIN_DAT, O_RDONLY);
-    if (fd1)
+    if (fd1 >= 0)
     {
         while (read(fd1, &open_plugin_entry, op_entry_sz) == op_entry_sz)
         {
@@ -189,13 +189,18 @@ static int open_plugin_hash_get_entry(uint32_t hash,
 
         int fd = open(dat_file, O_RDONLY);
 
-        if (fd)
+        if (fd >= 0)
         {
             while (read(fd, entry, op_entry_sz) == op_entry_sz)
             {
                 record++;
                 if (hash == 0 || entry->hash == hash)
                 {
+                    /* NULL terminate fields NOTE -- all are actually +1 larger */
+                    entry->name[OPEN_PLUGIN_NAMESZ] = '\0';
+                    /*entry->key[OPEN_PLUGIN_BUFSZ] = '\0';*/
+                    entry->path[OPEN_PLUGIN_BUFSZ] = '\0';
+                    entry->param[OPEN_PLUGIN_BUFSZ] = '\0';
                     ret = record;
                     break;
                 }
