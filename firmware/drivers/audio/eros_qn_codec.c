@@ -26,9 +26,13 @@
 #include "audiohw.h"
 #include "settings.h"
 #include "pcm_sw_volume.h"
+#include "gpio-x1000.h"
 
 static long int vol_l_hw = 0;
 static long int vol_r_hw = 0;
+
+/* internal: mute the headphone amp. 0 - unmuted, 1 - muted */
+void audiohw_mute_hp(int mute);
 
 void pcm5102_set_outputs(void)
 {
@@ -53,13 +57,33 @@ void audiohw_set_volume(int vol_l, int vol_r)
     if (lineout_inserted() && !headphones_inserted())
     {
         l = r = global_settings.volume_limit * 10;
+
+        /* mute the headphone amp if not plugged in */
+        audiohw_mute_hp(1);
     }
     else
     {
+        /* unmute the headphone amp when plugged in */
+        audiohw_mute_hp(0);
         l = vol_l;
         r = vol_r;
     }
 #endif
 
+    l = l <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : l;
+    r = r <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : r;
+
     pcm_set_master_volume(l, r);
+}
+
+void audiohw_mute_hp(int mute)
+{
+    if (mute == 0)
+    {
+        gpio_set_level(GPIO_MAX97220_SHDN, 1);
+    }
+    else
+    {
+        gpio_set_level(GPIO_MAX97220_SHDN, 0);
+    }
 }

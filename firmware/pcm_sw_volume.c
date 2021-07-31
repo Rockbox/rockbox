@@ -54,7 +54,11 @@ static typeof (memcpy) *pcm_scaling_fn = NULL;
 /* Scale sample by PCM factor */
 static inline int32_t pcm_scale_sample(PCM_F_T f, int32_t s)
 {
+#if defined(PCM_DC_OFFSET_VALUE)
+    return (f * s + PCM_DC_OFFSET_VALUE) >> PCM_SW_VOLUME_FRACBITS;
+#else
     return (f * s) >> PCM_SW_VOLUME_FRACBITS;
+#endif
 }
 
 /* Both UNITY, use direct copy */
