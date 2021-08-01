@@ -101,9 +101,12 @@ static struct event_queue tagcache_queue SHAREDBSS_ATTR;
 static long tagcache_stack[(DEFAULT_STACK_SIZE + 0x4000)/sizeof(long)];
 static const char tagcache_thread_name[] = "tagcache";
 #endif
+/* buffer size for all the (stack allocated & static) buffers handling tc data */
+#define TAGCACHE_BUFSZ (TAG_MAXLEN+32)
+
 
 /* Previous path when scanning directory tree recursively. */
-static char curpath[TAG_MAXLEN+32];
+static char curpath[TAGCACHE_BUFSZ];
 
 /* Used when removing duplicates. */
 static char *tempbuf;     /* Allocated when needed. */
@@ -303,6 +306,11 @@ static volatile int read_lock;
 
 static bool delete_entry(long idx_id);
 
+static inline void str_setlen(char *buf, size_t len)
+{
+    buf[len] = '\0';
+}
+
 static void allocate_tempbuf(void)
 {
     /* Yeah, malloc would be really nice now :) */
@@ -347,6 +355,27 @@ const char* tagcache_tag_to_str(int tag)
 static ssize_t ecread_tagfile_entry(int fd, struct tagfile_entry *buf)
 {
     return ecread(fd, buf, 1, tagfile_entry_ec, tc_stat.econ);
+}
+
+enum e_ecread_errors {e_SUCCESS = 0, e_ENTRY_SIZEMISMATCH = 1, e_TAG_TOOLONG, e_TAG_SIZEMISMATCH};
+static enum e_ecread_errors ecread_tagfile_entry_and_tag
+                       (int fd, struct tagfile_entry *tfe, char* buf, int bufsz)
+{
+    long tag_length;
+    str_setlen(buf, 0);
+    if (ecread_tagfile_entry(fd, tfe)!= sizeof(struct tagfile_entry))
+    {
+        return e_ENTRY_SIZEMISMATCH;
+    }
+    tag_length = tfe->tag_length;
+    if (tag_length >= bufsz)
+        return e_TAG_TOOLONG;
+
+    if (read(fd, buf, tag_length) != tag_length)
+        return e_TAG_SIZEMISMATCH;
+
+    str_setlen(buf, tag_length);
+    return e_SUCCESS;
 }
 
 static ssize_t ecread_index_entry(int fd, struct index_entry *buf)
@@ -508,7 +537,7 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
     bool found = false;
     struct tagfile_entry tfe;
     int fd;
-    char buf[TAG_MAXLEN+32];
+    char buf[TAGCACHE_BUFSZ];
     const long bufsz = sizeof(buf);
     int i;
     int pos = -1;
@@ -545,32 +574,33 @@ static long find_entry_disk(const char *filename_raw, bool localfd)
             pos_history[i+1] = pos_history[i];
         pos_history[0] = pos;
 
-        if (ecread_tagfile_entry(fd, &tfe)
-            != sizeof(struct tagfile_entry))
+        int res = ecread_tagfile_entry_and_tag(fd, &tfe, buf, bufsz);
+        if (res == e_SUCCESS)
+        {;;}
+        else if (res == e_ENTRY_SIZEMISMATCH)
+            break;
+        else
         {
-            break ;
+            switch (res)
+            {
+                case e_TAG_TOOLONG:
+                    logf("too long tag #1");
+                    close(fd);
+                    if (!localfd)
+                        filenametag_fd = -1;
+                    last_pos = -1;
+                    return -2;
+                case e_TAG_SIZEMISMATCH:
+                    logf("read error #2");
+                    close(fd);
+                    if (!localfd)
+                        filenametag_fd = -1;
+                    last_pos = -1;
+                    return -3;
+                default:
+                    break;
+            }
         }
-
-        if (tfe.tag_length >= bufsz)
-        {
-            logf("too long tag #1");
-            close(fd);
-            if (!localfd)
-                filenametag_fd = -1;
-            last_pos = -1;
-            return -2;
-        }
-
-        if (read(fd, buf, tfe.tag_length) != tfe.tag_length)
-        {
-            logf("read error #2");
-            close(fd);
-            if (!localfd)
-                filenametag_fd = -1;
-            last_pos = -1;
-            return -3;
-        }
-        buf[tfe.tag_length] = '\0';
 
         if (!strcmp(filename, buf))
         {
@@ -760,12 +790,12 @@ static bool open_files(struct tagcache_search *tcs, int tag)
 }
 
 static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
-                     struct index_entry *idx, int tag, char *buf, long size)
+                     struct index_entry *idx, int tag, char *buf, long bufsz)
 {
     struct tagfile_entry tfe;
     long seek;
 
-    *buf = '\0';
+    str_setlen(buf, 0);
 
     if (TAGCACHE_IS_NUMERIC(tag))
         return false;
@@ -783,7 +813,7 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
 #ifdef HAVE_DIRCACHE
         if (tag == tag_filename && (idx->flag & FLAG_DIRCACHE))
         {
-            if (dircache_get_fileref_path(&tcrc_dcfrefs[idx_id], buf, size) >= 0)
+            if (dircache_get_fileref_path(&tcrc_dcfrefs[idx_id], buf, bufsz) >= 0)
                 return true;
         }
         else
@@ -792,7 +822,7 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
         {
             struct tagfile_entry *ep =
                 (struct tagfile_entry *)&tcramcache.hdr->tags[tag][seek];
-            strlcpy(buf, ep->tag_data, size);
+            strlcpy(buf, ep->tag_data, bufsz);
 
             return true;
         }
@@ -803,27 +833,23 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
         return false;
 
     lseek(tcs->idxfd[tag], seek, SEEK_SET);
-    if (ecread_tagfile_entry(tcs->idxfd[tag], &tfe)
-        != sizeof(struct tagfile_entry))
+    switch (ecread_tagfile_entry_and_tag(tcs->idxfd[tag], &tfe, buf, bufsz))
     {
-        logf("read error #5");
-        return false;
+        case e_SUCCESS:
+             break;
+        case e_ENTRY_SIZEMISMATCH:
+            logf("read error #5");
+            return false;
+        case e_TAG_TOOLONG:
+            logf("too long tag #5");
+            return false;
+        case e_TAG_SIZEMISMATCH:
+            logf("read error #6");
+            return false;
+        default:
+            logf("unknown_error");
+            break;;
     }
-
-    if (tfe.tag_length >= size)
-    {
-        logf("too small buffer");
-        return false;
-    }
-
-    if (read(tcs->idxfd[tag], buf, tfe.tag_length) !=
-        tfe.tag_length)
-    {
-        logf("read error #6");
-        return false;
-    }
-
-    buf[tfe.tag_length] = '\0';
 
     return true;
 }
@@ -874,6 +900,15 @@ static long find_tag(int tag, int idx_id, const struct index_entry *idx)
     return idx->tag_seek[tag];
 }
 
+static inline long sec_in_ms(long ms)
+{
+    return (ms/1000) % 60;
+}
+
+static inline long min_in_ms(long ms)
+{
+    return (ms/1000) / 60;
+}
 
 static long check_virtual_tags(int tag, int idx_id,
                                const struct index_entry *idx)
@@ -883,19 +918,19 @@ static long check_virtual_tags(int tag, int idx_id,
     switch (tag)
     {
         case tag_virt_length_sec:
-            data = (find_tag(tag_length, idx_id, idx)/1000) % 60;
+            data = sec_in_ms(find_tag(tag_length, idx_id, idx));
             break;
 
         case tag_virt_length_min:
-            data = (find_tag(tag_length, idx_id, idx)/1000) / 60;
+            data = min_in_ms(find_tag(tag_length, idx_id, idx));
             break;
 
         case tag_virt_playtime_sec:
-            data = (find_tag(tag_playtime, idx_id, idx)/1000) % 60;
+            data = sec_in_ms(find_tag(tag_playtime, idx_id, idx));
             break;
 
         case tag_virt_playtime_min:
-            data = (find_tag(tag_playtime, idx_id, idx)/1000) / 60;
+            data = min_in_ms(find_tag(tag_playtime, idx_id, idx));
             break;
 
         case tag_virt_autoscore:
@@ -916,12 +951,11 @@ static long check_virtual_tags(int tag, int idx_id,
                      autoscore = 100 * (alpha / playcout + beta / length / playcount)
                    Both terms should be small enough to avoid any overflow
                 */
-                data = 100 * (find_tag(tag_playtime, idx_id, idx)
-                              / find_tag(tag_length, idx_id, idx))
-                       + (100 * (find_tag(tag_playtime, idx_id, idx)
-                                 % find_tag(tag_length, idx_id, idx)))
-                         / find_tag(tag_length, idx_id, idx);
-                data /=  find_tag(tag_playcount, idx_id, idx);
+                long playtime = find_tag(tag_playtime, idx_id, idx);
+                long length = find_tag(tag_length, idx_id, idx);
+                long playcount = find_tag(tag_playcount, idx_id, idx);
+                data = 100 * (playtime / length) + (100 * (playtime % length)) / length;
+                data /= playcount;
             }
             break;
 
@@ -1105,21 +1139,25 @@ static bool check_clauses(struct tagcache_search *tcs,
 
                 int fd = tcs->idxfd[tag];
                 lseek(fd, seek, SEEK_SET);
-                ecread_tagfile_entry(fd, &tfe);
-                if (tfe.tag_length >= bufsz)
+
+                switch (ecread_tagfile_entry_and_tag(fd, &tfe, str, bufsz))
                 {
-                    logf("Too long tag read!");
-                    return false;
+                    case e_SUCCESS:
+                         break;
+                    case e_ENTRY_SIZEMISMATCH:
+                        logf("read error #15");
+                        return false;
+                    case e_TAG_TOOLONG:
+                        logf("too long tag #6");
+                        return false;
+                    case e_TAG_SIZEMISMATCH:
+                        logf("read error #16");
+                        return false;
+                    default:
+                        logf("unknown_error");
+                        break;;
                 }
-
-                if (read(fd, str, tfe.tag_length)!= tfe.tag_length)
-                {
-                    logf("read error #15");
-                    return false;
-                }
-
-                str[tfe.tag_length] = '\0';
-
+  
                 /* Check if entry has been deleted. */
                 if (str[0] == '\0')
                     return false;
@@ -1489,7 +1527,7 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
 static bool get_next(struct tagcache_search *tcs)
 {
     /* WARNING pointers into buf are used in outside functions */
-    static char buf[TAG_MAXLEN+32];
+    static char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
     struct tagfile_entry entry;
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
@@ -1607,26 +1645,26 @@ static bool get_next(struct tagcache_search *tcs)
     /* Seek stream to the correct position and continue to direct fetch. */
     lseek(tcs->idxfd[tcs->type], tcs->position, SEEK_SET);
 
-    if (ecread_tagfile_entry(tcs->idxfd[tcs->type], &entry) != sizeof(struct tagfile_entry))
+    switch (ecread_tagfile_entry_and_tag(tcs->idxfd[tcs->type], &entry, buf, bufsz))
     {
-        logf("read error #5");
-        tcs->valid = false;
-        return false;
-    }
-    
-    if (entry.tag_length > (long)bufsz)
-    {
-        tcs->valid = false;
-        logf("too long tag #2");
-        logf("P:%lX/%lX", tcs->position, entry.tag_length);
-        return false;
-    }
-
-    if (read(tcs->idxfd[tcs->type], buf, entry.tag_length) != entry.tag_length)
-    {
-        tcs->valid = false;
-        logf("read error #4");
-        return false;
+        case e_SUCCESS:
+             break;
+        case e_ENTRY_SIZEMISMATCH:
+            logf("read error #5");
+            tcs->valid = false;
+            return false;
+        case e_TAG_TOOLONG:
+            tcs->valid = false;
+            logf("too long tag #2");
+            logf("P:%lX/%lX", tcs->position, entry.tag_length);
+            return false;
+        case e_TAG_SIZEMISMATCH:
+            tcs->valid = false;
+            logf("read error #4");
+            return false;
+        default:
+            logf("unknown_error");
+            break;;
     }
 
     /**
@@ -1634,7 +1672,8 @@ static bool get_next(struct tagcache_search *tcs)
      if filters or clauses are being used).
      */
     tcs->position += sizeof(struct tagfile_entry) + entry.tag_length;
-    buf[entry.tag_length] = '\0';
+    str_setlen(buf, entry.tag_length);
+
     tcs->result = buf;
     tcs->result_len = strlen(tcs->result) + 1;
     tcs->idx_id = entry.idx_id;
@@ -1831,7 +1870,7 @@ static int check_if_empty(char **tag)
     {
         logf("over length tag: %s", *tag);
         length = TAG_MAXLEN;
-        (*tag)[length] = '\0';
+        str_setlen((*tag), length);
     }
 
     return length + 1;
@@ -1845,8 +1884,8 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
 {
     #define ADD_TAG(entry, tag, data) \
         /* Adding tag */                              \
-        entry.tag_offset[tag] = offset;               \
         entry.tag_length[tag] = check_if_empty(data); \
+        entry.tag_offset[tag] = offset;               \
         offset += entry.tag_length[tag]
 
     struct mp3entry id3;
@@ -2027,12 +2066,11 @@ static bool tempbuf_insert(char *str, int id, int idx_id, bool unique)
     int i;
     unsigned crc32;
     unsigned *crcbuf = (unsigned *)&tempbuf[tempbuf_size-4];
-    char buf[TAG_MAXLEN+32];
+    char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
     
     for (i = 0; str[i] != '\0' && i < bufsz-1; i++)
         buf[i] = tolower(str[i]);
-    buf[i] = '\0';
 
     crc32 = crc_32(buf, i, 0xffffffff);
 
@@ -2243,7 +2281,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
     int entries_processed = 0;
     int i, j;
 
-    char buf[TAG_MAXLEN + 32];
+    char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
 
     max_entries = tempbuf_size / sizeof(struct temp_file_entry) - 1;
@@ -2310,7 +2348,7 @@ static bool build_numeric_indices(struct tagcache_header *h, int tmpfd)
         close(masterfd); \
         return false; \
     } \
-    buf[tfe->tag_length[tag]] = '\0'; \
+    str_setlen(buf, tfe->tag_length[tag]); \
     \
     tfe->tag_offset[tag] = crc_32(buf, strlen(buf), 0xffffffff); \
     lseek(tmpfd, datastart, SEEK_SET)
@@ -2484,7 +2522,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
     struct master_header   tcmh;
     struct index_entry idxbuf[IDX_BUF_DEPTH];
     int idxbuf_pos;
-    char buf[TAG_MAXLEN+32];
+    char buf[TAGCACHE_BUFSZ];
     const long bufsz = sizeof(buf);
     int fd = -1, masterfd;
     bool error = false;
@@ -2581,28 +2619,27 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 struct tagfile_entry entry;
                 int loc = lseek(fd, 0, SEEK_CUR);
                 bool ret;
-
-                if (ecread_tagfile_entry(fd, &entry) != sizeof(struct tagfile_entry))
+                switch (ecread_tagfile_entry_and_tag(fd, &entry, buf, bufsz))
                 {
-                    logf("read error #7");
-                    close(fd);
-                    return -2;
+                    case e_SUCCESS:
+                         break;
+                    case e_ENTRY_SIZEMISMATCH:
+                        logf("read error #7");
+                        close(fd);
+                        return -2;
+                    case e_TAG_TOOLONG:
+                        logf("too long tag #3");
+                        close(fd);
+                        return -2;
+                    case e_TAG_SIZEMISMATCH:
+                        logf("read error #8");
+                        close(fd);
+                        return -2;
+                    default:
+                        logf("unknown_error");
+                        break;;
                 }
 
-                if (entry.tag_length >= bufsz)
-                {
-                    logf("too long tag #3");
-                    close(fd);
-                    return -2;
-                }
-
-                if (read(fd, buf, entry.tag_length) != entry.tag_length)
-                {
-                    logf("read error #8");
-                    close(fd);
-                    return -2;
-                }
-                buf[entry.tag_length] = '\0';
                 /* Skip deleted entries. */
                 if (buf[0] == '\0')
                     continue;
@@ -2750,7 +2787,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
                 error = true;
                 goto error_exit;
             }
-            buf[entry.tag_length[index_type]] = '\0';
+            str_setlen(buf, entry.tag_length[index_type]);
 
             if (TAGCACHE_IS_UNIQUE(index_type))
                 error = !tempbuf_insert(buf, i, -1, true);
@@ -3350,7 +3387,7 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
         buf[i] = *(datastr++);
     }
 
-    buf[bufsz - 1] = '\0';
+    str_setlen(buf, bufsz - 1);
     strlcpy(&buf[i], "\" ", (bufsz - i - 1));
 
     write(fd, buf, i + 2);
@@ -3383,10 +3420,11 @@ static bool read_tag(char *dest, long size,
             src++;
             pos++;
 
-            if (*src == '\0' || pos >= (long)sizeof(current_tag))
+            if (*src == '\0' || pos >= (int) sizeof(current_tag))
                 return false;
         }
-        current_tag[pos] = '\0';
+
+        str_setlen(current_tag, pos); 
 
         /* Read in tag data */
 
@@ -3427,7 +3465,7 @@ static bool read_tag(char *dest, long size,
             dest[pos] = *(src++);
         }
 
-        dest[pos] = '\0';
+        str_setlen(dest, pos); 
 
         if (!strcasecmp(tagstr, current_tag))
             return true;
@@ -3439,7 +3477,7 @@ static bool read_tag(char *dest, long size,
 static int parse_changelog_line(int line_n, char *buf, void *parameters)
 {
     struct index_entry idx;
-    char tag_data[TAG_MAXLEN+32];
+    char tag_data[TAGCACHE_BUFSZ];
     int idx_id;
     long masterfd = (long)(intptr_t)parameters;
     const int import_tags[] = { tag_playcount, tag_rating, tag_playtime,
@@ -3561,7 +3599,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
 {
     struct master_header myhdr;
     struct index_entry idx;
-    char buf[TAG_MAXLEN+32];
+    char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
     char temp[32];
     int clfd;
@@ -3648,7 +3686,7 @@ static bool delete_entry(long idx_id)
     int tag, i;
     struct index_entry idx, myidx;
     struct master_header myhdr;
-    char buf[TAG_MAXLEN+32];
+    char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
     int in_use[TAG_COUNT];
 
@@ -3758,24 +3796,24 @@ static bool delete_entry(long idx_id)
 
             /* Skip the header block */
             lseek(fd, myidx.tag_seek[tag], SEEK_SET);
-            if (ecread_tagfile_entry(fd, &tfe) != sizeof(struct tagfile_entry))
-            {
-                logf("delete_entry(): read error #3");
-                goto cleanup;
-            }
 
-            if (tfe.tag_length >= (long)bufsz)
+            switch (ecread_tagfile_entry_and_tag(fd, &tfe, buf, bufsz))
             {
-                logf("too long tag #4");
-                goto cleanup;
+                case e_SUCCESS:
+                     break;
+                case e_ENTRY_SIZEMISMATCH:
+                    logf("delete_entry(): read error #3");
+                    goto cleanup;
+                case e_TAG_TOOLONG:
+                    logf("too long tag #4");
+                    goto cleanup;
+                case e_TAG_SIZEMISMATCH:
+                    logf("delete_entry(): read error #3");
+                    goto cleanup;
+                default:
+                    logf("unknown_error");
+                    break;;
             }
-
-            if (read(fd, buf, tfe.tag_length) != tfe.tag_length)
-            {
-                logf("delete_entry(): read error #4");
-                goto cleanup;
-            }
-            buf[tfe.tag_length] = '\0';
 
             myidx.tag_seek[tag] = crc_32(buf, strlen(buf), 0xffffffff);
         }
@@ -3797,7 +3835,7 @@ static bool delete_entry(long idx_id)
         {
             struct tagfile_entry *tagentry =
                     (struct tagfile_entry *)&tcramcache.hdr->tags[tag][oldseek];
-            tagentry->tag_data[0] = '\0';
+            str_setlen(tagentry->tag_data, 0); 
         }
 #endif /* HAVE_TC_RAMCACHE */
 
@@ -4183,11 +4221,11 @@ static bool load_tagcache(void)
                 bytesleft -= sizeof (struct dircache_fileref);
             #endif /* HAVE_DIRCACHE */
 
-                char filename[TAG_MAXLEN+32];
+                char filename[TAGCACHE_BUFSZ];
                 if (fe->tag_length >= (long)sizeof(filename)-1)
                 {
                     read(fd, filename, 10);
-                    filename[10] = '\0';
+                    str_setlen(filename, 10);
                     logf("TAG:%s", filename);
                     logf("too long filename");
                     goto failure;
@@ -4287,7 +4325,7 @@ failure:
 static bool check_deleted_files(void)
 {
     int fd;
-    char buf[TAG_MAXLEN+32];
+    char buf[TAGCACHE_BUFSZ];
     const int bufsz = sizeof(buf);
     struct tagfile_entry tfe;
 
@@ -4318,7 +4356,7 @@ static bool check_deleted_files(void)
             close(fd);
             return false;
         }
-        buf[tfe.tag_length] = '\0';
+        str_setlen(buf, tfe.tag_length);
 
         /* Check if the file has already deleted from the db. */
         if (*buf == '\0')
@@ -4420,7 +4458,7 @@ static bool add_search_root(const char *name)
     if (len < 0)
         return false;
 
-    target[len] = '\0';
+    str_setlen(target, len);
     if (realpath(target, abs_target) == NULL)
         return false;
 
@@ -4539,7 +4577,7 @@ static bool check_dir(const char *dirname, int add_files)
             tc_stat.curentry = NULL;
         }
 
-        curpath[len] = '\0';
+        str_setlen(curpath, len);
     }
 
     closedir(dir);
@@ -4566,7 +4604,7 @@ void do_tagcache_build(const char *path[])
     struct tagcache_header header;
     bool ret;
 
-    curpath[0] = '\0';
+    str_setlen(curpath, 0);
     data_size = 0;
     total_entry_count = 0;
     processed_dir_count = 0;
