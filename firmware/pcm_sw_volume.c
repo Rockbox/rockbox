@@ -51,10 +51,10 @@ static typeof (memcpy) *pcm_scaling_fn = NULL;
 #define PCM_F_T int64_t /* Requires large integer math */
 #endif /* PCM_SW_VOLUME_FRACBITS */
 
-/* Scale and round sample by PCM factor */
+/* Scale sample by PCM factor */
 static inline int32_t pcm_scale_sample(PCM_F_T f, int32_t s)
 {
-    return (f * s + (PCM_F_T)PCM_FACTOR_UNITY/2) >> PCM_SW_VOLUME_FRACBITS;
+    return (f * s) >> PCM_SW_VOLUME_FRACBITS;
 }
 
 /* Both UNITY, use direct copy */
