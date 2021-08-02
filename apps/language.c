@@ -86,7 +86,7 @@ int lang_load(const char *filename, const unsigned char *builtin,
             lang_init(builtin, dest, max_id);
             lseek(fd, foffset, SEEK_SET);
             read(fd, buffer, lang_size);
-
+            buffer[max_lang_size - 1] = '\0'; /* ensure buffer is null terminated */
             while(lang_size>3) {
                 id = ((buffer[0]<<8) | buffer[1]); /* get two-byte id */
                 buffer += 2;                       /* pass the id */
@@ -100,7 +100,7 @@ int lang_load(const char *filename, const unsigned char *builtin,
                 while(*buffer) {               /* pass the string */
                     lang_size--;
                     buffer++;
-                 }
+                }
                 lang_size-=3; /* the id and the terminating zero */
                 buffer++;     /* pass the terminating zero-byte */
             }
