@@ -29,7 +29,7 @@
 /* a small DC offset appears to prevent play/pause clicking */
 #define PCM_DC_OFFSET_VALUE -1
 
-AUDIOHW_SETTING(VOLUME, "dB", 0, 1, PCM5102A_VOLUME_MIN/10, PCM5102A_VOLUME_MAX/10, 0)
+AUDIOHW_SETTING(VOLUME, "dB", 0, 2, PCM5102A_VOLUME_MIN/10, PCM5102A_VOLUME_MAX/10, 0)
 
 /* this just calls audiohw_set_volume() with the last (locally) known volume,
  * used for switching to/from fixed line out volume. */

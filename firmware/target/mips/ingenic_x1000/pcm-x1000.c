@@ -66,10 +66,17 @@ void pcm_play_dma_init(void)
     /* Let the target initialize its hardware and setup the AIC */
     audiohw_init();
 
+#if (PCM_NATIVE_BITDEPTH > 16)
+    /* Program audio format (stereo, 24 bit samples) */
+    jz_writef(AIC_CCR, PACK16(0), CHANNEL_V(STEREO),
+              OSS_V(24BIT), ISS_V(24BIT), M2S(0));
+    jz_writef(AIC_I2SCR, SWLH(0));
+#else
     /* Program audio format (stereo, packed 16 bit samples) */
     jz_writef(AIC_CCR, PACK16(1), CHANNEL_V(STEREO),
               OSS_V(16BIT), ISS_V(16BIT), M2S(0));
     jz_writef(AIC_I2SCR, SWLH(0));
+#endif
 
     /* Set DMA settings */
     jz_writef(AIC_CFG, TFTH(16), RFTH(16));

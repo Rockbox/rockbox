@@ -70,10 +70,14 @@ void audiohw_set_volume(int vol_l, int vol_r)
     }
 #endif
 
-    l = l <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : l;
-    r = r <= PCM5102A_VOLUME_MIN ? PCM_MUTE_LEVEL : r;
-
-    pcm_set_master_volume(l, r);
+    if (l <= PCM5102A_VOLUME_MIN || r <= PCM5102A_VOLUME_MIN)
+    {
+        pcm_set_master_volume(PCM_MUTE_LEVEL, PCM_MUTE_LEVEL);
+    }
+    else
+    {
+        pcm_set_master_volume(l/20, r/20);
+    }
 }
 
 void audiohw_mute_hp(int mute)

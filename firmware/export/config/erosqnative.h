@@ -64,6 +64,9 @@
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_SW_VOLUME_CONTROL
 
+/* use high-bitdepth volume scaling */
+#define PCM_NATIVE_BITDEPTH 24
+
 /* Button defines */
 #define CONFIG_KEYPAD   EROSQ_PAD
 #define HAVE_SCROLLWHEEL
