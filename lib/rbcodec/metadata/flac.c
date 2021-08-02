@@ -125,12 +125,24 @@ bool get_flac_metadata(int fd, struct mp3entry* id3)
                 id3->albumart.pos = lseek(fd, 0, SEEK_CUR);
 
                 int bytes_read = read(fd, buf, buf_size);
+                buf[buf_size-1] = '\0';
                 i -= bytes_read;
+                if (bytes_read <= picframe_pos + 4) /* get_long_be expects 4 chars */
+                {
+                    logf("flac picture length invalid!");
+                    return false;
+                }
 
                 mime_length = get_long_be(&buf[picframe_pos]);
 
                 char *mime = buf + picframe_pos + 4;
                 picframe_pos +=  4 + mime_length;
+
+                if (bytes_read < picframe_pos)
+                {
+                    logf("flac picture length invalid!");
+                    return false;
+                }
 
                 id3->albumart.type = AA_TYPE_UNKNOWN;
                 if (memcmp(mime, "image/", 6) == 0)
