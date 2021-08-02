@@ -848,7 +848,7 @@ void root_menu(void)
                     }
                 }
 
-                open_plugin_get_entry(key, &open_plugin_entry);
+                bool flush = (open_plugin_get_entry(key, &open_plugin_entry) == -2);
                 char *path = open_plugin_entry.path;
                 char *param = open_plugin_entry.param;
                 if (param[0] == '\0')
@@ -856,7 +856,7 @@ void root_menu(void)
 
                 next_screen = load_plugin_screen(path, param);
 
-                if (next_screen != GO_TO_PLUGIN)
+                if (!flush && next_screen != GO_TO_PLUGIN)
                     open_plugin_add_path(NULL, NULL, NULL);
 
                 /* shortcuts may take several trips through the GO_TO_PLUGIN case

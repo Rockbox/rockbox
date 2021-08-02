@@ -49,7 +49,7 @@ static inline void op_clear_entry(struct open_plugin_entry_t *entry)
     }
 }
 
-static int op_update_dat(struct open_plugin_entry_t *entry)
+static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
 {
     int fd, fd1;
     uint32_t hash;
@@ -79,7 +79,9 @@ static int op_update_dat(struct open_plugin_entry_t *entry)
 
     rename(OPEN_PLUGIN_DAT ".tmp", OPEN_PLUGIN_DAT);
 
-    op_clear_entry(&open_plugin_entry);
+    if (clear)
+        op_clear_entry(&open_plugin_entry);
+
     return 0;
 }
 
@@ -106,7 +108,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
     if(open_plugin_entry.hash != hash)
     {
         /* the entry in ram needs saved */
-        op_update_dat(&open_plugin_entry);
+        op_update_dat(&open_plugin_entry, true);
     }
 
     if (plugin)
@@ -182,9 +184,9 @@ static int open_plugin_hash_get_entry(uint32_t hash,
         if (hash != 0)
         {
             if(entry->hash == hash) /* hasn't been flushed yet? */
-                return 0;
+                return -2;
             else
-                op_update_dat(&open_plugin_entry);
+                op_update_dat(&open_plugin_entry, true);
         }
 
         int fd = open(dat_file, O_RDONLY);
@@ -232,7 +234,8 @@ int open_plugin_run(const char *key)
     const char *path;
     const char *param;
 
-    open_plugin_get_entry(key, &open_plugin_entry);
+    if (open_plugin_get_entry(key, &open_plugin_entry) == -2) /* entry needs flushed */
+        op_update_dat(&open_plugin_entry, false);
 
     path = open_plugin_entry.path;
     param = open_plugin_entry.param;
@@ -250,7 +253,7 @@ int open_plugin_run(const char *key)
 
 void open_plugin_cache_flush(void)
 {
-    op_update_dat(&open_plugin_entry);
+    op_update_dat(&open_plugin_entry, true);
 }
 
 #endif /* ndef __PCTOOL__ */
