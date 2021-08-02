@@ -970,6 +970,9 @@ void setid3v2title(int fd, struct mp3entry *entry)
                 if((tr->tag_length == 4 && !memcmp( header, "COMM", 4)) ||
                    (tr->tag_length == 3 && !memcmp( header, "COM", 3))) {
                     int offset;
+                    if (buffersize - bufferpos <= 4)
+                        return; /* Error ?? */
+
                     if(bytesread >= 8 && !strncmp(tag+4, "iTun", 4)) {
                         /* check for iTunes gapless information */
                         if(bytesread >= 12 && !strncmp(tag+4, "iTunSMPB", 8))
