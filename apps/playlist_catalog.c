@@ -87,11 +87,14 @@ static int initialize_catalog(void)
                 mkdir(playlist_dir);
         }
 
+        playlist_dir_length = strlen(playlist_dir);
+
         /* remove duplicate leading '/' */
         if (playlist_dir[0] == '/' && playlist_dir[1] == '/')
-            strcpy(playlist_dir, &playlist_dir[1]);
-
-        playlist_dir_length = strlen(playlist_dir);
+        {
+            memmove(&playlist_dir[0], &playlist_dir[1], playlist_dir_length); /* gets the \0 too */
+            playlist_dir_length--;
+        }
 
         if (dir_exists(playlist_dir))
         {
@@ -125,7 +128,8 @@ void catalog_set_directory(const char* directory)
     }
     else
     {
-        strcpy(global_settings.playlist_catalog_dir, directory);
+        strlcpy(global_settings.playlist_catalog_dir,
+                directory, sizeof(global_settings.playlist_catalog_dir));
     }
     initialized = false;
     initialize_catalog();
