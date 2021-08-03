@@ -185,7 +185,8 @@ static int filetype_count = 0;
 static unsigned char highest_attr = 0;
 static int viewer_count = 0;
 
-static int strdup_handle, strdup_bufsize, strdup_cur_idx;
+static int strdup_handle, strdup_cur_idx;
+static size_t strdup_bufsize;
 static int move_callback(int handle, void* current, void* new)
 {
     /*could compare to strdup_handle, but ops is only used once */
@@ -353,13 +354,20 @@ void  filetype_init(void)
     if (fd < 0)
         return;
 
-    strdup_bufsize = filesize(fd);
-    strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
-    if (strdup_handle <= 0)
+    off_t filesz = filesize(fd);
+
+    if (filesz > 0)
+    {
+        strdup_bufsize = (size_t)filesz;
+        strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
+    }
+
+    if (filesz <= 0 || strdup_handle <= 0)
     {
         close(fd);
         return;
     }
+
     read_builtin_types();
     read_config(fd);
     close(fd);
