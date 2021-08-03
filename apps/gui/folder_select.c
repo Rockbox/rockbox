@@ -165,7 +165,10 @@ static struct folder* load_folder(struct folder* parent, char *folder)
         }
         char *name = folder_alloc_from_end(len+1);
         if (!name)
+        {
+            closedir(dir);
             return NULL;
+        }
         memcpy(name, (char *)entry->d_name, len+1);
         child_count++;
         first_child = name;
