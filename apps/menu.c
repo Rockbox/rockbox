@@ -180,6 +180,12 @@ static void init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback,
                      struct viewport parent[NB_SCREENS])
 {
+    if (!menu || !lists)
+    {
+        panicf("init_menu_lists, NULL pointer");
+        return;
+    }
+
     int i;
     int count = MIN(MENU_GET_COUNT(menu->flags), MAX_MENU_SUBITEMS);
     int type = (menu->flags&MENU_TYPE_MASK);
@@ -341,12 +347,19 @@ void do_setting_from_menu(const struct menu_item_ex *temp,
 {
     char *title;
     int setting_id;
+    if (!temp)
+    {
+        panicf("do_setting_from_menu, NULL pointer");
+        return;
+    }
     const struct settings_list *setting =
         find_setting(temp->variable, &setting_id);
-    if (temp && ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT))
+
+    if ((temp->flags&MENU_TYPE_MASK) == MT_SETTING_W_TEXT)
         title = temp->callback_and_desc->desc;
     else
         title = ID2P(setting->lang_id);
+
     do_setting_screen(setting, title, parent);
 }
 
