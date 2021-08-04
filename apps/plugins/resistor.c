@@ -953,9 +953,9 @@ static void color_to_resistance(void)
         if(third_band==RES_INVALID) break;
 
         fourth_band = do_fourth_band_menu();
-        if(third_band==RES_INVALID) break;
-                    
-        total_resistance_centiunits = calculate_resistance(first_band, 
+        if(fourth_band==RES_INVALID) break;
+
+        total_resistance_centiunits = calculate_resistance(first_band,
                                                            second_band,
                                                            third_band);
 
