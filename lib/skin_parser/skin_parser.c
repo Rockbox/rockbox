@@ -778,6 +778,11 @@ static int skin_parse_tag(struct skin_element* element, const char** document)
         else if (tolower(type_code) == 't')
         {
             struct skin_element* child = skin_alloc_element();
+            if (!child)
+            {
+                skin_error(MEMORY_LIMIT_EXCEEDED, cursor);
+                return 0;
+            }
             child->type = TAG;
             if (!skin_parse_tag(child, &cursor))
                 return 0;
