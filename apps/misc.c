@@ -1049,6 +1049,11 @@ int format_sound_value(char *buf, size_t size, int snd, int val)
     int physval = sound_val2phys(snd, val);
 
     unsigned int factor = ipow(10, numdec);
+    if (factor == 0)
+    {
+        DEBUGF("DIVISION BY ZERO: format_sound_value s:%d v:%d", snd, val);
+        factor = 1;
+    }
     unsigned int av = abs(physval);
     unsigned int i = av / factor;
     unsigned int d = av - i*factor;
