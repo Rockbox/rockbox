@@ -78,10 +78,6 @@ mikmod
 pdbox
 #endif
 
-#if !defined(RB_PROFILE) && MEMORYSIZE > 2  /* mpegplayer allocates at least 2MB of RAM */
-mpegplayer
-#endif
-
 /* Lua needs at least 160 KB to work in */
 #if PLUGIN_BUFFER_SIZE >= 0x80000
 lua
