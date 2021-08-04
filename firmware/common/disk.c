@@ -174,6 +174,13 @@ int disk_mount(int drive)
 
     int volume = get_free_volume();
 
+    if (volume < 0)
+    {
+        DEBUGF("No Free Volumes\n");
+        disk_writer_unlock();
+        return 0;
+    }
+
     if (!disk_init(IF_MD(drive)))
     {
         disk_writer_unlock();
