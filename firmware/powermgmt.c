@@ -197,12 +197,15 @@ int battery_time(void)
 
 #ifndef CURRENT_NORMAL /* no estimation without current */
     return -1;
-#endif
+#else
     if (battery_capacity <= 0) /* nor without capacity */
         return -1;
-
-#endif
     return _battery_time();
+#endif
+
+#else
+    return _battery_time();
+#endif
 }
 
 /* Returns battery level in percent */
