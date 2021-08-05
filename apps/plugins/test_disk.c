@@ -156,7 +156,7 @@ static bool test_fs(void)
     fd = rb->open(TEST_FILE, O_RDONLY);
     if (fd < 0)
     {
-        rb->splashf(0, "open() failed: %d", ret);
+        rb->splashf(0, "open() failed: %d", fd);
         goto error;
     }
 
