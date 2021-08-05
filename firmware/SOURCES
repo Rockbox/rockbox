@@ -270,6 +270,7 @@ common/unicode.c
 common/vuprintf.c
 common/zip.c
 common/adler32.c
+common/inflate.c
 
 /* Display */
 scroll_engine.c
