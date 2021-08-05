@@ -54,6 +54,9 @@ int rtc_write_datetime(const struct tm *tm)
     tv.tv_sec = mktime((struct tm *)tm);
     tv.tv_usec = 0;
 
+    if ((int)tv.tv_sec == -1)
+        return -1;
+
     /* set system clock */
     settimeofday(&tv, NULL);
 
