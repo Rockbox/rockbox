@@ -682,7 +682,9 @@ static int main_menu(void)
 /* double buffering thread */
 static void thread(void)
 {
-    struct queue_event ev;
+    struct queue_event ev = {
+         .id = 0,
+    };
 
     while (1)
     {
