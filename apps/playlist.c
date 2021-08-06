@@ -3707,7 +3707,7 @@ int playlist_save(struct playlist_info* playlist, char *filename,
         if (!rename(path, tmp_buf))
         {
             fd = open_utf8(tmp_buf, O_RDONLY);
-            if (fsamefile(fd, playlist->fd) > 0)
+            if (fd >= 0 && fsamefile(fd, playlist->fd) > 0)
             {
                 /* Replace the current playlist with the new one and update
                    indices */
