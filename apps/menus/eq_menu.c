@@ -49,6 +49,7 @@
 #include "exported_menus.h"
 #include "pcmbuf.h"
 #include "option_select.h"
+#include "string-extra.h"
 
 /*
  * Utility functions
