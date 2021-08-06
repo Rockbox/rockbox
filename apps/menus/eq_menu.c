@@ -239,14 +239,12 @@ static void selection_to_banditem(int selection, int expanded_band, int *band, i
 
 static char *advancedmenu_item_get_name(int selected_item, void *data, char *buffer, size_t len)
 {
-    (void)len;
     int band;
     int item;
-    char *lang = NULL;
+    int lang = -1;
 
     selection_to_banditem(selected_item, *(intptr_t*)data, &band, &item);
 
-    strcpy(buffer, "\t");
     switch (item)
     {
     case 0: /* Band title */
@@ -256,27 +254,34 @@ static char *advancedmenu_item_get_name(int selected_item, void *data, char *buf
             return str(LANG_EQUALIZER_BAND_HIGH_SHELF);
         else
         {
-            snprintf(buffer, MAX_PATH, str(LANG_EQUALIZER_BAND_PEAK), band);
+            snprintf(buffer, len, str(LANG_EQUALIZER_BAND_PEAK), band);
             return buffer;
         }
         break;
     case 1: /* cutoff */
         if (band == 0)
-            lang = str(LANG_EQUALIZER_BAND_CUTOFF);
+            lang = LANG_EQUALIZER_BAND_CUTOFF;
         else if (band == EQ_NUM_BANDS - 1)
-            lang = str(LANG_EQUALIZER_BAND_CUTOFF);
+            lang = LANG_EQUALIZER_BAND_CUTOFF;
         else
-            lang = str(LANG_EQUALIZER_BAND_CENTER);
+            lang = LANG_EQUALIZER_BAND_CENTER;
         break;
     case 2: /* Q */
-        lang = str(LANG_EQUALIZER_BAND_Q);
+        lang = LANG_EQUALIZER_BAND_Q;
         break;
     case 3: /* Gain */
-        lang = str(LANG_GAIN);
+        lang = LANG_GAIN;
         break;
     }
 
-    return strcat(buffer, lang);;
+    if(lang < 0)
+        buffer[0] = 0;
+    else {
+        buffer[0] = '\t';
+        strlcpy(&buffer[1], str(lang), len - 1);
+    }
+
+    return buffer;
 }
 
 static int advancedmenu_speak_item(int selected_item, void *data)
