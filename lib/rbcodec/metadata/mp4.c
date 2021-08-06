@@ -529,7 +529,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 {
                     char value[TAG_VALUE_LENGTH];
                     char* value_p = value;
-                    char* any;
+                    char* any = NULL;
                     unsigned int length = sizeof(value);
 
                     read_mp4_tag_string(fd, size, &value_p, &length, &any);
