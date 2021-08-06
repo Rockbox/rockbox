@@ -52,7 +52,7 @@ void rb_backtrace(int pc, int sp, unsigned *line)
 
     for(int i = 0; i < count; i++)
     {
-        lcd_putsf(0, (*line)++, "  %s", buffer[i], strings[i]);
+        lcd_putsf(0, (*line)++, "  %s", strings[i]);
         lcd_update();
     }
 
