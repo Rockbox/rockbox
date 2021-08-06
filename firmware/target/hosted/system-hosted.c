@@ -67,7 +67,7 @@ static void sig_handler(int sig, siginfo_t *siginfo, void *context)
     lcd_putsf(0, line++, "%s at %08x", strsignal(sig), pc);
 
     if(sig == SIGILL || sig == SIGFPE || sig == SIGSEGV || sig == SIGBUS || sig == SIGTRAP)
-        lcd_putsf(0, line++, "address 0x%08x", siginfo->si_addr);
+        lcd_putsf(0, line++, "address %p", siginfo->si_addr);
 
     if(!triggered)
     {
