@@ -61,7 +61,7 @@ static int logdiskfindex;
 #ifdef ROCKBOX_HAS_LOGF
 
 #ifndef __PCTOOL__
-unsigned char logfbuffer[MAX_LOGF_SIZE];
+unsigned char logfbuffer[MAX_LOGF_SIZE + 1];
 int logfindex;
 bool logfwrap;
 bool logfenabled = true;
@@ -272,10 +272,14 @@ void logf_panic_dump(int *y)
         return;
     }
 
+    /* Explicitly null-terminate our buffer */
+    logfbuffer[MAX_LOGF_SIZE] = 0;
+
     lcd_puts(1, (*y)++, "start of logf data");
     lcd_update();
-    i = logfindex - 2; /* The last actual characer (i.e. not '\0') */
 
+    /* The intent is to dump the newest log entries first! */
+    i = logfindex - 2; /* The last actual characer (i.e. not '\0') */
     while(i >= 0)
     {
         while(logfbuffer[i] != 0 && i>=0)
@@ -300,12 +304,13 @@ void logf_panic_dump(int *y)
             }
             if(strlen( &logfbuffer[i + 1]) > 0)
             {
-                lcd_putsf(1, (*y)++, "%*s", (MAX_LOGF_SIZE-i) &logfbuffer[i + 1]);
+                lcd_putsf(1, (*y)++, "%*s", &logfbuffer[i + 1]);
                 lcd_update();
             }
         }
         i--;
     }
+
     lcd_puts(1, (*y)++, "end of logf data");
     lcd_update();
 }

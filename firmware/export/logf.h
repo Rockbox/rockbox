@@ -31,7 +31,7 @@
 
 #define MAX_LOGF_SIZE 16384
 
-extern unsigned char logfbuffer[MAX_LOGF_SIZE];
+extern unsigned char logfbuffer[MAX_LOGF_SIZE + 1];
 extern int logfindex;
 extern bool logfwrap;
 extern bool logfenabled;
