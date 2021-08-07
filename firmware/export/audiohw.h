@@ -692,4 +692,9 @@ AUDIOHW_SETTING(BALANCE,      "%", 0, 1, -100, 100,   0)
 AUDIOHW_SETTING(CHANNELS,      "", 0, 1,    0,   5,   0)
 AUDIOHW_SETTING(STEREO_WIDTH, "%", 0, 5,    0, 250, 100)
 
+/* if not otherwise defined, set to 16 */
+#if !defined(PCM_NATIVE_BITDEPTH)
+# define PCM_NATIVE_BITDEPTH 16
+#endif
+
 #endif /* _AUDIOHW_H_ */

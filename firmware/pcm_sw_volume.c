@@ -49,11 +49,6 @@ static uint32_t pcm_new_factor_l = 0, pcm_new_factor_r = 0;
 static uint32_t pcm_factor_l = 0, pcm_factor_r = 0;
 static typeof (memcpy) *pcm_scaling_fn = NULL;
 
-/* default to 16-bit volume scaling unless specified */
-#if !defined(PCM_NATIVE_BITDEPTH)
-# define PCM_NATIVE_BITDEPTH 16
-#endif
-
 /* take care of some defines for 32-bit software vol */
 #if (PCM_NATIVE_BITDEPTH > 16) /* >16-bit */
 

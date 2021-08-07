@@ -48,11 +48,6 @@ static void pcm_play_dma_int_cb(int event);
 static void pcm_rec_dma_int_cb(int event);
 #endif
 
-/* if not otherwise defined, set to 16 */
-#if !defined(PCM_NATIVE_BITDEPTH)
-# define PCM_NATIVE_BITDEPTH 16
-#endif
-
 void pcm_play_dma_init(void)
 {
     /* Ungate clock, assign pins. NB this overlaps with pins labeled "sa0-sa4"
