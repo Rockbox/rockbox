@@ -215,10 +215,9 @@ static bool headers_have_same_type(unsigned long header1,
 /* Helper function to read 4-byte in big endian format. */
 static void read_uint32be_mp3data(int fd, unsigned long *data)
 {
-#ifdef ROCKBOX_BIG_ENDIAN
+    *data = 0;
     (void)read(fd, (char*)data, 4);
-#else
-    (void)read(fd, (char*)data, 4);
+#ifndef ROCKBOX_BIG_ENDIAN
     *data = betoh32(*data);
 #endif
 }
