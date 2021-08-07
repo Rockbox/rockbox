@@ -33,6 +33,14 @@
 #include "platform.h"
 #define MAX_SONGS  32
 
+static char readchar(int fd, char failchr)
+{
+    char ch;
+    if (read(fd,&ch,sizeof(ch)) == sizeof(ch))
+        return ch;
+    return failchr;
+}
+
 static bool parse_dec(int *retval, const char *p, int minval, int maxval)
 {
     int r = 0;
@@ -73,10 +81,13 @@ static bool parse_text(char *retval, const char *p)
 
 static int ASAP_ParseDuration(const char *s)
 {
-    int r;
-    if (*s < '0' || *s > '9')
-        return -1;
-    r = *s++ - '0';
+    #define chk_digit(rtn) if (*s < '0' || *s > '9') {return (rtn);}
+    #define set_digit(mult)   r += (mult) * (*s++ - '0')
+    #define parse_digit(m) chk_digit(r) set_digit(m)
+
+    int r = 0;
+    chk_digit(-1);
+    set_digit(1);
     if (*s >= '0' && *s <= '9')
         r = 10 * r + *s++ - '0';
     if (*s == ':') {
@@ -84,23 +95,18 @@ static int ASAP_ParseDuration(const char *s)
         if (*s < '0' || *s > '5')
             return -1;
         r = 60 * r + (*s++ - '0') * 10;
-        if (*s < '0' || *s > '9')
-            return -1;
-        r += *s++ - '0';
+        chk_digit(-1);
+        set_digit(1);
     }
+
     r *= 1000;
     if (*s != '.')
         return r;
     s++;
-    if (*s < '0' || *s > '9')
-        return r;
-    r += 100 * (*s++ - '0');
-    if (*s < '0' || *s > '9')
-        return r;
-    r += 10 * (*s++ - '0');
-    if (*s < '0' || *s > '9')
-        return r;
-    r += *s - '0';
+    parse_digit(100);
+    parse_digit(10);
+    parse_digit(1);
+
     return r;
 }
 
@@ -126,6 +132,7 @@ static bool read_asap_string(char* source, char** buf, char** buffer_end, char**
 
 static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
 {
+    #define EOH_CHAR (0xFF)
     int module_index = 0;
     int sap_signature = -1;
     int duration_index = 0;
@@ -151,10 +158,9 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
 
         if (module_index + 8 >= file_len)
             return false;
-        /* read a char */
-        read(fd,&cur_char,1);
+        cur_char = readchar(fd, EOH_CHAR);
         /* end of header */
-        if (cur_char == 0xff)
+        if (cur_char == EOH_CHAR)
             break;
 
         i = 0;
@@ -164,13 +170,11 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
             module_index++;
             if (module_index >= file_len || (unsigned)i >= sizeof(line) - 1)
                 return false;
-            /* read a char */
-            read(fd,&cur_char,1);
+            cur_char = readchar(fd, 0x0d);
         }
         if (++module_index >= file_len )
             return false;
-        /* read a char */
-        read(fd,&cur_char,1);
+        cur_char = readchar(fd, EOH_CHAR);
         if ( cur_char != 0x0a)
             return false;
 
