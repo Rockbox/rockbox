@@ -51,40 +51,42 @@ typedef struct {
 #define VTX_STRING_MAX 254
 
 static uint Reader_ReadByte(int fd) {
-    unsigned char c;
-    read(fd, &c, sizeof(c));
+    unsigned char c = 0;
+    (void)read(fd, &c, sizeof(c));
     return c;
 }
 
 static uint Reader_ReadWord(int fd) {
-    unsigned short s;
-    read(fd, &s, sizeof(s));
+    unsigned short s = 0;
+    (void)read(fd, &s, sizeof(s));
     return letoh16(s);
 }
 
 static uint Reader_ReadDWord(int fd) {
-    unsigned int i;
-    read(fd, &i, sizeof(i));
+    unsigned int i = 0;
+    (void)read(fd, &i, sizeof(i));
     return letoh32(i);
 }
 
 static char* Reader_ReadString(int fd, char *str) {
+    /*Note: still advances file buffer even if no string buffer supplied */
     int i = 0;
-    char c = 1;
+    char ch = '\0';
     char *p = str;
 
-    if (str)
-        *str = 0;
-
-    while (i < VTX_STRING_MAX && c) {
-        read(fd, &c, sizeof(c));
-	if (str)
-            *str++ = c;
-	i++;
+    while (i < VTX_STRING_MAX && (ch || i == 0))
+    {
+        if (read(fd, &ch, sizeof(ch) == sizeof(ch)))
+        {
+            if (str)
+                *str++ = ch;
+        }
+        else
+            break;
+        i++;
     }
-
     if (str)
-       *str = 0;
+        *str = '\0';
 
     return p;
 }
