@@ -1856,8 +1856,14 @@ static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char*
         return fd;
     }
 #ifndef __PCTOOL__
-    size_t buf_size = read_bmp_fd(fd, bitmap, 0,
-                                    format|FORMAT_RETURN_SIZE, NULL);
+    int buf_size = read_bmp_fd(fd, bitmap, 0,
+                               format|FORMAT_RETURN_SIZE, NULL);
+    if(buf_size < 0)
+    {
+        close(fd);
+        return buf_size;
+    }
+
     handle = core_alloc_ex(bitmap->data, buf_size, &buflib_ops);
     if (handle <= 0)
     {
