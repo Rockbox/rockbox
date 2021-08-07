@@ -61,14 +61,9 @@ INLINE unsigned range_limit(int value)
     return value;
 #else
     value += 128;
-
-    if ((unsigned)value <= 255)
-        return value;
-
-    if (value < 0)
-        return 0;
-
-    return 255;
+    if(value < 0)   return 0;
+    if(value > 255) return 255;
+    return value;
 #endif
 }
 
