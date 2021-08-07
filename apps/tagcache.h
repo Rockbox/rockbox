@@ -109,10 +109,9 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     (1LU << tag_playcount) | (1LU << tag_rating) | (1LU << tag_playtime) | \
     (1LU << tag_lastplayed) | (1LU << tag_commitid) | (1LU << tag_mtime) | \
     (1LU << tag_lastelapsed) | (1LU << tag_lastoffset) | \
-    (1LU << tag_virt_basename) | (1LU << tag_virt_length_min) | \
-    (1LU << tag_virt_length_sec) | (1LU << tag_virt_playtime_min) | \
-    (1LU << tag_virt_playtime_sec) | (1LU << tag_virt_entryage) | \
-    (1LU << tag_virt_autoscore))
+    (1LU << tag_virt_length_min) | (1LU << tag_virt_length_sec) | \
+    (1LU << tag_virt_playtime_min) | (1LU << tag_virt_playtime_sec) | \
+    (1LU << tag_virt_entryage) | (1LU << tag_virt_autoscore))
 
 #define TAGCACHE_IS_NUMERIC(tag) (BIT_N(tag) & TAGCACHE_NUMERIC_TAGS)
 
