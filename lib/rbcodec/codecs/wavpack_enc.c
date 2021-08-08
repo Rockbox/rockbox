@@ -365,6 +365,7 @@ enum codec_status codec_run(void)
             if (!(data = ci->enc_encbuf_get_buffer(out_reqsize)))
                 continue;
             getbuf = GETBUF_PCM;
+            /*fallthrough*/
         case GETBUF_PCM:
             if (!ci->enc_pcmbuf_read(input_buffer + PCM_SAMP_PER_CHUNK,
                                      PCM_SAMP_PER_CHUNK))

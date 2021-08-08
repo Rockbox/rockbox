@@ -288,14 +288,19 @@ static bool dbg_btn(bool *done, int *x)
         {
             case DEBUG_CANCEL:
                 *done = true;
+                /*fallthrough*/
             case DEBUG_NEXT:
                 cont = false;
+                /*fallthrough*/
             case DEBUG_LEFT_JUSTIFY:
                 (*x) = 0;
                 sleep(HZ/5);
                 break;
             case DEBUG_LEFT_SCROLL:
                 (*x)--;
+                break;
+            default:
+                break;
         }
     }
     lcd_clear_display();
