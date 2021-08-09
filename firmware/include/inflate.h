@@ -32,8 +32,8 @@ enum {
 
 struct inflate;
 
-typedef uint32_t inflate_reader(void* block, uint32_t block_size, void* ctx);
-typedef uint32_t inflate_writer(const void* block, uint32_t block_size, void* ctx);
+typedef uint32_t (*inflate_reader) (void* block, uint32_t block_size, void* ctx);
+typedef uint32_t (*inflate_writer) (const void* block, uint32_t block_size, void* ctx);
 
 extern const uint32_t inflate_size;
 extern const uint32_t inflate_align;
