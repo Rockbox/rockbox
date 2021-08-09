@@ -873,13 +873,17 @@ static bool open_rec_file(bool create)
 static void * ICODE_ATTR
 copy_buffer_mono_lr(void *dst, const void *src, size_t src_size)
 {
-    int16_t *d = dst;
-    int16_t const *s = src;
-
-    /* mono = (L + R) / 2 */
+    int16_t *d = (int16_t*) dst;
+    int16_t const *s = (int16_t const*) src;
+    ssize_t copy_size = src_size;
+ 
+     /* mono = (L + R) / 2 */
     do
-        *d++ = ((int32_t){ *s++ } + *s++ + 1) >> 1;
-    while (src_size -= PCM_SAMP_SIZE);
+    {
+        *d++ = ((int32_t){s[0]} + s[1] + 1) >> 1;
+        s+=2;
+    }
+    while ((copy_size -= PCM_SAMP_SIZE) > 0);
 
     return dst;
 }
@@ -888,13 +892,13 @@ copy_buffer_mono_lr(void *dst, const void *src, size_t src_size)
 static void * ICODE_ATTR
 copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
 {
-    int16_t *d = dst;
-    int16_t const *s = (int16_t *)src - 2;
-
+    int16_t *d = (int16_t*)dst;
+    int16_t const *s = (int16_t const*)src - 2;
+    ssize_t copy_size = src_size;
     /* mono = L */
     do
         *d++ = *(s += 2);
-    while (src_size -= PCM_SAMP_SIZE);
+    while ((copy_size -= PCM_SAMP_SIZE) > 0);
 
     return dst;
 }
@@ -903,13 +907,13 @@ copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
 static void * ICODE_ATTR
 copy_buffer_mono_r(void *dst, const void *src, size_t src_size)
 {
-    int16_t *d = dst;
-    int16_t const *s = (int16_t *)src - 1;
-
+    int16_t *d = (int16_t*)dst;
+    int16_t const *s = (int16_t const*)src - 1;
+    ssize_t copy_size = src_size;
     /* mono = R */
     do
         *d++ = *(s += 2);
-    while (src_size -= PCM_SAMP_SIZE);
+    while ((copy_size -= PCM_SAMP_SIZE) > 0);
 
     return dst;
 }
