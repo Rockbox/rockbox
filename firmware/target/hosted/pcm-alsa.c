@@ -68,6 +68,11 @@
 #warning "MIX_FRAME_SAMPLES <1024 may cause dropouts!"
 #endif
 
+/* PCM_DC_OFFSET_VALUE is a workaround for eros q hardware quirk */
+#if !defined(PCM_DC_OFFSET_VALUE)
+# define PCM_DC_OFFSET_VALUE 0
+#endif
+
 static const snd_pcm_access_t access_ = SND_PCM_ACCESS_RW_INTERLEAVED; /* access mode */
 #if defined(HAVE_ALSA_32BIT)
 static const snd_pcm_format_t format = SND_PCM_FORMAT_S32_LE;    /* sample format */
@@ -359,8 +364,8 @@ static bool copy_frames(bool first)
                 sample_t *sample_ptr = &frames[2*(period_size-frames_left)];
                 for (int i = 0; i < nframes; i++)
                 {
-                    *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_l;
-                    *sample_ptr++ = *pcm_ptr++ * dig_vol_mult_r;
+                    *sample_ptr++ = (*pcm_ptr++ * dig_vol_mult_l) + PCM_DC_OFFSET_VALUE;
+                    *sample_ptr++ = (*pcm_ptr++ * dig_vol_mult_r) + PCM_DC_OFFSET_VALUE;
                 }
             }
             else
