@@ -164,6 +164,12 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         gui_yesno_draw(&(yn[i]));
     }
 
+#ifdef HAVE_TOUCHSCREEN
+    /* switch to point mode because that's more intuitive */
+    enum touchscreen_mode tsm = touchscreen_get_mode();
+    touchscreen_set_mode(TOUCHSCREEN_POINT);
+#endif
+
     /* make sure to eat any extranous keypresses */
     action_wait_for_release();
     button_clear_queue();
@@ -211,11 +217,22 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                 /* ignore some SYS events that can happen */
                 continue;
             default:
-                if(default_event_handler(button) == SYS_USB_CONNECTED)
-                    return(YESNO_USB);
+                if(default_event_handler(button) == SYS_USB_CONNECTED) {
+#ifdef HAVE_TOUCHSCREEN
+                    /* restore old touchscreen mode */
+                    touchscreen_set_mode(tsm);
+#endif
+                    return YESNO_USB;
+                }
+
                 result = YESNO_NO;
         }
     }
+
+#ifdef HAVE_TOUCHSCREEN
+    /* restore old touchscreen mode */
+    touchscreen_set_mode(tsm);
+#endif
 
     FOR_NB_SCREENS(i)
         result_displayed=gui_yesno_draw_result(&(yn[i]), result);

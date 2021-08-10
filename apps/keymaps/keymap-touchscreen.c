@@ -179,8 +179,6 @@ static const struct button_mapping button_context_mainmenu[] =
 
 
 static const struct button_mapping button_context_yesno[]  = {
-    { ACTION_YESNO_ACCEPT,  BUTTON_TOPRIGHT,  BUTTON_NONE },
-    { ACTION_YESNO_ACCEPT,  BUTTON_BOTTOMLEFT,  BUTTON_NONE },
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_CUSTOM2|CONTEXT_YESNOSCREEN)
 }; /* button_context_settings_yesno */
 

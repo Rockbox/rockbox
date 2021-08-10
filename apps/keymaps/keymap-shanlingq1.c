@@ -57,6 +57,13 @@ static const struct button_mapping button_context_list[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_list */
 
+static const struct button_mapping button_context_yesno[] = {
+    /* note: touchscreen buttons are usable in addition to physical keys */
+    {ACTION_YESNO_ACCEPT,       BUTTON_PLAY,                        BUTTON_NONE},
+    {ACTION_STD_CANCEL,         BUTTON_POWER,                       BUTTON_NONE},
+    LAST_ITEM_IN_LIST
+}; /* button_context_yesno */
+
 const struct button_mapping* target_get_context_mapping(int context)
 {
     switch (context)
@@ -73,5 +80,7 @@ const struct button_mapping* target_get_context_mapping(int context)
             //return button_context_tree;
         case CONTEXT_LIST:
             return button_context_list;
+        case CONTEXT_YESNOSCREEN:
+            return button_context_yesno;
     }
 }
