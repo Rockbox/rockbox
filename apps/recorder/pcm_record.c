@@ -890,21 +890,6 @@ copy_buffer_mono_lr(void *dst, const void *src, size_t src_size)
 
 /* Copy with mono conversion - output 1/2 size of input */
 static void * ICODE_ATTR
-copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
-{
-    int16_t *d = (int16_t*)dst;
-    int16_t const *s = (int16_t const*)src - 2;
-    ssize_t copy_size = src_size;
-    /* mono = L */
-    do
-        *d++ = *(s += 2);
-    while ((copy_size -= PCM_SAMP_SIZE) > 0);
-
-    return dst;
-}
-
-/* Copy with mono conversion - output 1/2 size of input */
-static void * ICODE_ATTR
 copy_buffer_mono_r(void *dst, const void *src, size_t src_size)
 {
     int16_t *d = (int16_t*)dst;
@@ -917,6 +902,29 @@ copy_buffer_mono_r(void *dst, const void *src, size_t src_size)
 
     return dst;
 }
+
+#if 1
+static void * ICODE_ATTR
+copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
+{
+    return copy_buffer_mono_r(dst, src -1, src_size);
+}
+#else
+/* Copy with mono conversion - output 1/2 size of input */
+static void * ICODE_ATTR
+copy_buffer_mono_l(void *dst, const void *src, size_t src_size)
+{
+    int16_t *d = (int16_t*)dst;
+    int16_t const *s = (int16_t const*)src - 2;
+    ssize_t copy_size = src_size;
+    /* mono = L */
+    do
+        *d++ = *(s += 2);
+    while ((copy_size -= PCM_SAMP_SIZE) > 0);
+
+    return dst;
+}
+#endif
 
 
 /** pcm_rec_* group **/
