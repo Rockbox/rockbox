@@ -379,6 +379,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
 #ifdef HAVE_TOUCHSCREEN
     /* plugins possibly have grid mode active. force global settings in lists */
     enum touchscreen_mode tsm = touchscreen_get_mode();
+    enum touchscreen_mode old_global_mode = global_settings.touch_mode;
     touchscreen_set_mode(global_settings.touch_mode);
 #endif
 
@@ -740,7 +741,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     FOR_NB_SCREENS(i)
         viewportmanager_theme_undo(i, false);
 #ifdef HAVE_TOUCHSCREEN
-    touchscreen_set_mode(tsm);
+    /* This is needed because this function runs the settings menu and we do
+     * not want to switch back to the old mode if the user intentionally went
+     * to a different one. This is a very hacky way to do this... */
+    if(!(global_settings.touch_mode != (int)old_global_mode &&
+         tsm == old_global_mode))
+        touchscreen_set_mode(tsm);
 #endif
 
     return ret;
