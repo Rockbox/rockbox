@@ -547,6 +547,8 @@ static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
         gui_list->start_item[screen] = new_start_item;
         /* keep selected item in sync */
         gui_list->selected_item = new_start_item + selection_offset;
+        if(gui_list->selected_size > 1)
+            gui_list->selected_item -= (gui_list->selected_item % gui_list->selected_size);
     }
 
     return true;
@@ -737,6 +739,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 if (list_start_item+line >= list->nb_items)
                     return ACTION_NONE;
                 list->selected_item = list_start_item+line;
+                if(list->selected_size > 1)
+                    list->selected_item -= (list->selected_item % list->selected_size);
 
                 gui_synclist_speak_item(list);
             }
@@ -754,7 +758,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 if (click_loc & LIST)
                 {
                     /* held a single line for a while, bring up the context menu */
-                    gui_synclist_select_item(list, list_start_item + line);
+                    gui_synclist_select_item(list, list->selected_item);
                     /* don't sent context repeatedly */
                     action_wait_for_release();
                     initial_touch = true;
@@ -766,7 +770,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 initial_touch = true;
                 if (click_loc & LIST)
                 {   /* release on list item enters it */
-                    gui_synclist_select_item(list, list_start_item + line);
+                    gui_synclist_select_item(list, list->selected_item);
                     return ACTION_STD_OK;
                 }
                 else if (click_loc & TITLE_TEXT)
