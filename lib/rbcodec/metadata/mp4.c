@@ -85,31 +85,38 @@
 static unsigned long read_mp4_tag(int fd, unsigned int size_left, char* buffer,
                                   unsigned int buffer_left)
 {
-    unsigned int bytes_read = 0;
-    
-    if (buffer_left == 0)
-    {
-        lseek(fd, size_left, SEEK_CUR);     /* Skip everything */
-    } 
-    else 
+    unsigned long bytes_read = 0;
+    ssize_t rd_ret = 0;
+    ssize_t bytes_req;
+    #define MP4_TAG_HEADER_SIZE 16
+
+
+    if (size_left >= MP4_TAG_HEADER_SIZE)
     {
         /* Skip the data tag header - maybe we should parse it properly? */
-        lseek(fd, 16, SEEK_CUR); 
-        size_left -= 16;
+        lseek(fd, MP4_TAG_HEADER_SIZE, SEEK_CUR);
+        size_left -= MP4_TAG_HEADER_SIZE;
 
         if (size_left > buffer_left)
-        {
-            read(fd, buffer, buffer_left);
-            lseek(fd, size_left - buffer_left, SEEK_CUR);
-            bytes_read = buffer_left;
-        } 
+            bytes_req = buffer_left;
+        else
+            bytes_req = size_left;
+
+        rd_ret = read(fd, buffer, bytes_req);
+        if (rd_ret == bytes_req)
+            bytes_read = bytes_req;
         else
         {
-            read(fd, buffer, size_left);
-            bytes_read = size_left;
+            /* read less than expected or an error from read() */
+            logf("Error %d, read_mp4_tag", rd_ret);
+            if (rd_ret < 0)
+                rd_ret = 0; /* Skip everything */
         }
     }
-    
+    if (size_left >  (unsigned int) rd_ret)
+        lseek(fd, size_left - rd_ret, SEEK_CUR);
+
+
     return bytes_read;
 }
 
@@ -437,10 +444,11 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 
         case MP4_gnre:
             {
-                unsigned short genre;
-                
-                read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
-                id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
+                unsigned short genre = USHRT_MAX; /*invalid genre*/
+                unsigned long rd_ret;
+                rd_ret = read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
+                if (rd_ret == sizeof(genre))
+                    id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
             }
             break;
         
@@ -452,18 +460,18 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
         case MP4_disk:
             {
                 unsigned short n[2];
-                
-                read_mp4_tag(fd, size, (char*) &n, sizeof(n));
-                id3->discnum = betoh16(n[1]);
+                id3->discnum = 0;
+                if (read_mp4_tag(fd, size, (char*) &n, sizeof(n))  == sizeof(n))
+                    id3->discnum = betoh16(n[1]);
             }
             break;
 
         case MP4_trkn:
             {
                 unsigned short n[2];
-                
-                read_mp4_tag(fd, size, (char*) &n, sizeof(n));
-                id3->tracknum = betoh16(n[1]);
+                id3->tracknum = 0;
+                if (read_mp4_tag(fd, size, (char*) &n, sizeof(n)) == sizeof(n))
+                    id3->tracknum = betoh16(n[1]);
             }
             break;
 
@@ -471,23 +479,26 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
         case MP4_covr:
             {
                 int pos = lseek(fd, 0, SEEK_CUR) + 16;
-                
-                read_mp4_tag(fd, size, buffer, 8);
                 id3->albumart.type = AA_TYPE_UNKNOWN;
-                if (memcmp(buffer, "\xff\xd8\xff\xe0", 4) == 0)
-                {
-                    id3->albumart.type = AA_TYPE_JPG;
-                }
-                else if (memcmp(buffer, "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a", 8) == 0)
-                {
-                    id3->albumart.type = AA_TYPE_PNG;
-                }
                 
-                if (id3->albumart.type != AA_TYPE_UNKNOWN)
+                if (read_mp4_tag(fd, size, buffer, 8) >= 4)
                 {
-                    id3->albumart.pos  = pos;
-                    id3->albumart.size = size - 16;
-                    id3->has_embedded_albumart = true;
+
+                    if (memcmp(buffer, "\xff\xd8\xff\xe0", 4) == 0)
+                    {
+                        id3->albumart.type = AA_TYPE_JPG;
+                    }
+                    else if (memcmp(buffer, "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a", 8) == 0)
+                    {
+                        id3->albumart.type = AA_TYPE_PNG;
+                    }
+                    
+                    if (id3->albumart.type != AA_TYPE_UNKNOWN)
+                    {
+                        id3->albumart.pos  = pos;
+                        id3->albumart.size = size - 16;
+                        id3->has_embedded_albumart = true;
+                    }
                 }
             }
             break;
@@ -497,7 +508,7 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
             {
                 char tag_name[TAG_NAME_LENGTH];
                 uint32_t sub_size;
-                
+                ssize_t rd_ret;
                 /* "mean" atom */
                 read_uint32be(fd, &sub_size);
                 size -= sub_size;
@@ -510,16 +521,19 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                 
                 if (sub_size > sizeof(tag_name) - 1)
                 {
-                    read(fd, tag_name, sizeof(tag_name) - 1);
+                    rd_ret = read(fd, tag_name, sizeof(tag_name) - 1);                  
                     lseek(fd, sub_size - (sizeof(tag_name) - 1), SEEK_CUR);
-                    tag_name[sizeof(tag_name) - 1] = 0;
+                    sub_size = sizeof(tag_name) - 1;
                 }
                 else
                 {
-                    read(fd, tag_name, sub_size);
-                    tag_name[sub_size] = 0;
+                    rd_ret = read(fd, tag_name, sub_size);
                 }
-                
+                if (rd_ret != (ssize_t)sub_size)
+                    rd_ret = 0;
+                tag_name[rd_ret] = 0;
+
+
                 if ((strcasecmp(tag_name, "composer") == 0) && !cwrt)
                 {
                     read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
