@@ -77,6 +77,14 @@
 \usepackage{makeidx}
 \usepackage{fancyvrb}
 \usepackage{color}
+
+% Ifpdfoutput is part of KOMAscript 3.28, in earlier versions it's ifpdfoutput.
+% We use Ifpdfoutput, so redefine it here for old KOMAscript versions.
+% See also https://ctan.org/ctan-ann/id/mailman.2801.1577740444.2586.ctan-ann@ctan.org
+\ifdefined\Ifpdfoutput%
+\else\newcommand{\Ifpdfoutput}{\ifpdfoutput}%
+\fi
+
 \Ifpdfoutput{\usepackage{booktabs}}%
   {\newcommand{%
     \toprule}{}\newcommand{\midrule}{\hline}\newcommand{\bottomrule}{}%
