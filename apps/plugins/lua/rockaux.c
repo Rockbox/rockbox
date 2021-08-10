@@ -257,7 +257,7 @@ int filetol(int fd, long *num)
             {
                 case '-':
                 {
-                    if (retn) /* 0 preceeds, this negative sign must be in error */
+                    if (retn > 0) /* 0 preceeds, this negative sign must be in error */
                         goto get_digits;
                     neg = true;
                     continue;
