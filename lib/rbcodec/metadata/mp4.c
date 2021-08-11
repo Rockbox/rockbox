@@ -444,10 +444,10 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
 
         case MP4_gnre:
             {
-                unsigned short genre = USHRT_MAX; /*invalid genre*/
-                unsigned long rd_ret;
-                rd_ret = read_mp4_tag(fd, size, (char*) &genre, sizeof(genre));
-                if (rd_ret == sizeof(genre))
+                unsigned short genre;
+                const unsigned int g_size = sizeof(genre);
+                id3->genre_string = NULL;
+                if (read_mp4_tag(fd, size, (char*) &genre, g_size) == g_size)
                     id3->genre_string = id3_get_num_genre(betoh16(genre) - 1);
             }
             break;
