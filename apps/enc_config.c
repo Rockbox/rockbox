@@ -115,7 +115,7 @@ static void mp3_enc_convert_config(struct encoder_config *cfg,
     }
     else
     {
-        if ((unsigned)global_settings.mp3_enc_config.bitrate > MP3_ENC_NUM_BITR)
+        if ((unsigned)global_settings.mp3_enc_config.bitrate >= MP3_ENC_NUM_BITR)
             global_settings.mp3_enc_config.bitrate = MP3_ENC_BITRATE_CFG_DEFAULT;
         cfg->mp3_enc.bitrate = mp3_enc_bitr[global_settings.mp3_enc_config.bitrate];
     }
