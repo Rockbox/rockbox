@@ -183,14 +183,16 @@ const char * get_codec_filename(int cod_spec)
     /* Can choose decoder or encoder if one available */
     int type = cod_spec & CODEC_TYPE_MASK;
     int afmt = cod_spec & CODEC_AFMT_MASK;
-
+    int tmp_fmt = afmt;
     if ((unsigned)afmt >= AFMT_NUM_CODECS)
+    {
         type = AFMT_UNKNOWN | (type & CODEC_TYPE_MASK);
-
+        tmp_fmt = AFMT_UNKNOWN;
+    }
     fname = (type == CODEC_TYPE_ENCODER) ?
-                audio_formats[afmt].codec_enc_root_fn :
-                audio_formats[afmt].codec_root_fn;
-
+            audio_formats[tmp_fmt].codec_enc_root_fn :
+            audio_formats[tmp_fmt].codec_root_fn;
+    
     logf("%s: %d - %s",
         (type == CODEC_TYPE_ENCODER) ? "Encoder" : "Decoder",
         afmt, fname ? fname : "<unknown>");
