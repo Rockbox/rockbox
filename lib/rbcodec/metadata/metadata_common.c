@@ -30,7 +30,7 @@
 #include "metadata_parsers.h"
 #include "replaygain.h"
 
-/* Read a string from the file. Read up to size bytes, or, if eos != -1, 
+/* Read a string from the file. Read up to size bytes, or, if eos != -1,
  * until the eos character is found (eos is not stored in buf, unless it is
  * nil). Writes up to buf_size chars to buf, always terminating with a nil.
  * Returns number of chars read or -1 on read error.
@@ -39,7 +39,7 @@ long read_string(int fd, char* buf, long buf_size, int eos, long size)
 {
     long read_bytes = 0;
     char c;
-    
+
     while (size != 0)
     {
         if (read(fd, &c, 1) != 1)
@@ -47,22 +47,22 @@ long read_string(int fd, char* buf, long buf_size, int eos, long size)
             read_bytes = -1;
             break;
         }
-        
+
         read_bytes++;
         size--;
-        
+
         if ((eos != -1) && (eos == (unsigned char) c))
         {
             break;
         }
-        
+
         if (buf_size > 1)
         {
             *buf++ = c;
             buf_size--;
         }
     }
-    
+
     *buf = 0;
     return read_bytes;
 }
@@ -198,31 +198,31 @@ uint32_t get_itunes_int32(char* value, int count)
     static const char hexdigits[] = "0123456789ABCDEF";
     const char* c;
     int r = 0;
-    
+
     while (count-- > 0)
     {
         while (isspace(*value))
         {
             value++;
         }
-        
+
         while (*value && !isspace(*value))
         {
             value++;
         }
     }
-    
+
     while (isspace(*value))
     {
         value++;
     }
-    
+
     while (*value && ((c = strchr(hexdigits, toupper(*value))) != NULL))
     {
         r = (r << 4) | (c - hexdigits);
         value++;
     }
-    
+
     return r;
 }
 
@@ -243,9 +243,9 @@ bool skip_id3v2(int fd, struct mp3entry *id3)
         if ((id3->first_frame_offset = getid3v2len(fd)) == 0)
             return false;
 
-        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0)) 
+        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0))
             return false;
-        
+
         return true;
     } else {
         lseek(fd, 0, SEEK_SET);
@@ -278,7 +278,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     else if (((strcasecmp(name, "year") == 0) && (type == TAGTYPE_APE))
         || ((strcasecmp(name, "date") == 0) && (type == TAGTYPE_VORBIS)))
     {
-        /* Date's can be in any format in Vorbis. However most of them 
+        /* Date's can be in any format in Vorbis. However most of them
          * are in ISO8601 format so if we try and parse the first part
          * of the tag as a number, we should get the year. If we get crap,
          * then act like we never parsed it.
@@ -334,7 +334,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->grouping);
     }
-    else if (strcasecmp(name, "contentgroup") == 0) 
+    else if (strcasecmp(name, "contentgroup") == 0)
     {
         p = &(id3->grouping);
     }
@@ -348,9 +348,9 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
         parse_replaygain(name, value, id3);
         p = NULL;
     }
-    
+
     /* Do not overwrite already available metadata. Especially when reading
-     * tags with e.g. multiple genres / artists. This way only the first 
+     * tags with e.g. multiple genres / artists. This way only the first
      * of multiple entries is used, all following are dropped. */
     if (p!=NULL && *p==NULL)
     {
@@ -369,6 +369,6 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
             len = 0;
         }
     }
-    
+
     return len;
 }
