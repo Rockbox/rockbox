@@ -216,7 +216,9 @@ static bool headers_have_same_type(unsigned long header1,
 static void read_uint32be_mp3data(int fd, unsigned long *data)
 {
     *data = 0;
-    (void)read(fd, (char*)data, 4);
+    unsigned long ret;
+    if (read(fd, (char*)&ret, sizeof(ret)) == sizeof(ret))
+        *data = ret;
 #ifndef ROCKBOX_BIG_ENDIAN
     *data = betoh32(*data);
 #endif
@@ -769,7 +771,11 @@ int create_xing_header(int fd, long startpos, long filesize,
             last_pos = pos;
         }
     }
-    
+    else
+    {
+        memset(toc, 0, sizeof(toc));
+    }
+
     /* Use the template header and create a new one.
        We ignore the Protection bit even if the rest of the stream is
        protected. */
