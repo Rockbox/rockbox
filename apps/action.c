@@ -405,6 +405,7 @@ static inline bool get_action_touchscreen(action_last_t *last, action_cur_t *cur
         }
 
         last->button = cur->button;
+        last->tick = current_tick;
         cur->action = ACTION_TOUCHSCREEN;
         return true;
     }
@@ -684,13 +685,25 @@ static inline int do_auto_softlock(action_last_t *last, action_cur_t *cur)
     {
         do_key_lock(true);
 
-#if defined(HAVE_TOUCHPAD)
+#if defined(HAVE_TOUCHPAD) || defined(HAVE_TOUCHSCREEN)
         /* if the touchpad is supposed to be off and the current buttonpress
          * is from the touchpad, nullify both button and action. */
         if (!has_flag(action_last.softlock_mask, SEL_ACTION_ENABLED) ||
             has_flag(action_last.softlock_mask, SEL_ACTION_NOTOUCH))
         {
+#if defined(HAVE_TOUCHPAD)
             cur->button = touchpad_filter(cur->button);
+#endif
+#if defined(HAVE_TOUCHSCREEN)
+            const int touch_fakebuttons =
+                BUTTON_TOPLEFT    | BUTTON_TOPMIDDLE    | BUTTON_TOPRIGHT    |
+                BUTTON_LEFT       | BUTTON_CENTER       | BUTTON_RIGHT       |
+                BUTTON_BOTTOMLEFT | BUTTON_BOTTOMMIDDLE | BUTTON_BOTTOMRIGHT;
+            if (has_flag(cur->button, BUTTON_TOUCHSCREEN))
+                cur->button = BUTTON_NONE;
+            else
+                cur->button &= ~touch_fakebuttons;
+#endif
             if (cur->button == BUTTON_NONE)
             {
                 action = ACTION_NONE;
@@ -1008,6 +1021,7 @@ static int get_action_worker(action_last_t *last, action_cur_t *cur)
 
     if (get_action_touchscreen(last, cur))
     {
+        do_softlock(last, cur);
         return cur->action;
     }
 
@@ -1214,41 +1228,44 @@ void set_selective_softlock_actions(bool selective, unsigned int mask)
     }
 }
 
+/* look for an action in the given context, return button which triggers it.
+ * (note: pre_button isn't taken into account here) */
+static int find_button_for_action(int context, int action)
+{
+    const struct button_mapping *items;
+    int i;
+
+    do
+    {
+        items = get_context_mapping(context);
+        if (items == NULL)
+            break;
+
+        for (i = 0; items[i].button_code != BUTTON_NONE; ++i)
+        {
+            if (items[i].action_code == action)
+                return items[i].button_code;
+        }
+
+        /* get chained context, if none it will be CONTEXT_STOPSEARCHING */
+        context = items[i].action_code;
+    } while (context != (int)CONTEXT_STOPSEARCHING);
+
+    return BUTTON_NONE;
+}
 
 void action_autosoftlock_init(void)
 {
-    action_cur_t cur;
-    int i = 0;
+    /* search in WPS and STD contexts for the keylock button combo */
+    static const int contexts[2] = { CONTEXT_WPS, CONTEXT_STD };
 
-    if (action_last.unlock_combo == BUTTON_NONE)
+    for (int i = 0; i < 2; ++i)
     {
-        /* search CONTEXT_WPS, should be here */
-        cur.items = get_context_mapping(CONTEXT_WPS);
-        while (cur.items[i].button_code != BUTTON_NONE)
+        int button = find_button_for_action(contexts[i], ACTION_STD_KEYLOCK);
+        if (button != BUTTON_NONE)
         {
-            if (cur.items[i].action_code == ACTION_STD_KEYLOCK)
-            {
-                action_last.unlock_combo = cur.items[i].button_code;
-                break;
-            }
-            i = i + 1;
-        }
-
-        /* not there... let's try std
-        * I doubt any targets will need this, but... */
-        if (action_last.unlock_combo == BUTTON_NONE)
-        {
-            i = 0;
-            cur.items = get_context_mapping(CONTEXT_STD);
-            while (cur.items[i].button_code != BUTTON_NONE)
-            {
-                if (cur.items[i].action_code == ACTION_STD_KEYLOCK)
-                {
-                    action_last.unlock_combo = cur.items[i].button_code;
-                    break;
-                }
-                i = i + 1;
-            }
+            action_last.unlock_combo = button;
+            break;
         }
     }
 
