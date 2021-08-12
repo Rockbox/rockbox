@@ -104,16 +104,21 @@ static int asf_guid_match(const guid_t *guid1, const guid_t *guid2)
 /* Read the 16 byte GUID from a file */
 static void asf_readGUID(int fd, guid_t* guid)
 {
-    read_uint32le(fd, &guid->v1);
-    read_uint16le(fd, &guid->v2);
-    read_uint16le(fd, &guid->v3);
-    read(fd, guid->v4, 8);
+    int bytes;
+    bytes = read_uint32le(fd, &guid->v1);
+    bytes += read_uint16le(fd, &guid->v2);
+    bytes += read_uint16le(fd, &guid->v3);
+    bytes += read(fd, guid->v4, 8);
+    if (bytes != sizeof(guid_t))
+        memset(guid, 0, sizeof(guid_t));
 }
 
 static void asf_read_object_header(asf_object_t *obj, int fd)
 {
     asf_readGUID(fd, &obj->guid);
-    read_uint64le(fd, &obj->size);
+
+    if (read_uint64le(fd, &obj->size) != sizeof (uint64_t))
+        obj->size = 0;
     obj->datalen = 0;
 }
 
@@ -122,24 +127,28 @@ static void asf_read_object_header(asf_object_t *obj, int fd)
 */
 static int asf_intdecode(int fd, int type, int length)
 {
+    int bytes = 0;
+    int ret;
     uint16_t tmp16;
     uint32_t tmp32;
     uint64_t tmp64;
 
     if (type == 3) {
-        read_uint32le(fd, &tmp32);
-        lseek(fd,length - 4,SEEK_CUR);
-        return (int)tmp32;
+        bytes = read_uint32le(fd, &tmp32);
+        ret = (int)tmp32;
     } else if (type == 4) {
-        read_uint64le(fd, &tmp64);
-        lseek(fd,length - 8,SEEK_CUR);
-        return (int)tmp64;
+        bytes = read_uint64le(fd, &tmp64);
+        ret = (int)tmp64;
     } else if (type == 5) {
-        read_uint16le(fd, &tmp16);
-        lseek(fd,length - 2,SEEK_CUR);
-        return (int)tmp16;
+        bytes = read_uint16le(fd, &tmp16);
+        ret = (int)tmp16;
     }
 
+    if (bytes > 0)
+    {
+        lseek(fd,length - bytes, SEEK_CUR);
+        return ret;
+    }
     return 0;
 }
 
@@ -482,13 +491,16 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
 #ifdef HAVE_ALBUMART
                         } else if (!strcmp("WM/Picture", utf8buf)) {
-                            uint32_t datalength, strlength;
+                            uint32_t datalength = 0;
+                            uint32_t strlength;
                             /* Expected is either "01 00 xx xx 03 yy yy yy yy" or
                              * "03 yy yy yy yy". xx is the size of the WM/Picture
                              * container in bytes. yy equals the raw data length of
                              * the embedded image. */
                             lseek(fd, -4, SEEK_CUR);
-                            read(fd, &type, 1);
+                            if (read(fd, &type, 1) != 1)
+                                type = 0;
+
                             if (type == 1) {
                                 lseek(fd, 3, SEEK_CUR);
                                 read(fd, &type, 1);
