@@ -233,25 +233,23 @@ uint32_t get_itunes_int32(char* value, int count)
  */
 bool skip_id3v2(int fd, struct mp3entry *id3)
 {
-    char buf[4];
-
-    read(fd, buf, 4);
-    if (memcmp(buf, "ID3", 3) == 0)
+    #define ID3TAGSZ 4
+    char buf[ID3TAGSZ];
+    bool success = (read(fd, buf, ID3TAGSZ) == ID3TAGSZ);
+    if (success && memcmp(buf, "ID3", 3) == 0)
     {
         /* We have found an ID3v2 tag at the start of the file - find its
            length and then skip it. */
         if ((id3->first_frame_offset = getid3v2len(fd)) == 0)
-            return false;
+            success = false;
 
-        if ((lseek(fd, id3->first_frame_offset, SEEK_SET) < 0))
-            return false;
-
-        return true;
+        if (success && (lseek(fd, id3->first_frame_offset, SEEK_SET) < 0))
+            success = false;
     } else {
         lseek(fd, 0, SEEK_SET);
         id3->first_frame_offset = 0;
-        return true;
     }
+    return success;
 }
 
 /* Parse the tag (the name-value pair) and fill id3 and buffer accordingly.
