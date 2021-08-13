@@ -75,13 +75,15 @@ void file_cache_alloc(struct filestr_cache *cachep)
 /* free resources attached to the cache */
 void file_cache_free(struct filestr_cache *cachep)
 {
-    if (cachep && cachep->buffer)
+    if (cachep)
     {
-        dc_release_buffer(cachep->buffer);
-        cachep->buffer = NULL;
+        if(cachep->buffer)
+        {
+            dc_release_buffer(cachep->buffer);
+            cachep->buffer = NULL;
+        }
+        file_cache_reset(cachep);
     }
-
-    file_cache_reset(cachep);
 }
 
 
