@@ -35,6 +35,9 @@ size_t  strftime ( char* dst, size_t max, const char* format, const struct tm* t
     const char*   src;
     unsigned long no;
     char          buf [5];
+#if CONFIG_RTC
+    char sbuf[101];
+#endif
 
     if (!max) return 0;
     for ( ; *format != '\0'; format++ ) {
@@ -83,7 +86,6 @@ again:
         case 's': {
 #if CONFIG_RTC
             time_t t = rb->mktime((struct tm*)tm);
-            char sbuf[101];
             char* c;
             sbuf[100]=0;
             for (c=sbuf+99; c>sbuf; --c) {
