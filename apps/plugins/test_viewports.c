@@ -245,7 +245,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     rb->button_clear_queue();
     while(rb->button_get(true) <= BUTTON_NONE)
-     ;;
+    {;;}
 
     rb->button_get(true);
 

@@ -571,7 +571,7 @@ static bool confirm_quit(void)
              { (const char*[]) {"Quit?", "Progress will be lost"}, 2};
     enum yesno_res response = rb->gui_syncyesno_run(&prompt, NULL, NULL);
     while (rb->button_get(false) == BUTTON_NONE)
-        ;;
+    {;;}
 
     if(response == YESNO_NO)
         return false;
@@ -2286,7 +2286,7 @@ static bool free_slide_prio(int prio)
 static void free_all_slide_prio(int prio)
 {
     while (free_slide_prio(prio))
-    ;;
+    {;;}
 }
 
 

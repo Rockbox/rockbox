@@ -48,7 +48,7 @@ static size_t check_sentinel(void* buf, size_t size)
         {
             unused++;
             while(++i < sz && b[i] == SENTINEL(i) && ++unused)
-                ;;
+            {;;}
         }
     return unused * sizeof(sentinel);
 }
