@@ -175,6 +175,8 @@ extern unsigned char probed_ramsize;
 int battery_default_capacity(void);
 #endif
 
+#ifdef BOOTLOADER
+
 #ifdef HAVE_BOOTLOADER_USB_MODE
 void tick_stop(void);
 void system_prepare_fw_start(void);
