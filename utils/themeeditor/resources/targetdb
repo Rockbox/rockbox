@@ -814,15 +814,6 @@ sonynwzs750
     record : no
 }
 
-tatungtpj1022
-{
-    name   : Tatung Elio TPJ-1022
-    screen : 220 x 176 @ rgb
-    remote : no
-    fm     : no
-    record : no
-}
-
 gigabeats
 {
     name   : Toshiba Gigabeat S

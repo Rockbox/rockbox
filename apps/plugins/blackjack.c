@@ -185,22 +185,6 @@ enum {
 #define BJACK_RIGHT         BUTTON_RIGHT
 #define BJACK_LEFT          BUTTON_LEFT
 
-#elif CONFIG_KEYPAD == TATUNG_TPJ1022_PAD
-#define BJACK_SELECT_NAME    "MAIN"
-#define BJACK_STAY_NAME     "MENU"
-#define BJACK_QUIT_NAME     "POWER"
-#define BJACK_DOUBLE_NAME   "DOWN"
-#define BJACK_SELECT        BUTTON_MAIN
-#define BJACK_QUIT          BUTTON_POWER
-#define BJACK_MAX           (BUTTON_REC|BUTTON_UP)
-#define BJACK_MIN           (BUTTON_REC|BUTTON_DOWN)
-#define BJACK_STAY          BUTTON_MENU
-#define BJACK_DOUBLEDOWN    BUTTON_DOWN
-#define BJACK_UP            BUTTON_UP
-#define BJACK_DOWN          BUTTON_DOWN
-#define BJACK_RIGHT         BUTTON_RIGHT
-#define BJACK_LEFT          BUTTON_LEFT
-
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 #define BJACK_SELECT_NAME    "PLAY"
 #define BJACK_STAY_NAME     "VOL-"

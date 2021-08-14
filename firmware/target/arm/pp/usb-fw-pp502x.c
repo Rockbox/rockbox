@@ -81,12 +81,6 @@
 #define USB_GPIO_MASK   0x10
 #define USB_GPIO_VAL    0x10
 
-#elif defined(TATUNG_TPJ1022)
-    /* GPIO ? bit ? is usb detect (dummy value)*/
-#define USB_GPIO        GPIOD
-#define USB_GPIO_MASK   0x10
-#define USB_GPIO_VAL    0x10
-
 #elif defined(PBELL_VIBE500)
     /* GPIO L bit 3 is usb detect */
 #define USB_GPIO        GPIOL

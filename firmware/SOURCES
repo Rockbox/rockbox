@@ -1301,14 +1301,6 @@ target/arm/olympus/mrobe-100/power-mr100.c
 target/arm/olympus/mrobe-100/powermgmt-mr100.c
 #endif /* MROBE_100 */
 
-#ifdef TATUNG_TPJ1022
-target/arm/tatung/tpj1022/backlight-tpj1022.c
-target/arm/tatung/tpj1022/button-tpj1022.c
-target/arm/tatung/tpj1022/lcd-tpj1022.c
-target/arm/tatung/tpj1022/power-tpj1022.c
-target/arm/tatung/tpj1022/powermgmt-tpj1022.c
-#endif /* TATUNG_TPJ1022 */
-
 #ifdef IPOD_4G
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c

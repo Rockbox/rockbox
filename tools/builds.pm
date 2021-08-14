@@ -321,10 +321,6 @@ $releasenotes="/wiki/ReleaseNotes315";
         name => 'SanDisk Sansa View',
         status => 1,
     },
-    'tatungtpj1022' => {
-        name => 'Tatung Elio TPJ-1022',
-        status => 1,
-    },
     'vibe500' => {
         name => 'Packard Bell Vibe 500',
         status => 3,

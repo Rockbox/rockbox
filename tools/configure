@@ -1569,10 +1569,9 @@ cat <<EOF
  ==Samsung==              111) M6SP              61) Sansa View
  140) YH-820              112) M3                62) Sansa Clip+
  141) YH-920                                     63) Sansa Fuze v2
- 142) YH-925              ==Tatung==             64) Sansa Fuze+
- 143) YP-S3               150) Elio TPJ-1022     65) Sansa Clip Zip
-                                                 66) Sansa Connect
-                          ==Packard Bell==
+ 142) YH-925                                     64) Sansa Fuze+
+ 143) YP-S3                                      65) Sansa Clip Zip
+                          ==Packard Bell==       66) Sansa Connect
  ==Application==          160) Vibe 500
  200) SDL
  201) Android             ==MPIO==
@@ -2705,30 +2704,6 @@ fi
     t_manufacturer="tms320dm320"
     t_model="sansa-connect"
     arm926ejscc
-    ;;
-
-   150|tatungtpj1022)
-    target_id=25
-    modelname="tatungtpj1022"
-    target="TATUNG_TPJ1022"
-    memory=32 # always
-    arm7tdmicc
-    tool="$rootdir/tools/scramble -add tpj2"
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 5"
-    output="rockbox.elio"
-    appextra="recorder:gui:radio"
-    plugins="yes"
-    boottool="$rootdir/tools/scramble -mi4v2"
-    bootoutput="pp5020.mi4"
-    # toolset is the tools within the tools directory that we build for
-    # this particular target.
-    toolset=$scramblebitmaptools
-    # architecture, manufacturer and model for the target-tree build
-    t_cpu="arm"
-    t_soc="pp"
-    t_manufacturer="tatung"
-    t_model="tpj1022"
     ;;
 
    100|gogearsa9200)

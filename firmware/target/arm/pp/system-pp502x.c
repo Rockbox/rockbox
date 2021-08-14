@@ -559,8 +559,6 @@ void system_init(void)
         /* to be done */
 #elif defined (MROBE_100)
         /* to be done */
-#elif defined (TATUNG_TPJ1022)
-        /* to be done */
 #elif defined(PBELL_VIBE500)
         /* reset all allowed devices */
         DEV_RS         = 0x3ffffef8;

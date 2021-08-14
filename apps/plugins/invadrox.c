@@ -141,14 +141,6 @@
 #define RIGHT BUTTON_RIGHT
 #define FIRE BUTTON_SELECT
 
-#elif CONFIG_KEYPAD == TATUNG_TPJ1022_PAD
-
-/* TODO: Figure out which buttons to use for Tatung Elio TPJ-1022 */
-#define QUIT BUTTON_AB
-#define LEFT BUTTON_LEFT
-#define RIGHT BUTTON_RIGHT
-#define FIRE BUTTON_MENU
-
 #elif CONFIG_KEYPAD == GIGABEAT_S_PAD
 
 #define QUIT BUTTON_BACK
@@ -617,7 +609,7 @@ CONFIG_KEYPAD == MROBE500_PAD
 
 #elif (LCD_WIDTH == 220) && (LCD_HEIGHT == 176)
 
-/* TPJ1022, H300, iPod Color: 220x176x16
+/* H300, iPod Color: 220x176x16
  * ============================
  * X: 0p padding at left/right gives 220p playfield in middle.
  *    8p "border" gives 204p actual playfield. UFO use full 220p.

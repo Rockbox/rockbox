@@ -105,7 +105,6 @@
 #define IRIVER_H10_PAD     12
 #define SANSA_E200_PAD     13
 #define SANSA_C200_PAD     14
-#define TATUNG_TPJ1022_PAD 15
 #define MROBE100_PAD       17
 #define MROBE500_PAD       18
 #define GIGABEAT_S_PAD     19
@@ -224,7 +223,6 @@
 #define LCD_GIGABEAT 12
 #define LCD_H10_20GB 13 /* as used by iriver H10 20Gb */
 #define LCD_H10_5GB  14 /* as used by iriver H10 5Gb */
-#define LCD_TPJ1022  15 /* as used by Tatung Elio TPJ-1022 */
 #define LCD_C200     17 /* as used by Sandisk Sansa c200 */
 #define LCD_MROBE500 18 /* as used by Olympus M:Robe 500i */
 #define LCD_MROBE100 19 /* as used by Olympus M:Robe 100 */
@@ -425,8 +423,6 @@ Lyre prototype 1 */
 #include "config/sansae200.h"
 #elif defined(SANSA_C200)
 #include "config/sansac200.h"
-#elif defined(TATUNG_TPJ1022)
-#include "config/tatungtpj1022.h"
 #elif defined(MROBE_100)
 #include "config/mrobe100.h"
 #elif defined(MROBE_500)
