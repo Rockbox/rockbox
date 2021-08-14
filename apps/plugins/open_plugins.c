@@ -495,7 +495,7 @@ static const char* list_get_name_cb(int selected_item, void* data,
                                     char* buf, size_t buf_len)
 {
     /*TODO memoize names so we don't keep reading the disk when not necessary */
-    if (data == &MENU_ID_MAIN)
+    if (data == (void*) &MENU_ID_MAIN) /* check address */
     {
         if (op_entry_read_name(fd_dat, selected_item))
         {
@@ -549,7 +549,7 @@ static const char* list_get_name_cb(int selected_item, void* data,
 
 static int list_voice_cb(int list_index, void* data)
 {
-    if (data == &MENU_ID_MAIN)
+    if (data == (void*) &MENU_ID_MAIN) /* check address */
     {
         if (op_entry_read_name(fd_dat, list_index))
         {
