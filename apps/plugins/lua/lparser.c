@@ -359,6 +359,8 @@ static void open_func (LexState *ls, FuncState *fs) {
 
 
 static void close_func (LexState *ls) {
+  if (!ls || !ls->fs || !ls->fs->f)
+    return;
   lua_State *L = ls->L;
   FuncState *fs = ls->fs;
   Proto *f = fs->f;

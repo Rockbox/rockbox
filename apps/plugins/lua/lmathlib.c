@@ -96,7 +96,10 @@ static int math_floor (lua_State *L) {
 
 static int math_fmod (lua_State *L) {
   /* Was: lua_pushnumber(L, fmod(luaL_checknumber(L, 1), luaL_checknumber(L, 2))); */
-  lua_pushnumber(L, luaL_checknumber(L, 1) % luaL_checknumber(L, 2));
+  lua_Number n = luaL_checknumber(L, 1);
+  lua_Number d = luaL_checknumber(L, 2);
+  luaL_argcheck(L, d != 0, 2, "division by zero");
+  lua_pushnumber(L, n % d);
   return 1;
 }
 
