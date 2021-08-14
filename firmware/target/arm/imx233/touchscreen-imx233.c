@@ -23,9 +23,6 @@
 #include "kernel.h"
 #include "touchscreen-imx233.h"
 #include "stdlib.h"
-#ifdef SAMSUNG_YPZ5
-#include "pinctrl-imx233.h"
-#endif
 
 /* Description:
  * the driver basically has 2 modes:
@@ -82,24 +79,6 @@ static void touch_channel_irq(int chan)
     process();
 }
 
-#ifdef SAMSUNG_YPZ5
-/* On this target we need to manually setup pulldown pins,
- * using specific GPIO lines
- */
-static void pulldown_setup(bool xminus_enable, bool yminus_enable,
-    bool xplus_enable, bool yplus_enable)
-{
-    /* TX+ */
-    imx233_pinctrl_set_gpio(0, 25, xplus_enable);
-    /* TX- */
-    imx233_pinctrl_set_gpio(3, 15, xminus_enable);
-    /* TY+ */
-    imx233_pinctrl_set_gpio(0, 26, yplus_enable);
-    /* TY- */
-    imx233_pinctrl_set_gpio(1, 21, yminus_enable);
-}
-#endif
-
 static void kick_measure(bool pull_x, bool pull_y, bool detect, int src)
 {
 #if IMX233_SUBTARGET < 3700
@@ -116,9 +95,6 @@ static void kick_measure(bool pull_x, bool pull_y, bool detect, int src)
     imx233_icoll_enable_interrupt(INT_SRC_LRADC_CHx(touch_chan), true);
     imx233_lradc_enable_channel_irq(touch_chan, true);
     /* setup measurement: x- pull down and x+ pull up */
-#ifdef SAMSUNG_YPZ5
-    pulldown_setup(pull_x, pull_y, pull_x, pull_y);
-#endif
     imx233_lradc_setup_touch(pull_x, pull_y, pull_x, pull_y, detect);
     imx233_lradc_enable_touch_detect_irq(false);
     imx233_lradc_enable_channel_irq(touch_chan, true);
@@ -138,9 +114,6 @@ static void enter_state(enum touch_state_t state)
     switch(state)
     {
         case TOUCH_STATE_WAIT:
-#ifdef SAMSUNG_YPZ5
-            pulldown_setup(false, false, false, false);
-#endif
             imx233_lradc_setup_touch(false, false, false, false, true);
             imx233_lradc_enable_touch_detect_irq(true);
             break;

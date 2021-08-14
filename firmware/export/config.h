@@ -145,7 +145,6 @@
 #define MA_PAD            56
 #define SONY_NWZ_PAD       57
 #define CREATIVE_ZEN_PAD   58
-#define SAMSUNG_YPZ5_PAD   59
 #define IHIFI_PAD          60
 #define SAMSUNG_YPR1_PAD   61
 #define SAMSUNG_YH92X_PAD  62
@@ -264,7 +263,6 @@
 #define LCD_CREATIVEZENMOZAIC 56 /* as used by the Creative ZEN Mozaic (FGD0801) */
 #define LCD_ILI9342C   57 /* another type of lcd used by HiFi E.T MA9/MA8 */
 #define LCD_CREATIVEZENV  58 /* as used by the Creative Zen V (Plus) */
-#define LCD_SAMSUNGYPZ5   59 /* as used by Samsung YP-Z5 */
 #define LCD_IHIFI         60 /* as used by IHIFI 760/960 */
 #define LCD_CREATIVEZENXFISTYLE 61 /* as used by Creative Zen X-Fi Style */
 #define LCD_SAMSUNGYPR1   62 /* as used by Samsung YP-R1 */
@@ -543,8 +541,6 @@ Lyre prototype 1 */
 #include "config/sonynwze370.h"
 #elif defined(SONY_NWZE360)
 #include "config/sonynwze360.h"
-#elif defined(SAMSUNG_YPZ5)
-#include "config/samsungypz5.h"
 #elif defined(IHIFI760)
 #include "config/ihifi760.h"
 #elif defined(IHIFI770)

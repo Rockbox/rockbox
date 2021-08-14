@@ -1571,7 +1571,7 @@ cat <<EOF
  141) YH-920                                     63) Sansa Fuze v2
  142) YH-925              ==Tatung==             64) Sansa Fuze+
  143) YP-S3               150) Elio TPJ-1022     65) Sansa Clip Zip
- 144) YP-Z5                                      66) Sansa Connect
+                                                 66) Sansa Connect
                           ==Packard Bell==
  ==Application==          160) Vibe 500
  200) SDL
@@ -3083,25 +3083,6 @@ fi
     t_cpu="arm"
     t_manufacturer="s5l8700"
     t_model="yps3"
-    ;;
-
-  144|samsungypz5)
-    target_id=90
-    modelname="samsungypz5"
-    target="SAMSUNG_YPZ5"
-    memory=16
-    bmp2rb_mono="$rootdir/tools/bmp2rb -f 0"
-    bmp2rb_native="$rootdir/tools/bmp2rb -f 4"
-    tool="$rootdir/tools/scramble -add=ypz5"
-    output="rockbox.samsung"
-    bootoutput="bootloader-ypz5.samsung"
-    appextra="gui:recorder:radio"
-    plugins=""
-    toolset=$scramblebitmaptools
-    t_cpu="arm"
-    t_manufacturer="imx233"
-    t_model="samsung-ypz5"
-    arm926ejscc
     ;;
 
    160|vibe500)

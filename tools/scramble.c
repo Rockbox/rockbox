@@ -106,7 +106,7 @@ void usage(void)
            "\t                   m2v4, fuze, c2v2, clv2, y820, y920, y925, x747,\n"
            "\t                   747p, x777, nn2g, m244, cli+, fuz2, hd20, hd30,\n"
            "\t                   ip6g, rk27, clzp, zxf2, zxf3, fuz+, e370, e360,\n"
-           "\t                   zxfi, zmoz, zen, zenv, ypz5, zxfs, e450, e460,\n"
+           "\t                   zxfi, zmoz, zen, zenv, zxfs, e450, e460,\n"
            "\t                   e470, e580, a10, a20, a860, s750, e350, xdx3)\n");
     printf("\nNo option results in nothing being done.\n");
 
@@ -295,8 +295,6 @@ int main (int argc, char** argv)
             modelnum = 82;
         else if (!strcmp(&argv[1][5], "zxf3")) /* Creative Zen X-Fi3 */
             modelnum = 83;
-        else if (!strcmp(&argv[1][5], "ypz5")) /* Samsung YP-Z5 */
-            modelnum = 84;
         else if (!strcmp(&argv[1][5], "zenv")) /* Creative Zen V */
             modelnum = 85;
         else if (!strcmp(&argv[1][5], "zxfi")) /* Creative ZEN X-Fi */
