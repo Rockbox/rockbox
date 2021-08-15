@@ -74,13 +74,13 @@ static struct iconset {
                              (*(inbuilt_iconset[screen])) : iconsets[Iconset_user][screen].bmp).width
 
 /* x,y in letters, not pixles */
-void screen_put_icon(struct screen * display, 
+void screen_put_icon(struct screen * display,
                        int x, int y, enum themable_icons icon)
 {
     screen_put_icon_with_offset(display, x, y, 0, 0, icon);
 }
 
-void screen_put_icon_with_offset(struct screen * display, 
+void screen_put_icon_with_offset(struct screen * display,
                        int x, int y, int off_x, int off_y,
                        enum themable_icons icon)
 {
@@ -107,7 +107,7 @@ void screen_put_iconxy(struct screen * display,
     const int height = ICON_HEIGHT(screen);
     const int is_rtl = lang_is_rtl();
     const struct bitmap *iconset;
-    
+
     if (icon <= Icon_NOICON)
     {
         if (is_rtl)
@@ -119,7 +119,7 @@ void screen_put_iconxy(struct screen * display,
     {
         iconset = &iconsets[Iconset_viewers][screen].bmp;
         icon -= Icon_Last_Themeable;
-        if (!iconsets[Iconset_viewers][screen].loaded || 
+        if (!iconsets[Iconset_viewers][screen].loaded ||
            (global_status.viewer_icon_count * height > iconset->height) ||
            (icon * height + height > iconset->height))
         {
@@ -174,43 +174,54 @@ static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
 static void load_icons(const char* filename, enum Iconset iconset,
                         enum screen_type screen)
 {
-    int size_read;
+    ssize_t size_read;
+    ssize_t buf_size;
+    int fd;
     int bmpformat = (FORMAT_ANY|FORMAT_DITHER|FORMAT_TRANSPARENT);
     struct iconset *ic = &iconsets[iconset][screen];
-    int fd;
-    
+
     ic->loaded = false;
+    ic->handle = 0;
     if (filename[0] && filename[0] != '-')
     {
         char path[MAX_PATH];
-        
+
         snprintf(path, sizeof(path), ICON_DIR "/%s.bmp", filename);
         fd = open(path, O_RDONLY);
         if (fd < 0)
             return;
-        size_t buf_size = read_bmp_fd(fd, &ic->bmp, 0, 
+        buf_size = read_bmp_fd(fd, &ic->bmp, 0,
                                         bmpformat|FORMAT_RETURN_SIZE, NULL);
-        ic->handle = core_alloc_ex(filename, buf_size, &buflib_ops);
+        if (buf_size > 0)
+            ic->handle = core_alloc_ex(filename, (size_t) buf_size, &buflib_ops);
+
         if (ic->handle <= 0)
         {
-            close(fd);
-            return;
+            /* error */
+            goto finished;
         }
         lseek(fd, 0, SEEK_SET);
         ic->bmp.data = core_get_data(ic->handle);
 
         ic->handle_locked = 1;
         size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
-        close(fd);
         ic->handle_locked = 0;
 
+        if (size_read < 0)
+        {
+            /* error */
+            size_read = 0;
+        }
         /* free unused alpha channel, if any */
-        core_shrink(ic->handle, ic->bmp.data, size_read > 0 ? size_read : 0);
+        core_shrink(ic->handle, ic->bmp.data, size_read);
 
-        if (size_read <= 0)
+        if (size_read == 0)
             ic->handle = core_free(ic->handle);
         else
             ic->loaded = true;
+finished:
+        close(fd);
+        return;
     }
 }
 
@@ -234,31 +245,30 @@ void icons_init(void)
     {
         load_icons(global_settings.icon_file, Iconset_user, SCREEN_MAIN);
 
-        if (global_settings.viewers_icon_file[0] &&
-            global_settings.viewers_icon_file[0] != '-')
+        if (global_settings.viewers_icon_file[0] == '-' ||
+            global_settings.viewers_icon_file[0] == '\0')
+        {
+            load_icons(DEFAULT_VIEWER_BMP, Iconset_viewers, SCREEN_MAIN);
+        }
+        else
         {
             load_icons(global_settings.viewers_icon_file,
                     Iconset_viewers, SCREEN_MAIN);
             read_viewer_theme_file();
         }
-        else
-        {
-            load_icons(DEFAULT_VIEWER_BMP, Iconset_viewers, SCREEN_MAIN);
-        }
-
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
-        load_icons(global_settings.remote_icon_file, 
+        load_icons(global_settings.remote_icon_file,
                 Iconset_user, SCREEN_REMOTE);
-        
-        if (global_settings.remote_viewers_icon_file[0] &&
-            global_settings.remote_viewers_icon_file[0] != '-')
+
+        if (global_settings.remote_viewers_icon_file[0] == '-' ||
+            global_settings.remote_viewers_icon_file[0] == '\0')
         {
-            load_icons(global_settings.remote_viewers_icon_file,
+            load_icons(DEFAULT_REMOTE_VIEWER_BMP,
                     Iconset_viewers, SCREEN_REMOTE);
         }
         else
         {
-            load_icons(DEFAULT_REMOTE_VIEWER_BMP,
+            load_icons(global_settings.remote_viewers_icon_file,
                     Iconset_viewers, SCREEN_REMOTE);
         }
 #endif
