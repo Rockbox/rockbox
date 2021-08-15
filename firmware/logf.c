@@ -304,7 +304,7 @@ void logf_panic_dump(int *y)
             }
             if(strlen( &logfbuffer[i + 1]) > 0)
             {
-                lcd_putsf(1, (*y)++, "%*s", &logfbuffer[i + 1]);
+                lcd_putsf(1, (*y)++, "%*s", (MAX_LOGF_SIZE-i), &logfbuffer[i + 1]);
                 lcd_update();
             }
         }
