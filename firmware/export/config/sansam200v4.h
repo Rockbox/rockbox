@@ -75,9 +75,6 @@
 #define CONFIG_RTC RTC_AS3514
 #endif
 
-/* define this if you have RTC RAM available for settings */
-//#define HAVE_RTC_RAM
-
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 

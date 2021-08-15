@@ -584,7 +584,7 @@ void wps_do_playpause(bool updatewps)
         state->paused = true;
         pause_action(true, updatewps);
         settings_save();
-#if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
+#if !defined(HAVE_SW_POWEROFF)
         call_storage_idle_notifys(true);   /* make sure resume info is saved */
 #endif
     }
@@ -630,7 +630,7 @@ long gui_wps_show(void)
                about to shut down. lets save the settings. */
             if (state->paused) {
                 settings_save();
-#if !defined(HAVE_RTC_RAM) && !defined(HAVE_SW_POWEROFF)
+#if !defined(HAVE_SW_POWEROFF)
                 call_storage_idle_notifys(true);
 #endif
             }

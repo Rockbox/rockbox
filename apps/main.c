@@ -444,11 +444,6 @@ static void init(void)
 #if CONFIG_RTC
     rtc_init();
 #endif
-#ifdef HAVE_RTC_RAM
-    CHART(">settings_load(RTC)");
-    settings_load(SETTINGS_RTC); /* early load parts of global_settings */
-    CHART("<settings_load(RTC)");
-#endif
 
     adc_init();
 

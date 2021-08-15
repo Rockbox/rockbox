@@ -68,10 +68,6 @@
 /* TODO: ASCODEC has an auto dim feature, so disabling the supply to leds should do the trick. But for now I tested SW fading only */
 #define CONFIG_BACKLIGHT_FADING BACKLIGHT_FADING_SW_SETTING
 
-/* define this if you have RTC RAM available for settings */
-/* TODO: in theory we could use that, ascodec offers us such a ram. we have also a small device, part of the nand of 1 MB size, that Samsung uses to store region code etc and it's almost unused space */
-//#define HAVE_RTC_RAM
-
 /* define this if you have a real-time clock */
 #define CONFIG_RTC RTC_AS3514
 #define HAVE_RTC_ALARM

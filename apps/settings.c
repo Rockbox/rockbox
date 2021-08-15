@@ -83,11 +83,7 @@ struct system_status global_status;
 #include "pcm_sampr.h"
 
 #define NVRAM_DATA_START 8
-#ifdef HAVE_RTC_RAM
-#define NVRAM_BLOCK_SIZE 44
-#else
 #define NVRAM_BLOCK_SIZE (sizeof(struct system_status) + NVRAM_DATA_START)
-#endif
 
 #define MAX_LINES 10
 
@@ -118,7 +114,6 @@ static bool read_nvram_data(char* buf, int max_len)
 {
     unsigned crc32 = 0xffffffff;
     int var_count = 0, i = 0, buf_pos = 0;
-#ifndef HAVE_RTC_RAM
     int fd = open(NVRAM_FILE, O_RDONLY);
     int bytes;
     if (fd < 0)
@@ -128,12 +123,6 @@ static bool read_nvram_data(char* buf, int max_len)
     close(fd);
     if (bytes < 8) /* min is 8 bytes,magic, ver, vars, crc32 */
         return false;
-#else
-    memset(buf,0,max_len);
-    /* read rtc block */
-    for (i=0; i < max_len; i++ )
-        buf[i] = rtc_read(0x14+i);
-#endif
     /* check magic, version */
     if ((buf[0] != 'R') || (buf[1] != 'b')
         || (buf[2] != NVRAM_CONFIG_VERSION))
@@ -171,9 +160,7 @@ static bool write_nvram_data(char* buf, int max_len)
     unsigned crc32 = 0xffffffff;
     int i = 0, buf_pos = 0;
     char var_count = 0;
-#ifndef HAVE_RTC_RAM
     int fd;
-#endif
     memset(buf,0,max_len);
     /* magic, version */
     buf[0] = 'R'; buf[1] = 'b';
@@ -195,7 +182,6 @@ static bool write_nvram_data(char* buf, int max_len)
     crc32 = crc_32(&buf[NVRAM_DATA_START],
                     max_len-NVRAM_DATA_START-1,0xffffffff);
     memcpy(&buf[4],&crc32,4);
-#ifndef HAVE_RTC_RAM
     fd = open(NVRAM_FILE,O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd >= 0)
     {
@@ -204,16 +190,6 @@ static bool write_nvram_data(char* buf, int max_len)
         if (len < 8)
             return false;
     }
-#else
-    /* FIXME: okay, it _would_ be cleaner and faster to implement rtc_write so
-       that it would write a number of bytes at a time since the RTC chip
-       supports that, but this will have to do for now 8-) */
-    for (i=0; i < NVRAM_BLOCK_SIZE; i++ ) {
-        int r = rtc_write(0x14+i, buf[i]);
-        if (r)
-            return false;
-    }
-#endif
     return true;
 }
 
@@ -586,12 +562,12 @@ static bool settings_write_config(const char* filename, int options)
     close(fd);
     return true;
 }
-#ifndef HAVE_RTC_RAM
+
 static void flush_global_status_callback(void)
 {
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
 }
-#endif
+
 static void flush_config_block_callback(void)
 {
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
@@ -621,23 +597,12 @@ static void update_runtime(void)
 void status_save(void)
 {
     update_runtime();
-#ifdef HAVE_RTC_RAM
-    /* this will be done in the storage_callback if
-       target doesnt have rtc ram */
-    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-#else
     register_storage_idle_func(flush_global_status_callback);
-#endif
 }
 
 int settings_save(void)
 {
     update_runtime();
-#ifdef HAVE_RTC_RAM
-    /* this will be done in the storage_callback if
-       target doesnt have rtc ram */
-    write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-#endif
     register_storage_idle_func(flush_config_block_callback);
     return 0;
 }

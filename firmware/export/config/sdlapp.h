@@ -52,9 +52,6 @@
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 
-/* define this if you have RTC RAM available for settings */
-//#define HAVE_RTC_RAM
-
 /* define this if you have a real-time clock */
 #define CONFIG_RTC APPLICATION
 
