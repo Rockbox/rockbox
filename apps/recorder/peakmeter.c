@@ -46,9 +46,7 @@
 #include "pcm_record.h"
 #endif
 
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
 static bool pm_playback = true; /* selects between playback and recording peaks */
-#endif
 
 static struct meter_scales scales[NB_SCREENS];
 
@@ -543,11 +541,7 @@ void pm_reset_clipcount(void)
  */
 void peak_meter_playback(bool playback)
 {
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-    (void)playback;
-#else
     pm_playback = playback;
-#endif
     /* reset the scales just in case recording and playback
        use different viewport sizes. Normally we should be checking viewport
        sizes every time but this will do for now */
@@ -582,10 +576,6 @@ void peak_meter_peek(void)
     bool was_clipping = pm_clip_left || pm_clip_right;
 #endif
    /* read current values */
-#if (CONFIG_PLATFORM & PLATFORM_HOSTED)
-    pm_cur_left  = left  = 8000;
-    pm_cur_right = right = 9000;
-#else
     if (pm_playback)
     {
         static struct pcm_peaks chan_peaks; /* *MUST* be static */
@@ -600,7 +590,6 @@ void peak_meter_peek(void)
 #endif
     left  = pm_cur_left;
     right = pm_cur_right;
-#endif
 
     /* check for clips
        An clip is assumed when two consecutive readouts
@@ -1078,9 +1067,7 @@ static void peak_meter_draw(struct screen *display, struct meter_scales *scales,
     /* cliplight */
     if ((pm_clip_left || pm_clip_right) &&
         global_settings.cliplight
-#if !(CONFIG_PLATFORM & PLATFORM_HOSTED)
         && !pm_playback
-#endif
 	    )
     {
         /* if clipping, cliplight setting on and in recording screen */
