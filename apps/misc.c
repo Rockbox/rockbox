@@ -864,27 +864,17 @@ char* strrsplt(char* str, int c)
  */
 char *strip_extension(char* buffer, int buffer_size, const char *filename)
 {
-    char *dot = strrchr(filename, '.');
-    int len;
-
-    if (buffer_size <= 0)
+    if (!buffer || !filename || buffer_size <= 0)
     {
         return NULL;
     }
 
-    buffer_size--;  /* Make room for end nil */
+    off_t dotpos = (strrchr(filename, '.') - filename) + 1;
 
-    if (dot != 0 && filename[0] != '.')
-    {
-        len = dot - filename;
-        len = MIN(len, buffer_size);
-    }
-    else
-    {
-        len = buffer_size;
-    }
-
-    strlcpy(buffer, filename, len + 1);
+    /* no match on filename beginning with '.' or beyond buffer_size */
+    if(dotpos > 1 && dotpos < buffer_size)
+        buffer_size = dotpos;
+    strlcpy(buffer, filename, buffer_size);
 
     return buffer;
 }
