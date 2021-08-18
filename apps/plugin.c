@@ -439,7 +439,7 @@ static const struct plugin_api rockbox_api = {
     talk_file_or_spell,
     talk_dir_or_spell,
     talk_number,
-    talk_value,
+    talk_value_decimal,
     talk_spell,
     talk_time,
     talk_date,

@@ -334,7 +334,7 @@ static int speak_property_selection(int selected_item, void *data)
         rb->talk_time(&tm, true);
         break;
     case LANG_PROPERTIES_DURATION:
-        rb->talk_value(nseconds, UNIT_TIME, true);
+        rb->talk_value_decimal(nseconds, UNIT_TIME, 0, true);
         break;
     case LANG_PROPERTIES_SUBDIRS:
         rb->talk_number(dps->dc, true);

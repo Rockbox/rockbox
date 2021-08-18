@@ -185,6 +185,11 @@ static void config_reset_voice(void)
 }
 
 /****************** helper fuctions ******************/
+static inline int talk_val(long n, int unit, bool enqueue)
+{
+    #define NODECIMALS 0
+    return rb->talk_value_decimal(n, unit, NODECIMALS, enqueue);
+}
 
 void announce(void)
 {
@@ -658,7 +663,7 @@ static unsigned char* voice_info_group(unsigned char* current_token, bool testin
             if (current_char == 'T')
             {
                 runtime = rb->global_status->runtime;
-                rb->talk_value(runtime, UNIT_TIME, true);
+                talk_val(runtime, UNIT_TIME, true);
             }
             /* prefix suffix connectives */
             else if (current_char == '1')
@@ -669,7 +674,7 @@ static unsigned char* voice_info_group(unsigned char* current_token, bool testin
             {
                 if (current_char == 'S')
                 {
-                    rb->talk_value(sleep_remaining, UNIT_TIME, true);
+                    talk_val(sleep_remaining, UNIT_TIME, true);
                 }
                 /* prefix suffix connectives */
                 else if (current_char == '2')
@@ -704,15 +709,15 @@ static unsigned char* voice_info_group(unsigned char* current_token, bool testin
 
             if (current_char == 'E')
             {
-                rb->talk_value(elapsed_length, UNIT_TIME, true);
+                talk_val(elapsed_length, UNIT_TIME, true);
             }
             else if (current_char == 'L')
             {
-                rb->talk_value(track_length, UNIT_TIME, true);
+                talk_val(track_length, UNIT_TIME, true);
             }
             else if (current_char == 'R')
             {
-                rb->talk_value(track_remaining, UNIT_TIME, true);
+                talk_val(track_remaining, UNIT_TIME, true);
             }
             else if (current_char == 'T' && id3->title)
             {
@@ -797,11 +802,11 @@ static unsigned char* voice_info_group(unsigned char* current_token, bool testin
 
             if (current_char == 'P')
             {
-                rb->talk_value(rb->battery_level(), UNIT_PERCENT, true);
+                talk_val(rb->battery_level(), UNIT_PERCENT, true);
             }
             else if (current_char == 'M')
             {
-                rb->talk_value(rb->battery_time() * 60, UNIT_TIME, true);
+                talk_val(rb->battery_time() * 60, UNIT_TIME, true);
             }
             /* prefix suffix connectives */
             else if (current_char == '1')

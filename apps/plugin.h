@@ -495,7 +495,7 @@ struct plugin_api {
     int (*talk_dir_or_spell)(const char* filename,
                              const long *prefix_ids, bool enqueue);
     int (*talk_number)(long n, bool enqueue);
-    int (*talk_value)(long n, int unit, bool enqueue);
+    int (*talk_value_decimal)(long n, int unit, int decimals, bool enqueue);
     int (*talk_spell)(const char* spell, bool enqueue);
     void (*talk_time)(const struct tm *tm, bool enqueue);
     void (*talk_date)(const struct tm *tm, bool enqueue);

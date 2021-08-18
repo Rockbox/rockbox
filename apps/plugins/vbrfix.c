@@ -37,7 +37,7 @@ static void xingupdate(int percent)
         long now = *(rb->current_tick) / HZ;
         if (now - last_talk >= 5)
         {
-            rb->talk_value(percent, UNIT_PERCENT, false);
+            rb->talk_value_decimal(percent, UNIT_PERCENT, 0, false);
             last_talk = now;
         }
     }
