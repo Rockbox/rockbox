@@ -148,6 +148,8 @@ extern void msc_unlock(msc_drv* d);
 extern void msc_full_reset(msc_drv* d);
 extern bool msc_card_detect(msc_drv* d);
 
+extern void msc_led_trigger(void);
+
 /* Controller API */
 extern void msc_ctl_reset(msc_drv* d);
 extern void msc_set_clock_mode(msc_drv* d, int mode);

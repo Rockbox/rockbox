@@ -21,6 +21,7 @@
 
 #include "system.h"
 #include "panic.h"
+#include "led.h"
 #include "msc-x1000.h"
 #include "gpio-x1000.h"
 #include "irq-x1000.h"
@@ -223,6 +224,16 @@ bool msc_card_detect(msc_drv* d)
     return gpio_get_level(d->config->cd_gpio) == d->config->cd_active_level;
 }
 
+void msc_led_trigger(void)
+{
+    bool state = false;
+    for(int i = 0; i < MSC_COUNT; ++i)
+        if(msc_drivers[i].req_running)
+            state = true;
+
+    led(state);
+}
+
 /* ---------------------------------------------------------------------------
  * Controller API
  */
@@ -377,6 +388,8 @@ static void msc_finish_request(msc_drv* d, int status)
     d->req->status = status;
     d->req_running = 0;
     d->iflag_done = 0;
+
+    msc_led_trigger();
     timeout_cancel(&d->cmd_tmo);
     semaphore_release(&d->cmd_done);
 }
@@ -464,6 +477,7 @@ void msc_async_start(msc_drv* d, msc_req* r)
     /* Begin processing */
     d->req = r;
     d->req_running = 1;
+    msc_led_trigger();
     jz_writef(MSC_CTRL(d->msc_nr), START_OP(1));
     if(r->flags & MSC_RF_DATA)
         jz_writef(MSC_DMAC(d->msc_nr), ENABLE(1));
