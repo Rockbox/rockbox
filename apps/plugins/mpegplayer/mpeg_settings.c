@@ -470,12 +470,6 @@ static bool mpeg_set_int(const char *string, const char *unit,
     return usb;
 }
 
-static inline int talk_val(long n, int unit, bool enqueue)
-{
-    #define NODECIMALS 0
-    return rb->talk_value_decimal(n, unit, NODECIMALS, enqueue);
-}
-
 static int32_t backlight_brightness_getlang(int value, int unit)
 {
     if (value < 0)

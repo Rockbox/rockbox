@@ -27,6 +27,7 @@
  ****************************************************************************/
 
 #include "plugin.h"
+#include "lib/helper.h"
 #include "lib/kbd_helper.h"
 #include "lib/configfile.h"
 
@@ -185,12 +186,6 @@ static void config_reset_voice(void)
 }
 
 /****************** helper fuctions ******************/
-static inline int talk_val(long n, int unit, bool enqueue)
-{
-    #define NODECIMALS 0
-    return rb->talk_value_decimal(n, unit, NODECIMALS, enqueue);
-}
-
 void announce(void)
 {
     rb->talk_force_shutup();

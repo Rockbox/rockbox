@@ -22,6 +22,12 @@
 #include "plugin.h"
 #include "helper.h"
 
+int talk_val(long n, int unit, bool enqueue)
+{
+    #define NODECIMALS 0
+    return rb->talk_value_decimal(n, unit, NODECIMALS, enqueue);
+}
+
 #ifdef HAVE_BACKLIGHT
 /* Force the backlight on */
 void backlight_force_on(void)

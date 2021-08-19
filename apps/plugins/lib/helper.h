@@ -23,6 +23,8 @@
 
 #include "plugin.h"
 
+int talk_val(long n, int unit, bool enqueue);
+
 /**
  * Backlight on/off operations
  */
