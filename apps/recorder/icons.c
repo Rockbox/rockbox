@@ -122,3 +122,11 @@ const unsigned char bitmap_icon_disk[12] =
     {0x00,0x00,0x00,0x1c,0x2e,0x4f,0x77,0x79,0x3a,0x1c,0x00,0x00};
 #endif
 
+const struct cbmp_bitmap_info_entry core_bitmaps[CBMP_BitmapFormatLast] = /* */
+{
+/* index, pointer, w, h, count */
+[CBMP_Mono_5x8] = {bitmap_icons_5x8[0], 5,8, Icon5x8Last},
+[CBMP_Mono_7x8] = {bitmap_icons_7x8[0], 7, 8, Icon7x8Last},
+[CBMP_Mono_12x8] = {bitmap_icon_disk, 12, 8, 1},
+};
+

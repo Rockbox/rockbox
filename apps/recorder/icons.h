@@ -32,7 +32,25 @@
 #ifdef HAVE_REMOTE_LCD
 #include "bitmaps/remote_rockboxlogo.h"
 #endif
+#endif /* PLUGIN */
 
+struct cbmp_bitmap_info_entry /* */
+{
+    const unsigned char* pbmp;
+    unsigned char width;
+    unsigned char height; /* !ASSUMES MULTIPLES OF 8! */
+    unsigned char count;
+};
+
+enum cbmp_bitmap_format
+{
+    CBMP_Mono_5x8 = 0,
+    CBMP_Mono_7x8,
+    CBMP_Mono_12x8,
+    CBMP_BitmapFormatLast
+};
+
+extern const struct cbmp_bitmap_info_entry core_bitmaps[CBMP_BitmapFormatLast];
 
 /* Symbolic names for icons */
 enum icons_5x8 {
@@ -65,6 +83,12 @@ enum icons_7x8 {
     Icon7x8Last
 };
 
+enum icons_12x8 {
+    Icon_Disk,
+    Icon12x8Last
+};
+
+#ifndef PLUGIN
 #if defined (HAVE_RECORDING)
 #define BM_GLYPH_WIDTH 4
 enum Glyphs_4x8 {

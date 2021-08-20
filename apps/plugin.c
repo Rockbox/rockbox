@@ -178,7 +178,7 @@ static const struct plugin_api rockbox_api = {
     &global_settings,
     &global_status,
     language_strings,
-
+    &core_bitmaps,
     /* lcd */
     splash,
     splashf,

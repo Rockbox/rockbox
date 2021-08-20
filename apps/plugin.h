@@ -188,6 +188,7 @@ struct plugin_api {
     struct user_settings* global_settings;
     struct system_status *global_status;
     unsigned char **language_strings;
+    const struct cbmp_bitmap_info_entry *core_bitmaps;
 
     /* lcd */
     void (*splash)(int ticks, const char *str);
@@ -700,7 +701,7 @@ struct plugin_api {
     void (*dsp_eq_enable)(bool enable);
     void (*dsp_dither_enable)(bool enable);
 #ifdef HAVE_PITCHCONTROL
-    void (*dsp_set_timestretch)(int32_t percent);
+    void    (*dsp_set_timestretch)(int32_t percent);
 #endif
     intptr_t (*dsp_configure)(struct dsp_config *dsp,
                               unsigned int setting, intptr_t value);
