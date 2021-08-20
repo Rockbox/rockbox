@@ -155,12 +155,12 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 244
+#define PLUGIN_API_VERSION 245
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 244
+#define PLUGIN_MIN_API_VERSION 245
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -400,6 +400,7 @@ struct plugin_api {
     int (*get_action)(int context, int timeout);
 #ifdef HAVE_TOUCHSCREEN
     int (*action_get_touchscreen_press)(short *x, short *y);
+    int (*action_get_touchscreen_press_in_vp)(short *x1, short *y1, struct viewport *vp);
 #endif
     bool (*action_userabort)(int timeout);
 
@@ -462,6 +463,7 @@ struct plugin_api {
     bool (*file_exists)(const char *path);
     char* (*strip_extension)(char* buffer, int buffer_size, const char *filename);
     uint32_t (*crc_32)(const void *src, uint32_t len, uint32_t crc32);
+    uint32_t (*crc_32r)(const void *src, uint32_t len, uint32_t crc32);
 
     int (*filetype_get_attr)(const char* file);
 
@@ -667,6 +669,7 @@ struct plugin_api {
                                          unsigned int band_setting);
 #endif /* AUDIOHW_HAVE_EQ */
 #if defined (HAVE_PITCHCONTROL)
+    int32_t (*sound_get_pitch)(void);
     void (*sound_set_pitch)(int32_t pitch);
 #endif
     const unsigned long *audio_master_sampr_list;
@@ -701,7 +704,10 @@ struct plugin_api {
     void (*dsp_eq_enable)(bool enable);
     void (*dsp_dither_enable)(bool enable);
 #ifdef HAVE_PITCHCONTROL
+    int32_t (*dsp_get_timestretch)(void);
     void    (*dsp_set_timestretch)(int32_t percent);
+    void    (*dsp_timestretch_enable)(bool enabled);
+    bool    (*dsp_timestretch_available)(void);
 #endif
     intptr_t (*dsp_configure)(struct dsp_config *dsp,
                               unsigned int setting, intptr_t value);
@@ -727,6 +733,7 @@ struct plugin_api {
     void (*mixer_set_frequency)(unsigned int samplerate);
     unsigned int (*mixer_get_frequency)(void);
     void (*pcmbuf_fade)(bool fade, bool in);
+    void (*pcmbuf_set_low_latency)(bool state);
     void (*system_sound_play)(enum system_sound sound);
     void (*keyclick_click)(bool rawbutton, int action);
 
@@ -793,6 +800,9 @@ struct plugin_api {
     struct mp3entry* (*audio_current_track)(void);
     void (*audio_flush_and_reload_tracks)(void);
     int (*audio_get_file_pos)(void);
+#ifdef PLUGIN_USE_IRAM
+    void (*audio_hard_stop)(void);
+#endif
 
     /* menu */
     struct menu_table *(*root_menu_get_options)(int *nb_options);
@@ -853,6 +863,7 @@ struct plugin_api {
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     int * (*__errno)(void);
 #endif
+    void (*led)(bool on);
     void (*srand)(unsigned int seed);
     int  (*rand)(void);
     void (*qsort)(void *base, size_t nmemb, size_t size,
@@ -907,9 +918,6 @@ struct plugin_api {
     bool (*detect_flashed_ramimage)(void);
     bool (*detect_flashed_romimage)(void);
 #endif
-
-    void (*led)(bool on);
-
     /*plugin*/
     int (*plugin_open)(const char *path, const char *parameter);
     void* (*plugin_get_buffer)(size_t *buffer_size);
@@ -917,11 +925,6 @@ struct plugin_api {
     void (*plugin_release_audio_buffer)(void);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
-#ifdef PLUGIN_USE_IRAM
-    void (*audio_hard_stop)(void);
-#endif
-    uint32_t (*crc_32r)(const void *src, uint32_t len, uint32_t crc32);
-
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
 

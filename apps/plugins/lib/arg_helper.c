@@ -28,7 +28,9 @@
 
 #define SWCHAR '-'
 #define DECSEPCHAR '.'
-
+#ifdef PLUGIN
+    #define strchr rb->strchr
+#endif
 int string_parse(const char **parameter, char* buf, size_t buf_sz)
 {
 /* fills buf with a string upto buf_sz, null terminates the buffer

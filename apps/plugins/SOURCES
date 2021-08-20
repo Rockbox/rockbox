@@ -48,6 +48,10 @@ lamp.c
 pitch_detector.c
 #endif
 
+#ifdef HAVE_PITCHCONTROL
+pitch_screen.c
+#endif
+
 mp3_encoder.c
 wav2wv.c
 

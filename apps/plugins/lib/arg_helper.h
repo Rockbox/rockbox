@@ -26,7 +26,7 @@
 #define ARGPARSE_MAX_FRAC_DIGITS 9 /* Uses 30 bits max (0.999999999) */
 
 #define ARGP_EXP(a, b) (a ##E## b)
-#define ARGP_FRAC_DEC_MULTIPLIER(n) AP_EXP(1,n) /*1x10^n*/
+#define ARGP_FRAC_DEC_MULTIPLIER(n) ARGP_EXP(1,n) /*1x10^n*/
 #define ARGPARSE_FRAC_DEC_MULTIPLIER \
         (long)ARGP_FRAC_DEC_MULTIPLIER(ARGPARSE_MAX_FRAC_DIGITS)
 
