@@ -338,6 +338,29 @@ void read_viewer_theme_file(void)
     custom_icons_loaded = true;
 }
 
+static void read_viewers_config(void)
+{
+    int fd = open(VIEWERS_CONFIG, O_RDONLY);
+    if(fd < 0)
+        return;
+
+    off_t filesz = filesize(fd);
+    if(filesz <= 0)
+        goto out;
+
+    /* estimate bufsize with the filesize, will not be larger */
+    strdup_bufsize = (size_t)filesz;
+    strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
+    if(strdup_handle <= 0)
+        goto out;
+
+    read_config(fd);
+    core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
+
+  out:
+    close(fd);
+}
+
 void  filetype_init(void)
 {
     /* set the directory item first */
@@ -346,36 +369,15 @@ void  filetype_init(void)
     filetypes[0].attr   = 0;
     filetypes[0].icon   = Icon_Folder;
 
-    /* estimate bufsize with the filesize, will not be larger */
     viewer_count = 0;
     filetype_count = 1;
 
-    int fd = open(VIEWERS_CONFIG, O_RDONLY);
-    if (fd < 0)
-        return;
-
-    off_t filesz = filesize(fd);
-
-    if (filesz > 0)
-    {
-        strdup_bufsize = (size_t)filesz;
-        strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
-    }
-
-    if (filesz <= 0 || strdup_handle <= 0)
-    {
-        close(fd);
-        return;
-    }
-
     read_builtin_types();
-    read_config(fd);
-    close(fd);
+    read_viewers_config();
     read_viewer_theme_file();
 #ifdef HAVE_LCD_COLOR
     read_color_theme_file();
 #endif
-    core_shrink(strdup_handle, core_get_data(strdup_handle), strdup_cur_idx);
 }
 
 /* remove all white spaces from string */
