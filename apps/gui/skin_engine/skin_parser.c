@@ -982,6 +982,7 @@ static int parse_progressbar_tag(struct skin_element* element,
     char *image_filename = NULL;
 #ifdef HAVE_TOUCHSCREEN
     bool suppress_touchregion = false;
+    char *touchregion_label = NULL;
 #endif
 
     if (element->params_count == 0 &&
@@ -1156,6 +1157,17 @@ static int parse_progressbar_tag(struct skin_element* element,
 #ifdef HAVE_TOUCHSCREEN
         else if (pb_op == eNOTOUCH)
             suppress_touchregion = true;
+        else if (!strcmp(text, "touchlabel"))
+        {
+            if (curr_param+1 < element->params_count)
+            {
+                curr_param++;
+                param++;
+                touchregion_label = SKINOFFSETTOPTR(skin_buffer, param->data.text);
+            }
+            else /* option needs the next param */
+                return -1;
+        }
 #endif
         else if (token->type == SKIN_TOKEN_SETTING && pb_op == eSETTING_OFFSET)
         {
@@ -1285,7 +1297,7 @@ static int parse_progressbar_tag(struct skin_element* element,
         region->press_length = PRESS;
         region->last_press = -1;
         region->bar = PTRTOSKINOFFSET(skin_buffer, pb);
-        region->label = PTRTOSKINOFFSET(skin_buffer, NULL);
+        region->label = PTRTOSKINOFFSET(skin_buffer, touchregion_label);
 
         item = new_skin_token_list_item(NULL, region);
         if (!item)
