@@ -115,7 +115,8 @@ int fms_do_button_loop(bool update_screen)
         case ACTION_STD_MENU:
             return ACTION_FM_MENU;
         case ACTION_TOUCH_SCROLLBAR:
-            /* TODO */
+            /* TODO - skin_get_touchaction has this hardcoded to seek in
+             * current track, refactor it if this is ever implemented. */
             break;
     }   
 #endif

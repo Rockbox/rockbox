@@ -170,7 +170,6 @@ void wps_do_action(enum wps_do_action_type action, bool updatewps)
 static int skintouch_to_wps(void)
 {
     int offset = 0;
-    struct wps_state *gstate = get_wps_state();
     struct gui_wps *gwps = skin_get_gwps(WPS, SCREEN_MAIN);
     int button = skin_get_touchaction(gwps, &offset);
     switch (button)
@@ -193,18 +192,6 @@ static int skintouch_to_wps(void)
         case ACTION_STD_HOTKEY:
             return ACTION_WPS_HOTKEY;
 #endif
-        case ACTION_TOUCH_SCROLLBAR_SET:
-            audio_pre_ff_rewind();
-            gstate->id3->elapsed = gstate->id3->length*offset/1000;
-            return ACTION_TOUCHSCREEN;
-        case ACTION_TOUCH_SCROLLBAR_END:
-            audio_ff_rewind(gstate->id3->elapsed);
-            return ACTION_TOUCHSCREEN;
-        case ACTION_TOUCH_SCROLLBAR:
-            gstate->id3->elapsed = gstate->id3->length*offset/1000;
-            audio_pre_ff_rewind();
-            audio_ff_rewind(gstate->id3->elapsed);
-            return ACTION_TOUCHSCREEN;
     }
     return button;
 }

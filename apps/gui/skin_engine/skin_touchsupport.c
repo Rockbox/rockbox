@@ -33,6 +33,7 @@
 #include "splash.h"
 #include "playlist.h"
 #include "dsp_misc.h"
+#include "playback.h"
 
 /** Disarms all touchregions. */
 void skin_disarm_touchregions(struct gui_wps *gwps)
@@ -195,13 +196,32 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
     switch (action)
     {
     case ACTION_TOUCH_SCROLLBAR:
+    {
+        action = ACTION_TOUCHSCREEN;
+
+        struct wps_state* gwps = get_wps_state();
+        if (!gwps->id3)
+            break;
+
         if (gevent.id == GESTURE_HOLD ||
             gevent.id == GESTURE_DRAGSTART ||
             gevent.id == GESTURE_DRAG)
-            action = ACTION_TOUCH_SCROLLBAR_SET;
+        {
+            audio_pre_ff_rewind();
+            gwps->id3->elapsed = gwps->id3->length * (*edge_offset) / 1000;
+        }
         else if (gevent.id == GESTURE_RELEASE)
-            action = ACTION_TOUCH_SCROLLBAR_END;
-        break;
+        {
+            audio_ff_rewind(gwps->id3->elapsed);
+        }
+        else
+        {
+            gwps->id3->elapsed = gwps->id3->length * (*edge_offset) / 1000;
+            audio_pre_ff_rewind();
+            audio_ff_rewind(gwps->id3->elapsed);
+        }
+
+    } break;
 
     case ACTION_TOUCH_VOLUME:
     {
