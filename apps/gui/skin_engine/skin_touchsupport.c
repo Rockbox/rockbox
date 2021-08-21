@@ -203,6 +203,19 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
             action = ACTION_TOUCH_SCROLLBAR_END;
         break;
 
+    case ACTION_TOUCH_VOLUME:
+    {
+        const int min_vol = sound_min(SOUND_VOLUME);
+        const int max_vol = sound_max(SOUND_VOLUME);
+        const int step_vol = sound_steps(SOUND_VOLUME);
+
+        global_status.volume = from_normalized_volume(*edge_offset, min_vol, max_vol, 1000);
+        global_status.volume -= (global_status.volume % step_vol);
+        setvol();
+
+        action = ACTION_TOUCHSCREEN;
+    } break;
+
     case ACTION_TOUCH_SOFTLOCK:
         data->touchscreen_locked = !data->touchscreen_locked;
         action = ACTION_NONE;

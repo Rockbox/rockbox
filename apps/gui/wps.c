@@ -205,17 +205,6 @@ static int skintouch_to_wps(void)
             audio_pre_ff_rewind();
             audio_ff_rewind(gstate->id3->elapsed);
             return ACTION_TOUCHSCREEN;
-        case ACTION_TOUCH_VOLUME:
-        {
-            const int min_vol = sound_min(SOUND_VOLUME);
-            const int max_vol = sound_max(SOUND_VOLUME);
-            const int step_vol = sound_steps(SOUND_VOLUME);
-
-            global_status.volume = from_normalized_volume(offset, min_vol, max_vol, 1000);
-            global_status.volume -= (global_status.volume % step_vol);
-            setvol();
-        }
-        return ACTION_TOUCHSCREEN;
     }
     return button;
 }
