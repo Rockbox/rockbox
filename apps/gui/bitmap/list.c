@@ -359,8 +359,7 @@ static enum {
     SCROLL_KINETIC,         /* state after releasing swipe */
 } scroll_mode;
 
-static int scrollbar_scroll(struct gui_synclist * gui_list,
-                                              int y)
+static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
 {
     const int screen = screens[SCREEN_MAIN].screen_type;
     const int nb_lines = list_get_nb_lines(gui_list, screen);
@@ -369,11 +368,9 @@ static int scrollbar_scroll(struct gui_synclist * gui_list,
     {
         /* scrollbar scrolling is still line based */
         y_offset = 0;
-        int scrollbar_size = nb_lines*gui_list->line_height[screen];
+        int scrollbar_size = nb_lines * gui_list->line_height[screen];
         int actual_y = y - list_text[screen].y;
-
-        int new_selection = (actual_y * gui_list->nb_items)
-                / scrollbar_size;
+        int new_selection = (actual_y * gui_list->nb_items) / scrollbar_size;
 
         int start_item = new_selection - nb_lines/2;
         if(start_item < 0)
@@ -839,7 +836,7 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
             hide_selection = true;
             /* similarly to swipe scroll, using the scrollbar grabs
              * focus so the click location is irrelevant */
-            scrollbar_scroll(list, adj_y);
+            scrollbar_scroll(list, y);
             if (action & BUTTON_REL)
                 scroll_mode = SCROLL_NONE;
             break;
