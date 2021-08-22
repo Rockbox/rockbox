@@ -41,12 +41,33 @@
 
 #include "xdebug.h"
 
+#define SHOW_LOGO
+
 extern void show_logo(void);
 extern void power_off(void);
+
+static int lcd_inited = 0;
+void init_lcd(void)
+{
+    if(lcd_inited)
+        return;
+
+    lcd_init();
+    font_init();
+    lcd_setfont(FONT_SYSFIXED);
+
+    lcd_clear_display();
+    lcd_update();
+
+    backlight_init();
+
+    lcd_inited = true;
+}
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
 static void show_splash(int timeout, const char *msg)
 {
+    init_lcd();
     reset_screen();
     lcd_putsxy( (LCD_WIDTH - (SYSFONT_WIDTH * strlen(msg))) / 2,
                 (LCD_HEIGHT - SYSFONT_HEIGHT) / 2, msg);
@@ -68,19 +89,20 @@ static void usb_mode(void)
         usb_inited = 1;
     }
 
+    init_lcd();
+    reset_screen();
+
     /* Wait for threads to connect */
     show_splash(HZ/2, "Waiting for USB");
 
-    while (1)
-    {
+    while (1) {
         button = button_get_w_tmo(HZ/2);
 
         if (button == SYS_USB_CONNECTED)
             break; /* Hit */
     }
 
-    if (button == SYS_USB_CONNECTED)
-    {
+    if (button == SYS_USB_CONNECTED) {
         /* Got the message - wait for disconnect */
         show_splash(0, "Bootloader USB mode");
 
@@ -113,8 +135,7 @@ static int boot_rockbox(void)
 
     printf("Mounting disk...\n");
 
-    while((rc = disk_mount_all()) <= 0)
-    {
+    while((rc = disk_mount_all()) <= 0) {
         verbose = true;
 #ifdef HAVE_BOOTLOADER_USB_MODE
         error(EDISK, rc, false);
@@ -126,10 +147,9 @@ static int boot_rockbox(void)
 
     printf("Loading firmware...\n");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
-    if(rc <= EFILE_EMPTY)
+    if(rc <= EFILE_EMPTY) {
         return rc;
-    else
-    {
+    } else {
         printf("Starting Rockbox...\n");
         adc_close(); /* Disable SADC, seems to fix the re-init Rockbox does */
         disable_interrupt();
@@ -166,15 +186,19 @@ int main(void)
     system_init();
     kernel_init();
 
-    lcd_init();
-    font_init();
-    lcd_setfont(FONT_SYSFIXED);
-    backlight_init();
+    init_lcd();
+#ifdef SHOW_LOGO
     show_logo();
+#endif
+
+    button_init();
+    int btn = button_read_device();
+    if(btn & BUTTON_PLAY) {
+       verbose = true;
+    }
 
     rc = storage_init();
-    if(rc)
-    {
+    if(rc) {
         verbose = true;
         error(EATA, rc, true);
     }
@@ -185,8 +209,6 @@ int main(void)
        which are fixable in USB mode */
 
 #ifdef HAVE_BOOTLOADER_USB_MODE
-    button_init();
-    int btn = button_read_device();
 
     /* Enter USB mode if USB is plugged and PLAY button is pressed */
     if(btn & BUTTON_PLAY) {
@@ -197,20 +219,27 @@ int main(void)
 
     reset_screen();
 
+#ifndef SHOW_LOGO
     printf(MODEL_NAME" Rockbox Bootloader\n");
     printf("Version %s\n", rbversion);
+#endif
 
     rc = boot_rockbox();
 
-    if(rc <= EFILE_EMPTY)
-    {
+    if(rc <= EFILE_EMPTY) {
         verbose = true;
         printf("Error: %s", loader_strerror(rc));
     }
 
+#if 1
+    /* Power off */
+    sleep(5*HZ);
+    power_off();
+#else
     /* Halt */
     while (1)
         core_idle();
+#endif
 
     return 0;
 }
