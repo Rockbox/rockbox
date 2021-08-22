@@ -118,6 +118,10 @@ struct gui_synclist
     bool scroll_all;
     int nb_items;
     int selected_item;
+#ifdef HAVE_TOUCHSCREEN
+    /* absolute Y coordinate, used for smooth scrolling */
+    int y_pos;
+#endif
     int start_item[NB_SCREENS]; /* the item that is displayed at the top of the screen */
     /* the number of lines that are selected at the same time */
     int selected_size;
@@ -229,7 +233,7 @@ int skinlist_get_line_count(enum screen_type screen, struct gui_synclist *list);
 /* this needs to be fixed if we ever get more than 1 touchscreen on a target */
 extern unsigned gui_synclist_do_touchscreen(struct gui_synclist * gui_list);
 /* only for private use in gui/list.c */
-extern void _gui_synclist_stop_kinetic_scrolling(void);
+extern void _gui_synclist_stop_kinetic_scrolling(struct gui_synclist * gui_list);
 #endif
 
 /* If the list has a pending postponed scheduled announcement, that

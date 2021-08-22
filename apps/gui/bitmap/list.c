@@ -50,7 +50,6 @@
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
 
 #ifdef HAVE_TOUCHSCREEN
-static int y_offset;
 static bool hide_selection;
 #endif
 
@@ -170,12 +169,9 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     end = start + nb_lines;
 
 #ifdef HAVE_TOUCHSCREEN
-    if (list->selected_item == 0 || (list->nb_items < nb_lines))
-        y_offset = 0; /* reset in case it's a new list */
-
-    int draw_offset = y_offset;
+    int draw_offset = list_start_item * linedes.height - list->y_pos;
     /* draw some extra items to not have empty lines at the top and bottom */
-    if (y_offset > 0)
+    if (draw_offset > 0)
     {
         /* make it negative for more consistent apparence when switching
          * directions */
@@ -183,7 +179,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         if (start > 0)
             start--;
     }
-    else if (y_offset < 0)
+    else if (draw_offset < 0)
         end++;
 #else
     #define draw_offset 0
@@ -367,7 +363,6 @@ static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
     if (nb_lines <  gui_list->nb_items)
     {
         /* scrollbar scrolling is still line based */
-        y_offset = 0;
         int scrollbar_size = nb_lines * gui_list->line_height[screen];
         int actual_y = y - list_text[screen].y;
         int new_selection = (actual_y * gui_list->nb_items) / scrollbar_size;
@@ -379,6 +374,7 @@ static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
             start_item = gui_list->nb_items - nb_lines;
 
         gui_list->start_item[screen] = start_item;
+        gui_list->y_pos = start_item * gui_list->line_height[screen];
 
         return ACTION_REDRAW;
     }
@@ -468,9 +464,11 @@ static void kinetic_force_stop(void)
 
 /* helper for gui/list.c to cancel scrolling if a normal button event comes
  * through dpad or keyboard or whatever */
-void _gui_synclist_stop_kinetic_scrolling(void)
+void _gui_synclist_stop_kinetic_scrolling(struct gui_synclist * gui_list)
 {
-    y_offset = 0;
+    const enum screen_type screen = screens[SCREEN_MAIN].screen_type;
+    gui_list->y_pos = gui_list->start_item[screen] * gui_list->line_height[screen];
+
     if (scroll_mode == SCROLL_KINETIC)
         kinetic_force_stop();
     scroll_mode = SCROLL_NONE;
@@ -512,22 +510,25 @@ static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
     int new_start_item = -1;
     int line_diff = 0;
 
-    /* don't scroll at the edges of the list */
-    if ((old_start == 0 && difference > 0)
-     || (old_start == (gui_list->nb_items - nb_lines) && difference < 0))
-    {
-        y_offset = 0;
-        gui_list->start_item[screen] = old_start;
-        return scroll_mode != SCROLL_KINETIC; /* stop kinetic at the edges */
-    }
+    /* Track whether we hit the end of the list for sake of kinetic scroll */
+    bool hit_end = true;
 
-    /* add up y_offset over time and translate to lines
-     * if scrolled enough */
-    y_offset += difference;
-    if (abs(y_offset) > line_height)
+    /* Move the y position and clamp it (funny things happen otherwise...) */
+    gui_list->y_pos -= difference;
+    if(gui_list->y_pos < 0)
+        gui_list->y_pos = 0;
+    else if(gui_list->y_pos > (gui_list->nb_items - nb_lines) * line_height)
+        gui_list->y_pos = (gui_list->nb_items - nb_lines) * line_height;
+    else
+        hit_end = false;
+
+    /* Get the list y position. When pos_y differs by a line height or more,
+     * we need to scroll the list by adjusting the start item accordingly */
+    int cur_y = gui_list->start_item[screen] * line_height;
+    int diff_y = cur_y - gui_list->y_pos;
+    if (abs(diff_y) >= line_height)
     {
-        line_diff = y_offset/line_height;
-        y_offset -= line_diff * line_height;
+        line_diff = diff_y/line_height;
     }
 
     if(line_diff != 0)
@@ -548,7 +549,10 @@ static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
             gui_list->selected_item -= (gui_list->selected_item % gui_list->selected_size);
     }
 
-    return true;
+    if(hit_end)
+        return scroll_mode != SCROLL_KINETIC;
+    else
+        return true;
 }
 
 static int kinetic_callback(struct timeout *tmo)
@@ -729,7 +733,8 @@ unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
                 if(!skinlist_get_item(&screens[screen], list, adj_x, adj_y, &line))
                 {
                     /* selection needs to be corrected if items are only partially visible */
-                    line = (adj_y - y_offset) / line_height;
+                    int cur_y = list->start_item[screen] * line_height;
+                    line = (adj_y - (cur_y - list->y_pos)) / line_height;
                     if (list_display_title(list, screen))
                         line -= 1; /* adjust for the list title */
                 }

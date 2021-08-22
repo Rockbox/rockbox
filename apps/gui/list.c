@@ -152,6 +152,9 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->callback_speak_item = NULL;
     gui_list->nb_items = 0;
     gui_list->selected_item = 0;
+#ifdef HAVE_TOUCHSCREEN
+    gui_list->y_pos = 0;
+#endif
     FOR_NB_SCREENS(i)
     {
         gui_list->start_item[i] = 0;
@@ -282,6 +285,9 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
         gui_list->start_item[screen] = bottom;
     else
         gui_list->start_item[screen] = new_start_item;
+#ifdef HAVE_TOUCHSCREEN
+    gui_list->y_pos = gui_list->start_item[SCREEN_MAIN] * gui_list->line_height[SCREEN_MAIN];
+#endif
 }
 
 static void edge_beep(struct gui_synclist * gui_list, bool wrap)
@@ -417,6 +423,10 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                                     gui_list->selected_size);
                 gui_list->selected_item = gui_list->start_item[i] + nb_lines;
             }
+
+#ifdef HAVE_TOUCHSCREEN
+            gui_list->y_pos = gui_list->start_item[SCREEN_MAIN] * gui_list->line_height[SCREEN_MAIN];
+#endif
         }
         return;
     }
@@ -667,7 +677,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
         action = *actionptr = gui_synclist_do_touchscreen(lists);
     else if (action > ACTION_TOUCHSCREEN_MODE)
         /* cancel kinetic if we got a normal button event */
-        _gui_synclist_stop_kinetic_scrolling();
+        _gui_synclist_stop_kinetic_scrolling(lists);
 #endif
 
     /* Disable the skin redraw callback */
