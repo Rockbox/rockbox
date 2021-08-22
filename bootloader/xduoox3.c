@@ -55,13 +55,18 @@ static void show_splash(int timeout, const char *msg)
     sleep(timeout);
 }
 
+static int usb_inited = 0;
+
 static void usb_mode(void)
 {
     int button;
 
-    /* Init USB */
-    usb_init();
-    usb_start_monitoring();
+    /* Init USB, but only once */
+    if (!usb_inited) {
+        usb_init();
+        usb_start_monitoring();
+        usb_inited = 1;
+    }
 
     /* Wait for threads to connect */
     show_splash(HZ/2, "Waiting for USB");
@@ -91,10 +96,20 @@ static void usb_mode(void)
 }
 #endif
 
+/* Jump to loaded binary */
+void exec(void* addr) __attribute__((noinline, noreturn, section(".icode")));
+
+void exec(void* addr)
+{
+    commit_discard_idcache();
+    typedef void(*entry_fn)(void) __attribute__((noreturn));
+    entry_fn fn = (entry_fn)addr;
+    fn();
+}
+
 static int boot_rockbox(void)
 {
     int rc;
-    void (*kernel_entry)(void);
 
     printf("Mounting disk...\n");
 
@@ -103,7 +118,6 @@ static int boot_rockbox(void)
         verbose = true;
 #ifdef HAVE_BOOTLOADER_USB_MODE
         error(EDISK, rc, false);
-        usb_start_monitoring();
         usb_mode();
 #else
         error(EDISK, rc, true);
@@ -118,11 +132,8 @@ static int boot_rockbox(void)
     {
         printf("Starting Rockbox...\n");
         adc_close(); /* Disable SADC, seems to fix the re-init Rockbox does */
-
         disable_interrupt();
-        kernel_entry = (void*) CONFIG_SDRAM_START;
-        kernel_entry();
-
+        exec((void*) CONFIG_SDRAM_START);
         return 0; /* Shouldn't happen */
     }
 }
@@ -152,13 +163,13 @@ int main(void)
 
     serial_puts("\n\nSPL Stage 2\n\n");
 
+    system_init();
     kernel_init();
+
     lcd_init();
     font_init();
     lcd_setfont(FONT_SYSFIXED);
-    button_init();
     backlight_init();
-
     show_logo();
 
     rc = storage_init();
@@ -170,22 +181,19 @@ int main(void)
 
     filesystem_init();
 
-#ifdef HAVE_BOOTLOADER_USB_MODE
-    button_init_device();
-    int btn = button_read_device();
+    /* Don't mount the disks yet, there could be file system/partition errors
+       which are fixable in USB mode */
 
-    usb_init();
+#ifdef HAVE_BOOTLOADER_USB_MODE
+    button_init();
+    int btn = button_read_device();
 
     /* Enter USB mode if USB is plugged and PLAY button is pressed */
     if(btn & BUTTON_PLAY) {
-        usb_start_monitoring();
         if(usb_detect() == USB_INSERTED)
             usb_mode();
     }
 #endif /* HAVE_BOOTLOADER_USB_MODE */
-
-    /* Don't mount the disks yet, there could be file system/partition errors
-       which are fixable in USB mode */
 
     reset_screen();
 
