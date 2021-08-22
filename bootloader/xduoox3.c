@@ -136,7 +136,7 @@ static int boot_rockbox(void)
 {
     int rc;
 
-    printf("Mounting disk...\n");
+    printf("Mounting disk...");
 
     while((rc = disk_mount_all()) <= 0) {
         verbose = true;
@@ -148,12 +148,13 @@ static int boot_rockbox(void)
 #endif
     }
 
-    printf("Loading firmware...\n");
+    printf("Loading firmware...");
     rc = load_firmware((unsigned char *)CONFIG_SDRAM_START, BOOTFILE, 0x400000);
     if(rc <= EFILE_EMPTY) {
+        printf("!! " BOOTFILE);
         return rc;
     } else {
-        printf("Starting Rockbox...\n");
+        printf("Starting Rockbox...");
         adc_close(); /* Disable SADC, seems to fix the re-init Rockbox does */
         disable_interrupt();
         exec((void*) CONFIG_SDRAM_START);
@@ -223,8 +224,8 @@ int main(void)
     reset_screen();
 
 #ifndef SHOW_LOGO
-    printf(MODEL_NAME" Rockbox Bootloader\n");
-    printf("Version %s\n", rbversion);
+    printf(MODEL_NAME" Rockbox Bootloader");
+    printf("Version %s", rbversion);
 #endif
 
     rc = boot_rockbox();
