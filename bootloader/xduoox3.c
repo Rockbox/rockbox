@@ -26,7 +26,9 @@
 #include "font.h"
 #include "lcd.h"
 #include "file.h"
+#ifdef HAVE_BOOTLOADER_USB_MODE
 #include "usb.h"
+#endif
 #include "system.h"
 #include "button.h"
 #include "common.h"
@@ -80,7 +82,7 @@ static int usb_inited = 0;
 
 static void usb_mode(void)
 {
-    int button;
+    int button = 0;
 
     /* Init USB, but only once */
     if (!usb_inited) {
@@ -92,32 +94,28 @@ static void usb_mode(void)
     init_lcd();
     reset_screen();
 
-    /* Wait for threads to connect */
-    show_splash(HZ/2, "Waiting for USB");
-
-    while (1) {
+    /* Wait for USB */
+    show_splash(0, "Waiting for USB");
+    while(1) {
         button = button_get_w_tmo(HZ/2);
-
-        if (button == SYS_USB_CONNECTED)
-            break; /* Hit */
-
         if (button == BUTTON_POWER)
             return;
+        if (button == SYS_USB_CONNECTED)
+            break; /* Hit */
     }
 
-    if (button == SYS_USB_CONNECTED) {
-        /* Got the message - wait for disconnect */
-        show_splash(0, "Bootloader USB mode");
+    /* Got the message - wait for disconnect */
+    show_splash(0, "Bootloader USB mode");
 
-        usb_acknowledge(SYS_USB_CONNECTED_ACK);
+    usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
-        while (1)
-        {
-            button = button_get(true);
-            if (button == SYS_USB_DISCONNECTED)
-                break;
-        }
+    while(1) {
+        button = button_get_w_tmo(HZ/2);
+        if (button == SYS_USB_DISCONNECTED)
+            break;
     }
+
+    show_splash(HZ*2, "USB disconnected");
 }
 #endif
 
@@ -196,8 +194,10 @@ int main(void)
 #endif
 
     button_init();
+    enable_irq();
+
     int btn = button_read_device();
-    if(btn & BUTTON_PLAY) {
+    if(btn & BUTTON_POWER) {
        verbose = true;
     }
 
@@ -209,19 +209,13 @@ int main(void)
 
     filesystem_init();
 
-    /* Don't mount the disks yet, there could be file system/partition errors
-       which are fixable in USB mode */
-
 #ifdef HAVE_BOOTLOADER_USB_MODE
-
-    /* Enter USB mode if USB is plugged and PLAY button is pressed */
-    if(btn & BUTTON_PLAY) {
-        if(usb_detect() == USB_INSERTED)
-            usb_mode();
+    /* Enter USB mode if USB is plugged and POWER button is pressed */
+    if (btn & BUTTON_POWER) {
+        usb_mode();
+        reset_screen();
     }
 #endif /* HAVE_BOOTLOADER_USB_MODE */
-
-    reset_screen();
 
 #ifndef SHOW_LOGO
     printf(MODEL_NAME" Rockbox Bootloader");
@@ -235,15 +229,9 @@ int main(void)
         printf("Error: %s", loader_strerror(rc));
     }
 
-#if 1
     /* Power off */
     sleep(5*HZ);
     power_off();
-#else
-    /* Halt */
-    while (1)
-        core_idle();
-#endif
 
     return 0;
 }
