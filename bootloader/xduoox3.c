@@ -100,6 +100,9 @@ static void usb_mode(void)
 
         if (button == SYS_USB_CONNECTED)
             break; /* Hit */
+
+        if (button == BUTTON_POWER)
+            return;
     }
 
     if (button == SYS_USB_CONNECTED) {
