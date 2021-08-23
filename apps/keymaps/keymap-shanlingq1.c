@@ -30,8 +30,11 @@
 
 static const struct button_mapping button_context_standard[] = {
     {ACTION_STD_PREV,           BUTTON_PREV,                        BUTTON_NONE},
+    {ACTION_STD_PREVREPEAT,     BUTTON_PREV|BUTTON_REPEAT,          BUTTON_NONE},
     {ACTION_STD_NEXT,           BUTTON_NEXT,                        BUTTON_NONE},
+    {ACTION_STD_NEXTREPEAT,     BUTTON_NEXT|BUTTON_REPEAT,          BUTTON_NONE},
     {ACTION_STD_OK,             BUTTON_PLAY|BUTTON_REL,             BUTTON_PLAY},
+    {ACTION_STD_CONTEXT,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_PLAY},
     {ACTION_STD_CANCEL,         BUTTON_POWER|BUTTON_REL,            BUTTON_POWER},
     LAST_ITEM_IN_LIST
 }; /* button_context_standard */
@@ -77,7 +80,6 @@ const struct button_mapping* target_get_context_mapping(int context)
         case CONTEXT_CUSTOM|CONTEXT_TREE:
         case CONTEXT_MAINMENU:
         case CONTEXT_BOOKMARKSCREEN:
-            //return button_context_tree;
         case CONTEXT_LIST:
             return button_context_list;
         case CONTEXT_YESNOSCREEN:
