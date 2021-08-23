@@ -185,7 +185,7 @@
 
 /* enable these for the experimental usb stack */
 #define HAVE_USBSTACK
-#define HAVE_BOOTLOADER_USB_MODE
+//#define HAVE_BOOTLOADER_USB_MODE
 
 /* Connect by events, not by tick polling */
 #define USB_STATUS_BY_EVENT
