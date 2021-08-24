@@ -3,6 +3,7 @@ gcc-support.c
 pluginlib_actions.c
 helper.c
 icon_helper.c
+arg_helper.c
 md5.c
 jhash.c
 configfile.c
