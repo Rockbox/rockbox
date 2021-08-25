@@ -674,7 +674,7 @@ int eq_menu_graphical(void)
             {
                 if (current_band == 0) {
                     start_item = 0;
-                } else if (current_band == 9) {
+                } else if (current_band == EQ_NUM_BANDS - 1) {
                     start_item = EQ_NUM_BANDS - nb_eq_sliders[i];
                 } else {
                     start_item = current_band - 1;
