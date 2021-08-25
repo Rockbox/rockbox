@@ -48,4 +48,7 @@ const char* eq_q_format(char* buffer, size_t buffer_size, int value,
 const char* eq_precut_format(char* buffer, size_t buffer_size, int value,
                              const char* unit);
 
+/* callbacks for settings_list.c */
+void eq_enabled_option_callback(bool enabled);
+
 #endif

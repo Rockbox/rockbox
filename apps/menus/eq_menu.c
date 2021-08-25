@@ -51,6 +51,8 @@
 #include "option_select.h"
 #include "string-extra.h"
 
+static void eq_apply(void);
+
 /*
  * Utility functions
  */
@@ -67,6 +69,12 @@ const char* eq_precut_format(char* buffer, size_t buffer_size, int value, const 
     snprintf(buffer, buffer_size, "%s%d.%d %s", value == 0 ? " " : "-",
         value / EQ_USER_DIVISOR, value % EQ_USER_DIVISOR, unit);
     return buffer;
+}
+
+void eq_enabled_option_callback(bool enabled)
+{
+    (void)enabled;
+    eq_apply();
 }
 
 /*
