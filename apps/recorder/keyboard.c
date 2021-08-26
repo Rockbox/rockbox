@@ -342,6 +342,13 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         viewportmanager_theme_enable(l, false, NULL);
     }
 
+#ifdef HAVE_TOUCHSCREEN
+    /* keyboard is unusuable in pointing mode so force 3x3 for now.
+     * TODO - fix properly by using a bigger font and changing the layout */
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
+
     /* initialize state */
     state.text = text;
     state.buflen = buflen;
@@ -679,6 +686,10 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
 
     if (ret < 0)
         splash(HZ/2, ID2P(LANG_CANCEL));
+
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
 
 #if defined(HAVE_MORSE_INPUT) && defined(KBD_TOGGLE_INPUT)
     if (global_settings.morse_input != state.morse_mode)
