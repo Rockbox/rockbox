@@ -43,3 +43,10 @@ void backlight_hw_off(void)
 {
     GPIO_CLEAR_BITWISE(GPIOB_OUTPUT_VAL, 0x08);
 }
+
+bool backlight_hw_init(void)
+{
+    GPIO_SET_BITWISE(GPIOB_ENABLE, 0x0c); /* B02 and B03 enable */
+    GPIO_SET_BITWISE(GPIOB_OUTPUT_VAL, 0x08); /* B03 = 1 */
+    return true;
+}
