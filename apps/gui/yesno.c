@@ -28,6 +28,7 @@
 #include "talk.h"
 #include "settings.h"
 #include "viewport.h"
+#include "appevents.h"
 
 
 struct gui_yesno
@@ -142,6 +143,16 @@ static bool gui_yesno_draw_result(struct gui_yesno * yn, enum yesno_res result)
     return(true);
 }
 
+static void gui_yesno_ui_update(unsigned short id, void *event_data, void *user_data)
+{
+    (void)id;
+    (void)event_data;
+
+    struct gui_yesno* yn = (struct gui_yesno*)user_data;
+    FOR_NB_SCREENS(i)
+        gui_yesno_draw(&yn[i]);
+}
+
 enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                                  const struct text_message * yes_message,
                                  const struct text_message * no_message)
@@ -166,13 +177,17 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
 
 #ifdef HAVE_TOUCHSCREEN
     /* switch to point mode because that's more intuitive */
-    enum touchscreen_mode tsm = touchscreen_get_mode();
+    enum touchscreen_mode old_mode = touchscreen_get_mode();
     touchscreen_set_mode(TOUCHSCREEN_POINT);
 #endif
 
     /* make sure to eat any extranous keypresses */
     action_wait_for_release();
     button_clear_queue();
+
+    /* hook into UI update events to avoid the dialog disappearing
+     * in case the skin decides to do a full refresh */
+    add_event_ex(GUI_EVENT_NEED_UI_UPDATE, false, gui_yesno_ui_update, &yn[0]);
 
     while (result==-1)
     {
@@ -218,21 +233,13 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
                 continue;
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED) {
-#ifdef HAVE_TOUCHSCREEN
-                    /* restore old touchscreen mode */
-                    touchscreen_set_mode(tsm);
-#endif
-                    return YESNO_USB;
+                    result = YESNO_USB;
+                    goto exit;
                 }
 
                 result = YESNO_NO;
         }
     }
-
-#ifdef HAVE_TOUCHSCREEN
-    /* restore old touchscreen mode */
-    touchscreen_set_mode(tsm);
-#endif
 
     FOR_NB_SCREENS(i)
         result_displayed=gui_yesno_draw_result(&(yn[i]), result);
@@ -252,7 +259,12 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
         viewportmanager_theme_undo(i, true);
     }
 
-    return(result);
+  exit:
+    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, gui_yesno_ui_update, &yn[0]);
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(old_mode);
+#endif
+    return result;
 }
 
 
