@@ -94,7 +94,7 @@ static int button_read(void);
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-static int last_touchscreen_touch;
+static long last_touchscreen_touch;
 #endif
 #if defined(HAVE_HEADPHONE_DETECTION)
 static struct timeout hp_detect_timeout; /* Debouncer for headphone plug/unplug */
@@ -542,7 +542,7 @@ void button_init(void)
 #endif
 #endif
 #ifdef HAVE_TOUCHSCREEN
-    last_touchscreen_touch = 0xffff;
+    last_touchscreen_touch = -1;
 #endif
     /* Start polling last */
     tick_add_task(button_tick);
@@ -714,7 +714,7 @@ void button_clear_queue(void)
 }
 
 #ifdef HAVE_TOUCHSCREEN
-int touchscreen_last_touch(void)
+long touchscreen_last_touch(void)
 {
     return last_touchscreen_touch;
 }
