@@ -175,7 +175,11 @@ static const struct button_mapping button_context_yesnoscreen[] = {
     {ACTION_YESNO_ACCEPT,           BUTTON_SELECT,                      BUTTON_NONE},
     {ACTION_STD_CANCEL,             BUTTON_BACK,                        BUTTON_NONE},
     {ACTION_STD_CANCEL,             BUTTON_POWER,                       BUTTON_NONE},
-    LAST_ITEM_IN_LIST
+    {ACTION_STD_CANCEL,             BUTTON_RIGHT,                       BUTTON_NONE},
+    {ACTION_STD_CANCEL,             BUTTON_LEFT,                        BUTTON_NONE},
+    {ACTION_STD_CANCEL,             BUTTON_VOL_UP,                      BUTTON_NONE},
+    {ACTION_STD_CANCEL,             BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_yesnoscreen */
 
 static const struct button_mapping button_context_keyboard[] = {
