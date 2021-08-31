@@ -112,7 +112,7 @@ int bool_parse(const char **parameter, bool *choice)
     return found;
 }
 
-int longnum_parse(const char **parameter, long *number, unsigned long *decimal)
+int longnum_parse(const char **parameter, long *number, long *decimal)
 {
 /* passes number and or decimal portion of number base 10 only..
    fractional portion is scaled by ARGPARSE_FRAC_DEC_MULTIPLIER
@@ -159,11 +159,11 @@ int longnum_parse(const char **parameter, long *number, unsigned long *decimal)
             digits++;
             start++;
         }
-        if (decimal && digits <= AP_MAX_FRAC_DIGITS)
+        if (decimal && digits <= ARGPARSE_MAX_FRAC_DIGITS)
         {
-            if(digits < AP_MAX_FRAC_DIGITS)
+            if(digits < ARGPARSE_MAX_FRAC_DIGITS)
             {
-                digits = AP_MAX_FRAC_DIGITS - digits;
+                digits = ARGPARSE_MAX_FRAC_DIGITS - digits;
                 while (digits--)
                     dec *= 10;
             }
