@@ -23,6 +23,12 @@
 
 #include "plugin.h"
 
+#define ARGP_MAX_FRAC_DIGITS 9 /* Uses 30 bits max (0.999999999) */
+
+#define ARGP_EXP(a, b) (a ##E## b)
+#define ARGP_FRAC_DEC_MULTIPLIER(n) AP_EXP(1,n) /*1x10^n*/
+#define ARGPARSE_FRAC_DEC_MULTIPLIER (long) ARGP_FRAC_DEC_MULTIPLIER(ARGP_MAX_FRAC_DIGITS)
+
 /* fills buf with a string upto buf_sz, null terminates the buffer
  * strings break on WS by default but can be enclosed in single or double quotes
  * opening and closing quotes will not be included in the buffer but will be counted

@@ -88,7 +88,6 @@ int char_parse(const char **parameter, char* character)
 
 }
 
-
 int bool_parse(const char **parameter, bool *choice)
 {
 /* determine true false using the first character the rest are skipped/ignored */
@@ -113,15 +112,25 @@ int bool_parse(const char **parameter, bool *choice)
     return found;
 }
 
-
-int longnum_parse(const char **parameter, long *number, long *decimal)
+int longnum_parse(const char **parameter, long *number, unsigned long *decimal)
 {
-/* passes number and or decimal portion of number base 10 only.. */
+/* passes number and or decimal portion of number base 10 only..
+   fractional portion is scaled by ARGPARSE_FRAC_DEC_MULTIPLIER
+   Example (if ARGPARSE_FRAC_DEC_MULTIPLIER = 10 000)
+   meaning .0009 returns 9   , 9    / 10000 = .0009
+           .009  returns 90
+           .099  returns 990
+           .09   returns 900
+           .9    returns 9000
+           .9999 returns 9999
+*/
+
     long num = 0;
     long dec = 0;
     int found = 0;
     int neg = 0;
-    logf ("n: %s\n", *parameter);
+    int digits = 0;
+    //logf ("n: %s\n", *parameter);
     const char *start = *parameter;
 
     if (*start == '-')
@@ -139,11 +148,28 @@ int longnum_parse(const char **parameter, long *number, long *decimal)
     if (*start == DECSEPCHAR)
     {
         start++;
+        while(*start == '0')
+        {
+            digits++;
+            start++;
+        }
         while (isdigit(*start))
         {
             dec = dec *10 + *start - '0';
+            digits++;
             start++;
         }
+        if (decimal && digits <= AP_MAX_FRAC_DIGITS)
+        {
+            if(digits < AP_MAX_FRAC_DIGITS)
+            {
+                digits = AP_MAX_FRAC_DIGITS - digits;
+                while (digits--)
+                    dec *= 10;
+            }
+        }
+        else
+            dec = -1; /* error */
     }
 
     if (found > 0)
@@ -165,13 +191,10 @@ int num_parse(const char **parameter, int *number, int *decimal)
 {
     long num, dec;
     int ret = longnum_parse(parameter, &num, &dec);
-
     if(number)
         *number = num;
-
     if (decimal)
         *decimal = dec;
-
     return ret;
 }
 
