@@ -3,9 +3,16 @@
 
 #define AUDIOHW_CAPS (LINEOUT_CAP)
 
+/* a small DC offset prevents play/pause clicking due to the DAC auto-muting */
 #define PCM_DC_OFFSET_VALUE -1
 
-AUDIOHW_SETTING(VOLUME, "dB", 0,  2, -74, 0, -40)
+/*
+ * Note: Maximum volume is set one step below unity in order to
+ *       avoid overflowing pcm samples due to our DC Offset.
+ *
+ *       The DAC's output is hot enough this should not be an issue.
+ */
+AUDIOHW_SETTING(VOLUME, "dB", 0,  2, -74, -2, -40)
 
 //#define AUDIOHW_NEEDS_INITIAL_UNMUTE
 
