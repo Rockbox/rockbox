@@ -28,7 +28,7 @@
 
 #define TAGNAVI_VERSION    "#! rockbox/tagbrowser/2.0"
 #define TAGMENU_MAX_ITEMS  64
-#define TAGMENU_MAX_MENUS  32
+#define TAGMENU_MAX_MENUS 100
 #define TAGMENU_MAX_FMTS   32
 
 int tagtree_export(void);
