@@ -1995,11 +1995,11 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     entry.tag_offset[tag_bitrate] = id3.bitrate;
     entry.tag_offset[tag_mtime] = mtime;
 
-    /* String tags. */
-    has_albumartist = id3.albumartist != NULL
-        && strlen(id3.albumartist) > 0;
-    has_grouping = id3.grouping != NULL
-        && strlen(id3.grouping) > 0;
+    
+    
+        
+    
+       
 
     ADD_TAG(entry, tag_filename, &path);
     ADD_TAG(entry, tag_title, &id3.title);
@@ -2008,22 +2008,22 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     ADD_TAG(entry, tag_genre, &id3.genre_string);
     ADD_TAG(entry, tag_composer, &id3.composer);
     ADD_TAG(entry, tag_comment, &id3.comment);
-    if (has_albumartist)
-    {
-        ADD_TAG(entry, tag_albumartist, &id3.albumartist);
-    }
-    else
-    {
-        ADD_TAG(entry, tag_albumartist, &id3.artist);
-    }
-    if (has_grouping)
-    {
-        ADD_TAG(entry, tag_grouping, &id3.grouping);
-    }
-    else
-    {
-        ADD_TAG(entry, tag_grouping, &id3.title);
-    }
+    
+    
+    ADD_TAG(entry, tag_albumartist, &id3.albumartist);
+    
+    
+    
+        
+    
+    
+    
+    ADD_TAG(entry, tag_grouping, &id3.grouping);
+    
+    
+    
+        
+    
     entry.data_length = offset;
 
     /* Write the header */
@@ -2037,22 +2037,22 @@ static void NO_INLINE add_tagcache(char *path, unsigned long mtime)
     write_item(id3.genre_string);
     write_item(id3.composer);
     write_item(id3.comment);
-    if (has_albumartist)
-    {
-        write_item(id3.albumartist);
-    }
-    else
-    {
-        write_item(id3.artist);
-    }
-    if (has_grouping)
-    {
-        write_item(id3.grouping);
-    }
-    else
-    {
-        write_item(id3.title);
-    }
+    
+    
+    write_item(id3.albumartist);
+    
+   
+    
+        
+    
+    
+    
+    write_item(id3.grouping);
+    
+    
+    
+        
+    
 
     total_entry_count++;
 
