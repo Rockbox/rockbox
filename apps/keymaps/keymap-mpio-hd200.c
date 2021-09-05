@@ -105,8 +105,10 @@ static const struct button_mapping button_context_settings[]  = {
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,       BUTTON_FUNC,                   BUTTON_NONE },
     { ACTION_YESNO_ACCEPT,       BUTTON_PLAY,                   BUTTON_NONE },
+    { ACTION_STD_CANCEL,         BUTTON_VOL_UP,                 BUTTON_NONE },
+    { ACTION_STD_CANCEL,         BUTTON_VOL_DOWN,               BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_yesno */
 
 static const struct button_mapping button_context_bmark[]  = {
@@ -269,7 +271,7 @@ static const struct button_mapping button_rc_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,       BUTTON_RC_FUNC,                   BUTTON_NONE },
     { ACTION_YESNO_ACCEPT,       BUTTON_RC_PLAY,                   BUTTON_NONE },
 
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_yesno */
 
 static const struct button_mapping button_rc_context_radio[]  = {

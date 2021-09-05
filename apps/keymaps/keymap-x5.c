@@ -405,12 +405,12 @@ static const struct button_mapping remote_button_context_wps[]  = {
 /** Yes/No Screen **/
 static const struct button_mapping button_context_yesnoscreen[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_SELECT,              BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings_yesnoscreen */
 
 static const struct button_mapping remote_button_context_yesnoscreen[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_RC_PLAY,              BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* remote_button_context_settings_yesnoscreen */
 
 

@@ -113,7 +113,9 @@ static const struct button_mapping button_context_settings[]  = {
 
 static const struct button_mapping button_context_yesno[]  = {
     { ACTION_YESNO_ACCEPT,          BUTTON_OK,                     BUTTON_NONE },
-    LAST_ITEM_IN_LIST
+    { ACTION_STD_CANCEL,            BUTTON_PLAY,                   BUTTON_NONE },
+    { ACTION_STD_CANCEL,            BUTTON_REC,                    BUTTON_NONE },
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_yesno */
 
 static const struct button_mapping button_context_bmark[]  = {
