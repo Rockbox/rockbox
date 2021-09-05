@@ -405,7 +405,7 @@
     *: "Database"
   </source>
   <dest>
-    *: "Database"
+    *: "Music Database"
   </dest>
   <voice>
     *: "Database"
@@ -463,7 +463,7 @@
   </source>
   <dest>
     *: none
-    recording: "Recording"
+    recording: "Record..."
   </dest>
   <voice>
     *: none
@@ -509,7 +509,7 @@
     *: "Plugins"
   </source>
   <dest>
-    *: "Plugins"
+    *: "Extras"
   </dest>
   <voice>
     *: "Plugins"
@@ -5971,7 +5971,7 @@
     *: "Playlist Catalogue"
   </source>
   <dest>
-    *: "Playlist Catalogue"
+    *: "Playlists"
   </dest>
   <voice>
     *: "Playlist Catalogue"
