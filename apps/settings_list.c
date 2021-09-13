@@ -345,6 +345,12 @@ static const char graphic_numeric[] = "graphic,numeric";
 #endif
 #endif /* HAVE_BACKLIGHT */
 
+#if defined(HAVE_USB_CHARGING_ENABLE)
+# if !defined(TARGET_USB_CHARGING_DEFAULT)
+#  define TARGET_USB_CHARGING_DEFAULT USB_CHARGING_ENABLE
+# endif
+#endif
+
 #if LCD_DEPTH > 1
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
@@ -1827,7 +1833,7 @@ const struct settings_list settings[] = {
 #endif
     TEXT_SETTING(0,kbd_file,"kbd","-",ROCKBOX_DIR "/",".kbd"),
 #ifdef HAVE_USB_CHARGING_ENABLE
-    CHOICE_SETTING(0, usb_charging, LANG_USB_CHARGING, 1, "usb charging",
+    CHOICE_SETTING(0, usb_charging, LANG_USB_CHARGING, TARGET_USB_CHARGING_DEFAULT, "usb charging",
                    "off,on,force", NULL, 3, ID2P(LANG_SET_BOOL_NO),
                    ID2P(LANG_SET_BOOL_YES), ID2P(LANG_FORCE)),
 #endif
