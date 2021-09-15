@@ -338,6 +338,7 @@ static int get_tag(int *tag)
         {"filename", tag_filename},
         {"basename", tag_virt_basename},
         {"tracknum", tag_tracknumber},
+        {"canonicalartist", tag_virt_canonicalartist},
         {"discnum", tag_discnumber},
         {"year", tag_year},
         {"playcount", tag_playcount},

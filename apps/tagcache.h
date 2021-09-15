@@ -31,10 +31,10 @@
  tagcache.c and bump up the header version too.
  */
 enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
-    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year, 
-    tag_discnumber, tag_tracknumber, tag_bitrate, tag_length, tag_playcount, tag_rating,
-    tag_playtime, tag_lastplayed, tag_commitid, tag_mtime, tag_lastelapsed,
-    tag_lastoffset,
+    tag_filename, tag_composer, tag_comment, tag_albumartist, tag_grouping, tag_year,
+    tag_discnumber, tag_tracknumber, tag_virt_canonicalartist, tag_bitrate, tag_length,
+    tag_playcount, tag_rating, tag_playtime, tag_lastplayed, tag_commitid, tag_mtime,
+    tag_lastelapsed, tag_lastoffset,
     /* Real tags end here, count them. */
     TAG_COUNT,
     /* Virtual tags */
@@ -52,7 +52,7 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define IDX_BUF_DEPTH 64
 
 /* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
-#define TAGCACHE_MAGIC  0x5443480f
+#define TAGCACHE_MAGIC  0x54434810
 
 /* Dump store/restore header version 'TCSxx'. */
 #define TAGCACHE_STATEFILE_MAGIC 0x54435301
