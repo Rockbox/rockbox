@@ -37,6 +37,7 @@ char str_artist[MAX_PATH];
 char str_albumartist[MAX_PATH];
 char str_album[MAX_PATH];
 char str_genre[MAX_PATH];
+char str_comment[MAX_PATH];
 char str_duration[32];
 
 unsigned nseconds;
@@ -58,6 +59,7 @@ static const unsigned char* const props_file[] =
     ID2P(LANG_PROPERTIES_TITLE),      str_title,
     ID2P(LANG_PROPERTIES_ALBUM),      str_album,
     ID2P(LANG_PROPERTIES_GENRE),      str_genre,
+    ID2P(LANG_PROPERTIES_COMMENT),    str_comment,
     ID2P(LANG_PROPERTIES_DURATION),   str_duration,
 };
 static const unsigned char* const props_dir[] =
@@ -131,7 +133,9 @@ static bool file_properties(const char* selected_file)
                                  "%s", id3.album ? id3.album : "");
                     rb->snprintf(str_genre, sizeof str_genre,
                                  "%s", id3.genre_string ? id3.genre_string : "");
-                    num_properties += 5;
+                    rb->snprintf(str_comment, sizeof str_comment,
+                                 "%s", id3.comment ? id3.comment : "");
+                    num_properties += 6;
 
                     if (dur > 0)
                     {

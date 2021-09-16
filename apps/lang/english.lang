@@ -15982,3 +15982,17 @@
     *: "Genre"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
+  </dest>
+  <voice>
+    *: "Comment"
+  </voice>
+</phrase>
