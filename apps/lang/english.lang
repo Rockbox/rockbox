@@ -16024,3 +16024,17 @@
     *: "Year"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Tracknum]"
+  </dest>
+  <voice>
+    *: "Track number"
+  </voice>
+</phrase>
