@@ -16052,3 +16052,17 @@
     *: "Disc number"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frequency]"
+  </dest>
+  <voice>
+    *: "Frequency"
+  </voice>
+</phrase>
