@@ -16010,3 +16010,17 @@
     *: "Composer"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Year]"
+  </dest>
+  <voice>
+    *: "Year"
+  </voice>
+</phrase>
