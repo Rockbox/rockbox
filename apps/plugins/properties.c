@@ -33,6 +33,7 @@ char str_date[64];
 char str_time[64];
 
 char str_title[MAX_PATH];
+char str_composer[MAX_PATH];
 char str_artist[MAX_PATH];
 char str_albumartist[MAX_PATH];
 char str_album[MAX_PATH];
@@ -54,6 +55,7 @@ static const unsigned char* const props_file[] =
     ID2P(LANG_PROPERTIES_SIZE),       str_size,
     ID2P(LANG_PROPERTIES_DATE),       str_date,
     ID2P(LANG_PROPERTIES_TIME),       str_time,
+    ID2P(LANG_PROPERTIES_COMPOSER),   str_composer,
     ID2P(LANG_PROPERTIES_ARTIST),     str_artist,
     ID2P(LANG_PROPERTIES_ALBUMARTIST),     str_albumartist,
     ID2P(LANG_PROPERTIES_TITLE),      str_title,
@@ -123,6 +125,8 @@ static bool file_properties(const char* selected_file)
                     rb->get_metadata(&id3, fd, selected_file))
                 {
                     long dur = id3.length / 1000;           /* seconds */
+                    rb->snprintf(str_composer, sizeof str_composer,
+                                 "%s", id3.composer ? id3.composer : "");
                     rb->snprintf(str_artist, sizeof str_artist,
                                  "%s", id3.artist ? id3.artist : "");
                     rb->snprintf(str_albumartist, sizeof str_albumartist,
@@ -135,7 +139,7 @@ static bool file_properties(const char* selected_file)
                                  "%s", id3.genre_string ? id3.genre_string : "");
                     rb->snprintf(str_comment, sizeof str_comment,
                                  "%s", id3.comment ? id3.comment : "");
-                    num_properties += 6;
+                    num_properties += 7;
 
                     if (dur > 0)
                     {

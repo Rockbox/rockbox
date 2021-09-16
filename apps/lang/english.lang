@@ -15996,3 +15996,17 @@
     *: "Comment"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Composer]"
+  </dest>
+  <voice>
+    *: "Composer"
+  </voice>
+</phrase>
