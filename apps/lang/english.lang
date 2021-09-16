@@ -16038,3 +16038,17 @@
     *: "Track number"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: "Disc number"
+  </voice>
+</phrase>
