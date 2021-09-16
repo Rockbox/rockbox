@@ -15954,3 +15954,17 @@
     *: "Reload After Saving"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: "Album Artist"
+  </voice>
+</phrase>
