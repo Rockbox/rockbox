@@ -43,6 +43,7 @@ char str_year[MAX_PATH];
 char str_discnum[MAX_PATH];
 char str_tracknum[MAX_PATH];
 char str_duration[32];
+char str_bitrate[32];
 char str_frequency[32];
 
 unsigned nseconds;
@@ -70,6 +71,7 @@ static const unsigned char* const props_file[] =
     ID2P(LANG_PROPERTIES_DISCNUM),    str_discnum,
     ID2P(LANG_PROPERTIES_TRACKNUM),   str_tracknum,
     ID2P(LANG_PROPERTIES_DURATION),   str_duration,
+    ID2P(LANG_PROPERTIES_BITRATE),    str_bitrate,
     ID2P(LANG_PROPERTIES_FREQUENCY),  str_frequency,
 };
 static const unsigned char* const props_dir[] =
@@ -153,9 +155,11 @@ static bool file_properties(const char* selected_file)
                                  "%s", id3.disc_string ? id3.disc_string : "");
                     rb->snprintf(str_tracknum, sizeof str_tracknum,
                                  "%s", id3.track_string ? id3.track_string : "");
+                    rb->snprintf(str_bitrate, sizeof str_bitrate,
+                                 "%d kbps", id3.bitrate ? : 0);
                     rb->snprintf(str_frequency, sizeof str_frequency,
                                  "%ld Hz", id3.frequency ? : 0);
-                    num_properties += 11;
+                    num_properties += 12;
 
                     if (dur > 0)
                     {

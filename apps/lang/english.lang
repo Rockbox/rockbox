@@ -16066,3 +16066,17 @@
     *: "Frequency"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitrate]"
+  </dest>
+  <voice>
+    *: "Bit rate"
+  </voice>
+</phrase>
