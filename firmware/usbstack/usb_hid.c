@@ -785,27 +785,39 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
             (req->bRequest == USB_HID_SET_IDLE) ? "set idle" :
             ((req->bRequest == USB_HID_SET_REPORT) ? "set report" :
             ((req->bRequest == USB_HID_GET_REPORT) ? "get report" : "")));
+
+        int rc;
         switch (req->bRequest)
         {
         case USB_HID_SET_REPORT:
-            if (usb_hid_set_report(req))
-                break;
+            rc = usb_hid_set_report(req);
+            break;
         case USB_HID_GET_REPORT:
-            if (usb_hid_get_report(req, &dest))
-                break;
+            rc = usb_hid_get_report(req, &dest);
+            break;
         case USB_HID_SET_IDLE:
-            if (dest != orig_dest)
-            {
-                usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
-                usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
-            }
-            else
-            {
-                usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
-            }
-            return true;
+            rc = 0;
+            break;
+        default:
+            /* all other requests are errors */
+            rc = -1;
+            break;
         }
-        break;
+
+        if(rc != 0)
+            break;
+
+        if (dest != orig_dest)
+        {
+            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+            usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
+        }
+        else
+        {
+            usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+        }
+
+        return true;
     }
 
     case USB_TYPE_VENDOR:
