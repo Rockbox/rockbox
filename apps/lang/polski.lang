@@ -15887,3 +15887,129 @@
     es9218: "Ściana"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Wykonawca albumu]"
+  </dest>
+  <voice>
+    *: "Wykonawca albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_GENRE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Gatunek]"
+  </dest>
+  <voice>
+    *: "Gatunek"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Komentarz]"
+  </dest>
+  <voice>
+    *: "Komentarz"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Kompozytor]"
+  </dest>
+  <voice>
+    *: "Kompozytor"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Rok]"
+  </dest>
+  <voice>
+    *: "Rok"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Nr utworu]"
+  </dest>
+  <voice>
+    *: "Numer utworu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Nr płyty]"
+  </dest>
+  <voice>
+    *: "Numer płyty"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Częstotliwość]"
+  </dest>
+  <voice>
+    *: "Częstotliwość"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Prędkość transmisji]"
+  </dest>
+  <voice>
+    *: "Prędkość transmisji"
+  </voice>
+</phrase>
