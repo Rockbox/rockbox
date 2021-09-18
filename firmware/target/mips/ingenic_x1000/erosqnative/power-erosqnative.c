@@ -36,7 +36,7 @@ const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
     3470
 };
 
-/* the OF shuts down at this voltage */
+/* The OF shuts down at this voltage */
 const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 {
     3400
@@ -45,13 +45,13 @@ const unsigned short battery_level_shutoff[BATTERY_TYPES_COUNT] =
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging disabled */
 const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 {
-    { 3400, 3639, 3697, 3723, 3757, 3786, 3836, 3906, 3980, 4050, 4159 }
+    { 3400, 3477, 3540, 3578, 3617, 3674, 3771, 3856, 3936, 4016, 4117 }
 };
 
 /* voltages (millivolt) of 0%, 10%, ... 100% when charging enabled */
 const unsigned short percent_to_volt_charge[11] =
 {
-      3485, 3780, 3836, 3857, 3890, 3930, 3986, 4062, 4158, 4185, 4196
+      3400, 3477, 3540, 3578, 3617, 3674, 3771, 3856, 3936, 4016, 4117
 };
 
 void power_init(void)
