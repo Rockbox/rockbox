@@ -3798,12 +3798,10 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Batterij: %d%% %du %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: "Batterijniveau"
@@ -3843,14 +3841,17 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Intern:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Intern"
+    hibylinux: "micro S D"
     xduoox3: "micro S D 1"
   </voice>
 </phrase>
@@ -4032,7 +4033,7 @@
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -7926,16 +7927,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Volgende afspelen"
+    *: ""
   </dest>
   <voice>
-    *: "Volgende afspelen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8698,7 +8699,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -9601,15 +9602,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
   </voice>
 </phrase>
 <phrase>
@@ -12130,7 +12131,7 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
     *: "Afspelen"
@@ -12158,7 +12159,7 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
     *: "Melden uitschakelen"
@@ -12284,7 +12285,7 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
     *: "Overslaan"
@@ -12413,7 +12414,7 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
     *: "Zoeken"
@@ -15021,10 +15022,10 @@
     *: "Update cache"
   </source>
   <dest>
-    *: "Update cache"
+    *: "Cache bijwerken"
   </dest>
   <voice>
-    *: "Update cache"
+    *: "Cache bijwerken"
   </voice>
 </phrase>
 <phrase>
@@ -15119,8 +15120,8 @@
   <dest>
     *: "Druk op LINKS om te annuleren."
     android: "Druk op RECHTS om te annuleren."
-    hifietma*,zenvision: "Druk op BACK om te annuleren."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Druk op POWER om te annuleren."
+    hifietma*,zenvision: "Druk op BACK om te annuleren."
     ihifi760,ihifi960: "Dubbeltik op RETURN om te annuleren."
     ihifi770,ihifi770c,ihifi800: "Druk op HOME om te annuleren."
     iriverh10,samsungyh*: "Dubbeltik op LINKS om te annuleren."
@@ -15135,8 +15136,8 @@
   <voice>
     *: "Druk op LINKS om te annuleren."
     android: "Druk op RECHTS om te annuleren."
-    hifietma*,zenvision: "Druk op BACK om te annuleren."
     cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Druk op POWER om te annuleren."
+    hifietma*,zenvision: "Druk op BACK om te annuleren."
     ihifi760,ihifi960: "Dubbeltik op RETURN om te annuleren."
     ihifi770,ihifi770c,ihifi800: "Druk op HOME om te annuleren."
     iriverh10,samsungyh*: "Dubbeltik op LINKS om te annuleren."
@@ -15520,5 +15521,372 @@
   </dest>
   <voice>
     *: "USB massa opslag modus openen?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Volume van gesproken prompt"
+  </dest>
+  <voice>
+    *: "Volume van gesproken prompt"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Super Traag"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Super Traag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Lineair Snel"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Lineair Snel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Lineair Traag"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Lineair Traag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimaal Snel"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimaal Snel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimaal Traag"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimaal Traag"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodiserend type 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodiserend type 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodiserend type 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodiserend type 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Hybride Snel"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Hybride Snel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Stenen Muur"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Stenen Muur"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "DAC energiemodus"
+    es9218: "DAC uitgangsniveau"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "DAC energiemodus"
+    es9218: "DAC uitgangsniveau"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Hoge uitvoering"
+    es9218: "Hoge Versterking (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Hoge uitvoering"
+    es9218: "Hoge Versterking (2 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Energie besparen"
+    es9218: "Lage versterking (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Energie besparen"
+    es9218: "Lage versterking (1 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Lijst Wissen en Volgende Afspelen"
+  </dest>
+  <voice>
+    *: "Lijst Wissen en Volgende Afspelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Rij..."
+  </dest>
+  <voice>
+    *: "Rij..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Wachtrij-Opties Weergeven"
+  </dest>
+  <voice>
+    *: "Wachtrij Opties Weergeven"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Opties voor Geschud Toevoeging Weergeven"
+  </dest>
+  <voice>
+    *: "Opties voor Geschud Toevoeging Weergeven"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "In Submenu"
+  </dest>
+  <voice>
+    *: "In Submenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Lijst Wissen en in Geschude Volgorde Afspelen"
+  </dest>
+  <voice>
+    *: "Lijst Wissen en in Geschude Volgorde Afspelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Alle Vergrendelingsmeldingen Uitschakelen"
+  </dest>
+  <voice>
+    *: "Alle Vergrendelingsmeldingen Uitschakelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Volume Vrijstellen"
+  </dest>
+  <voice>
+    *: "Volume Vrijstellen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Altijd Auto-vergrendelen"
+  </dest>
+  <voice>
+    *: "Altijd Auto-vergrendelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
+  desc: reload playlist after saving
+  user: core
+  <source>
+    *: "Reload After Saving"
+  </source>
+  <dest>
+    *: "Herladen na Opslaan"
+  </dest>
+  <voice>
+    *: "Herladen na Opslaan"
   </voice>
 </phrase>
