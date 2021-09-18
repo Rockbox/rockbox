@@ -15878,3 +15878,138 @@
     es9218: "Brick Wall"
   </voice>
 </phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: "Album Artist"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_GENRE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Genre]"
+  </dest>
+  <voice>
+    *: "Genre"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
+  </dest>
+  <voice>
+    *: "Comment"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Composer]"
+  </dest>
+  <voice>
+    *: "Composer"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Year]"
+  </dest>
+  <voice>
+    *: "Year"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Tracknum]"
+  </dest>
+  <voice>
+    *: "Track number"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: "Disc number"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frequency]"
+  </dest>
+  <voice>
+    *: "Frequency"
+  </voice>
+</phrase>
+### This phrase is missing entirely, copying from english!
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitrate]"
+  </dest>
+  <voice>
+    *: "Bit rate"
+  </voice>
+</phrase>
