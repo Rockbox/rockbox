@@ -1056,8 +1056,8 @@ static int create_album_untagged(struct tagcache_search *tcs,
     draw_splashscreen(*buf, *bufsz);
     draw_progressbar(0, total_count, "Searching " UNTAGGED);
 
-    /* search tagcache for all <untagged> albums & save the albumartist seek pos */
-    if (rb->tagcache_search(tcs, tag_albumartist))
+    /* search tagcache for all <untagged> albums & save the canonicalartist seek pos */
+    if (rb->tagcache_search(tcs, tag_virt_canonicalartist))
     {
         rb->tagcache_search_add_filter(tcs, tag_album, pf_idx.album_untagged_seek);
 
@@ -1160,7 +1160,7 @@ static int build_artist_index(struct tagcache_search *tcs,
     /* artist names starts at beginning of buf */
     pf_idx.artist_names = *buf;
 
-    rb->tagcache_search(tcs, tag_albumartist);
+    rb->tagcache_search(tcs, tag_virt_canonicalartist);
     res = get_tcs_search_res(ePFS_ARTIST, tcs, &(*buf), bufsz);
     rb->tagcache_search_finish(tcs);
     if (res < SUCCESS)
@@ -1267,7 +1267,7 @@ static int create_album_index(void)
         draw_progressbar(j, pf_idx.album_ct, NULL);
         if (pf_idx.album_index[j].artist_seek >= 0) { continue; }
 
-        rb->tagcache_search(&tcs, tag_albumartist);
+        rb->tagcache_search(&tcs, tag_virt_canonicalartist);
         rb->tagcache_search_add_filter(&tcs, tag_album, pf_idx.album_index[j].seek);
 
         last = 0;
@@ -1601,7 +1601,7 @@ static void create_track_index(const int slide_index)
 
     if (pf_idx.album_index[slide_index].artist_idx >= 0)
     {
-        rb->tagcache_search_add_filter(&tcs, tag_albumartist,
+        rb->tagcache_search_add_filter(&tcs, tag_virt_canonicalartist,
             pf_idx.album_index[slide_index].artist_seek);
     }
 
@@ -1756,7 +1756,7 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
     rb->tagcache_search_add_filter(&tcs, tag_album,
                                    pf_idx.album_index[slide_index].seek);
 
-    rb->tagcache_search_add_filter(&tcs, tag_albumartist,
+    rb->tagcache_search_add_filter(&tcs, tag_virt_canonicalartist,
                                    pf_idx.album_index[slide_index].artist_seek);
 
     if ( rb->tagcache_get_next(&tcs) ) {
