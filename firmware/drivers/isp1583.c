@@ -341,7 +341,7 @@ static void usb_handle_setup_rx(void)
     if (len == 8)
     {
         ISP1583_DFLOW_CTRLFUN |= DFLOW_CTRLFUN_STATUS; /* Acknowledge packet */
-        usb_core_control_request((struct usb_ctrlrequest*)setup_pkt_buf);
+        usb_core_legacy_control_request((struct usb_ctrlrequest*)setup_pkt_buf);
     }
     else
     {

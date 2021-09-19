@@ -117,7 +117,7 @@ static void setup_received(void)
     setup_data[1] = SETUP2;
 
     /* pass setup data to the upper layer */
-    usb_core_control_request((struct usb_ctrlrequest*)setup_data);
+    usb_core_legacy_control_request((struct usb_ctrlrequest*)setup_data);
 }
 
 static int max_pkt_size(struct endpoint_t *endp)

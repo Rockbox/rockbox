@@ -977,7 +977,7 @@ void usb_core_handle_notify(long id, intptr_t data)
 }
 
 /* called by usb_drv_int() */
-void usb_core_control_request(struct usb_ctrlrequest* req)
+void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
 {
     struct usb_transfer_completion_event_data* completion_event =
         &ep_data[EP_CONTROL].completion_event[EP_DIR(USB_DIR_IN)];

@@ -208,7 +208,7 @@ static void control_received(void) {
     /* acknowledge packet recieved (clear valid) */
     M66591_INTSTAT_MAIN &= ~(1<<3);
 
-    usb_core_control_request(&temp);
+    usb_core_legacy_control_request(&temp);
 }
 
 /* This is a helper function, it is used to notife the stack that a transfer is

@@ -741,7 +741,7 @@ static void usb_dw_handle_setup_received(void)
      && (usb_ctrlsetup.bRequest == USB_REQ_SET_ADDRESS))
         usb_dw_set_address(usb_ctrlsetup.wValue);
 
-    usb_core_control_request(&usb_ctrlsetup);
+    usb_core_legacy_control_request(&usb_ctrlsetup);
 }
 
 static void usb_dw_abort_endpoint(int epnum, enum usb_dw_epdir epdir)

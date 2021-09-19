@@ -251,7 +251,7 @@ void handle_control(void)
         DEBUG(2, "req: %02x %02d", req->bRequestType, req->bRequest);
     }
 
-    usb_core_control_request(req);
+    usb_core_legacy_control_request(req);
 }
 
 static

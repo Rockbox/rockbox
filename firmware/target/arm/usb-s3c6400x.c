@@ -522,7 +522,7 @@ static void handle_ep_int(int ep, bool out)
                ep0_setup_pkt->bRequest     == USB_REQ_SET_ADDRESS)
                 DCFG = (DCFG & ~bitm(DCFG, devadr)) | (ep0_setup_pkt->wValue << DCFG_devadr_bitp);
 
-            usb_core_control_request(ep0_setup_pkt);
+            usb_core_legacy_control_request(ep0_setup_pkt);
         }
     }
 

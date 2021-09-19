@@ -1181,7 +1181,7 @@ void VLYNQ(void)
             }
 
             /* Process control packet */
-            usb_core_control_request(&setup);
+            usb_core_legacy_control_request(&setup);
         }
 
         if (sysIntrStatus.f.ep0_in_ack)

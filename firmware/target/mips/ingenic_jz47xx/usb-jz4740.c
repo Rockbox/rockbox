@@ -239,7 +239,7 @@ static void EP0_handler(void)
     {
         readFIFO(ep_recv, REG_USB_REG_COUNT0);
         REG_USB_REG_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY; /* clear OUTPKTRDY bit */
-        usb_core_control_request((struct usb_ctrlrequest*)ep_recv->buf);
+        usb_core_legacy_control_request((struct usb_ctrlrequest*)ep_recv->buf);
     }
 }
 
