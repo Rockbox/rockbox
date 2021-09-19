@@ -531,9 +531,9 @@ static void in_callback(int ep, unsigned char *buf, int len)
     usb_core_transfer_complete(ep, false, 0, len);
 }
 
-int usb_drv_recv(int ep, void* ptr, int length)
+int usb_drv_recv_nonblocking(int ep, void* ptr, int length)
 {
-    logf("usb_drv_recv(%d, 0x%x, %d)", ep, (int)ptr, length);
+    logf("usb_drv_recv_nonblocking(%d, 0x%x, %d)", ep, (int)ptr, length);
     if(ep == EP_CONTROL && length == 0 && ptr == NULL)
     {
         usb_status_ack(ep, DIR_TX);

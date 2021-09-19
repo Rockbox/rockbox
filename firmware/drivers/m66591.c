@@ -869,7 +869,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
 /* This function begins a receive (on an OUT endpoint), it should not block
  *  so the actual receive is done in the interrupt handler.
  */
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     return mxx_queue(endpoint, ptr, length, false, false);
 }

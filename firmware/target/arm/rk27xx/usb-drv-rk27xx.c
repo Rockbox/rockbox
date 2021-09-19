@@ -355,7 +355,7 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 }
 
 /* Setup a receive transfer. (non blocking) */
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     logf("udc: recv(%x)", endpoint);
     struct endpoint_t *ep;

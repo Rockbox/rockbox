@@ -470,7 +470,7 @@ void usb_storage_init_connection(void)
     ramdisk_buffer = tb.transfer_buffer + ALLOCATE_BUFFER_SIZE;
 #endif
 #endif
-    usb_drv_recv(ep_out, cbw_buffer, MAX_CBW_SIZE);
+    usb_drv_recv_nonblocking(ep_out, cbw_buffer, MAX_CBW_SIZE);
 
     int i;
     for(i=0;i<storage_num_drives();i++) {
@@ -685,7 +685,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* des
             if(skip_first) (*tb.max_lun) --;
 #endif
             logf("ums: getmaxlun");
-            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0); /* ack */
             usb_drv_send(EP_CONTROL, tb.max_lun, 1);
             handled = true;
             break;
@@ -1187,14 +1187,14 @@ static void send_command_failed_result(void)
 #if CONFIG_RTC
 static void receive_time(void)
 {
-    usb_drv_recv(ep_out, tb.transfer_buffer, 12);
+    usb_drv_recv_nonblocking(ep_out, tb.transfer_buffer, 12);
     state = RECEIVING_TIME;
 }
 #endif /* CONFIG_RTC */
 
 static void receive_block_data(void *data,int size)
 {
-    usb_drv_recv(ep_out, data, size);
+    usb_drv_recv_nonblocking(ep_out, data, size);
     state = RECEIVING_BLOCKS;
 }
 
@@ -1210,7 +1210,7 @@ static void send_csw(int status)
     state = WAITING_FOR_CSW_COMPLETION_OR_COMMAND;
     //logf("CSW: %X",status);
     /* Already start waiting for the next command */
-    usb_drv_recv(ep_out, cbw_buffer, MAX_CBW_SIZE);
+    usb_drv_recv_nonblocking(ep_out, cbw_buffer, MAX_CBW_SIZE);
     /* The next completed transfer will be either the CSW one
      * or the new command */
 

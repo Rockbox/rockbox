@@ -609,7 +609,7 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
     return rc;
 }
 
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     volatile struct tcc_ep *tcc_ep = &tcc_endpoints[endpoint & 0x7f];
     int flags;

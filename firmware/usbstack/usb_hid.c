@@ -693,7 +693,7 @@ static int usb_hid_set_report(struct usb_ctrlrequest *req)
     }
 
     memset(buf, 0, length);
-    usb_drv_recv(EP_CONTROL, buf, length);
+    usb_drv_recv_nonblocking(EP_CONTROL, buf, length);
 
 #ifdef LOGF_ENABLE
     if (buf[1] & 0x01)
@@ -772,7 +772,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
 
         if (dest != orig_dest)
         {
-            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0); /* ack */
             usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
             return true;
         }
@@ -809,7 +809,7 @@ bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
 
         if (dest != orig_dest)
         {
-            usb_drv_recv(EP_CONTROL, NULL, 0); /* ack */
+            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0); /* ack */
             usb_drv_send(EP_CONTROL, orig_dest, dest - orig_dest);
         }
         else

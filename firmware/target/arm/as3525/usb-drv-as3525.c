@@ -412,12 +412,12 @@ void usb_drv_cancel_all_transfers(void)
     restore_irq(flags);
 }
 
-int usb_drv_recv(int ep, void *ptr, int len)
+int usb_drv_recv_nonblocking(int ep, void *ptr, int len)
 {
     struct usb_dev_dma_desc *uc_desc = endpoints[ep][1].uc_desc;
 
     ep &= 0x7f;
-    logf("usb_drv_recv(%d,%x,%d)\n", ep, (int)ptr, len);
+    logf("usb_drv_recv_nonblocking(%d,%x,%d)\n", ep, (int)ptr, len);
 
     if (len > USB_DMA_DESC_RXTX_BYTES)
         panicf("usb_recv: len=%d > %d", len, USB_DMA_DESC_RXTX_BYTES);
@@ -674,7 +674,8 @@ static void handle_out_ep(int ep)
  * The usb_storage buffer is 63KB, but Linux sends 120KB.
  * We get the first part, but upon re-enabling receive dma we
  * get a 'buffer not available' error from the hardware, since
- * we haven't gotten the next usb_drv_recv() from the stack yet.
+ * we haven't gotten the next usb_drv_recv_nonblocking() from
+ * the stack yet.
  * It seems the NAK bit is ignored here and the HW tries to dma
  * the incoming data anyway.
  * In theory I think the BNA error should be recoverable, but

@@ -166,7 +166,7 @@ int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
     return 0;
 }
 
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     ep_transfer(EP_NUM(endpoint), ptr, length, true);
     return 0;

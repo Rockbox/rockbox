@@ -1118,7 +1118,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
     return -1;
 }
 
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     int flags;
     struct usb_endpoint *ep;

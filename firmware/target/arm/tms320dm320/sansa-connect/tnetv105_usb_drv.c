@@ -1026,8 +1026,8 @@ static bool tnetv_handle_cppi(void)
     if (rx_intstatus || tx_intstatus || rcv_sched)
     {
         /* Request calling again after short delay
-         * Needed when for example when OUT endpoint has pending
-         * data but the USB task did not call usb_drv_recv() yet.
+         * Needed when for example when OUT endpoint has pending data
+         * but the USB task did not call usb_drv_recv_nonblocking() yet.
          */
         return true;
     }
@@ -1371,7 +1371,7 @@ int usb_drv_send_nonblocking(int endpoint, void* ptr, int length)
     return _usb_drv_send(endpoint, ptr, length, false);
 }
 
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     int epn = EP_NUM(endpoint);
     struct ep_runtime_t *ep;
@@ -1387,8 +1387,6 @@ int usb_drv_recv(int endpoint, void* ptr, int length)
 
     return 0;
 }
-
-void usb_drv_ack(struct usb_ctrlrequest* req);
 
 void usb_drv_set_address(int address)
 {

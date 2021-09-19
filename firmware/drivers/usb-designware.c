@@ -1333,7 +1333,7 @@ void usb_drv_release_endpoint(int endpoint)
     usb_dw_target_enable_irq();
 }
 
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     int epnum = EP_NUM(endpoint);
     struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, USB_DW_EPDIR_OUT);

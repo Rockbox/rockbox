@@ -593,7 +593,7 @@ int usb_drv_send(int endpoint, void* ptr, int length)
     return prime_transfer(EP_NUM(endpoint), ptr, length, true, true);
 }
 
-int usb_drv_recv(int endpoint, void* ptr, int length)
+int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
     //logf("usbrecv(%x, %d)", ptr, length);
     return prime_transfer(EP_NUM(endpoint), ptr, length, false, false);
