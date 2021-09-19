@@ -1762,9 +1762,8 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
      * to "/<0>/bar" (aka "/bar" at this time). *fingers crossed*
      *
      * If any stripped drive spec was absolute, prepend the playlist
-     * directory's volume spec, or root if none. Relative paths remain
-     * relative and the playlist's directory fully qualifies them. Absolute
-     * UNIX-style paths remain unaltered.
+     * directory's volume spec, or root if none. Absolute UNIX-style paths
+     * remain unaltered.
      */
     if (path_strip_drive(src, (const char **)&src, true) >= 0 &&
         src[-1] == PATH_SEPCH)
@@ -1782,7 +1781,9 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
     if (len >= (size_t)buf_length)
         return -1; /* buffer too small */
 
-    return len;
+    path_remove_dot_segments (dest, dest);
+
+    return strlen (dest);
 }
 
 /*

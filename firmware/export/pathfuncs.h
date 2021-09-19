@@ -82,6 +82,7 @@ size_t path_basename(const char *name, const char **nameptr);
 size_t path_dirname(const char *name, const char **nameptr);
 size_t path_strip_trailing_separators(const char *name, const char **nameptr);
 void path_correct_separators(char *dstpath, const char *path);
+void path_remove_dot_segments(char *dstpath, const char *path);
 
 /* constants useable in basepath and component */
 #define PA_SEP_HARD NULL /* separate even if base is empty */

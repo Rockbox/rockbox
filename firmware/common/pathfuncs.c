@@ -340,6 +340,57 @@ void path_correct_separators(char *dstpath, const char *path)
         strcpy(dstp, p);
 }
 
+/* Remove dot segments from the path
+ *
+ * 'path' and 'dstpath' may either be the same buffer or non-overlapping
+ */
+void path_remove_dot_segments (char *dstpath, const char *path)
+{
+    char *dstp = dstpath;
+    char *odstp = dstpath;
+    const char *p = path;
+
+    while (*p)
+    {
+        if (p[0] == '.' && p[1] == PATH_SEPCH)
+            p += 2;
+        else if (p[0] == '.' && p[1] == '.' && p[2] == PATH_SEPCH)
+            p += 3;
+        else if (p[0] == PATH_SEPCH && p[1] == '.' && p[2] == PATH_SEPCH)
+            p += 2;
+        else if (p[0] == PATH_SEPCH && p[1] == '.' && !p[2])
+        {
+            *dstp++ = PATH_SEPCH;
+            break;
+        }
+        else if (p[0] == PATH_SEPCH && p[1] == '.' &&
+            p[2] == '.' && p[3] == PATH_SEPCH)
+        {
+            dstp = odstp;
+            p += 3;
+        }
+        else if (p[0] == PATH_SEPCH && p[1] == '.' && p[2] == '.' && !p[3])
+        {
+            dstp = odstp;
+            *dstp++ = PATH_SEPCH;
+            break;
+        }
+        else if (p[0] == '.' && !p[1])
+            break;
+        else if (p[0] == '.' && p[1] == '.' && !p[2])
+            break;
+        else
+        {
+            odstp = dstp;
+            if (p[0] == PATH_SEPCH)
+                *dstp++ = *p++;
+            while (p[0] && p[0] != PATH_SEPCH)
+                *dstp++ = *p++;
+        }
+    }
+    *dstp = 0;
+}
+
 /* Appends one path to another, adding separators between components if needed.
  * Return value and behavior is otherwise as strlcpy so that truncation may be
  * detected.
