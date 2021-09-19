@@ -489,8 +489,8 @@ static int onplay_menu(int index)
         playlist_buffer_get_track(&viewer.buffer, index);
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL,
                         ID2P(LANG_CURRENT_PLAYLIST), ID2P(LANG_CATALOG),
-                        ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_SHUFFLE),
-                        ID2P(LANG_SAVE),
+                        ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_PROPERTIES),
+                        ID2P(LANG_SHUFFLE), ID2P(LANG_SAVE),
                         ID2P(LANG_PLAYLISTVIEWER_SETTINGS));
     bool current = (current_track->index == viewer.current_playing_track);
 
@@ -547,16 +547,24 @@ static int onplay_menu(int index)
                 ret = 0;
                 break;
             case 4:
+                /* file properties */
+                struct playlist_track_info info;
+                playlist_get_track_info(viewer.playlist, current_track->index, &info);
+
+                result = filetype_load_plugin((void *)"properties", info.filename);
+                ret = (result == MENU_ATTACHED_USB) ? -1 : 0;
+                break;
+            case 5:
                 /* shuffle */
                 playlist_randomise(viewer.playlist, current_tick, false);
                 ret = 1;
                 break;
-            case 5:
+            case 6:
                 /* save playlist */
                 save_playlist_screen(viewer.playlist);
                 ret = 0;
                 break;
-            case 6:
+            case 7:
                 /* playlist viewer settings */
                 result = do_menu(&viewer_settings_menu, NULL, NULL, false);
                 ret = (result == MENU_ATTACHED_USB) ? -1 : 0;
