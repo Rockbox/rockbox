@@ -178,7 +178,7 @@ struct usb_transfer_completion_event_data
     int dir;
     int status;
     int length;
-    void* data;
+    void* data[2];
 };
 #endif /* HAVE_USBSTACK */
 

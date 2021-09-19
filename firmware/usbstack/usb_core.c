@@ -446,10 +446,10 @@ void usb_core_handle_transfer_completion(
         case EP_CONTROL:
             logf("ctrl handled %ld req=0x%x",
                  current_tick,
-                 ((struct usb_ctrlrequest*)event->data)->bRequest);
+                 ((struct usb_ctrlrequest*)event->data[0])->bRequest);
 
             usb_core_control_request_handler(
-                (struct usb_ctrlrequest*)event->data);
+                (struct usb_ctrlrequest*)event->data[0]);
             break;
         default:
             handler = ep_data[ep].completion_handler[EP_DIR(event->dir)];
@@ -952,7 +952,8 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
 
             completion_event->endpoint = endpoint;
             completion_event->dir = dir;
-            completion_event->data = 0;
+            completion_event->data[0] = NULL;
+            completion_event->data[1] = NULL;
             completion_event->status = status;
             completion_event->length = length;
             /* All other endpoints. Let the thread deal with it */
@@ -984,7 +985,8 @@ void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
 
     completion_event->endpoint = EP_CONTROL;
     completion_event->dir = 0;
-    completion_event->data = (void*)req;
+    completion_event->data[0] = (void*)req;
+    completion_event->data[1] = NULL;
     completion_event->status = 0;
     completion_event->length = 0;
     logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
