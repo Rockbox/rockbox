@@ -494,6 +494,9 @@ static int onplay_menu(int index)
                         ID2P(LANG_PLAYLISTVIEWER_SETTINGS));
     bool current = (current_track->index == viewer.current_playing_track);
 
+    struct playlist_track_info trackinfo;
+    playlist_get_track_info(viewer.playlist, index, &trackinfo);
+
     result = do_menu(&menu_items, NULL, NULL, false);
     if (result == MENU_ATTACHED_USB)
     {
@@ -548,10 +551,7 @@ static int onplay_menu(int index)
                 break;
             case 4:
                 /* file properties */
-                struct playlist_track_info info;
-                playlist_get_track_info(viewer.playlist, current_track->index, &info);
-
-                result = filetype_load_plugin((void *)"properties", info.filename);
+                result = filetype_load_plugin((void *)"properties", trackinfo.filename);
                 ret = (result == MENU_ATTACHED_USB) ? -1 : 0;
                 break;
             case 5:
