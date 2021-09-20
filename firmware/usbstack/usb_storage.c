@@ -687,8 +687,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, uns
             if(skip_first) (*tb.max_lun) --;
 #endif
             logf("ums: getmaxlun");
-            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0); /* ack */
-            usb_drv_send(EP_CONTROL, tb.max_lun, 1);
+            usb_drv_control_response(USB_CONTROL_ACK, tb.max_lun, 1);
             handled = true;
             break;
         }
@@ -703,7 +702,7 @@ bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, uns
             usb_drv_reset_endpoint(ep_in, false);
             usb_drv_reset_endpoint(ep_out, true);
 #endif
-            usb_drv_send(EP_CONTROL, NULL, 0);  /* ack */
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             handled = true;
             break;
     }
