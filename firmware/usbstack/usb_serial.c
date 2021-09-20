@@ -296,8 +296,10 @@ bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsi
             if (req->wLength == sizeof(line_coding))
             {
                 /* Receive line coding into local copy */
-                usb_drv_recv_nonblocking(EP_CONTROL, &line_coding, sizeof(line_coding));
-                usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+                if(!reqdata)
+                    usb_drv_control_response(USB_CONTROL_RECEIVE, &line_coding, sizeof(line_coding));
+                else
+                    usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
                 handled = true;
             }
         }
@@ -306,7 +308,7 @@ bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsi
             if (req->wLength == 0)
             {
                 /* wValue holds Control Signal Bitmap that is simply ignored here */
-                usb_drv_send(EP_CONTROL, NULL, 0); /* ack */
+                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
                 handled = true;
             }
         }
@@ -318,8 +320,7 @@ bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsi
             if (req->wLength == sizeof(line_coding))
             {
                 /* Send back line coding so host is happy */
-                usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0); /* ack */
-                usb_drv_send(EP_CONTROL, &line_coding, sizeof(line_coding));
+                usb_drv_control_response(USB_CONTROL_ACK, &line_coding, sizeof(line_coding));
                 handled = true;
             }
         }
