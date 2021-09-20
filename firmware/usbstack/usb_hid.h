@@ -32,7 +32,7 @@ void usb_hid_init_connection(void);
 void usb_hid_init(void);
 void usb_hid_disconnect(void);
 void usb_hid_transfer_complete(int ep, int dir, int status, int length);
-bool usb_hid_control_request(struct usb_ctrlrequest* req, unsigned char* dest);
+bool usb_hid_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest);
 
 void usb_hid_send(usage_page_t usage_page, int id);
 

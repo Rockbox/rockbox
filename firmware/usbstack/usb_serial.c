@@ -277,11 +277,13 @@ int usb_serial_get_config_descriptor(unsigned char *dest, int max_packet_size)
 }
 
 /* called by usb_core_control_request() */
-bool usb_serial_control_request(struct usb_ctrlrequest* req, unsigned char* dest)
+bool usb_serial_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest)
 {
     bool handled = false;
 
     (void)dest;
+    (void)reqdata;
+
     if (req->wIndex != control_interface)
     {
         return false;

@@ -673,11 +673,13 @@ void usb_storage_transfer_complete(int ep,int dir,int status,int length)
 }
 
 /* called by usb_core_control_request() */
-bool usb_storage_control_request(struct usb_ctrlrequest* req, unsigned char* dest)
+bool usb_storage_control_request(struct usb_ctrlrequest* req, void* reqdata, unsigned char* dest)
 {
     bool handled = false;
 
     (void)dest;
+    (void)reqdata;
+
     switch (req->bRequest) {
         case USB_BULK_GET_MAX_LUN: {
             *tb.max_lun = storage_num_drives() - 1;

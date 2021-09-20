@@ -172,7 +172,7 @@ static int usb_no_host_callback(struct timeout *tmo)
 static int usb_core_num_interfaces;
 
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
-typedef bool (*control_handler_t)(struct usb_ctrlrequest* req,
+typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, void* reqdata,
     unsigned char* dest);
 
 static struct
@@ -262,7 +262,7 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #endif
 };
 
-static void usb_core_control_request_handler(struct usb_ctrlrequest* req);
+static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata);
 
 static unsigned char response_data[256] USB_DEVBSS_ATTR;
 
@@ -449,7 +449,7 @@ void usb_core_handle_transfer_completion(
                  ((struct usb_ctrlrequest*)event->data[0])->bRequest);
 
             usb_core_control_request_handler(
-                (struct usb_ctrlrequest*)event->data[0]);
+                (struct usb_ctrlrequest*)event->data[0], event->data[1]);
             break;
         default:
             handler = ep_data[ep].completion_handler[EP_DIR(event->dir)];
@@ -560,7 +560,7 @@ static void allocate_interfaces_and_endpoints(void)
 }
 
 
-static void control_request_handler_drivers(struct usb_ctrlrequest* req)
+static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* reqdata)
 {
     int i, interface = req->wIndex & 0xff;
     bool handled = false;
@@ -571,7 +571,7 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req)
                 drivers[i].first_interface <= interface &&
                 drivers[i].last_interface > interface)
         {
-            handled = drivers[i].control_request(req, response_data);
+            handled = drivers[i].control_request(req, reqdata, response_data);
             if(handled)
                 break;
         }
@@ -583,7 +583,7 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req)
     }
 }
 
-static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
+static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, void* reqdata)
 {
     int size;
     const void* ptr = NULL;
@@ -662,7 +662,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
 
         default:
             logf("ctrl desc.");
-            control_request_handler_drivers(req);
+            control_request_handler_drivers(req, reqdata);
             break;
     }
 
@@ -718,7 +718,7 @@ static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
     }
 }
 
-static void request_handler_device(struct usb_ctrlrequest* req)
+static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
 {
     switch(req->bRequest) {
         case USB_REQ_GET_CONFIGURATION: {
@@ -744,7 +744,7 @@ static void request_handler_device(struct usb_ctrlrequest* req)
             }
         case USB_REQ_GET_DESCRIPTOR:
             logf("usb_core: GET_DESC %d", req->wValue >> 8);
-            request_handler_device_get_descriptor(req);
+            request_handler_device_get_descriptor(req, reqdata);
             break;
         case USB_REQ_CLEAR_FEATURE:
             break;
@@ -768,7 +768,7 @@ static void request_handler_device(struct usb_ctrlrequest* req)
     }
 }
 
-static void request_handler_interface_standard(struct usb_ctrlrequest* req)
+static void request_handler_interface_standard(struct usb_ctrlrequest* req, void* reqdata)
 {
     switch (req->bRequest)
     {
@@ -794,19 +794,19 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req)
             usb_drv_send(EP_CONTROL, response_data, 2);
             break;
         default:
-            control_request_handler_drivers(req);
+            control_request_handler_drivers(req, reqdata);
             break;
     }
 }
 
-static void request_handler_interface(struct usb_ctrlrequest* req)
+static void request_handler_interface(struct usb_ctrlrequest* req, void* reqdata)
 {
     switch(req->bRequestType & USB_TYPE_MASK) {
         case USB_TYPE_STANDARD:
-            request_handler_interface_standard(req);
+            request_handler_interface_standard(req, reqdata);
             break;
         case USB_TYPE_CLASS:
-            control_request_handler_drivers(req);
+            control_request_handler_drivers(req, reqdata);
             break;
         case USB_TYPE_VENDOR:
         default:
@@ -816,7 +816,7 @@ static void request_handler_interface(struct usb_ctrlrequest* req)
     }
 }
 
-static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
+static void request_handler_endoint_drivers(struct usb_ctrlrequest* req, void* reqdata)
 {
     bool handled = false;
     control_handler_t control_handler = NULL;
@@ -826,7 +826,7 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
             ep_data[EP_NUM(req->wIndex)].control_handler[EP_DIR(req->wIndex)];
     
     if(control_handler)
-        handled = control_handler(req, response_data);
+        handled = control_handler(req, reqdata, response_data);
     
     if(!handled) {
         /* nope. flag error */
@@ -835,7 +835,7 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req)
     }
 }
 
-static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
+static void request_handler_endpoint_standard(struct usb_ctrlrequest* req, void* reqdata)
 {
     switch (req->bRequest) {
         case USB_REQ_CLEAR_FEATURE:
@@ -863,19 +863,19 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req)
             usb_drv_send(EP_CONTROL, response_data, 2);
             break;
         default:
-            request_handler_endoint_drivers(req);
+            request_handler_endoint_drivers(req, reqdata);
             break;
     }
 }
 
-static void request_handler_endpoint(struct usb_ctrlrequest* req)
+static void request_handler_endpoint(struct usb_ctrlrequest* req, void* reqdata)
 {
     switch(req->bRequestType & USB_TYPE_MASK) {
         case USB_TYPE_STANDARD:
-            request_handler_endpoint_standard(req);
+            request_handler_endpoint_standard(req, reqdata);
             break;
         case USB_TYPE_CLASS:
-            request_handler_endoint_drivers(req);
+            request_handler_endoint_drivers(req, reqdata);
             break;
         case USB_TYPE_VENDOR:
         default:
@@ -886,7 +886,7 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req)
 }
 
 /* Handling USB requests starts here */
-static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
+static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata)
 {
 #ifdef HAVE_USB_CHARGING_ENABLE
     timeout_cancel(&usb_no_host_timeout);
@@ -904,13 +904,13 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req)
 
     switch(req->bRequestType & USB_RECIP_MASK) {
         case USB_RECIP_DEVICE:
-            request_handler_device(req);
+            request_handler_device(req, reqdata);
             break;
         case USB_RECIP_INTERFACE:
-            request_handler_interface(req);
+            request_handler_interface(req, reqdata);
             break;
         case USB_RECIP_ENDPOINT:
-            request_handler_endpoint(req);
+            request_handler_endpoint(req, reqdata);
             break;
         case USB_RECIP_OTHER:
             logf("unsupported recipient");

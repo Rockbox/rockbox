@@ -747,8 +747,10 @@ static int usb_hid_get_report(struct usb_ctrlrequest *req, unsigned char** dest)
 }
 
 /* called by usb_core_control_request() */
-bool usb_hid_control_request(struct usb_ctrlrequest *req, unsigned char *dest)
+bool usb_hid_control_request(struct usb_ctrlrequest *req, void *reqdata, unsigned char *dest)
 {
+    (void)reqdata;
+
     unsigned char *orig_dest = dest;
     switch (req->bRequestType & USB_TYPE_MASK)
     {
