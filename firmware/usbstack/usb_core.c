@@ -587,7 +587,7 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
     if(!handled) {
         /* nope. flag error */
         logf("bad req:desc %d:%d", req->bRequest, req->wValue >> 8);
-        usb_drv_stall(EP_CONTROL, true, true);
+        usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
 
@@ -659,7 +659,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
             }
             else {
                 logf("bad string id %d", index);
-                usb_drv_stall(EP_CONTROL, true, true);
+                ptr = NULL;
             }
             break;
 
@@ -671,7 +671,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
         default:
             logf("ctrl desc.");
             control_request_handler_drivers(req, reqdata);
-            break;
+            return;
     }
 
     if(ptr) {
@@ -681,8 +681,9 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req, v
         if (ptr != response_data)
             memcpy(response_data, ptr, length);
 
-        usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-        usb_drv_send(EP_CONTROL, response_data, length);
+        usb_drv_control_response(USB_CONTROL_ACK, response_data, length);
+    } else {
+        usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
 
@@ -729,49 +730,46 @@ static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
 static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
 {
     switch(req->bRequest) {
-        case USB_REQ_GET_CONFIGURATION: {
-                logf("usb_core: GET_CONFIG");
-                response_data[0] = (usb_state == ADDRESS ? 0 : 1);
-                usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-                usb_drv_send(EP_CONTROL, response_data, 1);
-                break;
-            }
-        case USB_REQ_SET_CONFIGURATION: {
-                usb_drv_cancel_all_transfers();
-                usb_core_do_set_config(req->wValue);
-                usb_drv_send(EP_CONTROL, NULL, 0);
-                break;
-            }
-        case USB_REQ_SET_ADDRESS: {
-                unsigned char address = req->wValue;
-                usb_drv_send(EP_CONTROL, NULL, 0);
-                usb_drv_cancel_all_transfers();
-                usb_drv_set_address(address);
-                usb_core_do_set_addr(address);
-                break;
-            }
+        case USB_REQ_GET_CONFIGURATION:
+            logf("usb_core: GET_CONFIG");
+            response_data[0] = (usb_state == ADDRESS ? 0 : 1);
+            usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+            break;
+        case USB_REQ_SET_CONFIGURATION:
+            usb_drv_cancel_all_transfers();
+            usb_core_do_set_config(req->wValue);
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            break;
+        case USB_REQ_SET_ADDRESS:
+            /* NOTE: We really have no business handling this and drivers
+             * should just handle it themselves. We don't care beyond
+             * knowing if we've been assigned an address yet, or not. */
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+            usb_drv_cancel_all_transfers();
+            usb_drv_set_address(req->wValue);
+            usb_core_do_set_addr(req->wValue);
+            break;
         case USB_REQ_GET_DESCRIPTOR:
             logf("usb_core: GET_DESC %d", req->wValue >> 8);
             request_handler_device_get_descriptor(req, reqdata);
             break;
-        case USB_REQ_CLEAR_FEATURE:
-            break;
         case USB_REQ_SET_FEATURE:
             if(req->wValue==USB_DEVICE_TEST_MODE) {
                 int mode = req->wIndex >> 8;
-                usb_drv_send(EP_CONTROL, NULL, 0);
+                usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
                 usb_drv_set_test_mode(mode);
+            } else {
+                usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
             }
             break;
         case USB_REQ_GET_STATUS:
             response_data[0] = 0;
             response_data[1] = 0;
-            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-            usb_drv_send(EP_CONTROL, response_data, 2);
+            usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
             break;
         default:
             logf("bad req:desc %d:%d", req->bRequest, req->wValue);
-            usb_drv_stall(EP_CONTROL, true, true);
+            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
@@ -782,24 +780,24 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req, void
     {
         case USB_REQ_SET_INTERFACE:
             logf("usb_core: SET_INTERFACE");
-            usb_drv_send(EP_CONTROL, NULL, 0);
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             break;
 
         case USB_REQ_GET_INTERFACE:
             logf("usb_core: GET_INTERFACE");
             response_data[0] = 0;
-            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-            usb_drv_send(EP_CONTROL, response_data, 1);
-            break;
-        case USB_REQ_CLEAR_FEATURE:
-            break;
-        case USB_REQ_SET_FEATURE:
+            usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
             break;
         case USB_REQ_GET_STATUS:
             response_data[0] = 0;
             response_data[1] = 0;
-            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-            usb_drv_send(EP_CONTROL, response_data, 2);
+            usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
+            break;
+        case USB_REQ_CLEAR_FEATURE:
+        case USB_REQ_SET_FEATURE:
+            /* TODO: These used to be ignored (erroneously).
+             * Should they be passed to the drivers instead? */
+            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
         default:
             control_request_handler_drivers(req, reqdata);
@@ -819,12 +817,12 @@ static void request_handler_interface(struct usb_ctrlrequest* req, void* reqdata
         case USB_TYPE_VENDOR:
         default:
             logf("bad req:desc %d", req->bRequest);
-            usb_drv_stall(EP_CONTROL, true, true);
+            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
 
-static void request_handler_endoint_drivers(struct usb_ctrlrequest* req, void* reqdata)
+static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, void* reqdata)
 {
     bool handled = false;
     control_handler_t control_handler = NULL;
@@ -839,7 +837,7 @@ static void request_handler_endoint_drivers(struct usb_ctrlrequest* req, void* r
     if(!handled) {
         /* nope. flag error */
         logf("usb bad req %d", req->bRequest);
-        usb_drv_stall(EP_CONTROL, true, true);
+        usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
 
@@ -850,14 +848,14 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req, void*
             usb_core_do_clear_feature(USB_RECIP_ENDPOINT,
                                       req->wIndex,
                                       req->wValue);
-            usb_drv_send(EP_CONTROL, NULL, 0);
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             break;
         case USB_REQ_SET_FEATURE:
             logf("usb_core: SET FEATURE (%d)", req->wValue);
             if(req->wValue == USB_ENDPOINT_HALT)
                usb_drv_stall(EP_NUM(req->wIndex), true, EP_DIR(req->wIndex));
-            
-            usb_drv_send(EP_CONTROL, NULL, 0);
+
+            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             break;
         case USB_REQ_GET_STATUS:
             response_data[0] = 0;
@@ -866,12 +864,11 @@ static void request_handler_endpoint_standard(struct usb_ctrlrequest* req, void*
             if(req->wIndex > 0)
                 response_data[0] = usb_drv_stalled(EP_NUM(req->wIndex),
                                                     EP_DIR(req->wIndex));
-            
-            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
-            usb_drv_send(EP_CONTROL, response_data, 2);
+
+            usb_drv_control_response(USB_CONTROL_ACK, response_data, 2);
             break;
         default:
-            request_handler_endoint_drivers(req, reqdata);
+            request_handler_endpoint_drivers(req, reqdata);
             break;
     }
 }
@@ -883,12 +880,12 @@ static void request_handler_endpoint(struct usb_ctrlrequest* req, void* reqdata)
             request_handler_endpoint_standard(req, reqdata);
             break;
         case USB_TYPE_CLASS:
-            request_handler_endoint_drivers(req, reqdata);
+            request_handler_endpoint_drivers(req, reqdata);
             break;
         case USB_TYPE_VENDOR:
         default:
             logf("bad req:desc %d", req->bRequest);
-            usb_drv_stall(EP_CONTROL, true, true);
+            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
 }
@@ -920,12 +917,11 @@ static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* 
         case USB_RECIP_ENDPOINT:
             request_handler_endpoint(req, reqdata);
             break;
-        case USB_RECIP_OTHER:
+        default:
             logf("unsupported recipient");
-            usb_drv_stall(EP_CONTROL, true, true);
+            usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
             break;
     }
-    //logf("control handled");
 }
 
 /* called by usb_drv_int() */
