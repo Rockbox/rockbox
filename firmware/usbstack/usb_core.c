@@ -22,6 +22,7 @@
 #include "thread.h"
 #include "kernel.h"
 #include "string.h"
+#include "panic.h"
 /*#define LOGF_ENABLE*/
 #include "logf.h"
 
@@ -261,6 +262,13 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
     },
 #endif
 };
+
+#ifdef USB_LEGACY_CONTROL_API
+static struct usb_ctrlrequest active_request_buf;
+static struct usb_ctrlrequest* active_request = NULL;
+static void* control_write_data = NULL;
+static bool control_write_data_done = false;
+#endif
 
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata);
 
@@ -940,26 +948,29 @@ void usb_core_bus_reset(void)
 /* called by usb_drv_transfer_completed() */
 void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
 {
-    struct usb_transfer_completion_event_data *completion_event;
+    struct usb_transfer_completion_event_data* completion_event =
+        &ep_data[endpoint].completion_event[EP_DIR(dir)];
 
-    switch (endpoint) {
-        case EP_CONTROL:
-            /* already handled */
-            break;
+    completion_event->endpoint = endpoint;
+    completion_event->dir = dir;
+    completion_event->data[0] = NULL;
+    completion_event->data[1] = NULL;
+    completion_event->status = status;
+    completion_event->length = length;
 
-        default:
-            completion_event = &ep_data[endpoint].completion_event[EP_DIR(dir)];
-
-            completion_event->endpoint = endpoint;
-            completion_event->dir = dir;
-            completion_event->data[0] = NULL;
-            completion_event->data[1] = NULL;
-            completion_event->status = status;
-            completion_event->length = length;
-            /* All other endpoints. Let the thread deal with it */
-            usb_signal_transfer_completion(completion_event);
-            break;
+#ifdef USB_LEGACY_CONTROL_API
+    if(endpoint == EP_CONTROL) {
+        if(dir == USB_DIR_OUT && active_request && control_write_data_done) {
+            completion_event->data[0] = active_request;
+            if(control_write_data_done && dir == USB_DIR_OUT)
+                completion_event->data[1] = control_write_data;
+        } else {
+            return;
+        }
     }
+#endif
+
+    usb_signal_transfer_completion(completion_event);
 }
 
 void usb_core_handle_notify(long id, intptr_t data)
@@ -977,8 +988,7 @@ void usb_core_handle_notify(long id, intptr_t data)
     }
 }
 
-/* called by usb_drv_int() */
-void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
+void usb_core_control_request(struct usb_ctrlrequest* req, void* reqdata)
 {
     struct usb_transfer_completion_event_data* completion_event =
         &ep_data[EP_CONTROL].completion_event[EP_DIR(USB_DIR_IN)];
@@ -986,12 +996,108 @@ void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
     completion_event->endpoint = EP_CONTROL;
     completion_event->dir = 0;
     completion_event->data[0] = (void*)req;
-    completion_event->data[1] = NULL;
+    completion_event->data[1] = reqdata;
     completion_event->status = 0;
     completion_event->length = 0;
     logf("ctrl received %ld, req=0x%x", current_tick, req->bRequest);
     usb_signal_transfer_completion(completion_event);
 }
+
+void usb_core_control_complete(int status)
+{
+    /* We currently don't use this, it's here to make the API look good ;)
+     * It makes sense to #define it away on normal builds.
+     */
+    (void)status;
+    logf("ctrl complete %ld, %d", current_tick, status);
+}
+
+#ifdef USB_LEGACY_CONTROL_API
+/* Only needed if the driver does not support the new API yet */
+void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
+{
+    memcpy(&active_request_buf, req, sizeof(*req));
+    active_request = &active_request_buf;
+    control_write_data = NULL;
+    control_write_data_done = false;
+
+    usb_core_control_request(req, NULL);
+}
+
+void usb_drv_control_response(enum usb_control_response resp,
+                              void* data, int length)
+{
+    if(!active_request)
+        panicf("null ctrl req");
+
+    if(active_request->wLength == 0)
+    {
+        active_request = NULL;
+
+        /* No-data request */
+        if(resp == USB_CONTROL_ACK)
+            usb_drv_send(EP_CONTROL, data, length);
+        else if(resp == USB_CONTROL_STALL)
+            usb_drv_stall(EP_CONTROL, true, true);
+        else
+            panicf("RECEIVE on non-data req");
+    }
+    else if(active_request->bRequestType & USB_DIR_IN)
+    {
+        /* Control read request */
+        if(resp == USB_CONTROL_ACK)
+        {
+            active_request = NULL;
+            usb_drv_recv_nonblocking(EP_CONTROL, NULL, 0);
+            usb_drv_send(EP_CONTROL, data, length);
+        }
+        else if(resp == USB_CONTROL_STALL)
+        {
+            active_request = NULL;
+            usb_drv_stall(EP_CONTROL, true, true);
+        }
+        else
+        {
+            panicf("RECEIVE on ctrl read req");
+        }
+    }
+    else if(!control_write_data_done)
+    {
+        /* Control write request, data phase */
+        if(resp == USB_CONTROL_RECEIVE)
+        {
+            control_write_data = data;
+            control_write_data_done = true;
+            usb_drv_recv_nonblocking(EP_CONTROL, data, length);
+        }
+        else if(resp == USB_CONTROL_STALL)
+        {
+            /* We should stall the OUT endpoint here, but the old code did
+             * not do so and some drivers may not handle it correctly. */
+            active_request = NULL;
+            usb_drv_stall(EP_CONTROL, true, true);
+        }
+        else
+        {
+            panicf("ACK on ctrl write data");
+        }
+    }
+    else
+    {
+        active_request = NULL;
+        control_write_data = NULL;
+        control_write_data_done = false;
+
+        /* Control write request, status phase */
+        if(resp == USB_CONTROL_ACK)
+            usb_drv_send(EP_CONTROL, NULL, 0);
+        else if(resp == USB_CONTROL_STALL)
+            usb_drv_stall(EP_CONTROL, true, true);
+        else
+            panicf("RECEIVE on ctrl write status");
+    }
+}
+#endif
 
 void usb_core_notify_set_address(uint8_t addr)
 {
