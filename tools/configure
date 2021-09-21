@@ -4432,6 +4432,8 @@ elif [ "$ARG_CCACHE" != "0" ]; then
   if test -n "$ccache"; then
     echo "Found and uses ccache ($ccache)"
   fi
+else
+  CCACHE_ARG="export CCACHE_DISABLE=true"
 fi
 
 # figure out the full path to the various commands if possible
@@ -4724,6 +4726,7 @@ export ANDROID_NDK_PATH=${ANDROID_NDK_PATH}
 export ANDROID_SDK_PATH=${ANDROID_SDK_PATH}
 export ANDROID_PLATFORM_VERSION=${ANDROID_PLATFORM_VERSION}
 export TOOLSET=${toolset}
+$CCACHE_ARG
 
 CONFIGURE_OPTIONS=${cmdline}
 
