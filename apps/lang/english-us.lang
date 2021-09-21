@@ -16013,3 +16013,17 @@
     *: "Bit rate"
   </voice>
 </phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>

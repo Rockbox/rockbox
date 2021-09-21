@@ -370,12 +370,14 @@ foreach my $id (@langorder) {
 #		print "#!! '$id:$tgt' voice is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
 		$lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
 	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
-		# If it's not blank, clear it and complain!
-		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is not blank!\n";
-		$lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
-		$lang{$id}{'notes'} .= "### $english{$id}{voice}{$tgt}\n";
-#		print "#!! '$id:$tgt' voice not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
-		$lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
+		if ($id ne 'VOICE_NUMERIC_TENS_SWAP_SEPARATOR') {
+		    # If it's not blank, clear it and complain!
+		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is not blank!\n";
+		    $lang{$id}{'notes'} .= "### the previously used one is commented below:\n";
+		    $lang{$id}{'notes'} .= "### $english{$id}{voice}{$tgt}\n";
+		    #		print "#!! '$id:$tgt' voice not blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
+		    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
+		}
 	    }
 	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'} && !$ignoredups) {
 	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";

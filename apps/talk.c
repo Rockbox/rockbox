@@ -1188,17 +1188,44 @@ int talk_number(long n, bool enqueue)
                 talk_id(VOICE_HUNDRED, true);
             }
 
-            /* combination indexing */
-            if (ones > 20)
+            struct queue_entry tens_swap;
+            if (get_clip(VOICE_NUMERIC_TENS_SWAP_SEPARATOR, &tens_swap) >= 0)
             {
-               int tens = ones/10 + 18;
-               talk_id(VOICE_ZERO + tens, true);
-               ones %= 10;
+                /* direct indexing */
+                if (ones <= 20)
+                {
+                    talk_id(VOICE_ZERO + ones, true);
+                }
+                else if (ones)
+                {
+                    int tmp = ones % 10;
+                    if (tmp)
+                    {
+                        talk_id(VOICE_ZERO + tmp, true);
+                        talk_id(VOICE_NUMERIC_TENS_SWAP_SEPARATOR, true);
+                    }
+                }
+                /* combination indexing */
+                if (ones > 20)
+                {
+                     int tens = ones/10 + 18;
+                     talk_id(VOICE_ZERO + tens, true);
+                }
             }
+            else
+            {
+                /* combination indexing */
+                if (ones > 20)
+                {
+                    int tens = ones/10 + 18;
+                    talk_id(VOICE_ZERO + tens, true);
+                    ones %= 10;
+                }
 
-            /* direct indexing */
-            if (ones)
-                talk_id(VOICE_ZERO + ones, true);
+                /* direct indexing */
+                if (ones)
+                    talk_id(VOICE_ZERO + ones, true);
+            }
 
             /* add billion, million, thousand */
             if (mil)
@@ -1215,7 +1242,7 @@ int talk_number(long n, bool enqueue)
 static int talk_year(long year, bool enqueue)
 {
     int rem;
-    if(year < 1100 || year >=2000)
+    if(year < 1100 || (year >=2000 && year < 2100))
         /* just say it as a regular number */
         return talk_number(year, enqueue);
     /* Say century */
