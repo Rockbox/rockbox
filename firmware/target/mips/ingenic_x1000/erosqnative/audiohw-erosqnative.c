@@ -42,6 +42,7 @@ void audiohw_init(void)
     gpio_set_level(GPIO_ISL54405_MUTE, 1);
     gpio_set_level(GPIO_PCM5102A_XMIT, 0);
 
+    aic_set_play_last_sample(true);
     aic_set_external_codec(true);
     aic_set_i2s_mode(AIC_I2S_MASTER_MODE);
     audiohw_set_frequency(HW_FREQ_48);

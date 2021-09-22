@@ -58,7 +58,7 @@ void pcm_play_dma_init(void)
     /* Configure AIC with some sane defaults */
     jz_writef(AIC_CFG, RST(1));
     jz_writef(AIC_I2SCR, STPBK(1));
-    jz_writef(AIC_CFG, MSB(0), LSMP(1), ICDC(0), AUSEL(1), BCKD(0), SYNCD(0));
+    jz_writef(AIC_CFG, MSB(0), LSMP(0), ICDC(0), AUSEL(1), BCKD(0), SYNCD(0));
     jz_writef(AIC_CCR, ENDSW(0), ASVTSU(0));
     jz_writef(AIC_I2SCR, RFIRST(0), ESCLK(0), AMSL(0));
     jz_write(AIC_SPENA, 0);
