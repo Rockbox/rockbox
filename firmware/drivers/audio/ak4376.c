@@ -83,11 +83,11 @@ void ak4376_open(void)
     ak4376_set_pdn_pin(1);
     mdelay(1);
 
-    static const int init_config[] = {
+    static const uint8_t init_config[] = {
         /* Ensure HPRHZ, HPLHZ are 0 */
         AK4376_REG_OUTPUT_MODE,  0x00,
         /* Mute all volume controls */
-        AK4376_REG_MIXER,        0x00,
+        AK4376_REG_MIXER,        AK4376_MIX_LCH | (AK4376_MIX_RCH << 4),
         AK4376_REG_LCH_VOLUME,   0x80,
         AK4376_REG_RCH_VOLUME,   0x00,
         AK4376_REG_AMP_VOLUME,   0x00,
@@ -150,14 +150,9 @@ static int round_step_up(int x, int step)
     return x - rem;
 }
 
-static void calc_volumes(int vol, int* mix, int* dig, int* sw)
+static void calc_volumes(int vol, int* dig, int* sw)
 {
-    /* Mixer can divide by 2, which gives an extra -6 dB adjustment */
-    if(vol < AK4376_DIG_VOLUME_MIN) {
-        *mix |= AK4376_MIX_HALF;
-        vol += 60;
-    }
-
+    /* Apply digital volume */
     *dig = round_step_up(vol, AK4376_DIG_VOLUME_STEP);
     *dig = MIN(*dig, AK4376_DIG_VOLUME_MAX);
     *dig = MAX(*dig, AK4376_DIG_VOLUME_MIN);
@@ -186,8 +181,8 @@ static int amp_vol_to_hw(int vol)
 void ak4376_set_volume(int vol_l, int vol_r)
 {
     int amp;
-    int mix_l = AK4376_MIX_LCH, dig_l, sw_l;
-    int mix_r = AK4376_MIX_RCH, dig_r, sw_r;
+    int dig_l, sw_l;
+    int dig_r, sw_r;
 
     if(vol_l <= AK4376_MIN_VOLUME && vol_r <= AK4376_MIN_VOLUME) {
         /* Special case for full mute */
@@ -202,11 +197,10 @@ void ak4376_set_volume(int vol_l, int vol_r)
         amp = MAX(amp, AK4376_AMP_VOLUME_MIN);
 
         /* Other controls are stereo */
-        calc_volumes(vol_l - amp, &mix_l, &dig_l, &sw_l);
-        calc_volumes(vol_r - amp, &mix_r, &dig_r, &sw_r);
+        calc_volumes(vol_l - amp, &dig_l, &sw_l);
+        calc_volumes(vol_r - amp, &dig_r, &sw_r);
     }
 
-    ak4376_write(AK4376_REG_MIXER, (mix_l & 0xf) | ((mix_r & 0xf) << 4));
     ak4376_write(AK4376_REG_LCH_VOLUME, dig_vol_to_hw(dig_l) | (1 << 7));
     ak4376_write(AK4376_REG_RCH_VOLUME, dig_vol_to_hw(dig_r));
     ak4376_write(AK4376_REG_AMP_VOLUME, amp_vol_to_hw(amp));
