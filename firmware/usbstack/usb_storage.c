@@ -71,7 +71,7 @@
 #endif /* USB_READ_BUFFER_SIZE */
 
 /* We don't use sizeof() here, because we *need* a multiple of 32 */
-#define MAX_CBW_SIZE 32
+#define MAX_CBW_SIZE 512
 
 #ifdef USB_WRITE_BUFFER_SIZE
 #define WRITE_BUFFER_SIZE USB_WRITE_BUFFER_SIZE

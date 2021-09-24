@@ -666,8 +666,7 @@ void usb_hid_transfer_complete(int ep, int dir, int status, int length)
  * to the DAP using the host's custom driver */
 static int usb_hid_set_report(struct usb_ctrlrequest *req, void *reqdata)
 {
-    static unsigned char buf[SET_REPORT_BUF_LEN] USB_DEVBSS_ATTR
-        __attribute__((aligned(32)));
+    static unsigned char buf[64] USB_DEVBSS_ATTR __attribute__((aligned(32)));
     int length;
 
     if ((req->wValue >> 8) != REPORT_TYPE_OUTPUT)
