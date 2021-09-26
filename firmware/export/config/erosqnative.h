@@ -106,7 +106,6 @@
 /* USB support */
 #ifndef SIMULATOR
 #define CONFIG_USBOTG USBOTG_DESIGNWARE
-#define USB_DW_ARCH_SLAVE
 #define USB_DW_TURNAROUND 5
 #define HAVE_USBSTACK
 #define USB_VENDOR_ID 0xc502
@@ -117,6 +116,10 @@
 #define HAVE_USB_CHARGING_IN_THREAD
 #define TARGET_USB_CHARGING_DEFAULT USB_CHARGING_FORCE
 #define HAVE_BOOTLOADER_USB_MODE
+/* This appears to improve transfer performance (the default is 64 KiB).
+ * Going any higher doesn't help but we're still slower than the OF. */
+#define USB_READ_BUFFER_SIZE    (128 * 1024)
+#define USB_WRITE_BUFFER_SIZE   (128 * 1024)
 #endif
 
 /* Rockbox capabilities */
