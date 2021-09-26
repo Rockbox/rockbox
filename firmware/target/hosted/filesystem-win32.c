@@ -462,6 +462,13 @@ int os_relate(const char *ospath1, const char *ospath2)
     return rc;
 }
 
+int os_modtime(const char *path, time_t modtime)
+{
+    (void)path;
+    (void)modtime;
+    return 0;
+}
+
 void volume_size(IF_MV(int volume,) unsigned long *sizep, unsigned long *freep)
 {
     ULARGE_INTEGER free = { .QuadPart = 0 },
