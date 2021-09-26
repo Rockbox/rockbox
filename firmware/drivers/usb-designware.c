@@ -53,13 +53,31 @@
 #define COMMIT_DCACHE_RANGE(b,s)    commit_dcache_range(b,s)
 #endif
 
-/* On some platforms, virtual addresses must be mangled to
- * get a physical address for DMA
+/* USB_DW_PHYSADDR(x) converts the address of buffer x to one usable with DMA.
+ * For example, converting a virtual address to a physical address.
+ *
+ * USB_DW_UNCACHEDADDR(x) is used to get an uncached pointer to a buffer.
+ * If the platform doesn't support this, define NO_UNCACHED_ADDR instead.
+ *
+ * Define POST_DMA_FLUSH if the driver should discard DMA RX buffers after a
+ * transfer completes. Needed if the CPU can speculatively fetch cache lines
+ * in any way, eg. due to speculative execution / prefetching.
  */
 #if CONFIG_CPU == X1000
-# define DMA_ADDR2PHYS(x) PHYSADDR(x)
-#else
-# define DMA_ADDR2PHYS(x) x
+# define USB_DW_PHYSADDR(x)     PHYSADDR(x)
+# define USB_DW_UNCACHEDADDR(x) ((typeof(x))UNCACHEDADDR(x))
+# define POST_DMA_FLUSH
+#elif CONFIG_CPU == AS3525v2
+# define USB_DW_PHYSADDR(x)     AS3525_PHYSICAL_ADDR(x)
+# define USB_DW_UNCACHEDADDR(x) AS3525_UNCACHED_ADDR(x)
+#elif CONFIG_CPU == S5L8701
+# define USB_DW_PHYSADDR(x)     x
+# define NO_UNCACHED_ADDR       /* Not known how to form uncached addresses */
+#elif CONFIG_CPU == S5L8702
+# define USB_DW_PHYSADDR(x)     S5L8702_PHYSICAL_ADDR(x)
+# define USB_DW_UNCACHEDADDR(x) S5L8702_UNCACHED_ADDR(x)
+#elif !defined(USB_DW_ARCH_SLAVE)
+# error "Must define USB_DW_PHYSADDR / USB_DW_UNCACHEDADDR!"
 #endif
 
 #ifndef USB_DW_TOUTCAL
@@ -77,19 +95,33 @@ enum usb_dw_epdir
     USB_DW_EPDIR_OUT = 1,
 };
 
-union usb_ep0_buffer
+enum usb_dw_ep0_state
 {
-    struct usb_ctrlrequest setup;
-    uint8_t raw[64];
-};
+    /* Waiting for a setup packet to arrive. This is the default state. */
+    EP0_SETUP,
 
-static union usb_ep0_buffer ep0_buffer USB_DEVBSS_ATTR;
+    /* Request wait states -- after submitting a request, we enter EP0_REQ
+     * (or EP0_REQ_CTRLWRITE for control writes). EP0_REQ is also used for
+     * the 2nd phase of a control write. */
+    EP0_REQ,
+    EP0_REQ_CTRLWRITE,
+
+    /* Waiting for a data phase to complete. */
+    EP0_DATA_IN,    EP0_FIRST_CNAK_STATE = EP0_DATA_IN,
+    EP0_DATA_OUT,
+
+    /* Waiting for the status phase */
+    EP0_STATUS_IN,
+    EP0_STATUS_OUT,
+
+    EP0_NUM_STATES
+};
 
 /* Internal EP state/info */
 struct usb_dw_ep
 {
     struct semaphore complete;
-    uint32_t* req_addr;
+    void* req_addr;
     uint32_t req_size;
     uint32_t* addr;
     uint32_t sizeleft;
@@ -99,7 +131,42 @@ struct usb_dw_ep
     uint8_t busy;
 };
 
+/* Additional state for EP0 */
+struct usb_dw_ep0
+{
+    enum usb_dw_ep0_state state;
+    struct usb_ctrlrequest active_req;
+    struct usb_ctrlrequest pending_req;
+};
+
+static const char* const dw_dir_str[USB_DW_NUM_DIRS] =
+{
+    [USB_DW_EPDIR_IN]  = "IN",
+    [USB_DW_EPDIR_OUT] = "OUT",
+};
+
+static const char* const dw_state_str[EP0_NUM_STATES] =
+{
+    [EP0_SETUP]         = "setup",
+    [EP0_REQ]           = "req",
+    [EP0_REQ_CTRLWRITE] = "req_cw",
+    [EP0_DATA_IN]       = "dat_in",
+    [EP0_DATA_OUT]      = "dat_out",
+    [EP0_STATUS_IN]     = "sts_in",
+    [EP0_STATUS_OUT]    = "sts_out",
+};
+
+static const char* const dw_resp_str[3] =
+{
+    [USB_CONTROL_ACK]     = "ACK",
+    [USB_CONTROL_RECEIVE] = "RECV",
+    [USB_CONTROL_STALL]   = "STALL",
+};
+
 static struct usb_dw_ep usb_dw_ep_list[USB_NUM_ENDPOINTS][USB_DW_NUM_DIRS];
+static struct usb_dw_ep0 ep0;
+uint8_t _ep0_buffer[64] USB_DEVBSS_ATTR __attribute__((aligned(32)));
+uint8_t* ep0_buffer; /* Uncached, unless NO_UNCACHED_ADDR is defined */
 
 static uint32_t usb_endpoints;  /* available EPs mask */
 
@@ -117,35 +184,30 @@ static uint32_t epmis_msk;
 static uint32_t ep_periodic_msk;
 #endif
 
-static const char *dw_dir_str[USB_DW_NUM_DIRS] =
-{
-    [USB_DW_EPDIR_IN] = "IN",
-    [USB_DW_EPDIR_OUT] = "OUT",
-};
-
-
 static struct usb_dw_ep *usb_dw_get_ep(int epnum, enum usb_dw_epdir epdir)
 {
     return &usb_dw_ep_list[epnum][epdir];
 }
 
-static int usb_dw_maxpktsize(int epnum, enum usb_dw_epdir epdir)
+static uint32_t usb_dw_maxpktsize(int epnum, enum usb_dw_epdir epdir)
 {
     return epnum ? DWC_EPCTL(epnum, epdir) & 0x3ff : 64;
 }
 
-static int usb_dw_maxxfersize(int epnum, enum usb_dw_epdir epdir)
+static uint32_t usb_dw_maxxfersize(int epnum, enum usb_dw_epdir epdir)
 {
-    return epnum ? ALIGN_DOWN_P2(MIN(hw_maxbytes,
-        hw_maxpackets*usb_dw_maxpktsize(epnum, epdir)), CACHEALIGN_BITS) : 64;
+    /* EP0 can only transfer one packet at a time. */
+    if(epnum == 0)
+        return 64;
+
+    uint32_t maxpktsize = usb_dw_maxpktsize(epnum, epdir);
+    return CACHEALIGN_DOWN(MIN(hw_maxbytes, hw_maxpackets * maxpktsize));
 }
 
 /* Calculate number of packets (if size == 0 an empty packet will be sent) */
-static int usb_dw_calc_packets(uint32_t size, uint32_t maxpktsize)
+static uint32_t usb_dw_calc_packets(uint32_t size, uint32_t maxpktsize)
 {
-    int packets = (size + maxpktsize - 1) / maxpktsize;
-    if (!packets) packets = 1;
-    return packets;
+    return MAX(1, (size + maxpktsize - 1) / maxpktsize);
 }
 
 static int usb_dw_get_stall(int epnum, enum usb_dw_epdir epdir)
@@ -184,8 +246,8 @@ static unsigned usb_dw_bytes_in_txfifo(int epnum, uint32_t *sentbytes)
     uint32_t dieptsiz = DWC_DIEPTSIZ(epnum);
     uint32_t packetsleft = (dieptsiz >> 19) & 0x3ff;
     if (!packetsleft) return 0;
-    int maxpktsize = usb_dw_maxpktsize(epnum, USB_DW_EPDIR_IN);
-    int packets = usb_dw_calc_packets(size, maxpktsize);
+    uint32_t maxpktsize = usb_dw_maxpktsize(epnum, USB_DW_EPDIR_IN);
+    uint32_t packets = usb_dw_calc_packets(size, maxpktsize);
     uint32_t bytesleft = dieptsiz & 0x7ffff;
     uint32_t bytespushed = size - bytesleft;
     uint32_t bytespulled = (packets - packetsleft) * maxpktsize;
@@ -200,7 +262,7 @@ static unsigned usb_dw_bytes_in_txfifo(int epnum, uint32_t *sentbytes)
 static void usb_dw_handle_rxfifo(void)
 {
     uint32_t rxsts = DWC_GRXSTSP;
-    int pktsts = (rxsts >> 17) & 0xf;
+    uint32_t pktsts = (rxsts >> 17) & 0xf;
 
     switch (pktsts)
     {
@@ -208,19 +270,31 @@ static void usb_dw_handle_rxfifo(void)
         case PKTSTS_SETUPRX:
         {
             int ep = rxsts & 0xf;
-            int words = (((rxsts >> 4) & 0x7ff) + 3) >> 2;
-            struct usb_dw_ep* dw_ep = usb_dw_get_ep(ep, USB_DW_EPDIR_OUT);
-            if (dw_ep->busy)
+            uint32_t words = (((rxsts >> 4) & 0x7ff) + 3) >> 2;
+
+            /* Annoyingly, we need to special-case EP0. */
+            if(ep == 0)
             {
+                uint32_t* addr = (uint32_t*)ep0_buffer;
                 while (words--)
-                    *dw_ep->addr++ = DWC_DFIFO(0);
+                    *addr++ = DWC_DFIFO(0);
             }
             else
             {
-                /* Discard data */
-                while (words--)
-                    (void) DWC_DFIFO(0);
+                struct usb_dw_ep* dw_ep = usb_dw_get_ep(ep, USB_DW_EPDIR_OUT);
+                if (dw_ep->busy)
+                {
+                    while (words--)
+                        *dw_ep->addr++ = DWC_DFIFO(0);
+                }
+                else
+                {
+                    /* Discard data */
+                    while (words--)
+                        (void) DWC_DFIFO(0);
+                }
             }
+
             break;
         }
         case PKTSTS_OUTDONE:
@@ -292,7 +366,7 @@ static void usb_dw_handle_dtxfifo(int epnum)
         {
             /* We push whole packets to read consistent info on DIEPTSIZ
                (i.e. when FIFO size is not maxpktsize multiplo). */
-            int maxpktwords = usb_dw_maxpktsize(epnum, USB_DW_EPDIR_IN) >> 2;
+            uint32_t maxpktwords = usb_dw_maxpktsize(epnum, USB_DW_EPDIR_IN) >> 2;
             words = (fifospace / maxpktwords) * maxpktwords;
         }
 
@@ -458,7 +532,7 @@ static void usb_dw_nptx_unqueue(int epnum)
             dw_ep->addr -= (bytesinfifo + 3) >> 2;
 #else
             (void) bytesinfifo;
-            DWC_DIEPDMA(ep) = DMA_ADDR2PHYS((uint32_t)(dw_ep->addr) + sentbytes);
+            DWC_DIEPDMA(ep) = USB_DW_PHYSADDR((uint32_t)(dw_ep->addr) + sentbytes);
 #endif
             DWC_DIEPTSIZ(ep) = PKTCNT(packetsleft) | (dw_ep->size - sentbytes);
 
@@ -664,57 +738,72 @@ static void usb_dw_reset_endpoints(void)
 #endif
 }
 
-static void usb_dw_start_xfer(int epnum,
-                enum usb_dw_epdir epdir, const void* buf, int size)
+static void usb_dw_epstart(int epnum, enum usb_dw_epdir epdir,
+                           void* buf, uint32_t size)
 {
     if ((uint32_t)buf & ((epdir == USB_DW_EPDIR_IN) ? 3 : CACHEALIGN_SIZE-1))
         logf("%s: %s%d %p unaligned", __func__, dw_dir_str[epdir], epnum, buf);
 
     struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, epdir);
+    uint32_t xfersize = MIN(size, usb_dw_maxxfersize(epnum, epdir));
 
-    dw_ep->busy = true;
-    dw_ep->status = -1;
-    dw_ep->sizeleft = size;
-    size = MIN(size, usb_dw_maxxfersize(epnum, epdir));
-    dw_ep->size = size;
-
-    int packets = usb_dw_calc_packets(size, usb_dw_maxpktsize(epnum, epdir));
-    uint32_t eptsiz = PKTCNT(packets) | size;
-    uint32_t nak;
-
-    /* Set up data source */
     dw_ep->addr = (uint32_t*)buf;
-#ifndef USB_DW_ARCH_SLAVE
-    DWC_EPDMA(epnum, epdir) = DMA_ADDR2PHYS((uint32_t)buf);
-#endif
+    dw_ep->size = xfersize;
+    dw_ep->sizeleft = size;
+    dw_ep->status = -1;
+    dw_ep->busy = true;
+
+    if (epnum == 0 && epdir == USB_DW_EPDIR_OUT)
+    {
+        /* FIXME: there's an extremely rare race condition here.
+         *
+         * 1. Host sends a control write.
+         * 2. We process the request.
+         * 3. (time passes)
+         * 4. This function is called via USB_CONTROL_RECEIVE response.
+         * 5. Right before we set CNAK, host sends another control write.
+         *
+         * So we may unintentionally receive data from the second request.
+         * It's possible to detect this when we see a setup packet because
+         * EP0 OUT will be busy. In principle it should even be possible to
+         * handle the 2nd request correctly. Currently we don't attempt to
+         * detect or recover from this error.
+         */
+        DWC_DOEPCTL(0) |= CNAK;
+        return;
+    }
+
+    uint32_t maxpktsize = usb_dw_maxpktsize(epnum, epdir);
+    uint32_t packets = usb_dw_calc_packets(xfersize, maxpktsize);
+    uint32_t eptsiz = PKTCNT(packets) | xfersize;
+    uint32_t nak = CNAK;
 
     if (epdir == USB_DW_EPDIR_IN)
     {
 #ifndef USB_DW_ARCH_SLAVE
-        COMMIT_DCACHE_RANGE(buf, size);
+        COMMIT_DCACHE_RANGE(buf, xfersize);
 #endif
 #ifdef USB_DW_SHARED_FIFO
         eptsiz |= MCCNT((ep_periodic_msk >> epnum) & 1);
 #endif
-        nak = CNAK;
+
     }
     else
     {
 #ifndef USB_DW_ARCH_SLAVE
-        DISCARD_DCACHE_RANGE(buf, size);
+        DISCARD_DCACHE_RANGE(buf, xfersize);
 #endif
-        eptsiz |= STUPCNT(!epnum);
-        nak = epnum ? CNAK : SNAK;
     }
 
+#ifndef USB_DW_ARCH_SLAVE
+    DWC_EPDMA(epnum, epdir) = USB_DW_PHYSADDR((uint32_t)buf);
+#endif
     DWC_EPTSIZ(epnum, epdir) = eptsiz;
-
-    /* Enable the endpoint */
     DWC_EPCTL(epnum, epdir) |= EPENA | nak;
 
 #ifdef USB_DW_ARCH_SLAVE
     /* Enable interrupts to start pushing data into the FIFO */
-    if ((epdir == USB_DW_EPDIR_IN) && size)
+    if ((epdir == USB_DW_EPDIR_IN) && dw_ep->size > 0)
 #ifdef USB_DW_SHARED_FIFO
         DWC_GINTMSK |= ((ep_periodic_msk & (1 << epnum)) ? PTXFE : NPTXFE);
 #else
@@ -723,25 +812,31 @@ static void usb_dw_start_xfer(int epnum,
 #endif
 }
 
-static void usb_dw_ep0_wait_setup(void)
+static void usb_dw_transfer(int epnum, enum usb_dw_epdir epdir,
+                            void* buf, uint32_t size)
 {
-    usb_dw_start_xfer(0, USB_DW_EPDIR_OUT, ep0_buffer.raw, 64);
+    struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, epdir);
+
+    if (!dw_ep->active)
+        logf("%s: %s%d inactive", __func__, dw_dir_str[epdir], epnum);
+    if (dw_ep->busy)
+        logf("%s: %s%d busy", __func__, dw_dir_str[epdir], epnum);
+
+    dw_ep->req_addr = buf;
+    dw_ep->req_size = size;
+    usb_dw_epstart(epnum, epdir, buf, size);
 }
 
-static void usb_dw_handle_setup_received(void)
+static void usb_dw_ep0_recv(void)
 {
-    static struct usb_ctrlrequest usb_ctrlsetup;
-
-    usb_dw_flush_endpoint(0, USB_DW_EPDIR_IN);
-
-    memcpy(&usb_ctrlsetup, ep0_buffer.raw, sizeof(usb_ctrlsetup));
-
-    if (((usb_ctrlsetup.bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE)
-     && ((usb_ctrlsetup.bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD)
-     && (usb_ctrlsetup.bRequest == USB_REQ_SET_ADDRESS))
-        usb_dw_set_address(usb_ctrlsetup.wValue);
-
-    usb_core_legacy_control_request(&usb_ctrlsetup);
+#ifndef USB_DW_ARCH_SLAVE
+#ifdef NO_UNCACHED_ADDR
+    DISCARD_DCACHE_RANGE(&_ep0_buffer[0], 64);
+#endif
+    DWC_DOEPDMA(0) = USB_DW_PHYSADDR((uint32_t)&_ep0_buffer[0]);
+#endif
+    DWC_DOEPTSIZ(0) = STUPCNT(1) | PKTCNT(1) | 64;
+    DWC_DOEPCTL(0) |= EPENA | SNAK;
 }
 
 static void usb_dw_abort_endpoint(int epnum, enum usb_dw_epdir epdir)
@@ -755,60 +850,223 @@ static void usb_dw_abort_endpoint(int epnum, enum usb_dw_epdir epdir)
     }
 }
 
+static void usb_dw_control_received(struct usb_ctrlrequest* req)
+{
+    logf("%s(%p) state=%s", __func__, req, dw_state_str[ep0.state]);
+    logf(" bRequestType=%02x bRequest=%02x", req->bRequestType, req->bRequest);
+    logf(" wValue=%04x wIndex=%u wLength=%u", req->wValue, req->wIndex, req->wLength);
+
+    /* FIXME: This will implode if we receive a setup packet while waiting
+     * for a response from the USB stack to a previous packet.
+     */
+
+    switch(ep0.state) {
+    case EP0_DATA_IN:
+    case EP0_STATUS_IN:
+    case EP0_DATA_OUT:
+    case EP0_STATUS_OUT:
+        usb_core_control_complete(-1);
+        /* fallthrough */
+
+    case EP0_SETUP:
+        /* Save the request */
+        memcpy(&ep0.active_req, req, sizeof(*req));
+        req = &ep0.active_req;
+
+        /* Check for a SET ADDRESS request, which we must handle here */
+        if ((req->bRequestType & USB_RECIP_MASK) == USB_RECIP_DEVICE &&
+            (req->bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD &&
+            (req->bRequest == USB_REQ_SET_ADDRESS))
+            usb_dw_set_address(req->wValue);
+
+        /* Check for control writes */
+        if (req->wLength > 0 && !(req->bRequestType & USB_DIR_IN))
+            ep0.state = EP0_REQ_CTRLWRITE;
+        else
+            ep0.state = EP0_REQ;
+
+        usb_dw_flush_endpoint(0, USB_DW_EPDIR_IN);
+        usb_core_control_request(req, NULL);
+        break;
+
+    default:
+        panicf("%s: bad state=%s", __func__, dw_state_str[ep0.state]);
+    }
+}
+
+static void usb_dw_control_response(enum usb_control_response resp,
+                                    void* data, int length)
+{
+    struct usb_ctrlrequest* req = &ep0.active_req;
+
+    switch(ep0.state) {
+    case EP0_REQ:
+    case EP0_REQ_CTRLWRITE:
+        switch(resp) {
+        case USB_CONTROL_ACK:
+            if(req->wLength > 0 && (req->bRequestType & USB_DIR_IN))
+                ep0.state = EP0_DATA_IN; /* control read */
+            else
+                ep0.state = EP0_STATUS_IN; /* non-data or write */
+
+            usb_dw_transfer(0, USB_DW_EPDIR_IN, data, length);
+            break;
+
+        case USB_CONTROL_RECEIVE:
+            if(ep0.state != EP0_REQ_CTRLWRITE)
+                panicf("%s: bad response", __func__);
+
+            ep0.state = EP0_DATA_OUT;
+            usb_dw_transfer(0, USB_DW_EPDIR_OUT, data, length);
+            break;
+
+        case USB_CONTROL_STALL:
+            if(ep0.state == EP0_REQ_CTRLWRITE)
+                usb_dw_set_stall(0, USB_DW_EPDIR_OUT, 1);
+            else
+                usb_dw_set_stall(0, USB_DW_EPDIR_IN, 1);
+
+            ep0.state = EP0_SETUP;
+            break;
+        }
+        break;
+
+    default:
+        panicf("%s: bad state=%s", __func__, dw_state_str[ep0.state]);
+    }
+}
+
+static void usb_dw_ep0_xfer_complete(enum usb_dw_epdir epdir,
+                                     int status, int transferred)
+{
+    struct usb_dw_ep* dw_ep = usb_dw_get_ep(0, epdir);
+
+    switch((ep0.state << 1) | epdir)
+    {
+    case (EP0_DATA_IN << 1) | USB_DW_EPDIR_IN:
+        ep0.state = EP0_STATUS_OUT;
+        usb_dw_transfer(0, USB_DW_EPDIR_OUT, NULL, 0);
+        break;
+
+    case (EP0_DATA_OUT << 1) | USB_DW_EPDIR_OUT:
+        ep0.state = EP0_REQ;
+        usb_core_control_request(&ep0.active_req, dw_ep->req_addr);
+        break;
+
+    case (EP0_STATUS_IN << 1) | USB_DW_EPDIR_IN:
+    case (EP0_STATUS_OUT << 1) | USB_DW_EPDIR_OUT:
+        if(status != 0 || transferred != 0)
+            usb_core_control_complete(-2);
+        else
+            usb_core_control_complete(0);
+
+        ep0.state = EP0_SETUP;
+        break;
+
+    default:
+        panicf("%s: state=%s dir=%s", __func__,
+               dw_state_str[ep0.state], dw_dir_str[epdir]);
+    }
+}
+
 static void usb_dw_handle_xfer_complete(int epnum, enum usb_dw_epdir epdir)
 {
     struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, epdir);
+    bool is_ep0out = (epnum == 0 && epdir == USB_DW_EPDIR_OUT);
 
     if (!dw_ep->busy)
-        return;
-
-    uint32_t bytesleft = DWC_EPTSIZ(epnum, epdir) & 0x7ffff;
-
-    if (!epnum && (epdir == USB_DW_EPDIR_OUT))  /* OUT0 */
     {
-        int recvbytes = 64 - bytesleft;
-        dw_ep->sizeleft = dw_ep->req_size - recvbytes;
-        if (dw_ep->req_addr)
-            memcpy(dw_ep->req_addr, ep0_buffer.raw, dw_ep->req_size);
+        if(is_ep0out)
+            usb_dw_ep0_recv();
+        return;
+    }
+
+    uint32_t bytes_left = DWC_EPTSIZ(epnum, epdir) & 0x7ffff;
+    uint32_t transferred = (is_ep0out ? 64 : dw_ep->size) - bytes_left;
+
+    if(transferred > dw_ep->sizeleft)
+    {
+        /* Host sent more data than expected.
+         * Shouldn't happen for IN endpoints. */
+        dw_ep->status = -2;
+        goto complete;
+    }
+
+    if(is_ep0out)
+    {
+#if defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
+        DISCARD_DCACHE_RANGE(ep0_buffer, 64);
+#endif
+        memcpy(dw_ep->addr, ep0_buffer, transferred);
+        usb_dw_ep0_recv();
+    }
+
+    dw_ep->sizeleft -= transferred;
+
+    /* Start a new transfer if there is still more to go */
+    if(bytes_left == 0 && dw_ep->sizeleft > 0)
+    {
+#ifndef USB_DW_ARCH_SLAVE
+        dw_ep->addr += (dw_ep->size >> 2); /* offset in words */
+#endif
+        usb_dw_epstart(epnum, epdir, dw_ep->addr, dw_ep->sizeleft);
+        return;
+    }
+
+    if(epdir == USB_DW_EPDIR_IN)
+    {
+        /* SNAK the disabled EP, otherwise IN tokens for this
+           EP could raise unwanted EPMIS interrupts. Useful for
+           usbserial when there is no data to send. */
+        DWC_DIEPCTL(epnum) |= SNAK;
+
+#ifdef USB_DW_SHARED_FIFO
+        /* See usb-s5l8701.c */
+        if (usb_dw_config.use_ptxfifo_as_plain_buffer)
+        {
+            int dtxfnum = GET_DTXFNUM(epnum);
+            if (dtxfnum)
+                usb_dw_flush_fifo(TXFFLSH, dtxfnum);
+        }
+#endif
     }
     else
     {
-        dw_ep->sizeleft -= (dw_ep->size - bytesleft);
-        if (!bytesleft && dw_ep->sizeleft)
-        {
-#ifndef USB_DW_ARCH_SLAVE
-            dw_ep->addr += (dw_ep->size >> 2); /* words */
+#if !defined(USB_DW_ARCH_SLAVE) && defined(POST_DMA_FLUSH)
+        /* On EP0 OUT we do not DMA into the request buffer,
+         * so do not discard the cache in this case. */
+        if(!is_ep0out)
+            DISCARD_DCACHE_RANGE(dw_ep->req_addr, dw_ep->req_size);
 #endif
-            usb_dw_start_xfer(epnum, epdir, dw_ep->addr, dw_ep->sizeleft);
-            return;
-        }
-
-        if (epdir == USB_DW_EPDIR_IN)
-        {
-            /* SNAK the disabled EP, otherwise IN tokens for this
-               EP could raise unwanted EPMIS interrupts. Useful for
-               usbserial when there is no data to send. */
-            DWC_DIEPCTL(epnum) |= SNAK;
-
-#ifdef USB_DW_SHARED_FIFO
-            /* See usb-s5l8701.c */
-            if (usb_dw_config.use_ptxfifo_as_plain_buffer)
-            {
-                int dtxfnum = GET_DTXFNUM(epnum);
-                if (dtxfnum)
-                    usb_dw_flush_fifo(TXFFLSH, dtxfnum);
-            }
-#endif
-        }
     }
 
-    dw_ep->busy = false;
     dw_ep->status = 0;
+
+  complete:
+    dw_ep->busy = false;
     semaphore_release(&dw_ep->complete);
 
-    int transfered = dw_ep->req_size - dw_ep->sizeleft;
-    usb_core_transfer_complete(epnum, (epdir == USB_DW_EPDIR_OUT) ?
-                USB_DIR_OUT : USB_DIR_IN, dw_ep->status, transfered);
+    int total_bytes = dw_ep->req_size - dw_ep->sizeleft;
+    if (epnum == 0)
+    {
+        usb_dw_ep0_xfer_complete(epdir, dw_ep->status, total_bytes);
+    }
+    else
+    {
+        usb_core_transfer_complete(epnum, (epdir == USB_DW_EPDIR_OUT) ?
+                    USB_DIR_OUT : USB_DIR_IN, dw_ep->status, total_bytes);
+    }
+}
+
+static void usb_dw_handle_setup_received(void)
+{
+#if defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
+    DISCARD_DCACHE_RANGE(ep0_buffer, 64);
+#endif
+    memcpy(&ep0.pending_req, ep0_buffer, sizeof(struct usb_ctrlrequest));
+    usb_dw_ep0_recv();
+
+    usb_dw_control_received(&ep0.pending_req);
 }
 
 #ifdef USB_DW_SHARED_FIFO
@@ -822,7 +1080,7 @@ static int usb_dw_get_epmis(void)
 
     /* Get the EP on the top of the queue, 0 < idx < number of available
        IN endpoints */
-    int idx = (gnptxsts >> 27) & 0xf;
+    uint32_t idx = (gnptxsts >> 27) & 0xf;
     for (epmis = 0; epmis < USB_NUM_ENDPOINTS; epmis++)
         if ((usb_endpoints & (1 << epmis)) && !idx--)
             break;
@@ -960,6 +1218,7 @@ static void usb_dw_irq(void)
         if (daint & (1 << (ep + 16)))
         {
             uint32_t epints = DWC_DOEPINT(ep);
+            DWC_DOEPINT(ep) = epints;
 
             if (!ep)
             {
@@ -967,17 +1226,31 @@ static void usb_dw_irq(void)
                 {
                     usb_dw_handle_setup_received();
                 }
-                else if (epints & XFRC)
+
+                if (epints & XFRC)
                 {
-                    usb_dw_handle_xfer_complete(0, USB_DW_EPDIR_OUT);
+                    if(epints & STATUSRECVD)
+                    {
+                        /* At the end of a control write's data phase, the
+                         * controller writes a spurious OUTDONE token to the
+                         * FIFO and raises StatusRecvd | XferCompl.
+                         *
+                         * We do not need or want this -- we've already handled
+                         * the data phase by this point -- but EP0 is stoppped
+                         * as a side effect of XferCompl, so we need to restart
+                         * it to keep receiving packets. */
+                        usb_dw_ep0_recv();
+                    }
+                    else if(!(epints & SETUPRECVD))
+                    {
+                        /* Only call this for normal data packets. Setup
+                         * packets use the STUP interrupt handler instead. */
+                        usb_dw_handle_xfer_complete(0, USB_DW_EPDIR_OUT);
+                    }
                 }
-                usb_dw_ep0_wait_setup();
-                /* Clear interrupt after the current EP0 packet is handled */
-                DWC_DOEPINT(0) = epints;
             }
             else
             {
-                DWC_DOEPINT(ep) = epints;
                 if (epints & XFRC)
                 {
                     usb_dw_handle_xfer_complete(ep, USB_DW_EPDIR_OUT);
@@ -991,14 +1264,14 @@ static void usb_dw_irq(void)
         DWC_GINTSTS = USBRST;
         usb_dw_set_address(0);
         usb_dw_reset_endpoints();
-        usb_dw_ep0_wait_setup();
         usb_core_bus_reset();
     }
 
     if (DWC_GINTSTS & ENUMDNE)
     {
         DWC_GINTSTS = ENUMDNE;
-        /* Nothing to do? */
+        ep0.state = EP0_SETUP;
+        usb_dw_ep0_recv();
     }
 }
 
@@ -1083,9 +1356,17 @@ static void usb_dw_init(void)
 
     if (!initialized)
     {
+#if !defined(USB_DW_ARCH_SLAVE) && !defined(NO_UNCACHED_ADDR)
+        ep0_buffer = USB_DW_UNCACHEDADDR(&_ep0_buffer[0]);
+#else
+        /* DMA is not used so we can operate on cached addresses */
+        ep0_buffer = &_ep0_buffer[0];
+#endif
+
         for (int ep = 0; ep < USB_NUM_ENDPOINTS; ep++)
             for (int dir = 0; dir < USB_DW_NUM_DIRS; dir++)
                 semaphore_init(&usb_dw_get_ep(ep, dir)->complete, 1, 0);
+
         initialized = true;
     }
 
@@ -1335,37 +1616,16 @@ void usb_drv_release_endpoint(int endpoint)
 
 int usb_drv_recv_nonblocking(int endpoint, void* ptr, int length)
 {
-    int epnum = EP_NUM(endpoint);
-    struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, USB_DW_EPDIR_OUT);
-
     usb_dw_target_disable_irq();
-    if (dw_ep->active)
-    {
-        dw_ep->req_addr = ptr;
-        dw_ep->req_size = length;
-        /* OUT0 is always launched waiting for SETUP packet,
-           it is CNAKed to receive app data */
-        if (epnum == 0)
-            DWC_DOEPCTL(0) |= CNAK;
-        else
-            usb_dw_start_xfer(epnum, USB_DW_EPDIR_OUT, ptr, length);
-    }
+    usb_dw_transfer(EP_NUM(endpoint), USB_DW_EPDIR_OUT, ptr, length);
     usb_dw_target_enable_irq();
     return 0;
 }
 
 int usb_drv_send_nonblocking(int endpoint, void *ptr, int length)
 {
-    int epnum = EP_NUM(endpoint);
-    struct usb_dw_ep* dw_ep = usb_dw_get_ep(epnum, USB_DW_EPDIR_IN);
-
     usb_dw_target_disable_irq();
-    if (dw_ep->active)
-    {
-        dw_ep->req_addr = ptr;
-        dw_ep->req_size = length;
-        usb_dw_start_xfer(epnum, USB_DW_EPDIR_IN, ptr, length);
-    }
+    usb_dw_transfer(EP_NUM(endpoint), USB_DW_EPDIR_IN, ptr, length);
     usb_dw_target_enable_irq();
     return 0;
 }
@@ -1387,4 +1647,12 @@ int usb_drv_send(int endpoint, void *ptr, int length)
     }
 
     return dw_ep->status;
+}
+
+void usb_drv_control_response(enum usb_control_response resp,
+                              void* data, int length)
+{
+    usb_dw_target_disable_irq();
+    usb_dw_control_response(resp, data, length);
+    usb_dw_target_enable_irq();
 }

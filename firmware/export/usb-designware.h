@@ -216,8 +216,11 @@
 
 #define DWC_DIEPINT(x)      (*((REG32_PTR_T)(OTGBASE + 0x908 + 0x20*(x))))
 #define DWC_DOEPINT(x)      (*((REG32_PTR_T)(OTGBASE + 0xb08 + 0x20*(x))))
+    #define SETUPRECVD      (1<<15) /* control OUT */
     #define TXFE            (1<<7)  /* IN */
+    #define BACK2BACKSETUP  (1<<6)  /* control OUT */
     #define INEPNE          (1<<6)  /* IN */
+    #define STATUSRECVD     (1<<5)  /* control OUT */
     #define ITEPMIS         (1<<5)  /* IN */
     #define ITTXFE          (1<<4)  /* IN */
     #define OTEPDIS         (1<<4)  /* OUT */
