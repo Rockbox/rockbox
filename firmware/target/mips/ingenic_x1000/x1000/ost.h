@@ -31,21 +31,21 @@
 #define JT_OST_CTRL                     JIO_32_RW
 #define JN_OST_CTRL                     OST_CTRL
 #define JI_OST_CTRL                     
-#define BP_OST_CTRL_PRESCALE2           3
-#define BM_OST_CTRL_PRESCALE2           0x38
+#define BP_OST_CTRL_PRESCALE2           2
+#define BM_OST_CTRL_PRESCALE2           0xc
 #define BV_OST_CTRL_PRESCALE2__BY_1     0x0
 #define BV_OST_CTRL_PRESCALE2__BY_4     0x1
 #define BV_OST_CTRL_PRESCALE2__BY_16    0x2
-#define BF_OST_CTRL_PRESCALE2(v)        (((v) & 0x7) << 3)
+#define BF_OST_CTRL_PRESCALE2(v)        (((v) & 0x3) << 2)
 #define BFM_OST_CTRL_PRESCALE2(v)       BM_OST_CTRL_PRESCALE2
 #define BF_OST_CTRL_PRESCALE2_V(e)      BF_OST_CTRL_PRESCALE2(BV_OST_CTRL_PRESCALE2__##e)
 #define BFM_OST_CTRL_PRESCALE2_V(v)     BM_OST_CTRL_PRESCALE2
 #define BP_OST_CTRL_PRESCALE1           0
-#define BM_OST_CTRL_PRESCALE1           0x7
+#define BM_OST_CTRL_PRESCALE1           0x3
 #define BV_OST_CTRL_PRESCALE1__BY_1     0x0
 #define BV_OST_CTRL_PRESCALE1__BY_4     0x1
 #define BV_OST_CTRL_PRESCALE1__BY_16    0x2
-#define BF_OST_CTRL_PRESCALE1(v)        (((v) & 0x7) << 0)
+#define BF_OST_CTRL_PRESCALE1(v)        (((v) & 0x3) << 0)
 #define BFM_OST_CTRL_PRESCALE1(v)       BM_OST_CTRL_PRESCALE1
 #define BF_OST_CTRL_PRESCALE1_V(e)      BF_OST_CTRL_PRESCALE1(BV_OST_CTRL_PRESCALE1__##e)
 #define BFM_OST_CTRL_PRESCALE1_V(v)     BM_OST_CTRL_PRESCALE1

@@ -807,8 +807,8 @@ node OST {
     addr 0xb2000000
 
     reg CTRL 0x00 {
-        field 5 3 PRESCALE2 { enum BY_1 0; enum BY_4 1; enum BY_16 2; }
-        field 2 0 PRESCALE1 { enum BY_1 0; enum BY_4 1; enum BY_16 2; }
+        field 3 2 PRESCALE2 { enum BY_1 0; enum BY_4 1; enum BY_16 2; }
+        field 1 0 PRESCALE1 { enum BY_1 0; enum BY_4 1; enum BY_16 2; }
     }
 
     reg ENABLE 0x04 {
