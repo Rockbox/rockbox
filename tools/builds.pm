@@ -541,6 +541,17 @@ sub allbuilds {
         'enabled' => 1,
     },
     # Everything else in alphabetical order
+    'dansk' => {
+	'lang' => 'dansk',
+	'name' => 'Dansk (Danish)',
+        'short' => 'da',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vda',
+	    'gtts' => '-l da',
+	},
+        'enabled' => 0,
+    },
     'deutsch' => {
 	'lang' => 'deutsch',
 	'name' => 'Deutsch (German)',
@@ -617,6 +628,7 @@ sub allbuilds {
 	    'espeak' => '-vno',
 	    'gtts' => '-l no',
 	},
+        'enabled' => 1,
     },
     'polski' => {
 	'lang' => 'polski',
@@ -660,6 +672,7 @@ sub allbuilds {
 	    'espeak' => '-vsr',
 	    'gtts' => '-l sr',
 	},
+        'enabled' => 1,
     },
 );
 
