@@ -421,7 +421,6 @@ static enum voice_state voice_message(struct voice_thread_data *td)
         /* Fall-through */
     case Q_VOICE_STOP:
         LOGFQUEUE("voice < Q_VOICE_STOP");
-        quiet_counter = 0;
         cancel_cpu_boost();
         voice_stop_playback();
         break;
