@@ -388,8 +388,14 @@ foreach my $id (@langorder) {
 		}
 	    }
 	} elsif ($lp{$tgt} ne 'none' && $lp{$tgt} ne '' && not_ignorelist($id) && !$lang{$id}{'new'} && !$ignoredups) {
-	    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
 #	    print "#!! '$id:$tgt' voice identical ('$lp{$tgt}')\n";
+	    if ($lang{$id}{'dest'}{$tgt} ne '' &&
+		$lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
+		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english, copying translated <dest>\n";
+		    $lang{$id}{'voice'}{$tgt} = $lang{$id}{'dest'}{$tgt};
+	    } else {
+		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is identical to english!\n";
+	    }
 	}
     }
 }
