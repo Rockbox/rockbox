@@ -89,6 +89,7 @@ char * cpu_boost_log_getlog_next(void)
 
 void cpu_boost_(bool on_off, char* location, int line)
 {
+    int item = cpu_boost_calls_count;
     if (!cpu_boost_lock())
         return;
 
@@ -98,12 +99,13 @@ void cpu_boost_(bool on_off, char* location, int line)
         cpu_boost_calls_count--;
         if (cpu_boost_calls_count < 0)
             cpu_boost_calls_count = 0;
+        item += cpu_boost_first;
     }
     if (cpu_boost_calls_count < MAX_BOOST_LOG)
     {
         int message = (cpu_boost_first+cpu_boost_calls_count)%MAX_BOOST_LOG;
-        snprintf(cpu_boost_calls[message], MAX_PATH,
-                    "%c %s:%d",on_off?'B':'U',location,line);
+        snprintf(cpu_boost_calls[message], MAX_PATH,"%d.) %c %d %s:%d",
+                 item,on_off?'B':'U',boost_counter,location,line);
         cpu_boost_calls_count++;
     }
 #else

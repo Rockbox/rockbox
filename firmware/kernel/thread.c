@@ -1501,7 +1501,14 @@ static inline void boost_thread(struct thread_entry *thread, bool boost)
     if ((thread->cpu_boost != 0) != boost)
     {
         thread->cpu_boost = boost;
+#ifdef CPU_BOOST_LOGGING
+        const char fmt[] = __FILE__" thread[%s]";
+        char pathbuf[sizeof(fmt) + 32]; /* thread name 32 */
+        snprintf(pathbuf, sizeof(pathbuf), fmt, thread->name);
+        cpu_boost_(boost, pathbuf,  __LINE__);
+#else
         cpu_boost(boost);
+#endif
     }
 }
 
