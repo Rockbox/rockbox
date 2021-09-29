@@ -361,12 +361,11 @@ static enum voice_state voice_message(struct voice_thread_data *td)
     {
     case Q_VOICE_PLAY:
         LOGFQUEUE("voice < Q_VOICE_PLAY");
-        if (quiet_counter == 0)
-        {
-            /* Boost CPU now */
-            trigger_cpu_boost();
-        }
-        else
+
+        /* Boost CPU now */
+        trigger_cpu_boost();
+
+        if (quiet_counter != 0)
         {
             /* Stop any clip still playing */
             voice_stop_playback();
