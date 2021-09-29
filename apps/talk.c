@@ -1496,9 +1496,30 @@ void talk_setting(const void *global_settings_variable)
 
 void talk_date(const struct tm *tm, bool enqueue)
 {
-    talk_id(LANG_MONTH_JANUARY + tm->tm_mon, enqueue);
-    talk_number(tm->tm_mday, true);
-    talk_number(1900 + tm->tm_year, true);
+    const char *format = str(LANG_VOICED_DATE_FORMAT);
+    const char *ptr;
+
+    if (!enqueue)
+        talk_shutup(); /* cut off all the pending stuff */
+
+    for (ptr = format ; *ptr ; ptr++) {
+        switch(*ptr) {
+	case 'Y':
+            talk_number(1900 + tm->tm_year, true);
+            break;
+	case 'A':
+            talk_id(LANG_MONTH_JANUARY + tm->tm_mon, true);
+            break;
+	case 'm':
+            talk_number(tm->tm_mon + 1, true);
+            break;
+	case 'd':
+            talk_number(tm->tm_mday, true);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 void talk_time(const struct tm *tm, bool enqueue)
