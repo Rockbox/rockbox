@@ -366,9 +366,17 @@ foreach my $id (@langorder) {
 	} elsif ($lp{$tgt} ne $ep{$tgt}) {
 	    if ($lp{$tgt} eq '' && $ep{$tgt} ne '') {
 		# If the lang voice string is blank, complain, and copy from English
-		$lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
 #		print "#!! '$id:$tgt' voice is blank ('$lp{$tgt}' vs '$ep{$tgt}')\n";
-		$lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
+		if ($lang{$id}{'dest'}{$tgt} ne '' &&
+		    $lang{$id}{'dest'}{$tgt} ne $english{$id}{'dest'}{$tgt}) {
+		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from translated <dest>!\n";
+		    $lang{$id}{'voice'}{$tgt} = $lang{$id}{'dest'}{$tgt};
+
+		} else {
+		    $lang{$id}{'notes'} .= "### The <voice> section for '$id:$tgt' is blank! Copying from english!\n";
+
+		    $lang{$id}{'voice'}{$tgt} = $english{$id}{'voice'}{$tgt};
+		}
 	    } elsif ($lp{$tgt} ne '' && $ep{$tgt} eq '') {
 		if ($id ne 'VOICE_NUMERIC_TENS_SWAP_SEPARATOR') {
 		    # If it's not blank, clear it and complain!
