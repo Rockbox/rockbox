@@ -2691,6 +2691,24 @@ static const char* menu_get_name(int item, void * data,
     return menuitems[item].desc;
 }
 
+static int menu_get_talk(int item, void *data)
+{
+    (void)data;
+    if (global_settings.talk_menu && menuitems[item].desc)
+    {
+        talk_number(item + 1, true);
+        talk_id(VOICE_PAUSE, true);
+#if 0 /* no debug items currently have lang ids */
+        long id = P2ID((const unsigned char *)(menuitems[item].desc));
+        if(id>=0)
+            talk_id(id, true);
+        else
+#endif
+        talk_spell(menuitems[item].desc, true);
+     }
+    return 0;
+}
+
 int debug_menu(void)
 {
     struct simplelist_info info;
@@ -2698,6 +2716,7 @@ int debug_menu(void)
     simplelist_info_init(&info, "Debug Menu", ARRAYLEN(menuitems), NULL);
     info.action_callback = menu_action_callback;
     info.get_name        = menu_get_name;
+    info.get_talk        = menu_get_talk;
     return (simplelist_show_list(&info)) ? 1 : 0;
 }
 
