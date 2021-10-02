@@ -51,6 +51,9 @@
 #if defined(SANSA_E200) || defined(SANSA_C200) || defined(PHILIPS_SA9200)
 #include "usb_drv.h"
 #endif
+#if defined(SANSA_E200) && defined(HAVE_BOOTLOADER_USB_MODE)
+#include "core_alloc.h"
+#endif
 #if defined(SAMSUNG_YH925)
 /* this function (in lcd-yh925.c) resets the screen orientation for the OF
  * for use with dualbooting */
@@ -232,7 +235,6 @@ static int handle_usb(int connect_timeout)
             usb = USB_HANDLED;
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             usb_wait_for_disconnect(&q);
-            break;
         }
 
         if (connect_timeout != TIMEOUT_BLOCK &&
@@ -299,6 +301,9 @@ void* main(void)
     int usb = USB_EXTRACTED;
 
     system_init();
+#if defined(SANSA_E200) && defined(HAVE_BOOTLOADER_USB_MODE)
+    core_allocator_init();
+#endif
     kernel_init();
 
 #ifdef HAVE_BOOTLOADER_USB_MODE

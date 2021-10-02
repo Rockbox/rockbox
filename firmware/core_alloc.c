@@ -8,16 +8,27 @@
 /* not static so it can be discovered by core_get_data() */
 struct buflib_context core_ctx;
 
-/* defined in linker script */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) && !defined(__PCTOOL__)
+
 #if defined(IPOD_VIDEO) && !defined(BOOTLOADER)
-extern unsigned char *audiobufend_lds[];
-unsigned char *audiobufend;
-#else /* !IPOD_VIDEO */
-extern unsigned char audiobufend[];
-#endif
 /* defined in linker script */
 extern unsigned char audiobuffer[];
+extern unsigned char *audiobufend_lds[];
+/* pointer to end of audio buffer filled at runtime allocator_init */
+unsigned char *audiobufend;
+#elif defined(SANSA_E200) && defined(HAVE_BOOTLOADER_USB_MODE)
+/* defined in linker script */
+extern unsigned char freebuffer[];
+extern unsigned char freebufferend[];
+/* map linker symbol to the audiobuffer in order to use core_alloc */
+unsigned char *audiobuffer = (unsigned char *)freebuffer;
+unsigned char *audiobufend = (unsigned char *)freebufferend;
+#else /* !IPOD_VIDEO, !SANSA_E200&&BOOTLOADERUSB */
+/* defined in linker script */
+extern unsigned char audiobuffer[];
+extern unsigned char audiobufend[];
+#endif
+
 #else /* PLATFORM_HOSTED */
 static unsigned char audiobuffer[((MEMORYSIZE)*1024-768)*1024];
 unsigned char *audiobufend = audiobuffer + sizeof(audiobuffer);
