@@ -511,9 +511,10 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     x = x * (linebased ? cwidth : 1);
     width = vp->width - x;
 
-    if (y >= vp->height || (height + y) > (vp->height))
+    if (y >= vp->height)
         return false;
-
+    if ((height + y) > (vp->height))
+        height = vp->height - y;
     s = find_scrolling_line(x, y);
     restart = !s;
 
