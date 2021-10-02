@@ -928,7 +928,13 @@ void usb_core_bus_reset(void)
     usb_address = 0;
     usb_state = DEFAULT;
 #ifdef HAVE_USB_CHARGING_ENABLE
+#ifdef HAVE_USB_CHARGING_IN_THREAD
+    /* On some targets usb_charging_maxcurrent_change() cannot be called
+     * from an interrupt handler; get the USB thread to do it instead. */
+    usb_charger_update();
+#else
     usb_charging_maxcurrent_change(usb_charging_maxcurrent());
+#endif
 #endif
 }
 

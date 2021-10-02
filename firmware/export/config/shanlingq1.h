@@ -104,6 +104,7 @@
 #define USB_DEVBSS_ATTR __attribute__((aligned(32)))
 #define HAVE_USB_POWER
 #define HAVE_USB_CHARGING_ENABLE
+#define HAVE_USB_CHARGING_IN_THREAD
 #define HAVE_BOOTLOADER_USB_MODE
 #endif
 
