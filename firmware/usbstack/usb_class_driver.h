@@ -22,6 +22,11 @@
 #ifndef _USB_CLASS_DRIVER_H_
 #define _USB_CLASS_DRIVER_H_
 
+#include "usb_ch9.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <string.h>
+
 /* Common api, implemented by all class drivers */
 
 struct usb_class_driver {
