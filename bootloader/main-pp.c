@@ -235,6 +235,7 @@ static int handle_usb(int connect_timeout)
             usb = USB_HANDLED;
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
             usb_wait_for_disconnect(&q);
+            break;
         }
 
         if (connect_timeout != TIMEOUT_BLOCK &&
