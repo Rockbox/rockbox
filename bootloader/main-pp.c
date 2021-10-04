@@ -234,7 +234,18 @@ static int handle_usb(int connect_timeout)
 
             usb = USB_HANDLED;
             usb_acknowledge(SYS_USB_CONNECTED_ACK);
+#if defined(SANSA_E200) && defined(HAVE_BOOTLOADER_USB_MODE)
+            /* E200 misses unplug randomly
+               probably fine for other targets too but needs tested */
+            while (usb_wait_for_disconnect_w_tmo(&q, HZ * 5) > 0)
+            {
+                /* timeout */
+                if (!usb_plugged())
+                    break;
+            }
+#else
             usb_wait_for_disconnect(&q);
+#endif
             break;
         }
 
