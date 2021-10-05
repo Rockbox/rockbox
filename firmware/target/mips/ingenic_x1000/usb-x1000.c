@@ -35,10 +35,13 @@
 const struct usb_dw_config usb_dw_config = {
     .phytype = DWC_PHYTYPE_UTMI_16,
 
-    /* Available FIFO memory: 3576 words */
-    .rx_fifosz   = 1024,
-    .nptx_fifosz = 128,  /* 1 dedicated FIFO for EP0 */
-    .ptx_fifosz  = 768,  /* 3 dedicated FIFOs */
+    /* Available FIFO memory: 3576 words
+     * Number of endpoints: 9
+     * Max packet size: 512 bytes
+     */
+    .rx_fifosz   = 816, /* shared RxFIFO */
+    .nptx_fifosz = 32,  /* only used for EP0 IN */
+    .ptx_fifosz  = 384, /* room for 7 IN EPs */
 
 #ifndef USB_DW_ARCH_SLAVE
     .ahb_burst_len = HBSTLEN_INCR16,
