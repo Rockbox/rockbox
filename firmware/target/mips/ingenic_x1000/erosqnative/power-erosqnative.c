@@ -78,8 +78,10 @@ void power_init(void)
      * OF's setting, although it's not strictly within the USB spec. */
     axp_set_charge_current(780);
 
-    /* Short delay to give power outputs time to stabilize */
-    mdelay(5);
+    /* Delay to give power outputs time to stabilize.
+     * From testing, 170 is the minimum. Make it
+     * 190 for safety. */
+    mdelay(190);
 }
 
 #ifdef HAVE_USB_CHARGING_ENABLE
