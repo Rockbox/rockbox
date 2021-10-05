@@ -47,6 +47,7 @@ void audiohw_init(void)
     aic_set_i2s_mode(AIC_I2S_MASTER_MODE);
     audiohw_set_frequency(HW_FREQ_48);
 
+    aic_set_play_last_sample(true);
     aic_enable_i2s_master_clock(true);
     aic_enable_i2s_bit_clock(true);
 
@@ -59,6 +60,22 @@ void audiohw_init(void)
 
 void audiohw_postinit(void)
 {
+    /*
+     * enable playback, fill FIFO buffer with -1 to prevent
+     * the DAC from auto-muting, wait, and then stop playback.
+     * This seems to completely prevent power-on or first-track
+     * clicking.
+     */
+    jz_writef(AIC_CCR, ERPL(1));
+    for (int i = 0; i < 32; i++)
+    {
+        jz_write(AIC_DR, 0xFFFFFF);
+    }
+    /* Wait until all samples are through the FIFO. */
+    while(jz_readf(AIC_SR, TFL) != 0);
+    mdelay(20); /* This seems to silence the power-on click */
+    jz_writef(AIC_CCR, ERPL(0));
+
     /* unmute - attempt to make power-on pop-free */
     gpio_set_level(GPIO_ISL54405_SEL, 0);
     gpio_set_level(GPIO_MAX97220_SHDN, 1);
