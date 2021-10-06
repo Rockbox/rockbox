@@ -90,9 +90,9 @@ static struct usb_device_descriptor __attribute__((aligned(2)))
     .idVendor           = USB_VENDOR_ID,
     .idProduct          = USB_PRODUCT_ID,
     .bcdDevice          = 0x0100,
-    .iManufacturer      = 1,
-    .iProduct           = 2,
-    .iSerialNumber      = 3,
+    .iManufacturer      = USB_STRING_INDEX_MANUFACTURER,
+    .iProduct           = USB_STRING_INDEX_PRODUCT,
+    .iSerialNumber      = USB_STRING_INDEX_SERIAL,
     .bNumConfigurations = 1
 } ;
 
@@ -141,12 +141,12 @@ static const struct usb_string_descriptor __attribute__((aligned(2)))
                                     lang_descriptor =
 USB_STRING_INITIALIZER(u"\x0409"); /* LANGID US English */
 
-static const struct usb_string_descriptor* const usb_strings[] =
+static const struct usb_string_descriptor* const usb_strings[USB_STRING_INDEX_MAX] =
 {
-   &lang_descriptor,
-   &usb_string_iManufacturer,
-   &usb_string_iProduct,
-   &usb_string_iSerial
+    [USB_STRING_INDEX_LANGUAGE] = &lang_descriptor,
+    [USB_STRING_INDEX_MANUFACTURER] = &usb_string_iManufacturer,
+    [USB_STRING_INDEX_PRODUCT] = &usb_string_iProduct,
+    [USB_STRING_INDEX_SERIAL] = &usb_string_iSerial,
 };
 
 static int usb_address = 0;
@@ -637,8 +637,7 @@ static void request_handler_device_get_descriptor(struct usb_ctrlrequest* req)
 
         case USB_DT_STRING:
             logf("STRING %d", index);
-            if((unsigned)index < (sizeof(usb_strings) /
-                        sizeof(struct usb_string_descriptor*))) {
+            if((unsigned)index < USB_STRING_INDEX_MAX) {
                 size = usb_strings[index]->bLength;
                 ptr = usb_strings[index];
             }

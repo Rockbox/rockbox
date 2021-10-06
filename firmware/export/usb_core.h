@@ -39,6 +39,14 @@
 
 extern int usb_max_pkt_size;
 
+enum {
+    USB_STRING_INDEX_LANGUAGE,
+    USB_STRING_INDEX_MANUFACTURER,
+    USB_STRING_INDEX_PRODUCT,
+    USB_STRING_INDEX_SERIAL,
+    USB_STRING_INDEX_MAX,
+};
+
 struct usb_class_driver;
 
 void usb_core_init(void);
