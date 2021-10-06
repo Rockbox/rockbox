@@ -47,7 +47,6 @@ void audiohw_init(void)
     aic_set_i2s_mode(AIC_I2S_MASTER_MODE);
     audiohw_set_frequency(HW_FREQ_48);
 
-    aic_set_play_last_sample(true);
     aic_enable_i2s_master_clock(true);
     aic_enable_i2s_bit_clock(true);
 
