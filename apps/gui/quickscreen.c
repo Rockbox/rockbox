@@ -282,22 +282,30 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 }
 
 #ifdef HAVE_TOUCHSCREEN
-static int quickscreen_touchscreen_button(const struct viewport
-                                                    vps[QUICKSCREEN_ITEM_COUNT])
+static int quickscreen_touchscreen_button(void)
 {
     short x,y;
     /* only hitting the text counts, everything else is exit */
     if (action_get_touchscreen_press(&x, &y) != BUTTON_REL)
         return ACTION_NONE;
-    else if (viewport_point_within_vp(&vps[QUICKSCREEN_TOP], x, y))
+
+    enum { left=1, right=2, top=4, bottom=8 };
+
+    int bits = (x < LCD_WIDTH/3 ? left : (x > 2*LCD_WIDTH/3 ? 2 : right)) |
+               (y < LCD_WIDTH/3 ? top  : (y > 2*LCD_WIDTH/3 ? 8 : bottom));
+
+    switch(bits) {
+    case top:
         return ACTION_QS_TOP;
-    else if (viewport_point_within_vp(&vps[QUICKSCREEN_BOTTOM], x, y))
+    case bottom:
         return ACTION_QS_DOWN;
-    else if (viewport_point_within_vp(&vps[QUICKSCREEN_LEFT], x, y))
+    case left:
         return ACTION_QS_LEFT;
-    else if (viewport_point_within_vp(&vps[QUICKSCREEN_RIGHT], x, y))
+    case right:
         return ACTION_QS_RIGHT;
-    return ACTION_STD_CANCEL;
+    default:
+        return ACTION_STD_CANCEL;
+    }
 }
 #endif
 
@@ -339,7 +347,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         button = get_action(CONTEXT_QUICKSCREEN, HZ/5);
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
-            button = quickscreen_touchscreen_button(vps[SCREEN_MAIN]);
+            button = quickscreen_touchscreen_button();
 #endif
         if (default_event_handler(button) == SYS_USB_CONNECTED)
         {
