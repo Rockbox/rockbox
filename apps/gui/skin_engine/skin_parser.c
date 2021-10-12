@@ -768,7 +768,7 @@ static int parse_setting_and_lang(struct skin_element *element,
 #ifndef __PCTOOL__
         i = lang_english_to_id(temp);
         if (i < 0)
-            return WPS_ERROR_INVALID_PARAM;
+            i = LANG_LAST_INDEX_IN_ARRAY;
 #endif
     }
     else if (element->params_count > 1)

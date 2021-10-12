@@ -821,7 +821,8 @@ const char *get_token_value(struct gui_wps *gwps,
             return (char*)SKINOFFSETTOPTR(get_skin_buffer(data), token->value.data);
 
         case SKIN_TOKEN_TRANSLATEDSTRING:
-            return (char*)P2STR(ID2P(token->value.i));
+            return token->value.i < LANG_LAST_INDEX_IN_ARRAY ?
+                                   (char*)P2STR(ID2P(token->value.i)) : "<ERR>";
 
         case SKIN_TOKEN_PLAYLIST_ENTRIES:
             numeric_ret = playlist_amount();
