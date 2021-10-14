@@ -32,17 +32,28 @@
 #ifndef __PCTOOL__
 /* open_plugin path lookup */
 #define OPEN_PLUGIN_DAT PLUGIN_DIR "/plugin.dat"
+#define OPEN_RBPLUGIN_DAT PLUGIN_DIR "/rb_plugins.dat"
 #define OPEN_PLUGIN_BUFSZ MAX_PATH
 #define OPEN_PLUGIN_NAMESZ 32
+
+enum {
+    OPEN_PLUGIN_LANG_INVALID    = (-1),
+    OPEN_PLUGIN_LANG_IGNORE     = (-2),
+    OPEN_PLUGIN_LANG_IGNOREALL  = (-3),
+    OPEN_PLUGIN_NOT_FOUND     = (-1),
+    OPEN_PLUGIN_NEEDS_FLUSHED = (-2)
+};
+
 struct open_plugin_entry_t
 {
+/* hash and lang_id need to be the first items */
     uint32_t hash;
     int32_t  lang_id;
     char name[OPEN_PLUGIN_NAMESZ+1];
     /*char key[OPEN_PLUGIN_BUFSZ+1];*/
     char path[OPEN_PLUGIN_BUFSZ+1];
     char param[OPEN_PLUGIN_BUFSZ+1];
-};
+}__attribute__((packed));
 
 inline static void open_plugin_get_hash(const char *key, uint32_t *hash)
 {

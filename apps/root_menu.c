@@ -848,7 +848,8 @@ void root_menu(void)
                     }
                 }
 
-                bool flush = (open_plugin_get_entry(key, &open_plugin_entry) == -2);
+                int opret = open_plugin_get_entry(key, &open_plugin_entry);
+                bool flush = (opret == OPEN_PLUGIN_NEEDS_FLUSHED);
                 char *path = open_plugin_entry.path;
                 char *param = open_plugin_entry.param;
                 if (param[0] == '\0')
