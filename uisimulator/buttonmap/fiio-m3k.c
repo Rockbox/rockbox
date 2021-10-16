@@ -83,8 +83,8 @@ int key_to_button(int keyboard_button)
 
 struct button_map bm[] = {
     { SDLK_ESCAPE,       12,  55, 15, "Power" },
-    { SDLK_KP_MINUS,     12, 125, 15, "Volume -" },
-    { SDLK_KP_PLUS,      12, 188, 15, "Volume +" },
+    { SDLK_KP_MINUS,     12, 188, 15, "Volume -" },
+    { SDLK_KP_PLUS,      12, 125, 15, "Volume +" },
     { SDLK_SPACE,        12, 255, 15, "Play" },
     { SDLK_UP,          146, 394, 20, "Up" },
     { SDLK_RETURN,      146, 438, 20, "Select" },
