@@ -296,6 +296,7 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
 {
     int len;
     uint32_t hash;
+    uint32_t newhash;
     char *pos = "";;
     int fd_tmp = -1;
     use_key = (use_key == true && key != NULL);
@@ -309,7 +310,8 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
     {
         /* need to keep the old hash so we can remove the old entry */
         hash = op_entry.hash;
-        open_plugin_get_hash(plugin, &op_entry.hash);
+        open_plugin_get_hash(plugin, &newhash);
+        op_entry.hash = newhash;
     }
     else
         hash = op_entry.hash;
@@ -352,7 +354,10 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
                 /* hash on the parameter path if it is a file */
                 if (op_entry.lang_id <0 && key == op_entry.path &&
                     rb->file_exists(op_entry.param))
-                    open_plugin_get_hash(op_entry.path, &op_entry.hash);
+                {
+                    open_plugin_get_hash(op_entry.path, &newhash);
+                    op_entry.hash = newhash;
+                }
             }
 
             rb->write(fd_tmp, &op_entry, op_entry_sz); /* add new entry first */
