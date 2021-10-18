@@ -77,7 +77,7 @@ void power_init(void)
     axp_set_charge_current(780);
 
     /* Short delay to give power outputs time to stabilize */
-    mdelay(5);
+    mdelay(80);
 }
 
 #ifdef HAVE_USB_CHARGING_ENABLE
