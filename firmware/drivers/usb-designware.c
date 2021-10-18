@@ -102,12 +102,14 @@ enum usb_dw_ep0_state
 
     /* Request wait states -- after submitting a request, we enter EP0_REQ
      * (or EP0_REQ_CTRLWRITE for control writes). EP0_REQ is also used for
-     * the 2nd phase of a control write. */
+     * the 2nd phase of a control write. EP0_REQ_CANCELLED is entered if we
+     * receive a setup packet before getting a response from the USB stack. */
     EP0_REQ,
     EP0_REQ_CTRLWRITE,
+    EP0_REQ_CANCELLED,
 
     /* Waiting for a data phase to complete. */
-    EP0_DATA_IN,    EP0_FIRST_CNAK_STATE = EP0_DATA_IN,
+    EP0_DATA_IN,
     EP0_DATA_OUT,
 
     /* Waiting for the status phase */
@@ -856,11 +858,15 @@ static void usb_dw_control_received(struct usb_ctrlrequest* req)
     logf(" bRequestType=%02x bRequest=%02x", req->bRequestType, req->bRequest);
     logf(" wValue=%04x wIndex=%u wLength=%u", req->wValue, req->wIndex, req->wLength);
 
-    /* FIXME: This will implode if we receive a setup packet while waiting
-     * for a response from the USB stack to a previous packet.
-     */
-
     switch(ep0.state) {
+    case EP0_REQ:
+    case EP0_REQ_CTRLWRITE:
+    case EP0_REQ_CANCELLED:
+        /* Save the request for later */
+        memcpy(&ep0.pending_req, req, sizeof(*req));
+        ep0.state = EP0_REQ_CANCELLED;
+        break;
+
     case EP0_DATA_IN:
     case EP0_STATUS_IN:
     case EP0_DATA_OUT:
@@ -894,6 +900,7 @@ static void usb_dw_control_received(struct usb_ctrlrequest* req)
     }
 }
 
+/* note: must be called with IRQs disabled */
 static void usb_dw_control_response(enum usb_control_response resp,
                                     void* data, int length)
 {
@@ -929,6 +936,15 @@ static void usb_dw_control_response(enum usb_control_response resp,
             ep0.state = EP0_SETUP;
             break;
         }
+        break;
+
+    case EP0_REQ_CANCELLED:
+        /* Terminate the old request */
+        usb_core_control_complete(-3);
+
+        /* Submit the pending request */
+        ep0.state = EP0_SETUP;
+        usb_dw_control_received(&ep0.pending_req);
         break;
 
     default:
@@ -1063,10 +1079,12 @@ static void usb_dw_handle_setup_received(void)
 #if defined(NO_UNCACHED_ADDR) && defined(POST_DMA_FLUSH)
     DISCARD_DCACHE_RANGE(ep0_buffer, 64);
 #endif
-    memcpy(&ep0.pending_req, ep0_buffer, sizeof(struct usb_ctrlrequest));
+    struct usb_ctrlrequest req;
+    memcpy(&req, ep0_buffer, sizeof(struct usb_ctrlrequest));
+
     usb_dw_ep0_recv();
 
-    usb_dw_control_received(&ep0.pending_req);
+    usb_dw_control_received(&req);
 }
 
 #ifdef USB_DW_SHARED_FIFO
