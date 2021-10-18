@@ -49,7 +49,8 @@
 static int fd_dat;
 static struct gui_synclist lists;
 struct open_plugin_entry_t op_entry;
-const off_t op_entry_sz = sizeof(struct open_plugin_entry_t);
+static const uint32_t open_plugin_csum = OPEN_PLUGIN_CHECKSUM;
+static const off_t op_entry_sz = sizeof(struct open_plugin_entry_t);
 
 /* we only need the names for the first menu so don't bother reading paths yet */
 const off_t op_name_sz = OPEN_PLUGIN_NAMESZ + (op_entry.name - (char*)&op_entry);
@@ -101,6 +102,15 @@ static bool op_entry_read_name(int fd, int selected_item)
     return op_entry_read(fd, selected_item, op_name_sz);
 }
 
+static int op_entry_checksum(void)
+{
+    if (op_entry.checksum != open_plugin_csum)
+    {
+        return 0;
+    }
+    return 1;
+}
+
 static int op_entry_read_opx(const char *path)
 {
     int ret = -1;
@@ -112,13 +122,14 @@ static int op_entry_read_opx(const char *path)
     if(len > OP_LEN && rb->strcasecmp(&((path)[len-OP_LEN]), "." OP_EXT) == 0)
     {
         fd_opx = rb->open(path, O_RDONLY);
-        if (fd_opx)
+        if (fd_opx >= 0)
         {
             filesize = rb->filesize(fd_opx);
             ret = filesize;
             if (filesize == op_entry_sz && !op_entry_read(fd_opx, 0, op_entry_sz))
                 ret = 0;
-
+            else if (op_entry_checksum() <= 0)
+                ret = 0;
             rb->close(fd_opx);
         }
     }
@@ -131,7 +142,7 @@ static void op_entry_export(int selection)
     int fd = -1;
     char filename [MAX_PATH + 1];
 
-    if (!op_entry_read(fd_dat, selection, op_entry_sz))
+    if (!op_entry_read(fd_dat, selection, op_entry_sz) || op_entry_checksum() <= 0)
         goto failure;
 
     rb->snprintf(filename, MAX_PATH, "%s/%s", PLUGIN_APPS_DIR, op_entry.name);
@@ -159,6 +170,11 @@ static void op_entry_export(int selection)
 failure:
     rb->splashf( 2*HZ, "Save Failed (%s)", filename );
 
+}
+
+static void op_entry_set_checksum(void)
+{
+        op_entry.checksum = open_plugin_csum;
 }
 
 static void op_entry_set_name(void)
@@ -277,12 +293,12 @@ static int op_entry_transfer(int fd, int fd_tmp,
                             void *data)
 {
     int entries = -1;
-    if (fd_tmp && fd && rb->lseek(fd, 0, SEEK_SET) == 0)
+    if (fd_tmp >= 0 && fd >= 0 && rb->lseek(fd, 0, SEEK_SET) == 0)
     {
         entries = 0;
         while (rb->read(fd, &op_entry, op_entry_sz) == op_entry_sz)
         {
-            if (compfn && compfn(&op_entry, entries, data) > 0)
+            if (compfn && compfn(&op_entry, entries, data) > 0 && op_entry_checksum() > 0)
             {
                 rb->write(fd_tmp, &op_entry, op_entry_sz);
                 entries++;
@@ -359,7 +375,7 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
                     op_entry.hash = newhash;
                 }
             }
-
+            op_entry_set_checksum();
             rb->write(fd_tmp, &op_entry, op_entry_sz); /* add new entry first */
         }
         else if(op_entry_read_opx(plugin) == op_entry_sz)
@@ -374,13 +390,13 @@ static uint32_t op_entry_add_path(const char *key, const char *plugin, const cha
                 open_plugin_get_hash(op_entry.path, &hash);
 
             op_entry.hash = hash;
-
+            op_entry_set_checksum();
             rb->write(fd_tmp, &op_entry, op_entry_sz); /* add new entry first */
         }
         else
         {
             if (op_entry.lang_id != LANG_SHORTCUTS)
-                rb->splashf(HZ / 2, rb->str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
+                rb->splashf(HZ * 2, rb->str(LANG_OPEN_PLUGIN_NOT_A_PLUGIN), pos);
             return 0;
         }
     }
@@ -845,7 +861,7 @@ reopen_datfile:
         synclist_set(MENU_ID_MAIN, selection, items, 1);
         rb->gui_synclist_draw(&lists);
 
-        while (!exit)
+        while (!exit && fd_dat >= 0)
         {
             action = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
 

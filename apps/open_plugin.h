@@ -41,19 +41,31 @@ enum {
     OPEN_PLUGIN_LANG_IGNORE     = (-2),
     OPEN_PLUGIN_LANG_IGNOREALL  = (-3),
     OPEN_PLUGIN_NOT_FOUND     = (-1),
-    OPEN_PLUGIN_NEEDS_FLUSHED = (-2)
+    OPEN_PLUGIN_NEEDS_FLUSHED = (-2),
 };
 
 struct open_plugin_entry_t
 {
-/* hash and lang_id need to be the first items */
+/* hash lang_id checksum need to be the first items */
     uint32_t hash;
     int32_t  lang_id;
+    uint32_t  checksum;
     char name[OPEN_PLUGIN_NAMESZ+1];
     /*char key[OPEN_PLUGIN_BUFSZ+1];*/
     char path[OPEN_PLUGIN_BUFSZ+1];
     char param[OPEN_PLUGIN_BUFSZ+1];
-}__attribute__((packed));
+};
+
+#define OPEN_PLUGIN_CHECKSUM (uint32_t)              \
+(                                                    \
+    (sizeof(struct open_plugin_entry_t) << 16)     + \
+    offsetof(struct open_plugin_entry_t, hash)     + \
+    offsetof(struct open_plugin_entry_t, lang_id)  + \
+    offsetof(struct open_plugin_entry_t, checksum) + \
+    offsetof(struct open_plugin_entry_t, name)     + \
+    /*offsetof(struct open_plugin_entry_t, key)+*/   \
+    offsetof(struct open_plugin_entry_t, path)     + \
+    offsetof(struct open_plugin_entry_t, param))
 
 inline static void open_plugin_get_hash(const char *key, uint32_t *hash)
 {

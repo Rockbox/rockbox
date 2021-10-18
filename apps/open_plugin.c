@@ -38,6 +38,8 @@
 
 struct open_plugin_entry_t open_plugin_entry = {0};
 
+static const uint32_t open_plugin_csum = OPEN_PLUGIN_CHECKSUM;
+
 static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
 
 static int open_plugin_hash_get_entry(uint32_t hash,
@@ -60,6 +62,13 @@ static inline void op_clear_entry(struct open_plugin_entry_t *entry)
     entry->lang_id = -1;
 }
 
+static int op_entry_checksum(struct open_plugin_entry_t *entry)
+{
+    if (!entry || entry->checksum != open_plugin_csum)
+        return 0;
+    return 1;
+}
+
 static int op_find_entry(int fd, struct open_plugin_entry_t *entry,
                                     uint32_t hash, int32_t lang_id)
 {
@@ -75,6 +84,13 @@ static int op_find_entry(int fd, struct open_plugin_entry_t *entry,
                (entry->hash == hash && hash != 0) ||
                (lang_id == OPEN_PLUGIN_LANG_IGNOREALL))/* return first entry found */
             {
+                /* sanity check */
+                if (op_entry_checksum(entry) <= 0)
+                {
+                    splashf(HZ * 2, "OpenPlugin Invalid entry");
+                    ret = OPEN_PLUGIN_NOT_FOUND;
+                    break;
+                }
                 /* NULL terminate fields NOTE -- all are actually +1 larger */
                 entry->name[OPEN_PLUGIN_NAMESZ] = '\0';
                 /*entry->key[OPEN_PLUGIN_BUFSZ] = '\0';*/
@@ -111,24 +127,27 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
     logf("OP update hash: %x lang_id: %d", hash, lang_id);
     logf("OP update name: %s clear: %d", entry->name, (int) clear);
     logf("OP update %s %s %s", entry->name, entry->path, entry->param);
+
 #if (CONFIG_STORAGE & STORAGE_ATA) /* Harddrive -- update existing */
     logf("OP update *Updating entries* %s", OPEN_PLUGIN_DAT);
     fd = open(OPEN_PLUGIN_DAT, O_RDWR | O_CREAT, 0666);
 
     if (fd < 0)
         return OPEN_PLUGIN_NOT_FOUND;
-    /* Only read the hash and lang id */
-    uint32_t hash_langid[2] = {0};
-    while (read(fd, &hash_langid, sizeof(hash_langid)) == sizeof(hash_langid))
+    /* Only read the hash lang id and checksum */
+    uint32_t hash_langid_csum[3] = {0};
+    const off_t hlc_sz = sizeof(hash_langid_csum);
+    while (read(fd, &hash_langid_csum, hlc_sz) == hlc_sz)
     {
-        if (hash_langid[0] == hash || (int32_t)hash_langid[1] == lang_id)
+        if ((hash_langid_csum[0] == hash || (int32_t)hash_langid_csum[1] == lang_id) &&
+             hash_langid_csum[2] == open_plugin_csum)
         {
             logf("OP update *Entry Exists* hash: %x langid: %d",
-                hash_langid[0], (int32_t)hash_langid[1]);
-            lseek(fd, 0-sizeof(hash_langid), SEEK_CUR);/* back to the start of record */
+                hash_langid_csum[0], (int32_t)hash_langid[1]);
+            lseek(fd, 0-hlc_sz, SEEK_CUR);/* back to the start of record */
             break;
         }
-        lseek(fd, op_entry_sz - sizeof(hash_langid), SEEK_CUR); /* finish record */
+        lseek(fd, op_entry_sz - hlc_sz, SEEK_CUR); /* finish record */
     }
     write(fd, entry, op_entry_sz);
     close(fd);
@@ -146,7 +165,8 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
         /* copy non-duplicate entries back from original */
         while (read(fd1, entry, op_entry_sz) == op_entry_sz)
         {
-            if (entry->hash != hash && entry->lang_id != lang_id)
+            if (entry->hash != hash && entry->lang_id != lang_id &&
+               op_entry_checksum(entry) > 0)
             {
                 write(fd, entry, op_entry_sz);
             }
@@ -202,8 +222,9 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
 
     if (plugin)
     {
-        open_plugin_entry.hash = hash;
-        open_plugin_entry.lang_id = lang_id;
+        open_plugin_entry.hash     = hash;
+        open_plugin_entry.lang_id  = lang_id;
+        open_plugin_entry.checksum = open_plugin_csum;
         /* name */
         if (path_basename(plugin, (const char **)&pos) == 0)
             pos = "\0";
@@ -242,7 +263,7 @@ retnhash:
 
 void open_plugin_browse(const char *key)
 {
-    logf("OP Browse");
+    logf("OP browse");
     struct browse_context browse;
     char tmp_buf[OPEN_PLUGIN_BUFSZ+1];
     open_plugin_get_entry(key, &open_plugin_entry);
