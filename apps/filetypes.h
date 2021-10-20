@@ -73,7 +73,7 @@ int filetype_get_color(const char* name, int attr);
 #endif
 int filetype_get_icon(int attr);
 /* return the plugin filename associated with the file */
-char* filetype_get_plugin(const struct entry* file);
+char* filetype_get_plugin(const struct entry* file, char *buffer, size_t buffer_len);
 
 /* returns true if the attr is supported */
 bool  filetype_supported(int attr);

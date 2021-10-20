@@ -435,7 +435,8 @@ static void ft_load_font(char *file)
 int ft_enter(struct tree_context* c)
 {
     int rc = GO_TO_PREVIOUS;
-    char buf[MAX_PATH];
+    static char buf[MAX_PATH];
+
     struct entry* file = tree_get_entry_at(c, c->selected_item);
     if (!file)
     {
@@ -634,17 +635,18 @@ int ft_enter(struct tree_context* c)
             case FILE_ATTR_LUA:
             case FILE_ATTR_OPX:
             {
-                char *plugin = buf, *argument = NULL, lua_path[MAX_PATH];
+                char *plugin = buf, *argument = NULL;
+                char plugin_path[MAX_PATH];
                 int ret;
 
                 if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
-                    snprintf(lua_path, sizeof(lua_path)-1, "%s/lua.rock", VIEWERS_DIR); /* Use a #define here ? */
-                    plugin = lua_path;
+                    snprintf(plugin_path, sizeof(plugin_path)-1, "%s/lua.rock", VIEWERS_DIR); /* Use a #define here ? */
+                    plugin = plugin_path;
                     argument = buf;
                 }
                 else if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_OPX) {
-                    snprintf(lua_path, sizeof(lua_path)-1, "%s/open_plugins.rock", VIEWERS_DIR); /* Use a #define here ? */
-                    plugin = lua_path;
+                    snprintf(plugin_path, sizeof(plugin_path)-1, "%s/open_plugins.rock", VIEWERS_DIR); /* Use a #define here ? */
+                    plugin = plugin_path;
                     argument = buf;
                 }
 
@@ -685,7 +687,8 @@ int ft_enter(struct tree_context* c)
             default:
             {
                 const char* plugin;
-
+                char plugin_path[MAX_PATH];
+                const char *argument = buf;
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
@@ -698,10 +701,10 @@ int ft_enter(struct tree_context* c)
                     return rc;
                 }
 
-                plugin = filetype_get_plugin(file);
+                plugin = filetype_get_plugin(file, plugin_path, sizeof(plugin_path));
                 if (plugin)
                 {
-                    switch (plugin_load(plugin,buf))
+                    switch (plugin_load(plugin, argument))
                     {
                         case PLUGIN_USB_CONNECTED:
                             rc = GO_TO_FILEBROWSER;

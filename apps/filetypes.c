@@ -531,17 +531,16 @@ int filetype_get_icon(int attr)
     return filetypes[index].icon;
 }
 
-char* filetype_get_plugin(const struct entry* file)
+char* filetype_get_plugin(const struct entry* file, char *buffer, size_t buffer_len)
 {
-    static char plugin_name[MAX_PATH];
     int index = find_attr(file->attr);
-    if (index < 0)
+    if (index < 0 || !buffer)
         return NULL;
     if (filetypes[index].plugin == NULL)
         return NULL;
-    snprintf(plugin_name, MAX_PATH, "%s/%s.%s", 
+    snprintf(buffer, buffer_len, "%s/%s.%s", 
              PLUGIN_DIR, filetypes[index].plugin, ROCK_EXTENSION);
-    return plugin_name;
+    return buffer;
 }
 
 bool filetype_supported(int attr)
