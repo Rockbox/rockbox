@@ -629,33 +629,19 @@ int ft_enter(struct tree_context* c)
                 rolo_load(buf);
                 break;
 #endif
+            case FILE_ATTR_CUE:
+                display_cuesheet_content(buf);
+                break;
 
                 /* plugin file */
             case FILE_ATTR_ROCK:
-            case FILE_ATTR_LUA:
-            case FILE_ATTR_OPX:
             {
                 char *plugin = buf, *argument = NULL;
-                char plugin_path[MAX_PATH];
-                int ret;
-
-                if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_LUA) {
-                    snprintf(plugin_path, sizeof(plugin_path)-1, "%s/lua.rock", VIEWERS_DIR); /* Use a #define here ? */
-                    plugin = plugin_path;
-                    argument = buf;
-                }
-                else if ((file_attr & FILE_ATTR_MASK) == FILE_ATTR_OPX) {
-                    snprintf(plugin_path, sizeof(plugin_path)-1, "%s/open_plugins.rock", VIEWERS_DIR); /* Use a #define here ? */
-                    plugin = plugin_path;
-                    argument = buf;
-                }
-
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
-                ret = plugin_load(plugin, argument);
-                switch (ret)
+                switch (plugin_load(plugin, argument))
                 {
                     case PLUGIN_GOTO_WPS:
                         play = true;
@@ -680,9 +666,6 @@ int ft_enter(struct tree_context* c)
                 }
                 break;
             }
-            case FILE_ATTR_CUE:
-                display_cuesheet_content(buf);
-                break;
 
             default:
             {
