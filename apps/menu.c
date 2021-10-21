@@ -68,7 +68,7 @@ static int current_subitems_count = 0;
 static int talk_menu_item(int selected_item, void *data);
 
 static void get_menu_callback(const struct menu_item_ex *m,
-                        menu_callback_type *menu_callback) 
+                        menu_callback_type *menu_callback)
 {
     if (m->flags&(MENU_HAS_DESC|MENU_DYNAMIC_DESC))
         *menu_callback= m->callback_and_desc->menu_callback;
@@ -340,7 +340,7 @@ void do_setting_screen(const struct settings_list *setting, const char * title,
     option_screen((struct settings_list *)setting, parent,
                   setting->flags&F_TEMPVAR, (char*)title);
 }
-    
+
 
 void do_setting_from_menu(const struct menu_item_ex *temp,
                           struct viewport parent[NB_SCREENS])
@@ -501,12 +501,12 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                                         ID2P(LANG_RIGHT_QS_ITEM),
                                         ID2P(LANG_ADD_TO_FAVES));
 #endif
-                    MENUITEM_STRINGLIST(notquickscreen_able_option, 
+                    MENUITEM_STRINGLIST(notquickscreen_able_option,
                                         ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
                                         ID2P(LANG_RESET_SETTING));
                     const struct menu_item_ex *menu;
                     int menu_selection = 0;
-                    const struct settings_list *setting = 
+                    const struct settings_list *setting =
                             find_setting(temp->variable, NULL);
 #ifdef HAVE_QUICKSCREEN
                     if (is_setting_quickscreenable(setting))
@@ -574,7 +574,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 if (!exiting_menu && (menu->flags&MENU_EXITAFTERTHISMENU))
                     done = true;
                 else
-                    init_menu_lists(menu, &lists, 
+                    init_menu_lists(menu, &lists,
                                     menu_stack_selected_item[stack_top], false, vps);
                 redraw_lists = true;
                 /* new menu, so reload the callback */
@@ -688,7 +688,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 init_menu_lists(menu,&lists,selected,true,vps);
             /* callback was changed, so reload the menu's callback */
             get_menu_callback(menu, &menu_callback);
-            if ((menu->flags&MENU_EXITAFTERTHISMENU) && 
+            if ((menu->flags&MENU_EXITAFTERTHISMENU) &&
                 !(temp->flags&MENU_EXITAFTERTHISMENU))
             {
                 done = true;

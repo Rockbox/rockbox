@@ -64,7 +64,7 @@ static bool search_for_cuesheet(const char *path, struct cuesheet_file *cue_file
     {
         strcpy(cuepath, CUE_DIR);
         if (strlcat(cuepath, slash, MAX_PATH) >= MAX_PATH)
-            goto skip; /* overflow */   
+            goto skip; /* overflow */
         char *dot = strrchr(cuepath, '.');
         strcpy(dot, ".cue");
         if (!file_exists(cuepath))
@@ -305,7 +305,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                     break;
             }
 
-            if (dest) 
+            if (dest)
             {
                 if (char_enc == CHAR_ENC_ISO_8859_1)
                 {
@@ -317,7 +317,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                 {
                     strlcpy(dest, string, count);
                 }
-            }    
+            }
         }
         if (is_embedded)
         {
@@ -505,7 +505,7 @@ bool display_cuesheet_content(char* filename)
 bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_pos)
 {
     int track = cue_find_current_track(cue, curr_pos);
-    
+
     if (direction >= 0 && track == cue->track_count - 1)
     {
         /* we want to get out of the cuesheet */
@@ -520,7 +520,7 @@ bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_
             to previous cuesheet segment. If skipping backward after
             DEFAULT_SKIP_TRESH seconds have elapsed, skip to the start of the
             current cuesheet segment */
-            if (direction == 1 || 
+            if (direction == 1 ||
                   ((curr_pos - cue->tracks[track].offset) < DEFAULT_SKIP_TRESH))
             {
                 track += direction;

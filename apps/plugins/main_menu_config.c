@@ -171,7 +171,7 @@ enum plugin_status plugin_start(const void* parameter)
     struct gui_synclist list;
     bool done = false;
     int action, cur_sel;
-    
+
     menu_table = rb->root_menu_get_options(&menu_item_count);
     load_from_cfg();
 

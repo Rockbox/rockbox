@@ -98,7 +98,7 @@ struct playlist_viewer {
     int selected_track;         /* The selected track, relative (first is 0) */
     int moving_track;           /* The track to move, relative (first is 0)
                                    or -1 if nothing is currently being moved */
-    int moving_playlist_index;  /* Playlist-relative index (as opposed to 
+    int moving_playlist_index;  /* Playlist-relative index (as opposed to
                                    viewer-relative index) of moving track    */
     struct playlist_buffer buffer;
 };
@@ -295,7 +295,7 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
            the name_buffer is probably too small to store enough
            titles to fill the screen, and preload data in the short
            direction.
-          
+
            If this happens then scrolling performance will probably
            be quite low, but it's better then having Data Abort errors */
         playlist_buffer_load_entries(pb, index, FORWARD);
@@ -319,7 +319,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
     }
     if (!have_list && (playlist_amount() > 0))
     {
-         /*If dynamic playlist still exists, view it anyway even 
+         /*If dynamic playlist still exists, view it anyway even
         if playback has reached the end of the playlist */
         have_list = true;
     }

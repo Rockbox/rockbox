@@ -75,10 +75,10 @@ static struct {
     bool shuffle;
     /* optional values */
     int  pitch;
-    int  speed; 
+    int  speed;
 } bm;
 
-static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark, 
+static bool  add_bookmark(const char* bookmark_file_name, const char* bookmark,
                           bool most_recent);
 static char* create_bookmark(void);
 static bool  delete_bookmark(const char* bookmark_file_name, int bookmark_id);
@@ -275,7 +275,7 @@ static bool get_playlist_and_track(const char *bookmark, char **pl_start,
 /* This function adds a bookmark to a file.                                */
 /* Returns true on successful bookmark add.                                */
 /* ------------------------------------------------------------------------*/
-static bool add_bookmark(const char* bookmark_file_name, const char* bookmark, 
+static bool add_bookmark(const char* bookmark_file_name, const char* bookmark,
                          bool most_recent)
 {
     int    temp_bookmark_file = 0;
@@ -466,7 +466,7 @@ bool bookmark_autoload(const char* file)
     else
     {
         int ret = select_bookmark(global_bookmark_file_name, true, &bookmark);
-        
+
         if (bookmark != NULL)
         {
             if (!play_bookmark(bookmark))
@@ -475,7 +475,7 @@ bool bookmark_autoload(const char* file)
                 splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
             }
 
-            /* Act as if autoload was done even if it failed, since the 
+            /* Act as if autoload was done even if it failed, since the
              * user did make an active selection.
              */
             return true;
@@ -520,7 +520,7 @@ bool bookmark_load(const char* file, bool autoload)
             {
                 splash(HZ*2, ID2P(LANG_NOTHING_TO_RESUME));
             }
-            
+
             return false;
         }
     }
@@ -541,7 +541,7 @@ static int get_bookmark_count(const char* bookmark_file_name)
     {
         read_count++;
     }
-    
+
     close(file);
     return read_count;
 }
@@ -563,25 +563,25 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
         /* Entire file fits in buffer */
         first_line = 0;
     }
-    
+
     bookmarks->start = first_line;
     bookmarks->count = 0;
     bookmarks->reload = false;
-    
+
     while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
     {
         read_count++;
-        
+
         if (read_count >= first_line)
         {
             dest -= strlen(global_read_buffer) + 1;
-            
+
             if (dest < ((char*) bookmarks) + sizeof(*bookmarks)
                 + (sizeof(char*) * (bookmarks->count + 1)))
             {
                 break;
             }
-            
+
             strcpy(dest, global_read_buffer);
             bookmarks->items[bookmarks->count] = dest;
             bookmarks->count++;
@@ -604,22 +604,22 @@ static const char* get_bookmark_info(int list_index,
     {
         if (index == 0)
         {
-            return list_index % 2 == 0 
+            return list_index % 2 == 0
                 ? (char*) str(LANG_BOOKMARK_DONT_RESUME) : " ";
         }
-        
+
         index--;
     }
 
-    if (bookmarks->reload || (index >= bookmarks->start + bookmarks->count) 
+    if (bookmarks->reload || (index >= bookmarks->start + bookmarks->count)
         || (index < bookmarks->start))
     {
         int read_index = index;
-        
+
         /* Using count as a guide on how far to move could possibly fail
          * sometimes. Use byte count if that is a problem?
          */
-        
+
         if (read_index != 0)
         {
             /* Move count * 3 / 4 items in the direction the user is moving,
@@ -627,31 +627,31 @@ static const char* get_bookmark_info(int list_index,
              */
             int offset = bookmarks->count;
             int max = bookmarks->total_count - (bookmarks->count / 2);
-            
+
             if (read_index < bookmarks->start)
             {
                 offset *= 3;
             }
-         
+
             read_index = index - offset / 4;
 
             if (read_index > max)
             {
                 read_index = max;
             }
-            
+
             if (read_index < 0)
             {
                 read_index = 0;
             }
         }
-        
+
         if (buffer_bookmarks(bookmarks, read_index) <= index)
         {
             return "";
         }
     }
-    
+
     if (!parse_bookmark(bookmarks->items[index - bookmarks->start], true, true))
     {
         return list_index % 2 == 0 ? (char*) str(LANG_BOOKMARK_INVALID) : " ";
@@ -662,12 +662,12 @@ static const char* get_bookmark_info(int list_index,
         char *name;
         char *format;
         int len = strlen(global_temp_buffer);
-        
+
         if (bookmarks->show_playlist_name && len > 0)
         {
             name = global_temp_buffer;
             len--;
-            
+
             if (name[len] != '/')
             {
                 strrsplt(name, '.');
@@ -689,7 +689,7 @@ static const char* get_bookmark_info(int list_index,
             name = global_filename;
             format = "%s";
         }
-        
+
         strrsplt(global_filename, '.');
         snprintf(buffer, buffer_len, format, name, global_filename);
         return buffer;
@@ -751,12 +751,12 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
     gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2, NULL);
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&list, bookmark_list_voice_cb);
-    gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK), 
+    gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK),
         Icon_Bookmark);
 
     while (!exit)
     {
-        
+
         if (refresh)
         {
             int count = get_bookmark_count(bookmark_file_name);
@@ -805,17 +805,17 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
         if (action == ACTION_STD_CONTEXT)
         {
             MENUITEM_STRINGLIST(menu_items, ID2P(LANG_BOOKMARK_CONTEXT_MENU),
-                NULL, ID2P(LANG_BOOKMARK_CONTEXT_RESUME), 
+                NULL, ID2P(LANG_BOOKMARK_CONTEXT_RESUME),
                 ID2P(LANG_BOOKMARK_CONTEXT_DELETE));
-            static const int menu_actions[] = 
+            static const int menu_actions[] =
             {
                 ACTION_STD_OK, ACTION_BMS_DELETE
             };
             int selection = do_menu(&menu_items, NULL, NULL, false);
-            
+
             refresh = true;
 
-            if (selection >= 0 && selection <= 
+            if (selection >= 0 && selection <=
                 (int) (sizeof(menu_actions) / sizeof(menu_actions[0])))
             {
                 action = menu_actions[selection];
@@ -842,7 +842,7 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
 
         case ACTION_BMS_DELETE:
             if (item >= 0)
-            {                
+            {
                 const char *lines[]={
                     ID2P(LANG_REALLY_DELETE)
                 };
@@ -854,7 +854,7 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
                 const struct text_message yes_message={yes_lines, 1};
 
                 if(gui_syncyesno_run(&message, &yes_message, NULL)==YESNO_YES)
-                {                    
+                {
                     delete_bookmark(bookmark_file_name, item);
                     bookmarks->reload = true;
                 }
@@ -1002,12 +1002,12 @@ static const char* skip_token(const char* s)
     {
         s++;
     }
-    
+
     if (*s)
     {
         s++;
     }
-    
+
     return s;
 }
 
@@ -1033,11 +1033,11 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
 {
     const char* s = bookmark;
     const char* end;
-    
+
 #define GET_INT_TOKEN(var)  s = int_token(s, &var)
 #define GET_LONG_TOKEN(var)  s = long_token(s, &var)
 #define GET_BOOL_TOKEN(var) var = (atoi(s)!=0); s = skip_token(s)
-    
+
     /* if new format bookmark, extract the optional content flags,
        otherwise treat as an original format bookmark */
     int opt_flags = 0;
@@ -1047,7 +1047,7 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
         s++;
         GET_INT_TOKEN(opt_flags);
     }
-    
+
     /* extract all original bookmark tokens */
     GET_INT_TOKEN(bm.resume_index);
     GET_LONG_TOKEN(bm.resume_offset);
@@ -1057,18 +1057,18 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
     GET_LONG_TOKEN(bm.resume_time);
     GET_INT_TOKEN(bm.repeat_mode);
     GET_BOOL_TOKEN(bm.shuffle);
-    
+
     /* extract all optional bookmark tokens */
     if (opt_flags & BM_PITCH)
         GET_INT_TOKEN(bm.pitch);
     if (opt_flags & BM_SPEED)
         GET_INT_TOKEN(bm.speed);
-    
+
     if (*s == 0)
     {
         return false;
     }
-    
+
     end = strchr(s, ';');
 
     /* extract file names */
@@ -1077,7 +1077,7 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
         size_t len = (end == NULL) ? strlen(s) : (size_t) (end - s);
         len = MIN(TEMP_BUF_SIZE - 1, len);
         strlcpy(global_temp_buffer, s, len + 1);
-        
+
         if (end != NULL)
         {
             end++;
@@ -1093,7 +1093,7 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
             strlcpy(global_filename, end, MAX_PATH);
         }
      }
-    
+
     return true;
 }
 

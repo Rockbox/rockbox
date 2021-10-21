@@ -428,8 +428,8 @@ static struct lrc_brpos *calc_brpos(struct lrc_line *lrc_line, int i)
         int nword;
         int word_count, word_width;
         const unsigned char *str;
-    } 
-        sp, 
+    }
+        sp,
         cr;
 
     lrc_buffer_used = (lrc_buffer_used+3)&~3; /* 4 bytes aligned */

@@ -75,7 +75,7 @@ static void encrypt_buffer(char *buf, size_t size, uint32_t *key);
 static void decrypt_buffer(char *buf, size_t size, uint32_t *key);
 
 /* the following two functions are the reference TEA implementation by
-   David Wheeler and Roger Needham taken from 
+   David Wheeler and Roger Needham taken from
    http://en.wikipedia.org/wiki/Tiny_Encryption_Algorithm */
 
 static void do_encrypt(uint32_t* v, uint32_t* k)
