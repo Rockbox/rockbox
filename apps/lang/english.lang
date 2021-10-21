@@ -16136,3 +16136,17 @@
     *: "List Wraparound"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Show Shutdown Message"
+  </dest>
+  <voice>
+    *: "Show Shutdown Message"
+  </voice>
+</phrase>

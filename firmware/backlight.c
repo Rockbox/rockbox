@@ -21,6 +21,9 @@
  *
  ****************************************************************************/
 #include "config.h"
+#if !defined(BOOTLOADER)
+#include "settings.h"
+#endif
 #include <stdlib.h>
 #include "cpu.h"
 #include "kernel.h"
@@ -667,7 +670,11 @@ void backlight_thread(void)
 
             case SYS_POWEROFF:  /* Lock backlight on poweroff so it doesn't */
                 locked = true;      /* go off before power is actually cut. */
-                /* fall through */
+#if !defined(BOOTLOADER)
+                if (!global_settings.show_shutdown_message)
+                    break;
+#endif
+                /* else fall through */
 #if CONFIG_CHARGING
             case SYS_CHARGER_CONNECTED:
             case SYS_CHARGER_DISCONNECTED:

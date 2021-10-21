@@ -563,9 +563,11 @@ MENUITEM_SETTING(sleeptimer_on_startup,
                  &global_settings.sleeptimer_on_startup, NULL);
 MENUITEM_SETTING(keypress_restarts_sleeptimer,
                  &global_settings.keypress_restarts_sleeptimer, NULL);
+MENUITEM_SETTING(show_shutdown_message, &global_settings.show_shutdown_message, NULL);
 
 MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           0, Icon_System_menu,
+            &show_shutdown_message,
             &start_screen,
             &poweroff,
             &sleeptimer_toggle,

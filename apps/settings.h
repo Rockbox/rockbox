@@ -761,6 +761,9 @@ struct user_settings
     bool sleeptimer_on_startup;
     bool keypress_restarts_sleeptimer;
 
+    bool show_shutdown_message; /* toggle whether display lights up and displays message
+                                when shutting down */
+
 #ifdef HAVE_MORSE_INPUT
     bool morse_input; /* text input method setting */
 #endif

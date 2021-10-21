@@ -323,7 +323,10 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #endif
             level = battery_level();
             if (level > 10 || level < 0)
-                splash(0, str(LANG_SHUTTINGDOWN));
+            {
+                if (global_settings.show_shutdown_message)
+                    splash(0, str(LANG_SHUTTINGDOWN));
+            }
             else
             {
                 msg_id = LANG_WARNING_BATTERY_LOW;
