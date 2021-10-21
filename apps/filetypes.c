@@ -601,32 +601,25 @@ static int openwith_get_talk(int selected_item, void * data)
     return 0;
 }
 
-static int openwith_action_callback(int action, struct gui_synclist *lists)
-{
-    struct cb_data *info = (struct cb_data *)lists->data;
-    int i;
-    if (action == ACTION_STD_OK)
-    {
-        char plugin[MAX_PATH];
-        i = viewers[gui_synclist_get_sel_pos(lists)];
-        snprintf(plugin, MAX_PATH, "%s/%s." ROCK_EXTENSION,
-                    PLUGIN_DIR, filetypes[i].plugin);
-        plugin_load(plugin, info->current_file);
-        return ACTION_STD_CANCEL;
-    }
-    return action;
-}
-
 int filetype_list_viewers(const char* current_file)
 {
     struct simplelist_info info;
-    struct cb_data data = { current_file };
-    simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), viewer_count, &data);
-    info.action_callback = openwith_action_callback;
+    simplelist_info_init(&info, str(LANG_ONPLAY_OPEN_WITH), viewer_count, NULL);
     info.get_name = openwith_get_name;
     info.get_icon = global_settings.show_icons?openwith_get_icon:NULL;
     info.get_talk = openwith_get_talk;
-    return simplelist_show_list(&info);
+
+    int ret = simplelist_show_list(&info);
+
+    if (info.selection >= 0) /* run user selected viewer */
+    {
+        char plugin[MAX_PATH];
+        int i = viewers[info.selection];
+        snprintf(plugin, MAX_PATH, "%s/%s." ROCK_EXTENSION,
+                    PLUGIN_DIR, filetypes[i].plugin);
+        plugin_load(plugin, current_file);
+    }
+    return ret;
 }
 
 int filetype_load_plugin(const char* plugin, const char* file)
