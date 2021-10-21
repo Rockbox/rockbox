@@ -155,6 +155,9 @@ void settings_apply_skins(void)
     char filename[MAX_PATH];
     static bool first_run = true;
 
+    if (audio_status() & AUDIO_STATUS_PLAY)
+        audio_stop();
+
     skin_backdrop_init();
     skins_initialised = true;
 
