@@ -567,8 +567,8 @@ static bool view_playlist(void)
 static int playlist_insert_func(void *param)
 {
     if (((intptr_t)param == PLAYLIST_REPLACE ||
-         ((intptr_t)param == PLAYLIST_INSERT_SHUFFLED && !(audio_status() & AUDIO_STATUS_PLAY))) &&
-        !warn_on_pl_erase())
+         (((intptr_t)param == PLAYLIST_INSERT_SHUFFLED || (intptr_t)param == PLAYLIST_INSERT)
+          && !(audio_status() & AUDIO_STATUS_PLAY))) && !warn_on_pl_erase())
         return 0;
     add_to_playlist((intptr_t)param, false);
     return 0;
