@@ -530,6 +530,7 @@ struct user_settings
     bool browse_current; /* 1=goto current song,
                             0=goto previous location */
     bool scroll_paginated; /* 0=dont 1=do */
+    bool list_wraparound;  /* wrap around to opposite end of list when scrolling */
     int  scroll_speed;     /* long texts scrolling speed: 1-30 */
     int  bidir_limit;      /* bidir scroll length limit */
     int  scroll_delay;     /* delay (in 1/10s) before starting scroll */

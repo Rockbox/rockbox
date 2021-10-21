@@ -3370,7 +3370,7 @@ static void select_next_track(void)
         pf_tracks.sel++;
         if (pf_tracks.sel==(pf_tracks.list_visible+pf_tracks.list_start))
             pf_tracks.list_start++;
-    } else {
+    } else if (rb->global_settings->list_wraparound) {
         /* Rollover */
         pf_tracks.sel = 0;
         pf_tracks.list_start = 0;
@@ -3382,7 +3382,7 @@ static void select_prev_track(void)
     if (pf_tracks.sel > 0 ) {
         if (pf_tracks.sel==pf_tracks.list_start) pf_tracks.list_start--;
         pf_tracks.sel--;
-    } else {
+    } else if (rb->global_settings->list_wraparound) {
         /* Rolllover */
         pf_tracks.sel = pf_tracks.count - 1;
         pf_tracks.list_start = pf_tracks.count - pf_tracks.list_visible;

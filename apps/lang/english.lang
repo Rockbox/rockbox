@@ -16122,3 +16122,17 @@
     *: ""
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "List Wraparound"
+  </dest>
+  <voice>
+    *: "List Wraparound"
+  </voice>
+</phrase>

@@ -1220,6 +1220,8 @@ const struct settings_list settings[] = {
                 gui_list_screen_scroll_step),
     OFFON_SETTING(0,scroll_paginated,LANG_SCROLL_PAGINATED,
                   false,"scroll paginated",NULL),
+    OFFON_SETTING(0,list_wraparound,LANG_LIST_WRAPAROUND,
+                  true,"list wraparound",NULL),
 #ifdef HAVE_LCD_COLOR
 
     {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.fg_color,-1,

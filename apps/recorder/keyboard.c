@@ -1215,16 +1215,18 @@ static void kbd_move_cursor(struct edit_state *state, int dir)
     {
         state->changed = CHANGED_CURSOR;
     }
-    else if (state->editpos > state->len_utf8)
+    else if (global_settings.list_wraparound && state->editpos > state->len_utf8)
     {
         state->editpos = 0;
         if (global_settings.talk_menu) beep_play(1000, 150, 1500);
     }
-    else if (state->editpos < 0)
+    else if (global_settings.list_wraparound && state->editpos < 0)
     {
         state->editpos = state->len_utf8;
         if (global_settings.talk_menu) beep_play(1000, 150, 1500);
     }
+    else if (!global_settings.list_wraparound)
+        state->editpos -= dir;
 }
 
 static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
@@ -1235,12 +1237,22 @@ static void kbd_move_picker_horizontal(struct keyboard_parameters *pm,
     pm->x += dir;
     if (pm->x < 0)
     {
+        if (!global_settings.list_wraparound && pm->page == 0)
+        {
+            pm->x = 0;
+            return;
+        }
         if (--pm->page < 0)
             pm->page = pm->pages - 1;
         pm->x = pm->max_chars - 1;
     }
     else if (pm->x >= pm->max_chars)
     {
+        if (!global_settings.list_wraparound && pm->page == pm->pages - 1)
+        {
+            pm->x = pm->max_chars - 1;
+            return;
+        }
         if (++pm->page >= pm->pages)
             pm->page = 0;
         pm->x = 0;
@@ -1261,6 +1273,22 @@ static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
 #endif /* HAVE_MORSE_INPUT */
 
     pm->y += dir;
+
+    if (!global_settings.list_wraparound)
+    {
+        if (pm->y >= pm->lines)
+        {
+            pm->y = pm->lines;
+            pm->line_edit = true;
+        }
+        else if (pm->y < 0)
+            pm->y = 0;
+        else if (pm->line_edit)
+            pm->line_edit = false;
+
+        return;
+    }
+
     if (pm->line_edit)
     {
         pm->y = (dir > 0 ? 0 : pm->lines - 1);
