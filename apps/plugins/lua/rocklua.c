@@ -175,9 +175,10 @@ static int loadfile_newstate(lua_State **L, const char *filename)
 static void lua_atexit(void)
 {
   char *filename;
-
+  int err_n;
   if(Ls && lua_gettop(Ls) > 1)
   {
+    err_n = lua_tointeger(Ls, -1); /* os.exit? */
     if (Ls == lua_touserdata(Ls, -1)) /* signal from restart_lua */
     {
       filename = (char *) malloc((MAX_PATH * 2) + 1);
@@ -195,7 +196,12 @@ static void lua_atexit(void)
       free(filename);
       plugin_start(NULL);
     }
-    else if (lua_tointeger(Ls, -1) != 0) /* os.exit */
+    else if (err_n >= PLUGIN_USB_CONNECTED) /* INTERNAL PLUGIN RETVAL */
+    {
+      lua_close(Ls);
+      _exit(err_n);  /* don't call exit handler */
+    }
+    else if (err_n != 0)
     {
 ERR_RUN:
       lu_status = LUA_ERRRUN;
@@ -205,7 +211,7 @@ ERR_RUN:
     else
       lua_close(Ls);
   }
-  _exit(0); /* don't call exit handler */
+  _exit(PLUGIN_OK); /* don't call exit handler */
 }
 
 /* split filename at argchar
