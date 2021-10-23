@@ -634,6 +634,7 @@ static int item_callback(int action,
     }
     return action;
 }
+
 static int get_selection(int last_screen)
 {
     int i;
@@ -683,6 +684,7 @@ static inline int load_screen(int screen)
         last_screen = old_previous;
     return ret_val;
 }
+
 static int load_context_screen(int selection)
 {
     const struct menu_item_ex *context_menu = NULL;
@@ -709,13 +711,12 @@ static int load_plugin_screen(char *key)
 {
     int ret_val;
     int old_previous = last_screen;
+    int old_global = global_status.last_screen;
     last_screen = next_screen;
     global_status.last_screen = (char)next_screen;
     status_save();
 
-
     int opret = open_plugin_get_entry(key, &open_plugin_entry);
-    bool flush = (opret == OPEN_PLUGIN_NEEDS_FLUSHED);
     char *path = open_plugin_entry.path;
     char *param = open_plugin_entry.param;
     if (param[0] == '\0')
@@ -723,6 +724,9 @@ static int load_plugin_screen(char *key)
 
     switch (plugin_load(path, param))
     {
+    case PLUGIN_USB_CONNECTED:
+        ret_val = GO_TO_ROOT;
+        break;
     case PLUGIN_GOTO_WPS:
         ret_val = GO_TO_WPS;
         break;
@@ -730,18 +734,30 @@ static int load_plugin_screen(char *key)
         ret_val = GO_TO_PLUGIN;
         break;
     case PLUGIN_OK:
-        ret_val = audio_status() ? GO_TO_PREVIOUS : GO_TO_ROOT;
-        break;
+        /* Prevents infinite loop with WPS & Plugins*/
+        if (old_global == GO_TO_WPS && !audio_status())
+        {
+            ret_val = GO_TO_ROOT;
+            break;
+        }
+        /*fallthrough*/
     default:
         ret_val = GO_TO_PREVIOUS;
+        last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
         break;
+
     }
 
-    if (!flush && ret_val != GO_TO_PLUGIN)
-        open_plugin_add_path(NULL, NULL, NULL);
-
-    if (ret_val == GO_TO_PREVIOUS)
-        last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
+    if (ret_val != GO_TO_PLUGIN)
+    {
+        if (opret != OPEN_PLUGIN_NEEDS_FLUSHED || last_screen != GO_TO_WPS)
+        {
+            /* Keep the entry in case of GO_TO_PREVIOUS */
+            open_plugin_entry.hash = 0; /*remove hash -- prevents flush to disk */
+            open_plugin_entry.lang_id = LANG_PREVIOUS_SCREEN;
+            /*open_plugin_add_path(NULL, NULL, NULL);// clear entry */
+        }
+    }
     return ret_val;
 }
 
@@ -858,8 +874,12 @@ void root_menu(void)
 #endif /* With !CONFIG_TUNER previous_music is always GO_TO_WPS */
 
             case GO_TO_PREVIOUS:
+            {
                 next_screen = last_screen;
+                if (last_screen == GO_TO_PLUGIN)/* for WPS */
+                    last_screen = GO_TO_PREVIOUS;
                 break;
+            }
 
             case GO_TO_PREVIOUS_BROWSER:
                 next_screen = previous_browser;
@@ -874,7 +894,8 @@ void root_menu(void)
             case GO_TO_PLUGIN:
             {
                 char *key;
-                if (global_status.last_screen == GO_TO_SHORTCUTMENU)
+                if (global_status.last_screen == GO_TO_SHORTCUTMENU &&
+                    last_screen != GO_TO_ROOT)
                 {
                     shortcut_origin = last_screen;
                     key = ID2P(LANG_SHORTCUTS);
@@ -892,6 +913,9 @@ void root_menu(void)
                         case GO_TO_SHORTCUTMENU:
                             key = ID2P(LANG_SHORTCUTS);
                             break;
+                        case GO_TO_PREVIOUS:
+                            key = ID2P(LANG_PREVIOUS_SCREEN);
+                            break;
                         default:
                             key = ID2P(LANG_OPEN_PLUGIN);
                             break;
@@ -900,15 +924,23 @@ void root_menu(void)
 
                 next_screen = load_plugin_screen(key);
 
-                /* shortcuts may take several trips through the GO_TO_PLUGIN case
-                   make sure we preserve and restore the origin */
-                if (next_screen == GO_TO_PREVIOUS && shortcut_origin != GO_TO_ROOT)
+                if (next_screen == GO_TO_PREVIOUS)
                 {
-                    if (shortcut_origin != GO_TO_WPS)
-                        next_screen = shortcut_origin;
-                    shortcut_origin = GO_TO_ROOT;
+                    /* shortcuts may take several trips through the GO_TO_PLUGIN
+                       case make sure we preserve and restore the origin */
+                    if (shortcut_origin != GO_TO_ROOT)
+                    {
+                        if (shortcut_origin != GO_TO_WPS)
+                            next_screen = shortcut_origin;
+                        shortcut_origin = GO_TO_ROOT;
+                    }
+                    /* skip GO_TO_PREVIOUS */
+                    if (last_screen == GO_TO_BROWSEPLUGINS)
+                    {
+                        next_screen = last_screen;
+                        last_screen = GO_TO_PLUGIN;
+                    }
                 }
-
                 previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PLUGIN;
                 break;
             }

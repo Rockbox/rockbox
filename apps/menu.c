@@ -187,17 +187,18 @@ static enum themable_icons  menu_get_icon(int selected_item, void * data)
     return menu_icon;
 }
 
-static void init_menu_lists(const struct menu_item_ex *menu,
+static int init_menu_lists(const struct menu_item_ex *menu,
                      struct gui_synclist *lists, int selected, bool callback,
                      struct viewport parent[NB_SCREENS])
 {
     if (!menu || !lists)
     {
         panicf("init_menu_lists, NULL pointer");
-        return;
+        return 0;
     }
 
     int i;
+    int start_action = ACTION_ENTER_MENUITEM;
     int count = MIN(MENU_GET_COUNT(menu->flags), MAX_MENU_SUBITEMS);
     int type = (menu->flags&MENU_TYPE_MASK);
     menu_callback_type menu_callback = NULL;
@@ -264,7 +265,9 @@ static void init_menu_lists(const struct menu_item_ex *menu,
 
     get_menu_callback(menu,&menu_callback);
     if (callback && menu_callback)
-        menu_callback(ACTION_ENTER_MENUITEM, menu, lists);
+        start_action = menu_callback(start_action, menu, lists);
+
+    return start_action;
 }
 
 static int talk_menu_item(int selected_item, void *data)
@@ -381,6 +384,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     int selected = start_selected? *start_selected : 0;
     int ret = 0;
     int action;
+    int start_action;
     struct gui_synclist lists;
     const struct menu_item_ex *temp = NULL;
     const struct menu_item_ex *menu = start_menu;
@@ -407,8 +411,10 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     menu_callback_type menu_callback = NULL;
 
     /* if hide_theme is true, assume parent has been fixed before passed into
-     * this function, e.g. with viewport_set_defaults(parent, screen) */
-    init_menu_lists(menu, &lists, selected, true, parent);
+     * this function, e.g. with viewport_set_defaults(parent, screen) 
+     * start_action allows an action to be processed
+     * by menu logic by bypassing get_action on the initial run */
+    start_action = init_menu_lists(menu, &lists, selected, true, parent);
     vps = *(lists.parent);
     in_stringlist = ((menu->flags&MENU_TYPE_MASK) == MT_RETURN_ID);
     /* load the callback, and only reload it if menu changes */
@@ -421,7 +427,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
     {
         keyclick_set_callback(gui_synclist_keyclick_callback, &lists);
 
-        action = get_action(CONTEXT_MAINMENU|ALLOW_SOFTLOCK,
+        if (UNLIKELY(start_action != ACTION_ENTER_MENUITEM))
+        {
+            action = start_action;
+            start_action = ACTION_ENTER_MENUITEM;
+        }
+        else
+            action = get_action(CONTEXT_MAINMENU|ALLOW_SOFTLOCK,
                                 list_do_action_timeout(&lists, HZ));
             /* HZ so the status bar redraws corectly */
 
@@ -639,7 +651,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     if (!(menu->flags&MENU_EXITAFTERTHISMENU) ||
                             (temp->flags&MENU_EXITAFTERTHISMENU))
                     {
-                        init_menu_lists(menu, &lists, selected, true, vps);
+                        /* Reload menu but don't run the calback again FS#8117 */
+                        init_menu_lists(menu, &lists, selected, false, vps);
                     }
                     if (temp->flags&MENU_FUNC_CHECK_RETVAL)
                     {

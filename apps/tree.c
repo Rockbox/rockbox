@@ -967,11 +967,17 @@ int rockbox_browse(struct browse_context *browse)
     if (*tc.dirfilter >= NUM_FILTER_MODES)
     {
         int last_context;
+        /* don't reset if its the same browse already loaded */
+        if (tc.browse != browse ||
+            !(tc.currdir[1] && strcmp(tc.currdir, browse->root) == 0))
+        {
+            tc.browse = browse;
+            tc.selected_item = 0;
+            tc.dirlevel = 0;
 
-        tc.browse = browse;
-        tc.selected_item = 0;
-        tc.dirlevel = 0;
-        strlcpy(tc.currdir, browse->root, sizeof(tc.currdir));
+            strlcpy(tc.currdir, browse->root, sizeof(tc.currdir));
+        }
+
         start_wps = false;
         last_context = curr_context;
 
