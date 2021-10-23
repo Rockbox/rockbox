@@ -67,11 +67,12 @@ struct open_plugin_entry_t
     offsetof(struct open_plugin_entry_t, path)     + \
     offsetof(struct open_plugin_entry_t, param))
 
+#define OPEN_PLUGIN_SEED 0x811C9DC5; //seed, 2166136261;
 inline static void open_plugin_get_hash(const char *key, uint32_t *hash)
 {
     /* Calculate modified FNV1a hash of string */
     const uint32_t p = 16777619;
-    *hash = 0x811C9DC5; //seed, 2166136261;
+    *hash = OPEN_PLUGIN_SEED;
     while(*key)
         *hash = (*key++ ^ *hash) * p;
 }

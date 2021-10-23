@@ -42,10 +42,6 @@ static const uint32_t open_plugin_csum = OPEN_PLUGIN_CHECKSUM;
 
 static const int op_entry_sz = sizeof(struct open_plugin_entry_t);
 
-static int open_plugin_hash_get_entry(uint32_t hash,
-                  struct open_plugin_entry_t *entry,
-                               const char* dat_file);
-
 static const char* strip_rockbox_root(const char *path)
 {
     int dlen = strlen(ROCKBOX_DIR);
@@ -64,7 +60,7 @@ static inline void op_clear_entry(struct open_plugin_entry_t *entry)
 
 static int op_entry_checksum(struct open_plugin_entry_t *entry)
 {
-    if (!entry || entry->checksum != open_plugin_csum)
+    if (entry == NULL || entry->checksum != open_plugin_csum)
         return 0;
     return 1;
 }
@@ -73,38 +69,43 @@ static int op_find_entry(int fd, struct open_plugin_entry_t *entry,
                                     uint32_t hash, int32_t lang_id)
 {
     int ret = OPEN_PLUGIN_NOT_FOUND;
-    int record = -1;
-    if (fd >= 0 && entry != NULL)
+    int record = 0;
+    if (hash == 0)
+        hash = OPEN_PLUGIN_SEED;
+    if (fd >= 0)
     {
         logf("OP find_entry *Searching* hash: %x lang_id: %d", hash, lang_id);
+
         while (read(fd, entry, op_entry_sz) == op_entry_sz)
         {
-            record++;
-            if (entry->lang_id == lang_id ||
-               (entry->hash == hash && hash != 0) ||
+            if (entry->lang_id == lang_id || entry->hash == hash ||
                (lang_id == OPEN_PLUGIN_LANG_IGNOREALL))/* return first entry found */
             {
-                /* sanity check */
-                if (op_entry_checksum(entry) <= 0)
-                {
-                    splashf(HZ * 2, "OpenPlugin Invalid entry");
-                    ret = OPEN_PLUGIN_NOT_FOUND;
-                    break;
-                }
+                ret = record;
                 /* NULL terminate fields NOTE -- all are actually +1 larger */
                 entry->name[OPEN_PLUGIN_NAMESZ] = '\0';
                 /*entry->key[OPEN_PLUGIN_BUFSZ] = '\0';*/
                 entry->path[OPEN_PLUGIN_BUFSZ] = '\0';
                 entry->param[OPEN_PLUGIN_BUFSZ] = '\0';
-                ret = record;
                 logf("OP find_entry *Found* hash: %x lang_id: %d",
                      entry->hash, entry->lang_id);
                 logf("OP find_entry rec: %d name: %s %s %s", record,
                      entry->name, entry->path, entry->param);
                 break;
             }
+            record++;
         }
     }
+
+    /* sanity check */
+    if (ret > OPEN_PLUGIN_NOT_FOUND && op_entry_checksum(entry) <= 0)
+    {
+        splash(HZ * 2, "OpenPlugin Invalid entry");
+        ret = OPEN_PLUGIN_NOT_FOUND;
+    }
+    if (ret == OPEN_PLUGIN_NOT_FOUND)
+        op_clear_entry(entry);
+
     return ret;
 }
 
@@ -113,7 +114,7 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
     int fd;
     uint32_t hash;
     int32_t lang_id;
-    if (!entry || entry->hash == 0)
+    if (entry == NULL|| entry->hash == 0)
     {
         logf("OP update *No entry*");
         return OPEN_PLUGIN_NOT_FOUND;
@@ -178,8 +179,7 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
     {
         logf("OP update *Loading original entry*");
         lseek(fd, 0, SEEK_SET);
-        int opret = op_find_entry(fd, entry, hash, lang_id);
-        clear = (opret == OPEN_PLUGIN_NOT_FOUND);
+        op_find_entry(fd, entry, hash, lang_id);
     }
     close(fd);
     rename(OPEN_PLUGIN_DAT ".tmp", OPEN_PLUGIN_DAT);
@@ -194,6 +194,41 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
     return 0;
 }
 
+static int op_get_entry(uint32_t hash, int32_t lang_id,
+                        struct open_plugin_entry_t *entry, const char *dat_file)
+{
+    int opret = OPEN_PLUGIN_NOT_FOUND;
+
+    if (entry != NULL)
+    {
+        /* Is the entry we want already loaded? */
+        if(hash != 0 && entry->hash == hash)
+            return OPEN_PLUGIN_NEEDS_FLUSHED;
+
+        if(lang_id <= OPEN_PLUGIN_LANG_INVALID)
+        {
+            lang_id = OPEN_PLUGIN_LANG_IGNORE;
+            if (hash == 0)/* no hash or langid -- returns first entry found */
+                lang_id = OPEN_PLUGIN_LANG_IGNOREALL;
+        }
+        else if(entry->lang_id == lang_id)
+        {
+            return OPEN_PLUGIN_NEEDS_FLUSHED;
+        }
+
+        /* if another entry is loaded; flush it to disk before we destroy it */
+        op_update_dat(&open_plugin_entry, true);
+
+        logf("OP get_entry hash: %x lang id: %d db: %s", hash, lang_id, dat_file);
+
+        int fd = open(dat_file, O_RDONLY);
+        opret = op_find_entry(fd, entry, hash, lang_id);
+        close(fd);
+    }
+
+    return opret;
+}
+
 uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *parameter)
 {
     int len;
@@ -201,7 +236,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
     int32_t lang_id;
     char *pos = "\0";
 
-    if(!key)
+    if(key == NULL)
     {
         logf("OP add_path No Key, *Clearing entry*");
         op_clear_entry(&open_plugin_entry);
@@ -242,7 +277,7 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
         }
         else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)
         {
-            open_plugin_hash_get_entry(0, &open_plugin_entry, plugin);
+            op_get_entry(0, OPEN_PLUGIN_LANG_IGNORE, &open_plugin_entry, plugin);
             goto retnhash;
         }
     }
@@ -285,72 +320,17 @@ void open_plugin_browse(const char *key)
         open_plugin_add_path(key, tmp_buf, NULL);
 }
 
- static int op_get_entry(uint32_t hash, int32_t lang_id,
-                        struct open_plugin_entry_t *entry, const char *dat_file)
-{
-    int opret = OPEN_PLUGIN_NOT_FOUND;
-
-    if (entry)
-    {
-        /* Is the entry we want already loaded? */
-        if(hash != 0 && entry->hash == hash)
-            return OPEN_PLUGIN_NEEDS_FLUSHED;
-
-        if(lang_id <= OPEN_PLUGIN_LANG_INVALID)
-        {
-            lang_id = OPEN_PLUGIN_LANG_IGNORE;
-            if (hash == 0)/* no hash or langid -- returns first entry found */
-                lang_id = OPEN_PLUGIN_LANG_IGNOREALL;
-        }
-        else if(entry->lang_id == lang_id)
-        {
-            return OPEN_PLUGIN_NEEDS_FLUSHED;
-        }
-
-        /* if another entry is loaded; flush it to disk before we destroy it */
-        op_update_dat(&open_plugin_entry, true);
-
-        logf("OP get_entry hash: %x lang id: %d db: %s", hash, lang_id, dat_file);
-
-        int fd = open(dat_file, O_RDONLY);
-        opret = op_find_entry(fd, entry, hash, lang_id);
-        close(fd);
-
-        if (opret < 0) /* nothing found */
-        {
-            op_clear_entry(entry);
-        }
-    }
-
-    return opret;
-}
-
-#if 0 //unused
-static int open_plugin_langid_get_entry(int32_t lang_id,
-                    struct open_plugin_entry_t *entry,
-                                    const char *dat_file)
-{
-    return op_get_entry(0, lang_id, entry, dat_file);
-}
-#endif
-
-static int open_plugin_hash_get_entry(uint32_t hash,
-                    struct open_plugin_entry_t *entry,
-                                    const char *dat_file)
-{
-    return op_get_entry(hash, OPEN_PLUGIN_LANG_IGNORE, entry, dat_file);
-}
-
 int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry)
 {
-    if (!key || !entry)
+    if (key == NULL || entry == NULL)
         return OPEN_PLUGIN_NOT_FOUND;
     int opret;
-    uint32_t hash;
+    uint32_t hash = 0;
     int32_t lang_id = P2ID((unsigned char *)key);
     const char* skey = P2STR((unsigned char *)key); /* string|LANGPTR => string */
 
-    open_plugin_get_hash(strip_rockbox_root(skey), &hash); /* in open_plugin.h */
+    if (lang_id <= OPEN_PLUGIN_LANG_INVALID)
+        open_plugin_get_hash(strip_rockbox_root(skey), &hash); /* in open_plugin.h */
 
     opret = op_get_entry(hash, lang_id, entry, OPEN_PLUGIN_DAT);
     logf("OP entry hash: %x lang id: %d ret: %d key: %s", hash, lang_id, opret, skey);
