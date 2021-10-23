@@ -1013,7 +1013,7 @@ static void plugin_tsr(bool (*exit_callback)(bool))
     pfn_tsr_exit = exit_callback; /* remember the callback for later */
 }
 
-int plugin_open(char *plugin, char *parameter)
+int plugin_open(const char *plugin, const char *parameter)
 {
     open_plugin_add_path(ID2P(LANG_OPEN_PLUGIN), plugin, parameter);
     return PLUGIN_GOTO_PLUGIN;

@@ -49,7 +49,7 @@
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
-int plugin_open(char *plugin, char *parameter);
+int plugin_open(const char *plugin, const char *parameter);
 
 #ifndef __PCTOOL__
 #include "config.h"
@@ -911,7 +911,7 @@ struct plugin_api {
     void (*led)(bool on);
 
     /*plugin*/
-    int (*plugin_open)(char *path, char *parameter);
+    int (*plugin_open)(const char *path, const char *parameter);
     void* (*plugin_get_buffer)(size_t *buffer_size);
     void* (*plugin_get_audio_buffer)(size_t *buffer_size);
     void (*plugin_release_audio_buffer)(void);
