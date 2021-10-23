@@ -754,7 +754,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
             if (lists->offset_position[0] == 0)
             {
                 pgleft_allow_cancel = true;
-                *actionptr = ACTION_STD_CANCEL;
+                *actionptr = ACTION_STD_MENU;
                 return true;
             }
             *actionptr = ACTION_TREE_PGLEFT;
