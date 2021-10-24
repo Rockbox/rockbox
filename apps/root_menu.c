@@ -766,11 +766,15 @@ static int root_menu_setup_screens(void)
 #endif
     add_event(PLAYBACK_EVENT_TRACK_CHANGE, rootmenu_track_changed_callback);
 #ifdef HAVE_RTC_ALARM
+    int alarm_wake_up_screen = 0;
     if ( rtc_check_alarm_started(true) )
     {
         rtc_enable_alarm(false);
 
-        switch (global_settings.alarm_wake_up_screen)
+#if (defined(HAVE_RECORDING) || CONFIG_TUNER)
+        alarm_wake_up_screen = global_settings.alarm_wake_up_screen;
+#endif
+        switch (alarm_wake_up_screen)
         {
 #if CONFIG_TUNER
             case ALARM_START_FM:
