@@ -36,6 +36,13 @@ enum quickscreen_item {
     QUICKSCREEN_ITEM_COUNT,
 };
 
+enum quickscreen_return {
+    QUICKSCREEN_OK = 0,
+    QUICKSCREEN_IN_USB = 0x1,
+    QUICKSCREEN_GOTO_SHORTCUTS_MENU = 0x2,
+    QUICKSCREEN_CHANGED = 0x4,
+};
+
 struct gui_quickscreen
 {
     const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];

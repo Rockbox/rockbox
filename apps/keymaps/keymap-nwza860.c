@@ -74,7 +74,8 @@ static const struct button_mapping button_context_keyboard[]  = {
 }; /* button_context_keyboard */
 
 static const struct button_mapping button_context_quickscreen[]  = {
-    { ACTION_STD_CANCEL,                BUTTON_PLAY,                       BUTTON_NONE },
+    { ACTION_STD_CONTEXT,               BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_PLAY },
+    { ACTION_STD_CANCEL,                BUTTON_PLAY|BUTTON_REL,            BUTTON_PLAY },
     { ACTION_STD_CANCEL,                BUTTON_BACK,                       BUTTON_NONE },
 
     LAST_ITEM_IN_LIST

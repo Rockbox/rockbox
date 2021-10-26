@@ -320,13 +320,13 @@ static int quickscreen_touchscreen_button(void)
 }
 #endif
 
-static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter, bool *usb)
+static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter, bool *usb)
 {
     int button;
     struct viewport parent[NB_SCREENS];
     struct viewport vps[NB_SCREENS][QUICKSCREEN_ITEM_COUNT];
     struct viewport vp_icons[NB_SCREENS];
-    bool changed = false;
+    int ret = QUICKSCREEN_OK;
     /* To quit we need either :
      *  - a second press on the button that made us enter
      *  - an action taken while pressing the enter button,
@@ -367,7 +367,7 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
         }
         if (gui_quickscreen_do_button(qs, button))
         {
-            changed = true;
+            ret |= QUICKSCREEN_CHANGED;
             can_quit = true;
             FOR_NB_SCREENS(i)
                 gui_quickscreen_draw(qs, &screens[i], &parent[i],
@@ -389,6 +389,11 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
             FOR_NB_SCREENS(i)
                 skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_NON_STATIC);
         }
+        else if (button == ACTION_STD_CONTEXT)
+        {
+            ret |= QUICKSCREEN_GOTO_SHORTCUTS_MENU;
+            break;
+        }
         if ((button == button_enter) && can_quit)
             break;
 
@@ -405,7 +410,8 @@ static bool gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_ente
     }
 
     pop_current_activity();
-    return changed;
+
+    return ret;
 }
 
 static const struct settings_list *get_setting(int gs_value,
@@ -427,9 +433,6 @@ int quick_screen_quick(int button_enter)
 #endif
     bool usb = false;
 
-    if (global_settings.shortcuts_replaces_qs)
-        return do_shortcut_menu(NULL);
-
     qs.items[QUICKSCREEN_TOP] =
             get_setting(global_settings.qs_items[QUICKSCREEN_TOP], NULL);
     qs.items[QUICKSCREEN_LEFT] =
@@ -442,7 +445,8 @@ int quick_screen_quick(int button_enter)
             get_setting(global_settings.qs_items[QUICKSCREEN_BOTTOM], NULL);
 
     qs.callback = NULL;
-    if (gui_syncquickscreen_run(&qs, button_enter, &usb))
+    int ret = gui_syncquickscreen_run(&qs, button_enter, &usb);
+    if (ret & QUICKSCREEN_CHANGED)
     {
         settings_save();
         /* make sure repeat/shuffle/any other nasty ones get updated */
@@ -465,7 +469,10 @@ int quick_screen_quick(int button_enter)
             set_albumart_mode(global_settings.album_art);
 #endif
     }
-    return (usb ? 1:0);
+    if (usb)
+        return QUICKSCREEN_IN_USB;
+    return ret & QUICKSCREEN_GOTO_SHORTCUTS_MENU ? QUICKSCREEN_GOTO_SHORTCUTS_MENU :
+                                                   QUICKSCREEN_OK;
 }
 
 /* stuff to make the quickscreen configurable */

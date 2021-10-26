@@ -53,6 +53,7 @@
 #include "root_menu.h"
 #include "backdrop.h"
 #include "quickscreen.h"
+#include "shortcuts.h"
 #include "pitchscreen.h"
 #include "appevents.h"
 #include "viewport.h"
@@ -839,15 +840,24 @@ long gui_wps_show(void)
             case ACTION_WPS_QUICKSCREEN:
             {
                 gwps_leave_wps();
-                if (global_settings.shortcuts_replaces_qs)
+                bool enter_shortcuts_menu = global_settings.shortcuts_replaces_qs;
+                if (!enter_shortcuts_menu)
+                {
+                    int ret = quick_screen_quick(button);
+                    if (ret == QUICKSCREEN_IN_USB)
+                        return GO_TO_ROOT;
+                    else if (ret == QUICKSCREEN_GOTO_SHORTCUTS_MENU)
+                        enter_shortcuts_menu = true;
+                    else
+                        restore = true;
+                }
+
+                if (enter_shortcuts_menu)
                 {
                     global_status.last_screen = GO_TO_SHORTCUTMENU;
-                    int ret = quick_screen_quick(button);
+                    int ret = do_shortcut_menu(NULL);
                     return (ret == GO_TO_PREVIOUS ? GO_TO_WPS : ret);
                 }
-                else if (quick_screen_quick(button) > 0)
-                    return GO_TO_ROOT;
-                restore = true;
             }
             break;
 #endif /* HAVE_QUICKSCREEN */

@@ -72,6 +72,7 @@
 #include "list.h"
 #include "splash.h"
 #include "quickscreen.h"
+#include "shortcuts.h"
 #include "appevents.h"
 
 #include "root_menu.h"
@@ -751,19 +752,28 @@ static int dirbrowse(void)
                 break;
 #ifdef HAVE_QUICKSCREEN
             case ACTION_STD_QUICKSCREEN:
-                if (global_settings.shortcuts_replaces_qs)
-                {
-                    if (*tc.dirfilter < NUM_FILTER_MODES)
-                    {
-                        global_status.last_screen = GO_TO_SHORTCUTMENU;
-                        return quick_screen_quick(button);
-                    }
+            {
+                bool enter_shortcuts_menu = global_settings.shortcuts_replaces_qs;
+                if (enter_shortcuts_menu && *tc.dirfilter >= NUM_FILTER_MODES)
                     break;
+                else if (!enter_shortcuts_menu)
+                {
+                    int ret = quick_screen_quick(button);
+                    if (ret == QUICKSCREEN_IN_USB)
+                        reload_dir = true;
+                    else if (ret == QUICKSCREEN_GOTO_SHORTCUTS_MENU)
+                        enter_shortcuts_menu = true;
                 }
-                else if (quick_screen_quick(button))
-                    reload_dir = true;
+                
+                if (enter_shortcuts_menu && *tc.dirfilter < NUM_FILTER_MODES)
+                {
+                    global_status.last_screen = GO_TO_SHORTCUTMENU;
+                    return do_shortcut_menu(NULL);
+                }
+                
                 restore = true;
                 break;
+            }
 #endif
 
 #ifdef HAVE_HOTKEY
