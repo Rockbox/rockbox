@@ -1576,6 +1576,8 @@ static bool onplay_load_plugin(void *param)
     int ret = filetype_load_plugin((const char*)param, selected_file);
     if (ret == PLUGIN_USB_CONNECTED)
         onplay_result = ONPLAY_RELOAD_DIR;
+    else if (ret == PLUGIN_GOTO_PLUGIN)
+        onplay_result = ONPLAY_PLUGIN;
     return false;
 }
 

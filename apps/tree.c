@@ -805,6 +805,7 @@ static int dirbrowse(void)
                 {
                     case ONPLAY_MAINMENU:
                         return GO_TO_ROOT;
+                        break;
 
                     case ONPLAY_OK:
                         restore = true;
@@ -816,6 +817,10 @@ static int dirbrowse(void)
 
                     case ONPLAY_START_PLAY:
                         return GO_TO_WPS;
+                        break;
+
+                    case ONPLAY_PLUGIN:
+                        return GO_TO_PLUGIN;
                         break;
                 }
                 break;
