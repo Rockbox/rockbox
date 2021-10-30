@@ -435,7 +435,7 @@ static void ft_load_font(char *file)
 int ft_enter(struct tree_context* c)
 {
     int rc = GO_TO_PREVIOUS;
-    static char buf[MAX_PATH];
+    char buf[MAX_PATH];
 
     struct entry* file = tree_get_entry_at(c, c->selected_item);
     if (!file)
@@ -641,6 +641,8 @@ int ft_enter(struct tree_context* c)
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
                 }
+
+#ifdef PLUGINS_RUN_IN_BROWSER /* Stay in the filetree to run a plugin */
                 switch (plugin_load(plugin, argument))
                 {
                     case PLUGIN_GOTO_WPS:
@@ -664,6 +666,10 @@ int ft_enter(struct tree_context* c)
                     default:
                         break;
                 }
+#else /* Exit the filetree to run a plugin */
+                plugin_open(plugin, argument);
+                rc = GO_TO_PLUGIN;
+#endif
                 break;
             }
 
@@ -687,6 +693,7 @@ int ft_enter(struct tree_context* c)
                 plugin = filetype_get_plugin(file, plugin_path, sizeof(plugin_path));
                 if (plugin)
                 {
+#ifdef PLUGINS_RUN_IN_BROWSER /* Stay in the filetree to run a plugin */
                     switch (plugin_load(plugin, argument))
                     {
                         case PLUGIN_USB_CONNECTED:
@@ -705,6 +712,10 @@ int ft_enter(struct tree_context* c)
                         default:
                             break;
                     }
+#else /* Exit the filetree to run a plugin */
+                    plugin_open(plugin, argument);
+                    rc = GO_TO_PLUGIN;
+#endif
                 }
                 break;
             }
