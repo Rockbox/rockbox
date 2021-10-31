@@ -2396,6 +2396,14 @@ static void audio_finalise_track_change(void)
 
     id3_write(PLAYING_ID3, track_id3);
 
+    if (global_settings.single_mode)
+        if ( ((skip_pending == TRACK_SKIP_AUTO) || (skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST))
+          && (global_settings.party_mode == 0) )
+        {
+            play_status = PLAY_PAUSED;
+            pcmbuf_pause(true);
+        }
+
     /* The skip is technically over */
     skip_pending = TRACK_SKIP_NONE;
 

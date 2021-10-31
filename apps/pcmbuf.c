@@ -741,6 +741,9 @@ void pcmbuf_start_track_change(enum pcm_track_change_type type)
         }
     }
 
+    if (auto_skip && global_settings.single_mode && !global_settings.party_mode)
+        crossfade = false;
+
     if (crossfade)
     {
         logf("crossfade track change");

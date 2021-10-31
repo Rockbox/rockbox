@@ -1300,6 +1300,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Single Mode"
+  </dest>
+  <voice>
+    *: "Single Mode"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_PARTY_MODE
   desc: party mode
   user: core

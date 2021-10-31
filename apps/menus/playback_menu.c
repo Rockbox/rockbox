@@ -92,6 +92,7 @@ MENUITEM_SETTING(buffer_margin, &global_settings.buffer_margin,
                  buffermargin_callback);
 #endif /*HAVE_DISK_STORAGE */
 MENUITEM_SETTING(fade_on_stop, &global_settings.fade_on_stop, NULL);
+MENUITEM_SETTING(single_mode, &global_settings.single_mode, NULL);
 MENUITEM_SETTING(party_mode, &global_settings.party_mode, NULL);
 
 #ifdef HAVE_CROSSFADE
@@ -208,7 +209,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_DISK_STORAGE
           &buffer_margin,
 #endif
-          &fade_on_stop, &party_mode,
+          &fade_on_stop, &single_mode, &party_mode,
 
 #if defined(HAVE_CROSSFADE)
           &crossfade_settings_menu,

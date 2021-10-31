@@ -476,6 +476,7 @@ struct user_settings
     int default_codepage;   /* set default codepage for tag conversion */
     bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
     bool play_selected; /* Plays selected file even in shuffle mode */
+    bool single_mode;    /* single mode - stop after every track */
     bool party_mode;    /* party mode - unstoppable music */
     bool audioscrobbler; /* Audioscrobbler logging  */
     bool cuesheet;

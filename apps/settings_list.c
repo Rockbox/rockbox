@@ -1238,6 +1238,7 @@ const struct settings_list settings[] = {
 #endif
     /* more playback */
     OFFON_SETTING(0,play_selected,LANG_PLAY_SELECTED,true,"play selected",NULL),
+    OFFON_SETTING(0,single_mode,LANG_SINGLE_MODE,false,"single mode",NULL),
     OFFON_SETTING(0,party_mode,LANG_PARTY_MODE,false,"party mode",NULL),
     OFFON_SETTING(0,fade_on_stop,LANG_FADE_ON_STOP,true,"volume fade",NULL),
     INT_SETTING(F_TIME_SETTING, ff_rewind_min_step, LANG_FFRW_STEP, 1,
