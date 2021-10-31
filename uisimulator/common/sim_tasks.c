@@ -145,7 +145,7 @@ void sim_trigger_screendump(void)
 static bool is_usb_inserted;
 void sim_trigger_usb(bool inserted)
 {
-    int usbmode = 0;
+    int usbmode = USBMODE_DEFAULT;
     if (inserted)
     {
         send_event(SYS_EVENT_USB_INSERTED, &usbmode);

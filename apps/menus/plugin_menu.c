@@ -29,7 +29,6 @@
 #include "rbpaths.h"
 #include "root_menu.h"
 #include "tree.h"
-static int reenter = 0;
 
 enum {
     GAMES,
@@ -46,6 +45,12 @@ static const struct {
     { PLUGIN_DEMOS_DIR, LANG_PLUGIN_DEMOS },
 };
 
+/* if handler is active we are waiting to reenter menu */
+static void pm_handler(unsigned short id, void *data)
+{
+    remove_event(id, data);
+}
+
 static int plugins_menu(void* param)
 {
     intptr_t item = (intptr_t)param;
@@ -60,7 +65,8 @@ static int plugins_menu(void* param)
     if (ret == GO_TO_PREVIOUS)
         return 0;
     if (ret == GO_TO_PLUGIN)
-        reenter = 1;
+        add_event(SYS_EVENT_USB_INSERTED, pm_handler);
+
     return ret;
 }
 
@@ -74,8 +80,11 @@ static int menu_callback(int action,
     if (action == ACTION_ENTER_MENUITEM)
     {
         this_list->selected_item = selected;
-        if (reenter-- > 0)
-            action = ACTION_STD_OK;
+        if (!add_event(SYS_EVENT_USB_INSERTED, pm_handler))
+        {
+            action = ACTION_STD_OK; /* event exists -- reenter menu */
+        }
+        remove_event(SYS_EVENT_USB_INSERTED, pm_handler);
     }
     else if (action == ACTION_STD_OK)
     {

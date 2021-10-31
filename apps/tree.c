@@ -1196,6 +1196,7 @@ static int ft_play_filename(char *dir, char *file, int attr)
 /* These two functions are called by the USB and shutdown handlers */
 void tree_flush(void)
 {
+    tc.browse = NULL; /* clear browse to prevent reentry to a possibly missing file */
 #ifdef HAVE_TAGCACHE
     tagcache_shutdown();
 #endif
