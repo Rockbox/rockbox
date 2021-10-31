@@ -477,6 +477,9 @@ static void NORETURN_ATTR usb_thread(void)
 
             usb_stack_enable(true);
 #ifndef BOOTLOADER
+#ifndef HAVE_USB_POWER
+            int usb_mode = 0;
+#endif
             send_event(SYS_EVENT_USB_INSERTED, &usb_mode);
 #endif
             /* Power (charging-only) button */
