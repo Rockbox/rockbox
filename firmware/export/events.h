@@ -52,7 +52,7 @@
 #define EVENT_CLASS_RECORDING  0x1000
 #define EVENT_CLASS_LCD        0x2000
 #define EVENT_CLASS_VOICE      0x4000
-
+#define EVENT_CLASS_SYSTEM     0x8000 /*LAST ONE */
 /**
  * Subscribe to an event with a simple callback. The callback will be called
  * synchronously everytime the event fires, passing the event id and data to
@@ -98,5 +98,15 @@ void remove_event_ex(unsigned short id, void (*handler)(unsigned short id, void 
  * optionally the user_data pointer from add_event_ex().
  */
 void send_event(unsigned short id, void *data);
+
+/** System events **/
+enum {
+    /* USB_INSERTED
+       data = &usbmode */
+    SYS_EVENT_USB_INSERTED = (EVENT_CLASS_SYSTEM|1),
+    /* USB_EXTRACTED
+       data = NULL */
+    SYS_EVENT_USB_EXTRACTED,
+};
 
 #endif

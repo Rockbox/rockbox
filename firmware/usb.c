@@ -476,7 +476,9 @@ static void NORETURN_ATTR usb_thread(void)
             usb_state = USB_POWERED;
 
             usb_stack_enable(true);
-
+#ifndef BOOTLOADER
+            send_event(SYS_EVENT_USB_INSERTED, &usb_mode);
+#endif
             /* Power (charging-only) button */
 #ifdef HAVE_USB_POWER
             new_usbmode = usb_mode;
@@ -547,7 +549,9 @@ static void NORETURN_ATTR usb_thread(void)
 #ifdef HAVE_USB_POWER
 	    new_usbmode = usb_mode;
 #endif
-
+#ifndef BOOTLOADER
+            send_event(SYS_EVENT_USB_EXTRACTED, NULL);
+#endif
             usb_set_host_present(false);
             break;
             /* USB_EXTRACTED: */

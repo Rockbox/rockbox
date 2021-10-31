@@ -145,10 +145,17 @@ void sim_trigger_screendump(void)
 static bool is_usb_inserted;
 void sim_trigger_usb(bool inserted)
 {
+    int usbmode = 0;
     if (inserted)
+    {
+        send_event(SYS_EVENT_USB_INSERTED, &usbmode);
         queue_post(&sim_queue, SIM_USB_INSERTED, 0);
+    }
     else
+    {
+        send_event(SYS_EVENT_USB_EXTRACTED, NULL);
         queue_post(&sim_queue, SIM_USB_EXTRACTED, 0);
+    }
     is_usb_inserted = inserted;
 }
 
