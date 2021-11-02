@@ -778,6 +778,7 @@ static int treeplaylist_callback(int action,
 
 void onplay_show_playlist_menu(char* path)
 {
+    context = CONTEXT_STD;
     selected_file = path;
     if (dir_exists(path))
         selected_file_attr = ATTR_DIRECTORY;
@@ -825,6 +826,7 @@ MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_CATALOG),
 
 void onplay_show_playlist_cat_menu(char* track_name)
 {
+    context = CONTEXT_STD;
     selected_file = track_name;
     selected_file_attr = FILE_ATTR_AUDIO;
     do_menu(&cat_playlist_menu, NULL, NULL, false);
