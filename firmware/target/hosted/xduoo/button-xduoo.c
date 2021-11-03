@@ -58,13 +58,13 @@ int button_map(int keycode)
 
 #if defined(XDUOO_X3II) && defined(USE_REMOTE) /* Headphone remote */
         case KEY_NEXTSONG:
-            return (BUTTON_NEXT | BUTTON_DELAY_RELEASE);
+            return headphones_inserted()? (BUTTON_NEXT | BUTTON_DELAY_RELEASE) : 0;
 
         case KEY_PLAYPAUSE:
-            return (BUTTON_PLAY | BUTTON_DELAY_RELEASE);
+            return headphones_inserted()? (BUTTON_PLAY | BUTTON_DELAY_RELEASE) : 0;
 
         case KEY_PREVIOUSSONG:
-            return (BUTTON_PREV | BUTTON_DELAY_RELEASE);
+            return headphones_inserted()? (BUTTON_PREV | BUTTON_DELAY_RELEASE) : 0;
 
 #endif
         default:
