@@ -727,7 +727,7 @@ static int load_plugin_screen(char *key)
 
         int ret = plugin_load(path, param);
 
-        if (ret == PLUGIN_USB_CONNECTED)
+        if (ret == PLUGIN_USB_CONNECTED || ret == PLUGIN_ERROR)
             ret_val = GO_TO_ROOT;
         else if (ret == PLUGIN_GOTO_WPS)
             ret_val = GO_TO_WPS;
@@ -735,13 +735,15 @@ static int load_plugin_screen(char *key)
             continue;
         else
         {
-            /* Prevents infinite loop with WPS & Plugins*/
+            /* Prevents infinite loop with WPS, Plugins, Previous Screen*/
             if (ret == PLUGIN_OK && old_global == GO_TO_WPS && !audio_status())
                 ret_val = GO_TO_ROOT;
             ret_val = GO_TO_PREVIOUS;
-            last_screen = (old_previous == next_screen) ? GO_TO_ROOT : old_previous;
+            last_screen = (old_previous == next_screen || old_global == GO_TO_ROOT)
+                ? GO_TO_ROOT : old_previous;
+            if (last_screen == GO_TO_ROOT)
+                global_status.last_screen = GO_TO_ROOT;
         }
-
         /* ret_val != GO_TO_PLUGIN */
 
         if (opret != OPEN_PLUGIN_NEEDS_FLUSHED || last_screen != GO_TO_WPS)
@@ -772,6 +774,29 @@ static int root_menu_setup_screens(void)
     if (global_settings.start_in_screen == 0)
         new_screen = (int)global_status.last_screen;
     else new_screen = global_settings.start_in_screen - 2;
+    if (new_screen == GO_TO_PLUGIN)
+    {
+        if (global_status.last_screen == GO_TO_SHORTCUTMENU)
+        {
+            /* Can make this any value other than GO_TO_SHORTCUTMENU
+               otherwise it takes over on startup when the user wanted
+               the plugin at key - LANG_START_SCREEN */
+            global_status.last_screen = GO_TO_PLUGIN;
+        }
+        if(global_status.last_screen == GO_TO_SHORTCUTMENU ||
+           global_status.last_screen == GO_TO_PLUGIN)
+        {
+            if (global_settings.start_in_screen == 0)
+            {  /* Start in: Previous Screen */
+                last_screen = GO_TO_PREVIOUS;
+                global_status.last_screen = GO_TO_ROOT;
+                /* since the plugin has GO_TO_PLUGIN as origin it
+                   will just return GO_TO_PREVIOUS <=> GO_TO_PLUGIN in a loop
+                   To allow exit after restart we check for GO_TO_ROOT
+                   if so exit to ROOT after the plugin exits */
+            }
+        }
+    }
 #if CONFIG_TUNER
     add_event(PLAYBACK_EVENT_START_PLAYBACK, rootmenu_start_playback_callback);
 #endif
@@ -841,7 +866,7 @@ void root_menu(void)
             case GO_TO_ROOT:
                 if (last_screen != GO_TO_ROOT)
                     selected = get_selection(last_screen);
-
+                global_status.last_screen = GO_TO_ROOT; /* We've returned to ROOT */
                 /* When we are in the main menu we want the hardware BACK
                  * button to be handled by HOST instead of rockbox */
                 ignore_back_button_stub(true);
@@ -889,8 +914,7 @@ void root_menu(void)
             case GO_TO_PLUGIN:
             {
                 char *key;
-                if (global_status.last_screen == GO_TO_SHORTCUTMENU &&
-                    last_screen != GO_TO_ROOT)
+                if (global_status.last_screen == GO_TO_SHORTCUTMENU)
                 {
                     shortcut_origin = last_screen;
                     key = ID2P(LANG_SHORTCUTS);

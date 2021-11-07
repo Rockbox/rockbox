@@ -374,6 +374,15 @@ int open_plugin_run(const char *key)
 void open_plugin_cache_flush(void)
 {
     logf("OP *cache flush*");
+    /* start_in_screen == 0 is 'Previous Screen' it is actually
+     *  defined as (GO_TO_PREVIOUS = -2) + 2 for *Legacy?* reasons AFAICT */
+    if (global_settings.start_in_screen == 0 &&
+        global_status.last_screen == GO_TO_PLUGIN &&
+        open_plugin_entry.lang_id > OPEN_PLUGIN_LANG_INVALID)
+    {
+        /* flush the last item as LANG_PREVIOUS_SCREEN if the user wants to resume */
+        open_plugin_entry.lang_id = LANG_PREVIOUS_SCREEN;
+    }
     op_update_dat(&open_plugin_entry, true);
 }
 
