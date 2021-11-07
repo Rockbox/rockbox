@@ -96,6 +96,29 @@ struct system_status global_status;
 #include "usb-ibasso.h"
 #endif
 
+#ifdef ROCKBOX_NO_TEMP_SETTINGS_FILE /* Overwrites same file each time */
+#define CONFIGFILE_TEMP CONFIGFILE
+#define NVRAM_FILE_TEMP NVRAM_FILE
+#define rename_temp_file(a,b,c)
+#else /* creates temp files on save, renames next load, saves old file if desired */
+#define CONFIGFILE_TEMP CONFIGFILE".new"
+#define NVRAM_FILE_TEMP NVRAM_FILE".new"
+static void rename_temp_file(const char *tempfile,
+                            const char *file,
+                            const char *oldfile)
+{
+    /* if tempfile does not exist -- Return
+     * if oldfile is supplied     -- Rename file to oldfile
+     * if tempfile does exist     -- Rename tempfile to file
+    */
+    if (file_exists(tempfile))
+    {
+        if (oldfile != NULL && file_exists(file))
+            rename(file, oldfile);
+        rename(tempfile, file);
+    }
+}
+#endif
 
 long lasttime = 0;
 
@@ -112,6 +135,7 @@ static char nvram_buffer[NVRAM_BLOCK_SIZE];
 
 static bool read_nvram_data(char* buf, int max_len)
 {
+    rename_temp_file(NVRAM_FILE_TEMP, NVRAM_FILE, NVRAM_FILE".old");
     unsigned crc32 = 0xffffffff;
     int var_count = 0, i = 0, buf_pos = 0;
     int fd = open(NVRAM_FILE, O_RDONLY);
@@ -182,7 +206,7 @@ static bool write_nvram_data(char* buf, int max_len)
     crc32 = crc_32(&buf[NVRAM_DATA_START],
                     max_len-NVRAM_DATA_START-1,0xffffffff);
     memcpy(&buf[4],&crc32,4);
-    fd = open(NVRAM_FILE,O_CREAT|O_TRUNC|O_WRONLY, 0666);
+    fd = open(NVRAM_FILE_TEMP,O_CREAT|O_TRUNC|O_WRONLY, 0666);
     if (fd >= 0)
     {
         int len = write(fd,buf,max_len);
@@ -203,6 +227,7 @@ void settings_load(int which)
         read_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
     if (which&SETTINGS_HD)
     {
+        rename_temp_file(CONFIGFILE_TEMP, CONFIGFILE, CONFIGFILE".old");
         settings_load_config(CONFIGFILE, false);
         settings_load_config(FIXEDSETTINGSFILE, false);
     }
@@ -571,7 +596,7 @@ static void flush_global_status_callback(void)
 static void flush_config_block_callback(void)
 {
     write_nvram_data(nvram_buffer,NVRAM_BLOCK_SIZE);
-    settings_write_config(CONFIGFILE, SETTINGS_SAVE_CHANGED);
+    settings_write_config(CONFIGFILE_TEMP, SETTINGS_SAVE_CHANGED);
 }
 
 void reset_runtime(void) {
@@ -609,6 +634,11 @@ int settings_save(void)
 
 bool settings_save_config(int options)
 {
+    /* if we have outstanding temp files it would be a good idea to flush
+     them before the user starts saving things */
+    rename_temp_file(NVRAM_FILE_TEMP, NVRAM_FILE, NULL); /* dont overwrite .old */
+    rename_temp_file(CONFIGFILE_TEMP, CONFIGFILE, NULL); /* files from last boot */
+
     char filename[MAX_PATH];
     const char *folder, *namebase;
     switch (options)
