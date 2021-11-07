@@ -913,9 +913,12 @@ void root_menu(void)
                 break;
             case GO_TO_PLUGIN:
             {
+
                 char *key;
                 if (global_status.last_screen == GO_TO_SHORTCUTMENU)
                 {
+                    if (open_plugin_entry.lang_id == LANG_OPEN_PLUGIN)
+                        open_plugin_entry.lang_id = LANG_SHORTCUTS;
                     shortcut_origin = last_screen;
                     key = ID2P(LANG_SHORTCUTS);
                 }
