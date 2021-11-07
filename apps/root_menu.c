@@ -715,7 +715,7 @@ static int load_plugin_screen(char *key)
     int old_global = global_status.last_screen;
     last_screen = next_screen;
     global_status.last_screen = (char)next_screen;
-    status_save();
+    /*status_save(); //only needed if we crash */
 
     while(loops-- > 0) /* just to keep things from getting out of hand */
     {
