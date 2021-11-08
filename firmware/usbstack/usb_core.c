@@ -265,9 +265,9 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 
 #ifdef USB_LEGACY_CONTROL_API
 static struct usb_ctrlrequest active_request_buf;
-static struct usb_ctrlrequest* active_request = NULL;
-static void* control_write_data = NULL;
-static bool control_write_data_done = false;
+static struct usb_ctrlrequest* volatile active_request = NULL;
+static void* volatile control_write_data = NULL;
+static volatile bool control_write_data_done = false;
 #endif
 
 static void usb_core_control_request_handler(struct usb_ctrlrequest* req, void* reqdata);
@@ -956,10 +956,12 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
 
 #ifdef USB_LEGACY_CONTROL_API
     if(endpoint == EP_CONTROL) {
-        if(dir == USB_DIR_OUT && active_request && control_write_data_done) {
-            completion_event->data[0] = active_request;
-            if(control_write_data_done && dir == USB_DIR_OUT)
-                completion_event->data[1] = control_write_data;
+        bool cwdd = control_write_data_done;
+        struct usb_ctrlrequest* req = active_request;
+
+        if(dir == USB_DIR_OUT && req && cwdd) {
+            completion_event->data[0] = req;
+            completion_event->data[1] = control_write_data;
         } else {
             return;
         }
@@ -1023,10 +1025,12 @@ void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
 void usb_drv_control_response(enum usb_control_response resp,
                               void* data, int length)
 {
-    if(!active_request)
+    struct usb_ctrlrequest* req = active_request;
+
+    if(!req)
         panicf("null ctrl req");
 
-    if(active_request->wLength == 0)
+    if(req->wLength == 0)
     {
         active_request = NULL;
 
@@ -1038,7 +1042,7 @@ void usb_drv_control_response(enum usb_control_response resp,
         else
             panicf("RECEIVE on non-data req");
     }
-    else if(active_request->bRequestType & USB_DIR_IN)
+    else if(req->bRequestType & USB_DIR_IN)
     {
         /* Control read request */
         if(resp == USB_CONTROL_ACK)
