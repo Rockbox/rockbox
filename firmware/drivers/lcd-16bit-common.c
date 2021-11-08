@@ -316,6 +316,18 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     x += lcd_current_viewport->x;
     y += lcd_current_viewport->y;
 
+    /* 'Bugfix' mono_bitmap_part reads ahead in the buffer, While this is a bug
+     * if the height is <= char bit pixels other memory gets read but is not used
+     * the other option is to check in the hot code path but this appears
+     * sufficient, limit to the sim to stop Address Sanitizer errors
+     */
+#if defined(SIMULATOR) && \
+    (!defined(LCD_STRIDEFORMAT) || LCD_STRIDEFORMAT != VERTICAL_STRIDE)
+    /* vertical stride targets don't seem affected by this */
+    if (height <= CHAR_BIT)
+        stride = 0;
+#endif
+
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
     /* nothing to draw? */
@@ -330,14 +342,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         src_x -= x;
         x = 0;
     }
-
-    /* 'Bugfix' mono_bitmap_part reads ahead in the buffer,
-     * if the height is <= char bit pixels other memory gets read
-     * the other option is to check in the hot code path but this appears
-     * sufficient
-     */
-    if (height <= CHAR_BIT)
-        stride = 0;
 
     if (y < 0)
     {
