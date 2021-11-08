@@ -451,6 +451,7 @@ static struct configdata config[] =
     { TYPE_INT, 0, 999999, { .int_p = &pf_cfg.last_album }, "last album", NULL },
     { TYPE_INT, 0, 1, { .int_p = &pf_cfg.backlight_mode }, "backlight", NULL },
     { TYPE_INT, 0, 999999, { .int_p = &aa_cache.idx }, "art cache pos", NULL },
+    { TYPE_INT, 0, 999999, { .int_p = &aa_cache.inspected }, "art cache inspected", NULL }
 };
 
 #define CONFIG_NUM_ITEMS (sizeof(config) / sizeof(struct configdata))
@@ -2002,6 +2003,7 @@ static bool create_albumart_cache(void)
 {
     draw_splashscreen(pf_idx.buf, pf_idx.buf_sz);
     draw_progressbar(0, pf_idx.album_ct, "Preparing artwork");
+    aa_cache.inspected = 0;
     for (int i=0; i < pf_idx.album_ct; i++)
     {
         incremental_albumart_cache(true);
