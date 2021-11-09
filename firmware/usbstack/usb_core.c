@@ -729,6 +729,8 @@ static void usb_core_do_clear_feature(int recip, int recip_nr, int feature)
 
 static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
 {
+    unsigned address;
+
     switch(req->bRequest) {
         case USB_REQ_GET_CONFIGURATION:
             logf("usb_core: GET_CONFIG");
@@ -744,10 +746,11 @@ static void request_handler_device(struct usb_ctrlrequest* req, void* reqdata)
             /* NOTE: We really have no business handling this and drivers
              * should just handle it themselves. We don't care beyond
              * knowing if we've been assigned an address yet, or not. */
+            address = req->wValue;
             usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
             usb_drv_cancel_all_transfers();
-            usb_drv_set_address(req->wValue);
-            usb_core_do_set_addr(req->wValue);
+            usb_drv_set_address(address);
+            usb_core_do_set_addr(address);
             break;
         case USB_REQ_GET_DESCRIPTOR:
             logf("usb_core: GET_DESC %d", req->wValue >> 8);
