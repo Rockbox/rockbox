@@ -366,7 +366,7 @@ bool dbg_hw_info(void)
                                                     calc_freq(CLK_IDE)/D_MHZ);
         lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "DBOP", AS3525_DBOP_FREQ/D_MHZ,
                                                    calc_freq(CLK_DBOP)/D_MHZ);
-        lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "I2C ", AS3525_I2C_FREQ/D_KHZ,
+        lcd_putsf(x, line++, "%s:%3dkHz    %3dkHz", "I2C ", AS3525_I2C_FREQ/D_KHZ,
                                                        calc_freq(CLK_I2C)/D_KHZ);
         lcd_putsf(x, line++, "I2SI: %s      %3dMHz", (CGU_AUDIO & (1<<23)) ?
                                    "on " : "off" , calc_freq(CLK_I2SI)/D_MHZ);
@@ -395,7 +395,7 @@ bool dbg_hw_info(void)
             lcd_putsf(x, line++, "%s:%3dMHz    %3dMHz", "SSP ", AS3525_SSP_FREQ/D_MHZ,
                                                     calc_freq(CLK_SSP)/D_MHZ);
         else
-            lcd_putsf(x, line++, "SSP :%3dMHz    %3dKHz", AS3525_SSP_FREQ/D_MHZ,
+            lcd_putsf(x, line++, "SSP :%3dMHz    %3dkHz", AS3525_SSP_FREQ/D_MHZ,
                                                     calc_freq(CLK_SSP)/D_KHZ);
 #endif  /* CONFIG_CPU == AS3525 */
         lcd_putsf(x, line++, "USB :          %3dMHz", calc_freq(CLK_USB)/D_MHZ);
