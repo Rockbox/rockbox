@@ -236,6 +236,19 @@ static void shortcuts_ata_idle_callback(void)
         write(fd, buf, len);
         if (sc->type == SHORTCUT_SETTING)
             write(fd, sc->u.setting->cfg_name, strlen(sc->u.setting->cfg_name));
+        else if (sc->type == SHORTCUT_TIME)
+        {
+#if CONFIG_RTC
+            if (sc->u.timedata.talktime)
+                write(fd, "talk", 4);
+            else
+#endif
+            {
+                write(fd, "sleep ", 6);
+                len = snprintf(buf, MAX_PATH, "%d", sc->u.timedata.sleep_timeout);
+                write(fd, buf, len);
+            }
+        }
         else
             write(fd, sc->u.path, strlen(sc->u.path));
 
@@ -599,6 +612,7 @@ int do_shortcut_menu(void *ignored)
 
     while (done == GO_TO_PREVIOUS)
     {
+        list.count = shortcut_count;
         if (simplelist_show_list(&list))
             break; /* some error happened?! */
         if (list.selection == -1)
