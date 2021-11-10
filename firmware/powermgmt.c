@@ -693,10 +693,18 @@ static void power_thread(void)
     /* Delay reading the first battery level */
 #ifdef MROBE_100
     while (_battery_voltage() > 4200) /* gives false readings initially */
+    {
 #elif defined(DX50) || defined(DX90)
     while (_battery_voltage() < 1) /* can give false readings initially */
-#endif
     {
+#elif defined(EROS_QN) || defined(FIIO_M3K) || defined(SHANLING_Q1)
+
+    /* wait until the first battery read is ready */
+    while (_battery_voltage() <= 0)
+    {
+#else
+    {
+#endif
         sleep(HZ/100);
     }
 
