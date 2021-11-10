@@ -79,9 +79,8 @@ void power_init(void)
     axp_set_charge_current(780);
 
     /* Delay to give power outputs time to stabilize.
-     * From testing, 170 is the minimum. Make it
-     * 190 for safety. */
-    mdelay(190);
+     * Had one report that 190 was not long enough, let's do 250. */
+    mdelay(250);
 }
 
 #ifdef HAVE_USB_CHARGING_ENABLE
