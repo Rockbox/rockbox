@@ -48,7 +48,6 @@
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
 #endif
-#include "folder_select.h"
 #ifndef HAS_BUTTON_HOLD
 #include "mask_select.h"
 #endif
@@ -56,6 +55,7 @@
 #include "governor-ibasso.h"
 #include "usb-ibasso.h"
 #endif
+#include "plugin.h"
 
 #ifndef HAS_BUTTON_HOLD
 static int selectivesoftlock_callback(int action,
@@ -133,8 +133,7 @@ static void tagcache_update_with_splash(void)
 
 static int dirs_to_scan(void)
 {
-    if (folder_select(global_settings.tagcache_scan_paths,
-                          sizeof(global_settings.tagcache_scan_paths)))
+    if(plugin_load(VIEWERS_DIR"/db_folder_select.rock", NULL) > PLUGIN_OK)
     {
         static const char *lines[] = {ID2P(LANG_TAGCACHE_BUSY),
                                       ID2P(LANG_TAGCACHE_FORCE_UPDATE)};
@@ -650,8 +649,8 @@ static int autoresume_nexttrack_callback(int action,
             break;
         case ACTION_EXIT_MENUITEM:
             if (global_settings.autoresume_automatic == AUTORESUME_NEXTTRACK_CUSTOM
-                && !folder_select(global_settings.autoresume_paths,
-                              MAX_PATHNAME+1))
+                && plugin_load(VIEWERS_DIR"/db_folder_select.rock",
+                               str(LANG_AUTORESUME)) == PLUGIN_OK)
             {
                 global_settings.autoresume_automatic = oldval;
             }

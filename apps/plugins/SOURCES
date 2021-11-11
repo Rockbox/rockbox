@@ -2,6 +2,9 @@
 #if !defined(SIMULATOR) && (CONFIG_BATTERY_MEASURE != 0)
 battery_bench.c
 #endif
+#ifdef HAVE_TAGCACHE
+db_folder_select.c
+#endif
 chessclock.c
 credits.c
 cube.c

@@ -346,6 +346,7 @@ static const struct plugin_api rockbox_api = {
     gui_syncyesno_run,
     simplelist_info_init,
     simplelist_show_list,
+    yesno_pop,
 
     /* action handling */
     get_custom_action,

@@ -393,6 +393,7 @@ struct plugin_api {
     void (*simplelist_info_init)(struct simplelist_info *info, char* title,
                                  int count, void* data);
     bool (*simplelist_show_list)(struct simplelist_info *info);
+    bool (*yesno_pop)(const char* text);
 
     /* action handling */
     int (*get_custom_action)(int context,int timeout,
