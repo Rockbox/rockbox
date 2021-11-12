@@ -61,9 +61,11 @@ int key_to_button(int keyboard_button)
             new_btn = BUTTON_MENU;
             break;
         case SDL_BUTTON_WHEELUP:
+        case SDLK_PAGEUP:
             new_btn = BUTTON_SCROLL_BACK;
             break;
         case SDL_BUTTON_WHEELDOWN:
+        case SDLK_PAGEDOWN:
             new_btn = BUTTON_SCROLL_FWD;
             break;
         case SDLK_BACKSPACE:
