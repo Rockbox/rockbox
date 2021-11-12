@@ -248,20 +248,21 @@ static void talk_qs_option(const struct settings_list *opt, bool enqueue)
 static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 {
     int item;
-    bool invert = false;
+    bool previous = false;
     switch(button)
     {
         case ACTION_QS_TOP:
-            invert = true;
             item = QUICKSCREEN_TOP;
             break;
+
         case ACTION_QS_LEFT:
-            invert = true;
             item = QUICKSCREEN_LEFT;
+            previous = true;
             break;
 
         case ACTION_QS_DOWN:
             item = QUICKSCREEN_BOTTOM;
+            previous = true;
             break;
 
         case ACTION_QS_RIGHT:
@@ -271,16 +272,11 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
         default:
             return false;
     }
+
     if (qs->items[item] == NULL)
         return false;
-#ifdef ASCENDING_INT_SETTINGS
-    if (((qs->items[item]->flags & F_INT_SETTING) == F_INT_SETTING) &&
-        ( button == ACTION_QS_DOWN || button == ACTION_QS_TOP))
-    {
-        invert = !invert;
-    }
-#endif
-    option_select_next_val(qs->items[item], invert, true);
+
+    option_select_next_val(qs->items[item], previous, true);
     talk_qs_option(qs->items[item], false);
     return true;
 }
