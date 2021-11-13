@@ -101,8 +101,35 @@ else
     PLUGINLIBFLAGS = $(PLUGINFLAGS) -ffunction-sections -fdata-sections
 endif
 
+ROOT_PLUGINSLIB_DIR := $(ROOTDIR)/apps/plugins/lib
+BUILD_PLUGINSLIB_DIR := $(BUILDDIR)/apps/plugins/lib
+
+# action_helper #
+ACTION_REQ := $(addprefix $(ROOT_PLUGINSLIB_DIR)/,action_helper.pl action_helper.h) \
+				$(BUILD_PLUGINSLIB_DIR)/pluginlib_actions.o
+
+# special rule for generating and compiling action_helper
+$(BUILD_PLUGINSLIB_DIR)/action_helper.o: $(ACTION_REQ)
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -E -P \
+		$(ROOT_PLUGINSLIB_DIR)/pluginlib_actions.h - < /dev/null | $< > $(basename $@).c
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(ROOT_PLUGINSLIB_DIR) \
+		$(PLUGINLIBFLAGS) -c $(basename $@).c -o $@
+
+# button_helper #
+BUTTON_REQ := $(addprefix $(ROOT_PLUGINSLIB_DIR)/,button_helper.pl button_helper.h) \
+				$(BUILD_PLUGINSLIB_DIR)/action_helper.o
+
+# special rule for generating and compiling button_helper
+$(BUILD_PLUGINSLIB_DIR)/button_helper.o: $(BUTTON_REQ) $(ROOTDIR)/firmware/export/button.h
+	$(SILENT)mkdir -p $(dir $@)
+	$(call PRINTS,GEN $(@F))$(CC) $(PLUGINFLAGS) $(INCLUDES) -dM -E -P \
+		$(addprefix -include ,button-target.h button.h) - < /dev/null | $< > $(basename $@).c
+	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(ROOT_PLUGINSLIB_DIR) \
+		$(PLUGINLIBFLAGS) -c $(basename $@).c -o $@
+
 # special pattern rule for compiling plugin lib (with function and data sections)
-$(BUILDDIR)/apps/plugins/lib/%.o: $(ROOTDIR)/apps/plugins/lib/%.c
+$(BUILD_PLUGINSLIB_DIR)/%.o: $(ROOT_PLUGINSLIB_DIR)/%.c
 	$(SILENT)mkdir -p $(dir $@)
 	$(call PRINTS,CC $(subst $(ROOTDIR)/,,$<))$(CC) -I$(dir $<) $(PLUGINLIBFLAGS) -c $< -o $@
 

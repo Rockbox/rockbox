@@ -17,6 +17,7 @@ mosaique.c
 main_menu_config.c
 properties.c
 random_folder_advance_config.c
+rb_info.c
 rockblox.c
 search.c
 settings_dumper.c

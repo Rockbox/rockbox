@@ -1,6 +1,8 @@
 sha1.c
 gcc-support.c
 pluginlib_actions.c
+action_helper.c
+button_helper.c
 helper.c
 icon_helper.c
 arg_helper.c
