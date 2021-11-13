@@ -950,12 +950,8 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
     struct usb_transfer_completion_event_data* completion_event =
         &ep_data[endpoint].completion_event[EP_DIR(dir)];
 
-    completion_event->endpoint = endpoint;
-    completion_event->dir = dir;
-    completion_event->data[0] = NULL;
-    completion_event->data[1] = NULL;
-    completion_event->status = status;
-    completion_event->length = length;
+    void* data0 = NULL;
+    void* data1 = NULL;
 
 #ifdef USB_LEGACY_CONTROL_API
     if(endpoint == EP_CONTROL) {
@@ -963,13 +959,20 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
         struct usb_ctrlrequest* req = active_request;
 
         if(dir == USB_DIR_OUT && req && cwdd) {
-            completion_event->data[0] = req;
-            completion_event->data[1] = control_write_data;
+            data0 = req;
+            data1 = control_write_data;
         } else {
             return;
         }
     }
 #endif
+
+    completion_event->endpoint = endpoint;
+    completion_event->dir = dir;
+    completion_event->data[0] = data0;
+    completion_event->data[1] = data1;
+    completion_event->status = status;
+    completion_event->length = length;
 
     usb_signal_transfer_completion(completion_event);
 }
