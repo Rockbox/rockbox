@@ -191,6 +191,8 @@ void announce(void)
     rb->talk_force_shutup();
     rb->sleep(HZ / 2);
     voice_general_info(false);
+    if (rb->talk_id(VOICE_PAUSE, true) < 0)
+        rb->beep_play(800, 100, 1000);
     //rb->talk_force_enqueue_next();
 }
 
@@ -412,6 +414,7 @@ static int settings_menu(void)
 /****************** main thread + helper ******************/
 void thread(void)
 {
+    bool in_usb = false;
     long interval;
     long last_tick = *rb->current_tick; /* for 1 sec tick */
 
@@ -424,6 +427,14 @@ void thread(void)
         {
             case SYS_USB_CONNECTED:
                 rb->usb_acknowledge(SYS_USB_CONNECTED_ACK);
+                in_usb = true;
+                break;
+            case SYS_USB_DISCONNECTED:
+                in_usb = false;
+                /*fall through*/
+            case EV_STARTUP:
+                rb->beep_play(1500, 100, 1000);
+                break;
             case EV_EXIT:
                 return;
             case EV_OTHINSTANCE:
@@ -431,15 +442,12 @@ void thread(void)
                 {
                     last_tick += interval;
                     rb->sleep(HZ / 10);
-                    announce();
+                    if (!in_usb) announce();
                 }
-                break;
-            case EV_STARTUP:
-                rb->beep_play(1500, 100, 1000);
                 break;
             case EV_TRACKCHANGE:
                 rb->sleep(HZ / 10);
-                announce();
+                if (!in_usb) announce();
                 break;
         }
     }
@@ -464,6 +472,7 @@ void thread_quit(void)
         rb->thread_wait(gThread.id);
         /* we don't want any more events */
         rb->remove_event(PLAYBACK_EVENT_TRACK_CHANGE, playback_event_callback);
+
         /* remove the thread's queue from the broadcast list */
         rb->queue_delete(&gThread.queue);
         gThread.exiting = true;
@@ -560,6 +569,8 @@ int plugin_main(const void* parameter)
 enum plugin_status plugin_start(const void* parameter)
 {
     /* now go ahead and have fun! */
+    if (rb->usb_inserted() == true)
+        return PLUGIN_USB_CONNECTED;
     int ret = plugin_main(parameter);
     return (ret==0) ? PLUGIN_OK : PLUGIN_ERROR;
 }
