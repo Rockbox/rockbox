@@ -264,7 +264,6 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 };
 
 #ifdef USB_LEGACY_CONTROL_API
-static struct usb_ctrlrequest active_request_buf;
 static struct usb_ctrlrequest* volatile active_request = NULL;
 static void* volatile control_write_data = NULL;
 static volatile bool control_write_data_done = false;
@@ -1020,8 +1019,7 @@ void usb_core_control_complete(int status)
 /* Only needed if the driver does not support the new API yet */
 void usb_core_legacy_control_request(struct usb_ctrlrequest* req)
 {
-    memcpy(&active_request_buf, req, sizeof(*req));
-    active_request = &active_request_buf;
+    active_request = req;
     control_write_data = NULL;
     control_write_data_done = false;
 
