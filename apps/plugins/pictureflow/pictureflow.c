@@ -495,6 +495,15 @@ static struct pf_track_t pf_tracks;
 void reset_track_list(void);
 
 static bool thread_is_running;
+static bool wants_to_quit = false;
+
+/*
+    Prevent picture loading thread from allocating
+    buflib memory while the main thread may be
+    performing buffer-shifting operations.
+*/
+static struct mutex buf_ctx_mutex;
+static bool buf_ctx_locked = false;
 
 static int cover_animation_keyframe;
 static int extra_fade;
@@ -536,6 +545,18 @@ int load_surface(int);
 static void draw_progressbar(int step, int count, char *msg);
 static void draw_splashscreen(unsigned char * buf_tmp, size_t buf_tmp_size);
 static void free_all_slide_prio(int prio);
+
+static inline void buf_ctx_lock(void)
+{
+    rb->mutex_lock(&buf_ctx_mutex);
+    buf_ctx_locked = true;
+}
+
+static inline void buf_ctx_unlock(void)
+{
+    rb->mutex_unlock(&buf_ctx_mutex);
+    buf_ctx_locked = false;
+}
 
 static bool check_database(bool prompt)
 {
@@ -1590,6 +1611,7 @@ static int compare_tracks (const void *a_v, const void *b_v)
  */
 static void create_track_index(const int slide_index)
 {
+    buf_ctx_lock();
     char temp[MAX_PATH + 1];
     if ( slide_index == pf_tracks.cur_idx )
         return;
@@ -1733,6 +1755,18 @@ fail:
     rb->tagcache_search_finish(&tcs);
     pf_tracks.count = 0;
     return;
+}
+
+/**
+  Re-grow the buflib buffer by returning space borrowed
+  for track list
+*/
+static inline void free_borrowed_tracks(void)
+{
+    rb->buflib_buffer_in(&buf_ctx, pf_tracks.borrowed);
+    pf_tracks.borrowed = 0;
+    pf_tracks.cur_idx = -1;
+    buf_ctx_unlock();
 }
 
 /**
@@ -2371,6 +2405,10 @@ static inline bool load_and_prepare_surface(const int slide_index,
 */
 bool load_new_slide(void)
 {
+    buf_ctx_lock();
+    if (wants_to_quit)
+        return false;
+
     int i = -1;
 
     if (pf_sldcache.center_idx != -1)
@@ -2417,6 +2455,7 @@ bool load_new_slide(void)
                 pf_sldcache.center_idx = i;
                 pf_sldcache.left_idx = i;
                 pf_sldcache.right_idx = i;
+                buf_ctx_unlock();
                 return true;
             }
         }
@@ -2447,25 +2486,33 @@ bool load_new_slide(void)
         if ((prio_l < prio_r || right >= number_of_slides) && left > 0)
         {
             if (pf_sldcache.free == -1 && !free_slide_prio(prio_l))
+            {
+                buf_ctx_unlock();
                 return false;
+            }
 
             i = lla_pop_head(&pf_sldcache.free);
             if (load_and_prepare_surface(left - 1, i, prio_l))
             {
                 lla_insert_before(&pf_sldcache.used, i, pf_sldcache.left_idx);
                 pf_sldcache.left_idx = i;
+                buf_ctx_unlock();
                 return true;
             }
         } else if(right < number_of_slides - 1)
         {
             if (pf_sldcache.free == -1 && !free_slide_prio(prio_r))
+            {
+                buf_ctx_unlock();
                 return false;
+            }
 
             i = lla_pop_head(&pf_sldcache.free);
             if (load_and_prepare_surface(right + 1, i, prio_r))
             {
                 lla_insert_after(i, pf_sldcache.right_idx);
                 pf_sldcache.right_idx = i;
+                buf_ctx_unlock();
                 return true;
             }
         }
@@ -2480,6 +2527,7 @@ insert_first_slide:
             pf_sldcache.left_idx = i;
             pf_sldcache.right_idx = i;
             pf_sldcache.used = i;
+            buf_ctx_unlock();
             return true;
         }
     }
@@ -2488,6 +2536,7 @@ fail_and_refree:
     {
         lla_insert_tail(&pf_sldcache.free, i);
     }
+    buf_ctx_unlock();
     return false;
 }
 
@@ -3004,6 +3053,10 @@ static void update_scroll_animation(void)
 */
 static void cleanup(void)
 {
+    wants_to_quit = true;
+    if (buf_ctx_locked)
+        buf_ctx_unlock();
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -3552,6 +3605,8 @@ static int pictureflow_main(void)
 #endif
     }
 
+    rb->mutex_init(&buf_ctx_mutex);
+
     init_scroll_lines();
     init_reflect_table();
 
@@ -3759,10 +3814,8 @@ static int pictureflow_main(void)
         case PF_BACK:
             if ( pf_state == pf_show_tracks )
             {
-                rb->buflib_buffer_in(&buf_ctx, pf_tracks.borrowed);
-                pf_tracks.borrowed = 0;
-                pf_tracks.cur_idx = -1;
                 pf_state = pf_cover_out;
+                free_borrowed_tracks();
             }
             if (pf_state == pf_idle || pf_state == pf_scrolling)
                 return PLUGIN_OK;
@@ -3803,6 +3856,7 @@ static int pictureflow_main(void)
                     create_track_index(center_slide.slide_index);
                     reset_track_list();
                     start_playback(true);
+                    free_borrowed_tracks();
                     rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
                 }
                 else if( pf_state == pf_show_tracks ) {
