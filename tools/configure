@@ -4054,7 +4054,7 @@ fi
     appextra="recorder:gui"
     plugins="yes"
     tool="$rootdir/tools/scramble -add=fiiom3k "
-    boottool="" # not used
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
     output="rockbox.m3k"
     bootoutput="bootloader.m3k"
     sysfontbl="16-Terminus"
@@ -4078,7 +4078,7 @@ fi
     appextra="recorder:gui"
     plugins="yes"
     tool="$rootdir/tools/scramble -add=shq1 "
-    boottool="" # not used
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
     output="rockbox.q1"
     bootoutput="bootloader.q1"
     sysfontbl="16-Terminus"
@@ -4102,7 +4102,7 @@ fi
     appextra="recorder:gui"
     plugins="yes"
     tool="$rootdir/tools/scramble -add=erosqnative "
-    boottool="" # not used
+    boottool="$rootdir/tools/mkspl-x1000 -type=nand -ppb=2 -bpp=2 "
     output="rockbox.erosq"
     bootoutput="bootloader.erosq"
     sysfontbl="16-Terminus"
