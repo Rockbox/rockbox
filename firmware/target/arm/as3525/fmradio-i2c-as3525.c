@@ -185,6 +185,11 @@ int fmradio_i2c_read(unsigned char address, unsigned char* buf, int count)
 }
 
 #ifdef HAVE_RDS_CAP
+/* On the Sansa Clip Zip, the tuner interrupt line is routed to the SoC so we
+ * can use to detect when a RDS packet is ready. On the Clip+, we have to
+ * regularly poll. */
+
+#if !(CONFIG_RDS & RDS_CFG_POLL)
 /* Low-level RDS Support */
 static struct semaphore rds_sema;
 static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
@@ -231,4 +236,5 @@ void si4700_rds_init(void)
     create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
                   IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }
+#endif /* !(CONFIG_RDS & RDS_CFG_POLL) */
 #endif /* HAVE_RDS_CAP */

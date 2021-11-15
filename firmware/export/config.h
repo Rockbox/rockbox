@@ -718,6 +718,7 @@ Lyre prototype 1 */
 #define RDS_CFG_ISR     0x1 /* uses ISR to process packets */
 #define RDS_CFG_PROCESS 0x2 /* uses raw packet processing */
 #define RDS_CFG_PUSH    0x4 /* pushes processed information */
+#define RDS_CFG_POLL    0x8 /* tuner driver provides a polling function */
 #ifndef CONFIG_RDS
 #define CONFIG_RDS  RDS_CFG_PROCESS /* thread processing+raw processing */
 #endif /* CONFIG_RDS */
