@@ -3295,6 +3295,47 @@ static void update_cover_out_animation(void)
 }
 
 /**
+   Skip steps for zooming into the current cover
+*/
+static void interrupt_cover_in_animation(void)
+{
+    pf_state = pf_show_tracks;
+    cover_animation_keyframe = 0;
+    extra_fade = 13 * 19;
+    center_slide.distance = -5 * 19;
+    center_slide.angle = 19 + (15 * 16);
+}
+
+/**
+   Skip steps for zooming out the current cover
+*/
+static void interrupt_cover_out_animation(void)
+{
+    pf_state = pf_idle;
+    cover_animation_keyframe = 0;
+    extra_fade = 0;
+    set_current_slide(center_index);
+}
+
+/**
+  Stop zooming out the current cover and start zooming in
+*/
+static void revert_cover_out_animation(void)
+{
+    pf_state = pf_cover_in;
+    cover_animation_keyframe = 34 - cover_animation_keyframe;
+}
+
+/**
+  Stop zooming into the current cover and start zooming out
+*/
+static void revert_cover_in_animation(void)
+{
+    pf_state = pf_cover_out;
+    cover_animation_keyframe = 34 - cover_animation_keyframe;
+}
+
+/**
    Draw a blue gradient at y with height h
  */
 static inline void draw_gradient(int y, int h)
@@ -3817,7 +3858,11 @@ static int pictureflow_main(void)
                 pf_state = pf_cover_out;
                 free_borrowed_tracks();
             }
-            if (pf_state == pf_idle || pf_state == pf_scrolling)
+            else if (pf_state == pf_cover_in)
+                revert_cover_in_animation();
+            else if (pf_state == pf_cover_out)
+                interrupt_cover_out_animation();
+            else if (pf_state == pf_idle || pf_state == pf_scrolling)
                 return PLUGIN_OK;
             break;
         case PF_MENU:
@@ -3838,6 +3883,11 @@ static int pictureflow_main(void)
         case PF_NEXT_REPEAT:
             if ( pf_state == pf_show_tracks )
                 select_next_track();
+            else if (pf_state == pf_cover_in)
+                interrupt_cover_in_animation();
+            else if (pf_state == pf_cover_out)
+                interrupt_cover_out_animation();
+
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_next_slide();
             break;
@@ -3846,13 +3896,27 @@ static int pictureflow_main(void)
         case PF_PREV_REPEAT:
             if ( pf_state == pf_show_tracks )
                 select_prev_track();
+            else if (pf_state == pf_cover_in)
+                interrupt_cover_in_animation();
+            else if (pf_state == pf_cover_out)
+                interrupt_cover_out_animation();
+
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_previous_slide();
             break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
-            if ( pf_cfg.auto_wps != 0  &&
-                (pf_state == pf_idle || pf_state == pf_show_tracks)) {
+            if (pf_cfg.auto_wps != 0  &&
+                (pf_state == pf_idle || pf_state == pf_scrolling ||
+                 pf_state == pf_show_tracks || pf_state == pf_cover_out)) {
+
+                if ( pf_state == pf_scrolling)
+                {
+                    set_current_slide(target);
+                    pf_state = pf_idle;
+                } else if (pf_state == pf_cover_out)
+                    interrupt_cover_out_animation();
+
                 if( pf_state == pf_idle ) {
                     create_track_index(center_slide.slide_index);
                     reset_track_list();
@@ -3887,7 +3951,9 @@ static int pictureflow_main(void)
                 break;
             }
         case PF_SELECT:
-            if ( pf_state == pf_idle ) {
+            if ( pf_state == pf_idle || pf_state == pf_scrolling) {
+                if (pf_state == pf_scrolling)
+                    set_current_slide(target);
 #if PF_PLAYBACK_CAPABLE
                 if(pf_cfg.auto_wps == 1) {
                     create_track_index(center_slide.slide_index);
@@ -3900,6 +3966,10 @@ static int pictureflow_main(void)
 #endif
                     pf_state = pf_cover_in;
             }
+            else if (pf_state == pf_cover_out)
+                revert_cover_out_animation();
+            else if (pf_state == pf_cover_in)
+                interrupt_cover_in_animation();
             else if ( pf_state == pf_show_tracks ) {
 #if PF_PLAYBACK_CAPABLE
                 start_playback(false);
