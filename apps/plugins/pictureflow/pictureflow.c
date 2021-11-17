@@ -3851,20 +3851,33 @@ static int pictureflow_main(void)
             break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
-            if ( pf_cfg.auto_wps != 0 ) {
+            if ( pf_cfg.auto_wps != 0  &&
+                (pf_state == pf_idle || pf_state == pf_show_tracks)) {
                 if( pf_state == pf_idle ) {
                     create_track_index(center_slide.slide_index);
                     reset_track_list();
                     start_playback(true);
                     free_borrowed_tracks();
-                    rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
                 }
-                else if( pf_state == pf_show_tracks ) {
+                else
+                {
                     rb->playlist_insert_track(NULL, get_track_filename(pf_tracks.sel),
                                                     PLAYLIST_INSERT_LAST, false, true);
                     rb->playlist_sync(NULL);
-                    rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
                 }
+#ifdef USEGSLIB
+                /*
+                calling splash() without switching off the grayscale overlay
+                beforehand, will lead to image corruption and a crash
+                in testing on device (iPod 4G,iPod mini)
+                */
+                grey_show(false);
+                rb->lcd_clear_display();
+#endif
+                rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
+#ifdef USEGSLIB
+                grey_show(true);
+#endif
             }
             break;
 #endif
