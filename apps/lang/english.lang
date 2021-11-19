@@ -16187,3 +16187,45 @@
     *: "Descending"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Album Art"
+  </dest>
+  <voice>
+    *: "Album Art"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Prefer Embedded"
+  </dest>
+  <voice>
+    *: "Prefer Embedded"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Prefer Image File"
+  </dest>
+  <voice>
+    *: "Prefer Image File"
+  </voice>
+</phrase>

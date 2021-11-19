@@ -172,6 +172,8 @@ static struct mutex id3_mutex SHAREDBSS_ATTR; /* (A,O)*/
 #define MAX_MULTIPLE_AA SKINNABLE_SCREENS_COUNT
 #ifdef HAVE_ALBUMART
 
+static int albumart_mode = -1;
+
 static struct albumart_slot
 {
     struct dim dim;     /* Holds width, height of the albumart */
@@ -1690,6 +1692,15 @@ static bool audio_load_cuesheet(struct track_info *infop,
 }
 
 #ifdef HAVE_ALBUMART
+
+void set_albumart_mode(int setting)
+{
+    if (albumart_mode != -1 &&
+        albumart_mode != setting)
+        playback_update_aa_dims();
+    albumart_mode = setting;
+}
+
 /* Load any album art for the file - returns false if the buffer is full */
 static int audio_load_albumart(struct track_info *infop,
                                 struct mp3entry *track_id3)
@@ -1709,18 +1720,28 @@ static int audio_load_albumart(struct track_info *infop,
         memset(&user_data, 0, sizeof(user_data));
         user_data.dim = &albumart_slots[i].dim;
 
+        char path[MAX_PATH];
+        if(global_settings.album_art == AA_PREFER_IMAGE_FILE &&
+           find_albumart(track_id3, path, sizeof(path),
+                          &albumart_slots[i].dim))
+        {
+                user_data.embedded_albumart = NULL;
+                hid = bufopen(path, 0, TYPE_BITMAP, &user_data);
+        }
+
         /* We can only decode jpeg for embedded AA */
-        if (track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
+        if (global_settings.album_art != AA_OFF &&
+            hid < 0 && hid != ERR_BUFFER_FULL &&
+            track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
         {
             user_data.embedded_albumart = &track_id3->albumart;
             hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);
         }
 
-        if (hid < 0 && hid != ERR_BUFFER_FULL)
+        if (global_settings.album_art != AA_OFF &&
+            hid < 0 && hid != ERR_BUFFER_FULL)
         {
             /* No embedded AA or it couldn't be loaded - try other sources */
-            char path[MAX_PATH];
-
             if (find_albumart(track_id3, path, sizeof(path),
                               &albumart_slots[i].dim))
             {

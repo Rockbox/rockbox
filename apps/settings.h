@@ -127,6 +127,15 @@ enum
     QUEUE_SHOW_IN_SUBMENU
 };
 
+#ifdef HAVE_ALBUMART
+enum
+{
+    AA_OFF = 0,
+    AA_PREFER_EMBEDDED,
+    AA_PREFER_IMAGE_FILE
+};
+#endif
+
 /* dir filter options */
 /* Note: Any new filter modes need to be added before NUM_FILTER_MODES.
  *       Any new rockbox browse filter modes (accessible through the menu)
@@ -598,7 +607,10 @@ struct user_settings
     bool warnon_erase_dynplaylist; /* warn when erasing dynamic playlist */
     bool show_shuffled_adding_options; /* whether to display options for adding shuffled tracks to dynamic playlist */
     int show_queue_options; /* how and whether to display options to queue tracks */
-
+#ifdef HAVE_ALBUMART
+    int album_art; /* switch off album art display or choose preferred source */
+#endif
+    
     /* playlist viewer settings */
     bool playlist_viewer_icons; /* display icons on viewer */
     bool playlist_viewer_indices; /* display playlist indices on viewer */

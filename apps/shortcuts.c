@@ -47,7 +47,9 @@
 #include "screens.h"
 #include "talk.h"
 #include "yesno.h"
-
+#ifdef HAVE_ALBUMART
+#include "playback.h"
+#endif
 
 #define MAX_SHORTCUT_NAME 32
 #define SHORTCUTS_FILENAME ROCKBOX_DIR "/shortcuts.txt"
@@ -661,9 +663,16 @@ int do_shortcut_menu(void *ignored)
                 case SHORTCUT_SETTING:
                 {
                     int old_sleeptimer_duration = global_settings.sleeptimer_duration;
+#ifdef HAVE_ALBUMART
+                    int old_album_art = global_settings.album_art;
+#endif
                     do_setting_screen(sc->u.setting,
                             sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id)),NULL);
 
+#ifdef HAVE_ALBUMART
+                    if (old_album_art != global_settings.album_art)
+                        set_albumart_mode(global_settings.album_art);
+#endif
                     if (old_sleeptimer_duration != global_settings.sleeptimer_duration &&
                         get_sleep_timer())
                         set_sleeptimer_duration(global_settings.sleeptimer_duration);

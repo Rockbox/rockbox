@@ -85,6 +85,9 @@ void audio_set_crossfade(int enable);
 #ifdef HAVE_PLAY_FREQ
 void audio_set_playback_frequency(int setting);
 #endif
+#ifdef HAVE_ALBUMART
+void set_albumart_mode(int setting);
+#endif
 
 size_t audio_get_filebuflen(void);
 

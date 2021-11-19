@@ -927,6 +927,16 @@ const struct settings_list settings[] = {
       #error "HAVE_PLAY_FREQ < 48???"
 #endif
 #endif /* HAVE_PLAY_FREQ */
+
+#ifdef HAVE_ALBUMART
+    CHOICE_SETTING(0, album_art, LANG_ALBUM_ART, 1,
+                      "album art", "off,prefer embedded,prefer image file",
+                      NULL, 3,
+                      ID2P(LANG_OFF),
+                      ID2P(LANG_PREFER_EMBEDDED),
+                      ID2P(LANG_PREFER_IMAGE_FILE)),
+#endif
+
     /* LCD */
 #ifdef HAVE_LCD_CONTRAST
     /* its easier to leave this one un-macro()ed for the time being */

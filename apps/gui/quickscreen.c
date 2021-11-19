@@ -39,6 +39,9 @@
 #include "option_select.h"
 #include "debug.h"
 #include "shortcuts.h"
+#ifdef HAVE_ALBUMART
+#include "playback.h"
+#endif
 
  /* 1 top, 1 bottom, 2 on either side, 1 for the icons
   * if enough space, top and bottom have 2 lines */
@@ -411,6 +414,9 @@ int quick_screen_quick(int button_enter)
     struct gui_quickscreen qs;
     bool oldshuffle = global_settings.playlist_shuffle;
     int oldrepeat = global_settings.repeat_mode;
+#ifdef HAVE_ALBUMART
+    int old_album_art = global_settings.album_art;
+#endif
     bool usb = false;
 
     if (global_settings.shortcuts_replaces_qs)
@@ -446,6 +452,10 @@ int quick_screen_quick(int button_enter)
             else
                 playlist_sort(NULL, true);
         }
+#ifdef HAVE_ALBUMART
+        if (old_album_art != global_settings.album_art)
+            set_albumart_mode(global_settings.album_art);
+#endif
     }
     return (usb ? 1:0);
 }
