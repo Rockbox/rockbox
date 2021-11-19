@@ -659,9 +659,16 @@ int do_shortcut_menu(void *ignored)
                 }
                 break;
                 case SHORTCUT_SETTING:
+                {
+                    int old_sleeptimer_duration = global_settings.sleeptimer_duration;
                     do_setting_screen(sc->u.setting,
                             sc->name[0] ? sc->name : P2STR(ID2P(sc->u.setting->lang_id)),NULL);
+
+                    if (old_sleeptimer_duration != global_settings.sleeptimer_duration &&
+                        get_sleep_timer())
+                        set_sleeptimer_duration(global_settings.sleeptimer_duration);
                     break;
+                }
                 case SHORTCUT_DEBUGITEM:
                     run_debug_screen(sc->u.path);
                     break;
@@ -683,7 +690,7 @@ int do_shortcut_menu(void *ignored)
                     {
                         char timer_buf[10];
                         set_sleeptimer_duration(sc->u.timedata.sleep_timeout);
-                        splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER), 
+                        splashf(HZ, "%s (%s)", str(LANG_SLEEP_TIMER),
                                 sleep_timer_formatter(timer_buf, sizeof(timer_buf),
                                                       sc->u.timedata.sleep_timeout, NULL));
                     }
