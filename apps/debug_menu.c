@@ -2097,7 +2097,7 @@ static int radio_callback(int btn, struct gui_synclist *lists)
 
         struct tm* time = gmtime(&seconds);
         simplelist_addline(
-            "CT:%4d-%02d-%02d %02d:%02d",
+            "CT:%4d-%02d-%02d %02d:%02d:%02d",
             time->tm_year + 1900, time->tm_mon + 1, time->tm_mday,
             time->tm_hour, time->tm_min, time->tm_sec);
     }
