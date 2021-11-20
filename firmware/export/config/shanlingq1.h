@@ -59,6 +59,7 @@
 #define HAVE_TOUCHSCREEN
 #define HAVE_BUTTON_DATA
 #define HAVE_FT6x06
+#define FT6x06_NUM_POINTS 5
 #define HAVE_HEADPHONE_DETECTION
 
 /* Storage defines */

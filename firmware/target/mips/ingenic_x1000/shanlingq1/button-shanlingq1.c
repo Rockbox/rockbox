@@ -32,6 +32,11 @@
 #include "i2c-x1000.h"
 #include <stdbool.h>
 
+#ifndef BOOTLOADER
+# include "lcd.h"
+# include "font.h"
+#endif
+
 /* Volume wheel rotation */
 static volatile int wheel_pos = 0;
 
@@ -109,6 +114,7 @@ void button_init_device(void)
 
 int button_read_device(int* data)
 {
+    const struct ft6x06_point* point;
     int r = 0;
 
     /* Read GPIO buttons, these are all active low */
@@ -138,16 +144,22 @@ int button_read_device(int* data)
         reset_poweroff_timer();
     }
 
-    /* Handle touchscreen
-     *
-     * TODO: Support 2-point multitouch (useful for 3x3 grid mode)
-     * TODO: Support simple gestures by converting them to fake buttons
-     */
-    int t = touchscreen_to_pixels(ft6x06_state.pos_x, ft6x06_state.pos_y, data);
-    if(ft6x06_state.event == FT6x06_EVT_PRESS ||
-       ft6x06_state.event == FT6x06_EVT_CONTACT) {
-        /* Only set the button bit if the screen is being touched. */
-        r |= t;
+    if(touchscreen_get_mode() == TOUCHSCREEN_POINT) {
+        /* Pointing mode can't use multitouch since we can only pass
+         * along coordinates for one touch event at a time */
+        point = &ft6x06_state.points[0];
+        int t = touchscreen_to_pixels(point->pos_x, point->pos_y, data);
+        if(point->event == FT6x06_EVT_PRESS ||
+           point->event == FT6x06_EVT_CONTACT)
+            r |= t;
+    } else {
+        /* 3x3 mode can have simultaneous 'button' presses via multitouch */
+        for(int i = 0; i < ft6x06_state.nr_points; ++i) {
+            point = &ft6x06_state.points[i];
+            if(point->event == FT6x06_EVT_PRESS ||
+               point->event == FT6x06_EVT_CONTACT)
+                r |= touchscreen_to_pixels(point->pos_x, point->pos_y, NULL);
+        }
     }
 
     return r;
@@ -193,3 +205,54 @@ void GPIOD03(void)
     handle_wheel_irq();
     gpio_flip_edge_irq(GPIO_WHEEL2);
 }
+
+#ifndef BOOTLOADER
+static int getbtn(void)
+{
+    int btn;
+    do {
+        btn = button_get_w_tmo(1);
+    } while(btn & (BUTTON_REL|BUTTON_REPEAT));
+    return btn;
+}
+
+bool dbg_shanlingq1_touchscreen(void)
+{
+    /* definition of box used to represent the touchpad */
+    const int pad_w = LCD_WIDTH;
+    const int pad_h = LCD_HEIGHT;
+    const int box_h = pad_h - SYSFONT_HEIGHT*5;
+    const int box_w = pad_w * box_h / pad_h;
+    const int box_x = (LCD_WIDTH - box_w) / 2;
+    const int box_y = SYSFONT_HEIGHT * 9 / 2;
+
+    bool draw_border = true;
+
+    do {
+        int line = 0;
+        lcd_clear_display();
+        lcd_putsf(0, line++, "nr_points: %d  gesture: %d",
+                  ft6x06_state.nr_points, ft6x06_state.gesture);
+
+        /* draw touchpad box borders */
+        if(draw_border)
+            lcd_drawrect(box_x, box_y, box_w, box_h);
+
+        for(int i = 0; i < ft6x06_state.nr_points; ++i) {
+            const struct ft6x06_point* point = &ft6x06_state.points[i];
+            lcd_putsf(0, line++, "pt%d  id:%d  pos: %d,%d  wgt: %d  area:%d",
+                      i, point->touch_id, point->pos_x, point->pos_y,
+                      point->weight, point->area);
+
+            /* draw crosshair */
+            int tx = box_x + point->pos_x * box_w / pad_w;
+            int ty = box_y + point->pos_y * box_h / pad_h;
+            lcd_hline(tx-2, tx+2, ty);
+            lcd_vline(tx, ty-2, ty+2);
+        }
+
+        lcd_update();
+    } while(getbtn() != BUTTON_POWER);
+    return false;
+}
+#endif

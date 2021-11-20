@@ -25,14 +25,6 @@
 #include "config.h"
 #include <stdbool.h>
 
-typedef void(*ft6x06_event_cb)(int, int, int);
-
-struct ft6x06_state {
-    int event;
-    int pos_x;
-    int pos_y;
-};
-
 enum ft6x06_event {
     FT6x06_EVT_NONE = -1,
     FT6x06_EVT_PRESS = 0,
@@ -40,7 +32,24 @@ enum ft6x06_event {
     FT6x06_EVT_CONTACT = 2,
 };
 
+struct ft6x06_point {
+    int event;
+    int touch_id;
+    int pos_x;
+    int pos_y;
+    int weight;
+    int area;
+};
+
+struct ft6x06_state {
+    int gesture;
+    int nr_points;
+    struct ft6x06_point points[FT6x06_NUM_POINTS];
+};
+
 extern struct ft6x06_state ft6x06_state;
+
+typedef void(*ft6x06_event_cb)(struct ft6x06_state* state);
 
 void ft6x06_init(void);
 void ft6x06_set_event_cb(ft6x06_event_cb fn);
