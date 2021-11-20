@@ -70,27 +70,21 @@ static bool enable_sw_poweroff = true;
 /* how long until repeat kicks in, in centiseconds */
 #define REPEAT_START      (30*HZ/100)
 
-#ifndef HAVE_TOUCHSCREEN
-/* the next two make repeat "accelerate", which is nice for lists
+/* The next two make repeat "accelerate", which is nice for lists
  * which begin to scroll a bit faster when holding until the
- * real list accerelation kicks in (this smoothes acceleration)
+ * real list accerelation kicks in (this smooths acceleration).
+ *
+ * Note that touchscreen pointing events are not subject to this
+ * acceleration and always use REPEAT_INTERVAL_TOUCH. (Do repeat
+ * events even do anything sane for touchscreens??)
  */
 
 /* the speed repeat starts at, in centiseconds */
 #define REPEAT_INTERVAL_START   (16*HZ/100)
 /* speed repeat finishes at, in centiseconds */
 #define REPEAT_INTERVAL_FINISH  (5*HZ/100)
-#else
-/*
- * on touchscreen it's different, scrolling is done by swiping over the
- * screen (potentially very quickly) and is completely different from button
- * targets
- * So, on touchscreen we don't want to artifically slow down early repeats,
- * it'd have the contrary effect of making rockbox appear lagging
- */
-#define REPEAT_INTERVAL_START   (5*HZ/100)
-#define REPEAT_INTERVAL_FINISH  (5*HZ/100)
-#endif
+/* repeat interval for touch events */
+#define REPEAT_INTERVAL_TOUCH   (5*HZ/100)
 
 #ifdef HAVE_BUTTON_DATA
 static int button_read(int *data);
@@ -275,6 +269,11 @@ static void button_tick(void)
                         /* yes we have repeat */
                         if (repeat_speed > REPEAT_INTERVAL_FINISH)
                             repeat_speed--;
+#ifdef HAVE_TOUCHSCREEN
+                        if(btn & BUTTON_TOUCHSCREEN)
+                            repeat_speed = REPEAT_INTERVAL_TOUCH;
+#endif
+
                         count = repeat_speed;
 
                         repeat_count++;
