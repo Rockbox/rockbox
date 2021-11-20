@@ -169,6 +169,12 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     end = start + nb_lines;
 
 #ifdef HAVE_TOUCHSCREEN
+    /* y_pos needs to be clamped now since it can overflow the maximum
+     * in some cases, and we have no easy way to prevent this beforehand */
+    int max_y_pos = list->nb_items * linedes.height - list_text[screen].height;
+    if (max_y_pos > 0 && list->y_pos > max_y_pos)
+        list->y_pos = max_y_pos;
+
     int draw_offset = list_start_item * linedes.height - list->y_pos;
     /* draw some extra items to not have empty lines at the top and bottom */
     if (draw_offset > 0)
@@ -179,8 +185,17 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         if (start > 0)
             start--;
     }
-    else if (draw_offset < 0)
-        end++;
+    else if (draw_offset < 0) {
+        if(end < list->nb_items)
+            end++;
+    }
+
+    /* If the viewport is not an exact multiple of the line height, then
+     * there will be space for one more partial line. */
+    int spare_space = list_text_vp->height - linedes.height * nb_lines;
+    if(nb_lines < list->nb_items && spare_space > 0 && end < list->nb_items)
+        if(end < list->nb_items)
+            end++;
 #else
     #define draw_offset 0
 #endif
@@ -193,17 +208,32 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         {
             struct viewport vp = *list_text_vp;
             vp.width = SCROLLBAR_WIDTH;
+#ifndef HAVE_TOUCHSCREEN
+            /* touchscreens must use full viewport height
+             * due to pixelwise rendering */
             vp.height = linedes.height * nb_lines;
+#endif
             list_text_vp->width -= SCROLLBAR_WIDTH;
             if (scrollbar_in_right)
                 vp.x += list_text_vp->width;
             else /* left */
                 list_text_vp->x += SCROLLBAR_WIDTH;
             struct viewport *last = display->set_viewport(&vp);
+
+#ifndef HAVE_TOUCHSCREEN
+            /* button targets go itemwise */
+            int scrollbar_items = list->nb_items;
+            int scrollbar_min = list_start_item;
+            int scrollbar_max = list_start_item + nb_lines;
+#else
+            /* touchscreens use pixelwise scrolling */
+            int scrollbar_items = list->nb_items * linedes.height;
+            int scrollbar_min = list->y_pos;
+            int scrollbar_max = list->y_pos + list_text_vp->height;
+#endif
             gui_scrollbar_draw(display,
                     (scrollbar_in_left? 0: 1), 0, SCROLLBAR_WIDTH-1, vp.height,
-                    list->nb_items, list_start_item, list_start_item + nb_lines,
-                    VERTICAL);
+                    scrollbar_items, scrollbar_min, scrollbar_max, VERTICAL);
             display->set_viewport(last);
         }
         /* shift everything a bit in relation to the title */
@@ -360,21 +390,28 @@ static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
     const int screen = screens[SCREEN_MAIN].screen_type;
     const int nb_lines = list_get_nb_lines(gui_list, screen);
 
-    if (nb_lines <  gui_list->nb_items)
+    if (nb_lines < gui_list->nb_items)
     {
-        /* scrollbar scrolling is still line based */
-        int scrollbar_size = nb_lines * gui_list->line_height[screen];
+        const int line_height = gui_list->line_height[screen];
+
+        /* try to position the center of the scrollbar at the touch point */
+        int scrollbar_size = list_text[screen].height;
         int actual_y = y - list_text[screen].y;
-        int new_selection = (actual_y * gui_list->nb_items) / scrollbar_size;
+        int new_y_pos = (actual_y * gui_list->nb_items * line_height) / scrollbar_size;
+        int new_start = (actual_y * gui_list->nb_items) / scrollbar_size;
 
-        int start_item = new_selection - nb_lines/2;
-        if(start_item < 0)
-            start_item = 0;
-        else if(start_item > gui_list->nb_items - nb_lines)
-            start_item = gui_list->nb_items - nb_lines;
+        new_start -= nb_lines / 2;
+        new_y_pos -= (nb_lines * line_height) / 2;
+        if(new_start < 0) {
+            new_start = 0;
+            new_y_pos = 0;
+        } else if(new_start > gui_list->nb_items - nb_lines) {
+            new_start = gui_list->nb_items - nb_lines;
+            new_y_pos = new_start * line_height;
+        }
 
-        gui_list->start_item[screen] = start_item;
-        gui_list->y_pos = start_item * gui_list->line_height[screen];
+        gui_list->start_item[screen] = new_start;
+        gui_list->y_pos = new_y_pos;
 
         return ACTION_REDRAW;
     }
@@ -509,6 +546,7 @@ static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
     const int old_start = gui_list->start_item[screen];
     int new_start_item = -1;
     int line_diff = 0;
+    int max_y_pos = gui_list->nb_items * line_height - list_text[screen].height;
 
     /* Track whether we hit the end of the list for sake of kinetic scroll */
     bool hit_end = true;
@@ -517,8 +555,8 @@ static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
     gui_list->y_pos -= difference;
     if(gui_list->y_pos < 0)
         gui_list->y_pos = 0;
-    else if(gui_list->y_pos > (gui_list->nb_items - nb_lines) * line_height)
-        gui_list->y_pos = (gui_list->nb_items - nb_lines) * line_height;
+    else if(gui_list->y_pos > max_y_pos)
+        gui_list->y_pos = max_y_pos;
     else
         hit_end = false;
 
