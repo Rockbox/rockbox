@@ -3529,7 +3529,7 @@ static void start_playback(bool append)
     else
         return;
 
-    if (rb->global_settings->playlist_shuffle)
+    if (!append && rb->global_settings->playlist_shuffle)
         position = rb->playlist_shuffle(*rb->current_tick, pf_tracks.sel);
 play:
     /* TODO: can we adjust selected_track if !play_selected ?
@@ -3540,8 +3540,10 @@ play:
         rb->playlist_start(position, 0, 0);
         /* make warn on playlist erase work */
         rb->playlist_get_current()->num_inserted_tracks = 0;
+        old_playlist = center_slide.slide_index;
     }
-    old_playlist = center_slide.slide_index;
+    else
+        old_playlist = -1;
     old_shuffle = shuffle;
 }
 #endif
