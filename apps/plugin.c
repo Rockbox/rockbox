@@ -802,7 +802,7 @@ static const struct plugin_api rockbox_api = {
     plugin_get_current_filename,
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
-
+    warn_on_pl_erase,
 };
 
 static int plugin_buffer_handle;

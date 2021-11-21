@@ -3227,7 +3227,7 @@ static int main_menu(void)
                 return -2;
 #if PF_PLAYBACK_CAPABLE
             case PF_MENU_CLEAR_PLAYLIST:
-                if(rb->playlist_remove_all_tracks(NULL) == 0) {
+                if(rb->warn_on_pl_erase() && rb->playlist_remove_all_tracks(NULL) == 0) {
                     rb->playlist_create(NULL, NULL);
                     rb->splash(HZ*2, ID2P(LANG_PLAYLIST_CLEARED));
                 }
@@ -3484,6 +3484,19 @@ static void select_prev_track(void)
 }
 
 #if PF_PLAYBACK_CAPABLE
+
+static bool pf_warn_on_pl_erase(void)
+{
+#ifdef USEGSLIB
+                grey_show(false);
+#endif
+                bool ret = rb->warn_on_pl_erase();
+#ifdef USEGSLIB
+                grey_show(true);
+#endif
+                return ret;
+}
+
 /*
  * Puts the current tracklist into a newly created playlist and starts playling
  */
@@ -3523,7 +3536,11 @@ play:
      * if shuffle, we can't predict the playing track easily, and for either
      * case the track list doesn't get auto scrolled*/
     if(!append)
+    {
         rb->playlist_start(position, 0, 0);
+        /* make warn on playlist erase work */
+        rb->playlist_get_current()->num_inserted_tracks = 0;
+    }
     old_playlist = center_slide.slide_index;
     old_shuffle = shuffle;
 }
@@ -3956,6 +3973,8 @@ static int pictureflow_main(void)
                     set_current_slide(target);
 #if PF_PLAYBACK_CAPABLE
                 if(pf_cfg.auto_wps == 1) {
+                    if (!pf_warn_on_pl_erase())
+                        break;
                     create_track_index(center_slide.slide_index);
                     reset_track_list();
                     start_playback(false);
@@ -3970,15 +3989,15 @@ static int pictureflow_main(void)
                 revert_cover_out_animation();
             else if (pf_state == pf_cover_in)
                 interrupt_cover_in_animation();
-            else if ( pf_state == pf_show_tracks ) {
 #if PF_PLAYBACK_CAPABLE
+            else if (pf_state == pf_show_tracks && pf_warn_on_pl_erase()) {
                 start_playback(false);
                 if(pf_cfg.auto_wps != 0) {
                     pf_cfg.last_album = center_index;
                     return PLUGIN_GOTO_WPS;
                 }
-#endif
             }
+#endif
             break;
         default:
             exit_on_usb(button);

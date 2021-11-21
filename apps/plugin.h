@@ -155,7 +155,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 245
+#define PLUGIN_API_VERSION 246
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -928,6 +928,7 @@ struct plugin_api {
     char* (*plugin_get_current_filename)(void);
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+    bool (*warn_on_pl_erase)(void);
 
 };
 
