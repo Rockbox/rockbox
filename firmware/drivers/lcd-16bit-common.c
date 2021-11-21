@@ -283,12 +283,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int src_y, int stride, int x, int y,
                                      int width, int height)
 {
-    const unsigned char *src_end;
-    fb_data *dst, *dst_col;
-    unsigned dmask = 0x100; /* bit 8 == sentinel */
-    int drmode = lcd_current_viewport->drawmode;
-    int row;
-
     /******************** Image in viewport clipping **********************/
     /* nothing to draw? */
     if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width) ||
@@ -312,21 +306,9 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     if (y + height > lcd_current_viewport->height)
         height = lcd_current_viewport->height - y;
 
-    /* adjust for viewport */
+    /* convert to viewport coordinates */
     x += lcd_current_viewport->x;
     y += lcd_current_viewport->y;
-
-    /* 'Bugfix' mono_bitmap_part reads ahead in the buffer, While this is a bug
-     * if the height is <= char bit pixels other memory gets read but is not used
-     * the other option is to check in the hot code path but this appears
-     * sufficient, limit to the sim to stop Address Sanitizer errors
-     */
-#if defined(SIMULATOR) && \
-    (!defined(LCD_STRIDEFORMAT) || LCD_STRIDEFORMAT != VERTICAL_STRIDE)
-    /* vertical stride targets don't seem affected by this */
-    if (height <= CHAR_BIT)
-        stride = 0;
-#endif
 
 #if defined(HAVE_VIEWPORT_CLIP)
     /********************* Viewport on screen clipping ********************/
@@ -342,7 +324,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
         src_x -= x;
         x = 0;
     }
-
     if (y < 0)
     {
         height += y;
@@ -354,14 +335,17 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     if (y + height > LCD_HEIGHT)
         height = LCD_HEIGHT - y;
 #endif
-    src += stride * (src_y >> 3) + src_x; /* move starting point */
-    src_y  &= 7;
-    src_end = src + width;
-    dst_col = FBADDR(x, y);
+
+    /* move starting point */
+    src += stride * (src_y >> 3) + src_x;
+    src_y &= 7;
+
+    unsigned dmask = 0;
+    int drmode = lcd_current_viewport->drawmode;
 
     if (drmode & DRMODE_INVERSEVID)
     {
-        dmask = 0x1ff;          /* bit 8 == sentinel */
+        dmask = 0xff;
         drmode &= DRMODE_SOLID; /* mask out inversevid */
     }
 
@@ -369,107 +353,99 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     if ((drmode & DRMODE_BG) && lcd_backdrop)
         drmode |= DRMODE_INT_BD;
 
-    /* go through each column and update each pixel  */
-    do
+    fb_data* dst = FBADDR(x, y);
+    while(height > 0)
     {
-        const unsigned char *src_col = src++;
-        unsigned data = (*src_col ^ dmask) >> src_y;
+        const unsigned char* src_col = src;
+        const unsigned char* src_end = src + width;
+        fb_data* dst_col = dst;
+
+        unsigned data;
         int fg, bg;
         uintptr_t bo;
 
-        dst = dst_col;
-        dst_col += COL_INC;
-        row = height;
+        switch (drmode) {
+        case DRMODE_COMPLEMENT:
+            do {
+                data = (*src_col++ ^ dmask) >> src_y;
+                if(data & 0x01)
+                    *dst_col = ~(*dst_col);
 
-#define UPDATE_SRC  do {                  \
-            data >>= 1;                   \
-            if (data == 0x001) {          \
-                src_col += stride;        \
-                data = *src_col ^ dmask;  \
-            }                             \
-        } while (0)
-
-        switch (drmode)
-        {
-          case DRMODE_COMPLEMENT:
-            do
-            {
-                if (data & 0x01)
-                    *dst = ~(*dst);
-
-                dst += ROW_INC;
-                UPDATE_SRC;
-            }
-            while (--row);
+                dst_col += COL_INC;
+            } while(src_col != src_end);
             break;
 
-          case DRMODE_BG|DRMODE_INT_BD:
+        case DRMODE_BG|DRMODE_INT_BD:
             bo = lcd_backdrop_offset;
-            do
-            {
-                if (!(data & 0x01))
-                    *dst = *PTR_ADD(dst, bo);
+            do {
+                data = (*src_col++ ^ dmask) >> src_y;
+                if(!(data & 0x01))
+                    *dst_col = *PTR_ADD(dst_col, bo);
 
-                dst += ROW_INC;
-                UPDATE_SRC;
-            }
-            while (--row);
+                dst_col += COL_INC;
+            } while(src_col != src_end);
             break;
 
         case DRMODE_BG:
             bg = lcd_current_viewport->bg_pattern;
-            do
-            {
-                if (!(data & 0x01))
-                    *dst = bg;
+            do {
+                data = (*src_col++ ^ dmask) >> src_y;
+                if(!(data & 0x01))
+                    *dst_col = bg;
 
-                dst += ROW_INC;
-                UPDATE_SRC;
-            }
-            while (--row);
+                dst_col += COL_INC;
+            } while(src_col != src_end);
             break;
 
-          case DRMODE_FG:
+        case DRMODE_FG:
             fg = lcd_current_viewport->fg_pattern;
-            do
-            {
-                if (data & 0x01)
-                    *dst = fg;
+            do {
+                data = (*src_col++ ^ dmask) >> src_y;
+                if(data & 0x01)
+                    *dst_col = fg;
 
-                dst += ROW_INC;
-                UPDATE_SRC;
-            }
-            while (--row);
+                dst_col += COL_INC;
+            } while(src_col != src_end);
             break;
 
-          case DRMODE_SOLID|DRMODE_INT_BD:
+        case DRMODE_SOLID|DRMODE_INT_BD:
             fg = lcd_current_viewport->fg_pattern;
             bo = lcd_backdrop_offset;
-            do
-            {
-                *dst = (data & 0x01) ? fg
-                           : *PTR_ADD(dst, bo);
-                dst += ROW_INC;
-                UPDATE_SRC;
-            }
-            while (--row);
+            do {
+                data = (*src_col++ ^ dmask) >> src_y;
+                if(data & 0x01)
+                    *dst_col = fg;
+                else
+                    *dst_col = *PTR_ADD(dst_col, bo);
+
+                dst_col += COL_INC;
+            } while(src_col != src_end);
             break;
 
-          case DRMODE_SOLID:
+        case DRMODE_SOLID:
             fg = lcd_current_viewport->fg_pattern;
             bg = lcd_current_viewport->bg_pattern;
-            do
-            {
-                *dst = (data & 0x01) ? fg : bg;
-                dst += ROW_INC;
-                UPDATE_SRC;
-            }
-            while (--row);
+            do {
+                data = (*src_col++ ^ dmask) >> src_y;
+                if(data & 0x01)
+                    *dst_col = fg;
+                else
+                    *dst_col = bg;
+
+                dst_col += COL_INC;
+            } while(src_col != src_end);
             break;
         }
+
+        src_y = (src_y + 1) & 7;
+        if(src_y == 0)
+            src += stride;
+
+        dst += ROW_INC;
+        height--;
     }
-    while (src < src_end);
 }
+
 /* Draw a full monochrome bitmap */
 void lcd_mono_bitmap(const unsigned char *src, int x, int y, int width, int height)
 {
