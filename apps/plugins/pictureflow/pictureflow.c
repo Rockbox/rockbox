@@ -3623,6 +3623,24 @@ static void draw_album_text(void)
 }
 
 /**
+  Display an info message when items have been added to playlist
+*/
+static void rb_splash_added_to_playlist(void)
+{
+#ifdef USEGSLIB
+                grey_show(false);
+                rb->lcd_set_background(N_BRIGHT(0));
+                rb->lcd_set_foreground(N_BRIGHT(255));
+                rb->lcd_clear_display();
+                rb->lcd_update();
+#endif
+                rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
+#ifdef USEGSLIB
+                grey_show(true);
+#endif
+}
+
+/**
   Display an error message and wait for input.
 */
 static void error_wait(const char *message)
@@ -3946,19 +3964,7 @@ static int pictureflow_main(void)
                                                     PLAYLIST_INSERT_LAST, false, true);
                     rb->playlist_sync(NULL);
                 }
-#ifdef USEGSLIB
-                /*
-                calling splash() without switching off the grayscale overlay
-                beforehand, will lead to image corruption and a crash
-                in testing on device (iPod 4G,iPod mini)
-                */
-                grey_show(false);
-                rb->lcd_clear_display();
-#endif
-                rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
-#ifdef USEGSLIB
-                grey_show(true);
-#endif
+                rb_splash_added_to_playlist();
             }
             break;
 #endif
