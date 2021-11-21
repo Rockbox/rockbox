@@ -55,13 +55,20 @@ static fb_data *lcd_fb;
 #define PF_BACK ACTION_STD_CANCEL
 #define PF_MENU ACTION_STD_MENU
 #define PF_WPS ACTION_TREE_WPS
+#define PF_JMP ACTION_LISTTREE_PGDOWN
+#define PF_JMP_PREV ACTION_LISTTREE_PGUP
 
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 #define PF_TRACKLIST (LAST_ACTION_PLACEHOLDER + 2)
 
 #if defined(HAVE_SCROLLWHEEL) || CONFIG_KEYPAD == IRIVER_H10_PAD || \
     CONFIG_KEYPAD == MPIO_HD300_PAD
+#if (CONFIG_KEYPAD != IPOD_1G2G_PAD) \
+    && (CONFIG_KEYPAD != IPOD_3G_PAD) \
+    && (CONFIG_KEYPAD != IPOD_4G_PAD) \
+    && (CONFIG_KEYPAD != FIIO_M3K_PAD)
 #define USE_CORE_PREVNEXT
+#endif
 #endif
 
 #ifndef USE_CORE_PREVNEXT
@@ -81,6 +88,18 @@ const struct button_mapping pf_context_album_scroll[] =
     {PF_PREV_REPEAT,  BUTTON_RC_REW|BUTTON_REPEAT,BUTTON_NONE},
     {PF_NEXT,         BUTTON_RC_FF,               BUTTON_NONE},
     {PF_NEXT_REPEAT,  BUTTON_RC_FF|BUTTON_REPEAT, BUTTON_NONE},
+#elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_3G_PAD) \
+    || (CONFIG_KEYPAD == IPOD_4G_PAD) \
+    || (CONFIG_KEYPAD == FIIO_M3K_PAD)
+    {PF_JMP_PREV,     BUTTON_LEFT,                BUTTON_NONE},
+    {PF_JMP_PREV,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    {PF_JMP,          BUTTON_RIGHT,               BUTTON_NONE},
+    {PF_JMP,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    {ACTION_NONE,     BUTTON_LEFT|BUTTON_REL,     BUTTON_LEFT},
+    {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REL,    BUTTON_RIGHT},
+    {ACTION_NONE,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_LEFT},
+    {ACTION_NONE,     BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_RIGHT},
 #elif defined(BUTTON_LEFT) && defined(BUTTON_RIGHT)
     {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
     {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
@@ -1558,6 +1577,35 @@ static char* get_track_filename(const int track_index)
     return 0;
 }
 #endif
+
+
+
+static int get_album_artist_alpha_prev_index(void)
+{
+    char* current_album_artist = get_album_artist(center_index);
+    for (int i = center_index - 1; i > 0; i-- )
+    {
+        int artist_idx = pf_idx.album_index[i].artist_idx;
+        if(rb->strncmp(pf_idx.artist_names + artist_idx, current_album_artist, 1))
+            current_album_artist = pf_idx.artist_names + artist_idx;
+        while (i > 0 && !rb->strncmp(pf_idx.artist_names + pf_idx.album_index[i-1].artist_idx, current_album_artist, 1))
+            i--;
+        return i;
+    }
+    return 0;
+}
+
+static int get_album_artist_alpha_next_index(void)
+{
+    char* current_album_artist = get_album_artist(center_index);
+    for (int i = center_index + 1; i < pf_idx.album_ct; i++ )
+    {
+        int artist_idx = pf_idx.album_index[i].artist_idx;
+        if(rb->strncmp(pf_idx.artist_names + artist_idx, current_album_artist, 1))
+            return i;
+    }
+    return pf_idx.album_ct - 1;
+}
 
 static int get_wps_current_index(void)
 {
@@ -3940,6 +3988,20 @@ static int pictureflow_main(void)
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_previous_slide();
             break;
+        case PF_JMP:
+                if (pf_state == pf_idle || pf_state == pf_scrolling)
+                {
+                    pf_state = pf_idle;
+                    set_current_slide(get_album_artist_alpha_next_index());
+                }
+                break;
+        case PF_JMP_PREV:
+                if (pf_state == pf_idle || pf_state == pf_scrolling)
+                {
+                    pf_state = pf_idle;
+                    set_current_slide(get_album_artist_alpha_prev_index());
+                }
+                break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
             if (pf_cfg.auto_wps != 0  &&
