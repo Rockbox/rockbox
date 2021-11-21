@@ -137,7 +137,7 @@ const struct button_mapping pf_context_buttons[] =
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
 #elif CONFIG_KEYPAD == MEIZU_M6SL_PAD
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
-#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD 
+#elif CONFIG_KEYPAD == IRIVER_H100_PAD || CONFIG_KEYPAD == IRIVER_H300_PAD
     {PF_QUIT,         BUTTON_OFF,                 BUTTON_NONE},
 #elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
     {PF_QUIT,         BUTTON_REC,                 BUTTON_NONE},
