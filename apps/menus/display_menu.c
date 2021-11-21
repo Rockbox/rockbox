@@ -366,6 +366,7 @@ static int listwraparound_callback(int action,
 }
 
 MENUITEM_SETTING(list_wraparound, &global_settings.list_wraparound, listwraparound_callback);
+MENUITEM_SETTING(list_order, &global_settings.list_order, NULL);
 
 MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
           &scroll_speed, &scroll_delay,
@@ -377,6 +378,7 @@ MAKE_MENU(scroll_settings_menu, ID2P(LANG_SCROLL_MENU), 0, Icon_NOICON,
           &offset_out_of_view, &screen_scroll_step,
           &scroll_paginated,
           &list_wraparound,
+          &list_order,
 #ifndef HAVE_WHEEL_ACCELERATION
           &list_accel_start_delay, &list_accel_wait
 #endif

@@ -1216,6 +1216,15 @@ const struct settings_list settings[] = {
                   false,"scroll paginated",NULL),
     OFFON_SETTING(0,list_wraparound,LANG_LIST_WRAPAROUND,
                   true,"list wraparound",NULL),
+    CHOICE_SETTING(0, list_order, LANG_LIST_ORDER,
+#if defined(HAVE_SCROLLWHEEL) && !defined(FIIO_M3K)
+                   1,
+#else
+                   0,
+#endif
+                   /* values are defined by the enum in option_select.h */
+                   "list order", "descending,ascending",
+                   NULL, 2, ID2P(LANG_DESCENDING), ID2P(LANG_ASCENDING)),
 #ifdef HAVE_LCD_COLOR
 
     {F_T_INT|F_RGB|F_THEMESETTING ,&global_settings.fg_color,-1,

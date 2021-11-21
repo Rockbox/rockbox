@@ -334,29 +334,35 @@ static int selection_to_val(const struct settings_list *setting, int selection)
     else if ((setting->flags & F_T_SOUND) == F_T_SOUND)
     {
         int setting_id = setting->sound_setting->setting;
-#ifndef ASCENDING_INT_SETTINGS
-        step = sound_steps(setting_id);
-        max = (setting_id == SOUND_VOLUME) ?
-            global_settings.volume_limit : sound_max(setting_id);
-        /* min = sound_min(setting_id); */
-#else
-        step = -sound_steps(setting_id);
-        /* min = sound_max(setting_id); */
-        max = sound_min(setting_id);
-#endif
+        if(global_settings.list_order == LIST_ORDER_DESCENDING)
+        {
+            step = sound_steps(setting_id);
+            max = (setting_id == SOUND_VOLUME) ?
+                global_settings.volume_limit : sound_max(setting_id);
+            /* min = sound_min(setting_id); */
+        }
+        else
+        {
+            step = -sound_steps(setting_id);
+            /* min = sound_max(setting_id); */
+            max = sound_min(setting_id);
+        }
     }
     else if ((setting->flags & F_INT_SETTING) == F_INT_SETTING)
     {
         const struct int_setting *info = setting->int_setting;
-#ifndef ASCENDING_INT_SETTINGS
-        /* min = info->min; */
-        max = info->max;
-        step = info->step;
-#else
-        max = info->min;
-        /* min = info->max; */
-        step = -info->step;
-#endif
+        if(global_settings.list_order == LIST_ORDER_DESCENDING)
+        {
+            /* min = info->min; */
+            max = info->max;
+            step = info->step;
+        }
+        else
+        {
+            max = info->min;
+            /* min = info->max; */
+            step = -info->step;
+        }
     }
     return max- (selection * step);
 }
@@ -424,11 +430,10 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
             int max = (setting_id == SOUND_VOLUME) ?
                 global_settings.volume_limit : sound_max(setting_id);
             *nb_items = (max-min)/steps + 1;
-#ifndef ASCENDING_INT_SETTINGS
-            *selected = (max - oldvalue) / steps;
-#else
-            *selected = (oldvalue - min) / steps;
-#endif
+            if (global_settings.list_order == LIST_ORDER_DESCENDING)
+                *selected = (max - oldvalue) / steps;
+            else
+                *selected = (oldvalue - min) / steps;
             *function = sound_get_fn(setting_id);
         }
         else
@@ -439,11 +444,10 @@ static void val_to_selection(const struct settings_list *setting, int oldvalue,
             min = info->min;
             step = info->step;
             *nb_items = (max-min)/step + 1;
-#ifndef ASCENDING_INT_SETTINGS
-            *selected = (max - oldvalue) / step;
-#else
-            *selected = (oldvalue - min) / step;
-#endif
+            if(global_settings.list_order == LIST_ORDER_DESCENDING)
+                *selected = (max - oldvalue) / step;
+            else
+                *selected = (oldvalue - min) / step;
             *function = info->option_callback;
         }
     }
