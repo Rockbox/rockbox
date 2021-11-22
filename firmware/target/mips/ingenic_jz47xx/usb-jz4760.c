@@ -106,7 +106,7 @@ static volatile bool ep0_data_requested = false;
 static struct usb_endpoint endpoints[] =
 {
     EP_INIT(ep_control,   USB_FIFO_EP(0),  64, NULL),
-    EP_INIT(ep_control,   USB_FIFO_EP(0),  64, &ep0_rx.buf),
+    EP_INIT(ep_control,   USB_FIFO_EP(0),  64, ep0_rx.buf),
     EP_INIT(ep_bulk,      USB_FIFO_EP(1), 512, NULL),
     EP_INIT(ep_bulk,      USB_FIFO_EP(1), 512, NULL),
     EP_INIT(ep_interrupt, USB_FIFO_EP(2), 512, NULL),
@@ -230,6 +230,8 @@ static void EP0_send(void)
     select_endpoint(0);
     csr0 = REG_USB_CSR0;
 
+    logf("%s(): 0x%x %d %d", __func__, csr0, ep->sent, ep->length);
+
     if(ep->sent == 0)
     {
         length = MIN(ep->length, ep->fifo_size);
@@ -245,7 +247,7 @@ static void EP0_send(void)
     {
         REG_USB_CSR0 = (csr0 | USB_CSR0_INPKTRDY | USB_CSR0_DATAEND); /* Set data end! */
         if (!ep->wait)
-            usb_core_transfer_complete(0, USB_DIR_IN, 0, ep->sent);
+            usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, 0, ep->sent);
         ep->rc = 0;
         ep_transfer_completed(ep);
     }
@@ -263,7 +265,7 @@ static void EP0_handler(void)
     select_endpoint(0);
     csr0 = REG_USB_CSR0;
 
-    logf("%s(): 0x%x", __func__, csr0);
+    logf("%s(): 0x%x %d", __func__, csr0, ep_send->busy);
 
     /* Check for SentStall:
         This bit is set when a STALL handshake is transmitted. The CPU should clear this bit.
@@ -288,12 +290,12 @@ static void EP0_handler(void)
         if (ep_send->busy)
         {
             if (!ep_send->wait)
-                usb_core_transfer_complete(0, USB_DIR_IN, -1, 0);
+                usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, -1, 0);
             ep_transfer_completed(ep_send);
         }
         if (ep_recv->busy)
         {
-            usb_core_transfer_complete(0, USB_DIR_OUT, -1, 0);
+            usb_core_transfer_complete(EP_CONTROL, USB_DIR_OUT, -1, 0);
             ep_transfer_completed(ep_recv);
         }
     }
@@ -304,7 +306,7 @@ static void EP0_handler(void)
         if (ep_send->busy)
         {
             if (!ep_send->wait)
-                usb_core_transfer_complete(0, USB_DIR_IN, -1, 0);
+                usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, -1, 0);
             ep_transfer_completed(ep_send);
         }
         if (ep_recv->busy && ep_recv->buf && ep_recv->length)
@@ -315,7 +317,7 @@ static void EP0_handler(void)
             if (size < ep_recv->fifo_size || ep_recv->received >= ep_recv->length)
             {
                 REG_USB_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY | USB_CSR0_DATAEND; /* Set data end! */
-                usb_core_transfer_complete(0, USB_DIR_OUT, 0, ep_recv->received);
+                usb_core_transfer_complete(EP_CONTROL, USB_DIR_OUT, 0, ep_recv->received);
                 ep_transfer_completed(ep_recv);
             }
             else REG_USB_CSR0 = csr0 | USB_CSR0_SVDOUTPKTRDY; /* clear OUTPKTRDY bit */
@@ -815,7 +817,8 @@ static void udc_reset(void)
     {
         if (endpoints[0].wait)
             semaphore_release(&endpoints[0].complete);
-        else usb_core_transfer_complete(0, USB_DIR_IN, -1, 0);
+        else
+            usb_core_transfer_complete(EP_CONTROL, USB_DIR_IN, -1, 0);
     }
 
     endpoints[0].busy = false;
@@ -825,7 +828,7 @@ static void udc_reset(void)
     endpoints[0].allocated = true;
 
     if (endpoints[1].busy)
-        usb_core_transfer_complete(0, USB_DIR_OUT, -1, 0);
+        usb_core_transfer_complete(EP_CONTROL, USB_DIR_OUT, -1, 0);
 
     endpoints[1].busy = false;
     endpoints[1].wait = false;

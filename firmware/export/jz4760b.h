@@ -7017,6 +7017,11 @@ do {								\
 #define USB_INTR_SUSPEND	0x01
 #define USB_INTR_RESUME		0x02
 #define USB_INTR_RESET		0x04
+#define USB_INTR_SOF		0x08
+#define USB_INTR_CONNECT        0x10
+#define USB_INTR_DISCONNECT     0x20
+#define USB_INTR_SESS_REQ       0x40
+#define USB_INTR_VBUS_ERR       0x80
 
 #define USB_INTR_EP(n)		(1 << (n))
 
