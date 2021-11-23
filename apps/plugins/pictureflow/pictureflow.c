@@ -2360,12 +2360,7 @@ static int read_pfraw(char* filename, int prio)
     bm->height = bmph.height;
     pix_t *data = (pix_t*)(sizeof(struct dim) + (char *)bm);
 
-    int y;
-    for( y = 0; y < bm->height; y++ )
-    {
-        rb->read( fh, data , sizeof( pix_t ) * bm->width );
-        data += bm->width;
-    }
+    rb->read( fh, data , sizeof( pix_t ) * bm->width * bm->height );
     rb->close( fh );
     return hid;
 }
