@@ -1,0 +1,6 @@
+src/xf_error.c
+src/xf_flashmap.c
+src/xf_nandio.c
+src/xf_package.c
+src/xf_stream.c
+src/xf_update.c
