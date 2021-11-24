@@ -357,12 +357,17 @@
         \item Multiple tags (e.g. for Genre) are not supported. The first tag 
               item of a set of multiple tags is used.
         \item Only one tag type is supported for each audio format.
-    \nopt{clipv1,c200v2}{
+    \nopt{lowmem,himem}{
         \item Overall there are 900 bytes available to load metadata strings.
         \item The maximum size of each metadata item (e.g. Artists) is limited 
               to 240 bytes.
     }
-    \opt{clipv1,c200v2}{
+    \opt{himem}{
+        \item Overall there are 1800 bytes available to load metadata strings.
+        \item The maximum size of each metadata item (e.g. Artists) is limited
+              to 500 bytes.
+    }
+    \opt{lowmem}{
         \item Overall there are 300 bytes available to load metadata strings.
         \item The maximum size of each metadata item (e.g. Artists) is limited 
               to 90 bytes.

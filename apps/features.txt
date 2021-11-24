@@ -262,6 +262,8 @@ recording_digital
 
 #if MEMORYSIZE <= 2
 lowmem
+#elif MEMORYSIZE > 8
+himem
 #endif
 
 #if defined(HAVE_HARDWARE_CLICK)
