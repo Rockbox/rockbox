@@ -1075,9 +1075,9 @@ const struct settings_list settings[] = {
 #endif
     /* tuner */
 #if CONFIG_TUNER
-    OFFON_SETTING(0,fm_force_mono, LANG_FM_MONO_MODE,
+    OFFON_SETTING(0, fm_force_mono, LANG_FM_MONO_MODE,
                   false, "force fm mono", toggle_mono_mode),
-                  SYSTEM_SETTING(NVRAM(4),last_frequency,0),
+    SYSTEM_SETTING(NVRAM(4), last_frequency, 0),
 #endif
 
 #if BATTERY_TYPES_COUNT > 1
