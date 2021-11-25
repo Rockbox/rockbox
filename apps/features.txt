@@ -105,6 +105,10 @@ radio_remote
 #endif
 #endif
 
+#if defined(HAVE_RDS_CAP)
+rds
+#endif
+
 #if defined(HAVE_RECORDING)
 recording
 #if defined(HAVE_LINE_IN)

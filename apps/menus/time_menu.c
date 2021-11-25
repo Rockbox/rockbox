@@ -242,6 +242,9 @@ static int time_menu_callback(int action,
     return action;
 }
 
+#if defined(HAVE_RDS_CAP) && defined(CONFIG_RTC)
+MENUITEM_SETTING(sync_rds_time, &global_settings.sync_rds_time, NULL);
+#endif
 
 MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
           &time_set,
@@ -250,6 +253,9 @@ MAKE_MENU(time_menu, ID2P(LANG_TIME_MENU), time_menu_callback, Icon_NOICON,
 #if defined(HAVE_RECORDING) || CONFIG_TUNER
           &alarm_wake_up_screen,
 #endif
+#endif
+#if defined(HAVE_RDS_CAP) && defined(CONFIG_RTC)
+          &sync_rds_time,
 #endif
           &timeformat);
 

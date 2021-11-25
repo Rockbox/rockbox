@@ -1096,6 +1096,9 @@ const struct settings_list settings[] = {
                   false, "force fm mono", toggle_mono_mode),
     SYSTEM_SETTING(NVRAM(4), last_frequency, 0),
 #endif
+#if defined(HAVE_RDS_CAP) && defined(CONFIG_RTC)
+    OFFON_SETTING(0, sync_rds_time, LANG_FM_SYNC_RDS_TIME, false, "sync_rds_time", NULL),
+#endif
 
 #if BATTERY_TYPES_COUNT > 1
     CHOICE_SETTING(0, battery_type, LANG_BATTERY_TYPE, 0, "battery type",

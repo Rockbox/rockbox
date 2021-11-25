@@ -16229,3 +16229,20 @@
     *: "Prefer Image File"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Sync RDS Time"
+  </dest>
+  <voice>
+    *: none
+    rds: "Sync RDS Time"
+  </voice>
+</phrase>

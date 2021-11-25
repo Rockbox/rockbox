@@ -87,6 +87,9 @@ MENUITEM_FUNCTION(presetclear_item, 0, ID2P(LANG_FM_PRESET_CLEAR),
 
 MENUITEM_SETTING(set_region, &global_settings.fm_region, NULL);
 MENUITEM_SETTING(force_mono, &global_settings.fm_force_mono, NULL);
+#if defined(HAVE_RDS_CAP) && defined(CONFIG_RTC)
+MENUITEM_SETTING(sync_rds_time, &global_settings.sync_rds_time, NULL);
+#endif
 
 #ifndef FM_MODE
 extern int radio_mode;
@@ -146,6 +149,9 @@ MAKE_MENU(radio_settings_menu, ID2P(LANG_FM_MENU), NULL,
 #endif
 #ifdef FM_RECORDING_SETTINGS
             &recsettings_item,
+#endif
+#if defined(HAVE_RDS_CAP) && defined(CONFIG_RTC)
+            &sync_rds_time,
 #endif
             &scan_presets_item);
 
