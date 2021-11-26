@@ -2198,6 +2198,26 @@ static bool create_pf_thread(void)
 }
 
 
+static void initialize_slide_cache(void)
+{
+    int i= 0;
+    for (i = 0; i < SLIDE_CACHE_SIZE; i++) {
+        pf_sldcache.cache[i].hid = 0;
+        pf_sldcache.cache[i].index = 0;
+        pf_sldcache.cache[i].next = i + 1;
+        pf_sldcache.cache[i].prev = i - 1;
+    }
+    pf_sldcache.cache[0].prev = i - 1;
+    pf_sldcache.cache[i - 1].next = 0;
+
+    pf_sldcache.free = 0;
+    pf_sldcache.used = -1;
+    pf_sldcache.left_idx = -1;
+    pf_sldcache.right_idx = -1;
+    pf_sldcache.center_idx = -1;
+}
+
+
 /*
  * The following functions implement the linked-list-in-array used to manage
  * the LRU cache of slides, and the list of free cache slots.
@@ -2206,20 +2226,30 @@ static bool create_pf_thread(void)
 #define _SEEK_RIGHT_WHILE(start, cond) \
 ({ \
     int ind_, next_ = (start); \
+    int i_ = 0; \
     do { \
         ind_ = next_; \
         next_ = pf_sldcache.cache[ind_].next; \
-    } while (next_ != pf_sldcache.used && (cond)); \
+        i_++; \
+    } while (next_ != pf_sldcache.used && (cond) && i_ < SLIDE_CACHE_SIZE); \
+    if (i_ >= SLIDE_CACHE_SIZE) \
+    /* TODO: Not supposed to happen */ \
+        ind_ = -1; \
     ind_; \
 })
 
 #define _SEEK_LEFT_WHILE(start, cond) \
 ({ \
     int ind_, next_ = (start); \
+    int i_ = 0; \
     do { \
         ind_ = next_; \
         next_ = pf_sldcache.cache[ind_].prev; \
-    } while (ind_ != pf_sldcache.used && (cond)); \
+        i_++; \
+    } while (ind_ != pf_sldcache.used && (cond) && i_ < SLIDE_CACHE_SIZE); \
+    if (i_ >= SLIDE_CACHE_SIZE) \
+    /* TODO: Not supposed to happen */ \
+        ind_ = -1; \
     ind_; \
 })
 
@@ -2463,6 +2493,8 @@ bool load_new_slide(void)
             {
                 pf_sldcache.center_idx = _SEEK_RIGHT_WHILE(pf_sldcache.center_idx,
                                 pf_sldcache.cache[next_].index <= center_index);
+                if (pf_sldcache.center_idx == -1)
+                    goto fatal_fail;
 
                 prev = pf_sldcache.center_idx;
                 next = pf_sldcache.cache[pf_sldcache.center_idx].next;
@@ -2471,6 +2503,8 @@ bool load_new_slide(void)
             {
                 pf_sldcache.center_idx = _SEEK_LEFT_WHILE(pf_sldcache.center_idx,
                                 pf_sldcache.cache[next_].index >= center_index);
+                if (pf_sldcache.center_idx == -1)
+                    goto fatal_fail;
 
                 next = pf_sldcache.center_idx;
                 prev = pf_sldcache.cache[pf_sldcache.center_idx].prev;
@@ -2517,6 +2551,8 @@ bool load_new_slide(void)
 
         pf_sldcache.right_idx = _SEEK_RIGHT_WHILE(pf_sldcache.right_idx,
             pf_sldcache.cache[ind_].index - 1 == pf_sldcache.cache[next_].index);
+        if (pf_sldcache.right_idx == -1 || pf_sldcache.left_idx == -1)
+            goto fatal_fail;
 
 
         /* update indices */
@@ -2581,6 +2617,11 @@ fail_and_refree:
     }
     buf_ctx_unlock();
     return false;
+fatal_fail:
+    free_all_slide_prio(0);
+    initialize_slide_cache();
+    buf_ctx_unlock();
+    return false;
 }
 
 
@@ -2612,11 +2653,13 @@ static inline struct dim *surface(const int slide_index)
     int i;
     if ((i = pf_sldcache.used ) != -1)
     {
+        int j = 0;
         do {
             if (pf_sldcache.cache[i].index == slide_index)
                 return get_slide(pf_sldcache.cache[i].hid);
             i = pf_sldcache.cache[i].next;
-        } while (i != pf_sldcache.used);
+            j++;
+        } while (i != pf_sldcache.used && j < SLIDE_CACHE_SIZE);
     }
     return get_slide(empty_slide_hid);
 }
@@ -3810,23 +3853,7 @@ static int pictureflow_main(void)
         return PLUGIN_ERROR;
     }
 
-    int i;
-
-    /* initialize */
-    for (i = 0; i < SLIDE_CACHE_SIZE; i++) {
-        pf_sldcache.cache[i].hid = 0;
-        pf_sldcache.cache[i].index = 0;
-        pf_sldcache.cache[i].next = i + 1;
-        pf_sldcache.cache[i].prev = i - 1;
-    }
-    pf_sldcache.cache[0].prev = i - 1;
-    pf_sldcache.cache[i - 1].next = 0;
-
-    pf_sldcache.free = 0;
-    pf_sldcache.used = -1;
-    pf_sldcache.left_idx = -1;
-    pf_sldcache.right_idx = -1;
-    pf_sldcache.center_idx = -1;
+    initialize_slide_cache();
 
     buffer = LCD_BUF;
 
