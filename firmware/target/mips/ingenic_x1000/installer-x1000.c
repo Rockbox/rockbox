@@ -23,7 +23,7 @@
 #include "nand-x1000.h"
 #include "core_alloc.h"
 #include "file.h"
-#include "microtar.h"
+#include "microtar-rockbox.h"
 #include <stddef.h>
 
 struct update_part {
@@ -90,21 +90,21 @@ static void get_image_loc(nand_drv* ndrv, size_t* offptr, size_t* lenptr)
 static int patch_part(mtar_t* tar, const struct update_part* part,
                       uint8_t* img_buf, size_t img_off)
 {
-    mtar_header_t h;
-    int rc = mtar_find(tar, part->filename, &h);
+    int rc = mtar_find(tar, part->filename);
     if(rc != MTAR_ESUCCESS)
         return IERR_BAD_FORMAT;
 
-    if(h.type != 0 && h.type != MTAR_TREG)
+    const mtar_header_t* h = mtar_get_header(tar);
+    if(h->type != 0 && h->type != MTAR_TREG)
         return IERR_BAD_FORMAT;
 
-    if(h.size > part->length)
+    if(h->size > part->length)
         return IERR_BAD_FORMAT;
 
     /* wipe the patched area, and read in the new data */
     memset(&img_buf[part->offset - img_off], 0xff, part->length);
-    rc = mtar_read_data(tar, &img_buf[part->offset - img_off], h.size);
-    if(rc != MTAR_ESUCCESS)
+    rc = mtar_read_data(tar, &img_buf[part->offset - img_off], h->size);
+    if(rc < 0 || (unsigned)rc != h->size)
         return IERR_FILE_IO;
 
     return IERR_SUCCESS;
@@ -165,7 +165,7 @@ static int updater_init(struct updater* u)
 
     CACHEALIGN_BUFFER(buffer, buf_len);
     u->tar = (mtar_t*)buffer;
-    memset(u->tar, 0, sizeof(struct mtar_t));
+    memset(u->tar, 0, sizeof(mtar_t));
 
     rc = IERR_SUCCESS;
 
@@ -175,7 +175,7 @@ static int updater_init(struct updater* u)
 
 static void updater_cleanup(struct updater* u)
 {
-    if(u->tar && u->tar->close)
+    if(u->tar && mtar_is_open(u->tar))
         mtar_close(u->tar);
 
     if(u->buf_hnd >= 0)
@@ -202,7 +202,7 @@ int install_bootloader(const char* filename)
     }
 
     /* get the tarball */
-    rc = mtar_open(u.tar, filename, "r");
+    rc = mtar_open(u.tar, filename, O_RDONLY);
     if(rc != MTAR_ESUCCESS) {
         if(rc == MTAR_EOPENFAIL)
             rc = IERR_FILE_NOT_FOUND;

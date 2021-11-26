@@ -21,7 +21,7 @@
 
 #include "jztool.h"
 #include "jztool_private.h"
-#include "microtar.h"
+#include "microtar-stdio.h"
 #include <stdbool.h>
 #include <string.h>
 
@@ -52,21 +52,22 @@ static int get_file(jz_context* jz, mtar_t* tar, const char* file,
                     bool decompress, jz_buffer** buf)
 {
     jz_buffer* buffer = NULL;
-    mtar_header_t h;
+    const mtar_header_t* h;
     int rc;
 
-    rc = mtar_find(tar, file, &h);
+    rc = mtar_find(tar, file);
     if(rc != MTAR_ESUCCESS) {
         jz_log(jz, JZ_LOG_ERROR, "can't find %s in boot file, tar error %d", file, rc);
         return JZ_ERR_BAD_FILE_FORMAT;
     }
 
-    buffer = jz_buffer_alloc(h.size, NULL);
+    h = mtar_get_header(tar);
+    buffer = jz_buffer_alloc(h->size, NULL);
     if(!buffer)
         return JZ_ERR_OUT_OF_MEMORY;
 
     rc = mtar_read_data(tar, buffer->data, buffer->size);
-    if(rc != MTAR_ESUCCESS) {
+    if(rc < 0 || (unsigned)rc != buffer->size) {
         jz_buffer_free(buffer);
         jz_log(jz, JZ_LOG_ERROR, "can't read %s in boot file, tar error %d", file, rc);
         return JZ_ERR_BAD_FILE_FORMAT;
@@ -127,7 +128,7 @@ int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename)
     sprintf(spl_filename, "spl.%s", dev_info->file_ext);
 
     /* Now open the archive */
-    rc = mtar_open(&tar, filename, "r");
+    rc = mtar_open(&tar, filename, "rb");
     if(rc != MTAR_ESUCCESS) {
         jz_log(dev->jz, JZ_LOG_ERROR, "cannot open file %s (tar error: %d)", filename, rc);
         return JZ_ERR_OPEN_FILE;
