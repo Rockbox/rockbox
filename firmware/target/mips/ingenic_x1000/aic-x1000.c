@@ -84,8 +84,10 @@ static int calc_i2s_clock_params(x1000_clk_t clksrc,
         *i2sdiv = X1000_EXCLK_FREQ / 64 / fs;
 
         /* clamp to maximum value */
-        if(*i2sdiv > 0x200)
-            *i2sdiv = 0x200;
+        if(*i2sdiv > 512)
+            *i2sdiv = 512;
+        if(*i2sdiv == 0)
+            *i2sdiv = 1;
 
         return 0;
     }
