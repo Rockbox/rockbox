@@ -1,128 +1,268 @@
 # microtar
-A lightweight tar library written in ANSI C
+
+A lightweight tar library written in ANSI C.
+
+This version is a fork of [rxi's microtar](https://github.com/rxi/microtar)
+with bugfixes and API changes aimed at improving usability, but still keeping
+with the minimal design of the original library.
+
+## License
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the MIT license. See [LICENSE](LICENSE) for details.
 
 
-## Modifications from upstream
+## Supported format variants
 
-[Upstream](https://github.com/rxi/microtar) has numerous bugs and gotchas,
-which I fixed in order to improve the overall robustness of the library.
-
-A summary of my changes, in no particular order:
-
-- Fix possible sscanf beyond the bounds of the input buffer
-- Fix possible buffer overruns due to strcpy on untrusted input
-- Fix incorrect octal formatting by sprintf and possible output overrruns
-- Catch read/writes which are too big and handle them gracefully
-- Handle over-long names in `mtar_write_file_header` / `mtar_write_dir_header`
-- Ensure strings in `mtar_header_t` are always null-terminated
-- Save and load group information so we don't lose information
-- Move `mtar_open()` to `microtar-stdio.c` so `microtar.c` can be used in
-  a freestanding environment
-- Allow control of stack usage by moving temporary variables into `mtar_t`,
-  so the caller can decide whether to use the stack or heap
-
-An up-to-date copy of this modified version can be found
-[here](https://github.com/amachronic/microtar).
+No effort has been put into handling every tar format variant. Basically
+what is accepted is the "old-style" format, which appears to work well
+enough to access basic archives created by GNU `tar`.
 
 
-## Modifications for Rockbox
+## Basic usage
 
-Added file `microtar-rockbox.c` implementing `mtar_open()` with native
-Rockbox filesystem API.
+The library consists of two files, `microtar.c` and `microtar.h`, which only
+depend on a tiny part of the standard C library & can be easily incorporated
+into a host project's build system.
+
+The core library does not include any I/O hooks as these are supposed to be
+provided by the host application. If the C library's `fopen` and friends is
+good enough, you can use `microtar-stdio.c`.
 
 
-## Basic Usage
-The library consists of `microtar.c` and `microtar.h`. These two files can be
-dropped into an existing project and compiled along with it.
+### Initialization
 
+Initialization is very simple. Everything the library needs is contained in
+the `mtar_t` struct; there is no memory allocation and no global state. It is
+enough to zero-initialize an `mtar_t` object to put it into a "closed" state.
+You can use `mtar_is_open()` to query whether the archive is open or not.
 
-#### Reading
+An archive can be opened for reading _or_ writing, but not both. You have to
+specify which access mode you're using when you create the archive.
+
 ```c
 mtar_t tar;
-mtar_header_t h;
-char *p;
+mtar_init(&tar, MTAR_READ, my_io_ops, my_stream);
+```
 
-/* Open archive for reading */
-mtar_open(&tar, "test.tar", "r");
+Or if using `microtar-stdio.c`:
 
-/* Print all file names and sizes */
-while ( (mtar_read_header(&tar, &h)) != MTAR_ENULLRECORD ) {
-  printf("%s (%d bytes)\n", h.name, h.size);
-  mtar_next(&tar);
+```c
+int error = mtar_open(&tar, "file.tar", "rb");
+if(error) {
+    /* do something about it */
+}
+```
+
+Note that `mtar_init()` is called for you in this case and the access mode is
+deduced from the mode flags.
+
+
+### Iterating and locating files
+
+If you opened an archive for reading, you'll likely want to iterate over
+all the files. Here's the long way of doing it:
+
+```c
+mtar_t tar;
+int err;
+
+/* Go to the start of the archive... Not necessary if you've
+ * just opened the archive and are already at the beginning.
+ * (And of course you normally want to check the return value.) */
+mtar_rewind(&tar);
+
+/* Iterate over the archive members */
+while((err = mtar_next(&tar)) == MTAR_ESUCCESS) {
+    /* Get a pointer to the current file header. It will
+     * remain valid until you move to another record with
+     * mtar_next() or call mtar_rewind() */
+    const mtar_header_t* header = mtar_get_header(&tar);
+
+    printf("%s (%d bytes)\n", header->name, header->size);
 }
 
-/* Load and print contents of file "test.txt" */
-mtar_find(&tar, "test.txt", &h);
-p = calloc(1, h.size + 1);
-mtar_read_data(&tar, p, h.size);
-printf("%s", p);
-free(p);
-
-/* Close archive */
-mtar_close(&tar);
+if(err != MTAR_ENULLRECORD) {
+    /* ENULLRECORD means we hit end of file; any
+     * other return value is an actual error. */
+}
 ```
 
-#### Writing
+There's a useful shortcut for this type of iteration which removes the
+loop boilerplate, replacing it with another kind of boilerplate that may
+be more palatable in some cases.
+
 ```c
-mtar_t tar;
-const char *str1 = "Hello world";
-const char *str2 = "Goodbye world";
+/* Will be called for each archive member visited by mtar_foreach().
+ * The member's header is passed in as an argument so you don't need
+ * to fetch it manually with mtar_get_header(). You can freely read
+ * data (if present) and seek around. There is no special cleanup
+ * required and it is not necessary to read to the end of the stream.
+ *
+ * The callback should return zero (= MTAR_SUCCESS) to continue the
+ * iteration or return nonzero to abort. On abort, the value returned
+ * by the callback will be returned from mtar_foreach(). Since it may
+ * also return normal microtar error codes, it is suggested to use a
+ * positive value or pass the result via 'arg'.
+ */
+int foreach_cb(mtar_t* tar, const mtar_header_t* header, void* arg)
+{
+    // ...
+    return 0;
+}
 
-/* Open archive for writing */
-mtar_open(&tar, "test.tar", "w");
+void main()
+{
+    mtar_t tar;
 
-/* Write strings to files `test1.txt` and `test2.txt` */
-mtar_write_file_header(&tar, "test1.txt", strlen(str1));
-mtar_write_data(&tar, str1, strlen(str1));
-mtar_write_file_header(&tar, "test2.txt", strlen(str2));
-mtar_write_data(&tar, str2, strlen(str2));
+    // ...
 
-/* Finalize -- this needs to be the last thing done before closing */
-mtar_finalize(&tar);
-
-/* Close archive */
-mtar_close(&tar);
+    int ret = mtar_foreach(&tar, foreach_cb, NULL);
+    if(ret < 0) {
+        /* Microtar error codes are negative and may be returned if
+         * there is a problem with the iteration. */
+    } else if(ret == MTAR_ESUCCESS) {
+        /* If the iteration reaches the end of the archive without
+         * errors, the return code is MTAR_ESUCCESS. */
+    } else if(ret > 0) {
+        /* Positive values might be returned by the callback to
+         * signal some condition was met; they'll never be returned
+         * by microtar */
+    }
+}
 ```
+
+The other thing you're likely to do is look for a specific file:
+
+```c
+/* Seek to a specific member in the archive */
+int err = mtar_find(&tar, "foo.txt");
+if(err == MTAR_ESUCCESS) {
+    /* File was found -- read the header with mtar_get_header() */
+} else if(err == MTAR_ENOTFOUND) {
+    /* File wasn't in the archive */
+} else {
+    /* Some error occurred */
+}
+```
+
+Note this isn't terribly efficient since it scans the entire archive
+looking for the file.
+
+
+### Reading file data
+
+Once pointed at a file via `mtar_next()` or `mtar_find()` you can read the
+data with a simple POSIX-like API.
+
+- `mtar_read_data(tar, buf, count)` reads up to `count` bytes into `buf`,
+  returning the actual number of bytes read, or a negative error value.
+  If at EOF, this returns zero.
+
+- `mtar_seek_data(tar, offset, whence)` works exactly like `fseek()` with
+  `whence` being one of `SEEK_SET`, `SEEK_CUR`, or `SEEK_END` and `offset`
+  indicating a point relative to the beginning, current position, or end
+  of the file. Returns zero on success, or a negative error code.
+
+- `mtar_eof_data(tar)` returns nonzero if the end of the file has been
+  reached. It is possible to seek backward to clear this condition.
+
+
+### Writing archives
+
+Microtar has limited support for creating archives. When an archive is opened
+for writing, you can add new members using `mtar_write_header()`.
+
+- `mtar_write_header(tar, header)` writes out the header for a new member.
+  The amount of data that follows is dictated by `header->size`, though if
+  the underlying stream supports seeking and re-writing data, this size can
+  be updated later with `mtar_update_header()` or `mtar_update_file_size()`.
+
+- `mtar_update_header(tar, header)` will re-write the previously written
+  header. This may be used to change any header field. The underlying stream
+  must support seeking. On a successful return the stream will be returned
+  to the position it was at before the call.
+
+File data can be written with `mtar_write_data()`, and if the underlying stream
+supports seeking, you can seek with `mtar_seek_data()` and read back previously
+written data with `mtar_read_data()`. Note that it is not possible to truncate
+the file stream by any means.
+
+- `mtar_write_data(tar, buf, count)` will write up to `count` bytes from
+  `buf` to the current member's data. Returns the number of bytes actually
+  written or a negative error code.
+
+- `mtar_update_file_size(tar)` will update the header size to reflect the
+  actual amount of written data. This is intended to be called right before
+  `mtar_end_data()` if you are not declaring file sizes in advance.
+
+- `mtar_end_data(tar)` will end the current member. It will complain if you
+  did not write the correct amount data provided in the header. This must be
+  called before writing the next header.
+
+- `mtar_finalize(tar)` is called after you have written all members to the
+  archive. It writes out some null records which mark the end of the archive,
+  so you cannot write any more archive members after this.
+
+Note that `mtar_close()` can fail if there was a problem flushing buffered
+data to disk, so its return value should always be checked.
 
 
 ## Error handling
-All functions which return an `int` will return `MTAR_ESUCCESS` if the operation
-is successful. If an error occurs an error value less-than-zero will be
-returned; this value can be passed to the function `mtar_strerror()` to get its
-corresponding error string.
+
+Most functions that return `int` return an error code from `enum mtar_error`.
+Zero is success and all other error codes are negative. `mtar_strerror()` can
+return a string describing the error code.
+
+A couple of functions use a different return value convention:
+
+- `mtar_foreach()` may error codes or an arbitrary nonzero value provided
+  by the callback.
+- `mtar_read_data()` and `mtar_write_data()` returns the number of bytes read
+  or written, or a negative error code. In particular zero means that no bytes
+  were read or written.
+- `mtar_get_header()` may return `NULL` if there is no valid header.
+  It is only possible to see a null pointer if misusing the API or after
+  a previous error so checking for this is usually not necessary.
+
+There is essentially no support for error recovery. After an error you can
+only do two things reliably: close the archive with `mtar_close()` or try
+rewinding to the beginning with `mtar_rewind()`.
 
 
-## Wrapping a stream
-If you want to read or write from something other than a file, the `mtar_t`
-struct can be manually initialized with your own callback functions and a
-`stream` pointer.
+## I/O hooks
 
-All callback functions are passed a pointer to the `mtar_t` struct as their
-first argument. They should return `MTAR_ESUCCESS` if the operation succeeds
-without an error, or an integer below zero if an error occurs.
+You can provide your own I/O hooks in a `mtar_ops_t` struct. The same ops
+struct can be shared among multiple `mtar_t` objects but each object gets
+its own `void* stream` pointer.
 
-After the `stream` field has been set, all required callbacks have been set and
-all unused fields have been zeroset the `mtar_t` struct can be safely used with
-the microtar functions. `mtar_open` *should not* be called if the `mtar_t`
-struct was initialized manually.
+Name    | Arguments                                 | Required
+--------|-------------------------------------------|------------
+`read`  | `void* stream, void* data, unsigned size` | If reading
+`write` | `void* stream, void* data, unsigned size` | If writing
+`seek`  | `void* stream, unsigned pos`              | If reading
+`close` | `void* stream`                            | Always
 
-#### Reading
-The following callbacks should be set for reading an archive from a stream:
+`read` and `write` should transfer the number of bytes indicated
+and return the number of bytes actually read or written, or a negative
+`enum mtar_error` code on error.
 
-Name    | Arguments                                | Description
---------|------------------------------------------|---------------------------
-`read`  | `mtar_t *tar, void *data, unsigned size` | Read data from the stream
-`seek`  | `mtar_t *tar, unsigned pos`              | Set the position indicator
-`close` | `mtar_t *tar`                            | Close the stream
+`seek` must have semantics like `lseek(..., pos, SEEK_SET)`; that is,
+the position is an absolute byte offset in the stream. Seeking is not
+optional for read support, but the library only performs backward
+seeks under two circumstances:
 
-#### Writing
-The following callbacks should be set for writing an archive to a stream:
+- `mtar_rewind()` seeks to position 0.
+- `mtar_seek_data()` may seek backward if the user requests it.
 
-Name    | Arguments                                      | Description
---------|------------------------------------------------|---------------------
-`write` | `mtar_t *tar, const void *data, unsigned size` | Write data to the stream
+Therefore, you will be able to get away with a limited forward-only
+seek function if you're able to read everything in a single pass use
+the API carefully. Note `mtar_find()` and `mtar_foreach()` will call
+`mtar_rewind()`.
 
+`close` is called by `mtar_close()` to clean up the stream. Note the
+library assumes that the stream handle is cleaned up by `close` even
+if an error occurs.
 
-## License
-This library is free software; you can redistribute it and/or modify it under
-the terms of the MIT license. See [LICENSE](LICENSE) for details.
+`seek` and `close` should return an `enum mtar_error` code, either
+`MTAR_SUCCESS`, or a negative value on error.

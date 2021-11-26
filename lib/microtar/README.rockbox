@@ -1,0 +1,14 @@
+Upstream commit/repo
+  1e921369b2c92bb219fcef84a37d4d2347794c0f
+  https://github.com/amachronic/microtar
+
+Summary of Rockbox-specific changes:
+
+- microtar.make, SOURCES
+  Target build system integration.
+
+- microtar-rockbox.c, microtar-rockbox.h
+  Implements mtar ops with Rockbox filesystem API.
+
+- microtar.c
+  Define strncpy since Rockbox's libc doesn't define it.
