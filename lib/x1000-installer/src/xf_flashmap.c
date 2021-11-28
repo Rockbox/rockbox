@@ -37,6 +37,18 @@ static int xdigit_to_int(char c)
     return -1;
 }
 
+static int isfilenamechar(char c)
+{
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+           (c >= '0' && c <= '9') ||
+           c == '$' || c == '%' || c == '\'' || c == '-' || c == '_' ||
+           c == '@' || c == '~' || c == '`' || c == '!' || c == '(' ||
+           c == ')' || c == '{' || c == '}' || c == '^' || c == '#' ||
+           c == '&' || c == '+' || c == ',' || c == ';' || c == '=' ||
+           c == '[' || c == ']' || c == '.';
+}
+
 int xf_map_parseline(const char* line, struct xf_map* map)
 {
     enum {
@@ -66,7 +78,7 @@ int xf_map_parseline(const char* line, struct xf_map* map)
             if(*line == ' ' || *line == '\t') {
                 nextstate();
                 continue;
-            } else if(isgraph((unsigned char)*line)) {
+            } else if(isfilenamechar(*line)) {
                 if(length == XF_MAP_NAMELEN)
                     return XF_E_FILENAME_TOO_LONG;
 
