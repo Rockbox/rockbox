@@ -159,6 +159,9 @@ int xf_stream_read_lines(struct xf_stream* s, char* buf, size_t bufsz,
     size_t pos = 0;
     bool at_eof = false;
 
+    if(bufsz <= 1)
+        return XF_E_LINE_TOO_LONG;
+
     while(!at_eof) {
         bytes_read = xf_stream_read(s, &buf[pos], bufsz - pos - 1);
         if(bytes_read < 0)
@@ -183,18 +186,12 @@ int xf_stream_read_lines(struct xf_stream* s, char* buf, size_t bufsz,
                     else
                         break; /* read ahead to look for newline */
                 } else {
-                    endp = &buf[pos]; /* treat EOF as a newline */
+                    if(startp == &buf[pos])
+                        break; /* nothing left to do */
+                    else
+                        endp = &buf[pos]; /* last line missing a newline -
+                                           * treat EOF as newline */
                 }
-            }
-
-            /* skip whitespace */
-            while(*startp && isspace(*startp))
-                ++startp;
-
-            /* ignore blank lines and comment lines */
-            if(*startp == '#' || *startp == '\0') {
-                startp = endp + 1;
-                continue;
             }
 
             rc = callback(n++, startp, arg);

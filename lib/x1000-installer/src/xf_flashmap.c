@@ -193,6 +193,10 @@ int map_parse_line_cb(int n, char* buf, void* arg)
 
     struct map_parse_args* args = arg;
 
+    /* skip whitespace */
+    while(*buf && isspace(*buf))
+        ++buf;
+
     /* ignore comments and blank lines */
     if(*buf == '#' || *buf == '\0')
         return 0;
