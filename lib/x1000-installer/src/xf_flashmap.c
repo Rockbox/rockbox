@@ -136,10 +136,8 @@ int xf_map_parseline(const char* line, struct xf_map* map)
 
                         if(int_val > UINT32_MAX/16)
                             return XF_E_INT_OVERFLOW;
-                        int_val *= 16;
 
-                        if(int_val > UINT32_MAX - digit_val)
-                            return XF_E_INT_OVERFLOW;
+                        int_val *= 16;
                         int_val |= digit_val;
                     }
                 }
