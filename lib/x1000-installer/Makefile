@@ -12,7 +12,8 @@ TOBJ = test_lib/core_alloc.o \
 	   test_lib/pathfuncs.o \
 	   test_lib/md5.o \
 	   test_lib/strlcpy.o \
-	   test/main.o
+	   test/main.o \
+	   test/test_stream.o
 TBIN = xf_test
 
 # dependency needs to be built manually

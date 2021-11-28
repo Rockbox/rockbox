@@ -39,8 +39,13 @@ struct test_info {
     test_t func;
 };
 
+extern void test_stream_read_lines(void);
+extern void test_stream_read_line_too_long(void);
+
 #define TEST(x) {#x, x}
 static const struct test_info all_tests[] = {
+    TEST(test_stream_read_lines),
+    TEST(test_stream_read_line_too_long),
 };
 #undef TEST
 
