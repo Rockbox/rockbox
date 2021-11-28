@@ -19,54 +19,43 @@
  *
  ****************************************************************************/
 
-#include "xf_nandio.h"
-#include "xf_error.h"
-#include "xf_update.h"
-#include "file.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-static struct xf_nandio nio;
+static int test_num_executed = 0;
+static int test_num_failed = 0;
+int test_num_asserts_executed = 0;
+int test_num_asserts_failed = 0;
 
-static struct xf_map testmap[] = {
-    {
-        .name = "src/xf_error.c",
-        .offset = 0x00000000,
-        .length = 0x00004000,
-    },
-    {
-        .name = "src/xf_update.c",
-        .offset = 0x00010000,
-        .length = 0x00004000,
-    },
-    {
-        .name = "src/xf_package.c",
-        .offset = 0x00020000,
-        .length = 0x00001800,
-    },
-};
-
-void checkrc(int rc)
+void test_failure(const char* file, int line, const char* msg)
 {
-    if(rc == XF_E_SUCCESS)
-        return;
-
-    if(rc == XF_E_NAND) {
-        printf("NAND error: %d\n", nio.nand_err);
-    } else {
-        printf("error: %s\n", xf_strerror(rc));
-        printf("  CurBlock  = %lu\n", (unsigned long)nio.cur_block);
-        printf("  CurOffset = %lu\n", (unsigned long)nio.offset_in_block);
-    }
-
-    exit(1);
+    fprintf(stderr, "%s:%d: ASSERTION FAILED: %s\n", file, line, msg);
+    ++test_num_asserts_failed;
 }
 
-int openstream_file(void* arg, const char* file, struct xf_stream* stream)
+typedef void(*test_t)(void);
+
+struct test_info {
+    const char* name;
+    test_t func;
+};
+
+#define TEST(x) {#x, x}
+static const struct test_info all_tests[] = {
+};
+#undef TEST
+
+void run_test(const struct test_info* tinfo)
 {
-    (void)arg;
-    return xf_open_file(file, O_RDONLY, stream);
+    int asserts_now = test_num_asserts_failed;
+    ++test_num_executed;
+
+    fprintf(stderr, "RUN %s\n", tinfo->name);
+    tinfo->func();
+
+    if(test_num_asserts_failed > asserts_now) {
+        fprintf(stderr, "  %s: FAILED!\n", tinfo->name);
+        ++test_num_failed;
+    }
 }
 
 int main(int argc, char* argv[])
@@ -74,25 +63,17 @@ int main(int argc, char* argv[])
     (void)argc;
     (void)argv;
 
-    nand_trace_reset(65535);
+    size_t num_tests = sizeof(all_tests) / sizeof(struct test_info);
+    for(size_t i = 0; i < num_tests; ++i)
+        run_test(&all_tests[i]);
 
-    int rc = xf_nandio_init(&nio);
-    checkrc(rc);
+    fprintf(stderr, "------------------------------------------\n");
+    fprintf(stderr, "TEST COMPLETE\n");
+    fprintf(stderr, "  Tests            %d failed / %d executed\n",
+            test_num_failed, test_num_executed);
+    fprintf(stderr, "  Assertions       %d failed / %d executed\n",
+            test_num_asserts_failed, test_num_asserts_executed);
 
-    rc = xf_updater_run(XF_UPDATE, &nio,
-                        testmap, sizeof(testmap)/sizeof(struct xf_map),
-                        openstream_file, NULL);
-    checkrc(rc);
-
-    for(size_t i = 0; i < nand_trace_length; ++i) {
-        const char* types[] = {"READ", "PROGRAM", "ERASE"};
-        const char* excep[] = {"NONE", "DOUBLE_PROGRAMMED", "CLEARED"};
-        printf("%s %s %lu\n",
-               types[nand_trace[i].type],
-               excep[nand_trace[i].exception],
-               (unsigned long)nand_trace[i].addr);
-    }
-
-    xf_nandio_destroy(&nio);
-    return 0;
+    if(test_num_failed > 0)
+        return 1;
 }
