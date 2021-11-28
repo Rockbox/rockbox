@@ -41,11 +41,13 @@ struct test_info {
 
 extern void test_stream_read_lines(void);
 extern void test_stream_read_line_too_long(void);
+extern void test_flashmap_parseline(void);
 
 #define TEST(x) {#x, x}
 static const struct test_info all_tests[] = {
     TEST(test_stream_read_lines),
     TEST(test_stream_read_line_too_long),
+    TEST(test_flashmap_parseline),
 };
 #undef TEST
 

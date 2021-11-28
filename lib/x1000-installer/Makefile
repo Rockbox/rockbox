@@ -13,6 +13,7 @@ TOBJ = test_lib/core_alloc.o \
 	   test_lib/md5.o \
 	   test_lib/strlcpy.o \
 	   test/main.o \
+	   test/test_flashmap.o \
 	   test/test_stream.o
 TBIN = xf_test
 
