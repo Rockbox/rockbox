@@ -28,13 +28,14 @@ local CANCEL_BUTTON = rb.actions.PLA_CANCEL
 local sINVALIDDATABASE = "Invalid Database"
 local sERROROPENING    = "Error opening"
 
--- tag cache header 
-local sTCVERSION = string.char(0x0F)
-local sTCHEADER  = string.reverse("TCH" .. sTCVERSION)
-local DATASZ    = 4  -- int32_t
-local TCHSIZE   = 3 * DATASZ -- 3 x int32_t
+-- tag cache header
+sTCVERSION = string.char(0x10)
+sTCHEADER  = string.reverse("TCH" .. sTCVERSION)
+DATASZ    = 4  -- int32_t
+TCHSIZE   = 3 * DATASZ -- 3 x int32_t
 
-local function bytesLE_n(str)
+-- Converts array of bytes to proper endian
+function bytesLE_n(str)
     str = str or ""
     local tbyte={str:byte(1, -1)}
     local bpos = 1
