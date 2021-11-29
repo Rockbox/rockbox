@@ -608,10 +608,9 @@ struct user_settings
 
     /* power settings */
     int poweroff;   /* idle power off timer */
-#if BATTERY_CAPACITY_DEFAULT > 0
+#if BATTERY_CAPACITY_INC > 0
     int battery_capacity; /* in mAh */
 #endif
-
 #if BATTERY_TYPES_COUNT > 1
     int battery_type;  /* for units which can take multiple types (Ondio). */
 #endif

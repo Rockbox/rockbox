@@ -835,7 +835,7 @@ void settings_apply(bool read_disk)
     set_keypress_restarts_sleep_timer(
         global_settings.keypress_restarts_sleeptimer);
 
-#if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
+#if BATTERY_CAPACITY_INC > 0
     /* only call if it's really exchangable */
     set_battery_capacity(global_settings.battery_capacity);
 #endif

@@ -259,7 +259,7 @@ static int usbcharging_callback(int action,
 MENUITEM_SETTING(usb_charging, &global_settings.usb_charging, usbcharging_callback);
 #endif /* HAVE_USB_CHARGING_ENABLE */
 MAKE_MENU(battery_menu, ID2P(LANG_BATTERY_MENU), 0, Icon_NOICON,
-#if defined(BATTERY_CAPACITY_INC) && BATTERY_CAPACITY_INC > 0
+#if BATTERY_CAPACITY_INC > 0
             &battery_capacity,
 #endif
 #if BATTERY_TYPES_COUNT > 1

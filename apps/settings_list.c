@@ -1036,13 +1036,7 @@ const struct settings_list settings[] = {
                   NULL, NULL, NULL),
 /* use this setting for user code even if there's no exchangable battery
  * support enabled */
-#if BATTERY_CAPACITY_DEFAULT > 0
-/* define min/max/inc for this file if there's only one battery */
-#ifndef BATTERY_CAPACITY_MIN
-#define BATTERY_CAPACITY_MIN BATTERY_CAPACITY_DEFAULT
-#define BATTERY_CAPACITY_MAX BATTERY_CAPACITY_DEFAULT
-#define BATTERY_CAPACITY_INC 0
-#endif
+#if BATTERY_CAPACITY_INC > 0
 #if defined(IPOD_VIDEO) && !defined(SIMULATOR)
     /* its easier to leave this one un-macro()ed for the time being */
     { F_T_INT|F_DEF_ISFUNC|F_INT_SETTING, &global_settings.battery_capacity,

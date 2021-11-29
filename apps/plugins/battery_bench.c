@@ -567,7 +567,12 @@ enum plugin_status plugin_start(const void* parameter)
                 ,MODEL_NAME,rb->rbversion);
 
             rb->fdprintf(fd, "# Battery type: %d mAh      Buffer Entries: %d\n",
-                rb->global_settings->battery_capacity, (int)BUF_ELEMENTS);
+#if BATTERY_CAPACITY_INC > 0
+                         rb->global_settings->battery_capacity,
+#else
+                         BATTERY_CAPACITY_DEFAULT,
+#endif
+                         (int)BUF_ELEMENTS);
 
             rb->fdprintf(fd, "# Rockbox has been running for %02d:%02d:%02d\n",
                 HMS((unsigned)start_tick/HZ));

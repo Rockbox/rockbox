@@ -114,7 +114,11 @@ int _battery_time(void) { return powermgmt_est_runningtime_min; }
 #endif
 
 /* default value, mAh */
+#if BATTERY_CAPACITY_INC > 0
 static int battery_capacity = BATTERY_CAPACITY_DEFAULT;
+#else
+# define battery_capacity BATTERY_CAPACITY_DEFAULT
+#endif
 
 #if BATTERY_TYPES_COUNT > 1
 static int battery_type = 0;
@@ -170,7 +174,7 @@ void set_battery_type(int type)
 }
 #endif
 
-#ifdef BATTERY_CAPACITY_MIN
+#if BATTERY_CAPACITY_INC > 0
 void set_battery_capacity(int capacity)
 {
     if (capacity > BATTERY_CAPACITY_MAX)

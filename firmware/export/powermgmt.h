@@ -157,8 +157,10 @@ void battery_read_info(int *voltage, int *level);
 bool battery_level_safe(void);
 
 void set_poweroff_timeout(int timeout);
+#if BATTERY_CAPACITY_INC > 0
 void set_battery_capacity(int capacity); /* set local battery capacity value */
-int  get_battery_capacity(void); /* get local battery capacity value */
+#endif
+int get_battery_capacity(void); /* get local battery capacity value */
 void set_battery_type(int type); /* set local battery type */
 
 void set_sleeptimer_duration(int minutes);
