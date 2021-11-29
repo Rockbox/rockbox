@@ -104,12 +104,6 @@ void powermgmt_init(void) INIT_ATTR;
 #endif
 #endif /* CONFIG_CHARGING */
 
-#ifdef CHARGING_DEBUG_FILE
-#define POWERMGMT_DEBUG_STACK ((0x1000)/sizeof(long))
-#else
-#define POWERMGMT_DEBUG_STACK 0
-#endif
-
 #ifndef BATT_AVE_SAMPLES
 /* slw filter constant unless otherwise specified */
 #define BATT_AVE_SAMPLES 128
