@@ -38,9 +38,7 @@
 #include "usb.h"
 #include "wifi.h"
 #include "powermgmt.h"
-#if !defined(DX50) && !defined(DX90)
 #include "adc.h"
-#endif
 #include "i2c.h"
 #ifndef DEBUG
 #include "serial.h"
