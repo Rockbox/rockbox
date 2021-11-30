@@ -121,6 +121,16 @@ int _battery_voltage(void)
     return axp_adc_read(ADC_BATTERY_VOLTAGE);
 }
 
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+int _battery_current(void)
+{
+    if(charging_state())
+        return axp_adc_read(ADC_CHARGE_CURRENT);
+    else
+        return axp_adc_read(ADC_DISCHARGE_CURRENT);
+}
+#endif
+
 #if defined(HAVE_CW2015) && (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) != 0
 int _battery_level(void)
 {
