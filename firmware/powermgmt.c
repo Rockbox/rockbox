@@ -145,22 +145,6 @@ static void battery_status_update(void);
 static int runcurrent(void);
 #endif
 
-void battery_read_info(int *voltage, int *level)
-{
-    int millivolts = _battery_voltage();
-    int percent;
-
-    if (voltage)
-        *voltage = millivolts;
-
-    if (level)  {
-        percent = _battery_level();
-        if (percent < 0)
-            percent = voltage_to_battery_level(millivolts);
-        *level = percent;
-    }
-}
-
 #if BATTERY_TYPES_COUNT > 1
 void set_battery_type(int type)
 {

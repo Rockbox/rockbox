@@ -144,7 +144,7 @@ bool dbg_ports(void)
 
         adc_buttons = adc_read(ADC_BUTTONS);
         adc_remote  = adc_read(ADC_REMOTE);
-        battery_read_info(&adc_battery_voltage, &adc_battery_level);
+
 #if defined(IAUDIO_X5) ||  defined(IAUDIO_M5) || defined(IRIVER_H300_SERIES)
         lcd_putsf(0, line++, "ADC_BUTTONS (%c): %02x",
             button_scan_enabled() ? '+' : '-', adc_buttons);
@@ -162,7 +162,8 @@ bool dbg_ports(void)
                  adc_read(ADC_REMOTEDETECT));
 #endif
 
-        battery_read_info(&adc_battery_voltage, &adc_battery_level);
+        adc_battery_voltage = _battery_voltage();
+        adc_battery_level = battery_level();
         lcd_putsf(0, line++, "Batt: %d.%03dV %d%%  ", adc_battery_voltage / 1000,
                  adc_battery_voltage % 1000, adc_battery_level);
 
