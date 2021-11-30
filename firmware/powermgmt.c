@@ -83,7 +83,7 @@ void handle_auto_poweroff(void);
 static int poweroff_timeout = 0;
 static long last_event_tick = 0;
 
-#if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) == PERCENTAGE_MEASURE
+#if CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
 #ifdef SIMULATOR
 int _battery_level(void) { return -1; }
 #endif
@@ -91,7 +91,7 @@ int _battery_level(void) { return -1; }
 int _battery_level(void) { return -1; }
 #endif
 
-#if (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE) == VOLTAGE_MEASURE
+#if CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE
 /*
  * Average battery voltage and charger voltage, filtered via a digital
  * exponential filter (aka. exponential moving average, scaled):
@@ -109,8 +109,12 @@ const unsigned short percent_to_volt_charge[11];
 #endif
 
 #if !(CONFIG_BATTERY_MEASURE & TIME_MEASURE)
+#ifdef CURRENT_NORMAL
 static int powermgmt_est_runningtime_min;
 int _battery_time(void) { return powermgmt_est_runningtime_min; }
+#else
+int _battery_time(void) { return -1; }
+#endif
 #endif
 
 /* default value, mAh */
@@ -140,10 +144,6 @@ static const char power_thread_name[] = "power";
 
 static int voltage_to_battery_level(int battery_millivolts);
 static void battery_status_update(void);
-
-#ifdef CURRENT_NORMAL   /*only used if we have run current*/
-static int runcurrent(void);
-#endif
 
 #if BATTERY_TYPES_COUNT > 1
 void set_battery_type(int type)
@@ -179,19 +179,15 @@ int get_battery_capacity(void)
 
 int battery_time(void)
 {
-#if ((CONFIG_BATTERY_MEASURE & TIME_MEASURE) == 0)
-
-#ifndef CURRENT_NORMAL /* no estimation without current */
-    return -1;
-#else
-    if (battery_capacity <= 0) /* nor without capacity */
+#if !(CONFIG_BATTERY_MEASURE & TIME_MEASURE)
+    /* Note: This should not really be possible but it might occur
+     * as a degenerate case for targets that don't define any battery
+     * capacity at all..? */
+    if(battery_capacity <= 0)
         return -1;
-    return _battery_time();
 #endif
 
-#else
     return _battery_time();
-#endif
 }
 
 /* Returns battery level in percent */
@@ -209,7 +205,7 @@ bool battery_level_safe(void)
 {
 #if defined(NO_LOW_BATTERY_SHUTDOWN)
     return true;
-#elif (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+#elif CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
     return (battery_percent > 0);
 #elif defined(HAVE_BATTERY_SWITCH)
     /* Cannot rely upon the battery reading to be valid and the
@@ -278,40 +274,36 @@ static void battery_status_update(void)
     if (level < 0)
         level = voltage_to_battery_level(millivolt);
 
-#ifdef CURRENT_NORMAL  /*don't try to estimate run or charge
-                        time without normal current defined*/
-    /* calculate estimated remaining running time */
+#ifdef CURRENT_NORMAL
+    int current = battery_current();
+
 #if CONFIG_CHARGING >= CHARGING_MONITOR
     if (charging_state()) {
         /* charging: remaining charging time */
-        powermgmt_est_runningtime_min = (100 - level)*battery_capacity*60
-                / 100 / (CURRENT_MAX_CHG - runcurrent());
+        if(current > 0) {
+            powermgmt_est_runningtime_min =
+                (100 - level) * battery_capacity * 60 / 100 / current;
+        }
     }
     else
 #endif
 
     /* discharging: remaining running time */
-    if (level > 0 && (millivolt > percent_to_volt_discharge[battery_type][0]
-        || millivolt < 0)) {
-        /* linear extrapolation */
-        powermgmt_est_runningtime_min = (level + battery_percent)*60
-                * battery_capacity / 200 / runcurrent();
+    if (level >= 0 && current > 0) {
+        powermgmt_est_runningtime_min =
+            (level + battery_percent) * battery_capacity * 60 / 200 / current;
     }
-    if (0 > powermgmt_est_runningtime_min) {
+
+    if (powermgmt_est_runningtime_min < 0 || current <= 0)
         powermgmt_est_runningtime_min = 0;
-    }
 #endif
 
     battery_percent = level;
     send_battery_level_event();
 }
 
-#ifdef CURRENT_NORMAL /*check that we have a current defined in a config file*/
-
-/*
- * Estimate how much current we are drawing just to run.
- */
-static int runcurrent(void)
+#ifdef CURRENT_NORMAL
+int battery_current(void)
 {
     int current = CURRENT_NORMAL;
 
@@ -328,7 +320,7 @@ static int runcurrent(void)
         current = CURRENT_USB;
     }
 
-#if defined(HAVE_BACKLIGHT)
+#if defined(HAVE_BACKLIGHT) && defined(CURRENT_BACKLIGHT)
     if (backlight_get_current_timeout() == 0) /* LED always on */
         current += CURRENT_BACKLIGHT;
 #endif
@@ -338,12 +330,12 @@ static int runcurrent(void)
         current += CURRENT_RECORD;
 #endif
 
-#ifdef HAVE_SPDIF_POWER
+#if defined(HAVE_SPDIF_POWER) && defined(CURRENT_SPDIF_OUT)
     if (spdif_powered())
         current += CURRENT_SPDIF_OUT;
 #endif
 
-#ifdef HAVE_REMOTE_LCD
+#if defined(HAVE_REMOTE_LCD) && defined(CURRENT_REMOTE)
     if (remote_detect())
         current += CURRENT_REMOTE;
 #endif
@@ -353,11 +345,18 @@ static int runcurrent(void)
         current += CURRENT_ATA;
 #endif
 
+#if CONFIG_CHARGING >= CHARGING_MONITOR
+    /* While charging we must report the charging current. */
+    if (charging_state()) {
+        current = CURRENT_MAX_CHG - current;
+        current = MIN(current, 1);
+    }
+#endif
+
 #endif /* BOOTLOADER */
 
     return current;
 }
-
 #endif  /* CURRENT_NORMAL */
 
 /* Check to see whether or not we've received an alarm in the last second */

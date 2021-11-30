@@ -198,7 +198,7 @@
 /* define current usage levels */
 #define CURRENT_NORMAL     85 /* Measured */
 #define CURRENT_BACKLIGHT  200 /* Over 200 mA total measured when on */
-#define CURRENT_RECORD     0  /* no recording */
+#define CURRENT_REMOTE     2   /* FIXME: placeholder value */
 
 /* Hardware controlled charging with monitoring */
 #define CONFIG_CHARGING CHARGING_MONITOR

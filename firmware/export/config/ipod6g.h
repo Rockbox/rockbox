@@ -158,6 +158,7 @@
 /* define current usage levels */
 #define CURRENT_NORMAL     18  /* playback @48MHz clock, backlight off */
 #define CURRENT_BACKLIGHT  23  /* maximum brightness */
+#define CURRENT_RECORD      2  /* FIXME: placeholder value */
 
 /* define this if the unit can be powered or charged via USB */
 #define HAVE_USB_POWER

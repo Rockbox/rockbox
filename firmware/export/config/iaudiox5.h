@@ -151,6 +151,7 @@
 #define CURRENT_NORMAL     65  /*2250mah/35h = 65 ma*/  
 #define CURRENT_BACKLIGHT  25  
 #define CURRENT_REMOTE      8  /* additional current when remote connected */
+#define CURRENT_RECORD      2  /* FIXME: placeholder value */
 
 /* Define this if your LCD can set contrast */
 #define HAVE_LCD_CONTRAST

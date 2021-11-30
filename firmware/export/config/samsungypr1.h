@@ -163,5 +163,6 @@
 /* Define current usage levels. */
 #define CURRENT_NORMAL     24 /* ~25h, on 600mAh that's about 24mA */
 #define CURRENT_BACKLIGHT  62 /* ~6,5h -> 92mA. Minus 24mA normal that gives us 68mA */
+#define CURRENT_RECORD      2 /* FIXME: placeholder value */
 
 #endif /* SIMULATOR */

@@ -81,28 +81,13 @@ void powermgmt_init(void) INIT_ATTR;
 /* Generic current values that are intentionally meaningless - config header
  * should define proper numbers.*/
 
-
-#ifndef CURRENT_BACKLIGHT
-#define CURRENT_BACKLIGHT  5  /* additional current when backlight always on */
-#endif
-
-#if defined(HAVE_RECORDING) && !defined(CURRENT_RECORD)
-#define CURRENT_RECORD     2  /* additional recording current */
-#endif /* HAVE_RECORDING && !CURRENT_RECORD*/
-
 #ifndef CURRENT_USB
 #define CURRENT_USB       2 /* usual current in mA in USB mode */
 #endif
 
-#if defined(HAVE_REMOTE_LCD) && !defined(CURRENT_REMOTE)
-#define CURRENT_REMOTE      2  /* additional current when remote connected */
-#endif /* CURRENT_REMOTE && !HAVE_REMOTE_LCD */
-
-#if CONFIG_CHARGING
-#ifndef CURRENT_MAX_CHG
+#if CONFIG_CHARGING && !defined(CURRENT_MAX_CHG)
 #define CURRENT_MAX_CHG   350  /* maximum charging current */
 #endif
-#endif /* CONFIG_CHARGING */
 
 #ifndef BATT_AVE_SAMPLES
 /* slw filter constant unless otherwise specified */
@@ -126,6 +111,8 @@ extern const unsigned short percent_to_volt_charge[11];
 int battery_level(void); /* percent */
 int battery_time(void); /* minutes */
 int battery_voltage(void); /* filtered batt. voltage in millivolts */
+int battery_current(void); /* battery current in milliamps
+                            * (may just be a rough estimate) */
 
 /* Implemented by the target, unfiltered */
 int _battery_level(void); /* percent */
