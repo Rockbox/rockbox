@@ -1147,6 +1147,10 @@ static bool view_battery(void)
                     lcd_putsf(0, 7, "Est. remain: %d m", time_left);
                 else
                     lcd_puts(0, 7, "Estimation n/a");
+
+#if (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
+                lcd_putsf(0, 8, "battery current: %d mA", battery_current());
+#endif
                 break;
         }
 
