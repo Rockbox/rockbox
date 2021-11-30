@@ -108,6 +108,18 @@ enum
     NUM_REPEAT_MODES
 };
 
+/* single mode options */
+enum {
+    SINGLE_MODE_OFF = 0,
+    SINGLE_MODE_TRACK,
+    SINGLE_MODE_ALBUM,
+    SINGLE_MODE_ALBUM_ARTIST,
+    SINGLE_MODE_ARTIST,
+    SINGLE_MODE_COMPOSER,
+    SINGLE_MODE_GROUPING,
+    SINGLE_MODE_GENRE
+};
+
 enum
 {
     QUEUE_HIDE = 0,
@@ -476,7 +488,8 @@ struct user_settings
     int default_codepage;   /* set default codepage for tag conversion */
     bool hold_lr_for_scroll_in_list; /* hold L/R scrolls the list left/right */
     bool play_selected; /* Plays selected file even in shuffle mode */
-    bool single_mode;    /* single mode - stop after every track */
+    int single_mode;    /* single mode - stop after every track, album, album artist,
+                           artist, composer, work, or genre */
     bool party_mode;    /* party mode - unstoppable music */
     bool audioscrobbler; /* Audioscrobbler logging  */
     bool cuesheet;

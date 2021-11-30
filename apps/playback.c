@@ -2367,6 +2367,31 @@ static void audio_on_handle_finished(int hid)
     }
 }
 
+static inline char* single_mode_get_id3_tag(struct mp3entry *id3)
+{
+    struct mp3entry *valid_id3 = valid_mp3entry(id3);
+    if (valid_id3 == NULL)
+        return NULL;
+
+    switch (global_settings.single_mode)
+    {
+        case SINGLE_MODE_ALBUM:
+            return valid_id3->album;
+        case SINGLE_MODE_ALBUM_ARTIST:
+            return valid_id3->albumartist;
+        case SINGLE_MODE_ARTIST:
+            return valid_id3->artist;
+        case SINGLE_MODE_COMPOSER:
+            return valid_id3->composer;
+        case SINGLE_MODE_GROUPING:
+            return valid_id3->grouping;
+        case SINGLE_MODE_GENRE:
+            return valid_id3->genre_string;
+    }
+
+    return NULL;
+}
+
 /* Called to make an outstanding track skip the current track and to send the
    transition events */
 static void audio_finalise_track_change(void)
@@ -2422,15 +2447,27 @@ static void audio_finalise_track_change(void)
         track_id3 = bufgetid3(info.id3_hid);
     }
 
-    id3_write(PLAYING_ID3, track_id3);
+    if (SINGLE_MODE_OFF != global_settings.single_mode && global_settings.party_mode == 0 &&
+        ((skip_pending == TRACK_SKIP_AUTO) || (skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST)))
+    {
+        bool single_mode_do_pause = true;
+        if (SINGLE_MODE_TRACK != global_settings.single_mode)
+        {
+            char *previous_tag = single_mode_get_id3_tag(id3_get(PLAYING_ID3));
+            char *new_tag = single_mode_get_id3_tag(track_id3);
+            single_mode_do_pause = previous_tag == NULL ||
+                                   new_tag == NULL ||
+                                   strcmp(previous_tag, new_tag) != 0;
+        }
 
-    if (global_settings.single_mode)
-        if ( ((skip_pending == TRACK_SKIP_AUTO) || (skip_pending == TRACK_SKIP_AUTO_NEW_PLAYLIST))
-          && (global_settings.party_mode == 0) )
+        if (single_mode_do_pause)
         {
             play_status = PLAY_PAUSED;
             pcmbuf_pause(true);
         }
+    }
+
+    id3_write(PLAYING_ID3, track_id3);
 
     /* The skip is technically over */
     skip_pending = TRACK_SKIP_NONE;
