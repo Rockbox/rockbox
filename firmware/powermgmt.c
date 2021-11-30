@@ -190,18 +190,6 @@ int battery_current(void)
     int current = CURRENT_NORMAL;
 
 #ifndef BOOTLOADER
-    if (usb_inserted()
-#ifdef HAVE_USB_POWER
-    #if (CURRENT_USB < CURRENT_NORMAL)
-       || usb_powered_only()
-    #else
-       && !usb_powered_only()
-    #endif
-#endif
-    ) {
-        current = CURRENT_USB;
-    }
-
 #if defined(HAVE_BACKLIGHT) && defined(CURRENT_BACKLIGHT)
     if (backlight_get_current_timeout() == 0) /* LED always on */
         current += CURRENT_BACKLIGHT;

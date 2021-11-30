@@ -84,13 +84,6 @@ enum shutdown_type
 /* Start up power management thread */
 void powermgmt_init(void) INIT_ATTR;
 
-/* Generic current values that are intentionally meaningless - config header
- * should define proper numbers.*/
-
-#ifndef CURRENT_USB
-#define CURRENT_USB       2 /* usual current in mA in USB mode */
-#endif
-
 #if CONFIG_CHARGING && !defined(CURRENT_MAX_CHG)
 #define CURRENT_MAX_CHG   350  /* maximum charging current */
 #endif
