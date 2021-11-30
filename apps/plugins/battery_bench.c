@@ -268,7 +268,10 @@ static struct batt_info
      * a power of 2 */
     unsigned secs;
     int eta;
-    unsigned int voltage;
+    int voltage;
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+    int current;
+#endif
     short level;
     unsigned short flags;
 } bat[BUF_SIZE/sizeof(struct batt_info)];
@@ -368,6 +371,9 @@ static void flush_buffer(void)
         rb->fdprintf(fd,
                 "%02d:%02d:%02d,  %05d,     %03d%%,     "
                 "%02d:%02d,         %04d,   "
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+                "      %04d,   "
+#endif
 #if CONFIG_CHARGING
                 "  %c"
 #if CONFIG_CHARGING >= CHARGING_MONITOR
@@ -382,6 +388,9 @@ static void flush_buffer(void)
                 HMS(bat[i].secs), bat[i].secs, bat[i].level,
                 bat[i].eta / 60, bat[i].eta % 60,
                 bat[i].voltage
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+                , bat[i].current
+#endif
 #if CONFIG_CHARGING
                 , (bat[i].flags & BIT_CHARGER) ? 'A' : '-'
 #if CONFIG_CHARGING >= CHARGING_MONITOR
@@ -419,6 +428,9 @@ static void thread(void)
             bat[buf_idx].level = rb->battery_level();
             bat[buf_idx].eta = rb->battery_time();
             bat[buf_idx].voltage = rb->battery_voltage();
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+            bat[buf_idx].current = rb->battery_current();
+#endif
 #if CONFIG_CHARGING || defined(HAVE_USB_POWER)
             bat[buf_idx].flags = charge_state();
 #endif
@@ -579,6 +591,9 @@ enum plugin_status plugin_start(const void* parameter)
 
             rb->fdprintf(fd,
                 "# Time:,  Seconds:,  Level:,  Time Left:,  Voltage[mV]:"
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+                ", Current[mA]:"
+#endif
 #if CONFIG_CHARGING
                 ", C:"
 #endif

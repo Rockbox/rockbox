@@ -804,6 +804,7 @@ static const struct plugin_api rockbox_api = {
        the API gets incompatible */
     warn_on_pl_erase,
     playlist_insert_playlist,
+    battery_current,
 };
 
 static int plugin_buffer_handle;
