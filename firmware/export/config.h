@@ -208,6 +208,8 @@
                                  Usually application ports, and only
                                  if the estimation is better that ours
                                  (which it probably is) */
+#define CURRENT_MEASURE     8 /* Target can report battery charge and/or
+                               * discharge current */
 /* CONFIG_LCD */
 #define LCD_SSD1815   1 /* as used by Sansa M200 and others */
 #define LCD_S1D15E06  3 /* as used by iRiver H100 series */

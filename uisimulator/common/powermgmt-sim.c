@@ -43,6 +43,7 @@ static bool charging = false;
 static unsigned int batt_millivolts = BATT_MAXMVOLT;
 static unsigned int batt_percent = 100;
 static unsigned int batt_runtime = BATT_MAXRUNTIME;
+static unsigned int batt_current = 0;
 
 void powermgmt_init_target(void) {}
 
@@ -97,6 +98,8 @@ static void battery_status_update(void)
 
     batt_percent = (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
     batt_runtime = batt_percent * BATT_MAXRUNTIME;
+    /* current is completely bogus... */
+    batt_current = charging ? BATT_CHARGE_STEP : BATT_DISCHARGE_STEP;
 }
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] = { 3200 };
@@ -129,6 +132,14 @@ int _battery_time(void)
 {
     battery_status_update();
     return batt_runtime;
+}
+#endif
+
+#if (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
+int _battery_current(void)
+{
+    battery_status_update();
+    return batt_current;
 }
 #endif
 

@@ -110,7 +110,8 @@ static int percent_now; /* Cached to avoid polling too often */
 #if !(CONFIG_BATTERY_MEASURE & TIME_MEASURE)
 int _battery_time(void) { return -1; }
 #endif
-#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || defined(CURRENT_NORMAL)
+#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || \
+    defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
 static int time_now; /* Cached to avoid polling too often */
 #endif
 
@@ -119,6 +120,12 @@ int _battery_voltage(void) { return -1; }
 #else
 /* Data for the digital exponential filter */
 static int voltage_avg, voltage_now;
+#endif
+
+#if !(CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
+int _battery_current(void) { return -1; }
+#else
+static int current_avg, current_now;
 #endif
 
 /* The battery level can be obtained in two ways. If the target reports
@@ -142,7 +149,8 @@ int battery_level(void)
  * on the battery level and the actual current usage. */
 int battery_time(void)
 {
-#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || defined(CURRENT_NORMAL)
+#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || \
+    defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
     return time_now;
 #else
     return -1;
@@ -166,7 +174,9 @@ int battery_voltage(void)
  * the power consumed by the backlight, remote display, SPDIF, etc. */
 int battery_current(void)
 {
-#if defined(CURRENT_NORMAL)
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+    return current_now;
+#elif defined(CURRENT_NORMAL)
     int current = CURRENT_NORMAL;
 
 #ifndef BOOTLOADER
@@ -223,8 +233,8 @@ int battery_current(void)
 #endif
 }
 
-/* Initialize the battery voltage filter. This is called once
- * by the power thread before entering the main polling loop. */
+/* Initialize the battery voltage/current filters. This is called
+ * once by the power thread before entering the main polling loop. */
 static void average_init(void)
 {
 #if CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE
@@ -244,9 +254,14 @@ static void average_init(void)
 
     voltage_avg = voltage_now * BATT_AVE_SAMPLES;
 #endif /* CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE */
+
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+    current_now = _battery_current();
+    current_avg = current_now * BATT_CURRENT_AVE_SAMPLES;
+#endif
 }
 
-/* Sample the battery voltage and update the filter.
+/* Sample the battery voltage/current and update the filters.
  * Updated once every POWER_THREAD_STEP_TICKS. */
 static void average_step(bool low_battery)
 {
@@ -261,6 +276,11 @@ static void average_step(bool low_battery)
     }
 #else
     (void)low_battery;
+#endif
+
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+    current_avg += _battery_current() - current_avg / BATT_CURRENT_AVE_SAMPLES;
+    current_now = current_avg / BATT_CURRENT_AVE_SAMPLES;
 #endif
 }
 
@@ -353,7 +373,7 @@ static void battery_status_update(void)
 
 #if CONFIG_BATTERY_MEASURE & TIME_MEASURE
     time_now = _battery_time();
-#elif defined(CURRENT_NORMAL)
+#elif defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
     int current = battery_current();
     if(level >= 0 && current > 0 && battery_capacity > 0) {
 #if CONFIG_CHARGING >= CHARGING_MONITOR
@@ -455,6 +475,11 @@ void reset_battery_filter(int millivolts)
 {
     voltage_avg = millivolts * BATT_AVE_SAMPLES;
     voltage_now = millivolts;
+#if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
+    /* current would probably be inaccurate too */
+    current_now = _battery_current();
+    current_avg = current_now * BATT_CURRENT_AVE_SAMPLES;
+#endif
     battery_status_update();
 }
 #endif /* HAVE_BATTERY_SWITCH */
@@ -588,7 +613,6 @@ static inline bool detect_charger(unsigned int pwr)
     return true;
 }
 #endif /* CONFIG_CHARGING */
-
 
 #if CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE
 static int power_hist_item(void)

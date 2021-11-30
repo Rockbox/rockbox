@@ -94,6 +94,11 @@ void powermgmt_init(void) INIT_ATTR;
 #define BATT_AVE_SAMPLES 128
 #endif
 
+#ifndef BATT_CURRENT_AVE_SAMPLES
+/* TODO may need tweaking */
+#define BATT_CURRENT_AVE_SAMPLES 16
+#endif
+
 #ifndef POWER_THREAD_STEP_TICKS
 /* 2HZ sample rate unless otherwise specified */
 #define POWER_THREAD_STEP_TICKS (HZ/2)
@@ -118,6 +123,8 @@ int battery_current(void); /* battery current in milliamps
 int _battery_level(void); /* percent */
 int _battery_time(void); /* minutes */
 int _battery_voltage(void); /* voltage in millivolts */
+int _battery_current(void); /* (dis)charge current in milliamps */
+
 #if CONFIG_CHARGING >= CHARGING_TARGET
 void powermgmt_init_target(void);
 void charging_algorithm_close(void);
