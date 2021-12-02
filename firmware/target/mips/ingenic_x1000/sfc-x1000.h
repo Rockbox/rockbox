@@ -87,13 +87,13 @@ extern void sfc_irq_end(void);
 extern void sfc_set_clock(uint32_t freq);
 
 /* Set the device configuration register */
-inline void sfc_set_dev_conf(uint32_t conf)
+static inline void sfc_set_dev_conf(uint32_t conf)
 {
     REG_SFC_DEV_CONF = conf;
 }
 
 /* Control the state of the write protect pin */
-inline void sfc_set_wp_enable(bool en)
+static inline void sfc_set_wp_enable(bool en)
 {
     jz_writef(SFC_GLB, WP_EN(en ? 1 : 0));
 }

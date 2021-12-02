@@ -247,14 +247,15 @@ extern int i2c_reg_modify1(int bus, uint8_t addr, uint8_t reg,
                            uint8_t clr, uint8_t set, uint8_t* val);
 
 /* Variant to write a single 8-bit value to a register */
-inline int i2c_reg_write1(int bus, uint8_t addr, uint8_t reg, uint8_t val)
+static inline int i2c_reg_write1(int bus, uint8_t addr,
+                                 uint8_t reg, uint8_t val)
 {
     return i2c_reg_write(bus, addr, reg, 1, &val);
 }
 
 /* Variant to read an 8-bit value from a register; returns the value
  * directly, or returns -1 on any error. */
-inline int i2c_reg_read1(int bus, uint8_t addr, uint8_t reg)
+static inline int i2c_reg_read1(int bus, uint8_t addr, uint8_t reg)
 {
     uint8_t v;
     int i = i2c_reg_read(bus, addr, reg, 1, &v);
@@ -265,8 +266,8 @@ inline int i2c_reg_read1(int bus, uint8_t addr, uint8_t reg)
 }
 
 /* Variant to set or clear one bit in an 8-bit register */
-inline int i2c_reg_setbit1(int bus, uint8_t addr, uint8_t reg,
-                           int bit, int value, uint8_t* val)
+static inline int i2c_reg_setbit1(int bus, uint8_t addr, uint8_t reg,
+                                  int bit, int value, uint8_t* val)
 {
     uint8_t clr = 0, set = 0;
     if(value)

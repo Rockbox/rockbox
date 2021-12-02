@@ -80,13 +80,13 @@ extern void clk_set_ccr_div(uint32_t divbits);
 extern void clk_set_ddr(x1000_clk_t src, uint32_t div);
 
 /* Returns the smallest n such that infreq/n <= outfreq */
-inline uint32_t clk_calc_div(uint32_t infreq, uint32_t outfreq)
+static inline uint32_t clk_calc_div(uint32_t infreq, uint32_t outfreq)
 {
     return (infreq + (outfreq - 1)) / outfreq;
 }
 
 /* Returns the smallest n such that (infreq >> n) <= outfreq */
-inline uint32_t clk_calc_shift(uint32_t infreq, uint32_t outfreq)
+static inline uint32_t clk_calc_shift(uint32_t infreq, uint32_t outfreq)
 {
     uint32_t div = clk_calc_div(infreq, outfreq);
     return __builtin_clz(div) ^ 31;
