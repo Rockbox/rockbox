@@ -3629,8 +3629,10 @@ static void rb_splash_added_to_playlist(void)
 {
 #ifdef USEGSLIB
                 grey_show(false);
+#if LCD_DEPTH > 1
                 rb->lcd_set_background(N_BRIGHT(0));
                 rb->lcd_set_foreground(N_BRIGHT(255));
+#endif
                 rb->lcd_clear_display();
                 rb->lcd_update();
 #endif
