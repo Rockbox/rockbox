@@ -3622,6 +3622,7 @@ static void draw_album_text(void)
     }
 }
 
+#if PF_PLAYBACK_CAPABLE
 /**
   Display an info message when items have been added to playlist
 */
@@ -3641,6 +3642,7 @@ static void rb_splash_added_to_playlist(void)
                 grey_show(true);
 #endif
 }
+#endif
 
 /**
   Display an error message and wait for input.
