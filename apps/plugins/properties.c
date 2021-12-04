@@ -149,12 +149,37 @@ static bool file_properties(const char* selected_file)
                                  "%s", id3.genre_string ? id3.genre_string : "");
                     rb->snprintf(str_comment, sizeof str_comment,
                                  "%s", id3.comment ? id3.comment : "");
-                    rb->snprintf(str_year, sizeof str_year,
-                                 "%s", id3.year_string ? id3.year_string : "");
-                    rb->snprintf(str_discnum, sizeof str_discnum,
-                                 "%s", id3.disc_string ? id3.disc_string : "");
-                    rb->snprintf(str_tracknum, sizeof str_tracknum,
-                                 "%s", id3.track_string ? id3.track_string : "");
+
+                    if (id3.year_string)
+                        rb->snprintf(str_year, sizeof str_year,
+                                 "%s", id3.year_string);
+                    else if (id3.year)
+                        rb->snprintf(str_year, sizeof str_year,
+                                 "%d", id3.year);
+                    else
+                        rb->snprintf(str_year, sizeof str_year,
+                                 "%s", "");
+
+                    if (id3.disc_string)
+                        rb->snprintf(str_discnum, sizeof str_discnum,
+                                 "%s", id3.disc_string);
+                    else if (id3.discnum)
+                        rb->snprintf(str_discnum, sizeof str_discnum,
+                                 "%d", id3.discnum);
+                    else
+                        rb->snprintf(str_discnum, sizeof str_discnum,
+                                 "%s", "");
+
+                    if (id3.track_string)
+                        rb->snprintf(str_tracknum, sizeof str_tracknum,
+                                 "%s", id3.track_string);
+                    else if(id3.tracknum)
+                        rb->snprintf(str_tracknum, sizeof str_tracknum,
+                                 "%d", id3.tracknum);
+                    else
+                        rb->snprintf(str_tracknum, sizeof str_tracknum,
+                                 "%s", "");
+
                     rb->snprintf(str_bitrate, sizeof str_bitrate,
                                  "%d kbps", id3.bitrate ? : 0);
                     rb->snprintf(str_frequency, sizeof str_frequency,
