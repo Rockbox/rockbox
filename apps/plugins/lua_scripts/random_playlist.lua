@@ -250,6 +250,7 @@ function create_random_playlist(database, playlist, trackcount, play)
             if y >= max_h then
                 do_progress_header()
                 rb.lcd_clear_display()
+                rb.yield()
                 y = h
             end
         end
@@ -402,7 +403,7 @@ function create_random_playlist(database, playlist, trackcount, play)
         rb.splash(10, sREMOVEPLAYLIST)
         rb.audio("stop")
         os.remove( playlistpath .. "/" .. playlist)
-        rb.playlist("remove_all_tracks")
+        --rb.playlist("remove_all_tracks")
         rb.playlist("create", playlistpath .. "/", playlist)
 --[[ --profiling
         local starttime = rb.current_tick();
