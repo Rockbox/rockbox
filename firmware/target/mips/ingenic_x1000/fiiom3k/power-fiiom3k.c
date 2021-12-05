@@ -26,7 +26,7 @@
 #ifdef HAVE_USB_CHARGING_ENABLE
 # include "usb_core.h"
 #endif
-#include "axp-pmu.h"
+#include "axp192.h"
 #include "i2c-x1000.h"
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] =
@@ -54,27 +54,29 @@ const unsigned short percent_to_volt_charge[11] =
 
 void power_init(void)
 {
-    /* Initialize driver */
-    i2c_x1000_set_freq(2, I2C_FREQ_400K);
-    axp_init();
+    /* Configure I2C bus */
+    i2c_x1000_set_freq(AXP_PMU_BUS, I2C_FREQ_400K);
 
-    /* Set lowest sample rate */
-    axp_adc_set_rate(AXP_ADC_RATE_25HZ);
+    /* Set DCDC1 and DCDC2 to fixed PWM mode to match OF settings. */
+    axp_modify(AXP_REG_DCDCMODE, 0, 0x0c);
 
-    /* Ensure battery voltage ADC is enabled */
-    int bits = axp_adc_get_enabled();
-    bits |= (1 << ADC_BATTERY_VOLTAGE);
-    axp_adc_set_enabled(bits);
+    /* Power on required supplies */
+    axp_set_enabled_supplies(
+        (1 << AXP_SUPPLY_DCDC1) | /* not sure (3.3 V) */
+        (1 << AXP_SUPPLY_DCDC2) | /* not sure (1.4 V) */
+        (1 << AXP_SUPPLY_DCDC3) | /* for CPU (1.8 V) */
+        (1 << AXP_SUPPLY_LDO2) |  /* LCD controller (3.3 V) */
+        (1 << AXP_SUPPLY_LDO3));  /* SD bus (3.3 V) */
 
-    /* Turn on all power outputs */
-    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_PWROUTPUTCTRL2, 0, 0x5f, NULL);
-    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
-
-    /* Set the default charging current. This is the same as the
-     * OF's setting, although it's not strictly within the USB spec. */
-    axp_set_charge_current(780);
+    /* Enable required ADCs */
+    axp_set_enabled_adcs(
+        (1 << AXP_ADC_BATTERY_VOLTAGE) |
+        (1 << AXP_ADC_CHARGE_CURRENT) |
+        (1 << AXP_ADC_DISCHARGE_CURRENT) |
+        (1 << AXP_ADC_VBUS_VOLTAGE) |
+        (1 << AXP_ADC_VBUS_CURRENT) |
+        (1 << AXP_ADC_INTERNAL_TEMP) |
+        (1 << AXP_ADC_APS_VOLTAGE));
 
     /* Short delay to give power outputs time to stabilize */
     mdelay(200);
@@ -99,20 +101,25 @@ void power_off(void)
 
 bool charging_state(void)
 {
-    return axp_battery_status() == AXP_BATT_CHARGING;
+    return axp_is_charging();
+}
+
+unsigned int power_input_status(void)
+{
+    return axp_power_input_status();
 }
 
 int _battery_voltage(void)
 {
-    return axp_adc_read(ADC_BATTERY_VOLTAGE);
+    return axp_read_adc(AXP_ADC_BATTERY_VOLTAGE);
 }
 
 #if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
 int _battery_current(void)
 {
     if(charging_state())
-        return axp_adc_read(ADC_CHARGE_CURRENT);
+        return axp_read_adc(AXP_ADC_CHARGE_CURRENT);
     else
-        return axp_adc_read(ADC_DISCHARGE_CURRENT);
+        return axp_read_adc(AXP_ADC_DISCHARGE_CURRENT);
 }
 #endif

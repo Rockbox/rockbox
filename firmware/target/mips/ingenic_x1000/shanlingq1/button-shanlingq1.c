@@ -23,7 +23,7 @@
 #include "button.h"
 #include "touchscreen.h"
 #include "ft6x06.h"
-#include "axp-pmu.h"
+#include "axp192.h"
 #include "kernel.h"
 #include "backlight.h"
 #include "powermgmt.h"
@@ -57,7 +57,7 @@ static void hp_detect_init(void)
 {
     /* TODO: replace this copy paste cruft with an API in axp-pmu */
     static struct timeout tmo;
-    static const uint8_t gpio_reg = AXP192_REG_GPIOSTATE1;
+    static const uint8_t gpio_reg = AXP_REG_GPIOLEVEL1;
     static i2c_descriptor desc = {
         .slave_addr = AXP_PMU_ADDR,
         .bus_cond = I2C_START | I2C_STOP,
@@ -72,10 +72,10 @@ static void hp_detect_init(void)
     };
 
     /* Headphone detect is wired to AXP192 GPIO: set it to input state */
-    i2c_reg_write1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP192_REG_GPIO1FUNCTION, 0x01);
+    axp_set_gpio_function(1, AXP_GPIO_INPUT);
 
     /* Get an initial reading before startup */
-    int r = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, gpio_reg);
+    int r = axp_read(gpio_reg);
     if(r >= 0)
         hp_detect_reg = r;
 
