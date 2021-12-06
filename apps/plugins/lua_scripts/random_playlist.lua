@@ -29,6 +29,9 @@ local playlistpath = "/Playlists"
 local max_tracks = 500;  -- size of playlist to create
 local min_repeat = 500;  -- this many songs before a repeat
 local play_on_success = true;
+--program vars
+local playlist_handle
+local t_playlistbuf -- table for playlist write buffer
 
 -- Random integer function
 local random = math.random; -- ref random(min, max)
@@ -48,7 +51,6 @@ rb.contexts = nil
 local sINITDATABASE    = "Initialize Database"
 local sHEADERTEXT      = "Random Playlist"
 local sPLAYLISTERROR   = "Playlist Error!"
-local sREMOVEPLAYLIST  = "Removing Dynamic Playlist"
 local sSEARCHINGFILES  = "Searching for Files.."
 local sERROROPENFMT    = "Error Opening %s"
 local sINVALIDDBFMT    = "Invalid Database %s"
@@ -174,13 +176,55 @@ local function _setup_random_playlist(tag_entries, play, min_repeat, trackcount)
     return play, min_repeat, trackcount;
 end
 
+--deletes existing file and creates a new playlist
+local function playlist_create(filename)
+    local filehandle = io.open(filename, "w+") --overwrite
+    if not filehandle then
+        rb.splash(rb.HZ, "Error opening " .. filename)
+        return false
+    end
+    t_playlistbuf = {}
+    filehandle:write("\239\187\191") -- Write BOM --"\xEF\xBB\xBF" 
+    playlist_handle = filehandle
+    return true
+    --os.remove( playlistpath .. "/" .. playlist)
+    --rb.playlist("remove_all_tracks")
+    --rb.playlist("create", playlistpath .. "/", playlist)
+end
+
+-- writes track path to a buffer must be flushed
+local function playlist_write(trackpath)
+    t_playlistbuf[#t_playlistbuf + 1] = trackpath
+    t_playlistbuf[#t_playlistbuf + 1] = "\n"
+    --[[if rb.playlist("insert_track", str) < 0 then
+        rb.splash(rb.HZ, sPLAYLISTERROR)
+        break; -- ERROR, PLAYLIST FULL?
+        end]]
+end
+
+-- flushes playlist buffer to file
+local function playlist_flush()
+    playlist_handle:write(table.concat(t_playlistbuf))
+    t_playlistbuf = {}
+    --[[if rb.playlist("insert_track", str) < 0 then
+        rb.splash(rb.HZ, sPLAYLISTERROR)
+        break; -- ERROR, PLAYLIST FULL?
+        end]]
+end
+
+-- closes playlist file descriptor
+local function playlist_finalize()
+    playlist_handle:close()
+end
+
 --[[ Given the filenameDB file [database]
     creates a random dynamic playlist with a default savename of [playlist]
     containing [trackcount] tracks, played on completion if [play] is true]]
-function create_random_playlist(database, playlist, trackcount, play)
+local function create_random_playlist(database, playlist, trackcount, play)
     if not database or not playlist or not trackcount then return end
     if not play then play = false end
 
+    local playlist_handle
     local file = io.open('/' .. database or "", "r") --read
     if not file then rb.splash(100, string.format(sERROROPENFMT, database)) return end
 
@@ -214,6 +258,7 @@ function create_random_playlist(database, playlist, trackcount, play)
     end
 
     local tag_entries = bytesLE_n(tagcache_entries)
+    if tag_entries > 50000 then play = false end
 
     play, min_repeat, trackcount = _setup_random_playlist(
                             tag_entries, play, min_repeat, trackcount);
@@ -250,6 +295,7 @@ function create_random_playlist(database, playlist, trackcount, play)
             if y >= max_h then
                 do_progress_header()
                 rb.lcd_clear_display()
+                playlist_flush(playlist_handle)
                 rb.yield()
                 y = h
             end
@@ -319,14 +365,11 @@ function create_random_playlist(database, playlist, trackcount, play)
                 tracks = tracks + 1
                 show_progress()
                 push_lru(idxp) -- add to repeat list
-                if rb.playlist("insert_track", str) < 0 then
-                    rb.splash(rb.HZ, sPLAYLISTERROR)
-                    break; -- ERROR, PLAYLIST FULL?
-                end
-
+                playlist_write(str)
             end
 
             if tracks >= trackcount then
+                playlist_flush()
                 do_progress_header()
                 break
             end
@@ -400,11 +443,7 @@ function create_random_playlist(database, playlist, trackcount, play)
             anchor_index = nil
         end
 
-        rb.splash(10, sREMOVEPLAYLIST)
-        rb.audio("stop")
-        os.remove( playlistpath .. "/" .. playlist)
-        --rb.playlist("remove_all_tracks")
-        rb.playlist("create", playlistpath .. "/", playlist)
+        if not playlist_create(playlistpath .. "/" .. playlist) then return end
 --[[ --profiling
         local starttime = rb.current_tick();
         get_tracks_random()
@@ -414,15 +453,20 @@ function create_random_playlist(database, playlist, trackcount, play)
     if (false) then
 --]]
         get_tracks_random()
+        playlist_finalize(playlist_handle)
     end
 
     file:close()
     collectgarbage("collect")
-    if trackcount and rb.playlist("amount") >= trackcount and play == true then
+    if trackcount and play == true then
+        rb.audio("stop")
+        rb.yield()
+        rb.playlist("create", playlistpath .. "/", "dynamic_playlist.m3u8")
+        rb.playlist("insert_playlist", playlistpath .. "/" .. playlist)
         rb.playlist("start", 0, 0, 0)
     end
 
-end -- create_playlist
+end -- playlist_create
 
 local function main()
     if not rb.file_exists(rb.ROCKBOX_DIR .. "/database_4.tcd") then

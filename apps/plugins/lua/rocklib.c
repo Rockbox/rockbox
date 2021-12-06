@@ -320,11 +320,12 @@ RB_WRAP(playlist)
     enum e_playlist {PLAYL_AMOUNT = 0, PLAYL_ADD, PLAYL_CREATE,
                      PLAYL_START, PLAYL_RESUMETRACK, PLAYL_RESUME,
                      PLAYL_SHUFFLE, PLAYL_SYNC, PLAYL_REMOVEALLTRACKS,
-                     PLAYL_INSERTTRACK, PLAYL_INSERTDIRECTORY, PLAYL_ECOUNT};
+                     PLAYL_INSERTTRACK, PLAYL_INSERTDIRECTORY, PLAYL_INSERTPLAYL,
+                     PLAYL_ECOUNT};
 
     const char *playlist_option[] = {"amount", "add", "create", "start", "resume_track",
                                      "resume", "shuffle", "sync", "remove_all_tracks",
-                                     "insert_track", "insert_directory", NULL};
+                                     "insert_track", "insert_directory", "insert_playlist", NULL};
 
     const char *filename, *dir;
     int result = 0;
@@ -387,6 +388,12 @@ RB_WRAP(playlist)
             queue = lua_toboolean(L, 4); /* default to false */
             recurse = lua_toboolean(L, 5); /* default to false */
             result = rb->playlist_insert_directory(NULL, dir, pos, queue, recurse);
+            break;
+        case PLAYL_INSERTPLAYL:
+            filename = luaL_checkstring(L, 2); /* only required parameter */
+            pos = luaL_optint(L, 3, 0);
+            queue = lua_toboolean(L, 4); /* default to false */
+            result = rb->playlist_insert_playlist(NULL, filename, pos, queue);
             break;
     }
 

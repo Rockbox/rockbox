@@ -803,6 +803,7 @@ static const struct plugin_api rockbox_api = {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     warn_on_pl_erase,
+    playlist_insert_playlist,
 };
 
 static int plugin_buffer_handle;

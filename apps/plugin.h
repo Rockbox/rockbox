@@ -929,7 +929,8 @@ struct plugin_api {
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
     bool (*warn_on_pl_erase)(void);
-
+    int (*playlist_insert_playlist)(struct playlist_info* playlist,
+                                    const char *filename, int position, bool queue);
 };
 
 /* plugin header */
