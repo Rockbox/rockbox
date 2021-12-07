@@ -56,13 +56,13 @@ static int update_rowpos(int action, int cur_pos, int rows_per_screen, int tot_r
         case ACTION_STD_NEXTREPEAT:
             cur_pos++;
             break;
-    }                
+    }
 
     if(cur_pos > tot_rows - rows_per_screen)
         cur_pos = 0;
     if(cur_pos < 0)
         cur_pos = tot_rows - rows_per_screen;
-    
+
     return cur_pos;
 }
 
@@ -150,7 +150,7 @@ static void roll_credits(void)
         if(stop_autoscroll(action))
             break;
     }
-    
+
     /* process user actions (if any) */
     if(ACTION_STD_CANCEL == action)
         return;
@@ -193,7 +193,7 @@ static void roll_credits(void)
                     rb->lcd_set_drawmode(DRMODE_SOLID);
                     rb->lcd_putsxy(namepos, font_h*(i+1), name);
                     rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
-    
+
                     /* exit on keypress, react to scrolling */
                     action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
                     if(stop_autoscroll(action))
@@ -214,7 +214,7 @@ static void roll_credits(void)
                 rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
                 if (j+i < NUM_VISIBLE_LINES) /* takes care of trail on loop */
                     rb->lcd_update_rect(0, 0, LCD_WIDTH, font_h);
-    
+
                 for(namepos = 0-name_w; namepos <= name_targetpos;
                     namepos += (name_targetpos - namepos + 14) / 7)
                 {
@@ -224,7 +224,7 @@ static void roll_credits(void)
                     rb->lcd_putsxy(namepos, font_h*(i+1), name);
                     rb->lcd_update_rect(0, font_h*(i+1), LCD_WIDTH, font_h);
                     rb->lcd_update_rect(CREDITS_TARGETPOS, 0, credits_w,font_h);
-    
+
                     /* stop on keypress */
                     action = rb->get_action(CONTEXT_LIST, HZ/ANIM_SPEED);
                     if(stop_autoscroll(action))
@@ -236,14 +236,14 @@ static void roll_credits(void)
             } /* for(i=0; i<NUM_VISIBLE_LINES; i++) */
             if(stop_autoscroll(action))
                 break;
-            
+
             action = rb->get_action(CONTEXT_LIST, HZ*PAUSE_TIME);
             if(stop_autoscroll(action))
                 break;
 
             j+=i; /* no user intervention, draw the next screen-full */
         } /* while(j < numnames) */
-        
+
         /* handle the keypress that we intercepted during autoscroll */
         if(ACTION_STD_CANCEL == action)
             return;
@@ -263,14 +263,14 @@ static void roll_credits(void)
                          j+NUM_VISIBLE_LINES, numnames);
             rb->lcd_getstringsize(elapsednames, &credits_w, NULL);
             rb->lcd_putsxy(CREDITS_TARGETPOS, 0, elapsednames);
-            
+
             for(i=0; i<NUM_VISIBLE_LINES; i++)
                 rb->lcd_putsxyf(0, font_h*(i+1), "%s", credits[j+i]);
 
             rb->lcd_update();
 
             rb->yield();
-            
+
             /* wait for user action */
             action = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
             if(ACTION_STD_CANCEL == action)
@@ -279,7 +279,7 @@ static void roll_credits(void)
         }
         return; /* exit without animation */
     }
-    
+
     action = rb->get_action(CONTEXT_LIST, HZ*3);
     if(ACTION_STD_CANCEL == action)
         return;
