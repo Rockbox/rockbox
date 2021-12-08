@@ -1,12 +1,13 @@
 % $Id$ %
+\newcommand{\includeicon}{\Ifpdfoutput{\includegraphics[width=0.37cm]}{\includegraphics}}
 \chapter{File formats}
 \section{\label{ref:Supportedfileformats}Supported file formats}
 \begin{rbtabular}{\textwidth}{cl>{\raggedright}p{7em}X}%
 {\textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
   & \textbf{Action when selected}}{}{}
-\includegraphics[width=0.37cm]{appendix/images/icon-directory.png} 
+\includeicon{appendix/images/icon-directory.png}
   & Directory & \emph{none} & Enter the directory \tabularnewline
-  \includegraphics[width=0.37cm]{appendix/images/icon-audio-file.png} 
+  \includeicon{appendix/images/icon-audio-file.png} 
   & Audio file & \emph{various}\newline%
   (see \ref{ref:Supportedaudioformats})%
   % do NOT use \reference{} here as that will break the table.
@@ -14,62 +15,62 @@
   & Bookmark & \fname{.bmark} & Display all bookmarks for an audio file\tabularnewline
   & Game of Life & \fname{.cells} & Show the configuration with the
      ``Rocklife'' plugin\tabularnewline
-\includegraphics[width=0.37cm]{appendix/images/icon-config.png} 
+\includeicon{appendix/images/icon-config.png}
   & Configuration File & \fname{.cfg} & Load the settings file\tabularnewline
-\includegraphics[width=0.37cm]{appendix/images/icon-chip8.png} 
+\includeicon{appendix/images/icon-chip8.png} 
   & Chip8 game & \fname{.ch8} & Play the Chip8 game \tabularnewline
 \opt{lcd_color}{
   & Colours & \fname{.colours} & Open the colours file for editing.
     See \reference{ref:ChangingFiletypeColours}.\tabularnewline
 }
-\includegraphics[width=0.37cm]{appendix/images/icon-cuesheet.png} 
+\includeicon{appendix/images/icon-cuesheet.png}
   & Cuesheet & \fname{.cue} & View the cuesheet file \tabularnewline
 \opt{radio}{
   & FM Presets & \fname{.fmr} & Load the FM Presets (previous are discarded)\tabularnewline
 }
-\includegraphics[width=0.37cm]{appendix/images/icon-font.png} 
+\includeicon{appendix/images/icon-font.png}
   & Font & \fname{.fnt} & Change the user interface font to this one\tabularnewline
 \opt{gigabeat}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.gigabeat} & Load the new firmware with ROLO \tabularnewline
 }
 \opt{iaudio}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.iaudio} & Load the new firmware with ROLO \tabularnewline
 }
 \opt{ipod}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.ipod} & Load the new firmware with ROLO \tabularnewline
 }
 \opt{iriverh100,iriverh300}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.iriver} & Load the new firmware with ROLO \tabularnewline
 }
-\includegraphics[width=0.37cm]{appendix/images/icon-image-file.png} 
+\includeicon{appendix/images/icon-image-file.png} 
   & Image & \fname{.jpg} & View the JPEG image \tabularnewline
   & Link & \fname{.link} & Display list of target files and directories;
     selecting one jumps to the target. See \reference{ref:Shortcutsplugin}.\tabularnewline
-\includegraphics[width=0.37cm]{appendix/images/icon-lang.png} 
+\includeicon{appendix/images/icon-lang.png} 
   & Language File & \fname{.lng} & Load the language file \tabularnewline
-\includegraphics[width=0.37cm]{appendix/images/icon-playlist.png}
+\includeicon{appendix/images/icon-playlist.png}
   & Playlist & \fname{.m3u}, \fname{.m3u8} & Load the playlist and start playing 
     the first file \tabularnewline
 \opt{iriverh10,iriverh10_5gb,sansa,mrobe100,vibe500,samsungyh}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png} 
   & Rockbox firmware & \fname{.mi4} & Load the new firmware with ROLO \tabularnewline
 }
- \includegraphics[width=0.37cm]{appendix/images/icon-movie-file.png}
+ \includeicon{appendix/images/icon-movie-file.png}
  & Video & \fname{.mpg}, \fname{.mpeg}, \fname{.mpv}, \fname{.m2v} & Play the MPEG1/2 video \tabularnewline
-\includegraphics[width=0.37cm]{appendix/images/icon-rock.png} 
+\includeicon{appendix/images/icon-rock.png} 
   & Plugin & \fname{.rock} & Start the plugin\tabularnewline
 \opt{sansaAMS}{
-  \includegraphics[width=0.37cm]{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.sansa} & Load the new firmware with ROLO \tabularnewline
 }
-\includegraphics[width=0.37cm]{appendix/images/icon-text.png} 
+\includeicon{appendix/images/icon-text.png}
   & Text File & \fname{.txt} & Display the text file using the text viewer plugin\tabularnewline
   & Voice file & \fname{.voice} & Allow Rockbox to speak menus\tabularnewline
-\includegraphics[width=0.37cm]{appendix/images/icon-wps.png} 
+\includeicon{appendix/images/icon-wps.png}
   & While Playing Screen & \fname{.wps} & Load the new WPS display configuration\tabularnewline
 \end{rbtabular}
 

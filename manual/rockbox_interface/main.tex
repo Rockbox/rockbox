@@ -15,8 +15,9 @@
 % specify the extension.
 \begin{center}
 \IfFileExists{rockbox_interface/images/\specimg-front.png}
-   {\includegraphics[height=8cm,width=10cm,keepaspectratio=true]%
-    {rockbox_interface/images/\specimg-front}
+   {\Ifpdfoutput{\includegraphics[height=8cm,width=10cm,keepaspectratio=true]%
+    {rockbox_interface/images/\specimg-front}}
+   {\includegraphics{rockbox_interface/images/\specimg-front}}
    }
    {\color{red}{\textbf{WARNING!} Image not found}%
     \typeout{Warning: missing front image}
@@ -26,7 +27,8 @@
   % spacing between the two pictures, could possibly be improved
   \begin{center}
   \IfFileExists{rockbox_interface/images/\specimg-remote.png}
-    {\includegraphics[height=5.6cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-remote}
+    {\Ifpdfoutput{\includegraphics[height=5.6cm,width=10cm,keepaspectratio=true]{rockbox_interface/images/\specimg-remote}}
+    {\includegraphics{rockbox_interface/images/\specimg-remote}}
     }
     {\color{red}{\textbf{WARNING!} Image not found}%
      \typeout{Warning: missing remote image}

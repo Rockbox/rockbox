@@ -178,19 +178,21 @@
     \newcommand{\seriesimg}{\specimg}
 \fi
 
+\newcommand{\includescreenshot}{\Ifpdfoutput{\includegraphics[width=\screenshotsize]}{\includegraphics}}
+
 \newcommand{\screenshot}[3]{
   \begin{figure}[H]
     \begin{center}
       \IfFileExists{#1-\genericimg-\specimg.png}
-        {\includegraphics[width=\screenshotsize]{#1-\genericimg-\specimg.png}
+        {\includescreenshot{#1-\genericimg-\specimg.png}
          \typeout{Note: device specific image used}}
         {\IfFileExists{#1-\genericimg-\seriesimg.png}
-          {\includegraphics[width=\screenshotsize]{#1-\genericimg-\seriesimg.png}
+          {\includescreenshot{#1-\genericimg-\seriesimg.png}
            \typeout{Note: series specific image used}}
           {\IfFileExists{#1-\genericimg.png}
-            {\includegraphics[width=\screenshotsize]{#1-\genericimg.png}}
+            {\includescreenshot{#1-\genericimg.png}}
             {\IfFileExists{#1}
-              {\includegraphics[width=\screenshotsize]{#1}
+              {\includescreenshot{#1}
                \typeout{Warning: deprecated plain image name used}}%
               {\typeout{Missing image: #1 (\genericimg) (\specimg)}%
                \color{red}{\textbf{WARNING!} Image not found}%
