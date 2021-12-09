@@ -102,7 +102,6 @@
 #include "rbunicode.h"
 #include "root_menu.h"
 #include "plugin.h" /* To borrow a temp buffer to rewrite a .m3u8 file */
-#include "panic.h"
 #include "logdiskf.h"
 #ifdef HAVE_DIRCACHE
 #include "dircache.h"
@@ -2092,8 +2091,9 @@ int playlist_create(const char *dir, const char *file)
         }
         else
         {
-            /* should not happen */
-            panicf("%s(): OOM", __func__);
+            /* should not happen -- happens if plugin takes audio buffer */
+            splashf(HZ * 2, "%s(): OOM", __func__);
+            return -1;
         }
     }
 
@@ -2127,7 +2127,10 @@ int playlist_resume(void)
         talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
     handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
     if (handle < 0)
-        panicf("%s(): OOM", __func__);
+    {
+        splashf(HZ * 2, "%s(): OOM", __func__);
+        return -1;
+    }
     buffer = core_get_data(handle);
 
     empty_playlist(playlist, true);
