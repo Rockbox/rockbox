@@ -20,6 +20,19 @@
  *
  ****************************************************************************/
 ]]
+--[[ random_playlist
+    This script opens the users database file containg track path + filenames
+    first it reads the database file making an index of tracks
+    [for large playlists it only saves an index every [10|100|1000] tracks.
+    tracks will be incrementally loaded along with the results of the entries
+    traversed but the garbage collector will erase them when needed]
+
+    next tracks are choosen at random and added either to an in-ram playlist
+    using plugin functions OR
+    to a on disk playlist using a table as a write buffer
+    the user can also choose to play the playlist in either case
+]]
+
 require ("actions")
 require("dbgettags")
 get_tags = nil -- unneeded
@@ -29,6 +42,7 @@ local playlistpath = "/Playlists"
 local max_tracks = 500;  -- size of playlist to create
 local min_repeat = 500;  -- this many songs before a repeat
 local play_on_success = true;
+local playlist_name = "random_playback.m3u8"
 --program vars
 local playlist_handle
 local t_playlistbuf -- table for playlist write buffer
@@ -63,12 +77,15 @@ local function text_extent(msg, font)
     return rb.font_getstringsize(msg, font)
 end
 
-local function _setup_random_playlist(tag_entries, play, min_repeat, trackcount)
+local function _setup_random_playlist(tag_entries, play, savepl, min_repeat, trackcount)
     -- Setup string tables
     local tPLAYTEXT   = {"Play? [ %s ] (up/dn)", "true = play tracks on success"}
+    local tSAVETEXT   = {"Save to disk? [ %s ] (up/dn)",
+                         "true = tracks saved to",
+                         playlist_name};
     local tREPEATTEXT = {"Repeat hist? [ %d ] (up/dn)","higher = less repeated songs"}
     local tPLSIZETEXT = {"Find [ %d ] tracks? (up/dn)",
-                         "Warning overwrites dynamic playlist",
+                         "Warning may overwrite dynamic playlist",
                          "Press back to cancel"};
     -- how many lines can we fit on the screen?
     local res, w, h = text_extent("I")
@@ -125,6 +142,22 @@ local function _setup_random_playlist(tag_entries, play, min_repeat, trackcount)
         end
     end
 
+    -- Save the playlist to disk true/false?
+    function setup_get_save()
+        action = ask_user_action(tdesc,
+                                 string.format(tSAVETEXT[1], tostring(savepl)),
+                                 tSAVETEXT[2], tSAVETEXT[3]);
+        if action == ADD_BUTTON then
+            savepl = true
+        elseif action == SUB_BUTTON then
+            savepl = false
+        elseif action == OK_BUTTON then
+            ask = setup_get_play;
+            setup_get_save = nil
+            action = 0
+        end
+    end
+
     -- Repeat song buffer list of previously added tracks 0-??
     function setup_get_repeat()
         if min_repeat >= trackcount then min_repeat = trackcount - 1 end
@@ -139,7 +172,7 @@ local function _setup_random_playlist(tag_entries, play, min_repeat, trackcount)
             min_repeat = min_repeat - increment
             if min_repeat < 0 then min_repeat = 0 end
         elseif action == OK_BUTTON then
-            ask = setup_get_play;
+            ask = setup_get_save;
             setup_get_repeat = nil
             action = 0
         end
@@ -173,9 +206,11 @@ local function _setup_random_playlist(tag_entries, play, min_repeat, trackcount)
         if action == CANCEL_BUTTON then rb.lcd_scroll_stop(); return nil end
     until (action == OK_BUTTON)
 
-    return play, min_repeat, trackcount;
+    return play, savepl, min_repeat, trackcount;
 end
-
+--[[ manually create a playlist
+playlist is created initially by creating a new file (or erasing old)
+and adding the BOM]]
 --deletes existing file and creates a new playlist
 local function playlist_create(filename)
     local filehandle = io.open(filename, "w+") --overwrite
@@ -184,47 +219,42 @@ local function playlist_create(filename)
         return false
     end
     t_playlistbuf = {}
-    filehandle:write("\239\187\191") -- Write BOM --"\xEF\xBB\xBF" 
+    filehandle:write("\239\187\191") -- Write BOM --"\xEF\xBB\xBF"
     playlist_handle = filehandle
     return true
-    --os.remove( playlistpath .. "/" .. playlist)
-    --rb.playlist("remove_all_tracks")
-    --rb.playlist("create", playlistpath .. "/", playlist)
 end
 
--- writes track path to a buffer must be flushed
-local function playlist_write(trackpath)
-    t_playlistbuf[#t_playlistbuf + 1] = trackpath
-    t_playlistbuf[#t_playlistbuf + 1] = "\n"
-    --[[if rb.playlist("insert_track", str) < 0 then
-        rb.splash(rb.HZ, sPLAYLISTERROR)
-        break; -- ERROR, PLAYLIST FULL?
-        end]]
+-- writes track path to a buffer must be later flushed to playlist file
+local function playlist_insert(trackpath)
+    local bufp = #t_playlistbuf + 1
+    t_playlistbuf[bufp] = trackpath
+    bufp = bufp + 1
+    t_playlistbuf[bufp] = "\n"
+    return bufp
 end
 
 -- flushes playlist buffer to file
 local function playlist_flush()
     playlist_handle:write(table.concat(t_playlistbuf))
     t_playlistbuf = {}
-    --[[if rb.playlist("insert_track", str) < 0 then
-        rb.splash(rb.HZ, sPLAYLISTERROR)
-        break; -- ERROR, PLAYLIST FULL?
-        end]]
 end
 
 -- closes playlist file descriptor
 local function playlist_finalize()
     playlist_handle:close()
+    return true
 end
 
 --[[ Given the filenameDB file [database]
     creates a random dynamic playlist with a default savename of [playlist]
     containing [trackcount] tracks, played on completion if [play] is true]]
-local function create_random_playlist(database, playlist, trackcount, play)
+local function create_random_playlist(database, playlist, trackcount, play, savepl)
     if not database or not playlist or not trackcount then return end
     if not play then play = false end
+    if not savepl then savepl = false end
 
     local playlist_handle
+    local playlistisfinalized = false
     local file = io.open('/' .. database or "", "r") --read
     if not file then rb.splash(100, string.format(sERROROPENFMT, database)) return end
 
@@ -258,11 +288,25 @@ local function create_random_playlist(database, playlist, trackcount, play)
     end
 
     local tag_entries = bytesLE_n(tagcache_entries)
-    if tag_entries > 50000 then play = false end
 
-    play, min_repeat, trackcount = _setup_random_playlist(
-                            tag_entries, play, min_repeat, trackcount);
+    play, savepl, min_repeat, trackcount = _setup_random_playlist(
+                            tag_entries, play, savepl, min_repeat, trackcount);
     _setup_random_playlist = nil
+
+    if savepl == false then
+        -- Use the rockbox playlist functions to add tracks to in-ram playlist
+        playlist_create  = function(filename)
+            return (rb.playlist("create", playlistpath .. "/", playlist) >= 0)
+        end
+        playlist_insert = function(str)
+            return rb.playlist("insert_track", str)
+        end
+        playlist_flush = function() end
+        playlist_finalize = function()
+            return (rb.playlist("amount") >= trackcount)
+        end
+    end
+    if not playlist_create(playlistpath .. "/" .. playlist) then return end
     collectgarbage("collect")
 
     -- how many lines can we fit on the screen?
@@ -344,7 +388,7 @@ local function create_random_playlist(database, playlist, trackcount, play)
         end
 
         get_index() --init get_index fn
-    -- Playlist insert loop
+        -- Playlist insert loop
         while true do
             str = nil
             tries = 0
@@ -365,7 +409,11 @@ local function create_random_playlist(database, playlist, trackcount, play)
                 tracks = tracks + 1
                 show_progress()
                 push_lru(idxp) -- add to repeat list
-                playlist_write(str)
+                if playlist_insert(str) < 0 then
+                    rb.sleep(rb.HZ) --rb playlist fn display own message wait for that
+                    rb.splash(rb.HZ, sPLAYLISTERROR)
+                    break; -- ERROR, PLAYLIST FULL?
+                end
             end
 
             if tracks >= trackcount then
@@ -384,7 +432,7 @@ local function create_random_playlist(database, playlist, trackcount, play)
     function build_anchor_index()
         -- index every n files
         ANCHOR_INTV = 1 -- for small db we can put all the entries in ram
-        local ent = tag_entries / 1000 -- more than 10,000 will be incrementally loaded
+        local ent = tag_entries / 100 -- more than 1000 will be incrementally loaded
         while ent >= 10 do -- need to reduce the size of the anchor index?
             ent = ent / 10
             ANCHOR_INTV = ANCHOR_INTV * 10
@@ -442,8 +490,6 @@ local function create_random_playlist(database, playlist, trackcount, play)
             track_index = anchor_index
             anchor_index = nil
         end
-
-        if not playlist_create(playlistpath .. "/" .. playlist) then return end
 --[[ --profiling
         local starttime = rb.current_tick();
         get_tracks_random()
@@ -453,16 +499,19 @@ local function create_random_playlist(database, playlist, trackcount, play)
     if (false) then
 --]]
         get_tracks_random()
-        playlist_finalize(playlist_handle)
+        playlistisfinalized = playlist_finalize(playlist_handle)
     end
 
     file:close()
     collectgarbage("collect")
-    if trackcount and play == true then
+    if trackcount and play == true and playlistisfinalized == true then
         rb.audio("stop")
         rb.yield()
-        rb.playlist("create", playlistpath .. "/", "dynamic_playlist.m3u8")
-        rb.playlist("insert_playlist", playlistpath .. "/" .. playlist)
+        if savepl == true then
+            rb.playlist("create", playlistpath .. "/", playlist)
+            rb.playlist("insert_playlist", playlistpath .. "/" .. playlist)
+            rb.sleep(rb.HZ)
+        end
         rb.playlist("start", 0, 0, 0)
     end
 
@@ -482,13 +531,13 @@ local function main()
     rb.lcd_update()
     collectgarbage("collect")
     create_random_playlist(rb.ROCKBOX_DIR .. "/database_4.tcd",
-                        "random_playback.m3u8", max_tracks, play_on_success);
-    rb.splash(rb.HZ * 2, sGOODBYE)
+                        playlist_name, max_tracks, play_on_success);
     -- Restore user backlight settings
     rb.backlight_use_settings()
     if rb.cpu_boost then rb.cpu_boost(false) end
-
---[[
+    rb.sleep(rb.HZ)
+    rb.splash(rb.HZ * 2, sGOODBYE)
+--[[ 
 local used, allocd, free = rb.mem_stats()
 local lu = collectgarbage("count")
 local fmt = function(t, v) return string.format("%s: %d Kb\n", t, v /1024) end
