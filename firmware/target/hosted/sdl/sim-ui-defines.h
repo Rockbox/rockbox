@@ -523,10 +523,10 @@
 
 #elif defined(FIIO_M3K) || defined(FIIO_M3K_LINUX)
 #define UI_TITLE                    "FiiO M3K"
-#define UI_WIDTH                    335 /* width of GUI window */
-#define UI_HEIGHT                   686 /* height of GUI window */
+#define UI_WIDTH                    334 /* width of GUI window */
+#define UI_HEIGHT                   684 /* height of GUI window */
 #define UI_LCD_POSX                 49
-#define UI_LCD_POSY                 38
+#define UI_LCD_POSY                 37
 
 
 #elif defined(SHANLING_Q1)
