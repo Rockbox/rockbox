@@ -728,7 +728,7 @@ Lyre prototype 1 */
 
 #ifdef HAVE_RDS_CAP
 /* combinable bitflags */
-#define RDS_CFG_ISR     0x1 /* uses ISR to process packets */
+/* 0x01 can be reused, was RDS_CFG_ISR */
 #define RDS_CFG_PROCESS 0x2 /* uses raw packet processing */
 #define RDS_CFG_PUSH    0x4 /* pushes processed information */
 #define RDS_CFG_POLL    0x8 /* tuner driver provides a polling function */

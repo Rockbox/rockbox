@@ -72,15 +72,6 @@ static int  rt_data_idx;        /* rt_data[0 or 1] */
 #define RT_DATA_INC(x) rt_data[rt_data_idx ^= (x)]
 #endif /* (CONFIG_RDS & RDS_CFG_PROCESS) */
 
-#if (CONFIG_RDS & RDS_CFG_ISR)
-/* Functions are called in ISR context */
-#define rds_disable_irq_save() disable_irq_save()
-#define rds_restore_irq(old) restore_irq(old)
-#else /* !(CONFIG_RDS & RDS_CFG_ISR) */
-#define rds_disable_irq_save() 0
-#define rds_restore_irq(old) ((void)(old))
-#endif /* (CONFIG_RDS & RDS_CFG_ISR) */
-
 /* RDS code table G0 to UTF-8 translation */
 static const uint16_t rds_tbl_g0[0x100-0x20] =
 {
@@ -195,8 +186,6 @@ static void register_activity(void)
 /* resets the rds parser */
 void rds_reset(void)
 {
-    int oldlevel = rds_disable_irq_save();
-
     /* reset general info */
     pi_code    = 0;
     ct_data    = 0;
@@ -210,8 +199,6 @@ void rds_reset(void)
     ps_segment = 0;
     rt_segment = 0;
 #endif /* (CONFIG_RDS & RDS_CFG_PROCESS) */
-
-    rds_restore_irq(oldlevel);
 }
 
 /* initialises the rds parser */
@@ -223,8 +210,6 @@ void rds_init(void)
 /* sync RDS state */
 void rds_sync(void)
 {
-    int oldlevel = rds_disable_irq_save();
-
     if (rds_active) {
         if (TIMED_OUT(rds_timeout)) {
             rds_reset();
@@ -238,8 +223,6 @@ void rds_sync(void)
             }
         }
     }
-
-    rds_restore_irq(oldlevel);
 }
 
 #if (CONFIG_RDS & RDS_CFG_PROCESS)
@@ -458,8 +441,6 @@ void rds_push_info(enum rds_info_id info_id, uintptr_t data, size_t size)
 /* read fully-processed RDS data */
 size_t rds_pull_info(enum rds_info_id info_id, uintptr_t data, size_t size)
 {
-    int oldlevel = rds_disable_irq_save();
-
     rds_sync();
 
     switch (info_id) {
@@ -490,7 +471,5 @@ size_t rds_pull_info(enum rds_info_id info_id, uintptr_t data, size_t size)
     default:
         size = 0;
     }
-
-    rds_restore_irq(oldlevel);
     return size;
 }

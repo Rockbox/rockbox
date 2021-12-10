@@ -125,53 +125,30 @@ bool si4700_st(void)
     return (GPIO1_DR & (1 << 28)) >> 28;
 }
 
-
 /* Low-level RDS Support */
-static bool int_restore;
-
-/* Called after I2C read cycle completes */
-static void si4700_rds_read_raw_async_callback(struct i2c_transfer_desc *xfer)
-{
-    if (xfer->rxcount == 0)
-        si4700_rds_process();
-    /* else read didn't finish */
-
-    if (int_restore)
-        gpio_int_enable(SI4700_EVENT_ID);
-}
-
-/* Called to read registers from ISR context */
-void si4700_rds_read_raw_async(unsigned char *buf, int count)
-{
-    /* transfer descriptor for RDS async operations */
-    static struct i2c_transfer_desc xfer = { .node = &si4700_i2c_node };
-
-    xfer.txdata = NULL;
-    xfer.txcount = 0;
-    xfer.rxdata = buf;
-    xfer.rxcount = count;
-    xfer.callback = si4700_rds_read_raw_async_callback;
-    xfer.next = NULL;
-
-    i2c_transfer(&xfer);
-}
+static struct semaphore rds_sema;
+static uint32_t rds_stack[DEFAULT_STACK_SIZE/sizeof(uint32_t)];
 
 /* RDS GPIO interrupt handler - start RDS data read */
 void INT_SI4700_RDS(void)
 {
-    /* mask and clear the interrupt until we're done */
-    gpio_int_disable(SI4700_EVENT_ID);
     gpio_int_clear(SI4700_EVENT_ID);
+    semaphore_release(&rds_sema);
+}
 
-    /* tell radio driver about it */
-    si4700_rds_interrupt();
+/* Captures RDS data and processes it */
+static void NORETURN_ATTR rds_thread(void)
+{
+    while (true) {
+        semaphore_wait(&rds_sema, TIMEOUT_BLOCK);
+        si4700_rds_process();
+    }
 }
 
 /* Called with on=true after full radio power up, and with on=false before
    powering down */
 void si4700_rds_powerup(bool on)
 {
-    int_restore = on;
     gpio_int_disable(SI4700_EVENT_ID);
     gpio_int_clear(SI4700_EVENT_ID);
     gpio_enable_event(SI4700_EVENT_ID, on);
@@ -180,5 +157,7 @@ void si4700_rds_powerup(bool on)
 /* One-time RDS init at startup */
 void si4700_rds_init(void)
 {
-    /* nothing to do */
+    semaphore_init(&rds_sema, 1, 0);
+    create_thread(rds_thread, rds_stack, sizeof(rds_stack), 0, "rds"
+                  IF_PRIO(, PRIORITY_REALTIME) IF_COP(, CPU));
 }

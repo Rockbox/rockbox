@@ -553,32 +553,6 @@ void si4700_dbg_info(struct si4700_dbg_info *nfo)
 }
 
 #ifdef HAVE_RDS_CAP
-
-#if (CONFIG_RDS & RDS_CFG_ISR)
-static unsigned char isr_regbuf[(RDSD - STATUSRSSI + 1) * 2];
-
-/* Called by RDS interrupt on target */
-void si4700_rds_interrupt(void)
-{
-    si4700_rds_read_raw_async(isr_regbuf, sizeof (isr_regbuf));
-}
-
-/* Handle RDS event from ISR */
-void si4700_rds_process(void)
-{
-    uint16_t rds_data[4];
-    int index = (RDSA - STATUSRSSI) * 2;
-
-    for (int i = 0; i < 4; i++) {
-        rds_data[i] = isr_regbuf[index] << 8 | isr_regbuf[index + 1];
-        index += 2;
-    }
-
-    rds_process(rds_data);
-}
-
-#else /* !(CONFIG_RDS & RDS_CFG_ISR) */
-
 /* Handle RDS event from thread */
 void si4700_rds_process(void)
 {
@@ -603,7 +577,6 @@ void si4700_rds_process(void)
 
     mutex_unlock(&fmr_mutex);
 }
-#endif /* (CONFIG_RDS & RDS_CFG_ISR) */
 
 #if (CONFIG_RDS & RDS_CFG_POLL)
 static struct event_queue rds_queue;

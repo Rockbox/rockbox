@@ -121,7 +121,6 @@
 /* Define this if you have a SI4700 fm radio tuner */
 #define CONFIG_TUNER SI4700
 #define HAVE_RDS_CAP
-#define CONFIG_RDS (RDS_CFG_ISR | RDS_CFG_PROCESS)
 
 /* define this if you can flip your LCD */
 #define HAVE_LCD_FLIP
@@ -164,7 +163,7 @@
 #define GPIO_EVENT_MASK (USE_GPIO1_EVENTS)
 
 /* Define this if target has an additional number of threads specific to it */
-#define TARGET_EXTRA_THREADS 1
+#define TARGET_EXTRA_THREADS 2 /* one is for RDS */
 
 /* Type of mobile power - check this out */
 #define BATTERY_CAPACITY_DEFAULT 700 /* default battery capacity */

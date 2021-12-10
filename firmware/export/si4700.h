@@ -49,15 +49,7 @@ void si4700_rds_init(void) INIT_ATTR;
 /* Radio is fully powered up or about to be powered down */
 void si4700_rds_powerup(bool on);
 
-#if (CONFIG_RDS & RDS_CFG_ISR) 
-/* Read raw RDS info for processing - asynchronously */
-void si4700_rds_read_raw_async(unsigned char *buf, int count); /* implemented by target */
-void si4700_rds_interrupt(void);
-#endif /* (CONFIG_RDS & RDS_CFG_ISR) */
-
 /* Read raw RDS info for processing.
- * - If RDS_CFG_ISR is set, the tuner driver will call si4700_rds_read_raw_async() which should
- *   perform an asynchronous read and call this function when the data has been read.
  * - If RDS_CFG_POLL is set, this function will read status and RDS data and process it if a new
  *   packet is available.
  * - Otherwise this function will read a RDS packet and process it under the assumption that it is
