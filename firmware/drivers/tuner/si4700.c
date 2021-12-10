@@ -586,7 +586,7 @@ void si4700_rds_process(void)
 
     if (tuner_powered())
     {
-        si4700_read_reg(RDSD);
+        si4700_read(6);
 #if (CONFIG_RDS & RDS_CFG_POLL)
 	/* we need to keep track of the ready bit because it stays set for 80ms
 	 * and we must avoid processing it twice */
