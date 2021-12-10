@@ -15892,7 +15892,6 @@
     es9218: "Brick Wall"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
   desc: in properties plugin
@@ -15907,7 +15906,6 @@
     *: "Album Artist"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_GENRE
   desc: in properties plugin
@@ -15922,7 +15920,6 @@
     *: "Genre"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_COMMENT
   desc: in properties plugin
@@ -15937,7 +15934,6 @@
     *: "Comment"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
   desc: in properties plugin
@@ -15952,7 +15948,6 @@
     *: "Composer"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_YEAR
   desc: in properties plugin
@@ -15967,7 +15962,6 @@
     *: "Year"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
   desc: in properties plugin
@@ -15982,7 +15976,6 @@
     *: "Track number"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
   desc: in properties plugin
@@ -15997,7 +15990,6 @@
     *: "Disc number"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
   desc: in properties plugin
@@ -16012,7 +16004,6 @@
     *: "Frequency"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PROPERTIES_BITRATE
   desc: in properties plugin
@@ -16053,5 +16044,33 @@
   </dest>
   <voice>
     *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "List Wraparound"
+  </dest>
+  <voice>
+    *: "List Wraparound"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Show Shutdown Message"
+  </dest>
+  <voice>
+    *: "Show Shutdown Message"
   </voice>
 </phrase>
