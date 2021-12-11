@@ -58,7 +58,8 @@
 
 #define str_or_empty(x) (x ? x : "(NULL)")
 
-#define FILE_SEARCH_INSTRUCTIONS ROCKBOX_DIR "/tagnavi.config"
+#define TAGNAVI_DEFAULT_CONFIG  ROCKBOX_DIR "/tagnavi.config"
+#define TAGNAVI_USER_CONFIG     ROCKBOX_DIR "/tagnavi_user.config"
 
 static int tagtree_play_folder(struct tree_context* c);
 
@@ -1262,7 +1263,14 @@ void tagtree_init(void)
     if (tagtree_handle < 0)
         panicf("tagtree OOM");
 
-    if (!parse_menu(FILE_SEARCH_INSTRUCTIONS))
+    /* Use the user tagnavi config if present, otherwise use the default. */
+    const char* tagnavi_file;
+    if(file_exists(TAGNAVI_USER_CONFIG))
+        tagnavi_file = TAGNAVI_USER_CONFIG;
+    else
+        tagnavi_file = TAGNAVI_DEFAULT_CONFIG;
+
+    if (!parse_menu(tagnavi_file))
     {
         tagtree_unload(NULL);
         return;
