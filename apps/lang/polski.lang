@@ -16083,3 +16083,45 @@
     *: "Pokazuj komunikat wyłączenia"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "Kolejność na liście"
+  </dest>
+  <voice>
+    *: "Kolejność na liście"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Rosnąco"
+  </dest>
+  <voice>
+    *: "Rosnąco"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Malejąco"
+  </dest>
+  <voice>
+    *: "Malejąco"
+  </voice>
+</phrase>
