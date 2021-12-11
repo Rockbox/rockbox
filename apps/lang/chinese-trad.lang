@@ -7552,7 +7552,7 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -7561,7 +7561,7 @@
   <dest>
     *: "PLAY = 是"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = 是"
     iriverh100,iriverh120,iriverh300: "NAVI = 是"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -9540,11 +9540,11 @@
   </source>
   <dest>
     *: none
-    fiiom3k, gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
+    fiiom3k, fiiom3k,gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
   </dest>
   <voice>
     *: none
-    fiiom3k, gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
+    fiiom3k, fiiom3k,gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
   </voice>
 </phrase>
 <phrase>

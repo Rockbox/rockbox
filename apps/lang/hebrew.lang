@@ -10342,15 +10342,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "רגישות משטח מגע"
+    fiiom3k,gigabeatfx,sansafuzeplus: "רגישות משטח מגע"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "רגישות משטח מגע"
+    fiiom3k,gigabeatfx,sansafuzeplus: "רגישות משטח מגע"
   </voice>
 </phrase>
 <phrase>

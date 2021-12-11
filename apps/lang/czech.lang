@@ -252,7 +252,7 @@
     *: "PLAY = Yes"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -262,7 +262,7 @@
     *: "PLAY = Ano"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, nebo vpravo nahoře = Ano"
-    creativezen*: "Select = Ano"
+    creativezen*: "SELECT = Ano"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Ano"
     iriverh100,iriverh120,iriverh300: "NAVI = Ano"
     mrobe500: "PLAY, POWER, nebo vpravo nahoře = Ano"
@@ -10328,11 +10328,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Citlivost touchpadu"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Citlivost touchpadu"
   </dest>
   <voice>
     *: none

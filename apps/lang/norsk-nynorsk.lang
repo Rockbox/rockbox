@@ -10150,15 +10150,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Styreputefølsemd"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Styreputefølsemd"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Styreputefølsemd"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Styreputefølsemd"
   </voice>
 </phrase>
 <phrase>

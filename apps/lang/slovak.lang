@@ -247,7 +247,7 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -256,7 +256,7 @@
   <dest>
     *: "PLAY = Áno"
     cowond2*: "MENU, alebo vpravo-hore = Áno"
-    creativezen*: "Select = Áno"
+    creativezen*: "SELECT = Áno"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Áno"
     iriverh100,iriverh120,iriverh300: "NAVI = Áno"
     mrobe500: "PLAY, POWER, alebo Vpravo-hore = Áno"
@@ -9603,11 +9603,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Citlivosť Dotykovej Plochy"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Citlivosť Dotykovej Plochy"
   </dest>
   <voice>
     *: none

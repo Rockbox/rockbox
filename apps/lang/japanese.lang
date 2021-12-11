@@ -254,7 +254,7 @@
     *: "PLAY = Yes"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -264,7 +264,7 @@
     *: "PLAY = はい"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU または top-right = はい"
-    creativezen*: "Select = はい"
+    creativezen*: "SELECT = はい"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = はい"
     iriverh100,iriverh120,iriverh300: "NAVI = はい"
     mrobe500: "PLAY または POWER, top-right = はい"
@@ -10319,15 +10319,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "タッチパッド感度"
+    fiiom3k,gigabeatfx,sansafuzeplus: "タッチパッド感度"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "タッチパッド感度"
+    fiiom3k,gigabeatfx,sansafuzeplus: "タッチパッド感度"
   </voice>
 </phrase>
 <phrase>

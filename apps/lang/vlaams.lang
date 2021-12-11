@@ -9274,7 +9274,7 @@
     *: "PLAY = Yes"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -9284,7 +9284,7 @@
     *: "PLAY = ja"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU of rechtsboven = ja"
-    creativezen*: "Select = ja"
+    creativezen*: "SELECT = ja"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = ja"
     iriverh100,iriverh120,iriverh300: "NAVI = ja"
     mrobe500: "PLAY, POWER of rechtsboven = ja"
@@ -9294,7 +9294,7 @@
     *: "PLAY = ja"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU of rechtsboven = ja"
-    creativezen*: "Select = ja"
+    creativezen*: "SELECT = ja"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = ja"
     iriverh100,iriverh120,iriverh300: "NAVI = ja"
     mrobe500: "PLAY, POWER of rechtsboven = ja"
@@ -10272,15 +10272,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpadgevoeligheid"
   </voice>
 </phrase>
 <phrase>

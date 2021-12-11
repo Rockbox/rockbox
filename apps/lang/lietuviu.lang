@@ -10386,15 +10386,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Jautrumas lietimui"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Jautrumas lietimui"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Jautrumas lietimui"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Jautrumas lietimui"
   </voice>
 </phrase>
 <phrase>

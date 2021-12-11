@@ -247,7 +247,7 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -256,7 +256,7 @@
   <dest>
     *: "PLAY = Да"
     cowond2*: "MENU, или горе-десно = Да"
-    creativezen*: "Select = Да"
+    creativezen*: "SELECT = Да"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Да"
     iriverh100,iriverh120,iriverh300: "NAVI = Да"
     mrobe500: "PLAY, POWER, или горе-десно = Да"
@@ -9627,15 +9627,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Осетљивост Touchpad-а"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Осетљивост Touchpad-а"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Осетљивост Touchpad-а"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Осетљивост Touchpad-а"
   </voice>
 </phrase>
 <phrase>

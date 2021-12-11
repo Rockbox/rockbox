@@ -9351,15 +9351,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus,fiiom3k: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Érintőpad érzékenysége"
+    fiiom3k,gigabeatfx,sansafuzeplus,fiiom3k: "Érintőpad érzékenysége"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus,fiiom3k: "Érintőpad érzékenysége"
+    fiiom3k,gigabeatfx,sansafuzeplus,fiiom3k: "Érintőpad érzékenysége"
   </voice>
 </phrase>
 <phrase>

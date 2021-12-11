@@ -10296,15 +10296,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Kosketuslevyn herkkyys"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Kosketuslevyn herkkyys"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Kosketuslevyn herkkyys"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Kosketuslevyn herkkyys"
   </voice>
 </phrase>
 <phrase>

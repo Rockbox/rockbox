@@ -252,7 +252,7 @@
     *: "PLAY = Yes"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "Select = Yes"
+    creativezen*: "SELECT = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
@@ -262,7 +262,7 @@
     *: "PLAY = Επικύρωση"
     archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU = Επικύρωση"
-    creativezen*: "Select = Επικύρωση"
+    creativezen*: "SELECT = Επικύρωση"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Επικύρωση"
     iriverh100,iriverh120,iriverh300: "NAVI = Επικύρωση"
     mrobe500: "PLAY, POWER, or top-right = Επικύρωση"
@@ -10125,15 +10125,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Ευαισθησία πινακίδας αφής"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Ευαισθησία πινακίδας αφής"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Ευαισθησία πινακίδας αφής"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Ευαισθησία πινακίδας αφής"
   </voice>
 </phrase>
 <phrase>

@@ -10310,15 +10310,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Sensibilidade do Touchpad"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Sensibilidade do Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Sensibilidade do Touchpad"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Sensibilidade do Touchpad"
   </voice>
 </phrase>
 <phrase>

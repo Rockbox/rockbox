@@ -10191,15 +10191,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Sensitibo Touchpad"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Sensitibo Touchpad"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "Sensitibo Touchpad"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Sensitibo Touchpad"
   </voice>
 </phrase>
 <phrase>

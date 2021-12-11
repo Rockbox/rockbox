@@ -10310,11 +10310,11 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "Skārienvirsmas Jūtība"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Skārienvirsmas Jūtība"
   </dest>
   <voice>
     *: none
