@@ -12898,16 +12898,13 @@
   desc: used in track x of y constructs
   user: core
   <source>
-    *: none
-    hotkey: "Track"
+    *: "Track"
   </source>
   <dest>
-    *: none
-    hotkey: "Skladba"
+    *: "Skladba"
   </dest>
   <voice>
-    *: none
-    hotkey: "Skladba"
+    *: "Skladba"
   </voice>
 </phrase>
 <phrase>

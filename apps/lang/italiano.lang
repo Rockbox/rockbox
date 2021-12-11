@@ -15148,16 +15148,13 @@
   desc: used in track x of y constructs
   user: core
   <source>
-    *: none
-    hotkey: "Track"
+    *: "Track"
   </source>
   <dest>
-    *: none
-    hotkey: "Traccia"
+    *: "Traccia"
   </dest>
   <voice>
-    *: none
-    hotkey: "Traccia"
+    *: "Traccia"
   </voice>
 </phrase>
 <phrase>
