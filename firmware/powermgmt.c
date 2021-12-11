@@ -392,6 +392,24 @@ static void battery_status_update(void)
     send_battery_level_event(level);
 }
 
+void battery_read_info(int *voltage, int *level)
+{
+    int millivolts = _battery_voltage();
+
+    if (voltage)
+        *voltage = millivolts;
+
+    if (level)  {
+#if (CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+        *level = _battery_level();
+#elif (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
+        *level = voltage_to_battery_level(millivolts);
+#else
+        *level = -1;
+#endif
+    }
+}
+
 #if BATTERY_TYPES_COUNT > 1
 void set_battery_type(int type)
 {

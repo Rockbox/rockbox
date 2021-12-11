@@ -849,7 +849,7 @@ static bool tsc2100_debug(void)
 static bool view_battery(void)
 {
     int view = 0;
-    int i, x, y, y1, y2, grid, graph;
+    int i, x, y, z, y1, y2, grid, graph;
     unsigned short maxv, minv;
 
     lcd_setfont(FONT_SYSFIXED);
@@ -944,12 +944,11 @@ static bool view_battery(void)
 #else
                 lcd_puts(0, 0, "Power status: unknown");
 #endif
-
-                y = _battery_voltage();
+                battery_read_info(&y, &z);
                 if (y > 0)
-                    lcd_putsf(0, 1, "Battery: %d.%03d V (%d %%)", y / 1000, y % 1000, battery_level());
-                else
-                    lcd_putsf(0, 1, "Battery: %d %%", _battery_level());
+                    lcd_putsf(0, 1, "Battery: %d.%03d V (%d %%)", y / 1000, y % 1000, z);
+                else if (z > 0)
+                    lcd_putsf(0, 1, "Battery: %d %%", z);
 #ifdef ADC_EXT_POWER
                 y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 1000;
                 lcd_putsf(0, 2, "External: %d.%03d V", y / 1000, y % 1000);

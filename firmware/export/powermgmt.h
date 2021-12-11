@@ -143,6 +143,10 @@ unsigned int input_millivolts(void); /* voltage that device is running from */
 void reset_battery_filter(int millivolts);
 #endif /* HAVE_BATTERY_SWITCH || HAVE_RESET_BATTERY_FILTER */
 
+
+/* read unfiltered battery info */
+void battery_read_info(int *voltage, int *level);
+
 /* Tells if the battery level is safe for disk writes */
 bool battery_level_safe(void);
 
