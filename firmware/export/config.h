@@ -611,6 +611,9 @@ Lyre prototype 1 */
 /* keep this include after the target configs */
 #ifdef SIMULATOR
 #include "config/sim.h"
+#ifndef HAVE_POWEROFF_WHILE_CHARGING
+    #define HAVE_POWEROFF_WHILE_CHARGING
+#endif
 #endif
 
 #ifndef CONFIG_PLATFORM
