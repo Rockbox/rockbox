@@ -18,6 +18,7 @@
 # - Xinlu Huang
 # - Harry Tu
 # - Tse-Hsien Chiang
+# - papaloco
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -57,7 +58,7 @@
     *: "開啟"
   </dest>
   <voice>
-    *: "On"
+    *: "開啟"
   </voice>
 </phrase>
 <phrase>
@@ -71,7 +72,7 @@
     *: "關閉"
   </dest>
   <voice>
-    *: "Off"
+    *: "關閉"
   </voice>
 </phrase>
 <phrase>
@@ -85,7 +86,7 @@
     *: "永遠"
   </dest>
   <voice>
-    *: "Always"
+    *: "永遠"
   </voice>
 </phrase>
 <phrase>
@@ -99,24 +100,7 @@
     *: "讀取中..."
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "按下 OFF 關機"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
+    *: "讀取中..."
   </voice>
 </phrase>
 <phrase>
@@ -130,24 +114,7 @@
     *: "關機中..."
   </dest>
   <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "請移除插入的 MMC 卡"
-  </dest>
-  <voice>
-    *: "Please remove multimedia card"
-    archosondio*: "Please remove multimedia card"
+    *: "關機中..."
   </voice>
 </phrase>
 <phrase>
@@ -161,7 +128,7 @@
     *: "失敗"
   </dest>
   <voice>
-    *: ""
+    *: "失敗"
   </voice>
 </phrase>
 <phrase>
@@ -175,7 +142,7 @@
     *: "最近的書籤"
   </dest>
   <voice>
-    *: "Recent Bookmarks"
+    *: "最近的書籤"
   </voice>
 </phrase>
 <phrase>
@@ -203,7 +170,7 @@
     *: "一般設定"
   </dest>
   <voice>
-    *: "General Settings"
+    *: "一般設定"
   </voice>
 </phrase>
 <phrase>
@@ -217,7 +184,7 @@
     *: "管理設定"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "管理設定"
   </voice>
 </phrase>
 <phrase>
@@ -248,7 +215,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio"
+    radio: "收聽 FM 廣播"
   </voice>
 </phrase>
 <phrase>
@@ -265,7 +232,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording"
+    recording: "錄音"
   </voice>
 </phrase>
 <phrase>
@@ -279,24 +246,7 @@
     *: "插件"
   </dest>
   <voice>
-    *: "Plugins"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "關機"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Shut down"
+    *: "插件"
   </voice>
 </phrase>
 <phrase>
@@ -310,7 +260,7 @@
     *: "音量"
   </dest>
   <voice>
-    *: "Volume"
+    *: "音量"
   </voice>
 </phrase>
 <phrase>
@@ -324,7 +274,7 @@
     *: "低頻音量"
   </dest>
   <voice>
-    *: "Bass"
+    *: "低頻音量"
   </voice>
 </phrase>
 <phrase>
@@ -338,7 +288,7 @@
     *: "高頻音量"
   </dest>
   <voice>
-    *: "Treble"
+    *: "高頻音量"
   </voice>
 </phrase>
 <phrase>
@@ -352,7 +302,7 @@
     *: "平衡"
   </dest>
   <voice>
-    *: "Balance"
+    *: "平衡"
   </voice>
 </phrase>
 <phrase>
@@ -366,7 +316,7 @@
     *: "立體聲"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "立體聲"
   </voice>
 </phrase>
 <phrase>
@@ -380,7 +330,7 @@
     *: "單聲道"
   </dest>
   <voice>
-    *: "Mono"
+    *: "單聲道"
   </voice>
 </phrase>
 <phrase>
@@ -394,7 +344,7 @@
     *: "自訂"
   </dest>
   <voice>
-    *: "Custom"
+    *: "自訂"
   </voice>
 </phrase>
 <phrase>
@@ -408,7 +358,7 @@
     *: "單聲道 (左)"
   </dest>
   <voice>
-    *: "Mono Left"
+    *: "單聲道 (左)"
   </voice>
 </phrase>
 <phrase>
@@ -422,7 +372,7 @@
     *: "單聲道 (右)"
   </dest>
   <voice>
-    *: "Mono Right"
+    *: "單聲道 (右)"
   </voice>
 </phrase>
 <phrase>
@@ -436,7 +386,7 @@
     *: "卡啦 OK"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "卡啦 OK"
   </voice>
 </phrase>
 <phrase>
@@ -450,160 +400,7 @@
     *: "立體聲寬度"
   </dest>
   <voice>
-    *: "Stereo Width"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "響度"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "自動音量調整"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "自動音量調整衰減時間"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "超低音"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 有效"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 強度"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 泛音"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 中心頻率"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB 形狀"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
+    *: "立體聲寬度"
   </voice>
 </phrase>
 <phrase>
@@ -617,7 +414,7 @@
     *: "交叉供音"
   </dest>
   <voice>
-    *: ""
+    *: "交叉供音"
   </voice>
 </phrase>
 <phrase>
@@ -631,7 +428,7 @@
     *: "等化器"
   </dest>
   <voice>
-    *: ""
+    *: "等化器"
   </voice>
 </phrase>
 <phrase>
@@ -659,7 +456,7 @@
     *: "檔案檢視設定"
   </dest>
   <voice>
-    *: "File View"
+    *: "檔案檢視設定"
   </voice>
 </phrase>
 <phrase>
@@ -673,7 +470,7 @@
     *: "顯示設定"
   </dest>
   <voice>
-    *: "Display"
+    *: "顯示設定"
   </voice>
 </phrase>
 <phrase>
@@ -687,7 +484,7 @@
     *: "系統設定"
   </dest>
   <voice>
-    *: "System"
+    *: "系統設定"
   </voice>
 </phrase>
 <phrase>
@@ -701,7 +498,7 @@
     *: "書籤設定"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "書籤設定"
   </voice>
 </phrase>
 <phrase>
@@ -715,7 +512,7 @@
     *: "語言設定"
   </dest>
   <voice>
-    *: "Language"
+    *: "語言設定"
   </voice>
 </phrase>
 <phrase>
@@ -729,7 +526,7 @@
     *: "語音"
   </dest>
   <voice>
-    *: "Voice"
+    *: "語音"
   </voice>
 </phrase>
 <phrase>
@@ -743,7 +540,7 @@
     *: "瀏覽 .cfg 檔案"
   </dest>
   <voice>
-    *: "Browse configuration files"
+    *: "瀏覽 .cfg 檔案"
   </voice>
 </phrase>
 <phrase>
@@ -757,7 +554,7 @@
     *: "重新設定"
   </dest>
   <voice>
-    *: "Reset Settings"
+    *: "重新設定"
   </voice>
 </phrase>
 <phrase>
@@ -771,7 +568,7 @@
     *: "已清除"
   </dest>
   <voice>
-    *: ""
+    *: "已清除"
   </voice>
 </phrase>
 <phrase>
@@ -802,7 +599,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "錄音設定"
   </voice>
 </phrase>
 <phrase>
@@ -816,7 +613,7 @@
     *: "開啟等化器"
   </dest>
   <voice>
-    *: ""
+    *: "開啟等化器"
   </voice>
 </phrase>
 <phrase>
@@ -830,7 +627,7 @@
     *: "圖解等化器"
   </dest>
   <voice>
-    *: ""
+    *: "圖解等化器"
   </voice>
 </phrase>
 <phrase>
@@ -844,7 +641,7 @@
     *: "預切"
   </dest>
   <voice>
-    *: ""
+    *: "預切"
   </voice>
 </phrase>
 <phrase>
@@ -858,7 +655,7 @@
     *: "簡易等化器設定"
   </dest>
   <voice>
-    *: ""
+    *: "簡易等化器設定"
   </voice>
 </phrase>
 <phrase>
@@ -872,7 +669,7 @@
     *: "進階等化器設定"
   </dest>
   <voice>
-    *: ""
+    *: "進階等化器設定"
   </voice>
 </phrase>
 <phrase>
@@ -886,7 +683,7 @@
     *: "儲存等化器設定"
   </dest>
   <voice>
-    *: ""
+    *: "儲存等化器設定"
   </voice>
 </phrase>
 <phrase>
@@ -900,7 +697,7 @@
     *: "瀏覽等化器設定"
   </dest>
   <voice>
-    *: ""
+    *: "瀏覽等化器設定"
   </voice>
 </phrase>
 <phrase>
@@ -928,7 +725,7 @@
     *: "%d Hz 頻帶增益"
   </dest>
   <voice>
-    *: ""
+    *: "%d Hz 頻帶增益"
   </voice>
 </phrase>
 <phrase>
@@ -942,7 +739,7 @@
     *: "低峰值過濾"
   </dest>
   <voice>
-    *: ""
+    *: "低峰值過濾"
   </voice>
 </phrase>
 <phrase>
@@ -956,7 +753,7 @@
     *: "峰值過濾 %d"
   </dest>
   <voice>
-    *: ""
+    *: "峰值過濾 %d"
   </voice>
 </phrase>
 <phrase>
@@ -970,7 +767,7 @@
     *: "高峰值過濾"
   </dest>
   <voice>
-    *: ""
+    *: "高峰值過濾"
   </voice>
 </phrase>
 <phrase>
@@ -984,7 +781,7 @@
     *: "截斷頻率"
   </dest>
   <voice>
-    *: ""
+    *: "截斷頻率"
   </voice>
 </phrase>
 <phrase>
@@ -998,7 +795,7 @@
     *: "中心頻率"
   </dest>
   <voice>
-    *: ""
+    *: "中心頻率"
   </voice>
 </phrase>
 <phrase>
@@ -1026,7 +823,7 @@
     *: "建立播放清單"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "建立播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -1040,7 +837,7 @@
     *: "檢視現在的播放清單"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "檢視現在的播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -1054,7 +851,7 @@
     *: "儲存現在的播放清單"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "儲存現在的播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -1068,7 +865,7 @@
     *: "遞迴插入目錄"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "遞迴插入目錄"
   </voice>
 </phrase>
 <phrase>
@@ -1082,7 +879,7 @@
     *: "消除動態播放清單時警示"
   </dest>
   <voice>
-    *: ""
+    *: "消除動態播放清單時警示"
   </voice>
 </phrase>
 <phrase>
@@ -1110,7 +907,7 @@
     *: "除錯 (請勿進入!)"
   </dest>
   <voice>
-    *: "Debug, keep out!"
+    *: "除錯 (請勿進入!)"
   </voice>
 </phrase>
 <phrase>
@@ -1124,7 +921,7 @@
     *: "亂序播放"
   </dest>
   <voice>
-    *: "Shuffle"
+    *: "亂序播放"
   </voice>
 </phrase>
 <phrase>
@@ -1138,7 +935,7 @@
     *: "重覆"
   </dest>
   <voice>
-    *: "Repeat"
+    *: "重覆"
   </voice>
 </phrase>
 <phrase>
@@ -1152,7 +949,7 @@
     *: "一首"
   </dest>
   <voice>
-    *: "One"
+    *: "一首"
   </voice>
 </phrase>
 <phrase>
@@ -1180,7 +977,7 @@
     *: "先播放選擇的檔案"
   </dest>
   <voice>
-    *: "Play Selected File First"
+    *: "先播放選擇的檔案"
   </voice>
 </phrase>
 <phrase>
@@ -1194,7 +991,7 @@
     *: "快轉/倒轉"
   </dest>
   <voice>
-    *: "Fast forward and Rewind"
+    *: "快轉/倒轉"
   </voice>
 </phrase>
 <phrase>
@@ -1210,7 +1007,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Anti-Skip Buffer"
+    *: "防止中斷緩衝區"
     flash_storage: none
   </voice>
 </phrase>
@@ -1225,7 +1022,7 @@
     *: "停止/暫停時淡出"
   </dest>
   <voice>
-    *: "Fade On Stop and Pause"
+    *: "停止/暫停時淡出"
   </voice>
 </phrase>
 <phrase>
@@ -1239,7 +1036,7 @@
     *: "派對模式"
   </dest>
   <voice>
-    *: "Party Mode"
+    *: "派對模式"
   </voice>
 </phrase>
 <phrase>
@@ -1256,7 +1053,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "交叉淡變"
   </voice>
 </phrase>
 <phrase>
@@ -1267,10 +1064,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "播放增益"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "播放增益"
   </voice>
 </phrase>
 <phrase>
@@ -1298,7 +1095,7 @@
     *: "弱"
   </dest>
   <voice>
-    *: ""
+    *: "弱"
   </voice>
 </phrase>
 <phrase>
@@ -1312,7 +1109,7 @@
     *: "中"
   </dest>
   <voice>
-    *: ""
+    *: "中"
   </voice>
 </phrase>
 <phrase>
@@ -1326,7 +1123,7 @@
     *: "強"
   </dest>
   <voice>
-    *: ""
+    *: "強"
   </voice>
 </phrase>
 <phrase>
@@ -1343,7 +1140,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: ""
+    spdif_power: "光纖輸出"
   </voice>
 </phrase>
 <phrase>
@@ -1357,7 +1154,7 @@
     *: "自動替換目錄"
   </dest>
   <voice>
-    *: "Auto-Change Directory"
+    *: "自動替換目錄"
   </voice>
 </phrase>
 <phrase>
@@ -1371,7 +1168,7 @@
     *: "資料庫"
   </dest>
   <voice>
-    *: ""
+    *: "資料庫"
   </voice>
 </phrase>
 <phrase>
@@ -1388,7 +1185,7 @@
   </dest>
   <voice>
     *: none
-    tc_ramcache: ""
+    tc_ramcache: "載入到記憶體"
   </voice>
 </phrase>
 <phrase>
@@ -1402,7 +1199,7 @@
     *: "即刻初始化"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "即刻初始化"
   </voice>
 </phrase>
 <phrase>
@@ -1416,7 +1213,7 @@
     *: "在背景更新中"
   </dest>
   <voice>
-    *: ""
+    *: "在背景更新中"
   </voice>
 </phrase>
 <phrase>
@@ -1430,7 +1227,7 @@
     *: "處理資料庫"
   </dest>
   <voice>
-    *: ""
+    *: "處理資料庫"
   </voice>
 </phrase>
 <phrase>
@@ -1444,7 +1241,7 @@
     *: "收集運行時資料"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "收集運行時資料"
   </voice>
 </phrase>
 <phrase>
@@ -1458,7 +1255,7 @@
     *: "排序時區別大小寫"
   </dest>
   <voice>
-    *: "Sort Case Sensitive"
+    *: "排序時區別大小寫"
   </voice>
 </phrase>
 <phrase>
@@ -1472,7 +1269,7 @@
     *: "排序目錄"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "排序目錄"
   </voice>
 </phrase>
 <phrase>
@@ -1486,7 +1283,7 @@
     *: "排序檔案"
   </dest>
   <voice>
-    *: "sort files"
+    *: "排序檔案"
   </voice>
 </phrase>
 <phrase>
@@ -1500,7 +1297,7 @@
     *: "字母順序"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "字母順序"
   </voice>
 </phrase>
 <phrase>
@@ -1514,7 +1311,7 @@
     *: "依日期"
   </dest>
   <voice>
-    *: "By Date"
+    *: "依日期"
   </voice>
 </phrase>
 <phrase>
@@ -1528,7 +1325,7 @@
     *: "依最新日期"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "依最新日期"
   </voice>
 </phrase>
 <phrase>
@@ -1542,7 +1339,7 @@
     *: "依類型"
   </dest>
   <voice>
-    *: "By Type"
+    *: "依類型"
   </voice>
 </phrase>
 <phrase>
@@ -1556,7 +1353,7 @@
     *: "顯示檔案"
   </dest>
   <voice>
-    *: "Show Files"
+    *: "顯示檔案"
   </voice>
 </phrase>
 <phrase>
@@ -1570,7 +1367,7 @@
     *: "支援的"
   </dest>
   <voice>
-    *: "Supported"
+    *: "支援的"
   </voice>
 </phrase>
 <phrase>
@@ -1584,7 +1381,7 @@
     *: "音樂"
   </dest>
   <voice>
-    *: "Music"
+    *: "音樂"
   </voice>
 </phrase>
 <phrase>
@@ -1598,7 +1395,7 @@
     *: "跟隨播放清單"
   </dest>
   <voice>
-    *: "Follow Playlist"
+    *: "跟隨播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -1612,7 +1409,7 @@
     *: "顯示圖示"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "顯示圖示"
   </voice>
 </phrase>
 <phrase>
@@ -1626,7 +1423,7 @@
     *: "瀏覽字形"
   </dest>
   <voice>
-    *: "字形"
+    *: "瀏覽字形"
   </voice>
 </phrase>
 <phrase>
@@ -1657,7 +1454,7 @@
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "瀏覽 .rwps 檔案"
   </voice>
 </phrase>
 <phrase>
@@ -1671,7 +1468,7 @@
     *: "液晶顯示設定"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "液晶顯示設定"
   </voice>
 </phrase>
 <phrase>
@@ -1688,7 +1485,7 @@
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "線控液晶顯示設定"
   </voice>
 </phrase>
 <phrase>
@@ -1702,7 +1499,7 @@
     *: "捲動設定"
   </dest>
   <voice>
-    *: "Scrolling"
+    *: "捲動設定"
   </voice>
 </phrase>
 <phrase>
@@ -1716,7 +1513,7 @@
     *: "狀態列/捲動軸"
   </dest>
   <voice>
-    *: ""
+    *: "狀態列/捲動軸"
   </voice>
 </phrase>
 <phrase>
@@ -1725,15 +1522,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "高峰顯示表"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "高峰顯示表"
   </voice>
 </phrase>
 <phrase>
@@ -1747,7 +1541,7 @@
     *: "預設編碼"
   </dest>
   <voice>
-    *: "Default codepage"
+    *: "預設編碼"
   </voice>
 </phrase>
 <phrase>
@@ -1873,7 +1667,7 @@
     *: "日文(SJIS)"
   </dest>
   <voice>
-    *: "Japanese"
+    *: "日文(SJIS)"
   </voice>
 </phrase>
 <phrase>
@@ -1887,7 +1681,7 @@
     *: "簡體中文 (GB2312)"
   </dest>
   <voice>
-    *: ""
+    *: "簡體中文 (GB2312)"
   </voice>
 </phrase>
 <phrase>
@@ -1901,7 +1695,7 @@
     *: "韓文 (KSX1001)"
   </dest>
   <voice>
-    *: ""
+    *: "韓文 (KSX1001)"
   </voice>
 </phrase>
 <phrase>
@@ -1915,7 +1709,7 @@
     *: "正體中文 (BIG5)"
   </dest>
   <voice>
-    *: ""
+    *: "正體中文 (BIG5)"
   </voice>
 </phrase>
 <phrase>
@@ -1929,7 +1723,7 @@
     *: "萬國碼 (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "萬國碼 (UTF-8)"
   </voice>
 </phrase>
 <phrase>
@@ -1943,7 +1737,7 @@
     *: "電池"
   </dest>
   <voice>
-    *: "Battery"
+    *: "電池"
   </voice>
 </phrase>
 <phrase>
@@ -1957,7 +1751,7 @@
     *: "硬碟"
   </dest>
   <voice>
-    *: "Disk"
+    *: "硬碟"
   </voice>
 </phrase>
 <phrase>
@@ -1974,7 +1768,7 @@
   </dest>
   <voice>
     *: none
-    rtc: ""
+    rtc: "時間與日期"
   </voice>
 </phrase>
 <phrase>
@@ -1988,7 +1782,7 @@
     *: "閒置關閉電源"
   </dest>
   <voice>
-    *: "Idle Poweroff"
+    *: "閒置關閉電源"
   </voice>
 </phrase>
 <phrase>
@@ -2002,7 +1796,7 @@
     *: "睡眠定時"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "睡眠定時"
   </voice>
 </phrase>
 <phrase>
@@ -2019,7 +1813,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "鬧鈴"
   </voice>
 </phrase>
 <phrase>
@@ -2033,7 +1827,7 @@
     *: "限制"
   </dest>
   <voice>
-    *: "Limits"
+    *: "限制"
   </voice>
 </phrase>
 <phrase>
@@ -2050,7 +1844,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "聲音輸入"
   </voice>
 </phrase>
 <phrase>
@@ -2067,7 +1861,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
+    charging: "車用變壓器模式"
   </voice>
 </phrase>
 <phrase>
@@ -2081,7 +1875,7 @@
     *: "停止時建立書籤"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "停止時建立書籤"
   </voice>
 </phrase>
 <phrase>
@@ -2095,7 +1889,7 @@
     *: "是 - 只存在最近書籤"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "是 - 只存在最近書籤"
   </voice>
 </phrase>
 <phrase>
@@ -2109,7 +1903,7 @@
     *: "詢問 - 只存在最近書籤"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "詢問 - 只存在最近書籤"
   </voice>
 </phrase>
 <phrase>
@@ -2123,7 +1917,7 @@
     *: "載入最近書籤"
   </dest>
   <voice>
-    *: "Load Last Bookmark"
+    *: "載入最近書籤"
   </voice>
 </phrase>
 <phrase>
@@ -2137,21 +1931,7 @@
     *: "維護最近書籤清單?"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
-  user: core
-  <source>
-    *: "Unique only"
-  </source>
-  <dest>
-    *: "只有唯一的"
-  </dest>
-  <voice>
-    *: "Unique only"
+    *: "維護最近書籤清單?"
   </voice>
 </phrase>
 <phrase>
@@ -2165,7 +1945,7 @@
     *: "語音選單"
   </dest>
   <voice>
-    *: "Voice Menus"
+    *: "語音選單"
   </voice>
 </phrase>
 <phrase>
@@ -2179,7 +1959,7 @@
     *: "語音目錄"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "語音目錄"
   </voice>
 </phrase>
 <phrase>
@@ -2193,7 +1973,7 @@
     *: "語音檔案名稱"
   </dest>
   <voice>
-    *: "Voice Filenames"
+    *: "語音檔案名稱"
   </voice>
 </phrase>
 <phrase>
@@ -2207,7 +1987,7 @@
     *: "數字"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "數字"
   </voice>
 </phrase>
 <phrase>
@@ -2221,7 +2001,7 @@
     *: "拼字"
   </dest>
   <voice>
-    *: "Spell"
+    *: "拼字"
   </voice>
 </phrase>
 <phrase>
@@ -2239,23 +2019,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "品質"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FREQUENCY
   desc: in recording and playback settings
   user: core
@@ -2269,7 +2032,7 @@
   </dest>
   <voice>
     *: none
-    play_frequency,recording: ""
+    play_frequency,recording: "頻率"
   </voice>
 </phrase>
 <phrase>
@@ -2286,7 +2049,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "來源"
   </voice>
 </phrase>
 <phrase>
@@ -2305,7 +2068,8 @@
   </dest>
   <voice>
     *: none
-    iriverh100,iriverh120,iriverh300,recording: ""
+    iriverh100,iriverh120,iriverh300: "內置麥克風"
+    recording: "麥克風"
   </voice>
 </phrase>
 <phrase>
@@ -2322,24 +2086,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "獨立框架"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: ""
+    recording: "數位"
   </voice>
 </phrase>
 <phrase>
@@ -2356,7 +2103,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "檔案分割選項"
   </voice>
 </phrase>
 <phrase>
@@ -2373,7 +2120,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "預錄時間"
   </voice>
 </phrase>
 <phrase>
@@ -2390,7 +2137,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "目錄"
   </voice>
 </phrase>
 <phrase>
@@ -2407,7 +2154,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "觸發"
   </voice>
 </phrase>
 <phrase>
@@ -2424,7 +2171,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "削波背光"
   </voice>
 </phrase>
 <phrase>
@@ -2441,7 +2188,7 @@
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "只有主機"
   </voice>
 </phrase>
 <phrase>
@@ -2458,7 +2205,7 @@
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "只有線控"
   </voice>
 </phrase>
 <phrase>
@@ -2475,7 +2222,7 @@
   </dest>
   <voice>
     *: none
-    remote: ""
+    remote: "主機與線控"
   </voice>
 </phrase>
 <phrase>
@@ -2489,7 +2236,7 @@
     *: "快轉/倒轉最小間隔"
   </dest>
   <voice>
-    *: "Minimum Step"
+    *: "快轉/倒轉最小間隔"
   </voice>
 </phrase>
 <phrase>
@@ -2503,7 +2250,7 @@
     *: "快轉/倒轉加速"
   </dest>
   <voice>
-    *: "Acceleration"
+    *: "快轉/倒轉加速"
   </voice>
 </phrase>
 <phrase>
@@ -2520,7 +2267,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: ""
+    crossfade: "開啟Crossfade"
   </voice>
 </phrase>
 <phrase>
@@ -2537,7 +2284,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "只在跳到另一首時"
   </voice>
 </phrase>
 <phrase>
@@ -2554,7 +2301,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Delay"
+    crossfade: "淡入延遲"
   </voice>
 </phrase>
 <phrase>
@@ -2571,7 +2318,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Duration"
+    crossfade: "淡入期間"
   </voice>
 </phrase>
 <phrase>
@@ -2588,7 +2335,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Delay"
+    crossfade: "淡出延遲"
   </voice>
 </phrase>
 <phrase>
@@ -2605,7 +2352,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Duration"
+    crossfade: "淡出期間"
   </voice>
 </phrase>
 <phrase>
@@ -2622,7 +2369,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Mode"
+    crossfade: "淡出模式"
   </voice>
 </phrase>
 <phrase>
@@ -2639,7 +2386,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "混合"
   </voice>
 </phrase>
 <phrase>
@@ -2653,7 +2400,7 @@
     *: "防止削波"
   </dest>
   <voice>
-    *: "Prevent Clipping"
+    *: "防止削波"
   </voice>
 </phrase>
 <phrase>
@@ -2664,10 +2411,10 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain 種類"
+    *: "播放增益種類"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "播放增益種類"
   </voice>
 </phrase>
 <phrase>
@@ -2678,10 +2425,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album Gain"
+    *: "專輯增益"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "專輯增益"
   </voice>
 </phrase>
 <phrase>
@@ -2692,10 +2439,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "單曲增益"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "單曲增益"
   </voice>
 </phrase>
 <phrase>
@@ -2706,10 +2453,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "亂序播放時使用 Track Gain"
+    *: "亂序播放時使用單曲增益"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "亂序播放時使用單曲增益"
   </voice>
 </phrase>
 <phrase>
@@ -2720,10 +2467,10 @@
     *: "Pre-amp"
   </source>
   <dest>
-    *: "前置放大"
+    *: "前級放大器"
   </dest>
   <voice>
-    *: "Preamp"
+    *: "前級放大器"
   </voice>
 </phrase>
 <phrase>
@@ -2737,7 +2484,7 @@
     *: "背光"
   </dest>
   <voice>
-    *: "Backlight"
+    *: "背光"
   </voice>
 </phrase>
 <phrase>
@@ -2754,7 +2501,7 @@
   </dest>
   <voice>
     *: none
-    charging: "Backlight (While Plugged In)"
+    charging: "背光 (使用外部電源時)"
   </voice>
 </phrase>
 <phrase>
@@ -2768,7 +2515,7 @@
     *: "標題背光"
   </dest>
   <voice>
-    *: "Caption Backlight"
+    *: "標題背光"
   </voice>
 </phrase>
 <phrase>
@@ -2785,7 +2532,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade In"
+    backlight_fade*: "背光淡入"
   </voice>
 </phrase>
 <phrase>
@@ -2802,7 +2549,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Backlight Fade Out"
+    backlight_fade*: "背光淡出"
   </voice>
 </phrase>
 <phrase>
@@ -2819,7 +2566,7 @@
   </dest>
   <voice>
     *: none
-    backlight_brightness: "Brightness"
+    backlight_brightness: "亮度"
   </voice>
 </phrase>
 <phrase>
@@ -2833,7 +2580,7 @@
     *: "對比"
   </dest>
   <voice>
-    *: "Contrast"
+    *: "對比"
   </voice>
 </phrase>
 <phrase>
@@ -2864,7 +2611,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD Mode"
+    lcd_invert,remote_lcd_invert: "液晶顯示模式"
   </voice>
 </phrase>
 <phrase>
@@ -2881,7 +2628,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "Inverse"
+    lcd_invert,remote_lcd_invert: "反轉"
   </voice>
 </phrase>
 <phrase>
@@ -2895,7 +2642,7 @@
     *: "上下反轉"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: "上下反轉"
   </voice>
 </phrase>
 <phrase>
@@ -2923,7 +2670,7 @@
     *: "指示器"
   </dest>
   <voice>
-    *: "Pointer"
+    *: "指示器"
   </voice>
 </phrase>
 <phrase>
@@ -2937,7 +2684,7 @@
     *: "整行反白"
   </dest>
   <voice>
-    *: "Inverse Bar"
+    *: "整行反白"
   </voice>
 </phrase>
 <phrase>
@@ -2954,7 +2701,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "清除背景"
   </voice>
 </phrase>
 <phrase>
@@ -2971,7 +2718,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Background Colour"
+    lcd_color: "背景顏色"
   </voice>
 </phrase>
 <phrase>
@@ -2988,7 +2735,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Foreground Colour"
+    lcd_color: "前景顏色"
   </voice>
 </phrase>
 <phrase>
@@ -3005,7 +2752,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Reset Colours"
+    lcd_color: "重設顏色"
   </voice>
 </phrase>
 <phrase>
@@ -3022,7 +2769,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "減少滴答聲"
   </voice>
 </phrase>
 <phrase>
@@ -3036,7 +2783,7 @@
     *: "捲動速度"
   </dest>
   <voice>
-    *: "Scroll Speed"
+    *: "捲動速度"
   </voice>
 </phrase>
 <phrase>
@@ -3064,7 +2811,7 @@
     *: "捲動開始延遲"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "捲動開始延遲"
   </voice>
 </phrase>
 <phrase>
@@ -3078,7 +2825,7 @@
     *: "捲動間隔"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "捲動間隔"
   </voice>
 </phrase>
 <phrase>
@@ -3106,7 +2853,7 @@
     *: "雙向捲動限制"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "雙向捲動限制"
   </voice>
 </phrase>
 <phrase>
@@ -3120,7 +2867,7 @@
     *: "畫面範圍外捲動"
   </dest>
   <voice>
-    *: "Screen Scrolls Out Of View"
+    *: "畫面範圍外捲動"
   </voice>
 </phrase>
 <phrase>
@@ -3134,7 +2881,7 @@
     *: "畫面捲動間隔"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "畫面捲動間隔"
   </voice>
 </phrase>
 <phrase>
@@ -3148,7 +2895,7 @@
     *: "頁捲動"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "頁捲動"
   </voice>
 </phrase>
 <phrase>
@@ -3162,7 +2909,7 @@
     *: "捲動軸"
   </dest>
   <voice>
-    *: "Scroll Bar"
+    *: "捲動軸"
   </voice>
 </phrase>
 <phrase>
@@ -3176,24 +2923,7 @@
     *: "狀態列"
   </dest>
   <voice>
-    *: "Status Bar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "按鈕列"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Button Bar"
+    *: "狀態列"
   </voice>
 </phrase>
 <phrase>
@@ -3207,7 +2937,7 @@
     *: "音量顯示"
   </dest>
   <voice>
-    *: "Volume Display"
+    *: "音量顯示"
   </voice>
 </phrase>
 <phrase>
@@ -3221,7 +2951,7 @@
     *: "電池顯示"
   </dest>
   <voice>
-    *: "Battery Display"
+    *: "電池顯示"
   </voice>
 </phrase>
 <phrase>
@@ -3235,7 +2965,7 @@
     *: "圖形"
   </dest>
   <voice>
-    *: "Graphic"
+    *: "圖形"
   </voice>
 </phrase>
 <phrase>
@@ -3249,7 +2979,7 @@
     *: "數值"
   </dest>
   <voice>
-    *: "Numeric"
+    *: "數值"
   </voice>
 </phrase>
 <phrase>
@@ -3258,15 +2988,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
-    *: "Peak Release"
-    masd: none
+    *: "峰值釋放速度"
   </dest>
   <voice>
-    *: "Peak Release"
-    masd: none
+    *: "峰值釋放速度"
   </voice>
 </phrase>
 <phrase>
@@ -3275,15 +3002,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "高峰記號停留時間"
-    masd: none
   </dest>
   <voice>
-    *: "Peak Hold Time"
-    masd: none
+    *: "高峰記號停留時間"
   </voice>
 </phrase>
 <phrase>
@@ -3292,15 +3016,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "削波記號停留時間"
-    masd: none
   </dest>
   <voice>
-    *: "Clip Hold Time"
-    masd: none
+    *: "削波記號停留時間"
   </voice>
 </phrase>
 <phrase>
@@ -3309,15 +3030,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "永久"
-    masd: none
   </dest>
   <voice>
-    *: "Eternal"
-    masd: none
+    *: "永久"
   </voice>
 </phrase>
 <phrase>
@@ -3326,15 +3044,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "比例"
-    masd: none
   </dest>
   <voice>
-    *: "Scale"
-    masd: none
+    *: "比例"
   </voice>
 </phrase>
 <phrase>
@@ -3343,15 +3058,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "對數 (dB)"
-    masd: none
   </dest>
   <voice>
-    *: "Logarithmic decibel"
-    masd: none
+    *: "對數 (dB)"
   </voice>
 </phrase>
 <phrase>
@@ -3360,15 +3072,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "線性 (%)"
-    masd: none
   </dest>
   <voice>
-    *: "Linear percent"
-    masd: none
+    *: "線性 (%)"
   </voice>
 </phrase>
 <phrase>
@@ -3377,15 +3086,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "最小範圍"
-    masd: none
   </dest>
   <voice>
-    *: "Minimum Of Range"
-    masd: none
+    *: "最小範圍"
   </voice>
 </phrase>
 <phrase>
@@ -3394,15 +3100,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "最大範圍"
-    masd: none
   </dest>
   <voice>
-    *: "Maximum Of Range"
-    masd: none
+    *: "最大範圍"
   </voice>
 </phrase>
 <phrase>
@@ -3416,7 +3119,7 @@
     *: "電池容量"
   </dest>
   <voice>
-    *: "Battery Capacity"
+    *: "電池容量"
   </voice>
 </phrase>
 <phrase>
@@ -3433,41 +3136,7 @@
   </dest>
   <voice>
     *: none
-    battery_types: "Battery type"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_1
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "Alkaline"
-  </source>
-  <dest>
-    *: none
-    battery_types: "鹼性"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Alkaline"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TYPE_2
-  desc: in battery settings
-  user: core
-  <source>
-    *: none
-    battery_types: "NiMH"
-  </source>
-  <dest>
-    *: none
-    battery_types: "鎳氫"
-  </dest>
-  <voice>
-    *: none
-    battery_types: "Nickel metal hydride"
+    battery_types: "電池類型"
   </voice>
 </phrase>
 <phrase>
@@ -3483,7 +3152,7 @@
     flash_storage: none
   </dest>
   <voice>
-    *: "Disk Spindown"
+    *: "硬碟迴轉停止"
     flash_storage: none
   </voice>
 </phrase>
@@ -3501,7 +3170,7 @@
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "目錄快取"
   </voice>
 </phrase>
 <phrase>
@@ -3529,7 +3198,7 @@
     *: "時間格式"
   </dest>
   <voice>
-    *: "Time Format"
+    *: "時間格式"
   </voice>
 </phrase>
 <phrase>
@@ -3543,7 +3212,7 @@
     *: "12 小時制"
   </dest>
   <voice>
-    *: "12 Hour Clock"
+    *: "12 小時制"
   </voice>
 </phrase>
 <phrase>
@@ -3557,7 +3226,7 @@
     *: "24 小時制"
   </dest>
   <voice>
-    *: "24 Hour Clock"
+    *: "24 小時制"
   </voice>
 </phrase>
 <phrase>
@@ -3585,7 +3254,7 @@
     *: "最大播放清單歌曲數"
   </dest>
   <voice>
-    *: "Maximum playlist size"
+    *: "最大播放清單歌曲數"
   </voice>
 </phrase>
 <phrase>
@@ -3599,7 +3268,7 @@
     *: "播放清單"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -3613,7 +3282,7 @@
     *: "書籤"
   </dest>
   <voice>
-    *: "Bookmarks"
+    *: "書籤"
   </voice>
 </phrase>
 <phrase>
@@ -3641,7 +3310,7 @@
     *: "設定歌曲評分"
   </dest>
   <voice>
-    *: "Set Song Rating"
+    *: "設定歌曲評分"
   </voice>
 </phrase>
 <phrase>
@@ -3655,7 +3324,7 @@
     *: "更名"
   </dest>
   <voice>
-    *: "Rename"
+    *: "更名"
   </voice>
 </phrase>
 <phrase>
@@ -3669,7 +3338,7 @@
     *: "剪下"
   </dest>
   <voice>
-    *: "Cut"
+    *: "剪下"
   </voice>
 </phrase>
 <phrase>
@@ -3683,7 +3352,7 @@
     *: "複製"
   </dest>
   <voice>
-    *: "Copy"
+    *: "複製"
   </voice>
 </phrase>
 <phrase>
@@ -3697,7 +3366,7 @@
     *: "貼上"
   </dest>
   <voice>
-    *: "Paste"
+    *: "貼上"
   </voice>
 </phrase>
 <phrase>
@@ -3711,7 +3380,7 @@
     *: "檔案/目錄已存在. 覆寫?"
   </dest>
   <voice>
-    *: ""
+    *: "檔案/目錄已存在. 覆寫?"
   </voice>
 </phrase>
 <phrase>
@@ -3725,7 +3394,7 @@
     *: "刪除"
   </dest>
   <voice>
-    *: "Delete"
+    *: "刪除"
   </voice>
 </phrase>
 <phrase>
@@ -3742,7 +3411,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "設定為背景"
   </voice>
 </phrase>
 <phrase>
@@ -3756,7 +3425,7 @@
     *: "刪除目錄"
   </dest>
   <voice>
-    *: "delete directory"
+    *: "刪除目錄"
   </voice>
 </phrase>
 <phrase>
@@ -3770,7 +3439,7 @@
     *: "刪除?"
   </dest>
   <voice>
-    *: ""
+    *: "刪除?"
   </voice>
 </phrase>
 <phrase>
@@ -3784,7 +3453,7 @@
     *: "已刪除"
   </dest>
   <voice>
-    *: ""
+    *: "已刪除"
   </voice>
 </phrase>
 <phrase>
@@ -3798,7 +3467,7 @@
     *: "開啟檔案..."
   </dest>
   <voice>
-    *: "open with"
+    *: "開啟檔案..."
   </voice>
 </phrase>
 <phrase>
@@ -3812,7 +3481,7 @@
     *: "建立目錄"
   </dest>
   <voice>
-    *: "Create Directory"
+    *: "建立目錄"
   </voice>
 </phrase>
 <phrase>
@@ -3829,7 +3498,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "音調"
   </voice>
 </phrase>
 <phrase>
@@ -3843,7 +3512,7 @@
     *: "檢視"
   </dest>
   <voice>
-    *: "View"
+    *: "檢視"
   </voice>
 </phrase>
 <phrase>
@@ -3857,7 +3526,7 @@
     *: "重新亂序"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "重新亂序"
   </voice>
 </phrase>
 <phrase>
@@ -3871,7 +3540,7 @@
     *: "插入"
   </dest>
   <voice>
-    *: "Insert"
+    *: "插入"
   </voice>
 </phrase>
 <phrase>
@@ -3885,7 +3554,7 @@
     *: "插入下一個"
   </dest>
   <voice>
-    *: "Insert Next"
+    *: "插入下一個"
   </voice>
 </phrase>
 <phrase>
@@ -3899,7 +3568,7 @@
     *: "插入到最後"
   </dest>
   <voice>
-    *: "Insert Last"
+    *: "插入到最後"
   </voice>
 </phrase>
 <phrase>
@@ -3913,7 +3582,7 @@
     *: "亂序插入"
   </dest>
   <voice>
-    *: "Insert Shuffled"
+    *: "亂序插入"
   </voice>
 </phrase>
 <phrase>
@@ -3927,7 +3596,7 @@
     *: "隊列"
   </dest>
   <voice>
-    *: "Queue"
+    *: "隊列"
   </voice>
 </phrase>
 <phrase>
@@ -3941,7 +3610,7 @@
     *: "隊列中下一個"
   </dest>
   <voice>
-    *: "Queue Next"
+    *: "隊列中下一個"
   </voice>
 </phrase>
 <phrase>
@@ -3955,7 +3624,7 @@
     *: "隊列最後"
   </dest>
   <voice>
-    *: "Queue Last"
+    *: "隊列最後"
   </voice>
 </phrase>
 <phrase>
@@ -3969,7 +3638,7 @@
     *: "隨機隊列"
   </dest>
   <voice>
-    *: "Queue Shuffled"
+    *: "隨機隊列"
   </voice>
 </phrase>
 <phrase>
@@ -3983,7 +3652,7 @@
     *: "在播放清單內搜尋"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "在播放清單內搜尋"
   </voice>
 </phrase>
 <phrase>
@@ -3997,7 +3666,7 @@
     *: "搜尋中... 找到 %d 件 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "搜尋中... 找到 %d 件 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -4011,7 +3680,7 @@
     *: "建立書籤"
   </dest>
   <voice>
-    *: "Create Bookmark"
+    *: "建立書籤"
   </voice>
 </phrase>
 <phrase>
@@ -4025,7 +3694,7 @@
     *: "列舉書籤"
   </dest>
   <voice>
-    *: "List Bookmarks"
+    *: "列舉書籤"
   </voice>
 </phrase>
 <phrase>
@@ -4039,7 +3708,7 @@
     *: "Rockbox 資訊"
   </dest>
   <voice>
-    *: ""
+    *: "Rockbox 資訊"
   </voice>
 </phrase>
 <phrase>
@@ -4056,24 +3725,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "電池: 完成充電"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: ""
+    charging: "電池: 充電中"
   </voice>
 </phrase>
 <phrase>
@@ -4090,7 +3742,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
+    charging: "電池: 涓流充電"
   </voice>
 </phrase>
 <phrase>
@@ -4100,16 +3752,13 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "電池: %d%% %d小時 %d分"
-    archosondiofm,iriverifp7xx: "%d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "電池: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
-    ipodmini1g,ipodmini2g,iriverh10,iriverifp7xx: ""
+    *: "電池: %d%% %d小時 %d分"
   </voice>
 </phrase>
 <phrase>
@@ -4123,7 +3772,7 @@
     *: "硬碟:"
   </dest>
   <voice>
-    *: ""
+    *: "硬碟:"
   </voice>
 </phrase>
 <phrase>
@@ -4137,7 +3786,7 @@
     *: "剩餘容量:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "剩餘容量:"
   </voice>
 </phrase>
 <phrase>
@@ -4146,41 +3795,41 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "內建:"
-    xduoox3: "Multimedia 卡1:"
+    *: "Int:"
+    hibylinux: "mSD:"
+    xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Internal"
-    xduoox3: "Multimedia 卡1"
+    hibylinux: "micro S D"
+    xduoox3: "micro S D 1"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
-    archosondio*: "MMC:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    archosondio*: "MMC 卡:"
     multivolume: "磁盤1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "Multimedia 卡:"
-    xduoox3: "Multimedia 卡2:"
+    xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    archosondio*: "MMC 卡"
     multivolume: "磁盤1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "Multimedia 卡"
-    xduoox3: "Multimedia 卡2"
+    xduoox3: "micro S D 2"
   </voice>
 </phrase>
 <phrase>
@@ -4193,7 +3842,7 @@
   </source>
   <dest>
     *: none
-    rtc: none
+    rtc: ""
   </dest>
   <voice>
     *: none
@@ -4245,7 +3894,7 @@
     *: "暫停"
   </dest>
   <voice>
-    *: ""
+    *: "暫停"
   </voice>
 </phrase>
 <phrase>
@@ -4259,7 +3908,7 @@
     *: "建立書籤?"
   </dest>
   <voice>
-    *: ""
+    *: "建立書籤?"
   </voice>
 </phrase>
 <phrase>
@@ -4273,7 +3922,7 @@
     *: "已建立書籤"
   </dest>
   <voice>
-    *: ""
+    *: "已建立書籤"
   </voice>
 </phrase>
 <phrase>
@@ -4287,7 +3936,7 @@
     *: "建立書籤失敗!"
   </dest>
   <voice>
-    *: ""
+    *: "建立書籤失敗!"
   </voice>
 </phrase>
 <phrase>
@@ -4301,7 +3950,7 @@
     *: "書籤為空"
   </dest>
   <voice>
-    *: ""
+    *: "書籤為空"
   </voice>
 </phrase>
 <phrase>
@@ -4326,19 +3975,19 @@
     *: none
     gigabeatfx: "POWER = 返回"
     gigabeats,sansafuzeplus: "BACK = 返回"
-    gogearsa9200: "LEFT = 返回"
+    gogearsa9200,ipod*,mpiohd300,sansac200*: "MENU = 返回"
     iaudiom5,iaudiox5: "RECORD = 回去"
-    ipod*,mpiohd300,sansac200*: "MENU = 回去"
     iriverh10,iriverh10_5gb,sansae200*,sansafuze*: "PREV = 返回"
     iriverh100,iriverh120,iriverh300: "STOP = 返回"
     mrobe100: "DISPLAY = 返回"
-    mrobe500: "POWER = 回去"
+    mrobe500: "POWER = Revert"
     rtc: "OFF = 返回"
     samsungyh*: "REW = 返回"
     vibe500: "CANCEL = 返回"
   </dest>
   <voice>
-    *: none
+    *: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4397,7 +4046,7 @@
   </dest>
   <voice>
     *: none
-    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
@@ -4414,7 +4063,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "一次"
   </voice>
 </phrase>
 <phrase>
@@ -4431,7 +4080,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "在之上開始"
   </voice>
 </phrase>
 <phrase>
@@ -4448,7 +4097,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "在之下停止"
   </voice>
 </phrase>
 <phrase>
@@ -4465,7 +4114,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "先設分割的間隔"
   </voice>
 </phrase>
 <phrase>
@@ -4482,7 +4131,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "minus infinity"
   </voice>
 </phrase>
 <phrase>
@@ -4516,7 +4165,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "在 %d:%02d 內關閉鬧鈴"
   </voice>
 </phrase>
 <phrase>
@@ -4533,7 +4182,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "已設定鬧鈴"
   </voice>
 </phrase>
 <phrase>
@@ -4550,7 +4199,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "鬧鈴設定時間不正確!"
   </voice>
 </phrase>
 <phrase>
@@ -4579,7 +4228,7 @@
   </dest>
   <voice>
     *: none
-    alarm,gigabeats,ipod*,iriverh10,iriverh10_5gb: ""
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4596,7 +4245,7 @@
   </dest>
   <voice>
     *: none
-    alarm: ""
+    alarm: "鬧鈴關閉"
   </voice>
 </phrase>
 <phrase>
@@ -4787,7 +4436,7 @@
     *: " (變動位元率)"
   </dest>
   <voice>
-    *: "變動位元率"
+    *: " (變動位元率)"
   </voice>
 </phrase>
 <phrase>
@@ -4815,7 +4464,7 @@
     *: "Track Gain"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Track gain"
   </voice>
 </phrase>
 <phrase>
@@ -4829,7 +4478,7 @@
     *: "Album Gain"
   </dest>
   <voice>
-    *: "Album Gain"
+    *: "Album gain"
   </voice>
 </phrase>
 <phrase>
@@ -4857,7 +4506,7 @@
     *: "<無資訊>"
   </dest>
   <voice>
-    *: "無資訊"
+    *: "<無資訊>"
   </voice>
 </phrase>
 <phrase>
@@ -4990,7 +4639,7 @@
     *: "１月"
   </dest>
   <voice>
-    *: "January"
+    *: "１月"
   </voice>
 </phrase>
 <phrase>
@@ -5004,7 +4653,7 @@
     *: "２月"
   </dest>
   <voice>
-    *: "February"
+    *: "２月"
   </voice>
 </phrase>
 <phrase>
@@ -5018,7 +4667,7 @@
     *: "３月"
   </dest>
   <voice>
-    *: "March"
+    *: "３月"
   </voice>
 </phrase>
 <phrase>
@@ -5032,7 +4681,7 @@
     *: "４月"
   </dest>
   <voice>
-    *: "April"
+    *: "４月"
   </voice>
 </phrase>
 <phrase>
@@ -5046,7 +4695,7 @@
     *: "５月"
   </dest>
   <voice>
-    *: "May"
+    *: "５月"
   </voice>
 </phrase>
 <phrase>
@@ -5060,7 +4709,7 @@
     *: "６月"
   </dest>
   <voice>
-    *: "June"
+    *: "６月"
   </voice>
 </phrase>
 <phrase>
@@ -5074,7 +4723,7 @@
     *: "７月"
   </dest>
   <voice>
-    *: "July"
+    *: "７月"
   </voice>
 </phrase>
 <phrase>
@@ -5088,7 +4737,7 @@
     *: "８月"
   </dest>
   <voice>
-    *: "August"
+    *: "８月"
   </voice>
 </phrase>
 <phrase>
@@ -5102,7 +4751,7 @@
     *: "９月"
   </dest>
   <voice>
-    *: "September"
+    *: "９月"
   </voice>
 </phrase>
 <phrase>
@@ -5116,7 +4765,7 @@
     *: "10月"
   </dest>
   <voice>
-    *: "October"
+    *: "10月"
   </voice>
 </phrase>
 <phrase>
@@ -5130,7 +4779,7 @@
     *: "11月"
   </dest>
   <voice>
-    *: "November"
+    *: "11月"
   </voice>
 </phrase>
 <phrase>
@@ -5144,7 +4793,7 @@
     *: "12月"
   </dest>
   <voice>
-    *: "December"
+    *: "12月"
   </voice>
 </phrase>
 <phrase>
@@ -5834,48 +5483,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "KB"
-  </source>
-  <dest>
-    *: "KB"
-  </dest>
-  <voice>
-    *: "kilobyte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "MB"
-  </source>
-  <dest>
-    *: "MB"
-  </dest>
-  <voice>
-    *: "megabyte"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "GB"
-  </source>
-  <dest>
-    *: "GB"
-  </dest>
-  <voice>
-    *: "gigabyte"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_POINT
   desc: decimal separator for composing numbers
   user: core
@@ -6417,7 +6024,7 @@
   </source>
   <dest>
     *: none
-    remote: none
+    remote: ""
   </dest>
   <voice>
     *: none
@@ -6449,7 +6056,7 @@
     *: "播放清單緩衝區已滿"
   </dest>
   <voice>
-    *: ""
+    *: "播放清單緩衝區已滿"
   </voice>
 </phrase>
 <phrase>
@@ -6477,7 +6084,7 @@
     *: "插入 %d 首歌曲 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "插入 %d 首歌曲 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6491,7 +6098,7 @@
     *: "列入了 %d 首歌曲 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "列入了 %d 首歌曲 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6505,7 +6112,7 @@
     *: "儲存 %d 首歌曲 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "儲存 %d 首歌曲 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -6519,7 +6126,7 @@
     *: "遞迴子目錄?"
   </dest>
   <voice>
-    *: ""
+    *: "遞迴子目錄?"
   </voice>
 </phrase>
 <phrase>
@@ -6533,7 +6140,7 @@
     *: "消除動態播放清單?"
   </dest>
   <voice>
-    *: ""
+    *: "消除動態播放清單?"
   </voice>
 </phrase>
 <phrase>
@@ -6547,7 +6154,7 @@
     *: "無法繼續上次播放"
   </dest>
   <voice>
-    *: ""
+    *: "無法繼續上次播放"
   </voice>
 </phrase>
 <phrase>
@@ -6561,7 +6168,7 @@
     *: "更新播放清單控制檔案錯誤"
   </dest>
   <voice>
-    *: ""
+    *: "更新播放清單控制檔案錯誤"
   </voice>
 </phrase>
 <phrase>
@@ -6575,7 +6182,7 @@
     *: "存取播放清單檔案錯誤"
   </dest>
   <voice>
-    *: ""
+    *: "存取播放清單檔案錯誤"
   </voice>
 </phrase>
 <phrase>
@@ -6589,7 +6196,7 @@
     *: "存取播放清單控制檔案錯誤"
   </dest>
   <voice>
-    *: ""
+    *: "存取播放清單控制檔案錯誤"
   </voice>
 </phrase>
 <phrase>
@@ -6603,7 +6210,7 @@
     *: "存取目錄錯誤"
   </dest>
   <voice>
-    *: ""
+    *: "存取目錄錯誤"
   </voice>
 </phrase>
 <phrase>
@@ -6617,7 +6224,7 @@
     *: "無效的播放清單控制檔"
   </dest>
   <voice>
-    *: ""
+    *: "無效的播放清單控制檔"
   </voice>
 </phrase>
 <phrase>
@@ -6634,7 +6241,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "沒有預設"
   </voice>
 </phrase>
 <phrase>
@@ -6651,7 +6258,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Add Preset"
+    radio: "增加預設"
   </voice>
 </phrase>
 <phrase>
@@ -6668,7 +6275,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "編輯預設"
   </voice>
 </phrase>
 <phrase>
@@ -6685,7 +6292,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "移除預設"
   </voice>
 </phrase>
 <phrase>
@@ -6702,7 +6309,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "儲存預設失敗"
   </voice>
 </phrase>
 <phrase>
@@ -6719,92 +6326,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "選單"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "離開"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "動作"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ADD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Add"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "增加"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_RECORD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Record"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "錄音"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
+    radio: "預設清單已滿"
   </voice>
 </phrase>
 <phrase>
@@ -6821,7 +6343,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "強迫使用單聲道"
   </voice>
 </phrase>
 <phrase>
@@ -6855,7 +6377,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Auto scan presets"
+    radio: "自動掃描預設"
   </voice>
 </phrase>
 <phrase>
@@ -6872,7 +6394,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "清除現在預設?"
   </voice>
 </phrase>
 <phrase>
@@ -6923,7 +6445,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "掃描"
   </voice>
 </phrase>
 <phrase>
@@ -6937,7 +6459,7 @@
     *: "目錄緩衝區已滿!"
   </dest>
   <voice>
-    *: ""
+    *: "目錄緩衝區已滿!"
   </voice>
 </phrase>
 <phrase>
@@ -6951,7 +6473,7 @@
     *: "新語言"
   </dest>
   <voice>
-    *: ""
+    *: "新語言"
   </voice>
 </phrase>
 <phrase>
@@ -6965,7 +6487,7 @@
     *: "設定已載入"
   </dest>
   <voice>
-    *: ""
+    *: "設定已載入"
   </voice>
 </phrase>
 <phrase>
@@ -6979,7 +6501,7 @@
     *: "設定已儲存"
   </dest>
   <voice>
-    *: ""
+    *: "設定已儲存"
   </voice>
 </phrase>
 <phrase>
@@ -6993,7 +6515,7 @@
     *: "開機檔已改變"
   </dest>
   <voice>
-    *: ""
+    *: "開機檔已改變"
   </voice>
 </phrase>
 <phrase>
@@ -7007,12 +6529,12 @@
     *: "現在要重新開機?"
   </dest>
   <voice>
-    *: ""
+    *: "現在要重新開機?"
   </voice>
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on archosrecorder models
+  desc: Used on many models
   user: core
   <source>
     *: "OFF to abort"
@@ -7047,7 +6569,7 @@
     *: "沒有檔案"
   </dest>
   <voice>
-    *: ""
+    *: "沒有檔案"
   </voice>
 </phrase>
 <phrase>
@@ -7061,7 +6583,7 @@
     *: "新鍵盤"
   </dest>
   <voice>
-    *: ""
+    *: "新鍵盤"
   </voice>
 </phrase>
 <phrase>
@@ -7075,7 +6597,7 @@
     *: "移動"
   </dest>
   <voice>
-    *: "Move"
+    *: "移動"
   </voice>
 </phrase>
 <phrase>
@@ -7089,7 +6611,7 @@
     *: "顯示索引"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "顯示索引"
   </voice>
 </phrase>
 <phrase>
@@ -7103,7 +6625,7 @@
     *: "曲目顯示"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "曲目顯示"
   </voice>
 </phrase>
 <phrase>
@@ -7117,7 +6639,7 @@
     *: "只顯示曲名"
   </dest>
   <voice>
-    *: "Track Name Only"
+    *: "只顯示曲名"
   </voice>
 </phrase>
 <phrase>
@@ -7131,7 +6653,7 @@
     *: "完整路徑"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "完整路徑"
   </voice>
 </phrase>
 <phrase>
@@ -7145,7 +6667,7 @@
     *: "移除"
   </dest>
   <voice>
-    *: "Remove"
+    *: "移除"
   </voice>
 </phrase>
 <phrase>
@@ -7178,7 +6700,7 @@
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
@@ -7187,7 +6709,7 @@
     *: "不相容機型"
   </dest>
   <voice>
-    *: ""
+    *: "不相容機型"
   </voice>
 </phrase>
 <phrase>
@@ -7201,7 +6723,7 @@
     *: "不相容版本"
   </dest>
   <voice>
-    *: ""
+    *: "不相容版本"
   </voice>
 </phrase>
 <phrase>
@@ -7215,7 +6737,7 @@
     *: "插件回傳錯誤"
   </dest>
   <voice>
-    *: ""
+    *: "插件回傳錯誤"
   </voice>
 </phrase>
 <phrase>
@@ -7229,7 +6751,7 @@
     *: "檔案類型陣列已滿"
   </dest>
   <voice>
-    *: ""
+    *: "檔案類型陣列已滿"
   </voice>
 </phrase>
 <phrase>
@@ -7246,7 +6768,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "載入預設清單"
   </voice>
 </phrase>
 <phrase>
@@ -7263,7 +6785,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "儲存預設清單"
   </voice>
 </phrase>
 <phrase>
@@ -7280,7 +6802,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "清除預設清單"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +6819,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "預設清單"
   </voice>
 </phrase>
 <phrase>
@@ -7314,7 +6836,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "找不到設定, 自動掃描?"
   </voice>
 </phrase>
 <phrase>
@@ -7328,7 +6850,7 @@
     *: "直接增加"
   </dest>
   <voice>
-    *: "Direct gain"
+    *: "直接增加"
   </voice>
 </phrase>
 <phrase>
@@ -7342,7 +6864,7 @@
     *: "交叉增加"
   </dest>
   <voice>
-    *: "Cross gain"
+    *: "交叉增加"
   </voice>
 </phrase>
 <phrase>
@@ -7356,7 +6878,7 @@
     *: "高頻衰減"
   </dest>
   <voice>
-    *: "High-frequency attenuation"
+    *: "高頻衰減"
   </voice>
 </phrase>
 <phrase>
@@ -7370,7 +6892,7 @@
     *: "高頻截斷"
   </dest>
   <voice>
-    *: "High-frequency cutoff"
+    *: "高頻截斷"
   </voice>
 </phrase>
 <phrase>
@@ -7398,7 +6920,7 @@
     *: "<所有曲目>"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "<所有曲目>"
   </voice>
 </phrase>
 <phrase>
@@ -7412,7 +6934,7 @@
     *: "無效的檔名!"
   </dest>
   <voice>
-    *: "Invalid Filename"
+    *: "無效的檔名!"
   </voice>
 </phrase>
 <phrase>
@@ -7429,7 +6951,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "線控捲動設定"
   </voice>
 </phrase>
 <phrase>
@@ -7472,193 +6994,6 @@
   </dest>
   <voice>
     *: "Export modifications"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-    recording: "Stereo"
-  </dest>
-  <voice>
-    *: none
-    recording: "Stereo"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-    recording: "Mono"
-  </dest>
-  <voice>
-    *: none
-    recording: "Mono"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Quality"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Quality"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "Frequency"
-  </dest>
-  <voice>
-    *: none
-    recording: "Frequency"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "Source"
-  </dest>
-  <voice>
-    *: none
-    recording: "Source"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "Mic"
-  </dest>
-  <voice>
-    *: none
-    recording: "Microphone"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "Digital"
-  </dest>
-  <voice>
-    *: none
-    recording: "Digital"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "Trigger"
-  </dest>
-  <voice>
-    *: none
-    recording: "Trigger"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Menu"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Option"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "LCD"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -7711,33 +7046,13 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
-    lcd_sleep: "Never"
+    *: "Never"
   </source>
   <dest>
-    *: none
-    lcd_sleep: "永不"
+    *: "Never"
   </dest>
   <voice>
-    *: none
-    lcd_sleep: "Never"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_LINE_IN
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Line In"
-  </source>
-  <dest>
-    *: none
-    recording: "Line In"
-  </dest>
-  <voice>
-    *: none
-    recording: "Line In"
+    *: "Never"
   </voice>
 </phrase>
 <phrase>
@@ -7746,7 +7061,6 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    archosplayer: "Building DB %d found"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
@@ -7754,14 +7068,13 @@
   </source>
   <dest>
     *: "建立資料庫... 找到 %d 項 (OFF: 回上一畫面)"
-    archosplayer: "建立資料庫... 找到 %d"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "建立資料庫... 找到 %d 項 (LEFT: 回上一畫面)"
-    gogearsa9200: "建立資料庫... 找到 %d 項 (REW: 回上一畫面)"
-    ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
+    gogearsa9200,ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "建立資料庫... 找到 %d 項 (PREV: 回上一畫面)"
     iriverh100,iriverh120,iriverh300: "建立資料庫... 找到 %d 項 (STOP: 回上一畫面)"
+    sansafuze*: "Building database... %d found (PREV to return)"
   </dest>
   <voice>
-    *: "entries found for database"
+    *: "建立資料庫... 找到 %d 項 (OFF: 回上一畫面)"
   </voice>
 </phrase>
 <phrase>
@@ -7775,7 +7088,7 @@
     *: "掃描文件..."
   </dest>
   <voice>
-    *: "Scanning disk"
+    *: "掃描文件..."
   </voice>
 </phrase>
 <phrase>
@@ -7789,7 +7102,7 @@
     *: "檔案"
   </dest>
   <voice>
-    *: "Files"
+    *: "檔案"
   </voice>
 </phrase>
 <phrase>
@@ -7820,7 +7133,7 @@
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ 設定 (慢)"
   </voice>
 </phrase>
 <phrase>
@@ -7834,7 +7147,7 @@
     *: "匯入更動"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "匯入更動"
   </voice>
 </phrase>
 <phrase>
@@ -7868,7 +7181,7 @@
   </dest>
   <voice>
     *: none
-    lcd_sleep: "Sleep after backlight off"
+    lcd_sleep: "睡眠 (在背光關閉後)"
   </voice>
 </phrase>
 <phrase>
@@ -7882,7 +7195,7 @@
     *: "添加"
   </dest>
   <voice>
-    *: "Gain"
+    *: "添加"
   </voice>
 </phrase>
 <phrase>
@@ -7896,7 +7209,7 @@
     *: "刪除中..."
   </dest>
   <voice>
-    *: "Deleting"
+    *: "刪除中..."
   </voice>
 </phrase>
 <phrase>
@@ -7913,7 +7226,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Charge During U S B Connection"
+    usb_charging_enable: "在 USB 連線時充電"
   </voice>
 </phrase>
 <phrase>
@@ -7930,7 +7243,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Display OFF"
+    remote: "線控顯示關閉"
   </voice>
 </phrase>
 <phrase>
@@ -7947,7 +7260,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "(與來源相同)"
   </voice>
 </phrase>
 <phrase>
@@ -7964,7 +7277,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "如沒耳機插入開機時不播放"
   </voice>
 </phrase>
 <phrase>
@@ -7978,7 +7291,7 @@
     *: "恢復播發"
   </dest>
   <voice>
-    *: "Resume"
+    *: "恢復播發"
   </voice>
 </phrase>
 <phrase>
@@ -7995,7 +7308,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "歐洲"
   </voice>
 </phrase>
 <phrase>
@@ -8009,7 +7322,7 @@
     *: "警告! 電池電量低!"
   </dest>
   <voice>
-    *: "WARNING! Low Battery!"
+    *: "警告! 電池電量低!"
   </voice>
 </phrase>
 <phrase>
@@ -8026,7 +7339,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "編碼設定"
   </voice>
 </phrase>
 <phrase>
@@ -8040,7 +7353,7 @@
     *: "播放清單設置"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "播放清單設置"
   </voice>
 </phrase>
 <phrase>
@@ -8057,7 +7370,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "設置時間/日期"
   </voice>
 </phrase>
 <phrase>
@@ -8071,7 +7384,7 @@
     *: "正在播放"
   </dest>
   <voice>
-    *: "Now Playing"
+    *: "正在播放"
   </voice>
 </phrase>
 <phrase>
@@ -8088,7 +7401,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop recording"
+    recording: "停止錄音"
   </voice>
 </phrase>
 <phrase>
@@ -8104,7 +7417,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "列表加速速度"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -8122,7 +7435,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Format"
+    recording: "格式"
   </voice>
 </phrase>
 <phrase>
@@ -8136,7 +7449,7 @@
     *: "書簽動作"
   </dest>
   <voice>
-    *: "Bookmark Actions"
+    *: "書簽動作"
   </voice>
 </phrase>
 <phrase>
@@ -8153,7 +7466,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "亂序播放與跳過曲目"
   </voice>
 </phrase>
 <phrase>
@@ -8167,7 +7480,7 @@
     *: "正常"
   </dest>
   <voice>
-    *: "Normal"
+    *: "正常"
   </voice>
 </phrase>
 <phrase>
@@ -8176,15 +7489,12 @@
   user: core
   <source>
     *: "Buffer:"
-    archosplayer: "Buf:"
   </source>
   <dest>
     *: "緩衝:"
-    archosplayer: "Buf:"
   </dest>
   <voice>
-    *: ""
-    archosplayer: ""
+    *: "緩衝:"
   </voice>
 </phrase>
 <phrase>
@@ -8201,7 +7511,7 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "暫停和恢復播放"
   </voice>
 </phrase>
 <phrase>
@@ -8218,7 +7528,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "不能寫入錄音目錄"
   </voice>
 </phrase>
 <phrase>
@@ -8229,10 +7539,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "聲道設置"
+    *: "聲道"
   </dest>
   <voice>
-    *: "Channel Configuration"
+    *: "聲道"
   </voice>
 </phrase>
 <phrase>
@@ -8241,7 +7551,6 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
     creativezen*: "Select = Yes"
     gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
@@ -8251,12 +7560,12 @@
   </source>
   <dest>
     *: "PLAY = 是"
-    archosplayer: "(PLAY/STOP)"
-    cowond2*: "MENU, or top-right = 是"
-    creativezen*: "Select = 是"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = 是"
+    cowond2*: "MENU, or top-right = Yes"
+    creativezen*: "Select = Yes"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = 是"
     iriverh100,iriverh120,iriverh300: "NAVI = 是"
-    mrobe500: "PLAY, POWER, or top-right = 是"
+    mrobe500: "PLAY, POWER, or top-right = Yes"
+    sansaclip*,sansaconnect,sansafuze*: "SELECT = Yes"
     vibe500: "OK = 是"
   </dest>
   <voice>
@@ -8279,16 +7588,18 @@
   </source>
   <dest>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = 設定"
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*: "SELECT = 設定"
     gogearsa9200,samsungyh*: "PLAY = 設定"
     iriverh100,iriverh120,iriverh300: "NAVI = 設定"
     mpiohd300: "ENTER = 設定"
-    mrobe500: "HEART = 設定"
+    mrobe500: "HEART = Set"
     rtc: "ON = 設定"
+    sansaclip*,sansaconnect,sansafuze*: "SELECT = Set"
     vibe500: "OK = 設定"
   </dest>
   <voice>
-    *: none
+    *: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -8297,15 +7608,12 @@
   user: core
   <source>
     *: "Any Other = No"
-    archosplayer: none
   </source>
   <dest>
     *: "Any Other = 否"
-    archosplayer: none
   </dest>
   <voice>
     *: ""
-    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -8319,7 +7627,7 @@
     *: "瀏覽 Cuesheet"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "瀏覽 Cuesheet"
   </voice>
 </phrase>
 <phrase>
@@ -8333,7 +7641,7 @@
     *: "樣品程序"
   </dest>
   <voice>
-    *: "Demos"
+    *: "樣品程序"
   </voice>
 </phrase>
 <phrase>
@@ -8350,7 +7658,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Bitrate"
+    recording: "位元率"
   </voice>
 </phrase>
 <phrase>
@@ -8364,7 +7672,7 @@
     *: "最高時間"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "最高時間"
   </voice>
 </phrase>
 <phrase>
@@ -8378,7 +7686,7 @@
     *: "使用 .talk 文件"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "使用 .talk 文件"
   </voice>
 </phrase>
 <phrase>
@@ -8392,7 +7700,7 @@
     *: "亂數"
   </dest>
   <voice>
-    *: "Random"
+    *: "亂數"
   </voice>
 </phrase>
 <phrase>
@@ -8406,7 +7714,7 @@
     *: "全部"
   </dest>
   <voice>
-    *: "All"
+    *: "全部"
   </voice>
 </phrase>
 <phrase>
@@ -8423,7 +7731,7 @@
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "新檔案"
   </voice>
 </phrase>
 <phrase>
@@ -8434,10 +7742,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "添加到快捷"
+    *: "添加到捷徑中"
   </dest>
   <voice>
-    *: "Add to Shortcuts"
+    *: "添加到捷徑中"
   </voice>
 </phrase>
 <phrase>
@@ -8454,7 +7762,7 @@
   </dest>
   <voice>
     *: none
-    radio: ""
+    radio: "預設"
   </voice>
 </phrase>
 <phrase>
@@ -8468,7 +7776,7 @@
     *: "主選單"
   </dest>
   <voice>
-    *: "Main Menu"
+    *: "主選單"
   </voice>
 </phrase>
 <phrase>
@@ -8482,7 +7790,7 @@
     *: "遊戲"
   </dest>
   <voice>
-    *: "Games"
+    *: "遊戲"
   </voice>
 </phrase>
 <phrase>
@@ -8491,15 +7799,12 @@
   user: core
   <source>
     *: "End of Song List"
-    archosplayer: "End of List"
   </source>
   <dest>
     *: "列表結束"
-    archosplayer: "列表結束"
   </dest>
   <voice>
-    *: "End of Song List"
-    archosplayer: "End of List"
+    *: "列表結束"
   </voice>
 </phrase>
 <phrase>
@@ -8516,7 +7821,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "鬧鈴啟動畫面"
   </voice>
 </phrase>
 <phrase>
@@ -8533,7 +7838,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clear Recording Directory"
+    recording: "清除錄音目錄"
   </voice>
 </phrase>
 <phrase>
@@ -8564,7 +7869,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "現場 (慢)"
   </voice>
 </phrase>
 <phrase>
@@ -8578,7 +7883,7 @@
     *: "儲存佈景主題設定"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "儲存佈景主題設定"
   </voice>
 </phrase>
 <phrase>
@@ -8599,20 +7904,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Mode:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AGC_VOICE
   desc: AGC preset
   user: core
@@ -8626,7 +7917,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "語音 (快)"
   </voice>
 </phrase>
 <phrase>
@@ -8643,7 +7934,7 @@
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "(無設定)"
   </voice>
 </phrase>
 <phrase>
@@ -8660,7 +7951,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "最少"
   </voice>
 </phrase>
 <phrase>
@@ -8677,7 +7968,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "分割檔案大小"
   </voice>
 </phrase>
 <phrase>
@@ -8691,7 +7982,7 @@
     *: "聲道"
   </dest>
   <voice>
-    *: "Channels"
+    *: "聲道"
   </voice>
 </phrase>
 <phrase>
@@ -8708,7 +7999,7 @@
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : 重新開啟)"
   </voice>
 </phrase>
 <phrase>
@@ -8722,7 +8013,7 @@
     *: "每次提問"
   </dest>
   <voice>
-    *: "Ask"
+    *: "每次提問"
   </voice>
 </phrase>
 <phrase>
@@ -8753,7 +8044,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Medium"
+    agc: "中等"
   </voice>
 </phrase>
 <phrase>
@@ -8787,7 +8078,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "安全 (clip)"
   </voice>
 </phrase>
 <phrase>
@@ -8801,7 +8092,7 @@
     *: "繼續播放"
   </dest>
   <voice>
-    *: "Resume Playback"
+    *: "繼續播放"
   </voice>
 </phrase>
 <phrase>
@@ -8818,21 +8109,21 @@
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "耳機拔出後暫停"
   </voice>
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "播放下一首"
+    *: ""
   </dest>
   <voice>
-    *: "Play Next"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8863,7 +8154,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "分割依據"
   </voice>
 </phrase>
 <phrase>
@@ -8891,7 +8182,7 @@
     *: "電池已空! 充電!"
   </dest>
   <voice>
-    *: "Battery empty! RECHARGE!"
+    *: "電池已空! 充電!"
   </voice>
 </phrase>
 <phrase>
@@ -8908,7 +8199,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "韓國"
   </voice>
 </phrase>
 <phrase>
@@ -8922,7 +8213,7 @@
     *: "運作時間"
   </dest>
   <voice>
-    *: "Running Time"
+    *: "運作時間"
   </voice>
 </phrase>
 <phrase>
@@ -8939,7 +8230,7 @@
   </dest>
   <voice>
     *: none
-    radio: "US and Canada"
+    radio: "美國 / 加拿大"
   </voice>
 </phrase>
 <phrase>
@@ -8956,7 +8247,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "區域"
   </voice>
 </phrase>
 <phrase>
@@ -9001,7 +8292,7 @@
     *: "增加到新的播放清單"
   </dest>
   <voice>
-    *: "Add to New Playlist"
+    *: "增加到新的播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -9018,7 +8309,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "停止"
   </voice>
 </phrase>
 <phrase>
@@ -9049,7 +8340,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "分割時間"
   </voice>
 </phrase>
 <phrase>
@@ -9063,7 +8354,7 @@
     *: "請重開機以啟用"
   </dest>
   <voice>
-    *: "Please reboot to enable"
+    *: "請重開機以啟用"
   </voice>
 </phrase>
 <phrase>
@@ -9077,7 +8368,7 @@
     *: "有關選單"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "有關選單"
   </voice>
 </phrase>
 <phrase>
@@ -9091,7 +8382,7 @@
     *: "先前畫面"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "先前畫面"
   </voice>
 </phrase>
 <phrase>
@@ -9105,7 +8396,7 @@
     *: "增加到播放清單"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "增加到播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -9122,7 +8413,7 @@
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: "Button Light Brightness"
+    buttonlight_brightness: "按鈕光度"
   </voice>
 </phrase>
 <phrase>
@@ -9136,7 +8427,7 @@
     *: "Cuesheet 支援"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Cuesheet 支援"
   </voice>
 </phrase>
 <phrase>
@@ -9178,7 +8469,7 @@
     *: "載入中... %d%% 完成 (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "載入中... %d%% 完成 (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -9195,7 +8486,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "開新檔案"
   </voice>
 </phrase>
 <phrase>
@@ -9212,7 +8503,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "分割時行為"
   </voice>
 </phrase>
 <phrase>
@@ -9226,7 +8517,7 @@
     *: "開機畫面"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "開機畫面"
   </voice>
 </phrase>
 <phrase>
@@ -9240,7 +8531,7 @@
     *: "<不要恢復書簽>"
   </dest>
   <voice>
-    *: "Do not resume"
+    *: "<不要恢復書簽>"
   </voice>
 </phrase>
 <phrase>
@@ -9254,7 +8545,7 @@
     *: "刪除"
   </dest>
   <voice>
-    *: "Delete"
+    *: "刪除"
   </voice>
 </phrase>
 <phrase>
@@ -9271,7 +8562,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "日本"
   </voice>
 </phrase>
 <phrase>
@@ -9285,7 +8576,7 @@
     *: "顯示路徑"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "顯示路徑"
   </voice>
 </phrase>
 <phrase>
@@ -9299,12 +8590,12 @@
     *: "選擇書簽"
   </dest>
   <voice>
-    *: "Select Bookmark"
+    *: "選擇書簽"
   </voice>
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: "Dithering"
@@ -9313,7 +8604,7 @@
     *: "添加抖動"
   </dest>
   <voice>
-    *: "Dithering"
+    *: "添加抖動"
   </voice>
 </phrase>
 <phrase>
@@ -9327,7 +8618,7 @@
     *: "應用程序"
   </dest>
   <voice>
-    *: "Applications"
+    *: "應用程序"
   </voice>
 </phrase>
 <phrase>
@@ -9343,7 +8634,7 @@
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "列表加速緩衝"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -9358,7 +8649,7 @@
     *: "正在移動..."
   </dest>
   <voice>
-    *: "Moving"
+    *: "正在移動..."
   </voice>
 </phrase>
 <phrase>
@@ -9372,7 +8663,7 @@
     *: "使用 .talk 文件夾"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "使用 .talk 文件夾"
   </voice>
 </phrase>
 <phrase>
@@ -9386,7 +8677,7 @@
     *: "屬性"
   </dest>
   <voice>
-    *: "Properties"
+    *: "屬性"
   </voice>
 </phrase>
 <phrase>
@@ -9442,7 +8733,7 @@
     *: "<無效書簽>"
   </dest>
   <voice>
-    *: "Invalid Bookmark"
+    *: "<無效書簽>"
   </voice>
 </phrase>
 <phrase>
@@ -9462,7 +8753,7 @@
   <voice>
     *: none
     button_light: "Button Light Timeout"
-    sansae200*,sansafuze*: "Wheel Light Timeout"
+    sansae200*,sansafuze*: "轉盤燈自動關時間"
   </voice>
 </phrase>
 <phrase>
@@ -9507,24 +8798,7 @@
     *: "只有目前目錄"
   </dest>
   <voice>
-    *: "Current Directory Only"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "聲道"
-  </dest>
-  <voice>
-    *: none
-    recording: "Channels"
+    *: "只有目前目錄"
   </voice>
 </phrase>
 <phrase>
@@ -9538,7 +8812,7 @@
     *: "播放清單"
   </dest>
   <voice>
-    *: "Playlists"
+    *: "播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -9594,7 +8868,7 @@
     *: "清除時間?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "清除時間?"
   </voice>
 </phrase>
 <phrase>
@@ -9608,7 +8882,7 @@
     *: "Last.fm 紀錄"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm 紀錄"
   </voice>
 </phrase>
 <phrase>
@@ -9625,7 +8899,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold"
+    hold_button: "背光 (Hold 時)"
   </voice>
 </phrase>
 <phrase>
@@ -9639,7 +8913,7 @@
     *: "設置"
   </dest>
   <voice>
-    *: "Settings"
+    *: "設置"
   </voice>
 </phrase>
 <phrase>
@@ -9653,7 +8927,7 @@
     *: "已取消"
   </dest>
   <voice>
-    *: "Cancelled"
+    *: "已取消"
   </voice>
 </phrase>
 <phrase>
@@ -9681,7 +8955,7 @@
     *: "你肯定嗎?"
   </dest>
   <voice>
-    *: "Are You Sure?"
+    *: "你肯定嗎?"
   </voice>
 </phrase>
 <phrase>
@@ -9695,7 +8969,7 @@
     *: "%s 不存在"
   </dest>
   <voice>
-    *: ""
+    *: "%s 不存在"
   </voice>
 </phrase>
 <phrase>
@@ -9709,7 +8983,7 @@
     *: "沒有播放清單"
   </dest>
   <voice>
-    *: ""
+    *: "沒有播放清單"
   </voice>
 </phrase>
 <phrase>
@@ -9723,7 +8997,7 @@
     *: "複製中..."
   </dest>
   <voice>
-    *: "Copying"
+    *: "複製中..."
   </voice>
 </phrase>
 <phrase>
@@ -9757,7 +9031,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "設為錄音目錄"
   </voice>
 </phrase>
 <phrase>
@@ -9774,7 +9048,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM 收音選單"
   </voice>
 </phrase>
 <phrase>
@@ -9791,7 +9065,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Clip Counter"
+    recording: "削波屢計"
   </voice>
 </phrase>
 <phrase>
@@ -9861,7 +9135,7 @@
     *: "讀出文件格式"
   </dest>
   <voice>
-    *: "Say File Type"
+    *: "讀出文件格式"
   </voice>
 </phrase>
 <phrase>
@@ -9878,7 +9152,7 @@
   </dest>
   <voice>
     *: none
-    multivolume: "Not present"
+    multivolume: "不存在"
   </voice>
 </phrase>
 <phrase>
@@ -9895,7 +9169,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "低音截斷"
   </voice>
 </phrase>
 <phrase>
@@ -9912,7 +9186,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Primary Colour"
+    lcd_color: "項目選擇條主要顏色"
   </voice>
 </phrase>
 <phrase>
@@ -9940,7 +9214,7 @@
     *: "讀出電池剩餘容量"
   </dest>
   <voice>
-    *: "Announce Battery Level"
+    *: "讀出電池剩餘容量"
   </voice>
 </phrase>
 <phrase>
@@ -9957,7 +9231,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Line Selector Colours"
+    lcd_color: "項目選擇條顏色"
   </voice>
 </phrase>
 <phrase>
@@ -9988,7 +9262,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "字體顏色"
   </voice>
 </phrase>
 <phrase>
@@ -10002,7 +9276,7 @@
     *: "主題設定"
   </dest>
   <voice>
-    *: "Theme Settings"
+    *: "主題設定"
   </voice>
 </phrase>
 <phrase>
@@ -10033,7 +9307,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Gradient Colour)"
+    lcd_color: "漸變顏色條"
   </voice>
 </phrase>
 <phrase>
@@ -10050,7 +9324,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "實色條"
   </voice>
 </phrase>
 <phrase>
@@ -10067,7 +9341,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Colours"
+    lcd_color: "顏色"
   </voice>
 </phrase>
 <phrase>
@@ -10084,7 +9358,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "項目選擇條次要顏色"
   </voice>
 </phrase>
 <phrase>
@@ -10097,11 +9371,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高聲截斷"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高音截斷"
   </dest>
   <voice>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "高音截斷"
   </voice>
 </phrase>
 <phrase>
@@ -10115,7 +9389,7 @@
     *: "歐洲中部 (CP1250)"
   </dest>
   <voice>
-    *: "Central European"
+    *: "歐洲中部 (CP1250)"
   </voice>
 </phrase>
 <phrase>
@@ -10262,15 +9536,15 @@
   user: core
   <source>
     *: none
-    gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
+    fiiom3k,gigabeatfx,sansafuzeplus: "Touchpad Sensitivity"
   </source>
   <dest>
     *: none
-    gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
+    fiiom3k, gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
   </dest>
   <voice>
     *: none
-    gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
+    fiiom3k, gigabeatfx,sansafuzeplus: "觸摸板靈敏度"
   </voice>
 </phrase>
 <phrase>
@@ -10847,11 +10121,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "那個地方"
+    touchscreen: "具體位置"
   </dest>
   <voice>
     *: none
-    touchscreen: "那個地方"
+    touchscreen: "具體位置"
   </voice>
 </phrase>
 <phrase>
@@ -10881,11 +10155,62 @@
   </source>
   <dest>
     *: none
-    touchscreen: "觸控模式"
+    touchscreen: "觸控面板操作模式"
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen 選擇"
+    touchscreen: "觸控面板操作模式"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_CALIBRATE
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Calibrate"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "觸控面板校正"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "觸控面板校正"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
+  desc: in Settings -> General -> Display -> Touchscreen Settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Reset Calibration"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "重新校正觸控"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "重新校正觸控"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SHORTCUTS_INSTEAD_OF_QS
+  desc: in settings_menu.
+  user: core
+  <source>
+    *: none
+    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+  </source>
+  <dest>
+    *: none
+    quickscreen: "使用快捷選單替代快捷熒幕"
+  </dest>
+  <voice>
+    *: none
+    quickscreen: "使用快捷選單替代快捷熒幕"
   </voice>
 </phrase>
 <phrase>
@@ -10900,6 +10225,581 @@
   </dest>
   <voice>
     *: "檔案大小"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GLYPHS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Glyphs To Cache"
+  </source>
+  <dest>
+    *: "快取字型容納數量"
+  </dest>
+  <voice>
+    *: "快取字型容納數量"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STARTUP_SHUTDOWN
+  desc: in the general settings menu
+  user: core
+  <source>
+    *: "Startup/Shutdown"
+  </source>
+  <dest>
+    *: "開機/關機"
+  </dest>
+  <voice>
+    *: "開機和關機"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_START_CURRENT
+  desc: shown when a sleep timer isn't running
+  user: core
+  <source>
+    *: "Start Sleep Timer"
+  </source>
+  <dest>
+    *: "啓動睡眠計時器"
+  </dest>
+  <voice>
+    *: "啓動睡眠計時器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_DURATION
+  desc: default sleep timer duration in minutes
+  user: core
+  <source>
+    *: "Default Sleep Timer Duration"
+  </source>
+  <dest>
+    *: "睡眠倒計時長度"
+  </dest>
+  <voice>
+    *: "睡眠倒計時長度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEYPRESS_RESTARTS_SLEEP_TIMER
+  desc: whether to restart running sleep timer on keypress
+  user: core
+  <source>
+    *: "Restart Sleep Timer On Keypress"
+  </source>
+  <dest>
+    *: "偵測到按鍵時重置睡眠計時器"
+  </dest>
+  <voice>
+    *: "偵測到按鍵時重置睡眠計時器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLEEP_TIMER_ON_POWER_UP
+  desc: whether sleep timer starts on power up
+  user: core
+  <source>
+    *: "Start Sleep Timer On Boot"
+  </source>
+  <dest>
+    *: "開機即啓動睡眠計時"
+  </dest>
+  <voice>
+    *: "開機後立即啓動睡眠計時"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHORTCUTS
+  desc: Title in the shortcuts menu
+  user: core
+  <source>
+    *: "Shortcuts"
+  </source>
+  <dest>
+    *: "捷徑"
+  </dest>
+  <voice>
+    *: "捷徑"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME
+  desc: resume settings menu
+  user: core
+  <source>
+    *: "Automatic resume"
+  </source>
+  <dest>
+    *: "單檔案斷點續撥"
+  </dest>
+  <voice>
+    *: "爲每個檔案保存斷點續撥"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_AUTOMATIC
+  desc: resume on automatic track change
+  user: core
+  <source>
+    *: "Resume on automatic track change"
+  </source>
+  <dest>
+    *: "曲目自動跳轉時斷點續撥"
+  </dest>
+  <voice>
+    *: "曲目自動跳轉時斷點續撥"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTORESUME_CUSTOM
+  desc: enable customization of resume on automatic track change
+  user: core
+  <source>
+    *: "In custom directories only"
+  </source>
+  <dest>
+    *: "僅針對自定資料夾中的檔案"
+  </dest>
+  <voice>
+    *: "僅針對自定資料夾中的檔案"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Compressor"
+  </source>
+  <dest>
+    *: "壓縮器"
+  </dest>
+  <voice>
+    *: "壓縮器"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RATIO
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Ratio"
+  </source>
+  <dest>
+    *: "壓縮比例"
+  </dest>
+  <voice>
+    *: "壓縮比例"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_RELEASE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Release Time"
+  </source>
+  <dest>
+    *: "壓縮釋放時間"
+  </dest>
+  <voice>
+    *: "壓縮釋放時間"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_THRESHOLD
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Threshold"
+  </source>
+  <dest>
+    *: "閥值"
+  </dest>
+  <voice>
+    *: "閥值"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_GAIN
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Makeup Gain"
+  </source>
+  <dest>
+    *: "增益"
+  </dest>
+  <voice>
+    *: "增益"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Knee"
+  </source>
+  <dest>
+    *: "拐點"
+  </dest>
+  <voice>
+    *: "拐點"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_SOFT_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Soft Knee"
+  </source>
+  <dest>
+    *: "軟拐點"
+  </dest>
+  <voice>
+    *: "軟拐點"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_COMPRESSOR_HARD_KNEE
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Hard Knee"
+  </source>
+  <dest>
+    *: "硬拐點"
+  </dest>
+  <voice>
+    *: "硬拐點"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO
+  desc: in sound settings
+  user: core
+  <source>
+    *: "Auto"
+  </source>
+  <dest>
+    *: "自動"
+  </dest>
+  <voice>
+    *: "自動"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMESTRETCH
+  desc: timestretch enable
+  user: core
+  <source>
+    *: "Timestretch"
+  </source>
+  <dest>
+    *: "時間伸縮"
+  </dest>
+  <voice>
+    *: "時間伸縮"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESUME_REWIND
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Before Resume"
+  </source>
+  <dest>
+    *: "暫停時自動倒退長度"
+  </dest>
+  <voice>
+    *: "暫停時自動倒退長度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PAUSE_REWIND
+  desc: Seconds to rewind when rewind on pause is enabled.
+  user: core
+  <source>
+    *: "Rewind on Pause"
+  </source>
+  <dest>
+    *: "暫停時自動倒退"
+  </dest>
+  <voice>
+    *: "暫停時自動倒退"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REPLAYGAIN
+  desc: in replaygain
+  user: core
+  <source>
+    *: "Replaygain"
+  </source>
+  <dest>
+    *: "播放增益"
+  </dest>
+  <voice>
+    *: "播放增益"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESET_START_DIR
+  desc: reset the browser start directory
+  user: core
+  <source>
+    *: "Start File Browser at /"
+  </source>
+  <dest>
+    *: "復原檔案瀏覽起始位置"
+  </dest>
+  <voice>
+    *: "復原檔案瀏覽起始位置"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SELECT_DATABASE_DIRS
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "Select directories to scan"
+  </source>
+  <dest>
+    *: "自定要掃描的資料夾"
+  </dest>
+  <voice>
+    *: "自定資料庫要進行媒體掃描的資料夾"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PM_RELEASE
+  desc: in the peak meter menu
+  user: core
+  <source>
+    *: "Peak Release"
+  </source>
+  <dest>
+    *: "峰值釋放速度"
+  </dest>
+  <voice>
+    *: "峰值釋放速度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_SETTINGS
+  desc: in Settings -> General -> Display menu
+  user: core
+  <source>
+    *: none
+    touchscreen: "Touchscreen Settings"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "觸控面板設定"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "觸控面板設定"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_LINE_PADDING
+  desc: list padding, in display settings
+  user: core
+  <source>
+    *: none
+    touchscreen: "Line Padding in Lists"
+  </source>
+  <dest>
+    *: none
+    touchscreen: "列表行間填充"
+  </dest>
+  <voice>
+    *: none
+    touchscreen: "列表行間填充"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator"
+  </source>
+  <dest>
+    *: "行分隔線"
+  </dest>
+  <voice>
+    *: "行分隔線"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_SEPARATOR_COLOR
+  desc: line between lines in lists
+  user: core
+  <source>
+    *: "Line Separator Colour"
+  </source>
+  <dest>
+    *: "行分隔線顏色"
+  </dest>
+  <voice>
+    *: "Color of Line Separator"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SCROLLBAR_WIDTH
+  desc: in Settings -> General -> Display -> Status-/Scrollbar
+  user: core
+  <source>
+    *: "Scroll Bar Width"
+  </source>
+  <dest>
+    *: "捲動軸寬度"
+  </dest>
+  <voice>
+    *: "捲動軸寬度"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONSTRAIN_NEXT_FOLDER
+  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
+  user: core
+  <source>
+    *: "Constrain Auto-Change"
+  </source>
+  <dest>
+    *: "限制自動跳轉"
+  </dest>
+  <voice>
+    *: "限制自動跳轉"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "熱鍵"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "熱鍵"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_FILE_BROWSER
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "File Browser Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "檔案瀏覽器的熱鍵"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "檔案瀏覽器的熱鍵"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOTKEY_WPS
+  desc: hotkey menu
+  user: core
+  <source>
+    *: none
+    hotkey: "WPS Hotkey"
+  </source>
+  <dest>
+    *: none
+    hotkey: "音樂播放介面熱鍵"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "音樂播放介面熱鍵"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_START_DIR
+  desc: used in the onplay menu to set a starting browser dir
+  user: core
+  <source>
+    *: "Start File Browser Here"
+  </source>
+  <dest>
+    *: "設爲起始檔案瀏覽位置"
+  </dest>
+  <voice>
+    *: "設爲起始檔案瀏覽位置"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CURRENT_PLAYLIST
+  desc: Used when you need to say playlist, also voiced
+  user: core
+  <source>
+    *: "Current Playlist"
+  </source>
+  <dest>
+    *: "當前播放清單"
+  </dest>
+  <voice>
+    *: "當前播放清單"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INSERT_LAST_SHUFFLED
+  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Insert Last Shuffled"
+  </source>
+  <dest>
+    *: "隨機插入到播放清單最後位置"
+  </dest>
+  <voice>
+    *: "隨機插入到播放清單最後位置"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_LAST_SHUFFLED
+  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
+  user: core
+  <source>
+    *: "Queue Last Shuffled"
+  </source>
+  <dest>
+    *: "清單播放完畢後重新隨機隊列"
+  </dest>
+  <voice>
+    *: "清單播放完畢後重新隨機隊列"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_AS_PLAYLISTCAT_DIR
+  desc: used in the onplay menu to set a playlist catalogue dir
+  user: core
+  <source>
+    *: "Set As Playlist Catalogue Directory"
+  </source>
+  <dest>
+    *: "設定為播放清單目錄位置"
+  </dest>
+  <voice>
+    *: "設定為播放清單目錄位置"
   </voice>
 </phrase>
 <phrase>
@@ -10941,7 +10841,7 @@
     *: "啓動睡眠計時器"
   </dest>
   <voice>
-    *: "Start Sleep Timer"
+    *: "啓動睡眠計時器"
   </voice>
 </phrase>
 <phrase>
@@ -11175,6 +11075,20 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_SURROUND
+  desc: in the sound settings menu
+  user: core
+  <source>
+    *: "Haas Surround"
+  </source>
+  <dest>
+    *: "哈斯環繞"
+  </dest>
+  <voice>
+    *: "哈斯環繞音效"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_FILTER_ROLL_OFF
   desc: in sound settings
   user: core
@@ -11254,20 +11168,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SURROUND
-  desc: in the sound settings menu
-  user: core
-  <source>
-    *: "Haas Surround"
-  </source>
-  <dest>
-    *: "哈斯環繞"
-  </dest>
-  <voice>
-    *: "哈斯環繞音效"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SURROUND_FX1
   desc: in sound settings
   user: core
@@ -11338,1616 +11238,5 @@
   <voice>
     *: none
     ibassodx50,ibassodx90: "CPU頻率管理器"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_MODE
-  desc: in Settings -> General -> System -> USB Mode
-  user: core
-  <source>
-    *: "USB Mode"
-  </source>
-  <dest>
-    *: "USB模式"
-  </dest>
-  <voice>
-    *: "USB模式"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_MODE_MASS_STORAGE
-  desc: in Settings -> General -> System -> USB Mode: Mass Storage
-  user: core
-  <source>
-    *: "Mass Storage"
-  </source>
-  <dest>
-    *: "大容量存儲"
-  </dest>
-  <voice>
-    *: "大容量存儲"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_MODE_CHARGE
-  desc: in Settings -> General -> System -> USB Mode: Charge Only
-  user: core
-  <source>
-    *: "Charge Only"
-  </source>
-  <dest>
-    *: "僅充電"
-  </dest>
-  <voice>
-    *: "僅充電"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_MODE_ADB
-  desc: in Settings -> General -> System -> USB Mode: Android Debug Bridge
-  user: core
-  <source>
-    *: "Android Debug Bridge"
-  </source>
-  <dest>
-    *: "ADB偵錯"
-  </dest>
-  <voice>
-    *: "ADB偵錯"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_BOTTOM
-  desc: in Settings -> General -> Display -> statusbar
-  user: core
-  <source>
-    *: "Bottom"
-  </source>
-  <dest>
-    *: "底部"
-  </dest>
-  <voice>
-    *: "Bottom"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LEFT
-  desc: Generic use of 'left'
-  user: core
-  <source>
-    *: "Left"
-  </source>
-  <dest>
-    *: "Left"
-  </dest>
-  <voice>
-    *: "Left"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LIST_SEPARATOR
-  desc: line between lines in lists
-  user: core
-  <source>
-    *: "Line Separator"
-  </source>
-  <dest>
-    *: "分隔行"
-  </dest>
-  <voice>
-    *: "Line Separator"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SKIP_OUTRO
-  desc: skipping to the 5 seconds before the end of a track
-  user: core
-  <source>
-    *: "Skip to Outro"
-  </source>
-  <dest>
-    *: "快轉"
-  </dest>
-  <voice>
-    *: "Skip to Outro"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_THRESHOLD
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Threshold"
-  </source>
-  <dest>
-    *: "閾"
-  </dest>
-  <voice>
-    *: "Threshold"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_STATION_HEADER
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio: "Station:"
-  </source>
-  <dest>
-    *: none
-    radio: "Station:"
-  </dest>
-  <voice>
-    *: none
-    radio: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_WIDTH_WIDE
-  desc: in sound_menu, hardware equalizer tone controls wide bandwidth setting
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Wide"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "寬"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Wide"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TOP_QS_ITEM
-  desc: used for the submenu name for the quickscreen items
-  user: core
-  <source>
-    *: none
-    quickscreen: "Set as Top Quickscreen Item"
-  </source>
-  <dest>
-    *: none
-    quickscreen: "Set as Top Quickscreen Item"
-  </dest>
-  <voice>
-    *: none
-    quickscreen: "Set as Top Quickscreen Item"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LIST_LINE_PADDING
-  desc: list padding, in display settings
-  user: core
-  <source>
-    *: none
-    touchscreen: "Line Padding in Lists"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "Line Padding in Lists"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Line Padding in Lists"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SEMITONE
-  desc:
-  user: core
-  <source>
-    *: none
-    pitchscreen: "Semitone"
-  </source>
-  <dest>
-    *: none
-    pitchscreen: "半音"
-  </dest>
-  <voice>
-    *: none
-    pitchscreen: "Semitone"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_QUEUE_LAST_SHUFFLED
-  desc: in onplay menu.  queue a playlist randomly at end of dynamic playlist
-  user: core
-  <source>
-    *: "Queue Last Shuffled"
-  </source>
-  <dest>
-    *: "Queue Last Shuffled"
-  </dest>
-  <voice>
-    *: "Queue Last Shuffled"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOMATIC
-  desc: generic automatic
-  user: core
-  <source>
-    *: "Automatic"
-  </source>
-  <dest>
-    *: "自動"
-  </dest>
-  <voice>
-    *: "Automatic"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_BASE_SKIN
-  desc: browse for the base skin in theme settings
-  user: core
-  <source>
-    *: "Remote Base Skin"
-  </source>
-  <dest>
-    *: "Remote Base Skin"
-  </dest>
-  <voice>
-    *: "Remote Base Skin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KBD_OK
-  desc: in keyboard
-  user: core
-  <source>
-    *: none
-    touchscreen: "OK"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "OK"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "OK"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NEXT_TRACK
-  desc: Shown in WPS
-  user: core
-  <source>
-    *: "Next Track:"
-  </source>
-  <dest>
-    *: "下一首:"
-  </dest>
-  <voice>
-    *: "Next Track:"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_SCREEN
-  desc: in the main menu
-  user: core
-  <source>
-    *: none
-    remote: "Remote Screen"
-  </source>
-  <dest>
-    *: none
-    remote: "Remote Screen"
-  </dest>
-  <voice>
-    *: none
-    remote: "Remote Screen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DEADZONE
-  desc: touchpad deadzone setting
-  user: core
-  <source>
-    *: none
-    sansafuzeplus: "Touchpad Dead Zone"
-  </source>
-  <dest>
-    *: none
-    sansafuzeplus: "觸控板盲區"
-  </dest>
-  <voice>
-    *: none
-    sansafuzeplus: "Touchpad Dead Zone"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_INSERT_LAST_SHUFFLED
-  desc: in onplay menu.  insert a playlist randomly at end of dynamic playlist
-  user: core
-  <source>
-    *: "Insert Last Shuffled"
-  </source>
-  <dest>
-    *: "Insert Last Shuffled"
-  </dest>
-  <voice>
-    *: "Insert Last Shuffled"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RATIO_LIMIT
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Limit"
-  </source>
-  <dest>
-    *: "Limit"
-  </dest>
-  <voice>
-    *: "Limit"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_Q
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Q"
-  </source>
-  <dest>
-    *: "品質因數"
-  </dest>
-  <voice>
-    *: "Q"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Compressor"
-  </source>
-  <dest>
-    *: "壓縮"
-  </dest>
-  <voice>
-    *: "Compressor"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFEED_MEIER
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Simple (Meier)"
-  </source>
-  <dest>
-    *: "Simple (Meier)"
-  </dest>
-  <voice>
-    *: "Simple"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_FREQUENCY
-  desc: in sound_menu, hardware equalizer tone controls shelf filter cutoff frequency
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Band %d Frequency"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "Band %d 頻率"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Band Frequency"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EXT_RFMS
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: none
-    radio_remote: ""
-  </source>
-  <dest>
-    *: none
-    radio_remote: ""
-  </dest>
-  <voice>
-    *: none
-    radio_remote: "remote radio screen skin"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EXT_RSBS
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: none
-    remote: ""
-  </source>
-  <dest>
-    *: none
-    remote: ""
-  </dest>
-  <voice>
-    *: none
-    remote: "remote statusbar skin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RATIO_10
-  desc: in sound settings
-  user: core
-  <source>
-    *: "10:1"
-  </source>
-  <dest>
-    *: "10:1"
-  </dest>
-  <voice>
-    *: "10 to 1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SCROLLBAR_POSITION
-  desc: in Settings -> General -> Display -> Status-/Scrollbar
-  user: core
-  <source>
-    *: "Scroll Bar Position"
-  </source>
-  <dest>
-    *: "滾動條位置"
-  </dest>
-  <voice>
-    *: "Scroll bar position"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_KNEE
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Knee"
-  </source>
-  <dest>
-    *: "Knee"
-  </dest>
-  <voice>
-    *: "Knee"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_TOP
-  desc: in Settings -> General -> Display -> statusbar
-  user: core
-  <source>
-    *: "Top"
-  </source>
-  <dest>
-    *: "頂部"
-  </dest>
-  <voice>
-    *: "Top"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RATIO_4
-  desc: in sound settings
-  user: core
-  <source>
-    *: "4:1"
-  </source>
-  <dest>
-    *: "4:1"
-  </dest>
-  <voice>
-    *: "4 to 1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KBD_DELETE
-  desc: in keyboard
-  user: core
-  <source>
-    *: none
-    touchscreen: "Del"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "刪除"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Del"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_SOFT_KNEE
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Soft Knee"
-  </source>
-  <dest>
-    *: "軟拐點"
-  </dest>
-  <voice>
-    *: "Soft Knee"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_OTHER
-  desc: Catch-all FM region. Select if none of the others work
-  user: core
-  <source>
-    *: none
-    radio: "Other"
-  </source>
-  <dest>
-    *: none
-    radio: "其他"
-  </dest>
-  <voice>
-    *: none
-    radio: "Other"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_TONE_CONTROLS_ADVANCED
-  desc: in sound_menu, advanced settings for hardware equalizer tone controls
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Advanced Tone Control Settings"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "進階音調控制設置"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Advanced Tone Control Settings"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CODEPAGE_WESTERN_EUROPEAN
-  desc: in codepage setting menu
-  user: core
-  <source>
-    *: "Western European (CP1252)"
-  </source>
-  <dest>
-    *: "西歐 (CP1252)"
-  </dest>
-  <voice>
-    *: "Western European"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_GAIN
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Makeup Gain"
-  </source>
-  <dest>
-    *: "Makeup Gain"
-  </dest>
-  <voice>
-    *: "Makeup Gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_WIDTH_NARROW
-  desc: in sound_menu, hardware equalizer tone controls narrow bandwith setting
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Narrow"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "Narrow"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Narrow"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SAVE_CHANGES
-  desc: When you try to exit screens to confirm save
-  user: core
-  <source>
-    *: "Save Changes?"
-  </source>
-  <dest>
-    *: "儲存變更?"
-  </dest>
-  <voice>
-    *: "Save Changes?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MAIN_SCREEN
-  desc: in the main menu
-  user: core
-  <source>
-    *: none
-    remote: "Main Screen"
-  </source>
-  <dest>
-    *: none
-    remote: "主畫面"
-  </dest>
-  <voice>
-    *: none
-    remote: "Main Screen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HISTOGRAM_INTERVAL
-  desc: in record settings menu
-  user: core
-  <source>
-    *: none
-    histogram: "Histogram interval"
-  </source>
-  <dest>
-    *: none
-    histogram: "Histogram interval"
-  </dest>
-  <voice>
-    *: none
-    histogram: "Histogram interval"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STATUSBAR_CUSTOM
-  desc: if this translation is compatible with LANG_CHANNEL_CUSTOM, then please use the same translation. it can be combined later then
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "自訂"
-  </dest>
-  <voice>
-    *: "Custom"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KBD_CANCEL
-  desc: in keyboard
-  user: core
-  <source>
-    *: none
-    touchscreen: "Cancel"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "取消"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Cancel"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EXT_FMS
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: none
-    radio: ""
-  </source>
-  <dest>
-    *: none
-    radio: ""
-  </dest>
-  <voice>
-    *: none
-    radio: "radio screen skin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RATIO_2
-  desc: in sound settings
-  user: core
-  <source>
-    *: "2:1"
-  </source>
-  <dest>
-    *: "2:1"
-  </dest>
-  <voice>
-    *: "2 to 1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CURRENT_PLAYLIST
-  desc: Used when you need to say playlist, also voiced
-  user: core
-  <source>
-    *: "Current Playlist"
-  </source>
-  <dest>
-    *: "當前播放列表"
-  </dest>
-  <voice>
-    *: "Current Playlist"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TAGNAVI_UNTAGGED
-  desc: "<untagged>" entry in tag browser
-  user: core
-  <source>
-    *: "<Untagged>"
-  </source>
-  <dest>
-    *: "<Untagged>"
-  </dest>
-  <voice>
-    *: "Untagged"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BROWSER_MODE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    usb_hid: "Browser"
-  </source>
-  <dest>
-    *: none
-    usb_hid: "瀏覽"
-  </dest>
-  <voice>
-    *: none
-    usb_hid: "Browser"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_HARD_KNEE
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Hard Knee"
-  </source>
-  <dest>
-    *: "硬拐點"
-  </dest>
-  <voice>
-    *: "Hard Knee"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_RADIOSCREEN
-  desc: in the theme menu
-  user: core
-  <source>
-    *: none
-    radio_remote: "Remote Radio Screen"
-  </source>
-  <dest>
-    *: none
-    radio_remote: "Remote Radio Screen"
-  </dest>
-  <voice>
-    *: none
-    radio_remote: "Remote Radio Screen"
-  </voice>
-</phrase>
-<phrase>
-  id: VOICE_EXT_SBS
-  desc: spoken only, for file extension
-  user: core
-  <source>
-    *: ""
-  </source>
-  <dest>
-    *: ""
-  </dest>
-  <voice>
-    *: "statusbar skin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_HID
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    usb_hid: "USB HID"
-  </source>
-  <dest>
-    *: none
-    usb_hid: "USB人性化介面"
-  </dest>
-  <voice>
-    *: none
-    usb_hid: "USB Human Interface Device"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TOUCHSCREEN_CALIBRATE
-  desc: in Settings -> General -> Display -> Touchscreen Settings
-  user: core
-  <source>
-    *: none
-    touchscreen: "Calibrate"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "校準"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Calibrate"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PLAYBACK_RATE
-  desc: "rate" in pitch screen
-  user: core
-  <source>
-    *: none
-    pitchscreen: "Rate"
-  </source>
-  <dest>
-    *: none
-    pitchscreen: "速率"
-  </dest>
-  <voice>
-    *: none
-    pitchscreen: "Rate"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MOUSE_MODE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    usb_hid: "Mouse"
-  </source>
-  <dest>
-    *: none
-    usb_hid: "滑鼠"
-  </dest>
-  <voice>
-    *: none
-    usb_hid: "Mouse"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_ATTACK
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Attack Time"
-  </source>
-  <dest>
-    *: "Attack Time"
-  </dest>
-  <voice>
-    *: "Attack Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MORSE_INPUT
-  desc: in Settings -> System
-  user: core
-  <source>
-    *: none
-    morse_input: "Use Morse Code Input"
-  </source>
-  <dest>
-    *: none
-    morse_input: "Use Morse Code Input"
-  </dest>
-  <voice>
-    *: none
-    morse_input: "Use Morse Code Input"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_RSSI
-  desc: Signal strength of a received FM station
-  user: core
-  <source>
-    *: none
-    radio: "Signal strength:"
-  </source>
-  <dest>
-    *: none
-    radio: "信號強度:"
-  </dest>
-  <voice>
-    *: none
-    radio: "Signal strength:"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RELEASE
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Release Time"
-  </source>
-  <dest>
-    *: "釋放時間"
-  </dest>
-  <voice>
-    *: "Release Time"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_ITALY
-  desc: fm region Italy
-  user: core
-  <source>
-    *: none
-    radio: "Italy"
-  </source>
-  <dest>
-    *: none
-    radio: "義大利"
-  </dest>
-  <voice>
-    *: none
-    radio: "Italy"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FORCE
-  desc: alternative to yes/no for tristate settings
-  user: core
-  <source>
-    *: "Force"
-  </source>
-  <dest>
-    *: "Force"
-  </dest>
-  <voice>
-    *: "Force"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_TONE_CONTROLS
-  desc: in sound_menu, hardware equalizer tone controls
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Tone Controls"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "音調控制"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Tone Controls"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOTRACKSKIP
-  desc: in crossfade settings
-  user: core
-  <source>
-    *: none
-    crossfade: "Automatic Track Change Only"
-  </source>
-  <dest>
-    *: none
-    crossfade: "Automatic Track Change Only"
-  </dest>
-  <voice>
-    *: none
-    crossfade: "Automatic Track Change Only"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_KEYPAD_MODE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    usb_hid: "USB Keypad Mode"
-  </source>
-  <dest>
-    *: none
-    usb_hid: "USB Keypad Mode"
-  </dest>
-  <voice>
-    *: none
-    usb_hid: "USB Keypad Mode"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SELECT_FOLDER
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Select one or more directories"
-  </source>
-  <dest>
-    *: "選擇一個或多個目錄"
-  </dest>
-  <voice>
-    *: "Select one or more directories"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_USB_SKIP_FIRST_DRIVE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    multidrive_usb: "USB Hide Internal Drive"
-  </source>
-  <dest>
-    *: none
-    multidrive_usb: "USB Hide Internal Drive"
-  </dest>
-  <voice>
-    *: none
-    multidrive_usb: "USB Hide Internal Drive"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_WIDTH
-  desc: in sound_menu, hardware equalizer tone controls peak bandwith setting
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Band %d Width"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "Band %d 寬"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Band Width"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONSTRAIN_NEXT_FOLDER
-  desc: in settings_menu. Whether LANG_NEXT_FOLDER should be constrained to directories within LANG_SET_AS_START_DIR
-  user: core
-  <source>
-    *: "Constrain Auto-Change"
-  </source>
-  <dest>
-    *: "Constrain Auto-Change"
-  </dest>
-  <voice>
-    *: "Constrain Auto-Change"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HW_EQ_GAIN
-  desc: in sound_menu, hardware equalizer tone controls filter gain
-  user: core
-  <source>
-    *: none
-    gigabeats,samsungypr1: "Band %d Gain"
-  </source>
-  <dest>
-    *: none
-    gigabeats,samsungypr1: "Band %d 增益"
-  </dest>
-  <voice>
-    *: none
-    gigabeats,samsungypr1: "Band Gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SPEED
-  desc: timestretch speed
-  user: core
-  <source>
-    *: "Speed"
-  </source>
-  <dest>
-    *: "速度"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TIMESTRETCH
-  desc: timestretch enable
-  user: core
-  <source>
-    *: "Timestretch"
-  </source>
-  <dest>
-    *: "Timestretch"
-  </dest>
-  <voice>
-    *: "Timestretch"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_STRETCH_LIMIT
-  desc: "limit" in pitch screen
-  user: core
-  <source>
-    *: none
-    pitchscreen: "Limit"
-  </source>
-  <dest>
-    *: none
-    pitchscreen: "Limit"
-  </dest>
-  <voice>
-    *: none
-    pitchscreen: "Limit"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TOUCHSCREEN_RESET_CALIBRATION
-  desc: in Settings -> General -> Display -> Touchscreen Settings
-  user: core
-  <source>
-    *: none
-    touchscreen: "Reset Calibration"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "復位校準"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Reset Calibration"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SHORTCUTS
-  desc: Title in the shortcuts menu
-  user: core
-  <source>
-    *: "Shortcuts"
-  </source>
-  <dest>
-    *: "快捷"
-  </dest>
-  <voice>
-    *: "Shortcuts"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ONPLAY_PICTUREFLOW
-  desc: Onplay pictureflow
-  user: core
-  <source>
-    *: "PictureFlow"
-  </source>
-  <dest>
-    *: "PictureFlow"
-  </dest>
-  <voice>
-    *: "open picture flow"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RIGHT
-  desc: Generic use of 'right'
-  user: core
-  <source>
-    *: "Right"
-  </source>
-  <dest>
-    *: "right"
-  </dest>
-  <voice>
-    *: "Right"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_FILE_BROWSER
-  desc: hotkey menu
-  user: core
-  <source>
-    *: none
-    hotkey: "File Browser Hotkey"
-  </source>
-  <dest>
-    *: none
-    hotkey: "檔案瀏覽器快捷鍵"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "File Browser Hotkey"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_ID3_COMPOSER
-  desc: in tag viewer
-  user: core
-  <source>
-    *: "Composer"
-  </source>
-  <dest>
-    *: "作曲家"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_GAIN
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Gain"
-  </source>
-  <dest>
-    *: "增益"
-  </dest>
-  <voice>
-    *: "Gain"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_EDIT_MODE
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Edit mode: %s %s"
-  </source>
-  <dest>
-    *: "編輯設定: %s %s"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_EQUALIZER_BAND_CUTOFF
-  desc: in the equalizer settings menu
-  user: core
-  <source>
-    *: "Cutoff"
-  </source>
-  <dest>
-    *: "Cutoff"
-  </dest>
-  <voice>
-    *: "Cutoff Frequency"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MULTIMEDIA_MODE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    usb_hid: "Multimedia"
-  </source>
-  <dest>
-    *: none
-    usb_hid: "多媒體"
-  </dest>
-  <voice>
-    *: none
-    usb_hid: "Multimedia"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CROSSFEED_CUSTOM
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Custom"
-  </source>
-  <dest>
-    *: "自訂"
-  </dest>
-  <voice>
-    *: "Custom"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_PRESENTATION_MODE
-  desc: in settings_menu
-  user: core
-  <source>
-    *: none
-    usb_hid: "Presentation"
-  </source>
-  <dest>
-    *: none
-    usb_hid: "介面"
-  </dest>
-  <voice>
-    *: none
-    usb_hid: "Presentation"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYCLICK_SOFTWARE
-  desc: in keyclick settings menu
-  user: core
-  <source>
-    *: none
-    hardware_click: "Headphone Keyclick"
-  </source>
-  <dest>
-    *: none
-    hardware_click: "耳機線控"
-  </dest>
-  <voice>
-    *: none
-    hardware_click: "Headphone Keyclick"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SET_AS_PLAYLISTCAT_DIR
-  desc: used in the onplay menu to set a playlist catalogue dir
-  user: core
-  <source>
-    *: "Set As Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "分類目錄添加於播放列表"
-  </dest>
-  <voice>
-    *: "Set As Playlist Catalogue Directory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RATIO_6
-  desc: in sound settings
-  user: core
-  <source>
-    *: "6:1"
-  </source>
-  <dest>
-    *: "6:1"
-  </dest>
-  <voice>
-    *: "6 to 1"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_COMPRESSOR_RATIO
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Ratio"
-  </source>
-  <dest>
-    *: "比率"
-  </dest>
-  <voice>
-    *: "Ratio"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BOOKMARK_SETTINGS_AUTOUPDATE
-  desc: prompt for user to decide whether to update bookmarks
-  user: core
-  <source>
-    *: "Update on Stop"
-  </source>
-  <dest>
-    *: "Update on Stop"
-  </dest>
-  <voice>
-    *: "Update on Stop"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY
-  desc: hotkey menu
-  user: core
-  <source>
-    *: none
-    hotkey: "Hotkey"
-  </source>
-  <dest>
-    *: none
-    hotkey: "快捷鍵"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "Hotkey"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RESET_PLAYLISTCAT_DIR
-  desc:
-  user: core
-  <source>
-    *: "Reset Playlist Catalogue Directory"
-  </source>
-  <dest>
-    *: "重置播放列表目錄"
-  </dest>
-  <voice>
-    *: "Reset Playlist Catalogue Directory"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_OF
-  desc: Shown in WPS: X of Y (tracks)
-  user: core
-  <source>
-    *: "of"
-  </source>
-  <dest>
-    *: "of"
-  </dest>
-  <voice>
-    *: "of"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_NEXT
-  desc: Shown in WPS (short form of Next Track)
-  user: core
-  <source>
-    *: "Next:"
-  </source>
-  <dest>
-    *: "下一首:"
-  </dest>
-  <voice>
-    *: "Next:"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_GLYPHS
-  desc: in settings_menu
-  user: core
-  <source>
-    *: "Glyphs To Cache"
-  </source>
-  <dest>
-    *: "字形緩存"
-  </dest>
-  <voice>
-    *: "Glyphs To Cache"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_REMOTE_STATUSBAR
-  desc: in Settings -> General -> Display -> statusbar
-  user: core
-  <source>
-    *: none
-    remote: "Remote Statusbar"
-  </source>
-  <dest>
-    *: none
-    remote: "Remote Statusbar"
-  </dest>
-  <voice>
-    *: none
-    remote: "Remote Statusbar"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LIST_SEPARATOR_COLOR
-  desc: line between lines in lists
-  user: core
-  <source>
-    *: "Line Separator Colour"
-  </source>
-  <dest>
-    *: "Line Separator Colour"
-  </dest>
-  <voice>
-    *: "Line Separator Colour"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DEPTH_3D
-  desc: in sound_menu, amount of 3D enhancement effect
-  user: core
-  <source>
-    *: none
-    depth_3d: "3-D Enhancement"
-  </source>
-  <dest>
-    *: none
-    depth_3d: "3D音效增強"
-  </dest>
-  <voice>
-    *: none
-    depth_3d: "3-D Enhancement"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTO
-  desc: in sound settings
-  user: core
-  <source>
-    *: "Auto"
-  </source>
-  <dest>
-    *: "自動"
-  </dest>
-  <voice>
-    *: "Auto"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_HOTKEY_WPS
-  desc: hotkey menu
-  user: core
-  <source>
-    *: none
-    hotkey: "WPS Hotkey"
-  </source>
-  <dest>
-    *: none
-    hotkey: "WPS快捷鍵"
-  </dest>
-  <voice>
-    *: none
-    hotkey: "WPS Hotkey"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_KEYCLICK_HARDWARE
-  desc: in keyclick settings menu
-  user: core
-  <source>
-    *: none
-    hardware_click: "Speaker Keyclick"
-  </source>
-  <dest>
-    *: none
-    hardware_click: "Speaker Keyclick"
-  </dest>
-  <voice>
-    *: none
-    hardware_click: "Speaker Keyclick"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LINEOUT_ONOFF
-  desc: in system settings menu
-  user: core
-  <source>
-    *: none
-    lineout_poweroff: "Line Out"
-  </source>
-  <dest>
-    *: none
-    lineout_poweroff: "輸出"
-  </dest>
-  <voice>
-    *: none
-    lineout_poweroff: "Line Out"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_TOUCHSCREEN_SETTINGS
-  desc: in Settings -> General -> Display menu
-  user: core
-  <source>
-    *: none
-    touchscreen: "Touchscreen Settings"
-  </source>
-  <dest>
-    *: none
-    touchscreen: "觸控設定"
-  </dest>
-  <voice>
-    *: none
-    touchscreen: "Touchscreen Settings"
   </voice>
 </phrase>
