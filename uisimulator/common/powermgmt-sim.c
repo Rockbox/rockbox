@@ -39,9 +39,10 @@
 #define POWER_AFTER_CHARGE_TICKS (8 * HZ)
 #endif
 
-extern int battery_percent;
 static bool charging = false;
-static unsigned int battery_millivolts = BATT_MAXMVOLT;
+static unsigned int batt_millivolts = BATT_MAXMVOLT;
+static unsigned int batt_percent = 100;
+static unsigned int batt_runtime = BATT_MAXRUNTIME;
 
 void powermgmt_init_target(void) {}
 
@@ -54,7 +55,7 @@ static void battery_status_update(void)
     static unsigned int ext_power_until_tick = 0;
 #endif
 
-    if TIME_BEFORE(current_tick, update_after_tick)
+    if(TIME_BEFORE(current_tick, update_after_tick))
         return;
 
     update_after_tick = current_tick + HZ;
@@ -72,10 +73,9 @@ static void battery_status_update(void)
 #endif
 
     if (charging) {
-        battery_millivolts += BATT_CHARGE_STEP;
-        if (battery_millivolts >= BATT_MAXMVOLT) {
+        batt_millivolts += BATT_CHARGE_STEP;
+        if (batt_millivolts >= BATT_MAXMVOLT) {
             charging = false;
-            battery_percent = 100;
 #if CONFIG_CHARGING >= CHARGING_MONITOR
             /* Keep external power until tick */
             ext_power_until_tick = current_tick + POWER_AFTER_CHARGE_TICKS;
@@ -83,23 +83,20 @@ static void battery_status_update(void)
             /* Pretend the charger was disconnected */
             charger_input_state = CHARGER_UNPLUGGED;
 #endif
-            return;
         }
     } else {
-        battery_millivolts -= BATT_DISCHARGE_STEP;
-        if (battery_millivolts <= BATT_MINMVOLT) {
+        batt_millivolts -= BATT_DISCHARGE_STEP;
+        if (batt_millivolts <= BATT_MINMVOLT) {
             charging = true;
-            battery_percent = 0;
 #if CONFIG_CHARGING
             /* Pretend the charger was connected */
             charger_input_state = CHARGER_PLUGGED;
 #endif
-            return;
         }
     }
 
-    battery_percent = 100 * (battery_millivolts - BATT_MINMVOLT) /
-                        (BATT_MAXMVOLT - BATT_MINMVOLT);
+    batt_percent = (batt_millivolts - BATT_MINMVOLT) / (BATT_MAXMVOLT - BATT_MINMVOLT);
+    batt_runtime = batt_percent * BATT_MAXRUNTIME;
 }
 
 const unsigned short battery_level_dangerous[BATTERY_TYPES_COUNT] = { 3200 };
@@ -111,15 +108,28 @@ const unsigned short percent_to_volt_discharge[BATTERY_TYPES_COUNT][11] =
 const unsigned short percent_to_volt_charge[11] =
 { 3300, 3400, 3500, 3600, 3700, 3800, 3900, 4000, 4100, 4200, 4300  };
 
+#if CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE
 int _battery_voltage(void)
 {
     battery_status_update();
-    return battery_millivolts;
+    return batt_millivolts;
 }
+#endif
+
+#if CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE
+int _battery_level(void)
+{
+    battery_status_update();
+    return batt_percent;
+}
+#endif
 
 #if (CONFIG_BATTERY_MEASURE & TIME_MEASURE)
-static int powermgmt_est_runningtime_min;
-int _battery_time(void) { return powermgmt_est_runningtime_min; }
+int _battery_time(void)
+{
+    battery_status_update();
+    return batt_runtime;
+}
 #endif
 
 #if CONFIG_CHARGING
@@ -169,6 +179,7 @@ unsigned int input_millivolts(void)
         /* Just return a safe value if battery isn't connected */
         return 4050;
     }
-    return battery_voltage();;
+
+    return battery_voltage();
 }
 #endif
