@@ -3467,30 +3467,32 @@ static inline void draw_gradient(int y, int h)
 
 static void track_list_yh(int char_height)
 {
+    bool needs_space = pf_cfg.show_fps || aa_cache.inspected < pf_idx.album_ct;
+
     switch (pf_cfg.show_album_name)
     {
         case ALBUM_NAME_HIDE:
-            pf_tracks.list_y = (pf_cfg.show_fps ? char_height : 0);
+            pf_tracks.list_y = (needs_space ? char_height : 0);
             pf_tracks.list_h = LCD_HEIGHT - pf_tracks.list_y;
             break;
         case ALBUM_NAME_BOTTOM:
-            pf_tracks.list_y = (pf_cfg.show_fps ? char_height : 0);
+            pf_tracks.list_y = (needs_space ? char_height : 0);
             pf_tracks.list_h = LCD_HEIGHT - pf_tracks.list_y - (char_height * 3);
             break;
         case ALBUM_AND_ARTIST_TOP:
             pf_tracks.list_y = char_height * 3;
             pf_tracks.list_h = LCD_HEIGHT - pf_tracks.list_y -
-                           (pf_cfg.show_fps ? char_height : 0);
+                           (needs_space ? char_height : 0);
             break;
         case ALBUM_AND_ARTIST_BOTTOM:
-            pf_tracks.list_y = (pf_cfg.show_fps ? char_height : 0);
+            pf_tracks.list_y = (needs_space ? char_height : 0);
             pf_tracks.list_h = LCD_HEIGHT - pf_tracks.list_y - (char_height * 3);
             break;
         case ALBUM_NAME_TOP:
         default:
             pf_tracks.list_y = char_height * 3;
             pf_tracks.list_h = LCD_HEIGHT - pf_tracks.list_y -
-                           (pf_cfg.show_fps ? char_height : 0);
+                           (needs_space ? char_height : 0);
             break;
     }
 }
@@ -3945,15 +3947,22 @@ static int pictureflow_main(void)
             last_update = current_update;
             frames = 0;
         }
-        /* Draw FPS */
-        if (pf_cfg.show_fps)
+        /* Draw FPS or draw percentage of already built album cache */
+        if (pf_cfg.show_fps || aa_cache.inspected < pf_idx.album_ct)
         {
 #ifdef USEGSLIB
             mylcd_set_foreground(G_BRIGHT(255));
 #else
             mylcd_set_foreground(G_PIX(255,0,0));
 #endif
-            rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
+            if(aa_cache.inspected >= pf_idx.album_ct)
+                 rb->snprintf(fpstxt, sizeof(fpstxt), "FPS: %d", fps);
+            else
+            {
+                int progress_pct = 100 * aa_cache.inspected / pf_idx.album_ct;
+                rb->snprintf(fpstxt, sizeof(fpstxt), "%d %%", progress_pct);
+            }
+
             if (pf_cfg.show_album_name == ALBUM_NAME_TOP)
                 fpstxt_y = LCD_HEIGHT -
                            rb->screens[SCREEN_MAIN]->getcharheight();
