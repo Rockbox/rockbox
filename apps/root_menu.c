@@ -898,6 +898,8 @@ void root_menu(void)
                 next_screen = last_screen;
                 if (last_screen == GO_TO_PLUGIN)/* for WPS */
                     last_screen = GO_TO_PREVIOUS;
+                else if (last_screen == GO_TO_PREVIOUS)
+                    next_screen = GO_TO_ROOT;
                 break;
             }
 
