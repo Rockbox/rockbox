@@ -4416,7 +4416,12 @@ static int pictureflow_main(const char* selected_file)
                 break;
             case pf_idle:
                 render_all_slides();
-                incremental_albumart_cache(false);
+                if (aa_cache.inspected < pf_idx.album_ct)
+                {
+                    buf_ctx_lock();
+                    incremental_albumart_cache(false);
+                    buf_ctx_unlock();
+                }
                 break;
         }
 
