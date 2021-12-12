@@ -1293,6 +1293,9 @@ static int create_album_index(void)
     draw_progressbar(0, pf_idx.album_ct, "Assigning Albums");
     for (j = 0; j < pf_idx.album_ct; j++)
     {
+        /* Prevent idle poweroff */
+        rb->reset_poweroff_timer();
+
         if (rb->button_get(false) > BUTTON_NONE)
         {
             if (confirm_quit())
@@ -1351,6 +1354,9 @@ retry_artist_lookup:
     /* mark duplicate albums for deletion */
     for (i = 0; i < pf_idx.album_ct - 1; i++) /* -1 don't check last entry */
     {
+        /* Prevent idle poweroff */
+        rb->reset_poweroff_timer();
+
         int idxi = pf_idx.album_index[i].artist_idx;
         int seeki = pf_idx.album_index[i].seek;
 
@@ -2008,6 +2014,9 @@ static bool incremental_albumart_cache(bool verbose)
     if (aa_cache.inspected >= pf_idx.album_ct)
         return false;
 
+    /* Prevent idle poweroff */
+    rb->reset_poweroff_timer();
+
     int idx, ret;
     unsigned int hash_artist, hash_album;
     unsigned int format = FORMAT_NATIVE;
@@ -2065,11 +2074,20 @@ static bool incremental_albumart_cache(bool verbose)
 
 aa_failure:
     if (verbose)
+    {
+        if (aa_cache.inspected >= pf_idx.album_ct)
+            configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
+                            CONFIG_VERSION);
         return false;
+    }
 
 aa_success:
     if (aa_cache.inspected >= pf_idx.album_ct)
+    {
+        configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
+                            CONFIG_VERSION);
         free_all_slide_prio(0);
+    }
 
     if(verbose)/* direct interaction with user */
         return true;
