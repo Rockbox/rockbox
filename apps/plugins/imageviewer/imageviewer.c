@@ -968,11 +968,13 @@ static int load_and_show(char* filename, struct image_info *info)
             break;
         }
 
+#ifdef USEGSLIB
+        grey_show(false); /* switch off overlay */
+#endif
         rb->lcd_clear_display();
     }
     while (status > PLUGIN_OTHER);
 #ifdef USEGSLIB
-    grey_show(false); /* switch off overlay */
     rb->lcd_update();
 #endif
     return status;
