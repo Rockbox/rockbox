@@ -210,7 +210,7 @@ static int get_image(struct image_info *info, int frame, int ds)
     /* assign image buffer */
     if (ds > 1)
     {
-        if (!iv->running_slideshow)
+        if (!iv->running_slideshow && (info->frames_count == 1))
         {
             rb->lcd_putsf(0, 3, "resizing %d*%d", info->width, info->height);
             rb->lcd_update();

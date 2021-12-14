@@ -915,7 +915,8 @@ static int load_and_show(char* filename, struct image_info *info)
             rb->lcd_update();
         }
 
-        mylcd_ub_clear_display();
+        if (frame == 0)
+            mylcd_ub_clear_display();
         imgdec->draw_image_rect(info, 0, 0,
                         info->width-info->x, info->height-info->y);
         mylcd_ub_update();
@@ -956,6 +957,7 @@ static int load_and_show(char* filename, struct image_info *info)
                     get_view(info, &cx, &cy);
                     cx /= zoom; /* prepare the position in the new image */
                     cy /= zoom;
+                    mylcd_ub_clear_display();
                 }
                 else
                     continue;
@@ -969,12 +971,14 @@ static int load_and_show(char* filename, struct image_info *info)
         }
 
 #ifdef USEGSLIB
-        grey_show(false); /* switch off overlay */
+        if (info->frames_count <= 1)
+            grey_show(false); /* switch off overlay */
 #endif
         rb->lcd_clear_display();
     }
     while (status > PLUGIN_OTHER);
 #ifdef USEGSLIB
+    grey_show(false); /* switch off overlay */
     rb->lcd_update();
 #endif
     return status;
