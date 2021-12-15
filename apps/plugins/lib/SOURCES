@@ -14,6 +14,7 @@ rgb_hsv.c
 highscore.c
 simple_viewer.c
 display_text.c
+printcell_helper.c
 strncpy.c
 stdio_compat.c
 

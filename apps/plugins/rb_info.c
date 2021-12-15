@@ -29,8 +29,9 @@
 #include "lib/action_helper.h"
 #include "lib/button_helper.h"
 #include "lib/pluginlib_actions.h"
+#include "lib/printcell_helper.h"
 
-#define MENU_ID(x) (((void*)&"RPBUTACNGX\0" + x))
+#define MENU_ID(x) (((void*)&"RPBUTACNGSX\0" + x))
 enum {
     M_ROOT = 0,
     M_PATHS,
@@ -41,6 +42,7 @@ enum {
     M_CONTEXTS,
     M_ACTTEST,
     M_PLUGINS,
+    M_TESTPUT,
     M_EXIT,
     M_LAST_ITEM //ITEM COUNT
 };
@@ -96,7 +98,8 @@ static const struct paths paths[] = {
     {"Fm Presets",  ""FMPRESET_PATH},
     {"MAX_PATH",    ""MACROVAL(MAX_PATH)" bytes"},
 };
-
+#define TESTPUT_HEADER "$*64$col1$col2$*128$col3$col4$col5$col6$*64$col7$col8"
+static int testput_cols = 0;
 struct mainmenu { const char *name; void *menuid; int items;};
 static struct mainmenu mainmenu[M_LAST_ITEM] = {
 #define MENU_ITEM(ID, NAME, COUNT) [ID]{NAME, MENU_ID(ID), (int)COUNT}
@@ -109,6 +112,7 @@ MENU_ITEM(M_ACTIONS, "Actions", LAST_ACTION_PLACEHOLDER),
 MENU_ITEM(M_CONTEXTS, "Contexts", LAST_CONTEXT_PLACEHOLDER ),
 MENU_ITEM(M_ACTTEST, "Action test", 3),
 MENU_ITEM(M_PLUGINS, ID2P(LANG_PLUGINS), MENU_ID_PLUGINS_ITEMS),
+MENU_ITEM(M_TESTPUT, "Printcell test", 36),
 MENU_ITEM(M_EXIT, ID2P(LANG_MENU_QUIT), 0),
 #undef MENU_ITEM
 };
@@ -125,8 +129,16 @@ static const struct mainmenu *mainitem(int selected_item)
 static void cleanup(void *parameter)
 {
     (void)parameter;
-
 }
+
+#if 0
+static enum themable_icons menu_icon_cb(int selected_item, void * data)
+{
+    (void)data;
+    (void)selected_item;
+    return Icon_NOICON;
+}
+#endif
 
 static const char *menu_plugin_name_cb(int selected_item, void* data,
                                            char* buf, size_t buf_len)
@@ -247,7 +259,7 @@ static const char* list_get_name_cb(int selected_item, void* data,
     buf[0] = '\0';
     if (data == MENU_ID(M_ROOT))
         return mainitem(selected_item)->name;
-    else if (selected_item == 0) /*header text*/
+    else if (selected_item == 0 && data != MENU_ID(M_TESTPUT)) /*header text*/
         return mainitem(main_last_sel)->name;
     else if (selected_item >= mainitem(main_last_sel)->items - 1)
             return ID2P(LANG_BACK);
@@ -285,6 +297,11 @@ static const char* list_get_name_cb(int selected_item, void* data,
     else if (data == MENU_ID(M_PLUGINS))
     {
         return menu_plugin_name_cb(selected_item - 1, data, buf, buf_len);
+    }
+    else if (data == MENU_ID(M_TESTPUT))
+    {
+        rb->snprintf(buf, buf_len, "put_line item: [ %d ]$Text %d$Text LONGER TEST text %d $4$5$6$7$8$9", selected_item, 1, 2);
+        return buf;
     }
     return buf;
 }
@@ -331,16 +348,38 @@ static int list_voice_cb(int list_index, void* data)
     return 0;
 }
 
-int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclist *lists)
+int menu_action_cb(int *action, int selected_item, bool* exit, struct gui_synclist *lists)
 {
-    if (lists->data == MENU_ID(M_ACTTEST))
+    if (lists->data == MENU_ID(M_TESTPUT) && (selected_item < (mainitem(M_TESTPUT)->items) - 1)/*back*/)
+    {
+        if (*action == ACTION_STD_OK)
+        {
+            printcell_increment_column(lists, 1, true);
+            *action = ACTION_NONE;
+        }
+        else if (*action == ACTION_STD_CANCEL)
+        {
+            if (printcell_increment_column(lists, -1, true) != testput_cols - 1)
+            {
+                *action = ACTION_NONE;
+            }
+        }
+        else if (*action == ACTION_STD_CONTEXT)
+        {
+            char buf[PRINTCELL_MAXLINELEN];
+            char* bufp = buf;
+            bufp = printcell_get_selected_column_text(lists, bufp, PRINTCELL_MAXLINELEN);
+            rb->splashf(HZ * 2, "Item: %s", bufp);
+        }
+    }
+    else if (lists->data == MENU_ID(M_ACTTEST))
     {
         if (selected_item == 2) /* context */
         {
             int ctx = m_test.context;
-            if (action == ACTION_STD_OK)
+            if (*action == ACTION_STD_OK)
                 m_test.context++;
-            else if (action == ACTION_STD_CANCEL)
+            else if (*action == ACTION_STD_CANCEL)
                 m_test.context--;
 
             if (m_test.context < 0)
@@ -353,7 +392,7 @@ int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclis
 
             goto default_handler;
         }
-        if (action == ACTION_STD_OK)
+        if (*action == ACTION_STD_OK)
         {
             if (selected_item == 1 || selected_item == 3)
             {
@@ -364,7 +403,7 @@ int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclis
     }
     else if (lists->data == MENU_ID(M_BTNTEST))
     {
-        if (action == ACTION_STD_OK)
+        if (*action == ACTION_STD_OK)
         {
             if (selected_item == 1 || selected_item == 2)
             {
@@ -373,18 +412,38 @@ int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclis
             }
         }
     }
-    if (action == ACTION_STD_OK)
+/* common */
+    if (*action == ACTION_STD_OK)
     {
             if (lists->data == MENU_ID(M_ROOT))
             {
                 rb->memset(&m_test, 0, sizeof(struct menu_test_t));
                 const struct mainmenu *cur = mainitem(selected_item);
+
                 if (cur->menuid == NULL || cur->menuid == MENU_ID(M_EXIT))
                     *exit = true;
                 else
                 {
                     main_last_sel = selected_item;
-                    synclist_set(cur->menuid, 1, cur->items, 1);
+
+                    if (cur->menuid == MENU_ID(M_TESTPUT))
+                    {
+                        //rb->gui_list_screen_scroll_out_of_view(true);
+                        synclist_set(cur->menuid, 0, cur->items, 1);
+#if LCD_DEPTH > 1
+                        /* If line sep is set to automatic then outline cells */
+                        bool showlinesep = (rb->global_settings->list_separator_height < 0);
+#else
+                        bool showlinesep = (rb->global_settings->cursor_style == 0);
+#endif
+                        printcell_enable(lists, true, showlinesep);
+                        //lists->callback_draw_item = test_listdraw_fn;
+                    }
+                    else
+                    {
+                        printcell_enable(lists, false, false);
+                        synclist_set(cur->menuid, 1, cur->items, 1);
+                    }
                     rb->gui_synclist_draw(lists);
                 }
             }
@@ -394,7 +453,11 @@ int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclis
             }
             else if (selected_item >= (mainitem(main_last_sel)->items) - 1)/*back*/
             {
-                action = ACTION_STD_CANCEL;
+                *action = ACTION_STD_CANCEL;
+            }
+            else if (lists->data == MENU_ID(M_TESTPUT))
+            {
+
             }
             else if (lists->data == MENU_ID(M_ACTIONS) ||
                      lists->data == MENU_ID(M_CONTEXTS))
@@ -406,8 +469,14 @@ int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclis
                 rb->button_get(true);
             }
     }
-    if (action == ACTION_STD_CANCEL)
+    if (*action == ACTION_STD_CANCEL)
     {
+        if (lists->data == MENU_ID(M_TESTPUT))
+        {
+            //rb->gui_list_screen_scroll_out_of_view(false);
+            //lists->callback_draw_item = NULL;
+            printcell_enable(lists, false, false);
+        }
         if (lists->data != MENU_ID(M_ROOT))
         {
             const struct mainmenu *mainm = &mainmenu[0];
@@ -418,7 +487,7 @@ int menu_action_cb(int action, int selected_item, bool* exit, struct gui_synclis
             *exit = true;
     }
 default_handler:
-    if (rb->default_event_handler_ex(action, cleanup, NULL) == SYS_USB_CONNECTED)
+    if (rb->default_event_handler_ex(*action, cleanup, NULL) == SYS_USB_CONNECTED)
     {
         *exit = true;
         return PLUGIN_USB_CONNECTED;
@@ -436,7 +505,14 @@ static void synclist_set(char* menu_id, int selected_item, int items, int sel_si
     list_voice_cb(0, menu_id);
     rb->gui_synclist_init(&lists,list_get_name_cb,
                           menu_id, false, sel_size, NULL);
-
+    if (menu_id == MENU_ID(M_TESTPUT))
+    {
+        testput_cols = printcell_set_columns(&lists, TESTPUT_HEADER, Icon_Rockbox);
+    }
+    else
+    {
+        rb->gui_synclist_set_title(&lists, NULL,-1);
+    }
     rb->gui_synclist_set_icon_callback(&lists,NULL);
     rb->gui_synclist_set_voice_callback(&lists, list_voice_cb);
     rb->gui_synclist_set_nb_items(&lists,items);
@@ -460,7 +536,7 @@ enum plugin_status plugin_start(const void* parameter)
     /* add header and back item to each submenu */
     for (int i = 1; i < M_LAST_ITEM; i++)
         mainmenu[i].items += 2;
-
+    mainmenu[M_TESTPUT].items -= 1;
     if (!exit)
     {
         const struct mainmenu *mainm = &mainmenu[0];
@@ -483,10 +559,10 @@ enum plugin_status plugin_start(const void* parameter)
             }
             else
                 redraw = true;
+            ret = menu_action_cb(&action, selected_item, &exit, &lists);
             if (rb->gui_synclist_do_button(&lists,&action,LIST_WRAP_UNLESS_HELD))
                 continue;
             selected_item = rb->gui_synclist_get_sel_pos(&lists);
-            ret = menu_action_cb(action, selected_item, &exit, &lists);
         }
     }
 

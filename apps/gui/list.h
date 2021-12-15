@@ -69,6 +69,35 @@ typedef enum themable_icons list_get_icon(int selected_item, void * data);
 typedef const char * list_get_name(int selected_item, void * data,
                                    char * buffer, size_t buffer_len);
 /*
+ * Draw callback
+ *  - display : functions supplied depends on the screen call originated from (typ: MAIN)
+ *  - list_info : a pointer to an internal struct containing item display information
+ */
+/* owner drawn lists need to know this info */
+struct list_putlineinfo_t {
+    int x;
+    int y;
+    int item_indent;
+    int item_offset;
+    int line;
+
+    int icon;
+    int icon_width;
+
+    struct screen *display;
+    struct viewport *vp;
+    struct line_desc *linedes;
+    struct gui_synclist * list;
+    char *dsp_text;
+
+    bool is_selected;
+    bool is_title;
+    bool show_cursor;
+    bool have_icons;
+};
+
+typedef void list_draw_item(struct list_putlineinfo_t *list_info);
+/*
  * Voice callback
  *  - selected_item : an integer that tells the number of the item to speak
  *  - data : a void pointer to the data you gave to the list when you
@@ -133,6 +162,7 @@ struct gui_synclist
     list_get_icon *callback_get_item_icon;
     list_get_name *callback_get_item_name;
     list_speak_item *callback_speak_item;
+    list_draw_item *callback_draw_item;
 
     /* The data that will be passed to the callback function YOU implement */
     void * data;
