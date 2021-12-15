@@ -49,31 +49,31 @@ libucl:
 	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/tools/ucl/src BUILD_DIR=$(BUILD_DIR)/ucl libucl.a
 
 libipodpatcher:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/ipodpatcher BUILD_DIR=$(BUILD_DIR)/ipodpatcher libipodpatcher.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/ipodpatcher BUILD_DIR=$(BUILD_DIR)/ipodpatcher libipodpatcher.a CC=$(CC)
 
 libsansapatcher:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/sansapatcher BUILD_DIR=$(BUILD_DIR)/sansapatcher libsansapatcher.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/sansapatcher BUILD_DIR=$(BUILD_DIR)/sansapatcher libsansapatcher.a CC=$(CC)
 
 libmkamsboot:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkamsboot BUILD_DIR=$(BUILD_DIR)/mkamsboot libmkamsboot.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/mkamsboot BUILD_DIR=$(BUILD_DIR)/mkamsboot libmkamsboot.a CC=$(CC)
 
 libmktccboot:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mktccboot BUILD_DIR=$(BUILD_DIR)/mktccboot libmktccboot.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/mktccboot BUILD_DIR=$(BUILD_DIR)/mktccboot libmktccboot.a CC=$(CC)
 
 libmkmpioboot:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkmpioboot BUILD_DIR=$(BUILD_DIR)/mkmpioboot libmkmpioboot.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/mkmpioboot BUILD_DIR=$(BUILD_DIR)/mkmpioboot libmkmpioboot.a CC=$(CC)
 
 libchinachippatcher:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/chinachippatcher BUILD_DIR=$(BUILD_DIR)/chinachippatcher libchinachippatcher.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/chinachippatcher BUILD_DIR=$(BUILD_DIR)/chinachippatcher libchinachippatcher.a CC=$(CC)
 
 libmkimxboot:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mkimxboot BUILD_DIR=$(BUILD_DIR)/mkimxboot libmkimxboot.a CC=$(CC) CXX=$(CXX)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/mkimxboot BUILD_DIR=$(BUILD_DIR)/mkimxboot libmkimxboot.a CC=$(CC) CXX=$(CXX)
 
 libmks5lboot:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/mks5lboot BUILD_DIR=$(BUILD_DIR)/mks5lboot libmks5lboot.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/mks5lboot BUILD_DIR=$(BUILD_DIR)/mks5lboot libmks5lboot.a CC=$(CC)
 
 libbz2:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/bzip2 BUILD_DIR=$(BUILD_DIR)/bzip2 libbz2.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/bzip2 BUILD_DIR=$(BUILD_DIR)/bzip2 libbz2.a CC=$(CC)
 
 libbspatch:
-	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/rbutil/bspatch BUILD_DIR=$(BUILD_DIR)/bspatch libbspatch.a CC=$(CC)
+	$(SILENT)$(MAKE) -C $(RBBASE_DIR)/utils/bspatch BUILD_DIR=$(BUILD_DIR)/bspatch libbspatch.a CC=$(CC)

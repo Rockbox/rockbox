@@ -61,7 +61,7 @@ contains(QT_MAJOR_VERSION, 4) {
 }
 
 RBBASE_DIR = $$_PRO_FILE_PWD_
-RBBASE_DIR = $$replace(RBBASE_DIR,/rbutil/rbutilqt,)
+RBBASE_DIR = $$replace(RBBASE_DIR,/utils/rbutilqt,)
 
 message("using Rockbox basedir $$RBBASE_DIR")
 
@@ -80,7 +80,7 @@ message("using Rockbox basedir $$RBBASE_DIR")
 }
 
 extralibs.commands = $$SILENT \
-        $(MAKE) -f $$RBBASE_DIR/rbutil/rbutilqt/Makefile.libs \
+        $(MAKE) -f $$RBBASE_DIR/utils/rbutilqt/Makefile.libs \
         $$VERBOSE \
         SYS_SPEEX=\"$$LIBSPEEX\" \
         BUILD_DIR=$$MYLIBBUILDDIR/ \
@@ -133,7 +133,7 @@ exists($$LRELEASE) {
 INCLUDEPATH += $$_PRO_FILE_PWD_ $$_PRO_FILE_PWD_/irivertools \
             $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/base \
             $$_PRO_FILE_PWD_/zlib $$_PRO_FILE_PWD_/gui
-INCLUDEPATH += $$RBBASE_DIR/rbutil/ipodpatcher $$RBBASE_DIR/rbutil/sansapatcher \
+INCLUDEPATH += $$RBBASE_DIR/utils/ipodpatcher $$RBBASE_DIR/utils/sansapatcher \
             $$RBBASE_DIR/tools/rbspeex $$RBBASE_DIR/tools
 INCLUDEPATH += logger
 
