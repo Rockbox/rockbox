@@ -72,7 +72,7 @@ static void draw_image_rect(struct image_info *info,
 static int img_mem(int ds)
 {
     struct gif_decoder *p_decoder = &decoder;
-    return p_decoder->native_img_size/ds;
+    return (p_decoder->native_img_size/ds + 3) & ~3;
 }
 
 static int load_image(char *filename, struct image_info *info,
