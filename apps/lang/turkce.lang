@@ -141,7 +141,7 @@
     *: "Yükleniyor... %%%d bitti (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Yükleniyor... %%%d tamamlandı (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -234,17 +234,14 @@
   user: core
   <source>
     *: "PLAY = Yes"
-    archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "SELECT = Yes"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
   </source>
   <dest>
     *: "PLAY = Devam et"
-    archosplayer: "(PLAY/STOP)"
     cowond2*: "MENU, veya üst-sağ = Evet"
     creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Evet"
     iriverh100,iriverh120,iriverh300: "NAVI = Devam et"
@@ -261,17 +258,12 @@
   user: core
   <source>
     *: "Any Other = No"
-    archosplayer: none
   </source>
   <dest>
     *: "Herhangi PLAY'dan başka = İptal et"
-    archosplayer: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200: "Herhangi SELECT'ten başka = İptal et"
-    iriverh100,iriverh120,iriverh300: "Herhangi NAVI'den başka = İptal et"
   </dest>
   <voice>
     *: ""
-    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -683,7 +675,7 @@
     *: "Stereo"
   </dest>
   <voice>
-    *: ""
+    *: "Stereo"
   </voice>
 </phrase>
 <phrase>
@@ -697,7 +689,7 @@
     *: "Mono"
   </dest>
   <voice>
-    *: ""
+    *: "Mono"
   </voice>
 </phrase>
 <phrase>
@@ -764,10 +756,10 @@
     *: "Direct Gain"
   </source>
   <dest>
-    *: "Direct Gain"
+    *: "Doğrudan kazanç"
   </dest>
   <voice>
-    *: "Direct Gain"
+    *: "Doğrudan kazanç"
   </voice>
 </phrase>
 <phrase>
@@ -778,10 +770,10 @@
     *: "Cross Gain"
   </source>
   <dest>
-    *: "Cross Gain"
+    *: "Çapraz Kazanç"
   </dest>
   <voice>
-    *: "Cross Gain"
+    *: "Çapraz Kazanç"
   </voice>
 </phrase>
 <phrase>
@@ -792,10 +784,10 @@
     *: "High-Frequency Attenuation"
   </source>
   <dest>
-    *: "High-Frequency Attenuation"
+    *: "Yüksek Frekanslı Zayıflama"
   </dest>
   <voice>
-    *: "High-Frequency Attenuation"
+    *: "Yüksek Frekanslı Zayıflama"
   </voice>
 </phrase>
 <phrase>
@@ -806,10 +798,10 @@
     *: "High-Frequency Cutoff"
   </source>
   <dest>
-    *: "High-Frequency Cutoff"
+    *: "Yüksek Frekans Kesimi	"
   </dest>
   <voice>
-    *: "High-Frequency Cutoff"
+    *: "Yüksek Frekans Kesimi"
   </voice>
 </phrase>
 <phrase>
@@ -862,10 +854,10 @@
     *: "Precut"
   </source>
   <dest>
-    *: "Precut"
+    *: "önceden kesilmiş"
   </dest>
   <voice>
-    *: "Precut"
+    *: "önceden kesilmiş	"
   </voice>
 </phrase>
 <phrase>
@@ -950,125 +942,6 @@
   </dest>
   <voice>
     *: "Ku"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_LOUDNESS
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Loudness"
-  </source>
-  <dest>
-    *: none
-    masf: "Ses yüksekliği"
-  </dest>
-  <voice>
-    *: none
-    masf: "Ses yüksekliği"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_AUTOVOL
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "Auto Volume"
-  </source>
-  <dest>
-    *: none
-    masf: "Özdevimli Ses Yüksekliği"
-  </dest>
-  <voice>
-    *: none
-    masf: "Özdevimli Ses Yüksekliği"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SUPERBASS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "Super Bass"
-  </source>
-  <dest>
-    *: none
-    masf: "Süper Bass"
-  </dest>
-  <voice>
-    *: none
-    masf: "Süper Bass"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_ENABLE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Enable"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Başla"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Başla"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_STRENGTH
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Strength"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Güçü"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Güçü"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_HARMONICS
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Harmonics"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Harmoniği"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Harmoniği"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MDB_SHAPE
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Shape"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Şekil"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Şekil"
   </voice>
 </phrase>
 <phrase>
@@ -1281,10 +1154,10 @@
     *: "File View"
   </source>
   <dest>
-    *: "Dosya Gorunumu"
+    *: "Dosya Görünümü"
   </dest>
   <voice>
-    *: ""
+    *: "Dosya Görünümü"
   </voice>
 </phrase>
 <phrase>
@@ -1295,10 +1168,10 @@
     *: "Sort Case Sensitive"
   </source>
   <dest>
-    *: "Buyuk Kucuk Harf Sirasi"
+    *: "Büyük/Küçük Harfe Duyarlı Sırala"
   </dest>
   <voice>
-    *: ""
+    *: "Büyük/Küçük Harfe Duyarlı Sırala"
   </voice>
 </phrase>
 <phrase>
@@ -1312,7 +1185,7 @@
     *: "Gösterilecek Dosyalar"
   </dest>
   <voice>
-    *: ""
+    *: "Gösterilecek Dosyalar"
   </voice>
 </phrase>
 <phrase>
@@ -1326,7 +1199,7 @@
     *: "Desteklenen"
   </dest>
   <voice>
-    *: ""
+    *: "Desteklenen"
   </voice>
 </phrase>
 <phrase>
@@ -1337,10 +1210,10 @@
     *: "Music"
   </source>
   <dest>
-    *: "Muzik"
+    *: "Müzik"
   </dest>
   <voice>
-    *: ""
+    *: "Müzik"
   </voice>
 </phrase>
 <phrase>
@@ -1351,10 +1224,10 @@
     *: "Follow Playlist"
   </source>
   <dest>
-    *: "Listeyi Takip Et"
+    *: "Oynatma Listesini Takip Et"
   </dest>
   <voice>
-    *: ""
+    *: "Oynatma Listesini Takip Et"
   </voice>
 </phrase>
 <phrase>
@@ -1363,7 +1236,6 @@
   user: core
   <source>
     *: "Building database... %d found (OFF to return)"
-    archosplayer: "Building DB %d found"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Building database... %d found (LEFT to return)"
     gogearsa9200: "Building database... %d found (REW to return)"
     ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Building database... %d found (PREV to return)"
@@ -1371,7 +1243,6 @@
   </source>
   <dest>
     *: "Veritabanı oluşturuluyor... %d bulundu (dönmek için OFF)"
-    archosplayer: "DB oluşturuluyor... %d bulundu"
     gigabeat*,iaudiom5,iaudiox5,mrobe100,samsungyh*: "Veritabanı oluşturuluyor... %d bulundu (dönmek için LEFT)"
     gogearsa9200: "Veritabanı oluşturuluyor... %d bulundu (dönmek için REW)"
     ipod*,iriverh10,iriverh10_5gb,sansac200*,sansae200*,sansafuze*,vibe500: "Veritabanı oluşturuluyor... %d bulundu (dönmek için PREV)"
@@ -1392,7 +1263,7 @@
     *: "Ekran"
   </dest>
   <voice>
-    *: ""
+    *: "Ekran"
   </voice>
 </phrase>
 <phrase>
@@ -1403,10 +1274,10 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "LCD Isigi"
+    *: "Ekran Işığı"
   </dest>
   <voice>
-    *: ""
+    *: "Ekran Işığı"
   </voice>
 </phrase>
 <phrase>
@@ -1423,7 +1294,7 @@
   </dest>
   <voice>
     *: none
-    charging: ""
+    charging: "Aydınlatma (Bağlı iken)"
   </voice>
 </phrase>
 <phrase>
@@ -1440,7 +1311,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: ""
+    backlight_fade*: "Aydınlatma Açılıyor"
   </voice>
 </phrase>
 <phrase>
@@ -1457,7 +1328,7 @@
   </dest>
   <voice>
     *: none
-    backlight_fade*: ""
+    backlight_fade*: "Aydınlatma Kapanıyor"
   </voice>
 </phrase>
 <phrase>
@@ -1471,7 +1342,7 @@
     *: "Kontrast"
   </dest>
   <voice>
-    *: ""
+    *: "Kontrast"
   </voice>
 </phrase>
 <phrase>
@@ -1488,7 +1359,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: ""
+    lcd_invert,remote_lcd_invert: "LCD Modu"
   </voice>
 </phrase>
 <phrase>
@@ -1505,7 +1376,7 @@
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: ""
+    lcd_invert,remote_lcd_invert: "Ters"
   </voice>
 </phrase>
 <phrase>
@@ -1516,10 +1387,10 @@
     *: "Scrolling"
   </source>
   <dest>
-    *: "Kayma Hizi"
+    *: "Kayma Hızı"
   </dest>
   <voice>
-    *: ""
+    *: "Kayma Hızı"
   </voice>
 </phrase>
 <phrase>
@@ -1547,7 +1418,7 @@
     *: "Kaydırma Çubuğu"
   </dest>
   <voice>
-    *: ""
+    *: "Kaydırma Çubuğu"
   </voice>
 </phrase>
 <phrase>
@@ -1561,7 +1432,7 @@
     *: "Durum Çubuğu"
   </dest>
   <voice>
-    *: ""
+    *: "Durum Çubuğu"
   </voice>
 </phrase>
 <phrase>
@@ -1575,7 +1446,7 @@
     *: "Ses Düzeyi"
   </dest>
   <voice>
-    *: ""
+    *: "Ses Düzeyi"
   </voice>
 </phrase>
 <phrase>
@@ -1589,7 +1460,7 @@
     *: "Pil Düzeyi"
   </dest>
   <voice>
-    *: ""
+    *: "Pil Düzeyi"
   </voice>
 </phrase>
 <phrase>
@@ -1603,7 +1474,7 @@
     *: "Grafik"
   </dest>
   <voice>
-    *: ""
+    *: "Grafik"
   </voice>
 </phrase>
 <phrase>
@@ -1617,7 +1488,7 @@
     *: "Sayısal"
   </dest>
   <voice>
-    *: ""
+    *: "Sayısal"
   </voice>
 </phrase>
 <phrase>
@@ -1626,15 +1497,12 @@
   user: core
   <source>
     *: "Peak Meter"
-    masd: none
   </source>
   <dest>
     *: "Ses Düzeyi Gösterimi"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Ses Düzeyi Gösterimi"
   </voice>
 </phrase>
 <phrase>
@@ -1643,15 +1511,12 @@
   user: core
   <source>
     *: "Clip Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Parça Kalış Süresi"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Parça Kalış Süresi"
   </voice>
 </phrase>
 <phrase>
@@ -1660,15 +1525,12 @@
   user: core
   <source>
     *: "Peak Hold Time"
-    masd: none
   </source>
   <dest>
     *: "Tepe noktası kalış süresi"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Tepe noktası kalış süresi"
   </voice>
 </phrase>
 <phrase>
@@ -1677,15 +1539,12 @@
   user: core
   <source>
     *: "Eternal"
-    masd: none
   </source>
   <dest>
     *: "Sonsuz"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Sonsuz"
   </voice>
 </phrase>
 <phrase>
@@ -1694,15 +1553,12 @@
   user: core
   <source>
     *: "Peak Release"
-    masd: none
   </source>
   <dest>
     *: "Tepe Noktası Bırakma"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Tepe Noktası Bırakma"
   </voice>
 </phrase>
 <phrase>
@@ -1711,15 +1567,12 @@
   user: core
   <source>
     *: "Scale"
-    masd: none
   </source>
   <dest>
     *: "Ölçek"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Ölçek"
   </voice>
 </phrase>
 <phrase>
@@ -1728,15 +1581,12 @@
   user: core
   <source>
     *: "Logarithmic (dB)"
-    masd: none
   </source>
   <dest>
     *: "Logaritmik (dB)"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Logaritmik (dB)"
   </voice>
 </phrase>
 <phrase>
@@ -1745,15 +1595,12 @@
   user: core
   <source>
     *: "Linear (%)"
-    masd: none
   </source>
   <dest>
     *: "Doğrusal (%)"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "Doğrusal (%)"
   </voice>
 </phrase>
 <phrase>
@@ -1762,15 +1609,12 @@
   user: core
   <source>
     *: "Minimum Of Range"
-    masd: none
   </source>
   <dest>
     *: "En Düşük Aralık"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "En Düşük Aralık"
   </voice>
 </phrase>
 <phrase>
@@ -1779,15 +1623,12 @@
   user: core
   <source>
     *: "Maximum Of Range"
-    masd: none
   </source>
   <dest>
     *: "En Yüksek Aralık"
-    masd: none
   </dest>
   <voice>
-    *: ""
-    masd: none
+    *: "En Yüksek Aralık"
   </voice>
 </phrase>
 <phrase>
@@ -1806,7 +1647,8 @@
   </dest>
   <voice>
     *: none
-    button_light,sansae200*,sansafuze*: ""
+    button_light: "Düğme Işığı Zaman Aşımı"
+    sansae200*,sansafuze*: "Teker Işığı Zaman Aşımı"
   </voice>
 </phrase>
 <phrase>
@@ -1823,7 +1665,7 @@
   </dest>
   <voice>
     *: none
-    buttonlight_brightness: ""
+    buttonlight_brightness: "Düğme Işığı Parlaklığı"
   </voice>
 </phrase>
 <phrase>
@@ -1835,11 +1677,11 @@
     flash_storage: none
   </source>
   <dest>
-    *: "Disk Donusu"
+    *: "Disk Dönüşü"
     flash_storage: none
   </dest>
   <voice>
-    *: ""
+    *: "Disk Dönüşü"
     flash_storage: none
   </voice>
 </phrase>
@@ -1851,10 +1693,10 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "Zaman Biçimi"
+    *: "Zaman Formatı"
   </dest>
   <voice>
-    *: ""
+    *: "Zaman Formatı"
   </voice>
 </phrase>
 <phrase>
@@ -1865,10 +1707,10 @@
     *: "12 Hour Clock"
   </source>
   <dest>
-    *: "12 Saatlık Zaman"
+    *: "12 Saatlık Dilim"
   </dest>
   <voice>
-    *: ""
+    *: "12 Saatlık Dilim"
   </voice>
 </phrase>
 <phrase>
@@ -1879,10 +1721,10 @@
     *: "24 Hour Clock"
   </source>
   <dest>
-    *: "24 Saatlık Zaman"
+    *: "24 Saatlık Dilim"
   </dest>
   <voice>
-    *: ""
+    *: "24 Saatlık Dilim"
   </voice>
 </phrase>
 <phrase>
@@ -1911,6 +1753,7 @@
   </dest>
   <voice>
     *: none
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1948,6 +1791,7 @@
   </dest>
   <voice>
     *: none
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -2105,7 +1949,7 @@
     *: "Mar"
   </source>
   <dest>
-    *: "Mar"
+    *: "Mart"
   </dest>
   <voice>
     *: "Mart"
@@ -2133,7 +1977,7 @@
     *: "May"
   </source>
   <dest>
-    *: "May"
+    *: "Mayıs"
   </dest>
   <voice>
     *: "Mayıs"
@@ -2248,7 +2092,7 @@
     *: "Otomatik Kapanma"
   </dest>
   <voice>
-    *: ""
+    *: "Otomatik Kapanma"
   </voice>
 </phrase>
 <phrase>
@@ -2262,7 +2106,7 @@
     *: "Yeni Dil"
   </dest>
   <voice>
-    *: ""
+    *: "Yeni Dil"
   </voice>
 </phrase>
 <phrase>
@@ -2273,10 +2117,10 @@
     *: "Reset Settings"
   </source>
   <dest>
-    *: "Ayarları Başa Döndür"
+    *: "Ayarları Sıfırla"
   </dest>
   <voice>
-    *: ""
+    *: "Ayarları Sıfırla"
   </voice>
 </phrase>
 <phrase>
@@ -2290,7 +2134,7 @@
     *: "Temizlendi"
   </dest>
   <voice>
-    *: ""
+    *: "Temizlendi"
   </voice>
 </phrase>
 <phrase>
@@ -2304,7 +2148,7 @@
     *: "Rockbox Bilgi:"
   </dest>
   <voice>
-    *: ""
+    *: "Rockbox Bilgi:"
   </voice>
 </phrase>
 <phrase>
@@ -2313,39 +2157,34 @@
   user: core
   <source>
     *: "Buffer:"
-    archosplayer: "Buf:"
   </source>
   <dest>
     *: "Tampon: "
-    archosplayer: "Tmpn:"
   </dest>
   <voice>
-    *: "Buffer size"
+    *: "Tampon: "
   </voice>
 </phrase>
 <phrase>
   id: LANG_DISK_NAME_MMC
-  desc: in info menu;  name for external disk with multivolume (Ondio; keep short!)
+  desc: in info menu;  name for external disk with multivolume (keep short!)
   user: core
   <source>
     *: none
-    archosondio*: "MMC:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </source>
   <dest>
     *: none
-    archosondio*: "MMC:"
     multivolume: "HD1"
     sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "mSD2:"
   </dest>
   <voice>
     *: none
-    archosondio*: "M M C"
     multivolume: "H D 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro S D"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
     xduoox3: "micro S D 2"
   </voice>
 </phrase>
@@ -2360,7 +2199,7 @@
     *: "Sürüm"
   </dest>
   <voice>
-    *: ""
+    *: "Sürüm"
   </voice>
 </phrase>
 <phrase>
@@ -2374,7 +2213,7 @@
     *: "Hata Arındırma (Uzak durun!)"
   </dest>
   <voice>
-    *: ""
+    *: "Hata Arındırma (Uzak durun!)"
   </voice>
 </phrase>
 <phrase>
@@ -2471,6 +2310,7 @@
   </source>
   <dest>
     *: none
+    pitchscreen: "Pitch Up"
   </dest>
   <voice>
     *: none
@@ -2487,6 +2327,7 @@
   </source>
   <dest>
     *: none
+    pitchscreen: "Pitch Down"
   </dest>
   <voice>
     *: none
@@ -2501,10 +2342,10 @@
     *: "Playlist Buffer Full"
   </source>
   <dest>
-    *: "SarkiListesi tampon dolu"
+    *: "Oynatma Listesi Tamponu Dolu"
   </dest>
   <voice>
-    *: ""
+    *: "Oynatma Listesi Tamponu Dolu"
   </voice>
 </phrase>
 <phrase>
@@ -2515,10 +2356,10 @@
     *: "Pause"
   </source>
   <dest>
-    *: "Durdur"
+    *: "Duraklat"
   </dest>
   <voice>
-    *: ""
+    *: "Duraklat"
   </voice>
 </phrase>
 <phrase>
@@ -2532,7 +2373,7 @@
     *: "Zaman/Tarih ayarla"
   </dest>
   <voice>
-    *: ""
+    *: "Zaman/Tarih ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -2549,20 +2390,22 @@
   </source>
   <dest>
     *: none
-    iaudiom5,iaudiox5: "The disk is full. Press POWER to continue."
-    iriverh100,iriverh120,iriverh300: "The disk is full. Press STOP to continue."
+    iaudiom5,iaudiox5: "Disk dolu. Devam etmek için GÜÇ'e basın."
+    iriverh100: "Disk dolu. Devam etmek için STOP'a basın."
+    iriverh120,iriverh300: "The disk is full. Press STOP to continue."
     recording: "The disk is full. Press OFF to continue."
     samsungyh*: "Disk full. Press LEFT to continue."
-    sansac200*,sansae200,vibe500: "The disk is full. Press UP to continue."
+    sansac200*,vibe500: "The disk is full. Press UP to continue."
+    sansae200*: "The disk is full. Press PREV to continue."
   </dest>
   <voice>
     *: none
-    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_OFF_ABORT
-  desc: Used on archosrecorder models
+  desc: Used on many models
   user: core
   <source>
     *: "OFF to abort"
@@ -2574,10 +2417,12 @@
     iriverh100,iriverh120,iriverh300: "STOP to abort"
   </source>
   <dest>
-    *: "OFF to abort"
+    *: "İptal etmek için KAPALI"
+    gigabeatfx: "POWER to abort"
+    gigabeats,sansafuzeplus: "BACK to abort"
     iaudiom5,iaudiox5: "Long PLAY to abort"
     ipod*: "PLAY/PAUSE to abort"
-    iriverh10,iriverh10_5gb,sansac200*,sansae200,vibe500: "PREV to abort"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
     iriverh100,iriverh120,iriverh300: "STOP to abort"
   </dest>
   <voice>
@@ -2592,10 +2437,10 @@
     *: "Plugin returned error"
   </source>
   <dest>
-    *: "Eklenti hata olması bildirdi"
+    *: "Eklenti hatası bildirdi"
   </dest>
   <voice>
-    *: ""
+    *: "Eklenti hatası bildirdi"
   </voice>
 </phrase>
 <phrase>
@@ -2609,7 +2454,7 @@
     *: "Dir Tamponu dolu!"
   </dest>
   <voice>
-    *: ""
+    *: "Dir Tamponu dolu!"
   </voice>
 </phrase>
 <phrase>
@@ -2655,23 +2500,6 @@
   <voice>
     *: none
     charging: "Pil yükliyor"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BATTERY_TOPOFF_CHARGE
-  desc: in info display, shows that top off charge is running Only for V1 archosrecorder
-  user: core
-  <source>
-    *: none
-    archosrecorder: "Battery: Top-Off Chg"
-  </source>
-  <dest>
-    *: none
-    archosrecorder: "Pil en son yüklemeler yapıyor"
-  </dest>
-  <voice>
-    *: none
-    archosrecorder: "Pil en son yüklemeler yapıyor"
   </voice>
 </phrase>
 <phrase>
@@ -2846,53 +2674,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_CHANNEL_STEREO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Stereo"
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNEL_MONO
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    recording: "Mono"
-  </source>
-  <dest>
-    *: none
-  </dest>
-  <voice>
-    *: none
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_CHANNELS
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Channels"
-  </source>
-  <dest>
-    *: none
-    recording: "Kanallar"
-  </dest>
-  <voice>
-    *: none
-    recording: "Kanallar"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLUGIN_GAMES
   desc: in the main menu
   user: core
@@ -3015,7 +2796,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "o'clock"
   </voice>
 </phrase>
 <phrase>
@@ -3450,10 +3231,10 @@
     *: "Base Skin"
   </source>
   <dest>
-    *: "Temel Kabuk"
+    *: "Ana Tema"
   </dest>
   <voice>
-    *: "Base Skin"
+    *: "Ana Tema"
   </voice>
 </phrase>
 <phrase>
@@ -3552,24 +3333,7 @@
     *: "Uzak Temel Kabuk"
   </dest>
   <voice>
-    *: "Remote Base Skin"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_DECAY
-  desc: in sound_settings
-  user: core
-  <source>
-    *: none
-    masf: "AV Decay Time"
-  </source>
-  <dest>
-    *: none
-    masf: "AV Bozulum Zamanı"
-  </dest>
-  <voice>
-    *: none
-    masf: ""
+    *: "Uzak Temel Kabuk"
   </voice>
 </phrase>
 <phrase>
@@ -3586,7 +3350,7 @@
   </dest>
   <voice>
     *: none
-    lineout_poweroff: "Line Out"
+    lineout_poweroff: "Çıkış"
   </voice>
 </phrase>
 <phrase>
@@ -3603,7 +3367,7 @@
   </dest>
   <voice>
     *: none
-    radio: "radio screen skin"
+    radio: "Radio Ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -3637,7 +3401,7 @@
   </dest>
   <voice>
     *: none
-    radio_remote: "remote radio screen skin"
+    radio_remote: "Radio Ekranı Teması"
   </voice>
 </phrase>
 <phrase>
@@ -3654,7 +3418,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Screen"
+    remote: "Uzak Ekran"
   </voice>
 </phrase>
 <phrase>
@@ -3688,7 +3452,7 @@
   </dest>
   <voice>
     *: none
-    hotkey: "File Browser Hotkey"
+    hotkey: "Dosya Tarama Geçiş Tuşu"
   </voice>
 </phrase>
 <phrase>
@@ -3701,11 +3465,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Headphone Keyclick"
+    hardware_click: "Kulaklık Tuş Tıklaması"
   </dest>
   <voice>
     *: none
-    hardware_click: "Headphone Keyclick"
+    hardware_click: "Kulaklık Tuş Tıklaması"
   </voice>
 </phrase>
 <phrase>
@@ -3718,11 +3482,11 @@
   </source>
   <dest>
     *: none
-    recording: "Start new file"
+    recording: "Yeni dosya başlat"
   </dest>
   <voice>
     *: none
-    recording: "Start new file"
+    recording: "Yeni dosya başlat"
   </voice>
 </phrase>
 <phrase>
@@ -3747,10 +3511,10 @@
     *: "Strong"
   </source>
   <dest>
-    *: "Strong"
+    *: "Güçlü"
   </dest>
   <voice>
-    *: "Strong"
+    *: "Güçlü"
   </voice>
 </phrase>
 <phrase>
@@ -3763,11 +3527,11 @@
   </source>
   <dest>
     *: none
-    battery_types: "Battery Type"
+    battery_types: "Pil Türü"
   </dest>
   <voice>
     *: none
-    battery_types: "Battery type"
+    battery_types: "Pil Türü"
   </voice>
 </phrase>
 <phrase>
@@ -3780,11 +3544,11 @@
   </source>
   <dest>
     *: none
-    play_frequency,recording: "Frequency"
+    play_frequency,recording: "Frekans"
   </dest>
   <voice>
     *: none
-    play_frequency,recording: "Frequency"
+    play_frequency,recording: "Frekans"
   </voice>
 </phrase>
 <phrase>
@@ -3793,14 +3557,17 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Internal"
+    hibylinux: "micro S D"
     xduoox3: "micro S D 1"
   </voice>
 </phrase>
@@ -3812,27 +3579,10 @@
     *: "While Playing Screen"
   </source>
   <dest>
-    *: "While Playing Screen"
+    *: "Oynatma Ekranı"
   </dest>
   <voice>
-    *: "While playing screen"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_EXIT
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Exit"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Çıkış"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
+    *: "Oynatma Ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -3857,10 +3607,10 @@
     *: "Start Screen"
   </source>
   <dest>
-    *: "Start Screen"
+    *: "Başlama Ekranı"
   </dest>
   <voice>
-    *: "Start Screen"
+    *: "Başlama Ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -3873,11 +3623,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "Uzaktan Kaydırma Seçenekleri"
   </dest>
   <voice>
     *: none
-    remote: "Remote Scrolling Options"
+    remote: "Uzaktan Kaydırma Seçenekleri"
   </voice>
 </phrase>
 <phrase>
@@ -3902,10 +3652,10 @@
     *: "Prevent Clipping"
   </source>
   <dest>
-    *: "Prevent Clipping"
+    *: "Kırpmayı Önle"
   </dest>
   <voice>
-    *: "Prevent Clipping"
+    *: "Kırpmayı Önle"
   </voice>
 </phrase>
 <phrase>
@@ -3918,11 +3668,11 @@
   </source>
   <dest>
     *: none
-    radio: "Preset List"
+    radio: "Ön Ayar Listesi"
   </dest>
   <voice>
     *: none
-    radio: "Preset List"
+    radio: "Ön Ayar Listesi"
   </voice>
 </phrase>
 <phrase>
@@ -3935,11 +3685,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Duraklat ve Devam Ettir"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause and Resume"
+    headphone_detection: "Duraklat ve Devam Ettir"
   </voice>
 </phrase>
 <phrase>
@@ -3966,11 +3716,11 @@
   </source>
   <dest>
     *: none
-    recording: "Clip Counter"
+    recording: "Klip Sayacı"
   </dest>
   <voice>
     *: none
-    recording: "Clip Counter"
+    recording: "Klip Sayacı"
   </voice>
 </phrase>
 <phrase>
@@ -3981,10 +3731,10 @@
     *: "Next:"
   </source>
   <dest>
-    *: "Next:"
+    *: "Sonraki:"
   </dest>
   <voice>
-    *: "Next:"
+    *: "Sonraki:"
   </voice>
 </phrase>
 <phrase>
@@ -3995,10 +3745,10 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Soft Knee"
+    *: "Yumuşak Diz"
   </dest>
   <voice>
-    *: "Soft Knee"
+    *: "Yumuşak Diz"
   </voice>
 </phrase>
 <phrase>
@@ -4011,11 +3761,11 @@
   </source>
   <dest>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "Mors Kodu Girişini Kullan"
   </dest>
   <voice>
     *: none
-    morse_input: "Use Morse Code Input"
+    morse_input: "Mors Kodu Girişini Kullan"
   </voice>
 </phrase>
 <phrase>
@@ -4026,10 +3776,10 @@
     *: "Queue"
   </source>
   <dest>
-    *: "Queue"
+    *: "Sıra"
   </dest>
   <voice>
-    *: "Queue"
+    *: "Sıra"
   </voice>
 </phrase>
 <phrase>
@@ -4040,10 +3790,10 @@
     *: "Recursively?"
   </source>
   <dest>
-    *: "Recursively?"
+    *: "Tekrarlı?"
   </dest>
   <voice>
-    *: "Recursively?"
+    *: "Tekrarlı?"
   </voice>
 </phrase>
 <phrase>
@@ -4056,11 +3806,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "Tamam"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "Tamam"
   </voice>
 </phrase>
 <phrase>
@@ -4071,10 +3821,10 @@
     *: "Left"
   </source>
   <dest>
-    *: "Left"
+    *: "Sol"
   </dest>
   <voice>
-    *: "Left"
+    *: "Sol"
   </voice>
 </phrase>
 <phrase>
@@ -4085,10 +3835,10 @@
     *: "Autolock Off"
   </source>
   <dest>
-    *: "Autolock Off"
+    *: "Otomatik Kilitleme Kapalı"
   </dest>
   <voice>
-    *: "Autolock Off"
+    *: "Otomatik Kilitleme Kapalı"
   </voice>
 </phrase>
 <phrase>
@@ -4115,11 +3865,11 @@
   </source>
   <dest>
     *: none
-    radio: "Preset Save Failed"
+    radio: "Ön Ayar Kaydetme Başarısız!"
   </dest>
   <voice>
     *: none
-    radio: "Preset Save Failed"
+    radio: "Ön Ayar Kaydetme Başarısız!"
   </voice>
 </phrase>
 <phrase>
@@ -4144,10 +3894,10 @@
     *: "Automatic"
   </source>
   <dest>
-    *: "Automatic"
+    *: "Otomatik"
   </dest>
   <voice>
-    *: "Automatic"
+    *: "Otomatik"
   </voice>
 </phrase>
 <phrase>
@@ -4160,11 +3910,11 @@
   </source>
   <dest>
     *: none
-    radio: "Remove Preset"
+    radio: "Ön Ayarı Sil"
   </dest>
   <voice>
     *: none
-    radio: "Remove Preset"
+    radio: "Ön Ayarı Sil"
   </voice>
 </phrase>
 <phrase>
@@ -4175,10 +3925,10 @@
     *: "Screen Scroll Step Size"
   </source>
   <dest>
-    *: "Screen Scroll Step Size"
+    *: "Ekran Kaydırma Adım Boyutu"
   </dest>
   <voice>
-    *: "Screen Scroll Step Size"
+    *: "Ekran Kaydırma Adım Boyutu"
   </voice>
 </phrase>
 <phrase>
@@ -4189,27 +3939,10 @@
     *: "Select directories to scan"
   </source>
   <dest>
-    *: "Select directories to scan"
+    *: "Taranacak dizinleri seçin"
   </dest>
   <voice>
-    *: "Select directories to scan"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SOURCE
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Source"
-  </source>
-  <dest>
-    *: none
-    recording: "Kaynak"
-  </dest>
-  <voice>
-    *: none
-    recording: "Kaynak"
+    *: "Taranacak dizinleri seçin"
   </voice>
 </phrase>
 <phrase>
@@ -4222,11 +3955,11 @@
   </source>
   <dest>
     *: none
-    recording: "(No Settings)"
+    recording: "(Ayarlanmadı)"
   </dest>
   <voice>
     *: none
-    recording: "No settings available"
+    recording: "(Ayarlanmadı)"
   </voice>
 </phrase>
 <phrase>
@@ -4237,10 +3970,10 @@
     *: "Settings Loaded"
   </source>
   <dest>
-    *: "Settings Loaded"
+    *: "Ayarlar Yüklendi"
   </dest>
   <voice>
-    *: "Settings Loaded"
+    *: "Ayarlar Yüklendi"
   </voice>
 </phrase>
 <phrase>
@@ -4265,10 +3998,10 @@
     *: "Search In Playlist"
   </source>
   <dest>
-    *: "Search In Playlist"
+    *: "Oynatma Listesinde Ara"
   </dest>
   <voice>
-    *: "Search In Playlist"
+    *: "Oynatma Listesinde Ara"
   </voice>
 </phrase>
 <phrase>
@@ -4279,10 +4012,10 @@
     *: "View Current Playlist"
   </source>
   <dest>
-    *: "View Current Playlist"
+    *: "Mevcut Oynatma Listesini Görüntüle"
   </dest>
   <voice>
-    *: "View Current Playlist"
+    *: "Mevcut Oynatma Listesini Görüntüle"
   </voice>
 </phrase>
 <phrase>
@@ -4293,7 +4026,7 @@
     *: "Scroll Step Size Setting Example Text"
   </source>
   <dest>
-    *: "Scroll Step Size Setting Example Text"
+    *: "Kaydırma Adım Boyutu Ayarı Örnek Metin"
   </dest>
   <voice>
     *: ""
@@ -4314,20 +4047,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BOOKMARK_SETTINGS_UNIQUE_ONLY
-  desc: Save only on bookmark for each playlist in recent bookmarks
-  user: core
-  <source>
-    *: "Unique only"
-  </source>
-  <dest>
-    *: "Unique only"
-  </dest>
-  <voice>
-    *: "Unique only"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_STATION_HEADER
   desc: in radio screen
   user: core
@@ -4337,7 +4056,7 @@
   </source>
   <dest>
     *: none
-    radio: "Station:"
+    radio: "İstasyon:"
   </dest>
   <voice>
     *: none
@@ -4352,10 +4071,10 @@
     *: "Reset Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Reset Playlist Catalogue Directory"
+    *: "Oynatma Listesi Katalog Dizinini Sıfırla"
   </dest>
   <voice>
-    *: "Reset Playlist Catalogue Directory"
+    *: "Oynatma Listesi Katalog Dizinini Sıfırla"
   </voice>
 </phrase>
 <phrase>
@@ -4394,10 +4113,10 @@
     *: "Queued %d tracks (%s)"
   </source>
   <dest>
-    *: "Queued %d tracks (%s)"
+    *: "Kuyruğa Alınan %d Parça (%s)"
   </dest>
   <voice>
-    *: "tracks queued"
+    *: "Kuyruğa Alınan %d Parça (%s)"
   </voice>
 </phrase>
 <phrase>
@@ -4408,10 +4127,10 @@
     *: "Rename"
   </source>
   <dest>
-    *: "Rename"
+    *: "Yeniden Adlandır"
   </dest>
   <voice>
-    *: "Rename"
+    *: "Yeniden Adlandır"
   </voice>
 </phrase>
 <phrase>
@@ -4424,7 +4143,7 @@
   </source>
   <dest>
     *: none
-    recording: "Filename:"
+    recording: "Dosya adı:"
   </dest>
   <voice>
     *: none
@@ -4459,7 +4178,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "1"
   </voice>
 </phrase>
 <phrase>
@@ -4472,11 +4191,11 @@
   </source>
   <dest>
     *: none
-    recording: "Split Measure"
+    recording: "Bölünmüş Ölçü"
   </dest>
   <voice>
     *: none
-    recording: "Split Measure"
+    recording: "Bölünmüş Ölçü"
   </voice>
 </phrase>
 <phrase>
@@ -4506,7 +4225,7 @@
   </source>
   <dest>
     *: none
-    recording: "Time:"
+    recording: "Zaman:"
   </dest>
   <voice>
     *: none
@@ -4523,11 +4242,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop Below"
+    recording: "Aşağıda Dur"
   </dest>
   <voice>
     *: none
-    recording: "Stop Below"
+    recording: "Aşağıda Dur"
   </voice>
 </phrase>
 <phrase>
@@ -4538,10 +4257,10 @@
     *: "Sort Directories"
   </source>
   <dest>
-    *: "Sort Directories"
+    *: "Dizinleri Sırala"
   </dest>
   <voice>
-    *: "sort directories"
+    *: "Dizinleri Sırala"
   </voice>
 </phrase>
 <phrase>
@@ -4566,10 +4285,10 @@
     *: "Android Debug Bridge"
   </source>
   <dest>
-    *: "Android Debug Bridge"
+    *: "Android Hata Ayıklama Köprüsü"
   </dest>
   <voice>
-    *: "Android Debug Bridge"
+    *: "Android Hata Ayıklama Köprüsü"
   </voice>
 </phrase>
 <phrase>
@@ -4582,11 +4301,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Gelişmiş Ton Kontrol Ayarları"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Advanced Tone Control Settings"
+    gigabeats,samsungypr1: "Gelişmiş Ton Kontrol Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -4625,10 +4344,10 @@
     *: "Save Changes?"
   </source>
   <dest>
-    *: "Save Changes?"
+    *: "Değişiklikleri Kaydet?"
   </dest>
   <voice>
-    *: "Save Changes?"
+    *: "Değişiklikleri Kaydet?"
   </voice>
 </phrase>
 <phrase>
@@ -4641,11 +4360,11 @@
   </source>
   <dest>
     *: none
-    recording: "Gain R"
+    recording: "Kazanç R Sağ"
   </dest>
   <voice>
     *: none
-    recording: "Gain Right"
+    recording: "Kazanç R Sağ"
   </voice>
 </phrase>
 <phrase>
@@ -4659,7 +4378,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milliseconds"
+    *: "Milisaniye"
   </voice>
 </phrase>
 <phrase>
@@ -4670,10 +4389,10 @@
     *: "Full Path"
   </source>
   <dest>
-    *: "Full Path"
+    *: "Tam yol"
   </dest>
   <voice>
-    *: "Full Path"
+    *: "Tam Yol"
   </voice>
 </phrase>
 <phrase>
@@ -4714,11 +4433,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Slow"
+    filter_roll_off: "Yavaş"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Slow"
+    filter_roll_off: "Yavaş"
   </voice>
 </phrase>
 <phrase>
@@ -4729,10 +4448,10 @@
     *: "High Shelf Filter"
   </source>
   <dest>
-    *: "High Shelf Filter"
+    *: "Yüksek Band Filtresi	"
   </dest>
   <voice>
-    *: "High shelf filter"
+    *: "Yüksek Band Filtresi	"
   </voice>
 </phrase>
 <phrase>
@@ -4743,10 +4462,10 @@
     *: "Remove"
   </source>
   <dest>
-    *: "Remove"
+    *: "Sil"
   </dest>
   <voice>
-    *: "Remove"
+    *: "Sil"
   </voice>
 </phrase>
 <phrase>
@@ -4759,11 +4478,11 @@
   </source>
   <dest>
     *: none
-    radio: "Add Preset"
+    radio: "Ön Ayar Ekle"
   </dest>
   <voice>
     *: none
-    radio: "Add Preset"
+    radio: "Ön Ayar Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -4809,23 +4528,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_BUTTON_BAR
-  desc: in settings menu
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Button Bar"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Button Bar"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: "Button Bar"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_CODEPAGE_TURKISH
   desc: in codepage setting menu
   user: core
@@ -4833,10 +4535,10 @@
     *: "Turkish (ISO-8859-9)"
   </source>
   <dest>
-    *: "Turkish (ISO-8859-9)"
+    *: "Turkçe (ISO-8859-9)"
   </dest>
   <voice>
-    *: "Turkish"
+    *: "Türkçe"
   </voice>
 </phrase>
 <phrase>
@@ -4847,10 +4549,10 @@
     *: "Previous Screen"
   </source>
   <dest>
-    *: "Previous Screen"
+    *: "Önceki Ekran"
   </dest>
   <voice>
-    *: "Previous Screen"
+    *: "Önceki Ekran"
   </voice>
 </phrase>
 <phrase>
@@ -4861,10 +4563,10 @@
     *: "Yes - Recent only"
   </source>
   <dest>
-    *: "Yes - Recent only"
+    *: "Evet - Yalnızca son zamanlarda"
   </dest>
   <voice>
-    *: "Yes - Recent only"
+    *: "Evet - Yalnızca son zamanlarda"
   </voice>
 </phrase>
 <phrase>
@@ -4875,10 +4577,10 @@
     *: "Queue Shuffled"
   </source>
   <dest>
-    *: "Queue Shuffled"
+    *: "Karışık Sıralama"
   </dest>
   <voice>
-    *: "Queue Shuffled"
+    *: "Karışık Sıralama"
   </voice>
 </phrase>
 <phrase>
@@ -4889,10 +4591,10 @@
     *: "Filetype array full"
   </source>
   <dest>
-    *: "Filetype array full"
+    *: "Dosya türü dizisi dolu"
   </dest>
   <voice>
-    *: "Filetype array full"
+    *: "Dosya türü dizisi dolu"
   </voice>
 </phrase>
 <phrase>
@@ -4903,10 +4605,10 @@
     *: "Speed"
   </source>
   <dest>
-    *: "Speed"
+    *: "Hız"
   </dest>
   <voice>
-    *: "Speed"
+    *: "Hız"
   </voice>
 </phrase>
 <phrase>
@@ -4919,11 +4621,11 @@
   </source>
   <dest>
     *: none
-    radio: "Save Preset List"
+    radio: "Ön Ayar Listesini Kaydet"
   </dest>
   <voice>
     *: none
-    radio: "Save Preset List"
+    radio: "Ön Ayar Listesini Kaydet"
   </voice>
 </phrase>
 <phrase>
@@ -4951,10 +4653,10 @@
     *: "Track Name Only"
   </source>
   <dest>
-    *: "Track Name Only"
+    *: "Yalnızca Parça Adı"
   </dest>
   <voice>
-    *: "Track Name Only"
+    *: "Yalnızca Parça Adı"
   </voice>
 </phrase>
 <phrase>
@@ -4965,10 +4667,10 @@
     *: "Limits"
   </source>
   <dest>
-    *: "Limits"
+    *: "Limitler"
   </dest>
   <voice>
-    *: "Limits"
+    *: "Limitler"
   </voice>
 </phrase>
 <phrase>
@@ -4981,11 +4683,11 @@
   </source>
   <dest>
     *: none
-    agc: "Safety (clip)"
+    agc: "Güvenlik (clip)"
   </dest>
   <voice>
     *: none
-    agc: "Safety (clip)"
+    agc: "Güvenlik (clip)"
   </voice>
 </phrase>
 <phrase>
@@ -4996,10 +4698,10 @@
     *: "Set As Playlist Catalogue Directory"
   </source>
   <dest>
-    *: "Set As Playlist Catalogue Directory"
+    *: "Oynatma Listesi Katalog Dizini Olarak Ayarla"
   </dest>
   <voice>
-    *: "Set As Playlist Catalogue Directory"
+    *: "Oynatma Listesi Katalog Dizini Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -5030,7 +4732,7 @@
   </dest>
   <voice>
     *: none
-    rtc: "Current time:"
+    rtc: "Geçerli Zaman:"
   </voice>
 </phrase>
 <phrase>
@@ -5102,11 +4804,11 @@
   </source>
   <dest>
     *: none
-    recording: "Stop"
+    recording: "Dur"
   </dest>
   <voice>
     *: none
-    recording: "Stop"
+    recording: "Dur"
   </voice>
 </phrase>
 <phrase>
@@ -5117,10 +4819,10 @@
     *: "Insert"
   </source>
   <dest>
-    *: "Insert"
+    *: "Tak"
   </dest>
   <voice>
-    *: "Insert"
+    *: "Tak"
   </voice>
 </phrase>
 <phrase>
@@ -5131,10 +4833,10 @@
     *: "LCD Settings"
   </source>
   <dest>
-    *: "LCD Settings"
+    *: "Ekran Ayarları"
   </dest>
   <voice>
-    *: "LCD Settings"
+    *: "Ekran Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -5147,11 +4849,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Speaker Keyclick"
+    hardware_click: "Hoparlör Tuş Sesi"
   </dest>
   <voice>
     *: none
-    hardware_click: "Speaker Keyclick"
+    hardware_click: "Hoparlör Tuş Sesi"
   </voice>
 </phrase>
 <phrase>
@@ -5162,10 +4864,10 @@
     *: "Voice Directories"
   </source>
   <dest>
-    *: "Voice Directories"
+    *: "Ses Dizinleri"
   </dest>
   <voice>
-    *: "Voice Directories"
+    *: "Ses Dizinleri"
   </voice>
 </phrase>
 <phrase>
@@ -5176,10 +4878,10 @@
     *: "Start File Browser Here"
   </source>
   <dest>
-    *: "Start File Browser Here"
+    *: "Dosya Tarayıcısını Buradan Başlat	"
   </dest>
   <voice>
-    *: "Start File Browser Here"
+    *: "Dosya Tarayıcısını Buradan Başlat"
   </voice>
 </phrase>
 <phrase>
@@ -5192,11 +4894,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Absolute Point"
+    touchscreen: "Mutlak Nokta"
   </dest>
   <voice>
     *: none
-    touchscreen: "Absolute Point"
+    touchscreen: "Mutlak Nokta"
   </voice>
 </phrase>
 <phrase>
@@ -5207,10 +4909,10 @@
     *: "Line Separator"
   </source>
   <dest>
-    *: "Line Separator"
+    *: "Hat Ayırıcı"
   </dest>
   <voice>
-    *: "Line Separator"
+    *: "Hat Ayırıcı"
   </voice>
 </phrase>
 <phrase>
@@ -5221,10 +4923,10 @@
     *: "Caption Backlight"
   </source>
   <dest>
-    *: "Caption Backlight"
+    *: "Altyazı Arka Işık"
   </dest>
   <voice>
-    *: "Caption Backlight"
+    *: "Altyazı Arka Işık"
   </voice>
 </phrase>
 <phrase>
@@ -5235,10 +4937,10 @@
     *: "Disable Touch"
   </source>
   <dest>
-    *: "Disable Touch"
+    *: "Dokunmayı Devre Dışı Bırak"
   </dest>
   <voice>
-    *: "Disable Touch"
+    *: "Dokunmayı Devre Dışı Bırak"
   </voice>
 </phrase>
 <phrase>
@@ -5263,7 +4965,7 @@
     *: "Automatic resume"
   </source>
   <dest>
-    *: "Automatic resume"
+    *: "Otomatik Devam"
   </dest>
   <voice>
     *: "Automatic resume"
@@ -5336,7 +5038,7 @@
     *: "Advanced Key Lock"
   </source>
   <dest>
-    *: "Advanced Key Lock"
+    *: "Gelişmiş Tuş Kilidi"
   </dest>
   <voice>
     *: "Advanced Key Lock"
@@ -5352,7 +5054,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Arka Plan Olarak Ayarla"
   </dest>
   <voice>
     *: none
@@ -5386,7 +5088,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Right Quickscreen Item"
+    quickscreen: "Sağ Hızlı Ekran Öğesi Olarak Ayarla"
   </dest>
   <voice>
     *: none
@@ -5403,7 +5105,7 @@
   </source>
   <dest>
     *: none
-    usb_charging_enable: "Charge During USB Connection"
+    usb_charging_enable: "USB Bağlantısı Sırasında Şarj Et"
   </dest>
   <voice>
     *: none
@@ -5418,7 +5120,7 @@
     *: "View Catalogue"
   </source>
   <dest>
-    *: "View Catalogue"
+    *: "Kataloğu Görüntüle	"
   </dest>
   <voice>
     *: "View Catalogue"
@@ -5446,7 +5148,7 @@
     *: "Update on Stop"
   </source>
   <dest>
-    *: "Update on Stop"
+    *: "Durunca Güncelle"
   </dest>
   <voice>
     *: "Update on Stop"
@@ -5460,7 +5162,7 @@
     *: "Manage Settings"
   </source>
   <dest>
-    *: "Manage Settings"
+    *: "Ayarları Yönet"
   </dest>
   <voice>
     *: "Manage Settings"
@@ -5504,7 +5206,7 @@
   </source>
   <dest>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "Karışık veya Manuel Parça Atlama"
   </dest>
   <voice>
     *: none
@@ -5536,7 +5238,7 @@
     *: "Max Playlist Size"
   </source>
   <dest>
-    *: "Max Playlist Size"
+    *: "Maksimum Oynatma Listesi Boyutu"
   </dest>
   <voice>
     *: "Maximum playlist size"
@@ -5552,7 +5254,7 @@
   </source>
   <dest>
     *: none
-    recording: "(Same As Source)"
+    recording: "(Kaynakla aynı)"
   </dest>
   <voice>
     *: none
@@ -5567,10 +5269,10 @@
     *: "Incompatible version"
   </source>
   <dest>
-    *: "Incompatible version"
+    *: "Uyumsuz sürüm"
   </dest>
   <voice>
-    *: ""
+    *: "Incompatible version"
   </voice>
 </phrase>
 <phrase>
@@ -5584,7 +5286,7 @@
     *: "Discnum"
   </dest>
   <voice>
-    *: ""
+    *: "Disc number"
   </voice>
 </phrase>
 <phrase>
@@ -5611,7 +5313,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Invalid colour"
+    lcd_color: "Geçersiz renk"
   </dest>
   <voice>
     *: none
@@ -5626,10 +5328,10 @@
     *: "Bitrate"
   </source>
   <dest>
-    *: "Bitrate"
+    *: "Bit hızı"
   </dest>
   <voice>
-    *: ""
+    *: "Bit rate"
   </voice>
 </phrase>
 <phrase>
@@ -5642,7 +5344,7 @@
   </source>
   <dest>
     *: none
-    recording: "Once"
+    recording: "Bir Kere"
   </dest>
   <voice>
     *: none
@@ -5657,7 +5359,7 @@
     *: "Context Menu"
   </source>
   <dest>
-    *: "Context Menu"
+    *: "Bağlam Menüsü"
   </dest>
   <voice>
     *: "Context Menu"
@@ -5671,7 +5373,7 @@
     *: "Properties"
   </source>
   <dest>
-    *: "Properties"
+    *: "Özellikler"
   </dest>
   <voice>
     *: "Properties"
@@ -5685,7 +5387,7 @@
     *: "Open With..."
   </source>
   <dest>
-    *: "Open With..."
+    *: "Bununla aç..."
   </dest>
   <voice>
     *: "open with"
@@ -5701,7 +5403,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen Mode"
+    touchscreen: "Dokunmatik Ekran Modu"
   </dest>
   <voice>
     *: none
@@ -5716,7 +5418,7 @@
     *: "Ratio"
   </source>
   <dest>
-    *: "Ratio"
+    *: "Oran"
   </dest>
   <voice>
     *: "Ratio"
@@ -5744,7 +5446,7 @@
     *: "Backlight Exemptions"
   </source>
   <dest>
-    *: "Backlight Exemptions"
+    *: "Arka Işık Muafiyetleri"
   </dest>
   <voice>
     *: "Backlight Exemptions"
@@ -5772,10 +5474,10 @@
     *: "Composer"
   </source>
   <dest>
-    *: "Composer"
+    *: "Besteci"
   </dest>
   <voice>
-    *: ""
+    *: "Composer"
   </voice>
 </phrase>
 <phrase>
@@ -5788,7 +5490,7 @@
   </source>
   <dest>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "İşaretlemeyi Azalt"
   </dest>
   <voice>
     *: none
@@ -5803,7 +5505,7 @@
     *: "Top Time"
   </source>
   <dest>
-    *: "Top Time"
+    *: "En İyi Zaman"
   </dest>
   <voice>
     *: "Top Time"
@@ -5848,7 +5550,7 @@
     *: "Buttons Unlocked"
   </source>
   <dest>
-    *: "Buttons Unlocked"
+    *: "Tuş Kilidi Açıldı"
   </dest>
   <voice>
     *: ""
@@ -5862,7 +5564,7 @@
     *: "Select one or more directories"
   </source>
   <dest>
-    *: "Select one or more directories"
+    *: "Bir veya daha fazla dizin seçin"
   </dest>
   <voice>
     *: "Select one or more directories"
@@ -5878,11 +5580,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Tiz Kesme"
   </dest>
   <voice>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Treble Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Tiz Kesme"
   </voice>
 </phrase>
 <phrase>
@@ -5893,7 +5595,7 @@
     *: "Scroll Step Size"
   </source>
   <dest>
-    *: "Scroll Step Size"
+    *: "Adım Boyutunu Kaydır"
   </dest>
   <voice>
     *: "Scroll Step Size"
@@ -5909,7 +5611,7 @@
   </source>
   <dest>
     *: none
-    recording: "Split Time"
+    recording: "Ayrık Zaman"
   </dest>
   <voice>
     *: none
@@ -5926,7 +5628,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Left Quickscreen Item"
+    quickscreen: "Sol Hızlı Ekran Öğesi Olarak Ayarla"
   </dest>
   <voice>
     *: none
@@ -5955,7 +5657,7 @@
     *: "%d Hz Band Gain"
   </source>
   <dest>
-    *: "%d Hz Band Gain"
+    *: "%d Hz Band Kazancı"
   </dest>
   <voice>
     *: "hertz band gain"
@@ -5977,16 +5679,16 @@
 </phrase>
 <phrase>
   id: LANG_PLUGIN_WRONG_MODEL
-  desc: The plugin is not compatible with the archos model trying to run it
+  desc: The plugin is not compatible with the player model trying to run it
   user: core
   <source>
     *: "Incompatible model"
   </source>
   <dest>
-    *: "Incompatible model"
+    *: "Uyumsuz model"
   </dest>
   <voice>
-    *: ""
+    *: "Incompatible model"
   </voice>
 </phrase>
 <phrase>
@@ -6014,7 +5716,7 @@
     *: "No files"
   </source>
   <dest>
-    *: "No files"
+    *: "Dosya yok"
   </dest>
   <voice>
     *: "No files"
@@ -6044,7 +5746,7 @@
   </source>
   <dest>
     *: none
-    radio: "Signal strength:"
+    radio: "Sinyal gücü:"
   </dest>
   <voice>
     *: none
@@ -6118,10 +5820,10 @@
     *: "Save Theme Settings"
   </source>
   <dest>
-    *: "Save Theme Settings"
+    *: "Tema Ayarlarını Kaydet"
   </dest>
   <voice>
-    *: "Save Theme Settings"
+    *: "Tema Ayarlarını Kaydet"
   </voice>
 </phrase>
 <phrase>
@@ -6134,7 +5836,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
+    quickscreen: "Alt Hızlı Ekran Öğesi Olarak Ayarla"
   </dest>
   <voice>
     *: none
@@ -6179,7 +5881,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Set"
+    alarm: "Alarm Ayarla"
   </dest>
   <voice>
     *: none
@@ -6196,7 +5898,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Yarım ton"
   </dest>
   <voice>
     *: none
@@ -6211,7 +5913,7 @@
     *: "Database is not ready"
   </source>
   <dest>
-    *: "Database is not ready"
+    *: "Veritabanı hazır değil"
   </dest>
   <voice>
     *: "Database is not ready"
@@ -6284,7 +5986,7 @@
     *: "Show Path"
   </source>
   <dest>
-    *: "Show Path"
+    *: "Yolu Göster"
   </dest>
   <voice>
     *: "Show Path"
@@ -6314,11 +6016,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "İkincil Renk"
   </dest>
   <voice>
     *: none
-    lcd_color: "Secondary Colour"
+    lcd_color: "İkincil Renk"
   </voice>
 </phrase>
 <phrase>
@@ -6329,10 +6031,10 @@
     *: "Current Playlist"
   </source>
   <dest>
-    *: "Current Playlist"
+    *: "Geçerli Oynatma Listesi"
   </dest>
   <voice>
-    *: "Current Playlist"
+    *: "Geçerli Oynatma Listesi"
   </voice>
 </phrase>
 <phrase>
@@ -6357,10 +6059,10 @@
     *: "Maximum Volume Limit"
   </source>
   <dest>
-    *: "Maximum Volume Limit"
+    *: "Maksimum Ses Sınırı"
   </dest>
   <voice>
-    *: "Maximum Volume Limit"
+    *: "Maksimum Ses Sınırı"
   </voice>
 </phrase>
 <phrase>
@@ -6399,27 +6101,10 @@
     *: "Copying..."
   </source>
   <dest>
-    *: "Copying..."
+    *: "Kopyalanıyor..."
   </dest>
   <voice>
-    *: "Copying"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ADD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Add"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Add"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
+    *: "Kopyalanıyor..."
   </voice>
 </phrase>
 <phrase>
@@ -6432,11 +6117,11 @@
   </source>
   <dest>
     *: none
-    recording: "File Split Options"
+    recording: "Dosya Bölme Seçenekleri"
   </dest>
   <voice>
     *: none
-    recording: "File Split Options"
+    recording: "Dosya Bölme Seçenekleri"
   </voice>
 </phrase>
 <phrase>
@@ -6461,27 +6146,10 @@
     *: "Max Entries in File Browser"
   </source>
   <dest>
-    *: "Max Entries in File Browser"
+    *: "Dosya Tarayıcıda Maksimum Giriş"
   </dest>
   <voice>
     *: "Maximum entries in file browser"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_RECORD
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Record"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Record"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -6494,11 +6162,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Reset Colours"
+    lcd_color: "Renkleri Sıfırla"
   </dest>
   <voice>
     *: none
-    lcd_color: "Reset Colours"
+    lcd_color: "Renkleri Sıfırla"
   </voice>
 </phrase>
 <phrase>
@@ -6556,7 +6224,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "Bar (Katı Renk)"
   </dest>
   <voice>
     *: none
@@ -6574,7 +6242,7 @@
     *: ""
   </dest>
   <voice>
-    *: "keyboard"
+    *: "Tuş Takımı"
   </voice>
 </phrase>
 <phrase>
@@ -6616,27 +6284,10 @@
     *: "First Buttonpress Enables Backlight Only"
   </source>
   <dest>
-    *: "First Buttonpress Enables Backlight Only"
+    *: "Tuşa İlk Basımada Yalnızca Arka Işığı Etkinleştirir"
   </dest>
   <voice>
-    *: "First Buttonpress Enables Backlight Only"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_CONFIRM_SHUTDOWN
-  desc: in shutdown screen
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Press OFF to shut down"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: ""
+    *: "Tuşa İlk Basımada Yalnızca Arka Işığı Etkinleştirir"
   </voice>
 </phrase>
 <phrase>
@@ -6653,7 +6304,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Waking up in"
+    alarm: "uyanma"
   </voice>
 </phrase>
 <phrase>
@@ -6680,11 +6331,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Kulaklık Çıkarıldığında Duraklat"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Pause on Headphone Unplug"
+    headphone_detection: "Kulaklık Çıkarıldığında Duraklat"
   </voice>
 </phrase>
 <phrase>
@@ -6695,10 +6346,10 @@
     *: "Paged Scrolling"
   </source>
   <dest>
-    *: "Paged Scrolling"
+    *: "Sayfalı Kaydırma"
   </dest>
   <voice>
-    *: "Paged scrolling"
+    *: "Sayfalı Kaydırma"
   </voice>
 </phrase>
 <phrase>
@@ -6726,7 +6377,7 @@
     *: "Uzunluk"
   </dest>
   <voice>
-    *: ""
+    *: "Uzunluk"
   </voice>
 </phrase>
 <phrase>
@@ -6739,7 +6390,7 @@
   </source>
   <dest>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "Kayıt dizinine yazılamıyor"
   </dest>
   <voice>
     *: none
@@ -6810,7 +6461,7 @@
     *: "Queue Last"
   </source>
   <dest>
-    *: "Queue Last"
+    *: "Kuyruk Sonu"
   </dest>
   <voice>
     *: "Queue Last"
@@ -6824,7 +6475,7 @@
     *: "Timestretch"
   </source>
   <dest>
-    *: "Timestretch"
+    *: "zaman aralığı"
   </dest>
   <voice>
     *: "Timestretch"
@@ -6838,7 +6489,7 @@
     *: "Track Skip Beep"
   </source>
   <dest>
-    *: "Track Skip Beep"
+    *: "Parça Atlamada Bip Sesi"
   </dest>
   <voice>
     *: "Track Skip Beep"
@@ -6854,7 +6505,7 @@
   </source>
   <dest>
     *: none
-    recording: "Pre-Recording"
+    recording: "Ön Kayıt"
   </dest>
   <voice>
     *: none
@@ -6869,10 +6520,10 @@
     *: "Perceptual Bass Enhancement"
   </source>
   <dest>
-    *: "Perceptual Bass Enhancement"
+    *: "Algısal Bas Geliştirme"
   </dest>
   <voice>
-    *: "Perceptual Bass Enhancement"
+    *: "Algısal Bas Geliştirme"
   </voice>
 </phrase>
 <phrase>
@@ -6913,11 +6564,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "Kalibrasyonu Sıfırla"
   </dest>
   <voice>
     *: none
-    touchscreen: "Reset Calibration"
+    touchscreen: "Kalibrasyonu Sıfırla"
   </voice>
 </phrase>
 <phrase>
@@ -6976,7 +6627,7 @@
     *: ""
   </dest>
   <voice>
-    *: "seconds"
+    *: "saniye"
   </voice>
 </phrase>
 <phrase>
@@ -6989,11 +6640,11 @@
   </source>
   <dest>
     *: none
-    speaker: "Enable Speaker"
+    speaker: "Hoparlörü Etkinleştir"
   </dest>
   <voice>
     *: none
-    speaker: "Enable Speaker"
+    speaker: "Hoparlörü Etkinleştir"
   </voice>
 </phrase>
 <phrase>
@@ -7007,7 +6658,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minute"
+    *: "Dakika"
   </voice>
 </phrase>
 <phrase>
@@ -7034,7 +6685,7 @@
   </source>
   <dest>
     *: none
-    recording: "Size:"
+    recording: "Boyut:"
   </dest>
   <voice>
     *: none
@@ -7052,7 +6703,7 @@
     *: " (VBR)"
   </dest>
   <voice>
-    *: ""
+    *: "VBR"
   </voice>
 </phrase>
 <phrase>
@@ -7077,7 +6728,7 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Start File Browser at /"
+    *: "Dosya Tarayıcıyı konumunda başlatın	"
   </dest>
   <voice>
     *: "Start File Browser at root"
@@ -7093,7 +6744,7 @@
   </source>
   <dest>
     *: none
-    dircache: "Directory Cache"
+    dircache: "Dizin Önbelleği"
   </dest>
   <voice>
     *: none
@@ -7110,28 +6761,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Time Is Too Soon!"
+    alarm: "Alarm Zamanı Çok Yakında!"
   </dest>
   <voice>
     *: none
     alarm: "Alarm Time Is Too Soon!"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_MIC
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Int. Mic"
-  </source>
-  <dest>
-    *: none
-    recording: "Dhl. Mik"
-  </dest>
-  <voice>
-    *: none
-    recording: "Dahili Mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -7142,10 +6776,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "Kazanç Takibi"
   </dest>
   <voice>
-    *: "Track Gain"
+    *: "Kazanç Takibi"
   </voice>
 </phrase>
 <phrase>
@@ -7172,11 +6806,11 @@
   </source>
   <dest>
     *: none
-    recording: "Prerecord Time"
+    recording: "Ön Kayıt Süresi"
   </dest>
   <voice>
     *: none
-    recording: "Pre-Record time"
+    recording: "Ön Kayıt Süresi"
   </voice>
 </phrase>
 <phrase>
@@ -7187,7 +6821,7 @@
     *: "Ask - Recent only"
   </source>
   <dest>
-    *: "Ask - Recent only"
+    *: "Sor - Yalnızca son zamanlarda"
   </dest>
   <voice>
     *: "Ask - Recent only"
@@ -7203,7 +6837,7 @@
   </source>
   <dest>
     *: none
-    gigabeatfx: "High"
+    gigabeatfx: "Yüksek"
   </dest>
   <voice>
     *: none
@@ -7232,7 +6866,7 @@
     *: "Battery"
   </source>
   <dest>
-    *: "Battery"
+    *: "Pil"
   </dest>
   <voice>
     *: "Battery"
@@ -7246,10 +6880,10 @@
     *: "Enabled"
   </source>
   <dest>
-    *: "Enabled"
+    *: "Etkin"
   </dest>
   <voice>
-    *: "Enabled"
+    *: "Etkin"
   </voice>
 </phrase>
 <phrase>
@@ -7263,7 +6897,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "piksel"
   </voice>
 </phrase>
 <phrase>
@@ -7276,7 +6910,7 @@
   </source>
   <dest>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM Radio Menüsü"
   </dest>
   <voice>
     *: none
@@ -7307,7 +6941,7 @@
   </source>
   <dest>
     *: none
-    multidrive_usb: "USB Hide Internal Drive"
+    multidrive_usb: "USB Dahili Sürücüyü Gizle"
   </dest>
   <voice>
     *: none
@@ -7339,7 +6973,7 @@
     *: "Show Track Info"
   </source>
   <dest>
-    *: "Show Track Info"
+    *: "Parça Bilgisini Göster"
   </dest>
   <voice>
     *: "Show Track Info"
@@ -7355,7 +6989,7 @@
   </source>
   <dest>
     *: none
-    recording: "Source"
+    recording: "Kaynak"
   </dest>
   <voice>
     *: none
@@ -7370,7 +7004,7 @@
     *: "Updating in background"
   </source>
   <dest>
-    *: "Updating in background"
+    *: "Arka planda güncelle"
   </dest>
   <voice>
     *: "Updating in background"
@@ -7384,7 +7018,7 @@
     *: "Playlist control file is invalid"
   </source>
   <dest>
-    *: "Playlist control file is invalid"
+    *: "Oynatma listesi kontrol dosyası geçersiz"
   </dest>
   <voice>
     *: "Playlist control file is invalid"
@@ -7398,7 +7032,7 @@
     *: "Rewind on Pause"
   </source>
   <dest>
-    *: "Rewind on Pause"
+    *: "Duraklatıldığında Geri Sar"
   </dest>
   <voice>
     *: "Rewind on Pause"
@@ -7412,7 +7046,7 @@
     *: "Right"
   </source>
   <dest>
-    *: "Right"
+    *: "Sağ"
   </dest>
   <voice>
     *: "Right"
@@ -7433,23 +7067,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_RECORDING_SRC_DIGITAL
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Digital"
-  </source>
-  <dest>
-    *: none
-    recording: "Digital"
-  </dest>
-  <voice>
-    *: none
-    recording: "Digital"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SLEEP_TIMER_START_CURRENT
   desc: shown when a sleep timer isn't running
   user: core
@@ -7457,7 +7074,7 @@
     *: "Start Sleep Timer"
   </source>
   <dest>
-    *: "Start Sleep Timer"
+    *: "Uyku Zamanlayıcısını Başlat"
   </dest>
   <voice>
     *: "Start Sleep Timer"
@@ -7483,11 +7100,9 @@
   user: core
   <source>
     *: "End of Song List"
-    archosplayer: "End of List"
   </source>
   <dest>
-    *: "End of Song List"
-    archosplayer: "End of List"
+    *: "Şarkı Listesinin Sonu"
   </dest>
   <voice>
     *: "End of Song List"
@@ -7501,7 +7116,7 @@
     *: "Save Current Playlist"
   </source>
   <dest>
-    *: "Save Current Playlist"
+    *: "Geçerli Oynatma Listesini Kaydet"
   </dest>
   <voice>
     *: "Save Current Playlist"
@@ -7532,7 +7147,7 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "By Newest Date"
+    *: "En Yeni Tarihe Göre"
   </dest>
   <voice>
     *: "By Newest Date"
@@ -7546,7 +7161,7 @@
     *: "Disable Unmapped Keys"
   </source>
   <dest>
-    *: "Disable Unmapped Keys"
+    *: "Eşlenmemiş Anahtarları Devre Dışı Bırak"
   </dest>
   <voice>
     *: "Disable Unmapped Keys"
@@ -7562,7 +7177,7 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+    quickscreen: "Hızlı Ekran Yerine Kısayollar Menüsünü Kullanın"
   </dest>
   <voice>
     *: none
@@ -7579,11 +7194,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote-LCD Settings"
+    remote: "Ekran Ayarlarını Kontrol Et"
   </dest>
   <voice>
     *: none
-    remote: "Remote LCD settings"
+    remote: "Ekran Ayarlarını Kontrol Et"
   </voice>
 </phrase>
 <phrase>
@@ -7596,7 +7211,7 @@
   </source>
   <dest>
     *: none
-    radio: "Preset"
+    radio: "Ön Ayar"
   </dest>
   <voice>
     *: none
@@ -7613,7 +7228,7 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Settings"
+    recording: "Kayıt Ayarları"
   </dest>
   <voice>
     *: none
@@ -7644,7 +7259,7 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Telefonlar takılı değilse başlangıçta devam etmeyi devre dışı bırakın"
   </dest>
   <voice>
     *: none
@@ -7678,7 +7293,7 @@
   </source>
   <dest>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Kayıt Dizini Olarak Ayarla"
   </dest>
   <voice>
     *: none
@@ -7709,7 +7324,7 @@
   </source>
   <dest>
     *: none
-    radio: "Load Preset List"
+    radio: "Ön Ayar Listesini Yükle"
   </dest>
   <voice>
     *: none
@@ -7726,28 +7341,11 @@
   </source>
   <dest>
     *: none
-    hold_button: "Backlight on Hold"
+    hold_button: "Beklemede Arka Işık"
   </dest>
   <voice>
     *: none
     hold_button: "Backlight on hold"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_EDITABLE
-  desc: Editable recordings setting
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Independent Frames"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Independent Frames"
   </voice>
 </phrase>
 <phrase>
@@ -7760,7 +7358,7 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "Sharp"
+    filter_roll_off: "Keskin"
   </dest>
   <voice>
     *: none
@@ -7775,7 +7373,7 @@
     *: "Auto Update"
   </source>
   <dest>
-    *: "Auto Update"
+    *: "Otomatik güncelleme"
   </dest>
   <voice>
     *: "Auto Update"
@@ -7789,7 +7387,7 @@
     *: "In custom directories only"
   </source>
   <dest>
-    *: "In custom directories only"
+    *: "Yalnızca özel dizinlerde"
   </dest>
   <voice>
     *: "In custom directories only"
@@ -7817,7 +7415,7 @@
     *: "Copy"
   </source>
   <dest>
-    *: "Copy"
+    *: "Kopyala"
   </dest>
   <voice>
     *: "Copy"
@@ -7833,7 +7431,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "Dokunmatik Ekran Ayarları"
   </dest>
   <voice>
     *: none
@@ -7848,7 +7446,7 @@
     *: "Create Directory"
   </source>
   <dest>
-    *: "Create Directory"
+    *: "Dizin Oluştur"
   </dest>
   <voice>
     *: "Create Directory"
@@ -7866,23 +7464,6 @@
   </dest>
   <voice>
     *: "percent"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Quality"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
@@ -7917,23 +7498,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F2
-  desc: in dir browser, F2 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Option"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Option"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_PLAYLIST_CONTROL_ACCESS_ERROR
   desc: Playlist error
   user: core
@@ -7955,7 +7519,7 @@
     *: "Queue Next"
   </source>
   <dest>
-    *: "Queue Next"
+    *: "Sonraki"
   </dest>
   <voice>
     *: "Queue Next"
@@ -8002,7 +7566,7 @@
   </source>
   <dest>
     *: none
-    spdif_power: "Optical Output"
+    spdif_power: "Optik Çıkış"
   </dest>
   <voice>
     *: none
@@ -8031,10 +7595,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "Çapraz besleme"
   </dest>
   <voice>
-    *: "Crossfeed"
+    *: "Çapraz besleme"
   </voice>
 </phrase>
 <phrase>
@@ -8045,7 +7609,7 @@
     *: "Nothing to resume"
   </source>
   <dest>
-    *: "Nothing to resume"
+    *: "Devam edecek bir şey yok"
   </dest>
   <voice>
     *: "Nothing to resume"
@@ -8059,7 +7623,7 @@
     *: "Insert Next"
   </source>
   <dest>
-    *: "Insert Next"
+    *: "Sonrakini Ekle"
   </dest>
   <voice>
     *: "Insert Next"
@@ -8073,7 +7637,7 @@
     *: "Numbers"
   </source>
   <dest>
-    *: "Numbers"
+    *: "Sayılar"
   </dest>
   <voice>
     *: "Numbers"
@@ -8089,7 +7653,7 @@
   </source>
   <dest>
     *: none
-    agc: "Voice (fast)"
+    agc: "Ses (hızlı)"
   </dest>
   <voice>
     *: none
@@ -8149,16 +7713,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Play Next"
+    *: ""
   </dest>
   <voice>
-    *: "Play Next"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -8183,7 +7747,7 @@
     *: "Playlist Catalogue"
   </source>
   <dest>
-    *: "Playlist Catalogue"
+    *: "Oynatma Listesi Kataloğu"
   </dest>
   <voice>
     *: "Playlist Catalogue"
@@ -8199,7 +7763,7 @@
   </source>
   <dest>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Bölme yaparken ne yapmalı"
   </dest>
   <voice>
     *: none
@@ -8225,7 +7789,7 @@
 </phrase>
 <phrase>
   id: LANG_DITHERING
-  desc: in the sound settings menu
+  desc: in the sound settings and some other menus
   user: core
   <source>
     *: "Dithering"
@@ -8247,7 +7811,7 @@
   </source>
   <dest>
     *: none
-    radio: "Scan"
+    radio: "Tara"
   </dest>
   <voice>
     *: none
@@ -8259,7 +7823,7 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
     *: "Ara"
@@ -8278,7 +7842,7 @@
   </source>
   <dest>
     *: none
-    recording: "Digital"
+    recording: "Dijital"
   </dest>
   <voice>
     *: none
@@ -8307,7 +7871,7 @@
     *: "Import Modifications"
   </source>
   <dest>
-    *: "Import Modifications"
+    *: "Değişiklikleri İçe Aktar"
   </dest>
   <voice>
     *: "Import Modifications"
@@ -8323,7 +7887,7 @@
   </source>
   <dest>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "Backdrop Zemini Temizle"
   </dest>
   <voice>
     *: none
@@ -8340,7 +7904,7 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Cancel"
+    touchscreen: "İptal"
   </dest>
   <voice>
     *: none
@@ -8355,7 +7919,7 @@
     *: "Replaygain Type"
   </source>
   <dest>
-    *: "Replaygain Type"
+    *: "Yeniden Oynatma Türü"
   </dest>
   <voice>
     *: "Replaygain Type"
@@ -8369,7 +7933,7 @@
     *: "Export Modifications"
   </source>
   <dest>
-    *: "Export Modifications"
+    *: "Değişiklikleri Dışa Aktar"
   </dest>
   <voice>
     *: "Export Modifications"
@@ -8383,7 +7947,7 @@
     *: "Reset Setting"
   </source>
   <dest>
-    *: "Reset Setting"
+    *: "Ayarları Sıfırla"
   </dest>
   <voice>
     *: "Reset Setting"
@@ -8407,23 +7971,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_MDB_CENTER
-  desc: in sound settings
-  user: core
-  <source>
-    *: none
-    masf: "MDB Centre Frequency"
-  </source>
-  <dest>
-    *: none
-    masf: "MDB Centre Frequency"
-  </dest>
-  <voice>
-    *: none
-    masf: "MDB Centre Frequency"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_SELECTOR_TEXT_COLOR
   desc: line selector text color option
   user: core
@@ -8433,7 +7980,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "Metin Rengi"
   </dest>
   <voice>
     *: none
@@ -8448,7 +7995,7 @@
     *: "Add to Playlist"
   </source>
   <dest>
-    *: "Add to Playlist"
+    *: "Oynatma listesine ekle"
   </dest>
   <voice>
     *: "Add to Playlist"
@@ -8462,27 +8009,10 @@
     *: "Reshuffle"
   </source>
   <dest>
-    *: "Reshuffle"
+    *: "yeniden karıştır"
   </dest>
   <voice>
     *: "Reshuffle"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORDING_FREQUENCY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Frequency"
-  </source>
-  <dest>
-    *: none
-    recording: "Frequency"
-  </dest>
-  <voice>
-    *: none
-    recording: "Frequency"
   </voice>
 </phrase>
 <phrase>
@@ -8493,7 +8023,7 @@
     *: "<Untagged>"
   </source>
   <dest>
-    *: "<Untagged>"
+    *: "<Etiketlenmemiş>"
   </dest>
   <voice>
     *: "Untagged"
@@ -8507,27 +8037,10 @@
     *: "Constrain Auto-Change"
   </source>
   <dest>
-    *: "Constrain Auto-Change"
+    *: "Otomatik Değişimi Kısıtla"
   </dest>
   <voice>
     *: "Constrain Auto-Change"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_FM_BUTTONBAR_ACTION
-  desc: in radio screen
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Action"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Action"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -8538,27 +8051,10 @@
     *: "Comment"
   </source>
   <dest>
+    *: "Yorumcu"
+  </dest>
+  <voice>
     *: "Comment"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_BUTTONBAR_MENU
-  desc: in button bar
-  user: core
-  <source>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </source>
-  <dest>
-    *: none
-    radio_screen_button_bar: "Menu"
-  </dest>
-  <voice>
-    *: none
-    radio_screen_button_bar: ""
   </voice>
 </phrase>
 <phrase>
@@ -8571,7 +8067,7 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Foreground Colour"
+    lcd_color: "Ön Plan Rengi"
   </dest>
   <voice>
     *: none
@@ -8619,7 +8115,7 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Statusbar"
+    remote: "Durum Çubuğu Kontrolü"
   </dest>
   <voice>
     *: none
@@ -8664,7 +8160,7 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Time:"
+    alarm: "Alarm Zamanı:"
   </dest>
   <voice>
     *: none
@@ -8814,7 +8310,7 @@
     *: "<No Info>"
   </dest>
   <voice>
-    *: ""
+    *: "No info"
   </voice>
 </phrase>
 <phrase>
@@ -8932,7 +8428,7 @@
     *: "Tarz"
   </dest>
   <voice>
-    *: ""
+    *: "Tarz"
   </voice>
 </phrase>
 <phrase>
@@ -8961,23 +8457,6 @@
   </dest>
   <voice>
     *: "tracks inserted"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_RECORDING_QUALITY
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording_hwcodec: "Quality"
-  </source>
-  <dest>
-    *: none
-    recording_hwcodec: "Quality"
-  </dest>
-  <voice>
-    *: none
-    recording_hwcodec: "Quality"
   </voice>
 </phrase>
 <phrase>
@@ -9092,7 +8571,7 @@
     *: "Searching... %d found (%s)"
   </dest>
   <voice>
-    *: ""
+    *: "Found"
   </voice>
 </phrase>
 <phrase>
@@ -9393,7 +8872,7 @@
     *: "Year"
   </dest>
   <voice>
-    *: ""
+    *: "Year"
   </voice>
 </phrase>
 <phrase>
@@ -9431,20 +8910,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_MODE
-  desc: in wps F2 pressed
-  user: core
-  <source>
-    *: "Mode:"
-  </source>
-  <dest>
-    *: "Mode:"
-  </dest>
-  <voice>
-    *: ""
-  </voice>
-</phrase>
-<phrase>
   id: LANG_ALARM_MOD_KEYS
   desc: Shown key functions in alarm menu (for the RTC alarm mod).
   user: core
@@ -9470,6 +8935,7 @@
   </dest>
   <voice>
     *: none
+    alarm,ipod*: ""
   </voice>
 </phrase>
 <phrase>
@@ -9807,16 +9273,13 @@
   desc: in lcd settings
   user: core
   <source>
-    *: none
-    lcd_sleep: "Never"
+    *: "Never"
   </source>
   <dest>
-    *: none
-    lcd_sleep: "Never"
+    *: "Never"
   </dest>
   <voice>
-    *: none
-    lcd_sleep: "Never"
+    *: "Never"
   </voice>
 </phrase>
 <phrase>
@@ -9958,14 +9421,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Nickel metal hydride"
+    xduoox3: "Older 1500 milliamp hour"
   </voice>
 </phrase>
 <phrase>
@@ -10243,7 +9709,7 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
     *: "Play"
@@ -10824,20 +10290,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_GIGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "GB"
-  </source>
-  <dest>
-    *: "GB"
-  </dest>
-  <voice>
-    *: "gigabyte"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_AUDIOSCROBBLER
   desc: "Last.fm Log" in the playback menu
   user: core
@@ -10949,7 +10401,7 @@
     *: "Track Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Track gain"
   </voice>
 </phrase>
 <phrase>
@@ -10998,20 +10450,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_KILOBYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "KB"
-  </source>
-  <dest>
-    *: "KB"
-  </dest>
-  <voice>
-    *: "kilobyte"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FORCE
   desc: alternative to yes/no for tristate settings
   user: core
@@ -11054,23 +10492,6 @@
   <voice>
     *: none
     radio: "No settings found. Autoscan?"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_LINE_IN
-  desc: in the recording settings
-  user: core
-  <source>
-    *: none
-    recording: "Line In"
-  </source>
-  <dest>
-    *: none
-    recording: "Line In"
-  </dest>
-  <voice>
-    *: none
-    recording: "Line In"
   </voice>
 </phrase>
 <phrase>
@@ -11129,7 +10550,7 @@
     *: "Album Gain"
   </dest>
   <voice>
-    *: ""
+    *: "Album gain"
   </voice>
 </phrase>
 <phrase>
@@ -11399,7 +10820,7 @@
     *: "Album"
   </dest>
   <voice>
-    *: ""
+    *: "Album"
   </voice>
 </phrase>
 <phrase>
@@ -11409,12 +10830,10 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: "Battery level"
@@ -11466,23 +10885,6 @@
   </dest>
   <voice>
     *: "Line Separator Colour"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F1
-  desc: in dir browser, F1 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "Menu"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "Menu"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
   </voice>
 </phrase>
 <phrase>
@@ -11621,23 +11023,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SYSFONT_DIRBROWSE_F3
-  desc: in dir browser, F3 button bar text
-  user: core
-  <source>
-    *: none
-    recorder_pad: "LCD"
-  </source>
-  <dest>
-    *: none
-    recorder_pad: "LCD"
-  </dest>
-  <voice>
-    *: none
-    recorder_pad: ""
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_MILLIAMPHOURS
   desc: spoken only, a unit postfix
   user: core
@@ -11656,7 +11041,7 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
     *: "Disable Notify"
@@ -11998,23 +11383,6 @@
   </dest>
   <voice>
     *: ""
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_SYSFONT_RECORD_TRIGGER
-  desc: in recording settings_menu
-  user: core
-  <source>
-    *: none
-    recording: "Trigger"
-  </source>
-  <dest>
-    *: none
-    recording: "Trigger"
-  </dest>
-  <voice>
-    *: none
-    recording: "Trigger"
   </voice>
 </phrase>
 <phrase>
@@ -12487,23 +11855,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_SHUTDOWN
-  desc: in main menu
-  user: core
-  <source>
-    *: none
-    soft_shutdown: "Shut down"
-  </source>
-  <dest>
-    *: none
-    soft_shutdown: "Shut down"
-  </dest>
-  <voice>
-    *: none
-    soft_shutdown: "Shut down"
-  </voice>
-</phrase>
-<phrase>
   id: VOICE_CHAR_J
   desc: spoken only, for spelling
   user: core
@@ -12591,23 +11942,6 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_REMOVE_MMC
-  desc: before acknowledging usb in case an MMC is inserted (Ondio)
-  user: core
-  <source>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </source>
-  <dest>
-    *: none
-    archosondio*: "Please remove inserted MMC"
-  </dest>
-  <voice>
-    *: none
-    archosondio*: "Please remove multimedia card"
-  </voice>
-</phrase>
-<phrase>
   id: LANG_FM_NO_PRESETS
   desc: error when preset list is empty
   user: core
@@ -12650,20 +11984,6 @@
   </dest>
   <voice>
     *: "G"
-  </voice>
-</phrase>
-<phrase>
-  id: LANG_MEGABYTE
-  desc: a unit postfix, also voiced
-  user: core
-  <source>
-    *: "MB"
-  </source>
-  <dest>
-    *: "MB"
-  </dest>
-  <voice>
-    *: "megabayt"
   </voice>
 </phrase>
 <phrase>
@@ -12967,7 +12287,7 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
     *: "Skip"
@@ -12983,14 +12303,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer 2000 milliamp hour"
   </voice>
 </phrase>
 <phrase>
@@ -13004,7 +12327,7 @@
     *: "Album Artist"
   </dest>
   <voice>
-    *: ""
+    *: "Album Artist"
   </voice>
 </phrase>
 <phrase>
@@ -13106,5 +12429,3691 @@
   </dest>
   <voice>
     *: "Language"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Single Mode"
+  </dest>
+  <voice>
+    *: "Single Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Voice prompt volume"
+  </dest>
+  <voice>
+    *: "Voice prompt volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Super Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Super Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Short"
+  </source>
+  <dest>
+    *: none
+    es9018: "Short"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Short"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BYPASS
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9018: "Bypass"
+  </source>
+  <dest>
+    *: none
+    es9018: "Bypass"
+  </dest>
+  <voice>
+    *: none
+    es9018: "Bypass"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Hybrid Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Hybrid Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Brick Wall"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Brick Wall"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "KiB"
+  </source>
+  <dest>
+    *: "KiB"
+  </dest>
+  <voice>
+    *: "kibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MEBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "MiB"
+  </source>
+  <dest>
+    *: "MiB"
+  </dest>
+  <voice>
+    *: "mebibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GIBIBYTE
+  desc: a unit postfix, also voiced
+  user: core
+  <source>
+    *: "GiB"
+  </source>
+  <dest>
+    *: "GiB"
+  </dest>
+  <voice>
+    *: "gibibyte"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_PLAYLIST
+  desc: Save only one bookmark for a playlist in recent bookmarks
+  user: core
+  <source>
+    *: "One per playlist"
+  </source>
+  <dest>
+    *: "One per playlist"
+  </dest>
+  <voice>
+    *: "One per playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BOOKMARK_SETTINGS_ONE_PER_TRACK
+  desc: Save only one bookmark for a combination (playlist,track) in recent bookmarks
+  user: core
+  <source>
+    *: "One per track"
+  </source>
+  <dest>
+    *: "One per track"
+  </dest>
+  <voice>
+    *: "One per track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_TRACK_TO_MOVE
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Track to move"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEUED
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queued"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAD_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bad track"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MOVING_TRACK
+  desc: playlist viewer
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Moving track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_VIEWERS
+  desc: text for splash to indicate that no viewers are available
+  user: core
+  <source>
+    *: "No viewers found"
+  </source>
+  <dest>
+    *: "No viewers  found"
+  </dest>
+  <voice>
+    *: "No viewers found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Playlist elapsed: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Playlist elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_ELAPSED
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track elapsed: %s / %s %ld%%"
+  </source>
+  <dest>
+    *: "Track elapsed: %s / %s %ld%%"
+  </dest>
+  <voice>
+    *: "Track elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Playlist remaining: %s"
+  </source>
+  <dest>
+    *: "Playlist remaining: %s"
+  </dest>
+  <voice>
+    *: "Playlist remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRK_REMAINING
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track remaining: %s"
+  </source>
+  <dest>
+    *: "Track remaining: %s"
+  </dest>
+  <voice>
+    *: "Track remaining"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_TRACK
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Track %d / %d %d%%"
+  </source>
+  <dest>
+    *: "Track %d / %d %d%%"
+  </dest>
+  <voice>
+    *: "Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_STORAGE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Storage: %s (done %s, remaining %s)"
+  </source>
+  <dest>
+    *: "Storage: %s (done %s, remaining %s)"
+  </dest>
+  <voice>
+    *: "Storage"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYTIME_DONE
+  desc: playing time screen
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Done"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_TRACK_SIZE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average track size: %s"
+  </source>
+  <dest>
+    *: "Average track size: %s"
+  </dest>
+  <voice>
+    *: "Average track size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_AVG_BITRATE
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Average bitrate: %ld kbps"
+  </source>
+  <dest>
+    *: "Average bitrate: %ld kbps"
+  </dest>
+  <voice>
+    *: "Average bit rate"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYTIME_ERROR
+  desc: playing time screen
+  user: core
+  <source>
+    *: "Error while gathering info"
+  </source>
+  <dest>
+    *: "Error while gathering info"
+  </dest>
+  <voice>
+    *: "Error while gathering info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYING_TIME
+  desc: onplay menu
+  user: core
+  <source>
+    *: "Playing time"
+  </source>
+  <dest>
+    *: "Playing time"
+  </dest>
+  <voice>
+    *: "Playing time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CAR_ADAPTER_MODE_DELAY
+  desc: Displayed for setting car adapter mode delay
+  user: core
+  <source>
+    *: none
+    charging: "Delay Before Resume"
+  </source>
+  <dest>
+    *: none
+    charging: "Delay Before Resume"
+  </dest>
+  <voice>
+    *: none
+    charging: "Delay Before Resume"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_ABSOLUTE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Absolute mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_SEMITONE_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Semitone mode"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PITCH_TIMESTRETCH_MODE
+  desc: spoken only
+  user: core
+  <source>
+    *: none
+    pitchscreen: ""
+  </source>
+  <dest>
+    *: none
+    pitchscreen: ""
+  </dest>
+  <voice>
+    *: none
+    pitchscreen: "Time stretch"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMOTE_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Remote Control"
+  </source>
+  <dest>
+    *: "Remote Control"
+  </dest>
+  <voice>
+    *: "Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_REM_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "No Rem. Control"
+  </source>
+  <dest>
+    *: "No Rem. Control"
+  </dest>
+  <voice>
+    *: "No Remote Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OUT_OF_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "Out of Control"
+  </source>
+  <dest>
+    *: "Out of Control"
+  </dest>
+  <voice>
+    *: "Out of Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_2_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "2 Key Control"
+  </source>
+  <dest>
+    *: "2 Key Control"
+  </dest>
+  <voice>
+    *: "2 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_4_KEY_CONTROL
+  desc: Item for menus
+  user: core
+  <source>
+    *: "4 Key Control"
+  </source>
+  <dest>
+    *: "4 Key Control"
+  </dest>
+  <voice>
+    *: "4 Key Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_WORMLET
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Play Wormlet!"
+  </source>
+  <dest>
+    *: "Play Wormlet!"
+  </dest>
+  <voice>
+    *: "Play Wormlet!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_WORMS
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Number of Worms"
+  </source>
+  <dest>
+    *: "Number of Worms"
+  </dest>
+  <voice>
+    *: "Number of Worms"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_GROWTH_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Growth Per Food"
+  </source>
+  <dest>
+    *: "Worm Growth Per Food"
+  </dest>
+  <voice>
+    *: "Worm Growth Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WORM_SPEED
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Worm Speed"
+  </source>
+  <dest>
+    *: "Worm Speed"
+  </dest>
+  <voice>
+    *: "Worm Speed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGHS_PER_FOOD
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Arghs Per Food"
+  </source>
+  <dest>
+    *: "Arghs Per Food"
+  </dest>
+  <voice>
+    *: "Arghs Per Food"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARGH_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Argh Size"
+  </source>
+  <dest>
+    *: "Argh Size"
+  </dest>
+  <voice>
+    *: "Argh Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FOOD_SIZE
+  desc: For wormlet menu
+  user: core
+  <source>
+    *: "Food Size"
+  </source>
+  <dest>
+    *: "Food Size"
+  </dest>
+  <voice>
+    *: "Food Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_PLAYERS
+  desc: For game menus
+  user: core
+  <source>
+    *: "Number of Players"
+  </source>
+  <dest>
+    *: "Number of Players"
+  </dest>
+  <voice>
+    *: "Number of Players"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONTROL_STYLE
+  desc: In various menus
+  user: core
+  <source>
+    *: "Control Style"
+  </source>
+  <dest>
+    *: "Control Style"
+  </dest>
+  <voice>
+    *: "Control Style"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERT_TO_DEFAULT_SETTINGS
+  desc: In various menus
+  user: core
+  <source>
+    *: "Revert to Default Settings"
+  </source>
+  <dest>
+    *: "Revert to Default Settings"
+  </dest>
+  <voice>
+    *: "Revert to Default Settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_QUIT
+  desc: in various menus
+  user: core
+  <source>
+    *: "Quit"
+  </source>
+  <dest>
+    *: "Quit"
+  </dest>
+  <voice>
+    *: "Quit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_DISPLAY_OPTIONS
+  desc: in various menus
+  user: core
+  <source>
+    *: "Display Options"
+  </source>
+  <dest>
+    *: "Display Options"
+  </dest>
+  <voice>
+    *: "Display Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREVTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Previous Track"
+  </source>
+  <dest>
+    *: "Previous Track"
+  </dest>
+  <voice>
+    *: "Previous Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYPAUSE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Pause / Play"
+  </source>
+  <dest>
+    *: "Pause / Play"
+  </dest>
+  <voice>
+    *: "Pause / Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_STOP_PLAYBACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Stop Playback"
+  </source>
+  <dest>
+    *: "Stop Playback"
+  </dest>
+  <voice>
+    *: "Stop Playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NEXTTRACK
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Next Track"
+  </source>
+  <dest>
+    *: "Next Track"
+  </dest>
+  <voice>
+    *: "Next Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_VOLUME
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Volume"
+  </source>
+  <dest>
+    *: "Change Volume"
+  </dest>
+  <voice>
+    *: "Change Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_SHUFFLE_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Shuffle Mode"
+  </source>
+  <dest>
+    *: "Shuffle Mode"
+  </dest>
+  <voice>
+    *: "Shuffle Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHANGE_REPEAT_MODE
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Change Repeat Mode"
+  </source>
+  <dest>
+    *: "Change Repeat Mode"
+  </dest>
+  <voice>
+    *: "Change Repeat Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYBACK_CONTROL
+  desc: in playback control menu
+  user: core
+  <source>
+    *: "Playback Control"
+  </source>
+  <dest>
+    *: "Playback Control"
+  </dest>
+  <voice>
+    *: "Playback Control"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_CHECKMATE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Checkmate!"
+  </source>
+  <dest>
+    *: "Checkmate!"
+  </dest>
+  <voice>
+    *: "Checkmate!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_ILLEGAL_MOVE
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Illegal move!"
+  </source>
+  <dest>
+    *: "Illegal move!"
+  </dest>
+  <voice>
+    *: "Illegal move!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_NEW_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "New Game"
+  </source>
+  <dest>
+    *: "New Game"
+  </dest>
+  <voice>
+    *: "New Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESUME_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Resume Game"
+  </source>
+  <dest>
+    *: "Resume Game"
+  </dest>
+  <voice>
+    *: "Resume Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SAVE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Save Game"
+  </source>
+  <dest>
+    *: "Save Game"
+  </dest>
+  <voice>
+    *: "Save Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTORE_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restore Game"
+  </source>
+  <dest>
+    *: "Restore Game"
+  </dest>
+  <voice>
+    *: "Restore Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_RESTART_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Restart Game"
+  </source>
+  <dest>
+    *: "Restart Game"
+  </dest>
+  <voice>
+    *: "Restart Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_SELECT_OTHER_GAME
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "Select Other Game"
+  </source>
+  <dest>
+    *: "Select Other Game"
+  </dest>
+  <voice>
+    *: "Select Other Game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_1
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 1: 60 moves / 5 min"
+  </source>
+  <dest>
+    *: "Level 1: 60 moves / 5 min"
+  </dest>
+  <voice>
+    *: "Level 1: 60 moves per 5 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_2
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 2: 60 moves / 15 min"
+  </source>
+  <dest>
+    *: "Level 2: 60 moves / 15 min"
+  </dest>
+  <voice>
+    *: "Level 2: 60 moves per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_3
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 3: 60 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 3: 60 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 3: 60 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_4
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 4: 40 moves / 30 min"
+  </source>
+  <dest>
+    *: "Level 4: 40 moves / 30 min"
+  </dest>
+  <voice>
+    *: "Level 4: 40 moves per 30 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_5
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 5: 40 moves / 60 min"
+  </source>
+  <dest>
+    *: "Level 5: 40 moves / 60 min"
+  </dest>
+  <voice>
+    *: "Level 5: 40 moves per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_6
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 6: 40 moves / 120 min"
+  </source>
+  <dest>
+    *: "Level 6: 40 moves / 120 min"
+  </dest>
+  <voice>
+    *: "Level 6: 40 moves per 120 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_7
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 7: 40 moves / 240 min"
+  </source>
+  <dest>
+    *: "Level 7: 40 moves / 240 min"
+  </dest>
+  <voice>
+    *: "Level 7: 40 moves per 240 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_8
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 8: 1 move / 15 min"
+  </source>
+  <dest>
+    *: "Level 8: 1 move / 15 min"
+  </dest>
+  <voice>
+    *: "Level 8: 1 move per 15 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_9
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 9: 1 move / 60 min"
+  </source>
+  <dest>
+    *: "Level 9: 1 move / 60 min"
+  </dest>
+  <voice>
+    *: "Level 9: 1 move per 60 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LEVEL_10
+  desc: in the chessbox game level selection
+  user: core
+  <source>
+    *: "Level 10: 1 move / 600 min"
+  </source>
+  <dest>
+    *: "Level 10: 1 move / 600 min"
+  </dest>
+  <voice>
+    *: "Level 10: 1 move per 600 minutes"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_PGN_PARSE_ERROR
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "Error parsing game !"
+  </source>
+  <dest>
+    *: "Error parsing game !"
+  </dest>
+  <voice>
+    *: "Error parsing game !"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_NO_GAMES
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "No games found !"
+  </source>
+  <dest>
+    *: "No games found !"
+  </dest>
+  <voice>
+    *: "No games found!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_BEGINNING
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the beginning of the game"
+  </source>
+  <dest>
+    *: "At the beginning of the game"
+  </dest>
+  <voice>
+    *: "At the beginning of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAME_END
+  desc: in the chessbox game viewer
+  user: core
+  <source>
+    *: "At the end of the game"
+  </source>
+  <dest>
+    *: "At the end of the game"
+  </dest>
+  <voice>
+    *: "At the end of the game"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PLAYER
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Player"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_GNUCHESS
+  desc: spoken only, for announcing player's id
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "GNU Chess"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_MARKED
+  desc: spoken only, for announcing chess piece marking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Marked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_UNMARKED
+  desc: spoken only, for announcing chess piece unmarking
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Unmarked"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_WHITE
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "White"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BLACK
+  desc: spoken only, for announcing chess piece color
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Black"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CHECK
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Check!"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CAPTURES
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "captures"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_CASTLE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "castle"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_KINGSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "king side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_CHESSBOX_QUEENSIDE
+  desc: spoken only, for announcing chess moves
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "queen side"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_PAWN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Pawn"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KNIGHT
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Knight"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BISHOP
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Bishop"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_ROOK
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Rook"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_QUEEN
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Queen"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_KING
+  desc: spoken only, for announcing chess piece names
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "King"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_GAMES
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Games"
+  </source>
+  <dest>
+    *: "Games"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_SAVING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Saving position"
+  </source>
+  <dest>
+    *: "Saving position"
+  </dest>
+  <voice>
+    *: "Saving position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_LOADING_POSITION
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Loading position"
+  </source>
+  <dest>
+    *: "Loading position"
+  </dest>
+  <voice>
+    *: "Loading position"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_THINKING
+  desc: in chessbox
+  user: core
+  <source>
+    *: "Thinking..."
+  </source>
+  <dest>
+    *: "Thinking..."
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BATTERY_BENCH_IS_ALREADY_RUNNING
+  desc: Spoken if battery bench is already running
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Battery bench is already running"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_BAT_BENCH_KEYS
+  desc: Battery bench start up message
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: "Press play to run battery bench or stop to cancel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANNOT_RESTART_PLAYBACK
+  desc: cannot restart playback splash in imageviewer
+  user: core
+  <source>
+    *: "Cannot restart playback"
+  </source>
+  <dest>
+    *: "Cannot restart playback"
+  </dest>
+  <voice>
+    *: "Cannot restart playback"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ORDERED
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Ordered"
+  </source>
+  <dest>
+    *: "Ordered"
+  </dest>
+  <voice>
+    *: "Ordered"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIFFUSION
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Diffusion"
+  </source>
+  <dest>
+    *: "Diffusion"
+  </dest>
+  <voice>
+    *: "Diffusion"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GRAYSCALE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Grayscale"
+  </source>
+  <dest>
+    *: "Grayscale"
+  </dest>
+  <voice>
+    *: "Grayscale"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_MODE
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Toggle Slideshow Mode"
+  </source>
+  <dest>
+    *: "Toggle Slideshow Mode"
+  </dest>
+  <voice>
+    *: "Toggle Slide show Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SLIDESHOW_TIME
+  desc: in the imageviewer settings menu
+  user: core
+  <source>
+    *: "Slideshow Time"
+  </source>
+  <dest>
+    *: "Slideshow Time"
+  </dest>
+  <voice>
+    *: "Slide show Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RETURN
+  desc: in various plugin menus
+  user: core
+  <source>
+    *: "Return"
+  </source>
+  <dest>
+    *: "Return"
+  </dest>
+  <voice>
+    *: "Return"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REC_DIR
+  desc: used in the info screen to show a recording dir
+  user: core
+  <source>
+    *: none
+    recording: "Recording Directory"
+  </source>
+  <dest>
+    *: none
+    recording: "Recording Directory"
+  </dest>
+  <voice>
+    *: none
+    recording: "Recording Directory"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CHESSBOX_MENU_VIEW_GAMES
+  desc: in the chessbox menu
+  user: core
+  <source>
+    *: "View Played Games"
+  </source>
+  <dest>
+    *: "View Played Games"
+  </dest>
+  <voice>
+    *: "View Played Games"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_AUDIO_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Audio Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Audio Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Audio Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_RESUME_OPTIONS
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume Options"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume Options"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume Options"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MENU_PLAY_MODE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Play Mode"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play Mode"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play Mode"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Single"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Single"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Single"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_SOUND_SETTING
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Use sound setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use sound setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use sound setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESTART_PLAYBACK
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Play from beginning"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Play from beginning"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Play from beginning"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SET_RESUME_TIME
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Set resume time (min)"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Set resume time (min)"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Set resume time"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DISPLAY_FPS
+  desc: in the mpegplayer and pictureflow settings menus
+  user: core
+  <source>
+    *: "Display FPS"
+  </source>
+  <dest>
+    *: "Display FPS"
+  </dest>
+  <voice>
+    *: "Display FPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIMIT_FPS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Limit FPS"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Limit FPS"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Limit FPS"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SKIP_FRAMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Skip frames"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Skip frames"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Skip frames"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACKLIGHT_BRIGHTNESS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Backlight brightness"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Backlight brightness"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Backlight brightness"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USE_COMMON_SETTING
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Use common setting"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Use common setting"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Use common setting"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TONE_CONTROLS
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Tone controls"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Tone controls"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Tone controls"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FORCE_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CONDITIONAL_START_MENU
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Start menu if not completed"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Start menu if not completed"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Start menu if not completed"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_AUTO_RESUME
+  desc: in mpegplayer menus
+  user: core
+  <source>
+    *: "Resume automatically"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Resume automatically"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Resume automatically"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL_RESUMES
+  desc: in the mpegplayer settings menu
+  user: core
+  <source>
+    *: "Clear all resumes"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Clear all resumes"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Clear all resumes"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UNAVAILABLE
+  desc: in mpegplayer settings
+  user: core
+  <source>
+    *: "Unavailable"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Unavailable"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Unavailable"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TOGGLE_ITEM
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Toggle Item"
+  </source>
+  <dest>
+    *: "Toggle Item"
+  </dest>
+  <voice>
+    *: "Toggle Item"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_UP
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Up"
+  </source>
+  <dest>
+    *: "Move Item Up"
+  </dest>
+  <voice>
+    *: "Move Item Up"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MOVE_ITEM_DOWN
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Move Item Down"
+  </source>
+  <dest>
+    *: "Move Item Down"
+  </dest>
+  <voice>
+    *: "Move Item Down"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LOAD_DEFAULT_CONFIGURATION
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Load Default Configuration"
+  </source>
+  <dest>
+    *: "Load Default Configuration"
+  </dest>
+  <voice>
+    *: "Load Default Configuration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE_EXIT
+  desc: in main_menu_config
+  user: core
+  <source>
+    *: "Save and Exit"
+  </source>
+  <dest>
+    *: "Save and Exit"
+  </dest>
+  <voice>
+    *: "Save and Exit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MAIN_MENU_ORDER
+  desc: main_menu_config plugin title
+  user: core
+  <source>
+    *: "Rockbox Main Menu Order"
+  </source>
+  <dest>
+    *: "Rockbox Main Menu Order"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_PATH
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Path]"
+  </source>
+  <dest>
+    *: "[Path]"
+  </dest>
+  <voice>
+    *: "Path"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILENAME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Filename]"
+  </source>
+  <dest>
+    *: "[Filename]"
+  </dest>
+  <voice>
+    *: "Filename"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SIZE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Size]"
+  </source>
+  <dest>
+    *: "[Size]"
+  </dest>
+  <voice>
+    *: "Size"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Date]"
+  </source>
+  <dest>
+    *: "[Date]"
+  </dest>
+  <voice>
+    *: "Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TIME
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Time]"
+  </source>
+  <dest>
+    *: "[Time]"
+  </dest>
+  <voice>
+    *: "Time"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Artist]"
+  </source>
+  <dest>
+    *: "[Artist]"
+  </dest>
+  <voice>
+    *: "Artist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TITLE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Title]"
+  </source>
+  <dest>
+    *: "[Title]"
+  </dest>
+  <voice>
+    *: "Title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album]"
+  </source>
+  <dest>
+    *: "[Album]"
+  </dest>
+  <voice>
+    *: "Album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DURATION
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Duration]"
+  </source>
+  <dest>
+    *: "[Duration]"
+  </dest>
+  <voice>
+    *: "Duration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_SUBDIRS
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Subdirs]"
+  </source>
+  <dest>
+    *: "[Subdirs]"
+  </dest>
+  <voice>
+    *: "Subdirs"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Files]"
+  </source>
+  <dest>
+    *: "[Files]"
+  </dest>
+  <voice>
+    *: "Files"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DIRECTORY_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Directory properties"
+  </source>
+  <dest>
+    *: "Directory properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FILE_PROPERTIES
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "File properties"
+  </source>
+  <dest>
+    *: "File properties"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FAIL
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "Failed to gather information"
+  </source>
+  <dest>
+    *: "Failed to gather information"
+  </dest>
+  <voice>
+    *: "Failed to gather information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SWAP_CHANNELS
+  desc: in sound_settings
+  user: core
+  <source>
+    *: "Swap Channels"
+  </source>
+  <dest>
+    *: "Swap Channels"
+  </dest>
+  <voice>
+    *: "Swap Channels"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PANNING_SEPARATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Panning Separation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Panning Separation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Panning Separation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REVERBERATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Reverberation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Reverberation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Reverberation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_INTERPOLATION
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Interpolation"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Interpolation"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Interpolation"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SURROUND
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Surround"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Surround"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Surround"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_HQMIXER
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "HQ Mixer"
+    lowmem: none
+  </source>
+  <dest>
+    *: "HQ Mixer"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "High Quality Mixer"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_MIKMOD_SAMPLERATE
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "Sample Rate"
+    lowmem: none
+  </source>
+  <dest>
+    *: "Sample Rate"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "Sample Rate"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CPU_BOOST
+  desc: in mikmod settings menu
+  user: core
+  <source>
+    *: "CPU Boost"
+    lowmem: none
+  </source>
+  <dest>
+    *: "CPU Boost"
+    lowmem: none
+  </dest>
+  <voice>
+    *: "CPU Boost"
+    lowmem: none
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SPACING
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Spacing"
+  </source>
+  <dest>
+    *: "Spacing"
+  </dest>
+  <voice>
+    *: "Spacing"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CENTRE_MARGIN
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Centre margin"
+  </source>
+  <dest>
+    *: "Centre margin"
+  </dest>
+  <voice>
+    *: "Centre margin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NUMBER_OF_SLIDES
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Number of slides"
+  </source>
+  <dest>
+    *: "Number of slides"
+  </dest>
+  <voice>
+    *: "Number of slides"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ZOOM
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Zoom"
+  </source>
+  <dest>
+    *: "Zoom"
+  </dest>
+  <voice>
+    *: "Zoom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALBUM_TITLE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Show album title"
+  </source>
+  <dest>
+    *: "Show album title"
+  </dest>
+  <voice>
+    *: "Show album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RESIZE_COVERS
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Resize Covers"
+  </source>
+  <dest>
+    *: "Resize Covers"
+  </dest>
+  <voice>
+    *: "Resize Covers"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REBUILD_CACHE
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Rebuild cache"
+  </source>
+  <dest>
+    *: "Rebuild cache"
+  </dest>
+  <voice>
+    *: "Rebuild cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WPS_INTEGRATION
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "WPS Integration"
+  </source>
+  <dest>
+    *: "WPS Integration"
+  </dest>
+  <voice>
+    *: "WPS Integration"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GOTO_WPS
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: "Go to WPS"
+  </source>
+  <dest>
+    *: "Go to WPS"
+  </dest>
+  <voice>
+    *: "Go to WPS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_PLAYLIST
+  desc: in the pictureflow main menu
+  user: core
+  <source>
+    *: "Clear playlist"
+  </source>
+  <dest>
+    *: "Clear playlist"
+  </dest>
+  <voice>
+    *: "Clear playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide album title"
+  </source>
+  <dest>
+    *: "Hide album title"
+  </dest>
+  <voice>
+    *: "Hide album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the bottom"
+  </source>
+  <dest>
+    *: "Show at the bottom"
+  </dest>
+  <voice>
+    *: "Show at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show at the top"
+  </source>
+  <dest>
+    *: "Show at the top"
+  </dest>
+  <voice>
+    *: "Show at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DIRECT
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Direct"
+  </source>
+  <dest>
+    *: "Direct"
+  </dest>
+  <voice>
+    *: "Direct"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VIA_TRACK_LIST
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Via Track list"
+  </source>
+  <dest>
+    *: "Via Track list"
+  </dest>
+  <voice>
+    *: "Via Track list"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALWAYS_ON
+  desc: in the pictureflow settings menu
+  user: core
+  <source>
+    *: "Always On"
+  </source>
+  <dest>
+    *: "Always On"
+  </dest>
+  <voice>
+    *: "Always On"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NO_ALBUMART_FOUND
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "No album art found"
+  </source>
+  <dest>
+    *: "No album art found"
+  </dest>
+  <voice>
+    *: "No album art found"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CACHE_REBUILT_NEXT_RESTART
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Cache will be rebuilt on next restart"
+  </source>
+  <dest>
+    *: "Cache will be rebuilt on next restart"
+  </dest>
+  <voice>
+    *: "Cache will be rebuilt on next restart"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_CLEARED
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Playlist Cleared"
+  </source>
+  <dest>
+    *: "Playlist Cleared"
+  </dest>
+  <voice>
+    *: "Playlist Cleared"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADDED_TO_PLAYLIST
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Added to playlist"
+  </source>
+  <dest>
+    *: "Added to playlist"
+  </dest>
+  <voice>
+    *: "Added to playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ERROR_WRITING_CONFIG
+  desc: in the pictureflow splash messages
+  user: core
+  <source>
+    *: "Error writing config"
+  </source>
+  <dest>
+    *: "Error writing config"
+  </dest>
+  <voice>
+    *: "Error writing config"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NOT_A_VBR_FILE
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "Not a VBR file"
+  </source>
+  <dest>
+    *: "Not a VBR file"
+  </dest>
+  <voice>
+    *: "Not a VBR file"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILE_ERROR
+  desc: in vbrfix plugin
+  user: core
+  <source>
+    *: "File error: %d"
+  </source>
+  <dest>
+    *: "File error: %d"
+  </dest>
+  <voice>
+    *: "File error"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_UPDATE_CACHE
+  desc: in pictureflow
+  user: core
+  <source>
+    *: "Update cache"
+  </source>
+  <dest>
+    *: "Update cache"
+  </dest>
+  <voice>
+    *: "Update cache"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HIDE_ALBUM_TITLE_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Hide information"
+  </source>
+  <dest>
+    *: "Hide information"
+  </dest>
+  <voice>
+    *: "Hide information"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_BOTTOM_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the bottom"
+  </source>
+  <dest>
+    *: "Show album at the bottom"
+  </dest>
+  <voice>
+    *: "Show album at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_AT_THE_TOP_NEW
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album at the top"
+  </source>
+  <dest>
+    *: "Show album at the top"
+  </dest>
+  <voice>
+    *: "Show album at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_TOP
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the top"
+  </source>
+  <dest>
+    *: "Show album and artist at the top"
+  </dest>
+  <voice>
+    *: "Show album and artist at the top"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_ALL_AT_THE_BOTTOM
+  desc: in the pictureflow settings
+  user: core
+  <source>
+    *: "Show album and artist at the bottom"
+  </source>
+  <dest>
+    *: "Show album and artist at the bottom"
+  </dest>
+  <voice>
+    *: "Show album and artist at the bottom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_STD_CANCEL
+  desc: standard press x to cancel string
+  user: core
+  <source>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </source>
+  <dest>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    sonynwza860: "Keymaps incomplete."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </dest>
+  <voice>
+    *: "Press LEFT to cancel."
+    android,hifietma*,zenvision: "Press BACK to cancel."
+    cowond2,creativezenxfi2,ibassodx50,ibassodx90,mrobe500,ondavx747: "Press POWER to cancel."
+    ihifi760,ihifi960: "Double tap RETURN to cancel."
+    ihifi770,ihifi770c,ihifi800: "Press HOME to cancel."
+    iriverh10,samsungyh*: "Double tap LEFT to cancel."
+    mpiohd200: "Double tap REC to cancel."
+    mpiohd300: "Double tap MENU to cancel."
+    rx27generic: "Press VOLUME to cancel."
+    touchscreen: "Press Middle Left to cancel."
+    vibe500: "Press PREV to cancel."
+    xduoox20,xduoox3,xduoox3ii: "Double tap HOME to cancel."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DATE
+  desc: for constructing time and date announcements
+  user: core
+  <source>
+    *: "Date"
+  </source>
+  <dest>
+    *: "Date"
+  </dest>
+  <voice>
+    *: "Date"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_ALL
+  desc:
+  user: core
+  <source>
+    *: "Clear all"
+  </source>
+  <dest>
+    *: "Clear all"
+  </dest>
+  <voice>
+    *: "Clear all"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CANCEL_0
+  desc: CANCEL.
+  user: core
+  <source>
+    *: "Cancel"
+  </source>
+  <dest>
+    *: "Cancel"
+  </dest>
+  <voice>
+    *: "Cancel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SAVE
+  desc:
+  user: core
+  <source>
+    *: "Save"
+  </source>
+  <dest>
+    *: "Save"
+  </dest>
+  <voice>
+    *: "Save"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TIMEOUT
+  desc:
+  user: core
+  <source>
+    *: "Timeout"
+  </source>
+  <dest>
+    *: "Timeout"
+  </dest>
+  <voice>
+    *: "Timeout"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK
+  desc: used in track x of y constructs
+  user: core
+  <source>
+    *: "Track"
+  </source>
+  <dest>
+    *: "Track"
+  </dest>
+  <voice>
+    *: "Track"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ELAPSED
+  desc: prefix for elapsed playtime announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Elapsed"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Elapsed"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Elapsed"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCEMENT_FMT
+  desc: format for wps hotkey announcement
+  user: core
+  <source>
+    *: none
+    hotkey: "Announcement format"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Announcement format"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Announcement format"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REMAIN
+  desc: for constructs such as number of tracks remaining etc
+  user: core
+  <source>
+    *: none
+    hotkey: "Remain"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Remain"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Remain"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_GROUPING
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Grouping"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Grouping"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Grouping"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ANNOUNCE_ON
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Announce on"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Announce on"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Announce on"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_CHANGE
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Track change"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Track change"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Track change"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_HOLD_FOR_SETTINGS
+  desc:
+  user: core
+  <source>
+    *: none
+    hotkey: "Hold for settings"
+  </source>
+  <dest>
+    *: none
+    hotkey: "Hold for settings"
+  </dest>
+  <voice>
+    *: none
+    hotkey: "Hold for settings"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Open Plugin"
+  </dest>
+  <voice>
+    *: "Open Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Not a plugin: %s"
+  </dest>
+  <voice>
+    *: "Not a plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Set Wps Context Plugin"
+  </dest>
+  <voice>
+    *: "Set WPS Context Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parameter"
+  </dest>
+  <voice>
+    *: "Parameter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Name"
+  </dest>
+  <voice>
+    *: "Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Add"
+  </dest>
+  <voice>
+    *: "Add"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Back"
+  </dest>
+  <voice>
+    *: "Back"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Edit"
+  </dest>
+  <voice>
+    *: "Edit"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Run"
+  </dest>
+  <voice>
+    *: "Run"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Export"
+  </dest>
+  <voice>
+    *: "Export"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Browse"
+  </dest>
+  <voice>
+    *: "Browse"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Enter USB mass storage mode?"
+  </dest>
+  <voice>
+    *: "Enter USB mass storage mode?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Clear List & Play Next"
+  </dest>
+  <voice>
+    *: "Clear List & Play Next"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Queue..."
+  </dest>
+  <voice>
+    *: "Queue..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Show Queue Options"
+  </dest>
+  <voice>
+    *: "Show Queue Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Show Shuffled Adding Options"
+  </dest>
+  <voice>
+    *: "Show Shuffled Adding Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "In Submenu"
+  </dest>
+  <voice>
+    *: "In Submenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Clear List & Play Shuffled"
+  </dest>
+  <voice>
+    *: "Clear List & Play Shuffled"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Disable All Lock Notifications"
+  </dest>
+  <voice>
+    *: "Disable All Lock Notifications"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Exempt Volume"
+  </dest>
+  <voice>
+    *: "Exempt Volume"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Always Autolock"
+  </dest>
+  <voice>
+    *: "Always Autolock"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
+  desc: reload playlist after saving
+  user: core
+  <source>
+    *: "Reload After Saving"
+  </source>
+  <dest>
+    *: "Reload After Saving"
+  </dest>
+  <voice>
+    *: "Reload After Saving"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Album Artist]"
+  </dest>
+  <voice>
+    *: "Album Artist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_GENRE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Genre]"
+  </dest>
+  <voice>
+    *: "Genre"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Comment]"
+  </dest>
+  <voice>
+    *: "Comment"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Composer]"
+  </dest>
+  <voice>
+    *: "Composer"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Year]"
+  </dest>
+  <voice>
+    *: "Year"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Tracknum]"
+  </dest>
+  <voice>
+    *: "Track number"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Discnum]"
+  </dest>
+  <voice>
+    *: "Disc number"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frequency]"
+  </dest>
+  <voice>
+    *: "Frequency"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Bitrate]"
+  </dest>
+  <voice>
+    *: "Bit rate"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICED_DATE_FORMAT
+  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  user: core
+  <source>
+    *: "dAY"
+  </source>
+  <dest>
+    *: "dAY"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "List Wraparound"
+  </dest>
+  <voice>
+    *: "List Wraparound"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Show Shutdown Message"
+  </dest>
+  <voice>
+    *: "Show Shutdown Message"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "List Order"
+  </dest>
+  <voice>
+    *: "List Order"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Ascending"
+  </dest>
+  <voice>
+    *: "Ascending"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Descending"
+  </dest>
+  <voice>
+    *: "Descending"
   </voice>
 </phrase>
