@@ -18,6 +18,7 @@
 # - Melih Özbek
 # - Brian Cloutier
 # - Altay Oz
+# - Selami Dinçer
 <phrase>
   id: LANG_SET_BOOL_YES
   desc: bool true representation
@@ -672,10 +673,10 @@
     *: "Stereo"
   </source>
   <dest>
-    *: "Stereo"
+    *: "Stereo Çift Kanallı"
   </dest>
   <voice>
-    *: "Stereo"
+    *: "Stereo Çift Kanallı"
   </voice>
 </phrase>
 <phrase>
@@ -686,10 +687,10 @@
     *: "Mono"
   </source>
   <dest>
-    *: "Mono"
+    *: "Mono Tek Kanallı"
   </dest>
   <voice>
-    *: "Mono"
+    *: "Mono Tek Kanallı"
   </voice>
 </phrase>
 <phrase>
@@ -2178,8 +2179,8 @@
   <dest>
     *: none
     multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "microSD:"
+    xduoox3: "microSD2:"
   </dest>
   <voice>
     *: none
@@ -2391,12 +2392,10 @@
   <dest>
     *: none
     iaudiom5,iaudiox5: "Disk dolu. Devam etmek için GÜÇ'e basın."
-    iriverh100: "Disk dolu. Devam etmek için STOP'a basın."
-    iriverh120,iriverh300: "The disk is full. Press STOP to continue."
-    recording: "The disk is full. Press OFF to continue."
-    samsungyh*: "Disk full. Press LEFT to continue."
-    sansac200*,vibe500: "The disk is full. Press UP to continue."
-    sansae200*: "The disk is full. Press PREV to continue."
+    iriverh100,iriverh120,iriverh300: "Disk dolu. Devam etmek için STOP'a basın."
+    recording: "Disk dolu. Devam etmek için KAPAT'a basın."
+    samsungyh*: "Disk dolu. Devam etmek için SOL tuşuna basın"
+    sansac200*,sansae200*,vibe500: "Disk dolu. Devam etmek için PREV'e basın."
   </dest>
   <voice>
     *: none
@@ -2418,12 +2417,12 @@
   </source>
   <dest>
     *: "İptal etmek için KAPALI"
-    gigabeatfx: "POWER to abort"
-    gigabeats,sansafuzeplus: "BACK to abort"
-    iaudiom5,iaudiox5: "Long PLAY to abort"
-    ipod*: "PLAY/PAUSE to abort"
-    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "PREV to abort"
-    iriverh100,iriverh120,iriverh300: "STOP to abort"
+    gigabeatfx: "iptal etmek için GÜÇ tu;una basin"
+    gigabeats,sansafuzeplus: "iptal etmek için GERİ DÖN"
+    iaudiom5,iaudiox5: "İptal etmek için uzun OYNAT"
+    ipod*: "iptal etmek için OYNAT/DURAKLAT"
+    iriverh10,iriverh10_5gb,sansac200*,sansae200*,vibe500: "iptal etmek için PREV"
+    iriverh100,iriverh120,iriverh300: "iptal etmek için DUR"
   </dest>
   <voice>
     *: ""
@@ -2667,10 +2666,10 @@
     *: "Cutoff"
   </source>
   <dest>
-    *: "Cutoff Frequency"
+    *: "Kesme Frekansı"
   </dest>
   <voice>
-    *: "Cutoff Frequency"
+    *: "Kesme Frekansı"
   </voice>
 </phrase>
 <phrase>
@@ -2796,7 +2795,7 @@
     *: ""
   </dest>
   <voice>
-    *: "o'clock"
+    *: "Saat"
   </voice>
 </phrase>
 <phrase>
@@ -3561,14 +3560,14 @@
     xduoox3: "mSD1:"
   </source>
   <dest>
-    *: "Int:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    *: "Dahili"
+    hibylinux: "MicroSD"
+    xduoox3: "MicroSD1"
   </dest>
   <voice>
-    *: "Internal"
-    hibylinux: "micro S D"
-    xduoox3: "micro S D 1"
+    *: "Dahili"
+    hibylinux: "MicroSD"
+    xduoox3: "MicroSD1"
   </voice>
 </phrase>
 <phrase>
@@ -4160,11 +4159,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigger"
+    recording: "Tetikle"
   </dest>
   <voice>
     *: none
-    recording: "Trigger"
+    recording: "Tetikle"
   </voice>
 </phrase>
 <phrase>
@@ -4757,10 +4756,10 @@
     *: "Browse Cuesheet"
   </source>
   <dest>
-    *: "Browse Cuesheet"
+    *: "Cuesheet'e göz atın"
   </dest>
   <voice>
-    *: "Browse Cuesheet"
+    *: "Cuesheet'e göz atın"
   </voice>
 </phrase>
 <phrase>
@@ -4951,10 +4950,10 @@
     *: "Latin Extended (ISO-8859-2)"
   </source>
   <dest>
-    *: "Latin Extended (ISO-8859-2)"
+    *: "Genişletilmiş Latince (ISO-8859-2)"
   </dest>
   <voice>
-    *: "Latin extended"
+    *: "Genişletilmiş Latince"
   </voice>
 </phrase>
 <phrase>
@@ -4968,7 +4967,7 @@
     *: "Otomatik Devam"
   </dest>
   <voice>
-    *: "Automatic resume"
+    *: "Otomatik Devam"
   </voice>
 </phrase>
 <phrase>
@@ -5023,11 +5022,11 @@
   </source>
   <dest>
     *: none
-    recording: "Line In"
+    recording: "Line In Girişi"
   </dest>
   <voice>
     *: none
-    recording: "Line In"
+    recording: "Line In Girişi"
   </voice>
 </phrase>
 <phrase>
@@ -5041,7 +5040,7 @@
     *: "Gelişmiş Tuş Kilidi"
   </dest>
   <voice>
-    *: "Advanced Key Lock"
+    *: "Gelişmiş Tuş Kilidi"
   </voice>
 </phrase>
 <phrase>
@@ -5058,7 +5057,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Set As Backdrop"
+    lcd_non-mono: "Arka Plan Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -5092,7 +5091,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Right Quickscreen Item"
+    quickscreen: "Sağ Hızlı Ekran Öğesi Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -5109,7 +5108,7 @@
   </dest>
   <voice>
     *: none
-    usb_charging_enable: "Charge During U S B Connection"
+    usb_charging_enable: "USB Bağlantısı Sırasında Şarj Et"
   </voice>
 </phrase>
 <phrase>
@@ -5123,7 +5122,7 @@
     *: "Kataloğu Görüntüle	"
   </dest>
   <voice>
-    *: "View Catalogue"
+    *: "Kataloğu Görüntüle	"
   </voice>
 </phrase>
 <phrase>
@@ -5151,7 +5150,7 @@
     *: "Durunca Güncelle"
   </dest>
   <voice>
-    *: "Update on Stop"
+    *: "Durunca Güncelle"
   </voice>
 </phrase>
 <phrase>
@@ -5165,7 +5164,7 @@
     *: "Ayarları Yönet"
   </dest>
   <voice>
-    *: "Manage Settings"
+    *: "Ayarları Yönet"
   </voice>
 </phrase>
 <phrase>
@@ -5176,10 +5175,10 @@
     *: "Cyrillic (CP1251)"
   </source>
   <dest>
-    *: "Cyrillic (CP1251)"
+    *: "Kiril (CP1251)"
   </dest>
   <voice>
-    *: "Cyrillic"
+    *: "Kiril"
   </voice>
 </phrase>
 <phrase>
@@ -5210,7 +5209,7 @@
   </dest>
   <voice>
     *: none
-    crossfade: "Shuffle or Manual Track Skip"
+    crossfade: "Karışık veya Manuel Parça Atlama"
   </voice>
 </phrase>
 <phrase>
@@ -5241,7 +5240,7 @@
     *: "Maksimum Oynatma Listesi Boyutu"
   </dest>
   <voice>
-    *: "Maximum playlist size"
+    *: "Maksimum Oynatma Listesi Boyutu"
   </voice>
 </phrase>
 <phrase>
@@ -5258,7 +5257,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Same As Source"
+    recording: "(Kaynakla aynı)"
   </voice>
 </phrase>
 <phrase>
@@ -5272,7 +5271,7 @@
     *: "Uyumsuz sürüm"
   </dest>
   <voice>
-    *: "Incompatible version"
+    *: "Uyumsuz sürüm"
   </voice>
 </phrase>
 <phrase>
@@ -5283,10 +5282,10 @@
     *: "Discnum"
   </source>
   <dest>
-    *: "Discnum"
+    *: "Disk numarası"
   </dest>
   <voice>
-    *: "Disc number"
+    *: "Disk numarası"
   </voice>
 </phrase>
 <phrase>
@@ -5297,10 +5296,10 @@
     *: "Simp. Chinese (GB2312)"
   </source>
   <dest>
-    *: "Simp. Chinese (GB2312)"
+    *: "Basitleştirilmiş Çince (GB2312)"
   </dest>
   <voice>
-    *: "Simplified Chinese"
+    *: "Basitleştirilmiş Çince"
   </voice>
 </phrase>
 <phrase>
@@ -5331,7 +5330,7 @@
     *: "Bit hızı"
   </dest>
   <voice>
-    *: "Bit rate"
+    *: "Bit hızı"
   </voice>
 </phrase>
 <phrase>
@@ -5348,7 +5347,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Once"
+    recording: "Bir Kere"
   </voice>
 </phrase>
 <phrase>
@@ -5362,7 +5361,7 @@
     *: "Bağlam Menüsü"
   </dest>
   <voice>
-    *: "Context Menu"
+    *: "Bağlam Menüsü"
   </voice>
 </phrase>
 <phrase>
@@ -5376,7 +5375,7 @@
     *: "Özellikler"
   </dest>
   <voice>
-    *: "Properties"
+    *: "Özellikler"
   </voice>
 </phrase>
 <phrase>
@@ -5390,7 +5389,7 @@
     *: "Bununla aç..."
   </dest>
   <voice>
-    *: "open with"
+    *: "Bununla aç..."
   </voice>
 </phrase>
 <phrase>
@@ -5407,7 +5406,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Mode"
+    touchscreen: "Dokunmatik Ekran Modu"
   </voice>
 </phrase>
 <phrase>
@@ -5421,7 +5420,7 @@
     *: "Oran"
   </dest>
   <voice>
-    *: "Ratio"
+    *: "Oran"
   </voice>
 </phrase>
 <phrase>
@@ -5449,7 +5448,7 @@
     *: "Arka Işık Muafiyetleri"
   </dest>
   <voice>
-    *: "Backlight Exemptions"
+    *: "Arka Işık Muafiyetleri"
   </voice>
 </phrase>
 <phrase>
@@ -5477,7 +5476,7 @@
     *: "Besteci"
   </dest>
   <voice>
-    *: "Composer"
+    *: "Besteci"
   </voice>
 </phrase>
 <phrase>
@@ -5494,7 +5493,7 @@
   </dest>
   <voice>
     *: none
-    remote_ticking: "Reduce Ticking"
+    remote_ticking: "İşaretlemeyi Azalt"
   </voice>
 </phrase>
 <phrase>
@@ -5508,7 +5507,7 @@
     *: "En İyi Zaman"
   </dest>
   <voice>
-    *: "Top Time"
+    *: "En İyi Zaman"
   </voice>
 </phrase>
 <phrase>
@@ -5521,11 +5520,11 @@
   </source>
   <dest>
     *: none
-    filter_roll_off: "DAC's filter roll-off"
+    filter_roll_off: "DAC'nin filtre roll-off'u"
   </dest>
   <voice>
     *: none
-    filter_roll_off: "DAC's filter roll-off"
+    filter_roll_off: "DAC'nin filtre roll-off'u"
   </voice>
 </phrase>
 <phrase>
@@ -5567,7 +5566,7 @@
     *: "Bir veya daha fazla dizin seçin"
   </dest>
   <voice>
-    *: "Select one or more directories"
+    *: "Bir veya daha fazla dizin seçin"
   </voice>
 </phrase>
 <phrase>
@@ -5598,7 +5597,7 @@
     *: "Adım Boyutunu Kaydır"
   </dest>
   <voice>
-    *: "Scroll Step Size"
+    *: "Adım Boyutunu Kaydır"
   </voice>
 </phrase>
 <phrase>
@@ -5615,7 +5614,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Split Time"
+    recording: "Ayrık Zaman"
   </voice>
 </phrase>
 <phrase>
@@ -5632,7 +5631,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Left Quickscreen Item"
+    quickscreen: "Sol Hızlı Ekran Öğesi Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -5660,7 +5659,7 @@
     *: "%d Hz Band Kazancı"
   </dest>
   <voice>
-    *: "hertz band gain"
+    *: "%d Hz Band Kazancı"
   </voice>
 </phrase>
 <phrase>
@@ -5688,7 +5687,7 @@
     *: "Uyumsuz model"
   </dest>
   <voice>
-    *: "Incompatible model"
+    *: "Uyumsuz model"
   </voice>
 </phrase>
 <phrase>
@@ -5719,7 +5718,7 @@
     *: "Dosya yok"
   </dest>
   <voice>
-    *: "No files"
+    *: "Dosya yok"
   </voice>
 </phrase>
 <phrase>
@@ -5750,7 +5749,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Signal strength:"
+    radio: "Sinyal gücü:"
   </voice>
 </phrase>
 <phrase>
@@ -5763,11 +5762,11 @@
   </source>
   <dest>
     *: none
-    radio: "Japan"
+    radio: "Japonya"
   </dest>
   <voice>
     *: none
-    radio: "Japan"
+    radio: "Japonya"
   </voice>
 </phrase>
 <phrase>
@@ -5778,10 +5777,10 @@
     *: "Moderate"
   </source>
   <dest>
-    *: "Moderate"
+    *: "Makul"
   </dest>
   <voice>
-    *: "Moderate"
+    *: "Makul"
   </voice>
 </phrase>
 <phrase>
@@ -5840,7 +5839,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Bottom Quickscreen Item"
+    quickscreen: "Alt Hızlı Ekran Öğesi Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -5865,10 +5864,10 @@
     *: "Credits"
   </source>
   <dest>
-    *: "Credits"
+    *: "Kredi"
   </dest>
   <voice>
-    *: "Credits"
+    *: "Kredi"
   </voice>
 </phrase>
 <phrase>
@@ -5881,11 +5880,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Ayarla"
+    alarm: "Alarm kuruldu"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm set"
+    alarm: "Alarm kuruldu"
   </voice>
 </phrase>
 <phrase>
@@ -5902,7 +5901,7 @@
   </dest>
   <voice>
     *: none
-    pitchscreen: "Semitone"
+    pitchscreen: "Yarım ton"
   </voice>
 </phrase>
 <phrase>
@@ -5916,7 +5915,7 @@
     *: "Veritabanı hazır değil"
   </dest>
   <voice>
-    *: "Database is not ready"
+    *: "Veritabanı hazır değil"
   </voice>
 </phrase>
 <phrase>
@@ -5944,10 +5943,10 @@
     *: "Clear Time?"
   </source>
   <dest>
-    *: "Clear Time?"
+    *: "Süreyi Sıfırla?"
   </dest>
   <voice>
-    *: "Clear Time?"
+    *: "Süreyi Sıfırla?"
   </voice>
 </phrase>
 <phrase>
@@ -5989,7 +5988,7 @@
     *: "Yolu Göster"
   </dest>
   <voice>
-    *: "Show Path"
+    *: "Yolu Göster"
   </voice>
 </phrase>
 <phrase>
@@ -6003,7 +6002,7 @@
     *: ""
   </dest>
   <voice>
-    *: "billion"
+    *: "milyar"
   </voice>
 </phrase>
 <phrase>
@@ -6048,7 +6047,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minus"
+    *: "Eksi"
   </voice>
 </phrase>
 <phrase>
@@ -6076,7 +6075,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "işaret levhası"
   </voice>
 </phrase>
 <phrase>
@@ -6087,10 +6086,10 @@
     *: "Central European (CP1250)"
   </source>
   <dest>
-    *: "Central European (CP1250)"
+    *: "Orta Avrupa (CP1250)"
   </dest>
   <voice>
-    *: "Central European"
+    *: "Orta Avrupa"
   </voice>
 </phrase>
 <phrase>
@@ -6149,7 +6148,7 @@
     *: "Dosya Tarayıcıda Maksimum Giriş"
   </dest>
   <voice>
-    *: "Maximum entries in file browser"
+    *: "Dosya Tarayıcıda Maksimum Giriş"
   </voice>
 </phrase>
 <phrase>
@@ -6177,10 +6176,10 @@
     *: "Hard Knee"
   </source>
   <dest>
-    *: "Hard Knee"
+    *: "Sert Knee"
   </dest>
   <voice>
-    *: "Hard Knee"
+    *: "Sert Knee"
   </voice>
 </phrase>
 <phrase>
@@ -6193,11 +6192,11 @@
   </source>
   <dest>
     *: none
-    recording: "Trigtype"
+    recording: "tetik tipi"
   </dest>
   <voice>
     *: none
-    recording: "Trigger type"
+    recording: "tetik tipi"
   </voice>
 </phrase>
 <phrase>
@@ -6228,7 +6227,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Bar (Solid Colour)"
+    lcd_color: "Bar (Katı Renk)"
   </voice>
 </phrase>
 <phrase>
@@ -6255,11 +6254,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "3x3 Grid"
+    touchscreen: "3x3 Izgara"
   </dest>
   <voice>
     *: none
-    touchscreen: "3 by 3 grid"
+    touchscreen: "3x3 Izgara"
   </voice>
 </phrase>
 <phrase>
@@ -6300,11 +6299,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Waking Up In %d:%02d"
+    alarm: "süre içinde uyanma %d:%02d"
   </dest>
   <voice>
     *: none
-    alarm: "uyanma"
+    alarm: "içinde uyanmak"
   </voice>
 </phrase>
 <phrase>
@@ -6394,7 +6393,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Can't write to recording directory"
+    recording: "Kayıt dizinine yazılamıyor"
   </voice>
 </phrase>
 <phrase>
@@ -6433,10 +6432,10 @@
     *: "Knee"
   </source>
   <dest>
-    *: "Knee"
+    *: "Knee (Diz?)"
   </dest>
   <voice>
-    *: "Knee"
+    *: "Knee (Diz?)"
   </voice>
 </phrase>
 <phrase>
@@ -6450,7 +6449,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hundred"
+    *: "Yüz"
   </voice>
 </phrase>
 <phrase>
@@ -6464,7 +6463,7 @@
     *: "Kuyruk Sonu"
   </dest>
   <voice>
-    *: "Queue Last"
+    *: "Kuyruk Sonu"
   </voice>
 </phrase>
 <phrase>
@@ -6492,7 +6491,7 @@
     *: "Parça Atlamada Bip Sesi"
   </dest>
   <voice>
-    *: "Track Skip Beep"
+    *: "Parça Atlamada Bip Sesi"
   </voice>
 </phrase>
 <phrase>
@@ -6579,10 +6578,10 @@
     *: "f(x1)"
   </source>
   <dest>
-    *: "f(x1)"
+    *: "Surround f(x1)"
   </dest>
   <voice>
-    *: "f(x1)"
+    *: "Surround f(x1)"
   </voice>
 </phrase>
 <phrase>
@@ -6596,7 +6595,7 @@
     *: ""
   </dest>
   <voice>
-    *: "font"
+    *: "Yazı Tipi"
   </voice>
 </phrase>
 <phrase>
@@ -6609,11 +6608,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Fade-Out Delay"
+    crossfade: "Kararma Gecikmesi"
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out Delay"
+    crossfade: "Kararma Gecikmesi"
   </voice>
 </phrase>
 <phrase>
@@ -6669,7 +6668,7 @@
     *: "Disk:"
   </source>
   <dest>
-    *: "Disk:"
+    *: "Disk Boyutu:"
   </dest>
   <voice>
     *: "Disk boyutu"
@@ -6714,10 +6713,10 @@
     *: "Limit"
   </source>
   <dest>
-    *: "Limit"
+    *: "Sınır"
   </dest>
   <voice>
-    *: "Limit"
+    *: "Sınır"
   </voice>
 </phrase>
 <phrase>
@@ -6728,10 +6727,10 @@
     *: "Start File Browser at /"
   </source>
   <dest>
-    *: "Dosya Tarayıcıyı konumunda başlatın	"
+    *: "Dosya Tarayıcı konumunda başlatın	"
   </dest>
   <voice>
-    *: "Start File Browser at root"
+    *: "Dosya Tarayıcı konumunda başlatın	"
   </voice>
 </phrase>
 <phrase>
@@ -6748,7 +6747,7 @@
   </dest>
   <voice>
     *: none
-    dircache: "Directory Cache"
+    dircache: "Dizin Önbelleği"
   </voice>
 </phrase>
 <phrase>
@@ -6765,7 +6764,7 @@
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Time Is Too Soon!"
+    alarm: "Alarm Zamanı Çok Yakında!"
   </voice>
 </phrase>
 <phrase>
@@ -6824,7 +6823,7 @@
     *: "Sor - Yalnızca son zamanlarda"
   </dest>
   <voice>
-    *: "Ask - Recent only"
+    *: "Sor - Yalnızca son zamanlarda"
   </voice>
 </phrase>
 <phrase>
@@ -6841,7 +6840,7 @@
   </dest>
   <voice>
     *: none
-    gigabeatfx: "High"
+    gigabeatfx: "Yüksek"
   </voice>
 </phrase>
 <phrase>
@@ -6869,7 +6868,7 @@
     *: "Pil"
   </dest>
   <voice>
-    *: "Battery"
+    *: "Pil"
   </voice>
 </phrase>
 <phrase>
@@ -6914,7 +6913,7 @@
   </dest>
   <voice>
     *: none
-    radio: "FM Radio Menu"
+    radio: "FM Radio Menüsü"
   </voice>
 </phrase>
 <phrase>
@@ -6945,7 +6944,7 @@
   </dest>
   <voice>
     *: none
-    multidrive_usb: "USB Hide Internal Drive"
+    multidrive_usb: "USB Dahili Sürücüyü Gizle"
   </voice>
 </phrase>
 <phrase>
@@ -6958,11 +6957,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Pitch (Aralık)"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Pitch"
+    pitchscreen: "Pitch (Aralık)"
   </voice>
 </phrase>
 <phrase>
@@ -6976,7 +6975,7 @@
     *: "Parça Bilgisini Göster"
   </dest>
   <voice>
-    *: "Show Track Info"
+    *: "Parça Bilgisini Göster"
   </voice>
 </phrase>
 <phrase>
@@ -6993,7 +6992,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Source"
+    recording: "Kaynak"
   </voice>
 </phrase>
 <phrase>
@@ -7007,7 +7006,7 @@
     *: "Arka planda güncelle"
   </dest>
   <voice>
-    *: "Updating in background"
+    *: "Arka planda güncelle"
   </voice>
 </phrase>
 <phrase>
@@ -7021,7 +7020,7 @@
     *: "Oynatma listesi kontrol dosyası geçersiz"
   </dest>
   <voice>
-    *: "Playlist control file is invalid"
+    *: "Oynatma listesi kontrol dosyası geçersiz"
   </voice>
 </phrase>
 <phrase>
@@ -7035,7 +7034,7 @@
     *: "Duraklatıldığında Geri Sar"
   </dest>
   <voice>
-    *: "Rewind on Pause"
+    *: "Duraklatıldığında Geri Sar"
   </voice>
 </phrase>
 <phrase>
@@ -7049,7 +7048,7 @@
     *: "Sağ"
   </dest>
   <voice>
-    *: "Right"
+    *: "Sağ"
   </voice>
 </phrase>
 <phrase>
@@ -7063,7 +7062,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "Bllenim-firmware"
   </voice>
 </phrase>
 <phrase>
@@ -7077,7 +7076,7 @@
     *: "Uyku Zamanlayıcısını Başlat"
   </dest>
   <voice>
-    *: "Start Sleep Timer"
+    *: "Uyku Zamanlayıcısını Başlat"
   </voice>
 </phrase>
 <phrase>
@@ -7105,7 +7104,7 @@
     *: "Şarkı Listesinin Sonu"
   </dest>
   <voice>
-    *: "End of Song List"
+    *: "Şarkı Listesinin Sonu"
   </voice>
 </phrase>
 <phrase>
@@ -7119,7 +7118,7 @@
     *: "Geçerli Oynatma Listesini Kaydet"
   </dest>
   <voice>
-    *: "Save Current Playlist"
+    *: "Geçerli Oynatma Listesini Kaydet"
   </voice>
 </phrase>
 <phrase>
@@ -7132,11 +7131,11 @@
   </source>
   <dest>
     *: none
-    sansafuzeplus: "Touchpad Dead Zone"
+    sansafuzeplus: "Dokunmatik Yüzey Ölü Bölge"
   </dest>
   <voice>
     *: none
-    sansafuzeplus: "Touchpad Dead Zone"
+    sansafuzeplus: "Dokunmatik Yüzey Ölü Bölge"
   </voice>
 </phrase>
 <phrase>
@@ -7147,10 +7146,10 @@
     *: "By Newest Date"
   </source>
   <dest>
-    *: "En Yeni Tarihe Göre"
+    *: "Tarihe Göre-En Yeni"
   </dest>
   <voice>
-    *: "By Newest Date"
+    *: "Tarihe Göre-En Yeni"
   </voice>
 </phrase>
 <phrase>
@@ -7164,7 +7163,7 @@
     *: "Eşlenmemiş Anahtarları Devre Dışı Bırak"
   </dest>
   <voice>
-    *: "Disable Unmapped Keys"
+    *: "Eşlenmemiş Anahtarları Devre Dışı Bırak"
   </voice>
 </phrase>
 <phrase>
@@ -7181,7 +7180,7 @@
   </dest>
   <voice>
     *: none
-    quickscreen: "Use Shortcuts Menu Instead of Quick Screen"
+    quickscreen: "Hızlı Ekran Yerine Kısayollar Menüsünü Kullanın"
   </voice>
 </phrase>
 <phrase>
@@ -7215,7 +7214,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Preset"
+    radio: "Ön Ayar"
   </voice>
 </phrase>
 <phrase>
@@ -7232,7 +7231,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Recording Settings"
+    recording: "Kayıt Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -7243,10 +7242,10 @@
     *: "Maintain a List of Recent Bookmarks?"
   </source>
   <dest>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Son Yer İmlerinin Bir Listesi Korunsun mu?"
   </dest>
   <voice>
-    *: "Maintain a List of Recent Bookmarks?"
+    *: "Son Yer İmlerinin Bir Listesi Korunsun mu?"
   </voice>
 </phrase>
 <phrase>
@@ -7259,11 +7258,11 @@
   </source>
   <dest>
     *: none
-    headphone_detection: "Telefonlar takılı değilse başlangıçta devam etmeyi devre dışı bırakın"
+    headphone_detection: "Kulaklık takılı değilse başlangıçta devam etmeyi devre dışı bırakın"
   </dest>
   <voice>
     *: none
-    headphone_detection: "Disable resume on startup if phones unplugged"
+    headphone_detection: "Kulaklık takılı değilse başlangıçta devam etmeyi devre dışı bırakın"
   </voice>
 </phrase>
 <phrase>
@@ -7297,7 +7296,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Set As Recording Directory"
+    recording: "Kayıt Dizini Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -7308,10 +7307,10 @@
     *: "Moving..."
   </source>
   <dest>
-    *: "Moving..."
+    *: "Hareketli..."
   </dest>
   <voice>
-    *: "Moving"
+    *: "Hareketli..."
   </voice>
 </phrase>
 <phrase>
@@ -7328,7 +7327,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Load Preset List"
+    radio: "Ön Ayar Listesini Yükle"
   </voice>
 </phrase>
 <phrase>
@@ -7345,7 +7344,7 @@
   </dest>
   <voice>
     *: none
-    hold_button: "Backlight on hold"
+    hold_button: "Beklemede Arka Işık"
   </voice>
 </phrase>
 <phrase>
@@ -7362,7 +7361,7 @@
   </dest>
   <voice>
     *: none
-    filter_roll_off: "Sharp"
+    filter_roll_off: "Keskin"
   </voice>
 </phrase>
 <phrase>
@@ -7376,7 +7375,7 @@
     *: "Otomatik güncelleme"
   </dest>
   <voice>
-    *: "Auto Update"
+    *: "Otomatik güncelleme"
   </voice>
 </phrase>
 <phrase>
@@ -7390,7 +7389,7 @@
     *: "Yalnızca özel dizinlerde"
   </dest>
   <voice>
-    *: "In custom directories only"
+    *: "Yalnızca özel dizinlerde"
   </voice>
 </phrase>
 <phrase>
@@ -7401,10 +7400,10 @@
     *: "View"
   </source>
   <dest>
-    *: "View"
+    *: "Görüntüle"
   </dest>
   <voice>
-    *: "View"
+    *: "Görüntüle"
   </voice>
 </phrase>
 <phrase>
@@ -7418,7 +7417,7 @@
     *: "Kopyala"
   </dest>
   <voice>
-    *: "Copy"
+    *: "Kopyala"
   </voice>
 </phrase>
 <phrase>
@@ -7435,7 +7434,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Touchscreen Settings"
+    touchscreen: "Dokunmatik Ekran Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -7449,7 +7448,7 @@
     *: "Dizin Oluştur"
   </dest>
   <voice>
-    *: "Create Directory"
+    *: "Dizin Oluştur"
   </voice>
 </phrase>
 <phrase>
@@ -7463,7 +7462,7 @@
     *: ""
   </dest>
   <voice>
-    *: "percent"
+    *: "yüzde"
   </voice>
 </phrase>
 <phrase>
@@ -7476,11 +7475,11 @@
   </source>
   <dest>
     *: none
-    radio: "Korea"
+    radio: "Kore"
   </dest>
   <voice>
     *: none
-    radio: "Korea"
+    radio: "Kore"
   </voice>
 </phrase>
 <phrase>
@@ -7491,10 +7490,10 @@
     *: "Western European (CP1252)"
   </source>
   <dest>
-    *: "Western European (CP1252)"
+    *: "Batı Avrupa (CP1252)"
   </dest>
   <voice>
-    *: "Western European"
+    *: "Batı Avrupa"
   </voice>
 </phrase>
 <phrase>
@@ -7522,7 +7521,7 @@
     *: "Sonraki"
   </dest>
   <voice>
-    *: "Queue Next"
+    *: "Sonraki"
   </voice>
 </phrase>
 <phrase>
@@ -7535,11 +7534,11 @@
   </source>
   <dest>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Yeniden etkinleştir)"
   </dest>
   <voice>
     *: none
-    remote: "(Vol- : Re-enable)"
+    remote: "(Vol- : Yeniden etkinleştir)"
   </voice>
 </phrase>
 <phrase>
@@ -7570,7 +7569,7 @@
   </dest>
   <voice>
     *: none
-    spdif_power: "Optical Output"
+    spdif_power: "Optik Çıkış"
   </voice>
 </phrase>
 <phrase>
@@ -7612,7 +7611,7 @@
     *: "Devam edecek bir şey yok"
   </dest>
   <voice>
-    *: "Nothing to resume"
+    *: "Devam edecek bir şey yok"
   </voice>
 </phrase>
 <phrase>
@@ -7626,7 +7625,7 @@
     *: "Sonrakini Ekle"
   </dest>
   <voice>
-    *: "Insert Next"
+    *: "Sonrakini Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -7640,7 +7639,7 @@
     *: "Sayılar"
   </dest>
   <voice>
-    *: "Numbers"
+    *: "Sayılar"
   </voice>
 </phrase>
 <phrase>
@@ -7657,7 +7656,7 @@
   </dest>
   <voice>
     *: none
-    agc: "Voice (fast)"
+    agc: "Ses (hızlı)"
   </voice>
 </phrase>
 <phrase>
@@ -7669,11 +7668,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "List Acceleration Start Delay"
+    *: "Liste Hızlandırma Başlatma Gecikmesi"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Start Delay"
+    *: "Liste Hızlandırma Başlatma Gecikmesi"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -7687,11 +7686,11 @@
   </source>
   <dest>
     *: none
-    radio: "Italy"
+    radio: "Italya"
   </dest>
   <voice>
     *: none
-    radio: "Italy"
+    radio: "Italya"
   </voice>
 </phrase>
 <phrase>
@@ -7733,10 +7732,10 @@
     *: "Makeup Gain"
   </source>
   <dest>
-    *: "Makeup Gain"
+    *: "Makeup Kazanç"
   </dest>
   <voice>
-    *: "Makeup Gain"
+    *: "Makeup  Kazanç"
   </voice>
 </phrase>
 <phrase>
@@ -7750,7 +7749,7 @@
     *: "Oynatma Listesi Kataloğu"
   </dest>
   <voice>
-    *: "Playlist Catalogue"
+    *: "Oynatma Listesi Kataloğu"
   </voice>
 </phrase>
 <phrase>
@@ -7767,7 +7766,7 @@
   </dest>
   <voice>
     *: none
-    recording: "What to do when Splitting"
+    recording: "Bölme yaparken ne yapmalı"
   </voice>
 </phrase>
 <phrase>
@@ -7780,11 +7779,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "sınır"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Limit"
+    pitchscreen: "sınır"
   </voice>
 </phrase>
 <phrase>
@@ -7795,10 +7794,10 @@
     *: "Dithering"
   </source>
   <dest>
-    *: "Dithering"
+    *: "Duraksama"
   </dest>
   <voice>
-    *: "Dithering"
+    *: "Duraksama"
   </voice>
 </phrase>
 <phrase>
@@ -7815,7 +7814,7 @@
   </dest>
   <voice>
     *: none
-    radio: "Scan"
+    radio: "Tara"
   </voice>
 </phrase>
 <phrase>
@@ -7846,7 +7845,7 @@
   </dest>
   <voice>
     *: none
-    recording: "Digital"
+    recording: "Dijital"
   </voice>
 </phrase>
 <phrase>
@@ -7874,7 +7873,7 @@
     *: "Değişiklikleri İçe Aktar"
   </dest>
   <voice>
-    *: "Import Modifications"
+    *: "Değişiklikleri İçe Aktar"
   </voice>
 </phrase>
 <phrase>
@@ -7891,7 +7890,7 @@
   </dest>
   <voice>
     *: none
-    lcd_non-mono: "Clear Backdrop"
+    lcd_non-mono: "Backdrop Zemini Temizle"
   </voice>
 </phrase>
 <phrase>
@@ -7908,7 +7907,7 @@
   </dest>
   <voice>
     *: none
-    touchscreen: "Cancel"
+    touchscreen: "İptal"
   </voice>
 </phrase>
 <phrase>
@@ -7922,7 +7921,7 @@
     *: "Yeniden Oynatma Türü"
   </dest>
   <voice>
-    *: "Replaygain Type"
+    *: "Yeniden Oynatma Türü"
   </voice>
 </phrase>
 <phrase>
@@ -7936,7 +7935,7 @@
     *: "Değişiklikleri Dışa Aktar"
   </dest>
   <voice>
-    *: "Export Modifications"
+    *: "Değişiklikleri Dışa Aktar"
   </voice>
 </phrase>
 <phrase>
@@ -7950,7 +7949,7 @@
     *: "Ayarları Sıfırla"
   </dest>
   <voice>
-    *: "Reset Setting"
+    *: "Ayarları Sıfırla"
   </voice>
 </phrase>
 <phrase>
@@ -7963,11 +7962,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Del"
+    touchscreen: "Sil"
   </dest>
   <voice>
     *: none
-    touchscreen: "Del"
+    touchscreen: "Sil"
   </voice>
 </phrase>
 <phrase>
@@ -7984,7 +7983,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Text Colour"
+    lcd_color: "Metin Rengi"
   </voice>
 </phrase>
 <phrase>
@@ -7998,7 +7997,7 @@
     *: "Oynatma listesine ekle"
   </dest>
   <voice>
-    *: "Add to Playlist"
+    *: "Oynatma listesine ekle"
   </voice>
 </phrase>
 <phrase>
@@ -8012,7 +8011,7 @@
     *: "yeniden karıştır"
   </dest>
   <voice>
-    *: "Reshuffle"
+    *: "yeniden karıştır"
   </voice>
 </phrase>
 <phrase>
@@ -8026,7 +8025,7 @@
     *: "<Etiketlenmemiş>"
   </dest>
   <voice>
-    *: "Untagged"
+    *: "<Etiketlenmemiş>"
   </voice>
 </phrase>
 <phrase>
@@ -8040,7 +8039,7 @@
     *: "Otomatik Değişimi Kısıtla"
   </dest>
   <voice>
-    *: "Constrain Auto-Change"
+    *: "Otomatik Değişimi Kısıtla"
   </voice>
 </phrase>
 <phrase>
@@ -8054,7 +8053,7 @@
     *: "Yorumcu"
   </dest>
   <voice>
-    *: "Comment"
+    *: "Yorumcu"
   </voice>
 </phrase>
 <phrase>
@@ -8071,7 +8070,7 @@
   </dest>
   <voice>
     *: none
-    lcd_color: "Foreground Colour"
+    lcd_color: "Ön Plan Rengi"
   </voice>
 </phrase>
 <phrase>
@@ -8084,11 +8083,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote While Playing Screen"
+    remote: "Oynatma Ekranı Kontrolü"
   </dest>
   <voice>
     *: none
-    remote: "Remote While Playing Screen"
+    remote: "Oynatma Ekranı Kontrolü"
   </voice>
 </phrase>
 <phrase>
@@ -8119,7 +8118,7 @@
   </dest>
   <voice>
     *: none
-    remote: "Remote Statusbar"
+    remote: "Durum Çubuğu Kontrolü"
   </voice>
 </phrase>
 <phrase>
@@ -8222,11 +8221,11 @@
   </source>
   <dest>
     *: none
-    radio: "Europe"
+    radio: "Avrupa"
   </dest>
   <voice>
     *: none
-    radio: "Europe"
+    radio: "Avrupa"
   </voice>
 </phrase>
 <phrase>
@@ -8237,10 +8236,10 @@
     *: "Recursively Insert Directories"
   </source>
   <dest>
-    *: "Recursively Insert Directories"
+    *: "Dizinleri Özyinelemeli Ekle"
   </dest>
   <voice>
-    *: "Recursively Insert Directories"
+    *: "Dizinleri Özyinelemeli Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -8251,10 +8250,10 @@
     *: "Weak"
   </source>
   <dest>
-    *: "Weak"
+    *: "Zayıf"
   </dest>
   <voice>
-    *: "Weak"
+    *: "Zayıf"
   </voice>
 </phrase>
 <phrase>
@@ -8265,10 +8264,10 @@
     *: "Glyphs To Cache"
   </source>
   <dest>
-    *: "Glyphs To Cache"
+    *: "Önbelleğe Alınacak Glifler"
   </dest>
   <voice>
-    *: "Glyphs To Cache"
+    *: "Önbelleğe Alınacak Glifler"
   </voice>
 </phrase>
 <phrase>
@@ -8279,10 +8278,10 @@
     *: "Sort Files"
   </source>
   <dest>
-    *: "Sort Files"
+    *: "Dosyaları Sırala"
   </dest>
   <voice>
-    *: "sort files"
+    *: "Dosyaları Sırala"
   </voice>
 </phrase>
 <phrase>
@@ -8293,10 +8292,10 @@
     *: "Free:"
   </source>
   <dest>
-    *: "Free:"
+    *: "Boş Alan:"
   </dest>
   <voice>
-    *: "Free diskspace:"
+    *: "Boş Alan:"
   </voice>
 </phrase>
 <phrase>
@@ -8307,10 +8306,10 @@
     *: "<No Info>"
   </source>
   <dest>
-    *: "<No Info>"
+    *: "<Bilgi Yok>"
   </dest>
   <voice>
-    *: "No info"
+    *: "Bilgi yok"
   </voice>
 </phrase>
 <phrase>
@@ -8327,7 +8326,7 @@
   </dest>
   <voice>
     *: none
-    recording: "minus infinity"
+    recording: "eksi sonsuzluk"
   </voice>
 </phrase>
 <phrase>
@@ -8355,10 +8354,10 @@
     *: "Paste"
   </source>
   <dest>
-    *: "Paste"
+    *: "Yapıştır"
   </dest>
   <voice>
-    *: "Paste"
+    *: "Yapıştır"
   </voice>
 </phrase>
 <phrase>
@@ -8369,10 +8368,10 @@
     *: "Prevent Track Skipping"
   </source>
   <dest>
-    *: "Prevent Track Skipping"
+    *: "Atlamayı Önle"
   </dest>
   <voice>
-    *: "Prevent Track Skipping"
+    *: "Atlamayı Önle"
   </voice>
 </phrase>
 <phrase>
@@ -8383,10 +8382,10 @@
     *: "Track Display"
   </source>
   <dest>
-    *: "Track Display"
+    *: "Parça Ekranı"
   </dest>
   <voice>
-    *: "Track Display"
+    *: "Parça Ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -8414,7 +8413,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "Oynatma Ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -8439,10 +8438,10 @@
     *: "Browse Theme Files"
   </source>
   <dest>
-    *: "Browse Theme Files"
+    *: "Tema Dosyalarına Göz Atın"
   </dest>
   <voice>
-    *: "Browse Theme Files"
+    *: "Tema Dosyalarına Göz Atın"
   </voice>
 </phrase>
 <phrase>
@@ -8453,10 +8452,10 @@
     *: "Inserted %d tracks (%s)"
   </source>
   <dest>
-    *: "Inserted %d tracks (%s)"
+    *: "Eklendi %d Parça (%s)"
   </dest>
   <voice>
-    *: "tracks inserted"
+    *: "eklenen parçalar"
   </voice>
 </phrase>
 <phrase>
@@ -8497,11 +8496,11 @@
   </source>
   <dest>
     *: none
-    radio: "Region"
+    radio: "Bölge"
   </dest>
   <voice>
     *: none
-    radio: "Region"
+    radio: "Bölge"
   </voice>
 </phrase>
 <phrase>
@@ -8512,10 +8511,10 @@
     *: "Track Gain if Shuffling"
   </source>
   <dest>
-    *: "Track Gain if Shuffling"
+    *: "Karıştırılıyorsa Kazancı Takip Edin"
   </dest>
   <voice>
-    *: "Track Gain if Shuffling"
+    *: "Karıştırılıyorsa Kazancı Takip Edin"
   </voice>
 </phrase>
 <phrase>
@@ -8540,10 +8539,10 @@
     *: "Use Directory .talk Clips"
   </source>
   <dest>
-    *: "Use Directory .talk Clips"
+    *: "Directory .talk Kliplerini Kullanın"
   </dest>
   <voice>
-    *: "Use Directory .talk Clips"
+    *: "Directory .talk Kliplerini Kullanın"
   </voice>
 </phrase>
 <phrase>
@@ -8554,10 +8553,10 @@
     *: "Thai (ISO-8859-11)"
   </source>
   <dest>
-    *: "Thai (ISO-8859-11)"
+    *: "Tayca (ISO-8859-11)"
   </dest>
   <voice>
-    *: "Thai"
+    *: "Tayca"
   </voice>
 </phrase>
 <phrase>
@@ -8568,10 +8567,10 @@
     *: "Searching... %d found (%s)"
   </source>
   <dest>
-    *: "Searching... %d found (%s)"
+    *: "Aranıyor... %d Bulundu (%s)"
   </dest>
   <voice>
-    *: "Found"
+    *: "Bulundu"
   </voice>
 </phrase>
 <phrase>
@@ -8582,10 +8581,10 @@
     *: "Insert Shuffled"
   </source>
   <dest>
-    *: "Insert Shuffled"
+    *: "Karışık Ekle"
   </dest>
   <voice>
-    *: "Insert Shuffled"
+    *: "Karışık Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -8596,10 +8595,10 @@
     *: "Upside Down"
   </source>
   <dest>
-    *: "Upside Down"
+    *: "Başaşağı"
   </dest>
   <voice>
-    *: "Upside Down"
+    *: "Başaşağı"
   </voice>
 </phrase>
 <phrase>
@@ -8612,11 +8611,11 @@
   </source>
   <dest>
     *: none
-    agc: "DJ-Set (slow)"
+    agc: "DJ Seti (yavaş)"
   </dest>
   <voice>
     *: none
-    agc: "DJ set (slow)"
+    agc: "DJ Seti (yavaş)"
   </voice>
 </phrase>
 <phrase>
@@ -8627,7 +8626,7 @@
     *: "Buttons Locked"
   </source>
   <dest>
-    *: "Buttons Locked"
+    *: "Tuşlar Kilitli"
   </dest>
   <voice>
     *: ""
@@ -8644,13 +8643,13 @@
   </source>
   <dest>
     *: none
-    iriverh100,iriverh120,iriverh300: "Internal Microphone"
-    recording: "Microphone"
+    iriverh100,iriverh120,iriverh300: "Dahili Mikrofon"
+    recording: "Mikrofon"
   </dest>
   <voice>
     *: none
-    iriverh100,iriverh120,iriverh300: "Internal Microphone"
-    recording: "Microphone"
+    iriverh100,iriverh120,iriverh300: "Dahili Mikrofon"
+    recording: "Mikrofon"
   </voice>
 </phrase>
 <phrase>
@@ -8661,10 +8660,10 @@
     *: "Spell"
   </source>
   <dest>
-    *: "Spell"
+    *: "Harf harf kodlamak"
   </dest>
   <voice>
-    *: "Spell"
+    *: "Harf harf kodlamak"
   </voice>
 </phrase>
 <phrase>
@@ -8675,10 +8674,10 @@
     *: "Add to Shortcuts"
   </source>
   <dest>
-    *: "Add to Shortcuts"
+    *: "Kısayollara Ekle"
   </dest>
   <voice>
-    *: "Add to Shortcuts"
+    *: "Kısayollara Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -8689,10 +8688,10 @@
     *: "File/directory exists. Overwrite?"
   </source>
   <dest>
-    *: "File/directory exists. Overwrite?"
+    *: "Dosya/dizin var. Üzerine yazılsın mı?"
   </dest>
   <voice>
-    *: "File or directory exists. Overwrite?"
+    *: "Dosya/dizin var. Üzerine yazılsın mı?"
   </voice>
 </phrase>
 <phrase>
@@ -8703,10 +8702,10 @@
     *: "Skip to Outro"
   </source>
   <dest>
-    *: "Skip to Outro"
+    *: "Bitimden 5sn. atla"
   </dest>
   <voice>
-    *: "Skip to Outro"
+    *: "Bitimden 5sn. atla"
   </voice>
 </phrase>
 <phrase>
@@ -8720,7 +8719,7 @@
     *: ""
   </dest>
   <voice>
-    *: "audio"
+    *: "Ses"
   </voice>
 </phrase>
 <phrase>
@@ -8733,11 +8732,11 @@
   </source>
   <dest>
     *: none
-    radio: "Auto-Scan Presets"
+    radio: "Otomatik Tarama Ön Ayarları"
   </dest>
   <voice>
     *: none
-    radio: "Auto scan presets"
+    radio: "Otomatik Tarama Ön Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -8764,11 +8763,11 @@
   </source>
   <dest>
     *: none
-    recording: "New file"
+    recording: "Yeni dosya"
   </dest>
   <voice>
     *: none
-    recording: "New file"
+    recording: "Yeni dosya"
   </voice>
 </phrase>
 <phrase>
@@ -8810,10 +8809,10 @@
     *: "Insert Last Shuffled"
   </source>
   <dest>
-    *: "Insert Last Shuffled"
+    *: "Son Karıştırılanı Ekle"
   </dest>
   <voice>
-    *: "Insert Last Shuffled"
+    *: "Son Karıştırılanı Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -8826,11 +8825,11 @@
   </source>
   <dest>
     *: none
-    remote: "Main and Remote Unit"
+    remote: "Ana ve Uzak Ünite"
   </dest>
   <voice>
     *: none
-    remote: "Main and remote unit"
+    remote: "Ana ve Uzak Ünite"
   </voice>
 </phrase>
 <phrase>
@@ -8841,10 +8840,10 @@
     *: "Scroll Start Delay"
   </source>
   <dest>
-    *: "Scroll Start Delay"
+    *: "Kaydırma Başlatma Gecikmesi"
   </dest>
   <voice>
-    *: "Scroll Start Delay"
+    *: "Kaydırma Başlatma Gecikmesi"
   </voice>
 </phrase>
 <phrase>
@@ -8855,10 +8854,10 @@
     *: "Error accessing playlist file"
   </source>
   <dest>
-    *: "Error accessing playlist file"
+    *: "Oynatma listesi dosyasına erişilirken hata oluştu"
   </dest>
   <voice>
-    *: "Error accessing playlist file"
+    *: "Oynatma listesi dosyasına erişilirken hata oluştu"
   </voice>
 </phrase>
 <phrase>
@@ -8869,10 +8868,10 @@
     *: "Year"
   </source>
   <dest>
-    *: "Year"
+    *: "Yıl"
   </dest>
   <voice>
-    *: "Year"
+    *: "Yıl"
   </voice>
 </phrase>
 <phrase>
@@ -8885,11 +8884,11 @@
   </source>
   <dest>
     *: none
-    recording: "Presplit Gap"
+    recording: "Önceden Bölünmüş Boşluk"
   </dest>
   <voice>
     *: none
-    recording: "Presplit Gap"
+    recording: "Önceden Bölünmüş Boşluk"
   </voice>
 </phrase>
 <phrase>
@@ -8902,11 +8901,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "kalibre et"
   </dest>
   <voice>
     *: none
-    touchscreen: "Calibrate"
+    touchscreen: "kalibre et"
   </voice>
 </phrase>
 <phrase>
@@ -8925,13 +8924,13 @@
   </source>
   <dest>
     *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    alarm: "OYNAT=KAPALI olarak ayarla=İptal"
+    gigabeats: "SELECT=GÜÇ Ayarla=İptal"
+    ipod*: "SELECT=Ayarla,MENÜ=İptal"
+    iriverh10,iriverh10_5gb: "SELECT=Ayarla PREV=İptal"
+    mpiohd300: "ENTER=Ayarla MENÜ=İptal"
+    sansafuzeplus: "SELECT=GERİ Ayarla=İptal"
+    vibe500: "Tamam=Ayarla, C=İptal"
   </dest>
   <voice>
     *: none
@@ -8946,10 +8945,10 @@
     *: "Peak Filter %d"
   </source>
   <dest>
-    *: "Peak Filter %d"
+    *: "Tepe Filtresi %d"
   </dest>
   <voice>
-    *: "Peak filter"
+    *: "Tepe Filtresi"
   </voice>
 </phrase>
 <phrase>
@@ -8962,11 +8961,11 @@
   </source>
   <dest>
     *: none
-    recording: "Encoder Settings"
+    recording: "Kodlayıcı Ayarları"
   </dest>
   <voice>
     *: none
-    recording: "Encoder Settings"
+    recording: "Kodlayıcı Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -8979,11 +8978,11 @@
   </source>
   <dest>
     *: none
-    radio: "The Preset List is Full"
+    radio: "Ön Ayar Listesi Dolu"
   </dest>
   <voice>
     *: none
-    radio: "The Preset List is Full"
+    radio: "Ön Ayar Listesi Dolu"
   </voice>
 </phrase>
 <phrase>
@@ -8997,7 +8996,7 @@
     *: ""
   </dest>
   <voice>
-    *: "of"
+    *: "den"
   </voice>
 </phrase>
 <phrase>
@@ -9010,11 +9009,11 @@
   </source>
   <dest>
     *: none
-    agc: "Live (slow)"
+    agc: "Canlı (yavaş)"
   </dest>
   <voice>
     *: none
-    agc: "Live (slow)"
+    agc: "Canlı (yavaş)"
   </voice>
 </phrase>
 <phrase>
@@ -9025,10 +9024,10 @@
     *: "Create Playlist"
   </source>
   <dest>
-    *: "Create Playlist"
+    *: "Oynatma listesi oluştur"
   </dest>
   <voice>
-    *: "Create Playlist"
+    *: "Oynatma listesi oluştur"
   </voice>
 </phrase>
 <phrase>
@@ -9041,7 +9040,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone Up"
+    pitchscreen: "Yarım Ton Yukarı"
   </dest>
   <voice>
     *: none
@@ -9072,11 +9071,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Time & Date"
+    rtc: "Saat ve Tarih"
   </dest>
   <voice>
     *: none
-    rtc: "Time and Date"
+    rtc: "Saat ve Tarih"
   </voice>
 </phrase>
 <phrase>
@@ -9089,11 +9088,11 @@
   </source>
   <dest>
     *: none
-    recording: "Start Above"
+    recording: "Yukarıdan Başlayın"
   </dest>
   <voice>
     *: none
-    recording: "Start Above"
+    recording: "Yukarıdan Başlayın"
   </voice>
 </phrase>
 <phrase>
@@ -9104,10 +9103,10 @@
     *: "of"
   </source>
   <dest>
-    *: "of"
+    *: "den"
   </dest>
   <voice>
-    *: "of"
+    *: "den"
   </voice>
 </phrase>
 <phrase>
@@ -9120,11 +9119,11 @@
   </source>
   <dest>
     *: none
-    remote: "Main Screen"
+    remote: "Ana ekran"
   </dest>
   <voice>
     *: none
-    remote: "Main Screen"
+    remote: "Ana ekran"
   </voice>
 </phrase>
 <phrase>
@@ -9137,11 +9136,11 @@
   </source>
   <dest>
     *: none
-    serial_port: "Serial Bitrate"
+    serial_port: "Seri Bit Hızı"
   </dest>
   <voice>
     *: none
-    serial_port: "Serial Bitrate"
+    serial_port: "Seri Bit Hızı"
   </voice>
 </phrase>
 <phrase>
@@ -9166,10 +9165,10 @@
     *: "Playlist Viewer Settings"
   </source>
   <dest>
-    *: "Playlist Viewer Settings"
+    *: "Oynatma Listesi Görüntüleyici Ayarları"
   </dest>
   <voice>
-    *: "Playlist Viewer Settings"
+    *: "Oynatma Listesi Görüntüleyici Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -9182,11 +9181,11 @@
   </source>
   <dest>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Frekans Ölçekleme Valisi"
   </dest>
   <voice>
     *: none
-    ibassodx50,ibassodx90: "Freq Scaling Governor"
+    ibassodx50,ibassodx90: "Frekans Ölçekleme Valisi"
   </voice>
 </phrase>
 <phrase>
@@ -9199,11 +9198,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "Yalnızca Manuel Atlama"
   </dest>
   <voice>
     *: none
-    crossfade: "Manual Track Skip Only"
+    crossfade: "Yalnızca Manuel Atlama"
   </voice>
 </phrase>
 <phrase>
@@ -9216,11 +9215,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "WPS Hotkey"
+    hotkey: "WPS Kısayol Tuşu"
   </dest>
   <voice>
     *: none
-    hotkey: "WPS Hotkey"
+    hotkey: "WPS Kısayol Tuşu"
   </voice>
 </phrase>
 <phrase>
@@ -9233,7 +9232,7 @@
   </source>
   <dest>
     *: none
-    recording: "Split Time:"
+    recording: "Bölme Süresi:"
   </dest>
   <voice>
     *: none
@@ -9262,10 +9261,10 @@
     *: "Threshold"
   </source>
   <dest>
-    *: "Threshold"
+    *: "Eşik"
   </dest>
   <voice>
-    *: "Threshold"
+    *: "Eşik"
   </voice>
 </phrase>
 <phrase>
@@ -9276,10 +9275,10 @@
     *: "Never"
   </source>
   <dest>
-    *: "Never"
+    *: "Asla"
   </dest>
   <voice>
-    *: "Never"
+    *: "Asla"
   </voice>
 </phrase>
 <phrase>
@@ -9290,10 +9289,10 @@
     *: "Bookmark on Stop"
   </source>
   <dest>
-    *: "Bookmark on Stop"
+    *: "Durunca Yer imi oluştur"
   </dest>
   <voice>
-    *: "Bookmark on Stop"
+    *: "Durunca Yer imi oluştur"
   </voice>
 </phrase>
 <phrase>
@@ -9307,7 +9306,7 @@
     *: ""
   </dest>
   <voice>
-    *: "minutes"
+    *: "Dakika"
   </voice>
 </phrase>
 <phrase>
@@ -9332,10 +9331,10 @@
     *: "Restart Sleep Timer On Keypress"
   </source>
   <dest>
-    *: "Restart Sleep Timer On Keypress"
+    *: "Tuşa Basıldığında Uyku Zamanlayıcısını Yeniden Başlatın"
   </dest>
   <voice>
-    *: "Restart Sleep Timer On Keypress"
+    *: "Tuşa Basıldığında Uyku Zamanlayıcısını Yeniden Başlatın"
   </voice>
 </phrase>
 <phrase>
@@ -9348,11 +9347,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Hotkey"
+    hotkey: "kısayol tuşu"
   </dest>
   <voice>
     *: none
-    hotkey: "Hotkey"
+    hotkey: "kısayol tuşu"
   </voice>
 </phrase>
 <phrase>
@@ -9365,11 +9364,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Çapraz geçiş"
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Çapraz geçiş"
   </voice>
 </phrase>
 <phrase>
@@ -9425,13 +9424,13 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
-    xduoox3: "Older (1500 mAh)"
+    battery_types: "NiMH Nikel metal Hidrit"
+    xduoox3: "Daha eski (1500 mAh)"
   </dest>
   <voice>
     *: none
-    battery_types: "Nickel metal hydride"
-    xduoox3: "Older 1500 milliamp hour"
+    battery_types: "Nikel metal Hidrit"
+    xduoox3: "Daha eski 1500 miliamper saat"
   </voice>
 </phrase>
 <phrase>
@@ -9442,10 +9441,10 @@
     *: "Auto"
   </source>
   <dest>
-    *: "Auto"
+    *: "Oto"
   </dest>
   <voice>
-    *: "Auto"
+    *: "Oto"
   </voice>
 </phrase>
 <phrase>
@@ -9456,10 +9455,10 @@
     *: "Arabic (CP1256)"
   </source>
   <dest>
-    *: "Arabic (CP1256)"
+    *: "Arapça (CP1256)"
   </dest>
   <voice>
-    *: "Arabic"
+    *: "Arapça"
   </voice>
 </phrase>
 <phrase>
@@ -9484,10 +9483,10 @@
     *: "Committing database"
   </source>
   <dest>
-    *: "Committing database"
+    *: "Veritabanı işleme"
   </dest>
   <voice>
-    *: "Committing database"
+    *: "Veritabanı işleme"
   </voice>
 </phrase>
 <phrase>
@@ -9501,7 +9500,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hour"
+    *: "Saat"
   </voice>
 </phrase>
 <phrase>
@@ -9512,10 +9511,10 @@
     *: "Greek (ISO-8859-7)"
   </source>
   <dest>
-    *: "Greek (ISO-8859-7)"
+    *: "Yunanca (ISO-8859-7)"
   </dest>
   <voice>
-    *: "Greek"
+    *: "Yunanca"
   </voice>
 </phrase>
 <phrase>
@@ -9528,11 +9527,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Fade-In Duration"
+    crossfade: "Yavaşlatma Süresi"
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Duration"
+    crossfade: "Yavaşlatma Süresi"
   </voice>
 </phrase>
 <phrase>
@@ -9543,10 +9542,10 @@
     *: "By Date"
   </source>
   <dest>
-    *: "By Date"
+    *: "Tarihe göre"
   </dest>
   <voice>
-    *: "By Date"
+    *: "Tarihe göre"
   </voice>
 </phrase>
 <phrase>
@@ -9559,11 +9558,11 @@
   </source>
   <dest>
     *: none
-    remote: "Main Unit Only"
+    remote: "Sadece Ana Ünite"
   </dest>
   <voice>
     *: none
-    remote: "Main unit only"
+    remote: "Sadece Ana Ünite"
   </voice>
 </phrase>
 <phrase>
@@ -9576,11 +9575,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Line Padding in Lists"
+    touchscreen: "Listelerde Satır Doldurma"
   </dest>
   <voice>
     *: none
-    touchscreen: "Line Padding in Lists"
+    touchscreen: "Listelerde Satır Doldurma"
   </voice>
 </phrase>
 <phrase>
@@ -9593,11 +9592,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC klip zamanı"
   </dest>
   <voice>
     *: none
-    agc: "AGC clip time"
+    agc: "AGC klip zamanı"
   </voice>
 </phrase>
 <phrase>
@@ -9608,10 +9607,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Playlist"
+    *: "Çalma listesi"
   </dest>
   <voice>
-    *: "Playlist"
+    *: "Çalma listesi"
   </voice>
 </phrase>
 <phrase>
@@ -9638,11 +9637,11 @@
   </source>
   <dest>
     *: none
-    radio: "Clear Preset List"
+    radio: "Ön Ayar Listesini Temizle"
   </dest>
   <voice>
     *: none
-    radio: "Clear Preset List"
+    radio: "Ön Ayar Listesini Temizle"
   </voice>
 </phrase>
 <phrase>
@@ -9653,10 +9652,10 @@
     *: "Boot changed"
   </source>
   <dest>
-    *: "Boot changed"
+    *: "Önyükleme değişti"
   </dest>
   <voice>
-    *: "Boot changed"
+    *: "Önyükleme değişti"
   </voice>
 </phrase>
 <phrase>
@@ -9667,10 +9666,10 @@
     *: "Alphabetical"
   </source>
   <dest>
-    *: "Alphabetical"
+    *: "Alfabetik"
   </dest>
   <voice>
-    *: "Alphabetical"
+    *: "Alfabetik"
   </voice>
 </phrase>
 <phrase>
@@ -9697,11 +9696,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Fade-In Delay"
+    crossfade: "Azalma Gecikmesi"
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-In Delay"
+    crossfade: "Azalma Gecikmesi"
   </voice>
 </phrase>
 <phrase>
@@ -9726,10 +9725,10 @@
     *: "Move"
   </source>
   <dest>
-    *: "Move"
+    *: "Taşı"
   </dest>
   <voice>
-    *: "Move"
+    *: "Taşı"
   </voice>
 </phrase>
 <phrase>
@@ -9740,10 +9739,10 @@
     *: "Settings Saved"
   </source>
   <dest>
-    *: "Settings Saved"
+    *: "Ayarlar kaydedildi"
   </dest>
   <voice>
-    *: "Settings Saved"
+    *: "Ayarlar kaydedildi"
   </voice>
 </phrase>
 <phrase>
@@ -9754,10 +9753,10 @@
     *: "Use File .talk Clips"
   </source>
   <dest>
-    *: "Use File .talk Clips"
+    *: "Dosya .talk Kliplerini Kullan"
   </dest>
   <voice>
-    *: "Use File .talk Clips"
+    *: "Dosya .talk Kliplerini Kullan"
   </voice>
 </phrase>
 <phrase>
@@ -9782,10 +9781,10 @@
     *: "Disable on External Power"
   </source>
   <dest>
-    *: "Disable on External Power"
+    *: "Harici Güçte Devre Dışı Bırak"
   </dest>
   <voice>
-    *: "Disable on External Power"
+    *: "Harici Güçte Devre Dışı Bırak"
   </voice>
 </phrase>
 <phrase>
@@ -9796,7 +9795,7 @@
     *: "Creating"
   </source>
   <dest>
-    *: "Creating"
+    *: "Oluşturuluyor..."
   </dest>
   <voice>
     *: ""
@@ -9813,7 +9812,7 @@
     *: ""
   </dest>
   <voice>
-    *: "statusbar skin"
+    *: "durum çubuğu görünümü"
   </voice>
 </phrase>
 <phrase>
@@ -9840,11 +9839,11 @@
   </source>
   <dest>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bas Kesme"
   </dest>
   <voice>
     *: none
-    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bass Cutoff"
+    gigabeatfx,ipod6g,ipodvideo,mpiohd200,mpiohd300,mrobe100: "Bas Kesme"
   </voice>
 </phrase>
 <phrase>
@@ -9857,11 +9856,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "MP3"
   </voice>
 </phrase>
 <phrase>
@@ -9872,10 +9871,10 @@
     *: "Next Track:"
   </source>
   <dest>
-    *: "Next Track:"
+    *: "Sonraki parça:"
   </dest>
   <voice>
-    *: "Next Track:"
+    *: "Sonraki parça:"
   </voice>
 </phrase>
 <phrase>
@@ -9889,7 +9888,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Index"
+    *: "Dizin"
   </voice>
 </phrase>
 <phrase>
@@ -9900,10 +9899,10 @@
     *: "Insert Last"
   </source>
   <dest>
-    *: "Insert Last"
+    *: "Sona Ekle"
   </dest>
   <voice>
-    *: "Insert Last"
+    *: "Sona Ekle"
   </voice>
 </phrase>
 <phrase>
@@ -9928,10 +9927,10 @@
     *: "Low Shelf Filter"
   </source>
   <dest>
-    *: "Low Shelf Filter"
+    *: "Düşük Raf Filtresi"
   </dest>
   <voice>
-    *: "Low shelf filter"
+    *: "Düşük Raf Filtresi"
   </voice>
 </phrase>
 <phrase>
@@ -9944,11 +9943,11 @@
   </source>
   <dest>
     *: none
-    radio: "Force Mono"
+    radio: "Mono'yu Zorla"
   </dest>
   <voice>
     *: none
-    radio: "Force Mono"
+    radio: "Mono'yu Zorla"
   </voice>
 </phrase>
 <phrase>
@@ -9961,11 +9960,11 @@
   </source>
   <dest>
     *: none
-    radio: "Clear Current Presets?"
+    radio: "Mevcut Ön Ayarlar Temizlensin mi?"
   </dest>
   <voice>
     *: none
-    radio: "Clear Current Presets?"
+    radio: "Mevcut Ön Ayarlar Temizlensin mi?"
   </voice>
 </phrase>
 <phrase>
@@ -9976,10 +9975,10 @@
     *: "Erase dynamic playlist?"
   </source>
   <dest>
-    *: "Erase dynamic playlist?"
+    *: "Dinamik oynatma listesi silinsin mi?"
   </dest>
   <voice>
-    *: "Erase dynamic playlist?"
+    *: "Dinamik oynatma listesi silinsin mi?"
   </voice>
 </phrase>
 <phrase>
@@ -9990,10 +9989,10 @@
     *: "By Type"
   </source>
   <dest>
-    *: "By Type"
+    *: "Türe Göre"
   </dest>
   <voice>
-    *: "By Type"
+    *: "Türe Göre"
   </voice>
 </phrase>
 <phrase>
@@ -10007,7 +10006,7 @@
     *: ""
   </dest>
   <voice>
-    *: "decibel"
+    *: "desibel"
   </voice>
 </phrase>
 <phrase>
@@ -10035,10 +10034,10 @@
     *: "USB Mode"
   </source>
   <dest>
-    *: "USB Mode"
+    *: "USB Modu"
   </dest>
   <voice>
-    *: "USB Mode"
+    *: "USB Modu"
   </voice>
 </phrase>
 <phrase>
@@ -10049,10 +10048,10 @@
     *: "Update Now"
   </source>
   <dest>
-    *: "Update Now"
+    *: "Şimdi güncelle"
   </dest>
   <voice>
-    *: "Update Now"
+    *: "Şimdi güncelle"
   </voice>
 </phrase>
 <phrase>
@@ -10063,10 +10062,10 @@
     *: "Simple (Meier)"
   </source>
   <dest>
-    *: "Simple (Meier)"
+    *: "Basit (Meier)"
   </dest>
   <voice>
-    *: "Simple"
+    *: "Basit"
   </voice>
 </phrase>
 <phrase>
@@ -10094,10 +10093,10 @@
     *: "f(x2)"
   </source>
   <dest>
-    *: "f(x2)"
+    *: "Surround f(x2)"
   </dest>
   <voice>
-    *: "f(x2)"
+    *: "Surround f(x2)"
   </voice>
 </phrase>
 <phrase>
@@ -10114,7 +10113,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote while-playing-screen"
+    remote: "Oyun oynarken uzaktan kumanda"
   </voice>
 </phrase>
 <phrase>
@@ -10125,10 +10124,10 @@
     *: "Gather Runtime Data"
   </source>
   <dest>
-    *: "Gather Runtime Data"
+    *: "Çalışma Zamanı Verilerini Toplayın"
   </dest>
   <voice>
-    *: "Gather Runtime Data"
+    *: "Çalışma Zamanı Verilerini Toplayın"
   </voice>
 </phrase>
 <phrase>
@@ -10141,11 +10140,11 @@
   </source>
   <dest>
     *: none
-    radio: "Radio Screen"
+    radio: "Radyo ekranı"
   </dest>
   <voice>
     *: none
-    radio: "Radio Screen"
+    radio: "Radyo ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -10158,11 +10157,11 @@
   </source>
   <dest>
     *: none
-    radio: "Other"
+    radio: "Diğer"
   </dest>
   <voice>
     *: none
-    radio: "Other"
+    radio: "Diğer"
   </voice>
 </phrase>
 <phrase>
@@ -10190,10 +10189,10 @@
     *: "Default Codepage"
   </source>
   <dest>
-    *: "Default Codepage"
+    *: "Varsayılan Kod Sayfası"
   </dest>
   <voice>
-    *: "Default codepage"
+    *: "Varsayılan Kod Sayfası"
   </voice>
 </phrase>
 <phrase>
@@ -10204,10 +10203,10 @@
     *: "Warn When Erasing Dynamic Playlist"
   </source>
   <dest>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "Dinamik Oynatma Listesini Silerken Uyar"
   </dest>
   <voice>
-    *: "Warn When Erasing Dynamic Playlist"
+    *: "Dinamik Oynatma Listesini Silerken Uyar"
   </voice>
 </phrase>
 <phrase>
@@ -10218,10 +10217,10 @@
     *: "Bookmarking"
   </source>
   <dest>
-    *: "Bookmarking"
+    *: "Yer imi"
   </dest>
   <voice>
-    *: "Bookmarking"
+    *: "Yer imi"
   </voice>
 </phrase>
 <phrase>
@@ -10247,11 +10246,11 @@
     wheel_acceleration: none
   </source>
   <dest>
-    *: "List Acceleration Speed"
+    *: "Liste Hızlandırma Hızı"
     wheel_acceleration: none
   </dest>
   <voice>
-    *: "List Acceleration Speed"
+    *: "Liste Hızlandırma Hızı"
     wheel_acceleration: none
   </voice>
 </phrase>
@@ -10265,11 +10264,11 @@
   </source>
   <dest>
     *: none
-    recording: "Split Filesize"
+    recording: "Dosya Boyutunu Böl"
   </dest>
   <voice>
     *: none
-    recording: "Split Filesize"
+    recording: "Dosya Boyutunu Böl"
   </voice>
 </phrase>
 <phrase>
@@ -10282,11 +10281,11 @@
   </source>
   <dest>
     *: none
-    gigabeats,samsungypr1: "Band %d Frequency"
+    gigabeats,samsungypr1: "Bant %d Frekans"
   </dest>
   <voice>
     *: none
-    gigabeats,samsungypr1: "Band Frequency"
+    gigabeats,samsungypr1: "Bant Frekansı"
   </voice>
 </phrase>
 <phrase>
@@ -10297,10 +10296,10 @@
     *: "Last.fm Log"
   </source>
   <dest>
-    *: "Last.fm Log"
+    *: "Last.fm Günlüğü"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm Günlüğü"
   </voice>
 </phrase>
 <phrase>
@@ -10311,10 +10310,10 @@
     *: "Cancel Sleep Timer"
   </source>
   <dest>
-    *: "Cancel Sleep Timer"
+    *: "Uyku Zamanlayıcısını İptal Et"
   </dest>
   <voice>
-    *: "Cancel Sleep Timer"
+    *: "Uyku Zamanlayıcısını İptal Et"
   </voice>
 </phrase>
 <phrase>
@@ -10327,11 +10326,11 @@
   </source>
   <dest>
     *: none
-    remote: "Remote Unit Only"
+    remote: "Yalnızca Uzak Ünite"
   </dest>
   <voice>
     *: none
-    remote: "Remote unit only"
+    remote: "Yalnızca Uzak Ünite"
   </voice>
 </phrase>
 <phrase>
@@ -10342,10 +10341,10 @@
     *: "Bar (Inverse)"
   </source>
   <dest>
-    *: "Bar (Inverse)"
+    *: "Bar (Ters)"
   </dest>
   <voice>
-    *: "Inverse Bar"
+    *: "Ters Bar"
   </voice>
 </phrase>
 <phrase>
@@ -10356,10 +10355,10 @@
     *: "<All tracks>"
   </source>
   <dest>
-    *: "<All tracks>"
+    *: "<Tüm parçalar>"
   </dest>
   <voice>
-    *: "All tracks"
+    *: "Tüm parçalar"
   </voice>
 </phrase>
 <phrase>
@@ -10370,10 +10369,10 @@
     *: "Set Song Rating"
   </source>
   <dest>
-    *: "Set Song Rating"
+    *: "Şarkı Derecelendirmesini Ayarla"
   </dest>
   <voice>
-    *: "Set Song Rating"
+    *: "Şarkı Derecelendirmesini Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -10384,10 +10383,10 @@
     *: "Mass Storage"
   </source>
   <dest>
-    *: "Mass Storage"
+    *: "Yığın Bellek"
   </dest>
   <voice>
-    *: "Mass Storage"
+    *: "Yığın Bellek"
   </voice>
 </phrase>
 <phrase>
@@ -10398,10 +10397,10 @@
     *: "Track Gain"
   </source>
   <dest>
-    *: "Track Gain"
+    *: "Kazanç Takibi"
   </dest>
   <voice>
-    *: "Track gain"
+    *: "Kazanç Takibi"
   </voice>
 </phrase>
 <phrase>
@@ -10414,11 +10413,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC max. gain"
+    agc: "AGC maks. kazanç"
   </dest>
   <voice>
     *: none
-    agc: "AGC maximum gain"
+    agc: "AGC maksimum kazanç"
   </voice>
 </phrase>
 <phrase>
@@ -10429,10 +10428,10 @@
     *: "Gain"
   </source>
   <dest>
-    *: "Gain"
+    *: "Kazanç"
   </dest>
   <voice>
-    *: "Gain"
+    *: "Kazanç"
   </voice>
 </phrase>
 <phrase>
@@ -10443,10 +10442,10 @@
     *: "Cuesheet Support"
   </source>
   <dest>
-    *: "Cuesheet Support"
+    *: "Cuesheet Desteği"
   </dest>
   <voice>
-    *: "Cuesheet Support"
+    *: "Cuesheet Desteği"
   </voice>
 </phrase>
 <phrase>
@@ -10457,10 +10456,10 @@
     *: "Force"
   </source>
   <dest>
-    *: "Force"
+    *: "Kuvvet"
   </dest>
   <voice>
-    *: "Force"
+    *: "Kuvvet"
   </voice>
 </phrase>
 <phrase>
@@ -10471,10 +10470,10 @@
     *: "Initialize Now"
   </source>
   <dest>
-    *: "Initialize Now"
+    *: "Şimdi Başlat"
   </dest>
   <voice>
-    *: "Initialize Now"
+    *: "Şimdi Başlat"
   </voice>
 </phrase>
 <phrase>
@@ -10487,11 +10486,11 @@
   </source>
   <dest>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "Ayar bulunamadı. Otomatik taransın mı?"
   </dest>
   <voice>
     *: none
-    radio: "No settings found. Autoscan?"
+    radio: "Ayar bulunamadı. Otomatik taransın mı?"
   </voice>
 </phrase>
 <phrase>
@@ -10532,11 +10531,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mix"
+    crossfade: "Karışık"
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "Karışık"
   </voice>
 </phrase>
 <phrase>
@@ -10547,10 +10546,10 @@
     *: "Album Gain"
   </source>
   <dest>
-    *: "Album Gain"
+    *: "Albüm Kazancı"
   </dest>
   <voice>
-    *: "Album gain"
+    *: "Albüm Kazancı"
   </voice>
 </phrase>
 <phrase>
@@ -10561,10 +10560,10 @@
     *: "Show Icons"
   </source>
   <dest>
-    *: "Show Icons"
+    *: "Simgeleri Göste"
   </dest>
   <voice>
-    *: "Show Icons"
+    *: "Simgeleri Göste"
   </voice>
 </phrase>
 <phrase>
@@ -10575,10 +10574,10 @@
     *: "Reboot now?"
   </source>
   <dest>
-    *: "Reboot now?"
+    *: "Şimdi yeniden başlat?"
   </dest>
   <voice>
-    *: "Reboot now?"
+    *: "Şimdi yeniden başlat?"
   </voice>
 </phrase>
 <phrase>
@@ -10591,11 +10590,11 @@
   </source>
   <dest>
     *: none
-    depth_3d: "3-D Enhancement"
+    depth_3d: "3-D Geliştirme"
   </dest>
   <voice>
     *: none
-    depth_3d: "3-D Enhancement"
+    depth_3d: "3-D Geliştirme"
   </voice>
 </phrase>
 <phrase>
@@ -10637,10 +10636,10 @@
     *: "Shortcuts"
   </source>
   <dest>
-    *: "Shortcuts"
+    *: "Kısayollar"
   </dest>
   <voice>
-    *: "Shortcuts"
+    *: "Kısayollar"
   </voice>
 </phrase>
 <phrase>
@@ -10654,7 +10653,7 @@
     *: "Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Unicode"
+    *: "Tek kod"
   </voice>
 </phrase>
 <phrase>
@@ -10667,11 +10666,11 @@
   </source>
   <dest>
     *: none
-    rtc: "Set Time/Date"
+    rtc: "Saati/Tarihi Ayarla"
   </dest>
   <voice>
     *: none
-    rtc: "Set Time and Date"
+    rtc: "Saati/Tarihi Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -10684,11 +10683,11 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "AGC (O.K.K)"
   </dest>
   <voice>
     *: none
-    agc: "Automatic gain control"
+    agc: "Otomatik kazanç kontrolü"
   </voice>
 </phrase>
 <phrase>
@@ -10713,10 +10712,10 @@
     *: "Korean (KSX1001)"
   </source>
   <dest>
-    *: "Korean (KSX1001)"
+    *: "Korece (KSX1001)"
   </dest>
   <voice>
-    *: "Korean"
+    *: "Korece"
   </voice>
 </phrase>
 <phrase>
@@ -10727,10 +10726,10 @@
     *: "Bidirectional Scroll Limit"
   </source>
   <dest>
-    *: "Bidirectional Scroll Limit"
+    *: "BÇift Yönlü Kaydırma Sınırı"
   </dest>
   <voice>
-    *: "Bidirectional Scroll Limit"
+    *: "Çift Yönlü Kaydırma Sınırı"
   </voice>
 </phrase>
 <phrase>
@@ -10743,11 +10742,11 @@
   </source>
   <dest>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "En İyi Hızlı Ekran Öğesi Olarak Ayarla"
   </dest>
   <voice>
     *: none
-    quickscreen: "Set as Top Quickscreen Item"
+    quickscreen: "En İyi Hızlı Ekran Öğesi Olarak Ayarla"
   </voice>
 </phrase>
 <phrase>
@@ -10760,11 +10759,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Wake-Up Alarm"
+    alarm: "Uyandırma Alarmı"
   </dest>
   <voice>
     *: none
-    alarm: "Wake-Up Alarm"
+    alarm: "Uyandırma Alarmı"
   </voice>
 </phrase>
 <phrase>
@@ -10775,10 +10774,10 @@
     *: "Sleep Timer"
   </source>
   <dest>
-    *: "Sleep Timer"
+    *: "Uyku Zamanlayıcısı"
   </dest>
   <voice>
-    *: "Sleep Timer"
+    *: "Uyku Zamanlayıcısı"
   </voice>
 </phrase>
 <phrase>
@@ -10789,10 +10788,10 @@
     *: "Hebrew (ISO-8859-8)"
   </source>
   <dest>
-    *: "Hebrew (ISO-8859-8)"
+    *: "İbranice (ISO-8859-8)"
   </dest>
   <voice>
-    *: "Hebrew"
+    *: "İbranice"
   </voice>
 </phrase>
 <phrase>
@@ -10806,7 +10805,7 @@
     *: ""
   </dest>
   <voice>
-    *: "second"
+    *: "ikinci"
   </voice>
 </phrase>
 <phrase>
@@ -10817,10 +10816,10 @@
     *: "Album"
   </source>
   <dest>
-    *: "Album"
+    *: "Albüm"
   </dest>
   <voice>
-    *: "Album"
+    *: "Albüm"
   </voice>
 </phrase>
 <phrase>
@@ -10832,11 +10831,11 @@
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
   </source>
   <dest>
-    *: "Battery: %d%% %dh %dm"
-    ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
+    *: "Pil: %d%% %dh %dm"
+    ipodmini1g,ipodmini2g,iriverh10: "Pil: %d%% %dh %dm"
   </dest>
   <voice>
-    *: "Battery level"
+    *: "Pil seviyesi"
   </voice>
 </phrase>
 <phrase>
@@ -10849,7 +10848,7 @@
   </source>
   <dest>
     *: none
-    radio: "Scanning %d.%02d MHz"
+    radio: "Taranıyor %d.%02d MHz"
   </dest>
   <voice>
     *: none
@@ -10881,10 +10880,10 @@
     *: "Line Separator Colour"
   </source>
   <dest>
-    *: "Line Separator Colour"
+    *: "Satır Ayırıcı Rengi"
   </dest>
   <voice>
-    *: "Line Separator Colour"
+    *: "Satır Ayırıcı Rengi"
   </voice>
 </phrase>
 <phrase>
@@ -10895,10 +10894,10 @@
     *: "Auditory Fatigue Reduction"
   </source>
   <dest>
-    *: "Auditory Fatigue Reduction"
+    *: "İşitsel Yorgunluk Azaltma"
   </dest>
   <voice>
-    *: "Auditory Fatigue Reduction"
+    *: "İşitsel Yorgunluk Azaltma"
   </voice>
 </phrase>
 <phrase>
@@ -10909,10 +10908,10 @@
     *: "Deleting..."
   </source>
   <dest>
-    *: "Deleting..."
+    *: "Siliniyor..."
   </dest>
   <voice>
-    *: "Deleting"
+    *: "Siliniyor..."
   </voice>
 </phrase>
 <phrase>
@@ -10925,11 +10924,11 @@
   </source>
   <dest>
     *: none
-    recording: "Bitrate"
+    recording: "bit hızı"
   </dest>
   <voice>
     *: none
-    recording: "Bitrate"
+    recording: "bit hızı"
   </voice>
 </phrase>
 <phrase>
@@ -10943,7 +10942,7 @@
     *: ""
   </dest>
   <voice>
-    *: "kilobits per second"
+    *: "saniyede kilobit"
   </voice>
 </phrase>
 <phrase>
@@ -10970,11 +10969,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "Yalnızca Otomatik Parça Değişimi"
   </dest>
   <voice>
     *: none
-    crossfade: "Automatic Track Change Only"
+    crossfade: "Yalnızca Otomatik Parça Değişimi"
   </voice>
 </phrase>
 <phrase>
@@ -10985,10 +10984,10 @@
     *: "SIDE ONLY"
   </source>
   <dest>
-    *: "SIDE ONLY"
+    *: "SADECE YAN"
   </dest>
   <voice>
-    *: "SIDE ONLY"
+    *: "SADECE YAN"
   </voice>
 </phrase>
 <phrase>
@@ -11001,11 +11000,11 @@
   </source>
   <dest>
     *: none
-    recording: "Mono Left + Right"
+    recording: "Mono Sol + Sağ"
   </dest>
   <voice>
     *: none
-    recording: "Mono Left plus Right"
+    recording: "Mono Sol artı Sağ"
   </voice>
 </phrase>
 <phrase>
@@ -11019,7 +11018,7 @@
     *: ""
   </dest>
   <voice>
-    *: "plus"
+    *: "artı"
   </voice>
 </phrase>
 <phrase>
@@ -11033,7 +11032,7 @@
     *: ""
   </dest>
   <voice>
-    *: "milli-amp hours"
+    *: "mili amper saat"
   </voice>
 </phrase>
 <phrase>
@@ -11060,7 +11059,7 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Semitone Down"
+    pitchscreen: "Yarım Ton Aşağı"
   </dest>
   <voice>
     *: none
@@ -11075,10 +11074,10 @@
     *: "Interpret numbers when sorting"
   </source>
   <dest>
-    *: "Interpret numbers when sorting"
+    *: "Sıralama sırasında sayıları yorumlayın"
   </dest>
   <voice>
-    *: "Interpret numbers when sorting"
+    *: "Sıralama sırasında sayıları yorumlayın"
   </voice>
 </phrase>
 <phrase>
@@ -11091,11 +11090,11 @@
   </source>
   <dest>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Alarm Uyandırma Ekranı"
   </dest>
   <voice>
     *: none
-    alarm: "Alarm Wake up Screen"
+    alarm: "Alarm Uyandırma Ekranı"
   </voice>
 </phrase>
 <phrase>
@@ -11106,10 +11105,10 @@
     *: "Show Indices"
   </source>
   <dest>
-    *: "Show Indices"
+    *: "Endeksleri Göster"
   </dest>
   <voice>
-    *: "Show Indices"
+    *: "Endeksleri Göster"
   </voice>
 </phrase>
 <phrase>
@@ -11120,10 +11119,10 @@
     *: "Auto-Change Directory"
   </source>
   <dest>
-    *: "Auto-Change Directory"
+    *: "Dizini Otomatik Değiştir"
   </dest>
   <voice>
-    *: "Auto-Change Directory"
+    *: "Dizini Otomatik Değiştir"
   </voice>
 </phrase>
 <phrase>
@@ -11136,11 +11135,11 @@
   </source>
   <dest>
     *: none
-    recording: "Gain L"
+    recording: "Kazanç L"
   </dest>
   <voice>
     *: none
-    recording: "Gain Left"
+    recording: "Sol Kazanç"
   </voice>
 </phrase>
 <phrase>
@@ -11153,11 +11152,10 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Background Colour"
+    lcd_color: "Arkaplan rengi"
   </dest>
   <voice>
     *: none
-    lcd_color: "Background Colour"
   </voice>
 </phrase>
 <phrase>
