@@ -674,6 +674,17 @@ sub allbuilds {
 	},
         'enabled' => 1,
     },
+    'turkce' => {
+	'lang' => 'turkce',
+	'name' => 'Türkçe (Turkish)',
+        'short' => 'tr',
+        'defengine' => 'espeak',
+	'engines' => {
+	    'espeak' => '-vtr',
+	    'gtts' => '-l tr',
+	},
+        'enabled' => 1,
+    },
 );
 
 sub bylang {
