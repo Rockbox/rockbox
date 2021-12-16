@@ -62,9 +62,9 @@ QString Changelog::parseChangelogFile(QString filename)
             while(line.startsWith("*")) {
                 QString t = line.remove(QRegularExpression("^\\*"));
                 t.replace(QRegularExpression("FS#(\\d+)"),
-                          "<a href='http://www.rockbox.org/tracker/task/\\1'>FS#\\1</a>");
+                          "<a href='https://www.rockbox.org/tracker/task/\\1'>FS#\\1</a>");
                 t.replace(QRegularExpression("G#(\\d+)"),
-                          "<a href='http://gerrit.rockbox.org/r/\\1'>G#\\1</a>");
+                          "<a href='https://gerrit.rockbox.org/r/\\1'>G#\\1</a>");
                 text.append(QString("<li>%1</li>").arg(t));
                 line = c.readLine();
                 if(line.startsWith("#"))
