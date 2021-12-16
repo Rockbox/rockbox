@@ -369,6 +369,10 @@ while(<LANG>) {
 
     if($_ =~ /^( *\#|[ \t\n\r]*\z)/) {
         # comment or empty line - output it if it's part of the header
+        if ($_ =~ /LANGUAGE_IS_RTL/) {
+            $langoptions |= $LANGUAGE_FLAG_RTL;
+        }
+
         if ($header and $sortfile) {
             print($_);
         }
@@ -485,12 +489,6 @@ while(<LANG>) {
                 }
                 undef @phrase;
             } # end of </phrase>
-            elsif($part eq "/options") {
-                # closing the options
-                if ($options{'rtl'}) {
-                    $langoptions |= $LANGUAGE_FLAG_RTL;
-                }
-            } # end of </options>
 
             # starts with a slash, this _ends_ this section
             $m = pop @m; # get back old value, the previous level's tag
