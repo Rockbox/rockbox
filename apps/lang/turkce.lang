@@ -1754,7 +1754,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -2179,14 +2179,14 @@
   <dest>
     *: none
     multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "micro-SD:"
-    xduoox3: "micro-SD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikro-SD:"
+    xduoox3: "mikro-SD2:"
   </dest>
   <voice>
     *: none
     multivolume: "H D 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "microSD:"
-    xduoox3: "microSD2:"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mikroSD"
+    xduoox3: "mikroSD2"
   </voice>
 </phrase>
 <phrase>
@@ -8098,10 +8098,10 @@
     *: "Karaoke"
   </source>
   <dest>
-    *: "Karaoke"
+    *: "Karaoke vokal"
   </dest>
   <voice>
-    *: "Karaoke"
+    *: "Karaoke vokal"
   </voice>
 </phrase>
 <phrase>
@@ -10650,10 +10650,10 @@
     *: "Unicode (UTF-8)"
   </source>
   <dest>
-    *: "Unicode (UTF-8)"
+    *: "Tek kodlu Unicode (UTF-8)"
   </dest>
   <voice>
-    *: "Tek kod"
+    *: "Tek kodlu"
   </voice>
 </phrase>
 <phrase>
@@ -11294,7 +11294,7 @@
     *: ""
   </dest>
   <voice>
-    *: "hertz"
+    *: "-hertz"
   </voice>
 </phrase>
 <phrase>
@@ -13109,7 +13109,7 @@
     *: "Remote Control"
   </source>
   <dest>
-    *: "Remote Control"
+    *: "Uzaktan kumanda"
   </dest>
   <voice>
     *: "Uzaktan kumanda"
@@ -13179,10 +13179,10 @@
     *: "Play Wormlet!"
   </source>
   <dest>
-    *: "Play Wormlet!"
+    *: "Wormlet'i oynayın!"
   </dest>
   <voice>
-    *: "Play Wormlet!"
+    *: "Wormlet'i oynayın!"
   </voice>
 </phrase>
 <phrase>
@@ -13235,10 +13235,10 @@
     *: "Arghs Per Food"
   </source>
   <dest>
-    *: "Arghs Per Food"
+    *: "AGıda Başına Arghs"
   </dest>
   <voice>
-    *: "Arghs Per Food"
+    *: "Gıda Başına Arghs"
   </voice>
 </phrase>
 <phrase>
@@ -13249,10 +13249,10 @@
     *: "Argh Size"
   </source>
   <dest>
-    *: "Argh Size"
+    *: "Argh Boyutu"
   </dest>
   <voice>
-    *: "Argh Size"
+    *: "Argh Boyutu"
   </voice>
 </phrase>
 <phrase>
@@ -13263,10 +13263,10 @@
     *: "Food Size"
   </source>
   <dest>
-    *: "Food Size"
+    *: "Gıda Boyutu"
   </dest>
   <voice>
-    *: "Food Size"
+    *: "Gıda Boyutu"
   </voice>
 </phrase>
 <phrase>
@@ -13277,10 +13277,10 @@
     *: "Number of Players"
   </source>
   <dest>
-    *: "Number of Players"
+    *: "Oyuncu sayısı"
   </dest>
   <voice>
-    *: "Number of Players"
+    *: "Oyuncu sayısı"
   </voice>
 </phrase>
 <phrase>
@@ -13291,10 +13291,10 @@
     *: "Control Style"
   </source>
   <dest>
-    *: "Control Style"
+    *: "Kontrol Stili"
   </dest>
   <voice>
-    *: "Control Style"
+    *: "Kontrol Stili"
   </voice>
 </phrase>
 <phrase>
@@ -13305,10 +13305,10 @@
     *: "Revert to Default Settings"
   </source>
   <dest>
-    *: "Revert to Default Settings"
+    *: "Varsayılan Ayarlara Dön"
   </dest>
   <voice>
-    *: "Revert to Default Settings"
+    *: "Varsayılan Ayarlara Dön"
   </voice>
 </phrase>
 <phrase>
@@ -13319,10 +13319,10 @@
     *: "Quit"
   </source>
   <dest>
-    *: "Quit"
+    *: "Çık"
   </dest>
   <voice>
-    *: "Quit"
+    *: "Çık"
   </voice>
 </phrase>
 <phrase>
@@ -13459,10 +13459,10 @@
     *: "Checkmate!"
   </source>
   <dest>
-    *: "Checkmate!"
+    *: "Şah Mat!"
   </dest>
   <voice>
-    *: "Checkmate!"
+    *: "Şah Mat"
   </voice>
 </phrase>
 <phrase>
@@ -13473,10 +13473,10 @@
     *: "Illegal move!"
   </source>
   <dest>
-    *: "Illegal move!"
+    *: "Geçersiz hareket!"
   </dest>
   <voice>
-    *: "Illegal move!"
+    *: "Geçersiz hareket"
   </voice>
 </phrase>
 <phrase>
@@ -13487,10 +13487,10 @@
     *: "New Game"
   </source>
   <dest>
-    *: "New Game"
+    *: "Yeni oyun"
   </dest>
   <voice>
-    *: "New Game"
+    *: "Yeni oyun"
   </voice>
 </phrase>
 <phrase>
@@ -13501,10 +13501,10 @@
     *: "Resume Game"
   </source>
   <dest>
-    *: "Resume Game"
+    *: "Oyuna devam et"
   </dest>
   <voice>
-    *: "Resume Game"
+    *: "Oyuna devam et"
   </voice>
 </phrase>
 <phrase>
@@ -13515,10 +13515,10 @@
     *: "Save Game"
   </source>
   <dest>
-    *: "Save Game"
+    *: "Oyunu kaydet"
   </dest>
   <voice>
-    *: "Save Game"
+    *: "Oyunu kaydet"
   </voice>
 </phrase>
 <phrase>
@@ -13529,10 +13529,10 @@
     *: "Restore Game"
   </source>
   <dest>
-    *: "Restore Game"
+    *: "Oyunu yenile"
   </dest>
   <voice>
-    *: "Restore Game"
+    *: "Oyunu yenile"
   </voice>
 </phrase>
 <phrase>
@@ -13543,10 +13543,10 @@
     *: "Restart Game"
   </source>
   <dest>
-    *: "Restart Game"
+    *: "Oyunu yeniden başlat"
   </dest>
   <voice>
-    *: "Restart Game"
+    *: "Oyunu yeniden başlat"
   </voice>
 </phrase>
 <phrase>
@@ -13557,10 +13557,10 @@
     *: "Select Other Game"
   </source>
   <dest>
-    *: "Select Other Game"
+    *: "Diğer Oyunu Seç"
   </dest>
   <voice>
-    *: "Select Other Game"
+    *: "Diğer Oyunu Seç"
   </voice>
 </phrase>
 <phrase>
@@ -13571,10 +13571,10 @@
     *: "Level 1: 60 moves / 5 min"
   </source>
   <dest>
-    *: "Level 1: 60 moves / 5 min"
+    *: "Seviye 1: 60 hamle / 5 dk."
   </dest>
   <voice>
-    *: "Level 1: 60 moves per 5 minutes"
+    *: "Seviye 1 5 dakikada 60 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13585,10 +13585,10 @@
     *: "Level 2: 60 moves / 15 min"
   </source>
   <dest>
-    *: "Level 2: 60 moves / 15 min"
+    *: "Seviye 2: 60 hamle / 15 dk."
   </dest>
   <voice>
-    *: "Level 2: 60 moves per 15 minutes"
+    *: "Seviye 2 15 dakikada 60 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13599,10 +13599,10 @@
     *: "Level 3: 60 moves / 30 min"
   </source>
   <dest>
-    *: "Level 3: 60 moves / 30 min"
+    *: "Seviye 3: 60 hamle / 30 dk."
   </dest>
   <voice>
-    *: "Level 3: 60 moves per 30 minutes"
+    *: "Seviye 3 30 dakikada 60 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13613,10 +13613,10 @@
     *: "Level 4: 40 moves / 30 min"
   </source>
   <dest>
-    *: "Level 4: 40 moves / 30 min"
+    *: "Seviye 4: 40 hamle / 30 dk."
   </dest>
   <voice>
-    *: "Level 4: 40 moves per 30 minutes"
+    *: "4. Seviye 30 dakikada 40 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13627,10 +13627,10 @@
     *: "Level 5: 40 moves / 60 min"
   </source>
   <dest>
-    *: "Level 5: 40 moves / 60 min"
+    *: "Seviye 5: 40 hamle / 60 dk."
   </dest>
   <voice>
-    *: "Level 5: 40 moves per 60 minutes"
+    *: "Seviye 5 60 dakikada 40 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13641,10 +13641,10 @@
     *: "Level 6: 40 moves / 120 min"
   </source>
   <dest>
-    *: "Level 6: 40 moves / 120 min"
+    *: "Seviye 6: 40 hamle / 120 dk."
   </dest>
   <voice>
-    *: "Level 6: 40 moves per 120 minutes"
+    *: "Seviye 6 120 dakikada 40 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13655,10 +13655,10 @@
     *: "Level 7: 40 moves / 240 min"
   </source>
   <dest>
-    *: "Level 7: 40 moves / 240 min"
+    *: "Seviye 7: 40 hamle / 240 dk."
   </dest>
   <voice>
-    *: "Level 7: 40 moves per 240 minutes"
+    *: "7. Seviye 240 dakikada 40 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13669,10 +13669,10 @@
     *: "Level 8: 1 move / 15 min"
   </source>
   <dest>
-    *: "Level 8: 1 move / 15 min"
+    *: "Seviye 8: 1 hamle / 15 dk."
   </dest>
   <voice>
-    *: "Level 8: 1 move per 15 minutes"
+    *: "Seviye 8 15 dakikada 1 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13683,10 +13683,10 @@
     *: "Level 9: 1 move / 60 min"
   </source>
   <dest>
-    *: "Level 9: 1 move / 60 min"
+    *: "Seviye 9: 1 hamle / 60 dk."
   </dest>
   <voice>
-    *: "Level 9: 1 move per 60 minutes"
+    *: "Seviye 9 60 dakikada 1 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13697,10 +13697,10 @@
     *: "Level 10: 1 move / 600 min"
   </source>
   <dest>
-    *: "Level 10: 1 move / 600 min"
+    *: "Seviye 10: 1 hamle / 600 dk."
   </dest>
   <voice>
-    *: "Level 10: 1 move per 600 minutes"
+    *: "Seviye 10: 600 dakikada 1 hamle"
   </voice>
 </phrase>
 <phrase>
@@ -13711,10 +13711,10 @@
     *: "Error parsing game !"
   </source>
   <dest>
-    *: "Error parsing game !"
+    *: "Oyun ayrıştırılırken hata oluştu!"
   </dest>
   <voice>
-    *: "Error parsing game !"
+    *: "Oyun ayrıştırılırken hata oluştu"
   </voice>
 </phrase>
 <phrase>
@@ -13739,10 +13739,10 @@
     *: "At the beginning of the game"
   </source>
   <dest>
-    *: "At the beginning of the game"
+    *: "Oyunun başında"
   </dest>
   <voice>
-    *: "At the beginning of the game"
+    *: "Oyunun başında"
   </voice>
 </phrase>
 <phrase>
@@ -13770,7 +13770,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Player"
+    *: "Oyuncu"
   </voice>
 </phrase>
 <phrase>
@@ -13784,7 +13784,7 @@
     *: ""
   </dest>
   <voice>
-    *: "GNU Chess"
+    *: "GNU Satranç"
   </voice>
 </phrase>
 <phrase>
@@ -13798,7 +13798,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Marked"
+    *: "İşaretlenmiş"
   </voice>
 </phrase>
 <phrase>
@@ -13812,7 +13812,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Unmarked"
+    *: "işaretlenmemiş"
   </voice>
 </phrase>
 <phrase>
@@ -13826,7 +13826,7 @@
     *: ""
   </dest>
   <voice>
-    *: "White"
+    *: "Beyaz"
   </voice>
 </phrase>
 <phrase>
@@ -13840,7 +13840,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Black"
+    *: "Siyah"
   </voice>
 </phrase>
 <phrase>
@@ -13854,7 +13854,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Check!"
+    *: "Kontrol"
   </voice>
 </phrase>
 <phrase>
@@ -13868,7 +13868,7 @@
     *: ""
   </dest>
   <voice>
-    *: "captures"
+    *: "yakalar"
   </voice>
 </phrase>
 <phrase>
@@ -13882,7 +13882,7 @@
     *: ""
   </dest>
   <voice>
-    *: "castle"
+    *: "kale"
   </voice>
 </phrase>
 <phrase>
@@ -13896,7 +13896,7 @@
     *: ""
   </dest>
   <voice>
-    *: "king side"
+    *: "ŞAH TARAFI"
   </voice>
 </phrase>
 <phrase>
@@ -13910,7 +13910,7 @@
     *: ""
   </dest>
   <voice>
-    *: "queen side"
+    *: "Vezir tarafı"
   </voice>
 </phrase>
 <phrase>
@@ -13924,7 +13924,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Pawn"
+    *: "Piyon"
   </voice>
 </phrase>
 <phrase>
@@ -13938,7 +13938,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Knight"
+    *: "AT"
   </voice>
 </phrase>
 <phrase>
@@ -13966,7 +13966,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Rook"
+    *: "Kale"
   </voice>
 </phrase>
 <phrase>
@@ -13980,7 +13980,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Queen"
+    *: "VEZİR"
   </voice>
 </phrase>
 <phrase>
@@ -13994,7 +13994,7 @@
     *: ""
   </dest>
   <voice>
-    *: "King"
+    *: "ŞAH"
   </voice>
 </phrase>
 <phrase>
@@ -14005,7 +14005,7 @@
     *: "Games"
   </source>
   <dest>
-    *: "Games"
+    *: "Oyunlar"
   </dest>
   <voice>
     *: ""
@@ -14019,10 +14019,10 @@
     *: "Saving position"
   </source>
   <dest>
-    *: "Saving position"
+    *: "Konum kaydediliyor"
   </dest>
   <voice>
-    *: "Saving position"
+    *: "Konum kaydediliyor"
   </voice>
 </phrase>
 <phrase>
@@ -14033,10 +14033,10 @@
     *: "Loading position"
   </source>
   <dest>
-    *: "Loading position"
+    *: "Yükleme konumu"
   </dest>
   <voice>
-    *: "Loading position"
+    *: "Yükleme konumu"
   </voice>
 </phrase>
 <phrase>
@@ -14047,7 +14047,7 @@
     *: "Thinking..."
   </source>
   <dest>
-    *: "Thinking..."
+    *: "düşün.."
   </dest>
   <voice>
     *: ""
@@ -14064,7 +14064,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Battery bench is already running"
+    *: "Pil tezgahı zaten çalışıyor"
   </voice>
 </phrase>
 <phrase>
@@ -14078,7 +14078,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Press play to run battery bench or stop to cancel"
+    *: "Pil sehpasını çalıştırmak için oynat'a basın veya iptal etmek için durdurun"
   </voice>
 </phrase>
 <phrase>
@@ -14089,10 +14089,10 @@
     *: "Cannot restart playback"
   </source>
   <dest>
-    *: "Cannot restart playback"
+    *: "Oynatma yeniden başlatılamıyor"
   </dest>
   <voice>
-    *: "Cannot restart playback"
+    *: "Oynatma yeniden başlatılamıyor"
   </voice>
 </phrase>
 <phrase>
@@ -14103,10 +14103,10 @@
     *: "Ordered"
   </source>
   <dest>
-    *: "Ordered"
+    *: "sipariş edildi"
   </dest>
   <voice>
-    *: "Ordered"
+    *: "sipariş edildi"
   </voice>
 </phrase>
 <phrase>
@@ -14117,10 +14117,10 @@
     *: "Diffusion"
   </source>
   <dest>
-    *: "Diffusion"
+    *: "difüzyon"
   </dest>
   <voice>
-    *: "Diffusion"
+    *: "difüzyon"
   </voice>
 </phrase>
 <phrase>
@@ -14131,10 +14131,10 @@
     *: "Grayscale"
   </source>
   <dest>
-    *: "Grayscale"
+    *: "Gri tonlamalı"
   </dest>
   <voice>
-    *: "Grayscale"
+    *: "Gri tonlamalı"
   </voice>
 </phrase>
 <phrase>
@@ -14145,10 +14145,10 @@
     *: "Toggle Slideshow Mode"
   </source>
   <dest>
-    *: "Toggle Slideshow Mode"
+    *: "Slayt Gösterisi Modunu Değiştir"
   </dest>
   <voice>
-    *: "Toggle Slide show Mode"
+    *: "Slayt Gösterisi Modunu Değiştir"
   </voice>
 </phrase>
 <phrase>
@@ -14159,10 +14159,10 @@
     *: "Slideshow Time"
   </source>
   <dest>
-    *: "Slideshow Time"
+    *: "Slayt Gösterisi Zamanı"
   </dest>
   <voice>
-    *: "Slide show Time"
+    *: "Slayt Gösterisi Zamanı"
   </voice>
 </phrase>
 <phrase>
@@ -14173,10 +14173,10 @@
     *: "Return"
   </source>
   <dest>
-    *: "Return"
+    *: "Dönüş"
   </dest>
   <voice>
-    *: "Return"
+    *: "Dönüş"
   </voice>
 </phrase>
 <phrase>
@@ -14189,11 +14189,11 @@
   </source>
   <dest>
     *: none
-    recording: "Recording Directory"
+    recording: "Kayıt Dizini"
   </dest>
   <voice>
     *: none
-    recording: "Recording Directory"
+    recording: "Kayıt Dizini"
   </voice>
 </phrase>
 <phrase>
@@ -14204,10 +14204,10 @@
     *: "View Played Games"
   </source>
   <dest>
-    *: "View Played Games"
+    *: "Oynanan Oyunları Görüntüle"
   </dest>
   <voice>
-    *: "View Played Games"
+    *: "Oynanan Oyunları Görüntüle"
   </voice>
 </phrase>
 <phrase>
@@ -14219,11 +14219,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Audio Options"
+    *: "Ses Seçenekleri"
     lowmem: none
   </dest>
   <voice>
-    *: "Audio Options"
+    *: "Ses Seçenekleri"
     lowmem: none
   </voice>
 </phrase>
@@ -14236,11 +14236,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume Options"
+    *: "Devam Seçenekleri"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume Options"
+    *: "Devam Seçenekleri"
     lowmem: none
   </voice>
 </phrase>
@@ -14253,11 +14253,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Play Mode"
+    *: "Oynatma modu"
     lowmem: none
   </dest>
   <voice>
-    *: "Play Mode"
+    *: "Oynatma modu"
     lowmem: none
   </voice>
 </phrase>
@@ -14270,11 +14270,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Single"
+    *: "Tek"
     lowmem: none
   </dest>
   <voice>
-    *: "Single"
+    *: "Tek"
     lowmem: none
   </voice>
 </phrase>
@@ -14287,11 +14287,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Use sound setting"
+    *: "Ses ayarını kullan"
     lowmem: none
   </dest>
   <voice>
-    *: "Use sound setting"
+    *: "Ses ayarını kullan"
     lowmem: none
   </voice>
 </phrase>
@@ -14304,11 +14304,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Play from beginning"
+    *: "Baştan oynat"
     lowmem: none
   </dest>
   <voice>
-    *: "Play from beginning"
+    *: "Baştan oynat"
     lowmem: none
   </voice>
 </phrase>
@@ -14321,11 +14321,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Set resume time (min)"
+    *: "Devam süresini ayarla (dk)"
     lowmem: none
   </dest>
   <voice>
-    *: "Set resume time"
+    *: "Devam süresini ayarla dakika olarak"
     lowmem: none
   </voice>
 </phrase>
@@ -14337,10 +14337,10 @@
     *: "Display FPS"
   </source>
   <dest>
-    *: "Display FPS"
+    *: "Ekran FPS'si"
   </dest>
   <voice>
-    *: "Display FPS"
+    *: "Ekran FPSsi"
   </voice>
 </phrase>
 <phrase>
@@ -14352,11 +14352,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Limit FPS"
+    *: "FPS'yi sınırla"
     lowmem: none
   </dest>
   <voice>
-    *: "Limit FPS"
+    *: "FPS'yi sınırla"
     lowmem: none
   </voice>
 </phrase>
@@ -14369,11 +14369,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Skip frames"
+    *: "Çerçeveleri atla"
     lowmem: none
   </dest>
   <voice>
-    *: "Skip frames"
+    *: "Çerçeveleri atla"
     lowmem: none
   </voice>
 </phrase>
@@ -14386,11 +14386,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Backlight brightness"
+    *: "Arka ışık parlaklığı"
     lowmem: none
   </dest>
   <voice>
-    *: "Backlight brightness"
+    *: "Arka ışık parlaklığı"
     lowmem: none
   </voice>
 </phrase>
@@ -14403,11 +14403,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Use common setting"
+    *: "Ortak ayarı kullan"
     lowmem: none
   </dest>
   <voice>
-    *: "Use common setting"
+    *: "Ortak ayarı kullan"
     lowmem: none
   </voice>
 </phrase>
@@ -14420,11 +14420,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Tone controls"
+    *: "Ton kontrolleri"
     lowmem: none
   </dest>
   <voice>
-    *: "Tone controls"
+    *: "Ton kontrolleri"
     lowmem: none
   </voice>
 </phrase>
@@ -14437,11 +14437,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu"
+    *: "Başlangıç ​​menüsü"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu"
+    *: "Başlangıç ​​menüsü"
     lowmem: none
   </voice>
 </phrase>
@@ -14454,11 +14454,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Start menu if not completed"
+    *: "Tamamlanmadıysa başlat menüsü"
     lowmem: none
   </dest>
   <voice>
-    *: "Start menu if not completed"
+    *: "Tamamlanmadıysa başlat menüsü"
     lowmem: none
   </voice>
 </phrase>
@@ -14471,11 +14471,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Resume automatically"
+    *: "Otomatik olarak devam ettir"
     lowmem: none
   </dest>
   <voice>
-    *: "Resume automatically"
+    *: "Otomatik olarak devam ettir"
     lowmem: none
   </voice>
 </phrase>
@@ -14488,11 +14488,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Clear all resumes"
+    *: "Tüm özgeçmişleri temizle"
     lowmem: none
   </dest>
   <voice>
-    *: "Clear all resumes"
+    *: "Tüm özgeçmişleri temizle"
     lowmem: none
   </voice>
 </phrase>
@@ -14505,11 +14505,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Unavailable"
+    *: "Kullanım dışı"
     lowmem: none
   </dest>
   <voice>
-    *: "Unavailable"
+    *: "Kullanım dışı"
     lowmem: none
   </voice>
 </phrase>
@@ -14521,10 +14521,10 @@
     *: "Toggle Item"
   </source>
   <dest>
-    *: "Toggle Item"
+    *: "Öğeyi Aç/Kapat"
   </dest>
   <voice>
-    *: "Toggle Item"
+    *: "Öğeyi Aç Kapat"
   </voice>
 </phrase>
 <phrase>
@@ -14535,10 +14535,10 @@
     *: "Move Item Up"
   </source>
   <dest>
-    *: "Move Item Up"
+    *: "Öğeyi Yukarı Taşı"
   </dest>
   <voice>
-    *: "Move Item Up"
+    *: "Öğeyi Yukarı Taşı"
   </voice>
 </phrase>
 <phrase>
@@ -14549,10 +14549,10 @@
     *: "Move Item Down"
   </source>
   <dest>
-    *: "Move Item Down"
+    *: "Öğeyi Aşağı Taşı"
   </dest>
   <voice>
-    *: "Move Item Down"
+    *: "Öğeyi Aşağı Taşı"
   </voice>
 </phrase>
 <phrase>
@@ -14563,10 +14563,10 @@
     *: "Load Default Configuration"
   </source>
   <dest>
-    *: "Load Default Configuration"
+    *: "Varsayılan Yapılandırmayı Yükle"
   </dest>
   <voice>
-    *: "Load Default Configuration"
+    *: "Varsayılan Yapılandırmayı Yükle"
   </voice>
 </phrase>
 <phrase>
@@ -14577,10 +14577,10 @@
     *: "Save and Exit"
   </source>
   <dest>
-    *: "Save and Exit"
+    *: "Kaydet ve çık"
   </dest>
   <voice>
-    *: "Save and Exit"
+    *: "Kaydet ve çık"
   </voice>
 </phrase>
 <phrase>
@@ -14591,7 +14591,7 @@
     *: "Rockbox Main Menu Order"
   </source>
   <dest>
-    *: "Rockbox Main Menu Order"
+    *: "Rockbox Ana Menü Sıralaması"
   </dest>
   <voice>
     *: ""
@@ -14605,10 +14605,10 @@
     *: "[Path]"
   </source>
   <dest>
-    *: "[Path]"
+    *: "[YOL]"
   </dest>
   <voice>
-    *: "Path"
+    *: "Yol"
   </voice>
 </phrase>
 <phrase>
@@ -14619,10 +14619,10 @@
     *: "[Filename]"
   </source>
   <dest>
-    *: "[Filename]"
+    *: "[Dosya adı]"
   </dest>
   <voice>
-    *: "Filename"
+    *: "Dosya adı"
   </voice>
 </phrase>
 <phrase>
@@ -14633,10 +14633,10 @@
     *: "[Size]"
   </source>
   <dest>
-    *: "[Size]"
+    *: "[BOYUT]"
   </dest>
   <voice>
-    *: "Size"
+    *: "BOYUT"
   </voice>
 </phrase>
 <phrase>
@@ -15214,10 +15214,10 @@
     *: "Error writing config"
   </source>
   <dest>
-    *: "Error writing config"
+    *: "Yapılandırma yazılırken hata oluştu"
   </dest>
   <voice>
-    *: "Error writing config"
+    *: "Yapılandırma yazılırken hata oluştu"
   </voice>
 </phrase>
 <phrase>
@@ -15228,10 +15228,10 @@
     *: "Not a VBR file"
   </source>
   <dest>
-    *: "Not a VBR file"
+    *: "VBR dosyası değil"
   </dest>
   <voice>
-    *: "Not a VBR file"
+    *: "VBR dosyası değil"
   </voice>
 </phrase>
 <phrase>
@@ -15242,10 +15242,10 @@
     *: "File error: %d"
   </source>
   <dest>
-    *: "File error: %d"
+    *: "Dosya hatası: %d"
   </dest>
   <voice>
-    *: "File error"
+    *: "Dosya hatası"
   </voice>
 </phrase>
 <phrase>
@@ -15256,10 +15256,10 @@
     *: "Update cache"
   </source>
   <dest>
-    *: "Update cache"
+    *: "Önbelleği güncelle"
   </dest>
   <voice>
-    *: "Update cache"
+    *: "Önbelleği güncelle"
   </voice>
 </phrase>
 <phrase>
@@ -15270,10 +15270,10 @@
     *: "Hide information"
   </source>
   <dest>
-    *: "Hide information"
+    *: "Bilgileri gizle"
   </dest>
   <voice>
-    *: "Hide information"
+    *: "Bilgileri gizle"
   </voice>
 </phrase>
 <phrase>
@@ -15284,10 +15284,10 @@
     *: "Show album at the bottom"
   </source>
   <dest>
-    *: "Show album at the bottom"
+    *: "Albümü altta göster"
   </dest>
   <voice>
-    *: "Show album at the bottom"
+    *: "Albümü altta göster"
   </voice>
 </phrase>
 <phrase>
@@ -15298,10 +15298,10 @@
     *: "Show album at the top"
   </source>
   <dest>
-    *: "Show album at the top"
+    *: "Albümü en üstte göster"
   </dest>
   <voice>
-    *: "Show album at the top"
+    *: "Albümü en üstte göster"
   </voice>
 </phrase>
 <phrase>
@@ -15312,10 +15312,10 @@
     *: "Show album and artist at the top"
   </source>
   <dest>
-    *: "Show album and artist at the top"
+    *: "Albümü ve sanatçıyı en üstte göster"
   </dest>
   <voice>
-    *: "Show album and artist at the top"
+    *: "Albümü ve sanatçıyı en üstte göster"
   </voice>
 </phrase>
 <phrase>
@@ -15326,10 +15326,10 @@
     *: "Show album and artist at the bottom"
   </source>
   <dest>
-    *: "Show album and artist at the bottom"
+    *: "Albümü ve sanatçıyı altta göster"
   </dest>
   <voice>
-    *: "Show album and artist at the bottom"
+    *: "Albümü ve sanatçıyı altta göster"
   </voice>
 </phrase>
 <phrase>
@@ -15358,9 +15358,9 @@
     ihifi760,ihifi960: "İptal etmek için GERİ DÖN'e iki kez dokunun."
     ihifi770,ihifi770c,ihifi800: "İptal etmek için EV TUŞUNA basın."
     iriverh10: "Dİptal etmek için SOL'a iki kez dokunun."
-    samsungyh*: "İptal etmek için SOL'a iki kez dokunun."
     mpiohd200,mpiohd300: "İptal etmek için KAYIT'a iki kez dokunun."
     rx27generic: "İptal etmek için VOLUME'a basın."
+    samsungyh*: "İptal etmek için SOL'a iki kez dokunun."
     sonynwza860: "Tuş haritaları eksik."
     touchscreen: "İptal etmek için Orta Sol'a basın."
     vibe500: "İptal etmek için PREV'e basın."
@@ -15829,10 +15829,10 @@
     *: "Clear List & Play Shuffled"
   </source>
   <dest>
-    *: "Clear List & Play Shuffled"
+    *: "Listeyi Temizle ve Karışık Oynat"
   </dest>
   <voice>
-    *: "Clear List & Play Shuffled"
+    *: "Listeyi Temizle ve Karışık Oynat"
   </voice>
 </phrase>
 <phrase>
@@ -15941,10 +15941,10 @@
     *: "[Composer]"
   </source>
   <dest>
-    *: "[Composer]"
+    *: "[Besteci]"
   </dest>
   <voice>
-    *: "Composer"
+    *: "Besteci"
   </voice>
 </phrase>
 <phrase>
