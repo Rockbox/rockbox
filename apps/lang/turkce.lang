@@ -125,7 +125,7 @@
     *: "Loading..."
   </source>
   <dest>
-    *: "Yükleniyor"
+    *: "Yükleniyor..."
   </dest>
   <voice>
     *: "Yükleniyor"
@@ -153,10 +153,10 @@
     *: "Scanning disk..."
   </source>
   <dest>
-    *: "Disk Kontrol yapıyor..."
+    *: "Disk Kontrolü yapıyor..."
   </dest>
   <voice>
-    *: "Disk Kontrol yapıyor..."
+    *: "Disk Kontrolü yapıyor..."
   </voice>
 </phrase>
 <phrase>
@@ -181,7 +181,7 @@
     *: "Cancelled"
   </source>
   <dest>
-    *: "İptal etildi"
+    *: "İptal etildi!"
   </dest>
   <voice>
     *: "İptal etildi"
@@ -195,10 +195,10 @@
     *: "Failed"
   </source>
   <dest>
-    *: "Başaramadı"
+    *: "Başarısız oldu"
   </dest>
   <voice>
-    *: "Başarısız kaldı"
+    *: "Başarısız oldu"
   </voice>
 </phrase>
 <phrase>
@@ -261,7 +261,7 @@
     *: "Any Other = No"
   </source>
   <dest>
-    *: "Herhangi PLAY'dan başka = İptal et"
+    *: "İptal etmek içim Play harici bir tuşa bas."
   </dest>
   <voice>
     *: ""
@@ -275,10 +275,10 @@
     *: "Recent Bookmarks"
   </source>
   <dest>
-    *: "En Son Kullanıldı Yer Imiler"
+    *: "Son Yer imleri"
   </dest>
   <voice>
-    *: "En son kullanıldı yer imiler"
+    *: "Son Yer imleri"
   </voice>
 </phrase>
 <phrase>
@@ -317,10 +317,10 @@
     *: "Now Playing"
   </source>
   <dest>
-    *: "Çalan Şarkı"
+    *: "Şimdi Çalınan..."
   </dest>
   <voice>
-    *: "Çalan Şarkı"
+    *: "Şimdi Çalınan"
   </voice>
 </phrase>
 <phrase>
@@ -331,10 +331,10 @@
     *: "Resume Playback"
   </source>
   <dest>
-    *: "Çalmayı Devam Et"
+    *: "Oynatmaya Devam Et"
   </dest>
   <voice>
-    *: "Çalmayı Devam Et"
+    *: "Oynatmaya Devam Et"
   </voice>
 </phrase>
 <phrase>
@@ -435,10 +435,10 @@
     *: "Select Bookmark"
   </source>
   <dest>
-    *: "Yer İmiyi Seç"
+    *: "Yer İmi Seç"
   </dest>
   <voice>
-    *: "Yer İmiyi Seç"
+    *: "Yer İmi Seç"
   </voice>
 </phrase>
 <phrase>
@@ -477,10 +477,10 @@
     *: "<Invalid Bookmark>"
   </source>
   <dest>
-    *: "<Yer İmiyi Geçersiztir>"
+    *: "<Geçersiz Yer imi>"
   </dest>
   <voice>
-    *: "Yer İmiyi Geçersiztir"
+    *: "Geçersiz Yer imi"
   </voice>
 </phrase>
 <phrase>
@@ -491,10 +491,10 @@
     *: "Bookmark Actions"
   </source>
   <dest>
-    *: "Yer İmi Eylemler"
+    *: "Yer İmi Eylemleri"
   </dest>
   <voice>
-    *: "Yer İmi Eylemler"
+    *: "Yer İmi Eylemleri"
   </voice>
 </phrase>
 <phrase>
@@ -533,10 +533,10 @@
     *: "Create a Bookmark?"
   </source>
   <dest>
-    *: "Yeni Bir Yer İmiyi Yarat Mı?"
+    *: "Yeni bir Yer imi Üretilsin mi?"
   </dest>
   <voice>
-    *: "Yeni Bir Yer İmiyi Yarat Mı?"
+    *: "Yeni bir Yer imi Üretilsin mi?"
   </voice>
 </phrase>
 <phrase>
@@ -547,10 +547,10 @@
     *: "Bookmark Created"
   </source>
   <dest>
-    *: "Yeni Yer İmi Yaratıldı"
+    *: "Yeni Yer İmi oluşturuldu!"
   </dest>
   <voice>
-    *: "Yeni Yer İmi Yaratıldı"
+    *: "Yeni Yer İmi oluşturuldu"
   </voice>
 </phrase>
 <phrase>
@@ -561,10 +561,10 @@
     *: "Bookmark Failed!"
   </source>
   <dest>
-    *: "Yer İmiyi Yaratmayı Başaramadı."
+    *: "Yeni Yer İmi oluşturma Başarısız!"
   </dest>
   <voice>
-    *: "Yer İmiyi Yaratmayı Başaramadı."
+    *: "Yeni Yer İmi oluşturma Başarısız!"
   </voice>
 </phrase>
 <phrase>
@@ -575,10 +575,10 @@
     *: "Bookmark Empty"
   </source>
   <dest>
-    *: "Yer İmi Boştur."
+    *: "Yer İmi Boş!"
   </dest>
   <voice>
-    *: "Yer İmi Boştur."
+    *: "Yer İmi Boş"
   </voice>
 </phrase>
 <phrase>
@@ -617,10 +617,10 @@
     *: "Bass"
   </source>
   <dest>
-    *: "Bas Sesi"
+    *: "Bas Ayarı"
   </dest>
   <voice>
-    *: "Bas Sesi"
+    *: "Bas Ayarı"
   </voice>
 </phrase>
 <phrase>
@@ -631,10 +631,10 @@
     *: "Treble"
   </source>
   <dest>
-    *: "Soprano Sesi"
+    *: "Tiz Ayarı"
   </dest>
   <voice>
-    *: "Soprano Sesi"
+    *: "Tiz Ayarı"
   </voice>
 </phrase>
 <phrase>
@@ -659,10 +659,10 @@
     *: "Channel Configuration"
   </source>
   <dest>
-    *: "Kanal Düzeneği"
+    *: "Kanal Yapılandırması"
   </dest>
   <voice>
-    *: "Kanal Düzeneği"
+    *: "Kanal Yapılandırması"
   </voice>
 </phrase>
 <phrase>
@@ -701,10 +701,10 @@
     *: "Custom"
   </source>
   <dest>
-    *: "Ismarlama"
+    *: "Özel"
   </dest>
   <voice>
-    *: "Ismarlama"
+    *: "Özel"
   </voice>
 </phrase>
 <phrase>
@@ -743,10 +743,10 @@
     *: "Stereo Width"
   </source>
   <dest>
-    *: "Stereo Genişliği"
+    *: "Stereo Genişletme"
   </dest>
   <voice>
-    *: "Stereo Genişliği"
+    *: "Stereo Genişletme"
   </voice>
 </phrase>
 <phrase>
@@ -813,10 +813,10 @@
     *: "Equalizer"
   </source>
   <dest>
-    *: "Ses Dengeleyici"
+    *: "Ekolayzer"
   </dest>
   <voice>
-    *: "Ses Dengeleyici"
+    *: "Ekolayzer"
   </voice>
 </phrase>
 <phrase>
@@ -827,10 +827,10 @@
     *: "Enable EQ"
   </source>
   <dest>
-    *: "EQ'yı başlat"
+    *: "Ekolayzer'ı Etkinleştir"
   </dest>
   <voice>
-    *: "Ses Dengeleyiciyi başlat"
+    *: "Ekolayzer'ı Etkinleştir"
   </voice>
 </phrase>
 <phrase>
@@ -841,10 +841,10 @@
     *: "Graphical EQ"
   </source>
   <dest>
-    *: "Çizgesel EQ"
+    *: "Grafik Ekolayzer"
   </dest>
   <voice>
-    *: "Çizgesel Ses Dengeleyici"
+    *: "Grafik Ekolayzer"
   </voice>
 </phrase>
 <phrase>
@@ -869,10 +869,10 @@
     *: "Simple EQ Settings"
   </source>
   <dest>
-    *: "EQ Ayarları"
+    *: "Basit Ekolayzer Ayarları"
   </dest>
   <voice>
-    *: "Ses Dengeleyici Ayarları"
+    *: "Basit Ekolayzer Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -883,10 +883,10 @@
     *: "Advanced EQ Settings"
   </source>
   <dest>
-    *: "Karmaşık EQ Ayarları"
+    *: "Gelişmiş Ekolayzer Ayarları"
   </dest>
   <voice>
-    *: "Karmaşık Ses Dengeleyici Ayarları"
+    *: "Gelişmiş Ekolayzer Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -897,10 +897,10 @@
     *: "Save EQ Preset"
   </source>
   <dest>
-    *: "EQ Ayarları Kaydet"
+    *: "Ekolayzer Ayarlarını Kaydet"
   </dest>
   <voice>
-    *: "Ses Dengeleyici Ayarları Kaydet"
+    *: "Ekolayzer Ayarlarını Kaydet"
   </voice>
 </phrase>
 <phrase>
@@ -911,10 +911,10 @@
     *: "Browse EQ Presets"
   </source>
   <dest>
-    *: "EQ Ayarlara göz at"
+    *: "EkolayzerAyarlarına göz at"
   </dest>
   <voice>
-    *: "Ses Dengeleyici Ayarlara göz at"
+    *: "EkolayzerAyarlarına göz at"
   </voice>
 </phrase>
 <phrase>
@@ -953,10 +953,10 @@
     *: "General Settings"
   </source>
   <dest>
-    *: "Genel Ayarları"
+    *: "Genel Ayarlar"
   </dest>
   <voice>
-    *: "Genel Ayarları"
+    *: "Genel Ayarlar"
   </voice>
 </phrase>
 <phrase>
@@ -981,10 +981,10 @@
     *: "Shuffle"
   </source>
   <dest>
-    *: "Karıştırmayı"
+    *: "Karışık Çal"
   </dest>
   <voice>
-    *: "Karıştırmayı"
+    *: "Karışık Çal"
   </voice>
 </phrase>
 <phrase>
@@ -995,10 +995,10 @@
     *: "Repeat"
   </source>
   <dest>
-    *: "Tekrar Etmeyi"
+    *: "Tekrarla"
   </dest>
   <voice>
-    *: "Tekrar Etmeyi"
+    *: "Tekrarla"
   </voice>
 </phrase>
 <phrase>
@@ -1009,10 +1009,10 @@
     *: "All"
   </source>
   <dest>
-    *: "Hep"
+    *: "Hepsini Tekrarla"
   </dest>
   <voice>
-    *: "Hep"
+    *: "Hepsini Tekrarla"
   </voice>
 </phrase>
 <phrase>
@@ -1023,10 +1023,10 @@
     *: "One"
   </source>
   <dest>
-    *: "Bir"
+    *: "Seçilen Parçayı Tekrarla"
   </dest>
   <voice>
-    *: "Bir"
+    *: "Seçilen Parçayı Tekrarla"
   </voice>
 </phrase>
 <phrase>
@@ -1037,10 +1037,10 @@
     *: "Play Selected First"
   </source>
   <dest>
-    *: "Çalmayı başla şeçilmiş şarkıyla"
+    *: "Önce Seçileni Oynat"
   </dest>
   <voice>
-    *: "Çalmayı başla şeçilmiş şarkıyı ile"
+    *: "Önce Seçileni Oynat"
   </voice>
 </phrase>
 <phrase>
@@ -1110,10 +1110,10 @@
     *: "Fade on Stop/Pause"
   </source>
   <dest>
-    *: "Durarken Sol"
+    *: "Dururken Sesi Azalt"
   </dest>
   <voice>
-    *: "Durarken Sol"
+    *: "Dururken Sesi Azalt"
   </voice>
 </phrase>
 <phrase>
@@ -1124,10 +1124,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Parti Hali"
+    *: "Parti Modu"
   </dest>
   <voice>
-    *: "Parti Hali"
+    *: "Parti Modu"
   </voice>
 </phrase>
 <phrase>
@@ -1140,11 +1140,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Crossfade Başla"
+    crossfade: "Çapraz Geçiş'i Etkinleştir"
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade başla"
+    crossfade: "Çapraz Geçiş'i Etkinleştir"
   </voice>
 </phrase>
 <phrase>
@@ -1261,10 +1261,10 @@
     *: "Display"
   </source>
   <dest>
-    *: "Ekran"
+    *: "Ekran Ayarları"
   </dest>
   <voice>
-    *: "Ekran"
+    *: "Ekran Ayarları"
   </voice>
 </phrase>
 <phrase>
@@ -1275,10 +1275,10 @@
     *: "Backlight"
   </source>
   <dest>
-    *: "Ekran Işığı"
+    *: "Ekran Işığı Zaman aşımı"
   </dest>
   <voice>
-    *: "Ekran Işığı"
+    *: "Ekran Işığı Zaman aşımı"
   </voice>
 </phrase>
 <phrase>
@@ -1308,11 +1308,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Aydınlatma Açılıyor"
+    backlight_fade*: "Aydınlatma Açılma süresi"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Aydınlatma Açılıyor"
+    backlight_fade*: "Aydınlatma Açılma süresi"
   </voice>
 </phrase>
 <phrase>
@@ -1325,11 +1325,11 @@
   </source>
   <dest>
     *: none
-    backlight_fade*: "Aydınlatma Kapanıyor"
+    backlight_fade*: "Aydınlatma Kapatma süresi"
   </dest>
   <voice>
     *: none
-    backlight_fade*: "Aydınlatma Kapanıyor"
+    backlight_fade*: "Aydınlatma Kapatma süresi"
   </voice>
 </phrase>
 <phrase>
@@ -1402,7 +1402,7 @@
     *: "Scroll Speed Setting Example"
   </source>
   <dest>
-    *: "Kayma Hizi Ayari Ornegi"
+    *: "Kayma Hızı Ayarı Örneği"
   </dest>
   <voice>
     *: ""
@@ -1514,10 +1514,10 @@
     *: "Clip Hold Time"
   </source>
   <dest>
-    *: "Parça Kalış Süresi"
+    *: "Parçanın Kalan Süresi"
   </dest>
   <voice>
-    *: "Parça Kalış Süresi"
+    *: "Parçanın Kalan Süresi"
   </voice>
 </phrase>
 <phrase>
@@ -1694,10 +1694,10 @@
     *: "Time Format"
   </source>
   <dest>
-    *: "Zaman Formatı"
+    *: "Saat Formatı"
   </dest>
   <voice>
-    *: "Zaman Formatı"
+    *: "Saat Formatı"
   </voice>
 </phrase>
 <phrase>
@@ -1754,7 +1754,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
+    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
   </voice>
 </phrase>
 <phrase>
@@ -1779,6 +1779,7 @@
     *: none
     gigabeatfx,mrobe500: "POWER = Geri Döndür"
     gigabeats: "LEFT =  Revert"
+    sansafuzeplus: "BACK = Geri Döndür"
     gogearsa9200: "LEFT = Geri Döndür"
     iaudiom5,iaudiox5: "RECORD = Geri Döndür"
     ipod*,mpiohd300,sansac200*: "MENU = Geri Döndür"
@@ -1787,12 +1788,11 @@
     mrobe100: "DISPLAY = Geri Döndür"
     rtc: "OFF = Geri Döndür"
     samsungyh*: "REW = Geri Döndür"
-    sansafuzeplus: "BACK = Geri Döndür"
     vibe500: "C = Geri Döndür"
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
+    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
   </voice>
 </phrase>
 <phrase>
@@ -1978,7 +1978,7 @@
     *: "May"
   </source>
   <dest>
-    *: "Mayıs"
+    *: "May"
   </dest>
   <voice>
     *: "Mayıs"
@@ -2132,7 +2132,7 @@
     *: "Cleared"
   </source>
   <dest>
-    *: "Temizlendi"
+    *: "Temizlendi!"
   </dest>
   <voice>
     *: "Temizlendi"
@@ -2225,10 +2225,10 @@
     *: "Title"
   </source>
   <dest>
-    *: "Adi"
+    *: "Başlık"
   </dest>
   <voice>
-    *: "Adi"
+    *: "Başlık"
   </voice>
 </phrase>
 <phrase>
@@ -2239,10 +2239,10 @@
     *: "Artist"
   </source>
   <dest>
-    *: "Sanatci"
+    *: "Sanatçı"
   </dest>
   <voice>
-    *: "Sanatci"
+    *: "Sanatçı"
   </voice>
 </phrase>
 <phrase>
@@ -2253,10 +2253,10 @@
     *: "Tracknum"
   </source>
   <dest>
-    *: "Sarki no"
+    *: "Parça Numarası"
   </dest>
   <voice>
-    *: "Sarki no"
+    *: "Parça Numarası"
   </voice>
 </phrase>
 <phrase>
@@ -2267,10 +2267,10 @@
     *: "Playlist"
   </source>
   <dest>
-    *: "Sarki Listesi"
+    *: "Şarkı Listesi"
   </dest>
   <voice>
-    *: "Sarki Listesi"
+    *: "Şarkı Listesi"
   </voice>
 </phrase>
 <phrase>
@@ -2450,10 +2450,10 @@
     *: "Dir Buffer is Full!"
   </source>
   <dest>
-    *: "Dir Tamponu dolu!"
+    *: "Dizin Tamponu dolu!"
   </dest>
   <voice>
-    *: "Dir Tamponu dolu!"
+    *: "Dizin Tamponu dolu!"
   </voice>
 </phrase>
 <phrase>
@@ -2464,10 +2464,10 @@
     *: "Invalid Filename!"
   </source>
   <dest>
-    *: "Dosyanın adısı geçersiz!"
+    *: "Geçersiz Dosya Adı!"
   </dest>
   <voice>
-    *: "Dosyanın adısı geçersiz"
+    *: "Geçersiz Dosya Adı"
   </voice>
 </phrase>
 <phrase>
@@ -2478,10 +2478,10 @@
     *: "Please reboot to enable"
   </source>
   <dest>
-    *: "Lütfen sistemi yeniden aç"
+    *: "Etkinleştirmek için lütfen yeniden başlatın"
   </dest>
   <voice>
-    *: "Lütfen sistemi yeniden aç"
+    *: "Etkinleştirmek için lütfen yeniden başlatın"
   </voice>
 </phrase>
 <phrase>
@@ -2494,11 +2494,11 @@
   </source>
   <dest>
     *: none
-    charging: "Pil yükliyor"
+    charging: "Pil Şarj Oluyor"
   </dest>
   <voice>
     *: none
-    charging: "Pil yükliyor"
+    charging: "Pil Şarj Oluyor"
   </voice>
 </phrase>
 <phrase>
@@ -2511,11 +2511,11 @@
   </source>
   <dest>
     *: none
-    charging: "Pil yavaşça yükliyor"
+    charging: "Pil yavaşça doluyor"
   </dest>
   <voice>
     *: none
-    charging: "Pil yavaşça yükliyor"
+    charging: "Pil yavaşça doluyor"
   </voice>
 </phrase>
 <phrase>
@@ -2540,10 +2540,10 @@
     *: "Battery empty! RECHARGE!"
   </source>
   <dest>
-    *: "Pil boş! Doldur!"
+    *: "Pil boş! Şarj Et "
   </dest>
   <voice>
-    *: "Pil boş! Doldur!"
+    *: "Pil boş! Şarj Et "
   </voice>
 </phrase>
 <phrase>
@@ -2652,7 +2652,7 @@
     *: "Edit mode: %s %s"
   </source>
   <dest>
-    *: "Edit mode: %s"
+    *: "Düzenleme Modu: %s"
   </dest>
   <voice>
     *: ""
@@ -2736,10 +2736,10 @@
     *: "Show Filename Extensions"
   </source>
   <dest>
-    *: "Dosya Çeşitleri Göster"
+    *: "Dosya Adlarını Göster"
   </dest>
   <voice>
-    *: "dosya çeşitleri göster"
+    *: "Dosya Adlarını Göster"
   </voice>
 </phrase>
 <phrase>
@@ -2750,10 +2750,10 @@
     *: "Only Unknown Types"
   </source>
   <dest>
-    *: "Sadece bilinmez çeşitler"
+    *: "Yalnızca Bilinmeyen Türler"
   </dest>
   <voice>
-    *: "Sadece bilinmez çeşitler"
+    *: "Yalnızca Bilinmeyen Türler"
   </voice>
 </phrase>
 <phrase>
@@ -2764,10 +2764,10 @@
     *: "Only When Viewing All Types"
   </source>
   <dest>
-    *: "Sadece hepsi çeşiti görürken"
+    *: "Yalnızca Tüm Türleri Görüntülerken"
   </dest>
   <voice>
-    *: "Sadece hepsi çeşiti görürken"
+    *: "Yalnızca Tüm Türleri Görüntülerken"
   </voice>
 </phrase>
 <phrase>
@@ -2781,7 +2781,7 @@
     *: ""
   </dest>
   <voice>
-    *: "bir tikta birim"
+    *: "Tık başına birim"
   </voice>
 </phrase>
 <phrase>
@@ -2809,7 +2809,7 @@
     *: ""
   </dest>
   <voice>
-    *: "akşam"
+    *: "ÖĞLEDEN SONRA"
   </voice>
 </phrase>
 <phrase>
@@ -2823,7 +2823,7 @@
     *: ""
   </dest>
   <voice>
-    *: "sabah"
+    *: "ÖĞLEDEN ÖNCE"
   </voice>
 </phrase>
 <phrase>
@@ -2881,11 +2881,11 @@
   </source>
   <dest>
     *: none
-    lcd_color: "Çizgi Seçen Renkler"
+    lcd_color: "Menü Gezinme Renkleri"
   </dest>
   <voice>
     *: none
-    lcd_color: "Çizgi seçen renkler"
+    lcd_color: "Menü Gezinme Renkleri"
   </voice>
 </phrase>
 <phrase>
@@ -2899,7 +2899,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit et"
+    *: "Düzenle"
   </voice>
 </phrase>
 <phrase>
@@ -2940,11 +2940,11 @@
   </source>
   <dest>
     *: none
-    multivolume: "Önceden ayarlamadı"
+    multivolume: "Mevcut Değil"
   </dest>
   <voice>
     *: none
-    multivolume: "Önceden ayarlamadı"
+    multivolume: "Mevcut Değil"
   </voice>
 </phrase>
 <phrase>
@@ -2955,10 +2955,10 @@
     *: "Announce Battery Level"
   </source>
   <dest>
-    *: "Pil güçü söyle"
+    *: "Pil Seviyesini Bildir"
   </dest>
   <voice>
-    *: "Pil güçü söyle"
+    *: "Pil Seviyesini Bildir"
   </voice>
 </phrase>
 <phrase>
@@ -2969,10 +2969,10 @@
     *: "Say File Type"
   </source>
   <dest>
-    *: "Dosya Çeşiti Söyle"
+    *: "Dosya Türünü Söyle"
   </dest>
   <voice>
-    *: "Dosya Çeşiti Söyle"
+    *: "Dosya Türünü Söyle"
   </voice>
 </phrase>
 <phrase>
@@ -2983,10 +2983,10 @@
     *: "<Random>"
   </source>
   <dest>
-    *: "<Rasgele>"
+    *: "<Rastgele>"
   </dest>
   <voice>
-    *: "Rasgele"
+    *: "Rastgele"
   </voice>
 </phrase>
 <phrase>
@@ -3041,11 +3041,11 @@
   </source>
   <dest>
     *: none
-    accessory_supply: "Yardımcı Elektrik Sağlayan"
+    accessory_supply: "Güç Kaynağı Aksesuarı"
   </dest>
   <voice>
     *: none
-    accessory_supply: "Yardımcı Elektrik Sağlayan"
+    accessory_supply: "Güç Kaynağı Aksesuarı"
   </voice>
 </phrase>
 <phrase>
@@ -3056,10 +3056,10 @@
     *: "Unknown"
   </source>
   <dest>
-    *: "Bilinmez"
+    *: "Bilinmiyor"
   </dest>
   <voice>
-    *: "Bilinmez"
+    *: "Bilinmiyor"
   </voice>
 </phrase>
 <phrase>
@@ -3073,7 +3073,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Hızlı ekranı"
+    *: "Hızlı ekran"
   </voice>
 </phrase>
 <phrase>
@@ -3100,11 +3100,11 @@
   </source>
   <dest>
     *: none
-    recording: "Ses kaydeti durup kapat"
+    recording: "Kaydı Durdur ve Kapat"
   </dest>
   <voice>
     *: none
-    recording: "Ses kaydeti durup kapat"
+    recording: "Kaydı Durdur ve Kapat"
   </voice>
 </phrase>
 <phrase>
@@ -3188,10 +3188,10 @@
     *: "Skip Length"
   </source>
   <dest>
-    *: "Şarkıyı Atlamasının Adımı"
+    *: "Şarkı Atlama Adımı"
   </dest>
   <voice>
-    *: "Şarkıyı Atlamasının Adımı"
+    *: "Şarkı Atlama Adımı"
   </voice>
 </phrase>
 <phrase>
@@ -3202,10 +3202,10 @@
     *: "Skip Track"
   </source>
   <dest>
-    *: "Bütün Şarkı"
+    *: "Tüm Şarkı"
   </dest>
   <voice>
-    *: "Bütün Şarkı"
+    *: "Tüm Şarkı"
   </voice>
 </phrase>
 <phrase>
@@ -3263,11 +3263,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Sunum Kipi"
+    usb_hid: "Sunum"
   </dest>
   <voice>
     *: none
-    usb_hid: "Presentation Mode"
+    usb_hid: "Sunum modu"
   </voice>
 </phrase>
 <phrase>
@@ -3280,11 +3280,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Ã‡okluortam Kipi"
+    usb_hid: "Çoklu Ortam(Multimedya)"
   </dest>
   <voice>
     *: none
-    usb_hid: "Multimedia Mode"
+    usb_hid: "Multimedia Modu"
   </voice>
 </phrase>
 <phrase>
@@ -3297,11 +3297,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Fare Kipi"
+    usb_hid: "Fare Kullanımı"
   </dest>
   <voice>
     *: none
-    usb_hid: "Mouse Mode"
+    usb_hid: "Fare Kullanımı"
   </voice>
 </phrase>
 <phrase>
@@ -3314,11 +3314,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "TarayÄ±cÄ± Kipi"
+    usb_hid: "Tarayıcı Modu"
   </dest>
   <voice>
     *: none
-    usb_hid: "Browser Mode"
+    usb_hid: "Tarayıcı Modu"
   </voice>
 </phrase>
 <phrase>
@@ -3447,11 +3447,11 @@
   </source>
   <dest>
     *: none
-    hotkey: "Dosya Tarama Geçiş Tuşu"
+    hotkey: "Dosya Tarayıcı Kısayol Tuşu"
   </dest>
   <voice>
     *: none
-    hotkey: "Dosya Tarama Geçiş Tuşu"
+    hotkey: "Dosya Tarayıcı Kısayol Tuşu"
   </voice>
 </phrase>
 <phrase>
@@ -3464,11 +3464,11 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Kulaklık Tuş Tıklaması"
+    hardware_click: "Tuş Sesi-Kulaklık"
   </dest>
   <voice>
     *: none
-    hardware_click: "Kulaklık Tuş Tıklaması"
+    hardware_click: "Kulaklık Tuş sesi"
   </voice>
 </phrase>
 <phrase>
@@ -3744,7 +3744,7 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Yumuşak Diz"
+    *: "Yumuşak Knee"
   </dest>
   <voice>
     *: "Yumuşak Diz"
@@ -4666,10 +4666,10 @@
     *: "Limits"
   </source>
   <dest>
-    *: "Limitler"
+    *: "Sınırlar"
   </dest>
   <voice>
-    *: "Limitler"
+    *: "Sınırlar"
   </voice>
 </phrase>
 <phrase>
@@ -4848,7 +4848,7 @@
   </source>
   <dest>
     *: none
-    hardware_click: "Hoparlör Tuş Sesi"
+    hardware_click: "Tuş Sesi-Hoparlör "
   </dest>
   <voice>
     *: none
