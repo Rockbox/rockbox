@@ -301,7 +301,7 @@ void gif_decode(struct gif_decoder *d,
                                    Row + i, Col, Width);
 
                         if (pf_progress != NULL)
-                            pf_progress(25*(i+1), 100);
+                            pf_progress((i+1), Height);
                     }
                 }
 
