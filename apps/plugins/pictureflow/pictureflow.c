@@ -4035,7 +4035,11 @@ static int pictureflow_main(const char* selected_file)
 #ifdef USEGSLIB
             grey_show(false);
 #endif
+            FOR_NB_SCREENS(i)
+                rb->viewportmanager_theme_enable(i, true, NULL);
             ret = main_menu();
+            FOR_NB_SCREENS(i)
+                rb->viewportmanager_theme_undo(i, false);
             if ( ret == -2 ) return PLUGIN_GOTO_WPS;
             if ( ret == -1 ) return PLUGIN_OK;
             if ( ret != 0 ) return ret;
