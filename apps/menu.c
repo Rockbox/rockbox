@@ -738,6 +738,8 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 if (menu_callback(ACTION_REDRAW, menu, &lists) != ACTION_REDRAW)
                     continue;
 
+
+            gui_synclist_set_title(&lists, lists.title, lists.title_icon);
             gui_synclist_draw(&lists);
             gui_synclist_speak_item(&lists);
         }

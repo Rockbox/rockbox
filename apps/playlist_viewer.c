@@ -826,6 +826,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     int start_index = current_track->index;
                     if (!warn_on_pl_erase())
                     {
+                        gui_synclist_set_title(&playlist_lists, playlist_lists.title, playlist_lists.title_icon);
                         gui_synclist_draw(&playlist_lists);
                         break;
                     }
@@ -875,6 +876,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 gui_synclist_set_icon_callback(&playlist_lists,
                               global_settings.playlist_viewer_icons?
                               &playlist_callback_icons:NULL);
+                gui_synclist_set_title(&playlist_lists, playlist_lists.title, playlist_lists.title_icon);
                 gui_synclist_draw(&playlist_lists);
                 gui_synclist_speak_item(&playlist_lists);
                 break;

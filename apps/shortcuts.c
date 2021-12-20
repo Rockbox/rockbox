@@ -451,10 +451,14 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
         int selection = gui_synclist_get_sel_pos(lists);
 
         if (!yesno_pop(ID2P(LANG_REALLY_DELETE)))
+        {
+            gui_synclist_set_title(lists, lists->title, lists->title_icon);
             return ACTION_REDRAW;
+        }
 
         remove_shortcut(selection);
         gui_synclist_set_nb_items(lists, shortcut_count);
+        gui_synclist_set_title(lists, lists->title, lists->title_icon);
         if (selection >= shortcut_count)
             gui_synclist_select_item(lists, shortcut_count - 1);
         first_idx_to_writeback = 0;

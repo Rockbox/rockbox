@@ -425,6 +425,7 @@ static bool playing_time(void)
     if (global_settings.talk_menu)
         gui_synclist_set_voice_callback(&pt_lists, playing_time_speak_info);
     gui_synclist_set_nb_items(&pt_lists, 8);
+    gui_synclist_set_title(&pt_lists, str(LANG_PLAYING_TIME), NOICON);
     gui_synclist_draw(&pt_lists);
     gui_synclist_speak_item(&pt_lists);
     while (true) {
