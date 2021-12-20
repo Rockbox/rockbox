@@ -211,7 +211,7 @@ TRANSLATIONS += \
 
 RESOURCES += $$_PRO_FILE_PWD_/rbutilqt.qrc
 !dbg {
-    RESOURCES += $$_PRO_FILE_PWD_/rbutilqt-lang.qrc
+    RESOURCES += $$_PRO_FILE_PWD_/lang/rbutilqt-lang.qrc
 }
 # windows specific files
 win32 {

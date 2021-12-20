@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/lang" >
+        <file>rbutil_cs.qm</file>
+        <file>rbutil_de.qm</file>
+        <file>rbutil_fi.qm</file>
+        <file>rbutil_fr.qm</file>
+        <file>rbutil_gr.qm</file>
+        <file>rbutil_he.qm</file>
+        <file>rbutil_it.qm</file>
+        <file>rbutil_ja.qm</file>
+        <file>rbutil_nl.qm</file>
+        <file>rbutil_pl.qm</file>
+        <file>rbutil_pt.qm</file>
+        <file>rbutil_pt_BR.qm</file>
+        <file>rbutil_ru.qm</file>
+        <file>rbutil_zh_CN.qm</file>
+        <file>rbutil_zh_TW.qm</file>
+        </qresource>
+</RCC>
