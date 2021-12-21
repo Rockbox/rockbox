@@ -23,7 +23,7 @@
 #include "httpget.h"
 
 #define TEST_USER_AGENT "TestAgent/2.3"
-#define TEST_HTTP_TIMEOUT 1000
+#define TEST_HTTP_TIMEOUT 10000
 #define TEST_BINARY_BLOB "\x01\x10\x20\x30\x40\x50\x60\x70" \
                          "\x80\x90\xff\xee\xdd\xcc\xbb\xaa"
 
