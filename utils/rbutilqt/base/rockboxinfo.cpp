@@ -18,15 +18,18 @@
 
 #include "rockboxinfo.h"
 
-#include <QtCore>
-#include <QDebug>
+#include <QRegularExpression>
+#include <QString>
+#include <QFile>
 #include "Logger.h"
 
-RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
+RockboxInfo::RockboxInfo(QString mountpoint, QString fname) :
+    m_ram(0),
+    m_voicefmt(0),
+    m_success(false)
 {
     LOG_INFO() << "Getting version info from rockbox-info.txt";
     QFile file(mountpoint + "/" + fname);
-    m_success = false;
     m_voicefmt = 400; // default value for compatibility
     if(!file.exists())
         return;
@@ -35,44 +38,47 @@ RockboxInfo::RockboxInfo(QString mountpoint, QString fname)
         return;
 
     // read file contents
-    QRegExp hash("^Version:\\s+(r?)([0-9a-fM]+)");
-    QRegExp version("^Version:\\s+(\\S.*)");
-    QRegExp release("^Version:\\s+([0-9\\.]+)\\s*$");
-    QRegExp target("^Target:\\s+(\\S.*)");
-    QRegExp features("^Features:\\s+(\\S.*)");
-    QRegExp targetid("^Target id:\\s+(\\S.*)");
-    QRegExp memory("^Memory:\\s+(\\S.*)");
-    QRegExp voicefmt("^Voice format:\\s+(\\S.*)");
+    QRegularExpression parts("^([A-Z][a-z ]+):\\s+(.*)");
+
     while (!file.atEnd())
     {
         QString line = file.readLine().trimmed();
 
-        if(version.indexIn(line) >= 0) {
-            m_version = version.cap(1);
+        auto match = parts.match(line);
+        if(!match.isValid())
+        {
+            continue;
         }
-        if(release.indexIn(line) >= 0) {
-            m_release = release.cap(1);
+
+        if(match.captured(1) == "Version") {
+            m_version = match.captured(2);
+
+            if(match.captured(2).contains(".")) {
+                // version number
+                m_release = match.captured(2);
+            }
+            if(match.captured(2).contains("-")) {
+                // hash-date format. Revision is first part.
+                m_revision = match.captured(2).split("-").at(0);
+                if(m_revision.startsWith("r")) {
+                    m_revision.remove(0, 1);
+                }
+            }
         }
-        if(hash.indexIn(line) >= 0) {
-            // git hashes are usually at least 7 characters.
-            // svn revisions are expected to be at least 4 digits.
-            if(hash.cap(2).size() > 3)
-                m_revision = hash.cap(2);
+        else if(match.captured(1) == "Target") {
+            m_target = match.captured(2);
         }
-        else if(target.indexIn(line) >= 0) {
-            m_target = target.cap(1);
+        else if(match.captured(1) == "Features") {
+            m_features = match.captured(2);
         }
-        else if(features.indexIn(line) >= 0) {
-            m_features = features.cap(1);
+        else if(match.captured(1) == "Target id") {
+            m_targetid = match.captured(2);
         }
-        else if(targetid.indexIn(line) >= 0) {
-            m_targetid = targetid.cap(1);
+        else if(match.captured(1) == "Memory") {
+            m_ram = match.captured(2).toInt();
         }
-        else if(memory.indexIn(line) >= 0) {
-            m_ram = memory.cap(1).toInt();
-        }
-        else if(voicefmt.indexIn(line) >= 0) {
-            m_voicefmt = voicefmt.cap(1).toInt();
+        else if(match.captured(1) == "Voice format") {
+            m_voicefmt = match.captured(2).toInt();
         }
     }
 

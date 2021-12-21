@@ -20,6 +20,7 @@
 
 #include <QtTest/QtTest>
 #include <QObject>
+#include <QFileInfo>
 #include "rockboxinfo.h"
 
 
@@ -83,12 +84,12 @@ void TestRockboxInfo::testVersion()
     QFETCH(QString, release);
     QTemporaryFile tf(this);
     tf.open();
-    QString filename = tf.fileName();
+    QFileInfo finfo(tf);
     tf.write(input.toLatin1());
     tf.write("\n");
     tf.close();
 
-    RockboxInfo info("", filename);
+    RockboxInfo info(finfo.path(), finfo.fileName());
     QCOMPARE(info.version(), QString(version));
     QCOMPARE(info.revision(), QString(revision));
     QCOMPARE(info.release(), QString(release));
@@ -112,13 +113,14 @@ void TestRockboxInfo::testTarget()
         QFETCH(QString, target);
         QTemporaryFile tf(this);
         tf.open();
+        QFileInfo finfo(tf);
         QString filename = tf.fileName();
         tf.write(prefix.at(j).toLatin1());
         tf.write(target.toLatin1());
         tf.write("\n");
         tf.close();
 
-        RockboxInfo info("", filename);
+        RockboxInfo info(finfo.path(), finfo.fileName());
         QCOMPARE(info.target(), target);
     }
 }
@@ -141,13 +143,14 @@ void TestRockboxInfo::testMemory()
         QFETCH(QString, memory);
         QTemporaryFile tf(this);
         tf.open();
+        QFileInfo finfo(tf);
         QString filename = tf.fileName();
         tf.write(prefix.at(j).toLatin1());
         tf.write(memory.toLatin1());
         tf.write("\n");
         tf.close();
 
-        RockboxInfo info("", filename);
+        RockboxInfo info(finfo.path(), finfo.fileName());
         QCOMPARE(info.ram(), memory.toInt());
     }
 }
@@ -168,13 +171,14 @@ void TestRockboxInfo::testFeatures()
         QFETCH(QString, features);
         QTemporaryFile tf(this);
         tf.open();
+        QFileInfo finfo(tf);
         QString filename = tf.fileName();
         tf.write(prefix.at(j).toLatin1());
         tf.write(features.toLatin1());
         tf.write("\n");
         tf.close();
 
-        RockboxInfo info("", filename);
+        RockboxInfo info(finfo.path(), finfo.fileName());
         QCOMPARE(info.features(), features);
     }
 }
