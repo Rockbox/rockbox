@@ -95,8 +95,8 @@ void powermgmt_init(void) INIT_ATTR;
 #endif
 
 #ifndef BATT_CURRENT_AVE_SAMPLES
-/* TODO may need tweaking */
-#define BATT_CURRENT_AVE_SAMPLES 16
+/* semi arbitrary but needs to be 'large' for the time estimation algorithm */
+#define BATT_CURRENT_AVE_SAMPLES 128
 #endif
 
 #ifndef POWER_THREAD_STEP_TICKS

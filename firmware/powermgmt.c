@@ -102,6 +102,13 @@ static char power_stack[DEFAULT_STACK_SIZE/2];
 #endif
 static const char power_thread_name[] = "power";
 
+/* Time estimation requires 64 bit math so don't use it in the bootloader.
+ * Also we need to be able to measure current, and not have a better time
+ * estimate source available. */
+#define HAVE_TIME_ESTIMATION \
+    (!defined(BOOTLOADER) && !(CONFIG_BATTERY_MEASURE & TIME_MEASURE) && \
+     (defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)))
+
 #if !(CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
 int _battery_level(void) { return -1; }
 #endif
@@ -109,10 +116,14 @@ static int percent_now; /* Cached to avoid polling too often */
 
 #if !(CONFIG_BATTERY_MEASURE & TIME_MEASURE)
 int _battery_time(void) { return -1; }
-#endif
-#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || \
-    defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
+#else
 static int time_now; /* Cached to avoid polling too often */
+#endif
+
+#if HAVE_TIME_ESTIMATION
+static int time_now;     /* reported time in minutes */
+static int64_t time_cnt; /* reported time in seconds */
+static int64_t time_err; /* error... it's complicated */
 #endif
 
 #if !(CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
@@ -149,8 +160,7 @@ int battery_level(void)
  * on the battery level and the actual current usage. */
 int battery_time(void)
 {
-#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || \
-    defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
+#if (CONFIG_BATTERY_MEASURE & TIME_MEASURE) || HAVE_TIME_ESTIMATION
     return time_now;
 #else
     return -1;
@@ -373,19 +383,43 @@ static void battery_status_update(void)
 
 #if CONFIG_BATTERY_MEASURE & TIME_MEASURE
     time_now = _battery_time();
-#elif defined(CURRENT_NORMAL) || (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
+#elif HAVE_TIME_ESTIMATION
+    /* TODO: This is essentially a bad version of coloumb counting,
+     * so in theory using coloumb counters when they are available
+     * should provide a more accurate result. Also note that this
+     * is hard-coded with a HZ/2 update rate to simplify arithmetic. */
+
     int current = battery_current();
-    if(level >= 0 && current > 0 && battery_capacity > 0) {
+    int resolution = battery_capacity * 36;
+
+    int time_est;
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-        if (charging_state())
-            time_now = (100 - level) * battery_capacity * 60 / 100 / current;
-        else
+    if (charging_state())
+        time_est = (100 - level) * battery_capacity * 36 / current;
+    else
 #endif
-            time_now = (level + percent_now) * battery_capacity * 60 / 200 / current;
-    } else {
-        /* not enough information to calculate time remaining */
-        time_now = -1;
+        time_est = level * battery_capacity * 36 / current;
+
+    /* The first term nudges the counter toward the estimate.
+     * The second term decrements the counter due to elapsed time. */
+    time_err += current * (time_est - time_cnt);
+    time_err -= resolution;
+
+    /* Arbitrary cutoff to ensure we don't get too far out
+     * of sync. Seems to work well on synthetic tests. */
+    if(time_err >  resolution * 12 ||
+       time_err < -resolution * 13) {
+        time_cnt = time_est;
+        time_err = 0;
     }
+
+    /* Convert the error into a time and adjust the counter. */
+    int64_t adjustment = time_err / (2 * resolution);
+    time_cnt += adjustment;
+    time_err -= adjustment * (2 * resolution);
+
+    /* Update the reported time based on the counter. */
+    time_now = (time_cnt + 30) / 60;
 #endif
 
     percent_now = level;
