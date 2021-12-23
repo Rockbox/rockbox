@@ -284,7 +284,8 @@ static void send_battery_level_event(int percent)
     }
 }
 
-#if !(CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE)
+#if !(CONFIG_BATTERY_MEASURE & PERCENTAGE_MEASURE) && \
+    (CONFIG_BATTERY_MEASURE & VOLTAGE_MEASURE)
 /* Look into the percent_to_volt_* table and estimate the battery level. */
 static int voltage_to_percent(int voltage, const short* table)
 {
