@@ -48,6 +48,8 @@ else()
     find_package(Qt6 REQUIRED COMPONENTS Core Core5Compat Widgets Svg Multimedia Network LinguistTools
                  OPTIONAL_COMPONENTS Test)
 endif()
+get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
+get_filename_component(QT_BINDIR "${_qmake_executable}" DIRECTORY)
 message("-- Found Qt${QT_VERSION_MAJOR}: ${Qt${QT_VERSION_MAJOR}_DIR}")
 
 # If we're on Linux, try to find the used libs in the system.
@@ -196,6 +198,13 @@ target_compile_definitions(RockboxUtility PRIVATE
 set_property(TARGET RockboxUtility PROPERTY AUTOMOC ON)
 set_property(TARGET RockboxUtility PROPERTY AUTORCC ON)
 set_property(TARGET RockboxUtility PROPERTY AUTOUIC ON)
+
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/deploy.cmake)
+deploy_qt(RockboxUtility
+    ${QT_BINDIR}
+    ${CMAKE_CURRENT_LIST_DIR}/../docs/logo/rockbox-clef.svg
+    ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/RockboxUtility.desktop
+    ${CMAKE_CURRENT_LIST_DIR}/rbutilqt/dmgbuild.cfg)
 
 add_library(rbbase
     ${CMAKE_CURRENT_LIST_DIR}/../tools/iriver.c
