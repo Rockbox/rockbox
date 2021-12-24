@@ -94,7 +94,6 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "scrollbar.h"
 #include "jpeg_load.h"
 #include "../recorder/bmp.h"
-#include "statusbar.h"
 #include "menu.h"
 #include "rbunicode.h"
 #include "list.h"

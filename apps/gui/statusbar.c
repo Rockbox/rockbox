@@ -725,18 +725,6 @@ void gui_syncstatusbar_init(struct gui_syncstatusbar * bars)
     }
 }
 
-void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars,
-                            bool force_redraw)
-{
-    if(!global_settings.statusbar)
-       return;
-    struct viewport viewport;
-    FOR_NB_SCREENS(i) {
-        GET_RECT(viewport,statusbar_position(i),&screens[i]);
-        gui_statusbar_draw( &(bars->statusbars[i]), force_redraw, &viewport );
-    }
-}
-
 
 #ifdef HAVE_REMOTE_LCD
 enum statusbar_values statusbar_position(int screen)

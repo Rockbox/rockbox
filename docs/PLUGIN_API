@@ -750,13 +750,6 @@ void gui_synclist_set_title(struct gui_synclist *lists, char* title, int icon)
     \param icon
     \description
 
-void gui_syncstatusbar_draw(struct gui_syncstatusbar * bars, bool force_redraw)
-    \group scroll bar
-    \param bars
-    \param force_redraw refreshes =bars= if true
-    \description Draws an initialized statusbar =bars= on the screen and refreshs it if =force_redraw= is true.
-    \see [S[apps/gui/statusbar.h]]
-
 enum yesno_res gui_syncyesno_run(const struct text_message * main_message, const struct text_message * yes_message, const struct text_message * no_message)
     \group list
     \param main_message
@@ -1968,11 +1961,6 @@ void srand(unsigned int seed)
     \group misc
     \param seed
     \description Seed the random number generator
-
-struct gui_syncstatusbar *statusbars
-    \group scroll bar
-    \return
-    \description
 
 int strcasecmp(const char *, const char *)
     \group strings and memory

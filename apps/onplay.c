@@ -425,10 +425,8 @@ static bool playing_time(void)
         gui_synclist_set_voice_callback(&pt_lists, playing_time_speak_info);
     gui_synclist_set_nb_items(&pt_lists, 8);
     gui_synclist_draw(&pt_lists);
-/*    gui_syncstatusbar_draw(&statusbars, true); */
     gui_synclist_speak_item(&pt_lists);
     while (true) {
-/*        gui_syncstatusbar_draw(&statusbars, false); */
         if (list_do_action(CONTEXT_LIST, HZ/2,
                           &pt_lists, &key, LIST_WRAP_UNLESS_HELD) == 0
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
