@@ -312,7 +312,7 @@ target_compile_definitions(quazip PUBLIC QUAZIP_STATIC)
 set_property(TARGET quazip PROPERTY AUTOMOC ON)
 
 add_library(mspack
-    mspack/cabc.c
+    #mspack/cabc.c
     mspack/cabd.c
     mspack/cab.h
     #mspack/chmc.c
