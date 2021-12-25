@@ -122,7 +122,7 @@ if(APPLE)
         PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
-target_link_libraries(RockboxUtility rbbase cutelogger
+target_link_libraries(RockboxUtility rbbase cutelogger gitversion
     Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia)
 
 target_include_directories(RockboxUtility PRIVATE

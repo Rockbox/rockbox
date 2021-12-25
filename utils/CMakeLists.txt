@@ -333,5 +333,21 @@ add_library(rbtomcrypt
     )
 target_include_directories(rbtomcrypt PUBLIC ${CMAKE_CURRENT_LIST_DIR}/tomcrypt/src/headers)
 
+
+# target will always be build. File is only updated when contents change.
+add_custom_target(gitversion.h
+    COMMENT "Updating gitversion.h"
+    COMMAND ${CMAKE_COMMAND}
+            -DOUTFILE=${CMAKE_CURRENT_BINARY_DIR}/gitversion/gitversion.h
+            -P ${CMAKE_CURRENT_LIST_DIR}/cmake/gitversion.cmake
+    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/gitversion/gitversion.h)
+
+# link to get git version header.
+add_library(gitversion INTERFACE
+    ${CMAKE_CURRENT_BINARY_DIR}/gitversion/gitversion.h)
+
+add_dependencies(gitversion gitversion.h)
+target_include_directories(gitversion INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/gitversion)
+
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/deploy.cmake)
 add_subdirectory(rbutilqt)

@@ -18,6 +18,8 @@
  *
  ****************************************************************************/
 
+#include "gitversion.h"
+
 // PUREVERSION is needed to be able to just compare versions. It does not
 // contain a build timestamp because it needs to be the same in different
 // files
@@ -38,7 +40,7 @@
 #define VERSIONSTRING(a, b, c) STR(a) "." STR(b) "." STR(c)
 #define VERSION VERSIONSTRING(VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO) BUILDID
 // PUREVERSION should identify the build uniquely. Use version string for now.
-#define PUREVERSION "$Rev$"
+#define PUREVERSION GITHASH
 
-#define FULLVERSION VERSION " (" PUREVERSION "), built " __DATE__ " " __TIME__
+#define FULLVERSION VERSION " (" GITHASH "), built " __DATE__ " " __TIME__
 
