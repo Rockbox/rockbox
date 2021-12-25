@@ -98,8 +98,10 @@
                     socket->close();
                     m_requestNumber++;
                 }
-                if (socket->state() == QTcpSocket::UnconnectedState)
+                if (socket->state() == QTcpSocket::UnconnectedState) {
                     delete socket;
+                    break;
+                }
             }
         }
         void discardClient()
