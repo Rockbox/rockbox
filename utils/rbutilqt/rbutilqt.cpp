@@ -127,7 +127,7 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     ui.selective->setLayout(selectivetablayout);
     selectiveinstallwidget = new SelectiveInstallWidget(this);
     selectivetablayout->addWidget(selectiveinstallwidget);
-    connect(ui.buttonChangeDevice, SIGNAL(clicked()), selectiveinstallwidget, SLOT(saveSettings()));
+    connect(ui.buttonChangeDevice, &QAbstractButton::clicked, selectiveinstallwidget, &SelectiveInstallWidget::saveSettings);
 
     // info tab
     QGridLayout *infotablayout = new QGridLayout(this);
@@ -135,28 +135,28 @@ RbUtilQt::RbUtilQt(QWidget *parent) : QMainWindow(parent)
     info = new InfoWidget(this);
     infotablayout->addWidget(info);
 
-    connect(ui.tabWidget, SIGNAL(currentChanged(int)), this, SLOT(updateTabs(int)));
+    connect(ui.tabWidget, &QTabWidget::currentChanged, this, &RbUtilQt::updateTabs);
     connect(ui.actionAbout_Qt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-    connect(ui.action_About, SIGNAL(triggered()), this, SLOT(about()));
-    connect(ui.action_Help, SIGNAL(triggered()), this, SLOT(help()));
-    connect(ui.action_Configure, SIGNAL(triggered()), this, SLOT(configDialog()));
-    connect(ui.actionE_xit, SIGNAL(triggered()), this, SLOT(shutdown()));
-    connect(ui.buttonChangeDevice, SIGNAL(clicked()), this, SLOT(configDialog()));
-    connect(ui.buttonEject, SIGNAL(clicked()), this, SLOT(eject()));
-    connect(ui.buttonTalk, SIGNAL(clicked()), this, SLOT(createTalkFiles()));
-    connect(ui.buttonCreateVoice, SIGNAL(clicked()), this, SLOT(createVoiceFile()));
-    connect(ui.buttonRemoveRockbox, SIGNAL(clicked()), this, SLOT(uninstall()));
-    connect(ui.buttonRemoveBootloader, SIGNAL(clicked()), this, SLOT(uninstallBootloader()));
-    connect(ui.buttonBackup, SIGNAL(clicked()), this, SLOT(backup()));
+    connect(ui.action_About, &QAction::triggered, this, &RbUtilQt::about);
+    connect(ui.action_Help, &QAction::triggered, this, &RbUtilQt::help);
+    connect(ui.action_Configure, &QAction::triggered, this, &RbUtilQt::configDialog);
+    connect(ui.actionE_xit, &QAction::triggered, this, &RbUtilQt::shutdown);
+    connect(ui.buttonChangeDevice, &QAbstractButton::clicked, this, &RbUtilQt::configDialog);
+    connect(ui.buttonEject, &QAbstractButton::clicked, this, &RbUtilQt::eject);
+    connect(ui.buttonTalk, &QAbstractButton::clicked, this, &RbUtilQt::createTalkFiles);
+    connect(ui.buttonCreateVoice, &QAbstractButton::clicked, this, &RbUtilQt::createVoiceFile);
+    connect(ui.buttonRemoveRockbox, &QAbstractButton::clicked, this, &RbUtilQt::uninstall);
+    connect(ui.buttonRemoveBootloader, &QAbstractButton::clicked, this, &RbUtilQt::uninstallBootloader);
+    connect(ui.buttonBackup, &QAbstractButton::clicked, this, &RbUtilQt::backup);
 
     // actions accessible from the menu
-    connect(ui.actionCreate_Voice_File, SIGNAL(triggered()), this, SLOT(createVoiceFile()));
-    connect(ui.actionCreate_Talk_Files, SIGNAL(triggered()), this, SLOT(createTalkFiles()));
-    connect(ui.actionRemove_bootloader, SIGNAL(triggered()), this, SLOT(uninstallBootloader()));
-    connect(ui.actionUninstall_Rockbox, SIGNAL(triggered()), this, SLOT(uninstall()));
-    connect(ui.action_System_Info, SIGNAL(triggered()), this, SLOT(sysinfo()));
-    connect(ui.action_Trace, SIGNAL(triggered()), this, SLOT(trace()));
-    connect(ui.actionShow_Changelog, SIGNAL(triggered()), this, SLOT(changelog()));
+    connect(ui.actionCreate_Voice_File, &QAction::triggered, this, &RbUtilQt::createVoiceFile);
+    connect(ui.actionCreate_Talk_Files, &QAction::triggered, this, &RbUtilQt::createTalkFiles);
+    connect(ui.actionRemove_bootloader, &QAction::triggered, this, &RbUtilQt::uninstallBootloader);
+    connect(ui.actionUninstall_Rockbox, &QAction::triggered, this, &RbUtilQt::uninstall);
+    connect(ui.action_System_Info, &QAction::triggered, this, &RbUtilQt::sysinfo);
+    connect(ui.action_Trace, &QAction::triggered, this, &RbUtilQt::trace);
+    connect(ui.actionShow_Changelog, &QAction::triggered, this, &RbUtilQt::changelog);
 
 #if !defined(STATIC)
     ui.actionInstall_Rockbox_Utility_on_player->setEnabled(false);
@@ -205,8 +205,8 @@ void RbUtilQt::downloadInfo()
 {
     // try to get the current build information
     daily = new HttpGet(this);
-    connect(daily, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(qApp, SIGNAL(lastWindowClosed()), daily, SLOT(abort()));
+    connect(daily, &HttpGet::done, this, &RbUtilQt::downloadDone);
+    connect(qApp, &QGuiApplication::lastWindowClosed, daily, &HttpGet::abort);
     daily->setCache(false);
     ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
     LOG_INFO() << "downloading build info";
@@ -327,7 +327,7 @@ void RbUtilQt::help()
 void RbUtilQt::configDialog()
 {
     Config *cw = new Config(this);
-    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    connect(cw, &Config::settingsUpdated, this, &RbUtilQt::updateSettings);
     cw->show();
 }
 
@@ -429,7 +429,7 @@ void RbUtilQt::createTalkFiles(void)
 {
     if(chkConfig(this)) return;
     InstallTalkWindow *installWindow = new InstallTalkWindow(this);
-    connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    connect(installWindow, &InstallTalkWindow::settingsUpdated, this, &RbUtilQt::updateSettings);
     installWindow->show();
 
 }
@@ -439,7 +439,7 @@ void RbUtilQt::createVoiceFile(void)
     if(chkConfig(this)) return;
     CreateVoiceWindow *installWindow = new CreateVoiceWindow(this);
 
-    connect(installWindow, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    connect(installWindow, &CreateVoiceWindow::settingsUpdated, this, &RbUtilQt::updateSettings);
     installWindow->show();
 }
 
@@ -503,7 +503,7 @@ void RbUtilQt::uninstallBootloader(void)
     }
 
     connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
-    connect(bl, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(bl, &BootloaderInstallBase::logProgress, logger, &ProgressLoggerGui::setProgress);
     connect(bl, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     // pass Abort button click signal to current installer
     connect(logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
@@ -608,8 +608,8 @@ void RbUtilQt::checkUpdate(void)
 #endif
 
     update = new HttpGet(this);
-    connect(update, SIGNAL(done(bool)), this, SLOT(downloadUpdateDone(bool)));
-    connect(qApp, SIGNAL(lastWindowClosed()), update, SLOT(abort()));
+    connect(update, &HttpGet::done, this, &RbUtilQt::downloadUpdateDone);
+    connect(qApp, &QGuiApplication::lastWindowClosed, update, &HttpGet::abort);
 
     ui.statusbar->showMessage(tr("Checking for update ..."));
     update->getFile(QUrl(url));

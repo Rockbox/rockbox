@@ -47,8 +47,8 @@ EncTtsCfgGui::EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QStri
     m_busyDlg->setLabel(nullptr);
     m_busyDlg->setCancelButton(nullptr);
     m_busyDlg->hide();
-    connect(iface,SIGNAL(busy()),this,SLOT(showBusy()));
-    connect(iface,SIGNAL(busyEnd()),this,SLOT(hideBusy()));
+    connect(iface,&EncTtsSettingInterface::busy,this,&EncTtsCfgGui::showBusy);
+    connect(iface,&EncTtsSettingInterface::busyEnd,this,&EncTtsCfgGui::hideBusy);
 
     //setup the window
     setWindowTitle(name);
@@ -144,7 +144,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             QLineEdit *lineEdit = new QLineEdit(this);
             lineEdit->setAccessibleName(setting->name());
             lineEdit->setText(setting->current().toString());
-            connect(lineEdit,SIGNAL(textChanged(QString)),this,SLOT(updateSetting()));
+            connect(lineEdit,&QLineEdit::textChanged,this,&EncTtsCfgGui::updateSetting);
             value = lineEdit;
             break;
         }
@@ -169,7 +169,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             QCheckBox *checkbox = new QCheckBox(this);
             checkbox->setAccessibleName(setting->name());
             checkbox->setCheckState(setting->current().toBool() == true ? Qt::Checked : Qt::Unchecked);
-            connect(checkbox,SIGNAL(stateChanged(int)),this,SLOT(updateSetting()));
+            connect(checkbox,&QCheckBox::stateChanged,this,&EncTtsCfgGui::updateSetting);
             value = checkbox;
             break;
         }
@@ -184,7 +184,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
     if(value != nullptr)
     {
         m_settingsWidgetsMap.insert(setting,value);
-        connect(setting,SIGNAL(updateGui()),this,SLOT(updateWidget()));
+        connect(setting,&EncTtsSetting::updateGui,this,&EncTtsCfgGui::updateWidget);
     }
 
     return value;
@@ -204,7 +204,7 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
     {
         QPushButton* refreshbtn = new QPushButton(tr("Refresh"),this);
         refreshbtn->setIcon(QIcon(":/icons/view-refresh.svg"));
-        connect(refreshbtn,SIGNAL(clicked()),setting,SIGNAL(refresh()));
+        connect(refreshbtn,&QAbstractButton::clicked,setting,&EncTtsSetting::refresh);
         return refreshbtn;
     }
     else

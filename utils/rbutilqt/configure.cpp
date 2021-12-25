@@ -95,24 +95,24 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
     this->setModal(true);
 
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(abort()));
-    connect(ui.radioNoProxy, SIGNAL(toggled(bool)), this, SLOT(setNoProxy(bool)));
-    connect(ui.radioSystemProxy, SIGNAL(toggled(bool)), this, SLOT(setSystemProxy(bool)));
-    connect(ui.refreshMountPoint, SIGNAL(clicked()), this, SLOT(refreshMountpoint()));
-    connect(ui.buttonAutodetect,SIGNAL(clicked()),this,SLOT(autodetect()));
-    connect(ui.buttonCacheBrowse, SIGNAL(clicked()), this, SLOT(browseCache()));
-    connect(ui.buttonCacheClear, SIGNAL(clicked()), this, SLOT(cacheClear()));
-    connect(ui.configTts, SIGNAL(clicked()), this, SLOT(configTts()));
-    connect(ui.configEncoder, SIGNAL(clicked()), this, SLOT(configEnc()));
+    connect(ui.buttonCancel, &QAbstractButton::clicked, this, &Config::abort);
+    connect(ui.radioNoProxy, &QAbstractButton::toggled, this, &Config::setNoProxy);
+    connect(ui.radioSystemProxy, &QAbstractButton::toggled, this, &Config::setSystemProxy);
+    connect(ui.refreshMountPoint, &QAbstractButton::clicked, this, &Config::refreshMountpoint);
+    connect(ui.buttonAutodetect, &QAbstractButton::clicked, this, &Config::autodetect);
+    connect(ui.buttonCacheBrowse, &QAbstractButton::clicked, this, &Config::browseCache);
+    connect(ui.buttonCacheClear, &QAbstractButton::clicked, this, &Config::cacheClear);
+    connect(ui.configTts, &QAbstractButton::clicked, this, &Config::configTts);
+    connect(ui.configEncoder, &QAbstractButton::clicked, this, &Config::configEnc);
     connect(ui.comboTts, SIGNAL(currentIndexChanged(int)), this, SLOT(updateTtsState(int)));
-    connect(ui.treeDevices, SIGNAL(itemSelectionChanged()), this, SLOT(updateEncState()));
-    connect(ui.testTTS,SIGNAL(clicked()),this,SLOT(testTts()));
-    connect(ui.showDisabled, SIGNAL(toggled(bool)), this, SLOT(showDisabled(bool)));
+    connect(ui.treeDevices, &QTreeWidget::itemSelectionChanged, this, &Config::updateEncState);
+    connect(ui.testTTS, &QAbstractButton::clicked, this, &Config::testTts);
+    connect(ui.showDisabled, &QAbstractButton::toggled, this, &Config::showDisabled);
     connect(ui.mountPoint, SIGNAL(editTextChanged(QString)), this, SLOT(updateMountpoint(QString)));
     connect(ui.mountPoint, SIGNAL(currentIndexChanged(int)), this, SLOT(updateMountpoint(int)));
-    connect(ui.checkShowProxyPassword, SIGNAL(toggled(bool)), this, SLOT(showProxyPassword(bool)));
+    connect(ui.checkShowProxyPassword, &QAbstractButton::toggled, this, &Config::showProxyPassword);
     // delete this dialog after it finished automatically.
-    connect(this, SIGNAL(finished(int)), this, SLOT(deleteLater()));
+    connect(this, &QDialog::finished, this, &QObject::deleteLater);
 
     setUserSettings();
     setDevices();
@@ -285,7 +285,7 @@ void Config::setUserSettings()
         ui.listLanguages->setCurrentItem(a.at(0));
     // don't connect before language list has been set up to prevent
     // triggering the signal by selecting the saved language.
-    connect(ui.listLanguages, SIGNAL(itemSelectionChanged()), this, SLOT(updateLanguage()));
+    connect(ui.listLanguages, &QListWidget::itemSelectionChanged, this, &Config::updateLanguage);
 
     // devices tab
     refreshMountpoint();

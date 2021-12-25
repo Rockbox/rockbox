@@ -73,7 +73,7 @@ PreviewLabel::PreviewLabel(QWidget * parent, Qt::WindowFlags f)
 
     hovertimer.setInterval(1500);  // wait for 1.5 seconds before showing the Fullsize Preview
     hovertimer.setSingleShot(true);
-    connect(&hovertimer,SIGNAL(timeout ()),this,SLOT(timeout()));
+    connect(&hovertimer, &QTimer::timeout, this, &PreviewLabel::timeout);
 }
 
 void PreviewLabel::mouseMoveEvent(QMouseEvent * event)

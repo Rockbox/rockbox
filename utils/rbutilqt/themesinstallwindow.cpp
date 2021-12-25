@@ -43,12 +43,12 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.listThemes->setLayoutDirection(Qt::LeftToRight);
     ui.themeDescription->setLayoutDirection(Qt::LeftToRight);
 
-    connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
+    connect(ui.buttonCancel, &QAbstractButton::clicked, this, &QWidget::close);
     connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
-    connect(ui.listThemes, SIGNAL(currentItemChanged(QListWidgetItem*, QListWidgetItem*)),
-            this, SLOT(updateDetails(QListWidgetItem*, QListWidgetItem*)));
-    connect(ui.listThemes, SIGNAL(itemSelectionChanged()), this, SLOT(updateSize()));
-    connect(&igetter, SIGNAL(done(bool)), this, SLOT(updateImage(bool)));
+    connect(ui.listThemes, &QListWidget::currentItemChanged,
+            this, &ThemesInstallWindow::updateDetails);
+    connect(ui.listThemes, &QListWidget::itemSelectionChanged, this, &ThemesInstallWindow::updateSize);
+    connect(&igetter, &HttpGet::done, this, &ThemesInstallWindow::updateImage);
 
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         igetter.setCache(true);
@@ -130,7 +130,7 @@ void ThemesInstallWindow::downloadDone(bool error)
         getter->abort();
         logger->setFinished();
         disconnect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-        connect(logger, SIGNAL(closed()), this, SLOT(close()));
+        connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
         return;
     }
     // handle possible error codes
@@ -140,7 +140,7 @@ void ThemesInstallWindow::downloadDone(bool error)
         logger->addItem(tr("the following error occured:\n%1")
             .arg(iniDetails.value("error/description", "unknown error").toString()), LOGERROR);
         logger->setFinished();
-        connect(logger, SIGNAL(closed()), this, SLOT(close()));
+        connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
         return;
     }
     logger->addItem(tr("done."), LOGOK);
@@ -371,11 +371,11 @@ void ThemesInstallWindow::install()
         installer->setCache(true);
 
     if(!windowSelectOnly) {
-        connect(logger, SIGNAL(closed()), this, SLOT(close()));
+        connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
         connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     }
     connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
-    connect(installer, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(installer, &ZipInstaller::logProgress, logger, &ProgressLoggerGui::setProgress);
     connect(installer, SIGNAL(done(bool)), this, SIGNAL(done(bool)));
     connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
     installer->install();

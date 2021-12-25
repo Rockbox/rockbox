@@ -30,7 +30,7 @@ CreateVoiceWindow::CreateVoiceWindow(QWidget *parent) : QDialog(parent)
     ui.setupUi(this);
     voicecreator = new VoiceFileCreator(this);
     updateSettings();
-    connect(ui.change,SIGNAL(clicked()),this,SLOT(change()));
+    connect(ui.change,&QAbstractButton::clicked,this,&CreateVoiceWindow::change);
 }
 
 void CreateVoiceWindow::change()
@@ -40,14 +40,14 @@ void CreateVoiceWindow::change()
 
     // call configuration dialog
     Config *cw = new Config(this,4);
-    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    connect(cw, &Config::settingsUpdated, this, &CreateVoiceWindow::updateSettings);
     cw->show();    
 }
 
 void CreateVoiceWindow::accept()
 {
     logger = new ProgressLoggerGui(this);
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));
+    connect(logger,&ProgressLoggerGui::closed,this,&QWidget::close);
     logger->show();    
 
     saveSettings();
@@ -60,7 +60,7 @@ void CreateVoiceWindow::accept()
     //start creating
     connect(voicecreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     connect(voicecreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
-    connect(voicecreator, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(voicecreator, &VoiceFileCreator::logProgress, logger, &ProgressLoggerGui::setProgress);
     connect(logger,SIGNAL(aborted()),voicecreator,SLOT(abort()));
     voicecreator->createVoiceFile();
 }

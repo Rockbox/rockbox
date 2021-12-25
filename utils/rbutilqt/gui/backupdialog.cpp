@@ -59,13 +59,13 @@ BackupDialog::BackupDialog(QWidget* parent) : QDialog(parent)
     ui.setupUi(this);
 
     m_thread = new BackupSizeThread();
-    connect(m_thread, SIGNAL(finished()), this, SLOT(updateSizeInfo()));
+    connect(m_thread, &QThread::finished, this, &BackupDialog::updateSizeInfo);
     connect(m_thread, SIGNAL(terminated()), this, SLOT(updateSizeInfo()));
 
-    connect(ui.buttonCancel, SIGNAL(clicked()), this, SLOT(close()));
-    connect(ui.buttonCancel, SIGNAL(clicked()), m_thread, SLOT(quit()));
-    connect(ui.buttonChange, SIGNAL(clicked()), this, SLOT(changeBackupPath()));
-    connect(ui.buttonBackup, SIGNAL(clicked()), this, SLOT(backup()));
+    connect(ui.buttonCancel, &QAbstractButton::clicked, this, &QWidget::close);
+    connect(ui.buttonCancel, &QAbstractButton::clicked, m_thread, &QThread::quit);
+    connect(ui.buttonChange, &QAbstractButton::clicked, this, &BackupDialog::changeBackupPath);
+    connect(ui.buttonBackup, &QAbstractButton::clicked, this, &BackupDialog::backup);
 
     ui.backupSize->setText(tr("Installation size: calculating ..."));
     m_mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
@@ -120,7 +120,7 @@ void BackupDialog::backup(void)
         }
     }
     m_logger = new ProgressLoggerGui(this);
-    connect(m_logger, SIGNAL(closed()), this, SLOT(close()));
+    connect(m_logger, &ProgressLoggerGui::closed, this, &QWidget::close);
     m_logger->show();
     m_logger->addItem(tr("Starting backup ..."),LOGINFO);
     QCoreApplication::processEvents();

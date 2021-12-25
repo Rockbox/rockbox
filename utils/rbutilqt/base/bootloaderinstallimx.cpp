@@ -121,7 +121,6 @@ void BootloaderInstallImx::installStage2(void)
     m_tempfile.close();
     m_patchedFile.close();
     connect(m_thread, &QThread::finished, this, &BootloaderInstallImx::installStage3);
-    connect(m_thread, SIGNAL(terminated()), this, SLOT(installStage3()));
     m_thread->start();
 }
 

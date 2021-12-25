@@ -29,7 +29,7 @@ ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): ProgressloggerInterface(p
     dp.setupUi(downloadProgress);
     dp.listProgress->setAlternatingRowColors(true);
     dp.saveLog->hide();
-    connect(dp.saveLog,SIGNAL(clicked()),this,SLOT(saveErrorLog()));
+    connect(dp.saveLog,&QAbstractButton::clicked,this,&ProgressLoggerGui::saveErrorLog);
     setRunning();
 }
 
@@ -100,9 +100,9 @@ void ProgressLoggerGui::setRunning()
     dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/process-stop.svg")));
 
     // make sure to not close the window on button press.
-    disconnect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+    disconnect(dp.buttonAbort, &QAbstractButton::clicked, downloadProgress, &QWidget::close);
     // emit aborted() once button is pressed but not closed().
-    disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));
+    disconnect(dp.buttonAbort, &QAbstractButton::clicked, this, &ProgressLoggerGui::closed);
     connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(aborted()));
 
 }
@@ -118,10 +118,10 @@ void ProgressLoggerGui::setFinished()
     dp.buttonAbort->setIcon(QIcon(QString::fromUtf8(":/icons/go-next.svg")));
 
     // close the window on button press.
-    connect(dp.buttonAbort, SIGNAL(clicked()), downloadProgress, SLOT(close()));
+    connect(dp.buttonAbort, &QAbstractButton::clicked, downloadProgress, &QWidget::close);
     // emit closed() once button is pressed but not aborted().
     disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(aborted()));
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(closed()));
+    connect(dp.buttonAbort, &QAbstractButton::clicked, this, &ProgressLoggerGui::closed);
 }
 
 

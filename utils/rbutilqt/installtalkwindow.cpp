@@ -29,7 +29,7 @@ InstallTalkWindow::InstallTalkWindow(QWidget *parent) : QDialog(parent)
     ui.setupUi(this);
     talkcreator = new TalkFileCreator(this);
 
-    connect(ui.change,SIGNAL(clicked()),this,SLOT(change()));
+    connect(ui.change,&QAbstractButton::clicked,this,&InstallTalkWindow::change);
 
     ui.recursive->setChecked(true);
     ui.GenerateOnlyNew->setChecked(true);
@@ -81,7 +81,7 @@ void InstallTalkWindow::change()
 
     // make sure the current selected folder doesn't get lost on settings
     // changes.
-    connect(cw, SIGNAL(settingsUpdated()), this, SLOT(updateSettings()));
+    connect(cw, &Config::settingsUpdated, this, &InstallTalkWindow::updateSettings);
 
     cw->show();
 }
@@ -100,7 +100,7 @@ void InstallTalkWindow::accept()
 
     logger = new ProgressLoggerGui(this);
 
-    connect(logger,SIGNAL(closed()),this,SLOT(close()));
+    connect(logger,&ProgressLoggerGui::closed,this,&QWidget::close);
     logger->show();
 
     talkcreator->setMountPoint(RbSettings::value(RbSettings::Mountpoint).toString());
@@ -118,7 +118,7 @@ void InstallTalkWindow::accept()
 
     connect(talkcreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
     connect(talkcreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
-    connect(talkcreator, SIGNAL(logProgress(int, int)), logger, SLOT(setProgress(int, int)));
+    connect(talkcreator, &TalkFileCreator::logProgress, logger, &ProgressLoggerGui::setProgress);
     connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
 
     for(int i = 0; i < foldersToTalk.size(); i++) {

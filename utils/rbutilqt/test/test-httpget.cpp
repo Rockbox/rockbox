@@ -51,8 +51,8 @@
             // works asynchronously, this means that all the communication is done
             // in the two slots readClient() and discardClient().
             QTcpSocket* s = new QTcpSocket(this);
-            connect(s, SIGNAL(readyRead()), this, SLOT(readClient()));
-            connect(s, SIGNAL(disconnected()), this, SLOT(discardClient()));
+            connect(s, &QIODevice::readyRead, this, &HttpDaemon::readClient);
+            connect(s, &QAbstractSocket::disconnected, this, &HttpDaemon::discardClient);
             s->setSocketDescriptor(socket);
         }
         QList<QString> lastRequestData(void)
@@ -183,8 +183,8 @@ void TestHttpGet::init(void)
     m_port = QString("%1").arg(m_daemon->port()).toLatin1();
     m_cachedir = temporaryFolder();
     m_getter = new HttpGet(this);
-    m_doneSpy = new QSignalSpy(m_getter, SIGNAL(done(bool)));
-    m_progressSpy = new QSignalSpy(m_getter, SIGNAL(dataReadProgress(int, int)));
+    m_doneSpy = new QSignalSpy(m_getter, &HttpGet::done);
+    m_progressSpy = new QSignalSpy(m_getter, &HttpGet::dataReadProgress);
     m_waitTimeoutOccured = false;
 }
 
@@ -201,7 +201,7 @@ void TestHttpGet::cleanup(void)
 
 void TestHttpGet::testFileUrlRequest(void)
 {
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     QString teststring = "The quick brown fox jumps over the lazy dog.";
     QTemporaryFile datafile;
@@ -239,7 +239,7 @@ void TestHttpGet::testUncachedRepeatedRequest(void)
         "<html></html>\r\n\r\n");
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.txt"));
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
@@ -287,7 +287,7 @@ void TestHttpGet::testCachedRequest(void)
         "\r\n");
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->setCache(m_cachedir);
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.txt"));
@@ -336,7 +336,7 @@ void TestHttpGet::testUserAgent(void)
         "<html></html>\r\n\r\n");
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->setGlobalUserAgent(TEST_USER_AGENT);
     m_getter->setCache(m_cachedir);
@@ -376,7 +376,7 @@ void TestHttpGet::testUncachedMovedRequest(void)
         "<html></html>\r\n\r\n");
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.php?var=1&b=foo"));
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
@@ -391,7 +391,7 @@ void TestHttpGet::testUncachedMovedRequest(void)
 
 void TestHttpGet::testResponseCode(void)
 {
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.txt"));
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
@@ -416,7 +416,7 @@ void TestHttpGet::testContentToBuffer(void)
         TEST_BINARY_BLOB);
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.txt"));
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
@@ -443,7 +443,7 @@ void TestHttpGet::testContentToFile(void)
         TEST_BINARY_BLOB);
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->setFile(&tf);
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.txt"));
@@ -462,7 +462,7 @@ void TestHttpGet::testContentToFile(void)
 
 void TestHttpGet::testNoServer(void)
 {
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
     m_getter->getFile(QUrl("http://localhost:53/test1.txt"));
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
         QCoreApplication::processEvents();
@@ -494,7 +494,7 @@ void TestHttpGet::testServerTimestamp(void)
 
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     int count = m_doneSpy->count();
     for(int i = 0; i < responses.size(); ++i) {
@@ -523,7 +523,7 @@ void TestHttpGet::testMovedQuery(void)
         "<html></html>\r\n\r\n");
     m_daemon->setResponsesToSend(responses);
 
-    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, SLOT(waitTimeout(void)));
+    QTimer::singleShot(TEST_HTTP_TIMEOUT, this, &TestHttpGet::waitTimeout);
 
     m_getter->getFile(QUrl("http://localhost:" + m_port + "/test1.php?var=1&b=foo"));
     while(m_doneSpy->count() == 0 && m_waitTimeoutOccured == false)
