@@ -139,7 +139,9 @@ bool encode_file(FILE *fin, FILE *fout, float quality, int complexity,
     int i, tmp, target_sr, numchan, bps, sr, numsamples, frame_size, lookahead;
     int nbytes;
     bool ret = true;
+#if defined(__BIG_ENDIAN__)
     int a;
+#endif
 
     if (!get_wave_metadata(fin, &numchan, &bps, &sr, &numsamples)) {
         snprintf(errstr, errlen, "invalid WAV file");
