@@ -114,7 +114,6 @@ void TestRockboxInfo::testTarget()
         QTemporaryFile tf(this);
         tf.open();
         QFileInfo finfo(tf);
-        QString filename = tf.fileName();
         tf.write(prefix.at(j).toLatin1());
         tf.write(target.toLatin1());
         tf.write("\n");
@@ -144,7 +143,6 @@ void TestRockboxInfo::testMemory()
         QTemporaryFile tf(this);
         tf.open();
         QFileInfo finfo(tf);
-        QString filename = tf.fileName();
         tf.write(prefix.at(j).toLatin1());
         tf.write(memory.toLatin1());
         tf.write("\n");
@@ -172,7 +170,6 @@ void TestRockboxInfo::testFeatures()
         QTemporaryFile tf(this);
         tf.open();
         QFileInfo finfo(tf);
-        QString filename = tf.fileName();
         tf.write(prefix.at(j).toLatin1());
         tf.write(features.toLatin1());
         tf.write("\n");
