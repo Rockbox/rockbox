@@ -161,13 +161,13 @@ TalkGenerator::Status TalkGenerator::voiceList(QList<TalkEntry>* list,int wavtri
         if(status == Warning)
         {
             warnings = true;
-            emit logItem(tr("Voicing of %1 failed: %2").arg(list->at(i).toSpeak).arg(error),
-                    LOGWARNING);
+            emit logItem(tr("Voicing of %1 failed: %2")
+                         .arg(list->at(i).toSpeak, error), LOGWARNING);
         }
         else if (status == FatalError)
         {
-            emit logItem(tr("Voicing of %1 failed: %2").arg(list->at(i).toSpeak).arg(error),
-                    LOGERROR);
+            emit logItem(tr("Voicing of %1 failed: %2")
+                         .arg(list->at(i).toSpeak, error), LOGERROR);
             return eERROR;
         }
         else

@@ -190,7 +190,7 @@ QString System::osVersionString(void)
     if(ret != -1) {
         result = QString("CPU: %1, %2 processor(s)").arg(u.machine).arg(cores);
         result += QString("<br/>System: %2<br/>Release: %3<br/>Version: %4")
-            .arg(u.sysname).arg(u.release).arg(u.version);
+            .arg(u.sysname, u.release, u.version);
     }
     else {
         result = QString("(Error when retrieving system information)");

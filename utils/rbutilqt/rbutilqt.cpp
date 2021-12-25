@@ -281,8 +281,7 @@ void RbUtilQt::about()
     licenses[":/docs/LICENSE.BZIP2"] = "<a id='bzip2'>bzip2 License</a>";
     licenses[":/docs/LICENSE.BSPATCH"] = "<a id='bspatch'>bspatch License</a>";
 
-    for (int i = 0; i < licenses.size(); i++) {
-        QString key = licenses.keys().at(i);
+    for (auto const& key : licenses.keys()) {
         QFile license(key);
         license.open(QIODevice::ReadOnly);
         QTextStream s(&license);
@@ -460,8 +459,6 @@ void RbUtilQt::uninstallBootloader(void)
     // create logger
     ProgressLoggerGui* logger = new ProgressLoggerGui(this);
     logger->show();
-
-    QString platform = RbSettings::value(RbSettings::Platform).toString();
 
     // create installer
     BootloaderInstallBase *bl

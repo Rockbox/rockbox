@@ -148,7 +148,8 @@ class TestHttpGet : public QObject
             QString tempdir;
             for(int i = 0; i < 100000; i++) {
                 tempdir = QDir::tempPath() + QString("/qttest-temp-%1").arg(i);
-                if(!QFileInfo(tempdir).exists()) break;
+                if(!QFileInfo::exists(tempdir))
+                    break;
             }
             QDir().mkpath(tempdir);
             return QDir(tempdir);

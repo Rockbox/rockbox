@@ -197,7 +197,7 @@ QStringList TTSSapi::getVoiceList(QString language)
     voicescript->closeWriteChannel();
     voicescript->waitForReadyRead();
 
-    QString dataRaw = voicescript->readAllStandardError().data();
+    const QString dataRaw = voicescript->readAllStandardError().constData();
     if(dataRaw.startsWith("Error")) {
         LOG_INFO() << "Error:" << dataRaw;
     }

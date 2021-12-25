@@ -193,7 +193,7 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
     QString path = RbSettings::subValue("festival-client",
             RbSettings::TtsPath).toString();
     QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp"
-            " --output \"%2\" --prolog \"%3\" - ").arg(path).arg(wavfile).arg(prologPath);
+            " --output \"%2\" --prolog \"%3\" - ").arg(path, wavfile, prologPath);
     LOG_INFO() << "Client cmd:" << cmd;
 
     QProcess clientProcess;

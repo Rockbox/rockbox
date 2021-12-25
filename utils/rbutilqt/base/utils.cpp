@@ -1057,7 +1057,7 @@ qint64 Utils::recursiveFolderSize(QString path)
         size += item.size();
     }
     QList<QString> folders = QDir(path).entryList(QDir::Dirs | QDir::NoDotAndDotDot);
-    for (auto folder: folders) {
+    for (auto const& folder: folders) {
         size += recursiveFolderSize(path + "/" + folder);
     }
     return size;

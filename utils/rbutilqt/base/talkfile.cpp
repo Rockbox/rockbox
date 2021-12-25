@@ -252,9 +252,10 @@ bool TalkFileCreator::copyTalkFiles(QString* errString)
         // copying
         LOG_INFO() << "copying" << m_talkList[i].talkfilename
                    << "to" << m_talkList[i].target;
-        if(!QFile::copy(m_talkList[i].talkfilename,m_talkList[i].target))
+        if(!QFile::copy(m_talkList[i].talkfilename, m_talkList[i].target))
         {
-            *errString = tr("Copying of %1 to %2 failed").arg(m_talkList[i].talkfilename).arg(m_talkList[i].target);
+            *errString = tr("Copying of %1 to %2 failed")
+                    .arg(m_talkList[i].talkfilename, m_talkList[i].target);
             return false;
         }
 

@@ -277,7 +277,6 @@ void SelectiveInstallWidget::installBootloader(void)
     if(ui.bootloaderCheckbox->isChecked()) {
         LOG_INFO() << "installing bootloader";
 
-        QString platform = RbSettings::value(RbSettings::Platform).toString();
         QString backupDestination = "";
 
         // create installer
@@ -509,7 +508,6 @@ void SelectiveInstallWidget::installVoicefile(void)
         RockboxInfo installInfo(m_mountpoint);
         QString voiceurl;
         QString logversion;
-        QString relversion = installInfo.release();
         if(m_buildtype != PlayerBuildInfo::TypeRelease) {
             // release is empty for non-release versions (i.e. daily / current)
             logversion = installInfo.release();
@@ -549,7 +547,6 @@ void SelectiveInstallWidget::installManual(void)
         RockboxInfo installInfo(m_mountpoint);
         QString manualurl;
         QString logversion;
-        QString relversion = installInfo.release();
         if(m_buildtype != PlayerBuildInfo::TypeRelease) {
             // release is empty for non-release versions (i.e. daily / current)
             logversion = installInfo.release();
@@ -638,7 +635,7 @@ void SelectiveInstallWidget::installPluginData(void)
         for(size_t i = 0; i < sizeof(PluginDataFiles) / sizeof(PluginDataFiles[0]); i++)
         {
             // check if installed Rockbox has this plugin.
-            if(QFileInfo(m_mountpoint + "/.rockbox/rocks/" + PluginDataFiles[i].rockfile).exists()) {
+            if(QFileInfo::exists(m_mountpoint + "/.rockbox/rocks/" + PluginDataFiles[i].rockfile)) {
                 dataName.append(PluginDataFiles[i].name);
                 // game URLs do not depend on the actual build type, but we need
                 // to pass it (simplifies the API, and will allow to make them
