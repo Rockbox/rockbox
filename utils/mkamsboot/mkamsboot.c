@@ -552,7 +552,7 @@ int check_sizes(int model, int rb_packed_size, int rb_unpacked_size,
 {
     /* XXX: we keep the first 0x200 bytes block unmodified, we just replace
      * the ARM vectors */
-    unsigned int packed_size = ams_identity[model].bootloader_size + sizeof(nrv2e_d8) +
+    int packed_size = ams_identity[model].bootloader_size + sizeof(nrv2e_d8) +
             of_packed_size + rb_packed_size + 0x200;
 
     /* how much memory is available */
