@@ -31,9 +31,9 @@ UninstallWindow::UninstallWindow(QWidget *parent) : QDialog(parent)
 
     uninstaller = new Uninstaller(this,mountpoint);
     logger = new ProgressLoggerGui(this);
-    connect(uninstaller, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(uninstaller, &Uninstaller::logItem, logger, &ProgressLoggerGui::addItem);
     connect(uninstaller, &Uninstaller::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(uninstaller, SIGNAL(logFinished(void)), logger, SLOT(setFinished(void)));
+    connect(uninstaller, &Uninstaller::logFinished, logger, &ProgressLoggerGui::setFinished);
     connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
 
     // disable smart uninstall, if not possible

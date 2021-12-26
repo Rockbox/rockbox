@@ -116,10 +116,10 @@ void InstallTalkWindow::accept()
     talkcreator->setIgnoreFiles(ui.ignoreFiles->text().split(",", QString::SkipEmptyParts));
 #endif
 
-    connect(talkcreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
-    connect(talkcreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(talkcreator, &TalkFileCreator::done, logger, &ProgressLoggerGui::setFinished);
+    connect(talkcreator, &TalkFileCreator::logItem, logger, &ProgressLoggerGui::addItem);
     connect(talkcreator, &TalkFileCreator::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(logger,SIGNAL(aborted()),talkcreator,SLOT(abort()));
+    connect(logger,&ProgressLoggerGui::aborted,talkcreator,&TalkFileCreator::abort);
 
     for(int i = 0; i < foldersToTalk.size(); i++) {
         LOG_INFO() << "creating talk files for folder"

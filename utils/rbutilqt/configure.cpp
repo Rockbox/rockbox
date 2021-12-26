@@ -94,7 +94,7 @@ Config::Config(QWidget *parent,int index) : QDialog(parent)
 
     this->setModal(true);
 
-    connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui.buttonOk, &QAbstractButton::clicked, this, &Config::accept);
     connect(ui.buttonCancel, &QAbstractButton::clicked, this, &Config::abort);
     connect(ui.radioNoProxy, &QAbstractButton::toggled, this, &Config::setNoProxy);
     connect(ui.radioSystemProxy, &QAbstractButton::toggled, this, &Config::setSystemProxy);

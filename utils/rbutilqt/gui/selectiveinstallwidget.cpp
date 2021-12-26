@@ -292,9 +292,9 @@ void SelectiveInstallWidget::installBootloader(void)
 
         // the bootloader install class does NOT use any GUI stuff.
         // All messages are passed via signals.
-        connect(bl, SIGNAL(done(bool)), m_logger, SLOT(setFinished()));
+        connect(bl, &BootloaderInstallBase::done, m_logger, &ProgressLoggerGui::setFinished);
         connect(bl, &BootloaderInstallBase::done, this, &SelectiveInstallWidget::continueInstall);
-        connect(bl, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(bl, &BootloaderInstallBase::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(bl, &BootloaderInstallBase::logProgress, m_logger, &ProgressLoggerGui::setProgress);
         // pass Abort button click signal to current installer
         connect(m_logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
@@ -447,9 +447,9 @@ void SelectiveInstallWidget::installRockbox(void)
 
         connect(m_zipinstaller, &ZipInstaller::done, this, &SelectiveInstallWidget::continueInstall);
 
-        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, &ZipInstaller::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(m_zipinstaller, &ZipInstaller::logProgress, m_logger, &ProgressLoggerGui::setProgress);
-        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        connect(m_logger, &ProgressLoggerGui::aborted, m_zipinstaller, &ZipInstaller::abort);
         m_zipinstaller->install();
 
     }
@@ -488,9 +488,9 @@ void SelectiveInstallWidget::installFonts(void)
             m_zipinstaller->setCache(true);
 
         connect(m_zipinstaller, &ZipInstaller::done, this, &SelectiveInstallWidget::continueInstall);
-        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, &ZipInstaller::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(m_zipinstaller, &ZipInstaller::logProgress, m_logger, &ProgressLoggerGui::setProgress);
-        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        connect(m_logger, &ProgressLoggerGui::aborted, m_zipinstaller, &ZipInstaller::abort);
         m_zipinstaller->install();
     }
     else {
@@ -527,9 +527,9 @@ void SelectiveInstallWidget::installVoicefile(void)
             m_zipinstaller->setCache(true);
 
         connect(m_zipinstaller, &ZipInstaller::done, this, &SelectiveInstallWidget::continueInstall);
-        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, &ZipInstaller::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(m_zipinstaller, &ZipInstaller::logProgress, m_logger, &ProgressLoggerGui::setProgress);
-        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        connect(m_logger, &ProgressLoggerGui::aborted, m_zipinstaller, &ZipInstaller::abort);
         m_zipinstaller->install();
     }
     else {
@@ -572,9 +572,9 @@ void SelectiveInstallWidget::installManual(void)
         m_zipinstaller->setUnzip(mantype == "html");
 
         connect(m_zipinstaller, &ZipInstaller::done, this, &SelectiveInstallWidget::continueInstall);
-        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, &ZipInstaller::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(m_zipinstaller, &ZipInstaller::logProgress, m_logger, &ProgressLoggerGui::setProgress);
-        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        connect(m_logger, &ProgressLoggerGui::aborted, m_zipinstaller, &ZipInstaller::abort);
         m_zipinstaller->install();
     }
     else {
@@ -667,9 +667,9 @@ void SelectiveInstallWidget::installPluginData(void)
         if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
             m_zipinstaller->setCache(true);
         connect(m_zipinstaller, &ZipInstaller::done, this, &SelectiveInstallWidget::continueInstall);
-        connect(m_zipinstaller, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+        connect(m_zipinstaller, &ZipInstaller::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(m_zipinstaller, &ZipInstaller::logProgress, m_logger, &ProgressLoggerGui::setProgress);
-        connect(m_logger, SIGNAL(aborted()), m_zipinstaller, SLOT(abort()));
+        connect(m_logger, &ProgressLoggerGui::aborted, m_zipinstaller, &ZipInstaller::abort);
         m_zipinstaller->install();
     }
     else {

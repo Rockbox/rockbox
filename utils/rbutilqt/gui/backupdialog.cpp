@@ -60,7 +60,6 @@ BackupDialog::BackupDialog(QWidget* parent) : QDialog(parent)
 
     m_thread = new BackupSizeThread();
     connect(m_thread, &QThread::finished, this, &BackupDialog::updateSizeInfo);
-    connect(m_thread, SIGNAL(terminated()), this, SLOT(updateSizeInfo()));
 
     connect(ui.buttonCancel, &QAbstractButton::clicked, this, &QWidget::close);
     connect(ui.buttonCancel, &QAbstractButton::clicked, m_thread, &QThread::quit);
@@ -135,8 +134,8 @@ void BackupDialog::backup(void)
 
     // create backup
     ZipUtil zip(this);
-    connect(&zip, SIGNAL(logProgress(int, int)), m_logger, SLOT(setProgress(int, int)));
-    connect(&zip, SIGNAL(logItem(QString, int)), m_logger, SLOT(addItem(QString, int)));
+    connect(&zip, &ZipUtil::logProgress, m_logger, &ProgressLoggerGui::setProgress);
+    connect(&zip, &ZipUtil::logItem, m_logger, &ProgressLoggerGui::addItem);
     zip.open(m_backupName, QuaZip::mdCreate);
 
     QString mp = m_mountpoint + "/.rockbox";

@@ -497,9 +497,9 @@ void RbUtilQt::uninstallBootloader(void)
         return;
     }
 
-    connect(bl, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(bl, &BootloaderInstallBase::logItem, logger, &ProgressLoggerGui::addItem);
     connect(bl, &BootloaderInstallBase::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(bl, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+    connect(bl, &BootloaderInstallBase::done, logger, &ProgressLoggerGui::setFinished);
     // pass Abort button click signal to current installer
     connect(logger, SIGNAL(aborted()), bl, SLOT(progressAborted()));
 

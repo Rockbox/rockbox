@@ -58,10 +58,10 @@ void CreateVoiceWindow::accept()
     voicecreator->setWavtrimThreshold(ui.wavtrimthreshold->value());
        
     //start creating
-    connect(voicecreator, SIGNAL(done(bool)), logger, SLOT(setFinished()));
-    connect(voicecreator, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(voicecreator, &VoiceFileCreator::done, logger, &ProgressLoggerGui::setFinished);
+    connect(voicecreator, &VoiceFileCreator::logItem, logger, &ProgressLoggerGui::addItem);
     connect(voicecreator, &VoiceFileCreator::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(logger,SIGNAL(aborted()),voicecreator,SLOT(abort()));
+    connect(logger,&ProgressLoggerGui::aborted,voicecreator,&VoiceFileCreator::abort);
     voicecreator->createVoiceFile();
 }
 

@@ -95,7 +95,7 @@ void ThemesInstallWindow::downloadInfo()
     getter->setFile(&themesInfo);
 
     connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
-    connect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
+    connect(logger, &ProgressLoggerGui::aborted, getter, &HttpGet::abort);
     getter->getFile(url);
 }
 
@@ -111,8 +111,8 @@ void ThemesInstallWindow::downloadDone(bool error)
 {
     LOG_INFO() << "Download done, error:" << error;
 
-    disconnect(logger, SIGNAL(aborted()), getter, SLOT(abort()));
-    disconnect(logger, SIGNAL(aborted()), this, SLOT(close()));
+    disconnect(logger, &ProgressLoggerGui::aborted, getter, &HttpGet::abort);
+    disconnect(logger, &ProgressLoggerGui::aborted, this, &QWidget::close);
     themesInfo.open();
 
     QSettings iniDetails(themesInfo.fileName(), QSettings::IniFormat, this);
@@ -299,7 +299,7 @@ void ThemesInstallWindow::show()
         logger->show();
         logger->addItem(tr("getting themes information ..."), LOGINFO);
 
-        connect(logger, SIGNAL(aborted()), this, SLOT(close()));
+        connect(logger, &ProgressLoggerGui::aborted, this, &QWidget::close);
 
         downloadInfo();
     }
@@ -372,12 +372,12 @@ void ThemesInstallWindow::install()
 
     if(!windowSelectOnly) {
         connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
-        connect(installer, SIGNAL(done(bool)), logger, SLOT(setFinished()));
+        connect(installer, &ZipInstaller::done, logger, &ProgressLoggerGui::setFinished);
     }
-    connect(installer, SIGNAL(logItem(QString, int)), logger, SLOT(addItem(QString, int)));
+    connect(installer, &ZipInstaller::logItem, logger, &ProgressLoggerGui::addItem);
     connect(installer, &ZipInstaller::logProgress, logger, &ProgressLoggerGui::setProgress);
     connect(installer, SIGNAL(done(bool)), this, SIGNAL(done(bool)));
-    connect(logger, SIGNAL(aborted()), installer, SLOT(abort()));
+    connect(logger, &ProgressLoggerGui::aborted, installer, &ZipInstaller::abort);
     installer->install();
 }
 
