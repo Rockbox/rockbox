@@ -78,7 +78,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             COMMENT "Setting up dmgbuild virtualenv"
             OUTPUT ${DMGBUILD}
             COMMAND python3 -m venv ${CMAKE_BINARY_DIR}/venv
-            COMMAND ${CMAKE_BINARY_DIR}/venv/bin/python -m pip install -q dmgbuild biplist
+            COMMAND ${CMAKE_BINARY_DIR}/venv/bin/python -m pip install -q dmgbuild
         )
 
         add_custom_command(
