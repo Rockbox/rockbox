@@ -19,7 +19,7 @@
 #include <QtCore>
 #include <QDebug>
 #include "ziputil.h"
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 #include "Logger.h"
 
 #include "quazip/quazip.h"

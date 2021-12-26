@@ -20,7 +20,7 @@
 #define BOOTLOADERINSTALLBASE_H
 
 #include <QtCore>
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 #include "httpget.h"
 
 //! baseclass for all Bootloader installs

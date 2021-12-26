@@ -23,7 +23,7 @@
 #define VOICEFILE_H
 
 #include <QtCore>
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 
 #include "httpget.h"
 #include "voicefont.h"

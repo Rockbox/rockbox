@@ -19,7 +19,7 @@
 #include <QtCore>
 #include "Logger.h"
 #include "mspackutil.h"
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 
 MsPackUtil::MsPackUtil(QObject* parent)
     :ArchiveUtil(parent)

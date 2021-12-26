@@ -23,7 +23,7 @@
 #define TALKGENERATOR_H
 
 #include <QtCore>
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 
 #include "encoderbase.h"
 #include "ttsbase.h"

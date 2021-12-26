@@ -20,7 +20,6 @@
 #define BOOTLOADERINSTALLFILE_H
 
 #include <QtCore>
-#include "progressloggerinterface.h"
 #include "bootloaderinstallbase.h"
 
 //! install a bootloader by putting a single file on the player.

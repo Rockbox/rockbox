@@ -23,7 +23,7 @@
 #define TALKFILE_H
 
 #include <QtCore>
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 
 #include "talkgenerator.h"
 

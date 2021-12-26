@@ -22,7 +22,7 @@
 #include "sysinfo.h"
 #include "systrace.h"
 
-ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): ProgressloggerInterface(parent)
+ProgressLoggerGui::ProgressLoggerGui(QWidget* parent): QObject(parent)
 {
     downloadProgress = new QDialog(parent);
     downloadProgress->setModal(true);
@@ -103,7 +103,7 @@ void ProgressLoggerGui::setRunning()
     disconnect(dp.buttonAbort, &QAbstractButton::clicked, downloadProgress, &QWidget::close);
     // emit aborted() once button is pressed but not closed().
     disconnect(dp.buttonAbort, &QAbstractButton::clicked, this, &ProgressLoggerGui::closed);
-    connect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(aborted()));
+    connect(dp.buttonAbort, &QAbstractButton::clicked, this, &ProgressLoggerGui::aborted);
 
 }
 
@@ -120,7 +120,7 @@ void ProgressLoggerGui::setFinished()
     // close the window on button press.
     connect(dp.buttonAbort, &QAbstractButton::clicked, downloadProgress, &QWidget::close);
     // emit closed() once button is pressed but not aborted().
-    disconnect(dp.buttonAbort, SIGNAL(clicked()), this, SIGNAL(aborted()));
+    disconnect(dp.buttonAbort, &QAbstractButton::clicked, this, &ProgressLoggerGui::aborted);
     connect(dp.buttonAbort, &QAbstractButton::clicked, this, &ProgressLoggerGui::closed);
 }
 

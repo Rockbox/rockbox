@@ -18,42 +18,11 @@
  *
  ****************************************************************************/
 
-#ifndef PROGRESSLOGGERINTERFACE_H
-#define PROGRESSLOGGERINTERFACE_H
-
-#include <QtCore>
+#ifndef PROGRESSLOGLEVELS_H
+#define PROGRESSLOGLEVELS_H
 
 enum {
     LOGNOICON, LOGOK, LOGINFO, LOGWARNING, LOGERROR
-};
-
-
-
-class ProgressloggerInterface : public QObject
-{
-   Q_OBJECT
-
-public:
-    ProgressloggerInterface(QObject* parent) : QObject(parent) {}
-
-    virtual void setProgressValue(int value)=0;
-    virtual void setProgressMax(int max)=0;
-    virtual int getProgressMax()=0;
-
-signals:
-    void aborted();
-
-
-public slots:
-    virtual void addItem(const QString &text, int flag)=0; //! add a string to the list, with icon
-
-    virtual void close()=0;
-    virtual void show()=0;
-    virtual void setRunning()=0;
-    virtual void setFinished()=0;
-
-private:
-
 };
 
 #endif

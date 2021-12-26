@@ -42,8 +42,6 @@
 #include "backupdialog.h"
 #include "changelog.h"
 
-#include "progressloggerinterface.h"
-
 #include "bootloaderinstallbase.h"
 #include "bootloaderinstallhelper.h"
 

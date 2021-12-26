@@ -195,7 +195,7 @@ add_library(rbbase
     ${CMAKE_CURRENT_LIST_DIR}/base/httpget.h
     ${CMAKE_CURRENT_LIST_DIR}/base/mspackutil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/mspackutil.h
-    ${CMAKE_CURRENT_LIST_DIR}/base/progressloggerinterface.h
+    ${CMAKE_CURRENT_LIST_DIR}/base/progressloglevels.h
     ${CMAKE_CURRENT_LIST_DIR}/base/playerbuildinfo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/base/playerbuildinfo.h
     ${CMAKE_CURRENT_LIST_DIR}/base/rbsettings.cpp

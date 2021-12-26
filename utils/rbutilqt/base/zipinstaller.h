@@ -24,7 +24,7 @@
 
 #include <QtCore>
 
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 #include "httpget.h"
 #include "Logger.h"
 

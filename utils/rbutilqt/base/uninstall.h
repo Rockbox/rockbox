@@ -24,7 +24,7 @@
 
 #include <QtCore>
 
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 
 
 class Uninstaller : public QObject

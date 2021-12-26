@@ -22,10 +22,10 @@
 
 #include <QWidget>
 
-#include "progressloggerinterface.h"
+#include "progressloglevels.h"
 #include "ui_progressloggerfrm.h"
 
-class ProgressLoggerGui :public ProgressloggerInterface
+class ProgressLoggerGui :public QObject
 {
     Q_OBJECT
 public:
