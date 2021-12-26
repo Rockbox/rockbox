@@ -25,27 +25,30 @@ endif()
 
 # Linux: Build AppImage
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(LINUXDEPLOY ${CMAKE_CURRENT_BINARY_DIR}/linuxdeploy-x86_64.AppImage)
-    add_custom_command(
-        OUTPUT ${LINUXDEPLOY}
-        COMMAND ${CMAKE_COMMAND}
-            -DOUTDIR=${CMAKE_CURRENT_BINARY_DIR}
-            -DURL=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-            -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
-        COMMAND ${CMAKE_COMMAND}
-            -DOUTDIR=${CMAKE_CURRENT_BINARY_DIR}
-            -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-            -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
-        )
-
     function(deploy_qt target qtbindir iconfile desktopfile dmgbuildcfg)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
+
+        set(LINUXDEPLOY ${CMAKE_BINARY_DIR}/linuxdeploy-x86_64.AppImage)
+        set(LINUXDEPLOYQT ${CMAKE_BINARY_DIR}/linuxdeploy-plugin-qt-x86_64.AppImage)
         add_custom_command(
-            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}.AppImage
+            COMMENT "Downloading linuxdeploy"
+            OUTPUT ${LINUXDEPLOY}
+            OUTPUT ${LINUXDEPLOYQT}
+            COMMAND ${CMAKE_COMMAND}
+                -DOUTDIR=${CMAKE_BINARY_DIR}
+                -DURL=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+                -P ${CMAKE_SOURCE_DIR}/cmake/download.cmake
+            COMMAND ${CMAKE_COMMAND}
+                -DOUTDIR=${CMAKE_BINARY_DIR}
+                -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+                -P ${CMAKE_SOURCE_DIR}/cmake/download.cmake
+            )
+        add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/${target}.AppImage
             COMMENT "Creating AppImage ${target}"
-            COMMAND OUTPUT=${CMAKE_CURRENT_BINARY_DIR}/${target}.AppImage
+            COMMAND OUTPUT=${CMAKE_BINARY_DIR}/${target}.AppImage
                     ${LINUXDEPLOY}
                     --icon-file=${iconfile}
                     --desktop-file=${desktopfile}
@@ -57,7 +60,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
                     ${LINUXDEPLOY}
             )
         add_custom_target(deploy_${target}
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}.AppImage)
+            DEPENDS ${CMAKE_BINARY_DIR}/${target}.AppImage)
         add_dependencies(deploy deploy_${target})
     endfunction()
 endif()
@@ -68,29 +71,29 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
-        set(DMGBUILD ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/dmgbuild)
+        set(DMGBUILD ${CMAKE_BINARY_DIR}/venv/bin/dmgbuild)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${qtbindir}")
 
         add_custom_command(
             COMMENT "Setting up dmgbuild virtualenv"
             OUTPUT ${DMGBUILD}
-            COMMAND python3 -m venv ${CMAKE_CURRENT_BINARY_DIR}/venv
-            COMMAND ${CMAKE_CURRENT_BINARY_DIR}/venv/bin/python -m pip install -q dmgbuild biplist
+            COMMAND python3 -m venv ${CMAKE_BINARY_DIR}/venv
+            COMMAND ${CMAKE_BINARY_DIR}/venv/bin/python -m pip install -q dmgbuild biplist
         )
 
         add_custom_command(
             # TODO: find a better way to figure the app bundle name.
-            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}.dmg
+            OUTPUT ${CMAKE_BINARY_DIR}/${target}.dmg
             COMMENT "Running macdeployqt and creating dmg ${target}"
             COMMAND ${MACDEPLOYQT_EXECUTABLE} ${target}.app
             COMMAND ${DMGBUILD} -s ${dmgbuildcfg}
                     -Dappbundle=${target}.app
-                    ${target} ${CMAKE_CURRENT_BINARY_DIR}/${target}.dmg
+                    ${target} ${CMAKE_BINARY_DIR}/${target}.dmg
             DEPENDS ${target}
                     ${DMGBUILD}
             )
         add_custom_target(deploy_${target}
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}.dmg)
+            DEPENDS ${CMAKE_BINARY_DIR}/${target}.dmg)
         add_dependencies(deploy deploy_${target})
     endfunction()
 endif()
@@ -103,7 +106,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         endif()
         set(_targetfile ${target}.exe)  # TODO: Use property. OUTPUT_NAME seems to fail.
         find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${qtbindir}")
-        set(deploydir ${CMAKE_CURRENT_BINARY_DIR}/deploy-${target})
+        set(deploydir ${CMAKE_BINARY_DIR}/deploy-${target})
         if(WINDEPLOYQT_EXECUTABLE)
             add_custom_command(
                 COMMENT "Creating deploy folder and running windeployqt"
@@ -126,15 +129,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         endif()
         add_custom_command(
             COMMENT "Compressing to zip"
-            OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${target}.zip
+            OUTPUT ${CMAKE_BINARY_DIR}/${target}.zip
             WORKING_DIRECTORY ${deploydir}
-            COMMAND ${CMAKE_COMMAND} -E tar c ${CMAKE_CURRENT_BINARY_DIR}/${target}.zip
+            COMMAND ${CMAKE_COMMAND} -E tar c ${CMAKE_BINARY_DIR}/${target}.zip
                     --format=zip .
             DEPENDS ${deploydir}/${_targetfile}
             )
 
         add_custom_target(deploy_${target}
-            DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${target}.zip)
+            DEPENDS ${CMAKE_BINARY_DIR}/${target}.zip)
         add_dependencies(deploy deploy_${target})
     endfunction()
 endif()
