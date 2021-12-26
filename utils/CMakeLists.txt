@@ -343,8 +343,7 @@ add_custom_target(gitversion.h
     BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/gitversion/gitversion.h)
 
 # link to get git version header.
-add_library(gitversion INTERFACE
-    ${CMAKE_CURRENT_BINARY_DIR}/gitversion/gitversion.h)
+add_library(gitversion INTERFACE)
 
 add_dependencies(gitversion gitversion.h)
 target_include_directories(gitversion INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/gitversion)
