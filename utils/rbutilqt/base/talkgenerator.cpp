@@ -275,7 +275,6 @@ QString TalkGenerator::correctString(QString s)
         LOG_INFO() << "corrected string" << s << "to" << corrected;
 
     return corrected;
-    m_abort = true;
 }
 
 void TalkGenerator::setLang(QString name)

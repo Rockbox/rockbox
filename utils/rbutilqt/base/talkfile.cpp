@@ -169,16 +169,20 @@ bool TalkFileCreator::createTalkList(QDir startDir)
         else  // its a File
         {
             // insert into List
-            if( !fileInf.fileName().isEmpty() && !fileInf.fileName().endsWith(".talk") && m_talkFiles)
+            if(!fileInf.fileName().isEmpty()
+                    && !fileInf.fileName().endsWith(".talk")
+                    && m_talkFiles)
             {
                 //test if we should ignore this file
                 bool match = false;
                 for(int i=0; i < m_ignoreFiles.size();i++)
                 {
-                    QRegExp rx(m_ignoreFiles[i].trimmed());
-                    rx.setPatternSyntax(QRegExp::Wildcard);
-                    if(rx.exactMatch(fileInf.fileName()))
+                    QRegularExpression rx(
+                            QRegularExpression::wildcardToRegularExpression(
+                                (m_ignoreFiles[i].trimmed())));
+                    if(rx.match(fileInf.fileName()).hasMatch())
                         match = true;
+
                 }
                 if(match)
                     continue;
