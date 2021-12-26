@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#include <QtTest/QtTest>
-#include <QtCore/QObject>
+#include <QtTest>
+#include <QObject>
 #include "httpget.h"
 
 #define TEST_USER_AGENT "TestAgent/2.3"
@@ -354,10 +354,11 @@ void TestHttpGet::testUserAgent(void)
     QCOMPARE(requests.at(0).startsWith("GET"), true);
 
     for(int i = 0; i < requests.size(); ++i) {
-        QRegExp rx("User-Agent:[\t ]+([a-zA-Z0-9\\./]+)");
-        bool userAgentFound = rx.indexIn(requests.at(i)) > 0 ? true : false;
+        QRegularExpression rx("User-Agent:[\t ]+([a-zA-Z0-9\\./]+)");
+        auto match = rx.match(requests.at(i));
+        bool userAgentFound = match.hasMatch();
         QCOMPARE(userAgentFound, true);
-        QString userAgentString = rx.cap(1);
+        QString userAgentString = match.captured(1);
         QCOMPARE(userAgentString, QString(TEST_USER_AGENT));
     }
 }
@@ -539,7 +540,8 @@ void TestHttpGet::testMovedQuery(void)
     QCOMPARE(m_daemon->lastRequestData().at(0).startsWith("GET"), true);
     QCOMPARE(m_daemon->lastRequestData().at(1).startsWith("GET"), true);
     // current implementation keeps order of query items.
-    QCOMPARE((bool)m_daemon->lastRequestData().at(1).contains("/test2.php?var=1&b=foo"), true);
+    qDebug() << m_daemon->lastRequestData().at(1);
+    QCOMPARE(m_daemon->lastRequestData().at(1).contains("/test2.php?var=1&b=foo"), true);
 }
 
 QTEST_MAIN(TestHttpGet)
