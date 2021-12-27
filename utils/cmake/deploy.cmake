@@ -25,26 +25,28 @@ endif()
 
 # Linux: Build AppImage
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(LINUXDEPLOY ${CMAKE_BINARY_DIR}/linuxdeploy-x86_64.AppImage)
+    set(LINUXDEPLOYQT ${CMAKE_BINARY_DIR}/linuxdeploy-plugin-qt-x86_64.AppImage)
+    add_custom_command(
+        COMMENT "Downloading linuxdeploy"
+        OUTPUT ${LINUXDEPLOY}
+               ${LINUXDEPLOYQT}
+        COMMAND ${CMAKE_COMMAND}
+            -DOUTDIR=${CMAKE_BINARY_DIR}
+            -DURL=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+            -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
+        COMMAND ${CMAKE_COMMAND}
+            -DOUTDIR=${CMAKE_BINARY_DIR}
+            -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+            -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
+        )
+        # intermediate target needed to be able to get back to the actual file dependency.
+        add_custom_target(linuxdeploy DEPENDS ${LINUXDEPLOY})
     function(deploy_qt target qtbindir iconfile desktopfile dmgbuildcfg)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
 
-        set(LINUXDEPLOY ${CMAKE_BINARY_DIR}/linuxdeploy-x86_64.AppImage)
-        set(LINUXDEPLOYQT ${CMAKE_BINARY_DIR}/linuxdeploy-plugin-qt-x86_64.AppImage)
-        add_custom_command(
-            COMMENT "Downloading linuxdeploy"
-            OUTPUT ${LINUXDEPLOY}
-            OUTPUT ${LINUXDEPLOYQT}
-            COMMAND ${CMAKE_COMMAND}
-                -DOUTDIR=${CMAKE_BINARY_DIR}
-                -DURL=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
-                -P ${CMAKE_SOURCE_DIR}/cmake/download.cmake
-            COMMAND ${CMAKE_COMMAND}
-                -DOUTDIR=${CMAKE_BINARY_DIR}
-                -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
-                -P ${CMAKE_SOURCE_DIR}/cmake/download.cmake
-            )
         add_custom_command(
             OUTPUT ${CMAKE_BINARY_DIR}/${target}.AppImage
             COMMENT "Creating AppImage ${target}"
@@ -57,8 +59,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
                     --appdir=AppImage-${target}
                     --output=appimage
                     --verbosity=2
-            DEPENDS ${target}
-                    ${LINUXDEPLOY}
+            DEPENDS ${target} linuxdeploy
             )
         add_custom_target(deploy_${target}
             DEPENDS ${CMAKE_BINARY_DIR}/${target}.AppImage)
