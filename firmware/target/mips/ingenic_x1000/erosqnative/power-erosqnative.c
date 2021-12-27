@@ -62,7 +62,8 @@ void power_init(void)
     /* FIXME: Copy paste from M3K. Probably not necessary */
     axp_modify(AXP_REG_DCDCMODE, 0, 0xc0);
 
-    /* Power on required supplies */
+    /* Power on required supplies
+     * TODO: This should be checked, though likely all but EXTEN are needed */
     axp_set_enabled_supplies(
         (1 << AXP_SUPPLY_EXTEN) |
         (1 << AXP_SUPPLY_DCDC1) |
@@ -81,6 +82,10 @@ void power_init(void)
         (1 << AXP_ADC_INTERNAL_TEMP) |
         (1 << AXP_ADC_APS_VOLTAGE));
 
+    /* Configure USB charging */
+    axp_set_vhold_level(4400);
+    usb_charging_maxcurrent_change(100);
+
     /* Delay to give power outputs time to stabilize.
      * With the power thread delay, this can apparently go as low as 50,
      * Keeping a higher value here just to ensure the bootloader works
@@ -91,7 +96,22 @@ void power_init(void)
 #ifdef HAVE_USB_CHARGING_ENABLE
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
-    axp_set_charge_current(maxcurrent);
+    int vbus_limit;
+    int charge_current;
+
+    /* Note that the charge current setting is a maximum: it will be
+     * reduced dynamically by the AXP192 so the combined load is less
+     * than the set VBUS current limit. */
+    if(maxcurrent <= 100) {
+        vbus_limit = AXP_VBUS_LIMIT_100mA;
+        charge_current = 550;
+    } else {
+        vbus_limit = AXP_VBUS_LIMIT_500mA;
+        charge_current = 550;
+    }
+
+    axp_set_vbus_limit(vbus_limit);
+    axp_set_charge_current(charge_current);
 }
 #endif
 
