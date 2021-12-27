@@ -1846,6 +1846,8 @@ int tagtree_enter(struct tree_context* c)
     tree_lock_cache(c);
     tagtree_lock();
 
+    bool reset_selection = true;
+
     switch (c->currtable) {
         case ROOT:
             c->currextra = newextra;
@@ -1931,6 +1933,8 @@ int tagtree_enter(struct tree_context* c)
         case ALLSUBENTRIES:
             if (newextra == PLAYTRACK)
             {
+                reset_selection = false;
+
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
                     break;
@@ -1962,9 +1966,12 @@ int tagtree_enter(struct tree_context* c)
             break;
     }
 
+    if (reset_selection)
+    {
+        c->selected_item=0;
+        gui_synclist_select_item(&tree_lists, c->selected_item);
+    }
 
-    c->selected_item=0;
-    gui_synclist_select_item(&tree_lists, c->selected_item);
     tree_unlock_cache(c);
     tagtree_unlock();
 
