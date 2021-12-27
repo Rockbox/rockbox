@@ -333,6 +333,21 @@ add_library(rbtomcrypt
     )
 target_include_directories(rbtomcrypt PUBLIC ${CMAKE_CURRENT_LIST_DIR}/tomcrypt/src/headers)
 
+add_library(skin_parser
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_buffer.c
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_buffer.h
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_debug.c
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_debug.h
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_parser.c
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_parser.h
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_scan.c
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/skin_scan.h
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/symbols.h
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/tag_table.c
+    ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser/tag_table.h
+    )
+target_include_directories(skin_parser PUBLIC ${CMAKE_CURRENT_LIST_DIR}/../lib/skin_parser)
+target_compile_definitions(skin_parser PUBLIC __PCTOOL__)
 
 # target will always be build. File is only updated when contents change.
 add_custom_target(gitversion.h
@@ -349,4 +364,7 @@ add_dependencies(gitversion gitversion.h)
 target_include_directories(gitversion INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/gitversion)
 
 include(${CMAKE_CURRENT_LIST_DIR}/cmake/deploy.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/QtTest.cmake)
 add_subdirectory(rbutilqt)
+add_subdirectory(themeeditor)
+
