@@ -1613,11 +1613,10 @@ static int get_album_artist_alpha_next_index(void)
     return pf_idx.album_ct - 1;
 }
 
-static int get_wps_current_index(void)
+static int id3_get_index(struct mp3entry *id3)
 {
     char* current_artist = UNTAGGED;
     char* current_album  = UNTAGGED;
-    struct mp3entry *id3 = rb->audio_current_track();
 
     if(id3)
     {
@@ -3752,6 +3751,35 @@ static void rb_splash_added_to_playlist(void)
 }
 #endif
 
+
+static void set_initial_slide(const char* selected_file)
+{
+    if (selected_file == NULL)
+        set_current_slide(id3_get_index(rb->audio_current_track()));
+    else
+    {
+        struct mp3entry id3;
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+        if (rb->tagcache_fill_tags(&id3, selected_file))
+            set_current_slide(id3_get_index(&id3));
+        else
+#endif
+        {
+            int fd = rb->open(selected_file, O_RDONLY);
+            if (fd >= 0)
+            {
+                if (rb->get_metadata(&id3, fd, selected_file))
+                    set_current_slide(id3_get_index(&id3));
+                else
+                    set_current_slide(pf_cfg.last_album);
+                rb->close(fd);
+            }
+            else
+                set_current_slide(pf_cfg.last_album);
+        }
+    }
+}
+
 /**
   Display an error message and wait for input.
 */
@@ -3767,7 +3795,7 @@ static void error_wait(const char *message)
   Main function that also contain the main plasma
   algorithm.
  */
-static int pictureflow_main(void)
+static int pictureflow_main(const char* selected_file)
 {
     int ret = SUCCESS;
 
@@ -3888,7 +3916,7 @@ static int pictureflow_main(void)
 
     recalc_offsets();
     reset_slides();
-    set_current_slide(get_wps_current_index());
+    set_initial_slide(selected_file);
 
     char fpstxt[10];
     int button;
@@ -4137,11 +4165,12 @@ enum plugin_status plugin_start(const void *parameter)
     lcd_fb = vp_main->buffer->fb_ptr;
 
     int ret;
-    (void) parameter;
+    const char *file = parameter;
 
     void * buf;
     size_t buf_size;
     bool prompt = (parameter && (((char *) parameter)[0] == ACTIVITY_MAINMENU));
+    bool file_id3 = (parameter && (((char *) parameter)[0] == '/'));
 
     if (!check_database(prompt))
     {
@@ -4188,7 +4217,7 @@ enum plugin_status plugin_start(const void *parameter)
     pf_idx.buf = buf;
     pf_idx.buf_sz = buf_size;
 
-    ret = pictureflow_main();
+    ret = file_id3 ? pictureflow_main(file) : pictureflow_main(NULL);
     if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
