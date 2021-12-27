@@ -50,6 +50,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             COMMENT "Creating AppImage ${target}"
             COMMAND OUTPUT=${CMAKE_BINARY_DIR}/${target}.AppImage
                     ${LINUXDEPLOY}
+                    --plugin qt
                     --icon-file=${iconfile}
                     --desktop-file=${desktopfile}
                     --executable=$<TARGET_FILE:${target}>
