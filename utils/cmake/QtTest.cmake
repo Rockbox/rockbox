@@ -86,6 +86,7 @@ The main function is :command:`qtest_discover_tests`.
 #]=======================================================================]
 
 function(qtest_discover_tests TARGET)
+if(NOT CMAKE_CROSSCOMPILING)
   cmake_parse_arguments(
     ""
     ""
@@ -120,6 +121,9 @@ function(qtest_discover_tests TARGET)
   set_property(DIRECTORY APPEND PROPERTY TEST_INCLUDE_FILES
     "${ctest_include_file}"
   )
+else()
+  message("-- Cross compiling, discovering unit tests disabled.")
+endif()
 endfunction()
 
 
