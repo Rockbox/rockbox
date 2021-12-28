@@ -127,7 +127,7 @@ set_target_properties(RockboxThemeEditor PROPERTIES AUTORCC ON)
 set_target_properties(RockboxThemeEditor PROPERTIES AUTOUIC ON)
 
 target_link_libraries(RockboxThemeEditor
-    Qt${QT_MAJOR_VERSION}::Network Qt${QT_MAJOR_VERSION}::Widgets Qt${QT_MAJOR_VERSION}::Core
+    Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Core
     skin_parser z)
 target_include_directories(RockboxThemeEditor PRIVATE models graphics gui qtfindreplacedialog quazip)
 target_compile_definitions(RockboxThemeEditor PRIVATE FINDREPLACE_NOLIB)
