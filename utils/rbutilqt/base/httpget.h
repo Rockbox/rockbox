@@ -80,7 +80,6 @@ class HttpGet : public QObject
     signals:
         void done(bool);
         void dataReadProgress(int, int);
-        void requestFinished(int, bool);
         void headerFinished(void);
 
     private slots:

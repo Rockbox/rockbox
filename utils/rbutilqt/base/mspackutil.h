@@ -36,10 +36,6 @@ class MsPackUtil : public ArchiveUtil
         virtual bool extractArchive(const QString& dest, QString file = "");
         virtual QStringList files(void);
 
-    signals:
-       void logProgress(int, int);
-       void logItem(QString, int);
-
     private:
         QString errorStringMsPack(int error) const;
         struct mscab_decompressor* m_cabd;

@@ -31,23 +31,23 @@ class ProgressLoggerGui :public QObject
 public:
     ProgressLoggerGui(QWidget * parent);
 
-    virtual void setProgressValue(int value);
-    virtual void setProgressMax(int max);
-    virtual int getProgressMax();
-    virtual void setProgressVisible(bool);
+    void setProgressValue(int value);
+    void setProgressMax(int max);
+    int getProgressMax();
+    void setProgressVisible(bool);
 
 signals:
     void aborted();
     void closed();
 
 public slots:
-    virtual void addItem(const QString &text, int flag);  //! add a string to the list
-    virtual void setProgress(int, int); //! set progress bar
+    void addItem(const QString &text, int flag);  //! add a string to the list
+    void setProgress(int, int); //! set progress bar
 
-    virtual void close();
-    virtual void show();
-    virtual void setRunning();
-    virtual void setFinished();
+    void close();
+    void show();
+    void setRunning();
+    void setFinished();
 
     void saveErrorLog();
 private:

@@ -600,7 +600,8 @@ void SelectiveInstallWidget::installThemes(void)
         if(m_themesinstaller == nullptr)
             m_themesinstaller = new ThemesInstallWindow(this);
 
-        connect(m_themesinstaller, SIGNAL(done(bool)), this, SLOT(continueInstall(bool)));
+        connect(m_themesinstaller, &ThemesInstallWindow::done,
+                this, &SelectiveInstallWidget::continueInstall);
         m_themesinstaller->setLogger(m_logger);
         m_themesinstaller->setModal(true);
         m_themesinstaller->install();

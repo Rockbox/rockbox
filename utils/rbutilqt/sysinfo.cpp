@@ -72,8 +72,7 @@ QString Sysinfo::getInfo(Sysinfo::InfoType type)
             .arg(QDir::toNativeSeparators(drives.at(i)))
             .arg((double)Utils::filesystemFree(drives.at(i)) / (1<<30), 0, 'f', 2)
             .arg((double)Utils::filesystemTotal(drives.at(i)) / (1<<30), 0, 'f', 2)
-            .arg(Utils::filesystemName(drives.at(i)))
-            .arg(Utils::filesystemType(drives.at(i)));
+            .arg(Utils::filesystemName(drives.at(i)), Utils::filesystemType(drives.at(i)));
     }
     info += "</table>";
     info += "<hr/>";

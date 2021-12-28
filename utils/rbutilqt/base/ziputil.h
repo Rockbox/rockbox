@@ -40,10 +40,6 @@ class ZipUtil : public ArchiveUtil
         qint64 totalUncompressedSize(unsigned int clustersize = 0);
         virtual QStringList files(void);
 
-    signals:
-       void logProgress(int, int);
-       void logItem(QString, int);
-
     private:
         QList<QuaZipFileInfo> contentProperties();
         QuaZip* m_zip;

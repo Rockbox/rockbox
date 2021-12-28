@@ -66,7 +66,6 @@ class ThemesInstallWindow : public QDialog
 
     private slots:
         void downloadDone(bool);
-        void downloadDone(int, bool);
         void updateImage(bool);
         void abort(void);
         void updateDetails(QListWidgetItem* cur, QListWidgetItem* prev);

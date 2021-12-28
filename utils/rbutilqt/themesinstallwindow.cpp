@@ -44,7 +44,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.themeDescription->setLayoutDirection(Qt::LeftToRight);
 
     connect(ui.buttonCancel, &QAbstractButton::clicked, this, &QWidget::close);
-    connect(ui.buttonOk, SIGNAL(clicked()), this, SLOT(accept()));
+    connect(ui.buttonOk, &QAbstractButton::clicked, this, &ThemesInstallWindow::accept);
     connect(ui.listThemes, &QListWidget::currentItemChanged,
             this, &ThemesInstallWindow::updateDetails);
     connect(ui.listThemes, &QListWidget::itemSelectionChanged, this, &ThemesInstallWindow::updateSize);
@@ -94,16 +94,9 @@ void ThemesInstallWindow::downloadInfo()
     LOG_INFO() << "Info URL:" << url;
     getter->setFile(&themesInfo);
 
-    connect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+    connect(getter, &HttpGet::done, this, &ThemesInstallWindow::downloadDone);
     connect(logger, &ProgressLoggerGui::aborted, getter, &HttpGet::abort);
     getter->getFile(url);
-}
-
-
-void ThemesInstallWindow::downloadDone(int id, bool error)
-{
-    downloadDone(error);
-    LOG_INFO() << "Download" << id << "done, error:" << error;
 }
 
 
@@ -129,7 +122,7 @@ void ThemesInstallWindow::downloadDone(bool error)
                 .arg(getter->errorString()), LOGERROR);
         getter->abort();
         logger->setFinished();
-        disconnect(getter, SIGNAL(done(bool)), this, SLOT(downloadDone(bool)));
+        disconnect(getter, &HttpGet::done, this, &ThemesInstallWindow::downloadDone);
         connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
         return;
     }
@@ -376,7 +369,7 @@ void ThemesInstallWindow::install()
     }
     connect(installer, &ZipInstaller::logItem, logger, &ProgressLoggerGui::addItem);
     connect(installer, &ZipInstaller::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(installer, SIGNAL(done(bool)), this, SIGNAL(done(bool)));
+    connect(installer, &ZipInstaller::done, this, &ThemesInstallWindow::done);
     connect(logger, &ProgressLoggerGui::aborted, installer, &ZipInstaller::abort);
     installer->install();
 }

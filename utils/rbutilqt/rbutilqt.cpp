@@ -279,11 +279,11 @@ void RbUtilQt::about()
     licenses[":/docs/LICENSE.BZIP2"] = "<a id='bzip2'>bzip2 License</a>";
     licenses[":/docs/LICENSE.BSPATCH"] = "<a id='bspatch'>bspatch License</a>";
 
-    for (auto const& key : licenses.keys()) {
-        QFile license(key);
+    for (auto it = licenses.keyBegin(); it != licenses.keyEnd(); ++it) {
+        QFile license(*it);
         license.open(QIODevice::ReadOnly);
         QTextStream s(&license);
-        about.browserLicenses->insertHtml("<hr/><h2>" + licenses[key] + "</h2><br/>\n");
+        about.browserLicenses->insertHtml("<hr/><h2>" + licenses[*it] + "</h2><br/>\n");
         about.browserLicenses->insertHtml("<pre>" + s.readAll() + "</pre>");
         license.close();
     }
@@ -675,7 +675,7 @@ void RbUtilQt::downloadUpdateDone(bool error)
                         tr("<b>New Rockbox Utility version available.</b><br><br>"
                            "You are currently using version %1. "
                            "Get version %2 at <a href='%3'>%3</a>")
-                           .arg(VERSION).arg(Utils::trimVersionString(foundVersion)).arg(url));
+                           .arg(VERSION, Utils::trimVersionString(foundVersion), url));
             ui.statusbar->showMessage(tr("New version of Rockbox Utility available."));
         }
         else {
