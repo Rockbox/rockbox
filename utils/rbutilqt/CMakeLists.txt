@@ -366,7 +366,7 @@ if(APPLE)
         ${FRAMEWORK_CARBON} ${FRAMEWORK_SYSTEMCONFIGURATION} ${FRAMEWORK_CORESERVICES})
 endif()
 target_include_directories(test_compareversion PRIVATE base test/stubs)
-add_test(test_compareversion test_compareversion)
+qtest_discover_tests(test_compareversion)
 set_property(TARGET test_compareversion PROPERTY AUTOMOC ON)
 
 add_executable(test_httpget
@@ -375,7 +375,7 @@ add_executable(test_httpget
     base/httpget.h)
 target_link_libraries(test_httpget Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test Qt${QT_VERSION_MAJOR}::Network)
 target_include_directories(test_httpget PRIVATE base test/stubs)
-add_test(test_httpget test_httpget)
+qtest_discover_tests(test_httpget)
 set_property(TARGET test_httpget PROPERTY AUTOMOC ON)
 
 add_executable(test_playerbuildinfo
@@ -388,7 +388,7 @@ add_executable(test_playerbuildinfo
     test/test-playerbuildinfo.cpp)
 target_link_libraries(test_playerbuildinfo Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test)
 target_include_directories(test_playerbuildinfo PRIVATE base test/stubs)
-add_test(test_playerbuildinfo test_playerbuildinfo)
+qtest_discover_tests(test_playerbuildinfo)
 set_property(TARGET test_playerbuildinfo PROPERTY AUTOMOC ON)
 set_property(TARGET test_playerbuildinfo PROPERTY AUTORCC ON)
 
@@ -400,7 +400,7 @@ add_executable(test_rockboxinfo
 target_link_libraries(test_rockboxinfo Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test)
 target_include_directories(test_rockboxinfo PRIVATE base test/stubs)
 target_compile_definitions(test_rockboxinfo PRIVATE UNICODE)
-add_test(test_rockboxinfo test_rockboxinfo)
+qtest_discover_tests(test_rockboxinfo)
 set_property(TARGET test_rockboxinfo PROPERTY AUTOMOC ON)
 
 
