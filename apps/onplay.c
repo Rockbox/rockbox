@@ -1529,7 +1529,9 @@ MENUITEM_FUNCTION(view_cue_item, 0, ID2P(LANG_BROWSE_CUESHEET),
 
 static int browse_id3_wrapper(void)
 {
-    if (browse_id3())
+    if (browse_id3(audio_current_track(),
+            playlist_get_display_index(),
+            playlist_amount()))
         return GO_TO_ROOT;
     return GO_TO_PREVIOUS;
 }
@@ -1854,7 +1856,7 @@ static struct hotkey_assignment hotkey_items[] = {
             HOTKEY_FUNC(NULL, NULL),
             ONPLAY_PLAYLIST },
     { HOTKEY_SHOW_TRACK_INFO,   LANG_MENU_SHOW_ID3_INFO,
-            HOTKEY_FUNC(browse_id3, NULL),
+            HOTKEY_FUNC(browse_id3_wrapper, NULL),
             ONPLAY_RELOAD_DIR },
 #ifdef HAVE_PITCHCONTROL
     { HOTKEY_PITCHSCREEN,       LANG_PITCH,

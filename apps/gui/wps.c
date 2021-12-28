@@ -903,7 +903,9 @@ long gui_wps_show(void)
             case ACTION_WPS_ID3SCREEN:
             {
                 gwps_leave_wps();
-                if (browse_id3())
+                if (browse_id3(audio_current_track(),
+                        playlist_get_display_index(),
+                        playlist_amount()))
                     return GO_TO_ROOT;
                 restore = true;
             }

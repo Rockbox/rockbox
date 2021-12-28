@@ -479,6 +479,31 @@ static bool update_playlist(bool force)
     return true;
 }
 
+static int show_track_info(struct playlist_entry *current_track)
+{
+    struct mp3entry id3;
+    bool id3_retrieval_successful = false;
+
+#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
+    if (tagcache_fill_tags(&id3, current_track->name))
+        id3_retrieval_successful = true;
+    else
+#endif
+    {
+        int fd = open(current_track->name, O_RDONLY);
+        if (fd >= 0)
+        {
+            if (get_metadata(&id3, fd, current_track->name))
+                id3_retrieval_successful = true;
+            close(fd);
+        }
+    }
+
+    return id3_retrieval_successful &&
+            browse_id3(&id3, current_track->index + 1,
+            viewer.num_tracks) ? -1 : 0;
+}
+
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen.
    Returns -1 if USB attached, 0 if no playlist change, 1 if playlist
    changed, 2 if a track was removed from the playlist */
@@ -489,7 +514,8 @@ static int onplay_menu(int index)
         playlist_buffer_get_track(&viewer.buffer, index);
     MENUITEM_STRINGLIST(menu_items, ID2P(LANG_PLAYLIST), NULL,
                         ID2P(LANG_CURRENT_PLAYLIST), ID2P(LANG_CATALOG),
-                        ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_SHUFFLE),
+                        ID2P(LANG_REMOVE), ID2P(LANG_MOVE), ID2P(LANG_MENU_SHOW_ID3_INFO),
+                        ID2P(LANG_SHUFFLE),
                         ID2P(LANG_SAVE),
                         ID2P(LANG_PLAYLISTVIEWER_SETTINGS));
     bool current = (current_track->index == viewer.current_playing_track);
@@ -547,16 +573,19 @@ static int onplay_menu(int index)
                 ret = 0;
                 break;
             case 4:
+                ret = show_track_info(current_track);
+                break;
+            case 5:
                 /* shuffle */
                 playlist_randomise(viewer.playlist, current_tick, false);
                 ret = 1;
                 break;
-            case 5:
+            case 6:
                 /* save playlist */
                 save_playlist_screen(viewer.playlist);
                 ret = 0;
                 break;
-            case 6:
+            case 7:
                 /* playlist viewer settings */
                 result = do_menu(&viewer_settings_menu, NULL, NULL, false);
                 ret = (result == MENU_ATTACHED_USB) ? -1 : 0;

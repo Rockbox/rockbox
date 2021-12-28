@@ -40,7 +40,6 @@
 #include "powermgmt.h"
 #include "talk.h"
 #include "misc.h"
-#include "metadata.h"
 #include "screens.h"
 #include "debug.h"
 #include "led.h"
@@ -389,6 +388,8 @@ static const int id3_headers[]=
 struct id3view_info {
     struct mp3entry* id3;
     int count;
+    int playlist_display_index;
+    int playlist_amount;
     int info_id[ARRAYLEN(id3_headers)];
 };
 
@@ -589,13 +590,13 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 break;
             case LANG_ID3_PLAYLIST:
                 snprintf(buffer, buffer_len, "%d/%d",
-                         playlist_get_display_index(), playlist_amount());
+                         info->playlist_display_index, info->playlist_amount);
                 val=buffer;
                 if(say_it)
                 {
-                    talk_number(playlist_get_display_index(), true);
+                    talk_number(info->playlist_display_index, true);
                     talk_id(VOICE_OF, true);
-                    talk_number(playlist_amount(), true);
+                    talk_number(info->playlist_amount, true);
                 }
                 break;
             case LANG_ID3_BITRATE:
@@ -669,15 +670,16 @@ static int id3_speak_item(int selected_item, void* data)
     return 0;
 }
 
-bool browse_id3(void)
+bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_amount)
 {
     struct gui_synclist id3_lists;
-    struct mp3entry* id3 = audio_current_track();
     int key;
     unsigned int i;
     struct id3view_info info;
     info.count = 0;
     info.id3 = id3;
+    info.playlist_display_index = playlist_display_index;
+    info.playlist_amount = playlist_amount;
     bool ret = false;
     push_current_activity(ACTIVITY_ID3SCREEN);
     for (i = 0; i < ARRAYLEN(id3_headers); i++)
