@@ -13,7 +13,7 @@
 # KIND, either express or implied.
 #
 
-add_executable(RockboxThemeEditor
+add_executable(RockboxThemeEditor WIN32 MACOSX_BUNDLE
     graphics/rbalbumart.cpp
     graphics/rbalbumart.h
     graphics/rbfont.cpp
