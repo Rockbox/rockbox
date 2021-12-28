@@ -73,12 +73,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
-        set(DMGBUILD ${CMAKE_BINARY_DIR}/venv/bin/dmgbuild)
+        set(DMGBUILD ${CMAKE_BINARY_DIR}/venv/bin/python3 -m dmgbuild)
+        set(DMGBUILD_STAMP ${CMAKE_BINARY_DIR}/dmgbuild.stamp)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${qtbindir}")
 
         add_custom_command(
             COMMENT "Setting up dmgbuild virtualenv"
-            OUTPUT ${DMGBUILD}
+            OUTPUT ${DMGBUILD_STAMP}
             COMMAND python3 -m venv ${CMAKE_BINARY_DIR}/venv
             COMMAND ${CMAKE_BINARY_DIR}/venv/bin/python -m pip install -q dmgbuild
         )
@@ -92,7 +93,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
                     -Dappbundle=${target}.app
                     ${target} ${CMAKE_BINARY_DIR}/${target}.dmg
             DEPENDS ${target}
-                    ${DMGBUILD}
+                    ${DMGBUILD_STAMP}
             )
         add_custom_target(deploy_${target}
             DEPENDS ${CMAKE_BINARY_DIR}/${target}.dmg)
