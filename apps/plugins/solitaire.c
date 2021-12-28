@@ -1678,7 +1678,7 @@ static int solitaire( int skipmenu )
     {
         switch( solitaire_menu(false) )
         {
-            case MENU_QUIT:
+            case MENU_SAVE_AND_QUIT:
                 return SOLITAIRE_QUIT;
 
             case MENU_USB:
