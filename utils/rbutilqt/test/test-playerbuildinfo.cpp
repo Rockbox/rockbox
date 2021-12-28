@@ -82,10 +82,10 @@ Q_DECLARE_METATYPE(PlayerBuildInfo::BuildType);
 Q_DECLARE_METATYPE(PlayerBuildInfo::DeviceInfo);
 
 struct {
-    QString target;
+    const char* target;
     PlayerBuildInfo::BuildInfo item;
     PlayerBuildInfo::BuildType type;
-    QString expected;
+    const char* expected;
 } testdataBuild[] =
 {
     // release builds
@@ -132,9 +132,9 @@ struct {
 };
 
 struct {
-    QString target;
+    const char* target;
     PlayerBuildInfo::DeviceInfo item;
-    QString expected;
+    const char* expected;
 } testdataPlayer[] =
 {
     { "archosfmrecorder", PlayerBuildInfo::BuildStatus,      "3"             },
@@ -166,8 +166,13 @@ void TestPlayerBuildInfo::testBuildInfo_data()
     QTest::addColumn<PlayerBuildInfo::BuildType>("type");
     QTest::addColumn<QString>("expected");
     for (size_t i = 0; i < sizeof(testdataBuild) / sizeof(testdataBuild[0]); i++)
-        QTest::newRow("") << testdataBuild[i].target << testdataBuild[i].item
-                          << testdataBuild[i].type << testdataBuild[i].expected;
+    {
+        char tag[30];
+        snprintf(tag, sizeof(tag), "%s-%i-%i",
+                 testdataBuild[i].target, testdataBuild[i].item, testdataBuild[i].type);
+        QTest::newRow(tag) << testdataBuild[i].target << testdataBuild[i].item
+                           << testdataBuild[i].type << testdataBuild[i].expected;
+    }
 }
 
 
@@ -204,8 +209,13 @@ void TestPlayerBuildInfo::testPlayerInfo_data()
     QTest::addColumn<PlayerBuildInfo::DeviceInfo>("item");
     QTest::addColumn<QString>("expected");
     for (size_t i = 0; i < sizeof(testdataPlayer) / sizeof(testdataPlayer[0]); i++)
-        QTest::newRow("") << testdataPlayer[i].target << testdataPlayer[i].item
-                          << testdataPlayer[i].expected;
+    {
+        char tag[30];
+        snprintf(tag, sizeof(tag), "%s-%i",
+                 testdataPlayer[i].target, testdataPlayer[i].item);
+        QTest::newRow(tag) << testdataPlayer[i].target << testdataPlayer[i].item
+                           << testdataPlayer[i].expected;
+    }
 }
 
 void TestPlayerBuildInfo::testPlayerInfo()
