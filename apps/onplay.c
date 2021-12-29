@@ -69,6 +69,7 @@ static const char *selected_file = NULL;
 static char selected_file_path[MAX_PATH];
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
+static bool (*ctx_playlist_insert)(int position, bool queue, bool create_new);
 extern struct menu_item_ex file_menu; /* settings_menu.c  */
 
 /* redefine MAKE_MENU so the MENU_EXITAFTERTHISMENU flag can be added easily */
@@ -474,7 +475,7 @@ MAKE_ONPLAYMENU( wps_playlist_menu, ID2P(LANG_PLAYLIST),
                  &playlist_save_item, &reshuffle_item, &playing_time_item
                );
 
-/* CONTEXT_[TREE|ID3DB] playlist options */
+/* CONTEXT_[TREE|ID3DB|STD] playlist options */
 static bool add_to_playlist(int position, bool queue)
 {
     bool new_playlist = false;
@@ -509,6 +510,10 @@ static bool add_to_playlist(int position, bool queue)
     if (context == CONTEXT_ID3DB)
     {
         tagtree_insert_selection_playlist(position, queue);
+    }
+    else if (context == CONTEXT_STD && ctx_playlist_insert != NULL)
+    {
+        ctx_playlist_insert(position, queue, false);
     }
     else
 #endif
@@ -774,9 +779,10 @@ static int treeplaylist_callback(int action,
     return action;
 }
 
-void onplay_show_playlist_menu(char* path)
+void onplay_show_playlist_menu(const char* path, void (*playlist_insert_cb))
 {
     context = CONTEXT_STD;
+    ctx_playlist_insert = playlist_insert_cb;
     selected_file = path;
     if (dir_exists(path))
         selected_file_attr = ATTR_DIRECTORY;
@@ -1939,6 +1945,7 @@ int onplay(char* file, int attr, int from, bool hotkey)
     const struct menu_item_ex *menu;
     onplay_result = ONPLAY_OK;
     context = from;
+    ctx_playlist_insert = NULL;
     if (file == NULL)
         selected_file = NULL;
     else

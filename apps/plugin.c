@@ -805,6 +805,7 @@ static const struct plugin_api rockbox_api = {
     warn_on_pl_erase,
     playlist_insert_playlist,
     battery_current,
+    onplay_show_playlist_menu,
 };
 
 static int plugin_buffer_handle;

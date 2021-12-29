@@ -557,6 +557,12 @@ enum pf_states {
 
 static int pf_state;
 
+#if PF_PLAYBACK_CAPABLE
+static bool insert_whole_album;
+static bool old_shuffle = false;
+static int old_playlist = -1;
+#endif
+
 /** code */
 static bool free_slide_prio(int prio);
 bool load_new_slide(void);
@@ -3590,68 +3596,131 @@ static void select_prev_track(void)
 
 #if PF_PLAYBACK_CAPABLE
 
-static bool pf_warn_on_pl_erase(void)
+static bool playlist_insert(int position, bool queue, bool create_new)
 {
-#ifdef USEGSLIB
-                grey_show(false);
-#endif
-                bool ret = rb->warn_on_pl_erase();
-#ifdef USEGSLIB
-                grey_show(true);
-#endif
-                return ret;
-}
-
-/*
- * Puts the current tracklist into a newly created playlist and starts playling
- */
-static void start_playback(bool append)
-{
-    static int old_playlist = -1, old_shuffle = 0;
-    int count = 0;
-    int position = pf_tracks.sel;
-    int shuffle = rb->global_settings->playlist_shuffle;
-    /* reuse existing playlist if possible
-     * regenerate if shuffle is on or changed, since playlist index and
-     * selected track are "out of sync" */
-    if (!shuffle && !append && center_slide.slide_index == old_playlist
-            && (old_shuffle == shuffle))
+    if (position == PLAYLIST_REPLACE)
     {
-        goto play;
+        if ((!create_new && rb->playlist_remove_all_tracks(NULL) == 0) ||
+             (create_new && rb->playlist_create(NULL, NULL) == 0))
+            position = PLAYLIST_INSERT_LAST;
+        else
+            return false;
     }
-    /* First, replace the current playlist with a new one */
-    else if (append || (rb->playlist_remove_all_tracks(NULL) == 0
-            && rb->playlist_create(NULL, NULL) == 0))
+
+    if (!insert_whole_album)
+        rb->playlist_insert_track(NULL, get_track_filename(pf_tracks.sel),
+                                        position, queue, true);
+    else
     {
+        int i = 0;
         do {
             rb->yield();
-            if (rb->playlist_insert_track(NULL, get_track_filename(count),
-                    PLAYLIST_INSERT_LAST, false, true) < 0)
+            if (rb->playlist_insert_track(NULL, get_track_filename(i),
+                    position, queue, true) < 0)
                 break;
-        } while(++count < pf_tracks.count);
-        rb->playlist_sync(NULL);
+            if (position == PLAYLIST_INSERT_FIRST)
+                position = PLAYLIST_INSERT;
+        } while(++i < pf_tracks.count);
     }
-    else
-        return;
-
-    if (!append && rb->global_settings->playlist_shuffle)
-        position = rb->playlist_shuffle(*rb->current_tick, pf_tracks.sel);
-play:
-    /* TODO: can we adjust selected_track if !play_selected ?
-     * if shuffle, we can't predict the playing track easily, and for either
-     * case the track list doesn't get auto scrolled*/
-    if(!append)
-    {
-        rb->playlist_start(position, 0, 0);
-        /* make warn on playlist erase work */
-        rb->playlist_get_current()->num_inserted_tracks = 0;
-        old_playlist = center_slide.slide_index;
-    }
-    else
-        old_playlist = -1;
-    old_shuffle = shuffle;
+    rb->playlist_sync(NULL);
+    old_playlist = create_new ? center_slide.slide_index : -1;
+    return true;
 }
+
+static void track_list_ready(void)
+{
+    if (pf_state != pf_show_tracks)
+    {
+        rb->splash(0, ID2P(LANG_WAIT));
+        create_track_index(center_slide.slide_index);
+        reset_track_list();
+    }
+}
+
+/**
+  Brings up "Current Playlist" menu with first
+  track of selection.
+
+  Onplay menu code calls back playlist_insert for
+  adding all of the tracks.
+*/
+static void show_current_playlist_menu(void)
+{
+#ifdef USEGSLIB
+    grey_show(false);
+    rb->lcd_clear_display();
+    rb->lcd_update();
 #endif
+    track_list_ready();
+    insert_whole_album = pf_state != pf_show_tracks;
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_enable(i, true, NULL);
+    rb->onplay_show_playlist_menu(get_track_filename(pf_tracks.sel),
+                              &playlist_insert);
+    FOR_NB_SCREENS(i)
+        rb->viewportmanager_theme_undo(i, false);
+    if (insert_whole_album)
+        free_borrowed_tracks();
+#ifdef USEGSLIB
+    grey_show(true);
+#endif
+    mylcd_set_drawmode(DRMODE_FG);
+}
+
+
+/*
+ * Puts selected album's tracks into a newly created playlist and starts playing
+ */
+static bool start_playback(bool return_to_WPS)
+{
+#ifdef USEGSLIB
+    grey_show(false);
+#if LCD_DEPTH > 1
+    rb->lcd_set_background(N_BRIGHT(0));
+    rb->lcd_set_foreground(N_BRIGHT(255));
+#endif
+    rb->lcd_clear_display();
+    rb->lcd_update();
+#endif /* USEGSLIB */
+
+    if (!rb->warn_on_pl_erase())
+    {
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
+        return false;
+    }
+
+    track_list_ready();
+    insert_whole_album = true;
+    int start_index = pf_tracks.sel;
+    bool shuffle = rb->global_settings->playlist_shuffle;
+    /* can't reuse playlist if it may be out of sync with our track list */
+    if (shuffle || center_slide.slide_index != old_playlist
+                || (old_shuffle != shuffle))
+    {
+        if (!playlist_insert(PLAYLIST_REPLACE, false, true))
+        {
+#ifdef USEGSLIB
+            grey_show(true);
+#endif
+            return false;
+        }
+        if (shuffle)
+            start_index = rb->playlist_shuffle(*rb->current_tick, pf_tracks.sel);
+    }
+    rb->playlist_start(start_index, 0, 0);
+    rb->playlist_get_current()->num_inserted_tracks = 0; /* prevent warn_on_pl_erase */
+    old_shuffle = shuffle;
+    if (return_to_WPS)
+        pf_cfg.last_album = center_index;
+#ifdef USEGSLIB
+    else
+        grey_show(true);
+#endif
+    return true;
+}
+#endif /* PF_PLAYBACK_CAPABLE */
 
 /**
    Draw the current album name
@@ -3728,28 +3797,6 @@ static void draw_album_text(void)
         mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);
     }
 }
-
-#if PF_PLAYBACK_CAPABLE
-/**
-  Display an info message when items have been added to playlist
-*/
-static void rb_splash_added_to_playlist(void)
-{
-#ifdef USEGSLIB
-                grey_show(false);
-#if LCD_DEPTH > 1
-                rb->lcd_set_background(N_BRIGHT(0));
-                rb->lcd_set_foreground(N_BRIGHT(255));
-#endif
-                rb->lcd_clear_display();
-                rb->lcd_update();
-#endif
-                rb->splash(HZ*2, ID2P(LANG_ADDED_TO_PLAYLIST));
-#ifdef USEGSLIB
-                grey_show(true);
-#endif
-}
-#endif
 
 
 static void set_initial_slide(const char* selected_file)
@@ -4101,19 +4148,7 @@ static int pictureflow_main(const char* selected_file)
                 } else if (pf_state == pf_cover_out)
                     interrupt_cover_out_animation();
 
-                if( pf_state == pf_idle ) {
-                    create_track_index(center_slide.slide_index);
-                    reset_track_list();
-                    start_playback(true);
-                    free_borrowed_tracks();
-                }
-                else
-                {
-                    rb->playlist_insert_track(NULL, get_track_filename(pf_tracks.sel),
-                                                    PLAYLIST_INSERT_LAST, false, true);
-                    rb->playlist_sync(NULL);
-                }
-                rb_splash_added_to_playlist();
+                show_current_playlist_menu();
             }
             break;
 #endif
@@ -4128,13 +4163,8 @@ static int pictureflow_main(const char* selected_file)
                     set_current_slide(target);
 #if PF_PLAYBACK_CAPABLE
                 if(pf_cfg.auto_wps == 1) {
-                    if (!pf_warn_on_pl_erase())
-                        break;
-                    create_track_index(center_slide.slide_index);
-                    reset_track_list();
-                    start_playback(false);
-                    pf_cfg.last_album = center_index;
-                    return PLUGIN_GOTO_WPS;
+                    if (start_playback(true))
+                        return PLUGIN_GOTO_WPS;
                 }
                 else
 #endif
@@ -4145,12 +4175,13 @@ static int pictureflow_main(const char* selected_file)
             else if (pf_state == pf_cover_in)
                 interrupt_cover_in_animation();
 #if PF_PLAYBACK_CAPABLE
-            else if (pf_state == pf_show_tracks && pf_warn_on_pl_erase()) {
-                start_playback(false);
+            else if (pf_state == pf_show_tracks) {
                 if(pf_cfg.auto_wps != 0) {
-                    pf_cfg.last_album = center_index;
-                    return PLUGIN_GOTO_WPS;
+                    if (start_playback(true))
+                        return PLUGIN_GOTO_WPS;
                 }
+                else
+                    start_playback(false);
             }
 #endif
             break;
@@ -4226,6 +4257,9 @@ enum plugin_status plugin_start(const void *parameter)
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {
+#ifdef USEGSLIB
+            grey_show(false);
+#endif
             rb->splash(HZ, ID2P(LANG_ERROR_WRITING_CONFIG));
             ret = PLUGIN_ERROR;
         }

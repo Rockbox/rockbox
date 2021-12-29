@@ -110,6 +110,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "rbpaths.h"
 #include "core_alloc.h"
 #include "screen_access.h"
+#include "onplay.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -154,7 +155,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 247
+#define PLUGIN_API_VERSION 248
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -931,6 +932,7 @@ struct plugin_api {
     int (*playlist_insert_playlist)(struct playlist_info* playlist,
                                     const char *filename, int position, bool queue);
     int (*battery_current)(void);
+    void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
 };
 
 /* plugin header */

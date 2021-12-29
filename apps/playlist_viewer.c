@@ -535,7 +535,7 @@ static int onplay_menu(int index)
         {
             case 0:
                 /* playlist */
-                onplay_show_playlist_menu(current_track->name);
+                onplay_show_playlist_menu(current_track->name, NULL);
                 ret = 0;
                 break;
             case 1:

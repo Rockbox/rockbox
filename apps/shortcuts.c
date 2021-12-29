@@ -633,7 +633,7 @@ int do_shortcut_menu(void *ignored)
                     }
                     else
                     {
-                        onplay_show_playlist_menu(sc->u.path);
+                        onplay_show_playlist_menu(sc->u.path, NULL);
                     }
                     break;
                 case SHORTCUT_FILE:
