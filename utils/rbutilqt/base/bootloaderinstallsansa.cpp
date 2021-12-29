@@ -27,10 +27,6 @@
 BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
         : BootloaderInstallBase(parent)
 {
-    (void)parent;
-    // initialize sector buffer. The sector buffer is part of the sansa_t
-    // structure, so a second instance of this class will have its own buffer.
-    sansa_alloc_buffer(&sansa, BUFFER_SIZE);
 }
 
 
@@ -46,6 +42,12 @@ BootloaderInstallSansa::~BootloaderInstallSansa()
  */
 bool BootloaderInstallSansa::install(void)
 {
+    // initialize sector buffer. The sector buffer is part of the sansa_t
+    // structure, so a second instance of this class will have its own buffer.
+    if(sansa.sectorbuf == nullptr) {
+        sansa_alloc_buffer(&sansa, BUFFER_SIZE);
+    }
+
     if(sansa.sectorbuf == nullptr) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
         return false;

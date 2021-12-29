@@ -28,10 +28,6 @@
 BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
         : BootloaderInstallBase(parent)
 {
-    (void)parent;
-    // initialize sector buffer. The sector buffer is part of the ipod_t
-    // structure, so a second instance of this class will have its own buffer.
-    ipod_alloc_buffer(&ipod, BUFFER_SIZE);
 }
 
 
@@ -45,11 +41,18 @@ BootloaderInstallIpod::~BootloaderInstallIpod()
 
 bool BootloaderInstallIpod::install(void)
 {
+    // initialize sector buffer. The sector buffer is part of the ipod_t
+    // structure, so a second instance of this class will have its own buffer.
+    if(ipod.sectorbuf == nullptr) {
+        ipod_alloc_buffer(&ipod, BUFFER_SIZE);
+    }
+
     if(ipod.sectorbuf == nullptr) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
         emit done(true);
         return false;
     }
+
     // save buffer pointer before cleaning up ipod_t structure
     unsigned char* sb = ipod.sectorbuf;
     memset(&ipod, 0, sizeof(struct ipod_t));

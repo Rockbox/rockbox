@@ -359,16 +359,14 @@ void RbUtilQt::updateSettings()
 
 void RbUtilQt::updateDevice()
 {
-    /* TODO: We should check the flags of the bootloaderinstall classes, and not
-     * just check if its != none or != "fwpatcher" */
+    PlayerBuildInfo* playerBuildInfo = PlayerBuildInfo::instance();
 
-    /* Enable bootloader installation, if possible */
-    bool bootloaderInstallable =
-        PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderMethod).toString() != "none";
+    BootloaderInstallBase::Capabilities bootloaderCapabilities =
+        BootloaderInstallHelper::bootloaderInstallerCapabilities(this,
+            playerBuildInfo->value(PlayerBuildInfo::BootloaderMethod).toString());
 
-    /* Enable bootloader uninstallation, if possible */
-    bool bootloaderUninstallable = bootloaderInstallable &&
-        PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderMethod) != "fwpatcher";
+    /* Disable uninstallation actions if they are not supported. */
+    bool bootloaderUninstallable = !(bootloaderCapabilities & BootloaderInstallBase::Uninstall);
     ui.labelRemoveBootloader->setEnabled(bootloaderUninstallable);
     ui.buttonRemoveBootloader->setEnabled(bootloaderUninstallable);
     ui.actionRemove_bootloader->setEnabled(bootloaderUninstallable);
@@ -379,11 +377,11 @@ void RbUtilQt::updateDevice()
     ui.menuA_ctions->setEnabled(configurationValid);
 
     // displayed device info
-    QString brand = PlayerBuildInfo::instance()->value(PlayerBuildInfo::Brand).toString();
+    QString brand = playerBuildInfo->value(PlayerBuildInfo::Brand).toString();
     QString name
         = QString("%1 (%2)").arg(
-            PlayerBuildInfo::instance()->value(PlayerBuildInfo::DisplayName).toString(),
-            PlayerBuildInfo::instance()->statusAsString());
+            playerBuildInfo->value(PlayerBuildInfo::DisplayName).toString(),
+            playerBuildInfo->statusAsString());
     ui.labelDevice->setText(QString("<b>%1 %2</b>").arg(brand, name));
 
     QString mountpoint = RbSettings::value(RbSettings::Mountpoint).toString();
@@ -398,7 +396,7 @@ void RbUtilQt::updateDevice()
     }
 
     QPixmap pm;
-    QString m = PlayerBuildInfo::instance()->value(PlayerBuildInfo::PlayerPicture).toString();
+    QString m = playerBuildInfo->value(PlayerBuildInfo::PlayerPicture).toString();
     pm.load(":/icons/players/" + m + "-small.png");
     pm = pm.scaledToHeight(QFontMetrics(QApplication::font()).height() * 3);
     ui.labelPlayerPic->setPixmap(pm);

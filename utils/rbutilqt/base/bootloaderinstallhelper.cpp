@@ -77,6 +77,26 @@ BootloaderInstallBase* BootloaderInstallHelper::createBootloaderInstaller(QObjec
     }
 }
 
+BootloaderInstallBase::Capabilities
+    BootloaderInstallHelper::bootloaderInstallerCapabilities(QObject *parent, QString type)
+{
+    /* Note - this is a terrible pattern in general, but in this case
+     * it is a much simpler option to just allocate a class instance.
+     * This operation is rarely used, anyway. */
+
+    BootloaderInstallBase* bootloaderInstaller =
+        createBootloaderInstaller(parent, type);
+
+    BootloaderInstallBase::Capabilities caps = BootloaderInstallBase::Capabilities();
+
+    if(bootloaderInstaller) {
+        caps = bootloaderInstaller->capabilities();
+        delete bootloaderInstaller;
+    }
+
+    return caps;
+}
+
 
 //! @brief Return post install hints string.
 //! @param model model string
