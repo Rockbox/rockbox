@@ -60,45 +60,45 @@ __pycache__
 /firmware/test/buflib/test_shrink_startchanged
 /firmware/test/buflib/test_shrink_unaligned
 
-# /rbutil/
-/rbutil/Makefile
-/rbutil/rbutil
+# /utils/
+/utils/Makefile
+/utils/rbutil
 
-# /rbutil/ipodpatcher/
-/rbutil/ipodpatcher/ipodpatcher
+# /utils/ipodpatcher/
+/utils/ipodpatcher/ipodpatcher
 
-# /rbutil/chinachippatcher/
-/rbutil/chinachippatcher/chinachip
+# /utils/chinachippatcher/
+/utils/chinachippatcher/chinachip
 
-# /rbutil/bspatch/
-/rbutil/bspatch/bspatch
+# /utils/bspatch/
+/utils/bspatch/bspatch
 
-# /rbutil/rbutilqt/
-/rbutil/rbutilqt/build
-/rbutil/rbutilqt/RockboxUtility
-/rbutil/rbutilqt/RockboxUtility.*
-/rbutil/rbutilqt/Makefile
-/rbutil/rbutilqt/*.qm
-/rbutil/rbutilqt/release
-/rbutil/rbutilqt/debug
-/rbutil/rbutilqt/*.Debug
-/rbutil/rbutilqt/*.Release
-/rbutil/rbutilqt/tags
-/rbutil/rbutilqt/.qmake.stash
+# /utils/rbutilqt/
+/utils/rbutilqt/build
+/utils/rbutilqt/RockboxUtility
+/utils/rbutilqt/RockboxUtility.*
+/utils/rbutilqt/Makefile
+/utils/rbutilqt/*.qm
+/utils/rbutilqt/release
+/utils/rbutilqt/debug
+/utils/rbutilqt/*.Debug
+/utils/rbutilqt/*.Release
+/utils/rbutilqt/tags
+/utils/rbutilqt/.qmake.stash
 
-# /rbutil/rbutilqt/lang/
-/rbutil/rbutilqt/lang/*.qm
+# /utils/rbutilqt/lang/
+/utils/rbutilqt/lang/*.qm
 
 # More rbutil
-/rbutil/*/buildposix
-/rbutil/*/uninstall_script.[ch]
-/rbutil/*/install_script.[ch]
-/rbutil/mkimxboot/mkimxboot
-/rbutil/mknwzboot/mknwzboot
-/rbutil/mkzenboot/mkzenboot
-/rbutil/sansapatcher/sansapatcher
-/rbutil/jztool/jztool
-/rbutil/tools/bin2c
+/utils/*/buildposix
+/utils/*/uninstall_script.[ch]
+/utils/*/install_script.[ch]
+/utils/mkimxboot/mkimxboot
+/utils/mknwzboot/mknwzboot
+/utils/mkzenboot/mkzenboot
+/utils/sansapatcher/sansapatcher
+/utils/jztool/jztool
+/utils/tools/bin2c
 
 # /tools/
 /tools/bdf2bmp
