@@ -392,17 +392,20 @@ static void battery_status_update(void)
     int current = battery_current();
     int resolution = battery_capacity * 36;
 
-    int time_est;
+    int time_est = 0;
+    if(level >= 0 && current > 0) {
 #if CONFIG_CHARGING >= CHARGING_MONITOR
-    if (charging_state())
-        time_est = (100 - level) * battery_capacity * 36 / current;
-    else
+        if (charging_state())
+            time_est = (100 - level) * battery_capacity * 36 / current;
+        else
 #endif
-        time_est = level * battery_capacity * 36 / current;
+            time_est = level * battery_capacity * 36 / current;
 
-    /* The first term nudges the counter toward the estimate.
-     * The second term decrements the counter due to elapsed time. */
-    time_err += current * (time_est - time_cnt);
+        /* The first term nudges the counter toward the estimate. */
+        time_err += current * (time_est - time_cnt);
+    }
+
+    /* The second term decrements the counter due to elapsed time. */
     time_err -= resolution;
 
     /* Arbitrary cutoff to ensure we don't get too far out
@@ -413,13 +416,17 @@ static void battery_status_update(void)
         time_err = 0;
     }
 
-    /* Convert the error into a time and adjust the counter. */
-    int64_t adjustment = time_err / (2 * resolution);
-    time_cnt += adjustment;
-    time_err -= adjustment * (2 * resolution);
+    if(resolution > 0) {
+        /* Convert the error into a time and adjust the counter. */
+        int64_t adjustment = time_err / (2 * resolution);
+        time_cnt += adjustment;
+        time_err -= adjustment * (2 * resolution);
+    }
 
     /* Update the reported time based on the counter. */
     time_now = (time_cnt + 30) / 60;
+    if(time_now < 0)
+        time_now = 0;
 #endif
 
     percent_now = level;
