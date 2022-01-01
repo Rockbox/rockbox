@@ -330,6 +330,7 @@ struct pf_track_t {
     int    list_y;
     int    list_h;
     size_t borrowed;
+    size_t used;
     struct track_data *index;
     char  *names;
 };
@@ -1665,13 +1666,109 @@ static int compare_tracks (const void *a_v, const void *b_v)
     return (int)(a - b);
 }
 
+
+
+static bool track_buffer_avail(size_t needed)
+{
+    size_t total_out = 0;
+    size_t out = 0;
+    if (pf_tracks.borrowed == 0 && pf_tracks.used == 0)
+    {
+        pf_tracks.names = rb->buflib_buffer_out(&buf_ctx, &out);
+        pf_tracks.borrowed = out;
+    }
+
+    if (needed <= pf_tracks.borrowed - pf_tracks.used)
+        return true;
+
+    while (needed > (pf_tracks.borrowed + total_out) - pf_tracks.used)
+    {
+        if (!free_slide_prio(0))
+            break;
+        out = 0;
+        rb->buflib_buffer_out(&buf_ctx, &out);
+        total_out += out;
+    }
+    pf_tracks.borrowed += total_out;
+
+    // have to move already stored track_data structs
+    if (pf_tracks.count)
+    {
+        struct track_data *new_tracks = (struct track_data *)(total_out + (uintptr_t)pf_tracks.index);
+        unsigned int bytes = pf_tracks.count * sizeof(struct track_data);
+        rb->memmove(new_tracks, pf_tracks.index, bytes);
+    }
+
+    if (needed > pf_tracks.borrowed - pf_tracks.used)
+        return false;
+
+    return true;
+}
+
+
+static int pf_tcs_retrieve_track_title(int string_index, int disc_num, int track_num)
+{
+    char file_name[MAX_PATH];
+    char *track_title = NULL;
+    int str_len;
+
+    if (rb->strcmp(UNTAGGED, tcs.result) == 0)
+    {
+        /* show filename instead of <untaggged> */
+        if (!rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
+                                file_name, MAX_PATH))
+            return 0;
+        track_title = file_name;
+        if (track_title)
+        {
+            /* if filename remove the '/' */
+            track_title = rb->strrchr(track_title, PATH_SEPCH);
+            if (track_title)
+                track_title++;
+        }
+    }
+
+    if (!track_title)
+        track_title = tcs.result;
+
+    int max_len = rb->strlen(track_title) + 10;
+    if (!track_buffer_avail(max_len))
+        return 0;
+
+    if (track_num > 0)
+    {
+        if (disc_num > 0)
+            str_len = rb->snprintf(pf_tracks.names + string_index, max_len,
+                "%d.%02d: %s", disc_num, track_num, track_title);
+        else
+            str_len = rb->snprintf(pf_tracks.names + string_index, max_len,
+                "%d: %s", track_num, track_title);
+    }
+    else
+        str_len = rb->snprintf(pf_tracks.names + string_index, max_len,
+            "%s", track_title);
+    return str_len;
+}
+
+#if PF_PLAYBACK_CAPABLE
+static int pf_tcs_retrieve_file_name(int fn_idx)
+{
+    if (!track_buffer_avail(MAX_PATH))
+        return 0;
+
+    rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
+            pf_tracks.names + fn_idx, MAX_PATH);
+
+    return rb->strlen(pf_tracks.names + fn_idx);
+}
+#endif
+
 /**
   Create the track index of the given slide_index.
  */
 static void create_track_index(const int slide_index)
 {
     buf_ctx_lock();
-    char temp[MAX_PATH + 1];
     if ( slide_index == pf_tracks.cur_idx )
         return;
 
@@ -1682,124 +1779,48 @@ static void create_track_index(const int slide_index)
                                    pf_idx.album_index[slide_index].seek);
 
     if (pf_idx.album_index[slide_index].artist_idx >= 0)
-    {
         rb->tagcache_search_add_filter(&tcs, tag_albumartist,
             pf_idx.album_index[slide_index].artist_seek);
-    }
 
-    int string_index = 0, track_num;
-    int disc_num;
-
-    char* result = NULL;
-    size_t out = 0;
-
+    int string_index = 0;
     pf_tracks.count = 0;
-    pf_tracks.names = rb->buflib_buffer_out(&buf_ctx, &out);
-    pf_tracks.borrowed += out;
-    int avail = pf_tracks.borrowed;
-    pf_tracks.index = (struct track_data*)(pf_tracks.names + pf_tracks.borrowed);
+
     while (rb->tagcache_get_next(&tcs))
     {
-        result = NULL;
-        if (rb->strcmp(UNTAGGED, tcs.result) == 0)
-        {
-            /* show filename instead of <untaggged> */
-            if (!rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
-                                    temp, sizeof(temp) - 1))
-            {
-                goto fail;
-            }
-            result = temp;
-        }
-
-        int len = 0, fn_idx = 0;
-
-        avail -= sizeof(struct track_data);
-        track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
-        disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
-
-        if (result)
-        {
-            /* if filename remove the '/' */
-            result = rb->strrchr(result, PATH_SEPCH);
-            if (result)
-                result++;
-        }
-
-        if (!result)
-            result = tcs.result;
-
-        if (disc_num < 0)
-            disc_num = 0;
-retry:
-        if (track_num > 0)
-        {
-            if (disc_num)
-                fn_idx = 1 + rb->snprintf(pf_tracks.names + string_index, avail,
-                    "%d.%02d: %s", disc_num, track_num, result);
-            else
-                fn_idx = 1 + rb->snprintf(pf_tracks.names + string_index, avail,
-                    "%d: %s", track_num, result);
-        }
-        else
-        {
-            track_num = 0;
-            fn_idx = 1 + rb->snprintf(pf_tracks.names + string_index, avail,
-                "%s", result);
-        }
-        if (fn_idx <= 0)
+        int disc_num = rb->tagcache_get_numeric(&tcs, tag_discnumber);
+        int track_num = rb->tagcache_get_numeric(&tcs, tag_tracknumber);
+        disc_num = disc_num > 0 ? disc_num : 0;
+        track_num = track_num > 0 ? track_num : 0;
+        int fn_idx = 1 + pf_tcs_retrieve_track_title(string_index, disc_num, track_num);
+        if (fn_idx <= 1)
             goto fail;
+        pf_tracks.used += fn_idx;
+
 #if PF_PLAYBACK_CAPABLE
-        int remain = avail - fn_idx;
-        if (remain >= MAX_PATH)
-        {   /* retrieve filename for building the playlist */
-            rb->tagcache_retrieve(&tcs, tcs.idx_id, tag_filename,
-                    pf_tracks.names + string_index + fn_idx, remain);
-
-            len = fn_idx + rb->strlen(pf_tracks.names + string_index + fn_idx) + 1;
-            /* make sure track name and file name are really split by a \0, else
-             * get_track_name might fail */
-            *(pf_tracks.names + string_index + fn_idx -1) = '\0';
-
-        }
-        else /* request more buffer so that track and filename fit */
-            len = (avail - remain) + MAX_PATH;
-#else
-            len = fn_idx;
+        int fn_len = 1 + pf_tcs_retrieve_file_name(string_index + fn_idx);
+        if (fn_len <= 1)
+            goto fail;
+        pf_tracks.used += fn_len;
 #endif
-        if (len > avail)
-        {
-            while (len > avail)
-            {
-                if (!free_slide_prio(0))
-                    goto fail;
-                out = 0;
-                rb->buflib_buffer_out(&buf_ctx, &out);
-                avail += out;
-                pf_tracks.borrowed += out;
+        if (!track_buffer_avail(sizeof(struct track_data)))
+            goto fail;
 
-                struct track_data *new_tracks;
-                new_tracks = (struct track_data *)(out + (uintptr_t)pf_tracks.index);
-
-                unsigned int bytes = pf_tracks.count * sizeof(struct track_data);
-                if (pf_tracks.count)
-                    rb->memmove(new_tracks, pf_tracks.index, bytes);
-                pf_tracks.index = new_tracks;
-            }
-            goto retry;
-        }
-
-        avail -= len;
-        pf_tracks.index--;
+        pf_tracks.used += sizeof(struct track_data);
+        unsigned int arr_sz = (pf_tracks.count + 1) * sizeof(struct track_data);
+        // Arrray descends from upper end of buflib-borrowed buffer.
+        pf_tracks.index = (struct track_data*)(pf_tracks.names + pf_tracks.borrowed
+                                                               - arr_sz );
         pf_tracks.index->sort = (disc_num << 24) + (track_num << 14);
         pf_tracks.index->sort += pf_tracks.count;
         pf_tracks.index->name_idx = string_index;
         pf_tracks.index->seek = tcs.result_seek;
 #if PF_PLAYBACK_CAPABLE
         pf_tracks.index->filename_idx = fn_idx + string_index;
+        string_index += (fn_idx + fn_len);
+#else
+        string_index += fn_idx;
 #endif
         pf_tracks.count++;
-        string_index += len;
     }
 
     rb->tagcache_search_finish(&tcs);
@@ -1824,6 +1845,7 @@ static inline void free_borrowed_tracks(void)
 {
     rb->buflib_buffer_in(&buf_ctx, pf_tracks.borrowed);
     pf_tracks.borrowed = 0;
+    pf_tracks.used = 0;
     pf_tracks.cur_idx = -1;
     buf_ctx_unlock();
 }
@@ -3955,6 +3977,9 @@ static int pictureflow_main(const char* selected_file)
     pf_state = pf_idle;
 
     pf_tracks.cur_idx = -1;
+    pf_tracks.borrowed = 0;
+    pf_tracks.used = 0;
+
     extra_fade = 0;
     slide_frame = 0;
     step = 0;
