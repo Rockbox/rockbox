@@ -3549,6 +3549,20 @@ void reset_track_list(void)
     }
 }
 
+static void draw_album_text(void);
+static void show_track_list_loading(void)
+{
+    int x = (LCD_WIDTH - mylcd_getstringsize(rb->str(LANG_WAIT), NULL, NULL)) / 2;
+    mylcd_set_foreground(G_BRIGHT(255));
+    int char_height = rb->screens[SCREEN_MAIN]->getcharheight();
+    track_list_yh(char_height);
+    mylcd_putsxy(x, pf_tracks.list_y + (pf_tracks.list_h  - char_height) / 2,
+                 rb->str(LANG_WAIT));
+    draw_album_text();
+    mylcd_update();
+    mylcd_clear_display();
+}
+
 /**
   Display the list of tracks
  */
@@ -3556,6 +3570,7 @@ static void show_track_list(void)
 {
     mylcd_clear_display();
     if ( center_slide.slide_index != pf_tracks.cur_idx ) {
+        show_track_list_loading();
         create_track_index(center_slide.slide_index);
         reset_track_list();
     }
