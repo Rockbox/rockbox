@@ -116,8 +116,8 @@ void usb_charging_maxcurrent_change(int maxcurrent)
      * reduced dynamically by the AXP192 so the combined load is less
      * than the set VBUS current limit. */
     if(maxcurrent <= 100) {
-        vbus_limit = AXP_VBUS_LIMIT_100mA;
-        charge_current = 550;
+        vbus_limit = AXP_VBUS_LIMIT_500mA;
+        charge_current = 100;
     } else {
         vbus_limit = AXP_VBUS_LIMIT_500mA;
         charge_current = 550;
