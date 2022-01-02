@@ -122,6 +122,11 @@
 #define USB_WRITE_BUFFER_SIZE   (128 * 1024)
 #endif
 
+#ifdef BOOTLOADER
+/* Ignore on any key can cause surprising USB issues in the bootloader */
+# define USBPOWER_BTN_IGNORE (~(BUTTON_PREV|BUTTON_NEXT))
+#endif
+
 /* Rockbox capabilities */
 #define HAVE_VOLUME_IN_LIST
 #define HAVE_FAT16SUPPORT

@@ -152,6 +152,10 @@ bool lcd_inited = false;
 bool usb_inited = false;
 bool disk_inited = false;
 
+/* Set to true if a SYS_USB_CONNECTED event is seen
+ * Set to false if a SYS_USB_DISCONNECTED event is seen */
+bool is_usb_connected = false;
+
 /* Jump to loaded binary */
 void exec(void* dst, const void* src, size_t bytes)
     __attribute__((noinline, noreturn, section(".icode")));
@@ -207,6 +211,17 @@ void splash(long delay, const char* msg)
     splash2(delay, msg, NULL);
 }
 
+int get_button(int timeout)
+{
+    int btn = button_get_w_tmo(timeout);
+    if(btn == SYS_USB_CONNECTED)
+        is_usb_connected = true;
+    else if(btn == SYS_USB_DISCONNECTED)
+        is_usb_connected = false;
+
+    return btn;
+}
+
 void init_lcd(void)
 {
     if(lcd_inited)
@@ -226,20 +241,6 @@ void init_lcd(void)
     lcd_inited = true;
 }
 
-/* TODO: This does not work properly after a USB boot.
- *
- * The USB core is not properly reset by just re-initializing it, and I can't
- * figure out how to make it work. Setting the DWC_DCTL.SDIS bit will force a
- * disconnect (the usb-designware driver does this already as part of its init
- * but it doesn't seem to cause a disconnect).
- *
- * But the host still doesn't detect us properly when we reconnect. Linux gives
- * messages "usb 1-3: config 1 has no interfaces?" in dmesg and no mass storage
- * interfaces show up.
- *
- * Re-plugging the cable seems to reset everything to a working state and there
- * are no issues, but that's annoying.
- */
 void init_usb(void)
 {
     if(usb_inited)
@@ -255,10 +256,9 @@ int init_disk(void)
     if(disk_inited)
         return 0;
 
-    button_clear_queue();
     while(!storage_present(IF_MD(0))) {
         splash2(0, "Insert SD card", "Press " BL_QUIT_NAME " for recovery");
-        if(button_get_w_tmo(HZ/4) == BL_QUIT)
+        if(get_button(HZ/4) == BL_QUIT)
             return -1;
     }
 
@@ -320,8 +320,7 @@ void recovery_menu(void)
         lcd_update();
 
         /* handle input */
-        button_clear_queue();
-        switch(button_get(true)) {
+        switch(get_button(TIMEOUT_BLOCK)) {
         case BL_SELECT: {
             if(recovery_items[selection].action)
                 recovery_items[selection].action();
@@ -376,19 +375,19 @@ void boot_rockbox(void)
 void usb_mode(void)
 {
     init_usb();
-    splash2(0, "Waiting for USB", "Press " BL_QUIT_NAME " to go back");
 
-    while(1) {
-        int btn = button_get(true);
-        if(btn == SYS_USB_CONNECTED)
-            break;
-        else if(btn == BL_QUIT)
+    if(!is_usb_connected)
+        splash2(0, "Waiting for USB", "Press " BL_QUIT_NAME " to go back");
+
+    while(!is_usb_connected)
+        if(get_button(TIMEOUT_BLOCK) == BL_QUIT)
             return;
-    }
 
     splash(0, "USB mode");
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
-    while(button_get(true) != SYS_USB_DISCONNECTED);
+
+    while(is_usb_connected)
+        get_button(TIMEOUT_BLOCK);
 
     splash(3*HZ, "USB disconnected");
 }
@@ -444,8 +443,7 @@ void bootloader_action(int which)
     const char* msg2 = "Press " BL_QUIT_NAME " to continue";
     splash2(0, msg1, msg2);
 
-    button_clear_queue();
-    while(button_get(true) != BL_QUIT);
+    while(get_button(TIMEOUT_BLOCK) != BL_QUIT);
 }
 
 void bootloader_install(void)
