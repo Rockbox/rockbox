@@ -151,6 +151,10 @@ const struct button_mapping pf_context_buttons[] =
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
     || (CONFIG_KEYPAD == IPOD_4G_PAD) \
     || (CONFIG_KEYPAD == MPIO_HD300_PAD)
+    {PF_JMP_PREV,     BUTTON_LEFT,                BUTTON_NONE},
+    {PF_JMP_PREV,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    {PF_JMP,          BUTTON_RIGHT,               BUTTON_NONE},
+    {PF_JMP,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
@@ -168,10 +172,10 @@ const struct button_mapping pf_context_buttons[] =
     {PF_TRACKLIST,    BUTTON_FFWD|BUTTON_REL,     BUTTON_FFWD},
     {PF_WPS,          BUTTON_PLAY|BUTTON_REPEAT,  BUTTON_PLAY},
 #elif CONFIG_KEYPAD == FIIO_M3K_PAD
-    {PF_PREV,         BUTTON_LEFT,                BUTTON_NONE},
-    {PF_PREV_REPEAT,  BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    {PF_NEXT,         BUTTON_RIGHT,               BUTTON_NONE},
-    {PF_NEXT_REPEAT,  BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
+    {PF_JMP_PREV,     BUTTON_LEFT,                BUTTON_NONE},
+    {PF_JMP_PREV,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
+    {PF_JMP,          BUTTON_RIGHT,               BUTTON_NONE},
+    {PF_JMP,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     {PF_MENU,         BUTTON_POWER|BUTTON_REL,    BUTTON_POWER},
     {PF_QUIT,         BUTTON_POWER|BUTTON_REPEAT, BUTTON_POWER},
     {PF_CONTEXT,      BUTTON_MENU|BUTTON_REL,     BUTTON_MENU},
@@ -2969,7 +2973,10 @@ static inline void set_current_slide(const int slide_index)
     step = 0;
     center_index = fbound(slide_index, 0, number_of_slides - 1);
     if (old_center_index != center_index)
+    {
+        rb->queue_remove_from_head(&thread_q, EV_WAKEUP);
         rb->queue_post(&thread_q, EV_WAKEUP, 0);
+    }
     target = center_index;
     slide_frame = slide_index << 16;
     reset_slides();
@@ -3572,6 +3579,12 @@ static void show_track_list(void)
     if ( center_slide.slide_index != pf_tracks.cur_idx ) {
         show_track_list_loading();
         create_track_index(center_slide.slide_index);
+        if (pf_tracks.count == 0)
+        {
+            pf_state = pf_cover_out;
+            free_borrowed_tracks();
+            return;
+        }
         reset_track_list();
     }
     int titletxt_w, titletxt_x, color, titletxt_h;
@@ -3628,6 +3641,26 @@ static void select_prev_track(void)
         /* Rolllover */
         pf_tracks.sel = pf_tracks.count - 1;
         pf_tracks.list_start = pf_tracks.count - pf_tracks.list_visible;
+    }
+}
+
+static void select_next_album(void)
+{
+    if (center_index < number_of_slides - 1) {
+        free_borrowed_tracks();
+        target = center_index + 1;
+        set_current_slide(target);
+        interrupt_cover_in_animation();
+    }
+}
+
+static void select_prev_album(void)
+{
+    if (center_index > 0) {
+        free_borrowed_tracks();
+        target = center_index - 1;
+        set_current_slide(target);
+        interrupt_cover_in_animation();
     }
 }
 
@@ -4167,6 +4200,8 @@ static int pictureflow_main(const char* selected_file)
                     pf_state = pf_idle;
                     set_current_slide(get_album_artist_alpha_next_index());
                 }
+                else if ( pf_state == pf_show_tracks )
+                    select_next_album();
                 break;
         case PF_JMP_PREV:
                 if (pf_state == pf_idle || pf_state == pf_scrolling)
@@ -4174,6 +4209,8 @@ static int pictureflow_main(const char* selected_file)
                     pf_state = pf_idle;
                     set_current_slide(get_album_artist_alpha_prev_index());
                 }
+                else if ( pf_state == pf_show_tracks )
+                    select_prev_album();
                 break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:

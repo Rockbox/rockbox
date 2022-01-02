@@ -806,6 +806,7 @@ static const struct plugin_api rockbox_api = {
     playlist_insert_playlist,
     battery_current,
     onplay_show_playlist_menu,
+    queue_remove_from_head,
 };
 
 static int plugin_buffer_handle;
