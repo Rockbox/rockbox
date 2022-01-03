@@ -3697,14 +3697,20 @@ static bool playlist_insert(int position, bool queue, bool create_new)
     return true;
 }
 
-static void track_list_ready(void)
+static bool track_list_ready(void)
 {
     if (pf_state != pf_show_tracks)
     {
         rb->splash(0, ID2P(LANG_WAIT));
         create_track_index(center_slide.slide_index);
+        if (pf_tracks.count == 0)
+        {
+            free_borrowed_tracks();
+            return false;
+        }
         reset_track_list();
     }
+    return true;
 }
 
 /**
@@ -3721,7 +3727,13 @@ static void show_current_playlist_menu(void)
     rb->lcd_clear_display();
     rb->lcd_update();
 #endif
-    track_list_ready();
+    if (!track_list_ready())
+    {
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
+        return;
+    }
     insert_whole_album = pf_state != pf_show_tracks;
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
@@ -3753,7 +3765,7 @@ static bool start_playback(bool return_to_WPS)
     rb->lcd_update();
 #endif /* USEGSLIB */
 
-    if (!rb->warn_on_pl_erase())
+    if (!rb->warn_on_pl_erase() || !track_list_ready())
     {
 #ifdef USEGSLIB
         grey_show(true);
@@ -3761,7 +3773,6 @@ static bool start_playback(bool return_to_WPS)
         return false;
     }
 
-    track_list_ready();
     insert_whole_album = true;
     int start_index = pf_tracks.sel;
     bool shuffle = rb->global_settings->playlist_shuffle;
