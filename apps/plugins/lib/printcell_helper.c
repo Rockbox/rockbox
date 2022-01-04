@@ -41,6 +41,7 @@ struct printcell_info_t {
     int  iconw[NB_SCREENS];
     int  selcol_offw[NB_SCREENS];
     int  totalcolw[NB_SCREENS];
+    int  firstcolxw[NB_SCREENS];
     uint16_t colw[NB_SCREENS][PRINTCELL_MAX_COLUMNS];
     int  ncols;
     int  selcol;
@@ -116,6 +117,15 @@ static void draw_selector(struct screen *display, struct line_desc *linedes,
             /* only draw left and right bars */
             display->drawrect(x + 1, y, 1, h);
             display->drawrect(x + w - 1, y, 1, h);
+            return;
+        }
+    }
+    else if (printcell.selcol < 0)
+    {
+        if (selected_flag == SELECTED_FLAG)
+        {
+            display->hline(x + 1, w + x, y);
+            display->hline(x + 1, w + x, y + h - 1);
             return;
         }
     }
@@ -255,6 +265,8 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
         nw += sbwidth;
 
         colxw = nx + nw;
+        printcell.firstcolxw[screen] = colxw; /* save position of first column for subsequent items */
+
         if (colxw > 0)
         {
             set_cell_width(vp, vp_w, colxw);
@@ -289,8 +301,9 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
             display->put_line(x, y, linedes, "$t", "");
         }
 
-        nw = screencolwidth[0] + printcell.iconw[screen] + text_offset;
-        colxw = nx + nw;
+        //nw = screencolwidth[0] + printcell.iconw[screen] + text_offset;
+        colxw = printcell.firstcolxw[screen] - vp->x; /* match title spacing */
+        nw = colxw - nx;
         if (colxw > 0)
         {
             set_cell_width(vp, vp_w, colxw);
