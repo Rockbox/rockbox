@@ -3679,14 +3679,14 @@ static bool playlist_insert(int position, bool queue, bool create_new)
 
     if (!insert_whole_album)
         rb->playlist_insert_track(NULL, get_track_filename(pf_tracks.sel),
-                                        position, queue, true);
+                                        position, queue, false);
     else
     {
         int i = 0;
         do {
             rb->yield();
             if (rb->playlist_insert_track(NULL, get_track_filename(i),
-                    position, queue, true) < 0)
+                    position, queue, false) < 0)
                 break;
             if (position == PLAYLIST_INSERT_FIRST)
                 position = PLAYLIST_INSERT;
