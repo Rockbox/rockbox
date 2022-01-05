@@ -124,9 +124,9 @@ static void draw_selector(struct screen *display, struct line_desc *linedes,
     {
         if (selected_flag == SELECTED_FLAG)
         {
-            display->hline(x + 1, w + x, y);
-            display->hline(x + 1, w + x, y + h - 1);
-            return;
+            if (selected_col > 0)
+                x--;
+            w++;
         }
     }
     /* draw whole rect outline */
@@ -143,9 +143,10 @@ static inline void set_cell_width(struct viewport *vp, int max_w, int new_w)
     vp->width -= COLUMN_ENDLEN;
 }
 
-static inline int printcells(struct screen *display, char* buffer, uint16_t *sidx,
-                        struct line_desc *linedes, struct viewport *vp, int vp_w,
-                        int separator, int x, int y, int offw, int selected_flag)
+static inline int printcells(struct screen *display, char* buffer,
+                             uint16_t *sidx, struct line_desc *linedes,
+                             struct viewport *vp, int vp_w, int separator,
+                             int x, int y, int offw, int selected_flag, bool scroll)
 {
     /* Internal function prints remaining cells */
     int text_offset = offw + offw;
@@ -166,10 +167,15 @@ static inline int printcells(struct screen *display, char* buffer, uint16_t *sid
             set_cell_width(vp, vp_w, nx);
 
             if (i == printcell.selcol)
+            {
+                linedes->scroll = (selected_flag > 0);
                 linedes->separator_height = selsep;
+            }
             else
+            {
+                linedes->scroll = scroll;
                 linedes->separator_height = separator;
-
+            }
             buftext = &buffer[sidx[i]];
             display->put_line(x + offw, ny, linedes, "$t", buftext);
             vp->width += COLUMN_ENDLEN + 1;
@@ -215,6 +221,7 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
     static char printcell_buffer[PRINTCELL_MAXLINELEN];
     static uint16_t sidx[PRINTCELL_MAX_COLUMNS]; /*indexes zero terminated strings in buffer*/
 
+    struct gui_synclist *list = list_info->list;
     int offset_pos = list_info->list->offset_position[screen];
     int x = list_info->x - offset_pos;
     int y = list_info->y;
@@ -229,11 +236,17 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
     struct line_desc *linedes = list_info->linedes;
     char *dsp_text = list_info->dsp_text;
     struct viewport *vp = list_info->vp;
+    int line = list_info->line;
 
     int selected_flag = ((is_selected || is_title) ?
                          (is_title ? TITLE_FLAG : SELECTED_FLAG) : 0);
-    int vp_w = vp->width;/* save for restore */
-    int saved_separator_height = linedes->separator_height;/* save for restore */
+    bool scroll_items = ((selected_flag == TITLE_FLAG) ||
+                  (printcell.selcol < 0 && selected_flag > 0));
+
+    /* save for restore */
+    int vp_w = vp->width;
+    int saved_separator_height = linedes->separator_height;
+    bool saved_scroll = linedes->scroll;
 
     linedes->separator_height = 0;
     int separator = saved_separator_height;
@@ -259,6 +272,7 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
 
         if (printcell.selcol_offw[screen] == 0 && printcell.selcol > 0)
             printcell.selcol_offw[screen] = calcvisible(screen, vp_w, text_offset, sbwidth);
+
         nx -= printcell.selcol_offw[screen];
 
         nw = screencolwidth[0] + printcell.iconw[screen] + text_offset;
@@ -310,8 +324,10 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
             if (printcell.selcol == 0 && selected_flag == 0)
                 linedes->separator_height = 0;
             else
+            {
+                linedes->scroll = printcell.selcol == 0 || scroll_items;
                 linedes->separator_height = separator;
-
+            }
             if (show_cursor && have_icons)
             {
             /* the list can have both, one of or neither of cursor and item icons,
@@ -341,9 +357,15 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
     }
     nx += nw;
     /* display remaining cells */
-    printcells(display, printcell_buffer, sidx, linedes,
-               vp, vp_w, separator, nx, y, col_offset_width, selected_flag);
+    printcells(display, printcell_buffer, sidx, linedes, vp, vp_w, separator,
+               nx, y, col_offset_width, selected_flag, scroll_items);
+
+    /* draw a line at the bottom of the list */
+    if (separator > 0 && line == list->nb_items - 1)
+        display->hline(x, LCD_WIDTH, y + linedes->height - 1);
+
     /* restore settings */
+    linedes->scroll = saved_scroll;
     linedes->separator_height = saved_separator_height;
     display->set_drawmode(DRMODE_FG);
     vp->width = vp_w;
