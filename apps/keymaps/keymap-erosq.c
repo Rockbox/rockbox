@@ -212,7 +212,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_list;
 
         case CONTEXT_SETTINGS:
-	case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_EQ:
+        case CONTEXT_SETTINGS_COLOURCHOOSER:
             return button_context_settings;
 
         case CONTEXT_SETTINGS_TIME:
