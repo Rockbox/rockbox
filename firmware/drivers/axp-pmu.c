@@ -128,17 +128,11 @@ static const struct axp_supply_info axp_supply_info[AXP_NUM_SUPPLIES] = {
 
 static struct axp_driver {
     int adc_enable;
-    int chip_id;
 } axp;
 
 static void axp_init_enabled_adcs(void)
 {
     axp.adc_enable = 0;
-
-    /* Read chip ID, so we can display it on the debug screen.
-     * This is undocumented but there's Linux driver code floating around
-     * which suggests this should work for many AXP chips. */
-    axp.chip_id = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP_REG_CHIP_ID);
 
     /* Read enabled ADCs from the hardware */
     uint8_t regs[2];
@@ -494,7 +488,6 @@ void axp_power_off(void)
 
 #ifndef BOOTLOADER
 enum {
-    AXP_DEBUG_CHIP_ID,
     AXP_DEBUG_BATTERY_STATUS,
     AXP_DEBUG_INPUT_STATUS,
     AXP_DEBUG_CHARGE_CURRENT,
@@ -568,12 +561,6 @@ static const char* axp_debug_menu_get_name(int item, void* data,
     }
 
     switch(item) {
-    case AXP_DEBUG_CHIP_ID: {
-        snprintf(buf, buflen, "Chip ID: %d (%02x) [Driver: AXP%d]",
-                 axp.chip_id, axp.chip_id, HAVE_AXP_PMU);
-        return buf;
-    } break;
-
     case AXP_DEBUG_BATTERY_STATUS: {
         switch(axp_battery_status()) {
         case AXP_BATT_FULL:
