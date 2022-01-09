@@ -1947,8 +1947,8 @@ drivers/touchpad.c
 #ifdef HAVE_I2C_ASYNC
 drivers/i2c-async.c
 #endif
-#if defined(HAVE_AXP_PMU) && HAVE_AXP_PMU == 192
-drivers/axp192.c
+#ifdef HAVE_AXP_PMU
+drivers/axp-pmu.c
 #endif
 #ifdef HAVE_FT6x06
 drivers/ft6x06.c

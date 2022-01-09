@@ -22,7 +22,7 @@
 #include "power.h"
 #include "adc.h"
 #include "system.h"
-#include "axp192.h"
+#include "axp-pmu.h"
 #ifdef HAVE_CW2015
 # include "cw2015.h"
 #endif
@@ -73,34 +73,24 @@ const unsigned short percent_to_volt_charge[11] =
 void power_init(void)
 {
     i2c_x1000_set_freq(AXP_PMU_BUS, I2C_FREQ_400K);
+    axp_init();
 #ifdef HAVE_CW2015
     cw2015_init();
 #endif
 
-    /* Set DCDC2 to 1.2 V to match OF settings. */
-    axp_set_supply_voltage(AXP_SUPPLY_DCDC2, 1200);
+    /* Change supply voltage from the default of 1250 mV to 1200 mV,
+     * this matches the original firmware's settings. Didn't observe
+     * any obviously bad behavior at 1250 mV, but better to be safe. */
+    axp_supply_set_voltage(AXP_SUPPLY_DCDC2, 1200);
 
-    /* Power on required supplies */
-    axp_set_enabled_supplies(
-        (1 << AXP_SUPPLY_DCDC1) | /* SD bus (3.3 V) */
-        (1 << AXP_SUPPLY_DCDC2) | /* LCD (1.2 V) */
-        (1 << AXP_SUPPLY_DCDC3) | /* CPU (1.8 V) */
-        (1 << AXP_SUPPLY_LDO2) |  /* Touchscreen (3.3 V) */
-        (1 << AXP_SUPPLY_LDO3));  /* USB analog (2.5 V) */
-
-    /* Enable required ADCs */
-    axp_set_enabled_adcs(
-        (1 << AXP_ADC_BATTERY_VOLTAGE) |
-        (1 << AXP_ADC_CHARGE_CURRENT) |
-        (1 << AXP_ADC_DISCHARGE_CURRENT) |
-        (1 << AXP_ADC_VBUS_VOLTAGE) |
-        (1 << AXP_ADC_VBUS_CURRENT) |
-        (1 << AXP_ADC_INTERNAL_TEMP) |
-        (1 << AXP_ADC_APS_VOLTAGE));
-
-    /* Configure USB charging */
-    axp_set_vhold_level(4400);
-    usb_charging_maxcurrent_change(100);
+    /* For now, just turn everything on... definitely the touchscreen
+     * is powered by one of the outputs */
+    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                    AXP_REG_PWROUTPUTCTRL1, 0, 0x05, NULL);
+    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                    AXP_REG_PWROUTPUTCTRL2, 0, 0x0f, NULL);
+    i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                    AXP_REG_DCDCWORKINGMODE, 0, 0xc0, NULL);
 
     /* Delay to give power output time to stabilize */
     mdelay(20);
@@ -109,22 +99,7 @@ void power_init(void)
 #ifdef HAVE_USB_CHARGING_ENABLE
 void usb_charging_maxcurrent_change(int maxcurrent)
 {
-    int vbus_limit;
-    int charge_current;
-
-    /* Note that the charge current setting is a maximum: it will be
-     * reduced dynamically by the AXP192 so the combined load is less
-     * than the set VBUS current limit. */
-    if(maxcurrent <= 100) {
-        vbus_limit = AXP_VBUS_LIMIT_500mA;
-        charge_current = 100;
-    } else {
-        vbus_limit = AXP_VBUS_LIMIT_500mA;
-        charge_current = 550;
-    }
-
-    axp_set_vbus_limit(vbus_limit);
-    axp_set_charge_current(charge_current);
+    axp_set_charge_current(maxcurrent);
 }
 #endif
 
@@ -136,28 +111,23 @@ void power_off(void)
 
 bool charging_state(void)
 {
-    return axp_is_charging();
-}
-
-unsigned int power_input_status(void)
-{
-    return axp_power_input_status();
+    return axp_battery_status() == AXP_BATT_CHARGING;
 }
 
 int _battery_voltage(void)
 {
     /* CW2015 can also read battery voltage, but the AXP consistently
      * reads ~20-30 mV higher so I suspect it's the "real" voltage. */
-    return axp_read_adc(AXP_ADC_BATTERY_VOLTAGE);
+    return axp_adc_read(ADC_BATTERY_VOLTAGE);
 }
 
 #if CONFIG_BATTERY_MEASURE & CURRENT_MEASURE
 int _battery_current(void)
 {
     if(charging_state())
-        return axp_read_adc(AXP_ADC_CHARGE_CURRENT);
+        return axp_adc_read(ADC_CHARGE_CURRENT);
     else
-        return axp_read_adc(AXP_ADC_DISCHARGE_CURRENT);
+        return axp_adc_read(ADC_DISCHARGE_CURRENT);
 }
 #endif
 
