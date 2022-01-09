@@ -61,10 +61,15 @@ void power_init(void)
     /* Set lowest sample rate */
     axp_adc_set_rate(AXP_ADC_RATE_25HZ);
 
-    /* Ensure battery voltage ADC is enabled */
-    int bits = axp_adc_get_enabled();
-    bits |= (1 << ADC_BATTERY_VOLTAGE);
-    axp_adc_set_enabled(bits);
+    /* Enable required ADCs */
+    axp_adc_set_enabled(
+        (1 << ADC_BATTERY_VOLTAGE) |
+        (1 << ADC_CHARGE_CURRENT) |
+        (1 << ADC_DISCHARGE_CURRENT) |
+        (1 << ADC_VBUS_VOLTAGE) |
+        (1 << ADC_VBUS_CURRENT) |
+        (1 << ADC_INTERNAL_TEMP) |
+        (1 << ADC_APS_VOLTAGE));
 
     /* Turn on all power outputs */
     i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,

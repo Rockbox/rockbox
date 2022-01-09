@@ -36,6 +36,8 @@ struct axp_adc_info {
     uint8_t reg;
     uint8_t en_reg;
     uint8_t en_bit;
+    int8_t num;
+    int8_t den;
 };
 
 struct axp_supply_info {
@@ -49,17 +51,16 @@ struct axp_supply_info {
 };
 
 static const struct axp_adc_info axp_adc_info[NUM_ADC_CHANNELS] = {
-    {0x56, AXP_REG_ADCENABLE1, 5}, /* ACIN_VOLTAGE */
-    {0x58, AXP_REG_ADCENABLE1, 4}, /* ACIN_CURRENT */
-    {0x5a, AXP_REG_ADCENABLE1, 3}, /* VBUS_VOLTAGE */
-    {0x5c, AXP_REG_ADCENABLE1, 2}, /* VBUS_CURRENT */
-    {0x5e, AXP_REG_ADCENABLE2, 7}, /* INTERNAL_TEMP */
-    {0x62, AXP_REG_ADCENABLE1, 1}, /* TS_INPUT */
-    {0x78, AXP_REG_ADCENABLE1, 7}, /* BATTERY_VOLTAGE */
-    {0x7a, AXP_REG_ADCENABLE1, 6}, /* CHARGE_CURRENT */
-    {0x7c, AXP_REG_ADCENABLE1, 6}, /* DISCHARGE_CURRENT */
-    {0x7e, AXP_REG_ADCENABLE1, 1}, /* APS_VOLTAGE */
-    {0x70, 0xff, 0},               /* BATTERY_POWER */
+    [ADC_ACIN_VOLTAGE]      = {0x56, AXP_REG_ADCENABLE1, 1 << 5, 17, 10},
+    [ADC_ACIN_CURRENT]      = {0x58, AXP_REG_ADCENABLE1, 1 << 4,  5,  8},
+    [ADC_VBUS_VOLTAGE]      = {0x5a, AXP_REG_ADCENABLE1, 1 << 3, 17, 10},
+    [ADC_VBUS_CURRENT]      = {0x5c, AXP_REG_ADCENABLE1, 1 << 2,  3,  8},
+    [ADC_INTERNAL_TEMP]     = {0x5e, AXP_REG_ADCENABLE2, 1 << 7,  0,  0},
+    [ADC_TS_INPUT]          = {0x62, AXP_REG_ADCENABLE1, 1 << 1,  4,  5},
+    [ADC_BATTERY_VOLTAGE]   = {0x78, AXP_REG_ADCENABLE1, 1 << 7, 11, 10},
+    [ADC_CHARGE_CURRENT]    = {0x7a, AXP_REG_ADCENABLE1, 1 << 6,  1,  2},
+    [ADC_DISCHARGE_CURRENT] = {0x7c, AXP_REG_ADCENABLE1, 1 << 6,  1,  2},
+    [ADC_APS_VOLTAGE]       = {0x7e, AXP_REG_ADCENABLE1, 1 << 1,  7,  5},
 };
 
 static const struct axp_supply_info axp_supply_info[AXP_NUM_SUPPLIES] = {
@@ -126,46 +127,8 @@ static const struct axp_supply_info axp_supply_info[AXP_NUM_SUPPLIES] = {
 #endif
 };
 
-static struct axp_driver {
-    int adc_enable;
-} axp;
-
-static void axp_init_enabled_adcs(void)
-{
-    axp.adc_enable = 0;
-
-    /* Read enabled ADCs from the hardware */
-    uint8_t regs[2];
-    int rc = i2c_reg_read(AXP_PMU_BUS, AXP_PMU_ADDR,
-                          AXP_REG_ADCENABLE1, 2, &regs[0]);
-    if(rc != I2C_STATUS_OK)
-        return;
-
-    /* Parse registers to set ADC enable bits */
-    const struct axp_adc_info* info = axp_adc_info;
-    for(int i = 0; i < NUM_ADC_CHANNELS; ++i) {
-        if(info[i].en_reg == 0xff)
-            continue;
-
-        if(regs[info[i].en_reg - AXP_REG_ADCENABLE1] & info[i].en_bit)
-            axp.adc_enable |= 1 << i;
-    }
-
-    /* Handle battery power ADC */
-    if((axp.adc_enable & (1 << ADC_BATTERY_VOLTAGE)) &&
-       (axp.adc_enable & (1 << ADC_DISCHARGE_CURRENT))) {
-        axp.adc_enable |= (1 << ADC_BATTERY_POWER);
-    }
-}
-
 void axp_init(void)
 {
-    axp_init_enabled_adcs();
-
-    /* We need discharge current ADC to reliably poll for a full battery */
-    int bits = axp.adc_enable;
-    bits |= (1 << ADC_DISCHARGE_CURRENT);
-    axp_adc_set_enabled(bits);
 }
 
 void axp_supply_set_voltage(int supply, int voltage)
@@ -294,22 +257,15 @@ int axp_adc_read(int adc)
 
 int axp_adc_read_raw(int adc)
 {
-    /* Don't give a reading if the ADC is not enabled */
-    if((axp.adc_enable & (1 << adc)) == 0)
-        return INT_MIN;
-
     /* Read the ADC */
-    uint8_t buf[3];
-    int count = (adc == ADC_BATTERY_POWER) ? 3 : 2;
+    uint8_t buf[2];
     uint8_t reg = axp_adc_info[adc].reg;
-    int rc = i2c_reg_read(AXP_PMU_BUS, AXP_PMU_ADDR, reg, count, &buf[0]);
+    int rc = i2c_reg_read(AXP_PMU_BUS, AXP_PMU_ADDR, reg, 2, &buf[0]);
     if(rc != I2C_STATUS_OK)
         return INT_MIN;
 
     /* Parse the value */
-    if(adc == ADC_BATTERY_POWER)
-        return (buf[0] << 16) | (buf[1] << 8) | buf[2];
-    else if(adc == ADC_CHARGE_CURRENT || adc == ADC_DISCHARGE_CURRENT)
+    if(adc == ADC_CHARGE_CURRENT || adc == ADC_DISCHARGE_CURRENT)
         return (buf[0] << 5) | (buf[1] & 0x1f);
     else
         return (buf[0] << 4) | (buf[1] & 0xf);
@@ -317,79 +273,33 @@ int axp_adc_read_raw(int adc)
 
 int axp_adc_conv_raw(int adc, int value)
 {
-    switch(adc) {
-    case ADC_ACIN_VOLTAGE:
-    case ADC_VBUS_VOLTAGE:
-        /* 0 mV ... 6.9615 mV, step 1.7 mV */
-        return value * 17 / 10;
-    case ADC_ACIN_CURRENT:
-        /* 0 mA ... 2.5594 A, step 0.625 mA */
-        return value * 5 / 8;
-    case ADC_VBUS_CURRENT:
-        /* 0 mA ... 1.5356 A, step 0.375 mA */
-        return value * 3 / 8;
-    case ADC_INTERNAL_TEMP:
-        /* -144.7 C ... 264.8 C, step 0.1 C */
+    if(adc == ADC_INTERNAL_TEMP)
         return value - 1447;
-    case ADC_TS_INPUT:
-        /* 0 mV ... 3.276 V, step 0.8 mV */
-        return value * 4 / 5;
-    case ADC_BATTERY_VOLTAGE:
-        /* 0 mV ... 4.5045 V, step 1.1 mV */
-        return value * 11 / 10;
-    case ADC_CHARGE_CURRENT:
-    case ADC_DISCHARGE_CURRENT:
-        /* 0 mA to 4.095 A, step 0.5 mA */
-        return value / 2;
-    case ADC_APS_VOLTAGE:
-        /* 0 mV to 5.733 V, step 1.4 mV */
-        return value * 7 / 5;
-    case ADC_BATTERY_POWER:
-        /* 0 uW to 23.6404 W, step 0.55 uW */
-        return value * 11 / 20;
-    default:
-        /* Shouldn't happen */
-        return INT_MIN;
-    }
-}
-
-int axp_adc_get_enabled(void)
-{
-    return axp.adc_enable;
+    else
+        return axp_adc_info[adc].num * value / axp_adc_info[adc].den;
 }
 
 void axp_adc_set_enabled(int adc_bits)
 {
-    /* Ignore no-op */
-    if(adc_bits == axp.adc_enable)
-        return;
+    uint8_t xfer[3];
+    xfer[0] = 0;
+    xfer[1] = AXP_REG_ADCENABLE2;
+    xfer[2] = 0;
 
     /* Compute the new register values */
     const struct axp_adc_info* info = axp_adc_info;
-    uint8_t regs[2] = {0, 0};
     for(int i = 0; i < NUM_ADC_CHANNELS; ++i) {
-        if(info[i].en_reg == 0xff)
+        if(!(adc_bits & (1 << i)))
             continue;
 
-        if(adc_bits & (1 << i))
-            regs[info[i].en_reg - 0x82] |= 1 << info[i].en_bit;
-    }
-
-    /* These ADCs share an enable bit */
-    if(adc_bits & ((1 << ADC_CHARGE_CURRENT)|(1 << ADC_DISCHARGE_CURRENT))) {
-        adc_bits |= (1 << ADC_CHARGE_CURRENT);
-        adc_bits |= (1 << ADC_DISCHARGE_CURRENT);
-    }
-
-    /* Enable required bits for battery power ADC */
-    if(adc_bits & (1 << ADC_BATTERY_POWER)) {
-        regs[0] |= 1 << info[ADC_DISCHARGE_CURRENT].en_bit;
-        regs[0] |= 1 << info[ADC_BATTERY_VOLTAGE].en_bit;
+        if(info[i].en_reg == AXP_REG_ADCENABLE1)
+            xfer[0] |= info[i].en_bit;
+        else
+            xfer[2] |= info[i].en_bit;
     }
 
     /* Update the configuration */
-    i2c_reg_write(AXP_PMU_BUS, AXP_PMU_ADDR, AXP_REG_ADCENABLE1, 2, &regs[0]);
-    axp.adc_enable = adc_bits;
+    i2c_reg_write(AXP_PMU_BUS, AXP_PMU_ADDR, AXP_REG_ADCENABLE1, 3, &xfer[0]);
 }
 
 int axp_adc_get_rate(void)
