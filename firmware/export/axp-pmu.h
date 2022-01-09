@@ -139,7 +139,7 @@ extern void axp_cc_enable(bool en);
 extern bool axp_cc_is_enabled(void);
 
 /* Set/get maximum charging current in milliamps */
-extern void axp_set_charge_current(int maxcurrent);
+extern void axp_set_charge_current(int current_mA);
 extern int axp_get_charge_current(void);
 
 /* Set the shutdown bit */

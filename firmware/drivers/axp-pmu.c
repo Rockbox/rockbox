@@ -128,7 +128,6 @@ static const struct axp_supply_info axp_supply_info[AXP_NUM_SUPPLIES] = {
 
 static struct axp_driver {
     int adc_enable;
-    int chargecurrent_setting;
     int chip_id;
 } axp;
 
@@ -173,10 +172,6 @@ void axp_init(void)
     int bits = axp.adc_enable;
     bits |= (1 << ADC_DISCHARGE_CURRENT);
     axp_adc_set_enabled(bits);
-
-    /* Read the maximum charging current */
-    int value = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR, AXP_REG_CHARGECONTROL1);
-    axp.chargecurrent_setting = (value < 0) ? -1 : (value & 0xf);
 }
 
 void axp_supply_set_voltage(int supply, int voltage)
@@ -468,38 +463,26 @@ static const int chargecurrent_tbl[] = {
     1080, 1160, 1240, 1320,
 };
 
-static const int chargecurrent_tblsz = sizeof(chargecurrent_tbl)/sizeof(int);
-
-void axp_set_charge_current(int maxcurrent)
+void axp_set_charge_current(int current_mA)
 {
-    /* Find the charge current just higher than maxcurrent */
-    int value = 0;
-    while(value < chargecurrent_tblsz &&
-          chargecurrent_tbl[value] <= maxcurrent)
-        ++value;
+    /* find greatest charging current not exceeding requested current */
+    unsigned int index = 0;
+    while(index < ARRAYLEN(chargecurrent_tbl)-1 &&
+          chargecurrent_tbl[index+1] <= current_mA)
+        ++index;
 
-    /* Select the next lower current, the greatest current <= maxcurrent */
-    if(value >= chargecurrent_tblsz)
-        value = chargecurrent_tblsz - 1;
-    else if(value > 0)
-        --value;
-
-    /* Don't issue i2c write if desired setting is already in use */
-    if(value == axp.chargecurrent_setting)
-        return;
-
-    /* Update register */
     i2c_reg_modify1(AXP_PMU_BUS, AXP_PMU_ADDR,
-                    AXP_REG_CHARGECONTROL1, 0x0f, value, NULL);
-    axp.chargecurrent_setting = value;
+                    AXP_REG_CHARGECONTROL1, 0x0f, index, NULL);
 }
 
 int axp_get_charge_current(void)
 {
-    if(axp.chargecurrent_setting < 0)
-        return chargecurrent_tbl[0];
-    else
-        return chargecurrent_tbl[axp.chargecurrent_setting];
+    int ret = i2c_reg_read1(AXP_PMU_BUS, AXP_PMU_ADDR,
+                            AXP_REG_CHARGECONTROL1);
+    if(ret < 0)
+        ret = 0;
+
+    return chargecurrent_tbl[ret & 0x0f];
 }
 
 void axp_power_off(void)
