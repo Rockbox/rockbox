@@ -245,8 +245,26 @@ void ak4376_set_freqmode(int fsel, int mult, int power_mode)
     if(power_mode == SOUND_LOW_POWER || hw_freq_sampr[fsel] <= SAMPR_12)
         mode_ctrl |= 0x40;
 
+    /* Handle the LPMODE bit */
+    int pwr3 = power_mode == SOUND_LOW_POWER ? 0x11 : 0x01;
+
+    /* The datasheet says the HP amp must be powered down before changing
+     * the operating mode of the DAC or HP amp. I'm assuming this means
+     * the amp must be shut down when changing DSMLP or LPMODE. */
+    int cur_mode_ctrl = ak4376_read(AK4376_REG_MODE_CTRL);
+    int cur_pwr3 = ak4376_read(AK4376_REG_PWR3);
+    bool disable_amp = mode_ctrl != cur_mode_ctrl || pwr3 != cur_pwr3;
+
     /* Program the new settings */
+    if(disable_amp)
+        ak4376_write(AK4376_REG_PWR4, 0x00);
+
     ak4376_write(AK4376_REG_CLOCK_MODE, clock_mode);
     ak4376_write(AK4376_REG_MODE_CTRL, mode_ctrl);
-    ak4376_write(AK4376_REG_PWR3, power_mode == SOUND_LOW_POWER ? 0x11 : 0x01);
+    ak4376_write(AK4376_REG_PWR3, pwr3);
+
+    if(disable_amp) {
+        ak4376_write(AK4376_REG_PWR4, 0x03);
+        mdelay(26);
+    }
 }
