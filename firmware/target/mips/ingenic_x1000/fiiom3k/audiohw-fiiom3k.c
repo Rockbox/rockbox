@@ -28,7 +28,7 @@
 #include "logf.h"
 
 static int cur_fsel = HW_FREQ_48;
-static int cur_power_mode = 0;
+static int cur_power_mode = SOUND_HIGH_POWER;
 
 static void set_ak_freqmode(void)
 {

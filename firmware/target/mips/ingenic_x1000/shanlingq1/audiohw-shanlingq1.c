@@ -154,7 +154,7 @@ void audiohw_set_filter_roll_off(int value)
 void audiohw_set_power_mode(int mode)
 {
     enum es9218_amp_mode new_amp_mode;
-    if(mode == 0)
+    if(mode == SOUND_HIGH_POWER)
         new_amp_mode = ES9218_AMP_MODE_2VRMS;
     else
         new_amp_mode = ES9218_AMP_MODE_1VRMS;

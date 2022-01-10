@@ -144,8 +144,8 @@ extern void ak4376_set_filter_roll_off(int val);
  * and power-up / power-down sequences as a frequency switch, so both settings
  * are controlled by this function.
  *
- * high power mode -- use power_mode=0
- * low power mode  -- use power_mode=1
+ * high power mode -- use power_mode=SOUND_HIGH_POWER
+ * low power mode  -- use power_mode=SOUND_LOW_POWER
  */
 extern void ak4376_set_freqmode(int fsel, int mult, int power_mode);
 

@@ -351,6 +351,12 @@ static const char graphic_numeric[] = "graphic,numeric";
 # endif
 #endif
 
+#ifdef AUDIOHW_HAVE_POWER_MODE
+# ifndef TARGET_DEFAULT_DAC_POWER_MODE
+#   define TARGET_DEFAULT_DAC_POWER_MODE SOUND_HIGH_POWER
+# endif
+#endif
+
 #if LCD_DEPTH > 1
 static const char* list_pad_formatter(char *buffer, size_t buffer_size,
                                     int val, const char *unit)
@@ -877,7 +883,8 @@ const struct settings_list settings[] = {
 #endif
 
 #ifdef AUDIOHW_HAVE_POWER_MODE
-    CHOICE_SETTING(F_SOUNDSETTING, power_mode, LANG_DAC_POWER_MODE, 0,
+    CHOICE_SETTING(F_SOUNDSETTING, power_mode, LANG_DAC_POWER_MODE,
+                   TARGET_DEFAULT_DAC_POWER_MODE,
                    "dac_power_mode", "high,low", sound_set_power_mode,
                    2, ID2P(LANG_DAC_POWER_HIGH), ID2P(LANG_DAC_POWER_LOW)),
 #endif

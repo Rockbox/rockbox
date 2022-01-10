@@ -242,11 +242,11 @@ void ak4376_set_freqmode(int fsel, int mult, int power_mode)
 
     /* Handle the DSMLP bit in the MODE_CTRL register */
     int mode_ctrl = 0x00;
-    if(power_mode || hw_freq_sampr[fsel] <= SAMPR_12)
+    if(power_mode == SOUND_LOW_POWER || hw_freq_sampr[fsel] <= SAMPR_12)
         mode_ctrl |= 0x40;
 
     /* Program the new settings */
     ak4376_write(AK4376_REG_CLOCK_MODE, clock_mode);
     ak4376_write(AK4376_REG_MODE_CTRL, mode_ctrl);
-    ak4376_write(AK4376_REG_PWR3, power_mode ? 0x11 : 0x01);
+    ak4376_write(AK4376_REG_PWR3, power_mode == SOUND_LOW_POWER ? 0x11 : 0x01);
 }

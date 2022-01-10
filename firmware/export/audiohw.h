@@ -605,6 +605,12 @@ void audiohw_set_filter_roll_off(int val);
 #endif
 
 #ifdef AUDIOHW_HAVE_POWER_MODE
+enum audiohw_power_mode
+{
+    SOUND_HIGH_POWER = 0,
+    SOUND_LOW_POWER,
+};
+
 /**
  * Set DAC's power saving mode.
  * @param enable 0 - highest performance, 1 - battery saving
