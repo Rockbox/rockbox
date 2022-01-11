@@ -118,12 +118,18 @@ static bool dbg_gpios(void)
 }
 
 extern volatile unsigned aic_tx_underruns;
+#ifdef HAVE_RECORDING
+extern volatile unsigned aic_rx_overruns;
+#endif
 
 static bool dbg_audio(void)
 {
     do {
         lcd_clear_display();
         lcd_putsf(0, 0, "TX underruns: %u", aic_tx_underruns);
+#ifdef HAVE_RECORDING
+        lcd_putsf(0, 1, "RX overruns:  %u", aic_rx_overruns);
+#endif
         lcd_update();
     } while(get_action(CONTEXT_STD, HZ) != ACTION_STD_CANCEL);
 
