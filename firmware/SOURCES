@@ -1669,6 +1669,10 @@ target/mips/ingenic_x1000/spl-start.S
 target/mips/ingenic_x1000/spl-x1000.c
 common/ucl_decompress.c
 #endif
+#if (defined(HAVE_X1000_ICODEC_PLAY) || defined(HAVE_X1000_ICODEC_REC)) \
+ && !defined(BOOTLOADER)
+drivers/audio/x1000-codec.c
+#endif
 #endif /* CONFIG_CPU == X1000 */
 
 #if defined(ONDA_VX747) || defined(ONDA_VX747P) || defined(ONDA_VX777)

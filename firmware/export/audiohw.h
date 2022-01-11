@@ -192,6 +192,8 @@ struct sound_settings_info
 #include "tsc2100.h"
 #elif defined(HAVE_JZ4740_CODEC)
 #include "jz4740-codec.h"
+#elif defined(HAVE_X1000_ICODEC_PLAY)
+#include "x1000-codec.h"
 #elif defined(HAVE_AK4537)
 #include "ak4537.h"
 #elif defined(HAVE_AK4376)
@@ -235,6 +237,11 @@ struct sound_settings_info
 #include "fiiolinux_codec.h"
 #elif defined(HAVE_EROSQ_LINUX_CODEC)
 #include "erosqlinux_codec.h"
+#endif
+
+#if defined(HAVE_X1000_ICODEC_REC) && !defined(HAVE_X1000_ICODEC_PLAY)
+/* Targets may have an external DAC above, but use icodec for recording only */
+#include "x1000-codec.h"
 #endif
 
 /* convert caps into defines */
