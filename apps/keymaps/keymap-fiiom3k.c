@@ -138,6 +138,16 @@ static const struct button_mapping button_context_settings[] = {
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 
+static const struct button_mapping button_context_settings_rectrigger[] = {
+    {ACTION_SETTINGS_INC,           BUTTON_RIGHT,                       BUTTON_NONE},
+    {ACTION_SETTINGS_INCREPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE},
+    {ACTION_SETTINGS_INCBIGSTEP,    BUTTON_VOL_UP,                      BUTTON_NONE},
+    {ACTION_SETTINGS_DEC,           BUTTON_LEFT,                        BUTTON_NONE},
+    {ACTION_SETTINGS_DECREPEAT,     BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE},
+    {ACTION_SETTINGS_DECBIGSTEP,    BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
+}; /* button_context_settings_rectrigger */
+
 static const struct button_mapping button_context_settings_eq[] = {
     {ACTION_SETTINGS_INC,           BUTTON_RIGHT,                       BUTTON_NONE},
     {ACTION_SETTINGS_INCREPEAT,     BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE},
@@ -202,6 +212,33 @@ static const struct button_mapping button_context_yesnoscreen[] = {
     {ACTION_STD_CANCEL,             BUTTON_VOL_DOWN,                    BUTTON_NONE},
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_yesnoscreen */
+
+static const struct button_mapping button_context_recscreen[] = {
+    {ACTION_REC_PAUSE,          BUTTON_SELECT,                      BUTTON_NONE},
+    {ACTION_REC_PAUSE,          BUTTON_PLAY,                        BUTTON_NONE},
+    {ACTION_REC_NEWFILE,        BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_SELECT},
+    {ACTION_REC_NEWFILE,        BUTTON_PLAY|BUTTON_REPEAT,          BUTTON_PLAY},
+    {ACTION_STD_MENU,           BUTTON_MENU,                        BUTTON_NONE},
+    {ACTION_STD_CANCEL,         BUTTON_BACK,                        BUTTON_NONE},
+    {ACTION_STD_CANCEL,         BUTTON_POWER,                       BUTTON_NONE},
+    {ACTION_STD_PREV,           BUTTON_UP,                          BUTTON_NONE},
+    {ACTION_STD_PREVREPEAT,     BUTTON_UP|BUTTON_REPEAT,            BUTTON_NONE},
+    {ACTION_STD_NEXT,           BUTTON_DOWN,                        BUTTON_NONE},
+    {ACTION_STD_NEXTREPEAT,     BUTTON_DOWN|BUTTON_REPEAT,          BUTTON_NONE},
+    {ACTION_STD_PREV,           BUTTON_SCROLL_BACK,                 BUTTON_NONE},
+    {ACTION_STD_PREVREPEAT,     BUTTON_SCROLL_BACK|BUTTON_REPEAT,   BUTTON_NONE},
+    {ACTION_STD_NEXT,           BUTTON_SCROLL_FWD,                  BUTTON_NONE},
+    {ACTION_STD_NEXTREPEAT,     BUTTON_SCROLL_FWD|BUTTON_REPEAT,    BUTTON_NONE},
+    {ACTION_SETTINGS_INC,       BUTTON_VOL_UP,                      BUTTON_NONE},
+    {ACTION_SETTINGS_INCREPEAT, BUTTON_VOL_UP|BUTTON_REPEAT,        BUTTON_NONE},
+    {ACTION_SETTINGS_DEC,       BUTTON_VOL_DOWN,                    BUTTON_NONE},
+    {ACTION_SETTINGS_DECREPEAT, BUTTON_VOL_DOWN|BUTTON_REPEAT,      BUTTON_NONE},
+    {ACTION_SETTINGS_INC,       BUTTON_RIGHT,                       BUTTON_NONE},
+    {ACTION_SETTINGS_INCREPEAT, BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE},
+    {ACTION_SETTINGS_DEC,       BUTTON_LEFT,                        BUTTON_NONE},
+    {ACTION_SETTINGS_DECREPEAT, BUTTON_LEFT|BUTTON_REPEAT,          BUTTON_NONE},
+    LAST_ITEM_IN_LIST
+}; /* button_context_recscreen */
 
 static const struct button_mapping button_context_keyboard[] = {
     {ACTION_KBD_UP,                 BUTTON_UP,                          BUTTON_NONE},
@@ -315,8 +352,9 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_list;
         case CONTEXT_SETTINGS:
         case CONTEXT_SETTINGS_TIME:
-        case CONTEXT_SETTINGS_RECTRIGGER:
             return button_context_settings;
+        case CONTEXT_SETTINGS_RECTRIGGER:
+            return button_context_settings_rectrigger;
         case CONTEXT_SETTINGS_EQ:
         case CONTEXT_SETTINGS_COLOURCHOOSER:
             return button_context_settings_eq;
@@ -326,6 +364,8 @@ const struct button_mapping* get_context_mapping(int context)
             return button_context_pitchscreen;
         case CONTEXT_YESNOSCREEN:
             return button_context_yesnoscreen;
+        case CONTEXT_RECSCREEN:
+            return button_context_recscreen;
         case CONTEXT_KEYBOARD:
             return button_context_keyboard;
         case CONTEXT_USB_HID:

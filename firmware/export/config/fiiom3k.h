@@ -55,11 +55,15 @@
 
 /* Codec / audio hardware defines */
 #define HW_SAMPR_CAPS   SAMPR_CAP_ALL_192
+#define REC_SAMPR_CAPS  (SAMPR_CAP_ALL_96 & ~SAMPR_CAP_64)
+#define INPUT_SRC_CAPS  SRC_CAP_MIC
+#define AUDIOHW_CAPS    (FILTER_ROLL_OFF_CAP|POWER_MODE_CAP|MIC_GAIN_CAP)
+#define HAVE_RECORDING
 #define HAVE_AK4376
+#define HAVE_X1000_ICODEC_REC
 #define HAVE_SW_TONE_CONTROLS
 #define HAVE_SW_VOLUME_CONTROL
-
-/* TODO: Need to implement recording */
+#define DEFAULT_REC_MIC_GAIN  12
 
 /* Button defines */
 #define CONFIG_KEYPAD   FIIO_M3K_PAD
