@@ -201,7 +201,6 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INCREPEAT,BUTTON_RIGHT|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_SETTINGS_DEC,      BUTTON_LEFT,                    BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,BUTTON_LEFT|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,    BUTTON_REW|BUTTON_REL,          BUTTON_REW  },
 
     { ACTION_STD_PREV,          BUTTON_UP,                      BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },

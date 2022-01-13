@@ -118,7 +118,6 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_PREVREPEAT,     BUTTON_RC_REW|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_STD_NEXT,           BUTTON_RC_FF,                    BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,     BUTTON_RC_FF|BUTTON_REPEAT,      BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,     BUTTON_RC_MODE,                  BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
@@ -132,7 +131,6 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_STD_PREVREPEAT,        BUTTON_RC_PLAY|BUTTON_REPEAT, BUTTON_NONE },
     { ACTION_STD_NEXT,              BUTTON_RC_DOWN,               BUTTON_NONE },
     { ACTION_STD_NEXTREPEAT,        BUTTON_RC_DOWN|BUTTON_REPEAT, BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,        BUTTON_RC_MODE,               BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settingsgraphical */

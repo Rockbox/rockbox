@@ -99,7 +99,6 @@ static const struct button_mapping button_context_settings[] = {
     { ACTION_STD_PREVREPEAT,    BUTTON_UP|BUTTON_REPEAT,          BUTTON_UP   },
     { ACTION_STD_NEXT,          BUTTON_DOWN|BUTTON_REL,           BUTTON_DOWN },
     { ACTION_STD_NEXTREPEAT,    BUTTON_DOWN|BUTTON_REPEAT,        BUTTON_DOWN },
-    { ACTION_SETTINGS_RESET,    BUTTON_SELECT,                    BUTTON_NONE },
 
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD),
 }; /* button_context_settings */

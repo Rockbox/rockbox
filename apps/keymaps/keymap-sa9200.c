@@ -155,7 +155,6 @@ static const struct button_mapping button_context_listtree_scroll_without_combo[
 
 static const struct button_mapping button_context_settings[]  = {
     { ACTION_STD_CANCEL,        BUTTON_POWER,                   BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,    BUTTON_PLAY,                    BUTTON_NONE },
 
     { ACTION_SETTINGS_INC,      BUTTON_UP,                      BUTTON_NONE },
     { ACTION_SETTINGS_INCREPEAT,BUTTON_UP|BUTTON_REPEAT,        BUTTON_NONE },

@@ -125,8 +125,6 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_DEC,              BUTTON_VOL_DOWN,                   BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,        BUTTON_VOL_DOWN|BUTTON_REPEAT,     BUTTON_NONE },
 
-    { ACTION_SETTINGS_RESET,            BUTTON_PLAY|BUTTON_REPEAT,         BUTTON_NONE },
-
     LAST_ITEM_IN_LIST__NEXTLIST(CONTEXT_STD)
 }; /* button_context_settings */
 

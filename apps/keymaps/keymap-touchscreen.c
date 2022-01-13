@@ -146,7 +146,6 @@ static const struct button_mapping button_context_settings[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_TOPMIDDLE|BUTTON_REPEAT,     BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_BOTTOMMIDDLE,                BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_BOTTOMMIDDLE|BUTTON_REPEAT,  BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,        BUTTON_CENTER,                      BUTTON_NONE },
 
     { ACTION_STD_PREV,          BUTTON_MIDLEFT,                         BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,    BUTTON_MIDLEFT|BUTTON_REPEAT,           BUTTON_NONE },
@@ -164,7 +163,6 @@ static const struct button_mapping button_context_settings_right_is_inc[]  = {
     { ACTION_SETTINGS_INCREPEAT,    BUTTON_MIDRIGHT|BUTTON_REPEAT,  BUTTON_NONE },
     { ACTION_SETTINGS_DEC,          BUTTON_MIDLEFT,                 BUTTON_NONE },
     { ACTION_SETTINGS_DECREPEAT,    BUTTON_MIDLEFT|BUTTON_REPEAT,   BUTTON_NONE },
-    { ACTION_SETTINGS_RESET,        BUTTON_CENTER,                  BUTTON_NONE },
 
     { ACTION_STD_CANCEL,            BUTTON_TOPLEFT,                 BUTTON_NONE },
 

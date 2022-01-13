@@ -131,7 +131,6 @@ static const struct button_mapping button_context_settings[] = {
     {ACTION_SETTINGS_DEC,           BUTTON_SCROLL_FWD,                  BUTTON_NONE},
     {ACTION_SETTINGS_DECREPEAT,     BUTTON_SCROLL_FWD|BUTTON_REPEAT,    BUTTON_NONE},
     {ACTION_SETTINGS_DECBIGSTEP,    BUTTON_VOL_DOWN,                    BUTTON_NONE},
-    {ACTION_SETTINGS_RESET,         BUTTON_SELECT|BUTTON_REPEAT,        BUTTON_SELECT},
     {ACTION_STD_NEXT,               BUTTON_RIGHT,                       BUTTON_NONE},
     {ACTION_STD_NEXTREPEAT,         BUTTON_RIGHT|BUTTON_REPEAT,         BUTTON_NONE},
     {ACTION_STD_PREV,               BUTTON_LEFT,                        BUTTON_NONE},

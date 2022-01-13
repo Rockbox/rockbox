@@ -150,7 +150,6 @@ static const struct button_mapping button_context_quickscreen[] = {
 
 /** Settings - General Mappings **/
 static const struct button_mapping button_context_settings[] = {
-    { ACTION_SETTINGS_RESET,  BUTTON_POWER|BUTTON_REL,          BUTTON_POWER },
     { ACTION_STD_PREV,        BUTTON_PREV,                      BUTTON_NONE },
     { ACTION_STD_PREVREPEAT,  BUTTON_PREV|BUTTON_REPEAT,        BUTTON_NONE },
     { ACTION_STD_NEXT,        BUTTON_NEXT,                      BUTTON_NONE },
