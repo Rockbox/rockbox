@@ -739,7 +739,9 @@ static void trigger_listener(int trigger_status)
 /* Stuff for drawing the screen */
 
 enum rec_list_items_stereo {
+#ifndef HAVE_RECORDING_WITHOUT_MONITORING
     ITEM_VOLUME,
+#endif
     ITEM_GAIN,
 #if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
     ITEM_GAIN_L,
@@ -771,12 +773,14 @@ static const char* reclist_get_name(int selected_item, void * data,
 
     switch (listid_to_enum[selected_item])
     {
+#ifndef HAVE_RECORDING_WITHOUT_MONITORING
         case ITEM_VOLUME:
             snprintf(buffer, buffer_len, "%s: %s", str(LANG_VOLUME),
                      fmt_gain(SOUND_VOLUME,
                               global_settings.volume,
                               buf2, sizeof(buf2)));
             break;
+#endif
         case ITEM_GAIN:
             switch(global_settings.rec_source) {
 #ifdef HAVE_MIC_REC
@@ -1155,7 +1159,9 @@ bool recording_screen(bool no_source)
 #ifdef HAVE_SPDIF_REC
             if(global_settings.rec_source == AUDIO_SRC_SPDIF)
             {
+#ifndef HAVE_RECORDING_WITHOUT_MONITORING
                 listid_to_enum[listi++] = ITEM_VOLUME;
+#endif
                 listid_to_enum[listi++] = ITEM_SAMPLERATE;
                 listid_to_enum[listi++] = ITEM_FILENAME;
 
@@ -1164,7 +1170,9 @@ bool recording_screen(bool no_source)
             else
 #endif
             {
+#ifndef HAVE_RECORDING_WITHOUT_MONITORING
                 listid_to_enum[listi++] = ITEM_VOLUME;
+#endif
                 listid_to_enum[listi++] = ITEM_GAIN;
 #if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
                 if(HAVE_MIC_REC_((global_settings.rec_source != AUDIO_SRC_MIC) || )
@@ -1265,9 +1273,11 @@ bool recording_screen(bool no_source)
             case ACTION_SETTINGS_INCREPEAT:
                 switch (listid_to_enum[gui_synclist_get_sel_pos(&lists)])
                 {
+#ifndef HAVE_RECORDING_WITHOUT_MONITORING
                     case ITEM_VOLUME:
                         recording_step_levels(SOUND_VOLUME, 1);
                         break;
+#endif
                     case ITEM_GAIN:
                         switch(global_settings.rec_source) {
 #ifdef HAVE_MIC_REC
@@ -1335,9 +1345,11 @@ bool recording_screen(bool no_source)
             case ACTION_SETTINGS_DECREPEAT:
                 switch (listid_to_enum[gui_synclist_get_sel_pos(&lists)])
                 {
+#ifndef HAVE_RECORDING_WITHOUT_MONITORING
                     case ITEM_VOLUME:
                         recording_step_levels(SOUND_VOLUME, -1);
                         break;
+#endif
                     case ITEM_GAIN:
                         switch(global_settings.rec_source) {
 #ifdef HAVE_MIC_REC
