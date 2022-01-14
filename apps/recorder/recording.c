@@ -739,43 +739,22 @@ static void trigger_listener(int trigger_status)
 /* Stuff for drawing the screen */
 
 enum rec_list_items_stereo {
-    ITEM_VOLUME = 0,
-    ITEM_GAIN = 1,
-    ITEM_GAIN_L = 2,
-    ITEM_GAIN_R = 3,
-#ifdef HAVE_AGC
-    ITEM_AGC_MODE = 4,
-    ITEM_AGC_MAXDB = 5,
-    ITEM_FILENAME = 7,
-    ITEM_COUNT = 7,
-#else
-    ITEM_FILENAME = 7,
-    ITEM_COUNT = 5,
+    ITEM_VOLUME,
+    ITEM_GAIN,
+#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
+    ITEM_GAIN_L,
+    ITEM_GAIN_R,
 #endif
-};
-
-enum rec_list_items_mono {
-    ITEM_VOLUME_M = 0,
-    ITEM_GAIN_M = 1,
 #ifdef HAVE_AGC
-    ITEM_AGC_MODE_M = 4,
-    ITEM_AGC_MAXDB_M = 5,
-    ITEM_FILENAME_M = 7,
-    ITEM_COUNT_M = 5,
-#else
-    ITEM_FILENAME_M = 7,
-    ITEM_COUNT_M = 3,
+    ITEM_AGC_MODE,
+    ITEM_AGC_MAXDB,
 #endif
-};
-
 #ifdef HAVE_SPDIF_REC
-enum rec_list_items_spdif {
-    ITEM_VOLUME_D = 0,
-    ITEM_SAMPLERATE_D = 6,
-    ITEM_FILENAME_D = 7,
-    ITEM_COUNT_D = 3,
-};
+    ITEM_SAMPLERATE,
 #endif
+    ITEM_FILENAME,
+    ITEM_COUNT,
+};
 
 static int listid_to_enum[ITEM_COUNT];
 
@@ -876,7 +855,7 @@ static const char* reclist_get_name(int selected_item, void * data,
         } break;
 #endif
 #ifdef HAVE_SPDIF_REC
-        case ITEM_SAMPLERATE_D:
+        case ITEM_SAMPLERATE:
             snprintf(buffer, buffer_len, "%s: %lu",
                      str(LANG_FREQUENCY), pcm_rec_sample_rate());
             break;
@@ -1170,46 +1149,37 @@ bool recording_screen(bool no_source)
             set_gain();
             update_countdown = 0; /* Update immediately */
 
+            int listi = 0;
+
             /* populate translation table for list id -> enum */
 #ifdef HAVE_SPDIF_REC
             if(global_settings.rec_source == AUDIO_SRC_SPDIF)
             {
-                listid_to_enum[0] = ITEM_VOLUME_D;
-                listid_to_enum[1] = ITEM_SAMPLERATE_D;
-                listid_to_enum[2] = ITEM_FILENAME_D;
+                listid_to_enum[listi++] = ITEM_VOLUME;
+                listid_to_enum[listi++] = ITEM_SAMPLERATE;
+                listid_to_enum[listi++] = ITEM_FILENAME;
 
-                gui_synclist_set_nb_items(&lists, ITEM_COUNT_D);   /* spdif */
+                gui_synclist_set_nb_items(&lists, listi);   /* spdif */
             }
             else
 #endif
-            if(HAVE_MIC_REC_((global_settings.rec_source == AUDIO_SRC_MIC) || )
-               (global_settings.rec_channels == 1))
             {
-                listid_to_enum[0] = ITEM_VOLUME_M;
-                listid_to_enum[1] = ITEM_GAIN_M;
-#ifdef HAVE_AGC
-                listid_to_enum[2] = ITEM_AGC_MODE_M;
-                listid_to_enum[3] = ITEM_AGC_MAXDB_M;
-                listid_to_enum[4] = ITEM_FILENAME_M;
-#else
-                listid_to_enum[2] = ITEM_FILENAME_M;
+                listid_to_enum[listi++] = ITEM_VOLUME;
+                listid_to_enum[listi++] = ITEM_GAIN;
+#if defined(HAVE_LINE_REC) || defined(HAVE_FMRADIO_REC)
+                if(HAVE_MIC_REC_((global_settings.rec_source != AUDIO_SRC_MIC) || )
+                   (global_settings.rec_channels != 1)) {
+                    listid_to_enum[listi++] = ITEM_GAIN_L;
+                    listid_to_enum[listi++] = ITEM_GAIN_R;
+                }
 #endif
-                gui_synclist_set_nb_items(&lists, ITEM_COUNT_M); /* mono */
-            }
-            else
-            {
-                listid_to_enum[0] = ITEM_VOLUME;
-                listid_to_enum[1] = ITEM_GAIN;
-                listid_to_enum[2] = ITEM_GAIN_L;
-                listid_to_enum[3] = ITEM_GAIN_R;
 #ifdef HAVE_AGC
-                listid_to_enum[4] = ITEM_AGC_MODE;
-                listid_to_enum[5] = ITEM_AGC_MAXDB;
-                listid_to_enum[6] = ITEM_FILENAME;
-#else
-                listid_to_enum[4] = ITEM_FILENAME;
+                listid_to_enum[listi++] = ITEM_AGC_MODE;
+                listid_to_enum[listi++] = ITEM_AGC_MAXDB;
 #endif
-                gui_synclist_set_nb_items(&lists, ITEM_COUNT);   /* stereo */
+                listid_to_enum[listi++] = ITEM_FILENAME;
+
+                gui_synclist_set_nb_items(&lists, listi);   /* stereo */
             }
 
             gui_synclist_draw(&lists);
