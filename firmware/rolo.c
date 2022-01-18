@@ -242,7 +242,7 @@ int rolo_load(const char* filename)
 
     /* get the system buffer. release only in case of error, otherwise
      * we don't return anyway */
-    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, NULL);
+    rolo_handle = core_alloc_maximum("rolo", &filebuf_size, &buflib_ops_locked);
     if (rolo_handle < 0)
     {
         rolo_error("OOM");

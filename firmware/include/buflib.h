@@ -129,6 +129,12 @@ struct buflib_callbacks {
     void (*sync_callback)(int handle, bool sync_on);
 };
 
+/** A set of all NULL callbacks for use with allocations that need to stay
+ * locked in RAM and not moved or shrunk. These type of allocations should
+ * be avoided as much as possible to avoid memory fragmentation but it can
+ * suitable for short-lived allocations. */
+extern struct buflib_callbacks buflib_ops_locked;
+
 #define BUFLIB_SHRINK_SIZE_MASK (~BUFLIB_SHRINK_POS_MASK)
 #define BUFLIB_SHRINK_POS_FRONT (1u<<31)
 #define BUFLIB_SHRINK_POS_BACK  (1u<<30)

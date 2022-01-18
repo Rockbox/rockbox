@@ -25,6 +25,7 @@
 #define N_POINTERS 100
 
 static void* pointers[N_POINTERS];
+struct buflib_callbacks buflib_ops_locked = {NULL, NULL, NULL};
 
 int core_alloc(const char* name, size_t size)
 {
@@ -44,6 +45,12 @@ int core_alloc(const char* name, size_t size)
 
     free(mem);
     return -1;
+}
+
+int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks* cb)
+{
+    (void)cb;
+    return core_alloc(name, size);
 }
 
 int core_free(int handle)

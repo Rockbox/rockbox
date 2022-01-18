@@ -449,12 +449,11 @@ void usb_storage_init_connection(void)
 #endif
 #else
     unsigned char * buffer;
-    /* dummy ops with no callbacks, needed because by
-     * default buflib buffers can be moved around which must be avoided */
-    static struct buflib_callbacks dummy_ops;
 
     // Add 31 to handle worst-case misalignment
-    usb_handle = core_alloc_ex("usb storage", ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31, &dummy_ops);
+    usb_handle = core_alloc_ex("usb storage",
+                               ALLOCATE_BUFFER_SIZE + MAX_CBW_SIZE + 31,
+                               &buflib_ops_locked);
     if (usb_handle < 0)
         panicf("%s(): OOM", __func__);
 

@@ -328,8 +328,7 @@ static void allocate_tempbuf(void)
 #else /* !__PCTOOL__ */
     /* Need to pass dummy ops to prevent the buffer being moved
      * out from under us, since we yield during the tagcache commit. */
-    static struct buflib_callbacks dummy_ops;
-    tempbuf_handle = core_alloc_maximum("tc tempbuf", &size, &dummy_ops);
+    tempbuf_handle = core_alloc_maximum("tc tempbuf", &size, &buflib_ops_locked);
     if (tempbuf_handle > 0)
     {
         tempbuf = core_get_data(tempbuf_handle);

@@ -51,7 +51,7 @@ int xf_nandio_init(struct xf_nandio* nio)
     alloc_size += CACHEALIGN_SIZE - 1;
     alloc_size += nio->block_size * 2;
 
-    nio->alloc_handle = core_alloc("xf_nandio", alloc_size);
+    nio->alloc_handle = core_alloc_ex("xf_nandio", alloc_size, &buflib_ops_locked);
     if(nio->alloc_handle < 0) {
         rc = XF_E_OUT_OF_MEMORY;
         goto out_nclose;

@@ -990,14 +990,11 @@ void* plugin_get_buffer(size_t *buffer_size)
  */
 static void* plugin_get_audio_buffer(size_t *buffer_size)
 {
-    /* dummy ops with no callbacks, needed because by
-     * default buflib buffers can be moved around which must be avoided */
-    static struct buflib_callbacks dummy_ops;
     if (plugin_buffer_handle <= 0)
     {
         plugin_buffer_handle = core_alloc_maximum("plugin audio buf",
                                                   &plugin_buffer_size,
-                                                  &dummy_ops);
+                                                  &buflib_ops_locked);
     }
 
     if (buffer_size)

@@ -97,6 +97,12 @@
 
 #define BPANICF panicf
 
+struct buflib_callbacks buflib_ops_locked = {
+    .move_callback = NULL,
+    .shrink_callback = NULL,
+    .sync_callback = NULL,
+};
+
 #define IS_MOVABLE(a) (!a[2].ops || a[2].ops->move_callback)
 static union buflib_data* find_first_free(struct buflib_context *ctx);
 static union buflib_data* find_block_before(struct buflib_context *ctx,

@@ -32,9 +32,7 @@
 #include "crc32.h"
 #include "rbendian.h"
 
-#define zip_core_alloc(N) core_alloc_ex("zip",(N),&dummy_ops)
-
-static struct buflib_callbacks dummy_ops;
+#define zip_core_alloc(N) core_alloc_ex("zip",(N),&buflib_ops_locked)
 
 enum {
     ZIP_SIG_ED = 0x06054b50,

@@ -1406,12 +1406,9 @@ static int pcmrec_handle;
 static void on_init_recording(void)
 {
     send_event(RECORDING_EVENT_START, NULL);
-    /* dummy ops with no callbacks, needed because by
-     * default buflib buffers can be moved around which must be avoided
-     * FIXME: This buffer should play nicer and be shrinkable/movable */
-    static struct buflib_callbacks dummy_ops;
+    /* FIXME: This buffer should play nicer and be shrinkable/movable */
     talk_buffer_set_policy(TALK_BUFFER_LOOSE);
-    pcmrec_handle = core_alloc_maximum("pcmrec", &rec_buffer_size, &dummy_ops);
+    pcmrec_handle = core_alloc_maximum("pcmrec", &rec_buffer_size, &buflib_ops_locked);
     if (pcmrec_handle <= 0)
     /* someone is abusing core_alloc_maximum(). Fix this evil guy instead of
      * trying to handle OOM without hope */

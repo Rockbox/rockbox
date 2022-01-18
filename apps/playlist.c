@@ -2076,13 +2076,10 @@ int playlist_create(const char *dir, const char *file)
 
     if (file)
     {
-        /* dummy ops with no callbacks, needed because by
-         * default buflib buffers can be moved around which must be avoided */
-        static struct buflib_callbacks dummy_ops;
         int handle;
         size_t buflen;
         /* use mp3 buffer for maximum load speed */
-        handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
+        handle = core_alloc_maximum("temp", &buflen, &buflib_ops_locked);
         if (handle > 0)
         {
             /* load the playlist file */
@@ -2119,13 +2116,10 @@ int playlist_resume(void)
     bool sorted = true;
     int result = -1;
 
-    /* dummy ops with no callbacks, needed because by
-     * default buflib buffers can be moved around which must be avoided */
-    static struct buflib_callbacks dummy_ops;
     /* use mp3 buffer for maximum load speed */
     if (core_allocatable() < (1 << 10))
         talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
-    handle = core_alloc_maximum("temp", &buflen, &dummy_ops);
+    handle = core_alloc_maximum("temp", &buflen, &buflib_ops_locked);
     if (handle < 0)
     {
         splashf(HZ * 2, "%s(): OOM", __func__);

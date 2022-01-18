@@ -49,7 +49,7 @@ static int pkg_alloc(struct xf_package* pkg)
     alloc_size += ALIGN_UP_P2(METADATA_SIZE, 3);
     alloc_size += 7; /* for alignment */
 
-    pkg->alloc_handle = core_alloc("xf_package", alloc_size);
+    pkg->alloc_handle = core_alloc_ex("xf_package", alloc_size, &buflib_ops_locked);
     if(pkg->alloc_handle < 0)
         return XF_E_OUT_OF_MEMORY;
 

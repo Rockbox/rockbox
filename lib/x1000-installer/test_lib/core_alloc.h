@@ -25,8 +25,18 @@
 #define CORE_ALLOC_H
 
 #include <stddef.h>
+#include <stdbool.h>
+
+struct buflib_callbacks {
+    int (*move_callback)(int handle, void* current, void* new);
+    int (*shrink_callback)(int handle, unsigned hints, void* start, size_t old_size);
+    void (*sync_callback)(int handle, bool sync_on);
+};
+
+extern struct buflib_callbacks buflib_ops_locked;
 
 int core_alloc(const char* name, size_t size);
+int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks* cb);
 int core_free(int handle);
 void* core_get_data(int handle);
 
