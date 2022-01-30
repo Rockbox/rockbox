@@ -59,7 +59,7 @@ static void codec_stop(void)
 {
     es9218_mute(true);
     es9218_close();
-    mdelay(1);
+    mdelay(4);
 }
 
 void audiohw_init(void)
