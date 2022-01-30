@@ -16038,7 +16038,7 @@
     *: "dAY"
   </source>
   <dest>
-    *: "dAY"
+    *: "dmY"
   </dest>
   <voice>
     *: ""
@@ -16112,5 +16112,47 @@
   </dest>
   <voice>
     *: "Discendente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Album Art"
+  </dest>
+  <voice>
+    *: "Album Art"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Preferire Incorporato"
+  </dest>
+  <voice>
+    *: "Preferire Incorporato"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Preferire File Immagine"
+  </dest>
+  <voice>
+    *: "Preferire File Immagine"
   </voice>
 </phrase>
