@@ -151,10 +151,6 @@ const struct button_mapping pf_context_buttons[] =
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
     || (CONFIG_KEYPAD == IPOD_4G_PAD) \
     || (CONFIG_KEYPAD == MPIO_HD300_PAD)
-    {PF_JMP_PREV,     BUTTON_LEFT,                BUTTON_NONE},
-    {PF_JMP_PREV,     BUTTON_LEFT|BUTTON_REPEAT,  BUTTON_NONE},
-    {PF_JMP,          BUTTON_RIGHT,               BUTTON_NONE},
-    {PF_JMP,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
