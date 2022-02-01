@@ -3,11 +3,11 @@
 \chapter{File formats}
 \section{\label{ref:Supportedfileformats}Supported file formats}
 \begin{rbtabular}{\textwidth}{cl>{\raggedright}p{7em}X}%
-{\textbf{Icon} & \textbf{File Type} & \textbf{Extension} 
+{\textbf{Icon} & \textbf{File Type} & \textbf{Extension}
   & \textbf{Action when selected}}{}{}
 \includeicon{appendix/images/icon-directory.png}
   & Directory & \emph{none} & Enter the directory \tabularnewline
-  \includeicon{appendix/images/icon-audio-file.png} 
+  \includeicon{appendix/images/icon-audio-file.png}
   & Audio file & \emph{various}\newline%
   (see \ref{ref:Supportedaudioformats})%
   % do NOT use \reference{} here as that will break the table.
@@ -17,7 +17,7 @@
      ``Rocklife'' plugin\tabularnewline
 \includeicon{appendix/images/icon-config.png}
   & Configuration File & \fname{.cfg} & Load the settings file\tabularnewline
-\includeicon{appendix/images/icon-chip8.png} 
+\includeicon{appendix/images/icon-chip8.png}
   & Chip8 game & \fname{.ch8} & Play the Chip8 game \tabularnewline
 \opt{lcd_color}{
   & Colours & \fname{.colours} & Open the colours file for editing.
@@ -46,22 +46,22 @@
   \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.iriver} & Load the new firmware with ROLO \tabularnewline
 }
-\includeicon{appendix/images/icon-image-file.png} 
+\includeicon{appendix/images/icon-image-file.png}
   & Image & \fname{.jpg} & View the JPEG image \tabularnewline
   & Link & \fname{.link} & Display list of target files and directories;
     selecting one jumps to the target. See \reference{ref:Shortcutsplugin}.\tabularnewline
-\includeicon{appendix/images/icon-lang.png} 
+\includeicon{appendix/images/icon-lang.png}
   & Language File & \fname{.lng} & Load the language file \tabularnewline
 \includeicon{appendix/images/icon-playlist.png}
-  & Playlist & \fname{.m3u}, \fname{.m3u8} & Load the playlist and start playing 
+  & Playlist & \fname{.m3u}, \fname{.m3u8} & Load the playlist and start playing
     the first file \tabularnewline
 \opt{iriverh10,iriverh10_5gb,sansa,mrobe100,vibe500,samsungyh}{
-  \includeicon{appendix/images/icon-rolo.png} 
+  \includeicon{appendix/images/icon-rolo.png}
   & Rockbox firmware & \fname{.mi4} & Load the new firmware with ROLO \tabularnewline
 }
  \includeicon{appendix/images/icon-movie-file.png}
  & Video & \fname{.mpg}, \fname{.mpeg}, \fname{.mpv}, \fname{.m2v} & Play the MPEG1/2 video \tabularnewline
-\includeicon{appendix/images/icon-rock.png} 
+\includeicon{appendix/images/icon-rock.png}
   & Plugin & \fname{.rock} & Start the plugin\tabularnewline
 \opt{sansaAMS}{
   \includeicon{appendix/images/icon-rolo.png}
@@ -83,7 +83,7 @@
         & \fname{.a52}, \fname{.ac3}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
         & Supports downmixing for playback of 5.1 streams in stereo\\
     ADX
-        & \fname{.adx} 
+        & \fname{.adx}
         & Encrypted ADX is not supported.\\
     Advanced Audio Coding
         & \fname{.m4a}, \fname{.m4b}, \fname{.mp4}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
@@ -92,15 +92,15 @@
         \opt{clipv1,c200v2}{ % low memory targets (CODEC_SIZE <= 512 KB)
             & Supports AAC-LC profile\\}
     MPEG audio
-        & \fname{.mpa}, \fname{.mp1}, \fname{.mp2}, \fname{.mp3} 
+        & \fname{.mpa}, \fname{.mpga}, \fname{.mp1}, \fname{.mp2}, \fname{.mp3}
         & MPEG 1/2/2.5 Layer 1/2/3\\
     Musepack
-        & \fname{.mpc} 
+        & \fname{.mpc}
         & Supports SV7 and SV8 in mono/stereo \\
     OGG/Vorbis
-        & \fname{.ogg}, \fname{.oga} 
+        & \fname{.ogg}, \fname{.oga}
         & Playback of some old ``floor 0'' files may fail on low memory targets.
-          Files with album art larger than available RAM will be skipped. 
+          Files with album art larger than available RAM will be skipped.
           Chained Ogg files are not supported.\\
     Sony Audio
         & \fname{.oma}, \fname{.aa3}, \fname{.rm}, \fname{.ra}, \fname{.rmvb}
@@ -109,32 +109,32 @@
         & \fname{.rm}, \fname{.ra}, \fname{.rmvb}
         & Supports RealAudio G2 (Cook)\\
     Speex
-        & \fname{.spx} 
+        & \fname{.spx}
         & \\
     Dialogic telephony type
-        & \fname{.vox} 
+        & \fname{.vox}
         & \\
     Windows Media Audio Standard
-        & \fname{.wma}, \fname{.wmv}, \fname{.asf} 
+        & \fname{.wma}, \fname{.wmv}, \fname{.asf}
         & \\
     Windows Media Audio Professional
-        & \fname{.wma}, \fname{.wmv}, \fname{.asf} 
+        & \fname{.wma}, \fname{.wmv}, \fname{.asf}
         & \\
   \end{rbtabular}
-  
-  \note{AAC-HE profiles might not play in realtime on all devices due to CPU 
+
+  \note{AAC-HE profiles might not play in realtime on all devices due to CPU
   performance requirements.}
 
   \subsection{Lossless Codecs}
   \begin{rbtabular}{\textwidth}{lp{6em}X}%
   {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
     Audio Interchange File Format
-        & \fname{.aif}, \fname{.aiff} 
+        & \fname{.aif}, \fname{.aiff}
         & Linear PCM 8/16/24/32 bit, IEEE float 32/64 bit, ITU-T G.711 a-law/$\mu$-law,
           QuickTime IMA ADPCM\\
     Monkey's Audio
-        & \fname{.ape}, \fname{.mac} 
-        & 
+        & \fname{.ape}, \fname{.mac}
+        &
         \opt{gigabeatf,iriverh100,iriverh300,iaudiox5,iaudiom5,iaudiom3,ipodnano2g,clipv1}{
             -c1000 to -c3000 files decode fast enough to be useful.}
         \opt{gigabeats}{}
@@ -142,45 +142,45 @@
             \nopt{ipodnano2g}{Only -c1000 files decode fast enough to be useful.}}
             \\
     Sun Audio
-        & \fname{.au}, \fname{.snd} 
+        & \fname{.au}, \fname{.snd}
         & Linear PCM 8/16/24/32 bit, IEEE float 32/64 bit, ITU-T G.711 a-law/$\mu$-law\\
     Free Lossless Audio
-        & \fname{.flac} 
+        & \fname{.flac}
         & Supports multichannel playback including downmixing to stereo.\\
     Apple Lossless
-        & \fname{.m4a}, \fname{.mp4} 
+        & \fname{.m4a}, \fname{.mp4}
         & \\
     Shorten
-        & \fname{.shn} 
+        & \fname{.shn}
         & Seeking not supported.\\
     True Audio
-        & \fname{.tta} 
+        & \fname{.tta}
         & \\
     Wave64
-        & \fname{.w64} 
+        & \fname{.w64}
         & Supports same formats as Waveform audio format.\\
     Waveform audio format
-        & \fname{.wav} 
+        & \fname{.wav}
         & Linear PCM 8/16/24/32 bit, IEEE float 32/64 bit, ITU-T G.711 a-law/$\mu$-law,
           Microsoft ADPCM, Intel DVI ADPCM (IMA ADPCM) 2/3/4/5 bit, Dialogic OKI ADPCM,
           YAMAHA ADPCM, Adobe SWF ADPCM\\
     Wavpack
-        & \fname{.wv} 
+        & \fname{.wv}
         & \\
   \end{rbtabular}
-  
-  \note{Free Lossless Audio multichannel tracks may not play in realtime on all devices due to CPU 
+
+  \note{Free Lossless Audio multichannel tracks may not play in realtime on all devices due to CPU
   performance requirements.}
 
   \subsection{Other Codecs}
   \begin{rbtabular}{\textwidth}{l>{\raggedright}p{6em}X}%
   {\textbf{Format} & \textbf{Extension} & \textbf{Notes}}{}{}
     Atari Sound Format
-        & \fname{.cmc}, \fname{.cm3}, \fname{.cmr}, \fname{.cms}, \fname{.dmc}, 
-          \fname{.dlt}, \fname{.mpt}, \fname{.mpd} 
+        & \fname{.cmc}, \fname{.cm3}, \fname{.cmr}, \fname{.cms}, \fname{.dmc},
+          \fname{.dlt}, \fname{.mpt}, \fname{.mpd}
         & \\
     Synthetic music Mobile Application Format
-        & \fname{.mmf} 
+        & \fname{.mmf}
         & PCM/ADPCM only \\
     Game Boy Sound Format
         & \fname{.gbs}
@@ -198,7 +198,7 @@
         & Progress bar and seek use subtracks instead of seconds.\\}
     SMS/GG/CV Sound Format
         & \fname{.sgc}
-        & Supports Sega Master System and Game Gear Sound Format. 
+        & Supports Sega Master System and Game Gear Sound Format.
           Progress bar and seek use subtracks instead of seconds.\\
     Video Game Music Format
         & \fname{.vgm}
@@ -207,25 +207,25 @@
         & \fname{.vgz}
         & \\
     MOD
-        & \fname{.mod} 
+        & \fname{.mod}
         & \\
     NES Sound Format
-        & \fname{.nsf}, \fname{.nsfe} 
+        & \fname{.nsf}, \fname{.nsfe}
         & Progress bar and seek use subtracks instead of seconds.\\
     Atari SAP
-        & \fname{.sap} 
+        & \fname{.sap}
         & \\
     Sound Interface Device
-        & \fname{.sid} 
+        & \fname{.sid}
         & Progress bar and seek use subtracks instead of seconds.\\
     SPC700
-        & \fname{.spc} 
+        & \fname{.spc}
         & \\
   \end{rbtabular}
-  
-  \note{NSF and VGM might not play in realtime on all devices due to CPU 
+
+  \note{NSF and VGM might not play in realtime on all devices due to CPU
   performance requirements.}
-  
+
   \subsection{Codec featureset}
   \begin{rbtabular}{.95\textwidth}{lXXX}%
   {\textbf{Format} & \textbf{Seek} & \textbf{Resume} & \textbf{Gapless}}{}{}
@@ -265,22 +265,22 @@
     Sound Interface Device                      & x &   &   \\
     SPC700                                      & x &   &   \\
   \end{rbtabular}
-  
+
   \note{The seek implementations of NES Sound Format, Sound Interface Device,
   Game Boy Sound Format, AY Sound Chip Music, Hudson Entertainment System Sound,
   Format, MSX Konami Sound System and SMS/GG/CV Sound Format use subtracks
   instead of seconds, whereas each subtrack equals a second.}
-  
+
   \section{\label{ref:SupportedMetadata}Supported metadata tags}
     Rockbox supports different metadata formats. In general those tag formats
-    are ID3 (v1.0, v1.1, v2.2, v2.3 and v2.4), APE (v1 and v2), Vorbis, MP4 and 
-    ASF. Few codecs use codec specific tags, several codecs do not use any tags 
-    yet. The following table gives an overview about what tag types rockbox 
+    are ID3 (v1.0, v1.1, v2.2, v2.3 and v2.4), APE (v1 and v2), Vorbis, MP4 and
+    ASF. Few codecs use codec specific tags, several codecs do not use any tags
+    yet. The following table gives an overview about what tag types rockbox
     supports for which audio file extension.
-    
+
     \note{There is always only \emph{one} tag type supported for each file
     extension.}
-    
+
     \begin{rbtabular}{\textwidth}{lX}%
     {\textbf{Tag type} & \textbf{File extension}}{}{}
       ID3               & \fname{.mp1}, \fname{.mpa}, \fname{.mp2}, \fname{.mp3},
@@ -299,11 +299,11 @@
                           \fname{.cms}, \fname{.dmc}, \fname{.dlt}, \fname{.mpt},
                           \fname{.mpd}, \fname{.hes}, \fname{.vgz} \\
     \end{rbtabular}
-    
+
     \subsection{Featureset for generic metadata tags}
     \label{ref:featureset_for_generic_metadata_tags}
     \begin{rbtabular}{0.90\textwidth}{lXXXXX}%
-    {\textbf{Feature} & \textbf{ID3} & \textbf{APE} & \textbf{Vorbis} & 
+    {\textbf{Feature} & \textbf{ID3} & \textbf{APE} & \textbf{Vorbis} &
      \textbf{MP4} & \textbf{ASF}}{}{}
      Embedded albumart \fname{.bmp}     &   & x &   &   &   \\
      Embedded albumart \fname{.jpg}     & x & x &   & x & x \\
@@ -322,9 +322,9 @@
      Albumartist (string)               & x & x & x & x & x \\
      Grouping (string)                  &   & x & x & x &   \\
     \end{rbtabular}
-    
+
     \note{Embedded album art for ASF is limited to pictures of maximum 64 KB size.}
-    
+
     \subsection{Featureset for codec specific metadata}
     \begin{rbtabular}{\textwidth}{lX}%
     {\textbf{Feature} & \textbf{Codec specific metadata (file extension)}}{}{}
@@ -332,12 +332,12 @@
      Embedded \fname{.jpg}  & None \\
      Embedded \fname{.png}  & None \\
      Replaygain             & \fname{.mpc}\\
-     Title                  & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid}, 
-                              \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf}, 
+     Title                  & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid},
+                              \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf},
                               \fname{.nsfe}, \fname{.mod}, \fname{.sap}, \fname{.gbs},
                               \fname{.ay}, \fname{.sgc}, \fname{.vgm} \\
-     Artist                 & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid}, 
-                              \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf}, 
+     Artist                 & \fname{.tta}, \fname{.spc}, \fname{.mmf}, \fname{.sid},
+                              \fname{.rm}, \fname{.ra}, \fname{.rmvb}, \fname{.nsf},
                               \fname{.nsfe}, \fname{.sap}, \fname{.gbs}, \fname{.ay},
                               \fname{.sgc}, \fname{.vgm} \\
      Album                  & \fname{.spc}, \fname{.sid}, \fname{.nsf}, \fname{.nsfe},
@@ -352,15 +352,15 @@
      Albumartist            & None \\
      Grouping               & None \\
     \end{rbtabular}
-    
+
     \subsection{Limitations of metadata handling}
     \begin{enumerate}
-        \item Multiple tags (e.g. for Genre) are not supported. The first tag 
+        \item Multiple tags (e.g. for Genre) are not supported. The first tag
               item of a set of multiple tags is used.
         \item Only one tag type is supported for each audio format.
     \nopt{lowmem,himem}{
         \item Overall there are 900 bytes available to load metadata strings.
-        \item The maximum size of each metadata item (e.g. Artists) is limited 
+        \item The maximum size of each metadata item (e.g. Artists) is limited
               to 240 bytes.
     }
     \opt{himem}{
@@ -370,7 +370,7 @@
     }
     \opt{lowmem}{
         \item Overall there are 300 bytes available to load metadata strings.
-        \item The maximum size of each metadata item (e.g. Artists) is limited 
+        \item The maximum size of each metadata item (e.g. Artists) is limited
               to 90 bytes.
     }
     \end{enumerate}

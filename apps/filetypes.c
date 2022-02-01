@@ -66,6 +66,7 @@ static const struct filetype inbuilt_filetypes[] = {
     { "m4b", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mp4", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "mod", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
+    { "mpga", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "shn", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "aif", FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
     { "aiff",FILE_ATTR_AUDIO, Icon_Audio, VOICE_EXT_MPA },
@@ -301,8 +302,8 @@ void read_viewer_theme_file(void)
     {
         custom_filetype_icons[i] = filetypes[i].icon;
     }
-    
-    snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR, 
+
+    snprintf(buffer, MAX_PATH, "%s/%s.icons", ICON_DIR,
              global_settings.viewers_icon_file);
     fd = open(buffer, O_RDONLY);
     if (fd < 0)
