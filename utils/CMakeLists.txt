@@ -35,6 +35,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     endif()
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Wall -Wextra)
+    add_link_options($<$<CONFIG:RELEASE>:-s>)
 endif()
 
 
