@@ -142,6 +142,23 @@ def get_object(repo, blob, destfile):
     return True
 
 
+def parse_rev(repo, hash):
+    '''Retrieve output of git rev-parse for a given hash.
+    @param repo Path to repository root.
+    @param hash Hash identifying the tree / commit to describe.
+    @return Description string.
+    '''
+    output = subprocess.Popen(
+        ["git", "rev-parse", "--verify", "--short=10", hash],
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=repo)
+    cmdout = output.communicate()
+    if len(cmdout[1]) > 0:
+        print("An error occured!\n")
+        print(cmdout[1])
+        return ""
+    return cmdout[0].decode().rstrip()
+
+
 def describe_treehash(repo, treehash):
     '''Retrieve output of git-describe for a given hash.
     @param repo Path to repository root.

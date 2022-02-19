@@ -1,13 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 #             __________               __   ___.
 #   Open      \______   \ ____   ____ |  | _\_ |__   _______  ___
 #   Source     |       _//  _ \_/ ___\|  |/ /| __ \ /  _ \  \/  /
 #   Jukebox    |    |   (  <_> )  \___|    < | \_\ (  <_> > <  <
 #   Firmware   |____|_  /\____/ \___  >__|_ \|___  /\____/__/\_ \
 #                     \/            \/     \/    \/            \/
-# $Id$
 #
-# Copyright (c) 2010 Dominik Riebeling
+# Copyright (c) 2022 Dominik Riebeling
 #
 # All files in this archive are subject to the GNU General Public License.
 # See the file COPYING in the source tree root for full license agreement.
@@ -16,13 +15,44 @@
 # KIND, either express or implied.
 #
 
-import deploy
+import os
+import sys
+import gitscraper
 
-deploy.program = "RockboxUtility"
-deploy.project = "rbutil/rbutilqt/rbutilqt.pro"
-deploy.svnserver = "svn://svn.rockbox.org/rockbox/"
-deploy.svnpaths = \
-           ["rbutil/",
+if len(sys.argv) < 2:
+    print("Usage: %s <version|hash>" % sys.argv[0])
+    sys.exit()
+
+repository = os.path.abspath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "../.."))
+
+if '.' in sys.argv[1]:
+    version = sys.argv[1]
+    basename = f"RockboxUtility-v{version}-src"
+    ref = f"refs/tags/rbutil_{version}"
+    refs = gitscraper.get_refs(repository)
+    if ref in refs:
+        tree = refs[ref]
+    else:
+        print("Could not find hash for version!")
+        sys.exit()
+else:
+    tree = gitscraper.parse_rev(repository, sys.argv[1])
+    basename = f"RockboxUtility-{tree}"
+
+filelist = ["utils/rbutilqt",
+            "utils/ipodpatcher",
+            "utils/sansapatcher",
+            "utils/mkamsboot",
+            "utils/chinachippatcher",
+            "utils/mks5lboot",
+            "utils/mkmpioboot",
+            "utils/mkimxboot",
+            "utils/mktccboot",
+            "utils/bspatch",
+            "utils/bzip2",
+            "utils/cmake",
+            "utils/CMakeLists.txt",
             "tools/ucl",
             "tools/rbspeex",
             "utils/imxtools",
@@ -48,41 +78,8 @@ deploy.svnpaths = \
             "tools/voicefont.h",
             "tools/wavtrim.c",
             "tools/sapi_voice.vbs"]
-deploy.useupx = False
-deploy.bundlecopy = {
-    "icons/rbutilqt.icns" : "Contents/Resources/",
-    "Info.plist"          : "Contents/"
-}
-deploy.progexe = {
-    "win32"    : "release/RockboxUtility.exe",
-    "darwin"   : "RockboxUtility.app",
-    "linux2"   : "RockboxUtility",
-    "linux"    : "RockboxUtility"
-}
-deploy.regreplace = {
-    "rbutil/rbutilqt/version.h"  : [["\$Rev\$", "%REVISION%"],
-                                    ["(^#define BUILDID).*", "\\1 \"%BUILDID%\""]],
-    "rbutil/rbutilqt/Info.plist" : [["\$Rev\$", "%REVISION%"]],
-}
-# OS X 10.6 defaults to gcc 4.2. Building universal binaries that are
-# compatible with 10.4 requires using gcc-4.0.
-deploy.qmakespec = {
-    "win32"    : "",
-    "darwin"   : "macx-g++40",
-    "linux2"   : "",
-    "linux"    : ""
-}
-deploy.make = {
-    "win32"    : "mingw32-make",
-    "darwin"   : "make",
-    "linux2"   : "make",
-    "linux"    : "make"
-}
 
-# all files of the program. Will get put into an archive after building
-# (zip on w32, tar.bz2 on Linux). Does not apply on Mac which uses dmg.
-# progexe will get added automatically.
-deploy.programfiles = list()
-deploy.nsisscript = ""
+print(f"Getting git revision {tree}")
+gitscraper.archive_files(repository, tree, filelist, basename, archive="tbz")
 
-deploy.deploy()
+print(f"Created {basename}.tar.bz2.")
