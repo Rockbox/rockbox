@@ -123,7 +123,8 @@ if(APPLE)
 endif()
 
 target_link_libraries(RockboxUtility rbbase cutelogger gitversion
-    Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia)
+    Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia
+    Qt${QT_VERSION_MAJOR}::Svg)
 
 target_include_directories(RockboxUtility PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/gui

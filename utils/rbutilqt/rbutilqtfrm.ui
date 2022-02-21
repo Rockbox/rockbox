@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>650</width>
-    <height>399</height>
+    <width>631</width>
+    <height>441</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,8 +19,8 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_3">
-    <item row="0" column="0">
-     <widget class="QLabel" name="logoLabel">
+    <item row="0" column="1">
+     <widget class="QSvgWidget" name="logoLabel" native="true">
       <property name="minimumSize">
        <size>
         <width>200</width>
@@ -39,21 +39,15 @@
         <height>62</height>
        </size>
       </property>
-      <property name="text">
-       <string comment="Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox."/>
+      <property name="toolTip">
+       <string>Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox.</string>
       </property>
-      <property name="pixmap">
-       <pixmap resource="rbutilqt.qrc">:/icons/rockbox-logo.svg</pixmap>
-      </property>
-      <property name="scaledContents">
-       <bool>true</bool>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
+      <property name="accessibleName">
+       <string>Rockbox Logo</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
+    <item row="0" column="2">
      <widget class="QGroupBox" name="groupBoxDevice">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -74,7 +68,7 @@
           <string/>
          </property>
          <property name="pixmap">
-          <pixmap resource="rbutilqt.qrc">:/icons/rockbox-32.png</pixmap>
+          <pixmap>:/icons/rockbox-32.png</pixmap>
          </property>
          <property name="scaledContents">
           <bool>false</bool>
@@ -159,7 +153,7 @@
       </layout>
      </widget>
     </item>
-    <item row="1" column="0" colspan="2">
+    <item row="1" column="0" colspan="3">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -384,8 +378,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>650</width>
-     <height>22</height>
+     <width>631</width>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -632,6 +626,14 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QSvgWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QSvgWidget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>buttonChangeDevice</tabstop>
