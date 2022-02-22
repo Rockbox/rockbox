@@ -247,8 +247,7 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "SELECT = Yes"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
@@ -256,8 +255,7 @@
   <dest>
     *: "PLAY = Áno"
     cowond2*: "MENU, alebo vpravo-hore = Áno"
-    creativezen*: "SELECT = Áno"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Áno"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Áno"
     iriverh100,iriverh120,iriverh300: "NAVI = Áno"
     mrobe500: "PLAY, POWER, alebo Vpravo-hore = Áno"
     vibe500: "OK = Áno"
@@ -3395,14 +3393,17 @@
   <source>
     *: none
     battery_types: "Alkaline"
+    xduoox3: "Newer (2000 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "Alkalická"
+    xduoox3: "Newer (2000 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Alkalická"
+    xduoox3: "Newer 2000 milliamp hour"
   </voice>
 </phrase>
 <phrase>
@@ -3412,14 +3413,17 @@
   <source>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </source>
   <dest>
     *: none
     battery_types: "NiMH"
+    xduoox3: "Older (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Nikel metal hydridová"
+    xduoox3: "Older 1500 milliamp hour"
   </voice>
 </phrase>
 <phrase>
@@ -5987,12 +5991,10 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Batéria: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Bat: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </dest>
   <voice>
     *: "Stav batérie"
@@ -6032,14 +6034,17 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "MSD1:"
   </dest>
   <voice>
     *: "Interný"
+    hibylinux: "micro S D"
     xduoox3: "mikro S D 1"
   </voice>
 </phrase>
@@ -6264,16 +6269,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Prehrať Ďalšie"
+    *: ""
   </dest>
   <voice>
-    *: "Prehrať ďalšie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -9611,6 +9616,7 @@
   </dest>
   <voice>
     *: none
+    fiiom3k: "Touchpad Sensitivity"
     gigabeatfx: "Citlivosť dotykovej plochy"
     sansafuzeplus: "Citlivosť Dotykovej Plochy"
   </voice>
@@ -12287,13 +12293,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
-    *: "Skočiť"
+    *: "Vyňať skočenie"
   </dest>
   <voice>
-    *: "Skočiť"
+    *: "Vyňať skočenie"
   </voice>
 </phrase>
 <phrase>
@@ -12301,7 +12307,7 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
     *: "Vypnúť upozornenie"
@@ -12469,13 +12475,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
-    *: "Prehrať"
+    *: "Vyňať prehratie"
   </dest>
   <voice>
-    *: "Prehrať"
+    *: "Vyňať prehratie"
   </voice>
 </phrase>
 <phrase>
@@ -12483,13 +12489,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
-    *: "preskočiť"
+    *: "Vyňať preskočenie"
   </dest>
   <voice>
-    *: "Preskočiť"
+    *: "Vyňať preskočenie"
   </voice>
 </phrase>
 <phrase>
@@ -12885,11 +12891,11 @@
     lowmem: none
   </source>
   <dest>
-    *: "Reverberation"
+    *: "Ozvena"
     lowmem: none
   </dest>
   <voice>
-    *: "Reverberation"
+    *: "Ozvena"
     lowmem: none
   </voice>
 </phrase>
@@ -15301,5 +15307,871 @@
   <voice>
     *: none
     hotkey: "Pridržte pre nastavenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Single Mode"
+  </dest>
+  <voice>
+    *: "Single Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Hlasitosť ozvučenia"
+  </dest>
+  <voice>
+    *: "Hlasitosť ozvučenia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Short Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Short Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Super Slow"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Super Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Linear Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Linear Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Minimum Slow"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Minimum Slow"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Apodizing type 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Apodizing type 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Hybrid Fast"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Hybrid Fast"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Brick Wall"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Brick Wall"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN
+  desc: onplay open plugin
+  user: core
+  <source>
+    *: "Open Plugin"
+  </source>
+  <dest>
+    *: "Open Plugin"
+  </dest>
+  <voice>
+    *: "Open Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_NOT_A_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Not a plugin: %s"
+  </source>
+  <dest>
+    *: "Nie je plugin: %s"
+  </dest>
+  <voice>
+    *: "Nie je plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_OPEN_PLUGIN_SET_WPS_CONTEXT_PLUGIN
+  desc: open plugin module
+  user: core
+  <source>
+    *: "Set Wps Context Plugin"
+  </source>
+  <dest>
+    *: "Set Wps Context Plugin"
+  </dest>
+  <voice>
+    *: "Set WPS Context Plugin"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PARAMETER
+  desc:
+  user: core
+  <source>
+    *: "Parameter"
+  </source>
+  <dest>
+    *: "Parameter"
+  </dest>
+  <voice>
+    *: "Parameter"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_NAME
+  desc:
+  user: core
+  <source>
+    *: "Name"
+  </source>
+  <dest>
+    *: "Názov"
+  </dest>
+  <voice>
+    *: "Názov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ADD
+  desc:
+  user: core
+  <source>
+    *: "Add"
+  </source>
+  <dest>
+    *: "Pridať"
+  </dest>
+  <voice>
+    *: "Pridať"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BACK
+  desc:
+  user: core
+  <source>
+    *: "Back"
+  </source>
+  <dest>
+    *: "Späť"
+  </dest>
+  <voice>
+    *: "Späť"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EDIT
+  desc:
+  user: core
+  <source>
+    *: "Edit"
+  </source>
+  <dest>
+    *: "Upraviť"
+  </dest>
+  <voice>
+    *: "Upraviť"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_RUN
+  desc:
+  user: core
+  <source>
+    *: "Run"
+  </source>
+  <dest>
+    *: "Spustiť"
+  </dest>
+  <voice>
+    *: "Spustiť"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_EXPORT
+  desc:
+  user: core
+  <source>
+    *: "Export"
+  </source>
+  <dest>
+    *: "Exportovať"
+  </dest>
+  <voice>
+    *: "Exportovať"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_BROWSE
+  desc:
+  user: core
+  <source>
+    *: "Browse"
+  </source>
+  <dest>
+    *: "Prehľadávať"
+  </dest>
+  <voice>
+    *: "Prehľadávať"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Prejsť do režimu USB úložiska?"
+  </dest>
+  <voice>
+    *: "Prejsť do režimu USB úložiska?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Vymazať zoznam a prehrať ako ďalšie"
+  </dest>
+  <voice>
+    *: "Vymazať zoznam a prehrať ako ďalšie"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Queue..."
+  </dest>
+  <voice>
+    *: "Queue..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Show Queue Options"
+  </dest>
+  <voice>
+    *: "Show Queue Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Show Shuffled Adding Options"
+  </dest>
+  <voice>
+    *: "Show Shuffled Adding Options"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "V podmenu"
+  </dest>
+  <voice>
+    *: "V podmenu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Vymazať zoznam a prehrať zamiešané"
+  </dest>
+  <voice>
+    *: "Vymazať zoznam a prehrať zamiešané"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Vypnúť všetky upozornenia o zamykaní"
+  </dest>
+  <voice>
+    *: "Vypnúť všetky upozornenia o zamykaní"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Vyňať hlasitosť"
+  </dest>
+  <voice>
+    *: "Vyňať hlasitosť"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Vždy automaticky zamknúť"
+  </dest>
+  <voice>
+    *: "Vždy automaticky zamknúť"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
+  desc: reload playlist after saving
+  user: core
+  <source>
+    *: "Reload After Saving"
+  </source>
+  <dest>
+    *: "Načítať znovu po uložení"
+  </dest>
+  <voice>
+    *: "Načítať znovu po uložení"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Interpret albumu]"
+  </dest>
+  <voice>
+    *: "Interpret albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_GENRE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Žáner]"
+  </dest>
+  <voice>
+    *: "Žáner"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Komentár]"
+  </dest>
+  <voice>
+    *: "Komentár"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Skladateľ]"
+  </dest>
+  <voice>
+    *: "Skladateľ"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Rok]"
+  </dest>
+  <voice>
+    *: "Rok"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Čstopy]"
+  </dest>
+  <voice>
+    *: "Č. stopy"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Čdisku]"
+  </dest>
+  <voice>
+    *: "Č. disku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Frekvencia]"
+  </dest>
+  <voice>
+    *: "Frekvencia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Početbitov]"
+  </dest>
+  <voice>
+    *: "Počet bitov"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICED_DATE_FORMAT
+  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  user: core
+  <source>
+    *: "dAY"
+  </source>
+  <dest>
+    *: "dAY"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "List Wraparound"
+  </dest>
+  <voice>
+    *: "List Wraparound"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Zobraziť správu pri vypínaní"
+  </dest>
+  <voice>
+    *: "Zobraziť správu pri vypínaní"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "Poradie zoznamu"
+  </dest>
+  <voice>
+    *: "Poradie zoznamu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Vzostupne"
+  </dest>
+  <voice>
+    *: "Vzostupne"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Zostupne"
+  </dest>
+  <voice>
+    *: "Zostupne"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Obal albumu"
+  </dest>
+  <voice>
+    *: "Obal albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Uprednostniť vložený"
+  </dest>
+  <voice>
+    *: "Uprednostniť vložený"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Uprednostniť súbor s obrázkom"
+  </dest>
+  <voice>
+    *: "Uprednostniť súbor s obrázkom"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Synchronizovať s časom RDS"
+  </dest>
+  <voice>
+    *: none
+    rds: "Synchronizovať s časom RDS"
   </voice>
 </phrase>
