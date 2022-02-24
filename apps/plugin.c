@@ -46,6 +46,7 @@
 #include "pathfuncs.h"
 #include "load_code.h"
 #include "file.h"
+#include "core_keymap.h"
 
 #if CONFIG_CHARGING
 #include "power.h"
@@ -807,6 +808,7 @@ static const struct plugin_api rockbox_api = {
     battery_current,
     onplay_show_playlist_menu,
     queue_remove_from_head,
+    core_set_keyremap,
 };
 
 static int plugin_buffer_handle;

@@ -934,6 +934,7 @@ struct plugin_api {
     int (*battery_current)(void);
     void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
     void (*queue_remove_from_head)(struct event_queue *q, long id);
+    int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
 };
 
 /* plugin header */

@@ -24,11 +24,15 @@
 #include <stdbool.h>
 #include <inttypes.h>
 #include "config.h"
+#include "action.h"
 #define KEYREMAP_VERSION 1
 #define KEYREMAP_HEADERID (LAST_ACTION_PLACEHOLDER | (TARGET_ID << 8))
 
 /* If exists remap file will be loaded at startup */
 #define CORE_KEYREMAP_FILE ROCKBOX_DIR "/keyremap.kmf"
+
+/* Allocates core buffer, copies keymap to allow buttons for actions to be remapped*/
+int core_set_keyremap(struct button_mapping* core_keymap, int count);
 
 /* open_key_remap(filename , *fd (you must close file_descriptor), *fsize)
  * checks/strips header and returns remaining count

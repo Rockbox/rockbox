@@ -24,25 +24,56 @@
 #include "core_keymap.h"
 
 #if !defined(__PCTOOL__) || defined(CHECKWPS)
+static int keymap_handle = -1;
+
+static int core_alloc_keymap(size_t bufsz)
+{
+    keymap_handle = core_alloc_ex("key remap", bufsz, &buflib_ops_locked);
+    return keymap_handle;
+}
+
+static void core_free_keymap(void)
+{
+    action_set_keymap(NULL, -1);
+    if (keymap_handle > 0) /* free old buffer */
+    {
+        keymap_handle = core_free(keymap_handle);
+    }
+}
+
+/* Allocates buffer from core and copies keymap into it */
+int core_set_keyremap(struct button_mapping* core_keymap, int count)
+{
+
+    core_free_keymap();
+    if (count > 0)
+    {
+        size_t bufsize = count * sizeof(struct button_mapping);
+        if (core_keymap != NULL && core_alloc_keymap(bufsize) > 0)
+        {
+            char *buf = core_get_data(keymap_handle);
+            memcpy(buf, core_keymap, bufsize);
+            count = action_set_keymap((struct button_mapping *) buf, count);
+        }
+        else
+            count = -1;
+    }
+    return count;
+}
+
 int core_load_key_remap(const char *filename)
 {
-    static int keymap_handle = -1;
     char *buf;
     int fd = -1;
     int count = 0;
     size_t fsize = 0;
-    if (keymap_handle > 0) /* free old buffer */
-    {
-        action_set_keymap(NULL, -1);
-        keymap_handle = core_free(keymap_handle);
-    }
+    core_free_keymap();
+
     if (filename != NULL)
         count = open_key_remap(filename, &fd, &fsize);
     while (count > 0)
     {
-
-        keymap_handle = core_alloc_ex("key remap", fsize, &buflib_ops_locked);
-        if (keymap_handle <= 0)
+        if (core_alloc_keymap(fsize) <= 0)
         {
             count = -30;
             break;

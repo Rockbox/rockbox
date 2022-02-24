@@ -105,7 +105,9 @@ enum {
     M_SAVEKEYS,
     M_LOADKEYS,
     M_DELKEYS,
+    M_TMPCORE,
     M_SETCORE,
+    M_DELCORE,
     M_EXIT,
     M_LAST_MAINITEM, //MAIN MENU ITEM COUNT
 /*Menus not directly accessible from main menu*/
@@ -126,7 +128,9 @@ MENU_ITEM(M_RESETKEYS, "Reset Keymap", 1),
 MENU_ITEM(M_SAVEKEYS, "Save Keymap", 1),
 MENU_ITEM(M_LOADKEYS, "Load Keymaps", 1),
 MENU_ITEM(M_DELKEYS, "Delete Keymaps", 1),
+MENU_ITEM(M_TMPCORE, "Temp Core Remap", 1),
 MENU_ITEM(M_SETCORE, "Set Core Remap", 1),
+MENU_ITEM(M_DELCORE, "Delete Core Remap", 1),
 MENU_ITEM(M_EXIT, ID2P(LANG_MENU_QUIT), 0),
 MENU_ITEM(M_ACTIONS, "Actions", LAST_ACTION_PLACEHOLDER),
 MENU_ITEM(M_BUTTONS, "Buttons", -1), /* Set at runtime in plugin_start: */
@@ -878,6 +882,17 @@ int menu_action_root(int *action, int selected_item, bool* exit, struct gui_sync
             {
                 keyset.view_lastcol = -1;
             }
+            else if (cur->menuid == MENU_ID(M_TMPCORE))
+            {
+                int entry_count;/* (ctx_count + ctx_count + act_count + 1) */
+                struct button_mapping *keymap = keyremap_create_temp(&entry_count);
+                if (rb->core_set_keyremap(keymap, entry_count) >= 0)
+                    rb->splash(HZ *2, "Keymap Applied");
+                else
+                    rb->splash(HZ *2, "Error Applying");
+
+                goto default_handler;
+            }
             else if (cur->menuid == MENU_ID(M_SETCORE))
             {
                 if (rb->file_exists(CORE_KEYREMAP_FILE) && 0 == core_savecount++)
@@ -887,7 +902,25 @@ int menu_action_root(int *action, int selected_item, bool* exit, struct gui_sync
                 if (keyremap_save_current(CORE_KEYREMAP_FILE) == 0)
                     rb->splash(HZ *2, "Error Saving");
                 else
-                    rb->splash(HZ *2, "Saved, Restart Device");
+                {
+                    rb->splash(HZ *2, "Saved");
+                    int entry_count;/* (ctx_count + ctx_count + act_count + 1) */
+                    struct button_mapping *keymap = keyremap_create_temp(&entry_count);
+                    rb->core_set_keyremap(keymap, entry_count);
+                }
+                goto default_handler;
+            }
+            else if (cur->menuid == MENU_ID(M_DELCORE))
+            {
+                rb->core_set_keyremap(NULL, -1);
+                if (rb->file_exists(CORE_KEYREMAP_FILE))
+                {
+                    rb->rename(CORE_KEYREMAP_FILE, KMFDIR "/core_deleted" KMFEXT2);
+                    rb->splash(HZ *2, "Removed");
+                }
+                else
+                    rb->splash(HZ *2, "Error Removing");
+
                 goto default_handler;
             }
             else if (cur->menuid == MENU_ID(M_SAVEKEYS))
