@@ -130,7 +130,7 @@ MENU_ITEM(M_LOADKEYS, "Load Keymaps", 1),
 MENU_ITEM(M_DELKEYS, "Delete Keymaps", 1),
 MENU_ITEM(M_TMPCORE, "Temp Core Remap", 1),
 MENU_ITEM(M_SETCORE, "Set Core Remap", 1),
-MENU_ITEM(M_DELCORE, "Delete Core Remap", 1),
+MENU_ITEM(M_DELCORE, "Remove Core Remap", 1),
 MENU_ITEM(M_EXIT, ID2P(LANG_MENU_QUIT), 0),
 MENU_ITEM(M_ACTIONS, "Actions", LAST_ACTION_PLACEHOLDER),
 MENU_ITEM(M_BUTTONS, "Buttons", -1), /* Set at runtime in plugin_start: */
@@ -578,6 +578,8 @@ static int keyremap_load_file(const char *filename)
                 if (offset == 0 || entries <= 0)
                 {
                     logf("keyremap: error reading offset");
+                    count = -15;
+                    goto fail;
                 }
                 logf("keyremap found context: %d file offset: %d entries: %d",
                      context, offset, entries);
@@ -591,18 +593,18 @@ static int keyremap_load_file(const char *filename)
                     bytes = rb->read(fd, &entry, sizeof(struct button_mapping));
                     if (bytes == sizeof(struct button_mapping))
                     {
-                        int action = entry.action_code;
+                        int act = entry.action_code;
                         int button = entry.button_code;
                         int prebtn = entry.pre_button_code;
 
-                        if (action == (int)CONTEXT_STOPSEARCHING || button == BUTTON_NONE)
+                        if (act == (int)CONTEXT_STOPSEARCHING || button == BUTTON_NONE)
                         {
                             logf("keyremap: entry invalid");
                             goto fail;
                         }
                         logf("keyremap: found ctx: %d, act: %d btn: %d pbtn: %d",
-                            context, action, button, prebtn);
-                        keymap_add_button_entry(context, action, button, prebtn);
+                            context, act, button, prebtn);
+                        keymap_add_button_entry(context, act, button, prebtn);
                     }
                     else
                         goto fail;
@@ -958,13 +960,7 @@ int menu_action_root(int *action, int selected_item, bool* exit, struct gui_sync
             }
             else if (cur->menuid == MENU_ID(M_RESETKEYS))
             {
-                rb->splashf(HZ / 2, "Delete Current?");
-                int usract = ACTION_NONE;
-                while (usract <= ACTION_UNKNOWN)
-                {
-                    usract = rb->get_action(CONTEXT_STD, HZ / 10);
-                }
-                if (usract == ACTION_STD_OK)
+                if (rb->yesno_pop("Delete Current Entries?") == true)
                 {
                     keyremap_reset_buffer();
                 }
@@ -1051,9 +1047,9 @@ int menu_action_setkeys(int *action, int selected_item, bool* exit, struct gui_s
             if (ctx_data.act_map[i].display_pos == selected_item - 1)
             {
                 int context = ctx_data.act_map[i].context;
-                int action = ctx_data.act_map[i].map.action_code;
-                int button = ctx_data.act_map[i].map.button_code;
-                int prebtn = ctx_data.act_map[i].map.pre_button_code;
+                int act     = ctx_data.act_map[i].map.action_code;
+                int button  = ctx_data.act_map[i].map.button_code;
+                int prebtn  = ctx_data.act_map[i].map.pre_button_code;
 
                 if (col < 0)
                 {
@@ -1071,7 +1067,7 @@ int menu_action_setkeys(int *action, int selected_item, bool* exit, struct gui_s
                 else if (col == 1) /* Action */
                 {
                     const struct mainmenu *mainm = &mainmenu[M_ACTIONS];
-                    synclist_set_update(mainm->index, action, mainm->items, 1);
+                    synclist_set_update(mainm->index, act, mainm->items, 1);
                     rb->gui_synclist_draw(lists);
                     goto default_handler;
                 }
@@ -1203,23 +1199,23 @@ int menu_action_listfiles(int *action, int selected_item, bool* exit, struct gui
 
                 if (lists->data == MENU_ID(M_DELKEYS))
                 {
-                    rb->splashf(HZ / 2, "Delete %s ?", buf);
-                    int action = ACTION_NONE;
-                    while (action <= ACTION_UNKNOWN)
-                    {
-                        action = rb->get_action(CONTEXT_STD, HZ / 10);
-                    }
-                    if (action == ACTION_STD_OK)
+                    const char *lines[] = {ID2P(LANG_DELETE), buf};
+                    const struct text_message message={lines, 2};
+                    if (rb->gui_syncyesno_run(&message, NULL, NULL)==YESNO_YES)
                     {
                         rb->remove(buf);
                         cur->items--;
                         lists->nb_items--;
+                        *action = ACTION_NONE;
                     }
                 }
                 else if (lists->data == MENU_ID(M_LOADKEYS))
                 {
-                    keyremap_load_file(buf);
-                    rb->splashf(HZ * 2, "Loaded %s ", buf);
+                    if (keyremap_load_file(buf) > 0)
+                    {
+                        rb->splashf(HZ * 2, "Loaded %s ", buf);
+                        *action = ACTION_STD_CANCEL;
+                    }
                 }
             }
         }
@@ -1425,13 +1421,7 @@ int menu_action_cb(int *action, int selected_item, bool* exit, struct gui_syncli
                 if (keymap != NULL && keyset.crc32 != rb->crc_32(keymap,
                     entries * sizeof(struct button_mapping), 0xFFFFFFFF))
                 {
-                    rb->splashf(HZ / 2, "Save?");
-                    int action = ACTION_NONE;
-                    while (action <= ACTION_UNKNOWN)
-                    {
-                        action = rb->get_action(CONTEXT_STD, HZ / 10);
-                    }
-                    if (action == ACTION_STD_OK)
+                    if (rb->yesno_pop("Save Keymap?") == true)
                     {
                         keyremap_save_user_keys(true);
                         goto default_handler;
