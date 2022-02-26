@@ -1495,8 +1495,9 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
                                 struct tagcache_search_clause *clause)
 {
     int i;
+    int clause_count = tcs->clause_count;
 
-    if (tcs->clause_count >= TAGCACHE_MAX_CLAUSES)
+    if (clause_count >= TAGCACHE_MAX_CLAUSES)
     {
         logf("Too many clauses");
         return false;
@@ -1504,13 +1505,19 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
 
     if (clause->type != clause_logical_or)
     {
-        /* Check if there is already a similar filter in present (filters are
-         * much faster than clauses).
-         */
-        for (i = 0; i < tcs->filter_count; i++)
+        /* BUGFIX OR'd clauses seem to be mishandled once made into a filter */
+        if (clause_count <= 1 || tcs->clause[clause_count - 1]->type != clause_logical_or)
         {
-            if (tcs->filter_tag[i] == clause->tag)
-                return true;
+            /* Check if there is already a similar filter in present (filters are
+             * much faster than clauses).
+             */
+            for (i = 0; i < tcs->filter_count; i++)
+            {
+                if (tcs->filter_tag[i] == clause->tag)
+                {
+                    return true;
+                }
+            }
         }
 
         if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
