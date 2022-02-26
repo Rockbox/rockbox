@@ -43,6 +43,7 @@
 
 #include "inflate.h"
 #include <stdbool.h>
+#include <string.h>
 #include "adler32.h"
 #include "crc32.h"
 #include "system.h"
@@ -756,4 +757,28 @@ int inflate(struct inflate* it, int st, inflate_reader read, void* rctx, inflate
         return -48;
 
     return inflate_blocks(it, st, read, rctx, write, wctx);
+}
+
+static uint32_t inflate_buffer_rw(struct inflate_bufferctx* c,
+                                  void* dst, const void* src, uint32_t block_size)
+{
+    size_t size_left = c->end - c->buf;
+    size_t copy_size = MIN((size_t)block_size, size_left);
+
+    memcpy(dst, src, copy_size);
+    c->buf += copy_size;
+
+    return copy_size;
+}
+
+uint32_t inflate_buffer_reader(void* block, uint32_t block_size, void* ctx)
+{
+    struct inflate_bufferctx* c = ctx;
+    return inflate_buffer_rw(c, block, c->buf, block_size);
+}
+
+uint32_t inflate_buffer_writer(const void* block, uint32_t block_size, void* ctx)
+{
+    struct inflate_bufferctx* c = ctx;
+    return inflate_buffer_rw(c, c->buf, block, block_size);
 }

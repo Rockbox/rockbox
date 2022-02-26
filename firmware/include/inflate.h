@@ -23,6 +23,7 @@
 #define _INFLATE_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 enum {
     INFLATE_RAW,
@@ -42,5 +43,19 @@ extern const uint32_t inflate_align;
 // and aligned at 'inflate_align' bytes. 'st' is the type of stream to decompress;
 // see above enum for possible options.
 int inflate(struct inflate* it, int st, inflate_reader read, void* rctx, inflate_writer write, void* wctx);
+
+struct inflate_bufferctx {
+    // initialize this with your input/output buffer.
+    // the pointer is updated as data is read or written.
+    void* buf;
+
+    // buffer end marker (= buf + buf_size).
+    void* end;
+};
+
+// reader and writer for using an in-memory buffer.
+// Use 'inflate_bufferctx' as the context argument.
+uint32_t inflate_buffer_reader(void* block, uint32_t block_size, void* ctx);
+uint32_t inflate_buffer_writer(const void* block, uint32_t block_size, void* ctx);
 
 #endif
