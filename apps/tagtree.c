@@ -1584,6 +1584,19 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
         if (strcmp(tcs.result, UNTAGGED) == 0)
         {
+            if (tag == tag_title) /* Fallback to filename */
+            {
+                char *lastname = dptr->name;
+                dptr->name = core_get_data(c->cache.name_buffer_handle)+namebufused;
+                if (tagcache_retrieve(&tcs, tcs.idx_id, tag_filename, dptr->name,
+                                      c->cache.name_buffer_size - namebufused))
+                {
+                    namebufused += strlen(dptr->name)+1;
+                    goto entry_skip_formatter;
+                }
+                dptr->name = lastname; /* restore last entry if filename failed */
+            }
+
             tcs.result = str(LANG_TAGNAVI_UNTAGGED);
             tcs.result_len = strlen(tcs.result);
             tcs.ramresult = true;
@@ -1632,6 +1645,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
         else
             dptr->name = tcs.result;
 
+entry_skip_formatter:
         dptr++;
         current_entry_count++;
 
