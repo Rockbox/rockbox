@@ -23,6 +23,9 @@
 #include "core_alloc.h"
 #include "core_keymap.h"
 
+/*#define LOGF_ENABLE*/
+#include "logf.h"
+
 #if !defined(__PCTOOL__) || defined(CHECKWPS)
 static int keymap_handle = -1;
 
@@ -76,6 +79,7 @@ int core_load_key_remap(const char *filename)
         if (core_alloc_keymap(fsize) <= 0)
         {
             count = -30;
+            logf("core_keymap: %d Failed to allocate buffer", count);
             break;
         }
         buf = core_get_data(keymap_handle);
@@ -84,7 +88,10 @@ int core_load_key_remap(const char *filename)
             count = action_set_keymap((struct button_mapping *) buf, count);
         }
         else
+        {
             count = -40;
+            logf("core_keymap: %d Failed to read", count);
+        }
         break;
     }
     close(fd);
@@ -108,6 +115,7 @@ int open_key_remap(const char *filename, int *fd, size_t *fsize)
             if (count * sizeof(struct button_mapping) != *fsize)
             {
                 count = -10;
+                logf("core_keymap: %d Size mismatch", count);
                 break;
             }
 
@@ -125,6 +133,7 @@ int open_key_remap(const char *filename, int *fd, size_t *fsize)
                 else /* Header mismatch */
                 {
                     count = -20;
+                    logf("core_keymap: %d Header mismatch", count);
                     break;
                 }
             }

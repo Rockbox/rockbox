@@ -419,7 +419,6 @@ typedef struct
     bool          wait_for_release;
 
 #ifndef DISABLE_ACTION_REMAP
-    bool check_remap;
     struct button_mapping* core_keymap;
 #endif
 
