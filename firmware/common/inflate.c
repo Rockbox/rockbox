@@ -782,3 +782,12 @@ uint32_t inflate_buffer_writer(const void* block, uint32_t block_size, void* ctx
     struct inflate_bufferctx* c = ctx;
     return inflate_buffer_rw(c, c->buf, block, block_size);
 }
+
+uint32_t inflate_getsize_writer(const void* block, uint32_t block_size, void* ctx)
+{
+    (void)block;
+
+    size_t* size = ctx;
+    *size += block_size;
+    return block_size;
+}

@@ -58,4 +58,13 @@ struct inflate_bufferctx {
 uint32_t inflate_buffer_reader(void* block, uint32_t block_size, void* ctx);
 uint32_t inflate_buffer_writer(const void* block, uint32_t block_size, void* ctx);
 
+// dummy writer used if you just want to figure out how big the decompressed
+// data will be. It does not actually write any data. Example usage:
+//
+//   size_t size = 0;
+//   inflate(it, st, read, rctx, inflate_getsize_writer, &size);
+//
+// Now 'size' will be the size of the decompressed data (assuming no errors).
+uint32_t inflate_getsize_writer(const void* block, uint32_t block_size, void* ctx);
+
 #endif
