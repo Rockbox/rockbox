@@ -443,7 +443,7 @@ static int open_master_fd(struct master_header *hdr, bool write)
 
     /* Check the header. */
     rc = read(fd, hdr, sizeof(struct master_header));
-    if (hdr->tch.magic == TAGCACHE_MAGIC && rc == sizeof(struct master_header))
+    if (rc == sizeof(struct master_header) && hdr->tch.magic == TAGCACHE_MAGIC)
     {
         /* Success. */
         return fd;
@@ -453,7 +453,7 @@ static int open_master_fd(struct master_header *hdr, bool write)
     lseek(fd, 0, SEEK_SET);
 
     rc = ecread(fd, hdr, 1, master_header_ec, true);
-    if (hdr->tch.magic != TAGCACHE_MAGIC || rc != sizeof(struct master_header))
+    if (rc != sizeof(struct master_header) || hdr->tch.magic != TAGCACHE_MAGIC)
     {
         logf("header error");
         tc_stat.ready = false;
@@ -3935,13 +3935,13 @@ static void fix_ramcache(void* old_addr, void* new_addr)
 
 static int move_cb(int handle, void* current, void* new)
 {
+    (void)handle;
     if (tcramcache.move_lock > 0)
         return BUFLIB_CB_CANNOT_MOVE;
 
     fix_ramcache(current, new);
     tcramcache.hdr = new;
     return BUFLIB_CB_OK;
-    (void)handle;
 }
 
 static struct buflib_callbacks ops = {

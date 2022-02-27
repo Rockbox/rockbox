@@ -38,9 +38,11 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
     /* Real tags end here, count them. */
     TAG_COUNT,
     /* Virtual tags */
-    tag_virt_basename, tag_virt_length_min, tag_virt_length_sec,
+    tag_virt_basename=TAG_COUNT,
+    tag_virt_length_min, tag_virt_length_sec,
     tag_virt_playtime_min, tag_virt_playtime_sec,
-    tag_virt_entryage, tag_virt_autoscore };
+    tag_virt_entryage, tag_virt_autoscore,
+    TAG_COUNT_ALL};
 
 /* Maximum length of a single tag. */
 #define TAG_MAXLEN (MAX_PATH*2)
