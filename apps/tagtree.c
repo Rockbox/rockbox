@@ -398,26 +398,28 @@ static int get_tag(int *tag)
 
 static int get_clause(int *condition)
 {
-    static const struct match get_clause_match[] =
-    {
-        {"=", clause_is},
-        {"==", clause_is},
-        {"!=", clause_is_not},
-        {">", clause_gt},
-        {">=", clause_gteq},
-        {"<", clause_lt},
-        {"<=", clause_lteq},
-        {"~", clause_contains},
-        {"!~", clause_not_contains},
-        {"^", clause_begins_with},
-        {"!^", clause_not_begins_with},
-        {"$", clause_ends_with},
-        {"!$", clause_not_ends_with},
-        {"@", clause_oneof}
-    };
+    /* one or two operator conditionals */ 
+    #define OPS2VAL(op1, op2) ((int)op1 << 8 | (int)op2)
+    #define CLAUSE(op1, op2, symbol) {OPS2VAL(op1, op2), symbol }
 
-    char buf[4];
-    unsigned int i;
+    struct clause_symbol {int value;int symbol;};
+    static const struct clause_symbol get_clause_match[] =
+    {
+        CLAUSE('=', ' ', clause_is),
+        CLAUSE('=', '=', clause_is),
+        CLAUSE('!', '=', clause_is_not),
+        CLAUSE('>', ' ', clause_gt),
+        CLAUSE('>', '=', clause_gteq),
+        CLAUSE('<', ' ', clause_lt),
+        CLAUSE('<', '=', clause_lteq),
+        CLAUSE('~', ' ', clause_contains),
+        CLAUSE('!', '~', clause_not_contains),
+        CLAUSE('^', ' ', clause_begins_with),
+        CLAUSE('!', '^', clause_not_begins_with),
+        CLAUSE('$', ' ', clause_ends_with),
+        CLAUSE('!', '$', clause_not_ends_with),
+        CLAUSE('@', ' ', clause_oneof)
+    };
 
     /* Find the start. */
     while (*strp == ' ' && *strp != '\0')
@@ -426,18 +428,16 @@ static int get_clause(int *condition)
     if (*strp == '\0')
         return 0;
 
-    for (i = 0; i < sizeof(buf)-1; i++)
-    {
-        if (*strp == '\0' || *strp == ' ')
-            break ;
-        buf[i] = *strp;
-        strp++;
-    }
-    buf[i] = '\0';
+    char op1 = strp[0];
+    char op2 = strp[1];
+    if (op2 == '"') /*allow " to end a single op conditional */
+        op2 = ' ';
 
-    for (i = 0; i < ARRAYLEN(get_clause_match); i++)
+    int value = OPS2VAL(op1, op2);
+
+    for (unsigned int i = 0; i < ARRAYLEN(get_clause_match); i++)
     {
-        if (!strcasecmp(buf, get_clause_match[i].str))
+        if (value == get_clause_match[i].value)
         {
             *condition = get_clause_match[i].symbol;
             return 1;
@@ -445,6 +445,8 @@ static int get_clause(int *condition)
     }
 
     return 0;
+#undef OPS2VAL
+#undef CLAUSE
 }
 
 static bool read_clause(struct tagcache_search_clause *clause)
