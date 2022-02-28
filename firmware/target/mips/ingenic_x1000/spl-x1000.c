@@ -432,7 +432,7 @@ void spl_main(void)
     /* handle compression */
     switch(opt->flags & BOOTFLAG_COMPRESSED) {
     case BOOTFLAG_UCLPACK: {
-        uint32_t out_size = X1000_DRAM_END - opt->load_addr;
+        uint32_t out_size = X1000_SDRAM_END - opt->load_addr;
         rc = ucl_unpack((uint8_t*)load_buffer, opt->storage_size,
                         (uint8_t*)opt->load_addr, &out_size);
     } break;
