@@ -17,6 +17,10 @@ project(RockboxUtils)
 
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if (NOT CMAKE_BUILD_TYPE)
+    message("-- CMAKE_BUILD_TYPE not set, assuming Release")
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
     message("-- Found ccache, enabling")
