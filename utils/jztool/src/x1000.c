@@ -25,19 +25,72 @@
 #include <stdbool.h>
 #include <string.h>
 
-/* TODO: these functions could be refactored to be CPU-agnostic */
+#define X1000_TCSM_BASE         0xf4000000
+
+#define X1000_SPL_LOAD_ADDR     (X1000_TCSM_BASE + 0x1000)
+#define X1000_SPL_EXEC_ADDR     (X1000_TCSM_BASE + 0x1800)
+
+#define X1000_STANDARD_DRAM_BASE 0x80004000
+
+#define HDR_BEGIN   128     /* header must begin within this many bytes */
+#define HDR_LEN     256     /* header length cannot exceed this */
+
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+
+/* search for header value, label must be a 4-character string.
+ * Returns the found value or 0 if the label wasn't found. */
+static uint32_t search_header(const unsigned char* source, size_t length,
+                              const char* label)
+{
+    size_t search_len = MIN(length, HDR_BEGIN);
+    if(search_len < 8)
+        return 0;
+    search_len -= 7;
+
+    /* find the beginning marker */
+    size_t i;
+    for(i = 8; i < search_len; i += 4)
+        if(!memcmp(&source[i], "BEGINHDR", 8))
+            break;
+    if(i >= search_len)
+        return 0;
+    i += 8;
+
+    /* search within the header */
+    search_len = MIN(length, i + HDR_LEN) - 7;
+    for(; i < search_len; i += 8) {
+        if(!memcmp(&source[i], "ENDH", 4)) {
+            break;
+        } else if(!memcmp(&source[i], label, 4)) {
+            i += 4;
+            /* read little-endian value */
+            uint32_t ret = source[i];
+            ret |= source[i+1] << 8;
+            ret |= source[i+2] << 16;
+            ret |= source[i+3] << 24;
+            return ret;
+        }
+    }
+
+    return 0;
+}
+
 static int run_stage1(jz_usbdev* dev, jz_buffer* buf)
 {
-    int rc = jz_usb_send(dev, 0xf4001000, buf->size, buf->data);
+    int rc = jz_usb_send(dev, X1000_SPL_LOAD_ADDR, buf->size, buf->data);
     if(rc < 0)
         return rc;
 
-    return jz_usb_start1(dev, 0xf4001800);
+    return jz_usb_start1(dev, X1000_SPL_EXEC_ADDR);
 }
 
 static int run_stage2(jz_usbdev* dev, jz_buffer* buf)
 {
-    int rc = jz_usb_send(dev, 0x80004000, buf->size, buf->data);
+    uint32_t load_addr = search_header(buf->data, buf->size, "LOAD");
+    if(!load_addr)
+        load_addr = X1000_STANDARD_DRAM_BASE;
+
+    int rc = jz_usb_send(dev, load_addr, buf->size, buf->data);
     if(rc < 0)
         return rc;
 
@@ -45,11 +98,16 @@ static int run_stage2(jz_usbdev* dev, jz_buffer* buf)
     if(rc < 0)
         return rc;
 
-    return jz_usb_start2(dev, 0x80004000);
+    return jz_usb_start2(dev, load_addr);
 }
 
+enum {
+    F_DECOMPRESS = 0x01,
+    F_OPTIONAL   = 0x02,
+};
+
 static int get_file(jz_context* jz, mtar_t* tar, const char* file,
-                    bool decompress, jz_buffer** buf)
+                    unsigned int flags, jz_buffer** buf)
 {
     jz_buffer* buffer = NULL;
     const mtar_header_t* h;
@@ -57,8 +115,9 @@ static int get_file(jz_context* jz, mtar_t* tar, const char* file,
 
     rc = mtar_find(tar, file);
     if(rc != MTAR_ESUCCESS) {
-        jz_log(jz, JZ_LOG_ERROR, "can't find %s in boot file, tar error %d", file, rc);
-        return JZ_ERR_BAD_FILE_FORMAT;
+        if(!(flags & F_OPTIONAL))
+            jz_log(jz, JZ_LOG_ERROR, "can't find %s in boot file, tar error %d", file, rc);
+        return JZ_ERR_OPEN_FILE;
     }
 
     h = mtar_get_header(tar);
@@ -73,7 +132,7 @@ static int get_file(jz_context* jz, mtar_t* tar, const char* file,
         return JZ_ERR_BAD_FILE_FORMAT;
     }
 
-    if(decompress) {
+    if(flags & F_DECOMPRESS) {
         uint32_t dst_len;
         jz_buffer* nbuf = jz_ucl_unpack(buffer->data, buffer->size, &dst_len);
         jz_buffer_free(buffer);
@@ -139,9 +198,27 @@ int jz_x1000_boot(jz_usbdev* dev, jz_device_type type, const char* filename)
     if(rc != JZ_SUCCESS)
         goto error;
 
-    rc = get_file(dev->jz, &tar, "bootloader.ucl", true, &bootloader);
-    if(rc != JZ_SUCCESS)
+    /* - A bootloader2.ucl binary should carry the LOAD header to define its
+     *   load address. This name must be used when the load address is not
+     *   equal to 0x80004000 to ensure old jztools will not try to load it.
+     *
+     * - The bootloader.ucl name must only be used when the binary loads at
+     *   0x80004000 and can be booted by old versions of jztool.
+     */
+    const char* bl_files[2] = {"bootloader2.ucl", "bootloader.ucl"};
+    for(int i = 0; i < 2; ++i) {
+        rc = get_file(dev->jz, &tar, bl_files[i],
+                      F_DECOMPRESS|F_OPTIONAL, &bootloader);
+        if(rc == JZ_SUCCESS)
+            break;
+        else if(rc != JZ_ERR_OPEN_FILE)
+            goto error;
+    }
+
+    if(rc != JZ_SUCCESS) {
+        jz_log(dev->jz, JZ_LOG_ERROR, "no bootloader binary found", filename);
         goto error;
+    }
 
     rc = get_file(dev->jz, &tar, "bootloader-info.txt", false, &info_file);
     if(rc != JZ_SUCCESS)
