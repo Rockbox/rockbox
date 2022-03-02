@@ -111,7 +111,7 @@ enum variables {
 
 /* Capacity 10 000 entries (for example 10k different artists) */
 #define UNIQBUF_SIZE (64*1024)
-static long uniqbuf[UNIQBUF_SIZE / sizeof(long)];
+static uint32_t uniqbuf[UNIQBUF_SIZE / sizeof(uint32_t)];
 
 #define MAX_TAGS 5
 #define MAX_MENU_ID_SIZE 32

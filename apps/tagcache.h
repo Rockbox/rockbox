@@ -188,7 +188,7 @@ struct tagcache_search {
     int entry_count;
     bool valid;
     bool initialized;
-    unsigned long *unique_list;
+    uint32_t *unique_list;
     int unique_list_capacity;
     int unique_list_count;
 
