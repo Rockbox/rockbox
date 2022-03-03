@@ -28,17 +28,14 @@
 #include "pathfuncs.h"
 #include "timefuncs.h"
 #include "fileobj_mgr.h"
-#include "dircache_redirect.h"
+#include "rb_namespace.h"
 
 /* structure used for open directory streams */
 static struct dirstr_desc
 {
     struct filestr_base stream; /* basic stream info (first!) */
-    struct dirscan_info scan;   /* directory scan cursor */
+    struct ns_scan_info scan;   /* directory scan cursor */
     struct dirent       entry;  /* current parsed entry information */
-#ifdef HAVE_MULTIVOLUME
-    int                 volumecounter; /* counter for root volume entries */
-#endif
 } open_streams[MAX_OPEN_DIRS];
 
 /* check and return a struct dirstr_desc* from a DIR* */
@@ -48,7 +45,7 @@ static struct dirstr_desc * get_dirstr(DIR *dirp)
 
     if (!PTR_IN_ARRAY(open_streams, dir, MAX_OPEN_DIRS))
         dir = NULL;
-    else if (dir->stream.flags & FDO_BUSY)
+    else if (dir->stream.flags & (FDO_BUSY|FD_VALID))
         return dir;
 
     int errnum;
@@ -105,50 +102,6 @@ static struct dirstr_desc * alloc_dirstr(void)
     return NULL;
 }
 
-#ifdef HAVE_MULTIVOLUME
-static int readdir_volume_inner(struct dirstr_desc *dir, struct dirent *entry)
-{
-    /* Volumes (secondary file systems) get inserted into the system root
-     * directory. If the path specified volume 0, enumeration will not
-     * include other volumes, but just its own files and directories.
-     *
-     * Fake special directories, which don't really exist, that will get
-     * redirected upon opendir()
-     */
-    while (++dir->volumecounter < NUM_VOLUMES)
-    {
-        /* on the system root */
-        if (!fat_ismounted(dir->volumecounter))
-            continue;
-
-        get_volume_name(dir->volumecounter, entry->d_name);
-        dir->entry.info.attr    = ATTR_MOUNT_POINT;
-        dir->entry.info.size    = 0;
-        dir->entry.info.wrtdate = 0;
-        dir->entry.info.wrttime = 0;
-        return 1;
-    }
-
-    /* do normal directory entry fetching */
-    return 0;
-}
-#endif /* HAVE_MULTIVOLUME */
-
-static inline int readdir_volume(struct dirstr_desc *dir,
-                                 struct dirent *entry)
-{
-#ifdef HAVE_MULTIVOLUME
-    /* fetch virtual volume entries? */
-    if (dir->volumecounter < NUM_VOLUMES)
-        return readdir_volume_inner(dir, entry);
-#endif /* HAVE_MULTIVOLUME */
-
-    /* do normal directory entry fetching */
-    return 0;
-    (void)dir; (void)entry;
-}
-
-
 /** POSIX interface **/
 
 /* open a directory */
@@ -166,20 +119,12 @@ DIR * opendir(const char *dirname)
     if (!dir)
         FILE_ERROR(EMFILE, RC);
 
-    rc = open_stream_internal(dirname, FF_DIR, &dir->stream, NULL);
+    rc = ns_open_stream(dirname, FF_DIR, &dir->stream, &dir->scan);
     if (rc < 0)
     {
         DEBUGF("Open failed: %d\n", rc);
         FILE_ERROR(ERRNO, RC);
     }
-
-#ifdef HAVE_MULTIVOLUME
-    /* volume counter is relevant only to the system root */
-    dir->volumecounter = rc > 1 ? 0 : INT_MAX;
-#endif /* HAVE_MULTIVOLUME */
-
-    fat_rewind(&dir->stream.fatstr);
-    rewinddir_dirent(&dir->scan);
 
     dirp = (DIR *)dir;
 file_error:
@@ -205,7 +150,7 @@ int closedir(DIR *dirp)
         FILE_ERROR(EBADF, -2);
     }
 
-    rc = close_stream_internal(&dir->stream);
+    rc = ns_close_stream(&dir->stream);
     if (rc < 0)
         FILE_ERROR(ERRNO, rc * 10 - 3);
 
@@ -223,16 +168,11 @@ struct dirent * readdir(DIR *dirp)
 
     struct dirent *res = NULL;
 
-    int rc = readdir_volume(dir, &dir->entry);
-    if (rc == 0)
-    {
-        rc = readdir_dirent(&dir->stream, &dir->scan, &dir->entry);
-        if (rc < 0)
-            FILE_ERROR(EIO, RC);
-    }
-
+    int rc = ns_readdir_dirent(&dir->stream, &dir->scan, &dir->entry);
     if (rc > 0)
         res = &dir->entry;
+    else if (rc < 0)
+        FILE_ERROR(EIO, RC);
 
 file_error:
     RELEASE_DIRSTR(READER, dir);
@@ -259,13 +199,9 @@ int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
     if (!dir)
         FILE_ERROR_RETURN(ERRNO, -1);
 
-    int rc = readdir_volume(dir, entry);
-    if (rc == 0)
-    {
-        rc = readdir_dirent(&dir->stream, &dir->scan, entry);
-        if (rc < 0)
-            FILE_ERROR(EIO, rc * 10 - 4);
-    }
+    int rc = ns_readdir_dirent(&dir->stream, &dir->scan, entry);
+    if (rc < 0)
+        FILE_ERROR(EIO, rc * 10 - 4);
 
 file_error:
     RELEASE_DIRSTR(READER, dir);
@@ -289,12 +225,7 @@ void rewinddir(DIR *dirp)
     if (!dir)
         FILE_ERROR_RETURN(ERRNO);
 
-    rewinddir_dirent(&dir->scan);
-
-#ifdef HAVE_MULTIVOLUME
-    if (dir->volumecounter != INT_MAX)
-        dir->volumecounter = 0;
-#endif /* HAVE_MULTIVOLUME */
+    ns_dirscan_rewind(&dir->scan);
 
     RELEASE_DIRSTR(READER, dir);
 }

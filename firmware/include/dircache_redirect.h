@@ -20,7 +20,10 @@
  ****************************************************************************/
 #ifndef _DIRCACHE_REDIRECT_H_
 
+#include "rbpaths.h"
+#include "pathfuncs.h"
 #include "dir.h"
+#include "dircache.h"
 
 /***
  ** Internal redirects that depend upon whether or not dircache is made
@@ -123,10 +126,20 @@ static inline void fileop_onsync_internal(struct filestr_base *stream)
 
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 {
+#ifdef HAVE_MULTIVOLUME
+    char path[VOL_MAX_LEN+2];
+    make_volume_root(volume, path);
+#else
+    const char *path = PATH_ROOTSTR;
+#endif
+    root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
+#ifdef HAVE_MULTIVOLUME
+    if (volume == path_strip_volume(RB_ROOT_CONTENTS_DIR, NULL, false))
+#endif
+        root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
 #ifdef HAVE_DIRCACHE
     dircache_mount();
 #endif
-    IF_MV( (void)volume; )
 }
 
 static inline void volume_onunmount_internal(IF_MV_NONVOID(int volume))
@@ -135,6 +148,7 @@ static inline void volume_onunmount_internal(IF_MV_NONVOID(int volume))
     /* First, to avoid update of something about to be destroyed anyway */
     dircache_unmount(IF_MV(volume));
 #endif
+    root_unmount_volume(IF_MV(volume));
     fileobj_mgr_unmount(IF_MV(volume));
 }
 
@@ -152,7 +166,7 @@ static inline void fileop_onunmount_internal(struct filestr_base *stream)
 
 static inline int readdir_dirent(struct filestr_base *stream,
                                  struct dirscan_info *scanp,
-                                 struct dirent *entry)
+                                 struct DIRENT *entry)
 {
 #ifdef HAVE_DIRCACHE
     return dircache_readdir_dirent(stream, scanp, entry);

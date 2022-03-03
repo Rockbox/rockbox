@@ -51,11 +51,13 @@
 /* internal functions open streams as well; make sure they don't fail if all
    user descs are busy; this needs to be at least the greatest quantity needed
    at once by all internal functions */
+#define MOUNT_AUX_FILEOBJS 1
 #ifdef HAVE_DIRCACHE
-#define AUX_FILEOBJS 3
+#define DIRCACHE_AUX_FILEOBJS 1
 #else
-#define AUX_FILEOBJS 2
+#define DIRCACHE_AUX_FILEOBJS 0
 #endif
+#define AUX_FILEOBJS (2+DIRCACHE_AUX_FILEOBJS+MOUNT_AUX_FILEOBJS)
 
 /* number of components statically allocated to handle the vast majority
    of path depths; should maybe be tuned for >= 90th percentile but for now,

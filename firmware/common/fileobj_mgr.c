@@ -20,12 +20,13 @@
  ****************************************************************************/
 #include "config.h"
 #include "system.h"
+#include <errno.h>
 #include "debug.h"
 #include "file.h"
 #include "dir.h"
 #include "disk_cache.h"
 #include "fileobj_mgr.h"
-#include "dircache_redirect.h"
+#include "rb_namespace.h"
 
 /**
  * Manages file and directory streams on all volumes
@@ -34,8 +35,8 @@
  */
 
 
-/* there will always be enough of these for all user handles, thus these
-   functions don't return failure codes */
+/* there will always be enough of these for all user handles, thus most of
+   these functions don't return failure codes */
 #define MAX_FILEOBJS (MAX_OPEN_HANDLES + AUX_FILEOBJS)
 
 /* describes the file as an image on the storage medium */
@@ -84,6 +85,14 @@ static struct ll_head busy_bindings[NUM_VOLUMES];
     for (struct filestr_base *s = STREAM_##what(start); \
          s; s = STREAM_NEXT(s))
 
+/* once a file/directory, always a file/directory; such a change
+   is a bug */
+#define CHECK_FO_DIRECTORY(callflags, fobp) \
+    if (((callflags) ^ (fobp)->flags) & FO_DIRECTORY) \
+    {                                                            \
+        DEBUGF("%s - FO_DIRECTORY flag does not match: %p %u\n", \
+               __func__, (fobp), (callflags));                   \
+    }
 
 /* syncs information for the stream's old and new parent directory if any are
    currently opened */
@@ -96,6 +105,9 @@ static void fileobj_sync_parent(const struct file_base_info *infop[],
             continue; /* not directory or removed can't be parent of anything */
 
         struct filestr_base *parentstrp = STREAM_FIRST(fobp);
+        if (!parentstrp)
+            continue;
+
         struct fat_file *parentfilep = &parentstrp->infop->fatfile;
 
         for (int i = 0; i < count; i++)
@@ -111,8 +123,8 @@ static void fileobj_sync_parent(const struct file_base_info *infop[],
 }
 
 /* see if this file has open streams and return that fileobj_binding if so,
-   else grab a new one from the free list; returns true if this stream is
-   the only open one */
+   else grab a new one from the free list; returns true if this is new */
+
 static bool binding_assign(const struct file_base_info *srcinfop,
                            struct fileobj_binding **fobpp)
 {
@@ -123,7 +135,7 @@ static bool binding_assign(const struct file_base_info *srcinfop,
 
         if (fat_file_is_same(&srcinfop->fatfile, &fobp->bind.info.fatfile))
         {
-            /* already has open streams */
+            /* already has open streams/mounts*/
             *fobpp = fobp;
             return false;
         }
@@ -141,6 +153,22 @@ static void binding_add_to_free_list(struct fileobj_binding *fobp)
 {
     fobp->flags = 0;
     ll_insert_last(FREE_BINDINGS(), &fobp->bind.node);
+}
+
+static void bind_source_info(const struct file_base_info *srcinfop,
+                             struct fileobj_binding **fobpp)
+{
+    if (!binding_assign(srcinfop, fobpp))
+        return; /* already in use */
+    /* is new */
+    (*fobpp)->bind.info = *srcinfop;
+    fileobj_bind_file(&(*fobpp)->bind);
+}
+
+static void release_binding(struct fileobj_binding *fobp)
+{
+    fileobj_unbind_file(&fobp->bind);
+    binding_add_to_free_list(fobp);
 }
 
 /** File and directory internal interface **/
@@ -169,6 +197,33 @@ void file_binding_remove_next(struct file_base_binding *prevp,
 }
 #endif /* HAVE_DIRCACHE */
 
+/* mounts a file object as a target from elsewhere */
+bool fileobj_mount(const struct file_base_info *srcinfop,
+                   unsigned int callflags,
+                   struct file_base_binding **bindpp)
+{
+    struct fileobj_binding *fobp;
+    bind_source_info(srcinfop, &fobp);
+    CHECK_FO_DIRECTORY(callflags, fobp);
+    if (fobp->flags & FO_MOUNTTARGET)
+        return false;           /* already mounted */
+    fobp->flags |= FDO_BUSY | FO_MOUNTTARGET |
+                   (callflags & FO_DIRECTORY);
+    *bindpp = &fobp->bind;
+    return true;
+}
+/* unmounts the file object and frees it if now unusued */
+void fileobj_unmount(struct file_base_binding *bindp)
+{
+    struct fileobj_binding *fobp = (struct fileobj_binding *)bindp;
+    if (!(fobp->flags & FO_MOUNTTARGET))
+        return;                /* not mounted */
+    if (STREAM_FIRST(fobp) == NULL)
+        release_binding(fobp); /* no longer in use */
+    else
+        fobp->flags &= ~FO_MOUNTTARGET;
+}
+
 /* opens the file object for a new stream and sets up the caches;
  * the stream must already be opened at the FS driver level and *stream
  * initialized.
@@ -180,10 +235,13 @@ void fileobj_fileop_open(struct filestr_base *stream,
                          const struct file_base_info *srcinfop,
                          unsigned int callflags)
 {
+    /* assign base file information */
     struct fileobj_binding *fobp;
-    bool first = binding_assign(srcinfop, &fobp);
+    bind_source_info(srcinfop, &fobp);
+    unsigned int foflags = fobp->flags;
 
     /* add stream to this file's list */
+    bool first = STREAM_FIRST(fobp) == NULL;
     ll_insert_last(&fobp->list, &stream->node);
 
     /* initiate the new stream into the enclave */
@@ -197,27 +255,16 @@ void fileobj_fileop_open(struct filestr_base *stream,
     if (first)
     {
         /* first stream for file */
-        fobp->bind.info = *srcinfop;
-        fobp->flags     = FDO_BUSY | FO_SINGLE |
-                          (callflags & (FO_DIRECTORY|FO_TRUNC));
-        fobp->writers   = 0;
-        fobp->size      = 0;
-
-        fileobj_bind_file(&fobp->bind);
+        fobp->flags   = foflags | FDO_BUSY | FO_SINGLE |
+                        (callflags & (FO_DIRECTORY|FO_TRUNC));
+        fobp->writers = 0;
+        fobp->size    = 0;
     }
     else
     {
         /* additional stream for file */
-        fobp->flags &= ~FO_SINGLE;
-        fobp->flags |= callflags & FO_TRUNC;
-
-        /* once a file/directory, always a file/directory; such a change
-           is a bug */
-        if ((callflags ^ fobp->flags) & FO_DIRECTORY)
-        {
-            DEBUGF("%s - FO_DIRECTORY flag does not match: %p %u\n",
-                   __func__, stream, callflags);
-        }
+        fobp->flags = (foflags & ~FO_SINGLE) | (callflags & FO_TRUNC);
+        CHECK_FO_DIRECTORY(callflags, fobp);
     }
 
     if ((callflags & FD_WRITE) && ++fobp->writers == 1)
@@ -257,12 +304,14 @@ void fileobj_fileop_close(struct filestr_base *stream)
     if (foflags & FO_SINGLE)
     {
        /* last stream for file; close everything */
-        fileobj_unbind_file(&fobp->bind);
-
         if (fobp->writers)
             file_cache_free(&fobp->cache);
 
-        binding_add_to_free_list(fobp); 
+        /* binding must stay valid if something is mounted to here */
+        if (foflags & FO_MOUNTTARGET)
+            fobp->flags = foflags & (FDO_BUSY|FO_DIRECTORY|FO_MOUNTTARGET);
+        else
+            release_binding(fobp);
     }
     else
     {

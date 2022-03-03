@@ -52,6 +52,9 @@
 #define PLUGIN_DIR          ROCKBOX_DIR "/rocks"
 #define CODECS_DIR          ROCKBOX_DIR "/codecs"
 
+#define RB_ROOT_VOL_HIDDEN(v)   (IF_MV_VOL(v) == 0)
+#define RB_ROOT_CONTENTS_DIR    "/" IF_MV("<0>")
+
 #else /* APPLICATION */
 
 #define HOME_DIR "<HOME>" /* replaced at runtime */

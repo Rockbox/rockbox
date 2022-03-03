@@ -87,6 +87,10 @@
 #define VOL_MAX_LEN      (1 + VOL_DEC_MAX_LEN + 2 + 1)
 #define VOL_NUM_MAX      100
 
+#ifndef ROOT_VOLUME
+#define ROOT_VOLUME      INT_MAX
+#endif
+
 #else /* empty definitions if no multi-volume */
 #define IF_MV(x...)
 #define IF_MV_NONVOID(x...) void

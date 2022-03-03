@@ -114,7 +114,7 @@ static const unsigned char storage_dec_indexes[STORAGE_NUM_TYPES+1] =
  */
 int path_strip_volume(const char *name, const char **nameptr, bool greedy)
 {
-    int volume = 0;
+    int volume = ROOT_VOLUME;
     const char *t = name;
     int c, v = 0;
 
@@ -123,9 +123,15 @@ int path_strip_volume(const char *name, const char **nameptr, bool greedy)
      * digits within the brackets is parsed as the volume number and of
      * those, only the last ones VOL_MUM_MAX allows.
      */
-    c = *(t = GOBBLE_PATH_SEPCH(t)); /* skip all leading slashes */
+    t = GOBBLE_PATH_SEPCH(t);   /* skip all leading slashes */
+    if (t == name)
+    {
+        volume = -1;            /* relative path; don't know */
+        goto psv_out;
+    }
+    c = *t;
     if (c != VOL_START_TOK)     /* missing start token? no volume */
-        goto volume0;
+        goto psv_out;
 
     do
     {
@@ -136,7 +142,7 @@ int path_strip_volume(const char *name, const char **nameptr, bool greedy)
             break;
         case '\0':
         case PATH_SEPCH:        /* no closing bracket; no volume */
-            goto volume0;
+            goto psv_out;
         default:                /* something else; reset volume */
             v = 0;
         }
@@ -146,7 +152,7 @@ int path_strip_volume(const char *name, const char **nameptr, bool greedy)
     if (!(c = *++t))            /* no more path and no '/' is ok */
         ;
     else if (c != PATH_SEPCH)   /* more path and no separator after end */
-        goto volume0;
+        goto psv_out;
     else if (greedy)
         t = GOBBLE_PATH_SEPCH(++t); /* strip remaining separators */
 
@@ -155,7 +161,7 @@ int path_strip_volume(const char *name, const char **nameptr, bool greedy)
 
     volume = v;
     name = t;
-volume0:
+psv_out:
     if (nameptr)
         *nameptr = name;
     return volume;
@@ -166,10 +172,13 @@ volume0:
  */
 int get_volume_name(int volume, char *buffer)
 {
-    if (volume < 0)
+    if (volume < 0 || volume == ROOT_VOLUME)
     {
-        *buffer = '\0';
-        return 0;
+        char *t = buffer;
+        if (volume == ROOT_VOLUME)
+            *t++ = PATH_ROOTCHR;
+        *t = '\0';
+        return t - buffer;
     }
 
     volume %= VOL_NUM_MAX; /* as path parser would have it */
@@ -182,7 +191,19 @@ int get_volume_name(int volume, char *buffer)
     return snprintf(buffer, VOL_MAX_LEN + 1, "%c%s%d%c",
                     VOL_START_TOK, voldec, volume, VOL_END_TOK);
 }
+
+/* Returns volume name formatted with the root. Assumes buffer size is at
+ * least {VOL_MAX_LEN}+2 */
+int make_volume_root(int volume, char *buffer)
+{
+    char *t = buffer;
+    if (volume >= 0 && volume != ROOT_VOLUME)
+        *t++ = PATH_ROOTCHR;
+    t += get_volume_name(volume, t);
+    return t - buffer;
+}
 #endif /* HAVE_MULTIVOLUME */
+
 
 /* Just like path_strip_volume() but strips a leading drive specifier and
  * returns the drive number (A=0, B=1, etc.). -1 means no drive was found.

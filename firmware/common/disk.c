@@ -27,7 +27,7 @@
 #include "disk_cache.h"
 #include "fileobj_mgr.h"
 #include "dir.h"
-#include "dircache_redirect.h"
+#include "rb_namespace.h"
 #include "disk.h"
 
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR) && !defined(BOOTLOADER)

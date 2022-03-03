@@ -309,6 +309,8 @@ int sim_get_os_path(char *buffer, const char *path, size_t bufsize)
 
             const char *next;
             volume = path_strip_volume(p, &next, true);
+            if (volume == ROOT_VOLUME)
+                volume = 0; /* FIXME: root no longer implies volume 0 */
 
             if (next > p)
             {

@@ -1473,7 +1473,7 @@ static void sab_process_volume(struct dircache_volume *dcvolp)
  */
 int dircache_readdir_dirent(struct filestr_base *stream,
                             struct dirscan_info *scanp,
-                            struct dirent *entry)
+                            struct DIRENT *entry)
 {
     struct file_base_info *dirinfop = stream->infop;
 
@@ -1760,7 +1760,7 @@ static int sab_process_volume(IF_MV(int volume,) struct dircache_entry *ce)
     return sab_process_dir(ce);
 }
 
-int dircache_readdir_r(struct dircache_dirscan *dir, struct dirent *result)
+int dircache_readdir_r(struct dircache_dirscan *dir, struct DIRENT *result)
 {
     if (dircache_state != DIRCACHE_READY)
         return readdir_r(dir->###########3, result, &result);
@@ -2541,13 +2541,10 @@ static ssize_t get_path_sub(int idx, struct get_path_sub_data *data)
         cename = "";
 
     #ifdef HAVE_MULTIVOLUME
+        /* prepend the volume specifier */
         int volume = IF_MV_VOL(-idx - 1);
-        if (volume > 0)
-        {
-            /* prepend the volume specifier for volumes > 0 */
-            cename = alloca(VOL_MAX_LEN+1);
-            get_volume_name(volume, cename);
-        }
+        cename = alloca(VOL_MAX_LEN+1);
+        get_volume_name(volume, cename);
     #endif /* HAVE_MULTIVOLUME */
 
         data->serialhash = dc_hash_serialnum(get_idx_dcvolp(idx)->serialnum,
