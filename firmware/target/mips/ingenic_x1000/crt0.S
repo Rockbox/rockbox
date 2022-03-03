@@ -25,6 +25,7 @@
     .text
     .extern main
     .extern system_early_init
+    .extern _loadaddress
     .global _start
 
     .set push
@@ -35,6 +36,19 @@
     .section .init.text
 
 _start:
+    b       _realstart
+    nop
+
+    /* Header entries are 4-byte string labels (not null terminated!) followed
+     * by 4-byte values. Header should begin in the first 128 bytes and should
+     * be no more than 256 bytes in length. */
+_header:
+    .ascii  "BEGINHDR"      /* beginning of header */
+    .ascii  "LOAD"
+    .word   _loadaddress
+    .ascii  "ENDH"          /* end of header structure */
+
+_realstart:
     /* Cache init */
     li      v0, 0x80000000
     ori     v1, v0, 0x4000
