@@ -6,6 +6,13 @@ OUTPUT_ARCH(MIPS)
 ENTRY(_start)
 STARTUP(target/mips/ingenic_x1000/crt0.o)
 
+#ifdef BOOTLOADER
+# undef PLUGIN_BUFFER_SIZE
+# undef CODEC_SIZE
+# define PLUGIN_BUFFER_SIZE 0
+# define CODEC_SIZE 0
+#endif
+
 /* End of the audio buffer, where the codec buffer starts */
 #define ENDAUDIOADDR (X1000_DRAM_END - PLUGIN_BUFFER_SIZE - CODEC_SIZE)
 
