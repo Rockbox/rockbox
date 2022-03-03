@@ -57,6 +57,9 @@
 #define X1000_STACKSIZE         0x1e00
 #define X1000_IRQSTACKSIZE      0x300
 
+/* Standard DRAM base address for backward compatibility */
+#define X1000_STANDARD_DRAM_BASE 0x80004000
+
 /* Required for pcm_rec_dma_get_peak_buffer(), doesn't do anything
  * except on targets with recording. */
 #define HAVE_PCM_DMA_ADDRESS

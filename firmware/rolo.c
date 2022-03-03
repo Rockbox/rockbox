@@ -129,9 +129,10 @@ static void rolo_error(const char *text)
     lcd_scroll_stop();
 }
 
-#if CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX
+#if CONFIG_CPU == IMX31L || CONFIG_CPU == RK27XX || CONFIG_CPU == X1000
 /* this is in firmware/target/arm/imx31/rolo_restart.c for IMX31 */
 /* this is in firmware/target/arm/rk27xx/rolo_restart.c for rk27xx */
+/* this is in firmware/target/mips/ingenic_x1000/boot-x1000.c for X1000 */
 extern void rolo_restart(const unsigned char* source, unsigned char* dest,
                          int length);
 #else

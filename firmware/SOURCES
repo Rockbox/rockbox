@@ -1646,6 +1646,7 @@ drivers/nand_id.c
 #if CONFIG_CPU == X1000
 target/mips/ingenic_x1000/crt0.S
 target/mips/ingenic_x1000/aic-x1000.c
+target/mips/ingenic_x1000/boot-x1000.c
 target/mips/ingenic_x1000/clk-x1000.c
 target/mips/ingenic_x1000/debug-x1000.c
 target/mips/ingenic_x1000/dma-x1000.c
