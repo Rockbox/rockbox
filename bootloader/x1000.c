@@ -137,11 +137,6 @@ const struct menuitem recovery_items[] = {
     {MENUITEM_ACTION,       "Restore",              &bootloader_restore},
 };
 
-/* Final load address of rockbox binary.
- * NOTE: this is really the load address of the bootloader... it relies
- * on the fact that bootloader and app are linked at the same address. */
-extern unsigned char loadaddress[];
-
 /* Temp buffer to contain the binary in memory */
 extern unsigned char loadbuffer[];
 extern unsigned char loadbufferend[];
@@ -155,20 +150,6 @@ bool disk_inited = false;
 /* Set to true if a SYS_USB_CONNECTED event is seen
  * Set to false if a SYS_USB_DISCONNECTED event is seen */
 bool is_usb_connected = false;
-
-/* Jump to loaded binary */
-void exec(void* dst, const void* src, size_t bytes)
-    __attribute__((noinline, noreturn, section(".icode")));
-
-void exec(void* dst, const void* src, size_t bytes)
-{
-    memcpy(dst, src, bytes);
-    commit_discard_idcache();
-
-    typedef void(*entry_fn)(void) __attribute__((noreturn));
-    entry_fn fn = (entry_fn)dst;
-    fn();
-}
 
 void clearscreen(void)
 {
@@ -368,8 +349,7 @@ void boot_rockbox(void)
     if(lcd_inited)
         backlight_hw_off();
 
-    disable_irq();
-    exec(loadaddress, loadbuffer, rc);
+    x1000_boot_rockbox(loadbuffer, rc);
 }
 
 void usb_mode(void)
