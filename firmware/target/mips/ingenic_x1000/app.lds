@@ -88,10 +88,8 @@ SECTIONS
     {
         . = ALIGN(4);
         audiobuffer = .;
-        loadbuffer = .;
     } > DRAM
 
-    loadbufferend = ENDAUDIOADDR;
     audiobufend = ENDAUDIOADDR;
     codecbuf = ENDAUDIOADDR;
     pluginbuf = ENDCODECADDR;

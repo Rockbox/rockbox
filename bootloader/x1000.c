@@ -137,11 +137,6 @@ const struct menuitem recovery_items[] = {
     {MENUITEM_ACTION,       "Restore",              &bootloader_restore},
 };
 
-/* Temp buffer to contain the binary in memory */
-extern unsigned char loadbuffer[];
-extern unsigned char loadbufferend[];
-#define MAX_LOAD_SIZE (loadbufferend - loadbuffer)
-
 /* Flags to indicate if hardware was already initialized */
 bool lcd_inited = false;
 bool usb_inited = false;
@@ -340,8 +335,17 @@ void boot_rockbox(void)
     if(init_disk() != 0)
         return;
 
-    int rc = load_firmware(loadbuffer, BOOTFILE, MAX_LOAD_SIZE);
+    size_t max_size = 0;
+    int handle = core_alloc_maximum("rockbox", &max_size, &buflib_ops_locked);
+    if(handle < 0) {
+        splash(5*HZ, "Out of memory");
+        return;
+    }
+
+    unsigned char* loadbuffer = core_get_data(handle);
+    int rc = load_firmware(loadbuffer, BOOTFILE, max_size);
     if(rc <= 0) {
+        core_free(handle);
         splash2(5*HZ, "Error loading Rockbox", loader_strerror(rc));
         return;
     }
