@@ -290,14 +290,14 @@ int nand_read_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* 
         if(rc < 0)
             return rc;
 
-        memcpy(buffer, &drv->page_buf[offset], MIN(pg_size, byte_len));
+        memcpy(buffer, &drv->page_buf[offset], MIN(pg_size - offset, byte_len));
 
-        if(byte_len <= pg_size)
+        if(byte_len <= pg_size - offset)
             break;
 
+        byte_len -= pg_size - offset;
+        buffer += pg_size - offset;
         offset = 0;
-        byte_len -= pg_size;
-        buffer += pg_size;
         page++;
     }
 
