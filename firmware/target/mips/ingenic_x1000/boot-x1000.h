@@ -47,6 +47,9 @@ enum {
 
 void x1000_boot_rockbox(const void* source, size_t length)
     __attribute__((section(".icode")));
+void x1000_boot_linux(const void* source, size_t length,
+                      void* load, void* entry, const char* args)
+    __attribute__((section(".icode")));
 
 /* Note: these functions are inlined to minimize SPL code size.
  * They are private to the X1000 early boot code anyway... */

@@ -102,6 +102,35 @@ void x1000_boot_rockbox(const void* source, size_t length)
     while(1);
 }
 
+void x1000_boot_linux(const void* source, size_t length,
+                      void* load, void* entry, const char* args)
+{
+    size_t args_len = strlen(args);
+
+    disable_irq();
+
+    /* --- Beyond this point, do not call into DRAM --- */
+
+    void* safe_mem = (void*)X1000_IRAM_END;
+
+    /* copy argument string to a safe location */
+    char* args_copy = safe_mem + 32;
+    iram_memmove(args_copy, args, args_len);
+
+    /* generate argv array */
+    char** argv = safe_mem;
+    argv[0] = NULL;
+    argv[1] = args_copy;
+
+    iram_memmove(load, source, length);
+    commit_discard_idcache();
+
+    typedef void(*entry_fn)(long, char**, long, long);
+    entry_fn fn = (entry_fn)entry;
+    fn(2, argv, 0, 0);
+    while(1);
+}
+
 void rolo_restart(const unsigned char* source, unsigned char* dest, int length)
 {
     (void)dest;
