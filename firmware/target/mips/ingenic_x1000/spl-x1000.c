@@ -47,37 +47,12 @@
 #endif
 
 static void* heap = (void*)(X1000_SDRAM_BASE + X1000_SDRAM_SIZE);
-static nand_drv* ndrv = NULL;
 
 void* spl_alloc(size_t count)
 {
     heap -= CACHEALIGN_UP(count);
     memset(heap, 0, CACHEALIGN_UP(count));
     return heap;
-}
-
-int spl_storage_open(void)
-{
-    /* We need to assign the GPIOs manually */
-    gpioz_configure(GPIO_A, 0x3f << 26, GPIOF_DEVICE(1));
-
-    /* Allocate NAND driver manually in DRAM */
-    ndrv = spl_alloc(sizeof(nand_drv));
-    ndrv->page_buf = spl_alloc(NAND_DRV_MAXPAGESIZE);
-    ndrv->scratch_buf = spl_alloc(NAND_DRV_SCRATCHSIZE);
-    ndrv->refcount = 0;
-
-    return nand_open(ndrv);
-}
-
-void spl_storage_close(void)
-{
-    nand_close(ndrv);
-}
-
-int spl_storage_read(uint32_t addr, uint32_t length, void* buffer)
-{
-    return nand_read_bytes(ndrv, addr, length, buffer);
 }
 
 /* Used by:

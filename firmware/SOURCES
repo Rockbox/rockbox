@@ -1711,6 +1711,7 @@ target/mips/ingenic_x1000/fiiom3k/button-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/lcd-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/power-fiiom3k.c
 target/mips/ingenic_x1000/fiiom3k/spl-fiiom3k.c
+target/mips/ingenic_x1000/spl-nand-x1000.c
 #endif /* FIIO_M3K */
 
 #if defined(SHANLING_Q1)
@@ -1720,6 +1721,7 @@ target/mips/ingenic_x1000/shanlingq1/button-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/lcd-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/power-shanlingq1.c
 target/mips/ingenic_x1000/shanlingq1/spl-shanlingq1.c
+target/mips/ingenic_x1000/spl-nand-x1000.c
 #endif /* SHANLING_Q1 */
 
 #if defined(EROS_QN)
@@ -1729,6 +1731,7 @@ target/mips/ingenic_x1000/erosqnative/button-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/lcd-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/power-erosqnative.c
 target/mips/ingenic_x1000/erosqnative/spl-erosqnative.c
+target/mips/ingenic_x1000/spl-nand-x1000.c
 #endif /* EROS_QN */
 
 #if defined(LYRE_PROTO1)
