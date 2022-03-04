@@ -34,7 +34,4 @@ ssize_t os_sdl_readwrite(int osfd, void *buf, size_t nbyte, bool dowrite);
 
 #endif /* HAVE_SDL_THREADS */
 
-#define RB_ROOT_VOL_HIDDEN(v)   (0 == 0)
-#define RB_ROOT_CONTENTS_DIR    "/" /* NOT USED YET */
-
 #endif /* _FILESYSTEM_SDL_H_ */

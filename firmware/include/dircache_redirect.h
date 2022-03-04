@@ -24,7 +24,12 @@
 #include "pathfuncs.h"
 #include "dir.h"
 #include "dircache.h"
-
+#ifndef RB_ROOT_VOL_HIDDEN
+#define RB_ROOT_VOL_HIDDEN(v)   (0 == 0)
+#endif
+#ifndef RB_ROOT_CONTENTS_DIR
+#define RB_ROOT_CONTENTS_DIR    "/"
+#endif
 /***
  ** Internal redirects that depend upon whether or not dircache is made
  **
