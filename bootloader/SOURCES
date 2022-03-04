@@ -89,4 +89,5 @@ sansaconnect.c
 show_logo.c
 #elif defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN)
 x1000.c
+x1000/gui.c
 #endif

@@ -67,13 +67,6 @@ struct menuitem {
     void(*action)(void);
 };
 
-void clearscreen(void);
-void putversion(void);
-void putcenter_y(int y, const char* msg);
-void putcenter_line(int line, const char* msg);
-void splash2(long delay, const char* msg, const char* msg2);
-void splash(long delay, const char* msg);
-
 void init_lcd(void);
 void init_usb(void);
 int init_disk(void);
@@ -102,84 +95,12 @@ const struct menuitem recovery_items[] = {
 };
 
 /* Flags to indicate if hardware was already initialized */
-bool lcd_inited = false;
 bool usb_inited = false;
 bool disk_inited = false;
 
 /* Set to true if a SYS_USB_CONNECTED event is seen
  * Set to false if a SYS_USB_DISCONNECTED event is seen */
 bool is_usb_connected = false;
-
-void clearscreen(void)
-{
-    init_lcd();
-    lcd_clear_display();
-    putversion();
-}
-
-void putversion(void)
-{
-    int x = (LCD_WIDTH - SYSFONT_WIDTH*strlen(rbversion)) / 2;
-    int y = LCD_HEIGHT - SYSFONT_HEIGHT;
-    lcd_putsxy(x, y, rbversion);
-}
-
-void putcenter_y(int y, const char* msg)
-{
-    int x = (LCD_WIDTH - SYSFONT_WIDTH*strlen(msg)) / 2;
-    lcd_putsxy(x, y, msg);
-}
-
-void putcenter_line(int line, const char* msg)
-{
-    int y = LCD_HEIGHT/2 + (line - 1)*SYSFONT_HEIGHT;
-    putcenter_y(y, msg);
-}
-
-void splash2(long delay, const char* msg, const char* msg2)
-{
-    clearscreen();
-    putcenter_line(0, msg);
-    if(msg2)
-        putcenter_line(1, msg2);
-    lcd_update();
-    sleep(delay);
-}
-
-void splash(long delay, const char* msg)
-{
-    splash2(delay, msg, NULL);
-}
-
-int get_button(int timeout)
-{
-    int btn = button_get_w_tmo(timeout);
-    if(btn == SYS_USB_CONNECTED)
-        is_usb_connected = true;
-    else if(btn == SYS_USB_DISCONNECTED)
-        is_usb_connected = false;
-
-    return btn;
-}
-
-void init_lcd(void)
-{
-    if(lcd_inited)
-        return;
-
-    lcd_init();
-    font_init();
-    lcd_setfont(FONT_SYSFIXED);
-
-    /* Clear screen before turning backlight on, otherwise we might
-     * display random garbage on the screen */
-    lcd_clear_display();
-    lcd_update();
-
-    backlight_init();
-
-    lcd_inited = true;
-}
 
 void init_usb(void)
 {
@@ -314,8 +235,7 @@ void boot_rockbox(void)
         return;
     }
 
-    if(lcd_inited)
-        backlight_hw_off();
+    gui_shutdown();
 
     x1000_boot_rockbox(loadbuffer, rc);
 }
