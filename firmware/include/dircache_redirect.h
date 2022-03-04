@@ -25,7 +25,7 @@
 #include "dir.h"
 #include "dircache.h"
 
-#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR)
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #include "rb-loader.h"
 #include "bootdata.h"
 #include "crc32.h"
@@ -145,7 +145,7 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
     const char *path = PATH_ROOTSTR;
 #endif
 
-#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR)
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
     static char rtpath[VOL_MAX_LEN+2] = RB_ROOT_CONTENTS_DIR;
     static bool redirected = false;
     int boot_volume = 0;
