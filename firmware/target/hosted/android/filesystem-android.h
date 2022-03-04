@@ -18,23 +18,10 @@
  * KIND, either express or implied.
  *
  ****************************************************************************/
-#ifndef _FILESYSTEM_SDL_H_
-#define _FILESYSTEM_SDL_H_
-
-#ifdef HAVE_SDL_THREADS
-#undef os_read
-#undef os_write
-
-ssize_t os_sdl_readwrite(int osfd, void *buf, size_t nbyte, bool dowrite);
-
-#define os_read(osfd, buf, nbyte) \
-    os_sdl_readwrite((osfd), (buf), (nbyte), false)
-#define os_write(osfd, buf, nbyte) \
-    os_sdl_readwrite((osfd), (void *)(buf), (nbyte), true)
-
-#endif /* HAVE_SDL_THREADS */
+#ifndef _FILESYSTEM_ANDROID_H_
+#define _FILESYSTEM_ANDROID_H_
 
 #define RB_ROOT_VOL_HIDDEN(v)   (0 == 0)
 #define RB_ROOT_CONTENTS_DIR    "/" /* NOT USED YET */
 
-#endif /* _FILESYSTEM_SDL_H_ */
+#endif /* _FILESYSTEM_ANDROID_H_ */
