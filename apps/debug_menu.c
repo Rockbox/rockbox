@@ -128,6 +128,9 @@
 
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 #include "bootdata.h"
+#include "rbpaths.h"
+#include "pathfuncs.h"
+#include "rb-loader.h"
 #endif
 
 static const char* threads_getname(int selected_item, void *data,
@@ -2530,12 +2533,17 @@ static bool dbg_boot_data(void)
     simplelist_set_line_count(0);
     crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
 #if defined(HAVE_MULTIBOOT)
+    char rootpath[VOL_MAX_LEN+2] = RB_ROOT_CONTENTS_DIR;
     int boot_volume = 0;
     if(crc == boot_data.crc)
     {
         boot_volume = boot_data.boot_volume; /* boot volume contained in uint8_t payload */
+        get_redirect_dir(rootpath, sizeof(rootpath), boot_volume, "", "");
+        rootpath[path_strip_trailing_separators(rootpath,NULL)] = '\0';
     }
     simplelist_addline("Boot Volume: <%lu>", boot_volume);
+    simplelist_addline("Root:");
+    simplelist_addline("%s", rootpath);
     simplelist_addline("");
 #endif
     simplelist_addline("Bootdata RAW:");
