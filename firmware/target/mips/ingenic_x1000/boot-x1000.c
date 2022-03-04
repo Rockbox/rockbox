@@ -19,8 +19,14 @@
  *
  ****************************************************************************/
 
-#include "boot-x1000.h"
 #include "system.h"
+#include "boot-x1000.h"
+#include "nand-x1000.h"
+#include "gpio-x1000.h"
+#include "clk-x1000.h"
+#include "x1000/cpm.h"
+#include "x1000/lcd.h"
+#include "x1000/uart.h"
 #include <string.h>
 
 #define HDR_BEGIN   128     /* header must begin within this many bytes */
@@ -135,4 +141,142 @@ void rolo_restart(const unsigned char* source, unsigned char* dest, int length)
 {
     (void)dest;
     x1000_boot_rockbox(source, length);
+}
+
+void x1000_dualboot_cleanup(void)
+{
+#ifdef SHANLING_Q1
+    /* hack for the Q1 since OF kernels don't reset this bit,
+     * leading to garbled graphics. */
+    if(!jz_readf(CPM_CLKGR, LCD)) {
+        jz_writef(LCD_CTRL, BEDN(0));
+    }
+#endif
+
+    /* clear USB PHY voodoo bits, not all kernels use them */
+    jz_writef(CPM_OPCR, GATE_USBPHY_CLK(0));
+    jz_writef(CPM_USBCDR, PHY_GATE(0));
+
+#if defined(FIIO_M3K) || defined(EROS_QN)
+    /*
+     * Need to bring up MPLL before booting Linux
+     * (Doesn't apply to Q1 since it sticks with the default Ingenic config)
+     */
+
+    /* 24 MHz * 25 = 600 MHz */
+    jz_writef(CPM_MPCR, BS(1), PLLM(25 - 1), PLLN(0), PLLOD(0), ENABLE(1));
+    while(jz_readf(CPM_MPCR, ON) == 0);
+
+    /* 600 MHz / 3 = 200 MHz */
+    clk_set_ddr(X1000_CLK_MPLL, 3);
+
+    clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
+                    CLKMUX_CPU(SCLK_A) |
+                    CLKMUX_AHB0(MPLL) |
+                    CLKMUX_AHB2(MPLL));
+    clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
+                    CLKDIV_L2(2) |      /* 504 MHz */
+                    CLKDIV_AHB0(3) |    /* 200 MHz */
+                    CLKDIV_AHB2(3) |    /* 200 MHz */
+                    CLKDIV_PCLK(6));    /* 100 MHz */
+#endif
+}
+
+void x1000_dualboot_init_clocktree(void)
+{
+    /* Make sure these are gated to match the OF behavior. */
+    jz_writef(CPM_CLKGR, PCM(1), MAC(1), LCD(1), MSC0(1), MSC1(1), OTG(1), CIM(1));
+
+    /* Set clock sources, and make sure every clock starts out stopped */
+    jz_writef(CPM_I2SCDR, CS_V(EXCLK));
+    jz_writef(CPM_PCMCDR, CS_V(EXCLK));
+
+    jz_writef(CPM_MACCDR, CLKSRC_V(MPLL), CE(1), STOP(1), CLKDIV(0xfe));
+    while(jz_readf(CPM_MACCDR, BUSY));
+
+    jz_writef(CPM_LPCDR, CLKSRC_V(MPLL), CE(1), STOP(1), CLKDIV(0xfe));
+    while(jz_readf(CPM_LPCDR, BUSY));
+
+    jz_writef(CPM_MSC0CDR, CLKSRC_V(MPLL), CE(1), STOP(1), CLKDIV(0xfe));
+    while(jz_readf(CPM_MSC0CDR, BUSY));
+
+    jz_writef(CPM_MSC1CDR, CE(1), STOP(1), CLKDIV(0xfe));
+    while(jz_readf(CPM_MSC1CDR, BUSY));
+
+    jz_writef(CPM_CIMCDR, CLKSRC_V(MPLL), CE(1), STOP(1), CLKDIV(0xfe));
+    while(jz_readf(CPM_CIMCDR, BUSY));
+
+    jz_writef(CPM_USBCDR, CLKSRC_V(EXCLK), CE(1), STOP(1));
+    while(jz_readf(CPM_USBCDR, BUSY));
+}
+
+void x1000_dualboot_init_uart2(void)
+{
+    /* Ungate the clock and select UART2 device function */
+    jz_writef(CPM_CLKGR, UART2(0));
+    gpioz_configure(GPIO_C, 3 << 30, GPIOF_DEVICE(1));
+
+    /* Disable all interrupts */
+    jz_write(UART_UIER(2), 0);
+
+    /* FIFO configuration */
+    jz_overwritef(UART_UFCR(2),
+                  RDTR(3), /* FIFO trigger level = 60? */
+                  UME(0),  /* UART module disable */
+                  DME(1),  /* DMA mode enable? */
+                  TFRT(1), /* transmit FIFO reset */
+                  RFRT(1), /* receive FIFO reset */
+                  FME(1)); /* FIFO mode enable */
+
+    /* IR mode configuration */
+    jz_overwritef(UART_ISR(2),
+                  RDPL(1),      /* Zero is negative pulse for receive */
+                  TDPL(1),      /* ... and for transmit */
+                  XMODE(1),     /* Pulse width 1.6us */
+                  RCVEIR(0),    /* Disable IR for recieve */
+                  XMITIR(0));   /* ... and for transmit */
+
+    /* Line configuration */
+    jz_overwritef(UART_ULCR(2), DLAB(0),
+                  WLS_V(8BITS),         /* 8 bit words */
+                  SBLS_V(1_STOP_BIT),   /* 1 stop bit */
+                  PARE(0),              /* no parity */
+                  SBK(0));              /* don't set break */
+
+    /* Set the baud rate... not too sure how this works. (Docs unclear!) */
+    const unsigned divisor = 0x0004;
+    jz_writef(UART_ULCR(2), DLAB(1));
+    jz_write(UART_UDLHR(2), (divisor >> 8) & 0xff);
+    jz_write(UART_UDLLR(2), divisor & 0xff);
+    jz_write(UART_UMR(2), 16);
+    jz_write(UART_UACR(2), 0);
+    jz_writef(UART_ULCR(2), DLAB(0));
+
+    /* Enable UART */
+    jz_overwritef(UART_UFCR(2),
+                  RDTR(0),  /* FIFO trigger level = 1 */
+                  DME(0),   /* DMA mode disable */
+                  UME(1),   /* UART module enable */
+                  TFRT(1),  /* transmit FIFO reset */
+                  RFRT(1),  /* receive FIFO reset */
+                  FME(1));  /* FIFO mode enable */
+}
+
+int x1000_dualboot_load_pdma_fw(void)
+{
+    nand_drv* n = nand_init();
+    nand_lock(n);
+
+    int ret = nand_open(n);
+    if(ret != NAND_SUCCESS)
+        goto err_unlock;
+
+    /* NOTE: hardcoded address is used by all current targets */
+    jz_writef(CPM_CLKGR, PDMA(0));
+    ret = nand_read_bytes(n, 0x4000, 0x2000, (void*)0xb3422000);
+
+    nand_close(n);
+  err_unlock:
+    nand_unlock(n);
+    return ret;
 }
