@@ -92,4 +92,10 @@ void boot_rockbox(void);
 void shutdown(void);
 void reboot(void);
 
+/*
+ * Misc
+ */
+
+void recovery_menu(void) __attribute__((noreturn));
+
 #endif /* __X1000BOOTLOADER_H__ */
