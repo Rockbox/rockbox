@@ -141,6 +141,7 @@ void bootloader_restore(void);
 void boot_rockbox(void);
 void boot_of_player(void);
 void boot_of_recovery(void);
+void boot_linux(void);
 void shutdown(void);
 void reboot(void);
 

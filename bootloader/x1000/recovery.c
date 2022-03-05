@@ -47,6 +47,7 @@ static const struct menuitem recovery_items[] = {
 #ifdef OF_RECOVERY_NAME
     {MENUITEM_ACTION,       OF_RECOVERY_NAME,       &boot_of_recovery},
 #endif
+    {MENUITEM_ACTION,       "Linux",                &boot_linux},
     {MENUITEM_HEADING,  "System",                   NULL},
     {MENUITEM_ACTION,       "USB mode",             &usb_mode},
     {MENUITEM_ACTION,       "Shutdown",             &shutdown},
