@@ -227,7 +227,7 @@ void rds_sync(void)
     }
 }
 
-void rds_set_time(time_t time)
+static void rds_set_time(time_t time)
 {
     ct_data = time;
 #ifdef CONFIG_RTC
