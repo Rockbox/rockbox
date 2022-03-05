@@ -73,10 +73,7 @@ int init_disk(void);
 
 void recovery_menu(void) __attribute__((noreturn));
 
-void boot_rockbox(void);
 void usb_mode(void);
-void shutdown(void);
-void reboot(void);
 
 /* Defines the recovery menu contents */
 const struct menuitem recovery_items[] = {
@@ -212,31 +209,6 @@ void recovery_menu(void)
     }
 }
 
-void boot_rockbox(void)
-{
-    if(init_disk() != 0)
-        return;
-
-    size_t max_size = 0;
-    int handle = core_alloc_maximum("rockbox", &max_size, &buflib_ops_locked);
-    if(handle < 0) {
-        splash(5*HZ, "Out of memory");
-        return;
-    }
-
-    unsigned char* loadbuffer = core_get_data(handle);
-    int rc = load_firmware(loadbuffer, BOOTFILE, max_size);
-    if(rc <= 0) {
-        core_free(handle);
-        splash2(5*HZ, "Error loading Rockbox", loader_strerror(rc));
-        return;
-    }
-
-    gui_shutdown();
-
-    x1000_boot_rockbox(loadbuffer, rc);
-}
-
 void usb_mode(void)
 {
     init_usb();
@@ -255,20 +227,6 @@ void usb_mode(void)
         get_button(TIMEOUT_BLOCK);
 
     splash(3*HZ, "USB disconnected");
-}
-
-void shutdown(void)
-{
-    splash(HZ, "Shutting down");
-    power_off();
-    while(1);
-}
-
-void reboot(void)
-{
-    splash(HZ, "Rebooting");
-    system_reboot();
-    while(1);
 }
 
 void main(void)

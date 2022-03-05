@@ -84,4 +84,12 @@ void bootloader_install(void);
 void bootloader_backup(void);
 void bootloader_restore(void);
 
+/*
+ * Boot code
+ */
+
+void boot_rockbox(void);
+void shutdown(void);
+void reboot(void);
+
 #endif /* __X1000BOOTLOADER_H__ */
