@@ -58,10 +58,6 @@ extern int spl_storage_open(void);
 extern void spl_storage_close(void);
 extern int spl_storage_read(uint32_t addr, uint32_t length, void* buffer);
 
-/* Helpers for dual-booting with the Ingenic Linux OF */
-extern void spl_dualboot_init_clocktree(void);
-extern void spl_dualboot_init_uart2(void);
-
 /* Get the boot option selected by the user, eg. by a key press */
 extern int spl_get_boot_option(void);
 
