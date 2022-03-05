@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2021-2022 Aidan MacDonald
+ * Copyright (C) 2022 Aidan MacDonald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,49 +20,26 @@
  ****************************************************************************/
 
 #include "x1000bootloader.h"
-#include "core_alloc.h"
-#include "rb-loader.h"
-#include "loader_strerror.h"
-#include "system.h"
+#include "storage.h"
+#include "button.h"
 #include "kernel.h"
-#include "power.h"
-#include "boot-x1000.h"
 
-void boot_rockbox(void)
+/* this is both incorrect and incredibly racy... */
+int check_disk(bool wait)
 {
-    if(check_disk(true) != DISK_PRESENT)
-        return;
+    if(storage_present(IF_MD(0)))
+        return DISK_PRESENT;
+    if(!wait)
+        return DISK_ABSENT;
 
-    size_t max_size = 0;
-    int handle = core_alloc_maximum("rockbox", &max_size, &buflib_ops_locked);
-    if(handle < 0) {
-        splash(5*HZ, "Out of memory");
-        return;
+    while(!storage_present(IF_MD(0))) {
+        splash2(0, "Insert SD card", "Press " BL_QUIT_NAME " to cancel");
+        if(get_button(HZ/4) == BL_QUIT)
+            return DISK_CANCELED;
     }
 
-    unsigned char* loadbuffer = core_get_data(handle);
-    int rc = load_firmware(loadbuffer, BOOTFILE, max_size);
-    if(rc <= 0) {
-        core_free(handle);
-        splash2(5*HZ, "Error loading Rockbox", loader_strerror(rc));
-        return;
-    }
+    /* a lie intended to give time for mounting the disk in the background */
+    splash(HZ, "Scanning disk");
 
-    gui_shutdown();
-
-    x1000_boot_rockbox(loadbuffer, rc);
-}
-
-void shutdown(void)
-{
-    splash(HZ, "Shutting down");
-    power_off();
-    while(1);
-}
-
-void reboot(void)
-{
-    splash(HZ, "Rebooting");
-    system_reboot();
-    while(1);
+    return DISK_PRESENT;
 }

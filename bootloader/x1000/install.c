@@ -25,8 +25,6 @@
 #include "installer-x1000.h"
 #include <stdio.h>
 
-extern int init_disk(void);
-
 enum {
     INSTALL,
     BACKUP,
@@ -35,7 +33,7 @@ enum {
 
 static void bootloader_action(int which)
 {
-    if(init_disk() != 0) {
+    if(check_disk(true) != DISK_PRESENT) {
         splash2(5*HZ, "Install aborted", "Cannot access SD card");
         return;
     }

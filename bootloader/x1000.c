@@ -56,15 +56,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-void init_lcd(void);
-void init_usb(void);
-int init_disk(void);
-
-void usb_mode(void);
-
 /* Flags to indicate if hardware was already initialized */
 bool usb_inited = false;
-bool disk_inited = false;
 
 /* Set to true if a SYS_USB_CONNECTED event is seen
  * Set to false if a SYS_USB_DISCONNECTED event is seen */
@@ -78,26 +71,6 @@ void init_usb(void)
     usb_init();
     usb_start_monitoring();
     usb_inited = true;
-}
-
-int init_disk(void)
-{
-    if(disk_inited)
-        return 0;
-
-    while(!storage_present(IF_MD(0))) {
-        splash2(0, "Insert SD card", "Press " BL_QUIT_NAME " for recovery");
-        if(get_button(HZ/4) == BL_QUIT)
-            return -1;
-    }
-
-    if(disk_mount_all() <= 0) {
-        splash(5*HZ, "Cannot mount disk");
-        return -1;
-    }
-
-    disk_inited = true;
-    return 0;
 }
 
 void usb_mode(void)
@@ -136,6 +109,11 @@ void main(void)
     }
 
     filesystem_init();
+
+    /* It's OK if this doesn't mount anything. Any disk access should
+     * be guarded by a call to check_disk() to see if the disk is really
+     * present, blocking with an "insert SD card" prompt if appropriate. */
+    disk_mount_all();
 
     /* If USB booting, the user probably needs to enter recovery mode;
      * let's not force them to hold down the recovery key. */

@@ -23,6 +23,7 @@
 #define __X1000BOOTLOADER_H__
 
 #include "config.h"
+#include <stdbool.h>
 
 #if defined(FIIO_M3K)
 # define BL_RECOVERY        BUTTON_VOL_UP
@@ -95,6 +96,14 @@ void reboot(void);
 /*
  * Misc
  */
+
+enum {
+    DISK_PRESENT = 0,
+    DISK_ABSENT = -1,
+    DISK_CANCELED = -2,
+};
+
+int check_disk(bool wait);
 
 void recovery_menu(void) __attribute__((noreturn));
 

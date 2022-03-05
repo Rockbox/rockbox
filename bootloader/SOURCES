@@ -93,4 +93,5 @@ x1000/boot.c
 x1000/gui.c
 x1000/install.c
 x1000/recovery.c
+x1000/utils.c
 #endif
