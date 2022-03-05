@@ -25,8 +25,11 @@
 #include "button.h"
 #include "kernel.h"
 #include "usb.h"
+#include "file.h"
 #include "rb-loader.h"
 #include "loader_strerror.h"
+#include "linuxboot.h"
+#include "nand-x1000.h"
 
 /* Set to true if a SYS_USB_CONNECTED event is seen
  * Set to false if a SYS_USB_DISCONNECTED event is seen
@@ -93,6 +96,79 @@ int load_rockbox(const char* filename, size_t* sizep)
 
     core_shrink(handle, loadbuffer, rc);
     *sizep = rc;
+
+    return handle;
+}
+
+int load_uimage_file(const char* filename,
+                     struct uimage_header* uh, size_t* sizep)
+{
+    if(check_disk(true) != DISK_PRESENT)
+        return -1;
+
+    int fd = open(filename, O_RDONLY);
+    if(fd < 0) {
+        splash2(5*HZ, "Can't open file", filename);
+        return -2;
+    }
+
+    int handle = uimage_load(uh, sizep, uimage_fd_reader, (void*)(intptr_t)fd);
+    if(handle <= 0) {
+        splash2(5*HZ, "Cannot load uImage", filename);
+        return -3;
+    }
+
+    return handle;
+}
+
+struct nand_reader_data
+{
+    nand_drv* ndrv;
+    uint32_t addr;
+    uint32_t end_addr;
+};
+
+static ssize_t uimage_nand_reader(void* buf, size_t count, void* rctx)
+{
+    struct nand_reader_data* d = rctx;
+
+    if(d->addr + count > d->end_addr)
+        count = d->end_addr - d->addr;
+
+    int ret = nand_read_bytes(d->ndrv, d->addr, count, buf);
+    if(ret != NAND_SUCCESS)
+        return -1;
+
+    d->addr += count;
+    return count;
+}
+
+int load_uimage_flash(uint32_t addr, uint32_t length,
+                      struct uimage_header* uh, size_t* sizep)
+{
+    int handle = -1;
+
+    struct nand_reader_data n;
+    n.ndrv = nand_init();
+    n.addr = addr;
+    n.end_addr = addr + length;
+
+    nand_lock(n.ndrv);
+    if(nand_open(n.ndrv) != NAND_SUCCESS) {
+        splash(5*HZ, "NAND open failed");
+        nand_unlock(n.ndrv);
+        return -1;
+    }
+
+    handle = uimage_load(uh, sizep, uimage_nand_reader, &n);
+
+    nand_close(n.ndrv);
+    nand_unlock(n.ndrv);
+
+    if(handle <= 0) {
+        splash(5*HZ, "uImage load failed");
+        return -2;
+    }
 
     return handle;
 }

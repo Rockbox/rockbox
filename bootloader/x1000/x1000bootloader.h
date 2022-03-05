@@ -24,7 +24,10 @@
 
 #include "config.h"
 #include <stddef.h>
+#include <stdint.h>
 #include <stdbool.h>
+
+struct uimage_header;
 
 #if defined(FIIO_M3K)
 # define BL_RECOVERY        BUTTON_VOL_UP
@@ -108,6 +111,10 @@ int check_disk(bool wait);
 void usb_mode(void);
 
 int load_rockbox(const char* filename, size_t* sizep);
+int load_uimage_file(const char* filename,
+                     struct uimage_header* uh, size_t* sizep);
+int load_uimage_flash(uint32_t addr, uint32_t length,
+                      struct uimage_header* uh, size_t* sizep);
 
 void recovery_menu(void) __attribute__((noreturn));
 
