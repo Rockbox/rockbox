@@ -19,42 +19,19 @@
  *
  ****************************************************************************/
 
-/* Unified bootloader for all X1000 targets. This is a bit messy.
- *
- * Features:
- * - Text based user interface
- * - USB mass storage access
- * - Bootloader installation / backup / restore
- *
- * Possible future improvements:
- * - Allow booting original firmware from the UI
- */
-
+#include "x1000bootloader.h"
 #include "system.h"
 #include "core_alloc.h"
 #include "kernel/kernel-internal.h"
-#include "i2c.h"
 #include "power.h"
-#include "lcd.h"
-#include "font.h"
-#include "backlight.h"
-#include "backlight-target.h"
 #include "button.h"
 #include "storage.h"
-#include "file_internal.h"
 #include "disk.h"
+#include "file_internal.h"
 #include "usb.h"
-#include "rb-loader.h"
-#include "loader_strerror.h"
-#include "version.h"
+#include "i2c-x1000.h"
 #include "boot-x1000.h"
-#include "installer-x1000.h"
-#include "x1000/x1000bootloader.h"
-#include <stddef.h>
 #include <stdbool.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
 
 void main(void)
 {
