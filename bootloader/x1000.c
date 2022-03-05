@@ -77,9 +77,6 @@ void boot_rockbox(void);
 void usb_mode(void);
 void shutdown(void);
 void reboot(void);
-void bootloader_install(void);
-void bootloader_backup(void);
-void bootloader_restore(void);
 
 /* Defines the recovery menu contents */
 const struct menuitem recovery_items[] = {
@@ -272,61 +269,6 @@ void reboot(void)
     splash(HZ, "Rebooting");
     system_reboot();
     while(1);
-}
-
-enum {
-    INSTALL,
-    BACKUP,
-    RESTORE,
-};
-
-void bootloader_action(int which)
-{
-    if(init_disk() != 0) {
-        splash2(5*HZ, "Install aborted", "Cannot access SD card");
-        return;
-    }
-
-    const char* msg;
-    switch(which) {
-    case INSTALL: msg = "Installing"; break;
-    case BACKUP:  msg = "Backing up"; break;
-    case RESTORE: msg = "Restoring";  break;
-    default: return; /* can't happen */
-    }
-
-    splash(0, msg);
-
-    int rc;
-    switch(which) {
-    case INSTALL: rc = install_bootloader("/bootloader." BOOTFILE_EXT); break;
-    case BACKUP:  rc = backup_bootloader(BOOTBACKUP_FILE); break;
-    case RESTORE: rc = restore_bootloader(BOOTBACKUP_FILE); break;
-    default: return;
-    }
-
-    static char buf[64];
-    snprintf(buf, sizeof(buf), "%s (%d)", installer_strerror(rc), rc);
-    const char* msg1 = rc == 0 ? "Success" : buf;
-    const char* msg2 = "Press " BL_QUIT_NAME " to continue";
-    splash2(0, msg1, msg2);
-
-    while(get_button(TIMEOUT_BLOCK) != BL_QUIT);
-}
-
-void bootloader_install(void)
-{
-    bootloader_action(INSTALL);
-}
-
-void bootloader_backup(void)
-{
-    bootloader_action(BACKUP);
-}
-
-void bootloader_restore(void)
-{
-    bootloader_action(RESTORE);
 }
 
 void main(void)

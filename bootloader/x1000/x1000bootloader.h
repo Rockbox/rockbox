@@ -76,4 +76,12 @@ void init_lcd(void);
 
 void gui_shutdown(void);
 
+/*
+ * Installer
+ */
+
+void bootloader_install(void);
+void bootloader_backup(void);
+void bootloader_restore(void);
+
 #endif /* __X1000BOOTLOADER_H__ */
