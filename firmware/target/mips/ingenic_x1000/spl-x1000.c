@@ -34,16 +34,46 @@
 #include "ucl_decompress.h"
 #include <string.h>
 
-#if defined(FIIO_M3K) || defined(SHANLING_Q1)
-# define SPL_DDR_MEMORYSIZE  64
-# define SPL_DDR_AUTOSR_EN   1
-# define SPL_DDR_NEED_BYPASS 1
+#if defined(FIIO_M3K)
+/* Size of memory, either 64 or 32 is legal. */
+# define SPL_DDR_MEMORYSIZE     64
+/* Pin to flash on spl_error(). Should be a backlight. */
+# define SPL_ERROR_PIN          GPIO_PC(24)
+/* Address and size of the bootloader on the storage medium used by the SPL */
+# define BOOT_STORAGE_ADDR      0x6800
+# define BOOT_STORAGE_SIZE      (102 * 1024)
+#elif defined(SHANLING_Q1)
+# define SPL_DDR_MEMORYSIZE     64
+# define SPL_ERROR_PIN          GPIO_PC(25)
+# define BOOT_STORAGE_ADDR      0x6800
+# define BOOT_STORAGE_SIZE      (102 * 1024)
 #elif defined(EROS_QN)
-# define SPL_DDR_MEMORYSIZE 32
-# define SPL_DDR_AUTOSR_EN   1
-# define SPL_DDR_NEED_BYPASS 1
+# define SPL_DDR_MEMORYSIZE     32
+# define SPL_ERROR_PIN          GPIO_PC(25)
+# define BOOT_STORAGE_ADDR      0x6800
+# define BOOT_STORAGE_SIZE      (102 * 1024)
 #else
-# error "please define DRAM settings"
+# error "please define SPL config"
+#endif
+
+/* Hardcode this since the SPL is considered part of the bootloader,
+ * and should never get built or updated separately. */
+#define BOOT_LOAD_ADDR  X1000_DRAM_BASE
+#define BOOT_EXEC_ADDR  BOOT_LOAD_ADDR
+
+/* Whether the bootloader is UCL-compressed */
+#ifndef SPL_USE_UCLPACK
+# define SPL_USE_UCLPACK 1
+#endif
+
+/* Whether auto-self-refresh should be enabled (seems it always should be?) */
+#ifndef SPL_DDR_AUTOSR_EN
+# define SPL_DDR_AUTOSR_EN 1
+#endif
+
+/* Whether DLL bypass is necessary (probably always?) */
+#ifndef SPL_DDR_NEED_BYPASS
+# define SPL_DDR_NEED_BYPASS 1
 #endif
 
 static void* heap = (void*)(X1000_SDRAM_BASE + X1000_SDRAM_SIZE);
@@ -53,6 +83,16 @@ void* spl_alloc(size_t count)
     heap -= CACHEALIGN_UP(count);
     memset(heap, 0, CACHEALIGN_UP(count));
     return heap;
+}
+
+void spl_error(void)
+{
+    int level = 0;
+    while(1) {
+        gpio_set_function(SPL_ERROR_PIN, GPIOF_OUTPUT(level));
+        mdelay(100);
+        level = 1 - level;
+    }
 }
 
 static void init_ost(void)
@@ -235,14 +275,14 @@ static int init_dram(void)
     return 0;
 }
 
-static void* get_load_buffer(const struct spl_boot_option* opt)
+static void* get_load_buffer(void)
 {
     /* read to a temporary location if we need to decompress,
      * otherwise simply read directly to the load address. */
-    if(opt->flags & BOOTFLAG_UCLPACK)
-        return spl_alloc(opt->storage_size);
+    if(SPL_USE_UCLPACK)
+        return spl_alloc(BOOT_STORAGE_SIZE);
     else
-        return (void*)opt->load_addr;
+        return (void*)BOOT_LOAD_ADDR;
 }
 
 /* Mapping of boot_sel[1:0] pins.
@@ -266,15 +306,10 @@ static uint32_t get_boot_sel(void)
     return (*(uint32_t*)0xf40001ec) & 3;
 }
 
-typedef void(*entry_fn)(int, char**, int, int) __attribute__((noreturn));
-
 void spl_main(void)
 {
-    int rc, boot_option;
-    const struct spl_boot_option* opt;
+    int rc;
     void* load_buffer;
-    char** kargv = NULL;
-    int kargc = 0;
 
     /* magic */
     REG_CPM_PSWC0ST = 0x00;
@@ -298,14 +333,6 @@ void spl_main(void)
         return;
     }
 
-    /* find out what we should boot */
-    boot_option = spl_get_boot_option();
-    opt = &spl_boot_options[boot_option];
-    load_buffer = get_load_buffer(opt);
-
-    /* save the selection for later */
-    set_boot_option(boot_option);
-
     /* finish up clock init */
     clk_init();
 
@@ -314,44 +341,29 @@ void spl_main(void)
     if(rc != 0)
         spl_error();
 
-    rc = spl_storage_read(opt->storage_addr, opt->storage_size, load_buffer);
+    load_buffer = get_load_buffer();
+    rc = spl_storage_read(BOOT_STORAGE_ADDR, BOOT_STORAGE_SIZE, load_buffer);
     if(rc != 0)
         spl_error();
 
-    /* handle compression */
-    switch(opt->flags & BOOTFLAG_COMPRESSED) {
-    case BOOTFLAG_UCLPACK: {
-        uint32_t out_size = X1000_SDRAM_END - opt->load_addr;
-        rc = ucl_unpack((uint8_t*)load_buffer, opt->storage_size,
-                        (uint8_t*)opt->load_addr, &out_size);
-    } break;
-
-    default:
-        break;
+    /* decompress */
+    if(SPL_USE_UCLPACK) {
+        uint32_t out_size = X1000_SDRAM_END - BOOT_LOAD_ADDR;
+        rc = ucl_unpack((uint8_t*)load_buffer, BOOT_STORAGE_SIZE,
+                        (uint8_t*)BOOT_LOAD_ADDR, &out_size);
+    } else {
+        rc = 0;
     }
 
     if(rc != 0)
         spl_error();
-
-    /* call the setup hook */
-    if(opt->setup) {
-        rc = opt->setup();
-        if(rc != 0)
-            spl_error();
-    }
 
     /* close off storage access */
     spl_storage_close();
 
-    /* handle kernel command line, if specified */
-    if(opt->cmdline) {
-        kargv = (char**)opt->cmdline_addr;
-        kargv[kargc++] = 0;
-        kargv[kargc++] = (char*)opt->cmdline;
-    }
-
     /* jump to the entry point */
-    entry_fn fn = (entry_fn)opt->exec_addr;
+    typedef void(*entry_fn)(void);
+    entry_fn fn = (entry_fn)BOOT_EXEC_ADDR;
     commit_discard_idcache();
-    fn(kargc, kargv, 0, 0);
+    fn();
 }
