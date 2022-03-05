@@ -104,6 +104,7 @@ enum {
 };
 
 int check_disk(bool wait);
+void usb_mode(void);
 
 void recovery_menu(void) __attribute__((noreturn));
 

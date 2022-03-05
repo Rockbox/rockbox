@@ -56,43 +56,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-/* Flags to indicate if hardware was already initialized */
-bool usb_inited = false;
-
-/* Set to true if a SYS_USB_CONNECTED event is seen
- * Set to false if a SYS_USB_DISCONNECTED event is seen */
-bool is_usb_connected = false;
-
-void init_usb(void)
-{
-    if(usb_inited)
-        return;
-
-    usb_init();
-    usb_start_monitoring();
-    usb_inited = true;
-}
-
-void usb_mode(void)
-{
-    init_usb();
-
-    if(!is_usb_connected)
-        splash2(0, "Waiting for USB", "Press " BL_QUIT_NAME " to go back");
-
-    while(!is_usb_connected)
-        if(get_button(TIMEOUT_BLOCK) == BL_QUIT)
-            return;
-
-    splash(0, "USB mode");
-    usb_acknowledge(SYS_USB_CONNECTED_ACK);
-
-    while(is_usb_connected)
-        get_button(TIMEOUT_BLOCK);
-
-    splash(3*HZ, "USB disconnected");
-}
-
 void main(void)
 {
     system_init();
@@ -109,6 +72,9 @@ void main(void)
     }
 
     filesystem_init();
+
+    usb_init();
+    usb_start_monitoring();
 
     /* It's OK if this doesn't mount anything. Any disk access should
      * be guarded by a call to check_disk() to see if the disk is really

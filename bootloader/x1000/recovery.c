@@ -26,8 +26,6 @@
 #include "kernel.h"
 #include <string.h>
 
-extern void usb_mode(void);
-
 enum {
     MENUITEM_HEADING,
     MENUITEM_ACTION,

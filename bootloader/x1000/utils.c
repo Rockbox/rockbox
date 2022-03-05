@@ -23,6 +23,13 @@
 #include "storage.h"
 #include "button.h"
 #include "kernel.h"
+#include "usb.h"
+
+/* Set to true if a SYS_USB_CONNECTED event is seen
+ * Set to false if a SYS_USB_DISCONNECTED event is seen
+ * Handled by the gui code since that's how events are delivered
+ * TODO: this is an ugly kludge */
+bool is_usb_connected = false;
 
 /* this is both incorrect and incredibly racy... */
 int check_disk(bool wait)
@@ -42,4 +49,22 @@ int check_disk(bool wait)
     splash(HZ, "Scanning disk");
 
     return DISK_PRESENT;
+}
+
+void usb_mode(void)
+{
+    if(!is_usb_connected)
+        splash2(0, "Waiting for USB", "Press " BL_QUIT_NAME " to cancel");
+
+    while(!is_usb_connected)
+        if(get_button(TIMEOUT_BLOCK) == BL_QUIT)
+            return;
+
+    splash(0, "USB mode");
+    usb_acknowledge(SYS_USB_CONNECTED_ACK);
+
+    while(is_usb_connected)
+        get_button(TIMEOUT_BLOCK);
+
+    splash(3*HZ, "USB disconnected");
 }
