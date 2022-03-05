@@ -138,49 +138,49 @@ static inline void fileop_onsync_internal(struct filestr_base *stream)
 
 static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
 {
-#ifdef HAVE_MULTIVOLUME
-    char path[VOL_MAX_LEN+2];
-    make_volume_root(volume, path);
-#else
-    const char *path = PATH_ROOTSTR;
-#endif
-
 #if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
-    static char rtpath[VOL_MAX_LEN+2] = RB_ROOT_CONTENTS_DIR;
-    static bool redirected = false;
-    int boot_volume = 0;
-    unsigned int crc = 0;
-    crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
-    if (crc == boot_data.crc)
+    char path[VOL_MAX_LEN+2];
+    char rtpath[MAX_PATH / 2];
+    make_volume_root(volume, path);
+
+    unsigned int crc = crc_32(boot_data.payload, boot_data.length, 0xffffffff);
+    if (crc > 0 && crc == boot_data.crc)
     {
-        root_mount_path(path, 0); /*root could be different folder don't hide*/
-        boot_volume = boot_data.boot_volume; /* boot volume contained in uint8_t payload */
-        //root_mount_path(path, volume == boot_volume ? NSITEM_HIDDEN : 0);
-        if (!redirected && volume == boot_volume)
+        /* we need to mount the drive before we can access it */
+        root_mount_path(path, 0); /* root could be different folder don't hide */
+
+        if (volume == boot_data.boot_volume) /* boot volume contained in uint8_t payload */
         {
-            if (get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "") < 0)
-            {   /* Error occurred, card removed? Set root to default */
-                root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
-            }
-            else
-                redirected = true;
-        }
-        if (redirected && volume == boot_volume)
+            int rtlen = get_redirect_dir(rtpath, sizeof(rtpath), volume, "", "");
+            while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)
+                rtpath[rtlen] = '\0'; /* remove extra separators */
+
+            if (rtlen <= 0 || rtpath[rtlen] == VOL_END_TOK)
+                root_unmount_volume(volume); /* unmount so root can be hidden*/
+
+            if (rtlen <= 0) /* Error occurred, card removed? Set root to default */
+                goto standard_redirect;
             root_mount_path(rtpath, NSITEM_CONTENTS);
+        }
+
     } /*CRC OK*/
     else
     {
+standard_redirect:
         root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
         if (volume == path_strip_volume(RB_ROOT_CONTENTS_DIR, NULL, false))
             root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
     }
-#else /*ndef HAVE_MULTIBOOT */
-
+#elif defined(HAVE_MULTIVOLUME)
+    char path[VOL_MAX_LEN+2];
+    make_volume_root(volume, path);
     root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
-#ifdef HAVE_MULTIVOLUME
     if (volume == path_strip_volume(RB_ROOT_CONTENTS_DIR, NULL, false))
-#endif
         root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
+#else
+    const char *path = PATH_ROOTSTR;
+    root_mount_path(path, RB_ROOT_VOL_HIDDEN(volume) ? NSITEM_HIDDEN : 0);
+    root_mount_path(RB_ROOT_CONTENTS_DIR, NSITEM_CONTENTS);
 #endif /* HAVE_MULTIBOOT */
 
 #ifdef HAVE_DIRCACHE
