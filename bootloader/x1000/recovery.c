@@ -39,8 +39,15 @@ struct menuitem {
 
 /* Defines the recovery menu contents */
 static const struct menuitem recovery_items[] = {
+    {MENUITEM_HEADING,  "Boot select",              NULL},
+    {MENUITEM_ACTION,       "Rockbox",              &boot_rockbox},
+#ifdef OF_PLAYER_NAME
+    {MENUITEM_ACTION,       OF_PLAYER_NAME,         &boot_of_player},
+#endif
+#ifdef OF_RECOVERY_NAME
+    {MENUITEM_ACTION,       OF_RECOVERY_NAME,       &boot_of_recovery},
+#endif
     {MENUITEM_HEADING,  "System",                   NULL},
-    {MENUITEM_ACTION,       "Start Rockbox",        &boot_rockbox},
     {MENUITEM_ACTION,       "USB mode",             &usb_mode},
     {MENUITEM_ACTION,       "Shutdown",             &shutdown},
     {MENUITEM_ACTION,       "Reboot",               &reboot},

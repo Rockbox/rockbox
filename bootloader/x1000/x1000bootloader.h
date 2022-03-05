@@ -41,6 +41,17 @@ struct uimage_header;
 # define BL_SELECT_NAME     "PLAY"
 # define BL_QUIT_NAME       "POWER"
 # define BOOTBACKUP_FILE    "/fiiom3k-boot.bin"
+// FIXME: OF kernel hangs on the m3k
+//# define OF_PLAYER_NAME     "FiiO player"
+# define OF_PLAYER_ADDR     0x20000
+# define OF_PLAYER_LENGTH   (4 * 1024 * 1024)
+# define OF_PLAYER_ARGS     OF_RECOVERY_ARGS \
+    " init=/linuxrc ubi.mtd=3 root=ubi0:rootfs ubi.mtd=4 rootfstype=ubifs rw loglevel=8"
+//# define OF_RECOVERY_NAME   "FiiO recovery"
+# define OF_RECOVERY_ADDR   0x420000
+# define OF_RECOVERY_LENGTH (5 * 1024 * 1024)
+# define OF_RECOVERY_ARGS \
+    "mem=64M@0x0 no_console_suspend console=ttyS2,115200n8 lpj=5009408 ip=off"
 #elif defined(SHANLING_Q1)
 # define BL_RECOVERY        BUTTON_NEXT
 # define BL_UP              BUTTON_PREV
@@ -52,6 +63,16 @@ struct uimage_header;
 # define BL_SELECT_NAME     "PLAY"
 # define BL_QUIT_NAME       "POWER"
 # define BOOTBACKUP_FILE    "/shanlingq1-boot.bin"
+# define OF_PLAYER_NAME     "Shanling player"
+# define OF_PLAYER_ADDR     0x140000
+# define OF_PLAYER_LENGTH   (8 * 1024 * 1024)
+# define OF_PLAYER_ARGS     OF_RECOVERY_ARGS \
+    " init=/linuxrc ubi.mtd=5 root=ubi0:rootfs ubi.mtd=6 rootfstype=ubifs rw"
+# define OF_RECOVERY_NAME   "Shanling recovery"
+# define OF_RECOVERY_ADDR   0x940000
+# define OF_RECOVERY_LENGTH (10 * 1024 * 1024)
+# define OF_RECOVERY_ARGS \
+    "mem=64M@0x0 no_console_suspend console=ttyS2,115200n8 lpj=5009408 ip=off"
 #elif defined(EROS_QN)
 # define BL_RECOVERY        BUTTON_VOL_UP
 # define BL_UP              BUTTON_SCROLL_BACK
@@ -118,6 +139,8 @@ void bootloader_restore(void);
  */
 
 void boot_rockbox(void);
+void boot_of_player(void);
+void boot_of_recovery(void);
 void shutdown(void);
 void reboot(void);
 
