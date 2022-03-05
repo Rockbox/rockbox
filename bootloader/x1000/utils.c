@@ -20,10 +20,13 @@
  ****************************************************************************/
 
 #include "x1000bootloader.h"
+#include "core_alloc.h"
 #include "storage.h"
 #include "button.h"
 #include "kernel.h"
 #include "usb.h"
+#include "rb-loader.h"
+#include "loader_strerror.h"
 
 /* Set to true if a SYS_USB_CONNECTED event is seen
  * Set to false if a SYS_USB_DISCONNECTED event is seen
@@ -67,4 +70,29 @@ void usb_mode(void)
         get_button(TIMEOUT_BLOCK);
 
     splash(3*HZ, "USB disconnected");
+}
+
+int load_rockbox(const char* filename, size_t* sizep)
+{
+    if(check_disk(true) != DISK_PRESENT)
+        return -1;
+
+    int handle = core_alloc_maximum("rockbox", sizep, &buflib_ops_locked);
+    if(handle < 0) {
+        splash(5*HZ, "Out of memory");
+        return -2;
+    }
+
+    unsigned char* loadbuffer = core_get_data(handle);
+    int rc = load_firmware(loadbuffer, filename, *sizep);
+    if(rc <= 0) {
+        core_free(handle);
+        splash2(5*HZ, "Error loading Rockbox", loader_strerror(rc));
+        return -3;
+    }
+
+    core_shrink(handle, loadbuffer, rc);
+    *sizep = rc;
+
+    return handle;
 }

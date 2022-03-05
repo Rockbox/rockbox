@@ -23,6 +23,7 @@
 #define __X1000BOOTLOADER_H__
 
 #include "config.h"
+#include <stddef.h>
 #include <stdbool.h>
 
 #if defined(FIIO_M3K)
@@ -105,6 +106,8 @@ enum {
 
 int check_disk(bool wait);
 void usb_mode(void);
+
+int load_rockbox(const char* filename, size_t* sizep);
 
 void recovery_menu(void) __attribute__((noreturn));
 

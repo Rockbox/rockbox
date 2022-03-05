@@ -21,8 +21,6 @@
 
 #include "x1000bootloader.h"
 #include "core_alloc.h"
-#include "rb-loader.h"
-#include "loader_strerror.h"
 #include "system.h"
 #include "kernel.h"
 #include "power.h"
@@ -30,27 +28,13 @@
 
 void boot_rockbox(void)
 {
-    if(check_disk(true) != DISK_PRESENT)
+    size_t length;
+    int handle = load_rockbox(BOOTFILE, &length);
+    if(handle < 0)
         return;
-
-    size_t max_size = 0;
-    int handle = core_alloc_maximum("rockbox", &max_size, &buflib_ops_locked);
-    if(handle < 0) {
-        splash(5*HZ, "Out of memory");
-        return;
-    }
-
-    unsigned char* loadbuffer = core_get_data(handle);
-    int rc = load_firmware(loadbuffer, BOOTFILE, max_size);
-    if(rc <= 0) {
-        core_free(handle);
-        splash2(5*HZ, "Error loading Rockbox", loader_strerror(rc));
-        return;
-    }
 
     gui_shutdown();
-
-    x1000_boot_rockbox(loadbuffer, rc);
+    x1000_boot_rockbox(core_get_data(handle), length);
 }
 
 void shutdown(void)
