@@ -28,16 +28,6 @@
 #include <stddef.h>
 
 enum {
-    BOOT_OPTION_ROCKBOX = 0,
-    BOOT_OPTION_OFW_PLAYER,
-    BOOT_OPTION_OFW_RECOVERY,
-};
-
-enum {
-    /* 3 bits to store the boot option selected by the SPL */
-    BOOT_OPTION_MASK  = 0x7,
-    BOOT_OPTION_SHIFT = 0,
-
     /* Set after running clk_init() and setting up system clocks */
     BOOT_FLAG_CLK_INIT = (1 << 31),
 
@@ -86,20 +76,6 @@ static inline void set_boot_flag(uint32_t bit)
 static inline void clr_boot_flag(uint32_t bit)
 {
     cpm_scratch_set(REG_CPM_SCRATCH & ~bit);
-}
-
-static inline void set_boot_option(int opt)
-{
-    uint32_t r = REG_CPM_SCRATCH;
-    r &= ~(BOOT_OPTION_MASK << BOOT_OPTION_SHIFT);
-    r |= (opt & BOOT_OPTION_MASK) << BOOT_OPTION_SHIFT;
-    cpm_scratch_set(r);
-}
-
-static inline int get_boot_option(void)
-{
-    uint32_t r = REG_CPM_SCRATCH;
-    return (r >> BOOT_OPTION_SHIFT) & BOOT_OPTION_MASK;
 }
 
 #endif /* __BOOT_X1000_H__ */

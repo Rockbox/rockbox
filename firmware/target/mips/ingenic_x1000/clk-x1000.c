@@ -265,39 +265,36 @@ void clk_init(void)
     jz_writef(CPM_APCR, BS(1), PLLM(42 - 1), PLLN(0), PLLOD(0), ENABLE(1));
     while(jz_readf(CPM_APCR, ON) == 0);
 
-#if (defined(FIIO_M3K) || defined(EROS_QN))
+#if defined(FIIO_M3K) || defined(EROS_QN)
     /* TODO: Allow targets to define their clock frequencies in their config,
      * instead of having this be a random special case. */
-    if(get_boot_option() == BOOT_OPTION_ROCKBOX) {
-        clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
-                        CLKDIV_L2(2) |      /* 504 MHz */
-                        CLKDIV_AHB0(5) |    /* 201.6 MHz */
-                        CLKDIV_AHB2(5) |    /* 201.6 MHz */
-                        CLKDIV_PCLK(10));   /* 100.8 MHz */
-        clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
-                        CLKMUX_CPU(SCLK_A) |
-                        CLKMUX_AHB0(SCLK_A) |
-                        CLKMUX_AHB2(SCLK_A));
+    clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
+                    CLKDIV_L2(2) |      /* 504 MHz */
+                    CLKDIV_AHB0(5) |    /* 201.6 MHz */
+                    CLKDIV_AHB2(5) |    /* 201.6 MHz */
+                    CLKDIV_PCLK(10));   /* 100.8 MHz */
+    clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
+                    CLKMUX_CPU(SCLK_A) |
+                    CLKMUX_AHB0(SCLK_A) |
+                    CLKMUX_AHB2(SCLK_A));
 
-        /* DDR to 201.6 MHz */
-        clk_set_ddr(X1000_CLK_SCLK_A, 5);
+    /* DDR to 201.6 MHz */
+    clk_set_ddr(X1000_CLK_SCLK_A, 5);
 
-        /* Disable MPLL */
-        jz_writef(CPM_MPCR, ENABLE(0));
-        while(jz_readf(CPM_MPCR, ON));
-    } else {
-#endif
-        clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
-                        CLKDIV_L2(2) |      /* 504 MHz */
-                        CLKDIV_AHB0(3) |    /* 200 MHz */
-                        CLKDIV_AHB2(3) |    /* 200 MHz */
-                        CLKDIV_PCLK(6));    /* 100 MHz */
-        clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
-                        CLKMUX_CPU(SCLK_A) |
-                        CLKMUX_AHB0(MPLL) |
-                        CLKMUX_AHB2(MPLL));
-#if (defined(FIIO_M3K) || defined(EROS_QN))
-    }
+    /* Disable MPLL */
+    jz_writef(CPM_MPCR, ENABLE(0));
+    while(jz_readf(CPM_MPCR, ON));
+#else
+    /* Default configuration matching the Ingenic OF */
+    clk_set_ccr_div(CLKDIV_CPU(1) |     /* 1008 MHz */
+                    CLKDIV_L2(2) |      /* 504 MHz */
+                    CLKDIV_AHB0(3) |    /* 200 MHz */
+                    CLKDIV_AHB2(3) |    /* 200 MHz */
+                    CLKDIV_PCLK(6));    /* 100 MHz */
+    clk_set_ccr_mux(CLKMUX_SCLK_A(APLL) |
+                    CLKMUX_CPU(SCLK_A) |
+                    CLKMUX_AHB0(MPLL) |
+                    CLKMUX_AHB2(MPLL));
 #endif
 
     /* mark that clocks have been initialized */

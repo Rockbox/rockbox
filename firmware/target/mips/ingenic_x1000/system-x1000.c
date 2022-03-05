@@ -72,7 +72,6 @@ void system_early_init(void)
      * This hack should keep everything working as usual. */
     if(jz_readf(CPM_MPCR, ON) == 0) {
         init_boot_flags();
-        set_boot_option(BOOT_OPTION_ROCKBOX);
         set_boot_flag(BOOT_FLAG_CLK_INIT);
     }
 #endif

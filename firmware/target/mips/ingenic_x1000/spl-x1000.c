@@ -319,7 +319,6 @@ void spl_main(void)
 
     /* set up boot flags */
     init_boot_flags();
-    set_boot_option(BOOT_OPTION_ROCKBOX);
 
     /* early clock and DRAM init */
     clk_init_early();
