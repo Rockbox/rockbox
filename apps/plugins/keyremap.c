@@ -21,12 +21,12 @@
 
 #include "plugin.h"
 #include "lang_enum.h"
-#include "../open_plugin.h"
 
 #include "lib/action_helper.h"
 #include "lib/button_helper.h"
 #include "lib/pluginlib_actions.h"
 #include "lib/printcell_helper.h"
+#include "lib/kbd_helper.h"
 
 #ifdef ROCKBOX_HAS_LOGF
 #define logf rb->logf
@@ -102,6 +102,8 @@ enum {
     M_SETKEYS,
     M_TESTKEYS,
     M_RESETKEYS,
+    M_EXPORTKEYS,
+    M_IMPORTKEYS,
     M_SAVEKEYS,
     M_LOADKEYS,
     M_DELKEYS,
@@ -125,8 +127,10 @@ MENU_ITEM(M_ROOT, "Key Remap Plugin", M_LAST_MAINITEM - 1),
 MENU_ITEM(M_SETKEYS, "Edit Keymap", 1),
 MENU_ITEM(M_TESTKEYS, "Test Keymap", 4),
 MENU_ITEM(M_RESETKEYS, "Reset Keymap", 1),
-MENU_ITEM(M_SAVEKEYS, "Save Keymap", 1),
-MENU_ITEM(M_LOADKEYS, "Load Keymaps", 1),
+MENU_ITEM(M_EXPORTKEYS, "Export Text Keymap", 1),
+MENU_ITEM(M_IMPORTKEYS, "Import Text Keymap", 1),
+MENU_ITEM(M_SAVEKEYS, "Save Native Keymap", 1),
+MENU_ITEM(M_LOADKEYS, "Load Native Keymaps", 1),
 MENU_ITEM(M_DELKEYS, "Delete Keymaps", 1),
 MENU_ITEM(M_TMPCORE, "Temp Core Remap", 1),
 MENU_ITEM(M_SETCORE, "Set Core Remap", 1),
@@ -172,8 +176,24 @@ static struct mainmenu *mainitem(int selected_item)
     else
         return &empty;
 }
-
+/* Forward Declarations */
+static const char *edit_keymap_name_cb(int selected_item, void* data,char* buf, size_t buf_len);
+static int keyremap_import_file(char *filenamebuf, size_t bufsz);
 static void synclist_set(int id, int selected_item, int items, int sel_size);
+
+static int prompt_filename(char *buf, size_t bufsz)
+{
+#define KBD_LAYOUT "abcdefghijklmnop\nqrstuvwxyz |()[]\n1234567890 /._-+\n\n" \
+                   "\nABCDEFGHIJKLMNOP\nQRSTUVWXYZ |()[]\n1234567890 /._-+"
+    unsigned short kbd[sizeof(KBD_LAYOUT) + 10];
+    unsigned short *kbd_p = kbd;
+    if (!kbd_create_layout(KBD_LAYOUT, kbd, sizeof(kbd)))
+        kbd_p = NULL;
+
+#undef KBD_LAYOUT
+    return rb->kbd_input(buf, bufsz, kbd_p) + 1;
+}
+
 static void synclist_set_update(int id, int selected_item, int items, int sel_size)
 {
     SET_MENU_ITEM(lists.selected_item + 1); /* update selected for previous menu*/
@@ -471,12 +491,17 @@ static int keyremap_save_current(const char *filename)
 static void keyremap_save_user_keys(bool notify)
 {
     char buf[MAX_PATH];
-    int i = 1;
+    int i = 0;
     do
     {
-        rb->snprintf(buf, sizeof(buf), "%s/%s%d%s", KMFDIR, KMFUSER, i, KMFEXT1);
         i++;
+        rb->snprintf(buf, sizeof(buf), "%s/%s%d%s", KMFDIR, KMFUSER, i, KMFEXT1);
     } while (i < 100 && rb->file_exists(buf));
+
+    if (notify && prompt_filename(buf, sizeof(buf)) <= 0)
+    {
+        return;
+    }
 
     if (keyremap_save_current(buf) == 0)
     {
@@ -485,6 +510,128 @@ static void keyremap_save_user_keys(bool notify)
     }
     else if (notify)
         rb->splashf(HZ *2, "Saved %s", buf);
+}
+
+static int keyremap_export_current(char *filenamebuf, size_t bufsz)
+{
+    filenamebuf[bufsz - 1] = '\0';
+    int i, j;
+    int ctx_count = 0;
+    size_t entrylen;
+
+    int entry_count = ctx_data.ctx_count + ctx_data.act_count + 1;;/* (ctx_count + ctx_count + act_count + 1) */
+
+    if (entry_count <= 3)
+        return 0;
+
+    int fd = rb->open(filenamebuf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+    if (fd < 0)
+        return -1;
+    rb->fdprintf(fd, "# Key Remap\n# Device: %s\n" \
+                     "# Entries: %d\n\n", MODEL_NAME, entry_count - 1);
+    rb->fdprintf(fd, "# Each entry should be PROPER_CASE and on its own line\n" \
+                     "# Comments run to end of line \n");
+
+    for (i = 0; i <= entry_count; i++)
+    {
+        entrylen = 0;
+        rb->memset(filenamebuf, 0, bufsz);
+        edit_keymap_name_cb(i, MENU_ID(M_EXPORTKEYS), filenamebuf, bufsz);
+        if (i == 0)
+        {
+            ctx_menu_data.act_fmt = "    {%s%s, %s, %s},\n\n";
+            continue;
+        }
+        else if (i == entry_count)
+        {
+            rb->strlcpy(filenamebuf, "}\n\n", bufsz);
+        }
+        char last = '\0';
+        for (j = 0; j < (int)bufsz ;j++)
+        {
+            char ch = filenamebuf[j];
+            if (ch == '$' && last == '\0') /*CONTEXT*/
+            {
+                if (ctx_count > 0)
+                    rb->fdprintf(fd, "}\n");
+                ctx_count++;
+                filenamebuf[j] = '\n';
+            }
+            if (ch == '\n' && last == '\n')
+            {
+                entrylen = j;
+                break;
+            }
+            else if (ch == '\0')
+                filenamebuf[j] = ',';
+            last = ch;
+        }
+
+        size_t bytes = rb->write(fd, filenamebuf, entrylen);
+        if (bytes != entrylen)
+        {
+            entry_count = -2;
+            goto fail;
+        }
+    }
+
+fail:
+    rb->close(fd);
+
+    return entry_count;
+}
+
+static void keyremap_export_user_keys(void)
+{
+    const bool notify = true;
+    char buf[MAX_PATH];
+    int i = 0;
+    do
+    {
+        i++;
+        rb->snprintf(buf, sizeof(buf), "%s/%s%d%s", "", KMFUSER, i, ".txt");
+    } while (i < 100 && rb->file_exists(buf));
+
+    if (notify && prompt_filename(buf, sizeof(buf)) <= 0)
+    {
+        return;
+    }
+
+    if (keyremap_export_current(buf, sizeof(buf)) <= 0)
+    {
+        if(notify)
+            rb->splash(HZ *2, "Error Saving");
+    }
+    else if (notify)
+    {
+        rb->snprintf(buf, sizeof(buf), "%s/%s%d%s", "", KMFUSER, i, ".txt");
+        rb->splashf(HZ *2, "Saved %s", buf);
+    }
+}
+
+static void keyremap_import_user_keys(void)
+{
+    char buf[MAX_PATH];
+    struct browse_context browse;
+
+    rb->browse_context_init(&browse, SHOW_ALL, BROWSE_SELECTONLY, "Select Keymap",
+                         Icon_Plugin, "/", NULL);
+
+    browse.buf = buf;
+    browse.bufsize = sizeof(buf);
+
+    if (rb->rockbox_browse(&browse) == GO_TO_PREVIOUS)
+    {
+        int ret = keyremap_import_file(buf, sizeof(buf));
+        if (ret <= 0)
+        {
+            keyremap_reset_buffer();
+            rb->splash(HZ *2, "Error Opening");
+        }
+        else
+            rb->splashf(HZ * 2, "Loaded Text Keymap ");
+    }
 }
 
 static int keymap_add_context_entry(int context)
@@ -535,6 +682,328 @@ static int keymap_add_button_entry(int context, int action_code,
     menu_useract_set_positions();
     return ctx_data.act_count;
 fail:
+    return 0;
+}
+
+static int get_action_from_str(char *pfield, size_t bufsz)
+{
+    int act = -1;
+    for (int i=0;i < LAST_ACTION_PLACEHOLDER; i++)
+    {
+        if (rb->strncasecmp(pfield, action_name(i), bufsz) == 0)
+        {
+            logf("Action Found: %s (%d)", pfield, i);
+            act = i;
+            break;
+        }
+    }
+    return act;
+}
+
+static int get_button_from_str(char *pfield, size_t bufsz)
+{
+    int btn = -1;
+    for (int i=0;i < available_button_count; i++)
+    {
+        const struct available_button* abtn = &available_buttons[i];
+        if (rb->strncasecmp(pfield, abtn->name, bufsz) == 0)
+        {
+            logf("Button Found: %s (%lx)", abtn->name, abtn->value);
+            btn = abtn->value;
+            break;
+        }
+    }
+    if (btn < 0) /* Not Fatal */
+    {
+        logf("Invalid Button %s", pfield);
+        rb->splashf(HZ, "Invalid Button %s", pfield);
+    }
+    return btn;
+}
+
+static int parse_action_import_entry(int context, char * pbuf, size_t bufsz)
+{
+    size_t bufleft;
+    int count = 0;
+    char ch;
+    char *pfirst = NULL;
+    char *pfield;
+    int field = -1;
+    int act = -1;
+    int button = BUTTON_NONE;
+    int prebtn = BUTTON_NONE;
+    while ((ch = *(pbuf)) != '\0')
+    {
+        pfield = NULL; /* Valid names */
+        if ((ch >= 'A' && ch <= 'Z') || ch == '_')
+        {
+            if (pfirst == NULL)
+                pfirst = pbuf;
+        }
+        else if (ch == ',')
+        {
+            if (pfirst != NULL)
+            {
+                field++;
+                pfield = pfirst;
+                pfirst = NULL;
+                *pbuf = '\0';
+            }
+        }
+        else if (ch == ' ' || ch == '|'){;}
+        else
+            pfirst = NULL;
+
+        if (field == 1 && pfirst != NULL && pbuf[1] == '\0')
+        {
+                field++;
+                pfield = pfirst;
+                pfirst = NULL;
+        }
+
+        if (pfield != NULL)
+        {
+            char *pf;
+
+            if (field == 0) /* action */
+            {
+                char *pact = pfield;
+                pf = pfield;
+                while ((ch = *(pf)) != '\0')
+                {
+                    if(ch == ' ')
+                        *pf = '\0';
+                    else
+                        pf++;
+                }
+                bufleft = bufsz - (pact - pbuf);
+                act = get_action_from_str(pact, bufleft);
+
+                if (act < 0)
+                {
+                    logf("Error Action Expected: %s", pact);
+                    return -1;
+                }
+            }
+            else if (field == 1 || field == 2) /* button / pre_btn */
+            {
+                char *pbtn = pfield;
+                pf = pfield;
+                while ((ch = *(pf)) != '\0')
+                {
+                    if (pf[1] == '\0') /* last item? */
+                    {
+                        pf++;
+                        ch = '|';
+                        pfield = NULL;
+                    }
+                    else if (ch == ' ' || ch == '|')
+                    {
+                        *pf = '\0';
+                    }
+
+                    if(ch == '|')
+                    {
+                        bufleft = bufsz - (pbtn - pbuf);
+                        int btn = get_button_from_str(pbtn, bufleft);
+
+                        if (btn > BUTTON_NONE)
+                        {
+                            if (field == 1)
+                                button |= btn;
+                            else if (field == 2)
+                                prebtn |= btn;
+                        }
+
+                        if (pfield != NULL)
+                        {
+                            pf++;
+                            while ((ch = *(pf)) != '\0')
+                            {
+                                if (*pf == ' ')
+                                    pf++;
+                                else
+                                    break;
+                            }
+                            pbtn = pf;
+                        }
+                    }
+                    else
+                        pf++;
+                }
+
+                if (act < 0)
+                {
+                    logf("Error Action Expected: %s", pfield);
+                    return -1;
+                }
+            }
+
+            pfield = NULL;
+        }
+
+        pbuf++;
+    }
+    if (field == 2)
+    {
+        count = keymap_add_button_entry(context, act, button, prebtn);
+        if (count > 0)
+        {
+            logf("Added: Ctx: %d, Act: %d, Btn: %d PBtn: %d",
+                context, act, button, prebtn);
+        }
+    }
+    return count;
+}
+
+static int keyremap_import_file(char *filenamebuf, size_t bufsz)
+{
+    size_t bufleft;
+    int count = 0;
+    int line = 0;
+    filenamebuf[bufsz - 1] = '\0';
+    logf("keyremap: import %s", filenamebuf);
+    int fd = rb->open(filenamebuf, O_RDONLY);
+    if (fd < 0)
+        return -1;
+
+    char ch;
+    char *pbuf;
+    char *pfirst;
+
+    char *pctx = NULL;
+    char *pact;
+    int ctx = -1;
+
+    keyremap_reset_buffer();
+next_line:
+    while (rb->read_line(fd, filenamebuf, (int) bufsz) > 0)
+    {
+        line++;
+
+
+        pbuf = filenamebuf;
+        pfirst = NULL;
+        pact = NULL;
+        char *pcomment = rb->strchr(pbuf, '#');
+        if (pcomment != NULL)
+        {
+            logf("ln: %d: Skipped Comment: %s", line, pcomment);
+            *pcomment = '\0';
+        }
+
+        while ((ch = *(pbuf)) != '\0')
+        {
+            /* PARSE CONTEXT = { */
+            if ((ch >= 'A' && ch <= 'Z') || ch == '_')
+            {
+                if (pfirst == NULL)
+                    pfirst = pbuf;
+            }
+            else if (ch == ' ')
+            {
+                if (ctx < 0 && pfirst != NULL)
+                {
+                    *pbuf = '\0';
+                    pctx = pfirst;
+                    pfirst = NULL;
+                }
+            }
+            else if (ch == '=')
+            {
+                if (ctx < 0 && pfirst != NULL)
+                {
+                    *pbuf = '\0';
+                    pbuf++;
+                    pctx = pfirst;
+                    pfirst = NULL;
+                }
+                while ((ch = *(pbuf)) != '\0')
+                {
+                    if (ch == '{')
+                        break;
+                    pbuf++;
+                }
+                if (ch == '{' && pctx != NULL)
+                {
+                    bufleft = bufsz - (pctx - filenamebuf);
+                    ctx = -1;
+                    for (int i=0;i < LAST_CONTEXT_PLACEHOLDER;i++)
+                    {
+                        if (rb->strncasecmp(pctx, context_name(i), bufleft) == 0)
+                        {
+                            logf("ln: %d: Context Found: %s (%d)", line, pctx, i);
+                            if (keymap_add_context_entry(i) <= 0)
+                                logf("ln: %d: Context Exists: %s (%d)", line, pctx, i);
+                            ctx = i;
+                            goto next_line;
+
+                        }
+                    }
+                    logf("ln: %d: ERROR { Context Expected got: %s", line, pctx);
+                    goto fail;
+                }
+            }
+            else if (ch == '}')
+            {
+                if (ctx >= 0)
+                    ctx = -1;
+                else
+                {
+                    logf("ln: %d: ERROR no context, unexpected close {", line);
+                    goto fail;
+                }
+            }
+            else if (ch == '{') /* PARSE FIELDS { ACTION, BUTTON, PREBTN } */
+            {
+                int res = 0;
+                if (ctx >= 0)
+                {
+                    pfirst = pbuf;
+
+                    while ((ch = *(pbuf)) != '\0')
+                    {
+                        if (ch == '}')
+                        {
+                            pact = pfirst + 1;
+                            pfirst = NULL;
+                            *pbuf = '\0';
+                            pbuf = "";
+                            continue;
+                        }
+                        pbuf++;
+                    }
+                    if (pact != NULL)
+                    {
+                        bufleft = bufsz - (pact - filenamebuf);
+                        logf("ln: %d: Entry Found: {%s} (%d)", line, pact, 0);
+                        res = parse_action_import_entry(ctx, pact, bufleft);
+                    }
+                }
+                if (res <= 0)
+                {
+                    logf("ln: %d: ERROR action entry expected", line);
+                    goto fail;
+                }
+                else
+                {
+                    pbuf = "";
+                    continue;
+                }
+            }
+            else
+                pfirst = NULL;
+            pbuf++;
+        }
+
+    }
+    rb->close(fd);
+    count = ctx_data.ctx_count + ctx_data.act_count;
+    return count;
+
+fail:
+    rb->close(fd);
+    rb->splashf(HZ * 2, "Error @ line %d", line);
     return 0;
 }
 
@@ -709,7 +1178,18 @@ static const char *menu_useract_items_cb(int selected_item, void* data,
     static char buf_button[MAX_BUTTON_NAME * MAX_BUTTON_COMBO];
     static char buf_prebtn[MAX_BUTTON_NAME * MAX_BUTTON_COMBO];
     int i;
-    (void)data;
+    int szbtn = sizeof("BUTTON");
+    int szctx = sizeof("CONTEXT");
+    int szact = sizeof("ACTION");
+    const char* ctxfmt = "%s";
+
+    if (data == MENU_ID(M_EXPORTKEYS))
+    {
+        szbtn = 0;
+        szctx = 0;
+        szact = 0;
+        ctxfmt = "$%s = {\n\n";
+    }
     buf[0] = '\0';
     for(i = 0; i < ctx_data.ctx_count; i ++)
     {
@@ -720,7 +1200,7 @@ static const char *menu_useract_items_cb(int selected_item, void* data,
                     context_name(ctx_data.ctx_map[i].context),
                     "Select$to add$actions");
             else
-                rb->snprintf(buf, buf_len, "%s", context_name(ctx_data.ctx_map[i].context));
+                rb->snprintf(buf, buf_len, ctxfmt, context_name(ctx_data.ctx_map[i].context));
             return buf;
         }
     }
@@ -730,19 +1210,23 @@ static const char *menu_useract_items_cb(int selected_item, void* data,
         {
             int context = ctx_data.act_map[i].context;
             char ctxbuf[action_helper_maxbuffer];
-            char *pctxbuf = ctxbuf;
+            char *pctxbuf = "\0";
             char *pactname;
-            rb->snprintf(ctxbuf, sizeof(ctxbuf), "%s", context_name(context));
-            pctxbuf += sizeof("CONTEXT");
+            if (data != MENU_ID(M_EXPORTKEYS))
+            {
+                pctxbuf = ctxbuf;
+                rb->snprintf(ctxbuf, sizeof(ctxbuf), ctxfmt, context_name(context));
+                pctxbuf += szctx;//sizeof("CONTEXT")
+            }
             struct button_mapping * bm = &ctx_data.act_map[i].map;
             pactname = action_name(bm->action_code);
-            pactname += sizeof("ACTION");
+            pactname += szact;//sizeof("ACTION")
             /* BUTTON & PRE_BUTTON */
             btnval_to_name(buf_button, sizeof(buf_button), bm->button_code);
             btnval_to_name(buf_prebtn, sizeof(buf_prebtn), bm->pre_button_code);
 
             rb->snprintf(buf, buf_len, ctx_menu_data.act_fmt, pctxbuf,
-                pactname, buf_button + sizeof("BUTTON"), buf_prebtn + sizeof("BUTTON"));
+                pactname, buf_button + szbtn, buf_prebtn + szbtn);
             return buf;
         }
     }
@@ -752,7 +1236,6 @@ static const char *menu_useract_items_cb(int selected_item, void* data,
 static const char *edit_keymap_name_cb(int selected_item, void* data,
                                            char* buf, size_t buf_len)
 {
-    (void)data;
     buf[0] = '\0';
     if (selected_item == 0)
     {
@@ -928,6 +1411,16 @@ int menu_action_root(int *action, int selected_item, bool* exit, struct gui_sync
             else if (cur->menuid == MENU_ID(M_SAVEKEYS))
             {
                 keyremap_save_user_keys(true);
+                goto default_handler;
+            }
+            else if (cur->menuid == MENU_ID(M_EXPORTKEYS))
+            {
+                keyremap_export_user_keys();
+                goto default_handler;
+            }
+            else if (cur->menuid == MENU_ID(M_IMPORTKEYS))
+            {
+                keyremap_import_user_keys();
                 goto default_handler;
             }
             else if (cur->menuid == MENU_ID(M_DELKEYS) ||
@@ -1117,7 +1610,6 @@ int menu_action_testkeys(int *action, int selected_item, bool* exit, struct gui_
         *action = ACTION_REDRAW;
         goto default_handler;
     }
-
 
     if (*action == ACTION_STD_CANCEL && selected_item == 0 && keytest.keymap != NULL)
     {
