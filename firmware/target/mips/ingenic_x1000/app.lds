@@ -23,6 +23,7 @@ MEMORY
 {
     IRAM : ORIGIN = X1000_IRAM_BASE, LENGTH = X1000_IRAM_SIZE
     DRAM : ORIGIN = X1000_DRAM_BASE, LENGTH = X1000_DRAM_SIZE
+    TCSM : ORIGIN = X1000_TCSM_BASE, LENGTH = X1000_TCSM_SIZE
 }
 
 SECTIONS
@@ -67,6 +68,14 @@ SECTIONS
         _iramend = .;
     } > IRAM
     _iramcopy = LOADADDR(.iram);
+
+    .tcsm X1000_TCSM_BASE: AT (_bssbegin + SIZEOF(.iram))
+    {
+        _tcsmstart = .;
+        KEEP(*(.tcsm*));
+        _tcsmend = .;
+    } > TCSM
+    _tcsmcopy = LOADADDR(.tcsm);
 
     . = ALIGN(4);
     .stack (NOLOAD) :

@@ -79,6 +79,19 @@ _iram_loop:
     bne     t1, t2, _iram_loop
     sw      t3, -4(t1)
 
+#if 0
+    /* Copy TCSM from BSS */
+    la      t0, _tcsmcopy
+    la      t1, _tcsmstart
+    la      t2, _tcsmend
+_tcsm_loop:
+    lw      t3, 0(t0)
+    addiu   t0, 4
+    sw      t3, 0(t1)
+    bne     t1, t2, _tcsm_loop
+    addiu   t1, 4
+#endif
+
     /* Clear the BSS segment (needed to zero-initialize C static values) */
     la      t0, _bssbegin
     la      t1, _bssend
