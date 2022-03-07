@@ -33,6 +33,16 @@
 #include "boot-x1000.h"
 #include <stdbool.h>
 
+static int read_btn(void)
+{
+#ifdef HAVE_BUTTON_DATA
+    int bdata;
+    return button_read_device(&bdata);
+#else
+    return button_read_device();
+#endif
+}
+
 void main(void)
 {
     system_init();
@@ -65,17 +75,24 @@ void main(void)
      * let's not force them to hold down the recovery key. */
     bool recovery_mode = get_boot_flag(BOOT_FLAG_USB_BOOT);
 
-#ifdef HAVE_BUTTON_DATA
-    int bdata;
-    if(button_read_device(&bdata) & BL_RECOVERY)
-#else
-    if(button_read_device() & BL_RECOVERY)
-#endif
-        recovery_mode = true;
+    /* Normal boot - if it fails, we bail to the recovery menu */
+    if(!recovery_mode) {
+        int btn = read_btn();
+        btn &= ~BUTTON_POWER; /* ignore power button */
 
-    /* If boot fails, it will return and continue on below */
-    if(!recovery_mode)
-        boot_rockbox();
+        if(btn == BL_RECOVERY)
+            recovery_mode = true;
+#if defined(OF_PLAYER_BTN)
+        else if(btn == OF_PLAYER_BTN)
+            boot_of_player();
+#endif
+#if defined(OF_RECOVERY_BTN)
+        else if(btn == OF_RECOVERY_BTN)
+            boot_of_recovery();
+#endif
+        else
+            boot_rockbox();
+    }
 
     /* This function does not return. */
     recovery_menu();
