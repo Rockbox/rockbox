@@ -41,23 +41,19 @@
 #include "loader_strerror.h"
 #if defined(MI4_FORMAT)
 #include "mi4-loader.h"
-#if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
-#include "bootdata.h"
-#include "crc32.h"
-extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*mi4-loader.c*/
-#endif
 #define LOAD_FIRMWARE(a,b,c) load_mi4(a,b,c)
 #elif defined(RKW_FORMAT)
 #include "rkw-loader.h"
 #define LOAD_FIRMWARE(a,b,c) load_rkw(a,b,c)
 #else
 #include "rb-loader.h"
+#define LOAD_FIRMWARE(a,b,c) load_firmware(a,b,c)
+#endif
+
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
+#include "multiboot.h"
 #include "bootdata.h"
 #include "crc32.h"
-extern  int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume); /*rb-loader.c*/
-#endif
-#define LOAD_FIRMWARE(a,b,c) load_firmware(a,b,c)
 #endif
 
 #if CONFIG_CPU == AS3525v2

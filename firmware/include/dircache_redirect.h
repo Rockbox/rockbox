@@ -27,6 +27,7 @@
 
 #if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR) && !defined(BOOTLOADER)
 #include "rb-loader.h"
+#include "multiboot.h"
 #include "bootdata.h"
 #include "crc32.h"
 #endif

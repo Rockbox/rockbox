@@ -128,6 +128,7 @@
 
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 #include "bootdata.h"
+#include "multiboot.h"
 #include "rbpaths.h"
 #include "pathfuncs.h"
 #include "rb-loader.h"

@@ -18,21 +18,9 @@
  *
  ****************************************************************************/
 
+#ifndef __RB_LOADER_H__
+#define __RB_LOADER_H__
+
 int load_firmware(unsigned char* buf, const char* firmware, int buffer_size);
 
-#ifdef HAVE_MULTIBOOT /* defined by config.h */
-/* Check in root of this <volume> for rockbox_main.<playername>
- * if this file empty or there is a single slash '/'
- * buf = '<volume#>/<rootdir>/<firmware(name)>\0'
- * If instead '/<*DIRECTORY*>' is supplied
- * addpath will be set to this DIRECTORY buf =
- * '/<volume#>/addpath/<rootdir>/<firmware(name)>\0'
- * On error returns Negative number or 0
- * On success returns bytes from snprintf
- * and generated path will be placed in buf
- * note: if supplied buffer is too small return will be
- * the number of bytes that would have been written
- */
-int get_redirect_dir(char* buf, int buffer_size, int volume,
-                     const char* rootdir, const char* firmware);
-#endif
+#endif /* __RB_LOADER_H__ */

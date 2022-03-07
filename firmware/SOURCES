@@ -51,6 +51,10 @@ panic.c
 target/hosted/rolo.c
 #endif
 
+#if defined(HAVE_BOOTDATA) || defined(HAVE_MULTIBOOT)
+common/multiboot.c
+#endif
+
 #ifdef HAVE_SDL
 target/hosted/sdl/button-sdl.c
 target/hosted/sdl/kernel-sdl.c
