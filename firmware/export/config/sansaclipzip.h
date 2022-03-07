@@ -11,6 +11,7 @@
 #define HAVE_BOOTDATA
 /* define boot redirect file name allows booting from external drives */
 #define BOOT_REDIR "rockbox_main.clipzip"
+#define MULTIBOOT_MIN_VOLUME 1
 
 #define HAVE_MULTIDRIVE
 #define NUM_DRIVES 2

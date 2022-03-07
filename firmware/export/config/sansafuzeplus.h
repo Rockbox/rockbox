@@ -12,6 +12,7 @@
 #define HAVE_BOOTDATA
 /* define boot redirect file name allows booting from external drives */
 #define BOOT_REDIR "rockbox_main.fuze+"
+#define MULTIBOOT_MIN_VOLUME 1
 
 // HW can do it but we don't have the IRAM for mix buffers
 //#define HW_SAMPR_CAPS       SAMPR_CAP_ALL_192

@@ -13,6 +13,7 @@
 
 /* define boot redirect file name allows booting from external drives */
 #define BOOT_REDIR "rockbox_main.e200"
+#define MULTIBOOT_MIN_VOLUME 1
 
 /* define this if you have recording possibility */
 #define HAVE_RECORDING

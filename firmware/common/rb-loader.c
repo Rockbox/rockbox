@@ -106,7 +106,7 @@ int load_firmware(unsigned char* buf, const char* firmware, int buffer_size)
          * 0 is the default boot volume, it is not checked here
          * if found <volume>/rockbox_main.<playername> and firmware
          * has a bootdata region this firmware will be loaded */
-        for (unsigned int i = NUM_VOLUMES - 1; i > 0 && ret < 0; i--)
+        for (int i = NUM_VOLUMES - 1; i >= MULTIBOOT_MIN_VOLUME && ret < 0; i--)
         {
             if (get_redirect_dir(filename, sizeof(filename), i,
                                  BOOTDIR, firmware) > 0)

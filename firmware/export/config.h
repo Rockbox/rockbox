@@ -869,6 +869,12 @@ Lyre prototype 1 */
 #define HAVE_MULTIBOOT
 #endif
 
+/* The lowest numbered volume to read a multiboot redirect from; default is to
+ * allow any volume but some targets may wish to exclude the internal drive. */
+#if defined(HAVE_MULTIBOOT) && !defined(MULTIBOOT_MIN_VOLUME)
+# define MULTIBOOT_MIN_VOLUME 0
+#endif
+
 #ifndef NUM_DRIVES
 #define NUM_DRIVES 1
 #endif
