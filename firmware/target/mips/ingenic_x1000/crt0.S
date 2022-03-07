@@ -21,6 +21,7 @@
 
 #include "config.h"
 #include "mips.h"
+#include "bootdata.h"
 
     .text
     .extern main
@@ -47,6 +48,11 @@ _header:
     .ascii  "LOAD"
     .word   _loadaddress
     .ascii  "ENDH"          /* end of header structure */
+
+#ifndef BOOTLOADER
+    /* Multiboot support header; this is not part of the above header. */
+    put_boot_data_here
+#endif
 
 _realstart:
     /* Copy IRAM from BSS to low memory. */

@@ -84,6 +84,7 @@
 #define HAVE_HOTSWAP
 #define HAVE_HOTSWAP_STORAGE_AS_MAIN
 #define HAVE_MULTIDRIVE
+#define HAVE_MULTIVOLUME
 #define NUM_DRIVES 1
 #define STORAGE_WANTS_ALIGN
 #define STORAGE_NEEDS_BOUNCE_BUFFER
@@ -108,6 +109,10 @@
 #define BATTERY_CAPACITY_MAX     1100
 #define BATTERY_CAPACITY_INC     0
 #define BATTERY_TYPES_COUNT      1
+
+/* Multiboot */
+#define HAVE_BOOTDATA
+#define BOOT_REDIR "rockbox_main.fiio_m3k"
 
 /* USB support */
 #ifndef SIMULATOR
