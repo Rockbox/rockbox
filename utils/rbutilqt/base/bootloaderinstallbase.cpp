@@ -116,19 +116,24 @@ void BootloaderInstallBase::progressAborted(void)
 bool BootloaderInstallBase::backup(QString to)
 {
     LOG_INFO() << "Backing up bootloader file";
-    QDir targetDir(".");
-    emit logItem(tr("Creating backup of original firmware file."), LOGINFO);
-    if(!targetDir.mkpath(to)) {
-        emit logItem(tr("Creating backup folder failed"), LOGERROR);
-        return false;
+    if(!m_blfile.isEmpty()) {
+        QDir targetDir(".");
+        emit logItem(tr("Creating backup of original firmware file."), LOGINFO);
+        if(!targetDir.mkpath(to)) {
+            emit logItem(tr("Creating backup folder failed"), LOGERROR);
+            return false;
+        }
+        QString tofile = to + "/" + QFileInfo(m_blfile).fileName();
+        LOG_INFO() << "trying to backup" << m_blfile << "to" << tofile;
+        if(!QFile::copy(Utils::resolvePathCase(m_blfile), tofile)) {
+            emit logItem(tr("Creating backup copy failed."), LOGERROR);
+            return false;
+        }
+        emit logItem(tr("Backup created."), LOGOK);
     }
-    QString tofile = to + "/" + QFileInfo(m_blfile).fileName();
-    LOG_INFO() << "trying to backup" << m_blfile << "to" << tofile;
-    if(!QFile::copy(Utils::resolvePathCase(m_blfile), tofile)) {
-        emit logItem(tr("Creating backup copy failed."), LOGERROR);
-        return false;
+    else {
+        LOG_INFO() << "Bootloader backup not supported for current device.";
     }
-    emit logItem(tr("Backup created."), LOGOK);
     return true;
 }
 
@@ -214,9 +219,6 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
         if(!Utils::resolvePathCase(sl.at(a)).isEmpty()) {
             m_blfile = sl.at(a);
         }
-    }
-    if(m_blfile.isEmpty()) {
-        m_blfile = sl.at(0);
     }
 }
 
