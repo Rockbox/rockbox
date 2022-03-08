@@ -28,6 +28,7 @@
 BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
         : BootloaderInstallBase(parent)
 {
+    ipod.sectorbuf = nullptr;
 }
 
 

@@ -27,6 +27,7 @@
 BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
         : BootloaderInstallBase(parent)
 {
+    sansa.sectorbuf = nullptr;
 }
 
 
