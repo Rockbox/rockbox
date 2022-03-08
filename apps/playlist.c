@@ -428,7 +428,7 @@ static int recreate_control(struct playlist_info* playlist)
         char c = playlist->filename[playlist->dirlen-1];
 
         close(playlist->control_fd);
-        playlist->control_fd = 0;
+        playlist->control_fd = -1;
 
         snprintf(temp_file, sizeof(temp_file), "%s%s",
             playlist->control_filename, file_suffix);
@@ -2205,7 +2205,7 @@ int playlist_resume(void)
 
                         if (!str1)
                         {
-                            result = -1;
+                            result = -2;
                             exit_loop = true;
                             break;
                         }
@@ -2220,7 +2220,7 @@ int playlist_resume(void)
                         
                         if (version != PLAYLIST_CONTROL_FILE_VERSION)
                         {
-                            result = -1;
+                            result = -3;
                             goto out;
                         }
                         
@@ -2254,7 +2254,7 @@ int playlist_resume(void)
                         
                         if (!str1 || !str2 || !str3)
                         {
-                            result = -1;
+                            result = -4;
                             exit_loop = true;
                             break;
                         }
@@ -2270,7 +2270,7 @@ int playlist_resume(void)
                         if (add_track_to_playlist(playlist, str3, position,
                                 queue, total_read+(str3-buffer)) < 0)
                         {
-                            result = -1;
+                            result = -5;
                             goto out;
                         }
                         
@@ -2285,7 +2285,7 @@ int playlist_resume(void)
                         
                         if (!str1)
                         {
-                            result = -1;
+                            result = -6;
                             exit_loop = true;
                             break;
                         }
@@ -2295,7 +2295,7 @@ int playlist_resume(void)
                         if (remove_track_from_playlist(playlist, position,
                                 false) < 0)
                         {
-                            result = -1;
+                            result = -7;
                             goto out;
                         }
 
@@ -2308,7 +2308,7 @@ int playlist_resume(void)
                         
                         if (!str1 || !str2)
                         {
-                            result = -1;
+                            result = -8;
                             exit_loop = true;
                             break;
                         }
@@ -2325,7 +2325,7 @@ int playlist_resume(void)
                         if (randomise_playlist(playlist, seed, false,
                                 false) < 0)
                         {
-                            result = -1;
+                            result = -9;
                             goto out;
                         }
                         sorted = false;
@@ -2336,7 +2336,7 @@ int playlist_resume(void)
                         /* str1=first_index */
                         if (!str1)
                         {
-                            result = -1;
+                            result = -10;
                             exit_loop = true;
                             break;
                         }
@@ -2345,7 +2345,7 @@ int playlist_resume(void)
                         
                         if (sort_playlist(playlist, false, false) < 0)
                         {
-                            result = -1;
+                            result = -11;
                             goto out;
                         }
 
@@ -2374,7 +2374,7 @@ int playlist_resume(void)
                 /* first non-comment line must always specify playlist */
                 if (first && *p != 'P' && *p != '#')
                 {
-                    result = -1;
+                    result = -12;
                     exit_loop = true;
                     break;
                 }
@@ -2385,7 +2385,7 @@ int playlist_resume(void)
                         /* playlist can only be specified once */
                         if (!first)
                         {
-                            result = -1;
+                            result = -13;
                             exit_loop = true;
                             break;
                         }
@@ -2414,7 +2414,7 @@ int playlist_resume(void)
                         current_command = PLAYLIST_COMMAND_COMMENT;
                         break;
                     default:
-                        result = -1;
+                        result = -14;
                         exit_loop = true;
                         break;
                 }
@@ -2459,7 +2459,7 @@ int playlist_resume(void)
 
         if (result < 0)
         {
-            splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
+            splashf(HZ*2, "Err: %d, %s", result, str(LANG_PLAYLIST_CONTROL_INVALID));
             goto out;
         }
 
@@ -2474,8 +2474,8 @@ int playlist_resume(void)
             if ((total_read + count) >= control_file_size)
             {
                 /* no newline at end of control file */
-                splash(HZ*2, ID2P(LANG_PLAYLIST_CONTROL_INVALID));
-                result = -1;
+                splashf(HZ*2, "Err: EOF, %s", str(LANG_PLAYLIST_CONTROL_INVALID));
+                result = -15;
                 goto out;
             }
 
