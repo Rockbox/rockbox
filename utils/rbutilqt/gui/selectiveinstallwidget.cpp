@@ -307,6 +307,11 @@ void SelectiveInstallWidget::installBootloader(void)
             blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
                     + blfile.at(a));
         }
+        // on devices without a bootloader file we use the mointpoint. The
+        // installer will use that to determine the correct device.
+        if(blfile.isEmpty()) {
+            blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString());
+        }
         bl->setBlFile(blfilepath);
         QUrl url(PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderUrl).toString()
                 + PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderName).toString());
