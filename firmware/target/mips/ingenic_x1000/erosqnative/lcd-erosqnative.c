@@ -99,6 +99,7 @@ static const uint32_t erosqnative_lcd_cmd_enable[] = {
     /* Display On */
     LCD_INSTR_CMD,      0x29,
     LCD_INSTR_UDELAY,   20000,
+    LCD_INSTR_END,
 };
 
 /* sleep and wake copied directly from m3k */
