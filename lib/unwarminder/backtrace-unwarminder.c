@@ -108,7 +108,8 @@ Boolean CliInvalidateW(const Int32 a)
 
 void rb_backtrace(int pcAddr, int spAddr, unsigned *line)
 {
-    lcd_putsf(0, (*line)++, "pc:%08x sp:%08x", pcAddr, spAddr);
+    lcd_putsf(0, (*line)++, "pc:%08x", pcAddr); 
+    lcd_putsf(0, (*line)++, "sp:%08x", spAddr);
     lcd_update();
 
     UnwindStart(pcAddr, spAddr, &cliCallbacks, (void *)line);
