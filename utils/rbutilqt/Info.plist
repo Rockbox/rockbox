@@ -11,7 +11,7 @@
 	<key>CFBundleIconFile</key>
 	<string>rbutilqt.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.rockbox.rbutil</string>
+	<string>org.rockbox.rbutil</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
