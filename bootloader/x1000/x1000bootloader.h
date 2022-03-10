@@ -23,6 +23,7 @@
 #define __X1000BOOTLOADER_H__
 
 #include "config.h"
+#include "lcd.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -70,6 +71,24 @@ struct uimage_header;
  * GUI stuff
  */
 
+struct bl_listitem {
+    struct bl_list* list;
+
+    int index;
+    int x, y, width, height;
+};
+
+struct bl_list {
+    struct viewport* vp;
+
+    int num_items;
+    int selected_item;
+    int top_item;
+    int item_height;
+
+    void(*draw_item)(const struct bl_listitem* item);
+};
+
 void clearscreen(void);
 void putversion(void);
 void putcenter_y(int y, const char* msg);
@@ -80,6 +99,11 @@ int get_button(int timeout);
 void init_lcd(void);
 
 void gui_shutdown(void);
+
+void gui_list_init(struct bl_list* list, struct viewport* vp);
+void gui_list_draw(struct bl_list* list);
+void gui_list_select(struct bl_list* list, int item_index);
+void gui_list_scroll(struct bl_list* list, int delta);
 
 /*
  * Installer
