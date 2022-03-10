@@ -50,77 +50,108 @@ static const struct menuitem recovery_items[] = {
     {MENUITEM_ACTION,       "Restore",              &bootloader_restore},
 };
 
-static void put_help_line(int line, const char* str1, const char* str2)
+static void recmenu_draw_item(const struct bl_listitem* item)
 {
-    int width = LCD_WIDTH / SYSFONT_WIDTH;
-    lcd_puts(0, line, str1);
-    lcd_puts(width - strlen(str2), line, str2);
+    const struct menuitem* mu = &recovery_items[item->index];
+    const char* fmt;
+
+    switch(mu->type) {
+    case MENUITEM_HEADING:
+        fmt = "[%s]";
+        break;
+
+    case MENUITEM_ACTION:
+    default:
+        if(item->index == item->list->selected_item)
+            fmt = "=> %s";
+        else
+            fmt = "   %s";
+        break;
+    }
+
+    lcd_putsxyf(item->x, item->y, fmt, mu->text);
+}
+
+static void recmenu_scroll(struct bl_list* list, int dir)
+{
+    int start, end, step;
+
+    if(dir < 0) {
+        start = list->selected_item - 1;
+        end = -1;
+        step = -1;
+    } else if(dir > 0) {
+        start = list->selected_item + 1;
+        end = list->num_items;
+        step = 1;
+    } else {
+        return;
+    }
+
+    for(int i = start; i != end; i += step) {
+        if(recovery_items[i].action) {
+            gui_list_select(list, i);
+
+            /* always show one item above the selection to ensure
+             * the topmost heading is visible */
+            if(list->selected_item == list->top_item && list->top_item > 0)
+                list->top_item--;
+
+            break;
+        }
+    }
+}
+
+static void put_help_line(int y, int line, const char* str1, const char* str2)
+{
+    y += line*SYSFONT_HEIGHT;
+    lcd_putsxy(0, y, str1);
+    lcd_putsxy(LCD_WIDTH - strlen(str2)*SYSFONT_WIDTH, y, str2);
 }
 
 void recovery_menu(void)
 {
-    const int n_items = sizeof(recovery_items)/sizeof(struct menuitem);
+    struct viewport vp = {
+        .x = 0, .y = SYSFONT_HEIGHT,
+        .width = LCD_WIDTH,
+        .height = LCD_HEIGHT - SYSFONT_HEIGHT*5,
+    };
+    lcd_init_viewport(&vp);
 
-    int selection = 0;
-    while(recovery_items[selection].type != MENUITEM_ACTION)
-        ++selection;
+    struct bl_list list;
+    gui_list_init(&list, &vp);
+    list.num_items = ARRAYLEN(recovery_items);
+    list.selected_item = 1; /* first item is a heading */
+    list.draw_item = recmenu_draw_item;
 
     while(1) {
         clearscreen();
         putcenter_y(0, "Rockbox recovery menu");
 
-        int top_line = 2;
-
-        /* draw the menu */
-        for(int i = 0; i < n_items; ++i) {
-            switch(recovery_items[i].type) {
-            case MENUITEM_HEADING:
-                lcd_putsf(0, top_line+i, "[%s]", recovery_items[i].text);
-                break;
-
-            case MENUITEM_ACTION:
-                lcd_puts(3, top_line+i, recovery_items[i].text);
-                break;
-
-            default:
-                break;
-            }
-        }
-
-        /* draw the selection marker */
-        lcd_puts(0, top_line+selection, "=>");
-
         /* draw the help text */
-        int line = (LCD_HEIGHT - SYSFONT_HEIGHT)/SYSFONT_HEIGHT - 3;
-        put_help_line(line++, BL_DOWN_NAME "/" BL_UP_NAME, "move cursor");
-        put_help_line(line++, BL_SELECT_NAME, "select item");
-        put_help_line(line++, BL_QUIT_NAME, "power off");
+        int ypos = LCD_HEIGHT - 4*SYSFONT_HEIGHT;
+        put_help_line(ypos, 0, BL_DOWN_NAME "/" BL_UP_NAME, "move cursor");
+        put_help_line(ypos, 1, BL_SELECT_NAME, "select item");
+        put_help_line(ypos, 2, BL_QUIT_NAME, "power off");
+
+        /* draw the list */
+        gui_list_draw(&list);
 
         lcd_update();
 
         /* handle input */
         switch(get_button(TIMEOUT_BLOCK)) {
         case BL_SELECT: {
-            if(recovery_items[selection].action)
-                recovery_items[selection].action();
+            if(recovery_items[list.selected_item].action)
+                recovery_items[list.selected_item].action();
         } break;
 
         case BL_UP:
-            for(int i = selection-1; i >= 0; --i) {
-                if(recovery_items[i].action) {
-                    selection = i;
-                    break;
-                }
-            }
+            recmenu_scroll(&list, -1);
             break;
 
         case BL_DOWN:
-            for(int i = selection+1; i < n_items; ++i) {
-                if(recovery_items[i].action) {
-                    selection = i;
-                    break;
-                }
-            }
+            recmenu_scroll(&list, 1);
             break;
 
         case BL_QUIT:
