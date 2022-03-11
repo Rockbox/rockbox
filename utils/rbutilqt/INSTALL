@@ -20,43 +20,34 @@ for Rockbox.
 Requirements:
 =============
 - gcc
-- Qt 4.5.0 or later
-- at least the following folders from Rockbox svn:
+- Qt 5
+- at least the following folders from Rockbox tree:
   o lib/rbcodec/codecs/libspeex
-  o rbutil/
+  o utils/
   o tools/
 - libusb (Linux only)
 
 Building:
 =========
-- run qmake
+- run cmake in the utils/ folder
 - run make
 
 Build Options:
 ==============
-- static
-  add "-config static" to the qmake call to build a static binary. Note that
-  this also requires that you have a statically built version of Qt.
-- dbg
-  add "-config dbg" to build with debug symbols.
-- silent
-  add "-config silent" to the qmake call. This is an undocumented feature of
-  Qt itself. Note that this doesn't seem to work on Windows and Mac OS X until
-  recent versions of Qt.
+There are no build options to set by the user. If your Qt installation is not
+in the PATH or a standard search location you might need to set
+CMAKE_PREFIX_PATH to point to it.
 
 Installation / Deployment:
 ==========================
-Rockbox Utility is build as all-in-one binary. This means for distribution
-you need:
-- RockboxUtility (main binary)
-- rbutil_*.qm (translation files, only for non-static builds)
-You don't need any other files like configuration files, especially
-rbutil.ini which will get included into the binary.
+For deployment the generated build system contains a target
+deploy_RockboxUtility (there's also a target deploy which will also deploy
+other tools.) Depending on the system deployment will create a zip file
+(Windows), dmg (MacOS) or AppImage (Linux).
 
-The script utils/common/deploy-rbutil.py automates building deployment
-binaries. For a complete list of paths to get from svn to build please check
+The script utils/common/tarball-rbutil.py automates building a source archive.
+For a complete list of paths to get from the repository to build please check
 its source.
-
 
 The website for Rockbox Utility is
 http://www.rockbox.org/wiki/RockboxUtility
