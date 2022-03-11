@@ -137,11 +137,13 @@ set_property(TARGET RockboxUtility PROPERTY AUTOMOC ON)
 set_property(TARGET RockboxUtility PROPERTY AUTORCC ON)
 set_property(TARGET RockboxUtility PROPERTY AUTOUIC ON)
 
-deploy_qt(RockboxUtility
-    ${QT_BINDIR}
-    ${CMAKE_CURRENT_LIST_DIR}/../../docs/logo/rockbox-clef.svg
-    ${CMAKE_CURRENT_LIST_DIR}/RockboxUtility.desktop
-    ${CMAKE_CURRENT_LIST_DIR}/dmgbuild.cfg)
+deploy_qt(TARGET RockboxUtility
+    QTBINDIR ${QT_BINDIR}
+    ICONFILE ${CMAKE_CURRENT_LIST_DIR}/../../docs/logo/rockbox-clef.svg
+    DESKTOPFILE ${CMAKE_CURRENT_LIST_DIR}/RockboxUtility.desktop
+    DMGBUILDCFG ${CMAKE_CURRENT_LIST_DIR}/dmgbuild.cfg
+    EXECUTABLES ipodpatcher-bin sansapatcher-bin
+    )
 
 add_library(rbbase
     ${CMAKE_CURRENT_LIST_DIR}/../../tools/iriver.c

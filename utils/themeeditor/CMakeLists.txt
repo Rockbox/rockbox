@@ -142,8 +142,9 @@ if(APPLE)
         PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 endif()
 
-deploy_qt(RockboxThemeEditor
-    ${QT_BINDIR}
-    ${CMAKE_CURRENT_LIST_DIR}/resources/rbthemeeditor.svg
-    ${CMAKE_CURRENT_LIST_DIR}/RockboxThemeEditor.desktop
-    ${CMAKE_CURRENT_LIST_DIR}/dmgbuild.cfg)
+deploy_qt(TARGET RockboxThemeEditor
+    QTBINDIR ${QT_BINDIR}
+    ICONFILE ${CMAKE_CURRENT_LIST_DIR}/resources/rbthemeeditor.svg
+    DESKTOPFILE ${CMAKE_CURRENT_LIST_DIR}/RockboxThemeEditor.desktop
+    DMGBUILDCFG ${CMAKE_CURRENT_LIST_DIR}/dmgbuild.cfg)
+

@@ -39,43 +39,91 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
             -DOUTDIR=${CMAKE_BINARY_DIR}
             -DURL=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
             -P ${CMAKE_CURRENT_LIST_DIR}/download.cmake
-        )
-        # intermediate target needed to be able to get back to the actual file dependency.
-        add_custom_target(linuxdeploy DEPENDS ${LINUXDEPLOY})
-    function(deploy_qt target qtbindir iconfile desktopfile dmgbuildcfg)
+    )
+    # intermediate target needed to be able to get back to the actual file dependency.
+    add_custom_target(linuxdeploy DEPENDS ${LINUXDEPLOY})
+
+    function(deploy_qt)
+        cmake_parse_arguments(deploy ""
+            "TARGET;DESKTOPFILE;ICONFILE;QTBINDIR;DMGBUILDCFG"
+            "EXECUTABLES"
+            ${ARGN})
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
 
+        add_custom_target(deploy_${deploy_TARGET}
+            DEPENDS ${CMAKE_BINARY_DIR}/${deploy_TARGET}.AppImage)
+
+        # need extra rules so we can use generator expressions
+        # (using get_target_property() doesn't know neede values during generation)
+        set(_deploy_deps "")
+        foreach(_deploy_exe_tgt ${deploy_EXECUTABLES})
+            add_custom_command(
+                OUTPUT ${CMAKE_BINARY_DIR}/${_deploy_exe_tgt}.appimage.stamp
+                COMMENT "Copying ${_deploy_exe_tgt} to AppImage"
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/AppImage-${deploy_TARGET}/usr/bin
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${_deploy_exe_tgt}>
+                                            ${CMAKE_BINARY_DIR}/AppImage-${deploy_TARGET}/usr/bin
+                COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/${_deploy_exe_tgt}.appimage.stamp
+                DEPENDS ${_deploy_exe_tgt}
+                )
+            add_custom_target(deploy_${deploy_TARGET}_${_deploy_exe_tgt}
+                DEPENDS ${CMAKE_BINARY_DIR}/${_deploy_exe_tgt}.appimage.stamp)
+
+            set(_deploy_deps "${_deploy_deps};deploy_${deploy_TARGET}_${_deploy_exe_tgt}")
+        endforeach()
+
         add_custom_command(
-            OUTPUT ${CMAKE_BINARY_DIR}/${target}.AppImage
-            COMMENT "Creating AppImage ${target}"
-            COMMAND OUTPUT=${CMAKE_BINARY_DIR}/${target}.AppImage
+            OUTPUT ${CMAKE_BINARY_DIR}/${deploy_TARGET}.AppImage
+            COMMENT "Creating AppImage ${deploy_TARGET}"
+            COMMAND OUTPUT=${CMAKE_BINARY_DIR}/${deploy_TARGET}.AppImage
                     ${LINUXDEPLOY}
                     --plugin qt
-                    --icon-file=${iconfile}
-                    --desktop-file=${desktopfile}
-                    --executable=$<TARGET_FILE:${target}>
-                    --appdir=AppImage-${target}
+                    --icon-file=${deploy_ICONFILE}
+                    --desktop-file=${deploy_DESKTOPFILE}
+                    --executable=$<TARGET_FILE:${deploy_TARGET}>
+                    --appdir=${CMAKE_BINARY_DIR}/AppImage-${deploy_TARGET}
                     --output=appimage
                     --verbosity=2
-            DEPENDS ${target} linuxdeploy
+                    DEPENDS ${deploy_TARGET} ${_deploy_deps} linuxdeploy
             )
-        add_custom_target(deploy_${target}
-            DEPENDS ${CMAKE_BINARY_DIR}/${target}.AppImage)
-        add_dependencies(deploy deploy_${target})
+        add_dependencies(deploy deploy_${deploy_TARGET})
     endfunction()
 endif()
 
 # MacOS: Build dmg
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    function(deploy_qt target qtbindir iconfile desktopfile dmgbuildcfg)
+    function(deploy_qt)
+        cmake_parse_arguments(deploy ""
+            "TARGET;DESKTOPFILE;ICONFILE;QTBINDIR;DMGBUILDCFG"
+            "EXECUTABLES"
+            ${ARGN})
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
         set(DMGBUILD ${CMAKE_BINARY_DIR}/venv/bin/python3 -m dmgbuild)
         set(DMGBUILD_STAMP ${CMAKE_BINARY_DIR}/dmgbuild.stamp)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${qtbindir}")
+
+        # need extra rules so we can use generator expressions
+        # (using get_target_property() doesn't know neede values during generation)
+        set(_deploy_deps "")
+        foreach(_deploy_exe_tgt ${deploy_EXECUTABLES})
+            add_custom_command(
+                OUTPUT ${CMAKE_BINARY_DIR}/${_deploy_exe_tgt}.app.stamp
+                COMMENT "Copying ${_deploy_exe_tgt} to App"
+                COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_BUNDLE_CONTENT_DIR:${deploy_TARGET}>/bin
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${_deploy_exe_tgt}>
+                                            $<TARGET_BUNDLE_CONTENT_DIR:${deploy_TARGET}>/bin
+                COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/${_deploy_exe_tgt}.app.stamp
+                DEPENDS ${_deploy_exe_tgt}
+                )
+            add_custom_target(deploy_${deploy_TARGET}_${_deploy_exe_tgt}
+                DEPENDS ${CMAKE_BINARY_DIR}/${_deploy_exe_tgt}.app.stamp)
+
+            set(_deploy_deps "${_deploy_deps};deploy_${deploy_TARGET}_${_deploy_exe_tgt}")
+        endforeach()
 
         add_custom_command(
             COMMENT "Setting up dmgbuild virtualenv"
@@ -86,62 +134,83 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
         add_custom_command(
             # TODO: find a better way to figure the app bundle name.
-            OUTPUT ${CMAKE_BINARY_DIR}/${target}.dmg
-            COMMENT "Running macdeployqt and creating dmg ${target}"
-            COMMAND ${MACDEPLOYQT_EXECUTABLE} ${target}.app
-            COMMAND ${DMGBUILD} -s ${dmgbuildcfg}
-                    -Dappbundle=${target}.app
-                    ${target} ${CMAKE_BINARY_DIR}/${target}.dmg
-            DEPENDS ${target}
+            OUTPUT ${CMAKE_BINARY_DIR}/${deploy_TARGET}.dmg
+            COMMENT "Running macdeployqt and creating dmg ${deploy_TARGET}"
+            COMMAND ${MACDEPLOYQT_EXECUTABLE} ${deploy_TARGET}.app
+            COMMAND ${DMGBUILD} -s ${deploy_DMGBUILDCFG}
+                    -Dappbundle=${deploy_TARGET}.app
+                    ${deploy_TARGET} ${CMAKE_BINARY_DIR}/${deploy_TARGET}.dmg
+            DEPENDS ${deploy_TARGET}
                     ${DMGBUILD_STAMP}
+                    ${_deploy_deps}
             )
-        add_custom_target(deploy_${target}
-            DEPENDS ${CMAKE_BINARY_DIR}/${target}.dmg)
-        add_dependencies(deploy deploy_${target})
+        add_custom_target(deploy_${deploy_TARGET}
+            DEPENDS ${CMAKE_BINARY_DIR}/${deploy_TARGET}.dmg)
+        add_dependencies(deploy deploy_${deploy_TARGET})
     endfunction()
 endif()
 
 # Windows. Copy to dist folder, run windeployqt on the binary, compress to zip.
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    function(deploy_qt target qtbindir iconfile desktopfile dmgbuildcfg)
+    function(deploy_qt)
+        cmake_parse_arguments(deploy ""
+            "TARGET;DESKTOPFILE;ICONFILE;QTBINDIR;DMGBUILDCFG"
+            "EXECUTABLES"
+            ${ARGN})
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
-        set(_targetfile ${target}.exe)  # TODO: Use property. OUTPUT_NAME seems to fail.
         find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${qtbindir}")
-        set(deploydir ${CMAKE_BINARY_DIR}/deploy-${target})
+        set(deploydir ${CMAKE_BINARY_DIR}/deploy-${deploy_TARGET})
         if(WINDEPLOYQT_EXECUTABLE)
             add_custom_command(
                 COMMENT "Creating deploy folder and running windeployqt"
-                OUTPUT ${deploydir}/${_targetfile}
+                OUTPUT ${deploydir}/${deploy_TARGET}
                 COMMAND ${CMAKE_COMMAND} -E make_directory ${deploydir}
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_targetfile} ${deploydir}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${deploy_TARGET}> ${deploydir}
                 COMMAND ${WINDEPLOYQT_EXECUTABLE}
                         $<IF:$<CONFIG:Debug>,--debug,--release>  # on MinGW, release is mistaken as debug.
-                        ${deploydir}/${_targetfile}
-                DEPENDS ${target}
+                        ${deploydir}/$<TARGET_FILE:${deploy_TARGET}>
+                DEPENDS ${deploy_TARGET}
             )
         else()
             add_custom_command(
                 COMMENT "Creating deploy folder"
-                OUTPUT ${deploydir}/${_targetfile}
+                OUTPUT ${deploydir}/${deploy_TARGET}
                 COMMAND ${CMAKE_COMMAND} -E make_directory ${deploydir}
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_targetfile} ${deploydir}
-                DEPENDS ${target}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${deploy_TARGET}> ${deploydir}
+                DEPENDS ${deploy_TARGET}
             )
         endif()
+        # need extra rules so we can use generator expressions
+        # (using get_target_property() doesn't know neede values during generation)
+        set(_deploy_deps "")
+        foreach(_deploy_exe_tgt ${deploy_EXECUTABLES})
+            add_custom_command(
+                OUTPUT ${CMAKE_BINARY_DIR}/${_deploy_exe_tgt}.app.stamp
+                COMMENT "Copying ${_deploy_exe_tgt} to deploy folder"
+                COMMAND ${CMAKE_COMMAND} -E make_directory ${deploydir}
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${_deploy_exe_tgt}> ${deploydir}
+                COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/${_deploy_exe_tgt}.app.stamp
+                DEPENDS ${_deploy_exe_tgt}
+                )
+            add_custom_target(deploy_${deploy_TARGET}_${_deploy_exe_tgt}
+                DEPENDS ${CMAKE_BINARY_DIR}/${_deploy_exe_tgt}.app.stamp)
+
+            set(_deploy_deps "${_deploy_deps};deploy_${deploy_TARGET}_${_deploy_exe_tgt}")
+        endforeach()
         add_custom_command(
             COMMENT "Compressing to zip"
-            OUTPUT ${CMAKE_BINARY_DIR}/${target}.zip
+            OUTPUT ${CMAKE_BINARY_DIR}/${deploy_TARGET}.zip
             WORKING_DIRECTORY ${deploydir}
-            COMMAND ${CMAKE_COMMAND} -E tar c ${CMAKE_BINARY_DIR}/${target}.zip
+            COMMAND ${CMAKE_COMMAND} -E tar c ${CMAKE_BINARY_DIR}/${deploy_TARGET}.zip
                     --format=zip .
-            DEPENDS ${deploydir}/${_targetfile}
+            DEPENDS ${deploydir}/${deploy_TARGET} ${_deploy_deps}
             )
 
-        add_custom_target(deploy_${target}
-            DEPENDS ${CMAKE_BINARY_DIR}/${target}.zip)
-        add_dependencies(deploy deploy_${target})
+        add_custom_target(deploy_${deploy_TARGET}
+            DEPENDS ${CMAKE_BINARY_DIR}/${deploy_TARGET}.zip)
+        add_dependencies(deploy deploy_${deploy_TARGET})
     endfunction()
 endif()
 
