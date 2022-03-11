@@ -1907,11 +1907,13 @@ static int audio_load_track(void)
             break;
 
         /* Test for broken playlists by probing for the files */
-        fd = open(path, O_RDONLY);
-        if (fd >= 0)
-            break;
-
-        logf("Open failed");
+        if (file_exists(path))
+        {
+            fd = open(path, O_RDONLY);
+            if (fd >= 0)
+                break;
+        }
+        logf("Open failed %s", path);
 
         /* only skip if failed track has a successor in playlist */
         if (!playlist_peek(playlist_peek_offset + 1, NULL, 0))
