@@ -104,6 +104,13 @@ endif()
 target_compile_definitions(ipodpatcher PUBLIC RBUTIL _LARGEFILE64_SOURCE)
 target_include_directories(ipodpatcher PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ipodpatcher)
 
+add_executable(sansapatcher-bin
+    sansapatcher/main.c
+    )
+target_link_libraries(sansapatcher-bin sansapatcher)
+target_compile_definitions(sansapatcher-bin PRIVATE VERSION="none")
+set_target_properties(sansapatcher-bin PROPERTIES OUTPUT_NAME sansapatcher)
+
 add_library(sansapatcher
     sansapatcher/parttypes.h
     sansapatcher/sansaio.h
