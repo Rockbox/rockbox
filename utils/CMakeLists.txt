@@ -82,6 +82,17 @@ if(APPLE)
 endif()
 
 
+add_executable(ipodpatcher-bin
+    ipodpatcher/main.c
+    ipodpatcher/ipodpatcher-aupd.c
+    )
+target_link_libraries(ipodpatcher-bin ipodpatcher)
+target_compile_definitions(ipodpatcher-bin PRIVATE VERSION="none")
+set_target_properties(ipodpatcher-bin PROPERTIES OUTPUT_NAME ipodpatcher)
+if(APPLE)
+    target_link_libraries(ipodpatcher-bin ${FRAMEWORK_IOKIT} ${FRAMEWORK_COREFOUNDATION})
+endif()
+
 add_library(ipodpatcher
     ipodpatcher/arc4.h
     ipodpatcher/arc4.c
