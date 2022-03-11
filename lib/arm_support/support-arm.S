@@ -676,8 +676,8 @@ __udivsi3:
     .size __udivsi3, . - __udivsi3
 
 __divsi3:
-    str lr, [sp, #-4]
-    ARMV5_SDIV32_BODY r0, r1, r0, "", r2, lr, ip, r3, __div0_wrap_s, "ldr pc, [sp, #-4]"
+    push {lr}
+    ARMV5_SDIV32_BODY r0, r1, r0, "", r2, lr, ip, r3, __div0_wrap_s, "pop {pc}"
     .size __divsi3, . - __divsi3
 
 #else
@@ -686,8 +686,8 @@ __aeabi_uidivmod:
     .size __aeabi_uidivmod, . - __aeabi_uidivmod
 
 __aeabi_idivmod:
-    str lr, [sp, #-4]
-    ARMV5_SDIV32_BODY r0, r1, r0, r1, r2, lr, ip, r3, __div0_wrap_s, "ldr pc, [sp, #-4]"
+    push {lr}
+    ARMV5_SDIV32_BODY r0, r1, r0, r1, r2, lr, ip, r3, __div0_wrap_s, "pop {pc}"
     .size __aeabi_idivmod, . - __aeabi_idivmod
 #endif
 
