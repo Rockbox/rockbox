@@ -494,6 +494,8 @@ static int open_internal_inner1(const char *path, int oflag,
     return fildes;
 
 file_error:
+    if (fildes >= 0)
+        close(fildes);
     return rc;
 }
 
