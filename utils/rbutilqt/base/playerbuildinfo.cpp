@@ -113,40 +113,46 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
     // For build info we don't use that.
     QString target = RbSettings::value(RbSettings::CurrentPlatform).toString().split('.').at(0);
 
-    QString s = ServerInfoList[i].name;
-    s.replace(":target:", target);
-    QString v;
+    QString serverinfo = ServerInfoList[i].name;
+    serverinfo.replace(":target:", target);
+    QString buildtypename;
     switch(type) {
     case TypeRelease:
-        v = "release";
+        buildtypename = "release";
         break;
     case TypeCandidate:
-        v = "release-candidate";
+        buildtypename = "release-candidate";
         break;
     case TypeDaily:
-        v = "daily";
+        buildtypename = "daily";
         break;
     case TypeDevel:
-        v = "development";
+        buildtypename = "development";
+        // manual and fonts don't exist for development builds. We do have an
+        // URL configured, but need to get the daily version instead.
+        if(item == BuildManualUrl || item == BuildFontUrl) {
+            LOG_INFO() << "falling back to daily build for this info value";
+            buildtypename = "daily";
+        }
         break;
     }
 
     QVariant result = QString();
     if (!serverInfo)
         return result;
-    QStringList version = serverInfo->value(v + "/" + target, "").toStringList();
-    s.replace(":build:", v);
-    s.replace(":version:", version.at(0));
+    QStringList version = serverInfo->value(buildtypename + "/" + target, "").toStringList();
+    serverinfo.replace(":build:", buildtypename);
+    serverinfo.replace(":version:", version.at(0));
 
     // get value from server build-info
     // we need to get a version string, otherwise the data is invalid.
     // For invalid data return an empty string.
     if(version.at(0).isEmpty()) {
-        LOG_INFO() << s << "(version invalid)";
+        LOG_INFO() << serverinfo << "(version invalid)";
         return result;
     }
-    if(!s.isEmpty())
-        result = serverInfo->value(s);
+    if(!serverinfo.isEmpty())
+        result = serverInfo->value(serverinfo);
 
     // depending on the actual value we need more replacements.
     switch(item) {
@@ -163,8 +169,8 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
 
     case BuildVoiceLangs:
         if (type == TypeDaily)
-            s = "voices/daily";
-        result = serverInfo->value(s);
+            serverinfo = "voices/daily";
+        result = serverInfo->value(serverinfo);
         break;
 
     case BuildManualUrl:
@@ -188,7 +194,7 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
                     .replace("%TARGET%", target)
                     .replace("%VERSION%", version.at(0));
 
-    LOG_INFO() << "B:" << s << result;
+    LOG_INFO() << "B:" << serverinfo << result;
     return result;
 }
 

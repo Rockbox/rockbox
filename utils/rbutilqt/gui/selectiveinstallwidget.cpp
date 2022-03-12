@@ -97,6 +97,12 @@ void SelectiveInstallWidget::selectedVersionChanged(int index)
     ui.voiceCombobox->setEnabled(voice);
     ui.voiceLabel->setEnabled(voice);
     ui.voiceCheckbox->setToolTip(voice ? "" : tr("Not available for the selected version"));
+    QString fontsurl = PlayerBuildInfo::instance()->value(
+                        PlayerBuildInfo::BuildFontUrl, m_buildtype).toString();
+    ui.fontsCheckbox->setEnabled(!fontsurl.isEmpty());
+    QString manualurl = PlayerBuildInfo::instance()->value(
+                        PlayerBuildInfo::BuildManualUrl, m_buildtype).toString();
+    ui.manualCheckbox->setEnabled(!manualurl.isEmpty());
 
     updateVoiceLangs();
 }

@@ -47,30 +47,42 @@ const char* testinfo =
     "iriverh100 = 3.11.2, http://dl.rockbox.org/release/3.11.2/rockbox-iriverh100-3.11.2.zip\n"
     "iriverh120 = 3.3\n"
     "iriverh300 = \n"
+    "\n"
     "[release-candidate]\n"
     "build_url=https://buildurl/rc/%VERSION%/rockbox-%TARGET%-%VERSION%.zip\n"
     "gigabeatfx=f9dce96,http://dl.rockbox.org/rc/f9dce96/rockbox-gigabeatfx.zip\n"
     "archosfmrecorder=f9dce96\n"
     "archosrecorder = f9dce96\n"
     "iaudiox5=f9dce96,http://dl.rockbox.org/rc/f9dce96/rockbox-iaudiox5.zip\n"
+    "\n"
     "[development]\n"
     "build_url=https://buildurl/dev/rockbox-%TARGET%.zip\n"
+    "font_url=https://buildurl/daily/fonts/rockbox-fonts-%VERSION%.zip\n"
+    "manual_url=https://buildurl/daily/manual/rockbox-%TARGET%-%VERSION%%FORMAT%\n"
     "iriverh100 = be1be79\n"
     "iaudiox5 = be1be76\n"
+    "\n"
     "[dailies]\n"
     "timestamp = 20201113\n"
     "rev = 362f7a3\n"
+    "\n"
     "[daily]\n"
     "build_url=https://buildurl/daily/rockbox-%TARGET%-%VERSION%.zip\n"
-    "iriverh100 = f9dce00\n"
+    "font_url=https://buildurl/daily/fonts/rockbox-fonts-%VERSION%.zip\n"
+    "manual_url=https://buildurl/daily/manual/rockbox-%TARGET%-%VERSION%%FORMAT%\n"
+    "iriverh100 = 20201114\n"
+    "iriverh120 = 20201115\n"
+    "\n"
     "[bleeding]\n"
     "timestamp = 20201114T105723Z\n"
     "rev = be1be79\n"
+    "\n"
     "[status]\n"
     "archosfmrecorder=3\n"
     "iriverh100=2\n"
     "iriverh300=1\n"
     "iriverh10=0\n"
+    "\n"
     "[voices]\n"
     "3.15=english,francais\n"
     "3.11.2=english\n"
@@ -124,11 +136,16 @@ struct {
     { "iriverh100",       PlayerBuildInfo::BuildUrl,        PlayerBuildInfo::TypeDevel,     "https://buildurl/dev/rockbox-iriverh100.zip" },
     { "iaudiox5.v",       PlayerBuildInfo::BuildVersion,    PlayerBuildInfo::TypeDevel,     "be1be76" },
     { "iaudiox5.v",       PlayerBuildInfo::BuildUrl,        PlayerBuildInfo::TypeDevel,     "https://buildurl/dev/rockbox-iaudiox5.zip" },
+    // devel builds use daily fonts.
+    { "iriverh100",       PlayerBuildInfo::BuildFontUrl,    PlayerBuildInfo::TypeDevel,     "https://buildurl/daily/fonts/rockbox-fonts-20201114.zip" },
+    { "iriverh100",       PlayerBuildInfo::BuildManualUrl,  PlayerBuildInfo::TypeDevel,     "https://buildurl/daily/manual/rockbox-iriverh100-20201114%FORMAT%" },
 
     // daily builds
     { "iriverh100",       PlayerBuildInfo::BuildVoiceLangs, PlayerBuildInfo::TypeDaily,     "deutsch,english,francais" },
-    { "iriverh100",       PlayerBuildInfo::BuildVersion,    PlayerBuildInfo::TypeDaily,     "f9dce00" },
-    { "iriverh100",       PlayerBuildInfo::BuildUrl,        PlayerBuildInfo::TypeDaily,     "https://buildurl/daily/rockbox-iriverh100-f9dce00.zip" },
+    { "iriverh100",       PlayerBuildInfo::BuildVersion,    PlayerBuildInfo::TypeDaily,     "20201114" },
+    { "iriverh100",       PlayerBuildInfo::BuildUrl,        PlayerBuildInfo::TypeDaily,     "https://buildurl/daily/rockbox-iriverh100-20201114.zip" },
+    { "iriverh100",       PlayerBuildInfo::BuildFontUrl,    PlayerBuildInfo::TypeDaily,     "https://buildurl/daily/fonts/rockbox-fonts-20201114.zip" },
+    { "iriverh120",       PlayerBuildInfo::BuildManualUrl,  PlayerBuildInfo::TypeDaily,     "https://buildurl/daily/manual/rockbox-iriverh100-20201115%FORMAT%" },
 };
 
 struct {
