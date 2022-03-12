@@ -42,11 +42,7 @@ BootloaderInstallIpod::~BootloaderInstallIpod()
 
 bool BootloaderInstallIpod::install(void)
 {
-    // initialize sector buffer. The sector buffer is part of the ipod_t
-    // structure, so a second instance of this class will have its own buffer.
-    if(ipod.sectorbuf == nullptr) {
-        ipod_alloc_buffer(&ipod, BUFFER_SIZE);
-    }
+    ipodInitialize(&ipod);
 
     if(ipod.sectorbuf == nullptr) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
@@ -227,6 +223,11 @@ BootloaderInstallBase::Capabilities BootloaderInstallIpod::capabilities(void)
  */
 bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
 {
+    // initialize sector buffer. The sector buffer is part of the ipod_t
+    // structure, so a second instance of this class will have its own buffer.
+    if(ipod->sectorbuf == nullptr) {
+        ipod_alloc_buffer(ipod, BUFFER_SIZE);
+    }
     if(!m_blfile.isEmpty()) {
         QString devicename = Utils::resolveDevicename(m_blfile);
         if(devicename.isEmpty()) {
