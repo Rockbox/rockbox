@@ -2588,9 +2588,11 @@ unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
     if (playlist_get_track_info(playlist, index, &track_info) == -1)
         return -1;
     const char *basename;
+#ifdef HAVE_MULTIVOLUME
     /* remove the volume identifier it might change just use the relative part*/
     path_strip_volume(track_info.filename, &basename, false);
     if (basename == NULL)
+#endif
         basename = track_info.filename;
     NOTEF("%s: %s", __func__, basename);
     return crc_32(basename, strlen(basename), -1);
