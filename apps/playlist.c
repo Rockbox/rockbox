@@ -107,6 +107,27 @@
 #include "dircache.h"
 #endif
 
+#if 0//def ROCKBOX_HAS_LOGDISKF
+#warning LOGF enabled
+#define LOGF_ENABLE
+#include "logf.h"
+#undef DEBUGF
+#undef ERRORF
+#undef WARNF
+#undef NOTEF
+#define DEBUGF logf
+#define ERRORF DEBUGF
+#define WARNF DEBUGF
+#define NOTEF DEBUGF
+//ERRORF
+//WARNF
+//NOTEF
+#endif
+
+
+
+
+
 #define PLAYLIST_CONTROL_FILE_VERSION 2
 
 /*
@@ -2566,8 +2587,13 @@ unsigned int playlist_get_filename_crc32(struct playlist_info *playlist,
     struct playlist_track_info track_info;
     if (playlist_get_track_info(playlist, index, &track_info) == -1)
         return -1;
-
-    return crc_32(track_info.filename, strlen(track_info.filename), -1);
+    const char *basename;
+    /* remove the volume identifier it might change just use the relative part*/
+    path_strip_volume(track_info.filename, &basename, false);
+    if (basename == NULL)
+        basename = track_info.filename;
+    NOTEF("%s: %s", __func__, basename);
+    return crc_32(basename, strlen(basename), -1);
 }
 
 /* resume a playlist track with the given crc_32 of the track name. */
