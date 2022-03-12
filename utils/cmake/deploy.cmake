@@ -170,7 +170,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${deploy_TARGET}> ${deploydir}
                 COMMAND ${WINDEPLOYQT_EXECUTABLE}
                         $<IF:$<CONFIG:Debug>,--debug,--release>  # on MinGW, release is mistaken as debug.
-                        ${deploydir}/$<TARGET_FILE:${deploy_TARGET}>
+                        $<TARGET_FILE:${deploy_TARGET}>
                 DEPENDS ${deploy_TARGET}
             )
         else()
