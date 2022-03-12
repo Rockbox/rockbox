@@ -43,11 +43,7 @@ BootloaderInstallSansa::~BootloaderInstallSansa()
  */
 bool BootloaderInstallSansa::install(void)
 {
-    // initialize sector buffer. The sector buffer is part of the sansa_t
-    // structure, so a second instance of this class will have its own buffer.
-    if(sansa.sectorbuf == nullptr) {
-        sansa_alloc_buffer(&sansa, BUFFER_SIZE);
-    }
+    sansaInitialize(&sansa);
 
     if(sansa.sectorbuf == nullptr) {
         emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
@@ -236,6 +232,12 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
 
 bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
 {
+    // initialize sector buffer. The sector buffer is part of the sansa_t
+    // structure, so a second instance of this class will have its own buffer.
+    if(sansa->sectorbuf == nullptr) {
+        sansa_alloc_buffer(sansa, BUFFER_SIZE);
+    }
+
     if(!m_blfile.isEmpty()) {
         QString devicename = Utils::resolveDevicename(m_blfile);
         if(devicename.isEmpty()) {
