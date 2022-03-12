@@ -2138,11 +2138,14 @@ int playlist_resume(void)
     int result = -1;
 
     splash(0, ID2P(LANG_WAIT));
-    dircache_wait(); /* we need the dircache to use the files in the playlist */
-
-    /* use mp3 buffer for maximum load speed */
     if (core_allocatable() < (1 << 10))
         talk_buffer_set_policy(TALK_BUFFER_LOOSE); /* back off voice buffer */
+
+#ifdef HAVE_DIRCACHE
+    dircache_wait(); /* we need the dircache to use the files in the playlist */
+#endif
+
+    /* use mp3 buffer for maximum load speed */
     handle = core_alloc_maximum("temp", &buflen, &buflib_ops_locked);
     if (handle < 0)
     {
