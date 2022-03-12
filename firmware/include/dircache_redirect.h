@@ -156,9 +156,10 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
             while (rtlen > 0 && rtpath[--rtlen] == PATH_SEPCH)
                 rtpath[rtlen] = '\0'; /* remove extra separators */
 
+#if 0 /*removed, causes issues with playback for now?*/
             if (rtlen <= 0 || rtpath[rtlen] == VOL_END_TOK)
                 root_unmount_volume(volume); /* unmount so root can be hidden*/
-
+#endif
             if (rtlen <= 0) /* Error occurred, card removed? Set root to default */
                 goto standard_redirect;
             root_mount_path(rtpath, NSITEM_CONTENTS);
