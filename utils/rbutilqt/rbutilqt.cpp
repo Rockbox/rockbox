@@ -367,10 +367,10 @@ void RbUtilQt::updateDevice()
             playerBuildInfo->value(PlayerBuildInfo::BootloaderMethod).toString());
 
     /* Disable uninstallation actions if they are not supported. */
-    bool bootloaderUninstallable = !(bootloaderCapabilities & BootloaderInstallBase::Uninstall);
-    ui.labelRemoveBootloader->setEnabled(bootloaderUninstallable);
-    ui.buttonRemoveBootloader->setEnabled(bootloaderUninstallable);
-    ui.actionRemove_bootloader->setEnabled(bootloaderUninstallable);
+    bool canUninstall = (bootloaderCapabilities & BootloaderInstallBase::Uninstall);
+    ui.labelRemoveBootloader->setEnabled(canUninstall);
+    ui.buttonRemoveBootloader->setEnabled(canUninstall);
+    ui.actionRemove_bootloader->setEnabled(canUninstall);
 
     /* Disable the whole tab widget if configuration is invalid */
     bool configurationValid = !chkConfig(nullptr);
