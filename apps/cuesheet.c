@@ -165,6 +165,38 @@ static unsigned long parse_cue_index(const char *line)
     return offset;
 }
 
+enum eCS_SUPPORTED_TAGS {
+    eCS_TRACK = 0, eCS_INDEX_01, eCS_TITLE,
+    eCS_PERFORMER, eCS_SONGWRITER, eCS_FILE,
+    eCS_COUNT_TAGS_COUNT, eCS_NOTFOUND = -1
+};
+
+static enum eCS_SUPPORTED_TAGS cuesheet_tag_get_option(const char *option)
+{
+    #define CS_OPTN(str) {str, sizeof(str)-1}
+    static const struct cs_option_t {
+        const char *str;
+        const int len;
+    } cs_options[eCS_COUNT_TAGS_COUNT + 1] = {
+        [eCS_TRACK] = CS_OPTN("TRACK"),
+        [eCS_INDEX_01] = CS_OPTN("INDEX_01"),
+        [eCS_TITLE] =CS_OPTN("TITLE"),
+        [eCS_PERFORMER] =CS_OPTN("PERFORMER"),
+        [eCS_SONGWRITER] =CS_OPTN("SONGWRITER"),
+        [eCS_FILE] =CS_OPTN("FILE"),
+        [eCS_COUNT_TAGS_COUNT] = {NULL, 0} /*SENTINEL*/
+    };
+
+    const struct cs_option_t *op;
+    for (int i=0; ((op=&cs_options[i]))->str != NULL; i++)
+    {
+        if (strncmp(option, op->str, op->len) == 0)
+            return i;
+    }
+    return eCS_NOTFOUND;
+#undef CS_OPTN
+}
+
 /* parse cuesheet "cue_file" and store the information in "cue" */
 bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
 {
@@ -245,11 +277,16 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
         }
         s = skip_whitespace(line);
 
-        if (!strncmp(s, "TRACK", 5))
+/*   RECOGNIZED  TAGS *********************** 
+*    eCS_TRACK = 0, eCS_INDEX_01, eCS_TITLE,
+*    eCS_PERFORMER, eCS_SONGWRITER, eCS_FILE,
+*/
+        enum eCS_SUPPORTED_TAGS option = cuesheet_tag_get_option(s);
+        if (option == eCS_TRACK)
         {
             cue->track_count++;
         }
-        else if (!strncmp(s, "INDEX 01", 8))
+        else if (option == eCS_INDEX_01)
         {
 #if 0
             s = strchr(s,' ');
@@ -265,10 +302,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
             cue->tracks[cue->track_count-1].offset = parse_cue_index(s);
 #endif
         }
-        else if (!strncmp(s, "TITLE", 5)
-                 || !strncmp(s, "PERFORMER", 9)
-                 || !strncmp(s, "SONGWRITER", 10)
-                 || !strncmp(s, "FILE", 4))
+        else if (option != eCS_NOTFOUND) 
         {
             char *dest = NULL;
             char *string = get_string(s);
@@ -278,30 +312,40 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
             size_t count = MAX_NAME*3 + 1;
             size_t count8859 = MAX_NAME;
 
-            switch (*s)
+            switch (option)
             {
-                case 'T': /* TITLE */
+                case eCS_TITLE: /* TITLE */
                     dest = (cue->track_count <= 0) ? cue->title :
                             cue->tracks[cue->track_count-1].title;
                     break;
 
-                case 'P': /* PERFORMER */
+                case eCS_PERFORMER: /* PERFORMER */
                     dest = (cue->track_count <= 0) ? cue->performer :
                         cue->tracks[cue->track_count-1].performer;
                     break;
 
-                case 'S': /* SONGWRITER */
+                case eCS_SONGWRITER: /* SONGWRITER */
                     dest = (cue->track_count <= 0) ? cue->songwriter :
                             cue->tracks[cue->track_count-1].songwriter;
                     break;
 
-                case 'F': /* FILE */
+                case eCS_FILE: /* FILE */
                     if (is_embedded || cue->track_count > 0)
                         break;
 
                     dest = cue->file;
                     count = MAX_PATH;
                     count8859 = MAX_PATH/3;
+                    break;
+                case eCS_TRACK:
+                    /*Fall-Through*/
+                case eCS_INDEX_01:
+                    /*Fall-Through*/
+                case eCS_COUNT_TAGS_COUNT:
+                    /*Fall-Through*/
+                case eCS_NOTFOUND: /*Shouldn't happen*/
+                    logf(HZ * 2, "Bad Tag %d @ %s", (int) option, __func__);
+                    dest = NULL;
                     break;
             }
 
@@ -319,6 +363,7 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
                 }
             }
         }
+
         if (is_embedded)
         {
             bytes_left -= line_len;
