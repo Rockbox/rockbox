@@ -252,7 +252,7 @@ bool skip_id3v2(int fd, struct mp3entry *id3)
     return success;
 }
 
-#ifndef ROCKBOX /*codecs can be built without rockbox */
+#if !defined(ROCKBOX) || defined(WARBLE) /*codecs can be built without rockbox */
 /* returns match index from option list
  * returns -1 if option was not found
  * option list is array of char pointers with the final item set to null

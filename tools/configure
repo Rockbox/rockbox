@@ -4280,7 +4280,7 @@ fi
       toolset='';
       t_cpu='';
       GCCOPTS='';
-      extradefines="$extradefines  -DDEBUG"
+      extradefines="$extradefines  -DDEBUG -DWARBLE"
       output='warble.'${modelname};
       echo "Warble build selected"
       ;;
