@@ -1416,7 +1416,7 @@ static int parse_skinvar(  struct skin_element *element,
             else if (sv_op == 0) /*touch*/
                 return WPS_ERROR_INVALID_PARAM;
             data->max = 0;
-            if ((sv_op == 1) /*set*/
+            if (sv_op == 1) /*set*/
                 data->direct = true;
             else if (sv_op == 2) /*inc*/
             {
