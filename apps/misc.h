@@ -123,6 +123,7 @@ extern int show_logo(void);
 
 int split_string(char *str, const char needle, char *vector[], int vector_length);
 int open_utf8(const char* pathname, int flags);
+int string_option(const char *option, const char *const oplist[], bool ignore_case);
 
 #ifdef BOOTFILE
 #if !defined(USB_NONE) && !defined(USB_HANDLED_BY_OF) \

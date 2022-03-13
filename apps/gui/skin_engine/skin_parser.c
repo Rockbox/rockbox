@@ -601,11 +601,16 @@ static int parse_viewporttextstyle(struct skin_element *element,
     *line = (struct line_desc)LINE_DESC_DEFINIT;
     unsigned colour;
 
-    if (!strcmp(mode, "invert"))
+    const char *vp_options[] = { "invert", "color", "colour",
+                                 "clear", "gradient", NULL};
+
+    int vp_op = string_option(mode, vp_options, false);
+
+    if (vp_op == 0) /*invert*/
     {
         line->style = STYLE_INVERT;
     }
-    else if (!strcmp(mode, "colour") || !strcmp(mode, "color"))
+    else if (vp_op == 1 || vp_op == 2) /*color/colour*/
     {
         if (element->params_count < 2 ||
             !parse_color(curr_screen, get_param_text(element, 1), &colour))
@@ -614,7 +619,7 @@ static int parse_viewporttextstyle(struct skin_element *element,
         line->text_color = colour;
     }
 #ifdef HAVE_LCD_COLOR
-    else if (!strcmp(mode, "gradient"))
+    else if (vp_op == 4) /*gradient*/
     {
         int num_lines;
         if (element->params_count < 2)
@@ -627,7 +632,7 @@ static int parse_viewporttextstyle(struct skin_element *element,
         line->nlines = num_lines;
     }
 #endif
-    else if (!strcmp(mode, "clear"))
+    else if (vp_op == 3) /*clear*/
     {
         line->style = STYLE_DEFAULT;
     }
@@ -1042,20 +1047,38 @@ static int parse_progressbar_tag(struct skin_element* element,
     }
 
     pb->horizontal = pb->width > pb->height;
+
+    enum
+    {
+        eINVERT = 0, eNOFILL, eNOBORDER, eNOBAR, eSLIDER, eIMAGE,
+        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING
+    };
+
+    const char *pb_options[] = {"invert", "nofill", "noborder, nobar", "slider",
+                                "image", "backdrop", "vertical", "horizontal",
+                                "notouch", "setting", NULL};
+
+    int pb_op;
+
+
+
+
     while (curr_param < element->params_count)
     {
         char* text;
         param++;
         text = SKINOFFSETTOPTR(skin_buffer, param->data.text);
-        if (!strcmp(text, "invert"))
+
+        pb_op = string_option(text, pb_options, false);
+        if (pb_op == eINVERT)
             pb->invert_fill_direction = true;
-        else if (!strcmp(text, "nofill"))
+        else if (pb_op == eNOFILL)
             pb->nofill = true;
-        else if (!strcmp(text, "noborder"))
+        else if (pb_op == eNOBORDER)
             pb->noborder = true;
-        else if (!strcmp(text, "nobar"))
+        else if (pb_op == eNOBAR)
             pb->nobar = true;
-        else if (!strcmp(text, "slider"))
+        else if (pb_op == eSLIDER)
         {
             if (curr_param+1 < element->params_count)
             {
@@ -1068,7 +1091,7 @@ static int parse_progressbar_tag(struct skin_element* element,
             else /* option needs the next param */
                 return -1;
         }
-        else if (!strcmp(text, "image"))
+        else if (pb_op == eIMAGE)
         {
             if (curr_param+1 < element->params_count)
             {
@@ -1079,7 +1102,7 @@ static int parse_progressbar_tag(struct skin_element* element,
             else /* option needs the next param */
                 return -1;
         }
-        else if (!strcmp(text, "backdrop"))
+        else if (pb_op == eBACKDROP)
         {
             if (curr_param+1 < element->params_count)
             {
@@ -1093,31 +1116,31 @@ static int parse_progressbar_tag(struct skin_element* element,
             else /* option needs the next param */
                 return -1;
         }
-        else if (!strcmp(text, "vertical"))
+        else if (pb_op == eVERTICAL)
         {
             pb->horizontal = false;
             if (isdefault(get_param(element, 3)))
                 pb->height = vp->height - pb->y;
         }
-        else if (!strcmp(text, "horizontal"))
+        else if (pb_op == eHORIZONTAL)
             pb->horizontal = true;
 #ifdef HAVE_TOUCHSCREEN
-        else if (!strcmp(text, "notouch"))
+        else if (pb_op == eNOTOUCH)
             suppress_touchregion = true;
 #endif
-		else if (token->type == SKIN_TOKEN_SETTING && !strcmp(text, "setting"))
-		{
+        else if (token->type == SKIN_TOKEN_SETTING && pb_op == eSETTING)
+        {
             if (curr_param+1 < element->params_count)
             {
                 curr_param++;
                 param++;
                 text = SKINOFFSETTOPTR(skin_buffer, param->data.text);
 #ifndef __PCTOOL__
-				if (find_setting_by_cfgname(text, &pb->setting_id) == NULL)
-					return WPS_ERROR_INVALID_PARAM;
+                if (find_setting_by_cfgname(text, &pb->setting_id) == NULL)
+                    return WPS_ERROR_INVALID_PARAM;
 #endif
-			}
-		}
+            }
+        }
         else if (curr_param == 4)
             image_filename = text;
 
@@ -1379,28 +1402,32 @@ static int parse_skinvar(  struct skin_element *element,
             return 0;
         case SKIN_TOKEN_VAR_SET:
         {
+            const char *sv_options[] = {"touch", "set", "inc", "dec", NULL};
+
             struct skin_var_changer *data = skin_buffer_alloc(sizeof(*data));
             if (!data)
                 return WPS_ERROR_INVALID_PARAM;
             data->var = PTRTOSKINOFFSET(skin_buffer, var);
             char *text_param1 = get_param_text(element, 1);
+            int sv_op = string_option(text_param1, sv_options, false);
+
             if (!isdefault(get_param(element, 2)))
                 data->newval = get_param(element, 2)->data.number;
-            else if (strcmp(text_param1, "touch"))
+            else if (sv_op == 0) /*touch*/
                 return WPS_ERROR_INVALID_PARAM;
             data->max = 0;
-            if (!strcmp(text_param1, "set"))
+            if ((sv_op == 1) /*set*/
                 data->direct = true;
-            else if (!strcmp(text_param1, "inc"))
+            else if (sv_op == 2) /*inc*/
             {
                 data->direct = false;
             }
-            else if (!strcmp(text_param1, "dec"))
+            (sv_op == 3) /*dec*/
             {
                 data->direct = false;
                 data->newval *= -1;
             }
-            else if (!strcmp(text_param1, "touch"))
+            else if (sv_op == 0) /*touch*/
             {
                 data->direct = false;
                 data->newval = 0;
@@ -1679,16 +1706,21 @@ static int parse_touchregion(struct skin_element *element,
         if (region->action == ACTION_NONE)
             return WPS_ERROR_INVALID_PARAM;
     }
+    const char *pm_options[] = {"allow_while_locked", "reverse_bar",
+                                "repeat_press", "long_press", NULL};
+    int pm_op;
+
     while (p < element->params_count)
     {
         char* param = get_param_text(element, p++);
-        if (!strcmp(param, "allow_while_locked"))
+        pm_op = string_option(param, pm_options, false);
+        if (pm_op == 0)
             region->allow_while_locked = true;
-        else if (!strcmp(param, "reverse_bar"))
+        else if (pm_op == 1)
             region->reverse_bar = true;
-        else if (!strcmp(param, "repeat_press"))
+        else if (pm_op == 2)
             region->press_length = REPEAT;
-        else if (!strcmp(param, "long_press"))
+        else if (pm_op == 3)
             region->press_length = LONG_PRESS;
     }
     struct skin_token_list *item = new_skin_token_list_item(NULL, region);
