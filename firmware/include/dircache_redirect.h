@@ -161,7 +161,10 @@ static inline void volume_onmount_internal(IF_MV_NONVOID(int volume))
                 root_unmount_volume(volume); /* unmount so root can be hidden*/
 #endif
             if (rtlen <= 0) /* Error occurred, card removed? Set root to default */
+            {
+                root_unmount_volume(volume); /* unmount so root can be hidden*/
                 goto standard_redirect;
+            }
             root_mount_path(rtpath, NSITEM_CONTENTS);
         }
 
