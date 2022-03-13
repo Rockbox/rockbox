@@ -308,24 +308,26 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
     char *start = tag;
     /* skip text encoding */
     tag += 1;
+    static const char *img_options[] = {"jpeg", "jpg", "png", NULL};
 
     if (memcmp(tag, "image/", 6) == 0)
     {
+        int tg_op = string_option(tag, img_options, false);
         /* ID3 v2.3+ */
         tag += 6;
-        if (strcmp(tag, "jpeg") == 0)
+        if (tg_op == 0) /*jpeg*/
         {
             entry->albumart.type = AA_TYPE_JPG;
             tag += 5;
         }
-        else if (strcmp(tag, "jpg") == 0)
+        else if (tg_op == 1) /*jpg*/
         {
             /* image/jpg is technically invalid, but it does occur in
              * the wild */
             entry->albumart.type = AA_TYPE_JPG;
             tag += 4;
         }
-        else if (strcmp(tag, "png") == 0)
+        else if (tg_op == 2) /*png*/
         {
             entry->albumart.type = AA_TYPE_PNG;
             tag += 4;
@@ -434,9 +436,11 @@ static int parserva2( struct mp3entry* entry, char* tag, int bufferpos)
             }
         }
     
-        if (strcasecmp(tag, "album") == 0) {
+        static const char *tg_options[] = {"album", "track", NULL};
+        int tg_op = string_option(tag, tg_options, true);
+        if (tg_op == 0) { /*album*/
             album = true;
-        } else if (strcasecmp(tag, "track") != 0) {
+        } else if (tg_op != 1) { /*!track*/
             /* Only accept non-track values if we don't have any previous
              * value.
              */

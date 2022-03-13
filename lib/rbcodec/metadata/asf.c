@@ -437,6 +437,18 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     read_uint16le(fd, &count);
                     bytesleft -= 2;
                     //DEBUGF("extended metadata count = %u\n",count);
+                    enum
+                    {
+                        eWM_TrackNumber, eWM_Genre, eWM_AlbumTitle,
+                        eWM_AlbumArtist, eWM_Composer, eWM_Year,
+                        eWM_MusicBrainz_Track_Id, eWM_Picture
+                    };
+                    
+                    static const char *tagops[] =
+                    { "WM/TrackNumber", "WM/Genre", "WM/AlbumTitle",
+                      "WM/AlbumArtist", "WM/Composer",  "WM/Year", 
+                      "MusicBrainz/Track Id", "WM/Picture", NULL
+                    };
 
                     for (i=0; i < count; i++) {
                         uint16_t length, type;
@@ -450,7 +462,9 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                         read_uint16le(fd, &type);
                         read_uint16le(fd, &length);
 
-                        if (!strcmp("WM/TrackNumber",utf8buf)) {
+                        int itag = string_option(utf8buf, tagops, false);
+
+                        if (itag == eWM_TrackNumber) {
                             if (type == 0) {
                                 id3->track_string = id3buf;
                                 asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
@@ -460,19 +474,19 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             } else {
                                 lseek(fd, length, SEEK_CUR);
                             }
-                        } else if ((!strcmp("WM/Genre", utf8buf)) && (type == 0)) {
+                        } else if ((itag == eWM_Genre) && (type == 0)) {
                             id3->genre_string = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if ((!strcmp("WM/AlbumTitle", utf8buf)) && (type == 0)) {
+                        } else if ((itag == eWM_AlbumTitle) && (type == 0)) {
                             id3->album = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if ((!strcmp("WM/AlbumArtist", utf8buf)) && (type == 0)) {
+                        } else if ((itag == eWM_AlbumArtist) && (type == 0)) {
                             id3->albumartist = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if ((!strcmp("WM/Composer", utf8buf)) && (type == 0)) {
+                        } else if ((itag == eWM_Composer) && (type == 0)) {
                             id3->composer = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                        } else if (!strcmp("WM/Year", utf8buf)) {
+                        } else if (itag == eWM_Year) {
                             if (type == 0) {
                                 id3->year_string = id3buf;
                                 asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
@@ -482,15 +496,11 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                             } else {
                                 lseek(fd, length, SEEK_CUR);
                             }
-                        } else if (!strncmp("replaygain_", utf8buf, 11)) {
-                            char *value = id3buf;
-                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
-                            parse_replaygain(utf8buf, value, id3);
-                        } else if (!strcmp("MusicBrainz/Track Id", utf8buf)) {
+                        } else if (itag == eWM_MusicBrainz_Track_Id) {
                             id3->mb_track_id = id3buf;
                             asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
 #ifdef HAVE_ALBUMART
-                        } else if (!strcmp("WM/Picture", utf8buf)) {
+                        } else if (itag == eWM_Picture) {
                             uint32_t datalength = 0;
                             uint32_t strlength;
                             /* Expected is either "01 00 xx xx 03 yy yy yy yy" or
@@ -521,13 +531,23 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                                 asf_utf16LEdecode(fd, 32, &utf8, &utf8length);
                                 strlength = (strlen(utf8buf) + 2) * 2;
                                 lseek(fd, strlength-32, SEEK_CUR);
-                                if (!strcmp("image/jpeg", utf8buf)) {
+
+                                static const char *aa_options[] = {"image/jpeg",
+                                                   "image/jpg","image/png", NULL};
+                                int aa_op = string_option(utf8buf, aa_options, false);
+
+                                if (aa_op == 0) /*image/jpeg*/
+                                {
                                     id3->albumart.type = AA_TYPE_JPG;
-                                } else if (!strcmp("image/jpg", utf8buf)) {
+                                }
+                                else if (aa_op == 1) /*image/jpg*/
+                                {
                                     /* image/jpg is technically invalid,
                                      * but it does occur in the wild */
                                     id3->albumart.type = AA_TYPE_JPG;
-                                } else if (!strcmp("image/png", utf8buf)) {
+                                }
+                                else if (aa_op == 2) /*image/png*/
+                                {
                                     id3->albumart.type = AA_TYPE_PNG;
                                 } else {
                                     id3->albumart.type = AA_TYPE_UNKNOWN;
@@ -543,6 +563,10 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
 
                             lseek(fd, datalength, SEEK_CUR);
 #endif
+                        } else if (!strncmp("replaygain_", utf8buf, 11)) {
+                            char *value = id3buf;
+                            asf_utf16LEdecode(fd, length, &id3buf, &id3buf_remaining);
+                            parse_replaygain(utf8buf, value, id3);
                         } else {
                             lseek(fd, length, SEEK_CUR);
                         }

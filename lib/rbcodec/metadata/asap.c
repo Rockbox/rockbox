@@ -185,38 +185,41 @@ static bool parse_sap_header(int fd, struct mp3entry* id3, int file_len)
                 break;
             }
         }
-
+        static const char *tg_options[] = {"SAP", "AUTHOR", "NAME", "DATE",
+                                            "SONGS", "DEFSONG", "TIME", NULL};
         /* parse tags */
-        if(strcmp(line, "SAP") == 0)
+        int tg_op = string_option(line, tg_options, false);
+        if (tg_op == 0) /*SAP*/
             sap_signature = 1;
         if (sap_signature == -1)
             return false;
-        if (strcmp(line, "AUTHOR") == 0)
+
+        if (tg_op == 1) /*AUTHOR*/
         {
             if(read_asap_string(p, &buffer, &buffer_end, &id3->artist) == false)
                 return false;
         }
-        else if(strcmp(line, "NAME") == 0)
+        else if(tg_op == 2) /*NAME*/
         {
             if(read_asap_string(p, &buffer, &buffer_end, &id3->title) == false)
                 return false;
         }
-        else if(strcmp(line, "DATE") == 0)
+        else if(tg_op == 3) /*DATE*/
         {
             if(read_asap_string(p, &buffer, &buffer_end, &id3->year_string) == false)
                 return false;
         }
-        else if (strcmp(line, "SONGS") == 0)
+        else if (tg_op == 4) /*SONGS*/
         {
             if (parse_dec(&numSongs, p, 1, MAX_SONGS) == false )
                 return false;
         }
-        else if (strcmp(line, "DEFSONG") == 0)
+        else if (tg_op == 5) /*DEFSONG*/
         {
             if (parse_dec(&defSong, p, 0, MAX_SONGS) == false)
                 return false;
         }
-        else if (strcmp(line, "TIME") == 0)
+        else if (tg_op == 6) /*TIME*/
         {
             int durationTemp = ASAP_ParseDuration(p);
             if (durationTemp < 0 || duration_index >= MAX_SONGS)

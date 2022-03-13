@@ -1389,35 +1389,18 @@ int split_string(char *str, const char split_char, char *vector[], const int vec
  * option list is array of char pointers with the final item set to null
  * ex - const char *option[] = { "op_a", "op_b", "op_c", NULL}
  */
-
 int string_option(const char *option, const char *const oplist[], bool ignore_case)
 {
-    int i;
-    int ifound = -1;
     const char *op;
-    if (ignore_case)
+    int (*cmp_fn)(const char*, const char*) = &strcasecmp;
+    if (!ignore_case)
+        cmp_fn = strcmp;
+    for (int i=0; (op=oplist[i]) != NULL; i++)
     {
-        for (i=0; (op=oplist[i]) != NULL; i++)
-        {
-            if (strcasecmp(op, option) == 0)
-            {
-                ifound = i;
-                break;
-            }
-        }
+        if (cmp_fn(op, option) == 0)
+            return i;
     }
-    else
-    {
-        for (i=0; (op=oplist[i]) != NULL; i++)
-        {
-            if (strcmp(op, option) == 0)
-            {
-                ifound = i;
-                break;
-            }
-        }
-    }
-    return ifound;
+    return -1;
 }
 
 /** Open a UTF-8 file and set file descriptor to first byte after BOM.

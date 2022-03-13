@@ -312,18 +312,22 @@ static int readline_cb(int n, char *buf, void *parameters)
     }
     else if (sc && settings_parseline(buf, &name, &value))
     {
-        if (!strcmp(name, "type"))
+        static const char *nm_options[] = {"type", "name", "data",
+                                        "icon", "talkclip", NULL};
+        int nm_op = string_option(name, nm_options, false);
+
+        if (nm_op == 0) /*type*/
         {
             int t = 0;
             for (t=0; t<SHORTCUT_TYPE_COUNT && sc->type == SHORTCUT_UNDEFINED; t++)
                 if (!strcmp(value, type_strings[t]))
                     sc->type = t;
         }
-        else if (!strcmp(name, "name"))
+        else if (nm_op == 1) /*name*/
         {
             strlcpy(sc->name, value, MAX_SHORTCUT_NAME);
         }
-        else if (!strcmp(name, "data"))
+        else if (nm_op == 2) /*data*/
         {
             switch (sc->type)
             {
@@ -357,7 +361,7 @@ static int readline_cb(int n, char *buf, void *parameters)
                     break;
             }
         }
-        else if (!strcmp(name, "icon"))
+        else if (nm_op == 3) /*icon*/
         {
             if (!strcmp(value, "filetype") && sc->type != SHORTCUT_SETTING && sc->u.path[0])
             {
@@ -368,7 +372,7 @@ static int readline_cb(int n, char *buf, void *parameters)
                 sc->icon = atoi(value);
             }
         }
-        else if (!strcmp(name, "talkclip"))
+        else if (nm_op == 4) /*talkclip*/
         {
             strlcpy(sc->talk_clip, value, MAX_PATH);
         }
