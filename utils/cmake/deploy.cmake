@@ -104,7 +104,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         endif()
         set(DMGBUILD ${CMAKE_BINARY_DIR}/venv/bin/python3 -m dmgbuild)
         set(DMGBUILD_STAMP ${CMAKE_BINARY_DIR}/dmgbuild.stamp)
-        find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${qtbindir}")
+        find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${QTBINDIR}")
 
         # need extra rules so we can use generator expressions
         # (using get_target_property() doesn't know neede values during generation)
@@ -160,7 +160,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             message(WARNING "Deploying a Debug build.")
         endif()
-        find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${qtbindir}")
+        find_program(WINDEPLOYQT_EXECUTABLE windeployqt HINTS "${QTBINDIR}")
         set(deploydir ${CMAKE_BINARY_DIR}/deploy-${deploy_TARGET})
         if(WINDEPLOYQT_EXECUTABLE)
             add_custom_command(
@@ -169,7 +169,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
                 COMMAND ${CMAKE_COMMAND} -E make_directory ${deploydir}
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${deploy_TARGET}> ${deploydir}
                 COMMAND ${WINDEPLOYQT_EXECUTABLE}
-                        $<IF:$<CONFIG:Debug>,--debug,--release>  # on MinGW, release is mistaken as debug.
+                        # on MinGW, release is mistaken as debug for Qt less than 5.14.
+                        # For later versions the opposite is true: adding --debug or
+                        # --release will fail with "platform plugin not found."
+                        $<IF:$<VERSION_LESS:${Qt${QT_VERSION_MAJOR}Core_VERSION},5.14.0>,$<IF:$<CONFIG:Debug>,--debug,--release>,>
                         ${deploydir}/$<TARGET_FILE_NAME:${deploy_TARGET}>
                 DEPENDS ${deploy_TARGET}
             )
