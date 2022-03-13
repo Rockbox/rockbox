@@ -38,6 +38,7 @@ bool read_ape_tags(int fd, struct mp3entry* id3);
 long read_vorbis_tags(int fd, struct mp3entry *id3,
     long tag_remaining);
 
+int string_option(const char *option, const char *const oplist[], bool ignore_case);
 bool skip_id3v2(int fd, struct mp3entry *id3);
 long read_string(int fd, char* buf, long buf_size, int eos, long size);
 

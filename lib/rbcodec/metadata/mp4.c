@@ -533,13 +533,18 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     rd_ret = 0;
                 tag_name[rd_ret] = 0;
 
+                static const char *tn_options[] = {"composer", "iTunSMPB",
+                                   "musicbrainz track id", "album artist", NULL};
 
-                if ((strcasecmp(tag_name, "composer") == 0) && !cwrt)
+                int tn_op = string_option(tag_name, tn_options, true);
+
+
+                if (tn_op == 0 && !cwrt) /*composer*/
                 {
                     read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
                         &id3->composer);
                 }   
-                else if (strcasecmp(tag_name, "iTunSMPB") == 0)
+                else if (tn_op == 1) /*iTunSMPB*/
                 {
                     char value[TAG_VALUE_LENGTH];
                     char* value_p = value;
@@ -552,12 +557,12 @@ static bool read_mp4_tags(int fd, struct mp3entry* id3,
                     DEBUGF("AAC: lead_trim %d, tail_trim %d\n", 
                         id3->lead_trim, id3->tail_trim);
                 }
-                else if (strcasecmp(tag_name, "musicbrainz track id") == 0)
+                else if (tn_op == 2) /*musicbrainz track id*/
                 {
                     read_mp4_tag_string(fd, size, &buffer, &buffer_left,
                         &id3->mb_track_id);
                 }
-                else if ((strcasecmp(tag_name, "album artist") == 0))
+                else if (tn_op == 3) /*album artist*/
                 {
                     read_mp4_tag_string(fd, size, &buffer, &buffer_left, 
                         &id3->albumartist);
