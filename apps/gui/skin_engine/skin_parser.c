@@ -1422,7 +1422,7 @@ static int parse_skinvar(  struct skin_element *element,
             {
                 data->direct = false;
             }
-            (sv_op == 3) /*dec*/
+            else if (sv_op == 3) /*dec*/
             {
                 data->direct = false;
                 data->newval *= -1;
