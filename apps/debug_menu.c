@@ -134,10 +134,19 @@
 #include "rb-loader.h"
 #endif
 
+#define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
+struct dbg_os_threads_t
+{
+    long next_scroll;
+    int scroll_pos;
+    int scroll_delay;
+    int scroll_speed;
+};
+
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
-    (void)data;
+struct dbg_os_threads_t* ost = (struct dbg_os_threads_t*) data;
 
 #if NUM_CORES > 1
     if (selected_item < (int)NUM_CORES)
@@ -161,7 +170,7 @@ static const char* threads_getname(int selected_item, void *data,
                  IFN_SDL(" %2d%%") " %s";
     }
 
-    snprintf(buffer, buffer_len, fmtstr,
+    size_t len = snprintf(buffer, buffer_len, fmtstr,
              selected_item,
              IF_COP(threadinfo.core,)
              threadinfo.statusstr,
@@ -169,24 +178,68 @@ static const char* threads_getname(int selected_item, void *data,
              IFN_SDL(threadinfo.stack_usage,)
              threadinfo.name);
 
+    buffer[buffer_len - 1] = '\0';
+
+    if (len >= SCREEN_MAX_CHARS)
+    {
+        if (len >= buffer_len)
+            len = buffer_len - 1;
+        int start = ost->scroll_pos%(len-1);
+        int rem = (len - start);
+        if (rem < SCREEN_MAX_CHARS)
+            start -= (SCREEN_MAX_CHARS - rem);
+
+        if (start > 0)
+        {
+            /* don't scroll the # and status */
+            if ((unsigned int)start + 7 < buffer_len)
+                memmove(&buffer[start], &buffer[0], 7);
+            return &buffer[start];
+        }
+    }
     return buffer;
+
 }
 
 static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 {
-    (void)lists;
+    struct dbg_os_threads_t* ost = (struct dbg_os_threads_t*) lists->data;
     if (action == ACTION_NONE)
+    {
+        if (TIME_AFTER(current_tick, ost->next_scroll))
+        {
+            ost->next_scroll = current_tick + ost->scroll_speed;
+            ost->scroll_pos++;
+            if (ost->scroll_pos > SCREEN_MAX_CHARS * 5)
+            {
+                ost->next_scroll += ost->scroll_delay;
+                ost->scroll_pos = 0;
+            }
+        }
         action = ACTION_REDRAW;
+    }
+    else
+    {
+        ost->next_scroll = current_tick + ost->scroll_delay;
+        ost->scroll_pos = 0;
+    }
+
     return action;
 }
 /* Test code!!! */
 static bool dbg_os(void)
 {
     struct simplelist_info info;
+    struct dbg_os_threads_t ost;
+    ost.scroll_pos = 0;
+    ost.scroll_speed = lcd_scroll_info.ticks;
+    ost.scroll_delay = global_settings.scroll_delay;
+    ost.next_scroll = current_tick + ost.scroll_delay;
+
     simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:",
-                         MAXTHREADS IF_COP( + NUM_CORES ), NULL);
+                         MAXTHREADS IF_COP( + NUM_CORES ), &ost);
     info.hide_selection = true;
-    info.scroll_all = true;
+    info.scroll_all = false;
     info.action_callback = dbg_threads_action_callback;
     info.get_name = threads_getname;
     return simplelist_show_list(&info);
