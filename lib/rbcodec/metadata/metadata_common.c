@@ -288,15 +288,21 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
         eYEAR, eDATE, eTITLE, eARTIST, eALBUM, eGENRE,
         eCOMPOSER, eCOMMENT, eALBUMARTIST, eALBUM_ARTIST,
         eENSEMBLE, eGROUPING, eCONTENTGROUP, eCONTENT_GROUP,
-        eMUSICBRAINZ1, eMUSICBRAINZ2
+        eMUSICBRAINZ1, eMUSICBRAINZ2, e_COUNT_TAG_COUNT
     };
-    
-    static const char *tagops[] =
-    { "track", "tracknumber", "discnumber", "disc",
-       "year","date","title", "artist", "album", "genre"
-       "composer","comment","albumartist","album artist",
-       "ensemble","grouping","contentgroup","content group",
-       "musicbrainz_trackid", "http://musicbrainz.org", NULL
+
+    static const char *tagops[e_COUNT_TAG_COUNT + 1] =
+    { [eTRACK] = "track", [eTRACKNUMBER] = "tracknumber",
+      [eDISCNUMBER] = "discnumber", [eDISC] = "disc",
+      [eYEAR] = "year", [eDATE] = "date", [eTITLE] = "title",
+      [eARTIST] = "artist", [eALBUM] = "album", [eGENRE] = "genre"
+      [eCOMPOSER] = "composer", [eCOMMENT] = "comment",
+      [eALBUMARTIST] = "albumartist", [eALBUM_ARTIST] ="album artist",
+      [eENSEMBLE] = "ensemble", [eGROUPING] = "grouping",
+      [eCONTENTGROUP] = "contentgroup", [eCONTENT_GROUP] = "content group",
+      [eMUSICBRAINZ1] = "musicbrainz_trackid",
+      [eMUSICBRAINZ2] = "http://musicbrainz.org",
+      [e_COUNT_TAG_COUNT] = NULL;
     };
 
     int item = string_option(name, tagops, true);
@@ -351,11 +357,7 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     {
         p = &(id3->comment);
     }
-    else if (item == eALBUMARTIST || item == eALBUM_ARTIST)
-    {
-        p = &(id3->albumartist);
-    }
-    else if (item == eENSEMBLE)
+    else if (item == eALBUMARTIST || item == eALBUM_ARTIST || item == eENSEMBLE)
     {
         p = &(id3->albumartist);
     }

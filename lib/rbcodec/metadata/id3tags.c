@@ -312,9 +312,10 @@ static int parsealbumart( struct mp3entry* entry, char* tag, int bufferpos )
 
     if (memcmp(tag, "image/", 6) == 0)
     {
-        int tg_op = string_option(tag, img_options, false);
         /* ID3 v2.3+ */
         tag += 6;
+        int tg_op = string_option(tag, img_options, false);
+
         if (tg_op == 0) /*jpeg*/
         {
             entry->albumart.type = AA_TYPE_JPG;

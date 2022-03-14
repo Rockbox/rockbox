@@ -1051,12 +1051,15 @@ static int parse_progressbar_tag(struct skin_element* element,
     enum
     {
         eINVERT = 0, eNOFILL, eNOBORDER, eNOBAR, eSLIDER, eIMAGE,
-        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING
+        eBACKDROP, eVERTICAL, eHORIZONTAL, eNOTOUCH, eSETTING, 
+        e_PB_TAG_COUNT
     };
 
-    static const char *pb_options[] = {"invert", "nofill", "noborder, nobar", "slider",
-                                "image", "backdrop", "vertical", "horizontal",
-                                "notouch", "setting", NULL};
+    static const char *pb_options[e_PB_TAG_COUNT + 1] = {[eINVERT] = "invert",
+                 [eNOFILL] = "nofill", [eNOBORDER] = "noborder", [eNOBAR] = "nobar",
+                 [eSLIDER] = "slider", [eIMAGE] = "image", [eBACKDROP] = "backdrop",
+                 [eVERTICAL] = "vertical", [eHORIZONTAL] = "horizontal",
+                 [eNOTOUCH] = "notouch", [eSETTING] = "setting", [e_PB_TAG_COUNT] = NULL};
     int pb_op;
 
     while (curr_param < element->params_count)
@@ -1409,7 +1412,7 @@ static int parse_skinvar(  struct skin_element *element,
 
             if (!isdefault(get_param(element, 2)))
                 data->newval = get_param(element, 2)->data.number;
-            else if (sv_op == 0) /*touch*/
+            else if (sv_op != 0) /*!touch*/
                 return WPS_ERROR_INVALID_PARAM;
             data->max = 0;
             if (sv_op == 1) /*set*/

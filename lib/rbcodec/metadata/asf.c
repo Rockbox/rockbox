@@ -441,13 +441,20 @@ static int asf_parse_header(int fd, struct mp3entry* id3,
                     {
                         eWM_TrackNumber, eWM_Genre, eWM_AlbumTitle,
                         eWM_AlbumArtist, eWM_Composer, eWM_Year,
-                        eWM_MusicBrainz_Track_Id, eWM_Picture
+                        eWM_MusicBrainz_Track_Id, eWM_Picture,
+                        eWM_COUNT_TAG_COUNT
                     };
-                    
-                    static const char *tagops[] =
-                    { "WM/TrackNumber", "WM/Genre", "WM/AlbumTitle",
-                      "WM/AlbumArtist", "WM/Composer",  "WM/Year", 
-                      "MusicBrainz/Track Id", "WM/Picture", NULL
+
+                    static const char *tagops[eWM_COUNT_TAG_COUNT + 1] =
+                    { [eWM_TrackNumber] = "WM/TrackNumber",
+                      [eWM_Genre] = "WM/Genre",
+                      [eWM_AlbumTitle] = "WM/AlbumTitle",
+                      [eWM_AlbumArtist] = "WM/AlbumArtist",
+                      [eWM_Composer] = "WM/Composer",
+                      [eWM_Year] = "WM/Year",
+                      [eWM_MusicBrainz_Track_Id]"MusicBrainz/Track Id",
+                      [eWM_Picture]"WM/Picture",
+                      [eWM_COUNT_TAG_COUNT] = NULL
                     };
 
                     for (i=0; i < count; i++) {
