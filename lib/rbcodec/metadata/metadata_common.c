@@ -295,14 +295,14 @@ long parse_tag(const char* name, char* value, struct mp3entry* id3,
     { [eTRACK] = "track", [eTRACKNUMBER] = "tracknumber",
       [eDISCNUMBER] = "discnumber", [eDISC] = "disc",
       [eYEAR] = "year", [eDATE] = "date", [eTITLE] = "title",
-      [eARTIST] = "artist", [eALBUM] = "album", [eGENRE] = "genre"
+      [eARTIST] = "artist", [eALBUM] = "album", [eGENRE] = "genre",
       [eCOMPOSER] = "composer", [eCOMMENT] = "comment",
       [eALBUMARTIST] = "albumartist", [eALBUM_ARTIST] ="album artist",
       [eENSEMBLE] = "ensemble", [eGROUPING] = "grouping",
       [eCONTENTGROUP] = "contentgroup", [eCONTENT_GROUP] = "content group",
       [eMUSICBRAINZ1] = "musicbrainz_trackid",
       [eMUSICBRAINZ2] = "http://musicbrainz.org",
-      [e_COUNT_TAG_COUNT] = NULL;
+      [e_COUNT_TAG_COUNT] = NULL
     };
 
     int item = string_option(name, tagops, true);
