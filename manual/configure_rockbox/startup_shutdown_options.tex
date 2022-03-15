@@ -36,6 +36,19 @@ are run at startup, or initiate a shutdown when conditions are met.
       to be enabled.
   \end{description}
 
+\opt{clear_settings_on_hold}{
+\subsection{\label{ref:ClearOnHold}Hold switch clears settings on startup }
+  This option controls whether Rockbox clears its configuration if the hold
+  switch is enabled during startup.
+
+  \begin{description}
+    \item[Yes.]
+          Clear the settings if the hold switch is enabled during startup.
+    \item[No.]
+          Do not clear the settings, regardless of the hold switch's position.
+    \end{description}
+}
+
 \subsection{\label{ref:IdlePoweroffSetting}Idle Poweroff}
   Rockbox can be configured to turn off power after the unit has been idle for
   a defined number of minutes. The \dap{} is idle when playback is stopped or

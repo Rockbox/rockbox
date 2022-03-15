@@ -566,7 +566,12 @@ static void init(void)
     pcm_init();
     dsp_init();
 
-#if defined(SETTINGS_RESET) || (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    CHART(">settings_load(ALL)");
+    settings_load(SETTINGS_ALL);
+    CHART("<settings_load(ALL)");
+
+#if defined(SETTINGS_RESET) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #ifdef SETTINGS_RESET
     /* Reset settings if holding the reset button. (Rec on Archos,
@@ -577,16 +582,13 @@ static void init(void)
     if (button_hold())
 #endif
     {
-        splash(HZ*2, str(LANG_RESET_DONE_CLEAR));
-        settings_reset();
+        if (global_settings.clear_settings_on_hold)
+        {
+            splash(HZ*2, str(LANG_RESET_DONE_CLEAR));
+            settings_reset();
+        }
     }
-    else
 #endif
-    {
-        CHART(">settings_load(ALL)");
-        settings_load(SETTINGS_ALL);
-        CHART("<settings_load(ALL)");
-    }
 
 #ifdef HAVE_DIRCACHE
     CHART(">init_dircache(true)");

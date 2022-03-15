@@ -584,6 +584,14 @@ MENUITEM_SETTING(keypress_restarts_sleeptimer,
                  &global_settings.keypress_restarts_sleeptimer, NULL);
 MENUITEM_SETTING(show_shutdown_message, &global_settings.show_shutdown_message, NULL);
 
+#if defined(SETTINGS_RESET) || \
+           (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+           (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#define SETTINGS_CLEAR_ON_HOLD
+MENUITEM_SETTING(clear_settings_on_hold,
+                 &global_settings.clear_settings_on_hold, NULL);
+#endif
+
 MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
           0, Icon_System_menu,
             &show_shutdown_message,
@@ -592,7 +600,11 @@ MAKE_MENU(startup_shutdown_menu, ID2P(LANG_STARTUP_SHUTDOWN),
             &sleeptimer_toggle,
             &sleeptimer_duration,
             &sleeptimer_on_startup,
-            &keypress_restarts_sleeptimer
+            &keypress_restarts_sleeptimer,
+#if defined(SETTINGS_CLEAR_ON_HOLD)
+            &clear_settings_on_hold,
+#undef SETTINGS_CLEAR_ON_HOLD
+#endif
          );
 
 /*    STARTUP/SHUTDOWN MENU      */

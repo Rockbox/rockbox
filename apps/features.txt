@@ -289,3 +289,9 @@ multi_boot
 #if defined(HIBY_LINUX)
 hibylinux
 #endif
+
+#if defined(SETTINGS_RESET) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H10_PAD)
+clear_settings_on_hold
+#endif

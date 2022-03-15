@@ -16368,3 +16368,20 @@
     *: "Keep Current Track When Replacing Playlist"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold, ipod4g, iriverh10: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold, ipod4g, iriverh10: "Clear settings when hold switch is on during startup"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold, ipod4g, iriverh10: "Clear settings when hold switch is on during startup"
+  </voice>
+</phrase>
