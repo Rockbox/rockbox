@@ -30,6 +30,14 @@
 #include "string-extra.h"
 #include "rbunicode.h"
 
+/* Define LOGF_ENABLE to enable logf output in this file */
+//#define LOGF_ENABLE
+#ifdef LOGF_ENABLE
+#include "logf.h"
+#undef DEBUGF
+#define DEBUGF logf
+#endif
+
 /** Internal common filesystem service functions  **/
 
 /* for internal functions' scanning use to save quite a bit of stack space -

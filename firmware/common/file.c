@@ -31,6 +31,15 @@
 #include "rb_namespace.h"
 #include "string-extra.h"
 
+/* Define LOGF_ENABLE to enable logf output in this file */
+//#define LOGF_ENABLE
+#ifdef LOGF_ENABLE
+#include "logf.h"
+#undef DEBUGF
+#define DEBUGF logf
+#endif
+
+
 /**
  * These functions provide a roughly POSIX-compatible file I/O API.
  */
@@ -600,8 +609,10 @@ static inline ssize_t readwrite_partial(struct filestr_desc *file,
 static ssize_t readwrite(struct filestr_desc *file, void *buf, size_t nbyte,
                          bool write)
 {
+#ifndef LOGF_ENABLE /* wipes out log before you can save it */
     DEBUGF("readwrite(%p,%lx,%lu,%s)\n",
            file, (long)buf, (unsigned long)nbyte, write ? "write" : "read");
+#endif
 
     const file_size_t size = *file->sizep;
     file_size_t filerem;
@@ -766,8 +777,9 @@ file_error:;
         /* error or not, update the file offset and size if anything was
            transferred */
         file->offset += done;
+#ifndef LOGF_ENABLE /* wipes out log before you can save it */
         DEBUGF("file offset: %ld\n", file->offset);
-
+#endif
         /* adjust file size to length written */
         if (write && file->offset > size)
             *file->sizep = file->offset;
@@ -901,8 +913,9 @@ file_error:
 /* move the read/write file offset */
 off_t lseek(int fildes, off_t offset, int whence)
 {
+#ifndef LOGF_ENABLE /* wipes out log before you can save it */
     DEBUGF("lseek(fd=%d,ofs=%ld,wh=%d)\n", fildes, (long)offset, whence);
-
+#endif
     struct filestr_desc * const file = GET_FILESTR(READER, fildes);
     if (!file)
         FILE_ERROR_RETURN(ERRNO, -1);
