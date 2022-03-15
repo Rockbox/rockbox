@@ -135,18 +135,11 @@
 #endif
 
 #define SCREEN_MAX_CHARS (LCD_WIDTH / SYSFONT_WIDTH)
-struct dbg_os_threads_t
-{
-    long next_scroll;
-    int scroll_pos;
-    int scroll_delay;
-    int scroll_speed;
-};
 
 static const char* threads_getname(int selected_item, void *data,
                                    char *buffer, size_t buffer_len)
 {
-struct dbg_os_threads_t* ost = (struct dbg_os_threads_t*) data;
+    int *x_offset = (int*) data;
 
 #if NUM_CORES > 1
     if (selected_item < (int)NUM_CORES)
@@ -166,62 +159,56 @@ struct dbg_os_threads_t* ost = (struct dbg_os_threads_t*) data;
     struct thread_debug_info threadinfo;
     if (thread_get_debug_info(selected_item, &threadinfo) > 0)
     {
-        fmtstr = "%2d:" IF_COP(" (%d)") " %s" IF_PRIO(" %d %d")
+        fmtstr = "%2d:" IF_COP(" (%d)") " %s%n" IF_PRIO(" %d %d")
                  IFN_SDL(" %2d%%") " %s";
     }
-
+    int status_len;
     size_t len = snprintf(buffer, buffer_len, fmtstr,
              selected_item,
              IF_COP(threadinfo.core,)
              threadinfo.statusstr,
+             &status_len,
              IF_PRIO(threadinfo.base_priority, threadinfo.current_priority,)
              IFN_SDL(threadinfo.stack_usage,)
              threadinfo.name);
 
-    buffer[buffer_len - 1] = '\0';
-
+    int start = 0;
     if (len >= SCREEN_MAX_CHARS)
     {
-        if (len >= buffer_len)
-            len = buffer_len - 1;
-        int start = ost->scroll_pos%(len-1);
-        int rem = (len - start);
-        if (rem < SCREEN_MAX_CHARS)
-            start -= (SCREEN_MAX_CHARS - rem);
+        int ch_offset = (*x_offset)%(len-1);
+        int rem = SCREEN_MAX_CHARS - (len - ch_offset);
+        if (rem > 0)
+            ch_offset -= rem;
 
-        if (start > 0)
+        if (ch_offset > 0)
         {
             /* don't scroll the # and status */
-            if ((unsigned int)start + 7 < buffer_len)
-                memmove(&buffer[start], &buffer[0], 7);
-            return &buffer[start];
+            status_len++;
+            if ((unsigned int)ch_offset + status_len < buffer_len)
+                memmove(&buffer[ch_offset], &buffer[0], status_len);
+            start = ch_offset;
         }
     }
-    return buffer;
-
+    return &buffer[start];
 }
 
 static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 {
-    struct dbg_os_threads_t* ost = (struct dbg_os_threads_t*) lists->data;
+
     if (action == ACTION_NONE)
     {
-        if (TIME_AFTER(current_tick, ost->next_scroll))
-        {
-            ost->next_scroll = current_tick + ost->scroll_speed;
-            ost->scroll_pos++;
-            if (ost->scroll_pos > SCREEN_MAX_CHARS * 5)
-            {
-                ost->next_scroll += ost->scroll_delay;
-                ost->scroll_pos = 0;
-            }
-        }
+        return ACTION_REDRAW;
+    }
+
+    int *x_offset = ((int*) lists->data);
+    if (action == ACTION_STD_OK)
+    {
+        *x_offset += 1;
         action = ACTION_REDRAW;
     }
-    else
+    else if (action != ACTION_UNKNOWN)
     {
-        ost->next_scroll = current_tick + ost->scroll_delay;
-        ost->scroll_pos = 0;
+        *x_offset = 0;
     }
 
     return action;
@@ -230,14 +217,10 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
 static bool dbg_os(void)
 {
     struct simplelist_info info;
-    struct dbg_os_threads_t ost;
-    ost.scroll_pos = 0;
-    ost.scroll_speed = lcd_scroll_info.ticks;
-    ost.scroll_delay = global_settings.scroll_delay;
-    ost.next_scroll = current_tick + ost.scroll_delay;
+    int xoffset = 0;
 
     simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:",
-                         MAXTHREADS IF_COP( + NUM_CORES ), &ost);
+                         MAXTHREADS IF_COP( + NUM_CORES ), &xoffset);
     info.hide_selection = true;
     info.scroll_all = false;
     info.action_callback = dbg_threads_action_callback;
