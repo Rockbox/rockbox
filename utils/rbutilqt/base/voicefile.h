@@ -52,7 +52,7 @@ signals:
     void logProgress(int, int); //! set progress bar.
 
 private slots:
-    void downloadDone(bool error);
+    void downloadDone(QNetworkReply::NetworkError error);
 
 private:
 

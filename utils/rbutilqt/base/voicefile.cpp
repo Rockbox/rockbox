@@ -175,7 +175,7 @@ bool VoiceFileCreator::createVoiceFile()
  }
 
 
-void VoiceFileCreator::downloadDone(bool error)
+void VoiceFileCreator::downloadDone(QNetworkReply::NetworkError error)
 {
     LOG_INFO() << "download done, error:" << error;
 
@@ -190,7 +190,7 @@ void VoiceFileCreator::downloadDone(bool error)
 
     if(getter->isCached())
         emit logItem(tr("Cached file used."), LOGINFO);
-    if(error)
+    if(error != QNetworkReply::NoError)
     {
         emit logItem(tr("Download error: %1").arg(getter->errorString()),LOGERROR);
         emit done(true);

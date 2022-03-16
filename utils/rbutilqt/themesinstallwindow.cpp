@@ -100,7 +100,7 @@ void ThemesInstallWindow::downloadInfo()
 }
 
 
-void ThemesInstallWindow::downloadDone(bool error)
+void ThemesInstallWindow::downloadDone(QNetworkReply::NetworkError error)
 {
     LOG_INFO() << "Download done, error:" << error;
 
@@ -116,7 +116,7 @@ void ThemesInstallWindow::downloadDone(bool error)
                << iniDetails.value("error/description").toString()
                << iniDetails.value("error/query").toString();
 
-    if(error) {
+    if(error != QNetworkReply::NoError) {
         logger->addItem(tr("Network error: %1.\n"
                 "Please check your network and proxy settings.")
                 .arg(getter->errorString()), LOGERROR);
@@ -236,19 +236,18 @@ void ThemesInstallWindow::updateDetails(QListWidgetItem* cur, QListWidgetItem* p
 }
 
 
-void ThemesInstallWindow::updateImage(bool error)
+void ThemesInstallWindow::updateImage(QNetworkReply::NetworkError error)
 {
     LOG_INFO() << "Updating image:"<< !error;
 
-    if(error) {
+    if(error != QNetworkReply::NoError) {
         ui.themePreview->clear();
         ui.themePreview->setText(tr("Retrieving theme preview failed.\n"
             "HTTP response code: %1").arg(igetter.httpResponse()));
         return;
     }
-
-    QPixmap p;
-    if(!error) {
+    else {
+        QPixmap p;
         imgData = igetter.readAll();
         if(imgData.isNull()) return;
         p.loadFromData(imgData);

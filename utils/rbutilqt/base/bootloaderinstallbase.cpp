@@ -57,16 +57,7 @@ void BootloaderInstallBase::downloadBlStart(QUrl source)
 }
 
 
-void BootloaderInstallBase::downloadReqFinished(int id, bool error)
-{
-    LOG_INFO() << "Download Request" << id
-               << "finished, error:" << m_http.errorString();
-
-    downloadBlFinish(error);
-}
-
-
-void BootloaderInstallBase::downloadBlFinish(bool error)
+void BootloaderInstallBase::downloadBlFinish(QNetworkReply::NetworkError error)
 {
     LOG_INFO() << "Downloading bootloader finished, error:"
                << error;
@@ -80,7 +71,7 @@ void BootloaderInstallBase::downloadBlFinish(bool error)
         emit done(true);
         return;
     }
-    if(error) {
+    if(error != QNetworkReply::NoError) {
         emit logItem(tr("Download error: %1")
                 .arg(m_http.errorString()), LOGERROR);
         emit done(true);

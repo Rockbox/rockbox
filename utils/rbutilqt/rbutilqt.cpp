@@ -214,9 +214,9 @@ void RbUtilQt::downloadInfo()
 }
 
 
-void RbUtilQt::downloadDone(bool error)
+void RbUtilQt::downloadDone(QNetworkReply::NetworkError error)
 {
-    if(error) {
+    if(error != QNetworkReply::NoError) {
         LOG_INFO() << "network error:" << daily->errorString();
         ui.statusbar->showMessage(tr("Can't get version information!"));
         QMessageBox::critical(this, tr("Network error"),
@@ -614,9 +614,9 @@ void RbUtilQt::checkUpdate(void)
     update->getFile(QUrl(url));
 }
 
-void RbUtilQt::downloadUpdateDone(bool error)
+void RbUtilQt::downloadUpdateDone(QNetworkReply::NetworkError error)
 {
-    if(error) {
+    if(error != QNetworkReply::NoError) {
         LOG_INFO() << "network error:" << update->errorString();
     }
     else {

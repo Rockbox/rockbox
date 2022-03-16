@@ -59,7 +59,7 @@ public slots:
     void abort(void);
 
 private slots:
-    void downloadDone(bool);
+    void downloadDone(QNetworkReply::NetworkError error);
     void installStart(void);
     void installContinue(void);
 

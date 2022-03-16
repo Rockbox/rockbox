@@ -65,8 +65,8 @@ class ThemesInstallWindow : public QDialog
         bool windowSelectOnly;
 
     private slots:
-        void downloadDone(bool);
-        void updateImage(bool);
+        void downloadDone(QNetworkReply::NetworkError error);
+        void updateImage(QNetworkReply::NetworkError error);
         void abort(void);
         void updateDetails(QListWidgetItem* cur, QListWidgetItem* prev);
         void updateSize(void);

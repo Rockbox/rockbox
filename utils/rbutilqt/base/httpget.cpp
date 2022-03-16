@@ -145,7 +145,7 @@ void HttpGet::requestFinished(QNetworkReply* reply)
 {
     m_lastStatusCode
         = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    LOG_INFO() << "Request finished, status code:" << m_lastStatusCode;
+    LOG_INFO() << "Request finished, status code:" << m_lastStatusCode << reply->error();
     m_lastServerTimestamp
         = reply->header(QNetworkRequest::LastModifiedHeader).toDateTime().toLocalTime();
     LOG_INFO() << "Data from cache:"
@@ -178,11 +178,11 @@ void HttpGet::requestFinished(QNetworkReply* reply)
             m_outputFile->write(m_data);
             m_outputFile->close();
         }
-        emit done(false);
+        emit done(QNetworkReply::NoError);
     }
     else {
         m_data.clear();
-        emit done(true);
+        emit done(reply->error());
     }
     reply->deleteLater();
     m_reply = nullptr;

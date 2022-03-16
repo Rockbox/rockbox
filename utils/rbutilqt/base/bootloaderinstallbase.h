@@ -68,8 +68,7 @@ class BootloaderInstallBase : public QObject
         static QString postinstallHints(QString model);
 
     protected slots:
-        void downloadReqFinished(int id, bool error);
-        void downloadBlFinish(bool error);
+        void downloadBlFinish(QNetworkReply::NetworkError error);
         void installBlfile(void);
         void progressAborted(void);
 

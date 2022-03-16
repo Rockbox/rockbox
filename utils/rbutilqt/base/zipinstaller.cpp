@@ -102,7 +102,7 @@ void ZipInstaller::installStart()
 }
 
 
-void ZipInstaller::downloadDone(bool error)
+void ZipInstaller::downloadDone(QNetworkReply::NetworkError error)
 {
     LOG_INFO() << "download done, error:" << error;
     QStringList zipContents; // needed later
@@ -118,7 +118,7 @@ void ZipInstaller::downloadDone(bool error)
     }
     if(m_getter->isCached())
         emit logItem(tr("Cached file used."), LOGINFO);
-    if(error) {
+    if(error != QNetworkReply::NoError) {
         emit logItem(tr("Download error: %1").arg(m_getter->errorString()), LOGERROR);
         emit done(true);
         return;

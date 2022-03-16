@@ -87,7 +87,7 @@ class RbUtilQt : public QMainWindow
 
         void createTalkFiles(void);
         void createVoiceFile(void);
-        void downloadDone(bool);
+        void downloadDone(QNetworkReply::NetworkError error);
         void downloadInfo(void);
         void backup(void);
 
@@ -97,7 +97,7 @@ class RbUtilQt : public QMainWindow
         void updateTabs(int);
 
         void checkUpdate(void);
-        void downloadUpdateDone(bool errror);
+        void downloadUpdateDone(QNetworkReply::NetworkError error);
 };
 
 #endif

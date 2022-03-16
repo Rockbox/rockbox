@@ -78,7 +78,7 @@ class HttpGet : public QObject
         void abort(void);
 
     signals:
-        void done(bool);
+        void done(QNetworkReply::NetworkError error);
         void dataReadProgress(int, int);
         void headerFinished(void);
 

@@ -195,11 +195,11 @@ void TestHttpGet::cleanup(void)
 {
     rmTree(m_cachedir.absolutePath());
     if(m_getter) {
-        m_getter->abort(); delete m_getter; m_getter = NULL;
+        m_getter->abort(); delete m_getter; m_getter = nullptr;
     }
-    if(m_daemon) { delete m_daemon; m_daemon = NULL; }
-    if(m_doneSpy) { delete m_doneSpy; m_doneSpy = NULL; }
-    if(m_progressSpy) { delete m_progressSpy; m_progressSpy = NULL; }
+    if(m_daemon) { delete m_daemon; m_daemon = nullptr; }
+    if(m_doneSpy) { delete m_doneSpy; m_doneSpy = nullptr; }
+    if(m_progressSpy) { delete m_progressSpy; m_progressSpy = nullptr; }
 }
 
 void TestHttpGet::testFileUrlRequest(void)
@@ -299,7 +299,7 @@ void TestHttpGet::testCachedRequest(void)
 
     QList<QString> requests = m_daemon->lastRequestData();
     QCOMPARE(m_doneSpy->count(), 1);
-    QCOMPARE(m_doneSpy->at(0).at(0).toBool(), false);
+    QCOMPARE(m_doneSpy->at(0).at(0).toInt(), QNetworkReply::NoError);
     QCOMPARE(m_waitTimeoutOccured, false);
     QCOMPARE(requests.size(), 2);
     QCOMPARE(requests.at(0).startsWith("GET"), true);
@@ -311,7 +311,7 @@ void TestHttpGet::testCachedRequest(void)
     while(m_doneSpy->count() < 2 && m_waitTimeoutOccured == false)
         QCoreApplication::processEvents();
     QCOMPARE(m_doneSpy->count(), 2);  // 2 requests, 2 times done()
-    QCOMPARE(m_doneSpy->at(1).at(0).toBool(), false);
+    QCOMPARE(m_doneSpy->at(1).at(0).toInt(), QNetworkReply::NoError);
     QCOMPARE(m_waitTimeoutOccured, false);
     QCOMPARE(m_daemon->lastRequestData().size(), 3);
     // redirect will not cache as the redirection target file.
@@ -402,7 +402,7 @@ void TestHttpGet::testResponseCode(void)
         QCoreApplication::processEvents();
 
     QCOMPARE(m_doneSpy->count(), 1);
-    QCOMPARE(m_doneSpy->at(0).at(0).toBool(), true);
+    QCOMPARE(m_doneSpy->at(0).at(0).toInt(), QNetworkReply::ContentNotFoundError);
     QCOMPARE(m_waitTimeoutOccured, false);
     QCOMPARE(m_daemon->lastRequestData().size(), 1);
     QCOMPARE(m_daemon->lastRequestData().at(0).startsWith("GET"), true);
@@ -472,7 +472,7 @@ void TestHttpGet::testNoServer(void)
         QCoreApplication::processEvents();
 
     QCOMPARE(m_doneSpy->count(), 1);
-    QCOMPARE(m_doneSpy->at(0).at(0).toBool(), true);
+    QCOMPARE(m_doneSpy->at(0).at(0).toInt(), QNetworkReply::ConnectionRefusedError);
     QCOMPARE(m_waitTimeoutOccured, false);
 }
 
