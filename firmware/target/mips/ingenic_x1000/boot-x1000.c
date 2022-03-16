@@ -145,13 +145,11 @@ void rolo_restart(const unsigned char* source, unsigned char* dest, int length)
 
 void x1000_dualboot_cleanup(void)
 {
-#ifdef SHANLING_Q1
-    /* hack for the Q1 since OF kernels don't reset this bit,
-     * leading to garbled graphics. */
-    if(!jz_readf(CPM_CLKGR, LCD)) {
-        jz_writef(LCD_CTRL, BEDN(0));
-    }
-#endif
+    /* - disable all LCD interrupts since the M3K can't cope with them
+     * - disable BEDN bit since it creates garbled graphics on the Q1 */
+    jz_writef(CPM_CLKGR, LCD(0));
+    jz_writef(LCD_CTRL, BEDN(0), EOFM(0), SOFM(0), IFUM(0), QDM(0));
+    jz_writef(CPM_CLKGR, LCD(1));
 
     /* clear USB PHY voodoo bits, not all kernels use them */
     jz_writef(CPM_OPCR, GATE_USBPHY_CLK(0));
