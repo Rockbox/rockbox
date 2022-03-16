@@ -186,4 +186,7 @@ int uimage_load(struct uimage_header* uh, size_t* out_size,
  */
 ssize_t uimage_fd_reader(void* buf, size_t size, void* ctx);
 
+/* helper for patching broken self-extracting kernels on MIPS */
+uint32_t mips_linux_stub_get_entry(void** code_start, size_t code_size);
+
 #endif /* __LINUXBOOT_H__ */

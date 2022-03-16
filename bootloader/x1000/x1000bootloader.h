@@ -41,13 +41,12 @@ struct uimage_header;
 # define BL_SELECT_NAME     "PLAY"
 # define BL_QUIT_NAME       "POWER"
 # define BOOTBACKUP_FILE    "/fiiom3k-boot.bin"
-// FIXME: OF kernel hangs on the m3k
-//# define OF_PLAYER_NAME     "FiiO player"
+# define OF_PLAYER_NAME     "FiiO player"
 # define OF_PLAYER_ADDR     0x20000
 # define OF_PLAYER_LENGTH   (4 * 1024 * 1024)
 # define OF_PLAYER_ARGS     OF_RECOVERY_ARGS \
     " init=/linuxrc ubi.mtd=3 root=ubi0:rootfs ubi.mtd=4 rootfstype=ubifs rw loglevel=8"
-//# define OF_RECOVERY_NAME   "FiiO recovery"
+# define OF_RECOVERY_NAME   "FiiO recovery"
 # define OF_RECOVERY_ADDR   0x420000
 # define OF_RECOVERY_LENGTH (5 * 1024 * 1024)
 # define OF_RECOVERY_ARGS \

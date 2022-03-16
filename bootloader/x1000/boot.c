@@ -148,6 +148,35 @@ void boot_linux(void)
  * Be careful when modifying this code.
  */
 
+#if defined(FIIO_M3K) || defined(SHANLING_Q1)
+uint32_t saved_kernel_entry __attribute__((section(".idata")));
+void kernel_thunk(long, long, long, long) __attribute__((section(".icode")));
+
+void kernel_thunk(long a0, long a1, long a2, long a3)
+{
+    /* cache flush */
+    commit_discard_idcache();
+
+    /* now we can jump to the kernel */
+    typedef void(*entry_fn)(long, long, long, long);
+    entry_fn fn = (entry_fn)saved_kernel_entry;
+    fn(a0, a1, a2, a3);
+    while(1);
+}
+
+static void patch_stub_call(void* patch_addr)
+{
+    uint32_t* code = patch_addr;
+    uint32_t stub_addr = (uint32_t)(void*)kernel_thunk;
+
+    /* generate call to stub */
+    code[0] = 0x3c190000 | (stub_addr >> 16);       /* lui t9, stub_hi */
+    code[1] = 0x37390000 | (stub_addr & 0xffff);    /* ori t9, t9, stub_lo */
+    code[2] = 0x0320f809;                           /* jalr t9 */
+    code[3] = 0x00000000;                           /* nop */
+}
+#endif
+
 static __attribute__((unused))
 void boot_of_helper(uint32_t addr, uint32_t flash_size, const char* args)
 {
@@ -156,6 +185,19 @@ void boot_of_helper(uint32_t addr, uint32_t flash_size, const char* args)
     int handle = load_uimage_flash(addr, flash_size, &uh, &img_length);
     if(handle < 0)
         return;
+
+#if defined(FIIO_M3K) || defined(SHANLING_Q1)
+    /* Fix for targets that use self-extracting kernel images */
+    void* jump_addr = core_get_data(handle);
+    uint32_t entry_addr = mips_linux_stub_get_entry(&jump_addr, img_length);
+    if(entry_addr >= 0xa0000000 || entry_addr < 0x80000000) {
+        splash2(5*HZ, "Kernel patch failed", "Please send bugreport");
+        return;
+    }
+
+    saved_kernel_entry = entry_addr;
+    patch_stub_call(jump_addr);
+#endif
 
     gui_shutdown();
 
