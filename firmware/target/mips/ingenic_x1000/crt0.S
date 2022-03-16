@@ -49,80 +49,65 @@ _header:
     .ascii  "ENDH"          /* end of header structure */
 
 _realstart:
-    /* Cache init */
-    li      v0, 0x80000000
-    ori     v1, v0, 0x4000
-    mtc0    zero, C0_TAGLO
-    mtc0    zero, C0_TAGHI
-_cache_loop:
-    cache   ICIndexStTag, 0(v0)
-    cache   DCIndexStTag, 0(v0)
-    addiu   v0, v0, 32
-    bne     v0, v1, _cache_loop
-    nop
-
-    /* Invalidate BTB */
-    mfc0    v0, C0_Config, 7
-    nop
-    ori     v0, v0, 2
-    mtc0    v0, C0_Config, 7
-    nop
-
     /* Copy IRAM from BSS to low memory. */
-    la      t0, _iramcopy
-    la      t1, _iramstart
-    la      t2, _iramend
-_iram_loop:
-    lw      t3, 0(t0)
-    addiu   t1, 4
-    addiu   t0, 4
-    bne     t1, t2, _iram_loop
-    sw      t3, -4(t1)
+    la      a0, _iramcopy
+    la      a1, _iramstart
+    la      a2, _iramend
+    bal     _copy
+    nop
 
-#if 0
     /* Copy TCSM from BSS */
-    la      t0, _tcsmcopy
-    la      t1, _tcsmstart
-    la      t2, _tcsmend
-_tcsm_loop:
-    lw      t3, 0(t0)
-    addiu   t0, 4
-    sw      t3, 0(t1)
-    bne     t1, t2, _tcsm_loop
-    addiu   t1, 4
-#endif
+    la      a0, _tcsmcopy
+    la      a1, _tcsmstart
+    la      a2, _tcsmend
+    bal     _copy
+    nop
 
     /* Clear the BSS segment (needed to zero-initialize C static values) */
-    la      t0, _bssbegin
-    la      t1, _bssend
-    beq     t0, t1, _bss_done
-_bss_loop:
-    addiu   t0, 4
-    bne     t0, t1, _bss_loop
-    sw      zero, -4(t0)
-_bss_done:
+    la      a0, _bssbegin
+    la      a1, _bssend
+    bal     _clear
+    move    a2, $0
 
     /* Set stack pointer and clear the stack */
     la      sp, stackend
-    la      t0, stackbegin
-    li      t1, 0xDEADBEEF
-_stack_loop:
-    addiu   t0, 4
-    bne     t0, sp, _stack_loop
-    sw      t1, -4(t0)
+    la      a0, stackbegin
+    li      a2, 0xDEADBEEF
+    bal     _clear
+    move    a1, sp
 
     /* Clear the IRQ stack */
     la      k0, _irqstackend
-    la      t0, _irqstackbegin
-_irqstack_loop:
-    addiu   t0, 4
-    bne     t0, k0, _irqstack_loop
-    sw      t1, -4(t0)
+    la      a0, _irqstackbegin
+    bal     _clear
+    move    a1, k0
 
     /* Jump to C code */
     jal     system_early_init
     nop
     j       main
+    nop
+
+    /* copy(void* src, void* dst, void* dst_end) */
+_copy:
+    beq     a1, a2, 1f
+    addiu   a1, 4
+    lw      t0, 0(a0)
+    addiu   a0, 4
+    b       _copy
+    sw      t0, -4(a1)
+1:
+    jr      ra
+    nop
+
+    /* clear(void* dst, void* dst_end, int value) */
+_clear:
+    beq     a0, a1, 1f
+    addiu   a0, 4
+    b       _clear
+    sw      a2, -4(a0)
+1:
+    jr      ra
     nop
 
     /* Exception entry points */
