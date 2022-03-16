@@ -49,9 +49,7 @@ void sb_bypass_touchregions(bool enable);
 int sb_touch_to_button(int context);
 #endif
 
-#if (LCD_DEPTH > 1) || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1)
 int sb_get_backdrop(enum screen_type screen);
-#endif
 int sb_preproccess(enum screen_type screen, struct wps_data *data);
 int sb_postproccess(enum screen_type screen, struct wps_data *data);
 

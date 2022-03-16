@@ -149,16 +149,28 @@ void skin_unload_all(void)
     gui_sync_skin_init();
 }
 
+static void skin_reset_buffers(int item, int screen)
+{
+    skin_data_free_buflib_allocs(&skins[item][screen].data);
+#ifdef HAVE_ALBUMART
+    if (skins[item][screen].data.playback_aa_slot >= 0)
+        playback_release_aa_slot(skins[item][screen].data.playback_aa_slot);
+#endif
+#ifdef HAVE_BACKDROP_IMAGE
+    if (skins[item][screen].data.backdrop_id >= 0)
+        skin_backdrop_unload(skins[item][screen].data.backdrop_id);
+#endif
+}
+
 void settings_apply_skins(void)
 {
     int i;
     char filename[MAX_PATH];
-    static bool first_run = true;
 
     if (audio_status() & AUDIO_STATUS_PLAY)
         audio_stop();
 
-    skin_backdrop_init();
+    bool first_run = skin_backdrop_init();
     skins_initialised = true;
 
     /* Make sure each skin is loaded */
@@ -170,15 +182,7 @@ void settings_apply_skins(void)
 
             if (!first_run)
             {
-                skin_data_free_buflib_allocs(&skins[i][j].data);
-#ifdef HAVE_ALBUMART
-                if (skins[i][j].data.playback_aa_slot >= 0)
-                    playback_release_aa_slot(skins[i][j].data.playback_aa_slot);
-#endif
-#ifdef HAVE_BACKDROP_IMAGE
-                if (skins[i][j].data.backdrop_id >= 0)
-                    skin_backdrop_unload(skins[i][j].data.backdrop_id);
-#endif
+                skin_reset_buffers(i, j);
             }
             gui_skin_reset(&skins[i][j]);
             skins[i][j].gui_wps.display = &screens[j];
@@ -186,17 +190,14 @@ void settings_apply_skins(void)
                 skin_get_gwps(i, j);
         }
     }
-    first_run = false;
-#ifdef HAVE_BACKDROP_IMAGE
+
     /* any backdrop that was loaded with "-" has to be reloaded because
      * the setting may have changed */
     skin_backdrop_load_setting();
-#endif
     viewportmanager_theme_changed(THEME_STATUSBAR);
-#ifdef HAVE_BACKDROP_IMAGE
+
     FOR_NB_SCREENS(i)
         skin_backdrop_show(sb_get_backdrop(i));
-#endif
 }
 
 void skin_load(enum skinnable_screens skin, enum screen_type screen,

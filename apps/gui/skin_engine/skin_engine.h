@@ -62,7 +62,7 @@ bool skin_has_sbs(enum screen_type screen, struct wps_data *data);
 /* load a backdrop into the skin buffer.
  * reuse buffers if the file is already loaded */
 char* skin_backdrop_load(char* backdrop, char *bmpdir, enum screen_type screen);
-void skin_backdrop_init(void);
+bool skin_backdrop_init(void);
 int skin_backdrop_assign(char* backdrop, char *bmpdir,
                           enum screen_type screen);
 bool skin_backdrops_preload(void);

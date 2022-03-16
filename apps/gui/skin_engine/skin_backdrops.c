@@ -81,8 +81,9 @@ static int buflib_move_callback(int handle, void* current, void* new)
 }
 static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
 static bool first_go = true;
-void skin_backdrop_init(void)
+bool skin_backdrop_init(void)
 {
+    bool go_status = first_go;
     if (first_go)
     {
         for (int i=0; i<NB_BDROPS; i++)
@@ -98,6 +99,7 @@ void skin_backdrop_init(void)
         handle_being_loaded = -1;
         first_go = false;
     }
+    return go_status;
 }
 
 int skin_backdrop_assign(char* backdrop, char *bmpdir,
@@ -331,8 +333,20 @@ void skin_backdrop_unload(int backdrop_id)
     (void)backdrop_id;
 }
 #else
-
-void skin_backdrop_init(void)
+static bool first_go = true;
+bool skin_backdrop_init(void)
 {
+    bool go_status = first_go;
+    first_go = false;
+    return go_status;
+}
+
+void skin_backdrop_load_setting(void)
+{
+}
+
+void skin_backdrop_show(int backdrop_id)
+{
+    (void) backdrop_id;
 }
 #endif
