@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2021 Aidan MacDonald
+ * Copyright (C) 2021-2022 Aidan MacDonald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -81,6 +81,24 @@ _realstart:
     la      a0, _irqstackbegin
     bal     _clear
     move    a1, k0
+
+    /* Write back D-cache and invalidate I-cache  */
+    li      v0, 0x80000000
+    ori     v1, v0, (0x4000 - 32)
+    mtc0    zero, C0_TAGLO
+    mtc0    zero, C0_TAGHI
+1:
+    cache   DCIndexWBInv, 0(v0)
+    cache   ICIndexStTag, 0(v0)
+    bne     v0, v1, 1b
+    addiu   v0, v0, 32
+
+    /* Invalidate BTB */
+    mfc0    v0, C0_Config, 7
+    nop
+    ori     v0, v0, 2
+    mtc0    v0, C0_Config, 7
+    nop
 
     /* Jump to C code */
     jal     system_early_init
