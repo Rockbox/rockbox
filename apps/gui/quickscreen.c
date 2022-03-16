@@ -288,14 +288,22 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 static int quickscreen_touchscreen_button(void)
 {
     short x,y;
-    /* only hitting the text counts, everything else is exit */
     if (action_get_touchscreen_press(&x, &y) != BUTTON_REL)
         return ACTION_NONE;
 
     enum { left=1, right=2, top=4, bottom=8 };
 
-    int bits = (x < LCD_WIDTH/3 ? left : (x > 2*LCD_WIDTH/3 ? 2 : right)) |
-               (y < LCD_WIDTH/3 ? top  : (y > 2*LCD_WIDTH/3 ? 8 : bottom));
+    int bits = 0;
+
+    if(x < LCD_WIDTH/3)
+        bits |= left;
+    else if(x > 2*LCD_WIDTH/3)
+        bits |= right;
+
+    if(y < LCD_HEIGHT/3)
+        bits |= top;
+    else if(y > 2*LCD_HEIGHT/3)
+        bits |= bottom;
 
     switch(bits) {
     case top:
