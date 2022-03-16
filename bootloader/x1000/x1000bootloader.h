@@ -44,13 +44,19 @@ struct uimage_header;
 # define OF_PLAYER_NAME     "FiiO player"
 # define OF_PLAYER_ADDR     0x20000
 # define OF_PLAYER_LENGTH   (4 * 1024 * 1024)
+/* WARNING: The length of kernel arguments cannot exceed 99 bytes on the M3K
+ * due to an Ingenic kernel bug: plat_mem_setup() calls ddr_param_change() and
+ * that function tries to copy the command line to an 100-char buffer without
+ * any bounds checking. Overflowing the buffer typically leads to disaster.
+ * It seems ddr_param_change() is not present on all Ingenic kernels and the
+ * bug may not affect the Q1. */
 # define OF_PLAYER_ARGS     OF_RECOVERY_ARGS \
-    " init=/linuxrc ubi.mtd=3 root=ubi0:rootfs ubi.mtd=4 rootfstype=ubifs rw loglevel=8"
+    " init=/linuxrc ubi.mtd=3 root=ubi0:rootfs ubi.mtd=4 rootfstype=ubifs rw"
 # define OF_RECOVERY_NAME   "FiiO recovery"
 # define OF_RECOVERY_ADDR   0x420000
 # define OF_RECOVERY_LENGTH (5 * 1024 * 1024)
 # define OF_RECOVERY_ARGS \
-    "mem=64M@0x0 no_console_suspend console=ttyS2,115200n8 lpj=5009408 ip=off"
+    "mem=64M console=ttyS2"
 #elif defined(SHANLING_Q1)
 # define BL_RECOVERY        BUTTON_NEXT
 # define BL_UP              BUTTON_PREV
