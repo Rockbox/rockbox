@@ -222,22 +222,25 @@ bool parse_cuesheet(struct cuesheet_file *cue_file, struct cuesheet *cue)
 
     /* Look for a Unicode BOM */
     unsigned char bom_read = 0;
-    read(fd, line, BOM_UTF_8_SIZE);
-    if(!memcmp(line, BOM_UTF_8, BOM_UTF_8_SIZE))
+    if (read(fd, line, BOM_UTF_8_SIZE) > 0)
     {
-        char_enc = CHAR_ENC_UTF_8;
-        bom_read = BOM_UTF_8_SIZE;
+        if(!memcmp(line, BOM_UTF_8, BOM_UTF_8_SIZE))
+        {
+            char_enc = CHAR_ENC_UTF_8;
+            bom_read = BOM_UTF_8_SIZE;
+        }
+        else if(!memcmp(line, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
+        {
+            char_enc = CHAR_ENC_UTF_16_LE;
+            bom_read = BOM_UTF_16_SIZE;
+        }
+        else if(!memcmp(line, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
+        {
+            char_enc = CHAR_ENC_UTF_16_BE;
+            bom_read = BOM_UTF_16_SIZE;
+        }
     }
-    else if(!memcmp(line, BOM_UTF_16_LE, BOM_UTF_16_SIZE))
-    {
-        char_enc = CHAR_ENC_UTF_16_LE;
-        bom_read = BOM_UTF_16_SIZE;
-    }
-    else if(!memcmp(line, BOM_UTF_16_BE, BOM_UTF_16_SIZE))
-    {
-        char_enc = CHAR_ENC_UTF_16_BE;
-        bom_read = BOM_UTF_16_SIZE;
-    }
+
     if (bom_read < BOM_UTF_8_SIZE)
         lseek(fd, cue_file->pos + bom_read, SEEK_SET);
     if (is_embedded)
