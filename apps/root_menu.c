@@ -735,10 +735,10 @@ static int load_plugin_screen(char *key)
             continue;
         else
         {
+            ret_val = GO_TO_PREVIOUS;
             /* Prevents infinite loop with WPS, Plugins, Previous Screen*/
             if (ret == PLUGIN_OK && old_global == GO_TO_WPS && !audio_status())
                 ret_val = GO_TO_ROOT;
-            ret_val = GO_TO_PREVIOUS;
             last_screen = (old_previous == next_screen || old_global == GO_TO_ROOT)
                 ? GO_TO_ROOT : old_previous;
             if (last_screen == GO_TO_ROOT)
