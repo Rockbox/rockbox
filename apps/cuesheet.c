@@ -179,7 +179,7 @@ static enum eCS_SUPPORTED_TAGS cuesheet_tag_get_option(const char *option)
         const int len;
     } cs_options[eCS_COUNT_TAGS_COUNT + 1] = {
         [eCS_TRACK] = CS_OPTN("TRACK"),
-        [eCS_INDEX_01] = CS_OPTN("INDEX_01"),
+        [eCS_INDEX_01] = CS_OPTN("INDEX 01"),
         [eCS_TITLE] =CS_OPTN("TITLE"),
         [eCS_PERFORMER] =CS_OPTN("PERFORMER"),
         [eCS_SONGWRITER] =CS_OPTN("SONGWRITER"),
