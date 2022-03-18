@@ -516,7 +516,7 @@ static int select_paths(struct folder* root, const char* filenames)
 
         sstr = lastfnp;
         lastfnp = fnp;
-        if (len <= 0 || len > buflen)
+        if (len <= 0 || len + 1 >= buflen)
             continue;
         strlcpy(buf, sstr, len + 1);
         struct child *item = find_from_filename(buf, root);
