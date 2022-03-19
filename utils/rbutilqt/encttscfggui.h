@@ -40,16 +40,10 @@ private slots:
     void accept(void);
     //! close window and dont save configuration
     void reject(void);
-    //! updates the corresponding setting from the sending Widget
-    void updateSetting();
-    //! updates corresponding Widget from the sending Setting.
-    void updateWidget();
     //! shows a busy dialog. counts calls.
     void showBusy();
     //! hides the busy dialog, counts calls
     void hideBusy();
-    //! used via the SignalMapper for all Browse buttons
-    void browse(QObject*);
 
 private:
     //! creates all dynamic window content
@@ -67,9 +61,7 @@ private:
     //! List of settings from the TTS or Encoder
     QList<EncTtsSetting*> m_settingsList;
     //! Maps settings and the correspondig Widget
-    QMap<EncTtsSetting*,QWidget*> m_settingsWidgetsMap;
-    //! Maps all browse buttons to the corresponding Setting
-    QSignalMapper m_browseBtnMap;
+    QMap<EncTtsSetting*, QWidget*> m_settingsWidgetsMap;
     //! counter how often busyShow() is called,
     int m_busyCnt;
 };

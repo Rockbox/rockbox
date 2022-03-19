@@ -35,11 +35,10 @@
 #include "Logger.h"
 
 EncTtsCfgGui::EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QString name)
-        : QDialog(parent)
+        : QDialog(parent),
+          m_settingInterface(iface),
+          m_busyCnt(0)
 {
-    m_settingInterface = iface;
-
-    m_busyCnt=0;
     // create a busy Dialog
     m_busyDlg= new QProgressDialog("", "", 0, 0,this);
     m_busyDlg->setWindowTitle(tr("Waiting for engine..."));
@@ -47,8 +46,8 @@ EncTtsCfgGui::EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QStri
     m_busyDlg->setLabel(nullptr);
     m_busyDlg->setCancelButton(nullptr);
     m_busyDlg->hide();
-    connect(iface,&EncTtsSettingInterface::busy,this,&EncTtsCfgGui::showBusy);
-    connect(iface,&EncTtsSettingInterface::busyEnd,this,&EncTtsCfgGui::hideBusy);
+    connect(iface, &EncTtsSettingInterface::busy, this, &EncTtsCfgGui::showBusy);
+    connect(iface, &EncTtsSettingInterface::busyEnd, this, &EncTtsCfgGui::hideBusy);
 
     //setup the window
     setWindowTitle(name);
@@ -88,17 +87,14 @@ void EncTtsCfgGui::setUpWindow()
     groupBox->setLayout(gridLayout);
     mainLayout->addWidget(groupBox);
 
-    // connect browse btn
-    connect(&m_browseBtnMap,SIGNAL(mapped(QObject*)),this,SLOT(browse(QObject*)));
-
     // ok - cancel buttons
     QPushButton* okBtn = new QPushButton(tr("Ok"),this);
     okBtn->setDefault(true);
     okBtn->setIcon(QIcon(":icons/go-next.svg"));
     QPushButton* cancelBtn = new QPushButton(tr("Cancel"),this);
     cancelBtn->setIcon(QIcon(":icons/process-stop.svg"));
-    connect(okBtn,SIGNAL(clicked()),this,SLOT(accept()));
-    connect(cancelBtn,SIGNAL(clicked()),this,SLOT(reject()));
+    connect(okBtn, &QPushButton::clicked, this, &EncTtsCfgGui::accept);
+    connect(cancelBtn, &QPushButton::clicked, this, &EncTtsCfgGui::reject);
 
     QHBoxLayout *btnbox = new QHBoxLayout;
     btnbox->addWidget(okBtn);
@@ -124,8 +120,21 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             spinBox->setMaximum(setting->max().toDouble());
             spinBox->setSingleStep(0.01);
             spinBox->setValue(setting->current().toDouble());
-            connect(spinBox,SIGNAL(valueChanged(double)),this,SLOT(updateSetting()));
+
             value = spinBox;
+
+            connect(spinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                    this, [=](double value) {
+                        this->m_settingsWidgetsMap.key(spinBox)->setCurrent(value, false);
+                    });
+            connect(setting, &EncTtsSetting::updateGui, this,
+                    [spinBox, setting]() {
+                        spinBox->setMinimum(setting->min().toDouble());
+                        spinBox->setMaximum(setting->max().toDouble());
+                        spinBox->blockSignals(true);
+                        spinBox->setValue(setting->current().toDouble());
+                        spinBox->blockSignals(false);
+                    });
             break;
         }
         case EncTtsSetting::eINT:
@@ -135,8 +144,19 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             spinBox->setMinimum(setting->min().toInt());
             spinBox->setMaximum(setting->max().toInt());
             spinBox->setValue(setting->current().toInt());
-            connect(spinBox,SIGNAL(valueChanged(int)),this,SLOT(updateSetting()));
             value = spinBox;
+            connect(spinBox, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+                    this, [=](int value) {
+                        this->m_settingsWidgetsMap.key(spinBox)->setCurrent(value, false);
+                    });
+            connect(setting, &EncTtsSetting::updateGui, this,
+                    [spinBox, setting]() {
+                        spinBox->setMinimum(setting->min().toInt());
+                        spinBox->setMaximum(setting->max().toInt());
+                        spinBox->blockSignals(true);
+                        spinBox->setValue(setting->current().toInt());
+                        spinBox->blockSignals(false);
+                    });
             break;
         }
         case EncTtsSetting::eSTRING:
@@ -144,13 +164,31 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             QLineEdit *lineEdit = new QLineEdit(this);
             lineEdit->setAccessibleName(setting->name());
             lineEdit->setText(setting->current().toString());
-            connect(lineEdit,&QLineEdit::textChanged,this,&EncTtsCfgGui::updateSetting);
             value = lineEdit;
+
+            connect(lineEdit, &QLineEdit::textChanged,
+                    this, [=](QString value) {
+                        this->m_settingsWidgetsMap.key(lineEdit)->setCurrent(value, false);
+                    });
+            connect(setting, &EncTtsSetting::updateGui, this,
+                    [lineEdit, setting]() {
+                        lineEdit->blockSignals(true);
+                        lineEdit->setText(setting->current().toString());
+                        lineEdit->blockSignals(false);
+                    });
             break;
         }
         case EncTtsSetting::eREADONLYSTRING:
         {
-            value = new QLabel(setting->current().toString(),this);
+            QLabel *label = new QLabel(setting->current().toString(), this);
+            label->setWordWrap(true);
+            value = label;
+            connect(setting, &EncTtsSetting::updateGui, this,
+                    [label, setting]() {
+                        label->blockSignals(true);
+                        label->setText(setting->current().toString());
+                        label->blockSignals(false);
+                    });
             break;
         }
         case EncTtsSetting::eSTRINGLIST:
@@ -160,17 +198,40 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
             comboBox->addItems(setting->list());
             int index = comboBox->findText(setting->current().toString());
             comboBox->setCurrentIndex(index);
-            connect(comboBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(updateSetting()));
+            connect(comboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+                    this, [=](int) {
+                        this->m_settingsWidgetsMap.key(comboBox)->setCurrent(comboBox->currentText(), false);
+                    });
             value = comboBox;
+            connect(setting, &EncTtsSetting::updateGui, this,
+                    [comboBox, setting]() {
+                        comboBox->blockSignals(true);
+                        comboBox->clear();
+                        comboBox->addItems(setting->list());
+                        comboBox->setCurrentIndex(comboBox->findText(setting->current().toString()));
+                        comboBox->blockSignals(false);
+                    });
+
             break;
         }
         case EncTtsSetting::eBOOL:
         {
             QCheckBox *checkbox = new QCheckBox(this);
             checkbox->setAccessibleName(setting->name());
-            checkbox->setCheckState(setting->current().toBool() == true ? Qt::Checked : Qt::Unchecked);
-            connect(checkbox,&QCheckBox::stateChanged,this,&EncTtsCfgGui::updateSetting);
+            checkbox->setCheckState(setting->current().toBool() == true
+                                    ? Qt::Checked : Qt::Unchecked);
+            connect(checkbox, &QCheckBox::stateChanged,
+                    this, [=](int value) {
+                        this->m_settingsWidgetsMap.key(checkbox)->setCurrent(value, false);
+                    });
             value = checkbox;
+            connect(setting, &EncTtsSetting::updateGui, this,
+                    [checkbox, setting]() {
+                        checkbox->blockSignals(true);
+                        checkbox->setCheckState(setting->current().toBool() == true
+                                                ? Qt::Checked : Qt::Unchecked);
+                        checkbox->blockSignals(false);
+                    });
             break;
         }
         default:
@@ -183,8 +244,7 @@ QWidget* EncTtsCfgGui::createWidgets(EncTtsSetting* setting)
     // remember widget
     if(value != nullptr)
     {
-        m_settingsWidgetsMap.insert(setting,value);
-        connect(setting,&EncTtsSetting::updateGui,this,&EncTtsCfgGui::updateWidget);
+        m_settingsWidgetsMap.insert(setting, value);
     }
 
     return value;
@@ -196,148 +256,28 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
     {
         QPushButton* browsebtn = new QPushButton(tr("Browse"),this);
         browsebtn->setIcon(QIcon(":/icons/system-search.svg"));
-        m_browseBtnMap.setMapping(browsebtn,setting);
-        connect(browsebtn,SIGNAL(clicked()),&m_browseBtnMap,SLOT(map()));
+
+        connect(browsebtn, &QPushButton::clicked, this,
+                [this, setting]()
+            {
+                QString exe = QFileDialog::getOpenFileName(this, tr("Select executable"),
+                                                           setting->current().toString(), "*");
+                if(QFileInfo(exe).isExecutable())
+                    setting->setCurrent(exe);
+            });
         return browsebtn;
     }
     else if(setting->button() == EncTtsSetting::eREFRESHBTN)
     {
         QPushButton* refreshbtn = new QPushButton(tr("Refresh"),this);
         refreshbtn->setIcon(QIcon(":/icons/view-refresh.svg"));
-        connect(refreshbtn,&QAbstractButton::clicked,setting,&EncTtsSetting::refresh);
+        connect(refreshbtn, &QAbstractButton::clicked, setting, &EncTtsSetting::refresh);
         return refreshbtn;
     }
     else
         return nullptr;
 }
 
-void EncTtsCfgGui::updateSetting()
-{
-    //cast and get the sender widget
-    QWidget* widget = qobject_cast<QWidget*>(QObject::sender());
-    if(widget == nullptr) return;
-    // get the corresponding setting
-    EncTtsSetting* setting = m_settingsWidgetsMap.key(widget);
-
-    // update widget based on setting type
-    switch(setting->type())
-    {
-        case EncTtsSetting::eDOUBLE:
-        {
-            setting->setCurrent(((QDoubleSpinBox*)widget)->value(),false);
-            break;
-        }
-        case EncTtsSetting::eINT:
-        {
-            setting->setCurrent(((QSpinBox*)widget)->value(),false);
-            break;
-        }
-        case EncTtsSetting::eSTRING:
-        {
-            setting->setCurrent(((QLineEdit*)widget)->text(),false);
-            break;
-        }
-        case EncTtsSetting::eREADONLYSTRING:
-        {
-             setting->setCurrent(((QLabel*)widget)->text(),false);
-            break;
-        }
-        case EncTtsSetting::eSTRINGLIST:
-        {
-            setting->setCurrent(((QComboBox*)widget)->currentText(),false);
-            break;
-        }
-        case EncTtsSetting::eBOOL:
-        {
-            setting->setCurrent(((QCheckBox*)widget)->isChecked(),false);
-            break;
-        }
-        default:
-        {
-            LOG_WARNING() << "unknown setting type!";
-            break;
-        }
-    }
-}
-
-void EncTtsCfgGui::updateWidget()
-{
-    // get sender setting
-    EncTtsSetting* setting = qobject_cast<EncTtsSetting*>(QObject::sender());
-    if(setting == nullptr) return;
-    // get corresponding widget
-    QWidget* widget = m_settingsWidgetsMap.value(setting);
-
-    // update Widget based on setting type
-    switch(setting->type())
-    {
-        case EncTtsSetting::eDOUBLE:
-        {
-            QDoubleSpinBox* spinbox = (QDoubleSpinBox*) widget;
-            spinbox->setMinimum(setting->min().toDouble());
-            spinbox->setMaximum(setting->max().toDouble());
-            spinbox->blockSignals(true);
-            spinbox->setValue(setting->current().toDouble());
-            spinbox->blockSignals(false);
-            break;
-        }
-        case EncTtsSetting::eINT:
-        {
-            QSpinBox* spinbox = (QSpinBox*) widget;
-            spinbox->setMinimum(setting->min().toInt());
-            spinbox->setMaximum(setting->max().toInt());
-            spinbox->blockSignals(true);
-            spinbox->setValue(setting->current().toInt());
-            spinbox->blockSignals(false);
-            break;
-        }
-        case EncTtsSetting::eSTRING:
-        {
-            QLineEdit* lineedit = (QLineEdit*) widget;
-
-            lineedit->blockSignals(true);
-            lineedit->setText(setting->current().toString());
-            lineedit->blockSignals(false);
-            break;
-        }
-        case EncTtsSetting::eREADONLYSTRING:
-        {
-            QLabel* label = (QLabel*) widget;
-
-            label->blockSignals(true);
-            label->setText(setting->current().toString());
-            label->blockSignals(false);
-            break;
-        }
-        case EncTtsSetting::eSTRINGLIST:
-        {
-            QComboBox* combobox = (QComboBox*) widget;
-
-            combobox->blockSignals(true);
-            combobox->clear();
-            combobox->addItems(setting->list());
-            int index = combobox->findText(setting->current().toString());
-            combobox->setCurrentIndex(index);
-            combobox->blockSignals(false);
-
-            break;
-        }
-        case EncTtsSetting::eBOOL:
-        {
-            QCheckBox* checkbox = (QCheckBox*) widget;
-
-            checkbox->blockSignals(true);
-            checkbox->setCheckState(setting->current().toBool() == true ? Qt::Checked : Qt::Unchecked);
-            checkbox->blockSignals(false);
-            break;
-        }
-        default:
-        {
-            LOG_WARNING() << "unknown EncTTsSetting";
-            break;
-        }
-    }
-}
 
 void EncTtsCfgGui::showBusy()
 {
@@ -365,20 +305,4 @@ void EncTtsCfgGui::reject(void)
     this->done(0);
 }
 
-//! takes a QObject because of QsignalMapper
-void EncTtsCfgGui::browse(QObject* settingObj)
-{
-    // cast top setting
-    EncTtsSetting* setting= qobject_cast<EncTtsSetting*>(settingObj);
-    if(setting == nullptr) return;
-
-    //current path
-    QString curPath = setting->current().toString();
-    // show file dialog
-    QString exe = QFileDialog::getOpenFileName(this, tr("Select executable"), curPath, "*");
-    if(!QFileInfo(exe).isExecutable())
-        return;
-    // set new value, gui will update automatically
-    setting->setCurrent(exe);
-}
 
