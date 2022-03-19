@@ -124,53 +124,111 @@ int load_uimage_file(const char* filename,
 struct nand_reader_data
 {
     nand_drv* ndrv;
-    uint32_t addr;
-    uint32_t end_addr;
+    nand_page_t page;
+    nand_page_t end_page;
+    unsigned offset;
+    uint32_t count;
 };
+
+static int uimage_nand_reader_init(struct nand_reader_data* d, nand_drv* ndrv,
+                                   uint32_t addr, uint32_t length)
+{
+    unsigned pg_size = ndrv->chip->page_size;
+
+    /* must start at a block address */
+    if(addr % (pg_size << ndrv->chip->log2_ppb))
+        return -1;
+
+    d->ndrv = ndrv;
+    d->page = addr / ndrv->chip->page_size;
+    d->end_page = d->page + (length + pg_size - 1) / pg_size;
+    d->offset = 0;
+    d->count = length;
+
+    if(d->end_page > ndrv->chip->nr_blocks << ndrv->chip->log2_ppb)
+        return -2;
+
+    return 0;
+}
 
 static ssize_t uimage_nand_reader(void* buf, size_t count, void* rctx)
 {
     struct nand_reader_data* d = rctx;
+    nand_drv* ndrv = d->ndrv;
+    unsigned pg_size = ndrv->chip->page_size;
+    size_t read_count = 0;
+    int rc;
 
-    if(d->addr + count > d->end_addr)
-        count = d->end_addr - d->addr;
+    /* truncate overlong reads */
+    if(count > d->count)
+        count = d->count;
 
-    int ret = nand_read_bytes(d->ndrv, d->addr, count, buf);
-    if(ret != NAND_SUCCESS)
-        return -1;
+    while(d->page < d->end_page && read_count < count) {
+        rc = nand_page_read(ndrv, d->page, ndrv->page_buf);
+        if(rc < 0)
+            return -1;
 
-    d->addr += count;
-    return count;
+        /* Check the first page of a block for the bad block marker.
+         * Any bad blocks are silently skipped. */
+        if(!(d->page & (ndrv->ppb - 1))) {
+            if(ndrv->page_buf[ndrv->chip->bbm_pos] != 0xff) {
+                if(d->offset != 0)
+                    return -1; /* shouldn't happen but just in case... */
+                d->page += ndrv->ppb;
+                continue;
+            }
+        }
+
+        size_t copy_len = MIN(count - read_count, pg_size - d->offset);
+        memcpy(buf, &ndrv->page_buf[d->offset], copy_len);
+
+        /* this seems like an excessive amount of arithmetic... */
+        buf += copy_len;
+        read_count += copy_len;
+        d->count -= copy_len;
+
+        d->offset += copy_len;
+        if(d->offset >= pg_size) {
+            d->offset -= pg_size;
+            d->page++;
+        }
+    }
+
+    return read_count;
 }
 
 int load_uimage_flash(uint32_t addr, uint32_t length,
                       struct uimage_header* uh, size_t* sizep)
 {
-    int handle = -1;
-
-    struct nand_reader_data n;
-    n.ndrv = nand_init();
-    n.addr = addr;
-    n.end_addr = addr + length;
-
-    nand_lock(n.ndrv);
-    if(nand_open(n.ndrv) != NAND_SUCCESS) {
+    nand_drv* ndrv = nand_init();
+    nand_lock(ndrv);
+    if(nand_open(ndrv) != NAND_SUCCESS) {
         splashf(5*HZ, "NAND open failed");
-        nand_unlock(n.ndrv);
+        nand_unlock(ndrv);
         return -1;
     }
 
-    handle = uimage_load(uh, sizep, uimage_nand_reader, &n);
-
-    nand_close(n.ndrv);
-    nand_unlock(n.ndrv);
-
-    if(handle <= 0) {
-        splashf(5*HZ, "uImage load failed (%d)", handle);
-        return -2;
+    struct nand_reader_data n;
+    int ret = uimage_nand_reader_init(&n, ndrv, addr, length);
+    if(ret != 0) {
+        splashf(5*HZ, "Bad image params\nAddr: %08lx\nLength: %lu", addr, length);
+        ret = -2;
+        goto out;
     }
 
-    return handle;
+    int handle = uimage_load(uh, sizep, uimage_nand_reader, &n);
+    if(handle <= 0) {
+        splashf(5*HZ, "uImage load failed (%d)", handle);
+        ret = -3;
+        goto out;
+    }
+
+    ret = handle;
+
+  out:
+    nand_close(ndrv);
+    nand_unlock(ndrv);
+    return ret;
 }
 
 int dump_flash(int fd, uint32_t addr, uint32_t length)
