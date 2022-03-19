@@ -73,6 +73,8 @@ class HttpGet : public QObject
         //< set global user agent string
         static void setGlobalUserAgent(const QString& u)
             { m_globalUserAgent = u; }
+        static void addTrustedPeerCert(QSslCertificate cert)
+            { m_acceptedClientCerts.append(cert);}
 
     public slots:
         void abort(void);
@@ -81,14 +83,17 @@ class HttpGet : public QObject
         void done(QNetworkReply::NetworkError error);
         void dataReadProgress(int, int);
         void headerFinished(void);
+        void sslError(const QSslError& error, const QSslCertificate& peerCert);
 
     private slots:
         void requestFinished(QNetworkReply* reply);
         void startRequest(QUrl url);
         void downloadProgress(qint64 received, qint64 total);
         void networkError(QNetworkReply::NetworkError error);
+        void gotSslError(const QList<QSslError> &errors);
 
     private:
+        static QList<QSslCertificate> m_acceptedClientCerts;
         static QString m_globalUserAgent;
         static QNetworkProxy m_globalProxy;
         QNetworkAccessManager m_mgr;

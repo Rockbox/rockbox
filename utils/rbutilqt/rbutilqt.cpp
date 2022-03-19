@@ -205,6 +205,7 @@ void RbUtilQt::downloadInfo()
     // try to get the current build information
     daily = new HttpGet(this);
     connect(daily, &HttpGet::done, this, &RbUtilQt::downloadDone);
+    connect(daily, &HttpGet::sslError, this, &RbUtilQt::sslError);
     connect(qApp, &QGuiApplication::lastWindowClosed, daily, &HttpGet::abort);
     daily->setCache(false);
     ui.statusbar->showMessage(tr("Downloading build information, please wait ..."));
@@ -213,10 +214,49 @@ void RbUtilQt::downloadInfo()
     daily->getFile(QUrl(PlayerBuildInfo::instance()->value(PlayerBuildInfo::BuildInfoUrl).toString()));
 }
 
+void RbUtilQt::sslError(const QSslError& error, const QSslCertificate& peerCert)
+{
+    LOG_WARNING() << "sslError" << (int)error.error();
+    // On Rockbox Utility start we always try to get the build info first.
+    // Thus we can use that to catch potential certificate errors.
+    // If the user accepts the certificate we'll have HttpGet ignore all cert
+    // errors for the exact certificate we got during this first request.
+    // Thus we don't need to handle cert errors later anymore.
+    if (error.error() == QSslError::UnableToGetLocalIssuerCertificate) {
+        QMessageBox mb(this);
+        mb.setWindowTitle(tr("Certificate error"));
+        mb.setIcon(QMessageBox::Warning);
+        mb.setText(tr("%1\n\n"
+                      "Issuer: %2\n"
+                      "Subject: %3\n"
+                      "Valid since: %4\n"
+                      "Valid until: %5\n\n"
+                      "Temporarily trust certificate?")
+                   .arg(error.errorString())
+                   .arg(peerCert.issuerInfo(QSslCertificate::Organization).at(0))
+                   .arg(peerCert.subjectDisplayName())
+                   .arg(peerCert.effectiveDate().toString())
+                   .arg(peerCert.expiryDate().toString())
+                   );
+        mb.setDetailedText(peerCert.toText());
+        mb.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+
+        auto r = mb.exec();
+        if (r == QMessageBox::Yes) {
+            HttpGet::addTrustedPeerCert(peerCert);
+            downloadInfo();
+        }
+        else {
+            downloadDone(QNetworkReply::OperationCanceledError);
+        }
+    }
+}
+
 
 void RbUtilQt::downloadDone(QNetworkReply::NetworkError error)
 {
-    if(error != QNetworkReply::NoError) {
+    if(error != QNetworkReply::NoError
+            && error != QNetworkReply::SslHandshakeFailedError) {
         LOG_INFO() << "network error:" << daily->errorString();
         ui.statusbar->showMessage(tr("Can't get version information!"));
         QMessageBox::critical(this, tr("Network error"),

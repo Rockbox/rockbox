@@ -72,6 +72,7 @@ class RbUtilQt : public QMainWindow
         bool m_auto;
 
     private slots:
+        void sslError(const QSslError& error, const QSslCertificate& peerCert);
         void shutdown(void);
         void about(void);
         void help(void);

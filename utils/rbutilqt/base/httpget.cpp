@@ -20,6 +20,7 @@
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
+#include <QSslConfiguration>
 
 #include "httpget.h"
 #include "Logger.h"
@@ -27,6 +28,7 @@
 QString HttpGet::m_globalUserAgent; //< globally set user agent for requests
 QDir HttpGet::m_globalCache; //< global cach path value for new objects
 QNetworkProxy HttpGet::m_globalProxy;
+QList<QSslCertificate> HttpGet::m_acceptedClientCerts;
 
 HttpGet::HttpGet(QObject *parent)
     : QObject(parent),
@@ -211,8 +213,29 @@ void HttpGet::startRequest(QUrl url)
     connect(m_reply, &QNetworkReply::errorOccurred, this, &HttpGet::networkError);
 #endif
     connect(m_reply, &QNetworkReply::downloadProgress, this, &HttpGet::downloadProgress);
+    connect(m_reply, &QNetworkReply::sslErrors, this, &HttpGet::gotSslError);
 }
 
+
+void HttpGet::gotSslError(const QList<QSslError> &errors)
+{
+    LOG_WARNING() << "Got SSL error" << errors;
+
+    // if this is a cert error, and only if we already accepted a remote cert
+    // ignore the error.
+    // This will make QNAM continue the request and finish it.
+    if (errors.size() == 1
+            && errors.at(0).error() == QSslError::UnableToGetLocalIssuerCertificate
+            && m_acceptedClientCerts.contains(m_reply->sslConfiguration().peerCertificate())) {
+        LOG_INFO() << "client cert temporarily trusted by user.";
+        m_reply->ignoreSslErrors();
+    }
+    else {
+        LOG_ERROR() << m_reply->sslConfiguration().peerCertificate().toText();
+        emit sslError(errors.at(0), m_reply->sslConfiguration().peerCertificate());
+    }
+
+}
 
 void HttpGet::networkError(QNetworkReply::NetworkError error)
 {
