@@ -1126,10 +1126,11 @@ static bool check_against_clause(long numeric, const char *str,
                 return !str_ends_with(str, clause->str);
             case clause_oneof:
                 return str_oneof(str, clause->str);
-            case clause_begins_oneof:
-                return str_begins_ends_oneof(str, clause->str, true);
             case clause_ends_oneof:
-                return str_begins_ends_oneof(str, clause->str, false);
+                /* Fall-Through */
+            case clause_begins_oneof:
+                return str_begins_ends_oneof(str, clause->str,
+                                             clause->type == clause_begins_oneof);
             default:
                 logf("Incorrect tag: %d", clause->type);
         }
