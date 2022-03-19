@@ -114,7 +114,7 @@ int load_uimage_file(const char* filename,
 
     int handle = uimage_load(uh, sizep, uimage_fd_reader, (void*)(intptr_t)fd);
     if(handle <= 0) {
-        splashf(5*HZ, "Cannot load uImage\n%s", filename);
+        splashf(5*HZ, "Cannot load uImage (%d)\n%s", handle, filename);
         return -3;
     }
 
@@ -166,7 +166,7 @@ int load_uimage_flash(uint32_t addr, uint32_t length,
     nand_unlock(n.ndrv);
 
     if(handle <= 0) {
-        splashf(5*HZ, "uImage load failed");
+        splashf(5*HZ, "uImage load failed (%d)", handle);
         return -2;
     }
 
