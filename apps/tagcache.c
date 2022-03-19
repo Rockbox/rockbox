@@ -56,7 +56,7 @@
  */
 
 /*#define LOGF_ENABLE*/
-
+/*#define LOGF_CLAUSES define to enable logf clause matching (LOGF_ENABLE req'd) */ 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -140,7 +140,31 @@ static const char *tags_str[] = { "artist", "album", "genre", "title",
     "filename", "composer", "comment", "albumartist", "grouping", "year",
     "discnumber", "tracknumber", "canonicalartist", "bitrate", "length",
     "playcount", "rating", "playtime", "lastplayed", "commitid", "mtime",
-    "lastelapsed", "lastoffset" };
+    "lastelapsed", "lastoffset" 
+#if !defined(LOGF_ENABLE)
+};
+#define logf(...) do { } while(0)
+#elif defined(LOGF_CLAUSES) /* strings for logf debugging */
+    "tag_virt_basename", "tag_virt_length_min", "tag_virt_length_sec",
+    "tag_virt_playtime_min", "tag_virt_playtime_sec",
+    "tag_virt_entryage", "tag_virt_autoscore"
+};
+/* more debug strings */
+static const char *tag_type_str[] = {
+    [clause_none] = "clause_none", [clause_is] = "clause_is",
+    [clause_is_not] = "clause_is_not", [clause_gt] = "clause_gt",
+    [clause_gteq] = "clause_gteq", [clause_lt] = "clause_lt",
+    [clause_lteq] = "clause_lteq", [clause_contains] = "clause_contains",
+    [clause_not_contains] = "clause_not_contains",
+    [clause_begins_with] = "clause_begins_with",
+    [clause_not_begins_with] = "clause_not_begins_with",
+    [clause_ends_with] = "clause_ends_with",
+    [clause_not_ends_with] = "clause_not_ends_with",
+    [clause_oneof] = "clause_oneof",
+    [clause_logical_or] = "clause_logical_or"
+ };
+#define logf_clause logf
+#endif /* ndef LOGF_ENABLE */
 
 /* Status information of the tagcache. */
 static struct tagcache_stat tc_stat;
@@ -999,6 +1023,7 @@ long tagcache_get_numeric(const struct tagcache_search *tcs, int tag)
 
 inline static bool str_ends_with(const char *str1, const char *str2)
 {
+    logf_clauses("%s %s %s", str1, __func__, str2);
     int str_len = strlen(str1);
     int clause_len = strlen(str2);
 
@@ -1010,6 +1035,7 @@ inline static bool str_ends_with(const char *str1, const char *str2)
 
 inline static bool str_oneof(const char *str, const char *list)
 {
+    logf_clauses("%s %s %s", str, __func__, list);
     const char *sep;
     int l, len = strlen(str);
 
@@ -1078,7 +1104,6 @@ static bool check_against_clause(long numeric, const char *str,
                 return !str_ends_with(str, clause->str);
             case clause_oneof:
                 return str_oneof(str, clause->str);
-
             default:
                 logf("Incorrect tag: %d", clause->type);
         }
@@ -1102,10 +1127,17 @@ static bool check_clauses(struct tagcache_search *tcs,
         char *str = buf;
         struct tagcache_search_clause *clause = clauses[i];
 
+        logf_clauses("%s clause %d %s %s [%ld] %s",
+            "Checking",  i, tag_type_str[clause->type],
+            tags_str[clause->tag],  clause->numeric_data,
+            (clause->numeric || clause->str == NULL) ? "[NUMERIC?]" : clause->str);
+
         if (clause->type == clause_logical_or)
+        {
+            logf_clauses("Bailing");
             break; /* all conditions before logical-or satisfied --
                       stop processing clauses */
-
+        }
         seek = check_virtual_tags(clause->tag, tcs->idx_id, idx);
 
 #ifdef HAVE_TC_RAMCACHE
@@ -1190,6 +1222,11 @@ static bool check_clauses(struct tagcache_search *tcs,
 
             return false;
         }
+
+        logf_clauses("%s clause %d %s %s [%ld] %s",
+            "Found",  i, tag_type_str[clause->type],
+            tags_str[clause->tag],  clause->numeric_data,
+            (clause->numeric || clause->str == NULL) ? "[NUMERIC?]" : clause->str);
     }
 
     return true;
@@ -1238,7 +1275,7 @@ static bool add_uniqbuf(struct tagcache_search *tcs, uint32_t id)
             /* Return false if entry is found. */
             if (entry->u16[0] == id || entry->u16[1] == id)
             {
-                logf("%d Exists (16) @ %d", id, i);
+                //logf("%d Exists (16) @ %d", id, i);
                 return false;
             }
   
@@ -1263,7 +1300,7 @@ static bool add_uniqbuf(struct tagcache_search *tcs, uint32_t id)
             /* Return false if entry is found. */
             if (tcs->unique_list[i] == id)
             {
-                logf("%d Exists (32)@ %d", id, i);
+                //logf("%d Exists (32)@ %d", id, i);
                 return false;
             }
         }
