@@ -172,3 +172,81 @@ int load_uimage_flash(uint32_t addr, uint32_t length,
 
     return handle;
 }
+
+int dump_flash(int fd, uint32_t addr, uint32_t length)
+{
+    static char buf[8192];
+    int ret = 0;
+
+    nand_drv* ndrv = nand_init();
+    nand_lock(ndrv);
+
+    ret = nand_open(ndrv);
+    if(ret != NAND_SUCCESS) {
+        splashf(5*HZ, "NAND open failed\n");
+        nand_unlock(ndrv);
+        return ret;
+    }
+
+    while(length > 0) {
+        uint32_t count = MIN(length, sizeof(buf));
+        ret = nand_read_bytes(ndrv, addr, count, buf);
+        if(ret != NAND_SUCCESS) {
+            splashf(5*HZ, "Dump failed\nNAND I/O error");
+            goto out;
+        }
+
+        if(write(fd, buf, count) != (ssize_t)count) {
+            splashf(5*HZ, "Dump failed\nFile I/O error");
+            ret = -1;
+            goto out;
+        }
+
+        length -= count;
+        addr += count;
+    }
+
+  out:
+    nand_close(ndrv);
+    nand_unlock(ndrv);
+    return ret;
+}
+
+int dump_flash_file(const char* file, uint32_t addr, uint32_t length)
+{
+    if(check_disk(true) != DISK_PRESENT)
+        return -1;
+
+    splashf(0, "Dumping...\n%s\n0x%08lx\n%lu bytes", file, addr, length);
+
+    int fd = open(file, O_WRONLY|O_CREAT|O_TRUNC);
+    if(fd < 0) {
+        splashf(5*HZ, "Cannot open file\n%s", file);
+        return -2;
+    }
+
+    int rc = dump_flash(fd, addr, length);
+    if(rc < 0) {
+        close(fd);
+        remove(file);
+        return -3;
+    }
+
+    splashf(5*HZ, "Dumped\n%s", file);
+    close(fd);
+    return 0;
+}
+
+void dump_of_player(void)
+{
+#ifdef OF_PLAYER_ADDR
+    dump_flash_file("/of_player.img", OF_PLAYER_ADDR, OF_PLAYER_LENGTH);
+#endif
+}
+
+void dump_of_recovery(void)
+{
+#ifdef OF_RECOVERY_ADDR
+    dump_flash_file("/of_recovery.img", OF_RECOVERY_ADDR, OF_RECOVERY_LENGTH);
+#endif
+}

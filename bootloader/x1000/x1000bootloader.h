@@ -167,6 +167,11 @@ int load_uimage_file(const char* filename,
 int load_uimage_flash(uint32_t addr, uint32_t length,
                       struct uimage_header* uh, size_t* sizep);
 
+int dump_flash(int fd, uint32_t addr, uint32_t length);
+int dump_flash_file(const char* file, uint32_t addr, uint32_t length);
+void dump_of_player(void);
+void dump_of_recovery(void);
+
 void recovery_menu(void) __attribute__((noreturn));
 
 #endif /* __X1000BOOTLOADER_H__ */
