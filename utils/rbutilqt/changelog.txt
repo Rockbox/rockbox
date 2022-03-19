@@ -40,3 +40,4 @@ Version 1.5.0
 * Improved HiDPI support.
 * Drop support for Qt4, now requires Qt5.
 * Update various external libraries.
+* Server Downloads changed to https.
