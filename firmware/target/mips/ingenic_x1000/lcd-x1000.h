@@ -105,6 +105,14 @@ extern void lcd_exec_commands(const uint32_t* cmdseq);
  */
 extern void lcd_tgt_enable(bool on);
 
+/* Enable/disable the LCD controller, but intended for booting the OF.
+ *
+ * This is only used for the Eros Q Native port, as the OF seems to be
+ * unable to initialize the LCD in the kernel boot rather than having
+ * the bootloader do it.
+ */
+extern void lcd_tgt_enable_of(bool on);
+
 /* Enter or exit sleep mode to save power, normally by sending the necessary
  * commands with lcd_exec_commands().
  */

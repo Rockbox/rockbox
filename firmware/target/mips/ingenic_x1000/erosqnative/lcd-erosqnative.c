@@ -102,6 +102,19 @@ static const uint32_t erosqnative_lcd_cmd_enable[] = {
     LCD_INSTR_END,
 };
 
+static const uint32_t erosqnative_lcd_of_compat_cmd[] = {
+    /* Pixel Format Set */
+    LCD_INSTR_CMD,      0x3a,
+    LCD_INSTR_DAT,      0x66, /* 18 bpp */
+    /* Exit Sleep */
+    LCD_INSTR_CMD,      0x11,
+    LCD_INSTR_UDELAY,   120000,
+    /* Display On */
+    LCD_INSTR_CMD,      0x29,
+    LCD_INSTR_UDELAY,   20000,
+    LCD_INSTR_END,
+};
+
 /* sleep and wake copied directly from m3k */
 static const uint32_t erosqnative_lcd_cmd_sleep[] = {
     /* Display OFF */
@@ -178,6 +191,15 @@ void lcd_tgt_enable(bool enable)
         gpio_set_level(GPIO_LCD_RESET, 0);
 #endif
     }
+}
+
+void lcd_tgt_enable_of(bool enable)
+{
+    /* silence the unused parameter warning */
+    if (enable)
+    {}
+
+    lcd_exec_commands(&erosqnative_lcd_of_compat_cmd[0]);
 }
 
 void lcd_tgt_sleep(bool sleep)

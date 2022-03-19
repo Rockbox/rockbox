@@ -99,6 +99,19 @@ struct uimage_header;
 # define BL_QUIT_NAME       "POWER"
 # define BL_SCREENSHOT_NAME "MENU"
 # define BOOTBACKUP_FILE    "/erosqnative-boot.bin"
+# define OF_PLAYER_NAME     "Aigo Player"
+# define OF_PLAYER_ADDR     0x300000
+# define OF_PLAYER_LENGTH   (6 * 1024 * 1024)
+# define OF_PLAYER_ARGS     OF_RECOVERY_ARGS \
+    " init=/linuxrc ubi.mtd=4 root=ubi0:rootfs ubi.mtd=5 rootfstype=ubifs \
+sn_no=00000000000000000000000000000000 bt_mac=xxxxxxxxxxxx wifi_mac=xxxxxxxxxxxx rw"
+# define OF_PLAYER_BTN      BUTTON_PLAY
+/* Note: OF Recovery boots, but is otherwise untested. */
+//# define OF_RECOVERY_NAME   "Aigo Recovery"
+//# define OF_RECOVERY_ADDR   0x900000
+//# define OF_RECOVERY_LENGTH (7 * 1024 * 1024)
+# define OF_RECOVERY_ARGS \
+    "console=ttyS2,115200n8 mem=32M@0x0 no_console_suspend lpj=5009408 ip=off"
 #else
 # error "Missing keymap!"
 #endif

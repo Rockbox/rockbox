@@ -29,6 +29,10 @@
 #include "boot-x1000.h"
 #include <ctype.h>
 #include <sys/types.h>
+#if defined(EROS_QN)
+# include "lcd-x1000.c"
+# include "backlight-target.h"
+#endif
 
 void boot_rockbox(void)
 {
@@ -200,6 +204,24 @@ void boot_of_helper(uint32_t addr, uint32_t flash_size, const char* args)
 #endif
 
     gui_shutdown();
+
+/* The Eros Q needs the LCD initialized in the bootloader */
+#if defined(EROS_QN)
+    /* enable LCD if it's not yet on, but keep the backlight off to avoid a white flash */
+    init_lcd();
+    backlight_hw_off();
+
+    /* TODO: this doesn't work for some reason */
+    //lcd_clear_display();
+    //lcd_update();
+    //lcd_wait_frame();
+
+    /* disable irq and dma */
+    lcd_enable(false);
+
+    /* set up LCD in a config compatible with OF */
+    lcd_tgt_enable_of(1);
+#endif
 
     x1000_dualboot_load_pdma_fw();
     x1000_dualboot_cleanup();
