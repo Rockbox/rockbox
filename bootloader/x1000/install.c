@@ -34,7 +34,7 @@ enum {
 static void bootloader_action(int which)
 {
     if(check_disk(true) != DISK_PRESENT) {
-        splash2(5*HZ, "Install aborted", "Cannot access SD card");
+        splashf(5*HZ, "Install aborted\nCannot access SD card");
         return;
     }
 
@@ -46,7 +46,7 @@ static void bootloader_action(int which)
     default: return; /* can't happen */
     }
 
-    splash(0, msg);
+    splashf(0, msg);
 
     int rc;
     switch(which) {
@@ -60,7 +60,7 @@ static void bootloader_action(int which)
     snprintf(buf, sizeof(buf), "%s (%d)", installer_strerror(rc), rc);
     const char* msg1 = rc == 0 ? "Success" : buf;
     const char* msg2 = "Press " BL_QUIT_NAME " to continue";
-    splash2(0, msg1, msg2);
+    splashf(0, "%s\n%s", msg1, msg2);
 
     while(get_button(TIMEOUT_BLOCK) != BL_QUIT);
 }

@@ -46,13 +46,13 @@ int check_disk(bool wait)
         return DISK_ABSENT;
 
     while(!storage_present(IF_MD(0))) {
-        splash2(0, "Insert SD card", "Press " BL_QUIT_NAME " to cancel");
+        splashf(0, "Insert SD card\nPress " BL_QUIT_NAME " to cancel");
         if(get_button(HZ/4) == BL_QUIT)
             return DISK_CANCELED;
     }
 
     /* a lie intended to give time for mounting the disk in the background */
-    splash(HZ, "Scanning disk");
+    splashf(HZ, "Scanning disk");
 
     return DISK_PRESENT;
 }
@@ -60,19 +60,19 @@ int check_disk(bool wait)
 void usb_mode(void)
 {
     if(!is_usb_connected)
-        splash2(0, "Waiting for USB", "Press " BL_QUIT_NAME " to cancel");
+        splashf(0, "Waiting for USB\nPress " BL_QUIT_NAME " to cancel");
 
     while(!is_usb_connected)
         if(get_button(TIMEOUT_BLOCK) == BL_QUIT)
             return;
 
-    splash(0, "USB mode");
+    splashf(0, "USB mode");
     usb_acknowledge(SYS_USB_CONNECTED_ACK);
 
     while(is_usb_connected)
         get_button(TIMEOUT_BLOCK);
 
-    splash(3*HZ, "USB disconnected");
+    splashf(3*HZ, "USB disconnected");
 }
 
 int load_rockbox(const char* filename, size_t* sizep)
@@ -82,7 +82,7 @@ int load_rockbox(const char* filename, size_t* sizep)
 
     int handle = core_alloc_maximum("rockbox", sizep, &buflib_ops_locked);
     if(handle < 0) {
-        splash(5*HZ, "Out of memory");
+        splashf(5*HZ, "Out of memory");
         return -2;
     }
 
@@ -90,7 +90,7 @@ int load_rockbox(const char* filename, size_t* sizep)
     int rc = load_firmware(loadbuffer, filename, *sizep);
     if(rc <= 0) {
         core_free(handle);
-        splash2(5*HZ, "Error loading Rockbox", loader_strerror(rc));
+        splashf(5*HZ, "Error loading Rockbox\n%s", loader_strerror(rc));
         return -3;
     }
 
@@ -108,13 +108,13 @@ int load_uimage_file(const char* filename,
 
     int fd = open(filename, O_RDONLY);
     if(fd < 0) {
-        splash2(5*HZ, "Can't open file", filename);
+        splashf(5*HZ, "Can't open file\n%s", filename);
         return -2;
     }
 
     int handle = uimage_load(uh, sizep, uimage_fd_reader, (void*)(intptr_t)fd);
     if(handle <= 0) {
-        splash2(5*HZ, "Cannot load uImage", filename);
+        splashf(5*HZ, "Cannot load uImage\n%s", filename);
         return -3;
     }
 
@@ -155,7 +155,7 @@ int load_uimage_flash(uint32_t addr, uint32_t length,
 
     nand_lock(n.ndrv);
     if(nand_open(n.ndrv) != NAND_SUCCESS) {
-        splash(5*HZ, "NAND open failed");
+        splashf(5*HZ, "NAND open failed");
         nand_unlock(n.ndrv);
         return -1;
     }
@@ -166,7 +166,7 @@ int load_uimage_flash(uint32_t addr, uint32_t length,
     nand_unlock(n.ndrv);
 
     if(handle <= 0) {
-        splash(5*HZ, "uImage load failed");
+        splashf(5*HZ, "uImage load failed");
         return -2;
     }
 

@@ -29,6 +29,8 @@
 #include "button.h"
 #include "version.h"
 #include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 static bool lcd_inited = false;
 extern bool is_usb_connected;
@@ -53,25 +55,68 @@ void putcenter_y(int y, const char* msg)
     lcd_putsxy(x, y, msg);
 }
 
-void putcenter_line(int line, const char* msg)
+static void get_splash_size(const char* str, int* width, int* height)
 {
-    int y = LCD_HEIGHT/2 + (line - 1)*SYSFONT_HEIGHT;
-    putcenter_y(y, msg);
+    *width = 0;
+    *height = 0;
+
+    while(str) {
+        const char* np = strchr(str, '\n');
+        int len;
+        if(np) {
+            len = np - str;
+            np++;
+        } else {
+            len = strlen(str);
+        }
+
+        *width = MAX(len, *width);
+        *height += 1;
+        str = np;
+    }
 }
 
-void splash2(long delay, const char* msg, const char* msg2)
+void splashf(long delay, const char* msg, ...)
 {
+    static char buf[512];
+
+    va_list ap;
+    va_start(ap, msg);
+    int len = vsnprintf(buf, sizeof(buf), msg, ap);
+    va_end(ap);
+
+    if(len < 0)
+        return;
+
+    int xpos, ypos;
+    int width, height;
+    get_splash_size(buf, &width, &height);
+
+    width *= SYSFONT_WIDTH;
+    height *= SYSFONT_HEIGHT;
+    xpos = (LCD_WIDTH - width) / 2;
+    ypos = (LCD_HEIGHT - height) / 2;
+
+    const int padding = 10;
     clearscreen();
-    putcenter_line(0, msg);
-    if(msg2)
-        putcenter_line(1, msg2);
+    lcd_drawrect(xpos-padding, ypos-padding,
+                 width+2*padding, height+2*padding);
+
+    char* str = buf;
+    do {
+        char* np = strchr(str, '\n');
+        if(np) {
+            *np = '\0';
+            np++;
+        }
+
+        lcd_putsxyf(xpos, ypos, "%s", str);
+        ypos += SYSFONT_HEIGHT;
+        str = np;
+    } while(str);
+
     lcd_update();
     sleep(delay);
-}
-
-void splash(long delay, const char* msg)
-{
-    splash2(delay, msg, NULL);
 }
 
 int get_button(int timeout)

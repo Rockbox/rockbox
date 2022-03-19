@@ -118,9 +118,7 @@ struct bl_list {
 void clearscreen(void);
 void putversion(void);
 void putcenter_y(int y, const char* msg);
-void putcenter_line(int line, const char* msg);
-void splash2(long delay, const char* msg, const char* msg2);
-void splash(long delay, const char* msg);
+void splashf(long delay, const char* msg, ...);
 int get_button(int timeout);
 void init_lcd(void);
 

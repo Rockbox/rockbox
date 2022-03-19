@@ -43,14 +43,14 @@ void boot_rockbox(void)
 
 void shutdown(void)
 {
-    splash(HZ, "Shutting down");
+    splashf(HZ, "Shutting down");
     power_off();
     while(1);
 }
 
 void reboot(void)
 {
-    splash(HZ, "Rebooting");
+    splashf(HZ, "Rebooting");
     system_reboot();
     while(1);
 }
@@ -70,13 +70,13 @@ static int read_linux_args(const char* filename)
     size_t max_size;
     int handle = core_alloc_maximum("args", &max_size, &buflib_ops_locked);
     if(handle <= 0) {
-        splash(5*HZ, "Out of memory");
+        splashf(5*HZ, "Out of memory");
         return -2;
     }
 
     int fd = open(filename, O_RDONLY);
     if(fd < 0) {
-        splash2(5*HZ, "Can't open args file", filename);
+        splashf(5*HZ, "Can't open args file\n%s", filename);
         ret = -3;
         goto err_free;
     }
@@ -84,7 +84,7 @@ static int read_linux_args(const char* filename)
     /* this isn't 100% correct but will be good enough */
     off_t fsize = filesize(fd);
     if(fsize < 0 || fsize+1 > (off_t)max_size) {
-        splash(5*HZ, "Arguments too long");
+        splashf(5*HZ, "Arguments too long");
         ret = -4;
         goto err_close;
     }
@@ -96,7 +96,7 @@ static int read_linux_args(const char* filename)
     close(fd);
 
     if(rdres != (ssize_t)fsize) {
-        splash(5*HZ, "Can't read args file");
+        splashf(5*HZ, "Can't read args file");
         ret = -5;
         goto err_free;
     }
@@ -191,7 +191,7 @@ void boot_of_helper(uint32_t addr, uint32_t flash_size, const char* args)
     void* jump_addr = core_get_data(handle);
     uint32_t entry_addr = mips_linux_stub_get_entry(&jump_addr, img_length);
     if(entry_addr >= 0xa0000000 || entry_addr < 0x80000000) {
-        splash2(5*HZ, "Kernel patch failed", "Please send bugreport");
+        splashf(5*HZ, "Kernel patch failed\nPlease send bugreport");
         return;
     }
 
@@ -216,7 +216,7 @@ void boot_of_player(void)
 #if defined(OF_PLAYER_ADDR)
     boot_of_helper(OF_PLAYER_ADDR, OF_PLAYER_LENGTH, OF_PLAYER_ARGS);
 #else
-    splash(HZ, "Not supported");
+    splashf(HZ, "Not supported");
 #endif
 }
 
@@ -225,6 +225,6 @@ void boot_of_recovery(void)
 #if defined(OF_RECOVERY_ADDR)
     boot_of_helper(OF_RECOVERY_ADDR, OF_RECOVERY_LENGTH, OF_RECOVERY_ARGS);
 #else
-    splash(HZ, "Not supported");
+    splashf(HZ, "Not supported");
 #endif
 }

@@ -44,7 +44,7 @@ void main(void)
     enable_irq();
 
     if(storage_init() < 0) {
-        splash(5*HZ, "storage_init() failed");
+        splashf(5*HZ, "storage_init() failed");
         power_off();
     }
 
