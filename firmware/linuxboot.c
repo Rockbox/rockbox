@@ -32,9 +32,20 @@
 #define HAVE_UIMAGE_COMP_NONE
 #define HAVE_UIMAGE_COMP_GZIP
 
+enum {
+    E_OUT_OF_MEMORY = -1,
+    E_BUFFER_OVERFLOW = -2,
+    E_MAGIC_MISMATCH = -3,
+    E_HCRC_MISMATCH = -4,
+    E_DCRC_MISMATCH = -5,
+    E_UNSUPPORTED_COMPRESSION = -6,
+    E_READ = -7,
+    E_INFLATE = -8,
+    E_INFLATE_UNCONSUMED = -9,
+};
+
 uint32_t uimage_crc(uint32_t crc, const void* data, size_t size)
 {
-    /* is this endian swapping required...? */
     return letoh32(crc_32r(data, size, htole32(crc ^ 0xffffffff))) ^ 0xffffffff;
 }
 
@@ -48,10 +59,10 @@ uint32_t uimage_calc_hcrc(const struct uimage_header* uh)
 static int uimage_check_header(const struct uimage_header* uh)
 {
     if(uimage_get_magic(uh) != IH_MAGIC)
-        return -1;
+        return E_MAGIC_MISMATCH;
 
     if(uimage_get_hcrc(uh) != uimage_calc_hcrc(uh))
-        return -2;
+        return E_HCRC_MISMATCH;
 
     return 0;
 }
@@ -73,7 +84,7 @@ static int uimage_alloc_state(const struct uimage_header* uh)
 #endif
 
     default:
-        return -1;
+        return E_UNSUPPORTED_COMPRESSION;
     }
 }
 
@@ -84,18 +95,21 @@ struct uimage_inflatectx
     void* rctx;
     uint32_t dcrc;
     size_t remain;
+    int err;
 };
 
 static uint32_t uimage_inflate_reader(void* block, uint32_t block_size, void* ctx)
 {
     struct uimage_inflatectx* c = ctx;
     ssize_t len = c->reader(block, block_size, c->rctx);
-    if(len > 0) {
-        len = MIN(c->remain, (size_t)len);
-        c->remain -= len;
-        c->dcrc = uimage_crc(c->dcrc, block, len);
+    if(len < 0) {
+        c->err = E_READ;
+        return 0;
     }
 
+    len = MIN(c->remain, (size_t)len);
+    c->remain -= len;
+    c->dcrc = uimage_crc(c->dcrc, block, len);
     return len;
 }
 
@@ -112,6 +126,7 @@ static int uimage_decompress_gzip(const struct uimage_header* uh, int state_h,
     r_ctx.rctx = rctx;
     r_ctx.dcrc = 0;
     r_ctx.remain = uimage_get_size(uh);
+    r_ctx.err = 0;
 
     struct inflate_bufferctx w_ctx;
     w_ctx.buf = out;
@@ -120,13 +135,20 @@ static int uimage_decompress_gzip(const struct uimage_header* uh, int state_h,
     int ret = inflate(hbuf, INFLATE_GZIP,
                       uimage_inflate_reader, &r_ctx,
                       inflate_buffer_writer, &w_ctx);
-    if(ret)
-        return ret;
+    if(ret) {
+        if(r_ctx.err)
+            return r_ctx.err;
+        else if(w_ctx.end == w_ctx.buf)
+            return E_BUFFER_OVERFLOW;
+        else
+            /* note: this will likely mask DCRC_MISMATCH errors */
+            return E_INFLATE;
+    }
 
     if(r_ctx.remain > 0)
-        return -1;
+        return E_INFLATE_UNCONSUMED;
     if(r_ctx.dcrc != uimage_get_dcrc(uh))
-        return -2;
+        return E_DCRC_MISMATCH;
 
     *out_size = w_ctx.end - w_ctx.buf;
     return 0;
@@ -144,14 +166,14 @@ static int uimage_decompress(const struct uimage_header* uh, int state_h,
 #ifdef HAVE_UIMAGE_COMP_NONE
     case IH_COMP_NONE:
         if(*out_size < in_size)
-            return -2;
+            return E_BUFFER_OVERFLOW;
 
         len = reader(out, in_size, rctx);
         if(len < 0 || (size_t)len != in_size)
-            return -3;
+            return E_READ;
 
         if(uimage_crc(0, out, in_size) != uimage_get_dcrc(uh))
-            return -4;
+            return E_DCRC_MISMATCH;
 
         *out_size = in_size;
         break;
@@ -163,7 +185,7 @@ static int uimage_decompress(const struct uimage_header* uh, int state_h,
 #endif
 
     default:
-        return -1;
+        return E_UNSUPPORTED_COMPRESSION;
     }
 
     return 0;
@@ -173,7 +195,7 @@ int uimage_load(struct uimage_header* uh, size_t* out_size,
                 uimage_reader reader, void* rctx)
 {
     if(reader(uh, sizeof(*uh), rctx) != (ssize_t)sizeof(*uh))
-        return -1; /* read error */
+        return E_READ;
 
     int ret = uimage_check_header(uh);
     if(ret)
@@ -181,12 +203,12 @@ int uimage_load(struct uimage_header* uh, size_t* out_size,
 
     int state_h = uimage_alloc_state(uh);
     if(state_h < 0)
-        return state_h;
+        return E_OUT_OF_MEMORY;
 
     *out_size = 0;
     int out_h = core_alloc_maximum("uimage", out_size, &buflib_ops_locked);
     if(out_h <= 0) {
-        ret = -1;
+        ret = E_OUT_OF_MEMORY;
         goto err;
     }
 
