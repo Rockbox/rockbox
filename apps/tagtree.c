@@ -418,6 +418,8 @@ static int get_clause(int *condition)
         CLAUSE('!', '^', clause_not_begins_with),
         CLAUSE('$', ' ', clause_ends_with),
         CLAUSE('!', '$', clause_not_ends_with),
+        CLAUSE('@', '^', clause_begins_oneof),
+        CLAUSE('@', '$', clause_ends_oneof),
         CLAUSE('@', ' ', clause_oneof)
     };
 

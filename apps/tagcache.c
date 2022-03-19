@@ -56,7 +56,7 @@
  */
 
 /*#define LOGF_ENABLE*/
-/*#define LOGF_CLAUSES define to enable logf clause matching (LOGF_ENABLE req'd) */ 
+/*#define LOGF_CLAUSES define to enable logf clause matching (LOGF_ENABLE req'd) */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -162,6 +162,8 @@ static const char *tag_type_str[] = {
     [clause_ends_with] = "clause_ends_with",
     [clause_not_ends_with] = "clause_not_ends_with",
     [clause_oneof] = "clause_oneof",
+    [clause_begins_oneof] = "clause_begins_oneof",
+    [clause_ends_oneof] = "clause_ends_oneof",
     [clause_logical_or] = "clause_logical_or"
  };
 #define logf_clauses logf
@@ -1052,6 +1054,25 @@ inline static bool str_oneof(const char *str, const char *list)
     return false;
 }
 
+inline static bool str_begins_ends_oneof(const char *str, const char *list, bool begins)
+{
+    logf_clauses("%s %s (%s) %s", str, __func__, begins ? "begins" : "ends", list);
+    const char *sep;
+    int l, p, len = strlen(str);
+
+    while (*list)
+    {
+        sep = strchr(list, '|');
+        l = sep ? (intptr_t)sep - (intptr_t)list : (int)strlen(list);
+        p = begins ? 0 : len - l;
+        if (l <= len && !strncasecmp(&str[p], list, l))
+            return true;
+        list += sep ? l + 1 : l;
+    }
+
+    return false;
+}
+
 static bool check_against_clause(long numeric, const char *str,
                                  const struct tagcache_search_clause *clause)
 {
@@ -1105,6 +1126,10 @@ static bool check_against_clause(long numeric, const char *str,
                 return !str_ends_with(str, clause->str);
             case clause_oneof:
                 return str_oneof(str, clause->str);
+            case clause_begins_oneof:
+                return str_begins_ends_oneof(str, clause->str, true);
+            case clause_ends_oneof:
+                return str_begins_ends_oneof(str, clause->str, false);
             default:
                 logf("Incorrect tag: %d", clause->type);
         }
