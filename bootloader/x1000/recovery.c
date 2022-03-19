@@ -37,6 +37,9 @@ struct menuitem {
     void(*action)(void);
 };
 
+static void to_main_menu(void);
+static void to_debug_menu(void);
+
 /* Defines the recovery menu contents */
 static const struct menuitem recovery_items[] = {
     {MENUITEM_HEADING,  "Boot select",              NULL},
@@ -56,11 +59,41 @@ static const struct menuitem recovery_items[] = {
     {MENUITEM_ACTION,       "Install or update",    &bootloader_install},
     {MENUITEM_ACTION,       "Backup",               &bootloader_backup},
     {MENUITEM_ACTION,       "Restore",              &bootloader_restore},
+    {MENUITEM_HEADING,  "Advanced",                 NULL},
+    {MENUITEM_ACTION,       "Debug tools",          &to_debug_menu},
 };
+
+static const struct menuitem debug_menu_items[] = {
+    {MENUITEM_HEADING,  "Debug tools",              NULL},
+#ifdef OF_PLAYER_ADDR
+    {MENUITEM_ACTION,       "Dump OF player",       &dump_of_player},
+#endif
+#ifdef OF_RECOVERY_ADDR
+    {MENUITEM_ACTION,       "Dump OF recovery",     &dump_of_recovery},
+#endif
+    {MENUITEM_ACTION,       "Main menu",            &to_main_menu},
+};
+
+static const struct menuitem* current_menu = NULL;
+static struct bl_list recmenu_list;
+
+static void to_main_menu(void)
+{
+    current_menu = recovery_items;
+    recmenu_list.num_items = ARRAYLEN(recovery_items);
+    recmenu_list.selected_item = 1;
+}
+
+static void to_debug_menu(void)
+{
+    current_menu = debug_menu_items;
+    recmenu_list.num_items = ARRAYLEN(debug_menu_items);
+    recmenu_list.selected_item = 1;
+}
 
 static void recmenu_draw_item(const struct bl_listitem* item)
 {
-    const struct menuitem* mu = &recovery_items[item->index];
+    const struct menuitem* mu = &current_menu[item->index];
     const char* fmt;
 
     switch(mu->type) {
@@ -97,7 +130,7 @@ static void recmenu_scroll(struct bl_list* list, int dir)
     }
 
     for(int i = start; i != end; i += step) {
-        if(recovery_items[i].action) {
+        if(current_menu[i].action) {
             gui_list_select(list, i);
 
             /* always show one item above the selection to ensure
@@ -126,11 +159,10 @@ void recovery_menu(void)
     };
     lcd_init_viewport(&vp);
 
-    struct bl_list list;
-    gui_list_init(&list, &vp);
-    list.num_items = ARRAYLEN(recovery_items);
-    list.selected_item = 1; /* first item is a heading */
-    list.draw_item = recmenu_draw_item;
+    struct bl_list* list = &recmenu_list;
+    gui_list_init(list, &vp);
+    list->draw_item = recmenu_draw_item;
+    to_main_menu();
 
     while(1) {
         clearscreen();
@@ -143,30 +175,27 @@ void recovery_menu(void)
         put_help_line(ypos, 2, BL_QUIT_NAME, "power off");
 
         /* draw the list */
-        gui_list_draw(&list);
+        gui_list_draw(list);
 
         lcd_update();
 
         /* handle input */
         switch(get_button(TIMEOUT_BLOCK)) {
         case BL_SELECT: {
-            if(recovery_items[list.selected_item].action)
-                recovery_items[list.selected_item].action();
+            if(current_menu[list->selected_item].action)
+                current_menu[list->selected_item].action();
         } break;
 
         case BL_UP:
-            recmenu_scroll(&list, -1);
+            recmenu_scroll(list, -1);
             break;
 
         case BL_DOWN:
-            recmenu_scroll(&list, 1);
+            recmenu_scroll(list, 1);
             break;
 
         case BL_QUIT:
             shutdown();
-            break;
-
-        default:
             break;
         }
     }
