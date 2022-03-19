@@ -250,3 +250,11 @@ void dump_of_recovery(void)
     dump_flash_file("/of_recovery.img", OF_RECOVERY_ADDR, OF_RECOVERY_LENGTH);
 #endif
 }
+
+void dump_entire_flash(void)
+{
+#if defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN)
+    /* TODO: this should read the real chip size instead of hardcoding it */
+    dump_flash_file("/flash.img", 0, 2048 * 64 * 1024);
+#endif
+}

@@ -71,6 +71,7 @@ static const struct menuitem debug_menu_items[] = {
 #ifdef OF_RECOVERY_ADDR
     {MENUITEM_ACTION,       "Dump OF recovery",     &dump_of_recovery},
 #endif
+    {MENUITEM_ACTION,       "Dump entire flash",    &dump_entire_flash},
     {MENUITEM_ACTION,       "Main menu",            &to_main_menu},
 };
 
