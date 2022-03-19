@@ -1698,8 +1698,8 @@ static int add_dir_entry(struct bpb *fat_bpb, struct fat_filestr *parentstr,
     int rc;
 
     unsigned char basisname[11], shortname[11];
-    int n;
     int entries_needed;
+    int n = -1;
     unsigned long ucslen = 0;
 
     if (is_dotdir_name(name) && (attr & ATTR_DIRECTORY))
