@@ -57,6 +57,7 @@
 
 /*#define LOGF_ENABLE*/
 /*#define LOGF_CLAUSES define to enable logf clause matching (LOGF_ENABLE req'd) */ 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -140,10 +141,10 @@ static const char *tags_str[] = { "artist", "album", "genre", "title",
     "filename", "composer", "comment", "albumartist", "grouping", "year",
     "discnumber", "tracknumber", "canonicalartist", "bitrate", "length",
     "playcount", "rating", "playtime", "lastplayed", "commitid", "mtime",
-    "lastelapsed", "lastoffset" 
+    "lastelapsed", "lastoffset"
 #if !defined(LOGF_ENABLE)
 };
-#define logf(...) do { } while(0)
+#define logf_clauses(...) do { } while(0)
 #elif defined(LOGF_CLAUSES) /* strings for logf debugging */
     "tag_virt_basename", "tag_virt_length_min", "tag_virt_length_sec",
     "tag_virt_playtime_min", "tag_virt_playtime_sec",
@@ -163,7 +164,7 @@ static const char *tag_type_str[] = {
     [clause_oneof] = "clause_oneof",
     [clause_logical_or] = "clause_logical_or"
  };
-#define logf_clause logf
+#define logf_clauses logf
 #endif /* ndef LOGF_ENABLE */
 
 /* Status information of the tagcache. */
