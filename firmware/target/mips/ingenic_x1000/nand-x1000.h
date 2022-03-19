@@ -78,6 +78,9 @@ typedef struct nand_chip {
     /* Total number of blocks in the chip */
     unsigned nr_blocks;
 
+    /* Bad block marker offset within the 1st page of a bad block */
+    unsigned bbm_pos;
+
     /* Clock frequency to use */
     uint32_t clock_freq;
 

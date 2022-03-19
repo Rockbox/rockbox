@@ -69,6 +69,7 @@ const nand_chip supported_nand_chips[] = {
         .page_size = 2048,
         .oob_size = 64,
         .nr_blocks = 1024,
+        .bbm_pos = 2048,
         .clock_freq = 150000000,
         .dev_conf = jz_orf(SFC_DEV_CONF,
                            CE_DL(1), HOLD_DL(1), WP_DL(1),
