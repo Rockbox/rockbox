@@ -54,8 +54,8 @@
 
 #ifdef BOOTLOADER
 
-#define screen_dump()
-#define remote_screen_dump()
+#define screen_dump() do { } while(0)
+#define remote_screen_dump() do { } while(0)
 
 #else /* !BOOTLOADER */
 

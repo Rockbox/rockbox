@@ -212,9 +212,3 @@ void main(void)
 
     start_firmware();
 }
-
-/* These functions are present in the firmware library, but we reimplement
-   them here because the originals do a lot more than we want */
-void screen_dump(void)
-{
-}
