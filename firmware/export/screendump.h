@@ -52,12 +52,7 @@
 #define DUMP_BMP_LINESIZE ((LCD_WIDTH*3 + 3) & ~3)
 #endif
 
-#ifdef BOOTLOADER
-
-#define screen_dump() do { } while(0)
-#define remote_screen_dump() do { } while(0)
-
-#else /* !BOOTLOADER */
+#ifdef HAVE_SCREENDUMP
 
 /* Save a .BMP file containing the current screen contents. */
 void screen_dump(void);
@@ -69,6 +64,11 @@ void screen_dump_set_hook(void (*hook)(int fd));
 void remote_screen_dump(void);
 #endif
 
-#endif /* !BOOTLOADER */
+#else /* !HAVE_SCREENDUMP */
+
+#define screen_dump() do { } while(0)
+#define remote_screen_dump() do { } while(0)
+
+#endif /* HAVE_SCREENDUMP */
 
 #endif /* __SCREENDUMP_H__ */

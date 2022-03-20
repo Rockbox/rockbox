@@ -286,7 +286,7 @@ font_cache.c
 font.c
 hangul.c
 lru.c
-#ifndef BOOTLOADER
+#ifdef HAVE_SCREENDUMP
 screendump.c
 #endif
 #if LCD_DEPTH == 1

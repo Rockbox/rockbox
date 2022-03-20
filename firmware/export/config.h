@@ -1281,6 +1281,10 @@ Lyre prototype 1 */
 #endif /* SIMULATOR */
 #endif /* default SDL SW volume conditions */
 
+#if !defined(BOOTLOADER) || defined(HAVE_BOOTLOADER_SCREENDUMP)
+# define HAVE_SCREENDUMP
+#endif
+
 /* null audiohw setting macro for when codec header is included for reasons
    other than audio support */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)
