@@ -41,7 +41,7 @@ static const int sample_rates[] =
 
 static bool check_adts_syncword(int fd)
 {
-    uint16_t syncword;
+    uint16_t syncword = 0;
 
     read_uint16be(fd, &syncword);
     return (syncword & 0xFFF6) == 0xFFF0;

@@ -195,7 +195,7 @@ static unsigned int read_mp4_length(int fd, uint32_t* size)
 {
     unsigned int length = 0;
     int bytes = 0;
-    unsigned char c;
+    unsigned char c = '\0';
 
     do
     {
@@ -211,7 +211,7 @@ static unsigned int read_mp4_length(int fd, uint32_t* size)
 
 static bool read_mp4_esds(int fd, struct mp3entry* id3, uint32_t* size)
 {
-    unsigned char buf[8];
+    unsigned char buf[8] = {0};
     bool sbr = false;
 
     lseek(fd, 4, SEEK_CUR);     /* Version and flags. */
@@ -789,8 +789,8 @@ static bool read_mp4_container(int fd, struct mp3entry* id3,
             {
                 /* ADDME: add support for real chapters. Right now it's only
                  * used for Nero's gapless hack */
-                uint8_t chapters;
-                uint64_t timestamp;
+                uint8_t chapters   = 0;
+                uint64_t timestamp = 0;
 
                 lseek(fd, 8, SEEK_CUR);
                 read_uint8(fd, &chapters);

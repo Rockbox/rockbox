@@ -129,9 +129,9 @@ static int asf_intdecode(int fd, int type, int length)
 {
     int bytes = 0;
     int ret;
-    uint16_t tmp16;
-    uint32_t tmp32;
-    uint64_t tmp64;
+    uint16_t tmp16 = 0;
+    uint32_t tmp32 = 0;
+    uint64_t tmp64 = 0;
 
     if (type == 3) {
         bytes = read_uint32le(fd, &tmp32);
