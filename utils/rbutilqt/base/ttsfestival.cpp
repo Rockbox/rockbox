@@ -121,17 +121,13 @@ void TTSFestival::startServer()
         QString path;
         /* currentPath is set by the GUI - if it's set, it is the currently set
          path in the configuration GUI; if it's not set, use the saved path */
-        if (currentPath == "")
+        if (currentPath.isEmpty())
             path = RbSettings::subValue("festival-server",RbSettings::TtsPath).toString();
         else
             path = currentPath;
 
-        serverProcess.start(QString("%1 --server").arg(path));
+        serverProcess.start(path, QStringList("--server"));
         serverProcess.waitForStarted();
-
-        /* A friendlier version of a spinlock */
-        while (serverProcess.processId() == 0 && serverProcess.state() != QProcess::Running)
-            QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
 
         if(serverProcess.state() == QProcess::Running)
             LOG_INFO() << "Server is up and running";
@@ -174,7 +170,7 @@ bool TTSFestival::start(QString* errStr)
     }
 
     if (!running)
-      (*errStr) = "Festival could not be started";
+      (*errStr) = tr("Festival could not be started");
     return running;
 }
 
@@ -192,12 +188,13 @@ TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
 
     QString path = RbSettings::subValue("festival-client",
             RbSettings::TtsPath).toString();
-    QString cmd = QString("%1 --server localhost --otype riff --ttw --withlisp"
-            " --output \"%2\" --prolog \"%3\" - ").arg(path, wavfile, prologPath);
-    LOG_INFO() << "Client cmd:" << cmd;
+    QStringList cmd;
+    cmd << "--server" << "localhost" << "--otype" << "riff" << "--ttw"
+        << "--withlisp" << "--output" << wavfile << "--prolog" << prologPath << "-";
+    LOG_INFO() << "Client cmd:" << path << cmd;
 
     QProcess clientProcess;
-    clientProcess.start(cmd);
+    clientProcess.start(path, cmd);
     clientProcess.write(QString("%1.\n").arg(text).toLatin1());
     clientProcess.waitForBytesWritten();
     clientProcess.closeWriteChannel();
@@ -332,6 +329,9 @@ QString TTSFestival::getVoiceInfo(QString voice)
 
 QString TTSFestival::queryServer(QString query, int timeout)
 {
+    // make sure we always abort at some point.
+    if(timeout == 0)
+        timeout = 60000;
     if(!configOk())
         return "";
 
@@ -347,66 +347,74 @@ QString TTSFestival::queryServer(QString query, int timeout)
       return "";
     }
 
-    QString response;
 
-    QDateTime endTime;
-    if(timeout > 0)
-        endTime = QDateTime::currentDateTime().addMSecs(timeout);
+    QDateTime endTime = QDateTime::currentDateTime().addMSecs(timeout);
 
     /* Festival is *extremely* unreliable. Although at this
      * point we are sure that SIOD is accepting commands,
      * we might end up with an empty response. Hence, the loop.
      */
-    while(true)
+    QTcpSocket socket;
+    QString response;
+    while(QDateTime::currentDateTime() < endTime)
     {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
-        QTcpSocket socket;
 
-        socket.connectToHost("localhost", 1314);
-        socket.waitForConnected();
-
-        if(socket.state() == QAbstractSocket::ConnectedState)
+        if(socket.state() != QAbstractSocket::ConnectedState)
         {
+            LOG_INFO() << "socket not (yet) connected, trying again.";
+            socket.connectToHost("localhost", 1314);
+            // appears we need to recheck the state still.
+            socket.waitForConnected();
+        }
+        else
+        {
+            // seems to be necessary to resend the request at times.
             socket.write(QString("%1\n").arg(query).toLatin1());
             socket.waitForBytesWritten();
             socket.waitForReadyRead();
 
-            response = socket.readAll().trimmed();
+            // we might not get the complete response on the first read.
+            // Concatenate until we got a full response.
+            response += socket.readAll();
 
-            if (response != "LP" && response != "")
+            // The query response ends with this.
+            if (response.contains("ft_StUfF_keyOK"))
+            {
                 break;
+            }
         }
-        socket.abort();
-        socket.disconnectFromHost();
 
-        if(timeout > 0 && QDateTime::currentDateTime() >= endTime)
-        {
-            emit busyEnd();
-            return "";
-        }
         /* make sure we wait a little as we don't want to flood the server
          * with requests */
         QDateTime tmpEndTime = QDateTime::currentDateTime().addMSecs(500);
         while(QDateTime::currentDateTime() < tmpEndTime)
             QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
+    emit busyEnd();
+    socket.disconnectFromHost();
+
     if(response == "nil")
     {
-        emit busyEnd();
         return "";
     }
 
-    QStringList lines = response.split('\n');
-    if(lines.size() > 2)
+    /* The response starts with "LP\n", and ends with "ft_StUfF_keyOK", but we
+     * could get trailing data -- we might have sent the request more than
+     * once. Use a regex to get the actual response part.
+     */
+    QRegularExpression regex("LP\\n(.*?)\\nft_StUfF_keyOK",
+                             QRegularExpression::MultilineOption
+                             | QRegularExpression::DotMatchesEverythingOption);
+    QRegularExpressionMatch match = regex.match(response);
+    if(match.hasMatch())
     {
-        lines.removeFirst(); /* should be LP */
-        lines.removeLast();  /* should be ft_StUfF_keyOK */
+        response = match.captured(1);
     }
-    else
-        LOG_ERROR() << "Response too short:" << response;
+    else {
+        LOG_WARNING() << "Invalid Festival response." << response;
+    }
 
-    emit busyEnd();
-    return lines.join("\n");
-
+    return response.trimmed();
 }
 
