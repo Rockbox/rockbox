@@ -662,13 +662,12 @@ void RbUtilQt::downloadUpdateDone(QNetworkReply::NetworkError error)
     else {
         QString toParse(update->readAll());
 
-        QRegExp searchString("<a[^>]*>([a-zA-Z]+[^<]*)</a>");
+        QRegularExpression searchString("<a[^>]*>([a-zA-Z]+[^<]*)</a>");
         QStringList rbutilList;
-        int pos = 0;
-        while ((pos = searchString.indexIn(toParse, pos)) != -1)
+        auto it = searchString.globalMatch(toParse);
+        while (it.hasNext())
         {
-            rbutilList << searchString.cap(1);
-            pos += searchString.matchedLength();
+            rbutilList << it.next().captured(1);
         }
         LOG_INFO() << "Checking for update";
 

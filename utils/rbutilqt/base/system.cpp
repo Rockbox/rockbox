@@ -418,10 +418,11 @@ QMultiMap<uint32_t, QString> System::listUsbDevices(void)
             // the keys (W7 uses different casing than XP at least), in addition
             // XP may use "Vid_" and "Pid_".
             QString data = QString::fromWCharArray(buffer).toUpper();
-            QRegExp rex("USB\\\\VID_([0-9A-F]{4})&PID_([0-9A-F]{4}).*");
-            if(rex.indexIn(data) >= 0) {
+            QRegularExpression regex("^USB\\\\VID_([0-9A-F]{4})&PID_([0-9A-F]{4})&REV_([0-9A-F]{4})$");
+            QRegularExpressionMatch match = regex.match(data);
+            if(match.hasMatch()) {
                 uint32_t id;
-                id = rex.cap(1).toUInt(0, 16) << 16 | rex.cap(2).toUInt(0, 16);
+                id = match.captured(1).toUInt(0, 16) << 16 | match.captured(2).toUInt(0, 16);
                 usbids.insert(id, description);
                 LOG_INFO() << "USB:" << QString("0x%1").arg(id, 8, 16);
             }

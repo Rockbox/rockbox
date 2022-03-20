@@ -177,9 +177,9 @@ bool TalkFileCreator::createTalkList(QDir startDir)
                 bool match = false;
                 for(int i=0; i < m_ignoreFiles.size();i++)
                 {
-                    QRegularExpression rx(
-                            QRegularExpression::wildcardToRegularExpression(
-                                (m_ignoreFiles[i].trimmed())));
+                    QString pattern = m_ignoreFiles[i].trimmed()
+                                        .replace("?", ".").replace("*", ".*");
+                    QRegularExpression rx(pattern);
                     if(rx.match(fileInf.fileName()).hasMatch())
                         match = true;
 
