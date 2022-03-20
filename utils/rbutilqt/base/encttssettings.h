@@ -108,8 +108,7 @@ public:
     virtual void saveSettings() = 0;
     
 signals:
-    void busy();  // emit this if a operation takes time
-    void busyEnd(); // emit this at the end of a busy section
+    void busy(bool show);  // emit this if a operation takes time
 
 protected:
     //! Child class should fill in the setttingsList

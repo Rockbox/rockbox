@@ -40,14 +40,14 @@ EncTtsCfgGui::EncTtsCfgGui(QDialog* parent, EncTtsSettingInterface* iface, QStri
           m_busyCnt(0)
 {
     // create a busy Dialog
-    m_busyDlg= new QProgressDialog("", "", 0, 0,this);
+    m_busyDlg= new QProgressDialog("", "", 0, 1, this);
     m_busyDlg->setWindowTitle(tr("Waiting for engine..."));
     m_busyDlg->setModal(true);
     m_busyDlg->setLabel(nullptr);
     m_busyDlg->setCancelButton(nullptr);
-    m_busyDlg->hide();
-    connect(iface, &EncTtsSettingInterface::busy, this, &EncTtsCfgGui::showBusy);
-    connect(iface, &EncTtsSettingInterface::busyEnd, this, &EncTtsCfgGui::hideBusy);
+    m_busyDlg->setMinimumDuration(100);
+    m_busyDlg->setValue(1);
+    connect(iface, &EncTtsSettingInterface::busy, this, &EncTtsCfgGui::busyDialog);
 
     //setup the window
     setWindowTitle(name);
@@ -279,18 +279,21 @@ QWidget* EncTtsCfgGui::createButton(EncTtsSetting* setting)
 }
 
 
-void EncTtsCfgGui::showBusy()
+void EncTtsCfgGui::busyDialog(bool show)
 {
-    if(m_busyCnt == 0) m_busyDlg->show();
-
-    m_busyCnt++;
-}
-
-void EncTtsCfgGui::hideBusy()
-{
-    m_busyCnt--;
-
-    if(m_busyCnt == 0) m_busyDlg->hide();
+    if(show)
+    {
+        m_busyDlg->setValue(0);
+        m_busyCnt++;
+    }
+    else
+    {
+        m_busyDlg->setValue(1);
+        if(m_busyCnt > 0)
+        {
+            m_busyCnt--;
+        }
+    }
 }
 
 

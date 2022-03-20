@@ -336,14 +336,14 @@ QString TTSFestival::queryServer(QString query, int timeout)
         return "";
 
     // this operation could take some time
-    emit busy();
+    emit busy(true);
 
     LOG_INFO() << "queryServer with" << query;
 
     if (!ensureServerRunning())
     {
       LOG_ERROR() << "queryServer: ensureServerRunning failed";
-      emit busyEnd();
+      emit busy(false);
       return "";
     }
 
@@ -391,7 +391,7 @@ QString TTSFestival::queryServer(QString query, int timeout)
         while(QDateTime::currentDateTime() < tmpEndTime)
             QCoreApplication::processEvents(QEventLoop::AllEvents);
     }
-    emit busyEnd();
+    emit busy(false);
     socket.disconnectFromHost();
 
     if(response == "nil")

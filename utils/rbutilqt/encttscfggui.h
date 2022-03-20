@@ -40,10 +40,8 @@ private slots:
     void accept(void);
     //! close window and dont save configuration
     void reject(void);
-    //! shows a busy dialog. counts calls.
-    void showBusy();
-    //! hides the busy dialog, counts calls
-    void hideBusy();
+    //! show / hide the busy dialog, counts calls
+    void busyDialog(bool show);
 
 private:
     //! creates all dynamic window content
