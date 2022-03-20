@@ -2022,13 +2022,7 @@ static bool save_pfraw(char* filename, struct bitmap *bm)
     int fh = rb->open(filename, O_WRONLY|O_CREAT|O_TRUNC, 0666);
     if( fh < 0 ) return false;
     rb->write( fh, &bmph, sizeof( struct pfraw_header ) );
-    pix_t *data = (pix_t*)( bm->data );
-    int y;
-    for( y = 0; y < bm->height; y++ )
-    {
-        rb->write( fh, data , sizeof( pix_t ) * bm->width );
-        data += bm->width;
-    }
+    rb->write( fh, bm->data , sizeof( pix_t ) * bm->width *  bm->height );
     rb->close( fh );
     return true;
 }
