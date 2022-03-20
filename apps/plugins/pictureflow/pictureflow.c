@@ -2185,12 +2185,15 @@ static void thread(void)
                 /* we just woke up */
                 break;
         }
-        if(ev.id != SYS_TIMEOUT)
-          while ( load_new_slide() ) {
-            rb->yield();
-            switch (ev.id) {
-                case EV_EXIT:
-                    return;
+
+        if(ev.id != SYS_TIMEOUT) {
+            while ( rb->queue_empty(&thread_q) ) {
+                buf_ctx_lock();
+                bool slide_loaded = load_new_slide();
+                buf_ctx_unlock();
+                if (!slide_loaded)
+                    break;
+                rb->yield();
             }
         }
     }
@@ -2517,7 +2520,6 @@ static inline bool load_and_prepare_surface(const int slide_index,
 */
 bool load_new_slide(void)
 {
-    buf_ctx_lock();
     if (wants_to_quit)
         return false;
 
@@ -2571,7 +2573,6 @@ bool load_new_slide(void)
                 pf_sldcache.center_idx = i;
                 pf_sldcache.left_idx = i;
                 pf_sldcache.right_idx = i;
-                buf_ctx_unlock();
                 return true;
             }
         }
@@ -2605,7 +2606,6 @@ bool load_new_slide(void)
         {
             if (pf_sldcache.free == -1 && !free_slide_prio(prio_l))
             {
-                buf_ctx_unlock();
                 return false;
             }
 
@@ -2614,14 +2614,12 @@ bool load_new_slide(void)
             {
                 lla_insert_before(&pf_sldcache.used, i, pf_sldcache.left_idx);
                 pf_sldcache.left_idx = i;
-                buf_ctx_unlock();
                 return true;
             }
         } else if(right < number_of_slides - 1)
         {
             if (pf_sldcache.free == -1 && !free_slide_prio(prio_r))
             {
-                buf_ctx_unlock();
                 return false;
             }
 
@@ -2630,7 +2628,6 @@ bool load_new_slide(void)
             {
                 lla_insert_after(i, pf_sldcache.right_idx);
                 pf_sldcache.right_idx = i;
-                buf_ctx_unlock();
                 return true;
             }
         }
@@ -2645,7 +2642,6 @@ insert_first_slide:
             pf_sldcache.left_idx = i;
             pf_sldcache.right_idx = i;
             pf_sldcache.used = i;
-            buf_ctx_unlock();
             return true;
         }
     }
@@ -2654,12 +2650,10 @@ fail_and_refree:
     {
         lla_insert_tail(&pf_sldcache.free, i);
     }
-    buf_ctx_unlock();
     return false;
 fatal_fail:
     free_all_slide_prio(0);
     initialize_slide_cache();
-    buf_ctx_unlock();
     return false;
 }
 
