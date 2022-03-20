@@ -16246,3 +16246,87 @@
     rds: "Sync RDS Time"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Sort albums by"
+  </dest>
+  <voice>
+    *: "Sort albums by"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Artist + Name"
+  </dest>
+  <voice>
+    *: "Artist And Name"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Artist + Year"
+  </dest>
+  <voice>
+    *: "Artist And Year"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Year sort order"
+  </dest>
+  <voice>
+    *: "Year sort order"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Show year in album title"
+  </dest>
+  <voice>
+    *: "Show year in album title"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Cache needs to finish updating first!"
+  </dest>
+  <voice>
+    *: "Cache needs to finish updating first!"
+  </voice>
+</phrase>

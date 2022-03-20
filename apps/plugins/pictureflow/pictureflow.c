@@ -60,6 +60,8 @@ static fb_data *lcd_fb;
 
 #define PF_QUIT (LAST_ACTION_PLACEHOLDER + 1)
 #define PF_TRACKLIST (LAST_ACTION_PLACEHOLDER + 2)
+#define PF_SORTING_NEXT (LAST_ACTION_PLACEHOLDER + 3)
+#define PF_SORTING_PREV (LAST_ACTION_PLACEHOLDER + 4)
 
 #if defined(HAVE_SCROLLWHEEL) || CONFIG_KEYPAD == IRIVER_H10_PAD || \
     CONFIG_KEYPAD == MPIO_HD300_PAD
@@ -173,6 +175,8 @@ const struct button_mapping pf_context_buttons[] =
     {PF_JMP,          BUTTON_RIGHT,               BUTTON_NONE},
     {PF_JMP,          BUTTON_RIGHT|BUTTON_REPEAT, BUTTON_NONE},
     {PF_MENU,         BUTTON_POWER|BUTTON_REL,    BUTTON_POWER},
+    {PF_SORTING_NEXT, BUTTON_VOL_UP,              BUTTON_NONE},
+    {PF_SORTING_PREV, BUTTON_VOL_DOWN,            BUTTON_NONE},
     {PF_QUIT,         BUTTON_POWER|BUTTON_REPEAT, BUTTON_POWER},
     {PF_CONTEXT,      BUTTON_MENU|BUTTON_REL,     BUTTON_MENU},
     {PF_TRACKLIST,    BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
@@ -274,7 +278,7 @@ typedef fb_data pix_t;
 #define ERROR_USER_ABORT    -4
 
 /* current version for cover cache */
-#define CACHE_VERSION 3
+#define CACHE_VERSION 4
 #define CONFIG_VERSION 1
 #define CONFIG_FILE "pictureflow.cfg"
 #define INDEX_HDR "PFID"
@@ -296,6 +300,10 @@ struct pf_config_t
      int cache_version;
 
      int show_album_name;
+     int sort_albums_by;
+     int year_sort_order;
+     bool show_year;
+
      bool resize;
      bool show_fps;
 };
@@ -364,6 +372,7 @@ struct slide_cache {
 struct album_data {
     int name_idx;    /* offset to the album name */
     int artist_idx;  /* offset to the artist name */
+    int year;        /* album year */
     long artist_seek; /* artist taglist position */
     long seek;        /* album taglist position */
 };
@@ -447,6 +456,31 @@ static char* show_album_name_conf[] =
     "both bottom",
 };
 
+enum sort_albums_by_values {
+    SORT_BY_ARTIST_AND_NAME = 0,
+    SORT_BY_ARTIST_AND_YEAR,
+    SORT_BY_YEAR,
+    SORT_BY_NAME,
+
+    SORT_VALUES_SIZE
+};
+static char* sort_albums_by_conf[] =
+{
+    "artist + name",
+    "artist + year",
+    "year",
+    "name"
+};
+enum year_sort_order_values {
+    ASCENDING = 0,
+    DESCENDING
+};
+static char* year_sort_order_conf[] =
+{
+    "ascending",
+    "descending"
+};
+
 #define MAX_SPACING 40
 #define MAX_MARGIN 80
 
@@ -471,7 +505,12 @@ static struct configdata config[] =
     { TYPE_INT, 0, 999999, { .int_p = &pf_cfg.last_album }, "last album", NULL },
     { TYPE_INT, 0, 1, { .int_p = &pf_cfg.backlight_mode }, "backlight", NULL },
     { TYPE_INT, 0, 999999, { .int_p = &aa_cache.idx }, "art cache pos", NULL },
-    { TYPE_INT, 0, 999999, { .int_p = &aa_cache.inspected }, "art cache inspected", NULL }
+    { TYPE_INT, 0, 999999, { .int_p = &aa_cache.inspected }, "art cache inspected", NULL },
+    { TYPE_ENUM, 0, 4, { .int_p = &pf_cfg.sort_albums_by }, "sort albums by",
+      sort_albums_by_conf },
+    { TYPE_ENUM, 0, 2, { .int_p = &pf_cfg.year_sort_order }, "year order",
+      year_sort_order_conf },
+    { TYPE_BOOL, 0, 1, { .bool_p = &pf_cfg.show_year }, "show year", NULL },
 };
 
 #define CONFIG_NUM_ITEMS (sizeof(config) / sizeof(struct configdata))
@@ -647,6 +686,9 @@ static void config_set_defaults(struct pf_config_t *cfg)
      cfg->cache_version = 0;
      cfg->show_album_name = (LCD_HEIGHT > 100)
         ? ALBUM_NAME_TOP : ALBUM_NAME_BOTTOM;
+     cfg->sort_albums_by = SORT_BY_ARTIST_AND_NAME;
+     cfg->year_sort_order = ASCENDING;
+     cfg->show_year = false;
 }
 
 static inline PFreal fmul(PFreal a, PFreal b)
@@ -997,6 +1039,51 @@ static void init_reflect_table(void)
             (5 * REFLECT_HEIGHT);
 }
 
+
+static int compare_albums (const void *a_v, const void *b_v)
+{
+    uint32_t artist_a = ((struct album_data *)a_v)->artist_idx;
+    uint32_t artist_b = ((struct album_data *)b_v)->artist_idx;
+
+    uint32_t album_a = ((struct album_data *)a_v)->name_idx;
+    uint32_t album_b = ((struct album_data *)b_v)->name_idx;
+
+    int year_a = ((struct album_data *)a_v)->year;
+    int year_b = ((struct album_data *)b_v)->year;
+
+    switch (pf_cfg.sort_albums_by)
+    {
+        case SORT_BY_ARTIST_AND_NAME:
+            if (artist_a - artist_b == 0)
+                return (int)(album_a - album_b);
+            break;
+        case SORT_BY_ARTIST_AND_YEAR:
+            if (artist_a - artist_b == 0)
+            {
+                if (pf_cfg.year_sort_order == ASCENDING)
+                    return year_a - year_b;
+                else
+                    return year_b - year_a;
+            }
+            break;
+        case SORT_BY_YEAR:
+            if (year_a - year_b != 0)
+            {
+                if (pf_cfg.year_sort_order == ASCENDING)
+                    return year_a - year_b;
+                else
+                    return year_b - year_a;
+            }
+            break;
+        case SORT_BY_NAME:
+            if (album_a - album_b != 0)
+                return (int)(album_a - album_b);
+            break;
+    }
+
+    return (int)(artist_a - artist_b);
+}
+
 static int compare_album_artists (const void *a_v, const void *b_v)
 {
     uint32_t a = ((struct album_data *)a_v)->artist_idx;
@@ -1011,6 +1098,7 @@ static void write_album_index(int idx, int name_idx,
     pf_idx.album_index[idx].seek = album_seek;
     pf_idx.album_index[idx].artist_idx = artist_idx;
     pf_idx.album_index[idx].artist_seek = artist_seek;
+    pf_idx.album_index[idx].year = 0;
 }
 
 static inline void write_album_entry(struct tagcache_search *tcs,
@@ -1238,6 +1326,49 @@ static int build_artist_index(struct tagcache_search *tcs,
 }
 
 
+static int assign_album_year(void)
+{
+    draw_progressbar(0, pf_idx.album_ct, "Assigning Album Year");
+    for (int album_idx = 0; album_idx < pf_idx.album_ct; album_idx++)
+    {
+        /* Prevent idle poweroff */
+        rb->reset_poweroff_timer();
+
+        if (rb->button_get(false) > BUTTON_NONE)
+        {
+            if (confirm_quit())
+                return ERROR_USER_ABORT;
+            else
+            {
+                rb->lcd_clear_display();
+                draw_progressbar(album_idx, pf_idx.album_ct, "Assigning Album Year");
+            }
+        }
+        draw_progressbar(album_idx, pf_idx.album_ct, NULL);
+        int album_year = 0;
+
+        if (rb->tagcache_search(&tcs, tag_year))
+        {
+            rb->tagcache_search_add_filter(&tcs, tag_album,
+                                       pf_idx.album_index[album_idx].seek);
+
+            if (pf_idx.album_index[album_idx].artist_idx >= 0)
+                rb->tagcache_search_add_filter(&tcs, tag_albumartist,
+                    pf_idx.album_index[album_idx].artist_seek);
+
+            while (rb->tagcache_get_next(&tcs)) {
+                int track_year = rb->tagcache_get_numeric(&tcs, tag_year);
+                if (track_year > album_year)
+                    album_year = track_year;
+            }
+        }
+        rb->tagcache_search_finish(&tcs);
+
+        pf_idx.album_index[album_idx].year = album_year;
+    }
+    return SUCCESS;
+}
+
 /**
   Create an index of all artists and albums from the database.
   Also store the artists and album names so we can access them later.
@@ -1352,6 +1483,14 @@ retry_artist_lookup:
         }
         rb->tagcache_search_finish(&tcs);
     }
+
+    draw_splashscreen(buf, buf_size);
+
+    res = assign_album_year();
+
+    if (res < SUCCESS)
+        return res;
+
     /* sort list order to find duplicates */
     rb->qsort(pf_idx.album_index, pf_idx.album_ct,
               sizeof(struct album_data), compare_album_artists);
@@ -1405,6 +1544,9 @@ retry_artist_lookup:
     pf_idx.buf = buf;
     pf_idx.buf_sz = buf_size;
     pf_idx.artist_index = 0;
+
+    rb->qsort(pf_idx.album_index, pf_idx.album_ct,
+                          sizeof(struct album_data), compare_albums);
 
     return (pf_idx.album_ct > 0) ? 0 : ERROR_NO_ALBUMS;
 }
@@ -1519,6 +1661,9 @@ static int load_album_index(void){
                 pf_idx.buf = buf;
                 pf_idx.buf_sz = buf_size;
 
+                rb->qsort(pf_idx.album_index, pf_idx.album_ct,
+                          sizeof(struct album_data), compare_albums);
+
                 return 0;
             }
         }
@@ -1572,6 +1717,14 @@ static char* get_album_artist(const int slide_index)
 }
 
 
+static char* get_slide_name(const int slide_index, bool artist)
+{
+    if (artist)
+        return get_album_artist(slide_index);
+
+    return get_album_name(slide_index);
+}
+
 /**
  Return a pointer to the track name of the active album
  create_track_index has to be called first.
@@ -1593,29 +1746,91 @@ static char* get_track_filename(const int track_index)
 
 
 
-static int get_album_artist_alpha_prev_index(void)
+static int jmp_idx_prev(void)
 {
-    char* current_album_artist = get_album_artist(center_index);
-    for (int i = center_index - 1; i > 0; i-- )
+    if (aa_cache.inspected < pf_idx.album_ct)
     {
-        int artist_idx = pf_idx.album_index[i].artist_idx;
-        if(rb->strncmp(pf_idx.artist_names + artist_idx, current_album_artist, 1))
-            current_album_artist = pf_idx.artist_names + artist_idx;
-        while (i > 0 && !rb->strncmp(pf_idx.artist_names + pf_idx.album_index[i-1].artist_idx, current_album_artist, 1))
-            i--;
-        return i;
+#ifdef USEGSLIB
+        grey_show(false);
+        rb->lcd_clear_display();
+        rb->lcd_update();
+#endif
+        rb->splash(HZ*2, rb->str(LANG_WAIT_FOR_CACHE));
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
+        return center_index;
     }
+
+    if (pf_cfg.sort_albums_by == SORT_BY_YEAR)
+    {
+        int current_year = pf_idx.album_index[center_index].year;
+
+        for (int i = center_index - 1; i > 0; i-- )
+        {
+            if(pf_idx.album_index[i].year != current_year)
+                current_year = pf_idx.album_index[i].year;
+            while (i > 0)
+            {
+                if (pf_idx.album_index[i-1].year != current_year)
+                    break;
+                i--;
+            }
+            return i;
+        }
+    }
+    else
+    {
+        bool by_artist = pf_cfg.sort_albums_by != SORT_BY_NAME;
+        char *current_selection = get_slide_name(center_index, by_artist);
+
+        for (int i = center_index - 1; i > 0; i-- )
+        {
+            if(rb->strncmp(get_slide_name(i, by_artist), current_selection, 1))
+                current_selection = get_slide_name(i, by_artist);
+            while (i > 0)
+            {
+                if (rb->strncmp(get_slide_name(i-1, by_artist), current_selection, 1))
+                    break;
+                i--;
+            }
+            return i;
+        }
+    }
+
     return 0;
 }
 
-static int get_album_artist_alpha_next_index(void)
+static int jmp_idx_next(void)
 {
-    char* current_album_artist = get_album_artist(center_index);
-    for (int i = center_index + 1; i < pf_idx.album_ct; i++ )
+    if (aa_cache.inspected < pf_idx.album_ct)
     {
-        int artist_idx = pf_idx.album_index[i].artist_idx;
-        if(rb->strncmp(pf_idx.artist_names + artist_idx, current_album_artist, 1))
-            return i;
+#ifdef USEGSLIB
+        grey_show(false);
+        rb->lcd_clear_display();
+        rb->lcd_update();
+#endif
+        rb->splash(HZ*2, rb->str(LANG_WAIT_FOR_CACHE));
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
+        return center_index;
+    }
+
+    if (pf_cfg.sort_albums_by == SORT_BY_YEAR)
+    {
+        int current_year = pf_idx.album_index[center_index].year;
+        for (int i = center_index + 1; i < pf_idx.album_ct; i++ )
+            if(pf_idx.album_index[i].year != current_year)
+                return i;
+    }
+    else
+    {
+        bool by_artist = pf_cfg.sort_albums_by != SORT_BY_NAME;
+        char *current_selection = get_slide_name(center_index, by_artist);
+        for (int i = center_index + 1; i < pf_idx.album_ct; i++ )
+            if(rb->strncmp(get_slide_name(i, by_artist), current_selection, 1))
+                return i;
     }
     return pf_idx.album_ct - 1;
 }
@@ -2966,6 +3181,85 @@ static inline void set_current_slide(const int slide_index)
     reset_slides();
 }
 
+
+static void interrupt_cover_out_animation(void);
+static bool sort_albums(int new_sorting, bool from_settings)
+{
+    int i, album_idx, artist_idx;
+    char* current_album_name = NULL;
+    char* current_album_artist = NULL;
+    static const char* sort_options[] = {
+        ID2P(LANG_ARTIST_PLUS_NAME),
+        ID2P(LANG_ARTIST_PLUS_YEAR),
+        ID2P(LANG_ID3_YEAR),
+        ID2P(LANG_NAME)
+    };
+
+    /* Only change sorting once artwork has been inspected */
+    if (aa_cache.inspected < pf_idx.album_ct)
+    {
+#ifdef USEGSLIB
+        if (!from_settings)
+            grey_show(false);
+#endif
+        rb->splash(HZ*2, rb->str(LANG_WAIT_FOR_CACHE));
+#ifdef USEGSLIB
+        if (!from_settings)
+            grey_show(true);
+#endif
+        return false;
+    }
+
+    /* set idle state */
+    if (pf_state == pf_show_tracks)
+        free_borrowed_tracks();
+    if (pf_state == pf_show_tracks ||
+        pf_state == pf_cover_in ||
+        pf_state == pf_cover_out)
+        interrupt_cover_out_animation();
+    else if (pf_state == pf_scrolling)
+        set_current_slide(target);
+    pf_state = pf_idle;
+
+    pf_cfg.sort_albums_by = new_sorting;
+    if (!from_settings)
+    {
+#ifdef USEGSLIB
+        grey_show(false);
+#endif
+        rb->splash(HZ, sort_options[pf_cfg.sort_albums_by]);
+#ifdef USEGSLIB
+        grey_show(true);
+#endif
+    }
+
+    current_album_artist = get_album_artist(center_index);
+    current_album_name = get_album_name(center_index);
+
+    end_pf_thread(); /* stop loading of covers  */
+
+    rb->qsort(pf_idx.album_index, pf_idx.album_ct,
+                  sizeof(struct album_data), compare_albums);
+
+    /* Empty cache and restart cover loading thread */
+    rb->buflib_init(&buf_ctx, (void *)pf_idx.buf, pf_idx.buf_sz);
+    empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0);
+    initialize_slide_cache();
+    create_pf_thread();
+
+    /* Go to previously selected slide */
+    for (i = 0; i < pf_idx.album_ct; i++ )
+    {
+        album_idx = pf_idx.album_index[i].name_idx;
+        artist_idx = pf_idx.album_index[i].artist_idx;
+
+        if(!rb->strcmp(pf_idx.album_names + album_idx, current_album_name) &&
+            !rb->strcmp(pf_idx.artist_names + artist_idx, current_album_artist))
+            set_current_slide(i);
+    }
+    return true;
+}
+
 /**
   Start the animation for changing slides
  */
@@ -3199,15 +3493,18 @@ static void cleanup(void)
 static int settings_menu(void)
 {
     int selection = 0;
-    bool old_val;
+    int old_val;
 
     MENUITEM_STRINGLIST(settings_menu, "PictureFlow Settings", NULL,
+                        ID2P(LANG_SHOW_ALBUM_TITLE),
+                        ID2P(LANG_SHOW_YEAR_IN_ALBUM_TITLE),
+                        ID2P(LANG_SORT_ALBUMS_BY),
+                        ID2P(LANG_YEAR_SORT_ORDER),
                         ID2P(LANG_DISPLAY_FPS),
                         ID2P(LANG_SPACING),
                         ID2P(LANG_CENTRE_MARGIN),
                         ID2P(LANG_NUMBER_OF_SLIDES),
                         ID2P(LANG_ZOOM),
-                        ID2P(LANG_SHOW_ALBUM_TITLE),
                         ID2P(LANG_RESIZE_COVERS),
                         ID2P(LANG_REBUILD_CACHE),
                         ID2P(LANG_UPDATE_CACHE),
@@ -3220,6 +3517,16 @@ static int settings_menu(void)
         { STR(LANG_SHOW_AT_THE_TOP_NEW) },
         { STR(LANG_SHOW_ALL_AT_THE_TOP) },
         { STR(LANG_SHOW_ALL_AT_THE_BOTTOM) },
+    };
+    static const struct opt_items sort_options[] = {
+        { STR(LANG_ARTIST_PLUS_NAME) },
+        { STR(LANG_ARTIST_PLUS_YEAR) },
+        { STR(LANG_ID3_YEAR) },
+        { STR(LANG_NAME) }
+    };
+    static const struct opt_items year_sort_order_options[] = {
+        { STR(LANG_ASCENDING) },
+        { STR(LANG_DESCENDING) }
     };
     static const struct opt_items wps_options[] = {
         { STR(LANG_OFF) },
@@ -3235,11 +3542,37 @@ static int settings_menu(void)
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
+                rb->set_option(rb->str(LANG_SHOW_ALBUM_TITLE),
+                      &pf_cfg.show_album_name, INT, album_name_options, 5, NULL);
+                reset_track_list();
+                recalc_offsets();
+                reset_slides();
+                break;
+            case 1:
+                rb->set_bool(rb->str(LANG_SHOW_YEAR_IN_ALBUM_TITLE), &pf_cfg.show_year);
+                break;
+            case 2:
+                old_val = pf_cfg.sort_albums_by;
+                rb->set_option(rb->str(LANG_SORT_ALBUMS_BY),
+                      &pf_cfg.sort_albums_by, INT, sort_options, 4, NULL);
+                if (old_val != pf_cfg.sort_albums_by &&
+                    !sort_albums(pf_cfg.sort_albums_by, true))
+                    pf_cfg.sort_albums_by = old_val;
+                break;
+            case 3:
+                old_val = pf_cfg.year_sort_order;
+                rb->set_option(rb->str(LANG_YEAR_SORT_ORDER),
+                      &pf_cfg.year_sort_order, INT, year_sort_order_options, 2, NULL);
+                if (old_val != pf_cfg.year_sort_order &&
+                    !sort_albums(pf_cfg.sort_albums_by, true))
+                    pf_cfg.year_sort_order = old_val;
+                break;
+            case 4:
                 rb->set_bool(rb->str(LANG_DISPLAY_FPS), &pf_cfg.show_fps);
                 reset_track_list();
                 break;
 
-            case 1:
+            case 5:
                 rb->set_int(rb->str(LANG_SPACING), "", 1,
                             &pf_cfg.slide_spacing,
                             NULL, 1, 0, 100, NULL );
@@ -3247,7 +3580,7 @@ static int settings_menu(void)
                 reset_slides();
                 break;
 
-            case 2:
+            case 6:
                 rb->set_int(rb->str(LANG_CENTRE_MARGIN), "", 1,
                             &pf_cfg.center_margin,
                             NULL, 1, 0, 80, NULL );
@@ -3255,51 +3588,45 @@ static int settings_menu(void)
                 reset_slides();
                 break;
 
-            case 3:
+            case 7:
                 rb->set_int(rb->str(LANG_NUMBER_OF_SLIDES), "", 1,
                         &pf_cfg.num_slides, NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
                 recalc_offsets();
                 reset_slides();
                 break;
 
-            case 4:
+            case 8:
                 rb->set_int(rb->str(LANG_ZOOM), "", 1, &pf_cfg.zoom,
                             NULL, 1, 10, 300, NULL );
                 recalc_offsets();
                 reset_slides();
                 break;
-            case 5:
-                rb->set_option(rb->str(LANG_SHOW_ALBUM_TITLE),
-                      &pf_cfg.show_album_name, INT, album_name_options, 5, NULL);
-                reset_track_list();
-                recalc_offsets();
-                reset_slides();
-                break;
-            case 6:
+
+            case 9:
                 old_val = pf_cfg.resize;
                 rb->set_bool(rb->str(LANG_RESIZE_COVERS), &pf_cfg.resize);
                 if (old_val == pf_cfg.resize) /* changed? */
                     break;
                 /* fallthrough if changed, since cache needs to be rebuilt */
-            case 7:
+            case 10:
                 pf_cfg.cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
                 rb->splash(HZ, ID2P(LANG_CACHE_REBUILT_NEXT_RESTART));
                 break;
-            case 8:
+            case 11:
                 pf_cfg.cache_version = CACHE_UPDATE;
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
                 rb->splash(HZ, ID2P(LANG_CACHE_REBUILT_NEXT_RESTART));
                 break;
-            case 9:
+            case 12:
                 rb->set_option(rb->str(LANG_WPS_INTEGRATION),
                                &pf_cfg.auto_wps, INT, wps_options, 3, NULL);
                 break;
-            case 10:
+            case 13:
                 rb->set_option(rb->str(LANG_BACKLIGHT),
                         &pf_cfg.backlight_mode, INT, backlight_options, 2, NULL);
                 break;
@@ -3792,10 +4119,13 @@ static bool start_playback(bool return_to_WPS)
  */
 static void draw_album_text(void)
 {
+    char album_and_year[MAX_PATH];
+
     if (pf_cfg.show_album_name == ALBUM_NAME_HIDE)
         return;
 
     static int prev_albumtxt_index = -1;
+    static bool prev_show_year = false;
     int albumtxt_index;
     int char_height;
     int albumtxt_x, albumtxt_y, artisttxt_x;
@@ -3823,10 +4153,18 @@ static void draw_album_text(void)
     }
     albumtxt = get_album_name_idx(albumtxt_index, &album_idx);
 
+    if (pf_cfg.show_year && pf_idx.album_index[albumtxt_index].year > 0)
+    {
+        rb->snprintf(album_and_year, sizeof(album_and_year), "%s – %d",
+             albumtxt, pf_idx.album_index[albumtxt_index].year);
+    } else
+        rb->snprintf(album_and_year, sizeof(album_and_year), "%s", albumtxt);
+
     mylcd_set_foreground(G_BRIGHT(c));
-    if (albumtxt_index != prev_albumtxt_index) {
-        set_scroll_line(albumtxt, PF_SCROLL_ALBUM);
+    if (albumtxt_index != prev_albumtxt_index || pf_cfg.show_year != prev_show_year) {
+        set_scroll_line(album_and_year, PF_SCROLL_ALBUM);
         prev_albumtxt_index = albumtxt_index;
+        prev_show_year = pf_cfg.show_year;
     }
 
     char_height = rb->screens[SCREEN_MAIN]->getcharheight();
@@ -3851,7 +4189,7 @@ static void draw_album_text(void)
         || (pf_cfg.show_album_name == ALBUM_AND_ARTIST_BOTTOM)){
 
         if (album_idx != (int) pf_idx.album_untagged_idx)
-            mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);
+            mylcd_putsxy(albumtxt_x, albumtxt_y, album_and_year);
 
         artisttxt = get_album_artist(albumtxt_index);
         set_scroll_line(artisttxt, PF_SCROLL_ARTIST);
@@ -3859,7 +4197,7 @@ static void draw_album_text(void)
         int y_offset = char_height + char_height/2;
         mylcd_putsxy(artisttxt_x, albumtxt_y + y_offset, artisttxt);
     } else {
-        mylcd_putsxy(albumtxt_x, albumtxt_y, albumtxt);
+        mylcd_putsxy(albumtxt_x, albumtxt_y, album_and_year);
     }
 }
 
@@ -4189,24 +4527,38 @@ static int pictureflow_main(const char* selected_file)
             if ( pf_state == pf_idle || pf_state == pf_scrolling )
                 show_previous_slide();
             break;
+        case PF_SORTING_NEXT:
+            sort_albums((pf_cfg.sort_albums_by + 1) % SORT_VALUES_SIZE, false);
+            break;
+        case PF_SORTING_PREV:
+            sort_albums((pf_cfg.sort_albums_by + (SORT_VALUES_SIZE - 1)) % SORT_VALUES_SIZE, false);
+            break;
         case PF_JMP:
-                if (pf_state == pf_idle || pf_state == pf_scrolling)
+            if (pf_state == pf_idle || pf_state == pf_scrolling)
+            {
+                int new_idx = jmp_idx_next();
+                if (new_idx != center_index)
                 {
                     pf_state = pf_idle;
-                    set_current_slide(get_album_artist_alpha_next_index());
+                    set_current_slide(new_idx);
                 }
-                else if ( pf_state == pf_show_tracks )
-                    select_next_album();
-                break;
+            }
+            else if ( pf_state == pf_show_tracks )
+                select_next_album();
+            break;
         case PF_JMP_PREV:
-                if (pf_state == pf_idle || pf_state == pf_scrolling)
+            if (pf_state == pf_idle || pf_state == pf_scrolling)
+            {
+                int new_idx = jmp_idx_prev();
+                if (new_idx != center_index)
                 {
                     pf_state = pf_idle;
-                    set_current_slide(get_album_artist_alpha_prev_index());
+                    set_current_slide(new_idx);
                 }
-                else if ( pf_state == pf_show_tracks )
-                    select_prev_album();
-                break;
+            }
+            else if ( pf_state == pf_show_tracks )
+                select_prev_album();
+            break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
             if (pf_cfg.auto_wps != 0  &&
