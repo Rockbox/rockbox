@@ -116,7 +116,15 @@ void splashf(long delay, const char* msg, ...)
     } while(str);
 
     lcd_update();
-    sleep(delay);
+
+    if(delay == TIMEOUT_BLOCK) {
+        while(get_button(TIMEOUT_BLOCK) != BL_QUIT);
+    } else if(delay > 0) {
+        long end_tick = current_tick + delay;
+        do {
+            get_button(end_tick - current_tick);
+        } while(current_tick < end_tick);
+    }
 }
 
 int get_button(int timeout)
