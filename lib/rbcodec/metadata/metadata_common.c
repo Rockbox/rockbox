@@ -98,7 +98,7 @@ int read_uint32be(int fd, uint32_t* buf)
 int read_uint64be(int fd, uint64_t* buf)
 {
   size_t n;
-  uint8_t data[8] = {0};
+  uint8_t data[8];
   int i;
 
   n = read(fd, data, 8);

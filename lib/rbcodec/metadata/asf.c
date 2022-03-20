@@ -129,19 +129,21 @@ static int asf_intdecode(int fd, int type, int length)
 {
     int bytes = 0;
     int ret;
-    uint16_t tmp16 = 0;
-    uint32_t tmp32 = 0;
-    uint64_t tmp64 = 0;
+    union {
+        uint16_t tmp16;
+        uint32_t tmp32;
+        uint64_t tmp64;
+    } uu = {0};
 
     if (type == 3) {
-        bytes = read_uint32le(fd, &tmp32);
-        ret = (int)tmp32;
+        bytes = read_uint32le(fd, &uu.tmp32);
+        ret = (int)uu.tmp32;
     } else if (type == 4) {
-        bytes = read_uint64le(fd, &tmp64);
-        ret = (int)tmp64;
+        bytes = read_uint64le(fd, &uu.tmp64);
+        ret = (int)uu.tmp64;
     } else if (type == 5) {
-        bytes = read_uint16le(fd, &tmp16);
-        ret = (int)tmp16;
+        bytes = read_uint16le(fd, &uu.tmp16);
+        ret = (int)uu.tmp16;
     }
 
     if (bytes > 0)
