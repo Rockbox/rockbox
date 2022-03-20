@@ -92,7 +92,8 @@ void Autodetection::detectUsb()
 
     int i = attached.size();
     while(i--) {
-        QStringList a = PlayerBuildInfo::instance()->value(PlayerBuildInfo::UsbIdTargetList, attached.at(i)).toStringList();
+        QStringList a = PlayerBuildInfo::instance()->value(
+                    PlayerBuildInfo::UsbIdTargetList, attached.at(i)).toStringList();
         if(a.size() > 0) {
             struct Detected d;
             d.status = PlayerOk;
@@ -100,7 +101,8 @@ void Autodetection::detectUsb()
             m_detected.append(d);
             LOG_INFO() << "[USB] detected supported player" << d.usbdevices;
         }
-        QStringList b = PlayerBuildInfo::instance()->value(PlayerBuildInfo::UsbIdErrorList, attached.at(i)).toStringList();
+        QStringList b = PlayerBuildInfo::instance()->value(
+                    PlayerBuildInfo::UsbIdErrorList, attached.at(i)).toStringList();
         if(b.size() > 0) {
             struct Detected d;
             d.status = PlayerMtpMode;
@@ -310,7 +312,7 @@ void Autodetection::mergePatcher(void)
 }
 
 
-QString Autodetection::detectAjbrec(QString root)
+QString Autodetection::detectAjbrec(const QString& root)
 {
     QFile f(root + "/ajbrec.ajz");
     char header[24];
@@ -347,7 +349,7 @@ QString Autodetection::detectAjbrec(QString root)
 }
 
 
-int Autodetection::findDetectedDevice(QString device)
+int Autodetection::findDetectedDevice(const QString& device)
 {
     int i = m_detected.size();
     while(i--) {

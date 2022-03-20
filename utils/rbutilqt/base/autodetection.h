@@ -55,12 +55,11 @@ public:
     QList<struct Detected> detected(void) { return m_detected; }
 
 private:
-    QString resolveMountPoint(QString);
     void detectUsb(void);
     void mergeMounted(void);
     void mergePatcher(void);
-    QString detectAjbrec(QString);
-    int findDetectedDevice(QString device);
+    QString detectAjbrec(const QString&);
+    int findDetectedDevice(const QString& device);
     void updateDetectedDevice(struct Detected& entry);
 
     QList<struct Detected> m_detected;
