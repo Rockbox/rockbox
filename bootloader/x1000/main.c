@@ -41,6 +41,9 @@ void main(void)
     i2c_init();
     power_init();
     button_init();
+#ifdef HAVE_TOUCHSCREEN
+    touchscreen_set_mode(TOUCHSCREEN_BUTTON);
+#endif
     enable_irq();
 
     if(storage_init() < 0) {
