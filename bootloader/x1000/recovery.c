@@ -65,6 +65,9 @@ static const struct menuitem recovery_items[] = {
 
 static const struct menuitem debug_menu_items[] = {
     {MENUITEM_HEADING,  "Debug tools",              NULL},
+#ifdef HAVE_SCREENDUMP
+    {MENUITEM_ACTION,       "Enable screenshots",   &screenshot_enable},
+#endif
 #ifdef OF_PLAYER_ADDR
     {MENUITEM_ACTION,       "Dump OF player",       &dump_of_player},
 #endif

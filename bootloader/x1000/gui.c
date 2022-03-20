@@ -122,10 +122,17 @@ void splashf(long delay, const char* msg, ...)
 int get_button(int timeout)
 {
     int btn = button_get_w_tmo(timeout);
-    if(btn == SYS_USB_CONNECTED)
-        is_usb_connected = true;
-    else if(btn == SYS_USB_DISCONNECTED)
-        is_usb_connected = false;
+    switch(btn) {
+    case SYS_USB_CONNECTED:
+    case SYS_USB_DISCONNECTED:
+        is_usb_connected = (btn == SYS_USB_CONNECTED);
+        break;
+#ifdef HAVE_SCREENDUMP
+    case BL_SCREENSHOT:
+        screenshot();
+        break;
+#endif
+    }
 
     return btn;
 }

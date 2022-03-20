@@ -36,10 +36,12 @@ struct uimage_header;
 # define BL_DOWN            BUTTON_VOL_DOWN
 # define BL_SELECT          BUTTON_PLAY
 # define BL_QUIT            BUTTON_POWER
+# define BL_SCREENSHOT_NAME BUTTON_MENU
 # define BL_UP_NAME         "VOL+"
 # define BL_DOWN_NAME       "VOL-"
 # define BL_SELECT_NAME     "PLAY"
 # define BL_QUIT_NAME       "POWER"
+# define BL_SCREENSHOT_NAME "MENU"
 # define BOOTBACKUP_FILE    "/fiiom3k-boot.bin"
 # define OF_PLAYER_NAME     "FiiO player"
 # define OF_PLAYER_ADDR     0x20000
@@ -63,10 +65,12 @@ struct uimage_header;
 # define BL_DOWN            BUTTON_NEXT
 # define BL_SELECT          BUTTON_PLAY
 # define BL_QUIT            BUTTON_POWER
+# define BL_SCREENSHOT      BUTTON_TOPLEFT
 # define BL_UP_NAME         "PREV"
 # define BL_DOWN_NAME       "NEXT"
 # define BL_SELECT_NAME     "PLAY"
 # define BL_QUIT_NAME       "POWER"
+# define BL_SCREENSHOT_NAME "TOPLEFT"
 # define BOOTBACKUP_FILE    "/shanlingq1-boot.bin"
 # define OF_PLAYER_NAME     "Shanling player"
 # define OF_PLAYER_ADDR     0x140000
@@ -84,10 +88,12 @@ struct uimage_header;
 # define BL_DOWN            BUTTON_SCROLL_FWD
 # define BL_SELECT          BUTTON_PLAY
 # define BL_QUIT            BUTTON_POWER
+# define BL_SCREENSHOT      BUTTON_MENU
 # define BL_UP_NAME         "Up"
 # define BL_DOWN_NAME       "Scroll Down"
 # define BL_SELECT_NAME     "PLAY"
 # define BL_QUIT_NAME       "POWER"
+# define BL_SCREENSHOT_NAME "MENU"
 # define BOOTBACKUP_FILE    "/erosqnative-boot.bin"
 #else
 # error "Missing keymap!"
@@ -160,6 +166,8 @@ enum {
 
 int check_disk(bool wait);
 void usb_mode(void);
+void screenshot(void);
+void screenshot_enable(void);
 
 int load_rockbox(const char* filename, size_t* sizep);
 int load_uimage_file(const char* filename,

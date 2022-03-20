@@ -29,6 +29,7 @@
 #include "rb-loader.h"
 #include "loader_strerror.h"
 #include "linuxboot.h"
+#include "screendump.h"
 #include "nand-x1000.h"
 
 /* Set to true if a SYS_USB_CONNECTED event is seen
@@ -36,6 +37,8 @@
  * Handled by the gui code since that's how events are delivered
  * TODO: this is an ugly kludge */
 bool is_usb_connected = false;
+
+static bool screenshot_enabled = false;
 
 /* this is both incorrect and incredibly racy... */
 int check_disk(bool wait)
@@ -73,6 +76,25 @@ void usb_mode(void)
         get_button(TIMEOUT_BLOCK);
 
     splashf(3*HZ, "USB disconnected");
+}
+
+void screenshot(void)
+{
+#ifdef HAVE_SCREENDUMP
+    if(!screenshot_enabled || check_disk(false) != DISK_PRESENT)
+        return;
+
+    screen_dump();
+#endif
+}
+
+void screenshot_enable(void)
+{
+#ifdef HAVE_SCREENDUMP
+    splashf(3*HZ, "Screenshots enabled\nPress %s for screenshot",
+            BL_SCREENSHOT_NAME);
+    screenshot_enabled = true;
+#endif
 }
 
 int load_rockbox(const char* filename, size_t* sizep)
