@@ -36,7 +36,7 @@ struct uimage_header;
 # define BL_DOWN            BUTTON_VOL_DOWN
 # define BL_SELECT          BUTTON_PLAY
 # define BL_QUIT            BUTTON_POWER
-# define BL_SCREENSHOT_NAME BUTTON_MENU
+# define BL_SCREENSHOT      BUTTON_MENU
 # define BL_UP_NAME         "VOL+"
 # define BL_DOWN_NAME       "VOL-"
 # define BL_SELECT_NAME     "PLAY"
