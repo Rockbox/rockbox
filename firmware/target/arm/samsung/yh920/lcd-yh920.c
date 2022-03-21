@@ -253,13 +253,14 @@ void lcd_update_rect(int x, int y, int width, int height)
     if(ymax >= LCD_FBHEIGHT)
         ymax = LCD_FBHEIGHT-1;
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
         lcd_write_reg(LCD_CNTL_PAGE, y);
         lcd_write_reg(LCD_CNTL_COLUMN, x);
 
-        addr = FBADDR(x,y);
+        addr = fbaddr(x,y);
 
         lcd_send_cmd(LCD_CNTL_DATA_WRITE);
         lcd_write_data(addr, width);

@@ -440,9 +440,10 @@ void lcd_update_rect(int x, int y, int width, int height)
     /* setup GRAM write window */
     lcd_setup_rect(x, x_end - 1, y, y_end - 1);
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* write to GRAM */
     for (row = y; row < y_end; row++) {
-        lcd_write_data(FBADDR(x,row), width);
+        lcd_write_data(fbaddr(x,row), width);
     }
 }
 

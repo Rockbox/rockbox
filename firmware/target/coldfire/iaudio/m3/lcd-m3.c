@@ -258,6 +258,7 @@ void lcd_update(void)
     int y;
     if (initialized)
     {
+        void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
         for(y = 0;y < LCD_FBHEIGHT;y++) 
         {
             /* Copy display bitmap to hardware.
@@ -266,7 +267,7 @@ void lcd_update(void)
                have to update one page at a time. */
             lcd_write_command(LCD_SET_PAGE | (y > 5 ? y + 2 : y));
             lcd_write_command_e(LCD_SET_COLUMN | 0, 0);
-            lcd_write_data(FBADDR(0, y), LCD_WIDTH);
+            lcd_write_data(fbaddr(0,y), LCD_WIDTH);
         }
     }
 }
@@ -289,6 +290,7 @@ void lcd_update_rect(int x, int y, int width, int height)
         if(ymax >= LCD_FBHEIGHT)
             ymax = LCD_FBHEIGHT-1;
 
+        void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
         /* Copy specified rectangle bitmap to hardware
            COM48-COM63 are not connected, so we need to skip those */
         for (; y <= ymax; y++) 
@@ -296,7 +298,7 @@ void lcd_update_rect(int x, int y, int width, int height)
             lcd_write_command(LCD_SET_PAGE | ((y > 5 ? y + 2 : y) & 0xf));
             lcd_write_command_e(LCD_SET_COLUMN | ((x >> 4) & 0xf), x & 0xf);
 
-            lcd_write_data(FBADDR(x,y), width);
+            lcd_write_data(fbaddr(x,y), width);
         } 
     }
 }

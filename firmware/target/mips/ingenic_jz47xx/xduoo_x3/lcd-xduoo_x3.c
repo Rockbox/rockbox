@@ -532,6 +532,7 @@ void lcd_update(void)
     const int column_high = get_column_high_byte(0);
     const int column_low = get_column_low_byte(0);
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_FBHEIGHT; y++)
     {
@@ -542,7 +543,7 @@ void lcd_update(void)
             (column_low)
         );
 
-        lcd_write_data (FBADDR(0, y), LCD_WIDTH);
+        lcd_write_data (fbaddr(0,y), LCD_WIDTH);
     }
 }
 
@@ -586,6 +587,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     ymax = (y + height-1) >> 3;
     y >>= 3;
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
@@ -596,6 +598,6 @@ void lcd_update_rect(int x, int y, int width, int height)
             (column_low)
         );
 
-        lcd_write_data (FBADDR(x,y), width);
+        lcd_write_data (fbaddr(x,y), width);
     }
 }

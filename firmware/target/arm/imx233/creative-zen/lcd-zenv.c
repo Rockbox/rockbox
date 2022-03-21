@@ -172,8 +172,9 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_send(false, 0x75); lcd_send(true, y); lcd_send(true, y + h - 1);
     lcd_send(false, 0x5c);
     imx233_lcdif_set_word_length(16);
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     for(int yy = y; yy < y + h; yy++)
-        imx233_lcdif_pio_send(true, w, FBADDR(x, yy));
+        imx233_lcdif_pio_send(true, w, fbaddr(x,yy));
 }
 
 #ifndef BOOTLOADER

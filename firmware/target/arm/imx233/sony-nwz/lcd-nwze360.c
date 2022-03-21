@@ -228,8 +228,9 @@ void lcd_update_rect(int x, int y, int w, int h)
     }
     else
     {
+        void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
         for(int i = 0; i < h; i++)
-            memcpy((fb_data *)FRAME + i * w, FBADDR(x,y + i), w * sizeof(fb_data));
+            memcpy((fb_data *)FRAME + i * w, fbaddr(x,y + i), w * sizeof(fb_data));
     }
     /* WARNING The LCDIF has a limitation on the vertical count ! In 16-bit packed mode
      * (which we used, ie 16-bit per pixel, 2 pixels per 32-bit words), the v_count

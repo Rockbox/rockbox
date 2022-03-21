@@ -200,6 +200,7 @@ void lcd_update(void)
 {
     int y;
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* Copy display bitmap to hardware */
     for (y = 0; y < LCD_FBHEIGHT; y++)
     {
@@ -207,7 +208,7 @@ void lcd_update(void)
         lcd_write_command_ex(LCD_CNTL_COLUMN, 0, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
-        lcd_write_data (FBADDR(0, y), LCD_WIDTH);
+        lcd_write_data (fbaddr(0,y), LCD_WIDTH);
     }
 }
 
@@ -228,6 +229,7 @@ void lcd_update_rect(int x, int y, int width, int height)
     if(ymax >= LCD_FBHEIGHT)
         ymax = LCD_FBHEIGHT-1;
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* Copy specified rectange bitmap to hardware */
     for (; y <= ymax; y++)
     {
@@ -235,6 +237,6 @@ void lcd_update_rect(int x, int y, int width, int height)
         lcd_write_command_ex(LCD_CNTL_COLUMN, x, -1);
 
         lcd_write_command(LCD_CNTL_DATA_WRITE);
-        lcd_write_data (FBADDR(x,y), width);
+        lcd_write_data (fbaddr(x,y), width);
     }
 }

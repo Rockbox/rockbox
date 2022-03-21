@@ -198,9 +198,10 @@ static void create_llp(int x, int y, int width, int height)
 
     width = width>>1;
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* build LLPs */
     for (i=0; i<height; i++)
-        llp_setup((void *)FBADDR(x,y+i),
+        llp_setup((void *)fbaddr(x,y+i),
                   (void*)(LCD_BUFF+((i%4)*4*width)),
                   &(scr_llp[i]),
                   width);

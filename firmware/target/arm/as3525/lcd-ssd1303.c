@@ -310,6 +310,7 @@ static void internal_update_rect(int x, int y, int width, int height)
     const int column_high = get_column_high_byte(x);
     const int column_low = get_column_low_byte(x);
 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     /* Copy specified rectange bitmap to hardware */
     for (; y <= height; y++)
     {
@@ -320,7 +321,7 @@ static void internal_update_rect(int x, int y, int width, int height)
             (column_low)
         );
 
-        lcd_write_data (FBADDR(x,y), width);
+        lcd_write_data (fbaddr(x,y), width);
     }
     lcd_write_command (LCD_NOP); /* return to command mode */
 

@@ -299,14 +299,15 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     fb_data* p;
     int h, w;
-    
+
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     if (lcd_type == 1) {
         /* TODO implement and test */
         lcd_set_window1(x, y, width, height);
         lcd_set_position1(x, y);
-    
+
         for (h = 0; h < height; h++) {
-            p = FBADDR(0,y);
+            p = fbaddr(0,y);
             for (w = 0; w < LCD_WIDTH; w++) {
                 while (LCD_STATUS & 0x10);
                 LCD_WDATA = *p++;
@@ -317,9 +318,9 @@ void lcd_update_rect(int x, int y, int width, int height)
     else {
         lcd_set_window2(x, y, width, height);
         lcd_set_position2(x, y);
-    
+
         for (h = 0; h < height; h++) {
-            p = FBADDR(x,y);
+            p = fbaddr(x,y);
             for (w = 0; w < width; w++) {
                 while (LCD_STATUS & 0x10);
                 LCD_WDATA = *p++;

@@ -507,7 +507,9 @@ typedef void lcd_blockfunc_type(fb_data *address, unsigned mask, unsigned bits);
 
 extern struct viewport* lcd_current_viewport;
 
-#define FBADDR(x,y) ((fb_data*) lcd_current_viewport->buffer->get_address_fn(x, y))
+#define FB_CURRENTVP_BUFFER (lcd_current_viewport->buffer)
+#define FBADDRBUF(buffer,x,y) ((fb_data*) buffer->get_address_fn(x,y))
+#define FBADDR(x,y) (FBADDRBUF(lcd_current_viewport->buffer,x,y))
 
 #define FRAMEBUFFER_SIZE (sizeof(fb_data)*LCD_FBWIDTH*LCD_FBHEIGHT)
 

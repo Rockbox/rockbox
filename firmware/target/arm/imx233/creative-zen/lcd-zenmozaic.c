@@ -149,6 +149,8 @@ void lcd_update_rect(int x, int y, int w, int h)
     lcd_write_reg(0x17, y | (y + h - 1) << 8);
     lcd_write_reg(0x21, y * LCD_WIDTH + x);
     lcd_write_reg(0x22, 0);
+
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
     for(int yy = y; yy < y + h; yy++)
-        imx233_lcdif_pio_send(true, 2 * w, FBADDR(x, yy));
+        imx233_lcdif_pio_send(true, 2 * w, fbaddr(x,yy));
 }

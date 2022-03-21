@@ -333,17 +333,18 @@ void lcd_update_rect(int x, int y, int width, int height)
     x >>= 3;
     width = xmax - x + 1;
 
-    for (; y <= ymax; y++) 
+    void* (*fbaddr)(int x, int y) = FB_CURRENTVP_BUFFER->get_address_fn;
+    for (; y <= ymax; y++)
     {
         lcd_cmd_and_data(R_RAM_ADDR_SET, (y << 5) + addr_offset - x);
         lcd_prepare_cmd(R_RAM_DATA);
-
+        fb_data *data = fbaddr(2*x,y);
 #if defined(IPOD_MINI) || defined(IPOD_MINI2G)
         if (pix_offset == -2)
-            lcd_write_data_shifted(FBADDR(2*x, y), width);
+            lcd_write_data_shifted(data, width);
         else
 #endif
-            lcd_write_data(FBADDR(2*x, y), width);
+            lcd_write_data(data, width);
     }
 }
 
