@@ -84,6 +84,7 @@ struct viewport* LCDFN(init_viewport)(struct viewport* vp)
     {
         vp = &default_vp;
         vp->buffer = fb_default;
+        return vp;
     }
 
     /* use defaults if no buffer is provided */
@@ -132,8 +133,9 @@ struct viewport* LCDFN(set_viewport_ex)(struct viewport* vp, int flags)
      *  expected.
      */
 
-    if((unsigned) vp->x > (unsigned) LCDM(WIDTH)
-        || (unsigned) vp->y > (unsigned) LCDM(HEIGHT)
+    if( vp->x < 0 || vp->y < 0
+        || vp->x > LCDM(WIDTH)
+        || vp->y > LCDM(HEIGHT)
         || vp->x + vp->width > LCDM(WIDTH)
         || vp->y + vp->height > LCDM(HEIGHT))
     {
@@ -177,12 +179,18 @@ struct viewport *LCDFN(get_viewport)(bool *is_default)
 void LCDFN(update_viewport)(void)
 {
     struct viewport* vp = LCDFN(current_viewport);
+    int x, y;
     if (vp->buffer->stride != LCDFN(framebuffer_default.stride))
     {
-        LCDFN(update_viewport_rect)(0,0, vp->width, vp->height);
-        return;
+        x = 0;
+        y = 0;
     }
-    LCDFN(update_rect)(vp->x, vp->y, vp->width, vp->height);
+    else
+    {
+        x = vp->x;
+        y = vp->y;
+    }
+    LCDFN(update_rect)(x, y, vp->width, vp->height);
 }
 
 void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
