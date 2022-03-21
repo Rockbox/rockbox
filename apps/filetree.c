@@ -330,42 +330,43 @@ int ft_load(struct tree_context* c, const char* tempdir)
         }
 
         dptr->attr = info.attribute;
+        int dir_attr = (dptr->attr & ATTR_DIRECTORY);
 
         /* check for known file types */
-        if ( !(dptr->attr & ATTR_DIRECTORY) )
+        if ( !(dir_attr) )
             dptr->attr |= filetype_get_attr((char *)entry->d_name);
 
+        int file_attr = (dptr->attr & FILE_ATTR_MASK);
+
         /* filter out non-visible files */
-        if ((!(dptr->attr & ATTR_DIRECTORY) && (
-            (*c->dirfilter == SHOW_PLAYLIST &&
-             (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
-            ((*c->dirfilter == SHOW_MUSIC &&
-             (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) &&
-             (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
+        if ((!(dir_attr) && ((*c->dirfilter == SHOW_PLAYLIST &&
+             file_attr != FILE_ATTR_M3U) ||
+            ((*c->dirfilter == SHOW_MUSIC && file_attr != FILE_ATTR_AUDIO) &&
+             file_attr != FILE_ATTR_M3U) ||
             (*c->dirfilter == SHOW_SUPPORTED && !filetype_supported(dptr->attr)))) ||
-            (*c->dirfilter == SHOW_WPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_WPS) ||
-            (*c->dirfilter == SHOW_FONT && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FONT) ||
-            (*c->dirfilter == SHOW_SBS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_SBS) ||
+            (*c->dirfilter == SHOW_WPS && file_attr != FILE_ATTR_WPS) ||
+            (*c->dirfilter == SHOW_FONT && file_attr != FILE_ATTR_FONT) ||
+            (*c->dirfilter == SHOW_SBS  && file_attr != FILE_ATTR_SBS) ||
 #if CONFIG_TUNER
-            (*c->dirfilter == SHOW_FMS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMS) ||
+            (*c->dirfilter == SHOW_FMS  && file_attr != FILE_ATTR_FMS) ||
 #endif
 #ifdef HAVE_REMOTE_LCD
-            (*c->dirfilter == SHOW_RWPS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RWPS) ||
-            (*c->dirfilter == SHOW_RSBS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RSBS) ||
+            (*c->dirfilter == SHOW_RWPS && file_attr != FILE_ATTR_RWPS) ||
+            (*c->dirfilter == SHOW_RSBS && file_attr != FILE_ATTR_RSBS) ||
 #if CONFIG_TUNER
-            (*c->dirfilter == SHOW_RFMS  && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_RFMS) ||
+            (*c->dirfilter == SHOW_RFMS  && file_attr != FILE_ATTR_RFMS) ||
 #endif
 #endif
 #if CONFIG_TUNER
-            (*c->dirfilter == SHOW_FMR && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_FMR) ||
+            (*c->dirfilter == SHOW_FMR && file_attr != FILE_ATTR_FMR) ||
 #endif
-            (*c->dirfilter == SHOW_M3U && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_M3U) ||
-            (*c->dirfilter == SHOW_CFG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_CFG) ||
-            (*c->dirfilter == SHOW_LNG && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LNG) ||
-            (*c->dirfilter == SHOW_MOD && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_MOD) ||
-            (*c->dirfilter == SHOW_PLUGINS && (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_ROCK &&
-                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_LUA &&
-                                              (dptr->attr & FILE_ATTR_MASK) != FILE_ATTR_OPX) ||
+            (*c->dirfilter == SHOW_M3U && file_attr != FILE_ATTR_M3U) ||
+            (*c->dirfilter == SHOW_CFG && file_attr != FILE_ATTR_CFG) ||
+            (*c->dirfilter == SHOW_LNG && file_attr != FILE_ATTR_LNG) ||
+            (*c->dirfilter == SHOW_MOD && file_attr != FILE_ATTR_MOD) ||
+            (*c->dirfilter == SHOW_PLUGINS && file_attr != FILE_ATTR_ROCK &&
+                                              file_attr != FILE_ATTR_LUA &&
+                                              file_attr != FILE_ATTR_OPX) ||
             (callback_show_item && !callback_show_item(entry->d_name, dptr->attr, c)))
         {
             continue;
@@ -384,7 +385,7 @@ int ft_load(struct tree_context* c, const char* tempdir)
         strcpy(dptr->name, (char *)entry->d_name);
         name_buffer_used += len + 1;
 
-        if (dptr->attr & ATTR_DIRECTORY) /* count the remaining dirs */
+        if (dir_attr) /* count the remaining dirs */
             c->dirsindir++;
     }
     c->filesindir = files_in_dir;
@@ -430,6 +431,13 @@ static void ft_load_font(char *file)
     screens[screen].setuifont(
         font_load_ex(file,0,global_settings.glyphs_to_cache));
     viewportmanager_theme_changed(THEME_UI_VIEWPORT);
+}
+
+static void ft_apply_skin_file(char *buf, char *file, const int maxlen)
+{
+    splash(0, ID2P(LANG_WAIT));
+    set_file(buf, file, maxlen);
+    settings_apply_skins();
 }
 
 int ft_enter(struct tree_context* c)
@@ -539,49 +547,32 @@ int ft_enter(struct tree_context* c)
 
                 break;
             case FILE_ATTR_FMS:
-                splash(0, ID2P(LANG_WAIT));
-                set_file(buf, (char *)global_settings.fms_file, MAX_FILENAME);
-                settings_apply_skins();
+                ft_apply_skin_file(buf, global_settings.fms_file, MAX_FILENAME);
                 break;
 #ifdef HAVE_REMOTE_LCD
             case FILE_ATTR_RFMS:
-                splash(0, ID2P(LANG_WAIT));
-                set_file(buf, (char *)global_settings.rfms_file, MAX_FILENAME);
-                settings_apply_skins();
+                ft_apply_skin_file(buf, global_settings.rfms_file, MAX_FILENAME);
                 break;
 #endif
 #endif
-
             case FILE_ATTR_SBS:
-                splash(0, ID2P(LANG_WAIT));
-                set_file(buf, (char *)global_settings.sbs_file, MAX_FILENAME);
-                settings_apply_skins();
+                ft_apply_skin_file(buf, global_settings.sbs_file, MAX_FILENAME);
                 break;
 #ifdef HAVE_REMOTE_LCD
             case FILE_ATTR_RSBS:
-                splash(0, ID2P(LANG_WAIT));
-                set_file(buf, (char *)global_settings.rsbs_file, MAX_FILENAME);
-                settings_apply_skins();
+                ft_apply_skin_file(buf, global_settings.rsbs_file, MAX_FILENAME);
                 break;
 #endif
                 /* wps config file */
             case FILE_ATTR_WPS:
-                splash(0, ID2P(LANG_WAIT));
-                set_file(buf, (char *)global_settings.wps_file,
-                         MAX_FILENAME);
-                settings_apply_skins();
+                ft_apply_skin_file(buf, global_settings.wps_file, MAX_FILENAME);
                 break;
-
 #if defined(HAVE_REMOTE_LCD) && (NB_SCREENS > 1)
                 /* remote-wps config file */
             case FILE_ATTR_RWPS:
-                splash(0, ID2P(LANG_WAIT));
-                set_file(buf, (char *)global_settings.rwps_file,
-                         MAX_FILENAME);
-                settings_apply_skins();
+                ft_apply_skin_file(buf, global_settings.rwps_file, MAX_FILENAME);
                 break;
 #endif
-
             case FILE_ATTR_CFG:
                 splash(0, ID2P(LANG_WAIT));
                 if (!settings_load_config(buf,true))
