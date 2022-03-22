@@ -370,7 +370,7 @@ static bool dbg_buffering_thread(void)
     struct buffering_debug d;
     size_t filebuflen = audio_get_filebuflen();
     /* This is a size_t, but call it a long so it puts a - when it's bad. */
-
+    const char * const fmt_used = "%s: %6ld/%ld";
 #ifndef CPU_MULTI_FREQUENCY
     boost_ticks = 0;
 #endif
@@ -406,13 +406,13 @@ static bool dbg_buffering_thread(void)
             screens[i].clear_display();
 
 
-            screens[i].putsf(0, line++, "pcm: %6ld/%ld", (long) bufused, (long) bufsize);
+            screens[i].putsf(0, line++, fmt_used, "pcm", (long) bufused, (long) bufsize);
 
             gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
                                bufsize, 0, bufused, HORIZONTAL);
             line++;
 
-            screens[i].putsf(0, line++, "alloc: %6ld/%ld", audio_filebufused(),
+            screens[i].putsf(0, line++, fmt_used, "alloc", audio_filebufused(),
                             (long) filebuflen);
 
 #if LCD_HEIGHT > 80 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_HEIGHT > 80)
@@ -422,7 +422,7 @@ static bool dbg_buffering_thread(void)
                                    filebuflen, 0, audio_filebufused(), HORIZONTAL);
                 line++;
 
-                screens[i].putsf(0, line++, "real:  %6ld/%ld", (long)d.buffered_data,
+                screens[i].putsf(0, line++, fmt_used, "real", (long)d.buffered_data,
                                 (long)filebuflen);
 
                 gui_scrollbar_draw(&screens[i],0, line*8, screens[i].lcdwidth, 6,
@@ -431,7 +431,7 @@ static bool dbg_buffering_thread(void)
             }
 #endif
 
-            screens[i].putsf(0, line++, "usefl: %6ld/%ld", (long)(d.useful_data),
+            screens[i].putsf(0, line++, fmt_used, "usefl", (long)(d.useful_data),
                                                        (long)filebuflen);
 
 #if LCD_HEIGHT > 80 || (defined(HAVE_REMOTE_LCD) && LCD_REMOTE_HEIGHT > 80)
@@ -856,8 +856,7 @@ static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
     if (action == ACTION_STD_OK)
     {
         *page = (*page+1)%3;
-        snprintf(lists->title, 32,
-                 "tsc2100 registers - Page %d", *page);
+        snprintf(lists->title, 32, "tsc2100 registers - Page %d", *page);
         return ACTION_REDRAW;
     }
     return action;
@@ -865,7 +864,8 @@ static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
 static bool tsc2100_debug(void)
 {
     int page = 0;
-    char title[32] = "tsc2100 registers - Page 0";
+    char title[32];
+    snprintf(title, 32, "tsc2100 registers - Page %d", page);
     struct simplelist_info info;
     simplelist_info_init(&info, title, 32, &page);
     info.timeout = HZ/100;
@@ -916,7 +916,7 @@ static bool view_battery(void)
                 else
                     grid = 5;
 
-                lcd_putsf(0, 0, "battery %d.%03dV", power_history[0] / 1000,
+                lcd_putsf(0, 0, "%s %d.%03dV", "Battery", power_history[0] / 1000,
                          power_history[0] % 1000);
                 lcd_putsf(0, 1, "%d.%03d-%d.%03dV (%2dmV)",
                           minv / 1000, minv % 1000, maxv / 1000, maxv % 1000,
@@ -927,7 +927,7 @@ static bool view_battery(void)
                     grid = 10;
                 else
                     grid = 1;
-                lcd_putsf(0, 0, "battery %d%%", power_history[0]);
+                lcd_putsf(0, 0, "%s %d%%", "Battery", power_history[0]);
                 lcd_putsf(0, 1, "%d%%-%d%% (%d %%)", minv, maxv, grid);
 #endif
 
@@ -982,16 +982,16 @@ static bool view_battery(void)
                 lcd_putsf(0, 0, "Pwr status: %s",
                          charging_state() ? "charging" : "discharging");
 #else
-                lcd_puts(0, 0, "Power status: unknown");
+                lcd_putsf(0, 0, "Pwr status: %s", "unknown");
 #endif
                 battery_read_info(&y, &z);
                 if (y > 0)
-                    lcd_putsf(0, 1, "Battery: %d.%03d V (%d %%)", y / 1000, y % 1000, z);
+                    lcd_putsf(0, 1, "%s: %d.%03d V (%d %%)", "Battery", y / 1000, y % 1000, z);
                 else if (z > 0)
-                    lcd_putsf(0, 1, "Battery: %d %%", z);
+                    lcd_putsf(0, 1, "%s: %d %%", "Battery", z);
 #ifdef ADC_EXT_POWER
                 y = (adc_read(ADC_EXT_POWER) * EXT_SCALE_FACTOR) / 1000;
-                lcd_putsf(0, 2, "External: %d.%03d V", y / 1000, y % 1000);
+                lcd_putsf(0, 2, "%s: %d.%03d V", "External", y / 1000, y % 1000);
 #endif
 #if CONFIG_CHARGING
 #if defined IPOD_NANO || defined IPOD_VIDEO
@@ -1005,7 +1005,7 @@ static bool view_battery(void)
                             usb_pwr ? "present" : "absent");
                 lcd_putsf(0, 4, "EXT pwr:   %s",
                             ext_pwr ? "present" : "absent");
-                lcd_putsf(0, 5, "Battery:   %s",
+                lcd_putsf(0, 5, "%s:   %s", "Battery",
                     charging ? "charging" : (usb_pwr||ext_pwr) ? "charged" : "discharging");
                 lcd_putsf(0, 6, "Dock mode: %s",
                          dock    ? "enabled" : "disabled");
@@ -1059,7 +1059,7 @@ static bool view_battery(void)
 
                 lcd_putsf(0, line++, "State: %s", chrgstate_strings[y]);
 
-                lcd_putsf(0, line++, "Battery Switch: %s",
+                lcd_putsf(0, line++, "%s Switch: %s", "Battery", 
                          (st & POWER_INPUT_BATTERY) ? "On" : "Off");
 
                 y = chrgraw_adc_voltage();
@@ -1082,11 +1082,11 @@ static bool view_battery(void)
                 y = battery_adc_temp();
 
                 if (y != INT_MIN) {
-                    lcd_putsf(0, line++, "T Battery: %d\u00b0C (%d\u00b0F)", y,
-                               (9*y + 160) / 5);
+                    lcd_putsf(0, line++, "T %s: %d\u00b0C (%d\u00b0F)",
+                              "Battery", y, (9*y + 160) / 5);
                 } else {
                     /* Conversion disabled */
-                    lcd_puts(0, line++, "T Battery: ?");
+                    lcd_putsf(0, line++, "T %s: ?", "Battery");
                 }
 #elif defined(HAVE_AS3514) && CONFIG_CHARGING
                 static const char * const chrgstate_strings[] =
@@ -1113,7 +1113,7 @@ static bool view_battery(void)
                 y = pmu_read_battery_voltage();
                 lcd_putsf(17, 1, "RAW: %d.%03d V", y / 1000, y % 1000);
                 y = pmu_read_battery_current();
-                lcd_putsf(0, 2, "Battery current: %d mA", y);
+                lcd_putsf(0, 2, "%s current: %d mA", "Battery", y);
                 lcd_putsf(0, 3, "PWRCON: %08x %08x", PWRCON, PWRCONEXT);
                 lcd_putsf(0, 4, "CLKCON: %08x %03x %03x", CLKCON, CLKCON2, CLKCON3);
                 lcd_putsf(0, 5, "PLL: %06x %06x %06x", PLL0PMS, PLL1PMS, PLL2PMS);
@@ -1139,9 +1139,9 @@ static bool view_battery(void)
                 lcd_putsf(0, 3, "Charger: %s",
                          charger_inserted() ? "present" : "absent");
                 x = (avr_hid_hdq_read_short(HDQ_REG_TEMP) / 4) - 273;
-                lcd_putsf(0, 4, "Battery temperature: %d C", x);
+                lcd_putsf(0, 4, "%s temperature: %d C", "Battery", x);
                 x = (avr_hid_hdq_read_short(HDQ_REG_AI) * 357) / 200;
-                lcd_putsf(0, 5, "Battery current: %d.%01d mA", x / 10, x % 10);
+                lcd_putsf(0, 5, "%s current: %d.%01d mA", "Battery", x / 10, x % 10);
                 x = (avr_hid_hdq_read_short(HDQ_REG_AP) * 292) / 20;
                 lcd_putsf(0, 6, "Discharge power: %d.%01d mW", x / 10, x % 10);
                 x = (avr_hid_hdq_read_short(HDQ_REG_SAE) * 292) / 2;
@@ -1179,7 +1179,7 @@ static bool view_battery(void)
                     power_history[0] % 1000);
 #endif
 
-                lcd_putsf(0, 6, "battery level: %d%%", battery_level());
+                lcd_putsf(0, 6, "%s level: %d%%", "Battery", battery_level());
 
                 int time_left = battery_time();
                 if (time_left >= 0)
@@ -1188,7 +1188,7 @@ static bool view_battery(void)
                     lcd_puts(0, 7, "Estimation n/a");
 
 #if (CONFIG_BATTERY_MEASURE & CURRENT_MEASURE)
-                lcd_putsf(0, 8, "battery current: %d mA", battery_current());
+                lcd_putsf(0, 8, "%s current: %d mA", "Battery", battery_current());
 #endif
                 break;
         }
@@ -2070,12 +2070,12 @@ static int radio_callback(int btn, struct gui_synclist *lists)
     tea5767_dbg_info(&nfo);
     simplelist_addline("Philips regs:");
     simplelist_addline(
-             "   Read: %02X %02X %02X %02X %02X",
+             "   %s: %02X %02X %02X %02X %02X", "Read",
              (unsigned)nfo.read_regs[0], (unsigned)nfo.read_regs[1],
              (unsigned)nfo.read_regs[2], (unsigned)nfo.read_regs[3],
              (unsigned)nfo.read_regs[4]);
     simplelist_addline(
-             "   Write: %02X %02X %02X %02X %02X",
+             "   %s: %02X %02X %02X %02X %02X", "Write",
              (unsigned)nfo.write_regs[0], (unsigned)nfo.write_regs[1],
              (unsigned)nfo.write_regs[2], (unsigned)nfo.write_regs[3],
              (unsigned)nfo.write_regs[4]);
