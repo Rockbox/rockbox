@@ -1284,52 +1284,13 @@ static bool add_uniqbuf(struct tagcache_search *tcs, uint32_t id)
         return true;
     }
 
-    if (id <= UINT16_MAX)
+    for (i = 0; i < tcs->unique_list_count; i++)
     {
-        /* place two 16-bit entries in a single 32-bit slot */
-        uint32_t idtmp;
-        union uentry{
-            uint16_t u16[2];
-            uint32_t u32;
-        } *entry;
-        id |= 1; /*odd - flag 16-bit entry */
-        for (i = 0; i < tcs->unique_list_count; i++)
+        /* Return false if entry is found. */
+        if (tcs->unique_list[i] == id)
         {
-            entry = (union uentry *) &tcs->unique_list[i];
-            if ((entry->u32 & 1) == 0) /* contains a 32-bit entry */
-                continue;
-
-            /* Return false if entry is found. */
-            if (entry->u16[0] == id || entry->u16[1] == id)
-            {
-                //logf("%d Exists (16) @ %d", id, i);
-                return false;
-            }
-  
-            if (entry->u16[1] == 0 && (entry->u16[0] & 1) == 1)
-            {
-                entry->u16[1] = id & UINT16_MAX;
-                return true; /*no more 16bit entries add to empty 16bit slot */
-            }
-
-        }
-        /* Not Found and no empty slot add a new entry */
-        entry = (union uentry *) &idtmp;
-        entry->u16[1] = 0;
-        entry->u16[0] = id & UINT16_MAX;
-        id = idtmp;
-    }
-    else
-    {
-        id &= ~1; /* even - flag 32-bit entry */
-        for (i = 0; i < tcs->unique_list_count; i++)
-        {
-            /* Return false if entry is found. */
-            if (tcs->unique_list[i] == id)
-            {
-                //logf("%d Exists (32)@ %d", id, i);
-                return false;
-            }
+            //logf("%d Exists @ %d", id, i);
+            return false;
         }
     }
 
