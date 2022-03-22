@@ -173,6 +173,7 @@ static const char* threads_getname(int selected_item, void *data,
              threadinfo.name);
 
     int start = 0;
+#if LCD_WIDTH <= 128
     if (len >= SCREEN_MAX_CHARS)
     {
         int ch_offset = (*x_offset)%(len-1);
@@ -189,6 +190,10 @@ static const char* threads_getname(int selected_item, void *data,
             start = ch_offset;
         }
     }
+#else
+    (void) x_offset;
+    (void) len;
+#endif
     return &buffer[start];
 }
 
@@ -199,7 +204,7 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
     {
         return ACTION_REDRAW;
     }
-
+#if LCD_WIDTH <= 128
     int *x_offset = ((int*) lists->data);
     if (action == ACTION_STD_OK)
     {
@@ -210,7 +215,9 @@ static int dbg_threads_action_callback(int action, struct gui_synclist *lists)
     {
         *x_offset = 0;
     }
-
+#else
+    (void) lists;
+#endif
     return action;
 }
 /* Test code!!! */
@@ -370,7 +377,14 @@ static bool dbg_buffering_thread(void)
     struct buffering_debug d;
     size_t filebuflen = audio_get_filebuflen();
     /* This is a size_t, but call it a long so it puts a - when it's bad. */
+#if LCD_WIDTH > 96
+    #define STR_DATAREM "data_rem"
     const char * const fmt_used = "%s: %6ld/%ld";
+#else /* clipzip, ?*/
+    #define STR_DATAREM "remain"
+    const char * const fmt_used = "%s:%ld/%ld";
+#endif
+
 #ifndef CPU_MULTI_FREQUENCY
     boost_ticks = 0;
 #endif
@@ -443,7 +457,7 @@ static bool dbg_buffering_thread(void)
             }
 #endif
 
-            screens[i].putsf(0, line++, "data_rem: %ld", (long)d.data_rem);
+            screens[i].putsf(0, line++, "%s: %ld", STR_DATAREM, (long)d.data_rem);
 
             screens[i].putsf(0, line++, "track count: %2u", audio_track_count());
 
@@ -482,6 +496,7 @@ static bool dbg_buffering_thread(void)
         screens[i].setfont(FONT_UI);
 
     return false;
+#undef STR_DATAREM
 }
 
 static const char* bf_getname(int selected_item, void *data,
