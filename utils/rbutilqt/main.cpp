@@ -39,7 +39,7 @@ Q_IMPORT_PLUGIN(AccessibleFactory)
 
 
 int main( int argc, char ** argv ) {
-#if QT_VERSION >= 0x050600
+#if QT_VERSION >= 0x050600 && QT_VERSION < 0x060000
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
@@ -83,7 +83,12 @@ int main( int argc, char ** argv ) {
         if(!translator.load("rbutil_" + applang, absolutePath))
             translator.load("rbutil_" + applang, ":/lang");
         if(!qttrans.load("qt_" + applang,
-            QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+#if QT_VERSION >= 0x060000
+            QLibraryInfo::path(QLibraryInfo::TranslationsPath)
+#else
+            QLibraryInfo::location(QLibraryInfo::TranslationsPath)
+#endif
+                ))
             qttrans.load("qt_" + applang, ":/lang");
 
         QLocale::setDefault(QLocale(applang));

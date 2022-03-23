@@ -48,13 +48,15 @@ enable_testing()
 # Qt
 find_package(QT NAMES Qt6 Qt5 REQUIRED)
 if(QT_VERSION_MAJOR EQUAL 5)
-    find_package(Qt5 COMPONENTS Core Widgets Svg Multimedia Network Test LinguistTools REQUIRED)
+    find_package(Qt5 REQUIRED COMPONENTS
+                 Core Widgets Svg Multimedia Network Test LinguistTools)
 else()
-    find_package(Qt6 REQUIRED COMPONENTS Core Core5Compat Widgets Svg Multimedia Network LinguistTools
+    find_package(Qt6 REQUIRED COMPONENTS
+                 Core Core5Compat Widgets Svg Multimedia Network LinguistTools SvgWidgets
                  OPTIONAL_COMPONENTS Test)
 endif()
-get_target_property(_qmake_executable Qt${QT_VERSION_MAJOR}::qmake IMPORTED_LOCATION)
-get_filename_component(QT_BINDIR "${_qmake_executable}" DIRECTORY)
+get_target_property(_moc_executable Qt${QT_VERSION_MAJOR}::moc IMPORTED_LOCATION)
+get_filename_component(QT_BINDIR "${_moc_executable}" DIRECTORY)
 message("-- Found Qt${QT_VERSION_MAJOR}: ${Qt${QT_VERSION_MAJOR}_DIR}")
 
 # If we're on Linux, try to find the used libs in the system.

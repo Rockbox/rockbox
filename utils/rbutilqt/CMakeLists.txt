@@ -125,6 +125,9 @@ endif()
 target_link_libraries(RockboxUtility rbbase cutelogger gitversion
     Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Multimedia
     Qt${QT_VERSION_MAJOR}::Svg)
+if(QT_VERSION_MAJOR EQUAL 6)
+    target_link_libraries(RockboxUtility Qt${QT_VERSION_MAJOR}::SvgWidgets)
+endif()
 
 target_include_directories(RockboxUtility PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/gui
