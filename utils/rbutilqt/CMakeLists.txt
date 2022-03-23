@@ -406,4 +406,21 @@ target_compile_definitions(test_rockboxinfo PRIVATE UNICODE)
 qtest_discover_tests(test_rockboxinfo)
 set_property(TARGET test_rockboxinfo PROPERTY AUTOMOC ON)
 
+add_executable(test_talkgenerator
+    base/talkgenerator.cpp
+    base/talkgenerator.h
+    base/encttssettings.cpp
+    base/encttssettings.h
+    base/ttsbase.h
+    test/stubs/stubs-talkgenerator.cpp
+    test/test-talkgenerator.qrc
+    test/test-talkgenerator.cpp)
+
+target_link_libraries(test_talkgenerator Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Test)
+target_include_directories(test_talkgenerator PRIVATE base test/stubs
+                            ${CMAKE_CURRENT_LIST_DIR}/../../tools)
+target_compile_definitions(test_talkgenerator PRIVATE UNICODE)
+qtest_discover_tests(test_talkgenerator)
+set_property(TARGET test_talkgenerator PROPERTY AUTOMOC ON)
+set_property(TARGET test_talkgenerator PROPERTY AUTORCC ON)
 
