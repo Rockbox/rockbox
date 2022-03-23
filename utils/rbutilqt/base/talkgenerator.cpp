@@ -24,7 +24,6 @@
 
 TalkGenerator::TalkGenerator(QObject* parent): QObject(parent)
 {
-
 }
 
 //! \brief Creates Talkfiles.
@@ -257,16 +256,17 @@ void TalkGenerator::abort()
     m_abort = true;
 }
 
-QString TalkGenerator::correctString(QString s)
+QString TalkGenerator::correctString(const QString& s)
 {
     QString corrected = s;
     int i = 0;
     int max = m_corrections.size();
     while(i < max) {
         corrected = corrected.replace(QRegularExpression(m_corrections.at(i).search,
-                m_corrections.at(i).modifier.contains("i")
-                    ? QRegularExpression::NoPatternOption
-                    : QRegularExpression::CaseInsensitiveOption),
+                (m_corrections.at(i).modifier.contains("i")
+                    ? QRegularExpression::CaseInsensitiveOption
+                    : QRegularExpression::NoPatternOption)
+                | QRegularExpression::UseUnicodePropertiesOption),
                 m_corrections.at(i).replace);
         i++;
     }
@@ -277,7 +277,7 @@ QString TalkGenerator::correctString(QString s)
     return corrected;
 }
 
-void TalkGenerator::setLang(QString name)
+void TalkGenerator::setLang(const QString& name)
 {
     m_lang = name;
 
@@ -287,7 +287,7 @@ void TalkGenerator::setLang(QString name)
     correctionsFile.open(QIODevice::ReadOnly);
 
     QString engine = RbSettings::value(RbSettings::Tts).toString();
-    TTSBase* tts = TTSBase::getTTS(this,RbSettings::value(RbSettings::Tts).toString());
+    TTSBase* tts = TTSBase::getTTS(this, RbSettings::value(RbSettings::Tts).toString());
     if(!tts)
     {
         LOG_ERROR() << "getting the TTS object failed!";
@@ -313,16 +313,16 @@ void TalkGenerator::setLang(QString name)
         if(items.size() < 6)
             continue;
 
-        QRegExp re_lang(items.at(0));
-        QRegExp re_engine(items.at(1));
-        QRegExp re_vendor(items.at(2));
-        if(!re_lang.exactMatch(m_lang)) {
+        QRegularExpression re_lang(items.at(0));
+        QRegularExpression re_engine(items.at(1));
+        QRegularExpression re_vendor(items.at(2));
+        if(!re_lang.match(m_lang).hasMatch()) {
             continue;
         }
-        if(!re_vendor.exactMatch(vendor)) {
+        if(!re_vendor.match(vendor).hasMatch()) {
             continue;
         }
-        if(!re_engine.exactMatch(engine)) {
+        if(!re_engine.match(engine).hasMatch()) {
             continue;
         }
         struct CorrectionItems co;

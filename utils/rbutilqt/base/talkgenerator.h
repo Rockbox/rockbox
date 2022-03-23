@@ -53,11 +53,11 @@ public:
     TalkGenerator(QObject* parent);
 
     Status process(QList<TalkEntry>* list,int wavtrimth = -1);
-    QString correctString(QString s);
+    QString correctString(const QString& s);
 
 public slots:
     void abort();
-    void setLang(QString name);
+    void setLang(const QString& name);
 
 signals:
     void done(bool);
