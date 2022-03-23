@@ -20,7 +20,7 @@
 #include <QProgressDialog>
 #include <QFileDialog>
 #include <QUrl>
-#ifdef QT_MULTIMEDIA_LIB
+#if defined(QT_MULTIMEDIA_LIB) && (QT_VERSION < 0x060000)
 #include <QSound>
 #endif
 
@@ -444,7 +444,7 @@ void Config::updateTtsState(int index)
     {
         ui.configTTSstatus->setText(tr("Configuration OK"));
         ui.configTTSstatusimg->setPixmap(QPixmap(QString::fromUtf8(":/icons/go-next.svg")));
-#ifdef QT_MULTIMEDIA_LIB
+#if defined(QT_MULTIMEDIA_LIB) && (QT_VERSION < 0x060000)
         ui.testTTS->setEnabled(true);
 #else
         ui.testTTS->setEnabled(false);
@@ -894,7 +894,7 @@ void Config::configTts()
 
 void Config::testTts()
 {
-#ifdef QT_MULTIMEDIA_LIB
+#if defined(QT_MULTIMEDIA_LIB) && (QT_VERSION < 0x060000)
     QString errstr;
     int index = ui.comboTts->currentIndex();
     TTSBase* tts;
