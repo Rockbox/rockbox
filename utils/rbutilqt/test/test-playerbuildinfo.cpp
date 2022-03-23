@@ -212,10 +212,10 @@ void TestPlayerBuildInfo::testBuildInfo()
 
     RbSettings::setValue(RbSettings::CurrentPlatform, target);
     QVariant result = PlayerBuildInfo::instance()->value(item, type);
-    if(result.canConvert(QMetaType::QString))
-        QCOMPARE(result.toString(), QString(expected));
-    else
+    if(result.canConvert(QMetaType::QStringList))
         QCOMPARE(result.toStringList().join(","), QString(expected));
+    else
+        QCOMPARE(result.toString(), QString(expected));
 }
 
 
@@ -252,10 +252,10 @@ void TestPlayerBuildInfo::testPlayerInfo()
     QFETCH(QString, expected);
 
     QVariant result = PlayerBuildInfo::instance()->value(item, target);
-    if(result.canConvert(QMetaType::QString))
-        QCOMPARE(result.toString(), QString(expected));
-    else
+    if(result.canConvert(QMetaType::QStringList))
         QCOMPARE(result.toStringList().join(","), QString(expected));
+    else
+        QCOMPARE(result.toString(), QString(expected));
 }
 
 

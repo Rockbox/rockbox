@@ -137,9 +137,9 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
         break;
     }
 
-    QVariant result = QString();
+    QVariant result;
     if (!serverInfo)
-        return result;
+        return QString();
     QStringList version = serverInfo->value(buildtypename + "/" + target, "").toStringList();
     serverinfo.replace(":build:", buildtypename);
     serverinfo.replace(":version:", version.at(0));
@@ -149,7 +149,7 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
     // For invalid data return an empty string.
     if(version.at(0).isEmpty()) {
         LOG_INFO() << serverinfo << "(version invalid)";
-        return result;
+        return QString();
     }
     if(!serverinfo.isEmpty())
         result = serverInfo->value(serverinfo);
@@ -189,7 +189,11 @@ QVariant PlayerBuildInfo::value(BuildInfo item, BuildType type)
     // if the value is a string we can replace some patterns.
     // if we cannot convert it (f.e. for a QStringList) we leave as-is, since
     // the conversion would return an empty type.
-    if (result.canConvert(QMetaType::QString))
+#if QT_VERSION < 0x060000
+    if (result.type() == QVariant::String)
+#else
+    if (result.metaType().id() == QMetaType::QString)
+#endif
         result = result.toString()
                     .replace("%TARGET%", target)
                     .replace("%VERSION%", version.at(0));
