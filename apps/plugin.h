@@ -49,6 +49,7 @@
 
 char* strncpy(char *, const char *, size_t);
 void* plugin_get_buffer(size_t *buffer_size);
+size_t plugin_reserve_buffer(size_t buffer_size);
 int plugin_open(const char *plugin, const char *parameter);
 
 #ifndef __PCTOOL__
@@ -935,6 +936,7 @@ struct plugin_api {
     void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
     void (*queue_remove_from_head)(struct event_queue *q, long id);
     int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
+    size_t (*plugin_reserve_buffer)(size_t buffer_size);
 };
 
 /* plugin header */

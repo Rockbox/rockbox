@@ -809,6 +809,7 @@ static const struct plugin_api rockbox_api = {
     onplay_show_playlist_menu,
     queue_remove_from_head,
     core_set_keyremap,
+    plugin_reserve_buffer,
 };
 
 static int plugin_buffer_handle;
@@ -961,6 +962,27 @@ int plugin_load(const char* plugin, const void* parameter)
         splash(HZ*2, str(LANG_PLUGIN_ERROR));
 
     return rc;
+}
+
+/* For Terminate Stay Resident plugins
+ * Locks buffer_size bytes of the plugin buffer
+ * freed on plugin exit; call plugin_get_buffer first then reserve all
+ * or a portion with plugin_reserve_buffer()
+ * Returns size of buffer remaining */
+size_t plugin_reserve_buffer(size_t buffer_size)
+{
+    size_t locked_size = 0;
+
+    if (current_plugin_handle)
+    {
+        locked_size = ALIGN_UP(plugin_size + buffer_size, 0x8);
+        if (locked_size > PLUGIN_BUFFER_SIZE)
+            locked_size = PLUGIN_BUFFER_SIZE;
+
+        plugin_size = locked_size;
+    }
+
+    return (PLUGIN_BUFFER_SIZE - locked_size);
 }
 
 /* Returns a pointer to the portion of the plugin buffer that is not already
