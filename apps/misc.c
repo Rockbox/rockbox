@@ -58,7 +58,6 @@
 #include "font.h"
 #include "splash.h"
 #include "tagcache.h"
-#include "scrobbler.h"
 #include "sound.h"
 #include "playlist.h"
 #include "yesno.h"
@@ -365,7 +364,6 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
 #if defined(HAVE_RECORDING)
             audio_close_recording();
 #endif
-            scrobbler_shutdown(true);
 
             system_flush();
 #ifdef HAVE_EEPROM_SETTINGS

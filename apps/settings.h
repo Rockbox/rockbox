@@ -503,7 +503,6 @@ struct user_settings
     int single_mode;    /* single mode - stop after every track, album, album artist,
                            artist, composer, work, or genre */
     bool party_mode;    /* party mode - unstoppable music */
-    bool audioscrobbler; /* Audioscrobbler logging  */
     bool cuesheet;
     bool car_adapter_mode; /* 0=off 1=on */
     int car_adapter_mode_delay; /* delay before resume,  in seconds*/

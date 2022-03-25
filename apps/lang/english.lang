@@ -1772,16 +1772,16 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </dest>
   <voice>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </voice>
 </phrase>
 <phrase>

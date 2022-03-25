@@ -31,7 +31,6 @@
 #include "sound_menu.h"
 #include "kernel.h"
 #include "playlist.h"
-#include "scrobbler.h"
 #include "audio.h"
 #include "cuesheet.h"
 #include "misc.h"
@@ -150,26 +149,6 @@ MENUITEM_SETTING(spdif_enable, &global_settings.spdif_enable, NULL);
 MENUITEM_SETTING(next_folder, &global_settings.next_folder, NULL);
 MENUITEM_SETTING(constrain_next_folder,
                  &global_settings.constrain_next_folder, NULL);
-static int audioscrobbler_callback(int action,
-                                   const struct menu_item_ex *this_item,
-                                   struct gui_synclist *this_list)
-{
-    (void)this_item;
-    (void)this_list;
-    switch (action)
-    {
-        case ACTION_EXIT_MENUITEM: /* on exit */
-            if (!scrobbler_is_enabled() && global_settings.audioscrobbler)
-                scrobbler_init();
-
-            if(scrobbler_is_enabled() && !global_settings.audioscrobbler)
-                scrobbler_shutdown(false);
-            break;
-    }
-    return action;
-}
-MENUITEM_SETTING(audioscrobbler, &global_settings.audioscrobbler, audioscrobbler_callback);
-
 
 static int cuesheet_callback(int action,
                              const struct menu_item_ex *this_item,
@@ -242,7 +221,7 @@ MAKE_MENU(playback_settings,ID2P(LANG_PLAYBACK),0,
 #ifdef HAVE_SPDIF_POWER
           &spdif_enable,
 #endif
-          &next_folder, &constrain_next_folder, &audioscrobbler, &cuesheet
+          &next_folder, &constrain_next_folder, &cuesheet
 #ifdef HAVE_HEADPHONE_DETECTION
          ,&unplug_menu
 #endif

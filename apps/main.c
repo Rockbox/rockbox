@@ -70,7 +70,6 @@
 #include "string.h"
 #include "splash.h"
 #include "eeprom_settings.h"
-#include "scrobbler.h"
 #include "icon.h"
 #include "viewport.h"
 #include "skin_engine/skin_engine.h"
@@ -373,9 +372,6 @@ static void init(void)
     playlist_init();
     shortcuts_init();
 
-    if (global_settings.audioscrobbler)
-        scrobbler_init();
-
     audio_init();
     talk_announce_voice_invalid(); /* notify user w/ voice prompt if voice file invalid */
     settings_apply_skins();
@@ -629,9 +625,6 @@ static void init(void)
     playlist_init();
     tree_mem_init();
     filetype_init();
-
-    if (global_settings.audioscrobbler)
-        scrobbler_init();
 
     shortcuts_init();
 
