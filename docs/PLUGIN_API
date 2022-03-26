@@ -211,22 +211,7 @@ bool bufclose(int handle_id)
     \return
     \description
 
-ssize_t bufcuttail(int handle_id, size_t size)
-    \group buffering API
-    \param handle_id
-    \param size
-    \return
-    \description
-
 ssize_t bufgetdata(int handle_id, size_t size, void **data)
-    \group buffering API
-    \param handle_id
-    \param size
-    \param data
-    \return
-    \description
-
-ssize_t bufgettail(int handle_id, size_t size, void **data)
     \group buffering API
     \param handle_id
     \param size

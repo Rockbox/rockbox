@@ -333,7 +333,6 @@ void wipe_mp3entry(struct mp3entry *id3);
 
 void fill_metadata_from_path(struct mp3entry *id3, const char *trackname);
 int get_audio_base_codec_type(int type);
-void strip_tags(int handle_id);
 bool rbcodec_format_is_atomic(int afmt);
 bool format_buffers_with_offset(int afmt);
 
