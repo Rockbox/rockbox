@@ -355,7 +355,9 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
     {
         logf("Added %s", scrobbler_buf);
         gCache.pos++;
+#if USING_STORAGE_CALLBACK
         rb->register_storage_idle_func(scrobbler_flush_callback);
+#endif
     }
 
 }
@@ -466,7 +468,12 @@ void thread(void)
                 gCache.force_flush = true;
                 /*fall through*/
             case EV_EXIT:
+#if USING_STORAGE_CALLBACK
                 rb->unregister_storage_idle_func(scrobbler_flush_callback, !in_usb);
+#else
+                if (!in_usb)
+                    scrobbler_flush_cache();
+#endif
                 return;
             case EV_OTHINSTANCE:
                 scrobbler_flush_cache();
