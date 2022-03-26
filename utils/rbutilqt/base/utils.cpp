@@ -634,7 +634,7 @@ QString Utils::resolveMountPoint(QString device)
     QString result;
     unsigned int driveno = device.replace(QRegularExpression("^.*([0-9]+)"), "\\1").toInt();
 
-    int letter;
+    char letter;
     for(letter = 'A'; letter <= 'Z'; letter++) {
         if(resolveDevicename(QString(letter)).toUInt() == driveno) {
             result = letter;
