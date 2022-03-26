@@ -307,8 +307,8 @@ static inline void cpu_boost_unlock(void)
 
 /* Define MEM_ALIGN_ATTR which may be used to align e.g. buffers for faster
  * access. */
-#if defined(CPU_ARM)
-    /* Use ARMs cache alignment. */
+#if defined(HAVE_CPU_CACHE_ALIGN)
+    /* Align to a cache line. */
     #define MEM_ALIGN_ATTR CACHEALIGN_ATTR
     #define MEM_ALIGN_SIZE CACHEALIGN_SIZE
 #elif defined(CPU_COLDFIRE)
