@@ -33,7 +33,6 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 #define logf(...) do { } while(0)
 #endif
 
-
 /****************** constants ******************/
 #define EV_EXIT        MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0xFF)
 #define EV_OTHINSTANCE MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0xFE)
@@ -299,6 +298,7 @@ static void scrobbler_write_cache(void)
     gCache.pos = 0;
 }
 
+#if USING_STORAGE_CALLBACK
 static void scrobbler_flush_callback(void)
 {
     (void) gCache.force_flush;
@@ -315,6 +315,7 @@ static void scrobbler_flush_callback(void)
         scrobbler_write_cache();
     }
 }
+#endif
 
 static void scrobbler_add_to_cache(const struct mp3entry *id)
 {
