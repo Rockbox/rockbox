@@ -83,11 +83,13 @@ void power_init(void)
      * OF's setting, although it's not strictly within the USB spec. */
     axp_set_charge_current(780);
 
+#ifdef BOOTLOADER
     /* Delay to give power outputs time to stabilize.
      * With the power thread delay, this can apparently go as low as 50,
      * Keeping a higher value here just to ensure the bootloader works
      * correctly. */
     mdelay(200);
+#endif
 }
 
 #ifdef HAVE_USB_CHARGING_ENABLE
