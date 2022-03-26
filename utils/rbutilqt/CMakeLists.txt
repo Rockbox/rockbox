@@ -109,8 +109,10 @@ if(WIN32)
     target_sources(RockboxUtility PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt-win.qrc
         ${CMAKE_CURRENT_LIST_DIR}/rbutilqt.rc)
-    # needed on Windows, otherwise svg icons won't show.
-    target_link_libraries(RockboxUtility Qt${QT_VERSION_MAJOR}::QSvgIconPlugin)
+    if(QT_VERSION_MAJOR EQUAL 5)
+        # needed on Windows, otherwise svg icons won't show.
+        target_link_libraries(RockboxUtility Qt${QT_VERSION_MAJOR}::QSvgIconPlugin)
+    endif()
 endif()
 if(APPLE)
     # MacOS Application Bundle specifics.
