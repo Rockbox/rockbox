@@ -71,8 +71,6 @@
 /* amount of data to read in one read() call */
 #define BUFFERING_DEFAULT_FILECHUNK      (1024*32)
 
-#define BUF_HANDLE_MASK                  0x7FFFFFFF
-
 enum handle_flags
 {
     H_CANWRAP   = 0x1,   /* Handle data may wrap in buffer */
@@ -295,12 +293,11 @@ static int next_handle_id(void)
 {
     static int cur_handle_id = 0;
 
-    /* Wrap signed int is safe and 0 doesn't happen */
-    int next_hid = (cur_handle_id + 1) & BUF_HANDLE_MASK;
-    if (next_hid == 0)
-        next_hid = 1;
-
-    cur_handle_id = next_hid;
+    int next_hid = cur_handle_id + 1;
+    if (next_hid == INT_MAX)
+        cur_handle_id = 0; /* next would overflow; reset the counter */
+    else
+        cur_handle_id = next_hid;
 
     return next_hid;
 }
