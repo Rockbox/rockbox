@@ -53,7 +53,7 @@ LANGS = {
 }
 
 
-LANGBASE = "rbutil/rbutilqt/"
+LANGBASE = "utils/rbutilqt"
 # Paths and files to retrieve from svn.
 # This is a mixed list, holding both paths and filenames.
 # Get cpp sources as well for lupdate to work.
@@ -75,24 +75,26 @@ def main():
 def langstat(pretty=True, tree=None):
     '''Get translation stats and print to stdout.'''
     # get gitpaths to temporary folder
-    workfolder = tempfile.mkdtemp() + "/"
+    workfolder = tempfile.mkdtemp()
     repo = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
     if tree is None:
         tree = gitscraper.get_refs(repo)['HEAD']
     filesprops = gitscraper.scrape_files(
         repo, tree, GITPATHS, dest=workfolder,
-        timestamp_files=["rbutil/rbutilqt/lang"])
+        timestamp_files=[f"{LANGBASE}/lang"])
 
-    projectfolder = workfolder + LANGBASE
+    projectfolder = os.path.join(workfolder, LANGBASE)
     # lupdate translations and drop all obsolete translations
-    subprocess.Popen(["lupdate", "-no-obsolete", "rbutilqt.pro"],
+    subprocess.Popen(["lupdate", "-no-obsolete", projectfolder, "-ts"]
+                     + [f"lang/rbutil_{l}.ts" for l in LANGS],
                      stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                      cwd=projectfolder).communicate()
     # lrelease translations to get status
-    output = subprocess.Popen(["lrelease", "rbutilqt.pro"],
+    output = subprocess.Popen(["lrelease"]
+                              + [f"lang/rbutil_{l}.ts" for l in LANGS],
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                               cwd=projectfolder).communicate()
-    lines = re.split(r"\n", output[0].decode())
+    lines = output[0].decode().split("\n")
 
     re_updating = re.compile(r"^Updating.*")
     re_generated = re.compile(r"Generated.*")
@@ -124,9 +126,8 @@ def langstat(pretty=True, tree=None):
         print(head)
         print(delim)
     else:
-        rev = "%s (%s)" % (
-            tree, gitscraper.get_file_timestamp(repo, tree, "."))
-        print("|  *Translation status as of revision %s*  ||||||||" % rev)
+        rev = f"{tree} {gitscraper.get_file_timestamp(repo, tree, '.')}"
+        print(f"|  *Translation status as of revision {rev}*  ||||||||")
         print("| *Language* | *Language Code* | *Translations* "
               "| *Finished* | *Unfinished* | *Untranslated* | *Updated* "
               "| *Done* |")
@@ -135,7 +136,7 @@ def langstat(pretty=True, tree=None):
     for i, line in enumerate(lines):
         if re_updating.search(line):
             lang = re_qmlang.findall(line)
-            tsfile = "rbutil/rbutilqt/lang/%s.ts" % re_qmbase.findall(line)[0]
+            tsfile = f"{LANGBASE}/lang/{re_qmbase.findall(line)[0]}.ts"
             tsdate = filesprops[1][tsfile]
 
             line = lines[i + 1]
@@ -166,11 +167,10 @@ def langstat(pretty=True, tree=None):
             else:
                 fancylang = lang[0]
             if pretty:
-                print(("| {:%i} | {:5} | {:3} | {:3} | {:3} | {:3} | {:25} | "
-                       "{:3}%% {} |"
-                       % titlemax).format(
-                           name, fancylang, translations, finished, unfinished,
-                           ignored, tsdate, int(percent), progress))
+                print(f"| {name:{titlemax}} | {fancylang:5} | "
+                      f"{translations:3} | {finished:3} | {unfinished:3} | "
+                      f"{ignored:3} | {tsdate:25} | "
+                      f"{int(percent):3}% {progress} |")
             else:
                 if percent > 90:
                     color = r'%GREEN%'
@@ -180,10 +180,9 @@ def langstat(pretty=True, tree=None):
                     else:
                         color = r'%RED%'
 
-                print("| %s | %s | %s | %s | %s | %s | %s | %s %i%% "
-                      "%%ENDCOLOR%% %s |" %
-                      (name, fancylang, translations, finished, unfinished,
-                       ignored, tsdate, color, percent, progress))
+                print(f"| {name} | {fancylang} | {translations} | {finished} "
+                      f"| {unfinished} | {ignored} | {tsdate} | {color} "
+                      f"{percent:.1f}% %ENDCOLOR% {progress} |")
 
     if pretty:
         print(delim)
