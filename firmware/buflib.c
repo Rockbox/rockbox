@@ -664,23 +664,22 @@ find_block_before(struct buflib_context *ctx, union buflib_data* block,
     union buflib_data *ret        = ctx->buf_start,
                       *next_block = ret;
 
+    /* no previous block */
+    if (next_block == block)
+        return NULL;
+
     /* find the block that's before the current one */
-    while (next_block < block)
+    while (next_block != block)
     {
         ret = next_block;
         next_block += abs(ret->val);
     }
 
-    /* If next_block == block, the above loop didn't go anywhere. If it did,
-     * and the block before this one is empty, that is the wanted one
-     */
-    if (next_block == block && ret < block)
-    {
-        if (is_free && ret->val >= 0) /* NULL if found block isn't free */
-            return NULL;
-        return ret;
-    }
-    return NULL;
+    /* don't return it if the found block isn't free */
+    if (is_free && ret->val >= 0)
+        return NULL;
+
+    return ret;
 }
 
 /* Free the buffer associated with handle_num. */
