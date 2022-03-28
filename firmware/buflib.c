@@ -144,7 +144,7 @@ bool buflib_context_relocate(struct buflib_context *ctx, void *buf)
 
     /* cannot continue if the buffer is not aligned, since we would need
      * to reduce the size of the buffer for aligning */
-    if ((uintptr_t)buf & 0x3)
+    if (!IS_ALIGNED((uintptr_t)buf, sizeof(union buflib_data)))
         return false;
 
     /* relocate the handle table entries  */
