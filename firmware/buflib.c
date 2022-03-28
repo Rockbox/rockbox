@@ -207,7 +207,11 @@ union buflib_data* handle_alloc(struct buflib_context *ctx)
      * and the found handle, therefore we can update first_free_handle */
     ctx->first_free_handle = handle - 1;
 
+    /* We need to set the table entry to a non-NULL value to ensure that
+     * compactions triggered by an allocation do not compact the handle
+     * table and delete this handle. */
     handle->val = -1;
+
     return handle;
 }
 
@@ -613,7 +617,6 @@ buffer_alloc:
         {
             goto buffer_alloc;
         } else {
-            handle->val=1;
             handle_free(ctx, handle);
             return -2;
         }
