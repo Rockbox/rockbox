@@ -247,18 +247,20 @@ union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
 /* Shrink the handle table, returning true if its size was reduced, false if
  * not
  */
-static inline
-bool
-handle_table_shrink(struct buflib_context *ctx)
+static inline bool handle_table_shrink(struct buflib_context *ctx)
 {
-    bool rv;
     union buflib_data *handle;
-    for (handle = ctx->last_handle; !(handle->alloc); handle++);
+    union buflib_data *old_last = ctx->last_handle;
+
+    for (handle = ctx->last_handle; handle != ctx->handle_table; ++handle)
+        if (handle->alloc)
+            break;
+
     if (handle > ctx->first_free_handle)
         ctx->first_free_handle = handle - 1;
-    rv = handle != ctx->last_handle;
+
     ctx->last_handle = handle;
-    return rv;
+    return handle != old_last;
 }
 
 
