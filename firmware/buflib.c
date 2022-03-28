@@ -196,8 +196,17 @@ union buflib_data* handle_alloc(struct buflib_context *ctx)
         if (handle >= ctx->alloc_end)
             ctx->last_handle--;
         else
+        {
+            /* We know the table is full, so update first_free_handle */
+            ctx->first_free_handle = ctx->last_handle - 1;
             return NULL;
+        }
     }
+
+    /* We know there are no free handles between the old first_free_handle
+     * and the found handle, therefore we can update first_free_handle */
+    ctx->first_free_handle = handle - 1;
+
     handle->val = -1;
     return handle;
 }
