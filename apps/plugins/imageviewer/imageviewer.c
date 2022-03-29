@@ -616,11 +616,19 @@ static int scroll_bmp(struct image_info *info)
 
         case IMGVIEW_UP:
         case IMGVIEW_UP | BUTTON_REPEAT:
+#ifdef IMGVIEW_SCROLL_UP
+        case IMGVIEW_SCROLL_UP:
+        case IMGVIEW_SCROLL_UP | BUTTON_REPEAT:
+#endif
             pan_view_up(info);
             break;
 
         case IMGVIEW_DOWN:
         case IMGVIEW_DOWN | BUTTON_REPEAT:
+#ifdef IMGVIEW_SCROLL_DOWN
+        case IMGVIEW_SCROLL_DOWN:
+        case IMGVIEW_SCROLL_DOWN | BUTTON_REPEAT:
+#endif
             pan_view_down(info);
             break;
 
