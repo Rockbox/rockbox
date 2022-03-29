@@ -49,7 +49,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 /* longest entry I've had is 323, add a safety margin */
 #define SCROBBLER_CACHE_LEN 512
 
-#define ITEM_HDR "#ARTIST #ALBUM #TITLE #TRACKNUM #LENGTH #RATING #TIMESTAMMP #MUSICBRAINZ_TRACKID\n"
+#define ITEM_HDR "#ARTIST #ALBUM #TITLE #TRACKNUM #LENGTH #RATING #TIMESTAMP #MUSICBRAINZ_TRACKID\n"
 
 #if CONFIG_RTC
 static time_t timestamp;
@@ -338,14 +338,14 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
     int ret = rb->snprintf(&scrobbler_buf[(SCROBBLER_CACHE_LEN*gCache.pos)],
                        SCROBBLER_CACHE_LEN,
                        "%s\t%s\t%s\t%s\t%d\t%c\t%ld\t%s\n",
-                       id->artist,
-                       id->album ?: "",
+                       id->artist ? id->artist : id->albumartist,
+                       id->album,
                        id->title,
                        tracknum,
                        (int)(id->length / 1000),
                        rating,
                        get_timestamp(),
-                       id->mb_track_id ?id->mb_track_id: "");
+                       id->mb_track_id);
 
     if ( ret >= SCROBBLER_CACHE_LEN )
     {
@@ -389,7 +389,8 @@ static void scrobbler_change_event(unsigned short id, void *ev_data)
 
     /*  check if track was resumed > %50 played ( likely got saved )
         check for blank artist or track name */
-    if ((id3->elapsed > id3->length / 2) || !id3->artist || !id3->title)
+    if ((id3->elapsed > id3->length / 2)
+        || (!id3->artist && !id3->albumartist) || !id3->title)
     {
         gCache.pending = false;
         logf("SCROBBLER: skipping file %s", id3->path);
