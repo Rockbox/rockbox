@@ -101,6 +101,7 @@
 #define PARANOIA_CHECK_LENGTH       (1 << 0)
 #define PARANOIA_CHECK_HANDLE       (1 << 1)
 #define PARANOIA_CHECK_BLOCK_HANDLE (1 << 2)
+#define PARANOIA_CHECK_CRC          (1 << 3)
 /* Bitmask of enabled paranoia checks */
 #define BUFLIB_PARANOIA 0
 
@@ -165,6 +166,16 @@ static void check_handle(struct buflib_context *ctx,
  */
 static void check_block_handle(struct buflib_context *ctx,
                                union buflib_data *block);
+
+/* Update the block's CRC checksum if CRCs are enabled. */
+static void update_block_crc(struct buflib_context *ctx,
+                             union buflib_data *block,
+                             union buflib_data *block_end);
+
+/* Check the block's CRC if CRCs are enabled. */
+static void check_block_crc(struct buflib_context *ctx,
+                            union buflib_data *block,
+                            union buflib_data *block_end);
 
 /* Initialize buffer manager */
 void
@@ -334,14 +345,6 @@ static inline bool handle_table_shrink(struct buflib_context *ctx)
     return handle != old_last;
 }
 
-static uint32_t calc_block_crc(union buflib_data *block,
-                               union buflib_data *block_end)
-{
-    union buflib_data *crc_slot = &block_end[-bidx_CRC];
-    const size_t size = (crc_slot - block) * sizeof(*block);
-    return crc_32(block, size, 0xffffffff);
-}
-
 /* If shift is non-zero, it represents the number of places to move
  * blocks in memory. Calculate the new address for this block,
  * update its entry in the handle table, and then move its contents.
@@ -358,11 +361,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     check_block_handle(ctx, block);
     union buflib_data *h_entry = block[fidx_HANDLE].handle;
     union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
-
-    uint32_t crc = calc_block_crc(block, block_end);
-    if (crc != block_end[-bidx_CRC].crc)
-        buflib_panic(ctx, "buflib metadata corrupted, crc: 0x%08x, expected: 0x%08x",
-               (unsigned int)crc, (unsigned int)block_end[-bidx_CRC].crc);
+    check_block_crc(ctx, block, block_end);
 
     if (!IS_MOVABLE(block))
         return false;
@@ -722,13 +721,12 @@ buffer_alloc:
     size_t bsize = BUFLIB_NUM_FIELDS + name_len/sizeof(union buflib_data);
     union buflib_data *block_end = block + bsize;
     block_end[-bidx_BSIZE].val = bsize;
-    block_end[-bidx_CRC].crc = calc_block_crc(block, block_end);
+    update_block_crc(ctx, block, block_end);
 
     handle->alloc = (char*)&block_end[-bidx_USER];
 
-    BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p crc=0x%0x name=\"%s\"\n",
-            (unsigned int)size, (void *)handle, (void *)ops,
-            (unsigned int)block_end[-bidx_CRC].crc, name ? name : "");
+    BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p name=\"%s\"\n",
+            (unsigned int)size, (void *)handle, (void *)ops, name ? name : "");
 
     block += size;
     /* alloc_end must be kept current if we're taking the last block. */
@@ -1000,7 +998,7 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
     /* update crc of the metadata */
     union buflib_data *new_h_entry = new_block[fidx_HANDLE].handle;
     union buflib_data *new_block_end = h_entry_to_block_end(ctx, new_h_entry);
-    new_block_end[-bidx_CRC].crc = calc_block_crc(new_block, new_block_end);
+    update_block_crc(ctx, new_block, new_block_end);
 
     /* Now deal with size changes that create free blocks after the allocation */
     if (old_next_block != new_next_block)
@@ -1055,12 +1053,7 @@ void buflib_check_valid(struct buflib_context *ctx)
         check_block_handle(ctx, block);
         union buflib_data *h_entry = block[fidx_HANDLE].handle;
         union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
-        uint32_t crc = calc_block_crc(block, block_end);
-        if (crc != block_end[-bidx_CRC].crc)
-        {
-            buflib_panic(ctx, "crc mismatch: 0x%08x, expected: 0x%08x",
-                         (unsigned int)crc, (unsigned int)block_end[-bidx_CRC].crc);
-        }
+        check_block_crc(ctx, block, block_end);
     }
 }
 #endif
@@ -1214,6 +1207,43 @@ static void check_block_handle(struct buflib_context *ctx,
         {
             buflib_panic(ctx, "alloc outside block [%p]=%p, %p-%p",
                          h_entry, alloc, alloc_begin, alloc_end);
+        }
+    }
+}
+
+static uint32_t calc_block_crc(union buflib_data *block,
+                               union buflib_data *block_end)
+{
+    union buflib_data *crc_slot = &block_end[-bidx_CRC];
+    const size_t size = (crc_slot - block) * sizeof(*block);
+    return crc_32(block, size, 0xffffffff);
+}
+
+static void update_block_crc(struct buflib_context *ctx,
+                             union buflib_data *block,
+                             union buflib_data *block_end)
+{
+    (void)ctx;
+
+    if (BUFLIB_PARANOIA & PARANOIA_CHECK_CRC)
+    {
+        block_end[-bidx_CRC].crc = calc_block_crc(block, block_end);
+    }
+}
+
+static void check_block_crc(struct buflib_context *ctx,
+                            union buflib_data *block,
+                            union buflib_data *block_end)
+{
+    if (BUFLIB_PARANOIA & PARANOIA_CHECK_CRC)
+    {
+        uint32_t crc = calc_block_crc(block, block_end);
+        if (block_end[-bidx_CRC].crc != crc)
+        {
+            buflib_panic(ctx, "buflib crc mismatch [%p]=%08lx, got %08lx",
+                         &block_end[-bidx_CRC],
+                         (unsigned long)block_end[-bidx_CRC].crc,
+                         (unsigned long)crc);
         }
     }
 }
