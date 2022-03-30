@@ -25,10 +25,6 @@ void core_check_valid(void);
 /* DO NOT ADD wrappers for buflib_buffer_out/in. They do not call
  * the move callbacks and are therefore unsafe in the core */
 
-#ifdef BUFLIB_DEBUG_BLOCKS
-void core_print_allocs(void (*print)(const char*));
-void core_print_blocks(void (*print)(const char*));
-#endif
 #ifdef BUFLIB_DEBUG_BLOCK_SINGLE
 int  core_get_num_blocks(void);
 void core_print_block_at(int block_num, char* buf, size_t bufsize);

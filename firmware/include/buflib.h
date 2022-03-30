@@ -342,27 +342,6 @@ void buflib_buffer_in(struct buflib_context *ctx, int size);
 const char* buflib_get_name(struct buflib_context *ctx, int handle);
 
 /**
- * Prints an overview of all current allocations with the help
- * of the passed printer helper
- *
- * This walks only the handle table and prints only valid allocations
- *
- * Only available if BUFLIB_DEBUG_BLOCKS is defined
- */
-void buflib_print_allocs(struct buflib_context *ctx, void (*print)(int, const char*));
-
-/**
- * Prints an overview of all blocks in the buflib buffer, allocated
- * or unallocated, with the help of the passed printer helper
- *
- * This walks the entire buffer and prints unallocated space also.
- * The output is also different from buflib_print_allocs().
- *
- * Only available if BUFLIB_DEBUG_BLOCKS is defined
- */
-void buflib_print_blocks(struct buflib_context *ctx, void (*print)(int, const char*));
-
-/**
  * Gets the number of blocks in the entire buffer, allocated or unallocated
  *
  * Only available if BUFLIB_DEBUG_BLOCK_SIGNLE is defined

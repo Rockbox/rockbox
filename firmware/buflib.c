@@ -1068,52 +1068,6 @@ void buflib_check_valid(struct buflib_context *ctx)
 }
 #endif
 
-#ifdef BUFLIB_DEBUG_BLOCKS
-void buflib_print_allocs(struct buflib_context *ctx,
-                                        void (*print)(int, const char*))
-{
-    union buflib_data *this, *end = ctx->handle_table;
-    char buf[128];
-    for(this = end - 1; this >= ctx->last_handle; this--)
-    {
-        if (!this->alloc) continue;
-
-        int handle_num = end - this;
-        void* alloc_start = this->alloc;
-        union buflib_data *block_start = handle_to_block(ctx, handle_num);
-        const char* name = buflib_get_name(ctx, handle_num);
-        intptr_t alloc_len = block_start[fidx_LEN];
-
-        snprintf(buf, sizeof(buf),
-                "%s(%d):\t%p\n"
-                "   \t%p\n"
-                "   \t%ld\n",
-                name?:"(null)", handle_num, block_start, alloc_start, alloc_len);
-        /* handle_num is 1-based */
-        print(handle_num - 1, buf);
-    }
-}
-
-void buflib_print_blocks(struct buflib_context *ctx,
-                                        void (*print)(int, const char*))
-{
-    char buf[128];
-    int i = 0;
-
-    for(union buflib_data *block = ctx->buf_start;
-        block != ctx->alloc_end;
-        block += abs(block->val))
-    {
-        check_block_length(ctx, block);
-
-        snprintf(buf, sizeof(buf), "%8p: val: %4ld (%s)",
-                 block, (long)block->val,
-                 block->val > 0 ? block[fidx_NAME].name : "<unallocated>");
-        print(i++, buf);
-    }
-}
-#endif
-
 #ifdef BUFLIB_DEBUG_BLOCK_SINGLE
 int buflib_get_num_blocks(struct buflib_context *ctx)
 {
