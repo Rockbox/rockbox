@@ -97,13 +97,34 @@
 
 #define BPANICF panicf
 
+/* Forward indices, used to index a block start pointer as block[fidx_XXX] */
+enum {
+    fidx_LEN,       /* length of the block, must come first */
+    fidx_HANDLE,    /* pointer to entry in the handle table */
+    fidx_OPS,       /* pointer to an ops struct */
+    fidx_NAME,      /* name, optional and variable length, must come last */
+};
+
+/* Backward indices, used to index a block end pointer as block[-bidx_XXX] */
+enum {
+    bidx_USER,      /* dummy to get below fields to be 1-based */
+    bidx_CRC,       /* CRC, protects all metadata behind it */
+    bidx_BSIZE,     /* total size of the block header */
+};
+
+/* Number of fields in the block header, excluding the name, which is
+ * accounted for using the BSIZE field. Note that bidx_USER is not an
+ * actual field so it is not included in the count. */
+#define BUFLIB_NUM_FIELDS   5
+
 struct buflib_callbacks buflib_ops_locked = {
     .move_callback = NULL,
     .shrink_callback = NULL,
     .sync_callback = NULL,
 };
 
-#define IS_MOVABLE(a) (!a[2].ops || a[2].ops->move_callback)
+#define IS_MOVABLE(a) (!a[fidx_OPS].ops || a[fidx_OPS].ops->move_callback)
+
 static union buflib_data* find_first_free(struct buflib_context *ctx);
 static union buflib_data* find_block_before(struct buflib_context *ctx,
                                             union buflib_data* block,
@@ -241,7 +262,7 @@ union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
     if (!data)
         return NULL;
 
-    return data - data[-2].val;
+    return data - data[-bidx_BSIZE].val;
 }
 
 /* Shrink the handle table, returning true if its size was reduced, false if
@@ -263,6 +284,20 @@ static inline bool handle_table_shrink(struct buflib_context *ctx)
     return handle != old_last;
 }
 
+static inline
+union buflib_data* userpointer_to_block_end(void *userpointer)
+{
+    union buflib_data *data = ALIGN_DOWN(userpointer, sizeof(*data));
+    return data;
+}
+
+static uint32_t calc_block_crc(union buflib_data *block,
+                               union buflib_data *block_end)
+{
+    union buflib_data *crc_slot = &block_end[-bidx_CRC];
+    const size_t size = (crc_slot - block) * sizeof(*block);
+    return crc_32(block, size, 0xffffffff);
+}
 
 /* If shift is non-zero, it represents the number of places to move
  * blocks in memory. Calculate the new address for this block,
@@ -275,32 +310,29 @@ static bool
 move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 {
     char* new_start;
+    union buflib_data *new_block;
 
     if (block < ctx->buf_start || block > ctx->alloc_end)
         buflib_panic(ctx, "buflib data corrupted %p", block);
 
-    union buflib_data *new_block, *tmp = block[1].handle, *crc_slot;
-    struct buflib_callbacks *ops = block[2].ops;
-    crc_slot = (union buflib_data*)tmp->alloc - 1;
-    if (crc_slot < ctx->buf_start || crc_slot > ctx->alloc_end)
-        buflib_panic(ctx, "buflib metadata corrupted %p", crc_slot);
+    union buflib_data *h_entry = block[fidx_HANDLE].handle;
+    union buflib_data *block_end = userpointer_to_block_end(h_entry->alloc);
 
-    const int metadata_size = (crc_slot - block)*sizeof(union buflib_data);
-    uint32_t crc = crc_32((void *)block, metadata_size, 0xffffffff);
-
-    /* check for metadata validity */
-    if (crc != crc_slot->crc)
+    uint32_t crc = calc_block_crc(block, block_end);
+    if (crc != block_end[-bidx_CRC].crc)
         buflib_panic(ctx, "buflib metadata corrupted, crc: 0x%08x, expected: 0x%08x",
-               (unsigned int)crc, (unsigned int)crc_slot->crc);
+               (unsigned int)crc, (unsigned int)block_end[-bidx_CRC].crc);
 
     if (!IS_MOVABLE(block))
         return false;
 
-    int handle = ctx->handle_table - tmp;
-    BDEBUGF("%s(): moving \"%s\"(id=%d) by %d(%d)\n", __func__, block[3].name,
-            handle, shift, shift*(int)sizeof(union buflib_data));
+    int handle = ctx->handle_table - h_entry;
+    BDEBUGF("%s(): moving \"%s\"(id=%d) by %d(%d)\n", __func__,
+            block[fidx_NAME].name, handle, shift, shift*(int)sizeof(union buflib_data));
     new_block = block + shift;
-    new_start = tmp->alloc + shift*sizeof(union buflib_data);
+    new_start = h_entry->alloc + shift*sizeof(union buflib_data);
+
+    struct buflib_callbacks *ops = block[fidx_OPS].ops;
 
     /* If move must be synchronized with use, user should have specified a
        callback that handles this */
@@ -308,10 +340,10 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
         ops->sync_callback(handle, true);
 
     bool retval = false;
-    if (!ops || ops->move_callback(handle, tmp->alloc, new_start)
+    if (!ops || ops->move_callback(handle, h_entry->alloc, new_start)
                     != BUFLIB_CB_CANNOT_MOVE)
     {
-        tmp->alloc = new_start; /* update handle table */
+        h_entry->alloc = new_start; /* update handle table */
         memmove(new_block, block, block->val * sizeof(union buflib_data));
         retval = true;
     }
@@ -424,41 +456,50 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
             this < ctx->alloc_end;
             before = this, this += abs(this->val))
         {
-            if (this->val > 0 && this[2].ops
-                              && this[2].ops->shrink_callback)
+            if (this->val <= 0)
+                continue;
+
+            struct buflib_callbacks *ops = this[fidx_OPS].ops;
+            if (!ops || !ops->shrink_callback)
+                continue;
+
+            union buflib_data* h_entry = this[fidx_HANDLE].handle;
+            int handle = ctx->handle_table - h_entry;
+
+            unsigned pos_hints = shrink_hints & BUFLIB_SHRINK_POS_MASK;
+            /* adjust what we ask for if there's free space in the front
+             * this isn't too unlikely assuming this block is
+             * shrinkable but not movable */
+            if (pos_hints == BUFLIB_SHRINK_POS_FRONT &&
+                before != this && before->val < 0)
             {
-                int ret;
-                int handle = ctx->handle_table - this[1].handle;
-                char* data = this[1].handle->alloc;
-                bool last = (this+this->val) == ctx->alloc_end;
-                unsigned pos_hints = shrink_hints & BUFLIB_SHRINK_POS_MASK;
-                /* adjust what we ask for if there's free space in the front
-                 * this isn't too unlikely assuming this block is
-                 * shrinkable but not movable */
-                if (pos_hints == BUFLIB_SHRINK_POS_FRONT
-                    && before != this && before->val < 0)
-                {   
-                    size_t free_space = (-before->val) * sizeof(union buflib_data);
-                    size_t wanted = shrink_hints & BUFLIB_SHRINK_SIZE_MASK;
-                    if (wanted < free_space) /* no shrink needed? */
-                        continue;
-                    wanted -= free_space;
-                    shrink_hints = pos_hints | wanted;
-                }
-                ret = this[2].ops->shrink_callback(handle, shrink_hints,
-                                            data, (char*)(this+this->val)-data);
-                result |= (ret == BUFLIB_CB_OK);
-                /* 'this' might have changed in the callback (if it shrinked
-                 * from the top or even freed the handle), get it again */
-                this = handle_to_block(ctx, handle);
-                /* The handle was possibly be freed in the callback,
-                 * re-run the loop with the handle before */
-                if (!this)
-                    this = before;
-                /* could also change with shrinking from back */
-                else if (last)
-                    ctx->alloc_end = this + this->val;
+                size_t free_space = (-before->val) * sizeof(union buflib_data);
+                size_t wanted = shrink_hints & BUFLIB_SHRINK_SIZE_MASK;
+                if (wanted < free_space) /* no shrink needed? */
+                    continue;
+                wanted -= free_space;
+                shrink_hints = pos_hints | wanted;
             }
+
+            char* data = h_entry->alloc;
+            char* data_end = (char*)(this + this->val);
+            bool last = (data_end == (char*)ctx->alloc_end);
+
+            int ret = ops->shrink_callback(handle, shrink_hints,
+                                           data, data_end - data);
+            result |= (ret == BUFLIB_CB_OK);
+
+            /* 'this' might have changed in the callback (if it shrinked
+             * from the top or even freed the handle), get it again */
+            this = handle_to_block(ctx, handle);
+
+            /* The handle was possibly be freed in the callback,
+             * re-run the loop with the handle before */
+            if (!this)
+                this = before;
+            /* could also change with shrinking from back */
+            else if (last)
+                ctx->alloc_end = this + this->val;
         }
         /* shrinking was successful at least once, try compaction again */
         if (result)
@@ -547,9 +588,7 @@ buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
     size += name_len;
     size = (size + sizeof(union buflib_data) - 1) /
            sizeof(union buflib_data)
-           /* add 5 objects for alloc len, pointer to handle table entry and
-            * name length, the ops pointer and crc */
-           + 5;
+           + BUFLIB_NUM_FIELDS;
 handle_alloc:
     handle = handle_alloc(ctx);
     if (!handle)
@@ -559,7 +598,7 @@ handle_alloc:
          */
         union buflib_data* last_block = find_block_before(ctx,
                                             ctx->alloc_end, false);
-        struct buflib_callbacks* ops = last_block[2].ops;
+        struct buflib_callbacks* ops = last_block[fidx_OPS].ops;
         unsigned hints = 0;
         if (!ops || !ops->shrink_callback)
         {   /* the last one isn't shrinkable
@@ -627,23 +666,22 @@ buffer_alloc:
     /* Set up the allocated block, by marking the size allocated, and storing
      * a pointer to the handle.
      */
-    union buflib_data *header_size_slot, *crc_slot;
-    block->val = size;
-    block[1].handle = handle;
-    block[2].ops = ops;
+    block[fidx_LEN].val = size;
+    block[fidx_HANDLE].handle = handle;
+    block[fidx_OPS].ops = ops;
     if (name_len > 0)
-        strcpy(block[3].name, name);
-    header_size_slot = (union buflib_data*)B_ALIGN_UP(block[3].name + name_len);
-    header_size_slot->val = 5 + name_len/sizeof(union buflib_data);
-    crc_slot = (union buflib_data*)(header_size_slot + 1);
-    crc_slot->crc = crc_32((void *)block,
-                           (crc_slot - block)*sizeof(union buflib_data),
-                           0xffffffff);
-    handle->alloc = (char*)(crc_slot + 1);
+        strcpy(block[fidx_NAME].name, name);
+
+    size_t bsize = BUFLIB_NUM_FIELDS + name_len/sizeof(union buflib_data);
+    union buflib_data *block_end = block + bsize;
+    block_end[-bidx_BSIZE].val = bsize;
+    block_end[-bidx_CRC].crc = calc_block_crc(block, block_end);
+
+    handle->alloc = (char*)&block_end[-bidx_USER];
 
     BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p crc=0x%0x name=\"%s\"\n",
             (unsigned int)size, (void *)handle, (void *)ops,
-            (unsigned int)crc_slot->crc, name ? block[3].name:"");
+            (unsigned int)block_end[-bidx_CRC].crc, name ? name : "");
 
     block += size;
     /* alloc_end must be kept current if we're taking the last block. */
@@ -743,7 +781,7 @@ free_space_at_end(struct buflib_context* ctx)
 {
     /* subtract 5 elements for
      * val, handle, meta_len, ops and the handle table entry*/
-    ptrdiff_t diff = (ctx->last_handle - ctx->alloc_end - 5);
+    ptrdiff_t diff = (ctx->last_handle - ctx->alloc_end - BUFLIB_NUM_FIELDS);
     diff -= 16; /* space for future handles */
     diff *= sizeof(union buflib_data); /* make it bytes */
     diff -= 16; /* reserve 16 for the name */
@@ -858,8 +896,6 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
 bool
 buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t new_size)
 {
-    union buflib_data *crc_slot;
-    int size_for_crc32;
     char* oldstart = buflib_get_data(ctx, handle);
     char* newstart = new_start;
     char* newend = newstart + new_size;
@@ -883,9 +919,9 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
     metadata_size.val = aligned_oldstart - block;
     /* update val and the handle table entry */
     new_block = aligned_newstart - metadata_size.val;
-    block[0].val = new_next_block - new_block;
+    block[fidx_LEN].val = new_next_block - new_block;
 
-    block[1].handle->alloc = newstart;
+    block[fidx_HANDLE].handle->alloc = newstart;
     if (block != new_block)
     {
         /* move metadata over, i.e. pointer to handle table entry and name
@@ -906,9 +942,9 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
     }
 
     /* update crc of the metadata */
-    crc_slot = (union buflib_data*)new_block[1].handle->alloc - 1;
-    size_for_crc32 = (crc_slot - new_block)*sizeof(union buflib_data);
-    crc_slot->crc = crc_32((void *)new_block, size_for_crc32, 0xffffffff);
+    union buflib_data *new_h_entry = new_block[fidx_HANDLE].handle;
+    union buflib_data *new_block_end = userpointer_to_block_end(new_h_entry->alloc);
+    new_block_end[-bidx_CRC].crc = calc_block_crc(new_block, new_block_end);
 
     /* Now deal with size changes that create free blocks after the allocation */
     if (old_next_block != new_next_block)
@@ -932,12 +968,12 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
     union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
-    size_t len = data[-2].val;
-    if (len <= 5)
+    size_t len = data[-bidx_BSIZE].val;
+    if (len <= BUFLIB_NUM_FIELDS)
         return NULL;
 
     data -= len;
-    return data[3].name;
+    return data[fidx_NAME].name;
 }
 
 #ifdef DEBUG
@@ -952,10 +988,6 @@ void *buflib_get_data(struct buflib_context *ctx, int handle)
 
 void buflib_check_valid(struct buflib_context *ctx)
 {
-    union buflib_data *crc_slot;
-    int metadata_size;
-    uint32_t crc;
-
     for(union buflib_data* this = ctx->buf_start;
                            this < ctx->alloc_end;
                            this += abs(this->val))
@@ -963,14 +995,14 @@ void buflib_check_valid(struct buflib_context *ctx)
         if (this->val < 0)
             continue;
 
-        crc_slot = (union buflib_data*)
-                       ((union buflib_data*)this[1].handle)->alloc - 1;
-        metadata_size = (crc_slot - this)*sizeof(union buflib_data);
-        crc = crc_32((void *)this, metadata_size, 0xffffffff);
-
-        if (crc != crc_slot->crc)
+        union buflib_data *h_entry = this[fidx_HANDLE].handle;
+        union buflib_data *block_end = userpointer_to_block_end(h_entry->alloc);
+        uint32_t crc = calc_block_crc(this, block_end);
+        if (crc != block_end[-bidx_CRC].crc)
+        {
             buflib_panic(ctx, "crc mismatch: 0x%08x, expected: 0x%08x",
-                   (unsigned int)crc, (unsigned int)crc_slot->crc);
+                         (unsigned int)crc, (unsigned int)block_end[-bidx_CRC].crc);
+        }
     }
 }
 #endif
@@ -985,16 +1017,11 @@ void buflib_print_allocs(struct buflib_context *ctx,
     {
         if (!this->alloc) continue;
 
-        int handle_num;
-        const char *name;
-        union buflib_data *block_start, *alloc_start;
-        intptr_t alloc_len;
-
-        handle_num = end - this;
-        alloc_start = buflib_get_data(ctx, handle_num);
-        name = buflib_get_name(ctx, handle_num);
-        block_start = (union buflib_data*)name - 3;
-        alloc_len = block_start->val * sizeof(union buflib_data);
+        int handle_num = end - this;
+        void* alloc_start = this->alloc;
+        union buflib_data *block_start = handle_to_block(ctx, handle_num);
+        const char* name = buflib_get_name(ctx, handle_num);
+        intptr_t alloc_len = block_start[fidx_LEN];
 
         snprintf(buf, sizeof(buf),
                 "%s(%d):\t%p\n"
@@ -1016,8 +1043,8 @@ void buflib_print_blocks(struct buflib_context *ctx,
                            this += abs(this->val))
     {
         snprintf(buf, sizeof(buf), "%8p: val: %4ld (%s)",
-                                this, this->val,
-                                this->val > 0? this[3].name:"<unallocated>");
+                 this, this->val,
+                 this->val > 0 ? this[fidx_NAME].name : "<unallocated>");
         print(i++, buf);
     }
 }
@@ -1045,9 +1072,10 @@ void buflib_print_block_at(struct buflib_context *ctx, int block_num,
         this += abs(this->val);
         block_num -= 1;
     }
+
     snprintf(buf, bufsize, "%8p: val: %4ld (%s)",
-                            this, (long)this->val,
-                            this->val > 0? this[3].name:"<unallocated>");
+             this, (long)this->val,
+             this->val > 0 ? this[fidx_NAME].name : "<unallocated>");
 }
 
 #endif
