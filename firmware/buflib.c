@@ -105,6 +105,10 @@
 /* Bitmask of enabled paranoia checks */
 #define BUFLIB_PARANOIA 0
 
+#if BUFLIB_PARANOIA & PARANOIA_CHECK_CRC
+# define BUFLIB_HAS_CRC
+#endif
+
 /* Forward indices, used to index a block start pointer as block[fidx_XXX] */
 enum {
     fidx_LEN,       /* length of the block, must come first */
@@ -116,14 +120,20 @@ enum {
 /* Backward indices, used to index a block end pointer as block[-bidx_XXX] */
 enum {
     bidx_USER,      /* dummy to get below fields to be 1-based */
+#ifdef BUFLIB_HAS_CRC
     bidx_CRC,       /* CRC, protects all metadata behind it */
+#endif
     bidx_BSIZE,     /* total size of the block header */
 };
 
 /* Number of fields in the block header, excluding the name, which is
  * accounted for using the BSIZE field. Note that bidx_USER is not an
  * actual field so it is not included in the count. */
-#define BUFLIB_NUM_FIELDS   5
+#ifdef BUFLIB_HAS_CRC
+# define BUFLIB_NUM_FIELDS 5
+#else
+# define BUFLIB_NUM_FIELDS 4
+#endif
 
 struct buflib_callbacks buflib_ops_locked = {
     .move_callback = NULL,
@@ -1211,6 +1221,7 @@ static void check_block_handle(struct buflib_context *ctx,
     }
 }
 
+#ifdef BUFLIB_HAS_CRC
 static uint32_t calc_block_crc(union buflib_data *block,
                                union buflib_data *block_end)
 {
@@ -1247,3 +1258,22 @@ static void check_block_crc(struct buflib_context *ctx,
         }
     }
 }
+#else
+static void update_block_crc(struct buflib_context *ctx,
+                             union buflib_data *block,
+                             union buflib_data *block_end)
+{
+    (void)ctx;
+    (void)block;
+    (void)block_end;
+}
+
+static void check_block_crc(struct buflib_context *ctx,
+                            union buflib_data *block,
+                            union buflib_data *block_end)
+{
+    (void)ctx;
+    (void)block;
+    (void)block_end;
+}
+#endif
