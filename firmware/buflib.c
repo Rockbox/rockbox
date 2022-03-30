@@ -65,7 +65,7 @@
  * H - handle table entry pointer
  * C - pointer to struct buflib_callbacks
  * c - variable sized string identifier
- * L2 - second length marker for string identifier
+ * L2 - length of the metadata
  * crc - crc32 protecting buflib metadata integrity
  * X - actual payload
  * Y - unallocated space
@@ -240,8 +240,8 @@ union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
      * has already been allocated but not the data */
     if (!data)
         return NULL;
-    volatile size_t len = data[-2].val;
-    return data - (len + 4);
+
+    return data - data[-2].val;
 }
 
 /* Shrink the handle table, returning true if its size was reduced, false if
@@ -627,15 +627,15 @@ buffer_alloc:
     /* Set up the allocated block, by marking the size allocated, and storing
      * a pointer to the handle.
      */
-    union buflib_data *name_len_slot, *crc_slot;
+    union buflib_data *header_size_slot, *crc_slot;
     block->val = size;
     block[1].handle = handle;
     block[2].ops = ops;
     if (name_len > 0)
         strcpy(block[3].name, name);
-    name_len_slot = (union buflib_data*)B_ALIGN_UP(block[3].name + name_len);
-    name_len_slot->val = 1 + name_len/sizeof(union buflib_data);
-    crc_slot = (union buflib_data*)(name_len_slot + 1);
+    header_size_slot = (union buflib_data*)B_ALIGN_UP(block[3].name + name_len);
+    header_size_slot->val = 5 + name_len/sizeof(union buflib_data);
+    crc_slot = (union buflib_data*)(header_size_slot + 1);
     crc_slot->crc = crc_32((void *)block,
                            (crc_slot - block)*sizeof(union buflib_data),
                            0xffffffff);
@@ -742,7 +742,7 @@ static size_t
 free_space_at_end(struct buflib_context* ctx)
 {
     /* subtract 5 elements for
-     * val, handle, name_len, ops and the handle table entry*/
+     * val, handle, meta_len, ops and the handle table entry*/
     ptrdiff_t diff = (ctx->last_handle - ctx->alloc_end - 5);
     diff -= 16; /* space for future handles */
     diff *= sizeof(union buflib_data); /* make it bytes */
@@ -933,9 +933,11 @@ const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
     union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
     size_t len = data[-2].val;
-    if (len <= 1)
+    if (len <= 5)
         return NULL;
-    return data[-len-1].name;
+
+    data -= len;
+    return data[3].name;
 }
 
 #ifdef DEBUG
