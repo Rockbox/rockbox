@@ -187,6 +187,11 @@ static void check_block_crc(struct buflib_context *ctx,
                             union buflib_data *block,
                             union buflib_data *block_end);
 
+static inline char* get_block_name(union buflib_data *block)
+{
+    return (char*)&block[fidx_NAME];
+}
+
 /* Initialize buffer manager */
 void
 buflib_init(struct buflib_context *ctx, void *buf, size_t size)
@@ -378,7 +383,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
 
     int handle = ctx->handle_table - h_entry;
     BDEBUGF("%s(): moving \"%s\"(id=%d) by %d(%d)\n", __func__,
-            block[fidx_NAME].name, handle, shift, shift*(int)sizeof(union buflib_data));
+            get_block_name(block), handle, shift, shift*(int)sizeof(union buflib_data));
     new_block = block + shift;
     new_start = h_entry->alloc + shift*sizeof(union buflib_data);
 
@@ -726,7 +731,7 @@ buffer_alloc:
     block[fidx_HANDLE].handle = handle;
     block[fidx_OPS].ops = ops;
     if (name_len > 0)
-        strcpy(block[fidx_NAME].name, name);
+        strcpy(get_block_name(block), name);
 
     size_t bsize = BUFLIB_NUM_FIELDS + name_len/sizeof(union buflib_data);
     union buflib_data *block_end = block + bsize;
@@ -1037,7 +1042,7 @@ const char* buflib_get_name(struct buflib_context *ctx, int handle)
         return NULL;
 
     data -= len;
-    return data[fidx_NAME].name;
+    return get_block_name(data);
 }
 
 #ifdef DEBUG
@@ -1095,7 +1100,7 @@ void buflib_print_block_at(struct buflib_context *ctx, int block_num,
         {
             snprintf(buf, bufsize, "%8p: val: %4ld (%s)",
                      block, (long)block->val,
-                     block->val > 0 ? block[fidx_NAME].name : "<unallocated>");
+                     block->val > 0 ? get_block_name(block) : "<unallocated>");
         }
     }
 }

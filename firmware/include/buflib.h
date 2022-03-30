@@ -38,7 +38,6 @@ union buflib_data
     intptr_t val;                 /* length of the block in n*sizeof(union buflib_data).
                                      Includes buflib metadata overhead. A negative value
                                      indicates block is unallocated */
-    char name[1];                 /* name, actually a variable sized string */
     struct buflib_callbacks* ops; /* callback functions for move and shrink. Can be NULL */
     char* alloc;                  /* start of allocated memory area */
     union buflib_data *handle;    /* pointer to entry in the handle table.
