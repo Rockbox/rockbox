@@ -123,7 +123,7 @@ static void say_time(int cursorpos, const struct tm *tm)
 #define OFF_YEAR    9
 #define OFF_DAY     14
 
-bool set_time_screen(const char* title, struct tm *tm)
+bool set_time_screen(const char* title, struct tm *tm, bool set_date)
 {
     struct viewport viewports[NB_SCREENS];
     bool done = false, usb = false;
@@ -138,6 +138,10 @@ bool set_time_screen(const char* title, struct tm *tm)
         offsets_ptr[IDX_YEAR] = OFF_DAY;
         offsets_ptr[IDX_DAY] = OFF_YEAR;
     }
+
+    int last_item = IDX_DAY; /*time & date*/
+    if (!set_date)
+        last_item = IDX_SECONDS; /*time*/
 
     /* speak selection when screen is entered */
     say_time(cursorpos, tm);
@@ -161,6 +165,7 @@ bool set_time_screen(const char* title, struct tm *tm)
         unsigned char buffer[20];
 #endif
         int *valptr = NULL;
+
         static unsigned char daysinmonth[] =
             {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
@@ -320,11 +325,11 @@ bool set_time_screen(const char* title, struct tm *tm)
         button = get_action(CONTEXT_SETTINGS_TIME, TIMEOUT_BLOCK);
         switch ( button ) {
             case ACTION_STD_PREV:
-                cursorpos = clamp_value_wrap(--cursorpos, 5, 0);
+                cursorpos = clamp_value_wrap(--cursorpos, last_item, 0);
                 say_time(cursorpos, tm);
                 break;
             case ACTION_STD_NEXT:
-                cursorpos = clamp_value_wrap(++cursorpos, 5, 0);
+                cursorpos = clamp_value_wrap(++cursorpos, last_item, 0);
                 say_time(cursorpos, tm);
                 break;
             case ACTION_SETTINGS_INC:

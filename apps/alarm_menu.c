@@ -38,161 +38,56 @@
 #include "splash.h"
 #include "viewport.h"
 
-static void speak_time(int hours, int minutes, bool speak_hours, bool enqueue)
-{
-    if (global_settings.talk_menu){
-        if(speak_hours) {
-            talk_value(hours, UNIT_HOUR, enqueue);
-            talk_value(minutes, UNIT_MIN, true);
-        } else {
-            talk_value(minutes, UNIT_MIN, enqueue);
-        }
-    }
-}
-
 int alarm_screen(void)
 {
-    int h, m;
-    bool done = false;
-    struct tm *tm;
-    int togo;
-    int button;
-    bool update = true;
-    bool hour_wrapped = false;
-    struct viewport vp[NB_SCREENS];
-    struct viewport * last_vp;
-
-    rtc_get_alarm(&h, &m);
+    bool usb, update;
+    struct tm *now = get_time();
+    struct tm atm;
+    memcpy(&atm, now, sizeof(struct tm));
+    rtc_get_alarm(&atm.tm_hour, &atm.tm_min);
 
     /* After a battery change the RTC values are out of range */
-    if (m > 60 || h > 24) {
-        m = 0;
-        h = 12;
-    } else {
-        m = m / 5 * 5; /* 5 min accuracy should be enough */
-    }
-    FOR_NB_SCREENS(i)
+    if (!valid_time(&atm))
+        memcpy(&atm, now, sizeof(struct tm));
+    atm.tm_sec = 0;
+
+    usb = set_time_screen(str(LANG_ALARM_MOD_TIME), &atm, false);
+    update = valid_time(&atm); /* set_time returns invalid time if canceled */
+
+    if (!usb && update)
     {
-        viewport_set_defaults(&vp[i], i);
-    }
 
-    while(!done) {
-        if(update)
-        {
-            FOR_NB_SCREENS(i)
-            {
-                screens[i].set_viewport(&vp[i]);
-                screens[i].clear_viewport();
-                screens[i].puts(0, 4, str(LANG_ALARM_MOD_KEYS));
-            }
-            /* Talk when entering the wakeup screen */
-            speak_time(h, m, true, true);
-            update = false;
-        }
-
-        FOR_NB_SCREENS(i)
-        {
-            last_vp = screens[i].set_viewport(&vp[i]);
-            screens[i].putsf(0, 1, str(LANG_ALARM_MOD_TIME));
-            screens[i].putsf(0, 2, "%02d:%02d", h, m);
-            screens[i].update_viewport();
-            screens[i].set_viewport(last_vp);
-        }
-        button = get_action(CONTEXT_SETTINGS,HZ);
-
-        switch(button) {
-            case ACTION_STD_OK:
+            now = get_time();
+            int nmins = now->tm_min + (now->tm_hour * 60);
+            int amins = atm.tm_min + (atm.tm_hour * 60);
+            int mins_togo = (amins - nmins + 1440) % 1440;
             /* prevent that an alarm occurs in the shutdown procedure */
             /* accept alarms only if they are in 2 minutes or more */
-            tm = get_time();
-            togo = (m + h * 60 - tm->tm_min - tm->tm_hour * 60 + 1440) % 1440;
-
-            if (togo > 1) {
+            if (mins_togo > 1) {
                 rtc_init();
-                rtc_set_alarm(h,m);
+                rtc_set_alarm(atm.tm_hour,atm.tm_min);
                 rtc_enable_alarm(true);
                 if (global_settings.talk_menu)
                 {
                     talk_id(LANG_ALARM_MOD_TIME_TO_GO, true);
-                    talk_value(togo / 60, UNIT_HOUR, true);
-                    talk_value(togo % 60, UNIT_MIN, true);
+                    talk_value(mins_togo / 60, UNIT_HOUR, true);
+                    talk_value(mins_togo % 60, UNIT_MIN, true);
                     talk_force_enqueue_next();
                 }
                 splashf(HZ*2, str(LANG_ALARM_MOD_TIME_TO_GO),
-                               togo / 60, togo % 60);
-                done = true;
+                               mins_togo / 60, mins_togo % 60);
             } else {
                 splash(HZ, ID2P(LANG_ALARM_MOD_ERROR));
-                update = true;
+                update = false;
             }
-            break;
+    }
 
-         /* inc(m) */
-        case ACTION_SETTINGS_INC:
-        case ACTION_SETTINGS_INCREPEAT:
-            m += 5;
-            if (m == 60) {
-                h += 1;
-                m = 0;
-                hour_wrapped = true;
-            }
-            if (h == 24)
-                h = 0;
-
-            speak_time(h, m, hour_wrapped, false);
-            break;
-
-         /* dec(m) */
-        case ACTION_SETTINGS_DEC:
-        case ACTION_SETTINGS_DECREPEAT:
-             m -= 5;
-             if (m == -5) {
-                 h -= 1;
-                 m = 55;
-                 hour_wrapped = true;
-             }
-             if (h == -1)
-                 h = 23;
-
-             speak_time(h, m, hour_wrapped, false);
-             break;
-
-         /* inc(h) */
-         case ACTION_STD_NEXT:
-         case ACTION_STD_NEXTREPEAT:
-             h = (h+1) % 24;
-
-             if (global_settings.talk_menu)
-                 talk_value(h, UNIT_HOUR, false);
-             break;
-
-         /* dec(h) */
-        case ACTION_STD_PREV:
-        case ACTION_STD_PREVREPEAT:
-             h = (h+23) % 24;
-             
-             if (global_settings.talk_menu)
-                 talk_value(h, UNIT_HOUR, false);
-             break;
-
-        case ACTION_STD_CANCEL:
-            rtc_enable_alarm(false);
+    if (usb || !update)
+    {
+        if (!usb)
             splash(HZ*2, ID2P(LANG_ALARM_MOD_DISABLE));
-            done = true;
-            break;
-
-        case ACTION_NONE:
-            hour_wrapped = false;
-            break;
-
-        default:
-            if(default_event_handler(button) == SYS_USB_CONNECTED)
-            {
-                rtc_enable_alarm(false);
-                return 1;
-            }
-            break;
-        }
+        rtc_enable_alarm(false);
+        return 1;
     }
     return 0;
 }

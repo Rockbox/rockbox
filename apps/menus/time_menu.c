@@ -73,7 +73,7 @@ static int timedate_set(void)
         tm.tm_year = YEAR-1900;
     }
 
-    result = (int)set_time_screen(str(LANG_SET_TIME), &tm);
+    result = (int)set_time_screen(str(LANG_SET_TIME), &tm, true);
 
     if(tm.tm_year != -1) {
         set_time(&tm);

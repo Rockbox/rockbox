@@ -36,7 +36,7 @@ int mmc_remove_request(void);
 #endif
 
 #if CONFIG_RTC
-bool set_time_screen(const char* title, struct tm *tm);
+bool set_time_screen(const char* title, struct tm *tm, bool set_date);
 #endif
 
 bool shutdown_screen(void);
