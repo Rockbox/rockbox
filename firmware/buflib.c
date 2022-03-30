@@ -98,7 +98,9 @@
 #define BPANICF panicf
 
 /* Available paranoia checks */
-#define PARANOIA_CHECK_LENGTH   (1 << 0)
+#define PARANOIA_CHECK_LENGTH       (1 << 0)
+#define PARANOIA_CHECK_HANDLE       (1 << 1)
+#define PARANOIA_CHECK_BLOCK_HANDLE (1 << 2)
 /* Bitmask of enabled paranoia checks */
 #define BUFLIB_PARANOIA 0
 
@@ -143,6 +145,26 @@ static union buflib_data* find_block_before(struct buflib_context *ctx,
 static void check_block_length(struct buflib_context *ctx,
                                union buflib_data *block);
 
+/* Check a handle table entry to ensure the user pointer is within the
+ * bounds of the allocated area and there is enough room for a minimum
+ * size block header.
+ *
+ * This verifies that it is safe to convert the entry's pointer to a
+ * block end pointer and dereference fields at the block end.
+ */
+static void check_handle(struct buflib_context *ctx,
+                         union buflib_data *h_entry);
+
+/* Check a block's handle pointer to ensure it is within the handle
+ * table, and that the user pointer is pointing within the block.
+ *
+ * This verifies that it is safe to dereference the entry, in addition
+ * to all checks performed by check_handle(). It also ensures that the
+ * pointer in the handle table points within the block, as determined
+ * by the length field at the start of the block.
+ */
+static void check_block_handle(struct buflib_context *ctx,
+                               union buflib_data *block);
 
 /* Initialize buffer manager */
 void
@@ -271,13 +293,26 @@ void handle_free(struct buflib_context *ctx, union buflib_data *handle)
 static inline
 union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
 {
-    union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
-    /* this is a valid case, e.g. during buflib_alloc_ex() when the handle
-     * has already been allocated but not the data */
-    if (!data)
+    void *ptr = buflib_get_data(ctx, handle);
+
+    /* this is a valid case for shrinking if handle
+     * was freed by the shrink callback */
+    if (!ptr)
         return NULL;
 
+    union buflib_data *data = ALIGN_DOWN(ptr, sizeof(*data));
     return data - data[-bidx_BSIZE].val;
+}
+
+/* Get the block end pointer from a handle table entry */
+static union buflib_data*
+h_entry_to_block_end(struct buflib_context *ctx, union buflib_data *h_entry)
+{
+    check_handle(ctx, h_entry);
+
+    void *alloc = h_entry->alloc;
+    union buflib_data *data = ALIGN_DOWN(alloc, sizeof(*data));
+    return data;
 }
 
 /* Shrink the handle table, returning true if its size was reduced, false if
@@ -297,13 +332,6 @@ static inline bool handle_table_shrink(struct buflib_context *ctx)
 
     ctx->last_handle = handle;
     return handle != old_last;
-}
-
-static inline
-union buflib_data* userpointer_to_block_end(void *userpointer)
-{
-    union buflib_data *data = ALIGN_DOWN(userpointer, sizeof(*data));
-    return data;
 }
 
 static uint32_t calc_block_crc(union buflib_data *block,
@@ -327,11 +355,9 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     char* new_start;
     union buflib_data *new_block;
 
-    if (block < ctx->buf_start || block > ctx->alloc_end)
-        buflib_panic(ctx, "buflib data corrupted %p", block);
-
+    check_block_handle(ctx, block);
     union buflib_data *h_entry = block[fidx_HANDLE].handle;
-    union buflib_data *block_end = userpointer_to_block_end(h_entry->alloc);
+    union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
 
     uint32_t crc = calc_block_crc(block, block_end);
     if (crc != block_end[-bidx_CRC].crc)
@@ -481,6 +507,7 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
             if (!ops || !ops->shrink_callback)
                 continue;
 
+            check_block_handle(ctx, this);
             union buflib_data* h_entry = this[fidx_HANDLE].handle;
             int handle = ctx->handle_table - h_entry;
 
@@ -949,6 +976,7 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
     new_block = aligned_newstart - metadata_size.val;
     block[fidx_LEN].val = new_next_block - new_block;
 
+    check_block_handle(ctx, block);
     block[fidx_HANDLE].handle->alloc = newstart;
     if (block != new_block)
     {
@@ -971,7 +999,7 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
 
     /* update crc of the metadata */
     union buflib_data *new_h_entry = new_block[fidx_HANDLE].handle;
-    union buflib_data *new_block_end = userpointer_to_block_end(new_h_entry->alloc);
+    union buflib_data *new_block_end = h_entry_to_block_end(ctx, new_h_entry);
     new_block_end[-bidx_CRC].crc = calc_block_crc(new_block, new_block_end);
 
     /* Now deal with size changes that create free blocks after the allocation */
@@ -1024,8 +1052,9 @@ void buflib_check_valid(struct buflib_context *ctx)
         if (block->val < 0)
             continue;
 
+        check_block_handle(ctx, block);
         union buflib_data *h_entry = block[fidx_HANDLE].handle;
-        union buflib_data *block_end = userpointer_to_block_end(h_entry->alloc);
+        union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
         uint32_t crc = calc_block_crc(block, block_end);
         if (crc != block_end[-bidx_CRC].crc)
         {
@@ -1127,6 +1156,64 @@ static void check_block_length(struct buflib_context *ctx,
         {
             buflib_panic(ctx, "block len wacky [%p]=%ld",
                          (void*)&block[fidx_LEN], (long)length);
+        }
+    }
+}
+
+static void check_handle(struct buflib_context *ctx,
+                         union buflib_data *h_entry)
+{
+    if (BUFLIB_PARANOIA & PARANOIA_CHECK_HANDLE)
+    {
+        /* For the pointer to be valid there needs to be room for a minimum
+         * size block header, so we add BUFLIB_NUM_FIELDS to ctx->buf_start. */
+        void *alloc       = h_entry->alloc;
+        void *alloc_begin = ctx->buf_start + BUFLIB_NUM_FIELDS;
+        void *alloc_end   = ctx->alloc_end;
+        /* buflib allows zero length allocations, so alloc_end is inclusive */
+        if (alloc < alloc_begin || alloc > alloc_end)
+        {
+            buflib_panic(ctx, "alloc outside buf [%p]=%p, %p-%p",
+                         h_entry, alloc, alloc_begin, alloc_end);
+        }
+    }
+}
+
+static void check_block_handle(struct buflib_context *ctx,
+                               union buflib_data *block)
+{
+    if (BUFLIB_PARANOIA & PARANOIA_CHECK_BLOCK_HANDLE)
+    {
+        intptr_t length = block[fidx_LEN].val;
+        union buflib_data *h_entry = block[fidx_HANDLE].handle;
+
+        /* Check the handle pointer is properly aligned */
+        /* TODO: Can we ensure the compiler doesn't optimize this out?
+         * I dunno, maybe the compiler can assume the pointer is always
+         * properly aligned due to some C standard voodoo?? */
+        if (!IS_ALIGNED((uintptr_t)h_entry, alignof(*h_entry)))
+        {
+            buflib_panic(ctx, "handle unaligned [%p]=%p",
+                         &block[fidx_HANDLE], h_entry);
+        }
+
+        /* Check the pointer is actually inside the handle table */
+        if (h_entry < ctx->last_handle || h_entry >= ctx->handle_table)
+        {
+            buflib_panic(ctx, "handle out of bounds [%p]=%p",
+                         &block[fidx_HANDLE], h_entry);
+        }
+
+        /* Now check the allocation is within the block.
+         * This is stricter than check_handle(). */
+        void *alloc       = h_entry->alloc;
+        void *alloc_begin = block;
+        void *alloc_end   = block + length;
+        /* buflib allows zero length allocations, so alloc_end is inclusive */
+        if (alloc < alloc_begin || alloc > alloc_end)
+        {
+            buflib_panic(ctx, "alloc outside block [%p]=%p, %p-%p",
+                         h_entry, alloc, alloc_begin, alloc_end);
         }
     }
 }
