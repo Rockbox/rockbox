@@ -65,7 +65,7 @@ struct buflib_context
  * BUFLIB_ALLOC_OVERHEAD + requested bytes + strlen(<name passed to
  * buflib_alloc_ex()) + pad to pointer size
  */
-#define BUFLIB_ALLOC_OVERHEAD (6*sizeof(union buflib_data))
+#define BUFLIB_ALLOC_OVERHEAD (5*sizeof(union buflib_data))
 
 /**
  * Callbacks used by the buflib to inform allocation that compaction
