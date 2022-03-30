@@ -97,6 +97,11 @@
 
 #define BPANICF panicf
 
+/* Available paranoia checks */
+#define PARANOIA_CHECK_LENGTH   (1 << 0)
+/* Bitmask of enabled paranoia checks */
+#define BUFLIB_PARANOIA 0
+
 /* Forward indices, used to index a block start pointer as block[fidx_XXX] */
 enum {
     fidx_LEN,       /* length of the block, must come first */
@@ -129,6 +134,16 @@ static union buflib_data* find_first_free(struct buflib_context *ctx);
 static union buflib_data* find_block_before(struct buflib_context *ctx,
                                             union buflib_data* block,
                                             bool is_free);
+
+/* Check the length of a block to ensure it does not go beyond the end
+ * of the allocated area. The block can be either allocated or free.
+ *
+ * This verifies that it is safe to iterate to the next block in a loop.
+ */
+static void check_block_length(struct buflib_context *ctx,
+                               union buflib_data *block);
+
+
 /* Initialize buffer manager */
 void
 buflib_init(struct buflib_context *ctx, void *buf, size_t size)
@@ -380,6 +395,8 @@ buflib_compact(struct buflib_context *ctx)
      * For simplicity only 1 hole at a time is considered */
     for(block = find_first_free(ctx); block < ctx->alloc_end; block += len)
     {
+        check_block_length(ctx, block);
+
         bool movable = true; /* cache result to avoid 2nd call to move_block */
         len = block->val;
         /* This block is free, add its length to the shift value */
@@ -456,7 +473,8 @@ buflib_compact_and_shrink(struct buflib_context *ctx, unsigned shrink_hints)
             this < ctx->alloc_end;
             before = this, this += abs(this->val))
         {
-            if (this->val <= 0)
+            check_block_length(ctx, this);
+            if (this->val < 0)
                 continue;
 
             struct buflib_callbacks *ops = this[fidx_OPS].ops;
@@ -622,7 +640,7 @@ buffer_alloc:
     /* need to re-evaluate last before the loop because the last allocation
      * possibly made room in its front to fit this, so last would be wrong */
     last = false;
-    for (block = find_first_free(ctx);;block += block_len)
+    for (block = find_first_free(ctx);; block += block_len)
     {
         /* If the last used block extends all the way to the handle table, the
          * block "after" it doesn't have a header. Because of this, it's easier
@@ -638,6 +656,8 @@ buffer_alloc:
                 block = NULL;
             break;
         }
+
+        check_block_length(ctx, block);
         block_len = block->val;
         /* blocks with positive length are already allocated. */
         if(block_len > 0)
@@ -697,13 +717,14 @@ buffer_alloc:
 static union buflib_data*
 find_first_free(struct buflib_context *ctx)
 {
-    union buflib_data* ret = ctx->buf_start;
-    while(ret < ctx->alloc_end)
+    union buflib_data *ret;
+    for(ret = ctx->buf_start; ret < ctx->alloc_end; ret += ret->val)
     {
+        check_block_length(ctx, ret);
         if (ret->val < 0)
             break;
-        ret += ret->val;
     }
+
     /* ret is now either a free block or the same as alloc_end, both is fine */
     return ret;
 }
@@ -723,6 +744,7 @@ find_block_before(struct buflib_context *ctx, union buflib_data* block,
     /* find the block that's before the current one */
     while (next_block != block)
     {
+        check_block_length(ctx, ret);
         ret = next_block;
         next_block += abs(ret->val);
     }
@@ -796,24 +818,31 @@ free_space_at_end(struct buflib_context* ctx)
 size_t
 buflib_allocatable(struct buflib_context* ctx)
 {
-    union buflib_data *this;
     size_t free_space = 0, max_free_space = 0;
+    intptr_t block_len;
 
     /* make sure buffer is as contiguous as possible  */
     if (!ctx->compact)
         buflib_compact(ctx);
 
     /* now look if there's free in holes */
-    for(this = find_first_free(ctx); this < ctx->alloc_end; this += abs(this->val))
+    for(union buflib_data *block = find_first_free(ctx);
+        block < ctx->alloc_end;
+        block += block_len)
     {
-        if (this->val < 0)
+        check_block_length(ctx, block);
+        block_len = block->val;
+
+        if (block_len < 0)
         {
-            free_space += -this->val;
+            block_len = -block_len;
+            free_space += block_len;
             continue;
         }
+
         /* an unmovable section resets the count as free space
          * can't be contigous */
-        if (!IS_MOVABLE(this))
+        if (!IS_MOVABLE(block))
         {
             if (max_free_space < free_space)
                 max_free_space = free_space;
@@ -836,17 +865,16 @@ buflib_allocatable(struct buflib_context* ctx)
 size_t
 buflib_available(struct buflib_context* ctx)
 {
-    union buflib_data *this;
     size_t free_space = 0;
 
-    /* now look if there's free in holes */
-    for(this = find_first_free(ctx); this < ctx->alloc_end; this += abs(this->val))
+    /* add up all holes */
+    for(union buflib_data *block = find_first_free(ctx);
+        block < ctx->alloc_end;
+        block += abs(block->val))
     {
-        if (this->val < 0)
-        {
-            free_space += -this->val;
-            continue;
-        }
+        check_block_length(ctx, block);
+        if (block->val < 0)
+            free_space += -block->val;
     }
 
     free_space *= sizeof(union buflib_data); /* make it bytes */
@@ -988,16 +1016,17 @@ void *buflib_get_data(struct buflib_context *ctx, int handle)
 
 void buflib_check_valid(struct buflib_context *ctx)
 {
-    for(union buflib_data* this = ctx->buf_start;
-                           this < ctx->alloc_end;
-                           this += abs(this->val))
+    for(union buflib_data *block = ctx->buf_start;
+        block < ctx->alloc_end;
+        block += abs(block->val))
     {
-        if (this->val < 0)
+        check_block_length(ctx, block);
+        if (block->val < 0)
             continue;
 
-        union buflib_data *h_entry = this[fidx_HANDLE].handle;
+        union buflib_data *h_entry = block[fidx_HANDLE].handle;
         union buflib_data *block_end = userpointer_to_block_end(h_entry->alloc);
-        uint32_t crc = calc_block_crc(this, block_end);
+        uint32_t crc = calc_block_crc(block, block_end);
         if (crc != block_end[-bidx_CRC].crc)
         {
             buflib_panic(ctx, "crc mismatch: 0x%08x, expected: 0x%08x",
@@ -1038,13 +1067,16 @@ void buflib_print_blocks(struct buflib_context *ctx,
 {
     char buf[128];
     int i = 0;
-    for(union buflib_data* this = ctx->buf_start;
-                           this < ctx->alloc_end;
-                           this += abs(this->val))
+
+    for(union buflib_data *block = ctx->buf_start;
+        block != ctx->alloc_end;
+        block += abs(block->val))
     {
+        check_block_length(ctx, block);
+
         snprintf(buf, sizeof(buf), "%8p: val: %4ld (%s)",
-                 this, this->val,
-                 this->val > 0 ? this[fidx_NAME].name : "<unallocated>");
+                 block, (long)block->val,
+                 block->val > 0 ? block[fidx_NAME].name : "<unallocated>");
         print(i++, buf);
     }
 }
@@ -1054,28 +1086,47 @@ void buflib_print_blocks(struct buflib_context *ctx,
 int buflib_get_num_blocks(struct buflib_context *ctx)
 {
     int i = 0;
-    for(union buflib_data* this = ctx->buf_start;
-                           this < ctx->alloc_end;
-                           this += abs(this->val))
+    for(union buflib_data *block = ctx->buf_start;
+        block < ctx->alloc_end;
+        block += abs(block->val))
     {
-        i++;
+        check_block_length(ctx, block);
+        ++i;
     }
     return i;
 }
 
 void buflib_print_block_at(struct buflib_context *ctx, int block_num,
-                                char* buf, size_t bufsize)
+                           char* buf, size_t bufsize)
 {
-    union buflib_data* this = ctx->buf_start;
-    while(block_num > 0 && this < ctx->alloc_end)
+    for(union buflib_data *block = ctx->buf_start;
+        block < ctx->alloc_end;
+        block += abs(block->val))
     {
-        this += abs(this->val);
-        block_num -= 1;
+        check_block_length(ctx, block);
+
+        if (block_num-- == 0)
+        {
+            snprintf(buf, bufsize, "%8p: val: %4ld (%s)",
+                     block, (long)block->val,
+                     block->val > 0 ? block[fidx_NAME].name : "<unallocated>");
+        }
     }
-
-    snprintf(buf, bufsize, "%8p: val: %4ld (%s)",
-             this, (long)this->val,
-             this->val > 0 ? this[fidx_NAME].name : "<unallocated>");
 }
-
 #endif
+
+static void check_block_length(struct buflib_context *ctx,
+                               union buflib_data *block)
+{
+    if (BUFLIB_PARANOIA & PARANOIA_CHECK_LENGTH)
+    {
+        intptr_t length = block[fidx_LEN].val;
+
+        /* Check the block length does not pass beyond the end */
+        if (length == 0 || block > ctx->alloc_end - abs(length))
+        {
+            buflib_panic(ctx, "block len wacky [%p]=%ld",
+                         (void*)&block[fidx_LEN], (long)length);
+        }
+    }
+}
