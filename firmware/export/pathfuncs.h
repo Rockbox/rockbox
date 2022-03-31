@@ -79,6 +79,7 @@ static inline bool name_is_dot_dot(const char *name)
 
 #ifdef HAVE_MULTIVOLUME
 int path_strip_volume(const char *name, const char **nameptr, bool greedy);
+int path_strip_last_volume(const char *name, const char **nameptr, bool greedy);
 int get_volume_name(int volume, char *name);
 int make_volume_root(int volume, char *dst);
 #endif

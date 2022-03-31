@@ -109,8 +109,8 @@ static const unsigned char storage_dec_indexes[STORAGE_NUM_TYPES+1] =
 /* Returns on which volume this is and sets *nameptr to the portion of the
  * path after the volume specifier, which could be the null if the path is
  * just a volume root. If *nameptr > name, then a volume specifier was
- * found. If 'greedy' is 'true', then it all separators after the volume
- * specifier are consumed, if one was found.
+ * found. If 'greedy' is 'true', then all separators after the volume
+ * specifier are consumed.
  */
 int path_strip_volume(const char *name, const char **nameptr, bool greedy)
 {
@@ -165,6 +165,41 @@ psv_out:
     if (nameptr)
         *nameptr = name;
     return volume;
+}
+
+/* Strip the last volume component in the path and return the remainder of
+ * the path in *nameptr. If 'greedy' is 'true', then all separators after
+ * the volume specifier are consumed.
+ */
+int path_strip_last_volume(const char *name, const char **nameptr, bool greedy)
+{
+    const char *p = name + strlen(name);
+
+    while (p > name)
+    {
+        /* skip the component */
+        while (p > name && p[-1] != PATH_SEPCH)
+            --p;
+
+        /* bail if we reached the beginning */
+        if (p <= name+1)
+            break;
+
+        /* point at the seprator */
+        --p;
+
+        /* try to strip the volume and return it if found */
+        int volume = path_strip_volume(p, nameptr, greedy);
+        if (volume != ROOT_VOLUME)
+            return volume;
+
+        /* skip any extra separators */
+        while (p > name && p[-1] == PATH_SEPCH)
+            --p;
+    }
+
+    /* return whatever is at the beginning of the path */
+    return path_strip_volume(name, nameptr, greedy);
 }
 
 /* Returns the volume specifier decorated with the storage type name.
