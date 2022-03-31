@@ -1741,6 +1741,20 @@ static int check_subdir_for_music(char *dir, const char *subdir, bool recurse)
 
 /*
  * Returns absolute path of track
+ *
+ * dest: output buffer
+ * src: the file name from the playlist
+ * dir: the absolute path to the directory where the playlist resides
+ *
+ * The type of path in "src" determines what will be written to "dest":
+ *
+ * 1. UNIX-style absolute paths (/foo/bar) remain unaltered
+ * 2. Windows-style absolute paths (C:/foo/bar) will be converted into an
+ *    absolute path by replacing the drive letter with the volume that the
+ *    *playlist* resides on, ie. the volume in "dir"
+ * 3. Relative paths are converted to absolute paths by prepending "dir".
+ *    This also applies to Windows-style relative paths "C:foo/bar" where
+ *    the drive letter is accepted but ignored.
  */
 static ssize_t format_track_path(char *dest, char *src, int buf_length,
                                  const char *dir)
@@ -1770,27 +1784,13 @@ static ssize_t format_track_path(char *dest, char *src, int buf_length,
     /* Replace backslashes with forward slashes */
     path_correct_separators(src, src);
 
-    /* Drive letters have no meaning here; handle DOS style drive letter
-     * and parse greedily so that:
-     *
-     * 1) "c:/foo" is fully qualified, use directory volume only
-     * 2) "c:foo" is relative to current directory on C, use directory path
-     *
-     * Assume any volume on the beginning of the directory path is actually
-     * the volume on which it resides. This may not be the case if the dir
-     * param contains a path such as "/<1>/foo/../../<0>/bar", which refers
-     * to "/<0>/bar" (aka "/bar" at this time). *fingers crossed*
-     *
-     * If any stripped drive spec was absolute, prepend the playlist
-     * directory's volume spec, or root if none. Absolute UNIX-style paths
-     * remain unaltered.
-     */
+    /* Handle Windows-style absolute paths */
     if (path_strip_drive(src, (const char **)&src, true) >= 0 &&
         src[-1] == PATH_SEPCH)
     {
     #ifdef HAVE_MULTIVOLUME
         const char *p;
-        path_strip_volume(dir, &p, false);
+        path_strip_last_volume(dir, &p, false);
         dir = strmemdupa(dir, p - dir); /* empty if no volspec on dir */
     #else
         dir = "";                       /* only volume is root */
