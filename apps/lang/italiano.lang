@@ -1685,10 +1685,10 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Log per Last.fm"
@@ -4096,31 +4096,16 @@
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  desc: deprecated
   user: core
   <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    *: ""
   </source>
   <dest>
-    *: none
-    alarm: "PLAY=Imposta OFF=Annulla"
-    gigabeats: "SELECT=Imposta POWER=Annulla"
-    ipod*: "SELECT=Imposta MENU=Annulla"
-    iriverh10,iriverh10_5gb: "SELECT=Imposta PREV=Annulla"
-    mpiohd300: "ENTER=Imposta MENU=Annulla"
-    sansafuzeplus: "SELECT=Imposta  BACK=Annulla"
-    vibe500: "OK=Imposta C=Annulla"
+    *: ""
   </dest>
   <voice>
-    *: none
-    alarm,ipod*: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16154,5 +16139,106 @@
   </dest>
   <voice>
     *: "Preferire File Immagine"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Sync Orario con RDS"
+  </dest>
+  <voice>
+    *: none
+    rds: "Sync Orario con RDS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Ordina album per"
+  </dest>
+  <voice>
+    *: "Ordina album per"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Artista + Nome"
+  </dest>
+  <voice>
+    *: "Artista E Nome"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Artista + Anno"
+  </dest>
+  <voice>
+    *: "Artista E Anno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Ordina per anno"
+  </dest>
+  <voice>
+    *: "Ordina per anno"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Mostra l'anno nel titolo dell'album"
+  </dest>
+  <voice>
+    *: "Mostra l'anno nel titolo dell'album"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "La cache deve prima completare l'aggiornamento!"
+  </dest>
+  <voice>
+    *: "La cache deve prima completare l'aggiornamento!"
   </voice>
 </phrase>
