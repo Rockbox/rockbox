@@ -32,6 +32,13 @@
 #ifndef _JPEG_LOAD_H
 #define _JPEG_LOAD_H
 
+/* Approximate memory overhead required for JPEG decoding. This memory is
+ * taken from the bitmap buffer so you must ensure the buffer is big enough
+ * to contain all decoded pixel data plus decoder overhead, otherwise the
+ * image cannot be loaded. After the image is loaded this extra memory can
+ * be freed. */
+extern const size_t JPEG_DECODE_OVERHEAD;
+
 int read_jpeg_file(const char* filename,
                    struct bitmap *bm,
                    int maxsize,

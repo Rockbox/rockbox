@@ -2228,4 +2228,15 @@ int read_jpeg_fd(int fd,
 }
 #endif
 
+const size_t JPEG_DECODE_OVERHEAD =
+    /* Reserve an arbitrary amount for the decode buffer
+     * FIXME: Somebody who knows what they're doing should look at this */
+    (32 * 1024)
+#ifndef JPEG_FROM_MEM
+    /* Unless the struct jpeg is defined statically, we need to allocate
+     * it in the bitmap buffer as well */
+    + sizeof(struct jpeg)
+#endif
+    ;
+
 /**************** end JPEG code ********************/
