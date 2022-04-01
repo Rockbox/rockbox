@@ -848,8 +848,9 @@ static bool fill_buffer(void)
    Return value is the total size (struct + data). */
 static int load_image(int fd, const char *path,
                       struct bufopen_bitmap_data *data,
-                      size_t bufidx)
+                      size_t bufidx, size_t max_size)
 {
+    (void)path;
     int rc;
     struct bitmap *bmp = ringbuf_ptr(bufidx);
     struct dim *dim = data->dim;
@@ -863,25 +864,20 @@ static int load_image(int fd, const char *path,
 #if (LCD_DEPTH > 1) || defined(HAVE_REMOTE_LCD) && (LCD_REMOTE_DEPTH > 1)
     bmp->maskdata = NULL;
 #endif
-    int free = (int)MIN(buffer_len - bytes_used(), buffer_len - bufidx)
-                        - sizeof(struct bitmap);
-
+    const int format = FORMAT_NATIVE | FORMAT_DITHER |
+                       FORMAT_RESIZE | FORMAT_KEEP_ASPECT;
 #ifdef HAVE_JPEG
     if (aa != NULL) {
         lseek(fd, aa->pos, SEEK_SET);
-        rc = clip_jpeg_fd(fd, aa->size, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
-                         FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+        rc = clip_jpeg_fd(fd, aa->size, bmp, (int)max_size, format, NULL);
     }
     else if (strcmp(path + strlen(path) - 4, ".bmp"))
-        rc = read_jpeg_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
-                          FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+        rc = read_jpeg_fd(fd, bmp, (int)max_size, format, NULL);
     else
 #endif
-        rc = read_bmp_fd(fd, bmp, free, FORMAT_NATIVE|FORMAT_DITHER|
-                         FORMAT_RESIZE|FORMAT_KEEP_ASPECT, NULL);
+        rc = read_bmp_fd(fd, bmp, (int)max_size, format, NULL);
 
     return rc + (rc > 0 ? sizeof(struct bitmap) : 0);
-    (void)path;
 }
 #endif /* HAVE_ALBUMART */
 
@@ -967,11 +963,18 @@ int bufopen(const char *file, off_t offset, enum data_type type,
     size_t size = 0;
 #ifdef HAVE_ALBUMART
     if (type == TYPE_BITMAP) {
-        /* If albumart is embedded, the complete file is not buffered,
-         * but only the jpeg part; filesize() would be wrong */
+        /* Bitmaps are resized to the requested dimensions when loaded,
+         * so the file size should not be used as it may be too large
+         * or too small */
         struct bufopen_bitmap_data *aa = user_data;
-        if (aa->embedded_albumart)
-            size = aa->embedded_albumart->size;
+        size = BM_SIZE(aa->dim->width, aa->dim->height, FORMAT_NATIVE, false);
+        size += sizeof(struct bitmap);
+
+#ifdef HAVE_JPEG
+        /* JPEG loading requires extra memory
+         * TODO: don't add unncessary overhead for .bmp images! */
+        size += JPEG_DECODE_OVERHEAD;
+#endif
     }
 #endif
 
@@ -980,7 +983,10 @@ int bufopen(const char *file, off_t offset, enum data_type type,
 
     unsigned int hflags = 0;
     if (type == TYPE_PACKET_AUDIO || type == TYPE_CODEC)
-        hflags = H_CANWRAP;
+        hflags |= H_CANWRAP;
+    /* Bitmaps need their space allocated up front */
+    if (type == TYPE_BITMAP)
+        hflags |= H_ALLOCALL;
 
     size_t adjusted_offset = offset;
     if (adjusted_offset > size)
@@ -1031,7 +1037,7 @@ int bufopen(const char *file, off_t offset, enum data_type type,
 #ifdef HAVE_ALBUMART
     if (type == TYPE_BITMAP) {
         /* Bitmap file: we load the data instead of the file */
-        int rc = load_image(fd, file, user_data, data);
+        int rc = load_image(fd, file, user_data, data, padded_size);
         if (rc <= 0) {
             handle_id = ERR_FILE_ERROR;
         } else {
