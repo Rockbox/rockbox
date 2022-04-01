@@ -1691,16 +1691,16 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
-    *: "Zapisuj log Last.fm"
+    *: "Rejestrator Last.fm"
   </dest>
   <voice>
-    *: "Zapisuj log Last ef em"
+    *: "Rejestrator Last ef em"
   </voice>
 </phrase>
 <phrase>
@@ -16160,5 +16160,106 @@
   </dest>
   <voice>
     *: "Preferuj plik obrazu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Synchronizuj czas RDS"
+  </dest>
+  <voice>
+    *: none
+    rds: "Synchronizuj czas er de es"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Sortuj albumy według"
+  </dest>
+  <voice>
+    *: "Sortuj albumy według"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Wykonawca + nazwa"
+  </dest>
+  <voice>
+    *: "Wykonawca plus nazwa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Wykonawca + rok"
+  </dest>
+  <voice>
+    *: "Wykonawca plus rok"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Kolejność sortowania według roku"
+  </dest>
+  <voice>
+    *: "Kolejność sortowania według roku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Pokaż rok w tytule albumu"
+  </dest>
+  <voice>
+    *: "Pokaż rok w tytule albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Pamięć podręczna musi najpierw zakończyć aktualizację!"
+  </dest>
+  <voice>
+    *: "Pamięć podręczna musi najpierw zakończyć aktualizację!"
   </voice>
 </phrase>
