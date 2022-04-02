@@ -124,8 +124,8 @@
 //NOTEF
 #endif
 
-
-
+/* default load buffer size (should be at least 1 KiB) */
+#define PLAYLIST_LOAD_BUFLEN    (32*1024)
 
 
 #define PLAYLIST_CONTROL_FILE_VERSION 2
@@ -1999,6 +1999,23 @@ static int rotate_index(const struct playlist_info* playlist, int index)
 }
 
 /*
+ * Allocate a temporary buffer for loading playlists
+ */
+static int alloc_tempbuf(size_t* buflen)
+{
+    /* request a reasonable size first */
+    int handle = core_alloc_ex(NULL, PLAYLIST_LOAD_BUFLEN, &buflib_ops_locked);
+    if (handle > 0)
+    {
+        *buflen = PLAYLIST_LOAD_BUFLEN;
+        return handle;
+    }
+
+    /* otherwise, try being unreasonable */
+    return core_alloc_maximum(NULL, buflen, &buflib_ops_locked);
+}
+
+/*
  * Need no movement protection since all 3 allocations are not passed to
  * other functions which can yield().
  */
@@ -2097,14 +2114,17 @@ int playlist_create(const char *dir, const char *file)
 
     if (file)
     {
-        int handle;
         size_t buflen;
-        /* use mp3 buffer for maximum load speed */
-        handle = core_alloc_maximum("temp", &buflen, &buflib_ops_locked);
+        int handle = alloc_tempbuf(&buflen);
         if (handle > 0)
         {
+            /* align for faster load times */
+            void* buf = core_get_data(handle);
+            STORAGE_ALIGN_BUFFER(buf, buflen);
+            buflen = ALIGN_DOWN(buflen, 512); /* to avoid partial sector I/O */
+
             /* load the playlist file */
-            add_indices_to_playlist(playlist, core_get_data(handle), buflen);
+            add_indices_to_playlist(playlist, buf, buflen);
             core_free(handle);
         }
         else
@@ -2145,14 +2165,17 @@ int playlist_resume(void)
     dircache_wait(); /* we need the dircache to use the files in the playlist */
 #endif
 
-    /* use mp3 buffer for maximum load speed */
-    handle = core_alloc_maximum("temp", &buflen, &buflib_ops_locked);
+    handle = alloc_tempbuf(&buflen);
     if (handle < 0)
     {
         splashf(HZ * 2, "%s(): OOM", __func__);
         return -1;
     }
+
+    /* align buffer for faster load times */
     buffer = core_get_data(handle);
+    STORAGE_ALIGN_BUFFER(buffer, buflen);
+    buflen = ALIGN_DOWN(buflen, 512); /* to avoid partial sector I/O */
 
     playlist_shutdown(); /* flush any cached control commands to disk */
     empty_playlist(playlist, true);
