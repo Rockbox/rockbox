@@ -1,23 +1,44 @@
 \subsection{PictureFlow}
 \screenshot{plugins/images/ss-pictureflow}{PictureFlow}{img:pictureflow}
-PictureFlow provides a visualisation of your albums with their associated cover
-art. It is possible to start playback of the selected album from PictureFlow.
-Playback will start from the selected track. The PictureFlow plugin will
-continue to run while your tracks are played.
+PictureFlow is a visual browser for your albums.  After you've selected something to play,
+PictureFlow will continue running by default, or can show the WPS. The optional WPS
+integration enables access to a context menu for adding albums or songs
+to the dynamic playlist directly from PictureFlow (see \reference{ref:currentplaylist_submenu}).
+
+\subsubsection{Sort Options}
+Albums can be sorted by:
+
+\begin{itemize}
+    \item Name
+    \item Year
+    \item Album Artist + Name
+    \item Album Artist + Year
+\end{itemize}
 
 \subsubsection{Requirements}
-PictureFlow uses both the album art (see \reference{ref:album_art}) and 
+PictureFlow uses both the album art (see \reference{ref:album_art}) and
 database (see \reference{ref:database}) features of Rockbox.
-It is therefore important that these are working correctly before attempting
-to use PictureFlow. In addition, there are some other points of which to be
-aware:
+These need to be working correctly before PictureFlow can be used.
+{\bf PictureFlow does not support embedded album art.}
+
+\opt{tc_ramcache}{\note{It is strongly recommended you enable the database's "Load to RAM" feature
+(and restart your player afterwards)! See \reference{ref:databasemenu}. This will {\bf vastly} speed up
+building the album index as well as loading of track titles when browsing albums.}}
+
+\opt{dircache}{\note{Enabling the disk's directory cache – see \reference{ref:dircache} – noticeably
+reduces the time it takes for cover art to be displayed.}}
+
 
   \begin{itemize}
-    \item First an album index must be built, If you have a lot of albums/artists
-    this could take a while, any button cancels the process and quits pictureflow.
-    \item You don't have to wait for the albumart search to finish, you can press
-    any button and the albumart will be searched in the background.
-    \item Pictureflow checks for updated albumart (in background) on every restart
+    \item PictureFlow needs to build an album index the first time it's launched
+    (Cancel/Quit by pressing any button) and then writes an album art cache to disk.
+    During the latter, press any button to skip past the progress bar screen and
+    to start browsing immediately. Processing of album art will continue in the
+    background. An indicator in the screen corner shows you the completed percentage.
+    When the cache is being built, the UI may be slow to react to your input.
+    For optimal performance, wait for processing to complete.
+    \item Each time you update your player's database, you should manually rebuild or
+    update the cache in PictureFlow.
     \item PictureFlow will accept album art larger than the dimensions of the
     screen, but the larger the dimensions, the longer they will take to scale.
   \end{itemize}
@@ -32,7 +53,7 @@ aware:
             Scroll through albums / track list
                 \\
         }
-        
+
         % only scroll wheel and `strip' targets use the same action in album and track list
         \nopt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD,MPIO_HD300_PAD}{%
             % currently the M3 does not use buttons of the main unit which has no display
@@ -54,6 +75,29 @@ aware:
                 \opt{GIGABEAT_RC_PAD}{\ButtonRCVolUp{} / \ButtonRCVolDown}
                 &}
             Scroll through track list
+                \\
+        }
+
+        \opt{FIIO_M3K_PAD}{
+                \ButtonLeft{} / \ButtonRight
+                &
+                \opt{HAVEREMOTEKEYMAP}{&}
+                Quickly jump to another album (alphabetically or by year) /
+                browse through albums from track list
+                \\
+        }
+        \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
+                \ButtonLeft{} / \ButtonRight
+                &
+                \opt{HAVEREMOTEKEYMAP}{&}
+                Quickly jump to another album (alphabetically or by year)
+                \\
+        }
+        \opt{FIIO_M3K_PAD}{
+                \ButtonVolUp{} / \ButtonVolDown
+                &
+                \opt{HAVEREMOTEKEYMAP}{&}
+                Adjust current album sorting
                 \\
         }
 
@@ -85,11 +129,13 @@ aware:
             Play album from selected track in track list
                 \\
         }
-        
-        \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen,SANSA_FUZEPLUS_PAD}{\ButtonLeft}
+
+        \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,touchscreen,SANSA_FUZEPLUS_PAD,%
+        FIIO_M3K_PAD}{\ButtonLeft}
         \opt{MPIO_HD200_PAD}{\ButtonRec}
         \opt{MPIO_HD300_PAD}{\ButtonMenu}
         \opt{SANSA_FUZEPLUS_PAD}{\ButtonLeft{} or \ButtonBack}
+        \opt{FIIO_M3K_PAD}{\ButtonBack}
         \opt{touchscreen}{
             \opt{COWON_D2_PAD}{\ButtonPower{} or}
             \TouchBottomRight}
@@ -100,10 +146,16 @@ aware:
         Exit track list
             \\
 
-        \nopt{IAUDIO_M3_PAD,SANSA_FUZEPLUS_PAD}{\ActionStdMenu}
-        \nopt{IAUDIO_M3_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ActionStdMenu}
-            \opt{SANSA_FUZEPLUS_PAD}{long \ButtonSelect}
-            \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{or \ButtonRew}
+        \ActionStdContext
+            &
+        \opt{HAVEREMOTEKEYMAP}{&}
+        Enter context menu (if WPS integration is enabled)
+            \\
+
+        \nopt{IAUDIO_M3_PAD,SANSA_FUZEPLUS_PAD,FIIO_M3K_PAD}{\ActionStdMenu}
+        \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{or \ButtonRew}
+        \opt{SANSA_FUZEPLUS_PAD}{Long \ButtonSelect}
+        \opt{FIIO_M3K_PAD}{\ButtonPower}
             &
         \opt{HAVEREMOTEKEYMAP}{
             \opt{IAUDIO_M3_PAD,GIGABEAT_RC_PAD}{\ActionRCStdMenu}
@@ -117,11 +169,12 @@ aware:
                 ,MROBE100_PAD,SANSA_FUZEPLUS_PAD}{\ButtonPower}
             \opt{SANSA_C200_PAD,IRIVER_H10_PAD}{Long \ButtonPower}
             \opt{IPOD_4G_PAD,IPOD_3G_PAD}{Long \ButtonMenu}
-            \opt{SANSA_FUZE_PAD}{Long \ButtonHome} 
+            \opt{SANSA_FUZE_PAD}{Long \ButtonHome}
             \opt{PBELL_VIBE500_PAD}{\ButtonRec}
             \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{long \ButtonRew}
             \opt{MPIO_HD200_PAD}{FIXME}
             \opt{MPIO_HD300_PAD}{Long \ButtonMenu}
+            \opt{FIIO_M3K_PAD}{\ButtonBack}
             \opt{touchscreen}{
                 \opt{COWON_D2_PAD}{Long \ButtonPower{} or}
                 \TouchBottomRight{} (in album view)}
@@ -133,12 +186,13 @@ aware:
             &}
         Exit PictureFlow
             \\
-            
+
     \end{btnmap}
 
 \subsubsection{Main Menu}
 \begin{description}
-  \item[Go to WPS.] Leave PictureFlow and enter the while playing screen.
+  \item[Go to WPS.] Leave PictureFlow and enter the While Playing Screen.
+  \item[Clear playlist] Removes all entries from the current playlist.
   \item[Playback Control.] Control music playback from within the plugin.
   \item[Settings.] Enter the settings menu.
   \item[Return.] Exit menu.
@@ -148,7 +202,14 @@ aware:
 \subsubsection{Settings Menu}
 
 \begin{description}
-  \item[Show FPS.] Displays frames per second on screen.
+  \item[Show album title.] Allows setting the album title / artist to be
+  shown above or below the cover art, or not at all.
+  \item[Show year in album title.] Set whether a year will be displayed next to each album
+  title (determined by the release year of the latest track on an album).
+  \item[Sort albums by.] Change the sorting of albums in PictureFlow.
+  \item[Year sort order.] Determines whether albums are sorted in ascending or descending
+  order, when sorting by year.
+  \item[Display FPS.] Displays frames per second on screen.
   \item[Spacing.] The distance between the front edges of the side slides, i.e. changes
   the degree of overlap of the side slides. A larger number means less overlap. Scales with zoom.
   \item[Centre margin.] The distance, in screen pixels, with zoom at 100, between
@@ -157,14 +218,13 @@ aware:
   centre slide. Therefore if set to 4, there will be 3 slides on the left,
   the centre slide, and then 3 slides on the right.
   \item[Zoom.] Changes the distance at which slides are rendered from the ``camera''.
-  \item[Show album title.] Allows setting the album title / artist to be
-  shown above or below the cover art, or not at all.
   \item[Resize Covers.] Set whether to automatically resize the covers or to leave
   them at their original size.
   \item[Rebuild cache.] Rebuild the PictureFlow cache. This is needed in order
   for PictureFlow to pick up new albums, and may occasionally be needed if albums
   are removed.
   \item[Update cache.] Update the PictureFlow cache. New albumart will be added.
-  \item[WPS integration.] Integrate pictureflow with the While Playing Screen.
+  \item[WPS integration.] Integrate PictureFlow with the While Playing Screen and enable
+  the Current Playlist context menu.
   \item[Backlight.] Force backlight on while running pictureflow.
 \end{description}
