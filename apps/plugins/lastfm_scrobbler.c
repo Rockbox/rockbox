@@ -317,6 +317,11 @@ static void scrobbler_flush_callback(void)
 }
 #endif
 
+static inline char* str_chk_valid(char *s, char *alt)
+{
+    return (s != NULL ? s : alt);
+}
+
 static void scrobbler_add_to_cache(const struct mp3entry *id)
 {
     if ( gCache.pos >= SCROBBLER_MAX_CACHE )
@@ -335,17 +340,19 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
     if (id->tracknum > 0)
         rb->snprintf(tracknum, sizeof (tracknum), "%d", id->tracknum);
 
+    char* artist = id->artist ? id->artist : id->albumartist;
+
     int ret = rb->snprintf(&scrobbler_buf[(SCROBBLER_CACHE_LEN*gCache.pos)],
                        SCROBBLER_CACHE_LEN,
                        "%s\t%s\t%s\t%s\t%d\t%c\t%ld\t%s\n",
-                       id->artist ? id->artist : id->albumartist,
-                       id->album,
-                       id->title,
+                       str_chk_valid(artist, UNTAGGED),
+                       str_chk_valid(id->album, ""),
+                       str_chk_valid(id->title, ""),
                        tracknum,
                        (int)(id->length / 1000),
                        rating,
                        get_timestamp(),
-                       id->mb_track_id);
+                       str_chk_valid(id->mb_track_id, ""));
 
     if ( ret >= SCROBBLER_CACHE_LEN )
     {
