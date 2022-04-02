@@ -27,6 +27,10 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 #include "plugin.h"
 
+#ifndef UNTAGGED
+    #define UNTAGGED "<UNTAGGED>"
+#endif
+
 #ifdef ROCKBOX_HAS_LOGF
 #define logf rb->logf
 #else
@@ -324,6 +328,9 @@ static inline char* str_chk_valid(char *s, char *alt)
 
 static void scrobbler_add_to_cache(const struct mp3entry *id)
 {
+    static uint32_t last_crc = 0;
+    int trk_info_len = 0;
+
     if ( gCache.pos >= SCROBBLER_MAX_CACHE )
         scrobbler_write_cache();
 
@@ -344,13 +351,14 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
 
     int ret = rb->snprintf(&scrobbler_buf[(SCROBBLER_CACHE_LEN*gCache.pos)],
                        SCROBBLER_CACHE_LEN,
-                       "%s\t%s\t%s\t%s\t%d\t%c\t%ld\t%s\n",
+                       "%s\t%s\t%s\t%s\t%d\t%c%n\t%ld\t%s\n",
                        str_chk_valid(artist, UNTAGGED),
                        str_chk_valid(id->album, ""),
                        str_chk_valid(id->title, ""),
                        tracknum,
                        (int)(id->length / 1000),
                        rating,
+                       &trk_info_len,
                        get_timestamp(),
                        str_chk_valid(id->mb_track_id, ""));
 
@@ -361,11 +369,19 @@ static void scrobbler_add_to_cache(const struct mp3entry *id)
     }
     else
     {
-        logf("Added %s", scrobbler_buf);
-        gCache.pos++;
+        uint32_t crc = rb->crc_32(&scrobbler_buf[(SCROBBLER_CACHE_LEN*gCache.pos)],
+                                  trk_info_len, 0xFFFFFFFF);
+        if (crc != last_crc)
+        {
+            last_crc = crc;
+            logf("Added %s", scrobbler_buf);
+            gCache.pos++;
 #if USING_STORAGE_CALLBACK
-        rb->register_storage_idle_func(scrobbler_flush_callback);
+            rb->register_storage_idle_func(scrobbler_flush_callback);
 #endif
+        }
+        else
+            logf("SCROBBLER: skipping repeat entry: %s", id->path);
     }
 
 }
