@@ -419,7 +419,7 @@ typedef struct
     bool          wait_for_release;
 
 #ifndef DISABLE_ACTION_REMAP
-    struct button_mapping* core_keymap;
+    int         key_remap;
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
@@ -449,7 +449,9 @@ bool action_userabort(int timeout);
 const struct button_mapping* get_context_mapping(int context);
 
 /* load a key map to allow buttons for actions to be remapped see: core_keymap */
-int action_set_keymap(struct button_mapping* core_button_map, int count);
+int action_set_keymap(struct button_mapping* core_keymap, int count);
+/* load keymap in a handle: takes ownership of the handle on success */
+int action_set_keymap_handle(int handle, int count);
 
 /* returns the status code variable from action.c for the button just pressed
    If button != NULL it will be set to the actual button code */

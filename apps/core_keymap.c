@@ -27,119 +27,67 @@
 #include "logf.h"
 
 #if !defined(__PCTOOL__) || defined(CHECKWPS)
-static int keymap_handle = -1;
-
-static int core_alloc_keymap(size_t bufsz)
-{
-    keymap_handle = core_alloc_ex("key remap", bufsz, &buflib_ops_locked);
-    return keymap_handle;
-}
-
-static void core_free_keymap(void)
-{
-    action_set_keymap(NULL, -1);
-    if (keymap_handle > 0) /* free old buffer */
-    {
-        keymap_handle = core_free(keymap_handle);
-    }
-}
-
-/* Allocates buffer from core and copies keymap into it */
 int core_set_keyremap(struct button_mapping* core_keymap, int count)
 {
+    return action_set_keymap(core_keymap, count);
+}
 
-    core_free_keymap();
-    if (count > 0)
+static int open_key_remap(const char *filename, int *countp)
+{
+    int fd = open(filename, O_RDONLY);
+    if (fd < 0)
+        return fd;
+
+    size_t fsize = filesize(fd);
+    int count = fsize / sizeof(struct button_mapping);
+    if (count == 0 || (size_t)(count * sizeof(struct button_mapping)) != fsize)
     {
-        size_t bufsize = count * sizeof(struct button_mapping);
-        if (core_keymap != NULL && core_alloc_keymap(bufsize) > 0)
-        {
-            char *buf = core_get_data(keymap_handle);
-            memcpy(buf, core_keymap, bufsize);
-            count = action_set_keymap((struct button_mapping *) buf, count);
-        }
-        else
-            count = -1;
+        logf("core_keyremap: bad filesize %d / %lu", count, (unsigned long)fsize);
+        goto error;
     }
-    return count;
+
+    struct button_mapping header;
+    if(read(fd, &header, sizeof(header)) != (ssize_t)sizeof(header))
+    {
+        logf("core_keyremap: read error");
+        goto error;
+    }
+
+    if (header.action_code != KEYREMAP_VERSION ||
+        header.button_code != KEYREMAP_HEADERID ||
+        header.pre_button_code != count)
+    {
+        logf("core_keyremap: bad header %d", count);
+        goto error;
+    }
+
+    *countp = count - 1;
+    return fd;
+
+  error:
+    close(fd);
+    return -1;
 }
 
 int core_load_key_remap(const char *filename)
 {
-    char *buf;
-    int fd = -1;
-    int count = 0;
-    size_t fsize = 0;
-    core_free_keymap();
+    int count = 0; /* gcc falsely believes this may be used uninitialized */
+    int fd = open_key_remap(filename, &count);
+    if (fd < 0)
+        return -1;
 
-    if (filename != NULL)
-        count = open_key_remap(filename, &fd, &fsize);
-    while (count > 0)
+    size_t bufsize = count * sizeof(struct button_mapping);
+    int handle = core_alloc("keyremap", bufsize);
+    if (handle > 0)
     {
-        if (core_alloc_keymap(fsize) <= 0)
-        {
-            count = -30;
-            logf("core_keymap: %d Failed to allocate buffer", count);
-            break;
-        }
-        buf = core_get_data(keymap_handle);
-        if (read(fd, buf, fsize) == (ssize_t) fsize)
-        {
-            count = action_set_keymap((struct button_mapping *) buf, count);
-        }
-        else
-        {
-            count = -40;
-            logf("core_keymap: %d Failed to read", count);
-        }
-        break;
+        core_pin(handle);
+        if (read(fd, core_get_data(handle), bufsize) == (ssize_t)bufsize)
+            count = action_set_keymap_handle(handle, count);
+
+        core_unpin(handle);
     }
+
     close(fd);
-    return count;
-}
-
-int open_key_remap(const char *filename, int *fd, size_t *fsize)
-{
-    int count = 0;
-
-    while (filename && fd && fsize)
-    {
-        *fsize = 0;
-        *fd = open(filename, O_RDONLY);
-        if (*fd)
-        {
-            *fsize = filesize(*fd);
-
-            count = *fsize / sizeof(struct button_mapping);
-
-            if (count * sizeof(struct button_mapping) != *fsize)
-            {
-                count = -10;
-                logf("core_keymap: %d Size mismatch", count);
-                break;
-            }
-
-            if (count > 1)
-            {
-                struct button_mapping header = {0};
-                read(*fd, &header, sizeof(struct button_mapping));
-                if (KEYREMAP_VERSION == header.action_code &&
-                    KEYREMAP_HEADERID == header.button_code &&
-                    header.pre_button_code == count)
-                {
-                    count--;
-                    *fsize -= sizeof(struct button_mapping);
-                }
-                else /* Header mismatch */
-                {
-                    count = -20;
-                    logf("core_keymap: %d Header mismatch", count);
-                    break;
-                }
-            }
-        }
-        break;
-    }
     return count;
 }
 

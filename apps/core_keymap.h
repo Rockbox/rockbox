@@ -34,13 +34,6 @@
 /* Allocates core buffer, copies keymap to allow buttons for actions to be remapped*/
 int core_set_keyremap(struct button_mapping* core_keymap, int count);
 
-/* open_key_remap(filename , *fd (you must close file_descriptor), *fsize)
- * checks/strips header and returns remaining count
- * fd is opened and set to first record
- * filesize contains the size of the remaining records
-*/
-int open_key_remap(const char *filename, int *fd, size_t *filesize);
-
 /* load a remap file to allow buttons for actions to be remapped */
 int core_load_key_remap(const char *filename);
 
