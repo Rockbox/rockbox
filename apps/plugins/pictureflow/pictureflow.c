@@ -531,6 +531,7 @@ static int itilt;
 static PFreal offsetX;
 static PFreal offsetY;
 static int number_of_slides;
+static bool is_initial_slide = true;
 
 static struct pf_slide_cache pf_sldcache;
 
@@ -2903,13 +2904,19 @@ static inline struct dim *surface(const int slide_index)
     {
         int j = 0;
         do {
-            if (pf_sldcache.cache[i].index == slide_index)
+            if (pf_sldcache.cache[i].index == slide_index) {
+                if (is_initial_slide && slide_index == center_index)
+                    is_initial_slide = false;
                 return get_slide(pf_sldcache.cache[i].hid);
+            }
             i = pf_sldcache.cache[i].next;
             j++;
         } while (i != pf_sldcache.used && j < SLIDE_CACHE_SIZE);
     }
-    return get_slide(empty_slide_hid);
+    if (is_initial_slide && slide_index == center_index)
+        return NULL;
+    else
+        return get_slide(empty_slide_hid);
 }
 
 /**
@@ -3245,6 +3252,7 @@ static bool sort_albums(int new_sorting, bool from_settings)
     rb->buflib_init(&buf_ctx, (void *)pf_idx.buf, pf_idx.buf_sz);
     empty_slide_hid = read_pfraw(EMPTY_SLIDE, 0);
     initialize_slide_cache();
+    is_initial_slide = true;
     create_pf_thread();
 
     /* Go to previously selected slide */
@@ -4455,7 +4463,8 @@ static int pictureflow_main(const char* selected_file)
 
 
         /* Copy offscreen buffer to LCD and give time to other threads */
-        mylcd_update();
+        if (is_initial_slide == false)
+            mylcd_update();
         rb->yield();
 
         /*/ Handle buttons */
