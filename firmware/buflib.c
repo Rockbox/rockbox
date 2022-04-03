@@ -317,6 +317,20 @@ void handle_free(struct buflib_context *ctx, union buflib_data *handle)
         ctx->compact = false;
 }
 
+static inline
+union buflib_data* handle_to_block_end(struct buflib_context *ctx, int handle)
+{
+    void *ptr = buflib_get_data(ctx, handle);
+
+    /* this is a valid case for shrinking if handle
+     * was freed by the shrink callback */
+    if (!ptr)
+        return NULL;
+
+    union buflib_data *data = ALIGN_DOWN(ptr, sizeof(*data));
+    return data;
+}
+
 /* Get the start block of an allocation */
 static inline
 union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
@@ -1038,7 +1052,7 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
 
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
-    union buflib_data *data = ALIGN_DOWN(buflib_get_data(ctx, handle), sizeof (*data));
+    union buflib_data *data = handle_to_block_end(ctx, handle);
     size_t len = data[-bidx_BSIZE].val;
     if (len <= BUFLIB_NUM_FIELDS)
         return NULL;
