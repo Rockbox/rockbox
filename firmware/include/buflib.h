@@ -38,6 +38,7 @@ union buflib_data
     intptr_t val;                 /* length of the block in n*sizeof(union buflib_data).
                                      Includes buflib metadata overhead. A negative value
                                      indicates block is unallocated */
+    volatile unsigned pincount;   /* number of pins */
     struct buflib_callbacks* ops; /* callback functions for move and shrink. Can be NULL */
     char* alloc;                  /* start of allocated memory area */
     union buflib_data *handle;    /* pointer to entry in the handle table.
@@ -290,6 +291,25 @@ static inline void* buflib_get_data(struct buflib_context *ctx, int handle)
  *
  */
 bool buflib_shrink(struct buflib_context *ctx, int handle, void* newstart, size_t new_size);
+
+/**
+ * Increment the pin count for a handle. When pinned the handle will not
+ * be moved and move callbacks will not be triggered, allowing a pointer
+ * to the buffer to be kept across yields or used for I/O.
+ *
+ * Note that shrink callbacks can still be invoked for pinned handles.
+ */
+void buflib_pin(struct buflib_context *ctx, int handle);
+
+/**
+ * Decrement the pin count for a handle.
+ */
+void buflib_unpin(struct buflib_context *ctx, int handle);
+
+/**
+ * Get the current pin count of a handle. Zero means the handle is not pinned.
+ */
+unsigned buflib_pin_count(struct buflib_context *ctx, int handle);
 
 /**
  * Frees memory associated with the given handle

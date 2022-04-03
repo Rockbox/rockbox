@@ -104,6 +104,21 @@ bool core_shrink(int handle, void* new_start, size_t new_size)
     return buflib_shrink(&core_ctx, handle, new_start, new_size);
 }
 
+void core_pin(int handle)
+{
+    buflib_pin(&core_ctx, handle);
+}
+
+void core_unpin(int handle)
+{
+    buflib_unpin(&core_ctx, handle);
+}
+
+unsigned core_pin_count(int handle)
+{
+    return buflib_pin_count(&core_ctx, handle);
+}
+
 const char* core_get_name(int handle)
 {
     const char *name = buflib_get_name(&core_ctx, handle);

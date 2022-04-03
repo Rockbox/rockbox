@@ -102,10 +102,12 @@
 #define PARANOIA_CHECK_HANDLE       (1 << 1)
 #define PARANOIA_CHECK_BLOCK_HANDLE (1 << 2)
 #define PARANOIA_CHECK_CRC          (1 << 3)
+#define PARANOIA_CHECK_PINNING      (1 << 4)
 /* Bitmask of enabled paranoia checks */
 #define BUFLIB_PARANOIA \
     (PARANOIA_CHECK_LENGTH | PARANOIA_CHECK_HANDLE | \
-     PARANOIA_CHECK_BLOCK_HANDLE | PARANOIA_CHECK_CRC)
+     PARANOIA_CHECK_BLOCK_HANDLE | PARANOIA_CHECK_CRC | \
+     PARANOIA_CHECK_PINNING)
 
 #if BUFLIB_PARANOIA & PARANOIA_CHECK_CRC
 # define BUFLIB_HAS_CRC
@@ -122,6 +124,7 @@ enum {
 /* Backward indices, used to index a block end pointer as block[-bidx_XXX] */
 enum {
     bidx_USER,      /* dummy to get below fields to be 1-based */
+    bidx_PIN,       /* pin count */
 #ifdef BUFLIB_HAS_CRC
     bidx_CRC,       /* CRC, protects all metadata behind it */
 #endif
@@ -132,9 +135,9 @@ enum {
  * accounted for using the BSIZE field. Note that bidx_USER is not an
  * actual field so it is not included in the count. */
 #ifdef BUFLIB_HAS_CRC
-# define BUFLIB_NUM_FIELDS 5
+# define BUFLIB_NUM_FIELDS 6
 #else
-# define BUFLIB_NUM_FIELDS 4
+# define BUFLIB_NUM_FIELDS 5
 #endif
 
 struct buflib_callbacks buflib_ops_locked = {
@@ -394,7 +397,7 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
     check_block_crc(ctx, block, block_end);
 
-    if (!IS_MOVABLE(block))
+    if (!IS_MOVABLE(block) || block_end[-bidx_PIN].pincount > 0)
         return false;
 
     int handle = ctx->handle_table - h_entry;
@@ -751,6 +754,7 @@ buffer_alloc:
 
     size_t bsize = BUFLIB_NUM_FIELDS + name_len/sizeof(union buflib_data);
     union buflib_data *block_end = block + bsize;
+    block_end[-bidx_PIN].pincount = 0;
     block_end[-bidx_BSIZE].val = bsize;
     update_block_crc(ctx, block, block_end);
 
@@ -1048,6 +1052,39 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
     }
 
     return true;
+}
+
+void buflib_pin(struct buflib_context *ctx, int handle)
+{
+    if ((BUFLIB_PARANOIA & PARANOIA_CHECK_PINNING) && handle <= 0)
+        buflib_panic(ctx, "invalid handle pin: %d", handle);
+
+    union buflib_data *data = handle_to_block_end(ctx, handle);
+    data[-bidx_PIN].pincount++;
+}
+
+void buflib_unpin(struct buflib_context *ctx, int handle)
+{
+    if ((BUFLIB_PARANOIA & PARANOIA_CHECK_PINNING) && handle <= 0)
+        buflib_panic(ctx, "invalid handle unpin: %d", handle);
+
+    union buflib_data *data = handle_to_block_end(ctx, handle);
+    if (BUFLIB_PARANOIA & PARANOIA_CHECK_PINNING)
+    {
+        if (data[-bidx_PIN].pincount == 0)
+            buflib_panic(ctx, "handle pin underflow: %d", handle);
+    }
+
+    data[-bidx_PIN].pincount--;
+}
+
+unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
+{
+    if ((BUFLIB_PARANOIA & PARANOIA_CHECK_PINNING) && handle <= 0)
+        buflib_panic(ctx, "invalid handle: %d", handle);
+
+    union buflib_data *data = handle_to_block_end(ctx, handle);
+    return data[-bidx_PIN].pincount;
 }
 
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
