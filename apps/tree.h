@@ -52,7 +52,6 @@ struct tree_cache {
     int     name_buffer_handle;     /* handle to the name cache */
     int     max_entries;            /* Max entries in the cache */
     int     name_buffer_size;       /* in bytes */
-    volatile int lock_count;        /* non-0 if buffers may not move */
 };
 
 struct browse_context {
@@ -120,14 +119,10 @@ void browse_context_init(struct browse_context *browse,
 int rockbox_browse(struct browse_context *browse);
 int create_playlist(void);
 void resume_directory(const char *dir);
-static inline void tree_lock_cache(struct tree_context *t)
-{
-    t->cache.lock_count++;
-}
-static inline void tree_unlock_cache(struct tree_context *t)
-{
-    t->cache.lock_count--;
-}
+
+void tree_lock_cache(struct tree_context *t);
+void tree_unlock_cache(struct tree_context *t);
+
 #ifdef WIN32
 /* it takes an int on windows */
 #define getcwd_size_t int

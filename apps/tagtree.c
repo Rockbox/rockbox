@@ -192,7 +192,7 @@ static int current_entry_count;
 static struct tree_context *tc;
 
 /* a few memory alloc helper */
-static int tagtree_handle, lock_count;
+static int tagtree_handle;
 static size_t tagtree_bufsize, tagtree_buf_used;
 
 #define UPDATE(x, y) { x = (typeof(x))((char*)(x) + (y)); }
@@ -200,9 +200,6 @@ static int move_callback(int handle, void* current, void* new)
 {
     (void)handle; (void)current; (void)new;
     ptrdiff_t diff = new - current;
-
-    if (lock_count > 0)
-        return BUFLIB_CB_CANNOT_MOVE;
 
     if (menu)
         UPDATE(menu, diff);
@@ -250,16 +247,6 @@ static int move_callback(int handle, void* current, void* new)
     return BUFLIB_CB_OK;
 }
 #undef UPDATE
-
-static inline void tagtree_lock(void)
-{
-    lock_count++;
-}
-
-static inline void tagtree_unlock(void)
-{
-    lock_count--;
-}
 
 static struct buflib_callbacks ops = {
     .move_callback = move_callback,
@@ -623,7 +610,7 @@ static int add_format(const char *buf)
         int clause_count = 0;
         strp++;
 
-        tagtree_lock();
+        core_pin(tagtree_handle);
         while (1)
         {
             struct tagcache_search_clause *new_clause;
@@ -646,7 +633,7 @@ static int add_format(const char *buf)
 
             clause_count++;
         }
-        tagtree_unlock();
+        core_unpin(tagtree_handle);
 
         formats[format_count]->clause_count = clause_count;
     }
@@ -719,9 +706,9 @@ static int get_condition(struct search_instruction *inst)
     }
     else
     {
-        tagtree_lock();
+        core_pin(tagtree_handle);
         bool ret = read_clause(new_clause);
-        tagtree_unlock();
+        core_unpin(tagtree_handle);
         if (!ret)
             return -1;
     }
@@ -812,9 +799,9 @@ static bool parse_search(struct menu_entry *entry, const char *str)
 
         logf("tag: %d", inst->tagorder[inst->tagorder_count]);
 
-        tagtree_lock();
+        core_pin(tagtree_handle);
         while ( (ret = get_condition(inst)) > 0 ) ;
-        tagtree_unlock();
+        core_unpin(tagtree_handle);
 
         if (ret < 0)
             return false;
@@ -1176,10 +1163,10 @@ static int parse_line(int n, char *buf, void *parameters)
         logf("tagtree failed to allocate %s", "menu items");
         return -2;
     }
-    tagtree_lock();
+    core_pin(tagtree_handle);
     if (parse_search(menu->items[menu->itemcount], buf))
         menu->itemcount++;
-    tagtree_unlock();
+    core_unpin(tagtree_handle);
 
     return 0;
 }
@@ -1212,8 +1199,8 @@ static bool parse_menu(const char *filename)
 
 static void tagtree_unload(struct tree_context *c)
 {
-    int i;
-    tagtree_lock();
+    /* may be spurious... */
+    core_pin(tagtree_handle);
 
     remove_event(PLAYBACK_EVENT_TRACK_BUFFER, tagtree_buffer_event);
     remove_event(PLAYBACK_EVENT_TRACK_FINISH, tagtree_track_finish_event);
@@ -1229,7 +1216,7 @@ static void tagtree_unload(struct tree_context *c)
             return;
         }
 
-        for (i = 0; i < menu->itemcount; i++)
+        for (int i = 0; i < menu->itemcount; i++)
         {
             dptr->name = NULL;
             dptr->newtable = 0;
@@ -1238,11 +1225,11 @@ static void tagtree_unload(struct tree_context *c)
         }
     }
 
-    for (i = 0; i < menu_count; i++)
+    for (int i = 0; i < menu_count; i++)
         menus[i] = NULL;
     menu_count = 0;
 
-    for (i = 0; i < format_count; i++)
+    for (int i = 0; i < format_count; i++)
         formats[i] = NULL;
     format_count = 0;
 
@@ -1253,9 +1240,6 @@ static void tagtree_unload(struct tree_context *c)
 
     if (c)
         tree_unlock_cache(c);
-    tagtree_unlock();
-    if (lock_count > 0)
-        tagtree_unlock();/* second unlock to enable re-init */
 }
 
 void tagtree_init(void)
@@ -1285,8 +1269,6 @@ void tagtree_init(void)
     if (sizeof(struct tagentry) != sizeof(struct entry))
         panicf("tagentry(%zu) and entry mismatch(%zu)",
                 sizeof(struct tagentry), sizeof(struct entry));
-    if (lock_count > 0)
-        panicf("tagtree locked after parsing");
 
     /* If no root menu is set, assume it's the first single menu
      * we have. That shouldn't normally happen. */
@@ -1502,7 +1484,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
     /* because tagcache saves the clauses, we need to lock the buffer
      * for the entire duration of the search */
-    tagtree_lock();
+    core_pin(tagtree_handle);
     for (i = 0; i <= level; i++)
     {
         int j;
@@ -1579,7 +1561,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
         fmt = NULL;
         /* Check the format */
-        tagtree_lock();
+        core_pin(tagtree_handle);
         for (i = 0; i < format_count; i++)
         {
             if (formats[i]->group_id != csi->format_id[level])
@@ -1592,7 +1574,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
                 break;
             }
         }
-        tagtree_unlock();
+        core_unpin(tagtree_handle);
 
         if (strcmp(tcs.result, UNTAGGED) == 0)
         {
@@ -1634,7 +1616,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
                     logf("format_str() failed");
                     tagcache_search_finish(&tcs);
                     tree_unlock_cache(c);
-                    tagtree_unlock();
+                    core_unpin(tagtree_handle);
                     return 0;
                 }
                 else
@@ -1675,7 +1657,7 @@ entry_skip_formatter:
             {   /* user aborted */
                 tagcache_search_finish(&tcs);
                 tree_unlock_cache(c);
-                tagtree_unlock();
+                core_unpin(tagtree_handle);
                 return current_entry_count;
             }
         }
@@ -1694,7 +1676,7 @@ entry_skip_formatter:
     {
         tagcache_search_finish(&tcs);
         tree_unlock_cache(c);
-        tagtree_unlock();
+        core_unpin(tagtree_handle);
         return current_entry_count;
     }
 
@@ -1710,7 +1692,7 @@ entry_skip_formatter:
 
     tagcache_search_finish(&tcs);
     tree_unlock_cache(c);
-    tagtree_unlock();
+    core_unpin(tagtree_handle);
 
     if (!sort && (sort_inverse || sort_limit))
     {
@@ -1870,7 +1852,7 @@ int tagtree_enter(struct tree_context* c)
 
     /* lock buflib for possible I/O to protect dptr */
     tree_lock_cache(c);
-    tagtree_lock();
+    core_pin(tagtree_handle);
 
     bool reset_selection = true;
 
@@ -1940,7 +1922,7 @@ int tagtree_enter(struct tree_context* c)
                             {
                                 tagtree_exit(c);
                                 tree_unlock_cache(c);
-                                tagtree_unlock();
+                                core_unpin(tagtree_handle);
                                 return 0;
                             }
                             if (csi->clause[i][j]->numeric)
@@ -1999,7 +1981,7 @@ int tagtree_enter(struct tree_context* c)
     }
 
     tree_unlock_cache(c);
-    tagtree_unlock();
+    core_unpin(tagtree_handle);
 
     return rc;
 }

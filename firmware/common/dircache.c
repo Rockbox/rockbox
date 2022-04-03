@@ -249,7 +249,6 @@ static struct dircache_runinfo
     /* cache buffer info */
     int          handle;           /* buflib buffer handle */
     size_t       bufsize;          /* size of buflib allocation - 1 */
-    int          buflocked;        /* don't move due to other allocs */
     union {
     void                  *p;      /* address of buffer - ENTRYSIZE */
     struct dircache_entry *pentry; /* alias of .p to assist entry resolution */
@@ -329,29 +328,9 @@ static inline void dumpster_clean_buffer(void *p, size_t size)
  */
 static int move_callback(int handle, void *current, void *new)
 {
-    if (dircache_runinfo.buflocked)
-        return BUFLIB_CB_CANNOT_MOVE;
-
-    dircache_runinfo.p = new - ENTRYSIZE;
-
-    return BUFLIB_CB_OK;
     (void)handle; (void)current;
-}
-
-/**
- * add a "don't move" lock count
- */
-static inline void buffer_lock(void)
-{
-    dircache_runinfo.buflocked++;
-}
-
-/**
- * remove a "don't move" lock count
- */
-static inline void buffer_unlock(void)
-{
-    dircache_runinfo.buflocked--;
+    dircache_runinfo.p = new - ENTRYSIZE;
+    return BUFLIB_CB_OK;
 }
 
 
@@ -530,14 +509,14 @@ static void set_buffer(int handle, size_t size)
 
 /**
  * remove the allocation from dircache control and return the handle
+ * Note that dircache must not be using the buffer!
  */
 static int reset_buffer(void)
 {
     int handle = dircache_runinfo.handle;
     if (handle > 0)
     {
-        /* don't mind .p; it might get changed by the callback even after
-           this call; buffer presence is determined by the following: */
+        /* don't mind .p; buffer presence is determined by the following: */
         dircache_runinfo.handle  = 0;
         dircache_runinfo.bufsize = 0;
     }
@@ -1857,7 +1836,7 @@ static void reset_cache(void)
  */
 static void build_volumes(void)
 {
-    buffer_lock();
+    core_pin(dircache_runinfo.handle);
 
     for (int i = 0; i < NUM_VOLUMES; i++)
     {
@@ -1903,12 +1882,14 @@ static void build_volumes(void)
 
     logf("Done, %ld KiB used", dircache.size / 1024);
 
-    buffer_unlock();
+    core_unpin(dircache_runinfo.handle);
 }
 
 /**
  * allocate buffer and return whether or not a synchronous build should take
  * place; if 'realloced' is NULL, it's just a query about what will happen
+ *
+ * Note this must be called with the dircache_lock() active.
  */
 static int prepare_build(bool *realloced)
 {
@@ -1958,16 +1939,14 @@ static int prepare_build(bool *realloced)
     *realloced = true;
     reset_cache();
 
-    buffer_lock();
-
     int handle = reset_buffer();
-    dircache_unlock();
+    dircache_unlock(); /* release lock held by caller */
 
     core_free(handle);
 
     handle = alloc_cache(size);
 
-    dircache_lock();
+    dircache_lock(); /* reacquire lock */
 
     if (dircache_runinfo.suspended && handle > 0)
     {
@@ -1979,13 +1958,9 @@ static int prepare_build(bool *realloced)
     }
 
     if (handle <= 0)
-    {
-        buffer_unlock();
         return -1;
-    }
 
     set_buffer(handle, size);
-    buffer_unlock();
 
     return syncbuild;
 }
@@ -2384,9 +2359,9 @@ void dircache_fileop_create(struct file_base_info *dirinfop,
     if ((dinp->attr & ATTR_DIRECTORY) && !is_dotdir_name(basename))
     {
         /* scan-in the contents of the new directory at this level only */
-        buffer_lock();
+        core_pin(dircache_runinfo.handle);
         sab_process_dir(infop, false);
-        buffer_unlock();
+        core_unpin(dircache_runinfo.handle);
     }
 }
 
@@ -2915,7 +2890,7 @@ void dircache_dump(void)
 
     if (dircache_runinfo.handle)
     {
-        buffer_lock();
+        core_pin(dircache_runinfo.handle);
 
         /* bin */
         write(fdbin, dircache_runinfo.p + ENTRYSIZE,
@@ -2985,7 +2960,7 @@ void dircache_dump(void)
                      tm.tm_hour, tm.tm_min, tm.tm_sec);
         }
 
-        buffer_unlock();
+        core_unpin(dircache_runinfo.handle);
     }
 
     dircache_unlock();
@@ -3104,7 +3079,6 @@ int dircache_load(void)
     }
 
     dircache_lock();
-    buffer_lock();
 
     if (!dircache_is_clean(false))
         goto error;
@@ -3113,6 +3087,7 @@ int dircache_load(void)
     dircache = maindata.dircache;
 
     set_buffer(handle, bufsize);
+    core_pin(handle);
     hasbuffer = true;
 
     /* convert back to in-RAM representation */
@@ -3167,13 +3142,13 @@ int dircache_load(void)
     dircache_enable_internal(false);
 
     /* cache successfully loaded */
+    core_unpin(handle);
     logf("Done, %ld KiB used", dircache.size / 1024);
     rc = 0;
 error:
     if (rc < 0 && hasbuffer)
         reset_buffer();
 
-    buffer_unlock();
     dircache_unlock();
 
 error_nolock:
@@ -3199,8 +3174,9 @@ int dircache_save(void)
     if (fd < 0)
         return -1;
 
+    /* it seems the handle *must* exist if this function is called */
     dircache_lock();
-    buffer_lock();
+    core_pin(dircache_runinfo.handle);
 
     int rc = -1;
 
@@ -3269,7 +3245,7 @@ int dircache_save(void)
        that makes what was saved completely invalid */
     rc = 0;
 error:
-    buffer_unlock();
+    core_unpin(dircache_runinfo.handle);
     dircache_unlock();
 
     if (rc < 0)

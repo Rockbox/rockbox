@@ -277,17 +277,16 @@ static struct tcramcache
 {
     struct ramcache_header *hdr;      /* allocated ramcache_header */
     int handle;                       /* buffer handle */
-    int move_lock;
 } tcramcache;
 
 static inline void tcrc_buffer_lock(void)
 {
-    tcramcache.move_lock++;
+    core_pin(tcramcache.handle);
 }
 
 static inline void tcrc_buffer_unlock(void)
 {
-    tcramcache.move_lock--;
+    core_unpin(tcramcache.handle);
 }
 
 #else /* ndef HAVE_TC_RAMCACHE */
@@ -3861,10 +3860,9 @@ static bool delete_entry(long idx_id)
             struct tagfile_entry *tfe;
             int32_t *seek = &tcramcache.hdr->indices[idx_id].tag_seek[tag];
 
+            /* crc_32 is assumed not to yield (why would it...?) */
             tfe = (struct tagfile_entry *)&tcramcache.hdr->tags[tag][*seek];
-            tcrc_buffer_lock(); /* protect tfe and seek if crc_32() yield()s */
             *seek = crc_32(tfe->tag_data, strlen(tfe->tag_data), 0xffffffff);
-            tcrc_buffer_unlock();
             myidx.tag_seek[tag] = *seek;
         }
         else
@@ -4005,9 +4003,6 @@ static void fix_ramcache(void* old_addr, void* new_addr)
 static int move_cb(int handle, void* current, void* new)
 {
     (void)handle;
-    if (tcramcache.move_lock > 0)
-        return BUFLIB_CB_CANNOT_MOVE;
-
     fix_ramcache(current, new);
     tcramcache.hdr = new;
     return BUFLIB_CB_OK;
@@ -4092,8 +4087,8 @@ static bool tagcache_dumpload(void)
         return false;
     }
 
-    tcrc_buffer_lock();
     tcramcache.handle = handle;
+    tcrc_buffer_lock();
     tcramcache.hdr = core_get_data(handle);
     rc = read(fd, tcramcache.hdr, shdr.tc_stat.ramcache_allocated);
     tcrc_buffer_unlock();

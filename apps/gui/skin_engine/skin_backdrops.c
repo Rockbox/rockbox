@@ -41,7 +41,6 @@ static struct skin_backdrop {
 } backdrops[NB_BDROPS];
 
 #define NB_BDROPS SKINNABLE_SCREENS_COUNT*NB_SCREENS
-static int handle_being_loaded;
 static int current_lcd_backdrop[NB_SCREENS];
 
 bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *size)
@@ -65,8 +64,8 @@ bool skin_backdrop_get_debug(int index, char **path, int *ref_count, size_t *siz
 
 static int buflib_move_callback(int handle, void* current, void* new)
 {
-    if (handle == handle_being_loaded)
-        return BUFLIB_CB_CANNOT_MOVE;
+    (void)handle;
+
     for (int i=0; i<NB_BDROPS; i++)
     {
         if (backdrops[i].buffer == current)
@@ -96,7 +95,6 @@ bool skin_backdrop_init(void)
         }
         FOR_NB_SCREENS(i)
             current_lcd_backdrop[i] = -1;
-        handle_being_loaded = -1;
         first_go = false;
     }
     return go_status;
@@ -182,16 +180,16 @@ bool skin_backdrops_preload(void)
                     backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
                     if (strcmp(filename, BACKDROP_BUFFERNAME))
                     {
-                        handle_being_loaded = backdrops[i].buflib_handle;
+                        core_pin(backdrops[i].buflib_handle);
                         backdrops[i].loaded =
                                 screens[screen].backdrop_load(filename, backdrops[i].buffer);
+                        core_unpin(backdrops[i].buflib_handle);
                         if (!backdrops[i].loaded)
                         {
                             core_free(backdrops[i].buflib_handle);
                             backdrops[i].buflib_handle = -1;
                             retval = false;
                         }
-                        handle_being_loaded = -1;
                     }
                     else
                         backdrops[i].loaded = true;
@@ -295,12 +293,12 @@ void skin_backdrop_load_setting(void)
                         return;
                 }
                 bool loaded;
+                core_pin(backdrops[i].buflib_handle);
                 backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
-                handle_being_loaded = backdrops[i].buflib_handle;
                 loaded = screens[SCREEN_MAIN].backdrop_load(
                                                    global_settings.backdrop_file,
                                                    backdrops[i].buffer);
-                handle_being_loaded = -1;
+                core_unpin(backdrops[i].buflib_handle);
                 backdrops[i].name[2] = loaded ? '.' : '\0';
                 backdrops[i].loaded = loaded;
                 return;

@@ -1870,13 +1870,11 @@ static void skin_data_reset(struct wps_data *wps_data)
 }
 
 #ifndef __PCTOOL__
-static int currently_loading_handle = -1;
 static int buflib_move_callback(int handle, void* current, void* new)
 {
+    (void)handle;
     (void)current;
     (void)new;
-    if (handle == currently_loading_handle)
-        return BUFLIB_CB_CANNOT_MOVE;
     /* Any active skins may be scrolling - which means using viewports which
      * will be moved after this callback returns. This is a hammer to make that
      * safe. TODO: use a screwdriver instead.
@@ -1890,14 +1888,6 @@ static int buflib_move_callback(int handle, void* current, void* new)
     return BUFLIB_CB_OK;
 }
 static struct buflib_callbacks buflib_ops = {buflib_move_callback, NULL, NULL};
-static void lock_handle(int handle)
-{
-    currently_loading_handle = handle;
-}
-static void unlock_handle(void)
-{
-    currently_loading_handle = -1;
-}
 #endif
 
 static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char* bmpdir)
@@ -1944,12 +1934,12 @@ static int load_skin_bmp(struct wps_data *wps_data, struct bitmap *bitmap, char*
     _stats->buflib_handles++;
     _stats->images_size += buf_size;
     lseek(fd, 0, SEEK_SET);
-    lock_handle(handle);
+    core_pin(handle);
     bitmap->data = core_get_data(handle);
     int ret = read_bmp_fd(fd, bitmap, buf_size, format, NULL);
     bitmap->data = NULL; /* do this to force a crash later if the
                             caller doesnt call core_get_data() */
-    unlock_handle();
+    core_unpin(handle);
     close(fd);
     if (ret > 0)
     {

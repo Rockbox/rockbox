@@ -90,7 +90,6 @@ extern struct font sysfont;
 
 struct buflib_alloc_data {
     struct font font;    /* must be the first member! */
-    int handle_locks;    /* is the buflib handle currently locked? */
     int refcount;        /* how many times has this font been loaded? */
     unsigned char buffer[];
 };
@@ -106,9 +105,6 @@ static int buflibmove_callback(int handle, void* current, void* new)
     (void)handle;
     struct buflib_alloc_data *alloc = (struct buflib_alloc_data*)current;
     ptrdiff_t diff = new - current;
-
-    if (alloc->handle_locks > 0)
-        return BUFLIB_CB_CANNOT_MOVE;
 
 #define UPDATE(x) if (x) { x = PTR_ADD(x, diff); }
 
@@ -129,18 +125,18 @@ static void lock_font_handle(int handle, bool lock)
 {
     if ( handle < 0 )
         return;
-    struct buflib_alloc_data *alloc = core_get_data(handle);
-    if ( lock )
-        alloc->handle_locks++;
+
+    if (lock)
+        core_pin(handle);
     else
-        alloc->handle_locks--;
+        core_unpin(handle);
 }
 
 void font_lock(int font_id, bool lock)
 {
     if( font_id < 0 || font_id >= MAXFONTS )
         return;
-    if( buflib_allocations[font_id] >= 0 )
+    if( buflib_allocations[font_id] > 0 )
         lock_font_handle(buflib_allocations[font_id], lock);
 }
 
@@ -522,8 +518,8 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
         return -1;
     }
     struct buflib_alloc_data *pdata;
+    core_pin(handle);
     pdata = core_get_data(handle);
-    pdata->handle_locks = 1;
     pdata->refcount     = 1;
 
     /* load and init */

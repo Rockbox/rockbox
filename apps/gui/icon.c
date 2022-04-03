@@ -63,7 +63,6 @@ static struct iconset {
     struct bitmap bmp;
     bool loaded;
     int handle;
-    int handle_locked;
 } iconsets[Iconset_Count][NB_SCREENS];
 
 #define ICON_HEIGHT(screen) (!iconsets[Iconset_user][screen].loaded ?       \
@@ -160,8 +159,6 @@ static int buflib_move_callback(int handle, void* current, void* new)
             struct iconset *set = &iconsets[i][j];
             if (set->bmp.data == current)
             {
-                if (set->handle_locked > 0)
-                    return BUFLIB_CB_CANNOT_MOVE;
                 set->bmp.data = new;
                 return BUFLIB_CB_OK;
             }
@@ -201,11 +198,10 @@ static void load_icons(const char* filename, enum Iconset iconset,
             goto finished;
         }
         lseek(fd, 0, SEEK_SET);
+        core_pin(ic->handle);
         ic->bmp.data = core_get_data(ic->handle);
-
-        ic->handle_locked = 1;
         size_read = read_bmp_fd(fd, &ic->bmp, buf_size, bmpformat, NULL);
-        ic->handle_locked = 0;
+        core_unpin(ic->handle);
 
         if (size_read < 0)
         {

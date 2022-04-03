@@ -168,6 +168,10 @@ static unsigned short default_cp_table_buf[MAX_CP_TABLE_SIZE+1];
     do {} while (0)
 #define cp_table_alloc(filename, size, opsp) \
     ({ (void)(opsp); 1; })
+#define cp_table_pin(handle) \
+    do { (void)handle; } while(0)
+#define cp_table_unpin(handle) \
+    do { (void)handle; } while(0)
 #else
 #define cp_table_alloc(filename, size, opsp) \
     core_alloc_ex((filename), (size), (opsp))
@@ -175,6 +179,10 @@ static unsigned short default_cp_table_buf[MAX_CP_TABLE_SIZE+1];
     core_free(handle)
 #define cp_table_get_data(handle) \
     core_get_data(handle)
+#define cp_table_pin(handle) \
+    core_pin(handle)
+#define cp_table_unpin(handle) \
+    core_unpin(handle)
 #endif
 
 static const unsigned char utf8comp[6] =
@@ -191,21 +199,8 @@ static inline void cptable_tohw16(uint16_t *buf, unsigned int count)
     (void)buf; (void)count;
 }
 
-static int move_callback(int handle, void *current, void *new)
-{
-    /* we don't keep a pointer but we have to stop it if this applies to a
-       buffer not yet swapped-in since it will likely be in use in an I/O
-       call */
-    return (handle != default_cp_handle || default_cp_table_ref != 0) ?
-                BUFLIB_CB_CANNOT_MOVE : BUFLIB_CB_OK;
-    (void)current; (void)new;
-}
-
 static int alloc_and_load_cp_table(int cp, void *buf)
 {
-    static struct buflib_callbacks ops =
-        { .move_callback = move_callback };
-
     /* alloc and read only if there is an associated file */
     const char *filename = cp_info[cp].filename;
     if (!filename)
@@ -228,13 +223,17 @@ static int alloc_and_load_cp_table(int cp, void *buf)
         !(size % (off_t)sizeof (uint16_t))) {
 
         /* if the buffer is provided, use that but don't alloc */
-        int handle = buf ? 0 : cp_table_alloc(filename, size, &ops);
-        if (handle > 0)
+        int handle = buf ? 0 : cp_table_alloc(filename, size, NULL);
+        if (handle > 0) {
+            cp_table_pin(handle);
             buf = cp_table_get_data(handle);
+        }
 
         if (buf && read(fd, buf, size) == size) {
             close(fd);
             cptable_tohw16(buf, size / sizeof (uint16_t));
+            if (handle > 0)
+                cp_table_unpin(handle);
             return handle;
         }
 

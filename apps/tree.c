@@ -314,6 +314,18 @@ struct tree_context* tree_get_context(void)
     return &tc;
 }
 
+void tree_lock_cache(struct tree_context *t)
+{
+    core_pin(t->cache.name_buffer_handle);
+    core_pin(t->cache.entries_handle);
+}
+
+void tree_unlock_cache(struct tree_context *t)
+{
+    core_unpin(t->cache.name_buffer_handle);
+    core_unpin(t->cache.entries_handle);
+}
+
 /*
  * Returns the position of a given file in the current directory
  * returns -1 if not found
@@ -1020,9 +1032,6 @@ int rockbox_browse(struct browse_context *browse)
 static int move_callback(int handle, void* current, void* new)
 {
     struct tree_cache* cache = &tc.cache;
-    if (cache->lock_count > 0)
-        return BUFLIB_CB_CANNOT_MOVE;
-
     ptrdiff_t diff = new - current;
     /* FIX_PTR makes sure to not accidentally update static allocations */
 #define FIX_PTR(x) \
