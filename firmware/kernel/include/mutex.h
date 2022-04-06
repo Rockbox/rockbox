@@ -36,10 +36,5 @@ struct mutex
 extern void mutex_init(struct mutex *m);
 extern void mutex_lock(struct mutex *m);
 extern void mutex_unlock(struct mutex *m);
-#ifndef HAVE_PRIORITY_SCHEDULING
-/* Deprecated but needed for now - firmware/drivers/ata_mmc.c */
-static inline bool mutex_test(const struct mutex *m)
-    { return m->blocker.thread != NULL; }
-#endif /* HAVE_PRIORITY_SCHEDULING */
 
 #endif /* MUTEX_H */
