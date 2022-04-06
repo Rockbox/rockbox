@@ -10,7 +10,7 @@ change to customise your listening experience.
   where 0~dB is a reference that indicates the maximum volume that the \dap{}
   can produce without possible distortion (clipping). All values lower than
   this reference will be negative and yield a progressively softer volume.
-  \nopt{iriverh100,iriverh300,ondavx777}{%
+  \nopt{iriverh100,iriverh300,ondavx777,erosqnative}{%
       Values higher than 0~dB are available and can be used to raise the
       volume more than would otherwise be possible. These volume levels will
       ordinarily lead to distorted sound, but might work nicely for music that has
@@ -28,11 +28,27 @@ change to customise your listening experience.
   \opt{gigabeatf,vibe500}{minimum of -74~dB to a maximum of +6~dB.}%
   \opt{fuzeplus}{minimum of -100~dB to a maximum of +6~dB.}
   \opt{samsungyh}{minimum of -128~dB to a maximum of 0~dB.}
+  \opt{erosqnative}{minimum of -74~dB (mute) to a maximum of -2~dB.}
   \opt{ipodvideo}{\\Remark: Lowering the volume below -57~dB will also affect the line-out
   and the recording gain.}
   \opt{cowond2}{\\Remark: Lowering the volume below -57~dB will also affect the line-out.}
+  \opt{erosqnative}{\note{When the Line Out is used without anything connected to the
+      Headphone port, the volume is fixed. The value is user-configurable; see \setting{Volume Limit}, \reference{ref:volume_limit}.
+      If the Headphone port is connected, the volume once again uses the normal \setting{Volume} setting,
+      regardless of whether the Line Out is in use.}}
 
 \nopt{gigabeats}{
+\section{\label{ref:volume_limit}Volume Limit}
+  This setting adjusts the maximum volume of your music. The setting is by
+  default set to the maximum volume the \dap{} supports. To set a volume
+  limit, select a volume from the list and the maximum volume will be limited to
+  the selected value all over the system.
+  \opt{xduoox3}{This setting also applies to the Line Out of the \dap{}, as at full scale the \dap{} overdrives the signal.}
+  \opt{erosqnative}{On the \playertype{}, when using the Line Out without anything connected to the Headphone port,
+      the volume is fixed to the \setting{Volume Limit} value.
+      \note{On the \playertype{}, the Line Out level at -2~dB is approximately +7~dBV, -4~dB is approximately +4~dBu,
+      and -18~dB is approximately -10~dBV.}}
+
 \section{Bass}
   This setting emphasises
   \nopt{iriverh100,iriverh300}{or suppresses}
@@ -44,13 +60,6 @@ change to customise your listening experience.
   \opt{ipodvideo}{The minimum setting is -12~dB and the maximum is 12~dB.}%
   \opt{iaudiom3,iaudiom5,iaudiox5,sansa,sansaAMS,iriverh10,iriverh10_5gb,vibe500,fuzeplus%
       ,samsungyh}{The minimum setting is -24~dB and the maximum is 24~dB.}
-
-\section{\label{ref:volume_limit}Volume Limit}
-  This setting adjusts the maximum volume of your music. The setting is by
-  default set to the maximum volume which equals to no limit. To set a volume
-  limit, select a volume from the list and the maximum volume will be limited to
-  the selected value all over the system.
-  \opt{xduoox3}{This setting also applies to the Line Out of the \dap{}, as at full scale the \dap{} overdrives the signal.}
 
 \opt{ipodvideo}{
 \section{Bass Cutoff}
@@ -353,7 +362,7 @@ change to customise your listening experience.
           ,GIGABEAT_S_PAD,SANSA_C200_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
           ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
           ,SAMSUNG_YH820_PAD}{\ButtonRight}
-      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollFwd}
+      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD,AIGO_EROSQ_PAD}{\ButtonScrollFwd}
       \opt{IRIVER_H10_PAD}{\ButtonScrollUp}
       \opt{PBELL_VIBE500_PAD}{\ButtonUp}
       \opt{MPIO_HD200_PAD,XDUOO_X3_PAD}{\ButtonVolUp}
@@ -371,7 +380,7 @@ change to customise your listening experience.
           ,GIGABEAT_S_PAD,SANSA_C200_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
           ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD%
           ,SAMSUNG_YH820_PAD}{\ButtonLeft}
-      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD}{\ButtonScrollBack}
+      \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IPOD_4G_PAD,IPOD_3G_PAD,AIGO_EROSQ_PAD}{\ButtonScrollBack}
       \opt{IRIVER_H10_PAD}{\ButtonScrollDown}
       \opt{PBELL_VIBE500_PAD}{\ButtonDown}
       \opt{MPIO_HD200_PAD,XDUOO_X3_PAD}{\ButtonVolDown}
@@ -388,7 +397,7 @@ change to customise your listening experience.
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,PBELL_VIBE500_PAD}{\ButtonLeft}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
           ,SANSA_FUZE_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
-          ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonUp}
+          ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,AIGO_EROSQ_PAD}{\ButtonUp}
       \opt{IRIVER_H10_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonRew}
       \opt{touchscreen}{\ActionStdPrev}
           &
@@ -404,7 +413,7 @@ change to customise your listening experience.
       \opt{IPOD_4G_PAD,IPOD_3G_PAD,PBELL_VIBE500_PAD}{\ButtonRight}
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,IAUDIO_X5_PAD,SANSA_E200_PAD,SANSA_C200_PAD%
           ,SANSA_FUZE_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_M3_PAD,MROBE100_PAD%
-          ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonDown}
+          ,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD,AIGO_EROSQ_PAD}{\ButtonDown}
       \opt{IRIVER_H10_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD}{\ButtonFF}
       \opt{touchscreen}{\ActionStdNext}
           &
@@ -419,7 +428,7 @@ change to customise your listening experience.
       %
       \opt{IRIVER_H100_PAD,IRIVER_H300_PAD,GIGABEAT_PAD,GIGABEAT_S_PAD,IAUDIO_X5_PAD%
           ,SANSA_C200_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_VIDEO_PAD,SANSA_E200_PAD%
-          ,SANSA_FUZE_PAD,MROBE100_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD}{\ButtonSelect}
+          ,SANSA_FUZE_PAD,MROBE100_PAD,SANSA_CLIP_PAD,SANSA_FUZEPLUS_PAD,AIGO_EROSQ_PAD}{\ButtonSelect}
       \opt{MPIO_HD200_PAD}{\ButtonFunc}
       \opt{MPIO_HD300_PAD}{\ButtonEnter}
       \opt{PBELL_VIBE500_PAD}{\ButtonOK}
@@ -444,7 +453,7 @@ change to customise your listening experience.
       \opt{SANSA_E200_PAD,SANSA_FUZE_PAD,IRIVER_H10_PAD}{\ButtonLeft}
       \opt{GIGABEAT_PAD,GIGABEAT_S_PAD,SANSA_C200_PAD,MROBE100_PAD,SANSA_CLIP_PAD}{\ButtonPower}
       \opt{PBELL_VIBE500_PAD}{\ButtonCancel}
-      \opt{SANSA_FUZEPLUS_PAD}{\ButtonBack}
+      \opt{SANSA_FUZEPLUS_PAD,AIGO_EROSQ_PAD}{\ButtonBack}
       \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonPlay}
       \opt{touchscreen}{\TouchTopLeft
           \opt{COWON_D2_PAD}{/ \ButtonPower}}

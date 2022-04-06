@@ -238,9 +238,15 @@ utilities. A detailed description of the different plugins is to be found in
 \opt{quickscreen}
 {
 \section{\label{ref:QuickScreen}Quick Screen}
-  Although the \setting{Quick Screen} is accessible from nearly everywhere,
-  not just the \setting{Main Menu}, it is worth mentioning here.  It allows
-  rapid access to your four favourite settings.  The default settings are
+  \nopt{erosqnative}{
+    Although the \setting{Quick Screen} is accessible from nearly everywhere,
+    not just the \setting{Main Menu}, it is worth mentioning here.
+  }
+  \opt{erosqnative}{
+    On the \playertype{}, The \setting{Quick Screen} is only
+    available from the \setting{While Playing Screen} by default.
+  }
+  It allows rapid access to your four favourite settings.  The default settings are
   \setting{Shuffle} (\reference{ref:PlaybackSettings}),
   \setting{Repeat} (\reference{ref:PlaybackSettings}) and the
   \setting{Show Files} (\reference{ref:ShowFiles}) options, but almost all
@@ -249,7 +255,9 @@ utilities. A detailed description of the different plugins is to be found in
   \ActionStdContext.  In the menu which appears you will be given options
   to place the setting on the \setting{Quick Screen}.
   
-  Press \ActionStdQuickScreen{} to access it and \ActionQuickScreenExit{} to exit.
+  Press
+  \nopt{erosqnative}{\ActionStdQuickScreen{}}
+  \opt{erosqnative}{\ActionWpsQuickScreen{}} to access it and \ActionQuickScreenExit{} to exit.
   The direction buttons will modify the individual setting values as indicated 
   by the arrow icons. Please note that the settings at opposite sides of the
    screen cycle through the available options in opposite directions.

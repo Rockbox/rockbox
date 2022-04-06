@@ -1,0 +1,28 @@
+% $Id$ %
+\def\UseOption{erosqnative}
+\edef\UseOption{\UseOption,AIGO_EROSQ_PAD}
+\edef\UseOption{\UseOption,HAVE_BACKLIGHT}
+\edef\UseOption{\UseOption,HAVE_RB_BL_IN_FLASH}
+\edef\UseOption{\UseOption,erosqnative}
+
+\newcommand{\playerman}{Aigo}
+\newcommand{\playertype}{Eros Q}
+\newcommand{\playerlongtype}{\playertype}
+\newcommand{\dapdisplaywidth}{320}
+\newcommand{\dapdisplayheight}{240}
+\newcommand{\dapdisplaydepth}{16}
+\newcommand{\specimg}{aigoerosq}
+%Used to name the player, e.g. ...to the \dap
+\newcommand{\dap}{player}
+%For use when referring to the player. E.g. the \daps\ capacity ...
+\newcommand{\daps}{player's}
+\newcommand{\firmwarefilename}{\fname{rockbox.erosq}}
+\newcommand{\bootfilename}{\fname{bootloader.erosq}}
+\newcommand{\firmwareextension}{\fname{erosq}}
+\newcommand{\bootbackupfilename}{\fname{erosqnative-boot.bin}}
+\newcommand{\jztoolsubcommand}{erosq}
+\newcommand{\screenshotsize}{8cm}
+\newcommand{\disk}{SD card}
+
+% link external keymap file
+\input{platform/keymap-erosqnative.tex}

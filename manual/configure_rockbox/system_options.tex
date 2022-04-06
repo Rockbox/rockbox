@@ -7,48 +7,51 @@
   Options relating to the battery
   in the \dap.
   \begin{description}
-    \item [Battery Capacity.] This setting can be used to tell Rockbox what
-      capacity (in mAh) the battery being used has. The default is
-      \opt{vibe500}{1000~mAh}%
-      \opt{iriverh100,iriverh300}{1300~mAh}%
-      \opt{mpiohd200}{850~mAh}%
-      \opt{ipodmini}{400~mAh (1G) or 630~mAh (2G)}%
-      \opt{ipodcolor}{700~mAh}%
-      \opt{ipodnano}{300~mAh}%
-      \opt{ipodvideo}{400~mAh (30~GB) or 600~mAh (60~GB and 80~GB)}%
-      \opt{ipod4g}{630~mAh}%
-      \opt{ipod3g}{630~mAh}%
-      \opt{ipod1g2g}{1200~mAh}%
-      \opt{iaudiom3,iaudiom5,iaudiox5}{950~mAh}%
-      \opt{gigabeatf}{2000~mAh}%
-      \opt{gigabeats}{700~mAh}%
-      \opt{cowond2}{1600~mAh}%
-      \opt{mrobe100}{720~mAh}%
-      \opt{samsungyh920,samsungyh925}{900~mAh}%
-      \opt{samsungyh820}{650~mAh}%
-      \opt{xduoox3}{2000~mAh}%
-      , which is the capacity value for the standard battery shipped with the \dap.
-        Rockbox uses this value for runtime estimation, not battery percentage
-        calculation. Changing this setting has no effect whatsoever on
-        actual battery life. This setting only affects the accuracy of the
-        runtime estimation as shown on screen.
-      \opt{iaudiom3,iaudiom5,iaudiox5}{Rockbox does not automatically distinguish
-        between the ``L'' models and the ``simple'' models which determine the
-        default value. If your \dap{} is an
-            \opt{iaudiom3}{M3L}%
-            \opt{iaudiom5}{M5L}%
-            \opt{iaudiox5}{X5L}
-        set the value to 2250~mAh for more accuracy in the runtime estimation.}
-      \opt{ipod,sansa}{This value is fairly meaningless in the \playerman{}
-        family at present, and work is on-going into finding a better way to
-        determine battery life.}
+    \nopt{erosqnative}
+    {
+      \item [Battery Capacity.] This setting can be used to tell Rockbox what
+        capacity (in mAh) the battery being used has. The default is
+        \opt{vibe500}{1000~mAh}%
+        \opt{iriverh100,iriverh300}{1300~mAh}%
+        \opt{mpiohd200}{850~mAh}%
+        \opt{ipodmini}{400~mAh (1G) or 630~mAh (2G)}%
+        \opt{ipodcolor}{700~mAh}%
+        \opt{ipodnano}{300~mAh}%
+        \opt{ipodvideo}{400~mAh (30~GB) or 600~mAh (60~GB and 80~GB)}%
+        \opt{ipod4g}{630~mAh}%
+        \opt{ipod3g}{630~mAh}%
+        \opt{ipod1g2g}{1200~mAh}%
+        \opt{iaudiom3,iaudiom5,iaudiox5}{950~mAh}%
+        \opt{gigabeatf}{2000~mAh}%
+        \opt{gigabeats}{700~mAh}%
+        \opt{cowond2}{1600~mAh}%
+        \opt{mrobe100}{720~mAh}%
+        \opt{samsungyh920,samsungyh925}{900~mAh}%
+        \opt{samsungyh820}{650~mAh}%
+        \opt{xduoox3}{2000~mAh}%
+        , which is the capacity value for the standard battery shipped with the \dap.
+          Rockbox uses this value for runtime estimation, not battery percentage
+          calculation. Changing this setting has no effect whatsoever on
+          actual battery life. This setting only affects the accuracy of the
+          runtime estimation as shown on screen.
+        \opt{iaudiom3,iaudiom5,iaudiox5}{Rockbox does not automatically distinguish
+          between the ``L'' models and the ``simple'' models which determine the
+          default value. If your \dap{} is an
+              \opt{iaudiom3}{M3L}%
+              \opt{iaudiom5}{M5L}%
+              \opt{iaudiox5}{X5L}
+          set the value to 2250~mAh for more accuracy in the runtime estimation.}
+        \opt{ipod,sansa}{This value is fairly meaningless in the \playerman{}
+          family at present, and work is on-going into finding a better way to
+          determine battery life.}
 
-      \opt{battery_types}{
-      \item [Battery Type.] This setting tells Rockbox which type of battery
-        is currently used in the \dap{}.
-       \nopt{xduoox3}{The two supported battery types are ``Alkaline'' or ``NiMH''.}
-       \opt{xduoox3}{Older \playerman{} \playertype{} units shipped with a 1500mAh battery, while newer units ships with a 2000mAh battery.  If you are not sure which type you have, older units have a button marked ``ESC''.}
-	}
+        \opt{battery_types}{
+        \item [Battery Type.] This setting tells Rockbox which type of battery
+          is currently used in the \dap{}.
+         \nopt{xduoox3}{The two supported battery types are ``Alkaline'' or ``NiMH''.}
+         \opt{xduoox3}{Older \playerman{} \playertype{} units shipped with a 1500mAh battery, while newer units ships with a 2000mAh battery.  If you are not sure which type you have, older units have a button marked ``ESC''.}
+	  }
+    }
 
       \opt{usb_charging_enable}{
       \item [Charge During USB Connection.] This option lets you control whether
@@ -119,13 +122,16 @@ This sub menu relates to limits in the Rockbox operating system.
     Entries in File Browser} or \setting{Max Playlist Size} to take effect
     while \setting{Glyphs To Cache} will affect the next font load.}
 % TODO: this needs to be rewritten in another style, it lets you mix sound from another source into the music
-  \subsection{Line In} This option activates the line-in port on \dap, which is
-    off by default. This is useful for such applications as:
-    \begin{itemize}
-    \item Game boy $\rightarrow$ \dap $\rightarrow$ human
-    \item laptop $\rightarrow$ \dap $\rightarrow$ human
-    \item LAN party computer $\rightarrow$ \dap $\rightarrow$ human
-    \end{itemize}
+  \nopt{erosqnative}
+  {
+    \subsection{Line In} This option activates the line-in port on \dap, which is
+      off by default. This is useful for such applications as:
+      \begin{itemize}
+      \item Game boy $\rightarrow$ \dap $\rightarrow$ human
+      \item laptop $\rightarrow$ \dap $\rightarrow$ human
+      \item LAN party computer $\rightarrow$ \dap $\rightarrow$ human
+      \end{itemize}
+  }
 \opt{quickscreen}{
   \subsection{Use Shortcuts Menu Instead of Quick Screen} This option
   activates the shortcuts menu instead of opening the quick screen when enabled.

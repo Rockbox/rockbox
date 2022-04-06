@@ -81,7 +81,7 @@ your WPS (While Playing Screen).
       % software hold targets
       \nopt{hold_button}{%
           \opt{SANSA_CLIP_PAD}{\ButtonHome+\ButtonSelect}
-          \opt{SANSA_FUZEPLUS_PAD}{\ButtonPower}
+          \opt{SANSA_FUZEPLUS_PAD,AIGO_EROSQ_PAD}{\ButtonPower}
           & Key lock (software hold switch) on/off.\\
       }%
       % We explicitly list all the appropriate targets here and do no condition
@@ -112,21 +112,23 @@ your WPS (While Playing Screen).
       \opt{ab_repeat_buttons}{%
          \ActionWpsAbSetBNextDir{} or }%
          % not all targets have the above action defined but the one below works on all
-      Short \ActionWpsSkipNext{} + Long \ActionWpsSkipNext
-      \opt{HAVEREMOTEKEYMAP}{
-        &
+      \nopt{erosqnative}{
+        Short \ActionWpsSkipNext{} + Long \ActionWpsSkipNext
+        \opt{HAVEREMOTEKEYMAP}{
+          &
           \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetBNextDir{} or}
-        Short \ActionRCWpsSkipNext{} + Long \ActionRCWpsSkipNext}
-      & Skip to the next directory.\\
-      %
-      \opt{ab_repeat_buttons}{%
-         \ActionWpsAbSetAPrevDir{} or }%
-      Short \ActionWpsSkipPrev{} + Long \ActionWpsSkipPrev
-      \opt{HAVEREMOTEKEYMAP}{
-        &
+          Short \ActionRCWpsSkipNext{} + Long \ActionRCWpsSkipNext}
+        & Skip to the next directory.\\
+        %
+        \opt{ab_repeat_buttons}{%
+           \ActionWpsAbSetAPrevDir{} or }%
+        Short \ActionWpsSkipPrev{} + Long \ActionWpsSkipPrev
+        \opt{HAVEREMOTEKEYMAP}{
+          &
           \opt{IRIVER_RC_H100_PAD}{\ActionRCWpsAbSetAPrevDir{} or}
-        Short \ActionRCWpsSkipPrev{} + Long \ActionRCWpsSkipPrev}
-      & Skip to the previous directory.\\
+          Short \ActionRCWpsSkipPrev{} + Long \ActionRCWpsSkipPrev}
+        & Skip to the previous directory.\\
+      }
       %
       \opt{SANSA_E200_PAD,SANSA_C200_PAD,IRIVER_H100_PAD,IRIVER_H300_PAD}{
         \ActionStdRec

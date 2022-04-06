@@ -66,7 +66,7 @@ the \setting{Show Files} setting to all.
          & If there is an audio file playing, return to the
          \setting{While Playing Screen} (WPS) without stopping playback.\\
       %
-      \nopt{player,SANSA_C200_PAD}%
+      \nopt{player,SANSA_C200_PAD,erosqnative}%
         {%
           \ActionTreeStop 
           \opt{HAVEREMOTEKEYMAP}{& \ActionRCTreeStop}
@@ -81,11 +81,13 @@ the \setting{Show Files} setting to all.
       \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdMenu}
       & Enter the \setting{Main Menu}.\\
       %
-      \opt{quickscreen}{
-        \ActionStdQuickScreen
-        \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdQuickScreen}
-        & Switch to the \setting{Quick Screen}
-        (see \reference{ref:QuickScreen}). \\
+      \nopt{erosqnative}{
+        \opt{quickscreen}{
+          \ActionStdQuickScreen
+          \opt{HAVEREMOTEKEYMAP}{& \ActionRCStdQuickScreen}
+          & Switch to the \setting{Quick Screen}
+          (see \reference{ref:QuickScreen}). \\
+        }
       }
       %
       \opt{SANSA_E200_PAD}{

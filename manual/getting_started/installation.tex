@@ -111,7 +111,7 @@ follow the instructions at
 \end{description}
 }
 
-\opt{fiiom3k,shanlingq1,agptekrocker,xduoox3ii,xduoox20,aigoerosq}{
+\opt{fiiom3k,shanlingq1,agptekrocker,xduoox3ii,xduoox20,aigoerosq,erosqnative}{
 Although Rockbox is considered fully functional on the \playername{}, there are
 a few limitations compared to the original firmware which you should be aware
 of before installing.
@@ -120,7 +120,7 @@ of before installing.
     filesystems such as exFAT or NTFS are not supported.
   \item[USB DAC.] This feature is not supported by Rockbox, but you can
     dual-boot the original firmware if you want to use it.
-  \opt{shanlingq1,agptekrocker,xduoox3ii,xduoox20,aigoerosq}{\item[Wireless.] There is no support for Bluetooth\opt{shanlingq1}{ or WiFi}.
+  \opt{shanlingq1,agptekrocker,xduoox3ii,xduoox20,aigoerosq,erosqnative}{\item[Wireless.] There is no support for Bluetooth\opt{shanlingq1}{ or WiFi}.
     You can dual-boot the original firmware to use wireless functionality.}
   \item[Hotswapping SD cards.] Rockbox runs from the SD card, not the internal
     flash memory. Hotswapping is technically possible, but you need to install
@@ -266,7 +266,7 @@ people. Rockbox Utility is a graphical application that does almost everything
 for you. However, should you encounter a problem, then the manual way is
 still available to you.\\
 
-\opt{gigabeats,fiiom3k,shanlingq1}{
+\opt{gigabeats,fiiom3k,shanlingq1,erosqnative}{
   \note{The automated install is not yet available for the
   \playerlongtype{}. For now you can use the manual method to install Rockbox.
   Please still read the section on the automatic install as it explains
@@ -342,7 +342,7 @@ housekeeping tool \caps{Rockbox Utility}. It allows you to:
 Prebuilt binaries for Windows, Linux and Mac OS X are
 available at the \wikilink{RockboxUtility} wiki page.\\
 
-\opt{gigabeats,ondavx777,fiiom3k,shanlingq1}{
+\opt{gigabeats,ondavx777,fiiom3k,shanlingq1,erosqnative}{
 \note{Rockbox Utility does not currently support the \playertype{} and you will
 therefore need to follow the manual install instructions below.\\}}
 
@@ -545,7 +545,7 @@ by Rockbox, in the main directory of your \daps{} drive.
         \opt{samsungyh}{\input{getting_started/samsungyh_install.tex}}
         \opt{xduoox3}{\input{getting_started/xduoox3_install.tex}}
         \opt{xduoox3ii,xduoox20,agptekrocker,aigoerosq}{\input{getting_started/hibyos_install.tex}}
-        \opt{fiiom3k,shanlingq1}{\input{getting_started/jztool_install.tex}}
+        \opt{fiiom3k,shanlingq1,erosqnative}{\input{getting_started/jztool_install.tex}}
     }
 }
 
@@ -641,7 +641,7 @@ by Rockbox, in the main directory of your \daps{} drive.
 }
 \opt{e200}{Your e200 will automatically reboot and Rockbox should load.}
 
-\opt{fiiom3k,shanlingq1}{
+\opt{fiiom3k,shanlingq1,erosqnative}{
   Safely eject / unmount your \dap{}.
 }
 
@@ -807,16 +807,17 @@ completely follow the manual uninstallation instructions below.}}
     \playerman{} firmware.
 }
 
-\opt{fiiom3k,shanlingq1}{
+\opt{fiiom3k,shanlingq1,erosqnative}{
     If you want to remove the Rockbox bootloader, copy an original firmware
-    update to your microSD card and run the \playerman{} update by holding
-    \ActionBootOFRecovery{} while powering on the \dap{}.
+    update to your microSD card and run the \playerman{} update by 
+    \opt{erosqnative}{running it from the Original Firmware's System Settings menu.}
+    \nopt{erosqnative}{holding \ActionBootOFRecovery{} while powering on the \dap{}.}
 
     Alternatively, if you took a backup of the original \playerman{} bootloader
     you can copy the backup file, \bootbackupfilename{}, to your SD card and
     select \emph{Restore bootloader} from the recovery menu. The recovery menu
     can be accessed by holding \ActionBootRecoveryMenu{} when powering on. If
-    your \dap won't boot, use \fname{jztool} to load the bootloader over USB
+    your \dap{} won't boot, use \fname{jztool} to load the bootloader over USB
     and enter the recovery menu -- see \reference{ref:jztool_load_bootloader}.
 }
 
