@@ -203,7 +203,7 @@ static const struct button_mapping button_context_pitchscreen[] = {
 
 static const struct button_mapping button_context_yesnoscreen[] = {
     {ACTION_YESNO_ACCEPT,           BUTTON_PLAY,                        BUTTON_NONE},
-    {ACTION_YESNO_ACCEPT,           BUTTON_SELECT,                      BUTTON_NONE},
+    {ACTION_STD_CANCEL,             BUTTON_SELECT,                      BUTTON_NONE},
     {ACTION_STD_CANCEL,             BUTTON_BACK,                        BUTTON_NONE},
     {ACTION_STD_CANCEL,             BUTTON_POWER,                       BUTTON_NONE},
     {ACTION_STD_CANCEL,             BUTTON_RIGHT,                       BUTTON_NONE},
