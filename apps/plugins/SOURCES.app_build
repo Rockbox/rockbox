@@ -19,6 +19,7 @@ stopwatch.lua
 
 
 #ifdef HAVE_TEST_PLUGINS /* enable in advanced build options */
+test_kbd.c
 test_fps.c
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
 test_boost.c

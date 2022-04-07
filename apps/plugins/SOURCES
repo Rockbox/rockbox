@@ -204,6 +204,7 @@ test_core_jpeg.c
 test_disk.c
 test_fps.c
 test_gfx.c
+test_kbd.c
 #if LCD_DEPTH < 4 && !defined(SIMULATOR)
 test_scanrate.c
 #endif

@@ -37,6 +37,7 @@
 #include "viewport.h"
 #include "file.h"
 #include "splash.h"
+#include "core_alloc.h"
 
 #ifndef O_BINARY
 #define O_BINARY 0
@@ -78,8 +79,19 @@
 #define CHANGED_CURSOR 2
 #define CHANGED_TEXT   3
 
+static int kbd_vpbuf_handle[NB_SCREENS] = {0};
+
+enum ekbd_viewports
+{
+    eKBD_VP_TEXT = 0,
+    eKBD_VP_PICKER,
+    eKBD_VP_MENU,
+    eKBD_COUNT_VP_COUNT
+};
+
 struct keyboard_parameters
 {
+    struct viewport *kbd_viewports;
     unsigned short kbd_buf[KBD_BUF_SIZE];
     unsigned short *kbd_buf_ptr;
     unsigned short max_line_len;
@@ -141,6 +153,78 @@ static const unsigned char morse_codes[] = {
     0x2f,0x27,0x23,0x21,0x20,0x30,0x38,0x3c,0x3e,0x3f,
     0x73,0x55,0x4c,0x61,0x5a,0x80 };
 #endif
+
+static void keyboard_layout(struct viewport *kbd_vp,
+                        struct keyboard_parameters *pm,
+                                     struct screen *sc)
+{
+     /*Note: viewports are initialized to vp_default by kbd_create_viewports */
+
+    int sc_w = sc->getwidth();
+    int sc_h = sc->getheight();
+
+    /* TEXT */
+    struct viewport *vp = &kbd_vp[eKBD_VP_TEXT];
+    /* make sure height is even for the text box */
+    int text_height = (MAX(pm->font_h, get_icon_height(sc->screen_type)) & ~1) + 2;
+    vp->x = 0; /* LEFT */
+    vp->y = 0; /* TOP */
+    vp->width = sc_w;
+    vp->height = text_height;
+    vp->font = pm->curfont;
+    text_height += vp->x + 3;
+
+    /* MENU */
+    vp = &kbd_vp[eKBD_VP_MENU];
+    int menu_w = 0;//pm->font_w * MENU_CHARS; /* NOT IMPLEMENTED */
+    vp->x = 0; /* LEFT */
+    vp->y = text_height; /* TOP */
+    vp->width = menu_w;
+    vp->height = 0;
+    vp->font = pm->curfont;
+    menu_w += vp->x;
+
+    /* PICKER */
+    vp = &kbd_vp[eKBD_VP_PICKER];
+    vp->x = menu_w; /* LEFT */
+    vp->y = text_height - 2; /* TOP */
+    vp->width = sc_w - menu_w;
+    vp->height = sc_h - vp->y; /* (MAX SIZE) - OVERWRITTEN */
+    vp->font = pm->curfont;
+}
+
+static int kbd_create_viewports(struct keyboard_parameters * kbd_param)
+{
+    struct viewport *vp;
+    size_t bufsz = (sizeof(struct viewport) * 3); /* different for remote??*/
+    int i, h;
+    FOR_NB_SCREENS(l)
+    {
+        h = core_alloc_ex("kbd vp", bufsz, &buflib_ops_locked);
+        if (h <= 0)
+            return h;
+        kbd_vpbuf_handle[l] = h;
+        kbd_param[l].kbd_viewports = ((struct viewport *) core_get_data(h));
+        for (i = 0; i < eKBD_COUNT_VP_COUNT; i++)
+        {
+            vp = &kbd_param[l].kbd_viewports[i];
+            viewport_set_defaults(vp, l);
+            vp->font = FONT_UI;
+        }
+    }
+    return bufsz;
+}
+
+static void kbd_destroy_viewports(void)
+{
+    FOR_NB_SCREENS(l)
+    {
+        if (kbd_vpbuf_handle[l] > 0) /* free old buffer */
+        {
+            kbd_vpbuf_handle[l] = core_free(kbd_vpbuf_handle[l]);
+        }
+    }
+}
 
 /* Loads a custom keyboard into memory
    call with NULL to reset keyboard    */
@@ -309,8 +393,9 @@ static unsigned short get_kbd_ch(struct keyboard_parameters *pm, int x, int y)
     k = k * pm->max_chars + x;
     return (*pbuf != 0xFEFF && k < *pbuf)? pbuf[k+1]: ' ';
 }
-
-static void kbd_calc_params(struct keyboard_parameters *pm,
+static void kbd_calc_pm_params(struct keyboard_parameters *pm,
+                            struct screen *sc, struct edit_state *state);
+static void kbd_calc_vp_params(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state);
 static void kbd_draw_picker(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state);
@@ -342,13 +427,18 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         viewportmanager_theme_enable(l, false, NULL);
     }
 
+    if (kbd_create_viewports(param) <= 0)
+    {
+        splash(HZ * 2,"Error: No Viewport Allocated, OOM?");
+        goto cleanup;
+    }
+
 #ifdef HAVE_TOUCHSCREEN
     /* keyboard is unusuable in pointing mode so force 3x3 for now.
      * TODO - fix properly by using a bigger font and changing the layout */
     enum touchscreen_mode old_mode = touchscreen_get_mode();
     touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
-
     /* initialize state */
     state.text = text;
     state.buflen = buflen;
@@ -443,7 +533,15 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
             pm->kbd_buf_ptr = pm->kbd_buf; /* internal layout buffer */
 
         struct screen *sc = &screens[l];
-        kbd_calc_params(pm, sc, &state);
+
+        kbd_calc_pm_params(pm, sc, &state);
+
+        keyboard_layout(pm->kbd_viewports, pm, sc);
+        /* have all the params we need lets set up our viewports */
+        kbd_calc_vp_params(pm, sc, &state);
+        /* We want these the same height */
+        pm->kbd_viewports[eKBD_VP_MENU].height = pm->main_y;
+        pm->kbd_viewports[eKBD_VP_PICKER].height = pm->main_y;
     }
 
     if (global_settings.talk_menu)      /* voice UI? */
@@ -698,26 +796,23 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         settings_save();
     }
 #endif /* HAVE_MORSE_INPUT && KBD_TOGGLE_INPUT */
-
+cleanup:
     FOR_NB_SCREENS(l)
     {
         screens[l].setfont(FONT_UI);
         viewportmanager_theme_undo(l, false);
     }
+    kbd_destroy_viewports();
     return ret;
 }
-
-static void kbd_calc_params(struct keyboard_parameters *pm,
+static void kbd_calc_pm_params(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state)
 {
     struct font* font;
     const unsigned char *p;
     unsigned short ch, *pbuf;
-    int icon_w, sc_w, sc_h, w;
-    int i, total_lines;
+    int i, w;
 #ifdef HAVE_TOUCHSCREEN
-    int button_h = 0;
-    bool flippage_button = false;
     pm->show_buttons = (sc->screen_type == SCREEN_MAIN &&
                                 (touchscreen_get_mode() == TOUCHSCREEN_POINT));
 #endif
@@ -765,9 +860,21 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
 #ifdef HAVE_TOUCHSCREEN
     pm->font_w = GRID_SIZE(sc->screen_type, pm->font_w);
 #endif
+
+}
+
+static void kbd_calc_vp_params(struct keyboard_parameters *pm,
+                            struct screen *sc, struct edit_state *state)
+{
+    (void) state;
+    struct viewport *vp = &pm->kbd_viewports[eKBD_VP_PICKER];
+    int icon_w, sc_w, sc_h;
+    int i, total_lines;
+    unsigned short *pbuf;
     /* calculate how many characters to put in a row. */
     icon_w = get_icon_width(sc->screen_type);
-    sc_w = sc->getwidth();
+
+    sc_w = vp->width; /**sc->getwidth();**/
     if (pm->font_w < sc_w / pm->max_line_len)
         pm->font_w = sc_w / pm->max_line_len;
     pm->max_chars = sc_w / pm->font_w;
@@ -776,8 +883,10 @@ static void kbd_calc_params(struct keyboard_parameters *pm,
         pm->max_chars_text = sc_w / pm->text_w - 2;
 
     /* calculate pm->pages and pm->lines */
-    sc_h = sc->getheight();
+    sc_h = vp->height;/**sc->getheight()**/;
 #ifdef HAVE_TOUCHSCREEN
+    int button_h = 0;
+    bool flippage_button = false;
     /* add space for buttons */
     if (pm->show_buttons)
     {
@@ -824,7 +933,7 @@ recalc_param:
     pm->main_y = pm->font_h*pm->lines + pm->keyboard_margin;
     pm->keyboard_margin -= pm->keyboard_margin/2;
 #ifdef HAVE_TOUCHSCREEN
-    /* flip page button is put between piker and edit line */
+    /* flip page button is put between picker and edit line */
     if (flippage_button)
         pm->main_y += button_h;
 #endif
@@ -843,13 +952,18 @@ recalc_param:
 static void kbd_draw_picker(struct keyboard_parameters *pm,
                             struct screen *sc, struct edit_state *state)
 {
+    struct viewport *last;
+    struct viewport *vp = &pm->kbd_viewports[eKBD_VP_PICKER];
+    last = sc->set_viewport(vp);
+    sc->clear_viewport();
+
     char outline[8];
 #ifdef HAVE_MORSE_INPUT
     if (state->morse_mode)
     {
         const int w = 6, h = 8; /* sysfixed font width, height */
         int i, j, x, y;
-        int sc_w = sc->getwidth(), sc_h = pm->main_y - pm->keyboard_margin - 1;
+        int sc_w = vp->width, sc_h = vp->height;//pm->main_y - pm->keyboard_margin - 1;
 
         /* Draw morse code screen with sysfont */
         sc->setfont(FONT_SYSFIXED);
@@ -926,6 +1040,7 @@ static void kbd_draw_picker(struct keyboard_parameters *pm,
             sc->set_drawmode(DRMODE_SOLID);
         }
     }
+    sc->set_viewport(last);
 }
 
 static void kbd_draw_edit_line(struct keyboard_parameters *pm,
@@ -933,22 +1048,33 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
 {
     char outline[8];
     unsigned char *utf8;
-    int i = 0, j = 0, icon_w, w;
-    int sc_w = sc->getwidth();
-    int y = pm->main_y - pm->keyboard_margin;
+    int i = 0, j = 0, w;
+    int icon_w, icon_y;
+    struct viewport *last;
+    struct viewport *vp = &pm->kbd_viewports[eKBD_VP_TEXT];
+    last = sc->set_viewport(vp);
+    sc->clear_viewport();
+    sc->hline(1, vp->width - 1, vp->height - 1);
+
+    int sc_w = vp->width;
+    int y = (vp->height - pm->font_h) / 2;
+
+    
     int text_margin = (sc_w - pm->text_w * pm->max_chars_text) / 2;
 
+#if 0
     /* Clear text area one pixel above separator line so any overdraw
        doesn't collide */
     screen_clear_area(sc, 0, y - 1, sc_w, pm->font_h + 6);
 
     sc->hline(0, sc_w - 1, y);
-
+#endif
     /* write out the text */
     sc->setfont(pm->curfont);
 
     pm->leftpos = MAX(0, MIN(state->len_utf8, state->editpos + 2)
                             - pm->max_chars_text);
+
     pm->curpos = state->editpos - pm->leftpos;
     utf8 = state->text + utf8seek(state->text, pm->leftpos);
 
@@ -958,12 +1084,13 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         strlcpy(outline, utf8, j+1);
         sc->getstringsize(outline, &w, NULL);
         sc->putsxy(text_margin + i*pm->text_w + (pm->text_w-w)/2,
-                   pm->main_y, outline);
+                   y, outline);
         utf8 += j;
         i++;
     }
 
     icon_w = get_icon_width(sc->screen_type);
+    icon_y = (vp->height - get_icon_height(sc->screen_type)) / 2;
     if (pm->leftpos > 0)
     {
         /* Draw nicer bitmap arrow if room, else settle for "<". */
@@ -971,12 +1098,12 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         {
             screen_put_icon_with_offset(sc, 0, 0,
                                         (text_margin - icon_w) / 2,
-                                        pm->main_y, Icon_Reverse_Cursor);
+                                        icon_y, Icon_Reverse_Cursor);
         }
         else
         {
             sc->getstringsize("<", &w, NULL);
-            sc->putsxy(text_margin - w, pm->main_y, "<");
+            sc->putsxy(text_margin - w, y, "<");
         }
     }
 
@@ -987,11 +1114,11 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
         {
             screen_put_icon_with_offset(sc, 0, 0,
                                         sc_w - (text_margin + icon_w) / 2,
-                                        pm->main_y, Icon_Cursor);
+                                        icon_y, Icon_Cursor);
         }
         else
         {
-            sc->putsxy(sc_w - text_margin, pm->main_y, ">");
+            sc->putsxy(sc_w - text_margin, y, ">");
         }
     }
 
@@ -999,17 +1126,19 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     i = text_margin + pm->curpos * pm->text_w;
 
     if (state->cur_blink)
-        sc->vline(i, pm->main_y, pm->main_y + pm->font_h - 1);
+        sc->vline(i, y, y + pm->font_h - 1);
 
     if (state->hangul) /* draw underbar */
-        sc->hline(i - pm->text_w, i, pm->main_y + pm->font_h - 1);
+        sc->hline(i - pm->text_w, i, y + pm->font_h - 1);
 
     if (pm->line_edit)
     {
         sc->set_drawmode(DRMODE_COMPLEMENT);
-        sc->fillrect(0, y + 2, sc_w, pm->font_h + 2);
+        sc->fillrect(0, y - 1, sc_w, pm->font_h + 2);
         sc->set_drawmode(DRMODE_SOLID);
     }
+
+    sc->set_viewport(last);
 }
 
 #ifdef HAVE_TOUCHSCREEN
