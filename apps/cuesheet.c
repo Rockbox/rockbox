@@ -123,6 +123,7 @@ static unsigned long parse_cue_index(const char *line)
     /* assumes strncmp(line, "INDEX 01", 8) & NULL terminated string */
     /* INDEX 01 MM:SS:FF\0 (00:00:00\0 - 99:99:99\0)*/
     const unsigned field_m[3] = {60 * 1000, 1000, 13}; /* MM:SS:~FF*/
+    const unsigned field_max[3] = {30000, 59, 74}; /* MM, SS, FF */
     const char f_sep = ':';
     int field = -1;
     unsigned long offset = 0; /* ms from start of track */
@@ -138,7 +139,7 @@ static unsigned long parse_cue_index(const char *line)
         while (isdigit(*line))
         {
             value = 10 * value + (*line - '0');
-            if (value > 99) /* Sanity check bail early */
+            if (value > field_max[field]) /* Sanity check bail early */
                 return 0;
             line++;
         }
