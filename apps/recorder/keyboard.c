@@ -79,8 +79,6 @@
 #define CHANGED_CURSOR 2
 #define CHANGED_TEXT   3
 
-static int kbd_vpbuf_handle[NB_SCREENS] = {0};
-
 enum ekbd_viewports
 {
     eKBD_VP_TEXT = 0,
@@ -195,35 +193,20 @@ static void keyboard_layout(struct viewport *kbd_vp,
 
 static int kbd_create_viewports(struct keyboard_parameters * kbd_param)
 {
-    struct viewport *vp;
-    size_t bufsz = (sizeof(struct viewport) * 3); /* different for remote??*/
-    int i, h;
+    static struct viewport viewports[NB_SCREENS][eKBD_COUNT_VP_COUNT];
+    int i;
     FOR_NB_SCREENS(l)
     {
-        h = core_alloc_ex("kbd vp", bufsz, &buflib_ops_locked);
-        if (h <= 0)
-            return h;
-        kbd_vpbuf_handle[l] = h;
-        kbd_param[l].kbd_viewports = ((struct viewport *) core_get_data(h));
+        kbd_param[l].kbd_viewports = viewports[l];
         for (i = 0; i < eKBD_COUNT_VP_COUNT; i++)
         {
-            vp = &kbd_param[l].kbd_viewports[i];
+            struct viewport *vp = &kbd_param[l].kbd_viewports[i];
             viewport_set_defaults(vp, l);
             vp->font = FONT_UI;
         }
     }
-    return bufsz;
-}
 
-static void kbd_destroy_viewports(void)
-{
-    FOR_NB_SCREENS(l)
-    {
-        if (kbd_vpbuf_handle[l] > 0) /* free old buffer */
-        {
-            kbd_vpbuf_handle[l] = core_free(kbd_vpbuf_handle[l]);
-        }
-    }
+    return sizeof(viewports);
 }
 
 /* Loads a custom keyboard into memory
@@ -802,7 +785,6 @@ cleanup:
         screens[l].setfont(FONT_UI);
         viewportmanager_theme_undo(l, false);
     }
-    kbd_destroy_viewports();
     return ret;
 }
 static void kbd_calc_pm_params(struct keyboard_parameters *pm,
