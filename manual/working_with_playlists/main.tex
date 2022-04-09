@@ -48,11 +48,11 @@ song.
   rather than erasing the current
   playlist, see the section below on how to add music to a playlist.}
 
-\subsubsection{By using the Clear List \& Play Next function}
-The \setting{Clear List \& Play Next} function as described in
-\ref{ref:currentplaylist_submenu} will replace the dynamic playlist with the selected
-tracks. If a track is currently playing, it is only removed once it’s finished
-playing.
+\subsubsection{By using the Play or Play Shuffled functions}
+The \setting{Play} function as described in \ref{ref:currentplaylist_submenu}
+will replace the dynamic playlist with the selected tracks. The \setting{Play
+Shuffled} function is similar, except the selected tracks will be added to the
+playlist in a random order.
 
 \subsubsection{\label{ref:playlist_catalogue}By using the Playlist catalogue}
 The \setting{Playlist catalogue} makes it possible to modify and create
@@ -96,20 +96,6 @@ have not been added yet, immediately after the currently playing track.
 \item [Insert Last Shuffled.] Add tracks in a random order to the end of the playlist.
 \end{description}
 
-If you want the existing playlist entries to first be removed before
-selected tracks are inserted, the following two options will achieve that effect.
-They are also available when playback is stopped, whereas the rest of the options
-require music to be playing or paused.
-
-\begin{description}
-\item [Clear List \& Play Next.] Replace all entries in the dynamic playlist with
-selected tracks. If a track is currently playing, it will be removed once it’s
-finished playing.
-
-\item [Clear List \& Play Shuffled.] Similar, except tracks are added in random order.
-Only available when playback is stopped.
-\end{description}
-
 Another possibility is to add tracks \emph{temporarily} to the dynamic playlist.
 In Rockbox’s parlance, this is called queuing. Queued tracks are automatically
 removed from the playlist after they have been played. They are also not saved
@@ -125,6 +111,17 @@ to the playlist file (see \reference{ref:playlistoptions}).
 \item [Queue Shuffled.] Corresponds to \setting{Insert Shuffled}.
 
 \item [Queue Last Shuffled.] Corresponds to \setting{Insert Last Shuffled}.
+\end{description}
+
+If you'd like to replace the current playlist with the new selection, the
+following two options will achieve that effect.
+
+\begin{description}
+\item [Play.] Replace all entries in the dynamic playlist with the selected
+  tracks and start playing the new playlist immediately.
+
+\item [Play Shuffled.] Similar, except the tracks will be added to the new
+  playlist in random order.
 \end{description}
 
 \note{You can hide the options to add shuffled tracks or to queue tracks, if you wish.

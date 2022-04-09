@@ -15807,16 +15807,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Clear List & Play Next"
+    *: ""
   </dest>
   <voice>
-    *: "Clear List & Play Next"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15877,16 +15877,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </dest>
   <voice>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16324,5 +16324,33 @@
   </dest>
   <voice>
     *: "Track Info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Play"
+  </dest>
+  <voice>
+    *: "Play"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Play Shuffled"
+  </dest>
+  <voice>
+    *: "Play Shuffled"
   </voice>
 </phrase>
