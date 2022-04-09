@@ -127,6 +127,9 @@ static int curfile = -1, direction = DIR_NEXT, entries = 0;
 /* list of the supported image files */
 static char **file_pt;
 
+/* progress update tick */
+static long next_progress_tick;
+
 static const struct image_decoder *imgdec = NULL;
 static enum image_type image_type = IMAGE_UNKNOWN;
 
@@ -428,7 +431,14 @@ static int ask_and_get_audio_buffer(const char *filename)
 /* callback updating a progress meter while image decoding */
 static void cb_progress(int current, int total)
 {
-    rb->yield(); /* be nice to the other threads */
+    /* do not yield or update the progress bar if we did so too recently */
+    long now = *rb->current_tick;
+    if(!TIME_AFTER(now, next_progress_tick))
+        return;
+
+    /* limit to 20fps */
+    next_progress_tick = now + HZ/20;
+
 #ifndef USEGSLIB
     /* in slideshow mode, keep gui interference to a minimum */
     const int size = (!iv_api.running_slideshow ? 8 : 4);
@@ -442,6 +452,8 @@ static void cb_progress(int current, int total)
                             total, 0, current, HORIZONTAL);
         rb->lcd_update_rect(0, LCD_HEIGHT-size, LCD_WIDTH, size);
     }
+
+    rb->yield(); /* be nice to the other threads */
 }
 
 #define VSCROLL (LCD_HEIGHT/8)
