@@ -129,6 +129,18 @@ void list_init_item_height(struct gui_synclist *list, enum screen_type screen)
 #endif
 }
 
+void gui_synclist_init_display_settings(struct gui_synclist * list)
+{
+    struct user_settings *gs = &global_settings;
+    list->scrollbar = gs->scrollbar;
+    list->show_icons = gs->show_icons;
+    list->scroll_paginated = gs->scroll_paginated;
+    list->keyclick = gs->keyclick;
+    list->talk_menu = gs->talk_menu;
+    list->wraparound = gs->list_wraparound;
+    list->cursor_style = gs->cursor_style;
+}
+
 /*
  * Initializes a scrolling list
  *  - gui_list : the list structure to initialize
@@ -153,6 +165,8 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->callback_draw_item = NULL;
     gui_list->nb_items = 0;
     gui_list->selected_item = 0;
+    gui_synclist_init_display_settings(gui_list);
+
 #ifdef HAVE_TOUCHSCREEN
     gui_list->y_pos = 0;
 #endif
@@ -263,7 +277,7 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
     {
         new_start_item = gui_list->selected_item;
     }
-    else if (global_settings.scroll_paginated)
+    else if (gui_list->scroll_paginated)
     {
         nb_lines -= nb_lines%gui_list->selected_size;
         if (difference < 0 || difference >= nb_lines)
@@ -293,7 +307,7 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
 
 static void edge_beep(struct gui_synclist * gui_list, bool wrap)
 {
-    if (global_settings.keyclick)
+    if (gui_list->keyclick)
     {
         list_speak_item *cb = gui_list->callback_speak_item;
         if (!wrap) /* a bounce */
@@ -356,7 +370,7 @@ static void _gui_synclist_speak_item(struct gui_synclist *lists)
 
 void gui_synclist_speak_item(struct gui_synclist *lists)
 {
-    if (global_settings.talk_menu)
+    if (lists->talk_menu)
     {
         if (lists->nb_items == 0)
             talk_id(VOICE_EMPTY_LIST, true);
@@ -683,11 +697,10 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 
     /* Disable the skin redraw callback */
     current_lists = NULL;
-
     switch (wrap)
     {
         case LIST_WRAP_ON:
-            gui_synclist_limit_scroll(lists, !global_settings.list_wraparound);
+            gui_synclist_limit_scroll(lists, !(lists->wraparound));
         break;
         case LIST_WRAP_OFF:
             gui_synclist_limit_scroll(lists, true);
@@ -698,7 +711,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
                 action == ACTION_LISTTREE_PGUP  ||
                 action == ACTION_LISTTREE_PGDOWN)
                 gui_synclist_limit_scroll(lists, true);
-            else gui_synclist_limit_scroll(lists, !global_settings.list_wraparound);
+            else gui_synclist_limit_scroll(lists, !(lists->wraparound));
         break;
     };
 

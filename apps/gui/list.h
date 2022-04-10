@@ -36,6 +36,14 @@ enum list_wrap {
     LIST_WRAP_UNLESS_HELD,
 };
 
+enum synclist_cursor
+{
+    SYNCLIST_CURSOR_NOSTYLE = 0,
+    SYNCLIST_CURSOR_INVERT,
+    SYNCLIST_CURSOR_COLOR,
+    SYNCLIST_CURSOR_GRADIENT,
+};
+
 /*
  * The gui_list is based on callback functions, if you want the list
  * to display something you have to provide it a function that
@@ -139,14 +147,24 @@ struct list_selection_color
 
 struct gui_synclist
 {
+    /*flags to hold settings show: icons, scrollbar etc..*/
+    int scrollbar;
+    int cursor_style;
+    bool show_icons;
+    bool keyclick;
+    bool talk_menu;
+    bool wraparound;
+    bool scroll_paginated;
     /* defines wether the list should stop when reaching the top/bottom
      * or should continue (by going to bottom/top) */
     bool limit_scroll;
-    /* wether the text of the whole items of the list have to be
+    /* whether the text of the whole items of the list have to be
      * scrolled or only for the selected item */
     bool scroll_all;
+    bool show_selection_marker; /* set to true by default */
     int nb_items;
     int selected_item;
+
 #ifdef HAVE_TOUCHSCREEN
     /* absolute Y coordinate, used for smooth scrolling */
     int y_pos;
@@ -170,7 +188,6 @@ struct gui_synclist
     char * title;
     /* Optional title icon */
     enum themable_icons title_icon;
-    bool show_selection_marker; /* set to true by default */
 
 #ifdef HAVE_LCD_COLOR
     int title_color;
@@ -187,7 +204,7 @@ extern void gui_list_screen_scroll_step(int ofs);
 
 /* parse global setting to static bool */
 extern void gui_list_screen_scroll_out_of_view(bool enable);
-
+extern void gui_synclist_init_display_settings(struct gui_synclist * list);
 extern void gui_synclist_init(
     struct gui_synclist * lists,
     list_get_name callback_get_item_name,

@@ -168,8 +168,10 @@ static bool draw_title(struct screen *display,
     int icon = list->title_icon;
     int icon_w = list_icon_width(display->screen_type);
     bool have_icons = false;
-    if (icon != Icon_NOICON && global_settings.show_icons)
+    if (icon != Icon_NOICON && list->show_icons)
+    {
         have_icons = true;
+    }
 
     struct list_putlineinfo_t list_info =
     {
@@ -192,11 +194,14 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     list_draw_item *callback_draw_item;
 
     const int list_start_item = list->start_item[screen];
-    const bool scrollbar_in_left = (global_settings.scrollbar == SCROLLBAR_LEFT);
-    const bool scrollbar_in_right = (global_settings.scrollbar == SCROLLBAR_RIGHT);
-    const bool show_cursor = !global_settings.cursor_style &&
-                        list->show_selection_marker;
-    const bool have_icons = global_settings.show_icons && list->callback_get_item_icon;
+    const bool scrollbar_in_left = (list->scrollbar == SCROLLBAR_LEFT);
+    const bool scrollbar_in_right = (list->scrollbar == SCROLLBAR_RIGHT);
+    
+    const bool show_cursor = list->show_selection_marker && 
+        (list->cursor_style == SYNCLIST_CURSOR_NOSTYLE);
+
+    const bool have_icons = list->callback_get_item_icon && list->show_icons;
+
     struct viewport *parent = (list->parent[screen]);
     struct line_desc linedes = LINE_DESC_DEFINIT;
     bool show_title;
@@ -264,7 +269,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #endif
 
     /* draw the scrollbar if its needed */
-    if (global_settings.scrollbar != SCROLLBAR_OFF)
+    if (list->scrollbar != SCROLLBAR_OFF)
     {
         /* if the scrollbar is shown the text viewport needs to shrink */
         if (nb_lines < list->nb_items)
@@ -340,7 +345,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         }
         if (line_indent)
         {
-            if (global_settings.show_icons)
+            if (list->show_icons)
                 line_indent *= icon_w;
             else
                 line_indent *= character_width;
@@ -374,12 +379,12 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             }
             else
 #endif
-            if (global_settings.cursor_style == 1
+            if (list->cursor_style == SYNCLIST_CURSOR_INVERT
 #ifdef HAVE_REMOTE_LCD
                     /* the global_settings.cursor_style check is here to make
                     * sure if they want the cursor instead of bar it will work
                     */
-                    || (display->depth < 16 && global_settings.cursor_style)
+                    || (display->depth < 16 && list->cursor_style)
 #endif
             )
             {
@@ -387,14 +392,14 @@ void list_draw(struct screen *display, struct gui_synclist *list)
                 style = STYLE_INVERT;
             }
 #ifdef HAVE_LCD_COLOR
-            else if (global_settings.cursor_style == 2)
+            else if (list->cursor_style == SYNCLIST_CURSOR_COLOR)
             {
                 /* Display colour line selector */
                 style = STYLE_COLORBAR;
                 linedes.text_color = global_settings.lst_color;
                 linedes.line_color = global_settings.lss_color;
             }
-            else if (global_settings.cursor_style == 3)
+            else if (list->cursor_style == SYNCLIST_CURSOR_GRADIENT)
             {
                 /* Display gradient line selector */
                 style = STYLE_GRADIENT;
@@ -753,7 +758,7 @@ static int get_click_location(struct gui_synclist *list, int x, int y)
         if (viewport_point_within_vp(title, x, y))
             retval = TITLE_TEXT;
         /* check the icon too */
-        if (list->title_icon != Icon_NOICON && global_settings.show_icons)
+        if (list->title_icon != Icon_NOICON && (list->show_icons)
         {
             int width = list_icon_width(screen);
             struct viewport vp = *title;
@@ -771,14 +776,19 @@ static int get_click_location(struct gui_synclist *list, int x, int y)
         {
             bool on_scrollbar_clicked;
             int adj_x = x - parent->x;
-            switch (global_settings.scrollbar)
+            switch (list->scrollbar)
             {
-                case SCROLLBAR_LEFT:
-                    on_scrollbar_clicked = adj_x <= SCROLLBAR_WIDTH; break;
-                case SCROLLBAR_RIGHT:
-                    on_scrollbar_clicked = adj_x > (title->x + title->width - SCROLLBAR_WIDTH); break;
+                case SCROLLBAR_OFF:
+                    /*fall-through*/
                 default:
-                    on_scrollbar_clicked = false; break;
+                    on_scrollbar_clicked = false;
+                    break;
+                case SCROLLBAR_LEFT:
+                    on_scrollbar_clicked = adj_x <= SCROLLBAR_WIDTH;
+                    break;
+                case SCROLLBAR_RIGHT:
+                    on_scrollbar_clicked = adj_x > (title->x + title->width - SCROLLBAR_WIDTH);
+                    break;
             }
             if (on_scrollbar_clicked)
                 retval = SCROLLBAR;

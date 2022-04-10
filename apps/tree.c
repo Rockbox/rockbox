@@ -963,6 +963,8 @@ int rockbox_browse(struct browse_context *browse)
     tc.dirfilter = &dirfilter;
     tc.sort_dir = global_settings.sort_dir;
 
+    gui_synclist_init_display_settings(&tree_lists); /* grab updated settings */
+
     reload_dir = true;
     if (*tc.dirfilter >= NUM_FILTER_MODES)
     {
