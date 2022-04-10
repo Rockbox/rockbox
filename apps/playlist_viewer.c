@@ -484,19 +484,12 @@ static int show_track_info(struct playlist_entry *current_track)
     struct mp3entry id3;
     bool id3_retrieval_successful = false;
 
-#if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
-    if (tagcache_fill_tags(&id3, current_track->name))
-        id3_retrieval_successful = true;
-    else
-#endif
+    int fd = open(current_track->name, O_RDONLY);
+    if (fd >= 0)
     {
-        int fd = open(current_track->name, O_RDONLY);
-        if (fd >= 0)
-        {
-            if (get_metadata(&id3, fd, current_track->name))
-                id3_retrieval_successful = true;
-            close(fd);
-        }
+        if (get_metadata(&id3, fd, current_track->name))
+            id3_retrieval_successful = true;
+        close(fd);
     }
 
     return id3_retrieval_successful &&
