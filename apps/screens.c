@@ -595,6 +595,8 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                     talk_value(id3->length /1000, UNIT_TIME, true);
                 break;
             case LANG_ID3_PLAYLIST:
+                if (info->playlist_display_index == 0 || info->playlist_amount == 0 )
+                    return NULL;
                 snprintf(buffer, buffer_len, "%d/%d",
                          info->playlist_display_index, info->playlist_amount);
                 val=buffer;
@@ -708,6 +710,7 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&id3_lists, id3_speak_item);
     gui_synclist_set_nb_items(&id3_lists, info.count*2);
+    gui_synclist_set_title(&id3_lists, str(LANG_TRACK_INFO), NOICON);
     gui_synclist_draw(&id3_lists);
     gui_synclist_speak_item(&id3_lists);
     while (true) {

@@ -14722,58 +14722,58 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Artist]"
+    *: ""
   </dest>
   <voice>
-    *: "Artist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Title]"
+    *: ""
   </dest>
   <voice>
-    *: "Title"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Album]"
+    *: ""
   </dest>
   <voice>
-    *: "Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Duration]"
+    *: ""
   </dest>
   <voice>
-    *: "Duration"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15947,128 +15947,128 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Album Artist]"
+    *: ""
   </dest>
   <voice>
-    *: "Album Artist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Genre]"
+    *: ""
   </dest>
   <voice>
-    *: "Genre"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Comment]"
+    *: ""
   </dest>
   <voice>
-    *: "Comment"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Composer]"
+    *: ""
   </dest>
   <voice>
-    *: "Composer"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Year]"
+    *: ""
   </dest>
   <voice>
-    *: "Year"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Tracknum]"
+    *: ""
   </dest>
   <voice>
-    *: "Track number"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Discnum]"
+    *: ""
   </dest>
   <voice>
-    *: "Disc number"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Frequency]"
+    *: ""
   </dest>
   <voice>
-    *: "Frequency"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: ""
   </dest>
   <voice>
-    *: "Bit rate"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16310,5 +16310,19 @@
   </dest>
   <voice>
     *: "Cache needs to finish updating first!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Track Info"
+  </dest>
+  <voice>
+    *: "Track Info"
   </voice>
 </phrase>

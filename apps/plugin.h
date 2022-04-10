@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 BjÃ¶rn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -112,6 +112,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "core_alloc.h"
 #include "screen_access.h"
 #include "onplay.h"
+#include "screens.h"
 
 #ifdef HAVE_ALBUMART
 #include "albumart.h"
@@ -156,7 +157,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 250
+#define PLUGIN_API_VERSION 251
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -942,6 +943,8 @@ struct plugin_api {
 #endif
     void (*sys_poweroff)(void);
     void (*sys_reboot)(void);
+    bool (*browse_id3)(struct mp3entry *id3,
+                       int playlist_display_index, int playlist_amount);
 };
 
 /* plugin header */

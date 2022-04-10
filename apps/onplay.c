@@ -1595,6 +1595,9 @@ MENUITEM_FUNCTION(list_viewers_item, 0, ID2P(LANG_ONPLAY_OPEN_WITH),
 MENUITEM_FUNCTION(properties_item, MENU_FUNC_USEPARAM, ID2P(LANG_PROPERTIES),
                   onplay_load_plugin, (void *)"properties",
                   clipboard_callback, Icon_NOICON);
+MENUITEM_FUNCTION(track_info_item, MENU_FUNC_USEPARAM, ID2P(LANG_MENU_SHOW_ID3_INFO),
+                  onplay_load_plugin, (void *)"properties",
+                  clipboard_callback, Icon_NOICON);
 #ifdef HAVE_TAGCACHE
 MENUITEM_FUNCTION(pictureflow_item, MENU_FUNC_USEPARAM, ID2P(LANG_ONPLAY_PICTUREFLOW),
                   onplay_load_plugin, (void *)"pictureflow",
@@ -1666,7 +1669,7 @@ static int clipboard_callback(int action,
             {
                 if (((selected_file_attr & FILE_ATTR_MASK) ==
                         FILE_ATTR_AUDIO) &&
-                    (this_item == &properties_item ||
+                    (this_item == &track_info_item ||
                      this_item == &pictureflow_item))
                     return action;
                 return ACTION_EXIT_MENUITEM;
@@ -1688,7 +1691,10 @@ static int clipboard_callback(int action,
                 if (this_item == &rename_file_item ||
                     this_item == &clipboard_cut_item ||
                     this_item == &clipboard_copy_item ||
-                    this_item == &properties_item ||
+                    (this_item == &track_info_item &&
+                        (selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_AUDIO) ||
+                    (this_item == &properties_item &&
+                        (selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO) ||
                     this_item == &add_to_faves_item)
                 {
                     return action;
@@ -1765,7 +1771,7 @@ MAKE_ONPLAYMENU( tree_onplay_menu, ID2P(LANG_ONPLAY_MENU_TITLE),
 #if LCD_DEPTH > 1
            &set_backdrop_item,
 #endif
-           &list_viewers_item, &create_dir_item, &properties_item,
+           &list_viewers_item, &create_dir_item, &properties_item, &track_info_item,
 #ifdef HAVE_TAGCACHE
            &pictureflow_item,
 #endif

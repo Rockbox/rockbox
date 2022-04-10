@@ -7,7 +7,7 @@
  *                     \/            \/     \/    \/            \/
  * $Id$
  *
- * Copyright (C) 2002 Björn Stenberg
+ * Copyright (C) 2002 BjÃ¶rn Stenberg
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -815,6 +815,7 @@ static const struct plugin_api rockbox_api = {
 #endif
     sys_poweroff,
     sys_reboot,
+    browse_id3,
 };
 
 static int plugin_buffer_handle;
