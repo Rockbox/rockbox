@@ -758,7 +758,7 @@ static int get_click_location(struct gui_synclist *list, int x, int y)
         if (viewport_point_within_vp(title, x, y))
             retval = TITLE_TEXT;
         /* check the icon too */
-        if (list->title_icon != Icon_NOICON && (list->show_icons)
+        if (list->title_icon != Icon_NOICON && list->show_icons)
         {
             int width = list_icon_width(screen);
             struct viewport vp = *title;
