@@ -313,7 +313,8 @@ enum plugin_status plugin_start(const void* parameter)
     int button;
     bool quit = false, usb = false;
     const char *file = parameter;
-    if(!parameter) return PLUGIN_ERROR;
+    if(!parameter || (file[0] != '/')) return PLUGIN_ERROR;
+
 #ifdef HAVE_TOUCHSCREEN
     rb->touchscreen_set_mode(rb->global_settings->touch_mode);
 #endif
