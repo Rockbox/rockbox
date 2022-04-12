@@ -1710,6 +1710,7 @@ static int audio_load_albumart(struct track_info *infop,
         struct bufopen_bitmap_data user_data;
         int *aa_hid = &infop->aa_hid[i];
         int hid = ERR_UNSUPPORTED_TYPE;
+        bool checked_image_file = false;
 
         /* albumart_slots may change during a yield of bufopen,
          * but that's no problem */
@@ -1721,12 +1722,15 @@ static int audio_load_albumart(struct track_info *infop,
         user_data.dim = &albumart_slots[i].dim;
 
         char path[MAX_PATH];
-        if(global_settings.album_art == AA_PREFER_IMAGE_FILE &&
-           find_albumart(track_id3, path, sizeof(path),
-                          &albumart_slots[i].dim))
+        if(global_settings.album_art == AA_PREFER_IMAGE_FILE)
         {
+            if (find_albumart(track_id3, path, sizeof(path),
+                          &albumart_slots[i].dim))
+            {
                 user_data.embedded_albumart = NULL;
                 hid = bufopen(path, 0, TYPE_BITMAP, &user_data);
+            }
+            checked_image_file = true;
         }
 
         /* We can only decode jpeg for embedded AA */
@@ -1738,7 +1742,7 @@ static int audio_load_albumart(struct track_info *infop,
             hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);
         }
 
-        if (global_settings.album_art != AA_OFF &&
+        if (global_settings.album_art != AA_OFF && !checked_image_file &&
             hid < 0 && hid != ERR_BUFFER_FULL)
         {
             /* No embedded AA or it couldn't be loaded - try other sources */
