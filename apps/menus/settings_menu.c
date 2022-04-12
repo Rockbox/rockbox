@@ -56,6 +56,7 @@
 #include "usb-ibasso.h"
 #endif
 #include "plugin.h"
+#include "onplay.h"
 
 #ifndef HAS_BUTTON_HOLD
 static int selectivesoftlock_callback(int action,
@@ -221,12 +222,30 @@ static int fileview_callback(int action,
     return action;
 }
 
-MAKE_MENU(file_menu, ID2P(LANG_FILE), 0, Icon_file_view_menu,
+static int filemenu_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list);
+MAKE_MENU(file_menu, ID2P(LANG_FILE), filemenu_callback, Icon_file_view_menu,
                 &sort_case, &sort_dir, &sort_file, &interpret_numbers,
                 &dirfilter, &show_filename_ext, &browse_current,
                 &show_path_in_browser,
                 &clear_start_directory_item
                 );
+static int filemenu_callback(int action,
+                             const struct menu_item_ex *this_item,
+                             struct gui_synclist *this_list)
+{
+    (void)this_list;
+
+    if (action == ACTION_REQUEST_MENUITEM &&
+        this_item == &file_menu &&
+        get_onplay_context() == CONTEXT_ID3DB &&
+        get_current_activity() != ACTIVITY_SETTINGS)
+        return ACTION_EXIT_MENUITEM;
+
+    return action;
+}
+
 /*    FILE VIEW MENU               */
 /***********************************/
 

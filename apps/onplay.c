@@ -1986,3 +1986,9 @@ int onplay(char* file, int attr, int from, bool hotkey)
             return onplay_result;
     }
 }
+
+int get_onplay_context(void)
+{
+    return context;
+}
+
