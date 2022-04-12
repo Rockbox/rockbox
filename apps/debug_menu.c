@@ -39,7 +39,6 @@
 #include "audio.h"
 #include "settings.h"
 #include "list.h"
-#include "statusbar.h"
 #include "dir.h"
 #include "panic.h"
 #include "screens.h"
