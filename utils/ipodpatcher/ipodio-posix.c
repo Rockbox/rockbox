@@ -355,6 +355,7 @@ int ipod_reopen_rw(struct ipod_t* ipod)
 int ipod_close(struct ipod_t* ipod)
 {
     close(ipod->dh);
+    ipod->dh = -1;
     return 0;
 }
 

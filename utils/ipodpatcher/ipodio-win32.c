@@ -155,6 +155,7 @@ int ipod_close(struct ipod_t* ipod)
 {
     unlock_volume(ipod->dh);
     CloseHandle(ipod->dh);
+    ipod->dh = INVALID_HANDLE_VALUE;
     return 0;
 }
 

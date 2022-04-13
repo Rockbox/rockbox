@@ -42,19 +42,6 @@ BootloaderInstallIpod::~BootloaderInstallIpod()
 
 bool BootloaderInstallIpod::install(void)
 {
-    ipodInitialize(&ipod);
-
-    if(ipod.sectorbuf == nullptr) {
-        emit logItem(tr("Error: can't allocate buffer memory!"), LOGERROR);
-        emit done(true);
-        return false;
-    }
-
-    // save buffer pointer before cleaning up ipod_t structure
-    unsigned char* sb = ipod.sectorbuf;
-    memset(&ipod, 0, sizeof(struct ipod_t));
-    ipod.sectorbuf = sb;
-
     if(!ipodInitialize(&ipod)) {
         emit done(true);
         return false;
@@ -223,6 +210,21 @@ BootloaderInstallBase::Capabilities BootloaderInstallIpod::capabilities(void)
  */
 bool BootloaderInstallIpod::ipodInitialize(struct ipod_t *ipod)
 {
+    // if the ipod was already opened make sure to close it first.
+#if defined(Q_OS_WIN32)
+    if(ipod->dh != INVALID_HANDLE_VALUE)
+#else
+    if(ipod->dh >= 0)
+#endif
+    {
+        ipod_close(ipod);
+    }
+
+    // save buffer pointer before cleaning up ipod_t structure
+    unsigned char* sb = ipod->sectorbuf;
+    memset(ipod, 0, sizeof(struct ipod_t));
+    ipod->sectorbuf = sb;
+
     // initialize sector buffer. The sector buffer is part of the ipod_t
     // structure, so a second instance of this class will have its own buffer.
     if(ipod->sectorbuf == nullptr) {
