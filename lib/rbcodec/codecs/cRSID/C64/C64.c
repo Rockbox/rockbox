@@ -3,6 +3,7 @@
 
 
 #include "../libcRSID.h"
+#include "libcRSIDc64.h"
 
 #include "MEM.c"
 #include "CPU.c"

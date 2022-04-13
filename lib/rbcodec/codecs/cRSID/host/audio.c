@@ -52,7 +52,7 @@ void cRSID_generateSound(cRSID_C64instance* C64instance, unsigned char *buf, uns
 #endif
 
 
-static inline signed short cRSID_generateSample (cRSID_C64instance* C64) { //call this from custom buffer-filler
+signed short cRSID_generateSample (cRSID_C64instance* C64) { //call this from custom buffer-filler
  static int Output;
  Output=cRSID_emulateC64(C64);
  if (C64->PSIDdigiMode) Output += cRSID_playPSIDdigi(C64);
