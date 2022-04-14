@@ -52,8 +52,8 @@ if(QT_VERSION_MAJOR EQUAL 5)
                  Core Widgets Svg Multimedia Network Test LinguistTools)
 else()
     find_package(Qt6 REQUIRED COMPONENTS
-                 Core Core5Compat Widgets Svg Multimedia Network LinguistTools SvgWidgets
-                 OPTIONAL_COMPONENTS Test)
+                 Core Core5Compat Widgets Svg Network LinguistTools SvgWidgets
+                 OPTIONAL_COMPONENTS Multimedia Test)
 endif()
 get_target_property(_moc_executable Qt${QT_VERSION_MAJOR}::moc IMPORTED_LOCATION)
 get_filename_component(QT_BINDIR "${_moc_executable}" DIRECTORY)
