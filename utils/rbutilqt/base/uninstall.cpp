@@ -57,8 +57,9 @@ void Uninstaller::uninstall(void)
         installlog.endGroup();
 
         // iterate over all entries
-        for(int j =0; j < toDeleteList.size(); j++ )
+        for(int j = 0; j < toDeleteList.size(); j++ )
         {
+            emit logProgress(j, toDeleteList.size());
             // check if current file is in use by another section
             bool deleteFile = true;
             for(int s = 0; s < sections.size(); s++)
