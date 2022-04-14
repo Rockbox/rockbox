@@ -110,6 +110,7 @@ int sansa_reopen_rw(struct sansa_t* sansa)
 int sansa_close(struct sansa_t* sansa)
 {
     close(sansa->dh);
+    sansa->dh = -1;
     return 0;
 }
 

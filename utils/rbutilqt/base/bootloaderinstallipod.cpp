@@ -29,6 +29,11 @@ BootloaderInstallIpod::BootloaderInstallIpod(QObject *parent)
         : BootloaderInstallBase(parent)
 {
     ipod.sectorbuf = nullptr;
+#if defined(Q_OS_WIN32)
+    ipod.dh = INVALID_HANDLE_VALUE;
+#else
+    ipod.dh = -1;
+#endif
 }
 
 

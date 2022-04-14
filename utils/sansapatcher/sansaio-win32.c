@@ -147,6 +147,7 @@ int sansa_close(struct sansa_t* sansa)
 {
     unlock_volume(sansa->dh);
     CloseHandle(sansa->dh);
+    sansa->dh = INVALID_HANDLE_VALUE;
     return 0;
 }
 

@@ -28,6 +28,11 @@ BootloaderInstallSansa::BootloaderInstallSansa(QObject *parent)
         : BootloaderInstallBase(parent)
 {
     sansa.sectorbuf = nullptr;
+#if defined(Q_OS_WIN32)
+    sansa.dh = INVALID_HANDLE_VALUE;
+#else
+    sansa.dh = -1;
+#endif
 }
 
 
@@ -51,21 +56,6 @@ bool BootloaderInstallSansa::install(void)
         emit done(true);
     }
 
-    emit logItem(tr("Searching for Sansa"), LOGINFO);
-
-    int n = sansa_scan(&sansa);
-    if(n == -1) {
-        emit logItem(tr("Permission for disc access denied!\n"
-                "This is required to install the bootloader"),
-                LOGERROR);
-        emit done(true);
-        return false;
-    }
-    if(n == 0) {
-        emit logItem(tr("No Sansa detected!"), LOGERROR);
-        emit done(true);
-        return false;
-    }
     if(sansa.hasoldbootloader) {
         emit logItem(tr("OLD ROCKBOX INSTALLATION DETECTED, ABORTING.\n"
                "You must reinstall the original Sansa firmware before running\n"
@@ -92,10 +82,6 @@ void BootloaderInstallSansa::installStage2(void)
 
     emit logItem(tr("Installing Rockbox bootloader"), LOGINFO);
     QCoreApplication::processEvents();
-    if(!sansaInitialize(&sansa)) {
-            emit done(true);
-            return;
-    }
 
     if(sansa_reopen_rw(&sansa) < 0) {
         emit logItem(tr("Could not open Sansa in R/W mode"), LOGERROR);
@@ -232,7 +218,21 @@ BootloaderInstallBase::BootloaderType BootloaderInstallSansa::installed(void)
 
 bool BootloaderInstallSansa::sansaInitialize(struct sansa_t *sansa)
 {
-    // initialize sector buffer. The sector buffer is part of the sansa_t
+    // if the ipod was already opened make sure to close it first.
+#if defined(Q_OS_WIN32)
+    if(sansa->dh != INVALID_HANDLE_VALUE)
+#else
+    if(sansa->dh >= 0)
+#endif
+    {
+        sansa_close(sansa);
+    }
+    // save buffer pointer before cleaning up ipod_t structure
+    unsigned char* sb = sansa->sectorbuf;
+    memset(sansa, 0, sizeof(struct sansa_t));
+    sansa->sectorbuf = sb;
+
+    // initialize sector buffer. The sector buffer is part of the ipod_t
     // structure, so a second instance of this class will have its own buffer.
     if(sansa->sectorbuf == nullptr) {
         sansa_alloc_buffer(sansa, BUFFER_SIZE);
