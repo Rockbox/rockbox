@@ -147,6 +147,7 @@ bool ZipUtil::extractArchive(const QString& dest, QString file)
         outputFile.close();
 
         emit logProgress(current, entries);
+        QCoreApplication::processEvents();
     }
     delete currentFile;
     emit logProgress(1, 1);

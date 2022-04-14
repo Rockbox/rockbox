@@ -57,6 +57,7 @@ void Uninstaller::uninstall(void)
         installlog.endGroup();
 
         // iterate over all entries
+        QStringList deletedItems;
         for(int j = 0; j < toDeleteList.size(); j++ )
         {
             emit logProgress(j, toDeleteList.size());
@@ -73,14 +74,13 @@ void Uninstaller::uninstall(void)
                 installlog.endGroup();
             }
 
-            installlog.beginGroup(uninstallSections.at(i));
             QFileInfo toDelete(m_mountpoint + "/" + toDeleteList.at(j));
             if(toDelete.isFile())  // if it is a file remove it
             {
                 if(deleteFile && !QFile::remove(toDelete.filePath()))
                     emit logItem(tr("Could not delete %1")
                           .arg(toDelete.filePath()), LOGWARNING);
-                installlog.remove(toDeleteList.at(j));
+                deletedItems.append(toDeleteList.at(j));
                 LOG_INFO() << "deleted:" << toDelete.filePath();
             }
             else  // if it is a dir, remember it for later deletion
@@ -89,17 +89,24 @@ void Uninstaller::uninstall(void)
                 // folders will be rm'ed.
                 dirList << toDeleteList.at(j);
             }
-            installlog.endGroup();
             QCoreApplication::processEvents();
         }
         // delete the dirs
         installlog.beginGroup(uninstallSections.at(i));
-        for(int j=0; j < dirList.size(); j++ )
+        for(int j = 0; j < dirList.size(); j++ )
         {
-            installlog.remove(dirList.at(j));
+            emit logProgress(j, dirList.size());
+            deletedItems.append(dirList.at(j));
             QDir dir(m_mountpoint);
             dir.rmdir(dirList.at(j)); // rm works only on empty folders
         }
+        // for speed reasons update log file only at the end.
+        installlog.beginGroup(uninstallSections.at(i));
+        for (auto file : deletedItems)
+        {
+            installlog.remove(file);
+        }
+        installlog.endGroup();
 
         installlog.endGroup();
         //installlog.removeGroup(uninstallSections.at(i))
