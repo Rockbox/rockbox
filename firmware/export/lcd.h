@@ -178,8 +178,9 @@ struct frame_buffer_t {
 
 #define VP_IS_RTL(vp) (((vp)->flags & VP_FLAG_ALIGNMENT_MASK) == VP_FLAG_ALIGN_RIGHT)
 
-#define VP_FLAG_VP_DIRTY 0x4000
-#define VP_FLAG_CLEAR_FLAG 0x8000
+#define VP_FLAG_OWNER_UPDATE 0x2000 /* block update_vp functions */
+#define VP_FLAG_VP_DIRTY     0x4000
+#define VP_FLAG_CLEAR_FLAG   0x8000
 #define VP_FLAG_VP_SET_CLEAN (VP_FLAG_CLEAR_FLAG | VP_FLAG_VP_DIRTY)
 
 struct viewport {

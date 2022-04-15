@@ -178,7 +178,13 @@ struct viewport *LCDFN(get_viewport)(bool *is_default)
 
 void LCDFN(update_viewport)(void)
 {
+
     struct viewport* vp = LCDFN(current_viewport);
+    if ((vp->flags & VP_FLAG_OWNER_UPDATE) == VP_FLAG_OWNER_UPDATE)
+    {
+        logf("%s ignored -  owner update", __func__);
+        return;
+    }
     int x, y;
     if (vp->buffer->stride != LCDFN(framebuffer_default.stride))
     {
@@ -196,7 +202,11 @@ void LCDFN(update_viewport)(void)
 void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
 {
     struct viewport* vp = LCDFN(current_viewport);
-
+    if ((vp->flags & VP_FLAG_OWNER_UPDATE) == VP_FLAG_OWNER_UPDATE)
+    {
+        logf("%s ignored -  owner update", __func__);
+        return;
+    }
     /* handle the case of viewport with differing stride from main screen */
     if (vp->buffer->stride != LCDFN(framebuffer_default.stride))
     {
