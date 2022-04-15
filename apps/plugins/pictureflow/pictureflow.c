@@ -4082,7 +4082,9 @@ static bool start_playback(bool return_to_WPS)
 #endif
     rb->lcd_clear_display();
     rb->lcd_update();
-#endif /* USEGSLIB */
+#else /* if !USEGSLIB */
+    (void) return_to_WPS;
+#endif
 
     if (!rb->warn_on_pl_erase() || !track_list_ready())
     {
@@ -4112,10 +4114,8 @@ static bool start_playback(bool return_to_WPS)
     rb->playlist_start(start_index, 0, 0);
     rb->playlist_get_current()->num_inserted_tracks = 0; /* prevent warn_on_pl_erase */
     old_shuffle = shuffle;
-    if (return_to_WPS)
-        pf_cfg.last_album = center_index;
 #ifdef USEGSLIB
-    else
+    if (!return_to_WPS)
         grey_show(true);
 #endif
     return true;
@@ -4213,7 +4213,9 @@ static void draw_album_text(void)
 static void set_initial_slide(const char* selected_file)
 {
     if (selected_file == NULL)
-        set_current_slide(id3_get_index(rb->audio_current_track()));
+        set_current_slide(rb->audio_status() ?
+                            id3_get_index(rb->audio_current_track()) :
+                            pf_cfg.last_album);
     else
     {
         struct mp3entry id3;
@@ -4687,6 +4689,7 @@ enum plugin_status plugin_start(const void *parameter)
 
     ret = file_id3 ? pictureflow_main(file) : pictureflow_main(NULL);
     if ( ret == PLUGIN_OK || ret == PLUGIN_GOTO_WPS) {
+        pf_cfg.last_album = center_index;
         if (configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION))
         {
