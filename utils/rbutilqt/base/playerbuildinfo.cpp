@@ -261,7 +261,7 @@ QVariant PlayerBuildInfo::value(DeviceInfo item, QString target)
         break;
 
     default:
-        result = playerInfo.value(s);
+        result = playerInfo.value(s, "");
         break;
     }
 

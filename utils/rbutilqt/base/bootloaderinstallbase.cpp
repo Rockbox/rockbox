@@ -211,6 +211,9 @@ void BootloaderInstallBase::setBlFile(QStringList sl)
             m_blfile = sl.at(a);
         }
     }
+    if(m_blfile.isEmpty() && sl.size() > 0) {
+        m_blfile = sl.at(0);
+    }
 }
 
 
