@@ -182,7 +182,9 @@ void LCDFN(update_viewport)(void)
     struct viewport* vp = LCDFN(current_viewport);
     if ((vp->flags & VP_FLAG_OWNER_UPDATE) == VP_FLAG_OWNER_UPDATE)
     {
-        logf("%s ignored -  owner update", __func__);
+#ifdef LOGF_ENABLE
+        logf("%s ignored - owner update", __func__);
+#endif
         return;
     }
     int x, y;
@@ -204,7 +206,9 @@ void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
     struct viewport* vp = LCDFN(current_viewport);
     if ((vp->flags & VP_FLAG_OWNER_UPDATE) == VP_FLAG_OWNER_UPDATE)
     {
-        logf("%s ignored -  owner update", __func__);
+#ifdef LOGF_ENABLE
+        logf("%s ignored - owner update", __func__);
+#endif
         return;
     }
     /* handle the case of viewport with differing stride from main screen */
