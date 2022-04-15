@@ -195,7 +195,11 @@ static int change_filename(int direct)
         return PLUGIN_ERROR;
     }
 
-    rb->strcpy(rb->strrchr(np_file, '/')+1, file_pt[curfile]);
+    size_t np_file_length = rb->strlen(np_file);
+    size_t np_file_name_length = rb->strlen(rb->strrchr(np_file, '/')+1);
+    size_t avail_length = sizeof(np_file) - (np_file_length - np_file_name_length);
+
+    rb->snprintf(rb->strrchr(np_file, '/')+1, avail_length, "%s", file_pt[curfile]);
 
     return PLUGIN_OTHER;
 }
