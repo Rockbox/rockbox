@@ -937,7 +937,9 @@ struct plugin_api {
     void (*queue_remove_from_head)(struct event_queue *q, long id);
     int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
     size_t (*plugin_reserve_buffer)(size_t buffer_size);
+#ifdef HAVE_MULTIVOLUME
     int (*path_strip_volume)(const char *name, const char **nameptr, bool greedy);
+#endif
     void (*sys_poweroff)(void);
     void (*sys_reboot)(void);
 };

@@ -810,7 +810,9 @@ static const struct plugin_api rockbox_api = {
     queue_remove_from_head,
     core_set_keyremap,
     plugin_reserve_buffer,
+#ifdef HAVE_MULTIVOLUME
     path_strip_volume,
+#endif
     sys_poweroff,
     sys_reboot,
 };
