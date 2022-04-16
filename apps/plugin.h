@@ -156,7 +156,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 249
+#define PLUGIN_API_VERSION 250
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -937,6 +937,9 @@ struct plugin_api {
     void (*queue_remove_from_head)(struct event_queue *q, long id);
     int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
     size_t (*plugin_reserve_buffer)(size_t buffer_size);
+    int (*path_strip_volume)(const char *name, const char **nameptr, bool greedy);
+    void (*sys_poweroff)(void);
+    void (*sys_reboot)(void);
 };
 
 /* plugin header */

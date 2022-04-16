@@ -810,6 +810,9 @@ static const struct plugin_api rockbox_api = {
     queue_remove_from_head,
     core_set_keyremap,
     plugin_reserve_buffer,
+    path_strip_volume,
+    sys_poweroff,
+    sys_reboot,
 };
 
 static int plugin_buffer_handle;

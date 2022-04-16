@@ -158,6 +158,10 @@ wormlet.c
 announce_status.c
 #endif
 
+#ifdef HAVE_MULTIBOOT
+multiboot_select.c
+#endif
+
 
 /* Plugins needing the grayscale lib on low-depth LCDs */
 fire.c
