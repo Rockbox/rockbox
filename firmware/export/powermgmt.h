@@ -70,6 +70,12 @@ extern unsigned int power_thread_inputs;
 
 #endif /* CONFIG_CHARGING */
 
+enum shutdown_type
+{
+    SHUTDOWN_POWER_OFF,
+    SHUTDOWN_REBOOT,
+};
+
 #if CONFIG_CHARGING == CHARGING_TARGET
 /* Include target-specific definitions */
 #include "powermgmt-target.h"
@@ -164,8 +170,9 @@ void handle_auto_poweroff(void);
 void set_car_adapter_mode(bool setting);
 void reset_poweroff_timer(void);
 void cancel_shutdown(void);
-void shutdown_hw(void);
+void shutdown_hw(enum shutdown_type sd_type);
 void sys_poweroff(void);
+void sys_reboot(void);
 /* Returns true if the system should force shutdown for some reason -
  * eg. low battery */
 bool query_force_shutdown(void);

@@ -823,7 +823,7 @@ void powermgmt_init(void)
 }
 
 /* Various hardware housekeeping tasks relating to shutting down the player */
-void shutdown_hw(void)
+void shutdown_hw(enum shutdown_type sd_type)
 {
     charging_algorithm_close();
     audio_stop();
@@ -863,7 +863,17 @@ void shutdown_hw(void)
        eeprom chips are quite slow and might be still writing the last
        byte. */
     sleep(HZ/4);
-    power_off();
+
+    switch (sd_type) {
+    case SHUTDOWN_POWER_OFF:
+    default:
+        power_off();
+        break;
+
+    case SHUTDOWN_REBOOT:
+        system_reboot();
+        break;
+    }
 }
 
 void set_poweroff_timeout(int timeout)
@@ -878,10 +888,9 @@ void reset_poweroff_timer(void)
         set_sleep_timer(sleeptimer_duration);
 }
 
-void sys_poweroff(void)
-{
 #ifndef BOOTLOADER
-    logf("sys_poweroff()");
+static void sys_shutdown_common(void)
+{
     /* If the main thread fails to shut down the system, we will force a
        power off after an 20 second timeout - 28 seconds if recording */
     if (shutdown_timeout == 0) {
@@ -899,9 +908,26 @@ void sys_poweroff(void)
         shutdown_timeout += HZ*20;
 #endif
     }
-
-    queue_broadcast(SYS_POWEROFF, 0);
+}
 #endif /* BOOTLOADER */
+
+void sys_poweroff(void)
+{
+#ifndef BOOTLOADER
+    logf("sys_poweroff()");
+    sys_shutdown_common();
+    queue_broadcast(SYS_POWEROFF, 0);
+#endif
+}
+
+/* not to be confused with system_reboot... :( */
+void sys_reboot(void)
+{
+#ifndef BOOTLOADER
+    logf("sys_reboot()");
+    sys_shutdown_common();
+    queue_broadcast(SYS_REBOOT, 0);
+#endif
 }
 
 void cancel_shutdown(void)

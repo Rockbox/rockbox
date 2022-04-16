@@ -364,6 +364,7 @@ static void iap_thread(void)
 
             /* Handle poweroff message */
             case SYS_POWEROFF:
+            case SYS_REBOOT:
             {
                 iap_shutdown = true;
                 break;

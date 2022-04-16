@@ -288,7 +288,8 @@ static void system_restore(void)
     tree_restore();
 }
 
-static bool clean_shutdown(void (*callback)(void *), void *parameter)
+static bool clean_shutdown(enum shutdown_type sd_type,
+                           void (*callback)(void *), void *parameter)
 {
     long msg_id = -1;
 
@@ -392,7 +393,7 @@ static bool clean_shutdown(void (*callback)(void *), void *parameter)
             voice_wait();
         }
 
-        shutdown_hw();
+        shutdown_hw(sd_type);
     }
     return false;
 }
@@ -605,8 +606,17 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             return SYS_USB_CONNECTED;
 
         case SYS_POWEROFF:
-            if (!clean_shutdown(callback, parameter))
-                return SYS_POWEROFF;
+        case SYS_REBOOT:
+        {
+            enum shutdown_type sd_type;
+            if (event == SYS_POWEROFF)
+                sd_type = SHUTDOWN_POWER_OFF;
+            else
+                sd_type = SHUTDOWN_REBOOT;
+
+            if (!clean_shutdown(sd_type, callback, parameter))
+                return event;
+        }
             break;
 #if CONFIG_CHARGING
         case SYS_CHARGER_CONNECTED:

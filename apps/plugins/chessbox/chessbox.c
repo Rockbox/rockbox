@@ -222,6 +222,7 @@ static void cb_wt_callback ( void ) {
     button = rb->button_get(false);
     switch (button) {
         case SYS_POWEROFF:
+        case SYS_REBOOT:
             cb_sysevent = button;
 #ifdef CB_RC_QUIT
         case CB_RC_QUIT:
@@ -585,6 +586,7 @@ static struct cb_command cb_get_viewer_command (void) {
         button = rb->button_get(true);
         switch (button) {
             case SYS_POWEROFF:
+            case SYS_REBOOT:
                 cb_sysevent = button;
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:
@@ -848,6 +850,7 @@ static struct cb_command cb_getcommand (void) {
         button = rb->button_get(true);
         switch (button) {
             case SYS_POWEROFF:
+            case SYS_REBOOT:
                 cb_sysevent = button;
 #ifdef CB_RC_QUIT
             case CB_RC_QUIT:

@@ -1534,7 +1534,8 @@ bool recording_screen(bool no_source)
                 break;
 
             case SYS_POWEROFF:
-                default_event_handler(SYS_POWEROFF);
+            case SYS_REBOOT:
+                default_event_handler(button);
                 done = true;
                 break;
 

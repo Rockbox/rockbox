@@ -192,6 +192,7 @@ int mpeg_sysevent_callback(int btn,
     {
     case SYS_USB_CONNECTED:
     case SYS_POWEROFF:
+    case SYS_REBOOT:
         mpeg_sysevent_id = btn;
         return ACTION_STD_CANCEL;
     }

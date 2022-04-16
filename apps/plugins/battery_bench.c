@@ -462,6 +462,7 @@ static void thread(void)
                 in_usb_mode = false;
                 break;
             case SYS_POWEROFF:
+            case SYS_REBOOT:
                 exit_reason = "power off";
                 exit = true;
                 break;

@@ -2149,6 +2149,7 @@ static int solitaire( int skipmenu )
                 break;
 
             case SYS_POWEROFF:
+            case SYS_REBOOT:
                 return SOLITAIRE_SAVE_AND_QUIT;
 
             default:

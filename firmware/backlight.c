@@ -668,6 +668,7 @@ void backlight_thread(void)
 #endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 #endif /* HAVE_BUTTON_LIGHT */
 
+            case SYS_REBOOT:
             case SYS_POWEROFF:  /* Lock backlight on poweroff so it doesn't */
                 locked = true;      /* go off before power is actually cut. */
 #if !defined(BOOTLOADER)

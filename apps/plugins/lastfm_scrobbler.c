@@ -490,6 +490,7 @@ void thread(void)
                 rb->beep_play(1500, 100, 1000);
                 break;
             case SYS_POWEROFF:
+            case SYS_REBOOT:
                 gCache.force_flush = true;
                 /*fall through*/
             case EV_EXIT:

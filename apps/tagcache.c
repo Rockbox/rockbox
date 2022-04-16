@@ -3989,6 +3989,7 @@ static bool check_event_queue(void)
     {
         case Q_STOP_SCAN:
         case SYS_POWEROFF:
+        case SYS_REBOOT:
         case SYS_USB_CONNECTED:
             return true;
     }
@@ -4944,6 +4945,7 @@ static void tagcache_thread(void)
                 break ;
 
             case SYS_POWEROFF:
+            case SYS_REBOOT:
                 break ;
 
             case SYS_USB_CONNECTED:
