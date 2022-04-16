@@ -308,17 +308,7 @@ void SelectiveInstallWidget::installBootloader(void)
         // set bootloader filename. Do this now as installed() needs it.
         QStringList blfile = PlayerBuildInfo::instance()->value(
                     PlayerBuildInfo::BootloaderFile).toStringList();
-        QStringList blfilepath;
-        for(int a = 0; a < blfile.size(); a++) {
-            blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
-                    + blfile.at(a));
-        }
-        // on devices without a bootloader file we use the mointpoint. The
-        // installer will use that to determine the correct device.
-        if(blfile.isEmpty()) {
-            blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString());
-        }
-        bl->setBlFile(blfilepath);
+        bl->setBlFile(RbSettings::value(RbSettings::Mountpoint).toString(), blfile);
         QUrl url(PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderUrl).toString()
                 + PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderName).toString());
         bl->setBlUrl(url);

@@ -507,18 +507,9 @@ void RbUtilQt::uninstallBootloader(void)
         logger->setFinished();
         return;
     }
-    QStringList blfile = PlayerBuildInfo::instance()->value(PlayerBuildInfo::BootloaderFile).toStringList();
-    QStringList blfilepath;
-    for(int a = 0; a < blfile.size(); a++) {
-        blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString()
-                + blfile.at(a));
-    }
-    // on devices without a bootloader file we use the mointpoint. The
-    // installer will use that to determine the correct device.
-    if(blfile.isEmpty()) {
-        blfilepath.append(RbSettings::value(RbSettings::Mountpoint).toString());
-    }
-    bl->setBlFile(blfilepath);
+    QStringList blfile = PlayerBuildInfo::instance()->value(
+                PlayerBuildInfo::BootloaderFile).toStringList();
+    bl->setBlFile(RbSettings::value(RbSettings::Mountpoint).toString(), blfile);
     bl->setLogfile(RbSettings::value(RbSettings::Mountpoint).toString()
             + "/.rockbox/rbutil.log");
 

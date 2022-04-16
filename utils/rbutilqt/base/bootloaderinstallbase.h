@@ -55,17 +55,17 @@ class BootloaderInstallBase : public QObject
         bool backup(QString to);
 
         //! set the different filenames and paths
-        void setBlFile(QStringList f);
+        void setBlFile(const QString& mountpoint, const QStringList& f);
         void setBlUrl(QUrl u)
             { m_blurl = u; }
-        void setLogfile(QString f)
+        void setLogfile(const QString& f)
             { m_logfile = f; }
-        bool setOfFile(QString of, QStringList blfile);
+        bool setOfFile(QString& of, const QStringList& blfile);
 
         //! returns a port Install Hint or empty if there is none
         //! static and in the base class, so the installer classes dont need to
         //  be modified for new targets
-        static QString postinstallHints(QString model);
+        static QString postinstallHints(const QString& model);
 
     protected slots:
         void downloadBlFinish(QNetworkReply::NetworkError error);

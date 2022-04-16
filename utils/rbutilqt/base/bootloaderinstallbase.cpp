@@ -203,21 +203,28 @@ void BootloaderInstallBase::checkRemount()
 
 //! @brief set list of possible bootloader files and pick the existing one.
 //! @param sl list of possible bootloader files.
-void BootloaderInstallBase::setBlFile(QStringList sl)
+void BootloaderInstallBase::setBlFile(const QString& mountpoint, const QStringList& sl)
 {
-    // figue which of the possible bootloader filenames is correct.
-    for(int a = 0; a < sl.size(); a++) {
-        if(!Utils::resolvePathCase(sl.at(a)).isEmpty()) {
-            m_blfile = sl.at(a);
-        }
+    if(sl.size() == 0) {
+        m_blfile = mountpoint;
     }
-    if(m_blfile.isEmpty() && sl.size() > 0) {
-        m_blfile = sl.at(0);
+    else {
+        for(int a = 0; a < sl.size(); a++) {
+            QString filename = mountpoint + sl.at(a);
+            if(!Utils::resolvePathCase(filename).isEmpty()) {
+                m_blfile = filename;
+                break;
+            }
+        }
+        // figue which of the possible bootloader filenames is correct.
+        if(m_blfile.isEmpty() && sl.size() > 0) {
+            m_blfile = mountpoint + sl.at(0);
+        }
     }
 }
 
 
-bool BootloaderInstallBase::setOfFile(QString of, QStringList blfile)
+bool BootloaderInstallBase::setOfFile(QString& of, const QStringList& blfile)
 {
     bool found = false;
     ArchiveUtil *util = nullptr;
