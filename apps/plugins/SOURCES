@@ -158,7 +158,8 @@ wormlet.c
 announce_status.c
 #endif
 
-#ifdef HAVE_MULTIBOOT
+/* can't build in the sim for some reason */
+#if defined(HAVE_MULTIBOOT) && !defined(SIMULATOR)
 multiboot_select.c
 #endif
 
