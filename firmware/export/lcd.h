@@ -182,6 +182,8 @@ struct frame_buffer_t {
 #define VP_FLAG_VP_DIRTY     0x4000
 #define VP_FLAG_CLEAR_FLAG   0x8000
 #define VP_FLAG_VP_SET_CLEAN (VP_FLAG_CLEAR_FLAG | VP_FLAG_VP_DIRTY)
+/* flags set by viewport_set_defaults() */
+#define VP_DEFAULT_FLAGS (VP_FLAG_VP_DIRTY)
 
 struct viewport {
     int x;

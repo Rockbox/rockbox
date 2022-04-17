@@ -71,6 +71,7 @@ static struct viewport default_vp =
     .y        = 0,
     .width    = LCDM(WIDTH),
     .height   = LCDM(HEIGHT),
+    .flags    = 0,
     .font     = FONT_SYSFIXED,
     .drawmode = DRMODE_SOLID,
     .buffer   = NULL,

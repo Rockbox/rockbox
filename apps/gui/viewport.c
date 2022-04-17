@@ -332,7 +332,7 @@ void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen)
 {
     vp->buffer = NULL; /* use default frame_buffer */
-
+    vp->flags = VP_DEFAULT_FLAGS;
 #if !defined(__PCTOOL__)
     struct viewport *sbs_area = NULL;
     if (!is_theme_enabled(screen))
