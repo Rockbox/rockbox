@@ -270,6 +270,12 @@ simcc () {
    LDOPTS="$LDOPTS -fsanitize=address -lasan"
  fi
 
+ if [ "$ARG_UBSAN" = "1" ] ; then
+   echo "Using UBSan"
+   GCCOPTS="$GCCOPTS -fsanitize=undefined -fPIC"
+   LDOPTS="$LDOPTS -fsanitize=undefined"
+ fi
+
  # Some linux setups like to warn about unused results. They are correct,
  # but cleaning this up is a lot of work.
  GCCOPTS="$GCCOPTS -Wno-unused-result"
@@ -477,6 +483,9 @@ EOF
 
  # AddressSanitizer requires SDL threads
  if [ "$ARG_ADDR_SAN" = "1" ] ; then
+     ARG_THREAD_SUPPORT=1
+ fi
+ if [ "$ARG_UBSAN" = "1" ] ; then
      ARG_THREAD_SUPPORT=1
  fi
 
@@ -1429,6 +1438,7 @@ ARG_PREFIX="$PREFIX"
 ARG_THREAD_SUPPORT=
 ARG_32BIT=
 ARG_ADDR_SAN=
+ARG_UBSAN=
 err=
 for arg in "$@"; do
 	case "$arg" in
@@ -1452,6 +1462,7 @@ for arg in "$@"; do
         --no-sdl-threads)
                       ARG_THREAD_SUPPORT=0;;
         --with-address-sanitizer) ARG_ADDR_SAN=1;;
+        --with-ubsan) ARG_UBSAN=1;;
         --prefix=*)   ARG_PREFIX=`echo "$arg" | cut -d = -f 2`;;
         --compiler-prefix=*)   ARG_COMPILER_PREFIX=`echo "$arg" | cut -d = -f 2`;;
 		--help)       help;;
