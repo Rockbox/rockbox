@@ -38,7 +38,7 @@
 /* make sure SYS_EVENT_CLS_BITS has enough range */
 
 /* Bit 31->|S|c...c|i...i| */
-#define SYS_EVENT                 ((long)(int)(1 << 31))
+#define SYS_EVENT                 ((long)(int)(1u << 31))
 #define SYS_EVENT_CLS_BITS        (3)
 #define SYS_EVENT_CLS_SHIFT       (31-SYS_EVENT_CLS_BITS)
 #define SYS_EVENT_CLS_MASK        (((1l << SYS_EVENT_CLS_BITS)-1) << SYS_EVENT_SHIFT)
