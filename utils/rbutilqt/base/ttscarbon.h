@@ -39,7 +39,7 @@ class TTSCarbon : public TTSBase
         TTSCarbon(QObject *parent = NULL);
 
         //! Child class should generate a clip
-        TTSStatus voice(QString text, QString wavfile, QString* errStr);
+        TTSStatus voice(const QString& text, const QString& wavfile, QString* errStr);
         //! Child class should do startup
         bool start(QString *errStr);
         //! child class should stop

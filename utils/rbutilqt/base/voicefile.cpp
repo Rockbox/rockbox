@@ -96,7 +96,7 @@ bool VoiceFileCreator::createVoiceFile()
                     // header (4 bytes): cookie = 9a, version = 06, targetid, options
                     // subheader for each user. Only "core" for now.
                     // subheader (6 bytes): count (2bytes), size (2bytes), offset (2bytes)
-                    if(buf[0] != (char)0x9a || buf[1] != 0x06 || buf[2] != m_targetid) {
+                    if(buf[0] != '\x9a' || buf[1] != '\x06' || buf[2] != m_targetid) {
                         emit logItem(tr("Extracted voice strings incompatible"), LOGINFO);
                     }
                     else {
@@ -121,14 +121,14 @@ bool VoiceFileCreator::createVoiceFile()
                         QTemporaryFile voicefontlist;
                         voicefontlist.open();
                         m_filename = voicefontlist.fileName();
-                        for(int i = 0; i < voicestrings.size(); ++i) {
+                        for(auto key : voicestrings.keys()) {
                             QByteArray qba;
                             qba = QString("id: %1_%2\n")
-                                    .arg(voicestrings.keys().at(i) < 0x8000 ? "LANG" : "VOICE")
-                                    .arg(voicestrings.keys().at(i)).toUtf8();
+                                    .arg(key < 0x8000 ? "LANG" : "VOICE")
+                                    .arg(key).toUtf8();
                             voicefontlist.write(qba);
                             qba = QString("voice: \"%1\"\n").arg(
-                                    voicestrings[voicestrings.keys().at(i)]).toUtf8();
+                                    voicestrings[key]).toUtf8();
                             voicefontlist.write(qba);
                         }
                         voicefontlist.close();

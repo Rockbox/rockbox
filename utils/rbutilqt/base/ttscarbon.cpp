@@ -171,7 +171,7 @@ void TTSCarbon::saveSettings(void)
 
 /** @brief create wav file from text using the selected TTS voice.
   */
-TTSStatus TTSCarbon::voice(QString text, QString wavfile, QString* errStr)
+TTSStatus TTSCarbon::voice(const QString& text, const QString& wavfile, QString* errStr)
 {
     TTSStatus status = NoError;
     OSErr error;

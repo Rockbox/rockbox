@@ -102,7 +102,7 @@ void Uninstaller::uninstall(void)
         }
         // for speed reasons update log file only at the end.
         installlog.beginGroup(uninstallSections.at(i));
-        for (auto file : deletedItems)
+        for (const auto& file : deletedItems)
         {
             installlog.remove(file);
         }

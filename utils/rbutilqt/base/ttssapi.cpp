@@ -228,7 +228,7 @@ QStringList TTSSapi::getVoiceList(QString language)
 
 
 
-TTSStatus TTSSapi::voice(QString text,QString wavfile, QString *errStr)
+TTSStatus TTSSapi::voice(const QString& text, const QString& wavfile, QString *errStr)
 {
     (void) errStr;
     QString query = "SPEAK\t"+wavfile+"\t"+text;

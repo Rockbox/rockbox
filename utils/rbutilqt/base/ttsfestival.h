@@ -40,7 +40,7 @@ class TTSFestival : public TTSBase
         ~TTSFestival();
         bool start(QString *errStr);
         bool stop();
-        TTSStatus voice(QString text,QString wavfile,  QString *errStr);
+        TTSStatus voice(const QString& text, const QString& wavfile, QString *errStr);
         QString voiceVendor(void) { return QString(); }
         Capabilities capabilities();
 

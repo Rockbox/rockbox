@@ -35,7 +35,7 @@ class TTSExes : public TTSBase
     Q_OBJECT
     public:
         TTSExes(QObject* parent=nullptr);
-        TTSStatus voice(QString text, QString wavfile, QString *errStr);
+        TTSStatus voice(const QString& text, const QString& wavfile, QString *errStr);
         bool start(QString *errStr);
         bool stop() {return true;}
         QString voiceVendor(void) { return QString(); }

@@ -62,7 +62,7 @@
 #endif
 
 // recursive function to delete a dir with files
-bool Utils::recursiveRmdir( const QString &dirName )
+bool Utils::recursiveRmdir(const QString &dirName)
 {
     QString dirN = dirName;
     QDir dir(dirN);

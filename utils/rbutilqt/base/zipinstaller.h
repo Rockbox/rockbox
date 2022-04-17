@@ -37,13 +37,12 @@ class ZipInstaller : public QObject
     Q_OBJECT
 public:
     ZipInstaller(QObject* parent);
-    ~ZipInstaller(){}
     void install(void);
-    void setMountPoint(QString mountpoint) {m_mountpoint = mountpoint;}
-    void setUrl(QString url){m_urllist = QStringList(url);}
-    void setUrl(QStringList url) { m_urllist = url; }
+    void setMountPoint(QString& mountpoint) {m_mountpoint = mountpoint;}
+    void setUrl(QString& url){m_urllist = QStringList(url);}
+    void setUrl(QStringList& url) { m_urllist = url; }
     void setLogSection(QString name) {m_loglist = QStringList(name);}
-    void setLogSection(QStringList name) { m_loglist = name; }
+    void setLogSection(QStringList& name) { m_loglist = name; }
     void setLogVersion(QString v = "")
     { m_verlist = QStringList(v); LOG_INFO() << m_verlist;}
     void setLogVersion(QStringList v)
@@ -52,7 +51,7 @@ public:
     void setUnzip(bool i) { m_unzip = i; }
     /** Set target filename for copy mode.
      *  If not set the filename part of the download URL is used. */
-    void setTarget(QString t) { m_target = t; }
+    void setTarget(QString& t) { m_target = t; }
     void setCache(bool c) { m_usecache = c; }
 
 public slots:

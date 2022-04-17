@@ -182,7 +182,7 @@ bool TTSFestival::stop()
     return true;
 }
 
-TTSStatus TTSFestival::voice(QString text, QString wavfile, QString* errStr)
+TTSStatus TTSFestival::voice(const QString& text, const QString& wavfile, QString* errStr)
 {
     LOG_INFO() << "Voicing" << text << "->" << wavfile;
 

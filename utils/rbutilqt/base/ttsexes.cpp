@@ -80,7 +80,7 @@ bool TTSExes::start(QString *errStr)
     }
 }
 
-TTSStatus TTSExes::voice(QString text, QString wavfile, QString *errStr)
+TTSStatus TTSExes::voice(const QString& text, const QString& wavfile, QString *errStr)
 {
     (void) errStr;
     QString execstring;

@@ -54,7 +54,7 @@ public:
     TTSFakeEspeak(QObject *parent): TTSBase(parent) {}
     virtual bool start(QString *errStr) { (void)errStr; return true; }
     virtual bool stop() { return true; }
-    virtual TTSStatus voice(QString text, QString wavfile, QString *errStr)
+    virtual TTSStatus voice(const QString& text, const QString& wavfile, QString *errStr)
     { (void)text; (void)wavfile; (void)errStr; return NoError; }
     virtual QString voiceVendor() { return QString("DummyVendor"); }
     virtual bool configOk() { return true; }
@@ -67,7 +67,7 @@ TTSBase::TTSBase(QObject* parent) : EncTtsSettingInterface(parent)
 {
 }
 
-TTSStatus TTSBase::voice(QString /*text*/, QString /*wavfile*/, QString* /*errStr*/)
+TTSStatus TTSBase::voice(const QString& /*text*/, const QString& /*wavfile*/, QString* /*errStr*/)
 {
     return NoError;
 }

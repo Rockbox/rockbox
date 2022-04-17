@@ -38,7 +38,7 @@ class TTSSapi : public TTSBase
     public:
         TTSSapi(QObject* parent=nullptr);
 
-        TTSStatus voice(QString text,QString wavfile, QString *errStr);
+        TTSStatus voice(const QString& text, const QString& wavfile, QString *errStr);
         bool start(QString *errStr);
         bool stop();
         QString voiceVendor(void);

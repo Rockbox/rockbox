@@ -36,9 +36,9 @@ class TTSBase : public EncTtsSettingInterface
 
         TTSBase(QObject *parent);
         //! Child class should generate a clip
-        virtual TTSStatus voice(QString text,QString wavfile, QString* errStr) =0;
+        virtual TTSStatus voice(const QString& text, const QString& wavfile, QString* errStr) = 0;
         //! Child class should do startup
-        virtual bool start(QString *errStr) =0;
+        virtual bool start(QString *errStr) = 0;
         //! child class should stop
         virtual bool stop() =0;
 
