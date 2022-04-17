@@ -44,7 +44,7 @@ ThemesInstallWindow::ThemesInstallWindow(QWidget *parent) : QDialog(parent)
     ui.themeDescription->setLayoutDirection(Qt::LeftToRight);
 
     connect(ui.buttonCancel, &QAbstractButton::clicked, this, &QWidget::close);
-    connect(ui.buttonOk, &QAbstractButton::clicked, this, &ThemesInstallWindow::accept);
+    connect(ui.buttonOk, &QAbstractButton::clicked, this, &ThemesInstallWindow::buttonOk);
     connect(ui.listThemes, &QListWidget::currentItemChanged,
             this, &ThemesInstallWindow::updateDetails);
     connect(ui.listThemes, &QListWidget::itemSelectionChanged, this, &ThemesInstallWindow::updateSize);
@@ -287,8 +287,7 @@ void ThemesInstallWindow::resizeEvent(QResizeEvent* e)
 void ThemesInstallWindow::show()
 {
     QDialog::show();
-    if(windowSelectOnly)
-        ui.buttonOk->setText(tr("Select"));
+    ui.buttonOk->setText(tr("Select"));
 
     if(!logger)
         logger = new ProgressLoggerGui(this);
@@ -309,16 +308,14 @@ void ThemesInstallWindow::abort()
 {
     igetter.abort();
     logger->setFinished();
-    this->close();
+    close();
 }
 
 
-void ThemesInstallWindow::accept(void)
+void ThemesInstallWindow::buttonOk(void)
 {
-    if(!windowSelectOnly)
-        install();
-    else
-        close();
+    emit selected(ui.listThemes->selectedItems().size());
+    close();
 }
 
 
@@ -326,7 +323,6 @@ void ThemesInstallWindow::install()
 {
     if(ui.listThemes->selectedItems().size() == 0) {
         logger->addItem(tr("No themes selected, skipping"), LOGINFO);
-        emit done(false);
         return;
     }
     QStringList themes;
@@ -368,13 +364,9 @@ void ThemesInstallWindow::install()
     if(!RbSettings::value(RbSettings::CacheDisabled).toBool())
         installer->setCache(true);
 
-    if(!windowSelectOnly) {
-        connect(logger, &ProgressLoggerGui::closed, this, &QWidget::close);
-        connect(installer, &ZipInstaller::done, logger, &ProgressLoggerGui::setFinished);
-    }
     connect(installer, &ZipInstaller::logItem, logger, &ProgressLoggerGui::addItem);
     connect(installer, &ZipInstaller::logProgress, logger, &ProgressLoggerGui::setProgress);
-    connect(installer, &ZipInstaller::done, this, &ThemesInstallWindow::done);
+    connect(installer, &ZipInstaller::done, this, &ThemesInstallWindow::finished);
     connect(logger, &ProgressLoggerGui::aborted, installer, &ZipInstaller::abort);
     installer->install();
 }

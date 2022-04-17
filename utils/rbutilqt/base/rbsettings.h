@@ -44,7 +44,6 @@ class RbSettings : public QObject
             BackupPath,
             InstallRockbox,
             InstallFonts,
-            InstallThemes,
             InstallPluginData,
             InstallVoice,
             InstallManual,

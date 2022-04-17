@@ -45,7 +45,6 @@ const static struct {
     { RbSettings::BackupPath,           "backuppath",           "" },
     { RbSettings::InstallRockbox,       "install_rockbox",      "true" },
     { RbSettings::InstallFonts,         "install_fonts",        "true" },
-    { RbSettings::InstallThemes,        "install_themes",       "false" },
     { RbSettings::InstallPluginData,    "install_plugin_data",  "true" },
     { RbSettings::InstallVoice,         "install_voice",        "false" },
     { RbSettings::InstallManual,        "install_manual",       "false" },

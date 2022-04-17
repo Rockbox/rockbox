@@ -39,7 +39,6 @@ class SelectiveInstallWidget : public QWidget
 
     private slots:
         void continueInstall(bool);
-        void customizeThemes(void);
         void selectedVersionChanged(int);
         void updateVoiceLangs();
 

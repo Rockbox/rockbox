@@ -36,7 +36,6 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
     ui.setupUi(this);
     ui.rockboxCheckbox->setChecked(RbSettings::value(RbSettings::InstallRockbox).toBool());
     ui.fontsCheckbox->setChecked(RbSettings::value(RbSettings::InstallFonts).toBool());
-    ui.themesCheckbox->setChecked(RbSettings::value(RbSettings::InstallThemes).toBool());
     ui.pluginDataCheckbox->setChecked(RbSettings::value(RbSettings::InstallPluginData).toBool());
     ui.voiceCheckbox->setChecked(RbSettings::value(RbSettings::InstallVoice).toBool());
     ui.manualCheckbox->setChecked(RbSettings::value(RbSettings::InstallManual).toBool());
@@ -52,14 +51,16 @@ SelectiveInstallWidget::SelectiveInstallWidget(QWidget* parent) : QWidget(parent
 
     m_logger = nullptr;
     m_zipinstaller = nullptr;
-    m_themesinstaller = nullptr;
+    m_themesinstaller = new ThemesInstallWindow(this);
+    connect(m_themesinstaller, &ThemesInstallWindow::selected,
+            [this](int count) {ui.themesCheckbox->setChecked(count > 0);});
 
     connect(ui.installButton, &QAbstractButton::clicked,
             this, &SelectiveInstallWidget::startInstall);
     connect(this, &SelectiveInstallWidget::installSkipped,
             this, &SelectiveInstallWidget::continueInstall);
     connect(ui.themesCustomize, &QAbstractButton::clicked,
-            this, &SelectiveInstallWidget::customizeThemes);
+            [this]() { m_themesinstaller->show(); } );
     connect(ui.selectedVersion, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &SelectiveInstallWidget::selectedVersionChanged);
     // update version information. This also handles setting the previously
@@ -202,7 +203,6 @@ void SelectiveInstallWidget::saveSettings(void)
 
     RbSettings::setValue(RbSettings::InstallRockbox, ui.rockboxCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallFonts, ui.fontsCheckbox->isChecked());
-    RbSettings::setValue(RbSettings::InstallThemes, ui.themesCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallPluginData, ui.pluginDataCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallVoice, ui.voiceCheckbox->isChecked());
     RbSettings::setValue(RbSettings::InstallManual, ui.manualCheckbox->isChecked());
@@ -584,28 +584,16 @@ void SelectiveInstallWidget::installManual(void)
     }
 }
 
-void SelectiveInstallWidget::customizeThemes(void)
-{
-    if(m_themesinstaller == nullptr)
-        m_themesinstaller = new ThemesInstallWindow(this);
-
-    m_themesinstaller->setSelectOnly(true);
-    m_themesinstaller->show();
-}
-
-
 void SelectiveInstallWidget::installThemes(void)
 {
     if(ui.themesCheckbox->isChecked()) {
         LOG_INFO() << "installing themes";
-        if(m_themesinstaller == nullptr)
-            m_themesinstaller = new ThemesInstallWindow(this);
 
-        connect(m_themesinstaller, &ThemesInstallWindow::done,
-                this, &SelectiveInstallWidget::continueInstall);
         m_themesinstaller->setLogger(m_logger);
         m_themesinstaller->setModal(true);
         m_themesinstaller->install();
+        connect(m_themesinstaller, &ThemesInstallWindow::finished,
+                this, &SelectiveInstallWidget::continueInstall);
     }
     else {
         LOG_INFO() << "Themes install disabled.";
