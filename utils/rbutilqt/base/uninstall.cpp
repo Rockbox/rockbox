@@ -101,15 +101,13 @@ void Uninstaller::uninstall(void)
             dir.rmdir(dirList.at(j)); // rm works only on empty folders
         }
         // for speed reasons update log file only at the end.
-        installlog.beginGroup(uninstallSections.at(i));
         for (const auto& file : deletedItems)
         {
             installlog.remove(file);
         }
-        installlog.endGroup();
 
+        installlog.remove("");
         installlog.endGroup();
-        //installlog.removeGroup(uninstallSections.at(i))
     }
     uninstallSections.clear();
     installlog.sync();
