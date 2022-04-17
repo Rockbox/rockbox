@@ -5296,20 +5296,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FORMAT
-  desc: audio format item in recording menu
+  id: LANG_FORMAT
+  desc: audio format
   user: core
   <source>
-    *: none
-    recording: "Format"
+    *: "Format"
   </source>
   <dest>
-    *: none
-    recording: "תבנית"
+    *: "תבנית"
   </dest>
   <voice>
-    *: none
-    recording: "תבנית"
+    *: "תבנית"
   </voice>
 </phrase>
 <phrase>

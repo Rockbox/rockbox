@@ -8258,20 +8258,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FORMAT
-  desc: audio format item in recording menu
+  id: LANG_FORMAT
+  desc: audio format
   user: core
   <source>
-    *: none
-    recording: "Format"
+    *: "Format"
   </source>
   <dest>
-    *: none
-    recording: "Muoto"
+    *: "Muoto"
   </dest>
   <voice>
-    *: none
-    recording: "Muoto"
+    *: "Muoto"
   </voice>
 </phrase>
 <phrase>

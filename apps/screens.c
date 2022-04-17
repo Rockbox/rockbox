@@ -382,7 +382,7 @@ static const int id3_headers[]=
     LANG_ID3_YEAR,
     LANG_ID3_LENGTH,
     LANG_ID3_PLAYLIST,
-    LANG_RECORDING_FORMAT,
+    LANG_FORMAT,
     LANG_ID3_BITRATE,
     LANG_ID3_FREQUENCY,
     LANG_ID3_TRACK_GAIN,
@@ -605,7 +605,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                     talk_number(info->playlist_amount, true);
                 }
                 break;
-            case LANG_RECORDING_FORMAT:
+            case LANG_FORMAT:
                 if (id3->codectype >= AFMT_NUM_CODECS)
                     return NULL;
                 snprintf(buffer, buffer_len, "%s", audio_formats[id3->codectype].label);

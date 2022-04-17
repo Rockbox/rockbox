@@ -5263,20 +5263,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FORMAT
-  desc: audio format item in recording menu
+  id: LANG_FORMAT
+  desc: audio format
   user: core
   <source>
-    *: none
-    recording: "Format"
+    *: "Format"
   </source>
   <dest>
-    *: none
-    recording: "Formatua"
+    *: "Formatua"
   </dest>
   <voice>
-    *: none
-    recording: "Formatua"
+    *: "Formatua"
   </voice>
 </phrase>
 <phrase>

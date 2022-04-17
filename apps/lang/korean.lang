@@ -8283,20 +8283,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FORMAT
-  desc: audio format item in recording menu
+  id: LANG_FORMAT
+  desc: audio format
   user: core
   <source>
-    *: none
-    recording: "Format"
+    *: "Format"
   </source>
   <dest>
-    *: none
-    recording: "파일 형식"
+    *: "파일 형식"
   </dest>
   <voice>
-    *: none
-    recording: "파일 형식"
+    *: "파일 형식"
   </voice>
 </phrase>
 <phrase>

@@ -5260,20 +5260,17 @@
   </voice>
 </phrase>
 <phrase>
-  id: LANG_RECORDING_FORMAT
-  desc: audio format item in recording menu
+  id: LANG_FORMAT
+  desc: audio format
   user: core
   <source>
-    *: none
-    recording: "Format"
+    *: "Format"
   </source>
   <dest>
-    *: none
-    recording: "Oblik"
+    *: "Oblik"
   </dest>
   <voice>
-    *: none
-    recording: "Oblik"
+    *: "Oblik"
   </voice>
 </phrase>
 <phrase>

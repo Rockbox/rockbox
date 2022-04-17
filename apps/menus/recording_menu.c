@@ -261,7 +261,7 @@ static int recformat_func(void)
     };
 
     int rec_format = global_settings.rec_format;
-    bool res = set_option(str(LANG_RECORDING_FORMAT), &rec_format, INT,
+    bool res = set_option(str(LANG_FORMAT), &rec_format, INT,
                           names, REC_NUM_FORMATS, NULL );
 
     if (rec_format != global_settings.rec_format)
@@ -272,7 +272,7 @@ static int recformat_func(void)
 
     return res;
 } /* recformat */
-MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_RECORDING_FORMAT), 
+MENUITEM_FUNCTION(recformat, 0, ID2P(LANG_FORMAT),
                     recformat_func, NULL, NULL, Icon_Menu_setting);
 
 MENUITEM_FUNCTION(enc_global_config_menu_item, 0, ID2P(LANG_ENCODER_SETTINGS),

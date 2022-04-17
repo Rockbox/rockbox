@@ -1468,7 +1468,7 @@ const struct settings_list settings[] = {
         LANG_FREQUENCY,INT(REC_FREQ_DEFAULT),
         "rec frequency",REC_FREQ_CFG_VAL_LIST,UNUSED},
     {F_T_INT|F_RECSETTING,&global_settings.rec_format,
-        LANG_RECORDING_FORMAT,INT(REC_FORMAT_DEFAULT),
+        LANG_FORMAT,INT(REC_FORMAT_DEFAULT),
         "rec format",REC_FORMAT_CFG_VAL_LIST,UNUSED},
     /** Encoder settings start - keep these together **/
     /* aiff_enc */
