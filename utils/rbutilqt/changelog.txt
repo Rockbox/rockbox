@@ -41,3 +41,10 @@ Version 1.5.0
 * Drop support for Qt4, now requires Qt5.
 * Update various external libraries.
 * Server Downloads changed to https.
+
+Version 1.5.1
+* Fix bootloader installation for Ipods.
+* Fix bootloader installation for Sandisk players.
+* Improve responsiveness on install / uninstall.
+* Enable Themes installation if themes are selected.
+
