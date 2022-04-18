@@ -36,26 +36,20 @@ InfoWidget::InfoWidget(QWidget *parent) : QWidget(parent)
 
 void InfoWidget::updateInfo(void)
 {
-    LOG_INFO() << "updating server info";
+    LOG_INFO() << "updating install info";
 
     QString mp = RbSettings::value(RbSettings::Mountpoint).toString();
     QSettings log(mp + "/.rockbox/rbutil.log", QSettings::IniFormat, this);
     QStringList groups = log.childGroups();
-    QList<QTreeWidgetItem *> items;
     QTreeWidgetItem *w, *w2;
     QString min, max;
-    int olditems = 0;
+    QTreeWidgetItem *loading = new QTreeWidgetItem;
+    loading->setText(0, tr("Loading, please wait ..."));
+    ui.treeInfo->clear();
+    ui.treeInfo->addTopLevelItem(loading);
+    ui.treeInfo->resizeColumnToContents(0);
+    QCoreApplication::processEvents();
 
-    // remove old list entries (if any)
-    int l = ui.treeInfo->topLevelItemCount();
-    while(l--) {
-        QTreeWidgetItem *m;
-        m = ui.treeInfo->takeTopLevelItem(l);
-        // delete childs (single level deep, no recursion here)
-        int n = m->childCount();
-        while(n--)
-            delete m->child(n);
-    }
     // get and populate new items
     for(int a = 0; a < groups.size(); a++) {
         log.beginGroup(groups.at(a));
@@ -63,40 +57,38 @@ void InfoWidget::updateInfo(void)
         w = new QTreeWidgetItem;
         w->setFlags(Qt::ItemIsEnabled);
         w->setText(0, groups.at(a));
-        items.append(w);
+        ui.treeInfo->addTopLevelItem(w);
         // get minimum and maximum version information so we can hilight old files
         min = max = log.value(keys.at(0)).toString();
         for(int b = 0; b < keys.size(); b++) {
-            if(log.value(keys.at(b)).toString() > max)
-                max = log.value(keys.at(b)).toString();
-            if(log.value(keys.at(b)).toString() < min)
-                min = log.value(keys.at(b)).toString();
-        }
+            QString v = log.value(keys.at(b)).toString();
+            if(v > max)
+                max = v;
+            if(v < min)
+                min = v;
 
-        for(int b = 0; b < keys.size(); b++) {
-            QString file;
-            file = mp + "/" + keys.at(b);
-            if(QFileInfo(file).isDir())
+            QString file = mp + "/" + keys.at(b);
+            if(QFileInfo(file).isDir()) {
+                // ignore folders
                 continue;
+            }
             w2 = new QTreeWidgetItem(w, QStringList() << "/"
-                    + keys.at(b) << log.value(keys.at(b)).toString());
-            if(log.value(keys.at(b)).toString() != max) {
+                    + keys.at(b) << v);
+            if(v != max) {
                 w2->setForeground(0, QBrush(QColor(255, 0, 0)));
                 w2->setForeground(1, QBrush(QColor(255, 0, 0)));
-                olditems++;
             }
-            items.append(w2);
+            w->addChild(w2);
         }
         log.endGroup();
         if(min != max)
             w->setData(1, Qt::DisplayRole, QString("%1 / %2").arg(min, max));
         else
             w->setData(1, Qt::DisplayRole, max);
+        QCoreApplication::processEvents();
     }
-    ui.treeInfo->insertTopLevelItems(0, items);
-    ui.treeInfo->expandAll();
+    ui.treeInfo->takeTopLevelItem(0);
     ui.treeInfo->resizeColumnToContents(0);
-    ui.treeInfo->collapseAll();
 }
 
 
