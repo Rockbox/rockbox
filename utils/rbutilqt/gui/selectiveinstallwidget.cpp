@@ -298,7 +298,6 @@ void SelectiveInstallWidget::installBootloader(void)
 
         // the bootloader install class does NOT use any GUI stuff.
         // All messages are passed via signals.
-        connect(bl, &BootloaderInstallBase::done, m_logger, &ProgressLoggerGui::setFinished);
         connect(bl, &BootloaderInstallBase::done, this, &SelectiveInstallWidget::continueInstall);
         connect(bl, &BootloaderInstallBase::logItem, m_logger, &ProgressLoggerGui::addItem);
         connect(bl, &BootloaderInstallBase::logProgress, m_logger, &ProgressLoggerGui::setProgress);
