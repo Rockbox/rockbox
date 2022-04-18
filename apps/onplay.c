@@ -1860,12 +1860,20 @@ static struct hotkey_assignment hotkey_items[] = {
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
             HOTKEY_FUNC(playlist_insert_shuffled, NULL),
             ONPLAY_RELOAD_DIR },
-    { HOTKEY_PLUGIN, LANG_OPEN_PLUGIN,
+    { HOTKEY_PLUGIN,            LANG_OPEN_PLUGIN,
             HOTKEY_FUNC(hotkey_run_plugin, NULL),
             ONPLAY_OK },
-    { HOTKEY_BOOKMARK,   LANG_BOOKMARK_MENU_CREATE,
+    { HOTKEY_BOOKMARK,          LANG_BOOKMARK_MENU_CREATE,
             HOTKEY_FUNC(bookmark_create_menu, NULL),
             ONPLAY_OK },
+    { HOTKEY_PROPERTIES,        LANG_PROPERTIES,
+            HOTKEY_FUNC(onplay_load_plugin, (void *)"properties"),
+            ONPLAY_RELOAD_DIR },
+#ifdef HAVE_TAGCACHE
+    { HOTKEY_PICTUREFLOW,       LANG_ONPLAY_PICTUREFLOW,
+            HOTKEY_FUNC(onplay_load_plugin, (void *)"pictureflow"),
+            ONPLAY_RELOAD_DIR },
+#endif
 };
 
 /* Return the language ID for this action */
