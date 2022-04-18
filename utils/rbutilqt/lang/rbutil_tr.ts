@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="tr">
+<TS version="2.1" language="tr">
 <context>
     <name>BackupDialog</name>
     <message>
@@ -40,7 +40,7 @@
         <translation type="unfinished">&amp;İptal</translation>
     </message>
     <message>
-        <location filename="../gui/backupdialog.cpp" line="+70"/>
+        <location filename="../gui/backupdialog.cpp" line="+69"/>
         <source>Installation size: calculating ...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -130,9 +130,57 @@
     </message>
 </context>
 <context>
+    <name>BootloaderInstallBSPatch</name>
+    <message>
+        <location filename="../base/bootloaderinstallbspatch.cpp" line="+65"/>
+        <source>Bootloader installation requires you to provide the correct verrsion of the original firmware file. This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; pages on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Could not read original firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Patching file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Patching the original firmware failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Succesfully patched firmware file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+15"/>
+        <source>Bootloader successful installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Patched bootloader could not be installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallBase</name>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="+78"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="+69"/>
         <source>Download error: received HTTP error %1.</source>
         <translation type="unfinished">İndirme hatası: HTTP %1 hatası.</translation>
     </message>
@@ -152,7 +200,7 @@
         <translation type="unfinished">İndirme işlemi tamamlandı.</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+29"/>
         <source>Creating backup of original firmware file.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -172,7 +220,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+17"/>
         <source>Creating installation log</source>
         <translation type="unfinished">Kurulum kayıt dosyası yaratılıyor</translation>
     </message>
@@ -197,7 +245,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+48"/>
         <source>Zip file format detected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -486,7 +534,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source>Can&apos;t open input file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -554,7 +602,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+26"/>
         <source>Patching the original firmware failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -582,12 +630,7 @@
 <context>
     <name>BootloaderInstallIpod</name>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="+49"/>
-        <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+15"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="+56"/>
         <location line="+87"/>
         <source>Failed to read firmware directory</source>
         <translation type="unfinished">Bellenim (firmware) dizini okunamadı</translation>
@@ -656,12 +699,12 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Removing bootloader failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+46"/>
+        <location line="+66"/>
         <source>Error: could not retrieve device name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -730,7 +773,7 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>Checking for original firmware file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -740,7 +783,7 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>Rockbox bootloader successful removed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -824,31 +867,165 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
 </context>
 <context>
-    <name>BootloaderInstallSansa</name>
+    <name>BootloaderInstallS5l</name>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="+50"/>
-        <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+5"/>
-        <source>Searching for Sansa</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Permission for disc access denied!
-This is required to install the bootloader</source>
+        <location filename="../base/bootloaderinstalls5l.cpp" line="+61"/>
+        <source>Could not find mounted iPod.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
-        <source>No Sansa detected!</source>
+        <source>Downloading bootloader file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+45"/>
+        <source>Could not make DFU image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <source>Ejecting iPod...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+22"/>
+        <source>Action required:
+
+Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject functionality.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Device successfully ejected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+20"/>
+        <source>Action required:
+
+Quit iTunes application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <source>iTunes closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+13"/>
+        <source>Could not suspend iTunesHelper. Stop it using the Task Manager, and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Waiting for HDD spin-down...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+16"/>
+        <source>Waiting for DFU mode...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Action required:
+
+Press and hold SELECT+MENU buttons, after about 12 seconds a new action will require you to release the buttons, DO IT QUICKLY, otherwise the process could fail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+23"/>
+        <source>DFU mode detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Action required:
+
+Release SELECT+MENU buttons and wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Device is not in DFU mode. It seems that the previous required action failed, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Transfering DFU image...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>No valid DFU USB driver found.
+
+Install iTunes (or the Apple Device Driver) and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Could not transfer DFU image.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+5"/>
-        <location line="+108"/>
+        <source>DFU transfer completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Restarting iPod, waiting for remount...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Action required:
+
+Could not remount the device, try to do it manually. If the iPod didn&apos;t restart, force a reset by pressing SELECT+MENU buttons for about 5 seconds. If the problem could not be solved then click &apos;Abort&apos; to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Device remounted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Bootloader successfully installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Bootloader successfully uninstalled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>Could not resume iTunesHelper.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <source>Install aborted by user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Uninstall aborted by user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallSansa</name>
+    <message>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="+54"/>
+        <source>Error: can&apos;t allocate buffer memory!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location line="+104"/>
         <source>OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
@@ -857,7 +1034,7 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-100"/>
+        <location line="-96"/>
         <source>Downloading bootloader file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -867,7 +1044,7 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+4"/>
         <location line="+87"/>
         <source>Could not open Sansa in R/W mode</source>
         <translation type="unfinished"></translation>
@@ -913,12 +1090,12 @@ See http://www.rockbox.org/wiki/SansaE200Install
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+8"/>
         <source>Removing bootloader failed.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+56"/>
         <source>Error: could not retrieve device name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1339,7 +1516,7 @@ Ayrıntılı bilgi için: http://www.rockbox.org/twiki/bin/view/Main/SansaE200In
         <translation type="obsolete">Seçilen dilin etkin olması için uygulamayı yeniden başlatmalısınız.</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="+322"/>
+        <location filename="../configure.cpp" line="+310"/>
         <source>Current cache size is %L1 kiB.</source>
         <translation>Mevcut önbellek boyutu %L1 KB.</translation>
     </message>
@@ -1368,7 +1545,7 @@ Kurulum için aygıtı UMS moduna almalısınız. </translation>
         <translation type="obsolete">Önemli hata</translation>
     </message>
     <message>
-        <location line="+536"/>
+        <location line="+543"/>
         <source>Autodetection</source>
         <translation>Otomatik algılama</translation>
     </message>
@@ -1380,14 +1557,14 @@ Select your Mountpoint manually.</source>
 Bağlama noktasını kendiniz seçiniz.</translation>
     </message>
     <message>
-        <location line="-95"/>
+        <location line="-98"/>
         <source>Could not detect a device.
 Select your device and Mountpoint manually.</source>
         <translation>Herhangi bir aygıt algılanamadı.
 Aygıtınızı ve bağlama noktasını kendiniz seçiniz.</translation>
     </message>
     <message>
-        <location line="-634"/>
+        <location line="-631"/>
         <source>The following errors occurred:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1432,7 +1609,7 @@ Aygıtınızı ve bağlama noktasını kendiniz seçiniz.</translation>
         <translation type="unfinished">Yapılandırma hatası</translation>
     </message>
     <message>
-        <location line="+109"/>
+        <location line="+102"/>
         <source>Showing disabled targets</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1442,7 +1619,7 @@ Aygıtınızı ve bağlama noktasını kendiniz seçiniz.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+107"/>
+        <location line="+109"/>
         <location line="+466"/>
         <source>TTS error</source>
         <translation type="unfinished"></translation>
@@ -1455,7 +1632,7 @@ Aygıtınızı ve bağlama noktasını kendiniz seçiniz.</translation>
     </message>
     <message>
         <location line="-460"/>
-        <location line="+30"/>
+        <location line="+34"/>
         <source>Configuration OK</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1477,7 +1654,7 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+113"/>
+        <location line="+110"/>
         <source>Set Cache Path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1507,38 +1684,38 @@ Rockbox Utility can&apos;t work with this proxy settings. Make sure the system p
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Note: detecting connected devices might be ambiguous. You might have less devices connected than listed. In this case it might not be possible to detect your player unambiguously.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <location line="+4"/>
-        <location line="+42"/>
+        <location line="+45"/>
         <source>Device Detection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-34"/>
         <source>Detected an unsupported player:
 %1
 Sorry, Rockbox doesn&apos;t run on your player.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>%1 in MTP mode found!
 You need to change your player to MSC mode for installation. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+9"/>
         <source>%1 &quot;MacPod&quot; found!
 Rockbox needs a FAT formatted Ipod (so-called &quot;WinPod&quot;) to run. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>The player contains an incompatible filesystem.
 Make sure you selected the correct mountpoint and the player is set up to use a filesystem compatible with Rockbox.</source>
         <translation type="unfinished"></translation>
@@ -1569,7 +1746,7 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
         <translation>Önbellek konumu geçersiz. İşlem durduruluyor.</translation>
     </message>
     <message>
-        <location line="+42"/>
+        <location line="+37"/>
         <source>TTS configuration invalid</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1647,12 +1824,12 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+224"/>
+        <location line="+231"/>
         <source>&amp;Browse</source>
         <translation>&amp;Göz At</translation>
     </message>
     <message>
-        <location line="-247"/>
+        <location line="-254"/>
         <source>&amp;Select your audio player</source>
         <translation>&amp;Ses oynatıcınızı seçin</translation>
     </message>
@@ -1716,7 +1893,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+41"/>
+        <location line="+48"/>
         <source>&amp;Language</source>
         <translation>&amp;Dil</translation>
     </message>
@@ -1767,12 +1944,12 @@ Please configure TTS engine.</source>
     </message>
     <message>
         <location line="+7"/>
-        <location line="+51"/>
+        <location line="+55"/>
         <source>Configuration invalid!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-34"/>
+        <location line="-38"/>
         <source>Configure &amp;TTS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1782,7 +1959,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+11"/>
         <source>&amp;Use string corrections for TTS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1805,7 +1982,7 @@ Please configure TTS engine.</source>
         <translation type="obsolete">&amp;Çevrimdışı modu</translation>
     </message>
     <message>
-        <location line="-127"/>
+        <location line="-131"/>
         <source>Clean cache &amp;now</source>
         <translation>Önbelleği &amp;temizle</translation>
     </message>
@@ -1836,7 +2013,7 @@ Please configure TTS engine.</source>
         <translation type="obsolete">TTS Dili</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+75"/>
         <source>Encoder Engine</source>
         <translation>Kodlayıcı Motoru</translation>
     </message>
@@ -1874,7 +2051,7 @@ Please configure TTS engine.</source>
         <translation type="obsolete">Türkçe</translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="-358"/>
+        <location filename="../configure.cpp" line="-356"/>
         <source>English</source>
         <comment>This is the localized language name, i.e. your language.</comment>
         <translation type="unfinished">Türkçe</translation>
@@ -1903,7 +2080,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+17"/>
         <source>Change</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1936,7 +2113,7 @@ Please configure TTS engine.</source>
 <context>
     <name>CreateVoiceWindow</name>
     <message>
-        <location filename="../createvoicewindow.cpp" line="+100"/>
+        <location filename="../createvoicewindow.cpp" line="+106"/>
         <source>TTS error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1955,12 +2132,12 @@ Please configure TTS engine.</source>
 <context>
     <name>EncTtsCfgGui</name>
     <message>
-        <location filename="../encttscfggui.cpp" line="+45"/>
+        <location filename="../encttscfggui.cpp" line="+44"/>
         <source>Waiting for engine...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+50"/>
+        <location line="+47"/>
         <source>Ok</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1970,17 +2147,17 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+99"/>
+        <location line="+163"/>
         <source>Browse</source>
         <translation type="unfinished">Göz At</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+15"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+172"/>
+        <location line="-9"/>
         <source>Select executable</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1988,7 +2165,7 @@ Please configure TTS engine.</source>
 <context>
     <name>EncoderExe</name>
     <message>
-        <location filename="../base/encoderexe.cpp" line="+41"/>
+        <location filename="../base/encoderexe.cpp" line="+37"/>
         <source>Path to Encoder:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2001,7 +2178,7 @@ Please configure TTS engine.</source>
 <context>
     <name>EncoderLame</name>
     <message>
-        <location filename="../base/encoderlame.cpp" line="+73"/>
+        <location filename="../base/encoderlame.cpp" line="+75"/>
         <location line="+10"/>
         <source>LAME</source>
         <translation type="unfinished"></translation>
@@ -2049,15 +2226,20 @@ Please configure TTS engine.</source>
     <name>InfoWidget</name>
     <message>
         <location filename="../gui/infowidget.cpp" line="+30"/>
-        <location line="+77"/>
+        <location line="+69"/>
         <source>File</source>
         <translation type="unfinished">Dosya</translation>
     </message>
     <message>
-        <location line="-77"/>
-        <location line="+77"/>
+        <location line="-69"/>
+        <location line="+69"/>
         <source>Version</source>
         <translation type="unfinished">Sürüm</translation>
+    </message>
+    <message>
+        <location line="-52"/>
+        <source>Loading, please wait ...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2257,7 +2439,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+20"/>
         <source>Change</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2318,7 +2500,7 @@ Please configure TTS engine.</source>
         <translation type="obsolete">Geçersiz kodlayıcı profili!</translation>
     </message>
     <message>
-        <location filename="../installtalkwindow.cpp" line="+96"/>
+        <location filename="../installtalkwindow.cpp" line="+95"/>
         <source>Empty selection</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2328,7 +2510,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+40"/>
+        <location line="+44"/>
         <source>TTS error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2341,77 +2523,59 @@ Please configure TTS engine.</source>
 <context>
     <name>ManualWidget</name>
     <message>
-        <location filename="../gui/manualwidget.cpp" line="+44"/>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Kılavuz (PDF)&lt;/a&gt;</translation>
+        <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Kılavuz (PDF)&lt;/a&gt;</translation>
     </message>
     <message>
-        <location line="+2"/>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Kılavuz (HTML) -- tarayıcıda açılır&lt;/a&gt;</translation>
+        <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Kılavuz (HTML) -- tarayıcıda açılır&lt;/a&gt;</translation>
     </message>
     <message>
-        <location line="+4"/>
         <source>Select a device for a link to the correct manual</source>
-        <translation type="unfinished">Uygun kılavuz için aygıt seçiniz</translation>
+        <translation type="obsolete">Uygun kılavuz için aygıt seçiniz</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation type="unfinished">&lt;a href=&apos;%1&apos;&gt;Kılavuz Genel Açıklaması&lt;/a&gt;</translation>
+        <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Kılavuz Genel Açıklaması&lt;/a&gt;</translation>
     </message>
     <message>
-        <location line="+11"/>
         <source>Confirm download</source>
-        <translation type="unfinished">İndirme işlemini onayla</translation>
+        <translation type="obsolete">İndirme işlemini onayla</translation>
     </message>
     <message>
-        <location line="+1"/>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
-        <translation type="unfinished">Kılavuzu indirmek istiyor musunuz? Aygıtınızın bulunduğu konuma kaydedilecektir.</translation>
+        <translation type="obsolete">Kılavuzu indirmek istiyor musunuz? Aygıtınızın bulunduğu konuma kaydedilecektir.</translation>
     </message>
 </context>
 <context>
     <name>ManualWidgetFrm</name>
     <message>
-        <location filename="../gui/manualwidgetfrm.ui" line="+14"/>
-        <source>Manual</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
         <source>Read the manual</source>
-        <translation type="unfinished">Kılavuzu oku</translation>
+        <translation type="obsolete">Kılavuzu oku</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>PDF manual</source>
-        <translation type="unfinished">Kılavuz (PDF)</translation>
+        <translation type="obsolete">Kılavuz (PDF)</translation>
     </message>
     <message>
-        <location line="+13"/>
         <source>HTML manual</source>
-        <translation type="unfinished">Kılavuz (HTML)</translation>
+        <translation type="obsolete">Kılavuz (HTML)</translation>
     </message>
     <message>
-        <location line="+16"/>
         <source>Download the manual</source>
-        <translation type="unfinished">Kılavuzu indir</translation>
+        <translation type="obsolete">Kılavuzu indir</translation>
     </message>
     <message>
-        <location line="+8"/>
         <source>&amp;PDF version</source>
-        <translation type="unfinished">&amp;PDF formatı</translation>
+        <translation type="obsolete">&amp;PDF formatı</translation>
     </message>
     <message>
-        <location line="+7"/>
         <source>&amp;HTML version (zip file)</source>
-        <translation type="unfinished">&amp;HTML formatı (zip dosyası)</translation>
+        <translation type="obsolete">&amp;HTML formatı (zip dosyası)</translation>
     </message>
     <message>
-        <location line="+22"/>
         <source>Down&amp;load</source>
-        <translation type="unfinished">&amp;İndir</translation>
+        <translation type="obsolete">&amp;İndir</translation>
     </message>
 </context>
 <context>
@@ -2428,6 +2592,34 @@ Please configure TTS engine.</source>
     </message>
 </context>
 <context>
+    <name>PlayerBuildInfo</name>
+    <message>
+        <location filename="../base/playerbuildinfo.cpp" line="+337"/>
+        <source>Stable (Retired)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unusable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unstable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Stable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Unknown</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PreviewFrm</name>
     <message>
         <location filename="../previewfrm.ui" line="+16"/>
@@ -2438,7 +2630,7 @@ Please configure TTS engine.</source>
 <context>
     <name>ProgressLoggerFrm</name>
     <message>
-        <location filename="../progressloggerfrm.ui" line="+13"/>
+        <location filename="../progressloggerfrm.ui" line="+18"/>
         <location line="+6"/>
         <source>Progress</source>
         <translation type="unfinished">İlerleme</translation>
@@ -2462,7 +2654,7 @@ Please configure TTS engine.</source>
 <context>
     <name>ProgressLoggerGui</name>
     <message>
-        <location filename="../progressloggergui.cpp" line="+122"/>
+        <location filename="../progressloggergui.cpp" line="+117"/>
         <source>&amp;Ok</source>
         <translation>&amp;Tamam</translation>
     </message>
@@ -2480,7 +2672,7 @@ Please configure TTS engine.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../base/bootloaderinstallhelper.cpp" line="+80"/>
+        <location filename="../base/bootloaderinstallhelper.cpp" line="+107"/>
         <source>Bootloader installation is almost complete. Installation &lt;b&gt;requires&lt;/b&gt; you to perform the following steps manually:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2490,7 +2682,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+6"/>
         <source>&lt;li&gt;Reboot your player into the original firmware.&lt;/li&gt;&lt;li&gt;Perform a firmware upgrade using the update functionality of the original firmware. Please refer to your player&apos;s manual on details.&lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; updating the firmware is a critical process that must not be interrupted. &lt;b&gt;Make sure the player is charged before starting the firmware update process.&lt;/b&gt;&lt;/li&gt;&lt;li&gt;After the firmware has been updated reboot your player.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2520,7 +2712,7 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../base/system.cpp" line="+385"/>
+        <location filename="../base/system.cpp" line="+333"/>
         <source>(unknown vendor name) </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2530,19 +2722,61 @@ Please configure TTS engine.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../configure.cpp" line="+36"/>
-        <location filename="../main.cpp" line="+83"/>
+        <location filename="../configure.cpp" line="+35"/>
+        <location filename="../main.cpp" line="+102"/>
         <source>LTR</source>
-        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.
-----------
-This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaGzipFile</name>
+    <message>
+        <location filename="../quazip/quagzipfile.cpp" line="+60"/>
+        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+60"/>
+        <source>QIODevice::Append is not supported for GZIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+6"/>
+        <source>Opening gzip for both reading and writing is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+8"/>
+        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+8"/>
+        <source>You can open a gzip either for reading or for writing. Which is it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+6"/>
+        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="+6"/>
+        <source>Could not gzopen() file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZIODevice</name>
+    <message>
+        <location filename="../quazip/quaziodevice.cpp" line="+188"/>
+        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="+188"/>
+        <source>QIODevice::Append is not supported for QuaZIODevice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+5"/>
+        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="+5"/>
+        <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QuaZipFile</name>
     <message>
-        <location filename="../quazip/quazipfile.cpp" line="+141"/>
+        <location filename="../quazip/quazipfile.cpp" line="+251"/>
+        <location filename="../quazip-1.2/quazip/quazipfile.cpp" line="+251"/>
+        <location filename="../quazip_/quazipfile.cpp" line="+251"/>
         <source>ZIP/UNZIP API error %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2558,8 +2792,8 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <translation type="obsolete">Sürüm</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="+337"/>
-        <location line="+305"/>
+        <location filename="../rbutilqt.cpp" line="+391"/>
+        <location line="+231"/>
         <source>Configuration error</source>
         <translation>Yapılandırma hatası</translation>
     </message>
@@ -2592,9 +2826,8 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <translation type="obsolete">&lt;a href=&apos;%1&apos;&gt;Kılavuz Genel Açıklaması&lt;/a&gt;</translation>
     </message>
     <message>
-        <location line="-192"/>
         <source>Confirm Installation</source>
-        <translation>Kurulumu onayla</translation>
+        <translation type="vanished">Kurulumu onayla</translation>
     </message>
     <message>
         <source>Do you really want to make a complete Installation?</source>
@@ -2605,7 +2838,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
         <translation type="obsolete">Mini kurulum yapmak istediğinize emin misiniz?</translation>
     </message>
     <message>
-        <location line="+132"/>
+        <location line="-60"/>
         <source>Mount point is wrong!</source>
         <translation>Bağlama noktası hatalı!</translation>
     </message>
@@ -2644,9 +2877,8 @@ Mevcut önyükleyiciyi değiştirmek istiyor musunuz?</translation>
         <translation type="obsolete">Yazı tipi paketini kurmak istediğinizden emin misiniz?</translation>
     </message>
     <message>
-        <location line="-131"/>
         <source>Do you really want to install the voice file?</source>
-        <translation>Seslendirme dosyasını yüklemek istediğinizden emin misiniz?</translation>
+        <translation type="vanished">Seslendirme dosyasını yüklemek istediğinizden emin misiniz?</translation>
     </message>
     <message>
         <source>Error</source>
@@ -2661,7 +2893,7 @@ Mevcut önyükleyiciyi değiştirmek istiyor musunuz?</translation>
         <translation type="obsolete">Oyun eklenti dosyalarını yüklemek istediğinizden emin misiniz?</translation>
     </message>
     <message>
-        <location line="+61"/>
+        <location line="-69"/>
         <source>Confirm Uninstallation</source>
         <translation>Kaldırma işlemini onayla</translation>
     </message>
@@ -2679,7 +2911,7 @@ Mevcut önyükleyiciyi değiştirmek istiyor musunuz?</translation>
         <translation type="obsolete">Kılavuzu indirmek istiyor musunuz? Aygıtınızın bulunduğu konuma kaydedilecektir.</translation>
     </message>
     <message>
-        <location line="-403"/>
+        <location line="-390"/>
         <source>Wine detected!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2689,12 +2921,29 @@ Mevcut önyükleyiciyi değiştirmek istiyor musunuz?</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+113"/>
+        <location line="+106"/>
         <source>Downloading build information, please wait ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+16"/>
+        <source>Certificate error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>%1
+
+Issuer: %2
+Subject: %3
+Valid since: %4
+Valid until: %5
+
+Temporarily trust certificate?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
         <source>Can&apos;t get version information!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2715,7 +2964,12 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+80"/>
+        <location line="+29"/>
+        <source>Libraries used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+79"/>
         <source>New installation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2730,62 +2984,27 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+78"/>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+13"/>
-        <source>No Rockbox installation found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+8"/>
-        <source>No voice file available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+1"/>
-        <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the &quot;Create voice file&quot; functionality.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+88"/>
+        <location line="+114"/>
         <source>No uninstall method for this target known.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
+        <location line="+12"/>
+        <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+187"/>
-        <source>RockboxUtility Update available</source>
+        <location line="+3"/>
+        <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+1"/>
-        <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-180"/>
+        <location line="+8"/>
         <source>No Rockbox bootloader found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+19"/>
         <source>Confirm installation</source>
         <translation>Kurulumu onayla</translation>
     </message>
@@ -2830,7 +3049,17 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+64"/>
+        <source>Rockbox Utility Update available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>New version of Rockbox Utility available.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2868,7 +3097,7 @@ Network error: %1. Please check your network and proxy settings.</source>
         <translation>Rockbox Aracı</translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="+45"/>
         <source>Device</source>
         <translation>Aygıt</translation>
     </message>
@@ -2896,7 +3125,7 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">&amp;Hızlı Başlangıç</translation>
     </message>
     <message>
-        <location line="+71"/>
+        <location line="+46"/>
         <source>Welcome</source>
         <translation>Hoş Geldiniz</translation>
     </message>
@@ -2933,7 +3162,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <location line="-3"/>
-        <location line="+498"/>
+        <location line="+457"/>
         <source>&amp;Installation</source>
         <translation>&amp;Kurulum</translation>
     </message>
@@ -3028,20 +3257,19 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Doom temel bir wad dosyasına ihtiyaç duyar.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location line="-490"/>
-        <location line="+282"/>
+        <location line="-449"/>
+        <location line="+242"/>
         <source>&amp;Accessibility</source>
         <translation>&amp;Erişilebilirlik</translation>
     </message>
     <message>
-        <location line="-279"/>
+        <location line="-239"/>
         <source>Install accessibility add-ons</source>
         <translation>Erişilebilirlik eklentilerini yükle</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Install Voice files</source>
-        <translation>Seslendirme Dosyalarını Yükle</translation>
+        <translation type="vanished">Seslendirme Dosyalarını Yükle</translation>
     </message>
     <message>
         <source>&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
@@ -3056,7 +3284,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Seslendirme dosyası kullanıcı arayüzünün seslendirilmesi için gereklidir. Seslendirme özelliği öntanımlı olarak açıktır, eğer seslendirme dosyasını yüklerseniz, Rockbox&apos;ınız konuşur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+6"/>
         <source>Install Talk files</source>
         <translation>Konuşma Dosyalarını Yükle</translation>
     </message>
@@ -3073,18 +3301,28 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600;&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Konuşma dosyaları Rockbox&apos;ın dosya ve dizin isimlerini seslendirmesi için gereklidir.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location line="+254"/>
+        <location line="+240"/>
         <source>&amp;Uninstallation</source>
         <translation>&amp;Kaldırma</translation>
     </message>
     <message>
-        <location line="-172"/>
+        <location line="-158"/>
         <location line="+33"/>
         <source>Uninstall Rockbox</source>
         <translation>Rockbox&apos;ı Kaldır</translation>
     </message>
     <message>
-        <location line="-254"/>
+        <location line="-252"/>
+        <source>Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Rockbox Logo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+47"/>
         <source>Device:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3109,12 +3347,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+73"/>
-        <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+27"/>
+        <location line="+48"/>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3140,12 +3373,7 @@ p, li { white-space: pre-wrap; }
         <translation>Önyükleyiciyi Kaldır</translation>
     </message>
     <message>
-        <location line="+140"/>
-        <source>&amp;Troubleshoot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+89"/>
+        <location line="+215"/>
         <source>&amp;Complete Installation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3249,14 +3477,12 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Önyükleyiciniz kaldırılmayacaktır, isterseniz daha sonra kendiniz kaldırabilirsiniz.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location line="-270"/>
         <source>&amp;Manual</source>
-        <translation>&amp;Kılavuz</translation>
+        <translation type="vanished">&amp;Kılavuz</translation>
     </message>
     <message>
-        <location line="+3"/>
         <source>View and download the manual</source>
-        <translation>Kılavuzu göster ve indir</translation>
+        <translation type="vanished">Kılavuzu göster ve indir</translation>
     </message>
     <message>
         <source>Read the manual</source>
@@ -3287,7 +3513,7 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">&amp;İndir</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="-256"/>
         <source>Inf&amp;o</source>
         <translation>&amp;Bilgi</translation>
     </message>
@@ -3309,12 +3535,12 @@ p, li { white-space: pre-wrap; }
         <translation>&amp;Dosya</translation>
     </message>
     <message>
-        <location line="+78"/>
+        <location line="+72"/>
         <source>&amp;About</source>
         <translation>&amp;Hakkında</translation>
     </message>
     <message>
-        <location line="-51"/>
+        <location line="-50"/>
         <source>Action&amp;s</source>
         <translation>İ&amp;şlemler</translation>
     </message>
@@ -3339,7 +3565,7 @@ p, li { white-space: pre-wrap; }
         <translation type="obsolete">Kaldırma</translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+27"/>
         <source>Empty local download cache</source>
         <translation>Yerel indirme önbelleği boş</translation>
     </message>
@@ -3369,13 +3595,13 @@ p, li { white-space: pre-wrap; }
         <translation>&amp;Qt Hakkında</translation>
     </message>
     <message>
-        <location line="-74"/>
-        <location line="+79"/>
+        <location line="-68"/>
+        <location line="+73"/>
         <source>&amp;Help</source>
         <translation>&amp;Yardım</translation>
     </message>
     <message>
-        <location line="-198"/>
+        <location line="-184"/>
         <source>&lt;b&gt;Remove the bootloader&lt;/b&gt;&lt;br/&gt;After removing the bootloader you won&apos;t be able to start Rockbox.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3395,7 +3621,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+146"/>
+        <location line="+132"/>
         <source>Info</source>
         <translation>Bilgi</translation>
     </message>
@@ -3472,77 +3698,92 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+91"/>
+        <source>Some plugins require additional data files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+37"/>
+        <source>Install prerendered voice file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Plugin Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>&amp;Manual</source>
+        <translation type="unfinished">&amp;Kılavuz</translation>
+    </message>
+    <message>
+        <location line="+11"/>
+        <source>&amp;Voice File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location line="+20"/>
         <source>The main Rockbox firmware.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="-138"/>
         <source>Fonts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="-41"/>
         <source>&amp;Rockbox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
-        <source>Some game plugins require additional files.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+16"/>
+        <location line="+104"/>
         <source>Additional fonts for the User Interface.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="-43"/>
         <source>The bootloader is required for starting Rockbox. Only necessary for first time install.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Game Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+11"/>
+        <location line="+26"/>
         <source>Customize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="-57"/>
         <source>Themes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+17"/>
+        <location line="-10"/>
         <source>Themes allow adjusting the user interface of Rockbox. Use &quot;Customize&quot; to select themes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+45"/>
+        <location line="+169"/>
+        <source>Save a copy of the manual on the player.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+29"/>
         <source>&amp;Install</source>
         <translation type="unfinished">&amp;Yükle</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="+67"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="+78"/>
         <source>This is the latest stable release available.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+3"/>
-        <source>The development version is updated on every code change. Last update was on %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
+        <location line="+10"/>
         <source>This will eventually become the next Rockbox version. Install it to help testing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+39"/>
         <source>Stable Release (Version %1)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3552,12 +3793,32 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-2"/>
         <source>Release Candidate (Revison %1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="-46"/>
+        <source>The development version is updated on every code change.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+10"/>
+        <source>Daily updated development version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Not available for the selected version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+30"/>
+        <source>Daily Build (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+28"/>
         <source>The selected player doesn&apos;t need a bootloader.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3567,7 +3828,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+35"/>
+        <location line="+61"/>
         <source>Continue with installation?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3582,12 +3843,12 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+56"/>
+        <location line="+58"/>
         <source>No install method known.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+27"/>
+        <location line="+25"/>
         <source>Bootloader detected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3602,7 +3863,7 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+14"/>
         <source>Create Bootloader backup</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3668,38 +3929,15 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+124"/>
-        <source>Your installation doesn&apos;t require game files, skipping.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ServerInfo</name>
-    <message>
-        <location filename="../base/serverinfo.cpp" line="+117"/>
-        <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+4"/>
-        <source>Unusable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Unstable</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+3"/>
-        <source>Stable</source>
+        <location line="+221"/>
+        <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>SysTrace</name>
     <message>
-        <location filename="../systrace.cpp" line="+98"/>
+        <location filename="../systrace.cpp" line="+100"/>
         <location line="+9"/>
         <source>Save system trace log</source>
         <translation type="unfinished"></translation>
@@ -3741,7 +3979,7 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>Sysinfo</name>
     <message>
-        <location filename="../sysinfo.cpp" line="+45"/>
+        <location filename="../sysinfo.cpp" line="+46"/>
         <source>&lt;b&gt;OS&lt;/b&gt;&lt;br/&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3792,7 +4030,7 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <location line="+1"/>
-        <source>Cluster Size</source>
+        <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3814,7 +4052,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+24"/>
         <source>&amp;OK</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3822,7 +4060,7 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>System</name>
     <message>
-        <location filename="../base/system.cpp" line="-282"/>
+        <location filename="../base/system.cpp" line="-234"/>
         <source>Guest</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3842,8 +4080,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished">Hata</translation>
     </message>
     <message>
-        <location line="+148"/>
-        <location line="+45"/>
+        <location line="+147"/>
         <source>(no description available)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3851,8 +4088,18 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>TTSBase</name>
     <message>
-        <location filename="../base/ttsbase.cpp" line="+45"/>
+        <location filename="../base/ttsbase.cpp" line="+47"/>
         <source>Espeak TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Espeak-ng TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Mimic TTS Engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3950,12 +4197,17 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+11"/>
         <source>Voice description:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+140"/>
+        <location line="+104"/>
+        <source>Festival could not be started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+34"/>
         <source>engine could not voice string</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3968,7 +4220,7 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>TTSSapi</name>
     <message>
-        <location filename="../base/ttssapi.cpp" line="+49"/>
+        <location filename="../base/ttssapi.cpp" line="+46"/>
         <source>Language:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4016,7 +4268,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
+        <location line="+21"/>
         <source>Copying Talkfiles...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4026,7 +4278,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+160"/>
+        <location line="+164"/>
         <source>File copy aborted</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4036,7 +4288,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source>Cleaning up...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4049,7 +4301,7 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>TalkGenerator</name>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="+39"/>
+        <location filename="../base/talkgenerator.cpp" line="+38"/>
         <source>Starting TTS Engine</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4065,7 +4317,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
         <source>Init of Encoder engine failed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4085,7 +4337,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+36"/>
+        <location line="+37"/>
         <location line="+5"/>
         <source>Voicing of %1 failed: %2</source>
         <translation type="unfinished"></translation>
@@ -4138,7 +4390,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="obsolete">&amp;Hepsini Yükle</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>&amp;Cancel</source>
         <translation>&amp;İptal</translation>
     </message>
@@ -4146,7 +4398,7 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>ThemesInstallWindow</name>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="+40"/>
+        <location filename="../themesinstallwindow.cpp" line="+41"/>
         <source>no theme selected</source>
         <translation>tema seçilmedi</translation>
     </message>
@@ -4156,7 +4408,7 @@ Press &quot;No&quot; to skip this step.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+84"/>
+        <location line="+80"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>Ağ hatası: %1.
@@ -4180,14 +4432,14 @@ Lütfen ağ ve vekil sunucu ayarlarınızı kontrol ediniz.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+17"/>
+        <location line="+20"/>
         <source>Download size %L1 kiB (%n item(s))</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+16"/>
         <source>fetching details for %1</source>
         <translation>%1 in bilgileri alınıyor</translation>
     </message>
@@ -4233,12 +4485,12 @@ HTTP response code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+11"/>
         <source>no theme preview</source>
         <translation>tema önizlemesi yok</translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+28"/>
         <source>Select</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4248,12 +4500,12 @@ HTTP response code: %1</source>
         <translation>temaların bilgileri alınıyor ...</translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+28"/>
         <source>No themes selected, skipping</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+29"/>
         <source>Mount point is wrong!</source>
         <translation>Bağlama noktası hatalı!</translation>
     </message>
@@ -4376,7 +4628,7 @@ HTTP response code: %1</source>
         <translation>&amp;Kaldır</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>&amp;Cancel</source>
         <translation>&amp;İptal</translation>
     </message>
@@ -4400,7 +4652,7 @@ HTTP response code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+32"/>
         <source>Could not delete %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4413,7 +4665,7 @@ HTTP response code: %1</source>
         <translation type="obsolete">Silinemedi:  </translation>
     </message>
     <message>
-        <location line="+29"/>
+        <location line="+34"/>
         <source>Uninstallation finished</source>
         <translation>Kaldırma işlemi tamamlandı</translation>
     </message>
@@ -4421,7 +4673,7 @@ HTTP response code: %1</source>
 <context>
     <name>Utils</name>
     <message>
-        <location filename="../base/utils.cpp" line="+312"/>
+        <location filename="../base/utils.cpp" line="+375"/>
         <source>&lt;li&gt;Permissions insufficient for bootloader installation.
 Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
@@ -4432,7 +4684,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+9"/>
         <source>Problem detected:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4465,7 +4717,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
+        <location line="+27"/>
         <source>Downloading voice info...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4500,7 +4752,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+57"/>
         <source>The downloaded file was empty!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4581,7 +4833,7 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
 <context>
     <name>ZipInstaller</name>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="+60"/>
+        <location filename="../base/zipinstaller.cpp" line="+59"/>
         <source>done.</source>
         <translation>tamamlandı.</translation>
     </message>
@@ -4595,37 +4847,47 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
+        <location line="+11"/>
         <source>Downloading file %1.%2</source>
         <translation>Dosya indiriliyor %1.%2</translation>
     </message>
     <message>
-        <location line="+35"/>
         <source>Download error: received HTTP error %1.</source>
-        <translation>İndirme hatası: HTTP %1 hatası.</translation>
+        <translation type="vanished">İndirme hatası: HTTP %1 hatası.</translation>
     </message>
     <message>
-        <location line="+6"/>
         <source>Cached file used.</source>
-        <translation>Önbellekteki dosya kullanıldı.</translation>
+        <translation type="vanished">Önbellekteki dosya kullanıldı.</translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="+35"/>
+        <source>Download error: received HTTP error %1
+%2</source>
+        <translation type="unfinished">İndirme hatası: HTTP %1 hatası. {1
+%2?}</translation>
+    </message>
+    <message>
+        <location line="+7"/>
         <source>Download error: %1</source>
         <translation>İndirme hatası: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+5"/>
+        <source>Download finished (cache used).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
         <source>Download finished.</source>
         <translation>İndirme işlemi tamamlandı.</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+7"/>
         <source>Extracting file.</source>
         <translation>Dosya çıkarılıyor.</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+14"/>
         <source>Not enough disk space! Aborting.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4643,12 +4905,12 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <translation type="obsolete">Arşivden çıkarma işlemi başarısız: %1.</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+12"/>
         <source>Installing file.</source>
         <translation>Dosya yükleniyor.</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+12"/>
         <source>Installing file failed.</source>
         <translation>Dosya yükleme işlemi başarısız.</translation>
     </message>
@@ -4702,7 +4964,7 @@ GNU Genel Kamu Lisansı v2 altında dağıtılmaktadır.</translation>
         <source>http://www.rockbox.org</source>
         <translation type="obsolete">http://www.rockbox.org</translation>
     </message>
-    <message utf8="true">
+    <message>
         <location line="+22"/>
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
@@ -4719,7 +4981,7 @@ GNU Genel Kamu Lisansı v2 altında dağıtılmaktadır.</translation>
     </message>
     <message>
         <location line="+26"/>
-        <source>&amp;Speex License</source>
+        <source>L&amp;ibraries</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

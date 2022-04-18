@@ -225,27 +225,27 @@
         <translation>Erzeuge Installationslog</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="235"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="245"/>
         <source>Zip file format detected</source>
         <translation>Zip-Format erkannt</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="247"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="257"/>
         <source>CAB file format detected</source>
         <translation>CAB-Format erkannt</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="268"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="278"/>
         <source>Extracting firmware %1 from archive</source>
         <translation>Entpacke Firmware %1 aus Archiv</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="275"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="285"/>
         <source>Error extracting firmware from archive</source>
         <translation>Fehler beim Extrahieren der Firmware</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallbase.cpp" line="284"/>
+        <location filename="../base/bootloaderinstallbase.cpp" line="294"/>
         <source>Could not find firmware in archive</source>
         <translation>Keine Firmware im Archiv gefunden</translation>
     </message>
@@ -630,112 +630,111 @@
 <context>
     <name>BootloaderInstallIpod</name>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="48"/>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation>Fehler: kann Speicher nicht allokieren!</translation>
+        <translation type="vanished">Fehler: kann Speicher nicht allokieren!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="80"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="72"/>
         <source>Downloading bootloader file</source>
         <translation>Lade Bootloader-Datei herunter</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="64"/>
-        <location filename="../base/bootloaderinstallipod.cpp" line="151"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="56"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="143"/>
         <source>Failed to read firmware directory</source>
         <translation>Konnte Firmwareverzeichnis nicht lesen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="69"/>
-        <location filename="../base/bootloaderinstallipod.cpp" line="156"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="61"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="148"/>
         <source>Unknown version number in firmware (%1)</source>
         <translation>Unbekannte Versionsnummer in Firmware (%1)</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="75"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="67"/>
         <source>Warning: This is a MacPod, Rockbox only runs on WinPods. 
 See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
         <translation>Warnung: Dies ist ein MacPod, Rockbox läuft nur auf WinPods.
 Siehe http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="94"/>
-        <location filename="../base/bootloaderinstallipod.cpp" line="163"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="86"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="155"/>
         <source>Could not open Ipod in R/W mode</source>
         <translation>Kann Ipod nicht im R/W-Modus öffnen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="104"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="96"/>
         <source>Successfull added bootloader</source>
         <translation>Bootloader erfolgreich hinzugefügt</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="115"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="107"/>
         <source>Failed to add bootloader</source>
         <translation>Konnte Bootloader nicht hinzufügen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="127"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="119"/>
         <source>Bootloader Installation complete.</source>
         <translation>Bootloader-Installation vollständig.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="132"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="124"/>
         <source>Writing log aborted</source>
         <translation>Schreiben der Log-Datei abgebrochen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="169"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="161"/>
         <source>No bootloader detected.</source>
         <translation>Kein Bootloader erkannt.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="234"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="241"/>
         <source>Error: could not retrieve device name</source>
         <translation>Fehler: konnte Gerätenamen nicht ermitteln</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="250"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="257"/>
         <source>Error: no mountpoint specified!</source>
         <translation>Fehler: kein Einhängepunkt angegeben!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="255"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="262"/>
         <source>Could not open Ipod: permission denied</source>
         <translation>Konnte Ipod nicht öffnen: Zugriff verweigert</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="259"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="266"/>
         <source>Could not open Ipod</source>
         <translation>Konnte Ipod nicht öffnen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="270"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="277"/>
         <source>No firmware partition on disk</source>
         <translation>Keine Firmware-Partition auf dem Laufwerk</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="175"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="167"/>
         <source>Successfully removed bootloader</source>
         <translation>Bootloader erfolgreich entfernt</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="183"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="175"/>
         <source>Removing bootloader failed.</source>
         <translation>Entfernen des Bootloaders fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="90"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="82"/>
         <source>Installing Rockbox bootloader</source>
         <translation>Installiere Rockbox Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="142"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="134"/>
         <source>Uninstalling bootloader</source>
         <translation>Entferne Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallipod.cpp" line="264"/>
+        <location filename="../base/bootloaderinstallipod.cpp" line="271"/>
         <source>Error reading partition table - possibly not an Ipod</source>
         <translation>Fehler beim Lesen der Partitionstabelle - möglicherweise kein Ipod</translation>
     </message>
@@ -1037,35 +1036,32 @@ Konnte Gerät nicht wieder einhängen, bitte manuall vornehmen. Wenn der iPod ni
 <context>
     <name>BootloaderInstallSansa</name>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="49"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="54"/>
         <source>Error: can&apos;t allocate buffer memory!</source>
         <translation>Fehler: kann Speicher nicht allokieren!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="54"/>
         <source>Searching for Sansa</source>
-        <translation>Suche nach Sansa</translation>
+        <translation type="vanished">Suche nach Sansa</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="58"/>
         <source>Permission for disc access denied!
 This is required to install the bootloader</source>
-        <translation>Direkter Laufwerkszugriff verweigert!
+        <translation type="vanished">Direkter Laufwerkszugriff verweigert!
 Der Zugriff ist notwendig, um den Bootloader zu installieren</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="65"/>
         <source>No Sansa detected!</source>
-        <translation>Kein Sansa gefunden!</translation>
+        <translation type="vanished">Kein Sansa gefunden!</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="78"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="68"/>
         <source>Downloading bootloader file</source>
         <translation>Lade Bootloader-Datei herunter</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="70"/>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="178"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="60"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="164"/>
         <source>OLD ROCKBOX INSTALLATION DETECTED, ABORTING.
 You must reinstall the original Sansa firmware before running
 sansapatcher for the first time.
@@ -1078,28 +1074,28 @@ Siehe http://www.rockbox.org/wiki/SansaE200Install
 </translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="101"/>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="188"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="87"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="174"/>
         <source>Could not open Sansa in R/W mode</source>
         <translation>Konnte Sansa nicht im R/W-Modus öffnen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="128"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="114"/>
         <source>Successfully installed bootloader</source>
         <translation>Bootloader erfolgreich installiert</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="139"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="125"/>
         <source>Failed to install bootloader</source>
         <translation>Bootloader-Installation fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="152"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="138"/>
         <source>Bootloader Installation complete.</source>
         <translation>Bootloader-Installation vollständig.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="157"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="143"/>
         <source>Writing log aborted</source>
         <translation>Schreiben der Log-Datei abgebrochen</translation>
     </message>
@@ -1129,32 +1125,32 @@ Siehe http://www.rockbox.org/wiki/SansaE200Install
         <translation>Laufwerk ist kein Sansa (Fehler: %1), breche ab.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="194"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="180"/>
         <source>Successfully removed bootloader</source>
         <translation>Bootloader erfolgreich entfernt</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="202"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="188"/>
         <source>Removing bootloader failed.</source>
         <translation>Entfernen des Bootloaders fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="93"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="83"/>
         <source>Installing Rockbox bootloader</source>
         <translation>Installiere Rockbox Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="169"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="155"/>
         <source>Uninstalling bootloader</source>
         <translation>Entferne Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="110"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="96"/>
         <source>Checking downloaded bootloader</source>
         <translation>Prüfe heruntergeladenen Bootloader</translation>
     </message>
     <message>
-        <location filename="../base/bootloaderinstallsansa.cpp" line="118"/>
+        <location filename="../base/bootloaderinstallsansa.cpp" line="104"/>
         <source>Bootloader mismatch! Aborting.</source>
         <translation>Fehler im Bootloader! Abbruch.</translation>
     </message>
@@ -1881,15 +1877,20 @@ Bitte TTS-System konfigurieren.</translation>
     <name>InfoWidget</name>
     <message>
         <location filename="../gui/infowidget.cpp" line="30"/>
-        <location filename="../gui/infowidget.cpp" line="107"/>
+        <location filename="../gui/infowidget.cpp" line="99"/>
         <source>File</source>
         <translation>Datei</translation>
     </message>
     <message>
         <location filename="../gui/infowidget.cpp" line="30"/>
-        <location filename="../gui/infowidget.cpp" line="107"/>
+        <location filename="../gui/infowidget.cpp" line="99"/>
         <source>Version</source>
         <translation>Version</translation>
+    </message>
+    <message>
+        <location filename="../gui/infowidget.cpp" line="47"/>
+        <source>Loading, please wait ...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2017,27 +2018,27 @@ Bitte TTS-System konfigurieren.</translation>
 <context>
     <name>PlayerBuildInfo</name>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="333"/>
+        <location filename="../base/playerbuildinfo.cpp" line="337"/>
         <source>Stable (Retired)</source>
         <translation>Stabil (Final)</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="336"/>
+        <location filename="../base/playerbuildinfo.cpp" line="340"/>
         <source>Unusable</source>
         <translation>Unbenutzbar</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="339"/>
+        <location filename="../base/playerbuildinfo.cpp" line="343"/>
         <source>Unstable</source>
         <translation>Instabil</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="342"/>
+        <location filename="../base/playerbuildinfo.cpp" line="346"/>
         <source>Stable</source>
         <translation>Stabil</translation>
     </message>
     <message>
-        <location filename="../base/playerbuildinfo.cpp" line="345"/>
+        <location filename="../base/playerbuildinfo.cpp" line="349"/>
         <source>Unknown</source>
         <translation>Unbekannt</translation>
     </message>
@@ -2096,7 +2097,7 @@ Bitte TTS-System konfigurieren.</translation>
     <name>QObject</name>
     <message>
         <location filename="../configure.cpp" line="616"/>
-        <location filename="../main.cpp" line="97"/>
+        <location filename="../main.cpp" line="102"/>
         <source>LTR</source>
         <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation>LTR</translation>
@@ -2222,67 +2223,67 @@ Bitte TTS-System konfigurieren.</translation>
         <translation>Keine Deinstallationsmethode für dieses Gerät verfügbar.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="538"/>
+        <location filename="../rbutilqt.cpp" line="529"/>
         <source>No Rockbox bootloader found.</source>
         <translation>Kein Rockbox-Bootloader gefunden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="557"/>
+        <location filename="../rbutilqt.cpp" line="548"/>
         <source>Confirm installation</source>
         <translation>Installation bestätigen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="558"/>
+        <location filename="../rbutilqt.cpp" line="549"/>
         <source>Do you really want to install Rockbox Utility to your player? After installation you can run it from the players hard drive.</source>
         <translation>Rockbox Utility wirklich auf dem Gerät installieren? Nach der Installation kann es von dem Laufwerk des Geräts ausgeführt werden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="567"/>
+        <location filename="../rbutilqt.cpp" line="558"/>
         <source>Installing Rockbox Utility</source>
         <translation>Installiere Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="717"/>
+        <location filename="../rbutilqt.cpp" line="708"/>
         <source>Rockbox Utility Update available</source>
         <translation>Update von Rockbox Utility verfügbar</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="718"/>
+        <location filename="../rbutilqt.cpp" line="709"/>
         <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
         <translation>&lt;b&gt;Neue Version von Rockbox Utility verfügbar.&lt;/b&gt;&lt;br&gt;&lt;br&gt;Aktuell verwendete Version ist %1. Version %2 ist verfügbar unter &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="722"/>
+        <location filename="../rbutilqt.cpp" line="713"/>
         <source>New version of Rockbox Utility available.</source>
         <translation>Neue Version von Rockbox Utility verfügbar.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="725"/>
+        <location filename="../rbutilqt.cpp" line="716"/>
         <source>Rockbox Utility is up to date.</source>
         <translation>Rockbox Utility ist aktuell.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="748"/>
+        <location filename="../rbutilqt.cpp" line="739"/>
         <source>Device ejected</source>
         <translation>Gerät ausgeworfen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="749"/>
+        <location filename="../rbutilqt.cpp" line="740"/>
         <source>Device successfully ejected. You may now disconnect the player from the PC.</source>
         <translation>Gerät erfolgreich ausgeworfen. Es kann jetzt vom PC getrennt werden.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="753"/>
+        <location filename="../rbutilqt.cpp" line="744"/>
         <source>Ejecting failed</source>
         <translation>Auswerfen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="754"/>
+        <location filename="../rbutilqt.cpp" line="745"/>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
         <translation>Auswerfen fehlgeschlagen. Bitte sicherstellen dass keine anderen Programme auf Dateien auf dem Gerät zugreifen. Falls das Auswerfen dann immer noch fehltschlägt bitte die Auswerf-Funktion des Computers benutzen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="571"/>
+        <location filename="../rbutilqt.cpp" line="562"/>
         <source>Mount point is wrong!</source>
         <translation>Falscher Einhängepunkt!</translation>
     </message>
@@ -2311,43 +2312,43 @@ Gültig bis: %5
 Zertifikat temporär akzeptieren?</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="527"/>
+        <location filename="../rbutilqt.cpp" line="518"/>
         <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
         <translation>Rockbox Utility kann den Bootloader auf dem Gerät nicht deinstallieren. Bitte ein Firmware-Update mit Hilfe des Update-Verfahrens des Herstellers durchführen.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="530"/>
+        <location filename="../rbutilqt.cpp" line="521"/>
         <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
         <translation>Wichtig: bitte darauf achten das Gerät vor dem Update in die Herstellerfirmware zu booten.</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="585"/>
+        <location filename="../rbutilqt.cpp" line="576"/>
         <source>Error installing Rockbox Utility</source>
         <translation>Fehler beim installieren von Rockbox Utility</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="589"/>
+        <location filename="../rbutilqt.cpp" line="580"/>
         <source>Installing user configuration</source>
         <translation>Installiere Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="593"/>
+        <location filename="../rbutilqt.cpp" line="584"/>
         <source>Error installing user configuration</source>
         <translation>Fehler beim installieren der Benutzerkonfiguration</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="597"/>
+        <location filename="../rbutilqt.cpp" line="588"/>
         <source>Successfully installed Rockbox Utility.</source>
         <translation>Rockbox Utility erfolgreich installiert.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="391"/>
-        <location filename="../rbutilqt.cpp" line="631"/>
+        <location filename="../rbutilqt.cpp" line="622"/>
         <source>Configuration error</source>
         <translation>Konfigurationsfehler</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="632"/>
+        <location filename="../rbutilqt.cpp" line="623"/>
         <source>Your configuration is invalid. Please go to the configuration dialog and make sure the selected values are correct.</source>
         <translation>Die Konfiguration ist ungültig. Bitte im Konfigurationsdialog sicherstellen, dass die Einstellungen korrekt sind.</translation>
     </message>
@@ -2409,7 +2410,7 @@ Netzwerkfehler: %1. Bitte Netzwerk- und Proxy-Einstellungen überprüfen.</trans
         <translation>Verwendete Bibliotheken</translation>
     </message>
     <message>
-        <location filename="../rbutilqt.cpp" line="653"/>
+        <location filename="../rbutilqt.cpp" line="644"/>
         <source>Checking for update ...</source>
         <translation>Prüfe auf Update ...</translation>
     </message>
@@ -2815,57 +2816,57 @@ Netzwerkfehler: %1. Bitte Netzwerk- und Proxy-Einstellungen überprüfen.</trans
         <translation>&amp;Installieren</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="77"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="78"/>
         <source>This is the latest stable release available.</source>
         <translation>Dies ist die letzte stabile Version.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="87"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="88"/>
         <source>This will eventually become the next Rockbox version. Install it to help testing.</source>
         <translation>Dies wird die Basis der nächsten Rockbox-Version. Um testen zu helfen, diese Version installieren.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="126"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="127"/>
         <source>Stable Release (Version %1)</source>
         <translation>Stabiles Release (Version %1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="130"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="131"/>
         <source>Development Version (Revison %1)</source>
         <translation>Entwicklungsversion (Revision %1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="128"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="129"/>
         <source>Release Candidate (Revison %1)</source>
         <translation>Release-Kandidat (Revision %1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="82"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="83"/>
         <source>The development version is updated on every code change.</source>
         <translation>Die Entwicklungsversion wird bei jeder Code-Änderung aktualisiert.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="92"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="93"/>
         <source>Daily updated development version.</source>
         <translation>Täglich aktuelisierte Entwicklungsversion.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="99"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="100"/>
         <source>Not available for the selected version</source>
         <translation>Für ausgewählte Version nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="129"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="130"/>
         <source>Daily Build (%1)</source>
         <translation>Tägliche Version (%1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="157"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="158"/>
         <source>The selected player doesn&apos;t need a bootloader.</source>
         <translation>Das ausgewählte Gerät benötigt keinen Bootloader.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="162"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="163"/>
         <source>The bootloader is required for starting Rockbox. Installation of the bootloader is only necessary on first time installation.</source>
         <translation>Der Bootloader ist notwendig, um Rockbox zu starten. Die Installation ist nur einmalig notwendig.</translation>
     </message>
@@ -2880,89 +2881,89 @@ Netzwerkfehler: %1. Bitte Netzwerk- und Proxy-Einstellungen überprüfen.</trans
         <translation>Keine Installationsmethode bekannt.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="329"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="319"/>
         <source>Bootloader detected</source>
         <translation>Bootloader erkannt</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="330"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="320"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>Bootloader ist bereits installiert. Soll der Bootloader neu installiert werden?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="334"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="324"/>
         <source>Bootloader installation skipped</source>
         <translation>Bootloader-Installation übersprungen</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="348"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="338"/>
         <source>Create Bootloader backup</source>
         <translation>Erzeuge Sicherungskopie vom Bootloader</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="349"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="339"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>Es kann eine Sicherungskopie der originalen Bootloader-Datei erstellt werden. &quot;Ja&quot;, um einen Zielordner auf dem Computer auszuwählen. Die Datei wird in einem neuen Unterordner &quot;%1&quot; im gewählten Ordner abgelegt.
 &quot;Nein&quot;, um diesen Schritt zu überspringen.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="356"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="346"/>
         <source>Browse backup folder</source>
         <translation>Ordner für Sicherungskopie suchen</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="368"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="358"/>
         <source>Prerequisites</source>
         <translation>Voraussetzungen</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="373"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="363"/>
         <source>Bootloader installation aborted</source>
         <translation>Bootloader-Installation abgebrochen</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="383"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="373"/>
         <source>Bootloader files (%1)</source>
         <translation>Bootloader-Dateien (%1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="385"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="375"/>
         <source>All files (*)</source>
         <translation>Alle Dateien (*)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="387"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="377"/>
         <source>Select firmware file</source>
         <translation>Firmware-Datei auswählen</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="389"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="379"/>
         <source>Error opening firmware file</source>
         <translation>Fehler beim Öffnen der Firmware-Datei</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="395"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="385"/>
         <source>Error reading firmware file</source>
         <translation>Fehler beim Lesen der Firmware-Datei</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="405"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="395"/>
         <source>Backup error</source>
         <translation>Sicherungskopie-Fehler</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="406"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="396"/>
         <source>Could not create backup file. Continue?</source>
         <translation>Konnte Sicherungskopie-Datei nicht erzeugen. Fortfahren?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="430"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="420"/>
         <source>Manual steps required</source>
         <translation>Manuelle Schritte erforderlich</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="663"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="641"/>
         <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
         <translation>Installation benötigt keine zusätzlichen Dateien, überspringe.</translation>
     </message>
@@ -3344,54 +3345,54 @@ Press &quot;No&quot; to skip this step.</source>
 <context>
     <name>TalkGenerator</name>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="39"/>
+        <location filename="../base/talkgenerator.cpp" line="38"/>
         <source>Starting TTS Engine</source>
         <translation>Starte TTS-System</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="44"/>
-        <location filename="../base/talkgenerator.cpp" line="51"/>
+        <location filename="../base/talkgenerator.cpp" line="43"/>
+        <location filename="../base/talkgenerator.cpp" line="50"/>
         <source>Init of TTS engine failed</source>
         <translation>Initalisierung des TTS-Systems fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="58"/>
+        <location filename="../base/talkgenerator.cpp" line="57"/>
         <source>Starting Encoder Engine</source>
         <translation>Starte Encoder</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="63"/>
+        <location filename="../base/talkgenerator.cpp" line="62"/>
         <source>Init of Encoder engine failed</source>
         <translation>Starten des Encoders fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="73"/>
+        <location filename="../base/talkgenerator.cpp" line="72"/>
         <source>Voicing entries...</source>
         <translation>Spreche Einträge ...</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="88"/>
+        <location filename="../base/talkgenerator.cpp" line="87"/>
         <source>Encoding files...</source>
         <translation>Kodiere Dateien ...</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="127"/>
+        <location filename="../base/talkgenerator.cpp" line="126"/>
         <source>Voicing aborted</source>
         <translation>Sprechen abgebrochen</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="164"/>
-        <location filename="../base/talkgenerator.cpp" line="169"/>
+        <location filename="../base/talkgenerator.cpp" line="163"/>
+        <location filename="../base/talkgenerator.cpp" line="168"/>
         <source>Voicing of %1 failed: %2</source>
         <translation>Sprechen von %1 fehlgeschlagen: %2</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="213"/>
+        <location filename="../base/talkgenerator.cpp" line="212"/>
         <source>Encoding aborted</source>
         <translation>Kodieren abgebrochen</translation>
     </message>
     <message>
-        <location filename="../base/talkgenerator.cpp" line="241"/>
+        <location filename="../base/talkgenerator.cpp" line="240"/>
         <source>Encoding of %1 failed</source>
         <translation>Kodieren of %1 ist fehlgeschlagen</translation>
     </message>
@@ -3442,82 +3443,82 @@ Press &quot;No&quot; to skip this step.</source>
         <translation>Kein Theme ausgewählt</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="120"/>
+        <location filename="../themesinstallwindow.cpp" line="122"/>
         <source>Network error: %1.
 Please check your network and proxy settings.</source>
         <translation>Netzwerkfehler: %1
 Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="133"/>
+        <location filename="../themesinstallwindow.cpp" line="135"/>
         <source>the following error occured:
 %1</source>
         <translation>Der folgende Fehler ist aufgetreten:
 %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="139"/>
+        <location filename="../themesinstallwindow.cpp" line="141"/>
         <source>done.</source>
         <translation>Abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="208"/>
+        <location filename="../themesinstallwindow.cpp" line="214"/>
         <source>fetching details for %1</source>
         <translation>lade Details für %1</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="211"/>
+        <location filename="../themesinstallwindow.cpp" line="217"/>
         <source>fetching preview ...</source>
         <translation>lade Vorschau ...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="224"/>
+        <location filename="../themesinstallwindow.cpp" line="230"/>
         <source>&lt;b&gt;Author:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Autor:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="225"/>
-        <location filename="../themesinstallwindow.cpp" line="227"/>
+        <location filename="../themesinstallwindow.cpp" line="231"/>
+        <location filename="../themesinstallwindow.cpp" line="233"/>
         <source>unknown</source>
         <translation>unbekannt</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="226"/>
+        <location filename="../themesinstallwindow.cpp" line="232"/>
         <source>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Version:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="229"/>
+        <location filename="../themesinstallwindow.cpp" line="235"/>
         <source>no description</source>
         <translation>Keine Beschreibung vorhanden</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="256"/>
+        <location filename="../themesinstallwindow.cpp" line="262"/>
         <source>no theme preview</source>
         <translation>Keine Themevorschau vorhanden</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="285"/>
+        <location filename="../themesinstallwindow.cpp" line="290"/>
         <source>Select</source>
         <translation>Auswählen</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="292"/>
+        <location filename="../themesinstallwindow.cpp" line="297"/>
         <source>getting themes information ...</source>
         <translation>lade Theme-Informationen ...</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="322"/>
+        <location filename="../themesinstallwindow.cpp" line="325"/>
         <source>No themes selected, skipping</source>
         <translation>Keine Themen ausgewählt, überspringe</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="352"/>
+        <location filename="../themesinstallwindow.cpp" line="354"/>
         <source>Mount point is wrong!</source>
         <translation>Einhängepunkt ungültig!</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="228"/>
+        <location filename="../themesinstallwindow.cpp" line="234"/>
         <source>&lt;b&gt;Description:&lt;/b&gt; %1&lt;hr/&gt;</source>
         <translation>&lt;b&gt;Beschreibung:&lt;/b&gt; %1&lt;hr/&gt;</translation>
     </message>
@@ -3527,12 +3528,12 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         <translation>keine Auswahl</translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="176"/>
+        <location filename="../themesinstallwindow.cpp" line="178"/>
         <source>Information</source>
         <translation>Information</translation>
     </message>
     <message numerus="yes">
-        <location filename="../themesinstallwindow.cpp" line="194"/>
+        <location filename="../themesinstallwindow.cpp" line="198"/>
         <source>Download size %L1 kiB (%n item(s))</source>
         <translation>
             <numerusform>Download-Größe %L1 kiB (%n Element)</numerusform>
@@ -3540,7 +3541,7 @@ Bitte Netzwerk- und Proxyeinstellungen überprüfen.</translation>
         </translation>
     </message>
     <message>
-        <location filename="../themesinstallwindow.cpp" line="245"/>
+        <location filename="../themesinstallwindow.cpp" line="251"/>
         <source>Retrieving theme preview failed.
 HTTP response code: %1</source>
         <translation>Laden der Vorschau fehlgeschlagen.
@@ -3614,12 +3615,12 @@ HTTP Antwortcode: %1</translation>
         <translation>Entferne %1 ...</translation>
     </message>
     <message>
-        <location filename="../base/uninstall.cpp" line="80"/>
+        <location filename="../base/uninstall.cpp" line="81"/>
         <source>Could not delete %1</source>
         <translation>Konnte %1 nicht löschen</translation>
     </message>
     <message>
-        <location filename="../base/uninstall.cpp" line="109"/>
+        <location filename="../base/uninstall.cpp" line="115"/>
         <source>Uninstallation finished</source>
         <translation>Entfernen erfolgreich</translation>
     </message>
@@ -3755,44 +3756,48 @@ Administratorrechte sind notwendig.&lt;/li&gt;</translation>
         <translation>Herunterladen von Datei %1.%2</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="122"/>
+        <location filename="../base/zipinstaller.cpp" line="120"/>
         <source>Download error: %1</source>
         <translation>Downloadfehler: %1</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="126"/>
+        <location filename="../base/zipinstaller.cpp" line="125"/>
+        <source>Download finished (cache used).</source>
+        <translation type="unfinished">Download abgeschlossen (Cache verwendet).</translation>
+    </message>
+    <message>
+        <location filename="../base/zipinstaller.cpp" line="128"/>
         <source>Download finished.</source>
         <translation>Download abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="132"/>
+        <location filename="../base/zipinstaller.cpp" line="135"/>
         <source>Extracting file.</source>
         <translation>Extrahiere Datei.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="153"/>
+        <location filename="../base/zipinstaller.cpp" line="156"/>
         <source>Extraction failed!</source>
         <translation>Extrahieren fehlgeschlagen!</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="165"/>
+        <location filename="../base/zipinstaller.cpp" line="168"/>
         <source>Installing file.</source>
         <translation>Installiere Datei.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="177"/>
+        <location filename="../base/zipinstaller.cpp" line="180"/>
         <source>Installing file failed.</source>
         <translation>Dateiinstallation fehlgeschlagen.</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="190"/>
+        <location filename="../base/zipinstaller.cpp" line="193"/>
         <source>Creating installation log</source>
         <translation>Erstelle Installationslog</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="120"/>
         <source>Cached file used.</source>
-        <translation>Datei aus Cache verwendet.</translation>
+        <translation type="vanished">Datei aus Cache verwendet.</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="67"/>
@@ -3807,7 +3812,7 @@ Administratorrechte sind notwendig.&lt;/li&gt;</translation>
 %2</translation>
     </message>
     <message>
-        <location filename="../base/zipinstaller.cpp" line="146"/>
+        <location filename="../base/zipinstaller.cpp" line="149"/>
         <source>Not enough disk space! Aborting.</source>
         <translation>Nicht genügend Speicherplatz verfügbar! Abbruch.</translation>
     </message>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru">
+<TS version="2.1" language="ru">
 <context>
     <name>BackupDialog</name>
     <message>
@@ -105,6 +105,45 @@
     <message>
         <source>Bootloader installation requires you to provide a copy of the original Sandisk firmware (bin file). This firmware file will be patched and then installed to your player along with the rockbox bootloader. You need to download this file yourself due to legal reasons. Please browse the &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;Sansa Forums&lt;/a&gt; or refer to the &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;manual&lt;/a&gt; and the &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; wiki page on how to obtain this file.&lt;br/&gt;&lt;b&gt;Note:&lt;/b&gt; This file is not present on your player and will disappear automatically after installing it.&lt;br/&gt;&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
         <translation>Установка загрузчика потребует от вас копию оригинальной прошивки от Sandisk (bin-файл). Эта прошивка будет пропатчена, а затем установлена на ваш плеер вместе с зарузчиком Rockbox\&apos;а. По законным причинам, Вам необходимо скачать файл самостоятельно. Зайдите на &lt;a href=&apos;http://forums.sandisk.com/sansa/&apos;&gt;форумы Sansa&lt;/a&gt; или читайте &lt;a href=&apos;http://www.rockbox.org/manual.shtml&apos;&gt;инструкцию&lt;/a&gt; и вики-страничку &lt;a href=&apos;http://www.rockbox.org/wiki/SansaAMS&apos;&gt;SansaAMS&lt;/a&gt; о том, как получить файл.&lt;br/&gt;Нажмите ОК чтобы продолжить и выбрать файл прошивки.</translation>
+    </message>
+</context>
+<context>
+    <name>BootloaderInstallBSPatch</name>
+    <message>
+        <source>Bootloader installation requires you to provide the correct verrsion of the original firmware file. This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; pages on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not read original firmware file</source>
+        <translation type="unfinished">Не удалось прочитать фирменную прошивку</translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Patching file...</source>
+        <translation type="unfinished">Изменяется прошивка...</translation>
+    </message>
+    <message>
+        <source>Patching the original firmware failed</source>
+        <translation type="unfinished">Сбой патчирования фирменной прошивки</translation>
+    </message>
+    <message>
+        <source>Succesfully patched firmware file</source>
+        <translation type="unfinished">Прошивка успешно пропатчена</translation>
+    </message>
+    <message>
+        <source>Bootloader successful installed</source>
+        <translation type="unfinished">Загрузчик успешно установлен</translation>
+    </message>
+    <message>
+        <source>Patched bootloader could not be installed</source>
+        <translation type="unfinished">Не удалось установить пропатченный загрузчик</translation>
+    </message>
+    <message>
+        <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
+        <translation type="unfinished">Для удаления выполните нормальное обновление с неизменённой фирменной прошивкой.</translation>
     </message>
 </context>
 <context>
@@ -474,7 +513,7 @@
     <name>BootloaderInstallIpod</name>
     <message>
         <source>Error: can&apos;t allocate buffer memory!</source>
-        <translation>Ошибка: не удалось выделить буферную память!</translation>
+        <translation type="vanished">Ошибка: не удалось выделить буферную память!</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
@@ -666,6 +705,129 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
 </context>
 <context>
+    <name>BootloaderInstallS5l</name>
+    <message>
+        <source>Could not find mounted iPod.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Downloading bootloader file...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not make DFU image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ejecting iPod...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action required:
+
+Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject functionality.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device successfully ejected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action required:
+
+Quit iTunes application.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>iTunes closed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not suspend iTunesHelper. Stop it using the Task Manager, and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for HDD spin-down...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Waiting for DFU mode...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action required:
+
+Press and hold SELECT+MENU buttons, after about 12 seconds a new action will require you to release the buttons, DO IT QUICKLY, otherwise the process could fail.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DFU mode detected.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action required:
+
+Release SELECT+MENU buttons and wait...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device is not in DFU mode. It seems that the previous required action failed, please try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Transfering DFU image...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No valid DFU USB driver found.
+
+Install iTunes (or the Apple Device Driver) and try again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not transfer DFU image.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DFU transfer completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restarting iPod, waiting for remount...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Action required:
+
+Could not remount the device, try to do it manually. If the iPod didn&apos;t restart, force a reset by pressing SELECT+MENU buttons for about 5 seconds. If the problem could not be solved then click &apos;Abort&apos; to cancel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device remounted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bootloader successfully installed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bootloader successfully uninstalled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not resume iTunesHelper.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install aborted by user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Uninstall aborted by user.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BootloaderInstallSansa</name>
     <message>
         <source>Error: can&apos;t allocate buffer memory!</source>
@@ -673,17 +835,17 @@ See http://www.rockbox.org/wiki/IpodConversionToFAT32</source>
     </message>
     <message>
         <source>Searching for Sansa</source>
-        <translation>Поиск плеера Sansa</translation>
+        <translation type="vanished">Поиск плеера Sansa</translation>
     </message>
     <message>
         <source>Permission for disc access denied!
 This is required to install the bootloader</source>
-        <translation>Доступ к диску отказан!
+        <translation type="vanished">Доступ к диску отказан!
 Это необходимо для установки загрузчика</translation>
     </message>
     <message>
         <source>No Sansa detected!</source>
-        <translation>Не найдено плеера Sansa!</translation>
+        <translation type="vanished">Не найдено плеера Sansa!</translation>
     </message>
     <message>
         <source>Downloading bootloader file</source>
@@ -1372,6 +1534,10 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
         <source>Version</source>
         <translation>Версия</translation>
     </message>
+    <message>
+        <source>Loading, please wait ...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>InfoWidgetFrm</name>
@@ -1466,62 +1632,62 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
     <name>ManualWidget</name>
     <message>
         <source>&lt;a href=&apos;%1&apos;&gt;PDF Manual&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в PDF&lt;/a&gt;</translation>
+        <translation type="vanished">&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в PDF&lt;/a&gt;</translation>
     </message>
     <message>
         <source>&lt;a href=&apos;%1&apos;&gt;HTML Manual (opens in browser)&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в HTML (открывается в обозревателе)&lt;/a&gt;</translation>
+        <translation type="vanished">&lt;a href=&apos;%1&apos;&gt;Руководство по эксплуатации в HTML (открывается в обозревателе)&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Select a device for a link to the correct manual</source>
-        <translation>Выберите устройство, чтобы получить ссылку на соответствующее руководство по эксплуатации</translation>
+        <translation type="vanished">Выберите устройство, чтобы получить ссылку на соответствующее руководство по эксплуатации</translation>
     </message>
     <message>
         <source>&lt;a href=&apos;%1&apos;&gt;Manual Overview&lt;/a&gt;</source>
-        <translation>&lt;a href=&apos;%1&apos;&gt;Обзор руководства по эксплуатации&lt;/a&gt;</translation>
+        <translation type="vanished">&lt;a href=&apos;%1&apos;&gt;Обзор руководства по эксплуатации&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Confirm download</source>
-        <translation>Потвердите скачивание</translation>
+        <translation type="vanished">Потвердите скачивание</translation>
     </message>
     <message>
         <source>Do you really want to download the manual? The manual will be saved to the root folder of your player.</source>
-        <translation>Вы действительно хотите скачать руководство по эксплуатации? Оно будет записано в коренную папку Вашего плеера.</translation>
+        <translation type="vanished">Вы действительно хотите скачать руководство по эксплуатации? Оно будет записано в коренную папку Вашего плеера.</translation>
     </message>
 </context>
 <context>
     <name>ManualWidgetFrm</name>
     <message>
         <source>Read the manual</source>
-        <translation>Читать руководство по эксплуатации</translation>
+        <translation type="vanished">Читать руководство по эксплуатации</translation>
     </message>
     <message>
         <source>PDF manual</source>
-        <translation>Руководство по эксплуатации в PDF</translation>
+        <translation type="vanished">Руководство по эксплуатации в PDF</translation>
     </message>
     <message>
         <source>HTML manual</source>
-        <translation>Руководство по эксплуатации в HTML</translation>
+        <translation type="vanished">Руководство по эксплуатации в HTML</translation>
     </message>
     <message>
         <source>Download the manual</source>
-        <translation>Скачать руководство по эксплуатации</translation>
+        <translation type="vanished">Скачать руководство по эксплуатации</translation>
     </message>
     <message>
         <source>&amp;PDF version</source>
-        <translation>Версия &amp;PDF</translation>
+        <translation type="vanished">Версия &amp;PDF</translation>
     </message>
     <message>
         <source>&amp;HTML version (zip file)</source>
-        <translation>Версия &amp;HTML (.zip-файл)</translation>
+        <translation type="vanished">Версия &amp;HTML (.zip-файл)</translation>
     </message>
     <message>
         <source>Down&amp;load</source>
-        <translation>С&amp;качать</translation>
+        <translation type="vanished">С&amp;качать</translation>
     </message>
     <message>
         <source>Manual</source>
-        <translation>Руководство по эксплуатации</translation>
+        <translation type="vanished">Руководство по эксплуатации</translation>
     </message>
 </context>
 <context>
@@ -1533,6 +1699,29 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
     <message>
         <source>Error during CAB operation</source>
         <translation>Ошибка при выполнении операции с CAB-пакетом</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerBuildInfo</name>
+    <message>
+        <source>Stable (Retired)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unusable</source>
+        <translation type="unfinished">Непригодный</translation>
+    </message>
+    <message>
+        <source>Unstable</source>
+        <translation type="unfinished">Нестабильный</translation>
+    </message>
+    <message>
+        <source>Stable</source>
+        <translation type="unfinished">Стабильный</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">Неизвестный</translation>
     </message>
 </context>
 <context>
@@ -1580,9 +1769,7 @@ Make sure you selected the correct mountpoint and the player is set up to use a 
     <name>QObject</name>
     <message>
         <source>LTR</source>
-        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.
-----------
-This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
+        <extracomment>This string is used to indicate the writing direction. Translate it to &quot;RTL&quot; (without quotes) for RTL languages. Anything else will get treated as LTR language.</extracomment>
         <translation>LTR</translation>
     </message>
     <message>
@@ -1627,6 +1814,36 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
 </context>
 <context>
+    <name>QuaGzipFile</name>
+    <message>
+        <source>QIODevice::Append is not supported for GZIP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Opening gzip for both reading and writing is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can open a gzip either for reading or for writing. Which is it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not gzopen() file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QuaZIODevice</name>
+    <message>
+        <source>QIODevice::Append is not supported for QuaZIODevice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QuaZipFile</name>
     <message>
         <source>ZIP/UNZIP API error %1</source>
@@ -1637,7 +1854,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     <name>RbUtilQt</name>
     <message>
         <source>Confirm Installation</source>
-        <translation>Подтвердите установку</translation>
+        <translation type="vanished">Подтвердите установку</translation>
     </message>
     <message>
         <source>Mount point is wrong!</source>
@@ -1645,7 +1862,7 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <source>Do you really want to install the voice file?</source>
-        <translation>Вы действительно хотите установить голосовой файл?</translation>
+        <translation type="vanished">Вы действительно хотите установить голосовой файл?</translation>
     </message>
     <message>
         <source>Confirm Uninstallation</source>
@@ -1693,11 +1910,11 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <source>Warning</source>
-        <translation>Предупреждение</translation>
+        <translation type="vanished">Предупреждение</translation>
     </message>
     <message>
         <source>The Application is still downloading Information about new Builds. Please try again shortly.</source>
-        <translation>Программа ещё загружает информацию о новых версиях. Попробуйте снова через несколько мгновений.</translation>
+        <translation type="vanished">Программа ещё загружает информацию о новых версиях. Попробуйте снова через несколько мгновений.</translation>
     </message>
     <message>
         <source>New installation</source>
@@ -1729,11 +1946,11 @@ This string is used to indicate the writing direction. Translate it to &quot;RTL
     </message>
     <message>
         <source>RockboxUtility Update available</source>
-        <translation>Доступно обновление мастера Rockbox</translation>
+        <translation type="vanished">Доступно обновление мастера Rockbox</translation>
     </message>
     <message>
         <source>&lt;b&gt;New RockboxUtility Version available.&lt;/b&gt; &lt;br&gt;&lt;br&gt;Download it from here: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</source>
-        <translation>Доступна новая версия мастера Rockbox. Скачать можно отсюда: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
+        <translation type="vanished">Доступна новая версия мастера Rockbox. Скачать можно отсюда: &lt;a href=&apos;%1&apos;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Wine detected!</source>
@@ -1751,11 +1968,11 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>No Rockbox installation found</source>
-        <translation>Не найдено установки Rockbox</translation>
+        <translation type="vanished">Не найдено установки Rockbox</translation>
     </message>
     <message>
         <source>Could not determine the installed Rockbox version. Please install a Rockbox build before installing voice files.</source>
-        <translation>Не удалось определить версию установленного Rockbox. Устанавливайте Rockbox перед установкой голосовых файлов.</translation>
+        <translation type="vanished">Не удалось определить версию установленного Rockbox. Устанавливайте Rockbox перед установкой голосовых файлов.</translation>
     </message>
     <message>
         <source>No uninstall method for this target known.</source>
@@ -1763,7 +1980,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>Rockbox Utility can not uninstall the bootloader on this target. Try a normal firmware update to remove the booloader.</source>
-        <translation>Мастер Rockbox не может удалить загрузчик с этого устройства. Попробуйте нормальное обновление прошивки, чтобы удалить загрузчик.</translation>
+        <translation type="vanished">Мастер Rockbox не может удалить загрузчик с этого устройства. Попробуйте нормальное обновление прошивки, чтобы удалить загрузчик.</translation>
     </message>
     <message>
         <source>Checking for update ...</source>
@@ -1779,11 +1996,11 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>No voice file available</source>
-        <translation>Нет доступного голосового файла</translation>
+        <translation type="vanished">Нет доступного голосового файла</translation>
     </message>
     <message>
         <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the &quot;Create voice file&quot; functionality.</source>
-        <translation>Установленная версия Rockbox является официально нестабильной. Готовые голоса доступны только для стабильных версий Rockbox. Создайте вручную голосовой файл с помощью кнопки &quot;Создать голосовой файл&quot;.</translation>
+        <translation type="vanished">Установленная версия Rockbox является официально нестабильной. Готовые голоса доступны только для стабильных версий Rockbox. Создайте вручную голосовой файл с помощью кнопки &quot;Создать голосовой файл&quot;.</translation>
     </message>
     <message>
         <source>No Rockbox bootloader found.</source>
@@ -1804,6 +2021,41 @@ Network error: %1. Please check your network and proxy settings.</source>
     <message>
         <source>Ejecting the device failed. Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject funtionality.</source>
         <translation>Извлечение не удалось. Убедитесь в том, что на устройстве нет файлов, занятых другими программами. Если извлечь всё равно не получается, пользуйтесь функцией извлечения Вашего компьютера.</translation>
+    </message>
+    <message>
+        <source>Certificate error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1
+
+Issuer: %2
+Subject: %3
+Valid since: %4
+Valid until: %5
+
+Temporarily trust certificate?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Libraries used</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox Utility can not uninstall the bootloader on your player. Please perform a firmware update using your player vendors firmware update process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Important: make sure to boot your player into the original firmware before using the vendors firmware update process.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox Utility Update available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;New Rockbox Utility version available.&lt;/b&gt;&lt;br&gt;&lt;br&gt;You are currently using version %1. Get version %2 at &lt;a href=&apos;%3&apos;&gt;%3&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1838,7 +2090,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>Install Voice files</source>
-        <translation>Установить голосовые файлы</translation>
+        <translation type="vanished">Установить голосовые файлы</translation>
     </message>
     <message>
         <source>Install Talk files</source>
@@ -1858,11 +2110,11 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>&amp;Manual</source>
-        <translation>&amp;Руководство по эксплуатации</translation>
+        <translation type="vanished">&amp;Руководство по эксплуатации</translation>
     </message>
     <message>
         <source>View and download the manual</source>
-        <translation>Смотреть и/или загрузить руководство по эксплуатации</translation>
+        <translation type="vanished">Смотреть и/или загрузить руководство по эксплуатации</translation>
     </message>
     <message>
         <source>Inf&amp;o</source>
@@ -1938,7 +2190,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>&lt;b&gt;Install Voice file&lt;/b&gt;&lt;br/&gt;Voice files are needed to make Rockbox speak the user interface. Speaking is enabled by default, so if you installed the voice file Rockbox will speak.</source>
-        <translation>&lt;b&gt;Установить голосовой файл&lt;/b&gt;&lt;br/&gt;Он нужен, чтобы Rockbox произносил пользовательский интерфейс. Произношение включено по умолчанию, поэтому если Вы установили голосовой файл, Rockbox станет разговаривать.</translation>
+        <translation type="vanished">&lt;b&gt;Установить голосовой файл&lt;/b&gt;&lt;br/&gt;Он нужен, чтобы Rockbox произносил пользовательский интерфейс. Произношение включено по умолчанию, поэтому если Вы установили голосовой файл, Rockbox станет разговаривать.</translation>
     </message>
     <message>
         <source>&lt;b&gt;Create Talk Files&lt;/b&gt;&lt;br/&gt;Talkfiles are needed to let Rockbox speak File and Foldernames</source>
@@ -2006,7 +2258,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>&amp;Troubleshoot</source>
-        <translation>&amp;Устранение неполадок</translation>
+        <translation type="vanished">&amp;Устранение неполадок</translation>
     </message>
     <message>
         <source>System &amp;Trace</source>
@@ -2053,6 +2305,14 @@ Network error: %1. Please check your network and proxy settings.</source>
         <source>Show &amp;Changelog</source>
         <translation>Показать &amp;историю изменений</translation>
     </message>
+    <message>
+        <source>Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rockbox Logo</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SelectiveInstallWidget</name>
@@ -2086,7 +2346,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>Some game plugins require additional files.</source>
-        <translation>Некоторые игры требуют дополнительных файлов.</translation>
+        <translation type="vanished">Некоторые игры требуют дополнительных файлов.</translation>
     </message>
     <message>
         <source>Additional fonts for the User Interface.</source>
@@ -2098,7 +2358,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>Game Files</source>
-        <translation>Файлы игр</translation>
+        <translation type="vanished">Файлы игр</translation>
     </message>
     <message>
         <source>Customize</source>
@@ -2122,7 +2382,7 @@ Network error: %1. Please check your network and proxy settings.</source>
     </message>
     <message>
         <source>The development version is updated on every code change. Last update was on %1</source>
-        <translation>Разрабатываемая версия обновляется с каждым изменением исходного кода. Дата последнего обновления: %1</translation>
+        <translation type="vanished">Разрабатываемая версия обновляется с каждым изменением исходного кода. Дата последнего обновления: %1</translation>
     </message>
     <message>
         <source>This will eventually become the next Rockbox version. Install it to help testing.</source>
@@ -2237,30 +2497,74 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <source>Your installation doesn&apos;t require game files, skipping.</source>
-        <translation>Ваша установка не требует игровых файлов, шаг пропущен.</translation>
+        <translation type="vanished">Ваша установка не требует игровых файлов, шаг пропущен.</translation>
     </message>
     <message>
         <source>Selective Installation</source>
         <translation>Выборочная установка</translation>
+    </message>
+    <message>
+        <source>Some plugins require additional data files.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Install prerendered voice file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Plugin Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Manual</source>
+        <translation type="unfinished">&amp;Руководство по эксплуатации</translation>
+    </message>
+    <message>
+        <source>&amp;Voice File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save a copy of the manual on the player.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The development version is updated on every code change.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily updated development version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not available for the selected version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Daily Build (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ServerInfo</name>
     <message>
         <source>Unknown</source>
-        <translation>Неизвестный</translation>
+        <translation type="vanished">Неизвестный</translation>
     </message>
     <message>
         <source>Unusable</source>
-        <translation>Непригодный</translation>
+        <translation type="vanished">Непригодный</translation>
     </message>
     <message>
         <source>Unstable</source>
-        <translation>Нестабильный</translation>
+        <translation type="vanished">Нестабильный</translation>
     </message>
     <message>
         <source>Stable</source>
-        <translation>Стабильный</translation>
+        <translation type="vanished">Стабильный</translation>
     </message>
 </context>
 <context>
@@ -2341,11 +2645,15 @@ Press &quot;No&quot; to skip this step.</source>
     </message>
     <message>
         <source>Cluster Size</source>
-        <translation>Размер кластера</translation>
+        <translation type="vanished">Размер кластера</translation>
     </message>
     <message>
         <source>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 GiB&lt;/td&gt;&lt;td&gt;%3 GiB&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</source>
         <translation>&lt;tr&gt;&lt;td&gt;%1&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td&gt;%2 ГиБ&lt;/td&gt;&lt;td&gt;%3 ГБ&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2424,6 +2732,14 @@ Press &quot;No&quot; to skip this step.</source>
         <source>MS Speech Platform</source>
         <translation>Платформа MS Speech</translation>
     </message>
+    <message>
+        <source>Espeak-ng TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mimic TTS Engine</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TTSCarbon</name>
@@ -2484,6 +2800,10 @@ Press &quot;No&quot; to skip this step.</source>
     <message>
         <source>Voice description:</source>
         <translation>Описание голоса:</translation>
+    </message>
+    <message>
+        <source>Festival could not be started</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2889,11 +3209,11 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     </message>
     <message>
         <source>Download error: received HTTP error %1.</source>
-        <translation>Сбой скачивания. Ошибка HTTP %1.</translation>
+        <translation type="vanished">Сбой скачивания. Ошибка HTTP %1.</translation>
     </message>
     <message>
         <source>Cached file used.</source>
-        <translation>Используется файл из кэша.</translation>
+        <translation type="vanished">Используется файл из кэша.</translation>
     </message>
     <message>
         <source>Download error: %1</source>
@@ -2930,6 +3250,16 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
     <message>
         <source>Package installation finished successfully.</source>
         <translation>Установка файла успешно завершена.</translation>
+    </message>
+    <message>
+        <source>Download error: received HTTP error %1
+%2</source>
+        <translation type="unfinished">Сбой скачивания. Ошибка HTTP %1. {1
+%2?}</translation>
+    </message>
+    <message>
+        <source>Download finished (cache used).</source>
+        <translation type="unfinished">Скачивание завершено (из кэша).</translation>
     </message>
 </context>
 <context>
@@ -2969,13 +3299,17 @@ Administrator priviledges are necessary.&lt;/li&gt;</source>
         <source>&amp;Ok</source>
         <translation>&amp;OK</translation>
     </message>
-    <message utf8="true">
+    <message>
         <source>Installer and housekeeping utility for the Rockbox open source digital audio player firmware.&lt;br/&gt;© The Rockbox Team.&lt;br/&gt;Released under the GNU General Public License v2.&lt;br/&gt;Uses icons by the &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;Tango Project&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</source>
         <translation>Мастер установки и управления Rockbox, микропрограммы с открытым исходным кодом для цифровых аудиоплееров.&lt;br/&gt;© Команда Rockbox.&lt;br/&gt;Раздаётся по лицензии GNU General Public License v2.&lt;br/&gt;Используются иконки из &lt;a href=&quot;http://tango.freedesktop.org/&quot;&gt;проекта Tango&lt;/a&gt;.&lt;br/&gt;&lt;center&gt;&lt;a href=&quot;http://www.rockbox.org&quot;&gt;http://www.rockbox.org&lt;/a&gt;&lt;/center&gt;</translation>
     </message>
     <message>
         <source>&amp;Speex License</source>
-        <translation>&amp;Лицензия Speex</translation>
+        <translation type="vanished">&amp;Лицензия Speex</translation>
+    </message>
+    <message>
+        <source>L&amp;ibraries</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
