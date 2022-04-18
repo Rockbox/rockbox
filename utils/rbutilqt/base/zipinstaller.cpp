@@ -116,14 +116,17 @@ void ZipInstaller::downloadDone(QNetworkReply::NetworkError error)
         emit done(true);
         return;
     }
-    if(m_getter->isCached())
-        emit logItem(tr("Cached file used."), LOGINFO);
     if(error != QNetworkReply::NoError) {
         emit logItem(tr("Download error: %1").arg(m_getter->errorString()), LOGERROR);
         emit done(true);
         return;
     }
-    else emit logItem(tr("Download finished."),LOGOK);
+    else if(m_getter->isCached()) {
+        emit logItem(tr("Download finished (cache used)."), LOGOK);
+    }
+    else {
+        emit logItem(tr("Download finished."),LOGOK);
+    }
     QCoreApplication::processEvents();
     if(m_unzip) {
         // unzip downloaded file
