@@ -349,6 +349,7 @@ static bool read_chunk_stts(qtmovie_t *qtmovie, size_t chunk_len)
 static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
 {
     size_t size_remaining = chunk_len - 8;
+    uint32_t numsizes, i;
 
     /* version */
     stream_read_uint8(qtmovie->stream);
@@ -369,8 +370,36 @@ static bool read_chunk_stsz(qtmovie_t *qtmovie, size_t chunk_len)
     }
     size_remaining -= 4;
 
-    qtmovie->res->num_sample_byte_sizes = stream_read_uint32(qtmovie->stream);
+    numsizes = stream_read_uint32(qtmovie->stream);
     size_remaining -= 4;
+
+    /* Because this table can be really large and is only used to improve seek
+     * accuracy, it's optional. In that case the seek code will fall back to a
+     * less accurate seek method. */
+    qtmovie->res->num_sample_byte_sizes = numsizes;
+    if (numsizes * sizeof(uint32_t) < CODEC_SIZE * 1 / 2)
+        qtmovie->res->sample_byte_sizes = malloc(numsizes * sizeof(uint32_t));
+    else
+        qtmovie->res->sample_byte_sizes = NULL;
+
+    if (qtmovie->res->sample_byte_sizes)
+    {
+        for (i = 0; i < numsizes; ++i)
+        {
+            qtmovie->res->sample_byte_sizes[i] =
+                stream_read_uint32(qtmovie->stream);
+            size_remaining -= 4;
+        }
+
+        if (size_remaining)
+        {
+            DEBUGF("extra bytes after stsz\n");
+        }
+    }
+    else
+    {
+        DEBUGF("stsz too large, ignoring it\n");
+    }
 
     if (size_remaining)
     {
