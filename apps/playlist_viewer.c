@@ -510,6 +510,17 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
             viewer.num_tracks) ? PV_ONPLAY_USB : PV_ONPLAY_UNCHANGED;
 }
 
+
+static enum pv_onplay_result open_with(const struct playlist_entry *current_track)
+{
+    char selected_track[MAX_PATH];
+    close_playlist_viewer();
+    snprintf(selected_track, sizeof(selected_track), "%s", current_track->name);
+
+    return (filetype_list_viewers(selected_track) ==
+                PLUGIN_USB_CONNECTED ? PV_ONPLAY_USB_CLOSED : PV_ONPLAY_CLOSED);
+}
+
 #ifdef HAVE_TAGCACHE
 static enum pv_onplay_result open_pictureflow(const struct playlist_entry *current_track)
 {
@@ -521,6 +532,31 @@ static enum pv_onplay_result open_pictureflow(const struct playlist_entry *curre
                 PLUGIN_USB_CONNECTED ? PV_ONPLAY_USB_CLOSED : PV_ONPLAY_CLOSED);
 }
 #endif
+
+static enum pv_onplay_result delete_track(int current_track_index,
+                                          int index, bool current_was_playing)
+{
+    playlist_delete(viewer.playlist, current_track_index);
+    if (current_was_playing)
+    {
+        if (playlist_amount_ex(viewer.playlist) <= 0)
+            audio_stop();
+        else
+        {
+           /* Start playing new track except if it's the lasttrack
+              track in the playlist and repeat mode is disabled */
+            struct playlist_entry *current_track =
+                playlist_buffer_get_track(&viewer.buffer, index);
+            if (current_track->display_index != viewer.num_tracks ||
+                global_settings.repeat_mode == REPEAT_ALL)
+            {
+                audio_play(0, 0);
+                viewer.current_playing_track = -1;
+            }
+        }
+    }
+    return PV_ONPLAY_ITEM_REMOVED;
+}
 
 /* Menu of playlist commands.  Invoked via ON+PLAY on main viewer screen. */
 static enum pv_onplay_result onplay_menu(int index)
@@ -539,7 +575,7 @@ static enum pv_onplay_result onplay_menu(int index)
 #endif
                         );
 
-    bool current = (current_track->index == viewer.current_playing_track);
+    bool current_was_playing = (current_track->index == viewer.current_playing_track);
 
     result = do_menu(&menu_items, NULL, NULL, false);
     if (result == MENU_ATTACHED_USB)
@@ -565,27 +601,7 @@ static enum pv_onplay_result onplay_menu(int index)
                 ret = PV_ONPLAY_UNCHANGED;
                 break;
             case 2:
-                /* delete track */
-                playlist_delete(viewer.playlist, current_track->index);
-                if (current)
-                {
-                    if (playlist_amount_ex(viewer.playlist) <= 0)
-                        audio_stop();
-                    else
-                    {
-                       /* Start playing new track except if it's the lasttrack
-                          track in the playlist and repeat mode is disabled */
-                        current_track =
-                            playlist_buffer_get_track(&viewer.buffer, index);
-                        if (current_track->display_index!=viewer.num_tracks ||
-                            global_settings.repeat_mode == REPEAT_ALL)
-                        {
-                            audio_play(0, 0);
-                            viewer.current_playing_track = -1;
-                        }
-                    }
-                }
-                ret = PV_ONPLAY_ITEM_REMOVED;
+                ret = delete_track(current_track->index, index, current_was_playing);
                 break;
             case 3:
                 /* move track */
@@ -722,6 +738,40 @@ static int playlist_callback_voice(int selected_item, void *data)
         talk_ids(true,VOICE_PAUSE, VOICE_MOVING_TRACK);
 
     return 0;
+}
+
+static void update_lists(struct gui_synclist * playlist_lists)
+{
+    gui_synclist_set_voice_callback(playlist_lists,
+                                    global_settings.talk_file?
+                                    &playlist_callback_voice:NULL);
+    gui_synclist_set_icon_callback(playlist_lists,
+                  global_settings.playlist_viewer_icons?
+                  &playlist_callback_icons:NULL);
+    gui_synclist_set_title(playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
+    gui_synclist_draw(playlist_lists);
+    gui_synclist_speak_item(playlist_lists);
+}
+
+static bool update_viewer_with_changes(struct gui_synclist *playlist_lists, enum pv_onplay_result res)
+{
+    bool exit = false;
+    if (res == PV_ONPLAY_CHANGED ||
+        res == PV_ONPLAY_ITEM_REMOVED)
+    {
+        if (res == PV_ONPLAY_ITEM_REMOVED)
+            gui_synclist_del_item(playlist_lists);
+        update_playlist(true);
+        if (viewer.num_tracks <= 0)
+            exit = true;
+        if (viewer.selected_track >= viewer.num_tracks)
+            viewer.selected_track = viewer.num_tracks-1;
+        dirty = true;
+    }
+    /* the show_icons option in the playlist viewer settings
+     * menu might have changed */
+    update_lists(playlist_lists);
+    return exit;
 }
 
 static void prepare_lists(struct gui_synclist * playlist_lists)
@@ -907,26 +957,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         goto exit;
                     break;
                 }
-                else if (pv_onplay_result == PV_ONPLAY_CHANGED ||
-                         pv_onplay_result == PV_ONPLAY_ITEM_REMOVED)
-                {
-                    if (pv_onplay_result == PV_ONPLAY_ITEM_REMOVED)
-                        gui_synclist_del_item(&playlist_lists);
-                    update_playlist(true);
-                    if (viewer.num_tracks <= 0)
-                        exit = true;
-                    if (viewer.selected_track >= viewer.num_tracks)
-                        viewer.selected_track = viewer.num_tracks-1;
-                    dirty = true;
-                }
-                /* the show_icons option in the playlist viewer settings
-                 * menu might have changed */
-                gui_synclist_set_icon_callback(&playlist_lists,
-                              global_settings.playlist_viewer_icons?
-                              &playlist_callback_icons:NULL);
-                gui_synclist_set_title(&playlist_lists, playlist_lists.title, playlist_lists.title_icon);
-                gui_synclist_draw(&playlist_lists);
-                gui_synclist_speak_item(&playlist_lists);
+                exit = update_viewer_with_changes(&playlist_lists, pv_onplay_result);
                 break;
             }
             case ACTION_STD_MENU:
@@ -938,18 +969,50 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     {
                         quick_screen_quick(button);
                         update_playlist(true);
-                        gui_synclist_set_voice_callback(&playlist_lists,
-                                                        global_settings.talk_file?
-                                                        &playlist_callback_voice:NULL);
-                        gui_synclist_set_icon_callback(&playlist_lists,
-                                      global_settings.playlist_viewer_icons?
-                                      &playlist_callback_icons:NULL);
-                        gui_synclist_set_title(&playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
-                        gui_synclist_draw(&playlist_lists);
-                        gui_synclist_speak_item(&playlist_lists);
+                        update_lists(&playlist_lists);
                         break;
                     }
 #endif
+#ifdef HAVE_HOTKEY
+            case ACTION_TREE_HOTKEY:
+            {
+                struct playlist_entry *current_track = playlist_buffer_get_track(
+                                                            &viewer.buffer,
+                                                            viewer.selected_track);
+                enum pv_onplay_result (*do_plugin)(const struct playlist_entry *) = NULL;
+#ifdef HAVE_TAGCACHE
+                if (global_settings.hotkey_tree == HOTKEY_PICTUREFLOW)
+                    do_plugin = &open_pictureflow;
+#endif
+                if (global_settings.hotkey_tree == HOTKEY_OPEN_WITH)
+                    do_plugin = &open_with;
+
+                if (do_plugin != NULL)
+                {
+                    if (do_plugin(current_track) == PV_ONPLAY_USB_CLOSED)
+                        return PLAYLIST_VIEWER_USB;
+                    else if (!open_playlist_viewer(filename, &playlist_lists, true))
+                        goto exit;
+                }
+                else if (global_settings.hotkey_tree == HOTKEY_PROPERTIES)
+                {
+                    if (show_track_info(current_track) == PV_ONPLAY_USB)
+                    {
+                        ret = PLAYLIST_VIEWER_USB;
+                        goto exit;
+                    }
+                    update_lists(&playlist_lists);
+                }
+                else if (global_settings.hotkey_tree == HOTKEY_DELETE)
+                    exit = update_viewer_with_changes(&playlist_lists,
+                            delete_track(current_track->index,
+                            viewer.selected_track,
+                            (current_track->index == viewer.current_playing_track)));
+                else
+                    onplay(current_track->name, FILE_ATTR_AUDIO, CONTEXT_STD, true);
+                break;
+            }
+#endif /* HAVE_HOTKEY */
             default:
                 if(default_event_handler(button) == SYS_USB_CONNECTED)
                 {
