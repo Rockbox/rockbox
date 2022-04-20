@@ -346,6 +346,10 @@ enum plugin_status plugin_start(const void* param)
 {
     (void)param;
 
+#ifdef HAVE_TOUCHSCREEN
+    rb->touchscreen_set_mode(rb->global_settings->touch_mode);
+#endif
+
     /* load the current root */
     const char* myroot = read_redirect();
     rb->strcpy(cur_root, myroot);
