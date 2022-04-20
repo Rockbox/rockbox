@@ -480,6 +480,13 @@ static const char graphic_numeric[] = "graphic,numeric";
 # define MAX_FILES_IN_DIR_STEP      50
 #endif
 
+#ifdef HAVE_TOUCHSCREEN
+/* on touchscreen, it makes more sense to put the scrollbar on the right */
+# define SCROLLBAR_DEFAULT SCROLLBAR_RIGHT
+#else
+# define SCROLLBAR_DEFAULT SCROLLBAR_LEFT
+#endif
+
 #ifndef __PCTOOL__
 
 #if LCD_DEPTH > 1
@@ -1190,7 +1197,7 @@ const struct settings_list settings[] = {
                   ID2P(LANG_STATUSBAR_BOTTOM)),
 #endif
     CHOICE_SETTING(F_THEMESETTING|F_TEMPVAR, scrollbar,
-                  LANG_SCROLL_BAR, SCROLLBAR_LEFT, "scrollbar","off,left,right",
+                  LANG_SCROLL_BAR, SCROLLBAR_DEFAULT, "scrollbar","off,left,right",
                   NULL, 3, ID2P(LANG_OFF), ID2P(LANG_LEFT), ID2P(LANG_RIGHT)),
     INT_SETTING(F_THEMESETTING, scrollbar_width, LANG_SCROLLBAR_WIDTH, 6,
                 "scrollbar width",UNIT_INT, 3, MAX(LCD_WIDTH/10,25), 1,
