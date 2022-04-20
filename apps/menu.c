@@ -434,6 +434,13 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
         /* query audio status to see if it changed */
         redraw_lists = query_audio_status(&old_audio_status);
 
+#ifdef HAVE_TOUCHSCREEN
+        /* need to translate touch actions *first* so the menu callback has
+         * a chance to intercept before it hits the list's do_button. */
+        if (action == ACTION_TOUCHSCREEN)
+            action = gui_synclist_do_touchscreen(&lists);
+#endif
+
         if (menu_callback)
         {
             int new_action = menu_callback(action, menu, &lists);
