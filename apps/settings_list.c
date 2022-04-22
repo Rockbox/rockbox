@@ -1753,9 +1753,11 @@ const struct settings_list settings[] = {
                    ID2P(LANG_CODEPAGE_JAPANESE),
                    ID2P(LANG_CODEPAGE_SIMPLIFIED), ID2P(LANG_CODEPAGE_KOREAN),
                    ID2P(LANG_CODEPAGE_TRADITIONAL), ID2P(LANG_CODEPAGE_UTF8)),
+
     OFFON_SETTING(0, warnon_erase_dynplaylist, LANG_WARN_ERASEDYNPLAYLIST_MENU,
                   true, "warn when erasing dynamic playlist",NULL),
-
+    OFFON_SETTING(0, keep_current_track_on_replace_playlist, LANG_KEEP_CURRENT_TRACK_ON_REPLACE,
+                  true, "keep current track when replacing playlist",NULL),
     OFFON_SETTING(0, show_shuffled_adding_options, LANG_SHOW_SHUFFLED_ADDING_OPTIONS, true,
                       "show shuffled adding options", NULL),
     CHOICE_SETTING(0, show_queue_options, LANG_SHOW_QUEUE_OPTIONS, 1,

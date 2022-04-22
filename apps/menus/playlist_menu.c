@@ -169,12 +169,17 @@ MAKE_MENU(viewer_settings_menu, ID2P(LANG_PLAYLISTVIEWER_SETTINGS),
 
 /* Current Playlist submenu */
 MENUITEM_SETTING(warn_on_erase, &global_settings.warnon_erase_dynplaylist, NULL);
+MENUITEM_SETTING(keep_current_track_on_replace, &global_settings.keep_current_track_on_replace_playlist, NULL);
 MENUITEM_SETTING(show_shuffled_adding_options, &global_settings.show_shuffled_adding_options, NULL);
 MENUITEM_SETTING(show_queue_options, &global_settings.show_queue_options, NULL);
 MENUITEM_SETTING(playlist_reload_after_save, &global_settings.playlist_reload_after_save, NULL);
 MAKE_MENU(currentplaylist_settings_menu, ID2P(LANG_CURRENT_PLAYLIST),
           NULL, Icon_Playlist,
-          &warn_on_erase, &show_shuffled_adding_options, &show_queue_options, &playlist_reload_after_save);
+          &warn_on_erase,
+          &keep_current_track_on_replace,
+          &show_shuffled_adding_options,
+          &show_queue_options,
+          &playlist_reload_after_save);
 
 MAKE_MENU(playlist_settings, ID2P(LANG_PLAYLISTS), NULL,
           Icon_Playlist,

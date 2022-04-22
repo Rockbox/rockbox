@@ -16354,3 +16354,17 @@
     *: "Play Shuffled"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Keep Current Track When Replacing Playlist"
+  </dest>
+  <voice>
+    *: "Keep Current Track When Replacing Playlist"
+  </voice>
+</phrase>

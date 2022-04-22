@@ -504,8 +504,8 @@ static int add_to_playlist(void* arg)
 {
     struct add_to_pl_param* param = arg;
     int position = param->position;
-    bool new_playlist = param->replace ? true : false;
-    bool queue = param->queue ? true : false;
+    bool new_playlist = !!param->replace;
+    bool queue = !!param->queue;
 
     /* warn if replacing the playlist */
     if (new_playlist && !warn_on_pl_erase())
@@ -518,6 +518,15 @@ static int add_to_playlist(void* arg)
     const struct text_message message={lines, 2};
 
     splash(0, ID2P(LANG_WAIT));
+
+    if (new_playlist && global_settings.keep_current_track_on_replace_playlist)
+    {
+        if (audio_status() & AUDIO_STATUS_PLAY)
+        {
+            playlist_remove_all_tracks(NULL);
+            new_playlist = false;
+        }
+    }
 
     if (new_playlist)
         playlist_create(NULL, NULL);
