@@ -42,6 +42,21 @@ enum touchscreen_mode
                               from button_get_data */
 };
 
+enum touchevent_type
+{
+    TOUCHEVENT_NONE = 0,
+    TOUCHEVENT_PRESS,
+    TOUCHEVENT_CONTACT,
+    TOUCHEVENT_RELEASE,
+};
+
+struct touchevent
+{
+    int type;
+    short x, y;
+    long tick;
+};
+
 extern struct touchscreen_parameter calibration_parameters;
 extern const struct touchscreen_parameter default_calibration_parameters;
 int touchscreen_calibrate(struct touchscreen_calibration *cal);

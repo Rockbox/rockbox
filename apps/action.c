@@ -101,8 +101,9 @@ typedef struct
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    bool     ts_short_press;
-    int      ts_data;
+    int ts_data;
+    long ts_start_tick;
+    struct touchevent touchevent;
 #endif
 } action_last_t;
 
@@ -123,8 +124,8 @@ static action_last_t action_last =
 #endif
 
 #ifdef HAVE_TOUCHSCREEN
-    .ts_data        = 0,
-    .ts_short_press = false,
+    .ts_data = 0,
+    .ts_start_tick = 0,
 #endif
 
 #ifdef HAVE_BACKLIGHT
@@ -414,12 +415,10 @@ static inline void update_screen_has_lock(action_last_t *last, action_cur_t *cur
 }
 
 /***********************************************
-* get_action_touchscreen allows touchscreen
-* presses to have short_press and repeat events
+* handles touch event processing
 */
 static inline bool get_action_touchscreen(action_last_t *last, action_cur_t *cur)
 {
-
 #if !defined(HAVE_TOUCHSCREEN)
     (void) last;
     (void) cur;
@@ -427,25 +426,52 @@ static inline bool get_action_touchscreen(action_last_t *last, action_cur_t *cur
 #else
     if (has_flag(cur->button, BUTTON_TOUCHSCREEN))
     {
-        last->repeated = false;
-        last->ts_short_press = false;
-        if (has_flag(last->button, BUTTON_TOUCHSCREEN))
+        intptr_t data = button_get_data();
+        long now = current_tick;
+
+        if (has_flag(last->button, BUTTON_TOUCHSCREEN) &&
+            !has_flag(last->button, BUTTON_REL))
         {
-            if (has_flag(cur->button, BUTTON_REL) &&
-                !has_flag(last->button, BUTTON_REPEAT))
-            {
-                last->ts_short_press = true;
-            }
-            else if (has_flag(cur->button, BUTTON_REPEAT))
-            {
+            /* Only update the coordinates if this is not a release event.
+             * For release events, we reuse the previous event coordinates. */
+            if (!has_flag(cur->button, BUTTON_REL))
+                last->ts_data = data;
+
+            /* Historical baggage... may be unnecessary. */
+            if (has_flag(cur->button, BUTTON_REPEAT))
                 last->repeated = true;
-            }
+        }
+        else
+        {
+            /* Ignore isolated release events. No good can come of this. */
+            if (has_flag(cur->button, BUTTON_REL))
+                return false;
+
+            last->ts_data = data;
+            last->ts_start_tick = now;
         }
 
         last->button = cur->button;
-        last->tick = current_tick;
+        last->tick = now;
         cur->action = ACTION_TOUCHSCREEN;
+
+        /* Update touchevent data */
+        if (has_flag(last->button, BUTTON_REL))
+            last->touchevent.type = TOUCHEVENT_RELEASE;
+        else if (has_flag(last->button, BUTTON_REPEAT))
+            last->touchevent.type = TOUCHEVENT_CONTACT;
+        else
+            last->touchevent.type = TOUCHEVENT_PRESS;
+
+        last->touchevent.x = (last->ts_data >> 16) & 0xffff;
+        last->touchevent.y = last->ts_data & 0xffff;
+        last->touchevent.tick = last->tick;
+
         return true;
+    }
+    else
+    {
+        last->touchevent.type = TOUCHEVENT_NONE;
     }
 
     return false;
@@ -1117,54 +1143,59 @@ static int get_action_worker(action_last_t *last, action_cur_t *cur)
 *******************************************************************************
 */
 #ifdef HAVE_TOUCHSCREEN
+int action_get_touch_event(struct touchevent *ev)
+{
+    if (ev)
+        *ev = action_last.touchevent;
+
+    return action_last.touchevent.type;
+}
+
 /* return BUTTON_NONE               on error
  *        BUTTON_REPEAT             if repeated press
  *        BUTTON_REPEAT|BUTTON_REL  if release after repeated press
  *        BUTTON_REL                if it's a short press = release after press
  *        BUTTON_TOUCHSCREEN        if press
+ * DEPRECATED, do not use it anymore.
  */
 int action_get_touchscreen_press(short *x, short *y)
 {
+    /* historical default value */
+    const long long_press_time = 30 * HZ / 100;
 
-    int data;
-    int ret = BUTTON_TOUCHSCREEN;
-
-    if (!has_flag(action_last.button, BUTTON_TOUCHSCREEN))
+    int ret;
+    struct touchevent ev;
+    switch (action_get_touch_event(&ev))
     {
-        return BUTTON_NONE;
+    case TOUCHEVENT_PRESS:
+    case TOUCHEVENT_CONTACT:
+        if (TIME_AFTER(ev.tick, action_last.ts_start_tick + long_press_time))
+            ret = BUTTON_REPEAT;
+        else
+            ret = BUTTON_TOUCHSCREEN;
+        break;
+
+    case TOUCHEVENT_RELEASE:
+        if (TIME_AFTER(ev.tick, action_last.ts_start_tick + long_press_time))
+            ret = BUTTON_REPEAT|BUTTON_REL;
+        else
+            ret = BUTTON_REL;
+        break;
+
+    default:
+        ret = BUTTON_NONE;
+        break;
     }
 
-    data = button_get_data();
-    if (has_flag(action_last.button, BUTTON_REL))
-    {
-        *x = (action_last.ts_data&0xffff0000)>>16;
-        *y = (action_last.ts_data&0xffff);
-    }
-    else
-    {
-        *x = (data&0xffff0000)>>16;
-        *y = (data&0xffff);
-    }
-
-    action_last.ts_data = data;
-
-    if (action_last.repeated)
-    {
-        ret = BUTTON_REPEAT;
-    }
-    else if (action_last.ts_short_press)
-    {
-        ret = BUTTON_REL;
-    }
-    /* This is to return a BUTTON_REL after a BUTTON_REPEAT. */
-    else if (has_flag(action_last.button, BUTTON_REL))
-    {
-        ret = BUTTON_REPEAT|BUTTON_REL;
+    if (ret != BUTTON_NONE) {
+        *x = ev.x;
+        *y = ev.y;
     }
 
     return ret;
 }
 
+/* DEPRECATED, do not use it anymore. */
 int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp)
 {
     short x, y;

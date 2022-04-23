@@ -415,24 +415,11 @@ int get_action_statuscode(int *button);
 intptr_t get_action_data(void);
 
 #ifdef HAVE_TOUCHSCREEN
-/* return BUTTON_NONE               on error
- *        BUTTON_REPEAT             if repeated press
- *        BUTTON_REPEAT|BUTTON_REL  if release after repeated press
- *        BUTTON_REL                if it's a short press = release after press
- *        BUTTON_TOUCHSCREEN        if press
- */
-int action_get_touchscreen_press(short *x, short *y);
+/* Return a touch event and screen coordinates of the touch. */
+int action_get_touch_event(struct touchevent *ev);
 
-/*
- * wrapper action_get_touchscreen_press()
- * to filter the touchscreen coordinates through a viewport
- *
- * returns the action and x1, y1 relative to the viewport if
- * the press was within the viewport,
- * ACTION_UNKNOWN (and x1, y1 untouched) if the press was outside
- * BUTTON_NONE else
- *
- **/
+/* DEPRECATED, do not use these anymore */
+int action_get_touchscreen_press(short *x, short *y);
 int action_get_touchscreen_press_in_vp(short *x1, short *y1, struct viewport *vp);
 #endif
 
