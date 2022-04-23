@@ -249,6 +249,7 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
     /* switch to point mode because that's more intuitive */
     enum touchscreen_mode old_mode = touchscreen_get_mode();
     touchscreen_set_mode(TOUCHSCREEN_POINT);
+    action_gesture_reset();
 #endif
 
     /* make sure to eat any extranous keypresses */
@@ -277,22 +278,20 @@ enum yesno_res gui_syncyesno_run_w_tmo(int ticks, enum yesno_res tmo_default_res
         {
 #ifdef HAVE_TOUCHSCREEN
             case ACTION_TOUCHSCREEN:
+            {
+                struct gesture_event gevent;
+                if (action_gesture_get_event_in_vp(&gevent, &yn[0].vp) &&
+                    gevent.id == GESTURE_TAP)
                 {
-                    int btn;
-                    short int x, y;
-                    btn = action_get_touchscreen_press_in_vp(&x, &y, &(yn[0].vp));
-                    if (btn == BUTTON_REL)
+                    if (gevent.y > yn[0].vp.height/2)
                     {
-                        if (y > yn[0].vp.height/2)
-                        {
-                            if (x <= yn[0].vp.width/2)
-                                result = YESNO_YES;
-                            else
-                                result = YESNO_NO;
-                        }
+                        if (gevent.x <= yn[0].vp.width/2)
+                            result = YESNO_YES;
+                        else
+                            result = YESNO_NO;
                     }
                 }
-                break;
+            } break;
 #endif
             case ACTION_YESNO_ACCEPT:
                 result = YESNO_YES;
