@@ -11,6 +11,9 @@ core_keymap.c
 debug_menu.c
 filetypes.c
 fileop.c
+#ifdef HAVE_TOUCHSCREEN
+gesture.c
+#endif
 language.c
 main.c
 menu.c
