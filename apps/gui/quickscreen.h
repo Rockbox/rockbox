@@ -28,6 +28,8 @@
 
 #include "screen_access.h"
 
+struct settings_list;
+
 enum quickscreen_item {
     QUICKSCREEN_TOP = 0,
     QUICKSCREEN_LEFT,
@@ -41,11 +43,6 @@ enum quickscreen_return {
     QUICKSCREEN_IN_USB = 0x1,
     QUICKSCREEN_GOTO_SHORTCUTS_MENU = 0x2,
     QUICKSCREEN_CHANGED = 0x4,
-};
-
-struct gui_quickscreen
-{
-    const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];
 };
 
 extern int quick_screen_quick(int button_enter);

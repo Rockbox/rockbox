@@ -50,6 +50,11 @@
 #define MARGIN 10
 #define CENTER_ICONAREA_SIZE (MARGIN+8*2)
 
+struct gui_quickscreen
+{
+    const struct settings_list *items[QUICKSCREEN_ITEM_COUNT];
+};
+
 static bool redraw;
 
 static void quickscreen_update_callback(unsigned short id,
@@ -297,22 +302,30 @@ static bool gui_quickscreen_do_button(struct gui_quickscreen * qs, int button)
 #ifdef HAVE_TOUCHSCREEN
 static int quickscreen_touchscreen_button(void)
 {
-    short x,y;
-    if (action_get_touchscreen_press(&x, &y) != BUTTON_REL)
+    struct gesture_event gevent;
+    if (!action_gesture_get_event(&gevent))
         return ACTION_NONE;
+
+    switch (gevent.id) {
+    case GESTURE_TAP:
+    case GESTURE_HOLD:
+        break;
+    default:
+        return ACTION_NONE;
+    }
 
     enum { left=1, right=2, top=4, bottom=8 };
 
     int bits = 0;
 
-    if(x < LCD_WIDTH/3)
+    if(gevent.x < LCD_WIDTH/3)
         bits |= left;
-    else if(x > 2*LCD_WIDTH/3)
+    else if(gevent.x > 2*LCD_WIDTH/3)
         bits |= right;
 
-    if(y < LCD_HEIGHT/3)
+    if(gevent.y < LCD_HEIGHT/3)
         bits |= top;
-    else if(y > 2*LCD_HEIGHT/3)
+    else if(gevent.y > 2*LCD_HEIGHT/3)
         bits |= bottom;
 
     switch(bits) {
@@ -366,6 +379,10 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
     talk_qs_option(qs->items[QUICKSCREEN_LEFT], true);
     if (qs->items[QUICKSCREEN_LEFT] != qs->items[QUICKSCREEN_RIGHT])
         talk_qs_option(qs->items[QUICKSCREEN_RIGHT], true);
+
+#ifdef HAVE_TOUCHSCREEN
+    action_gesture_reset();
+#endif
     while (true) {
         if (redraw)
         {
