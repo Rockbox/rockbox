@@ -75,8 +75,8 @@ static bool enable_sw_poweroff = true;
  * real list acceleration kicks in (this smooths acceleration).
  *
  * Note that touchscreen pointing events are not subject to this
- * acceleration and always use REPEAT_INTERVAL_TOUCH. (Do repeat
- * events even do anything sane for touchscreens??)
+ * acceleration and always use REPEAT_INTERVAL_TOUCH. That value
+ * essentially determines the touchscreen polling rate.
  */
 
 /* the speed repeat starts at, in centiseconds */
@@ -324,21 +324,29 @@ static void button_tick(void)
                 }
                 else
                 {
-                    if (count++ > REPEAT_START)
+                    ++count;
+                    if (count > REPEAT_START
+#ifdef HAVE_TOUCHSCREEN
+                        /* For touch events we want to repost quickly since
+                         * the coordinates can change */
+                        || ((btn & BUTTON_TOUCHSCREEN) &&
+                            count > REPEAT_INTERVAL_TOUCH)
+#endif
+                        )
                     {
                         post = true;
                         repeat = true;
                         repeat_count = 0;
                         /* initial repeat */
-                        count = REPEAT_INTERVAL_START;
-                    }
 #ifdef HAVE_TOUCHSCREEN
-                    else if (lastdata != data && btn == lastbtn)
-                    {   /* only coordinates changed, post anyway */
-                        if (touchscreen_get_mode() == TOUCHSCREEN_POINT)
-                            post = true;
-                    }
+                        if (btn & BUTTON_TOUCHSCREEN)
+                            count = REPEAT_INTERVAL_TOUCH;
+                        else
 #endif
+                        {
+                            count = REPEAT_INTERVAL_START;
+                        }
+                    }
                 }
             }
             if ( post )
