@@ -119,3 +119,65 @@ bool gesture_get_event_in_vp(struct gesture *g, struct gesture_event *gevt,
 
     return !vp || viewport_point_within_vp(vp, g->ox, g->oy);
 }
+
+/*
+ * gesture velocity helper
+ */
+
+void gesture_vel_reset(struct gesture_vel *gv)
+{
+    gv->idx = 0;
+    gv->cnt = 0;
+}
+
+void gesture_vel_process(struct gesture_vel *gv, const struct touchevent *ev)
+{
+    if (ev->type != TOUCHEVENT_PRESS &&
+        ev->type != TOUCHEVENT_CONTACT)
+        return;
+
+    gv->xsamp[gv->idx] = ev->x;
+    gv->ysamp[gv->idx] = ev->y;
+    gv->tsamp[gv->idx] = ev->tick;
+
+    gv->idx++;
+    gv->cnt++;
+
+    if (gv->idx >= ARRAYLEN(gv->xsamp))
+        gv->idx = 0;
+}
+
+bool gesture_vel_get(struct gesture_vel *gv, int *xvel, int *yvel)
+{
+    if (gv->cnt <= 1) {
+        *xvel = 0;
+        *yvel = 0;
+        return false;
+    }
+
+    int dx = 0, dy = 0, dt = 0;
+    size_t n = MIN(gv->cnt, ARRAYLEN(gv->xsamp)) - 1;
+    size_t i = gv->cnt < ARRAYLEN(gv->xsamp) ? 0 : gv->idx;
+    size_t ip = i + 1;
+    while (n-- > 0) {
+        if (ip >= ARRAYLEN(gv->xsamp))
+            ip = 0;
+
+        dx += gv->xsamp[ip] - gv->xsamp[i];
+        dy += gv->ysamp[ip] - gv->ysamp[i];
+        dt += gv->tsamp[ip] - gv->tsamp[i];
+
+        i = ip;
+        ip++;
+    }
+
+    if (dt == 0) {
+        *xvel = 0;
+        *yvel = 0;
+    } else {
+        *xvel = dx * HZ / dt;
+        *yvel = dy * HZ / dt;
+    }
+
+    return gv->cnt >= ARRAYLEN(gv->xsamp);
+}

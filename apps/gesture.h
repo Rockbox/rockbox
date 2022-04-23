@@ -120,4 +120,18 @@ static inline bool gesture_is_pressed(struct gesture *g)
     return !!(g->flags & GESTURE_F_PRESSED);
 }
 
+/* Helper for computing velocity vectors */
+struct gesture_vel
+{
+    size_t idx;
+    size_t cnt;
+    short xsamp[4];
+    short ysamp[4];
+    long tsamp[4];
+};
+
+void gesture_vel_reset(struct gesture_vel *gv);
+void gesture_vel_process(struct gesture_vel *gv, const struct touchevent *ev);
+bool gesture_vel_get(struct gesture_vel *gv, int *xvel, int *yvel);
+
 #endif /* _GESTURE_H_ */
