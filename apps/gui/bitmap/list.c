@@ -46,12 +46,18 @@
 #define ICON_PADDING 1
 #define ICON_PADDING_S "1"
 
+#ifdef HAVE_TOUCHSCREEN
+/* used in gui_synclist->scroll_mode */
+enum {
+    SCROLL_NONE = 0,        /* no scrolling */
+    SCROLL_BAR,             /* scroll by using the scrollbar */
+    SCROLL_SWIPE,           /* scroll by wiping over the screen */
+    SCROLL_KINETIC,         /* state after releasing swipe */
+};
+#endif
+
 /* these are static to make scrolling work */
 static struct viewport list_text[NB_SCREENS], title_text[NB_SCREENS];
-
-#ifdef HAVE_TOUCHSCREEN
-static bool hide_selection;
-#endif
 
 /* list-private helpers from the generic list.c (move to header?) */
 int gui_list_get_item_offset(struct gui_synclist * gui_list, int item_width,
@@ -363,7 +369,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         if(
 #ifdef HAVE_TOUCHSCREEN
             /* don't draw it during scrolling */
-            !hide_selection &&
+            list->scroll_mode == SCROLL_NONE &&
 #endif
                 i >= list->selected_item
                 && i <  list->selected_item + list->selected_size)
@@ -448,48 +454,71 @@ void list_draw(struct screen *display, struct gui_synclist *list)
 #if defined(HAVE_TOUCHSCREEN)
 /* This needs to be fixed if we ever get more than 1 touchscreen on a target. */
 
-/* difference in pixels between draws, above it means enough to start scrolling */
-#define SCROLL_BEGIN_THRESHOLD 3 
-
-static enum {
-    SCROLL_NONE,            /* no scrolling */
-    SCROLL_BAR,             /* scroll by using the scrollbar */
-    SCROLL_SWIPE,           /* scroll by wiping over the screen */
-    SCROLL_KINETIC,         /* state after releasing swipe */
-} scroll_mode;
-
-static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
+static void do_touch_scroll(struct gui_synclist *gui_list, int new_y_pos)
 {
-    const int screen = screens[SCREEN_MAIN].screen_type;
+    if (new_y_pos < 0)
+        new_y_pos = 0;
+
+    int line_height = gui_list->line_height[SCREEN_MAIN];
+    int new_start = new_y_pos / line_height;
+    int nb_lines = list_get_nb_lines(gui_list, SCREEN_MAIN);
+    if (new_start > gui_list->nb_items - nb_lines)
+    {
+        new_start = gui_list->nb_items - nb_lines;
+        new_y_pos = new_start * line_height;
+    }
+
+    int new_item = new_start + nb_lines/2;
+    if (gui_list->selected_size > 1)
+        new_item -= new_item % gui_list->selected_size;
+
+    gui_list->selected_item = new_item;
+    gui_list->start_item[SCREEN_MAIN] = new_start;
+    gui_list->y_pos = new_y_pos;
+}
+
+/* Handle touch scrolling using the scrollbar. Pass the screen y-coordinate
+ * of the current touch position. */
+static int scrollbar_scroll(struct gui_synclist *gui_list, int y)
+{
+    const enum screen_type screen = SCREEN_MAIN;
     const int nb_lines = list_get_nb_lines(gui_list, screen);
 
     if (nb_lines < gui_list->nb_items)
     {
         const int line_height = gui_list->line_height[screen];
+        int bar_height = list_text[screen].height;
+        int bar_y = y - list_text[screen].y;
 
-        /* try to position the center of the scrollbar at the touch point */
-        int scrollbar_size = list_text[screen].height;
-        int actual_y = y - list_text[screen].y;
-        int new_y_pos = (actual_y * gui_list->nb_items * line_height) / scrollbar_size;
-        int new_start = (actual_y * gui_list->nb_items) / scrollbar_size;
+        if (bar_y < 0)
+            bar_y = 0;
+        else if(bar_y >= bar_height)
+            bar_y = bar_height - 1;
 
-        new_start -= nb_lines / 2;
+        int new_y_pos = (bar_y * gui_list->nb_items * line_height) / bar_height;
         new_y_pos -= (nb_lines * line_height) / 2;
-        if(new_start < 0) {
-            new_start = 0;
-            new_y_pos = 0;
-        } else if(new_start > gui_list->nb_items - nb_lines) {
-            new_start = gui_list->nb_items - nb_lines;
-            new_y_pos = new_start * line_height;
-        }
 
-        gui_list->start_item[screen] = new_start;
-        gui_list->y_pos = new_y_pos;
+        do_touch_scroll(gui_list, new_y_pos);
 
         return ACTION_REDRAW;
     }
 
     return ACTION_NONE;
+}
+
+/* Handle swipe scrolling on a list. 'delta' is the distance to scroll
+ * relative to gui_list->scroll_base_y, which should be set up at the
+ * beginning of scrolling. */
+static int swipe_scroll(struct gui_synclist *gui_list, int delta)
+{
+    /* nothing to do if the list does not scroll */
+    const int nb_lines = list_get_nb_lines(gui_list, SCREEN_MAIN);
+    if (nb_lines >= gui_list->nb_items)
+        return ACTION_NONE;
+
+    do_touch_scroll(gui_list, gui_list->scroll_base_y - delta);
+
+    return ACTION_REDRAW;
 }
 
 /* kinetic scrolling, based on
@@ -513,7 +542,6 @@ static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
  * relatively accurate
  */
 
-
 #define SIGN(a) ((a) < 0 ? -1 : 1)
 /* these could possibly be configurable */
 /* the lower the smoother */
@@ -521,217 +549,92 @@ static int scrollbar_scroll(struct gui_synclist * gui_list, int y)
 /* the higher the earler the list stops */
 #define DECELERATION (1000*RELOAD_INTERVAL/HZ)
 
-/* this array holds data to compute the initial velocity v0 */
-static struct kinetic_info {
-    int difference;
-    long ticks;
-} kinetic_data[4];
-static size_t cur_idx;
+struct kinetic_cb_data {
+    struct gui_synclist *list;
+    int velocity;
+};
 
-static struct cb_data {
-    struct gui_synclist *list;  /* current list */
-    int velocity;               /* in pixel/s */
-} cb_data;
+struct kinetic {
+    /* callback for performing the scroll animation */
+    struct kinetic_cb_data cb_data;
+    struct timeout tmo;
+};
 
-/* data member points to the above struct */
-static struct timeout kinetic_tmo;
+static struct kinetic kinetic;
+static struct gesture_vel list_gvel;
 
-static bool is_kinetic_over(void)
+static void kinetic_stop_scrolling(struct kinetic *k, struct gui_synclist *list)
 {
-    return !cb_data.velocity && (scroll_mode == SCROLL_KINETIC);
+    if (k->cb_data.list == list)
+        timeout_cancel(&k->tmo);
 }
 
-/*
- * collect data about how fast the list is moved in order to compute
- * the initial velocity from it later */
-static void kinetic_stats_collect(const int difference)
+/* helper for gui/list.c to cancel scrolling if a normal button event comes */
+void _gui_synclist_stop_kinetic_scrolling(struct gui_synclist *list)
 {
-    static long last_tick;
-    /* collect velocity statistics */
-    kinetic_data[cur_idx].difference = difference;
-    kinetic_data[cur_idx].ticks = current_tick - last_tick;
-
-    last_tick = current_tick;
-    cur_idx += 1;
-    if (cur_idx >= ARRAYLEN(kinetic_data))
-        cur_idx = 0; /* rewind the index */
-}
-
-/*
- * resets the statistic */
-static void kinetic_stats_reset(void)
-{
-    memset(kinetic_data, 0, sizeof(kinetic_data));
-    cur_idx = 0;
-}
-
-/* cancels all currently active kinetic scrolling */
-static void kinetic_force_stop(void)
-{
-    timeout_cancel(&kinetic_tmo);
-    kinetic_stats_reset();
-}
-
-/* helper for gui/list.c to cancel scrolling if a normal button event comes
- * through dpad or keyboard or whatever */
-void _gui_synclist_stop_kinetic_scrolling(struct gui_synclist * gui_list)
-{
-    const enum screen_type screen = screens[SCREEN_MAIN].screen_type;
-    gui_list->y_pos = gui_list->start_item[screen] * gui_list->line_height[screen];
-
-    if (scroll_mode == SCROLL_KINETIC)
-        kinetic_force_stop();
-    scroll_mode = SCROLL_NONE;
-    hide_selection = false;
-}
-/*
- * returns false if scrolling should be stopped entirely
- *
- * otherwise it returns true even if it didn't actually scroll,
- * but scrolling mode shouldn't be changed
- **/
-
- 
-static int scroll_begin_threshold;
-static int threshold_accumulation;
-static bool swipe_scroll(struct gui_synclist * gui_list, int difference)
-{
-    /* fixme */
-    const enum screen_type screen = screens[SCREEN_MAIN].screen_type;
-    const int nb_lines = list_get_nb_lines(gui_list, screen);
-    const int line_height = gui_list->line_height[screen];
-
-    if (UNLIKELY(scroll_begin_threshold == 0))
-        scroll_begin_threshold = touchscreen_get_scroll_threshold();
-
-    /* make selecting items easier */
-    threshold_accumulation += abs(difference);
-    if (threshold_accumulation < scroll_begin_threshold && scroll_mode == SCROLL_NONE)
-        return false;
-
-    threshold_accumulation = 0;
-
-    /* does the list even scroll? if no, return but still show
-     * the caller that we would scroll */
-    if (nb_lines >= gui_list->nb_items)
-        return true;
-
-    const int old_start = gui_list->start_item[screen];
-    int new_start_item = -1;
-    int line_diff = 0;
-    int max_y_pos = gui_list->nb_items * line_height - list_text[screen].height;
-
-    /* Track whether we hit the end of the list for sake of kinetic scroll */
-    bool hit_end = true;
-
-    /* Move the y position and clamp it (funny things happen otherwise...) */
-    gui_list->y_pos -= difference;
-    if(gui_list->y_pos < 0)
-        gui_list->y_pos = 0;
-    else if(gui_list->y_pos > max_y_pos)
-        gui_list->y_pos = max_y_pos;
-    else
-        hit_end = false;
-
-    /* Get the list y position. When pos_y differs by a line height or more,
-     * we need to scroll the list by adjusting the start item accordingly */
-    int cur_y = gui_list->start_item[screen] * line_height;
-    int diff_y = cur_y - gui_list->y_pos;
-    if (abs(diff_y) >= line_height)
+    if (list->scroll_mode == SCROLL_KINETIC)
     {
-        line_diff = diff_y/line_height;
+        kinetic_stop_scrolling(&kinetic, list);
+        list->scroll_mode = SCROLL_NONE;
     }
-
-    if(line_diff != 0)
-    {
-        int selection_offset = gui_list->selected_item - old_start;
-        new_start_item = old_start - line_diff;
-        /* check if new_start_item is bigger than list item count */
-        if(new_start_item > gui_list->nb_items - nb_lines)
-            new_start_item = gui_list->nb_items - nb_lines;
-        /* set new_start_item to 0 if it's negative */
-        if(new_start_item < 0)
-            new_start_item = 0;
-
-        gui_list->start_item[screen] = new_start_item;
-        /* keep selected item in sync */
-        gui_list->selected_item = new_start_item + selection_offset;
-        if(gui_list->selected_size > 1)
-            gui_list->selected_item -= (gui_list->selected_item % gui_list->selected_size);
-    }
-
-    if(hit_end)
-        return scroll_mode != SCROLL_KINETIC;
-    else
-        return true;
 }
 
 static int kinetic_callback(struct timeout *tmo)
 {
-    /* cancel if screen was pressed */
-    if (scroll_mode != SCROLL_KINETIC)
+    struct kinetic_cb_data *data = (struct kinetic_cb_data*)tmo->data;
+    struct gui_synclist *list = data->list;
+
+    /* deal with cancellation */
+    if (list->scroll_mode != SCROLL_KINETIC)
         return 0;
 
-    struct cb_data *data = (struct cb_data*)tmo->data;
     /* ds = v*dt */
     int pixel_diff = data->velocity * RELOAD_INTERVAL / HZ;
-    /* remember signedness to detect stopping */
-    int old_sign = SIGN(data->velocity);
-    /* advance the list */
-    if (!swipe_scroll(data->list, pixel_diff))
+    int action = swipe_scroll(list, pixel_diff);
+    if (action == ACTION_REDRAW)
     {
-        /* nothing to scroll? */
-        data->velocity = 0;
-    }
-    else
-    {
-        /* decelerate by a fixed amount
-         * decrementing v0 over time by the deceleration is
-         * equivalent to computing v = a*t + v0 */
-        data->velocity -= SIGN(data->velocity)*DECELERATION;
-        if (SIGN(data->velocity) != old_sign)
-            data->velocity = 0;
+        /* force the list to redraw */
+        button_queue_post(BUTTON_REDRAW, 0);
     }
 
-    /* let get_action() timeout, which loads to a
-     * gui_synclist_draw() call from the main thread */
-    button_queue_post(BUTTON_REDRAW, 0);
-    /* stop if the velocity hit or crossed zero */
-    if (!data->velocity)
+    /* apply deceleration */
+    int old_sign = SIGN(data->velocity);
+    data->velocity -= SIGN(data->velocity) * DECELERATION;
+    if (SIGN(data->velocity) != old_sign)
+        data->velocity = 0;
+
+    /* stop scrolling if we didn't move, it means we hit the end */
+    if (list->y_pos == list->scroll_base_y)
+        data->velocity = 0;
+    else
+        /* update base y since our scroll distance doesn't accumulate. */
+        list->scroll_base_y = list->y_pos;
+
+    if (data->velocity == 0)
     {
-        kinetic_stats_reset();
+        list->scroll_mode = SCROLL_NONE;
         return 0;
     }
-    return RELOAD_INTERVAL; /* cancel or reload */
+
+    return RELOAD_INTERVAL;
 }
 
-/*
- * computes the initial velocity v0 and sets up the timer */
-static bool kinetic_setup_scroll(struct gui_synclist *list)
+/* Computes the initial velocity v0 and sets up the timer */
+static bool kinetic_start_scrolling(struct kinetic *k, struct gui_synclist *list)
 {
-    /* compute initial velocity */
-    int i, _i, v0, len = ARRAYLEN(kinetic_data);
-    for(i = 0, _i = 0, v0 = 0; i < len; i++)
-    {   /* in pixel/s */
-        if (kinetic_data[i].ticks > 0)
-        {
-            v0 += kinetic_data[i].difference*HZ/kinetic_data[i].ticks;
-            _i++;
-        }
-    }
-    if (_i > 0)
-        v0 /= _i;
-    else
-        v0 = 0;
+    int xvel, yvel;
+    gesture_vel_get(&list_gvel, &xvel, &yvel);
+    if (yvel == 0)
+        return false;
 
-    if (v0 != 0)
-    {
-        cb_data.list = list;
-        cb_data.velocity = v0;
-        timeout_register(&kinetic_tmo, kinetic_callback, RELOAD_INTERVAL, (intptr_t)&cb_data);
-        return true;
-    }
-    return false;
+    k->cb_data.list = list;
+    k->cb_data.velocity = yvel;
+
+    list->scroll_mode = SCROLL_KINETIC;
+    list->scroll_base_y = list->y_pos;
+    timeout_register(&k->tmo, kinetic_callback, RELOAD_INTERVAL,
+                     (intptr_t)&k->cb_data);
+    return true;
 }
 
 #define OUTSIDE    0
@@ -746,18 +649,20 @@ static bool kinetic_setup_scroll(struct gui_synclist *list)
 
 static int get_click_location(struct gui_synclist *list, int x, int y)
 {
-    int screen = SCREEN_MAIN;
-    struct viewport *parent, *title, *text;
+    const enum screen_type screen = SCREEN_MAIN;
     int retval = OUTSIDE;
 
-    parent = list->parent[screen];
+    struct viewport *parent = list->parent[screen];
+    struct viewport *text = &list_text[screen];
+    struct viewport *title = &title_text[screen];
+
     if (viewport_point_within_vp(parent, x, y))
     {
         /* see if the title was clicked */
-        title = &title_text[screen];
         if (viewport_point_within_vp(title, x, y))
             retval = TITLE_TEXT;
-        /* check the icon too */
+
+        /* check the title icon */
         if (list->title_icon != Icon_NOICON && list->show_icons)
         {
             int width = list_icon_width(screen);
@@ -770,12 +675,12 @@ static int get_click_location(struct gui_synclist *list, int x, int y)
             if (viewport_point_within_vp(&vp, x, y))
                 retval = TITLE_ICON;
         }
-        /* check scrollbar. assume it's shown, if it isn't it will be handled
-         * later */
+
+        /* check scrollbar if shown */
         if (retval == OUTSIDE)
         {
             bool on_scrollbar_clicked;
-            int adj_x = x - parent->x;
+            int adj_x = x - text->x;
             switch (list->scrollbar)
             {
                 case SCROLLBAR_OFF:
@@ -787,12 +692,14 @@ static int get_click_location(struct gui_synclist *list, int x, int y)
                     on_scrollbar_clicked = adj_x <= SCROLLBAR_WIDTH;
                     break;
                 case SCROLLBAR_RIGHT:
-                    on_scrollbar_clicked = adj_x > (title->x + title->width - SCROLLBAR_WIDTH);
+                    on_scrollbar_clicked = adj_x > (text->x + text->width - SCROLLBAR_WIDTH);
                     break;
             }
             if (on_scrollbar_clicked)
                 retval = SCROLLBAR;
         }
+
+        /* check the text area */
         if (retval == OUTSIDE)
         {
             text = &list_text[screen];
@@ -805,170 +712,126 @@ static int get_click_location(struct gui_synclist *list, int x, int y)
     return retval;
 }
 
-unsigned gui_synclist_do_touchscreen(struct gui_synclist * list)
+unsigned gui_synclist_do_touchscreen(struct gui_synclist *list)
 {
-    enum screen_type screen;
-    struct viewport *parent;
-    short x, y;
-    int action, adj_x, adj_y, line, line_height, list_start_item;
-    bool recurse;
-    static bool initial_touch = true;
-    static int last_y;
-    
-    screen = SCREEN_MAIN;
-    parent = list->parent[screen];
-    line_height = list->line_height[screen];
-    list_start_item = list->start_item[screen];
-    /* start with getting the action code and finding the click location */
-    action = action_get_touchscreen_press(&x, &y);
-    adj_x = x - parent->x;
-    adj_y = y - parent->y;
+    struct touchevent tevent;
+    struct gesture_event gevent;
 
+    action_get_touch_event(&tevent);
+    if (!action_gesture_get_event(&gevent))
+        return ACTION_NONE;
 
-    /* some defaults before running the state machine */
-    recurse = false;
-    hide_selection = false;
+    const enum screen_type screen = SCREEN_MAIN;
+    struct viewport *list_vp = list->parent[screen];
+    int adj_x = gevent.x - list_vp->x;
+    int adj_y = gevent.y - list_vp->y;
+    int line_height = list->line_height[screen];
+    int start_item = list->start_item[screen];
+    int start_y = start_item * line_height;
+    int action = ACTION_NONE;
+    int click_loc;
 
-    switch (scroll_mode)
+    switch (gevent.id)
     {
-        case SCROLL_NONE:
+    case GESTURE_NONE:
+        if (!action_gesture_is_pressed())
+            break;
+        /* fallthrough */
+
+    case GESTURE_TAP:
+    case GESTURE_LONG_PRESS:
+        _gui_synclist_stop_kinetic_scrolling(list);
+        click_loc = get_click_location(list, gevent.x, gevent.y);
+        if (click_loc & LIST)
         {
-            int click_loc;
-            if (initial_touch)
+            int line;
+            if(!skinlist_get_item(&screens[screen], list, adj_x, adj_y, &line))
             {
-                /* on the first touch last_y has to be reset to avoid
-                 * glitches with touches from long ago */
-                last_y = adj_y;
-                initial_touch = false;
+                line = (adj_y - (start_y - list->y_pos)) / line_height;
+                if (list_display_title(list, screen))
+                    line -= 1;
             }
 
-            line = 0; /* silence gcc 'used uninitialized' warning */
-            click_loc = get_click_location(list, x, y);
-            if (click_loc & LIST)
+            int new_item = start_item + line;
+            if (new_item < list->nb_items)
             {
-                if(!skinlist_get_item(&screens[screen], list, adj_x, adj_y, &line))
-                {
-                    /* selection needs to be corrected if items are only partially visible */
-                    int cur_y = list->start_item[screen] * line_height;
-                    line = (adj_y - (cur_y - list->y_pos)) / line_height;
-                    if (list_display_title(list, screen))
-                        line -= 1; /* adjust for the list title */
-                }
-                if (list_start_item+line >= list->nb_items)
-                    return ACTION_NONE;
-                list->selected_item = list_start_item+line;
-                if(list->selected_size > 1)
-                    list->selected_item -= (list->selected_item % list->selected_size);
+                if (list->selected_size > 1)
+                    new_item -= new_item % list->selected_size;
 
+                list->selected_item = new_item;
                 gui_synclist_speak_item(list);
-            }
-            if (action == BUTTON_TOUCHSCREEN)
-            {
-                /* if not scrolling, the user is trying to select */
-                int diff = adj_y - last_y;
-                if ((click_loc & LIST) && swipe_scroll(list, diff))
-                    scroll_mode = SCROLL_SWIPE;
-                else if (click_loc & SCROLLBAR)
-                    scroll_mode = SCROLL_BAR;
-            }
-            else if (action == BUTTON_REPEAT)
-            {
-                if (click_loc & LIST)
-                {
-                    /* held a single line for a while, bring up the context menu */
-                    gui_synclist_select_item(list, list->selected_item);
-                    /* don't sent context repeatedly */
-                    action_wait_for_release();
-                    initial_touch = true;
-                    return ACTION_STD_CONTEXT;
-                }
-            }
-            else if (action & BUTTON_REL)
-            {
-                initial_touch = true;
-                if (click_loc & LIST)
-                {   /* release on list item enters it */
-                    gui_synclist_select_item(list, list->selected_item);
-                    return ACTION_STD_OK;
-                }
-                else if (click_loc & TITLE_TEXT)
-                {   /* clicking the title goes one level up (cancel) */
-                    return ACTION_STD_CANCEL;
-                }
-                else if (click_loc & TITLE_ICON)
-                {   /* clicking the title icon goes back to the root */
-                    return ACTION_STD_MENU;
-                }
-            }
-            break;
-        }
-        case SCROLL_SWIPE:
-        {
-            /* when swipe scrolling, we accept outside presses as well and
-             * grab the entire screen (i.e. click_loc does not matter) */
-            int diff = adj_y - last_y;
-            hide_selection = true;
-            kinetic_stats_collect(diff);
-            if (swipe_scroll(list, diff))
-            {
-                /* letting the pen go enters kinetic scrolling */
-                if ((action & BUTTON_REL))
-                {
-                    if (kinetic_setup_scroll(list))
-                    {
-                        hide_selection = true;
-                        scroll_mode = SCROLL_KINETIC;
-                    }
-                    else
-                        scroll_mode = SCROLL_NONE;
-                }
-            }
-            else if (action & BUTTON_REL)
-                scroll_mode = SCROLL_NONE;
 
-            if (scroll_mode == SCROLL_NONE)
-                initial_touch = true;
-            break;
-        }
-        case SCROLL_KINETIC:
-        {
-            /* during kinetic scrolling we need to handle cancellation.
-             * This state is actually only entered upon end of it as this
-             * function is not called during the animation. */
-            if (!is_kinetic_over())
-            {   /* a) the user touched the screen (manual cancellation) */
-                kinetic_force_stop();
-                if (get_click_location(list, x, y) & SCROLLBAR)
-                    scroll_mode = SCROLL_BAR;
+                if (gevent.id == GESTURE_TAP)
+                    action = ACTION_STD_OK;
+                else if (gevent.id == GESTURE_LONG_PRESS)
+                    action = ACTION_STD_CONTEXT;
                 else
-                    scroll_mode = SCROLL_SWIPE;
+                    action = ACTION_REDRAW;
             }
-            else
-            {   /* b) kinetic scrolling stopped on its own */
-                /* need to re-run this with SCROLL_NONE since otherwise
-                 * the next touch is not detected correctly */
-                scroll_mode = SCROLL_NONE;
-                recurse = true;
-            }
-            break;
         }
-        case SCROLL_BAR:
+        else if ((click_loc & TITLE) && gevent.id == GESTURE_TAP)
         {
-            hide_selection = true;
-            /* similarly to swipe scroll, using the scrollbar grabs
-             * focus so the click location is irrelevant */
-            scrollbar_scroll(list, y);
-            if (action & BUTTON_REL)
-                scroll_mode = SCROLL_NONE;
-            break;
+            if (click_loc & TITLE_TEXT)
+                action = ACTION_STD_CANCEL;
+            else if (click_loc & TITLE_ICON)
+                action = ACTION_STD_MENU;
         }
+        else if (gevent.id != GESTURE_NONE && (click_loc & SCROLLBAR))
+        {
+            action = scrollbar_scroll(list, gevent.y);
+
+            /* allow long press to become a motion event */
+            if (gevent.id != GESTURE_TAP)
+                break;
+        }
+
+        if (action != ACTION_REDRAW)
+            gui_synclist_select_item(list, list->selected_item);
+        if (gevent.id != GESTURE_NONE)
+            action_gesture_reset();
+        break;
+
+    case GESTURE_DRAGSTART:
+        _gui_synclist_stop_kinetic_scrolling(list);
+        gesture_vel_reset(&list_gvel);
+        list->scroll_base_y = list->y_pos;
+        /* fallthrough */
+
+    case GESTURE_DRAG:
+        gesture_vel_process(&list_gvel, &tevent);
+
+        if (list->scroll_mode == SCROLL_NONE)
+        {
+            click_loc = get_click_location(list, gevent.ox, gevent.oy);
+            if (click_loc & SCROLLBAR)
+                list->scroll_mode = SCROLL_BAR;
+            else if (click_loc & LIST)
+                list->scroll_mode = SCROLL_SWIPE;
+        }
+
+        if (list->scroll_mode == SCROLL_BAR)
+            action = scrollbar_scroll(list, gevent.y);
+        else if (list->scroll_mode == SCROLL_SWIPE)
+            action = swipe_scroll(list, gevent.y - gevent.oy);
+
+        break;
+
+    case GESTURE_RELEASE:
+        if (list->scroll_mode != SCROLL_SWIPE ||
+            !kinetic_start_scrolling(&kinetic, list))
+        {
+            list->scroll_mode = SCROLL_NONE;
+        }
+
+        action_gesture_reset();
+        action = ACTION_REDRAW;
+        break;
+
+    default:
+        break;
     }
 
-    /* register y position unless forcefully reset */
-    if (!initial_touch)
-        last_y = adj_y;
-
-    return recurse ? gui_synclist_do_touchscreen(list) : ACTION_REDRAW;
+    return action;
 }
 
 #endif

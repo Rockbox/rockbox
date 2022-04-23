@@ -163,6 +163,8 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_synclist_init_display_settings(gui_list);
 #ifdef HAVE_TOUCHSCREEN
     gui_list->y_pos = 0;
+    gui_list->scroll_base_y = 0;
+    gui_list->scroll_mode = 0;
 #endif
     FOR_NB_SCREENS(i)
     {

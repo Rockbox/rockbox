@@ -23,6 +23,7 @@
 #define _GUI_LIST_H_
 
 #include "config.h"
+#include "action.h"
 #include "icon.h"
 #include "screen_access.h"
 #include "skin_engine/skin_engine.h"
@@ -155,10 +156,6 @@ struct gui_synclist
     int nb_items;
     int selected_item;
 
-#ifdef HAVE_TOUCHSCREEN
-    /* absolute Y coordinate, used for smooth scrolling */
-    int y_pos;
-#endif
     int start_item[NB_SCREENS]; /* the item that is displayed at the top of the screen */
     /* the number of lines that are selected at the same time */
     int selected_size;
@@ -185,6 +182,12 @@ struct gui_synclist
     struct list_selection_color *selection_color;
 #endif
     struct viewport *parent[NB_SCREENS];
+
+#ifdef HAVE_TOUCHSCREEN
+    int y_pos; /* absolute Y coordinate, used for smooth scrolling */
+    int scroll_base_y; /* used for swipe scrolling */
+    int scroll_mode; /* see apps/gui/bitmap/list.c */
+#endif
 };
 
 
