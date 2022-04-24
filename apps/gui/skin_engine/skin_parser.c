@@ -1284,7 +1284,6 @@ static int parse_progressbar_tag(struct skin_element* element,
         region->allow_while_locked = false;
         region->press_length = PRESS;
         region->last_press = -1;
-        region->armed = false;
         region->bar = PTRTOSKINOFFSET(skin_buffer, pb);
         region->label = PTRTOSKINOFFSET(skin_buffer, NULL);
 
@@ -1781,13 +1780,13 @@ static int parse_touchregion(struct skin_element *element,
     p++;
 
     region->wvp = PTRTOSKINOFFSET(skin_buffer, curr_vp);
-    region->armed = false;
     region->reverse_bar = false;
     region->value = 0;
     region->last_press = -1;
     region->press_length = PRESS;
     region->allow_while_locked = false;
     region->bar = PTRTOSKINOFFSET(skin_buffer, NULL);
+
     action = get_param_text(element, p++);
 
     /* figure out the action */

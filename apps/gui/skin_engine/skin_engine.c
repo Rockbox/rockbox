@@ -119,6 +119,7 @@ static void gui_skin_reset(struct gui_skin *skin)
     skin->data.tree = -1;
 #ifdef HAVE_TOUCHSCREEN
     skin->data.touchregions = -1;
+    gesture_reset(&skin->data.gesture);
 #endif
 #ifdef HAVE_SKIN_VARIABLES
     skin->data.skinvars = -1;

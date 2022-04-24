@@ -27,6 +27,7 @@
 
 #include "tag_table.h"
 #include "skin_parser.h"
+#include "gesture.h"
 #ifndef __PCTOOL__
 #include "core_alloc.h"
 #endif
@@ -218,8 +219,6 @@ struct touchregion {
     int16_t hpad;          /* padding to height */
     bool reverse_bar;        /* if true 0% is the left or top */
     bool allow_while_locked;
-    bool armed;              /* A region is armed on press. Only armed regions are triggered
-                                on repeat or release. */
     enum {
         PRESS,               /* quick press only */
         LONG_PRESS,          /* Long press without repeat */
@@ -371,6 +370,7 @@ struct wps_data
 #ifdef HAVE_TOUCHSCREEN
     bool touchscreen_locked;
     OFFSETTYPE(struct skin_token_list *) touchregions;
+    struct gesture gesture;
 #endif
 #ifdef HAVE_ALBUMART
     OFFSETTYPE(struct skin_albumart *) albumart;
