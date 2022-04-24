@@ -1287,6 +1287,7 @@ static int parse_progressbar_tag(struct skin_element* element,
         region->last_press = -1;
         region->armed = false;
         region->bar = PTRTOSKINOFFSET(skin_buffer, pb);
+        region->label = PTRTOSKINOFFSET(skin_buffer, NULL);
 
         item = new_skin_token_list_item(NULL, region);
         if (!item)
