@@ -74,6 +74,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #include "thread.h"
 #include "button.h"
 #include "action.h"
+#include "gesture.h"
 #include "load_code.h"
 #include "usb.h"
 #include "font.h"
@@ -996,6 +997,24 @@ struct plugin_api {
     bool (*yesno_pop_confirm)(const char* text);
 #ifdef USB_ENABLE_AUDIO
     bool (*usb_audio_get_playing)(void);
+#endif
+#ifdef HAVE_TOUCHSCREEN
+    int (*action_get_touch_event)(struct touchevent *ev);
+    void (*action_gesture_reset)(void);
+    bool (*action_gesture_get_event_in_vp)(struct gesture_event *gevt,
+                                           const struct viewport *vp);
+    bool (*action_gesture_get_event)(struct gesture_event *gevt);
+    bool (*action_gesture_is_valid)(void);
+    bool (*action_gesture_is_pressed)(void);
+    void (*gesture_reset)(struct gesture *g);
+    void (*gesture_process)(struct gesture *g, const struct touchevent *ev);
+    bool (*gesture_get_event_in_vp)(struct gesture *g,
+                                    struct gesture_event *gevt,
+                                    const struct viewport *vp);
+    void (*gesture_vel_reset)(struct gesture_vel *gv);
+    void (*gesture_vel_process)(struct gesture_vel *gv,
+                                const struct touchevent *ev);
+    bool (*gesture_vel_get)(struct gesture_vel *gv, int *xvel, int *yvel);
 #endif
 };
 

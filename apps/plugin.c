@@ -852,6 +852,20 @@ static const struct plugin_api rockbox_api = {
 #ifdef USB_ENABLE_AUDIO
     usb_audio_get_playing,
 #endif
+#ifdef HAVE_TOUCHSCREEN
+    action_get_touch_event,
+    action_gesture_reset,
+    action_gesture_get_event_in_vp,
+    action_gesture_get_event,
+    action_gesture_is_valid,
+    action_gesture_is_pressed,
+    gesture_reset,
+    gesture_process,
+    gesture_get_event_in_vp,
+    gesture_vel_reset,
+    gesture_vel_process,
+    gesture_vel_get,
+#endif
 };
 
 static int plugin_buffer_handle;
