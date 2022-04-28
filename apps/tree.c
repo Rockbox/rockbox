@@ -686,7 +686,11 @@ static int dirbrowse(void)
                         return GO_TO_FM;
 #endif
                     case GO_TO_ROOT: exit_func = true; break;
-                    default: break;
+                    default:
+                        if (*tc.dirfilter == SHOW_CFG) /* theme changed */
+                            gui_synclist_init_display_settings(&tree_lists);
+
+                        break;
                 }
                 restore = true;
                 break;
