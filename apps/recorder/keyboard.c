@@ -1398,6 +1398,7 @@ static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
 
     if (!global_settings.list_wraparound)
     {
+#if 0  /* edit line below picker */
         if (pm->y >= pm->lines)
         {
             pm->y = pm->lines;
@@ -1407,7 +1408,22 @@ static void kbd_move_picker_vertical(struct keyboard_parameters *pm,
             pm->y = 0;
         else if (pm->line_edit)
             pm->line_edit = false;
-
+#else /* edit line above picker */
+        if (pm->y >= pm->lines)
+        {
+            pm->y = pm->lines;
+        }
+        else if (pm->y < 0)
+        {
+            pm->line_edit = true;
+            pm->y = 0;
+        }
+        else if (pm->line_edit)
+        {
+            pm->line_edit = false;
+            pm->y = 0;
+        }
+#endif
         return;
     }
 
