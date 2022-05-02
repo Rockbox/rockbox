@@ -223,7 +223,8 @@ static int move_callback(int handle, void* current, void* new)
             {
                 for(int l = 0; l < mentry->si.clause_count[k]; l++)
                 {
-                    UPDATE(mentry->si.clause[k][l]->str, diff);
+                    if(mentry->si.clause[k][l]->str)
+                        UPDATE(mentry->si.clause[k][l]->str, diff);
                     UPDATE(mentry->si.clause[k][l], diff);
                 }
             }
@@ -702,7 +703,7 @@ static int get_condition(struct search_instruction *inst)
         return -2;
     }
 
-    new_clause = tagtree_alloc(sizeof(struct tagcache_search_clause));
+    new_clause = tagtree_alloc0(sizeof(struct tagcache_search_clause));
     if (!new_clause)
     {
         logf("tagtree failed to allocate %s", "search clause");
