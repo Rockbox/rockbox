@@ -222,6 +222,8 @@ static int op_get_entry(uint32_t hash, int32_t lang_id,
         logf("OP get_entry hash: %x lang id: %d db: %s", hash, lang_id, dat_file);
 
         int fd = open(dat_file, O_RDONLY);
+        if(fd < 0)
+            return OPEN_PLUGIN_NOT_FOUND;
         opret = op_find_entry(fd, entry, hash, lang_id);
         close(fd);
     }
