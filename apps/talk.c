@@ -552,8 +552,8 @@ alloc_err:
 }
 static inline int load_voicefile_failure(int fd)
 {
-    /*if (fd >= 0) probably redundant */
-    close(fd);
+    if (fd >= 0)
+        close(fd);
     return -1;
 }
 /* load the voice file into the mp3 buffer */
@@ -829,7 +829,7 @@ void talk_init(void)
      * and so we can re-use it if it's already allocated in any event */
 
     filehandle = open_voicefile();
-    if (filehandle > -1)
+    if (filehandle >= 0)
     {
         if (!load_voicefile_index(filehandle))
         {
@@ -880,7 +880,8 @@ void talk_init(void)
         voice_thread_init();
 
 out:
-    close(filehandle); /* close again, this was just to detect presence */
+    if (filehandle >= 0)
+        close(filehandle); /* close again, this was just to detect presence */
 }
 
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
