@@ -523,19 +523,18 @@ static void chopAddBlock(int x,int y,int sx,int sy, int indexOverride)
 
 static void chopAddParticle(int x,int y,int sx,int sy)
 {
-    int i=0;
-
-    while(mParticles[i].bIsActive && i < NUMBER_OF_PARTICLES)
-        i++;
-
-    if(i==NUMBER_OF_PARTICLES)
-        return;
-
-    mParticles[i].bIsActive = 1;
-    mParticles[i].iWorldX = x;
-    mParticles[i].iWorldY = y;
-    mParticles[i].iSpeedX = sx;
-    mParticles[i].iSpeedY = sy;
+    for(int i = 0; i < NUMBER_OF_PARTICLES; ++i)
+    {
+        if(!mParticles[i].bIsActive)
+        {
+            mParticles[i].bIsActive = 1;
+            mParticles[i].iWorldX = x;
+            mParticles[i].iWorldY = y;
+            mParticles[i].iSpeedX = sx;
+            mParticles[i].iSpeedY = sy;
+            return;
+        }
+    }
 }
 
 static void chopGenerateBlockIfNeeded(void)
