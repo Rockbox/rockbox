@@ -2258,17 +2258,12 @@ static int tempbuf_sort(int fd)
         while (idlist->next != NULL)
             idlist = idlist->next;
 
+        ALIGN_BUFFER(tempbuf_pos, tempbuf_left, alignof(struct tempbuf_id_list));
         tempbuf_left -= sizeof(struct tempbuf_id_list);
-        if (tempbuf_left - 4 < 0)
+        if (tempbuf_left < 0)
             return -1;
 
         idlist->next = (struct tempbuf_id_list *)&tempbuf[tempbuf_pos];
-        if (tempbuf_pos & 0x03)
-        {
-            tempbuf_pos = (tempbuf_pos & ~0x03) + 0x04;
-            tempbuf_left -= 3;
-            idlist->next = (struct tempbuf_id_list *)&tempbuf[tempbuf_pos];
-        }
         tempbuf_pos += sizeof(struct tempbuf_id_list);
 
         idlist = idlist->next;

@@ -80,8 +80,8 @@ void* skin_buffer_alloc(size_t size)
 {
     void *retval = NULL;
 #endif
-    /* 32-bit aligned */
-    size = (size + 3) & ~3;
+    /* align to long which is enough for most types */
+    size = (size + sizeof(long) - 1) & ~(sizeof(long) - 1);
     if (size > skin_buffer_freespace())
     {
         skin_error(MEMORY_LIMIT_EXCEEDED, NULL);

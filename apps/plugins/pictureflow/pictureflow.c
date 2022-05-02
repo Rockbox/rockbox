@@ -1303,9 +1303,8 @@ static int build_artist_index(struct tagcache_search *tcs,
     if (res < SUCCESS)
         return res;
 
-    ALIGN_BUFFER(*buf, *bufsz, 4);
-
     /* finalize the artist index */
+    ALIGN_BUFFER(*buf, *bufsz, alignof(struct artist_data));
     tmp_artist = (struct artist_data*)*buf;
     for (i = pf_idx.artist_ct - 1; i >= 0; i--)
         tmp_artist[i] = pf_idx.artist_index[-i];
@@ -1313,7 +1312,6 @@ static int build_artist_index(struct tagcache_search *tcs,
     pf_idx.artist_index = tmp_artist;
     /* move buf ptr to end of artist_index */
     *buf = pf_idx.artist_index + pf_idx.artist_ct;
-    ALIGN_BUFFER(*buf, *bufsz, 4);
 
     if (res == SUCCESS)
     {
@@ -1384,14 +1382,14 @@ static int create_album_index(void)
     int i, j, last, final, retry, res;
 
     draw_splashscreen(buf, buf_size);
-    ALIGN_BUFFER(buf, buf_size, 4);
+    ALIGN_BUFFER(buf, buf_size, sizeof(long));
 
-/* Artists */
+    /* Artists */
     res = build_artist_index(&tcs, &buf, &buf_size);
     if (res < SUCCESS)
         return res;
 
-/* Albums */
+    /* Albums */
     pf_idx.album_ct = 0;
     pf_idx.album_len =0;
     pf_idx.album_untagged_idx = 0;
@@ -1407,7 +1405,6 @@ static int create_album_index(void)
     rb->tagcache_search_finish(&tcs);
     if (res < SUCCESS)
         return res;
-    ALIGN_BUFFER(buf, buf_size, 4);
 
     /* Build artist list for untagged albums */
     res = create_album_untagged(&tcs, &buf, &buf_size);
@@ -1415,9 +1412,8 @@ static int create_album_index(void)
     if (res < SUCCESS)
         return res;
 
-    ALIGN_BUFFER(buf, buf_size, 4);
-
     /* finalize the album index */
+    ALIGN_BUFFER(buf, buf_size, alignof(struct album_data));
     tmp_album = (struct album_data*)buf;
     for (i = pf_idx.album_ct - 1; i >= 0; i--)
         tmp_album[i] = pf_idx.album_index[-i];
@@ -1425,9 +1421,8 @@ static int create_album_index(void)
     pf_idx.album_index = tmp_album;
     /* move buf ptr to end of album_index */
     buf = pf_idx.album_index + pf_idx.album_ct;
-    ALIGN_BUFFER(buf, buf_size, 4);
 
-/* Assign indices */
+    /* Assign indices */
     draw_splashscreen(buf, buf_size);
     draw_progressbar(0, pf_idx.album_ct, "Assigning Albums");
     for (j = 0; j < pf_idx.album_ct; j++)
@@ -1541,7 +1536,6 @@ retry_artist_lookup:
         }
     }
 
-    ALIGN_BUFFER(buf, buf_size, 4);
     pf_idx.buf = buf;
     pf_idx.buf_sz = buf_size;
     pf_idx.artist_index = 0;
@@ -1618,7 +1612,6 @@ static int load_album_index(void){
 
                 //rb->lseek(fr, sizeof(data) + 1, SEEK_SET);
                 /* artist names */
-                ALIGN_BUFFER(buf, buf_size, 4);
                 if (read2buf(fr, buf, data.artist_len) == 0)
                     goto failure;
 
@@ -1627,7 +1620,6 @@ static int load_album_index(void){
                 buf_size -= data.artist_len;
 
                 /* album names */
-                ALIGN_BUFFER(buf, buf_size, 4);
                 if (read2buf(fr, buf, data.album_len) == 0)
                     goto failure;
 
@@ -1636,7 +1628,6 @@ static int load_album_index(void){
                 buf_size -= data.album_len;
 
                 /* index of album names */
-                ALIGN_BUFFER(buf, buf_size, 4);
                 if (read2buf(fr, buf, album_idx_sz) == 0)
                     goto failure;
 
@@ -4286,8 +4277,6 @@ static int pictureflow_main(const char* selected_file)
     init_scroll_lines();
     init_reflect_table();
 
-    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
-
     /*Scan will trigger when no file is found or the option was activated*/
     if ((pf_cfg.cache_version != CACHE_VERSION)||(load_album_index() < 0)){
         rb->splash(HZ/2,"Creating index, please wait");
@@ -4312,23 +4301,20 @@ static int pictureflow_main(const char* selected_file)
         return PLUGIN_ERROR;
     }
 
-    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
-    number_of_slides  = pf_idx.album_ct;
+    number_of_slides = pf_idx.album_ct;
 
-    size_t aa_bufsz = ALIGN_DOWN(pf_idx.buf_sz / 4, 0x4);
-
+    size_t aa_bufsz = pf_idx.buf_sz / 4 + sizeof(long) - 1;
     if (aa_bufsz < DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(pix_t))
     {
         error_wait("Not enough memory for album art cache");
         return PLUGIN_ERROR;
     }
 
-    pf_idx.buf_sz -= aa_bufsz;
-    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
+    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, sizeof(long));
     aa_cache.buf = (char*) pf_idx.buf;
     aa_cache.buf_sz = aa_bufsz;
     pf_idx.buf += aa_bufsz;
-    ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, 4);
+    pf_idx.buf_sz -= aa_bufsz;
 
     if (!create_empty_slide(pf_cfg.cache_version != CACHE_VERSION)) {
         config_save(CACHE_REBUILD);
