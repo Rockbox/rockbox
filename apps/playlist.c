@@ -2040,7 +2040,7 @@ void playlist_init(void)
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
     handle = core_alloc_ex("playlist idx",
-                                playlist->max_playlist_size * sizeof(int), &ops);
+                           playlist->max_playlist_size * sizeof(*playlist->indices), &ops);
     playlist->indices = core_get_data(handle);
     playlist->buffer_size =
         AVERAGE_FILENAME_LENGTH * global_settings.max_files_in_dir;
@@ -2981,7 +2981,7 @@ int playlist_set_current(struct playlist_info* playlist)
     if (playlist->indices && playlist->indices != current_playlist.indices)
     {
         memcpy((void*)current_playlist.indices, (void*)playlist->indices,
-               playlist->max_playlist_size*sizeof(int));
+               playlist->max_playlist_size*sizeof(*playlist->indices));
 #ifdef HAVE_DIRCACHE
         copy_filerefs(current_playlist.dcfrefs, playlist->dcfrefs,
                       playlist->max_playlist_size);
