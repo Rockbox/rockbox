@@ -41,7 +41,6 @@
 #define MAX_INPUTCOUNT       512 /* Max input count so dst doesn't overflow */
 #define FIXED_BUFCOUNT      3072 /* 48KHz factor 3.0 */
 #define FIXED_OUTBUFCOUNT   4096
-#define NBUFFERS 4
 
 enum tdspeed_ops
 {
@@ -65,9 +64,9 @@ static struct tdspeed_state_s
     int32_t *ovl_buff[2];   /* overlap buffer (L+R) */
 } tdspeed_state;
 
-static int32_t *buffers[NBUFFERS] = { NULL, NULL, NULL, NULL };
+static int32_t *buffers[TDSPEED_NBUFFERS] = { NULL, NULL, NULL, NULL };
 
-static const int buffer_sizes[NBUFFERS] =
+static const int buffer_sizes[TDSPEED_NBUFFERS] =
 {
     FIXED_BUFCOUNT * sizeof(int32_t),
     FIXED_BUFCOUNT * sizeof(int32_t),
@@ -552,7 +551,7 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
         break;
 
     case DSP_PROC_INIT:
-        if (!tdspeed_alloc_buffers(buffers, buffer_sizes, NBUFFERS))
+        if (!tdspeed_alloc_buffers(buffers, buffer_sizes, TDSPEED_NBUFFERS))
             return -1; /* fail the init */
 
         st->this = this;
@@ -564,7 +563,7 @@ static intptr_t tdspeed_configure(struct dsp_proc_entry *this,
         st->this = NULL;
         st->factor = PITCH_SPEED_100;
         dsp_outbuf.remcount = 0;
-        tdspeed_free_buffers(buffers, NBUFFERS);
+        tdspeed_free_buffers(buffers, TDSPEED_NBUFFERS);
         break;
 
     case DSP_PROC_NEW_FORMAT:

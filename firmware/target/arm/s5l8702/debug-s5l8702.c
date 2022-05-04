@@ -104,7 +104,7 @@ bool dbg_hw_info(void)
             _DEBUG_PRINTF("PMU:");
             for(i=0;i<7;i++)
             {
-                char *device[] = {"unknown",
+                static const char *const device[] = {"unknown",
                                   "unknown",
                                   "LCD",
                                   "AUDIO",
@@ -157,7 +157,7 @@ bool dbg_hw_info(void)
                 char line_cfg[4];
                 int abr_stat;
                 uint32_t abr_cnt;
-                char *abrstatus[] = {"Idle", "Launched", "Counting", "Abnormal"};
+                static const char * const abrstatus[] = {"Idle", "Launched", "Counting", "Abnormal"};
 
                 uartc_port_get_line_info(&ser_port,
                             &tx_stat, &rx_stat, &tx_speed, &rx_speed, line_cfg);

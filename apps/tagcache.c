@@ -137,7 +137,7 @@ static int tempbuf_handle;
     (1LU << tag_virt_canonicalartist))
 
 /* String presentation of the tags defined in tagcache.h. Must be in correct order! */
-static const char *tags_str[] = { "artist", "album", "genre", "title",
+static const char * const tags_str[] = { "artist", "album", "genre", "title",
     "filename", "composer", "comment", "albumartist", "grouping", "year",
     "discnumber", "tracknumber", "canonicalartist", "bitrate", "length",
     "playcount", "rating", "playtime", "lastplayed", "commitid", "mtime",
@@ -151,7 +151,7 @@ static const char *tags_str[] = { "artist", "album", "genre", "title",
     "tag_virt_entryage", "tag_virt_autoscore"
 };
 /* more debug strings */
-static const char *tag_type_str[] = {
+static const char * const tag_type_str[] = {
     [clause_none] = "clause_none", [clause_is] = "clause_is",
     [clause_is_not] = "clause_is_not", [clause_gt] = "clause_gt",
     [clause_gteq] = "clause_gteq", [clause_lt] = "clause_lt",

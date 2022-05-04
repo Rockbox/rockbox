@@ -189,7 +189,7 @@ static short balance_mem[BAL_MEM_SIZE];
 #define AGC_MODE_SIZE 5
 #define AGC_SAFETY_MODE 0
 
-static const char* agc_preset_str[] =
+static const char* const agc_preset_str[] =
 { "Off", "S", "L", "D", "M", "V" };
 /*  "Off",
     "Safety (clip)",

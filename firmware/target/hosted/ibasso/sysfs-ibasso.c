@@ -32,7 +32,7 @@
 #include "sysfs-ibasso.h"
 
 
-static const char* SYSFS_PATHS[] =
+static const char* const SYSFS_PATHS[] =
 {
     /* SYSFS_DX50_CODEC_VOLUME */
     "/dev/codec_volume",

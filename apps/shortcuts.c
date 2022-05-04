@@ -312,7 +312,7 @@ static int readline_cb(int n, char *buf, void *parameters)
     }
     else if (sc && settings_parseline(buf, &name, &value))
     {
-        static const char *nm_options[] = {"type", "name", "data",
+        static const char * const nm_options[] = {"type", "name", "data",
                                         "icon", "talkclip", NULL};
         int nm_op = string_option(name, nm_options, false);
 

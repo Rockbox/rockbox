@@ -601,7 +601,7 @@ static int parse_viewporttextstyle(struct skin_element *element,
     *line = (struct line_desc)LINE_DESC_DEFINIT;
     unsigned colour;
 
-    static const char *vp_options[] = { "invert", "color", "colour",
+    static const char * const vp_options[] = { "invert", "color", "colour",
                                  "clear", "gradient", NULL};
 
     int vp_op = string_option(mode, vp_options, false);
@@ -1401,7 +1401,7 @@ static int parse_skinvar(  struct skin_element *element,
             return 0;
         case SKIN_TOKEN_VAR_SET:
         {
-            static const char *sv_options[] = {"touch", "set", "inc", "dec", NULL};
+            static const char * const sv_options[] = {"touch", "set", "inc", "dec", NULL};
 
             struct skin_var_changer *data = skin_buffer_alloc(sizeof(*data));
             if (!data)
@@ -1705,7 +1705,7 @@ static int parse_touchregion(struct skin_element *element,
         if (region->action == ACTION_NONE)
             return WPS_ERROR_INVALID_PARAM;
     }
-    static const char *pm_options[] = {"allow_while_locked", "reverse_bar",
+    static const char * const pm_options[] = {"allow_while_locked", "reverse_bar",
                                 "repeat_press", "long_press", NULL};
     int pm_op;
 

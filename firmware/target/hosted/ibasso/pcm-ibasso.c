@@ -123,7 +123,7 @@ static void* pcm_thread_run(void* nothing)
 
 /* https://github.com/tinyalsa/tinyalsa/blob/master/tinypcminfo.c */
 
-static const char* format_lookup[] =
+static const char* const format_lookup[] =
 {
     /*[0] =*/ "S8",
     "U8",

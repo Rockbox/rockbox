@@ -940,8 +940,8 @@ bool dbg_hw_info_emi(void)
 
 bool dbg_hw_info_audio(void)
 {
-    static const char *hp_sel[2] = {"DAC", "Line1"};
-    static const char *mux_sel[4] = {"Mic", "Line1", "HP", "Line2"};
+    static const char * const hp_sel[2] = {"DAC", "Line1"};
+    static const char * const mux_sel[4] = {"Mic", "Line1", "HP", "Line2"};
     lcd_setfont(FONT_SYSFIXED);
 
     while(1)
@@ -1171,7 +1171,7 @@ bool dbg_hw_info_button(void)
             }
             else if(MAP[i].periph == IMX233_BUTTON_LRADC)
             {
-                static const char *op_name[] =
+                static const char * const op_name[] =
                 {
                     [IMX233_BUTTON_EQ] = "eq",
                     [IMX233_BUTTON_GT] = "gt",

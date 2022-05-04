@@ -63,8 +63,8 @@ void usb_enable(bool on)
 */
 int disk_mount_all(void)
 {
-    const char *dev[] = {"/dev/mmcblk0p1", "/dev/mmcblk0"};
-    const char *fs[] = {"vfat", "exfat"};
+    const char * const dev[] = {"/dev/mmcblk0p1", "/dev/mmcblk0"};
+    const char * const fs[] = {"vfat", "exfat"};
 
     sysfs_set_string("/sys/class/android_usb/android0/f_mass_storage/lun/file", "");
 

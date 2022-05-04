@@ -1395,7 +1395,7 @@ int split_string(char *str, const char split_char, char *vector[], const int vec
 /* returns match index from option list
  * returns -1 if option was not found
  * option list is array of char pointers with the final item set to null
- * ex - const char *option[] = { "op_a", "op_b", "op_c", NULL}
+ * ex - const char * const option[] = { "op_a", "op_b", "op_c", NULL}
  */
 int string_option(const char *option, const char *const oplist[], bool ignore_case)
 {

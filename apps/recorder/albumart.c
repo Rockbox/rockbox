@@ -98,7 +98,7 @@ static void fix_path_part(char* path, int offset, int count)
 }
 
 #ifdef USE_JPEG_COVER
-static const char * extensions[] = { "jpeg", "jpg", "bmp" };
+static const char * const extensions[] = { "jpeg", "jpg", "bmp" };
 static const unsigned char extension_lens[] = { 4, 3, 3 };
 /* Try checking for several file extensions, return true if a file is found and
  * leaving the path modified to include the matching extension.
