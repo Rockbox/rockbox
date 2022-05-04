@@ -59,18 +59,12 @@ static struct buflib_callbacks ops =
 /* Allocate timestretch buffers */
 bool tdspeed_alloc_buffers(int32_t **buffers, const int *buf_s, int nbuf)
 {
-    static const char *buffer_names[4] = {
-        "tdspeed ovl L",
-        "tdspeed ovl R",
-        "tdspeed out L",
-        "tdspeed out R"
-    };
-
+    /*  #Buffer index - 0 ovl L, 1 ovl R, 2 out L, 3 out R */
     for (int i = 0; i < nbuf; i++)
     {
         if (handles[i] <= 0)
         {
-            handles[i] = core_alloc_ex(buffer_names[i], buf_s[i], &ops);
+            handles[i] = core_alloc_ex("tdspeed", buf_s[i], &ops);
 
             if (handles[i] <= 0)
                 return false;
