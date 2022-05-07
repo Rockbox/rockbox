@@ -4303,7 +4303,7 @@ static int pictureflow_main(const char* selected_file)
 
     number_of_slides = pf_idx.album_ct;
 
-    size_t aa_bufsz = pf_idx.buf_sz / 4 + sizeof(long) - 1;
+    size_t aa_bufsz = ALIGN_DOWN(pf_idx.buf_sz / 4, sizeof(long));
     if (aa_bufsz < DISPLAY_WIDTH * DISPLAY_HEIGHT * sizeof(pix_t))
     {
         error_wait("Not enough memory for album art cache");
@@ -4313,6 +4313,7 @@ static int pictureflow_main(const char* selected_file)
     ALIGN_BUFFER(pf_idx.buf, pf_idx.buf_sz, sizeof(long));
     aa_cache.buf = (char*) pf_idx.buf;
     aa_cache.buf_sz = aa_bufsz;
+
     pf_idx.buf += aa_bufsz;
     pf_idx.buf_sz -= aa_bufsz;
 
