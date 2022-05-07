@@ -1628,6 +1628,7 @@ static int load_album_index(void){
                 buf_size -= data.album_len;
 
                 /* index of album names */
+                ALIGN_BUFFER(buf, buf_size, alignof(struct album_data));
                 if (read2buf(fr, buf, album_idx_sz) == 0)
                     goto failure;
 
