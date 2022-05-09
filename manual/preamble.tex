@@ -20,7 +20,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass[a4paper,11pt,hyphens]{scrreprt}
-\usepackage[utf8]{inputenx}
+\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 % load ix-utf8enc.dfu to get additional characters from the inputenx package.
 \makeatletter\input{ix-utf8enc.dfu}\makeatother
@@ -126,7 +126,7 @@
 %% \newenvironment{example}
 %%     {\stepcounter{example}\paragraph{Example \theexample:}}
 %%     {\hfill$\Box$
-    
+
 %%     \bigskip
 %%     \noindent}
 
@@ -146,7 +146,7 @@
 \long\gdef\nil#1{\IfN@Ught#1* {#1}!}% if null
 \long\gdef\IfN@Ught#1 #2!{\blank{#2}}
 \long\gdef\Ifbl@nk#1#2Q#3!{\ifx#3}% same as above
-} 
+}
 
 % environment for setting the changelog.
 \newenvironment{changelog}%
@@ -262,7 +262,7 @@
 % B1 & B2\\
 % C1 & C2\\
 % \end{rbtabular}
-%    
+%
 \newenvironment{rbtabular}[5]{%
   \rowcolors{2}{tbloddrowbgcolor}{tblevenrowbgcolor}
   \expandafter\let\expandafter\SavedEndTab\csname endtabular*\endcsname
@@ -317,7 +317,7 @@
 
 % set link to download server
 % Usage: \download{bootloader/bootloader-ipodnano.ipod}
-%        gets expanded to 
+%        gets expanded to
 %        "https://download.rockbox.org/bootloader/bootloader-ipodnano.ipod"
 \newcommand{\download}[1]{\url{https://download.rockbox.org/#1}}
 

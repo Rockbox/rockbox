@@ -19,10 +19,10 @@ Albums can be sorted by:
 PictureFlow uses both the album art (see \reference{ref:album_art}) and
 database (see \reference{ref:database}) features of Rockbox.
 These need to be working correctly before PictureFlow can be used.
-{\bf PictureFlow does not support embedded album art.}
+\textbf{PictureFlow does not support embedded album art.}
 
 \opt{tc_ramcache}{\note{It is strongly recommended you enable the database's "Load to RAM" feature
-(and restart your player afterwards)! See \reference{ref:databasemenu}. This will {\bf vastly} speed up
+(and restart your player afterwards)! See \reference{ref:databasemenu}. This will \textbf{vastly} speed up
 building the album index as well as loading of track titles when browsing albums.}}
 
 \opt{dircache}{\note{Enabling the disk's directory cache – see \reference{ref:dircache} – noticeably
@@ -57,7 +57,7 @@ reduces the time it takes for cover art to be displayed.}}
         % only scroll wheel and `strip' targets use the same action in album and track list
         \nopt{scrollwheel,IRIVER_H10_PAD,PBELL_VIBE500_PAD,MPIO_HD300_PAD}{%
             % currently the M3 does not use buttons of the main unit which has no display
-            \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,touchscreen}{\ButtonLeft{} / \ButtonRight}
+            \nopt{IAUDIO_M3_PAD,MPIO_HD200_PAD,touchscreen}{\ButtonLeft{} / \ButtonRight{}}
             \opt{MPIO_HD200_PAD}{FIXME}
             \opt{touchscreen}{\TouchMidLeft{} / \TouchMidRight}
                 &
@@ -79,7 +79,7 @@ reduces the time it takes for cover art to be displayed.}}
         }
 
         \opt{FIIO_M3K_PAD}{
-                \ButtonLeft{} / \ButtonRight
+                \ButtonLeft{} / \ButtonRight{}
                 &
                 \opt{HAVEREMOTEKEYMAP}{&}
                 Quickly jump to another album (alphabetically or by year) /
@@ -87,7 +87,7 @@ reduces the time it takes for cover art to be displayed.}}
                 \\
         }
         \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
-                \ButtonLeft{} / \ButtonRight
+                \ButtonLeft{} / \ButtonRight{}
                 &
                 \opt{HAVEREMOTEKEYMAP}{&}
                 Quickly jump to another album (alphabetically or by year)
@@ -104,7 +104,7 @@ reduces the time it takes for cover art to be displayed.}}
         \nopt{IAUDIO_M3_PAD}{%
             \nopt{IRIVER_H10_PAD,touchscreen,PBELL_VIBE500_PAD%
                  ,SANSA_FUZE_PAD,MPIO_HD200_PAD,MPIO_HD300_PAD,SAMSUNG_YH92X_PAD%
-                 ,SAMSUNG_YH820_PAD}
+                 ,SAMSUNG_YH820_PAD,XDUOO_X3_PAD}
                  {\ButtonSelect}
             \opt{IRIVER_H10_PAD,PBELL_VIBE500_PAD}{\ButtonRight}
             \opt{SAMSUNG_YH92X_PAD,SAMSUNG_YH820_PAD}{\ButtonFF}
@@ -112,6 +112,7 @@ reduces the time it takes for cover art to be displayed.}}
             \opt{SANSA_FUZE_PAD}{\ButtonRight}
             \opt{MPIO_HD200_PAD}{\ButtonFunc}
             \opt{MPIO_HD300_PAD}{\ButtonEnter}
+            \opt{XDUOO_X3_PAD}{\ButtonPlay}
         }
             &
         \opt{HAVEREMOTEKEYMAP}{
