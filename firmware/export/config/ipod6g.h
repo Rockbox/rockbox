@@ -133,11 +133,9 @@
 /* Define this if you have a software controlled poweroff */
 #define HAVE_SW_POWEROFF
 
-/* The number of bytes reserved for loadable codecs */
-#define CODEC_SIZE 0x100000
-
-/* The number of bytes reserved for loadable plugins */
-#define PLUGIN_BUFFER_SIZE 0x80000
+/* Buffer for plugins and codecs. */
+#define PLUGIN_BUFFER_SIZE  0x200000 /* 2 MiB */
+#define CODEC_SIZE          0x100000 /* 1 MiB */
 
 /* 6g has a standard battery of 550mAh, except for the thick 6g (2007 160gb)
  * which has a standard battery of 850mAh.
