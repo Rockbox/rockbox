@@ -268,7 +268,6 @@ typedef fb_data pix_t;
 
 /* some magic numbers for cache_version. */
 #define CACHE_REBUILD   0
-#define CACHE_UPDATE    1
 
 /* Error return values */
 #define SUCCESS              0
@@ -306,6 +305,8 @@ struct pf_config_t
 
      bool resize;
      bool show_fps;
+
+     bool update_albumart;
 };
 
 struct pf_index_t {
@@ -511,6 +512,7 @@ static struct configdata config[] =
     { TYPE_ENUM, 0, 2, { .int_p = &pf_cfg.year_sort_order }, "year order",
       year_sort_order_conf },
     { TYPE_BOOL, 0, 1, { .bool_p = &pf_cfg.show_year }, "show year", NULL },
+    { TYPE_BOOL, 0, 1, { .bool_p = &pf_cfg.update_albumart }, "update albumart", NULL }
 };
 
 #define CONFIG_NUM_ITEMS (sizeof(config) / sizeof(struct configdata))
@@ -667,9 +669,10 @@ static bool confirm_quit(void)
         return true;
 }
 
-static void config_save(int cache_version)
+static void config_save(int cache_version, bool update_albumart)
 {
     pf_cfg.cache_version = cache_version;
+    pf_cfg.update_albumart = update_albumart;
     configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
 }
 
@@ -684,12 +687,13 @@ static void config_set_defaults(struct pf_config_t *cfg)
      cfg->last_album = 0;
      cfg->backlight_mode = 0;
      cfg->resize = true;
-     cfg->cache_version = 0;
+     cfg->cache_version = CACHE_REBUILD;
      cfg->show_album_name = (LCD_HEIGHT > 100)
         ? ALBUM_NAME_TOP : ALBUM_NAME_BOTTOM;
      cfg->sort_albums_by = SORT_BY_ARTIST_AND_NAME;
      cfg->year_sort_order = ASCENDING;
      cfg->show_year = false;
+     cfg->update_albumart = false;
 }
 
 static inline PFreal fmul(PFreal a, PFreal b)
@@ -2250,8 +2254,6 @@ static bool incremental_albumart_cache(bool verbose)
     unsigned int hash_artist, hash_album;
     unsigned int format = FORMAT_NATIVE;
 
-    bool update = (pf_cfg.cache_version == CACHE_UPDATE);
-
     if (pf_cfg.resize)
         format |= FORMAT_RESIZE|FORMAT_KEEP_ASPECT;
 
@@ -2263,8 +2265,6 @@ static bool incremental_albumart_cache(bool verbose)
     aa_cache.inspected++;
     if (aa_cache.idx >= pf_idx.album_ct) { aa_cache.idx = 0; } /* Rollover */
 
-    if (!get_albumart_for_index_from_db(idx, aa_cache.file, sizeof(aa_cache.file)))
-        goto aa_failure; //rb->strcpy(aa_cache.file, EMPTY_SLIDE_BMP);
 
     hash_artist = mfnv(get_album_artist(idx));
     hash_album = mfnv(get_album_name(idx));
@@ -2272,12 +2272,14 @@ static bool incremental_albumart_cache(bool verbose)
     rb->snprintf(aa_cache.pfraw_file, sizeof(aa_cache.pfraw_file),
                  CACHE_PREFIX "/%x%x.pfraw", hash_album, hash_artist);
 
-    if(rb->file_exists(aa_cache.pfraw_file)) {
-        if(update) {
-            aa_cache.slides++;
-            goto aa_success;
-        }
+    if(pf_cfg.update_albumart && rb->file_exists(aa_cache.pfraw_file)) {
+        aa_cache.slides++;
+        goto aa_success;
     }
+
+    if (!get_albumart_for_index_from_db(idx, aa_cache.file, sizeof(aa_cache.file)))
+        goto aa_failure; //rb->strcpy(aa_cache.file, EMPTY_SLIDE_BMP);
+
 
     aa_cache.input_bmp.data = aa_cache.buf;
     aa_cache.input_bmp.width = DISPLAY_WIDTH;
@@ -3609,6 +3611,7 @@ static int settings_menu(void)
                     break;
                 /* fallthrough if changed, since cache needs to be rebuilt */
             case 10:
+                pf_cfg.update_albumart = false;
                 pf_cfg.cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
@@ -3616,7 +3619,8 @@ static int settings_menu(void)
                 rb->splash(HZ, ID2P(LANG_CACHE_REBUILT_NEXT_RESTART));
                 break;
             case 11:
-                pf_cfg.cache_version = CACHE_UPDATE;
+                pf_cfg.update_albumart = true;
+                pf_cfg.cache_version = CACHE_REBUILD;
                 rb->remove(EMPTY_SLIDE);
                 configfile_save(CONFIG_FILE, config,
                                 CONFIG_NUM_ITEMS, CONFIG_VERSION);
@@ -4319,13 +4323,13 @@ static int pictureflow_main(const char* selected_file)
     pf_idx.buf_sz -= aa_bufsz;
 
     if (!create_empty_slide(pf_cfg.cache_version != CACHE_VERSION)) {
-        config_save(CACHE_REBUILD);
+        config_save(CACHE_REBUILD, false);
         error_wait("Could not load the empty slide");
         return PLUGIN_ERROR;
     }
 
     if ((pf_cfg.cache_version != CACHE_VERSION) && !create_albumart_cache()) {
-        config_save(CACHE_REBUILD);
+        config_save(CACHE_REBUILD, false);
         error_wait("Could not create album art cache");
     } else if(aa_cache.inspected < pf_idx.album_ct) {
         rb->splash(HZ * 2, "Updating album art cache in background");
@@ -4333,7 +4337,7 @@ static int pictureflow_main(const char* selected_file)
 
     if (pf_cfg.cache_version != CACHE_VERSION)
     {
-        config_save(CACHE_VERSION);
+        config_save(CACHE_VERSION, pf_cfg.update_albumart);
     }
 
     rb->buflib_init(&buf_ctx, (void *)pf_idx.buf, pf_idx.buf_sz);
