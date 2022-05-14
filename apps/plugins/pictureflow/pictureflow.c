@@ -3169,14 +3169,14 @@ static inline void set_current_slide(const int slide_index)
 {
     int old_center_index = center_index;
     step = 0;
-    center_index = fbound(slide_index, 0, number_of_slides - 1);
+    center_index = fbound(0, slide_index, number_of_slides - 1);
     if (old_center_index != center_index)
     {
         rb->queue_remove_from_head(&thread_q, EV_WAKEUP);
         rb->queue_post(&thread_q, EV_WAKEUP, 0);
     }
     target = center_index;
-    slide_frame = slide_index << 16;
+    slide_frame = center_index << 16;
     reset_slides();
 }
 
