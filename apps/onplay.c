@@ -497,7 +497,7 @@ static struct add_to_pl_param addtopl_queue_shuf       = {PLAYLIST_INSERT_SHUFFL
 static struct add_to_pl_param addtopl_queue_last_shuf  = {PLAYLIST_INSERT_LAST_SHUFFLED, 1, 0};
 
 static struct add_to_pl_param addtopl_replace          = {PLAYLIST_INSERT, 0, 1};
-static struct add_to_pl_param addtopl_replace_shuffled = {PLAYLIST_INSERT_SHUFFLED, 0, 1};
+static struct add_to_pl_param addtopl_replace_shuffled = {PLAYLIST_INSERT_LAST_SHUFFLED, 0, 1};
 
 /* CONTEXT_[TREE|ID3DB|STD] playlist options */
 static int add_to_playlist(void* arg)
