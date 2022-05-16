@@ -25,6 +25,9 @@
 #ifdef BACKTRACE_UNWARMINDER
 #include "backtrace-unwarminder.h"
 #endif
+#ifdef BACKTRACE_MIPSUNWINDER
+#include "backtrace-mipsunwinder.h"
+#endif
 
 /* Print a backtrace using lcd_* functions, starting at the given line and updating
  * the line number. On targets that support it (typically native targets), the

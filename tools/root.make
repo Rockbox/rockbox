@@ -75,6 +75,12 @@ ifeq (,$(findstring checkwps,$(APP_TYPE)))
             include $(ROOTDIR)/lib/unwarminder/unwarminder.make
           endif
       endif
+      ifeq (arch_mips,$(ARCH))
+          # mips unwinder is only usable on native ports
+          ifeq (,$(APP_TYPE))
+            include $(ROOTDIR)/lib/mipsunwinder/mipsunwinder.make
+          endif
+      endif
       ifeq (,$(findstring bootloader,$(APPSDIR)))
         include $(ROOTDIR)/lib/skin_parser/skin_parser.make
         include $(ROOTDIR)/lib/tlsf/libtlsf.make

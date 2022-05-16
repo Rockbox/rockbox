@@ -258,7 +258,8 @@ static inline void cpu_boost_unlock(void)
 #endif
 
 /* Define this if target has support for generating backtraces */
-#ifdef CPU_ARM
+#if defined(CPU_ARM) || \
+    (defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE))
     #define HAVE_RB_BACKTRACE
 #endif
 

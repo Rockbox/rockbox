@@ -32,9 +32,9 @@
 #include "system.h"
 #include "logf.h"
 
-#if defined(CPU_ARM)
+#ifdef HAVE_RB_BACKTRACE
 #include "gcc_extensions.h"
-#include <backtrace.h>
+#include "backtrace.h"
 #endif
 
 static char panic_buf[128];
@@ -65,6 +65,12 @@ void panicf_f( const char *fmt, ...)
                  );
 
     int pc = (int)__builtin_return_address(0);
+#elif defined(BACKTRACE_MIPSUNWINDER)
+void panicf( const char *fmt, ... )
+{
+    /* NOTE: these are obtained by the backtrace lib */
+    const int pc = 0;
+    const int sp = 0;
 #else
 void panicf( const char *fmt, ...)
 {
