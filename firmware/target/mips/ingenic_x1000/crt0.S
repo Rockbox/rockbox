@@ -110,7 +110,7 @@ _realstart:
     jal     system_early_init
     nop
     j       main
-    nop
+    move    ra, zero     /* init backtrace root */
 
     /* copy(void* src, void* dst, void* dst_end) */
 _copy:

@@ -185,7 +185,7 @@ _irq_stack_loop:
     jal     system_main  /* Init clocks etc first */
     ssnop
     j       main
-    ssnop
+    move    ra, zero     /* init backtrace root */
 
 
     /*
