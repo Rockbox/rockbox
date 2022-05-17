@@ -779,10 +779,14 @@ target/arm/crt0.S
 #endif /* defined(CPU_*) */
 
 #elif defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE)
+target/mips/exception-mips.S
 target/mips/mmu-mips.c
+target/mips/system-mips.c
 #if CONFIG_CPU==JZ4732 || CONFIG_CPU==JZ4760B
 target/mips/ingenic_jz47xx/crt0.S
-#endif /* CONFIG_CPU == JZ4732 || JZ4760B */
+#elif CONFIG_CPU==X1000
+target/mips/ingenic_x1000/crt0.S
+#endif
 
 #else
 
@@ -1644,7 +1648,6 @@ drivers/nand_id.c
 #endif /* CONFIG_CPU == JZ4760B */
 
 #if CONFIG_CPU == X1000
-target/mips/ingenic_x1000/crt0.S
 target/mips/ingenic_x1000/aic-x1000.c
 target/mips/ingenic_x1000/boot-x1000.c
 target/mips/ingenic_x1000/clk-x1000.c

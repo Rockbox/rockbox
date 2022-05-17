@@ -537,7 +537,7 @@ static const char* hw_info_menu_get_name(int item, void * data,
     (void)data;
     struct tm *cur_time;
     uint32_t *stackptr;
-    extern uint32_t irqstackend,irqstackbegin;
+    extern uint32_t _irqstackend,_irqstackbegin;
     int btn;
 #ifdef HAVE_TOUCHSCREEN
     int touch;
@@ -557,10 +557,10 @@ static const char* hw_info_menu_get_name(int item, void * data,
                      read_cp0_15(), (REG_CPM_CLKGR0 & BIT31) >> 31);
             return buffer;
         case 2: /*IRQstack*/
-            stackptr = &irqstackbegin;
-            for ( ; stackptr < &irqstackend && *stackptr == 0xDEADBEEF; stackptr++) {}
+            stackptr = &_irqstackbegin;
+            for ( ; stackptr < &_irqstackend && *stackptr == 0xDEADBEEF; stackptr++) {}
             snprintf(buffer, buffer_len, "IRQ stack max: %lu",
-                     (uint32_t)&irqstackend - (uint32_t)stackptr);
+                     (uint32_t)&_irqstackend - (uint32_t)stackptr);
             return buffer;
         case 5: /*Touch/BTN*/
 #ifdef HAVE_TOUCHSCREEN

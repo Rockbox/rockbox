@@ -27,6 +27,7 @@
 #include "config.h"
 #include "cpu.h"
 #include "mipsregs.h"
+#include "system-mips.h"
 
 #define CACHE_SIZE       16*1024
 #define CACHEALIGN_BITS  5

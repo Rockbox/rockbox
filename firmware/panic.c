@@ -37,7 +37,13 @@
 #include "backtrace.h"
 #endif
 
+#if (defined(CPU_MIPS) && (CONFIG_PLATFORM & PLATFORM_NATIVE))
+/* TODO: see comment above exception_dump in system-mips.c */
+char panic_buf[128];
+#else
 static char panic_buf[128];
+#endif
+
 #define LINECHARS (LCD_WIDTH/SYSFONT_WIDTH) - 2
 
 #if defined(CPU_ARM)

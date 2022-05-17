@@ -5,6 +5,8 @@ OUTPUT_FORMAT("elf32-littlemips")
 OUTPUT_ARCH(MIPS)
 ENTRY(_start)
 STARTUP(target/mips/ingenic_x1000/crt0.o)
+INPUT(target/mips/exception-mips.o)
+INPUT(target/mips/system-mips.o)
 
 #ifdef BOOTLOADER
 # undef PLUGIN_BUFFER_SIZE

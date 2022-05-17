@@ -4,6 +4,8 @@ OUTPUT_FORMAT("elf32-littlemips")
 OUTPUT_ARCH(MIPS)
 ENTRY(_start)
 STARTUP(target/mips/ingenic_jz47xx/crt0.o)
+INPUT(target/mips/exception-mips.o)
+INPUT(target/mips/system-mips.o)
 
 #define STUBOFFSET    0x4000
 
@@ -83,9 +85,9 @@ SECTIONS
          stackbegin = .;
          . += 0x1d00;
          stackend = .;
-         irqstackbegin = .;
+         _irqstackbegin = .;
          . += 0x400;
-         irqstackend = .;
+         _irqstackend = .;
     } > IRAM
 
     .bss (NOLOAD):

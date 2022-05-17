@@ -301,46 +301,6 @@ top:
     goto top;
 }
 
-#define EXC(x,y) case (x): return (y);
-static char* parse_exception(unsigned int cause)
-{
-    switch(cause & M_CauseExcCode)
-    {
-        EXC(EXC_INT, "Interrupt");
-        EXC(EXC_MOD, "TLB Modified");
-        EXC(EXC_TLBL, "TLB Exception (Load or Ifetch)");
-        EXC(EXC_ADEL, "Address Error (Load or Ifetch)");
-        EXC(EXC_ADES, "Address Error (Store)");
-        EXC(EXC_TLBS, "TLB Exception (Store)");
-        EXC(EXC_IBE, "Instruction Bus Error");
-        EXC(EXC_DBE, "Data Bus Error");
-        EXC(EXC_SYS, "Syscall");
-        EXC(EXC_BP, "Breakpoint");
-        EXC(EXC_RI, "Reserved Instruction");
-        EXC(EXC_CPU, "Coprocessor Unusable");
-        EXC(EXC_OV, "Overflow");
-        EXC(EXC_TR, "Trap Instruction");
-        EXC(EXC_FPE, "Floating Point Exception");
-        EXC(EXC_C2E, "COP2 Exception");
-        EXC(EXC_MDMX, "MDMX Exception");
-        EXC(EXC_WATCH, "Watch Exception");
-        EXC(EXC_MCHECK, "Machine Check Exception");
-        EXC(EXC_CacheErr, "Cache error caused re-entry to Debug Mode");
-        default:
-            return NULL;
-    }
-}
-
-void exception_handler(void* stack_ptr, unsigned int cause, unsigned int epc)
-{
-    panicf("Exception occurred: %s [0x%08x] at 0x%08x (stack at 0x%08x)", parse_exception(cause), read_c0_badvaddr(), epc, (unsigned int)stack_ptr);
-}
-
-void tlb_refill_handler(void)
-{
-    panicf("TLB refill handler at 0x%08lx! [0x%x]", read_c0_epc(), read_c0_badvaddr());
-}
-
 #ifdef HW_UDELAY_TIMER
 /* This enables the HW timer, set to EXT_XTAL / 4 (so @ 12/4 = 3MHz, 1 us = 3 ticks) */
 static void init_delaytimer(void)

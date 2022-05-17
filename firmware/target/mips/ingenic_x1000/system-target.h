@@ -31,6 +31,7 @@
 #include "mmu-mips.h"
 #include "mipsregs.h"
 #include "mipsr2-endian.h"
+#include "system-mips.h"
 #include <stdint.h>
 
 /* Rockbox API */
