@@ -226,5 +226,6 @@ test_sampr.c
 #ifdef HAVE_TOUCHSCREEN
 test_touchscreen.c
 #endif
+test_usb.c
 test_viewports.c
 #endif /* HAVE_TEST_PLUGINS */

@@ -178,6 +178,7 @@ test_resize,apps
 test_sampr,apps
 test_scanrate,apps
 test_touchscreen,apps
+test_usb,apps
 test_viewports,apps
 test_greylib_bitmap_scale,viewers
 text_editor,apps
