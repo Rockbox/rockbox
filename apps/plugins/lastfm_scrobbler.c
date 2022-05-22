@@ -39,7 +39,7 @@ http://www.audioscrobbler.net/wiki/Portable_Player_Logging
 
 /****************** constants ******************/
 #define EV_EXIT        MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0xFF)
-#define EV_OTHINSTANCE MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0xFE)
+#define EV_FLUSHCACHE  MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0xFE)
 #define EV_STARTUP     MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0x01)
 #define EV_TRACKCHANGE MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0x02)
 #define EV_TRACKFINISH MAKE_SYS_EVENT(SYS_EVENT_CLS_PRIVATE, 0x03)
@@ -70,123 +70,6 @@ static time_t timestamp;
 
 #define THREAD_STACK_SIZE 4*DEFAULT_STACK_SIZE
 
-#if (CONFIG_KEYPAD == IRIVER_H100_PAD) || \
-      (CONFIG_KEYPAD == IRIVER_H300_PAD)
-#define SCROBBLE_OFF BUTTON_OFF
-#define SCROBBLE_OFF_TXT "STOP"
-#elif (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_3G_PAD) || \
-      (CONFIG_KEYPAD == IPOD_1G2G_PAD)
-#define SCROBBLE_OFF BUTTON_MENU
-#define SCROBBLE_OFF_TXT "MENU"
-#elif CONFIG_KEYPAD == IAUDIO_X5M5_PAD || \
-      CONFIG_KEYPAD == AGPTEK_ROCKER_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif (CONFIG_KEYPAD == SANSA_E200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_C200_PAD) || \
-      (CONFIG_KEYPAD == SANSA_CLIP_PAD) || \
-      (CONFIG_KEYPAD == SANSA_M200_PAD)
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif (CONFIG_KEYPAD == SANSA_FUZE_PAD)
-#define SCROBBLE_OFF BUTTON_HOME
-#define SCROBBLE_OFF_TXT "HOME"
-#elif (CONFIG_KEYPAD == IRIVER_H10_PAD ||    \
-       CONFIG_KEYPAD == CREATIVE_ZENXFI3_PAD || \
-       CONFIG_KEYPAD == SONY_NWZ_PAD || \
-       CONFIG_KEYPAD == XDUOO_X3_PAD || \
-       CONFIG_KEYPAD == IHIFI_770_PAD || \
-       CONFIG_KEYPAD == IHIFI_800_PAD || \
-       CONFIG_KEYPAD == XDUOO_X3II_PAD || \
-       CONFIG_KEYPAD == XDUOO_X20_PAD || \
-       CONFIG_KEYPAD == FIIO_M3K_LINUX_PAD || \
-       CONFIG_KEYPAD == EROSQ_PAD)
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == GIGABEAT_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == GIGABEAT_S_PAD \
-   || CONFIG_KEYPAD == SAMSUNG_YPR0_PAD \
-   || CONFIG_KEYPAD == CREATIVE_ZEN_PAD
-#define SCROBBLE_OFF BUTTON_BACK
-#define SCROBBLE_OFF_TXT "BACK"
-#elif CONFIG_KEYPAD == MROBE500_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == MROBE100_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == IAUDIO_M3_PAD
-#define SCROBBLE_OFF BUTTON_REC
-#define BATTERY_RC_OFF BUTTON_RC_REC
-#define SCROBBLE_OFF_TXT "REC"
-#elif CONFIG_KEYPAD == COWON_D2_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == CREATIVEZVM_PAD
-#define SCROBBLE_OFF BUTTON_BACK
-#define SCROBBLE_OFF_TXT "BACK"
-#elif CONFIG_KEYPAD == PHILIPS_HDD1630_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == PHILIPS_HDD6330_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == PHILIPS_SA9200_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == ONDAVX747_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == ONDAVX777_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif (CONFIG_KEYPAD == SAMSUNG_YH820_PAD) || \
-      (CONFIG_KEYPAD == SAMSUNG_YH92X_PAD)
-#define SCROBBLE_OFF     BUTTON_RIGHT
-#define SCROBBLE_OFF_TXT "RIGHT"
-#elif CONFIG_KEYPAD == PBELL_VIBE500_PAD
-#define SCROBBLE_OFF BUTTON_REC
-#define SCROBBLE_OFF_TXT "REC"
-#elif CONFIG_KEYPAD == MPIO_HD200_PAD
-#define SCROBBLE_OFF BUTTON_REC
-#define SCROBBLE_OFF_TXT "REC"
-#elif CONFIG_KEYPAD == MPIO_HD300_PAD
-#define SCROBBLE_OFF BUTTON_REC
-#define SCROBBLE_OFF_TXT "REC"
-#elif CONFIG_KEYPAD == SANSA_FUZEPLUS_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == SANSA_CONNECT_PAD
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif (CONFIG_KEYPAD == HM60X_PAD) || (CONFIG_KEYPAD == HM801_PAD)
-#define SCROBBLE_OFF BUTTON_POWER
-#define SCROBBLE_OFF_TXT "POWER"
-#elif CONFIG_KEYPAD == DX50_PAD
-#define SCROBBLE_OFF     BUTTON_POWER_LONG
-#define SCROBBLE_OFF_TXT "Power Long"
-#elif CONFIG_KEYPAD == CREATIVE_ZENXFI2_PAD
-#define SCROBBLE_OFF     BUTTON_POWER
-#define SCROBBLE_OFF_TXT "Power"
-#elif CONFIG_KEYPAD == FIIO_M3K_PAD
-#define SCROBBLE_OFF     BUTTON_POWER
-#define SCROBBLE_OFF_TXT "Power"
-#elif CONFIG_KEYPAD == SHANLING_Q1_PAD
-/* use touchscreen */
-#else
-#error "No keymap defined!"
-#endif
-#if defined(HAVE_TOUCHSCREEN)
-#ifndef SCROBBLE_OFF
-#define SCROBBLE_OFF      BUTTON_TOPLEFT
-#endif
-#ifndef SCROBBLE_OFF_TXT
-#define SCROBBLE_OFF_TXT "TOPLEFT"
-#endif
-#endif
 /****************** prototypes ******************/
 int plugin_main(const void* parameter); /* main loop */
 enum plugin_status plugin_start(const void* parameter); /* entry */
@@ -198,7 +81,8 @@ static struct
 {
     bool exiting; /* signal to the thread that we want to exit */
     unsigned int id; /* worker thread id */
-    struct  event_queue queue; /* thread event queue */
+    struct event_queue queue; /* thread event queue */
+    struct queue_sender_list queue_send;
     long stack[THREAD_STACK_SIZE / sizeof(long)];
 } gThread;
 
@@ -501,9 +385,9 @@ void thread(void)
                     scrobbler_flush_cache();
 #endif
                 return;
-            case EV_OTHINSTANCE:
+            case EV_FLUSHCACHE:
                 scrobbler_flush_cache();
-                rb->splashf(HZ * 2, "%s Cache Flushed", str(LANG_AUDIOSCROBBLER));
+                rb->queue_reply(&gThread.queue, 0);
                 break;
             default:
                 logf("default %ld", ev.id);
@@ -520,6 +404,7 @@ void thread_create(void)
                                       0, "Last.Fm_TSR"
                                       IF_PRIO(, PRIORITY_BACKGROUND)
                                       IF_COP(, CPU));
+    rb->queue_enable_queue_send(&gThread.queue, &gThread.queue_send, gThread.id);
     rb->queue_post(&gThread.queue, EV_STARTUP, 0);
     rb->yield();
 }
@@ -541,46 +426,44 @@ void thread_quit(void)
 /* callback to end the TSR plugin, called before a new one gets loaded */
 static bool exit_tsr(bool reenter)
 {
-    logf("%s", __func__);
-    bool is_exit = false;
-    int button;
-    if (reenter)
-    {
-        logf(" reenter other instance ");
-        rb->queue_post(&gThread.queue, EV_OTHINSTANCE, 0);
-        return false; /* dont let it start again */
-    }
-    rb->lcd_clear_display();
-    rb->lcd_puts_scroll(0, 0, "Scrobbler is currently running.");
-    rb->lcd_puts_scroll(0, 1, "Press " SCROBBLE_OFF_TXT " to exit");
-    rb->lcd_puts_scroll(0, 2, "Anything else will resume");
+    MENUITEM_STRINGLIST(menu, ID2P(LANG_AUDIOSCROBBLER), NULL,
+                        "Flush Cache", "Quit", "Back");
 
-    rb->lcd_update();
-    rb->button_clear_queue();
-    while (1)
+    const struct text_message quit_prompt = {
+        (const char*[]){ ID2P(LANG_AUDIOSCROBBLER),
+                         "is currently running.",
+                         "Quit scrobbler?" }, 3
+    };
+
+    while(true)
     {
-        button = rb->button_get(true);
-        if (IS_SYSEVENT(button))
-            continue;
-        if (button == SCROBBLE_OFF)
+        int result = reenter ? rb->do_menu(&menu, NULL, NULL, false) : 1;
+        switch(result)
         {
-            rb->queue_post(&gThread.queue, EV_EXIT, 0);
-            rb->thread_wait(gThread.id);
-            /* remove the thread's queue from the broadcast list */
-            rb->queue_delete(&gThread.queue);
-            is_exit = true;
+            case 0: /* flush cache */
+                rb->queue_send(&gThread.queue, EV_FLUSHCACHE, 0);
+                rb->splashf(2*HZ, "%s Cache Flushed", str(LANG_AUDIOSCROBBLER));
+                break;
+
+            case 1: /* quit */
+                if(rb->gui_syncyesno_run(&quit_prompt, NULL, NULL) == YESNO_YES)
+                {
+                    rb->queue_post(&gThread.queue, EV_EXIT, 0);
+                    rb->thread_wait(gThread.id);
+                    /* remove the thread's queue from the broadcast list */
+                    rb->queue_delete(&gThread.queue);
+                    return true;
+                }
+
+                if(!reenter)
+                    return false;
+
+                break;
+
+            case 2: /* back to menu */
+                return false;
         }
-        else is_exit = false;
-
-        break;
     }
-    FOR_NB_SCREENS(idx)
-        rb->screens[idx]->scroll_stop();
-
-    if (is_exit)
-        thread_quit();
-
-    return is_exit;
 }
 
 /****************** main ******************/
