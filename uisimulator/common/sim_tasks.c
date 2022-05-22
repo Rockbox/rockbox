@@ -92,7 +92,9 @@ void sim_thread(void)
                     last_broadcast_tick = current_tick;
                 }
 
-                num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0) - 1;
+                /* NOTE: Unlike the USB code, we do not subtract one here
+                 * because the sim_queue is not registered for broadcasts! */
+                num_acks_to_expect += queue_broadcast(SYS_USB_CONNECTED, 0);
                 DEBUGF("USB inserted. Waiting for %d acks...\n",
                        num_acks_to_expect);
                 break;
