@@ -1429,6 +1429,10 @@ static struct tagentry* get_entries(struct tree_context *tc)
     return core_get_data(tc->cache.entries_handle);
 }
 
+#ifdef HAVE_TC_RAMCACHE
+extern struct tagcache_stat tc_stat;
+#endif
+
 static int retrieve_entries(struct tree_context *c, int offset, bool init)
 {
     struct tagcache_search tcs;
@@ -1447,6 +1451,9 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
        otherwise show it after the normal 1/2 second delay */
     show_search_progress(
 #ifdef HAVE_DISK_STORAGE
+#ifdef HAVE_TC_RAMCACHE
+        tc_stat.ramcache ? true :
+#endif
         storage_disk_is_active()
 #else
         true

@@ -170,7 +170,7 @@ static const char * const tag_type_str[] = {
 #endif /* ndef LOGF_ENABLE */
 
 /* Status information of the tagcache. */
-static struct tagcache_stat tc_stat;
+struct tagcache_stat tc_stat;
 
 /* Queue commands. */
 enum tagcache_queue {
