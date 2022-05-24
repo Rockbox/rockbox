@@ -2148,19 +2148,18 @@ const struct settings_list settings[] = {
                    LANG_USB_MODE,
                    USBMODE_DEFAULT,
                    "usb mode",
-                   "ask,mass storage,charge"
+                   "mass storage,charge"
 #if defined(DX50) || defined(DX90)
                    ",adb"
 #endif
                    ,
 #if defined(DX50) || defined(DX90)
                    ibasso_set_usb_mode,
-                   4,
+                   3,
 #else
                    usb_set_mode,
-                   3,
+                   2,
 #endif
-                   ID2P(LANG_ASK),
                    ID2P(LANG_USB_MODE_MASS_STORAGE),
                    ID2P(LANG_USB_MODE_CHARGE)
 #if defined(DX50) || defined(DX90)

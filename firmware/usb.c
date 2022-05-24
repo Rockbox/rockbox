@@ -491,37 +491,12 @@ static void NORETURN_ATTR usb_thread(void)
                 if (button_status() & ~USBPOWER_BTN_IGNORE)
                     new_usbmode = USB_MODE_MASS_STORAGE;
                 break;
-#ifndef BOOTLOADER
-            case USB_MODE_ASK:
-                new_usbmode = USB_MODE_ASK;
-                break;
-#endif
             default:
             case USB_MODE_MASS_STORAGE:
                 if (button_status() & ~USBPOWER_BTN_IGNORE)
                     new_usbmode = USB_MODE_CHARGE;
                 break;
 	    }
-
-#ifndef BOOTLOADER
-            if (new_usbmode == USB_MODE_ASK)
-            {
-                push_current_activity(ACTIVITY_USBSCREEN);
-                if (yesno_pop(ID2P(LANG_ENTER_USB_STORAGE_MODE_QUERY)))
-                    new_usbmode = USB_MODE_MASS_STORAGE;
-                else
-                    new_usbmode = USB_MODE_CHARGE;
-                pop_current_activity();
-                /* Force full redraw */
-//                queue_post(&button_queue, BUTTON_REDRAW, 0);
-// Alternative approach, as above is supposedly inadequate by design.
-                FOR_NB_SCREENS(i)
-                {
-                    struct screen *screen = &screens[i];
-                    screen->set_viewport(NULL);
-                }
-            }
-#endif
 #endif
 
 #ifndef USB_DETECT_BY_REQUEST

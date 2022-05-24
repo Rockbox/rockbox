@@ -848,16 +848,13 @@ properly.}
 
   \opt{usb_power}{
     \section{USB Charging}
-    Whenever your \dap{} is connected to USB, it will automatically charge.
-    However, depending on the \config{usb\_mode} setting, the \dap{} may also
-    enter mass storage mode or prompt the user for what action to take.
-    When the \dap{} is configured to enter mass storage mode or automatically
-    charge, you may trigger the opposite behavior by holding down any button
-    while plugging it in.  Your \dap{} must already be in Rockbox for this to
-    function.
+    Your \dap{} will automatically charge when connected to USB. By default
+    Rockbox will connect in mass storage mode to transfer files, but you can
+    prevent this by holding down any button while plugging in the USB cable,
+    or by changing the \setting{USB Mode} setting to \setting{Charge Only}.
     \nopt{fuzeplus}{
-    \note{Be aware that this button may still perform its normal function, so
-    it is recommended to use a button without harmful side effects, such as
+    \note{Be aware that holding a button may still perform its normal function,
+    so it is recommended to use a button without harmful side effects, such as
     \ActionStdUsbCharge{}.}
     }
   }

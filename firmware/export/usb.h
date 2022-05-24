@@ -134,7 +134,6 @@ enum
 /* Supported usb modes. */
 enum
 {
-    USB_MODE_ASK = 0,
     USB_MODE_MASS_STORAGE,
     USB_MODE_CHARGE,
     USB_MODE_ADB
