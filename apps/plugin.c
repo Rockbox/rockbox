@@ -821,6 +821,9 @@ static const struct plugin_api rockbox_api = {
 
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+
+    splash_progress,
+    splash_progress_set_delay,
 };
 
 static int plugin_buffer_handle;

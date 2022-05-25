@@ -622,6 +622,8 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                     talk_spell(val, true);
                 break;
             case LANG_ID3_BITRATE:
+                if (!id3->bitrate)
+                    return NULL;
                 snprintf(buffer, buffer_len, "%d kbps%s", id3->bitrate,
             id3->vbr ? str(LANG_ID3_VBR) : (const unsigned char*) "");
                 val=buffer;
@@ -633,6 +635,8 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 }
                 break;
             case LANG_ID3_FREQUENCY:
+                if (!id3->frequency)
+                    return NULL;
                 snprintf(buffer, buffer_len, "%ld Hz", id3->frequency);
                 val=buffer;
                 if(say_it)
@@ -661,6 +665,8 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                     talk_spell(val, true);
                 break;
             case LANG_FILESIZE: /* not LANG_ID3_FILESIZE because the string is shared */
+                if (!id3->filesize)
+                    return NULL;
                 output_dyn_value(buffer, buffer_len, id3->filesize, byte_units, 4, true);
                 val=buffer;
                 if(say_it && val)

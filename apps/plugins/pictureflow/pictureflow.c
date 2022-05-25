@@ -397,6 +397,26 @@ struct track_data {
 #endif
 };
 
+#if PF_PLAYBACK_CAPABLE
+struct multiple_tracks_id3 {
+    unsigned long length;
+    unsigned long filesize;
+    unsigned long frequency;
+    unsigned int artist_hash;
+    unsigned int composer_hash;
+    unsigned int albumartist_hash;
+    unsigned int grouping_hash;
+    unsigned int comment_hash;
+    unsigned int album_hash;
+    unsigned int genre_hash;
+    unsigned int codectype;
+    unsigned int bitrate;
+    bool filesize_ovf;
+    bool length_ovf;
+    bool vbr;
+};
+#endif
+
 struct rect {
     int left;
     int right;
@@ -557,6 +577,8 @@ static struct buflib_context buf_ctx;
 static struct pf_index_t pf_idx;
 
 static struct pf_track_t pf_tracks;
+
+static struct mp3entry id3;
 
 void reset_track_list(void);
 
@@ -2093,7 +2115,6 @@ static bool get_albumart_for_index_from_db(const int slide_index, char *buf,
                                    pf_idx.album_index[slide_index].artist_seek);
 
     if ( rb->tagcache_get_next(&tcs) ) {
-        struct mp3entry id3;
         int fd;
 
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
@@ -2217,6 +2238,9 @@ static unsigned int mfnv(char *str)
 {
     const unsigned int p = 16777619;
     unsigned int hash = 0x811C9DC5; // 2166136261;
+
+    if (!str)
+        return 0;
 
     while(*str)
         hash = (hash ^ *str++) * p;
@@ -4010,6 +4034,169 @@ static void select_prev_album(void)
 }
 
 #if PF_PLAYBACK_CAPABLE
+static void collect_id3(struct multiple_tracks_id3 *mul_id3, bool is_first_track)
+{
+    if (is_first_track)
+    {
+        mul_id3->artist_hash = mfnv(id3.artist);
+        mul_id3->album_hash = mfnv(id3.album);
+        mul_id3->genre_hash = mfnv(id3.genre_string);
+        mul_id3->composer_hash = mfnv(id3.composer);
+        mul_id3->albumartist_hash = mfnv(id3.albumartist);
+        mul_id3->grouping_hash = mfnv(id3.grouping);
+        mul_id3->comment_hash = mfnv(id3.comment);
+        mul_id3->codectype = id3.codectype;
+        mul_id3->vbr = id3.vbr;
+        mul_id3->bitrate = id3.bitrate;
+        mul_id3->frequency = id3.frequency;
+    }
+    else
+    {
+        if (mul_id3->artist_hash && (mfnv(id3.artist) != mul_id3->artist_hash))
+            mul_id3->artist_hash = 0;
+        if (mul_id3->album_hash && (mfnv(id3.album) != mul_id3->album_hash))
+            mul_id3->album_hash = 0;
+        if (mul_id3->genre_hash && (mfnv(id3.genre_string) != mul_id3->genre_hash))
+            mul_id3->genre_hash = 0;
+        if (mul_id3->composer_hash && (mfnv(id3.composer) != mul_id3->composer_hash))
+            mul_id3->composer_hash = 0;
+        if (mul_id3->albumartist_hash && (mfnv(id3.albumartist) !=
+                                          mul_id3->albumartist_hash))
+            mul_id3->albumartist_hash = 0;
+        if (mul_id3->grouping_hash && (mfnv(id3.grouping) != mul_id3->grouping_hash))
+            mul_id3->grouping_hash = 0;
+        if (mul_id3->comment_hash && (mfnv(id3.comment) != mul_id3->comment_hash))
+            mul_id3->comment_hash = 0;
+
+        if (mul_id3->codectype && (id3.codectype != mul_id3->codectype))
+            mul_id3->codectype = AFMT_UNKNOWN;
+        if (mul_id3->bitrate && (id3.bitrate != mul_id3->bitrate ||
+                                 id3.vbr != mul_id3->vbr))
+            mul_id3->bitrate = 0;
+        if (mul_id3->frequency && (id3.frequency != mul_id3->frequency))
+            mul_id3->frequency = 0;
+    }
+
+    if (ULONG_MAX - mul_id3->length < id3.length)
+    {
+        mul_id3->length_ovf = true;
+        mul_id3->length = 0;
+    }
+    else if (!mul_id3->length_ovf)
+        mul_id3->length += id3.length;
+
+    if (INT_MAX - mul_id3->filesize < id3.filesize) /* output_dyn_value expects int */
+    {
+        mul_id3->filesize_ovf = true;
+        mul_id3->filesize = 0;
+    }
+    else if (!mul_id3->filesize_ovf)
+        mul_id3->filesize += id3.filesize;
+}
+
+
+static void write_id3_mul_tracks(struct multiple_tracks_id3 *mul_id3)
+{
+    id3.path[0] = '\0';
+    id3.title = NULL;
+    if (!mul_id3->artist_hash)
+        id3.artist = NULL;
+    if (!mul_id3->album_hash)
+        id3.album = NULL;
+    if (!mul_id3->genre_hash)
+        id3.genre_string = NULL;
+    if (!mul_id3->composer_hash)
+        id3.composer = NULL;
+    if (!mul_id3->albumartist_hash)
+        id3.albumartist = NULL;
+    if (!mul_id3->grouping_hash)
+        id3.grouping = NULL;
+    if (!mul_id3->comment_hash)
+        id3.comment = NULL;
+    id3.disc_string = NULL;
+    id3.track_string = NULL;
+    id3.year_string = NULL;
+    id3.year = pf_idx.album_index[center_index].year;
+    id3.length = mul_id3->length;
+    id3.filesize = mul_id3->filesize;
+    id3.frequency = mul_id3->frequency;
+    id3.bitrate = mul_id3->bitrate;
+    id3.codectype = mul_id3->codectype;
+    id3.vbr = mul_id3->vbr;
+    id3.discnum = 0;
+    id3.tracknum = 0;
+    id3.track_level = 0;
+    id3.album_level = 0;
+}
+
+static void init_mul_id3(struct multiple_tracks_id3 *mul_id3)
+{
+    mul_id3->artist_hash = 0;
+    mul_id3->album_hash = 0;
+    mul_id3->genre_hash = 0;
+    mul_id3->composer_hash = 0;
+    mul_id3->albumartist_hash = 0;
+    mul_id3->grouping_hash = 0;
+    mul_id3->comment_hash = 0;
+    mul_id3->codectype = 0;
+    mul_id3->vbr = false;
+    mul_id3->bitrate = 0;
+    mul_id3->frequency = 0;
+    mul_id3->length = 0;
+    mul_id3->filesize = 0;
+    mul_id3->length_ovf = false;
+    mul_id3->filesize_ovf = false;
+}
+
+static int show_id3_info(const char *selected_file)
+{
+    int fd, i;
+    unsigned long last_tick;
+    const char *file_name;
+    bool id3_retrieval_successful;
+    bool is_multiple_tracks = insert_whole_album && pf_tracks.count > 1;
+    struct multiple_tracks_id3 mul_id3;
+
+    init_mul_id3(&mul_id3);
+
+    last_tick = *(rb->current_tick) + HZ/2;
+    rb->splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
+    i = 0;
+    do {
+        id3_retrieval_successful = false;
+        file_name = i == 0 ? selected_file : get_track_filename(i);
+        fd = rb->open(file_name, O_RDONLY);
+        if (fd >= 0)
+        {
+            if (rb->get_metadata(&id3, fd, file_name))
+                id3_retrieval_successful = true;
+            rb->close(fd);
+        }
+        if (!id3_retrieval_successful)
+            return 0;
+
+        if (is_multiple_tracks)
+        {
+            rb->splash_progress(i, pf_tracks.count,
+                                "%s (%s)", rb->str(LANG_WAIT), rb->str(LANG_OFF_ABORT));
+            if (TIME_AFTER(*(rb->current_tick), last_tick + HZ/4))
+            {
+                if (rb->action_userabort(TIMEOUT_NOBLOCK))
+                    return 0;
+                last_tick = *(rb->current_tick);
+            }
+
+            collect_id3(&mul_id3, i == 0);
+            rb->yield();
+        }
+    } while (++i < pf_tracks.count && is_multiple_tracks);
+
+    if (is_multiple_tracks)
+        write_id3_mul_tracks(&mul_id3);
+
+    return rb->browse_id3(&id3, 0, 0, NULL) ? PLUGIN_USB_CONNECTED : 0;
+}
+
 
 static bool playlist_insert(int position, bool queue, bool create_new)
 {
@@ -4061,14 +4248,8 @@ static bool track_list_ready(void)
     return true;
 }
 
-/**
-  Brings up "Current Playlist" menu with first
-  track of selection.
 
-  Onplay menu code calls back playlist_insert for
-  adding all of the tracks.
-*/
-static void show_current_playlist_menu(void)
+static bool context_menu_ready(void)
 {
 #ifdef USEGSLIB
     grey_show(false);
@@ -4080,13 +4261,23 @@ static void show_current_playlist_menu(void)
 #ifdef USEGSLIB
         grey_show(true);
 #endif
-        return;
+        return false;
     }
+#if LCD_DEPTH > 1
+#ifdef USEGSLIB
+    rb->lcd_set_foreground(N_BRIGHT(0));
+    rb->lcd_set_background(N_BRIGHT(255));
+#endif
+#endif
     insert_whole_album = pf_state != pf_show_tracks;
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_enable(i, true, NULL);
-    rb->onplay_show_playlist_menu(get_track_filename(pf_tracks.sel),
-                              &playlist_insert);
+
+    return true;
+}
+
+static void context_menu_cleanup(void)
+{
     FOR_NB_SCREENS(i)
         rb->viewportmanager_theme_undo(i, false);
     if (insert_whole_album)
@@ -4096,6 +4287,39 @@ static void show_current_playlist_menu(void)
 #endif
     mylcd_set_drawmode(DRMODE_FG);
 }
+
+
+static int context_menu(void)
+{
+    char *file_name = get_track_filename(pf_tracks.sel);
+
+    enum {
+        PF_CURRENT_PLAYLIST = 0,
+        PF_ID3_INFO
+    };
+    MENUITEM_STRINGLIST(context_menu, ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
+                        ID2P(LANG_PLAYING_NEXT),
+                        ID2P(LANG_MENU_SHOW_ID3_INFO));
+
+    while (1)  {
+        switch (rb->do_menu(&context_menu,
+                            NULL, NULL, false)) {
+
+            case PF_CURRENT_PLAYLIST:
+                rb->onplay_show_playlist_menu(file_name,
+                                              &playlist_insert);
+                return 0;
+            case PF_ID3_INFO:
+                return show_id3_info(file_name);
+            case MENU_ATTACHED_USB:
+                return PLUGIN_USB_CONNECTED;
+            default:
+                return 0;
+
+        }
+    }
+}
+
 
 
 /*
@@ -4247,7 +4471,6 @@ static void set_initial_slide(const char* selected_file)
                             pf_cfg.last_album);
     else
     {
-        static struct mp3entry id3;
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         if (rb->tagcache_fill_tags(&id3, selected_file))
             set_current_slide(id3_get_index(&id3));
@@ -4601,8 +4824,8 @@ static int pictureflow_main(const char* selected_file)
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
             if (pf_state == pf_idle || pf_state == pf_scrolling ||
-                pf_state == pf_show_tracks || pf_state == pf_cover_out) {
-
+                pf_state == pf_show_tracks || pf_state == pf_cover_out)
+            {
                 if ( pf_state == pf_scrolling)
                 {
                     set_current_slide(target);
@@ -4611,7 +4834,12 @@ static int pictureflow_main(const char* selected_file)
                 else if (pf_state == pf_cover_out)
                     interrupt_cover_out_animation();
 
-                show_current_playlist_menu();
+                if (context_menu_ready())
+                {
+                    ret = context_menu();
+                    context_menu_cleanup();
+                    if ( ret != 0 ) return ret;
+                }
             }
             break;
 #endif
