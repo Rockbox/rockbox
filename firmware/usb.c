@@ -65,6 +65,9 @@
 #define USB_FULL_INIT
 #endif
 
+/* USB detect debouncing interval (200ms taken from the usb polling code) */
+#define USB_DEBOUNCE_TIME (200*HZ/1000)
+
 bool do_screendump_instead_of_usb = false;
 
 #if !defined(SIMULATOR) && !defined(USB_NONE)
@@ -580,8 +583,33 @@ void usb_charger_update(void)
 #endif
 
 #ifdef USB_STATUS_BY_EVENT
+static int usb_status_tmo_callback(struct timeout* tmo)
+{
+    if(usb_monitor_enabled)
+    {
+        int current_status = usb_detect();
+        int* last_status = (int*)tmo->data;
+
+        if(current_status != *last_status)
+        {
+            /* Signal changed during the timeout; wait longer */
+            *last_status = current_status;
+            return USB_DEBOUNCE_TIME;
+        }
+
+        /* Signal is stable, post the event. The thread will deal with
+         * any spurious transitions (like inserted -> inserted). */
+        queue_post(&usb_queue, current_status, 0);
+    }
+
+    return 0;
+}
+
 void usb_status_event(int current_status)
 {
+    static struct timeout tmo;
+    static int last_status = USB_EXTRACTED;
+
     /* Caller isn't expected to filter for changes in status.
      * current_status:
      *   USB_INSERTED, USB_EXTRACTED
@@ -589,8 +617,9 @@ void usb_status_event(int current_status)
     if(usb_monitor_enabled)
     {
         int oldstatus = disable_irq_save(); /* Dual-use function */
-        queue_remove_from_head(&usb_queue, current_status);
-        queue_post(&usb_queue, current_status, 0);
+        last_status = current_status;
+        timeout_register(&tmo, usb_status_tmo_callback, USB_DEBOUNCE_TIME,
+                         (intptr_t)&last_status);
         restore_irq(oldstatus);
     }
 }
@@ -626,7 +655,6 @@ void usb_firewire_connect_event(void)
 
 static void usb_tick(void)
 {
-    #define NUM_POLL_READINGS (HZ/5)
     static int usb_countdown = -1;
     static int last_usb_status = USB_EXTRACTED;
 #ifdef USB_FIREWIRE_HANDLING
@@ -641,7 +669,7 @@ static void usb_tick(void)
         if(current_firewire_status != last_firewire_status)
         {
             last_firewire_status = current_firewire_status;
-            firewire_countdown = NUM_POLL_READINGS;
+            firewire_countdown = USB_DEBOUNCE_TIME;
         }
         else
         {
@@ -649,8 +677,7 @@ static void usb_tick(void)
             if(firewire_countdown >= 0)
                 firewire_countdown--;
 
-            /* Report to the thread if we have had 3 identical status
-               readings in a row */
+            /* Report status when the signal has been stable long enough */
             if(firewire_countdown == 0)
             {
                 queue_post(&usb_queue, USB_REQUEST_REBOOT, 0);
@@ -664,7 +691,7 @@ static void usb_tick(void)
         if(current_status != last_usb_status)
         {
             last_usb_status = current_status;
-            usb_countdown = NUM_POLL_READINGS;
+            usb_countdown = USB_DEBOUNCE_TIME;
         }
         else
         {
@@ -672,8 +699,7 @@ static void usb_tick(void)
             if(usb_countdown >= 0)
                 usb_countdown--;
 
-            /* Report to the thread if we have had 3 identical status
-               readings in a row */
+            /* Report status when the signal has been stable long enough */
             if(usb_countdown == 0)
             {
                 queue_post(&usb_queue, current_status, 0);
