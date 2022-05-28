@@ -233,8 +233,10 @@ static int add_to_playlist(const char* playlist, bool new_playlist,
         fd = open(playlist, O_CREAT|O_WRONLY|O_APPEND, 0666);
 
     if(fd < 0)
+    {
+        splash(HZ*2, ID2P(LANG_FAILED));
         return result;
-
+    }
     /* In case we're in the playlist directory */
     reload_directory();
 
