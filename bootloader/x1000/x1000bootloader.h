@@ -197,6 +197,7 @@ int dump_flash_file(const char* file, uint32_t addr, uint32_t length);
 void dump_of_player(void);
 void dump_of_recovery(void);
 void dump_entire_flash(void);
+void show_flash_info(void);
 
 void recovery_menu(void) __attribute__((noreturn));
 

@@ -31,6 +31,7 @@
 #include "linuxboot.h"
 #include "screendump.h"
 #include "nand-x1000.h"
+#include "sfc-x1000.h"
 
 /* Set to true if a SYS_USB_CONNECTED event is seen
  * Set to false if a SYS_USB_DISCONNECTED event is seen
@@ -337,4 +338,76 @@ void dump_entire_flash(void)
     /* TODO: this should read the real chip size instead of hardcoding it */
     dump_flash_file("/flash.img", 0, 2048 * 64 * 1024);
 #endif
+}
+
+static void probe_flash(int log_fd)
+{
+    static uint8_t buffer[CACHEALIGN_UP(32)] CACHEALIGN_ATTR;
+
+    /* Use parameters from maskrom */
+    const uint32_t clock_freq = X1000_EXCLK_FREQ; /* a guess */
+    const uint32_t dev_conf = jz_orf(SFC_DEV_CONF,
+                                     CE_DL(1), HOLD_DL(1), WP_DL(1),
+                                     CPHA(0), CPOL(0),
+                                     TSH(0), TSETUP(0), THOLD(0),
+                                     STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
+                                     SMP_DELAY(0));
+    const size_t readid_len = 4;
+
+    /* NOTE: This assumes the NAND driver is inactive. If this is not true,
+     * this will seriously mess up the NAND driver. */
+    sfc_open();
+    sfc_set_dev_conf(dev_conf);
+    sfc_set_clock(clock_freq);
+
+    /* Issue reset */
+    sfc_exec(NANDCMD_RESET, 0, NULL, 0);
+    mdelay(10);
+
+    /* Try various read ID commands (cf. Linux's SPI NAND identify routine) */
+    sfc_exec(NANDCMD_READID(0, 0), 0, buffer, readid_len|SFC_READ);
+    fdprintf(log_fd, "readID opcode  = %02x %02x %02x %02x\n",
+             buffer[0], buffer[1], buffer[2], buffer[3]);
+
+    sfc_exec(NANDCMD_READID(1, 0), 0, buffer, readid_len|SFC_READ);
+    fdprintf(log_fd, "readID address = %02x %02x %02x %02x\n",
+             buffer[0], buffer[1], buffer[2], buffer[3]);
+
+    sfc_exec(NANDCMD_READID(0, 8), 0, buffer, readid_len|SFC_READ);
+    fdprintf(log_fd, "readID dummy   = %02x %02x %02x %02x\n",
+             buffer[0], buffer[1], buffer[2], buffer[3]);
+
+    /* Try reading Ingenic SFC boot block */
+    sfc_exec(NANDCMD_PAGE_READ(3), 0, NULL, 0);
+    mdelay(500);
+    sfc_exec(NANDCMD_READ_CACHE_SLOW(2), 0, buffer, 16|SFC_READ);
+
+    fdprintf(log_fd, "sfc params0  = %02x %02x %02x %02x\n",
+             buffer[ 0], buffer[ 1], buffer[ 2], buffer[ 3]);
+    fdprintf(log_fd, "sfc params1  = %02x %02x %02x %02x\n",
+             buffer[ 4], buffer[ 5], buffer[ 6], buffer[ 7]);
+    fdprintf(log_fd, "sfc params2  = %02x %02x %02x %02x\n",
+             buffer[ 8], buffer[ 9], buffer[10], buffer[11]);
+    fdprintf(log_fd, "sfc params3  = %02x %02x %02x %02x\n",
+             buffer[12], buffer[13], buffer[14], buffer[15]);
+
+    sfc_close();
+}
+
+void show_flash_info(void)
+{
+    if(check_disk(true) != DISK_PRESENT)
+        return;
+
+    int fd = open("/flash_info.txt", O_WRONLY|O_CREAT|O_TRUNC);
+    if(fd < 0) {
+        splashf(5*HZ, "Cannot create log file");
+        return;
+    }
+
+    splashf(0, "Probing flash...");
+    probe_flash(fd);
+
+    close(fd);
+    splashf(3*HZ, "Dumped flash info\nSee flash_info.txt");
 }

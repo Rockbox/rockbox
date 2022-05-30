@@ -68,6 +68,7 @@ static const struct menuitem debug_menu_items[] = {
 #ifdef HAVE_SCREENDUMP
     {MENUITEM_ACTION,       "Enable screenshots",   &screenshot_enable},
 #endif
+    {MENUITEM_ACTION,       "Flash info",           &show_flash_info},
 #ifdef OF_PLAYER_ADDR
     {MENUITEM_ACTION,       "Dump OF player",       &dump_of_player},
 #endif
