@@ -24,39 +24,6 @@
 #include "system.h"
 #include <string.h>
 
-/*                                          cmd   mode             a  d  phase format         has data */
-#define NANDCMD_RESET               SFC_CMD(0xff, SFC_TMODE_1_1_1, 0, 0, SFC_PFMT_ADDR_FIRST, 0)
-#define NANDCMD_READID(x,y)         SFC_CMD(0x9f, SFC_TMODE_1_1_1, x, y, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_WR_EN               SFC_CMD(0x06, SFC_TMODE_1_1_1, 0, 0, SFC_PFMT_ADDR_FIRST, 0)
-#define NANDCMD_GET_FEATURE         SFC_CMD(0x0f, SFC_TMODE_1_1_1, 1, 0, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_SET_FEATURE         SFC_CMD(0x1f, SFC_TMODE_1_1_1, 1, 0, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_PAGE_READ(x)        SFC_CMD(0x13, SFC_TMODE_1_1_1, x, 0, SFC_PFMT_ADDR_FIRST, 0)
-#define NANDCMD_READ_CACHE(x)       SFC_CMD(0x0b, SFC_TMODE_1_1_1, x, 8, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_READ_CACHE_x4(x)    SFC_CMD(0x6b, SFC_TMODE_1_1_4, x, 8, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_PROGRAM_LOAD(x)     SFC_CMD(0x02, SFC_TMODE_1_1_1, x, 0, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_PROGRAM_LOAD_x4(x)  SFC_CMD(0x32, SFC_TMODE_1_1_4, x, 0, SFC_PFMT_ADDR_FIRST, 1)
-#define NANDCMD_PROGRAM_EXECUTE(x)  SFC_CMD(0x10, SFC_TMODE_1_1_1, x, 0, SFC_PFMT_ADDR_FIRST, 0)
-#define NANDCMD_BLOCK_ERASE(x)      SFC_CMD(0xd8, SFC_TMODE_1_1_1, x, 0, SFC_PFMT_ADDR_FIRST, 0)
-
-/* Feature registers are found in linux/mtd/spinand.h,
- * apparently these are pretty standardized */
-#define FREG_PROT        0xa0
-#define FREG_PROT_UNLOCK 0x00
-
-#define FREG_CFG             0xb0
-#define FREG_CFG_OTP_ENABLE  (1 << 6)
-#define FREG_CFG_ECC_ENABLE  (1 << 4)
-#define FREG_CFG_QUAD_ENABLE (1 << 0)
-
-#define FREG_STATUS               0xc0
-#define FREG_STATUS_BUSY          (1 << 0)
-#define FREG_STATUS_EFAIL         (1 << 2)
-#define FREG_STATUS_PFAIL         (1 << 3)
-#define FREG_STATUS_ECC_MASK      (3 << 4)
-#define FREG_STATUS_ECC_NO_FLIPS  (0 << 4)
-#define FREG_STATUS_ECC_HAS_FLIPS (1 << 4)
-#define FREG_STATUS_ECC_UNCOR_ERR (2 << 4)
-
 const nand_chip supported_nand_chips[] = {
 #if defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN)
     {
