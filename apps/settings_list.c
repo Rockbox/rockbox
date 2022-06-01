@@ -1544,6 +1544,8 @@ const struct settings_list settings[] = {
                   "gather runtime data", NULL),
     TEXT_SETTING(0, tagcache_scan_paths, "database scan paths",
                  DEFAULT_TAGCACHE_SCAN_PATHS, NULL, NULL),
+    TEXT_SETTING(0, tagcache_db_path, "database path",
+                 ROCKBOX_DIR, NULL, NULL),
 #endif
 
     /* replay gain */

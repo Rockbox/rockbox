@@ -585,6 +585,7 @@ struct user_settings
     unsigned char autoresume_paths[MAX_PATHNAME+1]; /* colon-separated list */
     bool runtimedb;           /* runtime database active? */
     unsigned char tagcache_scan_paths[MAX_PATHNAME+1];
+    unsigned char tagcache_db_path[MAX_PATHNAME+1];
 #endif /* HAVE_TAGCACHE */
 
 #if LCD_DEPTH > 1

@@ -84,6 +84,7 @@
 #include "structec.h"
 #include "debug.h"
 #include "dircache.h"
+#include "errno.h"
 
 #ifndef __PCTOOL__
 #include "lang.h"
@@ -124,19 +125,19 @@
 #define TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY  HZ*2
 
 /* Temporary database containing new tags to be committed to the main db. */
-#define TAGCACHE_FILE_TEMP       ROCKBOX_DIR "/database_tmp.tcd"
+#define TAGCACHE_FILE_TEMP       "database_tmp.tcd"
 
 /* The main database master index and numeric data. */
-#define TAGCACHE_FILE_MASTER     ROCKBOX_DIR "/database_idx.tcd"
+#define TAGCACHE_FILE_MASTER     "database_idx.tcd"
 
 /* The main database string data. */
-#define TAGCACHE_FILE_INDEX      ROCKBOX_DIR "/database_%d.tcd"
+#define TAGCACHE_FILE_INDEX      "database_%d.tcd"
 
 /* ASCII dumpfile of the DB contents. */
-#define TAGCACHE_FILE_CHANGELOG  ROCKBOX_DIR "/database_changelog.txt"
+#define TAGCACHE_FILE_CHANGELOG  "database_changelog.txt"
 
 /* Serialized DB. */
-#define TAGCACHE_STATEFILE       ROCKBOX_DIR "/database_state.tcd"
+#define TAGCACHE_STATEFILE       "database_state.tcd"
 
 /* Flags */
 #define FLAG_DELETED     0x0001  /* Entry has been removed from db */
@@ -474,6 +475,33 @@ static ssize_t ecwrite_index_entry(int fd, struct index_entry *buf)
     return ecwrite(fd, buf, 1, index_entry_ec, tc_stat.econ);
 }
 
+/*
+ * open_db_fd and remove_db_file are noinline to minimize stack usage
+ */
+static int NO_INLINE open_db_fd(const char* filename, int mode)
+{
+    char buf[MAX_PATH];
+
+    if(mode & O_CREAT)
+    {
+        if (mkdir(global_settings.tagcache_db_path) < 0 && errno != EEXIST)
+            return -1;
+    }
+
+    return open_pathfmt(buf, sizeof(buf), mode, "%s/%s",
+                        global_settings.tagcache_db_path, filename);
+}
+
+static int NO_INLINE remove_db_file(const char* filename)
+{
+    char buf[MAX_PATH];
+
+    snprintf(buf, sizeof(buf), "%s/%s",
+             global_settings.tagcache_db_path, filename);
+
+    return remove(buf);
+}
+
 static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
@@ -484,8 +512,8 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
         return -1;
 
     fd = open_pathfmt(fname, sizeof(fname),
-                      write ? O_RDWR : O_RDONLY, TAGCACHE_FILE_INDEX, tag);
-
+                      write ? O_RDWR : O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
+                      global_settings.tagcache_db_path, tag);
     if (fd < 0)
     {
         logf("tag file open failed: tag=%d write=%d file= " TAGCACHE_FILE_INDEX,
@@ -512,7 +540,7 @@ static int open_master_fd(struct master_header *hdr, bool write)
     int fd;
     int rc;
 
-    fd = open(TAGCACHE_FILE_MASTER, write ? O_RDWR : O_RDONLY);
+    fd = open_db_fd(TAGCACHE_FILE_MASTER, write ? O_RDWR : O_RDONLY);
     if (fd < 0)
     {
         logf("master file open failed for R/W");
@@ -862,7 +890,8 @@ static bool open_files(struct tagcache_search *tcs, int tag)
     {
         char fname[MAX_PATH];
         tcs->idxfd[tag] = open_pathfmt(fname, sizeof(fname),
-                                       O_RDONLY, TAGCACHE_FILE_INDEX, tag);
+                                       O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
+                                       global_settings.tagcache_db_path, tag);
     }
 
     if (tcs->idxfd[tag] < 0)
@@ -1480,13 +1509,14 @@ static void remove_files(void)
     tc_stat.ready = false;
     tc_stat.ramcache = false;
     tc_stat.econ = false;
-    remove(TAGCACHE_FILE_MASTER);
+    remove_db_file(TAGCACHE_FILE_MASTER);
     for (i = 0; i < TAG_COUNT; i++)
     {
         if (TAGCACHE_IS_NUMERIC(i))
             continue;
 
-        snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, i);
+        snprintf(buf, bufsz, "%s/" TAGCACHE_FILE_INDEX,
+                 global_settings.tagcache_db_path, i);
         remove(buf);
     }
 }
@@ -1645,7 +1675,8 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
         {
             char fname[MAX_PATH];
             tcs->idxfd[clause->tag] = open_pathfmt(fname, sizeof(fname), O_RDONLY,
-                                                 TAGCACHE_FILE_INDEX, clause->tag);
+                                                   "%s/" TAGCACHE_FILE_INDEX,
+                                                   global_settings.tagcache_db_path, clause->tag);
         }
     }
 
@@ -2793,9 +2824,13 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
         /**
          * Creating new index file to store the tags. No need to preload
          * anything whether the index type is sorted or not.
+         *
+         * Note: although we are creating a file under the db path, it must
+         * already exist by this point so no mkdir is required.
          */
         fd = open_pathfmt(buf, bufsz, O_WRONLY | O_CREAT | O_TRUNC,
-                          TAGCACHE_FILE_INDEX, index_type);
+                          "%s/" TAGCACHE_FILE_INDEX,
+                          global_settings.tagcache_db_path, index_type);
         if (fd < 0)
         {
             logf(TAGCACHE_FILE_INDEX " open fail", index_type);
@@ -2817,12 +2852,12 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
 
     /* Loading the tag lookup file as "master file". */
     logf("Loading index file");
-    masterfd = open(TAGCACHE_FILE_MASTER, O_RDWR);
+    masterfd = open_db_fd(TAGCACHE_FILE_MASTER, O_RDWR);
 
     if (masterfd < 0)
     {
         logf("Creating new DB");
-        masterfd = open(TAGCACHE_FILE_MASTER, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        masterfd = open_db_fd(TAGCACHE_FILE_MASTER, O_WRONLY | O_CREAT | O_TRUNC);
 
         if (masterfd < 0)
         {
@@ -3149,7 +3184,7 @@ static bool commit(void)
     while (write_lock)
         sleep(1);
 
-    tmpfd = open(TAGCACHE_FILE_TEMP, O_RDONLY);
+    tmpfd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (tmpfd < 0)
     {
         logf("nothing to commit");
@@ -3165,7 +3200,7 @@ static bool commit(void)
     {
         logf("incorrect tmpheader");
         close(tmpfd);
-        remove(TAGCACHE_FILE_TEMP);
+        remove_db_file(TAGCACHE_FILE_TEMP);
         return false;
     }
 
@@ -3176,7 +3211,7 @@ static bool commit(void)
     tc_stat.ready = check_all_headers();
 
 #ifdef HAVE_EEPROM_SETTINGS
-    remove(TAGCACHE_STATEFILE);
+    remove_db_file(TAGCACHE_STATEFILE);
 #endif
 
     /* At first be sure to unload the ramcache! */
@@ -3268,7 +3303,7 @@ static bool commit(void)
     if ( (masterfd = open_master_fd(&tcmh, true)) < 0)
         goto commit_error;
 
-    remove(TAGCACHE_FILE_TEMP);
+    remove_db_file(TAGCACHE_FILE_TEMP);
 
     tcmh.tch.entry_count += tch.entry_count;
     tcmh.tch.datasize = sizeof(struct master_header)
@@ -3681,7 +3716,7 @@ bool tagcache_import_changelog(void)
     while (read_lock)
         sleep(1);
 
-    clfd = open(TAGCACHE_FILE_CHANGELOG, O_RDONLY);
+    clfd = open_db_fd(TAGCACHE_FILE_CHANGELOG, O_RDONLY);
     if (clfd < 0)
     {
         logf("failure to open changelog");
@@ -3736,7 +3771,7 @@ bool tagcache_create_changelog(struct tagcache_search *tcs)
         return false;
 
     /* Initialize the changelog */
-    clfd = open(TAGCACHE_FILE_CHANGELOG, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    clfd = open_db_fd(TAGCACHE_FILE_CHANGELOG, O_WRONLY | O_CREAT | O_TRUNC);
     if (clfd < 0)
     {
         logf("failure to open changelog");
@@ -4104,7 +4139,7 @@ static bool tagcache_dumpload(void)
     tcramcache.handle = 0;
     tcramcache.hdr = NULL;
 
-    fd = open(TAGCACHE_STATEFILE, O_RDONLY);
+    fd = open_db_fd(TAGCACHE_STATEFILE, O_RDONLY);
     if (fd < 0)
     {
         logf("no tagcache statedump");
@@ -4164,7 +4199,7 @@ static bool tagcache_dumpsave(void)
     if (!tc_stat.ramcache)
         return false;
 
-    fd = open(TAGCACHE_STATEFILE, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    fd = open_db_fd(TAGCACHE_STATEFILE, O_WRONLY | O_CREAT | O_TRUNC);
     if (fd < 0)
     {
         logf("failed to create a statedump");
@@ -4208,7 +4243,7 @@ static bool load_tagcache(void)
 
     tcrc_buffer_lock(); /* lock for the rest of the scan, simpler to handle */
 
-    fd = open(TAGCACHE_FILE_MASTER, O_RDONLY);
+    fd = open_db_fd(TAGCACHE_FILE_MASTER, O_RDONLY);
     if (fd < 0)
     {
         logf("tagcache open failed");
@@ -4451,8 +4486,8 @@ static bool check_deleted_files(void)
     struct tagfile_entry tfe;
 
     logf("reverse scan...");
-
-    fd = open_pathfmt(buf, bufsz, O_RDONLY, TAGCACHE_FILE_INDEX, tag_filename);
+    fd = open_pathfmt(buf, bufsz, O_RDONLY, "%s/" TAGCACHE_FILE_INDEX,
+                      global_settings.tagcache_db_path, tag_filename);
     if (fd < 0)
     {
         logf(TAGCACHE_FILE_INDEX " open fail", tag_filename);
@@ -4735,7 +4770,7 @@ void do_tagcache_build(const char *path[])
 
     logf("updating tagcache");
 
-    cachefd = open(TAGCACHE_FILE_TEMP, O_RDONLY);
+    cachefd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDONLY);
     if (cachefd >= 0)
     {
         logf("skipping, cache already waiting for commit");
@@ -4743,7 +4778,7 @@ void do_tagcache_build(const char *path[])
         return ;
     }
 
-    cachefd = open(TAGCACHE_FILE_TEMP, O_RDWR | O_CREAT | O_TRUNC, 0666);
+    cachefd = open_db_fd(TAGCACHE_FILE_TEMP, O_RDWR | O_CREAT | O_TRUNC);
     if (cachefd < 0)
     {
         logf("master file open failed: %s", TAGCACHE_FILE_TEMP);
@@ -4872,7 +4907,7 @@ void tagcache_unload_ramcache(void)
 {
     tc_stat.ramcache = false;
     /* Just to make sure there is no statefile present. */
-    // remove(TAGCACHE_STATEFILE);
+    // remove_db_file(TAGCACHE_STATEFILE);
 }
 #endif /* HAVE_TC_RAMCACHE */
 
@@ -4897,7 +4932,7 @@ static void tagcache_thread(void)
         check_done = tagcache_dumpload();
     }
 
-    remove(TAGCACHE_STATEFILE);
+    remove_db_file(TAGCACHE_STATEFILE);
 #endif /* HAVE_EEPROM_SETTINGS */
 
     /* Allocate space for the tagcache if found on disk. */
@@ -4930,7 +4965,7 @@ static void tagcache_thread(void)
 
             case Q_REBUILD:
                 remove_files();
-                remove(TAGCACHE_FILE_TEMP);
+                remove_db_file(TAGCACHE_FILE_TEMP);
                 tagcache_build();
                 break;
 
@@ -5014,7 +5049,7 @@ void tagcache_shutdown(void)
 
 void tagcache_remove_statefile(void)
 {
-    remove(TAGCACHE_STATEFILE);
+    remove_db_file(TAGCACHE_STATEFILE);
 }
 
 static int get_progress(void)
