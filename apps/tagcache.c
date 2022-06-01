@@ -90,6 +90,61 @@
 #include "eeprom_settings.h"
 #endif
 
+/* Maximum length of a single tag. */
+#define TAG_MAXLEN (MAX_PATH*2)
+
+/* Allow a little drift to the filename ordering (should not be too high/low). */
+#define POS_HISTORY_COUNT 4
+
+/* How much to pre-load entries while committing to prevent seeking. */
+#define IDX_BUF_DEPTH 64
+
+/* Tag Cache Header version 'TCHxx'. Increment when changing internal structures. */
+#define TAGCACHE_MAGIC  0x54434810
+
+/* Dump store/restore header version 'TCSxx'. */
+#define TAGCACHE_STATEFILE_MAGIC 0x54435301
+
+/* How much to allocate extra space for ramcache. */
+#define TAGCACHE_RESERVE 32768
+
+/*
+ * Define how long one entry must be at least (longer -> less memory at commit).
+ * Must be at least 4 bytes in length for correct alignment.
+ */
+#define TAGFILE_ENTRY_CHUNK_LENGTH   8
+
+/* Used to guess the necessary buffer size at commit. */
+#define TAGFILE_ENTRY_AVG_LENGTH   16
+
+/* Always strict align entries for best performance and binary compatibility. */
+#define TAGCACHE_STRICT_ALIGN 1
+
+/* Max events in the internal tagcache command queue. */
+#define TAGCACHE_COMMAND_QUEUE_LENGTH 32
+
+/* Idle time before committing events in the command queue. */
+#define TAGCACHE_COMMAND_QUEUE_COMMIT_DELAY  HZ*2
+
+/* Temporary database containing new tags to be committed to the main db. */
+#define TAGCACHE_FILE_TEMP       ROCKBOX_DIR "/database_tmp.tcd"
+
+/* The main database master index and numeric data. */
+#define TAGCACHE_FILE_MASTER     ROCKBOX_DIR "/database_idx.tcd"
+
+/* The main database string data. */
+#define TAGCACHE_FILE_INDEX      ROCKBOX_DIR "/database_%d.tcd"
+
+/* ASCII dumpfile of the DB contents. */
+#define TAGCACHE_FILE_CHANGELOG  ROCKBOX_DIR "/database_changelog.txt"
+
+/* Flags */
+#define FLAG_DELETED     0x0001  /* Entry has been removed from db */
+#define FLAG_DIRCACHE    0x0002  /* Filename is a dircache pointer */
+#define FLAG_DIRTYNUM    0x0004  /* Numeric data has been modified */
+#define FLAG_TRKNUMGEN   0x0008  /* Track number has been generated  */
+#define FLAG_RESURRECTED 0x0010  /* Statistics data has been resurrected */
+
 #ifdef __PCTOOL__
 #define yield() do { } while(0)
 #define sim_sleep(timeout) do { } while(0)
