@@ -1265,7 +1265,7 @@ void tree_restore(void)
 #endif
 
 #ifdef HAVE_TC_RAMCACHE
-    remove(TAGCACHE_STATEFILE);
+    tagcache_remove_statefile();
 #endif
 
 #ifdef HAVE_DIRCACHE

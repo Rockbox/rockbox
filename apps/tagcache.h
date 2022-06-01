@@ -50,9 +50,6 @@ enum tag_type { tag_artist = 0, tag_album, tag_genre, tag_title,
 #define TAGCACHE_MAX_FILTERS 4
 #define TAGCACHE_MAX_CLAUSES 32
 
-/* Serialized DB. */
-#define TAGCACHE_STATEFILE       ROCKBOX_DIR "/database_state.tcd"
-
 /* Tag to be used on untagged files. */
 #define UNTAGGED "<Untagged>"
 
@@ -185,6 +182,7 @@ struct tagcache_stat* tagcache_get_stat(void);
 int tagcache_get_commit_step(void);
 bool tagcache_prepare_shutdown(void);
 void tagcache_shutdown(void);
+void tagcache_remove_statefile(void);
 
 void tagcache_screensync_event(void);
 void tagcache_screensync_enable(bool state);

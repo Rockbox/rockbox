@@ -135,6 +135,9 @@
 /* ASCII dumpfile of the DB contents. */
 #define TAGCACHE_FILE_CHANGELOG  ROCKBOX_DIR "/database_changelog.txt"
 
+/* Serialized DB. */
+#define TAGCACHE_STATEFILE       ROCKBOX_DIR "/database_state.tcd"
+
 /* Flags */
 #define FLAG_DELETED     0x0001  /* Entry has been removed from db */
 #define FLAG_DIRCACHE    0x0002  /* Filename is a dircache pointer */
@@ -5007,6 +5010,11 @@ void tagcache_shutdown(void)
     if (tc_stat.ramcache)
         tagcache_dumpsave();
 #endif
+}
+
+void tagcache_remove_statefile(void)
+{
+    remove(TAGCACHE_STATEFILE);
 }
 
 static int get_progress(void)

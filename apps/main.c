@@ -597,7 +597,7 @@ static void init(void)
     CHART("<init_dircache(true)");
 #ifdef HAVE_TAGCACHE
     if (rc < 0)
-        remove(TAGCACHE_STATEFILE);
+        tagcache_remove_statefile();
 #endif /* HAVE_TAGCACHE */
 #endif /* HAVE_DIRCACHE */
 
