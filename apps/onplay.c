@@ -1390,9 +1390,27 @@ static bool set_catalogdir(void)
 MENUITEM_FUNCTION(set_catalogdir_item, 0, ID2P(LANG_PLAYLIST_DIR),
                   set_catalogdir, clipboard_callback, Icon_Playlist);
 
+static bool set_databasedir(void)
+{
+    path_append(global_settings.tagcache_db_path, selected_file,
+                PA_SEP_SOFT, sizeof(global_settings.tagcache_db_path));
+
+    struct tagcache_stat *tc_stat = tagcache_get_stat();
+    if (strcasecmp(global_settings.tagcache_db_path, tc_stat->db_path))
+    {
+        splashf(HZ, ID2P(LANG_PLEASE_REBOOT));
+    }
+
+    settings_save();
+    return false;
+}
+MENUITEM_FUNCTION(set_databasedir_item, 0, ID2P(LANG_DATABASE_DIR),
+                  set_databasedir, clipboard_callback, Icon_Audio);
+
 MAKE_ONPLAYMENU(set_as_dir_menu, ID2P(LANG_SET_AS),
                 clipboard_callback, Icon_NOICON,
                 &set_catalogdir_item,
+                &set_databasedir_item,
 #ifdef HAVE_RECORDING
                 &set_recdir_item,
 #endif
@@ -1454,6 +1472,7 @@ static int clipboard_callback(int action,
                     if (this_item == &delete_dir_item ||
                         this_item == &set_startdir_item ||
                         this_item == &set_catalogdir_item ||
+                        this_item == &set_databasedir_item ||
                         this_item == &set_as_dir_menu
 #ifdef HAVE_RECORDING
                      || this_item == &set_recdir_item

@@ -1871,6 +1871,7 @@ static int database_callback(int btn, struct gui_synclist *lists)
              stat->initialized ? "Yes" : "No");
     simplelist_addline("DB Ready: %s",
              stat->ready ? "Yes" : "No");
+    simplelist_addline("DB Path: %s", stat->db_path);
     simplelist_addline("RAM Cache: %s",
              stat->ramcache ? "Yes" : "No");
     simplelist_addline("RAM: %d/%d B",

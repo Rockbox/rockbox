@@ -16641,3 +16641,17 @@
     *: "Go to Last Album"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_DATABASE_DIR
+  desc: in database settings menu
+  user: core
+  <source>
+    *: "Database Directory"
+  </source>
+  <dest>
+    *: "Database Directory"
+  </dest>
+  <voice>
+    *: "Database Directory"
+  </voice>
+</phrase>

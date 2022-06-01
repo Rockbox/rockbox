@@ -142,6 +142,12 @@
                     (struct filename_setting[]){                    \
                         {prefix,suffix,sizeof(global_settings.var)}}} }
 
+#define DIRECTORY_SETTING(flags,var,lang_id,name,default) \
+    {flags|F_DIRNAME|F_T_UCHARPTR, &global_settings.var, lang_id, \
+     CHARPTR(default), name, NULL, \
+     {.filename_setting=(struct filename_setting[]){ \
+         {NULL, NULL, sizeof(global_settings.var)}}}}
+
 /*  Used for settings which use the set_option() setting screen.
     The ... arg is a list of pointers to strings to display in the setting
     screen. These can either be literal strings, or ID2P(LANG_*) */

@@ -179,6 +179,13 @@ each option pertains both to files and directories):
 \begin{description}
   \item [Playlist Directory.]
      Set as default directory for the Playlist Catalogue.
+  \opt{tagcache}{
+  \item [Database Directory.]
+     Rockbox usually stores database files in the \fname{/.rockbox} folder.
+     You can choose another location for the database using this setting.
+     This is mainly useful for multiboot targets, so the same database can
+     be shared among several builds without needing to rebuild it each time.
+  }
   \opt{recording}{
     \item [Recording Directory.]
      Save recordings in the selected directory.
