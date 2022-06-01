@@ -117,9 +117,6 @@
 /* Used to guess the necessary buffer size at commit. */
 #define TAGFILE_ENTRY_AVG_LENGTH   16
 
-/* Always strict align entries for best performance and binary compatibility. */
-#define TAGCACHE_STRICT_ALIGN 1
-
 /* Max events in the internal tagcache command queue. */
 #define TAGCACHE_COMMAND_QUEUE_LENGTH 32
 
@@ -2352,15 +2349,6 @@ static int tempbuf_sort(int fd)
                 ((fe.tag_length + sizeof(struct tagfile_entry))
                  % TAGFILE_ENTRY_CHUNK_LENGTH);
         }
-
-#ifdef TAGCACHE_STRICT_ALIGN
-        /* Make sure the entry is long aligned. */
-        if (index[i].seek & 0x03)
-        {
-            logf("tempbuf_sort: alignment error!");
-            return -3;
-        }
-#endif
 
         if (ecwrite(fd, &fe, 1, tagfile_entry_ec, tc_stat.econ) !=
             sizeof(struct tagfile_entry))
