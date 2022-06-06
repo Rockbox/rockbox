@@ -121,7 +121,7 @@ void x1000_boot_linux(const void* source, size_t length,
 
     /* copy argument string to a safe location */
     char* args_copy = safe_mem + 32;
-    iram_memmove(args_copy, args, args_len);
+    iram_memmove(args_copy, args, args_len+1);
 
     /* generate argv array */
     char** argv = safe_mem;
