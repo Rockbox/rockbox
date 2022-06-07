@@ -25,6 +25,8 @@
 #include "logf.h"
 #include <string.h>
 
+static void winbond_setup_chip(struct nand_drv* drv);
+
 static const struct nand_chip chip_ato25d1ga = {
     .log2_ppb = 6, /* 64 pages */
     .page_size = 2048,
@@ -46,9 +48,32 @@ static const struct nand_chip chip_ato25d1ga = {
     .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
 };
 
+static const struct nand_chip chip_w25n01gvxx = {
+    .log2_ppb = 6, /* 64 pages */
+    .page_size = 2048,
+    .oob_size = 64,
+    .nr_blocks = 1024,
+    .bbm_pos = 2048,
+    .clock_freq = 150000000,
+    .dev_conf = jz_orf(SFC_DEV_CONF,
+                       CE_DL(1), HOLD_DL(1), WP_DL(1),
+                       CPHA(0), CPOL(0),
+                       TSH(11), TSETUP(0), THOLD(0),
+                       STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
+                       SMP_DELAY(1)),
+    .flags = NAND_CHIPFLAG_ON_DIE_ECC,
+    /* TODO: quad mode? */
+    .cmd_page_read = NANDCMD_PAGE_READ,
+    .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE,
+    .cmd_block_erase = NANDCMD_BLOCK_ERASE,
+    .cmd_read_cache = NANDCMD_READ_CACHE_SLOW,
+    .cmd_program_load = NANDCMD_PROGRAM_LOAD,
+    .setup_chip = winbond_setup_chip,
+};
 
 const struct nand_chip_id supported_nand_chips[] = {
     NAND_CHIP_ID(&chip_ato25d1ga, NAND_READID_ADDR, 0x9b, 0x12),
+    NAND_CHIP_ID(&chip_w25n01gvxx, NAND_READID_ADDR, 0xef, 0xaa, 0x21),
 };
 
 const size_t nr_supported_nand_chips = ARRAYLEN(supported_nand_chips);
@@ -125,6 +150,12 @@ static void setup_chip_data(struct nand_drv* drv)
 {
     drv->ppb = 1 << drv->chip->log2_ppb;
     drv->fpage_size = drv->chip->page_size + drv->chip->oob_size;
+}
+
+static void winbond_setup_chip(struct nand_drv* drv)
+{
+    /* Ensure we are in buffered read mode. */
+    nand_upd_reg(drv, FREG_CFG, FREG_CFG_WINBOND_BUF, FREG_CFG_WINBOND_BUF);
 }
 
 static void setup_chip_registers(struct nand_drv* drv)

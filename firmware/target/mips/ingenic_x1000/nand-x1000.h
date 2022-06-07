@@ -72,6 +72,9 @@
 #define FREG_CFG_ECC_ENABLE  (1 << 4)
 #define FREG_CFG_QUAD_ENABLE (1 << 0)
 
+/* Winbond-specific bit used on the W25N01GVxx */
+#define FREG_CFG_WINBOND_BUF (1 << 3)
+
 #define FREG_STATUS               0xc0
 #define FREG_STATUS_BUSY          (1 << 0)
 #define FREG_STATUS_EFAIL         (1 << 2)
