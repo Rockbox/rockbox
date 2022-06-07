@@ -189,6 +189,15 @@ static ssize_t uimage_nand_reader(void* buf, size_t count, void* rctx)
 
     while(d->page < d->end_page && read_count < count) {
         rc = nand_page_read(ndrv, d->page, ndrv->page_buf);
+
+        /* Ignore ECC errors on the first page of a block. This may
+         * indicate a bad block. */
+        if(rc == NAND_ERR_ECC_FAIL &&
+           d->page % ndrv->ppb == 0 && d->offset == 0) {
+            d->page += ndrv->ppb;
+            continue;
+        }
+
         if(rc < 0)
             return -1;
 
