@@ -41,6 +41,8 @@
 #define NAND_CHIPFLAG_QUAD          0x0001
 /* Chip requires QE bit set to enable quad I/O mode */
 #define NAND_CHIPFLAG_HAS_QE_BIT    0x0002
+/* Chip has 2nd device ID byte */
+#define NAND_CHIPFLAG_HAS_DEVID2    0x0004
 
 /*                                          cmd   mode             a  d  phase format         has data */
 #define NANDCMD_RESET               SFC_CMD(0xff, SFC_TMODE_1_1_1, 0, 0, SFC_PFMT_ADDR_FIRST, 0)
@@ -97,6 +99,7 @@ typedef struct nand_chip {
     /* Manufacturer and device ID bytes */
     uint8_t mf_id;
     uint8_t dev_id;
+    uint8_t dev_id2;
 
     /* Row/column address width */
     uint8_t row_cycles;
@@ -158,6 +161,7 @@ typedef struct nand_drv {
     /* Probed mf_id / dev_id for debugging, in case identification fails. */
     uint8_t mf_id;
     uint8_t dev_id;
+    uint8_t dev_id2;
 
     /* SFC commands used for I/O, these are set based on chip data */
     uint32_t cmd_page_read;

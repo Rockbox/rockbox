@@ -98,21 +98,24 @@ static bool identify_chip(nand_drv* drv)
      * - 1 byte address, no dummy byte
      * - no address byte, 1 byte dummy
      *
-     * Right now there is only a need for the 2nd variation, as that is
-     * the method used by the ATO25D1GA.
-     *
-     * Some chips also output more than 2 ID bytes.
+     * Currently we use the 2nd method, aka. address read ID.
      */
-    sfc_exec(NANDCMD_READID(1, 0), 0, drv->scratch_buf, 2|SFC_READ);
+    sfc_exec(NANDCMD_READID(1, 0), 0, drv->scratch_buf, 4|SFC_READ);
     drv->mf_id = drv->scratch_buf[0];
     drv->dev_id = drv->scratch_buf[1];
+    drv->dev_id2 = drv->scratch_buf[2];
 
     for(size_t i = 0; i < nr_supported_nand_chips; ++i) {
         const nand_chip* chip = &supported_nand_chips[i];
-        if(chip->mf_id == drv->mf_id && chip->dev_id == drv->dev_id) {
-            drv->chip = chip;
-            return true;
-        }
+        if(chip->mf_id != drv->mf_id || chip->dev_id != drv->dev_id)
+            continue;
+
+        if((chip->flags & NAND_CHIPFLAG_HAS_DEVID2) &&
+           chip->dev_id2 != drv->dev_id2)
+            continue;
+
+        drv->chip = chip;
+        return true;
     }
 
     return false;
