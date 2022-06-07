@@ -156,6 +156,10 @@ static void setup_chip_registers(struct nand_drv* drv)
 
     /* Clear write protection bits */
     nand_set_reg(drv, FREG_PROT, FREG_PROT_UNLOCK);
+
+    /* Call any chip-specific hooks */
+    if(drv->chip->setup_chip)
+        drv->chip->setup_chip(drv);
 }
 
 int nand_open(struct nand_drv* drv)

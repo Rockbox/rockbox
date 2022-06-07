@@ -95,6 +95,8 @@
 typedef uint32_t nand_block_t;
 typedef uint32_t nand_page_t;
 
+struct nand_drv;
+
 struct nand_chip {
     /* Manufacturer and device ID bytes */
     uint8_t mf_id;
@@ -126,6 +128,9 @@ struct nand_chip {
 
     /* Chip specific flags */
     uint32_t flags;
+
+    /* Chip-specific setup routine */
+    void(*setup_chip)(struct nand_drv* drv);
 };
 
 struct nand_drv {
