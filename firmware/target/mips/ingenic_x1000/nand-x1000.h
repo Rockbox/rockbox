@@ -32,6 +32,7 @@
 #define NAND_ERR_PROGRAM_FAIL   (-2)
 #define NAND_ERR_ERASE_FAIL     (-3)
 #define NAND_ERR_UNALIGNED      (-4)
+#define NAND_ERR_ECC_FAIL       (-5)
 
 /* keep max page size in sync with the NAND chip table in the .c file */
 #define NAND_DRV_SCRATCHSIZE 32
@@ -43,6 +44,8 @@
 #define NAND_CHIPFLAG_HAS_QE_BIT    0x0002
 /* Chip has 2nd device ID byte */
 #define NAND_CHIPFLAG_HAS_DEVID2    0x0004
+/* True if the chip has on-die ECC */
+#define NAND_CHIPFLAG_ON_DIE_ECC    0x0008
 
 /*                                          cmd   mode             a  d  phase format         has data */
 #define NANDCMD_RESET               SFC_CMD(0xff, SFC_TMODE_1_1_1, 0, 0, SFC_PFMT_ADDR_FIRST, 0)

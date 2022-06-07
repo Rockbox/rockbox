@@ -22,6 +22,7 @@
 #include "nand-x1000.h"
 #include "sfc-x1000.h"
 #include "system.h"
+#include "logf.h"
 #include <string.h>
 
 const struct nand_chip supported_nand_chips[] = {
@@ -151,6 +152,11 @@ static void setup_chip_registers(struct nand_drv* drv)
                      en ? FREG_CFG_QUAD_ENABLE : 0);
     }
 
+    if(drv->chip->flags & NAND_CHIPFLAG_ON_DIE_ECC) {
+        /* Enable on-die ECC */
+        nand_upd_reg(drv, FREG_CFG, FREG_CFG_ECC_ENABLE, FREG_CFG_ECC_ENABLE);
+    }
+
     /* Clear OTP bit to access the main data array */
     nand_upd_reg(drv, FREG_CFG, FREG_CFG_OTP_ENABLE, 0);
 
@@ -249,6 +255,20 @@ int nand_page_read(struct nand_drv* drv, nand_page_t page, void* buffer)
     sfc_exec(drv->cmd_page_read, page, NULL, 0);
     nand_wait_busy(drv);
     sfc_exec(drv->cmd_read_cache, 0, buffer, drv->fpage_size|SFC_READ);
+
+    if(drv->chip->flags & NAND_CHIPFLAG_ON_DIE_ECC) {
+        uint8_t status = nand_get_reg(drv, FREG_STATUS);
+
+        if(status & FREG_STATUS_ECC_UNCOR_ERR) {
+            logf("ecc uncorrectable error on page %08lx", (unsigned long)page);
+            return NAND_ERR_ECC_FAIL;
+        }
+
+        if(status & FREG_STATUS_ECC_HAS_FLIPS) {
+            logf("ecc corrected bitflips on page %08lx", (unsigned long)page);
+        }
+    }
+
     return NAND_SUCCESS;
 }
 
