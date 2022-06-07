@@ -216,6 +216,12 @@ void nand_close(struct nand_drv* drv)
     sfc_close();
 }
 
+void nand_enable_otp(struct nand_drv* drv, bool enable)
+{
+    nand_upd_reg(drv, FREG_CFG, FREG_CFG_OTP_ENABLE,
+                 enable ? FREG_CFG_OTP_ENABLE : 0);
+}
+
 static uint8_t nand_wait_busy(struct nand_drv* drv)
 {
     uint8_t reg;

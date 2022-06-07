@@ -211,6 +211,9 @@ static inline void nand_unlock(struct nand_drv* drv)
 extern int nand_open(struct nand_drv* drv);
 extern void nand_close(struct nand_drv* drv);
 
+/* Enable/disable OTP access. OTP data pages are usually vendor-specific. */
+void nand_enable_otp(struct nand_drv* drv, bool enable);
+
 /* Read / program / erase operations. Buffer needs to be cache-aligned for DMA.
  * Read and program operate on full page data, ie. including OOB data areas.
  *
