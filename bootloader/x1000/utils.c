@@ -421,3 +421,78 @@ void show_flash_info(void)
     close(fd);
     splashf(3*HZ, "Dumped flash info\nSee flash_info.txt");
 }
+
+static int dump_flash_onfi_info(int fd)
+{
+    struct nand_drv* ndrv = nand_init();
+    nand_lock(ndrv);
+
+    int ret = nand_open(ndrv);
+    if(ret != NAND_SUCCESS) {
+        splashf(5*HZ, "NAND open failed\n");
+        nand_unlock(ndrv);
+        return ret;
+    }
+
+    nand_enable_otp(ndrv, true);
+
+    /* read ONFI parameter page */
+    ret = nand_page_read(ndrv, 0x01, ndrv->page_buf);
+    if(ret != NAND_SUCCESS) {
+        splashf(5*HZ, "Dump failed\nNAND read error");
+        goto out;
+    }
+
+    uint8_t* buf = ndrv->page_buf;
+
+    fdprintf(fd, "signature = %08lx\n", load_le32(buf));
+    fdprintf(fd, "revision = %04x\n", load_le16(buf+4));
+
+    char strbuf[32];
+    memcpy(strbuf, &buf[32], 12);
+    strbuf[12] = '\0';
+    fdprintf(fd, "manufacturer = \"%s\"\n", strbuf);
+
+    memcpy(strbuf, &buf[44], 20);
+    strbuf[20] = '\0';
+    fdprintf(fd, "device model = \"%s\"\n", strbuf);
+
+    fdprintf(fd, "JEDEC mf. id = %02x\n", buf[64]);
+
+    fdprintf(fd, "data bytes per page = %lu\n", load_le32(buf+80));
+    fdprintf(fd, "spare bytes per page = %u\n", load_le16(buf+84));
+    fdprintf(fd, "pages per block = %lu\n", load_le32(buf+92));
+    fdprintf(fd, "blocks per lun = %lu\n", load_le32(buf+96));
+    fdprintf(fd, "number of luns = %u\n", buf[100]);
+    fdprintf(fd, "bits per cell = %u\n", buf[102]);
+    fdprintf(fd, "max bad blocks = %u\n", load_le16(buf+103));
+    fdprintf(fd, "block endurance = %u\n", load_le16(buf+105));
+    fdprintf(fd, "programs per page = %u\n", buf[110]);
+    fdprintf(fd, "page program time = %u\n", load_le16(buf+133));
+    fdprintf(fd, "block erase time = %u\n", load_le16(buf+135));
+    fdprintf(fd, "page read time = %u\n", load_le16(buf+137));
+
+  out:
+    nand_enable_otp(ndrv, false);
+    nand_close(ndrv);
+    nand_unlock(ndrv);
+    return ret;
+}
+
+void show_flash_onfi_info(void)
+{
+    if(check_disk(true) != DISK_PRESENT)
+        return;
+
+    int fd = open("/flash_onfi_info.txt", O_WRONLY|O_CREAT|O_TRUNC);
+    if(fd < 0) {
+        splashf(5*HZ, "Cannot create log file");
+        return;
+    }
+
+    splashf(0, "Reading ONFI info...");
+    dump_flash_onfi_info(fd);
+
+    close(fd);
+    splashf(3*HZ, "Dumped flash ONFI info\nSee flash_onfi_info.txt");
+}
