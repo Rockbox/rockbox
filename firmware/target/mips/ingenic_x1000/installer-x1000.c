@@ -65,7 +65,7 @@ static const int num_updates = sizeof(updates) / sizeof(struct update_part);
 /* calculate the offset and length of the update image; this is constant
  * for a given target, based on the update parts and the NAND chip geometry.
  */
-static void get_image_loc(nand_drv* ndrv, size_t* offptr, size_t* lenptr)
+static void get_image_loc(struct nand_drv* ndrv, size_t* offptr, size_t* lenptr)
 {
     size_t blk_size = ndrv->chip->page_size << ndrv->chip->log2_ppb;
     size_t img_off = 0;
@@ -119,7 +119,7 @@ struct updater {
     size_t img_len; /* image length in flash = size of the buffer */
 
     mtar_t* tar;
-    nand_drv* ndrv;
+    struct nand_drv* ndrv;
 };
 
 static int updater_init(struct updater* u)

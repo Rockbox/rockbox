@@ -24,7 +24,7 @@
 #include "system.h"
 #include <string.h>
 
-const nand_chip supported_nand_chips[] = {
+const struct nand_chip supported_nand_chips[] = {
 #if defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN)
     {
         /* ATO25D1GA */
@@ -51,14 +51,13 @@ const nand_chip supported_nand_chips[] = {
 #endif
 };
 
-const size_t nr_supported_nand_chips =
-    sizeof(supported_nand_chips) / sizeof(nand_chip);
+const size_t nr_supported_nand_chips = ARRAYLEN(supported_nand_chips);
 
-static nand_drv static_nand_drv;
+static struct nand_drv static_nand_drv;
 static uint8_t static_scratch_buf[NAND_DRV_SCRATCHSIZE] CACHEALIGN_ATTR;
 static uint8_t static_page_buf[NAND_DRV_MAXPAGESIZE] CACHEALIGN_ATTR;
 
-nand_drv* nand_init(void)
+struct nand_drv* nand_init(void)
 {
     static bool inited = false;
     if(!inited) {
@@ -71,19 +70,19 @@ nand_drv* nand_init(void)
     return &static_nand_drv;
 }
 
-static uint8_t nand_get_reg(nand_drv* drv, uint8_t reg)
+static uint8_t nand_get_reg(struct nand_drv* drv, uint8_t reg)
 {
     sfc_exec(NANDCMD_GET_FEATURE, reg, drv->scratch_buf, 1|SFC_READ);
     return drv->scratch_buf[0];
 }
 
-static void nand_set_reg(nand_drv* drv, uint8_t reg, uint8_t val)
+static void nand_set_reg(struct nand_drv* drv, uint8_t reg, uint8_t val)
 {
     drv->scratch_buf[0] = val;
     sfc_exec(NANDCMD_SET_FEATURE, reg, drv->scratch_buf, 1|SFC_WRITE);
 }
 
-static void nand_upd_reg(nand_drv* drv, uint8_t reg, uint8_t msk, uint8_t val)
+static void nand_upd_reg(struct nand_drv* drv, uint8_t reg, uint8_t msk, uint8_t val)
 {
     uint8_t x = nand_get_reg(drv, reg);
     x &= ~msk;
@@ -91,7 +90,7 @@ static void nand_upd_reg(nand_drv* drv, uint8_t reg, uint8_t msk, uint8_t val)
     nand_set_reg(drv, reg, x);
 }
 
-static bool identify_chip(nand_drv* drv)
+static bool identify_chip(struct nand_drv* drv)
 {
     /* Read ID command has some variations; Linux handles these 3:
      * - no address or dummy bytes
@@ -106,7 +105,7 @@ static bool identify_chip(nand_drv* drv)
     drv->dev_id2 = drv->scratch_buf[2];
 
     for(size_t i = 0; i < nr_supported_nand_chips; ++i) {
-        const nand_chip* chip = &supported_nand_chips[i];
+        const struct nand_chip* chip = &supported_nand_chips[i];
         if(chip->mf_id != drv->mf_id || chip->dev_id != drv->dev_id)
             continue;
 
@@ -121,13 +120,13 @@ static bool identify_chip(nand_drv* drv)
     return false;
 }
 
-static void setup_chip_data(nand_drv* drv)
+static void setup_chip_data(struct nand_drv* drv)
 {
     drv->ppb = 1 << drv->chip->log2_ppb;
     drv->fpage_size = drv->chip->page_size + drv->chip->oob_size;
 }
 
-static void setup_chip_commands(nand_drv* drv)
+static void setup_chip_commands(struct nand_drv* drv)
 {
     /* Select commands appropriate for the chip */
     drv->cmd_page_read = NANDCMD_PAGE_READ(drv->chip->row_cycles);
@@ -143,7 +142,7 @@ static void setup_chip_commands(nand_drv* drv)
     }
 }
 
-static void setup_chip_registers(nand_drv* drv)
+static void setup_chip_registers(struct nand_drv* drv)
 {
     /* Set chip registers to enter normal operation */
     if(drv->chip->flags & NAND_CHIPFLAG_HAS_QE_BIT) {
@@ -159,7 +158,7 @@ static void setup_chip_registers(nand_drv* drv)
     nand_set_reg(drv, FREG_PROT, FREG_PROT_UNLOCK);
 }
 
-int nand_open(nand_drv* drv)
+int nand_open(struct nand_drv* drv)
 {
     if(drv->refcount > 0) {
         drv->refcount++;
@@ -193,7 +192,7 @@ int nand_open(nand_drv* drv)
     return NAND_SUCCESS;
 }
 
-void nand_close(nand_drv* drv)
+void nand_close(struct nand_drv* drv)
 {
     --drv->refcount;
     if(drv->refcount > 0)
@@ -207,7 +206,7 @@ void nand_close(nand_drv* drv)
     sfc_close();
 }
 
-static uint8_t nand_wait_busy(nand_drv* drv)
+static uint8_t nand_wait_busy(struct nand_drv* drv)
 {
     uint8_t reg;
     do {
@@ -216,7 +215,7 @@ static uint8_t nand_wait_busy(nand_drv* drv)
     return reg;
 }
 
-int nand_block_erase(nand_drv* drv, nand_block_t block)
+int nand_block_erase(struct nand_drv* drv, nand_block_t block)
 {
     sfc_exec(NANDCMD_WR_EN, 0, NULL, 0);
     sfc_exec(drv->cmd_block_erase, block, NULL, 0);
@@ -228,7 +227,7 @@ int nand_block_erase(nand_drv* drv, nand_block_t block)
         return NAND_SUCCESS;
 }
 
-int nand_page_program(nand_drv* drv, nand_page_t page, const void* buffer)
+int nand_page_program(struct nand_drv* drv, nand_page_t page, const void* buffer)
 {
     sfc_exec(NANDCMD_WR_EN, 0, NULL, 0);
     sfc_exec(drv->cmd_program_load, 0, (void*)buffer, drv->fpage_size|SFC_WRITE);
@@ -241,7 +240,7 @@ int nand_page_program(nand_drv* drv, nand_page_t page, const void* buffer)
         return NAND_SUCCESS;
 }
 
-int nand_page_read(nand_drv* drv, nand_page_t page, void* buffer)
+int nand_page_read(struct nand_drv* drv, nand_page_t page, void* buffer)
 {
     sfc_exec(drv->cmd_page_read, page, NULL, 0);
     nand_wait_busy(drv);
@@ -249,7 +248,7 @@ int nand_page_read(nand_drv* drv, nand_page_t page, void* buffer)
     return NAND_SUCCESS;
 }
 
-int nand_read_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* buffer)
+int nand_read_bytes(struct nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* buffer)
 {
     if(byte_len == 0)
         return NAND_SUCCESS;
@@ -277,7 +276,7 @@ int nand_read_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* 
     return NAND_SUCCESS;
 }
 
-int nand_write_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, const void* buffer)
+int nand_write_bytes(struct nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, const void* buffer)
 {
     if(byte_len == 0)
         return NAND_SUCCESS;

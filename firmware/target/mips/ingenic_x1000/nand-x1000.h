@@ -95,7 +95,7 @@
 typedef uint32_t nand_block_t;
 typedef uint32_t nand_page_t;
 
-typedef struct nand_chip {
+struct nand_chip {
     /* Manufacturer and device ID bytes */
     uint8_t mf_id;
     uint8_t dev_id;
@@ -126,9 +126,9 @@ typedef struct nand_chip {
 
     /* Chip specific flags */
     uint32_t flags;
-} nand_chip;
+};
 
-typedef struct nand_drv {
+struct nand_drv {
     /* NAND access lock. Needs to be held during any operations. */
     struct mutex mutex;
 
@@ -150,7 +150,7 @@ typedef struct nand_drv {
     uint8_t* page_buf;
 
     /* Pointer to the chip data. */
-    const nand_chip* chip;
+    const struct nand_chip* chip;
 
     /* Pages per block = 1 << chip->log2_ppb */
     unsigned ppb;
@@ -169,9 +169,9 @@ typedef struct nand_drv {
     uint32_t cmd_program_load;
     uint32_t cmd_program_execute;
     uint32_t cmd_block_erase;
-} nand_drv;
+};
 
-extern const nand_chip supported_nand_chips[];
+extern const struct nand_chip supported_nand_chips[];
 extern const size_t nr_supported_nand_chips;
 
 /* Return the static NAND driver instance.
@@ -179,14 +179,14 @@ extern const size_t nr_supported_nand_chips;
  * ALL normal Rockbox code should use this instance. The SPL does not
  * use it, because it needs to manually place buffers in external RAM.
  */
-extern nand_drv* nand_init(void);
+extern struct nand_drv* nand_init(void);
 
-static inline void nand_lock(nand_drv* drv)
+static inline void nand_lock(struct nand_drv* drv)
 {
     mutex_lock(&drv->mutex);
 }
 
-static inline void nand_unlock(nand_drv* drv)
+static inline void nand_unlock(struct nand_drv* drv)
 {
     mutex_unlock(&drv->mutex);
 }
@@ -200,8 +200,8 @@ static inline void nand_unlock(nand_drv* drv)
  *
  * These functions require the lock to be held.
  */
-extern int nand_open(nand_drv* drv);
-extern void nand_close(nand_drv* drv);
+extern int nand_open(struct nand_drv* drv);
+extern void nand_close(struct nand_drv* drv);
 
 /* Read / program / erase operations. Buffer needs to be cache-aligned for DMA.
  * Read and program operate on full page data, ie. including OOB data areas.
@@ -209,15 +209,15 @@ extern void nand_close(nand_drv* drv);
  * NOTE: ECC is not implemented. If it ever needs to be, these functions will
  * probably use ECC transparently. All code should be written to expect this.
  */
-extern int nand_block_erase(nand_drv* drv, nand_block_t block);
-extern int nand_page_program(nand_drv* drv, nand_page_t page, const void* buffer);
-extern int nand_page_read(nand_drv* drv, nand_page_t page, void* buffer);
+extern int nand_block_erase(struct nand_drv* drv, nand_block_t block);
+extern int nand_page_program(struct nand_drv* drv, nand_page_t page, const void* buffer);
+extern int nand_page_read(struct nand_drv* drv, nand_page_t page, void* buffer);
 
 /* Wrappers to read/write bytes. For simple access to the main data area only.
  * The write address / length must align to a block boundary. Reads do not have
  * any alignment requirement. OOB data is never read, and is written as 0xff.
  */
-extern int nand_read_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* buffer);
-extern int nand_write_bytes(nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, const void* buffer);
+extern int nand_read_bytes(struct nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, void* buffer);
+extern int nand_write_bytes(struct nand_drv* drv, uint32_t byte_addr, uint32_t byte_len, const void* buffer);
 
 #endif /* __NAND_X1000_H__ */

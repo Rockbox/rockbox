@@ -146,14 +146,15 @@ int load_uimage_file(const char* filename,
 
 struct nand_reader_data
 {
-    nand_drv* ndrv;
+    struct nand_drv* ndrv;
     nand_page_t page;
     nand_page_t end_page;
     unsigned offset;
     uint32_t count;
 };
 
-static int uimage_nand_reader_init(struct nand_reader_data* d, nand_drv* ndrv,
+static int uimage_nand_reader_init(struct nand_reader_data* d,
+                                   struct nand_drv* ndrv,
                                    uint32_t addr, uint32_t length)
 {
     unsigned pg_size = ndrv->chip->page_size;
@@ -177,7 +178,7 @@ static int uimage_nand_reader_init(struct nand_reader_data* d, nand_drv* ndrv,
 static ssize_t uimage_nand_reader(void* buf, size_t count, void* rctx)
 {
     struct nand_reader_data* d = rctx;
-    nand_drv* ndrv = d->ndrv;
+    struct nand_drv* ndrv = d->ndrv;
     unsigned pg_size = ndrv->chip->page_size;
     size_t read_count = 0;
     int rc;
@@ -223,7 +224,7 @@ static ssize_t uimage_nand_reader(void* buf, size_t count, void* rctx)
 int load_uimage_flash(uint32_t addr, uint32_t length,
                       struct uimage_header* uh, size_t* sizep)
 {
-    nand_drv* ndrv = nand_init();
+    struct nand_drv* ndrv = nand_init();
     nand_lock(ndrv);
     if(nand_open(ndrv) != NAND_SUCCESS) {
         splashf(5*HZ, "NAND open failed");
@@ -259,7 +260,7 @@ int dump_flash(int fd, uint32_t addr, uint32_t length)
     static char buf[8192];
     int ret = 0;
 
-    nand_drv* ndrv = nand_init();
+    struct nand_drv* ndrv = nand_init();
     nand_lock(ndrv);
 
     ret = nand_open(ndrv);

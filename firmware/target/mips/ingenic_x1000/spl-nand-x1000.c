@@ -23,7 +23,7 @@
 #include "gpio-x1000.h"
 #include "nand-x1000.h"
 
-static nand_drv* ndrv = NULL;
+static struct nand_drv* ndrv = NULL;
 
 int spl_storage_open(void)
 {
@@ -31,7 +31,7 @@ int spl_storage_open(void)
     gpioz_configure(GPIO_A, 0x3f << 26, GPIOF_DEVICE(1));
 
     /* Allocate NAND driver manually in DRAM */
-    ndrv = spl_alloc(sizeof(nand_drv));
+    ndrv = spl_alloc(sizeof(struct nand_drv));
     ndrv->page_buf = spl_alloc(NAND_DRV_MAXPAGESIZE);
     ndrv->scratch_buf = spl_alloc(NAND_DRV_SCRATCHSIZE);
     ndrv->refcount = 0;

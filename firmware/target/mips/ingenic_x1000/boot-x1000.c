@@ -267,7 +267,7 @@ void x1000_dualboot_init_uart2(void)
 
 int x1000_dualboot_load_pdma_fw(void)
 {
-    nand_drv* n = nand_init();
+    struct nand_drv* n = nand_init();
     nand_lock(n);
 
     int ret = nand_open(n);
