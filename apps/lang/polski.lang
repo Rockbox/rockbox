@@ -4102,31 +4102,16 @@
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  desc: deprecated
   user: core
   <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    *: ""
   </source>
   <dest>
-    *: none
-    alarm: "PLAY=Ustaw OFF=Anuluj"
-    gigabeats: "WYBIERZ=Ustaw POWER=Anuluj"
-    ipod*: "WYBIERZ=Ustaw MENU=Anuluj"
-    iriverh10,iriverh10_5gb: "WYBIERZ=Ustaw COFNIJ=Anuluj"
-    mpiohd300: "ENTER=Ustaw MENU=Anuluj"
-    sansafuzeplus: "SELECT=Ustaw  BACK=Anuluj"
-    vibe500: "OK=Ustaw C=Anuluj"
+    *: ""
   </dest>
   <voice>
-    *: none
-    alarm,ipod*: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13182,16 +13167,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Album]"
+    *: ""
   </dest>
   <voice>
-    *: "Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13654,16 +13639,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Czas trwania]"
+    *: ""
   </dest>
   <voice>
-    *: "Czas trwania"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14224,16 +14209,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Artysta]"
+    *: ""
   </dest>
   <voice>
-    *: "Artysta"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14900,16 +14885,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Tytuł]"
+    *: ""
   </dest>
   <voice>
-    *: "Tytuł"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15528,16 +15513,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Wyczyść listę i odtwarzaj następne"
+    *: ""
   </dest>
   <voice>
-    *: "Wyczyść listę i odtwarzaj następne"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15598,16 +15583,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Wyczyść listę i odtwarzaj losowe"
+    *: ""
   </dest>
   <voice>
-    *: "Wyczyść listę i odtwarzaj losowe"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15881,128 +15866,128 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Wykonawca albumu]"
+    *: ""
   </dest>
   <voice>
-    *: "Wykonawca albumu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Gatunek]"
+    *: ""
   </dest>
   <voice>
-    *: "Gatunek"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Komentarz]"
+    *: ""
   </dest>
   <voice>
-    *: "Komentarz"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Kompozytor]"
+    *: ""
   </dest>
   <voice>
-    *: "Kompozytor"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Rok]"
+    *: ""
   </dest>
   <voice>
-    *: "Rok"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Nr utworu]"
+    *: ""
   </dest>
   <voice>
-    *: "Numer utworu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Nr płyty]"
+    *: ""
   </dest>
   <voice>
-    *: "Numer płyty"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Częstotliwość]"
+    *: ""
   </dest>
   <voice>
-    *: "Częstotliwość"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Prędkość transmisji]"
+    *: ""
   </dest>
   <voice>
-    *: "Prędkość transmisji"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16258,5 +16243,61 @@
   </dest>
   <voice>
     *: "Pamięć podręczna musi najpierw zakończyć aktualizację!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Informacje o utworze"
+  </dest>
+  <voice>
+    *: "Informacje o utworze"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Odtwarzaj"
+  </dest>
+  <voice>
+    *: "Odtwarzaj"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Odtwarzaj losowe"
+  </dest>
+  <voice>
+    *: "Odtwarzaj losowe"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Zachowaj bieżący utwór podczas zastępowania listy odtwarzania"
+  </dest>
+  <voice>
+    *: "Zachowaj bieżący utwór podczas zastępowania listy odtwarzania"
   </voice>
 </phrase>
