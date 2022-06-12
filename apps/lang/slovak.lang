@@ -1683,10 +1683,10 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Denník Last.fm"
@@ -3576,7 +3576,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansae200*,gogearsa9200,samsungyh*,iriverh100,iriverh120,iriverh300,rtc: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3613,7 +3613,7 @@
   </dest>
   <voice>
     *: none
-    gogearsa9200,iaudiom5,iaudiox5,ipod*,sansac200*,iriverh10,iriverh10_5gb,sansae200*,iriverh100,iriverh120,iriverh300,mrobe100,rtc,samsungyh*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -4094,31 +4094,16 @@
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  desc: deprecated
   user: core
   <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    *: ""
   </source>
   <dest>
-    *: none
-    alarm: "PLAY=Nastaviť OFF=Zrušiť"
-    gigabeats: "SELECT=Nastaviť POWER=Zrušiť"
-    ipod*: "SELECT=Nastaviť MENU=Zrušiť"
-    iriverh10,iriverh10_5gb: "SELECT=Nastaviť PREV=Zrušiť"
-    mpiohd300: "ENTER=Nastaviť MENU=Zrušiť"
-    sansafuzeplus: "SELECT=Nastaviť  BACK=Zrušiť"
-    vibe500: "OK=Nastaviť C=Zrušiť"
+    *: ""
   </dest>
   <voice>
-    *: none
-    alarm,ipod*: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7672,10 +7657,10 @@
     *: "."
   </source>
   <dest>
-    *: "."
+    *: ","
   </dest>
   <voice>
-    *: "bodka"
+    *: "čiarka"
   </voice>
 </phrase>
 <phrase>
@@ -12664,16 +12649,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Názov]"
+    *: ""
   </dest>
   <voice>
-    *: "Názov"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13419,16 +13404,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Trvanie]"
+    *: ""
   </dest>
   <voice>
-    *: "Trvanie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14267,16 +14252,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Interpret]"
+    *: ""
   </dest>
   <voice>
-    *: "Interpret"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14427,16 +14412,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Album]"
+    *: ""
   </dest>
   <voice>
-    *: "Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15313,10 +15298,10 @@
     *: "Single Mode"
   </source>
   <dest>
-    *: "Single Mode"
+    *: "Single režim"
   </dest>
   <voice>
-    *: "Single Mode"
+    *: "Single režim"
   </voice>
 </phrase>
 <phrase>
@@ -15588,10 +15573,10 @@
     *: "Open Plugin"
   </source>
   <dest>
-    *: "Open Plugin"
+    *: "Otvoriť plugin"
   </dest>
   <voice>
-    *: "Open Plugin"
+    *: "Otvoriť plugin"
   </voice>
 </phrase>
 <phrase>
@@ -15750,16 +15735,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Vymazať zoznam a prehrať ako ďalšie"
+    *: ""
   </dest>
   <voice>
-    *: "Vymazať zoznam a prehrať ako ďalšie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15770,10 +15755,10 @@
     *: "Queue..."
   </source>
   <dest>
-    *: "Queue..."
+    *: "Poradovník..."
   </dest>
   <voice>
-    *: "Queue..."
+    *: "Poradovník..."
   </voice>
 </phrase>
 <phrase>
@@ -15784,10 +15769,10 @@
     *: "Show Queue Options"
   </source>
   <dest>
-    *: "Show Queue Options"
+    *: "Ukázať voľby poradovníka"
   </dest>
   <voice>
-    *: "Show Queue Options"
+    *: "Ukázať voľby poradovníka"
   </voice>
 </phrase>
 <phrase>
@@ -15798,10 +15783,10 @@
     *: "Show Shuffled Adding Options"
   </source>
   <dest>
-    *: "Show Shuffled Adding Options"
+    *: "Ukázať voľby pridávania zamiešane"
   </dest>
   <voice>
-    *: "Show Shuffled Adding Options"
+    *: "Ukázať voľby pridávania zamiešane"
   </voice>
 </phrase>
 <phrase>
@@ -15820,16 +15805,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Vymazať zoznam a prehrať zamiešané"
+    *: ""
   </dest>
   <voice>
-    *: "Vymazať zoznam a prehrať zamiešané"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15890,128 +15875,128 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Interpret albumu]"
+    *: ""
   </dest>
   <voice>
-    *: "Interpret albumu"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Žáner]"
+    *: ""
   </dest>
   <voice>
-    *: "Žáner"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Komentár]"
+    *: ""
   </dest>
   <voice>
-    *: "Komentár"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Skladateľ]"
+    *: ""
   </dest>
   <voice>
-    *: "Skladateľ"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Rok]"
+    *: ""
   </dest>
   <voice>
-    *: "Rok"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Čstopy]"
+    *: ""
   </dest>
   <voice>
-    *: "Č. stopy"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Čdisku]"
+    *: ""
   </dest>
   <voice>
-    *: "Č. disku"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Frekvencia]"
+    *: ""
   </dest>
   <voice>
-    *: "Frekvencia"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Početbitov]"
+    *: ""
   </dest>
   <voice>
-    *: "Počet bitov"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16050,10 +16035,10 @@
     *: "List Wraparound"
   </source>
   <dest>
-    *: "List Wraparound"
+    *: "Otáčať zoznam"
   </dest>
   <voice>
-    *: "List Wraparound"
+    *: "Otáčať zoznam"
   </voice>
 </phrase>
 <phrase>
@@ -16169,5 +16154,145 @@
   <voice>
     *: none
     rds: "Synchronizovať s časom RDS"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Triediť albumy podľa"
+  </dest>
+  <voice>
+    *: "Triediť albumy podľa"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Interpret + názov"
+  </dest>
+  <voice>
+    *: "Interpret a názov"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Interpret + rok"
+  </dest>
+  <voice>
+    *: "Interpret a rok"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Triediť podľa roku"
+  </dest>
+  <voice>
+    *: "Triediť podľa roku"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Ukázať rok v názve albumu"
+  </dest>
+  <voice>
+    *: "Ukázať rok v názve albumu"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Najprv sa musí dokončiť aktualizácia cache!"
+  </dest>
+  <voice>
+    *: "Najprv sa musí dokončiť aktualizácia cache!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Info o stope"
+  </dest>
+  <voice>
+    *: "Info o stope"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Prehrať"
+  </dest>
+  <voice>
+    *: "Prehrať"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Prehrať zamiešané"
+  </dest>
+  <voice>
+    *: "Prehrať zamiešané"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Ponechať aktuálnu stopu pri nahradení playlistu"
+  </dest>
+  <voice>
+    *: "Ponechať aktuálnu stopu pri nahradení playlistu"
   </voice>
 </phrase>
