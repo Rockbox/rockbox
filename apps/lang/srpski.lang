@@ -247,8 +247,7 @@
   <source>
     *: "PLAY = Yes"
     cowond2*: "MENU, or top-right = Yes"
-    creativezen*: "SELECT = Yes"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Yes"
     iriverh100,iriverh120,iriverh300: "NAVI = Yes"
     mrobe500: "PLAY, POWER, or top-right = Yes"
     vibe500: "OK = Yes"
@@ -256,8 +255,7 @@
   <dest>
     *: "PLAY = Да"
     cowond2*: "MENU, или горе-десно = Да"
-    creativezen*: "SELECT = Да"
-    gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Да"
+    creativezen*,gigabeat*,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh10_5gb,mrobe100,sansac200*,sansaclip*,sansaconnect,sansae200*,sansafuze*: "SELECT = Да"
     iriverh100,iriverh120,iriverh300: "NAVI = Да"
     mrobe500: "PLAY, POWER, или горе-десно = Да"
     vibe500: "OK = Да"
@@ -278,7 +276,6 @@
   </dest>
   <voice>
     *: ""
-    archosplayer: none
   </voice>
 </phrase>
 <phrase>
@@ -799,10 +796,10 @@
     *: "Crossfeed"
   </source>
   <dest>
-    *: "Crossfeed"
+    *: "Кросфид"
   </dest>
   <voice>
-    *: "Crossfeed"
+    *: "Кросфид"
   </voice>
 </phrase>
 <phrase>
@@ -981,7 +978,7 @@
     *: "Edit mode: %s"
   </source>
   <dest>
-    *: "Мод подешавања: %s"
+    *: "Режим уређивања: %s"
   </dest>
   <voice>
     *: ""
@@ -1292,10 +1289,10 @@
     *: "Party Mode"
   </source>
   <dest>
-    *: "Мод за журке"
+    *: "Режим за журке"
   </dest>
   <voice>
-    *: "Мод за журке"
+    *: "Режим за журке"
   </voice>
 </phrase>
 <phrase>
@@ -1308,11 +1305,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Претапање"
   </dest>
   <voice>
     *: none
-    crossfade: "Crossfade"
+    crossfade: "Претапање"
   </voice>
 </phrase>
 <phrase>
@@ -1325,11 +1322,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Укључи Crossfade"
+    crossfade: "Укључи претапање"
   </dest>
   <voice>
     *: none
-    crossfade: "Укључи Crossfade"
+    crossfade: "Укључи претапање"
   </voice>
 </phrase>
 <phrase>
@@ -1444,11 +1441,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Fade-Out мод"
+    crossfade: "Fade-Out режим"
   </dest>
   <voice>
     *: none
-    crossfade: "Fade-Out мод"
+    crossfade: "Fade-Out режим"
   </voice>
 </phrase>
 <phrase>
@@ -1461,11 +1458,11 @@
   </source>
   <dest>
     *: none
-    crossfade: "Mix"
+    crossfade: "Микс"
   </dest>
   <voice>
     *: none
-    crossfade: "Mix"
+    crossfade: "Микс"
   </voice>
 </phrase>
 <phrase>
@@ -1669,16 +1666,16 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
-    *: "Last.fm дневник"
+    *: "Креатор Last.fm дневника"
   </dest>
   <voice>
-    *: "Last.fm дневник"
+    *: "Креатор Last.fm дневника"
   </voice>
 </phrase>
 <phrase>
@@ -2376,11 +2373,11 @@
   </source>
   <dest>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD мод"
+    lcd_invert,remote_lcd_invert: "LCD режим"
   </dest>
   <voice>
     *: none
-    lcd_invert,remote_lcd_invert: "LCD мод"
+    lcd_invert,remote_lcd_invert: "LCD режим"
   </voice>
 </phrase>
 <phrase>
@@ -3599,7 +3596,7 @@
   </dest>
   <voice>
     *: none
-    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,sansac200*,sansae200*: ""
+    gigabeat*,gogearsa9200,iaudiom5,iaudiox5,ipod*,iriverh10,iriverh100,iriverh10_5gb,iriverh120,iriverh300,mrobe100,rtc,samsungyh*,sansac200*,sansae200*: ""
   </voice>
 </phrase>
 <phrase>
@@ -3969,11 +3966,11 @@
   </source>
   <dest>
     *: none
-    charging: "Мод за адаптер у аутомобилу"
+    charging: "Режим за адаптер у аутомобилу"
   </dest>
   <voice>
     *: none
-    charging: "Мод за адаптер у аутомобилу"
+    charging: "Режим за адаптер у аутомобилу"
   </voice>
 </phrase>
 <phrase>
@@ -4080,31 +4077,16 @@
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  desc: deprecated
   user: core
   <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    *: ""
   </source>
   <dest>
-    *: none
-    alarm: "PLAY=Постави OFF=Одустани"
-    gigabeats: "SELECT=Постави POWER=Одустани"
-    ipod*: "SELECT=Постави MENU=Одустани"
-    iriverh10,iriverh10_5gb: "SELECT=Постави PREV=Одустани"
-    mpiohd300: "ENTER=Постави MENU=Одустани"
-    sansafuzeplus: "SELECT=Постави  BACK=Одустани"
-    vibe500: "OK=Постави C=Одустани"
+    *: ""
   </dest>
   <voice>
-    *: none
-    alarm,ipod*: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -5974,12 +5956,10 @@
   <source>
     *: "Battery: %d%% %dh %dm"
     ipodmini1g,ipodmini2g,iriverh10: "Batt: %d%% %dh %dm"
-    iriverifp7xx: "%d%% %dh %dm"
   </source>
   <dest>
     *: "Батерија: %d%% %dч %dм"
     ipodmini1g,ipodmini2g,iriverh10: "Бат: %d%% %dч %dм"
-    iriverifp7xx: "%d%% %dч %dм"
   </dest>
   <voice>
     *: "Ниво батерије"
@@ -6019,14 +5999,17 @@
   user: core
   <source>
     *: "Int:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </source>
   <dest>
     *: "Инт:"
+    hibylinux: "mSD:"
     xduoox3: "mSD1:"
   </dest>
   <voice>
     *: "Интерни"
+    hibylinux: "мајкро Ес Де"
     xduoox3: "мајкро Ес Де 1"
   </voice>
 </phrase>
@@ -6251,16 +6234,16 @@
 </phrase>
 <phrase>
   id: LANG_REPLACE
-  desc: in onplay menu.  Replace the current playlist with a new one.
+  desc: deprecated
   user: core
   <source>
-    *: "Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Репродукуј следећу"
+    *: ""
   </dest>
   <voice>
-    *: "Репродукуј следећу"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7241,10 +7224,10 @@
     *: "Mode:"
   </source>
   <dest>
-    *: "Мод:"
+    *: "Режим:"
   </dest>
   <voice>
-    *: "Мод:"
+    *: "Режим:"
   </voice>
 </phrase>
 <phrase>
@@ -7345,7 +7328,7 @@
   </dest>
   <voice>
     *: none
-    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,sansac200*,sansae200*: ""
+    iaudiom5,iaudiox5,iriverh100,iriverh120,iriverh300,recording,samsungyh*,sansac200*,sansae200*,vibe500: ""
   </voice>
 </phrase>
 <phrase>
@@ -7483,7 +7466,7 @@
     *: "Incompatible model"
   </source>
   <dest>
-    *: "Модел није одговарајући"
+    *: "Овај модел није подржан"
   </dest>
   <voice>
     *: "Неодговарајући модел"
@@ -8304,7 +8287,7 @@
     *: ""
   </dest>
   <voice>
-    *: "pixel"
+    *: "пиксела"
   </voice>
 </phrase>
 <phrase>
@@ -8332,7 +8315,7 @@
     *: ""
   </dest>
   <voice>
-    *: "херц"
+    *: "херца"
   </voice>
 </phrase>
 <phrase>
@@ -8808,7 +8791,7 @@
     *: ""
   </dest>
   <voice>
-    *: "while-playing-screen"
+    *: "екран-током-репродукције"
   </voice>
 </phrase>
 <phrase>
@@ -8864,7 +8847,7 @@
     *: ""
   </dest>
   <voice>
-    *: "firmware"
+    *: "фирмвер"
   </voice>
 </phrase>
 <phrase>
@@ -8909,7 +8892,7 @@
     *: ""
   </dest>
   <voice>
-    *: "cuesheet"
+    *: "кјулиста"
   </voice>
 </phrase>
 <phrase>
@@ -9108,7 +9091,7 @@
     *: ""
   </dest>
   <voice>
-    *: "units per tick"
+    *: "јединица по подеоку"
   </voice>
 </phrase>
 <phrase>
@@ -9122,7 +9105,7 @@
     *: ""
   </dest>
   <voice>
-    *: "o'clock"
+    *: "сати"
   </voice>
 </phrase>
 <phrase>
@@ -9136,7 +9119,7 @@
     *: ""
   </dest>
   <voice>
-    *: "P M"
+    *: "поподне"
   </voice>
 </phrase>
 <phrase>
@@ -9150,7 +9133,7 @@
     *: ""
   </dest>
   <voice>
-    *: "A M"
+    *: "преподне"
   </voice>
 </phrase>
 <phrase>
@@ -9164,7 +9147,7 @@
     *: ""
   </dest>
   <voice>
-    *: "oh"
+    *: "о"
   </voice>
 </phrase>
 <phrase>
@@ -9342,7 +9325,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Edit"
+    *: "Уреди"
   </voice>
 </phrase>
 <phrase>
@@ -9356,7 +9339,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Blank"
+    *: "Празно"
   </voice>
 </phrase>
 <phrase>
@@ -9370,7 +9353,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Empty list"
+    *: "Празна листа"
   </voice>
 </phrase>
 <phrase>
@@ -9536,7 +9519,7 @@
     *: ""
   </dest>
   <voice>
-    *: "Quick screen"
+    *: "Брзи екран"
   </voice>
 </phrase>
 <phrase>
@@ -9564,7 +9547,7 @@
     *: ""
   </dest>
   <voice>
-    *: "OK"
+    *: "О Кеј"
   </voice>
 </phrase>
 <phrase>
@@ -9598,7 +9581,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "величина"
   </voice>
 </phrase>
 <phrase>
@@ -9691,7 +9674,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "време дељења"
   </voice>
 </phrase>
 <phrase>
@@ -9722,7 +9705,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "клип"
   </voice>
 </phrase>
 <phrase>
@@ -9756,7 +9739,7 @@
   </dest>
   <voice>
     *: none
-    recording: ""
+    recording: "фајл"
   </voice>
 </phrase>
 <phrase>
@@ -9975,11 +9958,11 @@
   </source>
   <dest>
     *: none
-    recording: "Моно мод"
+    recording: "Моно режим"
   </dest>
   <voice>
     *: none
-    recording: "Моно мод"
+    recording: "Моно режим"
   </voice>
 </phrase>
 <phrase>
@@ -10201,11 +10184,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "Тачскрин мод"
+    touchscreen: "Тачскрин режим"
   </dest>
   <voice>
     *: none
-    touchscreen: "Тачскрин мод"
+    touchscreen: "Тачскрин режим"
   </voice>
 </phrase>
 <phrase>
@@ -10247,7 +10230,7 @@
     *: ""
   </dest>
   <voice>
-    *: "statusbar skin"
+    *: "изглед статусне линије"
   </voice>
 </phrase>
 <phrase>
@@ -10337,7 +10320,7 @@
   </dest>
   <voice>
     *: none
-    remote: "remote statusbar skin"
+    remote: "изглед удаљене статусне линије"
   </voice>
 </phrase>
 <phrase>
@@ -10348,10 +10331,10 @@
     *: "Knee"
   </source>
   <dest>
-    *: "Knee"
+    *: "Колено"
   </dest>
   <voice>
-    *: "Ни"
+    *: "колено"
   </voice>
 </phrase>
 <phrase>
@@ -10390,10 +10373,10 @@
     *: "Soft Knee"
   </source>
   <dest>
-    *: "Soft Knee"
+    *: "Меко колено"
   </dest>
   <voice>
-    *: "Софт ни"
+    *: "меко колено"
   </voice>
 </phrase>
 <phrase>
@@ -10434,11 +10417,11 @@
   </source>
   <dest>
     *: none
-    usb_hid: "Мод USB тастатуре"
+    usb_hid: "Режим USB тастатуре"
   </dest>
   <voice>
     *: none
-    usb_hid: "Мод USB тастатуре"
+    usb_hid: "режим у ес бе тастатуре"
   </voice>
 </phrase>
 <phrase>
@@ -10449,10 +10432,10 @@
     *: "Hard Knee"
   </source>
   <dest>
-    *: "Hard Knee"
+    *: "Тврдо колено"
   </dest>
   <voice>
-    *: "Хард ни"
+    *: "тврдо колено"
   </voice>
 </phrase>
 <phrase>
@@ -10813,10 +10796,10 @@
     *: "Timestretch"
   </source>
   <dest>
-    *: "Timestretch"
+    *: "Временско растезање"
   </dest>
   <voice>
-    *: "Timestretch"
+    *: "Временско растезање"
   </voice>
 </phrase>
 <phrase>
@@ -10975,11 +10958,11 @@
   </source>
   <dest>
     *: none
-    touchscreen: "OK"
+    touchscreen: "ОК"
   </dest>
   <voice>
     *: none
-    touchscreen: "OK"
+    touchscreen: "О Кеј"
   </voice>
 </phrase>
 <phrase>
@@ -11979,7 +11962,7 @@
     *: "Q"
   </dest>
   <voice>
-    *: "Q"
+    *: "Ку фактор"
   </voice>
 </phrase>
 <phrase>
@@ -12122,13 +12105,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Play"
+    *: "Exempt Play"
   </source>
   <dest>
-    *: "Репродукуј"
+    *: "Изузми репродукцију"
   </dest>
   <voice>
-    *: "Репродукуј"
+    *: "Изузми репродукцију"
   </voice>
 </phrase>
 <phrase>
@@ -12136,13 +12119,13 @@
   desc: Softlock behaviour setting
   user: core
   <source>
-    *: "Disable Notify"
+    *: "Disable Locked Reminders"
   </source>
   <dest>
-    *: "Онемогући обавештење"
+    *: "Онемогући закључана обавештења"
   </dest>
   <voice>
-    *: "Онемогући обавештење"
+    *: "Онемогући закључана обавештења"
   </voice>
 </phrase>
 <phrase>
@@ -12181,10 +12164,10 @@
     *: "USB Mode"
   </source>
   <dest>
-    *: "USB Мод"
+    *: "USB режим"
   </dest>
   <voice>
-    *: "USB Мод"
+    *: "USB режим"
   </voice>
 </phrase>
 <phrase>
@@ -12248,13 +12231,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Skip"
+    *: "Exempt Skip"
   </source>
   <dest>
-    *: "Прескочи"
+    *: "Изузми прескакање"
   </dest>
   <voice>
-    *: "Прескочи"
+    *: "Изузми прескакање"
   </voice>
 </phrase>
 <phrase>
@@ -12276,13 +12259,13 @@
   desc: Selective Actions
   user: core
   <source>
-    *: "Seek"
+    *: "Exempt Seek"
   </source>
   <dest>
-    *: "Премотај"
+    *: "Изузми премотавање"
   </dest>
   <voice>
-    *: "Премотај"
+    *: "Изузми премотавање"
   </voice>
 </phrase>
 <phrase>
@@ -14299,7 +14282,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Притисните репродукцију за покретање теста батерије или стоп за отказивање"
   </voice>
 </phrase>
 <phrase>
@@ -14583,7 +14566,7 @@
     *: ""
   </dest>
   <voice>
-    *: ""
+    *: "Обележено"
   </voice>
 </phrase>
 <phrase>
@@ -15349,7 +15332,6 @@
     mpiohd200: "Дупли тап REC за прекид."
     mpiohd300: "Дупли тап MENU за прекид."
     rx27generic: "Притисните VOLUME за прекид."
-    sonynwza860: "Мапе тастера нису комплетне."
     touchscreen: "Притисните Middle Left за прекид."
     vibe500: "Притисните PREV за прекид."
     xduoox20,xduoox3,xduoox3ii: "Дупли тап HOME за прекид."
@@ -15457,5 +15439,801 @@
   <voice>
     *: none
     hotkey: "Објављивање укључено"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SINGLE_MODE
+  desc: single mode
+  user: core
+  <source>
+    *: "Single Mode"
+  </source>
+  <dest>
+    *: "Режим само једне"
+  </dest>
+  <voice>
+    *: "режим само једне"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TALK_MIXER_LEVEL
+  desc: Relative volume of voice prompts
+  user: core
+  <source>
+    *: "Voice prompt volume"
+  </source>
+  <dest>
+    *: "Јачина гласа"
+  </dest>
+  <voice>
+    *: "јачина гласа"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SHARP
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Sharp"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Кратки оштар"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "кратки оштар"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SHORT_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Short Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Кратки спори"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Кратки спори"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_SUPER_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    filter_roll_off: "Super Slow"
+  </source>
+  <dest>
+    *: none
+    filter_roll_off: "Супер спори"
+  </dest>
+  <voice>
+    *: none
+    filter_roll_off: "Супер спори"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Линеарни брзи"
+  </dest>
+  <voice>
+    *: none
+    es9218: "линеарни брзи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_LINEAR_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Linear Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Линеарни спори"
+  </dest>
+  <voice>
+    *: none
+    es9218: "линеарни спори"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Минимални брзи"
+  </dest>
+  <voice>
+    *: none
+    es9218: "минимални брзи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_MINIMUM_SLOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Minimum Slow"
+  </source>
+  <dest>
+    *: none
+    es9218: "Минимални спори"
+  </dest>
+  <voice>
+    *: none
+    es9218: "минимални спори"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_1
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 1"
+  </source>
+  <dest>
+    *: none
+    es9218: "Аподизацијски тип 1"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Аподизацијски тип 1"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_APODIZING_2
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Apodizing type 2"
+  </source>
+  <dest>
+    *: none
+    es9218: "Аподизацијски тип 2"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Аподизацијски тип 2"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_HYBRID_FAST
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Hybrid Fast"
+  </source>
+  <dest>
+    *: none
+    es9218: "Хибридни брзи"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Хибридни брзи"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FILTER_BRICK_WALL
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    es9218: "Brick Wall"
+  </source>
+  <dest>
+    *: none
+    es9218: "Зид"
+  </dest>
+  <voice>
+    *: none
+    es9218: "Зид"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_MODE
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "DAC's power mode"
+    es9218: "DAC's output level"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Режим напајања ДАК"
+    es9218: "Излазни ниво ДАК"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Режим напајања ДАК"
+    es9218: "Излазни ниво ДАК"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_HIGH
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "High performance"
+    es9218: "High Gain (2 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Високе перформансе"
+    es9218: "Високо појачање (2 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Високе перформансе"
+    es9218: "Високо појачање (2 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DAC_POWER_LOW
+  desc: in sound settings
+  user: core
+  <source>
+    *: none
+    dac_power_mode: "Save battery"
+    es9218: "Low Gain (1 Vrms)"
+  </source>
+  <dest>
+    *: none
+    dac_power_mode: "Штедња батерије"
+    es9218: "Ниско појачање (1 Vrms)"
+  </dest>
+  <voice>
+    *: none
+    dac_power_mode: "Штедња батерије"
+    es9218: "Ниско појачање (1 Vrms)"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ENTER_USB_STORAGE_MODE_QUERY
+  desc: upon plugging in USB
+  user: core
+  <source>
+    *: "Enter USB mass storage mode?"
+  </source>
+  <dest>
+    *: "Да пређем у режим USB масовне меморије?"
+  </dest>
+  <voice>
+    *: "Да пређем у режим USB масовне меморије?"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_NEXT
+  desc: in onplay menu.  Replace current playlist with selected tracks
+  user: core
+  <source>
+    *: "Clear List & Play Next"
+  </source>
+  <dest>
+    *: "Очисти листу & репродукуј наредну"
+  </dest>
+  <voice>
+    *: "Очисти листу и репродукуј наредну"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_QUEUE_MENU
+  desc: in onplay menu
+  user: core
+  <source>
+    *: "Queue..."
+  </source>
+  <dest>
+    *: "Ред..."
+  </dest>
+  <voice>
+    *: "ред..."
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_QUEUE_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Queue Options"
+  </source>
+  <dest>
+    *: "Прикажи опције реда"
+  </dest>
+  <voice>
+    *: "Прикажи опције реда"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUFFLED_ADDING_OPTIONS
+  desc: in Current Playlist settings
+  user: core
+  <source>
+    *: "Show Shuffled Adding Options"
+  </source>
+  <dest>
+    *: "Прикажи опције измешаног додавања"
+  </dest>
+  <voice>
+    *: "Прикажи опције измешаног додавања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_IN_SUBMENU
+  desc: in Settings
+  user: core
+  <source>
+    *: "In Submenu"
+  </source>
+  <dest>
+    *: "У подменију"
+  </dest>
+  <voice>
+    *: "У подменију"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
+  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  user: core
+  <source>
+    *: "Clear List & Play Shuffled"
+  </source>
+  <dest>
+    *: "Очисти листу & репродукуј измешано"
+  </dest>
+  <voice>
+    *: "Очисти листу & репродукуј измешано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SOFTLOCK_DISABLE_ALL_NOTIFY
+  desc: disable all softlock notifications
+  user: core
+  <source>
+    *: "Disable All Lock Notifications"
+  </source>
+  <dest>
+    *: "Искључи сва закључана обавештења"
+  </dest>
+  <voice>
+    *: "Искључи сва закључана обавештења"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_VOLUME
+  desc: exempt volume from softlock
+  user: core
+  <source>
+    *: "Exempt Volume"
+  </source>
+  <dest>
+    *: "Изузми јачину"
+  </dest>
+  <voice>
+    *: "Изузми јачину"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ACTION_ALWAYSAUTOLOCK
+  desc: always prime autolock
+  user: core
+  <source>
+    *: "Always Autolock"
+  </source>
+  <dest>
+    *: "Увек аутоматски закључај"
+  </dest>
+  <voice>
+    *: "Увек аутоматски закључај"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAYLIST_RELOAD_AFTER_SAVE
+  desc: reload playlist after saving
+  user: core
+  <source>
+    *: "Reload After Saving"
+  </source>
+  <dest>
+    *: "Поново учитај након чувања"
+  </dest>
+  <voice>
+    *: "Поново учитај након чувања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_ALBUMARTIST
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Album Artist]"
+  </source>
+  <dest>
+    *: "[Уметник албума]"
+  </dest>
+  <voice>
+    *: "Уметник албума"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_GENRE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Genre]"
+  </source>
+  <dest>
+    *: "[Жанр]"
+  </dest>
+  <voice>
+    *: "Жанр"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMMENT
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Comment]"
+  </source>
+  <dest>
+    *: "[Коментар]"
+  </dest>
+  <voice>
+    *: "Коментар"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_COMPOSER
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Composer]"
+  </source>
+  <dest>
+    *: "[Композитор]"
+  </dest>
+  <voice>
+    *: "Композитор"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_YEAR
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Year]"
+  </source>
+  <dest>
+    *: "[Година]"
+  </dest>
+  <voice>
+    *: "Година"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_TRACKNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Tracknum]"
+  </source>
+  <dest>
+    *: "[Брнумере]"
+  </dest>
+  <voice>
+    *: "Број нумере"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_DISCNUM
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Discnum]"
+  </source>
+  <dest>
+    *: "[Брдиска]"
+  </dest>
+  <voice>
+    *: "Број диска"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_FREQUENCY
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Frequency]"
+  </source>
+  <dest>
+    *: "[Фреквенција]"
+  </dest>
+  <voice>
+    *: "Фреквенција"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PROPERTIES_BITRATE
+  desc: in properties plugin
+  user: core
+  <source>
+    *: "[Bitrate]"
+  </source>
+  <dest>
+    *: "[Битски_проток]"
+  </dest>
+  <voice>
+    *: "Битски проток"
+  </voice>
+</phrase>
+<phrase>
+  id: VOICE_NUMERIC_TENS_SWAP_SEPARATOR
+  desc: voice only, for speaking numbers in languages that swap the tens and ones fields. Leave blank for languages that do not need it, such as English ("231" => "two hundred thirty one") but other languages may speak it as "two hundred one [AND] thirty"
+  user: core
+  <source>
+    *: ""
+  </source>
+  <dest>
+    *: ""
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_VOICED_DATE_FORMAT
+  desc: format string for how dates will be read back. Y == 4-digit year, A == month name, m == numeric month, d == numeric day. For example, "AdY" will read "January 21 2021"
+  user: core
+  <source>
+    *: "dAY"
+  </source>
+  <dest>
+    *: "dAY"
+  </dest>
+  <voice>
+    *: ""
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_WRAPAROUND
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Wraparound"
+  </source>
+  <dest>
+    *: "Обмотавање листе"
+  </dest>
+  <voice>
+    *: "Обмотавање листе"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_SHUTDOWN_MESSAGE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show Shutdown Message"
+  </source>
+  <dest>
+    *: "Прикажи поруку искључивања"
+  </dest>
+  <voice>
+    *: "Прикажи поруку искључивања"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_LIST_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "List Order"
+  </source>
+  <dest>
+    *: "Редослед листе"
+  </dest>
+  <voice>
+    *: "Редослед листе"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ASCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Ascending"
+  </source>
+  <dest>
+    *: "Растући"
+  </dest>
+  <voice>
+    *: "растући"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DESCENDING
+  desc: in Settings
+  user: core
+  <source>
+    *: "Descending"
+  </source>
+  <dest>
+    *: "Опадајући"
+  </dest>
+  <voice>
+    *: "опадајући"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Слика омота"
+  </dest>
+  <voice>
+    *: "слика омота"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Предност има уграђена"
+  </dest>
+  <voice>
+    *: "Предност има уграђена"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Предност има фајл слике"
+  </dest>
+  <voice>
+    *: "Предност има фајл слике"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "Синхронизуј са RDS временом"
+  </dest>
+  <voice>
+    *: none
+    rds: "Синхронизуј са RDS временом"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Сортирај албуме по"
+  </dest>
+  <voice>
+    *: "Сортирај албуме по"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Уметник + Име"
+  </dest>
+  <voice>
+    *: "Уметник и име"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Уметник + Година"
+  </dest>
+  <voice>
+    *: "Ументик и година"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Редослед сортирања године"
+  </dest>
+  <voice>
+    *: "Редослед сортирања године"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Приказуј годину у наслову албума"
+  </dest>
+  <voice>
+    *: "Приказуј годину у наслову албума"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Најпре мора да се освежи кеш!"
+  </dest>
+  <voice>
+    *: "Најпре мора да се освежи кеш!"
   </voice>
 </phrase>
