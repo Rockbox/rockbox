@@ -134,47 +134,47 @@
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="65"/>
         <source>Bootloader installation requires you to provide the correct verrsion of the original firmware file. This file will be patched with the Rockbox bootloader and installed to your player. You need to download this file yourself due to legal reasons. Please refer to the &lt;a href=&apos;http://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; pages on how to obtain this file.&lt;br/&gt;Press Ok to continue and browse your computer for the firmware file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalace zavaděče vyžaduje správnou verzi souboru původního firmware. Ten bude doplněn zavaděčem Rockboxu a instalován na váš přehrávač.Z právních důvodů si tento soubor musíte stáhnou sami. Podívejte se prosím na &lt;a href=&apos;http://www.rockbox.org/wiki/&apos;&gt;rockbox wiki&lt;/a&gt; &gt; stránky jak ho získat. &lt;br/&gt;Vyberte OK pro pokračování a vyberte umístění souboru ve vašem počítači.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="84"/>
         <source>Could not read original firmware file</source>
-        <translation type="unfinished">Nepodařilo se přečíst původní firmware</translation>
+        <translation>Nepodařilo se přečíst původní firmware</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="90"/>
         <source>Downloading bootloader file</source>
-        <translation type="unfinished">Stahuji soubor zavaděče</translation>
+        <translation>Stahuji soubor zavaděče</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="99"/>
         <source>Patching file...</source>
-        <translation type="unfinished">Patchuji soubor...</translation>
+        <translation>Patchuji soubor...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="124"/>
         <source>Patching the original firmware failed</source>
-        <translation type="unfinished">Patchování původního firmware selhalo</translation>
+        <translation>Patchování původního firmware selhalo</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="130"/>
         <source>Succesfully patched firmware file</source>
-        <translation type="unfinished">Soubor firmware úspěšně opatchován</translation>
+        <translation>Soubor firmware úspěšně opatchován</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="145"/>
         <source>Bootloader successful installed</source>
-        <translation type="unfinished"></translation>
+        <translation>Zavaděč úspěšně nainstalován</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="151"/>
         <source>Patched bootloader could not be installed</source>
-        <translation type="unfinished">Opatchovaný zavaděč nemohl být nainstalován</translation>
+        <translation>Opatchovaný zavaděč nemohl být nainstalován</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstallbspatch.cpp" line="161"/>
         <source>To uninstall, perform a normal upgrade with an unmodified original firmware.</source>
-        <translation type="unfinished">Pro odinstalaci proveďte běžnou aktualizaci s neupravovaným původním firmware.</translation>
+        <translation>Pro odinstalaci proveďte běžnou aktualizaci s neupravovaným původním firmware.</translation>
     </message>
 </context>
 <context>
@@ -898,72 +898,84 @@ Viz http://www.rockbox.org/wiki/IpodConversionToFAT32</translation>
         <source>Action required:
 
 Please make sure no programs are accessing files on the device. If ejecting still fails please use your computers eject functionality.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je nutný zásah:
+
+Přesvědčte se prosím, že žádné programy nepracuj se soubory na zařízení. Jestliže odpojení přesto selže využijte prosím funkci odpojení vašeho počítače.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="171"/>
         <source>Action required:
 
 Quit iTunes application.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je nutný zásah:
+
+Ukončete aplikaci iTunes.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="192"/>
         <source>Could not suspend iTunesHelper. Stop it using the Task Manager, and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nepodařilo se zavřít iTunesHelper. Ukončete ho prostřednictvím Správce úloh a zkuste to znovu.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="218"/>
         <source>Action required:
 
 Press and hold SELECT+MENU buttons, after about 12 seconds a new action will require you to release the buttons, DO IT QUICKLY, otherwise the process could fail.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je nutný zásah:
+
+Zmáčkněte a držte tlačítka SELECT+MENU, po zhruba 12 sekundách bude nutné tlačítka pustit UDĚLEJTE TO RYCHLE, jinak může proces selhat.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="243"/>
         <source>Action required:
 
 Release SELECT+MENU buttons and wait...</source>
-        <translation type="unfinished"></translation>
+        <translation>Je nutný zásah:
+
+Pusťte tlačítka SELECT+MENU a čekejte...</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="268"/>
         <source>Device is not in DFU mode. It seems that the previous required action failed, please try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zařízení není v DFU režimu. Zdá se, že předchozí potřebný zásah selhal. Prosím, zkuste to znovu.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="285"/>
         <source>No valid DFU USB driver found.
 
 Install iTunes (or the Apple Device Driver) and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nebyl nalezen platný DFU USB ovladač.
+
+Instalujte iTunes (nebo Apple Device Driver) a zkuste to znovu.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="321"/>
         <source>Action required:
 
 Could not remount the device, try to do it manually. If the iPod didn&apos;t restart, force a reset by pressing SELECT+MENU buttons for about 5 seconds. If the problem could not be solved then click &apos;Abort&apos; to cancel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Je nutný zásah:
+
+Zařízení se nepodařilo znovu připojit, zkuste to prosím ručně. Jestliže se iPod nerestartoval, vynuťte restart stisknutím tlačítek SELECT+MENU na 5 sekund. Jestliže se problém nepodařilo vyřešit, klikněte na &apos;Zrušit&apos; pro přerušení.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="336"/>
         <source>Bootloader successfully installed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zavaděč úspěšně nainstalován.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="338"/>
         <source>Bootloader successfully uninstalled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Zavaděč úspěšně odinstalován.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="368"/>
         <source>Install aborted by user.</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalace přerušena uživatelem.</translation>
     </message>
     <message>
         <location filename="../base/bootloaderinstalls5l.cpp" line="370"/>
         <source>Uninstall aborted by user.</source>
-        <translation type="unfinished"></translation>
+        <translation>Odstalace přerušena uživatelem.</translation>
     </message>
     <message>
         <source>Action required:
@@ -1973,7 +1985,7 @@ Prosím nastavte engine syntézy řeči.</translation>
     <message>
         <location filename="../gui/infowidget.cpp" line="47"/>
         <source>Loading, please wait ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Načítám, prosím čekejte...</translation>
     </message>
 </context>
 <context>
@@ -2165,27 +2177,27 @@ Prosím nastavte engine syntézy řeči.</translation>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="337"/>
         <source>Stable (Retired)</source>
-        <translation type="unfinished"></translation>
+        <translation>Stabilní (historická)</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="340"/>
         <source>Unusable</source>
-        <translation type="unfinished">Nepoužitelný</translation>
+        <translation>Nepoužitelný</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="343"/>
         <source>Unstable</source>
-        <translation type="unfinished">Nestabilní</translation>
+        <translation>Nestabilní</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="346"/>
         <source>Stable</source>
-        <translation type="unfinished">Stabilní</translation>
+        <translation>Stabilní</translation>
     </message>
     <message>
         <location filename="../base/playerbuildinfo.cpp" line="349"/>
         <source>Unknown</source>
-        <translation type="unfinished">Neznámý</translation>
+        <translation>Neznámý</translation>
     </message>
 </context>
 <context>
@@ -2299,53 +2311,9 @@ Prosím nastavte engine syntézy řeči.</translation>
     </message>
 </context>
 <context>
-    <name>QuaGzipFile</name>
-    <message>
-        <location filename="../quazip/quagzipfile.cpp" line="60"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="60"/>
-        <source>QIODevice::Append is not supported for GZIP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../quazip/quagzipfile.cpp" line="66"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="66"/>
-        <source>Opening gzip for both reading and writing is not supported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../quazip/quagzipfile.cpp" line="74"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="74"/>
-        <source>You can open a gzip either for reading or for writing. Which is it?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../quazip/quagzipfile.cpp" line="80"/>
-        <location filename="../quazip-1.2/quazip/quagzipfile.cpp" line="80"/>
-        <source>Could not gzopen() file</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QuaZIODevice</name>
-    <message>
-        <location filename="../quazip/quaziodevice.cpp" line="188"/>
-        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="188"/>
-        <source>QIODevice::Append is not supported for QuaZIODevice</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../quazip/quaziodevice.cpp" line="193"/>
-        <location filename="../quazip-1.2/quazip/quaziodevice.cpp" line="193"/>
-        <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QuaZipFile</name>
     <message>
         <location filename="../quazip/quazipfile.cpp" line="251"/>
-        <location filename="../quazip-1.2/quazip/quazipfile.cpp" line="251"/>
-        <location filename="../quazip_/quazipfile.cpp" line="251"/>
         <source>ZIP/UNZIP API error %1</source>
         <translation>Chyba %1 API ZIP/UNZIP</translation>
     </message>
@@ -2360,7 +2328,7 @@ Prosím nastavte engine syntézy řeči.</translation>
     <message>
         <location filename="../rbutilqt.cpp" line="304"/>
         <source>Libraries used</source>
-        <translation type="unfinished"></translation>
+        <translation>Použité knihovny</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="383"/>
@@ -2401,7 +2369,7 @@ Prosím nastavte engine syntézy řeči.</translation>
     <message>
         <location filename="../rbutilqt.cpp" line="227"/>
         <source>Certificate error</source>
-        <translation type="unfinished"></translation>
+        <translation>Chyba certifikátu</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="229"/>
@@ -2413,7 +2381,14 @@ Valid since: %4
 Valid until: %5
 
 Temporarily trust certificate?</source>
-        <translation type="unfinished"></translation>
+        <translation>%1
+
+Vydal: %2
+Vydáno pro: %3
+Platný od: %4
+Platný do: %5
+
+Dočasně důvěřovat certifikátu?</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="261"/>
@@ -2497,7 +2472,7 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     </message>
     <message>
         <source>The installed version of Rockbox is a development version. Pre-built voices are only available for release versions of Rockbox. Please generate a voice yourself using the &quot;Create voice file&quot; functionality.</source>
-        <translation type="vanished">Je instalována vývojářská verze Rockboxu. Předpřipravené hlasy jsou k dispozici jen pro stabilní vydání. Prosím vytvořte si hlas pomocí funkce &quot;Vytvoření hlasového souboru&quot;.</translation>
+        <translation type="vanished">Je instalována vývojová verze Rockboxu. Předpřipravené hlasy jsou k dispozici jen pro stabilní vydání. Prosím vytvořte si hlas pomocí funkce &quot;Vytvoření hlasového souboru&quot;.</translation>
     </message>
     <message>
         <location filename="../rbutilqt.cpp" line="518"/>
@@ -2793,12 +2768,12 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     <message>
         <location filename="../rbutilqtfrm.ui" line="43"/>
         <source>Welcome to Rockbox Utility, the installation and housekeeping tool for Rockbox.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vítá Vás Rockbox Utilita, nástroj pro instalaci a údržbu Rockboxu.</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="46"/>
         <source>Rockbox Logo</source>
-        <translation type="unfinished"></translation>
+        <translation>Logo Rockboxu</translation>
     </message>
     <message>
         <location filename="../rbutilqtfrm.ui" line="131"/>
@@ -2941,27 +2916,27 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="151"/>
         <source>Some plugins require additional data files.</source>
-        <translation type="unfinished"></translation>
+        <translation>Některé doplňky potřebují dodatečné datové soubory.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="188"/>
         <source>Install prerendered voice file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Instalace sestavených hlasových souborů.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="195"/>
         <source>Plugin Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Doplňkové soubory</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="222"/>
         <source>&amp;Manual</source>
-        <translation type="unfinished">&amp;Příručka</translation>
+        <translation>&amp;Příručka</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="233"/>
         <source>&amp;Voice File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Soubor hlasů</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="253"/>
@@ -3014,7 +2989,7 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="263"/>
         <source>Save a copy of the manual on the player.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uložit kopii manuálu do přehrávače.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidgetfrm.ui" line="292"/>
@@ -3028,7 +3003,7 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     </message>
     <message>
         <source>The development version is updated on every code change. Last update was on %1</source>
-        <translation type="vanished">Vývojářská verze je aktualizována při každé změně kódu. Poslední aktualizace proběhla %1</translation>
+        <translation type="vanished">Vývojová verze je aktualizována při každé změně kódu. Poslední aktualizace proběhla %1</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="88"/>
@@ -3043,7 +3018,7 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="131"/>
         <source>Development Version (Revison %1)</source>
-        <translation>Vývojářská verze (Revize %1)</translation>
+        <translation>Vývojová verze (Revize %1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="129"/>
@@ -3053,22 +3028,22 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="83"/>
         <source>The development version is updated on every code change.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vývojová verze je aktualizována při každé změně zdrojového kódu.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="93"/>
         <source>Daily updated development version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Každodenně aktualizovaná vývojová verze.</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="100"/>
         <source>Not available for the selected version</source>
-        <translation type="unfinished"></translation>
+        <translation>Není dostupný pro vybranou verzi</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="130"/>
         <source>Daily Build (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Denní sestavení (%1)</translation>
     </message>
     <message>
         <location filename="../gui/selectiveinstallwidget.cpp" line="158"/>
@@ -3091,91 +3066,91 @@ Chyba sítě: %1. Prosím zkontrolujte vaše nastavení sítě a proxy.</transla
         <translation>Není známý žádný způsob instalace.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="319"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="318"/>
         <source>Bootloader detected</source>
         <translation>Zavaděč nalezen</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="320"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="319"/>
         <source>Bootloader already installed. Do you want to reinstall the bootloader?</source>
         <translation>Zavaděč je již instalován. Opravdu chcete přeinstalovat zavaděč?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="324"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="323"/>
         <source>Bootloader installation skipped</source>
         <translation>Instalace zavaděče přeskočena</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="338"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="337"/>
         <source>Create Bootloader backup</source>
         <translation>Vytváří se záloha zavaděče</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="339"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="338"/>
         <source>You can create a backup of the original bootloader file. Press &quot;Yes&quot; to select an output folder on your computer to save the file to. The file will get placed in a new folder &quot;%1&quot; created below the selected folder.
 Press &quot;No&quot; to skip this step.</source>
         <translation>Můžete vytvořit zálohu původního souboru zavaděče. Stiskněte &quot;Ano&quot; pro výběr adresáře na vašem počítači, kam se má tento soubor uložit. Soubor bude umístěn do nového podadresáře &quot;%1&quot; vytvořeného v tomto adresáři.
 Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="346"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="345"/>
         <source>Browse backup folder</source>
         <translation>Vybrat zálohovací adresář</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="358"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="357"/>
         <source>Prerequisites</source>
         <translation>Předpoklady</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="363"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="362"/>
         <source>Bootloader installation aborted</source>
         <translation>Instalace zavaděče přerušena</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="373"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="372"/>
         <source>Bootloader files (%1)</source>
         <translation>Soubory zavaděče (%1)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="375"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="374"/>
         <source>All files (*)</source>
         <translation>Všechny soubory (*)</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="377"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="376"/>
         <source>Select firmware file</source>
         <translation>Vyberte soubor firmware</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="379"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="378"/>
         <source>Error opening firmware file</source>
         <translation>Chyba otevírání souboru firmware</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="385"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="384"/>
         <source>Error reading firmware file</source>
         <translation>Chyba čtení souboru firmware</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="395"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="394"/>
         <source>Backup error</source>
         <translation>Chyba zálohování</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="396"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="395"/>
         <source>Could not create backup file. Continue?</source>
         <translation>Nelze vytvořit soubor se zálohou. Pokračovat?</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="420"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="419"/>
         <source>Manual steps required</source>
         <translation>Nutné ruční kroky</translation>
     </message>
     <message>
-        <location filename="../gui/selectiveinstallwidget.cpp" line="641"/>
+        <location filename="../gui/selectiveinstallwidget.cpp" line="640"/>
         <source>Your installation doesn&apos;t require any plugin data files, skipping.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vaše instalace nepotřebuje žádné dodatečné soubory, přeskakuji.</translation>
     </message>
     <message>
         <source>Your installation doesn&apos;t require any game files, skipping.</source>
@@ -3316,7 +3291,7 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
     <message>
         <location filename="../sysinfo.cpp" line="69"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ</translation>
     </message>
     <message>
         <source>Cluster Size</source>
@@ -3384,12 +3359,12 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
     <message>
         <location filename="../base/ttsbase.cpp" line="48"/>
         <source>Espeak-ng TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Syntéza řeči Espeak-ng</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="49"/>
         <source>Mimic TTS Engine</source>
-        <translation type="unfinished"></translation>
+        <translation>Syntéza řeči Mimic</translation>
     </message>
     <message>
         <location filename="../base/ttsbase.cpp" line="51"/>
@@ -3493,7 +3468,7 @@ Stiskněte &quot;Ne&quot; pro přeskočení tohoto kroku.</translation>
     <message>
         <location filename="../base/ttsfestival.cpp" line="173"/>
         <source>Festival could not be started</source>
-        <translation type="unfinished"></translation>
+        <translation>Festival nemohl být spuštěn</translation>
     </message>
     <message>
         <location filename="../base/ttsfestival.cpp" line="207"/>
@@ -4043,13 +4018,13 @@ Jsou nutná administrátorská práva.&lt;/li&gt;</translation>
         <location filename="../base/zipinstaller.cpp" line="113"/>
         <source>Download error: received HTTP error %1
 %2</source>
-        <translation type="unfinished">Chyba stahování: HTTP chyba %1. {1
-%2?}</translation>
+        <translation>Chyba stahování: nastala HTTP chyba %1
+%2</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="125"/>
         <source>Download finished (cache used).</source>
-        <translation type="unfinished">Stahování dokončeno (použita vyrovnávací paměť).</translation>
+        <translation>Stahování dokončeno (použita vyrovnávací paměť).</translation>
     </message>
     <message>
         <location filename="../base/zipinstaller.cpp" line="168"/>
@@ -4115,7 +4090,7 @@ Jsou nutná administrátorská práva.&lt;/li&gt;</translation>
     <message>
         <location filename="../aboutbox.ui" line="132"/>
         <source>L&amp;ibraries</source>
-        <translation type="unfinished"></translation>
+        <translation>K&amp;nihovny</translation>
     </message>
     <message>
         <source>&amp;Speex License</source>
