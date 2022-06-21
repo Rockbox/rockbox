@@ -868,9 +868,10 @@ struct user_settings
 #if defined(DX50) || defined(DX90) || (defined(HAVE_USB_POWER) && !defined(USB_NONE) && !defined(SIMULATOR))
     int usb_mode;
 #endif
-#if defined(SETTINGS_RESET) || \
-           (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-           (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#if defined(BUTTON_REC) || \
+    (CONFIG_KEYPAD == GIGABEAT_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H10_PAD)
     bool clear_settings_on_hold;
 #endif
 };

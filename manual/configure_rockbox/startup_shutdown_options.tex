@@ -37,16 +37,42 @@ are run at startup, or initiate a shutdown when conditions are met.
   \end{description}
 
 \opt{clear_settings_on_hold}{
-\subsection{\label{ref:ClearOnHold}Hold switch clears settings on startup }
-  This option controls whether Rockbox clears its configuration if the hold
-  switch is enabled during startup.
+  \opt{ipod}{
+    \subsection{\label{ref:ClearOnHold}Hold switch clears settings on startup }
+      This option controls whether Rockbox clears its configuration if the hold
+      switch is enabled during startup.
 
-  \begin{description}
-    \item[Yes.]
-          Clear the settings if the hold switch is enabled during startup.
-    \item[No.]
-          Do not clear the settings, regardless of the hold switch's position.
-    \end{description}
+      \begin{description}
+        \item[Yes.]
+              Clear the settings if the hold switch is enabled during startup.
+        \item[No.]
+              Do not clear the settings, regardless of the hold switch's position.
+        \end{description}
+  }
+  \nopt{ipod}{
+    \opt{GIGABEAT_S_PAD}{
+      \subsection{\label{ref:ClearOnHold}BUTTON A clears settings on startup }
+        This option controls whether Rockbox clears its configuration if BUTTON_A
+ is held during startup.
+        \begin{description}
+          \item[Yes.]
+                Clear the settings if the BUTTON A is held.
+          \item[No.]
+                Do not clear the settings, regardless of BUTTON A.
+          \end{description}
+    }
+    \nopt{GIGABEAT_S_PAD}{
+      \subsection{\label{ref:ClearOnHold}BUTTON REC clears settings on startup }
+        This option controls whether Rockbox clears its configuration if BUTTON REC
+ is held during startup.
+        \begin{description}
+          \item[Yes.]
+                Clear the settings if the BUTTON REC is held.
+          \item[No.]
+                Do not clear the settings, regardless of BUTTON REC.
+          \end{description}
+    }
+  }
 }
 
 \subsection{\label{ref:IdlePoweroffSetting}Idle Poweroff}

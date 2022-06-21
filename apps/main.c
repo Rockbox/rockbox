@@ -570,16 +570,18 @@ static void init(void)
     settings_load(SETTINGS_ALL);
     CHART("<settings_load(ALL)");
 
-#if defined(SETTINGS_RESET) || \
+#if defined(BUTTON_REC) || \
+    (CONFIG_KEYPAD == GIGABEAT_PAD) || \
     (CONFIG_KEYPAD == IPOD_4G_PAD) || \
     (CONFIG_KEYPAD == IRIVER_H10_PAD)
+    if (global_settings.clear_settings_on_hold &&
 #ifdef SETTINGS_RESET
     /* Reset settings if holding the reset button. (Rec on Archos,
        A on Gigabeat) */
-    if ((button_status() & SETTINGS_RESET) == SETTINGS_RESET)
+    ((button_status() & SETTINGS_RESET) == SETTINGS_RESET))
 #else
     /* Reset settings if the hold button is turned on */
-    if (global_settings.clear_settings_on_hold && button_hold())
+    (button_hold()))
 #endif
     {
         splash(HZ*2, str(LANG_RESET_DONE_CLEAR));

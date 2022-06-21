@@ -16374,14 +16374,21 @@
   user: core
   <source>
     *: none
-    clear_settings_on_hold, ipod4g, iriverh10: "Clear settings when hold switch is on during startup"
+    ipod3g: none
+    ipod*: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
   </source>
   <dest>
     *: none
-    clear_settings_on_hold, ipod4g, iriverh10: "Clear settings when hold switch is on during startup"
+    ipod3g: none
+    ipod*: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
   </dest>
   <voice>
     *: none
-    clear_settings_on_hold, ipod4g, iriverh10: "Clear settings when hold switch is on during startup"
+    ipod3g: none
+    ipod*: "Clear settings when hold switch is on during startup"
+    clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
   </voice>
 </phrase>
+

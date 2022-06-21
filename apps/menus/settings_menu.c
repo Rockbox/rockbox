@@ -584,9 +584,10 @@ MENUITEM_SETTING(keypress_restarts_sleeptimer,
                  &global_settings.keypress_restarts_sleeptimer, NULL);
 MENUITEM_SETTING(show_shutdown_message, &global_settings.show_shutdown_message, NULL);
 
-#if defined(SETTINGS_RESET) || \
-           (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-           (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#if defined(BUTTON_REC) || \
+    (CONFIG_KEYPAD == GIGABEAT_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H10_PAD)
 #define SETTINGS_CLEAR_ON_HOLD
 MENUITEM_SETTING(clear_settings_on_hold,
                  &global_settings.clear_settings_on_hold, NULL);

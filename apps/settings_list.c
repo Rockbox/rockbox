@@ -2167,9 +2167,10 @@ const struct settings_list settings[] = {
 #endif
 	    ),
 #endif
-#if defined(SETTINGS_RESET) || \
-           (CONFIG_KEYPAD == IPOD_4G_PAD) || \
-           (CONFIG_KEYPAD == IRIVER_H10_PAD)
+#if defined(BUTTON_REC) || \
+    (CONFIG_KEYPAD == GIGABEAT_PAD) || \
+    (CONFIG_KEYPAD == IPOD_4G_PAD) || \
+    (CONFIG_KEYPAD == IRIVER_H10_PAD)
     OFFON_SETTING(0, clear_settings_on_hold, LANG_CLEAR_SETTINGS_ON_HOLD,
                   true, "clear settings on hold", NULL),
 #endif
