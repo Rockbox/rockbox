@@ -579,14 +579,11 @@ static void init(void)
     if ((button_status() & SETTINGS_RESET) == SETTINGS_RESET)
 #else
     /* Reset settings if the hold button is turned on */
-    if (button_hold())
+    if (global_settings.clear_settings_on_hold && button_hold())
 #endif
     {
-        if (global_settings.clear_settings_on_hold)
-        {
-            splash(HZ*2, str(LANG_RESET_DONE_CLEAR));
-            settings_reset();
-        }
+        splash(HZ*2, str(LANG_RESET_DONE_CLEAR));
+        settings_reset();
     }
 #endif
 
