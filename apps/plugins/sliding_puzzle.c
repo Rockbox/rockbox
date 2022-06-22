@@ -468,8 +468,8 @@ static const char * initial_bmp_path=NULL;
 static const char * get_albumart_bmp_path(void)
 {
     struct mp3entry* track = rb->audio_current_track();
-
-    if (!track || !track->path || track->path[0] == '\0')
+    /* Note rb->audio_current_track->path should never be null */
+    if (!track || track->path[0] == '\0')
         return NULL;
 
     if (!rb->search_albumart_files(track, "", albumart_path, MAX_PATH ) )
