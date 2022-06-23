@@ -106,10 +106,6 @@ struct nand_chip {
     uint8_t dev_id;
     uint8_t dev_id2;
 
-    /* Row/column address width */
-    uint8_t row_cycles;
-    uint8_t col_cycles;
-
     /* Base2 logarithm of the number of pages per block */
     unsigned log2_ppb;
 
@@ -131,6 +127,13 @@ struct nand_chip {
 
     /* Chip specific flags */
     uint32_t flags;
+
+    /* SFC commands for issuing I/O ops */
+    uint32_t cmd_page_read;
+    uint32_t cmd_program_execute;
+    uint32_t cmd_block_erase;
+    uint32_t cmd_read_cache;
+    uint32_t cmd_program_load;
 
     /* Chip-specific setup routine */
     void(*setup_chip)(struct nand_drv* drv);
@@ -170,13 +173,6 @@ struct nand_drv {
     uint8_t mf_id;
     uint8_t dev_id;
     uint8_t dev_id2;
-
-    /* SFC commands used for I/O, these are set based on chip data */
-    uint32_t cmd_page_read;
-    uint32_t cmd_read_cache;
-    uint32_t cmd_program_load;
-    uint32_t cmd_program_execute;
-    uint32_t cmd_block_erase;
 };
 
 extern const struct nand_chip supported_nand_chips[];

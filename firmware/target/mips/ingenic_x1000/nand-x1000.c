@@ -31,8 +31,6 @@ const struct nand_chip supported_nand_chips[] = {
         /* ATO25D1GA */
         .mf_id = 0x9b,
         .dev_id = 0x12,
-        .row_cycles = 3,
-        .col_cycles = 2,
         .log2_ppb = 6, /* 64 pages */
         .page_size = 2048,
         .oob_size = 64,
@@ -46,6 +44,11 @@ const struct nand_chip supported_nand_chips[] = {
                            STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
                            SMP_DELAY(1)),
         .flags = NAND_CHIPFLAG_QUAD | NAND_CHIPFLAG_HAS_QE_BIT,
+        .cmd_page_read       = NANDCMD_PAGE_READ(3),
+        .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE(3),
+        .cmd_block_erase     = NANDCMD_BLOCK_ERASE(3),
+        .cmd_read_cache      = NANDCMD_READ_CACHE_x4(2),
+        .cmd_program_load    = NANDCMD_PROGRAM_LOAD_x4(2),
     },
 #else
     { 0 },
@@ -127,22 +130,6 @@ static void setup_chip_data(struct nand_drv* drv)
     drv->fpage_size = drv->chip->page_size + drv->chip->oob_size;
 }
 
-static void setup_chip_commands(struct nand_drv* drv)
-{
-    /* Select commands appropriate for the chip */
-    drv->cmd_page_read = NANDCMD_PAGE_READ(drv->chip->row_cycles);
-    drv->cmd_program_execute = NANDCMD_PROGRAM_EXECUTE(drv->chip->row_cycles);
-    drv->cmd_block_erase = NANDCMD_BLOCK_ERASE(drv->chip->row_cycles);
-
-    if(drv->chip->flags & NAND_CHIPFLAG_QUAD) {
-        drv->cmd_read_cache = NANDCMD_READ_CACHE_x4(drv->chip->col_cycles);
-        drv->cmd_program_load = NANDCMD_PROGRAM_LOAD_x4(drv->chip->col_cycles);
-    } else {
-        drv->cmd_read_cache = NANDCMD_READ_CACHE(drv->chip->col_cycles);
-        drv->cmd_program_load = NANDCMD_PROGRAM_LOAD(drv->chip->col_cycles);
-    }
-}
-
 static void setup_chip_registers(struct nand_drv* drv)
 {
     /* Set chip registers to enter normal operation */
@@ -189,7 +176,6 @@ int nand_open(struct nand_drv* drv)
         return NAND_ERR_UNKNOWN_CHIP;
 
     setup_chip_data(drv);
-    setup_chip_commands(drv);
 
     /* Set new SFC parameters */
     sfc_set_dev_conf(drv->chip->dev_conf);
@@ -234,7 +220,7 @@ static uint8_t nand_wait_busy(struct nand_drv* drv)
 int nand_block_erase(struct nand_drv* drv, nand_block_t block)
 {
     sfc_exec(NANDCMD_WR_EN, 0, NULL, 0);
-    sfc_exec(drv->cmd_block_erase, block, NULL, 0);
+    sfc_exec(drv->chip->cmd_block_erase, block, NULL, 0);
 
     uint8_t status = nand_wait_busy(drv);
     if(status & FREG_STATUS_EFAIL)
@@ -246,8 +232,9 @@ int nand_block_erase(struct nand_drv* drv, nand_block_t block)
 int nand_page_program(struct nand_drv* drv, nand_page_t page, const void* buffer)
 {
     sfc_exec(NANDCMD_WR_EN, 0, NULL, 0);
-    sfc_exec(drv->cmd_program_load, 0, (void*)buffer, drv->fpage_size|SFC_WRITE);
-    sfc_exec(drv->cmd_program_execute, page, NULL, 0);
+    sfc_exec(drv->chip->cmd_program_load,
+             0, (void*)buffer, drv->fpage_size|SFC_WRITE);
+    sfc_exec(drv->chip->cmd_program_execute, page, NULL, 0);
 
     uint8_t status = nand_wait_busy(drv);
     if(status & FREG_STATUS_PFAIL)
@@ -258,9 +245,9 @@ int nand_page_program(struct nand_drv* drv, nand_page_t page, const void* buffer
 
 int nand_page_read(struct nand_drv* drv, nand_page_t page, void* buffer)
 {
-    sfc_exec(drv->cmd_page_read, page, NULL, 0);
+    sfc_exec(drv->chip->cmd_page_read, page, NULL, 0);
     nand_wait_busy(drv);
-    sfc_exec(drv->cmd_read_cache, 0, buffer, drv->fpage_size|SFC_READ);
+    sfc_exec(drv->chip->cmd_read_cache, 0, buffer, drv->fpage_size|SFC_READ);
 
     if(drv->chip->flags & NAND_CHIPFLAG_ON_DIE_ECC) {
         uint8_t status = nand_get_reg(drv, FREG_STATUS);
