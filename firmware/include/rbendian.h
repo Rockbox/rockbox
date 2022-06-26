@@ -184,4 +184,241 @@ static inline uint32_t swaw32_hw(uint32_t value)
   #error "Unknown endianness!"
 #endif
 
+/*
+ * Generic unaligned loads
+ */
+static inline uint16_t _generic_load_le16(const void* p)
+{
+    const uint8_t* d = p;
+    return d[0] | (d[1] << 8);
+}
+
+static inline uint32_t _generic_load_le32(const void* p)
+{
+    const uint8_t* d = p;
+    return d[0] | (d[1] << 8) | (d[2] << 16) | (d[3] << 24);
+}
+
+static inline uint64_t _generic_load_le64(const void* p)
+{
+    const uint8_t* d = p;
+    return (((uint64_t)d[0] << 0)  | ((uint64_t)d[1] << 8)  |
+            ((uint64_t)d[2] << 16) | ((uint64_t)d[3] << 24) |
+            ((uint64_t)d[4] << 32) | ((uint64_t)d[5] << 40) |
+            ((uint64_t)d[6] << 48) | ((uint64_t)d[7] << 56));
+}
+
+static inline uint16_t _generic_load_be16(const void* p)
+{
+    const uint8_t* d = p;
+    return (d[0] << 8) | d[1];
+}
+
+static inline uint32_t _generic_load_be32(const void* p)
+{
+    const uint8_t* d = p;
+    return (d[0] << 24) | (d[1] << 16) | (d[2] << 8) | d[3];
+}
+
+static inline uint64_t _generic_load_be64(const void* p)
+{
+    const uint8_t* d = p;
+    return (((uint64_t)d[0] << 56) | ((uint64_t)d[1] << 48) |
+            ((uint64_t)d[2] << 40) | ((uint64_t)d[3] << 32) |
+            ((uint64_t)d[4] << 24) | ((uint64_t)d[5] << 16) |
+            ((uint64_t)d[6] << 8)  | ((uint64_t)d[7] << 0));
+}
+
+static inline void _generic_store_le16(void* p, uint16_t val)
+{
+    uint8_t* d = p;
+    d[0] = val & 0xff;
+    d[1] = (val >> 8) & 0xff;
+}
+
+static inline void _generic_store_le32(void* p, uint32_t val)
+{
+    uint8_t* d = p;
+    d[0] = val & 0xff;
+    d[1] = (val >> 8) & 0xff;
+    d[2] = (val >> 16) & 0xff;
+    d[3] = (val >> 24) & 0xff;
+}
+
+static inline void _generic_store_le64(void* p, uint64_t val)
+{
+    uint8_t* d = p;
+    d[0] = val & 0xff;
+    d[1] = (val >> 8) & 0xff;
+    d[2] = (val >> 16) & 0xff;
+    d[3] = (val >> 24) & 0xff;
+    d[4] = (val >> 32) & 0xff;
+    d[5] = (val >> 40) & 0xff;
+    d[6] = (val >> 48) & 0xff;
+    d[7] = (val >> 56) & 0xff;
+}
+
+static inline void _generic_store_be16(void* p, uint16_t val)
+{
+    uint8_t* d = p;
+    d[0] = (val >> 8) & 0xff;
+    d[1] = val & 0xff;
+}
+
+static inline void _generic_store_be32(void* p, uint32_t val)
+{
+    uint8_t* d = p;
+    d[0] = (val >> 24) & 0xff;
+    d[1] = (val >> 16) & 0xff;
+    d[2] = (val >> 8) & 0xff;
+    d[3] = val & 0xff;
+}
+
+static inline void _generic_store_be64(void* p, uint64_t val)
+{
+    uint8_t* d = p;
+    d[0] = (val >> 56) & 0xff;
+    d[1] = (val >> 48) & 0xff;
+    d[2] = (val >> 40) & 0xff;
+    d[3] = (val >> 32) & 0xff;
+    d[4] = (val >> 24) & 0xff;
+    d[5] = (val >> 16) & 0xff;
+    d[6] = (val >> 8) & 0xff;
+    d[7] = val & 0xff;
+}
+
+#if !defined(HAVE_UNALIGNED_LOAD_STORE)
+
+/* Use generic unaligned loads */
+#define load_le16 _generic_load_le16
+#define load_le32 _generic_load_le32
+#define load_le64 _generic_load_le64
+#define load_be16 _generic_load_be16
+#define load_be32 _generic_load_be32
+#define load_be64 _generic_load_be64
+#define store_le16 _generic_store_le16
+#define store_le32 _generic_store_le32
+#define store_le64 _generic_store_le64
+#define store_be16 _generic_store_be16
+#define store_be32 _generic_store_be32
+#define store_be64 _generic_store_be64
+
+/* Define host byte order unaligned load */
+#if defined(ROCKBOX_LITTLE_ENDIAN)
+# define load_h16 load_le16
+# define load_h32 load_le32
+# define load_h64 load_le64
+# define store_h16 store_le16
+# define store_h32 store_le32
+# define store_h64 store_le64
+#elif defined(ROCKBOX_BIG_ENDIAN)
+# define load_h16 load_be16
+# define load_h32 load_be32
+# define load_h64 load_be64
+# define store_h16 store_be16
+# define store_h32 store_be32
+# define store_h64 store_be64
+#else
+# error
+#endif
+
+#else /* HAVE_UNALIGNED_LOAD_STORE */
+
+/* The arch should define unaligned loads in host byte order */
+#if defined(ROCKBOX_LITTLE_ENDIAN)
+# define load_le16 load_h16
+# define load_le32 load_h32
+# define load_le64 load_h64
+# define load_be16(p) swap16(load_h16((p)))
+# define load_be32(p) swap32(load_h32((p)))
+# define load_be64(p) swap64(load_h64((p)))
+# define store_le16 store_h16
+# define store_le32 store_h32
+# define store_le64 store_h64
+# define store_be16(p,v) store_h16((p),swap16((v)))
+# define store_be32(p,v) store_h32((p),swap32((v)))
+# define store_be64(p,v) store_h64((p),swap64((v)))
+#elif defined(ROCKBOX_BIG_ENDIAN)
+# define load_le16(p) swap16(load_h16((p)))
+# define load_le32(p) swap32(load_h32((p)))
+# define load_le64(p) swap64(load_h64((p)))
+# define load_be16 load_h16
+# define load_be32 load_h32
+# define load_be64 load_h64
+# define store_le16(p,v) store_h16((p),swap16((v)))
+# define store_le32(p,v) store_h32((p),swap32((v)))
+# define store_le64(p,v) store_h64((p),swap64((v)))
+# define store_be16 store_h16
+# define store_be32 store_h32
+# define store_be64 store_h64
+#else
+# error
+#endif
+
+#endif /* HAVE_UNALIGNED_LOAD_STORE */
+
+/*
+ * Aligned loads
+ */
+
+static inline uint16_t load_h16_aligned(const void* p)
+{
+    return *(const uint16_t*)p;
+}
+
+static inline uint32_t load_h32_aligned(const void* p)
+{
+    return *(const uint32_t*)p;
+}
+
+static inline uint64_t load_h64_aligned(const void* p)
+{
+    return *(const uint64_t*)p;
+}
+
+static inline void store_h16_aligned(void* p, uint16_t val)
+{
+    *(uint16_t*)p = val;
+}
+
+static inline void store_h32_aligned(void* p, uint32_t val)
+{
+    *(uint32_t*)p = val;
+}
+
+static inline void store_h64_aligned(void* p, uint64_t val)
+{
+    *(uint64_t*)p = val;
+}
+
+#if defined(ROCKBOX_LITTLE_ENDIAN)
+# define load_le16_aligned load_h16_aligned
+# define load_le32_aligned load_h32_aligned
+# define load_le64_aligned load_h64_aligned
+# define load_be16_aligned(p) swap16(load_h16_aligned((p)))
+# define load_be32_aligned(p) swap32(load_h32_aligned((p)))
+# define load_be64_aligned(p) swap64(load_h64_aligned((p)))
+# define store_le16_aligned store_h16_aligned
+# define store_le32_aligned store_h32_aligned
+# define store_le64_aligned store_h64_aligned
+# define store_be16_aligned(p,v) store_h16_aligned((p),swap16((v)))
+# define store_be32_aligned(p,v) store_h32_aligned((p),swap32((v)))
+# define store_be64_aligned(p,v) store_h64_aligned((p),swap64((v)))
+#elif defined(ROCKBOX_BIG_ENDIAN)
+# define load_le16_aligned(p) swap16(load_h16_aligned((p)))
+# define load_le32_aligned(p) swap32(load_h32_aligned((p)))
+# define load_le64_aligned(p) swap64(load_h64_aligned((p)))
+# define load_be16_aligned load_h16_aligned
+# define load_be32_aligned load_h32_aligned
+# define load_be64_aligned load_h64_aligned
+# define store_le16_aligned(p,v) store_h16_aligned((p),swap16((v)))
+# define store_le32_aligned(p,v) store_h32_aligned((p),swap32((v)))
+# define store_le64_aligned(p,v) store_h64_aligned((p),swap64((v)))
+# define store_be16_aligned store_h16_aligned
+# define store_be32_aligned store_h32_aligned
+# define store_be64_aligned store_h64_aligned
+#else
+# error "Unknown endian!"
+#endif
+
 #endif /* _RBENDIAN_H_ */
