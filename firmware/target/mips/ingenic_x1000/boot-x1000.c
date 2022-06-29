@@ -20,6 +20,7 @@
  ****************************************************************************/
 
 #include "system.h"
+#include "usb.h"
 #include "boot-x1000.h"
 #include "nand-x1000.h"
 #include "gpio-x1000.h"
@@ -113,6 +114,14 @@ void x1000_boot_linux(const void* source, size_t length,
 {
     size_t args_len = strlen(args);
 
+    /* Shut off USB to avoid "irq 21 nobody cared" error */
+    usb_close();
+    usb_enable(false);
+
+    /* clear USB PHY voodoo bits, not all kernels use them */
+    jz_writef(CPM_OPCR, GATE_USBPHY_CLK(0));
+    jz_writef(CPM_USBCDR, PHY_GATE(0));
+
     disable_irq();
 
     /* --- Beyond this point, do not call into DRAM --- */
@@ -150,10 +159,6 @@ void x1000_dualboot_cleanup(void)
     jz_writef(CPM_CLKGR, LCD(0));
     jz_writef(LCD_CTRL, BEDN(0), EOFM(0), SOFM(0), IFUM(0), QDM(0));
     jz_writef(CPM_CLKGR, LCD(1));
-
-    /* clear USB PHY voodoo bits, not all kernels use them */
-    jz_writef(CPM_OPCR, GATE_USBPHY_CLK(0));
-    jz_writef(CPM_USBCDR, PHY_GATE(0));
 
 #if defined(FIIO_M3K) || defined(EROS_QN)
     /*

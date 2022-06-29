@@ -926,6 +926,9 @@ Lyre prototype 1 */
 #define INCLUDE_TIMEOUT_API
 #define USB_DRIVER_CLOSE
 #endif
+#if CONFIG_CPU == X1000
+#define USB_DRIVER_CLOSE
+#endif
 #endif
 
 #else /* !BOOTLOADER */
