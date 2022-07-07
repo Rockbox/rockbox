@@ -22,9 +22,9 @@
 #include "progressloglevels.h"
 #include "Logger.h"
 
-#include "quazip/quazip.h"
-#include "quazip/quazipfile.h"
-#include "quazip/quazipfileinfo.h"
+#include <quazip.h>
+#include <quazipfile.h>
+#include <quazipfileinfo.h>
 
 
 ZipUtil::ZipUtil(QObject* parent) : ArchiveUtil(parent)

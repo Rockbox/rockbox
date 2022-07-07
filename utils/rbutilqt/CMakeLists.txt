@@ -255,9 +255,44 @@ if(APPLE)
         ${CMAKE_CURRENT_LIST_DIR}/base/ttscarbon.h)
 endif()
 
+find_package(QuaZip-Qt${QT_VERSION_MAJOR} QUIET)
+if(QuaZip-Qt${QT_VERSION_MAJOR}_FOUND)
+    message("-- Found QuaZip")
+    set(QUAZIP_LIBRARY QuaZip::QuaZip)
+else()
+    message("-- QuaZip not found, building our own")
+    # TODO: Upstream has cmake support, use that instead.
+    add_library(quazip
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/ioapi.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/minizip_crypt.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/qioapi.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazip.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfile.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfile.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfileinfo.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfileinfo.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazip_global.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazip.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipnewinfo.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipnewinfo.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/unzip.c
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/unzip.h
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/zip.c
+        ${CMAKE_CURRENT_LIST_DIR}/quazip/zip.h
+        )
+    target_include_directories(quazip PUBLIC ${CMAKE_CURRENT_LIST_DIR}/quazip)
+    target_link_libraries(quazip z Qt${QT_VERSION_MAJOR}::Core)
+    if(QT_VERSION_MAJOR EQUAL 6)
+        target_link_libraries(quazip Qt${QT_VERSION_MAJOR}::Core5Compat)
+    endif()
+    target_compile_definitions(quazip PUBLIC QUAZIP_STATIC)
+    set_property(TARGET quazip PROPERTY AUTOMOC ON)
+    set(QUAZIP_LIBRARY quazip)
+endif()
+
 target_link_libraries(rbbase
-    cutelogger quazip mspack bspatch rbspeex voicefont
-    sansapatcher ipodpatcher chinachippatcher
+    cutelogger ${QUAZIP_LIBRARY} mspack bspatch rbspeex
+    voicefont sansapatcher ipodpatcher chinachippatcher
     mkamsboot mkimxboot mkmpioboot mktccboot mks5lboot
     Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
 target_include_directories(rbbase PUBLIC ${CMAKE_CURRENT_LIST_DIR}/base)
@@ -297,33 +332,6 @@ target_include_directories(cutelogger PUBLIC ${CMAKE_CURRENT_LIST_DIR}/logger/in
 target_link_libraries(cutelogger PUBLIC Qt${QT_VERSION_MAJOR}::Core)
 target_compile_definitions(cutelogger PUBLIC CUTELOGGER_STATIC)
 set_property(TARGET cutelogger PROPERTY AUTOMOC ON)
-
-# TODO: Upstream has cmake support, use that instead.
-add_library(quazip
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/ioapi.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/minizip_crypt.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/qioapi.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazip.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfile.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfile.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfileinfo.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipfileinfo.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazip_global.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazip.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipnewinfo.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/quazipnewinfo.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/unzip.c
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/unzip.h
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/zip.c
-    ${CMAKE_CURRENT_LIST_DIR}/quazip/zip.h
-    )
-target_include_directories(quazip PUBLIC ${CMAKE_CURRENT_LIST_DIR}/quazip)
-target_link_libraries(quazip z Qt${QT_VERSION_MAJOR}::Core)
-if(QT_VERSION_MAJOR EQUAL 6)
-    target_link_libraries(quazip Qt${QT_VERSION_MAJOR}::Core5Compat)
-endif()
-target_compile_definitions(quazip PUBLIC QUAZIP_STATIC)
-set_property(TARGET quazip PROPERTY AUTOMOC ON)
 
 add_library(mspack
     #mspack/cabc.c
