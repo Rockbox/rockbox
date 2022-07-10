@@ -36,10 +36,10 @@ enum {
 };
 
 void x1000_boot_rockbox(const void* source, size_t length)
-    __attribute__((section(".icode")));
+    __attribute__((section(".icode.x1000_boot_rockbox")));
 void x1000_boot_linux(const void* source, size_t length,
                       void* load, void* entry, const char* args)
-    __attribute__((section(".icode")));
+    __attribute__((section(".icode.x1000_boot_linux")));
 
 /* dual boot support code */
 void x1000_dualboot_cleanup(void);
