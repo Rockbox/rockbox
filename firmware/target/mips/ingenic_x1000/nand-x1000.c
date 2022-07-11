@@ -44,11 +44,11 @@ const struct nand_chip supported_nand_chips[] = {
                            STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
                            SMP_DELAY(1)),
         .flags = NAND_CHIPFLAG_QUAD | NAND_CHIPFLAG_HAS_QE_BIT,
-        .cmd_page_read       = NANDCMD_PAGE_READ(3),
-        .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE(3),
-        .cmd_block_erase     = NANDCMD_BLOCK_ERASE(3),
-        .cmd_read_cache      = NANDCMD_READ_CACHE_x4(2),
-        .cmd_program_load    = NANDCMD_PROGRAM_LOAD_x4(2),
+        .cmd_page_read = NANDCMD_PAGE_READ,
+        .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE,
+        .cmd_block_erase = NANDCMD_BLOCK_ERASE,
+        .cmd_read_cache = NANDCMD_READ_CACHE_x4,
+        .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
     },
 #else
     { 0 },
@@ -103,7 +103,7 @@ static bool identify_chip(struct nand_drv* drv)
      *
      * Currently we use the 2nd method, aka. address read ID.
      */
-    sfc_exec(NANDCMD_READID(1, 0), 0, drv->scratch_buf, 4|SFC_READ);
+    sfc_exec(NANDCMD_READID_ADDR, 0, drv->scratch_buf, 4|SFC_READ);
     drv->mf_id = drv->scratch_buf[0];
     drv->dev_id = drv->scratch_buf[1];
     drv->dev_id2 = drv->scratch_buf[2];

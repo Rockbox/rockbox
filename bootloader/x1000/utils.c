@@ -375,22 +375,22 @@ static void probe_flash(int log_fd)
     mdelay(10);
 
     /* Try various read ID commands (cf. Linux's SPI NAND identify routine) */
-    sfc_exec(NANDCMD_READID(0, 0), 0, buffer, readid_len|SFC_READ);
+    sfc_exec(NANDCMD_READID_OPCODE, 0, buffer, readid_len|SFC_READ);
     fdprintf(log_fd, "readID opcode  = %02x %02x %02x %02x\n",
              buffer[0], buffer[1], buffer[2], buffer[3]);
 
-    sfc_exec(NANDCMD_READID(1, 0), 0, buffer, readid_len|SFC_READ);
+    sfc_exec(NANDCMD_READID_ADDR, 0, buffer, readid_len|SFC_READ);
     fdprintf(log_fd, "readID address = %02x %02x %02x %02x\n",
              buffer[0], buffer[1], buffer[2], buffer[3]);
 
-    sfc_exec(NANDCMD_READID(0, 8), 0, buffer, readid_len|SFC_READ);
+    sfc_exec(NANDCMD_READID_DUMMY, 0, buffer, readid_len|SFC_READ);
     fdprintf(log_fd, "readID dummy   = %02x %02x %02x %02x\n",
              buffer[0], buffer[1], buffer[2], buffer[3]);
 
     /* Try reading Ingenic SFC boot block */
-    sfc_exec(NANDCMD_PAGE_READ(3), 0, NULL, 0);
+    sfc_exec(NANDCMD_PAGE_READ, 0, NULL, 0);
     mdelay(500);
-    sfc_exec(NANDCMD_READ_CACHE_SLOW(2), 0, buffer, 16|SFC_READ);
+    sfc_exec(NANDCMD_READ_CACHE_SLOW, 0, buffer, 16|SFC_READ);
 
     fdprintf(log_fd, "sfc params0  = %02x %02x %02x %02x\n",
              buffer[ 0], buffer[ 1], buffer[ 2], buffer[ 3]);
