@@ -53,7 +53,9 @@ void Blip_clear( struct Blip_Buffer* this )
 	this->reader_accum_ = 0;
 	this->modified      = false;
 
+#if 0	// this is redundant as buffer is static and triggers -Waddress
 	if ( this->buffer_ )
+#endif
 	{
 		int count = (entire_buffer ? this->buffer_size_ : Blip_samples_avail( this ));
 		memset( this->buffer_, 0, (count + blip_buffer_extra_) * sizeof (delta_t) );

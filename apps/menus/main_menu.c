@@ -338,7 +338,7 @@ static int info_speak_item(int selected_item, void * data)
 #ifdef HAVE_RECORDING
         case INFO_REC_DIR:
             talk_id(LANG_REC_DIR, false);
-            if (global_settings.rec_directory && global_settings.rec_directory[0])
+            if (global_settings.rec_directory[0])
             {
                 long *pathsep = NULL;
                 char rec_directory[MAX_PATHNAME+1];
