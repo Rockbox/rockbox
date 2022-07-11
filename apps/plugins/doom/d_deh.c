@@ -63,7 +63,7 @@ char* strlwr(char* str)
 typedef struct {
     const byte *inp; // Pointer to string
     size_t size;     // Bytes remaining in string
-    int fd;          // Current file descriptor 
+    int fd;          // Current file descriptor
 } DEHFILE;
 
 // killough 10/98: emulate IO whether input really comes from a file or not
@@ -2868,6 +2868,7 @@ boolean deh_GetData(char *s, char *k, uint_64_t *l, char **strval, int fpout)
       if (*t == '=') break;
       buffer[i] = *t;  // copy it
    }
+   if (i == 0) i = 1; /* Just in case */
    buffer[--i] = '\0';  // terminate the key before the '='
    if (!*t)  // end of string with no equal sign
    {
