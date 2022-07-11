@@ -293,7 +293,7 @@ void engine_processInput(struct Engine* e) {
         e->sys->input.save = false;
     }
     if (e->sys->input.fastMode) {
-        e->vm._fastMode = !&e->vm._fastMode;
+        e->vm._fastMode = !e->vm._fastMode;
         e->sys->input.fastMode = false;
     }
     if (e->sys->input.stateSlot != 0) {
