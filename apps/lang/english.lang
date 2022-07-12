@@ -17211,3 +17211,17 @@
     *: "Composite Video Output"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_TOUCHSCREEN_FLICK_SHORTCUTS
+  desc: in settings menu
+  user: core
+  <source>
+    *: "Touchscreen Flick Shortcuts"
+  </source>
+  <dest>
+    *: "Touchscreen Flick Shortcuts"
+  </dest>
+  <voice>
+    *: "Touchscreen Flick Shortcuts"
+  </voice>
+</phrase>
