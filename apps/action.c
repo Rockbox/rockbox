@@ -104,6 +104,7 @@ typedef struct
     int ts_data;
     long ts_start_tick;
     struct touchevent touchevent;
+    struct gesture gesture;
 #endif
 } action_last_t;
 
@@ -466,6 +467,9 @@ static inline bool get_action_touchscreen(action_last_t *last, action_cur_t *cur
         last->touchevent.x = (last->ts_data >> 16) & 0xffff;
         last->touchevent.y = last->ts_data & 0xffff;
         last->touchevent.tick = last->tick;
+
+        /* Update gesture state */
+        gesture_process(&last->gesture, &last->touchevent);
 
         return true;
     }
@@ -1149,6 +1153,27 @@ int action_get_touch_event(struct touchevent *ev)
         *ev = action_last.touchevent;
 
     return action_last.touchevent.type;
+}
+
+void action_gesture_reset(void)
+{
+    gesture_reset(&action_last.gesture);
+}
+
+bool action_gesture_get_event_in_vp(struct gesture_event *gevt,
+                                    const struct viewport *vp)
+{
+    return gesture_get_event_in_vp(&action_last.gesture, gevt, vp);
+}
+
+bool action_gesture_is_valid(void)
+{
+    return gesture_is_valid(&action_last.gesture);
+}
+
+bool action_gesture_is_pressed(void)
+{
+    return gesture_is_pressed(&action_last.gesture);
 }
 
 /* return BUTTON_NONE               on error

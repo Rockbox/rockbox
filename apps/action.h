@@ -23,6 +23,7 @@
 #include "stdbool.h"
 #include "button.h"
 #include "viewport.h"
+#include "gesture.h"
 
 #define TIMEOUT_BLOCK   -1
 #define TIMEOUT_NOBLOCK  0
@@ -417,6 +418,18 @@ intptr_t get_action_data(void);
 #ifdef HAVE_TOUCHSCREEN
 /* Return a touch event and screen coordinates of the touch. */
 int action_get_touch_event(struct touchevent *ev);
+
+/* Action system gesture recognition */
+void action_gesture_reset(void);
+bool action_gesture_get_event_in_vp(struct gesture_event *gevt,
+                                    const struct viewport *vp);
+bool action_gesture_is_valid(void);
+bool action_gesture_is_pressed(void);
+
+static inline bool action_gesture_get_event(struct gesture_event *gevt)
+{
+    return action_gesture_get_event_in_vp(gevt, NULL);
+}
 
 /* DEPRECATED, do not use these anymore */
 int action_get_touchscreen_press(short *x, short *y);
