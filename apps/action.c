@@ -58,6 +58,54 @@
 #define REPEAT_WINDOW_TICKS HZ/4
 #define ACTION_FILTER_TICKS HZ/2 /* timeout between filtered actions SL/BL */
 
+/* act_cur holds action state during get_action() call */
+typedef struct
+{
+    int                            action;
+    int                            button;
+    int                            context;
+    int                            timeout;
+    const struct button_mapping   *items;
+    const struct button_mapping* (*get_context_map)(int);
+    bool                           is_prebutton;
+} action_cur_t;
+
+/* act_last holds action state between get_action() calls */
+typedef struct
+{
+    int      action;
+    long     tick;
+    int      button;
+    int      context;
+    intptr_t data;
+
+#if defined(HAVE_BACKLIGHT)
+    unsigned int backlight_mask;
+    long         bl_filter_tick;
+#endif
+
+#if !defined(HAS_BUTTON_HOLD)
+    long         sl_filter_tick;
+    unsigned int softlock_mask;
+    int          unlock_combo;
+    bool         keys_locked;
+    bool         screen_has_lock;
+
+#endif
+
+    bool          repeated;
+    bool          wait_for_release;
+
+#ifndef DISABLE_ACTION_REMAP
+    int     key_remap;
+#endif
+
+#ifdef HAVE_TOUCHSCREEN
+    bool     ts_short_press;
+    int      ts_data;
+#endif
+} action_last_t;
+
 /* holds the action state between calls to get_action \ get_action_custom) */
 static action_last_t action_last =
 {

@@ -379,54 +379,6 @@ enum {
     LAST_ACTION_PLACEHOLDER, /* custom actions should be this + something */
 };
 
- /* act_cur holds action state during get_action() call */
-typedef struct
-{
-    int                            action;
-    int                            button;
-    int                            context;
-    int                            timeout;
-    const struct button_mapping   *items;
-    const struct button_mapping* (*get_context_map)(int);
-    bool                           is_prebutton;
-} action_cur_t;
-
-/* act_last holds action state between get_action() calls */
-typedef struct
-{
-    int      action;
-    long     tick;
-    int      button;
-    int      context;
-    intptr_t data;
-
-#if defined(HAVE_BACKLIGHT)
-    unsigned int backlight_mask;
-    long         bl_filter_tick;
-#endif
-
-#if !defined(HAS_BUTTON_HOLD)
-    long         sl_filter_tick;
-    unsigned int softlock_mask;
-    int          unlock_combo;
-    bool         keys_locked;
-    bool         screen_has_lock;
-
-#endif
-
-    bool          repeated;
-    bool          wait_for_release;
-
-#ifndef DISABLE_ACTION_REMAP
-    int         key_remap;
-#endif
-
-#ifdef HAVE_TOUCHSCREEN
-    bool     ts_short_press;
-    int      ts_data;
-#endif
-} action_last_t;
-
 struct button_mapping {
     int action_code;
     int button_code;
