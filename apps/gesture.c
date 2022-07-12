@@ -180,3 +180,59 @@ bool gesture_vel_get(struct gesture_vel *gv, int *xvel, int *yvel)
 
     return gv->cnt >= ARRAYLEN(gv->xsamp);
 }
+
+/*
+ * flick detector
+ */
+
+int gesture_flick_get_in_vp(const struct gesture_event *gevt,
+                            const struct viewport *vp)
+{
+    const int vp_height = vp ? vp->height : LCD_HEIGHT;
+    const int vp_width = vp ? vp->width : LCD_WIDTH;
+
+    /* margin at edge where flicks must originate */
+    const int margin = touchscreen_get_scroll_threshold() * 2;
+
+    /* minimum distance from edge before a flick is reported */
+    const int x_dist = 1 + vp_width/4;
+    const int y_dist = 1 + vp_height/4;
+
+    /* a flick only triggers if the velocity along the main axis
+     * exceeds the minimum and the velocity on the other axis is
+     * below the maximum */
+    const int xv_min = 2*vp_width;
+    const int xv_max = vp_width;
+    const int yv_min = 2*vp_height;
+    const int yv_max = vp_height;
+
+    /* a flick is only detected if it occurs within this timeout */
+    const long timeout = HZ/2;
+
+    long dt = gevt->last_tick - gevt->start_tick;
+    if (dt <= 0 || dt > timeout)
+        return GESTURE_FLICK_NONE;
+
+    int xvel = (gevt->x - gevt->ox) * HZ / dt;
+    int yvel = (gevt->y - gevt->oy) * HZ / dt;
+
+    if (gevt->ox < margin && gevt->x >= x_dist &&
+        xvel >= xv_min && abs(yvel) <= yv_max)
+        return GESTURE_FLICK_LEFT;
+
+    if (gevt->ox >= LCD_WIDTH - margin &&
+        gevt->x < LCD_WIDTH - x_dist &&
+        xvel <= -xv_min && abs(yvel) <= yv_max)
+        return GESTURE_FLICK_RIGHT;
+
+    if (gevt->oy < margin && gevt->y >= y_dist &&
+        yvel >= yv_min && abs(xvel) <= xv_max)
+        return GESTURE_FLICK_TOP;
+
+    if (gevt->oy >= LCD_HEIGHT - margin &&
+        gevt->y < LCD_HEIGHT - y_dist &&
+        yvel <= -yv_min && abs(xvel) < xv_max)
+        return GESTURE_FLICK_BOTTOM;
+
+    return GESTURE_FLICK_NONE;
+}

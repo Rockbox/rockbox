@@ -133,4 +133,24 @@ void gesture_vel_reset(struct gesture_vel *gv);
 void gesture_vel_process(struct gesture_vel *gv, const struct touchevent *ev);
 bool gesture_vel_get(struct gesture_vel *gv, int *xvel, int *yvel);
 
+/* Flick detection */
+enum gesture_flick_id
+{
+    /* The enum refers to originating edge: GESTURE_FLICK_LEFT
+     * means a flick from the left edge moving rightward. */
+    GESTURE_FLICK_NONE = 0,
+    GESTURE_FLICK_TOP,
+    GESTURE_FLICK_BOTTOM,
+    GESTURE_FLICK_LEFT,
+    GESTURE_FLICK_RIGHT,
+};
+
+int gesture_flick_get_in_vp(const struct gesture_event *gevt,
+                            const struct viewport *vp);
+
+static inline int gesture_flick_get(const struct gesture_event *gevt)
+{
+    return gesture_flick_get_in_vp(gevt, NULL);
+}
+
 #endif /* _GESTURE_H_ */
