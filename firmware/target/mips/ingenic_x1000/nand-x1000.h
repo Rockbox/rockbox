@@ -42,10 +42,8 @@
 #define NAND_CHIPFLAG_QUAD          0x0001
 /* Chip requires QE bit set to enable quad I/O mode */
 #define NAND_CHIPFLAG_HAS_QE_BIT    0x0002
-/* Chip has 2nd device ID byte */
-#define NAND_CHIPFLAG_HAS_DEVID2    0x0004
 /* True if the chip has on-die ECC */
-#define NAND_CHIPFLAG_ON_DIE_ECC    0x0008
+#define NAND_CHIPFLAG_ON_DIE_ECC    0x0004
 
 /*                                          cmd   mode             a  d  phase format         has data */
 #define NANDCMD_RESET               SFC_CMD(0xff, SFC_TMODE_1_1_1, 0, 0, SFC_PFMT_ADDR_FIRST, 0)
@@ -103,11 +101,6 @@ typedef uint32_t nand_page_t;
 struct nand_drv;
 
 struct nand_chip {
-    /* Manufacturer and device ID bytes */
-    uint8_t mf_id;
-    uint8_t dev_id;
-    uint8_t dev_id2;
-
     /* Base2 logarithm of the number of pages per block */
     unsigned log2_ppb;
 
@@ -141,6 +134,25 @@ struct nand_chip {
     void(*setup_chip)(struct nand_drv* drv);
 };
 
+enum nand_readid_method {
+    NAND_READID_OPCODE,
+    NAND_READID_ADDR,
+    NAND_READID_DUMMY,
+};
+
+struct nand_chip_id {
+    uint8_t method;
+    uint8_t num_id_bytes;
+    uint8_t id_bytes[4];
+    const struct nand_chip* chip;
+};
+
+#define NAND_CHIP_ID(_chip, _method, ...) \
+    { .method = _method, \
+      .num_id_bytes = ARRAYLEN(((uint8_t[]){__VA_ARGS__})),   \
+      .id_bytes = {__VA_ARGS__}, \
+      .chip = _chip }
+
 struct nand_drv {
     /* NAND access lock. Needs to be held during any operations. */
     struct mutex mutex;
@@ -170,14 +182,9 @@ struct nand_drv {
 
     /* Full page size = chip->page_size + chip->oob_size */
     unsigned fpage_size;
-
-    /* Probed mf_id / dev_id for debugging, in case identification fails. */
-    uint8_t mf_id;
-    uint8_t dev_id;
-    uint8_t dev_id2;
 };
 
-extern const struct nand_chip supported_nand_chips[];
+extern const struct nand_chip_id supported_nand_chips[];
 extern const size_t nr_supported_nand_chips;
 
 /* Return the static NAND driver instance.

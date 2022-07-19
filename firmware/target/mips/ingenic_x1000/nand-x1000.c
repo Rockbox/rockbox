@@ -25,34 +25,30 @@
 #include "logf.h"
 #include <string.h>
 
-const struct nand_chip supported_nand_chips[] = {
-#if defined(FIIO_M3K) || defined(SHANLING_Q1) || defined(EROS_QN)
-    {
-        /* ATO25D1GA */
-        .mf_id = 0x9b,
-        .dev_id = 0x12,
-        .log2_ppb = 6, /* 64 pages */
-        .page_size = 2048,
-        .oob_size = 64,
-        .nr_blocks = 1024,
-        .bbm_pos = 2048,
-        .clock_freq = 150000000,
-        .dev_conf = jz_orf(SFC_DEV_CONF,
-                           CE_DL(1), HOLD_DL(1), WP_DL(1),
-                           CPHA(0), CPOL(0),
-                           TSH(7), TSETUP(0), THOLD(0),
-                           STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
-                           SMP_DELAY(1)),
-        .flags = NAND_CHIPFLAG_QUAD | NAND_CHIPFLAG_HAS_QE_BIT,
-        .cmd_page_read = NANDCMD_PAGE_READ,
-        .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE,
-        .cmd_block_erase = NANDCMD_BLOCK_ERASE,
-        .cmd_read_cache = NANDCMD_READ_CACHE_x4,
-        .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
-    },
-#else
-    { 0 },
-#endif
+static const struct nand_chip chip_ato25d1ga = {
+    .log2_ppb = 6, /* 64 pages */
+    .page_size = 2048,
+    .oob_size = 64,
+    .nr_blocks = 1024,
+    .bbm_pos = 2048,
+    .clock_freq = 150000000,
+    .dev_conf = jz_orf(SFC_DEV_CONF,
+                       CE_DL(1), HOLD_DL(1), WP_DL(1),
+                       CPHA(0), CPOL(0),
+                       TSH(7), TSETUP(0), THOLD(0),
+                       STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
+                       SMP_DELAY(1)),
+    .flags = NAND_CHIPFLAG_QUAD | NAND_CHIPFLAG_HAS_QE_BIT,
+    .cmd_page_read = NANDCMD_PAGE_READ,
+    .cmd_program_execute = NANDCMD_PROGRAM_EXECUTE,
+    .cmd_block_erase = NANDCMD_BLOCK_ERASE,
+    .cmd_read_cache = NANDCMD_READ_CACHE_x4,
+    .cmd_program_load = NANDCMD_PROGRAM_LOAD_x4,
+};
+
+
+const struct nand_chip_id supported_nand_chips[] = {
+    NAND_CHIP_ID(&chip_ato25d1ga, NAND_READID_ADDR, 0x9b, 0x12),
 };
 
 const size_t nr_supported_nand_chips = ARRAYLEN(supported_nand_chips);
@@ -94,6 +90,19 @@ static void nand_upd_reg(struct nand_drv* drv, uint8_t reg, uint8_t msk, uint8_t
     nand_set_reg(drv, reg, x);
 }
 
+static const struct nand_chip* identify_chip_method(uint8_t method,
+                                                    const uint8_t* id_buf)
+{
+    for (size_t i = 0; i < nr_supported_nand_chips; ++i) {
+        const struct nand_chip_id* chip_id = &supported_nand_chips[i];
+        if (chip_id->method == method &&
+            !memcmp(chip_id->id_bytes, id_buf, chip_id->num_id_bytes))
+            return chip_id->chip;
+    }
+
+    return NULL;
+}
+
 static bool identify_chip(struct nand_drv* drv)
 {
     /* Read ID command has some variations; Linux handles these 3:
@@ -101,25 +110,13 @@ static bool identify_chip(struct nand_drv* drv)
      * - 1 byte address, no dummy byte
      * - no address byte, 1 byte dummy
      *
-     * Currently we use the 2nd method, aka. address read ID.
+     * Currently we use the 2nd method, aka. address read ID, the
+     * other methods can be added when needed.
      */
     sfc_exec(NANDCMD_READID_ADDR, 0, drv->scratch_buf, 4|SFC_READ);
-    drv->mf_id = drv->scratch_buf[0];
-    drv->dev_id = drv->scratch_buf[1];
-    drv->dev_id2 = drv->scratch_buf[2];
-
-    for(size_t i = 0; i < nr_supported_nand_chips; ++i) {
-        const struct nand_chip* chip = &supported_nand_chips[i];
-        if(chip->mf_id != drv->mf_id || chip->dev_id != drv->dev_id)
-            continue;
-
-        if((chip->flags & NAND_CHIPFLAG_HAS_DEVID2) &&
-           chip->dev_id2 != drv->dev_id2)
-            continue;
-
-        drv->chip = chip;
+    drv->chip = identify_chip_method(NAND_READID_ADDR, drv->scratch_buf);
+    if (drv->chip)
         return true;
-    }
 
     return false;
 }
@@ -164,8 +161,13 @@ int nand_open(struct nand_drv* drv)
 
     /* Initialize the controller */
     sfc_open();
-    sfc_set_dev_conf(supported_nand_chips[0].dev_conf);
-    sfc_set_clock(supported_nand_chips[0].clock_freq);
+    sfc_set_dev_conf(jz_orf(SFC_DEV_CONF,
+                            CE_DL(1), HOLD_DL(1), WP_DL(1),
+                            CPHA(0), CPOL(0),
+                            TSH(15), TSETUP(0), THOLD(0),
+                            STA_TYPE_V(1BYTE), CMD_TYPE_V(8BITS),
+                            SMP_DELAY(0)));
+    sfc_set_clock(X1000_EXCLK_FREQ);
 
     /* Send the software reset command */
     sfc_exec(NANDCMD_RESET, 0, NULL, 0);
