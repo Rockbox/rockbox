@@ -1457,10 +1457,10 @@ const char *get_token_value(struct gui_wps *gwps,
             return NULL;
         case SKIN_TOKEN_HAVE_TOUCH:
 #ifdef HAVE_TOUCHSCREEN
-            return "t";
-#else
-            return NULL;
+            if (touchscreen_get_mode() == TOUCHSCREEN_POINT)
+                return "t";
 #endif
+            return NULL;
 
 #ifdef HAVE_QUICKSCREEN
         case SKIN_TOKEN_TOP_QUICKSETTING_NAME:

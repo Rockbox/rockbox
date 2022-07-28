@@ -238,7 +238,7 @@ static const struct tag_info legal_tags[] =
      *  keep in sync with parse_touchregion() and parse_lasttouch() */
     TAG(SKIN_TOKEN_LASTTOUCH,     "Tl" , "|[SD]D", SKIN_REFRESH_DYNAMIC),
     TAG(SKIN_TOKEN_TOUCHREGION,   "T"  , "[Sip][ip][ip][ip][Sip]|S*", 0|NOBREAK),
-    TAG(SKIN_TOKEN_HAVE_TOUCH,    "Tp", "", FEATURE_TAG),
+    TAG(SKIN_TOKEN_HAVE_TOUCH,    "Tp", "", SKIN_REFRESH_STATIC),
 
     TAG(SKIN_TOKEN_CURRENT_SCREEN,"cs", "", SKIN_REFRESH_DYNAMIC),
 
