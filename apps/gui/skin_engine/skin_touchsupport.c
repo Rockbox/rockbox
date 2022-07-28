@@ -103,12 +103,12 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
         case ACTION_TOUCH_SCROLLBAR:
         case ACTION_TOUCH_VOLUME:
         case ACTION_TOUCH_SETTING:
-            /* we need something press-like */
+            /* accept taps and drags, ignore the rest */
             if (!(gevent.id == GESTURE_TAP ||
-                  gevent.id == GESTURE_LONG_PRESS ||
                   gevent.id == GESTURE_HOLD ||
                   gevent.id == GESTURE_DRAGSTART ||
-                  gevent.id == GESTURE_DRAG))
+                  gevent.id == GESTURE_DRAG ||
+                  gevent.id == GESTURE_RELEASE))
                 break;
 
             if (edge_offset)
@@ -194,6 +194,15 @@ int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
 
     switch (action)
     {
+    case ACTION_TOUCH_SCROLLBAR:
+        if (gevent.id == GESTURE_HOLD ||
+            gevent.id == GESTURE_DRAGSTART ||
+            gevent.id == GESTURE_DRAG)
+            action = ACTION_TOUCH_SCROLLBAR_SET;
+        else if (gevent.id == GESTURE_RELEASE)
+            action = ACTION_TOUCH_SCROLLBAR_END;
+        break;
+
     case ACTION_TOUCH_SOFTLOCK:
         data->touchscreen_locked = !data->touchscreen_locked;
         action = ACTION_NONE;
