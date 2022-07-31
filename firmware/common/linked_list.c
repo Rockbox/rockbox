@@ -133,6 +133,38 @@ void ll_remove(struct ll_head *list, struct ll_node *node)
 
 /** (L)inked (L)ist (D)ouble **/
 
+void lld_insert_next(struct lld_head *list, struct lld_node *node,
+                     struct lld_node *newnode)
+{
+    struct lld_node **nodep = node != NULL ? &node->next : &list->head;
+    struct lld_node *next = *nodep;
+
+    newnode->next = next;
+    newnode->prev = node;
+    *nodep = newnode;
+
+    if (next == NULL)
+        list->tail = newnode;
+    else
+        next->prev = newnode;
+}
+
+void lld_insert_prev(struct lld_head *list, struct lld_node *node,
+                     struct lld_node *newnode)
+{
+    struct lld_node **nodep = node != NULL ? &node->prev : &list->tail;
+    struct lld_node *prev = *nodep;
+
+    newnode->next = node;
+    newnode->prev = prev;
+    *nodep = newnode;
+
+    if (prev == NULL)
+        list->head = newnode;
+    else
+        prev->next = newnode;
+}
+
 /**
  * Adds a node to a doubly-linked list using "insert first"
  */

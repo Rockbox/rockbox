@@ -103,6 +103,10 @@ static inline void lld_init(struct lld_head *list)
        the routines and maintains the non-circularity */
 }
 
+void lld_insert_next(struct lld_head *list, struct lld_node *node,
+                     struct lld_node *newnode);
+void lld_insert_prev(struct lld_head *list, struct lld_node *node,
+                     struct lld_node *newnode);
 void lld_insert_first(struct lld_head *list, struct lld_node *node);
 void lld_insert_last(struct lld_head *list, struct lld_node *node);
 void lld_remove(struct lld_head *list, struct lld_node *node);
