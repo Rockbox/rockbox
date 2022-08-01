@@ -1294,6 +1294,7 @@ static int parse_progressbar_tag(struct skin_element* element,
         region->wvp = PTRTOSKINOFFSET(skin_buffer, curr_vp);
         region->reverse_bar = false;
         region->allow_while_locked = false;
+        region->user_region = false;
         region->press_length = PRESS;
         region->last_press = -1;
         region->bar = PTRTOSKINOFFSET(skin_buffer, pb);
@@ -1797,6 +1798,7 @@ static int parse_touchregion(struct skin_element *element,
     region->last_press = -1;
     region->press_length = PRESS;
     region->allow_while_locked = false;
+    region->user_region = true;
     region->bar = PTRTOSKINOFFSET(skin_buffer, NULL);
 
     action = get_param_text(element, p++);
@@ -2721,8 +2723,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
         struct touchregion *r = NULL;
         if (token)
             r = SKINOFFSETTOPTR(skin_buffer, token->value.data);
-        if (r && r->action != ACTION_TOUCH_SCROLLBAR &&
-            r->action != ACTION_TOUCH_VOLUME)
+        if (r && r->user_region)
         {
             user_touch_region_found = true;
             break;

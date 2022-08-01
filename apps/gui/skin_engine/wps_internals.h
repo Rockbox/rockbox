@@ -219,6 +219,7 @@ struct touchregion {
     int16_t hpad;          /* padding to height */
     bool reverse_bar;        /* if true 0% is the left or top */
     bool allow_while_locked;
+    bool user_region;        /* if true this is a user-defined region */
     enum {
         PRESS,               /* quick press only */
         LONG_PRESS,          /* Long press without repeat */
