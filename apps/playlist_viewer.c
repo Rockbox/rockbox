@@ -511,6 +511,7 @@ static enum pv_onplay_result show_track_info(const struct playlist_entry *curren
 }
 
 
+#ifdef HAVE_HOTKEY
 static enum pv_onplay_result open_with(const struct playlist_entry *current_track)
 {
     char selected_track[MAX_PATH];
@@ -520,6 +521,7 @@ static enum pv_onplay_result open_with(const struct playlist_entry *current_trac
     return (filetype_list_viewers(selected_track) ==
                 PLUGIN_USB_CONNECTED ? PV_ONPLAY_USB_CLOSED : PV_ONPLAY_CLOSED);
 }
+#endif /* HAVE_HOTKEY */
 
 #ifdef HAVE_TAGCACHE
 static enum pv_onplay_result open_pictureflow(const struct playlist_entry *current_track)
