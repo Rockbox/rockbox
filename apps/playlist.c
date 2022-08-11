@@ -2154,6 +2154,7 @@ int playlist_resume(void)
     }
     buffer = core_get_data(handle);
 
+    playlist_shutdown(); /* flush any cached control commands to disk */
     empty_playlist(playlist, true);
 
     playlist->control_fd = open(playlist->control_filename, O_RDWR);
