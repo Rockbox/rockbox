@@ -963,6 +963,9 @@ const struct custom_format format_transposed = {
 
 static const struct button_mapping* get_context_map(int context)
 {
+#ifdef HAVE_LOCKED_ACTIONS
+    context &= ~CONTEXT_LOCKED;
+#endif
     return pf_contexts[context & ~CONTEXT_PLUGIN];
 }
 
