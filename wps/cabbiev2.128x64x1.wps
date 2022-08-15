@@ -53,9 +53,9 @@
 #
 # Current Track Info
 %V(0,16,128,24,1)
+%ac%s%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %ac%s%?it<%it|%fn>
 %ac%s%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%ac%s%?id<%id|%?d(1)<%d(1)|%(root%)>>
 #
 # Next Track Info
 %V(0,42,128,8,1)

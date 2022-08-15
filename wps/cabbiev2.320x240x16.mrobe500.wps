@@ -40,9 +40,9 @@
 %s%al%?Ia<%Ia|%IA>
 
 %Vl(b,0,30,-,130,1)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%iy
 
 %ac%Sx(Next Track:)

@@ -13,17 +13,17 @@
 
 %?C<|>
 %?C<|>
+%?C<|%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>>
 %?C<|%s%ac%?it<%it|%fn>>
 %?C<|%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>>
-%?C<|%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>>
 %?C<|%ac%?iy<%iy|>>
 %?C<|>
 %?C<|%ac%?ig<%ig|>>
 %?C<|%ac%?fv<%(vbr%) |>%fb kbit/s %fc>
 %?C<|>
+%?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|%ac%s%?It<%It|%Fn>>
 %?C<%s%ac%?it<%it|%fn>|>
 %?C<%s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>|%ac%Sx(Next Track:)>
-%?C<%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>|%ac%s%?It<%It|%Fn>>
 %?C<|%s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>>>
 %?C<%s%ac%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>|%s%ac%?Id<%Id|%?D(1)<%D(1)|%(root%)>>>
 

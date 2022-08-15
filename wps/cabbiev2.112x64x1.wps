@@ -47,9 +47,9 @@
 #
 # Track Info
 %V(0,8,-,35,-)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %t(5)%ac%s%?Fn<%Sx(Next:) %?It<%It|%Fn>|%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>>%;%t(5)%ac%s%?Fn<%Sx(Next:) %?Ia<%Ia|%?IA<%IA|%Fn>|%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>>>
 %V(0,48,-,8,-)
 %pc%ar%pr

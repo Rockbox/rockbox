@@ -50,7 +50,7 @@
 #
 # Track Info
 %V(0,10,128,48,1)%Vf(0)%Vb(3)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%Sx(Next:) %ac%It

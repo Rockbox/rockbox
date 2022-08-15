@@ -58,9 +58,9 @@
 #
 # Track Info - Album Art
 %ax%Vl(a,153,30,-,130,1)
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%?iy<%iy>
 
 %s%al%Sx(Next Track:)
@@ -69,9 +69,9 @@
 #
 # Track Info - No Album Art
 %ax%Vl(b,0,30,-,130,1)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?iy<%iy>
 
 %ac%Sx(Next Track:)

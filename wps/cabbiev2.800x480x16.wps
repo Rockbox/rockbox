@@ -17,9 +17,9 @@
 # tap on current title info for playlist (ie. where albumart would normally be)
 %T(0,0,225,225,playlist)
 %Vl(b,0,79,-,225,-)
+%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%ac%?it<%it|%fn>
 %s%ac%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%ac%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
 %ac%Sx(Next Track:)
 %s%ac%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>
@@ -34,9 +34,9 @@
 
 # track & next track info - AA
 %Vl(d,309,83,-,211,-)
+%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 %s%al%?it<%it|%fn>
 %s%al%?ia<%ia|%?iA<%iA|%?d(2)<%d(2)|%(root%)>>>
-%s%al%?id<%id|%?d(1)<%d(1)|%(root%)>>
 
 %s%al%Sx(Next Track:)
 %s%al%?Ia<%Ia|%?IA<%IA|%?D(2)<%D(2)|%(root%)>>> - %?It<%It|%Fn>
