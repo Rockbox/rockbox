@@ -4214,7 +4214,7 @@ static void set_initial_slide(const char* selected_file)
                             pf_cfg.last_album);
     else
     {
-        struct mp3entry id3;
+        static struct mp3entry id3;
 #if defined(HAVE_TC_RAMCACHE) && defined(HAVE_DIRCACHE)
         if (rb->tagcache_fill_tags(&id3, selected_file))
             set_current_slide(id3_get_index(&id3));
