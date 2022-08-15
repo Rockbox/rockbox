@@ -240,8 +240,10 @@ static const char graphic_numeric[] = "graphic,numeric";
   #define DEFAULT_FONTNAME "08-Rockfont"
 #elif LCD_HEIGHT <= 220
   #define DEFAULT_FONT_HEIGHT 12
-#elif LCD_HEIGHT <= 320
+#elif LCD_HEIGHT <= 240
   #define DEFAULT_FONT_HEIGHT 15
+#elif LCD_HEIGHT <= 320
+  #define DEFAULT_FONT_HEIGHT 18
 #elif defined(SHANLING_Q1)
   /* 16pt font looks pretty aliased & ugly */
   #define DEFAULT_FONT_HEIGHT 18
