@@ -4198,7 +4198,7 @@ static int show_id3_info(const char *selected_file)
 }
 
 
-static bool playlist_insert(int position, bool queue, bool create_new)
+static bool pf_current_playlist_insert(int position, bool queue, bool create_new)
 {
     if (position == PLAYLIST_REPLACE)
     {
@@ -4228,6 +4228,44 @@ static bool playlist_insert(int position, bool queue, bool create_new)
     old_playlist = create_new ? center_slide.slide_index : -1;
     return true;
 }
+
+
+static int pf_add_to_playlist(const char* playlist, bool new_playlist)
+{
+    int fd;
+    int result = 0;
+
+    if (new_playlist)
+        fd = rb->open_utf8(playlist, O_CREAT|O_WRONLY|O_TRUNC);
+    else
+        fd = rb->open(playlist, O_CREAT|O_WRONLY|O_APPEND, 0666);
+
+    if(fd < 0)
+        return -1;
+
+    rb->reload_directory();
+
+    if (!insert_whole_album)
+    {
+        if (rb->fdprintf(fd, "%s\n", get_track_filename(pf_tracks.sel)) <= 0)
+            result = -1;
+    }
+    else
+    {
+        int i = 0;
+        do {
+            if (rb->fdprintf(fd, "%s\n", get_track_filename(i)) <= 0)
+            {
+                result = -1;
+                break;
+            }
+            rb->yield();
+        } while(++i < pf_tracks.count);
+    }
+    rb->close(fd);
+    return result;
+}
+
 
 static bool track_list_ready(void)
 {
@@ -4291,14 +4329,18 @@ static void context_menu_cleanup(void)
 
 static int context_menu(void)
 {
+    char album_name[MAX_PATH];
     char *file_name = get_track_filename(pf_tracks.sel);
+    int attr;
 
     enum {
         PF_CURRENT_PLAYLIST = 0,
+        PF_CATALOG,
         PF_ID3_INFO
     };
     MENUITEM_STRINGLIST(context_menu, ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
                         ID2P(LANG_PLAYING_NEXT),
+                        ID2P(LANG_ADD_TO_PL),
                         ID2P(LANG_MENU_SHOW_ID3_INFO));
 
     while (1)  {
@@ -4307,7 +4349,22 @@ static int context_menu(void)
 
             case PF_CURRENT_PLAYLIST:
                 rb->onplay_show_playlist_menu(file_name,
-                                              &playlist_insert);
+                                              &pf_current_playlist_insert);
+                return 0;
+            case PF_CATALOG:
+                if (!insert_whole_album)
+                    attr = FILE_ATTR_AUDIO;
+                else
+                {
+                    /* add a leading slash so that catalog_add_to_a_playlist
+                       later prefills the name when creating a new playlist */
+                    rb->snprintf(album_name, MAX_PATH, "/%s", get_album_name(center_index));
+                    rb->fix_path_part(album_name, 1, sizeof(album_name));
+                    file_name = album_name;
+                    attr = ATTR_DIRECTORY;
+                }
+
+                rb->onplay_show_playlist_cat_menu(file_name, attr, &pf_add_to_playlist);
                 return 0;
             case PF_ID3_INFO:
                 return show_id3_info(file_name);
@@ -4354,7 +4411,7 @@ static bool start_playback(bool return_to_WPS)
     if (shuffle || center_slide.slide_index != old_playlist
                 || (old_shuffle != shuffle))
     {
-        if (!playlist_insert(PLAYLIST_REPLACE, false, true))
+        if (!pf_current_playlist_insert(PLAYLIST_REPLACE, false, true))
         {
 #ifdef USEGSLIB
             grey_show(true);
