@@ -124,6 +124,8 @@ int split_string(char *str, const char needle, char *vector[], int vector_length
 #ifndef O_PATH
 #define O_PATH 0x2000
 #endif
+
+void fix_path_part(char* path, int offset, int count);
 int open_pathfmt(char *buf, size_t size, int oflag, const char *pathfmt, ...);
 int open_utf8(const char* pathname, int flags);
 int string_option(const char *option, const char *const oplist[], bool ignore_case);

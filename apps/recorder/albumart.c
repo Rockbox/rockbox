@@ -77,32 +77,6 @@ static char* strip_filename(char* buf, int buf_size, const char* fullpath)
     return (sep + 1);
 }
 
-/* Make sure part of path only contain chars valid for a FAT32 long name.
- * Double quotes are replaced with single quotes, other unsupported chars 
- * are replaced with an underscore.
- *
- * path   - path to modify.
- * offset - where in path to start checking.
- * count  - number of chars to check.
- */
-static void fix_path_part(char* path, int offset, int count)
-{
-    static const char invalid_chars[] = "*/:<>?\\|";
-    int i;
-    
-    path += offset;
-    
-    for (i = 0; i <= count; i++, path++)
-    {
-        if (*path == 0)
-            return;
-        if (*path == '"')
-            *path = '\'';
-        else if (strchr(invalid_chars, *path))
-            *path = '_';
-    }
-}
-
 #ifdef USE_JPEG_COVER
 static const char * const extensions[] = { "jpeg", "jpg", "bmp" };
 static const unsigned char extension_lens[] = { 4, 3, 3 };

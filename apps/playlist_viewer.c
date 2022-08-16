@@ -630,7 +630,7 @@ static enum pv_onplay_result onplay_menu(int index)
                 break;
             case 1:
                 /* add to catalog */
-                onplay_show_playlist_cat_menu(current_track->name);
+                onplay_show_playlist_cat_menu(current_track->name, FILE_ATTR_AUDIO, NULL);
                 ret = PV_ONPLAY_UNCHANGED;
                 break;
             case 2:

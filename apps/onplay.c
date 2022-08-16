@@ -70,7 +70,8 @@ static const char *selected_file = NULL;
 static char selected_file_path[MAX_PATH];
 static int selected_file_attr = 0;
 static int onplay_result = ONPLAY_OK;
-static bool (*ctx_playlist_insert)(int position, bool queue, bool create_new);
+static bool (*ctx_current_playlist_insert)(int position, bool queue, bool create_new);
+static int (*ctx_add_to_playlist)(const char* playlist, bool new_playlist);
 extern struct menu_item_ex file_menu; /* settings_menu.c  */
 
 /* redefine MAKE_MENU so the MENU_EXITAFTERTHISMENU flag can be added easily */
@@ -626,11 +627,11 @@ static int add_to_playlist(void* arg)
 #ifdef HAVE_TAGCACHE
     if (context == CONTEXT_ID3DB)
     {
-        tagtree_insert_selection_playlist(position, queue);
+        tagtree_current_playlist_insert(position, queue);
     }
-    else if (context == CONTEXT_STD && ctx_playlist_insert != NULL)
+    else if (context == CONTEXT_STD && ctx_current_playlist_insert != NULL)
     {
-        ctx_playlist_insert(position, queue, false);
+        ctx_current_playlist_insert(position, queue, false);
     }
     else
 #endif
@@ -837,7 +838,7 @@ static int treeplaylist_callback(int action,
 void onplay_show_playlist_menu(const char* path, void (*playlist_insert_cb))
 {
     context = CONTEXT_STD;
-    ctx_playlist_insert = playlist_insert_cb;
+    ctx_current_playlist_insert = playlist_insert_cb;
     selected_file = path;
     if (dir_exists(path))
         selected_file_attr = ATTR_DIRECTORY;
@@ -850,13 +851,13 @@ void onplay_show_playlist_menu(const char* path, void (*playlist_insert_cb))
 static bool cat_add_to_a_playlist(void)
 {
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
-                                     false, NULL);
+                                     false, NULL, ctx_add_to_playlist);
 }
 
 static bool cat_add_to_a_new_playlist(void)
 {
     return catalog_add_to_a_playlist(selected_file, selected_file_attr,
-                                     true, NULL);
+                                     true, NULL, ctx_add_to_playlist);
 }
 
 static int cat_playlist_callback(int action,
@@ -871,11 +872,12 @@ MAKE_ONPLAYMENU(cat_playlist_menu, ID2P(LANG_ADD_TO_PL),
                 cat_playlist_callback, Icon_Playlist,
                 &cat_add_to_list, &cat_add_to_new);
 
-void onplay_show_playlist_cat_menu(char* track_name)
+void onplay_show_playlist_cat_menu(const char* track_name, int attr, void (*add_to_pl_cb))
 {
     context = CONTEXT_STD;
+    ctx_add_to_playlist = add_to_pl_cb;
     selected_file = track_name;
-    selected_file_attr = FILE_ATTR_AUDIO;
+    selected_file_attr = attr;
     do_menu(&cat_playlist_menu, NULL, NULL, false);
 }
 
@@ -892,13 +894,6 @@ static int cat_playlist_callback(int action,
     {
         return ACTION_EXIT_MENUITEM;
     }
-#ifdef HAVE_TAGCACHE
-    if (context == CONTEXT_ID3DB &&
-        ((selected_file_attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO))
-    {
-        return ACTION_EXIT_MENUITEM;
-    }
-#endif
 
     switch (action)
     {
@@ -2026,13 +2021,31 @@ int onplay(char* file, int attr, int from, bool hotkey)
     const struct menu_item_ex *menu;
     onplay_result = ONPLAY_OK;
     context = from;
-    ctx_playlist_insert = NULL;
-    if (file == NULL)
-        selected_file = NULL;
-    else
+    ctx_current_playlist_insert = NULL;
+    selected_file = NULL;
+#ifdef HAVE_TAGCACHE
+    if (context == CONTEXT_ID3DB &&
+        (attr & FILE_ATTR_MASK) != FILE_ATTR_AUDIO)
     {
-        strmemccpy(selected_file_path, file, MAX_PATH);
-        selected_file = selected_file_path;
+        ctx_add_to_playlist = tagtree_add_to_playlist;
+        if (file != NULL)
+        {
+            /* add a leading slash so that catalog_add_to_a_playlist
+               later prefills the name when creating a new playlist */
+            snprintf(selected_file_path, MAX_PATH, "/%s", file);
+            selected_file = selected_file_path;
+        }
+    }
+   else
+#endif
+    {
+        ctx_add_to_playlist = NULL;
+        if (file != NULL)
+        {
+            strmemccpy(selected_file_path, file, MAX_PATH);
+            selected_file = selected_file_path;
+        }
+
     }
     selected_file_attr = attr;
     int menu_selection;

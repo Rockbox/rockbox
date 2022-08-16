@@ -389,9 +389,12 @@ bool catalog_view_playlists(void)
     return (display_playlists(NULL, CATBROWSE_CATVIEW) >= 0);
 }
 
+static int (*ctx_add_to_playlist)(const char* playlist, bool new_playlist);
 bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
-                               bool new_playlist, char *m3u8name)
+                               bool new_playlist, char *m3u8name,
+                               void (*add_to_pl_cb))
 {
+    int result;
     char playlist[MAX_PATH + 7]; /* room for /.m3u8\0*/
     if ((browser_status & CATBROWSE_PLAYLIST) == CATBROWSE_PLAYLIST)
         return false;
@@ -437,8 +440,13 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
             return false;
     }
 
-    if (add_to_playlist(playlist, new_playlist, sel, sel_attr) == 0)
-        return true;
+    if (add_to_pl_cb != NULL)
+    {
+        ctx_add_to_playlist = add_to_pl_cb;
+        result = ctx_add_to_playlist(playlist, new_playlist);
+    }
     else
-        return false;
+        result = add_to_playlist(playlist, new_playlist, sel, sel_attr);
+
+    return (result == 0);
 }

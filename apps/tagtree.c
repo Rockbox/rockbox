@@ -2069,10 +2069,14 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
     return 0;
 }
 
-static bool insert_all_playlist(struct tree_context *c, int position, bool queue)
+
+static bool insert_all_playlist(struct tree_context *c,
+                                const char* playlist, bool new_playlist,
+                                int position, bool queue)
 {
     struct tagcache_search tcs;
     int i, n;
+    int fd = -1;
     unsigned long last_tick;
     char buf[MAX_PATH];
 
@@ -2084,11 +2088,24 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
         return false;
     }
 
-    if (position == PLAYLIST_REPLACE)
+    if (playlist == NULL && position == PLAYLIST_REPLACE)
     {
         if (playlist_remove_all_tracks(NULL) == 0)
             position = PLAYLIST_INSERT_LAST;
         else
+        {
+            cpu_boost(false);
+            return false;
+        }
+    }
+    else if (playlist != NULL)
+    {
+        if (new_playlist)
+            fd = open_utf8(playlist, O_CREAT|O_WRONLY|O_TRUNC);
+        else
+            fd = open(playlist, O_CREAT|O_WRONLY|O_APPEND, 0666);
+
+        if(fd < 0)
         {
             cpu_boost(false);
             return false;
@@ -2115,26 +2132,36 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
             continue;
         }
 
-        if (playlist_insert_track(NULL, buf, position, queue, false) < 0)
+        if (playlist == NULL)
         {
-            logf("playlist_insert_track failed");
-            break;
+            if (playlist_insert_track(NULL, buf, position, queue, false) < 0)
+            {
+                logf("playlist_insert_track failed");
+                break;
+            }
         }
+        else if (fdprintf(fd, "%s\n", buf) <= 0)
+                break;
+
         yield();
 
-        if (position == PLAYLIST_INSERT_FIRST)
+        if (playlist == NULL && position == PLAYLIST_INSERT_FIRST)
         {
             position = PLAYLIST_INSERT;
         }
     }
-    playlist_sync(NULL);
+    if (playlist == NULL)
+        playlist_sync(NULL);
+    else
+        close(fd);
     tagcache_search_finish(&tcs);
     cpu_boost(false);
 
     return true;
 }
 
-bool tagtree_insert_selection_playlist(int position, bool queue)
+static bool tagtree_insert_selection(int position, bool queue,
+                                     const char* playlist, bool new_playlist)
 {
     char buf[MAX_PATH];
     int dirlevel = tc->dirlevel;
@@ -2201,7 +2228,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     else
     {
         logf("insert_all_playlist");
-        if (!insert_all_playlist(tc, position, queue))
+        if (!insert_all_playlist(tc, playlist, new_playlist, position, queue))
             splash(HZ*2, ID2P(LANG_FAILED));
     }
 
@@ -2214,6 +2241,20 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     return true;
 }
 
+
+bool tagtree_current_playlist_insert(int position, bool queue)
+{
+    return tagtree_insert_selection(position, queue, NULL, false);
+}
+
+
+int tagtree_add_to_playlist(const char* playlist, bool new_playlist)
+{
+    if (!new_playlist)
+        tagtree_load(tc); /* because display_playlists was called */
+    return tagtree_insert_selection(0, false, playlist, new_playlist) ? 0 : -1;
+}
+
 static int tagtree_play_folder(struct tree_context* c)
 {
     int start_index = c->selected_item;
@@ -2224,7 +2265,7 @@ static int tagtree_play_folder(struct tree_context* c)
         return -1;
     }
 
-    if (!insert_all_playlist(c, PLAYLIST_INSERT_LAST, false))
+    if (!insert_all_playlist(c, NULL, false, PLAYLIST_INSERT_LAST, false))
         return -2;
 
     if (global_settings.playlist_shuffle)

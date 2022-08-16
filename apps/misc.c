@@ -1387,6 +1387,32 @@ int string_option(const char *option, const char *const oplist[], bool ignore_ca
     return -1;
 }
 
+/* Make sure part of path only contain chars valid for a FAT32 long name.
+ * Double quotes are replaced with single quotes, other unsupported chars
+ * are replaced with an underscore.
+ *
+ * path   - path to modify.
+ * offset - where in path to start checking.
+ * count  - number of chars to check.
+ */
+void fix_path_part(char* path, int offset, int count)
+{
+    static const char invalid_chars[] = "*/:<>?\\|";
+    int i;
+
+    path += offset;
+
+    for (i = 0; i <= count; i++, path++)
+    {
+        if (*path == 0)
+            return;
+        if (*path == '"')
+            *path = '\'';
+        else if (strchr(invalid_chars, *path))
+            *path = '_';
+    }
+}
+
 /* open but with a builtin printf for assembling the path */
 int open_pathfmt(char *buf, size_t size, int oflag, const char *pathfmt, ...)
 {

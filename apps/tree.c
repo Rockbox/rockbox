@@ -811,7 +811,12 @@ static int dirbrowse(void)
                             tagtree_get_filename(&tc, buf, sizeof(buf));
                         }
                         else
+                        {
                             attr = ATTR_DIRECTORY;
+                            tagtree_get_entry_name(&tc, tc.selected_item,
+                                                   buf, sizeof(buf));
+                            fix_path_part(buf, 0, sizeof(buf));
+                        }
                     }
                     else
 #endif
@@ -956,7 +961,7 @@ int create_playlist(void)
 #endif
 
     trigger_cpu_boost();
-    ret = catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, NULL);
+    ret = catalog_add_to_a_playlist(tc.currdir, ATTR_DIRECTORY, true, NULL, NULL);
     cancel_cpu_boost();
 
     return (ret) ? 1 : 0;

@@ -41,9 +41,13 @@ bool catalog_view_playlists(void);
  *  new_playlist : whether we want to create a new playlist or add to an
  *                 existing one.
  *  m3u8name     : filename to save the playlist to, NULL to show the keyboard
+ *  add_to_pl_cb : can be NULL, or a function responsible for handling the
+ *                 insert operations itself, in case the caller wants full
+ *                 control over how and what files are actually added.
  *  ret          : true if the file was successfully added
  */
 bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
-                               bool new_playlist, char* m3u8name);
+                               bool new_playlist, char* m3u8name,
+                               void (*add_to_pl_cb));
 
 #endif
