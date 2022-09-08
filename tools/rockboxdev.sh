@@ -762,7 +762,7 @@ fi
 if [ -z "$RBDEV_TARGET" ]; then
     echo "Select target arch:"
     echo "m   - m68k     (iriver h1x0/h3x0, iaudio m3/m5/x5 and mpio hd200)"
-    echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, etc)"
+    echo "a   - arm      (ipods, iriver H10, Sansa, D2, Gigabeat, older Sony NWZ, etc)"
     echo "i   - mips     (Jz47xx and ATJ-based players)"
     echo "x   - arm-linux  (Generic Linux ARM: Samsung ypr0, Linux-based Sony NWZ)"
     echo "y   - mips-linux  (Generic Linux MIPS: eg the many HiBy-OS targets)"
