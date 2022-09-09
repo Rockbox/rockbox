@@ -116,6 +116,9 @@
 
 #ifdef HAVE_USBSTACK
 #include "usb_core.h"
+#ifdef USB_ENABLE_AUDIO
+#include "../usbstack/usb_audio.h"
+#endif
 #endif
 
 #include "talk.h"
@@ -2509,18 +2512,56 @@ static bool dbg_talk(void)
 }
 
 #ifdef HAVE_USBSTACK
-#if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
-static bool toggle_usb_serial(void)
+#if (defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL))
+static bool toggle_usb_core_driver(int driver, char *msg)
 {
-    bool enabled = !usb_core_driver_enabled(USB_DRIVER_SERIAL);
+    bool enabled = !usb_core_driver_enabled(driver);
 
-    usb_core_enable_driver(USB_DRIVER_SERIAL, enabled);
-    splashf(HZ, "USB Serial %sabled", enabled ? "en" : "dis");
+    usb_core_enable_driver(driver,enabled);
+    splashf(HZ, "%s %s", msg, enabled ? "enabled" : "disabled");
 
     return false;
 }
+
+#ifdef USB_ENABLE_SERIAL
+static bool toggle_usb_serial(void)
+{
+    return toggle_usb_core_driver(USB_DRIVER_SERIAL, "USB Serial");
+}
+#endif /* USB_ENABLE_SERIAL */
 #endif
-#endif
+
+#ifdef USB_ENABLE_AUDIO
+static int dbg_usb_audio_cb(int action, struct gui_synclist *lists)
+{
+    (void)lists;
+    simplelist_reset_lines();
+    simplelist_addline("%sabled", usb_core_driver_enabled(USB_DRIVER_AUDIO)?"En":"Dis");
+    simplelist_addline("%sPlaying", usb_audio_get_playing()?"":"Not ");
+    simplelist_addline("iface: %d alt: %d", usb_audio_get_main_intf(), usb_audio_get_alt_intf());
+    simplelist_addline("out ep: 0x%X in ep: 0x%X", usb_audio_get_out_ep(), usb_audio_get_in_ep());
+    simplelist_addline("Volume: %d", usb_audio_get_cur_volume());
+    simplelist_addline("Playback Frequency: %lu", usb_audio_get_playback_sampling_frequency());
+    simplelist_addline("Buffers filled: %d", usb_audio_get_prebuffering());
+    simplelist_addline("%s", usb_audio_get_underflow()?"UNDERFLOW!":" ");
+    simplelist_addline("%s", usb_audio_get_overflow()?"OVERFLOW!":" ");
+    simplelist_addline("%s", usb_audio_get_alloc_failed()?"ALLOC FAILED!":" ");
+    if (action == ACTION_NONE)
+    {
+        action = ACTION_REDRAW;
+    }
+    return action;
+}
+static bool dbg_usb_audio(void)
+{
+    struct simplelist_info info;
+    simplelist_info_init(&info, "USB Audio", 0, NULL);
+    info.scroll_all = true;
+    info.action_callback = dbg_usb_audio_cb;
+    return simplelist_show_list(&info);
+}
+#endif /* USB_ENABLE_AUDIO */
+#endif /* HAVE_USBSTACK */
 
 #if CONFIG_USBOTG == USBOTG_ISP1583
 extern int dbg_usb_num_items(void);
@@ -2846,6 +2887,9 @@ static const struct {
 #if defined(HAVE_USBSTACK)
 #if defined(ROCKBOX_HAS_LOGF) && defined(USB_ENABLE_SERIAL)
         {"USB Serial driver (logf)", toggle_usb_serial },
+#endif
+#if defined(USB_ENABLE_AUDIO)
+        {"USB-DAC", dbg_usb_audio},
 #endif
 #endif /* HAVE_USBSTACK */
 #ifdef CPU_BOOST_LOGGING

@@ -2315,6 +2315,11 @@ const struct settings_list settings[] = {
     ), /* CHOICE_SETTING( usb_keypad_mode ) */
 #endif
 
+#ifdef USB_ENABLE_AUDIO
+    CHOICE_SETTING(0, usb_audio, LANG_USB_DAC, 0, "usb-dac", "never,always,while_charge_only,while_mass_storage", usb_set_audio, 4,
+        ID2P(LANG_NEVER), ID2P(LANG_ALWAYS), ID2P(LANG_WHILE_USB_CHARGE_ONLY), ID2P(LANG_WHILE_MASS_STORAGE_USB_ONLY)),
+#endif
+
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
     OFFON_SETTING(0, usb_skip_first_drive, LANG_USB_SKIP_FIRST_DRIVE, false, "usb skip first drive", usb_set_skip_first_drive),
 #endif

@@ -10371,6 +10371,62 @@
   </voice>
 </phrase>
 <phrase>
+  id: LANG_USB_DAC
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "USB-DAC"
+  </source>
+  <dest>
+    *: "USB-DAC"
+  </dest>
+  <voice>
+    *: "USB-DAC"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_USB_CHARGE_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "While In USB Charge-Only Mode"
+  </source>
+  <dest>
+    *: "While In USB Charge-Only Mode"
+  </dest>
+  <voice>
+    *: "While In USB Charge-Only Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WHILE_MASS_STORAGE_USB_ONLY
+  desc: in settings_menu
+  user: core
+  <source>
+    *: "While In USB Mass-Storage Mode"
+  </source>
+  <dest>
+    *: "While In USB Mass-Storage Mode"
+  </dest>
+  <voice>
+    *: "While In USB Mass-Storage Mode"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_USB_DAC_ACTIVE
+  desc: for splash
+  user: core
+  <source>
+    *: "USB-DAC Active"
+  </source>
+  <dest>
+    *: "USB-DAC Active"
+  </dest>
+  <voice>
+    *: "USB-DAC Active"
+  </voice>
+</phrase>
+<phrase>
   id: LANG_SCROLLBAR_WIDTH
   desc: in Settings -> General -> Display -> Status-/Scrollbar
   user: core

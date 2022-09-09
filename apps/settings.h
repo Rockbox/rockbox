@@ -823,6 +823,10 @@ struct user_settings
     int usb_keypad_mode;
 #endif
 
+#ifdef USB_ENABLE_AUDIO
+    int usb_audio;
+#endif
+
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)
     bool usb_skip_first_drive;
 #endif

@@ -97,6 +97,9 @@ static bool exclusive_storage_access = false;
 #ifdef USB_ENABLE_HID
 static bool usb_hid = true;
 #endif
+#ifdef USB_ENABLE_AUDIO
+static int usb_audio = 0;
+#endif
 
 #ifdef USB_FULL_INIT
 static bool usb_host_present = false;
@@ -194,6 +197,10 @@ static inline void usb_handle_hotswap(long id)
 
 static inline bool usb_configure_drivers(int for_state)
 {
+#ifdef USB_ENABLE_AUDIO
+    // FIXME: doesn't seem to get set when loaded at boot...
+    usb_audio = global_settings.usb_audio;
+#endif
     switch(for_state)
     {
     case USB_POWERED:
@@ -207,6 +214,9 @@ static inline bool usb_configure_drivers(int for_state)
         usb_core_enable_driver(USB_DRIVER_HID, true);
 #endif /* USB_ENABLE_CHARGING_ONLY */
 #endif /* USB_ENABLE_HID */
+#ifdef USB_ENABLE_AUDIO
+        usb_core_enable_driver(USB_DRIVER_AUDIO, (usb_audio == 1) || (usb_audio == 2)); // while "always" or "only in charge-only mode"
+#endif /* USB_ENABLE_AUDIO */
 
 #ifdef USB_ENABLE_CHARGING_ONLY
         usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, true);
@@ -224,6 +234,9 @@ static inline bool usb_configure_drivers(int for_state)
 #ifdef USB_ENABLE_HID
         usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 #endif
+#ifdef USB_ENABLE_AUDIO
+        usb_core_enable_driver(USB_DRIVER_AUDIO, (usb_audio == 1) || (usb_audio == 3)); // while "always" or "only in mass-storage mode"
+#endif /* USB_ENABLE_AUDIO */
 #ifdef USB_ENABLE_CHARGING_ONLY
         usb_core_enable_driver(USB_DRIVER_CHARGING_ONLY, false);
 #endif
@@ -844,6 +857,13 @@ void usb_set_hid(bool enable)
     usb_core_enable_driver(USB_DRIVER_HID, usb_hid);
 }
 #endif /* USB_ENABLE_HID */
+
+#ifdef USB_ENABLE_AUDIO
+void usb_set_audio(int value)
+{
+    usb_audio = value;
+}
+#endif /* USB_ENABLE_AUDIO */
 
 #ifdef HAVE_USB_POWER
 bool usb_powered_only(void)

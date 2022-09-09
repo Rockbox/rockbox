@@ -168,6 +168,9 @@ enum {
 #ifdef USB_ENABLE_HID
     USB_DRIVER_HID,
 #endif
+#ifdef USB_ENABLE_AUDIO
+    USB_DRIVER_AUDIO,
+#endif
     USB_NUM_DRIVERS
 };
 
@@ -254,6 +257,10 @@ void usb_firewire_connect_event(void);
 #ifdef USB_ENABLE_HID
 /* enable or disable the HID driver */
 void usb_set_hid(bool enable);
+#endif
+
+#ifdef USB_ENABLE_AUDIO
+void usb_set_audio(int value);
 #endif
 
 #if defined(USB_ENABLE_STORAGE) && defined(HAVE_MULTIDRIVE)

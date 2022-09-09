@@ -231,7 +231,7 @@ static void usb_dw_set_stall(int epnum, enum usb_dw_epdir epdir, int stall)
     else
     {
         DWC_EPCTL(epnum, epdir) &= ~STALL;
-        DWC_EPCTL(epnum, epdir) |= SD0PID;
+        DWC_EPCTL(epnum, epdir) |= SETD0PIDEF;
     }
 }
 
@@ -668,7 +668,7 @@ static void usb_dw_unconfigure_ep(int epnum, enum usb_dw_epdir epdir)
 static int usb_dw_configure_ep(int epnum,
                 enum usb_dw_epdir epdir, int type, int maxpktsize)
 {
-    uint32_t epctl = SD0PID|EPTYP(type)|USBAEP|maxpktsize;
+    uint32_t epctl = SETD0PIDEF|EPTYP(type)|USBAEP|maxpktsize;
 
     if (epdir == USB_DW_EPDIR_IN)
     {
@@ -1259,7 +1259,7 @@ static void usb_dw_irq(void)
                          * FIFO and raises StatusRecvd | XferCompl.
                          *
                          * We do not need or want this -- we've already handled
-                         * the data phase by this point -- but EP0 is stoppped
+                         * the data phase by this point -- but EP0 is stopped
                          * as a side effect of XferCompl, so we need to restart
                          * it to keep receiving packets. */
                         usb_dw_ep0_recv();
@@ -1528,7 +1528,7 @@ void usb_drv_cancel_all_transfers()
                 {
                     //usb_dw_flush_endpoint(ep, dir);
                     usb_dw_abort_endpoint(ep, dir);
-                    DWC_EPCTL(ep, dir) |= SD0PID;
+                    DWC_EPCTL(ep, dir) |= SETD0PIDEF;
                 }
     usb_dw_target_enable_irq();
 }
@@ -1606,8 +1606,15 @@ int usb_drv_request_endpoint(int type, int dir)
             struct usb_dw_ep* dw_ep = usb_dw_get_ep(ep, epdir);
             if (!dw_ep->active)
             {
+                int maxpktsize = 64;
+                if (type == EPTYP_ISOCHRONOUS){
+                    maxpktsize = 1023;
+                } else {
+                    maxpktsize = usb_drv_port_speed() ? 512 : 64;
+                }
+
                 if (usb_dw_configure_ep(ep, epdir, type,
-                                usb_drv_port_speed() ? 512 : 64) >= 0)
+                                maxpktsize) >= 0)
                 {
                     dw_ep->active = true;
                     request_ep = ep | dir;
@@ -1678,4 +1685,12 @@ void usb_drv_control_response(enum usb_control_response resp,
     usb_dw_target_disable_irq();
     usb_dw_control_response(resp, data, length);
     usb_dw_target_enable_irq();
+}
+
+int usb_drv_get_frame_number()
+{
+    // SOFFN is 14 bits, the least significant 3 appear to be some sort of microframe count.
+    // The USB spec says a frame number is 11 bits. This way we get 1 frame per millisecond,
+    // just like we're supposed to!
+    return (DWC_DSTS >> 11) & 0x7FF;
 }

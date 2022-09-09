@@ -48,6 +48,11 @@
 #include "usb_hid.h"
 #endif
 
+#ifdef USB_ENABLE_AUDIO
+#include "usb_audio.h"
+#include "usb_audio_def.h" // DEBUG
+#endif
+
 /* TODO: Move target-specific stuff somewhere else (serial number reading) */
 
 #if defined(IPOD_ARCH) && defined(CPU_PP)
@@ -166,12 +171,14 @@ static int usb_no_host_callback(struct timeout *tmo)
 static int usb_core_num_interfaces;
 
 typedef void (*completion_handler_t)(int ep, int dir, int status, int length);
+typedef bool (*fast_completion_handler_t)(int ep, int dir, int status, int length);
 typedef bool (*control_handler_t)(struct usb_ctrlrequest* req, void* reqdata,
     unsigned char* dest);
 
 static struct
 {
     completion_handler_t completion_handler[2];
+    fast_completion_handler_t fast_completion_handler[2];
     control_handler_t control_handler[2];
     struct usb_transfer_completion_event_data completion_event[2];
 } ep_data[USB_NUM_ENDPOINTS];
@@ -252,6 +259,28 @@ static struct usb_class_driver drivers[USB_NUM_DRIVERS] =
 #ifdef HAVE_HOTSWAP
         .notify_hotswap = NULL,
 #endif
+    },
+#endif
+#ifdef USB_ENABLE_AUDIO
+    [USB_DRIVER_AUDIO] = {
+        .enabled = false,
+        .needs_exclusive_storage = false,
+        .first_interface = 0,
+        .last_interface = 0,
+        .request_endpoints = usb_audio_request_endpoints,
+        .set_first_interface = usb_audio_set_first_interface,
+        .get_config_descriptor = usb_audio_get_config_descriptor,
+        .init_connection = usb_audio_init_connection,
+        .init = usb_audio_init,
+        .disconnect = usb_audio_disconnect,
+        .transfer_complete = usb_audio_transfer_complete,
+        .fast_transfer_complete = usb_audio_fast_transfer_complete,
+        .control_request = usb_audio_control_request,
+#ifdef HAVE_HOTSWAP
+        .notify_hotswap = NULL,
+#endif
+        .set_interface = usb_audio_set_interface,
+        .get_interface = usb_audio_get_interface,
     },
 #endif
 };
@@ -542,6 +571,7 @@ int usb_core_request_endpoint(int type, int dir, struct usb_class_driver* drv)
     ep = EP_NUM(ret);
 
     ep_data[ep].completion_handler[dir] = drv->transfer_complete;
+    ep_data[ep].fast_completion_handler[dir] = drv->fast_transfer_complete;
     ep_data[ep].control_handler[dir] = drv->control_request;
 
     return ret;
@@ -598,16 +628,46 @@ static void control_request_handler_drivers(struct usb_ctrlrequest* req, void* r
         if(drivers[i].enabled &&
                 drivers[i].control_request &&
                 drivers[i].first_interface <= interface &&
-                drivers[i].last_interface > interface)
-        {
+                drivers[i].last_interface > interface) {
+            /* Check for SET_INTERFACE and GET_INTERFACE */
+            if((req->bRequestType & USB_RECIP_MASK) == USB_RECIP_INTERFACE &&
+                    (req->bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD) {
+
+                if(req->bRequest == USB_REQ_SET_INTERFACE) {
+                    logf("usb_core: SET INTERFACE 0x%x 0x%x", req->wValue, req->wIndex);
+                    if(drivers[i].set_interface &&
+                            drivers[i].set_interface(req->wIndex, req->wValue) >= 0) {
+
+                        usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
+                        handled = true;
+                    }
+                    break;
+                }
+                else if(req->bRequest == USB_REQ_GET_INTERFACE) {
+                    int alt = -1;
+                    logf("usb_core: GET INTERFACE 0x%x", req->wIndex);
+
+                    if(drivers[i].get_interface)
+                        alt = drivers[i].get_interface(req->wIndex);
+
+                    if(alt >= 0 && alt < 255) {
+                        response_data[0] = alt;
+                        usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+                        handled = true;
+                    }
+                    break;
+                }
+                /* fallback */
+            }
+
             handled = drivers[i].control_request(req, reqdata, response_data);
-            if(handled)
-                break;
+            break; /* no other driver can handle it because it's interface specific */
         }
     }
     if(!handled) {
         /* nope. flag error */
-        logf("bad req:desc %d:%d", req->bRequest, req->wValue >> 8);
+        logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
+            req->wValue, req->wIndex, req->wLength);
         usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
@@ -804,13 +864,9 @@ static void request_handler_interface_standard(struct usb_ctrlrequest* req, void
     {
         case USB_REQ_SET_INTERFACE:
             logf("usb_core: SET_INTERFACE");
-            usb_drv_control_response(USB_CONTROL_ACK, NULL, 0);
-            break;
-
         case USB_REQ_GET_INTERFACE:
-            logf("usb_core: GET_INTERFACE");
-            response_data[0] = 0;
-            usb_drv_control_response(USB_CONTROL_ACK, response_data, 1);
+            control_request_handler_drivers(req, reqdata);
+            break;
             break;
         case USB_REQ_GET_STATUS:
             response_data[0] = 0;
@@ -860,7 +916,8 @@ static void request_handler_endpoint_drivers(struct usb_ctrlrequest* req, void* 
 
     if(!handled) {
         /* nope. flag error */
-        logf("usb bad req %d", req->bRequest);
+        logf("bad req 0x%x:0x%x:0x%x:0x%x:0x%x", req->bRequestType,req->bRequest,
+             req->wValue, req->wIndex, req->wLength);
         usb_drv_control_response(USB_CONTROL_STALL, NULL, 0);
     }
 }
@@ -970,6 +1027,10 @@ void usb_core_transfer_complete(int endpoint, int dir, int status, int length)
 {
     struct usb_transfer_completion_event_data* completion_event =
         &ep_data[endpoint].completion_event[EP_DIR(dir)];
+    /* Fast notification */
+    fast_completion_handler_t handler = ep_data[endpoint].fast_completion_handler[EP_DIR(dir)];
+    if(handler != NULL && handler(endpoint, dir, status, length))
+        return; /* do not dispatch to the queue if handled */
 
     void* data0 = NULL;
     void* data1 = NULL;
