@@ -33,8 +33,19 @@ extern "C"
 /* Use this type and macro to convert a pointer from the
  * skin buffer to a useable pointer */
 typedef long skinoffset_t;
-#define SKINOFFSETTOPTR(base, offset) ((offset) < 0 ? NULL : ((void*)&base[offset]))
-#define PTRTOSKINOFFSET(base, pointer) ((pointer) ? ((void*)pointer-(void*)base) : -1)
+/*
+ * The statement-expression here is needed to work around a
+ * bogus -Waddress warning produced by GCC 12 when this macro
+ * is used like "if (!SKINOFFSETTOPTR(...))".
+ *
+ * Related:
+ * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=102967
+ * https://godbolt.org/z/YEY4Yzdnf
+ */
+#define SKINOFFSETTOPTR(base, offset) \
+    ({ void *__p = ((offset) < 0 ? NULL : ((void*)&base[offset])); __p; })
+#define PTRTOSKINOFFSET(base, pointer) \
+    ((pointer) ? ((void*)pointer-(void*)base) : -1)
 /* Use this macro when declaring a variable to self-document the code.
  * type is the actual type being pointed to (i.e OFFSETTYPE(char*) foo )
  * 
