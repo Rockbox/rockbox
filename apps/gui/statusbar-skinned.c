@@ -49,11 +49,11 @@
 static int update_delay = DEFAULT_UPDATE_DELAY;
 
 static bool sbs_has_title[NB_SCREENS];
-static char* sbs_title[NB_SCREENS];
+static const char* sbs_title[NB_SCREENS];
 static enum themable_icons sbs_icon[NB_SCREENS];
 static bool sbs_loaded[NB_SCREENS] = { false };
 
-bool sb_set_title_text(char* title, enum themable_icons icon, enum screen_type screen)
+bool sb_set_title_text(const char* title, enum themable_icons icon, enum screen_type screen)
 {
     sbs_title[screen] = title;
     /* Icon_NOICON == -1 which the skin engine wants at position 1, so + 2 */

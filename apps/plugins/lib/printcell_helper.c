@@ -234,7 +234,7 @@ static void printcell_listdraw_fn(struct list_putlineinfo_t *list_info)
     bool show_cursor = list_info->show_cursor;
     bool have_icons = list_info->have_icons;
     struct line_desc *linedes = list_info->linedes;
-    char *dsp_text = list_info->dsp_text;
+    const char *dsp_text = list_info->dsp_text;
     struct viewport *vp = list_info->vp;
     int line = list_info->line;
 

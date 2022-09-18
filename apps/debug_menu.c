@@ -1247,7 +1247,8 @@ static int disk_callback(int btn, struct gui_synclist *lists)
     int *cardnum = (int*)lists->data;
     unsigned char card_name[6];
     unsigned char pbuf[32];
-    char *title = lists->title;
+    /* Casting away const is safe; the buffer is defined as non-const. */
+    char *title = (char *)lists->title;
     static const unsigned char i_vmin[] = { 0, 1, 5, 10, 25, 35, 60, 100 };
     static const unsigned char i_vmax[] = { 1, 5, 10, 25, 35, 45, 80, 200 };
     static const unsigned char * const kbit_units[] = { "kBit/s", "MBit/s", "GBit/s" };

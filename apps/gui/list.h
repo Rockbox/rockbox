@@ -96,7 +96,7 @@ struct list_putlineinfo_t {
     struct viewport *vp;
     struct line_desc *linedes;
     struct gui_synclist * list;
-    char *dsp_text;
+    const char *dsp_text;
 
     bool is_selected;
     bool is_title;
@@ -185,7 +185,7 @@ struct gui_synclist
     /* The data that will be passed to the callback function YOU implement */
     void * data;
     /* The optional title, set to NULL for none */
-    char * title;
+    const char * title;
     /* Optional title icon */
     enum themable_icons title_icon;
 
@@ -233,7 +233,7 @@ extern void gui_synclist_select_item(struct gui_synclist * lists,
 extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
-extern void gui_synclist_set_title(struct gui_synclist * lists, char * title,
+extern void gui_synclist_set_title(struct gui_synclist * lists, const char * title,
                                    enum themable_icons icon);
 extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
                                                 bool hide);
@@ -301,7 +301,7 @@ extern bool list_do_action(int context, int timeout,
  **/
 
 struct simplelist_info {
-    char *title; /* title to show on the list */
+    const char *title; /* title to show on the list */
     int  count; /* number of items in the list, each item is selection_size high */
     int selection_size; /* list selection size, usually 1 */
     bool hide_selection;
