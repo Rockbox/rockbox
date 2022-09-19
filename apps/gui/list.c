@@ -47,8 +47,6 @@
  */
 #define FRAMEDROP_TRIGGER 6
 
-static void gui_list_select_at_offset(struct gui_synclist * gui_list,
-                                      int offset);
 void list_draw(struct screen *display, struct gui_synclist *list);
 
 static long last_dirty_tick;
@@ -178,7 +176,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     list_init_viewports(gui_list);
     FOR_NB_SCREENS(i)
         list_init_item_height(gui_list, i);
-    gui_list->limit_scroll = false;
     gui_list->data = data;
     gui_list->scroll_all = scroll_all;
     gui_list->selected_size = selected_size;
@@ -382,7 +379,7 @@ void gui_synclist_select_item(struct gui_synclist * gui_list, int item_number)
 }
 
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
-                                      int offset)
+                                      int offset, bool allow_wrap)
 {
     int new_selection;
     if (gui_list->selected_size > 1)
@@ -394,15 +391,13 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
 
     if (new_selection >= gui_list->nb_items)
     {
-        new_selection = gui_list->limit_scroll ?
-            gui_list->nb_items - gui_list->selected_size : 0;
-        edge_beep(gui_list, !gui_list->limit_scroll);
+        new_selection = allow_wrap ? 0 : gui_list->nb_items - gui_list->selected_size;
+        edge_beep(gui_list, allow_wrap);
     }
     else if (new_selection < 0)
     {
-        new_selection = gui_list->limit_scroll ?
-            0 : gui_list->nb_items - gui_list->selected_size;
-        edge_beep(gui_list, !gui_list->limit_scroll);
+        new_selection = allow_wrap ? gui_list->nb_items - gui_list->selected_size : 0;
+        edge_beep(gui_list, allow_wrap);
     }
 
     gui_synclist_select_item(gui_list, new_selection);
@@ -508,21 +503,25 @@ void gui_synclist_set_sel_color(struct gui_synclist * lists,
 #endif
 
 static void gui_synclist_select_next_page(struct gui_synclist * lists,
-                                          enum screen_type screen)
+                                          enum screen_type screen,
+                                          bool allow_wrap)
 {
     int nb_lines = list_get_nb_lines(lists, screen);
     if (lists->selected_size > 1)
         nb_lines = MAX(1, nb_lines/lists->selected_size);
-    gui_list_select_at_offset(lists, nb_lines);
+
+    gui_list_select_at_offset(lists, nb_lines, allow_wrap);
 }
 
 static void gui_synclist_select_previous_page(struct gui_synclist * lists,
-                                              enum screen_type screen)
+                                              enum screen_type screen,
+                                              bool allow_wrap)
 {
     int nb_lines = list_get_nb_lines(lists, screen);
     if (lists->selected_size > 1)
         nb_lines = MAX(1, nb_lines/lists->selected_size);
-    gui_list_select_at_offset(lists, -nb_lines);
+
+    gui_list_select_at_offset(lists, -nb_lines, allow_wrap);
 }
 
 /*
@@ -561,16 +560,22 @@ bool gui_synclist_keyclick_callback(int action, void* data)
 {
     struct gui_synclist *lists = (struct gui_synclist *)data;
 
-    /* block the beep if we are at the end of the list and we are not wrapping.
-     * CAVEAT: mosts lists don't set limit_scroll untill it sees a repeat
-     * press at the end of the list so this can cause an extra beep.
-     */
-    if (lists->limit_scroll == false)
-        return true;
+    /* Block the beep if we're at the end of the list and we're not wrapping. */
     if (lists->selected_item == 0)
-        return (action != ACTION_STD_PREV && action != ACTION_STD_PREVREPEAT);
+    {
+        if (action == ACTION_STD_PREVREPEAT)
+            return false;
+        if (action == ACTION_STD_PREV && !lists->wraparound)
+            return false;
+    }
+
     if (lists->selected_item == lists->nb_items - lists->selected_size)
-        return (action != ACTION_STD_NEXT && action != ACTION_STD_NEXTREPEAT);
+    {
+        if (action == ACTION_STD_NEXTREPEAT)
+            return false;
+        if (action == ACTION_STD_NEXT && !lists->wraparound)
+            return false;
+    }
 
     return action != ACTION_NONE;
 }
@@ -643,13 +648,12 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
     current_lists = NULL;
 
     /* Prevent list wraparound by repeating actions */
+    bool allow_wrap = lists->wraparound;
     if (action == ACTION_STD_PREVREPEAT ||
         action == ACTION_STD_NEXTREPEAT ||
         action == ACTION_LISTTREE_PGUP  ||
         action == ACTION_LISTTREE_PGDOWN)
-        lists->limit_scroll = true;
-    else
-        lists->limit_scroll = !lists->wraparound;
+        allow_wrap = false;
 
     switch (action)
     {
@@ -669,7 +673,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
 #endif
         case ACTION_STD_PREV:
         case ACTION_STD_PREVREPEAT:
-            gui_list_select_at_offset(lists, -next_item_modifier);
+            gui_list_select_at_offset(lists, -next_item_modifier, allow_wrap);
 #ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
 #endif
@@ -680,7 +684,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
 
         case ACTION_STD_NEXT:
         case ACTION_STD_NEXTREPEAT:
-            gui_list_select_at_offset(lists, next_item_modifier);
+            gui_list_select_at_offset(lists, next_item_modifier, allow_wrap);
 #ifndef HAVE_WHEEL_ACCELERATION
             if (button_queue_count() < FRAMEDROP_TRIGGER)
 #endif
@@ -731,7 +735,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
                          SCREEN_REMOTE :
 #endif
                                           SCREEN_MAIN;
-            gui_synclist_select_previous_page(lists, screen);
+            gui_synclist_select_previous_page(lists, screen, allow_wrap);
             gui_synclist_draw(lists);
             yield();
             *actionptr = ACTION_STD_NEXT;
@@ -746,7 +750,7 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
                          SCREEN_REMOTE :
 #endif
                                           SCREEN_MAIN;
-            gui_synclist_select_next_page(lists, screen);
+            gui_synclist_select_next_page(lists, screen, allow_wrap);
             gui_synclist_draw(lists);
             yield();
             *actionptr = ACTION_STD_PREV;

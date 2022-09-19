@@ -149,9 +149,6 @@ struct gui_synclist
     bool talk_menu;
     bool wraparound;
     bool scroll_paginated;
-    /* defines wether the list should stop when reaching the top/bottom
-     * or should continue (by going to bottom/top) */
-    bool limit_scroll;
     /* whether the text of the whole items of the list have to be
      * scrolled or only for the selected item */
     bool scroll_all;
