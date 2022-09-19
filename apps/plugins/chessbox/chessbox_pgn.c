@@ -678,7 +678,6 @@ struct pgn_game_node* pgn_show_game_list(struct pgn_game_node* first_game){
     if (rb->global_settings->talk_menu)
         rb->gui_synclist_set_voice_callback(&games_list, speak_game_selection);
     rb->gui_synclist_set_nb_items(&games_list, i);
-    rb->gui_synclist_limit_scroll(&games_list, true);
     rb->gui_synclist_select_item(&games_list, 0);
 
     rb->gui_synclist_draw(&games_list);

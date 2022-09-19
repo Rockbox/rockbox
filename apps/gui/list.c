@@ -525,11 +525,6 @@ static void gui_synclist_select_previous_page(struct gui_synclist * lists,
     gui_list_select_at_offset(lists, -nb_lines);
 }
 
-void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
-{
-    lists->limit_scroll = scroll;
-}
-
 /*
  * Makes all the item in the list scroll by one step to the right.
  * Should stop increasing the value when reaching the widest item value
@@ -650,19 +645,20 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
     switch (wrap)
     {
         case LIST_WRAP_ON:
-            gui_synclist_limit_scroll(lists, !(lists->wraparound));
-        break;
+            lists->limit_scroll = !lists->wraparound;
+            break;
         case LIST_WRAP_OFF:
-            gui_synclist_limit_scroll(lists, true);
-        break;
+            lists->limit_scroll = true;
+            break;
         case LIST_WRAP_UNLESS_HELD:
             if (action == ACTION_STD_PREVREPEAT ||
                 action == ACTION_STD_NEXTREPEAT ||
                 action == ACTION_LISTTREE_PGUP  ||
                 action == ACTION_LISTTREE_PGDOWN)
-                gui_synclist_limit_scroll(lists, true);
-            else gui_synclist_limit_scroll(lists, !(lists->wraparound));
-        break;
+                lists->limit_scroll = true;
+            else
+                lists->limit_scroll = !lists->wraparound;
+            break;
     };
 
     switch (action)

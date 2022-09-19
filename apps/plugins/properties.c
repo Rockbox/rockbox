@@ -389,7 +389,6 @@ enum plugin_status plugin_start(const void* parameter)
         rb->gui_synclist_set_nb_items(&properties_lists,
                                       2 * (props_type == PROPS_FILE ? NUM_FILE_PROPERTIES :
                                                                       NUM_DIR_PROPERTIES));
-        rb->gui_synclist_limit_scroll(&properties_lists, true);
         rb->gui_synclist_select_item(&properties_lists, 0);
         rb->gui_synclist_draw(&properties_lists);
         rb->gui_synclist_speak_item(&properties_lists);

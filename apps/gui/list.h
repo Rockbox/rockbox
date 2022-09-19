@@ -227,7 +227,6 @@ extern void gui_synclist_select_item(struct gui_synclist * lists,
                                      int item_number);
 extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
-extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_set_title(struct gui_synclist * lists, const char * title,
                                    enum themable_icons icon);
 extern bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,

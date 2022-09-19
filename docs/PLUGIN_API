@@ -704,12 +704,6 @@ void gui_synclist_init(struct gui_synclist * lists, list_get_name callback_get_i
     \param parent[NB_SCREENS]
     \description
 
-void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll)
-    \group list
-    \param lists
-    \param scroll
-    \description
-
 void gui_synclist_select_item(struct gui_synclist * lists, int item_number)
     \group list
     \param lists

@@ -344,7 +344,6 @@ static int listwraparound_callback(int action,
     switch (action)
     {
         case ACTION_EXIT_MENUITEM:
-            gui_synclist_limit_scroll(this_list, !global_settings.list_wraparound);
             gui_synclist_init_display_settings(this_list);
             break;
     }

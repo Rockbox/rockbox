@@ -506,7 +506,6 @@ bool option_screen(const struct settings_list *setting,
     gui_synclist_set_nb_items(&lists, nb_items);
     gui_synclist_select_item(&lists, selected);
 
-    gui_synclist_limit_scroll(&lists, true);
     gui_synclist_draw(&lists);
     /* talk the item */
     gui_synclist_speak_item(&lists);

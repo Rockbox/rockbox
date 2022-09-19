@@ -115,7 +115,6 @@ int list_sc(void)
     rb->gui_synclist_set_title(&gui_sc,
         (user_file?"Shortcuts (sealed)":"Shortcuts (editable)"), NOICON);
     rb->gui_synclist_set_nb_items(&gui_sc, sc_file.entry_cnt);
-    rb->gui_synclist_limit_scroll(&gui_sc, false);
     rb->gui_synclist_select_item(&gui_sc, 0);
 
     /* Draw the prepared widget to the LCD now */

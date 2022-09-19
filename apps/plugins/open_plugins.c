@@ -623,7 +623,6 @@ static void synclist_set(char* menu_id, int selection, int items, int sel_size)
     rb->gui_synclist_set_icon_callback(&lists,NULL);
     rb->gui_synclist_set_voice_callback(&lists, list_voice_cb);
     rb->gui_synclist_set_nb_items(&lists,items);
-    rb->gui_synclist_limit_scroll(&lists,true);
     rb->gui_synclist_select_item(&lists, selection);
     list_voice_cb(selection, menu_id);
 }

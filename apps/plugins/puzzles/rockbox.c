@@ -2450,7 +2450,6 @@ static int list_choose(const char *list_str, const char *title, int sel)
     rb->gui_synclist_init(&list, &config_choices_formatter, (void*)list_str, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(&list, NULL);
     rb->gui_synclist_set_nb_items(&list, n);
-    rb->gui_synclist_limit_scroll(&list, false);
 
     rb->gui_synclist_select_item(&list, sel);
 
@@ -2664,7 +2663,6 @@ static bool config_menu(void)
     rb->gui_synclist_init(&list, &config_formatter, config, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(&list, NULL);
     rb->gui_synclist_set_nb_items(&list, n);
-    rb->gui_synclist_limit_scroll(&list, false);
 
     rb->gui_synclist_select_item(&list, 0);
 
@@ -2750,7 +2748,6 @@ static int do_preset_menu(struct preset_menu *menu, char *title, int selected)
     rb->gui_synclist_init(&list, &preset_formatter, menu, false, 1, NULL);
     rb->gui_synclist_set_icon_callback(&list, NULL);
     rb->gui_synclist_set_nb_items(&list, menu->n_entries);
-    rb->gui_synclist_limit_scroll(&list, false);
 
     rb->gui_synclist_select_item(&list, selected);
 

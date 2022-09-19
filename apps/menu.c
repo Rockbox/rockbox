@@ -260,7 +260,6 @@ static int init_menu_lists(const struct menu_item_ex *menu,
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(lists, talk_menu_item);
     gui_synclist_set_nb_items(lists,current_subitems_count);
-    gui_synclist_limit_scroll(lists,true);
     gui_synclist_select_item(lists, find_menu_selection(selected));
 
     get_menu_callback(menu,&menu_callback);

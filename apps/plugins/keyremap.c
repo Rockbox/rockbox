@@ -1950,7 +1950,6 @@ static void synclist_set(int id, int selected_item, int items, int sel_size)
     rb->gui_synclist_set_icon_callback(&lists,NULL);
     rb->gui_synclist_set_voice_callback(&lists, list_voice_cb);
     rb->gui_synclist_set_nb_items(&lists,items);
-    rb->gui_synclist_limit_scroll(&lists,true);
     rb->gui_synclist_select_item(&lists, selected_item);
     printcell_enable(&lists, false, false);
 
