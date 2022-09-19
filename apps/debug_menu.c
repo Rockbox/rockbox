@@ -227,7 +227,6 @@ static bool dbg_os(void)
 
     simplelist_info_init(&info, IF_COP("Core and ") "Stack usage:",
                          MAXTHREADS IF_COP( + NUM_CORES ), &xoffset);
-    info.hide_selection = true;
     info.scroll_all = false;
     info.action_callback = dbg_threads_action_callback;
     info.get_name = threads_getname;
@@ -341,7 +340,6 @@ static bool dbg_cpuinfo(void)
     info.get_name = get_cpuinfo;
     info.action_callback = cpuinfo_cb;
     info.timeout = HZ;
-    info.hide_selection = true;
     info.scroll_all = true;
     return simplelist_show_list(&info);
 }
@@ -568,7 +566,6 @@ static bool dbg_partitions(void)
     struct simplelist_info info;
     simplelist_info_init(&info, "Partition Info", NUM_DRIVES * 4, NULL);
     info.selection_size = 2;
-    info.hide_selection = true;
     info.scroll_all = true;
     info.get_name = dbg_partitions_getname;
     return simplelist_show_list(&info);
@@ -1722,7 +1719,6 @@ static bool dbg_ata_smart(void)
     struct simplelist_info info;
     simplelist_info_init(&info, "S.M.A.R.T. Data [CONTEXT to dump]", 1, NULL);
     info.action_callback = ata_smart_callback;
-    info.hide_selection = true;
     info.scroll_all = true;
     return simplelist_show_list(&info);
 }
@@ -1776,7 +1772,6 @@ static bool dbg_disk_info(void)
     info.title = title;
 #endif
     info.action_callback = disk_callback;
-    info.hide_selection = true;
     info.scroll_all = true;
     return simplelist_show_list(&info);
 }
@@ -1845,7 +1840,6 @@ static bool dbg_dircache_info(void)
     int syncbuild = 0;
     simplelist_info_init(&info, "Dircache Info", 8, &syncbuild);
     info.action_callback = dircache_callback;
-    info.hide_selection = true;
     info.scroll_all = true;
     return simplelist_show_list(&info);
 }
@@ -1903,7 +1897,6 @@ static bool dbg_tagcache_info(void)
     struct simplelist_info info;
     simplelist_info_init(&info, "Database Info", 8, NULL);
     info.action_callback = database_callback;
-    info.hide_selection = true;
     info.scroll_all = true;
 
     /* Don't do nonblock here, must give enough processing time
@@ -2176,7 +2169,6 @@ static bool dbg_fm_radio(void)
                        radio_hardware_present() ? "yes" : "no");
 
     info.action_callback = radio_hardware_present()?radio_callback : NULL;
-    info.hide_selection = true;
     return simplelist_show_list(&info);
 }
 #endif /* CONFIG_TUNER */
@@ -2448,7 +2440,6 @@ static bool dbg_talk(void)
     else
         simplelist_info_init(&list, "Voice Information:", 2, &data);
     list.scroll_all = true;
-    list.hide_selection = true;
     list.timeout = HZ;
     list.get_name = dbg_talk_get_name;
 
@@ -2488,7 +2479,6 @@ static bool dbg_isp1583(void)
     isp1583.scroll_all = true;
     simplelist_info_init(&isp1583, "ISP1583", dbg_usb_num_items(), NULL);
     isp1583.timeout = HZ/100;
-    isp1583.hide_selection = true;
     isp1583.get_name = dbg_usb_item;
     isp1583.action_callback = isp1583_action_callback;
     return simplelist_show_list(&isp1583);
@@ -2514,7 +2504,6 @@ static bool dbg_pic(void)
     pic.scroll_all = true;
     simplelist_info_init(&pic, "PIC", pic_dbg_num_items(), NULL);
     pic.timeout = HZ/100;
-    pic.hide_selection = true;
     pic.get_name = pic_dbg_item;
     pic.action_callback = pic_action_callback;
     return simplelist_show_list(&pic);
@@ -2533,7 +2522,6 @@ static bool dbg_skin_engine(void)
 #endif
     simplelist_info_init(&info, "Skin engine usage", 0, NULL);
     simplelist_set_line_count(0);
-    info.hide_selection = true;
     FOR_NB_SCREENS(j) {
 #if NB_SCREENS > 1
         simplelist_addline("%s display:",
@@ -2612,7 +2600,6 @@ static bool dbg_boot_data(void)
             boot_data.payload[i+1], boot_data.payload[i+2], boot_data.payload[i+3]);
     }
 
-    info.hide_selection = true;
     return simplelist_show_list(&info);
 }
 #endif /* defined(HAVE_BOOTDATA) && !defined(SIMULATOR) */

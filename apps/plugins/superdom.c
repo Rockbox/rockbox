@@ -1450,7 +1450,6 @@ static int show_inventory(void)
 {
     struct simplelist_info info;
     rb->simplelist_info_init(&info, "Inventory", 9, NULL);
-    info.hide_selection = true;
     info.get_name = inventory_data;
     if(rb->simplelist_show_list(&info))
     {

@@ -458,9 +458,6 @@ static int show_info(void)
     struct simplelist_info info;
     int count = INFO_COUNT + refresh_data(&data) - 1;
     simplelist_info_init(&info, str(LANG_ROCKBOX_INFO), count, (void*)&data);
-    info.hide_selection = !global_settings.talk_menu;
-    if (info.hide_selection)
-        info.scroll_all = true;
     info.get_name = info_getname;
     if(global_settings.talk_menu)
          info.get_talk = info_speak_item;

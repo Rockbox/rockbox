@@ -357,6 +357,7 @@ static const struct plugin_api rockbox_api = {
     action_get_touchscreen_press_in_vp,
 #endif
     action_userabort,
+    core_set_keyremap,
 
     /* button */
     button_get,
@@ -436,6 +437,8 @@ static const struct plugin_api rockbox_api = {
     tree_get_entry_at,
     set_current_file,
     set_dirfilter,
+    onplay_show_playlist_menu,
+    browse_id3,
 
     /* talking */
     talk_id,
@@ -519,6 +522,7 @@ static const struct plugin_api rockbox_api = {
     queue_wait,
     queue_send,
     queue_reply,
+    queue_remove_from_head,
 
 #ifdef RB_PROFILE
     profile_thread,
@@ -688,7 +692,9 @@ static const struct plugin_api rockbox_api = {
     playlist_create,
     playlist_insert_track,
     playlist_insert_directory,
+    playlist_insert_playlist,
     playlist_shuffle,
+    warn_on_pl_erase,
     audio_play,
     audio_stop,
     audio_pause,
@@ -731,6 +737,7 @@ static const struct plugin_api rockbox_api = {
     battery_level_safe,
     battery_time,
     battery_voltage,
+    battery_current,
 #if CONFIG_CHARGING
     charger_inserted,
 # if CONFIG_CHARGING >= CHARGING_MONITOR
@@ -801,21 +808,19 @@ static const struct plugin_api rockbox_api = {
     plugin_release_audio_buffer, /* defined in plugin.c */
     plugin_tsr,                  /* defined in plugin.c */
     plugin_get_current_filename,
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-    warn_on_pl_erase,
-    playlist_insert_playlist,
-    battery_current,
-    onplay_show_playlist_menu,
-    queue_remove_from_head,
-    core_set_keyremap,
     plugin_reserve_buffer,
+
+    /* reboot and poweroff */
+    sys_poweroff,
+    sys_reboot,
+
+    /* pathfuncs */
 #ifdef HAVE_MULTIVOLUME
     path_strip_volume,
 #endif
-    sys_poweroff,
-    sys_reboot,
-    browse_id3,
+
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 };
 
 static int plugin_buffer_handle;

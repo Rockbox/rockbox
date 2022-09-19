@@ -161,7 +161,6 @@ struct gui_synclist
     /* whether the text of the whole items of the list have to be
      * scrolled or only for the selected item */
     bool scroll_all;
-    bool show_selection_marker; /* set to true by default */
     int nb_items;
     int selected_item;
 
@@ -235,8 +234,6 @@ extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_limit_scroll(struct gui_synclist * lists, bool scroll);
 extern void gui_synclist_set_title(struct gui_synclist * lists, const char * title,
                                    enum themable_icons icon);
-extern void gui_synclist_hide_selection_marker(struct gui_synclist *lists,
-                                                bool hide);
 extern bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
                                           enum screen_type screen, int item);
 
@@ -304,7 +301,6 @@ struct simplelist_info {
     const char *title; /* title to show on the list */
     int  count; /* number of items in the list, each item is selection_size high */
     int selection_size; /* list selection size, usually 1 */
-    bool hide_selection;
     bool scroll_all;
     bool hide_theme;
     bool speak_onshow; /* list speaks first item or 'empty list' */
@@ -350,7 +346,6 @@ void simplelist_addline(const char *fmt, ...);
 /* setup the info struct. members not setup in this function need to be assigned manually
    members set in this function:
     info.selection_size = 1;
-    info.hide_selection = false;
     info.scroll_all = false;
     info.hide_theme = false;
     info.speak_onshow = true;

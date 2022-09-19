@@ -213,8 +213,7 @@ bool skinlist_draw(struct screen *display, struct gui_synclist *list)
         if (list_start_item+cur_line+1 > list->nb_items)
             break;
         current_drawing_line = list_start_item+cur_line;
-        is_selected = list->show_selection_marker &&
-                list_start_item+cur_line == list->selected_item;
+        is_selected = list_start_item+cur_line == list->selected_item;
 
         for (viewport = SKINOFFSETTOPTR(get_skin_buffer(wps.data), listcfg[screen]->data->tree);
              viewport;

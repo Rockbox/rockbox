@@ -157,12 +157,12 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 251
+#define PLUGIN_API_VERSION 252
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 245
+#define PLUGIN_MIN_API_VERSION 252
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -406,6 +406,7 @@ struct plugin_api {
     int (*action_get_touchscreen_press_in_vp)(short *x1, short *y1, struct viewport *vp);
 #endif
     bool (*action_userabort)(int timeout);
+    int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
 
     /* button */
     long (*button_get)(bool block);
@@ -491,6 +492,10 @@ struct plugin_api {
 
     void (*set_current_file)(const char* path);
     void (*set_dirfilter)(int l_dirfilter);
+
+    void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
+    bool (*browse_id3)(struct mp3entry *id3,
+                       int playlist_display_index, int playlist_amount);
 
     /* talking */
     int (*talk_id)(int32_t id, bool enqueue);
@@ -588,6 +593,7 @@ struct plugin_api {
     intptr_t (*queue_send)(struct event_queue *q, long id,
                            intptr_t data);
     void (*queue_reply)(struct event_queue *q, intptr_t retval);
+    void (*queue_remove_from_head)(struct event_queue *q, long id);
 
 #ifdef RB_PROFILE
     void (*profile_thread)(void);
@@ -790,7 +796,10 @@ struct plugin_api {
     int (*playlist_insert_directory)(struct playlist_info* playlist,
                               const char *dirname, int position, bool queue,
                               bool recurse);
+    int (*playlist_insert_playlist)(struct playlist_info* playlist,
+                                    const char *filename, int position, bool queue);
     int (*playlist_shuffle)(int random_seed, int start_index);
+    bool (*warn_on_pl_erase)(void);
     void (*audio_play)(unsigned long elapsed, unsigned long offset);
     void (*audio_stop)(void);
     void (*audio_pause)(void);
@@ -850,6 +859,7 @@ struct plugin_api {
     bool (*battery_level_safe)(void);
     int (*battery_time)(void);
     int (*battery_voltage)(void);
+    int (*battery_current)(void);
 #if CONFIG_CHARGING
     bool (*charger_inserted)(void);
 # if CONFIG_CHARGING >= CHARGING_MONITOR
@@ -928,23 +938,16 @@ struct plugin_api {
     void (*plugin_release_audio_buffer)(void);
     void (*plugin_tsr)(bool (*exit_callback)(bool reenter));
     char* (*plugin_get_current_filename)(void);
-    /* new stuff at the end, sort into place next time
-       the API gets incompatible */
-    bool (*warn_on_pl_erase)(void);
-    int (*playlist_insert_playlist)(struct playlist_info* playlist,
-                                    const char *filename, int position, bool queue);
-    int (*battery_current)(void);
-    void (*onplay_show_playlist_menu)(const char* path, void (*playlist_insert_cb));
-    void (*queue_remove_from_head)(struct event_queue *q, long id);
-    int (*core_set_keyremap)(struct button_mapping* core_keymap, int count);
     size_t (*plugin_reserve_buffer)(size_t buffer_size);
+    /* reboot and poweroff */
+    void (*sys_poweroff)(void);
+    void (*sys_reboot)(void);
+    /* pathfuncs */
 #ifdef HAVE_MULTIVOLUME
     int (*path_strip_volume)(const char *name, const char **nameptr, bool greedy);
 #endif
-    void (*sys_poweroff)(void);
-    void (*sys_reboot)(void);
-    bool (*browse_id3)(struct mp3entry *id3,
-                       int playlist_display_index, int playlist_amount);
+    /* new stuff at the end, sort into place next time
+       the API gets incompatible */
 };
 
 /* plugin header */

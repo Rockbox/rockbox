@@ -2437,7 +2437,6 @@ static bool lrc_debug_menu(void)
 {
     struct simplelist_info info;
     rb->simplelist_info_init(&info, "Debug Menu", 6, NULL);
-    info.hide_selection = true;
     info.scroll_all = true;
     info.get_name = lrc_debug_data;
     return rb->simplelist_show_list(&info);

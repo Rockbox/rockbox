@@ -196,10 +196,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
     const int list_start_item = list->start_item[screen];
     const bool scrollbar_in_left = (list->scrollbar == SCROLLBAR_LEFT);
     const bool scrollbar_in_right = (list->scrollbar == SCROLLBAR_RIGHT);
-    
-    const bool show_cursor = list->show_selection_marker && 
-        (list->cursor_style == SYNCLIST_CURSOR_NOSTYLE);
-
+    const bool show_cursor = (list->cursor_style == SYNCLIST_CURSOR_NOSTYLE);
     const bool have_icons = list->callback_get_item_icon && list->show_icons;
 
     struct viewport *parent = (list->parent[screen]);
@@ -365,8 +362,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
             !hide_selection &&
 #endif
                 i >= list->selected_item
-                && i <  list->selected_item + list->selected_size
-                && list->show_selection_marker)
+                && i <  list->selected_item + list->selected_size)
         {/* The selected item must be displayed scrolling */
 #ifdef HAVE_LCD_COLOR
             if (list->selection_color)

@@ -191,7 +191,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
 
     gui_list->scheduled_talk_tick = gui_list->last_talked_tick = 0;
     gui_list->dirty_tick = current_tick;
-    gui_list->show_selection_marker = true;
 
 #ifdef HAVE_LCD_COLOR
     gui_list->title_color = -1;
@@ -199,13 +198,6 @@ void gui_synclist_init(struct gui_synclist * gui_list,
     gui_list->selection_color = NULL;
 #endif
 }
-
-/* this toggles the selection bar or cursor */
-void gui_synclist_hide_selection_marker(struct gui_synclist * lists, bool hide)
-{
-    lists->show_selection_marker = !hide;
-}
-
 
 int gui_list_get_item_offset(struct gui_synclist * gui_list,
                             int item_width,
@@ -269,11 +261,7 @@ static void gui_list_put_selection_on_screen(struct gui_synclist * gui_list,
     const int scroll_limit_up   = (nb_lines < gui_list->selected_size+2 ? 0:1);
     const int scroll_limit_down = (scroll_limit_up+gui_list->selected_size);
 
-    if (gui_list->show_selection_marker == false)
-    {
-        new_start_item = gui_list->selected_item;
-    }
-    else if (gui_list->selected_size >= nb_lines)
+    if (gui_list->selected_size >= nb_lines)
     {
         new_start_item = gui_list->selected_item;
     }
@@ -420,31 +408,7 @@ static void gui_list_select_at_offset(struct gui_synclist * gui_list,
             0 : gui_list->nb_items - gui_list->selected_size;
         edge_beep(gui_list, !gui_list->limit_scroll);
     }
-    else if (gui_list->show_selection_marker == false)
-    {
-        FOR_NB_SCREENS(i)
-        {
-            int nb_lines = list_get_nb_lines(gui_list, i);
-            if (offset > 0)
-            {
-                int screen_top = MAX(0, gui_list->nb_items - nb_lines);
-                gui_list->start_item[i] = MIN(screen_top, gui_list->start_item[i] +
-                                                gui_list->selected_size);
-                gui_list->selected_item = gui_list->start_item[i];
-            }
-            else
-            {
-                gui_list->start_item[i] = MAX(0, gui_list->start_item[i] -
-                                                    gui_list->selected_size);
-                gui_list->selected_item = gui_list->start_item[i] + nb_lines;
-            }
 
-#ifdef HAVE_TOUCHSCREEN
-            gui_list->y_pos = gui_list->start_item[SCREEN_MAIN] * gui_list->line_height[SCREEN_MAIN];
-#endif
-        }
-        return;
-    }
     gui_synclist_select_item(gui_list, new_selection);
 }
 
@@ -950,12 +914,6 @@ bool simplelist_show_list(struct simplelist_info *info)
         gui_synclist_set_sel_color(&lists, info->selection_color);
 #endif
 
-    if (info->hide_selection)
-    {
-        gui_synclist_hide_selection_marker(&lists, true);
-        wrap = LIST_WRAP_OFF;
-    }
-
     if (info->action_callback)
         info->action_callback(ACTION_REDRAW, &lists);
 
@@ -1039,7 +997,6 @@ void simplelist_info_init(struct simplelist_info *info, char* title,
     info->title = title;
     info->count = count;
     info->selection_size = 1;
-    info->hide_selection = false;
     info->scroll_all = false;
     info->hide_theme = false;
     info->speak_onshow = true;
