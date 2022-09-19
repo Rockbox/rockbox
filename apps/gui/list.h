@@ -198,11 +198,7 @@ struct gui_synclist
 
 
 extern void list_init(void);
-/* parse global setting to static int */
-extern void gui_list_screen_scroll_step(int ofs);
 
-/* parse global setting to static bool */
-extern void gui_list_screen_scroll_out_of_view(bool enable);
 extern void gui_synclist_init_display_settings(struct gui_synclist * list);
 extern void gui_synclist_init(
     struct gui_synclist * lists,

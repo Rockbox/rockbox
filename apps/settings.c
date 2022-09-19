@@ -940,8 +940,6 @@ void settings_apply(bool read_disk)
 #endif
 
     lcd_scroll_step(global_settings.scroll_step);
-    gui_list_screen_scroll_step(global_settings.screen_scroll_step);
-    gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
     lcd_bidir_scroll(global_settings.bidir_limit);
     lcd_scroll_delay(global_settings.scroll_delay);
 

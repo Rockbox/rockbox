@@ -47,10 +47,6 @@
  */
 #define FRAMEDROP_TRIGGER 6
 
-static int offset_step = 16; /* pixels per screen scroll step */
-/* should lines scroll out of the screen */
-static bool offset_out_of_view = false;
-
 static void gui_list_select_at_offset(struct gui_synclist * gui_list,
                                       int offset);
 void list_draw(struct screen *display, struct gui_synclist *list);
@@ -207,7 +203,7 @@ int gui_list_get_item_offset(struct gui_synclist * gui_list,
 {
     int item_offset;
 
-    if (offset_out_of_view)
+    if (global_settings.offset_out_of_view)
     {
         item_offset = gui_list->offset_position[display->screen_type];
     }
@@ -439,16 +435,6 @@ void gui_synclist_del_item(struct gui_synclist * gui_list)
     }
 }
 
-void gui_list_screen_scroll_step(int ofs)
-{
-    offset_step = ofs;
-}
-
-void gui_list_screen_scroll_out_of_view(bool enable)
-{
-    offset_out_of_view = enable;
-}
-
 /*
  * Set the title and title icon of the list. Setting title to NULL disables
  * both the title and icon. Use NOICON if there is no icon.
@@ -556,7 +542,7 @@ static void gui_synclist_scroll_right(struct gui_synclist * lists)
         /* FIXME: This is a fake right boundry limiter. there should be some
         * callback function to find the longest item on the list in pixels,
         * to stop the list from scrolling past that point */
-        lists->offset_position[i] += offset_step;
+        lists->offset_position[i] += global_settings.screen_scroll_step;
         if (lists->offset_position[i] > 1000)
             lists->offset_position[i] = 1000;
     }
@@ -570,7 +556,7 @@ static void gui_synclist_scroll_left(struct gui_synclist * lists)
 {
     FOR_NB_SCREENS(i)
     {
-        lists->offset_position[i] -= offset_step;
+        lists->offset_position[i] -= global_settings.screen_scroll_step;
         if (lists->offset_position[i] < 0)
             lists->offset_position[i] = 0;
     }

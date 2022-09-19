@@ -332,22 +332,7 @@ MENUITEM_SETTING(list_accel_start_delay,
                  &global_settings.list_accel_start_delay, NULL);
 MENUITEM_SETTING(list_accel_wait, &global_settings.list_accel_wait, NULL);
 #endif /* HAVE_WHEEL_ACCELERATION */
-static int screenscroll_callback(int action,
-                                 const struct menu_item_ex *this_item,
-                                 struct gui_synclist *this_list)
-{
-    (void)this_item;
-    (void)this_list;
-    switch (action)
-    {
-        case ACTION_EXIT_MENUITEM:
-            gui_list_screen_scroll_out_of_view(global_settings.offset_out_of_view);
-            break;
-    }
-    return action;
-}
-MENUITEM_SETTING(offset_out_of_view, &global_settings.offset_out_of_view,
-                 screenscroll_callback);
+MENUITEM_SETTING(offset_out_of_view, &global_settings.offset_out_of_view, NULL);
 MENUITEM_SETTING(screen_scroll_step, &global_settings.screen_scroll_step, NULL);
 MENUITEM_SETTING(scroll_paginated, &global_settings.scroll_paginated, NULL);
 

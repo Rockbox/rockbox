@@ -428,7 +428,6 @@ int menu_action_cb(int *action, int selected_item, bool* exit, struct gui_syncli
 
                     if (cur->menuid == MENU_ID(M_TESTPUT))
                     {
-                        //rb->gui_list_screen_scroll_out_of_view(true);
                         synclist_set(cur->menuid, 0, cur->items, 1);
 #if LCD_DEPTH > 1
                         /* If line sep is set to automatic then outline cells */
@@ -473,7 +472,6 @@ int menu_action_cb(int *action, int selected_item, bool* exit, struct gui_syncli
     {
         if (lists->data == MENU_ID(M_TESTPUT))
         {
-            //rb->gui_list_screen_scroll_out_of_view(false);
             //lists->callback_draw_item = NULL;
             printcell_enable(lists, false, false);
         }
