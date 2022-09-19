@@ -844,8 +844,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
         }
 
         /* Timeout so we can determine if play status has changed */
-        bool res = list_do_action(CONTEXT_TREE, HZ/2,
-                            &playlist_lists, &button, LIST_WRAP_UNLESS_HELD);
+        bool res = list_do_action(CONTEXT_TREE, HZ/2, &playlist_lists, &button);
         /* during moving, another redraw is going to be needed,
          * since viewer.selected_track is updated too late (after the first draw)
          * drawing the moving item needs it */
@@ -1131,8 +1130,7 @@ bool search_playlist(void)
     gui_synclist_speak_item(&playlist_lists);
     while (!exit)
     {
-        if (list_do_action(CONTEXT_LIST, HZ/4,
-                           &playlist_lists, &button, LIST_WRAP_UNLESS_HELD))
+        if (list_do_action(CONTEXT_LIST, HZ/4, &playlist_lists, &button))
             continue;
         switch (button)
         {

@@ -681,7 +681,7 @@ static void edit_menu(int selection)
     {
         action = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
 
-        if (rb->gui_synclist_do_button(&lists,&action,LIST_WRAP_UNLESS_HELD))
+        if (rb->gui_synclist_do_button(&lists, &action))
             continue;
         selected_item = rb->gui_synclist_get_sel_pos(&lists);
         switch (action)
@@ -864,7 +864,7 @@ reopen_datfile:
         {
             action = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
 
-            if (rb->gui_synclist_do_button(&lists,&action,LIST_WRAP_UNLESS_HELD))
+            if (rb->gui_synclist_do_button(&lists, &action))
                 continue;
             selection = rb->gui_synclist_get_sel_pos(&lists);
             switch (action)

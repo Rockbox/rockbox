@@ -649,7 +649,7 @@ static int dirbrowse(void)
         button = get_action(CONTEXT_TREE|ALLOW_SOFTLOCK,
                             list_do_action_timeout(&tree_lists, HZ/2));
         oldbutton = button;
-        gui_synclist_do_button(&tree_lists, &button,LIST_WRAP_UNLESS_HELD);
+        gui_synclist_do_button(&tree_lists, &button);
         tc.selected_item = gui_synclist_get_sel_pos(&tree_lists);
         switch ( button ) {
             case ACTION_STD_OK:

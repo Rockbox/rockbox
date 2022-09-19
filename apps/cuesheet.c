@@ -481,7 +481,7 @@ void browse_cuesheet(struct cuesheet *cue)
     {
         gui_synclist_draw(&lists);
         action = get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD))
+        if (gui_synclist_do_button(&lists, &action))
             continue;
         switch (action)
         {

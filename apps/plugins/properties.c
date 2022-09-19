@@ -397,7 +397,7 @@ enum plugin_status plugin_start(const void* parameter)
         {
             button = rb->get_action(CONTEXT_LIST, HZ);
             /* HZ so the status bar redraws corectly */
-            if (rb->gui_synclist_do_button(&properties_lists,&button,LIST_WRAP_UNLESS_HELD))
+            if (rb->gui_synclist_do_button(&properties_lists, &button))
                 continue;
             switch(button)
             {

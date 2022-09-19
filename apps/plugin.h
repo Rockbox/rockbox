@@ -157,12 +157,12 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 253
+#define PLUGIN_API_VERSION 254
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
    new function which are "waiting" at the end of the function table) */
-#define PLUGIN_MIN_API_VERSION 253
+#define PLUGIN_MIN_API_VERSION 254
 
 /* 239 Marks the removal of ARCHOS HWCODEC and CHARCELL */
 
@@ -373,8 +373,7 @@ struct plugin_api {
                                      int item_number);
     void (*gui_synclist_add_item)(struct gui_synclist * lists);
     void (*gui_synclist_del_item)(struct gui_synclist * lists);
-    bool (*gui_synclist_do_button)(struct gui_synclist * lists,
-                                   int *action, enum list_wrap wrap);
+    bool (*gui_synclist_do_button)(struct gui_synclist * lists, int *action);
     void (*gui_synclist_set_title)(struct gui_synclist *lists, const char* title,
                                    enum themable_icons icon);
     enum yesno_res (*gui_syncyesno_run)(const struct text_message * main_message,

@@ -2078,8 +2078,7 @@ static int timetag_editor(void)
     while (!exit)
     {
         button = rb->get_action(CONTEXT_TREE, TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&gui_editor, &button,
-                                      LIST_WRAP_UNLESS_HELD))
+        if (rb->gui_synclist_do_button(&gui_editor, &button))
             continue;
 
         switch (button)

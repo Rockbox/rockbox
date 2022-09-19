@@ -490,8 +490,7 @@ int handle_radio_presets(void)
     while (result == 0)
     {
         gui_synclist_draw(&lists);
-        list_do_action(CONTEXT_STD, TIMEOUT_BLOCK,
-                       &lists, &action, LIST_WRAP_UNLESS_HELD);
+        list_do_action(CONTEXT_STD, TIMEOUT_BLOCK, &lists, &action);
         switch (action)
         {
             case ACTION_STD_MENU:

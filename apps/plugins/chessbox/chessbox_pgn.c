@@ -686,9 +686,8 @@ struct pgn_game_node* pgn_show_game_list(struct pgn_game_node* first_game){
     while (true) {
         curr_selection = rb->gui_synclist_get_sel_pos(&games_list);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&games_list,&button,LIST_WRAP_OFF)){
+        if (rb->gui_synclist_do_button(&games_list, &button))
             continue;
-        }
         switch (button) {
             case ACTION_STD_OK:
                 return get_game_info(curr_selection, first_game);

@@ -595,8 +595,7 @@ static void _lists_uiviewport_update_callback(unsigned short id, void *data)
         gui_synclist_draw(current_lists);
 }
 
-bool gui_synclist_do_button(struct gui_synclist * lists,
-                            int *actionptr, enum list_wrap wrap)
+bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
 {
     int action = *actionptr;
     static bool pgleft_allow_cancel = false;
@@ -642,24 +641,15 @@ bool gui_synclist_do_button(struct gui_synclist * lists,
 
     /* Disable the skin redraw callback */
     current_lists = NULL;
-    switch (wrap)
-    {
-        case LIST_WRAP_ON:
-            lists->limit_scroll = !lists->wraparound;
-            break;
-        case LIST_WRAP_OFF:
-            lists->limit_scroll = true;
-            break;
-        case LIST_WRAP_UNLESS_HELD:
-            if (action == ACTION_STD_PREVREPEAT ||
-                action == ACTION_STD_NEXTREPEAT ||
-                action == ACTION_LISTTREE_PGUP  ||
-                action == ACTION_LISTTREE_PGDOWN)
-                lists->limit_scroll = true;
-            else
-                lists->limit_scroll = !lists->wraparound;
-            break;
-    };
+
+    /* Prevent list wraparound by repeating actions */
+    if (action == ACTION_STD_PREVREPEAT ||
+        action == ACTION_STD_NEXTREPEAT ||
+        action == ACTION_LISTTREE_PGUP  ||
+        action == ACTION_LISTTREE_PGDOWN)
+        lists->limit_scroll = true;
+    else
+        lists->limit_scroll = !lists->wraparound;
 
     switch (action)
     {
@@ -795,8 +785,7 @@ int list_do_action_timeout(struct gui_synclist *lists, int timeout)
 }
 
 bool list_do_action(int context, int timeout,
-                    struct gui_synclist *lists, int *action,
-                    enum list_wrap wrap)
+                    struct gui_synclist *lists, int *action)
 /* Combines the get_action() (with possibly overridden timeout) and
    gui_synclist_do_button() calls. Returns the list action from
    do_button, and places the action from get_action in *action. */
@@ -804,7 +793,7 @@ bool list_do_action(int context, int timeout,
     timeout = list_do_action_timeout(lists, timeout);
     keyclick_set_callback(gui_synclist_keyclick_callback, lists);
     *action = get_action(context, timeout);
-    return gui_synclist_do_button(lists, action, wrap);
+    return gui_synclist_do_button(lists, action);
 }
 
 bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
@@ -871,7 +860,6 @@ bool simplelist_show_list(struct simplelist_info *info)
     struct gui_synclist lists;
     int action, old_line_count = simplelist_line_count;
     list_get_name *getname;
-    int wrap = global_settings.list_wraparound ? LIST_WRAP_UNLESS_HELD : LIST_WRAP_OFF;
     if (info->get_name)
         getname = info->get_name;
     else
@@ -914,8 +902,7 @@ bool simplelist_show_list(struct simplelist_info *info)
 
     while(1)
     {
-        list_do_action(CONTEXT_LIST, info->timeout,
-                       &lists, &action, wrap);
+        list_do_action(CONTEXT_LIST, info->timeout, &lists, &action);
 
         /* We must yield in this case or no other thread can run */
         if (info->timeout == TIMEOUT_NOBLOCK)

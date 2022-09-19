@@ -964,7 +964,7 @@ static bool view_events(int selected, struct shown *shown)
     while (!exit)
     {
         button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        rb->gui_synclist_do_button(&gui_memos, &button, LIST_WRAP_UNLESS_HELD);
+        rb->gui_synclist_do_button(&gui_memos, &button);
 
         switch (button)
         {

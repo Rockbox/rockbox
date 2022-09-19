@@ -59,13 +59,8 @@ enum sc_list_action_type draw_sc_list(struct gui_synclist *gui_sc)
         /* user input */
         button = rb->get_action(CONTEXT_LIST, HZ);
         /* HZ so the status bar redraws corectly */
-        if (rb->gui_synclist_do_button(gui_sc, &button,
-                                            LIST_WRAP_UNLESS_HELD)) {
-            /* automatic handling of user input.
-            * _UNLESS_HELD can be _ON or _OFF also
-            * selection changed, so redraw */
+        if (rb->gui_synclist_do_button(gui_sc, &button))
             continue;
-        }
         switch (button) { /* process the user input */
             case ACTION_STD_OK:
                 return SCLA_SELECT;

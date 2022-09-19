@@ -511,9 +511,13 @@ bool option_screen(const struct settings_list *setting,
     gui_synclist_speak_item(&lists);
     while (!done)
     {
+        /* override user wraparound setting; used mainly by EQ settings.
+         * Not sure this is justified? */
+        if (!allow_wrap)
+            lists.wraparound = false;
+
         if (list_do_action(CONTEXT_LIST, HZ, /* HZ so the status bar redraws */
-                           &lists, &action,
-            allow_wrap? LIST_WRAP_UNLESS_HELD: LIST_WRAP_OFF))
+                           &lists, &action))
         {
             /* setting changed */
             selected = gui_synclist_get_sel_pos(&lists);

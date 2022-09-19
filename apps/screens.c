@@ -714,8 +714,7 @@ bool browse_id3(struct mp3entry *id3, int playlist_display_index, int playlist_a
     gui_synclist_draw(&id3_lists);
     gui_synclist_speak_item(&id3_lists);
     while (true) {
-        if(!list_do_action(CONTEXT_LIST,HZ/2,
-                           &id3_lists, &key,LIST_WRAP_UNLESS_HELD)
+        if(!list_do_action(CONTEXT_LIST,HZ/2, &id3_lists, &key)
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
         {
             if (key == ACTION_STD_OK || key == ACTION_STD_CANCEL)
@@ -793,8 +792,7 @@ int view_runtime(void)
             say_runtime = false;
         }
         gui_synclist_draw(&lists);
-        list_do_action(CONTEXT_STD, HZ,
-                    &lists, &action, LIST_WRAP_UNLESS_HELD);
+        list_do_action(CONTEXT_STD, HZ, &lists, &action);
         if(action == ACTION_STD_CANCEL)
             break;
         if(action == ACTION_STD_OK) {

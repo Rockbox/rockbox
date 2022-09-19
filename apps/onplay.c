@@ -429,8 +429,7 @@ static bool playing_time(void)
     gui_synclist_draw(&pt_lists);
     gui_synclist_speak_item(&pt_lists);
     while (true) {
-        if (list_do_action(CONTEXT_LIST, HZ/2,
-                          &pt_lists, &key, LIST_WRAP_UNLESS_HELD) == 0
+        if (list_do_action(CONTEXT_LIST, HZ/2, &pt_lists, &key) == 0
            && key!=ACTION_NONE && key!=ACTION_UNKNOWN)
         {
             talk_force_shutup();

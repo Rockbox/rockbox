@@ -1265,7 +1265,7 @@ bool recording_screen(bool no_source)
         }
 
         /* let list handle the button */
-        gui_synclist_do_button(&lists, &button, LIST_WRAP_UNLESS_HELD);
+        gui_synclist_do_button(&lists, &button);
 
 
         switch(button)

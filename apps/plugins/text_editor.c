@@ -394,7 +394,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->gui_synclist_draw(&lists);
         cur_sel = rb->gui_synclist_get_sel_pos(&lists);
         button = rb->get_action(CONTEXT_LIST,TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&lists,&button,LIST_WRAP_UNLESS_HELD))
+        if (rb->gui_synclist_do_button(&lists, &button))
             continue;
         switch (button)
         {

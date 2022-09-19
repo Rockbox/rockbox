@@ -793,8 +793,7 @@ static int select_bookmark(const char* bookmark_file_name, bool show_dont_resume
             refresh = false;
         }
 
-        list_do_action(CONTEXT_BOOKMARKSCREEN, HZ / 2,
-                       &list, &action, LIST_WRAP_UNLESS_HELD);
+        list_do_action(CONTEXT_BOOKMARKSCREEN, HZ / 2, &list, &action);
         item = gui_synclist_get_sel_pos(&list) / 2;
 
         if (bookmarks->show_dont_resume)

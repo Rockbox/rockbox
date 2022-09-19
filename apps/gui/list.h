@@ -30,12 +30,6 @@
 
 #define SCROLLBAR_WIDTH global_settings.scrollbar_width
 
-enum list_wrap {
-    LIST_WRAP_ON = 0,
-    LIST_WRAP_OFF,
-    LIST_WRAP_UNLESS_HELD,
-};
-
 enum synclist_cursor
 {
     SYNCLIST_CURSOR_NOSTYLE = 0,
@@ -238,9 +232,7 @@ extern bool gui_synclist_keyclick_callback(int action, void* data);
  * returns true if the action was handled.
  * NOTE: *action may be changed regardless of return value
  */
-extern bool gui_synclist_do_button(struct gui_synclist * lists,
-                                       int *action,
-                                       enum list_wrap);
+extern bool gui_synclist_do_button(struct gui_synclist * lists, int *action);
 #if !defined(PLUGIN)
 struct listitem_viewport_cfg {
     struct wps_data *data;
@@ -283,8 +275,7 @@ extern int list_do_action_timeout(struct gui_synclist *lists, int timeout);
    list_do_action_timeout) with the gui_synclist_do_button call, for
    convenience. */
 extern bool list_do_action(int context, int timeout,
-                           struct gui_synclist *lists, int *action,
-                           enum list_wrap wrap);
+                           struct gui_synclist *lists, int *action);
 
 
 /** Simplelist implementation.

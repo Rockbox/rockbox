@@ -450,7 +450,7 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                 action = new_action;
         }
 
-        if (LIKELY(gui_synclist_do_button(&lists, &action, LIST_WRAP_UNLESS_HELD)))
+        if (LIKELY(gui_synclist_do_button(&lists, &action)))
             continue;
 #ifdef HAVE_QUICKSCREEN
         else if (action == ACTION_STD_QUICKSCREEN)

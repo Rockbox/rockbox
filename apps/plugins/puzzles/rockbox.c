@@ -2458,7 +2458,7 @@ static int list_choose(const char *list_str, const char *title, int sel)
     {
         rb->gui_synclist_draw(&list);
         int button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if(rb->gui_synclist_do_button(&list, &button, LIST_WRAP_UNLESS_HELD))
+        if(rb->gui_synclist_do_button(&list, &button))
             continue;
         switch(button)
         {
@@ -2672,7 +2672,7 @@ static bool config_menu(void)
     {
         rb->gui_synclist_draw(&list);
         int button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if(rb->gui_synclist_do_button(&list, &button, LIST_WRAP_UNLESS_HELD))
+        if(rb->gui_synclist_do_button(&list, &button))
             continue;
         switch(button)
         {
@@ -2757,7 +2757,7 @@ static int do_preset_menu(struct preset_menu *menu, char *title, int selected)
     {
         rb->gui_synclist_draw(&list);
         int button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if(rb->gui_synclist_do_button(&list, &button, LIST_WRAP_UNLESS_HELD))
+        if(rb->gui_synclist_do_button(&list, &button))
             continue;
         switch(button)
         {

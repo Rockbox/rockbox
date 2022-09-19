@@ -567,7 +567,7 @@ static int keybox(void)
     {
         rb->gui_synclist_draw(&kb_list);
         button = rb->get_action(CONTEXT_LIST, TIMEOUT_BLOCK);
-        if (rb->gui_synclist_do_button(&kb_list, &button, LIST_WRAP_UNLESS_HELD))
+        if (rb->gui_synclist_do_button(&kb_list, &button))
             continue;
 
         switch (button)

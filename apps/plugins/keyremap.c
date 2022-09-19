@@ -2054,7 +2054,7 @@ enum plugin_status plugin_start(const void* parameter)
                 redraw = true;
 
             ret = menu_action_cb(&action, selected_item, &exit, &lists);
-            if (rb->gui_synclist_do_button(&lists,&action,LIST_WRAP_UNLESS_HELD))
+            if (rb->gui_synclist_do_button(&lists, &action))
                 continue;
             selected_item = rb->gui_synclist_get_sel_pos(&lists);
 

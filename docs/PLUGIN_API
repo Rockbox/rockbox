@@ -669,7 +669,7 @@ void gui_synclist_del_item(struct gui_synclist * lists)
     \param lists
     \description
 
-bool gui_synclist_do_button(struct gui_synclist * lists, unsigned *action, enum list_wrap wrap)
+bool gui_synclist_do_button(struct gui_synclist * lists, unsigned *action)
     \group list
     \param lists
     \param action
