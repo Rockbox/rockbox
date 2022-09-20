@@ -220,8 +220,6 @@ extern void gui_synclist_add_item(struct gui_synclist * lists);
 extern void gui_synclist_del_item(struct gui_synclist * lists);
 extern void gui_synclist_set_title(struct gui_synclist * lists, const char * title,
                                    enum themable_icons icon);
-extern bool gui_synclist_item_is_onscreen(struct gui_synclist *lists,
-                                          enum screen_type screen, int item);
 
 extern bool gui_synclist_keyclick_callback(int action, void* data);
 /*

@@ -441,8 +441,7 @@ static int info_action_callback(int action, struct gui_synclist *lists)
     else if (action == ACTION_NONE)
     {
         static int last_redraw = 0;
-        if (gui_synclist_item_is_onscreen(lists, 0, INFO_TIME)
-            && TIME_AFTER(current_tick, last_redraw + HZ*5))
+        if (TIME_AFTER(current_tick, last_redraw + HZ*5))
         {
             last_redraw = current_tick;
             return ACTION_REDRAW;
