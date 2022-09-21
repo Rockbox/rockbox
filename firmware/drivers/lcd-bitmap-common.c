@@ -139,11 +139,7 @@ struct viewport* LCDFN(set_viewport_ex)(struct viewport* vp, int flags)
         || vp->x + vp->width > LCDM(WIDTH)
         || vp->y + vp->height > LCDM(HEIGHT))
     {
-#if !defined(HAVE_VIEWPORT_CLIP)
         DEBUGF("ERROR: "
-#else
-        DEBUGF("NOTE: "
-#endif
             "set_viewport out of bounds: x: %d y: %d width: %d height:%d\n",
             vp->x, vp->y, vp->width, vp->height);
     }

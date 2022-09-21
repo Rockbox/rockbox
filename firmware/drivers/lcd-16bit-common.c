@@ -40,30 +40,6 @@ void lcd_clear_viewport(void)
     width = lcd_current_viewport->width;
     height = lcd_current_viewport->height;
 
-#if defined(HAVE_VIEWPORT_CLIP)
-    /********************* Viewport on screen clipping ********************/
-    /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clip image in viewport in screen */
-    if (x < 0)
-    {
-        width += x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-#endif
-
     len  = STRIDE_MAIN(width, height);
     step = STRIDE_MAIN(ROW_INC, COL_INC);
 
@@ -182,30 +158,6 @@ void lcd_fillrect(int x, int y, int width, int height)
     x += lcd_current_viewport->x;
     y += lcd_current_viewport->y;
 
-#if defined(HAVE_VIEWPORT_CLIP)
-    /********************* Viewport on screen clipping ********************/
-    /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clip image in viewport in screen */
-    if (x < 0)
-    {
-        width += x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-#endif
-
     /* drawmode and optimisation */
     if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
     {
@@ -309,32 +261,6 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     /* convert to viewport coordinates */
     x += lcd_current_viewport->x;
     y += lcd_current_viewport->y;
-
-#if defined(HAVE_VIEWPORT_CLIP)
-    /********************* Viewport on screen clipping ********************/
-    /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-        return;
-
-    /* clip image in viewport in screen */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-#endif
 
     /* move starting point */
     src += stride * (src_y >> 3) + src_x;
@@ -567,35 +493,6 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     /* adjust for viewport */
     x += lcd_current_viewport->x;
     y += lcd_current_viewport->y;
-
-#if defined(HAVE_VIEWPORT_CLIP)
-    /********************* Viewport on screen clipping ********************/
-    /* nothing to draw? */
-    if ((x >= LCD_WIDTH) || (y >= LCD_HEIGHT)
-        || (x + width <= 0) || (y + height <= 0))
-    {
-        BLEND_FINISH;
-        return;
-    }
-
-    /* clip image in viewport in screen */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-    if (x + width > LCD_WIDTH)
-        width = LCD_WIDTH - x;
-    if (y + height > LCD_HEIGHT)
-        height = LCD_HEIGHT - y;
-#endif
 
     /* the following drawmode combinations are possible:
      * 1) COMPLEMENT: just negates the framebuffer contents

@@ -198,10 +198,6 @@ void lcd_drawpixel(int x, int y)
 {
     if (   ((unsigned)x < (unsigned)lcd_current_viewport->width)
         && ((unsigned)y < (unsigned)lcd_current_viewport->height)
-#if defined(HAVE_VIEWPORT_CLIP)
-        && ((unsigned)x < (unsigned)LCD_WIDTH)
-        && ((unsigned)y < (unsigned)LCD_HEIGHT)
-#endif
         )
         lcd_fastpixelfuncs[lcd_current_viewport->drawmode](FBADDR(lcd_current_viewport->x+x, lcd_current_viewport->y+y));
 }
@@ -281,10 +277,6 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
         if ((x >= 0 && y >= 0)
             && (x < w_vp)
             && (y < h_vp)
-#if defined(HAVE_VIEWPORT_CLIP)
-            && (x < LCD_WIDTH)
-            && (y < LCD_HEIGHT)
-#endif
             )
             pfunc(fbaddr( x + x_vp, y + y_vp));
 
