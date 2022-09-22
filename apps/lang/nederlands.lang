@@ -4250,31 +4250,16 @@
 </phrase>
 <phrase>
   id: LANG_ALARM_MOD_KEYS
-  desc: Shown key functions in alarm menu (for the RTC alarm mod).
+  desc: deprecated
   user: core
   <source>
-    *: none
-    alarm: "PLAY=Set OFF=Cancel"
-    gigabeats: "SELECT=Set POWER=Cancel"
-    ipod*: "SELECT=Set MENU=Cancel"
-    iriverh10,iriverh10_5gb: "SELECT=Set PREV=Cancel"
-    mpiohd300: "ENTER=Set MENU=Cancel"
-    sansafuzeplus: "SELECT=Set  BACK=Cancel"
-    vibe500: "OK=Set C=Cancel"
+    *: ""
   </source>
   <dest>
-    *: none
-    alarm: "PLAY=Instellen, OFF=Annuleren"
-    gigabeats: "SELECT=Instellen, POWER=Annuleren"
-    ipod*: "SELECT=Instellen, MENU=Annuleren"
-    iriverh10,iriverh10_5gb: "SELECT=Instellen, PREV=Annuleren"
-    mpiohd300: "ENTER=Instellen, MENU=Annuleren"
-    sansafuzeplus: "SELECT=Instellen, BACK=Annuleren"
-    vibe500: "OK=Instellen, C=Annuleren"
+    *: ""
   </dest>
   <voice>
-    *: none
-    alarm,ipod*: ""
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -7580,10 +7565,10 @@
 </phrase>
 <phrase>
   id: LANG_AUDIOSCROBBLER
-  desc: "Last.fm Log" in the playback menu
+  desc: "Last.fm Logger" in Plugin/apps/scrobbler
   user: core
   <source>
-    *: "Last.fm Log"
+    *: "Last.fm Logger"
   </source>
   <dest>
     *: "Last.fm-logboek"
@@ -14430,58 +14415,58 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Artiest]"
+    *: ""
   </dest>
   <voice>
-    *: "Artiest"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Titel]"
+    *: ""
   </dest>
   <voice>
-    *: "Titel"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Album]"
+    *: ""
   </dest>
   <voice>
-    *: "Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Looptijd]"
+    *: ""
   </dest>
   <voice>
-    *: "Looptijd"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -14683,7 +14668,7 @@
     lowmem: none
   </dest>
   <voice>
-    *: "CPU Boost"
+    *: "CPU-boost"
     lowmem: none
   </voice>
 </phrase>
@@ -15744,16 +15729,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Lijst Wissen en Volgende Afspelen"
+    *: ""
   </dest>
   <voice>
-    *: "Lijst Wissen en Volgende Afspelen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15814,16 +15799,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Lijst Wissen en in Geschude Volgorde Afspelen"
+    *: ""
   </dest>
   <voice>
-    *: "Lijst Wissen en in Geschude Volgorde Afspelen"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15898,128 +15883,128 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Album Artiest]"
+    *: ""
   </dest>
   <voice>
-    *: "Album Artiest"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Genre]"
+    *: ""
   </dest>
   <voice>
-    *: "Genre"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Commentaar]"
+    *: ""
   </dest>
   <voice>
-    *: "Commentaar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Componist]"
+    *: ""
   </dest>
   <voice>
-    *: "Componist"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Jaar]"
+    *: ""
   </dest>
   <voice>
-    *: "Jaar"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Tracknum]"
+    *: ""
   </dest>
   <voice>
-    *: "Tracknummer"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Schijfnum]"
+    *: ""
   </dest>
   <voice>
-    *: "Schijfnummer"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Frequentie]"
+    *: ""
   </dest>
   <voice>
-    *: "Frequentie"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Bitsnelheid]"
+    *: ""
   </dest>
   <voice>
-    *: "Bitsnelheid"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16118,5 +16103,224 @@
   </dest>
   <voice>
     *: "Aflopend"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ALBUM_ART
+  desc: in Settings
+  user: core
+  <source>
+    *: "Album Art"
+  </source>
+  <dest>
+    *: "Albumhoezen"
+  </dest>
+  <voice>
+    *: "Albumhoezen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_EMBEDDED
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Embedded"
+  </source>
+  <dest>
+    *: "Liever Ingesloten"
+  </dest>
+  <voice>
+    *: "Liever Ingesloten"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PREFER_IMAGE_FILE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Prefer Image File"
+  </source>
+  <dest>
+    *: "Liever Afbeeldingsbestand"
+  </dest>
+  <voice>
+    *: "Liever Afbeeldingsbestand"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_FM_SYNC_RDS_TIME
+  desc: in radio screen and Settings
+  user: core
+  <source>
+    *: none
+    rds: "Sync RDS Time"
+  </source>
+  <dest>
+    *: none
+    rds: "RDS-tijd Synchroniseren"
+  </dest>
+  <voice>
+    *: none
+    rds: "RDS Tijd Synchroniseren"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SORT_ALBUMS_BY
+  desc: in Settings
+  user: core
+  <source>
+    *: "Sort albums by"
+  </source>
+  <dest>
+    *: "Sorteer albums op"
+  </dest>
+  <voice>
+    *: "Sorteer albums op"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_NAME
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Name"
+  </source>
+  <dest>
+    *: "Artiest + Naam"
+  </dest>
+  <voice>
+    *: "Artiest En Naam"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_ARTIST_PLUS_YEAR
+  desc: in Settings
+  user: core
+  <source>
+    *: "Artist + Year"
+  </source>
+  <dest>
+    *: "Artiest + Jaar"
+  </dest>
+  <voice>
+    *: "Artiest En Jaar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_YEAR_SORT_ORDER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Year sort order"
+  </source>
+  <dest>
+    *: "Sorteervolgorde jaar"
+  </dest>
+  <voice>
+    *: "Sorteer volgorde jaar"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Show year in album title"
+  </source>
+  <dest>
+    *: "Jaar in albumtitel weergeven"
+  </dest>
+  <voice>
+    *: "Jaar in albumtitel weergeven"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_WAIT_FOR_CACHE
+  desc: in Settings
+  user: core
+  <source>
+    *: "Cache needs to finish updating first!"
+  </source>
+  <dest>
+    *: "Cache moet eerst de update voltooien!"
+  </dest>
+  <voice>
+    *: "Cache moet eerst de update voltooien!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Nummer Info"
+  </dest>
+  <voice>
+    *: "Nummer Info"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Speel"
+  </dest>
+  <voice>
+    *: "Speel"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Geschud Afspelen"
+  </dest>
+  <voice>
+    *: "Geschud Afspelen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Huidige Track Behouden bij het Vervangen van een Afspeellijst"
+  </dest>
+  <voice>
+    *: "Huidige Track Behouden bij het Vervangen van een Afspeellijst"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Instellingen wissen wanneer de resetknop wordt ingedrukt tijdens het opstarten"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Instellingen wissen wanneer de houd-schakelaar aan staat tijdens het opstarten"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Instellingen wissen wanneer de resetknop wordt ingedrukt tijdens het opstarten"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Instellingen wissen wanneer de houd schakelaar aan staat tijdens het opstarten"
   </voice>
 </phrase>
