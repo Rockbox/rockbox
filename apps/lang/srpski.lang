@@ -1473,10 +1473,10 @@
     *: "Replaygain"
   </source>
   <dest>
-    *: "Replaygain"
+    *: "Риплејгејн"
   </dest>
   <voice>
-    *: "Replaygain"
+    *: "Риплејгејн"
   </voice>
 </phrase>
 <phrase>
@@ -3400,13 +3400,13 @@
   </source>
   <dest>
     *: none
-    battery_types: "NiMH"
+    battery_types: "НиМХ"
     xduoox3: "Старија (1500 mAh)"
   </dest>
   <voice>
     *: none
     battery_types: "Никл метал хидридна"
-    xduoox3: "Старија (1500 милиампер часова)"
+    xduoox3: "Старија 1500 милиампер часова"
   </voice>
 </phrase>
 <phrase>
@@ -4936,11 +4936,11 @@
   </source>
   <dest>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "МПЕГ Слој 3"
   </dest>
   <voice>
     *: none
-    recording: "MPEG Layer 3"
+    recording: "МПЕГ Слој 3"
   </voice>
 </phrase>
 <phrase>
@@ -4953,11 +4953,11 @@
   </source>
   <dest>
     *: none
-    recording: "PCM Wave"
+    recording: "ПЦМ Талас"
   </dest>
   <voice>
     *: none
-    recording: "PCM Wave"
+    recording: "ПЦМ Талас"
   </voice>
 </phrase>
 <phrase>
@@ -6004,13 +6004,13 @@
   </source>
   <dest>
     *: "Инт:"
-    hibylinux: "mSD:"
-    xduoox3: "mSD1:"
+    hibylinux: "мСД:"
+    xduoox3: "мСД1:"
   </dest>
   <voice>
     *: "Интерни"
-    hibylinux: "мајкро Ес Де"
-    xduoox3: "мајкро Ес Де 1"
+    hibylinux: "микро Ес Де"
+    xduoox3: "микро Ес Де 1"
   </voice>
 </phrase>
 <phrase>
@@ -6025,15 +6025,15 @@
   </source>
   <dest>
     *: none
-    multivolume: "HD1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "mSD:"
-    xduoox3: "mSD2:"
+    multivolume: "ХД1"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "мСД:"
+    xduoox3: "мСД2:"
   </dest>
   <voice>
     *: none
     multivolume: "Ха Де 1"
-    sansac200*,sansaclipplus,sansae200*,sansafuze*: "мајкро Ес Де"
-    xduoox3: "мајкро Ес Де 2"
+    sansac200*,sansaclipplus,sansae200*,sansafuze*: "микро Ес Де"
+    xduoox3: "микро Ес Де 2"
   </voice>
 </phrase>
 <phrase>
@@ -9581,7 +9581,7 @@
   </dest>
   <voice>
     *: none
-    recording: "величина"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9674,7 +9674,7 @@
   </dest>
   <voice>
     *: none
-    recording: "време дељења"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9705,7 +9705,7 @@
   </dest>
   <voice>
     *: none
-    recording: "клип"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9735,11 +9735,11 @@
   </source>
   <dest>
     *: none
-    recording: "Фајл:"
+    recording: "Датотека:"
   </dest>
   <voice>
     *: none
-    recording: "фајл"
+    recording: ""
   </voice>
 </phrase>
 <phrase>
@@ -9797,7 +9797,7 @@
   </source>
   <dest>
     *: none
-    agc: "AGC"
+    agc: "АРП"
   </dest>
   <voice>
     *: none
@@ -10465,11 +10465,11 @@
   </source>
   <dest>
     *: none
-    pitchscreen: "Rate"
+    pitchscreen: "Рата"
   </dest>
   <voice>
     *: none
-    pitchscreen: "Рејт"
+    pitchscreen: "Рата"
   </voice>
 </phrase>
 <phrase>
@@ -12192,10 +12192,10 @@
     *: "Android Debug Bridge"
   </source>
   <dest>
-    *: "Android Debug Bridge"
+    *: "Андроид Прегледни Мост"
   </dest>
   <voice>
-    *: "Android Debug Bridge"
+    *: "Андроид Прегледни Мост"
   </voice>
 </phrase>
 <phrase>
@@ -12248,10 +12248,10 @@
     *: "Haas Surround"
   </source>
   <dest>
-    *: "Haas Surround"
+    *: "Хаас Просторни Звук"
   </dest>
   <voice>
-    *: "Haas Surround"
+    *: "Хаас Просторни Звук"
   </voice>
 </phrase>
 <phrase>
@@ -13008,16 +13008,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Албум]"
+    *: ""
   </dest>
   <voice>
-    *: "Албум"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13350,16 +13350,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Наслов]"
+    *: ""
   </dest>
   <voice>
-    *: "Наслов"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13765,16 +13765,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Уметник]"
+    *: ""
   </dest>
   <voice>
-    *: "Уметник"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13869,16 +13869,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Трајање]"
+    *: ""
   </dest>
   <voice>
-    *: "Трајање"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15732,16 +15732,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Очисти листу & репродукуј наредну"
+    *: ""
   </dest>
   <voice>
-    *: "Очисти листу и репродукуј наредну"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15802,16 +15802,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Очисти листу & репродукуј измешано"
+    *: ""
   </dest>
   <voice>
-    *: "Очисти листу & репродукуј измешано"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15872,128 +15872,128 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Уметник албума]"
+    *: ""
   </dest>
   <voice>
-    *: "Уметник албума"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Жанр]"
+    *: ""
   </dest>
   <voice>
-    *: "Жанр"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Коментар]"
+    *: ""
   </dest>
   <voice>
-    *: "Коментар"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Композитор]"
+    *: ""
   </dest>
   <voice>
-    *: "Композитор"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Година]"
+    *: ""
   </dest>
   <voice>
-    *: "Година"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Брнумере]"
+    *: ""
   </dest>
   <voice>
-    *: "Број нумере"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Брдиска]"
+    *: ""
   </dest>
   <voice>
-    *: "Број диска"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Фреквенција]"
+    *: ""
   </dest>
   <voice>
-    *: "Фреквенција"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Битски_проток]"
+    *: ""
   </dest>
   <voice>
-    *: "Битски проток"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16018,7 +16018,7 @@
     *: "dAY"
   </source>
   <dest>
-    *: "dAY"
+    *: "dmY"
   </dest>
   <voice>
     *: ""
@@ -16235,5 +16235,81 @@
   </dest>
   <voice>
     *: "Најпре мора да се освежи кеш!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Подаци о Песми"
+  </dest>
+  <voice>
+    *: "Подаци о Песми"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Покрени"
+  </dest>
+  <voice>
+    *: "Покрени"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Покрени Разбацано"
+  </dest>
+  <voice>
+    *: "Покрени Разбацано"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Задржите Тренутну Нумеру Када Замењујете Плејлисту"
+  </dest>
+  <voice>
+    *: "Задржите Тренутну Нумеру Када Замењујете Плејлисту"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Обришите подешавања када се дугме за ресетовање држи током покретања"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Обришите подешавања када је прекидач за чекање укључен током покретања"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Обришите подешавања када се дугме за ресетовање држи током покретања"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Обришите подешавања када је прекидач за чекање укључен током покретања"
   </voice>
 </phrase>
