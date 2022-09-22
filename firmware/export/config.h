@@ -1078,8 +1078,16 @@ Lyre prototype 1 */
  * only while main() runs), otherwise things may go wild,
  * from crashes to freezes to exploding daps.
  */
-#define INIT_ATTR       __attribute__ ((section(".init")))
-#define INITDATA_ATTR   __attribute__ ((section(".initdata")))
+
+
+#if defined(__APPLE__) && defined(__MACH__)
+    #define INIT_ATTR __attribute__((section ("__INIT,.init")))
+    #define INITDATA_ATTR __attribute__((section ("__INITDATA,.initdata")))
+#else
+    #define INIT_ATTR       __attribute__ ((section(".init")))
+    #define INITDATA_ATTR   __attribute__ ((section(".initdata")))
+#endif
+
 #define HAVE_INIT_ATTR
 #else
 #define INIT_ATTR
