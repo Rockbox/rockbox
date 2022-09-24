@@ -46,15 +46,6 @@ static struct ll_node * ll_search_prev(struct ll_head *list,
 }
 
 /**
- * Initializes the singly-linked list
- */
-void ll_init(struct ll_head *list)
-{
-    list->head = NULL;
-    list->tail = NULL;
-}
-
-/**
  * Adds a node to s singly-linked list using "insert next"
  */
 void ll_insert_next(struct ll_head *list, struct ll_node *node,
@@ -143,18 +134,6 @@ void ll_remove(struct ll_head *list, struct ll_node *node)
 /** (L)inked (L)ist (D)ouble **/
 
 /**
- * Initializes the doubly-linked list
- */
-void lld_init(struct lld_head *list)
-{
-    list->head = NULL;
-    list->tail = NULL;
-
-    /* tail could be stored in first item's prev pointer but this simplifies
-       the routines and maintains the non-circularity */
-}
-
-/**
  * Adds a node to a doubly-linked list using "insert first"
  */
 void lld_insert_first(struct lld_head *list, struct lld_node *node)
@@ -235,14 +214,6 @@ static inline struct lldc_node * lldc_insert(struct lldc_head *list,
     }
 
     return head;
-}
-
-/**
- * Initializes the doubly-linked circular list
- */
-void lldc_init(struct lldc_head *list)
-{
-    list->head = NULL;
 }
 
 /**

@@ -21,6 +21,8 @@
 #ifndef LINKED_LIST_H
 #define LINKED_LIST_H
 
+#include <stddef.h>
+
 /***
  ** NOTES:
  ** Node field order chosen so that one type can alias the other for forward
@@ -51,7 +53,15 @@ struct ll_node
     struct ll_node *next; /* Next list item */
 };
 
-void ll_init(struct ll_head *list);
+/**
+ * Initializes the singly-linked list
+ */
+static inline void ll_init(struct ll_head *list)
+{
+    list->head = NULL;
+    list->tail = NULL;
+}
+
 void ll_insert_next(struct ll_head *list, struct ll_node *node,
                     struct ll_node *newnode);
 void ll_insert_last(struct ll_head *list, struct ll_node *node);
@@ -81,7 +91,18 @@ struct lld_node
     struct lld_node *prev; /* Previous list item */
 };
 
-void lld_init(struct lld_head *list);
+/**
+ * Initializes the doubly-linked list
+ */
+static inline void lld_init(struct lld_head *list)
+{
+    list->head = NULL;
+    list->tail = NULL;
+
+    /* tail could be stored in first item's prev pointer but this simplifies
+       the routines and maintains the non-circularity */
+}
+
 void lld_insert_first(struct lld_head *list, struct lld_node *node);
 void lld_insert_last(struct lld_head *list, struct lld_node *node);
 void lld_remove(struct lld_head *list, struct lld_node *node);
@@ -106,7 +127,14 @@ struct lldc_node
     struct lldc_node *prev; /* Previous list item */
 };
 
-void lldc_init(struct lldc_head *list);
+/**
+ * Initializes the doubly-linked circular list
+ */
+static inline void lldc_init(struct lldc_head *list)
+{
+    list->head = NULL;
+}
+
 void lldc_insert_first(struct lldc_head *list, struct lldc_node *node);
 void lldc_insert_last(struct lldc_head *list, struct lldc_node *node);
 void lldc_remove(struct lldc_head *list, struct lldc_node *node);
