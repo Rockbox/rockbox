@@ -13069,16 +13069,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album]"
+    *: ""
   </source>
   <dest>
-    *: "[Album]"
+    *: ""
   </dest>
   <voice>
-    *: "Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13198,16 +13198,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Artista]"
+    *: ""
   </dest>
   <voice>
-    *: "Artista"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13257,16 +13257,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TITLE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Title]"
+    *: ""
   </source>
   <dest>
-    *: "[Titolo]"
+    *: ""
   </dest>
   <voice>
-    *: "Titolo"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -13532,16 +13532,16 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DURATION
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Duration]"
+    *: ""
   </source>
   <dest>
-    *: "[Durata]"
+    *: ""
   </dest>
   <voice>
-    *: "Durata"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15507,16 +15507,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_NEXT
-  desc: in onplay menu.  Replace current playlist with selected tracks
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Next"
+    *: ""
   </source>
   <dest>
-    *: "Cancella Lista e Riproduci Successivo"
+    *: ""
   </dest>
   <voice>
-    *: "Cancella Lista e Riproduci Successivo"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15637,16 +15637,16 @@
 </phrase>
 <phrase>
   id: LANG_CLEAR_LIST_AND_PLAY_SHUFFLED
-  desc: in onplay menu.  Replace current playlist with selected tracks in random order.
+  desc: deprecated
   user: core
   <source>
-    *: "Clear List & Play Shuffled"
+    *: ""
   </source>
   <dest>
-    *: "Cancella Lista e Riproduci in Ordine Casuale"
+    *: ""
   </dest>
   <voice>
-    *: "Cancella Lista e Riproduci in Ordine Casuale"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -15874,128 +15874,128 @@
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_ALBUMARTIST
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Album Artist]"
+    *: ""
   </source>
   <dest>
-    *: "[Artista Album]"
+    *: ""
   </dest>
   <voice>
-    *: "Artista Album"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_GENRE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Genre]"
+    *: ""
   </source>
   <dest>
-    *: "[Genere]"
+    *: ""
   </dest>
   <voice>
-    *: "Genere"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMMENT
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Comment]"
+    *: ""
   </source>
   <dest>
-    *: "[Commento]"
+    *: ""
   </dest>
   <voice>
-    *: "Commento"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_COMPOSER
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Composer]"
+    *: ""
   </source>
   <dest>
-    *: "[Compositore]"
+    *: ""
   </dest>
   <voice>
-    *: "Compositore"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_YEAR
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Year]"
+    *: ""
   </source>
   <dest>
-    *: "[Anno]"
+    *: ""
   </dest>
   <voice>
-    *: "Anno"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_TRACKNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Tracknum]"
+    *: ""
   </source>
   <dest>
-    *: "[Numtraccia]"
+    *: ""
   </dest>
   <voice>
-    *: "Numero traccia"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_DISCNUM
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Discnum]"
+    *: ""
   </source>
   <dest>
-    *: "[Numdisco]"
+    *: ""
   </dest>
   <voice>
-    *: "Numero disco"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_FREQUENCY
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Frequency]"
+    *: ""
   </source>
   <dest>
-    *: "[Frequenza]"
+    *: ""
   </dest>
   <voice>
-    *: "Frequenza"
+    *: ""
   </voice>
 </phrase>
 <phrase>
   id: LANG_PROPERTIES_BITRATE
-  desc: in properties plugin
+  desc: deprecated
   user: core
   <source>
-    *: "[Bitrate]"
+    *: ""
   </source>
   <dest>
-    *: "[Bitrate]"
+    *: ""
   </dest>
   <voice>
-    *: "Bitrate"
+    *: ""
   </voice>
 </phrase>
 <phrase>
@@ -16237,5 +16237,81 @@
   </dest>
   <voice>
     *: "La cache deve prima completare l'aggiornamento!"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_TRACK_INFO
+  desc: Track Info Title
+  user: core
+  <source>
+    *: "Track Info"
+  </source>
+  <dest>
+    *: "Info Traccia"
+  </dest>
+  <voice>
+    *: "Info Traccia"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY
+  desc: play selected file/directory, in playlist context menu
+  user: core
+  <source>
+    *: "Play"
+  </source>
+  <dest>
+    *: "Riproduci"
+  </dest>
+  <voice>
+    *: "Riproduci"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_PLAY_SHUFFLED
+  desc: play selected files in shuffled order, in playlist context menu
+  user: core
+  <source>
+    *: "Play Shuffled"
+  </source>
+  <dest>
+    *: "Riproduci Casualmente"
+  </dest>
+  <voice>
+    *: "Riproduci Casualmente"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
+  desc: used in the playlist settings menu
+  user: core
+  <source>
+    *: "Keep Current Track When Replacing Playlist"
+  </source>
+  <dest>
+    *: "Mantieni La Traccia Corrente Quando Sostituisci La Playlist"
+  </dest>
+  <voice>
+    *: "Mantieni La Traccia Corrente Quando Sostituisci La Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Cancella le impostazioni quando si tiene premuto il pulsante reset durante l'avvio"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Cancella le impostazioni quando l'interruttore di blocco è attivo durante l'avvio"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Cancella le impostazioni quando si tiene premuto il pulsante reset durante l'avvio"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Cancella le impostazioni quando l'interruttore di blocco è attivo durante l'avvio"
   </voice>
 </phrase>
