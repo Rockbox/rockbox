@@ -1181,6 +1181,11 @@ Lyre prototype 1 */
 #define INCLUDE_TIMEOUT_API
 #endif /* HAVE_USB_CHARGING_ENABLE && HAVE_USBSTACK */
 
+#if defined(USB_STATUS_BY_EVENT) && defined(HAVE_USBSTACK)
+/* Status by event requires timeout for debouncing */
+# define INCLUDE_TIMEOUT_API
+#endif
+
 #ifndef SIMULATOR
 #if defined(HAVE_USBSTACK) || (CONFIG_STORAGE & STORAGE_NAND) || (CONFIG_STORAGE & STORAGE_RAMDISK)
 #define STORAGE_GET_INFO
