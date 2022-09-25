@@ -16301,3 +16301,23 @@
     *: "Zachowaj bieżący utwór podczas zastępowania listy odtwarzania"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Wyczyść ustawienia, gdy przycisk resetowania będzie przytrzymany podczas uruchamiania"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Wyczyść ustawienia, gdy przełącznik blokady będzie włączony podczas uruchamiania"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Wyczyść ustawienia, gdy przycisk resetowania będzie przytrzymany podczas uruchamiania"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Wyczyść ustawienia, gdy przełącznik blokady będzie włączony podczas uruchamiania"
+  </voice>
+</phrase>
