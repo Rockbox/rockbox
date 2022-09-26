@@ -53,6 +53,116 @@
 extern void viewport_set_buffer(struct viewport *vp,
                                 struct frame_buffer_t *buffer,
                                 const enum screen_type screen); /* viewport.c */
+
+/*
+ * In-viewport clipping functions:
+ *
+ * These clip a primitive (pixel, line, rect) given in
+ * viewport-relative coordinates to the current viewport,
+ * and translate it to screen coordinates. They return
+ * false if the resulting primitive would be off-screen.
+ */
+
+static bool LCDFN(clip_viewport_pixel)(int *x, int *y)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+
+    if(*x >= vp->width || *y >= vp->height)
+        return false;
+
+    *x += vp->x;
+    *y += vp->y;
+    return true;
+}
+
+static bool LCDFN(clip_viewport_hline)(int *x1, int *x2, int *y)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+
+    if (*y < 0 || *y > vp->height)
+        return false;
+
+    if (*x2 < *x1) {
+        int tmp = *x2;
+        *x2 = *x1;
+        *x1 = tmp;
+    }
+
+    if (*x1 < 0)
+        *x1 = 0;
+    else if (*x1 >= vp->width)
+        return false;
+
+    if (*x2 < 0)
+        return false;
+    else if (*x2 >= vp->width)
+        *x2 = vp->width - 1;
+
+    *x1 += vp->x;
+    *x2 += vp->x;
+    *y += vp->y;
+    return true;
+}
+
+static bool LCDFN(clip_viewport_vline)(int *x, int *y1, int *y2)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+
+    if (*x < 0 || *x > vp->width)
+        return false;
+
+    if (*y2 < *y1) {
+        int tmp = *y2;
+        *y2 = *y1;
+        *y1 = tmp;
+    }
+
+    if (*y1 < 0)
+        *y1 = 0;
+    else if (*y1 >= vp->height)
+        return false;
+
+    if (*y2 < 0)
+        return false;
+    else if (*y2 >= vp->height)
+        *y2 = vp->height - 1;
+
+    *x += vp->x;
+    *y1 += vp->y;
+    *y2 += vp->y;
+    return true;
+}
+
+static bool LCDFN(clip_viewport_rect)(int *x, int *y, int *width, int *height,
+                                      int *src_x, int *src_y)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+
+    if (*x < 0) {
+        *width += *x;
+        if (src_x)
+            *src_x -= *x;
+        *x = 0;
+    }
+
+    if (*y < 0) {
+        *height += *y;
+        if (src_y)
+            *src_y -= *y;
+        *y = 0;
+    }
+
+    if (*x + *width > vp->width)
+        *width = vp->width - *x;
+
+    if (*y + *height > vp->height)
+        *height = vp->height - *y;
+
+    *x += vp->x;
+    *y += vp->y;
+    return *width > 0 && *height > 0;
+}
+
 /*
  * draws the borders of the current viewport
  **/

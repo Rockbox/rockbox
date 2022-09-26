@@ -54,46 +54,23 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                                       int stride_image, int stride_src);
 
 #include "lcd-color-common.c"
-#include "lcd-16bit-common.c"
 #include "lcd-bitmap-common.c"
+#include "lcd-16bit-common.c"
 
 /*** drawing functions ***/
 
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
-    int x;
     fb_data *dst, *dst_end;
     int stride_dst;
 
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[lcd_current_viewport->drawmode];
 
-    /* direction flip */
-    if (x2 < x1)
-    {
-        x = x1;
-        x1 = x2;
-        x2 = x;
-    }
-
-    /******************** In viewport clipping **********************/
-    /* nothing to draw? */
-    if (((unsigned)y >= (unsigned)lcd_current_viewport->height) ||
-        (x1 >= lcd_current_viewport->width) ||
-        (x2 < 0))
+    if (!lcd_clip_viewport_hline(&x1, &x2, &y))
         return;
 
-    if (x1 < 0)
-        x1 = 0;
-    if (x2 >= lcd_current_viewport->width)
-        x2 = lcd_current_viewport->width-1;
-
-    /* Adjust x1 and y to viewport */
-    x1 += lcd_current_viewport->x;
-    x2 += lcd_current_viewport->x;
-    y += lcd_current_viewport->y;
-
-    dst = FBADDR(x1 , y );
+    dst = FBADDR(x1, y);
     stride_dst = lcd_current_viewport->buffer->stride;
     dst_end = dst + (x2 - x1) * stride_dst;
 
@@ -108,35 +85,13 @@ void lcd_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
-    int y, height;
+    int height;
     unsigned bits = 0;
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
 
-    /* direction flip */
-    if (y2 < y1)
-    {
-        y = y1;
-        y1 = y2;
-        y2 = y;
-    }
-
-    /******************** In viewport clipping **********************/
-    /* nothing to draw? */
-    if (((unsigned)x >= (unsigned)lcd_current_viewport->width) ||
-        (y1 >= lcd_current_viewport->height) ||
-        (y2 < 0))
+    if(!lcd_clip_viewport_vline(&x, &y1, &y2))
         return;
-
-    if (y1 < 0)
-        y1 = 0;
-    if (y2 >= lcd_current_viewport->height)
-        y2 = lcd_current_viewport->height-1;
-
-    /* adjust for viewport */
-    x += lcd_current_viewport->x;
-    y1 += lcd_current_viewport->y;
-    y2 += lcd_current_viewport->y;
 
     height = y2 - y1 + 1;
 
@@ -194,33 +149,9 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 {
     fb_data *dst;
     int stride_dst;
-    /******************** Image in viewport clipping **********************/
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width) ||
-        (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
+
+    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
         return;
-
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-
-    if (x + width > lcd_current_viewport->width)
-        width = lcd_current_viewport->width - x;
-    if (y + height > lcd_current_viewport->height)
-        height = lcd_current_viewport->height - y;
-
-    /* adjust for viewport */
-    x += lcd_current_viewport->x;
-    y += lcd_current_viewport->y;
 
     src += stride * src_x + src_y; /* move starting point */
     dst = FBADDR(x, y);
@@ -244,33 +175,8 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     fb_data *dst, *dst_end;
     int stride_dst;
 
-    /******************** Image in viewport clipping **********************/
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= lcd_current_viewport->width) ||
-        (y >= lcd_current_viewport->height) || (x + width <= 0) || (y + height <= 0))
+    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
         return;
-
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-
-    if (x + width > lcd_current_viewport->width)
-        width = lcd_current_viewport->width - x;
-    if (y + height > lcd_current_viewport->height)
-        height = lcd_current_viewport->height - y;
-
-    /* adjust for viewport */
-    x += lcd_current_viewport->x;
-    y += lcd_current_viewport->y;
 
     src += stride * src_x + src_y; /* move starting point */
     dst = FBADDR(x, y);

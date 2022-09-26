@@ -92,6 +92,8 @@ static void *LCDFN(frameaddress_default)(int x, int y)
     return fb->FBFN(ptr) + element;/*(element % fb->elems);*/
 }
 
+#include "lcd-bitmap-common.c"
+
 /* LCD init */
 void LCDFN(init)(void)
 {
@@ -272,10 +274,8 @@ void LCDFN(clear_viewport)(void)
 /* Set a single pixel */
 void LCDFN(drawpixel)(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)CURRENT_VP->width)
-        && ((unsigned)y < (unsigned)CURRENT_VP->height)
-        )
-        LCDFN(pixelfuncs)[CURRENT_VP->drawmode](CURRENT_VP->x + x, CURRENT_VP->y + y);
+    if (LCDFN(clip_viewport_pixel)(&x, &y))
+        LCDFN(pixelfuncs)[CURRENT_VP->drawmode](x, y);
 }
 
 /* Draw a line */
@@ -287,6 +287,7 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
     int d, dinc1, dinc2;
     int x, xinc1, xinc2;
     int y, yinc1, yinc2;
+    int x_vp, y_vp, w_vp, h_vp;
     LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[CURRENT_VP->drawmode];
 
     deltax = abs(x2 - x1);
@@ -341,12 +342,15 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
     x = x1;
     y = y1;
 
+    x_vp = CURRENT_VP->x;
+    y_vp = CURRENT_VP->y;
+    w_vp = CURRENT_VP->width;
+    h_vp = CURRENT_VP->height;
+
     for (i = 0; i < numpixels; i++)
     {
-        if (   ((unsigned)x < (unsigned)CURRENT_VP->width)
-            && ((unsigned)y < (unsigned)CURRENT_VP->height)
-            )
-            pfunc(CURRENT_VP->x + x, CURRENT_VP->y + y);
+        if (x >= 0 && y >= 0 && x < w_vp && y < h_vp)
+            pfunc(x + x_vp, y + y_vp);
 
         if (d < 0)
         {
@@ -366,34 +370,13 @@ void LCDFN(drawline)(int x1, int y1, int x2, int y2)
 /* Draw a horizontal line (optimised) */
 void LCDFN(hline)(int x1, int x2, int y)
 {
-    int x, width;
+    int width;
     unsigned char *dst, *dst_end;
     unsigned mask;
     LCDFN(blockfunc_type) *bfunc;
 
-    /* direction flip */
-    if (x2 < x1)
-    {
-        x = x1;
-        x1 = x2;
-        x2 = x;
-    }
-
-    /******************** In viewport clipping **********************/
-    /* nothing to draw? */
-    if (((unsigned)y >= (unsigned)CURRENT_VP->height) || (x1 >= CURRENT_VP->width)
-        || (x2 < 0))
+    if (!LCDFN(clip_viewport_hline)(&x1, &x2, &y))
         return;
-
-    if (x1 < 0)
-        x1 = 0;
-    if (x2 >= CURRENT_VP->width)
-        x2 = CURRENT_VP->width-1;
-
-    /* adjust to viewport */
-    x1 += CURRENT_VP->x;
-    x2 += CURRENT_VP->x;
-    y += CURRENT_VP->y;
 
     width = x2 - x1 + 1;
 
@@ -416,29 +399,8 @@ void LCDFN(vline)(int x, int y1, int y2)
     unsigned mask, mask_bottom;
     LCDFN(blockfunc_type) *bfunc;
 
-    /* direction flip */
-    if (y2 < y1)
-    {
-        ny = y1;
-        y1 = y2;
-        y2 = ny;
-    }
-
-    /******************** In viewport clipping **********************/
-    /* nothing to draw? */
-    if (((unsigned)x >= (unsigned)CURRENT_VP->width) || (y1 >= CURRENT_VP->height)
-        || (y2 < 0))
+    if (!LCDFN(clip_viewport_vline)(&x, &y1, &y2))
         return;
-
-    if (y1 < 0)
-        y1 = 0;
-    if (y2 >= CURRENT_VP->height)
-        y2 = CURRENT_VP->height-1;
-
-    /* adjust for viewport */
-    y1 += CURRENT_VP->y;
-    y2 += CURRENT_VP->y;
-    x += CURRENT_VP->x;
 
     bfunc = LCDFN(blockfuncs)[CURRENT_VP->drawmode];
     dst   = LCDFB(x,y1>>3);
@@ -483,30 +445,8 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     LCDFN(blockfunc_type) *bfunc;
     bool fillopt = false;
 
-    /******************** In viewport clipping **********************/
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= CURRENT_VP->width)
-        || (y >= CURRENT_VP->height) || (x + width <= 0) || (y + height <= 0))
+    if (!LCDFN(clip_viewport_rect)(&x, &y, &width, &height, NULL, NULL))
         return;
-
-    if (x < 0)
-    {
-        width += x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        y = 0;
-    }
-    if (x + width > CURRENT_VP->width)
-        width = CURRENT_VP->width - x;
-    if (y + height > CURRENT_VP->height)
-        height = CURRENT_VP->height - y;
-
-    /* adjust for viewport */
-    x += CURRENT_VP->x;
-    y += CURRENT_VP->y;
 
     if (CURRENT_VP->drawmode & DRMODE_INVERSEVID)
     {
@@ -582,33 +522,8 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     unsigned mask, mask_bottom;
     LCDFN(blockfunc_type) *bfunc;
 
-    /******************** Image in viewport clipping **********************/
-    /* nothing to draw? */
-    if ((width <= 0) || (height <= 0) || (x >= CURRENT_VP->width)
-        || (y >= CURRENT_VP->height) || (x + width <= 0) || (y + height <= 0))
+    if (!LCDFN(clip_viewport_rect)(&x, &y, &width, &height, &src_x, &src_y))
         return;
-
-    /* clip image in viewport */
-    if (x < 0)
-    {
-        width += x;
-        src_x -= x;
-        x = 0;
-    }
-    if (y < 0)
-    {
-        height += y;
-        src_y -= y;
-        y = 0;
-    }
-    if (x + width > CURRENT_VP->width)
-        width = CURRENT_VP->width - x;
-    if (y + height > CURRENT_VP->height)
-        height = CURRENT_VP->height - y;
-
-    /* adjust for viewport */
-    x += CURRENT_VP->x;
-    y += CURRENT_VP->y;
 
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
     src_y  &= 7;
@@ -696,5 +611,3 @@ void LCDFN(bitmap)(const unsigned char *src, int x, int y, int width,
 {
     LCDFN(bitmap_part)(src, 0, 0, width, x, y, width, height);
 }
-
-#include "lcd-bitmap-common.c"

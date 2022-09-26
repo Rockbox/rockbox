@@ -40,6 +40,7 @@ static fb_data lcd_static_framebuffer[LCD_FBHEIGHT][LCD_FBWIDTH]
     IRAM_LCDFRAMEBUFFER CACHEALIGN_AT_LEAST_ATTR(16);
 
 static void *lcd_frameaddress_default(int x, int y);
+static bool lcd_clip_viewport_pixel(int *x, int *y);
 
 static fb_data* lcd_backdrop = NULL;
 static long lcd_backdrop_offset IDATA_ATTR = 0;
@@ -196,10 +197,8 @@ fb_data* lcd_get_backdrop(void)
 /* Set a single pixel */
 void lcd_drawpixel(int x, int y)
 {
-    if (   ((unsigned)x < (unsigned)lcd_current_viewport->width)
-        && ((unsigned)y < (unsigned)lcd_current_viewport->height)
-        )
-        lcd_fastpixelfuncs[lcd_current_viewport->drawmode](FBADDR(lcd_current_viewport->x+x, lcd_current_viewport->y+y));
+    if (lcd_clip_viewport_pixel(&x, &y))
+        lcd_fastpixelfuncs[lcd_current_viewport->drawmode](FBADDR(x, y));
 }
 
 /* Draw a line */
@@ -274,11 +273,8 @@ void lcd_drawline(int x1, int y1, int x2, int y2)
 
     for (i = 0; i < numpixels; i++)
     {
-        if ((x >= 0 && y >= 0)
-            && (x < w_vp)
-            && (y < h_vp)
-            )
-            pfunc(fbaddr( x + x_vp, y + y_vp));
+        if (x >= 0 && y >= 0 && x < w_vp && y < h_vp)
+            pfunc(fbaddr(x + x_vp, y + y_vp));
 
         if (d < 0)
         {
@@ -401,7 +397,7 @@ void lcd_gradient_fillrect_part(int x, int y, int width, int height,
     x1 = x;
     x2 = x + width;
 
-    if (height == 0) return;
+    if (height <= 0) return;
 
     step_mul = (1 << 16) / src_height;
     int h_r = RGB_UNPACK_RED(start_rgb);
