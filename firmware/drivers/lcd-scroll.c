@@ -185,10 +185,9 @@ static void LCDFN(scroll_worker)(void)
 {
     int index;
     bool makedelay;
-    bool is_default;
     struct scroll_screen_info *si = &LCDFN(scroll_info);
     struct scrollinfo *s;
-    struct viewport *vp;
+    struct viewport *oldvp;
     int step;
 
     for ( index = 0; index < si->lines; index++ )
@@ -206,8 +205,7 @@ static void LCDFN(scroll_worker)(void)
          * is unaware of the swapped viewports. the vp must
          * be switched early so that lcd_getstringsize() picks the
          * correct font */
-        vp = LCDFN(get_viewport)(&is_default);
-        LCDFN(set_viewport_ex)(s->vp, 0); /* don't mark the last vp as dirty */
+        oldvp = LCDFN(set_viewport_ex)(s->vp, 0); /* don't mark the last vp as dirty */
 
         makedelay = false;
         step = si->step;
@@ -220,7 +218,7 @@ static void LCDFN(scroll_worker)(void)
         /* put the line onto the display now */
         makedelay = LCDFN(scroll_now(s));
 
-        LCDFN(set_viewport_ex)(vp, 0); /* don't mark the last vp as dirty */
+        LCDFN(set_viewport_ex)(oldvp, 0); /* don't mark the last vp as dirty */
 
         if (makedelay)
             s->start_tick += si->delay + si->ticks;

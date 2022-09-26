@@ -271,18 +271,6 @@ struct viewport* LCDFN(set_viewport)(struct viewport* vp)
     return LCDFN(set_viewport_ex)(vp, VP_FLAG_VP_DIRTY);
 }
 
-struct viewport *LCDFN(get_viewport)(bool *is_default)
-{
-#if 0
-    *is_default = memcmp(LCDFN(current_viewport),
-                         &default_vp, sizeof(struct viewport)) == 0;
-#else
-    *is_default = LCDFN(current_viewport) == &default_vp;
-#endif
-
-    return LCDFN(current_viewport);
-}
-
 void LCDFN(update_viewport)(void)
 {
 

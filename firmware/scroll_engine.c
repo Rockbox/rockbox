@@ -37,14 +37,6 @@
 #endif
 #include "scroll_engine.h"
 
-
-/* private helper function for the scroll engine. Do not use in apps/.
- * defined in lcd-bitmap-common.c */
-extern struct viewport *lcd_get_viewport(bool *is_defaut);
-#ifdef HAVE_REMOTE_LCD
-extern struct viewport *lcd_remote_get_viewport(bool *is_defaut);
-#endif
-
 static const char scroll_tick_table[18] = {
  /* Hz values [f(x)=100.8/(x+.048)]:
     1, 1.25, 1.55, 2, 2.5, 3.12, 4, 5, 6.25, 8.33, 10, 12.5, 16.7, 20, 25, 33, 49.2, 96.2 */
