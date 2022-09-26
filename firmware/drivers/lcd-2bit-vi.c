@@ -452,102 +452,6 @@ void LCDFN(clear_viewport)(void)
     CURRENT_VP->flags &= ~(VP_FLAG_VP_SET_CLEAN);
 }
 
-/* Set a single pixel */
-void LCDFN(drawpixel)(int x, int y)
-{
-    if (LCDFN(clip_viewport_pixel)(&x, &y))
-        LCDFN(pixelfuncs)[CURRENT_VP->drawmode](x, y);
-}
-
-/* Draw a line */
-void LCDFN(drawline)(int x1, int y1, int x2, int y2)
-{
-    int numpixels;
-    int i;
-    int deltax, deltay;
-    int d, dinc1, dinc2;
-    int x, xinc1, xinc2;
-    int y, yinc1, yinc2;
-    int x_vp, y_vp, w_vp, h_vp;
-    LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[CURRENT_VP->drawmode];
-
-    deltax = abs(x2 - x1);
-    if (deltax == 0)
-    {
-        /* DEBUGF(LCDNAME "drawline() called for vertical line - optimisation.\n"); */
-        LCDFN(vline)(x1, y1, y2);
-        return;
-    }
-    deltay = abs(y2 - y1);
-    if (deltay == 0)
-    {
-        /* DEBUGF(LCDNAME "drawline() called for horizontal line - optimisation.\n"); */
-        LCDFN(hline)(x1, x2, y1);
-        return;
-    }
-    xinc2 = 1;
-    yinc2 = 1;
-
-    if (deltax >= deltay)
-    {
-        numpixels = deltax;
-        d = 2 * deltay - deltax;
-        dinc1 = deltay * 2;
-        dinc2 = (deltay - deltax) * 2;
-        xinc1 = 1;
-        yinc1 = 0;
-    }
-    else
-    {
-        numpixels = deltay;
-        d = 2 * deltax - deltay;
-        dinc1 = deltax * 2;
-        dinc2 = (deltax - deltay) * 2;
-        xinc1 = 0;
-        yinc1 = 1;
-    }
-    numpixels++; /* include endpoints */
-
-    if (x1 > x2)
-    {
-        xinc1 = -xinc1;
-        xinc2 = -xinc2;
-    }
-
-    if (y1 > y2)
-    {
-        yinc1 = -yinc1;
-        yinc2 = -yinc2;
-    }
-
-    x = x1;
-    y = y1;
-
-    x_vp = CURRENT_VP->x;
-    y_vp = CURRENT_VP->y;
-    w_vp = CURRENT_VP->width;
-    h_vp = CURRENT_VP->height;
-
-    for (i = 0; i < numpixels; i++)
-    {
-        if (x >= 0 && y >= 0 && x < w_vp && y < h_vp)
-            pfunc(x + x_vp, y + y_vp);
-
-        if (d < 0)
-        {
-            d += dinc1;
-            x += xinc1;
-            y += yinc1;
-        }
-        else
-        {
-            d += dinc2;
-            x += xinc2;
-            y += yinc2;
-        }
-    }
-}
-
 /* Draw a horizontal line (optimised) */
 void LCDFN(hline)(int x1, int x2, int y)
 {
@@ -600,21 +504,6 @@ void LCDFN(vline)(int x, int y1, int y2)
     }
     mask &= mask_bottom;
     bfunc(dst, mask, 0xFFFFu);
-}
-
-/* Draw a rectangular box */
-void LCDFN(drawrect)(int x, int y, int width, int height)
-{
-    if ((width <= 0) || (height <= 0))
-        return;
-
-    int x2 = x + width - 1;
-    int y2 = y + height - 1;
-
-    LCDFN(vline)(x, y, y2);
-    LCDFN(vline)(x2, y, y2);
-    LCDFN(hline)(x, x2, y);
-    LCDFN(hline)(x, x2, y2);
 }
 
 /* Fill a rectangular area */

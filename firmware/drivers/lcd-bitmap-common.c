@@ -67,7 +67,8 @@ static bool LCDFN(clip_viewport_pixel)(int *x, int *y)
 {
     struct viewport *vp = LCDFN(current_viewport);
 
-    if(*x >= vp->width || *y >= vp->height)
+    if (*x < 0 || *x >= vp->width ||
+        *y < 0 || *y >= vp->height)
         return false;
 
     *x += vp->x;
@@ -804,4 +805,129 @@ void LCDFN(nine_segment_bmp)(const struct bitmap* bm, int x, int y,
     LCDFN(bmp_part)(bm, 0, bm->width - corner_h, 0, height - corner_h, corner_w, corner_h);
     LCDFN(bmp_part)(bm, bm->width - corner_w, bm->width - corner_h,
             width - corner_w, height - corner_h, corner_w, corner_h);
+}
+
+void LCDFN(drawpixel)(int x, int y)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+    if (LCDFN(clip_viewport_pixel(&x, &y)))
+    {
+#if LCDM(DEPTH) >= 8
+        LCDFN(fastpixelfunc_type) *pfunc = LCDFN(fastpixelfuncs)[vp->drawmode];
+        void *(*fbaddr)(int x, int y) = vp->buffer->get_address_fn;
+        pfunc(fbaddr(x, y));
+#else
+        LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[vp->drawmode];
+        pfunc(x, y);
+#endif
+    }
+}
+
+void LCDFN(drawline)(int x1, int y1, int x2, int y2)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+    int numpixels;
+    int i;
+    int deltax, deltay;
+    int d, dinc1, dinc2;
+    int x, xinc1, xinc2;
+    int y, yinc1, yinc2;
+
+    deltay = abs(y2 - y1);
+    if (deltay == 0)
+    {
+        lcd_hline(x1, x2, y1);
+        return;
+    }
+
+    deltax = abs(x2 - x1);
+    if (deltax == 0)
+    {
+        lcd_vline(x1, y1, y2);
+        return;
+    }
+
+    xinc2 = 1;
+    yinc2 = 1;
+
+    if (deltax >= deltay)
+    {
+        numpixels = deltax;
+        d = 2 * deltay - deltax;
+        dinc1 = deltay * 2;
+        dinc2 = (deltay - deltax) * 2;
+        xinc1 = 1;
+        yinc1 = 0;
+    }
+    else
+    {
+        numpixels = deltay;
+        d = 2 * deltax - deltay;
+        dinc1 = deltax * 2;
+        dinc2 = (deltax - deltay) * 2;
+        xinc1 = 0;
+        yinc1 = 1;
+    }
+    numpixels++; /* include endpoints */
+
+    if (x1 > x2)
+    {
+        xinc1 = -xinc1;
+        xinc2 = -xinc2;
+    }
+
+    if (y1 > y2)
+    {
+        yinc1 = -yinc1;
+        yinc2 = -yinc2;
+    }
+
+    x = x1;
+    y = y1;
+
+#if LCDM(DEPTH) >= 8
+    LCDFN(fastpixelfunc_type) *pfunc = LCDFN(fastpixelfuncs)[vp->drawmode];
+    void *(*fbaddr)(int x, int y) = vp->buffer->get_address_fn;
+#else
+    LCDFN(pixelfunc_type) *pfunc = LCDFN(pixelfuncs)[vp->drawmode];
+#endif
+
+    for (i = 0; i < numpixels; i++)
+    {
+        if (x >= 0 && y >= 0 && x < vp->width && y < vp->height)
+        {
+#if LCDM(DEPTH) >= 8
+            pfunc(fbaddr(x + vp->x, y + vp->y));
+#else
+            pfunc(x + vp->x, y + vp->y);
+#endif
+        }
+
+        if (d < 0)
+        {
+            d += dinc1;
+            x += xinc1;
+            y += yinc1;
+        }
+        else
+        {
+            d += dinc2;
+            x += xinc2;
+            y += yinc2;
+        }
+    }
+}
+
+void LCDFN(drawrect)(int x, int y, int width, int height)
+{
+    if ((width <= 0) || (height <= 0))
+        return;
+
+    int x2 = x + width - 1;
+    int y2 = y + height - 1;
+
+    LCDFN(vline)(x, y, y2);
+    LCDFN(vline)(x2, y, y2);
+    LCDFN(hline)(x, x2, y);
+    LCDFN(hline)(x, x2, y2);
 }
