@@ -234,6 +234,7 @@ common/pathfuncs.c
 common/fdprintf.c
 common/linked_list.c
 common/rb_namespace.c
+common/rectangle.c
 common/strcasecmp.c
 common/strcasestr.c
 common/strnatcmp.c
