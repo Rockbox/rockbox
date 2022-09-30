@@ -83,7 +83,7 @@ static void *LCDFN(frameaddress_default)(int x, int y)
 {
     /* the default expects a buffer the same size as the screen */
     struct frame_buffer_t *fb = CURRENT_VP->buffer;
-#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if defined(MAIN_LCD) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
     size_t element = (x * LCDM(NATIVE_STRIDE)(fb->stride)) + y;
 #else
     size_t element = (y * LCDM(NATIVE_STRIDE)(fb->stride)) + x;
