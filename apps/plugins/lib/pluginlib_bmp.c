@@ -94,7 +94,7 @@ int save_bmp_file( char* filename, struct bitmap *bm )
 */
 void simple_resize_bitmap(struct bitmap *src, struct bitmap *dst)
 {
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
     const int srcw = src->height;
     const int srch = src->width;
     const int dstw = dst->height;

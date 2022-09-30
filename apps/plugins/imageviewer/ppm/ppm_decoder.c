@@ -177,7 +177,7 @@ static int read_ppm_row(int fd, struct ppm_info *ppm, int row)
     int col;
     int r, g, b;
 #ifdef HAVE_LCD_COLOR
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
     fb_data *dst = (fb_data *) ppm->buf + row;
     const int stride = ppm->x;
 #else

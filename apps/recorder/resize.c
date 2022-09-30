@@ -593,7 +593,7 @@ static inline bool scale_v_linear(struct rowset *rset,
 static void output_row_32_native_fromyuv(uint32_t row, void * row_in,
                                struct scaler_context *ctx)
 {
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define DEST_STEP   (ctx->bm->height)
 #define Y_STEP      (1)
 #else

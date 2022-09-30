@@ -82,7 +82,7 @@ enum screen_type {
 
 struct scrollinfo;
 
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define STRIDE_MAIN(w, h)   (h)
 #else
 #define STRIDE_MAIN(w, h)   (w)
@@ -496,7 +496,7 @@ typedef void lcd_blockfunc_type(fb_data *address, unsigned mask, unsigned bits);
 #endif
 
 #ifndef LCD_NBELEMS
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define LCD_NBELEMS(w, h) (((w-1)*STRIDE_MAIN(w, h)) + h)
 #else
 #define LCD_NBELEMS(w, h) (((h-1)*STRIDE_MAIN(w, h)) + w)

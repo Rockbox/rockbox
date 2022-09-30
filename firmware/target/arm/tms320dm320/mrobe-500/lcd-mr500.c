@@ -38,7 +38,7 @@
 
 #if CONFIG_ORIENTATION == SCREEN_PORTRAIT
 #define LCD_USE_DMA
-#elif defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#elif LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define LCD_USE_DMA
 #endif
 
@@ -511,7 +511,7 @@ void lcd_update_rect(int x, int y, int width, int height)
 
 #else
 
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 
 #if defined(LCD_USE_DMA)
     dma_start_transfer16( (char *)FBADDR(0,0), x, y, LCD_HEIGHT, 

@@ -1465,7 +1465,7 @@ static void rb_blitter_free(void *handle, blitter *bl)
 static void rb_blitter_save(void *handle, blitter *bl, int x, int y)
 {
     /* no viewport offset */
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #error no vertical stride
 #else
     if(bl && bl->bmp.data)

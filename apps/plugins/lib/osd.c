@@ -106,10 +106,10 @@ static struct osd grey_osd;
 #    error Unknown 2-bit format; please define macros
 #  endif /* LCD_PIXELFORMAT */
 #elif LCD_DEPTH == 16
-#  if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#  if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #    define _OSD_HEIGHT2BYTES(h)   ((h)*2)
 #    define _OSD_BYTES2HEIGHT(b)   ((b)/2)
-#  else /* !defined(LCD_STRIDEFORMAT) || LCD_STRIDEFORMAT != VERTICAL_STRIDE */
+#  else /* LCD_STRIDEFORMAT != VERTICAL_STRIDE */
 #    define _OSD_WIDTH2BYTES(w)    ((w)*2)
 #    define _OSD_BYTES2WIDTH(b)    ((b)/2)
 #  endif /* end stride type selection */
@@ -160,7 +160,7 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
 
     rb->viewport_set_fullscreen(&osd->vp, SCREEN_MAIN);
 
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
     int colbytes = _OSD_HEIGHT2BYTES(LCD_HEIGHT);
     int bytecols = *bufsize / colbytes;
     int w = _OSD_BYTES2WIDTH(bytecols);
@@ -193,7 +193,7 @@ static void * _osd_lcd_init_buffers(struct osd *osd, unsigned flags,
     w = _OSD_BYTES2WIDTH(_OSD_WIDTH2BYTES(w));
     osd->lcd_bitmap_stride = _OSD_BYTES2HEIGHT(_OSD_HEIGHT2BYTES(LCD_HEIGHT));
     osd->back_bitmap_stride = h;
-#else /* !defined(LCD_STRIDEFORMAT) || LCD_STRIDEFORMAT != VERTICAL_STRIDE */
+#else /* LCD_STRIDEFORMAT != VERTICAL_STRIDE */
     int rowbytes = _OSD_WIDTH2BYTES(LCD_WIDTH);
     int byterows = *bufsize / rowbytes;
     int w = _OSD_BYTES2WIDTH(rowbytes);

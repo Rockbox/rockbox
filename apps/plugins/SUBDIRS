@@ -9,8 +9,7 @@ clock
 #endif
 
 /* color horizontal-stride LCDs */
-#if defined(HAVE_LCD_COLOR) && \
-    (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE))
+#if defined(HAVE_LCD_COLOR) && (LCD_STRIDEFORMAT == HORIZONTAL_STRIDE)
 xworld
 
 /* for duke3d, wolf3d and quake */

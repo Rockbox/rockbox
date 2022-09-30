@@ -785,7 +785,7 @@ static fb_data *lcd_fb;
 /* No standard get_pixel function yet, use this hack instead */
 #if (LCD_DEPTH >= 8)
 
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 static inline fb_data get_pixel(int x, int y)
 {
     return lcd_fb[x*LCD_HEIGHT+y];

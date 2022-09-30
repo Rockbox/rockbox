@@ -130,7 +130,7 @@ static void *test_address_fn(int x, int y)
 
     struct frame_buffer_t *fb = vp0.buffer;
 /* LCD_STRIDEFORMAT & LCD_NATIVE_STRIDE macros allow Horiz screens to work with RB */
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
     size_t element = (x * LCD_NATIVE_STRIDE(fb->stride)) + y;
 #else
     size_t element = (y * LCD_NATIVE_STRIDE(fb->stride)) + x;

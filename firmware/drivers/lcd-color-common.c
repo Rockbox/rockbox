@@ -76,7 +76,7 @@ static void *lcd_frameaddress_default(int x, int y)
     /* the default expects a buffer the same size as the screen */
     struct frame_buffer_t *fb = lcd_current_viewport->buffer;
 
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
     size_t element = (x * LCD_NATIVE_STRIDE(fb->stride)) + y;
 #else
     size_t element = (y * LCD_NATIVE_STRIDE(fb->stride)) + x;

@@ -496,7 +496,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
                 for (int i = 0; i < w / 2; ++i) {
                     uint8_t pix1 = *(buf + i) >> 4;
                     uint8_t pix2 = *(buf + i) & 0xF;
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
                     framebuffer[( (h * 2)    ) * 320 + i] = sys->palette[pix1];
                     framebuffer[( (h * 2) + 1) * 320 + i] = sys->palette[pix2];
 #else
@@ -515,7 +515,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
                 for (int i = 0; i < w / 2; ++i) {
                     uint8_t pix1 = *(buf + i) >> 4;
                     uint8_t pix2 = *(buf + i) & 0xF;
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
                     framebuffer[(200 - h * 2    ) * 320 + ( 320 - i )] = sys->palette[pix1];
                     framebuffer[(200 - h * 2 - 1) * 320 + ( 320 - i )] = sys->palette[pix2];
 #else
@@ -531,7 +531,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
     else
     {
         int next = 0;
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
         for(int x = 0; x < w / 2; ++x)
         {
             for(int y = 0; y < h; ++y)
@@ -565,7 +565,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
         struct bitmap in_bmp;
         if(sys->settings.rotation_option)
         {
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
             in_bmp.width = 320;
             in_bmp.height = 200;
 #else
@@ -575,7 +575,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
         }
         else
         {
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
             in_bmp.width = 200;
             in_bmp.height = 320;
 #else
@@ -600,7 +600,7 @@ void sys_copyRect(struct System* sys, uint16_t x, uint16_t y, uint16_t w, uint16
     }
     else
     {
-#if defined(LCD_STRIDEFORMAT) && (LCD_STRIDEFORMAT == VERTICAL_STRIDE)
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
         for(int x = 0; x < 320; ++x)
         {
             for(int y = 0; y < 200; ++y)

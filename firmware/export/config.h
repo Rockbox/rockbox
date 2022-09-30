@@ -772,6 +772,11 @@ Lyre prototype 1 */
 #define LCD_SPLIT_LINES 0
 #endif
 
+/* Most displays have a horizontal stride */
+#ifndef LCD_STRIDEFORMAT
+# define LCD_STRIDEFORMAT HORIZONTAL_STRIDE
+#endif
+
 /* Simulator LCD dimensions. Set to standard dimensions if undefined */
 #ifndef SIM_LCD_WIDTH
 #define SIM_LCD_WIDTH LCD_WIDTH
@@ -978,8 +983,7 @@ Lyre prototype 1 */
     || defined(CPU_S5L870X) || (CONFIG_CPU == S3C2440) \
     || defined(APPLICATION) || (CONFIG_CPU == PP5002) \
     || (CONFIG_CPU == RK27XX) || (CONFIG_CPU == IMX233) ||              \
-    (defined(HAVE_LCD_COLOR) &&                                         \
-     (!defined(LCD_STRIDEFORMAT) || (LCD_STRIDEFORMAT != VERTICAL_STRIDE)))
+    (defined(HAVE_LCD_COLOR) && (LCD_STRIDEFORMAT == HORIZONTAL_STRIDE))
 #define HAVE_SEMAPHORE_OBJECTS
 #endif
 

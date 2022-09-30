@@ -30,7 +30,7 @@
 static const unsigned short patterns[4] = {0xFFFF, 0xFF00, 0x00FF, 0x0000};
 #endif
 
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 void xlcd_scroll_left(int count)
 {
     /*size_t dst_stride;*/
@@ -668,4 +668,4 @@ void xlcd_scroll_down(int count)
 }
 
 #endif /* LCD_PIXELFORMAT, LCD_DEPTH */
-#endif /* defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE */
+#endif /* LCD_STRIDEFORMAT == VERTICAL_STRIDE */

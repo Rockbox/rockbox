@@ -3101,7 +3101,7 @@ static void render_slide(struct slide_data *slide, const int alpha)
 
         const pix_t *ptr = &src[column * bmp->height];
 
-#if   defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
 #define PIXELSTEP_Y   1
 #define LCDADDR(x, y) (&buffer[BUFFER_HEIGHT*(x) + (y)])
 #else

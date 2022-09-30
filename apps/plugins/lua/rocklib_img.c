@@ -380,7 +380,7 @@ static inline fb_data* rli_get_element(struct rocklua_image* img, int x, int y)
 
     pixel_to_native(x, y, &x, &y);
 
-#if defined(LCD_STRIDEFORMAT) && LCD_STRIDEFORMAT == VERTICAL_STRIDE
+#if LCD_STRIDEFORMAT == VERTICAL_STRIDE
     /* column major address */
     size_t data_address = (stride * (x - 1)) + (y - 1);
 
