@@ -164,6 +164,52 @@ static bool LCDFN(clip_viewport_rect)(int *x, int *y, int *width, int *height,
     return *width > 0 && *height > 0;
 }
 
+/*** parameter handling ***/
+
+void LCDFN(set_drawmode)(int mode)
+{
+    LCDFN(current_viewport)->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
+}
+
+int LCDFN(get_drawmode)(void)
+{
+    return LCDFN(current_viewport)->drawmode;
+}
+
+int LCDFN(getwidth)(void)
+{
+    return LCDFN(current_viewport)->width;
+}
+
+int LCDFN(getheight)(void)
+{
+    return LCDFN(current_viewport)->height;
+}
+
+void LCDFN(setfont)(int newfont)
+{
+    LCDFN(current_viewport)->font = newfont;
+}
+
+int LCDFN(getfont)(void)
+{
+    return LCDFN(current_viewport)->font;
+}
+
+int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
+{
+    return font_getstringsize(str, w, h, LCDFN(current_viewport)->font);
+}
+
+#if LCDM(DEPTH) > 1
+void LCDFN(set_drawinfo)(int mode, unsigned foreground, unsigned background)
+{
+    LCDFN(set_drawmode)(mode);
+    LCDFN(set_foreground)(foreground);
+    LCDFN(set_background)(background);
+}
+#endif
+
 /*
  * draws the borders of the current viewport
  **/

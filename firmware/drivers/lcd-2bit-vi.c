@@ -136,16 +136,6 @@ unsigned lcd_remote_color_to_native(unsigned color)
 }
 #endif
 
-void LCDFN(set_drawmode)(int mode)
-{
-    CURRENT_VP->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
-}
-
-int LCDFN(get_drawmode)(void)
-{
-    return CURRENT_VP->drawmode;
-}
-
 void LCDFN(set_foreground)(unsigned brightness)
 {
     CURRENT_VP->fg_pattern = brightness;
@@ -166,38 +156,6 @@ void LCDFN(set_background)(unsigned brightness)
 unsigned LCDFN(get_background)(void)
 {
     return CURRENT_VP->bg_pattern;
-}
-
-void LCDFN(set_drawinfo)(int mode, unsigned fg_brightness,
-                         unsigned bg_brightness)
-{
-    LCDFN(set_drawmode)(mode);
-    LCDFN(set_foreground)(fg_brightness);
-    LCDFN(set_background)(bg_brightness);
-}
-
-int LCDFN(getwidth)(void)
-{
-    return CURRENT_VP->width;
-}
-
-int LCDFN(getheight)(void)
-{
-    return CURRENT_VP->height;
-}
-void LCDFN(setfont)(int newfont)
-{
-    CURRENT_VP->font = newfont;
-}
-
-int LCDFN(getfont)(void)
-{
-    return CURRENT_VP->font;
-}
-
-int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
-{
-    return font_getstringsize(str, w, h, CURRENT_VP->font);
 }
 
 /*** low-level drawing functions ***/

@@ -108,43 +108,6 @@ void LCDFN(init)(void)
 
 }
 
-/*** parameter handling ***/
-
-void LCDFN(set_drawmode)(int mode)
-{
-    CURRENT_VP->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
-}
-
-int LCDFN(get_drawmode)(void)
-{
-    return CURRENT_VP->drawmode;
-}
-
-int LCDFN(getwidth)(void)
-{
-    return CURRENT_VP->width;
-}
-
-int LCDFN(getheight)(void)
-{
-    return CURRENT_VP->height;
-}
-
-void LCDFN(setfont)(int newfont)
-{
-    CURRENT_VP->font = newfont;
-}
-
-int LCDFN(getfont)(void)
-{
-    return CURRENT_VP->font;
-}
-
-int LCDFN(getstringsize)(const unsigned char *str, int *w, int *h)
-{
-    return font_getstringsize(str, w, h, CURRENT_VP->font);
-}
-
 /*** low-level drawing functions ***/
 
 static void setpixel(int x, int y)

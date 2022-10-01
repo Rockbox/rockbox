@@ -107,16 +107,6 @@ void lcd_init(void)
 
 /*** parameter handling ***/
 
-void lcd_set_drawmode(int mode)
-{
-    lcd_current_viewport->drawmode = mode & (DRMODE_SOLID|DRMODE_INVERSEVID);
-}
-
-int lcd_get_drawmode(void)
-{
-    return lcd_current_viewport->drawmode;
-}
-
 void lcd_set_foreground(unsigned brightness)
 {
     lcd_current_viewport->fg_pattern = brightness;
@@ -137,38 +127,6 @@ void lcd_set_background(unsigned brightness)
 unsigned lcd_get_background(void)
 {
     return lcd_current_viewport->bg_pattern;
-}
-
-void lcd_set_drawinfo(int mode, unsigned fg_brightness, unsigned bg_brightness)
-{
-    lcd_set_drawmode(mode);
-    lcd_set_foreground(fg_brightness);
-    lcd_set_background(bg_brightness);
-}
-
-int lcd_getwidth(void)
-{
-    return lcd_current_viewport->width;
-}
-
-int lcd_getheight(void)
-{
-    return lcd_current_viewport->height;
-}
-
-void lcd_setfont(int newfont)
-{
-    lcd_current_viewport->font = newfont;
-}
-
-int lcd_getfont(void)
-{
-    return lcd_current_viewport->font;
-}
-
-int lcd_getstringsize(const unsigned char *str, int *w, int *h)
-{
-    return font_getstringsize(str, w, h, lcd_current_viewport->font);
 }
 
 /*** low-level drawing functions ***/
