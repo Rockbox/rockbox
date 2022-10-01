@@ -615,7 +615,8 @@ static int parse_viewporttextstyle(struct skin_element *element,
         if (element->params_count < 2 ||
             !parse_color(curr_screen, get_param_text(element, 1), &colour))
             return 1;
-        line->style = STYLE_COLORED;
+        /* STYLE_COLORED is only a modifier and can't be used on its own */
+        line->style = STYLE_COLORED | STYLE_DEFAULT;
         line->text_color = colour;
     }
 #ifdef HAVE_LCD_COLOR
