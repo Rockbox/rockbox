@@ -61,14 +61,15 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
 /* Clear the current viewport */
 void lcd_clear_viewport(void)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst, *dst_end;
     int x, y, width, height;
     int len, step;
 
-    x = lcd_current_viewport->x;
-    y = lcd_current_viewport->y;
-    width = lcd_current_viewport->width;
-    height = lcd_current_viewport->height;
+    x = vp->x;
+    y = vp->y;
+    width = vp->width;
+    height = vp->height;
 
     len  = STRIDE_MAIN(width, height);
     step = STRIDE_MAIN(ROW_INC, COL_INC);
@@ -76,9 +77,9 @@ void lcd_clear_viewport(void)
     dst = FBADDR(x, y);
     dst_end = FBADDR(x + width - 1 , y + height - 1);
 
-    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        fb_data px = FB_SCALARPACK(lcd_current_viewport->fg_pattern);
+        fb_data px = FB_SCALARPACK(vp->fg_pattern);
         do
         {
             fb_data *end = dst + len;
@@ -93,7 +94,7 @@ void lcd_clear_viewport(void)
     {
         if (!lcd_backdrop)
         {
-            fb_data px = FB_SCALARPACK(lcd_current_viewport->bg_pattern);
+            fb_data px = FB_SCALARPACK(vp->bg_pattern);
             do
             {
                 fb_data *end = dst + len;
@@ -116,12 +117,12 @@ void lcd_clear_viewport(void)
         }
     }
 
-    if (lcd_current_viewport == &default_vp)
+    if (vp == &default_vp)
         lcd_scroll_stop();
     else
-        lcd_scroll_stop_viewport(lcd_current_viewport);
+        lcd_scroll_stop_viewport(vp);
 
-    lcd_current_viewport->flags &= ~(VP_FLAG_VP_SET_CLEAN);
+    vp->flags &= ~(VP_FLAG_VP_SET_CLEAN);
 }
 
 /*** low-level drawing functions ***/
@@ -167,6 +168,7 @@ lcd_fastpixelfunc_type* const * lcd_fastpixelfuncs = lcd_fastpixelfuncs_bgcolor;
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
     int len, step;
@@ -177,14 +179,14 @@ void lcd_fillrect(int x, int y, int width, int height)
         return;
 
     /* drawmode and optimisation */
-    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (lcd_current_viewport->drawmode & DRMODE_BG)
+        if (vp->drawmode & DRMODE_BG)
         {
             if (!lcd_backdrop)
             {
                 fillopt = OPT_SET;
-                bits = FB_SCALARPACK(lcd_current_viewport->bg_pattern);
+                bits = FB_SCALARPACK(vp->bg_pattern);
             }
             else
                 fillopt = OPT_COPY;
@@ -192,13 +194,13 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     else
     {
-        if (lcd_current_viewport->drawmode & DRMODE_FG)
+        if (vp->drawmode & DRMODE_FG)
         {
             fillopt = OPT_SET;
-            bits = FB_SCALARPACK(lcd_current_viewport->fg_pattern);
+            bits = FB_SCALARPACK(vp->fg_pattern);
         }
     }
-    if (fillopt == OPT_NONE && lcd_current_viewport->drawmode != DRMODE_COMPLEMENT)
+    if (fillopt == OPT_NONE && vp->drawmode != DRMODE_COMPLEMENT)
         return;
 
     dst = FBADDR(x, y);
@@ -259,10 +261,11 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int src_y, int stride, int x, int y,
                                      int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     const unsigned char *src_end;
     fb_data *dst, *dst_col;
     unsigned dmask = 0x100; /* bit 8 == sentinel */
-    int drmode = lcd_current_viewport->drawmode;
+    int drmode = vp->drawmode;
     int row;
 
     if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
@@ -332,7 +335,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
         case DRMODE_BG:
-            bg = FB_SCALARPACK(lcd_current_viewport->bg_pattern);
+            bg = FB_SCALARPACK(vp->bg_pattern);
             do
             {
                 if (!(data & 0x01))
@@ -345,7 +348,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
           case DRMODE_FG:
-            fg = FB_SCALARPACK(lcd_current_viewport->fg_pattern);
+            fg = FB_SCALARPACK(vp->fg_pattern);
             do
             {
                 if (data & 0x01)
@@ -358,7 +361,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
           case DRMODE_SOLID|DRMODE_INT_BD:
-            fg = FB_SCALARPACK(lcd_current_viewport->fg_pattern);
+            fg = FB_SCALARPACK(vp->fg_pattern);
             bo = lcd_backdrop_offset;
             do
             {
@@ -371,8 +374,8 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
             break;
 
           case DRMODE_SOLID:
-            fg = FB_SCALARPACK(lcd_current_viewport->fg_pattern);
-            bg = FB_SCALARPACK(lcd_current_viewport->bg_pattern);
+            fg = FB_SCALARPACK(vp->fg_pattern);
+            bg = FB_SCALARPACK(vp->bg_pattern);
             do
             {
                 *dst = (data & 0x01) ? fg : bg;
@@ -442,9 +445,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                                       int width, int height,
                                       int stride_image, int stride_src)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst, *dst_row;
     unsigned dmask = 0x00000000;
-    int drmode = lcd_current_viewport->drawmode;
+    int drmode = vp->drawmode;
 
     if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
         return;
@@ -570,7 +574,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_BG:
-                bg = lcd_current_viewport->bg_pattern;
+                bg = vp->bg_pattern;
                 do
                 {
                     unsigned px = FB_UNPACK_SCALAR_LCD(*dst);
@@ -593,7 +597,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_FG:
-                fg = lcd_current_viewport->fg_pattern;
+                fg = vp->fg_pattern;
                 do
                 {
                     unsigned px = FB_UNPACK_SCALAR_LCD(*dst);
@@ -605,7 +609,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 break;
             case DRMODE_SOLID|DRMODE_INT_BD:
                 bo = lcd_backdrop_offset;
-                fg = lcd_current_viewport->fg_pattern;
+                fg = vp->fg_pattern;
                 do
                 {
                     unsigned c = FB_UNPACK_SCALAR_LCD(*(fb_data *)((uintptr_t)dst +  bo));
@@ -616,7 +620,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_SOLID|DRMODE_INT_IMG:
-                bg = lcd_current_viewport->bg_pattern;
+                bg = vp->bg_pattern;
                 img_offset = image - dst;
                 do
                 {
@@ -641,8 +645,8 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
                 while (--col);
                 break;
             case DRMODE_SOLID:
-                bg = lcd_current_viewport->bg_pattern;
-                fg = lcd_current_viewport->fg_pattern;
+                bg = vp->bg_pattern;
+                fg = vp->fg_pattern;
                 do
                 {
                     *dst = blend_two_colors(bg, fg, data & ALPHA_COLOR_LOOKUP_SIZE );
@@ -689,9 +693,10 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
+    struct viewport *vp = lcd_current_viewport;
     int width;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[lcd_current_viewport->drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[vp->drawmode];
 
     if (!lcd_clip_viewport_hline(&x1, &x2, &y))
         return;
@@ -710,8 +715,9 @@ void lcd_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst, *dst_end;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[lcd_current_viewport->drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[vp->drawmode];
 
     if (!lcd_clip_viewport_vline(&x, &y1, &y2))
         return;
@@ -754,6 +760,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
                                             int src_y, int stride, int x,
                                             int y, int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst;
     fb_data fg, transparent, replacewithfg;
 
@@ -765,7 +772,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
 
     transparent = FB_SCALARPACK(TRANSPARENT_COLOR);
     replacewithfg = FB_SCALARPACK(REPLACEWITHFG_COLOR);
-    fg = FB_SCALARPACK(lcd_current_viewport->fg_pattern);
+    fg = FB_SCALARPACK(vp->fg_pattern);
 #define CMP(c1, c2) (c1.r == c2.r && c1.g == c2.g && c1.b == c2.b)
 
     do

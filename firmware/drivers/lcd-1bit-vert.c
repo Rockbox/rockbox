@@ -237,6 +237,7 @@ void LCDFN(clear_viewport)(void)
 /* Draw a horizontal line (optimised) */
 void LCDFN(hline)(int x1, int x2, int y)
 {
+    struct viewport *vp = CURRENT_VP;
     int width;
     unsigned char *dst, *dst_end;
     unsigned mask;
@@ -247,7 +248,7 @@ void LCDFN(hline)(int x1, int x2, int y)
 
     width = x2 - x1 + 1;
 
-    bfunc = LCDFN(blockfuncs)[CURRENT_VP->drawmode];
+    bfunc = LCDFN(blockfuncs)[vp->drawmode];
     dst   = LCDFB(x1,y>>3);
     mask  = BIT_N(y & 7);
 
@@ -260,6 +261,7 @@ void LCDFN(hline)(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void LCDFN(vline)(int x, int y1, int y2)
 {
+    struct viewport *vp = CURRENT_VP;
     int ny;
     FBFN(data) *dst;
     int stride_dst;
@@ -269,12 +271,12 @@ void LCDFN(vline)(int x, int y1, int y2)
     if (!LCDFN(clip_viewport_vline)(&x, &y1, &y2))
         return;
 
-    bfunc = LCDFN(blockfuncs)[CURRENT_VP->drawmode];
+    bfunc = LCDFN(blockfuncs)[vp->drawmode];
     dst   = LCDFB(x,y1>>3);
     ny    = y2 - (y1 & ~7);
     mask  = 0xFFu << (y1 & 7);
     mask_bottom = 0xFFu >> (~ny & 7);
-    stride_dst = CURRENT_VP->buffer->stride;
+    stride_dst = vp->buffer->stride;
 
     for (; ny >= 8; ny -= 8)
     {
@@ -289,6 +291,7 @@ void LCDFN(vline)(int x, int y1, int y2)
 /* Fill a rectangular area */
 void LCDFN(fillrect)(int x, int y, int width, int height)
 {
+    struct viewport *vp = CURRENT_VP;
     int ny;
     FBFN(data) *dst, *dst_end;
     int stride_dst;
@@ -300,27 +303,27 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     if (!LCDFN(clip_viewport_rect)(&x, &y, &width, &height, NULL, NULL))
         return;
 
-    if (CURRENT_VP->drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (CURRENT_VP->drawmode & DRMODE_BG)
+        if (vp->drawmode & DRMODE_BG)
         {
             fillopt = true;
         }
     }
     else
     {
-        if (CURRENT_VP->drawmode & DRMODE_FG)
+        if (vp->drawmode & DRMODE_FG)
         {
             fillopt = true;
             bits = 0xFFu;
         }
     }
-    bfunc = LCDFN(blockfuncs)[CURRENT_VP->drawmode];
+    bfunc = LCDFN(blockfuncs)[vp->drawmode];
     dst   = LCDFB(x,y>>3);
     ny    = height - 1 + (y & 7);
     mask  = 0xFFu << (y & 7);
     mask_bottom = 0xFFu >> (~ny & 7);
-    stride_dst = CURRENT_VP->buffer->stride;
+    stride_dst = vp->buffer->stride;
 
     for (; ny >= 8; ny -= 8)
     {
@@ -368,6 +371,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
                                    int src_y, int stride, int x, int y,
                                    int width, int height)
 {
+    struct viewport *vp = CURRENT_VP;
     int shift, ny;
     FBFN(data) *dst, *dst_end;
     int stride_dst;
@@ -381,17 +385,17 @@ void ICODE_ATTR LCDFN(bitmap_part)(const unsigned char *src, int src_x,
     src_y  &= 7;
     y      -= src_y;
     dst    = LCDFB(x,y>>3);
-    stride_dst = CURRENT_VP->buffer->stride;
+    stride_dst = vp->buffer->stride;
     shift  = y & 7;
     ny     = height - 1 + shift + src_y;
 
-    bfunc  = LCDFN(blockfuncs)[CURRENT_VP->drawmode];
+    bfunc  = LCDFN(blockfuncs)[vp->drawmode];
     mask   = 0xFFu << (shift + src_y);
     mask_bottom = 0xFFu >> (~ny & 7);
 
     if (shift == 0)
     {
-        bool copyopt = (CURRENT_VP->drawmode == DRMODE_SOLID);
+        bool copyopt = (vp->drawmode == DRMODE_SOLID);
 
         for (; ny >= 8; ny -= 8)
         {

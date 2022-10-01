@@ -380,6 +380,7 @@ void lcd_clear_viewport(void)
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
+    struct viewport *vp = lcd_current_viewport;
     int width;
     fb_data *dst, *dst_end;
     unsigned mask;
@@ -390,7 +391,7 @@ void lcd_hline(int x1, int x2, int y)
 
     width = x2 - x1 + 1;
 
-    bfunc = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc = lcd_blockfuncs[vp->drawmode];
     dst   = FBADDR(x1,y>>2);
     mask  = pixmask[y & 3];
 
@@ -403,6 +404,7 @@ void lcd_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
+    struct viewport *vp = lcd_current_viewport;
     int ny;
     fb_data *dst;
     int stride_dst;
@@ -412,9 +414,9 @@ void lcd_vline(int x, int y1, int y2)
     if (!lcd_clip_viewport_vline(&x, &y1, &y2))
         return;
 
-    bfunc = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc = lcd_blockfuncs[vp->drawmode];
     dst   = FBADDR(x,y1>>2);
-    stride_dst = lcd_current_viewport->buffer->stride;
+    stride_dst = vp->buffer->stride;
     ny    = y2 - (y1 & ~3);
     mask  = 0xFFu << (2 * (y1 & 3));
     mask_bottom = 0xFFu >> (2 * (~ny & 3));
@@ -432,6 +434,7 @@ void lcd_vline(int x, int y1, int y2)
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     int ny;
     fb_data *dst, *dst_end;
     int stride_dst;
@@ -443,9 +446,9 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (!lcd_clip_viewport_rect(&x, &y, &width, &height, NULL, NULL))
         return;
 
-    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        if ((lcd_current_viewport->drawmode & DRMODE_BG) && !lcd_backdrop)
+        if ((vp->drawmode & DRMODE_BG) && !lcd_backdrop)
         {
             fillopt = true;
             bits = bg_pattern;
@@ -453,15 +456,15 @@ void lcd_fillrect(int x, int y, int width, int height)
     }
     else
     {
-        if (lcd_current_viewport->drawmode & DRMODE_FG)
+        if (vp->drawmode & DRMODE_FG)
         {
             fillopt = true;
             bits = fg_pattern;
         }
     }
-    bfunc = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc = lcd_blockfuncs[vp->drawmode];
     dst   = FBADDR(x,y>>2);
-    stride_dst = lcd_current_viewport->buffer->stride;
+    stride_dst = vp->buffer->stride;
     ny    = height - 1 + (y & 3);
     mask  = 0xFFu << (2 * (y & 3));
     mask_bottom = 0xFFu >> (2 * (~ny & 3));
@@ -512,6 +515,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int src_y, int stride, int x, int y,
                                      int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     int shift, ny;
     fb_data *dst, *dst_end;
     int stride_dst;
@@ -525,14 +529,14 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src_y  &= 7;
     y      -= src_y;
     dst    = FBADDR(x,y>>2);
-    stride_dst = lcd_current_viewport->buffer->stride;
+    stride_dst = vp->buffer->stride;
     shift  = y & 3;
     ny     = height - 1 + shift + src_y;
     mask   = 0xFFFFu << (2 * (shift + src_y));
              /* Overflowing bits aren't important. */
     mask_bottom  = 0xFFFFu >> (2 * (~ny & 7));
 
-    bfunc  = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc  = lcd_blockfuncs[vp->drawmode];
 
     if (shift == 0)
     {
@@ -662,6 +666,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                                 int stride, int x, int y, int width,
                                 int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     int shift, ny;
     fb_data *dst, *dst_end;
     int stride_dst;
@@ -674,7 +679,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     src_y &= 3;
     y     -= src_y;
     dst    = FBADDR(x,y>>2);
-    stride_dst = lcd_current_viewport->buffer->stride;
+    stride_dst = vp->buffer->stride;
     shift  = y & 3;
     ny     = height - 1 + shift + src_y;
 

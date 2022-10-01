@@ -378,6 +378,7 @@ void lcd_clear_viewport(void)
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
+    struct viewport *vp = lcd_current_viewport;
     int nx;
     unsigned char *dst;
     unsigned mask, mask_right;
@@ -386,7 +387,7 @@ void lcd_hline(int x1, int x2, int y)
     if (!lcd_clip_viewport_hline(&x1, &x2, &y))
         return;
 
-    bfunc = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc = lcd_blockfuncs[vp->drawmode];
     dst   = FBADDR(x1>>2,y);
     nx    = x2 - (x1 & ~3);
     mask  = 0xFFu >> (2 * (x1 & 3));
@@ -404,6 +405,7 @@ void lcd_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
+    struct viewport *vp = lcd_current_viewport;
     unsigned char *dst, *dst_end;
     int stride_dst;
     unsigned mask;
@@ -412,9 +414,9 @@ void lcd_vline(int x, int y1, int y2)
     if (!lcd_clip_viewport_vline(&x, &y1, &y2))
         return;
 
-    bfunc = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc = lcd_blockfuncs[vp->drawmode];
     dst   = FBADDR(x>>2,y1);
-    stride_dst = LCD_FBSTRIDE(lcd_current_viewport->buffer->stride, 0);
+    stride_dst = LCD_FBSTRIDE(vp->buffer->stride, 0);
     mask  = pixmask[x & 3];
 
     dst_end = dst + (y2 - y1) * stride_dst;
@@ -429,6 +431,7 @@ void lcd_vline(int x, int y1, int y2)
 /* Fill a rectangular area */
 void lcd_fillrect(int x, int y, int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     int nx;
     unsigned char *dst, *dst_end;
     int stride_dst;
@@ -438,9 +441,9 @@ void lcd_fillrect(int x, int y, int width, int height)
     if (!lcd_clip_viewport_rect(&x, &y, &width, &height, NULL, NULL))
         return;
 
-    bfunc      = lcd_blockfuncs[lcd_current_viewport->drawmode];
+    bfunc      = lcd_blockfuncs[vp->drawmode];
     dst        = FBADDR(x>>2,y);
-    stride_dst = LCD_FBSTRIDE(lcd_current_viewport->buffer->stride, 0);
+    stride_dst = LCD_FBSTRIDE(vp->buffer->stride, 0);
     nx         = width - 1 + (x & 3);
     mask       = 0xFFu >> (2 * (x & 3));
     mask_right = 0xFFu << (2 * (~nx & 3));
@@ -485,12 +488,13 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int src_y, int stride, int x, int y,
                                      int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     const unsigned char *src_end;
     fb_data *dst, *dst_end;
     int stride_dst;
     unsigned dmask = 0x100; /* bit 8 == sentinel */
     unsigned dst_mask;
-    int drmode = lcd_current_viewport->drawmode;
+    int drmode = vp->drawmode;
 
     if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
         return;
@@ -500,7 +504,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     src_end = src + width;
 
     dst = FBADDR(x >> 2,y);
-    stride_dst = LCD_FBSTRIDE(lcd_current_viewport->buffer->stride, 0);
+    stride_dst = LCD_FBSTRIDE(vp->buffer->stride, 0);
     dst_end = dst + height * stride_dst;
     dst_mask = pixmask[x & 3];
 
@@ -652,6 +656,7 @@ void ICODE_ATTR lcd_bitmap_part(const unsigned char *src, int src_x,
                                 int src_y, int stride, int x, int y,
                                 int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     int  shift, nx;
     unsigned char *dst, *dst_end;
     int stride_dst;
@@ -666,7 +671,7 @@ void ICODE_ATTR lcd_bitmap_part(const unsigned char *src, int src_x,
     src_x &= 3;
     x     -= src_x;
     dst   = FBADDR(x>>2,y);
-    stride_dst = LCD_FBSTRIDE(lcd_current_viewport->buffer->stride, 0);
+    stride_dst = LCD_FBSTRIDE(vp->buffer->stride, 0);
     shift = x & 3;
     nx    = width - 1 + shift + src_x;
 

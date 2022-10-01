@@ -62,6 +62,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {
+    struct viewport *vp = lcd_current_viewport;
     int width;
     unsigned bits = 0;
     enum fill_opt fillopt = OPT_NONE;
@@ -73,14 +74,14 @@ void lcd_hline(int x1, int x2, int y)
     width = x2 - x1 + 1;
 
     /* drawmode and optimisation */
-    if (lcd_current_viewport->drawmode & DRMODE_INVERSEVID)
+    if (vp->drawmode & DRMODE_INVERSEVID)
     {
-        if (lcd_current_viewport->drawmode & DRMODE_BG)
+        if (vp->drawmode & DRMODE_BG)
         {
             if (!lcd_backdrop)
             {
                 fillopt = OPT_SET;
-                bits = lcd_current_viewport->bg_pattern;
+                bits = vp->bg_pattern;
             }
             else
                 fillopt = OPT_COPY;
@@ -88,13 +89,13 @@ void lcd_hline(int x1, int x2, int y)
     }
     else
     {
-        if (lcd_current_viewport->drawmode & DRMODE_FG)
+        if (vp->drawmode & DRMODE_FG)
         {
             fillopt = OPT_SET;
-            bits = lcd_current_viewport->fg_pattern;
+            bits = vp->fg_pattern;
         }
     }
-    if (fillopt == OPT_NONE && lcd_current_viewport->drawmode != DRMODE_COMPLEMENT)
+    if (fillopt == OPT_NONE && vp->drawmode != DRMODE_COMPLEMENT)
         return;
 
     dst = FBADDR(x1, y);
@@ -122,15 +123,16 @@ void lcd_hline(int x1, int x2, int y)
 /* Draw a vertical line (optimised) */
 void lcd_vline(int x, int y1, int y2)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst, *dst_end;
     int stride_dst;
-    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[lcd_current_viewport->drawmode];
+    lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[vp->drawmode];
 
     if (!lcd_clip_viewport_vline(&x, &y1, &y2))
         return;
 
     dst = FBADDR(x, y1);
-    stride_dst = lcd_current_viewport->buffer->stride;
+    stride_dst = vp->buffer->stride;
     dst_end = dst + (y2 - y1) * stride_dst;
 
     do
@@ -146,6 +148,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                                 int stride, int x, int y, int width,
                                 int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst;
     int stride_dst;
 
@@ -154,7 +157,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
 
     src += stride * src_y + src_x; /* move starting point */
     dst = FBADDR(x, y);
-    stride_dst = lcd_current_viewport->buffer->stride;
+    stride_dst = vp->buffer->stride;
 
     do
     {
@@ -170,9 +173,10 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
                                             int src_y, int stride, int x,
                                             int y, int width, int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst;
-    unsigned fg = lcd_current_viewport->fg_pattern;
-    int stride_dst = lcd_current_viewport->buffer->stride;
+    unsigned fg = vp->fg_pattern;
+    int stride_dst = vp->buffer->stride;
 
     if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
         return;
