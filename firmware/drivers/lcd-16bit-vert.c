@@ -68,7 +68,7 @@ void lcd_hline(int x1, int x2, int y)
 
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[vp->drawmode];
 
-    if (!lcd_clip_viewport_hline(&x1, &x2, &y))
+    if (!clip_viewport_hline(vp, &x1, &x2, &y))
         return;
 
     dst = FBADDR(x1, y);
@@ -92,7 +92,7 @@ void lcd_vline(int x, int y1, int y2)
     enum fill_opt fillopt = OPT_NONE;
     fb_data *dst, *dst_end;
 
-    if(!lcd_clip_viewport_vline(&x, &y1, &y2))
+    if(!clip_viewport_vline(vp, &x, &y1, &y2))
         return;
 
     height = y2 - y1 + 1;
@@ -153,7 +153,7 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
     fb_data *dst;
     int stride_dst;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src += stride * src_x + src_y; /* move starting point */
@@ -179,7 +179,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     fb_data *dst, *dst_end;
     int stride_dst;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src += stride * src_x + src_y; /* move starting point */

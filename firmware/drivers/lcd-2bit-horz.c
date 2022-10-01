@@ -384,7 +384,7 @@ void lcd_hline(int x1, int x2, int y)
     unsigned mask, mask_right;
     lcd_blockfunc_type *bfunc;
 
-    if (!lcd_clip_viewport_hline(&x1, &x2, &y))
+    if (!clip_viewport_hline(vp, &x1, &x2, &y))
         return;
 
     bfunc = lcd_blockfuncs[vp->drawmode];
@@ -411,7 +411,7 @@ void lcd_vline(int x, int y1, int y2)
     unsigned mask;
     lcd_blockfunc_type *bfunc;
 
-    if (!lcd_clip_viewport_vline(&x, &y1, &y2))
+    if (!clip_viewport_vline(vp, &x, &y1, &y2))
         return;
 
     bfunc = lcd_blockfuncs[vp->drawmode];
@@ -438,7 +438,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     unsigned mask, mask_right;
     lcd_blockfunc_type *bfunc;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, NULL, NULL))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, NULL, NULL))
         return;
 
     bfunc      = lcd_blockfuncs[vp->drawmode];
@@ -496,7 +496,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     unsigned dst_mask;
     int drmode = vp->drawmode;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
@@ -662,7 +662,7 @@ void ICODE_ATTR lcd_bitmap_part(const unsigned char *src, int src_x,
     int stride_dst;
     unsigned mask, mask_right;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     stride = LCD_FBSTRIDE(stride, 0); /* convert to no. of bytes */

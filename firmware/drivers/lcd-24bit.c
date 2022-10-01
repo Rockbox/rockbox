@@ -175,7 +175,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     fb_data bits;
     memset(&bits, 0, sizeof(fb_data));
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, NULL, NULL))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, NULL, NULL))
         return;
 
     /* drawmode and optimisation */
@@ -268,7 +268,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
     int drmode = vp->drawmode;
     int row;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src += stride * (src_y >> 3) + src_x; /* move starting point */
@@ -450,7 +450,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     unsigned dmask = 0x00000000;
     int drmode = vp->drawmode;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     /* the following drawmode combinations are possible:
@@ -698,7 +698,7 @@ void lcd_hline(int x1, int x2, int y)
     fb_data *dst, *dst_end;
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[vp->drawmode];
 
-    if (!lcd_clip_viewport_hline(&x1, &x2, &y))
+    if (!clip_viewport_hline(vp, &x1, &x2, &y))
         return;
 
     width = x2 - x1 + 1;
@@ -719,7 +719,7 @@ void lcd_vline(int x, int y1, int y2)
     fb_data *dst, *dst_end;
     lcd_fastpixelfunc_type *pfunc = lcd_fastpixelfuncs[vp->drawmode];
 
-    if (!lcd_clip_viewport_vline(&x, &y1, &y2))
+    if (!clip_viewport_vline(vp, &x, &y1, &y2))
         return;
 
     dst = FBADDR(x, y1);
@@ -738,9 +738,10 @@ void ICODE_ATTR lcd_bitmap_part(const fb_data *src, int src_x, int src_y,
                                 int stride, int x, int y, int width,
                                 int height)
 {
+    struct viewport *vp = lcd_current_viewport;
     fb_data *dst;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src += stride * src_y + src_x; /* move starting point */
@@ -764,7 +765,7 @@ void ICODE_ATTR lcd_bitmap_transparent_part(const fb_data *src, int src_x,
     fb_data *dst;
     fb_data fg, transparent, replacewithfg;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src += stride * src_y + src_x; /* move starting point */

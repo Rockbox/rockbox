@@ -135,7 +135,7 @@ void lcd_fillrect(int x, int y, int width, int height)
     fb_data *dst, *dst_end;
     int len, step;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, NULL, NULL))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, NULL, NULL))
         return;
 
     /* drawmode and optimisation */
@@ -216,7 +216,7 @@ void ICODE_ATTR lcd_mono_bitmap_part(const unsigned char *src, int src_x,
                                      int width, int height)
 {
     struct viewport *vp = lcd_current_viewport;
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     /* move starting point */
@@ -424,7 +424,7 @@ static void ICODE_ATTR lcd_alpha_bitmap_part_mix(const fb_data* image,
     unsigned dmask = 0x00000000;
     int drmode = vp->drawmode;
 
-    if (!lcd_clip_viewport_rect(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     /* initialize blending */

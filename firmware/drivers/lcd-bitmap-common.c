@@ -58,15 +58,13 @@ extern void viewport_set_buffer(struct viewport *vp,
  * In-viewport clipping functions:
  *
  * These clip a primitive (pixel, line, rect) given in
- * viewport-relative coordinates to the current viewport,
+ * viewport-relative coordinates to the specified viewport,
  * and translate it to screen coordinates. They return
  * false if the resulting primitive would be off-screen.
  */
 
-static bool LCDFN(clip_viewport_pixel)(int *x, int *y)
+static inline bool clip_viewport_pixel(struct viewport *vp, int *x, int *y)
 {
-    struct viewport *vp = LCDFN(current_viewport);
-
     if (*x < 0 || *x >= vp->width ||
         *y < 0 || *y >= vp->height)
         return false;
@@ -76,10 +74,9 @@ static bool LCDFN(clip_viewport_pixel)(int *x, int *y)
     return true;
 }
 
-static bool LCDFN(clip_viewport_hline)(int *x1, int *x2, int *y)
+static inline bool clip_viewport_hline(struct viewport *vp,
+                                       int *x1, int *x2, int *y)
 {
-    struct viewport *vp = LCDFN(current_viewport);
-
     if (*y < 0 || *y > vp->height)
         return false;
 
@@ -105,10 +102,9 @@ static bool LCDFN(clip_viewport_hline)(int *x1, int *x2, int *y)
     return true;
 }
 
-static bool LCDFN(clip_viewport_vline)(int *x, int *y1, int *y2)
+static inline bool clip_viewport_vline(struct viewport *vp,
+                                       int *x, int *y1, int *y2)
 {
-    struct viewport *vp = LCDFN(current_viewport);
-
     if (*x < 0 || *x > vp->width)
         return false;
 
@@ -134,11 +130,10 @@ static bool LCDFN(clip_viewport_vline)(int *x, int *y1, int *y2)
     return true;
 }
 
-static bool LCDFN(clip_viewport_rect)(int *x, int *y, int *width, int *height,
+static inline bool clip_viewport_rect(struct viewport *vp,
+                                      int *x, int *y, int *width, int *height,
                                       int *src_x, int *src_y)
 {
-    struct viewport *vp = LCDFN(current_viewport);
-
     if (*x < 0) {
         *width += *x;
         if (src_x)
@@ -844,7 +839,7 @@ void LCDFN(nine_segment_bmp)(const struct bitmap* bm, int x, int y,
 void LCDFN(drawpixel)(int x, int y)
 {
     struct viewport *vp = LCDFN(current_viewport);
-    if (LCDFN(clip_viewport_pixel(&x, &y)))
+    if (clip_viewport_pixel(vp, &x, &y))
     {
 #if LCDM(DEPTH) >= 8
         LCDFN(fastpixelfunc_type) *pfunc = LCDFN(fastpixelfuncs)[vp->drawmode];

@@ -419,7 +419,7 @@ void LCDFN(hline)(int x1, int x2, int y)
     unsigned mask;
     LCDFN(blockfunc_type) *bfunc;
 
-    if (!LCDFN(clip_viewport_hline)(&x1, &x2, &y))
+    if (!clip_viewport_hline(vp, &x1, &x2, &y))
         return;
 
     width = x2 - x1 + 1;
@@ -444,7 +444,7 @@ void LCDFN(vline)(int x, int y1, int y2)
     unsigned mask, mask_bottom;
     LCDFN(blockfunc_type) *bfunc;
 
-    if (!LCDFN(clip_viewport_vline)(&x, &y1, &y2))
+    if (!clip_viewport_vline(vp, &x, &y1, &y2))
         return;
 
     bfunc = LCDFN(blockfuncs)[vp->drawmode];
@@ -478,7 +478,7 @@ void LCDFN(fillrect)(int x, int y, int width, int height)
     LCDFN(blockfunc_type) *bfunc;
     bool fillopt = false;
 
-    if (!LCDFN(clip_viewport_rect)(&x, &y, &width, &height, NULL, NULL))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, NULL, NULL))
         return;
 
     if (vp->drawmode & DRMODE_INVERSEVID)
@@ -559,7 +559,7 @@ void ICODE_ATTR LCDFN(mono_bitmap_part)(const unsigned char *src, int src_x,
     unsigned data, mask, mask_bottom;
     LCDFN(blockfunc_type) *bfunc;
 
-    if (!LCDFN(clip_viewport_rect)(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src    += stride * (src_y >> 3) + src_x; /* move starting point */
@@ -680,7 +680,7 @@ void ICODE_ATTR LCDFN(bitmap_part)(const FBFN(data) *src, int src_x,
     int stride_dst;
     unsigned mask, mask_bottom;
 
-    if (!LCDFN(clip_viewport_rect)(&x, &y, &width, &height, &src_x, &src_y))
+    if (!clip_viewport_rect(vp, &x, &y, &width, &height, &src_x, &src_y))
         return;
 
     src   += stride * (src_y >> 3) + src_x; /* move starting point */
