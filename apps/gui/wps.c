@@ -207,6 +207,7 @@ static bool ffwd_rew(int button)
     int direction = -1;         /* forward=1 or backward=-1 */
     bool exit = false;
     bool usb = false;
+    bool ff_rewind = false;
     const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
 
     if (button == ACTION_NONE)
@@ -222,7 +223,7 @@ static bool ffwd_rew(int button)
                  direction = 1;
                  /* Fallthrough */
             case ACTION_WPS_SEEKBACK:
-                if (skin_get_global_state()->ff_rewind)
+                if (ff_rewind)
                 {
                     if (direction == 1)
                     {
@@ -260,7 +261,7 @@ static bool ffwd_rew(int button)
                         else
                             status_set_ffmode(STATUS_FASTBACKWARD);
 
-                        skin_get_global_state()->ff_rewind = true;
+                        ff_rewind = true;
 
                         step = 1000 * global_settings.ff_rewind_min_step;
                     }
@@ -296,7 +297,7 @@ static bool ffwd_rew(int button)
                 skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->elapsed+ff_rewind_count;
                 audio_ff_rewind(skin_get_global_state()->id3->elapsed);
                 skin_get_global_state()->ff_rewind_count = 0;
-                skin_get_global_state()->ff_rewind = false;
+                ff_rewind = false;
                 status_set_ffmode(0);
                 exit = true;
                 break;
@@ -1046,7 +1047,6 @@ static void track_info_callback(unsigned short id, void *param)
 static void wps_state_init(void)
 {
     struct wps_state *state = skin_get_global_state();
-    state->ff_rewind = false;
     state->paused = false;
     if(audio_status() & AUDIO_STATUS_PLAY)
     {

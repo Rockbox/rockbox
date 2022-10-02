@@ -402,7 +402,6 @@ struct wps_state
     struct mp3entry* id3;
     struct mp3entry* nid3;
     int  ff_rewind_count;
-    bool ff_rewind;
     bool paused;
     bool is_fading;
 };
