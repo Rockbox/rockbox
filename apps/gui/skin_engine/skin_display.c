@@ -46,6 +46,7 @@
 #include "tagcache.h"
 #include "list.h"
 #include "option_select.h"
+#include "buffering.h"
 
 #include "peakmeter.h"
 /* Image stuff */
@@ -633,6 +634,76 @@ void draw_peakmeters(struct gui_wps *gwps, int line_number,
             peak_meter_screen(gwps->display, 0, peak_meter_y,
                               MIN(h, viewport->y+viewport->height - peak_meter_y));
         }
+    }
+}
+
+/* Draw the album art bitmap from the given handle ID onto the given WPS.
+   Call with clear = true to clear the bitmap instead of drawing it. */
+void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
+{
+    if (!gwps || !gwps->data || !gwps->display || handle_id < 0)
+        return;
+
+    struct wps_data *data = gwps->data;
+    struct skin_albumart *aa = SKINOFFSETTOPTR(get_skin_buffer(data), data->albumart);
+
+    if (!aa)
+        return;
+
+    struct bitmap *bmp;
+    if (bufgetdata(handle_id, 0, (void *)&bmp) <= 0)
+        return;
+
+    short x = aa->x;
+    short y = aa->y;
+    short width = bmp->width;
+    short height = bmp->height;
+
+    if (aa->width > 0)
+    {
+        /* Crop if the bitmap is too wide */
+        width = MIN(bmp->width, aa->width);
+
+        /* Align */
+        if (aa->xalign & WPS_ALBUMART_ALIGN_RIGHT)
+            x += aa->width - width;
+        else if (aa->xalign & WPS_ALBUMART_ALIGN_CENTER)
+            x += (aa->width - width) / 2;
+    }
+
+    if (aa->height > 0)
+    {
+        /* Crop if the bitmap is too high */
+        height = MIN(bmp->height, aa->height);
+
+        /* Align */
+        if (aa->yalign & WPS_ALBUMART_ALIGN_BOTTOM)
+            y += aa->height - height;
+        else if (aa->yalign & WPS_ALBUMART_ALIGN_CENTER)
+            y += (aa->height - height) / 2;
+    }
+
+    if (!clear)
+    {
+        /* Draw the bitmap */
+        gwps->display->bitmap_part((fb_data*)bmp->data, 0, 0,
+                                    STRIDE(gwps->display->screen_type,
+                                        bmp->width, bmp->height),
+                                   x, y, width, height);
+#ifdef HAVE_LCD_INVERT
+        if (global_settings.invert) {
+            gwps->display->set_drawmode(DRMODE_COMPLEMENT);
+            gwps->display->fillrect(x, y, width, height);
+            gwps->display->set_drawmode(DRMODE_SOLID);
+        }
+#endif
+    }
+    else
+    {
+        /* Clear the bitmap */
+        gwps->display->set_drawmode(DRMODE_SOLID|DRMODE_INVERSEVID);
+        gwps->display->fillrect(x, y, width, height);
+        gwps->display->set_drawmode(DRMODE_SOLID);
     }
 }
 

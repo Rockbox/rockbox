@@ -26,8 +26,7 @@
 #ifndef PLUGIN
 
 #include "tag_table.h"
-
-#include "wps_internals.h" /* TODO: remove this line.. shoudlnt be needed */
+#include "screen_access.h"
 
 enum skinnable_screens {
     CUSTOM_STATUSBAR,
@@ -38,6 +37,11 @@ enum skinnable_screens {
 
     SKINNABLE_SCREENS_COUNT
 };
+
+struct skin_stats;
+struct skin_viewport;
+struct touchregion;
+struct wps_data;
 
 #ifdef HAVE_TOUCHSCREEN
 int skin_get_touchaction(struct wps_data *data, int* edge_offset,
@@ -88,6 +92,8 @@ void skin_unload_all(void);
 
 bool skin_do_full_update(enum skinnable_screens skin, enum screen_type screen);
 void skin_request_full_update(enum skinnable_screens skin);
+
+bool dbg_skin_engine(void);
 
 #endif /* !PLUGIN */
 #endif

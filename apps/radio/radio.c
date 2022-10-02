@@ -56,6 +56,7 @@
 #include "statusbar-skinned.h"
 #include "playback.h"
 #include "presets.h"
+#include "skin_engine/wps_internals.h"
 
 #if CONFIG_TUNER
 

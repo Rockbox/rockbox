@@ -74,6 +74,8 @@ struct skin_draw_info {
     int offset; /* used by the playlist viewer */
 };
 
+extern void sb_set_info_vp(enum screen_type screen, OFFSETTYPE(char*) label);
+
 typedef bool (*skin_render_func)(struct skin_element* alternator, struct skin_draw_info *info);
 bool skin_render_alternator(struct skin_element* alternator, struct skin_draw_info *info);
 

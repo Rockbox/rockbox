@@ -61,6 +61,7 @@
 #include "playlist_viewer.h"
 #include "wps.h"
 #include "statusbar-skinned.h"
+#include "skin_engine/wps_internals.h"
 
 #define RESTORE_WPS_INSTANTLY       0l
 #define RESTORE_WPS_NEXT_SECOND     ((long)(HZ+current_tick))

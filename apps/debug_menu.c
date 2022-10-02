@@ -2509,59 +2509,6 @@ static bool dbg_pic(void)
 }
 #endif
 
-static bool dbg_skin_engine(void)
-{
-    struct simplelist_info info;
-    int i, total = 0;
-#if defined(HAVE_BACKDROP_IMAGE)
-    int ref_count;
-    char *path;
-    size_t bytes;
-    int path_prefix_len = strlen(ROCKBOX_DIR "/wps/");
-#endif
-    simplelist_info_init(&info, "Skin engine usage", 0, NULL);
-    simplelist_set_line_count(0);
-    FOR_NB_SCREENS(j) {
-#if NB_SCREENS > 1
-        simplelist_addline("%s display:",
-                           j == 0 ? "Main" : "Remote");
-#endif
-        for (i = 0; i < skin_get_num_skins(); i++) {
-            struct skin_stats *stats = skin_get_stats(i, j);
-            if (stats->buflib_handles)
-            {
-                simplelist_addline("Skin ID: %d, %d allocations",
-                        i, stats->buflib_handles);
-                simplelist_addline("\tskin: %d bytes",
-                        stats->tree_size);
-                simplelist_addline("\tImages: %d bytes",
-                        stats->images_size);
-                simplelist_addline("\tTotal: %d bytes",
-                        stats->tree_size + stats->images_size);
-                total += stats->tree_size + stats->images_size;
-            }
-        }
-    }
-    simplelist_addline("Skin total usage: %d bytes", total);
-#if defined(HAVE_BACKDROP_IMAGE)
-    simplelist_addline("Backdrop Images:");
-    i = 0;
-    while (skin_backdrop_get_debug(i++, &path, &ref_count, &bytes)) {
-        if (ref_count > 0) {
-
-            if (!strncasecmp(path, ROCKBOX_DIR "/wps/", path_prefix_len))
-                path += path_prefix_len;
-            simplelist_addline("%s", path);
-            simplelist_addline("\tref_count: %d", ref_count);
-            simplelist_addline("\tsize: %d", bytes);
-            total += bytes;
-        }
-    }
-    simplelist_addline("Total usage: %d bytes", total);
-#endif
-    return simplelist_show_list(&info);
-}
-
 #if defined(HAVE_BOOTDATA) && !defined(SIMULATOR)
 static bool dbg_boot_data(void)
 {

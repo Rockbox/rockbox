@@ -36,6 +36,7 @@
 #include "sound.h"
 #include "misc.h"
 #endif
+#include "skin_engine/wps_internals.h"
 
 
 char* default_radio_skin(enum screen_type screen)

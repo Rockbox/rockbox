@@ -313,6 +313,17 @@ struct listitem {
     short offset;
 };
 
+struct listitem_viewport_cfg {
+    struct wps_data *data;
+    OFFSETTYPE(char *)   label;
+    int     width;
+    int     height;
+    int     xmargin;
+    int     ymargin;
+    bool    tile;
+    struct skin_viewport selected_item_vp;
+};
+
 #ifdef HAVE_SKIN_VARIABLES
 struct skin_var {
     OFFSETTYPE(const char *) label;
