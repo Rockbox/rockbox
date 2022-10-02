@@ -23,12 +23,25 @@
 
 #include <stdbool.h>
 
+struct mp3entry;
+
+/* Please don't add anything else to here... */
+struct wps_state
+{
+    struct mp3entry *id3;
+    struct mp3entry *nid3;
+    int ff_rewind_count;
+    bool paused;
+};
+
 long gui_wps_show(void);
 
 /* fade (if enabled) and pause the audio, optionally rewind a little */
 void pause_action(bool updatewps);
 void unpause_action(bool updatewps);
 void wps_do_playpause(bool updatewps);
+
+struct wps_state *get_wps_state(void);
 
 /* in milliseconds */
 #define DEFAULT_SKIP_THRESH          3000l

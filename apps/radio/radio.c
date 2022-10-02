@@ -56,7 +56,7 @@
 #include "statusbar-skinned.h"
 #include "playback.h"
 #include "presets.h"
-#include "skin_engine/wps_internals.h"
+#include "wps.h" /* for wps_state... */
 
 #if CONFIG_TUNER
 
@@ -364,7 +364,9 @@ void radio_screen(void)
     {
         radio_load_presets(global_settings.fmr_file);
     }
-    skin_get_global_state()->id3 = NULL;
+    /* TODO: Can this be moved somewhere else? */
+    get_wps_state()->id3 = NULL;
+    get_wps_state()->nid3 = NULL;
 #ifdef HAVE_ALBUMART
     radioart_init(true);
 #endif    

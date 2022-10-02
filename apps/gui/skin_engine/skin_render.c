@@ -50,6 +50,7 @@
 #include "root_menu.h"
 #include "misc.h"
 #include "list.h"
+#include "wps.h"
 
 
 #define MAX_LINE 1024
@@ -956,8 +957,8 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
     else
 #endif
     {
-        struct cuesheet *cue = skin_get_global_state()->id3 ?
-                               skin_get_global_state()->id3->cuesheet : NULL;
+        struct wps_state *state = get_wps_state();
+        struct cuesheet *cue = state->id3 ? state->id3->cuesheet : NULL;
         cur_pos = playlist_get_display_index();
         max = playlist_amount()+1;
         if (cue)

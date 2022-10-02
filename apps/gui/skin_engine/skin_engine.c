@@ -53,7 +53,6 @@ static bool skins_initialised = false;
 static char* get_skin_filename(char *buf, size_t buf_size,
                                enum skinnable_screens skin, enum screen_type screen);
 
-struct wps_state     wps_state               = { .id3 = NULL };
 static struct gui_skin_helper {
     int (*preproccess)(enum screen_type screen, struct wps_data *data);
     int (*postproccess)(enum screen_type screen, struct wps_data *data);
@@ -308,11 +307,6 @@ struct gui_wps *skin_get_gwps(enum skinnable_screens skin, enum screen_type scre
         cpu_boost(false);
     }
     return &skins[skin][screen].gui_wps;
-}
-
-struct wps_state *skin_get_global_state(void)
-{
-    return &wps_state;
 }
 
 /* This is called to find out if we the screen needs a full update.

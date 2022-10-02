@@ -393,28 +393,6 @@ static inline char* get_skin_buffer(struct wps_data* data)
 
 /* wps_data end */
 
-/* wps_state
-   holds the data which belongs to the current played track,
-   the track which will be played afterwards, current path to the track
-   and some status infos */
-struct wps_state
-{
-    struct mp3entry* id3;
-    struct mp3entry* nid3;
-    int  ff_rewind_count;
-    bool paused;
-};
-
-/* change the ff/rew-status
-   if ff_rew = true then we are in skipping mode
-   else we are in normal mode */
-/* void wps_state_update_ff_rew(bool ff_rew); Currently unused */
-
-/* change the tag-information of the current played track
-   and the following track */
-/* void wps_state_update_id3_nid3(struct mp3entry *id3, struct mp3entry *nid3); Currently unused */
-/* wps_state end*/
-
 /* gui_wps
    defines a wps with its data, state,
    and the screen on which the wps-content should be drawn */

@@ -70,6 +70,8 @@
                                 /* 3% of 30min file == 54s step size */
 #define MIN_FF_REWIND_STEP 500
 
+static struct wps_state wps_state;
+
 /* initial setup of wps_data  */
 static void wps_state_init(void);
 static void track_info_callback(unsigned short id, void *param);
@@ -157,6 +159,7 @@ static int skintouch_to_wps(struct wps_data *data)
 {
     int offset = 0;
     struct touchregion *region;
+    struct wps_state *gstate = get_wps_state();
     int button = skin_get_touchaction(data, &offset, &region);
     switch (button)
     {
@@ -179,9 +182,9 @@ static int skintouch_to_wps(struct wps_data *data)
             return ACTION_WPS_HOTKEY;
 #endif
         case ACTION_TOUCH_SCROLLBAR:
-            skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->length*offset/1000;
+            gstate->id3->elapsed = gstate->id3->length*offset/1000;
             audio_pre_ff_rewind();
-            audio_ff_rewind(skin_get_global_state()->id3->elapsed);
+            audio_ff_rewind(gstate->id3->elapsed);
             return ACTION_TOUCHSCREEN;
         case ACTION_TOUCH_VOLUME:
         {
@@ -209,6 +212,7 @@ static bool ffwd_rew(int button)
     bool usb = false;
     bool ff_rewind = false;
     const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
+    struct wps_state *gstate = get_wps_state();
 
     if (button == ACTION_NONE)
     {
@@ -228,15 +232,15 @@ static bool ffwd_rew(int button)
                     if (direction == 1)
                     {
                         /* fast forwarding, calc max step relative to end */
-                        max_step = (skin_get_global_state()->id3->length -
-                                    (skin_get_global_state()->id3->elapsed +
+                        max_step = (gstate->id3->length -
+                                    (gstate->id3->elapsed +
                                      ff_rewind_count)) *
                                      FF_REWIND_MAX_PERCENT / 100;
                     }
                     else
                     {
                         /* rewinding, calc max step relative to start */
-                        max_step = (skin_get_global_state()->id3->elapsed + ff_rewind_count) *
+                        max_step = (gstate->id3->elapsed + ff_rewind_count) *
                                     FF_REWIND_MAX_PERCENT / 100;
                     }
 
@@ -253,7 +257,7 @@ static bool ffwd_rew(int button)
                 else
                 {
                     if ( (audio_status() & AUDIO_STATUS_PLAY) &&
-                          skin_get_global_state()->id3 && skin_get_global_state()->id3->length )
+                          gstate->id3 && gstate->id3->length )
                     {
                         audio_pre_ff_rewind();
                         if (direction > 0)
@@ -270,19 +274,17 @@ static bool ffwd_rew(int button)
                 }
 
                 if (direction > 0) {
-                    if ((skin_get_global_state()->id3->elapsed + ff_rewind_count) >
-                        skin_get_global_state()->id3->length)
-                        ff_rewind_count = skin_get_global_state()->id3->length -
-                            skin_get_global_state()->id3->elapsed;
+                    if ((gstate->id3->elapsed + ff_rewind_count) > gstate->id3->length)
+                        ff_rewind_count = gstate->id3->length - gstate->id3->elapsed;
                 }
                 else {
-                    if ((int)(skin_get_global_state()->id3->elapsed + ff_rewind_count) < 0)
-                        ff_rewind_count = -skin_get_global_state()->id3->elapsed;
+                    if ((int)(gstate->id3->elapsed + ff_rewind_count) < 0)
+                        ff_rewind_count = -gstate->id3->elapsed;
                 }
 
                 /* set the wps state ff_rewind_count so the progess info
                    displays corectly */
-                skin_get_global_state()->ff_rewind_count = ff_rewind_count;
+                gstate->ff_rewind_count = ff_rewind_count;
 
                 FOR_NB_SCREENS(i)
                 {
@@ -294,9 +296,9 @@ static bool ffwd_rew(int button)
                 break;
 
             case ACTION_WPS_STOPSEEK:
-                skin_get_global_state()->id3->elapsed = skin_get_global_state()->id3->elapsed+ff_rewind_count;
-                audio_ff_rewind(skin_get_global_state()->id3->elapsed);
-                skin_get_global_state()->ff_rewind_count = 0;
+                gstate->id3->elapsed = gstate->id3->elapsed+ff_rewind_count;
+                audio_ff_rewind(gstate->id3->elapsed);
+                gstate->ff_rewind_count = 0;
                 ff_rewind = false;
                 status_set_ffmode(0);
                 exit = true;
@@ -328,7 +330,7 @@ static bool ffwd_rew(int button)
 #if defined(HAVE_BACKLIGHT) || defined(HAVE_REMOTE_LCD)
 static void gwps_caption_backlight(struct wps_state *state)
 {
-    if (state && state->id3)
+    if (state->id3)
     {
 #ifdef HAVE_BACKLIGHT
         if (global_settings.caption_backlight)
@@ -383,7 +385,7 @@ static void change_dir(int direction)
 
 static void prev_track(unsigned long skip_thresh)
 {
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     if (state->id3->elapsed < skip_thresh)
     {
         audio_prev();
@@ -404,7 +406,7 @@ static void prev_track(unsigned long skip_thresh)
 
 static void next_track(void)
 {
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     /* take care of if we're playing a cuesheet */
     if (state->id3->cuesheet)
     {
@@ -421,7 +423,7 @@ static void next_track(void)
 
 static void play_hop(int direction)
 {
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     struct cuesheet *cue = state->id3->cuesheet;
     long step = global_settings.skip_length*1000;
     long elapsed = state->id3->elapsed;
@@ -571,7 +573,7 @@ static void gwps_enter_wps(void)
 
 void wps_do_playpause(bool updatewps)
 {
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     if ( state->paused )
     {
         state->paused = false;
@@ -608,7 +610,7 @@ long gui_wps_show(void)
     bool update = false;
     bool vol_changed = false;
     long last_left = 0, last_right = 0;
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
 
 #ifdef AB_REPEAT_ENABLE
     ab_repeat_init();
@@ -1021,10 +1023,15 @@ long gui_wps_show(void)
     return GO_TO_ROOT; /* unreachable - just to reduce compiler warnings */
 }
 
+struct wps_state *get_wps_state(void)
+{
+    return &wps_state;
+}
+
 /* this is called from the playback thread so NO DRAWING! */
 static void track_info_callback(unsigned short id, void *param)
 {
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
 
     if (id == PLAYBACK_EVENT_TRACK_CHANGE || id == PLAYBACK_EVENT_CUR_TRACK_READY)
     {
@@ -1040,13 +1047,13 @@ static void track_info_callback(unsigned short id, void *param)
         state->id3 = audio_current_track();
     }
 #endif
-    skin_get_global_state()->nid3 = audio_next_track();
+    state->nid3 = audio_next_track();
     skin_request_full_update(WPS);
 }
 
 static void wps_state_init(void)
 {
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     state->paused = false;
     if(audio_status() & AUDIO_STATUS_PLAY)
     {

@@ -66,10 +66,9 @@
 #include "fixedpoint.h"
 #endif
 #include "list.h"
+#include "wps.h"
 
 #define NOINLINE __attribute__ ((noinline))
-
-extern struct wps_state wps_state;
 
 static const char* get_codectype(const struct mp3entry* id3)
 {
@@ -228,7 +227,7 @@ static const char* get_filename_token(struct wps_token *token, char* filename,
 const char *get_id3_token(struct wps_token *token, struct mp3entry *id3,
                           char *filename, char *buf, int buf_size, int limit, int *intval)
 {
-    struct wps_state *state = &wps_state;
+    struct wps_state *state = get_wps_state();
     if (id3)
     {
         unsigned long length = id3->length;
@@ -540,7 +539,7 @@ const char *get_radio_token(struct wps_token *token, int preset_offset,
 static struct mp3entry* get_mp3entry_from_offset(int offset, char **filename)
 {
     struct mp3entry* pid3 = NULL;
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     struct cuesheet *cue = state->id3 ? state->id3->cuesheet : NULL;
     const char *fname = NULL;
     if (cue && cue->curr_track_idx + offset < cue->track_count)
@@ -678,7 +677,7 @@ const char *get_token_value(struct gui_wps *gwps,
         return NULL;
 
     struct wps_data *data = gwps->data;
-    struct wps_state *state = skin_get_global_state();
+    struct wps_state *state = get_wps_state();
     struct mp3entry *id3; /* Think very carefully about using this.
                              maybe get_id3_token() is the better place? */
     const char *out_text = NULL;
