@@ -30,11 +30,6 @@ void pause_action(bool updatewps);
 void unpause_action(bool updatewps);
 void wps_do_playpause(bool updatewps);
 
-#ifdef IPOD_ACCESSORY_PROTOCOL
-/* whether the wps is fading the volume due to pausing/stopping */
-bool is_wps_fading(void);
-#endif /* IPOD_ACCESSORY_PROTOCOL */
-
 /* in milliseconds */
 #define DEFAULT_SKIP_THRESH          3000l
 

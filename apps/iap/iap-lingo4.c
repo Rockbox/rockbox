@@ -1218,7 +1218,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             memcpy(cur_dbrecord, buf + 3, 5);
 
-            int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
+            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             uint32_t index;
             uint32_t trackcount;
             index = get_u32(&cur_dbrecord[1]);
@@ -2003,7 +2003,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *
              */
         {
-            int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
+            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             uint32_t index;
             uint32_t trackcount;
             index = get_u32(&buf[3]);
@@ -2821,7 +2821,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
              *
              */
         {
-            int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
+            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             long tracknum = get_u32(&buf[3]);
 
             audio_pause();
@@ -2977,7 +2977,7 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
         {
             memcpy(cur_dbrecord, buf + 3, 5);
 
-            int paused = (is_wps_fading() || (audio_status() & AUDIO_STATUS_PAUSE));
+            int paused = !!(audio_status() & AUDIO_STATUS_PAUSE);
             unsigned int number_of_playlists = nbr_total_playlists();
             uint32_t index;
             uint32_t trackcount;

@@ -1070,11 +1070,3 @@ static void wps_state_init(void)
     add_event(PLAYBACK_EVENT_TRACK_SKIP, track_info_callback);
 #endif
 }
-
-
-#ifdef IPOD_ACCESSORY_PROTOCOL
-bool is_wps_fading(void)
-{
-    return skin_get_global_state()->is_fading;
-}
-#endif

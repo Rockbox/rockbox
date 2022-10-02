@@ -1044,8 +1044,7 @@ const char *get_token_value(struct gui_wps *gwps,
             int mode = 1; /* stop */
             if (status == STATUS_PLAY)
                 mode = 2; /* play */
-            if (state->is_fading ||
-               (status == STATUS_PAUSE  && !status_get_ffmode()))
+            if (status == STATUS_PAUSE && !status_get_ffmode())
                 mode = 3; /* pause */
             else
             {   /* ff / rwd */
