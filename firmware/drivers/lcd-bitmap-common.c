@@ -342,27 +342,8 @@ struct viewport* LCDFN(set_viewport)(struct viewport* vp)
 
 void LCDFN(update_viewport)(void)
 {
-
     struct viewport* vp = LCDFN(current_viewport);
-    if ((vp->flags & VP_FLAG_OWNER_UPDATE) == VP_FLAG_OWNER_UPDATE)
-    {
-#ifdef LOGF_ENABLE
-        logf("%s ignored - owner update", __func__);
-#endif
-        return;
-    }
-    int x, y;
-    if (vp->buffer->stride != LCDFN(framebuffer_default.stride))
-    {
-        x = 0;
-        y = 0;
-    }
-    else
-    {
-        x = vp->x;
-        y = vp->y;
-    }
-    LCDFN(update_rect)(x, y, vp->width, vp->height);
+    LCDFN(update_viewport_rect)(0, 0, vp->width, vp->height);
 }
 
 void LCDFN(update_viewport_rect)(int x, int y, int width, int height)
