@@ -26,8 +26,8 @@
 long gui_wps_show(void);
 
 /* fade (if enabled) and pause the audio, optionally rewind a little */
-void pause_action(bool may_fade, bool updatewps);
-void unpause_action(bool may_fade, bool updatewps);
+void pause_action(bool updatewps);
+void unpause_action(bool updatewps);
 void wps_do_playpause(bool updatewps);
 
 #ifdef IPOD_ACCESSORY_PROTOCOL

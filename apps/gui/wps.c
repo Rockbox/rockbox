@@ -115,7 +115,7 @@ static void update_non_static(void)
         skin_update(WPS, i, SKIN_REFRESH_NON_STATIC);
 }
 
-void pause_action(bool may_fade, bool updatewps)
+void pause_action(bool updatewps)
 {
     /* Do audio first, then update, unless skin were to use its local
        status in which case, reverse it */
@@ -132,11 +132,9 @@ void pause_action(bool may_fade, bool updatewps)
             - global_settings.pause_rewind * 1000;
         audio_ff_rewind(newpos > 0 ? newpos : 0);
     }
-
-    (void)may_fade;
 }
 
-void unpause_action(bool may_fade, bool updatewps)
+void unpause_action(bool updatewps)
 {
     /* Do audio first, then update, unless skin were to use its local
        status in which case, reverse it */
@@ -144,8 +142,6 @@ void unpause_action(bool may_fade, bool updatewps)
 
     if (updatewps)
         update_non_static();
-
-    (void)may_fade;
 }
 
 static bool update_onvol_change(enum screen_type screen)
@@ -578,12 +574,12 @@ void wps_do_playpause(bool updatewps)
     if ( state->paused )
     {
         state->paused = false;
-        unpause_action(true, updatewps);
+        unpause_action(updatewps);
     }
     else
     {
         state->paused = true;
-        pause_action(true, updatewps);
+        pause_action(updatewps);
         settings_save();
 #if !defined(HAVE_SW_POWEROFF)
         call_storage_idle_notifys(true);   /* make sure resume info is saved */

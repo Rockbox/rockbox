@@ -465,7 +465,7 @@ static void car_adapter_mode_processing(bool inserted)
             if ((audio_status() & AUDIO_STATUS_PLAY) &&
                 !(audio_status() & AUDIO_STATUS_PAUSE))
             {
-                pause_action(true, true);
+                pause_action(true);
                 paused_on_unplugged = true;
             }
             else if (!waiting_to_resume_play)
@@ -513,14 +513,14 @@ static void hp_unplug_change(bool inserted)
             if ((audio_stat & AUDIO_STATUS_PLAY) &&
                     headphone_caused_pause &&
                     global_settings.unplug_mode > 1 )
-                unpause_action(true, true);
+                unpause_action(true);
             headphone_caused_pause = false;
         } else {
             if ((audio_stat & AUDIO_STATUS_PLAY) &&
                     !(audio_stat & AUDIO_STATUS_PAUSE))
             {
                 headphone_caused_pause = true;
-                pause_action(false, false);
+                pause_action(false);
             }
         }
     }
@@ -552,14 +552,14 @@ static void lo_unplug_change(bool inserted)
             if ((audio_stat & AUDIO_STATUS_PLAY) &&
                     lineout_caused_pause &&
                     global_settings.unplug_mode > 1 )
-                unpause_action(true, true);
+                unpause_action(true);
             lineout_caused_pause = false;
         } else {
             if ((audio_stat & AUDIO_STATUS_PLAY) &&
                     !(audio_stat & AUDIO_STATUS_PAUSE))
             {
                 lineout_caused_pause = true;
-                pause_action(false, false);
+                pause_action(false);
             }
         }
     }
@@ -629,7 +629,7 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             return SYS_CHARGER_DISCONNECTED;
 
         case SYS_CAR_ADAPTER_RESUME:
-            unpause_action(true, true);
+            unpause_action(true);
             return SYS_CAR_ADAPTER_RESUME;
 #endif
 #ifdef HAVE_HOTSWAP_STORAGE_AS_MAIN
@@ -710,9 +710,9 @@ long default_event_handler_ex(long event, void (*callback)(void *), void *parame
             if (status & AUDIO_STATUS_PLAY)
             {
                 if (status & AUDIO_STATUS_PAUSE)
-                    unpause_action(true, true);
+                    unpause_action(true);
                 else
-                    pause_action(true, true);
+                    pause_action(true);
             }
             else
                 if (playlist_resume() != -1)
