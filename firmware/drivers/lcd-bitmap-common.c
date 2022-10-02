@@ -221,6 +221,34 @@ void LCDFN(fill_viewport)(void)
     LCDFN(fillrect)(0, 0, LCDFN(current_viewport)->width, LCDFN(current_viewport)->height);
 }
 
+#if LCDM(DEPTH) < 8
+/*
+ * clear the current viewport - grayscale displays
+ */
+void LCDFN(clear_viewport)(void)
+{
+    struct viewport *vp = LCDFN(current_viewport);
+    int oldmode;
+
+    if (vp == &default_vp && default_vp.buffer == &LCDFN(framebuffer_default))
+    {
+        LCDFN(clear_display)();
+    }
+    else
+    {
+        oldmode = vp->drawmode;
+        vp->drawmode &= ~DRMODE_INVERSEVID;
+        vp->drawmode |= DRMODE_SOLID;
+
+        LCDFN(fillrect)(0, 0, vp->width, vp->height);
+
+        vp->drawmode = oldmode;
+        LCDFN(scroll_stop_viewport)(vp);
+    }
+
+    vp->flags &= ~VP_FLAG_VP_SET_CLEAN;
+}
+#endif
 
 /*** Viewports ***/
 /* init_viewport Notes: When a viewport is initialized

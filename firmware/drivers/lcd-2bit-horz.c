@@ -348,33 +348,6 @@ void lcd_clear_display(void)
     lcd_scroll_info.lines = 0;
 }
 
-/* Clear the current viewport */
-void lcd_clear_viewport(void)
-{
-    int lastmode;
-
-    if (lcd_current_viewport == &default_vp &&
-           default_vp.buffer == &lcd_framebuffer_default)
-    {
-        lcd_clear_display();
-    }
-    else
-    {
-        lastmode = lcd_current_viewport->drawmode;
-
-        /* Invert the INVERSEVID bit and set basic mode to SOLID */
-        lcd_current_viewport->drawmode = (~lastmode & DRMODE_INVERSEVID) |
-                               DRMODE_SOLID;
-
-        lcd_fillrect(0, 0, lcd_current_viewport->width, lcd_current_viewport->height);
-
-        lcd_current_viewport->drawmode = lastmode;
-
-        lcd_scroll_stop_viewport(lcd_current_viewport);
-    }
-    lcd_current_viewport->flags &= ~(VP_FLAG_VP_SET_CLEAN);
-}
-
 /* Draw a horizontal line (optimised) */
 void lcd_hline(int x1, int x2, int y)
 {

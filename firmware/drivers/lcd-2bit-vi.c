@@ -383,33 +383,6 @@ void LCDFN(clear_display)(void)
     LCDFN(scroll_info).lines = 0;
 }
 
-/* Clear the current viewport */
-void LCDFN(clear_viewport)(void)
-{
-    int lastmode;
-
-    if (CURRENT_VP == &default_vp &&
-           default_vp.buffer == &LCDFN(framebuffer_default))
-    {
-        LCDFN(clear_display)();
-    }
-    else
-    {
-        lastmode = CURRENT_VP->drawmode;
-
-        /* Invert the INVERSEVID bit and set basic mode to SOLID */
-        CURRENT_VP->drawmode = (~lastmode & DRMODE_INVERSEVID) |
-                               DRMODE_SOLID;
-
-        LCDFN(fillrect)(0, 0, CURRENT_VP->width, CURRENT_VP->height);
-
-        CURRENT_VP->drawmode = lastmode;
-
-        LCDFN(scroll_stop_viewport)(CURRENT_VP);
-    }
-    CURRENT_VP->flags &= ~(VP_FLAG_VP_SET_CLEAN);
-}
-
 /* Draw a horizontal line (optimised) */
 void LCDFN(hline)(int x1, int x2, int y)
 {
