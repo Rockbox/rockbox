@@ -203,7 +203,7 @@ static int skintouch_to_wps(struct wps_data *data)
 }
 #endif /* HAVE_TOUCHSCREEN */
 
-bool ffwd_rew(int button)
+static bool ffwd_rew(int button)
 {
     unsigned int step = 0;     /* current ff/rewind step */
     unsigned int max_step = 0; /* maximum ff/rewind step */
@@ -1080,10 +1080,5 @@ static void wps_state_init(void)
 bool is_wps_fading(void)
 {
     return skin_get_global_state()->is_fading;
-}
-
-int wps_get_ff_rewind_count(void)
-{
-    return skin_get_global_state()->ff_rewind_count;
 }
 #endif
