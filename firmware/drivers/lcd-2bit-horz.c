@@ -345,7 +345,7 @@ void lcd_clear_display(void)
             memset(FBADDR(0,0), bg_pattern, FRAMEBUFFER_SIZE);
     }
 
-    lcd_scroll_info.lines = 0;
+    lcd_scroll_stop();
 }
 
 /* Draw a horizontal line (optimised) */

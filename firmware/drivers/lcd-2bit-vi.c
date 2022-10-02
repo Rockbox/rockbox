@@ -380,7 +380,7 @@ void LCDFN(clear_display)(void)
                    FBSIZE);
     }
 
-    LCDFN(scroll_info).lines = 0;
+    LCDFN(scroll_stop)();
 }
 
 /* Draw a horizontal line (optimised) */

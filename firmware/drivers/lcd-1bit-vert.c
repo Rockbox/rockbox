@@ -203,7 +203,7 @@ void LCDFN(clear_display)(void)
     unsigned bits = (CURRENT_VP->drawmode & DRMODE_INVERSEVID) ? 0xFFu : 0;
 
     memset(LCDFB(0, 0), bits, FBSIZE);
-    LCDFN(scroll_info).lines = 0;
+    LCDFN(scroll_stop)();
 }
 
 /* Draw a horizontal line (optimised) */
