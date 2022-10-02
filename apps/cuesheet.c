@@ -565,12 +565,12 @@ bool curr_cuesheet_skip(struct cuesheet *cue, int direction, unsigned long curr_
         if (!(direction <= 0 && track == 0))
         {
             /* If skipping forward, skip to next cuesheet segment. If skipping
-            backward before DEFAULT_SKIP_TRESH milliseconds have elapsed, skip
+            backward before DEFAULT_SKIP_THRESH milliseconds have elapsed, skip
             to previous cuesheet segment. If skipping backward after
-            DEFAULT_SKIP_TRESH seconds have elapsed, skip to the start of the
+            DEFAULT_SKIP_THRESH seconds have elapsed, skip to the start of the
             current cuesheet segment */
             if (direction == 1 ||
-                  ((curr_pos - cue->tracks[track].offset) < DEFAULT_SKIP_TRESH))
+                  ((curr_pos - cue->tracks[track].offset) < DEFAULT_SKIP_THRESH))
             {
                 track += direction;
             }

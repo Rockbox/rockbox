@@ -443,26 +443,26 @@ static void play_hop(int direction)
     {
         if (direction < 0)
         {
-            prev_track(DEFAULT_SKIP_TRESH);
+            prev_track(DEFAULT_SKIP_THRESH);
             return;
         }
-        else if (remaining < DEFAULT_SKIP_TRESH*2)
+        else if (remaining < DEFAULT_SKIP_THRESH*2)
         {
             next_track();
             return;
         }
         else
-            elapsed += (remaining - DEFAULT_SKIP_TRESH*2);
+            elapsed += (remaining - DEFAULT_SKIP_THRESH*2);
     }
     else if (!global_settings.prevent_skip &&
            (!step ||
             (direction > 0 && step >= remaining) ||
-            (direction < 0 && elapsed < DEFAULT_SKIP_TRESH)))
+            (direction < 0 && elapsed < DEFAULT_SKIP_THRESH)))
     {   /* Do normal track skipping */
         if (direction > 0)
             next_track();
         else if (direction < 0)
-            prev_track(DEFAULT_SKIP_TRESH);
+            prev_track(DEFAULT_SKIP_THRESH);
         return;
     }
     else if (direction == 1 && step >= remaining)

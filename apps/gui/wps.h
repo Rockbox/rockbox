@@ -36,6 +36,6 @@ bool is_wps_fading(void);
 #endif /* IPOD_ACCESSORY_PROTOCOL */
 
 /* in milliseconds */
-#define DEFAULT_SKIP_TRESH          3000l
+#define DEFAULT_SKIP_THRESH          3000l
 
 #endif /* _WPS_H_ */
