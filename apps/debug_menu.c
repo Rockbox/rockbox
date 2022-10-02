@@ -870,7 +870,7 @@ static int tsc2100debug_action_callback(int action, struct gui_synclist *lists)
     if (action == ACTION_STD_OK)
     {
         *page = (*page+1)%3;
-        snprintf(lists->title, 32, "tsc2100 registers - Page %d", *page);
+        snprintf((char*)lists->title, 32, "tsc2100 registers - Page %d", *page);
         return ACTION_REDRAW;
     }
     return action;
