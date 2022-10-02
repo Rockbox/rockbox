@@ -427,9 +427,6 @@ static int parse_image_load(struct skin_element *element,
     img->is_9_segment = false;
     img->loaded = false;
 
-    /* save current viewport */
-    img->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
-
     if (token->type == SKIN_TOKEN_IMAGE_DISPLAY)
         token->value.data = PTRTOSKINOFFSET(skin_buffer, img);
 
@@ -1170,7 +1167,6 @@ static int parse_progressbar_tag(struct skin_element* element,
             img->display = -1;
             img->using_preloaded_icons = false;
             img->buflib_handle = -1;
-            img->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
             img->loaded = false;
             struct skin_token_list *item = new_skin_token_list_item(NULL, img);
             if (!item)

@@ -81,7 +81,6 @@ struct skin_token_list {
 };
 
 struct gui_img {
-    OFFSETTYPE(struct viewport*) vp;    /* The viewport to display this image in */
     short int x;                  /* x-pos */
     short int y;                  /* y-pos */
     short int num_subimages;      /* number of sub-images */
