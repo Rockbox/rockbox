@@ -145,7 +145,6 @@ struct scrollinfo;
 #if defined(HAVE_LCD_MODES)
     void lcd_set_mode(int mode);
 #define LCD_MODE_RGB565 0x00000001
-#define LCD_MODE_YUV    0x00000002
 #define LCD_MODE_PAL256 0x00000004
 
 #if HAVE_LCD_MODES & LCD_MODE_PAL256
@@ -236,15 +235,7 @@ extern bool lcd_putsxy_scroll_func(int x, int y, const unsigned char *string,
                                    void *data, int x_offset);
 
 /* performance function */
-#if defined(HAVE_LCD_COLOR)
-#if MEMORYSIZE > 2
-#define LCD_YUV_DITHER 0x1
-    extern void lcd_yuv_set_options(unsigned options);
-    extern void lcd_blit_yuv(unsigned char * const src[3],
-                         int src_x, int src_y, int stride,
-                         int x, int y, int width, int height);
-#endif /* MEMORYSIZE > 2 */
-#else
+#if !defined(HAVE_LCD_COLOR)
     extern void lcd_blit_mono(const unsigned char *data, int x, int by, int width,
                           int bheight, int stride);
     extern void lcd_blit_grey_phase(unsigned char *values, unsigned char *phases,

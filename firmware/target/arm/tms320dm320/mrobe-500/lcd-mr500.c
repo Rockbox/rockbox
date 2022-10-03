@@ -273,15 +273,7 @@ void lcd_init_device(void)
 #if defined(HAVE_LCD_MODES)
 void lcd_set_mode(int mode)
 {
-    if(mode==LCD_MODE_YUV) {
-        /* Turn off the RGB buffer and enable the YUV buffer with zoom */
-        IO_OSD_OSDWINMD0    |= 0x04;
-        IO_OSD_VIDWINMD     |= 0x01;
-#if LCD_NATIVE_WIDTH > 240
-        IO_OSD_VIDWINMD     |= (0x05<<2); /* This does a 2x zoom */
-#endif
-        memset16(FRAME2, 0x0080, LCD_NATIVE_HEIGHT*(LCD_NATIVE_WIDTH+LCD_FUDGE));
-    } else if(mode==LCD_MODE_RGB565) {
+    if(mode==LCD_MODE_RGB565) {
         /* Turn on the RGB window, set it to 16 bit and turn YUV window off */
         IO_OSD_VIDWINMD     &= ~(0x01);
         IO_OSD_OSDWIN0OFST  =  LCD_NATIVE_WIDTH / 16;
@@ -644,82 +636,6 @@ void lcd_pal256_update_pal(fb_data *palette)
 }
 #endif
                                            
-/* Performance function to blit a YUV bitmap directly to the LCD */
-/* Show it rotated so the LCD_WIDTH is now the height */
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    unsigned char const * yuv_src[3];
-
-    if (!lcd_on)
-        return;
-    
-    /* y has to be on a 16 pixel boundary */
-    y &= ~0xF;
-
-    if(     ((y | x | height | width ) < 0) 
-            || y>LCD_NATIVE_HEIGHT || x>LCD_NATIVE_WIDTH )
-        return;
-
-    if(y+height>LCD_NATIVE_WIDTH)
-    {
-        height=LCD_NATIVE_WIDTH-y;
-    }
-    if(x+width>LCD_NATIVE_HEIGHT)
-    {
-        width=LCD_NATIVE_HEIGHT-x;
-    }
-
-    /* Sorry, but width and height must be >= 2 or else */
-    width &= ~1;
-    height>>=1;
-
-    fb_data * dst = FRAME2 
-        + ((LCD_NATIVE_WIDTH+LCD_FUDGE)*(LCD_NATIVE_HEIGHT-1)) 
-        - (LCD_NATIVE_WIDTH+LCD_FUDGE)*x + y ;
-
-    /* Scope z */
-    {
-        off_t z;
-        z = stride*src_y;
-        yuv_src[0] = src[0] + z + src_x;
-        yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-        yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-    }
-
-    int cbcr_remain=(stride>>1)-(width>>1);
-    int y_remain=(stride<<1)-width;
-    do
-    {
-        register int c_width=width;
-        register unsigned int *c_dst=(unsigned int*)dst;
-        do
-        {
-            register unsigned short Y=*((unsigned short*)yuv_src[0]);
-            register unsigned short Yst=*((unsigned short*)(yuv_src[0]+stride));
-            yuv_src[0]+=2;
-            
-            register unsigned char Cb=*yuv_src[1]++;
-            register unsigned char Cr=*yuv_src[2]++;
-            
-            *c_dst = (Yst<<24) | (Cr << 16) | ((Y&0xFF)<<8) | Cb;
-            *(c_dst - (LCD_NATIVE_WIDTH+LCD_FUDGE)/2) = 
-                    ( (Yst&0xFF00)<<16) | (Cr << 16) | (Y&0xFF00) | Cb;
-                    
-            c_dst -= (LCD_NATIVE_WIDTH+LCD_FUDGE);
-            
-            c_width -= 2;
-        } while (c_width);
-        
-        yuv_src[0] += y_remain; /* Skip down two luma lines-width */
-        yuv_src[1] += cbcr_remain; /* Skip down one chroma line-width/2 */
-        yuv_src[2] += cbcr_remain;
-
-        dst+=2;
-    } while (--height);
-}
-
 void lcd_set_contrast(int val) {
   (void) val;
   // TODO:

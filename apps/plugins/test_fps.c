@@ -123,94 +123,6 @@ static void time_main_update(void)
     log_text(str);
 }
 
-#if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
-
-#if LCD_WIDTH >= LCD_HEIGHT
-#define YUV_WIDTH LCD_WIDTH
-#define YUV_HEIGHT LCD_HEIGHT
-#else /* Assume the screen is rotated on portrait LCDs */
-#define YUV_WIDTH LCD_HEIGHT
-#define YUV_HEIGHT LCD_WIDTH
-#endif
-
-static unsigned char ydata[YUV_HEIGHT][YUV_WIDTH];
-static unsigned char udata[YUV_HEIGHT/2][YUV_WIDTH/2];
-static unsigned char vdata[YUV_HEIGHT/2][YUV_WIDTH/2];
-
-static unsigned char * const yuvbuf[3] = {
-    (void*)ydata,
-    (void*)udata,
-    (void*)vdata
-};
-
-static void make_gradient_rect(int width, int height)
-{
-    unsigned char vline[YUV_WIDTH/2];
-    int x, y;
-
-    width /= 2;
-    height /= 2;
-
-    for (x = 0; x < width; x++)
-        vline[x] = (x << 8) / width;
-    for (y = 0; y < height; y++)
-    {
-        rb->memset(udata[y], (y << 8) / height, width);
-        rb->memcpy(vdata[y], vline, width);
-    }
-}
-
-static void time_main_yuv(void)
-{
-    char str[32];     /* text buffer */
-    long time_start;  /* start tickcount */
-    long time_end;    /* end tickcount */
-    int frame_count;
-    int fps;
-
-    const int part14_x = YUV_WIDTH/4;   /* x-offset for 1/4 update test */
-    const int part14_w = YUV_WIDTH/2;   /* x-size for 1/4 update test */
-    const int part14_y = YUV_HEIGHT/4;  /* y-offset for 1/4 update test */
-    const int part14_h = YUV_HEIGHT/2;  /* y-size for 1/4 update test */
-    
-    log_text("Main LCD YUV");
-
-    rb->memset(ydata, 128, sizeof(ydata)); /* medium grey */
-
-    /* Test 1: full LCD update */
-    make_gradient_rect(YUV_WIDTH, YUV_HEIGHT);
-
-    frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
-    {
-        rb->lcd_blit_yuv(yuvbuf, 0, 0, YUV_WIDTH,
-                         0, 0, YUV_WIDTH, YUV_HEIGHT);
-        frame_count++;
-    }
-    fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/1: %d.%d fps", fps / 10, fps % 10);
-    log_text(str);
-
-    /* Test 2: quarter LCD update */
-    make_gradient_rect(YUV_WIDTH/2, YUV_HEIGHT/2);
-
-    frame_count = 0;
-    rb->sleep(0); /* sync to tick */
-    time_start = *rb->current_tick;
-    while((time_end = *rb->current_tick) - time_start < DURATION)
-    {
-        rb->lcd_blit_yuv(yuvbuf, 0, 0, YUV_WIDTH,
-                         part14_x, part14_y, part14_w, part14_h);
-        frame_count++;
-    }
-    fps = calc_tenth_fps(frame_count, time_end - time_start);
-    rb->snprintf(str, sizeof(str), "1/4: %d.%d fps", fps / 10, fps % 10);
-    log_text(str);
-}
-#endif
-
 #ifdef HAVE_REMOTE_LCD
 static void time_remote_update(void)
 {
@@ -406,9 +318,6 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     time_main_update();
     rb->sleep(HZ);
-#if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
-    time_main_yuv();
-#endif
 #if LCD_DEPTH < 4
     time_greyscale();
 #endif

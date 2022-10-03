@@ -178,22 +178,3 @@ void lcd_set_gram_area(int x_start, int y_start,
     lcd_cmd(GRAM_WRITE);
     LCDC_CTRL &= ~RGB24B;
 }
-
-/* Blit a YUV bitmap directly to the LCD
- * provided by generic fallback in lcd-16bit-common.c
- */
-#if 0
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-}
-#endif

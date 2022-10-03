@@ -838,19 +838,6 @@ void lcd_blit_mono(const unsigned char *data, int x, int by, int width, int bhei
     \param stride
     \description
 
-void lcd_blit_yuv(unsigned char * const src[3], int src_x, int src_y, int stride, int x, int y, int width, int height)
-    \group lcd
-    \conditions (LCD_DEPTH >= 16)
-    \param src[3]
-    \param src_x
-    \param src_y
-    \param stride
-    \param x
-    \param y
-    \param width
-    \param height
-    \description
-
 void lcd_clear_display(void)
     \group lcd
     \description Clears the LCD and the framebuffer
@@ -1244,12 +1231,6 @@ void lcd_vline(int x, int y1, int y2)
     \param y1 Y start coordinate
     \param y2 Y end coordinate
     \description Draws a vertical line at (=x=, =y1=) -> (=x=, =y2=) within current drawing mode
-
-void lcd_yuv_set_options(unsigned options)
-    \group lcd
-    \conditions (LCD_DEPTH >= 16) && (defined(TOSHIBA_GIGABEAT_F) || defined(SANSA_E200) || defined(SANSA_C200)  || defined(IRIVER_H10) || defined(COWON_D2))
-    \param options
-    \description
 
 void led(bool on)
     \param on

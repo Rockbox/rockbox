@@ -406,36 +406,3 @@ void lcd_update_rect(int x, int y, int width, int height)
         } while (--height > 0 );
     }
 }
-
-/* Line write helper function for lcd_yuv_blit. Writes two lines of yuv420. */
-extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
-                                   const unsigned int lcd_baseadress,
-                                   int width,
-                                   int stride);
-
-/* Blit a YUV bitmap directly to the LCD */
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    unsigned int z;
-    unsigned char const * yuv_src[3];
-    
-    width = (width + 1) & ~1;       /* ensure width is even */
-
-    lcd_setup_drawing_region(x, y, width, height);
-
-    z = stride * src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    height >>= 1;
-
-    do {
-        lcd_write_yuv420_lines(yuv_src, LCD_BASE, width, stride);
-        yuv_src[0] += stride << 1;
-        yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-        yuv_src[2] += stride >> 1;
-    } while (--height > 0);
-}

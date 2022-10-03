@@ -947,7 +947,6 @@ target/arm/sandisk/sansa-e200/powermgmt-e200.c
 #endif /* SANSA_E200 */
 
 #ifdef SANSA_C200
-target/arm/sandisk/sansa-c200/lcd-as-c200.S
 target/arm/sandisk/sansa-c200/button-c200.c
 target/arm/sandisk/sansa-c200/powermgmt-c200.c
 #endif /* SANSA_C200 */
@@ -972,7 +971,6 @@ target/arm/philips/piezo.c
 target/arm/philips/sa9200/backlight-sa9200.c
 target/arm/philips/sa9200/button-sa9200.c
 target/arm/philips/sa9200/lcd-sa9200.c
-target/arm/philips/sa9200/lcd-as-sa9200.S
 target/arm/philips/sa9200/power-sa9200.c
 target/arm/philips/sa9200/powermgmt-sa9200.c
 #endif /* PHILIPS_SA9200 */
@@ -990,7 +988,6 @@ target/arm/philips/fmradio_i2c-hdd.c
 target/arm/philips/hdd1630/backlight-hdd1630.c
 target/arm/philips/hdd1630/button-hdd1630.c
 target/arm/philips/hdd1630/lcd-hdd1630.c
-target/arm/philips/hdd1630/lcd-as-hdd1630.S
 target/arm/philips/hdd1630/powermgmt-hdd1630.c
 #endif /* PHILIPS_HDD1630 */
 
@@ -998,7 +995,6 @@ target/arm/philips/hdd1630/powermgmt-hdd1630.c
 target/arm/philips/hdd6330/backlight-hdd6330.c
 target/arm/philips/hdd6330/button-hdd6330.c
 target/arm/philips/hdd6330/lcd-hdd6330.c
-target/arm/philips/hdd6330/lcd-as-hdd6330.S
 target/arm/philips/hdd6330/powermgmt-hdd6330.c
 #endif /* PHILIPS_HDD6330 */
 
@@ -1077,7 +1073,6 @@ target/coldfire/iriver/h300/adc-h300.c
 target/coldfire/iriver/h300/backlight-h300.c
 target/coldfire/iriver/h300/button-h300.c
 target/coldfire/iriver/h300/pcf50606-h300.c
-target/coldfire/iriver/h300/lcd-as-h300.S
 target/coldfire/iriver/h300/lcd-h300.c
 target/coldfire/iriver/h300/power-h300.c
 target/coldfire/iriver/h300/powermgmt-h300.c
@@ -1110,7 +1105,6 @@ target/arm/iriver/h10/powermgmt-h10.c
 
 #ifdef IRIVER_H10
 target/arm/iriver/h10/lcd-h10_20gb.c
-target/arm/iriver/h10/lcd-as-h10.S
 #endif /* IRIVER_H10 */
 
 #ifdef IRIVER_H10_5GB
@@ -1314,13 +1308,11 @@ target/arm/ipod/button-clickwheel.c
 #ifdef IPOD_COLOR
 target/arm/ipod/backlight-4g_color.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/lcd-as-color-nano.S
 #endif /* IPOD_COLOR */
 
 #ifdef IPOD_NANO
 target/arm/ipod/backlight-nano_video.c
 target/arm/ipod/button-clickwheel.c
-target/arm/ipod/lcd-as-color-nano.S
 #endif /* IPOD_NANO */
 
 #ifdef IPOD_VIDEO
@@ -1392,7 +1384,6 @@ target/arm/as3525/backlight-e200v2-fuze.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-e200v2/powermgmt-e200v2.c
-target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
 #endif /* SANSA_E200V2 */
 
@@ -1419,7 +1410,6 @@ target/arm/as3525/backlight-e200v2-fuze.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-fuze/powermgmt-fuze.c
-target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
 #endif /* SANSA_FUZE */
 
@@ -1430,7 +1420,6 @@ target/arm/as3525/sansa-fuzev2/button-fuzev2.c
 target/arm/as3525/dbop-as3525.c
 #ifndef BOOTLOADER
 target/arm/as3525/sansa-fuzev2/powermgmt-fuzev2.c
-target/arm/as3525/lcd-as-e200v2-fuze-fuzev2.S
 #endif /* !BOOTLOADER */
 #endif /* SANSA_FUZEV2 */
 
@@ -1551,7 +1540,6 @@ target/arm/s5l8702/pl080.c
 target/arm/s5l8702/dma-s5l8702.c
 target/arm/s5l8702/clocking-s5l8702.c
 target/arm/s5l8702/ipod6g/lcd-6g.c
-target/arm/s5l8702/ipod6g/lcd-asm-6g.S
 target/arm/s5l8702/ipod6g/piezo-6g.c
 #if 0 //TODO
 target/arm/s5l8702/postmortemstub.S
@@ -1768,7 +1756,6 @@ target/arm/samsung/power-yh82x_yh92x.c
 #ifdef SAMSUNG_YH820
 target/arm/samsung/yh820/backlight-yh820.c
 target/arm/samsung/yh820/lcd-yh820.c
-target/arm/samsung/yh820/lcd-as-yh820.S
 target/arm/samsung/yh820/powermgmt-yh820.c
 #endif /* SAMSUNG_YH820 */
 
@@ -1783,7 +1770,6 @@ target/arm/samsung/fmradio-yh92x.c
 #ifdef SAMSUNG_YH925
 target/arm/samsung/yh925/backlight-yh925.c
 target/arm/samsung/yh925/lcd-yh925.c
-target/arm/samsung/yh925/lcd-as-yh925.S
 target/arm/samsung/yh925/powermgmt-yh925.c
 #endif /* SAMSUNG_YH925 */
 
@@ -1802,7 +1788,6 @@ target/arm/pbell/vibe500/lcd-vibe500.c
 target/arm/pbell/vibe500/button-vibe500.c
 target/arm/pbell/vibe500/power-vibe500.c
 target/arm/pbell/vibe500/backlight-vibe500.c
-target/arm/pbell/vibe500/lcd-as-vibe500.S
 target/arm/pbell/vibe500/powermgmt-vibe500.c
 #endif
 

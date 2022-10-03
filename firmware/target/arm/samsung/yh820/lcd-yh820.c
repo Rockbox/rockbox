@@ -30,8 +30,6 @@
 #endif
 
 /* Display status */
-static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
-
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static bool is_lcd_enabled = true;
 #endif
@@ -290,78 +288,6 @@ void lcd_set_flip(bool yesno)
 
 
 /*** update functions ***/
-
-void lcd_yuv_set_options(unsigned options)
-{
-    lcd_yuv_options = options;
-}
-
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
-extern void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
-                                           int width,
-                                           int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
-/* Performance function to blit a YUV bitmap directly to the LCD */
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    unsigned char const * yuv_src[3];
-    off_t z;
-
-    /* Sorry, but width and height must be >= 2 or else */
-    width &= ~1;
-    height >>= 1;
-    
-    z = stride*src_y;
-    yuv_src[0] = src[0] + z + src_x;
-    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-
-    lcd_send_command(R_ENTRY_MODE);
-    lcd_send_command(0x03);
-
-    lcd_send_command(R_Y_ADDR_AREA);
-    lcd_send_command(x + 4);
-    lcd_send_command(x + width - 1 + 4);
-
-    if (lcd_yuv_options & LCD_YUV_DITHER)
-    {
-        do
-        {
-            lcd_send_command(R_X_ADDR_AREA);
-            lcd_send_command(y);
-            lcd_send_command(y + 1);
-
-            lcd_write_yuv420_lines_odither(yuv_src, width, stride, x, y);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            y += 2;
-        }
-         while (--height > 0);
-    }
-    else
-    {
-        do
-        {
-            lcd_send_command(R_X_ADDR_AREA);
-            lcd_send_command(y);
-            lcd_send_command(y + 1);
-
-            lcd_write_yuv420_lines(yuv_src, width, stride);
-            yuv_src[0] += stride << 1; /* Skip down two luma lines */
-            yuv_src[1] += stride >> 1; /* Skip down one chroma line */
-            yuv_src[2] += stride >> 1;
-            y += 2;
-        }
-         while (--height > 0);
-    }
-}
 
 /* Update the display.
    This must be called after all other LCD functions that change the display. */

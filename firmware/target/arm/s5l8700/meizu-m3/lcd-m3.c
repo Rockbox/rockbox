@@ -311,11 +311,3 @@ void lcd_update_rect(int x, int y, int width, int height)
 {
     lcd_update();
 }
-
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    /* stub */
-}
-

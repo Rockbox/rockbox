@@ -350,22 +350,3 @@ bool lcd_active()
 {
     return display_on;
 }
-
-/* Blit a YUV bitmap directly to the LCD
- * provided by generic fallback in lcd-16bit-common.c
- */
-#if 0
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    (void)src;
-    (void)src_x;
-    (void)src_y;
-    (void)stride;
-    (void)x;
-    (void)y;
-    (void)width;
-    (void)height;
-}
-#endif

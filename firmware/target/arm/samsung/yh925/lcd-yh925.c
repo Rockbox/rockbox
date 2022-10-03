@@ -37,8 +37,6 @@ static unsigned short disp_control_rev;
 /* Contrast setting << 8 */
 static int lcd_contrast;
 
-static unsigned lcd_yuv_options SHAREDBSS_ATTR = 0;
-
 /* Forward declarations */
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
 static void lcd_display_off(void);
@@ -509,98 +507,6 @@ bool lcd_active(void)
 #endif
 
 /*** update functions ***/
-
-void lcd_yuv_set_options(unsigned options)
-{
-    lcd_yuv_options = options;
-}
-
-/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420. */
-extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
-                                   int width,
-                                   int stride);
-extern void lcd_write_yuv420_lines_odither(unsigned char const * const src[3],
-                                           int width,
-                                           int stride,
-                                           int x_screen, /* To align dither pattern */
-                                           int y_screen);
-
-/* Performance function to blit a YUV bitmap directly to the LCD */
-void lcd_blit_yuv(unsigned char * const src[3],
-                  int src_x, int src_y, int stride,
-                  int x, int y, int width, int height)
-{
-    const unsigned char *yuv_src[3];
-    const unsigned char *ysrc_max;
-    int y0;
-    int options;
-
-    /* NOT MODIFIED FOR THE YH-925 */
-
-    if (!display_on)
-        return;
-
-    width &= ~1;
-    height &= ~1;
-
-    x += x_offset;
-
-    /* calculate the drawing region */
-
-    /* The 20GB LCD is actually 128x160 but rotated 90 degrees so the origin
-     * is actually the bottom left and horizontal and vertical are swapped. 
-     * Rockbox expects the origin to be the top left so we need to use 
-     * 127 - y instead of just y */
-    
-    /* max vert << 8 | start vert */
-    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((x + width - 1) << 8) | x);
-
-    y0 = LCD_HEIGHT - 1 - y + y_offset;
-
-    /* DIT=0, BGR=1, HWM=0, I/D1-0=10, AM=0, LG2-0=000 */
-    lcd_write_reg(R_ENTRY_MODE, 0x1020);
-
-    yuv_src[0] = src[0] + src_y * stride + src_x;
-    yuv_src[1] = src[1] + (src_y * stride >> 2) + (src_x >> 1);
-    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
-    ysrc_max = yuv_src[0] + height * stride;
-
-    options = lcd_yuv_options;
-
-    do
-    {
-        /* max horiz << 8 | start horiz */
-        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, (y0 << 8) | (y0 - 1));
-
-        /* position cursor (set AD0-AD15) */
-        /* start vert << 8 | start horiz */
-        lcd_write_reg(R_RAM_ADDR_SET, (x << 8) | y0);
-
-        /* start drawing */
-        lcd_send_cmd(R_WRITE_DATA_2_GRAM);
-
-        if (options & LCD_YUV_DITHER)
-        {
-            lcd_write_yuv420_lines_odither(yuv_src, width, stride,
-                                           x, y);
-            y -= 2;
-        }
-        else
-        {
-            lcd_write_yuv420_lines(yuv_src, width, stride);
-        }
-
-        y0 -= 2;
-        yuv_src[0] += stride << 1;
-        yuv_src[1] += stride >> 1;
-        yuv_src[2] += stride >> 1;
-    }
-    while (yuv_src[0] < ysrc_max);
-
-    /* DIT=0, BGR=1, HWM=0, I/D1-0=10, AM=1, LG2-0=000 */
-    lcd_write_reg(R_ENTRY_MODE, 0x1028);
-}
-
 
 /* Update a fraction of the display. */
 void lcd_update_rect(int x0, int y0, int width, int height)
