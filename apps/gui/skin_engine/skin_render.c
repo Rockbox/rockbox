@@ -67,7 +67,6 @@ struct skin_draw_info {
     bool no_line_break;
     bool line_scrolls;
     bool force_redraw;
-    bool viewport_change;
 
     char *buf;
     size_t buf_size;
