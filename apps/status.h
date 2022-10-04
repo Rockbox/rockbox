@@ -21,6 +21,8 @@
 #ifndef _STATUS_H
 #define _STATUS_H
 
+/* Do not reorder these, inbuilt statusbar icons and the
+ * skin engine %mp tag depend on this ordering. */
 enum playmode
 {
     STATUS_PLAY,
