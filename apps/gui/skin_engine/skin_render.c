@@ -241,7 +241,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct progressbar *bar = (struct progressbar*)SKINOFFSETTOPTR(skin_buffer, token->value.data);
             if (do_refresh)
-                draw_progressbar(gwps, info->line_number, bar);
+                draw_progressbar(gwps, info->skin_vp, info->line_number, bar);
         }
         break;
         case SKIN_TOKEN_IMAGE_DISPLAY:

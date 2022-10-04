@@ -112,7 +112,6 @@ struct image_display {
 
 struct progressbar {
     enum skin_token_type type;
-    OFFSETTYPE(struct viewport *) vp;
     /* regular pb */
     short x;
     /* >=0: explicitly set in the tag -> y-coord within the viewport

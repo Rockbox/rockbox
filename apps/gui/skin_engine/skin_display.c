@@ -158,10 +158,11 @@ void ab_draw_markers(struct screen * screen, int capacity,
 
 #endif
 
-void draw_progressbar(struct gui_wps *gwps, int line, struct progressbar *pb)
+void draw_progressbar(struct gui_wps *gwps, struct skin_viewport* skin_viewport,
+                      int line, struct progressbar *pb)
 {
     struct screen *display = gwps->display;
-    struct viewport *vp = SKINOFFSETTOPTR(get_skin_buffer(gwps->data), pb->vp);
+    struct viewport *vp = &skin_viewport->vp;
     struct wps_state *state = get_wps_state();
     struct mp3entry *id3 = state->id3;
     int x = pb->x, y = pb->y, width = pb->width, height = pb->height;

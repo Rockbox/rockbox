@@ -966,7 +966,6 @@ static int parse_progressbar_tag(struct skin_element* element,
 
     if (!pb)
         return WPS_ERROR_INVALID_PARAM;
-    pb->vp = PTRTOSKINOFFSET(skin_buffer, vp);
     pb->follow_lang_direction = follow_lang_direction > 0;
     pb->nofill = false;
     pb->noborder = false;
