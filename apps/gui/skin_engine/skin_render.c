@@ -593,10 +593,6 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                                                         sizeof(tempbuf), NULL);
                     if (valuestr)
                     {
-#if defined(ONDA_VX747) || defined(ONDA_VX747P)
-                        /* Doesn't redraw (in sim at least) */
-                        needs_update = true;
-#endif
 #if CONFIG_RTC
                         if (child->tag->flags&SKIN_RTC_REFRESH)
                             needs_update = needs_update || info->refresh_type&SKIN_REFRESH_DYNAMIC;
@@ -609,10 +605,6 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 }
                 break;
             case TEXT:
-#if defined(ONDA_VX747) || defined(ONDA_VX747P)
-                /* Doesn't redraw (in sim at least) */
-                needs_update = true;
-#endif
                 strlcat(info->cur_align_start, SKINOFFSETTOPTR(skin_buffer, child->data),
                         info->buf_size - (info->cur_align_start-info->buf));
                 needs_update = needs_update ||
