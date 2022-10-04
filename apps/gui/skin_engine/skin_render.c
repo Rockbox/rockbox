@@ -96,11 +96,11 @@ get_child(OFFSETTYPE(struct skin_element**) children, int child)
 
 
 static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
-                             struct skin_element *element, struct skin_viewport* skin_vp)
+                             struct skin_element *element)
 {
     struct wps_token *token = (struct wps_token *)SKINOFFSETTOPTR(skin_buffer, element->data);
     if (!token) return false;
-    struct viewport *vp = &skin_vp->vp;
+    struct skin_viewport *skin_vp = info->skin_vp;
     struct wps_data *data = gwps->data;
     bool do_refresh = (element->tag->flags & info->refresh_type) > 0;
 
@@ -199,7 +199,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         case SKIN_TOKEN_PEAKMETER:
             data->peak_meter_enabled = true;
             if (do_refresh)
-                draw_peakmeters(gwps, info->line_number, vp);
+                draw_peakmeters(gwps, info->line_number, &skin_vp->vp);
             break;
         case SKIN_TOKEN_DRAWRECTANGLE:
             if (do_refresh)
@@ -218,13 +218,13 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
 #endif
                 {
 #if LCD_DEPTH > 1
-                    unsigned backup = vp->fg_pattern;
-                    vp->fg_pattern = rect->start_colour;
+                    unsigned backup = skin_vp->vp.fg_pattern;
+                    skin_vp->vp.fg_pattern = rect->start_colour;
 #endif
                     gwps->display->fillrect(rect->x, rect->y, rect->width,
                         rect->height);
 #if LCD_DEPTH > 1
-                    vp->fg_pattern = backup;
+                    skin_vp->vp.fg_pattern = backup;
 #endif
                 }
             }
@@ -585,7 +585,7 @@ static bool skin_render_line(struct skin_element* line, struct skin_draw_info *i
                 {
                     break;
                 }
-                if (!do_non_text_tags(info->gwps, info, child, info->skin_vp))
+                if (!do_non_text_tags(info->gwps, info, child))
                 {
                     static char tempbuf[128];
                     const char *valuestr = get_token_value(info->gwps, SKINOFFSETTOPTR(skin_buffer, child->data),
