@@ -1317,7 +1317,6 @@ static int parse_albumart_load(struct skin_element* element,
     if (!isdefault(param3) && param3->type == PERCENT)
         aa->height = param3->data.number * curr_vp->vp.height / 1000;
 
-    aa->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
     aa->draw_handle = -1;
 
     /* if we got here, we parsed everything ok .. ! */
@@ -2405,13 +2404,6 @@ static int skin_element_callback(struct skin_element* element, void* data)
                     break;
 #endif
 #ifdef HAVE_ALBUMART
-                case SKIN_TOKEN_ALBUMART_DISPLAY:
-                    if (SKINOFFSETTOPTR(skin_buffer, wps_data->albumart))
-                    {
-                        struct skin_albumart *aa = SKINOFFSETTOPTR(skin_buffer, wps_data->albumart);
-                        aa->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
-                    }
-                    break;
                 case SKIN_TOKEN_ALBUMART_LOAD:
                     function = parse_albumart_load;
                     break;
