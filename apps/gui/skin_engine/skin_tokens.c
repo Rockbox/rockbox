@@ -1039,36 +1039,19 @@ const char *get_token_value(struct gui_wps *gwps,
         case SKIN_TOKEN_PLAYBACK_STATUS:
         {
             int status = current_playmode();
-            /* music */
-            int mode = 1; /* stop */
-            if (status == STATUS_PLAY)
-                mode = 2; /* play */
-            if (status == STATUS_PAUSE && !status_get_ffmode())
-                mode = 3; /* pause */
-            else
-            {   /* ff / rwd */
-                if (status_get_ffmode() == STATUS_FASTFORWARD)
-                    mode = 4;
-                if (status_get_ffmode() == STATUS_FASTBACKWARD)
-                    mode = 5;
+            switch (status) {
+            case STATUS_STOP:
+                numeric_ret = 1;
+                break;
+            case STATUS_PLAY:
+                numeric_ret = 2;
+                break;
+            default:
+                numeric_ret = status + 1;
+                break;
             }
-#ifdef HAVE_RECORDING
-            /* recording */
-            if (status == STATUS_RECORD)
-                mode = 6;
-            else if (status == STATUS_RECORD_PAUSE)
-                mode = 7;
-#endif
-#if CONFIG_TUNER
-            /* radio */
-            if (status == STATUS_RADIO)
-                mode = 8;
-            else if (status == STATUS_RADIO_PAUSE)
-                mode = 9;
-#endif
 
-            numeric_ret = mode;
-            snprintf(buf, buf_size, "%d", mode-1);
+            snprintf(buf, buf_size, "%d", numeric_ret-1);
             numeric_buf = buf;
             goto gtv_ret_numeric_tag_info;
         }
