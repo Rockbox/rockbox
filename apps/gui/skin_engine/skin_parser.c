@@ -494,7 +494,6 @@ static int parse_playlistview(struct skin_element *element,
     struct playlistviewer *viewer = skin_buffer_alloc(sizeof(*viewer));
     if (!viewer)
         return WPS_ERROR_INVALID_PARAM;
-    viewer->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
     viewer->show_icons = true;
     viewer->start_offset = get_param(element, 0)->data.number;
     viewer->line = PTRTOSKINOFFSET(skin_buffer, get_param_code(element, 1));

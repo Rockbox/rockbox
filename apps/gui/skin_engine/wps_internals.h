@@ -244,7 +244,6 @@ struct touchregion_lastpress {
 #endif
 
 struct playlistviewer {
-    OFFSETTYPE(struct viewport *) vp;
     bool show_icons;
     int start_offset;
     OFFSETTYPE(struct skin_element *) line;

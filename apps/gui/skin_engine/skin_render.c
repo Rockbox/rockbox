@@ -937,7 +937,7 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
     struct align_pos * align = &info.align;
     bool needs_update;
     int cur_pos, start_item, max;
-    int nb_lines = viewport_get_nb_lines(SKINOFFSETTOPTR(skin_buffer, viewer->vp));
+    int nb_lines = viewport_get_nb_lines(&skin_viewport->vp);
 #if CONFIG_TUNER
     if (get_current_activity() == ACTIVITY_FM)
     {
@@ -983,7 +983,7 @@ void skin_render_playlistviewer(struct playlistviewer* viewer,
         /* only update if the line needs to be, and there is something to write */
         if (refresh_type && needs_update)
         {
-            struct viewport *vp = SKINOFFSETTOPTR(skin_buffer, viewer->vp);
+            struct viewport *vp = &skin_viewport->vp;
             if (!info.force_redraw)
                 display->scroll_stop_viewport_rect(vp,
                     0, info.line_number*display->getcharheight(),
