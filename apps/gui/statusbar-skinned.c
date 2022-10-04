@@ -307,7 +307,6 @@ void sb_bypass_touchregions(bool enable)
 
 int sb_touch_to_button(int context)
 {
-    struct touchregion *region;
     static int last_context = -1;
     int button, offset;
     if (bypass_sb_touchregions)
@@ -317,7 +316,7 @@ int sb_touch_to_button(int context)
         skin_disarm_touchregions(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data);
     last_context = context;
     button = skin_get_touchaction(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data,
-                                  &offset, &region);
+                                  &offset);
     
     switch (button)
     {

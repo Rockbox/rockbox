@@ -96,11 +96,10 @@ int fms_do_button_loop(bool update_screen)
     int button = skin_wait_for_action(FM_SCREEN, CONTEXT_FM|ALLOW_SOFTLOCK,
                                       update_screen ? TIMEOUT_NOBLOCK : HZ/5);
 #ifdef HAVE_TOUCHSCREEN
-    struct touchregion *region;
     int offset;
     if (button == ACTION_TOUCHSCREEN)
         button = skin_get_touchaction(skin_get_gwps(FM_SCREEN, SCREEN_MAIN)->data,
-                                      &offset, &region);
+                                      &offset);
     switch (button)
     {
         case ACTION_WPS_STOP:

@@ -40,12 +40,10 @@ enum skinnable_screens {
 
 struct skin_stats;
 struct skin_viewport;
-struct touchregion;
 struct wps_data;
 
 #ifdef HAVE_TOUCHSCREEN
-int skin_get_touchaction(struct wps_data *data, int* edge_offset,
-                         struct touchregion **retregion);
+int skin_get_touchaction(struct wps_data *data, int* edge_offset);
 void skin_disarm_touchregions(struct wps_data *data);
 #endif
 

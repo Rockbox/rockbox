@@ -159,9 +159,8 @@ static bool update_onvol_change(enum screen_type screen)
 static int skintouch_to_wps(struct wps_data *data)
 {
     int offset = 0;
-    struct touchregion *region;
     struct wps_state *gstate = get_wps_state();
-    int button = skin_get_touchaction(data, &offset, &region);
+    int button = skin_get_touchaction(data, &offset);
     switch (button)
     {
         case ACTION_STD_PREV:
