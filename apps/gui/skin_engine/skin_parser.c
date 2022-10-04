@@ -747,7 +747,6 @@ static int parse_viewportcolour(struct skin_element *element,
                     &colour->colour))
             return -1;
     }
-    colour->vp = PTRTOSKINOFFSET(skin_buffer, &curr_vp->vp);
     token->value.data = PTRTOSKINOFFSET(skin_buffer, colour);
     if (element->line == curr_viewport_element->line)
     {

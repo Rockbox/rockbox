@@ -196,7 +196,6 @@ struct skin_viewport {
 #endif
 };
 struct viewport_colour {
-    OFFSETTYPE(struct viewport *) vp;
     unsigned colour;
 };
 

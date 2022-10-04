@@ -110,9 +110,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct viewport_colour *col = SKINOFFSETTOPTR(skin_buffer, token->value.data);
             if (!col) return false;
-            struct viewport *vp = SKINOFFSETTOPTR(skin_buffer, col->vp);
-            if (!vp) return false;
-            vp->fg_pattern = col->colour;
+            skin_vp->vp.fg_pattern = col->colour;
             skin_vp->fgbg_changed = true;
         }
         break;
@@ -120,9 +118,7 @@ static bool do_non_text_tags(struct gui_wps *gwps, struct skin_draw_info *info,
         {
             struct viewport_colour *col = SKINOFFSETTOPTR(skin_buffer, token->value.data);
             if (!col) return false;
-            struct viewport *vp = SKINOFFSETTOPTR(skin_buffer, col->vp);
-            if (!vp) return false;
-            vp->bg_pattern = col->colour;
+            skin_vp->vp.bg_pattern = col->colour;
             skin_vp->fgbg_changed = true;
         }
         break;
