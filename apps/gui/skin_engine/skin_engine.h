@@ -40,25 +40,18 @@ enum skinnable_screens {
 
 struct skin_stats;
 struct skin_viewport;
-struct wps_data;
+struct gui_wps;
 
 #ifdef HAVE_TOUCHSCREEN
-int skin_get_touchaction(struct wps_data *data, int* edge_offset);
-void skin_disarm_touchregions(struct wps_data *data);
+int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset);
+void skin_disarm_touchregions(struct gui_wps *gwps);
 #endif
 
 /* Do a update_type update of the skinned screen */
 void skin_update(enum skinnable_screens skin, enum screen_type screen,
                  unsigned int update_type);
 
-/*
- * setup up the skin-data from a format-buffer (isfile = false)
- * or from a skinfile (isfile = true)
- */
-bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
-                    const char *buf, bool isfile, struct skin_stats *stats);
-
-bool skin_has_sbs(enum screen_type screen, struct wps_data *data);
+bool skin_has_sbs(struct gui_wps *gwps);
 
 
 /* load a backdrop into the skin buffer.

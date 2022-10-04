@@ -709,14 +709,14 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
 }
 #endif
 
-bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
+bool skin_has_sbs(struct gui_wps *gwps)
 {
-    (void)screen;
-    (void)data;
+    struct wps_data *data = gwps->data;
+
     bool draw = false;
     if (data->wps_sb_tag)
         draw = data->show_sb_on_wps;
-    else if (statusbar_position(screen) != STATUSBAR_OFF)
+    else if (statusbar_position(gwps->display->screen_type) != STATUSBAR_OFF)
         draw = true;
     return draw;
 }

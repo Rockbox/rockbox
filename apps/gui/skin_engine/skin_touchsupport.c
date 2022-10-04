@@ -35,8 +35,9 @@
 #include "dsp_misc.h"
 
 /** Disarms all touchregions. */
-void skin_disarm_touchregions(struct wps_data *data)
+void skin_disarm_touchregions(struct gui_wps *gwps)
 {
+    struct wps_data *data = gwps->data;
     char* skin_buffer = get_skin_buffer(data);
     struct skin_token_list *regions = SKINOFFSETTOPTR(skin_buffer, data->touchregions);
     while (regions)
@@ -52,8 +53,9 @@ void skin_disarm_touchregions(struct wps_data *data)
  * egde_offset is a percentage value for the position of the touch
  * inside the bar for regions which arnt WPS_TOUCHREGION_ACTION type.
  */
-int skin_get_touchaction(struct wps_data *data, int* edge_offset)
+int skin_get_touchaction(struct gui_wps *gwps, int* edge_offset)
 {
+    struct wps_data *data = gwps->data;
     int returncode = ACTION_NONE;
     short x,y;
     short vx, vy;
@@ -161,7 +163,7 @@ int skin_get_touchaction(struct wps_data *data, int* edge_offset)
 
     /* On release, all regions are disarmed. */
     if (released)
-        skin_disarm_touchregions(data);
+        skin_disarm_touchregions(gwps);
     if (temp && temp->press_length == LONG_PRESS)
         temp->armed = false;
     

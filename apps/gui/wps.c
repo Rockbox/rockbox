@@ -156,11 +156,12 @@ static bool update_onvol_change(enum screen_type screen)
 
 
 #ifdef HAVE_TOUCHSCREEN
-static int skintouch_to_wps(struct wps_data *data)
+static int skintouch_to_wps(void)
 {
     int offset = 0;
     struct wps_state *gstate = get_wps_state();
-    int button = skin_get_touchaction(data, &offset);
+    struct gui_wps *gwps = skin_get_gwps(WPS, SCREEN_MAIN);
+    int button = skin_get_touchaction(gwps, &offset);
     switch (button)
     {
         case ACTION_STD_PREV:
@@ -327,7 +328,7 @@ static bool ffwd_rew(int button, bool seek_from_end)
             button = get_action(CONTEXT_WPS|ALLOW_SOFTLOCK,TIMEOUT_BLOCK);
 #ifdef HAVE_TOUCHSCREEN
             if (button == ACTION_TOUCHSCREEN)
-                button = skintouch_to_wps(skin_get_gwps(WPS, SCREEN_MAIN)->data);
+                button = skintouch_to_wps();
 #endif
             if (button != ACTION_WPS_SEEKFWD
                 && button != ACTION_WPS_SEEKBACK
@@ -517,12 +518,12 @@ static void gwps_leave_wps(void)
 {
     FOR_NB_SCREENS(i)
     {
-        skin_get_gwps(WPS, i)->display->scroll_stop();
+        struct gui_wps *gwps = skin_get_gwps(WPS, i);
+        gwps->display->scroll_stop();
 #ifdef HAVE_BACKDROP_IMAGE
         skin_backdrop_show(sb_get_backdrop(i));
 #endif
-        viewportmanager_theme_undo(i, skin_has_sbs(i, skin_get_gwps(WPS, i)->data));
-
+        viewportmanager_theme_undo(i, skin_has_sbs(gwps));
     }
 
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
@@ -547,7 +548,7 @@ static void gwps_enter_wps(void)
         gwps = skin_get_gwps(WPS, i);
         display = gwps->display;
         display->scroll_stop();
-        viewportmanager_theme_enable(i, skin_has_sbs(i, skin_get_gwps(WPS, i)->data), NULL);
+        viewportmanager_theme_enable(i, skin_has_sbs(gwps), NULL);
 
         /* Update the values in the first (default) viewport - in case the user
            has modified the statusbar or colour settings */
@@ -574,7 +575,7 @@ static void gwps_enter_wps(void)
     }
 #ifdef HAVE_TOUCHSCREEN
     gwps = skin_get_gwps(WPS, SCREEN_MAIN);
-    skin_disarm_touchregions(gwps->data);
+    skin_disarm_touchregions(gwps);
     if (gwps->data->touchregions < 0)
         touchscreen_set_mode(TOUCHSCREEN_BUTTON);
 #endif
@@ -655,7 +656,7 @@ long gui_wps_show(void)
             exit = true;
 #ifdef HAVE_TOUCHSCREEN
         if (button == ACTION_TOUCHSCREEN)
-            button = skintouch_to_wps(skin_get_gwps(WPS, SCREEN_MAIN)->data);
+            button = skintouch_to_wps();
 #endif
 /* The iPods/X5/M5 use a single button for the A-B mode markers,
    defined as ACTION_WPSAB_SINGLE in their config files. */

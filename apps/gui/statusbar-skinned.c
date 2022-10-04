@@ -310,13 +310,13 @@ int sb_touch_to_button(int context)
     int button, offset;
     if (bypass_sb_touchregions)
         return ACTION_TOUCHSCREEN;
-    
+
+    struct gui_wps *gwps = skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN);
     if (last_context != context)
-        skin_disarm_touchregions(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data);
+        skin_disarm_touchregions(gwps);
     last_context = context;
-    button = skin_get_touchaction(skin_get_gwps(CUSTOM_STATUSBAR, SCREEN_MAIN)->data,
-                                  &offset);
-    
+
+    button = skin_get_touchaction(gwps, &offset);
     switch (button)
     {
 #ifdef HAVE_VOLUME_IN_LIST

@@ -63,12 +63,12 @@ void fms_fix_displays(enum fms_exiting toggle_state)
 {
     FOR_NB_SCREENS(i)
     {
-        struct wps_data *data = skin_get_gwps(FM_SCREEN, i)->data;
+        struct gui_wps *gwps = skin_get_gwps(FM_SCREEN, i);
         if (toggle_state == FMS_ENTER)
         {
-            viewportmanager_theme_enable(i, skin_has_sbs(i, data), NULL);  
+            viewportmanager_theme_enable(i, skin_has_sbs(gwps), NULL);
 #ifdef HAVE_BACKDROP_IMAGE
-            skin_backdrop_show(data->backdrop_id);
+            skin_backdrop_show(gwps->data->backdrop_id);
 #endif
             screens[i].clear_display();
             /* force statusbar/skin update since we just cleared the whole screen */
@@ -80,10 +80,10 @@ void fms_fix_displays(enum fms_exiting toggle_state)
 #ifdef HAVE_BACKDROP_IMAGE
             skin_backdrop_show(sb_get_backdrop(i));
 #endif
-            viewportmanager_theme_undo(i, skin_has_sbs(i, data));
+            viewportmanager_theme_undo(i, skin_has_sbs(gwps));
         }
 #ifdef HAVE_TOUCHSCREEN
-        if (i==SCREEN_MAIN && !data->touchregions)
+        if (i==SCREEN_MAIN && !gwps->data->touchregions)
             touchscreen_set_mode(toggle_state == FMS_ENTER ? 
                                  TOUCHSCREEN_BUTTON : global_settings.touch_mode);
 #endif
@@ -96,10 +96,10 @@ int fms_do_button_loop(bool update_screen)
     int button = skin_wait_for_action(FM_SCREEN, CONTEXT_FM|ALLOW_SOFTLOCK,
                                       update_screen ? TIMEOUT_NOBLOCK : HZ/5);
 #ifdef HAVE_TOUCHSCREEN
+    struct gui_wps *gwps = skin_get_gwps(FM_SCREEN, SCREEN_MAIN);
     int offset;
     if (button == ACTION_TOUCHSCREEN)
-        button = skin_get_touchaction(skin_get_gwps(FM_SCREEN, SCREEN_MAIN)->data,
-                                      &offset);
+        button = skin_get_touchaction(gwps, &offset);
     switch (button)
     {
         case ACTION_WPS_STOP:

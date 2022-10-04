@@ -30,6 +30,8 @@
 #include "icon.h"
 #include "skin_engine/skin_engine.h"
 
+struct wps_data;
+
 char* sb_create_from_settings(enum screen_type screen);
 void sb_skin_init(void) INIT_ATTR;
 struct viewport *sb_skin_get_info_vp(enum screen_type screen);
