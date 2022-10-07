@@ -712,8 +712,35 @@ static int parse_viewportcolour(struct skin_element *element,
         return -1;
     if (isdefault(param))
     {
-        colour->colour = get_viewport_default_colour(curr_screen,
-                                   token->type == SKIN_TOKEN_VIEWPORT_FGCOLOUR);
+        unsigned int fg_color;
+        unsigned int bg_color;
+
+        switch (curr_screen)
+        {
+#if defined(HAVE_REMOTE_LCD) && LCD_REMOTE_DEPTH > 1
+        case SCREEN_REMOTE:
+            fg_color = LCD_REMOTE_DEFAULT_FG;
+            bg_color = LCD_REMOTE_DEFAULT_BG;
+            break;
+#endif
+        default:
+#if defined(HAVE_LCD_COLOR)
+            fg_color = global_settings.fg_color;
+            bg_color = global_settings.bg_color;
+#elif LCD_DEPTH > 1
+            fg_color = LCD_DEFAULT_FG;
+            bg_color = LCD_DEFAULT_BG;
+#else
+            fg_color = 0;
+            bg_color = 0;
+#endif
+            break;
+        }
+
+        if (token->type == SKIN_TOKEN_VIEWPORT_FGCOLOUR)
+            colour->colour = fg_color;
+        else
+            colour->colour = bg_color;
     }
     else
     {

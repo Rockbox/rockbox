@@ -43,7 +43,6 @@ void viewport_set_defaults(struct viewport *vp,
                             const enum screen_type screen);
 void viewport_set_fullscreen(struct viewport *vp,
                               const enum screen_type screen);
-int get_viewport_default_colour(enum screen_type screen, bool fgcolour);
 
 #ifndef __PCTOOL__
 
