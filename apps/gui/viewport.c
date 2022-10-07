@@ -233,7 +233,7 @@ static void viewportmanager_redraw(unsigned short id, void* data)
     }
 }
 
-void viewportmanager_init()
+void viewportmanager_init(void)
 {
     FOR_NB_SCREENS(i)
     {
