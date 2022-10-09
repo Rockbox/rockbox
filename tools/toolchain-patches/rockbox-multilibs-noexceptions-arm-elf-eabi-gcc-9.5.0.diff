@@ -1,0 +1,43 @@
+diff -aur gcc-8.5.0/gcc/config/arm/t-arm-elf gcc-8.5.0-patched/gcc/config/arm/t-arm-elf
+--- gcc-8.5.0/gcc/config/arm/t-arm-elf	2021-05-14 04:42:08.000000000 -0400
++++ gcc-8.5.0-patched/gcc/config/arm/t-arm-elf	2022-11-26 23:16:30.714433566 -0500
+@@ -81,6 +81,10 @@
+ MULTILIB_REQUIRED    += marm/mfpu=auto/march=armv5te+fp/mfloat-abi=hard
+ MULTILIB_REQUIRED    += mthumb/mfpu=auto/march=armv7+fp/mfloat-abi=hard
+
++# And we want to be able to disable interworking
++MULTILIB_OPTIONS    += mno-thumb-interwork/mthumb-interwork
++MULTILIB_DIRNAMES   += normal interwork
++
+ # PART 3 - Match rules
+
+ # Map all supported FPUs onto mfpu=auto
+diff -aur gcc-8.5.0/libgcc/config/arm/t-bpabi gcc-8.5.0-patched/libgcc/config/arm/t-bpabi
+--- gcc-8.5.0/libgcc/config/arm/t-bpabi	2021-05-14 04:42:10.000000000 -0400
++++ gcc-8.5.0-patched/libgcc/config/arm/t-bpabi	2022-11-26 23:14:40.938038440 -0500
+@@ -17,4 +17,4 @@
+ # On ARM, specifying -fnon-call-exceptions will needlessly pull in
+ # the unwinder in simple programs which use 64-bit division.  Omitting
+ # the option is safe.
+-LIB2_DIVMOD_EXCEPTION_FLAGS := -fexceptions
++LIB2_DIVMOD_EXCEPTION_FLAGS := -fno-exceptions -fno-non-call-exceptions
+diff -aur gcc-8.5.0/libgcc/Makefile.in gcc-8.5.0-patched/libgcc/Makefile.in
+--- gcc-8.5.0/libgcc/Makefile.in	2021-05-14 04:42:10.000000000 -0400
++++ gcc-8.5.0-patched/libgcc/Makefile.in	2022-11-26 23:13:56.781304250 -0500
+@@ -530,7 +530,7 @@
+ ifeq ($(LIB2_DIVMOD_EXCEPTION_FLAGS),)
+ # Provide default flags for compiling divmod functions, if they haven't been
+ # set already by a target-specific Makefile fragment.
+-LIB2_DIVMOD_EXCEPTION_FLAGS := -fexceptions -fnon-call-exceptions
++LIB2_DIVMOD_EXCEPTION_FLAGS := -fno-exceptions -fno-non-call-exceptions
+ endif
+
+ # Build LIB2_DIVMOD_FUNCS.
+@@ -851,7 +851,7 @@
+ # libgcc_eh.a, only LIB2ADDEH matters.  If we do, only LIB2ADDEHSTATIC and
+ # LIB2ADDEHSHARED matter.  (Usually all three are identical.)
+
+-c_flags := -fexceptions
++c_flags := -fno-exceptions
+
+ ifeq ($(enable_shared),yes)
