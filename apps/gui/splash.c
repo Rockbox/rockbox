@@ -49,7 +49,6 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     int x = 0;
     int y, i;
     int space_w, w, h;
-
     int width, height;
     int maxw = 0;
 
@@ -198,6 +197,7 @@ void splash(int ticks, const char *str)
 /* splash a progress meter */
 void splash_progress(int current, int total, const char *fmt, ...)
 {
+    va_list ap;
     int vp_flag = VP_FLAG_VP_DIRTY;
     /* progress update tick */
     static long next_tick = 0;
@@ -211,8 +211,6 @@ void splash_progress(int current, int total, const char *fmt, ...)
         next_tick = now + HZ/20;
         vp_flag = 0; /* don't mark vp dirty to prevent flashing */
     }
-
-    va_list ap;
 
     /* If fmt is a lang ID then get the corresponding string (which
        still might contain % place holders). */
@@ -228,11 +226,16 @@ void splash_progress(int current, int total, const char *fmt, ...)
         if (splash_internal(screen, fmt, ap, &vp, 1))
         {
             int size = screen->getcharheight();
+            int x = RECT_SPACING;
             int y = vp.height - size - RECT_SPACING;
             int w = vp.width - RECT_SPACING * 2;
-
-            gui_scrollbar_draw(screen, RECT_SPACING, y, w, size,
-                               total, 0, current, HORIZONTAL | FOREGROUND);
+            int h = size;
+#ifdef HAVE_LCD_COLOR
+            const int sb_flags = HORIZONTAL | FOREGROUND;
+#else
+            const int sb_flags = HORIZONTAL;
+#endif
+            gui_scrollbar_draw(screen, x, y, w, h, total, 0, current, sb_flags);
 
             screen->update_viewport();
         }
