@@ -2039,10 +2039,9 @@ int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
 static bool insert_all_playlist(struct tree_context *c, int position, bool queue)
 {
     struct tagcache_search tcs;
-    int i;
+    int i, n;
+    unsigned long last_tick;
     char buf[MAX_PATH];
-    int from, to, direction;
-    int files_left = c->filesindir;
 
     cpu_boost(true);
     if (!tagcache_search(&tcs, tag_filename))
@@ -2063,15 +2062,21 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
         }
     }
 
-    from = 0;
-    to = c->filesindir;
-    direction = 1;
+    last_tick = current_tick + HZ/2; /* Show splash after 0.5 seconds have passed */
 
-    for (i = from; i != to; i += direction)
+    n = c->filesindir;
+    for (i = 0; i < n; i++)
     {
-        /* Count back to zero */
-        if (!show_search_progress(false, files_left--))
-            break;
+        if (TIME_AFTER(current_tick, last_tick - 1))
+        {
+            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+            if (TIME_AFTER(current_tick, last_tick + HZ/10))
+            {
+                if (action_userabort(TIMEOUT_NOBLOCK))
+                    break;
+                last_tick = current_tick;
+            }
+        }
 
         if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek,
                                tcs.type, buf, sizeof buf))
