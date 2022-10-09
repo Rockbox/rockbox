@@ -1,3 +1,16 @@
+diff --git a/gcc/gcc/config/aarch64/aarch64.h b/gcc/gcc/config/aarch64/aarch64.h
+index 976f9afae5..736b83ff0b 100644
+--- a/gcc/config/aarch64/aarch64.h
++++ b/gcc/config/aarch64/aarch64.h
+@@ -1000,7 +1000,7 @@ extern const char *aarch64_rewrite_mcpu (int argc, const char **argv);
+ #define MCPU_TO_MARCH_SPEC_FUNCTIONS \
+   { "rewrite_mcpu", aarch64_rewrite_mcpu },
+ 
+-#if defined(__aarch64__)
++#if defined(__aarch64__) && ! defined(__APPLE__)
+ extern const char *host_detect_local_cpu (int argc, const char **argv);
+ #define HAVE_LOCAL_CPU_DETECT
+ # define EXTRA_SPEC_FUNCTIONS						\
 diff --git a/gcc/gcc/config/host-darwin.c b/gcc/gcc/config/host-darwin.c
 index 8f700eec85..b737abc006 100644
 --- a/gcc/config/host-darwin.c

@@ -149,7 +149,7 @@ ifdef APP_TYPE
  PLUGINFLAGS += $(SHARED_CFLAGS) # <-- from Makefile
 else
  PLUGINLDFLAGS = -T$(PLUGINLINK_LDS) -Wl,--gc-sections -Wl,-Map,$*.map
- OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap
+ OVERLAYLDFLAGS = -T$(OVERLAYREF_LDS) -Wl,--gc-sections -Wl,-Map,$*.refmap $(GLOBAL_LDOPTS)
 endif
 PLUGINLDFLAGS += $(GLOBAL_LDOPTS)
 
