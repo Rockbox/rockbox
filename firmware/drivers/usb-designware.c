@@ -896,7 +896,7 @@ static void usb_dw_control_received(struct usb_ctrlrequest* req)
         break;
 
     default:
-        panicf("%s: bad state=%s", __func__, dw_state_str[ep0.state]);
+        panicf("%s: bad state=%s", __func__, ep0.state >= EP0_NUM_STATES ? "unk" : dw_state_str[ep0.state]);
     }
 }
 
