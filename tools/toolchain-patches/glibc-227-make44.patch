@@ -1,7 +1,7 @@
-diff -Naur glibc-2.25/libio/stdio.h glibc-2.25-patched/libio/stdio.h
---- glibc-2.25/libio/stdio.h	2017-02-05 10:28:43.000000000 -0500
-+++ glibc-2.25-patched/libio/stdio.h	2023-05-23 15:22:27.482980335 -0400
-@@ -154,18 +154,23 @@
+diff -Naur glibc-2.27/libio/stdio.h glibc-2.27-patched/libio/stdio.h
+--- glibc-2.27/libio/stdio.h	2018-02-01 11:17:18.000000000 -0500
++++ glibc-2.27-patched/libio/stdio.h	2023-05-23 14:10:06.618633203 -0400
+@@ -118,18 +118,23 @@
  # define P_tmpdir	"/tmp"
  #endif
  
@@ -32,20 +32,19 @@ diff -Naur glibc-2.25/libio/stdio.h glibc-2.25-patched/libio/stdio.h
  
  /* Standard streams.  */
  extern struct _IO_FILE *stdin;		/* Standard input stream.  */
-diff -Naur glibc-2.25/Makerules glibc-2.25-patched/Makerules
---- glibc-2.25/Makerules	2017-02-05 10:28:43.000000000 -0500
-+++ glibc-2.25-patched/Makerules	2023-05-23 15:22:05.594967548 -0400
-@@ -1474,55 +1474,7 @@
- endif
+diff -Naur glibc-2.27/Makerules glibc-2.27-patched/Makerules
+--- glibc-2.27/Makerules	2018-02-01 11:17:18.000000000 -0500
++++ glibc-2.27-patched/Makerules	2023-05-23 14:10:06.617633203 -0400
+@@ -1522,46 +1522,6 @@
  
  endif
--
+ 
 -# These will have been set by sysdeps/posix/Makefile.
 -L_tmpnam  ?= 1
 -TMP_MAX   ?= 0
 -L_ctermid ?= 1
 -L_cuserid ?= 1
- 
+-
 -stdio_lim = $(common-objpfx)bits/stdio_lim.h
 -
 -$(stdio_lim:lim.h=%.h) $(stdio_lim:lim.h=%.d): $(stdio_lim:lim.h=%.st); @:
@@ -53,8 +52,7 @@ diff -Naur glibc-2.25/Makerules glibc-2.25-patched/Makerules
 -		   $(common-objpfx)config.make
 -	$(make-target-directory)
 -	{ echo '#include "$(..)posix/bits/posix1_lim.h"';		\
--	  echo '#define _LIBC 1';					\
--	  echo '#include "$(..)misc/sys/uio.h"'; } |			\
+-	} |								\
 -	$(CC) -E -dM -MD -MP -MF $(@:st=dT) -MT '$(@:st=h) $(@:st=d)' 	\
 -	      $(CPPUNDEFS) $(+includes) -xc - -o $(@:st=hT)
 -	sed $(sed-remove-objpfx) $(sed-remove-dotdot)			\
@@ -62,21 +60,14 @@ diff -Naur glibc-2.25/Makerules glibc-2.25-patched/Makerules
 -	mv -f $(@:st=dt) $(@:st=d)
 -	fopen_max=`sed -n 's/^#define OPEN_MAX //1p' $(@:st=hT)`; 	\
 -	filename_max=`sed -n 's/^#define PATH_MAX //1p' $(@:st=hT)`;	\
--	iov_max=`sed -n 's/^#define UIO_MAXIOV //p' $(@:st=hT)`;	\
 -	fopen_max=$${fopen_max:-16};					\
 -	filename_max=$${filename_max:-1024};				\
--	if [ -z "$$iov_max" ]; then					\
--	  define_iov_max="# undef IOV_MAX";				\
--	else								\
--	  define_iov_max="# define IOV_MAX $$iov_max";			\
--	fi;								\
 -	sed -e "s/@FOPEN_MAX@/$$fopen_max/"				\
 -	    -e "s/@FILENAME_MAX@/$$filename_max/"			\
 -	    -e "s/@L_tmpnam@/$(L_tmpnam)/"				\
 -	    -e "s/@TMP_MAX@/$(TMP_MAX)/"				\
 -	    -e "s/@L_ctermid@/$(L_ctermid)/"				\
 -	    -e "s/@L_cuserid@/$(L_cuserid)/"				\
--	    -e "s/@define_IOV_MAX@/$$define_iov_max/"			\
 -	    $< > $(@:st=h.new)
 -	$(move-if-change) $(@:st=h.new) $(@:st=h)
 -# Remove these last so that they can be examined if something went wrong.
@@ -91,9 +82,9 @@ diff -Naur glibc-2.25/Makerules glibc-2.25-patched/Makerules
  FORCE:
  
  .PHONY: echo-headers
-diff -Naur glibc-2.25/Rules glibc-2.25-patched/Rules
---- glibc-2.25/Rules	2017-02-05 10:28:43.000000000 -0500
-+++ glibc-2.25-patched/Rules	2023-05-23 15:22:27.482980335 -0400
+diff -Naur glibc-2.27/Rules glibc-2.27-patched/Rules
+--- glibc-2.27/Rules	2018-02-01 11:17:18.000000000 -0500
++++ glibc-2.27-patched/Rules	2023-05-23 14:10:06.617633203 -0400
 @@ -60,9 +60,6 @@
  common-generated :=
  endif
@@ -104,11 +95,11 @@ diff -Naur glibc-2.25/Rules glibc-2.25-patched/Rules
  include $(..)Makerules
  
  .PHONY: subdir_lib
-diff -Naur glibc-2.25/stdio-common/stdio_lim.h.in glibc-2.25-patched/stdio-common/stdio_lim.h.in
---- glibc-2.25/stdio-common/stdio_lim.h.in	2017-02-05 10:28:43.000000000 -0500
-+++ glibc-2.25-patched/stdio-common/stdio_lim.h.in	1969-12-31 19:00:00.000000000 -0500
-@@ -1,42 +0,0 @@
--/* Copyright (C) 1994-2017 Free Software Foundation, Inc.
+diff -Naur glibc-2.27/stdio-common/stdio_lim.h.in glibc-2.27-patched/stdio-common/stdio_lim.h.in
+--- glibc-2.27/stdio-common/stdio_lim.h.in	2018-02-01 11:17:18.000000000 -0500
++++ glibc-2.27-patched/stdio-common/stdio_lim.h.in	1969-12-31 19:00:00.000000000 -0500
+@@ -1,39 +0,0 @@
+-/* Copyright (C) 1994-2018 Free Software Foundation, Inc.
 -   This file is part of the GNU C Library.
 -
 -   The GNU C Library is free software; you can redistribute it and/or
@@ -125,34 +116,31 @@ diff -Naur glibc-2.25/stdio-common/stdio_lim.h.in glibc-2.25-patched/stdio-commo
 -   License along with the GNU C Library; if not, see
 -   <http://www.gnu.org/licenses/>.  */
 -
--#if !defined _STDIO_H && !defined __need_FOPEN_MAX && !defined __need_IOV_MAX
+-#ifndef _BITS_STDIO_LIM_H
+-#define _BITS_STDIO_LIM_H 1
+-
+-#ifndef _STDIO_H
 -# error "Never include <bits/stdio_lim.h> directly; use <stdio.h> instead."
 -#endif
 -
--#ifdef _STDIO_H
--# define L_tmpnam @L_tmpnam@
--# define TMP_MAX @TMP_MAX@
--# define FILENAME_MAX @FILENAME_MAX@
+-#define L_tmpnam @L_tmpnam@
+-#define TMP_MAX @TMP_MAX@
+-#define FILENAME_MAX @FILENAME_MAX@
 -
--# ifdef __USE_POSIX
--#  define L_ctermid @L_ctermid@
--#  if !defined __USE_XOPEN2K || defined __USE_GNU
--#   define L_cuserid @L_cuserid@
--#  endif
+-#ifdef __USE_POSIX
+-# define L_ctermid @L_ctermid@
+-# if !defined __USE_XOPEN2K || defined __USE_GNU
+-#  define L_cuserid @L_cuserid@
 -# endif
 -#endif
 -
--#if defined __need_FOPEN_MAX || defined _STDIO_H
--# undef  FOPEN_MAX
--# define FOPEN_MAX @FOPEN_MAX@
--#endif
+-#undef  FOPEN_MAX
+-#define FOPEN_MAX @FOPEN_MAX@
 -
--#if defined __need_IOV_MAX && !defined IOV_MAX
--@define_IOV_MAX@
--#endif
-diff -Naur glibc-2.25/sysdeps/mach/hurd/bits/stdio_lim.h glibc-2.25-patched/sysdeps/mach/hurd/bits/stdio_lim.h
---- glibc-2.25/sysdeps/mach/hurd/bits/stdio_lim.h	1969-12-31 19:00:00.000000000 -0500
-+++ glibc-2.25-patched/sysdeps/mach/hurd/bits/stdio_lim.h	2023-05-23 15:22:27.483980336 -0400
+-#endif /* bits/stdio_lim.h */
+diff -Naur glibc-2.27/sysdeps/mach/hurd/bits/stdio_lim.h glibc-2.27-patched/sysdeps/mach/hurd/bits/stdio_lim.h
+--- glibc-2.27/sysdeps/mach/hurd/bits/stdio_lim.h	1969-12-31 19:00:00.000000000 -0500
++++ glibc-2.27-patched/sysdeps/mach/hurd/bits/stdio_lim.h	2023-05-23 14:10:06.618633203 -0400
 @@ -0,0 +1,28 @@
 +/* System specific stdio.h definitions.  Hurd version.
 +   Copyright (C) 2023 Free Software Foundation, Inc.
@@ -182,9 +170,9 @@ diff -Naur glibc-2.25/sysdeps/mach/hurd/bits/stdio_lim.h glibc-2.25-patched/sysd
 +#define FILENAME_MAX 1024
 +
 +#endif /* bits/stdio_lim.h */
-diff -Naur glibc-2.25/sysdeps/posix/Makefile glibc-2.25-patched/sysdeps/posix/Makefile
---- glibc-2.25/sysdeps/posix/Makefile	2017-02-05 10:28:43.000000000 -0500
-+++ glibc-2.25-patched/sysdeps/posix/Makefile	2023-05-23 15:22:27.483980336 -0400
+diff -Naur glibc-2.27/sysdeps/posix/Makefile glibc-2.27-patched/sysdeps/posix/Makefile
+--- glibc-2.27/sysdeps/posix/Makefile	2018-02-01 11:17:18.000000000 -0500
++++ glibc-2.27-patched/sysdeps/posix/Makefile	2023-05-23 14:10:06.618633203 -0400
 @@ -1,8 +1,3 @@
 -# These affect the generated bits/stdio_lim.h file.
 -L_tmpnam  = 20
@@ -194,9 +182,9 @@ diff -Naur glibc-2.25/sysdeps/posix/Makefile glibc-2.25-patched/sysdeps/posix/Ma
  
  ifeq ($(subdir)|$(have-thread-library),rt|no)
  # With NPTL, this lives in libpthread so it can be used for sem_open too.
-diff -Naur glibc-2.25/sysdeps/unix/sysv/linux/bits/stdio_lim.h glibc-2.25-patched/sysdeps/unix/sysv/linux/bits/stdio_lim.h
---- glibc-2.25/sysdeps/unix/sysv/linux/bits/stdio_lim.h	1969-12-31 19:00:00.000000000 -0500
-+++ glibc-2.25-patched/sysdeps/unix/sysv/linux/bits/stdio_lim.h	2023-05-23 15:22:27.483980336 -0400
+diff -Naur glibc-2.27/sysdeps/unix/sysv/linux/bits/stdio_lim.h glibc-2.27-patched/sysdeps/unix/sysv/linux/bits/stdio_lim.h
+--- glibc-2.27/sysdeps/unix/sysv/linux/bits/stdio_lim.h	1969-12-31 19:00:00.000000000 -0500
++++ glibc-2.27-patched/sysdeps/unix/sysv/linux/bits/stdio_lim.h	2023-05-23 14:10:06.618633203 -0400
 @@ -0,0 +1,28 @@
 +/* System specific stdio.h definitions.  Linux version.
 +   Copyright (C) 2023 Free Software Foundation, Inc.
@@ -219,9 +207,9 @@ diff -Naur glibc-2.25/sysdeps/unix/sysv/linux/bits/stdio_lim.h glibc-2.25-patche
 +#ifndef _BITS_STDIO_LIM_H
 +#define _BITS_STDIO_LIM_H 1
 +
-+//#ifndef _STDIO_H
-+//# error "Never include <bits/stdio_lim.h> directly; use <stdio.h> instead."
-+//#endif
++#ifndef _STDIO_H
++# error "Never include <bits/stdio_lim.h> directly; use <stdio.h> instead."
++#endif
 +
 +#define FILENAME_MAX 4096
 +

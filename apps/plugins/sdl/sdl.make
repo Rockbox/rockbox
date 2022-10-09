@@ -49,7 +49,7 @@ ifndef APP_TYPE
     WOLF3D_OUTLDS = $(SDL_OBJDIR)/wolf3d.link
     QUAKE_OUTLDS = $(SDL_OBJDIR)/quake.link
 
-    SDL_OVLFLAGS = -Wl,--gc-sections -Wl,-Map,$(basename $@).map
+    SDL_OVLFLAGS = -Wl,--gc-sections -Wl,-Map,$(basename $@).map $(GLOBAL_LDOPTS)
 else
     ### simulator
     ROCKS += $(SDL_OBJDIR)/duke3d.rock
