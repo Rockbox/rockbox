@@ -138,7 +138,7 @@ app_set_lcd_size () {
 
 findarmgcc() {
   prefixtools arm-elf-eabi-
-  gccchoice="4.9.4"
+  gccchoice="9.5.0"
 }
 
 # scan the $PATH for the given command
@@ -543,7 +543,7 @@ coldfirecc () {
  GCCOPTS="$CCOPTS -mcpu=5249 -malign-int -mstrict-align"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="big"
- gccchoice="4.9.4"
+ gccchoice="9.5.0"
 }
 
 arm7tdmicc () {
@@ -616,7 +616,7 @@ mipselcc () {
  GCCOPTS="$GCCOPTS -ffunction-sections -msoft-float -G 0 -Wno-parentheses"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.9.4"
+ gccchoice="9.5.0"
 }
 
 mipsr2elcc () {
@@ -626,7 +626,7 @@ mipsr2elcc () {
  GCCOPTS="$GCCOPTS -ffunction-sections -msoft-float -G 0 -Wno-parentheses"
  GCCOPTIMIZE="-fomit-frame-pointer"
  endian="little"
- gccchoice="4.9.4"
+ gccchoice="9.5.0"
 }
 
 maemocc () {
@@ -773,7 +773,7 @@ arm1176jzlinuxcc () {
  GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
 
  # Set up compiler
- gccchoice="4.9.4"
+ gccchoice="9.5.0"
  prefixtools "arm-rockbox-linux-gnueabi-"
 }
 
@@ -953,7 +953,7 @@ mipsellinuxcc () {
  GCCOPTS="$GCCOPTS  -D_GNU_SOURCE=1 -U_FORTIFY_SOURCE -D_REENTRANT"
 
  # Set up compiler
- gccchoice="4.9.4"
+ gccchoice="9.5.0"
  prefixtools "mipsel-rockbox-linux-gnu-"
 }
 
