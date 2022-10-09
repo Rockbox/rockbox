@@ -36,7 +36,11 @@ void map_address(unsigned long virtual, unsigned long physical,
 void mmu_init(void);
 
 /* Commits entire DCache */
-MIPS_CACHEFUNC_API(void, commit_dcache, (void));
+#if 0 /* NOTE:  This is currently aliased to commit_discard_dcache.  Causes compilation errors with newer GCC if we try to assign it to a section here */
+//MIPS_CACHEFUNC_API(void, commit_dcache, (void));
+#else
+void commit_dcache(void);
+#endif
 /* Commit and discard entire DCache, will do writeback */
 MIPS_CACHEFUNC_API(void, commit_discard_dcache, (void));
 
