@@ -189,10 +189,6 @@ gettool() {
             url="$GNU_MIRROR/glibc"
             ;;
 
-        crosstool-ng)
-            url="http://crosstool-ng.org/download/crosstool-ng"
-            ;;
-
         alsa-lib)
             url="ftp://ftp.alsa-project.org/pub/lib"
             ;;
@@ -474,16 +470,7 @@ build() {
     cd build-$toolname
 
     echo "ROCKBOXDEV: $toolname/configure"
-    case $toolname in
-        crosstool-ng) # ct-ng doesnt support out-of-tree build and the src folder is named differently
-            toolname="crosstool-ng"
-            cp -r ../$toolname-$version/* ../$toolname-$version/.version .
-            ./configure --prefix=$prefix $configure_params
-        ;;
-        *)
-            CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' CXXFLAGS='-std=gnu++03' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
-        ;;
-    esac
+    CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' CXXFLAGS='-std=gnu++03' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
 
     echo "ROCKBOXDEV: $toolname/make"
     $make $make_parallel
@@ -494,68 +481,6 @@ build() {
     echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
     cd ..
     rm -rf build-$toolname $toolname-$version
-}
-
-make_ctng() {
-    if test -f "`which ct-ng 2>/dev/null`"; then
-        ctng="ct-ng"
-    else
-        ctng=""
-    fi
-
-    if test ! -n "$ctng"; then
-        if test ! -f "$prefix/bin/ct-ng"; then # look if we build it already
-            build "crosstool-ng" "" "1.13.2" "crosstool-ng-1.13.2.diff"
-        fi
-    fi
-    ctng=`PATH=$prefix/bin:$PATH which ct-ng`
-}
-
-build_ctng() {
-    ctng_target="$1"
-    extra="$2"
-    tc_arch="$3"
-    tc_host="$4"
-
-    make_ctng
-
-    dlurl="http://www.rockbox.org/gcc/$ctng_target"
-
-    # download
-    getfile "ct-ng-config" "$dlurl"
-
-    test -n "$extra" && getfile "$extra" "$dlurl"
-
-    # create build directory
-    if test -d $builddir; then
-        if test ! -w $builddir; then
-            echo "ROCKBOXDEV: No write permission for $builddir"
-            exit
-        fi
-    else
-        mkdir -p $builddir
-    fi
-
-    # copy config and cd to $builddir
-    mkdir $builddir/build-$ctng_target
-    ctng_config="$builddir/build-$ctng_target/.config"
-    cat "$dlwhere/ct-ng-config" | sed -e "s,\(CT_PREFIX_DIR=\).*,\1$prefix," > $ctng_config
-    cd $builddir/build-$ctng_target
-
-    $ctng "build"
-
-    # install extras
-    if test -e "$dlwhere/$extra"; then
-        # verify the toolchain has sysroot support
-        if test -n `cat $ctng_config | grep CT_USE_SYSROOT\=y`; then
-            sysroot=`cat $ctng_config | grep CT_SYSROOT_NAME | sed -e 's,CT_SYSROOT_NAME\=\"\([a-zA-Z0-9]*\)\",\1,'`
-            tar xf "$dlwhere/$extra" -C "$prefix/$tc_arch-$ctng_target-$tc_host/$sysroot"
-        fi
-    fi
-
-    # cleanup
-    cd $builddir
-    rm -rf $builddir/build-$ctng_target
 }
 
 # build a cross compiler toolchain for linux
