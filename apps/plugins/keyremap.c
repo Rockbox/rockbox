@@ -391,7 +391,7 @@ static struct button_mapping *keyremap_create_temp(int *entries)
     size_t keymap_bytes = (entry_count) * sizeof(struct button_mapping);
     *entries = entry_count;
     logf("keyremap create temp entry count: %d", entry_count);
-    logf("keyremap bytes: %ld, avail: %ld", keymap_bytes,
+    logf("keyremap bytes: %zu, avail: %zu", keymap_bytes,
          (keyremap_buffer.end - keyremap_buffer.front));
     if (keyremap_buffer.front + keymap_bytes < keyremap_buffer.end)
     {
