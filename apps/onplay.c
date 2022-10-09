@@ -382,8 +382,9 @@ static bool playing_time(void)
        although playback continues forward. */
     for (i = 0; i < pti.nb_tracks; i++) {
         /* Show a splash while we are loading. */
-        splashf(0, str(LANG_LOADING_PERCENT),
-                i*100/pti.nb_tracks, str(LANG_OFF_ABORT));
+        splash_progress(i, pti.nb_tracks,
+                         "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+
         /* Voice equivalent */
         if (TIME_AFTER(current_tick, talked_tick+5*HZ)) {
             talked_tick = current_tick;

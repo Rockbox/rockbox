@@ -288,13 +288,15 @@ static void init_tagcache(void)
 #endif
             if (lang_is_rtl())
             {
-                splashf(0, "[%d/%d] %s", ret, tagcache_get_max_commit_step(),
-                    str(LANG_TAGCACHE_INIT));
+                splash_progress(ret, tagcache_get_max_commit_step(),
+                               "[%d/%d] %s", ret, tagcache_get_max_commit_step(),
+                               str(LANG_TAGCACHE_INIT));
             }
             else
             {
-                splashf(0, "%s [%d/%d]", str(LANG_TAGCACHE_INIT), ret,
-                    tagcache_get_max_commit_step());
+                splash_progress(ret, tagcache_get_max_commit_step(),
+                                "%s [%d/%d]", str(LANG_TAGCACHE_INIT), ret,
+                                tagcache_get_max_commit_step());
             }
             clear = true;
         }

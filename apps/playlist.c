@@ -2201,12 +2201,11 @@ int playlist_resume(void)
         
         for(count=0; count<nread && !exit_loop && !useraborted; count++,p++)
         {
-            /* So a splash while we are loading. */
+            /* Show a splash while we are loading. */
+            splash_progress((total_read + count), control_file_size,
+                             "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
             if (TIME_AFTER(current_tick, last_tick + HZ/4))
             {
-                splashf(0, str(LANG_LOADING_PERCENT), 
-                           (total_read+count)*100/control_file_size,
-                           str(LANG_OFF_ABORT));
                 if (action_userabort(TIMEOUT_NOBLOCK))
                 {
                     useraborted = true;

@@ -241,15 +241,19 @@ static int browser(void* param)
                     {
                         if (lang_is_rtl())
                         {
-                            splashf(0, "[%d/%d] %s", stat->commit_step,
-                                tagcache_get_max_commit_step(),
-                                str(LANG_TAGCACHE_INIT));
+                            splash_progress(stat->commit_step,
+                                            tagcache_get_max_commit_step(),
+                                            "[%d/%d] %s", stat->commit_step,
+                                            tagcache_get_max_commit_step(),
+                                            str(LANG_TAGCACHE_INIT));
                         }
                         else
                         {
-                            splashf(0, "%s [%d/%d]", str(LANG_TAGCACHE_INIT),
-                                stat->commit_step,
-                                tagcache_get_max_commit_step());
+                            splash_progress(stat->commit_step,
+                                            tagcache_get_max_commit_step(),
+                                            "%s [%d/%d]", str(LANG_TAGCACHE_INIT),
+                                            stat->commit_step,
+                                            tagcache_get_max_commit_step());
                         }
                     }
                     else
