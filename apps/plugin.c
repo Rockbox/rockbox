@@ -847,7 +847,10 @@ int plugin_load(const char* plugin, const void* parameter)
         plugin_buffer_handle = core_free(plugin_buffer_handle);
     }
 
-    splash(0, ID2P(LANG_WAIT));
+#ifdef HAVE_DISK_STORAGE
+    if (!storage_disk_is_active())
+        splash(0, ID2P(LANG_WAIT));
+#endif
     strcpy(current_plugin, plugin);
 
     current_plugin_handle = lc_open(plugin, pluginbuf, PLUGIN_BUFFER_SIZE);
