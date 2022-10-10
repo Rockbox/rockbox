@@ -2196,24 +2196,26 @@ int playlist_resume(void)
         char *str1 = NULL;
         char *str2 = NULL;
         char *str3 = NULL;
-        unsigned long last_tick = current_tick;
+        unsigned long last_tick = current_tick + HZ / 2; /* wait 1/2 sec before progress */
         bool useraborted = false;
         
         for(count=0; count<nread && !exit_loop && !useraborted; count++,p++)
         {
             /* Show a splash while we are loading. */
-            splash_progress((total_read + count), control_file_size,
-                             "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
-            if (TIME_AFTER(current_tick, last_tick + HZ/4))
+            if (TIME_AFTER(current_tick, last_tick - 1))
             {
-                if (action_userabort(TIMEOUT_NOBLOCK))
+                splash_progress((total_read + count), control_file_size,
+                             "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+                if (TIME_AFTER(current_tick, last_tick + HZ/4))
                 {
-                    useraborted = true;
-                    break;
+                    if (action_userabort(TIMEOUT_NOBLOCK))
+                    {
+                        useraborted = true;
+                        break;
+                    }
+                    last_tick = current_tick;
                 }
-                last_tick = current_tick;
             }
-            
             /* Are we on a new line? */
             if((*p == '\n') || (*p == '\r'))
             {
