@@ -51,7 +51,7 @@ if [ -z $LINUX_MIRROR ] ; then
 fi
 
 # These are the tools this script requires and depends upon.
-reqtools="gcc g++ bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
+reqtools="gcc g++ xz bzip2 gzip make patch makeinfo automake libtool autoconf flex bison"
 
 ##############################################################################
 # Functions:
@@ -179,14 +179,23 @@ gettool() {
                 srv_file="gcc-core-$version"
             fi
             url="$GNU_MIRROR/gcc/gcc-$version"
+	    if ! version_lt "$version" "7.2"; then
+		ext="tar.xz"
+	    fi
             ;;
 
         binutils)
             url="$GNU_MIRROR/binutils"
+	    if ! version_lt "$version" "2.28.1"; then
+		ext="tar.xz"
+	    fi
             ;;
 
         glibc)
             url="$GNU_MIRROR/glibc"
+	    if ! version_lt "$version" "2.11"; then
+		ext="tar.xz"
+	    fi
             ;;
 
         alsa-lib)
@@ -281,7 +290,7 @@ run_cmd() {
     echo "Running '$@'" >>$logfile
     if ! $@ >> "$logfile" 2>&1; then
         echo "ROCKBOXDEV: an error occured, please see $logfile"
-        exit
+        exit 1
     fi
 }
 
@@ -332,8 +341,7 @@ buildtool() {
     echo "ROCKBOXDEV: mkdir build-$toolname"
     mkdir "build-$toolname"
 
-    echo "ROCKBOXDEV: cd build-$toolname"
-    cd "build-$toolname"
+    cd build-$toolname
 
     # in-tree/out-of-tree build
     case "$tool" in
@@ -383,9 +391,14 @@ buildtool() {
     echo "ROCKBOXDEV: $toolname/make (install)"
     run_cmd "$logfile" $make $install_opts
 
-    echo "ROCKBOXDEV: rm -rf build-$toolname $toolname"
     cd ..
+
+    echo "ROCKBOXDEV: rm -rf build-$toolname $toolname"
     rm -rf build-$toolname
+    if [ "$stepname" != "gcc-stage1" ] ; then
+        echo "ROCKBOXDEV: rm -rf $toolname"
+        rm -rf $toolname
+    fi
 }
 
 build() {
@@ -395,6 +408,14 @@ build() {
     patch="$4"
     configure_params="$5"
     needs_libs="$6"
+    logfile="$builddir/build-$toolname.log"
+
+    stepname=${RESTART_STEP:-$toolname}
+    if ! check_restart "$stepname"; then
+        echo "ROCKBOXDEV: Skipping step '$stepname' as requested per RBDEV_RESTART"
+        return
+    fi
+    echo "ROCKBOXDEV: Starting step '$stepname'"
 
     # create build directory
     if test -d $builddir; then
@@ -463,23 +484,31 @@ build() {
         cd $builddir
     fi
 
+    # GCC is special
+    if [ "$toolname" == "gcc" ] ; then
+	configure_params="--enable-languages=c --disable-libssp $configure_params"
+    fi
+
+    echo "ROCKBOXDEV: logging to $logfile"
+    rm -f "$logfile"
+
     echo "ROCKBOXDEV: mkdir build-$toolname"
     mkdir build-$toolname
 
-    echo "ROCKBOXDEV: cd build-$toolname"
     cd build-$toolname
 
     echo "ROCKBOXDEV: $toolname/configure"
-    CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon' CXXFLAGS='-std=gnu++03' ../$toolname-$version/configure --target=$target --prefix=$prefix --enable-languages=c --disable-libssp --disable-docs $configure_params
+    CFLAGS='-U_FORTIFY_SOURCE -fgnu89-inline -fcommon -O2' CXXFLAGS='-std=gnu++03' run_cmd "$logfile" ../$toolname-$version/configure --target=$target --prefix=$prefix --disable-docs $configure_params
 
     echo "ROCKBOXDEV: $toolname/make"
-    $make $make_parallel
+    run_cmd "$logfile" $make $make_parallel
 
     echo "ROCKBOXDEV: $toolname/make install"
-    $make install
+    run_cmd "$logfile" $make install
+
+    cd ..
 
     echo "ROCKBOXDEV: rm -rf build-$toolname $toolname-$version"
-    cd ..
     rm -rf build-$toolname $toolname-$version
 }
 
