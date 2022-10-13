@@ -26,7 +26,7 @@
 
 CODEC_HEADER
 
-#if NUM_CORES > 1
+#if NUM_CORES > 1 && !defined(MPEGPLAYER)
 #define MPA_SYNTH_ON_COP
 #endif
 

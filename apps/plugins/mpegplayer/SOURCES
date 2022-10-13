@@ -1,0 +1,35 @@
+libmpeg2/decode.c
+libmpeg2/header.c
+libmpeg2/idct.c
+libmpeg2/motion_comp.c
+libmpeg2/slice.c
+
+#ifdef CPU_COLDFIRE
+libmpeg2/idct_coldfire.S
+libmpeg2/motion_comp_coldfire_c.c
+libmpeg2/motion_comp_coldfire_s.S
+#elif defined CPU_ARM
+#if ARM_ARCH >= 6
+libmpeg2/idct_armv6.S
+#else
+libmpeg2/idct_arm.S
+#endif
+libmpeg2/motion_comp_arm_c.c
+libmpeg2/motion_comp_arm_s.S
+#else  /* other CPU or SIM */
+libmpeg2/motion_comp_c.c
+#endif /* CPU_* */
+
+
+
+alloc.c
+video_out_rockbox.c
+video_thread.c
+pcm_output.c
+audio_thread.c
+disk_buf.c
+mpeg_settings.c
+stream_mgr.c
+mpegplayer.c
+mpeg_parser.c
+mpeg_misc.c
