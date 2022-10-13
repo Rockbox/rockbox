@@ -220,7 +220,7 @@
 #define HAVE_USB_HID_MOUSE
 
 /* Define this if hardware supports alternate blitting */
-#define HAVE_LCD_MODES (LCD_MODE_RGB565 | LCD_MODE_PAL256)
+#define HAVE_LCD_MODES (LCD_MODE_RGB565 | LCD_MODE_YUV | LCD_MODE_PAL256)
 
 #define CONFIG_CPU DM320
 

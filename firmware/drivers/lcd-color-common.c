@@ -220,6 +220,195 @@ static inline int clamp(int val, int min, int max)
     return val;
 }
 
+#ifndef _WIN32
+/*
+ * weak attribute doesn't work for win32 as of gcc 4.6.2 and binutils 2.21.52
+ * When building win32 simulators, we won't be using an optimized version of
+ * lcd_blit_yuv(), so just don't use the weak attribute.
+ */
+__attribute__((weak))
+#endif
+void lcd_yuv_set_options(unsigned options)
+{
+    (void)options;
+}
+
+/* Draw a partial YUV colour bitmap */
+#ifndef _WIN32
+__attribute__((weak))
+#endif
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    const unsigned char *ysrc, *usrc, *vsrc;
+    int linecounter;
+    fb_data *dst, *row_end;
+    long z;
+
+    /* width and height must be >= 2 and an even number */
+    width &= ~1;
+    linecounter = height >> 1;
+
+#if LCD_WIDTH >= LCD_HEIGHT
+    dst     = FBADDR(x, y);
+    row_end = dst + width;
+#else
+    dst     = FBADDR(LCD_WIDTH - y - 1, x);
+    row_end = dst + LCD_WIDTH * width;
+#endif
+
+    z    = stride * src_y;
+    ysrc = src[0] + z + src_x;
+    usrc = src[1] + (z >> 2) + (src_x >> 1);
+    vsrc = src[2] + (usrc - src[1]);
+
+    /* stride => amount to jump from end of last row to start of next */
+    stride -= width;
+
+    /* upsampling, YUV->RGB conversion and reduction to RGB565 in one go */
+
+    do
+    {
+        do
+        {
+            int y, cb, cr, rv, guv, bu, r, g, b;
+
+            y  = YFAC*(*ysrc++ - 16);
+            cb = *usrc++ - 128;
+            cr = *vsrc++ - 128;
+
+            rv  =            RVFAC*cr;
+            guv = GUFAC*cb + GVFAC*cr;
+            bu  = BUFAC*cb;
+
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 64*256-1)
+            {
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
+            }
+
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;
+#else
+            dst += LCD_WIDTH;
+#endif
+
+            y = YFAC*(*ysrc++ - 16);
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 64*256-1)
+            {
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
+            }
+
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;
+#else
+            dst += LCD_WIDTH;
+#endif
+        }
+        while (dst < row_end);
+
+        ysrc    += stride;
+        usrc    -= width >> 1;
+        vsrc    -= width >> 1;
+
+#if LCD_WIDTH >= LCD_HEIGHT
+        row_end += LCD_WIDTH;
+        dst     += LCD_WIDTH - width;
+#else
+        row_end -= 1;
+        dst     -= LCD_WIDTH*width + 1;
+#endif
+
+        do
+        {
+            int y, cb, cr, rv, guv, bu, r, g, b;
+
+            y  = YFAC*(*ysrc++ - 16);
+            cb = *usrc++ - 128;
+            cr = *vsrc++ - 128;
+
+            rv  =            RVFAC*cr;
+            guv = GUFAC*cb + GVFAC*cr;
+            bu  = BUFAC*cb;
+
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 64*256-1)
+            {
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
+            }
+
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;
+#else
+            dst += LCD_WIDTH;
+#endif
+
+            y = YFAC*(*ysrc++ - 16);
+            r = y + rv;
+            g = y + guv;
+            b = y + bu;
+
+            if ((unsigned)(r | g | b) > 64*256-1)
+            {
+                r = clamp(r, 0, 64*256-1);
+                g = clamp(g, 0, 64*256-1);
+                b = clamp(b, 0, 64*256-1);
+            }
+
+            *dst = FB_RGBPACK(r >> 6, g >> 6, b >> 6);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+            dst++;
+#else
+            dst += LCD_WIDTH;
+#endif
+        }
+        while (dst < row_end);
+
+        ysrc    += stride;
+        usrc    += stride >> 1;
+        vsrc    += stride >> 1;
+
+#if LCD_WIDTH >= LCD_HEIGHT
+        row_end += LCD_WIDTH;
+        dst     += LCD_WIDTH - width;
+#else
+        row_end -= 1;
+        dst     -= LCD_WIDTH*width + 1;
+#endif
+    }
+    while (--linecounter > 0);
+
+#if LCD_WIDTH >= LCD_HEIGHT
+    lcd_update_rect(x, y, width, height);
+#else
+    lcd_update_rect(LCD_WIDTH - y - height, x, height, width);
+#endif
+}
+
 /* Fill a rectangle with a gradient. This function draws only the partial
  * gradient. It assumes the original gradient is src_height high and skips
  * the first few rows. This is useful for drawing only the bottom half of

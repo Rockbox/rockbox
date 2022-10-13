@@ -202,6 +202,62 @@ static void lcd_setup_drawing_region(int x, int y, int width, int height)
     }
 }
 
+/* Line write helper function for lcd_yuv_blit. Writes two lines of yuv420. */
+extern void lcd_write_yuv420_lines(unsigned char const * const src[3],
+                                   const unsigned int lcd_baseadress,
+                                   int width,
+                                   int stride);
+
+/* Performance function to blit a YUV bitmap directly to the LCD */
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    int z;
+    unsigned char const * yuv_src[3];
+
+    width  = (width  + 1) & ~1; /* ensure width is even  */
+    height = (height + 1) & ~1; /* ensure height is even */
+
+    lcd_setup_drawing_region(x, y, width, height);
+
+    z = stride * src_y;
+    yuv_src[0] = src[0] + z + src_x;
+    yuv_src[1] = src[1] + (z >> 2) + (src_x >> 1);
+    yuv_src[2] = src[2] + (yuv_src[1] - src[1]);
+
+    while (height > 0) {
+        int r, h, pixels_to_write;
+
+        pixels_to_write = (width * height) * 2;
+        h = height;
+
+        /* calculate how much we can do in one go */
+        if (pixels_to_write > 0x10000) {
+            h = ((0x10000/2) / width) & ~1; /* ensure h is even */
+            pixels_to_write = (width * h) * 2;
+        }
+        
+        LCD2_BLOCK_CTRL   = 0x10000080;
+        LCD2_BLOCK_CONFIG = 0xc0010000 | (pixels_to_write - 1);
+        LCD2_BLOCK_CTRL   = 0x34000000;
+
+        r = h>>1; /* lcd_write_yuv420_lines writes two lines at once */
+        do {
+            lcd_write_yuv420_lines(yuv_src, LCD2_BASE, width, stride);
+            yuv_src[0] += stride << 1;
+            yuv_src[1] += stride >> 1;
+            yuv_src[2] += stride >> 1;
+        } while (--r > 0);
+        
+        /* transfer of pixels_to_write bytes finished */
+        while (!(LCD2_BLOCK_CTRL & LCD2_BLOCK_READY));
+        LCD2_BLOCK_CONFIG = 0;
+        
+        height -= h;
+    }
+}
+
 /* Helper function writes 'count' consecutive pixels from src to LCD IF */
 static void lcd_write_line(int count, unsigned long *src)
 {

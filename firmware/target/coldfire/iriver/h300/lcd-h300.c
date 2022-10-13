@@ -325,6 +325,67 @@ bool lcd_active(void)
 
 /*** update functions ***/
 
+/* Line write helper function for lcd_yuv_blit. Write two lines of yuv420.
+ * y should have two lines of Y back to back, 2nd line first.
+ * c should contain the Cb and Cr data for the two lines of Y back to back.
+ * Needs EMAC set to saturated, signed integer mode.
+ */
+extern void lcd_write_yuv420_lines(const unsigned char *y,
+                                   const unsigned char *c, int cwidth);
+
+/* Performance function to blit a YUV bitmap directly to the LCD
+ * src_x, src_y, width and height should be even
+ * x, y, width and height have to be within LCD bounds
+ */
+void lcd_blit_yuv(unsigned char * const src[3],
+                  int src_x, int src_y, int stride,
+                  int x, int y, int width, int height)
+{
+    /* IRAM Y, Cb and Cb buffers. */
+    unsigned char y_ibuf[LCD_WIDTH*2];
+    unsigned char c_ibuf[LCD_WIDTH];
+    const unsigned char *ysrc, *usrc, *vsrc;
+    const unsigned char *ysrc_max;
+
+    if (!display_on)
+        return;
+
+    LCD_MUTEX_LOCK();
+    width &= ~1;  /* stay on the safe side */
+    height &= ~1;
+
+    lcd_write_reg(R_ENTRY_MODE, R_ENTRY_MODE_HORZ);
+    /* Set start position and window */
+    lcd_write_reg(R_VERT_RAM_ADDR_POS, ((xoffset + 219) << 8) | xoffset);
+
+    ysrc = src[0] + src_y * stride + src_x;
+    usrc = src[1] + (src_y * stride >> 2) + (src_x >> 1);
+    vsrc = src[2] + (src_y * stride >> 2) + (src_x >> 1);
+    ysrc_max = ysrc + height * stride;
+
+    coldfire_set_macsr(EMAC_SATURATE);
+    do
+    {
+        lcd_write_reg(R_HORIZ_RAM_ADDR_POS, ((y + 1) << 8) | y);
+        lcd_write_reg(R_RAM_ADDR_SET, ((x+xoffset) << 8) | y);
+        lcd_begin_write_gram();
+
+        memcpy(y_ibuf + width, ysrc, width);
+        memcpy(y_ibuf, ysrc + stride, width);
+        memcpy(c_ibuf, usrc, width >> 1);
+        memcpy(c_ibuf + (width >> 1), vsrc, width >> 1);
+        lcd_write_yuv420_lines(y_ibuf, c_ibuf, width >> 1);
+
+        y += 2;
+        ysrc += 2 * stride;
+        usrc += stride >> 1;
+        vsrc += stride >> 1;
+    }
+    while (ysrc < ysrc_max)
+        ;;
+    LCD_MUTEX_UNLOCK();
+}
+
 #ifndef BOOTLOADER
 /* LCD DMA ISR */
 void DMA3(void) __attribute__ ((interrupt_handler, section(".icode")));
