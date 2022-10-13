@@ -40,6 +40,8 @@ extern void splashf(int ticks, const char *fmt, ...) ATTRIBUTE_PRINTF(2, 3);
  */
 extern void splash(int ticks, const char *str);
 
+/* set a delay before displaying the progress meter the first time */
+extern void splash_progress_set_delay(long delay_ticks);
 /*
  * Puts a splash message centered on all the screens with a progressbar
  *  - current : current progress increment

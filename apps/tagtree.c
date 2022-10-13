@@ -2063,19 +2063,17 @@ static bool insert_all_playlist(struct tree_context *c, int position, bool queue
     }
 
     last_tick = current_tick + HZ/2; /* Show splash after 0.5 seconds have passed */
-
+    splash_progress_set_delay(HZ / 2); /* wait 1/2 sec before progress */
     n = c->filesindir;
     for (i = 0; i < n; i++)
     {
-        if (TIME_AFTER(current_tick, last_tick - 1))
+
+        splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
+        if (TIME_AFTER(current_tick, last_tick + HZ/4))
         {
-            splash_progress(i, n, "%s (%s)", str(LANG_WAIT), str(LANG_OFF_ABORT));
-            if (TIME_AFTER(current_tick, last_tick + HZ/10))
-            {
-                if (action_userabort(TIMEOUT_NOBLOCK))
-                    break;
-                last_tick = current_tick;
-            }
+            if (action_userabort(TIMEOUT_NOBLOCK))
+                break;
+            last_tick = current_tick;
         }
 
         if (!tagcache_retrieve(&tcs, tagtree_get_entry(c, i)->extraseek,

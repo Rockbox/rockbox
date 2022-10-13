@@ -32,6 +32,8 @@
 #include "strtok_r.h"
 #include "scrollbar.h"
 
+static long progress_next_tick = 0;
+
 #define MAXLINES  (LCD_HEIGHT/6)
 #define MAXBUFFER 512
 #define RECT_SPACING 2
@@ -194,21 +196,26 @@ void splash(int ticks, const char *str)
     splashf(ticks, "%s", P2STR((const unsigned char*)str));
 }
 
+/* set delay before progress meter is shown */
+void splash_progress_set_delay(long delay_ticks)
+{
+    progress_next_tick = current_tick + delay_ticks;
+}
+
 /* splash a progress meter */
 void splash_progress(int current, int total, const char *fmt, ...)
 {
     va_list ap;
     int vp_flag = VP_FLAG_VP_DIRTY;
     /* progress update tick */
-    static long next_tick = 0;
     long now = current_tick;
 
     if (current < total)
     {
-        if(TIME_BEFORE(now, next_tick))
+        if(TIME_BEFORE(now, progress_next_tick))
             return;
         /* limit to 20fps */
-        next_tick = now + HZ/20;
+        progress_next_tick = now + HZ/20;
         vp_flag = 0; /* don't mark vp dirty to prevent flashing */
     }
 
