@@ -127,15 +127,14 @@ enum {
 #ifdef BUFLIB_HAS_CRC
     bidx_CRC,       /* CRC, protects all metadata behind it */
 #endif
-    bidx_BSIZE,     /* total size of the block header */
 };
 
 /* Number of fields in the block header. Note that bidx_USER is not an
  * actual field so it is not included in the count. */
 #ifdef BUFLIB_HAS_CRC
-# define BUFLIB_NUM_FIELDS 6
-#else
 # define BUFLIB_NUM_FIELDS 5
+#else
+# define BUFLIB_NUM_FIELDS 4
 #endif
 
 struct buflib_callbacks buflib_ops_locked = {
@@ -339,7 +338,7 @@ union buflib_data* handle_to_block(struct buflib_context* ctx, int handle)
         return NULL;
 
     union buflib_data *data = ALIGN_DOWN(ptr, sizeof(*data));
-    return data - data[-bidx_BSIZE].val;
+    return data - BUFLIB_NUM_FIELDS;
 }
 
 /* Get the block end pointer from a handle table entry */
@@ -740,10 +739,8 @@ buffer_alloc:
     block[fidx_HANDLE].handle = handle;
     block[fidx_OPS].ops = ops;
 
-    size_t bsize = BUFLIB_NUM_FIELDS;
-    union buflib_data *block_end = block + bsize;
+    union buflib_data *block_end = block + BUFLIB_NUM_FIELDS;
     block_end[-bidx_PIN].pincount = 0;
-    block_end[-bidx_BSIZE].val = bsize;
     update_block_crc(ctx, block, block_end);
 
     handle->alloc = (char*)&block_end[-bidx_USER];
