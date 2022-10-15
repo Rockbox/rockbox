@@ -1830,7 +1830,6 @@ abort:
     wps_data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL); /* Safe if skin_buffer is NULL */
     wps_data->images = PTRTOSKINOFFSET(skin_buffer, NULL);
     wps_data->buflib_handle = core_free(wps_data->buflib_handle);
-    wps_data->buflib_handle = -1;
 #endif
 }
 
@@ -1998,7 +1997,7 @@ static bool load_skin_bitmaps(struct wps_data *wps_data, char *bmpdir)
                 strcpy(path, img->bm.data);
                 handle = load_skin_bmp(wps_data, &img->bm, bmpdir);
                 img->buflib_handle = handle;
-                img->loaded = img->buflib_handle >= 0;
+                img->loaded = img->buflib_handle > 0;
 
                 if (img->loaded)
                 {

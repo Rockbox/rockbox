@@ -372,7 +372,7 @@ struct wps_data
 #ifndef __PCTOOL__
 static inline char* get_skin_buffer(struct wps_data* data)
 {
-    if (data->buflib_handle >= 0)
+    if (data->buflib_handle > 0)
         return core_get_data(data->buflib_handle);
     return NULL;
 }
