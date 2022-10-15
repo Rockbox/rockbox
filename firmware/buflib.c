@@ -118,7 +118,6 @@ enum {
     fidx_LEN,       /* length of the block, must come first */
     fidx_HANDLE,    /* pointer to entry in the handle table */
     fidx_OPS,       /* pointer to an ops struct */
-    fidx_NAME,      /* name, optional and variable length, must come last */
 };
 
 /* Backward indices, used to index a block end pointer as block[-bidx_XXX] */
@@ -131,8 +130,7 @@ enum {
     bidx_BSIZE,     /* total size of the block header */
 };
 
-/* Number of fields in the block header, excluding the name, which is
- * accounted for using the BSIZE field. Note that bidx_USER is not an
+/* Number of fields in the block header. Note that bidx_USER is not an
  * actual field so it is not included in the count. */
 #ifdef BUFLIB_HAS_CRC
 # define BUFLIB_NUM_FIELDS 6
@@ -191,11 +189,6 @@ static void update_block_crc(struct buflib_context *ctx,
 static void check_block_crc(struct buflib_context *ctx,
                             union buflib_data *block,
                             union buflib_data *block_end);
-
-static inline char* get_block_name(union buflib_data *block)
-{
-    return (char*)&block[fidx_NAME];
-}
 
 /* Initialize buffer manager */
 void
@@ -401,8 +394,8 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
         return false;
 
     int handle = ctx->handle_table - h_entry;
-    BDEBUGF("%s(): moving \"%s\"(id=%d) by %d(%d)\n", __func__,
-            get_block_name(block), handle, shift, shift*(int)sizeof(union buflib_data));
+    BDEBUGF("%s(): moving id=%d by %d(%d)\n", __func__,
+            handle, shift, shift*(int)sizeof(union buflib_data));
     new_block = block + shift;
     new_start = h_entry->alloc + shift*sizeof(union buflib_data);
 
@@ -645,8 +638,7 @@ buflib_alloc(struct buflib_context *ctx, size_t size)
 
 /* Allocate a buffer of size bytes, returning a handle for it.
  *
- * The additional name parameter gives the allocation a human-readable name,
- * the ops parameter points to caller-implemented callbacks for moving and
+ * The ops parameter points to caller-implemented callbacks for moving and
  * shrinking.
  *
  * If you pass NULL for "ops", buffers are movable by default.
@@ -658,12 +650,12 @@ int
 buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
                 struct buflib_callbacks *ops)
 {
+    (void)name;
+
     union buflib_data *handle, *block;
-    size_t name_len = name ? B_ALIGN_UP(strlen(name)+1) : 0;
     bool last;
     /* This really is assigned a value before use */
     int block_len;
-    size += name_len;
     size = (size + sizeof(union buflib_data) - 1) /
            sizeof(union buflib_data)
            + BUFLIB_NUM_FIELDS;
@@ -749,10 +741,8 @@ buffer_alloc:
     block[fidx_LEN].val = size;
     block[fidx_HANDLE].handle = handle;
     block[fidx_OPS].ops = ops;
-    if (name_len > 0)
-        strcpy(get_block_name(block), name);
 
-    size_t bsize = BUFLIB_NUM_FIELDS + name_len/sizeof(union buflib_data);
+    size_t bsize = BUFLIB_NUM_FIELDS;
     union buflib_data *block_end = block + bsize;
     block_end[-bidx_PIN].pincount = 0;
     block_end[-bidx_BSIZE].val = bsize;
@@ -760,8 +750,8 @@ buffer_alloc:
 
     handle->alloc = (char*)&block_end[-bidx_USER];
 
-    BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p name=\"%s\"\n",
-            (unsigned int)size, (void *)handle, (void *)ops, name ? name : "");
+    BDEBUGF("buflib_alloc_ex: size=%d handle=%p clb=%p\n",
+            (unsigned int)size, (void *)handle, (void *)ops);
 
     block += size;
     /* alloc_end must be kept current if we're taking the last block. */
@@ -868,7 +858,6 @@ free_space_at_end(struct buflib_context* ctx)
     ptrdiff_t diff = (ctx->last_handle - ctx->alloc_end - BUFLIB_NUM_FIELDS);
     diff -= 16; /* space for future handles */
     diff *= sizeof(union buflib_data); /* make it bytes */
-    diff -= 16; /* reserve 16 for the name */
 
     if (diff > 0)
         return diff;
@@ -956,9 +945,6 @@ buflib_available(struct buflib_context* ctx)
 int
 buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size, struct buflib_callbacks *ops)
 {
-    /* limit name to 16 since that's what buflib_available() accounts for it */
-    char buf[16];
-
     /* ignore ctx->compact because it's true if all movable blocks are contiguous
      * even if the buffer has holes due to unmovable allocations */
     unsigned hints;
@@ -974,9 +960,7 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
     if (*size <= 0) /* OOM */
         return -1;
 
-    strmemccpy(buf, name, sizeof(buf));
-
-    return buflib_alloc_ex(ctx, *size, buf, ops);
+    return buflib_alloc_ex(ctx, *size, name, ops);
 }
 
 /* Shrink the allocation indicated by the handle according to new_start and
@@ -1091,13 +1075,9 @@ unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
 
 const char* buflib_get_name(struct buflib_context *ctx, int handle)
 {
-    union buflib_data *data = handle_to_block_end(ctx, handle);
-    size_t len = data[-bidx_BSIZE].val;
-    if (len <= BUFLIB_NUM_FIELDS)
-        return NULL;
-
-    data -= len;
-    return get_block_name(data);
+    (void)ctx;
+    (void)handle;
+    return "";
 }
 
 #ifdef DEBUG
@@ -1153,9 +1133,9 @@ void buflib_print_block_at(struct buflib_context *ctx, int block_num,
 
         if (block_num-- == 0)
         {
-            snprintf(buf, bufsize, "%8p: val: %4ld (%s)",
+            snprintf(buf, bufsize, "%8p: val: %4ld (%sallocated)",
                      block, (long)block->val,
-                     block->val > 0 ? get_block_name(block) : "<unallocated>");
+                     block->val > 0 ? "" : "un");
         }
     }
 }
