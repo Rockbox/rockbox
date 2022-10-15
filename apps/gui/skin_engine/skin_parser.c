@@ -1830,6 +1830,7 @@ abort:
     wps_data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL); /* Safe if skin_buffer is NULL */
     wps_data->images = PTRTOSKINOFFSET(skin_buffer, NULL);
     wps_data->buflib_handle = core_free(wps_data->buflib_handle);
+    wps_data->buflib_handle = -1;
 #endif
 }
 
