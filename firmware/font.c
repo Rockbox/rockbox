@@ -90,6 +90,7 @@ extern struct font sysfont;
 
 struct buflib_alloc_data {
     struct font font;    /* must be the first member! */
+    char path[MAX_PATH]; /* font path and filename */
     int refcount;        /* how many times has this font been loaded? */
     unsigned char buffer[];
 };
@@ -331,8 +332,13 @@ static int find_font_index(const char* path)
     while (index < MAXFONTS)
     {
         handle = buflib_allocations[index];
-        if (handle > 0 && !strcmp(core_get_name(handle), path))
-            return index;
+        if (handle > 0)
+        {
+            struct buflib_alloc_data *data = core_get_data(handle);
+            if(!strcmp(data->path, path))
+                return index;
+        }
+
         index++;
     }
     return FONT_SYSFIXED;
@@ -344,7 +350,11 @@ const char* font_filename(int font_id)
         return NULL;
     int handle = buflib_allocations[font_id];
     if (handle > 0)
-        return core_get_name(handle);
+    {
+        struct buflib_alloc_data *data = core_get_data(handle);
+        return data->path;
+    }
+
     return NULL;
 }
 
@@ -402,6 +412,11 @@ static struct font* font_load_header(int fd, struct font *pheader,
 /* load a font with room for glyphs, limited to bufsize if not zero */
 int font_load_ex( const char *path, size_t buf_size, int glyphs )
 {
+    /* needed to handle the font properly after it's loaded */
+    size_t path_len = strlen(path);
+    if ( path_len >= MAX_PATH )
+        return -1;
+
     //printf("\nfont_load_ex(%s, %d, %d)\n", path, buf_size, glyphs);
     int fd = open(path, O_RDONLY|O_BINARY);
     if ( fd < 0 )
@@ -510,7 +525,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     font_id = open_slot;
 
     /* allocate mem */    
-    int handle = core_alloc_ex( path, 
+    int handle = core_alloc_ex( NULL,
                      bufsize + sizeof( struct buflib_alloc_data ), 
                      &buflibops );
     if ( handle <= 0 )
@@ -521,6 +536,9 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     core_pin(handle);
     pdata = core_get_data(handle);
     pdata->refcount     = 1;
+
+    /* save load path so we can recognize this font later */
+    memcpy(pdata->path, path, path_len+1);
 
     /* load and init */
     struct font *pf = &pdata->font;
@@ -594,7 +612,6 @@ void font_unload(int font_id)
     pdata->refcount--;
     if (pdata->refcount < 1)
     {
-        //printf("freeing id: %d %s\n", font_id, core_get_name(*handle));
         if (pf && pf->fd >= 0)
         {
             glyph_cache_save(font_id);
