@@ -202,7 +202,7 @@ void radioart_init(bool entering_screen)
     {
         /* grab control over buffering */
         size_t bufsize;
-        int handle = core_alloc_maximum("radioart", &bufsize, &radioart_ops);
+        int handle = core_alloc_maximum(&bufsize, &radioart_ops);
         if (handle <0)
         {
             splash(HZ, "Radioart Failed - OOM");

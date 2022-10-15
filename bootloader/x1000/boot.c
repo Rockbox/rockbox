@@ -72,7 +72,7 @@ static int read_linux_args(const char* filename)
     int ret;
 
     size_t max_size;
-    int handle = core_alloc_maximum("args", &max_size, &buflib_ops_locked);
+    int handle = core_alloc_maximum(&max_size, &buflib_ops_locked);
     if(handle <= 0) {
         splashf(5*HZ, "Out of memory");
         return -2;

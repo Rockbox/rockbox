@@ -2574,8 +2574,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     }
 #endif
 #ifndef __PCTOOL__
-    wps_data->buflib_handle = core_alloc(isfile ? buf : "failsafe skin",
-                                            skin_buffer_usage());
+    wps_data->buflib_handle = core_alloc(skin_buffer_usage());
     if (wps_data->buflib_handle > 0)
     {
         wps_data->wps_loaded = true;

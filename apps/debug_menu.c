@@ -515,7 +515,7 @@ static int bf_action_cb(int action, struct gui_synclist* list)
         else
         {
             splash(HZ/1, "Attempting a 64k allocation");
-            int handle = core_alloc("test", 64<<10);
+            int handle = core_alloc(64<<10);
             splash(HZ/2, (handle > 0) ? "Success":"Fail");
             /* for some reason simplelist doesn't allow adding items here if
              * info.get_name is given, so use normal list api */

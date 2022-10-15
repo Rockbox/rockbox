@@ -1202,7 +1202,7 @@ int action_set_keymap(struct button_mapping* core_keymap, int count)
         return action_set_keymap_handle(0, 0);
 
     size_t keyremap_buf_size = count * sizeof(struct button_mapping);
-    int handle = core_alloc("keyremap", keyremap_buf_size);
+    int handle = core_alloc(keyremap_buf_size);
     if (handle < 0)
         return -6;
 

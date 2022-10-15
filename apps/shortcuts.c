@@ -128,8 +128,7 @@ static struct shortcut* get_shortcut(int index)
 
     if (first_handle == 0)
     {
-        first_handle = core_alloc_ex("shortcuts_head",
-                                  sizeof(struct shortcut_handle), &shortcut_ops);
+        first_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
         if (first_handle <= 0)
             return NULL;
         h = core_get_data(first_handle);
@@ -146,11 +145,9 @@ static struct shortcut* get_shortcut(int index)
     } while (handle_count > 0 && current_handle > 0);
     if (handle_count > 0 && handle_index == 0)
     {
-        char buf[32];
-        snprintf(buf, sizeof buf, "shortcuts_%d", index/SHORTCUTS_PER_HANDLE);
         /* prevent invalidation of 'h' during compaction */
         ++buflib_move_lock;
-        h->next_handle = core_alloc_ex(buf, sizeof(struct shortcut_handle), &shortcut_ops);
+        h->next_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
         --buflib_move_lock;
         if (h->next_handle <= 0)
             return NULL;
@@ -390,7 +387,7 @@ void shortcuts_init(void)
     fd = open_utf8(SHORTCUTS_FILENAME, O_RDONLY);
     if (fd < 0)
         return;
-    first_handle = core_alloc_ex("shortcuts_head", sizeof(struct shortcut_handle), &shortcut_ops);
+    first_handle = core_alloc_ex(sizeof(struct shortcut_handle), &shortcut_ops);
     if (first_handle <= 0) {
         close(fd);
         return;

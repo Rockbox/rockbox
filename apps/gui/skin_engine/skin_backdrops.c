@@ -174,7 +174,7 @@ bool skin_backdrops_preload(void)
             }
             if (*filename && *filename != '-')
             {
-                backdrops[i].buflib_handle = core_alloc_ex(filename, buf_size, &buflib_ops);
+                backdrops[i].buflib_handle = core_alloc_ex(buf_size, &buflib_ops);
                 if (backdrops[i].buflib_handle > 0)
                 {
                     backdrops[i].buffer = core_get_data(backdrops[i].buflib_handle);
@@ -287,8 +287,7 @@ void skin_backdrop_load_setting(void)
                 if (backdrops[i].buflib_handle <= 0)
                 {
                     backdrops[i].buflib_handle =
-                            core_alloc_ex(global_settings.backdrop_file,
-                                        LCD_BACKDROP_BYTES, &buflib_ops);
+                            core_alloc_ex(LCD_BACKDROP_BYTES, &buflib_ops);
                     if (backdrops[i].buflib_handle <= 0)
                         return;
                 }

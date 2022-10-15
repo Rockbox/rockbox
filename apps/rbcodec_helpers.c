@@ -64,7 +64,7 @@ bool tdspeed_alloc_buffers(int32_t **buffers, const int *buf_s, int nbuf)
     {
         if (handles[i] <= 0)
         {
-            handles[i] = core_alloc_ex("tdspeed", buf_s[i], &ops);
+            handles[i] = core_alloc_ex(buf_s[i], &ops);
 
             if (handles[i] <= 0)
                 return false;

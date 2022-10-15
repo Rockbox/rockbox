@@ -103,7 +103,7 @@ int load_rockbox(const char* filename, size_t* sizep)
     if(check_disk(true) != DISK_PRESENT)
         return -1;
 
-    int handle = core_alloc_maximum("rockbox", sizep, &buflib_ops_locked);
+    int handle = core_alloc_maximum(sizep, &buflib_ops_locked);
     if(handle < 0) {
         splashf(5*HZ, "Out of memory");
         return -2;

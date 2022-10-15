@@ -649,8 +649,8 @@ struct plugin_api {
     size_t (*buflib_available)(struct buflib_context* ctx);
     int    (*buflib_alloc)(struct buflib_context* ctx, size_t size);
     int    (*buflib_alloc_ex)(struct buflib_context* ctx, size_t size,
-                              const char* name, struct buflib_callbacks *ops);
-    int    (*buflib_alloc_maximum)(struct buflib_context* ctx, const char* name,
+                              struct buflib_callbacks *ops);
+    int    (*buflib_alloc_maximum)(struct buflib_context* ctx,
                                    size_t* size, struct buflib_callbacks *ops);
     void   (*buflib_buffer_in)(struct buflib_context* ctx, int size);
     void*  (*buflib_buffer_out)(struct buflib_context* ctx, size_t* size);
@@ -658,7 +658,6 @@ struct plugin_api {
     bool   (*buflib_shrink)(struct buflib_context* ctx, int handle,
                             void* new_start, size_t new_size);
     void*  (*buflib_get_data)(struct buflib_context* ctx, int handle);
-    const char* (*buflib_get_name)(struct buflib_context* ctx, int handle);
 
     /* sound */
     void (*sound_set)(int setting, int value);

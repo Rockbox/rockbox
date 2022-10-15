@@ -66,7 +66,7 @@ static int handle = -1;
 
 static int surround_buffer_alloc(void)
 {
-    handle = core_alloc("dsp_surround_buffer", SURROUND_BUFSIZE);
+    handle = core_alloc(SURROUND_BUFSIZE);
     return handle;
 }
 

@@ -11,9 +11,9 @@
  * they have a predefined context
  */
 void core_allocator_init(void) INIT_ATTR;
-int core_alloc(const char* name, size_t size);
-int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks *ops);
-int core_alloc_maximum(const char* name, size_t *size, struct buflib_callbacks *ops);
+int core_alloc(size_t size);
+int core_alloc_ex(size_t size, struct buflib_callbacks *ops);
+int core_alloc_maximum(size_t *size, struct buflib_callbacks *ops);
 bool core_shrink(int handle, void* new_start, size_t new_size);
 void core_pin(int handle);
 void core_unpin(int handle);
@@ -21,7 +21,6 @@ unsigned core_pin_count(int handle);
 int core_free(int handle);
 size_t core_available(void);
 size_t core_allocatable(void);
-const char* core_get_name(int handle);
 #ifdef DEBUG
 void core_check_valid(void);
 #endif

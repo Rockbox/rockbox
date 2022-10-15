@@ -166,15 +166,15 @@ static unsigned short default_cp_table_buf[MAX_CP_TABLE_SIZE+1];
     default_cp_table_buf
 #define cp_table_free(handle) \
     do {} while (0)
-#define cp_table_alloc(filename, size, opsp) \
+#define cp_table_alloc(size, opsp) \
     ({ (void)(opsp); 1; })
 #define cp_table_pin(handle) \
     do { (void)handle; } while(0)
 #define cp_table_unpin(handle) \
     do { (void)handle; } while(0)
 #else
-#define cp_table_alloc(filename, size, opsp) \
-    core_alloc_ex((filename), (size), (opsp))
+#define cp_table_alloc(size, opsp) \
+    core_alloc_ex((size), (opsp))
 #define cp_table_free(handle) \
     core_free(handle)
 #define cp_table_get_data(handle) \
@@ -223,7 +223,7 @@ static int alloc_and_load_cp_table(int cp, void *buf)
         !(size % (off_t)sizeof (uint16_t))) {
 
         /* if the buffer is provided, use that but don't alloc */
-        int handle = buf ? 0 : cp_table_alloc(filename, size, NULL);
+        int handle = buf ? 0 : cp_table_alloc(size, NULL);
         if (handle > 0) {
             cp_table_pin(handle);
             buf = cp_table_get_data(handle);

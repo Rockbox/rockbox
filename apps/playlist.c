@@ -2020,7 +2020,7 @@ static void alloc_namebuffer(void)
 static int alloc_tempbuf(size_t* buflen)
 {
     /* request a reasonable size first */
-    int handle = core_alloc_ex(NULL, PLAYLIST_LOAD_BUFLEN, &buflib_ops_locked);
+    int handle = core_alloc_ex(PLAYLIST_LOAD_BUFLEN, &buflib_ops_locked);
     if (handle > 0)
     {
         *buflen = PLAYLIST_LOAD_BUFLEN;
@@ -2028,7 +2028,7 @@ static int alloc_tempbuf(size_t* buflen)
     }
 
     /* otherwise, try being unreasonable */
-    return core_alloc_maximum(NULL, buflen, &buflib_ops_locked);
+    return core_alloc_maximum(buflen, &buflib_ops_locked);
 }
 
 /*
@@ -2075,15 +2075,14 @@ void playlist_init(void)
     playlist->fd = -1;
     playlist->control_fd = -1;
     playlist->max_playlist_size = global_settings.max_files_in_playlist;
-    handle = core_alloc_ex("playlist idx",
-                playlist->max_playlist_size * sizeof(*playlist->indices), &ops);
 
+    handle = core_alloc_ex(playlist->max_playlist_size * sizeof(*playlist->indices), &ops);
     playlist->indices = core_get_data(handle);
 
     initalize_new_playlist(playlist, true);
 
 #ifdef HAVE_DIRCACHE
-    handle = core_alloc_ex("playlist dc",
+    handle = core_alloc_ex(
         playlist->max_playlist_size * sizeof(*playlist->dcfrefs), &ops);
     playlist->dcfrefs = core_get_data(handle);
     dc_copy_filerefs(playlist->dcfrefs, NULL, playlist->max_playlist_size);

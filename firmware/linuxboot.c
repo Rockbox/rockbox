@@ -80,7 +80,7 @@ static int uimage_alloc_state(const struct uimage_header* uh)
 #ifdef HAVE_UIMAGE_COMP_GZIP
     case IH_COMP_GZIP:
         size = inflate_size + inflate_align - 1;
-        return core_alloc_ex("inflate", size, &buflib_ops_locked);
+        return core_alloc_ex(size, &buflib_ops_locked);
 #endif
 
     default:
@@ -206,7 +206,7 @@ int uimage_load(struct uimage_header* uh, size_t* out_size,
         return E_OUT_OF_MEMORY;
 
     *out_size = 0;
-    int out_h = core_alloc_maximum("uimage", out_size, &buflib_ops_locked);
+    int out_h = core_alloc_maximum(out_size, &buflib_ops_locked);
     if(out_h <= 0) {
         ret = E_OUT_OF_MEMORY;
         goto err;

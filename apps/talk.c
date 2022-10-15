@@ -496,7 +496,7 @@ static bool load_index_table(int fd, const struct voicefile_header *hdr)
         return true;
 
     ssize_t alloc_size = (hdr->id1_max + hdr->id2_max) * sizeof(struct clip_entry);
-    index_handle = core_alloc_ex("voice index", alloc_size, &talk_ops);
+    index_handle = core_alloc_ex(alloc_size, &talk_ops);
     if (index_handle < 0)
         return false;
 
@@ -536,7 +536,7 @@ static bool load_header(int fd, struct voicefile_header *hdr)
 static bool create_clip_buffer(size_t max_size)
 {
     /* just allocate, populate on an as-needed basis later */
-    talk_handle = core_alloc_ex("voice data", max_size, &talk_ops);
+    talk_handle = core_alloc_ex(max_size, &talk_ops);
     if (talk_handle < 0)
         goto alloc_err;
 

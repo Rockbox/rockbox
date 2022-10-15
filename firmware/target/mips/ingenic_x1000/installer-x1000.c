@@ -151,7 +151,7 @@ static int updater_init(struct updater* u)
 
     /* buf_len is a bit oversized here, but it's not really important */
     u->buf_len = u->img_len + sizeof(mtar_t) + 2*CACHEALIGN_SIZE;
-    u->buf_hnd = core_alloc_ex("boot_image", u->buf_len, &buflib_ops_locked);
+    u->buf_hnd = core_alloc_ex(u->buf_len, &buflib_ops_locked);
     if(u->buf_hnd < 0) {
         rc = IERR_OUT_OF_MEMORY;
         goto error;

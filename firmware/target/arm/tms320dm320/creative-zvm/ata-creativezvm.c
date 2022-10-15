@@ -303,7 +303,7 @@ static void cfs_init(void)
         _ata_read_sectors(CFS_CLUSTER2CLUSTER(vfat_inodes_nr[1]), 1, &sector);
         inode = (struct cfs_inode*)&sector;
 #ifndef BOOTLOADER
-        sectors_handle = core_alloc("ata sectors", VFAT_SECTOR_SIZE(inode->filesize));
+        sectors_handle = core_alloc(VFAT_SECTOR_SIZE(inode->filesize));
         unsigned long *sectors = core_get_data(sectors_handle);
 #else
         static unsigned long _sector[VFAT_SECTOR_SIZE(1024*1024*1024)]; /* 1GB guess */

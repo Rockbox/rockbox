@@ -1606,9 +1606,7 @@ int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
 
     if (buf_size > 0)
     {
-        
-        handle = core_alloc_ex(filename, (size_t) buf_size, ops);
-
+        handle = core_alloc_ex(buf_size, ops);
         if (handle > 0)
         {
             core_pin(handle);

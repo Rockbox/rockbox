@@ -51,7 +51,7 @@ void core_allocator_init(void)
 
     buflib_init(&core_ctx, start, audiobufend - start);
 
-    test_alloc = core_alloc("test", 112);
+    test_alloc = core_alloc(112);
 }
 
 bool core_test_free(void)
@@ -69,14 +69,14 @@ bool core_test_free(void)
  * Note: Buffers allocated by this functions are movable.
  *       Don't pass them to functions that call yield()
  *       like disc input/output. */
-int core_alloc(const char* name, size_t size)
+int core_alloc(size_t size)
 {
-    return buflib_alloc_ex(&core_ctx, size, name, NULL);
+    return buflib_alloc_ex(&core_ctx, size, NULL);
 }
 
-int core_alloc_ex(const char* name, size_t size, struct buflib_callbacks *ops)
+int core_alloc_ex(size_t size, struct buflib_callbacks *ops)
 {
-    return buflib_alloc_ex(&core_ctx, size, name, ops);
+    return buflib_alloc_ex(&core_ctx, size, ops);
 }
 
 size_t core_available(void)
@@ -94,9 +94,9 @@ int core_free(int handle)
     return buflib_free(&core_ctx, handle);
 }
 
-int core_alloc_maximum(const char* name, size_t *size, struct buflib_callbacks *ops)
+int core_alloc_maximum(size_t *size, struct buflib_callbacks *ops)
 {
-    return buflib_alloc_maximum(&core_ctx, name, size, ops);
+    return buflib_alloc_maximum(&core_ctx, size, ops);
 }
 
 bool core_shrink(int handle, void* new_start, size_t new_size)
@@ -117,12 +117,6 @@ void core_unpin(int handle)
 unsigned core_pin_count(int handle)
 {
     return buflib_pin_count(&core_ctx, handle);
-}
-
-const char* core_get_name(int handle)
-{
-    const char *name = buflib_get_name(&core_ctx, handle);
-    return name ?: "<anonymous>";
 }
 
 int core_get_num_blocks(void)

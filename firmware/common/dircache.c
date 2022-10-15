@@ -479,7 +479,7 @@ static void binding_dissolve_volume(struct dircache_runinfo_volume *dcrivolp)
 static int alloc_cache(size_t size)
 {
     /* pad with one extra-- see alloc_name() and free_name() */
-    return core_alloc_ex("dircache", size + 1, &dircache_runinfo.ops);
+    return core_alloc_ex(size + 1, &dircache_runinfo.ops);
 }
 
 /**

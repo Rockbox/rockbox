@@ -49,7 +49,7 @@ static int handle = -1;
 
 static int pbe_buffer_alloc(void)
 {
-    handle = core_alloc("dsp_pbe_buffer", PBE_BUFSIZE);
+    handle = core_alloc(PBE_BUFSIZE);
     return handle;
 }
 

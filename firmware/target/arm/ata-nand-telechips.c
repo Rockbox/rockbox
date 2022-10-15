@@ -915,7 +915,7 @@ int nand_init(void)
 #ifndef BOOTLOADER
     /* Use chip info to allocate the correct size LPT buffer */
     lptbuf_size = sizeof(struct lpt_entry) * segments_per_bank * total_banks;
-    lpt_handle = core_alloc("lpt lookup", lptbuf_size);
+    lpt_handle = core_alloc(lptbuf_size);
     struct lpt_entry* lpt_lookup = core_get_data(lpt_handle);
 #else
     /* Use a static array in the bootloader */

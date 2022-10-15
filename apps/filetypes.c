@@ -409,7 +409,7 @@ static void read_viewers_config_init(void)
 
     /* estimate bufsize with the filesize, will not be larger */
     strdup_bufsize = (size_t)filesz;
-    strdup_handle = core_alloc_ex("filetypes", strdup_bufsize, &ops);
+    strdup_handle = core_alloc_ex(strdup_bufsize, &ops);
     if(strdup_handle <= 0)
         goto out;
 

@@ -77,7 +77,7 @@ int core_load_key_remap(const char *filename)
         return -1;
 
     size_t bufsize = count * sizeof(struct button_mapping);
-    int handle = core_alloc("keyremap", bufsize);
+    int handle = core_alloc(bufsize);
     if (handle > 0)
     {
         core_pin(handle);

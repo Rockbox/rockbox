@@ -633,7 +633,7 @@ buflib_buffer_in(struct buflib_context *ctx, int size)
 int
 buflib_alloc(struct buflib_context *ctx, size_t size)
 {
-    return buflib_alloc_ex(ctx, size, NULL, NULL);
+    return buflib_alloc_ex(ctx, size, NULL);
 }
 
 /* Allocate a buffer of size bytes, returning a handle for it.
@@ -647,11 +647,9 @@ buflib_alloc(struct buflib_context *ctx, size_t size)
  */
 
 int
-buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
+buflib_alloc_ex(struct buflib_context *ctx, size_t size,
                 struct buflib_callbacks *ops)
 {
-    (void)name;
-
     union buflib_data *handle, *block;
     bool last;
     /* This really is assigned a value before use */
@@ -943,7 +941,7 @@ buflib_available(struct buflib_context* ctx)
  * serviced anyway).
  */
 int
-buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size, struct buflib_callbacks *ops)
+buflib_alloc_maximum(struct buflib_context* ctx, size_t *size, struct buflib_callbacks *ops)
 {
     /* ignore ctx->compact because it's true if all movable blocks are contiguous
      * even if the buffer has holes due to unmovable allocations */
@@ -960,7 +958,7 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
     if (*size <= 0) /* OOM */
         return -1;
 
-    return buflib_alloc_ex(ctx, *size, name, ops);
+    return buflib_alloc_ex(ctx, *size, ops);
 }
 
 /* Shrink the allocation indicated by the handle according to new_start and
@@ -1071,13 +1069,6 @@ unsigned buflib_pin_count(struct buflib_context *ctx, int handle)
 
     union buflib_data *data = handle_to_block_end(ctx, handle);
     return data[-bidx_PIN].pincount;
-}
-
-const char* buflib_get_name(struct buflib_context *ctx, int handle)
-{
-    (void)ctx;
-    (void)handle;
-    return "";
 }
 
 #ifdef DEBUG

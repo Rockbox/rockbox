@@ -1063,14 +1063,11 @@ void tree_mem_init(void)
 
     cache->name_buffer_size = AVERAGE_FILENAME_LENGTH *
         global_settings.max_files_in_dir;
-    cache->name_buffer_handle = core_alloc_ex("tree names",
-                                    cache->name_buffer_size,
-                                    &ops);
+    cache->name_buffer_handle = core_alloc_ex(cache->name_buffer_size, &ops);
 
     cache->max_entries = global_settings.max_files_in_dir;
-    cache->entries_handle = core_alloc_ex("tree entries",
-                                    cache->max_entries*(sizeof(struct entry)),
-                                    &ops);
+    cache->entries_handle =
+            core_alloc_ex(cache->max_entries*(sizeof(struct entry)), &ops);
 }
 
 bool bookmark_play(char *resume_file, int index, unsigned long elapsed,

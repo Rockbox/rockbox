@@ -585,7 +585,6 @@ static const struct plugin_api rockbox_api = {
     buflib_free,
     buflib_shrink,
     buflib_get_data,
-    buflib_get_name,
 
     /* sound */
     sound_set,
@@ -1039,8 +1038,7 @@ static void* plugin_get_audio_buffer(size_t *buffer_size)
 {
     if (plugin_buffer_handle <= 0)
     {
-        plugin_buffer_handle = core_alloc_maximum("plugin audio buf",
-                                                  &plugin_buffer_size,
+        plugin_buffer_handle = core_alloc_maximum(&plugin_buffer_size,
                                                   &buflib_ops_locked);
     }
 

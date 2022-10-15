@@ -1255,7 +1255,7 @@ static bool initialize_tagtree(void) /* also used when user selects 'Reload' in 
     menu_count = 0;
     menu = NULL;
     rootmenu = -1;
-    tagtree_handle = core_alloc_maximum("tagtree", &tagtree_bufsize, &ops);
+    tagtree_handle = core_alloc_maximum(&tagtree_bufsize, &ops);
     if (tagtree_handle < 0)
         panicf("tagtree OOM");
 

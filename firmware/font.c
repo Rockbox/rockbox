@@ -525,7 +525,7 @@ int font_load_ex( const char *path, size_t buf_size, int glyphs )
     font_id = open_slot;
 
     /* allocate mem */    
-    int handle = core_alloc_ex( NULL,
+    int handle = core_alloc_ex(
                      bufsize + sizeof( struct buflib_alloc_data ), 
                      &buflibops );
     if ( handle <= 0 )

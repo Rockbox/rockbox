@@ -410,7 +410,7 @@ static void allocate_tempbuf(void)
 #else /* !__PCTOOL__ */
     /* Need to pass dummy ops to prevent the buffer being moved
      * out from under us, since we yield during the tagcache commit. */
-    tempbuf_handle = core_alloc_maximum("tc tempbuf", &size, &buflib_ops_locked);
+    tempbuf_handle = core_alloc_maximum(&size, &buflib_ops_locked);
     if (tempbuf_handle > 0)
     {
         tempbuf = core_get_data(tempbuf_handle);
@@ -4115,7 +4115,7 @@ static bool allocate_tagcache(void)
     alloc_size += tcmh.tch.entry_count*sizeof(struct dircache_fileref);
 #endif
 
-    int handle = core_alloc_ex("tc ramcache", alloc_size, &ops);
+    int handle = core_alloc_ex(alloc_size, &ops);
     if (handle <= 0)
         return false;
 
@@ -4158,7 +4158,7 @@ static bool tagcache_dumpload(void)
     }
 
     /* Lets allocate real memory and load it */
-    handle = core_alloc_ex("tc ramcache", shdr.tc_stat.ramcache_allocated, &ops);
+    handle = core_alloc_ex(shdr.tc_stat.ramcache_allocated, &ops);
     if (handle <= 0)
     {
         logf("alloc failure");

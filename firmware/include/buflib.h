@@ -62,8 +62,7 @@ struct buflib_context
  * to the actually requested number of bytes.
  *
  * The total number of bytes consumed by an allocation is
- * BUFLIB_ALLOC_OVERHEAD + requested bytes + strlen(<name passed to
- * buflib_alloc_ex()) + pad to pointer size
+ * BUFLIB_ALLOC_OVERHEAD + requested bytes + pad to pointer size
  */
 #define BUFLIB_ALLOC_OVERHEAD (5*sizeof(union buflib_data))
 
@@ -215,7 +214,6 @@ int buflib_alloc(struct buflib_context *context, size_t size);
  * Allocates memory from the buflib's memory pool with additional callbacks
  * and flags
  *
- * name: A string identifier giving this allocation a name
  * size: How many bytes to allocate
  * ops: a struct with pointers to callback functions (see above).
  *      if "ops" is NULL: Buffer is movable.
@@ -223,7 +221,7 @@ int buflib_alloc(struct buflib_context *context, size_t size);
  * Returns: A positive integer handle identifying this allocation, or
  * a negative value on error (0 is also not a valid handle)
  */
-int buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
+int buflib_alloc_ex(struct buflib_context *ctx, size_t size,
                     struct buflib_callbacks *ops);
 
 
@@ -241,15 +239,14 @@ int buflib_alloc_ex(struct buflib_context *ctx, size_t size, const char *name,
  * and even shrinks other allocations. However, do not depend on this behavior,
  * it may change.
  *
- * name: A string identifier giving this allocation a name
  * size: The actual size will be returned into size
  * ops: a struct with pointers to callback functions
  *
  * Returns: A positive integer handle identifying this allocation, or
  * a negative value on error (0 is also not a valid handle)
  */
-int buflib_alloc_maximum(struct buflib_context* ctx, const char* name,
-                    size_t *size, struct buflib_callbacks *ops);
+int buflib_alloc_maximum(struct buflib_context* ctx,
+                         size_t *size, struct buflib_callbacks *ops);
 
 /**
  * Queries the data pointer for the given handle. It's actually a cheap
@@ -347,18 +344,6 @@ void* buflib_buffer_out(struct buflib_context *ctx, size_t *size);
 void buflib_buffer_in(struct buflib_context *ctx, int size);
 
 /* debugging */
-
-/**
- * Returns the name, as given to buflib_alloc() and buflib_allloc_ex(), of the
- * allocation associated with the given handle. As naming allocations
- * is optional, there might be no name associated.
- *
- * handle: The handle indicating the allocation
- *
- * Returns: A pointer to the string identifier of the allocation, or NULL
- * if none was specified with buflib_alloc_ex().
- */
-const char* buflib_get_name(struct buflib_context *ctx, int handle);
 
 /**
  * Gets the number of blocks in the entire buffer, allocated or unallocated
