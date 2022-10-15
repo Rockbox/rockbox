@@ -77,7 +77,7 @@ static inline bool clip_viewport_pixel(struct viewport *vp, int *x, int *y)
 static inline bool clip_viewport_hline(struct viewport *vp,
                                        int *x1, int *x2, int *y)
 {
-    if (*y < 0 || *y > vp->height)
+    if (*y < 0 || *y >= vp->height)
         return false;
 
     if (*x2 < *x1) {
@@ -105,7 +105,7 @@ static inline bool clip_viewport_hline(struct viewport *vp,
 static inline bool clip_viewport_vline(struct viewport *vp,
                                        int *x, int *y1, int *y2)
 {
-    if (*x < 0 || *x > vp->width)
+    if (*x < 0 || *x >= vp->width)
         return false;
 
     if (*y2 < *y1) {
