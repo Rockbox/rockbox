@@ -33,7 +33,6 @@
 #include "string-extra.h" /* strmemccpy() */
 #include "debug.h"
 #include "panic.h"
-#include "crc32.h"
 #include "system.h" /* for ALIGN_*() */
 
 /* The main goal of this design is fast fetching of the pointer for a handle.
@@ -101,17 +100,11 @@
 #define PARANOIA_CHECK_LENGTH       (1 << 0)
 #define PARANOIA_CHECK_HANDLE       (1 << 1)
 #define PARANOIA_CHECK_BLOCK_HANDLE (1 << 2)
-#define PARANOIA_CHECK_CRC          (1 << 3)
-#define PARANOIA_CHECK_PINNING      (1 << 4)
+#define PARANOIA_CHECK_PINNING      (1 << 3)
 /* Bitmask of enabled paranoia checks */
 #define BUFLIB_PARANOIA \
     (PARANOIA_CHECK_LENGTH | PARANOIA_CHECK_HANDLE | \
-     PARANOIA_CHECK_BLOCK_HANDLE | PARANOIA_CHECK_CRC | \
-     PARANOIA_CHECK_PINNING)
-
-#if BUFLIB_PARANOIA & PARANOIA_CHECK_CRC
-# define BUFLIB_HAS_CRC
-#endif
+     PARANOIA_CHECK_BLOCK_HANDLE | PARANOIA_CHECK_PINNING)
 
 /* Forward indices, used to index a block start pointer as block[fidx_XXX] */
 enum {
@@ -124,18 +117,11 @@ enum {
 enum {
     bidx_USER,      /* dummy to get below fields to be 1-based */
     bidx_PIN,       /* pin count */
-#ifdef BUFLIB_HAS_CRC
-    bidx_CRC,       /* CRC, protects all metadata behind it */
-#endif
 };
 
 /* Number of fields in the block header. Note that bidx_USER is not an
  * actual field so it is not included in the count. */
-#ifdef BUFLIB_HAS_CRC
-# define BUFLIB_NUM_FIELDS 5
-#else
-# define BUFLIB_NUM_FIELDS 4
-#endif
+#define BUFLIB_NUM_FIELDS 4
 
 struct buflib_callbacks buflib_ops_locked = {
     .move_callback = NULL,
@@ -178,16 +164,6 @@ static void check_handle(struct buflib_context *ctx,
  */
 static void check_block_handle(struct buflib_context *ctx,
                                union buflib_data *block);
-
-/* Update the block's CRC checksum if CRCs are enabled. */
-static void update_block_crc(struct buflib_context *ctx,
-                             union buflib_data *block,
-                             union buflib_data *block_end);
-
-/* Check the block's CRC if CRCs are enabled. */
-static void check_block_crc(struct buflib_context *ctx,
-                            union buflib_data *block,
-                            union buflib_data *block_end);
 
 /* Initialize buffer manager */
 void
@@ -387,7 +363,6 @@ move_block(struct buflib_context* ctx, union buflib_data* block, int shift)
     check_block_handle(ctx, block);
     union buflib_data *h_entry = block[fidx_HANDLE].handle;
     union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
-    check_block_crc(ctx, block, block_end);
 
     if (!IS_MOVABLE(block) || block_end[-bidx_PIN].pincount > 0)
         return false;
@@ -741,7 +716,6 @@ buffer_alloc:
 
     union buflib_data *block_end = block + BUFLIB_NUM_FIELDS;
     block_end[-bidx_PIN].pincount = 0;
-    update_block_crc(ctx, block, block_end);
 
     handle->alloc = (char*)&block_end[-bidx_USER];
 
@@ -1011,11 +985,6 @@ buflib_shrink(struct buflib_context* ctx, int handle, void* new_start, size_t ne
         block = new_block;
     }
 
-    /* update crc of the metadata */
-    union buflib_data *new_h_entry = new_block[fidx_HANDLE].handle;
-    union buflib_data *new_block_end = h_entry_to_block_end(ctx, new_h_entry);
-    update_block_crc(ctx, new_block, new_block_end);
-
     /* Now deal with size changes that create free blocks after the allocation */
     if (old_next_block != new_next_block)
     {
@@ -1089,9 +1058,6 @@ void buflib_check_valid(struct buflib_context *ctx)
             continue;
 
         check_block_handle(ctx, block);
-        union buflib_data *h_entry = block[fidx_HANDLE].handle;
-        union buflib_data *block_end = h_entry_to_block_end(ctx, h_entry);
-        check_block_crc(ctx, block, block_end);
     }
 }
 #endif
@@ -1202,60 +1168,3 @@ static void check_block_handle(struct buflib_context *ctx,
         }
     }
 }
-
-#ifdef BUFLIB_HAS_CRC
-static uint32_t calc_block_crc(union buflib_data *block,
-                               union buflib_data *block_end)
-{
-    union buflib_data *crc_slot = &block_end[-bidx_CRC];
-    const size_t size = (crc_slot - block) * sizeof(*block);
-    return crc_32(block, size, 0xffffffff);
-}
-
-static void update_block_crc(struct buflib_context *ctx,
-                             union buflib_data *block,
-                             union buflib_data *block_end)
-{
-    (void)ctx;
-
-    if (BUFLIB_PARANOIA & PARANOIA_CHECK_CRC)
-    {
-        block_end[-bidx_CRC].crc = calc_block_crc(block, block_end);
-    }
-}
-
-static void check_block_crc(struct buflib_context *ctx,
-                            union buflib_data *block,
-                            union buflib_data *block_end)
-{
-    if (BUFLIB_PARANOIA & PARANOIA_CHECK_CRC)
-    {
-        uint32_t crc = calc_block_crc(block, block_end);
-        if (block_end[-bidx_CRC].crc != crc)
-        {
-            buflib_panic(ctx, "buflib crc mismatch [%p]=%08lx, got %08lx",
-                         &block_end[-bidx_CRC],
-                         (unsigned long)block_end[-bidx_CRC].crc,
-                         (unsigned long)crc);
-        }
-    }
-}
-#else
-static void update_block_crc(struct buflib_context *ctx,
-                             union buflib_data *block,
-                             union buflib_data *block_end)
-{
-    (void)ctx;
-    (void)block;
-    (void)block_end;
-}
-
-static void check_block_crc(struct buflib_context *ctx,
-                            union buflib_data *block,
-                            union buflib_data *block_end)
-{
-    (void)ctx;
-    (void)block;
-    (void)block_end;
-}
-#endif

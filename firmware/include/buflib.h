@@ -43,7 +43,6 @@ union buflib_data
     char* alloc;                  /* start of allocated memory area */
     union buflib_data *handle;    /* pointer to entry in the handle table.
                                      Used during compaction for fast lookup */
-    uint32_t crc;                 /* checksum of this data to detect corruption */
 };
 
 struct buflib_context
@@ -64,7 +63,7 @@ struct buflib_context
  * The total number of bytes consumed by an allocation is
  * BUFLIB_ALLOC_OVERHEAD + requested bytes + pad to pointer size
  */
-#define BUFLIB_ALLOC_OVERHEAD (5*sizeof(union buflib_data))
+#define BUFLIB_ALLOC_OVERHEAD (4*sizeof(union buflib_data))
 
 /**
  * Callbacks used by the buflib to inform allocation that compaction
