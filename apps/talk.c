@@ -226,7 +226,7 @@ static int shrink_callback(int handle, unsigned hints, void *start, size_t old_s
 
         mutex_lock(&read_buffer_mutex);
         /* the clip buffer isn't usable without index table */
-        if (handle == index_handle && talk_handle > 0)
+        if (handle == index_handle)
             talk_handle = core_free(talk_handle);
         if (h)
             *h = core_free(handle);
@@ -546,8 +546,7 @@ static bool create_clip_buffer(size_t max_size)
 
 alloc_err:
     talk_status = TALK_STATUS_ERR_ALLOC;
-    if (index_handle > 0)
-        index_handle = core_free(index_handle);
+    index_handle = core_free(index_handle);
     return false;
 }
 static inline int load_voicefile_failure(int fd)
@@ -621,8 +620,7 @@ static bool load_voicefile_data(int fd)
 
     /* just allocate, populate on an as-needed basis later
      * re-create the clip buffer to ensure clip_ctx is up-to-date */
-    if (talk_handle > 0)
-        talk_handle = core_free(talk_handle);
+    talk_handle = core_free(talk_handle);
     if (!create_clip_buffer(voicebuf_size))
         return false;
 
@@ -823,8 +821,8 @@ void talk_init(void)
     voicefile_size = has_voicefile = 0;
     /* need to free these as their size depends on the voice file, and
      * this function is called when the talk voice file changes */
-    if (index_handle > 0) index_handle = core_free(index_handle);
-    if (talk_handle  > 0) talk_handle  = core_free(talk_handle);
+    index_handle = core_free(index_handle);
+    talk_handle  = core_free(talk_handle);
     /* don't free thumb handle, it doesn't depend on the actual voice file
      * and so we can re-use it if it's already allocated in any event */
 

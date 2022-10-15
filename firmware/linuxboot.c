@@ -221,8 +221,7 @@ int uimage_load(struct uimage_header* uh, size_t* out_size,
     ret = 0;
 
   err:
-    if(state_h > 0)
-        core_free(state_h);
+    core_free(state_h);
     if(out_h > 0) {
         if(ret == 0)
             ret = out_h;

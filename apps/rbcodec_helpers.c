@@ -87,10 +87,7 @@ void tdspeed_free_buffers(int32_t **buffers, int nbuf)
 {
     for (int i = 0; i < nbuf; i++)
     {
-        if (handles[i] > 0)
-            core_free(handles[i]);
-
-        handles[i] = 0;
+        handles[i] = core_free(handles[i]);
         buffers[i] = NULL;
     }
 }

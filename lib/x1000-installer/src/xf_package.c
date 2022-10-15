@@ -257,8 +257,5 @@ void xf_package_close(struct xf_package* pkg)
     if(mtar_is_open(pkg->tar))
         mtar_close(pkg->tar);
 
-    if(pkg->alloc_handle > 0) {
-        core_free(pkg->alloc_handle);
-        pkg->alloc_handle = 0;
-    }
+    pkg->alloc_handle = core_free(pkg->alloc_handle);
 }

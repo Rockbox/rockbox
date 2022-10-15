@@ -267,8 +267,7 @@ void skin_backdrop_unload(int backdrop_id)
     backdrops[backdrop_id].ref_count--;
     if (backdrops[backdrop_id].ref_count <= 0)
     {
-        if (backdrops[backdrop_id].buflib_handle > 0)
-            core_free(backdrops[backdrop_id].buflib_handle);
+        core_free(backdrops[backdrop_id].buflib_handle);
         backdrops[backdrop_id].buffer = NULL;
         backdrops[backdrop_id].buflib_handle = -1;
         backdrops[backdrop_id].loaded = false;

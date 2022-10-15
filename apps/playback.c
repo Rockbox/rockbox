@@ -3683,8 +3683,7 @@ void audio_hard_stop(void)
 #ifdef PLAYBACK_VOICE
     voice_stop();
 #endif
-    if (audiobuf_handle > 0)
-        audiobuf_handle = core_free(audiobuf_handle);
+    audiobuf_handle = core_free(audiobuf_handle);
 }
 
 /* Resume playback if paused */

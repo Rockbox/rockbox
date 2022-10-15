@@ -1219,8 +1219,7 @@ int action_set_keymap_handle(int handle, int count)
     return -1;
 #else
     /* free an existing remap */
-    if (action_last.key_remap > 0)
-        action_last.key_remap = core_free(action_last.key_remap);
+    action_last.key_remap = core_free(action_last.key_remap);
 
     /* if clearing the remap, we're done */
     if (count <= 0 || handle <= 0)

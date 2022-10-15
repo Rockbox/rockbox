@@ -604,8 +604,7 @@ void font_unload(int font_id)
             glyph_cache_save(font_id);
             close(pf->fd);
         }
-        if (handle > 0)
-            core_free(handle);
+        core_free(handle);
         buflib_allocations[font_id] = -1;
 
     }

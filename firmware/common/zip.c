@@ -237,8 +237,7 @@ static int zip_read_ed(struct zip* z) {
     rv = 0;
 
 bail:
-    if (mem_handle >= 0)
-        core_free(mem_handle);
+    core_free(mem_handle);
     return rv;
 }
 
@@ -337,10 +336,9 @@ static int zip_read_cd(struct zip* z, bool use_cb) {
     rv = 0;
 
 bail:
-    if (rv != 0 && cds_handle >= 0)
+    if (rv != 0)
         core_free(cds_handle);
-    if (mem_handle >= 0)
-        core_free(mem_handle);
+    core_free(mem_handle);
     return rv;
 }
 
@@ -497,8 +495,7 @@ static int zip_read_entries(struct zip* z) {
     rv = 0;
 
 bail:
-    if (mem_handle >= 0)
-        core_free(mem_handle);
+    core_free(mem_handle);
     return rv;
 }
 
@@ -754,10 +751,8 @@ struct zip* zip_open(const char* name, bool try_mem) {
 bail:
     if (file >= 0)
         close(file);
-    if (mem_handle >= 0)
-        core_free(mem_handle);
-    if (zip_handle >= 0)
-        core_free(zip_handle);
+    core_free(mem_handle);
+    core_free(zip_handle);
     return NULL;
 }
 
@@ -875,8 +870,7 @@ void zip_close(struct zip* z) {
 
     z->close(z);
 
-    if (z->cds_handle >= 0)
-        core_free(z->cds_handle);
+    core_free(z->cds_handle);
 
     core_free(z->zip_handle);
 }

@@ -75,10 +75,7 @@ int xf_nandio_init(struct xf_nandio* nio)
 
 void xf_nandio_destroy(struct xf_nandio* nio)
 {
-    if(nio->alloc_handle > 0) {
-        core_free(nio->alloc_handle);
-        nio->alloc_handle = 0;
-    }
+    nio->alloc_handle = core_free(nio->alloc_handle);
 
     if(nio->ndrv) {
         nand_lock(nio->ndrv);

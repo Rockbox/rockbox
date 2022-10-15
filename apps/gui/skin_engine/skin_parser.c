@@ -1829,9 +1829,7 @@ void skin_data_free_buflib_allocs(struct wps_data *wps_data)
 abort:
     wps_data->font_ids = PTRTOSKINOFFSET(skin_buffer, NULL); /* Safe if skin_buffer is NULL */
     wps_data->images = PTRTOSKINOFFSET(skin_buffer, NULL);
-    if (wps_data->buflib_handle > 0)
-        core_free(wps_data->buflib_handle);
-    wps_data->buflib_handle = -1;
+    wps_data->buflib_handle = core_free(wps_data->buflib_handle);
 #endif
 }
 

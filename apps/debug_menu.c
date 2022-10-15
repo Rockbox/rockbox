@@ -520,8 +520,7 @@ static int bf_action_cb(int action, struct gui_synclist* list)
             /* for some reason simplelist doesn't allow adding items here if
              * info.get_name is given, so use normal list api */
             gui_synclist_set_nb_items(list, core_get_num_blocks());
-            if (handle > 0)
-                core_free(handle);
+            core_free(handle);
         }
         action = ACTION_REDRAW;
     }

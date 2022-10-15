@@ -839,8 +839,7 @@ int plugin_load(const char* plugin, const void* parameter)
         }
         lc_close(current_plugin_handle);
         current_plugin_handle = pfn_tsr_exit = NULL;
-        if (plugin_buffer_handle > 0)
-            plugin_buffer_handle = core_free(plugin_buffer_handle);
+        plugin_buffer_handle = core_free(plugin_buffer_handle);
     }
 
     splash(0, ID2P(LANG_WAIT));
@@ -921,8 +920,7 @@ int plugin_load(const char* plugin, const void* parameter)
     {   /* close handle if plugin is no tsr one */
         lc_close(current_plugin_handle);
         current_plugin_handle = NULL;
-        if (plugin_buffer_handle > 0)
-            plugin_buffer_handle = core_free(plugin_buffer_handle);
+        plugin_buffer_handle = core_free(plugin_buffer_handle);
     }
 
     talk_buffer_set_policy(TALK_BUFFER_DEFAULT);

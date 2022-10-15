@@ -1437,8 +1437,7 @@ static void on_close_recording(void)
     audio_set_output_source(AUDIO_SRC_PLAYBACK);
     pcm_apply_settings();
 
-    if (pcmrec_handle > 0)
-        pcmrec_handle = core_free(pcmrec_handle);
+    pcmrec_handle = core_free(pcmrec_handle);
     talk_buffer_set_policy(TALK_BUFFER_DEFAULT);
 
     send_event(RECORDING_EVENT_STOP, NULL);

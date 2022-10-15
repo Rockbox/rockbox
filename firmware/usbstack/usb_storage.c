@@ -481,8 +481,7 @@ void usb_storage_init_connection(void)
 
 void usb_storage_disconnect(void)
 {
-    if (usb_handle > 0)
-        usb_handle = core_free(usb_handle);
+    usb_handle = core_free(usb_handle);
 }
 
 /* called by usb_core_transfer_complete() */

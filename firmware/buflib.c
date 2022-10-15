@@ -820,6 +820,8 @@ find_block_before(struct buflib_context *ctx, union buflib_data* block,
 int
 buflib_free(struct buflib_context *ctx, int handle_num)
 {
+    if (handle_num <= 0) /* invalid or already free */
+        return handle_num;
     union buflib_data *handle = ctx->handle_table - handle_num,
                       *freed_block = handle_to_block(ctx, handle_num),
                       *block, *next_block;

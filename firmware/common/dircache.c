@@ -1963,8 +1963,7 @@ static int prepare_build(bool *realloced)
     int handle = reset_buffer();
     dircache_unlock();
 
-    if (handle > 0)
-        core_free(handle);
+    core_free(handle);
 
     handle = alloc_cache(size);
 
@@ -2164,8 +2163,7 @@ static void dircache_suspend_internal(bool freeit)
 
     dircache_unlock();
 
-    if (handle > 0)
-        core_free(handle);
+    core_free(handle);
 
     thread_wait(thread_id);
 
@@ -3179,7 +3177,7 @@ error:
     dircache_unlock();
 
 error_nolock:
-    if (rc < 0 && handle > 0)
+    if (rc < 0)
         core_free(handle);
 
     if (fd >= 0)

@@ -178,8 +178,7 @@ static void updater_cleanup(struct updater* u)
     if(u->tar && mtar_is_open(u->tar))
         mtar_close(u->tar);
 
-    if(u->buf_hnd >= 0)
-        core_free(u->buf_hnd);
+    core_free(u->buf_hnd);
 
     if(u->ndrv) {
         nand_close(u->ndrv);
