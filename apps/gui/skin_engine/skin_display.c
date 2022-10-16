@@ -499,78 +499,82 @@ void write_line(struct screen *display, struct align_pos *format_align,
 
     /* CASE 1: left and centered string overlap */
     /* there is a left string, need to merge left and center */
-    if ((left_width != 0 && center_width != 0) &&
-        (left_width + space_width > center_xpos)) {
-        /* replace the former separator '\0' of left and
-            center string with a space */
-        *(--format_align->center) = ' ';
-        /* calculate the new width and position of the merged string */
-        left_width = left_width + space_width + center_width;
-        /* there is no centered string anymore */
-        center_width = 0;
-    }
-    /* there is no left string, move center to left */
-    if ((left_width == 0 && center_width != 0) &&
-        (left_width > center_xpos)) {
-        /* move the center string to the left string */
-        format_align->left = format_align->center;
-        /* calculate the new width and position of the string */
-        left_width = center_width;
-        /* there is no centered string anymore */
-        center_width = 0;
-    }
+    if (center_width != 0)
+    {
+        if (left_width != 0 && left_width + space_width > center_xpos) {
+            /* replace the former separator '\0' of left and
+                center string with a space */
+            *(--format_align->center) = ' ';
+            /* calculate the new width and position of the merged string */
+            left_width = left_width + space_width + center_width;
+            /* there is no centered string anymore */
+            center_width = 0;
+        }
+        /* there is no left string, move center to left */
+        else if (left_width == 0 && center_xpos < 0) {
+            /* move the center string to the left string */
+            format_align->left = format_align->center;
+            /* calculate the new width and position of the string */
+            left_width = center_width;
+            /* there is no centered string anymore */
+            center_width = 0;
+        }
+    } /*(center_width != 0)*/
 
     /* CASE 2: centered and right string overlap */
     /* there is a right string, need to merge center and right */
-    if ((center_width != 0 && right_width != 0) &&
-        (center_xpos + center_width + space_width > right_xpos)) {
-        /* replace the former separator '\0' of center and
-            right string with a space */
-        *(--format_align->right) = ' ';
-        /* move the center string to the right after merge */
-        format_align->right = format_align->center;
-        /* calculate the new width and position of the merged string */
-        right_width = center_width + space_width + right_width;
-        right_xpos = (viewport_width - right_width);
-        /* there is no centered string anymore */
-        center_width = 0;
-    }
-    /* there is no right string, move center to right */
-    if ((center_width != 0 && right_width == 0) &&
-        (center_xpos + center_width > right_xpos)) {
-        /* move the center string to the right string */
-        format_align->right = format_align->center;
-        /* calculate the new width and position of the string */
-        right_width = center_width;
-        right_xpos = (viewport_width - right_width);
-        /* there is no centered string anymore */
-        center_width = 0;
-    }
+    if (center_width != 0)
+    {
+        int center_left_x = center_xpos + center_width;
+        if (right_width != 0 && center_left_x + space_width > right_xpos) {
+            /* replace the former separator '\0' of center and
+                right string with a space */
+            *(--format_align->right) = ' ';
+            /* move the center string to the right after merge */
+            format_align->right = format_align->center;
+            /* calculate the new width and position of the merged string */
+            right_width = center_width + space_width + right_width;
+            right_xpos = (viewport_width - right_width);
+            /* there is no centered string anymore */
+            center_width = 0;
+        }
+        /* there is no right string, move center to right */
+        else if (right_width == 0 && center_left_x > right_xpos) {
+            /* move the center string to the right string */
+            format_align->right = format_align->center;
+            /* calculate the new width and position of the string */
+            right_width = center_width;
+            right_xpos = (viewport_width - right_width);
+            /* there is no centered string anymore */
+            center_width = 0;
+        }
+    } /*(center_width != 0)*/
 
     /* CASE 3: left and right overlap
         There is no center string anymore, either there never
         was one or it has been merged in case 1 or 2 */
     /* there is a left string, need to merge left and right */
-    if ((left_width != 0 && center_width == 0 && right_width != 0) &&
-        (left_width + space_width > right_xpos)) {
-        /* replace the former separator '\0' of left and
-            right string with a space */
-        *(--format_align->right) = ' ';
-        /* calculate the new width and position of the string */
-        left_width = left_width + space_width + right_width;
-        /* there is no right string anymore */
-        right_width = 0;
-    }
-    /* there is no left string, move right to left */
-    if ((left_width == 0 && center_width == 0 && right_width != 0) &&
-        (left_width > right_xpos)) {
-        /* move the right string to the left string */
-        format_align->left = format_align->right;
-        /* calculate the new width and position of the string */
-        left_width = right_width;
-        /* there is no right string anymore */
-        right_width = 0;
-    }
+    if (center_width == 0 && right_width != 0)
+    {
+        if (left_width != 0 && left_width + space_width > right_xpos) {
+            /* replace the former separator '\0' of left and
+                right string with a space */
+            *(--format_align->right) = ' ';
+            /* calculate the new width and position of the string */
+            left_width = left_width + space_width + right_width;
+            /* there is no right string anymore */
+            right_width = 0;
+        }
+        /* there is no left string, move right to left */
+        else if (left_width == 0 && right_xpos < 0) {
+            /* move the right string to the left string */
+            format_align->left = format_align->right;
+            /* calculate the new width and position of the string */
+            left_width = right_width;
+            /* there is no right string anymore */
+            right_width = 0;
+        }
+    } /* (center_width == 0 && right_width != 0)*/
 
     if (scroll && ((left_width > scroll_width) ||
                    (center_width > scroll_width) ||
