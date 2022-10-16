@@ -237,7 +237,7 @@ void LCDFN(clear_viewport)(void)
     else
     {
         oldmode = vp->drawmode;
-        vp->drawmode &= ~DRMODE_INVERSEVID;
+        vp->drawmode ^= DRMODE_INVERSEVID;
         vp->drawmode |= DRMODE_SOLID;
 
         LCDFN(fillrect)(0, 0, vp->width, vp->height);
