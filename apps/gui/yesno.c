@@ -253,14 +253,15 @@ enum yesno_res gui_syncyesno_run(const struct text_message * main_message,
     if(result_displayed)
         sleep(HZ);
 
+  exit:
+    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, gui_yesno_ui_update, &yn[0]);
+
     FOR_NB_SCREENS(i)
     {
         screens[i].scroll_stop_viewport(yn[i].vp);
         viewportmanager_theme_undo(i, true);
     }
 
-  exit:
-    remove_event_ex(GUI_EVENT_NEED_UI_UPDATE, gui_yesno_ui_update, &yn[0]);
 #ifdef HAVE_TOUCHSCREEN
     touchscreen_set_mode(old_mode);
 #endif
