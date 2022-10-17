@@ -637,6 +637,7 @@ void draw_peakmeters(struct gui_wps *gwps, int line_number,
     }
 }
 
+#ifdef HAVE_ALBUMART
 /* Draw the album art bitmap from the given handle ID onto the given WPS.
    Call with clear = true to clear the bitmap instead of drawing it. */
 void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
@@ -706,6 +707,7 @@ void draw_album_art(struct gui_wps *gwps, int handle_id, bool clear)
         gwps->display->set_drawmode(DRMODE_SOLID);
     }
 }
+#endif
 
 bool skin_has_sbs(enum screen_type screen, struct wps_data *data)
 {
