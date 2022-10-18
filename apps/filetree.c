@@ -89,7 +89,8 @@ int ft_build_playlist(struct tree_context* c, int start_index)
  * avoid allocating yet another path buffer on the stack (and save some
  * code; the caller typically needs to create the full pathname anyway)...
  */
-bool ft_play_playlist(char* pathname, char* dirname, char* filename, bool skip_dyn_warning)
+bool ft_play_playlist(char* pathname, char* dirname,
+                      char* filename, bool skip_warn_and_bookmarks)
 {
     if (global_settings.party_mode && audio_status())
     {
@@ -97,21 +98,13 @@ bool ft_play_playlist(char* pathname, char* dirname, char* filename, bool skip_d
         return false;
     }
 
-    if (bookmark_autoload(pathname))
+    if (!skip_warn_and_bookmarks)
     {
-        return false;
+        if (bookmark_autoload(pathname) || !warn_on_pl_erase())
+            return false;
     }
 
     splash(0, ID2P(LANG_WAIT));
-
-    /* about to create a new current playlist...
-     * allow user to cancel the operation.
-     * Do not show if skip_dyn_warning is true */
-    if (!skip_dyn_warning)
-    {
-        if (!warn_on_pl_erase())
-            return false;
-    }
 
     if (playlist_create(dirname, filename) != -1)
     {
