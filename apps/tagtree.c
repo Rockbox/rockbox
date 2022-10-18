@@ -2161,6 +2161,8 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
 
 static int tagtree_play_folder(struct tree_context* c)
 {
+    int start_index = c->selected_item;
+
     if (playlist_create(NULL, NULL) < 0)
     {
         logf("Failed creating playlist\n");
@@ -2171,12 +2173,13 @@ static int tagtree_play_folder(struct tree_context* c)
         return -2;
 
     if (global_settings.playlist_shuffle)
-        c->selected_item = playlist_shuffle(current_tick, c->selected_item);
-    if (!global_settings.play_selected)
-        c->selected_item = 0;
-    gui_synclist_select_item(&tree_lists, c->selected_item);
+    {
+        start_index = playlist_shuffle(current_tick, c->selected_item);
+        if (!global_settings.play_selected)
+            start_index = 0;
+    }
 
-    playlist_start(c->selected_item, 0, 0);
+    playlist_start(start_index, 0, 0);
     playlist_get_current()->num_inserted_tracks = 0; /* make warn on playlist erase work */
     return 0;
 }
