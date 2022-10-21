@@ -392,8 +392,11 @@ static int update_dir(void)
     /* if selected item is undefined */
     if (tc.selected_item == -1)
     {
-        /* use lastfile to determine the selected item */
-        tc.selected_item = tree_get_file_position(lastfile);
+#ifdef HAVE_TAGCACHE
+        if (!id3db)
+#endif
+            /* use lastfile to determine the selected item */
+            tc.selected_item = tree_get_file_position(lastfile);
 
         /* If the file doesn't exists, select the first one (default) */
         if(tc.selected_item < 0)
