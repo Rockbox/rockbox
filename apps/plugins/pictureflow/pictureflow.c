@@ -689,7 +689,7 @@ static void config_set_defaults(struct pf_config_t *cfg)
      cfg->resize = true;
      cfg->cache_version = CACHE_REBUILD;
      cfg->show_album_name = (LCD_HEIGHT > 100)
-        ? ALBUM_NAME_TOP : ALBUM_NAME_BOTTOM;
+        ? ALBUM_AND_ARTIST_BOTTOM : ALBUM_NAME_BOTTOM;
      cfg->sort_albums_by = SORT_BY_ARTIST_AND_NAME;
      cfg->year_sort_order = ASCENDING;
      cfg->show_year = false;
@@ -2321,6 +2321,8 @@ aa_success:
         configfile_save(CONFIG_FILE, config, CONFIG_NUM_ITEMS,
                             CONFIG_VERSION);
         free_all_slide_prio(0);
+        if (pf_state == pf_idle)
+            rb->queue_post(&thread_q, EV_WAKEUP, 0);
     }
 
     if(verbose)/* direct interaction with user */
@@ -3492,6 +3494,20 @@ static void cleanup(void)
 #endif
 }
 
+static void interrupt_cover_in_animation(void);
+static void adjust_album_display_for_setting(int old_val, int new_val)
+{
+    if (old_val == new_val)
+        return;
+
+    reset_track_list();
+    recalc_offsets();
+    reset_slides();
+
+    if (pf_state == pf_show_tracks)
+        interrupt_cover_in_animation();
+}
+
 /**
   Shows the settings menu
  */
@@ -3547,11 +3563,10 @@ static int settings_menu(void)
         selection=rb->do_menu(&settings_menu,&selection, NULL, false);
         switch(selection) {
             case 0:
+                old_val = pf_cfg.show_album_name;
                 rb->set_option(rb->str(LANG_SHOW_ALBUM_TITLE),
                       &pf_cfg.show_album_name, INT, album_name_options, 5, NULL);
-                reset_track_list();
-                recalc_offsets();
-                reset_slides();
+                adjust_album_display_for_setting(old_val, pf_cfg.show_album_name);
                 break;
             case 1:
                 rb->set_bool(rb->str(LANG_SHOW_YEAR_IN_ALBUM_TITLE), &pf_cfg.show_year);
@@ -3573,38 +3588,40 @@ static int settings_menu(void)
                     pf_cfg.year_sort_order = old_val;
                 break;
             case 4:
+                old_val = pf_cfg.show_fps;
                 rb->set_bool(rb->str(LANG_DISPLAY_FPS), &pf_cfg.show_fps);
-                reset_track_list();
+                if (old_val != pf_cfg.show_fps)
+                    reset_track_list();
                 break;
 
             case 5:
+                old_val = pf_cfg.slide_spacing;
                 rb->set_int(rb->str(LANG_SPACING), "", 1,
                             &pf_cfg.slide_spacing,
                             NULL, 1, 0, 100, NULL );
-                recalc_offsets();
-                reset_slides();
+                adjust_album_display_for_setting(old_val, pf_cfg.slide_spacing);
                 break;
 
             case 6:
+                old_val = pf_cfg.center_margin;
                 rb->set_int(rb->str(LANG_CENTRE_MARGIN), "", 1,
                             &pf_cfg.center_margin,
                             NULL, 1, 0, 80, NULL );
-                recalc_offsets();
-                reset_slides();
+                adjust_album_display_for_setting(old_val, pf_cfg.center_margin);
                 break;
 
             case 7:
+                old_val = pf_cfg.num_slides;
                 rb->set_int(rb->str(LANG_NUMBER_OF_SLIDES), "", 1,
                         &pf_cfg.num_slides, NULL, 1, 1, MAX_SLIDES_COUNT, NULL );
-                recalc_offsets();
-                reset_slides();
+                adjust_album_display_for_setting(old_val, pf_cfg.num_slides);
                 break;
 
             case 8:
+                old_val = pf_cfg.zoom;
                 rb->set_int(rb->str(LANG_ZOOM), "", 1, &pf_cfg.zoom,
                             NULL, 1, 10, 300, NULL );
-                recalc_offsets();
-                reset_slides();
+                adjust_album_display_for_setting(old_val, pf_cfg.zoom);
                 break;
 
             case 9:
@@ -3895,7 +3912,10 @@ static void show_track_list(void)
 {
     mylcd_clear_display();
     if ( center_slide.slide_index != pf_tracks.cur_idx ) {
-        show_track_list_loading();
+#ifdef HAVE_TC_RAMCACHE
+        if (!rb->tagcache_is_in_ram())
+#endif
+            show_track_list_loading();
         create_track_index(center_slide.slide_index);
         if (pf_tracks.count == 0)
         {
@@ -4019,7 +4039,10 @@ static bool track_list_ready(void)
 {
     if (pf_state != pf_show_tracks)
     {
-        rb->splash(0, ID2P(LANG_WAIT));
+#ifdef HAVE_TC_RAMCACHE
+        if (!rb->tagcache_is_in_ram())
+#endif
+            rb->splash(0, ID2P(LANG_WAIT));
         create_track_index(center_slide.slide_index);
         if (pf_tracks.count == 0)
         {
@@ -4271,14 +4294,11 @@ static int pictureflow_main(const char* selected_file)
     config_set_defaults(&pf_cfg);
 
     configfile_load(CONFIG_FILE, config, CONFIG_NUM_ITEMS, CONFIG_VERSION);
-    if(pf_cfg.auto_wps == 0)
-        draw_splashscreen(pf_idx.buf, pf_idx.buf_sz);
-    if(pf_cfg.backlight_mode == 0) {
-        /* Turn off backlight timeout */
+
 #ifdef HAVE_BACKLIGHT
+    if(pf_cfg.backlight_mode == 0)
         backlight_ignore_timeout();
 #endif
-    }
 
     rb->mutex_init(&buf_ctx_mutex);
 
@@ -4454,7 +4474,8 @@ static int pictureflow_main(const char* selected_file)
                 rb->snprintf(fpstxt, sizeof(fpstxt), "%d %%", progress_pct);
             }
 
-            if (pf_cfg.show_album_name == ALBUM_NAME_TOP)
+            if (pf_cfg.show_album_name == ALBUM_NAME_TOP ||
+                pf_cfg.show_album_name == ALBUM_AND_ARTIST_TOP)
                 fpstxt_y = LCD_HEIGHT -
                            rb->screens[SCREEN_MAIN]->getcharheight();
             else
@@ -4572,15 +4593,15 @@ static int pictureflow_main(const char* selected_file)
             break;
 #if PF_PLAYBACK_CAPABLE
         case PF_CONTEXT:
-            if (pf_cfg.auto_wps != 0  &&
-                (pf_state == pf_idle || pf_state == pf_scrolling ||
-                 pf_state == pf_show_tracks || pf_state == pf_cover_out)) {
+            if (pf_state == pf_idle || pf_state == pf_scrolling ||
+                pf_state == pf_show_tracks || pf_state == pf_cover_out) {
 
                 if ( pf_state == pf_scrolling)
                 {
                     set_current_slide(target);
                     pf_state = pf_idle;
-                } else if (pf_state == pf_cover_out)
+                }
+                else if (pf_state == pf_cover_out)
                     interrupt_cover_out_animation();
 
                 show_current_playlist_menu();

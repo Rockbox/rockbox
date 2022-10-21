@@ -246,6 +246,7 @@ void tagcache_screensync_event(void);
 void tagcache_screensync_enable(bool state);
 
 #ifdef HAVE_TC_RAMCACHE
+bool tagcache_is_in_ram(void);
 #ifdef HAVE_DIRCACHE
 bool tagcache_fill_tags(struct mp3entry *id3, const char *filename);
 #endif

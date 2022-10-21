@@ -157,7 +157,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 255
+#define PLUGIN_API_VERSION 256
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -946,6 +946,11 @@ struct plugin_api {
 #endif
     /* new stuff at the end, sort into place next time
        the API gets incompatible */
+#ifdef HAVE_TAGCACHE
+#ifdef HAVE_TC_RAMCACHE
+    bool (*tagcache_is_in_ram)(void);
+#endif
+#endif
 };
 
 /* plugin header */

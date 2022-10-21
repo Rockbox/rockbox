@@ -170,7 +170,7 @@ static const char * const tag_type_str[] = {
 #endif /* ndef LOGF_ENABLE */
 
 /* Status information of the tagcache. */
-struct tagcache_stat tc_stat;
+static struct tagcache_stat tc_stat;
 
 /* Queue commands. */
 enum tagcache_queue {
@@ -5079,6 +5079,12 @@ bool tagcache_is_usable(void)
 {
     return tc_stat.initialized && tc_stat.ready;
 }
+#ifdef HAVE_TC_RAMCACHE
+bool tagcache_is_in_ram(void)
+{
+    return tc_stat.ramcache;
+}
+#endif
 int tagcache_get_commit_step(void)
 {
     return tc_stat.commit_step;
