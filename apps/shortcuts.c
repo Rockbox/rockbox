@@ -80,7 +80,7 @@ struct shortcut {
         } timedata;
     } u;
 };
-#define SHORTCUTS_PER_HANDLE 32
+#define SHORTCUTS_PER_HANDLE 4
 struct shortcut_handle {
     struct shortcut shortcuts[SHORTCUTS_PER_HANDLE];
     int next_handle;
