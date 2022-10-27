@@ -51,7 +51,7 @@
 #include "playback.h"
 #endif
 
-#define MAX_SHORTCUT_NAME 32
+#define MAX_SHORTCUT_NAME 64
 #define SHORTCUTS_FILENAME ROCKBOX_DIR "/shortcuts.txt"
 static const char * const type_strings[SHORTCUT_TYPE_COUNT] = {
     [SHORTCUT_SETTING] = "setting",
