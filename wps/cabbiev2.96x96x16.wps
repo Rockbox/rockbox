@@ -53,7 +53,7 @@
 #
 # Time Elapsed/Remaining
 %V(2,73,92,8,1)
-%al%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr
+%al%pc%ac%?Sr<%pe/%pp|%pp/%pe>%ar%pr
 #
 # Track Info - Album Art
 %ax%Vl(a,51,12,-,34,1)
