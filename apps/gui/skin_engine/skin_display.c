@@ -606,9 +606,9 @@ void write_line(struct screen *display, struct align_pos *format_align,
         char *center = format_align->center ?: "";
         char *right  = format_align->right  ?: "";
 
-        display->put_line(0, line, linedes, "$t$*s$t$*s$t", left,
-                center_xpos - left_width, center,
-                right_xpos - (center_xpos + center_width), right);
+        display->put_line(0, line, linedes, "$t$*s$t$*s$t", left_width == 0 ? "" : left ,
+                center_xpos - left_width, center_width == 0 ? "" : center,
+                right_xpos - center_xpos - center_width, right_width == 0 ? "" : right);
     }
 }
 
