@@ -326,7 +326,6 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         unsigned const char *s;
         char entry_buffer[MAX_PATH];
         unsigned char *entry_name;
-        const int text_pos = 0; /* UNUSED */
         int line = i - start;
         int line_indent = 0;
         int style = STYLE_DEFAULT;
@@ -352,7 +351,7 @@ void list_draw(struct screen *display, struct gui_synclist *list)
         /* position the string at the correct offset place */
         int item_width,h;
         display->getstringsize(entry_name, &item_width, &h);
-        item_offset = gui_list_get_item_offset(list, item_width, text_pos,
+        item_offset = gui_list_get_item_offset(list, item_width, indent + (list->show_icons ? icon_w : 0),
                 display, list_text_vp);
 
         /* draw the selected line */
