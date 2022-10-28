@@ -45,6 +45,7 @@ enum {
     IERR_NAND_OPEN,
     IERR_NAND_READ,
     IERR_NAND_WRITE,
+    IERR_CORRUPTED_BACKUP,
 };
 
 extern int install_bootloader(const char* filename);

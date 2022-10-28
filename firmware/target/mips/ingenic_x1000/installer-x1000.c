@@ -62,6 +62,9 @@ static const struct update_part updates[] = {
 
 static const int num_updates = sizeof(updates) / sizeof(struct update_part);
 
+static const uint8_t flash_sig_magic[8] =
+    {0x06, 0x05, 0x04, 0x03, 0x02, 0x55, 0xaa, 0x55};
+
 /* calculate the offset and length of the update image; this is constant
  * for a given target, based on the update parts and the NAND chip geometry.
  */
@@ -249,6 +252,12 @@ int backup_bootloader(const char* filename)
         goto error;
     }
 
+    /* bail if we're backing up something that looks like garbage */
+    if (memcmp(u.img_buf, flash_sig_magic, 8)) {
+        rc = IERR_CORRUPTED_BACKUP;
+        goto error;
+    }
+
     /* write to file */
     fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY);
     if(fd < 0) {
@@ -293,6 +302,12 @@ int restore_bootloader(const char* filename)
         goto error;
     }
 
+    /* safety check to reduce risk of flashing complete garbage */
+    if (memcmp(u.img_buf, flash_sig_magic, 8)) {
+        rc = IERR_CORRUPTED_BACKUP;
+        goto error;
+    }
+
     /* write image */
     rc = nand_write_bytes(u.ndrv, u.img_off, u.img_len, u.img_buf);
     if(rc != NAND_SUCCESS) {
@@ -320,6 +335,7 @@ const char* installer_strerror(int rc)
     case IERR_NAND_OPEN:        return "NAND open error";
     case IERR_NAND_READ:        return "NAND read error";
     case IERR_NAND_WRITE:       return "NAND write error";
+    case IERR_CORRUPTED_BACKUP: return "Backup is corrupt";
     default:                    return "Unknown error!?";
     }
 }
