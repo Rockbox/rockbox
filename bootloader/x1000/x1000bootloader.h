@@ -80,12 +80,13 @@ struct uimage_header;
 # define OF_PLAYER_ARGS     OF_RECOVERY_ARGS \
     " init=/linuxrc ubi.mtd=5 root=ubi0:rootfs ubi.mtd=6 rootfstype=ubifs rw"
 # define OF_PLAYER_BTN      BUTTON_PREV
-# define OF_RECOVERY_NAME   "Shanling recovery"
+/* Hide recovery kernel, it needs the OF player to initiate the update. */
+//# define OF_RECOVERY_NAME   "Shanling recovery"
 # define OF_RECOVERY_ADDR   0x940000
 # define OF_RECOVERY_LENGTH (10 * 1024 * 1024)
 # define OF_RECOVERY_ARGS \
     "mem=64M@0x0 no_console_suspend console=ttyS2,115200n8 lpj=5009408 ip=off"
-# define OF_RECOVERY_BTN    (BUTTON_PREV|BUTTON_NEXT)
+//# define OF_RECOVERY_BTN    (BUTTON_PREV|BUTTON_NEXT)
 #elif defined(EROS_QN)
 # define BL_RECOVERY        BUTTON_VOL_UP
 # define BL_UP              BUTTON_SCROLL_BACK
