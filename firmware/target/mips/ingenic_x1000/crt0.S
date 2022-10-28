@@ -55,6 +55,12 @@ _header:
 #endif
 
 _realstart:
+    /* Save bootloader arguments. */
+    move    s0, a0
+    move    s1, a1
+    move    s2, a2
+    move    s3, a3
+
     /* Copy IRAM from BSS to low memory. */
     la      a0, _iramcopy
     la      a1, _iramstart
@@ -109,6 +115,13 @@ _realstart:
     /* Jump to C code */
     jal     system_early_init
     nop
+
+    /* Restore bootloader arguments, jump to main. */
+    move    a0, s0
+    move    a1, s1
+    move    a2, s2
+    move    a3, s3
+
     j       main
     move    ra, zero     /* init backtrace root */
 
