@@ -317,6 +317,9 @@ void spl_main(void)
     REG_CPM_PSWC2ST = 0x18;
     REG_CPM_PSWC3ST = 0x08;
 
+    /* Save this, it's needed on some targets */
+    uint32_t saved_cpm_scratch = REG_CPM_SCRATCH;
+
     /* set up boot flags */
     init_boot_flags();
 
@@ -361,8 +364,8 @@ void spl_main(void)
     spl_storage_close();
 
     /* jump to the entry point */
-    typedef void(*entry_fn)(void);
+    typedef void(*entry_fn)(uint32_t);
     entry_fn fn = (entry_fn)BOOT_EXEC_ADDR;
     commit_discard_idcache();
-    fn();
+    fn(saved_cpm_scratch);
 }
