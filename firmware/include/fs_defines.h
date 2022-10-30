@@ -45,8 +45,15 @@
 
 /* limits for number of open descriptors - if you increase these values, make
    certain that the disk cache has enough available buffers */
+
+#if MEMORYSIZE < 8
 #define MAX_OPEN_FILES  11
 #define MAX_OPEN_DIRS   12
+#else
+#define MAX_OPEN_FILES  31
+#define MAX_OPEN_DIRS   32
+#endif /* MEMORYSIZE */
+
 
 /* internal functions open streams as well; make sure they don't fail if all
    user descs are busy; this needs to be at least the greatest quantity needed
@@ -96,10 +103,7 @@
 #if MEMORYSIZE < 8
 #define DC_NUM_ENTRIES      32
 #define DC_MAP_NUM_ENTRIES  128
-#elif MEMORYSIZE <= 32
-#define DC_NUM_ENTRIES      48
-#define DC_MAP_NUM_ENTRIES  128
-#else /* MEMORYSIZE > 32 */
+#else
 #define DC_NUM_ENTRIES      64
 #define DC_MAP_NUM_ENTRIES  256
 #endif /* MEMORYSIZE */
