@@ -408,6 +408,35 @@ enum codec_status codec_main(enum codec_entry_call_reason reason)
     return CODEC_OK;
 }
 
+bool seek_by_time(int64_t* samplesdone, unsigned long current_frequency, unsigned long elapsed_ms)
+{
+    if (ci->id3->is_asf_stream) {
+        asf_waveformatex_t *wfx = (asf_waveformatex_t *)(ci->id3->toc);
+        int elapsedtime = asf_seek(elapsed_ms, wfx);
+
+        *samplesdone = (elapsedtime > 0) ?
+                       (((int64_t)elapsedtime)*current_frequency/1000) : 0;
+
+        if (elapsedtime < 1) {
+            ci->set_elapsed(0);
+            return false;
+        } else {
+            ci->set_elapsed(elapsedtime);
+            reset_stream_buffer();
+        }
+    } else {
+        int newpos = elapsed_ms ? get_file_pos(elapsed_ms) : (int)(ci->id3->first_frame_offset);
+
+        *samplesdone = ((int64_t)elapsed_ms) * current_frequency / 1000;
+
+        if (!ci->seek_buffer(newpos))
+            return false;
+
+        ci->set_elapsed((*samplesdone * 1000LL) / current_frequency);
+    }
+    return true;
+}
+
 /* this is called for each file to process */
 enum codec_status codec_run(void)
 {
@@ -431,13 +460,8 @@ enum codec_status codec_run(void)
     ci->configure(DSP_SET_FREQUENCY, ci->id3->frequency);
     current_frequency = ci->id3->frequency;
     codec_set_replaygain(ci->id3);
-    
-    if (!ci->id3->is_asf_stream && !ci->id3->offset && ci->id3->elapsed) {
-        /* Have elapsed time but not offset */
-        ci->id3->offset = get_file_pos(ci->id3->elapsed);
-    }
 
-    if (ci->id3->offset) {
+     if (ci->id3->offset) {
 
         if (ci->id3->is_asf_stream) {
             asf_waveformatex_t *wfx = (asf_waveformatex_t *)(ci->id3->toc);
@@ -453,6 +477,9 @@ enum codec_status codec_run(void)
             set_elapsed(ci->id3);
         }
     }
+    else if (ci->id3->elapsed)
+         /* Have elapsed time but not offset */
+        seek_by_time(&samplesdone, current_frequency, ci->id3->elapsed);
     else
         ci->seek_buffer(ci->id3->first_frame_offset);
 
@@ -508,36 +535,10 @@ enum codec_status codec_run(void)
                 samples_to_skip = 0;
             }
 
-            if (ci->id3->is_asf_stream) {
-                asf_waveformatex_t *wfx = (asf_waveformatex_t *)(ci->id3->toc);
-                int elapsedtime = asf_seek(param, wfx);
-
-                samplesdone = (elapsedtime > 0) ?
-                  (((int64_t)elapsedtime)*current_frequency/1000) : 0;
-
-                if (elapsedtime < 1) {
-                    ci->set_elapsed(0);
-                    ci->seek_complete();
-                    break;
-                } else {
-                    ci->set_elapsed(elapsedtime);
-                    ci->seek_complete();
-                    reset_stream_buffer();
-                }
-            } else {
-                int newpos = param ? get_file_pos(param) : (int)(ci->id3->first_frame_offset);
-
-                samplesdone = ((int64_t)param)*current_frequency/1000;
-
-                if (!ci->seek_buffer(newpos))
-                {
-                    ci->seek_complete();
-                    break;
-                }
-
-                ci->set_elapsed((samplesdone * 1000LL) / current_frequency);
-                ci->seek_complete();
-            }
+            bool success = seek_by_time(&samplesdone, current_frequency, param);
+            ci->seek_complete();
+            if (!success)
+                break;
 
             init_mad();
             framelength = 0;
