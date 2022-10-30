@@ -2097,22 +2097,10 @@ static int audio_finish_load_track(struct track_info *infop)
     /** Finally, load the audio **/
     off_t file_offset = 0;
 
-    if (track_id3->elapsed > track_id3->length)
-        track_id3->elapsed = 0;
-
-    if ((off_t)track_id3->offset >= buf_filesize(infop->audio_hid))
-        track_id3->offset = 0;
-
-    logf("%s: set offset for %s to %lu\n", __func__,
-         track_id3->title, track_id3->offset);
-
     /* Adjust for resume rewind so we know what to buffer - starting the codec
        calls it again, so we don't save it (and they shouldn't accumulate) */
     unsigned long elapsed, offset;
     resume_rewind_adjust_progress(track_id3, &elapsed, &offset);
-
-    logf("%s: Set resume for %s to %lu %lu", __func__,
-         track_id3->title, elapsed, offset);
 
     enum data_type audiotype = rbcodec_format_is_atomic(track_id3->codectype) ?
                                       TYPE_ATOMIC_AUDIO : TYPE_PACKET_AUDIO;
@@ -2145,6 +2133,19 @@ static int audio_finish_load_track(struct track_info *infop)
     if (hid >= 0)
     {
         infop->audio_hid = hid;
+
+        /*
+         * Fix up elapsed time and offset if past the end
+         */
+        if (track_id3->elapsed > track_id3->length)
+            track_id3->elapsed = 0;
+
+        if ((off_t)track_id3->offset >= buf_filesize(infop->audio_hid))
+            track_id3->offset = 0;
+
+        logf("%s: set resume for %s to %lu %lX", __func__,
+             track_id3->title, track_id3->elapsed, track_id3->offset);
+
         if (infop->self_hid == cur_info.self_hid)
         {
             /* This is the current track to decode - should be started now */
