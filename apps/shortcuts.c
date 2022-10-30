@@ -446,7 +446,7 @@ static const char * shortcut_menu_get_name(int selected_item, void * data,
 static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
 {
     (void)lists;
-    if (action == ACTION_STD_OK)
+    if (action == ACTION_STD_OK || action == ACTION_STD_MENU)
         return ACTION_STD_CANCEL;
     else if (action == ACTION_STD_QUICKSCREEN && action != ACTION_STD_CONTEXT)
         return ACTION_STD_CANCEL;
