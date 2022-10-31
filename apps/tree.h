@@ -81,10 +81,6 @@ struct tree_context {
      * (used when we want to return back to a previouws directory)*/
     int selected_item_history[MAX_DIR_LEVELS];
 
-    int firstpos; /* which dir entry is on first
-                     position in dir buffer */
-    int pos_history[MAX_DIR_LEVELS];
-
     int *dirfilter; /* file use */
     int filesindir; /* The number of files in the dircache */
     int dirsindir; /* file use */

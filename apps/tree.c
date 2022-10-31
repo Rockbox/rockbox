@@ -89,7 +89,7 @@ static struct tree_context tc;
 char lastfile[MAX_PATH];
 static char lastdir[MAX_PATH];
 #ifdef HAVE_TAGCACHE
-static int lasttable, lastextra, lastfirstpos;
+static int lasttable, lastextra;
 #endif
 
 static bool reload_dir = false;
@@ -364,7 +364,6 @@ static int update_dir(void)
     if (id3db) {
         if (tc.currtable != lasttable ||
             tc.currextra != lastextra ||
-            tc.firstpos  != lastfirstpos ||
             reload_dir)
         {
             if (tagtree_load(&tc) < 0)
@@ -372,7 +371,6 @@ static int update_dir(void)
 
             lasttable = tc.currtable;
             lastextra = tc.currextra;
-            lastfirstpos = tc.firstpos;
             changed = true;
         }
     }
@@ -636,10 +634,8 @@ static int dirbrowse(void)
     if (tc.selected_item < 0)
         tc.selected_item = 0;
 #ifdef HAVE_TAGCACHE
-    tc.firstpos = 0;
     lasttable = -1;
     lastextra = -1;
-    lastfirstpos = 0;
 #endif
 
     start_wps = false;

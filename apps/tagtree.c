@@ -1847,7 +1847,6 @@ int tagtree_enter(struct tree_context* c)
     selected_item_history[c->dirlevel]=c->selected_item;
     table_history[c->dirlevel] = c->currtable;
     extra_history[c->dirlevel] = c->currextra;
-    c->pos_history[c->dirlevel] = c->firstpos;
     c->dirlevel++;
 
     /* lock buflib for possible I/O to protect dptr */
@@ -1995,7 +1994,6 @@ void tagtree_exit(struct tree_context* c)
     gui_synclist_select_item(&tree_lists, c->selected_item);
     c->currtable = table_history[c->dirlevel];
     c->currextra = extra_history[c->dirlevel];
-    c->firstpos  = c->pos_history[c->dirlevel];
 }
 
 int tagtree_get_filename(struct tree_context* c, char *buf, int buflen)
