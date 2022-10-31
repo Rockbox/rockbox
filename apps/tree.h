@@ -90,8 +90,6 @@ struct tree_context {
     int dirsindir; /* file use */
     int dirlength; /* total number of entries in dir, incl. those not loaded */
 #ifdef HAVE_TAGCACHE
-    int table_history[MAX_DIR_LEVELS]; /* db use */
-    int extra_history[MAX_DIR_LEVELS]; /* db use */
     int currtable; /* db use */
     int currextra; /* db use */
 #endif

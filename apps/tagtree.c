@@ -191,6 +191,10 @@ static int current_entry_count;
 
 static struct tree_context *tc;
 
+static int selected_item_history[MAX_DIR_LEVELS];
+static int table_history[MAX_DIR_LEVELS];
+static int extra_history[MAX_DIR_LEVELS];
+
 /* a few memory alloc helper */
 static int tagtree_handle;
 static size_t tagtree_bufsize, tagtree_buf_used;
@@ -1840,9 +1844,9 @@ int tagtree_enter(struct tree_context* c)
     if (c->dirlevel >= MAX_DIR_LEVELS)
         return 0;
 
-    c->selected_item_history[c->dirlevel]=c->selected_item;
-    c->table_history[c->dirlevel] = c->currtable;
-    c->extra_history[c->dirlevel] = c->currextra;
+    selected_item_history[c->dirlevel]=c->selected_item;
+    table_history[c->dirlevel] = c->currtable;
+    extra_history[c->dirlevel] = c->currextra;
     c->pos_history[c->dirlevel] = c->firstpos;
     c->dirlevel++;
 
@@ -1987,10 +1991,10 @@ void tagtree_exit(struct tree_context* c)
     c->dirfull = false;
     if (c->dirlevel > 0)
         c->dirlevel--;
-    c->selected_item=c->selected_item_history[c->dirlevel];
+    c->selected_item=selected_item_history[c->dirlevel];
     gui_synclist_select_item(&tree_lists, c->selected_item);
-    c->currtable = c->table_history[c->dirlevel];
-    c->currextra = c->extra_history[c->dirlevel];
+    c->currtable = table_history[c->dirlevel];
+    c->currextra = extra_history[c->dirlevel];
     c->firstpos  = c->pos_history[c->dirlevel];
 }
 
