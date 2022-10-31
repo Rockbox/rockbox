@@ -176,38 +176,27 @@ static int get_file_pos(int newtime)
     struct mp3entry *id3 = ci->id3;
 
     if (id3->vbr) {
-        /* Convert newtime and id3->length to seconds to
-         * avoid overflow */
-        unsigned int newtime_s = newtime/1000;
-        unsigned int length_s  = id3->length/1000;
-        
         if (id3->has_toc) {
             /* Use the TOC to find the new position */
-            unsigned int percent, remainder;
-            int curtoc, nexttoc, plen;
-
-            percent = (newtime_s*100) / length_s;
+            unsigned int percent = ((uint64_t)newtime * 100) / id3->length;
             if (percent > 99)
                 percent = 99;
 
-            curtoc = id3->toc[percent];
+            unsigned int pct_timestep = id3->length / 100;
+            unsigned int toc_sizestep = id3->filesize / 256;
+            unsigned int cur_toc = id3->toc[percent];
+            unsigned int next_toc = percent < 99 ? id3->toc[percent+1] : 256;
+            unsigned int plength = (next_toc - cur_toc) * toc_sizestep;
 
-            if (percent < 99) {
-                nexttoc = id3->toc[percent+1];
-            } else {
-                nexttoc = 256;
-            }
+            /* Seek to TOC mark */
+            pos = cur_toc * toc_sizestep;
 
-            pos = (id3->filesize/256)*curtoc;
-
-            /* Use the remainder to get a more accurate position */
-            remainder   = (newtime_s*100) % length_s;
-            remainder   = (remainder*100) / length_s;
-            plen        = (nexttoc - curtoc)*(id3->filesize/256);
-            pos        += (plen/100)*remainder;
+            /* Interpolate between this TOC mark and the next TOC mark */
+            newtime -= percent * pct_timestep;
+            pos += (uint64_t)plength * newtime / pct_timestep;
         } else {
             /* No TOC exists, estimate the new position */
-            pos = (id3->filesize / length_s) * newtime_s;
+            pos = (uint64_t)newtime * id3->filesize / id3->length;
         }
     } else if (id3->bitrate) {
         pos = newtime * (id3->bitrate / 8);
@@ -234,43 +223,31 @@ static void set_elapsed(struct mp3entry* id3)
 
     if ( id3->vbr ) {
         if ( id3->has_toc ) {
-            /* calculate elapsed time using TOC */
-            int i;
-            unsigned int remainder, plen, relpos, nextpos;
+            unsigned int pct_timestep = id3->length / 100;
+            unsigned int toc_sizestep = id3->filesize / 256;
 
-            /* find wich percent we're at */
-            for (i=0; i<100; i++ )
-                if ( offset < id3->toc[i] * (id3->filesize / 256) )
+            int percent;
+            for (percent = 0; percent < 100; ++percent)
+                if (offset < id3->toc[percent] * toc_sizestep)
                     break;
+            if (percent > 0)
+                --percent;
 
-            i--;
-            if (i < 0)
-                i = 0;
+            unsigned int cur_toc  = id3->toc[percent];
+            unsigned int next_toc = percent < 99 ? id3->toc[percent+1] : 256;
+            unsigned int plength = (next_toc - cur_toc) * toc_sizestep;
 
-            relpos = id3->toc[i];
+            /* Set elapsed time to the TOC mark */
+            elapsed = percent * pct_timestep;
 
-            if (i < 99)
-                nextpos = id3->toc[i+1];
-            else
-                nextpos = 256;
-
-            remainder = offset - (relpos * (id3->filesize / 256));
-
-            /* set time for this percent (divide before multiply to prevent
-               overflow on long files. loss of precision is negligible on
-               short files) */
-            elapsed = i * (id3->length / 100);
-
-            /* calculate remainder time */
-            plen = (nextpos - relpos) * (id3->filesize / 256);
-            elapsed += (((remainder * 100) / plen) * (id3->length / 10000));
-        }
-        else {
-            /* no TOC exists. set a rough estimate using average bitrate */
-            int tpk = id3->length /
-                ((id3->filesize - id3->first_frame_offset - id3->id3v1len) /
-                1024);
-            elapsed = offset / 1024 * tpk;
+            /* Interpolate between this TOC mark and the next TOC mark */
+            offset -= cur_toc * toc_sizestep;
+            elapsed += (uint64_t)pct_timestep * offset / plength;
+        } else {
+            /* No TOC, use an approximation (this'll be wildly inaccurate) */
+            uint64_t data_size = id3->filesize -
+                                 id3->first_frame_offset - id3->id3v1len;
+            elapsed = (uint64_t)id3->length * offset / data_size;
         }
     }
     else
