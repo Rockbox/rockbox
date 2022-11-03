@@ -766,8 +766,13 @@ static int dirbrowse(void)
                 
                 if (enter_shortcuts_menu && *tc.dirfilter < NUM_FILTER_MODES)
                 {
+                    int last_screen = global_status.last_screen;
                     global_status.last_screen = GO_TO_SHORTCUTMENU;
-                    return do_shortcut_menu(NULL);
+                    int shortcut_ret = do_shortcut_menu(NULL);
+                    if (shortcut_ret == GO_TO_PREVIOUS)
+                        global_status.last_screen = last_screen;
+                    else
+                        return shortcut_ret;
                 }
                 
                 restore = true;

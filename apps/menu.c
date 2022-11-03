@@ -458,9 +458,16 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
             if (global_settings.shortcuts_replaces_qs ||
                 quick_screen_quick(action) == QUICKSCREEN_GOTO_SHORTCUTS_MENU)
             {
+                int last_screen = global_status.last_screen;
                 global_status.last_screen = GO_TO_SHORTCUTMENU;
-                ret = do_shortcut_menu(NULL);
-                done = true;
+                int shortcut_ret = do_shortcut_menu(NULL);
+                if (shortcut_ret == GO_TO_PREVIOUS)
+                    global_status.last_screen = last_screen;
+                else
+                {
+                    ret = shortcut_ret;
+                    done = true;
+                }
             }
             redraw_lists = true;
         }
