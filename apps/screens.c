@@ -233,12 +233,10 @@ bool set_time_screen(const char* title, struct tm *tm, bool set_date)
             else
                 prev_line_height = 0;
 
-            screen->getstringsize(SEPARATOR, &separator_width, NULL);
-
             /* weekday */
-            screen->getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
-                                     &weekday_width, NULL);
-            screen->getstringsize(" ", &separator_width, NULL);
+            weekday_width = screen->getstringsize(str(LANG_WEEKDAY_SUNDAY + tm->tm_wday),
+                                     NULL, NULL);
+            separator_width = screen->getstringsize(SEPARATOR, NULL, NULL);
 
             for(i=0, j=0; i < 6; i++)
             {
@@ -247,7 +245,7 @@ bool set_time_screen(const char* title, struct tm *tm, bool set_date)
                     j = weekday_width + separator_width;
                     prev_line_height *= 2;
                 }
-                screen->getstringsize(ptr[i], &width, NULL);
+                width = screen->getstringsize(ptr[i], NULL, NULL);
                 cursor[i][INDEX_Y] = prev_line_height;
                 cursor[i][INDEX_X] = j;
                 j += width + separator_width;
