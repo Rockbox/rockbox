@@ -613,7 +613,8 @@ struct user_settings
 #ifdef HAVE_ALBUMART
     int album_art; /* switch off album art display or choose preferred source */
 #endif
-    
+    bool rewind_across_tracks;
+
     /* playlist viewer settings */
     bool playlist_viewer_icons; /* display icons on viewer */
     bool playlist_viewer_indices; /* display playlist indices on viewer */

@@ -202,7 +202,7 @@ static int skintouch_to_wps(struct wps_data *data)
 }
 #endif /* HAVE_TOUCHSCREEN */
 
-static bool ffwd_rew(int button)
+static bool ffwd_rew(int button, bool seek_from_end)
 {
     unsigned int step = 0;     /* current ff/rewind step */
     unsigned int max_step = 0; /* maximum ff/rewind step */
@@ -213,6 +213,7 @@ static bool ffwd_rew(int button)
     bool ff_rewind = false;
     const long ff_rw_accel = (global_settings.ff_rewind_accel + 3);
     struct wps_state *gstate = get_wps_state();
+    struct mp3entry *old_id3 = gstate->id3;
 
     if (button == ACTION_NONE)
     {
@@ -221,6 +222,16 @@ static bool ffwd_rew(int button)
     }
     while (!exit)
     {
+        struct mp3entry *id3 = gstate->id3;
+        if (id3 != old_id3)
+        {
+            ff_rewind = false;
+            ff_rewind_count = 0;
+            old_id3 = id3;
+        }
+        if (id3 && seek_from_end)
+            id3->elapsed = id3->length;
+
         switch ( button )
         {
             case ACTION_WPS_SEEKFWD:
@@ -232,16 +243,16 @@ static bool ffwd_rew(int button)
                     if (direction == 1)
                     {
                         /* fast forwarding, calc max step relative to end */
-                        max_step = (gstate->id3->length -
-                                    (gstate->id3->elapsed +
+                        max_step = (id3->length -
+                                    (id3->elapsed +
                                      ff_rewind_count)) *
                                      FF_REWIND_MAX_PERCENT / 100;
                     }
                     else
                     {
                         /* rewinding, calc max step relative to start */
-                        max_step = (gstate->id3->elapsed + ff_rewind_count) *
-                                    FF_REWIND_MAX_PERCENT / 100;
+                        max_step = (id3->elapsed + ff_rewind_count) *
+                                   FF_REWIND_MAX_PERCENT / 100;
                     }
 
                     max_step = MAX(max_step, MIN_FF_REWIND_STEP);
@@ -256,8 +267,7 @@ static bool ffwd_rew(int button)
                 }
                 else
                 {
-                    if ( (audio_status() & AUDIO_STATUS_PLAY) &&
-                          gstate->id3 && gstate->id3->length )
+                    if ((audio_status() & AUDIO_STATUS_PLAY) && id3 && id3->length )
                     {
                         audio_pre_ff_rewind();
                         if (direction > 0)
@@ -274,12 +284,12 @@ static bool ffwd_rew(int button)
                 }
 
                 if (direction > 0) {
-                    if ((gstate->id3->elapsed + ff_rewind_count) > gstate->id3->length)
-                        ff_rewind_count = gstate->id3->length - gstate->id3->elapsed;
+                    if ((id3->elapsed + ff_rewind_count) > id3->length)
+                        ff_rewind_count = id3->length - id3->elapsed;
                 }
                 else {
-                    if ((int)(gstate->id3->elapsed + ff_rewind_count) < 0)
-                        ff_rewind_count = -gstate->id3->elapsed;
+                    if ((int)(id3->elapsed + ff_rewind_count) < 0)
+                        ff_rewind_count = -id3->elapsed;
                 }
 
                 /* set the wps state ff_rewind_count so the progess info
@@ -296,8 +306,8 @@ static bool ffwd_rew(int button)
                 break;
 
             case ACTION_WPS_STOPSEEK:
-                gstate->id3->elapsed = gstate->id3->elapsed+ff_rewind_count;
-                audio_ff_rewind(gstate->id3->elapsed);
+                id3->elapsed = id3->elapsed + ff_rewind_count;
+                audio_ff_rewind(id3->elapsed);
                 gstate->ff_rewind_count = 0;
                 ff_rewind = false;
                 status_set_ffmode(0);
@@ -319,8 +329,9 @@ static bool ffwd_rew(int button)
             if (button == ACTION_TOUCHSCREEN)
                 button = skintouch_to_wps(skin_get_gwps(WPS, SCREEN_MAIN)->data);
 #endif
-            if (button != ACTION_WPS_SEEKFWD &&
-                button != ACTION_WPS_SEEKBACK)
+            if (button != ACTION_WPS_SEEKFWD
+                && button != ACTION_WPS_SEEKBACK
+                && button != 0)
                 button = ACTION_WPS_STOPSEEK;
         }
     }
@@ -733,7 +744,7 @@ long gui_wps_show(void)
                     }
                 }
                 else
-                    ffwd_rew(ACTION_WPS_SEEKFWD);
+                    ffwd_rew(ACTION_WPS_SEEKFWD, false);
                 last_right = last_left = 0;
                 break;
             /* fast rewind
@@ -752,9 +763,19 @@ long gui_wps_show(void)
                     {
                         change_dir(-1);
                     }
+                } else if (global_settings.rewind_across_tracks
+                           && get_wps_state()->id3->elapsed < DEFAULT_SKIP_THRESH
+                           && playlist_check(-1))
+                {
+                    if (!audio_paused)
+                        audio_pause();
+                    audio_prev();
+                    ffwd_rew(ACTION_WPS_SEEKBACK, true);
+                    if (!audio_paused)
+                        audio_resume();
                 }
                 else
-                    ffwd_rew(ACTION_WPS_SEEKBACK);
+                    ffwd_rew(ACTION_WPS_SEEKBACK, false);
                 last_left = last_right = 0;
                 break;
 
@@ -926,7 +947,7 @@ long gui_wps_show(void)
                 break;
             case ACTION_NONE: /* Timeout, do a partial update */
                 update = true;
-                ffwd_rew(button); /* hopefully fix the ffw/rwd bug */
+                ffwd_rew(button, false); /* hopefully fix the ffw/rwd bug */
                 break;
 #ifdef HAVE_RECORDING
             case ACTION_WPS_REC:

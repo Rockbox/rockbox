@@ -16388,3 +16388,17 @@
     clear_settings_on_hold, iriverh10: "Clear settings when reset button is held during startup"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Rewind Across Tracks"
+  </dest>
+  <voice>
+    *: "Rewind across tracks"
+  </voice>
+</phrase>
