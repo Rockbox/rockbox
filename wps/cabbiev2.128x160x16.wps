@@ -60,7 +60,7 @@
 
 #Time and Playlist Info
 %V(8,126,112,12,1)
-%al%pc%ac%pc%ac%?Sr<%pe %Sx(of) %pp|%pp %Sx(of) %pe>%ar%pr%ar%pr
+%al%pc%ac%?Sr<%pe/%pp|%pp/%pe>%ar%pr
 
 #Progressbar
 %V(8,116,112,8,1)
