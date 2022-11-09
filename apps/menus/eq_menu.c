@@ -480,17 +480,18 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
     /* Print out the band label */
     if (band == 0) {
         screen->putsxy(x1, y1, "LS: ");
-        screen->getstringsize("LS:", &w, &h);
+        /*screen->getstringsize("LS:", &w, &h); UNUSED*/
     } else if (band == EQ_NUM_BANDS - 1) {
         screen->putsxy(x1, y1, "HS: ");
-        screen->getstringsize("HS:", &w, &h);
+        /*screen->getstringsize("HS:", &w, &h); UNUSED*/
     } else {
         snprintf(buf, sizeof(buf),  "PK%d:", band);
         screen->putsxy(x1, y1, buf);
-        screen->getstringsize(buf, &w, &h);
+        /*screen->getstringsize(buf, &w, &h); UNUSED*/
     }
 
-    screen->getstringsize("A", &w, &h);
+    w = screen->getstringsize("A", NULL, &h);
+
     x1 += 5*w; /* 4 chars for label + 1 space = 5 */
 
     /* Print out gain part of status line (left justify after label) */
@@ -503,7 +504,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
         abs_gain / EQ_USER_DIVISOR, abs_gain % EQ_USER_DIVISOR,
         screen->lcdwidth >= 160 ? "dB" : "");
     screen->putsxy(x1, y1, buf);
-    screen->getstringsize(buf, &w, &h);
+    w = screen->getstringsize(buf, NULL, NULL);
     x1 += w;
 
     /* Print out Q part of status line (right justify) */
@@ -514,7 +515,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
 
     snprintf(buf, sizeof(buf), "%d.%d%s", q / EQ_USER_DIVISOR,
              q % EQ_USER_DIVISOR, screen->lcdwidth >= 160 ? " Q" : "");
-    screen->getstringsize(buf, &w, &h);
+    w = screen->getstringsize(buf, NULL, NULL);
     x2 = x + width - w - 2;
     screen->putsxy(x2, y1, buf);
 
@@ -526,7 +527,7 @@ static int draw_eq_slider(struct screen * screen, int x, int y,
 
     snprintf(buf, sizeof(buf),  "%5d%s", cutoff,
              screen->lcdwidth >= 160 ? "Hz" : "");
-    screen->getstringsize(buf, &w, &h);
+    w = screen->getstringsize(buf, NULL, NULL);
     x1 = x1 + (x2 - x1 - w)/2;
     screen->putsxy(x1, y1, buf);
 
@@ -590,7 +591,7 @@ int eq_menu_graphical(void)
     int current_band, x, y, step, fast_step, min, max;
     enum eq_slider_mode mode;
     char buf[24];
-    int w, h, height, start_item, nb_eq_sliders[NB_SCREENS];
+    int h, height, start_item, nb_eq_sliders[NB_SCREENS];
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, false, NULL);
 
@@ -601,7 +602,7 @@ int eq_menu_graphical(void)
         screens[i].clear_display();
 
         /* Figure out how many sliders can be drawn on the screen */
-        screens[i].getstringsize("A", &w, &h);
+        h = screens[i].getcharheight();
 
         /* Total height includes margins (1), text, slider, and line selector (1) */
         height = 3 + h + 1 + SCROLLBAR_SIZE + 3;
