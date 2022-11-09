@@ -748,25 +748,32 @@ long default_event_handler(long event)
 
 int show_logo( void )
 {
-    char version[32];
-    int font_h, font_w;
+    unsigned char version[32];
+    int font_h, ver_w;
 
     snprintf(version, sizeof(version), "Ver. %s", rbversion);
 
+    ver_w = font_getstringsize(version, NULL, &font_h, FONT_SYSFIXED);
+
     lcd_clear_display();
+
+    lcd_setfont(FONT_SYSFIXED);
+
 #if defined(SANSA_CLIP) || defined(SANSA_CLIPV2) || defined(SANSA_CLIPPLUS)
     /* display the logo in the blue area of the screen (bottom 48 pixels) */
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               0, (unsigned char *)version);
+    if (ver_w > LCD_WIDTH)
+        lcd_putsxy(0, 0, rbversion);
+    else
+        lcd_putsxy((LCD_WIDTH/2) - (ver_w/2), 0, version);
+
     lcd_bmp(&bm_rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 16);
 #else
     lcd_bmp(&bm_rockboxlogo, (LCD_WIDTH - BMPWIDTH_rockboxlogo) / 2, 10);
-    lcd_setfont(FONT_SYSFIXED);
-    lcd_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_putsxy((LCD_WIDTH/2) - ((strlen(version)*font_w)/2),
-               LCD_HEIGHT-font_h, (unsigned char *)version);
+
+    if (ver_w > LCD_WIDTH)
+        lcd_putsxy(0, LCD_HEIGHT-font_h, rbversion);
+    else
+        lcd_putsxy((LCD_WIDTH/2) - (ver_w/2), LCD_HEIGHT-font_h, version);
 #endif
     lcd_setfont(FONT_UI);
 
@@ -776,9 +783,13 @@ int show_logo( void )
     lcd_remote_clear_display();
     lcd_remote_bmp(&bm_remote_rockboxlogo, 0, 10);
     lcd_remote_setfont(FONT_SYSFIXED);
-    lcd_remote_getstringsize((unsigned char *)"A", &font_w, &font_h);
-    lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - ((strlen(version)*font_w)/2),
-                       LCD_REMOTE_HEIGHT-font_h, (unsigned char *)version);
+
+    if (ver_w > LCD_REMOTE_WIDTH)
+        lcd_remote_putsxy(0, LCD_REMOTE_HEIGHT-font_h, rbversion);
+    else
+        lcd_remote_putsxy((LCD_REMOTE_WIDTH/2) - (ver_w/2),
+                      LCD_REMOTE_HEIGHT-font_h, version);
+
     lcd_remote_setfont(FONT_UI);
     lcd_remote_update();
 #endif
