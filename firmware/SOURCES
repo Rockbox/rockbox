@@ -205,39 +205,10 @@ target/hosted/samsungypr/ypr1/wmcodec-ypr1.c
 target/hosted/maemo/maemo-thread.c
 #endif
 
-/* Standard library */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
-libc/strtok.c
-#endif /* PLATFORM_NATIVE || __MINGW32__ || __CYGWIN__ */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
-libc/atoi.c
-libc/errno.c
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
-/* our ctype.[ch] comes from newlib and is incompitble with most desktop's ctype */
-libc/ctype.c
-/* alsa on linux requires a more advanced sprintf, i.e. not ours */
-libc/sprintf.c
-#endif
-
-libc/memchr.c
-libc/memcmp.c
-
-libc/qsort.c
-libc/random.c
-libc/strcat.c
-libc/strchr.c
-libc/strcmp.c
-libc/strcpy.c
-
-libc/strncmp.c
-libc/strrchr.c
-libc/strstr.c
-libc/mktime.c
-libc/gmtime.c
-#endif /* CONFIG_PLATFORM || HAVE_ROCKBOX_C_LIBRARY */
-
 /* Common */
 #ifndef BOOTLOADER
+common/strptokspn.c
+#define HAVE_STRTOK_R
 common/ap_int.c
 #endif
 common/version.c
@@ -276,6 +247,37 @@ common/vuprintf.c
 common/zip.c
 common/adler32.c
 common/inflate.c
+
+/* Standard library */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
+libc/strtok.c
+#endif /* PLATFORM_NATIVE || __MINGW32__ || __CYGWIN__ */
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
+libc/atoi.c
+libc/errno.c
+#if (CONFIG_PLATFORM & PLATFORM_NATIVE)
+/* our ctype.[ch] comes from newlib and is incompitble with most desktop's ctype */
+libc/ctype.c
+/* alsa on linux requires a more advanced sprintf, i.e. not ours */
+libc/sprintf.c
+#endif
+
+libc/memchr.c
+libc/memcmp.c
+
+libc/qsort.c
+libc/random.c
+libc/strcat.c
+libc/strchr.c
+libc/strcmp.c
+libc/strcpy.c
+
+libc/strncmp.c
+libc/strrchr.c
+libc/strstr.c
+libc/mktime.c
+libc/gmtime.c
+#endif /* CONFIG_PLATFORM || HAVE_ROCKBOX_C_LIBRARY */
 
 /* Display */
 scroll_engine.c

@@ -109,6 +109,7 @@ struct screen
     void (*putsxy)(int x, int y, const unsigned char *str);
     void (*puts)(int x, int y, const unsigned char *str);
     void (*putsf)(int x, int y, const unsigned char *str, ...);
+    void (*putsxyf)(int x, int y, const unsigned char *fmt, ...);
     bool (*puts_scroll)(int x, int y, const unsigned char *string);
     bool (*putsxy_scroll_func)(int x, int y, const unsigned char *string,
                                void (*scroll_func)(struct scrollinfo *),

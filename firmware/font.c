@@ -1046,16 +1046,20 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 #endif /* BOOTLOADER */
 
 /*
- * Returns the stringsize of a given string. 
+ * Returns the stringsize of a given NULL terminated string
+ *  stops after maxbytes or NULL (\0) whichever occurs first.
+ * maxbytes = -1 ignores maxbytes and relies on NULL terminator (\0)
+ *  to terminate the string
  */
-int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
+int font_getstringnsize(const unsigned char *str, size_t maxbytes, int *w, int *h, int fontnum)
 {
-    struct font* pf = font_get(fontnumber);
+    struct font* pf = font_get(fontnum);
+    font_lock( fontnum, true );
     unsigned short ch;
     int width = 0;
+    size_t b = maxbytes - 1;
 
-    font_lock( fontnumber, true );
-    for (str = utf8decode(str, &ch); ch != 0 ; str = utf8decode(str, &ch))
+    for (str = utf8decode(str, &ch); ch != 0 && b < maxbytes; str = utf8decode(str, &ch), b--)
     {
         if (is_diacritic(ch, NULL))
             continue;
@@ -1067,8 +1071,16 @@ int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
         *w = width;
     if ( h )
         *h = pf->height;
-    font_lock( fontnumber, false );
+    font_lock( fontnum, false );
     return width;
+}
+
+/*
+ * Returns the stringsize of a given NULL terminated string.
+ */
+int font_getstringsize(const unsigned char *str, int *w, int *h, int fontnumber)
+{
+    return font_getstringnsize(str, -1, w, h, fontnumber);
 }
 
 /* -----------------------------------------------------------------

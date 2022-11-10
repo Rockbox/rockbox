@@ -29,8 +29,9 @@
 #include "talk.h"
 #include "splash.h"
 #include "viewport.h"
-#include "strtok_r.h"
+#include "strptokspn_r.h"
 #include "scrollbar.h"
+#include "font.h"
 
 static long progress_next_tick = 0;
 
@@ -43,57 +44,68 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                             struct viewport *vp, int addl_lines)
 {
     char splash_buf[MAXBUFFER];
-    char *lines[MAXLINES];
+    struct splash_lines {
+        const char *str;
+        size_t len;
+    } lines[MAXLINES];
     char *next;
     char *lastbreak = NULL;
     char *store = NULL;
     int line = 0;
     int x = 0;
     int y, i;
-    int space_w, w, h;
+    int space_w, w, chr_h;
     int width, height;
     int maxw = 0;
+    int fontnum = vp->font;
 
-    screen->getstringsize(" ", &space_w, &h);
-    y = h + (addl_lines * h);
+    char lastbrkchr;
+    size_t len, next_len;
+    const char matchstr[] = "\r\n\f\v\t ";
+    font_getstringsize(" ", &space_w, &chr_h, fontnum);
+    y = chr_h + (addl_lines * chr_h);
 
     vsnprintf(splash_buf, sizeof(splash_buf), fmt, ap);
     va_end(ap);
 
     /* break splash string into display lines, doing proper word wrap */
-
-    next = strtok_r(splash_buf, " ", &store);
+    next = strptokspn_r(splash_buf, matchstr, &next_len, &store);
     if (!next)
         return false; /* nothing to display */
 
-    lines[0] = next;
+    lines[line].len = next_len + 1;
+    lines[line].str = next;
     while (true)
     {
-        screen->getstringsize(next, &w, NULL);
+        w = font_getstringnsize(next, next_len + 1, NULL, NULL, fontnum);
         if (lastbreak)
         {
-            int next_w = (next - lastbreak) * space_w;
-
-            if (x + next_w + w > vp->width - RECT_SPACING*2)
-            {   /* too wide, wrap */
+            len = next - lastbreak;
+            int next_w = len * space_w;
+            if (x + next_w + w > vp->width - RECT_SPACING*2 || lastbrkchr != ' ')
+            {   /* too wide, or control character wrap */
                 if (x > maxw)
                     maxw = x;
-                if ((y + h > vp->height) || (line >= (MAXLINES-1)))
+                if ((y + chr_h * 2 > vp->height) || (line >= (MAXLINES-1)))
                     break;  /* screen full or out of lines */
                 x = 0;
-                y += h;
-                lines[++line] = next;
+                y += chr_h;
+                lines[++line].len = next_len + len;
+                lines[line].str = next;
             }
             else
             {
                 /*  restore & calculate spacing */
-                *lastbreak = ' ';
+                lines[line].len += next_len + len + 1;
                 x += next_w;
             }
         }
         x += w;
-        lastbreak = next + strlen(next);
-        next = strtok_r(NULL, " ", &store);
+        lastbreak = next + next_len + 1;
+        lastbrkchr = *lastbreak;
+
+        next = strptokspn_r(NULL, matchstr, &next_len, &store);
+
         if (!next)
         {   /* no more words */
             if (x > maxw)
@@ -147,13 +159,10 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
 
     screen->draw_border_viewport();
 
-    /* prepare putting the text */
-    y = RECT_SPACING;
-
     /* print the message to screen */
-    for (i = 0; i <= line; i++, y+=h)
+    for(i = 0, y = RECT_SPACING; i <= line; i++, y+= chr_h)
     {
-        screen->putsxy(0, y, lines[i]);
+        screen->putsxyf(0, y, "%.*s", lines[i].len, lines[i].str);
     }
     return true; /* needs update */
 }
