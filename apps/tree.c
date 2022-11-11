@@ -683,7 +683,7 @@ static int dirbrowse(void)
                     }
                 }
 #ifdef HAVE_TAGCACHE
-                switch (id3db?tagtree_enter(&tc):ft_enter(&tc))
+                switch (id3db ? tagtree_enter(&tc, true) : ft_enter(&tc))
 #else
                 switch (ft_enter(&tc))
 #endif
@@ -723,7 +723,7 @@ static int dirbrowse(void)
 
 #ifdef HAVE_TAGCACHE
                 if (id3db)
-                    tagtree_exit(&tc);
+                    tagtree_exit(&tc, true);
                 else
 #endif
                     if (ft_exit(&tc) == 3)

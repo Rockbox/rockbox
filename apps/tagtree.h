@@ -34,8 +34,8 @@
 int tagtree_export(void);
 int tagtree_import(void);
 void tagtree_init(void) INIT_ATTR;
-int tagtree_enter(struct tree_context* c);
-void tagtree_exit(struct tree_context* c);
+int tagtree_enter(struct tree_context* c, bool is_visible);
+void tagtree_exit(struct tree_context* c, bool is_visible);
 int tagtree_load(struct tree_context* c);
 char* tagtree_get_entry_name(struct tree_context *c, int id,
                                     char* buf, size_t bufsize);

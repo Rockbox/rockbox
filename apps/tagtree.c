@@ -191,6 +191,7 @@ static int current_entry_count;
 
 static struct tree_context *tc;
 
+static int max_history_level; /* depth of menu levels with applicable history */
 static int selected_item_history[MAX_DIR_LEVELS];
 static int table_history[MAX_DIR_LEVELS];
 static int extra_history[MAX_DIR_LEVELS];
@@ -1248,6 +1249,7 @@ static void tagtree_unload(struct tree_context *c)
 
 void tagtree_init(void)
 {
+    max_history_level = 0;
     format_count = 0;
     menu_count = 0;
     menu = NULL;
@@ -1818,7 +1820,16 @@ int tagtree_load(struct tree_context* c)
     return count;
 }
 
-int tagtree_enter(struct tree_context* c)
+/* Enters menu or table for selected item in the database.
+ *
+ * Call this with the is_visible parameter set to false to
+ * prevent selected_item_history from being updated or applied, in
+ * case the menus aren't displayed to the user.
+ * Before calling tagtree_enter again with the parameter set to
+ * true, make sure that you are back at the previous dirlevel, by
+ * calling tagtree_exit as needed, with is_visible set to false.
+ */
+int tagtree_enter(struct tree_context* c, bool is_visible)
 {
     int rc = 0;
     struct tagentry *dptr;
@@ -1826,14 +1837,17 @@ int tagtree_enter(struct tree_context* c)
     int newextra;
     int seek;
     int source;
+    bool is_random_item = false;
+    bool adjust_selection = true;
 
     dptr = tagtree_get_entry(c, c->selected_item);
 
     c->dirfull = false;
     seek = dptr->extraseek;
-    if (seek == -1)
+    if (seek == -1) /* <Random> menu item was selected */
     {
-        if(c->filesindir<=2)
+        is_random_item = true;
+        if(c->filesindir<=2) /* Menu contains only <All> and <Random> menu items */
             return 0;
         srand(current_tick);
         dptr = (tagtree_get_entry(c, 2+(rand() % (c->filesindir-2))));
@@ -1844,7 +1858,21 @@ int tagtree_enter(struct tree_context* c)
     if (c->dirlevel >= MAX_DIR_LEVELS)
         return 0;
 
-    selected_item_history[c->dirlevel]=c->selected_item;
+    if (is_visible) /* update selection history only for user-selected items */
+    {
+        /* We need to discard selected item history for levels
+        descending from current one if selection has changed */
+        if (max_history_level < c->dirlevel + 1
+            || (max_history_level > c->dirlevel
+                && selected_item_history[c->dirlevel] != c->selected_item)
+            || is_random_item)
+        {
+            max_history_level = c->dirlevel + 1;
+            selected_item_history[c->dirlevel + 1] = 0;
+        }
+
+        selected_item_history[c->dirlevel]=c->selected_item;
+    }
     table_history[c->dirlevel] = c->currtable;
     extra_history[c->dirlevel] = c->currextra;
     c->dirlevel++;
@@ -1852,8 +1880,6 @@ int tagtree_enter(struct tree_context* c)
     /* lock buflib for possible I/O to protect dptr */
     tree_lock_cache(c);
     core_pin(tagtree_handle);
-
-    bool reset_selection = true;
 
     switch (c->currtable) {
         case ROOT:
@@ -1890,6 +1916,10 @@ int tagtree_enter(struct tree_context* c)
                         if (source == source_constant)
                             continue;
 
+                        /* discard history for lower levels when doing runtime searches */
+                        if (is_visible)
+                            max_history_level = c->dirlevel - 1;
+
                         searchstring=csi->clause[i][j]->str;
                         *searchstring = '\0';
 
@@ -1919,7 +1949,7 @@ int tagtree_enter(struct tree_context* c)
                             rc = kbd_input(searchstring, SEARCHSTR_SIZE, NULL);
                             if (rc < 0 || !searchstring[0])
                             {
-                                tagtree_exit(c);
+                                tagtree_exit(c, is_visible);
                                 tree_unlock_cache(c);
                                 core_unpin(tagtree_handle);
                                 return 0;
@@ -1940,7 +1970,7 @@ int tagtree_enter(struct tree_context* c)
         case ALLSUBENTRIES:
             if (newextra == PLAYTRACK)
             {
-                reset_selection = false;
+                adjust_selection = false;
 
                 if (global_settings.party_mode && audio_status()) {
                     splash(HZ, ID2P(LANG_PARTY_MODE));
@@ -1973,9 +2003,12 @@ int tagtree_enter(struct tree_context* c)
             break;
     }
 
-    if (reset_selection)
+    if (adjust_selection)
     {
-        c->selected_item=0;
+        if (is_visible && c->dirlevel <= max_history_level)
+            c->selected_item = selected_item_history[c->dirlevel];
+        else
+            c->selected_item = 0;
     }
 
     tree_unlock_cache(c);
@@ -1984,12 +2017,16 @@ int tagtree_enter(struct tree_context* c)
     return rc;
 }
 
-void tagtree_exit(struct tree_context* c)
+/* Exits current database menu or table */
+void tagtree_exit(struct tree_context* c, bool is_visible)
 {
+    if (is_visible) /* update selection history only for user-selected items */
+        selected_item_history[c->dirlevel] = c->selected_item;
     c->dirfull = false;
     if (c->dirlevel > 0)
         c->dirlevel--;
-    c->selected_item=selected_item_history[c->dirlevel];
+    if (is_visible)
+        c->selected_item=selected_item_history[c->dirlevel];
     c->currtable = table_history[c->dirlevel];
     c->currextra = extra_history[c->dirlevel];
 }
@@ -2083,6 +2120,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
 {
     char buf[MAX_PATH];
     int dirlevel = tc->dirlevel;
+    int selected_item = tc->selected_item;
     int newtable;
 
     show_search_progress(
@@ -2112,7 +2150,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
 
     if (newtable == NAVIBROWSE)
     {
-        tagtree_enter(tc);
+        tagtree_enter(tc, false);
         tagtree_load(tc);
         newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
     }
@@ -2125,7 +2163,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
     /* Now the current table should be allsubentries. */
     if (newtable != PLAYTRACK)
     {
-        tagtree_enter(tc);
+        tagtree_enter(tc, false);
         tagtree_load(tc);
         newtable = tagtree_get_entry(tc, tc->selected_item)->newtable;
 
@@ -2134,7 +2172,7 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
         {
             logf("newtable: %d !!", newtable);
             while (tc->dirlevel > dirlevel)
-                tagtree_exit(tc);
+                tagtree_exit(tc, false);
             tagtree_load(tc);
             return false;
         }
@@ -2151,7 +2189,8 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
 
     /* Finally return the dirlevel to its original value. */
     while (tc->dirlevel > dirlevel)
-        tagtree_exit(tc);
+        tagtree_exit(tc, false);
+    tc->selected_item = selected_item;
     tagtree_load(tc);
 
     return true;
