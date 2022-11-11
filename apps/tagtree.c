@@ -1578,8 +1578,8 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
 
         if (strcmp(tcs.result, UNTAGGED) == 0)
         {
-            if (tag == tag_title) /* Fallback to filename */
-            {
+            if (tag == tag_title && tcs.type == tag_title && tcs.filter_count <= 1)
+            { /* Fallback to filename */
                 char *lastname = dptr->name;
                 dptr->name = core_get_data(c->cache.name_buffer_handle)+namebufused;
                 if (tagcache_retrieve(&tcs, tcs.idx_id, tag_filename, dptr->name,
