@@ -208,7 +208,6 @@ target/hosted/maemo/maemo-thread.c
 /* Common */
 #ifndef BOOTLOADER
 common/strptokspn.c
-#define HAVE_STRTOK_R
 common/ap_int.c
 #endif
 common/version.c
@@ -250,9 +249,6 @@ common/adler32.c
 common/inflate.c
 
 /* Standard library */
-#if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(__MINGW32__) || defined(__CYGWIN__)
-libc/strtok.c
-#endif /* PLATFORM_NATIVE || __MINGW32__ || __CYGWIN__ */
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE) || defined(HAVE_ROCKBOX_C_LIBRARY)
 libc/atoi.c
 libc/errno.c
