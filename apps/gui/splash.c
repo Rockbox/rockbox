@@ -48,9 +48,9 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
         const char *str;
         size_t len;
     } lines[MAXLINES];
-    char *next;
-    char *lastbreak = NULL;
-    char *store = NULL;
+    const char *next;
+    const char *lastbreak = NULL;
+    const char *store = NULL;
     int line = 0;
     int x = 0;
     int y, i;
