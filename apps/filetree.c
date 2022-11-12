@@ -667,7 +667,7 @@ int ft_enter(struct tree_context* c)
                     break;
                 }
 
-                struct entry* file = tree_get_entry_at(c, c->selected_item);
+                file = tree_get_entry_at(c, c->selected_item);
                 if (!file)
                 {
                     splashf(HZ, str(LANG_READ_FAILED), str(LANG_UNKNOWN));

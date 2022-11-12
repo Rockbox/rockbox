@@ -549,8 +549,8 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
         {
             /* declare scoped pointers inside screen loops - hide the
                declarations from previous block level */
-            struct keyboard_parameters *pm = &param[l];
             struct screen *sc = &screens[l];
+            pm = &param[l];
             sc->clear_display();
             kbd_draw_picker(pm, sc, &state);
             kbd_draw_edit_line(pm, sc, &state);

@@ -208,7 +208,7 @@ static struct folder* load_folder(struct folder* parent, char *folder)
         if ((dn[0] == '.') && (dn[1] == '\0' || (dn[1] == '.' && dn[2] == '\0')))
             continue;
         /* copy entry name to end of buffer, save pointer */
-        int len = strlen((char *)entry->d_name);
+        len = strlen((char *)entry->d_name);
         char *name = folder_alloc_from_end(len+1); /*for NULL*/
         if (name == NULL)
         {

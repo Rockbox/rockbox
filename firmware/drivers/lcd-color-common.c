@@ -242,6 +242,8 @@ void lcd_blit_yuv(unsigned char * const src[3],
                   int x, int y, int width, int height)
 {
     const unsigned char *ysrc, *usrc, *vsrc;
+    int cb, cr, rv, guv, bu, r, g, b;
+
     int linecounter;
     fb_data *dst, *row_end;
     long z;
@@ -272,8 +274,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
     {
         do
         {
-            int y, cb, cr, rv, guv, bu, r, g, b;
-
             y  = YFAC*(*ysrc++ - 16);
             cb = *usrc++ - 128;
             cr = *vsrc++ - 128;
@@ -337,8 +337,6 @@ void lcd_blit_yuv(unsigned char * const src[3],
 
         do
         {
-            int y, cb, cr, rv, guv, bu, r, g, b;
-
             y  = YFAC*(*ysrc++ - 16);
             cb = *usrc++ - 128;
             cr = *vsrc++ - 128;

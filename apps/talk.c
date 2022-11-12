@@ -987,7 +987,7 @@ static int _talk_file(const char* filename,
         return -1;
     if (talk_handle <= 0 || index_handle <= 0)
     {
-        int fd = open_voicefile();
+        fd = open_voicefile();
         if (fd < 0 || !load_voicefile_index(fd))
             return load_voicefile_failure(fd);
         load_voicefile_data(fd);

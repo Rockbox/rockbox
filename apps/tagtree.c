@@ -215,11 +215,11 @@ static int move_callback(int handle, void* current, void* new)
     /* loop over menus */
     for(int i = 0; i < menu_count; i++)
     {
-        struct menu_root* menu = menus[i];
+        struct menu_root* menuroot = menus[i];
         /* then over the menu_entries of a menu */
-        for(int j = 0; j < menu->itemcount; j++)
+        for(int j = 0; j < menuroot->itemcount; j++)
         {
-            struct menu_entry* mentry = menu->items[j];
+            struct menu_entry* mentry = menuroot->items[j];
             /* then over the search_instructions of each menu_entry */
             for(int k = 0; k < mentry->si.tagorder_count; k++)
             {
@@ -230,7 +230,7 @@ static int move_callback(int handle, void* current, void* new)
                     UPDATE(mentry->si.clause[k][l], diff);
                 }
             }
-            UPDATE(menu->items[j], diff);
+            UPDATE(menuroot->items[j], diff);
         }
         UPDATE(menus[i], diff);
     }
