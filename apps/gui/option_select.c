@@ -525,7 +525,7 @@ bool option_screen(const struct settings_list *setting,
         }
         else if (action == ACTION_NONE)
             continue;
-        else if (action == ACTION_STD_CANCEL)
+        else if (action == ACTION_STD_CANCEL || action == ACTION_STD_MENU)
         {
             /* setting canceled, restore old value if changed */
             if (*variable != oldvalue)
