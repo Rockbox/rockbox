@@ -31,6 +31,12 @@ CODEC_HEADER
 
 static int32_t outputbuffer[ALAC_MAX_CHANNELS][ALAC_BLOCKSIZE] IBSS_ATTR;
 
+static void set_elapsed_samples(uint32_t samplesdone)
+{
+    uint32_t elapsedtime = (uint64_t)samplesdone * 1000ULL / ci->id3->frequency;
+    ci->set_elapsed(elapsedtime);
+}
+
 /* this is the codec entry point */
 enum codec_status codec_main(enum codec_entry_call_reason reason)
 {
@@ -50,12 +56,14 @@ enum codec_status codec_run(void)
     demux_res_t demux_res;
     stream_t input_stream;
     uint32_t samplesdone;
-    uint32_t elapsedtime;
     int samplesdecoded;
     unsigned int i;
     unsigned char* buffer;
     alac_file alac;
     intptr_t param;
+    unsigned long resume_time;
+    uint32_t resume_offset;
+    unsigned int did_resume;
 
     /* Clean and initialize decoder structures */
     memset(&demux_res , 0, sizeof(demux_res));
@@ -71,10 +79,10 @@ enum codec_status codec_run(void)
 
     stream_create(&input_stream,ci);
 
-    /* Read resume info before calling qtmovie_read. */
-    elapsedtime = ci->id3->elapsed;
-    samplesdone = ci->id3->offset;
-  
+    /* Save resume info because qtmovie_read() can modify it. */
+    resume_time = ci->id3->elapsed;
+    resume_offset = ci->id3->offset;
+
     /* if qtmovie_read returns successfully, the stream is up to
      * the movie data, which can be used directly by the decoder */
     if (!qtmovie_read(&input_stream, &demux_res)) {
@@ -84,28 +92,24 @@ enum codec_status codec_run(void)
 
     /* initialise the sound converter */
     alac_set_info(&alac, demux_res.codecdata);
-  
-    /* Set i for first frame, seek to desired sample position for resuming. */
-    i=0;
 
-    if (elapsedtime || samplesdone) {
-        if (samplesdone) {
-            samplesdone =
-                (uint32_t)((uint64_t)samplesdone*ci->id3->frequency /
-                           (ci->id3->bitrate*128));
-        }
-        else {
-            samplesdone = (elapsedtime/10) * (ci->id3->frequency/100);
-        }
+    if (resume_time)
+        did_resume = m4a_seek(&demux_res, &input_stream,
+                              (uint64_t)resume_time * ci->id3->frequency / 1000ULL,
+                              &samplesdone, (int *) &i);
+    else if (resume_offset)
+        did_resume = m4a_seek_raw(&demux_res, &input_stream, resume_offset,
+                                  &samplesdone, (int *) &i);
+    else
+        did_resume = 0;
 
-        if (!m4a_seek(&demux_res, &input_stream, samplesdone,
-                      &samplesdone, (int*) &i)) {
-            samplesdone = 0;
-        }
+    /* Start from the beginning if we did not resume. */
+    if (!did_resume) {
+        i = 0;
+        samplesdone = 0;
     }
 
-    elapsedtime = samplesdone * 1000LL / ci->id3->frequency;
-    ci->set_elapsed(elapsedtime);
+    set_elapsed_samples(samplesdone);
 
     /* The main decoding loop */
     while (i < demux_res.num_sample_byte_sizes) {
@@ -117,11 +121,10 @@ enum codec_status codec_run(void)
         /* Deal with any pending seek requests */
         if (action == CODEC_ACTION_SEEK_TIME) {
             if (m4a_seek(&demux_res, &input_stream,
-                         (param/10) * (ci->id3->frequency/100),
-                         &samplesdone, (int *)&i)) {
-                elapsedtime=samplesdone*1000LL/ci->id3->frequency;
-            }
-            ci->set_elapsed(elapsedtime);
+                         (uint64_t)param * ci->id3->frequency / 1000ULL,
+                         &samplesdone, (int *) &i))
+                set_elapsed_samples(samplesdone);
+
             ci->seek_complete();
         }
 
@@ -140,8 +143,7 @@ enum codec_status codec_run(void)
 
         /* Update the elapsed-time indicator */
         samplesdone+=samplesdecoded;
-        elapsedtime=samplesdone*1000LL/ci->id3->frequency;
-        ci->set_elapsed(elapsedtime);
+        set_elapsed_samples(samplesdone);
 
         i++;
     }
