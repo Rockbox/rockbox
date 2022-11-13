@@ -1483,7 +1483,7 @@ static bool audio_init_codec(struct track_info *track_infop,
 enum { AUTORESUMABLE_UNKNOWN = 0, AUTORESUMABLE_TRUE, AUTORESUMABLE_FALSE };
 static bool autoresumable(struct mp3entry *id3)
 {
-    char *endp, *path;
+    char *path;
     size_t len;
     bool is_resumable;
 
@@ -1501,13 +1501,7 @@ static bool autoresumable(struct mp3entry *id3)
             if (*path == ':')           /* Skip empty search patterns */
                 continue;
 
-            /* FIXME: As soon as strcspn or strchrnul are made available in
-               the core, the following can be made more efficient. */
-            endp = strchr(path, ':');
-            if (endp)
-                len = endp - path;
-            else
-                len = strlen(path);
+            len = strcspn(path, ":");
 
             /* Note: At this point, len is always > 0 */
 

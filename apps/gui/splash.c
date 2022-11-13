@@ -73,11 +73,11 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
     if (!next)
         return false; /* nothing to display */
 
-    lines[line].len = next_len + 1;
+    lines[line].len = next_len;
     lines[line].str = next;
     while (true)
     {
-        w = font_getstringnsize(next, next_len + 1, NULL, NULL, fontnum);
+        w = font_getstringnsize(next, next_len, NULL, NULL, fontnum);
         if (lastbreak)
         {
             len = next - lastbreak;
@@ -90,18 +90,19 @@ static bool splash_internal(struct screen * screen, const char *fmt, va_list ap,
                     break;  /* screen full or out of lines */
                 x = 0;
                 y += chr_h;
-                lines[++line].len = next_len + len;
+                lines[++line].len = next_len;
                 lines[line].str = next;
             }
             else
             {
                 /*  restore & calculate spacing */
-                lines[line].len += next_len + len + 1;
+                lines[line].len += next_len + 1;
                 x += next_w;
             }
         }
         x += w;
-        lastbreak = next + next_len + 1;
+
+        lastbreak = next + next_len;
         lastbrkchr = *lastbreak;
 
         next = strptokspn_r(NULL, matchstr, &next_len, &store);

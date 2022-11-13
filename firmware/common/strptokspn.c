@@ -39,40 +39,29 @@
  * Pointer **end
  *
  * Note the returned token is NOT NULL terminated by the function as in strtok_r
- * However the caller can use ret[len+1] = '\0'; to emulate a call to strtok_r
+ * However the caller can use ret[len] = '\0'; to emulate a call to strtok_r
 */
-
 const char *strptokspn_r(const char *ptr, const char *sep, size_t *len, const char **end)
 {
-    *len = 0;
-    if (!ptr)
-        /* we got NULL input so then we get our last position instead */
+    if (ptr == NULL) /* we got NULL input so then we get last position instead */
+    {
         ptr = *end;
+    }
 
     /* pass all letters that are including in the separator string */
     while (*ptr && strchr(sep, *ptr))
         ++ptr;
 
-    if (*ptr) {
+    if (*ptr != '\0')
+    {
         /* so this is where the next piece of string starts */
         const char *start = ptr;
-
-        /* set the end pointer to the first byte after the start */
-        *end = start + 1;
-
-        /* scan through the string to find where it ends, it ends on a
-           null byte or a character that exists in the separator string */
-        while (**end && !strchr(sep, **end))
+        *len = strcspn(ptr, sep); /* Get span until any sep character in string */
+        *end = ptr + *len;
+        if (**end) /* the end is not a null byte */
             ++*end;
-        *len  = (*end - start) - 1; /* this would be the string len if there actually was a NULL */
-        if (**end) { /* the end is not a null byte */
-            ++*end;  /* advance last pointer to beyond the match */
-        }
-
-        return start; /* return the position where the string starts */
+        return start;
     }
-
-    /* we ended up on a null byte, there are no more strings to find! */
     return NULL;
 }
 
@@ -82,7 +71,7 @@ char * strtok_r(char *ptr, const char *sep, char **end)
     size_t len;
     char * ret = (char*) strptokspn_r((const char*)ptr, sep, &len, (const char**) end);
     if (ret)
-        ret[len + 1] = '\0';
+        ret[len] = '\0';
     return ret;
 }
 #endif

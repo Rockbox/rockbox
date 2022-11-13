@@ -271,7 +271,7 @@ libc/strcat.c
 libc/strchr.c
 libc/strcmp.c
 libc/strcpy.c
-
+libc/strcspn.c
 libc/strncmp.c
 libc/strrchr.c
 libc/strstr.c
