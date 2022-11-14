@@ -262,6 +262,7 @@ libc/ctype.c
 libc/sprintf.c
 #endif
 
+libc/memccpy.c
 libc/memchr.c
 libc/memcmp.c
 

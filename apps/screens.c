@@ -561,7 +561,10 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
             case LANG_ID3_COMMENT:
                 if (!id3->comment)
                     return NULL;
-                snprintf(buffer, buffer_len, "%s", id3->comment);
+
+                if (!memccpy (buffer, id3->comment, '\0', buffer_len))
+                    buffer[buffer_len - 1] = '\0';
+
                 val=buffer;
                 if(say_it && val)
                     talk_spell(val, true);
@@ -608,7 +611,10 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
             case LANG_FORMAT:
                 if (id3->codectype >= AFMT_NUM_CODECS)
                     return NULL;
-                snprintf(buffer, buffer_len, "%s", audio_formats[id3->codectype].label);
+
+                if (!memccpy (buffer, audio_formats[id3->codectype].label, '\0', buffer_len))
+                    buffer[buffer_len - 1] = '\0';
+
                 val=buffer;
                 if(say_it)
                     talk_spell(val, true);

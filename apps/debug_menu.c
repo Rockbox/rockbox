@@ -1627,7 +1627,9 @@ static int ata_smart_attr_to_string(
             if (len >= name_sz) len = name_sz-1;
             slen += len;
         }
-        snprintf(str+slen, size-slen, "%s", buf);
+
+        if (!memccpy (str+slen, buf, '\0', size-slen))
+            (str+slen)[size-slen - 1] = '\0';
     }
 
     return 1; /* ok */

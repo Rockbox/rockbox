@@ -20,6 +20,7 @@ extern "C" {
 _PTR     _EXFUN(memchr,(const _PTR, int, size_t));
 int      _EXFUN(memcmp,(const _PTR, const _PTR, size_t));
 _PTR     _EXFUN(memcpy,(_PTR, const _PTR, size_t));
+_PTR     _EXFUN(memccpy,(_PTR, const _PTR, int, size_t));
 _PTR     _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
 _PTR     _EXFUN(memmove,(_PTR, const _PTR, size_t));
 _PTR     _EXFUN(memset,(_PTR, int, size_t));
