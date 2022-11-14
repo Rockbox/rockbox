@@ -1587,7 +1587,7 @@ MENUITEM_FUNCTION(add_to_faves_item, 0, ID2P(LANG_ADD_TO_FAVES),
 #if LCD_DEPTH > 1
 static bool set_backdrop(void)
 {
-    strlcpy(global_settings.backdrop_file, selected_file,
+    strmemccpy(global_settings.backdrop_file, selected_file,
             sizeof(global_settings.backdrop_file));
     settings_save();
     skin_backdrop_load_setting();
@@ -1600,7 +1600,7 @@ MENUITEM_FUNCTION(set_backdrop_item, 0, ID2P(LANG_SET_AS_BACKDROP),
 #ifdef HAVE_RECORDING
 static bool set_recdir(void)
 {
-    strlcpy(global_settings.rec_directory, selected_file,
+    strmemccpy(global_settings.rec_directory, selected_file,
             sizeof(global_settings.rec_directory));
     settings_save();
     return false;
@@ -1937,7 +1937,7 @@ int onplay(char* file, int attr, int from, bool hotkey)
         selected_file = NULL;
     else
     {
-        strlcpy(selected_file_path, file, MAX_PATH);
+        strmemccpy(selected_file_path, file, MAX_PATH);
         selected_file = selected_file_path;
     }
     selected_file_attr = attr;

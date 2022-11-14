@@ -624,11 +624,11 @@ static char* qs_write_to_cfg(void* setting, char*buf, int buf_len)
     int index = *(int*)setting;
     if (index < 0 || index >= nb_settings)
     {
-        strlcpy(buf, "-", buf_len);
+        strmemccpy(buf, "-", buf_len);
         return buf;
     }
     const struct settings_list *var = &settings[index];
-    strlcpy(buf, var->cfg_name, buf_len);
+    strmemccpy(buf, var->cfg_name, buf_len);
     return buf;
 }
 static bool qs_is_changed(void* setting, void* defaultval)

@@ -1352,7 +1352,7 @@ static void mark_stream(const char *path, enum mark_stream_action action)
 
         file->hdr.type = CHUNK_T_STREAM_START;
         file->hdr.size = count;
-        strlcpy(file->path, path, MAX_PATH);
+        strmemccpy(file->path, path, MAX_PATH);
     }
 }
 
@@ -1582,7 +1582,7 @@ static void on_record(const char *filename)
 
     /* Copy path and let caller go */
     char path[MAX_PATH];
-    strlcpy(path, filename, MAX_PATH);
+    strmemccpy(path, filename, MAX_PATH);
 
     queue_reply(&audio_queue, 0);
 

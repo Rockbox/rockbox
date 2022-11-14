@@ -128,8 +128,8 @@ void catalog_set_directory(const char* directory)
     }
     else
     {
-        strlcpy(global_settings.playlist_catalog_dir,
-                directory, sizeof(global_settings.playlist_catalog_dir));
+        strmemccpy(global_settings.playlist_catalog_dir,
+                   directory, sizeof(global_settings.playlist_catalog_dir));
     }
     initialized = false;
     initialize_catalog();
@@ -164,8 +164,8 @@ restart:
 
     if (browse.flags & BROWSE_SELECTED)
     {
-        strlcpy(most_recent_playlist, selected_playlist+playlist_dir_length+1,
-            sizeof(most_recent_playlist));
+        strmemccpy(most_recent_playlist, selected_playlist+playlist_dir_length+1,
+                   sizeof(most_recent_playlist));
 
         if (view)
         {
@@ -180,7 +180,7 @@ restart:
         else
         {
             result = 0;
-            strlcpy(playlist, selected_playlist, MAX_PATH);
+            strmemccpy(playlist, selected_playlist, MAX_PATH);
         }
     }
 
@@ -360,7 +360,7 @@ bool catalog_add_to_a_playlist(const char* sel, int sel_attr,
                      (name!=NULL && (sel_attr & ATTR_DIRECTORY))?name+1:"");
         }
         else
-            strlcpy(playlist, m3u8name, MAX_PATH);
+            strmemccpy(playlist, m3u8name, MAX_PATH);
 
         if (kbd_input(playlist, MAX_PATH, NULL))
             return false;

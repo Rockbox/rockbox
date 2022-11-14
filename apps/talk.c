@@ -810,8 +810,8 @@ void talk_init(void)
     talk_force_shutup();  /* In case we have something speaking! */
 
     talk_initialized = true;
-    strlcpy((char *)last_lang, (char *)global_settings.lang_file,
-        MAX_FILENAME);
+    strmemccpy((char *)last_lang, (char *)global_settings.lang_file,
+               MAX_FILENAME);
 
     /* reset some states */
     queue_write = queue_read = 0; /* reset the queue */
@@ -1066,14 +1066,21 @@ static int talk_spell_basename(const char *path,
     }
     char buf[MAX_PATH];
     /* Spell only the path component after the last slash */
-    strlcpy(buf, path, sizeof(buf));
-    if(strlen(buf) >1 && buf[strlen(buf)-1] == '/')
-        /* strip trailing slash */
-        buf[strlen(buf)-1] = '\0';
+    char *end = strmemccpy(buf, path, sizeof(buf));
+
+    if (!end)
+        return 0;
+
+    size_t len = end - buf - 1;
+    if(len >1 && buf[len-1] == '/')
+        buf[--len] = '\0'; /* strip trailing slash */
+
     char *ptr = strrchr(buf, '/');
-    if(ptr && strlen(buf) >1)
+    if(ptr && len >1)
         ++ptr;
-    else ptr = buf;
+    else
+        ptr = buf;
+
     return talk_spell(ptr, enqueue);
 }
 
@@ -1122,7 +1129,7 @@ int talk_fullpath(const char* path, bool enqueue)
         return talk_spell(path, true);
     talk_id(VOICE_CHAR_SLASH, true);
     char buf[MAX_PATH];
-    strlcpy(buf, path, MAX_PATH);
+    strmemccpy(buf, path, MAX_PATH);
     char *start = buf+1; /* start of current component */
     char *ptr = strchr(start, '/'); /* end of current component */
     while(ptr) { /* There are more slashes ahead */
@@ -1636,7 +1643,7 @@ bool talk_get_debug_data(struct talk_debug_data *data)
     if (global_settings.lang_file[0] && global_settings.lang_file[0] != 0xff)
         p_lang = (char *)global_settings.lang_file;
 
-    strlcpy(data->voicefile, p_lang, sizeof(data->voicefile));
+    strmemccpy(data->voicefile, p_lang, sizeof(data->voicefile));
 
     if (!has_voicefile || index_handle <= 0)
     {

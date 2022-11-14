@@ -517,8 +517,7 @@ static enum pv_onplay_result open_with(const struct playlist_entry *current_trac
     char selected_track[MAX_PATH];
     close_playlist_viewer();
 
-    if (!memccpy (selected_track, current_track->name, '\0', sizeof(selected_track)))
-        selected_track[sizeof(selected_track) - 1] = '\0';
+    strmemccpy(selected_track, current_track->name, sizeof(selected_track));
 
 
     return (filetype_list_viewers(selected_track) ==
@@ -532,8 +531,7 @@ static enum pv_onplay_result open_pictureflow(const struct playlist_entry *curre
     char selected_track[MAX_PATH];
     close_playlist_viewer();
 
-    if (!memccpy (selected_track, current_track->name, '\0', sizeof(selected_track)))
-        selected_track[sizeof(selected_track) - 1] = '\0';
+    strmemccpy(selected_track, current_track->name, sizeof(selected_track));
 
     return (filetype_load_plugin((void *)"pictureflow", selected_track) ==
                 PLUGIN_USB_CONNECTED ? PV_ONPLAY_USB_CLOSED : PV_ONPLAY_CLOSED);

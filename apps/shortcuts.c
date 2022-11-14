@@ -284,7 +284,7 @@ void shortcuts_add(enum shortcut_type type, const char* value)
     if (type == SHORTCUT_SETTING)
         sc->u.setting = (void*)value;
     else
-        strlcpy(sc->u.path, value, MAX_PATH);
+        strmemccpy(sc->u.path, value, MAX_PATH);
 
     if (first_idx_to_writeback < 0)
         first_idx_to_writeback = shortcut_count - 1;
@@ -325,7 +325,7 @@ static int readline_cb(int n, char *buf, void *parameters)
         }
         else if (nm_op == 1) /*name*/
         {
-            strlcpy(sc->name, value, MAX_SHORTCUT_NAME);
+            strmemccpy(sc->name, value, MAX_SHORTCUT_NAME);
         }
         else if (nm_op == 2) /*data*/
         {
@@ -339,7 +339,7 @@ static int readline_cb(int n, char *buf, void *parameters)
                 case SHORTCUT_FILE:
                 case SHORTCUT_DEBUGITEM:
                 case SHORTCUT_PLAYLISTMENU:
-                    strlcpy(sc->u.path, value, MAX_PATH);
+                    strmemccpy(sc->u.path, value, MAX_PATH);
                     break;
                 case SHORTCUT_SETTING:
                     sc->u.setting = find_setting_by_cfgname(value, NULL);
@@ -374,7 +374,7 @@ static int readline_cb(int n, char *buf, void *parameters)
         }
         else if (nm_op == 4) /*talkclip*/
         {
-            strlcpy(sc->talk_clip, value, MAX_PATH);
+            strmemccpy(sc->talk_clip, value, MAX_PATH);
         }
     }
     return 0;
@@ -534,7 +534,7 @@ static int shortcut_menu_speak_item(int selected_item, void * data)
                     if (*filename != '\0')
                     {
                         int dirlen = (filename - sc->u.path);
-                        strlcpy(path, sc->u.path, dirlen + 1);
+                        strmemccpy(path, sc->u.path, dirlen + 1);
                         dir = opendir(path);
                         if (dir)
                         {

@@ -87,7 +87,7 @@ static void get_playlist_name(unsigned char *dest,
         }
     }
     if (playlist_file != NULL) {
-        strlcpy(dest, playlist_file->d_name, max_length);
+        strmemccpy(dest, playlist_file->d_name, max_length);
     }
     closedir(dp);
 }
@@ -1465,22 +1465,21 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
                         switch(buf[3])
                         {
                             case 0x05:
-                                len = strlcpy((char *)&data[7], id3.title,64);
+                                strmemccpy((char *)&data[7], id3.title,64);
                                 break;
                             case 0x02:
-                                len = strlcpy((char *)&data[7], id3.artist,64);
+                                strmemccpy((char *)&data[7], id3.artist,64);
                                 break;
                             case 0x03:
-                                len = strlcpy((char *)&data[7], id3.album,64);
+                                strmemccpy((char *)&data[7], id3.album,64);
                                 break;
                             case 0x04:
                             case 0x06:
-                                len = strlcpy((char *)&data[7], "Not Supported",14);
+                                strmemccpy((char *)&data[7], "Not Supported",14);
                                 break;
                         }
                         break;
                 }
-		(void)len;  /* Shut up, compiler */
                 put_u32(&data[3], start_index+counter);
                 iap_send_pkt(data, 7 + strlen(data+7) + 1);
                 yield();

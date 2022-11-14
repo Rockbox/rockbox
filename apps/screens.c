@@ -20,7 +20,7 @@
  ****************************************************************************/
 
 #include <stdbool.h>
-#include <string.h>
+#include <string-extra.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "backlight.h"
@@ -562,8 +562,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if (!id3->comment)
                     return NULL;
 
-                if (!memccpy (buffer, id3->comment, '\0', buffer_len))
-                    buffer[buffer_len - 1] = '\0';
+                strmemccpy(buffer, id3->comment, buffer_len);
 
                 val=buffer;
                 if(say_it && val)
@@ -612,8 +611,7 @@ static const char * id3_get_or_speak_info(int selected_item, void* data,
                 if (id3->codectype >= AFMT_NUM_CODECS)
                     return NULL;
 
-                if (!memccpy (buffer, audio_formats[id3->codectype].label, '\0', buffer_len))
-                    buffer[buffer_len - 1] = '\0';
+                strmemccpy(buffer, audio_formats[id3->codectype].label, buffer_len);
 
                 val=buffer;
                 if(say_it)

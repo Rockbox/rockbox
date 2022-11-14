@@ -107,7 +107,7 @@ static void rootmenu_track_changed_callback(unsigned short id, void* param)
 {
     (void)id;
     struct mp3entry *id3 = ((struct track_event *)param)->id3;
-    strlcpy(current_track_path, id3->path, MAX_PATH);
+    strmemccpy(current_track_path, id3->path, MAX_PATH);
 }
 static int browser(void* param)
 {

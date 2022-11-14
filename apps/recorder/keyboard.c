@@ -1063,7 +1063,7 @@ static void kbd_draw_edit_line(struct keyboard_parameters *pm,
     while (*utf8 && i < pm->max_chars_text)
     {
         j = utf8seek(utf8, 1);
-        strlcpy(outline, utf8, j+1);
+        strmemccpy(outline, utf8, j+1);
         sc->getstringsize(outline, &w, NULL);
         sc->putsxy(text_margin + i*pm->text_w + (pm->text_w-w)/2,
                    y, outline);

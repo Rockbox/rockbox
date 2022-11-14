@@ -240,6 +240,7 @@ common/strcasestr.c
 common/strnatcmp.c
 common/strlcat.c
 common/strlcpy.c
+common/strmemccpy.c
 common/structec.c
 common/timefuncs.c
 common/unicode.c

@@ -1707,8 +1707,8 @@ static int sab_process_dir(struct dircache_entry *ce)
             /* save current paths size */
             int pathpos = strlen(sab_path);
             /* append entry */
-            strlcpy(&sab_path[pathpos], "/", sizeof(sab_path) - pathpos);
-            strlcpy(&sab_path[pathpos+1], entry->d_name, sizeof(sab_path) - pathpos - 1);
+            strmemccpy(&sab_path[pathpos], "/", sizeof(sab_path) - pathpos);
+            strmemccpy(&sab_path[pathpos+1], entry->d_name, sizeof(sab_path) - pathpos - 1);
 
             int rc = sab_process_dir(ce->down);
             /* restore path */
@@ -1735,7 +1735,7 @@ static int sab_process_dir(struct dircache_entry *ce)
 static int sab_process_volume(IF_MV(int volume,) struct dircache_entry *ce)
 {
     memset(ce, 0, sizeof(struct dircache_entry));
-    strlcpy(sab_path, "/", sizeof sab_path);
+    strmemccpy(sab_path, "/", sizeof sab_path);
     return sab_process_dir(ce);
 }
 
@@ -1755,7 +1755,7 @@ int dircache_readdir_r(struct dircache_dirscan *dir, struct DIRENT *result)
 
     dir->scanidx = ce - dircache_root;
 
-    strlcpy(result->d_name, ce->d_name, sizeof (result->d_name));
+    strmemccpy(result->d_name, ce->d_name, sizeof (result->d_name));
     result->info = ce->dirinfo;
 
     return 1;

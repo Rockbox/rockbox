@@ -82,7 +82,7 @@ static int load_radioart_image(struct radioart *ra, const char* preset_name,
 #endif
         return -1;
     }
-    strlcpy(ra->name, preset_name, MAX_FMPRESET_LEN+1);
+    strmemccpy(ra->name, preset_name, MAX_FMPRESET_LEN+1);
     ra->dim.height = dim->height;
     ra->dim.width = dim->width;
     ra->last_tick = current_tick;

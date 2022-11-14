@@ -854,7 +854,7 @@ const unsigned char* font_get_bits(struct font* pf, unsigned short char_code)
 static void font_path_to_glyph_path( const char *font_path, char *glyph_path)
 {
     /* take full file name, cut extension, and add .glyphcache */
-    strlcpy(glyph_path, font_path, MAX_PATH);
+    strmemccpy(glyph_path, font_path, MAX_PATH);
     glyph_path[strlen(glyph_path)-4] = '\0';
     strcat(glyph_path, ".gc");
 }

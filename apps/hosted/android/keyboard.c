@@ -100,7 +100,7 @@ int kbd_input(char* text, int buflen, unsigned short *kbd)
     if (accepted)
     {
         utf8_string = e->GetStringUTFChars(env_ptr, new_string, 0);
-        strlcpy(text, utf8_string, buflen);
+        strmemccpy(text, utf8_string, buflen);
         e->ReleaseStringUTFChars(env_ptr, new_string, utf8_string);
         e->DeleteGlobalRef(env_ptr, new_string);
     }

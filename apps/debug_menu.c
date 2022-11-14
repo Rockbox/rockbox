@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <string.h>
+#include <string-extra.h>
 #include "lcd.h"
 #include "lang.h"
 #include "menu.h"
@@ -1274,7 +1274,7 @@ static int disk_callback(int btn, struct gui_synclist *lists)
             {
                 card_name[i] = card_extract_bits(card->cid, (103-8*i), 8);
             }
-            strlcpy(card_name, card_name, sizeof(card_name));
+            strmemccpy(card_name, card_name, sizeof(card_name));
             simplelist_addline(
                     "%s Rev %d.%d", card_name,
                     (int) card_extract_bits(card->cid, 63, 4),
@@ -1628,8 +1628,7 @@ static int ata_smart_attr_to_string(
             slen += len;
         }
 
-        if (!memccpy (str+slen, buf, '\0', size-slen))
-            (str+slen)[size-slen - 1] = '\0';
+        strmemccpy(str+slen, buf, size-slen);
     }
 
     return 1; /* ok */

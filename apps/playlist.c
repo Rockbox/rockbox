@@ -1457,7 +1457,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
         }
     }
 
-    strlcpy(dir_buf, playlist->filename, playlist->dirlen);
+    strmemccpy(dir_buf, playlist->filename, playlist->dirlen);
 
     return format_track_path(buf, tmp_buf, buf_length, dir_buf);
 
@@ -1551,7 +1551,7 @@ static int get_next_dir(char *dir, bool is_forward)
 
     /* if the current file is within our base dir, use its dir instead */
     if (base_len == 0 || !strncmp(playlist->filename, dir, base_len))
-        strlcpy(dir, playlist->filename, playlist->dirlen);
+        strmemccpy(dir, playlist->filename, playlist->dirlen);
 
     /* use the tree browser dircache to load files */
     *(tc->dirfilter) = SHOW_ALL;
@@ -2034,7 +2034,7 @@ void playlist_init(void)
     mutex_init(&created_playlist_mutex);
 
     playlist->current = true;
-    strlcpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
+    strmemccpy(playlist->control_filename, PLAYLIST_CONTROL_FILE,
             sizeof(playlist->control_filename));
     playlist->fd = -1;
     playlist->control_fd = -1;
@@ -2955,7 +2955,7 @@ int playlist_set_current(struct playlist_info* playlist)
 
     empty_playlist(&current_playlist, false);
 
-    strlcpy(current_playlist.filename, playlist->filename,
+    strmemccpy(current_playlist.filename, playlist->filename,
         sizeof(current_playlist.filename));
 
     current_playlist.utf8 = playlist->utf8;
@@ -3517,7 +3517,7 @@ char *playlist_name(const struct playlist_info* playlist, char *buf,
     if (!playlist)
         playlist = &current_playlist;
 
-    strlcpy(buf, playlist->filename+playlist->dirlen, buf_size);
+    strmemccpy(buf, playlist->filename+playlist->dirlen, buf_size);
   
     if (!buf[0])
         return NULL;
@@ -3537,7 +3537,7 @@ char *playlist_get_name(const struct playlist_info* playlist, char *buf,
     if (!playlist)
         playlist = &current_playlist;
 
-    strlcpy(buf, playlist->filename, buf_size);
+    strmemccpy(buf, playlist->filename, buf_size);
 
     if (!buf[0])
         return NULL;

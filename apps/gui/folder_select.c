@@ -185,7 +185,7 @@ static struct folder* load_folder(struct folder* parent, char *folder)
         if (len >= sizeof(fullpath))
             goto fail;
     }
-    strlcpy(&fullpath[len], folder, sizeof(fullpath) - len);
+    strmemccpy(&fullpath[len], folder, sizeof(fullpath) - len);
     logf("load_folder: [%s]", fullpath);
 
     dir = opendir(fullpath);
@@ -518,7 +518,7 @@ static int select_paths(struct folder* root, const char* filenames)
         lastfnp = fnp;
         if (len <= 0 || len + 1 >= buflen)
             continue;
-        strlcpy(buf, sstr, len + 1);
+        strmemccpy(buf, sstr, len + 1);
         struct child *item = find_from_filename(buf, root);
         if (item)
             item->state = SELECTED;
@@ -563,7 +563,7 @@ static void save_folders_r(struct folder *root, char* dst, size_t maxlen, size_t
                 int dlen = strlen(dst);
                 if (dlen + len >= maxlen)
                     continue;
-                strlcpy(&dst[dlen], buffer_front, maxlen - dlen);
+                strmemccpy(&dst[dlen], buffer_front, maxlen - dlen);
             }
             else
             {

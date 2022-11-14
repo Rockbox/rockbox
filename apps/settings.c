@@ -35,8 +35,7 @@
 #include "backlight.h"
 #include "audio.h"
 #include "talk.h"
-#include "strlcpy.h"
-#include "strcasestr.h"
+#include "string-extra.h"
 #include "rtc.h"
 #include "power.h"
 #include "ata_idle_notify.h"
@@ -251,7 +250,7 @@ bool cfg_string_to_int(int setting_id, int* out, const char* str)
             }
             else return false;
         }
-        strlcpy(temp, start, end-start+1);
+        strmemccpy(temp, start, end-start+1);
         if (!strcmp(str, temp))
         {
             *out = count;
@@ -343,18 +342,22 @@ bool settings_load_config(const char* file, bool apply)
                             size_t len = strlen(dir);
                             if (!strncasecmp(value, dir, len))
                             {
-                                strlcpy(storage, &value[len], MAX_PATH);
+                                strmemccpy(storage, &value[len], MAX_PATH);
                             }
-                            else strlcpy(storage, value, MAX_PATH);
+                            else
+                                strmemccpy(storage, value, MAX_PATH);
+
                         }
-                        else strlcpy(storage, value, MAX_PATH);
+                        else
+                            strmemccpy(storage, value, MAX_PATH);
+
                         if (settings[i].filename_setting->suffix)
                         {
                             char *s = strcasestr(storage,settings[i].filename_setting->suffix);
                             if (s) *s = '\0';
                         }
-                        strlcpy((char*)settings[i].setting, storage,
-                                settings[i].filename_setting->max_len);
+                        strmemccpy((char*)settings[i].setting, storage,
+                                   settings[i].filename_setting->max_len);
                         break;
                     }
                 }
@@ -393,11 +396,11 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
             if (value[count] == val)
             {
                 if (end == NULL)
-                    strlcpy(buf, start, buf_len);
+                    strmemccpy(buf, start, buf_len);
                 else
                 {
                     int len = MIN(buf_len, (end-start) + 1);
-                    strlcpy(buf, start, len);
+                    strmemccpy(buf, start, len);
                 }
                 return true;
             }
@@ -421,11 +424,11 @@ bool cfg_int_to_string(int setting_id, int val, char* buf, int buf_len)
     }
     end = strchr(start,',');
     if (end == NULL)
-        strlcpy(buf, start, buf_len);
+        strmemccpy(buf, start, buf_len);
     else
     {
         int len = MIN(buf_len, (end-start) + 1);
-        strlcpy(buf, start, len);
+        strmemccpy(buf, start, len);
     }
     return true;
 }
@@ -491,7 +494,7 @@ bool cfg_to_string(int i/*setting_id*/, char* buf, int buf_len)
             else
             {
                 int len = MIN(buf_len, settings[i].filename_setting->max_len);
-                strlcpy(buf,(char*)settings[i].setting,len);
+                strmemccpy(buf,(char*)settings[i].setting,len);
             }
             break;
     } /* switch () */
@@ -1071,8 +1074,8 @@ void reset_setting(const struct settings_list *setting, void *var)
         break;
     case F_T_CHARPTR:
     case F_T_UCHARPTR:
-        strlcpy((char*)var, setting->default_val.charptr,
-                setting->filename_setting->max_len);
+        strmemccpy((char*)var, setting->default_val.charptr,
+                   setting->filename_setting->max_len);
         break;
     }
 }
@@ -1265,6 +1268,6 @@ void set_file(const char* filename, char* setting, const int maxlen)
     if (len > maxlen)
         return;
 
-    strlcpy(setting, fptr, len);
+    strmemccpy(setting, fptr, len);
     settings_save();
 }

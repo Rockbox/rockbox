@@ -2548,7 +2548,7 @@ bool skin_data_load(enum screen_type screen, struct wps_data *wps_data,
     {
         /* get the bitmap dir */
         char *dot = strrchr(buf, '.');
-        strlcpy(bmpdir, buf, dot - buf + 1);
+        strmemccpy(bmpdir, buf, dot - buf + 1);
     }
     else
     {

@@ -383,7 +383,7 @@ static int update_dir(void)
         {
             if (ft_load(&tc, NULL) < 0)
                 return -1;
-            strlcpy(lastdir, tc.currdir, MAX_PATH);
+            strmemccpy(lastdir, tc.currdir, MAX_PATH);
             changed = true;
         }
     }
@@ -573,7 +573,7 @@ void set_current_file(const char *path)
     name = strrchr(path+1,'/');
     if (name)
     {
-        strlcpy(tc.currdir, path, name - path + 1);
+        strmemccpy(tc.currdir, path, name - path + 1);
         name++;
     }
     else
@@ -582,7 +582,7 @@ void set_current_file(const char *path)
         name = path+1;
     }
 
-    strlcpy(lastfile, name, MAX_PATH);
+    strmemccpy(lastfile, name, MAX_PATH);
 
 
     /* If we changed dir we must recalculate the dirlevel
@@ -1007,7 +1007,7 @@ int rockbox_browse(struct browse_context *browse)
             tc.selected_item = 0;
             tc.dirlevel = 0;
 
-            strlcpy(tc.currdir, browse->root, sizeof(tc.currdir));
+            strmemccpy(tc.currdir, browse->root, sizeof(tc.currdir));
         }
 
         start_wps = false;
@@ -1030,7 +1030,7 @@ int rockbox_browse(struct browse_context *browse)
         if (dirfilter != SHOW_ID3DB)
             tc.dirfilter = &global_settings.dirfilter;
         tc.browse = browse;
-        strlcpy(current, browse->root, MAX_PATH);
+        strmemccpy(current, browse->root, MAX_PATH);
         set_current_file(current);
         if (browse->flags&BROWSE_RUNFILE)
             ret_val = ft_enter(&tc);

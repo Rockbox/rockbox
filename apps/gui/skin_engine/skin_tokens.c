@@ -114,7 +114,7 @@ char* get_dir(char* buf, int buf_size, const char* path, int level)
         return NULL;
 
     len = MIN(last_sep - sep, buf_size - 1);
-    strlcpy(buf, sep + 1, len + 1);
+    strmemccpy(buf, sep + 1, len + 1);
     return buf;
 }
 

@@ -137,7 +137,7 @@ int skin_backdrop_assign(char* backdrop, char *bmpdir,
     }
     if (free >= 0)
     {
-        strlcpy(backdrops[free].name, filename, MAX_PATH);
+        strmemccpy(backdrops[free].name, filename, MAX_PATH);
         backdrops[free].buffer = NULL;
         backdrops[free].screen = screen;
         backdrops[free].ref_count = 1;

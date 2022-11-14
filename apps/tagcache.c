@@ -853,7 +853,7 @@ static bool retrieve(struct tagcache_search *tcs, IF_DIRCACHE(int idx_id,)
         {
             struct tagfile_entry *ep =
                 (struct tagfile_entry *)&tcramcache.hdr->tags[tag][seek];
-            strlcpy(buf, ep->tag_data, bufsz);
+            strmemccpy(buf, ep->tag_data, bufsz);
 
             return true;
         }
@@ -3469,7 +3469,7 @@ static bool write_tag(int fd, const char *tagstr, const char *datastr)
     }
 
     str_setlen(buf, bufsz - 1);
-    strlcpy(&buf[i], "\" ", (bufsz - i - 1));
+    strmemccpy(&buf[i], "\" ", (bufsz - i - 1));
 
     write(fd, buf, i + 2);
 
@@ -4737,7 +4737,7 @@ void do_tagcache_build(const char *path[])
     /* check_dir might add new roots */
     for(this = &roots_ll[0]; this; this = this->next)
     {
-        strlcpy(curpath, this->path, sizeof(curpath));
+        strmemccpy(curpath, this->path, sizeof(curpath));
         ret = ret && check_dir(this->path, true);
     }
     free_search_roots(&roots_ll[0]);
@@ -4792,7 +4792,7 @@ void tagcache_build(void)
 {
     char *vect[MAX_STATIC_ROOTS + 1]; /* +1 to ensure NULL sentinel */
     char str[sizeof(global_settings.tagcache_scan_paths)];
-    strlcpy(str, global_settings.tagcache_scan_paths, sizeof(str));
+    strmemccpy(str, global_settings.tagcache_scan_paths, sizeof(str));
 
     int res = split_string(str, ':', vect, MAX_STATIC_ROOTS);
     vect[res] = NULL;

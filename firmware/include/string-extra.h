@@ -25,6 +25,7 @@
 #include "strlcat.h"
 #include "strcasecmp.h"
 #include "strcasestr.h"
+#include "strmemccpy.h"
 #include "strtok_r.h"
 #include "memset16.h"
 

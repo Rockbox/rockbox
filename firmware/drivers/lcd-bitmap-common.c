@@ -699,7 +699,7 @@ static bool LCDFN(puts_scroll_worker)(int x, int y, const unsigned char *string,
     }
 
     /* copy contents to the line buffer */
-    strlcpy(s->linebuffer, string, sizeof(s->linebuffer));
+    strmemccpy(s->linebuffer, string, sizeof(s->linebuffer));
     /* scroll bidirectional or forward only depending on the string width */
     if ( LCDFN(scroll_info).bidir_limit ) {
         s->bidir = w < (vp->width) *

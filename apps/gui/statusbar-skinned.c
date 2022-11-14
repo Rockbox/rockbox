@@ -27,7 +27,6 @@
 #include "appevents.h"
 #include "screens.h"
 #include "screen_access.h"
-#include "strlcpy.h"
 #include "skin_parser.h"
 #include "skin_buffer.h"
 #include "skin_engine/skin_engine.h"

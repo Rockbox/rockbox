@@ -225,7 +225,7 @@ void radio_load_presets(char *filename)
     }
     /* Temporary preset, loaded until player shuts down. */
     else if(filename[0] == '/')
-        strlcpy(filepreset, filename, sizeof(filepreset));
+        strmemccpy(filepreset, filename, sizeof(filepreset));
     /* Preset from default directory. */
     else
         snprintf(filepreset, sizeof(filepreset), "%s/%s.fmr",
@@ -246,7 +246,7 @@ void radio_load_presets(char *filename)
                     {
                         struct fmstation * const fms = &presets[num_presets];
                         fms->frequency = f;
-                        strlcpy(fms->name, name, MAX_FMPRESET_LEN+1);
+                        strmemccpy(fms->name, name, MAX_FMPRESET_LEN+1);
                         num_presets++;
                     }
                 }

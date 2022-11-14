@@ -1075,7 +1075,7 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
     {
         size_t len = (end == NULL) ? strlen(s) : (size_t) (end - s);
         len = MIN(TEMP_BUF_SIZE - 1, len);
-        strlcpy(global_temp_buffer, s, len + 1);
+        strmemccpy(global_temp_buffer, s, len + 1);
 
         if (end != NULL)
         {
@@ -1089,7 +1089,7 @@ static bool parse_bookmark(const char *bookmark, const bool parse_filenames, con
                     end++;
                 }
             }
-            strlcpy(global_filename, end, MAX_PATH);
+            strmemccpy(global_filename, end, MAX_PATH);
         }
      }
 

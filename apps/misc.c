@@ -896,7 +896,7 @@ char *strip_extension(char* buffer, int buffer_size, const char *filename)
     /* no match on filename beginning with '.' or beyond buffer_size */
     if(dotpos > 1 && dotpos < buffer_size)
         buffer_size = dotpos;
-    strlcpy(buffer, filename, buffer_size);
+    strmemccpy(buffer, filename, buffer_size);
 
     return buffer;
 }
@@ -1335,12 +1335,12 @@ const char *format_time_auto(char *buffer, int buf_len, long value,
 
         if (!supress_unit)
         {
-            strlcpy(buffer, unit_strings_core[units[max_idx]], buf_len);
+            strmemccpy(buffer, unit_strings_core[units[max_idx]], buf_len);
             left_offset += strlcat(buffer, " ", buf_len);
             strlcat(buffer, &timebuf[offsets[base_idx]], buf_len);
         }
         else
-            strlcpy(buffer, &timebuf[offsets[base_idx]], buf_len);
+            strmemccpy(buffer, &timebuf[offsets[base_idx]], buf_len);
 
         strlcat(buffer, sign, buf_len);
     }

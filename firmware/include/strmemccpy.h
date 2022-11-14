@@ -19,21 +19,14 @@
  *
  ****************************************************************************/
 
-#include <string.h>
-#include "strmemccpy.h"
 
-/*
- * Copy src to string dst of size siz.  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz == 0).
- * Returns strlen(src); if retval >= siz, truncation occurred.
- */
-size_t strlcpy(char *dst, const char *src, size_t siz)
-{
-    /* Copy as many bytes as will fit */
-    char *d = strmemccpy(dst, src, siz);
-    if (d)
-        return (d - dst - 1); /* count does not include NUL */
-
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    return(siz + strlen(src+siz)); /* count does not include NUL */
-}
+#ifndef __STRMEMCCPY_H__
+#define __STRMEMCCPY_H__
+/* copies src to a buffer of len bytes stopping after
+ * len or the first NULL (\0) in src
+ * NULL terminates except when len = 0
+ * If len was exceeded NULL is returned otherwise returns
+ * a pointer to the first byte following the NULL in dst.
+*/
+char * strmemccpy(char *dst, const char *src, size_t len);
+#endif

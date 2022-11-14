@@ -287,7 +287,7 @@ static char *advancedmenu_item_get_name(int selected_item, void *data, char *buf
         buffer[0] = 0;
     else {
         buffer[0] = '\t';
-        strlcpy(&buffer[1], str(lang), len - 1);
+        strmemccpy(&buffer[1], str(lang), len - 1);
     }
 
     return buffer;

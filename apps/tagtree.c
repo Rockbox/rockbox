@@ -779,7 +779,7 @@ static bool parse_search(struct menu_entry *entry, const char *str)
             logf("tagtree failed to allocate %s", "menu");
             return false;
         }
-        strlcpy(menus[menu_count]->id, buf, MAX_MENU_ID_SIZE);
+        strmemccpy(menus[menu_count]->id, buf, MAX_MENU_ID_SIZE);
         entry->link = menu_count;
         ++menu_count;
 
@@ -1118,7 +1118,7 @@ static int parse_line(int n, char *buf, void *parameters)
                     }
                     menu = menus[menu_count];
                     ++menu_count;
-                    strlcpy(menu->id, data, MAX_MENU_ID_SIZE);
+                    strmemccpy(menu->id, data, MAX_MENU_ID_SIZE);
                 }
 
                 if (get_token_str(menu->title, sizeof(menu->title)) < 0)
@@ -1898,8 +1898,8 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
                 csi = &menu->items[seek]->si;
                 c->currextra = 0;
 
-                strlcpy(current_title[c->currextra], dptr->name,
-                        sizeof(current_title[0]));
+                strmemccpy(current_title[c->currextra], dptr->name,
+                           sizeof(current_title[0]));
 
                 /* Read input as necessary. */
                 for (i = 0; i < csi->tagorder_count; i++)
@@ -1928,7 +1928,7 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
                         if (source == source_current_path && id3)
                         {
                             char *e;
-                            strlcpy(searchstring, id3->path, SEARCHSTR_SIZE);
+                            strmemccpy(searchstring, id3->path, SEARCHSTR_SIZE);
                             e = strrchr(searchstring, '/');
                             if (e)
                                 *e = '\0';
@@ -1941,7 +1941,7 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
                             char **src = (char**)((char*)id3 + offset);
                             if (*src)
                             {
-                                strlcpy(searchstring, *src, SEARCHSTR_SIZE);
+                                strmemccpy(searchstring, *src, SEARCHSTR_SIZE);
                             }
                         }
                         else
@@ -1994,8 +1994,8 @@ int tagtree_enter(struct tree_context* c, bool is_visible)
                 c->dirlevel--;
 
             /* Update the statusbar title */
-            strlcpy(current_title[c->currextra], dptr->name,
-                    sizeof(current_title[0]));
+            strmemccpy(current_title[c->currextra], dptr->name,
+                       sizeof(current_title[0]));
             break;
 
         default:
@@ -2251,7 +2251,7 @@ char* tagtree_get_entry_name(struct tree_context *c, int id,
     struct tagentry *entry = tagtree_get_entry(c, id);
     if (!entry)
         return NULL;
-    strlcpy(buf, entry->name, bufsize);
+    strmemccpy(buf, entry->name, bufsize);
     return buf;
 }
 

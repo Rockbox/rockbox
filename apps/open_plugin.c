@@ -270,11 +270,11 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
         if (len > ROCK_LEN && strcasecmp(&(pos[len-ROCK_LEN]), "." ROCK_EXT) == 0)
         {
             /* path */
-            strlcpy(open_plugin_entry.path, plugin, OPEN_PLUGIN_BUFSZ);
+            strmemccpy(open_plugin_entry.path, plugin, OPEN_PLUGIN_BUFSZ);
 
             if(!parameter)
                 parameter = "";
-            strlcpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
+            strmemccpy(open_plugin_entry.param, parameter, OPEN_PLUGIN_BUFSZ);
             goto retnhash;
         }
         else if (len > OP_LEN && strcasecmp(&(pos[len-OP_LEN]), "." OP_EXT) == 0)

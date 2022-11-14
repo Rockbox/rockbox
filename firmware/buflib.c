@@ -30,7 +30,7 @@
 #include <stdio.h> /* for snprintf() */
 #include <stddef.h> /* for ptrdiff_t */
 #include "buflib.h"
-#include "string-extra.h" /* strlcpy() */
+#include "string-extra.h" /* strmemccpy() */
 #include "debug.h"
 #include "panic.h"
 #include "crc32.h"
@@ -974,7 +974,7 @@ buflib_alloc_maximum(struct buflib_context* ctx, const char* name, size_t *size,
     if (*size <= 0) /* OOM */
         return -1;
 
-    strlcpy(buf, name, sizeof(buf));
+    strmemccpy(buf, name, sizeof(buf));
 
     return buflib_alloc_ex(ctx, *size, buf, ops);
 }
