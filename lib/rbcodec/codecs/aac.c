@@ -130,9 +130,12 @@ enum codec_status codec_run(void)
 
     i = 0;
     
-    if (file_offset > 0) {
+    if (param) {
+        elapsed_time = param;
+        action = CODEC_ACTION_SEEK_TIME;
+    } else if (file_offset > 0) {
         /* Resume the desired (byte) position. Important: When resuming SBR
-         * upsampling files the resulting sound_samples_done must be expanded 
+         * upsampling files the resulting sound_samples_done must be expanded
          * by a factor of 2. This is done via using sbr_fac. */
         if (m4a_seek_raw(&demux_res, &input_stream, file_offset,
                           &sound_samples_done, (int*) &i)) {
@@ -142,9 +145,6 @@ enum codec_status codec_run(void)
         }
         NeAACDecPostSeekReset(decoder, i);
         elapsed_time = sound_samples_done * 1000LL / ci->id3->frequency;
-    } else if (param) {
-        elapsed_time = param;
-        action = CODEC_ACTION_SEEK_TIME;
     } else {
         elapsed_time = 0;
         sound_samples_done = 0;
