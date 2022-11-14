@@ -2135,7 +2135,9 @@ bool tagtree_insert_selection_playlist(int position, bool queue)
         if (newtable != PLAYTRACK)
         {
             logf("newtable: %d !!", newtable);
-            tc->dirlevel = dirlevel;
+            while (tc->dirlevel > dirlevel)
+                tagtree_exit(tc);
+            tagtree_load(tc);
             return false;
         }
     }
