@@ -1976,7 +1976,6 @@ int tagtree_enter(struct tree_context* c)
     if (reset_selection)
     {
         c->selected_item=0;
-        gui_synclist_select_item(&tree_lists, c->selected_item);
     }
 
     tree_unlock_cache(c);
@@ -1991,7 +1990,6 @@ void tagtree_exit(struct tree_context* c)
     if (c->dirlevel > 0)
         c->dirlevel--;
     c->selected_item=selected_item_history[c->dirlevel];
-    gui_synclist_select_item(&tree_lists, c->selected_item);
     c->currtable = table_history[c->dirlevel];
     c->currextra = extra_history[c->dirlevel];
 }
