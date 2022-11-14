@@ -54,13 +54,17 @@ static int volume_limit_callback(int action,
     (void)this_list;
 
     static struct int_setting volume_limit_int_setting;
-    volume_limit_int_setting.option_callback = NULL;
-    volume_limit_int_setting.unit = UNIT_DB;
-    volume_limit_int_setting.min = sound_min(SOUND_VOLUME);
-    volume_limit_int_setting.max = sound_max(SOUND_VOLUME);
-    volume_limit_int_setting.step = sound_steps(SOUND_VOLUME);
-    volume_limit_int_setting.formatter = vol_limit_format;
-    volume_limit_int_setting.get_talk_id = NULL;
+
+    volume_limit_int_setting = (struct int_setting)
+    {
+        .option_callback = NULL,
+        .unit = UNIT_DB,
+        .step = sound_steps(SOUND_VOLUME),
+        .min = sound_min(SOUND_VOLUME),
+        .max = sound_max(SOUND_VOLUME),
+        .formatter = vol_limit_format,
+        .get_talk_id = NULL
+    };
 
     struct settings_list setting;
     setting.flags = F_BANFROMQS|F_INT_SETTING|F_T_INT|F_NO_WRAP;

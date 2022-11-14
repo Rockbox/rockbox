@@ -154,9 +154,9 @@ static int32_t get_dec_talkid(int value, int unit)
 static const struct int_setting gain_int_setting = {
     .option_callback = NULL,
     .unit = UNIT_DB,
+    .step = EQ_GAIN_STEP,
     .min = EQ_GAIN_MIN,
     .max = EQ_GAIN_MAX,
-    .step = EQ_GAIN_STEP,
     .formatter = db_format,
     .get_talk_id = get_dec_talkid,
 };
@@ -164,9 +164,9 @@ static const struct int_setting gain_int_setting = {
 static const struct int_setting q_int_setting = {
     .option_callback = NULL,
     .unit = UNIT_INT,
+    .step = EQ_Q_STEP,
     .min = EQ_Q_MIN,
     .max = EQ_Q_MAX,
-    .step = EQ_Q_STEP,
     .formatter = eq_q_format,
     .get_talk_id = get_dec_talkid,
 };
@@ -174,9 +174,9 @@ static const struct int_setting q_int_setting = {
 static const struct int_setting cutoff_int_setting = {
     .option_callback = NULL,
     .unit = UNIT_HERTZ,
+    .step = EQ_CUTOFF_STEP,
     .min = EQ_CUTOFF_MIN,
     .max = EQ_CUTOFF_MAX,
-    .step = EQ_CUTOFF_STEP,
     .formatter = NULL,
     .get_talk_id = NULL,
 };

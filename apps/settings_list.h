@@ -69,10 +69,11 @@ struct filename_setting {
 
 struct int_setting {
     void (*option_callback)(int);
-    int unit;
+    int16_t unit;
+    int16_t step;
     int min;
     int max;
-    int step;
+
     const char* (*formatter)(char*, size_t, int, const char*);
     int32_t (*get_talk_id)(int, int);
 };

@@ -1180,9 +1180,14 @@ bool set_int_ex(const unsigned char* string,
 {
     (void)unit;
     struct settings_list item;
-    struct int_setting data = {
-        function, voice_unit, min, max, step,
-        formatter, get_talk_id
+    const struct int_setting data = {
+        .option_callback = function,
+        .unit = voice_unit,
+        .step = step,
+        .min = min,
+        .max = max,
+        .formatter = formatter,
+        .get_talk_id = get_talk_id,
     };
     item.int_setting = &data;
     item.flags = F_INT_SETTING|F_T_INT;
@@ -1212,9 +1217,14 @@ bool set_option(const char* string, const void* variable, enum optiontype type,
 {
     int temp;
     struct settings_list item;
-    struct int_setting data = {
-        function, UNIT_INT, 0, numoptions-1, 1,
-        set_option_formatter, set_option_get_talk_id
+    const struct int_setting data = {
+        .option_callback = function,
+        .unit = UNIT_INT,
+        .step = 1,
+        .min = 0,
+        .max = numoptions-1,
+        .formatter = set_option_formatter,
+        .get_talk_id = set_option_get_talk_id
     };
     memset(&item, 0, sizeof(struct settings_list));
     set_option_options = options;
