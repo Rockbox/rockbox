@@ -126,8 +126,8 @@ static bool clipboard_clip(struct clipboard *clip, const char *path,
                            unsigned int attr, unsigned int flags)
 {
     /* if it fits it clips */
-    if (strlcpy(clip->path, path, sizeof (clip->path))
-            < sizeof (clip->path)) {
+    if (strmemccpy(clip->path, path, sizeof (clip->path)) != NULL)
+    {
         clip->attr = attr;
         clip->flags = flags;
         return true;
@@ -1048,7 +1048,7 @@ static int rename_file(void)
     size_t pathlen = oldbase - selection;
     char *newbase = newname + pathlen;
 
-    if (strlcpy(newname, selection, sizeof (newname)) >= sizeof (newname)) {
+    if (strmemccpy(newname, selection, sizeof (newname)) == NULL) {
         /* Too long */
     } else if (kbd_input(newbase, sizeof (newname) - pathlen, NULL) < 0) {
         rc = OPRC_CANCELLED;

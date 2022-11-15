@@ -1400,7 +1400,7 @@ static int get_filename(struct playlist_info* playlist, int index, int seek,
     
     if (playlist->in_ram && !control_file && max < 0)
     {
-        max = strlcpy(tmp_buf, (char*)&playlist->buffer[seek], sizeof(tmp_buf));
+        strmemccpy(tmp_buf, (char*)&playlist->buffer[seek], sizeof(tmp_buf));
     }
     else if (max < 0)
     {

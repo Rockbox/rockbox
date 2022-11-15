@@ -511,10 +511,10 @@ char *getcwd(char *buf, getcwd_size_t size)
         return tc.currdir;
     else if (size)
     {
-        if ((getcwd_size_t)strlcpy(buf, tc.currdir, size) < size)
+        if (strmemccpy(buf, tc.currdir, size) != NULL)
             return buf;
     }
-    /* size == 0, or truncation in strlcpy */
+    /* size == 0, or truncation in strmemccpy */
     return NULL;
 }
 

@@ -39,6 +39,12 @@
 #define USE_JPEG_COVER
 #endif
 
+#ifdef PLUGIN
+    #define strmemccpy strlcpy
+    /* Note we don't use the return value so this works */
+    /* FIXME if strmemccpy gets added to the rb->plugin struct */
+#endif
+
 /* Strip filename from a full path
  *
  * buf      - buffer to extract directory to.

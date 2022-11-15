@@ -24,6 +24,7 @@
 #include "filetree.h"
 #include "wps.h"
 #include "playback.h"
+#include "string-extra.h"
 
 /*
  * This macro is meant to be used inside an IAP mode message handler.
@@ -1430,7 +1431,6 @@ void iap_handlepkt_mode4(const unsigned int len, const unsigned char *buf)
             unsigned int number_of_playlists = nbr_total_playlists();
             uint32_t trackcount;
             trackcount = playlist_amount();
-            size_t len;
 
             if ((buf[3] == 0x05) && ((start_index + read_count ) > trackcount))
             {
