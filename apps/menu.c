@@ -522,16 +522,17 @@ int do_menu(const struct menu_item_ex *start_menu, int *start_selected,
                     MENUITEM_STRINGLIST(notquickscreen_able_option,
                                         ID2P(LANG_ONPLAY_MENU_TITLE), NULL,
                                         ID2P(LANG_RESET_SETTING));
+                    const struct menu_item_ex *context_menu;
                     const struct settings_list *setting =
                             find_setting(temp->variable, NULL);
 #ifdef HAVE_QUICKSCREEN
                     if (is_setting_quickscreenable(setting))
-                        menu = &quickscreen_able_option;
+                        context_menu = &quickscreen_able_option;
                     else
 #endif
-                        menu = &notquickscreen_able_option;
+                        context_menu = &notquickscreen_able_option;
 
-                    int msel = do_menu(menu, NULL, NULL, false);
+                    int msel = do_menu(context_menu, NULL, NULL, false);
 
                     switch (msel)
                     {
