@@ -1,4 +1,5 @@
 warble.c
+../../../firmware/common/strmemccpy.c
 ../../../firmware/common/strlcpy.c
 ../../../firmware/common/unicode.c
 ../../../firmware/common/structec.c
