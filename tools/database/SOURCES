@@ -4,6 +4,7 @@ database.c
 ../../apps/tagcache.c
 ../../firmware/common/crc32.c
 ../../firmware/common/pathfuncs.c
+../../firmware/common/strmemccpy.c
 ../../firmware/common/strlcpy.c
 ../../firmware/common/strcasestr.c
 ../../firmware/common/structec.c

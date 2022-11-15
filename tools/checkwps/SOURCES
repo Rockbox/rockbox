@@ -3,6 +3,7 @@
 ../../apps/gui/skin_engine/skin_backdrops.c
 ../../apps/gui/viewport.c
 ../../apps/misc.c
+../../firmware/common/strmemccpy.c
 ../../firmware/common/strlcpy.c
 ../../firmware/common/pathfuncs.c
 ../../firmware/asm/mempcpy.c
