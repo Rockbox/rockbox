@@ -1694,12 +1694,6 @@
     *: "Random"
   </voice>
 </phrase>
-### The 'desc' field for 'LANG_AUDIOSCROBBLER' differs from the english!
-### the previously used desc is commented below:
-### desc: "Last.fm Log" in the playback menu
-### The <source> section for 'LANG_AUDIOSCROBBLER:*' differs from the english!
-### the previously used one is commented below:
-### Last.fm Logger
 <phrase>
   id: LANG_AUDIOSCROBBLER
   desc: "Last.fm Logger" in Plugin/apps/scrobbler
@@ -16099,7 +16093,6 @@
     *: "Descending"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_ALBUM_ART
   desc: in Settings
@@ -16114,7 +16107,6 @@
     *: "Album Art"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PREFER_EMBEDDED
   desc: in Settings
@@ -16129,7 +16121,6 @@
     *: "Prefer Embedded"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PREFER_IMAGE_FILE
   desc: in Settings
@@ -16144,7 +16135,6 @@
     *: "Prefer Image File"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_FM_SYNC_RDS_TIME
   desc: in radio screen and Settings
@@ -16162,7 +16152,6 @@
     rds: "Sync RDS Time"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_SORT_ALBUMS_BY
   desc: in Settings
@@ -16177,7 +16166,6 @@
     *: "Sort albums by"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_ARTIST_PLUS_NAME
   desc: in Settings
@@ -16192,7 +16180,6 @@
     *: "Artist And Name"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_ARTIST_PLUS_YEAR
   desc: in Settings
@@ -16207,7 +16194,6 @@
     *: "Artist And Year"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_YEAR_SORT_ORDER
   desc: in Settings
@@ -16222,7 +16208,6 @@
     *: "Year sort order"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_SHOW_YEAR_IN_ALBUM_TITLE
   desc: in Settings
@@ -16237,7 +16222,6 @@
     *: "Show year in album title"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_WAIT_FOR_CACHE
   desc: in Settings
@@ -16252,7 +16236,6 @@
     *: "Cache needs to finish updating first!"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_TRACK_INFO
   desc: Track Info Title
@@ -16267,7 +16250,6 @@
     *: "Track Info"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PLAY
   desc: play selected file/directory, in playlist context menu
@@ -16282,7 +16264,6 @@
     *: "Play"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_PLAY_SHUFFLED
   desc: play selected files in shuffled order, in playlist context menu
@@ -16297,7 +16278,6 @@
     *: "Play Shuffled"
   </voice>
 </phrase>
-### This phrase is missing entirely, copying from english!
 <phrase>
   id: LANG_KEEP_CURRENT_TRACK_ON_REPLACE
   desc: used in the playlist settings menu
@@ -16310,5 +16290,39 @@
   </dest>
   <voice>
     *: "Keep Current Track When Replacing Playlist"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_CLEAR_SETTINGS_ON_HOLD
+  desc: in the system sub menu
+  user: core
+  <source>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </source>
+  <dest>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </dest>
+  <voice>
+    *: none
+    clear_settings_on_hold,iriverh10: "Clear settings when reset button is held during startup"
+    ipod4g,ipodcolor,ipodmini1g,ipodmini2g,ipodnano1g,ipodvideo: "Clear settings when hold switch is on during startup"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_REWIND_ACROSS_TRACKS
+  desc: in playback settings menu
+  user: core
+  <source>
+    *: "Rewind Across Tracks"
+  </source>
+  <dest>
+    *: "Rewind Across Tracks"
+  </dest>
+  <voice>
+    *: "Rewind across tracks"
   </voice>
 </phrase>
