@@ -22,7 +22,7 @@
 #include "config.h"
 #include "system.h"
 #include "sys/types.h"
-#include <string.h>
+#include "string-extra.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>

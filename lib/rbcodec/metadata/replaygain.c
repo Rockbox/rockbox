@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include <inttypes.h>
 #include "platform.h"
-#include "strlcpy.h"
+#include "string-extra.h"
 #include "strcasecmp.h"
 #include "metadata.h"
 #include "debug.h"

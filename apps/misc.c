@@ -1387,7 +1387,7 @@ int split_string(char *str, const char split_char, char *vector[], const int vec
     char sep[2] = {split_char, '\0'};
     char *e, *p = strtok_r(str, sep, &e);
 
-    /* *p in the condition takes care of trailing splitters */
+    /* strtok takes care of leading & trailing splitters */
     for(i = 0; i < vector_length; i++)
     {
         vector[i] = p;

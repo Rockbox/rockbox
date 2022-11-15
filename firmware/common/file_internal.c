@@ -227,6 +227,7 @@ void iso_decode_d_name(char *d_name)
         return;
 
     char shortname[13];
+    /* this only gets called in the case of DOS (8.3) filenames */
     size_t len = strlcpy(shortname, d_name, sizeof (shortname));
     /* This MUST be the default codepage thus not something that could be
        loaded on call */

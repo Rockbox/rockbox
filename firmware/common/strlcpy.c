@@ -34,6 +34,6 @@ size_t strlcpy(char *dst, const char *src, size_t siz)
     if (d)
         return (d - dst - 1); /* count does not include NUL */
 
-    /* Not enough room in dst, add NUL and traverse rest of src */
+    /* Not enough room in dst, traverse rest of src */
     return(siz + strlen(src+siz)); /* count does not include NUL */
 }
