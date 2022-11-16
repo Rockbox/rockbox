@@ -249,9 +249,11 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->button_get(true);
 
+    rb->screens[SCREEN_MAIN]->scroll_stop();
     /* Restore the default viewport */
     rb->screens[SCREEN_MAIN]->set_viewport(NULL);
 #ifdef HAVE_REMOTE_LCD
+    rb->screens[SCREEN_REMOTE]->scroll_stop();
     rb->screens[SCREEN_REMOTE]->set_viewport(NULL);
 #endif
 
