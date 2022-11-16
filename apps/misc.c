@@ -1384,20 +1384,16 @@ void format_time(char* buf, int buf_size, long t)
 int split_string(char *str, const char split_char, char *vector[], const int vector_length)
 {
     int i;
-    char *p = str;
-
-    /* skip leading splitters */
-    while(*p == split_char) p++;
+    char sep[2] = {split_char, '\0'};
+    char *e, *p = strtok_r(str, sep, &e);
 
     /* *p in the condition takes care of trailing splitters */
-    for(i = 0; p && *p && i < vector_length; i++)
+    for(i = 0; i < vector_length; i++)
     {
         vector[i] = p;
-        if ((p = strchr(p, split_char)))
-        {
-            *p++ = '\0';
-            while(*p == split_char) p++; /* skip successive splitters */
-        }
+        if (!p)
+            break;
+        p = strtok_r(NULL, sep, &e);
     }
 
     return i;
