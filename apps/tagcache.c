@@ -4333,11 +4333,11 @@ static bool load_tagcache(void)
                 unsigned int searchflag = auto_update ? DCS_STORAGE_PATH :
                                                         DCS_CACHED_PATH;
 
-                rc = dircache_search(searchflag | DCS_UPDATE_FILEREF,
-                                         &tcrc_dcfrefs[idx_id], filename);
-                if (rc > 0)           /* in cache and we have fileref */
+                int rc_cache = dircache_search(searchflag | DCS_UPDATE_FILEREF,
+                                               &tcrc_dcfrefs[idx_id], filename);
+                if (rc_cache > 0)           /* in cache and we have fileref */
                     idx->flag |= FLAG_DIRCACHE;
-                else if (rc == 0)     /* not in cache but okay */
+                else if (rc_cache == 0)     /* not in cache but okay */
                     ;
                 else if (auto_update)
             #else /* ndef HAVE_DIRCACHE */
