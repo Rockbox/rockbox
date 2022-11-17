@@ -180,6 +180,9 @@ static struct albumart_slot
     int used;           /* Counter; increments if something uses it */
 } albumart_slots[MAX_MULTIPLE_AA]; /* (A,O) */
 
+static char last_folder_aa_path[MAX_PATH] = "\0";
+static int last_folder_aa_hid[MAX_MULTIPLE_AA] = {0};
+
 #define FOREACH_ALBUMART(i) for (int i = 0; i < MAX_MULTIPLE_AA; i++)
 #endif /* HAVE_ALBUMART */
 
@@ -590,6 +593,20 @@ static bool track_list_commit_buf_info(struct track_buf_info *tbip,
     return true;
 }
 
+#ifdef HAVE_ALBUMART
+static inline void clear_cached_aa_handles(int* aa_handles)
+{
+    if (last_folder_aa_path[0] == 0)
+        return;
+
+    FOREACH_ALBUMART(i)
+    {
+        if (aa_handles[i] == last_folder_aa_hid[i])
+            aa_handles[i] = 0;
+    }
+}
+#endif //HAVE_ALBUMART
+
 /* Free the track buffer entry and possibly remove it from the list if it
    was succesfully added at some point */
 static void track_list_free_buf_info(struct track_buf_info *tbip)
@@ -631,6 +648,9 @@ static void track_list_free_buf_info(struct track_buf_info *tbip)
     /* No movement allowed during bufclose calls */
     buf_pin_handle(hid, true);
 
+#ifdef HAVE_ALBUMART
+    clear_cached_aa_handles(tbip->info.aa_hid);
+#endif
     FOR_EACH_TRACK_INFO_HANDLE(i)
         bufclose(tbip->info.handle[i]);
 
@@ -818,6 +838,21 @@ size_t audio_buffer_available(void)
     return MAX(core_size, size);
 }
 
+#ifdef HAVE_ALBUMART
+static void clear_last_folder_album_art(void)
+{
+    if(last_folder_aa_path[0] == 0)
+        return;
+
+    last_folder_aa_path[0] = 0;
+    FOREACH_ALBUMART(i)
+    {
+        bufclose(last_folder_aa_hid[i]);
+        last_folder_aa_hid[i] = 0;
+    }
+}
+#endif
+
 /* Set up the audio buffer for playback
  * filebuflen must be pre-initialized with the maximum size */
 static void audio_reset_buffer_noalloc(
@@ -853,6 +888,10 @@ static void audio_reset_buffer_noalloc(
     scratch_mem_init(filebuf);
     filebuf += allocsize;
     filebuflen -= allocsize;
+
+#ifdef HAVE_ALBUMART
+    clear_last_folder_album_art();
+#endif
 
     buffering_reset(filebuf, filebuflen);
 
@@ -1695,9 +1734,31 @@ void set_albumart_mode(int setting)
     albumart_mode = setting;
 }
 
+static int load_album_art_from_path(char *path, struct bufopen_bitmap_data *user_data, bool is_current_track, int i)
+{
+    user_data->embedded_albumart = NULL;
+
+    bool same_path = strcmp(last_folder_aa_path, path) == 0;
+    if (same_path && last_folder_aa_hid[i] != 0)
+        return last_folder_aa_hid[i];
+
+    // To simplify caching logic a bit we keep track only for first AA path
+    // If other album arts use different path (like dimension specific arts) just skip caching for them
+    bool is_cacheable = i == 0 && (is_current_track || last_folder_aa_path[0] == 0);
+    if (!same_path && is_cacheable)
+    {
+        clear_last_folder_album_art();
+        strcpy(last_folder_aa_path, path);
+    }
+    int hid = bufopen(path, 0, TYPE_BITMAP, user_data);
+    if (hid != ERR_BUFFER_FULL && (same_path || is_cacheable))
+        last_folder_aa_hid[i] = hid;
+    return hid;
+}
+
 /* Load any album art for the file - returns false if the buffer is full */
 static int audio_load_albumart(struct track_info *infop,
-                                struct mp3entry *track_id3)
+                                struct mp3entry *track_id3, bool is_current_track)
 {
     FOREACH_ALBUMART(i)
     {
@@ -1721,8 +1782,7 @@ static int audio_load_albumart(struct track_info *infop,
             if (find_albumart(track_id3, path, sizeof(path),
                           &albumart_slots[i].dim))
             {
-                user_data.embedded_albumart = NULL;
-                hid = bufopen(path, 0, TYPE_BITMAP, &user_data);
+                hid = load_album_art_from_path(path, &user_data, is_current_track, i);
             }
             checked_image_file = true;
         }
@@ -1732,6 +1792,8 @@ static int audio_load_albumart(struct track_info *infop,
             hid < 0 && hid != ERR_BUFFER_FULL &&
             track_id3->has_embedded_albumart && track_id3->albumart.type == AA_TYPE_JPG)
         {
+            if (is_current_track)
+                clear_last_folder_album_art();
             user_data.embedded_albumart = &track_id3->albumart;
             hid = bufopen(track_id3->path, 0, TYPE_BITMAP, &user_data);
         }
@@ -1743,8 +1805,7 @@ static int audio_load_albumart(struct track_info *infop,
             if (find_albumart(track_id3, path, sizeof(path),
                               &albumart_slots[i].dim))
             {
-                user_data.embedded_albumart = NULL;
-                hid = bufopen(path, 0, TYPE_BITMAP, &user_data);
+                hid = load_album_art_from_path(path, &user_data, is_current_track, i);
             }
         }
 
@@ -2037,7 +2098,7 @@ static int audio_finish_load_track(struct track_info *infop)
 
 #ifdef HAVE_ALBUMART
     /* Try to load album art for the track */
-    int retval = audio_load_albumart(infop, track_id3);
+    int retval = audio_load_albumart(infop, track_id3, infop->self_hid == cur_info.self_hid);
     if (retval == ERR_BITMAP_TOO_LARGE)
     {
         /* No space for album art on buffer because the file is larger than the buffer.
@@ -2876,7 +2937,9 @@ static void audio_stop_playback(void)
     play_status = PLAY_STOPPED;
 
     wipe_track_metadata(true);
-
+#ifdef HAVE_ALBUMART
+    clear_last_folder_album_art();
+#endif
     /* Go idle */
     filling = STATE_IDLE;
     cancel_cpu_boost();
