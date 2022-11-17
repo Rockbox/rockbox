@@ -122,7 +122,8 @@ compare_left(char const *a, char const *b)
      return 0;
 }
 
-static int strnatcmp0(char const *a, char const *b, int fold_case)
+static int strnatcmp0(char const *a, char const *b,
+                      int (*cmp_fn)(const char*, const char*))
 {
      int ai, bi;
      int ca, cb;
@@ -150,13 +151,10 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
           if (!ca && !cb) {
                /* The strings compare the same.  Call str[case]cmp() to ensure
                   consistent results. */
-               if(fold_case)
-                   return strcasecmp(a,b);
-               else
-                   return strcmp(a,b);
+                   return cmp_fn(a,b);
           }
 
-          if (fold_case) {
+          if (cmp_fn == &strcasecmp) {
                ca = nat_unify_case(ca);
                cb = nat_unify_case(cb);
           }
@@ -170,14 +168,12 @@ static int strnatcmp0(char const *a, char const *b, int fold_case)
      }
 }
 
-
-
 int strnatcmp(const char *a, const char *b) {
-     return strnatcmp0(a, b, 0);
+     return strnatcmp0(a, b, strcmp);
 }
 
 
 /* Compare, recognizing numeric string and ignoring case. */
 int strnatcasecmp(const char *a, const char *b) {
-     return strnatcmp0(a, b, 1);
+     return strnatcmp0(a, b, &strcasecmp);
 }
