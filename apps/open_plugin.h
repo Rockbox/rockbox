@@ -40,8 +40,9 @@ enum {
     OPEN_PLUGIN_LANG_INVALID    = (-1),
     OPEN_PLUGIN_LANG_IGNORE     = (-2),
     OPEN_PLUGIN_LANG_IGNOREALL  = (-3),
-    OPEN_PLUGIN_NOT_FOUND     = (-1),
-    OPEN_PLUGIN_NEEDS_FLUSHED = (-2),
+    OPEN_PLUGIN_INVALID_ENTRY = (-1),
+    OPEN_PLUGIN_NOT_FOUND     = (-2),
+    OPEN_PLUGIN_NEEDS_FLUSHED = (-3),
 };
 
 struct open_plugin_entry_t

@@ -730,6 +730,8 @@ static int load_plugin_screen(char *key)
         char *param = open_plugin_entry.param;
         if (param[0] == '\0')
             param = NULL;
+        if (path[0] == '\0' && key)
+            path = P2STR((unsigned char *)key);
 
         int ret = plugin_load(path, param);
 

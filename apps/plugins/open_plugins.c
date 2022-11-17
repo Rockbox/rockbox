@@ -87,6 +87,15 @@ static size_t pathbasename(const char *name, const char **nameptr)
     *nameptr = q;
     return r - q;
 }
+static int op_entry_checksum(void)
+{
+    if (op_entry.checksum != open_plugin_csum +
+        (op_entry.lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY))
+    {
+        return 0;
+    }
+    return 1;
+}
 
 static bool op_entry_read(int fd, int selected_item, off_t data_sz)
 {
@@ -94,21 +103,12 @@ static bool op_entry_read(int fd, int selected_item, off_t data_sz)
     op_entry.lang_id = -1;
     return ((selected_item >= 0) &&
         (rb->lseek(fd, selected_item  * op_entry_sz, SEEK_SET) >= 0) &&
-        (rb->read(fd, &op_entry, data_sz) == data_sz));
+        (rb->read(fd, &op_entry, data_sz) == data_sz) && op_entry_checksum() > 0);
 }
 
 static bool op_entry_read_name(int fd, int selected_item)
 {
     return op_entry_read(fd, selected_item, op_name_sz);
-}
-
-static int op_entry_checksum(void)
-{
-    if (op_entry.checksum != open_plugin_csum)
-    {
-        return 0;
-    }
-    return 1;
 }
 
 static int op_entry_read_opx(const char *path)
@@ -174,7 +174,8 @@ failure:
 
 static void op_entry_set_checksum(void)
 {
-        op_entry.checksum = open_plugin_csum;
+        op_entry.checksum = open_plugin_csum +
+        (op_entry.lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
 }
 
 static void op_entry_set_name(void)
@@ -466,7 +467,7 @@ static void op_entry_remove_empty(void)
         while (resave == false &&
                rb->read(fd_dat, &op_entry, op_entry_sz) == op_entry_sz)
         {
-            if (op_entry.hash == 0)
+            if (op_entry.hash == 0 || !op_entry_checksum())
                 resave = true;
         }
     }
@@ -837,6 +838,12 @@ reopen_datfile:
                 }
             }
         }/* OP_EXT */
+    }
+
+    for (int i = items - 1; i > 0 && !exit; i--)
+    {
+        if (!op_entry_read(fd_dat, i, op_entry_sz))
+            items--;
     }
 
     if (items < 1 && !exit)

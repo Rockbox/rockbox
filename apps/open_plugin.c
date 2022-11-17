@@ -28,7 +28,7 @@
 #include "lang.h"
 
 /* Define LOGF_ENABLE to enable logf output in this file */
-//#define LOGF_ENABLE
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 #define ROCK_EXT "rock"
@@ -60,8 +60,12 @@ static inline void op_clear_entry(struct open_plugin_entry_t *entry)
 
 static int op_entry_checksum(struct open_plugin_entry_t *entry)
 {
-    if (entry == NULL || entry->checksum != open_plugin_csum)
+    if (entry == NULL || entry->checksum != open_plugin_csum +
+        (entry->lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY))
+    {
+        logf("OP entry bad checksum");
         return 0;
+    }
     return 1;
 }
 
@@ -81,6 +85,14 @@ static int op_find_entry(int fd, struct open_plugin_entry_t *entry,
             if (entry->lang_id == lang_id || entry->hash == hash ||
                (lang_id == OPEN_PLUGIN_LANG_IGNOREALL))/* return first entry found */
             {
+#if (CONFIG_STORAGE & STORAGE_ATA)
+                /* may have invalid entries but we append the file so continue looking*/
+                if (op_entry_checksum(entry) <= 0)
+                {
+                    ret = OPEN_PLUGIN_INVALID_ENTRY;
+                    continue;
+                }
+#endif
                 ret = record;
                 /* NULL terminate fields NOTE -- all are actually +1 larger */
                 entry->name[OPEN_PLUGIN_NAMESZ] = '\0';
@@ -98,7 +110,12 @@ static int op_find_entry(int fd, struct open_plugin_entry_t *entry,
     }
 
     /* sanity check */
-    if (ret > OPEN_PLUGIN_NOT_FOUND && op_entry_checksum(entry) <= 0)
+#if (CONFIG_STORAGE & STORAGE_ATA)
+    if (ret == OPEN_PLUGIN_INVALID_ENTRY ||
+#else
+    if(
+#endif
+       (ret > OPEN_PLUGIN_NOT_FOUND && op_entry_checksum(entry) <= 0))
     {
         splash(HZ * 2, "OpenPlugin Invalid entry");
         ret = OPEN_PLUGIN_NOT_FOUND;
@@ -144,7 +161,7 @@ static int op_update_dat(struct open_plugin_entry_t *entry, bool clear)
              hash_langid_csum[2] == open_plugin_csum)
         {
             logf("OP update *Entry Exists* hash: %x langid: %d",
-                hash_langid_csum[0], (int32_t)hash_langid[1]);
+                hash_langid_csum[0], (int32_t)hash_langid_csum[1]);
             lseek(fd, 0-hlc_sz, SEEK_CUR);/* back to the start of record */
             break;
         }
@@ -261,7 +278,8 @@ uint32_t open_plugin_add_path(const char *key, const char *plugin, const char *p
     {
         open_plugin_entry.hash     = hash;
         open_plugin_entry.lang_id  = lang_id;
-        open_plugin_entry.checksum = open_plugin_csum;
+        open_plugin_entry.checksum = open_plugin_csum +
+            (lang_id <= OPEN_PLUGIN_LANG_INVALID ? 0 : LANG_LAST_INDEX_IN_ARRAY);
         /* name */
         if (path_basename(plugin, (const char **)&pos) == 0)
             pos = "\0";
@@ -337,7 +355,7 @@ int open_plugin_get_entry(const char *key, struct open_plugin_entry_t *entry)
     opret = op_get_entry(hash, lang_id, entry, OPEN_PLUGIN_DAT);
     logf("OP entry hash: %x lang id: %d ret: %d key: %s", hash, lang_id, opret, skey);
 
-    if (opret == OPEN_PLUGIN_NOT_FOUND && lang_id > OPEN_PLUGIN_LANG_INVALID) 
+    if (opret == OPEN_PLUGIN_NOT_FOUND && lang_id > OPEN_PLUGIN_LANG_INVALID)
     {   /* try rb defaults */
         opret = op_get_entry(hash, lang_id, entry, OPEN_RBPLUGIN_DAT);
         logf("OP rb_entry hash: %x lang id: %d ret: %d key: %s", hash, lang_id, opret, skey);
@@ -364,6 +382,8 @@ int open_plugin_run(const char *key)
 
     if (param[0] == '\0')
         param = NULL;
+    if (path[0] == '\0' && key)
+        path = P2STR((unsigned char *)key);
 
     ret = plugin_load(path, param);
 
