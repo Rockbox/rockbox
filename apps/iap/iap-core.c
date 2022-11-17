@@ -19,8 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <string.h>
 
+#include "string-extra.h"
 #include "panic.h"
 #include "iap-core.h"
 #include "iap-lingo.h"
