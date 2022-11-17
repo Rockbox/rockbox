@@ -41,7 +41,7 @@ int write_bootdata(unsigned char* buf, int len, unsigned int boot_volume)
     int payload_len = EKEY_NOT_FOUND;
 
     /* search for boot data header prior to search_len */
-    for(int i = 0;i < search_len;i++)
+    for(int i = 0; i < search_len; i++)
     {
         fw_boot_data = (struct boot_data_t*) &buf[i];
         if (fw_boot_data->magic[0] != BOOT_DATA_MAGIC0 ||
@@ -83,7 +83,7 @@ int get_redirect_dir(char* buf, int buffer_size, int volume,
                      const char* rootdir, const char* firmware)
 {
     int fd;
-    int f_offset;
+    size_t f_offset;
     char add_path[MAX_PATH];
     /* Check in root of volume for rockbox_main.<playername> redirect */
     snprintf(add_path, sizeof(add_path), "/<%d>/"BOOT_REDIR, volume);
@@ -96,7 +96,7 @@ int get_redirect_dir(char* buf, int buffer_size, int volume,
     f_offset = read(fd, add_path,sizeof(add_path));
     close(fd);
 
-    for(int i = f_offset - 1;i > 0; i--)
+    for(size_t i = f_offset - 1; i < f_offset; i--)
     {
         /* strip control chars < SPACE or all if path doesn't start with '/' */
         if (add_path[i] < 0x20 || add_path[0] != '/')
