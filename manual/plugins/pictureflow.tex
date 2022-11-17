@@ -1,9 +1,10 @@
 \subsection{PictureFlow}
 \screenshot{plugins/images/ss-pictureflow}{PictureFlow}{img:pictureflow}
 PictureFlow is a visual browser for your albums.  After you've selected something to play,
-PictureFlow will continue running by default, or can show the WPS. The optional WPS
-integration enables access to a context menu for adding albums or songs
-to the dynamic playlist directly from PictureFlow (see \reference{ref:currentplaylist_submenu}).
+PictureFlow will continue running by default, or can optionally show the WPS. Using the
+context menu, albums or songs can be added to the dynamic playlist directly from
+PictureFlow (see \reference{ref:currentplaylist_submenu}).
+
 
 \subsubsection{Sort Options}
 Albums can be sorted by:
@@ -37,8 +38,8 @@ reduces the time it takes for cover art to be displayed.}}
     background. An indicator in the screen corner shows you the completed percentage.
     When the cache is being built, the UI may be slow to react to your input.
     For optimal performance, wait for processing to complete.
-    \item Each time you update your player's database, you should manually rebuild or
-    update the cache in PictureFlow.
+    \item Each time you update your player's database, you should also update the cache
+    in PictureFlow.
     \item PictureFlow will accept album art larger than the dimensions of the
     screen, but the larger the dimensions, the longer they will take to scale.
   \end{itemize}
@@ -93,8 +94,11 @@ reduces the time it takes for cover art to be displayed.}}
                 Quickly jump to another album (alphabetically or by year)
                 \\
         }
-        \opt{FIIO_M3K_PAD}{
-                \ButtonVolUp{} / \ButtonVolDown
+        \opt{FIIO_M3K_PAD,IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
+                \opt{FIIO_M3K_PAD}{\ButtonVolUp{} / \ButtonVolDown}
+                \opt{IPOD_4G_PAD,IPOD_3G_PAD,IPOD_1G2G_PAD}{
+                     \ButtonSelect{} + \ButtonMenu{} / \ButtonSelect{} + \ButtonPlay
+                }
                 &
                 \opt{HAVEREMOTEKEYMAP}{&}
                 Adjust current album sorting
@@ -150,7 +154,7 @@ reduces the time it takes for cover art to be displayed.}}
         \ActionStdContext
             &
         \opt{HAVEREMOTEKEYMAP}{&}
-        Enter context menu (if WPS integration is enabled)
+        Enter context menu
             \\
 
         \nopt{IAUDIO_M3_PAD,SANSA_FUZEPLUS_PAD,FIIO_M3K_PAD}{\ActionStdMenu}
@@ -224,7 +228,6 @@ reduces the time it takes for cover art to be displayed.}}
   \item[Rebuild cache.] Creates a fresh album index and builds the artwork cache from scratch.
   \item[Update cache.] Creates a fresh album index and updates the existing artwork cache to
   include newly added albums.
-  \item[WPS integration.] Integrate PictureFlow with the While Playing Screen and enable
-  the Current Playlist context menu.
+  \item[WPS integration.] Integrate PictureFlow with the While Playing Screen.
   \item[Backlight.] Force backlight on while running pictureflow.
 \end{description}

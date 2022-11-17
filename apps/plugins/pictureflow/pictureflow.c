@@ -151,8 +151,11 @@ const struct button_mapping pf_context_buttons[] =
     {PF_QUIT,         BUTTON_POWER,               BUTTON_NONE},
 #elif (CONFIG_KEYPAD == IPOD_1G2G_PAD) \
     || (CONFIG_KEYPAD == IPOD_3G_PAD) \
-    || (CONFIG_KEYPAD == IPOD_4G_PAD) \
-    || (CONFIG_KEYPAD == MPIO_HD300_PAD)
+    || (CONFIG_KEYPAD == IPOD_4G_PAD)
+    {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
+    {PF_SORTING_NEXT, BUTTON_SELECT|BUTTON_MENU,  BUTTON_NONE},
+    {PF_SORTING_PREV, BUTTON_SELECT|BUTTON_PLAY,  BUTTON_NONE},
+#elif CONFIG_KEYPAD == MPIO_HD300_PAD
     {PF_QUIT,         BUTTON_MENU|BUTTON_REPEAT,  BUTTON_MENU},
 #elif CONFIG_KEYPAD == IAUDIO_M3_PAD
     {PF_QUIT,         BUTTON_RC_REC,              BUTTON_NONE},
@@ -3232,6 +3235,12 @@ static bool sort_albums(int new_sorting, bool from_settings)
     {
 #ifdef USEGSLIB
         grey_show(false);
+#if LCD_DEPTH > 1
+        rb->lcd_set_background(N_BRIGHT(0));
+        rb->lcd_set_foreground(N_BRIGHT(255));
+#endif
+        rb->lcd_clear_display();
+        rb->lcd_update();
 #endif
         rb->splash(HZ, sort_options[pf_cfg.sort_albums_by]);
 #ifdef USEGSLIB
