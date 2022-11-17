@@ -253,7 +253,9 @@ static int lua_rev_callback(lua_State *L, struct cb_data *evt)
     lua_pushlightuserdata(L, evt->data);
 
     lua_status = lua_resume(L, 2); /* call the saved function */
-    if (lua_status == LUA_YIELD) /* coroutine.yield() disallowed */
+    if (lua_status == LUA_SUCCESS)
+            lua_settop(L, 0); /* eat any value(s) returned */
+    else if (lua_status == LUA_YIELD) /* coroutine.yield() disallowed */
         luaL_where(L, 1); /* push error string on stack */
 
     return lua_status;
