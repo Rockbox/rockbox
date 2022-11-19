@@ -883,7 +883,8 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 else
                 {
                     exit = true;
-                    ret = PLAYLIST_VIEWER_CANCEL;
+                    ret = button == ACTION_TREE_WPS ?
+                                    PLAYLIST_VIEWER_OK : PLAYLIST_VIEWER_CANCEL;
                 }
                 break;
             }

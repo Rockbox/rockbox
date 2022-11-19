@@ -161,7 +161,9 @@ static int display_playlists(char* playlist, bool view)
 
 restart:
     browse.flags &= ~BROWSE_SELECTED;
-    if (rockbox_browse(&browse) == GO_TO_WPS)
+    int browse_ret = rockbox_browse(&browse);
+    if (browse_ret == GO_TO_WPS
+        || (view && browse_ret == GO_TO_PREVIOUS_MUSIC))
         result = 0;
 
     if (browse.flags & BROWSE_SELECTED)
