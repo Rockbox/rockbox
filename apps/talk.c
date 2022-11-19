@@ -776,6 +776,9 @@ static int _talk_spell(const char* spell, size_t len, bool enqueue)
             talk_id(VOICE_PAUSE, true);
         else if (c == '/')
             talk_id(VOICE_CHAR_SLASH, true);
+
+        while (QUEUE_LEVEL == QUEUE_SIZE - 1) /* queue full - busy loop */
+            yield();
     }
     return 0;
 }
