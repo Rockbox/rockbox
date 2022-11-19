@@ -76,6 +76,7 @@ enum direction
 enum pv_onplay_result {
     PV_ONPLAY_USB,
     PV_ONPLAY_USB_CLOSED,
+    PV_ONPLAY_WPS_CLOSED,
     PV_ONPLAY_CLOSED,
     PV_ONPLAY_ITEM_REMOVED,
     PV_ONPLAY_CHANGED,
@@ -519,9 +520,17 @@ static enum pv_onplay_result open_with(const struct playlist_entry *current_trac
 
     strmemccpy(selected_track, current_track->name, sizeof(selected_track));
 
+    int plugin_return = filetype_list_viewers(selected_track);
 
-    return (filetype_list_viewers(selected_track) ==
-                PLUGIN_USB_CONNECTED ? PV_ONPLAY_USB_CLOSED : PV_ONPLAY_CLOSED);
+    switch (plugin_return)
+    {
+        case PLUGIN_USB_CONNECTED:
+            return PV_ONPLAY_USB_CLOSED;
+        case PLUGIN_GOTO_WPS:
+            return PV_ONPLAY_WPS_CLOSED;
+        default:
+            return PV_ONPLAY_CLOSED;
+    }
 }
 #endif /* HAVE_HOTKEY */
 
@@ -533,8 +542,17 @@ static enum pv_onplay_result open_pictureflow(const struct playlist_entry *curre
 
     strmemccpy(selected_track, current_track->name, sizeof(selected_track));
 
-    return (filetype_load_plugin((void *)"pictureflow", selected_track) ==
-                PLUGIN_USB_CONNECTED ? PV_ONPLAY_USB_CLOSED : PV_ONPLAY_CLOSED);
+    int plugin_return = filetype_load_plugin((void *)"pictureflow", selected_track);
+
+    switch (plugin_return)
+    {
+        case PLUGIN_USB_CONNECTED:
+            return PV_ONPLAY_USB_CLOSED;
+        case PLUGIN_GOTO_WPS:
+            return PV_ONPLAY_WPS_CLOSED;
+        default:
+            return PV_ONPLAY_CLOSED;
+    }
 }
 #endif
 
@@ -959,6 +977,8 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                 }
                 else if (pv_onplay_result == PV_ONPLAY_USB_CLOSED)
                     return PLAYLIST_VIEWER_USB;
+                else if (pv_onplay_result == PV_ONPLAY_WPS_CLOSED)
+                    return PLAYLIST_VIEWER_OK;
                 else if (pv_onplay_result == PV_ONPLAY_CLOSED)
                 {
                     if (!open_playlist_viewer(filename, &playlist_lists, true))
@@ -1004,8 +1024,12 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
 
                 if (do_plugin != NULL)
                 {
-                    if (do_plugin(current_track) == PV_ONPLAY_USB_CLOSED)
+                    int plugin_result = do_plugin(current_track);
+
+                    if (plugin_result == PV_ONPLAY_USB_CLOSED)
                         return PLAYLIST_VIEWER_USB;
+                    else if (plugin_result == PV_ONPLAY_WPS_CLOSED)
+                        return PLAYLIST_VIEWER_OK;
                     else if (!open_playlist_viewer(filename, &playlist_lists, true))
                     {
                         ret = PLAYLIST_VIEWER_CANCEL;

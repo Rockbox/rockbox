@@ -618,7 +618,7 @@ int filetype_list_viewers(const char* current_file)
         int i = viewers[info.selection];
         snprintf(plugin, MAX_PATH, "%s/%s." ROCK_EXTENSION,
                     PLUGIN_DIR, filetypes[i].plugin);
-        plugin_load(plugin, current_file);
+        ret = plugin_load(plugin, current_file);
     }
     return ret;
 }

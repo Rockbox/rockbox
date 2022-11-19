@@ -1558,6 +1558,8 @@ static bool onplay_load_plugin(void *param)
         onplay_result = ONPLAY_RELOAD_DIR;
     else if (ret == PLUGIN_GOTO_PLUGIN)
         onplay_result = ONPLAY_PLUGIN;
+    else if (ret == PLUGIN_GOTO_WPS)
+        onplay_result = ONPLAY_START_PLAY;
     return false;
 }
 
@@ -1818,6 +1820,14 @@ static int playlist_insert_shuffled(void)
     return ONPLAY_RELOAD_DIR;
 }
 
+static int tree_hotkey_run_plugin(void *param)
+{
+    if (filetype_load_plugin((const char*)param, selected_file) == PLUGIN_GOTO_WPS)
+        return ONPLAY_START_PLAY;
+
+    return ONPLAY_RELOAD_DIR;
+}
+
 static void hotkey_run_plugin(void)
 {
     open_plugin_run(ID2P(LANG_HOTKEY_WPS));
@@ -1866,12 +1876,12 @@ static struct hotkey_assignment hotkey_items[] = {
             HOTKEY_FUNC(bookmark_create_menu, NULL),
             ONPLAY_OK },
     { HOTKEY_PROPERTIES,        LANG_PROPERTIES,
-            HOTKEY_FUNC(onplay_load_plugin, (void *)"properties"),
-            ONPLAY_RELOAD_DIR },
+            HOTKEY_FUNC(tree_hotkey_run_plugin, (void *)"properties"),
+            ONPLAY_OK },
 #ifdef HAVE_TAGCACHE
     { HOTKEY_PICTUREFLOW,       LANG_ONPLAY_PICTUREFLOW,
-            HOTKEY_FUNC(onplay_load_plugin, (void *)"pictureflow"),
-            ONPLAY_RELOAD_DIR },
+            HOTKEY_FUNC(tree_hotkey_run_plugin, (void *)"pictureflow"),
+            ONPLAY_OK },
 #endif
 };
 
