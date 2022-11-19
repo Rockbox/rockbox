@@ -1828,17 +1828,18 @@ static int tree_hotkey_run_plugin(void *param)
     return ONPLAY_RELOAD_DIR;
 }
 
-static void hotkey_run_plugin(void)
+static int hotkey_run_plugin(void)
 {
     open_plugin_run(ID2P(LANG_HOTKEY_WPS));
+    return ONPLAY_OK;
 }
 
 struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
     struct menu_func func;  /* Function to run if this entry is selected */
-    int return_code;        /* What to return after the function is run  */
-};
+    int return_code;        /* What to return after the function is run. ONPLAY_OK here */
+};                          /* means to use function return code, see execute_hotkey    */
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
 
