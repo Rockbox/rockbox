@@ -64,6 +64,13 @@ enum talk_status {
     TALK_STATUS_ERR_INCOMPATIBLE
 };
 
+enum talk_speakmode {
+    /* voice mode: 0=off, 1=number, 2=spell */
+    TALK_SPEAK_OFF = 0,
+    TALK_SPEAK_NUMBER,
+    TALK_SPEAK_SPELL
+};
+
 #define UNIT_SHIFT (32-5) /* this many bits left from UNIT_xx enum */
 
 #define DECIMAL_SHIFT (32 - 8)

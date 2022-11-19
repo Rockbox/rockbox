@@ -97,7 +97,7 @@ struct voicefile_header /* file format of our voice file */
 #define MAX_CLIP_BUFFER_SIZE (1<<30)
 #endif
 #define THUMBNAIL_RESERVE (50000)
-
+#define NULL_TERMINATED ((size_t)-1)
 /* Multiple thumbnails can be loaded back-to-back in this buffer. */
 static volatile int thumbnail_buf_used SHAREDBSS_ATTR; /* length of data in
                                                           thumbnail buffer */
@@ -118,6 +118,7 @@ static unsigned char last_lang[MAX_FILENAME+1]; /* name of last used lang file (
 static bool talk_initialized; /* true if talk_init has been called */
 static bool give_buffer_away; /* true if we should give the buffers away in shrink_callback if requested */
 static int talk_temp_disable_count; /* if positive, temporarily disable voice UI (not saved) */
+
  /* size of the voice data in the voice file and the actually allocated buffer
   * for it. voicebuf_size is always smaller or equal to voicefile_size */
 static unsigned long voicefile_size, voicebuf_size;
@@ -306,14 +307,15 @@ static int free_oldest_clip(void)
     unsigned i;
     int oldest = 0;
     bool thumb = false;
-    long age, now;
+    long age, now, next_age;
     struct clip_entry* clipbuf;
     struct clip_cache_metadata *cc = buflib_get_data(&clip_ctx, metadata_table_handle);
     for(age = i = 0, now = current_tick; i < max_clips; i++)
     {
         if (cc[i].handle)
         {
-            if (thumb && cc[i].voice_id == VOICEONLY_DELIMITER && (now - cc[i].tick) > age)
+            next_age = (now - cc[i].tick);
+            if (thumb && cc[i].voice_id == VOICEONLY_DELIMITER && next_age > age)
             {
                 /* thumb clips are freed first */
                 age = now - cc[i].tick;
@@ -323,14 +325,14 @@ static int free_oldest_clip(void)
             {
                 if (cc[i].voice_id == VOICEONLY_DELIMITER)
                 {
-                    age = now - cc[i].tick;
+                    age = next_age;
                     oldest = i;
                     thumb = true;
                 }
-                else if ((now - cc[i].tick) > age && cc[i].voice_id != VOICE_PAUSE)
+                else if (next_age > age && cc[i].voice_id != VOICE_PAUSE)
                 {
                     /* find the last-used clip but never consider silence */
-                    age = now - cc[i].tick;
+                    age = next_age;
                     oldest = i;
                 }
             }
@@ -347,7 +349,6 @@ static int free_oldest_clip(void)
     }
     return oldest;
 }
-
 
 /* common code for load_initial_clips() and get_clip() */
 static void add_cache_entry(int clip_handle, int table_index, int id)
@@ -549,12 +550,14 @@ alloc_err:
     index_handle = core_free(index_handle);
     return false;
 }
+
 static inline int load_voicefile_failure(int fd)
 {
     if (fd >= 0)
         close(fd);
     return -1;
 }
+
 /* load the voice file into the mp3 buffer */
 static bool load_voicefile_index(int fd)
 {
@@ -719,6 +722,99 @@ static void mp3_callback(const void** start, size_t* size)
     talk_queue_unlock();
 }
 
+/***************** Private routines *****************/
+
+/* return if a voice codec is required or not */
+static bool talk_voice_required(void)
+{
+    return (has_voicefile) /* Voice file is available */
+        || (global_settings.talk_dir_clip)  /* Thumbnail clips are required */
+        || (global_settings.talk_file_clip);
+}
+
+static bool talk_is_disabled(void)
+{
+    if (talk_temp_disable_count > 0 || (!check_audio_status()))
+        return true;
+    return false;
+}
+
+static void do_enqueue(bool enqueue)
+{
+    if (!enqueue)
+        talk_shutup(); /* cut off all the pending stuff */
+}
+
+/* spell a string */
+static int _talk_spell(const char* spell, size_t len, bool enqueue)
+{
+    char c; /* currently processed char */
+
+    if (talk_is_disabled())
+        return -1;
+
+    do_enqueue(enqueue); /* cut off all the pending stuff */
+
+    size_t len0 = len - 1;
+
+    while ((c = *spell++) != '\0' && len0-- < len)
+    {
+        /* if this grows into too many cases, I should use a table */
+        if (c >= 'A' && c <= 'Z')
+            talk_id(VOICE_CHAR_A + c - 'A', true);
+        else if (c >= 'a' && c <= 'z')
+            talk_id(VOICE_CHAR_A + c - 'a', true);
+        else if (c >= '0' && c <= '9')
+            talk_id(VOICE_ZERO + c - '0', true);
+        else if (c == '-')
+            talk_id(VOICE_MINUS, true);
+        else if (c == '+')
+            talk_id(VOICE_PLUS, true);
+        else if (c == '.')
+            talk_id(VOICE_DOT, true);
+        else if (c == ' ')
+            talk_id(VOICE_PAUSE, true);
+        else if (c == '/')
+            talk_id(VOICE_CHAR_SLASH, true);
+    }
+    return 0;
+}
+
+static int talk_spell_basename(const char *path,
+                               const long *prefix_ids, bool enqueue)
+{
+    if(prefix_ids)
+    {
+        talk_idarray(prefix_ids, enqueue);
+        enqueue = true;
+    }
+    const char *basename;
+    size_t len = path_basename(path, &basename);
+
+    return _talk_spell(basename, len, enqueue);
+}
+
+/* Say year like "nineteen ninety nine" instead of "one thousand 9
+   hundred ninety nine". */
+static int talk_year(long year, bool enqueue)
+{
+    int rem;
+    if(year < 1100 || (year >=2000 && year < 2100))
+        /* just say it as a regular number */
+        return talk_number(year, enqueue);
+    /* Say century */
+    talk_number(year/100, enqueue);
+    rem = year%100;
+    if(rem == 0)
+        /* as in 1900 */
+        return talk_id(VOICE_HUNDRED, true);
+    if(rem <10)
+        /* as in 1905 */
+        talk_id(VOICE_ZERO, true);
+    /* sub-century year */
+    return talk_number(rem, true);
+}
+
 /***************** Public routines *****************/
 
 /* stop the playback and the pending clips */
@@ -746,8 +842,8 @@ static void queue_clip(struct queue_entry *clip, bool enqueue)
     struct queue_entry *qe;
     int queue_level;
 
-    if (!enqueue)
-        talk_shutup(); /* cut off all the pending stuff */
+    do_enqueue(enqueue);  /* cut off all the pending stuff */
+
     /* Something is being enqueued, force_enqueue_next override is no
        longer in effect. */
     force_enqueue_next = false;
@@ -779,14 +875,6 @@ static void queue_clip(struct queue_entry *clip, bool enqueue)
     need_shutup = true;
 
     return;
-}
-
-/* return if a voice codec is required or not */
-static bool talk_voice_required(void)
-{
-    return (has_voicefile) /* Voice file is available */
-        || (global_settings.talk_dir_clip)  /* Thumbnail clips are required */
-        || (global_settings.talk_file_clip);
 }
 
 /***************** Public implementation *****************/
@@ -885,6 +973,7 @@ out:
 /* somebody else claims the mp3 buffer, e.g. for regular play/record */
 void talk_buffer_set_policy(int policy)
 {
+#ifdef DEBUG
     switch(policy)
     {
         case TALK_BUFFER_DEFAULT:
@@ -892,6 +981,9 @@ void talk_buffer_set_policy(int policy)
         case TALK_BUFFER_LOOSE: give_buffer_away = true;             break;
         default:           DEBUGF("Ignoring unknown policy\n"); break;
     }
+#else
+    give_buffer_away = (policy == TALK_BUFFER_LOOSE);
+#endif
 }
 
 /* play a voice ID from voicefile */
@@ -903,10 +995,8 @@ int talk_id(int32_t id, bool enqueue)
     bool isloaded = true;
 
     if (!has_voicefile)
-        return 0; /* no voicefile loaded, not an error -> pretent success */
-    if (talk_temp_disable_count > 0)
-        return -1;  /* talking has been disabled */
-    if (!check_audio_status())
+        return 0; /* no voicefile loaded, not an error -> pretend success */
+    if (talk_is_disabled())
         return -1;
 
     if (talk_handle <= 0 || index_handle <= 0) /* reload needed? */
@@ -948,6 +1038,7 @@ int talk_id(int32_t id, bool enqueue)
 
     return 0;
 }
+
 /* Speaks zero or more IDs (from an array). */
 int talk_idarray(const long *ids, bool enqueue)
 {
@@ -981,9 +1072,7 @@ static int _talk_file(const char* filename,
     int oldest = -1;
 
     /* reload needed? */
-    if (talk_temp_disable_count > 0)
-        return -1;  /* talking has been disabled */
-    if (!check_audio_status())
+    if (talk_is_disabled())
         return -1;
     if (talk_handle <= 0 || index_handle <= 0)
     {
@@ -994,9 +1083,7 @@ static int _talk_file(const char* filename,
         close(fd);
     }
 
-    if (!enqueue)
-        /* shutup now to free the thumbnail buffer */
-        talk_shutup();
+    do_enqueue(enqueue); /* shutup now to free the thumbnail buffer */
 
     fd = open(filename, O_RDONLY);
     if (fd < 0) /* failed to open */
@@ -1045,43 +1132,16 @@ int talk_file(const char *root, const char *dir, const char *file,
 /* Play a thumbnail file */
 {
     char buf[MAX_PATH];
+    const char *fmt = "%s%s%s%s%s";
     /* Does root end with a slash */
-    char *slash = (root && root[0]
-                   && root[strlen(root)-1] != '/') ? "/" : "";
-    snprintf(buf, MAX_PATH, "%s%s%s%s%s%s",
-             root ? root : "", slash,
+    if(root && root[0] && root[strlen(root)-1] != '/')
+        fmt = "%s/%s%s%s%s";
+    snprintf(buf, MAX_PATH, fmt,
+             root ? root : "",
              dir ? dir : "", dir ? "/" : "",
              file ? file : "",
              ext ? ext : "");
     return _talk_file(buf, prefix_ids, enqueue);
-}
-
-static int talk_spell_basename(const char *path,
-                               const long *prefix_ids, bool enqueue)
-{
-    if(prefix_ids)
-    {
-        talk_idarray(prefix_ids, enqueue);
-        enqueue = true;
-    }
-    char buf[MAX_PATH];
-    /* Spell only the path component after the last slash */
-    char *end = strmemccpy(buf, path, sizeof(buf));
-
-    if (!end)
-        return 0;
-
-    size_t len = end - buf - 1;
-    if(len >1 && buf[len-1] == '/')
-        buf[--len] = '\0'; /* strip trailing slash */
-
-    char *ptr = strrchr(buf, '/');
-    if(ptr && len >1)
-        ++ptr;
-    else
-        ptr = buf;
-
-    return talk_spell(ptr, enqueue);
 }
 
 /* Play a file's .talk thumbnail, fallback to spelling the filename, or
@@ -1095,7 +1155,7 @@ int talk_file_or_spell(const char *dirname, const char *filename,
                               prefix_ids, enqueue) >0)
             return 0;
     }
-    if (global_settings.talk_file == 2)
+    if (global_settings.talk_file == TALK_SPEAK_SPELL)
         /* Either .talk clips are disabled, or as a fallback */
         return talk_spell_basename(filename, prefix_ids, enqueue);
     return 0;
@@ -1112,7 +1172,7 @@ int talk_dir_or_spell(const char* dirname,
                               prefix_ids, enqueue) >0)
             return 0;
     }
-    if (global_settings.talk_dir == 2)
+    if (global_settings.talk_dir == TALK_SPEAK_SPELL)
         /* Either .talk clips disabled or as a fallback */
         return talk_spell_basename(dirname, prefix_ids, enqueue);
     return 0;
@@ -1122,8 +1182,8 @@ int talk_dir_or_spell(const char* dirname,
    back or going straight to spelling depending on settings. */
 int talk_fullpath(const char* path, bool enqueue)
 {
-    if (!enqueue)
-        talk_shutup();
+    do_enqueue(enqueue);  /* cut off all the pending stuff */
+
     if(path[0] != '/')
         /* path ought to start with /... */
         return talk_spell(path, true);
@@ -1152,13 +1212,10 @@ int talk_number(long n, bool enqueue)
     int level = 2; /* mille count */
     long mil = 1000000000; /* highest possible "-illion" */
 
-    if (talk_temp_disable_count > 0)
-        return -1;  /* talking has been disabled */
-    if (!check_audio_status())
+    if (talk_is_disabled())
         return -1;
 
-    if (!enqueue)
-        talk_shutup(); /* cut off all the pending stuff */
+    do_enqueue(enqueue); /* cut off all the pending stuff */
 
     if (n==0)
     {   /* special case */
@@ -1243,27 +1300,6 @@ int talk_number(long n, bool enqueue)
     return 0;
 }
 
-/* Say year like "nineteen ninety nine" instead of "one thousand 9
-   hundred ninety nine". */
-static int talk_year(long year, bool enqueue)
-{
-    int rem;
-    if(year < 1100 || (year >=2000 && year < 2100))
-        /* just say it as a regular number */
-        return talk_number(year, enqueue);
-    /* Say century */
-    talk_number(year/100, enqueue);
-    rem = year%100;
-    if(rem == 0)
-        /* as in 1900 */
-        return talk_id(VOICE_HUNDRED, true);
-    if(rem <10)
-        /* as in 1905 */
-        talk_id(VOICE_ZERO, true);
-    /* sub-century year */
-    return talk_number(rem, true);
-}
-
 /* Say time duration/interval. Input is time in seconds,
    say hours,minutes,seconds. */
 static int talk_time_unit(long secs, bool enqueue)
@@ -1336,9 +1372,7 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     char tbuf[8];
     char fmt[] = "%0nd";
 
-    if (talk_temp_disable_count > 0)
-        return -1;  /* talking has been disabled */
-    if (!check_audio_status())
+    if (talk_is_disabled())
         return -1;
 
     /* special pronounciation for year number */
@@ -1389,15 +1423,19 @@ int talk_value_decimal(long n, int unit, int decimals, bool enqueue)
     return 0;
 }
 
+static inline void talk_time_value(long n, int unit, bool enqueue)
+{
+    if (n != 0)
+        talk_value_decimal(n, unit, 0, enqueue);
+}
+
 /* Say time duration/interval. Input is time unit specifies base unit,
    say hours,minutes,seconds, milliseconds. or any combination thereof */
 int talk_time_intervals(long time, int unit_idx, bool enqueue)
 {
     unsigned long units_in[UNIT_IDX_TIME_COUNT];
 
-    if (talk_temp_disable_count > 0)
-        return -1;  /* talking has been disabled */
-    if (!check_audio_status())
+    if (talk_is_disabled())
         return -1;
 
     if (talk_handle <= 0 || index_handle <= 0) /* reload needed? */
@@ -1409,8 +1447,7 @@ int talk_time_intervals(long time, int unit_idx, bool enqueue)
         close(fd);
     }
 
-    if (!enqueue)
-        talk_shutup(); /* cut off all the pending stuff */
+    do_enqueue(enqueue); /* cut off all the pending stuff */
 
     time_split_units(unit_idx, labs(time), &units_in);
 
@@ -1421,22 +1458,10 @@ int talk_time_intervals(long time, int unit_idx, bool enqueue)
         talk_value(0, unit_idx, true);
     else
     {
-        if (units_in[UNIT_IDX_HR] != 0)
-        {
-            talk_value(units_in[UNIT_IDX_HR], UNIT_HOUR, true);
-        }
-        if (units_in[UNIT_IDX_MIN] != 0)
-        {
-            talk_value(units_in[UNIT_IDX_MIN], UNIT_MIN, true);
-        }
-        if (units_in[UNIT_IDX_SEC] != 0)
-        {
-            talk_value(units_in[UNIT_IDX_SEC], UNIT_SEC, true);
-        }
-        if (units_in[UNIT_IDX_MS] != 0)
-        {
-            talk_value(units_in[UNIT_IDX_MS], UNIT_MS, true);
-        }
+        talk_time_value(units_in[UNIT_IDX_HR], UNIT_HOUR, true);
+        talk_time_value(units_in[UNIT_IDX_MIN], UNIT_MIN, true);
+        talk_time_value(units_in[UNIT_IDX_SEC], UNIT_SEC, true);
+        talk_time_value(units_in[UNIT_IDX_MS], UNIT_MS, true);
     }
 
     return -1;
@@ -1445,38 +1470,7 @@ int talk_time_intervals(long time, int unit_idx, bool enqueue)
 /* spell a string */
 int talk_spell(const char* spell, bool enqueue)
 {
-    char c; /* currently processed char */
-
-    if (talk_temp_disable_count > 0)
-        return -1;  /* talking has been disabled */
-    if (!check_audio_status())
-        return -1;
-
-    if (!enqueue)
-        talk_shutup(); /* cut off all the pending stuff */
-
-    while ((c = *spell++) != '\0')
-    {
-        /* if this grows into too many cases, I should use a table */
-        if (c >= 'A' && c <= 'Z')
-            talk_id(VOICE_CHAR_A + c - 'A', true);
-        else if (c >= 'a' && c <= 'z')
-            talk_id(VOICE_CHAR_A + c - 'a', true);
-        else if (c >= '0' && c <= '9')
-            talk_id(VOICE_ZERO + c - '0', true);
-        else if (c == '-')
-            talk_id(VOICE_MINUS, true);
-        else if (c == '+')
-            talk_id(VOICE_PLUS, true);
-        else if (c == '.')
-            talk_id(VOICE_DOT, true);
-        else if (c == ' ')
-            talk_id(VOICE_PAUSE, true);
-        else if (c == '/')
-            talk_id(VOICE_CHAR_SLASH, true);
-    }
-
-    return 0;
+    return _talk_spell(spell, NULL_TERMINATED, enqueue);
 }
 
 void talk_disable(bool disable)
@@ -1499,14 +1493,12 @@ void talk_setting(const void *global_settings_variable)
         talk_id(setting->lang_id,false);
 }
 
-
 void talk_date(const struct tm *tm, bool enqueue)
 {
     const char *format = str(LANG_VOICED_DATE_FORMAT);
     const char *ptr;
 
-    if (!enqueue)
-        talk_shutup(); /* cut off all the pending stuff */
+    do_enqueue(enqueue); /* cut off all the pending stuff */
 
     for (ptr = format ; *ptr ; ptr++) {
         switch(*ptr) {
@@ -1586,8 +1578,7 @@ void talk_announce_voice_invalid(void)
     int buf_handle;
     struct queue_entry qe;
 
-    const char talkfile[] =
-               LANG_DIR "/InvalidVoice_" DEFAULT_VOICE_LANG ".talk";
+    const char talkfile[] = LANG_DIR "/InvalidVoice_" DEFAULT_VOICE_LANG ".talk";
 
     if (global_settings.talk_menu && talk_status != TALK_STATUS_OK)
     {
