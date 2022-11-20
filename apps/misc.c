@@ -1423,6 +1423,7 @@ int open_pathfmt(int oflag, const char *pathfmt, ...)
 {
     static char buf[MAX_PATH];
     va_list ap;
+    va_start(ap, pathfmt);
     vsnprintf(buf, sizeof(buf), pathfmt, ap);
     va_end(ap);
     return open(buf, oflag, 0666);
