@@ -247,7 +247,6 @@ static struct buflib_callbacks talk_ops = {
 
 static int open_voicefile(void)
 {
-    char buf[64];
     char* p_lang = DEFAULT_VOICE_LANG; /* default */
 
     if ( global_settings.lang_file[0] &&
@@ -256,9 +255,7 @@ static int open_voicefile(void)
         p_lang = (char *)global_settings.lang_file;
     }
 
-    snprintf(buf, sizeof(buf), LANG_DIR "/%s.voice", p_lang);
-
-    return open(buf, O_RDONLY);
+    return open_pathfmt(O_RDONLY, LANG_DIR "/%s.voice", p_lang);
 }
 
 

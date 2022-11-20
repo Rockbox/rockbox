@@ -1418,6 +1418,16 @@ int string_option(const char *option, const char *const oplist[], bool ignore_ca
     return -1;
 }
 
+/* open but with a builtin printf for assembling the path */
+int open_pathfmt(int oflag, const char *pathfmt, ...)
+{
+    static char buf[MAX_PATH];
+    va_list ap;
+    vsnprintf(buf, sizeof(buf), pathfmt, ap);
+    va_end(ap);
+    return open(buf, oflag, 0666);
+}
+
 /** Open a UTF-8 file and set file descriptor to first byte after BOM.
  *  If no BOM is present this behaves like open().
  *  If the file is opened for writing and O_TRUNC is set, write a BOM to

@@ -422,19 +422,17 @@ static ssize_t ecwrite_index_entry(int fd, struct index_entry *buf)
 static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
-    char buf[MAX_PATH];
-    const int bufsz = sizeof(buf);
     int rc;
 
     if (TAGCACHE_IS_NUMERIC(tag) || tag < 0 || tag >= TAG_COUNT)
         return -1;
 
-    snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, tag);
+    fd = open_pathfmt(write ? O_RDWR : O_RDONLY, TAGCACHE_FILE_INDEX, tag);
 
-    fd = open(buf, write ? O_RDWR : O_RDONLY);
     if (fd < 0)
     {
-        logf("tag file open failed: tag=%d write=%d file=%s", tag, write, buf);
+        logf("tag file open failed: tag=%d write=%d file= " TAGCACHE_FILE_INDEX,
+             tag, write, tag);
         tc_stat.ready = false;
         return fd;
     }
@@ -805,10 +803,7 @@ static bool open_files(struct tagcache_search *tcs, int tag)
 {
     if (tcs->idxfd[tag] < 0)
     {
-        char fn[MAX_PATH];
-
-        snprintf(fn, sizeof fn, TAGCACHE_FILE_INDEX, tag);
-        tcs->idxfd[tag] = open(fn, O_RDONLY);
+        tcs->idxfd[tag] = open_pathfmt(O_RDONLY, TAGCACHE_FILE_INDEX, tag);
     }
 
     if (tcs->idxfd[tag] < 0)
@@ -1588,12 +1583,9 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
         }
 
         if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
-        {
-            char buf[MAX_PATH];
-            const int bufsz = sizeof(buf);
-            
-            snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, clause->tag);        
-            tcs->idxfd[clause->tag] = open(buf, O_RDONLY);
+        {   
+            tcs->idxfd[clause->tag] = open_pathfmt(O_RDONLY,
+                                              TAGCACHE_FILE_INDEX, clause->tag);
         }
     }
 
@@ -2751,11 +2743,11 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * Creating new index file to store the tags. No need to preload
          * anything whether the index type is sorted or not.
          */
-        snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, index_type);
-        fd = open(buf, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        fd = open_pathfmt(O_WRONLY | O_CREAT | O_TRUNC,
+                          TAGCACHE_FILE_INDEX, index_type);
         if (fd < 0)
         {
-            logf("%s open fail", buf);
+            logf(TAGCACHE_FILE_INDEX " open fail", index_type);
             return -2;
         }
 
@@ -4408,12 +4400,11 @@ static bool check_deleted_files(void)
     struct tagfile_entry tfe;
 
     logf("reverse scan...");
-    snprintf(buf, bufsz, TAGCACHE_FILE_INDEX, tag_filename);
-    fd = open(buf, O_RDONLY);
 
+    fd = open_pathfmt(O_RDONLY, TAGCACHE_FILE_INDEX, tag_filename);
     if (fd < 0)
     {
-        logf("%s open fail", buf);
+        logf(TAGCACHE_FILE_INDEX " open fail", tag_filename);
         return false;
     }
 

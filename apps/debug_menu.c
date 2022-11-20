@@ -2297,11 +2297,6 @@ static bool cpu_boost_log(void)
 static bool cpu_boost_log_dump(void)
 {
     int fd;
-#if CONFIG_RTC
-    struct tm *nowtm;
-    char fname[MAX_PATH];
-#endif
-
     int count = cpu_boost_log_getcount();
     char *str = cpu_boost_log_getlog_first();
 
@@ -2312,11 +2307,11 @@ static bool cpu_boost_log_dump(void)
         return false;
 
 #if CONFIG_RTC
-    nowtm = get_time();
-    snprintf(fname, MAX_PATH, "%s/boostlog_%04d%02d%02d%02d%02d%02d.txt", ROCKBOX_DIR,
-             nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday,
-             nowtm->tm_hour, nowtm->tm_min, nowtm->tm_sec);
-    fd = open(fname, O_CREAT|O_WRONLY|O_TRUNC);
+    struct tm *nowtm = get_time();
+    fd = open_pathfmt(O_CREAT|O_WRONLY|O_TRUNC,
+                      "%s/boostlog_%04d%02d%02d%02d%02d%02d.txt", ROCKBOX_DIR,
+                      nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday,
+                      nowtm->tm_hour, nowtm->tm_min, nowtm->tm_sec);
 #else
     fd = open(ROCKBOX_DIR "/boostlog.txt", O_CREAT|O_WRONLY|O_TRUNC, 0666);
 #endif
