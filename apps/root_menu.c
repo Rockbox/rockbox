@@ -357,6 +357,7 @@ static int miscscrn(void * param)
         case GO_TO_PLUGIN:
         case GO_TO_PLAYLIST_VIEWER:
         case GO_TO_WPS:
+        case GO_TO_PREVIOUS_MUSIC:
             return result;
         default:
             return GO_TO_ROOT;
