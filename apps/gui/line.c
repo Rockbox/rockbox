@@ -264,8 +264,7 @@ next:
                     else
                     {
                         /* any other character here is an erroneous format string */
-                        snprintf(tempbuf, sizeof(tempbuf), "<E:%c>", ch);
-                        display->putsxy(xpos, y, tempbuf);
+                        display->putsxyf(xpos, y, "<E:%c>", ch);
                         /* Don't consider going forward, fix the caller */
                         return;
                     }

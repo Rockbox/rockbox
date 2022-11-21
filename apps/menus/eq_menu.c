@@ -590,7 +590,6 @@ int eq_menu_graphical(void)
     int *setting;
     int current_band, x, y, step, fast_step, min, max;
     enum eq_slider_mode mode;
-    char buf[24];
     int h, height, start_item, nb_eq_sliders[NB_SCREENS];
     FOR_NB_SCREENS(i)
         viewportmanager_theme_enable(i, false, NULL);
@@ -638,10 +637,8 @@ int eq_menu_graphical(void)
                 min = EQ_GAIN_MIN;
                 max = EQ_GAIN_MAX;
 
-                snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                screens[i].putsxyf(0, 0, str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_GAIN), "(dB)");
-
-                screens[i].putsxy(0, 0, buf);
             } else if (mode == CUTOFF) {
                 /* cutoff */
                 setting = &global_settings.eq_band_settings[current_band].cutoff;
@@ -651,10 +648,8 @@ int eq_menu_graphical(void)
                 min = EQ_CUTOFF_MIN;
                 max = EQ_CUTOFF_MAX;
 
-                snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                screens[i].putsxyf(0, 0, str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_EQUALIZER_BAND_CUTOFF), "(Hz)");
-
-                screens[i].putsxy(0, 0, buf);
             } else {
                 /* Q */
                 setting = &global_settings.eq_band_settings[current_band].q;
@@ -664,10 +659,8 @@ int eq_menu_graphical(void)
                 min = EQ_Q_MIN;
                 max = EQ_Q_MAX;
 
-                snprintf(buf, sizeof(buf), str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
+                screens[i].putsxyf(0, 0, str(LANG_SYSFONT_EQUALIZER_EDIT_MODE),
                          str(LANG_SYSFONT_EQUALIZER_BAND_Q), "");
-
-                screens[i].putsxy(0, 0, buf);
             }
 
             /* Draw scrollbar if needed */
