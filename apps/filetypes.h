@@ -53,9 +53,9 @@
 struct filetype {
     char* extension;
     int tree_attr;
-    enum themable_icons icon;
     int voiceclip;
 };
+
 void tree_get_filetypes(const struct filetype**, int*) INIT_ATTR;
 
 /* init the filetypes structs.
