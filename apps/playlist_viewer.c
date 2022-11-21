@@ -102,7 +102,8 @@ struct playlist_buffer
 
 /* Global playlist viewer settings */
 struct playlist_viewer {
-    struct playlist_info* playlist; /* playlist being viewed                 */
+    const char *title;          /* Playlist Viewer list title                */
+    struct playlist_info* playlist; /* Playlist being viewed                 */
     int num_tracks;             /* Number of tracks in playlist              */
     int current_playing_track;  /* Index of current playing track            */
     int selected_track;         /* The selected track, relative (first is 0) */
@@ -349,7 +350,10 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
         return false;
 
     if (!filename)
+    {
         viewer->playlist = NULL;
+        viewer->title = (char *) str(LANG_PLAYLIST);
+    }
     else
     {
         /* Viewing playlist on disk */
@@ -373,6 +377,7 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
             dir = "/";
             file = filename+1;
         }
+        viewer->title = file;
 
         if (is_playing)
         {
@@ -771,7 +776,7 @@ static void update_lists(struct gui_synclist * playlist_lists)
     gui_synclist_set_icon_callback(playlist_lists,
                   global_settings.playlist_viewer_icons?
                   &playlist_callback_icons:NULL);
-    gui_synclist_set_title(playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
+    gui_synclist_set_title(playlist_lists, viewer.title, Icon_Playlist);
     gui_synclist_draw(playlist_lists);
     gui_synclist_speak_item(playlist_lists);
 }
@@ -808,7 +813,7 @@ static void prepare_lists(struct gui_synclist * playlist_lists)
                                    global_settings.playlist_viewer_icons ?
                                     &playlist_callback_icons : NULL);
     gui_synclist_set_nb_items(playlist_lists, viewer.num_tracks);
-    gui_synclist_set_title(playlist_lists, str(LANG_PLAYLIST), Icon_Playlist);
+    gui_synclist_set_title(playlist_lists, viewer.title, Icon_Playlist);
     gui_synclist_select_item(playlist_lists, viewer.selected_track);
     gui_synclist_draw(playlist_lists);
     gui_synclist_speak_item(playlist_lists);
