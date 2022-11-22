@@ -900,9 +900,25 @@ static int root_menu_setup_screens(void)
     return new_screen;
 }
 
+static int browser_default(void)
+{
+    switch (global_settings.browser_default)
+    {
+#ifdef HAVE_TAGCACHE
+        case BROWSER_DEFAULT_DB:
+            return GO_TO_DBBROWSER;
+#endif
+        case BROWSER_DEFAULT_PL_CAT:
+            return GO_TO_PLAYLISTS_SCREEN;
+        case BROWSER_DEFAULT_FILES:
+        default:
+            return GO_TO_FILEBROWSER;
+    }
+}
+
 void root_menu(void)
 {
-    int previous_browser = GO_TO_FILEBROWSER;
+    int previous_browser = browser_default();
     int selected = 0;
     int shortcut_origin = GO_TO_ROOT;
 
@@ -932,12 +948,13 @@ void root_menu(void)
                     last_screen = GO_TO_ROOT;
                 break;
 #ifdef HAVE_TAGCACHE
-            case GO_TO_FILEBROWSER:
             case GO_TO_DBBROWSER:
+#endif
+            case GO_TO_FILEBROWSER:
+            case GO_TO_PLAYLISTS_SCREEN:
                 previous_browser = next_screen;
                 goto load_next_screen;
                 break;
-#endif /* With !HAVE_TAGCACHE previous_browser is always GO_TO_FILEBROWSER */
 #if CONFIG_TUNER
             case GO_TO_WPS:
             case GO_TO_FM:
@@ -1030,7 +1047,8 @@ void root_menu(void)
                         last_screen = GO_TO_PLUGIN;
                     }
                 }
-                previous_browser = (next_screen != GO_TO_WPS) ? GO_TO_FILEBROWSER : GO_TO_PLUGIN;
+                previous_browser = (next_screen != GO_TO_WPS) ? browser_default() :
+                                                                GO_TO_PLUGIN;
                 break;
             }
             default:

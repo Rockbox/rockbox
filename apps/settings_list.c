@@ -1852,6 +1852,25 @@ const struct settings_list settings[] = {
                       ID2P(LANG_SET_BOOL_YES),
                       ID2P(LANG_IN_SUBMENU)),
 
+    CHOICE_SETTING(0, browser_default, LANG_DEFAULT_BROWSER, 0,
+                      "default browser",
+#ifdef HAVE_TAGCACHE
+                      "files,database,playlists",
+#else
+                      "files,playlists",
+#endif
+                      NULL,
+#ifdef HAVE_TAGCACHE
+                      3
+#else
+                      2
+#endif
+                      ,ID2P(LANG_DIR_BROWSER),
+#ifdef HAVE_TAGCACHE
+                      ID2P(LANG_TAGCACHE),
+#endif
+                      ID2P(LANG_CATALOG)),
+
 #ifdef HAVE_BACKLIGHT
     CHOICE_SETTING(0, backlight_on_button_hold,
                    LANG_BACKLIGHT_ON_BUTTON_HOLD,

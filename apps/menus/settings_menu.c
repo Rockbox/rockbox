@@ -191,6 +191,9 @@ MENUITEM_SETTING(dirfilter, &global_settings.dirfilter, NULL);
 MENUITEM_SETTING(show_filename_ext, &global_settings.show_filename_ext, NULL);
 MENUITEM_SETTING(browse_current, &global_settings.browse_current, NULL);
 MENUITEM_SETTING(show_path_in_browser, &global_settings.show_path_in_browser, NULL);
+#ifdef HAVE_HOTKEY
+MENUITEM_SETTING(hotkey_tree_item, &global_settings.hotkey_tree, NULL);
+#endif
 static int clear_start_directory(void)
 {
     path_append(global_settings.start_directory, PATH_ROOTSTR,
@@ -229,6 +232,9 @@ MAKE_MENU(file_menu, ID2P(LANG_FILE), filemenu_callback, Icon_file_view_menu,
                 &dirfilter, &show_filename_ext, &browse_current,
                 &show_path_in_browser,
                 &clear_start_directory_item
+#ifdef HAVE_HOTKEY
+                ,&hotkey_tree_item
+#endif
                 );
 static int filemenu_callback(int action,
                              const struct menu_item_ex *this_item,
@@ -776,14 +782,24 @@ MENUITEM_FUNCTION(wps_set_context_plugin, 0,
 /***********************************/
 
 /***********************************/
-/*    HOTKEY MENU                  */
+/*    WPS Settings MENU            */
+
+MENUITEM_SETTING(browser_default,
+                 &global_settings.browser_default, NULL);
+
 #ifdef HAVE_HOTKEY
 MENUITEM_SETTING(hotkey_wps_item, &global_settings.hotkey_wps, NULL);
-MENUITEM_SETTING(hotkey_tree_item, &global_settings.hotkey_tree, NULL);
-MAKE_MENU(hotkey_menu, ID2P(LANG_HOTKEY), 0, Icon_NOICON,
-            &hotkey_wps_item, &hotkey_tree_item);
-#endif /*have_hotkey */
-/*    HOTKEY MENU                  */
+#endif
+
+MAKE_MENU(wps_settings, ID2P(LANG_WPS), 0, Icon_Playback_menu
+            ,&browser_default
+#ifdef HAVE_HOTKEY
+            ,&hotkey_wps_item
+#endif
+            ,&wps_set_context_plugin
+            );
+
+/*    WPS Settings MENU            */
 /***********************************/
 
 
@@ -797,6 +813,7 @@ MENUITEM_FUNCTION_W_PARAM(browse_langs, 0, ID2P(LANG_LANGUAGE),
 
 MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           Icon_General_settings_menu,
+          &wps_settings,
           &playlist_settings, &file_menu,
 #ifdef HAVE_TAGCACHE
           &tagcache_menu,
@@ -808,10 +825,6 @@ MAKE_MENU(settings_menu_item, ID2P(LANG_GENERAL_SETTINGS), 0,
           &autoresume_menu,
 #endif
           &browse_langs, &voice_settings_menu,
-          &wps_set_context_plugin,
-#ifdef HAVE_HOTKEY
-          &hotkey_menu,
-#endif
           );
 /*    SETTINGS MENU                */
 /***********************************/

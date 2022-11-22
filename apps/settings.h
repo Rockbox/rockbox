@@ -127,6 +127,15 @@ enum
     QUEUE_SHOW_IN_SUBMENU
 };
 
+enum
+{
+    BROWSER_DEFAULT_FILES = 0,
+#ifdef HAVE_TAGCACHE
+    BROWSER_DEFAULT_DB,
+#endif
+    BROWSER_DEFAULT_PL_CAT
+};
+
 #ifdef HAVE_ALBUMART
 enum
 {
@@ -607,6 +616,8 @@ struct user_settings
     int lst_color; /* color of the text for the selector */
     unsigned char colors_file[MAX_FILENAME+1];
 #endif
+
+    int browser_default;        /* Default browser when accessed from WPS */
 
     /* playlist/playback settings */
     int  repeat_mode; /* 0=off 1=repeat all 2=repeat one 3=shuffle 4=ab */

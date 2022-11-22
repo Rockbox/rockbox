@@ -16683,3 +16683,31 @@
     *: "Quick (Ignore Directory Cache)"
   </voice>
 </phrase>
+<phrase>
+  id: LANG_WPS
+  desc: in Settings
+  user: core
+  <source>
+    *: "What's Playing Screen"
+  </source>
+  <dest>
+    *: "What's Playing Screen"
+  </dest>
+  <voice>
+    *: "What's Playing Screen"
+  </voice>
+</phrase>
+<phrase>
+  id: LANG_DEFAULT_BROWSER
+  desc: in Settings
+  user: core
+  <source>
+    *: "Default Browser"
+  </source>
+  <dest>
+    *: "Default Browser"
+  </dest>
+  <voice>
+    *: "Default Browser"
+  </voice>
+</phrase>
