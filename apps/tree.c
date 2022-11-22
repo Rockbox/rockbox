@@ -1179,25 +1179,9 @@ bool bookmark_play(char *resume_file, int index, unsigned long elapsed,
     return started;
 }
 
-static long filetype_voiceclip(int attr)
-{
-    int j;
-    if (global_settings.talk_filetype)
-    {
-        /* try to find a voice ID for the extension, if known */
-        attr &= FILE_ATTR_MASK; /* file type */
-        for (j=0; j<filetypes_count; j++)
-            if (attr == filetypes[j].tree_attr)
-            {
-                return filetypes[j].voiceclip;
-            }
-    }
-    return -1;
-}
-
 static void say_filetype(int attr)
 {
-    talk_id(filetype_voiceclip(attr), true);
+    talk_id(tree_filetype_voiceclip(attr), true);
 }
 
 static int ft_play_dirname(char* name)
@@ -1215,7 +1199,7 @@ static int ft_play_filename(char *dir, char *file, int attr)
                       file_thumbnail_ext))
         /* file has no .talk extension */
         return talk_file(dir, NULL, file, file_thumbnail_ext,
-                         TALK_IDARRAY(filetype_voiceclip(attr)), false);
+                         TALK_IDARRAY(tree_filetype_voiceclip(attr)), false);
 
     /* it already is a .talk file, play this directly, but prefix it. */
     return talk_file(dir, NULL, file, NULL,

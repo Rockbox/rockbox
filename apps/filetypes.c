@@ -38,6 +38,7 @@
 #include "splash.h"
 #include "core_alloc.h"
 #include "icons.h"
+/*#define LOGF_ENABLE*/
 #include "logf.h"
 
 /* max filetypes (plugins & icons stored here) */
@@ -47,103 +48,136 @@
 
 /* a table for the known file types */
 static const struct filetype inbuilt_filetypes[] = {
-    { "mp3",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mp2",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mpa",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mp1",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "ogg",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "oga",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "wma",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "wmv",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "asf",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "wav",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "flac", FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "ac3",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "a52",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mpc",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "wv",   FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "m4a",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "m4b",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mp4",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mod",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mpga", FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "shn",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "aif",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "aiff", FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "spx" , FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "opus", FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "sid",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "adx",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "nsf",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "nsfe", FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "spc",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "ape",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mac",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "sap" , FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "rm",   FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "ra",   FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "rmvb", FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "cmc",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "cm3",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "cmr",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "cms",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "dmc",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "dlt",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mpt",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mpd",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "rmt",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "tmc",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "tm8",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "tm2",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "oma",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "aa3",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "at3",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "mmf",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "au",   FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "snd",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "vox",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "w64",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "tta",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "ay",   FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "vtx",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "gbs",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "hes",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "sgc",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "vgm",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "vgz",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "kss",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "aac",  FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { "m3u",  FILE_ATTR_M3U,    LANG_PLAYLIST },
-    { "m3u8", FILE_ATTR_M3U,    LANG_PLAYLIST },
-    { "cfg",  FILE_ATTR_CFG,    VOICE_EXT_CFG },
-    { "wps",  FILE_ATTR_WPS,    VOICE_EXT_WPS },
+    { "mp3",  FILE_ATTR_AUDIO },
+    { "mp2",  FILE_ATTR_AUDIO },
+    { "mpa",  FILE_ATTR_AUDIO },
+    { "mp1",  FILE_ATTR_AUDIO },
+    { "ogg",  FILE_ATTR_AUDIO },
+    { "oga",  FILE_ATTR_AUDIO },
+    { "wma",  FILE_ATTR_AUDIO },
+    { "wmv",  FILE_ATTR_AUDIO },
+    { "asf",  FILE_ATTR_AUDIO },
+    { "wav",  FILE_ATTR_AUDIO },
+    { "flac", FILE_ATTR_AUDIO },
+    { "ac3",  FILE_ATTR_AUDIO },
+    { "a52",  FILE_ATTR_AUDIO },
+    { "mpc",  FILE_ATTR_AUDIO },
+    { "wv",   FILE_ATTR_AUDIO },
+    { "m4a",  FILE_ATTR_AUDIO },
+    { "m4b",  FILE_ATTR_AUDIO },
+    { "mp4",  FILE_ATTR_AUDIO },
+    { "mod",  FILE_ATTR_AUDIO },
+    { "mpga", FILE_ATTR_AUDIO },
+    { "shn",  FILE_ATTR_AUDIO },
+    { "aif",  FILE_ATTR_AUDIO },
+    { "aiff", FILE_ATTR_AUDIO },
+    { "spx" , FILE_ATTR_AUDIO },
+    { "opus", FILE_ATTR_AUDIO },
+    { "sid",  FILE_ATTR_AUDIO },
+    { "adx",  FILE_ATTR_AUDIO },
+    { "nsf",  FILE_ATTR_AUDIO },
+    { "nsfe", FILE_ATTR_AUDIO },
+    { "spc",  FILE_ATTR_AUDIO },
+    { "ape",  FILE_ATTR_AUDIO },
+    { "mac",  FILE_ATTR_AUDIO },
+    { "sap" , FILE_ATTR_AUDIO },
+    { "rm",   FILE_ATTR_AUDIO },
+    { "ra",   FILE_ATTR_AUDIO },
+    { "rmvb", FILE_ATTR_AUDIO },
+    { "cmc",  FILE_ATTR_AUDIO },
+    { "cm3",  FILE_ATTR_AUDIO },
+    { "cmr",  FILE_ATTR_AUDIO },
+    { "cms",  FILE_ATTR_AUDIO },
+    { "dmc",  FILE_ATTR_AUDIO },
+    { "dlt",  FILE_ATTR_AUDIO },
+    { "mpt",  FILE_ATTR_AUDIO },
+    { "mpd",  FILE_ATTR_AUDIO },
+    { "rmt",  FILE_ATTR_AUDIO },
+    { "tmc",  FILE_ATTR_AUDIO },
+    { "tm8",  FILE_ATTR_AUDIO },
+    { "tm2",  FILE_ATTR_AUDIO },
+    { "oma",  FILE_ATTR_AUDIO },
+    { "aa3",  FILE_ATTR_AUDIO },
+    { "at3",  FILE_ATTR_AUDIO },
+    { "mmf",  FILE_ATTR_AUDIO },
+    { "au",   FILE_ATTR_AUDIO },
+    { "snd",  FILE_ATTR_AUDIO },
+    { "vox",  FILE_ATTR_AUDIO },
+    { "w64",  FILE_ATTR_AUDIO },
+    { "tta",  FILE_ATTR_AUDIO },
+    { "ay",   FILE_ATTR_AUDIO },
+    { "vtx",  FILE_ATTR_AUDIO },
+    { "gbs",  FILE_ATTR_AUDIO },
+    { "hes",  FILE_ATTR_AUDIO },
+    { "sgc",  FILE_ATTR_AUDIO },
+    { "vgm",  FILE_ATTR_AUDIO },
+    { "vgz",  FILE_ATTR_AUDIO },
+    { "kss",  FILE_ATTR_AUDIO },
+    { "aac",  FILE_ATTR_AUDIO },
+    { "m3u",  FILE_ATTR_M3U },
+    { "m3u8", FILE_ATTR_M3U },
+    { "cfg",  FILE_ATTR_CFG },
+    { "wps",  FILE_ATTR_WPS },
 #ifdef HAVE_REMOTE_LCD
-    { "rwps", FILE_ATTR_RWPS,   VOICE_EXT_RWPS },
+    { "rwps", FILE_ATTR_RWPS },
 #endif
 #if CONFIG_TUNER
-    { "fmr",  FILE_ATTR_FMR,    LANG_FMR },
-    { "fms",  FILE_ATTR_FMS,    VOICE_EXT_FMS },
+    { "fmr",  FILE_ATTR_FMR },
+    { "fms",  FILE_ATTR_FMS },
 #endif
-    { "lng",  FILE_ATTR_LNG,    LANG_LANGUAGE },
-    { "rock", FILE_ATTR_ROCK,   VOICE_EXT_ROCK },
-    { "lua",  FILE_ATTR_LUA,    VOICE_EXT_ROCK },
-    { "opx",  FILE_ATTR_OPX,    VOICE_EXT_ROCK },
-    { "fnt",  FILE_ATTR_FONT,   VOICE_EXT_FONT },
-    { "kbd",  FILE_ATTR_KBD,    VOICE_EXT_KBD },
-    { "bmark",FILE_ATTR_BMARK,  VOICE_EXT_BMARK },
-    { "cue",  FILE_ATTR_CUE,    VOICE_EXT_CUESHEET },
-    { "sbs",  FILE_ATTR_SBS,    VOICE_EXT_SBS },
+    { "lng",  FILE_ATTR_LNG   },
+    { "rock", FILE_ATTR_ROCK  },
+    { "lua",  FILE_ATTR_LUA   },
+    { "opx",  FILE_ATTR_OPX   },
+    { "fnt",  FILE_ATTR_FONT  },
+    { "kbd",  FILE_ATTR_KBD   },
+    { "bmark",FILE_ATTR_BMARK },
+    { "cue",  FILE_ATTR_CUE   },
+    { "sbs",  FILE_ATTR_SBS   },
 #ifdef HAVE_REMOTE_LCD
-    { "rsbs", FILE_ATTR_RSBS,   VOICE_EXT_RSBS },
+    { "rsbs", FILE_ATTR_RSBS },
 #if CONFIG_TUNER
-    { "rfms", FILE_ATTR_RFMS,   VOICE_EXT_RFMS },
+    { "rfms", FILE_ATTR_RFMS },
 #endif
 #endif
 #ifdef BOOTFILE_EXT
-    { BOOTFILE_EXT,  FILE_ATTR_MOD, VOICE_EXT_AJZ },
+    { BOOTFILE_EXT,  FILE_ATTR_MOD },
 #endif
 #ifdef BOOTFILE_EXT2
-    { BOOTFILE_EXT2, FILE_ATTR_MOD, VOICE_EXT_AJZ },
+    { BOOTFILE_EXT2, FILE_ATTR_MOD },
+#endif
+};
+
+/* a table for the known file types voice clips */
+static const struct fileattr_voice inbuilt_attrvoices[] = {
+    { FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
+    { FILE_ATTR_M3U,    LANG_PLAYLIST },
+    { FILE_ATTR_CFG,    VOICE_EXT_CFG },
+    { FILE_ATTR_WPS,    VOICE_EXT_WPS },
+#ifdef HAVE_REMOTE_LCD
+    { FILE_ATTR_RWPS,   VOICE_EXT_RWPS },
+#endif
+#if CONFIG_TUNER
+    { FILE_ATTR_FMR,    LANG_FMR },
+    { FILE_ATTR_FMS,    VOICE_EXT_FMS },
+#endif
+    { FILE_ATTR_LNG,    LANG_LANGUAGE },
+    { FILE_ATTR_ROCK,   VOICE_EXT_ROCK },
+    { FILE_ATTR_LUA,    VOICE_EXT_ROCK },
+    { FILE_ATTR_OPX,    VOICE_EXT_ROCK },
+    { FILE_ATTR_FONT,   VOICE_EXT_FONT },
+    { FILE_ATTR_KBD,    VOICE_EXT_KBD },
+    { FILE_ATTR_BMARK,  VOICE_EXT_BMARK },
+    { FILE_ATTR_CUE,    VOICE_EXT_CUESHEET },
+    { FILE_ATTR_SBS,    VOICE_EXT_SBS },
+#ifdef HAVE_REMOTE_LCD
+    { FILE_ATTR_RSBS,   VOICE_EXT_RSBS },
+#if CONFIG_TUNER
+    { FILE_ATTR_RFMS,   VOICE_EXT_RFMS },
+#endif
+#endif
+#if defined(BOOTFILE_EXT) || defined(BOOTFILE_EXT2)
+    { FILE_ATTR_MOD, VOICE_EXT_AJZ },
 #endif
 };
 
@@ -189,6 +223,25 @@ void tree_get_filetypes(const struct filetype** types, int* count)
 {
     *types = inbuilt_filetypes;
     *count = sizeof(inbuilt_filetypes) / sizeof(*inbuilt_filetypes);
+}
+
+long tree_filetype_voiceclip(int attr)
+{
+    logf("%s attr %d", __func__, attr);
+    int j;
+    if (global_settings.talk_filetype)
+    {
+        int count = sizeof(inbuilt_attrvoices)/sizeof(*inbuilt_attrvoices);
+        /* try to find a voice ID for the extension, if known */
+        //attr &= FILE_ATTR_MASK; /* file type */
+        for (j=0; j<count; j++)
+            if (attr == inbuilt_attrvoices[j].tree_attr)
+            {
+                logf("%s attr %d id %d", __func__, attr, inbuilt_attrvoices[j].voiceclip);
+                return inbuilt_attrvoices[j].voiceclip;
+            }
+    }
+    return -1;
 }
 
 #define ROCK_EXTENSION "rock"
