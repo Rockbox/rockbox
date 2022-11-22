@@ -105,6 +105,7 @@ struct playlist_viewer {
     const char *title;          /* Playlist Viewer list title                */
     struct playlist_info* playlist; /* Playlist being viewed                 */
     int num_tracks;             /* Number of tracks in playlist              */
+    int *initial_selection;     /* The initially selected track              */
     int current_playing_track;  /* Index of current playing track            */
     int selected_track;         /* The selected track, relative (first is 0) */
     int moving_track;           /* The track to move, relative (first is 0)
@@ -132,7 +133,8 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
                                                          int index);
 
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
-                                 const char* filename, bool reload);
+                                 const char* filename, bool reload,
+                                 int *most_recent_selection);
 
 static void format_name(char* dest, const char* src);
 static void format_line(const struct playlist_entry* track, char* str,
@@ -321,7 +323,8 @@ static struct playlist_entry * playlist_buffer_get_track(struct playlist_buffer 
 
 /* Initialize the playlist viewer. */
 static bool playlist_viewer_init(struct playlist_viewer * viewer,
-                                 const char* filename, bool reload)
+                                 const char* filename, bool reload,
+                                 int *most_recent_selection)
 {
     char* buffer;
     size_t buffer_size;
@@ -406,11 +409,12 @@ static bool playlist_viewer_init(struct playlist_viewer * viewer,
 
     viewer->moving_track = -1;
     viewer->moving_playlist_index = -1;
+    viewer->initial_selection = most_recent_selection;
 
     if (!reload)
     {
         if (viewer->playlist)
-            viewer->selected_track = 0;
+            viewer->selected_track = most_recent_selection ? *most_recent_selection : 0;
         else
             viewer->selected_track = playlist_get_display_index() - 1;
     }
@@ -668,7 +672,7 @@ static enum pv_onplay_result onplay_menu(int index)
 /* View current playlist */
 enum playlist_viewer_result playlist_viewer(void)
 {
-    return playlist_viewer_ex(NULL);
+    return playlist_viewer_ex(NULL, NULL);
 }
 
 static int get_track_num(struct playlist_viewer *local_viewer,
@@ -821,11 +825,11 @@ static void prepare_lists(struct gui_synclist * playlist_lists)
 
 static bool open_playlist_viewer(const char* filename,
                                   struct gui_synclist *playlist_lists,
-                                  bool reload)
+                                  bool reload, int *most_recent_selection)
 {
     push_current_activity(ACTIVITY_PLAYLISTVIEWER);
 
-    if (!playlist_viewer_init(&viewer, filename, reload))
+    if (!playlist_viewer_init(&viewer, filename, reload, most_recent_selection))
         return false;
 
     prepare_lists(playlist_lists);
@@ -835,14 +839,15 @@ static bool open_playlist_viewer(const char* filename,
 
 /* Main viewer function.  Filename identifies playlist to be viewed.  If NULL,
    view current playlist. */
-enum playlist_viewer_result playlist_viewer_ex(const char* filename)
+enum playlist_viewer_result playlist_viewer_ex(const char* filename,
+                                               int* most_recent_selection)
 {
     enum playlist_viewer_result ret = PLAYLIST_VIEWER_OK;
     bool exit = false;        /* exit viewer */
     int button;
     struct gui_synclist playlist_lists;
 
-    if (!open_playlist_viewer(filename, &playlist_lists, false))
+    if (!open_playlist_viewer(filename, &playlist_lists, false, most_recent_selection))
     {
         ret = PLAYLIST_VIEWER_CANCEL;
         goto exit;
@@ -961,8 +966,11 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         start_index = playlist_shuffle(current_tick, start_index);
                     playlist_start(start_index, 0, 0);
 
+                    if (viewer.initial_selection)
+                        *(viewer.initial_selection) = viewer.selected_track;
+
                     /* Our playlist is now the current list */
-                    if (!playlist_viewer_init(&viewer, NULL, true))
+                    if (!playlist_viewer_init(&viewer, NULL, true, NULL))
                         goto exit;
                     exit = true;
                 }
@@ -986,7 +994,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                     return PLAYLIST_VIEWER_OK;
                 else if (pv_onplay_result == PV_ONPLAY_CLOSED)
                 {
-                    if (!open_playlist_viewer(filename, &playlist_lists, true))
+                    if (!open_playlist_viewer(filename, &playlist_lists, true, NULL))
                     {
                         ret = PLAYLIST_VIEWER_CANCEL;
                         goto exit;
@@ -1035,7 +1043,7 @@ enum playlist_viewer_result playlist_viewer_ex(const char* filename)
                         return PLAYLIST_VIEWER_USB;
                     else if (plugin_result == PV_ONPLAY_WPS_CLOSED)
                         return PLAYLIST_VIEWER_OK;
-                    else if (!open_playlist_viewer(filename, &playlist_lists, true))
+                    else if (!open_playlist_viewer(filename, &playlist_lists, true, NULL))
                     {
                         ret = PLAYLIST_VIEWER_CANCEL;
                         goto exit;
@@ -1087,6 +1095,9 @@ static void close_playlist_viewer(void)
     pop_current_activity();
     if (viewer.playlist)
     {
+        if (viewer.initial_selection)
+            *(viewer.initial_selection) = viewer.selected_track;
+
         if(dirty && yesno_pop(ID2P(LANG_SAVE_CHANGES)))
             save_playlist_screen(viewer.playlist);
         playlist_close(viewer.playlist);
@@ -1127,7 +1138,7 @@ bool search_playlist(void)
     struct gui_synclist playlist_lists;
     struct playlist_track_info track;
 
-    if (!playlist_viewer_init(&viewer, 0, false))
+    if (!playlist_viewer_init(&viewer, 0, false, NULL))
         return ret;
     if (kbd_input(search_str, sizeof(search_str), NULL) < 0)
         return ret;

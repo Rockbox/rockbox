@@ -147,6 +147,7 @@ const char* catalog_get_directory(void)
    If "view" mode is set then we're not adding anything into playlist. */
 static int display_playlists(char* playlist, bool view)
 {
+    static int most_recent_selection = 0;
     struct browse_context browse;
     char selected_playlist[MAX_PATH];
     int result = -1;
@@ -154,7 +155,7 @@ static int display_playlists(char* playlist, bool view)
     browse_context_init(&browse, SHOW_M3U,
                         BROWSE_SELECTONLY|(view? 0: BROWSE_NO_CONTEXT_MENU),
                         str(LANG_CATALOG), NOICON,
-                        playlist_dir, most_recent_playlist);
+                        playlist_dir, playlist_dir_length + 1 + most_recent_playlist);
 
     browse.buf = selected_playlist;
     browse.bufsize = sizeof(selected_playlist);
@@ -168,8 +169,12 @@ restart:
 
     if (browse.flags & BROWSE_SELECTED)
     {
-        strmemccpy(most_recent_playlist, selected_playlist+playlist_dir_length+1,
-                   sizeof(most_recent_playlist));
+        if (strcmp(most_recent_playlist, selected_playlist)) /* isn't most recent one */
+        {
+            strmemccpy(most_recent_playlist, selected_playlist,
+                       sizeof(most_recent_playlist));
+            most_recent_selection = 0;
+        }
 
         if (view)
         {
@@ -179,7 +184,7 @@ restart:
                result = 0;
             else
             {
-                switch (playlist_viewer_ex(selected_playlist)) {
+                switch (playlist_viewer_ex(selected_playlist, &most_recent_selection)) {
                     case PLAYLIST_VIEWER_OK:
                         result = 0;
                         break;

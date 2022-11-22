@@ -137,7 +137,7 @@ int save_playlist_screen(struct playlist_info* playlist)
 
 static int playlist_view_(void)
 {
-    playlist_viewer_ex(NULL);
+    playlist_viewer_ex(NULL, NULL);
     return 0;
 }
 MENUITEM_FUNCTION(create_playlist_item, 0, ID2P(LANG_CREATE_PLAYLIST),

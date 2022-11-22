@@ -591,7 +591,7 @@ static bool view_playlist(void)
 {
     bool result;
 
-    result = playlist_viewer_ex(selected_file);
+    result = playlist_viewer_ex(selected_file, NULL);
 
     if (result == PLAYLIST_VIEWER_OK &&
         onplay_result == ONPLAY_OK)
