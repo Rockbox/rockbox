@@ -824,6 +824,113 @@ void setvol(void)
     settings_save();
 }
 
+#ifdef HAVE_PERCEPTUAL_VOLUME
+static short norm_tab[MAX_NORM_VOLUME_STEPS+2];
+static int norm_tab_num_steps;
+static int norm_tab_size;
+
+static void update_norm_tab(void)
+{
+    const int lim = global_settings.volume_adjust_norm_steps;
+    if (lim == norm_tab_num_steps)
+        return;
+    norm_tab_num_steps = lim;
+
+    const int min = sound_min(SOUND_VOLUME);
+    const int max = sound_max(SOUND_VOLUME);
+    const int step = sound_steps(SOUND_VOLUME);
+
+    /* Ensure the table contains the minimum volume */
+    norm_tab[0] = min;
+    norm_tab_size = 1;
+
+    for (int i = 0; i < lim; ++i)
+    {
+        int vol = from_normalized_volume(i, min, max, lim);
+        int rem = vol % step;
+
+        vol -= rem;
+        if (abs(rem) > step/2)
+            vol += rem < 0 ? -step : step;
+
+        /* Add volume step, ignoring any duplicate entries that may
+         * occur due to rounding */
+        if (vol != norm_tab[norm_tab_size-1])
+            norm_tab[norm_tab_size++] = vol;
+    }
+
+    /* Ensure the table contains the maximum volume */
+    if (norm_tab[norm_tab_size-1] != max)
+        norm_tab[norm_tab_size++] = max;
+}
+
+void set_normalized_volume(int vol)
+{
+    update_norm_tab();
+
+    if (vol < 0)
+        vol = 0;
+    if (vol >= norm_tab_size)
+        vol = norm_tab_size - 1;
+
+    global_settings.volume = norm_tab[vol];
+}
+
+int get_normalized_volume(void)
+{
+    update_norm_tab();
+
+    int a = 0, b = norm_tab_size - 1;
+    while (a != b)
+    {
+        int i = (a + b + 1) / 2;
+        if (global_settings.volume < norm_tab[i])
+            b = i - 1;
+        else
+            a = i;
+    }
+
+    return a;
+}
+#else
+void set_normalized_volume(int vol)
+{
+    global_settings.volume = vol * sound_steps(SOUND_VOLUME);
+}
+
+int get_normalized_volume(void)
+{
+    return global_settings.volume / sound_steps(SOUND_VOLUME);
+}
+#endif
+
+void adjust_volume(int steps)
+{
+#ifdef HAVE_PERCEPTUAL_VOLUME
+    adjust_volume_ex(steps, global_settings.volume_adjust_mode);
+#else
+    adjust_volume_ex(steps, VOLUME_ADJUST_DIRECT);
+#endif
+}
+
+void adjust_volume_ex(int steps, enum volume_adjust_mode mode)
+{
+    switch (mode)
+    {
+    case VOLUME_ADJUST_PERCEPTUAL:
+#ifdef HAVE_PERCEPTUAL_VOLUME
+        set_normalized_volume(get_normalized_volume() + steps);
+        break;
+#endif
+    case VOLUME_ADJUST_DIRECT:
+    default:
+        global_settings.volume += steps * sound_steps(SOUND_VOLUME);
+        break;
+    }
+
+    setvol();
+}
+
 char* strrsplt(char* str, int c)
 {
     char* s = strrchr(str, c);

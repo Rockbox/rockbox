@@ -378,14 +378,12 @@ static int gui_syncquickscreen_run(struct gui_quickscreen * qs, int button_enter
         else if (button == button_enter)
             can_quit = true;
         else if (button == ACTION_QS_VOLUP) {
-            global_settings.volume += sound_steps(SOUND_VOLUME);
-            setvol();
+            adjust_volume(1);
             FOR_NB_SCREENS(i)
                 skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_NON_STATIC);
         }
         else if (button == ACTION_QS_VOLDOWN) {
-            global_settings.volume -= sound_steps(SOUND_VOLUME);
-            setvol();
+            adjust_volume(-1);
             FOR_NB_SCREENS(i)
                 skin_update(CUSTOM_STATUSBAR, i, SKIN_REFRESH_NON_STATIC);
         }

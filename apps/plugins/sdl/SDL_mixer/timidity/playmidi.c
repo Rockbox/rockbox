@@ -21,6 +21,8 @@
 
 #include "tables.h"
 
+/* ROCKBOX HACK: avoid a conflict with adjust_volume() in misc.h */
+#define adjust_volume adjust_midi_volume
 
 static int opt_expression_curve = 2;
 static int opt_volume_curve = 2;

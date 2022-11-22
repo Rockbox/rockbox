@@ -663,12 +663,10 @@ bool gui_synclist_do_button(struct gui_synclist * lists, int *actionptr)
 
 #ifdef HAVE_VOLUME_IN_LIST
         case ACTION_LIST_VOLUP:
-            global_settings.volume += sound_steps(SOUND_VOLUME);
-            setvol();
+            adjust_volume(1);
             return true;
         case ACTION_LIST_VOLDOWN:
-            global_settings.volume -= sound_steps(SOUND_VOLUME);
-            setvol();
+            adjust_volume(-1);
             return true;
 #endif
         case ACTION_STD_PREV:

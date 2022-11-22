@@ -841,9 +841,9 @@ long gui_wps_show(void)
             case ACTION_WPS_VOLUP: /* fall through */
             case ACTION_WPS_VOLDOWN:
                 if (button == ACTION_WPS_VOLUP)
-                    global_settings.volume += sound_steps(SOUND_VOLUME);
+                    adjust_volume(1);
                 else
-                    global_settings.volume -= sound_steps(SOUND_VOLUME);
+                    adjust_volume(-1);
 
                 setvol();
                 FOR_NB_SCREENS(i)

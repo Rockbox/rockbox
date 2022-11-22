@@ -296,3 +296,7 @@ hibylinux
     (CONFIG_KEYPAD == IRIVER_H10_PAD)
 clear_settings_on_hold
 #endif
+
+#if defined(HAVE_PERCEPTUAL_VOLUME)
+perceptual_volume
+#endif

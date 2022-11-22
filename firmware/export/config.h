@@ -1319,6 +1319,10 @@ Lyre prototype 1 */
 # define HAVE_SCREENDUMP
 #endif
 
+#if !defined(BOOTLOADER) && MEMORYSIZE > 2
+# define HAVE_PERCEPTUAL_VOLUME
+#endif
+
 /* null audiohw setting macro for when codec header is included for reasons
    other than audio support */
 #define AUDIOHW_SETTING(name, us, nd, st, minv, maxv, defv, expr...)

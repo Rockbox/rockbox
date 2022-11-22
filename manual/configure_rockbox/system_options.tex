@@ -137,6 +137,23 @@ This sub menu relates to limits in the Rockbox operating system.
       \item LAN party computer $\rightarrow$ \dap $\rightarrow$ human
       \end{itemize}
   }
+\opt{perceptual_volume}{
+  \subsection{Volume Adjustment Mode}
+  This setting selects the method used to adjust volume with \ButtonVolUp{} and
+  \ButtonVolDown{}. In \setting{Direct} mode each volume step changes the volume
+  by a fixed number of decibels (dB).
+
+  In \setting{Perceptual} mode, the hardware volume range is divided into a
+  number of steps, controlled by the \setting{Number of Volume Steps} option.
+  Each step changes the volume by a variable number of decibels (dB) so the
+  perceived loudness changes by about the same amount at each step. The dB
+  change is smaller at high volumes and larger at low volumes, so a large
+  range of low volumes are effectively compressed into a smaller number of
+  volume steps.
+
+  \setting{Volume Adjustment Mode} does not affect how volume is displayed by
+  themes.
+}
 \opt{quickscreen}{
   \subsection{Use Shortcuts Menu Instead of Quick Screen} This option
   activates the shortcuts menu instead of opening the quick screen when enabled.

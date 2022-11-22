@@ -828,6 +828,7 @@ static const struct plugin_api rockbox_api = {
 #if defined(HAVE_TAGCACHE)
     tagtree_subentries_do_action,
 #endif
+    adjust_volume,
 };
 
 static int plugin_buffer_handle;

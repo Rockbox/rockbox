@@ -855,6 +855,11 @@ struct user_settings
 #endif
     int volume_limit; /* maximum volume limit */
 
+#ifdef HAVE_PERCEPTUAL_VOLUME
+    int volume_adjust_mode;
+    int volume_adjust_norm_steps;
+#endif
+
     int surround_enabled;
     int surround_balance;
     int surround_fx1;

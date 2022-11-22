@@ -2625,16 +2625,10 @@ static int handle_button(void)
                 ff_rewind(0, false);
             break;
         case ACTION_WPS_VOLDOWN:
-            limit = rb->sound_min(SOUND_VOLUME);
-            if (--rb->global_settings->volume < limit)
-                rb->global_settings->volume = limit;
-            rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+            rb->adjust_volume(-1);
             break;
         case ACTION_WPS_VOLUP:
-            limit = rb->sound_max(SOUND_VOLUME);
-            if (++rb->global_settings->volume > limit)
-                rb->global_settings->volume = limit;
-            rb->sound_set(SOUND_VOLUME, rb->global_settings->volume);
+            rb->adjust_volume(1);
             break;
         case ACTION_WPS_CONTEXT:
             ret = LRC_GOTO_EDITOR;

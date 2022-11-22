@@ -710,7 +710,6 @@ static void mm_errorhandler(void)
 
 static int playfile(char* filename)
 {
-    int vol = 0;
     int button;
     int retval = PLUGIN_OK;
     bool changingpos = false;
@@ -789,13 +788,8 @@ static int playfile(char* filename)
                 }
                 break;
             }
-            vol = rb->global_settings->volume;
-            if (vol < rb->sound_max(SOUND_VOLUME))
-            {
-                vol++;
-                rb->sound_set(SOUND_VOLUME, vol);
-                rb->global_settings->volume = vol;
-            }
+
+            rb->adjust_volume(1);
             break;
 
         case ACTION_WPS_VOLDOWN:
@@ -808,13 +802,8 @@ static int playfile(char* filename)
                 }
                 break;
             }
-            vol = rb->global_settings->volume;
-            if (vol > rb->sound_min(SOUND_VOLUME))
-            {
-                vol--;
-                rb->sound_set(SOUND_VOLUME, vol);
-                rb->global_settings->volume = vol;
-            }
+
+            rb->adjust_volume(-1);
             break;
 
         case ACTION_WPS_SKIPPREV:

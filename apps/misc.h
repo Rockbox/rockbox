@@ -137,8 +137,22 @@ void check_bootfile(bool do_rolo);
 #endif
 #endif
 
+enum volume_adjust_mode
+{
+    VOLUME_ADJUST_DIRECT,       /* adjust in units of the volume step size */
+    VOLUME_ADJUST_PERCEPTUAL,   /* adjust using perceptual steps */
+};
+
+/* min/max values for global_settings.volume_adjust_norm_steps */
+#define MIN_NORM_VOLUME_STEPS 10
+#define MAX_NORM_VOLUME_STEPS 100
+
 /* check range, set volume and save settings */
 void setvol(void);
+void set_normalized_volume(int vol);
+int get_normalized_volume(void);
+void adjust_volume(int steps);
+void adjust_volume_ex(int steps, enum volume_adjust_mode mode);
 
 #ifdef HAVE_LCD_COLOR
 int hex_to_rgb(const char* hex, int* color);

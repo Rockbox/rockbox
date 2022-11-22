@@ -40,6 +40,7 @@
 #include "powermgmt.h"
 #include "kernel.h"
 #include "open_plugin.h"
+#include "misc.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -1057,6 +1058,16 @@ const struct settings_list settings[] = {
                 MAX_FILES_IN_DIR_STEP /* min */, MAX_FILES_IN_DIR_MAX,
                 MAX_FILES_IN_DIR_STEP,
                 NULL, NULL, NULL),
+#ifdef HAVE_PERCEPTUAL_VOLUME
+    CHOICE_SETTING(0, volume_adjust_mode, LANG_VOLUME_ADJUST_MODE,
+                   VOLUME_ADJUST_DIRECT, "volume adjustment mode",
+                   "direct,perceptual", NULL, 2,
+                   ID2P(LANG_DIRECT), ID2P(LANG_PERCEPTUAL)),
+    INT_SETTING_NOWRAP(0, volume_adjust_norm_steps, LANG_VOLUME_ADJUST_NORM_STEPS,
+                       50, "perceptual volume step count", UNIT_INT,
+                       MIN_NORM_VOLUME_STEPS, MAX_NORM_VOLUME_STEPS, 5,
+                       NULL, NULL, NULL),
+#endif
 /* use this setting for user code even if there's no exchangable battery
  * support enabled */
 #if BATTERY_CAPACITY_INC > 0

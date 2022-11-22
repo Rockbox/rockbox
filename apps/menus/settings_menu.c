@@ -338,6 +338,11 @@ MAKE_MENU(limits_menu, ID2P(LANG_LIMITS_MENU), 0, Icon_NOICON,
            ,&default_glyphs
            );
 
+#ifdef HAVE_PERCEPTUAL_VOLUME
+/* Volume adjustment */
+MENUITEM_SETTING(volume_adjust_mode, &global_settings.volume_adjust_mode, NULL);
+MENUITEM_SETTING(volume_adjust_norm_steps, &global_settings.volume_adjust_norm_steps, NULL);
+#endif
 
 /* Keyclick menu */
 MENUITEM_SETTING(keyclick, &global_settings.keyclick, NULL);
@@ -424,6 +429,10 @@ MAKE_MENU(system_menu, ID2P(LANG_SYSTEM),
             &disk_menu,
 #endif
             &limits_menu,
+#ifdef HAVE_PERCEPTUAL_VOLUME
+            &volume_adjust_mode,
+            &volume_adjust_norm_steps,
+#endif
 #ifdef HAVE_QUICKSCREEN
             &shortcuts_replaces_quickscreen,
 #endif

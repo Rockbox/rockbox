@@ -158,7 +158,7 @@ int plugin_open(const char *plugin, const char *parameter);
 #define PLUGIN_MAGIC 0x526F634B /* RocK */
 
 /* increase this every time the api struct changes */
-#define PLUGIN_API_VERSION 264
+#define PLUGIN_API_VERSION 265
 
 /* update this to latest version if a change to the api struct breaks
    backwards compatibility (and please take the opportunity to sort in any
@@ -954,6 +954,7 @@ struct plugin_api {
 #ifdef HAVE_TAGCACHE
     bool (*tagtree_subentries_do_action)(bool (*action_cb)(const char *file_name));
 #endif
+    void (*adjust_volume)(int steps);
 };
 
 /* plugin header */
