@@ -238,4 +238,12 @@ int core_load_bmp(const char *filename, struct bitmap *bm, const int bmformat,
                   ssize_t *buf_reqd, struct buflib_callbacks *ops);
 #endif
 
+/* Convert a volume (in tenth dB) in the range [min_vol, max_vol]
+ * to a normalized linear value in the range [0, max_norm]. */
+long to_normalized_volume(long vol, long min_vol, long max_vol, long max_norm);
+
+/* Inverse of to_normalized_volume(), returns the volume in tenth dB
+ * for the given normalized volume. */
+long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm);
+
 #endif /* MISC_H */

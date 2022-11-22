@@ -1664,3 +1664,105 @@ int core_load_bmp(const char * filename, struct bitmap *bm, const int bmformat,
     return handle;
 }
 #endif /* ndef __PCTOOL__ */
+
+/*
+ * Normalized volume routines adapted from alsamixer volume_mapping.c
+ */
+/*
+ * Copyright (c) 2010 Clemens Ladisch <clemens@ladisch.de>
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+/*
+ * "The mapping is designed so that the position in the interval is proportional
+ * to the volume as a human ear would perceive it (i.e., the position is the
+ * cubic root of the linear sample multiplication factor).  For controls with
+ * a small range (24 dB or less), the mapping is linear in the dB values so
+ * that each step has the same size visually.  Only for controls without dB
+ * information, a linear mapping of the hardware volume register values is used
+ * (this is the same algorithm as used in the old alsamixer)."
+ */
+
+#define NVOL_FRACBITS 16
+#define NVOL_UNITY    (1L << NVOL_FRACBITS)
+#define NVOL_FACTOR   (600L << NVOL_FRACBITS)
+
+#define NVOL_MAX_LINEAR_DB_SCALE (240L << NVOL_FRACBITS)
+
+#define nvol_div(x,y) fp_div((x), (y), NVOL_FRACBITS)
+#define nvol_mul(x,y) fp_mul((x), (y), NVOL_FRACBITS)
+#define nvol_exp10(x) fp_exp10((x), NVOL_FRACBITS)
+#define nvol_log10(x) fp_log10((x), NVOL_FRACBITS)
+
+static bool use_linear_dB_scale(long min_vol, long max_vol)
+{
+    /*
+     * Alsamixer uses a linear scale for small ranges.
+     * Commented out so perceptual volume works as advertised on all targets.
+     */
+    /*
+    return max_vol - min_vol <= NVOL_MAX_LINEAR_DB_SCALE;
+    */
+
+    (void)min_vol;
+    (void)max_vol;
+    return false;
+}
+
+long to_normalized_volume(long vol, long min_vol, long max_vol, long max_norm)
+{
+    long norm, min_norm;
+
+    vol <<= NVOL_FRACBITS;
+    min_vol <<= NVOL_FRACBITS;
+    max_vol <<= NVOL_FRACBITS;
+    max_norm <<= NVOL_FRACBITS;
+
+    if (use_linear_dB_scale(min_vol, max_vol))
+    {
+        norm = nvol_div(vol - min_vol, max_vol - min_vol);
+    }
+    else
+    {
+        min_norm = nvol_exp10(nvol_div(min_vol - max_vol, NVOL_FACTOR));
+        norm = nvol_exp10(nvol_div(vol - max_vol, NVOL_FACTOR));
+        norm = nvol_div(norm - min_norm, NVOL_UNITY - min_norm);
+    }
+
+    return nvol_mul(norm, max_norm) >> NVOL_FRACBITS;
+}
+
+long from_normalized_volume(long norm, long min_vol, long max_vol, long max_norm)
+{
+    long vol, min_norm;
+
+    norm <<= NVOL_FRACBITS;
+    min_vol <<= NVOL_FRACBITS;
+    max_vol <<= NVOL_FRACBITS;
+    max_norm <<= NVOL_FRACBITS;
+
+    vol = nvol_div(norm, max_norm);
+
+    if (use_linear_dB_scale(min_vol, max_vol))
+    {
+        vol = nvol_mul(vol, max_vol - min_vol) + min_vol;
+    }
+    else
+    {
+        min_norm = nvol_exp10(nvol_div(min_vol - max_vol, NVOL_FACTOR));
+        vol = nvol_mul(vol, NVOL_UNITY - min_norm) + min_norm;
+        vol = nvol_mul(nvol_log10(vol), NVOL_FACTOR) + max_vol;
+    }
+
+    return vol >> NVOL_FRACBITS;
+}
