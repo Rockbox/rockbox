@@ -51,7 +51,23 @@
 #endif
 #include "wps.h"
 
-static int compare_sort_dir; /* qsort key for sorting directories */
+static struct compare_data
+{
+    int sort_dir; /* qsort key for sorting directories */
+    int(*_compar)(const char*, const char*, size_t);
+} cmp_data;
+
+/* dummmy functions to allow compatibility with strncmp & strncasecmp */
+static int strnatcmp_n(const char *a, const char *b, size_t n)
+{
+    (void)n;
+     return strnatcmp(a, b);
+}
+static int strnatcasecmp_n(const char *a, const char *b, size_t n)
+{
+    (void)n;
+     return strnatcasecmp(a, b);
+}
 
 int ft_build_playlist(struct tree_context* c, int start_index)
 {
@@ -192,7 +208,7 @@ static int compare(const void* p1, const void* p2)
 
     if (e1->attr & ATTR_DIRECTORY && e2->attr & ATTR_DIRECTORY)
     {   /* two directories */
-        criteria = compare_sort_dir;
+        criteria = cmp_data.sort_dir;
 
 #ifdef HAVE_MULTIVOLUME
         if (e1->attr & ATTR_VOLUME || e2->attr & ATTR_VOLUME)
@@ -227,41 +243,22 @@ static int compare(const void* p1, const void* p2)
 
             if (t1 != t2) /* if different */
                 return (t1 - t2) * (criteria == SORT_TYPE_REVERSED ? -1 : 1);
-            /* else fall through to alphabetical sorting */
+            /* else alphabetical sorting */
+            return cmp_data._compar(e1->name, e2->name, MAX_PATH);
         }
 
         case SORT_DATE:
         case SORT_DATE_REVERSED:
-            /* Ignore SORT_TYPE */
-            if (criteria == SORT_DATE || criteria == SORT_DATE_REVERSED)
-            {
-                if (e1->time_write != e2->time_write)
-                    return (e1->time_write - e2->time_write)
-                           * (criteria == SORT_DATE_REVERSED ? -1 : 1);
-                /* else fall through to alphabetical sorting */
-            }
-
+        {
+            if (e1->time_write != e2->time_write)
+                return (e1->time_write - e2->time_write)
+                       * (criteria == SORT_DATE_REVERSED ? -1 : 1);
+            /* else fall through to alphabetical sorting */
+        }
         case SORT_ALPHA:
         case SORT_ALPHA_REVERSED:
         {
-            if (global_settings.sort_case)
-            {
-                if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)
-                    return strnatcmp(e1->name, e2->name)
-                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
-                else
-                    return strncmp(e1->name, e2->name, MAX_PATH)
-                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
-            }
-            else
-            {
-                if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)
-                    return strnatcasecmp(e1->name, e2->name)
-                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
-                else
-                    return strncasecmp(e1->name, e2->name, MAX_PATH)
-                           * (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
-            }
+            return cmp_data._compar(e1->name, e2->name, MAX_PATH);
         }
 
     }
@@ -386,7 +383,22 @@ int ft_load(struct tree_context* c, const char* tempdir)
     c->dirlength = files_in_dir;
     closedir(dir);
 
-    compare_sort_dir = c->sort_dir;
+    cmp_data.sort_dir = c->sort_dir;
+    if (global_settings.sort_case)
+    {
+        if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)
+            cmp_data._compar = strnatcmp_n;
+        else
+            cmp_data._compar = strncmp;
+    }
+    else
+    {
+        if (global_settings.interpret_numbers == SORT_INTERPRET_AS_NUMBER)
+            cmp_data._compar = strnatcasecmp_n;
+        else
+            cmp_data._compar = strncasecmp;
+    }
+
     qsort(tree_get_entries(c), files_in_dir, sizeof(struct entry), compare);
 
     /* If thumbnail talking is enabled, make an extra run to mark files with
