@@ -182,8 +182,8 @@ static int skintouch_to_wps(void)
             const int min_vol = sound_min(SOUND_VOLUME);
             const int max_vol = sound_max(SOUND_VOLUME);
             const int step_vol = sound_steps(SOUND_VOLUME);
-            global_settings.volume = (offset * (max_vol - min_vol)) / 1000;
-            global_settings.volume += min_vol;
+
+            global_settings.volume = from_normalized_volume(offset, min_vol, max_vol, 1000);
             global_settings.volume -= (global_settings.volume % step_vol);
             setvol();
         }
