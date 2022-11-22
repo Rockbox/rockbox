@@ -169,13 +169,13 @@
                  {.int_setting = (struct int_setting[]){                    \
                     {cb, unit, step, min, max, formatter, get_talk_id}}}}
 #define INT_SETTING(flags, var, lang_id, default, name,                 \
-                    unit, step, min, max, formatter, get_talk_id, cb)   \
+                    unit, min, max, step, formatter, get_talk_id, cb)   \
             {flags|F_INT_SETTING|F_T_INT, &global_settings.var,         \
                 lang_id, INT(default), name, NULL,                      \
                  {.int_setting = (struct int_setting[]){                \
                     {cb, unit, step, min, max, formatter, get_talk_id}}}}
 #define INT_SETTING_NOWRAP(flags, var, lang_id, default, name,             \
-                    unit, step, min, max, formatter, get_talk_id, cb)      \
+                    unit, min, max, step, formatter, get_talk_id, cb)      \
             {flags|F_INT_SETTING|F_T_INT|F_NO_WRAP, &global_settings.var,  \
                 lang_id, INT(default), name, NULL,                         \
                  {.int_setting = (struct int_setting[]){                   \
