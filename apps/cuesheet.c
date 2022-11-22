@@ -139,7 +139,7 @@ static unsigned long parse_cue_index(const char *line)
         while (isdigit(*line))
         {
             value = 10 * value + (*line - '0');
-            if (value > field_max[field]) /* Sanity check bail early */
+            if (field >= 0 && value > field_max[field]) /* Sanity check bail early */
                 return 0;
             line++;
         }
