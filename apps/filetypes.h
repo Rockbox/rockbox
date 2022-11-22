@@ -55,13 +55,8 @@ struct filetype {
     int tree_attr;
 };
 
-struct fileattr_voice {
-    int tree_attr;
-    int voiceclip;
-};
-
 void tree_get_filetypes(const struct filetype**, int*) INIT_ATTR;
-long tree_filetype_voiceclip(int attr) INIT_ATTR;
+long tree_get_filetype_voiceclip(int attr) INIT_ATTR;
 
 /* init the filetypes structs.
    uses audio buffer for storage, so call early in init... */

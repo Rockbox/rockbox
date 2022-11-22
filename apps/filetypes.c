@@ -148,74 +148,42 @@ static const struct filetype inbuilt_filetypes[] = {
 #endif
 };
 
-/* a table for the known file types voice clips */
-static const struct fileattr_voice inbuilt_attrvoices[] = {
-    { FILE_ATTR_AUDIO,  VOICE_EXT_MPA },
-    { FILE_ATTR_M3U,    LANG_PLAYLIST },
-    { FILE_ATTR_CFG,    VOICE_EXT_CFG },
-    { FILE_ATTR_WPS,    VOICE_EXT_WPS },
-#ifdef HAVE_REMOTE_LCD
-    { FILE_ATTR_RWPS,   VOICE_EXT_RWPS },
-#endif
-#if CONFIG_TUNER
-    { FILE_ATTR_FMR,    LANG_FMR },
-    { FILE_ATTR_FMS,    VOICE_EXT_FMS },
-#endif
-    { FILE_ATTR_LNG,    LANG_LANGUAGE },
-    { FILE_ATTR_ROCK,   VOICE_EXT_ROCK },
-    { FILE_ATTR_LUA,    VOICE_EXT_ROCK },
-    { FILE_ATTR_OPX,    VOICE_EXT_ROCK },
-    { FILE_ATTR_FONT,   VOICE_EXT_FONT },
-    { FILE_ATTR_KBD,    VOICE_EXT_KBD },
-    { FILE_ATTR_BMARK,  VOICE_EXT_BMARK },
-    { FILE_ATTR_CUE,    VOICE_EXT_CUESHEET },
-    { FILE_ATTR_SBS,    VOICE_EXT_SBS },
-#ifdef HAVE_REMOTE_LCD
-    { FILE_ATTR_RSBS,   VOICE_EXT_RSBS },
-#if CONFIG_TUNER
-    { FILE_ATTR_RFMS,   VOICE_EXT_RFMS },
-#endif
-#endif
-#if defined(BOOTFILE_EXT) || defined(BOOTFILE_EXT2)
-    { FILE_ATTR_MOD, VOICE_EXT_AJZ },
-#endif
-};
-
-struct attr_icon {
-    uint16_t tree_attr;
+struct fileattr_icon_voice {
+    int tree_attr;
     uint16_t icon;
+    uint16_t voiceclip;
 };
 
-/* a table for the known file type icons */
-static const struct attr_icon inbuilt_attricons[] = {
-    { FILE_ATTR_AUDIO, Icon_Audio}, 
-    { FILE_ATTR_M3U,   Icon_Playlist},
-    { FILE_ATTR_CFG,   Icon_Config},
-    { FILE_ATTR_WPS,   Icon_Wps},
+/* a table for the known file types icons & voice clips */
+static const struct fileattr_icon_voice inbuilt_attr_icons_voices[] = {
+    { FILE_ATTR_AUDIO, Icon_Audio,     VOICE_EXT_MPA },
+    { FILE_ATTR_M3U,   Icon_Playlist,  LANG_PLAYLIST },
+    { FILE_ATTR_CFG,   Icon_Config,    VOICE_EXT_CFG },
+    { FILE_ATTR_WPS,   Icon_Wps,       VOICE_EXT_WPS },
 #ifdef HAVE_REMOTE_LCD
-    { FILE_ATTR_RWPS,  Icon_Wps},
+    {FILE_ATTR_RWPS,   Icon_Wps,       VOICE_EXT_RWPS },
 #endif
 #if CONFIG_TUNER
-    { FILE_ATTR_FMR,   Icon_Preset},
-    { FILE_ATTR_FMS,   Icon_Wps},
+    { FILE_ATTR_FMR,   Icon_Preset,    LANG_FMR },
+    { FILE_ATTR_FMS,   Icon_Wps,       VOICE_EXT_FMS },
 #endif
-    { FILE_ATTR_LNG,   Icon_Language},
-    { FILE_ATTR_ROCK,  Icon_Plugin},
-    { FILE_ATTR_LUA,   Icon_Plugin},
-    { FILE_ATTR_OPX,   Icon_Plugin},
-    { FILE_ATTR_FONT,  Icon_Font},
-    { FILE_ATTR_KBD,   Icon_Keyboard},
-    { FILE_ATTR_BMARK, Icon_Bookmark},
-    { FILE_ATTR_CUE,   Icon_Bookmark},
-    { FILE_ATTR_SBS,   Icon_Wps},
+    { FILE_ATTR_LNG,   Icon_Language,  LANG_LANGUAGE },
+    { FILE_ATTR_ROCK,  Icon_Plugin,    VOICE_EXT_ROCK },
+    { FILE_ATTR_LUA,   Icon_Plugin,    VOICE_EXT_ROCK },
+    { FILE_ATTR_OPX,   Icon_Plugin,    VOICE_EXT_ROCK },
+    { FILE_ATTR_FONT,  Icon_Font,      VOICE_EXT_FONT },
+    { FILE_ATTR_KBD,   Icon_Keyboard,  VOICE_EXT_KBD },
+    { FILE_ATTR_BMARK, Icon_Bookmark,  VOICE_EXT_BMARK },
+    { FILE_ATTR_CUE,   Icon_Bookmark,  VOICE_EXT_CUESHEET },
+    { FILE_ATTR_SBS,   Icon_Wps,       VOICE_EXT_SBS },
 #ifdef HAVE_REMOTE_LCD
-    { FILE_ATTR_RSBS,  Icon_Wps},
+    { FILE_ATTR_RSBS,  Icon_Wps,       VOICE_EXT_RSBS },
 #if CONFIG_TUNER
-    { FILE_ATTR_RFMS,  Icon_Wps},
+    { FILE_ATTR_RFMS,  Icon_Wps,       VOICE_EXT_RFMS },
 #endif
 #endif
 #if defined(BOOTFILE_EXT) || defined(BOOTFILE_EXT2)
-    { FILE_ATTR_MOD,   Icon_Firmware},
+    { FILE_ATTR_MOD,   Icon_Firmware,  VOICE_EXT_AJZ },
 #endif
 };
 
@@ -225,22 +193,25 @@ void tree_get_filetypes(const struct filetype** types, int* count)
     *count = sizeof(inbuilt_filetypes) / sizeof(*inbuilt_filetypes);
 }
 
-long tree_filetype_voiceclip(int attr)
+long tree_get_filetype_voiceclip(int attr)
 {
-    logf("%s attr %d", __func__, attr);
-    int j;
     if (global_settings.talk_filetype)
     {
-        int count = sizeof(inbuilt_attrvoices)/sizeof(*inbuilt_attrvoices);
+        size_t count = ARRAY_SIZE(inbuilt_attr_icons_voices);
         /* try to find a voice ID for the extension, if known */
         attr &= FILE_ATTR_MASK; /* file type */
-        for (j=0; j<count; j++)
-            if (attr == inbuilt_attrvoices[j].tree_attr)
+
+        for (size_t i = count - 1; i < count; i--)
+        {
+            if (attr == inbuilt_attr_icons_voices[i].tree_attr)
             {
-                logf("%s attr %d id %d", __func__, attr, inbuilt_attrvoices[j].voiceclip);
-                return inbuilt_attrvoices[j].voiceclip;
+                logf("%s found attr %d id %d", __func__, attr,
+                     inbuilt_attr_icons_voices[i].voiceclip);
+                return inbuilt_attr_icons_voices[i].voiceclip;
             }
+        }
     }
+    logf("%s not found attr %d", __func__, attr);
     return -1;
 }
 
@@ -489,10 +460,10 @@ static void rm_whitespaces(char* str)
 
 static void read_builtin_types(void)
 {
-    int i,j, tree_attr;
-    int count = sizeof(inbuilt_filetypes)/sizeof(*inbuilt_filetypes);
-    int icon_count = sizeof(inbuilt_attricons)/sizeof(*inbuilt_attricons);
-    for(i=0; i<count && (filetype_count < MAX_FILETYPES); i++)
+    int tree_attr; 
+    size_t count = ARRAY_SIZE(inbuilt_filetypes);
+    size_t icon_count = ARRAY_SIZE(inbuilt_attr_icons_voices);
+    for(size_t i = 0; (i < count) && (filetype_count < MAX_FILETYPES); i++)
     {
         filetypes[filetype_count].extension = inbuilt_filetypes[i].extension;
         filetypes[filetype_count].plugin = NULL;
@@ -503,11 +474,11 @@ static void read_builtin_types(void)
             highest_attr = filetypes[filetype_count].attr;
 
         filetypes[filetype_count].icon = unknown_file.icon;
-        for (j = 0; j < icon_count; j++)
+        for (size_t j = icon_count - 1; j < icon_count; j--)
         {
-            if (tree_attr == inbuilt_attricons[j].tree_attr)
+            if (tree_attr == inbuilt_attr_icons_voices[j].tree_attr)
             {
-                filetypes[filetype_count].icon = inbuilt_attricons[j].icon;
+                filetypes[filetype_count].icon = inbuilt_attr_icons_voices[j].icon;
                 break;
             }
         }
