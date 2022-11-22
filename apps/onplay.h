@@ -31,6 +31,9 @@ enum {
     ONPLAY_START_PLAY,
     ONPLAY_PLAYLIST,
     ONPLAY_PLUGIN,
+#ifdef HAVE_HOTKEY
+    ONPLAY_FUNC_RETURN, /* for use in hotkey_assignment only */
+#endif
 };
 
 #ifdef HAVE_HOTKEY

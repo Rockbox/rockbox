@@ -1785,7 +1785,7 @@ static int onplaymenu_callback(int action,
 
 #ifdef HAVE_HOTKEY
 /* direct function calls, no need for menu callbacks */
-static bool delete_item(void)
+static bool hotkey_delete_item(void)
 {
 #ifdef HAVE_MULTIVOLUME
     /* no delete for volumes */
@@ -1795,7 +1795,7 @@ static bool delete_item(void)
     return delete_file_dir();
 }
 
-static bool open_with(void)
+static bool hotkey_open_with(void)
 {
     /* only open files */
     if (selected_file_attr & ATTR_DIRECTORY)
@@ -1807,20 +1807,18 @@ static bool open_with(void)
     return list_viewers();
 }
 
-static int playlist_insert_shuffled(void)
+static int hotkey_tree_pl_insert_shuffled(void)
 {
     if ((audio_status() & AUDIO_STATUS_PLAY) ||
         (selected_file_attr & ATTR_DIRECTORY) ||
         ((selected_file_attr & FILE_ATTR_MASK) == FILE_ATTR_M3U))
     {
         add_to_playlist(&addtopl_insert_shuf);
-        return ONPLAY_START_PLAY;
     }
-
     return ONPLAY_RELOAD_DIR;
 }
 
-static int tree_hotkey_run_plugin(void *param)
+static int hotkey_tree_run_plugin(void *param)
 {
     if (filetype_load_plugin((const char*)param, selected_file) == PLUGIN_GOTO_WPS)
         return ONPLAY_START_PLAY;
@@ -1828,7 +1826,7 @@ static int tree_hotkey_run_plugin(void *param)
     return ONPLAY_RELOAD_DIR;
 }
 
-static int hotkey_run_plugin(void)
+static int hotkey_wps_run_plugin(void)
 {
     open_plugin_run(ID2P(LANG_HOTKEY_WPS));
     return ONPLAY_OK;
@@ -1838,8 +1836,8 @@ struct hotkey_assignment {
     int action;             /* hotkey_action */
     int lang_id;            /* Language ID */
     struct menu_func func;  /* Function to run if this entry is selected */
-    int return_code;        /* What to return after the function is run. ONPLAY_OK here */
-};                          /* means to use function return code, see execute_hotkey    */
+    int return_code;        /* What to return after the function is run. */
+};                          /* (Pick ONPLAY_FUNC_RETURN to use function's return value) */
 
 #define HOTKEY_FUNC(func, param) {{(void *)func}, param}
 
@@ -1859,30 +1857,30 @@ static struct hotkey_assignment hotkey_items[] = {
             ONPLAY_RELOAD_DIR },
 #endif
     { HOTKEY_OPEN_WITH,         LANG_ONPLAY_OPEN_WITH,
-            HOTKEY_FUNC(open_with, NULL),
+            HOTKEY_FUNC(hotkey_open_with, NULL),
             ONPLAY_RELOAD_DIR },
     { HOTKEY_DELETE,            LANG_DELETE,
-            HOTKEY_FUNC(delete_item, NULL),
+            HOTKEY_FUNC(hotkey_delete_item, NULL),
             ONPLAY_RELOAD_DIR },
     { HOTKEY_INSERT,            LANG_INSERT,
             HOTKEY_FUNC(add_to_playlist, (intptr_t*)&addtopl_insert),
             ONPLAY_RELOAD_DIR },
     { HOTKEY_INSERT_SHUFFLED,   LANG_INSERT_SHUFFLED,
-            HOTKEY_FUNC(playlist_insert_shuffled, NULL),
-            ONPLAY_RELOAD_DIR },
+            HOTKEY_FUNC(hotkey_tree_pl_insert_shuffled, NULL),
+            ONPLAY_FUNC_RETURN },
     { HOTKEY_PLUGIN,            LANG_OPEN_PLUGIN,
-            HOTKEY_FUNC(hotkey_run_plugin, NULL),
-            ONPLAY_OK },
+            HOTKEY_FUNC(hotkey_wps_run_plugin, NULL),
+            ONPLAY_FUNC_RETURN },
     { HOTKEY_BOOKMARK,          LANG_BOOKMARK_MENU_CREATE,
             HOTKEY_FUNC(bookmark_create_menu, NULL),
             ONPLAY_OK },
     { HOTKEY_PROPERTIES,        LANG_PROPERTIES,
-            HOTKEY_FUNC(tree_hotkey_run_plugin, (void *)"properties"),
-            ONPLAY_OK },
+            HOTKEY_FUNC(hotkey_tree_run_plugin, (void *)"properties"),
+            ONPLAY_FUNC_RETURN },
 #ifdef HAVE_TAGCACHE
     { HOTKEY_PICTUREFLOW,       LANG_ONPLAY_PICTUREFLOW,
-            HOTKEY_FUNC(tree_hotkey_run_plugin, (void *)"pictureflow"),
-            ONPLAY_OK },
+            HOTKEY_FUNC(hotkey_tree_run_plugin, (void *)"pictureflow"),
+            ONPLAY_FUNC_RETURN },
 #endif
 };
 
@@ -1905,7 +1903,7 @@ static int execute_hotkey(bool is_wps)
     int i = ARRAYLEN(hotkey_items);
     struct hotkey_assignment *this_item;
     const int action = (is_wps ? global_settings.hotkey_wps :
-        global_settings.hotkey_tree);
+                                 global_settings.hotkey_tree);
 
     /* search assignment struct for a match for the hotkey setting */
     while (i--)
@@ -1923,12 +1921,11 @@ static int execute_hotkey(bool is_wps)
                 else
                     func_return = (*func.function)();
             }
-            /* return with the associated code */
             const int return_code = this_item->return_code;
-            /* ONPLAY_OK here means to use the function return code */
-            if (return_code == ONPLAY_OK)
-                return func_return;
-            return return_code;
+
+            if (return_code == ONPLAY_FUNC_RETURN)
+                return func_return;  /* Use value returned by function */
+            return return_code;      /* or return the associated value */
         }
     }
 
