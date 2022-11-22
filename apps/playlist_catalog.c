@@ -147,6 +147,7 @@ const char* catalog_get_directory(void)
    If "view" mode is set then we're not adding anything into playlist. */
 static int display_playlists(char* playlist, bool view)
 {
+    static bool reopen_last_playlist = false;
     static int most_recent_selection = 0;
     struct browse_context browse;
     char selected_playlist[MAX_PATH];
@@ -162,21 +163,42 @@ static int display_playlists(char* playlist, bool view)
 
 restart:
     browse.flags &= ~BROWSE_SELECTED;
-    int browse_ret = rockbox_browse(&browse);
-    if (browse_ret == GO_TO_WPS
-        || (view && browse_ret == GO_TO_PREVIOUS_MUSIC))
-        result = 0;
 
-    if (browse.flags & BROWSE_SELECTED)
+    if (view && reopen_last_playlist)
+    {
+        switch (playlist_viewer_ex(most_recent_playlist, &most_recent_selection))
+        {
+            case PLAYLIST_VIEWER_OK:
+                result = 0;
+                break;
+            case PLAYLIST_VIEWER_CANCEL:
+                reopen_last_playlist = false;
+                goto restart;
+            case PLAYLIST_VIEWER_USB:
+            case PLAYLIST_VIEWER_MAINMENU:
+            default:
+                break;
+        }
+    }
+    else /* browse playlist dir */
+    {
+        int browse_ret = rockbox_browse(&browse);
+        if (browse_ret == GO_TO_WPS
+            || (view && browse_ret == GO_TO_PREVIOUS_MUSIC))
+            result = 0;
+    }
+
+    if (browse.flags & BROWSE_SELECTED) /* User picked a playlist */
     {
         if (strcmp(most_recent_playlist, selected_playlist)) /* isn't most recent one */
         {
             strmemccpy(most_recent_playlist, selected_playlist,
                        sizeof(most_recent_playlist));
             most_recent_selection = 0;
+            reopen_last_playlist = false;
         }
 
-        if (view)
+        if (view) /* display playlist contents or resume bookmark */
         {
 
             int res = bookmark_autoload(selected_playlist);
@@ -186,6 +208,7 @@ restart:
             {
                 switch (playlist_viewer_ex(selected_playlist, &most_recent_selection)) {
                     case PLAYLIST_VIEWER_OK:
+                        reopen_last_playlist = true;
                         result = 0;
                         break;
                     case PLAYLIST_VIEWER_CANCEL:
@@ -193,11 +216,12 @@ restart:
                     case PLAYLIST_VIEWER_USB:
                     case PLAYLIST_VIEWER_MAINMENU:
                     default:
+                        reopen_last_playlist = true;
                         break;
                 }
             }
         }
-        else
+        else /* we're just adding something to a playlist */
         {
             result = 0;
             strmemccpy(playlist, selected_playlist, MAX_PATH);
@@ -212,7 +236,7 @@ restart:
 static void display_insert_count(int count)
 {
     static long talked_tick = 0;
-    if(global_settings.talk_menu && count && 
+    if(global_settings.talk_menu && count &&
         (talked_tick == 0 || TIME_AFTER(current_tick, talked_tick+5*HZ)))
     {
         talked_tick = current_tick;
