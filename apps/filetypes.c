@@ -233,7 +233,7 @@ long tree_filetype_voiceclip(int attr)
     {
         int count = sizeof(inbuilt_attrvoices)/sizeof(*inbuilt_attrvoices);
         /* try to find a voice ID for the extension, if known */
-        //attr &= FILE_ATTR_MASK; /* file type */
+        attr &= FILE_ATTR_MASK; /* file type */
         for (j=0; j<count; j++)
             if (attr == inbuilt_attrvoices[j].tree_attr)
             {
