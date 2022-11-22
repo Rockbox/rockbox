@@ -248,6 +248,7 @@ static int tree_voice_cb(int selected_item, void * data)
                 did_clip = false;
         }
     }
+    bool spell_name = false;
     if(!did_clip)
     {
         /* say the number or spell if required or as a fallback */
@@ -265,7 +266,7 @@ static int tree_voice_cb(int selected_item, void * data)
                 if(is_dir)
                     talk_id(VOICE_DIR, true);
             }
-            talk_spell(name, true);
+            spell_name = true;
             break;
         }
     }
@@ -275,6 +276,10 @@ static int tree_voice_cb(int selected_item, void * data)
     {
         say_filetype(attr);
     }
+
+    /* spell name AFTER voicing filetype */
+    if (spell_name)
+        talk_spell(name, true);
 
     return 0;
 }
