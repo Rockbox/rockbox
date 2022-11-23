@@ -258,7 +258,8 @@ static int compare(const void* p1, const void* p2)
         case SORT_ALPHA:
         case SORT_ALPHA_REVERSED:
         {
-            return cmp_data._compar(e1->name, e2->name, MAX_PATH);
+            return cmp_data._compar(e1->name, e2->name, MAX_PATH) *
+                (criteria == SORT_ALPHA_REVERSED ? -1 : 1);
         }
 
     }
