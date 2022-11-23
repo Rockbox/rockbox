@@ -117,7 +117,23 @@ static uint32_t uniqbuf[UNIQBUF_SIZE / sizeof(uint32_t)];
 #define MAX_MENU_ID_SIZE 32
 
 #define RELOAD_TAGTREE (-1024)
-static bool sort_inverse;
+
+static int(*qsort_fn)(const char*, const char*, size_t);
+/* dummmy functions to allow compatibility strncasecmp */
+static int strnatcasecmp_n(const char *a, const char *b, size_t n)
+{
+    (void)n;
+     return strnatcasecmp(a, b);
+}
+static int strnatcasecmp_n_inv(const char *a, const char *b, size_t n)
+{
+    (void)n;
+     return strnatcasecmp(b, a);
+}
+static int strncasecmp_inv(const char *a, const char *b, size_t n)
+{
+    return strncasecmp(b, a, n);
+}
 
 /*
  * "%3d. %s" autoscore title %sort = "inverse" %limit = "100"
@@ -824,22 +840,7 @@ static int compare(const void *p1, const void *p2)
 {
     struct tagentry *e1 = (struct tagentry *)p1;
     struct tagentry *e2 = (struct tagentry *)p2;
-
-    if (sort_inverse)
-        return strncasecmp(e2->name, e1->name, MAX_PATH);
-
-    return strncasecmp(e1->name, e2->name, MAX_PATH);
-}
-
-static int nat_compare(const void *p1, const void *p2)
-{
-    struct tagentry *e1 = (struct tagentry *)p1;
-    struct tagentry *e2 = (struct tagentry *)p2;
-
-    if (sort_inverse)
-        return strnatcasecmp(e2->name, e1->name);
-
-    return strnatcasecmp(e1->name, e2->name);
+    return qsort_fn(e1->name, e2->name, MAX_PATH);
 }
 
 static void tagtree_buffer_event(unsigned short id, void *ev_data)
@@ -1428,6 +1429,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
     int level = c->currextra;
     int tag;
     bool sort = false;
+    bool sort_inverse;
     int sort_limit;
     int strip;
 
@@ -1667,11 +1669,16 @@ entry_skip_formatter:
 
     if (sort)
     {
+        if (global_settings.interpret_numbers)
+            qsort_fn = sort_inverse ? strnatcasecmp_n_inv : strnatcasecmp_n;
+        else
+            qsort_fn = sort_inverse ? strncasecmp_inv : strncasecmp;
+
         struct tagentry *entries = get_entries(c);
         qsort(&entries[special_entry_count],
               current_entry_count - special_entry_count,
               sizeof(struct tagentry),
-              global_settings.interpret_numbers ? nat_compare : compare);
+              compare);
     }
 
     if (!init)
