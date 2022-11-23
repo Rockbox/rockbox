@@ -1589,7 +1589,7 @@ static int retrieve_entries(struct tree_context *c, int offset, bool init)
                 if (tagcache_retrieve(&tcs, tcs.idx_id, tag_filename, dptr->name,
                                       c->cache.name_buffer_size - namebufused))
                 {
-                    namebufused += strlen(dptr->name)+1;
+                    namebufused += tcs.result_len;
                     goto entry_skip_formatter;
                 }
                 dptr->name = lastname; /* restore last entry if filename failed */
