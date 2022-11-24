@@ -945,8 +945,10 @@ const struct settings_list settings[] = {
     { F_T_INT|F_DEF_ISFUNC|F_INT_SETTING, &global_settings.contrast,
         LANG_CONTRAST, FUNCTYPE(lcd_default_contrast), "contrast", NULL , {
             .int_setting = (struct int_setting[]) {
-                { lcd_set_contrast, UNIT_INT, MIN_CONTRAST_SETTING,
-                  MAX_CONTRAST_SETTING, 1, NULL, NULL }}}},
+                { .option_callback = lcd_set_contrast,
+                  .unit = UNIT_INT, .step = 1,
+                  .min = MIN_CONTRAST_SETTING, .max = MAX_CONTRAST_SETTING,
+                  .formatter = NULL, .get_talk_id = NULL }}}},
 #endif
 #ifdef HAVE_BACKLIGHT
     TABLE_SETTING_LIST(F_TIME_SETTING | F_ALLOW_ARBITRARY_VALS,
@@ -1062,8 +1064,10 @@ const struct settings_list settings[] = {
         LANG_BATTERY_CAPACITY, FUNCTYPE(battery_default_capacity),
         "battery capacity", NULL , {
             .int_setting = (struct int_setting[]) {
-                { set_battery_capacity, UNIT_MAH, BATTERY_CAPACITY_MIN,
-                  BATTERY_CAPACITY_MAX, BATTERY_CAPACITY_INC, NULL, NULL }}}},
+                { .option_callback = set_battery_capacity,
+                  .unit = UNIT_MAH, .step = BATTERY_CAPACITY_INC,
+                  .min = BATTERY_CAPACITY_MIN, .max = BATTERY_CAPACITY_MAX,
+                  .formatter = NULL, .get_talk_id = NULL }}}},
 #else /* IPOD_VIDEO */
     INT_SETTING(0, battery_capacity, LANG_BATTERY_CAPACITY,
                 BATTERY_CAPACITY_DEFAULT, "battery capacity", UNIT_MAH,
