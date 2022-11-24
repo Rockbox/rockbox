@@ -722,9 +722,9 @@ enum plugin_status plugin_start(const void* parameter)
    systemvol= rb->global_settings->volume-rb->global_settings->volume%mod;
    general_translucency = default_translucency;                    // phares
 
-#ifdef HAVE_BACKLIGHT
+
    backlight_ignore_timeout();
-#endif
+
 #ifdef RB_PROFILE
    rb->profile_thread();
 #endif
@@ -738,9 +738,9 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef RB_PROFILE
    rb->profstop();
 #endif
-#ifdef HAVE_BACKLIGHT
+
    backlight_use_settings();
-#endif
+
    M_SaveDefaults ();
 
    I_Quit(); // Make SURE everything was closed out right

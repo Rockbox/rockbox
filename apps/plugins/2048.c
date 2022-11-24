@@ -148,9 +148,7 @@ static inline int rand_range(int min, int max)
 /* prepares for exit */
 static void cleanup(void)
 {
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
 }
 
 /* returns 2 or 4 */
@@ -700,9 +698,8 @@ static void init_game(bool newgame)
     max_numeral_width = rb->font_get_width(rb->font_get(WHAT_FONT), '0');
 #endif
 
-#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-#endif
+
     draw();
 }
 

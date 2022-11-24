@@ -1215,10 +1215,9 @@ static void osd_lcd_enable_hook(unsigned short id, void* param)
 static void osdbacklight_hw_on_video_mode(bool video_on)
 {
     if (video_on) {
-#ifdef HAVE_BACKLIGHT
         /* Turn off backlight timeout */
         backlight_ignore_timeout();
-#endif
+
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         rb->remove_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
@@ -1226,10 +1225,8 @@ static void osdbacklight_hw_on_video_mode(bool video_on)
 #if defined(HAVE_LCD_ENABLE) || defined(HAVE_LCD_SLEEP)
         rb->add_event(LCD_EVENT_ACTIVATION, osd_lcd_enable_hook);
 #endif
-#ifdef HAVE_BACKLIGHT
         /* Revert to user's backlight settings */
         backlight_use_settings();
-#endif
     }
 }
 

@@ -1184,9 +1184,8 @@ static void fft_cleanup(void)
 #ifndef HAVE_LCD_COLOR
     grey_release();
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_use_settings();
-#endif
 
     /* save settings if changed */
     if (rb->memcmp(&fft, &fft_disk, sizeof(fft)))
@@ -1237,9 +1236,8 @@ static bool fft_setup(void)
     mylcd_clear_display();
     myosd_lcd_update();
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_ignore_timeout();
-#endif
 
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->trigger_cpu_boost();

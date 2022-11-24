@@ -262,12 +262,10 @@ static void polygons_draw(struct polygon_fifo * polygons, struct screen * displa
 
 static void cleanup(void)
 {
-#ifdef HAVE_BACKLIGHT
+
     backlight_use_settings();
-#ifdef HAVE_REMOTE_LCD
     remote_backlight_use_settings();
-#endif
-#endif
+
 }
 
 #ifdef HAVE_LCD_COLOR
@@ -438,12 +436,10 @@ enum plugin_status plugin_start(const void* parameter)
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_ignore_timeout();
-#ifdef HAVE_REMOTE_LCD
     remote_backlight_ignore_timeout();
-#endif
-#endif
+
     ret = plugin_main();
 
     return ret;

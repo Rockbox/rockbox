@@ -141,9 +141,9 @@ static void cleanup(void)
 {
     if(custom_font != FONT_UI)
         rb->font_unload(custom_font);
-#ifdef HAVE_BACKLIGHT
+
     backlight_use_settings();
-#endif
+
 }
 
 /* returns height of drawn area */
@@ -302,9 +302,8 @@ static void begin_anim(void)
 
 static void init_drawing(void)
 {
-#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-#endif
+
     atexit(cleanup);
 
     rb->lcd_set_background(OUTSIDE_COLOR);

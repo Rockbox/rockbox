@@ -64,9 +64,8 @@ void cleanup(void)
     if(audiobuf)
         memset(audiobuf, 0, 4); /* clear */
 
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
+
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
@@ -219,9 +218,9 @@ enum plugin_status plugin_start(const void *param)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(true);
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_ignore_timeout();
-#endif
+
     /* set the real exit handler */
 #undef rb_atexit
     rb_atexit(cleanup);

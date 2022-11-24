@@ -1064,10 +1064,8 @@ enum plugin_status plugin_start(const void* parameter)
                     ARRAYLEN(config), IMGVIEW_SETTINGS_MINVERSION);
     rb->memcpy(&old_settings, &settings, sizeof (settings));
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
 
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
@@ -1094,10 +1092,8 @@ enum plugin_status plugin_start(const void* parameter)
     rb->storage_spindown(rb->global_settings->disk_spindown);
 #endif
 
-#ifdef HAVE_BACKLIGHT
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
 
 #ifdef USEGSLIB
     grey_release(); /* deinitialize */

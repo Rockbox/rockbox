@@ -401,9 +401,9 @@ enum plugin_status plugin_start(const void* parameter)
 #if (CONFIG_PLATFORM & PLATFORM_NATIVE)
     cpu_freq = *rb->cpu_frequency; /* remember CPU frequency */
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_ignore_timeout();
-#endif
+
     time_main_update();
     rb->sleep(HZ);
 #if defined(HAVE_LCD_COLOR) && (MEMORYSIZE > 2)
@@ -424,9 +424,9 @@ enum plugin_status plugin_start(const void* parameter)
                      (cpu_freq + 500000) / 1000000);
     log_text(str);
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_use_settings();
-#endif
+
     /* wait until user closes plugin */
     plugin_quit();
 

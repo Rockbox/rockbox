@@ -3390,9 +3390,7 @@ static void shutdown_tlsf(void)
 
 static void exit_handler(void)
 {
-#ifdef HAVE_SW_POWEROFF
     sw_poweroff_restore();
-#endif
 
     unload_fonts();
     shutdown_tlsf();
@@ -3652,9 +3650,7 @@ static void puzzles_main(void)
 {
     rb_atexit(exit_handler);
 
-#ifdef HAVE_SW_POWEROFF
     sw_poweroff_disable();
-#endif
 
     init_default_settings();
     init_fonttab();

@@ -602,10 +602,9 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
-#ifdef HAVE_BACKLIGHT
     /* ignore backlight time out */
     backlight_ignore_timeout();
-#endif
+
     gnuboy_main(parameter);
 
 #ifdef HAVE_WHEEL_POSITION
@@ -616,9 +615,7 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
 
     if(!rb->audio_status())
         rockboy_pcm_close();

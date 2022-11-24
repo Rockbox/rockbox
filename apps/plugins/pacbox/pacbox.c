@@ -809,8 +809,8 @@ enum plugin_status plugin_start(const void* parameter)
 #ifdef HAVE_ADJUSTABLE_CPU_FREQ
     rb->cpu_boost(false);
 #endif
-#ifdef HAVE_BACKLIGHT
+
     backlight_use_settings();
-#endif
+
     return PLUGIN_OK;
 }

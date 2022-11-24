@@ -2428,10 +2428,9 @@ static bool launch_wormlet(void)
 
     rb->lcd_clear_display();
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     /* start the game */
     while (game_result == 1)
         game_result = run();
@@ -2439,10 +2438,10 @@ static bool launch_wormlet(void)
     switch (game_result)
     {
         case 2:
-#ifdef HAVE_BACKLIGHT
+
             /* Turn on backlight timeout (revert to settings) */
             backlight_use_settings();
-#endif
+
             return false;
             break;
     }

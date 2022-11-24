@@ -256,9 +256,7 @@ static void store_lcd_settings(void)
 ******************************************************************************/
 static void restore_lcd_settings(void) {
     /* Turn on backlight timeout (revert to settings) */
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
 
     /* Restore the old settings */
 #if LCD_DEPTH > 1
@@ -272,10 +270,9 @@ static void restore_lcd_settings(void) {
 * Adjust the LCD settings to suit MazezaM levels
 ******************************************************************************/
 static void plugin_lcd_settings(void) {
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     /* Set the new settings */
 #ifdef HAVE_LCD_COLOR
     rb->lcd_set_background(MAZEZAM_BG_COLOR);

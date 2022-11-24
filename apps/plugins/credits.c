@@ -303,10 +303,10 @@ enum plugin_status plugin_start(const void* parameter)
 {
     (void)parameter;
 
-#ifdef HAVE_BACKLIGHT
+
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
 
 #if LCD_DEPTH>=16
     rb->lcd_set_foreground (LCD_WHITE);
@@ -318,10 +318,10 @@ enum plugin_status plugin_start(const void* parameter)
     if(!rb->action_userabort(3*HZ))
         roll_credits();
 
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
+
 
     return PLUGIN_OK;
 }

@@ -574,9 +574,8 @@ static void display_helpfile(void)
 
 static void led_resistance_calc(void)
 {
-#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-#endif
+
     int voltage_menu_selection, button_press, j, k, l, foreward_current = 0;
     int fwd_current_selection = 0;
     bool quit = false;
@@ -769,9 +768,8 @@ static void led_resistance_calc(void)
             default:
                 quit = true;
 
-#ifdef HAVE_BACKLIGHT
                 backlight_use_settings();
-#endif
+
                 break;
         }
     }
@@ -784,9 +782,8 @@ static void led_resistance_calc(void)
 
 static void resistance_to_color(void)
 {
-#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-#endif
+
     int menu_selection;
     int menu_selection_tol;
     int button_press;
@@ -910,9 +907,9 @@ static void resistance_to_color(void)
                 break;
             default:
                 quit = true;
-#ifdef HAVE_BACKLIGHT
+
                 backlight_use_settings();
-#endif
+
                 break;
         }
     }
@@ -924,9 +921,8 @@ static void resistance_to_color(void)
 
 static void color_to_resistance(void)
 {
-#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-#endif
+
     bool quit = false;
     int button_input = 0;
 
@@ -995,9 +991,7 @@ static void color_to_resistance(void)
             case PLA_SELECT:
             default:
                 quit = true;
-#ifdef HAVE_BACKLIGHT
                 backlight_use_settings();
-#endif
                 break;
         }
     }

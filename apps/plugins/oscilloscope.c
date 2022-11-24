@@ -1939,10 +1939,9 @@ static void osc_cleanup(void)
     rb->lcd_set_foreground(LCD_DEFAULT_FG);
     rb->lcd_set_background(LCD_DEFAULT_BG);
 #endif
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
 
     /* save settings if changed */
     if (rb->memcmp(&osc, &osc_disk, sizeof(osc)))
@@ -1975,10 +1974,9 @@ static void osc_setup(void)
     mixer_sampr = rb->mixer_get_frequency();
 #endif
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     graphmode_setup();
 }
 

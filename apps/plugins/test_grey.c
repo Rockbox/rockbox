@@ -123,9 +123,9 @@ enum plugin_status plugin_start(const void* parameter)
     }
     for (i = 0; i <= STEPS; i++)
         input_levels[i] = lcd_levels[i] = (255 * i + (STEPS/2)) / STEPS;
-#ifdef HAVE_BACKLIGHT
+
     backlight_ignore_timeout();
-#endif
+
     grey_set_background(0); /* set background to black */
     grey_clear_display();
     grey_show(true);
@@ -221,8 +221,8 @@ enum plugin_status plugin_start(const void* parameter)
     }
 
     grey_release();
-#ifdef HAVE_BACKLIGHT
+
     backlight_use_settings();
-#endif
+
     return PLUGIN_OK;
 }

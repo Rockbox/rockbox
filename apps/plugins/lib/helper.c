@@ -58,7 +58,12 @@ void backlight_use_settings(void)
                                       backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 }
-#endif /* HAVE_BACKLIGHT */
+#else /* HAVE_BACKLIGHT */
+/* DUMMY FUNCTIONS */
+void backlight_force_on(void){}
+void backlight_ignore_timeout(void){}
+void backlight_use_settings(void){}
+#endif /* !HAVE_BACKLIGHT */
 
 #ifdef HAVE_SW_POWEROFF
 static bool original_sw_poweroff_state = true;
@@ -73,7 +78,11 @@ void sw_poweroff_restore(void)
 {
     rb->button_set_sw_poweroff_state(original_sw_poweroff_state);
 }
-#endif
+#else /* HAVE_SW_POWEROFF */
+/* DUMMY FUNCTIONS */
+void sw_poweroff_disable(void){}
+void sw_poweroff_restore(void){}
+#endif /* !HAVE_SW_POWEROFF */
 
 #ifdef HAVE_REMOTE_LCD
 /*  Force the backlight on */
@@ -106,7 +115,12 @@ void remote_backlight_use_settings(void)
                                              remote_backlight_timeout_plugged);
 #endif /* CONFIG_CHARGING */
 }
-#endif /* HAVE_REMOTE_LCD */
+#else /* HAVE_REMOTE_LCD */
+/* DUMMY FUNCTIONS */
+void remote_backlight_force_on(void){}
+void remote_backlight_ignore_timeout(void){}
+void remote_backlight_use_settings(void){}
+#endif /* !HAVE_REMOTE_LCD */
 
 #ifdef HAVE_BUTTON_LIGHT
 /*  Force the buttonlight on */
@@ -133,7 +147,13 @@ void buttonlight_use_settings(void)
 {
     rb->buttonlight_set_timeout(rb->global_settings->buttonlight_timeout);
 }
-#endif /* HAVE_BUTTON_LIGHT */
+#else /* HAVE_BUTTON_LIGHT */
+/* DUMMY FUNCTIONS */
+void buttonlight_force_on(void){}
+void buttonlight_force_off(void){}
+void buttonlight_ignore_timeout(void){}
+void buttonlight_use_settings(void){}
+#endif /* !HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_BACKLIGHT_BRIGHTNESS
 void backlight_brightness_set(int brightness)
@@ -145,7 +165,15 @@ void backlight_brightness_use_setting(void)
 {
     rb->backlight_set_brightness(rb->global_settings->brightness);
 }
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
+#else /* HAVE_BACKLIGHT_BRIGHTNESS */
+/* DUMMY FUNCTIONS */
+void backlight_brightness_set(int brightness)
+{
+    (void)brightness;
+}
+void backlight_brightness_use_setting(void){}
+
+#endif /* !HAVE_BACKLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
 void buttonlight_brightness_set(int brightness)
@@ -157,4 +185,12 @@ void buttonlight_brightness_use_setting(void)
 {
     rb->buttonlight_set_brightness(rb->global_settings->buttonlight_brightness);
 }
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+#else /* HAVE_BUTTONLIGHT_BRIGHTNESS */
+/* DUMMY FUNCTIONS */
+void buttonlight_brightness_set(int brightness)
+{
+    (void)brightness;
+}
+
+void buttonlight_brightness_use_setting(void){}
+#endif /* !HAVE_BUTTONLIGHT_BRIGHTNESS */

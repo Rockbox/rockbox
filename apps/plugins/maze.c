@@ -498,10 +498,8 @@ enum plugin_status plugin_start(const void* parameter)
     struct maze maze;
     (void)parameter;
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
 
     /* Seed the RNG */
     rb->srand(*rb->current_tick);
@@ -591,8 +589,7 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     }
     /* Turn on backlight timeout (revert to settings) */
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
+
     return ((quit == 1) ? PLUGIN_OK : PLUGIN_USB_CONNECTED);
 }

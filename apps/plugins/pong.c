@@ -750,10 +750,9 @@ enum plugin_status plugin_start(const void* parameter)
        this to avoid the compiler warning about it */
     (void)parameter;
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     /* Clear screen */
     rb->lcd_clear_display();
 
@@ -792,9 +791,9 @@ enum plugin_status plugin_start(const void* parameter)
             rb->lcd_clear_display();
         }
     }
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
+
     return (game == 0) ? PLUGIN_OK : PLUGIN_USB_CONNECTED;
 }

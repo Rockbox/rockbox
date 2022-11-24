@@ -1297,10 +1297,9 @@ enum plugin_status plugin_start (const void *parameter)
     rb->lcd_set_backdrop(NULL);
 #endif
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
 
     if (!load_game()) {
@@ -1310,10 +1309,10 @@ enum plugin_status plugin_start (const void *parameter)
     randomize ();
     ret = xobox_loop ();
 
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
+
     rb->lcd_setfont (FONT_UI);
 
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);

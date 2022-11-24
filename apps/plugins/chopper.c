@@ -1083,10 +1083,10 @@ enum plugin_status plugin_start(const void* parameter)
     rb->lcd_set_foreground(LCD_WHITE);
 #endif
 
-#ifdef HAVE_BACKLIGHT
+
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
 
     rb->srand( *rb->current_tick );
 
@@ -1098,10 +1098,10 @@ enum plugin_status plugin_start(const void* parameter)
     configfile_save(CFG_FILE, config, 1, 0);
 
     rb->lcd_setfont(FONT_UI);
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
+
 
     return ret;
 }

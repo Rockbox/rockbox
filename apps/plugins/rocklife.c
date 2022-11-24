@@ -474,9 +474,8 @@ enum plugin_status plugin_start(const void* parameter)
     char *ptemp;
     (void)(parameter);
 
-#ifdef HAVE_BACKLIGHT
     backlight_ignore_timeout();
-#endif
+
 #if LCD_DEPTH > 1
     rb->lcd_set_backdrop(NULL);
 #ifdef HAVE_LCD_COLOR
@@ -580,8 +579,7 @@ enum plugin_status plugin_start(const void* parameter)
         rb->yield();
     }
 
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
+
     return usb? PLUGIN_USB_CONNECTED: PLUGIN_OK;
 }

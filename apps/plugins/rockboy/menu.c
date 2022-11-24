@@ -83,9 +83,8 @@ int do_user_menu(void) {
     rb->lcd_set_mode(LCD_MODE_RGB565);
 #endif
 
-#ifdef HAVE_BACKLIGHT
     backlight_use_settings();
-#endif
+
     /* Clean out the button Queue */
     while (rb->button_get(false) != BUTTON_NONE) 
         rb->yield();
@@ -139,10 +138,9 @@ int do_user_menu(void) {
     rb->lcd_set_mode(LCD_MODE_PAL256);
 #endif
 
-#ifdef HAVE_BACKLIGHT
     /* ignore backlight time out */
     backlight_ignore_timeout();
-#endif
+
     return ret;
 }
 

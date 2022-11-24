@@ -1498,16 +1498,13 @@ static int rockblox_loop (void)
 #ifdef HAS_BUTTON_HOLD
         if (rb->button_hold ()) {
             /* Turn on backlight timeout (revert to settings) */
-#ifdef HAVE_BACKLIGHT
             backlight_use_settings();
-#endif
             rb->splash(0, "Paused");
             while (rb->button_hold ())
                 rb->sleep(HZ/10);
-#ifdef HAVE_BACKLIGHT
             /* Turn off backlight timeout */
             backlight_ignore_timeout();
-#endif
+            
             /* get rid of the splash text */
             rb->lcd_bitmap (rockblox_background, 0, 0, LCD_WIDTH, LCD_HEIGHT);
             show_details ();
@@ -1677,10 +1674,9 @@ enum plugin_status plugin_start (const void *parameter)
 
     rb->lcd_setfont (FONT_SYSFIXED);
 
-#ifdef HAVE_BACKLIGHT
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     load_game();
     resume_file = resume;
 
@@ -1728,9 +1724,8 @@ enum plugin_status plugin_start (const void *parameter)
 
     /* Save user's HighScore */
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
-#ifdef HAVE_BACKLIGNT
+
     backlight_use_settings();
-#endif
 
     return PLUGIN_OK;
 }

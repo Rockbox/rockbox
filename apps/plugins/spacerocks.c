@@ -2128,10 +2128,10 @@ enum plugin_status plugin_start(const void* parameter)
 #endif
     /* universal font */
     rb->lcd_setfont(FONT_SYSFIXED);
-#ifdef HAVE_BACKLIGHT
+
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     highscore_load(SCORE_FILE, highscores, NUM_SCORES);
     rb->srand(*rb->current_tick);
 
@@ -2143,10 +2143,9 @@ enum plugin_status plugin_start(const void* parameter)
 
     rb->lcd_setfont(FONT_UI);
     highscore_save(SCORE_FILE, highscores, NUM_SCORES);
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
 
     return ret;
 }

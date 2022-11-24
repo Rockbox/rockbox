@@ -103,9 +103,8 @@ enum plugin_status plugin_start(const void* parameter)
     int current_brightness = MAX_BRIGHTNESS_SETTING;
     backlight_brightness_set(MAX_BRIGHTNESS_SETTING);
 #endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+
     buttonlight_brightness_set(MAX_BRIGHTNESS_SETTING);
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #ifdef HAVE_LCD_INVERT
 #ifdef HAVE_NEGATIVE_LCD
@@ -116,9 +115,8 @@ enum plugin_status plugin_start(const void* parameter)
 #endif /* HAVE_LCD_INVERT */
 
     backlight_force_on();
-#ifdef HAVE_BUTTON_LIGHT
     buttonlight_force_on();
-#endif /* HAVE_BUTTON_LIGHT */
+
 
     rb->lcd_clear_display();
     rb->lcd_update();
@@ -207,20 +205,17 @@ enum plugin_status plugin_start(const void* parameter)
 
     /* restore */
     backlight_use_settings();
-#ifdef HAVE_BUTTON_LIGHT
+
     buttonlight_use_settings();
-#endif /* HAVE_BUTTON_LIGHT */
 
 #ifdef HAVE_LCD_INVERT
     rb->lcd_set_invert_display(rb->global_settings->invert);
 #endif /* HAVE_LCD_INVERT */
 
-#ifdef HAVE_BACKLIGHT_BRIGHTNESS
+
     backlight_brightness_use_setting();
-#endif /* HAVE_BACKLIGHT_BRIGHTNESS */
-#ifdef HAVE_BUTTONLIGHT_BRIGHTNESS
+
     buttonlight_brightness_use_setting();
-#endif /* HAVE_BUTTONLIGHT_BRIGHTNESS */
 
 #if LCD_DEPTH > 1
     rb->lcd_set_background(bg_color);

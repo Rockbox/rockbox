@@ -3493,10 +3493,9 @@ static void cleanup(void)
     rb->cpu_boost(false);
 #endif
     end_pf_thread();
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
 
 #ifdef USEGSLIB
     grey_release();

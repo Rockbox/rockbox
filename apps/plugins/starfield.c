@@ -324,14 +324,14 @@ enum plugin_status plugin_start(const void* parameter)
     int ret;
 
     (void)parameter;
-#ifdef HAVE_BACKLIGHT
+
     /* Turn off backlight timeout */
     backlight_ignore_timeout();
-#endif
+
     ret = plugin_main();
-#ifdef HAVE_BACKLIGHT
+
     /* Turn on backlight timeout (revert to settings) */
     backlight_use_settings();
-#endif
+
     return ret;
 }
