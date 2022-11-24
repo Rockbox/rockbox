@@ -225,8 +225,9 @@ bool logfdump(void)
     logfenabled = false;
 
 #if CONFIG_RTC
+    char fname[MAX_PATH];
     struct tm *nowtm = get_time();
-    fd = open_pathfmt(O_CREAT|O_WRONLY|O_TRUNC,
+    fd = open_pathfmt(fname, sizeof(fname), O_CREAT|O_WRONLY|O_TRUNC,
              "%s/logf_%04d%02d%02d%02d%02d%02d.txt", ROCKBOX_DIR,
              nowtm->tm_year + 1900, nowtm->tm_mon + 1, nowtm->tm_mday,
              nowtm->tm_hour, nowtm->tm_min, nowtm->tm_sec);

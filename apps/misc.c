@@ -1419,12 +1419,11 @@ int string_option(const char *option, const char *const oplist[], bool ignore_ca
 }
 
 /* open but with a builtin printf for assembling the path */
-int open_pathfmt(int oflag, const char *pathfmt, ...)
+int open_pathfmt(char *buf, size_t size, int oflag, const char *pathfmt, ...)
 {
-    static char buf[MAX_PATH];
     va_list ap;
     va_start(ap, pathfmt);
-    vsnprintf(buf, sizeof(buf), pathfmt, ap);
+    vsnprintf(buf, size, pathfmt, ap);
     va_end(ap);
     return open(buf, oflag, 0666);
 }

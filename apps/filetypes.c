@@ -325,8 +325,8 @@ void read_color_theme_file(void) {
     if (!global_settings.colors_file[0] || global_settings.colors_file[0] == '-')
         return;
 
-    fd = open_pathfmt(O_RDONLY, THEME_DIR "/%s.colours",
-                                            global_settings.colors_file);
+    fd = open_pathfmt(buffer, sizeof(buffer), O_RDONLY,
+                      THEME_DIR "/%s.colours", global_settings.colors_file);
     if (fd < 0)
         return;
     while (read_line(fd, buffer, MAX_PATH) > 0)
@@ -365,10 +365,11 @@ void read_viewer_theme_file(void)
         custom_filetype_icons[i] = filetypes[i].icon;
     }
 
-    fd = open_pathfmt(O_RDONLY, "%s/%s.icons", ICON_DIR,
-                                global_settings.viewers_icon_file);
+    fd = open_pathfmt(buffer, sizeof(buffer), O_RDONLY,
+                      ICON_DIR "/%s.icons", global_settings.viewers_icon_file);
     if (fd < 0)
         return;
+
     while (read_line(fd, buffer, MAX_PATH) > 0)
     {
         if (!settings_parseline(buffer, &ext, &icon))

@@ -423,11 +423,13 @@ static int open_tag_fd(struct tagcache_header *hdr, int tag, bool write)
 {
     int fd;
     int rc;
+    char fname[MAX_PATH];
 
     if (TAGCACHE_IS_NUMERIC(tag) || tag < 0 || tag >= TAG_COUNT)
         return -1;
 
-    fd = open_pathfmt(write ? O_RDWR : O_RDONLY, TAGCACHE_FILE_INDEX, tag);
+    fd = open_pathfmt(fname, sizeof(fname),
+                      write ? O_RDWR : O_RDONLY, TAGCACHE_FILE_INDEX, tag);
 
     if (fd < 0)
     {
@@ -803,7 +805,9 @@ static bool open_files(struct tagcache_search *tcs, int tag)
 {
     if (tcs->idxfd[tag] < 0)
     {
-        tcs->idxfd[tag] = open_pathfmt(O_RDONLY, TAGCACHE_FILE_INDEX, tag);
+        char fname[MAX_PATH];
+        tcs->idxfd[tag] = open_pathfmt(fname, sizeof(fname),
+                                       O_RDONLY, TAGCACHE_FILE_INDEX, tag);
     }
 
     if (tcs->idxfd[tag] < 0)
@@ -1583,9 +1587,10 @@ bool tagcache_search_add_clause(struct tagcache_search *tcs,
         }
 
         if (!TAGCACHE_IS_NUMERIC(clause->tag) && tcs->idxfd[clause->tag] < 0)
-        {   
-            tcs->idxfd[clause->tag] = open_pathfmt(O_RDONLY,
-                                              TAGCACHE_FILE_INDEX, clause->tag);
+        {
+            char fname[MAX_PATH];
+            tcs->idxfd[clause->tag] = open_pathfmt(fname, sizeof(fname), O_RDONLY,
+                                                 TAGCACHE_FILE_INDEX, clause->tag);
         }
     }
 
@@ -2743,7 +2748,7 @@ static int build_index(int index_type, struct tagcache_header *h, int tmpfd)
          * Creating new index file to store the tags. No need to preload
          * anything whether the index type is sorted or not.
          */
-        fd = open_pathfmt(O_WRONLY | O_CREAT | O_TRUNC,
+        fd = open_pathfmt(buf, bufsz, O_WRONLY | O_CREAT | O_TRUNC,
                           TAGCACHE_FILE_INDEX, index_type);
         if (fd < 0)
         {
@@ -4401,7 +4406,7 @@ static bool check_deleted_files(void)
 
     logf("reverse scan...");
 
-    fd = open_pathfmt(O_RDONLY, TAGCACHE_FILE_INDEX, tag_filename);
+    fd = open_pathfmt(buf, bufsz, O_RDONLY, TAGCACHE_FILE_INDEX, tag_filename);
     if (fd < 0)
     {
         logf(TAGCACHE_FILE_INDEX " open fail", tag_filename);

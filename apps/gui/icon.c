@@ -182,7 +182,9 @@ static void load_icons(const char* filename, enum Iconset iconset,
     ic->handle = 0;
     if (filename[0] && filename[0] != '-')
     {
-        fd = open_pathfmt(O_RDONLY, ICON_DIR "/%s.bmp", filename);
+        char fname[MAX_PATH];
+        fd = open_pathfmt(fname, sizeof(fname), O_RDONLY,
+                          ICON_DIR "/%s.bmp", filename);
         if (fd < 0)
             return;
         buf_size = read_bmp_fd(fd, &ic->bmp, 0,
