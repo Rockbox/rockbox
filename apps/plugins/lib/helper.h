@@ -23,6 +23,16 @@
 
 #include "plugin.h"
 
+#ifndef MAX_BRIGHTNESS_SETTING
+#define MAX_BRIGHTNESS_SETTING 0
+#endif
+#ifndef MIN_BRIGHTNESS_SETTING
+#define MIN_BRIGHTNESS_SETTING 0
+#endif
+#ifndef DEFAULT_BRIGHTNESS_SETTING
+#define DEFAULT_BRIGHTNESS_SETTING 0
+#endif
+
 int talk_val(long n, int unit, bool enqueue);
 
 /**
