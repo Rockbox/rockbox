@@ -1133,6 +1133,14 @@ int read_line(int fd, char* buffer, int buffer_size)
     return rdbufend >= 0 ? num_read : -1;
 }
 
+int confirm_delete_yesno(const char *name)
+{
+    const char *lines[] = { ID2P(LANG_REALLY_DELETE), name };
+    const char *yes_lines[] = { ID2P(LANG_DELETING), name };
+    const struct text_message message = { lines, 2 };
+    const struct text_message yes_message = { yes_lines, 2 };
+    return gui_syncyesno_run(&message, &yes_message, NULL);
+}
 
 char* skip_whitespace(char* const str)
 {

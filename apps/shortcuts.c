@@ -454,7 +454,7 @@ static int shortcut_menu_get_action(int action, struct gui_synclist *lists)
     {
         int selection = gui_synclist_get_sel_pos(lists);
 
-        if (!yesno_pop(ID2P(LANG_REALLY_DELETE)))
+        if (confirm_delete_yesno("") != YESNO_YES)
         {
             gui_synclist_set_title(lists, lists->title, lists->title_icon);
             return ACTION_REDRAW;

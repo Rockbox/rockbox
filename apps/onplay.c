@@ -63,6 +63,7 @@
 #include "viewport.h"
 #include "pathfuncs.h"
 #include "shortcuts.h"
+#include "misc.h"
 
 static int context;
 static const char *selected_file = NULL;
@@ -898,15 +899,6 @@ static int confirm_overwrite(void)
     return gui_syncyesno_run(&message, NULL, NULL);
 }
 
-static int confirm_delete(const char *file)
-{
-    const char *lines[] = { ID2P(LANG_REALLY_DELETE), file };
-    const char *yes_lines[] = { ID2P(LANG_DELETING), file };
-    const struct text_message message = { lines, 2 };
-    const struct text_message yes_message = { yes_lines, 2 };
-    return gui_syncyesno_run(&message, &yes_message, NULL);
-}
-
 static bool check_new_name(const char *basename)
 {
     /* at least prevent escapes out of the base directory from keyboard-
@@ -1001,7 +993,7 @@ static int delete_file_dir(void)
 {
     const char *to_delete=selected_file;
     const int   to_delete_attr=selected_file_attr;
-    if (confirm_delete(to_delete) != YESNO_YES) {
+    if (confirm_delete_yesno(to_delete) != YESNO_YES) {
         return 1;
     }
 

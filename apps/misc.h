@@ -143,6 +143,8 @@ void setvol(void);
 int hex_to_rgb(const char* hex, int* color);
 #endif
 
+int confirm_delete_yesno(const char *name);
+
 char* strrsplt(char* str, int c);
 char* skip_whitespace(char* const str);
 
