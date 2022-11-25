@@ -122,6 +122,9 @@ extern int show_logo(void);
 #define BOM_UTF_16_SIZE 2
 
 int split_string(char *str, const char needle, char *vector[], int vector_length);
+#ifndef O_PATH
+#define O_PATH 0x2000
+#endif
 int open_pathfmt(char *buf, size_t size, int oflag, const char *pathfmt, ...);
 int open_utf8(const char* pathname, int flags);
 int string_option(const char *option, const char *const oplist[], bool ignore_case);

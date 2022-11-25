@@ -78,15 +78,12 @@ static struct {
     int  speed;
 } bm;
 
-#define TEMP_BUF_SIZE (MAX_PATH + 1)
+/* Temp buffer used for reading and filename creation */
+#define TEMP_BUF_SIZE (MAX(MAX_BOOKMARK_SIZE, MAX_PATH + 1))
 static char global_temp_buffer[TEMP_BUF_SIZE];
-/* File name created by generate_bookmark_file_name */
-static char global_bookmark_file_name[MAX_PATH];
-static char global_read_buffer[MAX_BOOKMARK_SIZE];
+
 /* Bookmark created by create_bookmark*/
 static char global_bookmark[MAX_BOOKMARK_SIZE];
-/* Filename from parsed bookmark (can be made local where needed) */
-static char global_filename[MAX_PATH];
 
 static const char* skip_token(const char* s)
 {
@@ -138,7 +135,9 @@ static bool get_playlist_and_track(const char *bookmark,
 /* the filename tokens are to be extracted.                                */
 /* Returns true on successful bookmark parse.                              */
 /* ----------------------------------------------------------------------- */
-static bool parse_bookmark(const char *bookmark,
+static bool parse_bookmark(char *filenamebuf,
+                           size_t filenamebufsz,
+                           const char *bookmark,
                            const bool parse_filenames,
                            const bool strip_dir)
 {
@@ -201,11 +200,26 @@ static bool parse_bookmark(const char *bookmark,
                     end++;
                 }
             }
-            strmemccpy(global_filename, end, MAX_PATH);
+            if(filenamebuf)
+                strmemccpy(filenamebuf, end, filenamebufsz);
         }
      }
 
     return true;
+}
+
+/* ------------------------------------------------------------------------- */
+/* This function takes a filename and appends .tmp. This function also opens */
+/* the resulting file based on oflags, filename will be in buf on return     */
+/* Returns file descriptor                                                   */
+/* --------------------------------------------------------------------------*/
+static int open_temp_bookmark(char *buf,
+                              size_t bufsz,
+                              int oflags,
+                              const char* filename)
+{
+    /* Opening up a temp bookmark file */
+    return open_pathfmt(buf, bufsz, oflags, "%s.tmp", filename);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -228,8 +242,11 @@ static bool add_bookmark(const char* bookmark_file_name,
     bool   equal;
 
     /* Opening up a temp bookmark file */
-    temp_bookmark_file = open_pathfmt(global_temp_buffer, sizeof(global_temp_buffer),
-                         O_WRONLY | O_CREAT | O_TRUNC, "%s.tmp", bookmark_file_name);
+    temp_bookmark_file = open_temp_bookmark(global_temp_buffer,
+                                            sizeof(global_temp_buffer),
+                                            O_WRONLY | O_CREAT | O_TRUNC,
+                                            bookmark_file_name);
+
     if (temp_bookmark_file < 0)
         return false; /* can't open the temp file */
 
@@ -254,25 +271,27 @@ static bool add_bookmark(const char* bookmark_file_name,
     bookmark_file = open(bookmark_file_name, O_RDONLY);
     if (bookmark_file >= 0)
     {
-        while (read_line(bookmark_file, global_read_buffer,
-                         sizeof(global_read_buffer)) > 0)
+        while (read_line(bookmark_file, global_temp_buffer,
+                         sizeof(global_temp_buffer)) > 0)
         {
             /* The MRB has a max of MAX_BOOKMARKS in it */
             /* This keeps it from getting too large */
             if (most_recent && (bookmark_count >= MAX_BOOKMARKS))
                 break;
 
-            if (!parse_bookmark(global_read_buffer, false, false))
+            if (!parse_bookmark(NULL, 0, global_temp_buffer, false, false))
                 break;
 
             equal = false;
             if (comp_playlist)
             {
-                if (get_playlist_and_track(global_read_buffer, &bm_pl_start,
+                if (get_playlist_and_track(global_temp_buffer, &bm_pl_start,
                         &bm_pl_end, &bm_track))
                 {
                     bm_pl_len = bm_pl_end - bm_pl_start;
-                    equal = (pl_len == bm_pl_len) && !strncmp(pl_start, bm_pl_start, pl_len);
+                    equal = (pl_len == bm_pl_len) &&
+                            !strncmp(pl_start, bm_pl_start, pl_len);
+
                     if (equal && comp_track)
                         equal = !strcmp(track, bm_track);
                 }
@@ -280,8 +299,8 @@ static bool add_bookmark(const char* bookmark_file_name,
             if (!equal)
             {
                 bookmark_count++;
-                write(temp_bookmark_file, global_read_buffer,
-                      strlen(global_read_buffer));
+                write(temp_bookmark_file, global_temp_buffer,
+                      strlen(global_temp_buffer));
                 write(temp_bookmark_file, "\n", 1);
             }
         }
@@ -289,6 +308,11 @@ static bool add_bookmark(const char* bookmark_file_name,
     }
     close(temp_bookmark_file);
 
+    /* only retrieve the path*/
+    open_temp_bookmark(global_temp_buffer,
+                       sizeof(global_temp_buffer),
+                       O_PATH,
+                       bookmark_file_name);
     remove(bookmark_file_name);
     rename(global_temp_buffer, bookmark_file_name);
 
@@ -303,37 +327,39 @@ static bool add_bookmark(const char* bookmark_file_name,
 /* could be placed.                                                        */
 /* Returns true if the file name is generated, false if it was too long    */
 /* ----------------------------------------------------------------------- */
-static bool generate_bookmark_file_name(const char *in)
+static bool generate_bookmark_file_name(char *filenamebuf,
+                                        size_t filenamebufsz,
+                                        const char *bmarknamein)
 {
     /* if this is a root dir MP3, rename the bookmark file root_dir.bmark */
-    /* otherwise, name it based on the in variable */
-    if (!strcmp("/", in))
-        strcpy(global_bookmark_file_name, "/root_dir.bmark");
+    /* otherwise, name it based on the bmarknamein variable */
+    if (!strcmp("/", bmarknamein))
+        strmemccpy(filenamebuf, "/root_dir.bmark", filenamebufsz);
     else
     {
 #ifdef HAVE_MULTIVOLUME
         /* The "root" of an extra volume need special handling too. */
         const char *filename;
-        path_strip_volume(in, &filename, true);
+        path_strip_volume(bmarknamein, &filename, true);
         bool volume_root = *filename == '\0';
 #endif
-        size_t len = strlcpy(global_bookmark_file_name, in, MAX_PATH);
-        if(len >= MAX_PATH)
+        size_t len = strlcpy(filenamebuf, bmarknamein, filenamebufsz);
+        if(len >= filenamebufsz)
             return false;
 
-        if(global_bookmark_file_name[len-1] == '/') {
-            global_bookmark_file_name[len-1] = '\0';
+        if(filenamebuf[len-1] == '/') {
+            filenamebuf[len-1] = '\0';
             len--;
         }
 
 #ifdef HAVE_MULTIVOLUME
         if (volume_root)
-            len = strlcat(global_bookmark_file_name, "/volume_dir.bmark", MAX_PATH);
+            len = strlcat(filenamebuf, "/volume_dir.bmark", filenamebufsz);
         else
 #endif
-            len = strlcat(global_bookmark_file_name, ".bmark", MAX_PATH);
+            len = strlcat(filenamebuf, ".bmark", filenamebufsz);
 
-        if(len >= MAX_PATH)
+        if(len >= filenamebufsz)
             return false;
     }
 
@@ -348,11 +374,12 @@ static bool generate_bookmark_file_name(const char *in)
 /* resume_file*milliseconds*MP3 Title*                                     */
 /* Returns true on successful bookmark write.                              */
 /* Returns false if any part of the bookmarking process fails.  It is      */
-/* possible that a bookmark is successfully added to the most recent        */
+/* possible that a bookmark is successfully added to the most recent       */
 /* bookmark list but fails to be added to the bookmark file or vice versa. */
 /* ------------------------------------------------------------------------*/
 static bool write_bookmark(bool create_bookmark_file, const char *bookmark)
 {
+    char bm_filename[MAX_PATH];
     bool ret=true;
 
     if (!bookmark)
@@ -370,9 +397,11 @@ static bool write_bookmark(bool create_bookmark_file, const char *bookmark)
         {
             char* name = playlist_get_name(NULL, global_temp_buffer,
                                        sizeof(global_temp_buffer));
-            if (generate_bookmark_file_name(name))
+
+            if (generate_bookmark_file_name(bm_filename,
+                                            sizeof(bm_filename), name))
             {
-                ret = ret & add_bookmark(global_bookmark_file_name, bookmark, false);
+                ret = ret & add_bookmark(bm_filename, bookmark, false);
             }
             else
             {
@@ -395,7 +424,7 @@ static int get_bookmark_count(const char* bookmark_file_name)
     if(file < 0)
         return -1;
 
-    while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
+    while(read_line(file, global_temp_buffer, sizeof(global_temp_buffer)) > 0)
     {
         read_count++;
     }
@@ -426,13 +455,13 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
     bookmarks->count = 0;
     bookmarks->reload = false;
 
-    while(read_line(file, global_read_buffer, sizeof(global_read_buffer)) > 0)
+    while(read_line(file, global_temp_buffer, sizeof(global_temp_buffer)) > 0)
     {
         read_count++;
 
         if (read_count >= first_line)
         {
-            dest -= strlen(global_read_buffer) + 1;
+            dest -= strlen(global_temp_buffer) + 1;
 
             if (dest < ((char*) bookmarks) + sizeof(*bookmarks)
                 + (sizeof(char*) * (bookmarks->count + 1)))
@@ -440,7 +469,7 @@ static int buffer_bookmarks(struct bookmark_list* bookmarks, int first_line)
                 break;
             }
 
-            strcpy(dest, global_read_buffer);
+            strcpy(dest, global_temp_buffer);
             bookmarks->items[bookmarks->count] = dest;
             bookmarks->count++;
         }
@@ -455,6 +484,7 @@ static const char* get_bookmark_info(int list_index,
                                      char *buffer,
                                      size_t buffer_len)
 {
+    char fnamebuf[MAX_PATH];
     struct bookmark_list* bookmarks = (struct bookmark_list*) data;
     int     index = list_index / 2;
 
@@ -510,7 +540,8 @@ static const char* get_bookmark_info(int list_index,
         }
     }
 
-    if (!parse_bookmark(bookmarks->items[index - bookmarks->start], true, true))
+    if (!parse_bookmark(fnamebuf, sizeof(fnamebuf),
+                        bookmarks->items[index - bookmarks->start], true, true))
     {
         return list_index % 2 == 0 ? (char*) str(LANG_BOOKMARK_INVALID) : " ";
     }
@@ -544,12 +575,12 @@ static const char* get_bookmark_info(int list_index,
         }
         else
         {
-            name = global_filename;
+            name = fnamebuf;
             format = "%s";
         }
 
-        strrsplt(global_filename, '.');
-        snprintf(buffer, buffer_len, format, name, global_filename);
+        strrsplt(fnamebuf, '.');
+        snprintf(buffer, buffer_len, format, name, fnamebuf);
         return buffer;
     }
     else
@@ -570,7 +601,8 @@ static void say_bookmark(const char* bookmark,
                          int bookmark_id,
                          bool show_playlist_name)
 {
-    if (!parse_bookmark(bookmark, true, false))
+    char fnamebuf[MAX_PATH];
+    if (!parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, true, false))
     {
         talk_id(LANG_BOOKMARK_INVALID, false);
         return;
@@ -604,7 +636,7 @@ static void say_bookmark(const char* bookmark,
     /* Track filename */
     if(!is_dir)
         global_temp_buffer[0] = 0;
-    talk_file_or_spell(global_temp_buffer, global_filename,
+    talk_file_or_spell(global_temp_buffer, fnamebuf,
                        TALK_IDARRAY(VOICE_FILE), true);
 }
 
@@ -636,8 +668,10 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
     int bookmark_count = 0;
 
     /* Opening up a temp bookmark file */
-    temp_bookmark_file = open_pathfmt(global_temp_buffer, sizeof(global_temp_buffer),
-                         O_WRONLY | O_CREAT | O_TRUNC, "%s.tmp", bookmark_file_name);
+    temp_bookmark_file = open_temp_bookmark(global_temp_buffer,
+                                            sizeof(global_temp_buffer),
+                                            O_WRONLY | O_CREAT | O_TRUNC,
+                                            bookmark_file_name);
 
     if (temp_bookmark_file < 0)
         return false; /* can't open the temp file */
@@ -646,13 +680,13 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
     bookmark_file = open(bookmark_file_name, O_RDONLY);
     if (bookmark_file >= 0)
     {
-        while (read_line(bookmark_file, global_read_buffer,
-                         sizeof(global_read_buffer)) > 0)
+        while (read_line(bookmark_file, global_temp_buffer,
+                         sizeof(global_temp_buffer)) > 0)
         {
             if (bookmark_id != bookmark_count)
             {
-                write(temp_bookmark_file, global_read_buffer,
-                      strlen(global_read_buffer));
+                write(temp_bookmark_file, global_temp_buffer,
+                      strlen(global_temp_buffer));
                 write(temp_bookmark_file, "\n", 1);
             }
             bookmark_count++;
@@ -660,6 +694,12 @@ static bool delete_bookmark(const char* bookmark_file_name, int bookmark_id)
         close(bookmark_file);
     }
     close(temp_bookmark_file);
+
+    /* only retrieve the path*/
+    open_temp_bookmark(global_temp_buffer,
+                       sizeof(global_temp_buffer),
+                       O_PATH,
+                       bookmark_file_name);
 
     remove(bookmark_file_name);
     rename(global_temp_buffer, bookmark_file_name);
@@ -695,8 +735,11 @@ static int select_bookmark(const char* bookmark_file_name,
     bookmarks->filename = bookmark_file_name;
     bookmarks->start = 0;
     bookmarks->show_playlist_name
-        = strcmp(bookmark_file_name, RECENT_BOOKMARK_FILE) == 0;
-    gui_synclist_init(&list, &get_bookmark_info, (void*) bookmarks, false, 2, NULL);
+        = (strcmp(bookmark_file_name, RECENT_BOOKMARK_FILE) == 0);
+
+    gui_synclist_init(&list, &get_bookmark_info,
+                      (void*) bookmarks, false, 2, NULL);
+
     if(global_settings.talk_menu)
         gui_synclist_set_voice_callback(&list, bookmark_list_voice_cb);
     gui_synclist_set_title(&list, str(LANG_BOOKMARK_SELECT_BOOKMARK),
@@ -831,13 +874,14 @@ static int select_bookmark(const char* bookmark_file_name,
 /* ------------------------------------------------------------------------*/
 static bool play_bookmark(const char* bookmark)
 {
+    char fnamebuf[MAX_PATH];
 #if defined(HAVE_PITCHCONTROL)
     /* preset pitch and speed to 100% in case bookmark doesn't have info */
     bm.pitch = sound_get_pitch();
     bm.speed = dsp_get_timestretch();
 #endif
 
-    if (parse_bookmark(bookmark, true, true))
+    if (parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, true, true))
     {
         global_settings.repeat_mode = bm.repeat_mode;
         global_settings.playlist_shuffle = bm.shuffle;
@@ -848,7 +892,7 @@ static bool play_bookmark(const char* bookmark)
         if (!warn_on_pl_erase())
             return false;
         return bookmark_play(global_temp_buffer, bm.resume_index,
-            bm.resume_time, bm.resume_offset, bm.resume_seed, global_filename);
+            bm.resume_time, bm.resume_offset, bm.resume_seed, fnamebuf);
     }
 
     return false;
@@ -924,7 +968,7 @@ static char* create_bookmark(void)
              file);
 
     /* checking to see if the bookmark is valid */
-    if (parse_bookmark(global_bookmark, false, false))
+    if (parse_bookmark(NULL, 0, global_bookmark, false, false))
         return global_bookmark;
     else
         return NULL;
@@ -958,6 +1002,7 @@ bool bookmark_create_menu(void)
 /* ----------------------------------------------------------------------- */
 int bookmark_load_menu(void)
 {
+    char bm_filename[MAX_PATH];
     char* bookmark;
     int ret = BOOKMARK_FAIL;
 
@@ -965,9 +1010,9 @@ int bookmark_load_menu(void)
 
     char* name = playlist_get_name(NULL, global_temp_buffer,
                                        sizeof(global_temp_buffer));
-    if (generate_bookmark_file_name(name))
+    if (generate_bookmark_file_name(bm_filename, sizeof(bm_filename), name))
     {
-        ret = select_bookmark(global_bookmark_file_name, false, &bookmark);
+        ret = select_bookmark(bm_filename, false, &bookmark);
         if (bookmark != NULL)
         {
             ret = play_bookmark(bookmark) ? BOOKMARK_SUCCESS : BOOKMARK_FAIL;
@@ -1053,28 +1098,29 @@ bool bookmark_autobookmark(bool prompt_ok)
 /* ------------------------------------------------------------------------*/
 int bookmark_autoload(const char* file)
 {
+    char bm_filename[MAX_PATH];
     char* bookmark;
 
     if(global_settings.autoloadbookmark == BOOKMARK_NO)
         return BOOKMARK_DONT_RESUME;
 
     /*Checking to see if a bookmark file exists.*/
-    if(!generate_bookmark_file_name(file))
+    if(!generate_bookmark_file_name(bm_filename, sizeof(bm_filename), file))
     {
         return BOOKMARK_DONT_RESUME;
     }
 
-    if(!file_exists(global_bookmark_file_name))
+    if(!file_exists(bm_filename))
         return BOOKMARK_DONT_RESUME;
 
     if(global_settings.autoloadbookmark == BOOKMARK_YES)
     {
-        return bookmark_load(global_bookmark_file_name, true) ? BOOKMARK_DO_RESUME :
-                                                                BOOKMARK_DONT_RESUME;
+        return (bookmark_load(bm_filename, true)
+                ? BOOKMARK_DO_RESUME : BOOKMARK_DONT_RESUME);
     }
     else
     {
-        int ret = select_bookmark(global_bookmark_file_name, true, &bookmark);
+        int ret = select_bookmark(bm_filename, true, &bookmark);
 
         if (bookmark != NULL)
         {
@@ -1090,7 +1136,7 @@ int bookmark_autoload(const char* file)
             return BOOKMARK_DO_RESUME;
         }
 
-        return ret != BOOKMARK_SUCCESS ? BOOKMARK_CANCEL : BOOKMARK_DONT_RESUME;
+        return ret != (BOOKMARK_SUCCESS ? BOOKMARK_CANCEL : BOOKMARK_DONT_RESUME);
     }
 }
 
@@ -1109,8 +1155,8 @@ bool bookmark_load(const char* file, bool autoload)
         fd = open(file, O_RDONLY);
         if(fd >= 0)
         {
-            if(read_line(fd, global_read_buffer, sizeof(global_read_buffer)) > 0)
-                bookmark=global_read_buffer;
+            if(read_line(fd, global_temp_buffer, sizeof(global_temp_buffer)) > 0)
+                bookmark=global_temp_buffer;
             close(fd);
         }
     }
@@ -1143,13 +1189,14 @@ bool bookmark_load(const char* file, bool autoload)
 /* ----------------------------------------------------------------------- */
 bool bookmark_exists(void)
 {
+    char bm_filename[MAX_PATH];
     bool exist=false;
 
     char* name = playlist_get_name(NULL, global_temp_buffer,
                                    sizeof(global_temp_buffer));
-    if (generate_bookmark_file_name(name))
+    if (generate_bookmark_file_name(bm_filename, sizeof(bm_filename), name))
     {
-        exist = file_exists(global_bookmark_file_name);
+        exist = file_exists(bm_filename);
     }
     return exist;
 }

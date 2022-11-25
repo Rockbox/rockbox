@@ -1425,6 +1425,8 @@ int open_pathfmt(char *buf, size_t size, int oflag, const char *pathfmt, ...)
     va_start(ap, pathfmt);
     vsnprintf(buf, size, pathfmt, ap);
     va_end(ap);
+    if ((oflag & O_PATH) == O_PATH)
+        return -1;
     return open(buf, oflag, 0666);
 }
 
