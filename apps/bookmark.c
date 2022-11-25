@@ -131,14 +131,13 @@ static bool get_playlist_and_track(const char *bookmark,
 
 /* ----------------------------------------------------------------------- */
 /* This function takes a bookmark and parses it.  This function also       */
-/* validates the bookmark.  The parse_filenames flag indicates whether     */
+/* validates the bookmark.  Valid filenamebuf indicates whether            */
 /* the filename tokens are to be extracted.                                */
 /* Returns true on successful bookmark parse.                              */
 /* ----------------------------------------------------------------------- */
 static bool parse_bookmark(char *filenamebuf,
                            size_t filenamebufsz,
                            const char *bookmark,
-                           const bool parse_filenames,
                            const bool strip_dir)
 {
     const char* s = bookmark;
@@ -182,7 +181,7 @@ static bool parse_bookmark(char *filenamebuf,
     end = strchr(s, ';');
 
     /* extract file names */
-    if (parse_filenames)
+    if(filenamebuf)
     {
         size_t len = (end == NULL) ? strlen(s) : (size_t) (end - s);
         len = MIN(TEMP_BUF_SIZE - 1, len);
@@ -200,8 +199,7 @@ static bool parse_bookmark(char *filenamebuf,
                     end++;
                 }
             }
-            if(filenamebuf)
-                strmemccpy(filenamebuf, end, filenamebufsz);
+            strmemccpy(filenamebuf, end, filenamebufsz);
         }
      }
 
@@ -279,7 +277,7 @@ static bool add_bookmark(const char* bookmark_file_name,
             if (most_recent && (bookmark_count >= MAX_BOOKMARKS))
                 break;
 
-            if (!parse_bookmark(NULL, 0, global_temp_buffer, false, false))
+            if (!parse_bookmark(NULL, 0, global_temp_buffer, false))
                 break;
 
             equal = false;
@@ -541,7 +539,7 @@ static const char* get_bookmark_info(int list_index,
     }
 
     if (!parse_bookmark(fnamebuf, sizeof(fnamebuf),
-                        bookmarks->items[index - bookmarks->start], true, true))
+                        bookmarks->items[index - bookmarks->start], true))
     {
         return list_index % 2 == 0 ? (char*) str(LANG_BOOKMARK_INVALID) : " ";
     }
@@ -602,7 +600,7 @@ static void say_bookmark(const char* bookmark,
                          bool show_playlist_name)
 {
     char fnamebuf[MAX_PATH];
-    if (!parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, true, false))
+    if (!parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, false))
     {
         talk_id(LANG_BOOKMARK_INVALID, false);
         return;
@@ -881,7 +879,7 @@ static bool play_bookmark(const char* bookmark)
     bm.speed = dsp_get_timestretch();
 #endif
 
-    if (parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, true, true))
+    if (parse_bookmark(fnamebuf, sizeof(fnamebuf), bookmark, true))
     {
         global_settings.repeat_mode = bm.repeat_mode;
         global_settings.playlist_shuffle = bm.shuffle;
@@ -968,7 +966,7 @@ static char* create_bookmark(void)
              file);
 
     /* checking to see if the bookmark is valid */
-    if (parse_bookmark(NULL, 0, global_bookmark, false, false))
+    if (parse_bookmark(NULL, 0, global_bookmark, false))
         return global_bookmark;
     else
         return NULL;
