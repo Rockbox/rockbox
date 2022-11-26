@@ -189,6 +189,36 @@ struct gui_synclist
 #endif
 };
 
+#ifdef HAVE_TOUCHSCREEN
+#define LIST_KINETIC_FRACBITS 8
+
+struct list_kinetic_scroll_settings
+{
+    /* Coefficients for a polynomial a1*x + a0, in fixed point.
+     * x is the kinetic scroll speed in pixels/sec (always positive) */
+    long a0;
+    long a1;
+
+    /* Delay (in ticks) during which the acceleration is not applied. */
+    long delay;
+};
+
+/* Acceleration applied to the scroll velocity when a swipe occurs during
+ * kinetic scrolling. This is needed to counteract the deceleration term
+ * for high scrolling speeds, since the user can only input a low constant
+ * acceleration from swiping alone. Delay is ignored. */
+extern const struct list_kinetic_scroll_settings list_kinetic_scroll_accel_default;
+
+/* Deceleration applied to the scroll velocity during kinetic scrolling.
+ * The delay occurs right at the beginning of scrolling, eg. a delay of
+ * 1 second means deceleration starts 1 second after scrolling. */
+extern const struct list_kinetic_scroll_settings list_kinetic_scroll_decel_default;
+
+/* Deceleration applied during kinetic scrolling when the screen is
+ * pressed for longer than the delay interval (motion is not required).
+ * This is additive with list_kinetic_scroll_decel. */
+extern const struct list_kinetic_scroll_settings list_kinetic_scroll_press_default;
+#endif
 
 extern void list_init(void);
 

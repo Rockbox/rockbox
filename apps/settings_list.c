@@ -42,6 +42,7 @@
 #include "open_plugin.h"
 #include "misc.h"
 #include "playback.h"
+#include "fixedpoint.h"
 #ifdef HAVE_REMOTE_LCD
 #include "lcd-remote.h"
 #endif
@@ -949,6 +950,77 @@ static bool tsc_is_changed(void* setting, void* defaultval)
 static void tsc_set_default(void* setting, void* defaultval)
 {
     memcpy(setting, defaultval, sizeof(struct touchscreen_parameter));
+}
+
+static void list_kinetic_load_from_cfg(void *setting, char *value)
+{
+    struct list_kinetic_scroll_settings *param = setting;
+    long vals[4] = { 0, 0, 0 };
+    int count = 0;
+
+    while (*value && count < 3)
+    {
+        while (isspace (*value))
+            value++;
+
+        int num = atoi(value);
+        while (!isspace(*value))
+            value++;
+
+        if (count == 2)
+            /* delay in milliseconds */
+            vals[count] = HZ * num / 1000;
+        else
+        {
+            /* polynomial coefficients in 1/100th scale */
+            int sign = 1;
+            if (num < 0)
+            {
+                num = -num;
+                sign = -1;
+            }
+
+            int frac = num % 100;
+            num /= 100;
+
+            num <<= LIST_KINETIC_FRACBITS;
+            frac <<= LIST_KINETIC_FRACBITS;
+            vals[count] = num + fp_div(frac, 100, LIST_KINETIC_FRACBITS);
+            vals[count] *= sign;
+        }
+
+        count++;
+    }
+
+    param->a1 = vals[0];
+    param->a0 = vals[1];
+    param->delay = vals[2];
+}
+
+static char *list_kinetic_write_to_cfg(void *setting, char *buf, int buf_len)
+{
+    struct list_kinetic_scroll_settings *param = setting;
+    long vals[2] = { param->a1, param->a0 };
+
+    for (int i = 0; i < 2; ++i)
+    {
+        long num = vals[i] >> LIST_KINETIC_FRACBITS;
+        long frac = vals[i] - (num << LIST_KINETIC_FRACBITS);
+        vals[i] = (num * 100) + (frac * 100) / (1 << LIST_KINETIC_FRACBITS);
+    }
+
+    snprintf(buf, buf_len, "%ld %ld %ld",
+             vals[0], vals[1], 1000 * param->delay / HZ);
+    return buf;
+}
+
+static bool list_kinetic_is_default(void *setting, void *defaultval)
+{
+    return memcmp(setting, defaultval, sizeof(struct list_kinetic_scroll_settings)) != 0;
+}
+static void list_kinetic_set_default(void *setting, void *defaultval)
+{
+    memcpy(setting, defaultval, sizeof(struct list_kinetic_scroll_settings));
 }
 #endif
 
@@ -2353,6 +2425,18 @@ const struct settings_list settings[] = {
                     &default_calibration_parameters, "touchscreen calibration",
                     tsc_load_from_cfg, tsc_write_to_cfg,
                     tsc_is_changed, tsc_set_default),
+    CUSTOM_SETTING(0, kinetic_scroll_accel, -1,
+                   &list_kinetic_scroll_accel_default, "kinetic scroll accel",
+                   list_kinetic_load_from_cfg, list_kinetic_write_to_cfg,
+                   list_kinetic_is_default, list_kinetic_set_default),
+    CUSTOM_SETTING(0, kinetic_scroll_decel, -1,
+                   &list_kinetic_scroll_decel_default, "kinetic scroll decel",
+                   list_kinetic_load_from_cfg, list_kinetic_write_to_cfg,
+                   list_kinetic_is_default, list_kinetic_set_default),
+    CUSTOM_SETTING(0, kinetic_scroll_press, -1,
+                   &list_kinetic_scroll_press_default, "kinetic scroll press",
+                   list_kinetic_load_from_cfg, list_kinetic_write_to_cfg,
+                   list_kinetic_is_default, list_kinetic_set_default),
 #endif
     OFFON_SETTING(0, prevent_skip, LANG_PREVENT_SKIPPING, false, "prevent track skip", NULL),
     OFFON_SETTING(0, rewind_across_tracks, LANG_REWIND_ACROSS_TRACKS, false, "rewind across tracks", NULL),
