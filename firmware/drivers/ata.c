@@ -389,25 +389,28 @@ static ICODE_ATTR void copy_write_sectors(const unsigned char* buf,
 int ata_disk_isssd(void)
 {
     /*
-       offset 217 is "Nominal Rotation rate"
-       0x0000 == Not reported
-       0x0001 == Solid State
-       0x0401 -> 0xffe == RPM
-       All others reserved
+       Offset 217 is "Nominal Rotation rate"
+        0x0000 == Not reported
+        0x0001 == Solid State
+        0x0401 -> 0xffe == RPM
+        All others reserved
 
-       Some CF cards return 0x0100 (ie byteswapped 0x0001) so accept either.
+        Some CF cards return 0x0100 (ie byteswapped 0x0001) so accept either.
+        However, this is a relatively recent change, and we can't rely on it,
+        especially for the FC1307A CF->SD adapters!
 
-       However, this is a very recent change, and we can't rely on it,
-       especially for the FC1307A CF->SD adapters.
+       Offset 167 is "Nominal Form Factor"
+        all values >= 0x06 are guaranteed to be solid State.
 
-       So we have to resort to other heuristics.
+       Offset 83 b2 and/or 86 b2 is set to show device implementes CFA commands
 
-       offset 83 b2 is set to show device implementes CFA commands
-       offset 0 is 0x848a for CF, but that's not guaranteed, because reasons.
+       Offset 169 b0 is set to show device implements TRIM.
 
-       These don't guarantee this is an SSD but it's better than nothing.
+       Offset 0 is 0x848a for CF, but that's not guaranteed, because reasons.
      */
-    return (identify_info[83] & (1<<2) ||
+    return (identify_info[83] & (1<<2) || identify_info[86] & (1<<2) ||
+            (identify_info[168] & 0x0f) >= 0x06 ||
+            identify_info[169] & (1<<0) ||
             identify_info[217] == 0x0001 || identify_info[217] == 0x0100);
 }
 
