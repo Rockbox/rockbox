@@ -84,7 +84,7 @@ int rtc_write_datetime(const struct tm *tm)
  * Checks the PCF interrupt 1 register bit 7 to see if an alarm interrupt has
  * triggered since last we checked.
  */
-bool rtc_check_alarm_flag(void) 
+bool rtc_check_alarm_flag(void)
 {
     return pcf50605_read(0x02) & 0x80;
 }
@@ -125,9 +125,9 @@ bool rtc_check_alarm_started(bool release_alarm)
     static bool run_before = false, alarm_state;
     bool rc;
 
-    if (run_before) { 
+    if (run_before) {
         rc = alarm_state;
-        alarm_state &= ~release_alarm;
+        alarm_state &= !release_alarm;
     } else {
         char rt[3], at[3];
         /* The Ipod bootloader seems to read (and thus clear) the PCF interrupt
@@ -165,4 +165,3 @@ void rtc_get_alarm(int *h, int *m)
     *m = BCD2DEC(buf[0]);
     *h = BCD2DEC(buf[1]);
 }
-
