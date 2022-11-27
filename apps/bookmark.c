@@ -43,7 +43,7 @@
 #include "file.h"
 #include "pathfuncs.h"
 
-/*#define LOGF_ENABLE*/
+/* #define LOGF_ENABLE */
 #include "logf.h"
 
 #define MAX_BOOKMARKS 10
@@ -122,6 +122,7 @@ static bool bookmark_get_playlist_and_track(const char *bookmark,
                                             char **pl_end,
                                             char **track)
 {
+    logf("%s", __func__);
     *pl_start = strchr(bookmark,'/');
     if (!(*pl_start))
         return false;
@@ -217,6 +218,8 @@ static int open_temp_bookmark(char *buf,
                               int oflags,
                               const char* filename)
 {
+    if(filename[0] == '/')
+        filename++;
     /* Opening up a temp bookmark file */
     int fd  = open_pathfmt(buf, bufsz, oflags, "/%s.tmp", filename);
 #ifdef LOGF_ENABLE
@@ -348,8 +351,9 @@ static bool generate_bookmark_file_name(char *filenamebuf,
         strmemccpy(filenamebuf, "/root_dir.bmark", filenamebufsz);
     else
     {
+        filenamebufsz--; /* strlcpy considers the NULL so bmarknamelen is one off */
         size_t len = strlcpy(filenamebuf, bmarknamein,
-                             MIN(filenamebufsz, bmarknamelen));
+                             MIN(filenamebufsz, bmarknamelen) + 1);
         if(len >= filenamebufsz)
             return false;
 #ifdef HAVE_MULTIVOLUME
@@ -360,7 +364,6 @@ static bool generate_bookmark_file_name(char *filenamebuf,
 #endif
         if(filenamebuf[len-1] == '/') {
             filenamebuf[len-1] = '\0';
-            len--;
         }
 
         const char *name = ".bmark";
@@ -484,6 +487,7 @@ static char* create_bookmark(char **name, size_t *namelen)
 /* ------------------------------------------------------------------------*/
 static bool write_bookmark(bool create_bookmark_file)
 {
+    logf("%s", __func__);
     char bm_filename[MAX_PATH];
     bool ret=true;
 
@@ -1082,6 +1086,7 @@ bool bookmark_mrb_load()
 /* ----------------------------------------------------------------------- */
 bool bookmark_autobookmark(bool prompt_ok)
 {
+    logf("%s", __func__);
     bool update;
 
     if (!bookmark_is_bookmarkable_state())
@@ -1127,6 +1132,7 @@ bool bookmark_autobookmark(bool prompt_ok)
 /* ------------------------------------------------------------------------*/
 int bookmark_autoload(const char* file)
 {
+    logf("%s", __func__);
     char bm_filename[MAX_PATH];
     char* bookmark;
 
@@ -1176,6 +1182,7 @@ int bookmark_autoload(const char* file)
 /* ------------------------------------------------------------------------*/
 bool bookmark_load(const char* file, bool autoload)
 {
+    logf("%s", __func__);
     int  fd;
     char* bookmark = NULL;
 
